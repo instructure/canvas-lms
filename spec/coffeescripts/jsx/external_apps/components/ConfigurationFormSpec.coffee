@@ -29,7 +29,7 @@ define [
     ok true, 'handleSubmit called successfully'
 
   createElement = (data) ->
-    React.createElement(ConfigurationForm,{
+    React.createElement(ConfigurationForm, {
       configurationType: data.configurationType
       handleSubmit: data.handleSubmit
       tool: data.tool
@@ -116,3 +116,103 @@ define [
     nodes = getDOMNodes(data)
     ok nodes.configurationFormManual
     ok !nodes.configurationTypeSelector
+
+  test 'saves manual form with trimmed props', ->
+    handleSubmitSpy = sinon.spy()
+    data =
+      configurationType: 'manual'
+      handleSubmit: handleSubmitSpy
+      tool: {
+        name           : '  My App'
+        consumer_key   : 'key  '
+        shared_secret  : '  secret'
+        url            : '\u0009http://example.com  '
+        domain         : ''
+        privacy_level  : 'anonymous'
+        custom_fields  : { a: 1, b: 2, c: 3 }
+        description    : '\u0009My super awesome example app'
+      }
+      showConfigurationSelector: true
+    component = renderComponent(data)
+    e = {
+      type: 'click',
+      preventDefault: sinon.stub()
+    }
+    component.handleSubmit(e)
+    formData = handleSubmitSpy.getCall(0).args[1]
+    handleSubmitSpy.reset()
+    strictEqual formData.name, 'My App'
+    strictEqual formData.consumerKey, 'key'
+    strictEqual formData.sharedSecret, 'secret'
+    strictEqual formData.url, 'http://example.com'
+    strictEqual formData.domain, ''
+    strictEqual formData.description, 'My super awesome example app'
+
+  test 'saves url form with trimmed props', ->
+    handleSubmitSpy = sinon.spy()
+    data =
+      configurationType: 'url'
+      handleSubmit: handleSubmitSpy
+      tool: {
+        name           : '  My App'
+        consumer_key   : 'key  '
+        shared_secret  : '  secret'
+        config_url     : '\u0009http://example.com  '
+      }
+      showConfigurationSelector: true
+    component = renderComponent(data)
+    e = {
+      type: 'click',
+      preventDefault: sinon.stub()
+    }
+    component.handleSubmit(e)
+    formData = handleSubmitSpy.getCall(0).args[1]
+    handleSubmitSpy.reset()
+    strictEqual formData.name, 'My App'
+    strictEqual formData.consumerKey, 'key'
+    strictEqual formData.sharedSecret, 'secret'
+    strictEqual formData.configUrl, 'http://example.com'
+
+  test 'saves xml form with trimmed props', ->
+    handleSubmitSpy = sinon.spy()
+    data =
+      configurationType: 'xml'
+      handleSubmit: handleSubmitSpy
+      tool: {
+        name           : '  My App'
+        consumer_key   : 'key   '
+        shared_secret  : '   secret'
+        xml            : '\u0009 some xml  '
+      }
+      showConfigurationSelector: true
+    component = renderComponent(data)
+    e = {
+      type: 'click',
+      preventDefault: sinon.stub()
+    }
+    component.handleSubmit(e)
+    formData = handleSubmitSpy.getCall(0).args[1]
+    handleSubmitSpy.reset()
+    strictEqual formData.name, 'My App'
+    strictEqual formData.consumerKey, 'key'
+    strictEqual formData.sharedSecret, 'secret'
+    strictEqual formData.xml, 'some xml'
+
+  test 'saves lti2 form with trimmed props', ->
+    handleSubmitSpy = sinon.spy()
+    data =
+      configurationType: 'lti2'
+      handleSubmit: handleSubmitSpy
+      tool: {
+        registration_url: '\u0009https://lti-tool-provider-example..com/register '
+      }
+      showConfigurationSelector: true
+    component = renderComponent(data)
+    e = {
+      type: 'click',
+      preventDefault: sinon.stub()
+    }
+    component.handleSubmit(e)
+    formData = handleSubmitSpy.getCall(0).args[1]
+    handleSubmitSpy.reset()
+    strictEqual formData.registrationUrl, 'https://lti-tool-provider-example..com/register'
