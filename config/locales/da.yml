@@ -8538,11 +8538,11 @@ da:
   help_dialog: 
     Back: Tilbage
     Help: Hjælp
-    Submitting_Ticket: "Indsender billet ..."
+    Submitting_Ticket: "Indsender supportanmodning ..."
     canvas_help_sub: "Find svar på hyppige spørgsmål"
     description: Beskrivelse
     extreme_critical_emergency: "EKSTREMT KRITISK NØDSTILFÆLDE!!"
-    file_a_ticket_for_a_personal_response_from_our_support_team: "Indsend billet for et personligt svar fra vores supportteam"
+    file_a_ticket_for_a_personal_response_from_our_support_team: "Indsend supportanmodning for et personligt svar fra vores supportteam"
     for_an_instant_answer: "For øjeblikkeligt svar:"
     how_is_this_affecting_you: "Hvordan påvirker det dig?"
     i_cant_get_things_done_until_i_hear_back_from_you: "Jeg kan ikke gøre noget, før jeg hører fra dig"
@@ -8562,7 +8562,7 @@ da:
     sending: "Sender ..."
     somethings_broken_but_i_can_work_around_it_for_now: "Der er noget galt, men jeg kan omgå det lige nu"
     subject: Emne
-    submit_this_support_request: "Indsend billet"
+    submit_this_support_request: "Indsend supportanmodning"
     which_course_is_this_question_about: "Hvilket fag drejer dette spørgsmål sig om?"
     your_email_address: "Din e-mailadresse"
   help_menu_links_51184b65: Hjælpemenulinks
@@ -12781,9 +12781,9 @@ da:
         parallelism: "Antal jobprocessorer som bruges til at behandle SIS-importer i parallel"
         queue_for_parallel_jobs: "Jobkø som bruges til parallelle jobs (tom for standard)"
     ticketing_system_settings: 
-      description: "Konfiguration af billetteringssystem"
+      description: "Konfiguration af supportanmodning system"
       labels: 
-        type: "Systemtype for billettering"
+        type: "Systemtype for supportanmodning"
     twitter: 
       description: Twitter-notifikationer
     twitter_settings: 
@@ -16762,7 +16762,7 @@ da:
   submit_assignment_5799b4e3: "Indsend opgave"
   submit_comment_commenttext_8e5638d7: "Tilføj kommentar: %{commentText}"
   submit_media_file_f334c1ba: "Indsend mediefil"
-  submit_ticket_5515ffd: "Indsend billet"
+  submit_ticket_5515ffd: "Indsend supportanmodning"
   submitted_at_4d5ea3aa: Afleveret
   submitted_datetime_fa2e9287: "Indsendt: %{dateTime}"
   submitted_files_82dd3009: "Indsendte filer"
@@ -17147,9 +17147,9 @@ da:
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Dette giver dig mulighed for at godkende Canvas til at lægge karakterer ud på SIS"
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: "Dette vil gøre disse ændringer gældende for hele din konto. Vi du fortsætte?"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "Dette vil anvende dette tema for hele din konto. Ønsker du at fortsætte?"
-  ticket_successfully_submitted_f6254460: "Billet indsendt."
-  ticketing_system_52205bff: Billetteringssystem
-  ticketing_system_configurations_c4fecd96: "Konfigurationer af billetteringssystem"
+  ticket_successfully_submitted_f6254460: "Supportanmodning indsendt."
+  ticketing_system_52205bff: "Supportanmodning system"
+  ticketing_system_configurations_c4fecd96: "Konfigurationer af supportanmodning system"
   time: 
     am: am
     count_hours_ago: 
