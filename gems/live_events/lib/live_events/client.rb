@@ -25,7 +25,7 @@ module LiveEvents
 
   class Client
     def self.config
-      res = LiveEvents.plugin_settings.try(:settings)
+      res = LiveEvents.settings
       return nil unless res && !res['kinesis_stream_name'].blank? &&
                                !res['aws_access_key_id'].blank? &&
                                !res['aws_secret_access_key_dec'].blank? &&
