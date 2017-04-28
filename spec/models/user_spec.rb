@@ -2123,6 +2123,11 @@ describe User do
       expect(User.sortable_name_order_by_clause).not_to match(/'es'/)
       expect(User.sortable_name_order_by_clause).to match(/'root'/)
     end
+
+    it "breaks ties with user id" do
+      ids = 5.times.map { User.create!(:name => "Abcde").id }.sort
+      expect(User.order_by_sortable_name.where(id: ids).map(&:id)).to eq(ids)
+    end
   end
 
   describe "quota" do
