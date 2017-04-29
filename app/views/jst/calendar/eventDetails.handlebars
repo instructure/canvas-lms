@@ -48,32 +48,32 @@
           </td>
         </tr>
       {{/if}}
-      {{#if reservations}}
-        <tr>
-          <th scope="row">{{#t "attendees"}}Attendees{{/t}}</th>
-          <td>
-            {{#if can_edit}}
-              <ul id="attendees">
-                {{#each reservations}}
-                <li data-url="{{event_url}}">
-                  <div class="ellipsis">{{name}}</div>
-                  <button type="button" class="cancel_appointment_link" title="{{#t}}Remove attendee {{name}}{{/t}}">
-                    <i class="icon-x" aria-hidden="true"></i>
-                    <span class="screenreader-only">{{#t}}Remove attendee {{name}}{{/t}}</span>
-                  </button>
-                </li>
-                {{/each}}
-              </ul>
-            {{else}}
-              <ul>
-                {{#each reservations}}
-                  <li>{{name}}</li>
-                {{/each}}
-              </ul>
-            {{/if}}
-          </td>
-        </tr>
-      {{/if}}
+      <tr id='reservations'>
+        <th scope="row">{{#t "attendees"}}Attendees{{/t}}</th>
+        {{#if reservations}}
+            <td>
+              {{#if can_edit}}
+                <ul id="attendees">
+                  {{#each reservations}}
+                  <li data-url="{{event_url}}">
+                    <div class="ellipsis">{{name}}</div>
+                    <button type="button" class="cancel_appointment_link" title="{{#t}}Remove attendee {{name}}{{/t}}">
+                      <i class="icon-x" aria-hidden="true"></i>
+                      <span class="screenreader-only">{{#t}}Remove attendee {{name}}{{/t}}</span>
+                    </button>
+                  </li>
+                  {{/each}}
+                </ul>
+              {{else}}
+                <ul>
+                  {{#each reservations}}
+                    <li>{{name}}</li>
+                  {{/each}}
+                </ul>
+              {{/if}}
+            </td>
+        {{/if}}
+      </tr>
       {{#if availableSlotsText}}
         <tr>
           <th scope="row">{{#t "slots_available"}}Slots available{{/t}}</th>

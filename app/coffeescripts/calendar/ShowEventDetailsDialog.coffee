@@ -28,11 +28,12 @@ define [
   'compiled/calendar/MessageParticipantsDialog'
   'compiled/fn/preventDefault'
   'underscore'
+  'axios'
   'vendor/jquery.ba-tinypubsub'
   'jquery.ajaxJSON'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
-], ($, I18n, Popover, CommonEvent, commonEventFactory, EditEventDetailsDialog, eventDetailsTemplate, deleteItemTemplate, reservationOverLimitDialog, MessageParticipantsDialog, preventDefault, _, {publish}) ->
+], ($, I18n, Popover, CommonEvent, commonEventFactory, EditEventDetailsDialog, eventDetailsTemplate, deleteItemTemplate, reservationOverLimitDialog, MessageParticipantsDialog, preventDefault, _, axios, {publish}) ->
 
   destroyArguments = (fn) => -> fn.apply(this, [])
 
@@ -182,6 +183,20 @@ define [
             (params.reserved_users ?= []).push reservation
           if e.group
             (params.reserved_groups ?= []).push reservation
+
+      if (!params.reservations? || params.reservations == []) && @event.object.parent_event_id?
+        axios.get("api/v1/calendar_events/#{@event.object.parent_event_id}/participants")
+         .then((response) =>
+            if (response.data?)
+              $ul = $("<ul>")
+              for p in response.data
+                $li = $("<li>").text(p.display_name)
+                $ul.append($li)
+              $("#reservations").append($ul)
+            else
+              $("#reservations").remove()
+         ).catch( -> $("#reservations").remove())
+
 
       if @event.object?.available_slots == 0
         params.can_reserve = false

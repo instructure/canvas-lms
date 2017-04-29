@@ -542,6 +542,18 @@ class CalendarEventsApiController < ApplicationController
     end
   end
 
+  # Pulling participants is done from the parent event that spawns the user's child calendar events
+  def participants
+    get_event
+    if authorized_action(@event, @current_user, :read_child_events)
+      participants = Api.paginate(@event.child_event_participants.order(:id), self, api_v1_calendar_event_participants_url)
+      json = participants.map do |user|
+        user_display_json(user)
+      end
+      render :json => json
+    end
+  end
+
   # @API Update a calendar event
   #
   # Update and return a calendar event

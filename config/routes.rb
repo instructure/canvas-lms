@@ -1397,6 +1397,7 @@ CanvasRails::Application.routes.draw do
       delete 'calendar_events/:id', action: :destroy
       post 'calendar_events/:id/reservations', action: :reserve
       post 'calendar_events/:id/reservations/:participant_id', action: :reserve, as: 'calendar_event_reserve'
+      get 'calendar_events/:id/participants', action: :participants, as: 'calendar_event_participants'
       post 'calendar_events/save_selected_contexts', action: :save_selected_contexts
 
       get 'courses/:course_id/calendar_events/timetable', action: :get_course_timetable

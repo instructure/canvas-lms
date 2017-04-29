@@ -736,6 +736,117 @@ describe CalendarEventsApiController, type: :request do
           end
         end
       end
+
+      context 'participants' do
+        before :each do
+          course_with_teacher(:active_all => true)
+          @ag = AppointmentGroup.create!(title: "something", participants_per_appointment: 4, contexts: [@course],
+            participant_visibility: "protected", new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"],
+                                                                    ["2012-01-01 13:00:00", "2012-01-01 14:00:00"]])
+          @ag.publish!
+          @event = @ag.appointments.first
+          course_with_student(course: @course, active_all: true)
+          @student1 = @student
+          @event.reserve_for(@student1, @student1)
+          course_with_student(course: @course, active_all: true)
+          @student2 = @student
+          @event.reserve_for(@student2, @student2)
+        end
+
+        it 'should return participants in the same appointment group slot for a student' do
+          json = api_call_as_user(@student1, :get, "/api/v1/calendar_events/#{@event.id}/participants",
+            {controller: 'calendar_events_api', action: 'participants', id: @event.id.to_s, format: 'json'})
+          expect(json).to eq [
+            {
+              "id" => @student1.id,
+              "display_name" => @student1.short_name,
+              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
+              "html_url" => "http://www.example.com/about/#{@student1.id}"
+            },
+            {
+              "id" => @student2.id,
+              "display_name" => @student2.short_name,
+              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
+              "html_url" => "http://www.example.com/users/#{@student2.id}"
+            }
+          ]
+        end
+
+        it 'should return participants in the same appointment group slot for a teacher' do
+          json = api_call_as_user(@teacher, :get, "/api/v1/calendar_events/#{@event.id}/participants",
+            {controller: 'calendar_events_api', action: 'participants', id: @event.id.to_s, format: 'json'})
+          expect(json).to eq [
+            {
+              "id" => @student1.id,
+              "display_name" => @student1.short_name,
+              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
+              "html_url" => "http://www.example.com/users/#{@student1.id}"
+            },
+            {
+              "id" => @student2.id,
+              "display_name" => @student2.short_name,
+              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
+              "html_url" => "http://www.example.com/users/#{@student2.id}"
+            }
+          ]
+        end
+
+        it 'should paginate participants' do
+          @ag.participants_per_appointment = 15
+          @ag.save!
+          students = create_users_in_course(@course, 10, active_all: true)
+          students.each do |student_id|
+            student = User.find(student_id)
+            @event.reserve_for(student, student)
+          end
+          json = api_call(:get, "/api/v1/calendar_events/#{@event.id}/participants",
+            {controller: 'calendar_events_api', action: 'participants', id: @event.id.to_s, format: 'json'})
+          expect(json.length).to eq 10
+          json = api_call(:get, "/api/v1/calendar_events/#{@event.id}/participants?page=2",
+            {controller: 'calendar_events_api', action: 'participants', id: @event.id.to_s, format: 'json', page: 2})
+          expect(json.length).to eq 2
+        end
+
+        it 'should not list users participating in other appointment group slots' do
+          course_with_student(course: @course, active_all: true)
+          event2 = @ag.appointments.last
+          event2.reserve_for(@student, @student)
+          json = api_call_as_user(@student1, :get, "/api/v1/calendar_events/#{@event.id}/participants",
+            {controller: 'calendar_events_api', action: 'participants', id: @event.id.to_s, format: 'json'})
+          expect(json).to eq [
+            {
+              "id" => @student1.id,
+              "display_name" => @student1.short_name,
+              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
+              "html_url" => "http://www.example.com/about/#{@student1.id}"
+            },
+            {
+              "id" => @student2.id,
+              "display_name" => @student2.short_name,
+              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
+              "html_url" => "http://www.example.com/users/#{@student2.id}"
+            }
+          ]
+          json = api_call(:get, "/api/v1/calendar_events/#{event2.id}/participants",
+            {controller: 'calendar_events_api', action: 'participants', id: event2.id.to_s, format: 'json'})
+          expect(json).to eq [
+            {
+              "id" => @student.id,
+              "display_name" => @student.short_name,
+              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
+              "html_url" => "http://www.example.com/about/#{@student.id}"
+            }
+          ]
+        end
+
+        it 'should return 401 if not allowed to view participants' do
+          @ag.participant_visibility = "private"
+          @ag.save!
+          api_call_as_user(@student1, :get, "/api/v1/calendar_events/#{@event.id}/participants",
+            {controller: 'calendar_events_api', action: 'participants', id: @event.id.to_s, format: 'json'})
+          expect(response.code).to eq '401'
+        end
+      end
     end
 
     it 'should get a single event' do
