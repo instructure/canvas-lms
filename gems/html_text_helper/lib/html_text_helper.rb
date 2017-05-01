@@ -84,12 +84,16 @@ module HtmlTextHelper
            when 'img'
              src = node['src']
              if src
-               begin
-                 src = URI.join(opts[:base_url], src) if opts[:base_url]
-               rescue URI::Error
-                 # do nothing, let src pass through as is
+               if opts[:preserve_links]
+                 node.to_html
+               else
+                 begin
+                   src = URI.join(opts[:base_url], src) if opts[:base_url]
+                 rescue URI::Error
+                   # do nothing, let src pass through as is
+                 end
+                 node['alt'] ? "[#{node['alt']}](#{src})" : src
                end
-               node['alt'] ? "[#{node['alt']}](#{src})" : src
              else
                ''
              end
@@ -101,12 +105,16 @@ module HtmlTextHelper
              when 'a'
                href = node['href']
                if href
-                 begin
-                   href = URI.join(opts[:base_url], href) if opts[:base_url]
-                 rescue URI::Error
-                   # do nothing, let href pass through as is
+                 if opts[:preserve_links]
+                   node.to_html
+                 else
+                   begin
+                     href = URI.join(opts[:base_url], href) if opts[:base_url]
+                   rescue URI::Error
+                     # do nothing, let href pass through as is
+                   end
+                   href == subtext ? subtext : "[#{subtext}](#{href})"
                  end
-                 href == subtext ? subtext : "[#{subtext}](#{href})"
                else
                  subtext
                end
