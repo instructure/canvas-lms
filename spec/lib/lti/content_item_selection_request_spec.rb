@@ -73,6 +73,11 @@ describe Lti::ContentItemSelectionRequest do
         })
       end
 
+      it 'adds context_title param' do
+        lti_launch = lti_request.generate_lti_launch(placement)
+        expect(lti_launch.params[:context_title]).to eq course.name
+      end
+
       context 'return_url' do
         it 'properly sets the return URL when no content item id is provided' do
           lti_launch = lti_request.generate_lti_launch(placement)

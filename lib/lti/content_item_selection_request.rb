@@ -38,6 +38,7 @@ module Lti
         lti_message_type: 'ContentItemSelectionRequest',
         lti_version: 'LTI-1p0',
         content_item_return_url: return_url(opts[:content_item_id]),
+        context_title: @context.name,
         # optional params
         accept_multiple: false
       }).merge(placement_params(placement, assignment: opts[:assignment]))
