@@ -1,0 +1,147 @@
+---
+RubySpecsLinter:
+  Severity: "warn"
+  Globs:
+    Ruby:
+      # TODO: gems, plugins, etc?
+      - "app/**.rb"
+      - "lib/**.rb"
+    RubySpec: # excludes SeleniumSpec globs
+      # canvas proper
+      - "spec/**.rb"
+      - "spec_canvas/**.rb"
+      - "test/**.rb"
+      # gems, plugins, etc.
+      - "**/spec/**.rb"
+      - "**/spec_canvas/**.rb"
+      - "**/test/**.rb"
+    SeleniumSpec:
+      # canvas proper
+      - "spec/selenium/**"
+      - "spec_canvas/selenium/**"
+      - "test/selenium/**"
+      # gems, plugins, etc.
+      - "**/spec/selenium/**"
+      - "**/spec_canvas/selenium/**"
+      - "**/test/selenium/**"
+  Messages:
+    RubyChangesWithOnlySelenium: Your commit includes ruby changes, but does not include
+      non-selenium specs (model, controller, etc). Please add some to verify your changes.
+    RubyChangesWithNoRubySpecs: Your commit includes ruby changes, but does not include ruby specs.
+      Please add some to verify your changes.
+
+SeleniumSpecsLinter:
+  Severity: "warn"
+  Globs:
+    Ruby:
+      # TODO: gems, plugins, etc?
+      - "app/**.rb"
+      - "lib/**.rb"
+    RubySpec: # excludes SeleniumSpec globs
+      # canvas proper
+      - "spec/**.rb"
+      - "spec_canvas/**.rb"
+      - "test/**.rb"
+      # gems, plugins, etc.
+      - "**/spec/**.rb"
+      - "**/spec_canvas/**.rb"
+      - "**/test/**.rb"
+    SeleniumSpec:
+      # canvas proper
+      - "spec/selenium/**"
+      - "spec_canvas/selenium/**"
+      - "test/selenium/**"
+      # gems, plugins, etc.
+      - "**/spec/selenium/**"
+      - "**/spec_canvas/selenium/**"
+      - "**/test/selenium/**"
+    # the following globs are used to determine if there are unnecessary selenium specs.
+    # i.e., the code changes could/should be tested at a lower level.
+    PublicJs:
+      - "public/javascripts/**.js"
+    PublicJsWhitelist:
+      - "**/bower/**"
+      - "**/mediaelement/**"
+      - "**/shims/**"
+      - "**/vendor/**"
+      - "**/symlink_to_node_modules/**"
+    PublicJsSpec:
+      - "spec/coffeescripts/**"
+      - "spec/javascripts/**"
+    Coffee:
+      - "app/coffeescripts/**.coffee"
+    CoffeeWhitelist:
+      - "app/coffeescripts/bundles/**"
+    CoffeeSpec:
+      - "spec/coffeescripts/**.coffee"
+    Jsx:
+      - "app/jsx/**.js"
+    JsxSpec:
+      - "spec/coffeescripts/jsx/**"
+      - "spec/javascripts/jsx/**"
+  Message: Your commit modifies selenium specs, when your changes might be more appropriately
+      tested at a lower level. Please limit your selenium specs to happy-path scenarios.
+
+Simple/CoffeeSpecsLinter:
+  Severity: "warn"
+  Precondition:
+    Include:
+    - "app/coffeescripts/**.coffee"
+    Whitelist:
+    - "app/coffeescripts/bundles/**"
+  Requirement:
+    Include:
+    - "spec/coffeescripts/**.coffee"
+    - "spec/coffeescripts/jsx/**"
+    - "spec/javascripts/jsx/**"
+  Message: Your commit includes coffee changes, but does not include coffee or jsx
+    specs. Please add some to verify your changes.
+
+Simple/JsxSpecsLinter:
+  Severity: "warn"
+  Precondition:
+    Include:
+    - "app/jsx/**.js"
+  Requirement:
+    Include:
+    - "spec/coffeescripts/jsx/**"
+    - "spec/javascripts/jsx/**"
+  Message: Your commit includes coffee changes, but does not include coffee or jsx
+    specs. Please add some to verify your changes.
+
+Simple/PublicJsSpecsLinter:
+  Severity: "warn"
+  Precondition:
+    Include:
+    - "public/javascripts/**.js"
+    Whitelist:
+    - "**/bower/**"
+    - "**/mediaelement/**"
+    - "**/shims/**"
+    - "**/vendor/**"
+    - "**/symlink_to_node_modules/**"
+  Requirement:
+    Include:
+    - "spec/coffeescripts/**"
+    - "spec/javascripts/**"
+  Message: Your commit includes changes to public/javascripts, but does not include
+    specs (coffee or jsx). Please add some to verify your changes. Even $.fn.crazyMethods
+    can and should be tested (and not via selenium).
+
+Simple/NewErbLinter:
+  Severity: "warn"
+  Precondition:
+    Include:
+    - "app/views/**.erb"
+    Statuses:
+    - added
+  Message: |-
+    Your commit includes new ERB files, which has been a no-no in Canvas since 2011. All new UI should be built in React on top of documented APIs.
+    Maybe try doing something like this in your controller instead:
+
+        @page_title = t('Your Page Title')
+        @body_classes << 'whatever-classes you-want-to-add-to-body'
+        js_bundle :your_js_bundle
+        css_bundle :any_css_bundles_you_want
+        js_env({whatever: 'you need to put in window.ENV'})
+        render :text => "".html_safe, :layout => true

@@ -4,7 +4,7 @@ describe TatlTael::Linters do
   describe TatlTael::Linters::BaseLinter do
     describe ".inherited" do
       context "not a simple linter" do
-        class FooLinter < TatlTael::Linters::BaseLinter;
+        class FooLinter < TatlTael::Linters::BaseLinter
         end
 
         it "saves the subclass" do
@@ -22,11 +22,12 @@ describe TatlTael::Linters do
     describe "#changes_matching" do
       Change = Struct.new(:status, :path)
 
-      let(:base_linter) { TatlTael::Linters::BaseLinter.new(changes) }
+      let(:config) { {} }
+      let(:base_linter) { TatlTael::Linters::BaseLinter.new(config: config, changes: changes) }
 
       before :each do
         allow(base_linter).to receive(:changes)
-                                .and_return(changes)
+          .and_return(changes)
       end
 
       context "filtering by statuses" do
@@ -52,7 +53,7 @@ describe TatlTael::Linters do
         end
       end
 
-      context "filtering by include_regexes" do
+      context "filtering by includes" do
         let(:added_change_path) { "path/to/foo" }
         let(:added_change) { Change.new("added", added_change_path) }
         let(:modified_change_path) { "path/to/mod" }
@@ -64,16 +65,16 @@ describe TatlTael::Linters do
           expect(base_linter.changes_matching).to match(changes)
         end
 
-        context "include_regexes exist" do
-          let(:query) { {include_regexes: [/zoo/, /foo/, /bar/]} }
+        context "includes exist" do
+          let(:query) { {include: ["**/zoo", "**/foo", "**/bar"]} }
 
-          it "returns the changes that match any of the include_regexes" do
+          it "returns the changes that match any of the includes" do
             expect(base_linter.changes_matching(query)).to match([added_change])
           end
         end
       end
 
-      context "filtering by exclude_regexes" do
+      context "filtering by whitelist" do
         let(:added_change_path) { "path/to/foo" }
         let(:added_change) { Change.new("added", added_change_path) }
         let(:modified_change_path) { "path/to/mod" }
@@ -86,9 +87,9 @@ describe TatlTael::Linters do
         end
 
         context "include_regexes exist" do
-          let(:query) { {exclude_regexes: [/zoo/, /foo/, /bar/]} }
+          let(:query) { {whitelist: ["**/zoo", "**/foo", "**/bar"]} }
 
-          it "returns the changes that don't match any of the exclude_regexes" do
+          it "returns the changes that don't match any of the whitelists" do
             expect(base_linter.changes_matching(query)).to match([modified_change])
           end
         end
@@ -103,12 +104,13 @@ describe TatlTael::Linters do
           exclude_regexes: [/^public/]
         }
       end
-      let(:base_linter) { TatlTael::Linters::BaseLinter.new(changes) }
+      let(:config) { {} }
+      let(:base_linter) { TatlTael::Linters::BaseLinter.new(config: config, changes: changes) }
 
       before :each do
         allow(base_linter).to receive(:changes_matching)
-                                .with(hash_including(query))
-                                .and_return(changes)
+          .with(hash_including(query))
+          .and_return(changes)
       end
 
 
@@ -138,21 +140,6 @@ describe TatlTael::Linters do
   let(:changes) { double }
 
   describe ".comments" do
-    let(:simple_comments) { [["a", "b", nil, "c"]] }
-    let(:reg_comments) { nil }
-
-    it "collects simple and regular linter comments" do
-      expect(TatlTael::Linters::SimpleLinter).to receive(:comments)
-                                                   .with(changes)
-                                                   .and_return(simple_comments)
-      expect(linters).to receive(:run_linters)
-                           .with(changes)
-                           .and_return(reg_comments)
-      expect(linters.comments(changes)).to match(%w[a b c])
-    end
-  end
-
-  describe ".run_linters" do
     class BarLinter < TatlTael::Linters::BaseLinter
       def run
         [[], [nil], "1"]
@@ -166,9 +153,9 @@ describe TatlTael::Linters do
 
     let(:saved_linters) { [BarLinter, ZooLinter] }
 
-    it "collects regular linter comments" do
-      expect(TatlTael::Linters).to receive(:linters).and_return(saved_linters)
-      expect(linters.run_linters(changes)).to match(%w[1 2 3])
+    it "collects linter comments" do
+      expect(linters).to receive(:linters).and_return(saved_linters)
+      expect(linters.comments(changes)).to match(%w[1 2 3])
     end
   end
 end

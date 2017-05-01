@@ -1,75 +1,10 @@
 require 'spec_helper'
 require_relative "./shared_constants"
+require_relative "./shared_linter_examples"
 
-describe TatlTael::Linters::RubySpecsLinter do
+describe TatlTael::Linters::SeleniumSpecsLinter do
   let(:linter_class) { described_class }
-
-  shared_examples "comments" do |raw_changes, msg|
-    let(:changes) { raw_changes.map { |c| double(c) } }
-    let(:linter) { described_class.new(changes) }
-
-    it "comments" do
-      allow(linter_class).to receive(:new)
-        .with(changes)
-        .and_return(linter)
-      result = linter.run.select { |comment| comment[:message] == msg }
-      expect(result.size).to eq(1)
-      expect(result.first[:message]).to eq(msg)
-    end
-  end
-
-  shared_examples "does not comment" do |raw_changes|
-    let(:changes) { raw_changes.map { |c| double(c) } }
-    let(:linter) { described_class.new(changes) }
-
-    it "does not comment" do
-      allow(linter_class).to receive(:new)
-        .with(changes)
-        .and_return(linter)
-      expect(linter.run).to be_empty
-    end
-  end
-
-  shared_examples "change combos" do |change_path, spec_path, msg|
-    context "not deletion" do
-      context "no spec changes" do
-        include_examples "comments",
-                         [{path: change_path, status: "added"}],
-                         msg
-      end
-      context "has spec non deletions" do
-        include_examples "does not comment",
-                         [{path: change_path, status: "modified"},
-                          {path: spec_path, status: "added"}]
-      end
-      context "has spec deletions" do
-        include_examples "comments",
-                         [{path: change_path, status: "added"},
-                          {path: spec_path, status: "deleted"}],
-                         msg
-      end
-    end
-    context "deletion" do
-      include_examples "does not comment",
-                       [{path: change_path, status: "deleted"}]
-    end
-  end
-
-  describe "ensure ruby specs" do
-    context "app" do
-      include_examples "change combos",
-                       Consts::APP_RB_PATH,
-                       Consts::APP_RB_SPEC_PATH,
-                       TatlTael::Linters::RubySpecsLinter::RUBY_NO_SPECS_MSG
-    end
-
-    context "lib" do
-      include_examples "change combos",
-                       Consts::LIB_RB_PATH,
-                       Consts::LIB_RB_SPEC_PATH,
-                       TatlTael::Linters::RubySpecsLinter::RUBY_NO_SPECS_MSG
-    end
-  end
+  let(:config) { TatlTael::Linters.config_for_linter(described_class) }
 
   context "unnecessary selenium specs" do
     context "has selenium specs" do
@@ -78,7 +13,7 @@ describe TatlTael::Linters::RubySpecsLinter do
           include_examples "comments",
                            [{path: Consts::SELENIUM_SPEC_PATH, status: "added"},
                             {path: Consts::PUBLIC_JS_PATH, status: "added"}],
-                           TatlTael::Linters::RubySpecsLinter::BAD_SELENIUM_SPEC_MSG
+                           :unnecessary_selenium_specs
         end
 
         context "has public js specs" do
@@ -94,7 +29,7 @@ describe TatlTael::Linters::RubySpecsLinter do
           include_examples "comments",
                            [{path: Consts::SELENIUM_SPEC_PATH, status: "added"},
                             {path: Consts::APP_COFFEE_PATH, status: "added"}],
-                           TatlTael::Linters::RubySpecsLinter::BAD_SELENIUM_SPEC_MSG
+                           :unnecessary_selenium_specs
         end
 
         context "has coffee specs" do
@@ -110,7 +45,7 @@ describe TatlTael::Linters::RubySpecsLinter do
           include_examples "comments",
                            [{path: Consts::SELENIUM_SPEC_PATH, status: "added"},
                             {path: Consts::APP_JSX_PATH, status: "added"}],
-                           TatlTael::Linters::RubySpecsLinter::BAD_SELENIUM_SPEC_MSG
+                           :unnecessary_selenium_specs
         end
 
         context "has jsx specs" do
@@ -126,13 +61,13 @@ describe TatlTael::Linters::RubySpecsLinter do
           include_examples "comments",
                            [{path: Consts::SELENIUM_SPEC_PATH, status: "added"},
                             {path: Consts::APP_RB_PATH, status: "added"}],
-                           TatlTael::Linters::RubySpecsLinter::BAD_SELENIUM_SPEC_MSG
+                           :unnecessary_selenium_specs
 
           # has selenium specs only
           include_examples "comments",
                            [{path: Consts::SELENIUM_SPEC_PATH, status: "added"},
                             {path: Consts::APP_RB_PATH, status: "added"}],
-                           TatlTael::Linters::RubySpecsLinter::RUBY_ONLY_SELENIUM_MSG
+                           :ruby_changes_with_only_selenium
         end
 
         context "has ruby specs" do
