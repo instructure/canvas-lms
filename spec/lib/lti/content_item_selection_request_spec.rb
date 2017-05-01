@@ -60,6 +60,11 @@ describe Lti::ContentItemSelectionRequest do
         expect(lti_launch.params).to include(default_params)
       end
 
+      it "sets the 'accept_multiple' param to false" do
+        lti_launch = lti_request.generate_lti_launch(placement)
+        expect(lti_launch.params[:accept_multiple]).to eq false
+      end
+
       it 'adds message type and version params' do
         lti_launch = lti_request.generate_lti_launch(placement)
         expect(lti_launch.params).to include({

@@ -37,7 +37,9 @@ module Lti
         # required params
         lti_message_type: 'ContentItemSelectionRequest',
         lti_version: 'LTI-1p0',
-        content_item_return_url: return_url(opts[:content_item_id])
+        content_item_return_url: return_url(opts[:content_item_id]),
+        # optional params
+        accept_multiple: false
       }).merge(placement_params(placement, assignment: opts[:assignment]))
 
       lti_launch
