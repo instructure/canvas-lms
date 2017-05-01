@@ -80,10 +80,9 @@ export default class BlueprintAssociations extends React.Component {
     }
   }
 
-  selectCourses = (selected) => {
-    const added = this.props.addedAssociations.map(course => course.id)
-    const courseIds = Object.keys(selected).filter(courseId => selected[courseId] && !added.includes(courseId))
-    this.props.addAssociations(courseIds)
+  onSelectedChanged = ({ added, removed }) => {
+    if (added.length) this.props.addAssociations(added)
+    if (removed.length) this.props.removeAssociations(removed)
   }
 
   renderLoadingOverlay () {
@@ -112,12 +111,12 @@ export default class BlueprintAssociations extends React.Component {
           <CoursePicker
             ref={(c) => { this.coursePicker = c }}
             courses={this.props.courses}
-            excludeCourses={this.props.addedAssociations.map(c => c.id)}
             terms={this.props.terms}
             subAccounts={this.props.subAccounts}
             loadCourses={this.props.loadCourses}
             isLoadingCourses={this.props.isLoadingCourses}
-            onSelectedChanged={this.selectCourses}
+            selectedCourses={this.props.addedAssociations.map(course => course.id)}
+            onSelectedChanged={this.onSelectedChanged}
             isExpanded={this.props.isExpanded}
           />
           <hr />

@@ -32,9 +32,9 @@ const { func, bool, arrayOf, string } = React.PropTypes
 export default class CoursePicker extends React.Component {
   static propTypes = {
     courses: propTypes.courseList.isRequired,
-    excludeCourses: arrayOf(string),
     terms: propTypes.termList.isRequired,
     subAccounts: propTypes.accountList.isRequired,
+    selectedCourses: arrayOf(string).isRequired,
     loadCourses: func.isRequired,
     isLoadingCourses: bool.isRequired,
     onSelectedChanged: func,
@@ -42,7 +42,6 @@ export default class CoursePicker extends React.Component {
   }
 
   static defaultProps = {
-    excludeCourses: [],
     onSelectedChanged: () => {},
     isExpanded: true,
   }
@@ -104,8 +103,6 @@ export default class CoursePicker extends React.Component {
   }
 
   render () {
-    const courses = this.props.courses.filter(course => !this.props.excludeCourses.includes(course.id))
-
     return (
       <div className="bca-course-picker">
         <CourseFilter
@@ -126,7 +123,8 @@ export default class CoursePicker extends React.Component {
               <Spinner title={I18n.t('Loading Courses')} />
             </div>)}
             <CoursePickerTable
-              courses={courses}
+              courses={this.props.courses}
+              selectedCourses={this.props.selectedCourses}
               onSelectedChanged={this.onSelectedChanged}
             />
           </ToggleDetails>

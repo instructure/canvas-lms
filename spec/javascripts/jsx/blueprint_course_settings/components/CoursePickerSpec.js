@@ -25,6 +25,7 @@ QUnit.module('CoursePicker component')
 
 const defaultProps = () => ({
   courses: data.courses,
+  selectedCourses: [],
   subAccounts: data.subAccounts,
   terms: data.terms,
   isLoadingCourses: false,

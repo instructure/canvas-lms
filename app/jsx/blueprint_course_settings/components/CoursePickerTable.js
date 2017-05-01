@@ -28,9 +28,12 @@ import 'compiled/jquery.rails_flash_notifications'
 
 import propTypes from '../propTypes'
 
+const { arrayOf, string } = React.PropTypes
+
 export default class CoursePickerTable extends React.Component {
   static propTypes = {
     courses: propTypes.courseList.isRequired,
+    selectedCourses: arrayOf(string).isRequired,
     onSelectedChanged: React.PropTypes.func,
   }
 
@@ -41,34 +44,27 @@ export default class CoursePickerTable extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      selected: {},
+      selected: this.parseSelectedCourses(props.selectedCourses),
       selectedAll: false,
     }
   }
 
   componentWillReceiveProps (nextProps) {
-    // remove selected state for courses that are removed from props
-    const courseIds = nextProps.courses.map(course => course.id)
     this.setState({
-      selectedAll: false,
-      selected: Object.keys(this.state.selected)
-        .filter(id => courseIds.includes(id))
-        .reduce((selected, id) => Object.assign(selected, { [id]: this.state.selected[id] }), {}),
+      selected: this.parseSelectedCourses(nextProps.selectedCourses),
+      selectedAll: nextProps.selectedCourses.length === nextProps.courses.length,
     })
   }
 
   onSelectToggle = (e) => {
-    const selected = this.state.selected
-    selected[e.target.value] = e.target.checked
     const index = this.props.courses.findIndex(c => c.id === e.target.value)
     const course = this.props.courses[index]
     const srMsg = e.target.checked
                 ? I18n.t('Selected course %{course}', { course: course.name })
                 : I18n.t('Unselected course %{course}', { course: course.name })
     $.screenReaderFlashMessage(srMsg)
-    this.setState({ selected, selectedAll: false }, () => {
-      this.props.onSelectedChanged(this.state.selected)
-    })
+
+    this.updateSelected({ [e.target.value]: e.target.checked }, false)
 
     setTimeout(() => {
       this.handleFocusLoss(index)
@@ -76,19 +72,36 @@ export default class CoursePickerTable extends React.Component {
   }
 
   onSelectAllToggle = (e) => {
-    const srMsg = e.target.checked
-                ? I18n.t('Selected all courses')
-                : I18n.t('Unselected all courses')
-    $.screenReaderFlashMessage(srMsg)
-    this.setState({
-      selectedAll: e.target.checked,
-      selected: e.target.checked ? this.props.courses
-                  .reduce((selected, course) =>
-                    Object.assign(selected, { [course.id]: true })
-                  , {}) : {}
-    }, () => {
-      this.props.onSelectedChanged(this.state.selected)
+    $.screenReaderFlashMessage(e.target.checked
+      ? I18n.t('Selected all courses')
+      : I18n.t('Unselected all courses'))
+
+    const selected = this.props.courses.reduce((selectedMap, course) => {
+      selectedMap[course.id] = e.target.checked // eslint-disable-line
+      return selectedMap
+    }, {})
+    this.updateSelected(selected, e.target.checked)
+  }
+
+  parseSelectedCourses (courses = []) {
+    return courses.reduce((selected, courseId) => {
+      selected[courseId] = true // eslint-disable-line
+      return selected
+    }, {})
+  }
+
+  updateSelected (selectedDiff, selectedAll) {
+    const oldSelected = this.state.selected
+    const added = []
+    const removed = []
+
+    this.props.courses.forEach(({ id }) => {
+      if (oldSelected[id] === true && selectedDiff[id] === false) removed.push(id)
+      if (oldSelected[id] !== true && selectedDiff[id] === true) added.push(id)
     })
+
+    this.props.onSelectedChanged({ added, removed })
+    this.setState({ selectedAll })
   }
 
   handleFocusLoss (index) {
@@ -140,7 +153,7 @@ export default class CoursePickerTable extends React.Component {
           <Checkbox
             onChange={this.onSelectToggle}
             value={course.id}
-            checked={this.state.selected[course.id]}
+            checked={this.state.selected[course.id] === true}
             label={
               <ScreenReaderContent>
                 {I18n.t('Toggle select course %{name}', { name: course.original_name || course.name })}
