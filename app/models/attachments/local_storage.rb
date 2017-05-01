@@ -38,13 +38,13 @@ class Attachments::LocalStorage
 
   def initialize_ajax_upload_params(local_upload_url, s3_success_url, options)
     {
-        :upload_url => local_upload_url,
-        :file_param => options[:file_param] || 'attachment[uploaded_data]', #uploadify ignores this and uses 'file',
-        :upload_params => options[:upload_params] || {}
+      :upload_url => local_upload_url,
+      :file_param => options[:file_param] || 'attachment[uploaded_data]', # uploadify ignores this and uses 'file'
+      :upload_params => options[:upload_params] || {}
     }
   end
 
-  def amend_policy_conditions(policy, pseudonym)
+  def amend_policy_conditions(policy, pseudonym:, datetime: nil)
     # flash won't send the session cookie, so for local uploads we put the user id in the signed
     # policy so we can mock up the session for FilesController#create
     policy['conditions'] << { 'pseudonym_id' => pseudonym.id }
@@ -52,8 +52,17 @@ class Attachments::LocalStorage
     policy
   end
 
-  def shared_secret
+  def shared_secret(datetime)
     Attachment.shared_secret
+  end
+
+  def sign_policy(policy_encoded, datetime)
+    signature = Base64.encode64(
+      OpenSSL::HMAC.digest(
+        OpenSSL::Digest.new('sha1'), shared_secret(datetime), policy_encoded
+      )
+    ).gsub(/\n/, '')
+    ['Signature', signature]
   end
 
   def open(opts)

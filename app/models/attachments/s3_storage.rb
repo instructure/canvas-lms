@@ -56,19 +56,44 @@ class Attachments::S3Storage
         :upload_url => bucket.url,
         :file_param => 'file',
         :success_url => s3_success_url,
-        :upload_params => {
-            'AWSAccessKeyId' => bucket.client.config.access_key_id
-        }
+        :upload_params => cred_params(options[:datetime])
     }
   end
 
-  def amend_policy_conditions(policy, _)
+  def amend_policy_conditions(policy, datetime:, pseudonym: nil)
     policy['conditions'].unshift({'bucket' => bucket.name})
+    cred_params(datetime).each do |k, v|
+      policy['conditions'] << { k => v }
+    end
     policy
   end
 
-  def shared_secret
-    bucket.client.config.secret_access_key
+  def cred_params(datetime)
+    access_key = bucket.client.config.access_key_id
+    day_string = datetime[0,8]
+    region = bucket.client.config.region
+    credential = "#{access_key}/#{day_string}/#{region}/s3/aws4_request"
+    {
+      'x-amz-credential' => credential,
+      'x-amz-algorithm' => "AWS4-HMAC-SHA256",
+      'x-amz-date' => datetime
+    }
+  end
+
+  def shared_secret(datetime)
+    config = bucket.client.config
+    sha256 = OpenSSL::Digest::SHA256.new
+    date_key = OpenSSL::HMAC.digest(sha256, "AWS4#{config.secret_access_key}", datetime[0,8])
+    date_region_key = OpenSSL::HMAC.digest(sha256, date_key, config.region)
+    date_region_service_key = OpenSSL::HMAC.digest(sha256, date_region_key, "s3")
+    OpenSSL::HMAC.digest(sha256, date_region_service_key, "aws4_request")
+  end
+
+  def sign_policy(policy_encoded, datetime)
+    signature = OpenSSL::HMAC.hexdigest(
+      OpenSSL::Digest.new('sha256'), shared_secret(datetime), policy_encoded
+    )
+    ['x-amz-signature', signature]
   end
 
   def open(opts, &block)
@@ -91,5 +116,4 @@ class Attachments::S3Storage
       tempfile
     end
   end
-
 end

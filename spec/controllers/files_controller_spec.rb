@@ -856,7 +856,7 @@ describe FilesController do
       expect(json['id']).to eql(assigns[:attachment].id)
       expect(json['upload_url']).not_to be_nil
       expect(json['upload_params']).to be_present
-      expect(json['upload_params']['AWSAccessKeyId']).to eq 'stub_id'
+      expect(json['upload_params']['x-amz-credential']).to start_with('stub_id')
     end
 
     it "should not allow going over quota for file uploads" do
@@ -890,7 +890,7 @@ describe FilesController do
       expect(json['id']).to eql(assigns[:attachment].id)
       expect(json['upload_url']).not_to be_nil
       expect(json['upload_params']).to be_present
-      expect(json['upload_params']['AWSAccessKeyId']).to eq 'stub_id'
+      expect(json['upload_params']['x-amz-credential']).to start_with('stub_id')
     end
 
     it "should associate assignment submission for a group assignment with the group" do
