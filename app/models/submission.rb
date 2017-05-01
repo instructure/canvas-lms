@@ -52,6 +52,7 @@ class Submission < ActiveRecord::Base
   attr_readonly :assignment_id
   attr_accessor :visible_to_user,
                 :skip_grade_calc
+  attr_writer :versioned_originality_reports
 
   belongs_to :attachment # this refers to the screenshot of the submission if it is a url submission
   belongs_to :assignment
@@ -1278,6 +1279,14 @@ class Submission < ActiveRecord::Base
     write_attribute :attachment_ids, ids
   end
 
+  def versioned_originality_reports
+    @versioned_originality_reports ||= begin
+      ids = (attachment_ids || "").split(",")
+      ids << attachment_id if attachment_id
+      ids.empty? ? [] : OriginalityReport.where(submission_id: id, attachment_id: ids)
+    end
+  end
+
   def versioned_attachments
     if @versioned_attachments
       @versioned_attachments
@@ -1297,10 +1306,8 @@ class Submission < ActiveRecord::Base
     }
   end
 
-  # use this method to pre-load the versioned_attachments for a bunch of
-  # submissions (avoids having O(N) attachment queries)
-  # NOTE: all submissions must belong to the same shard
-  def self.bulk_load_versioned_attachments(submissions, preloads: [:thumbnail, :media_object])
+  # This helper method is used by the bulk_load_versioned_* methods
+  def self.group_attachment_ids_by_submission_and_index(submissions)
     # The index of the submission is considered part of the key for
     # the hash that is built. This is needed for bulk loading
     # submission_histories where multiple submission histories will
@@ -1311,21 +1318,47 @@ class Submission < ActiveRecord::Base
       attachment_ids << s.attachment_id if s.attachment_id
       [[s, index], attachment_ids]
     end
-    attachment_ids_by_submission_and_index = Hash[submissions_with_index_and_attachment_ids]
+    Hash[submissions_with_index_and_attachment_ids]
+  end
+  private_class_method :group_attachment_ids_by_submission_and_index
 
+  # use this method to pre-load the versioned_attachments for a bunch of
+  # submissions (avoids having O(N) attachment queries)
+  # NOTE: all submissions must belong to the same shard
+  def self.bulk_load_versioned_attachments(submissions, preloads: [:thumbnail, :media_object])
+    attachment_ids_by_submission_and_index = group_attachment_ids_by_submission_and_index(submissions)
     bulk_attachment_ids = attachment_ids_by_submission_and_index.values.flatten
 
-    if bulk_attachment_ids.empty?
-      attachments_by_id = {}
+    attachments_by_id = if bulk_attachment_ids.empty?
+      {}
     else
-      attachments_by_id = Attachment.where(:id => bulk_attachment_ids)
-                          .preload(preloads)
-                          .group_by(&:id)
+      Attachment.where(:id => bulk_attachment_ids).preload(preloads).group_by(&:id)
     end
 
     submissions.each_with_index do |s, index|
       s.versioned_attachments =
         attachments_by_id.values_at(*attachment_ids_by_submission_and_index[[s, index]]).flatten
+    end
+  end
+
+  # use this method to pre-load the versioned_originality_reports for a bunch of
+  # submissions (avoids having O(N) originality report queries)
+  # NOTE: all submissions must belong to the same shard
+  def self.bulk_load_versioned_originality_reports(submissions)
+    attachment_ids_by_submission_and_index = group_attachment_ids_by_submission_and_index(submissions)
+    bulk_attachment_ids = attachment_ids_by_submission_and_index.values.flatten
+
+    reports_by_assignment_id = if bulk_attachment_ids.empty?
+      {}
+    else
+      OriginalityReport.where(
+        submission_id: submissions.map(&:id), attachment_id: bulk_attachment_ids
+      ).group_by(&:attachment_id)
+    end
+
+    submissions.each_with_index do |s, index|
+      s.versioned_originality_reports =
+        reports_by_assignment_id.values_at(*attachment_ids_by_submission_and_index[[s, index]]).flatten.compact
     end
   end
 

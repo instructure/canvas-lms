@@ -122,10 +122,11 @@ class Assignment
       attachments_for_submission =
         Submission.bulk_load_attachments_for_submissions(submissions, preloads: attachment_includes)
 
-      # Preloading submission history versioned attachments
+      # Preloading submission history versioned attachments and originality reports
       submission_histories = submissions.map(&:submission_history).flatten
       Submission.bulk_load_versioned_attachments(submission_histories,
                                                  preloads: attachment_includes)
+      Submission.bulk_load_versioned_originality_reports(submission_histories)
 
       preloaded_prov_grades =
         case @grading_role
@@ -193,7 +194,7 @@ class Assignment
           json['submission_history'] = json['submission_history'].map do |version|
             version.as_json(only: submission_fields,
                             methods: [:versioned_attachments, :late, :external_tool_url]).tap do |version_json|
-              version_json['submission']['has_originality_report'] = version.originality_reports.present?
+              version_json['submission']['has_originality_report'] = version.versioned_originality_reports.present?
               if version_json['submission'] && version_json['submission']['versioned_attachments']
                 version_json['submission']['versioned_attachments'].map! do |a|
                   if @grading_role == :moderator

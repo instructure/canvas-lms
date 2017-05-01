@@ -2107,7 +2107,119 @@ describe Submission do
     end
   end
 
-  context "bulk loading" do
+  describe "#versioned_originality_reports" do
+    it "loads originality reports for the submission" do
+      student_in_course(active_all: true)
+      attachment = attachment_model(filename: "submission.doc", :context => @student)
+      submission = @assignment.submit_homework(@student, attachments: [attachment])
+      report = OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
+
+      expect(submission.versioned_originality_reports).to eq [report]
+    end
+
+    it "memoizes the loaded originality reports" do
+      student_in_course(active_all: true)
+      attachment = attachment_model(filename: "submission.doc", :context => @student)
+      submission = @assignment.submit_homework(@student, attachments: [attachment])
+      OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
+
+      submission.versioned_originality_reports
+      OriginalityReport.expects(:where).never
+      submission.versioned_originality_reports
+    end
+
+    it "returns an empty array when there are no reports" do
+      student_in_course(active_all: true)
+      attachment = attachment_model(filename: "submission.doc", :context => @student)
+      submission = @assignment.submit_homework(@student, attachments: [attachment])
+
+      expect(submission.versioned_originality_reports).to eq []
+    end
+
+    it "returns an empty array when there are no attachments" do
+      student_in_course(active_all: true)
+      submission = @assignment.submit_homework(@student, body: "Oh my!")
+
+      expect(submission.versioned_originality_reports).to eq []
+    end
+  end
+
+  describe "#bulk_load_versioned_originality_reports" do
+    it "bulk loads originality reports for many submissions at once" do
+      originality_reports = []
+      submissions = Array.new(3) do |i|
+        student_in_course(active_all: true)
+        attachments = [
+          attachment_model(filename: "submission#{i}-a.doc", :context => @student),
+          attachment_model(filename: "submission#{i}-b.doc", :context => @student)
+        ]
+
+        sub = @assignment.submit_homework(@student, attachments: attachments)
+        originality_reports << attachments.map do |a|
+          OriginalityReport.create!(attachment: a, originality_score: '1', submission: sub)
+        end
+        sub
+      end
+
+      Submission.bulk_load_versioned_originality_reports(submissions)
+      submissions.each_with_index do |s, i|
+        expect(s.versioned_originality_reports).to eq originality_reports[i]
+      end
+    end
+
+    it "avoids N+1s in the bulk load" do
+      student_in_course(active_all: true)
+      attachment = attachment_model(filename: "submission.doc", :context => @student)
+      submission = @assignment.submit_homework(@student, attachments: [attachment])
+      OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
+
+      Submission.bulk_load_versioned_originality_reports([submission])
+      OriginalityReport.expects(:where).never
+      submission.versioned_originality_reports
+    end
+
+    it "ignores invalid attachment ids" do
+      student_in_course(active_all: true)
+      s = @assignment.submit_homework(@student, submission_type: "online_url", url: "http://example.com")
+      s.update_attribute(:attachment_ids, '99999999')
+      Submission.bulk_load_versioned_originality_reports([s])
+      expect(s.versioned_originality_reports).to eq []
+    end
+
+    it "loads only the originality reports that pertain to that version" do
+      student_in_course(active_all: true)
+      originality_reports = []
+      attachment = attachment_model(filename: "submission-a.doc", context: @student)
+      Timecop.freeze(10.seconds.ago) do
+        sub = @assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [attachment])
+        originality_reports <<
+          OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: sub)
+      end
+
+      attachment = attachment_model(filename: "submission-b.doc", :context => @student)
+      Timecop.freeze(5.seconds.ago) do
+        sub = @assignment.submit_homework(@student, attachments: [attachment])
+        originality_reports <<
+          OriginalityReport.create!(attachment: attachment, originality_score: '1',submission: sub)
+      end
+
+      attachment = attachment_model(filename: "submission-c.doc", :context => @student)
+      Timecop.freeze(1.second.ago) do
+        sub = @assignment.submit_homework(@student, attachments: [attachment])
+        originality_reports <<
+          OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: sub)
+      end
+
+      submission = @assignment.submission_for_student(@student)
+      Submission.bulk_load_versioned_originality_reports(submission.submission_history)
+
+      submission.submission_history.each_with_index do |s, index|
+        expect(s.versioned_originality_reports.first).to eq originality_reports[index]
+      end
+    end
+  end
+
+  context "bulk loading attachments" do
     def ensure_attachments_arent_queried
       Attachment.expects(:where).never
     end
