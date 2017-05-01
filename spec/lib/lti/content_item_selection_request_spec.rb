@@ -19,8 +19,14 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Lti::ContentItemSelectionRequest do
-  subject(:lti_request) { described_class.new(course, root_account, teacher) }
+  subject(:lti_request) do
+    described_class.new(context: course,
+                        domain_root_account: root_account,
+                        user: teacher,
+                        host: test_host)
+  end
 
+  let(:test_host) { 'canvas.test' }
   let(:course) { course_model }
   let(:root_account) { course.root_account }
   let(:teacher) { course_with_teacher(course: course).user }
@@ -60,6 +66,22 @@ describe Lti::ContentItemSelectionRequest do
           lti_message_type: 'ContentItemSelectionRequest',
           lti_version: 'LTI-1p0'
         })
+      end
+
+      context 'return_url' do
+        it 'properly sets the return URL when no content item id is provided' do
+          lti_launch = lti_request.generate_lti_launch(placement)
+          expected_url = "http://#{test_host}/courses/#{course.id}/external_content/success/external_tool_dialog"
+          expect(lti_launch.params[:content_item_return_url]).to eq expected_url
+        end
+
+        it 'properly sets the return URL when a content item id is provided' do
+          item_id = 1
+          lti_launch = lti_request.generate_lti_launch(placement, content_item_id: item_id)
+          expected_url = "http://#{test_host}/courses/#{course.id}/external_content/success/external_tool_dialog/#{item_id}"
+
+          expect(lti_launch.params[:content_item_return_url]).to eq expected_url
+        end
       end
 
       context 'placement params' do
@@ -145,8 +167,8 @@ describe Lti::ContentItemSelectionRequest do
 
           it 'adds params for extensions allowed by an assignment' do
             assignment = assignment_model(
-              course: course, 
-              submission_types: 'online_upload', 
+              course: course,
+              submission_types: 'online_upload',
               allowed_extensions: %w(txt jpg)
             )
             lti_launch = lti_request.generate_lti_launch('homework_submission', assignment: assignment)

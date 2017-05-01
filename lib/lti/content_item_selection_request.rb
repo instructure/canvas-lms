@@ -18,10 +18,14 @@
 
 module Lti
   class ContentItemSelectionRequest
-    def initialize(context, domain_root_account, user=nil)
+    include ActionDispatch::Routing::PolymorphicRoutes
+    include Rails.application.routes.url_helpers
+
+    def initialize(context:, domain_root_account:, host:, user: nil)
       @context = context
       @domain_root_account = domain_root_account
       @user = user
+      @host = host
     end
 
     def generate_lti_launch(placement, opts = {})
@@ -33,6 +37,7 @@ module Lti
         # required params
         lti_message_type: 'ContentItemSelectionRequest',
         lti_version: 'LTI-1p0',
+        content_item_return_url: return_url(opts[:content_item_id])
       }).merge(placement_params(placement, assignment: opts[:assignment]))
 
       lti_launch
@@ -55,6 +60,20 @@ module Lti
     end
 
     private
+
+    def return_url(content_item_id)
+      return_url_opts = {
+        service: 'external_tool_dialog',
+        host: @host
+      }
+
+      if content_item_id
+        return_url_opts[:id] = content_item_id
+        polymorphic_url([@context, :external_content_update], return_url_opts)
+      else
+        polymorphic_url([@context, :external_content_success], return_url_opts)
+      end
+    end
 
     def placement_params(placement, assignment: nil)
       case placement
