@@ -268,6 +268,23 @@ describe Api do
 
         expect(@api.api_find_all(User, [@user2.id, @user3.id]).sort_by(&:global_id)).to eq [@user2, @user3].sort_by(&:global_id)
       end
+
+      it 'find users from other shards via SIS ID' do
+        @shard1.activate do
+          @account = Account.create(name: 'new')
+          @user = user_with_pseudonym username: "sis_user_1@example.com", account: @account
+        end
+        expect(Api).to receive(:sis_parse_id).
+          with("root_account:school:sis_login_id:sis_user_1@example.com", anything, anything, anything).
+          twice.
+          and_return(['LOWER(pseudonyms.unique_id)', [QuotedValue.new("LOWER('sis_user_1@example.com')"), @account]])
+        expect(@api.api_find(User, "root_account:school:sis_login_id:sis_user_1@example.com")).to eq @user
+        # works through an association, too
+        account2 = Account.create!
+        course = account2.courses.create!
+        course.enroll_student(@user)
+        expect(@api.api_find(course.students, "root_account:school:sis_login_id:sis_user_1@example.com")).to eq @user
+      end
     end
   end
 
