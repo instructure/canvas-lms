@@ -28,7 +28,7 @@ module Lti
       @host = host
     end
 
-    def generate_lti_launch(placement, opts = {})
+    def generate_lti_launch(placement:, tool:, opts: {})
       lti_launch = Lti::Launch.new(opts)
       lti_launch.resource_url = opts[:launch_url]
 
@@ -38,6 +38,7 @@ module Lti
         lti_message_type: 'ContentItemSelectionRequest',
         lti_version: 'LTI-1p0',
         content_item_return_url: return_url(opts[:content_item_id]),
+        data: data_hash_jwt(tool, placement, opts),
         context_title: @context.name,
         # optional params
         accept_multiple: false
@@ -63,6 +64,20 @@ module Lti
     end
 
     private
+
+    def data_hash_jwt(tool, placement, opts)
+      launch_url = opts[:launch_url] || tool.extension_setting(placement, :url)
+
+      data_hash = {default_launch_url: launch_url}
+      if opts[:content_item_id]
+        data_hash.merge!({
+          content_item_id: opts[:content_item_id],
+          oauth_consumer_key: tool.consumer_key
+        })
+      end
+
+      Canvas::Security.create_jwt(data_hash)
+    end
 
     def return_url(content_item_id)
       return_url_opts = {
