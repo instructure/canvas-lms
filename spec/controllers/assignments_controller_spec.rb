@@ -39,7 +39,7 @@ describe AssignmentsController do
   describe "GET 'index'" do
     it "should throw 404 error without a valid context id" do
       #controller.use_rails_error_handling!
-      get 'index'
+      get 'index', :course_id => 'notvalid'
       assert_status(404)
     end
 
