@@ -127,6 +127,24 @@ describe MasterCourses::MasterTemplate do
       page_tag = @template.content_tag_for(@page)
       expect(page_tag.reload.content).to eq @page
     end
+
+    it "should be able to load tags selectively" do
+      graded_topic = @course.discussion_topics.new
+      graded_topic.assignment = @course.assignments.build
+      graded_topic.save!
+      topic_assmt = graded_topic.assignment.reload
+      normal_topic = @course.discussion_topics.create!
+      other_assmt = @course.assignments.create!
+
+      objects = [topic_assmt, normal_topic, @assignment]
+      objects.each {|o| @template.content_tag_for(o)}
+      @template.load_tags!(objects)
+      objects.each do |o|
+        expect(@template.cached_content_tag_for(o)).to be_present
+      end
+      expect(@template.cached_content_tag_for(graded_topic)).to be_present # should load the submittable
+      expect(@template.cached_content_tag_for(other_assmt)).to be_nil
+    end
   end
 
   describe "default restriction syncing" do

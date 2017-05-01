@@ -477,32 +477,36 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     return render :json => [] unless cutoff_time
 
     max_records = Setting.get('master_courses_history_count', '150').to_i
-    @template.load_tags!
-    changes = []
+    items = []
     (MasterCourses::ALLOWED_CONTENT_TYPES - ['AssignmentGroup']).each do |klass|
       item_scope = case klass
       when 'Attachment'
         @course.attachments
       when 'WikiPage'
         @course.wiki.wiki_pages
+      when 'Assignment'
+        @course.assignments.include_submittables
       else
         klass.constantize.where(:context_id => @course, :context_type => 'Course')
       end
 
-      item_scope.where('updated_at>?', cutoff_time).each do |asset|
-        action = if asset.respond_to?(:deleted?) && asset.deleted?
-          :deleted
-        elsif asset.created_at > cutoff_time
-          :created
-        else
-          :updated
-        end
-        tag = @template.cached_content_tag_for(asset)
-        locked = !!tag&.restrictions&.values&.any?
-        changes << changed_asset_json(asset, action, locked)
-        break if changes.size >= max_records
+      remaining_count = max_records - items.size
+      items += item_scope.where('updated_at>?', cutoff_time).order(:id).limit(remaining_count).to_a
+      break if items.size >= max_records
+    end
+    @template.load_tags!(items) # only load the tags we need
+
+    changes = items.map do |asset|
+      action = if asset.respond_to?(:deleted?) && asset.deleted?
+        :deleted
+      elsif asset.created_at > cutoff_time
+        :created
+      else
+        :updated
       end
-      break if changes.size >= max_records
+      tag = @template.cached_content_tag_for(asset)
+      locked = !!tag&.restrictions&.values&.any?
+      changed_asset_json(asset, action, locked)
     end
 
     render :json => changes

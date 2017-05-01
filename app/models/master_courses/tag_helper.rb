@@ -25,11 +25,17 @@ module MasterCourses::TagHelper
     self.send(self.content_tag_association)
   end
 
-  def load_tags!
-    return if @content_tag_index
-    @content_tag_index = {}
-    self.content_tags.to_a.group_by(&:content_type).each do |content_type, typed_tags|
-      @content_tag_index[content_type] = typed_tags.index_by(&:content_id)
+  def load_tags!(objects=nil)
+    return if @content_tag_index && objects
+    @content_tag_index ||= {}
+    tag_scope = self.content_tags
+
+    if objects
+      objects_to_load = objects.map{|o| (o.is_a?(Assignment) && o.submittable_object) || o}
+      tag_scope = tag_scope.polymorphic_where(:content => objects_to_load)
+    end
+    tag_scope.to_a.group_by(&:content_type).each do |content_type, typed_tags|
+      @content_tag_index[content_type] = typed_tags.index_by(&:content_id).merge(@content_tag_index[content_type] || {})
     end
     true
   end
