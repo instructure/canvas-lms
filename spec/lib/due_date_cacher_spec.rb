@@ -424,5 +424,20 @@ describe DueDateCacher do
         expect(@submission2.reload.cached_due_date).to eq @assignment.due_at.change(sec: 0)
       end
     end
+
+    it 'kicks off a LatePolicyApplicator job on completion when called with a single assignment' do
+      expect(LatePolicyApplicator).to receive(:for_assignment).with(@assignment)
+
+      @cacher.recompute
+    end
+
+    it 'does not kick off a LatePolicyApplicator job when called with multiple assignments' do
+      @assignment1 = @assignment
+      @assignment2 = assignment_model(course: @course)
+
+      expect(LatePolicyApplicator).not_to receive(:for_assignment)
+
+      DueDateCacher.new(@course, [@assignment1, @assignment2]).recompute
+    end
   end
 end

@@ -67,6 +67,16 @@ class DueDateCacher
         Assignment.connection.execute(query)
       end
     end
+
+    if @assignments.size == 1
+      # Only changes to LatePolicy or (sometimes) Assignment records can result in a re-calculation
+      # of student scores.  No changes to the Course record can trigger such re-calculations so
+      # let's ensure this is triggered only when DueDateCacher is called for a Assignment-level
+      # changes and not for Course-level changes
+      assignment = Assignment.find(@assignments.first)
+
+      LatePolicyApplicator.for_assignment(assignment)
+    end
   end
 
   private

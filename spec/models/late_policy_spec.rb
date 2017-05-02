@@ -143,4 +143,68 @@ describe LatePolicy do
       expect(policy.points_deducted(score: 10, possible: 10, late_for: 6.hours)).to eq 0.6
     end
   end
+
+  describe '#update_late_submissions' do
+    before :once do
+      @course = Course.create(name: 'Late Policy Course')
+      @late_policy = LatePolicy.create(course: @course)
+    end
+
+    it 'kicks off a late policy applicator for the course if late_submission_deduction_enabled_changed changes' do
+      @late_policy.late_submission_deduction_enabled = !@late_policy.late_submission_deduction_enabled
+
+      expect(LatePolicyApplicator).to receive(:for_course).with(@course)
+
+      @late_policy.save!
+    end
+
+    it 'kicks off a late policy applicator for the course if late_submission_deduction changes' do
+      @late_policy.late_submission_deduction = 3.14
+
+      expect(LatePolicyApplicator).to receive(:for_course).with(@course)
+
+      @late_policy.save!
+    end
+
+    it 'kicks off a late policy applicator for the course if late_submission_interval changes' do
+      @late_policy.late_submission_interval = 'hour'
+
+      expect(LatePolicyApplicator).to receive(:for_course).with(@course)
+
+      @late_policy.save!
+    end
+
+    it 'kicks off a late policy applicator for the course if late_submission_minimum_percent_enabled changes' do
+      @late_policy.late_submission_minimum_percent_enabled = !@late_policy.late_submission_minimum_percent_enabled
+
+      expect(LatePolicyApplicator).to receive(:for_course).with(@course)
+
+      @late_policy.save!
+    end
+
+    it 'kicks off a late policy applicator for the course if late_submission_minimum_percent changes' do
+      @late_policy.late_submission_minimum_percent = 3.14
+
+      expect(LatePolicyApplicator).to receive(:for_course).with(@course)
+
+      @late_policy.save!
+    end
+
+    it 'does not kick off a late policy applicator if missing_submission_deduction_enabled changes' do
+      @late_policy.missing_submission_deduction_enabled = !@late_policy.missing_submission_deduction_enabled
+
+      expect(LatePolicyApplicator).not_to receive(:for_course)
+
+      @late_policy.save!
+    end
+
+    it 'does not kick off a late policy applicator if missing_submission_deduction changes' do
+      @late_policy.missing_submission_deduction = 3.14
+
+      expect(LatePolicyApplicator).not_to receive(:for_course)
+
+      @late_policy.save!
+    end
+  end
+
 end

@@ -29,6 +29,8 @@ class LatePolicy < ActiveRecord::Base
     presence: true,
     inclusion: { in: %w(day hour) }
 
+  after_save :update_late_submissions, if: :late_policy_attributes_changed?
+
   def points_deducted(score: nil, possible: 0.0, late_for: 0.0)
     return 0.0 unless late_submission_deduction_enabled && score && possible&.positive? && late_for&.positive?
 
@@ -44,5 +46,21 @@ class LatePolicy < ActiveRecord::Base
 
   def interval_seconds
     { 'hour' => 1.hour, 'day' => 1.day }[late_submission_interval].to_f
+  end
+
+  def update_late_submissions
+    LatePolicyApplicator.for_course(course)
+  end
+
+  def late_policy_attributes_changed?
+    (
+      [
+        'late_submission_deduction_enabled',
+        'late_submission_deduction',
+        'late_submission_interval',
+        'late_submission_minimum_percent_enabled',
+        'late_submission_minimum_percent'
+      ] & changed
+    ).present?
   end
 end

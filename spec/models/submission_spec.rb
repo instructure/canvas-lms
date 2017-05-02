@@ -3242,6 +3242,165 @@ describe Submission do
     end
   end
 
+  describe 'scope: late' do
+    before :once do
+      @now = Time.zone.now
+
+      ### Quizzes
+      @quiz = generate_quiz(@course)
+      @quiz_assignment = @quiz.assignment
+
+      # rubocop:disable Rails/SkipsModelValidations
+      @unsubmitted_quiz_submission = @assignment.submissions.create(user: User.create, submission_type: 'online_quiz')
+      Submission.where(id: @unsubmitted_quiz_submission.id).update_all(submitted_at: nil, cached_due_date: nil)
+
+      @ongoing_unsubmitted_quiz = generate_quiz_submission(@quiz, student: User.create)
+      @ongoing_unsubmitted_quiz_submission = @ongoing_unsubmitted_quiz.submission
+      Submission.where(id: @ongoing_unsubmitted_quiz_submission.id).update_all(submitted_at: nil)
+
+      @timely_quiz1 = generate_quiz_submission(@quiz, student: User.create, finished_at: @now)
+      @timely_quiz1_submission = @timely_quiz1.submission
+      Submission.where(id: @timely_quiz1_submission.id).update_all(submitted_at: @now, cached_due_date: nil)
+
+      @timely_quiz2 = generate_quiz_submission(@quiz, student: User.create, finished_at: @now)
+      @timely_quiz2_submission = @timely_quiz2.submission
+      Submission.where(id: @timely_quiz2_submission.id).update_all(submitted_at: @now, cached_due_date: @now + 1.hour)
+
+      @timely_quiz3 = generate_quiz_submission(@quiz, student: User.create, finished_at: @now)
+      @timely_quiz3_submission = @timely_quiz3.submission
+      Submission.where(id: @timely_quiz3_submission.id).
+        update_all(submitted_at: @now, cached_due_date: @now - 45.seconds)
+
+      @late_quiz1 = generate_quiz_submission(@quiz, student: User.create, finished_at: @now)
+      @late_quiz1_submission = @late_quiz1.submission
+      Submission.where(id: @late_quiz1_submission).update_all(submitted_at: @now, cached_due_date: @now - 61.seconds)
+
+      @late_quiz2 = generate_quiz_submission(@quiz, student: User.create, finished_at: @now)
+      @late_quiz2_submission = @late_quiz2.submission
+      Submission.where(id: @late_quiz2_submission).update_all(submitted_at: @now, cached_due_date: @now - 1.hour)
+
+      @timely_quiz_marked_late = generate_quiz_submission(@quiz, student: User.create, finished_at: @now)
+      @timely_quiz_marked_late_submission = @timely_quiz_marked_late.submission
+      Submission.where(id: @timely_quiz_marked_late_submission).update_all(submitted_at: @now, cached_due_date: nil)
+      Submission.where(id: @timely_quiz_marked_late_submission).update_all(late_policy_status: 'late')
+
+      @ongoing_late_quiz1 = generate_quiz_submission(@quiz, student: User.create)
+      @ongoing_late_quiz1_submission = @ongoing_late_quiz1.submission
+      Submission.where(id: @ongoing_late_quiz1_submission).
+        update_all(submitted_at: @now, cached_due_date: @now - 61.seconds)
+
+      @ongoing_late_quiz2 = generate_quiz_submission(@quiz, student: User.create)
+      @ongoing_late_quiz2_submission = @ongoing_late_quiz2.submission
+      Submission.where(id: @ongoing_late_quiz2_submission).
+        update_all(submitted_at: @now, cached_due_date: @now - 1.hour)
+
+      @ongoing_timely_quiz_marked_late = generate_quiz_submission(@quiz, student: User.create)
+      @ongoing_timely_quiz_marked_late_submission = @ongoing_timely_quiz_marked_late.submission
+      Submission.where(id: @ongoing_timely_quiz_marked_late_submission).
+        update_all(submitted_at: @now, cached_due_date: nil, late_policy_status: 'late')
+
+      ### Homeworks
+      @unsubmitted_hw = @assignment.submissions.create(user: User.create, submission_type: 'online_text_entry')
+      Submission.where(id: @unsubmitted_hw.id).update_all(submitted_at: nil, cached_due_date: nil)
+
+      @timely_hw1 = @assignment.submissions.create(user: User.create, submission_type: 'online_text_entry')
+      Submission.where(id: @timely_hw1.id).update_all(submitted_at: @now, cached_due_date: nil)
+
+      @timely_hw2 = @assignment.submissions.create(user: User.create, submission_type: 'online_text_entry')
+      Submission.where(id: @timely_hw2.id).update_all(submitted_at: @now, cached_due_date: @now + 1.hour)
+
+      @late_hw1 = @assignment.submissions.create(user: User.create, submission_type: 'online_text_entry')
+      Submission.where(id: @late_hw1.id).update_all(submitted_at: @now, cached_due_date: @now - 45.seconds)
+
+      @late_hw2 = @assignment.submissions.create(user: User.create, submission_type: 'online_text_entry')
+      Submission.where(id: @late_hw2.id).update_all(submitted_at: @now, cached_due_date: @now - 61.seconds)
+
+      @late_hw3 = @assignment.submissions.create(user: User.create, submission_type: 'online_text_entry')
+      Submission.where(id: @late_hw3.id).update_all(submitted_at: @now, cached_due_date: @now - 1.hour)
+
+      @timely_hw_marked_late = @assignment.submissions.create(user: User.create, submission_type: 'online_text_entry')
+      Submission.where(id: @timely_hw_marked_late.id).update_all(submitted_at: @now, cached_due_date: nil)
+      Submission.where(id: @timely_hw_marked_late.id).update_all(late_policy_status: 'late')
+      # rubocop:enable Rails/SkipsModelValidations
+
+      @late_submission_ids = Submission.late.map(&:id)
+    end
+
+    ### Quizzes
+    it 'excludes unsubmitted quizzes' do
+      expect(@late_submission_ids).not_to include(@unsubmitted_quiz_submission.id)
+    end
+
+    it 'excludes ongoing quizzes that have never been submitted before' do
+      expect(@late_submission_ids).not_to include(@ongoing_unsubmitted_quiz_submission.id)
+    end
+
+    it 'excludes quizzes submitted with no due date' do
+      expect(@late_submission_ids).not_to include(@timely_quiz1_submission.id)
+    end
+
+    it 'excludes quizzes submitted before the due date' do
+      expect(@late_submission_ids).not_to include(@timely_quiz2_submission.id)
+    end
+
+    it 'excludes quizzes submitted less than 60 seconds after the due date' do
+      expect(@late_submission_ids).not_to include(@timely_quiz3_submission.id)
+    end
+
+    it 'includes quizzes submitted more than 60 seconds after the due date' do
+      expect(@late_submission_ids).to include(@late_quiz1_submission.id)
+    end
+
+    it 'excludes quizzes that were last submitted more than 60 seconds after the due date but are being retaken' do
+      expect(@late_submission_ids).not_to include(@ongoing_late_quiz1_submission.id)
+    end
+
+    it 'includes quizzes submitted after the due date' do
+      expect(@late_submission_ids).to include(@late_quiz2_submission.id)
+    end
+
+    it 'excludes quizzes that were last submitted after the due date but are being retaken' do
+      expect(@late_submission_ids).not_to include(@ongoing_late_quiz2_submission.id)
+    end
+
+    it 'includes quizzes that have been manually marked as late' do
+      expect(@late_submission_ids).to include(@timely_quiz_marked_late_submission.id)
+    end
+
+    it 'excludes quizzes that have been manually marked as late but are being retaken' do
+      expect(@late_submission_ids).to include(@ongoing_timely_quiz_marked_late_submission.id)
+    end
+
+    ### Homeworks
+    it 'excludes unsubmitted homeworks' do
+      expect(@late_submission_ids).not_to include(@unsubmitted_hw.id)
+    end
+
+    it 'excludes homeworks submitted with no due date' do
+      expect(@late_submission_ids).not_to include(@timely_hw1.id)
+    end
+
+    it 'excludes homeworks submitted before the due date' do
+      expect(@late_submission_ids).not_to include(@timely_hw2.id)
+    end
+
+    it 'includes homeworks submitted less than 60 seconds after the due date' do
+      expect(@late_submission_ids).to include(@late_hw1.id)
+    end
+
+    it 'includes homeworks submitted more than 60 seconds after the due date' do
+      expect(@late_submission_ids).to include(@late_hw2.id)
+    end
+
+    it 'includes homeworks submitted after the due date' do
+      expect(@late_submission_ids).to include(@late_hw3.id)
+    end
+
+    it 'includes homeworks that have been manually marked as late' do
+      expect(@late_submission_ids).to include(@timely_hw_marked_late.id)
+    end
+  end
+
   def submission_spec_model(opts={})
     opts = @valid_attributes.merge(opts)
     assignment = opts.delete(:assignment) || Assignment.find(opts.delete(:assignment_id))

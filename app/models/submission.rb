@@ -199,6 +199,55 @@ class Submission < ActiveRecord::Base
     ")
   end
 
+  #
+  # Karnaugh Map for this scope
+  #
+  # A: late_policy_status: 'late'
+  # B: submission_type: 'online_quiz'
+  # C: not(cached_due_date: nil)
+  # D: not(submitted_at: nil)
+  # E: submitted_at > cached_due_date
+  # F: submitted_at - 60.seconds > cached_due_date
+  #
+  # +--------+--------+--------+--------+--------+--------+--------+--------+--------+
+  # |        | D'E'F' | D'E'F  | D'EF   | D'EF'  | DE'F'  | DE'F   | DEF    | DEF'   |
+  # +--------+--------+--------+--------+--------+--------+--------+--------+--------+
+  # | A'B'C' |   0    |   0    |   0    |   0    |   0    |   0    |   0    |   0    |
+  # +--------+--------+--------+--------+--------+--------+--------+--------+--------+
+  # | A'B'C  |   0    |   0    |   0    |   0    |   0    |   0    |   1    |   1    |
+  # +--------+--------+--------+--------+--------+--------+--------+--------+--------+
+  # | A'BC   |   0    |   0    |   0    |   0    |   0    |   1    |   1    |   0    |
+  # +--------+--------+--------+--------+--------+--------+--------+--------+--------+
+  # | A'BC'  |   0    |   0    |   0    |   0    |   0    |   0    |   0    |   0    |
+  # +--------+--------+--------+--------+--------+--------+--------+--------+--------+
+  # | AB'C'  |   1    |   1    |   1    |   1    |   1    |   1    |   1    |   1    |
+  # +--------+--------+--------+--------+--------+--------+--------+--------+--------+
+  # | AB'C   |   1    |   1    |   1    |   1    |   1    |   1    |   1    |   1    |
+  # +--------+--------+--------+--------+--------+--------+--------+--------+--------+
+  # | ABC    |   1    |   1    |   1    |   1    |   1    |   1    |   1    |   1    |
+  # +--------+--------+--------+--------+--------+--------+--------+--------+--------+
+  # | ABC'   |   1    |   1    |   1    |   1    |   1    |   1    |   1    |   1    |
+  # +--------+--------+--------+--------+--------+--------+--------+--------+--------+
+  #
+  # y = A + B'CDE + BCDF
+  #
+  def self.late
+    submissions_that_could_be_late = where(late_policy_status: nil).
+      where.not(submitted_at: nil).
+      where.not(cached_due_date: nil)
+
+    late_quizzes = submissions_that_could_be_late.
+      where(submission_type: 'online_quiz').
+      where("submissions.submitted_at - '60 seconds'::INTERVAL > submissions.cached_due_date").
+      joins(:quiz_submission).merge(Quizzes::QuizSubmission.completed)
+
+    late_non_quizzes = submissions_that_could_be_late.
+      where.not(submission_type: 'online_quiz').
+      where("submissions.submitted_at > submissions.cached_due_date")
+
+    where(late_policy_status: 'late').union(late_quizzes.union(late_non_quizzes))
+  end
+
   workflow do
     state :submitted do
       event :grade_it, :transitions_to => :graded
