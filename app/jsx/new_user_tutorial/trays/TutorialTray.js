@@ -97,6 +97,7 @@ class TutorialTray extends React.Component {
         onEntering={this.handleEntering}
         onExiting={this.handleExiting}
         onEntered={this.handleEntering}
+        trapFocus
       >
         <div className="NewUserTutorialTray">
           <div className="NewUserTutorialTray__ButtonContainer">
