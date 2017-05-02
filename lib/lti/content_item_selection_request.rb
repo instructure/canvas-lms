@@ -28,7 +28,7 @@ module Lti
       @host = host
     end
 
-    def generate_lti_launch(placement:, tool:, opts: {})
+    def generate_lti_launch(placement:, tool:, opts: {}, expanded_variables: {})
       lti_launch = Lti::Launch.new(opts)
       lti_launch.resource_url = opts[:launch_url] || tool.extension_setting(placement, :url)
       default_params = ContentItemSelectionRequest.default_lti_params(@context, @domain_root_account, @user)
@@ -41,7 +41,7 @@ module Lti
         context_title: @context.name,
         # optional params
         accept_multiple: false
-      }).merge(placement_params(placement, assignment: opts[:assignment]))
+      }).merge(placement_params(placement, assignment: opts[:assignment])).merge(expanded_variables)
 
       lti_launch.params = Lti::Security.signed_post_params(
         params,
@@ -112,7 +112,6 @@ module Lti
         lti_launch_selection_params
       when 'collaboration'
         collaboration_params
-        # collaboration = ExternalToolCollaboration.find(opts[:content_item_id]) if opts[:content_item_id]
       when 'homework_submission'
         homework_submission_params(assignment)
       else
@@ -135,6 +134,8 @@ module Lti
         accept_presentation_document_targets: 'download',
         accept_copy_advice: true,
         ext_content_file_extensions: %w(zip imscc mbz xml).join(','),
+        accept_unsigned: true,
+        auto_create: false
       }
     end
 
@@ -142,6 +143,8 @@ module Lti
       {
         accept_media_types: %w(image/* text/html application/vnd.ims.lti.v1.ltilink */*).join(','),
         accept_presentation_document_targets: %w(embed frame iframe window).join(','),
+        accept_unsigned: true,
+        auto_create: false
       }
     end
 
@@ -149,6 +152,8 @@ module Lti
       {
         accept_media_types: 'application/vnd.ims.lti.v1.ltilink',
         accept_presentation_document_targets: %w(frame window).join(','),
+        accept_unsigned: true,
+        auto_create: false
       }
     end
 
