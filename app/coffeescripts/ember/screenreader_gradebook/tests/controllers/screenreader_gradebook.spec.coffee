@@ -296,11 +296,11 @@ define [
     submissions = @srgb.submissionsForStudent.call(self, @student)
     propEqual _.pluck(submissions, 'assignment_id'), ['2']
 
-
   QUnit.module 'screenreader_gradebook_controller: with selected student',
     setup: ->
       setup.call this
       @stub(@srgb, 'calculateStudentGrade')
+      @stub(@srgb, 'subtotalByGradingPeriod')
       @completeSetup = =>
         workAroundRaceCondition().then =>
           Ember.run =>
@@ -589,6 +589,8 @@ define [
         get: (attr) -> props[attr]
         submissionsForStudent: () -> submissions
         assignmentGroupsHash: () -> assignmentGroupsHash
+        subtotalByGradingPeriod: () -> false
+        calculateSingleGrade: ->
 
     setup: ->
       @calculateStudentGrade = SRGBController.prototype.calculateStudentGrade

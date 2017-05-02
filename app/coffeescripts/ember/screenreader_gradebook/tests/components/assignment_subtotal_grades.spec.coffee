@@ -33,9 +33,15 @@ define [
       submission_count: 10
       submissions: []
       weight: 90
+  periodScores =
+    grading_period_1:
+      possible: 1800.111
+      score: 95.1225
+      submission_count: 30
+      submissions: []
+      weight: 60
 
-
-  QUnit.module 'assignment_subtotal_grades_component',
+  QUnit.module 'assignment_subtotal_grades_component by group',
     setup: ->
       fixtures.create()
       App = startApp()
@@ -83,4 +89,48 @@ define [
 
   test 'scoreDetail', ->
     expected = "(85.12 / 1,000.11)"
+    equal @component.get('scoreDetail'), expected
+
+  QUnit.module 'assignment_subtotal_grades_component by period',
+    setup: ->
+      fixtures.create()
+      App = startApp()
+      @component = App.AssignmentSubtotalGradesComponent.create()
+      @component.reopen
+        gradingStandard: (->
+          originalGradingStandard = this._super
+          [["A", 0.50],["C", 0.05],["F", 0.00]]
+        ).property()
+      run =>
+        @student = Ember.Object.create Ember.copy periodScores
+        @component.setProperties
+          student: @student
+          subtotal:
+            name: 'Grading Period 1'
+            weight: 0.65
+            key: "grading_period_1"
+
+    teardown: ->
+      run =>
+        @component.destroy()
+        App.destroy()
+
+
+  test 'values', ->
+    deepEqual @component.get('values'), periodScores.grading_period_1
+
+  test 'points', ->
+    expected = "95.12 / 1,800.11"
+    equal @component.get('points'), expected
+
+  test 'percent', ->
+    expected = "5.28%"
+    equal @component.get('percent'), expected
+
+  test 'letterGrade', ->
+    expected = "C"
+    equal @component.get('letterGrade'), expected
+
+  test 'scoreDetail', ->
+    expected = "(95.12 / 1,800.11)"
     equal @component.get('scoreDetail'), expected
