@@ -30,10 +30,9 @@ module Lti
 
     def generate_lti_launch(placement:, tool:, opts: {})
       lti_launch = Lti::Launch.new(opts)
-      lti_launch.resource_url = opts[:launch_url]
-
+      lti_launch.resource_url = opts[:launch_url] || tool.extension_setting(placement, :url)
       default_params = ContentItemSelectionRequest.default_lti_params(@context, @domain_root_account, @user)
-      lti_launch.params = default_params.merge({
+      params = default_params.merge({
         # required params
         lti_message_type: 'ContentItemSelectionRequest',
         lti_version: 'LTI-1p0',
@@ -43,6 +42,14 @@ module Lti
         # optional params
         accept_multiple: false
       }).merge(placement_params(placement, assignment: opts[:assignment]))
+
+      lti_launch.params = Lti::Security.signed_post_params(
+        params,
+        lti_launch.resource_url,
+        tool.consumer_key,
+        tool.shared_secret,
+        @context.root_account.feature_enabled?(:disable_lti_post_only) || tool.extension_setting(:oauth_compliant)
+      )
 
       lti_launch
     end
