@@ -15,7 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [], () ->
+define [
+  'compiled/util/fcUtil'
+], (fcUtil) ->
   # We want to filter events received from the datasource. It seems like you should be able
   # to do this at render time as well, and return "false" in eventRender, but on the agenda
   # view that still assumes that the item is taking up space even though it's not displayed.
@@ -52,7 +54,7 @@ define [], () ->
             # appointment slot
             if schedulerState.inFindAppointmentMode && event.isOnCalendar(schedulerState.selectedCourse.asset_string)
               # show it (non-grayed) if it is reservable; filter it out otherwise
-              if event.calendarEvent.reserved || event.calendarEvent.available_slots == 0
+              if event.calendarEvent.reserved || event.calendarEvent.available_slots == 0 || event.endDate() < fcUtil.now()
                 keep = false
               else
                 gray = false

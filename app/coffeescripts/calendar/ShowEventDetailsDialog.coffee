@@ -19,6 +19,7 @@ define [
   'jquery'
   'i18n!calendar'
   'compiled/util/Popover'
+  'compiled/util/fcUtil'
   'compiled/calendar/CommonEvent'
   'compiled/calendar/commonEventFactory'
   'compiled/calendar/EditEventDetailsDialog'
@@ -33,7 +34,7 @@ define [
   'jquery.ajaxJSON'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
-], ($, I18n, Popover, CommonEvent, commonEventFactory, EditEventDetailsDialog, eventDetailsTemplate, deleteItemTemplate, reservationOverLimitDialog, MessageParticipantsDialog, preventDefault, _, axios, {publish}) ->
+], ($, I18n, Popover, fcUtil, CommonEvent, commonEventFactory, EditEventDetailsDialog, eventDetailsTemplate, deleteItemTemplate, reservationOverLimitDialog, MessageParticipantsDialog, preventDefault, _, axios, {publish}) ->
 
   destroyArguments = (fn) => -> fn.apply(this, [])
 
@@ -169,7 +170,7 @@ define [
 
       if @event.object?.child_events
         if @event.object.reserved || (@event.object.parent_event_id && @event.object.appointment_group_id)
-          params.can_unreserve = true
+          params.can_unreserve = (@event.endDate() > fcUtil.now())
           params.can_reserve = false
 
         for e in @event.object.child_events

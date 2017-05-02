@@ -514,7 +514,7 @@ class CalendarEventsApiController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   def reserve
     get_event
-    if authorized_action(@event, @current_user, :reserve)
+    if authorized_action(@event, @current_user, :reserve) && check_for_past_signup(@event)
       begin
         participant_id = Shard.relative_id_for(params[:participant_id], Shard.current, Shard.current) if params[:participant_id]
         if participant_id && @event.appointment_group.grants_right?(@current_user, session, :manage)
@@ -644,7 +644,7 @@ class CalendarEventsApiController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   def destroy
     get_event
-    if authorized_action(@event, @current_user, :delete)
+    if authorized_action(@event, @current_user, :delete) && check_for_past_signup(@event.parent_event)
       @event.updating_user = @current_user
       @event.cancel_reason = params[:cancel_reason]
       if @event.destroy
@@ -1292,5 +1292,15 @@ class CalendarEventsApiController < ApplicationController
   def calendar_event_params
     params.require(:calendar_event).
       permit(CalendarEvent.permitted_attributes + [:child_event_data => strong_anything])
+  end
+
+  def check_for_past_signup(event)
+    if event && event.end_at < Time.now.utc && event.context.is_a?(AppointmentGroup)
+      unless event.context.grants_right?(@current_user, :manage)
+        render :json => { :message => 'Cannot create or change reservation for past appointment' }, :status => :forbidden
+        return false
+      end
+    end
+    true
   end
 end

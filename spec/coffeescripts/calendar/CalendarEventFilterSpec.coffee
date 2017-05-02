@@ -22,7 +22,7 @@ define [
   'helpers/fakeENV'
 ], (CommonEvent, commonEventFactory, CalendarEventFilter, fakeENV) ->
 
-  test_events = (can_edit, child_events_count, available_slots = 1, reserved = false) ->
+  test_events = (can_edit, child_events_count, available_slots = 1, reserved = false, past_slot = false) ->
     [
       commonEventFactory
         id: "1"
@@ -46,8 +46,8 @@ define [
       commonEventFactory
         id: "20"
         title: "Appointment Slot"
-        start_at: "2016-08-29T11:00:00Z"
-        end_at: "2016-08-29T11:30:00Z"
+        start_at: "#{(new Date).getFullYear() + (if past_slot then -1 else 1)}-08-29T11:00:00Z"
+        end_at:   "#{(new Date).getFullYear() + (if past_slot then -1 else 1)}-08-29T11:30:00Z"
         workflow_state: "active"
         type: "event"
         description: ""
@@ -120,6 +120,12 @@ define [
 
   test 'CalendarEventFilter: hides already-reserved appointments that still have available slots', ->
     events = test_events(false, 0, 1, true)
+    filteredEvents = CalendarEventFilter(null, events, {inFindAppointmentMode: true, selectedCourse: {id: 1, asset_string: 'course_1'}})
+    equal filteredEvents.length, 1
+    equal filteredEvents[0].id, 'calendar_event_1'
+
+  test 'CalendarEventFilter: hides past appointments', ->
+    events = test_events(false, 0, 1, false, true)
     filteredEvents = CalendarEventFilter(null, events, {inFindAppointmentMode: true, selectedCourse: {id: 1, asset_string: 'course_1'}})
     equal filteredEvents.length, 1
     equal filteredEvents[0].id, 'calendar_event_1'
