@@ -22,7 +22,7 @@ import I18n from 'i18n!modules'
 import PostGradesDialog from 'jsx/gradebook/SISGradePassback/PostGradesDialog'
 import classnames from 'classnames'
 
-  // The PostGradesApp mounts a single "Post Grades" button, which pops up
+  // The PostGradesApp mounts a single "Sync Grades" button, which pops up
   // the PostGradesDialog when clicked.
 
   var PostGradesApp = React.createClass({
@@ -60,7 +60,7 @@ import classnames from 'classnames'
       var returnFocusTo = this.props.returnFocusTo;
 
       var $dialog = $('<div class="post-grades-dialog">').dialog({
-        title: I18n.t("Post Grades to SIS"),
+        title: I18n.t('Sync Grades to SIS'),
         maxWidth: 650,     maxHeight: 450,
         minWidth: 650,     minHeight: 450,
         width:    650,     height:    450,

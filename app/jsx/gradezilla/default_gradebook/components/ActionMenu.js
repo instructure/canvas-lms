@@ -268,7 +268,7 @@ const { arrayOf, bool, func, object, shape, string } = React.PropTypes;
       return (
         <MenuItem onSelect={() => { this.handlePublishGradesToSis() }}>
           <span data-menu-id="publish-grades-to-sis">
-            {I18n.t('Publish grades to SIS')}
+            {I18n.t('Sync grades to SIS')}
           </span>
         </MenuItem>
       );

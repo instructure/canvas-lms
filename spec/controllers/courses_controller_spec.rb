@@ -1864,19 +1864,34 @@ describe CoursesController do
       get 'sis_publish_status', :course_id => @course.id
       expect(response).to be_success
       response_body = json_parse(response.body)
-      response_body["sis_publish_statuses"]["Published"].sort_by!{|x|x["id"]}
+      response_body["sis_publish_statuses"]["Synced"].sort_by!{|x| x["id"]}
       expect(response_body).to eq({
-          "sis_publish_overall_status" => "error",
-          "sis_publish_statuses" => {
-              "Error: cause of this reason" => [
-                  {"name"=>"User", "sortable_name"=>"User", "url"=>course_user_url(@course, students[1].user), "id"=>students[1].user.id}
-                ],
-              "Published" => [
-                  {"name"=>"User", "sortable_name"=>"User", "url"=>course_user_url(@course, students[0].user), "id"=>students[0].user.id},
-                  {"name"=>"User", "sortable_name"=>"User", "url"=>course_user_url(@course, students[2].user), "id"=>students[2].user.id}
-                ].sort_by{|x|x["id"]}
+        "sis_publish_overall_status" => "error",
+        "sis_publish_statuses" => {
+          "Error: cause of this reason" => [
+            {
+              "name"=>"User",
+              "sortable_name"=>"User",
+              "url"=>course_user_url(@course, students[1].user),
+              "id"=>students[1].user.id
             }
-        })
+          ],
+          "Synced" => [
+            {
+              "name"=>"User",
+              "sortable_name"=>"User",
+              "url"=>course_user_url(@course, students[0].user),
+              "id"=>students[0].user.id
+            },
+            {
+              "name"=>"User",
+              "sortable_name"=>"User",
+              "url"=>course_user_url(@course, students[2].user),
+              "id"=>students[2].user.id
+            }
+          ].sort_by{|x| x["id"]}
+        }
+      })
     end
   end
 
@@ -1924,17 +1939,32 @@ describe CoursesController do
 
       expect(response).to be_success
       response_body = json_parse(response.body)
-      response_body["sis_publish_statuses"]["Published"].sort_by!{|x|x["id"]}
+      response_body["sis_publish_statuses"]["Synced"].sort_by!{|x| x["id"]}
       expect(response_body).to eq({
-          "sis_publish_overall_status" => "published",
-          "sis_publish_statuses" => {
-              "Published" => [
-                  {"name"=>"User", "sortable_name"=>"User", "url"=>course_user_url(@course, students[0].user), "id"=>students[0].user.id},
-                  {"name"=>"User", "sortable_name"=>"User", "url"=>course_user_url(@course, students[1].user), "id"=>students[1].user.id},
-                  {"name"=>"User", "sortable_name"=>"User", "url"=>course_user_url(@course, students[2].user), "id"=>students[2].user.id}
-                ].sort_by{|x|x["id"]}
+        "sis_publish_overall_status" => "published",
+        "sis_publish_statuses" => {
+          "Synced" => [
+            {
+              "name"=>"User",
+              "sortable_name"=>"User",
+              "url"=>course_user_url(@course, students[0].user),
+              "id"=>students[0].user.id
+            },
+            {
+              "name"=>"User",
+              "sortable_name"=>"User",
+              "url"=>course_user_url(@course, students[1].user),
+              "id"=>students[1].user.id
+            },
+            {
+              "name"=>"User",
+              "sortable_name"=>"User",
+              "url"=>course_user_url(@course, students[2].user),
+              "id"=>students[2].user.id
             }
-        })
+          ].sort_by{|x| x["id"]}
+        }
+      })
     end
   end
 

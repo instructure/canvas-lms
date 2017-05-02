@@ -30,9 +30,9 @@ import React from 'react'
             className="lead"
           >
             <span className="assignments-to-post-count">
-              {I18n.t('assignments_to_post', {
-                 one: 'You are ready to post 1 assignment.',
-                 other: 'You are ready to post %{count} assignments.'
+              {I18n.t({
+                one: 'You are ready to sync 1 assignment.',
+                other: 'You are ready to sync %{count} assignments.'
               }, { count: this.props.postCount })}
             </span>
           </h1>
@@ -58,7 +58,7 @@ import React from 'react'
                 className="btn btn-primary"
                 onClick={ this.props.postGrades }
               >
-                {I18n.t("Post Grades")}
+                {I18n.t('Sync Grades')}
               </button>
             </div>
           </form>

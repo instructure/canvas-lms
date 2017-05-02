@@ -1063,7 +1063,7 @@ define [
         app = React.createElement(PostGradesApp, {
           store: @postGradesStore
           renderAsButton: !$placeholder.hasClass('in-menu')
-          labelText: if $placeholder.hasClass('in-menu') then I18n.t 'PowerSchool' else I18n.t 'Post Grades',
+          labelText: if $placeholder.hasClass('in-menu') then I18n.t 'PowerSchool' else I18n.t 'Sync Grades',
           returnFocusTo: $('#post_grades')
         })
         ReactDOM.render(app, $placeholder[0])

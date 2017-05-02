@@ -68,7 +68,7 @@ describe SIS::CSV::GradePublishingResultsImporter do
 
     statuses = @course.reload.grade_publishing_statuses
     expect(statuses[1]).to eq "published"
-    expect(statuses[0]).to eq({ "Published: message1" => [@enrollment] })
+    expect(statuses[0]).to eq({ "Synced: message1" => [@enrollment] })
 
     @enrollment.reload
     expect(@enrollment.grade_publishing_status).to eq 'published'

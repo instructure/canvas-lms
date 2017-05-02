@@ -105,7 +105,7 @@ export default React.createClass({
         "link_selection":I18n.t("Link Selection"),
         "migration_selection":I18n.t("Migration Selection"),
         "module_menu":I18n.t("Module Menu"),
-        "post_grades":I18n.t("Post Grades"),
+        "post_grades":I18n.t("Sync Grades"),
         "quiz_menu":I18n.t("Quiz Menu"),
         "tool_configuration":I18n.t("Tool Configuration"),
         "user_navigation":I18n.t("User Navigation"),

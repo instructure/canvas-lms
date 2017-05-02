@@ -25,7 +25,7 @@ import classnames from 'classnames'
 
 const { bool, func, shape, string } = React.PropTypes
 
-// The PostGradesApp mounts a single "Post Grades" button, which pops up
+// The PostGradesApp mounts a single "Sync Grades" button, which pops up
 // the PostGradesDialog when clicked.
 class PostGradesApp extends React.Component {
   static propTypes = {
@@ -46,7 +46,7 @@ class PostGradesApp extends React.Component {
 
   static AppLaunch (store, returnFocusTo) {
     const $dialog = $('<div class="post-grades-dialog">').dialog({
-      title: I18n.t('Post Grades to SIS'),
+      title: I18n.t('Sync Grades to SIS'),
       maxWidth: 650,
       maxHeight: 450,
       minWidth: 650,

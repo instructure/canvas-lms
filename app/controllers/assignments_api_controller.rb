@@ -392,7 +392,7 @@
 #         "post_to_sis": {
 #           "example": true,
 #           "type" : "boolean",
-#           "description" : "(optional, present if Post Grades to SIS feature is enabled)"
+#           "description" : "(optional, present if Sync Grades to SIS feature is enabled)"
 #         },
 #         "integration_id": {
 #           "example": "12341234",

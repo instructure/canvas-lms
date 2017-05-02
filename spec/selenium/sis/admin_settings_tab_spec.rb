@@ -129,7 +129,7 @@ describe "admin settings tab" do
           get_settings_page(account)
         end
 
-        it "does not display 'Post Grades to SIS'" do
+        it "does not display 'Sync Grades to SIS'" do
           expect(f("body")).not_to contain_css(default_grade_export)
         end
       end
@@ -140,11 +140,11 @@ describe "admin settings tab" do
           get_settings_page(account)
         end
 
-        it "persists 'Post Grades to SIS' on" do
+        it "persists 'Sync Grades to SIS' on" do
           test_checkbox_on(default_grade_export)
         end
 
-        it "persists 'Post Grades to SIS' off" do
+        it "persists 'Sync Grades to SIS' off" do
           test_checkbox_off(default_grade_export)
         end
       end
@@ -252,7 +252,7 @@ describe "admin settings tab" do
           expect(f("body")).not_to contain_css(sis_syncing)
         end
 
-        it "does not display the 'Post Grades to SIS' option" do
+        it "does not display the 'Sync Grades to SIS' option" do
           expect(f("body")).not_to contain_css(default_grade_export)
         end
       end
@@ -269,7 +269,7 @@ describe "admin settings tab" do
             get_settings_page(account)
           end
 
-          it "does not display the 'Post Grades to SIS' option" do
+          it "does not display the 'Sync Grades to SIS' option" do
             expect(f(default_grade_export)).not_to be_displayed
           end
         end
@@ -281,11 +281,11 @@ describe "admin settings tab" do
             get_settings_page(account)
           end
 
-          it "persists 'Post Grades to SIS' on" do
+          it "persists 'Sync Grades to SIS' on" do
             test_checkbox_on(default_grade_export)
           end
 
-          it "persists 'Post Grades to SIS' off" do
+          it "persists 'Sync Grades to SIS' off" do
             test_checkbox_off(default_grade_export)
           end
         end

@@ -1498,51 +1498,42 @@ class Course < ActiveRecord::Base
 
   def grade_publishing_status_translation(status, message)
     status = "unpublished" if status.blank?
-    case status
-    when 'error'
-      if message.present?
-        message = t('grade_publishing_status.error_with_message', "Error: %{message}", :message => message)
+
+    if message.present?
+      case status
+      when 'error'
+        t("Error: %{message}", message: message)
+      when 'unpublished'
+        t("Not Synced: %{message}", message: message)
+      when 'pending'
+        t("Pending: %{message}", message: message)
+      when 'publishing'
+        t("Syncing: %{message}", message: message)
+      when 'published'
+        t("Synced: %{message}", message: message)
+      when 'unpublishable'
+        t("Unsyncable: %{message}", message: message)
       else
-        message = t('grade_publishing_status.error', "Error")
-      end
-    when 'unpublished'
-      if message.present?
-        message = t('grade_publishing_status.unpublished_with_message', "Unpublished: %{message}", :message => message)
-      else
-        message = t('grade_publishing_status.unpublished', "Unpublished")
-      end
-    when 'pending'
-      if message.present?
-        message = t('grade_publishing_status.pending_with_message', "Pending: %{message}", :message => message)
-      else
-        message = t('grade_publishing_status.pending', "Pending")
-      end
-    when 'publishing'
-      if message.present?
-        message = t('grade_publishing_status.publishing_with_message', "Publishing: %{message}", :message => message)
-      else
-        message = t('grade_publishing_status.publishing', "Publishing")
-      end
-    when 'published'
-      if message.present?
-        message = t('grade_publishing_status.published_with_message', "Published: %{message}", :message => message)
-      else
-        message = t('grade_publishing_status.published', "Published")
-      end
-    when 'unpublishable'
-      if message.present?
-        message = t('grade_publishing_status.unpublishable_with_message', "Unpublishable: %{message}", :message => message)
-      else
-        message = t('grade_publishing_status.unpublishable', "Unpublishable")
+        t("Unknown status, %{status}: %{message}", message: message, status: status)
       end
     else
-      if message.present?
-        message = t('grade_publishing_status.unknown_with_message', "Unknown status, %{status}: %{message}", :message => message, :status => status)
+      case status
+      when 'error'
+        t("Error")
+      when 'unpublished'
+        t("Not Synced")
+      when 'pending'
+        t("Pending")
+      when 'publishing'
+        t("Syncing")
+      when 'published'
+        t("Synced")
+      when 'unpublishable'
+        t("Unsyncable")
       else
-        message = t('grade_publishing_status.unknown', "Unknown status, %{status}", :status => status)
+        t("Unknown status, %{status}", status: status)
       end
     end
-    message
   end
 
   def grade_publishing_statuses

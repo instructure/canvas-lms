@@ -54,7 +54,7 @@
         </button>
         <% if !@context.account.feature_enabled?(:new_sis_integrations) %>
           <% if @post_grades_tools.count > 1 %>
-            <button id="post_grades" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"><%= t('Post Grades') %></button>
+            <button id="post_grades" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"><%= t('Sync Grades') %></button>
             <ul style="display: none;" class="post-grades-menu ui-kyle-menu">
               <% @post_grades_tools.each do |tool| %>
                 <% case tool[:type] %>
@@ -148,7 +148,7 @@
           <% if @context.allows_grade_publishing_by(@current_user) && can_do(@context, @current_user, :manage_grades) %>
           <li><a id="publish_to_sis" href="<%= context_url(@context, :context_details_url,
                                                            :anchor => 'tab-grade-publishing') %>">
-            <%= t('Publish grades to SIS') %>
+            <%= t('Sync grades to SIS') %>
           </a></li>
           <% end %>
           <li><a class="student_names_toggle" href="#" role="button"><%= t('Hide Student Names') %></a></li>
