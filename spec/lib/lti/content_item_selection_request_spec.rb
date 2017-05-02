@@ -57,6 +57,16 @@ describe Lti::ContentItemSelectionRequest do
       expect(lti_launch.resource_url).to eq 'https://www.example.com'
     end
 
+    it 'sets the link text to the placement label' do
+      lti_launch = lti_request.generate_lti_launch(placement: placement, tool: tool, opts: {launch_url: 'https://www.example.com'})
+      expect(lti_launch.link_text).to eq tool.label_for(placement.to_sym, I18n.locale)
+    end
+
+    it 'sets the analytics id to the tool id' do
+      lti_launch = lti_request.generate_lti_launch(placement: placement, tool: tool, opts: {launch_url: 'https://www.example.com'})
+      expect(lti_launch.analytics_id).to eq tool.tool_id
+    end
+
     context 'params' do
       it 'builds a params hash that includes the default lti params' do
         lti_launch = lti_request.generate_lti_launch(placement: placement, tool: tool)
