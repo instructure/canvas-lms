@@ -402,6 +402,13 @@ module Lti
           expect(exp_hash[:test]).to eq 123
         end
 
+        it 'has substitution for $vnd.instructure.Course.uuid' do
+          course.stubs(:uuid).returns('Ioe3sJPt0KZp9Pw6xAvcHuLCl0z4TvPKP0iIOLbo')
+          exp_hash = {test: '$vnd.instructure.Course.uuid'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'Ioe3sJPt0KZp9Pw6xAvcHuLCl0z4TvPKP0iIOLbo'
+        end
+
         it 'has substitution for $Canvas.course.name' do
           course.stubs(:name).returns('Course 101')
           exp_hash = {test: '$Canvas.course.name'}
@@ -783,6 +790,13 @@ module Lti
           exp_hash = {test: '$Canvas.user.id'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 456
+        end
+
+        it 'has substitution for $vnd.instructure.User.uuid' do
+          user.stubs(:uuid).returns('N2ST123dQ9zyhurykTkBfXFa3Vn1RVyaw9Os6vu3')
+          exp_hash = {test: '$vnd.instructure.User.uuid'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'N2ST123dQ9zyhurykTkBfXFa3Vn1RVyaw9Os6vu3'
         end
 
         it 'has substitution for $Canvas.user.isRootAccountAdmin' do

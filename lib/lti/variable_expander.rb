@@ -295,6 +295,15 @@ module Lti
                        -> { @context.id },
                        COURSE_GUARD
 
+    # returns the current course uuid.
+    # @example
+    #   ```
+    #   S3vhRY2pBzG8iPdZ3OBPsPrEnqn5sdRoJOLXGbwc
+    #   ```
+    register_expansion 'vnd.instructure.Course.uuid', [],
+                       -> { @context.uuid },
+                       COURSE_GUARD
+
     # returns the current course name.
     # @example
     #   ```
@@ -493,6 +502,16 @@ module Lti
     #   ```
     register_expansion 'Canvas.user.id', [],
                        -> { @current_user.id },
+                       USER_GUARD
+
+    # Returns the Canvas user_uuid of the launching user.
+    # @duplicates User.uuid
+    # @example
+    #   ```
+    #   N2ST123dQ9zyhurykTkBfXFa3Vn1RVyaw9Os6vu3
+    #   ```
+    register_expansion 'vnd.instructure.User.uuid', [],
+                       -> { @current_user.uuid },
                        USER_GUARD
 
     # Returns the users preference for high contrast colors (an accessibility feature).
