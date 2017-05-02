@@ -1533,6 +1533,32 @@ describe Quizzes::QuizSubmission do
     end
   end
 
+  describe "associated submission" do
+    before(:each) { course_with_student }
+
+    it "assigns minutes_late to zero when not late" do
+      Timecop.freeze do
+        quiz = @course.quizzes.create(due_at: 5.minutes.from_now, quiz_type: "assignment")
+        qs = Quizzes::QuizSubmission.create(
+          finished_at: Time.zone.now, user: @user, quiz: quiz, workflow_state: :complete
+        )
+
+        expect(qs.submission.minutes_late).to be_zero
+      end
+    end
+
+    it "assigns minutes_late with a -1 minute offset" do
+      Timecop.freeze do
+        quiz = @course.quizzes.create(due_at: 5.minutes.ago, quiz_type: "assignment")
+        qs = Quizzes::QuizSubmission.create(
+          finished_at: Time.zone.now, user: @user, quiz: quiz, workflow_state: :complete
+        )
+
+        expect(qs.submission.minutes_late).to eq(4)
+      end
+    end
+  end
+
   describe "#time_spent" do
     it "should return nil if there's no finished_at" do
       subject.finished_at = nil

@@ -91,6 +91,8 @@ class Submission < ActiveRecord::Base
   validates_length_of :body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :published_grade, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
   validates_as_url :url
+  validates :points_deducted, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  validates :late_policy_status, inclusion: ['none', 'missing', 'late'], allow_nil: true
   validate :ensure_grader_can_grade
 
   scope :with_comments, -> { preload(:submission_comments) }
@@ -126,7 +128,6 @@ class Submission < ActiveRecord::Base
     state :pending_review
     state :graded
   end
-
 
   # see #needs_grading?
   # When changing these conditions, consider updating index_submissions_on_assignment_id
@@ -1086,6 +1087,7 @@ class Submission < ActiveRecord::Base
       self.context_code = assignment.context_code
     end
 
+    self.accepted_at = nil unless late_policy_status == 'late'
     self.submitted_at ||= Time.now if self.has_submission? || (self.submission_type && !self.submission_type.empty?)
     self.quiz_submission.reload if self.quiz_submission_id
     self.workflow_state = 'unsubmitted' if self.submitted? && !self.has_submission?
@@ -1765,18 +1767,17 @@ class Submission < ActiveRecord::Base
   #  * submitted_at (Time)
   #  * score (Integer)
   #  * excused (Boolean)
+  #  * late_policy_status (String)
+  #  * accepted_at (Time)
   #
   module Tardiness
     def past_due?
-      return false if cached_due_date.nil?
-      check_time = submitted_at || Time.now
-      check_time -= 60.seconds if submission_type == 'online_quiz'
-      cached_due_date < check_time
+      minutes_late > 0
     end
     alias_method :past_due, :past_due?
 
     def late?
-      submitted_at.present? && past_due?
+      accepted_at.present? && past_due?
     end
     alias_method :late, :late?
 
@@ -1786,16 +1787,28 @@ class Submission < ActiveRecord::Base
     end
     alias_method :missing, :missing?
 
-    # QUESTIONS ABOUT EXCUSED:
-    #   * what happens for group assignments? excuse individually
-    #     * can't excuse for group assignments in speedgrader 1.0
-    #     * TODO make sure Assignment#representatives is updated accordingly
-    #
-    # QUESTIONS FOR ME:
-    #   * are we messing up graded / not graded counts???
     def graded?
       excused || (!!score && workflow_state == 'graded')
     end
+
+    def minutes_late
+      # the submission cannot be late if it's been marked with 'none' or 'missing'
+      return 0.0 if ['none', 'missing'].include?(late_policy_status)
+      return 0.0 if cached_due_date.nil? || time_of_submission <= cached_due_date
+
+      (time_of_submission - cached_due_date) / 60
+    end
+
+    def accepted_at
+      read_attribute(:accepted_at) || submitted_at
+    end
+
+    def time_of_submission
+      time = accepted_at || Time.zone.now
+      time -= 60.seconds if submission_type == 'online_quiz'
+      time
+    end
+    private :time_of_submission
   end
   include Tardiness
 

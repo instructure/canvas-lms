@@ -16,9 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
-require File.expand_path(File.dirname(__FILE__) + '/../lib/validates_as_url.rb')
+require_relative '../spec_helper'
+require_relative '../sharding_spec_helper'
+require_relative '../lib/validates_as_url'
 
 describe Submission do
   before(:once) do
@@ -36,6 +36,9 @@ describe Submission do
       url: "www.instructure.com"
     }
   end
+
+  it { is_expected.to validate_numericality_of(:points_deducted).is_greater_than_or_equal_to(0).allow_nil }
+  it { is_expected.to validate_inclusion_of(:late_policy_status).in_array(["none", "missing", "late"]).allow_nil }
 
   describe "with grading periods" do
     let(:in_closed_grading_period) { 9.days.ago }
@@ -123,7 +126,7 @@ describe Submission do
 
     let(:submission) { @assignment.submissions.find_by(user_id: @student) }
 
-    it "should get initialized during submission creation" do
+    it "gets initialized during submission creation" do
       # create an invited user, so that the submission is not automatically
       # created by the DueDateCacher
       student_in_course
@@ -134,18 +137,16 @@ describe Submission do
       override.set = @course.default_section
       override.override_due_at(Time.zone.now + 1.day)
       override.save!
-      # mysql just truncated the timestamp
-      override.reload
 
       submission = @assignment.submissions.create(:user => @user)
-      expect(submission.cached_due_date).to eq override.due_at
+      expect(submission.cached_due_date).to eq override.reload.due_at
     end
 
     context 'due date changes after student submits' do
       before(:once) do
         Timecop.freeze(@now) do
-          @assignment.update!(due_at: 20.minutes.ago, submission_types: 'online_text_entry')
-          @assignment.submit_homework(@student, body: 'how is babby formed')
+          @assignment.update!(due_at: 20.minutes.ago, submission_types: "online_text_entry")
+          @assignment.submit_homework(@student, body: "a body")
         end
       end
 
@@ -164,6 +165,26 @@ describe Submission do
           expect { @override.assignment_override_students.create!(user: @student) }.to change {
             submission.reload.cached_due_date
           }.from(20.minutes.ago(@now)).to(15.minutes.ago(@now))
+        end
+
+        it "does not change if an override is added for the student and the due date is earlier" \
+        " than an existing override that applies to the student for the assignment" do
+          section = @course.course_sections.create!(name: "My Awesome Section")
+          student_in_section(section, user: @student)
+          @assignment.assignment_overrides.create!(
+            due_at: 10.minutes.ago(@now),
+            due_at_overridden: true,
+            set: section
+          )
+
+          override = @assignment.assignment_overrides.create!(
+            due_at: 15.minutes.ago(@now),
+            due_at_overridden: true
+          )
+
+          expect { override.assignment_override_students.create!(user: @student) }.not_to change {
+            submission.reload.cached_due_date
+          }
         end
 
         it 'changes if an override is removed for the student' do
@@ -248,7 +269,7 @@ describe Submission do
           category = @course.group_categories.create!(name: 'New Group Category')
           @group = @course.groups.create!(group_category: category)
           @assignment = @course.assignments.create!(group_category: category, due_at: 20.minutes.ago(@now))
-          @assignment.submit_homework(@student, body: 'how is babby formed')
+          @assignment.submit_homework(@student, body: "a body")
         end
 
         it 'changes if an override is added for the group the student is in' do
@@ -308,7 +329,7 @@ describe Submission do
         category = @course.group_categories.create!(name: 'New Group Category')
         group = @course.groups.create!(group_category: category)
         assignment = @course.assignments.create!(group_category: category, due_at: 20.minutes.ago(@now))
-        assignment.submit_homework(@student, body: 'how is babby formed')
+        assignment.submit_homework(@student, body: "a body")
 
         section = @course.course_sections.create!(name: 'My Awesome Section')
         @course.enroll_student(@student, section: section, allow_multiple_enrollments: true).accept!
@@ -361,6 +382,144 @@ describe Submission do
         expect { override_student.destroy }.to change {
           submission.reload.cached_due_date
         }.from(21.minutes.ago(@now)).to(20.minutes.ago(@now))
+      end
+    end
+  end
+
+  describe "accepted_at" do
+    before(:once) do
+      @now = Time.zone.now
+      Timecop.freeze(2.days.ago(@now)) do
+        @submission = @assignment.submit_homework(@student, body: "a body")
+        @submission.update!(late_policy_status: "late", accepted_at: 1.day.ago(@now))
+      end
+    end
+
+    it "returns the accepted_at attribute if it is not nil" do
+      expect(@submission.accepted_at).to eq 1.day.ago(@now)
+    end
+
+    it "returns the submitted_at if the accepted_at attribute is nil" do
+      @submission.update!(late_policy_status: nil, accepted_at: nil)
+      expect(@submission.accepted_at).to eq 2.days.ago(@now)
+    end
+
+    it "sets the accepted_at attribute to nil if the late_policy_status is set to anything other than 'late'" do
+      @submission.update!(late_policy_status: "missing")
+      expect(@submission.read_attribute(:accepted_at)).to be_nil
+    end
+  end
+
+  describe "minutes_late" do
+    before(:once) do
+      @date = Time.zone.local(2017, 1, 15, 12)
+      @assignment.update!(due_at: 1.hour.ago(@date), submission_types: "online_text_entry")
+    end
+
+    let(:submission) { @assignment.submissions.find_by(user_id: @student) }
+
+    it "returns time between submitted_at and cached_due_date" do
+      Timecop.freeze(@date) do
+        @assignment.submit_homework(@student, body: "a body")
+        expect(submission.minutes_late).to eq 60
+      end
+    end
+
+    it "is adjusted if the student resubmits" do
+      Timecop.freeze(@date) { @assignment.submit_homework(@student, body: "a body") }
+      Timecop.freeze(30.minutes.from_now(@date)) do
+        @assignment.submit_homework(@student, body: "a body")
+        expect(submission.minutes_late).to eq 90
+      end
+    end
+
+    it "returns time between accepted_at and cached_due_date if the submission has a" \
+    " late_policy_status of 'late' and an accepted_at" do
+      Timecop.freeze(@date) do
+        @assignment.submit_homework(@student, body: "a body")
+        submission.update!(late_policy_status: "late", accepted_at: 30.minutes.from_now(@date))
+        expect(submission.minutes_late).to eq 90
+      end
+    end
+
+    it "is not adjusted if the student resubmits and the submission has a late_policy_status" \
+    " of 'late' and an accepted_at" do
+      Timecop.freeze(@date) { @assignment.submit_homework(@student, body: "a body") }
+      submission.update!(late_policy_status: "late", accepted_at: 30.minutes.from_now(@date))
+      Timecop.freeze(40.minutes.from_now(@date)) do
+        @assignment.submit_homework(@student, body: "a body")
+        expect(submission.minutes_late).to eq 90
+      end
+    end
+
+    it "returns time between submitted_at and cached_due_date if the submission has a" \
+    " late_policy_status of 'late' but no accepted_at is present" do
+      Timecop.freeze(@date) do
+        @assignment.submit_homework(@student, body: "a body")
+        submission.update!(late_policy_status: "late")
+        expect(submission.minutes_late).to eq 60
+      end
+    end
+
+    it "is zero if it is not late" do
+      Timecop.freeze(2.hours.ago(@date)) do
+        @assignment.submit_homework(@student, body: "a body")
+        expect(submission.minutes_late).to be_zero
+      end
+    end
+
+    it "is zero if it was turned in late but the teacher sets the late_policy_status to 'none'" do
+      Timecop.freeze(@date) do
+        @assignment.submit_homework(@student, body: "a body")
+        submission.update!(late_policy_status: "none")
+        expect(submission.minutes_late).to be_zero
+      end
+    end
+
+    it "is zero if it was turned in late but the teacher sets the late_policy_status to 'missing'" do
+      Timecop.freeze(@date) do
+        @assignment.submit_homework(@student, body: "a body")
+        submission.update!(late_policy_status: "missing")
+        expect(submission.minutes_late).to be_zero
+      end
+    end
+
+    it "is zero if it was turned in late but the teacher sets the late_policy_status to 'late'" \
+    " and sets the accepted_at to the due date" do
+      Timecop.freeze(@date) do
+        @assignment.submit_homework(@student, body: "a body")
+        submission.update!(late_policy_status: "late", accepted_at: submission.cached_due_date)
+        expect(submission.minutes_late).to be_zero
+      end
+    end
+
+    it "is zero if cached_due_date is nil" do
+      Timecop.freeze(@date) do
+        @assignment.update!(due_at: nil)
+        @assignment.submit_homework(@student, body: "a body")
+        expect(submission.minutes_late).to be_zero
+      end
+    end
+
+    it "subtracts 60 seconds from the time of submission when submission_type is 'online_quiz'" do
+      Timecop.freeze(@date) do
+        @assignment.update!(submission_types: "online_quiz")
+        @assignment.submit_homework(@student, submission_type: "online_quiz", body: "a body")
+        expect(submission.minutes_late).to eq 59
+      end
+    end
+
+    it "includes seconds" do
+      Timecop.freeze(30.seconds.from_now(@date)) do
+        @assignment.submit_homework(@student, body: "a body")
+        expect(submission.minutes_late).to be 60.5
+      end
+    end
+
+    it "uses the current time if submitted_at is nil" do
+      Timecop.freeze(1.day.from_now(@date)) do
+        @assignment.grade_student(@student, score: 10, grader: @teacher)
+        expect(submission.minutes_late).to eq 1500 # 25 hours * 60
       end
     end
   end
@@ -1827,15 +1986,15 @@ describe Submission do
       submission_spec_model
     end
 
-    it "should be false if not past due" do
+    it 'should be false if not past due' do
       @submission.submitted_at = 2.days.ago
       @submission.cached_due_date = 1.day.ago
       expect(@submission).not_to be_late
     end
 
-    it "should be false if not submitted, even if past due" do
-      @submission.submission_type = nil # forces submitted_at to be nil
-      @submission.cached_due_date = 1.day.ago
+    it 'should be false if not submitted, even if past due' do
+      @submission.submission_type = nil
+      @submission.cached_due_date = 1.day.ago # forces submitted_at to be nil
       expect(@submission).not_to be_late
     end
 
@@ -2564,12 +2723,12 @@ describe Submission do
     end
 
     it "returns the last published comment made by the teacher" do
-      @submission.add_comment(author: @teacher, comment: "how is babby formed")
+      @submission.add_comment(author: @teacher, comment: 'a comment')
       expect(@submission.last_teacher_comment).to be_present
     end
 
     it "does not include draft comments" do
-      @submission.add_comment(author: @teacher, comment: "how is babby formed", draft_comment: true)
+      @submission.add_comment(author: @teacher, comment: 'a comment', draft_comment: true)
       expect(@submission.last_teacher_comment).to be_nil
     end
   end
@@ -2673,7 +2832,7 @@ describe Submission do
 
   describe ".needs_grading" do
     before :once do
-      @submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry', body: 'asdf')
+      @submission = @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "a body")
     end
 
     it "includes submission that has not been graded" do
