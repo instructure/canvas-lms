@@ -648,6 +648,9 @@ class CalendarEventsApiController < ApplicationController
       @event.updating_user = @current_user
       @event.cancel_reason = params[:cancel_reason]
       if @event.destroy
+        if @event.appointment_group && @event.appointment_group.appointments.count == 0 && @event.appointment_group.context.root_account.feature_enabled?(:better_scheduler)
+          @event.appointment_group.destroy
+        end
         render :json => event_json(@event, @current_user, session)
       else
         render :json => @event.errors, :status => :bad_request

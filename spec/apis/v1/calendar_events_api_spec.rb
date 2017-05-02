@@ -1019,6 +1019,22 @@ describe CalendarEventsApiController, type: :request do
       expect(event.reload).to be_deleted
     end
 
+    it 'should delete the appointment group if it has no appointments' do
+      @course.root_account.enable_feature!(:better_scheduler)
+      time = Time.utc(Time.now.year, Time.now.month, Time.now.day, 4, 20)
+      @appointment_group = AppointmentGroup.create!(
+        :title => "appointment group", :participants_per_appointment => 4,
+        :new_appointments => [
+          [time + 3.days, time + 3.days + 1.hour]
+        ],
+        :contexts => [@course]
+      )
+
+      api_call(:delete, "/api/v1/calendar_events/#{@appointment_group.appointments.first.id}",
+                      {:controller => 'calendar_events_api', :action => 'destroy', :id => @appointment_group.appointments.first.id.to_s, :format => 'json'})
+      expect(@appointment_group.reload).to be_deleted
+    end
+
     it 'should api translate event descriptions' do
       should_translate_user_content(@course) do |content|
         event = @course.calendar_events.create!(:title => 'event', :start_at => '2012-01-08 12:00:00', :description => content)
