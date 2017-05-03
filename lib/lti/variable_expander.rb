@@ -684,6 +684,17 @@ module Lti
                        -> { lti_helper.section_sis_ids },
                        ENROLLMENT_GUARD
 
+    # Returns the course code
+    #
+    # @example
+    #   ```
+    #   section_sis_id_1, section_sis_id_2
+    #   ```
+    register_expansion 'com.instructure.contextLabel', [],
+                       -> { @context.course_code },
+                       COURSE_GUARD,
+                       default_name: 'context_label'
+
     # Returns the module_id that the module item was launched from.
     #
     # @example

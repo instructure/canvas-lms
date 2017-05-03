@@ -660,10 +660,11 @@ class ExternalToolsController < ApplicationController
     }
 
     collaboration = opts[:content_item_id].present? ? ExternalToolCollaboration.find(opts[:content_item_id]) : nil
-    expander = variable_expander(tool:tool, collaboration: collaboration)
+    params_helper = content_item_param_helper(placement, collaboration)
+
     lti_launch = selection_request.generate_lti_launch(placement: placement,
                                                        tool: @tool,
-                                                       expanded_variables: expander.expand_variables!(tool.set_custom_fields(placement)),
+                                                       expanded_variables: params_helper.expanded_variables,
                                                        opts: opts)
   end
   protected :content_item_selection_request
@@ -1082,6 +1083,19 @@ class ExternalToolsController < ApplicationController
       current_pseudonym: @current_pseudonym,
       tool: @tool }
     Lti::VariableExpander.new(@domain_root_account, @context, self, default_opts.merge(opts))
+  end
+
+  def content_item_param_helper(placement, collaboration)
+    Lti::ContentItemParameterHelper.new(tool: @tool,
+                                        placement: placement,
+                                        collaboration: collaboration,
+                                        context: @context,
+                                        opts: {
+                                          current_user: @current_user,
+                                          current_pseudonym: @current_pseudonym,
+                                          domain_root_account: @domain_root_account,
+                                          controller: self
+                                        })
   end
 
   def default_lti_params

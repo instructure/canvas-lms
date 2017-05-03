@@ -22,7 +22,7 @@ module Lti
   describe VariableExpander do
     let(:root_account) { Account.new(lti_guid: 'test-lti-guid') }
     let(:account) { Account.new(root_account: root_account) }
-    let(:course) { Course.new(account: account) }
+    let(:course) { Course.new(account: account, course_code: 'CS 124') }
     let(:group_category) { course.group_categories.new(name: 'Category') }
     let(:group) { course.groups.new(name: 'Group', group_category: group_category) }
     let(:user) { User.new }
@@ -469,6 +469,12 @@ module Lti
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq '1,2'
         end
+
+         it 'has a substitution for com.instructure.contextLabel' do
+            exp_hash = {test: '$com.instructure.contextLabel'}
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq course.course_code
+          end
       end
 
       context 'context is a course and there is a user' do
