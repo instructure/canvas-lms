@@ -16,7 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'aws-sdk'
+require 'aws-sdk-s3'
+require 'aws-sdk-sqs'
 require File.expand_path('../configurable_timeout', __FILE__)
 
 module IncomingMailProcessor

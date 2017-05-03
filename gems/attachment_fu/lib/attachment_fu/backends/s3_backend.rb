@@ -140,7 +140,7 @@ module AttachmentFu # :nodoc:
       mattr_reader :bucket
 
       def self.included(base) #:nodoc:
-        require 'aws-sdk'
+        require 'aws-sdk-s3'
 
         s3_config_path = base.attachment_options[:s3_config_path] || (Rails.root + 'config/amazon_s3.yml')
         s3_config = YAML.load(ERB.new(File.read(s3_config_path)).result)[Rails.env].symbolize_keys

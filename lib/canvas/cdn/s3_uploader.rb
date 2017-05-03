@@ -24,7 +24,7 @@ module Canvas
       attr_accessor :bucket, :config, :mutex
 
       def initialize(folder='dist')
-        require 'aws-sdk'
+        require 'aws-sdk-s3'
         @folder = folder
         @config = Canvas::Cdn.config
         @s3 = Aws::S3::Resource.new(access_key_id: config.aws_access_key_id,

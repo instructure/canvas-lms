@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-gem "aws-sdk", "=2.6.7" unless defined? Bundler
+gem "aws-sdk-s3", "1.0.0.rc3" unless defined? Bundler
 require "json"
-require "aws-sdk"
+require "aws-sdk-s3"
 require "fileutils"
 require "tmpdir"
 require 'yaml'
