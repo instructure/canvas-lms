@@ -21,6 +21,7 @@ define [
   'compiled/fn/preventDefault'
   'Backbone'
   'jqueryui/tooltip'
+  'compiled/jquery.rails_flash_notifications'
 ], (I18n, $, preventDefault, {View}) ->
 
   class ToggleableSubscriptionIconView extends View
@@ -37,6 +38,9 @@ define [
       initial_post_required: I18n.t('initial_post_required_to_subscribe', 'You must post a reply before subscribing')
       not_in_group_set: I18n.t('cant_subscribe_not_in_group_set', 'You must be in an associated group to subscribe')
       not_in_group: I18n.t('cant_subscribe_not_in_group', 'You must be in this group to subscribe')
+      toggle_on: I18n.t('You are subscribed to this topic. Click to unsubscribe.')
+      toggle_off: I18n.t('You are not subscribed to this topic. Click to subscribe.')
+
 
     tooltipOptions:
       items: '*'
@@ -64,9 +68,11 @@ define [
       if @subscribed()
         @model.topicUnsubscribe()
         @displayStateDuringHover = true
+        $.screenReaderFlashMessage(@messages['toggle_off'])
       else if @canSubscribe()
         @model.topicSubscribe()
         @displayStateDuringHover = true
+        $.screenReaderFlashMessage(@messages['toggle_on'])
       @render()
 
     subscribed: -> @model.get('subscribed') && @canSubscribe()
@@ -114,9 +120,9 @@ define [
 
     setScreenreaderText: ->
       if (@model.get('subscribed'))
-        @$el.attr('aria-label', I18n.t('You are subscribed to this topic. Click to unsubscribe.'))
+        @$el.attr('aria-label',@messages['toggle_on'])
       else
-        @$el.attr('aria-label', I18n.t('You are not subscribed to this topic. Click to subscribe.'))
+        @$el.attr('aria-label', @messages['toggle_off'])
 
     afterRender: ->
       [newClass, tooltipText] = @classAndTextForTooltip()
