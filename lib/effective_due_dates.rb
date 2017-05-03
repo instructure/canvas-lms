@@ -83,11 +83,12 @@ class EffectiveDueDates
   end
 
   def find_effective_due_date(student_id, assignment_id)
+    student_id = Shard.relative_id_for(student_id, Shard.current, @context.shard)
     find_effective_due_dates_for_assignment(assignment_id).fetch(student_id, {})
   end
 
   def find_effective_due_dates_for_assignment(assignment_id)
-    to_hash.fetch(assignment_id, {})
+    to_hash.fetch(Shard.relative_id_for(assignment_id, Shard.current, @context.shard), {})
   end
 
   private
@@ -117,235 +118,248 @@ class EffectiveDueDates
   #   }, ...
   # }
   def query
-    return @query unless @query.nil?
+    @query ||= @context.shard.activate do
+      # default to all active assignments on this course if nothing is passed
+      assignment_collection = @assignments.empty? ? [@context.active_assignments] : @assignments
 
-    # default to all active assignments on this course if nothing is passed
-    assignment_collection = @assignments.empty? ? [@context.active_assignments] : @assignments
+      if assignment_collection.length == 1 &&
+        assignment_collection.first.respond_to?(:to_sql) &&
+        !assignment_collection.first.loaded?
+        # it's a relation, let's not load it unnecessarily out here
+        assignment_collection = assignment_collection.first.except(:order).select(:id).to_sql
+      else
+        # otherwise, map through the array as necessary to get id's
+        assignment_collection.flatten!
+        assignment_collection.map!{ |assignment| assignment.try(:id) } if assignment_collection.first.is_a?(Assignment)
+        assignment_collection.compact!
+        assignment_collection = assignment_collection.join(',')
+      end
 
-    if assignment_collection.length == 1 &&
-      assignment_collection.first.respond_to?(:to_sql) &&
-      !assignment_collection.first.loaded?
-      # it's a relation, let's not load it unnecessarily out here
-      assignment_collection = assignment_collection.first.except(:order).select(:id).to_sql
-    else
-      # otherwise, map through the array as necessary to get id's
-      assignment_collection.flatten!
-      assignment_collection.map!{ |assignment| assignment.try(:id) } if assignment_collection.first.is_a?(Assignment)
-      assignment_collection.compact!
-      return {} if assignment_collection.empty?
-      assignment_collection = assignment_collection.join(',')
+      if assignment_collection.empty?
+        {}
+      else
+        ActiveRecord::Base.connection.select_all("
+          -- fetch the assignment itself
+          WITH models AS (
+            SELECT *
+            FROM #{Assignment.quoted_table_name}
+            WHERE
+              id IN (#{assignment_collection}) AND
+              workflow_state <> 'deleted' AND
+              context_id = #{@context.id} AND context_type = 'Course'
+          ),
+
+          -- fetch all overrides for this assignment
+          overrides AS (
+            SELECT
+              o.id,
+              o.assignment_id,
+              o.set_type,
+              o.set_id,
+              o.due_at_overridden,
+              CASE WHEN o.due_at_overridden IS TRUE THEN o.due_at ELSE a.due_at END AS due_at
+            FROM
+              models a
+            INNER JOIN #{AssignmentOverride.quoted_table_name} o ON o.assignment_id = a.id
+            WHERE
+              o.workflow_state = 'active'
+          ),
+
+          -- fetch all students affected by adhoc overrides
+          override_adhoc_students AS (
+            SELECT
+              os.user_id AS student_id,
+              o.assignment_id,
+              o.id AS override_id,
+              date_trunc('minute', o.due_at) AS due_at,
+              o.set_type AS override_type,
+              o.due_at_overridden,
+              1 AS priority
+            FROM
+              overrides o
+            INNER JOIN #{AssignmentOverrideStudent.quoted_table_name} os ON os.assignment_override_id = o.id
+            WHERE
+              o.set_type = 'ADHOC'
+          ),
+
+          -- fetch all students affected by group overrides
+          override_groups_students AS (
+            SELECT
+              gm.user_id AS student_id,
+              o.assignment_id,
+              o.id AS override_id,
+              date_trunc('minute', o.due_at) AS due_at,
+              o.set_type AS override_type,
+              o.due_at_overridden,
+              1 AS priority
+            FROM
+              overrides o
+            INNER JOIN #{Group.quoted_table_name} g ON g.id = o.set_id
+            INNER JOIN #{GroupMembership.quoted_table_name} gm ON gm.group_id = g.id
+            WHERE
+              o.set_type = 'Group' AND
+              g.workflow_state <> 'deleted' AND
+              gm.workflow_state = 'accepted'
+          ),
+
+          -- fetch all students affected by section overrides
+          override_sections_students AS (
+            SELECT
+              e.user_id AS student_id,
+              o.assignment_id,
+              o.id AS override_id,
+              date_trunc('minute', o.due_at) AS due_at,
+              o.set_type AS override_type,
+              o.due_at_overridden,
+              1 AS priority
+            FROM
+              overrides o
+            INNER JOIN #{CourseSection.quoted_table_name} s ON s.id = o.set_id
+            INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_section_id = s.id
+            WHERE
+              o.set_type = 'CourseSection' AND
+              s.workflow_state <> 'deleted' AND
+              e.workflow_state NOT IN ('rejected', 'deleted') AND
+              e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
+          ),
+
+          -- fetch all students who have an 'Everyone Else'
+          -- due date applied to them from the assignment
+          override_everyonelse_students AS (
+            SELECT
+              student.id AS student_id,
+              a.id as assignment_id,
+              NULL::integer AS override_id,
+              date_trunc('minute', a.due_at) AS due_at,
+              'Everyone Else'::varchar AS override_type,
+              FALSE AS due_at_overridden,
+              2 AS priority
+            FROM
+              models a
+            INNER JOIN #{Course.quoted_table_name} c ON a.context_id = c.id AND a.context_type = 'Course'
+            INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_id = c.id
+            INNER JOIN #{User.quoted_table_name} student ON e.user_id = student.id
+            WHERE
+              e.workflow_state NOT IN ('rejected', 'deleted') AND
+              e.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND
+              a.only_visible_to_overrides IS NOT TRUE
+          ),
+
+          -- fetch all students who have graded submissions
+          -- because if the student received a grade, they
+          -- shouldn't lose visibility to the assignment
+          override_submissions_students AS (
+            SELECT
+              s.user_id AS student_id,
+              s.assignment_id,
+              NULL::integer AS override_id,
+              NULL::timestamp AS due_at,
+              'Submission'::varchar AS override_type,
+              FALSE AS due_at_overridden,
+              3 AS priority
+            FROM
+              models a
+            INNER JOIN #{Submission.quoted_table_name} s ON s.assignment_id = a.id
+            WHERE s.workflow_state = 'graded'
+          ),
+
+          -- join all these students together into a single table
+          override_all_students AS (
+            SELECT * FROM override_adhoc_students
+            UNION ALL
+            SELECT * FROM override_groups_students
+            UNION ALL
+            SELECT * FROM override_sections_students
+            UNION ALL
+            SELECT * FROM override_everyonelse_students
+            UNION ALL
+            SELECT * FROM override_submissions_students
+          ),
+
+          -- and pick the latest override date as the effective due date
+          calculated_overrides AS (
+            SELECT DISTINCT ON (student_id, assignment_id)
+              *
+            FROM override_all_students
+            ORDER BY student_id ASC, assignment_id ASC, priority ASC, due_at_overridden DESC, due_at DESC NULLS FIRST
+          ),
+
+          -- now find all grading periods, including both
+          -- legacy course periods and newer account-level periods
+          course_and_account_grading_periods AS (
+              SELECT DISTINCT ON (gp.id)
+                gp.id,
+                date_trunc('minute', gp.start_date) AS start_date,
+                date_trunc('minute', gp.end_date) AS end_date,
+                date_trunc('minute', gp.close_date) AS close_date,
+                gpg.course_id,
+                gpg.account_id
+              FROM
+                models a
+              INNER JOIN #{Course.quoted_table_name} c ON c.id = a.context_id AND a.context_type = 'Course'
+              INNER JOIN #{EnrollmentTerm.quoted_table_name} term ON c.enrollment_term_id = term.id
+              LEFT OUTER JOIN #{GradingPeriodGroup.quoted_table_name} gpg ON
+                  gpg.course_id = c.id OR gpg.id = term.grading_period_group_id
+              LEFT OUTER JOIN #{GradingPeriod.quoted_table_name} gp ON gp.grading_period_group_id = gpg.id
+              WHERE
+                gpg.workflow_state = 'active' AND
+                gp.workflow_state = 'active'
+          ),
+
+          -- then filter down to the grading periods we care about:
+          -- if legacy periods exist, only return those. Otherwise,
+          -- return the account-level periods.
+          applied_grading_periods AS (
+            SELECT *
+            FROM course_and_account_grading_periods
+            WHERE
+              EXISTS (
+                SELECT 1 FROM course_and_account_grading_periods WHERE course_id IS NOT NULL
+              ) AND course_id IS NOT NULL
+            UNION ALL
+            SELECT *
+            FROM course_and_account_grading_periods
+            WHERE
+              NOT EXISTS (
+                SELECT 1 FROM course_and_account_grading_periods WHERE course_id IS NOT NULL
+              ) AND account_id IS NOT NULL
+          ),
+
+          -- infinite due dates are put in the last grading period.
+          -- better to fetch it once since we'll likely reference it multiple times below
+          last_period AS (
+            SELECT id, close_date FROM applied_grading_periods ORDER BY end_date DESC LIMIT 1
+          )
+
+          -- finally bring it all together!
+          SELECT
+            overrides.assignment_id,
+            overrides.student_id,
+            overrides.due_at,
+            overrides.override_type,
+            overrides.override_id,
+            CASE
+              -- check whether or not this due date falls in a closed grading period
+              WHEN overrides.due_at IS NOT NULL AND '#{Time.zone.now.iso8601}'::timestamptz >= periods.close_date THEN TRUE
+              -- when no explicit due date is provided, we treat it as if it's in the latest grading period
+              WHEN overrides.due_at IS NULL AND
+                  overrides.override_type <> 'Submission' AND
+                  '#{Time.zone.now.iso8601}'::timestamptz >= (SELECT close_date FROM last_period) THEN TRUE
+              ELSE FALSE
+            END AS closed,
+            CASE
+              -- if infinite due date, put it in the last grading period
+              WHEN overrides.due_at IS NULL AND
+                  overrides.override_type <> 'Submission' THEN (SELECT id FROM last_period)
+              -- otherwise, put it in whatever grading period id we found for it
+              ELSE periods.id
+            END AS grading_period_id
+          FROM calculated_overrides overrides
+          -- match the effective due date with its grading period
+          LEFT OUTER JOIN applied_grading_periods periods ON
+              periods.start_date < overrides.due_at AND overrides.due_at <= periods.end_date
+        ")
+      end
     end
-
-    @query = ActiveRecord::Base.connection.select_all("
-      -- fetch the assignment itself
-      WITH models AS (
-        SELECT *
-        FROM #{Assignment.quoted_table_name}
-        WHERE
-          id IN (#{assignment_collection}) AND
-          workflow_state <> 'deleted' AND
-          context_id = #{@context.id} AND context_type = 'Course'
-      ),
-
-      -- fetch all overrides for this assignment
-      overrides AS (
-        SELECT
-          o.*
-        FROM
-          models a
-        INNER JOIN #{AssignmentOverride.quoted_table_name} o ON o.assignment_id = a.id
-        WHERE
-          o.workflow_state = 'active' AND o.due_at_overridden
-      ),
-
-      -- fetch all students affected by adhoc overrides
-      override_adhoc_students AS (
-        SELECT
-          os.user_id AS student_id,
-          o.assignment_id,
-          o.id AS override_id,
-          date_trunc('minute', o.due_at) AS due_at,
-          o.set_type AS override_type,
-          1 AS priority
-        FROM
-          overrides o
-        INNER JOIN #{AssignmentOverrideStudent.quoted_table_name} os ON os.assignment_override_id = o.id
-        WHERE
-          o.set_type = 'ADHOC'
-      ),
-
-      -- fetch all students affected by group overrides
-      override_groups_students AS (
-        SELECT
-          gm.user_id AS student_id,
-          o.assignment_id,
-          o.id AS override_id,
-          date_trunc('minute', o.due_at) AS due_at,
-          o.set_type AS override_type,
-          1 AS priority
-        FROM
-          overrides o
-        INNER JOIN #{Group.quoted_table_name} g ON g.id = o.set_id
-        INNER JOIN #{GroupMembership.quoted_table_name} gm ON gm.group_id = g.id
-        WHERE
-          o.set_type = 'Group' AND
-          g.workflow_state <> 'deleted' AND
-          gm.workflow_state = 'accepted'
-      ),
-
-      -- fetch all students affected by section overrides
-      override_sections_students AS (
-        SELECT
-          e.user_id AS student_id,
-          o.assignment_id,
-          o.id AS override_id,
-          date_trunc('minute', o.due_at) AS due_at,
-          o.set_type AS override_type,
-          1 AS priority
-        FROM
-          overrides o
-        INNER JOIN #{CourseSection.quoted_table_name} s ON s.id = o.set_id
-        INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_section_id = s.id
-        WHERE
-          o.set_type = 'CourseSection' AND
-          s.workflow_state <> 'deleted' AND
-          e.workflow_state NOT IN ('rejected', 'deleted') AND
-          e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-      ),
-
-      -- fetch all students who have an 'Everyone Else'
-      -- due date applied to them from the assignment
-      override_everyonelse_students AS (
-        SELECT
-          student.id AS student_id,
-          a.id as assignment_id,
-          NULL::integer AS override_id,
-          date_trunc('minute', a.due_at) AS due_at,
-          'Everyone Else'::varchar AS override_type,
-          2 AS priority
-        FROM
-          models a
-        INNER JOIN #{Course.quoted_table_name} c ON a.context_id = c.id AND a.context_type = 'Course'
-        INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_id = c.id
-        INNER JOIN #{User.quoted_table_name} student ON e.user_id = student.id
-        WHERE
-          e.workflow_state NOT IN ('rejected', 'deleted') AND
-          e.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND
-          a.only_visible_to_overrides IS NOT TRUE
-      ),
-
-      -- fetch all students who have graded submissions
-      -- because if the student received a grade, they
-      -- shouldn't lose visibility to the assignment
-      override_submissions_students AS (
-        SELECT
-          s.user_id AS student_id,
-          s.assignment_id,
-          NULL::integer AS override_id,
-          NULL::timestamp AS due_at,
-          'Submission'::varchar AS override_type,
-          3 AS priority
-        FROM
-          models a
-        INNER JOIN #{Submission.quoted_table_name} s ON s.assignment_id = a.id
-        WHERE s.workflow_state = 'graded'
-      ),
-
-      -- join all these students together into a single table
-      override_all_students AS (
-        SELECT * FROM override_adhoc_students
-        UNION ALL
-        SELECT * FROM override_groups_students
-        UNION ALL
-        SELECT * FROM override_sections_students
-        UNION ALL
-        SELECT * FROM override_everyonelse_students
-        UNION ALL
-        SELECT * FROM override_submissions_students
-      ),
-
-      -- and pick the latest override date as the effective due date
-      calculated_overrides AS (
-        SELECT DISTINCT ON (student_id, assignment_id)
-          *
-        FROM override_all_students
-        ORDER BY student_id ASC, assignment_id ASC, priority ASC, due_at DESC NULLS FIRST
-      ),
-
-      -- now find all grading periods, including both
-      -- legacy course periods and newer account-level periods
-      course_and_account_grading_periods AS (
-          SELECT DISTINCT ON (gp.id)
-            gp.id,
-            date_trunc('minute', gp.start_date) AS start_date,
-            date_trunc('minute', gp.end_date) AS end_date,
-            date_trunc('minute', gp.close_date) AS close_date,
-            gpg.course_id,
-            gpg.account_id
-          FROM
-            models a
-          INNER JOIN #{Course.quoted_table_name} c ON c.id = a.context_id AND a.context_type = 'Course'
-          INNER JOIN #{EnrollmentTerm.quoted_table_name} term ON c.enrollment_term_id = term.id
-          LEFT OUTER JOIN #{GradingPeriodGroup.quoted_table_name} gpg ON
-              gpg.course_id = c.id OR gpg.id = term.grading_period_group_id
-          LEFT OUTER JOIN #{GradingPeriod.quoted_table_name} gp ON gp.grading_period_group_id = gpg.id
-          WHERE
-            gpg.workflow_state = 'active' AND
-            gp.workflow_state = 'active'
-      ),
-
-      -- then filter down to the grading periods we care about:
-      -- if legacy periods exist, only return those. Otherwise,
-      -- return the account-level periods.
-      applied_grading_periods AS (
-        SELECT *
-        FROM course_and_account_grading_periods
-        WHERE
-          EXISTS (
-            SELECT 1 FROM course_and_account_grading_periods WHERE course_id IS NOT NULL
-          ) AND course_id IS NOT NULL
-        UNION ALL
-        SELECT *
-        FROM course_and_account_grading_periods
-        WHERE
-          NOT EXISTS (
-            SELECT 1 FROM course_and_account_grading_periods WHERE course_id IS NOT NULL
-          ) AND account_id IS NOT NULL
-      ),
-
-      -- infinite due dates are put in the last grading period.
-      -- better to fetch it once since we'll likely reference it multiple times below
-      last_period AS (
-        SELECT id, close_date FROM applied_grading_periods ORDER BY end_date DESC LIMIT 1
-      )
-
-      -- finally bring it all together!
-      SELECT
-        overrides.assignment_id,
-        overrides.student_id,
-        overrides.due_at,
-        overrides.override_type,
-        overrides.override_id,
-        CASE
-          -- check whether or not this due date falls in a closed grading period
-          WHEN overrides.due_at IS NOT NULL AND '#{Time.zone.now.iso8601}'::timestamptz >= periods.close_date THEN TRUE
-          -- when no explicit due date is provided, we treat it as if it's in the latest grading period
-          WHEN overrides.due_at IS NULL AND
-              overrides.override_type <> 'Submission' AND
-              '#{Time.zone.now.iso8601}'::timestamptz >= (SELECT close_date FROM last_period) THEN TRUE
-          ELSE FALSE
-        END AS closed,
-        CASE
-          -- if infinite due date, put it in the last grading period
-          WHEN overrides.due_at IS NULL AND
-              overrides.override_type <> 'Submission' THEN (SELECT id FROM last_period)
-          -- otherwise, put it in whatever grading period id we found for it
-          ELSE periods.id
-        END AS grading_period_id
-      FROM calculated_overrides overrides
-      -- match the effective due date with its grading period
-      LEFT OUTER JOIN applied_grading_periods periods ON
-          periods.start_date < overrides.due_at AND overrides.due_at <= periods.end_date
-    ")
   end
 end

@@ -46,6 +46,7 @@ class GradeCalculator
     @current_updates = {}
     @final_updates = {}
     @ignore_muted = opts[:ignore_muted]
+    @effective_due_dates = opts[:effective_due_dates]
   end
 
   # recomputes the scores and saves them to each user's Enrollment
@@ -73,10 +74,8 @@ class GradeCalculator
       select("submissions.id, user_id, assignment_id, score, excused, submissions.workflow_state")
     scores_and_group_sums = []
     @user_ids.each_slice(100) do |batched_ids|
-      load_assignment_visibilities_for_users(batched_ids)
       scores_and_group_sums_batch = compute_scores_and_group_sums_for_batch(batched_ids)
       scores_and_group_sums.concat(scores_and_group_sums_batch)
-      clear_assignment_visibilities_cache
     end
     scores_and_group_sums
   end
@@ -92,6 +91,10 @@ class GradeCalculator
 
   private
 
+  def effective_due_dates
+    @effective_due_dates ||= EffectiveDueDates.for_course(@course, @assignments)
+  end
+
   def compute_scores_and_group_sums_for_batch(user_ids)
     user_ids.map do |user_id|
       group_sums = compute_group_sums_for_user(user_id)
@@ -106,10 +109,15 @@ class GradeCalculator
     end
   end
 
+  def assignment_visible_to_student?(assignment_id, user_id)
+    effective_due_dates.find_effective_due_date(user_id, assignment_id).key?(:due_at)
+  end
+
   def compute_group_sums_for_user(user_id)
     user_submissions = submissions_by_user.fetch(user_id, []).select do |submission|
-      assignment_ids_visible_to_user(user_id).include?(submission.assignment_id)
+      assignment_visible_to_student?(submission.assignment_id, user_id)
     end
+
     {
       current: create_group_sums(user_submissions, user_id, ignore_ungraded: true),
       final: create_group_sums(user_submissions, user_id, ignore_ungraded: false)
@@ -199,10 +207,6 @@ class GradeCalculator
   end
 
   def calculate_grading_period_scores
-    @course.preload_user_roles!
-    ActiveRecord::Associations::Preloader.new.preload(@assignments, [:assignment_overrides, :context])
-    @assignments.select{ |a| a.assignment_overrides.size == 0 }.each { |a| a.has_no_overrides = true }
-
     grading_periods_for_course.each do |grading_period|
       # update this grading period score, and do not
       # update any other scores (grading period or course)
@@ -213,7 +217,8 @@ class GradeCalculator
         update_all_grading_period_scores: false,
         update_course_score: false,
         grading_period: grading_period,
-        assignments: @assignments
+        assignments: @assignments,
+        effective_due_dates: effective_due_dates
       ).compute_and_save_scores
     end
 
@@ -234,7 +239,8 @@ class GradeCalculator
       @user_ids,
       @course,
       update_all_grading_period_scores: false,
-      update_course_score: false
+      update_course_score: false,
+      effective_due_dates: effective_due_dates
     ).compute_and_save_scores
   end
 
@@ -348,13 +354,17 @@ class GradeCalculator
   #   ...]
   # each group
   def create_group_sums(submissions, user_id, ignore_ungraded: true)
-    visible_assignments = @assignments
-    visible_assignments = visible_assignments.select{|a| assignment_ids_visible_to_user(user_id).include?(a.id)}
+    visible_assignments = @assignments.select { |assignment| assignment_visible_to_student?(assignment.id, user_id) }
 
     if @grading_period
-      user = User.find(user_id)
-      visible_assignments = @grading_period.assignments_for_student(visible_assignments, user)
+      visible_assignments.select! do |assignment|
+        effective_due_dates.grading_period_id_for(
+          student_id: user_id,
+          assignment_id: assignment.id
+        ) == Shard.relative_id_for(@grading_period.id, Shard.current, @course.shard)
+      end
     end
+
     assignments_by_group_id = visible_assignments.group_by(&:assignment_group_id)
     submissions_by_assignment_id = Hash[
       submissions.map { |s| [s.assignment_id, s] }
@@ -407,25 +417,6 @@ class GradeCalculator
         Rails.logger.info "GRADES: calculated #{group_grade_info.inspect}"
       }
     end
-  end
-
-  def load_assignment_visibilities_for_users(user_ids)
-    @assignment_ids_visible_to_user ||= begin
-      AssignmentStudentVisibility.shard(@course.shard)
-        .visible_assignment_ids_in_course_by_user(
-          course_id: @course.id,
-          user_id: user_ids.map { |u| Shard.global_id_for(u) }, # hack to always find cross-shard enrollments
-          use_global_id: true
-        )
-    end
-  end
-
-  def clear_assignment_visibilities_cache
-    @assignment_ids_visible_to_user = nil
-  end
-
-  def assignment_ids_visible_to_user(user_id)
-    @assignment_ids_visible_to_user[Shard.global_id_for(user_id)]
   end
 
   # see comments for dropAssignments in grade_calculator.coffee
