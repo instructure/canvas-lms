@@ -2030,4 +2030,14 @@ describe DiscussionTopic do
       end
     end
   end
+
+  it "should let course admins reply to concluded topics" do
+    course_with_teacher(:active_all => true)
+    topic = @course.discussion_topics.create!
+    group_model(:context => @course)
+    group_topic = @group.discussion_topics.create!
+    @course.complete!
+    expect(topic.grants_right?(@teacher, :reply)).to be_truthy
+    expect(group_topic.grants_right?(@teacher, :reply)).to be_truthy
+  end
 end
