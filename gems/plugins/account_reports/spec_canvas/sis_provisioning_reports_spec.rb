@@ -1115,10 +1115,10 @@ describe "Default Account Reports" do
       before(:once) do
         create_an_account
         create_some_users_with_pseudonyms
-        uo1 = @user2.user_observees.create_or_restore(user_id: @user1)
+        @uo1 = @user2.user_observees.create_or_restore(user_id: @user1)
         uo2 = @user4.user_observees.create_or_restore(user_id: @user3)
         @user7.user_observees.create_or_restore(user_id: @user6)
-        UserObserver.where(id: [uo1.id, uo2.id]).update_all(sis_batch_id: @sis)
+        UserObserver.where(id: [@uo1.id, uo2.id]).update_all(sis_batch_id: @sis)
       end
 
       it 'should run user_observer provisioning report' do
@@ -1146,6 +1146,25 @@ describe "Default Account Reports" do
         expect(parsed.length).to eq 3
       end
 
+      it 'should exclude deleted observers by default' do
+        @uo1.destroy
+        parameters = {}
+        parameters["user_observers"] = true
+        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
+        expect(parsed[0]).to eq ["user_sis_id_04", "user_sis_id_03", "active"]
+        expect(parsed.length).to eq 1
+      end
+
+      it 'should include deleted observers by when param is present' do
+        @uo1.destroy
+        parameters = {}
+        parameters["user_observers"] = true
+        parameters["include_deleted"] = true
+        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
+        expect(parsed[0]).to eq ["user_sis_id_02", "user_sis_id_01", "deleted"]
+        expect(parsed[1]).to eq ["user_sis_id_04", "user_sis_id_03", "active"]
+        expect(parsed.length).to eq 2
+      end
     end
 
     it "should run multiple SIS Export reports" do

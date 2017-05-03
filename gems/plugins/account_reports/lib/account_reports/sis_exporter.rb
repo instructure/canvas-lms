@@ -710,14 +710,14 @@ module AccountReports
         select("pseudonyms.*,
                 p2.sis_user_id AS observer_sis_id,
                 p2.user_id AS observer_id,
-                user_observers.workflow_state AS state,
+                user_observers.workflow_state AS ob_state,
                 user_observers.sis_batch_id AS o_batch_id").
         joins("INNER JOIN #{UserObserver.quoted_table_name} ON pseudonyms.user_id=user_observers.user_id
                INNER JOIN #{Pseudonym.quoted_table_name} AS p2 ON p2.user_id=user_observers.observer_id").
         where("p2.account_id=pseudonyms.account_id")
 
       observers = observers.where.not(user_observers: {sis_batch_id: nil}) if @created_by_sis || @sis_format
-      observers = observers.active unless @include_deleted
+      observers = observers.active.where.not(user_observers: {workflow_state: 'deleted'}) unless @include_deleted
 
       generate_and_run_report headers do |csv|
         observers.find_each do |observer|
@@ -726,7 +726,7 @@ module AccountReports
           row << observer.observer_sis_id
           row << observer.user_id unless @sis_format
           row << observer.sis_user_id
-          row << observer.state
+          row << observer.ob_state
           row << observer.o_batch_id? unless @sis_format
           csv << row
         end
