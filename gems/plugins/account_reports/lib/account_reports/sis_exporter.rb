@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - present Instructure, Inc.
+# Copyright (C) 2012 - 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -65,12 +65,15 @@ module AccountReports
     def users
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = ['user_id', 'login_id', 'password', 'first_name', 'last_name',
-                   'full_name', 'sortable_name', 'short_name', 'email', 'status']
+        headers = ['user_id', 'integration_id', 'authentication_provider_id',
+                   'login_id', 'password', 'first_name', 'last_name', 'full_name',
+                   'sortable_name', 'short_name', 'email', 'status']
       else # provisioning_report
         headers = []
         headers << I18n.t('#account_reports.report_header_canvas_user_id', 'canvas_user_id')
         headers << I18n.t('#account_reports.report_header_user__id', 'user_id')
+        headers << I18n.t('#account_reports.report_header_integration_id', 'integration_id')
+        headers << I18n.t('#account_reports.report_header_authentication_provider_id', 'authentication_provider_id')
         headers << I18n.t('#account_reports.report_header_login_id', 'login_id')
         headers << I18n.t('#account_reports.report_header_first_name', 'first_name')
         headers << I18n.t('#account_reports.report_header_last_name', 'last_name')
@@ -84,8 +87,9 @@ module AccountReports
 
       users = root_account.pseudonyms.except(:preload).joins(:user).select(
         "pseudonyms.id, pseudonyms.sis_user_id, pseudonyms.user_id, pseudonyms.sis_batch_id,
-         pseudonyms.unique_id, pseudonyms.workflow_state, users.sortable_name,
-         users.updated_at AS user_updated_at, users.name, users.short_name").
+         pseudonyms.integration_id,pseudonyms.authentication_provider_id,pseudonyms.unique_id,
+         pseudonyms.workflow_state, users.sortable_name,users.updated_at AS user_updated_at,
+         users.name, users.short_name").
         where("NOT EXISTS (SELECT user_id
                            FROM #{Enrollment.quoted_table_name} e
                            WHERE e.type = 'StudentViewEnrollment'
@@ -118,6 +122,8 @@ module AccountReports
             row = []
             row << u.user_id unless @sis_format
             row << u.sis_user_id
+            row << u.integration_id
+            row << u.authentication_provider_id
             row << u.unique_id
             row << nil if @sis_format
             name_parts = User.name_parts(u.sortable_name, likely_already_surname_first: true)
@@ -225,12 +231,13 @@ module AccountReports
     def courses
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = ['course_id', 'short_name', 'long_name', 'account_id', 'term_id', 'status',
-                   'start_date', 'end_date']
+        headers = ['course_id', 'integration_id', 'short_name', 'long_name',
+                   'account_id', 'term_id', 'status', 'start_date', 'end_date']
       else
         headers = []
         headers << I18n.t('#account_reports.report_header_canvas_course_id', 'canvas_course_id')
         headers << I18n.t('#account_reports.report_header_course__id', 'course_id')
+        headers << I18n.t('#account_reports.report_header_integration_id', 'integration_id')
         headers << I18n.t('#account_reports.report_header_short__name', 'short_name')
         headers << I18n.t('#account_reports.report_header_long__name', 'long_name')
         headers << I18n.t('#account_reports.report_header_canvas_account_id', 'canvas_account_id')
@@ -267,6 +274,7 @@ module AccountReports
           row = []
           row << c.id unless @sis_format
           row << c.sis_source_id
+          row << c.integration_id
           row << c.course_code
           row << c.name
           row << c.account_id unless @sis_format
@@ -299,13 +307,15 @@ module AccountReports
     def sections
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = ['section_id', 'course_id', 'name', 'status', 'start_date', 'end_date']
+        headers = ['section_id', 'course_id', 'integration_id', 'name', 'status',
+                   'start_date', 'end_date']
       else
         headers = []
         headers << I18n.t('#account_reports.report_header_canvas_section_id', 'canvas_section_id')
         headers << I18n.t('#account_reports.report_header_section__id', 'section_id')
         headers << I18n.t('#account_reports.report_header_canvas_course_id', 'canvas_course_id')
         headers << I18n.t('#account_reports.report_header_course__id', 'course_id')
+        headers << I18n.t('#account_reports.report_header_integration_id', 'integration_id')
         headers << I18n.t('#account_reports.report_header_name', 'name')
         headers << I18n.t('#account_reports.report_header_status', 'status')
         headers << I18n.t('#account_reports.report_header_start__date', 'start_date')
@@ -358,6 +368,7 @@ module AccountReports
             row << s.non_x_course_id unless @sis_format
             row << s.non_x_course_sis_id
           end
+          row << s.integration_id
           row << s.name
           row << s.workflow_state
           if s.restrict_enrollments_to_section_dates
