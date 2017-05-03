@@ -61,8 +61,8 @@ module TatlTael
 
       def underscore_and_symbolize_keys(hash)
         if hash.is_a? Hash
-          return hash.reduce({}) do |memo, (k, v)|
-            memo.tap { |m| m[underscore(k).to_sym] = underscore_and_symbolize_keys(v) }
+          return hash.each_with_object({}) do |(k, v), memo|
+            memo[underscore(k).to_sym] = underscore_and_symbolize_keys(v)
           end
         end
 
