@@ -22,7 +22,7 @@ describe Lti::ContentItemParameterHelper do
     tool.save!
   end
 
-  let(:subject) do
+  let(:helper) do
     Lti::ContentItemParameterHelper.new(
       tool: tool,
       placement: placement,
@@ -38,7 +38,7 @@ describe Lti::ContentItemParameterHelper do
         'custom_context_id' => Lti::Asset.opaque_identifier_for(course)
       }
 
-      expect(subject.expanded_variables).to include expected_params
+      expect(helper.expanded_variables).to include expected_params
     end
 
     it 'includes supported parameters' do
@@ -46,7 +46,115 @@ describe Lti::ContentItemParameterHelper do
         'context_label' => course.course_code
       }
 
-      expect(subject.expanded_variables).to include expected_params
+      expect(helper.expanded_variables).to include expected_params
+    end
+  end
+
+  describe 'supported_parameters' do
+    context 'public privacy level' do
+      let(:tool) do
+        tool = new_valid_tool(course)
+        tool.workflow_state = 'public'
+        tool.save!
+        tool
+      end
+
+      let(:helper) do
+        Lti::ContentItemParameterHelper.new(
+          tool: tool,
+          placement: placement,
+          context: course,
+          collaboration: nil,
+          opts: opts
+        )
+      end
+
+      it 'includes all supported parameters if privacy level is public' do
+        expected_params = %w(com.instructure.contextLabel
+                             Person.sourcedId
+                             CourseOffering.sourcedId
+                             Person.email.primary
+                             Person.name.given
+                             Person.name.full
+                             Person.name.family)
+        expect(helper.supported_parameters).to match_array expected_params
+      end
+    end
+
+    context 'name only privacy level' do
+      let(:tool) do
+        tool = new_valid_tool(course)
+        tool.workflow_state = 'name_only'
+        tool.save!
+        tool
+      end
+
+      let(:helper) do
+        Lti::ContentItemParameterHelper.new(
+          tool: tool,
+          placement: placement,
+          context: course,
+          collaboration: nil,
+          opts: opts
+        )
+      end
+
+      it 'inlcudes anonymous and name only params if privacy level is name only' do
+        expected_params = %w(com.instructure.contextLabel
+                             Person.name.given
+                             Person.name.full
+                             Person.name.family)
+        expect(helper.supported_parameters).to match_array expected_params
+      end
+    end
+
+    context 'email only privacy level' do
+      let(:tool) do
+        tool = new_valid_tool(course)
+        tool.workflow_state = 'email_only'
+        tool.save!
+        tool
+      end
+
+      let(:helper) do
+        Lti::ContentItemParameterHelper.new(
+          tool: tool,
+          placement: placement,
+          context: course,
+          collaboration: nil,
+          opts: opts
+        )
+      end
+
+      it 'includes anonymous and email only params if privacy level is email only' do
+        expected_params = %w(com.instructure.contextLabel
+                             Person.email.primary)
+        expect(helper.supported_parameters).to match_array expected_params
+      end
+    end
+
+    context 'anonymous privacy level' do
+      let(:tool) do
+        tool = new_valid_tool(course)
+        tool.workflow_state = 'anonymous'
+        tool.save!
+        tool
+      end
+
+      let(:helper) do
+        Lti::ContentItemParameterHelper.new(
+          tool: tool,
+          placement: placement,
+          context: course,
+          collaboration: nil,
+          opts: opts
+        )
+      end
+
+      it 'includes anonymouse parameters only if privacy level is anonymous' do
+        expected_params = %w(com.instructure.contextLabel)
+        expect(helper.supported_parameters).to match_array expected_params
+      end
     end
   end
 end
