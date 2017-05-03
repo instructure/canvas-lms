@@ -28,5 +28,5 @@ QUnit.module('CourseSidebar component')
 test('renders the CourseSidebar component', () => {
   const tree = enzyme.shallow(<CourseSidebar {...defaultProps()} />)
   const rows = tree.find('.bcs__row')
-  equal(rows.length, 3)
+  equal(rows.length, 4)
 })

@@ -24,7 +24,6 @@ import select from 'jsx/shared/select'
 
 import Button from 'instructure-ui/lib/components/Button'
 import Typography from 'instructure-ui/lib/components/Typography'
-import Checkbox from 'instructure-ui/lib/components/Checkbox'
 import Spinner from 'instructure-ui/lib/components/Spinner'
 
 import propTypes from '../propTypes'
@@ -36,6 +35,7 @@ import BlueprintModal from './BlueprintModal'
 import { ConnectedMigrationSync as MigrationSync } from './MigrationSync'
 import { ConnectedBlueprintAssociations as BlueprintAssociations } from './BlueprintAssociations'
 import { ConnectedSyncHistory as SyncHistory } from './SyncHistory'
+import { ConnectedEnableNotification as EnableNotification } from './EnableNotification'
 
 let UnsynchedChanges = null
 
@@ -54,8 +54,10 @@ export default class CourseSidebar extends Component {
     isLoadingUnsynchedChanges: PropTypes.bool.isRequired,
     hasLoadedUnsynchedChanges: PropTypes.bool.isRequired,
     unsynchedChanges: propTypes.unsynchedChanges,
+    isLoadingBeginMigration: PropTypes.bool.isRequired,
     migrationStatus: PropTypes.oneOf(MigrationStates.states)
   }
+
   static defaultProps = {
     unsynchedChanges: [],
     migrationStatus: MigrationStates.unknown,
@@ -126,7 +128,11 @@ export default class CourseSidebar extends Component {
         doneButton: <MigrationSync
           showProgress={false}
           onClick={() => this.closeModal(() => {
-            this.unsynchedChangesBtn.focus()
+            if (this.unsynchedChangesBtn) {
+              this.unsynchedChangesBtn.focus()
+            } else {
+              this.syncHistoryBtn.focus()
+            }
           })}
         />
       },
@@ -175,16 +181,27 @@ export default class CourseSidebar extends Component {
   // if we have unsynched changes, show the sync button
   maybeRenderSyncButton () {
     if (this.props.hasLoadedUnsynchedChanges && this.props.unsynchedChanges.length > 0) {
-      return <MigrationSync />
+      return (
+        <div className="bcs__row bcs__row-sync-holder">
+          <MigrationSync />
+        </div>
+      )
     }
     return null
   }
 
   // if we have unsynched changes, show the button
   maybeRenderUnsynchedChanges () {
+    // if loading changes, show spinner
     if (!this.props.hasLoadedUnsynchedChanges || this.props.isLoadingUnsynchedChanges) {
       return this.renderSpinner(I18n.t('Loading Unsynched Changes'))
     }
+    // if syncing, hide
+    const isSyncing = MigrationStates.isLoadingState(this.props.migrationStatus) || this.props.isLoadingBeginMigration
+    if (isSyncing) {
+      return null
+    }
+    // if changes are loaded, show me
     if (this.props.hasLoadedUnsynchedChanges && this.props.unsynchedChanges.length > 0) {
       return (
         <div className="bcs__row">
@@ -197,13 +214,7 @@ export default class CourseSidebar extends Component {
             <Typography>{I18n.t('Unsynched Changes')}</Typography>
           </Button>
           <Typography><span className="bcs__row-right-content">{this.props.unsynchedChanges.length}</span></Typography>
-          <div className="bcs__history-notification">
-            <Checkbox
-              label={I18n.t('Send Notification')}
-              checked={this.props.willSendNotification}
-              onChange={this.handleSendNotificationClick}
-            />
-          </div>
+          <EnableNotification />
         </div>
       )
     }
@@ -238,7 +249,7 @@ export default class CourseSidebar extends Component {
           <Typography><span className="bcs__row-right-content">{this.props.associations.length}</span></Typography>
         </div>
         <div className="bcs__row">
-          <Button is="mcSyncHistoryBtn" ref={(c) => { this.syncHistoryBtn = c }} variant="link" onClick={this.handleSyncHistoryClick}>
+          <Button id="mcSyncHistoryBtn" ref={(c) => { this.syncHistoryBtn = c }} variant="link" onClick={this.handleSyncHistoryClick}>
             <Typography>{I18n.t('Sync History')}</Typography>
           </Button>
         </div>

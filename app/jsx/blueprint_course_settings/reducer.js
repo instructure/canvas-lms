@@ -118,6 +118,12 @@ export default combineReducers({
   willSendNotification: handleActions({
     [actionTypes.ENABLE_SEND_NOTIFICATION]: (state, action) => action.payload
   }, false),
+  willIncludeCustomNotificationMessage: handleActions({
+    [actionTypes.INCLUDE_CUSTOM_NOTIFICATION_MESSAGE]: (state, action) => action.payload
+  }, false),
+  notificationMessage: handleActions({
+    [actionTypes.SET_NOTIFICATION_MESSAGE]: (state, action) => action.payload
+  }, ''),
   errors: (state = [], action) => (
     action.error
       ? state.concat([action.payload.message])

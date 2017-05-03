@@ -6,29 +6,20 @@ import select from 'jsx/shared/select'
 
 import Alert from 'instructure-ui/lib/components/Alert'
 import Heading from 'instructure-ui/lib/components/Heading'
-import Checkbox from 'instructure-ui/lib/components/Checkbox'
 
 import UnsynchedChange from './UnsynchedChange'
+import { ConnectedEnableNotification as EnableNotification } from './EnableNotification'
 
 import actions from '../actions'
 import propTypes from '../propTypes'
 
-const { func, bool } = React.PropTypes
-
 export default class UnsynchedChanges extends Component {
   static propTypes = {
     unsynchedChanges: propTypes.unsynchedChanges,
-    willSendNotification: bool.isRequired,
-    enableSendNotification: func.isRequired,
   }
 
   static defaultProps = {
     unsynchedChanges: [],
-  }
-
-  handleSendNotificationClick = (event) => {
-    const enabled = event.target.checked
-    this.props.enableSendNotification(enabled)
   }
 
   maybeRenderChanges () {
@@ -52,15 +43,7 @@ export default class UnsynchedChanges extends Component {
         {this.props.unsynchedChanges.map(change =>
           (<UnsynchedChange key={change.asset_id} change={change} />)
         )}
-        <div className="bcs__history-notification">
-          <div>
-            <Checkbox
-              label={I18n.t('Send Notification')}
-              checked={this.props.willSendNotification}
-              onChange={this.handleSendNotificationClick}
-            />
-          </div>
-        </div>
+        <EnableNotification />
       </div>
     )
   }
@@ -76,10 +59,7 @@ export default class UnsynchedChanges extends Component {
 
 const connectState = state =>
   select(state, [
-    'hasLoadedUnsynchedChanges',
-    'isLoadingUnsynchedChanges',
     'unsynchedChanges',
-    'willSendNotification',
   ])
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
 export const ConnectedUnsynchedChanges = connect(connectState, connectActions)(UnsynchedChanges)

@@ -77,8 +77,14 @@ const ApiClient = {
     return axios.get(`/api/v1/courses/${course.id}/blueprint_templates/default/migrations`)
   },
 
-  beginMigration ({ course }) {
-    return axios.post(`/api/v1/courses/${course.id}/blueprint_templates/default/migrations`)
+  beginMigration ({ course, willSendNotification, willIncludeCustomNotificationMessage, notificationMessage}) {
+    const params = {
+      send_notification: willSendNotification
+    }
+    if (willIncludeCustomNotificationMessage && notificationMessage) {
+      params.comment = notificationMessage
+    }
+    return axios.post(`/api/v1/courses/${course.id}/blueprint_templates/default/migrations`, params)
   },
 
   checkMigration (state) {

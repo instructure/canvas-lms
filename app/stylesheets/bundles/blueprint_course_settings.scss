@@ -25,6 +25,7 @@
 
 .bcs__content {
   width: 270px;
+  border-bottom: 2px solid $ic-border-color;
 
   .bcs__body {
     margin: 0 1.5em;
@@ -306,17 +307,34 @@
   }
 }
 
-.bcs__body .bcs__migration-sync .bcs__migration-sync__button { // when sync button is in the sidebar
-  float: right;
-}
-
 .bcs__history-notification {
   margin-bottom: 1em;
 }
 
+.bcs__migration-sync__button {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.bcs__row.bcs__row-sync-holder {
+  padding: 1em 0
+}
 
 .bcs__migration-sync .bcs__migration-sync__loading {
   margin-bottom: .5em;
+}
+
+/* EnableNotification component styles */
+.bcs__history-notification__enable,
+.bcs__history-notification__add-message,
+.bcs__history-notification__message {
+  margin-bottom:.5em;
+}
+.bcs__history-notification__add-message {
+  margin-left: 1em;
+  label {
+    margin-right: .5em;
+  }
 }
 
 /* unsynched changes are a little different than sync history */
@@ -331,7 +349,4 @@
 
 .bcs__unsynched-changes .bcs__history-notification {
   padding-top: 1em;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
 }

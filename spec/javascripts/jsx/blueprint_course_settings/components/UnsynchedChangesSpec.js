@@ -1,6 +1,9 @@
 import React from 'react'
+import { Provider } from 'react-redux'
 import * as enzyme from 'enzyme'
-import UnsynchedChanges from 'jsx/blueprint_course_settings/components/UnsynchedChanges'
+import createStore from 'jsx/blueprint_course_settings/store'
+import {ConnectedUnsynchedChanges} from 'jsx/blueprint_course_settings/components/UnsynchedChanges'
+import MigrationStates from 'jsx/blueprint_course_settings/migrationStates'
 
 const noop = () => {}
 const unsynchedChanges = [
@@ -30,32 +33,54 @@ const unsynchedChanges = [
   }
 ]
 
-QUnit.module('UnsynchedChanges component')
-
-const defaultProps = () => ({
+const defaultProps = {
   unsynchedChanges,
-  loadUnsynchedChanges: noop,
   isLoadingUnsynchedChanges: false,
   hasLoadedUnsynchedChanges: true,
-  willSendNotification: true,
+  migrationStatus: MigrationStates.unknown,
+
+  willSendNotification: false,
+  willIncludeCustomNotificationMessage: false,
+  notificationMessage: '',
+}
+const actionProps = {
+  loadUnsynchedChanges: noop,
   enableSendNotification: noop,
-  migrationStatus: 'unknown'
-})
+  includeCustomNotificationMessage: noop,
+  setNotificationMessage: noop,
+}
+
+function mockStore (props = {...defaultProps}) {
+  return createStore({...props})
+}
+
+function connect (props = {...defaultProps}) {
+  const store = mockStore()
+  return (
+    <Provider store={store}>
+      <ConnectedUnsynchedChanges {...props} {...actionProps} />
+    </Provider>
+  )
+}
+
+QUnit.module('UnsynchedChanges component')
 
 test('renders the UnsynchedChanges component', () => {
-  const tree = enzyme.shallow(<UnsynchedChanges {...defaultProps()} />)
-  const node = tree.find('.bcs__history')
+  const tree = enzyme.mount(connect())
+  let node = tree.find('UnsynchedChanges')
+  ok(node.exists())
+  node = tree.find('.bcs__history')
   ok(node.exists())
 })
 
-test('renders the notification checkbox', () => {
-  const tree = enzyme.mount(<UnsynchedChanges {...defaultProps()} />)
-  const notificationCheckbox = tree.find('input[type="checkbox"]')
-  equal(notificationCheckbox.node.checked, true)
+test('renders the enable notification component', () => {
+  const tree = enzyme.mount(connect())
+  const node = tree.find('EnableNotification')
+  ok(node.exists())
 })
 
 test('renders the changes', () => {
-  const tree = enzyme.mount(<UnsynchedChanges {...defaultProps()} />)
+  const tree = enzyme.mount(connect())
   const changes = tree.find('.bcs__history-item__change')
   equal(changes.length, 3)
   const locks = tree.find('.bcs__history-item__lock-icon IconLockSolid')
