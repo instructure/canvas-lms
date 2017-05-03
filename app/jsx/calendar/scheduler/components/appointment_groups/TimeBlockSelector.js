@@ -55,11 +55,16 @@ import 'jquery.instructure_date_and_time'
     }
 
     getNewSlotData () {
-      return this.state.timeBlockRows.map(tbr => ([
-        tbr.timeData.startTime,
-        tbr.timeData.endTime,
-        false
-      ]));
+      return this.state.timeBlockRows.reduce((acc, tbr) => {
+        if (tbr.timeData.startTime && tbr.timeData.endTime) {
+          acc.push([
+            tbr.timeData.startTime,
+            tbr.timeData.endTime,
+            false
+          ]);
+        }
+        return acc;
+      }, []);
     }
 
     deleteRow = (slotEventId) => {
@@ -86,7 +91,7 @@ import 'jquery.instructure_date_and_time'
       }));
       // Make sure a new blank row is there as well.
       newRows.push({
-        slotEventId: `${this.newIdPrefix}${this.lastNewId}`,
+        slotEventId: `${this.newIdPrefix}${this.lastNewId++}`,
         timeData: {}
       });
       this.setState({
@@ -128,18 +133,20 @@ import 'jquery.instructure_date_and_time'
                                                'TimeBlockSelector';
       return (
         <div className={classes}>
-          {this.props.timeData.map(timeBlock => (
-            <TimeBlockSelectRow {...timeBlock} key={timeBlock.slotEventId} readOnly />
-          ))}
-          {this.state.timeBlockRows.map(timeBlock => (
-            <TimeBlockSelectRow
-              key={timeBlock.slotEventId}
-              handleDelete={this.deleteRow}
-              onBlur={this.addRow}
-              setData={this.handleSetData}
-              {...timeBlock}
-            />
-          ))}
+          <div className="TimeBlockSelector__Rows">
+            {this.props.timeData.map(timeBlock => (
+              <TimeBlockSelectRow {...timeBlock} key={timeBlock.slotEventId} readOnly />
+            ))}
+            {this.state.timeBlockRows.map(timeBlock => (
+              <TimeBlockSelectRow
+                key={timeBlock.slotEventId}
+                handleDelete={this.deleteRow}
+                onBlur={this.addRow}
+                setData={this.handleSetData}
+                {...timeBlock}
+              />
+            ))}
+          </div>
           <div className="TimeBlockSelector__DivideSection">
             <Typography>
               <label

@@ -21,8 +21,10 @@ define([
   'react',
   'react-dom',
   'react-addons-test-utils',
+  'enzyme',
   'jsx/calendar/scheduler/components/appointment_groups/TimeBlockSelector',
-], ($, React, ReactDOM, TestUtils, TimeBlockSelector) => {
+  'jsx/calendar/scheduler/components/appointment_groups/TimeBlockSelectRow',
+], ($, React, ReactDOM, TestUtils, enzyme, TimeBlockSelector, TimeBlockSelectRow) => {
   let props;
 
   QUnit.module('TimeBlockSelector', {
@@ -42,6 +44,14 @@ define([
     ok(component);
   });
 
+  test('it renders TimeBlockSelectRows in their own container', () => {
+    // Adding new blank rows is dependent on TimeBlockSelectRows being the last
+    // item in the container
+    const wrapper = enzyme.shallow(<TimeBlockSelector {...props} />);
+    const children = wrapper.find('.TimeBlockSelector__Rows').children();
+    equal(children.last().type(), TimeBlockSelectRow);
+  });
+
   test('handleSlotDivision divides slots and adds new rows to the selector', () => {
     const component = TestUtils.renderIntoDocument(<TimeBlockSelector {...props} />);
     const domNode = ReactDOM.findDOMNode(component);
@@ -50,7 +60,10 @@ define([
     newRow.timeData.startTime = new Date('Oct 26 2016 10:00');
     newRow.timeData.endTime = new Date('Oct 26 2016 15:00');
     component.setState({
-      timeBlockRows: [newRow]
+      timeBlockRows: [
+        newRow,
+        {timeData: {startTime: null, endTime: null}}
+      ]
     });
     component.handleSlotDivision();
     equal(component.state.timeBlockRows.length, 6);

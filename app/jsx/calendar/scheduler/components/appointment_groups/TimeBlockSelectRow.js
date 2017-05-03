@@ -87,7 +87,7 @@ import 'jquery.instructure_date_and_time'
     handleFieldBlur = (e) => {
       // In some browsers, we actually need to handle the update of data on blur
       this.prepareData();
-      // Only call the onBlur if it's non blank, and it's not the last one in the list.
+      // Only call the onBlur if it's not blank, and it's the last one in the list.
       if (!$(e.target).data('blank') && $(e.target).closest('.TimeBlockSelectorRow').is(':last-child')) {
         this.props.onBlur && this.props.onBlur();
       }
