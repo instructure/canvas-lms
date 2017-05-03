@@ -997,7 +997,7 @@ describe DiscussionTopic do
       expect(@topic.user_can_see_posts?(@ta)).to eq false
     end
 
-    it "shouldn't allow student (and observer) who hasn't posted to see" do
+    it "shouldn't allow student who hasn't posted to see" do
       expect(@topic.user_can_see_posts?(@student)).to eq false
     end
 
@@ -1013,7 +1013,7 @@ describe DiscussionTopic do
       expect { @topic.reply_from(:user => @student, :text => "hai") }.to raise_error(IncomingMail::Errors::ReplyToDeletedDiscussion)
     end
 
-    it "should allow student (and observer) who has posted to see" do
+    it "should allow student who has posted to see" do
       @topic.reply_from(:user => @student, :text => 'hai')
       expect(@topic.user_can_see_posts?(@student)).to eq true
     end
@@ -1028,6 +1028,33 @@ describe DiscussionTopic do
       ct.reply_from(user: @student, text: 'ohai')
       ct.user_ids_who_have_posted_and_admins
       expect(ct.user_can_see_posts?(@student)).to be_truthy
+    end
+
+    describe "observers" do
+      before :once do
+        @other_student = user_factory(:active_all => true)
+        @course.enroll_student(@other_student, :enrollment_state => 'active')
+        @course.enroll_user(@observer, 'ObserverEnrollment',
+                            :associated_user_id => @student, :enrollment_state => 'active')
+        @course.enroll_user(@observer, 'ObserverEnrollment',
+                            :associated_user_id => @other_student, :enrollment_state => 'active')
+      end
+
+      it "does not allow observers to see replies to a discussion linked students haven't posted in" do
+        expect(@topic.initial_post_required?(@observer)).to be
+      end
+
+      # previously this worked for exactly one observer enrollment, whichever became @context_enrollment
+      # so test both ways
+      it "allows observers to see replies in a discussion a linked student has posted in (1/2)" do
+        @topic.reply_from(:user => @student, :text => 'wat')
+        expect(@topic.initial_post_required?(@observer)).not_to be
+      end
+
+      it "allows observers to see replies in a discussion a linked student has posted in (2/2)" do
+        @topic.reply_from(:user => @other_student, :text => 'wat')
+        expect(@topic.initial_post_required?(@observer)).not_to be
+      end
     end
   end
 
