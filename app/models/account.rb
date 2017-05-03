@@ -1641,9 +1641,11 @@ class Account < ActiveRecord::Base
   end
 
   def create_default_objects
-    self.class.connection.after_transaction_commit do
+    work = -> do
       default_enrollment_term
       enable_canvas_authentication
     end
+    return work.call if Rails.env.test?
+    self.class.connection.after_transaction_commit(&work)
   end
 end
