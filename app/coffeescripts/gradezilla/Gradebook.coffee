@@ -42,7 +42,6 @@ define [
   'compiled/userSettings'
   'spin.js'
   'compiled/AssignmentMuter'
-  'compiled/SubmissionDetailsDialog'
   'compiled/gradezilla/AssignmentGroupWeightsDialog'
   'compiled/shared/GradeDisplayWarningDialog'
   'compiled/gradezilla/PostGradesFrameDialog'
@@ -58,6 +57,7 @@ define [
   'jsx/gradezilla/default_gradebook/constants/StudentRowHeaderConstants'
   'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader'
   'jsx/gradezilla/default_gradebook/components/AssignmentGroupColumnHeader'
+  'jsx/gradezilla/default_gradebook/components/AssignmentRowCellPropFactory'
   'jsx/gradezilla/default_gradebook/components/CustomColumnHeader'
   'jsx/gradezilla/default_gradebook/components/StudentColumnHeader'
   'jsx/gradezilla/default_gradebook/components/StudentRowHeader'
@@ -97,11 +97,11 @@ define [
 ], ($, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
   GradingPeriodsApi, GradingPeriodSetsApi, round, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS,
   CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, GradeFormatHelper, UserSettings, Spinner, AssignmentMuter,
-  SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
+  AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
   SubmissionCell, NumberCompare, natcompare, htmlEscape, AssignmentDetailsDialogManager, SetDefaultGradeDialogManager,
   CurveGradesDialogManager, GradebookApi, CellEditorFactory, StudentRowHeaderConstants, AssignmentColumnHeader,
-  AssignmentGroupColumnHeader, CustomColumnHeader, StudentColumnHeader, StudentRowHeader, TotalGradeColumnHeader,
-  GradebookMenu, ViewOptionsMenu, ActionMenu, PostGradesStore, PostGradesApp, SubmissionStateMap,
+  AssignmentGroupColumnHeader, AssignmentRowCellPropFactory, CustomColumnHeader, StudentColumnHeader, StudentRowHeader,
+  TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, PostGradesStore, PostGradesApp, SubmissionStateMap,
   DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager, GroupTotalCellTemplate, SectionMenuView,
   GradingPeriodMenuView, GradebookKeyboardNav, AssignmentMuterDialogManager,
   assignmentHelper, GradebookSettingsModal, Button, IconSettingsSolid) ->
@@ -708,8 +708,6 @@ define [
     # where each student has an array of submissions.  This one just expects an array of submissions,
     # they are not grouped by student.
     updateSubmissionsFromExternal: (submissions) =>
-      activeCell = @grid.getActiveCell()
-      editing = $(@grid.getActiveCellNode()).hasClass('editable')
       columns = @grid.getColumns()
       changedColumnHeaders = {}
       for submission in submissions
@@ -720,10 +718,6 @@ define [
         unless changedColumnHeaders[submission.assignment_id]
           changedColumnHeaders[submission.assignment_id] = cell
 
-        thisCellIsActive = activeCell? and
-          editing and
-          activeCell.row is student.row and
-          activeCell.cell is cell
         #check for DA visible
         @updateAssignmentVisibilities(submission) unless submission.assignment_visible
         @updateSubmission(submission)
@@ -731,7 +725,7 @@ define [
         submissionState = @submissionStateMap.getSubmissionState(submission)
         student["assignment_#{submission.assignment_id}"].gradeLocked = submissionState.locked
         @calculateStudentGrade(student)
-        @grid.updateCell student.row, cell unless thisCellIsActive
+        @grid.updateCell student.row, cell
         @updateRowTotals student.row
 
       for assignmentId, cell of changedColumnHeaders
@@ -963,23 +957,6 @@ define [
 
       @grid.getEditorLock().commitCurrentEdit()
 
-    cellCommentClickHandler: (event) ->
-      event.preventDefault()
-      return false if $(@grid.getActiveCellNode()).hasClass("cannot_edit")
-      currentTargetElement = $(event.currentTarget)
-      # Access these data attributes individually instead of using currentTargetElement.data()
-      # so they stay strings.  Strange things have happened here with long numbers:
-      # parseInt("61890000000013319") = 61890000000013320
-      data =
-        assignmentId: currentTargetElement.attr('data-assignment-id'),
-        userId: currentTargetElement.attr('data-user-id')
-      $(@grid.getActiveCellNode()).removeClass('editable')
-      assignment = @assignments[data.assignmentId]
-      student = @student(data.userId)
-      opts = @options
-
-      SubmissionDetailsDialog.open assignment, student, opts
-
     onGridInit: () ->
       tooltipTexts = {}
       # TODO: this "if @spinner" crap is necessary because the outcome
@@ -1009,8 +986,6 @@ define [
           'mouseleave focusout' : (event) ->
             $(this).removeClass('hover focus')
             $(this).find('div.gradebook-tooltip').removeClass('first-row')
-        .delegate '.gradebook-cell-comment', 'click.gradebook', (event) =>
-          @cellCommentClickHandler(event)
         .delegate '.minimized',
           'mouseenter' : @hoverMinimizedCell,
           'mouseleave' : @unhoverMinimizedCell
@@ -1032,12 +1007,6 @@ define [
       @keyboardNav.init()
       keyBindings = @keyboardNav.keyBindings
       @kbDialog = new KeyboardNavDialog().render(KeyboardNavTemplate({keyBindings}))
-      # when we close a dialog we want to return focus to the grid
-      $(document).on('dialogclose', (e) =>
-        setTimeout(( =>
-          @grid.editActiveCell()
-        ), 0)
-      )
       $(document).trigger('gridready')
 
     sectionList: ->
@@ -1253,12 +1222,12 @@ define [
         gradebookExportUrl: @options.export_gradebook_csv_url
         postGradesLtis: @postGradesLtis
         postGradesFeature:
-          enabled: @options.post_grades_feature && !@disablePostGradesFeature
+          enabled: @options.post_grades_feature? && !@disablePostGradesFeature
           returnFocusTo: focusReturnPoint
           label: @options.sis_name
           store: @postGradesStore
         publishGradesToSis:
-          isEnabled: @options.publish_to_sis_enabled
+          isEnabled: @options.publish_to_sis_enabled?
           publishToSisUrl: @options.publish_to_sis_url
 
       progressData = @options.gradebook_csv_progress
@@ -1404,8 +1373,9 @@ define [
           name: assignment.name
           object: assignment
           formatter: this.cellFormatter
-          minWidth: columnWidths.assignment.min,
-          maxWidth: columnWidths.assignment.max,
+          propFactory: new AssignmentRowCellPropFactory(assignment, @)
+          minWidth: columnWidths.assignment.min
+          maxWidth: columnWidths.assignment.max
           width: assignmentWidth
           toolTip: assignment.name
           type: 'assignment'
@@ -1492,10 +1462,6 @@ define [
 
       # this is a faux blur event for SlickGrid.
       $('#application').on('click', @onGridBlur)
-
-      @grid.onKeyDown.subscribe ->
-        # TODO: start editing automatically when a number or letter is typed
-        false
 
       @grid.onHeaderCellRendered.subscribe @onHeaderCellRendered
       @grid.onBeforeHeaderCellDestroy.subscribe @onBeforeHeaderCellDestroy

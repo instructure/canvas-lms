@@ -17,19 +17,27 @@
  */
 
 import ReactDOM from 'react-dom';
-import SubmissionCell from 'compiled/gradezilla/SubmissionCell';
+import AssignmentRowCellPropFactory from 'jsx/gradezilla/default_gradebook/components/AssignmentRowCellPropFactory';
 import AssignmentCellEditor from 'jsx/gradezilla/default_gradebook/slick-grid/editors/AssignmentCellEditor';
 
 QUnit.module('AssignmentCellEditor', {
   setup () {
+    const assignment = {
+      grading_type: 'points',
+      id: '2301',
+      points_possible: 10
+    };
     this.$fixtures = document.querySelector('#fixtures');
     this.options = {
       column: {
         field: 'assignment_2301',
-        object: { // assignment
-          grading_type: 'points',
-          id: '2301',
-          points_possible: 10
+        object: assignment,
+        propFactory: new AssignmentRowCellPropFactory(assignment, { options: {} })
+      },
+      grid: {
+        onKeyDown: {
+          subscribe () {},
+          unsubscribe () {}
         }
       },
       item: { // student row object
@@ -61,50 +69,46 @@ test('creates an AssignmentRowCell in the given container', function () {
   equal(container, this.$fixtures, 'container is the test #fixtures element');
 });
 
-test('renders an "out_of" SubmissionCell when the assignment grading type is "points"', function () {
+test('stores a reference to the rendered AssignmentRowCell component', function () {
   this.createEditor();
-  equal(this.editor.submissionCell.constructor.name, 'out_of');
-  ok(this.editor.submissionCell instanceof SubmissionCell.out_of);
+  equal(this.editor.component.constructor.name, 'AssignmentRowCell');
 });
 
-test('renders the SubmissionCell within the AssignmentRowCell', function () {
+test('includes editor options in AssignmentRowCell props', function () {
   this.createEditor();
-  ok(this.editor.reactContainer.querySelector('.gradebook-cell'), 'reactContainer includes a gradebook cell');
+  equal(this.editor.component.props.editorOptions, this.editor.options);
 });
 
-test('renders an "out_of" SubmissionCell when a "points" assignment has zero points possible', function () {
-  this.options.column.object.points_possible = 0;
+test('#handleKeyDown delegates to the AssignmentRowCell component', function () {
   this.createEditor();
-  equal(this.editor.submissionCell.constructor.name, 'out_of');
-  ok(this.editor.submissionCell instanceof SubmissionCell.out_of);
+  this.spy(this.editor.component, 'handleKeyDown');
+  const keyboardEvent = new KeyboardEvent('example');
+  this.editor.handleKeyDown(keyboardEvent);
+  strictEqual(this.editor.component.handleKeyDown.callCount, 1);
 });
 
-test('renders a "points" SubmissionCell when a "points" assignment grading type has null points possible', function () {
-  this.options.column.object.points_possible = null;
+test('#handleKeyDown passes the event when delegating handleKeyDown', function () {
   this.createEditor();
-  equal(this.editor.submissionCell.constructor.name, 'points');
-  ok(this.editor.submissionCell instanceof SubmissionCell.points);
+  this.spy(this.editor.component, 'handleKeyDown');
+  const keyboardEvent = new KeyboardEvent('example');
+  this.editor.handleKeyDown(keyboardEvent);
+  const [event] = this.editor.component.handleKeyDown.lastCall.args;
+  equal(event, keyboardEvent);
 });
 
-test('renders an "pass_fail" SubmissionCell when the assignment grading type is "pass_fail"', function () {
-  this.options.column.object.grading_type = 'pass_fail';
+test('#destroy removes the reference to the AssignmentRowCell component', function () {
   this.createEditor();
-  equal(this.editor.submissionCell.constructor.name, 'pass_fail');
-  ok(this.editor.submissionCell instanceof SubmissionCell.pass_fail);
-});
-
-test('renders a SubmissionCell when the assignment grading type is "percent"', function () {
-  this.options.column.object.grading_type = 'percent';
-  this.createEditor();
-  equal(this.editor.submissionCell.constructor.name, 'SubmissionCell');
-  ok(this.editor.submissionCell instanceof SubmissionCell);
-});
-
-test('#destroy destroys the SubmissionCell', function () {
-  this.createEditor();
-  this.spy(this.editor.submissionCell, 'destroy');
   this.editor.destroy();
-  strictEqual(this.editor.submissionCell.destroy.callCount, 1);
+  strictEqual(this.editor.component, null);
+});
+
+test('#destroy unsubscribes from grid.onKeyDown', function () {
+  this.createEditor();
+  this.spy(this.options.grid.onKeyDown, 'unsubscribe');
+  this.editor.destroy();
+  strictEqual(this.options.grid.onKeyDown.unsubscribe.callCount, 1, 'calls grid.onKeyDown.unsubscribe');
+  const [handleKeyDown] = this.options.grid.onKeyDown.unsubscribe.lastCall.args;
+  equal(handleKeyDown, this.editor.handleKeyDown, 'unsubscribes using the editor handleKeyDown function');
 });
 
 test('#destroy unmounts the AssignmentRowCell component', function () {
@@ -114,52 +118,52 @@ test('#destroy unmounts the AssignmentRowCell component', function () {
   strictEqual(unmounted, false, 'component was already unmounted');
 });
 
-test('#focus delegates to the SubmissionCell', function () {
+test('#focus delegates to the AssignmentRowCell component', function () {
   this.createEditor();
-  this.spy(this.editor.submissionCell, 'focus');
+  this.spy(this.editor.component, 'focus');
   this.editor.focus();
-  strictEqual(this.editor.submissionCell.focus.callCount, 1);
+  strictEqual(this.editor.component.focus.callCount, 1);
 });
 
-test('#isValueChanged delegates to the SubmissionCell', function () {
+test('#isValueChanged delegates to the AssignmentRowCell component', function () {
   this.createEditor();
-  this.stub(this.editor.submissionCell, 'isValueChanged').returns(true);
+  this.stub(this.editor.component, 'isValueChanged').returns(true);
   const changed = this.editor.isValueChanged();
-  strictEqual(this.editor.submissionCell.isValueChanged.callCount, 1);
+  strictEqual(this.editor.component.isValueChanged.callCount, 1);
   strictEqual(changed, true);
 });
 
-test('#serializeValue delegates to the SubmissionCell', function () {
+test('#serializeValue delegates to the AssignmentRowCell component', function () {
   this.createEditor();
-  this.stub(this.editor.submissionCell, 'serializeValue').returns('9.7');
+  this.stub(this.editor.component, 'serializeValue').returns('9.7');
   const value = this.editor.serializeValue();
-  strictEqual(this.editor.submissionCell.serializeValue.callCount, 1);
+  strictEqual(this.editor.component.serializeValue.callCount, 1);
   strictEqual(value, '9.7');
 });
 
-test('#loadValue delegates to the SubmissionCell', function () {
+test('#loadValue delegates to the AssignmentRowCell component', function () {
   this.createEditor();
-  this.spy(this.editor.submissionCell, 'loadValue');
+  this.spy(this.editor.component, 'loadValue');
   this.editor.loadValue('9.7');
-  strictEqual(this.editor.submissionCell.loadValue.callCount, 1);
-  const [value] = this.editor.submissionCell.loadValue.lastCall.args;
+  strictEqual(this.editor.component.loadValue.callCount, 1);
+  const [value] = this.editor.component.loadValue.lastCall.args;
   strictEqual(value, '9.7');
 });
 
-test('#applyValue delegates to the SubmissionCell', function () {
+test('#applyValue delegates to the AssignmentRowCell component', function () {
   this.createEditor();
-  this.stub(this.editor.submissionCell, 'applyValue');
+  this.stub(this.editor.component, 'applyValue');
   this.editor.applyValue({ id: '1101' }, '9.7');
-  strictEqual(this.editor.submissionCell.applyValue.callCount, 1);
-  const [item, value] = this.editor.submissionCell.applyValue.lastCall.args;
+  strictEqual(this.editor.component.applyValue.callCount, 1);
+  const [item, value] = this.editor.component.applyValue.lastCall.args;
   deepEqual(item, { id: '1101' });
   strictEqual(value, '9.7');
 });
 
-test('#validate delegates to the SubmissionCell', function () {
+test('#validate delegates to the AssignmentRowCell component', function () {
   this.createEditor();
-  this.stub(this.editor.submissionCell, 'validate').returns({ valid: true });
+  this.stub(this.editor.component, 'validate').returns({ valid: true });
   const validation = this.editor.validate();
-  strictEqual(this.editor.submissionCell.validate.callCount, 1);
+  strictEqual(this.editor.component.validate.callCount, 1);
   deepEqual(validation, { valid: true });
 });

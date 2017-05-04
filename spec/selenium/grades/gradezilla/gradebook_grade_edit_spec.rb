@@ -154,7 +154,7 @@ describe "Gradezilla editing grades" do
     @course.default_section.users.each { |u| expect(u.submissions.map(&:grade)).not_to include '13' }
   end
 
-  it "does not lose focus when editting a grade, move to the next cell", priority: "1", test_id: 220318 do
+  it "tab sets focus on the options menu trigger when editing a grade", priority: "1" do
     gradezilla_page.visit(@course)
 
     first_cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
@@ -162,6 +162,16 @@ describe "Gradezilla editing grades" do
     grade_input = first_cell.find_element(:css, '.grade')
     set_value(grade_input, 3)
     grade_input.send_keys(:tab)
+    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')).to have_class('editable')
+  end
+
+  it "tab activates and focuses on the next cell when focused on the options menu trigger", priority: "1" do
+    gradezilla_page.visit(@course)
+
+    first_cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
+    first_cell.click
+    options_menu = first_cell.find_element(:css, '.Grid__AssignmentRowCell__Options button')
+    options_menu.send_keys(:tab)
     expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l3')).to have_class('editable')
   end
 
@@ -170,7 +180,7 @@ describe "Gradezilla editing grades" do
     gradezilla_page.visit(@course)
 
     assignment_1_sel = '#gradebook_grid .container_1 .slick-row:nth-child(1) .l2'
-    assignment_2_sel= '#gradebook_grid .container_1 .slick-row:nth-child(1) .l3'
+    assignment_2_sel = '#gradebook_grid .container_1 .slick-row:nth-child(1) .l3'
     a1 = f(assignment_1_sel)
     a2 = f(assignment_2_sel)
     expect(a1).to have_class 'dropped'
@@ -179,7 +189,7 @@ describe "Gradezilla editing grades" do
     a2.click
     grade_input = a2.find_element(:css, '.grade')
     set_value(grade_input, 3)
-    grade_input.send_keys(:tab)
+    grade_input.send_keys(:arrow_right)
     expect(f(assignment_1_sel)).not_to have_class 'dropped'
     expect(f(assignment_2_sel)).to have_class 'dropped'
   end

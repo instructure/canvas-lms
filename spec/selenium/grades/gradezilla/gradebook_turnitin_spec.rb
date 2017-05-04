@@ -54,28 +54,5 @@ describe "Gradezilla - turnitin" do
     gradezilla_page.visit(@course)
     icons = ff('.gradebook-cell-turnitin')
     expect(icons).to have_size 2
-
-    none        = f('.none-score')       # icons[0]
-    acceptable  = f('.acceptable-score') # icons[1]
-    # make sure it appears in each submission dialog
-
-    cell = none.find_element(:xpath, '..')
-
-    driver.action.move_to(f('#gradebook_settings')).move_to(cell).perform
-    expect(cell.find_element(:css, "a")).to be_displayed
-    cell.find_element(:css, "a").click
-
-    fj('button.ui-dialog-titlebar-close:visible').click
-
-    cell = acceptable.find_element(:xpath, '..')
-
-    # This is a quick fix to change the keyboard focus so that an accessible
-    # tooltip does not block the visibility of the cell.
-    driver.action.send_keys(:tab).perform
-    driver.action.move_to(f('#gradebook_settings')).move_to(cell).perform
-    expect(cell.find_element(:css, "a")).to be_displayed
-    cell.find_element(:css, "a").click
-
-    fj('button.ui-dialog-titlebar-close:visible').click
   end
 end

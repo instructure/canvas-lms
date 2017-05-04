@@ -24,6 +24,7 @@ import natcompare from 'compiled/util/natcompare';
 import round from 'compiled/util/round';
 import fakeENV from 'helpers/fakeENV';
 import { createCourseGradesWithGradingPeriods as createGrades } from 'spec/jsx/gradebook/GradeCalculatorSpecHelper';
+import { createGradebook } from 'spec/jsx/gradezilla/default_gradebook/GradebookSpecHelper';
 
 import SubmissionDetailsDialog from 'compiled/SubmissionDetailsDialog';
 import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator';
@@ -36,20 +37,6 @@ import ActionMenu from 'jsx/gradezilla/default_gradebook/components/ActionMenu';
 import GradebookApi from 'jsx/gradezilla/default_gradebook/GradebookApi';
 
 const $fixtures = document.getElementById('fixtures');
-
-function createGradebook (options = {}) {
-  return new Gradebook({
-    settings: {
-      show_concluded_enrollments: 'false',
-      show_inactive_enrollments: 'false'
-    },
-    context_id: '1',
-    sections: [],
-    post_grades_ltis: [],
-    post_grades_feature: { enabled: false, store: {}, returnFocusTo: {} },
-    ...options
-  });
-}
 
 QUnit.module('Gradebook');
 
@@ -1391,71 +1378,6 @@ test('does not load the notes if they are already loaded', function () {
   });
   this.showNotesColumn();
   equal(DataLoader.getDataForColumn.callCount, 0);
-});
-
-QUnit.module('Gradebook#cellCommentClickHandler', {
-  setup () {
-    this.cellCommentClickHandler = Gradebook.prototype.cellCommentClickHandler;
-    this.assignments = {
-      '61890000000013319': {
-        name: 'Assignment #1'
-      }
-    };
-    this.student = this.stub().returns({});
-    this.options = {};
-    this.fixture = document.createElement('div');
-    this.fixture.className = 'editable';
-    this.fixture.setAttribute('data-assignment-id', '61890000000013319');
-    this.fixture.setAttribute('data-user-id', '61890000000013319');
-    $fixtures.appendChild(this.fixture);
-    this.submissionDialogArgs = undefined;
-    this.stub(SubmissionDetailsDialog, 'open').callsFake((...args) => {
-      this.submissionDialogArgs = args;
-    });
-    this.event = {
-      preventDefault: this.stub(),
-      currentTarget: this.fixture
-    };
-    this.grid = {
-      getActiveCellNode: this.stub().returns(this.fixture)
-    };
-  },
-
-  teardown () {
-    $fixtures.innerHTML = '';
-    this.fixture = null;
-  }
-});
-
-test('when not editable, returns false if the active cell node has the "cannot_edit" class', function () {
-  this.fixture.className = 'cannot_edit';
-  const result = this.cellCommentClickHandler(this.event);
-  equal(result, false);
-  ok(this.event.preventDefault.called);
-});
-
-test('when editable, removes the "editable" class from the active cell', function () {
-  this.cellCommentClickHandler(this.event);
-  equal('', this.fixture.className);
-  ok(this.event.preventDefault.called);
-});
-
-test('when editable, calls @student with the user id as a string', function () {
-  this.cellCommentClickHandler(this.event);
-  ok(this.student.calledWith('61890000000013319'));
-});
-
-test('when editable, calls SubmissionDetailsDialog', function () {
-  this.cellCommentClickHandler(this.event);
-  const expectedArguments = [
-    {
-      name: 'Assignment #1'
-    },
-    {},
-    {}
-  ];
-  equal(SubmissionDetailsDialog.open.callCount, 1);
-  deepEqual(this.submissionDialogArgs, expectedArguments);
 });
 
 QUnit.module('Gradebook#getTeacherNotesViewOptionsMenuProps');

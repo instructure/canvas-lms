@@ -65,6 +65,13 @@ define [
 
     ok dialog.dialog.find('.submission-details').text().match('LATE')
 
+  test 'calls the onClose callback when closing', ->
+    onClose = @spy()
+    dialog = new SubmissionDetailsDialog(@assignment, @user, {speed_grader_enabled: true, change_grade_url: ':assignment/:student', onClose})
+    dialog.open()
+    dialog.dialog.trigger('dialogclose')
+    equal(onClose.callCount, 1)
+
   QUnit.module '_submission_detail',
     setup: ->
       defaults =

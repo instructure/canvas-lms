@@ -18,55 +18,60 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import SubmissionCell from 'compiled/gradezilla/SubmissionCell';
 import AssignmentRowCell from 'jsx/gradezilla/default_gradebook/components/AssignmentRowCell';
-
-function renderSubmissionCell (options) {
-  const assignment = options.column.object;
-  if (assignment.grading_type === 'points' && assignment.points_possible != null) {
-    return new SubmissionCell.out_of(options); // eslint-disable-line new-cap
-  }
-  return new (SubmissionCell[assignment.grading_type] || SubmissionCell)(options);
-}
 
 class AssignmentCellEditor {
   constructor (options) {
+    this.options = options;
     this.container = options.container;
+    this.handleKeyDown = this.handleKeyDown.bind(this);
 
-    const bindContainer = (ref) => { this.reactContainer = ref };
-    const element = React.createElement(AssignmentRowCell, { containerRef: bindContainer }, null);
+    const bindComponent = (ref) => { this.component = ref };
+    const props = {
+      ...options.column.propFactory.getProps(options.item),
+      ref: bindComponent,
+      editorOptions: options
+    };
+
+    const element = React.createElement(AssignmentRowCell, props, null);
     ReactDOM.render(element, this.container);
+    options.grid.onKeyDown.subscribe(this.handleKeyDown);
+  }
 
-    this.submissionCell = renderSubmissionCell({ ...options, container: this.reactContainer });
+  handleKeyDown (event) {
+    if (this.component) {
+      this.component.handleKeyDown(event);
+    }
   }
 
   destroy () {
-    this.submissionCell.destroy();
+    this.component = null;
+    this.options.grid.onKeyDown.unsubscribe(this.handleKeyDown);
     ReactDOM.unmountComponentAtNode(this.container);
   }
 
   focus () {
-    this.submissionCell.focus();
+    this.component.focus();
   }
 
   isValueChanged () {
-    return this.submissionCell.isValueChanged();
+    return this.component.isValueChanged();
   }
 
   serializeValue () {
-    return this.submissionCell.serializeValue();
+    return this.component.serializeValue();
   }
 
   loadValue (item) {
-    this.submissionCell.loadValue(item);
+    this.component.loadValue(item);
   }
 
   applyValue (item, state) {
-    this.submissionCell.applyValue(item, state);
+    this.component.applyValue(item, state);
   }
 
   validate () {
-    return this.submissionCell.validate();
+    return this.component.validate();
   }
 }
 
