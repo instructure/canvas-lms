@@ -257,7 +257,7 @@ class ApplicationController < ActionController::Base
   helper_method :setup_master_course_restrictions
 
   def set_master_course_js_env_data(object, course)
-    return unless object.respond_to?(:master_course_api_restriction_data)
+    return unless object.respond_to?(:master_course_api_restriction_data) && object.persisted?
     status = setup_master_course_restrictions([object], course)
     return unless status
     # we might have to include more information about the object here to make it easier to plug a common component in
