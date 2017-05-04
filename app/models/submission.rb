@@ -182,6 +182,7 @@ class Submission < ActiveRecord::Base
   attr_accessor :saved_by,
                 :assignment_changed_not_sub,
                 :grading_error_message
+  before_save :apply_late_policy, if: :late_policy_relevant_changes?
   before_save :update_if_pending
   before_save :validate_single_submission, :infer_values
   before_save :prep_for_submitting_to_plagiarism
@@ -1112,7 +1113,7 @@ class Submission < ActiveRecord::Base
       self.quiz_submission ||= Quizzes::QuizSubmission.where(user_id: self.user_id, quiz_id: self.assignment.quiz).first rescue nil
     end
     @just_submitted = (self.submitted? || self.pending_review?) && self.submission_type && (self.new_record? || self.workflow_state_changed?)
-    if score_changed?
+    if score_changed? || grade_changed?
       self.grade = assignment ?
         assignment.score_to_grade(score, grade) :
         score.to_s
@@ -1189,6 +1190,34 @@ class Submission < ActiveRecord::Base
     end
     true
   end
+
+  # apply_late_policy is called directly by bulk update processes, or indirectly by before_save on a Submission
+  def apply_late_policy(late_policy=nil, points_possible=nil)
+    return if score.nil? || points_deducted_changed?
+    late_policy ||= assignment.course.late_policy
+    points_possible ||= assignment.points_possible
+    raw_score = score_changed? ? score : originally_entered_score
+    deducted = late_points_deducted(raw_score, late_policy, points_possible)
+    self.points_deducted = deducted
+    self.score = raw_score - deducted
+  end
+
+  def originally_entered_score
+    score + (points_deducted || 0)
+  end
+  private :originally_entered_score
+
+  def late_points_deducted(raw_score, late_policy, points_possible)
+    return 0 unless late_policy && points_possible && past_due?
+    late_policy.points_deducted(score: raw_score, possible: points_possible, late_for: duration_late)
+  end
+  private :late_points_deducted
+
+  def late_policy_relevant_changes?
+    # can treat change of late_policy_status 'none' <--> 'missing' as irrelevant if needed for performance
+    changes.slice(:score, :submitted_at, :accepted_at, :late_policy_status, :cached_due_date).any?
+  end
+  private :late_policy_relevant_changes?
 
   def ensure_grader_can_grade
     return true if grader_can_grade?
@@ -1808,31 +1837,31 @@ class Submission < ActiveRecord::Base
   #
   module Tardiness
     def past_due?
-      minutes_late > 0
+      duration_late > 0
     end
-    alias_method :past_due, :past_due?
+    alias past_due past_due?
 
     def late?
       accepted_at.present? && past_due?
     end
-    alias_method :late, :late?
+    alias late late?
 
     def missing?
       return false if !past_due? || submitted_at.present?
       assignment.expects_submission? || !(self.excused || (self.graded? && self.score > 0))
     end
-    alias_method :missing, :missing?
+    alias missing missing?
 
     def graded?
       excused || (!!score && workflow_state == 'graded')
     end
 
-    def minutes_late
+    def duration_late
       # the submission cannot be late if it's been marked with 'none' or 'missing'
       return 0.0 if ['none', 'missing'].include?(late_policy_status)
       return 0.0 if cached_due_date.nil? || time_of_submission <= cached_due_date
 
-      (time_of_submission - cached_due_date) / 60
+      (time_of_submission - cached_due_date)
     end
 
     def accepted_at

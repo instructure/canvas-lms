@@ -27,4 +27,21 @@ class LatePolicy < ActiveRecord::Base
   validates :late_submission_interval,
     presence: true,
     inclusion: { in: %w(day hour) }
+
+  def points_deducted(score: nil, possible: 0.0, late_for: 0.0)
+    return 0.0 unless late_submission_deduction_enabled && score && possible&.positive? && late_for&.positive?
+
+    intervals_late = (late_for / interval_seconds).ceil
+    minimum_percent = late_submission_minimum_percent_enabled ? late_submission_minimum_percent : 0.0
+    raw_score_percent = score * 100.0 / possible
+    maximum_deduct = [raw_score_percent - minimum_percent, 0.0].max
+    late_percent_deduct = late_submission_deduction * intervals_late
+    possible * [late_percent_deduct, maximum_deduct].min / 100
+  end
+
+  private
+
+  def interval_seconds
+    { 'hour' => 1.hour, 'day' => 1.day }[late_submission_interval].to_f
+  end
 end

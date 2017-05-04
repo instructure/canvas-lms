@@ -1865,6 +1865,46 @@ describe 'Submissions API', type: :request do
     end
   end
 
+  context "with late policies" do
+    before :once do
+      student_in_course(active_all: true)
+      teacher_in_course(active_all: true)
+      @late_policy = late_policy_factory(course: @course, deduct: 10, every: :day, down_to: 30)
+      @late_assignment = @course.assignments.create!(
+        title: "assignment1",
+        due_at: 47.hours.ago,
+        points_possible: 10
+      )
+    end
+
+    let(:late_submission_api_header) do
+      {
+        controller: "submissions_api",
+        action: "update",
+        format: "json",
+        course_id: @course.id.to_s,
+        assignment_id: @late_assignment.id.to_s,
+        user_id: @student.id.to_s
+      }
+    end
+
+    it "applies late policy when grading the submission twice with the same raw score" do
+      2.times do
+        json = api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@late_assignment.id}/submissions/#{@student.id}.json",
+          late_submission_api_header, {
+            submission: {
+              posted_grade: "10"
+            }
+          }
+        )
+        expect(json['grade']).to eq "8"
+        expect(json['score']).to eq 8
+      end
+    end
+  end
+
   describe "for_students non-admin" do
     before :once do
       course_with_student :active_all => true

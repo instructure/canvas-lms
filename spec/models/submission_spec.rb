@@ -411,7 +411,7 @@ describe Submission do
     end
   end
 
-  describe "minutes_late" do
+  describe "duration_late" do
     before(:once) do
       @date = Time.zone.local(2017, 1, 15, 12)
       @assignment.update!(due_at: 1.hour.ago(@date), submission_types: "online_text_entry")
@@ -422,7 +422,7 @@ describe Submission do
     it "returns time between submitted_at and cached_due_date" do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
-        expect(submission.minutes_late).to eq 60
+        expect(submission.duration_late).to eq 60.minutes
       end
     end
 
@@ -430,7 +430,7 @@ describe Submission do
       Timecop.freeze(@date) { @assignment.submit_homework(@student, body: "a body") }
       Timecop.freeze(30.minutes.from_now(@date)) do
         @assignment.submit_homework(@student, body: "a body")
-        expect(submission.minutes_late).to eq 90
+        expect(submission.duration_late).to eq 90.minutes
       end
     end
 
@@ -439,7 +439,7 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.update!(late_policy_status: "late", accepted_at: 30.minutes.from_now(@date))
-        expect(submission.minutes_late).to eq 90
+        expect(submission.duration_late).to eq 90.minutes
       end
     end
 
@@ -449,7 +449,7 @@ describe Submission do
       submission.update!(late_policy_status: "late", accepted_at: 30.minutes.from_now(@date))
       Timecop.freeze(40.minutes.from_now(@date)) do
         @assignment.submit_homework(@student, body: "a body")
-        expect(submission.minutes_late).to eq 90
+        expect(submission.duration_late).to eq 90.minutes
       end
     end
 
@@ -458,14 +458,14 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.update!(late_policy_status: "late")
-        expect(submission.minutes_late).to eq 60
+        expect(submission.duration_late).to eq 60.minutes
       end
     end
 
     it "is zero if it is not late" do
       Timecop.freeze(2.hours.ago(@date)) do
         @assignment.submit_homework(@student, body: "a body")
-        expect(submission.minutes_late).to be_zero
+        expect(submission.duration_late).to be_zero
       end
     end
 
@@ -473,7 +473,7 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.update!(late_policy_status: "none")
-        expect(submission.minutes_late).to be_zero
+        expect(submission.duration_late).to be_zero
       end
     end
 
@@ -481,7 +481,7 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.update!(late_policy_status: "missing")
-        expect(submission.minutes_late).to be_zero
+        expect(submission.duration_late).to be_zero
       end
     end
 
@@ -490,7 +490,7 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.update!(late_policy_status: "late", accepted_at: submission.cached_due_date)
-        expect(submission.minutes_late).to be_zero
+        expect(submission.duration_late).to be_zero
       end
     end
 
@@ -498,7 +498,7 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.update!(due_at: nil)
         @assignment.submit_homework(@student, body: "a body")
-        expect(submission.minutes_late).to be_zero
+        expect(submission.duration_late).to be_zero
       end
     end
 
@@ -506,22 +506,107 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.update!(submission_types: "online_quiz")
         @assignment.submit_homework(@student, submission_type: "online_quiz", body: "a body")
-        expect(submission.minutes_late).to eq 59
+        expect(submission.duration_late).to eq 59.minutes
       end
     end
 
     it "includes seconds" do
       Timecop.freeze(30.seconds.from_now(@date)) do
         @assignment.submit_homework(@student, body: "a body")
-        expect(submission.minutes_late).to be 60.5
+        expect(submission.duration_late).to eq 60.minutes + 30.seconds
       end
     end
 
     it "uses the current time if submitted_at is nil" do
       Timecop.freeze(1.day.from_now(@date)) do
         @assignment.grade_student(@student, score: 10, grader: @teacher)
-        expect(submission.minutes_late).to eq 1500 # 25 hours * 60
+        expect(submission.duration_late).to eq 25.hours
       end
+    end
+  end
+
+  describe "#apply_late_policy" do
+    before(:once) do
+      @date = Time.zone.local(2017, 1, 15, 12)
+      @assignment.update!(due_at: 3.hours.ago(@date), points_possible: 1000, submission_types: "online_text_entry")
+      @late_policy = late_policy_model(deduct: 10.0, every: :hour)
+    end
+
+    let(:submission) { @assignment.submissions.find_by(user_id: @student) }
+
+    it "deducts a percentage per interval late" do
+      Timecop.freeze(@date) do
+        @assignment.submit_homework(@student, body: "a body")
+        submission.score = 700
+        submission.apply_late_policy(@late_policy, 1000)
+        expect(submission.score).to eq 400
+        expect(submission.points_deducted).to eq 300
+      end
+    end
+
+    it "deducts nothing if there is no late policy" do
+      Timecop.freeze(@date) do
+        @assignment.submit_homework(@student, body: "a body")
+        submission.score = 700
+        submission.apply_late_policy(nil, 1000)
+        expect(submission.score).to eq 700
+        expect(submission.points_deducted).to eq 0
+      end
+    end
+
+    it "deducts only once even if called twice" do
+      Timecop.freeze(@date) do
+        @assignment.submit_homework(@student, body: "a body")
+        submission.score = 800
+        submission.apply_late_policy(@late_policy, 1000)
+        expect(submission.score).to eq 500
+        expect(submission.points_deducted).to eq 300
+        submission.apply_late_policy(@late_policy, 1000)
+        expect(submission.score).to eq 500
+        expect(submission.points_deducted).to eq 300
+      end
+    end
+  end
+
+  describe "#apply_late_policy_before_save" do
+    before(:once) do
+      @date = Time.zone.local(2017, 3, 25, 11)
+      @assignment.update!(due_at: 4.days.ago(@date), points_possible: 1000, submission_types: "online_text_entry")
+      @late_policy = late_policy_factory(course: @course, deduct: 5.0, every: :day)
+    end
+
+    let(:submission) { @assignment.submissions.find_by(user_id: @student) }
+
+    it "applies the late policy when score changes" do
+      Timecop.freeze(2.days.ago(@date)) do
+        @assignment.submit_homework(@student, body: "a body")
+        submission.update!(score: 600)
+        expect(submission.score).to eq 500
+        expect(submission.points_deducted).to eq 100
+      end
+    end
+
+    it "does not apply the late policy when what-if score changes" do
+      Timecop.freeze(2.days.ago(@date)) do
+        @assignment.submit_homework(@student, body: "a body")
+        submission.update!(score: 600)
+      end
+      Timecop.freeze(@date) do
+        @assignment.submit_homework(@student, body: "a body")
+        submission.update!(student_entered_score: 900)
+        expect(submission.score).to eq 500
+        expect(submission.points_deducted).to eq 100
+      end
+    end
+
+    it "re-applies the late policy when accepted_at changes" do
+      Timecop.freeze(@date) do
+        @assignment.submit_homework(@student, body: "a body")
+        submission.update!(score: 800)
+      end
+      submission.update!(accepted_at: @assignment.due_at + 3.days)
+      expect(submission.score).to eq 650
+      expect(submission.points_deducted).to eq 150
     end
   end
 
