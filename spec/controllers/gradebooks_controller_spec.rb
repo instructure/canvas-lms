@@ -492,6 +492,19 @@ describe GradebooksController do
       end
     end
 
+    describe 'js_env' do
+      before :each do
+        user_session(@teacher)
+      end
+
+      it "includes colors" do
+        get :show, course_id: @course.id
+
+        gradebook_options = controller.js_env.fetch(:GRADEBOOK_OPTIONS)
+        expect(gradebook_options).to have_key :colors
+      end
+    end
+
     describe "csv" do
       before :once do
         @course.assignments.create(:title => "Assignment 1")

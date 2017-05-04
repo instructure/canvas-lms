@@ -395,22 +395,10 @@ $gradebook_cell_padding_top: 8px;
   height: $cell_height - $gradebook_cell_padding_top;
   position: relative;
   text-align: center;
-  background-repeat: repeat;
   border: none;
-  &.late {
-    background-image: url("/images/gradebook-late-indicator.png");
-  }
-  &.resubmitted {
-    background-image: url("/images/gradebook-resubmitted-indicator.png");
-  }
   &.grayed-out {
     background-color: $grayLighter;
   }
-}
-
-.slick-cell.dropped {
-  background-image: url("/images/gradebook-dropped-indicator.png");
-  background-repeat: repeat;
 }
 
 .gradebook-cell-turnitin {

@@ -20,7 +20,8 @@ define [
   'str/htmlEscape'
   'jquery'
   'jsx/shared/helpers/numberHelper'
-], (SubmissionCell, htmlEscape, $, numberHelper) ->
+  'compiled/gradezilla/GradebookTranslations'
+], (SubmissionCell, htmlEscape, $, numberHelper, GRADEBOOK_TRANSLATIONS) ->
 
   dangerousHTML= '"><img src=/ onerror=alert(document.cookie);>'
   escapedDangerousHTML = htmlEscape dangerousHTML
@@ -225,3 +226,247 @@ define [
   test "#pass_fail#transitionValue updates the icon class", ->
     @cell.transitionValue('pass')
     ok @cell.$input.find('i').hasClass('icon-check')
+
+  QUnit.module ".styles"
+
+  test "when submission and assignment are empty, return nothing", ->
+    deepEqual SubmissionCell.styles(), []
+
+  test "when submission is dropped it returns dropped", ->
+    deepEqual SubmissionCell.styles({ drop: true }), ["dropped"]
+
+  test "when submission is not dropped it returns nothing", ->
+    deepEqual SubmissionCell.styles({ drop: false }), []
+
+  test "when submission's 'drop' property is undefined it returns nothing", ->
+    deepEqual SubmissionCell.styles({ drop: undefined }), []
+
+  test "when submission is excused it returns dropped", ->
+    deepEqual SubmissionCell.styles({ excused: true }), ["excused"]
+
+  test "when submission is not excused it returns nothing", ->
+    deepEqual SubmissionCell.styles({ excused: false }), []
+
+  test "when submission's 'excused' property is undefined it returns nothing", ->
+    deepEqual SubmissionCell.styles({ excused: undefined }), []
+
+  test "when submission's grade does not match the current submission it returns resubmitted", ->
+    deepEqual SubmissionCell.styles({ grade_matches_current_submission: false }), ["resubmitted"]
+
+  test "when submission's grade matches the current submission it returns resubmitted", ->
+    deepEqual SubmissionCell.styles({ grade_matches_current_submission: true }), []
+
+  test "when submission's 'grade_matches_current_submission' property is undefined it returns nothing", ->
+    deepEqual SubmissionCell.styles({ grade_matches_current_submission: undefined }), []
+
+  test "when a submission is missing it returns missing", ->
+    deepEqual SubmissionCell.styles({ missing: true }), ["missing"]
+
+  test "when a submission is not missing it returns nothing", ->
+    deepEqual SubmissionCell.styles({ missing: false }), []
+
+  test "when a submission's 'missing' property is undefined it returns nothing", ->
+    deepEqual SubmissionCell.styles({ missing: undefined }), []
+
+  test "when a submission is late it returns late", ->
+    deepEqual SubmissionCell.styles({ late: true }), ["late"]
+
+  test "when a submission is not late it returns nothing", ->
+    deepEqual SubmissionCell.styles({ late: false }), []
+
+  test "when a submission's 'late' property is undefined it return nothing", ->
+    deepEqual SubmissionCell.styles({ late: undefined }), []
+
+  test "when an assignment's is ungraded it returns ungraded", ->
+    assignment = {}
+    deepEqual SubmissionCell.styles(assignment, { submission_types: ["not_graded"] }), ["ungraded"]
+
+  test "when an assignment's is not ungraded it returns nothing", ->
+    assignment = {}
+    deepEqual SubmissionCell.styles(assignment, { submission_types: ['online_text_entry'] }), []
+
+  test "when an assignment's type is undefined it return nothing", ->
+    assignment = {}
+    deepEqual SubmissionCell.styles(assignment, { submission_types: undefined }), []
+
+  test "when an assignment is muted it returns muted", ->
+    assignment = {}
+    deepEqual SubmissionCell.styles(assignment, { muted: true }), ["muted"]
+
+  test "when an assignment is not muted it returns nothing", ->
+    assignment = {}
+    deepEqual SubmissionCell.styles(assignment, { muted: false }), []
+
+  test "when an assignment submission's 'mute' property is undefined it return nothing", ->
+    assignment = {}
+    deepEqual SubmissionCell.styles(assignment, { muted: undefined }), []
+
+  test "when a submission has a type it is returned", ->
+    deepEqual SubmissionCell.styles({ submission_type: "fake_type" }), ["fake_type"]
+
+  test "when a submission has no type it returns nothing", ->
+    deepEqual SubmissionCell.styles({ submission_type: '' }), []
+
+  test "when a submission's submitions_type is undefined it return nothing", ->
+    deepEqual SubmissionCell.styles({ submission_type: undefined }), []
+
+  test "when a submission is late, ungraded, muted and has a submission type", ->
+    submission =
+      late: true
+      submission_type: "online_text_entry"
+    assignment =
+      submission_types: ["not_graded"]
+      muted: true
+    deepEqual SubmissionCell.styles(submission, assignment), [
+      'late',
+      'ungraded',
+      'muted',
+      'online_text_entry'
+    ]
+
+  test "when a submission is both dropped and excused, dropped takes priority", ->
+    deepEqual SubmissionCell.styles({ drop: true, excused: true }), ['dropped']
+
+  test "when a submission is both excused and resubmitted, excused takes priority", ->
+    deepEqual SubmissionCell.styles({ excused: true, grade_matches_current_submission: false }), ['excused']
+
+  test "when a submission is both resubmitted and missing, missing takes priority", ->
+    deepEqual SubmissionCell.styles({ grade_matches_current_submission: false, late: true }), ['resubmitted']
+
+  test "when a submission is both missing and late, missing takes priority", ->
+    deepEqual SubmissionCell.styles({ missing: true, late: true }), ['missing']
+
+  test "when all criteria are present, the styles are dropped, ungraded, muted, and the submission_type", ->
+    submission =
+      drop: true
+      excused: true
+      grade_matches_current_submission: false
+      missing: true
+      late: true
+      submission_type: "online_text_entry"
+    assignment =
+      submission_types: ["not_graded"]
+      muted: true
+    deepEqual SubmissionCell.styles(submission, assignment), [
+      "dropped",
+      "ungraded",
+      "muted",
+      "online_text_entry"
+    ]
+
+  QUnit.module ".tooltips"
+
+  test "given nothing, it returns nothing", ->
+    deepEqual SubmissionCell.tooltips(), []
+
+  test "given all criteria, everything is present", ->
+    submission =
+      drop: true
+      excused: true
+      grade_matches_current_submission: false
+      missing: true
+      late: true
+      submission_type: "online_url"
+    assignment =
+      submission_types: ["not_graded"]
+      muted: true
+    deepEqual SubmissionCell.tooltips(submission, assignment), [
+      "dropped",
+      "excused",
+      "resubmitted",
+      "missing",
+      "late",
+      "ungraded"
+      "muted",
+      "online_url"
+    ]
+
+  test "given a dropped submission, it returns dropped", ->
+    deepEqual SubmissionCell.tooltips({ drop: true }), ["dropped"]
+
+  test "given an excused submission, it returns excused", ->
+    deepEqual SubmissionCell.tooltips({ excused: true }), ["excused"]
+
+  test "given a resubmitted submission, it returns resubmitted", ->
+    deepEqual SubmissionCell.tooltips({ grade_matches_current_submission: false }), ["resubmitted"]
+
+  test "given a missing submission, it returns missing", ->
+    deepEqual SubmissionCell.tooltips({ missing: true }), ["missing"]
+
+  test "given a late submission, it returns late", ->
+    deepEqual SubmissionCell.tooltips({ late: true }), ["late"]
+
+  test "given an ungraded assignment, it returns ungraded", ->
+    deepEqual SubmissionCell.tooltips({}, { submission_types: ["not_graded"] }), ["ungraded"]
+
+  test "given a muted assignment, it returns muted", ->
+    deepEqual SubmissionCell.tooltips({}, { muted: true }), ["muted"]
+
+  QUnit.module "#cellWrapper",
+    setup: ->
+      @fixtures = document.querySelector('#fixtures')
+
+    params: ->
+      item:
+        'whatever':
+          id: '1'
+          submission_type: "online_text_entry"
+      column:
+        field: 'whatever'
+
+    teardown: ->
+      @fixtures.innerHTML = ''
+
+  test "if student is inactive, styles include 'grayed-out'", ->
+    cell = (new SubmissionCell(@params())).cellWrapper('', { student: { isInactive: true } })
+    @fixtures.innerHTML = cell
+    strictEqual @fixtures.querySelectorAll('div.grayed-out').length, 1
+
+  test "if student is concluded, styles include 'grayed-out'", ->
+    @fixtures.innerHTML = (new SubmissionCell(@params())).cellWrapper('', { student: { isConcluded: true } })
+    strictEqual @fixtures.querySelectorAll('div.grayed-out').length, 1
+
+  test "if isLocked, styles include 'grayed-out'", ->
+    @fixtures.innerHTML = (new SubmissionCell(@params())).cellWrapper('', { isLocked: true })
+    strictEqual @fixtures.querySelectorAll('div.grayed-out').length, 1
+
+  test "if student is inactive, tooltips include 'grayed-out'", ->
+    @fixtures.innerHTML = (new SubmissionCell(@params())).cellWrapper('', { student: { isInactive: true } })
+    strictEqual @fixtures.querySelectorAll('div.grayed-out').length, 1
+
+  test "if student is concluded, styles include 'grayed-out'", ->
+    @fixtures.innerHTML = (new SubmissionCell(@params())).cellWrapper('', { student: { isConcluded: true } })
+    strictEqual @fixtures.querySelectorAll('div.grayed-out').length, 1
+
+  test "if locked, styles include 'grayed-out'", ->
+    @fixtures.innerHTML = (new SubmissionCell(@params())).cellWrapper('', { isLocked: true })
+    strictEqual @fixtures.querySelectorAll('div.grayed-out').length, 1
+
+  test "if student is concluded, styles include 'cannot_edit'", ->
+    @fixtures.innerHTML = (new SubmissionCell(@params())).cellWrapper('', { student: { isConcluded: true } })
+    strictEqual @fixtures.querySelectorAll('div.cannot_edit').length, 1
+
+  test "if is locked, styles include 'cannot_edit'", ->
+    @fixtures.innerHTML = (new SubmissionCell(@params())).cellWrapper('', { isLocked: true })
+    strictEqual @fixtures.querySelectorAll('div.cannot_edit').length, 1
+
+  test "if it has tooltip key, styles include that value", ->
+    @fixtures.innerHTML = (new SubmissionCell(@params())).cellWrapper('', { tooltip: 'fake-tooltip' })
+    strictEqual @fixtures.querySelectorAll('div.fake-tooltip').length, 1
+
+  test "if it has tooltip key, tooltips includes that value", ->
+    key = 'in_closed_grading_period'
+    @fixtures.innerHTML = (new SubmissionCell(@params())).cellWrapper('', { tooltip: key })
+    ok @fixtures.querySelector('.gradebook-tooltip').innerText.includes(
+      GRADEBOOK_TRANSLATIONS["submission_tooltip_#{key}"]
+    )
+
+  test "if it has turnitin data, styles includes 'turnitin'", ->
+    params = @params()
+    params.item.whatever.turnitin_data = { submission_1: 'none' }
+    @fixtures.innerHTML = (new SubmissionCell(params)).cellWrapper('')
+    strictEqual @fixtures.querySelectorAll('div.turnitin').length, 1
+
+  test "if no turnitin data, styles do not includes 'turnitin'", ->
+    @fixtures.innerHTML = (new SubmissionCell(@params()).cellWrapper(''))
+    strictEqual @fixtures.querySelectorAll('div.turnitin').length, 0

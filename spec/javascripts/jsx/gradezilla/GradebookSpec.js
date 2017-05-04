@@ -20,13 +20,14 @@ import $ from 'jquery';
 import _ from 'underscore';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import Slick from 'vendor/slickgrid';
+import colors from 'jsx/gradezilla/default_gradebook/constants/colors';
 import natcompare from 'compiled/util/natcompare';
 import round from 'compiled/util/round';
 import fakeENV from 'helpers/fakeENV';
 import { createCourseGradesWithGradingPeriods as createGrades } from 'spec/jsx/gradebook/GradeCalculatorSpecHelper';
 import { createGradebook } from 'spec/jsx/gradezilla/default_gradebook/GradebookSpecHelper';
 
-import SubmissionDetailsDialog from 'compiled/SubmissionDetailsDialog';
 import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator';
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
 import DataLoader from 'jsx/gradezilla/DataLoader';
@@ -225,7 +226,6 @@ QUnit.module('Gradebook#calculateStudentGrade', {
       submissionsForStudent () {
         return submissions;
       },
-      addDroppedClass () {},
       ...options
     };
   },
@@ -2194,7 +2194,9 @@ test('ActionMenu is rendered on renderActionMenu', function () {
       gradebook_is_editable: true,
       context_allows_gradebook_uploads: true,
       gradebook_import_url: 'http://someUrl',
-      export_gradebook_csv_url: 'http://someUrl'
+      export_gradebook_csv_url: 'http://someUrl',
+      post_grades_feature: false,
+      publish_to_sis_enabled: false
     },
     postGradesLtis: [],
     postGradesStore: {},
@@ -4900,7 +4902,7 @@ test('sets postGradesLtis to conform to ActionMenu.propTypes.postGradesLtis', fu
 
   this.spy(console, 'error');
   PropTypes.checkPropTypes({postGradesLtis: ActionMenu.propTypes.postGradesLtis}, props, 'prop', 'ActionMenu');
-  ok(console.error.notCalled);
+  ok(console.error.notCalled); // eslint-disable-line no-console
 });
 
 QUnit.module('Gradebook#getActionMenuProps', {
@@ -4936,7 +4938,7 @@ test('generates props that conform to ActionMenu.propTypes', function () {
 
   this.spy(console, 'error');
   PropTypes.checkPropTypes(ActionMenu.propTypes, props, 'props', 'ActionMenu')
-  ok(console.error.notCalled);
+  ok(console.error.notCalled); // eslint-disable-line no-console
 });
 
 QUnit.module('Gradebook#getInitialGridDisplaySettings');
@@ -5161,4 +5163,99 @@ test('does not prevent default when clicking within the active cell', function (
   this.spy(this.editorLock, 'commitCurrentEdit');
   const returnValue = this.gradebook.onGridBlur({ target: $fixtures.querySelector('.example-target') });
   equal(typeof returnValue, 'undefined', 'jQuery event handlers prevent default when returning false');
+});
+
+QUnit.module('GridColor');
+
+test('is rendered on init', function () {
+  const gradebook = createGradebook();
+  const renderGridColorStub = this.stub(gradebook, 'renderGridColor');
+  this.stub(gradebook, 'getFrozenColumnCount');
+  this.stub(gradebook, 'getVisibleGradeGridColumns');
+  const subscribe = () => {};
+  this.stub(Slick, 'Grid').returns({
+    setSortColumn () {},
+    onKeyDown: { subscribe },
+    onHeaderCellRendered: { subscribe },
+    onBeforeHeaderCellDestroy: { subscribe },
+    onColumnsReordered: { subscribe },
+    onColumnsResized: { subscribe },
+    onBeforeEditCell: { subscribe },
+    onCellChange: { subscribe },
+    getUID () {},
+  });
+  this.stub(gradebook, 'onGridInit');
+
+  gradebook.initGrid();
+  ok(renderGridColorStub.called);
+});
+
+test('is rendered on renderGridColor', function () {
+  $fixtures.innerHTML = '<span data-component="GridColor"></span>';
+  const self = {
+    options: {
+      colors: {}
+    }
+  };
+  Gradebook.prototype.renderGridColor.call(self);
+  const style = document.querySelector('[data-component="GridColor"] style').innerText;
+  equal(style, [
+    `.even .gradebook-cell.late { background-color: ${colors.light.blue}; }`,
+    `.odd .gradebook-cell.late { background-color: ${colors.dark.blue}; }`,
+    '.slick-cell.editable .gradebook-cell.late { background-color: white; }',
+    `.even .gradebook-cell.missing { background-color: ${colors.light.purple}; }`,
+    `.odd .gradebook-cell.missing { background-color: ${colors.dark.purple}; }`,
+    '.slick-cell.editable .gradebook-cell.missing { background-color: white; }',
+    `.even .gradebook-cell.resubmitted { background-color: ${colors.light.green}; }`,
+    `.odd .gradebook-cell.resubmitted { background-color: ${colors.dark.green}; }`,
+    '.slick-cell.editable .gradebook-cell.resubmitted { background-color: white; }',
+    `.even .gradebook-cell.dropped { background-color: ${colors.light.orange}; }`,
+    `.odd .gradebook-cell.dropped { background-color: ${colors.dark.orange}; }`,
+    '.slick-cell.editable .gradebook-cell.dropped { background-color: white; }',
+    `.even .gradebook-cell.excused { background-color: ${colors.light.yellow}; }`,
+    `.odd .gradebook-cell.excused { background-color: ${colors.dark.yellow}; }`,
+    '.slick-cell.editable .gradebook-cell.excused { background-color: white; }'
+  ].join(''));
+  $fixtures.innerHTML = '';
+});
+
+QUnit.module('#updateSubmissionsFromExternal');
+
+test('updateCell is called for each assignment in a row', function () {
+  // test data
+  const columns = [
+    { id: 'student', type: 'student' },
+    { id: 'assignment_232', type: 'assignment' },
+    { id: 'total_grade', type: 'total_grade' },
+    { id: 'assignment_group_12', type: 'assignment' }
+  ];
+  const gradebook = createGradebook();
+  const submissions = [
+    { assignment_id: 201, user_id: 123, score: 10, assignment_visible: true }
+  ];
+
+  // stubs
+  gradebook.students = {
+    123: { row: 1, assignment_201: {} }
+  };
+  gradebook.assignments = []
+  gradebook.submissionStateMap = {
+    setSubmissionCellState () {},
+    getSubmissionState () { return { locked: false } }
+  };
+  gradebook.grid = {
+    updateCell: this.stub(),
+    getColumns () { return columns },
+  };
+  const updateCellStub = gradebook.grid.updateCell;
+  this.stub(gradebook, 'renderAssignmentColumnHeader')
+  this.stub(gradebook, 'updateSubmission');
+
+  gradebook.updateSubmissionsFromExternal(submissions);
+
+  ok(updateCellStub.withArgs(1, 0).calledOnce);
+  ok(updateCellStub.withArgs(1, 2).calledOnce);
+  ok(updateCellStub.withArgs(1, 1).calledOnce);
+  ok(updateCellStub.withArgs(1, 3).calledOnce);
+  strictEqual(updateCellStub.callCount, 4);
 });

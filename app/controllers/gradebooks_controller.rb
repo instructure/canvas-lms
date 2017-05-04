@@ -389,10 +389,11 @@ class GradebooksController < ApplicationController
       post_grades_feature: post_grades_feature?,
       sections: sections_json(@context.active_course_sections, @current_user, session),
       settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
-      settings: @current_user.preferences.fetch(:gradebook_settings, {}).fetch(@context.id, {}),
+      settings: gradebook_settings.fetch(@context.id, {}),
       login_handle_name: @context.root_account.settings[:login_handle_name],
       sis_name: @context.root_account.settings[:sis_name],
-      version: params.fetch(:version, nil)
+      version: params.fetch(:version, nil),
+      colors: gradebook_settings.fetch(:colors, {})
     }
   end
 
@@ -674,6 +675,8 @@ class GradebooksController < ApplicationController
     redirect_to polymorphic_url([@context, 'gradebook'])
   end
 
+  private
+
   def set_gradebook_warnings(groups, assignments)
     @assignments_in_bad_groups = Set.new
 
@@ -710,9 +713,6 @@ class GradebooksController < ApplicationController
 
     js_env :total_grade_warning => warning if warning
   end
-  private :set_gradebook_warnings
-
-  private
 
   def new_history
     @page_title = t("Gradebook History")
@@ -887,5 +887,9 @@ class GradebooksController < ApplicationController
       state: state,
       per_page: per_page
     )
+  end
+
+  def gradebook_settings
+    @current_user.preferences.fetch(:gradebook_settings, {})
   end
 end

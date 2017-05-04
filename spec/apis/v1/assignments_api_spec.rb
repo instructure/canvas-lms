@@ -3648,6 +3648,7 @@ describe AssignmentsApiController, type: :request do
          "user_id" => @observed_student.id,
          "workflow_state" => "submitted",
          "late" => false,
+         "missing" => false,
          "late_policy_status" => nil,
          "accepted_at" => nil,
          "preview_url" =>
@@ -3680,6 +3681,7 @@ describe AssignmentsApiController, type: :request do
          "user_id" => @observed_student.id,
          "workflow_state" => "submitted",
          "late" => false,
+         "missing" => false,
          "late_policy_status" => nil,
          "accepted_at" => nil,
          "preview_url" =>

@@ -65,6 +65,7 @@ define [
   'jsx/gradezilla/default_gradebook/components/GradebookMenu'
   'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu'
   'jsx/gradezilla/default_gradebook/components/ActionMenu'
+  'jsx/gradezilla/default_gradebook/components/GridColor'
   'jsx/gradezilla/SISGradePassback/PostGradesStore'
   'jsx/gradezilla/SISGradePassback/PostGradesApp'
   'jsx/gradezilla/SubmissionStateMap'
@@ -100,7 +101,7 @@ define [
   SubmissionCell, NumberCompare, natcompare, htmlEscape, AssignmentDetailsDialogManager, SetDefaultGradeDialogManager,
   CurveGradesDialogManager, GradebookApi, CellEditorFactory, StudentRowHeaderConstants, AssignmentColumnHeader,
   AssignmentGroupColumnHeader, AssignmentRowCellPropFactory, CustomColumnHeader, StudentColumnHeader, StudentRowHeader,
-  TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, PostGradesStore, PostGradesApp, SubmissionStateMap,
+  TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, GridColor, PostGradesStore, PostGradesApp,  SubmissionStateMap,
   DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager, GroupTotalCellTemplate, SectionMenuView,
   GradingPeriodMenuView, GradebookKeyboardNav, AssignmentMuterDialogManager,
   assignmentHelper, GradebookSettingsModal, Button, IconSettingsSolid) ->
@@ -212,7 +213,7 @@ define [
         $.extend(assignmentGroupsParams, {grading_period_id: @gradingPeriodToShow})
 
       submissionParams =
-        response_fields: ['id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id', 'grade_matches_current_submission', 'attachments', 'late', 'workflow_state', 'excused']
+        response_fields: ['id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id', 'grade_matches_current_submission', 'attachments', 'late', 'missing', 'workflow_state', 'excused']
         exclude_response_fields: ['preview_url']
       submissionParams['grading_period_id'] = @gradingPeriodToShow if @gradingPeriodSet? && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
       dataLoader = DataLoader.loadGradebookData(
@@ -428,6 +429,7 @@ define [
       e.type == "StudentEnrollment" || e.type == "StudentViewEnrollment"
 
     setupGrading: (students) =>
+      # set up a submission for each student even if we didn't receive one
       @submissionStateMap.setup(students, @assignments)
       for student in students
         for assignment_id, assignment of @assignments
@@ -723,6 +725,7 @@ define [
     updateSubmissionsFromExternal: (submissions) =>
       columns = @grid.getColumns()
       changedColumnHeaders = {}
+      changedRows = []
       for submission in submissions
         student = @student(submission.user_id)
         idToMatch = @getAssignmentColumnId(submission.assignment_id)
@@ -738,11 +741,16 @@ define [
         submissionState = @submissionStateMap.getSubmissionState(submission)
         student["assignment_#{submission.assignment_id}"].gradeLocked = submissionState.locked
         @calculateStudentGrade(student)
-        @grid.updateCell student.row, cell
+        changedRows.push(student.row)
         @updateRowTotals student.row
 
       for assignmentId, cell of changedColumnHeaders
         @renderAssignmentColumnHeader(assignmentId)
+
+      columns = (index for column, index in @grid.getColumns() when column.type is 'assignment')
+      for row in _.uniq(changedRows)
+        for column in columns
+          @grid.updateCell row, column
 
     updateRowTotals: (rowIndex) ->
       columns = @grid.getColumns()
@@ -850,20 +858,7 @@ define [
             submissionData.submission.drop = submissionData.drop
         student["total_grade"] = grades[finalOrCurrent]
 
-        @addDroppedClass(student)
-
     ## Grid Styling Methods
-
-    addDroppedClass: (student) ->
-      droppedAssignments = (name for name, assignment of student when name.match(/assignment_\d+/) and (assignment.drop? or assignment.excused))
-      drops = {}
-      drops[student.row] = {}
-      for a in droppedAssignments
-        drops[student.row][a] = 'dropped'
-
-      styleKey = "dropsForRow#{student.row}"
-      @grid.removeCellCssStyles(styleKey)
-      @grid.addCellCssStyles(styleKey, drops)
 
     highlightColumn: (event) =>
       $headers = @$grid.find('.slick-header-column')
@@ -1257,6 +1252,11 @@ define [
       @updateSectionFilterVisibility()
       @updateGradingPeriodFilterVisibility()
 
+    renderGridColor: =>
+      gridColorMountPoint = document.querySelector('[data-component="GridColor"]')
+      gridColorProps = @options.colors
+      renderComponent(GridColor, gridColorMountPoint, gridColorProps)
+
     checkForUploadComplete: () ->
       if UserSettings.contextGet('gradebookUploadComplete')
         $.flashMessage I18n.t('Upload successful')
@@ -1464,6 +1464,8 @@ define [
         numberOfColumnsToFreeze: @getFrozenColumnCount()
       }, @options)
 
+      @renderGridColor()
+
       @grid = new Slick.Grid('#gradebook_grid', @rows, @getVisibleGradeGridColumns(), options)
       @grid.setSortColumn('student')
 
@@ -1574,9 +1576,6 @@ define [
           sortFn
 
       @rows.sort respectorOfPersonsSort()
-      for student, i in @rows
-        student.row = i
-        @addDroppedClass(student)
       @grid?.invalidate()
 
     getStudentGradeForColumn: (student, field) =>

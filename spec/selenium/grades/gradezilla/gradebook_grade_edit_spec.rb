@@ -143,11 +143,11 @@ describe "Gradezilla editing grades" do
   end
 
   it "displays dropped grades correctly after editing a grade", priority: "1", test_id: 220316 do
-    @course.assignment_groups.first.update_attribute :rules, 'drop_lowest:1'
+    @course.assignment_groups.first.update!(rules: 'drop_lowest:1')
     Gradezilla.visit(@course)
 
-    assignment_1_sel = '#gradebook_grid .container_1 .slick-row:nth-child(1) .l2'
-    assignment_2_sel = '#gradebook_grid .container_1 .slick-row:nth-child(1) .l3'
+    assignment_1_sel = '#gradebook_grid .container_1 .slick-row:nth-child(1) .l2 .gradebook-cell'
+    assignment_2_sel = '#gradebook_grid .container_1 .slick-row:nth-child(1) .l3 .gradebook-cell'
     a1 = f(assignment_1_sel)
     a2 = f(assignment_2_sel)
     expect(a1).to have_class 'dropped'

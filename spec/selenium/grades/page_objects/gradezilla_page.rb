@@ -180,11 +180,9 @@ class Gradezilla
     end
 
     def grading_cell(x=0, y=0)
-      row_idx, col_idx = y + 1, x + 1
-
-      cell = f('.container_1')
-      cell = f(".slick-row:nth-child(#{row_idx})", cell)
-      f(".slick-cell:nth-child(#{col_idx})", cell)
+      row_idx = y + 1
+      col_idx = x + 1
+      f(".container_1 .slick-row:nth-child(#{row_idx}) .slick-cell:nth-child(#{col_idx})")
     end
 
     def total_score_for_row(row)
@@ -209,13 +207,9 @@ class Gradezilla
       grade_input(cell).send_keys(:return)
     end
 
-    def cell_graded?(grade, x_coordinate, y_coordinate)
-      cell = grading_cell(x_coordinate, y_coordinate)
-      if cell.text == grade
-        return true
-      else
-        return false
-      end
+    def cell_graded?(grade, x, y)
+      cell = f('.gradebook-cell', grading_cell(x, y))
+      cell.text == grade
     end
 
     def open_student_column_menu

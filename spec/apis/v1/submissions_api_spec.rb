@@ -74,6 +74,7 @@ describe 'Submissions API', type: :request do
       "score"=>nil,
       "workflow_state"=>"unsubmitted",
       "late"=>false,
+      "missing"=>false,
       "graded_at"=>nil,
       "late_policy_status"=>nil,
       "accepted_at"=>nil
@@ -728,6 +729,7 @@ describe 'Submissions API', type: :request do
         "score"=>13.5,
         "workflow_state"=>"graded",
         "late"=>false,
+        "missing"=>false,
         "late_policy_status"=>nil,
         "accepted_at"=>"1970-01-01T01:00:00Z"})
 
@@ -913,6 +915,7 @@ describe 'Submissions API', type: :request do
            "score"=>nil,
            "workflow_state" => "submitted",
            "late"=>false,
+           "missing"=>false,
            "late_policy_status"=>nil,
            "accepted_at"=>"1970-01-01T01:00:00Z"},
           {"id"=>sub1.id,
@@ -938,6 +941,7 @@ describe 'Submissions API', type: :request do
            "score"=>nil,
            "workflow_state" => "submitted",
            "late"=>false,
+           "missing"=>false,
            "late_policy_status"=>nil,
            "accepted_at"=>"1970-01-01T02:00:00Z"},
           {"id"=>sub1.id,
@@ -985,6 +989,7 @@ describe 'Submissions API', type: :request do
            "score"=>13.5,
            "workflow_state" => "graded",
            "late"=>false,
+           "missing"=>false,
            "late_policy_status"=>nil,
            "accepted_at"=>"1970-01-01T03:00:00Z"}],
         "attempt"=>3,
@@ -1019,6 +1024,7 @@ describe 'Submissions API', type: :request do
         "score"=>13.5,
         "workflow_state"=>"graded",
         "late"=>false,
+        "missing"=>false,
         "late_policy_status"=>nil,
         "accepted_at"=>"1970-01-01T03:00:00Z"},
        {"id"=>sub2.id,
@@ -1073,6 +1079,7 @@ describe 'Submissions API', type: :request do
            "score"=>9,
            "workflow_state" => "graded",
            "late"=>false,
+           "missing"=>false,
            "late_policy_status"=>nil,
            "accepted_at"=>"1970-01-01T04:00:00Z"}],
         "attempt"=>1,
@@ -1109,6 +1116,7 @@ describe 'Submissions API', type: :request do
           "crit1"=>{"comments"=>nil, "points"=>7}},
         "workflow_state"=>"graded",
         "late"=>false,
+        "missing"=>false,
         "late_policy_status"=>nil,
         "accepted_at"=>"1970-01-01T04:00:00Z"}]
     expect(json.sort_by { |h| h['user_id'] }).to eq res.sort_by { |h| h['user_id'] }
