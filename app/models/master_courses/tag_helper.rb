@@ -31,6 +31,7 @@ module MasterCourses::TagHelper
     tag_scope = self.content_tags
 
     if objects
+      return unless objects.any?
       objects_to_load = objects.map{|o| (o.is_a?(Assignment) && o.submittable_object) || o}
       tag_scope = tag_scope.polymorphic_where(:content => objects_to_load)
     end
