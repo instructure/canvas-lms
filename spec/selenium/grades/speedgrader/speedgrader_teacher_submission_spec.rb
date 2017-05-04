@@ -240,9 +240,11 @@ describe "speed grader submissions" do
         # validates the image\attachment is inside the iframe as expected
         image_element = f('img')
 
-        expect(image_element.attribute('src')).to include('download')
-        expect(image_element.attribute('style')).to include('max-height: 100')
-        expect(image_element.attribute('style')).to include('max-width: 100')
+        if Attachment.local_storage?
+          expect(image_element.attribute('src')).to include('download')
+        else
+          expect(image_element.attribute('src')).to include('amazonaws')
+        end
       end
     end
 

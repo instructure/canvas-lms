@@ -294,7 +294,7 @@ describe FilesController do
     it "should force download when download_frd is set" do
       user_session(@teacher)
       # this call should happen inside of FilesController#send_attachment
-      FilesController.any_instance.expects(:send_stored_file).with(@file, false, true)
+      FilesController.any_instance.expects(:send_stored_file).with(@file, false)
       get 'show', :course_id => @course.id, :id => @file.id, :download => 1, :verifier => @file.uuid, :download_frd => 1
     end
 

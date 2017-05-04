@@ -173,7 +173,7 @@ module Lti
       attachment = Attachment.find(params[:attachment_id])
       render_unauthorized and return unless attachment_for_submission?(attachment)
       render_or_redirect_to_stored_file(
-        attachment: attachment, redirect_to_s3: true)
+        attachment: attachment)
     end
 
 

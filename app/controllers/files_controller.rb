@@ -626,12 +626,12 @@ class FilesController < ApplicationController
         redirect_to(named_context_url(@context, :context_file_url, attachment.id))
       end
     else
-      send_stored_file(attachment, false, true)
+      send_stored_file(attachment, false)
     end
   end
   protected :send_attachment
 
-  def send_stored_file(attachment, inline=true, redirect_to_s3=false)
+  def send_stored_file(attachment, inline=true)
     user = @current_user
     user ||= api_find(User, params[:user_id]) if params[:user_id].present?
     attachment.context_module_action(user, :read) if user && !params[:preview]
@@ -639,8 +639,7 @@ class FilesController < ApplicationController
     render_or_redirect_to_stored_file(
       attachment: attachment,
       verifier: params[:verifier],
-      inline: inline,
-      redirect_to_s3: redirect_to_s3
+      inline: inline
     )
   end
   protected :send_stored_file
