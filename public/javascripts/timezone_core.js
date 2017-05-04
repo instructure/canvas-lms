@@ -131,6 +131,22 @@ define([
       var datetime = tz.parse(value);
       if (datetime == null) return null;
 
+      format = tz.adjustFormat(format);
+
+      // try and apply the format string to the datetime. if it succeeds, we'll
+      // get a string; otherwise we'll get the (non-string) date back.
+      var formatted = null;
+      if (usingOtherZone){
+        formatted = localTz(datetime, format, otherZone);
+      } else {
+        formatted = localTz(datetime, format);
+      }
+
+      if (typeof formatted !== 'string') return null;
+      return formatted;
+    },
+
+    adjustFormat: function(format) {
       // translate recognized 'date.formats.*' and 'time.formats.*' to
       // appropriate format strings according to locale.
       if (format.match(/^(date|time)\.formats\./)) {
@@ -170,17 +186,7 @@ define([
       }
       format = format.split("").reverse().join("");
 
-      // try and apply the format string to the datetime. if it succeeds, we'll
-      // get a string; otherwise we'll get the (non-string) date back.
-      var formatted = null;
-      if (usingOtherZone){
-        formatted = localTz(datetime, format, otherZone);
-      } else {
-        formatted = localTz(datetime, format);
-      }
-
-      if (typeof formatted !== 'string') return null;
-      return formatted;
+      return format;
     },
 
     hasMeridian: function() {
