@@ -265,6 +265,24 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       expect(mc_tag.restrictions).to be_blank
       expect(mc_tag.use_default_restrictions).to be_falsey
     end
+
+    it "should use default restrictions by object type if enabled" do
+      assmt = @course.assignments.create!
+      assmt_tag = @template.content_tag_for(assmt)
+      page = @course.wiki.wiki_pages.create!(:title => "blah")
+      page_tag = @template.content_tag_for(page)
+
+      assmt_restricts = {:content => true, :points => true}
+      page_restricts = {:content => true}
+      @template.update_attributes(:use_default_restrictions_by_type => true,
+        :default_restrictions_by_type => {'Assignment' => assmt_restricts, 'WikiPage' => page_restricts})
+
+      api_call(:put, @url, @params, {:content_type => 'assignment', :content_id => assmt.id, :restricted => '1'}, {}, {:expected_status => 200})
+      expect(assmt_tag.reload.restrictions).to eq assmt_restricts
+
+      api_call(:put, @url, @params, {:content_type => 'wiki_page', :content_id => page.id, :restricted => '1'}, {}, {:expected_status => 200})
+      expect(page_tag.reload.restrictions).to eq page_restricts
+    end
   end
 
   def run_master_migration

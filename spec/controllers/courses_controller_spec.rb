@@ -1711,6 +1711,34 @@ describe CoursesController do
         expect(response).to_not be_success
         expect(response.body).to include 'Invalid restrictions'
       end
+
+      it "should allow setting whether to use template restrictions by object type" do
+        put 'update', :id => @course.id, :format => 'json', :course => { :blueprint => '1',
+          :use_blueprint_restrictions_by_object_type => '1'}
+        expect(response).to be_success
+        template = MasterCourses::MasterTemplate.full_template_for(@course)
+        expect(template.use_default_restrictions_by_type).to be_truthy
+      end
+
+      it "should allow setting default template restrictions by object type" do
+        put 'update', :id => @course.id, :format => 'json', :course => { :blueprint => '1',
+          :blueprint_restrictions_by_object_type =>
+            {'assignment' => {'content' => '1', 'due_dates' => '1'}, 'quiz' => {'content' => '1'}}}
+        expect(response).to be_success
+        template = MasterCourses::MasterTemplate.full_template_for(@course)
+        expect(template.default_restrictions_by_type).to eq ({
+          "Assignment" => {:content => true, :due_dates => true},
+          "Quizzes::Quiz" => {:content => true}
+        })
+      end
+
+      it "should validate default template restrictions by object type" do
+        put 'update', :id => @course.id, :format => 'json', :course => { :blueprint => '1',
+          :blueprint_restrictions_by_object_type =>
+            {'notarealtype' => {'content' => '1', 'due_dates' => '1'}}}
+        expect(response).to_not be_success
+        expect(response.body).to include 'Invalid restrictions'
+      end
     end
   end
 

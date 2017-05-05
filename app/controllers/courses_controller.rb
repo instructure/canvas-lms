@@ -2152,8 +2152,21 @@ class CoursesController < ApplicationController
   #   Sets the course as a blueprint course. NOTE: The Blueprint Courses feature is in beta
   #
   # @argument course[blueprint_restrictions] [BlueprintRestriction]
-  #   Sets a default set to apply to blueprint course objects when restricted.
+  #   Sets a default set to apply to blueprint course objects when restricted,
+  #   unless _use_blueprint_restrictions_by_object_type_ is enabled.
   #   See the {api:Blueprint_Templates:BlueprintRestriction Blueprint Restriction} documentation
+  #
+  # @argument course[use_blueprint_restrictions_by_object_type] [Boolean]
+  #   When enabled, the _blueprint_restrictions_ parameter will be ignored in favor of
+  #   the _blueprint_restrictions_by_object_type_ parameter
+  #
+  # @argument course[blueprint_restrictions_by_object_type] [multiple BlueprintRestrictions]
+  #   Allows setting multiple {api:Blueprint_Templates:BlueprintRestriction Blueprint Restriction}
+  #   to apply to blueprint course objects of the matching type when restricted.
+  #   The possible object types are "assignment", "attachment", "discussion_topic", "quiz" and "wiki_page".
+  #   Example usage:
+  #     course[blueprint_restrictions_by_object_type][assignment][content]=1
+  #
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id> \
@@ -2328,12 +2341,30 @@ class CoursesController < ApplicationController
           end
         end
       end
-      if (mc_restrictions = params[:course][:blueprint_restrictions]) && MasterCourses::MasterTemplate.is_master_course?(@course)
+      blueprint_keys = [:blueprint_restrictions, :use_blueprint_restrictions_by_object_type, :blueprint_restrictions_by_object_type]
+      if blueprint_keys.any?{|k| params[:course].has_key?(k)} && MasterCourses::MasterTemplate.is_master_course?(@course)
         return unless authorized_action(@course.account, @current_user, :manage_master_courses)
         template = MasterCourses::MasterTemplate.full_template_for(@course)
-        restrictions = Hash[mc_restrictions.map{|k, v| [k.to_sym, value_to_boolean(v)]}]
-        template.default_restrictions = restrictions
-        unless template.save
+
+        if params[:course].has_key?(:use_blueprint_restrictions_by_object_type)
+          template.use_default_restrictions_by_type = value_to_boolean(params[:course][:use_blueprint_restrictions_by_object_type])
+        end
+
+        if (mc_restrictions = params[:course][:blueprint_restrictions])
+          restrictions = Hash[mc_restrictions.map{|k, v| [k.to_sym, value_to_boolean(v)]}]
+          template.default_restrictions = restrictions
+        end
+
+        if (mc_restrictions_by_type = params[:course][:blueprint_restrictions_by_object_type])
+          parsed_restrictions_by_type = {}
+          mc_restrictions_by_type.each do |type, restrictions|
+            class_name = type == "quiz" ? "Quizzes::Quiz" : type.camelcase
+            parsed_restrictions_by_type[class_name] = Hash[restrictions.map{|k, v| [k.to_sym, value_to_boolean(v)]}]
+          end
+          template.default_restrictions_by_type = parsed_restrictions_by_type
+        end
+
+        if template.changed? && !template.save
           @course.errors.add(:master_course_restrictions, t("Invalid restrictions"))
         end
       end

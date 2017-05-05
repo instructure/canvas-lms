@@ -407,7 +407,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     mc_tag = @template.content_tag_for(item)
     if value_to_boolean(params[:restricted])
       custom_restrictions = params[:restrictions] && Hash[params[:restrictions].map{|k, v| [k.to_sym, value_to_boolean(v)]}]
-      mc_tag.restrictions = custom_restrictions || @template.default_restrictions
+      mc_tag.restrictions = custom_restrictions || @template.default_restrictions_for(item)
       mc_tag.use_default_restrictions = !custom_restrictions
     else
       mc_tag.restrictions = {}
@@ -478,6 +478,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
 
     max_records = Setting.get('master_courses_history_count', '150').to_i
     items = []
+    Shackles.activate(:slave) do
     (MasterCourses::ALLOWED_CONTENT_TYPES - ['AssignmentGroup']).each do |klass|
       item_scope = case klass
       when 'Attachment'
@@ -495,6 +496,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
       break if items.size >= max_records
     end
     @template.load_tags!(items) # only load the tags we need
+    end
 
     changes = items.map do |asset|
       action = if asset.respond_to?(:deleted?) && asset.deleted?

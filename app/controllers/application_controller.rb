@@ -263,7 +263,7 @@ class ApplicationController < ActionController::Base
     # we might have to include more information about the object here to make it easier to plug a common component in
     data = object.master_course_api_restriction_data(status)
     if status == :master
-      data[:default_restrictions] = MasterCourses::MasterTemplate.full_template_for(course).default_restrictions
+      data[:default_restrictions] = MasterCourses::MasterTemplate.full_template_for(course).default_restrictions_for(object)
     end
     js_env(:MASTER_COURSE_DATA => data)
   end

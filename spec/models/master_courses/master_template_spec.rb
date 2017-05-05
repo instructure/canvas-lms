@@ -148,8 +148,11 @@ describe MasterCourses::MasterTemplate do
   end
 
   describe "default restriction syncing" do
-    it "should keep content tag restrictions up to date" do
+    before :once do
       @template = MasterCourses::MasterTemplate.set_as_master_course(@course)
+    end
+
+    it "should keep content tag restrictions up to date" do
       tag1 = @template.create_content_tag_for!(@course.discussion_topics.create!, :use_default_restrictions => true)
       tag2 = @template.create_content_tag_for!(@course.discussion_topics.create!, :use_default_restrictions => false)
       old_default = tag2.restrictions
@@ -158,6 +161,34 @@ describe MasterCourses::MasterTemplate do
       @template.update_attribute(:default_restrictions, new_default)
       expect(tag1.reload.restrictions).to eq new_default
       expect(tag2.reload.restrictions).to eq old_default
+    end
+
+    it "should keep tags up to date when default restrictions are set by object type" do
+      topic_tag1 = @template.create_content_tag_for!(@course.discussion_topics.create!, :use_default_restrictions => true)
+      topic_tag2 = @template.create_content_tag_for!(@course.discussion_topics.create!, :use_default_restrictions => false)
+      assmt_tag1 = @template.create_content_tag_for!(@course.assignments.create!, :use_default_restrictions => true)
+      assmt_tag2 = @template.create_content_tag_for!(@course.assignments.create!, :use_default_restrictions => false)
+
+      assmt_restricts = {:content => true, :points => true}
+      topic_restricts = {:content => true}
+      @template.update_attribute(:default_restrictions_by_type,
+        {'Assignment' => assmt_restricts, 'DiscussionTopic' => topic_restricts})
+
+      expect(topic_tag1.reload.restrictions).to be_blank # shouldn't have updated yet because it's not configured to use per-object defaults
+      expect(assmt_tag1.reload.restrictions).to be_blank
+
+      @template.update_attribute(:use_default_restrictions_by_type, true)
+
+      expect(topic_tag1.reload.restrictions).to eq topic_restricts
+      expect(assmt_tag1.reload.restrictions).to eq assmt_restricts
+
+      expect(topic_tag2.reload.restrictions).to be_blank # shouldn't have updated because use_default_restrictions is not set
+      expect(assmt_tag2.reload.restrictions).to be_blank
+
+      @template.update_attribute(:default_restrictions_by_type, {})
+
+      expect(topic_tag1.reload.restrictions).to be_blank
+      expect(assmt_tag1.reload.restrictions).to be_blank
     end
   end
 

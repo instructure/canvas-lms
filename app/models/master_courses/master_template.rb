@@ -27,6 +27,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   belongs_to :active_migration, :class_name => "MasterCourses::MasterMigration"
 
   serialize :default_restrictions, Hash
+  serialize :default_restrictions_by_type, Hash
   validate :require_valid_restrictions
 
   attr_accessor :child_course_count
@@ -57,8 +58,17 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   end
 
   def sync_default_restrictions
-    if self.default_restrictions_changed?
-      self.master_content_tags.where(:use_default_restrictions => true).update_all(:restrictions => self.default_restrictions)
+    if self.use_default_restrictions_by_type
+      if self.use_default_restrictions_by_type_changed? || self.default_restrictions_by_type_changed?
+        MasterCourses::RESTRICTED_OBJECT_TYPES.each do |type|
+          self.master_content_tags.where(:use_default_restrictions => true, :content_type => type).
+            update_all(:restrictions => self.default_restrictions_by_type[type] || {})
+        end
+      end
+    else
+      if self.default_restrictions_changed?
+        self.master_content_tags.where(:use_default_restrictions => true).update_all(:restrictions => self.default_restrictions)
+      end
     end
   end
 
@@ -66,6 +76,13 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     if self.default_restrictions_changed?
       if (self.default_restrictions.keys - MasterCourses::LOCK_TYPES).any?
         self.errors.add(:default_restrictions, "Invalid settings")
+      end
+    end
+    if self.default_restrictions_by_type_changed?
+      if (self.default_restrictions_by_type.keys - MasterCourses::RESTRICTED_OBJECT_TYPES).any?
+        self.errors.add(:default_restrictions_by_type, "Invalid content type")
+      elsif self.default_restrictions_by_type.values.any?{|k, v| (k.keys - MasterCourses::LOCK_TYPES).any?}
+        self.errors.add(:default_restrictions_by_type, "Invalid settings")
       end
     end
   end
@@ -193,5 +210,13 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
       deletions_by_type[klass] = deleted_mig_ids if deleted_mig_ids.any?
     end
     deletions_by_type
+  end
+
+  def default_restrictions_for(object)
+    if self.use_default_restrictions_by_type
+      self.default_restrictions_by_type[object.class.base_class.name] || {}
+    else
+      self.default_restrictions
+    end
   end
 end
