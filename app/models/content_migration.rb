@@ -39,6 +39,8 @@ class ContentMigration < ActiveRecord::Base
 
   attr_accessor :imported_migration_items, :outcome_to_id_map, :attachment_path_id_lookup, :attachment_path_id_lookup_lower, :last_module_position, :skipped_master_course_items
 
+  has_a_broadcast_policy
+
   workflow do
     state :created
     state :queued
@@ -543,8 +545,11 @@ class ContentMigration < ActiveRecord::Base
   end
   alias_method :import_content_without_send_later, :import_content
 
+  def master_migration
+    @master_migration ||= MasterCourses::MasterMigration.find(self.migration_settings[:master_migration_id])
+  end
+
   def update_master_migration(state)
-    master_migration = MasterCourses::MasterMigration.find(self.migration_settings[:master_migration_id])
     master_migration.update_import_state!(self, state)
   end
 
@@ -892,5 +897,14 @@ class ContentMigration < ActiveRecord::Base
         end
       end
     end
+  end
+
+  set_broadcast_policy do |p|
+    p.dispatch :blueprint_content_added
+    p.to { context.participating_admins }
+    p.whenever { |record|
+      record.changed_state_to(:imported) && record.for_master_course_import? &&
+        record.master_migration && record.master_migration.send_notification?
+    }
   end
 end

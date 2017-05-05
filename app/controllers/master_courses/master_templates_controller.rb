@@ -305,11 +305,14 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   #
   # @argument comment [Optional, String]
   #     An optional comment to be included in the sync history.
+  # @argument send_notification [Optional, Boolean]
+  #     Send a notification to the calling user when the sync completes.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/1/blueprint_templates/default/migrations \
   #     -X POST \
   #     -F 'comment=Fixed spelling in question 3 of midterm exam' \
+  #     -F 'send_notification=true' \
   #     -H 'Authorization: Bearer <token>'
   #
   # @returns BlueprintMigration
@@ -320,7 +323,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
       return render :json => {:message => "No associated courses to migrate to"}, :status => :bad_request
     end
 
-    options = params.permit(:comment)
+    options = params.permit(:comment, :send_notification)
 
     migration = MasterCourses::MasterMigration.start_new_migration!(@template, @current_user, options)
     render :json => master_migration_json(migration, @current_user, session)

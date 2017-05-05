@@ -22,6 +22,8 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   serialize :export_results, Hash
   serialize :import_results, Hash
 
+  has_a_broadcast_policy
+
   include Workflow
   workflow do
     state :created
@@ -241,5 +243,18 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
       self.save!
     end
   end
+
+  set_broadcast_policy do |p|
+    p.dispatch :blueprint_sync_complete
+    p.to { [user] }
+    p.whenever { |record|
+      record.changed_state_to(:completed) && record.send_notification?
+    }
+  end
+
+  def notification_link_anchor
+    "!/blueprint/migrations/#{id}"
+  end
+
 end
 

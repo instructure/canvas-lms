@@ -352,6 +352,8 @@ class Notification < ActiveRecord::Base
     t 'names.appointment_reserved_for_user', 'Appointment Reserved For User'
     t 'names.submission_needs_grading', 'Submission Needs Grading'
     t 'names.web_conference_recording_ready', 'Web Conference Recording Ready'
+    t 'names.blueprint_sync_complete', 'Blueprint Sync Complete'
+    t 'names.blueprint_content_added', 'Blueprint Content Added'
   end
 
   # TODO: i18n ... show these anywhere we show the category today
@@ -379,6 +381,7 @@ class Notification < ActiveRecord::Base
     t 'categories.reminder', 'Reminder'
     t 'categories.submission_comment', 'Submission Comment'
     t 'categories.recording_ready', 'Recording Ready'
+    t 'categories.blueprint', 'Blueprint'
   end
 
   # Translatable display text to use when representing the category to the user.
@@ -436,6 +439,8 @@ class Notification < ActiveRecord::Base
       t(:reminder_display, 'Reminder')
     when 'Recording Ready'
       t(:recording_ready_display, 'Recording Ready')
+    when 'Blueprint'
+      t(:blueprint_display, 'Blueprint Sync')
     else
       t(:missing_display_display, "For %{category} notifications", :category => category)
     end
@@ -538,6 +543,12 @@ EOS
 
 * Group enrollment
 * accepted/rejected
+EOS
+    when 'Blueprint'
+      mt(:blueprint_description, <<-EOS)
+*Instructor and Admin only:*
+
+Content was synced from a blueprint course to associated courses
 EOS
     else
       t(:missing_description_description, "For %{category} notifications", :category => category)

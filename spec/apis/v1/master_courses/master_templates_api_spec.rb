@@ -189,6 +189,14 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       migration = @template.master_migrations.find(json['id'])
       expect(migration).to be_queued
       expect(migration.comment).to eq 'seriously'
+      expect(migration.send_notification).to eq false
+    end
+
+    it "should accept the send_notification option" do
+      json = api_call(:post, @url, @params.merge(:send_notification => true))
+      migration = @template.master_migrations.find(json['id'])
+      expect(migration).to be_queued
+      expect(migration.send_notification).to eq true
     end
   end
 
