@@ -84,7 +84,7 @@ const ApiClient = {
   checkMigration (state) {
     return this.getMigrations(state)
       .then((res) => {
-        let status = MigrationStates.void
+        let status = MigrationStates.states.void
 
         if (res.data[0]) {
           status = res.data[0].workflow_state

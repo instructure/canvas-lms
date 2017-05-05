@@ -24,12 +24,13 @@ const states = [
   ...endStates,
 ]
 
-const migrationStates = states.reduce((map, state) =>
-  Object.assign(map, {
-    [state]: state,
-  }), {})
+const migrationStates = {
+  states: states.reduce((map, state) =>
+    Object.assign(map, {
+      [state]: state,
+    }), {})
+}
 
-migrationStates.states = states
 migrationStates.isEndState = state => endStates.includes(state)
 migrationStates.isLoadingState = state => loadingStates.includes(state)
 migrationStates.getLoadingValue = state => loadingStates.indexOf(state) + 1

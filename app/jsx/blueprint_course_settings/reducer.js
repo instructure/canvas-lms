@@ -37,6 +37,7 @@ export default combineReducers({
   }, false),
   hasLoadedHistory: handleActions({
     [actionTypes.LOAD_HISTORY_SUCCESS]: () => true,
+    [actionTypes.CHECK_MIGRATION_SUCCESS]: (state, action) => (MigrationStates.isEndState(action.payload) ? false : state),
   }, false),
   migrations: handleActions({
     [actionTypes.LOAD_HISTORY_SUCCESS]: (state, action) => action.payload,
@@ -44,7 +45,7 @@ export default combineReducers({
   migrationStatus: handleActions({
     [actionTypes.CHECK_MIGRATION_SUCCESS]: (state, action) => action.payload,
     [actionTypes.BEGIN_MIGRATION_SUCCESS]: (state, action) => action.payload.workflow_state,
-  }, MigrationStates.unknown),
+  }, MigrationStates.states.unknown),
   hasCheckedMigration: handleActions({
     [actionTypes.CHECK_MIGRATION_SUCCESS]: () => true,
     [actionTypes.BEGIN_MIGRATION_SUCCESS]: () => true,

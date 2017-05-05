@@ -18,6 +18,7 @@
 
 import actions from 'jsx/blueprint_course_settings/actions'
 import reducer from 'jsx/blueprint_course_settings/reducer'
+import MigrationStates from 'jsx/blueprint_course_settings/migrationStates'
 import sampleData from './sampleData'
 
 QUnit.module('Course Blueprint Settings reducer')
@@ -196,6 +197,11 @@ test('sets migrationStatus to true on CHECK_MIGRATION_SUCCESS', () => {
 test('sets hasLoadedHistory to true on LOAD_HISTORY_SUCCESS', () => {
   const newState = reduce(actions.loadHistorySuccess({}))
   equal(newState.hasLoadedHistory, true)
+})
+
+test('resets hasLoadedHistory to false when CHECK_MIGRATION_SUCCESS returns an end state', () => {
+  const newState = reduce(actions.checkMigrationSuccess(MigrationStates.states.completed))
+  equal(newState.hasLoadedHistory, false)
 })
 
 test('sets isLoadingHistory to true on LOAD_HISTORY_START', () => {

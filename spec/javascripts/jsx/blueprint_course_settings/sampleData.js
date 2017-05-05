@@ -63,7 +63,7 @@ export default {
           asset_id: '2',
           asset_type: 'quiz',
           asset_name: 'Chapter 5 Quiz',
-          change_type: 'update',
+          change_type: 'updated',
           html_url: 'http://localhost:3000/courses/3/quizzes/2',
           exceptions: [
             {
