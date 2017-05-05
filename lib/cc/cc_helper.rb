@@ -157,6 +157,10 @@ module CCHelper
         linked_objects.push({local_path: attachment_key, type: 'Attachment'})
       else
         type, object_key = source.split('/').last 2
+        if type =~ /%24[^%]*%24/
+          type = object_key
+          object_key = nil
+        end
         linked_objects.push({identifier: object_key, type: type})
       end
     end
