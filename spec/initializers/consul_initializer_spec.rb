@@ -103,13 +103,10 @@ describe ConsulInitializer do
   describe "just from loading" do
     it "clears the DynamicSettings cache on reload" do
       Canvas::DynamicSettings.reset_cache!
-      Canvas::DynamicSettings.cache["key"] = {
-        value: "value",
-        timestamp: Time.zone.now.to_i
-      }
+      Canvas::DynamicSettings::Cache.insert('key', 'value')
       expect(Canvas::DynamicSettings.from_cache("key")).to eq("value")
       Canvas::Reloader.reload!
-      expect(Canvas::DynamicSettings.cache).to eq({})
+      expect(Canvas::DynamicSettings::Cache.store).to eq({})
     end
   end
 end

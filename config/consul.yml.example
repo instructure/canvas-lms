@@ -41,3 +41,8 @@ development:
     live-events:
       aws_endpoint: http://localhost:4567 # assumes kinesalite is running locally
       kinesis_stream_name: live-events
+  init_values:
+    math-man:
+      base_url: 'http://mathman.docker'
+      use_for_svg: 'false'
+      use_for_mml: 'false'
