@@ -27,7 +27,6 @@ a#accessibility_warning {
   display: none;
 }
 
-
 #keyboard-shortcuts:focus {
   margin: -1px;
   border-radius: 0.25rem;
@@ -729,4 +728,16 @@ $gradebook_checkbox_size: 16px;
   margin: 0px;
   width: 225px;
   list-style-type: none;
+}
+
+#late-policies-tab-panel-loading {
+  min-height: 30rem;
+  text-align: center;
+}
+
+#late-policies-tab-panel {
+  min-height: 30rem;
+  display: flex;
+  justify-content: space-around;
+  flex-direction: column;
 }

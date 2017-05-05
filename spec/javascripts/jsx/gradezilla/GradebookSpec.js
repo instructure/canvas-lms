@@ -33,7 +33,7 @@ import SubmissionStateMap from 'jsx/gradezilla/SubmissionStateMap';
 import StudentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/StudentRowHeaderConstants';
 import UserSettings from 'compiled/userSettings';
 import ActionMenu from 'jsx/gradezilla/default_gradebook/components/ActionMenu';
-import GradebookApi from 'jsx/gradezilla/default_gradebook/GradebookApi';
+import GradebookApi from 'jsx/gradezilla/default_gradebook/apis/GradebookApi';
 import PropTypes from 'prop-types';
 import Gradebook from 'compiled/gradezilla/Gradebook';
 

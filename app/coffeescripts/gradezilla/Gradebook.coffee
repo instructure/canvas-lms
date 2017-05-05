@@ -52,7 +52,7 @@ define [
   'str/htmlEscape'
   'jsx/gradezilla/shared/SetDefaultGradeDialogManager'
   'jsx/gradezilla/default_gradebook/CurveGradesDialogManager'
-  'jsx/gradezilla/default_gradebook/GradebookApi'
+  'jsx/gradezilla/default_gradebook/apis/GradebookApi'
   'jsx/gradezilla/default_gradebook/slick-grid/CellEditorFactory'
   'jsx/gradezilla/default_gradebook/constants/StudentRowHeaderConstants'
   'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader'
@@ -67,6 +67,7 @@ define [
   'jsx/gradezilla/default_gradebook/components/ActionMenu'
   'jsx/gradezilla/default_gradebook/components/GridColor'
   'jsx/gradezilla/default_gradebook/components/StatusesModal'
+  'jsx/gradezilla/default_gradebook/components/GradebookSettingsModal'
   'jsx/gradezilla/SISGradePassback/PostGradesStore'
   'jsx/gradezilla/SISGradePassback/PostGradesApp'
   'jsx/gradezilla/SubmissionStateMap'
@@ -78,7 +79,6 @@ define [
   'compiled/gradezilla/GradebookKeyboardNav'
   'jsx/gradezilla/shared/AssignmentMuterDialogManager'
   'jsx/gradezilla/shared/helpers/assignmentHelper'
-  'jsx/gradezilla/GradebookSettingsModal'
   'instructure-ui/lib/components/Button'
   'instructure-icons/lib/Solid/IconSettingsSolid'
   'jquery.ajaxJSON'
@@ -102,10 +102,10 @@ define [
   SubmissionCell, NumberCompare, natcompare, ConvertCase, htmlEscape, SetDefaultGradeDialogManager,
   CurveGradesDialogManager, GradebookApi, CellEditorFactory, StudentRowHeaderConstants, AssignmentColumnHeader,
   AssignmentGroupColumnHeader, AssignmentRowCellPropFactory, CustomColumnHeader, StudentColumnHeader, StudentRowHeader,
-  TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, GridColor, StatusesModal, PostGradesStore,
-  PostGradesApp,  SubmissionStateMap, DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager,
+  TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, GridColor, StatusesModal, GradebookSettingsModal,
+  PostGradesStore, PostGradesApp,  SubmissionStateMap, DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager,
   GroupTotalCellTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, AssignmentMuterDialogManager,
-  assignmentHelper, GradebookSettingsModal, { default: Button }, { default: IconSettingsSolid }) ->
+  assignmentHelper, { default: Button }, { default: IconSettingsSolid }) ->
 
   isAdmin = =>
     _.contains(ENV.current_user_roles, 'admin')
@@ -1289,6 +1289,8 @@ define [
     renderGradebookSettingsModal: =>
       gradebookSettingsModalMountPoint = document.querySelector("[data-component='GradebookSettingsModal']")
       gradebookSettingsModalProps =
+        courseId: @options.context_id
+        locale: @options.locale
         onClose: => @gradebookSettingsModalButton.focus()
       @gradebookSettingsModal = renderComponent(
         GradebookSettingsModal,

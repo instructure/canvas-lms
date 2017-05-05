@@ -17,7 +17,7 @@
  */
 
 import _ from 'underscore';
-import GradebookApi from 'jsx/gradezilla/default_gradebook/GradebookApi';
+import GradebookApi from 'jsx/gradezilla/default_gradebook/apis/GradebookApi';
 
 QUnit.module('GradebookApi.createTeacherNotesColumn', {
   setup () {
