@@ -110,7 +110,12 @@ module CC::Exporter::WebZip
     end
 
     def string_to_symbol_type(type)
-      type.underscore.pluralize.split('/').first.to_sym
+      case type
+      when 'pages'
+        :wiki_pages
+      else
+        type.underscore.pluralize.split('/').first.to_sym
+      end
     end
 
     def check_for_links_and_mark_exportable(export_item, linked_items, items_to_check)
@@ -123,7 +128,7 @@ module CC::Exporter::WebZip
       linked_items.add(assignment_export_id) if assignment_export_id
       return if export_item[:type] == 'Attachment'
       type = string_to_symbol_type(export_item[:type])
-      match_item = @export_item_map[type][export_id]
+      match_item = @export_item_map.dig(type, export_id)
       return unless match_item
       content = match_item[:content] || match_item[:text] || match_item[:description]
       linked_objects = format_linked_objects(CC::CCHelper.map_linked_objects(content))
@@ -250,17 +255,21 @@ module CC::Exporter::WebZip
       return :all if modul.completion_requirements.count > 0
     end
 
+    def mod_item_or_content_locked?(item)
+      return true if item.locked_for?(user, deep_check_if_needed: true)
+      locked = !!item.content.locked_for?(user) if item.content.respond_to?(:locked_for?)
+      locked || false
+    end
+
     def parse_module_item_data(modul)
       items = modul.content_tags.active.select{ |item| item.visible_to_user?(user) }
       items.map do |item|
-        locked = item.locked_for?(user, deep_check_if_needed: true) 
-        locked ||= item.content.locked_for?(user) if item.content
         item_hash = {
           id: item.id,
           title: item.title,
           type: item.content_type,
           indent: item.indent,
-          locked: !!locked
+          locked: mod_item_or_content_locked?(item)
         }
         parse_module_item_details(item, item_hash) if item.content_type != 'ContextModuleSubHeader'
         item_hash
