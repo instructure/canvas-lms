@@ -367,7 +367,7 @@ class CommunicationChannelsController < ApplicationController
           end
 
           # They may have switched e-mail address when they logged in; create a CC if so
-          if @pseudonym.unique_id != cc.path
+          if @pseudonym.unique_id != cc.path && EmailAddressValidator.valid?(@pseudonym.unique_id)
             new_cc = @user.communication_channels.email.by_path(@pseudonym.unique_id).first
             new_cc ||= @user.communication_channels.build(:path => @pseudonym.unique_id)
             new_cc.user = @user
@@ -376,7 +376,7 @@ class CommunicationChannelsController < ApplicationController
             new_cc.save! if new_cc.changed?
             @pseudonym.communication_channel = new_cc
           end
-          @pseudonym.communication_channel.pseudonym = @pseudonym
+          @pseudonym.communication_channel.pseudonym = @pseudonym if @pseudonym.communication_channel
 
           @user.save!
           @pseudonym.save!
