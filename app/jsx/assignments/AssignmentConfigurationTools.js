@@ -128,10 +128,13 @@ import 'compiled/jquery.rails_flash_notifications'
           ref={(c) => { this.similarityDetectionTool = c; }}
           value={this.state.selectedToolValue}
         >
-          <option data-launch="none">None</option>
+          <option title="Plagiarism Review Tool" data-launch="none">
+            None
+          </option>
           {
             this.state.tools.map(tool => (
               <option
+                title="Plagiarism Review Tool"
                 key={`${tool.definition_type}_${tool.definition_id}`}
                 value={`${tool.definition_type}_${tool.definition_id}`}
                 data-launch={this.getLaunch(tool)}
@@ -147,7 +150,12 @@ import 'compiled/jquery.rails_flash_notifications'
 
     renderToolType() {
       return(
-        <input type="hidden" id ="configuration-tool-type" name="configuration_tool_type" value={this.state.toolType} />
+        <input
+          type="hidden"
+          id="configuration-tool-type"
+          name="configuration_tool_type"
+          value={this.state.toolType}
+        />
       );
     },
 
