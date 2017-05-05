@@ -168,6 +168,19 @@ describe CommunicationChannelsController do
         expect(@cc).to be_active
       end
 
+      it "should not break when trying to register when psuedonym is not a valid email" do
+        user_with_pseudonym(:password => :autogenerate, :username => 'notanemail')
+        @user.accept_terms
+        @user.save
+
+        post 'confirm', :nonce => @cc.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
+        expect(response).to be_redirect
+        @user.reload
+        expect(@user).to be_registered
+        @cc.reload
+        expect(@cc).to be_active
+      end
+
       it "should properly validate pseudonym for a pre-registered user" do
         u1 = user_with_communication_channel(:username => 'asdf@qwerty.com', :user_state => 'creation_pending')
         cc1 = @cc
