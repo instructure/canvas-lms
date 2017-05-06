@@ -1415,7 +1415,7 @@ da:
   add_new_group_7ac49f31: "Tilføj ny gruppe"
   add_new_set_of_due_dates_e8e240f: "Tilføj nyt sæt med deadlines"
   add_new_term_d2217c0d: "Tilføj nyt semester"
-  add_people_7ee4b2ec: "Tilføj  folk"
+  add_people_7ee4b2ec: "Tilføj Users"
   add_quiz_ip_filter_c7b37dc5: "Tilføj quiz IP-filter"
   add_recipient_ff135ed7: "Tilføj modtager"
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "Tilføj, slet eller omorganiser sektioner til denne ePortfolio"
@@ -3380,7 +3380,7 @@ da:
         collaboration_members: Samarbejdsmedlemmer
         groups: Grupper
         loading: Indlæser
-        people: Folk
+        people: Users
         remove_all: "Fjern alle"
       member_instructions: "Klik på en bruger eller gruppe i den venstre kolonne for at tilføje samarbejdspartnere."
     delete_button: 
@@ -3961,7 +3961,7 @@ da:
       headings: 
         prior_users: "Forrige brugere"
       links: 
-        back_to_people: "Tilbage til Folk"
+        back_to_people: "Tilbage til Users"
       titles: 
         prior_users: "Forrige brugere"
     roster: 
@@ -4323,7 +4323,7 @@ da:
     all_in_context: "Alle i %{context}"
     archive: Arkiv
     autocomplete_result: 
-      group_people: "Folk: %{people}"
+      group_people: "Users: %{people}"
       no_results: "Ingen resultater"
     back: Tilbage
     cannot_add_to_private: "Du kan ikke føje deltagere til en privat samtale."
@@ -4419,7 +4419,7 @@ da:
       headings: 
         new_message: "Ny besked"
       inbox_actions: 
-        add_people: "Tilføj  folk"
+        add_people: "Tilføj Users"
       individual_message_explanation: "Dette sender en individuel besked til hver enkel modtager"
       labels: 
         add_to_faculty_journal: "Opret som postering i Fakultetsjournal"
@@ -5074,10 +5074,10 @@ da:
         cannot_add_users: "Nye brugere kan ikke tilføjes, fordi faget er afsluttet"
         filter_field_description: "Søg efter brugere. Når du indtaster i feltet, filtreres listen over brugere automatisk til kun at inkludere dem, hvis navne matcher din indtastning."
         group_set: Gruppesæt
-        people: Folk
+        people: Users
         role_to_search: "Begræns søgning til rolle"
         search_people: "Søg efter personer"
-        title_add_people: "Tilføj  folk"
+        title_add_people: "Tilføj Users"
       invitations_view: 
         accepted_invitation: "%{name} har allerede modtaget og accepteret invitationen til at deltage i faget, men du kan stadig sende invitationen igen efter behov."
         admin_invitation_unaccepted: "%{name} har endnu ikke accepteret invitationen til at deltage i faget. Invitationen blev sendt: %{time}"
@@ -5462,7 +5462,7 @@ da:
     messages: Beskeder
     modules: Moduler
     outcomes: Læringsmål
-    people: Folk
+    people: Users
     plugins: Plugins
     prior_users: "Forrige brugere"
     question_banks: Spørgsmålsbanker
@@ -8182,7 +8182,7 @@ da:
       files: Filer
       home: Startside
       pages: Sider
-      people: Folk
+      people: Users
   group_a8f5ed9c: Gruppe
   group_assignments_cannot_be_enabled_for_moderated__6b2faeef: "Gruppeopgaver kan ikke aktiveres til modererede opgaver"
   group_categories: 
@@ -8595,11 +8595,11 @@ da:
   help_dialog: 
     Back: Tilbage
     Help: Hjælp
-    Submitting_Ticket: "Indsender supportanmodning ..."
+    Submitting_Ticket: "Indsender supportsag ..."
     canvas_help_sub: "Find svar på hyppige spørgsmål"
     description: Beskrivelse
     extreme_critical_emergency: "EKSTREMT KRITISK NØDSTILFÆLDE!!"
-    file_a_ticket_for_a_personal_response_from_our_support_team: "Indsend supportanmodning for et personligt svar fra vores supportteam"
+    file_a_ticket_for_a_personal_response_from_our_support_team: "Indsend supportsag for et personligt svar fra vores supportteam"
     for_an_instant_answer: "For øjeblikkeligt svar:"
     how_is_this_affecting_you: "Hvordan påvirker det dig?"
     i_cant_get_things_done_until_i_hear_back_from_you: "Jeg kan ikke gøre noget, før jeg hører fra dig"
@@ -8619,7 +8619,7 @@ da:
     sending: "Sender ..."
     somethings_broken_but_i_can_work_around_it_for_now: "Der er noget galt, men jeg kan omgå det lige nu"
     subject: Emne
-    submit_this_support_request: "Indsend supportanmodning"
+    submit_this_support_request: "Opret supportsag"
     which_course_is_this_question_about: "Hvilket fag drejer dette spørgsmål sig om?"
     your_email_address: "Din e-mailadresse"
   help_menu_links_51184b65: Hjælpemenulinks
@@ -12449,9 +12449,9 @@ da:
     errors: 
       delete_reminder_failed: "Sletning mislykkedes"
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "Peer reviews kan ikke aktiveres til modererede opgaver"
-  people_b4ebb13c: Folk
+  people_b4ebb13c: Users
   people_options_cfb419a6: "Brugere muligheder"
-  people_tutorial_tray_a87a6c48: "Folk selvstudiumområde"
+  people_tutorial_tray_a87a6c48: "Users selvstudiumområde"
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "Brugere vil se dette navn i diskussioner, beskeder og kommentarer."
   percent_448ea947: procent
   percent_complete_3a7edc20: "%{percent} komplet"
@@ -12859,9 +12859,9 @@ da:
         parallelism: "Antal jobprocessorer som bruges til at behandle SIS-importer i parallel"
         queue_for_parallel_jobs: "Jobkø som bruges til parallelle jobs (tom for standard)"
     ticketing_system_settings: 
-      description: "Konfiguration af supportanmodning system"
+      description: "Konfiguration af supportsag system"
       labels: 
-        type: "Systemtype for supportanmodning"
+        type: "Systemtype for supportsag"
     twitter: 
       description: Twitter-notifikationer
     twitter_settings: 
@@ -16316,7 +16316,7 @@ da:
         syllabus: "Fagets pensum"
         upload_file: "Upload en ny fil"
         upload_image: "Upload et nyt billede"
-        users_page: Folk
+        users_page: Users
         wiki_pages_index: "Wiki startside"
       links_to: 
         announcements: Beskeder
@@ -16853,7 +16853,7 @@ da:
   submit_assignment_5799b4e3: "Indsend opgave"
   submit_comment_commenttext_8e5638d7: "Tilføj kommentar: %{commentText}"
   submit_media_file_f334c1ba: "Indsend mediefil"
-  submit_ticket_5515ffd: "Indsend supportanmodning"
+  submit_ticket_5515ffd: "Opret supportsag"
   submitted_at_4d5ea3aa: Afleveret
   submitted_datetime_fa2e9287: "Indsendt: %{dateTime}"
   submitted_files_82dd3009: "Indsendte filer"
@@ -16946,7 +16946,7 @@ da:
     observees: Observerer
     outcomes: Læringsmål
     pages: Sider
-    people: Folk
+    people: Users
     profile: Profil
     quizzes: Quizzer
     settings: Indstillinger
@@ -17248,9 +17248,9 @@ da:
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Dette giver dig mulighed for at godkende Canvas til at lægge karakterer ud på SIS"
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: "Dette vil gøre disse ændringer gældende for hele din konto. Vi du fortsætte?"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "Dette vil anvende dette tema for hele din konto. Ønsker du at fortsætte?"
-  ticket_successfully_submitted_f6254460: "Supportanmodning indsendt."
-  ticketing_system_52205bff: "Supportanmodning system"
-  ticketing_system_configurations_c4fecd96: "Konfigurationer af supportanmodning system"
+  ticket_successfully_submitted_f6254460: "Supportsag indsendt."
+  ticketing_system_52205bff: "Supportsag system"
+  ticketing_system_configurations_c4fecd96: "Konfigurationer af supportsag system"
   time: 
     am: am
     count_hours_ago: 
