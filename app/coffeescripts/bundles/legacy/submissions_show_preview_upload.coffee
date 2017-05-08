@@ -18,7 +18,7 @@
 define [
   "jquery",
   "i18n!submissions.show_preview",
-  "vendor/swfobject/swfobject",
+  "swfobject",
   "jqueryui/dialog",
   "jquery.doc_previews"
 ], ($, I18n, swfobject, _docPreviews) ->

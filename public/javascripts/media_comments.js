@@ -17,6 +17,7 @@
  */
 
 define([
+  'swfobject',
   'i18n!media_comments',
   'underscore',
   'vendor/jquery.ba-tinypubsub',
@@ -31,7 +32,7 @@ define([
   'jquery.instructure_misc_plugins' /* .dim, /\.log\(/ */,
   'jqueryui/progressbar' /* /\.progressbar/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, _, pubsub, $, htmlEscape, mediaCommentsTemplate, JsUploader) {
+], function (swfobject, I18n, _, pubsub, $, htmlEscape, mediaCommentsTemplate, JsUploader) {
 
   "use strict"
   var jsUploader
