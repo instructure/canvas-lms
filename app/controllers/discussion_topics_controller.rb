@@ -458,7 +458,12 @@ class DiscussionTopicsController < ApplicationController
 
       post_to_sis = Assignment.sis_grade_export_enabled?(@context)
       js_hash[:POST_TO_SIS] = post_to_sis
-      js_hash[:POST_TO_SIS_DEFAULT] = @context.account.sis_default_grade_export[:value] if post_to_sis && @topic.new_record?
+      if post_to_sis && @topic.new_record?
+        js_hash[:POST_TO_SIS_DEFAULT] = @context.account.sis_default_grade_export[:value]
+      end
+      if @context.root_account.feature_enabled?(:student_planner)
+        js_hash[:STUDENT_PLANNER_ENABLED] = @context.grants_any_right?(@current_user, session, :manage)
+      end
 
       js_hash[:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.name_length_required_for_account?(@context)
       js_hash[:MAX_NAME_LENGTH] = AssignmentUtil.assignment_max_name_length(@context)
@@ -606,7 +611,8 @@ class DiscussionTopicsController < ApplicationController
               :INITIAL_POST_REQUIRED => @initial_post_required,
               :THREADED => @topic.threaded?,
               :ALLOW_RATING => @topic.allow_rating,
-              :SORT_BY_RATING => @topic.sort_by_rating
+              :SORT_BY_RATING => @topic.sort_by_rating,
+              :TODO_DATE => @topic.todo_date
             }
             if params[:hide_student_names]
               env_hash[:HIDE_STUDENT_NAMES] = true
@@ -910,11 +916,11 @@ class DiscussionTopicsController < ApplicationController
   end
 
   API_ALLOWED_TOPIC_FIELDS = %w(title message discussion_type delayed_post_at lock_at podcast_enabled
-                                podcast_has_student_posts require_initial_post pinned
+                                podcast_has_student_posts require_initial_post pinned todo_date
                                 group_category_id allow_rating only_graders_can_rate sort_by_rating).freeze
 
-  API_ALLOWED_TOPIC_FIELDS_FOR_GROUP = %w(title message discussion_type podcast_enabled pinned
-                                allow_rating only_graders_can_rate sort_by_rating).freeze
+  API_ALLOWED_TOPIC_FIELDS_FOR_GROUP = %w(title message discussion_type podcast_enabled pinned todo_date
+                                          allow_rating only_graders_can_rate sort_by_rating).freeze
 
 
   def process_discussion_topic(is_new = false)
@@ -960,6 +966,7 @@ class DiscussionTopicsController < ApplicationController
 
     process_group_parameters(discussion_topic_hash)
     process_pin_parameters(discussion_topic_hash)
+    process_todo_parameters(discussion_topic_hash)
 
     if @errors.present?
       render :json => {errors: @errors}, :status => :bad_request
@@ -1005,8 +1012,27 @@ class DiscussionTopicsController < ApplicationController
     end
   end
 
+  def process_todo_parameters(discussion_topic_hash)
+    unless @topic.context.root_account.feature_enabled?(:student_planner)
+      discussion_topic_hash.delete(:todo_date)
+      return
+    end
+    remove_assign = ['false', false, '0'].include?(params.dig(:assignment, :set_assignment))
+    if params[:assignment] && !remove_assign && !params[:todo_date]
+      @topic.todo_date = nil
+      return
+    end
+    return unless params[:todo_date]
+    if !authorized_action(@topic.context, @current_user, :manage)
+      @errors[:todo_date] = t(:error_todo_date_unauthorized,
+        "You do not have permission to add this topic to the student to-do list.")
+    elsif (@topic.assignment || params[:assignment]) && !remove_assign
+      @errors[:todo_date] = t(:error_todo_date_assignment, 'Date cannot be added if discussion topic is graded')
+    end
+  end
+
   # Internal: detetermines if the delayed_post_at or lock_at dates were changed
-  # and applies changes to the topic if the were.
+  # and applies changes to the topic if they were.
   #
   # Returns true if dates were changed and the topic was updated, false otherwise.
   def process_future_date_parameters(discussion_topic_hash)
