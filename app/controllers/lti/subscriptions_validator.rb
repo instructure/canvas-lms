@@ -24,7 +24,10 @@ module Lti
     class ToolNotInContext < StandardError
     end
 
-    CONTEXT_WHITELIST = [Course, Account, Assignment].freeze
+    CONTEXT_WHITELIST = {
+      'root_account' => Account,
+      'assignment' => Assignment
+    }.freeze
 
     attr_reader :subscription, :tool_proxy
 
@@ -60,12 +63,16 @@ module Lti
 
     def subscription_context
       @_subscription_context ||= begin
-        model = subscription[:ContextType].titlecase.constantize
-        raise InvalidContextType unless CONTEXT_WHITELIST.include?(model)
-        model.find(subscription[:ContextId].to_i)
+        model = CONTEXT_WHITELIST[subscription[:ContextType]]
+        raise InvalidContextType unless model
+
+        case subscription[:ContextType]
+        when "root_account"
+          model.find_by(uuid: subscription[:ContextId])
+        else
+          model.find(subscription[:ContextId])
+        end
       end
-    rescue NameError
-      raise InvalidContextType, "ContextType is invalid"
     end
   end
 end
