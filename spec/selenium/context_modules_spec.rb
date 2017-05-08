@@ -1,4 +1,4 @@
-#
+﻿#
 # Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -247,6 +247,30 @@ describe "context modules" do
       go_to_modules
       add_new_external_item('External URL', 'www.google.com', 'Google')
       verify_edit_item_form
+    end
+
+    it 'editing external URL module item inline w/ load in new tab should use the right title' do
+      go_to_modules
+
+      f('.add_module_item_link').click
+      wait_for_ajaximations
+      select_module_item('#add_module_item_select', 'External URL')
+      wait_for_ajaximations
+      url_input = fj('input[name="url"]:visible')
+      title_input = fj('input[name="title"]:visible')
+      replace_content(url_input, 'http://www.google.com')
+      title = 'Goooogle'
+      replace_content(title_input, title)
+      fj('input[name="new_tab"]:visible').click
+
+      fj('.add_item_button.ui-button').click
+      wait_for_ajaximations
+      go_to_modules
+      f('.context_module_item .al-trigger').click
+      wait_for_ajaximations
+      f('.edit_item_link').click
+      wait_for_ajaximations
+      expect(get_value('#content_tag_title')).to eq title
     end
   end
 
