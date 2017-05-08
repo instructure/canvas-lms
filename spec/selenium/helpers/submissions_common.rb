@@ -37,7 +37,7 @@ module SubmissionsCommon
   def open_media_comment_dialog
     move_to_click('.media_comment_link')
     # swf and stuff loads, give it a sec to do its thing
-    sleep 0.5
+    expect(f('#media_record_tabs')).to be_displayed
   end
 
   def submit_media_comment_1
