@@ -2057,5 +2057,8 @@ CanvasRails::Application.routes.draw do
       get 'accounts/:account_id/assignments', action: 'sis_assignments', as: :sis_account_assignments
       get 'courses/:course_id/assignments', action: 'sis_assignments', as: :sis_course_assignments
     end
+    scope(controller: :disable_post_to_sis_api) do
+      put 'courses/:course_id/disable_post_to_sis', action: 'disable_post_to_sis', as: :disable_post_to_sis_course_assignments
+    end
   end
 end
