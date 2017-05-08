@@ -59,6 +59,7 @@
           }, '*'
         );
       }
+      EG.showSubmissionDetails();
       quizzesNextChange(submission);
     }
 
