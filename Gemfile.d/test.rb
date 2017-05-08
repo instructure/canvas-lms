@@ -24,6 +24,7 @@ group :test do
   end
 
   gem 'gergich', '0.1.13', require: false
+  gem 'dotenv', '2.2.1', require: false
   gem 'testingbot', require: false
   gem 'brakeman', require: false
   gem 'simplecov', '0.14.1', require: false, github: 'jenseng/simplecov', ref: '78c1171e98b7227f6bdd8f76f4c14666fd7fc5ea'

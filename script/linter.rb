@@ -5,6 +5,7 @@ require 'json'
 class Linter
   DEFAULT_OPTIONS = {
     append_files_to_command: false,
+    auto_correct: false,
     boyscout_mode: true,
     campsite_mode: true,
     comment_post_processing: proc { |comments| comments },
@@ -60,6 +61,7 @@ class Linter
 
   # TODO: generate from DEFAULT_OPTIONS
   attr_reader :append_files_to_command,
+              :auto_correct,
               :boyscout_mode,
               :campsite_mode,
               :command,
@@ -122,7 +124,7 @@ class Linter
 
   def generate_comments
     if custom_comment_generation
-      generate_comment_proc.call(changes: changes)
+      generate_comment_proc.call(changes: changes, auto_correct: auto_correct)
     else
       comments
     end
@@ -142,6 +144,11 @@ class Linter
       publish_gergich_comments(processed_comments)
     else
       publish_local_comments(processed_comments)
+      if auto_correct
+        puts "Errors detected and possibly auto corrected."
+        puts "Fix and/or git add the corrections and try to commit again."
+        exit 1
+      end
     end
   end
 

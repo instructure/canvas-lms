@@ -2,16 +2,15 @@ module TatlTael
   module Linters
     # TODO: inherit from SimpleLinter
     class SeleniumSpecsLinter < BaseLinter
-      attr_reader :config, :comment
+      attr_reader :comment
 
-      def initialize(config:, changes:)
-        @config = config
+      def initialize(config:, changes:, auto_correct: false)
+        super
         @comment = {
           message: config[:message],
           severity: config[:severity],
           cover_message: true
         }
-        @changes = changes
       end
 
       def run

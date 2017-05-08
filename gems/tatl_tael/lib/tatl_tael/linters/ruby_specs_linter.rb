@@ -2,11 +2,10 @@ module TatlTael
   module Linters
     # TODO: inherit from SimpleLinter
     class RubySpecsLinter < BaseLinter
-      attr_reader :config, :comment
+      attr_reader :comment
 
-      def initialize(config:, changes:)
-        @config = config
-        @changes = changes
+      def initialize(config:, changes:, auto_correct: false)
+        super
         @comment = {
           message: comment_msg,
           severity: config[:severity],

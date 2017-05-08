@@ -11,9 +11,11 @@ module TatlTael
 
       attr_reader :changes
       attr_reader :config
-      def initialize(config:, changes:)
+      attr_reader :auto_correct
+      def initialize(config:, changes:, auto_correct: false)
         @changes = changes
         @config = config
+        @auto_correct = auto_correct
       end
 
       ### core
@@ -53,9 +55,13 @@ module TatlTael
         underscore_and_symbolize_keys(config[base_config_key])
       end
 
-      def comments(changes:)
+      def comments(changes:, auto_correct: false)
         @comments ||= linters.map do |linter_class|
-          linter_class.new(config: config_for_linter(linter_class), changes: changes).run
+          linter_class.new(
+            config: config_for_linter(linter_class),
+            changes: changes,
+            auto_correct: auto_correct
+          ).run
         end.flatten.compact
       end
 

@@ -28,6 +28,7 @@ CopyrightLinter:
       - !ruby/regexp '/coding:/' # encodings
       - !ruby/regexp '/@jsx React\.DOM/' # jsx header (see client_apps/quizzes)
     CommentPrefixRegex: !ruby/regexp '/^( *)?(#|\/\/|\/?\*+|<%|\{\{\!)( *)?/'
+  CopyrightYearPlaceholder: "CURRENT_YEAR"
   Copyright: |-
     Copyright (C) CURRENT_YEAR - present Instructure, Inc.
 
@@ -45,11 +46,29 @@ CopyrightLinter:
     You should have received a copy of the GNU Affero General Public License along
     with this program. If not, see <http://www.gnu.org/licenses/>.
   CopyrightEndingToken: "<http://www.gnu.org/licenses/>."
+  CommentSymbols:
+    Js:
+      Block: true
+      BlockStart: "/*"
+      Line: " *"
+      BlockEnd: " */"
+    Rb:
+      Block: false
+      BlockStart: "#" # empty first line
+      Line: "#"
+    Coffee:
+      Block: false
+      BlockStart: "#"
+      Line: "#"
   Message: |-
     Please prefix source files with our COPYRIGHT header. i.e.:
     Copyright (C) CURRENT_YEAR - present Instructure, Inc.
 
     This file is part of Canvas... (rest of copyright found in ./COPYRIGHT)
+    Tired of seeing this? Install the pre-commit auto-correct script in bin/lint.
+  AutoCorrect:
+    Message: "Corrected missing copyright header."
+    RaiseIfTwoLinesWith: "Copyright (C)" # after auto correct
 
 RubySpecsLinter:
   Severity: "warn"
