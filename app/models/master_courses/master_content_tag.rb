@@ -58,7 +58,7 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
     end
   end
 
-  def self.fetch_module_item_restrictions(item_ids)
+  def self.fetch_module_item_restrictions_for_child(item_ids)
     # does a silly fancy doublejoin so we can get all the restrictions in one query
     data = self.
       joins("INNER JOIN #{MasterCourses::ChildContentTag.quoted_table_name} ON
@@ -66,6 +66,16 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
       joins("INNER JOIN #{ContentTag.quoted_table_name} ON
           #{MasterCourses::ChildContentTag.table_name}.content_type=#{ContentTag.table_name}.content_type AND
           #{MasterCourses::ChildContentTag.table_name}.content_id=#{ContentTag.table_name}.content_id").
+      where(:content_tags => {:id => item_ids}).
+      pluck('content_tags.id', :restrictions)
+    Hash[data]
+  end
+
+  def self.fetch_module_item_restrictions_for_master(item_ids)
+    data = self.
+      joins("INNER JOIN #{ContentTag.quoted_table_name} ON
+          #{self.table_name}.content_type=#{ContentTag.table_name}.content_type AND
+          #{self.table_name}.content_id=#{ContentTag.table_name}.content_id").
       where(:content_tags => {:id => item_ids}).
       pluck('content_tags.id', :restrictions)
     Hash[data]

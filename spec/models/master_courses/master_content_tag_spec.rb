@@ -62,7 +62,7 @@ describe MasterCourses::MasterContentTag do
     end
   end
 
-  describe "fetch_module_item_restrictions" do
+  describe "fetch_module_item_restrictions_for_child" do
     it "should fetch restrictions for module items in a most fancy fashion" do
       @copy_from = course_factory
       @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
@@ -82,7 +82,26 @@ describe MasterCourses::MasterContentTag do
       tag1 = mod.add_item(:id => copied_topic.id, :type => "discussion_topic")
       tag2 = mod.add_item(:id => copied_assmt.id, :type => "assignment")
 
-      item_restriction_map = MasterCourses::MasterContentTag.fetch_module_item_restrictions([tag1.id, tag2.id])
+      item_restriction_map = MasterCourses::MasterContentTag.fetch_module_item_restrictions_for_child([tag1.id, tag2.id])
+      expect(item_restriction_map).to eq({tag1.id => {}, tag2.id => restrictions})
+    end
+  end
+
+  describe "fetch_module_item_restrictions_for_master" do
+    it "should fetch restrictions for module items on the master-side" do
+      @copy_from = course_factory
+      @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
+      topic = @copy_from.discussion_topics.create!
+      topic_master_tag = @template.create_content_tag_for!(topic)
+      assmt = @copy_from.assignments.create!
+      restrictions = {:content => true}
+      assmt_master_tag = @template.create_content_tag_for!(assmt, {:restrictions => restrictions})
+
+      mod = @copy_from.context_modules.create!(:name => "something")
+      tag1 = mod.add_item(:id => topic.id, :type => "discussion_topic")
+      tag2 = mod.add_item(:id => assmt.id, :type => "assignment")
+
+      item_restriction_map = MasterCourses::MasterContentTag.fetch_module_item_restrictions_for_master([tag1.id, tag2.id])
       expect(item_restriction_map).to eq({tag1.id => {}, tag2.id => restrictions})
     end
   end
