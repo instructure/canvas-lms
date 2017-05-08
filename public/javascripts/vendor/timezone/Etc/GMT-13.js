@@ -1,1 +1,0 @@
-!function(){var e={zones:{"Etc/GMT-13":["z",{wallclock:-1.7976931348623157e308,format:"GMT-13",abbrev:"GMT-13",offset:468e5,posix:-1.7976931348623157e308,save:0}]},rules:{}};"function"==typeof define&&define.amd?define(e):("undefined"==typeof __PRELOADED_TIMEZONE_DATA__&&(__PRELOADED_TIMEZONE_DATA__={}),__PRELOADED_TIMEZONE_DATA__["Etc/GMT-13"]=e)}();

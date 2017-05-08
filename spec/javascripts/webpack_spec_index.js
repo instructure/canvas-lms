@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'vendor/ie11-polyfill.js'
 import { canvas } from 'instructure-ui/lib/themes'
 import './support/sinon/sinon-qunit-1.0.0'
 
