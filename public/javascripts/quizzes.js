@@ -45,7 +45,7 @@ define([
   'jsx/shared/conditional_release/ConditionalRelease',
   'compiled/util/deparam',
   'compiled/util/SisValidationHelper',
-  'jsx/blueprint_courses/lockManager',
+  'jsx/blueprint_courses/apps/LockManager',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */,

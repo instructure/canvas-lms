@@ -34,7 +34,7 @@ import DiscussionTopicToolbarView from 'compiled/views/DiscussionTopic/Discussio
 import TopicView from 'compiled/views/DiscussionTopic/TopicView'
 import EntriesView from 'compiled/views/DiscussionTopic/EntriesView'
 import CyoeStats from 'jsx/conditional_release_stats/index'
-import LockManager from 'jsx/blueprint_courses/lockManager'
+import LockManager from 'jsx/blueprint_courses/apps/LockManager'
 import 'rubricEditBinding'
 import 'compiled/jquery/sticky'
 import 'compiled/jquery/ModuleSequenceFooter'

@@ -269,12 +269,15 @@ class ApplicationController < ActionController::Base
   end
   helper_method :set_master_course_js_env_data
 
-  def load_master_course_sidebar
-    return unless @context && @context.is_a?(Course) && master_courses? && MasterCourses::MasterTemplate.is_master_course?(@context) && @context.grants_right?(@current_user, :manage)
-    js_bundle :blueprint_course_settings
-    css_bundle :blueprint_course_settings
+  def load_blueprint_courses_ui
+    return unless @context && @context.is_a?(Course) && master_courses? && @context.grants_right?(@current_user, :manage) && (MasterCourses::MasterTemplate.is_master_course?(@context) || MasterCourses::ChildSubscription.is_child_course?(@context))
+
+    js_bundle :blueprint_courses
+    css_bundle :blueprint_courses
     js_env({
-      BLUEPRINT_SETTINGS_DATA: {
+      BLUEPRINT_COURSES_DATA: {
+        isMasterCourse: MasterCourses::MasterTemplate.is_master_course?(@context),
+        isChildCourse: MasterCourses::ChildSubscription.is_child_course?(@context),
         accountId: @context.account.id,
         course: @context.slice(:id, :name),
         subAccounts: @context.account.sub_accounts.pluck(:id, :name).map{|id, name| {id: id, name: name}},
@@ -282,7 +285,7 @@ class ApplicationController < ActionController::Base
       }
     })
   end
-  helper_method :load_master_course_sidebar
+  helper_method :load_blueprint_courses_ui
 
   def editing_restricted?(content, edit_type=:any)
     return false unless master_courses? && content.respond_to?(:editing_restricted?)

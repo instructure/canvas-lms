@@ -27,7 +27,7 @@ import MarkAsDone from 'compiled/util/markAsDone'
 import CyoeStats from 'jsx/conditional_release_stats/index'
 import 'compiled/jquery/ModuleSequenceFooter'
 import 'jquery.instructure_forms'
-import LockManager from 'jsx/blueprint_courses/lockManager'
+import LockManager from 'jsx/blueprint_courses/apps/LockManager'
 
 const lockManager = new LockManager()
 lockManager.init({ itemType: 'assignment', page: 'show' })
