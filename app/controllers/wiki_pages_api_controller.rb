@@ -301,7 +301,7 @@ class WikiPagesApiController < ApplicationController
     @page = @wiki.build_wiki_page(@current_user, initial_params)
     if authorized_action(@page, @current_user, :create)
       update_params = get_update_params(Set[:title, :body])
-
+      assign_todo_date
       if !update_params.is_a?(Symbol) && @page.update_attributes(update_params) && process_front_page
         log_asset_access(@page, "wiki", @wiki, 'participate')
         apply_assignment_parameters(assignment_params, @page) if @context.feature_enabled?(:conditional_release)
@@ -372,6 +372,7 @@ class WikiPagesApiController < ApplicationController
     end
 
     if perform_update
+      assign_todo_date
       update_params = get_update_params
       if !update_params.is_a?(Symbol) && @page.update_attributes(update_params) && process_front_page
         log_asset_access(@page, "wiki", @wiki, 'participate')
@@ -628,6 +629,14 @@ class WikiPagesApiController < ApplicationController
 
   def assignment_params
     params[:wiki_page] && params[:wiki_page][:assignment]
+  end
+
+  def assign_todo_date
+    if @context.root_account.feature_enabled?(:student_planner) && @page.context.grants_any_right?(@current_user, session, :manage)
+      @page.todo_date = params[:wiki_page][:student_todo_at]
+      @page.todo_date = nil if !value_to_boolean(params[:wiki_page][:student_planner_checkbox])
+      @page.save!
+    end
   end
 
   def process_front_page
