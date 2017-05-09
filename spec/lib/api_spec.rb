@@ -183,6 +183,10 @@ describe Api do
       account.save!
       expect(@api.api_find(Account, "lti_context_id:#{account.lti_context_id}")).to eq account
     end
+
+    it "should find user by uuid" do
+      expect(@api.api_find(User, "uuid:#{@user.uuid}")).to eq @user
+    end
   end
 
   context 'api_find_all' do
@@ -197,6 +201,10 @@ describe Api do
 
     it 'should find a simple record' do
       expect(@api.api_find_all(User, [@user.id])).to eq [@user]
+    end
+
+    it 'should find a simple record with uuid' do
+      expect(@api.api_find_all(User, ["uuid:#{@user.uuid}"])).to eq [@user]
     end
 
     it 'should not find a missing record' do
@@ -442,6 +450,11 @@ describe Api do
       expect(Api.sis_parse_id("  hex:sis_login_id:7369737573657233406578616d706c652e636f6d     ", @lookups)).to eq ["LOWER(pseudonyms.unique_id)", "LOWER('sisuser3@example.com')"]
       expect(Api.sis_parse_id("  sis_login_id:sisuser3@example.com\t", @lookups)).to eq ["LOWER(pseudonyms.unique_id)", "LOWER('sisuser3@example.com')"]
     end
+
+    it 'should handle user uuid' do
+      expect(Api.sis_parse_id("uuid:tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0", @lookups)).to \
+        eq ["users.uuid", "tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0"]
+    end
   end
 
   context 'sis_parse_ids' do
@@ -570,6 +583,8 @@ describe Api do
       expect(Api.sis_parse_id("sis_account_id:1", lookups)).to eq [nil, nil]
       expect(Api.sis_parse_id("sis_section_id:1", lookups)).to eq [nil, nil]
       expect(Api.sis_parse_id("1", lookups)).to eq ["users.id", 1]
+      expect(Api.sis_parse_id("uuid:tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0", lookups)).to \
+        eq ["users.uuid", "tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0"]
     end
 
     it 'should correctly capture account lookups' do

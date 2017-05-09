@@ -112,8 +112,9 @@ module Api
                       'id' => 'users.id',
                       'sis_integration_id' => 'pseudonyms.integration_id',
                       'lti_context_id' => 'users.lti_context_id',
-                      'lti_user_id' => 'users.lti_context_id' }.freeze,
-        :is_not_scoped_to_account => ['users.id', 'users.lti_context_id'].freeze,
+                      'lti_user_id' => 'users.lti_context_id',
+                      'uuid' => 'users.uuid' }.freeze,
+        :is_not_scoped_to_account => ['users.id', 'users.lti_context_id', 'users.uuid'].freeze,
         :scope => 'pseudonyms.account_id',
         :joins => :pseudonym }.freeze,
     'accounts' =>
@@ -138,6 +139,7 @@ module Api
 
   MAX_ID_LENGTH = (2**63 - 1).to_s.length
   ID_REGEX = %r{\A\d{1,#{MAX_ID_LENGTH}}\z}
+  USER_UUID_REGEX = %r{\Auuid:(\w{40,})\z}
 
   def self.sis_parse_id(id, lookups, _current_user = nil,
                         root_account: nil)
@@ -152,6 +154,8 @@ module Api
       sis_id = $2
     elsif id =~ ID_REGEX
       return lookups['id'], (id =~ /\A\d+\z/ ? id.to_i : id)
+    elsif id =~ USER_UUID_REGEX
+      return lookups['uuid'], $1
     else
       return nil, nil
     end
@@ -214,12 +218,10 @@ module Api
 
   def self.relation_for_sis_mapping_and_columns(relation, columns, sis_mapping, sis_root_account)
     raise ArgumentError, "sis_root_account required for lookups" unless sis_root_account.is_a?(Account)
-
     return relation.none if columns.empty?
     relation = relation.all unless relation.is_a?(ActiveRecord::Relation)
 
     not_scoped_to_account = sis_mapping[:is_not_scoped_to_account] || []
-
     if columns.length == 1 && not_scoped_to_account.include?(columns.keys.first)
       relation = relation.where(columns)
     else
