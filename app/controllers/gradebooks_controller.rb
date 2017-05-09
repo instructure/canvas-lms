@@ -429,6 +429,8 @@ class GradebooksController < ApplicationController
 
   def history
     if authorized_action(@context, @current_user, :manage_grades)
+      return new_history if @context.root_account.feature_enabled?(:new_gradebook_history)
+
       #
       # Temporary disabling of this page for large courses
       # We need some reworking of the gradebook history to allow using it
@@ -736,6 +738,16 @@ class GradebooksController < ApplicationController
   private :set_gradebook_warnings
 
   private
+
+  def new_history
+    @page_title = t("Gradebook History")
+    @body_classes << "full-width padless-content"
+    js_bundle :react_gradebook_history
+    # css_bundle :react_gradebook_history
+    js_env({})
+
+    render html: "", layout: true
+  end
 
   def percentage(weight)
     I18n.n(weight, percentage: true)

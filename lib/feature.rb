@@ -513,6 +513,15 @@ END
       beta: true,
       development: true,
     },
+    'new_gradebook_history' =>
+    {
+      display_name: -> { I18n.t('New Gradebook History') },
+      description: -> { I18n.t('Enable New Gradebook History page.') },
+      applies_to: "RootAccount",
+      state: "hidden",
+      beta: true,
+      development: true,
+    },
     'modules_home_page' =>
     {
       display_name: -> { I18n.t('Modules Home Page') },
