@@ -28,11 +28,12 @@ define([
 
 $(document).ready(function(event) {
   var state = 'nothing';
-  
+
   $("#batch_mode").change(function(event) {
-    $("#batch_mode_term_id").showIf($(this).attr('checked'));
+    $('#batch_mode_term_id_label').showIf($(this).attr('checked'));
+    $('#batch_mode_term_id').showIf($(this).attr('checked'));
   }).change();
-  
+
   var $override_sis_stickiness = $("#override_sis_stickiness");
   var $add_sis_stickiness = $("#add_sis_stickiness");
   var $clear_sis_stickiness = $("#clear_sis_stickiness");

@@ -56,6 +56,9 @@
               <%= mt(:batch_import_instructions,
                      "If selected, this will delete everything for this term, which includes all courses and enrollments that are not in the selected import file above.  \nSee the documentation for details.") %>
             </p>
+            <label id="batch_mode_term_id_label" for="batch_mode_term_id">
+              <%= t('Term:') %>
+            </label>
             <select id="batch_mode_term_id" name="batch_mode_term_id">
               <%= options_from_collection_for_select(@terms, :id, :name, @terms.first.try(:id)) %>
             </select>
