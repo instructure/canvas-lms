@@ -317,13 +317,9 @@ class ContextModulesController < ApplicationController
         tag_ids = tag_scope.pluck(:id)
         restriction_info = {}
         if tag_ids.any?
-          if is_child_course
-            MasterCourses::MasterContentTag.fetch_module_item_restrictions_for_child(tag_ids).each do |tag_id, restrictions|
-              restriction_info[tag_id] = restrictions.any?{|k, v| v} ? 'locked' : 'unlocked' # might need to elaborate in the future
-            end
-          elsif is_master_course
-            restriction_info = MasterCourses::MasterContentTag.fetch_module_item_restrictions_for_master(tag_ids)
-          end
+          restriction_info = is_child_course ?
+            MasterCourses::MasterContentTag.fetch_module_item_restrictions_for_child(tag_ids) :
+            MasterCourses::MasterContentTag.fetch_module_item_restrictions_for_master(tag_ids)
         end
         info[:tag_restrictions] = restriction_info
       end

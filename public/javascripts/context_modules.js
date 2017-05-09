@@ -24,6 +24,8 @@ define([
   'react-dom',
   'compiled/models/PublishableModuleItem',
   'compiled/views/PublishIconView',
+  'compiled/views/LockIconView',
+  'compiled/models/MasterCourseModuleLock',
   'INST' /* INST */,
   'i18n!context_modules',
   'jquery' /* $ */,
@@ -37,6 +39,7 @@ define([
   'compiled/views/PublishButtonView',
   'str/htmlEscape',
   'jsx/modules/utils/setupContentIds',
+  'jsx/shared/dig',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* dateString, datetimeString, time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors, errorBox */,
@@ -51,7 +54,10 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'compiled/jquery.rails_flash_notifications'
-], function(_, ModuleFile, PublishCloud, React, ReactDOM, PublishableModuleItem, PublishIconView, INST, I18n, $, Helper, CyoeHelper, ContextModulesView, RelockModulesDialog, vddTooltip, vddTooltipView, Publishable, PublishButtonView, htmlEscape, setupContentIds) {
+], function (_, ModuleFile, PublishCloud, React, ReactDOM, PublishableModuleItem, PublishIconView,
+  LockIconView, MasterCourseModuleLock, INST, I18n, $, Helper, CyoeHelper, ContextModulesView, RelockModulesDialog,
+  vddTooltip, vddTooltipView, Publishable, PublishButtonView, htmlEscape, setupContentIds, dig) {
+    MasterCourseModuleLock = MasterCourseModuleLock.default
 
   // TODO: AMD don't export global, use as module
   /*global modules*/
@@ -233,21 +239,18 @@ define([
       loadMasterCourseData: function(tag_id) {
         if (ENV.MASTER_COURSE_SETTINGS) {
           // Grab the stuff for master courses if needed
-          $.ajaxJSON(ENV.MASTER_COURSE_SETTINGS.MASTER_COURSE_DATA_URL, 'GET', {tag_id: tag_id}, function(data) {
+          $.ajaxJSON(ENV.MASTER_COURSE_SETTINGS.MASTER_COURSE_DATA_URL, 'GET', {tag_id: tag_id}, function (data) {
             if (data.tag_restrictions) {
               $.each(data.tag_restrictions, function (id, restriction) {
-                var $item = $("#context_module_item_" + id).not('.master_course_content');
+                var $item = $('#context_module_item_' + id).not('.master_course_content');
                 $item.addClass('master_course_content');
-                var $admin_links = $item.find('.ig-admin');
-                if (restriction == 'locked') {
-                  $item.addClass('locked_by_master_course');
-                  $admin_links.prepend("<span class='master-course-cell'><i class='icon-lock'/></span>");
-                } else {
-                  $admin_links.prepend("<span class='master-course-cell'><i class='icon-unlock icon-Line'/></span>");
+                if (Object.keys(restriction).some(function (r) { return restriction[r] })) {
+                  $item.attr('data-master_course_restrictions', JSON.stringify(restriction));  // need it if user selects Edit from cog menu
                 }
-              });
+                this.initMasterCourseLockButton($item, restriction);
+              }.bind(this));
             }
-          });
+          }.bind(this));
         }
       },
 
@@ -752,8 +755,34 @@ define([
         forcePlaceholderSize: true,
         axis: 'y',
         containment: '#content'
+      },
+      initMasterCourseLockButton: function ($item, tagRestriction) {
+        // add the lock button|icon
+        var $lockCell = $item.find('.lock-icon');
+        var data = $($lockCell).data() || {};
+
+        var isMasterCourseMasterContent = !!('moduleItemId' in data && ENV.MASTER_COURSE_SETTINGS.IS_MASTER_COURSE);
+        var isMasterCourseChildContent = !!('moduleItemId' in data && ENV.MASTER_COURSE_SETTINGS.IS_CHILD_COURSE);
+        var restricted = !!('moduleItemId' in data && Object.keys(tagRestriction).some(function (r) { return tagRestriction[r] }));
+
+        var model = new MasterCourseModuleLock({
+          is_master_course_master_content: isMasterCourseMasterContent,
+          is_master_course_child_content: isMasterCourseChildContent,
+          restricted_by_master_course: restricted
+        });
+
+        var viewOptions = {
+          model: model,
+          el: $lockCell[0],
+          course_id: ENV.COURSE_ID,
+          content_type: data.moduleType,
+          content_id: data.contentId
+        };
+
+        var view = new LockIconView(viewOptions);
+        view.render();
       }
-    };
+    }
   })();
 
   var addIcon = function($icon_container, css_class, message) {
@@ -1185,8 +1214,10 @@ define([
       $("#edit_item_form").attr('action', $(this).attr('href'));
       $("#edit_item_form").fillFormData(data, {object_name: 'content_tag'});
 
-      var $title_input = $("#edit_item_form #content_tag_title")
-      $title_input.attr('disabled', $item.hasClass('locked_by_master_course'))
+      var $titleInput = $('#edit_item_form #content_tag_title');
+      var restrictions = $item.data().master_course_restrictions;
+      var isDisabled = !dig(ENV, 'MASTER_COURSE_SETTINGS.IS_MASTER_COURSE') && !!dig(restrictions, 'content');
+      $titleInput.attr('disabled', isDisabled);
 
       $("#edit_item_form").dialog({
         title: I18n.t('titles.edit_item', "Edit Item Details"),
