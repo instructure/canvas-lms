@@ -28,6 +28,7 @@ import ProfileTray from 'jsx/navigation_header/trays/ProfileTray'
 import HelpTray from 'jsx/navigation_header/trays/HelpTray'
 import SVGWrapper from 'jsx/shared/SVGWrapper'
 import preventDefault from 'compiled/fn/preventDefault'
+import parseLinkHeader from 'compiled/fn/parseLinkHeader'
 
   var EXTERNAL_TOOLS_REGEX = /^\/accounts\/[^\/]*\/(external_tools)/;
   var ACTIVE_ROUTE_REGEX = /^\/(courses|groups|accounts|grades|calendar|conversations|profile)/;
@@ -41,6 +42,12 @@ import preventDefault from 'compiled/fn/preventDefault'
     accounts: '/api/v1/accounts',
     help: '/help_links'
   };
+
+  const TYPE_FILTER_MAP = {
+    groups: group => group.can_access && !group.concluded
+  };
+
+  const RESOURCE_COUNT = 10;
 
   var Navigation = React.createClass({
     displayName: 'Navigation',
@@ -113,13 +120,37 @@ import preventDefault from 'compiled/fn/preventDefault'
       loadingState[`${type}Loading`] = true;
       this.setState(loadingState);
 
-      $.getJSON(url, (data) => {
-        var newState = {};
-        newState[type] = data;
+      this.loadResourcePage(url, type);
+    },
+
+    loadResourcePage (url, type, previousData = []) {
+      $.getJSON(url, (data, __, xhr) => {
+        const newData = previousData.concat(this.filterDataForType(data, type));
+
+        // queue the next page if we need one
+        if (newData.length < RESOURCE_COUNT) {
+          const link = parseLinkHeader(xhr);
+          if (link.next) {
+            this.loadResourcePage(link.next, type, newData);
+            return;
+          }
+        }
+
+        // finished
+        let newState = {};
+        newState[type] = newData;
         newState[`${type}Loading`] = false;
         newState[`${type}AreLoaded`] = true;
         this.setState(newState);
       });
+    },
+
+    filterDataForType (data, type) {
+      const filterFunc = TYPE_FILTER_MAP[type];
+      if (typeof filterFunc === 'function') {
+        return data.filter(filterFunc);
+      }
+      return data;
     },
 
     pollUnreadCount () {

@@ -58,6 +58,29 @@ describe 'Global Navigation' do
       end
     end
 
+    describe 'Groups Link' do
+      it 'filters concluded groups and loads additional pages if necessary' do
+        Setting.set('api_per_page', 2)
+
+        student = user_factory
+        2.times do |x|
+          course = course_with_student(:user => student, :active_all => true).course
+          group_with_user(:user => student, :group_context => course, :name => "A Old Group #{x}")
+          course.complete!
+        end
+
+        course = course_with_student(:user => student, :active_all => true).course
+        group_with_user(:user => student, :group_context => course, :name => "Z Current Group")
+
+        user_session(student)
+        get "/"
+        f('#global_nav_groups_link').click
+        wait_for_ajaximations
+        links = ff('.ic-NavMenu__link-list li')
+        expect(links.map(&:text)).to eq(['Z Current Group', 'All Groups'])
+      end
+    end
+
     describe 'LTI Tools' do
       it 'should show a custom logo/link for LTI tools' do
         Account.default.enable_feature! :lor_for_account

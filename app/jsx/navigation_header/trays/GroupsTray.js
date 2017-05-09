@@ -42,14 +42,12 @@ import Spinner from 'instructure-ui/lib/components/Spinner'
           </li>
         );
       }
-      var groups =  this.props.groups.map((group) => {
-        if (group.can_access && !group.concluded) {
-          return (
-            <li className="ic-NavMenu-list-item" key={group.id}>
-              <a href={`/groups/${group.id}`} className='ic-NavMenu-list-item__link'>{group.name}</a>
-            </li>
-          );
-        };
+      var groups = this.props.groups.map((group) => {
+        return (
+          <li className="ic-NavMenu-list-item" key={group.id}>
+            <a href={`/groups/${group.id}`} className='ic-NavMenu-list-item__link'>{group.name}</a>
+          </li>
+        );
       });
       groups.push(
         <li key='allGroupsLink' className='ic-NavMenu-list-item ic-NavMenu-list-item--feature-item'>
