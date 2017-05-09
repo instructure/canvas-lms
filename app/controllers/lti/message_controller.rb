@@ -20,7 +20,7 @@ require 'ims/lti'
 module Lti
   class MessageController < ApplicationController
 
-    before_action :require_context
+    before_action :require_context, :require_user
 
     def registration
       if authorized_action(@context, @current_user, :update)
@@ -103,7 +103,7 @@ module Lti
           launch_params.merge! enabled_parameters(tool_proxy, message_handler, variable_expander)
 
           message = IMS::LTI::Models::Messages::BasicLTILaunchRequest.new(launch_params)
-          message.user_id = Lti::Asset.opaque_identifier_for(@current_user) if @current_user
+          message.user_id = Lti::Asset.opaque_identifier_for(@current_user)
           @active_tab = message_handler.asset_string
           @lti_launch.resource_url = message.launch_url
           @lti_launch.link_text = resource_handler.name
