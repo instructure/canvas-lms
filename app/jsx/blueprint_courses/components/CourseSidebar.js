@@ -49,7 +49,6 @@ export default class CourseSidebar extends Component {
     clearAssociations: PropTypes.func.isRequired,
     hasAssociationChanges: PropTypes.bool.isRequired,
     isSavingAssociations: PropTypes.bool.isRequired,
-    willSendNotification: PropTypes.bool.isRequired,
     enableSendNotification: PropTypes.func.isRequired,
     loadUnsyncedChanges: PropTypes.func.isRequired,
     isLoadingUnsyncedChanges: PropTypes.bool.isRequired,
@@ -103,7 +102,7 @@ export default class CourseSidebar extends Component {
           this.props.clearAssociations()
         }),
       },
-      children: () => <BlueprintAssociations />,
+      children: <BlueprintAssociations />,
       onCancel: () => this.closeModal(() => {
         this.asscBtn.focus()
         this.props.clearAssociations()
@@ -116,18 +115,16 @@ export default class CourseSidebar extends Component {
           this.syncHistoryBtn.focus()
         }),
       },
-      children: () => <SyncHistory />,
+      children: <SyncHistory />,
     }),
     unsyncedChanges: () => ({
       props: {
         title: I18n.t('Unsynced Changes'),
         hasChanges: this.props.unsyncedChanges.length > 0,
-        willSendNotification: this.props.willSendNotification,
-        enableSendNotification: this.props.enableSendNotification,
         onCancel: () => this.closeModal(() => {
           this.unsyncedChangesBtn.focus()
         }),
-        doneButton: <MigrationSync
+        saveButton: <MigrationSync
           showProgress={false}
           onClick={() => this.closeModal(() => {
             if (this.unsyncedChangesBtn) {
@@ -138,7 +135,7 @@ export default class CourseSidebar extends Component {
           })}
         />
       },
-      children: () => <UnsyncedChanges />,
+      children: <UnsyncedChanges />,
     })
   }
 
@@ -286,7 +283,6 @@ const connectState = state =>
     'hasCheckedMigration',
     'isSavingAssociations',
     ['existingAssociations', 'associations'],
-    'willSendNotification',
     'unsyncedChanges',
     'isLoadingUnsyncedChanges',
     'hasLoadedUnsyncedChanges',

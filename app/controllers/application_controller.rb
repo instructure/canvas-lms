@@ -270,20 +270,26 @@ class ApplicationController < ActionController::Base
   helper_method :set_master_course_js_env_data
 
   def load_blueprint_courses_ui
-    return unless @context && @context.is_a?(Course) && master_courses? && @context.grants_right?(@current_user, :manage) && (MasterCourses::MasterTemplate.is_master_course?(@context) || MasterCourses::ChildSubscription.is_child_course?(@context))
+    return unless @context && @context.is_a?(Course) && master_courses? && @context.grants_right?(@current_user, :manage)
+
+    is_child = MasterCourses::ChildSubscription.is_child_course?(@context)
+    is_master = MasterCourses::MasterTemplate.is_master_course?(@context)
+
+    return unless is_master || is_child
 
     js_bundle :blueprint_courses
     css_bundle :blueprint_courses
-    js_env({
-      BLUEPRINT_COURSES_DATA: {
-        isMasterCourse: MasterCourses::MasterTemplate.is_master_course?(@context),
-        isChildCourse: MasterCourses::ChildSubscription.is_child_course?(@context),
-        accountId: @context.account.id,
-        course: @context.slice(:id, :name),
-        subAccounts: @context.account.sub_accounts.pluck(:id, :name).map{|id, name| {id: id, name: name}},
-        terms: @context.account.root_account.enrollment_terms.active.pluck(:id, :name).map{|id, name| {id: id, name: name}}
-      }
-    })
+
+    master_course = is_master ? @context : @context.master_course_subscriptions.active.first.master_template.course
+    js_env :BLUEPRINT_COURSES_DATA => {
+      isMasterCourse: is_master,
+      isChildCourse: is_child,
+      accountId: @context.account.id,
+      masterCourse: master_course.slice(:id, :name, :enrollment_term_id),
+      course: @context.slice(:id, :name, :enrollment_term_id),
+      subAccounts: @context.account.sub_accounts.pluck(:id, :name).map{|id, name| {id: id, name: name}},
+      terms: @context.account.root_account.enrollment_terms.active.pluck(:id, :name).map{|id, name| {id: id, name: name}}
+    }
   end
   helper_method :load_blueprint_courses_ui
 

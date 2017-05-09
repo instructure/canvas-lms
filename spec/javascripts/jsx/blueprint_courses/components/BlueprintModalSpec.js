@@ -26,7 +26,7 @@ const defaultProps = () => ({
   isOpen: true,
 })
 
-const render = (props = defaultProps(), children = () => <p>content</p>) => (
+const render = (props = defaultProps(), children = <p>content</p>) => (
   <BlueprintModal {...props}>{children}</BlueprintModal>
 )
 

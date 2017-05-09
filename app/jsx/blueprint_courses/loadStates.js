@@ -16,30 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import ReactDOM from 'react-dom'
-import { Provider } from 'react-redux'
-import createStore from '../store'
-import { ConnectedCourseSidebar } from '../components/CourseSidebar'
-
-class BlueprintSettingsApp {
-  constructor (root, data) {
-    this.root = root
-    this.store = createStore(data)
-  }
-
-  unmount () {
-    ReactDOM.unmountComponentAtNode(this.root)
-  }
-
-  render () {
-    ReactDOM.render(
-      <Provider store={this.store}>
-        <ConnectedCourseSidebar />
-      </Provider>,
-      this.root
-    )
-  }
+const statesList = ['not_loaded', 'loading', 'loaded']
+const loadStates = {
+  statesList,
+  states: statesList.reduce((map, state) =>
+    Object.assign(map, {
+      [state]: state,
+    }), {})
 }
 
-export default BlueprintSettingsApp
+loadStates.isLoading = state => state === loadStates.states.loading
+loadStates.hasLoaded = state => state === loadStates.states.loaded
+loadStates.isNotLoaded = state => state === loadStates.states.not_loaded
+
+export default loadStates

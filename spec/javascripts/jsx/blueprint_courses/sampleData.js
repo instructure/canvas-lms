@@ -25,6 +25,16 @@ export default {
     { id: '1', name: 'Account One' },
     { id: '2', name: 'Account Two' },
   ],
+  childCourse: {
+    id: '1',
+    enrollment_term_id: '1',
+    name: 'Course 1',
+  },
+  masterCourse: {
+    id: '2',
+    enrollment_term_id: '1',
+    name: 'Course 2',
+  },
   courses: [
     {
       id: '1',

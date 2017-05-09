@@ -18,14 +18,15 @@
 
 const loadingStates = ['queued', 'exporting', 'imports_queued']
 const endStates = ['completed', 'exports_failed', 'imports_failed']
-const states = [
+const statesList = [
   'void', 'unknown',
   ...loadingStates,
   ...endStates,
 ]
 
 const migrationStates = {
-  states: states.reduce((map, state) =>
+  statesList,
+  states: statesList.reduce((map, state) =>
     Object.assign(map, {
       [state]: state,
     }), {})

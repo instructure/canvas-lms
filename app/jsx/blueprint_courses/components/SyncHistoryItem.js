@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!blueprint_settings'
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import Heading from 'instructure-ui/lib/components/Heading'
 import Typography from 'instructure-ui/lib/components/Typography'
@@ -26,7 +27,7 @@ import SyncChange from './SyncChange'
 
 import propTypes from '../propTypes'
 
-const SyncHistoryItem = ({ migration }) => {
+const SyncHistoryItem = ({ migration, heading, ChangeComponent }) => {
   const { created_at, comment, changes } = migration
   const date = Date.parse(created_at)
 
@@ -38,14 +39,24 @@ const SyncHistoryItem = ({ migration }) => {
         </Heading>
         <Typography color="secondary" size="small">{I18n.t('%{count} pushed changes', { count: changes.length })}</Typography>
       </header>
-      {comment && <Typography as="p" color="secondary">{comment}</Typography>}
-      {changes.map(change => <SyncChange key={change.html_url} change={change} />)}
+      {comment && <Typography as="p" color="secondary" size="small">{`"${comment}"`}</Typography>}
+      <div role="grid">
+        {changes.length ? heading : null}
+        {changes.length ? changes.map(change => <ChangeComponent key={change.html_url} change={change} />) : null}
+      </div>
     </div>
   )
 }
 
 SyncHistoryItem.propTypes = {
   migration: propTypes.migration.isRequired,
+  ChangeComponent: PropTypes.func,
+  heading: PropTypes.node,
+}
+
+SyncHistoryItem.defaultProps = {
+  ChangeComponent: SyncChange,
+  heading: null,
 }
 
 export default SyncHistoryItem

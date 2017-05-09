@@ -16,18 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const data = ENV.BLUEPRINT_COURSES_DATA
-
-require.ensure([], (require) => {
-  const App = data.isMasterCourse
-    ? require('../blueprint_courses/apps/BlueprintCourse')
-    : require('../blueprint_courses/apps/ChildCourse')
-
-  const wrapper = document.getElementById('wrapper')
-  const root = document.createElement('div')
-  root.className = 'blueprint__root'
-  wrapper.appendChild(root)
-
-  const app = new App(root, data)
-  app.start()
-})
+export default function shortId () {
+  const prefix = String.fromCharCode(97 + Math.floor(Math.random() * 26))
+  const id = Math.random().toString(36).substring(2, 10)
+  return prefix + id
+}

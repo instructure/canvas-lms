@@ -20,18 +20,47 @@ import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import { actionTypes } from './actions'
 import MigrationStates from './migrationStates'
+import LoadStates from './loadStates'
 
 const identity = (defaultState = null) => (
   state => (state === undefined ? defaultState : state)
 )
 
+const changeLogReducer = combineReducers({
+  changeId: identity(),
+  status: handleActions({
+    [actionTypes.LOAD_CHANGE_START]: () => LoadStates.states.loading,
+    [actionTypes.LOAD_CHANGE_SUCCESS]: () => LoadStates.states.loaded,
+    [actionTypes.LOAD_CHANGE_FAILED]: () => LoadStates.states.not_loaded,
+  }, LoadStates.states.not_loaded),
+  data: handleActions({
+    [actionTypes.LOAD_CHANGE_SUCCESS]: (state, action) => action.payload,
+  }, null),
+})
+
 export default combineReducers({
+  course: identity(null),
+  masterCourse: identity(),
   isMasterCourse: identity(),
   isChildCourse: identity(),
   accountId: identity(),
-  course: identity(),
   terms: identity([]),
   subAccounts: identity([]),
+  selectedChangeLog: handleActions({
+    [actionTypes.SELECT_CHANGE_LOG]: (state, action) => action.payload.changeId,
+  }, null),
+  changeLogs: (state = {}, action) => {
+    let newState = state
+    const { changeId } = action.payload || {}
+
+    if (changeId) {
+      newState = Object.assign({
+        [changeId]: changeLogReducer(state[changeId] || { changeId }, action)
+      })
+    }
+
+    return newState
+  },
   isLoadingHistory: handleActions({
     [actionTypes.LOAD_HISTORY_START]: () => true,
     [actionTypes.LOAD_HISTORY_SUCCESS]: () => false,

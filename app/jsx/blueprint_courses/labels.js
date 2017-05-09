@@ -38,12 +38,12 @@ const exceptionTypeLabels = {
   content: I18n.t('Content changed exceptions:'),
   due_dates: I18n.t('Due Dates changed exceptions:'),
   availability_dates: I18n.t('Availability Dates changed exceptions:'),
-  settings: I18n.t('Settings changed exceptions:')
+  settings: I18n.t('Settings changed exceptions:'),
 }
 
 const lockTypeLabel = {
   locked: I18n.t('Locked'),
-  unlocked: I18n.t('Unlocked')
+  unlocked: I18n.t('Unlocked'),
 }
 
 export {itemTypeLabels, changeTypeLabels, exceptionTypeLabels, lockTypeLabel}

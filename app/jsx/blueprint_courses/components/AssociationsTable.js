@@ -20,23 +20,19 @@ import I18n from 'i18n!blueprint_settings'
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
+import shortId from 'jsx/shared/shortid'
+import 'compiled/jquery.rails_flash_notifications'
+
 import Typography from 'instructure-ui/lib/components/Typography'
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
 import Table from 'instructure-ui/lib/components/Table'
 import Button from 'instructure-ui/lib/components/Button'
 import Spinner from 'instructure-ui/lib/components/Spinner'
 import RemoveIcon from 'instructure-icons/lib/Solid/IconXSolid'
-import 'compiled/jquery.rails_flash_notifications'
 
 import propTypes from '../propTypes'
 
 const { func, arrayOf, string, bool } = PropTypes
-
-function shortId () {
-  const prefix = String.fromCharCode(97 + Math.floor(Math.random() * 26))
-  const id = Math.random().toString(36).substring(2, 10)
-  return prefix + id
-}
 
 export default class AssociationsTable extends React.Component {
   static propTypes = {
@@ -121,7 +117,6 @@ export default class AssociationsTable extends React.Component {
     return associations.map((course, courseIndex) => {
       // try next item first, if not then previous, if not then the section header
       const focusTo = focusIds[courseIndex + 1] || focusIds[courseIndex - 1] || headerFocus
-              // {/* onClick={this.onRemove} */}
       return (
         <tr key={course.id} className="bca-associations__course-row">
           <td>{this.renderCellText(course.name)}</td>

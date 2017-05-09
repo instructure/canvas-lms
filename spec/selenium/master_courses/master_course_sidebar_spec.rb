@@ -60,25 +60,25 @@ describe "master courses sidebar" do
 
     it "should show sidebar trigger tab" do
      get "/courses/#{@master.id}"
-     expect(f('.bcs__root .bcs__wrapper .bcs__trigger')).to be_displayed
+     expect(f('.blueprint__root .bcs__wrapper .bcs__trigger')).to be_displayed
     end
 
     it "should show sidebar when trigger is clicked" do
       get "/courses/#{@master.id}"
-      f('.bcs__root .bcs__wrapper .bcs__trigger').click
+      f('.blueprint__root .bcs__wrapper .bcs__trigger').click
       expect(f('.bcs__content')).to be_displayed
     end
 
     it "should show Sync History modal when button is clicked" do
       get "/courses/#{@master.id}"
-      f('.bcs__root .bcs__wrapper .bcs__trigger').click
+      f('.blueprint__root .bcs__wrapper .bcs__trigger').click
       f('button#mcSyncHistoryBtn').click
       expect(f('div[aria-label="Sync History"]')).to be_displayed
     end
 
     it "should show Unsynced Changes modal when button is clicked" do
       get "/courses/#{@master.id}"
-      f('.bcs__root .bcs__wrapper .bcs__trigger').click
+      f('.blueprint__root .bcs__wrapper .bcs__trigger').click
       wait_for_ajaximations
       f('button#mcUnsyncedChangesBtn').click
       wait_for_ajaximations
@@ -97,7 +97,7 @@ describe "master courses sidebar" do
 
     it "should show Associations modal when button is clicked" do
       get "/courses/#{@master.id}"
-      f('.bcs__root .bcs__wrapper .bcs__trigger').click
+      f('.blueprint__root .bcs__wrapper .bcs__trigger').click
       f('button#mcSidebarAsscBtn').click
       expect(f('div[aria-label="Associations"]')).to be_displayed
     end

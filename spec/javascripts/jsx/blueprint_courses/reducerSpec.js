@@ -19,6 +19,7 @@
 import actions from 'jsx/blueprint_courses/actions'
 import reducer from 'jsx/blueprint_courses/reducer'
 import MigrationStates from 'jsx/blueprint_courses/migrationStates'
+import LoadStates from 'jsx/blueprint_courses/loadStates'
 import sampleData from './sampleData'
 
 QUnit.module('Blurpint Courses reducer')
@@ -251,4 +252,40 @@ test('sets willSendNotification on ENABLE_SEND_NOTIFICATION', () => {
   equal(newState.willSendNotification, true)
   newState = reduce(actions.enableSendNotification(false))
   equal(newState.willSendNotification, false)
+})
+
+test('creates empty change log entry on SELECT_CHANGE_LOG', () => {
+  const newState = reduce(actions.realSelectChangeLog({ changeId: '5' }))
+  deepEqual(newState.changeLogs, { 5: {
+    changeId: '5',
+    status: LoadStates.states.not_loaded,
+    data: null,
+  } })
+})
+
+test('sets change log status to loading on LOAD_CHANGE_START', () => {
+  const newState = reduce(actions.loadChangeStart({ changeId: '5' }))
+  deepEqual(newState.changeLogs, { 5: {
+    changeId: '5',
+    status: LoadStates.states.loading,
+    data: null,
+  } })
+})
+
+test('sets change log data and status to loaded on LOAD_CHANGE_SUCCESS', () => {
+  const newState = reduce(actions.loadChangeSuccess({ changeId: '5', changes: ['1', '2'] }))
+  deepEqual(newState.changeLogs, { 5: {
+    changeId: '5',
+    status: LoadStates.states.loaded,
+    data: { changeId: '5', changes: ['1', '2'] },
+  } })
+})
+
+test('sets change log status to not loaded on LOAD_CHANGE_FAILED', () => {
+  const newState = reduce(actions.loadChangeFail({ changeId: '5' }))
+  deepEqual(newState.changeLogs, { 5: {
+    changeId: '5',
+    status: LoadStates.states.not_loaded,
+    data: null,
+  } })
 })

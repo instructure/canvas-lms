@@ -23,7 +23,7 @@ import MigrationStates from './migrationStates'
 const { shape, string, arrayOf, oneOf, bool } = PropTypes
 const propTypes = {}
 
-propTypes.migrationState = oneOf(Object.keys(MigrationStates.states))
+propTypes.migrationState = oneOf(MigrationStates.statesList)
 
 propTypes.term = shape({
   id: string.isRequired,
@@ -48,6 +48,13 @@ propTypes.course = shape({
   sis_course_id: string,
 })
 propTypes.courseList = arrayOf(propTypes.course)
+
+propTypes.courseInfo = shape({
+  id: string.isRequired,
+  name: string.isRequired,
+  enrollment_term_id: string.isRequired,
+  sis_course_id: string,
+})
 
 propTypes.migrationException = shape({
   course_id: string.isRequired,

@@ -20,6 +20,7 @@ import I18n from 'i18n!blueprint_settings'
 import { createActions } from 'redux-actions'
 import { showAjaxFlashAlert } from 'jsx/shared/AjaxFlashAlert'
 import api from './apiClient'
+import LoadStates from './loadStates'
 
 const handleError = (msg, dispatch, actionCreator) => (err) => {
   showAjaxFlashAlert(msg, err)
@@ -39,9 +40,32 @@ const types = [
   'REMOVE_COURSE_ASSOCIATIONS', 'UNDO_REMOVE_COURSE_ASSOCIATIONS',
   'CLEAR_ASSOCIATIONS',
   'LOAD_UNSYNCED_CHANGES_START', 'LOAD_UNSYNCED_CHANGES_SUCCESS', 'LOAD_UNSYNCED_CHANGES_FAIL',
-  'ENABLE_SEND_NOTIFICATION', 'INCLUDE_CUSTOM_NOTIFICATION_MESSAGE', 'SET_NOTIFICATION_MESSAGE'
+  'ENABLE_SEND_NOTIFICATION', 'INCLUDE_CUSTOM_NOTIFICATION_MESSAGE', 'SET_NOTIFICATION_MESSAGE',
+  'LOAD_CHANGE_START', 'LOAD_CHANGE_SUCCESS', 'LOAD_CHANGE_FAIL', 'SELECT_CHANGE_LOG',
 ]
 const actions = createActions(...types)
+
+actions.loadChange = changeId => (dispatch, getState) => {
+  const state = getState()
+  const change = state.changeLogs[changeId]
+  if (change && LoadStates.isLoading(change.status)) return;
+
+  dispatch(actions.loadChangeStart())
+  api.getFullMigration(state, changeId)
+    .then(data => dispatch(actions.loadChangeSuccess(data)))
+    .catch(handleError(I18n.t('An error occurred while loading changes'), dispatch, actions.loadChangeFail))
+}
+
+actions.realSelectChangeLog = actions.selectChangeLog
+actions.selectChangeLog = ({ changeId }) => (dispatch, getState) => {
+  dispatch(actions.realSelectChangeLog({ changeId }))
+  if (changeId === null) return;
+  const state = getState()
+  const change = state.changeLogs[changeId]
+  if (!change || LoadStates.isNotLoaded(change.status)) {
+    actions.loadChange(changeId)(dispatch, getState)
+  }
+}
 
 actions.loadHistory = () => (dispatch, getState) => {
   dispatch(actions.loadHistoryStart())

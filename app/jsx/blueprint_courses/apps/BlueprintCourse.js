@@ -16,18 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const data = ENV.BLUEPRINT_COURSES_DATA
+import React from 'react'
+import ReactDOM from 'react-dom'
+import { Provider } from 'react-redux'
 
-require.ensure([], (require) => {
-  const App = data.isMasterCourse
-    ? require('../blueprint_courses/apps/BlueprintCourse')
-    : require('../blueprint_courses/apps/ChildCourse')
+import createStore from '../store'
+import { ConnectedCourseSidebar } from '../components/CourseSidebar'
 
-  const wrapper = document.getElementById('wrapper')
-  const root = document.createElement('div')
-  root.className = 'blueprint__root'
-  wrapper.appendChild(root)
+export default class BlueprintCourse {
+  constructor (root, data) {
+    this.root = root
+    this.store = createStore(data)
+  }
 
-  const app = new App(root, data)
-  app.start()
-})
+  unmount () {
+    ReactDOM.unmountComponentAtNode(this.root)
+  }
+
+  render () {
+    ReactDOM.render(
+      <Provider store={this.store}>
+        <ConnectedCourseSidebar />
+      </Provider>,
+      this.root
+    )
+  }
+
+  start () {
+    this.render()
+  }
+}
