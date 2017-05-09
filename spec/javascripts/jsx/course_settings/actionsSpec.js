@@ -178,16 +178,17 @@ define([
   });
 
   asyncTest('uploadFile dispatches prepareSetImage when successful', () => {
-    const firstCallPromise = new Promise((resolve) => {
+    const successUrl = 'http://successUrl'
+    const preflightResponse = new Promise((resolve) => {
       setTimeout(() => resolve({
         data: {
-          upload_params: {fakeKey: 'fakeValue'},
+          upload_params: {fakeKey: 'fakeValue', success_url: successUrl},
           upload_url: 'http://uploadUrl'
         }
       }));
     });
 
-    const secondCallPromise = new Promise((resolve) => {
+    const successResponse = new Promise((resolve) => {
       setTimeout(() => resolve({
         data: {
           url: 'http://fileDownloadUrl',
@@ -197,11 +198,14 @@ define([
     })
 
     const postStub = sinon.stub();
-    postStub.onCall(0).returns(firstCallPromise)
-    postStub.onCall(1).returns(secondCallPromise);
+    const getStub = sinon.stub()
+    postStub.onCall(0).returns(preflightResponse)
+    postStub.onCall(1).returns(Promise.resolve());
+    getStub.returns(successResponse)
 
     const fakeAjaxLib = {
-      post: postStub
+      post: postStub,
+      get: getStub
     };
 
     const fakeDragonDropEvent = {
@@ -220,6 +224,7 @@ define([
     Actions.uploadFile(fakeDragonDropEvent, 1, fakeAjaxLib)((dispatched) => {
       if (dispatched.type !== 'UPLOADING_IMAGE') {
         start();
+        ok(getStub.calledWith(successUrl), 'made request to success url')
         ok(Actions.prepareSetImage.called, 'prepareSetImage was called');
         Actions.prepareSetImage.restore();
       }

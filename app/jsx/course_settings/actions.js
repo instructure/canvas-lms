@@ -182,15 +182,19 @@ import 'compiled/jquery.rails_flash_notifications'
             name: file.name,
             size: file.size,
             parent_folder_path: 'course_image',
-            type
+            type,
+            no_redirect: true
           };
           ajaxLib.post(`/api/v1/courses/${courseId}/files`, data)
                  .then((response) => {
                     const formData = Helpers.createFormData(response.data.upload_params);
+                    const successUrl = response.data.upload_params.success_url
                     formData.append('file', file);
                     ajaxLib.post(response.data.upload_url, formData)
                            .then((response) => {
-                             dispatch(this.prepareSetImage(response.data.url, response.data.id, courseId, ajaxLib));
+                             return ajaxLib.get(successUrl).then((successResp) => {
+                               dispatch(this.prepareSetImage(successResp.data.url, successResp.data.id, courseId, ajaxLib));
+                             })
                            })
                            .catch((response) => {
                               dispatch(this.errorUploadingImage());
