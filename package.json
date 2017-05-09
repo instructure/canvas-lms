@@ -12,7 +12,8 @@
     "fullcalendar": "https://github.com/ryankshaw/fullcalendar.git#aa686b36d10cee1e1e3ec7c7784145e46667d47d",
     "instructure-icons": "2.2.0",
     "instructure-ui": "1.4.2",
-    "tinymce": "4.1.9"
+    "tinymce": "4.5.7",
+    "tinymce-light-skin": "1.2.2"
   },
   "devDependencies": {
     "axe-core": "2.1.7",

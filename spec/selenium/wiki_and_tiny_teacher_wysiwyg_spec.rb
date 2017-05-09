@@ -165,14 +165,14 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       wysiwyg_state_setup
 
       # I'm so, so sorry...
-      driver.find_element(:xpath, "//button/span[text()[contains(.,'Font Sizes')]]").click
+      driver.find_element(:xpath, "//button/span[text()[contains(.,'11pt')]]").click
       driver.find_element(:xpath, "//span[text()[contains(.,'36pt')]]").click
       validate_wiki_style_attrib("font-size", "36pt", "p span")
     end
 
     it "should change and remove all custom formatting on selected text", priority: "1", test_id: 298748 do
       wysiwyg_state_setup
-      driver.find_element(:xpath, "//button/span[text()[contains(.,'Font Sizes')]]").click
+      driver.find_element(:xpath, "//button/span[text()[contains(.,'11pt')]]").click
       driver.find_element(:xpath, "//span[text()[contains(.,'36pt')]]").click
       validate_wiki_style_attrib("font-size", "36pt", "p span")
       f(".mce-i-removeformat").click
@@ -390,7 +390,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       driver.find_element(:xpath, "//button/span[text()[contains(.,'Paragraph')]]").click
       driver.find_element(:xpath, "//span[text()[contains(.,'Preformatted')]]").click
       in_frame wiki_page_body_ifr_id do
-        expect(ff('#tinymce pre').length).to eq 3
+        expect(ff('#tinymce pre').length).to eq 1
       end
     end
 
@@ -407,7 +407,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     it "should create a table", priority: "1", test_id: 307627 do
       wysiwyg_state_setup
       f('.mce-i-table').click
-      driver.find_element(:xpath, "//span[text()[contains(.,'Insert table')]]").click
+      driver.find_element(:xpath, "//div/span[text()[contains(.,'Table')]]").click
       driver.find_element(:xpath, "//td/a[@data-mce-x='3' and @data-mce-y='3']").click
       in_frame wiki_page_body_ifr_id do
         expect(ff('#tinymce tr').length).to eq 4
@@ -415,10 +415,10 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       end
     end
 
-    it "should edit a table", priority: "1", test_id: 588944 do
+    it "should edit a table from toolbar", priority: "1", test_id: 588944 do
       wysiwyg_state_setup
       f('.mce-i-table').click
-      driver.find_element(:xpath, "//span[text()[contains(.,'Insert table')]]").click
+      driver.find_element(:xpath, "//div/span[text()[contains(.,'Table')]]").click
       driver.find_element(:xpath, "//td/a[@data-mce-x='3' and @data-mce-y='3']").click
 
       f('.mce-i-table').click
@@ -428,7 +428,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       f('.mce-i-table').click
       driver.find_element(:xpath, "//span[text()[contains(.,'Table properties')]]").click
       driver.find_element(:xpath, "//div[text()[contains(.,'Advanced')]]").click
-      ff('.mce-placeholder')[1].send_keys("green")
+      ff('div>input[placeholder]')[1].send_keys("green")
       f('.mce-primary').click
       in_frame wiki_page_body_ifr_id do
         expect(ff('#tinymce tr').length).to eq 5
@@ -437,11 +437,49 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       validate_wiki_style_attrib("background-color", "green", "table")
     end
 
-    it "should delete a table", priority: "1", test_id: 588945 do
+    it "should edit a table from context menu", priority: "1", test_id: 307628 do
+      wysiwyg_state_setup
+      f('.mce-i-table').click
+      driver.find_element(:xpath, "//div/span[text()[contains(.,'Table')]]").click
+      driver.find_element(:xpath, "//td/a[@data-mce-x='3' and @data-mce-y='3']").click
+
+      f('.mce-i-table').click
+      driver.find_element(:xpath, "//span[text()[contains(.,'Row')]]").click
+      driver.find_element(:xpath, "//span[text()[contains(.,'Insert row after')]]").click
+
+      driver.find_element(:xpath, "(//i[contains(@class,'mce-i-table') and "\
+                                  "not(contains(@class,'mce-i-tabledelete')) "\
+                                  "and not(contains(@class,'mce-i-tableinsert'))])[3]").click
+      driver.find_element(:xpath, "//div[text()[contains(.,'Advanced')]]").click
+
+      ff('div>input[placeholder]')[1].send_keys("green")
+      f('.mce-primary').click
+      in_frame wiki_page_body_ifr_id do
+        expect(ff('#tinymce tr').length).to eq 5
+        expect(ff('#tinymce td').length).to eq 20
+      end
+      validate_wiki_style_attrib("background-color", "green", "table")
+    end
+
+
+    it "should delete a table from toolbar", priority: "1", test_id: 588945 do
       table = "<table><tbody><tr><td></td><td></td></tr><tr><td></td><td></td></tr></tbody></table>"
       wysiwyg_state_setup(table, html: true)
       f('.mce-i-table').click
       driver.find_element(:xpath, "//span[text()[contains(.,'Delete table')]]").click
+      in_frame wiki_page_body_ifr_id do
+        expect(f("#tinymce")).not_to contain_css('table')
+      end
+    end
+
+    it "should delete a table from context menu", priority: "1", test_id: 588945 do
+      wysiwyg_state_setup
+
+      f('.mce-i-table').click
+      driver.find_element(:xpath, "//div/span[text()[contains(.,'Table')]]").click
+      driver.find_element(:xpath, "//td/a[@data-mce-x='3' and @data-mce-y='3']").click
+
+      f('.mce-i-tabledelete').click
       in_frame wiki_page_body_ifr_id do
         expect(f("#tinymce")).not_to contain_css('table')
       end

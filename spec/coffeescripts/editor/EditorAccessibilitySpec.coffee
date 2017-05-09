@@ -28,9 +28,9 @@ define [
 
   QUnit.module "EditorAccessibility",
     setup: ->
-      textarea = $("<textarea id='42' data-rich_text='true'></textarea>")
+      textarea = $("<textarea id='a42' data-rich_text='true'></textarea>")
       fixtures.append(textarea)
-      tinymce.init({selector: "#fixtures textarea#42"})
+      tinymce.init({selector: "#fixtures textarea#a42"})
       acc = new EditorAccessibility(tinymce.activeEditor)
       activeEditorNodes = tinymce.activeEditor.getContainer().children
     teardown: ->

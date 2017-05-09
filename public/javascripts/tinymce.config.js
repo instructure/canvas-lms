@@ -65,8 +65,7 @@ define([], function(){
       selector: "#" + this.idAttribute,
       toolbar: this.toolbar(),
       theme: "modern",
-      skin: "light",
-      skin_url: "/vendor/tinymce_themes/light",
+      skin: false,
       plugins: "autolink,media,paste,table,textcolor,link,directionality,lists",
       external_plugins: {
         "instructure_image": "/javascripts/tinymce_plugins/instructure_image/plugin.js",

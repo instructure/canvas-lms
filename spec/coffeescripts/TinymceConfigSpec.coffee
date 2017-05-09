@@ -72,7 +72,7 @@ define [
     INST.maxVisibleEditorButtons = 2
     config = new EditorConfig(fake_tinymce, INST, largeScreenWidth, dom_id)
     schema = config.defaultConfig()
-    equal(schema.skin, 'light')
+    equal(schema.skin, false)
 
   test "default config includes toolbar", ->
     INST.maxVisibleEditorButtons = 2
@@ -85,11 +85,6 @@ define [
     schema = config.defaultConfig()
     equal(schema.selector, "#some_textarea")
 
-  test "it loads up the right skin_url from an absolute path", ->
-    config = new EditorConfig(fake_tinymce, INST, largeScreenWidth, dom_id)
-    schema = config.defaultConfig()
-    equal(schema.skin_url, "/vendor/tinymce_themes/light")
-
   test "browser spellcheck enabled by default", ->
     config = new EditorConfig(fake_tinymce, INST, largeScreenWidth, dom_id)
     schema = config.defaultConfig()
@@ -97,15 +92,15 @@ define [
 
   QUnit.module "Tinymce Config Integration",
     setup: ->
-      $("body").append("<textarea id=42></textarea>")
+      $("body").append("<textarea id=a42></textarea>")
 
     teardown: ->
-      $("textarea#42").remove()
+      $("textarea#a42").remove()
 
   asyncTest "configured not to strip spans", ->
     expect(1)
-    $textarea = $("textarea#42")
-    config = new EditorConfig(tinymce, INST, 1000, "42")
+    $textarea = $("textarea#a42")
+    config = new EditorConfig(tinymce, INST, 1000, "a42")
     configHash = $.extend(config.defaultConfig(),{
       plugins: "",
       external_plugins: {},

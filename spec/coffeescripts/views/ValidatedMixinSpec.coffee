@@ -24,7 +24,7 @@ define [
   textarea = null
   QUnit.module "ValidatedMixin",
     setup: ->
-      textarea = $("<textarea id='42' name='message' data-rich_text='true'></textarea>")
+      textarea = $("<textarea id='a42' name='message' data-rich_text='true'></textarea>")
       $('#fixtures').append textarea
       ValidatedMixin.$ = $
 
@@ -33,6 +33,6 @@ define [
       $("#fixtures").empty()
 
   test 'it can find tinymce instances as fields', ->
-    tinymce.init({selector: "#fixtures textarea#42"})
+    tinymce.init({selector: "#fixtures textarea#a42"})
     element = ValidatedMixin.findField('message')
     equal(element.length, 1)
