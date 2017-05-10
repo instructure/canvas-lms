@@ -1213,6 +1213,8 @@ define([
       this.updateStatsInHeader();
       this.showSubmissionDetails();
       this.refreshFullRubric();
+      if(window.onSpeedGraderLoaded)
+      	window.onSpeedGraderLoaded();
     },
 
     handleModerationTabs: function(index_to_load) {
