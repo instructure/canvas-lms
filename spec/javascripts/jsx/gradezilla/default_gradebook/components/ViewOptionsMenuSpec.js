@@ -20,6 +20,35 @@ import React from 'react';
 import { mount, ReactWrapper } from 'enzyme';
 import ViewOptionsMenu from 'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu';
 
+function createExampleProps () {
+  return {
+    columnSortSettings: {
+      criterion: 'due_date',
+      direction: 'ascending',
+      disabled: false,
+      onSortByDefault () {},
+      onSortByDueDateAscending () {},
+      onSortByDueDateDescending () {},
+      onSortByNameAscending () {},
+      onSortByNameDescending () {},
+      onSortByPointsAscending () {},
+      onSortByPointsDescending () {}
+    },
+    filterSettings: {
+      available: ['assignmentGroups', 'gradingPeriods', 'modules', 'sections'],
+      onSelect () {},
+      selected: []
+    },
+    onSelectShowUnpublishedAssignments () {},
+    showUnpublishedAssignments: false,
+    teacherNotes: {
+      disabled: false,
+      onSelect () {},
+      selected: true
+    }
+  };
+}
+
 function mountAndOpenOptions (props) {
   const wrapper = mount(<ViewOptionsMenu {...props} />);
   wrapper.find('button').simulate('click');
@@ -28,27 +57,7 @@ function mountAndOpenOptions (props) {
 
 QUnit.module('ViewOptionsMenu - notes', {
   setup () {
-    this.props = {
-      columnSortSettings: {
-        criterion: 'due_date',
-        direction: 'ascending',
-        disabled: false,
-        onSortByDefault () {},
-        onSortByNameAscending () {},
-        onSortByNameDescending () {},
-        onSortByDueDateAscending () {},
-        onSortByDueDateDescending () {},
-        onSortByPointsAscending () {},
-        onSortByPointsDescending () {}
-      },
-      showUnpublishedAssignments: false,
-      onSelectShowUnpublishedAssignments: () => {},
-      teacherNotes: {
-        disabled: false,
-        onSelect: () => {},
-        selected: true
-      }
-    };
+    this.props = createExampleProps();
   },
 
   getMenuItemGroup () {
@@ -58,8 +67,11 @@ QUnit.module('ViewOptionsMenu - notes', {
     ).find('MenuItemGroup').at(1);
   },
 
-  getMenuItem (index) {
-    return this.getMenuItemGroup().find('MenuItem').at(index);
+  getMenuItem () {
+    const optionsMenu = new ReactWrapper(this.wrapper.node.menuContent, this.wrapper.node);
+    return optionsMenu.findWhere(component => (
+      component.name() === 'MenuItem' && component.text().includes('Notes')
+    ));
   },
 
   teardown () {
@@ -69,36 +81,112 @@ QUnit.module('ViewOptionsMenu - notes', {
 
 test('teacher notes are optionally enabled', function () {
   this.wrapper = mountAndOpenOptions(this.props);
-  const notesMenuItem = this.getMenuItem(0);
+  const notesMenuItem = this.getMenuItem();
   strictEqual(notesMenuItem.prop('disabled'), false)
 });
 
 test('teacher notes are optionally disabled', function () {
   this.props.teacherNotes.disabled = true;
   this.wrapper = mountAndOpenOptions(this.props);
-  const notesMenuItem = this.getMenuItem(0);
+  const notesMenuItem = this.getMenuItem();
   equal(notesMenuItem.prop('disabled'), true)
 });
 
 test('triggers the onSelect when the "Notes" option is clicked', function () {
   this.stub(this.props.teacherNotes, 'onSelect');
   this.wrapper = mountAndOpenOptions(this.props);
-  const notesMenuItem = this.getMenuItem(0);
+  const notesMenuItem = this.getMenuItem();
   notesMenuItem.simulate('click');
   equal(this.props.teacherNotes.onSelect.callCount, 1);
 });
 
 test('the "Notes" option is optionally selected', function () {
   this.wrapper = mountAndOpenOptions(this.props);
-  const notesMenuItem = this.getMenuItem(0);
+  const notesMenuItem = this.getMenuItem();
   equal(notesMenuItem.prop('selected'), true);
 });
 
 test('the "Notes" option is optionally deselected', function () {
   this.props.teacherNotes.selected = false;
   this.wrapper = mountAndOpenOptions(this.props);
-  const notesMenuItem = this.getMenuItem(0);
+  const notesMenuItem = this.getMenuItem();
   equal(notesMenuItem.prop('selected'), false);
+});
+
+QUnit.module('ViewOptionsMenu - Filters', {
+  setup () {
+    this.props = createExampleProps();
+  },
+
+  findMenuItemGroup (text) {
+    const optionsMenu = new ReactWrapper(this.wrapper.node.menuContent, this.wrapper.node);
+    return optionsMenu.findWhere(component => (
+      component.name() === 'MenuItemGroup' && component.text().includes(text)
+    ));
+  },
+
+  findMenuItem (text) {
+    return this.findMenuItemGroup('Filters')
+      .findWhere(component => (
+        component.name() === 'MenuItem' && component.text().includes(text)
+      ));
+  },
+
+  teardown () {
+    this.wrapper.unmount();
+  }
+});
+
+test('includes each available filter', function () {
+  this.wrapper = mountAndOpenOptions(this.props);
+  const group = this.findMenuItemGroup('Filters');
+  strictEqual(group.find('MenuItem').length, 4)
+});
+
+test('displays filters by name', function () {
+  this.wrapper = mountAndOpenOptions(this.props);
+  const filters = this.findMenuItemGroup('Filters').find('MenuItem');
+  const names = filters.map(filter => filter.text());
+  deepEqual(names, ['Assignment Groups', 'Grading Periods', 'Modules', 'Sections']);
+});
+
+test('includes only available filters', function () {
+  this.props.filterSettings.available = ['gradingPeriods', 'modules'];
+  this.wrapper = mountAndOpenOptions(this.props);
+  const filters = this.findMenuItemGroup('Filters').find('MenuItem');
+  const names = filters.map(filter => filter.text());
+  deepEqual(names, ['Grading Periods', 'Modules']);
+});
+
+test('does not display filters group when no filters are available', function () {
+  this.props.filterSettings.available = [];
+  this.wrapper = mountAndOpenOptions(this.props);
+  const group = this.findMenuItemGroup('Filters');
+  strictEqual(group.length, 0);
+});
+
+test('onSelect is called when a filter is selected', function () {
+  this.props.filterSettings.onSelect = this.stub();
+  this.wrapper = mountAndOpenOptions(this.props);
+  this.findMenuItem('Grading Periods').simulate('click');
+  strictEqual(this.props.filterSettings.onSelect.callCount, 1);
+});
+
+test('onSelect is called with the selected filter', function () {
+  this.props.filterSettings.onSelect = this.stub();
+  this.wrapper = mountAndOpenOptions(this.props);
+  this.findMenuItem('Modules').simulate('click');
+  const [filters] = this.props.filterSettings.onSelect.lastCall.args;
+  deepEqual(filters, ['modules']);
+});
+
+test('onSelect is called with list of selected filters upon any selection change', function () {
+  this.props.filterSettings.selected = ['assignmentGroups', 'sections'];
+  this.props.filterSettings.onSelect = this.stub();
+  this.wrapper = mountAndOpenOptions(this.props);
+  this.findMenuItem('Grading Periods').simulate('click');
+  const [filters] = this.props.filterSettings.onSelect.lastCall.args;
+  deepEqual(filters.sort(), ['assignmentGroups', 'gradingPeriods', 'sections']);
 });
 
 QUnit.module('ViewOptionsMenu - unpublished assignments', {
@@ -106,37 +194,21 @@ QUnit.module('ViewOptionsMenu - unpublished assignments', {
     showUnpublishedAssignments = true,
     onSelectShowUnpublishedAssignments = () => {}
   } = {}) {
+    const props = createExampleProps();
     return mount(
       <ViewOptionsMenu
+        {...props}
         showUnpublishedAssignments={showUnpublishedAssignments}
         onSelectShowUnpublishedAssignments={onSelectShowUnpublishedAssignments}
-        teacherNotes={{
-          disabled: false,
-          onSelect: () => {},
-          selected: false
-        }}
-        columnSortSettings={{
-          criterion: 'due_date',
-          direction: 'ascending',
-          disabled: false,
-          onSortByDefault () {},
-          onSortByNameAscending () {},
-          onSortByNameDescending () {},
-          onSortByDueDateAscending () {},
-          onSortByDueDateDescending () {},
-          onSortByPointsAscending () {},
-          onSortByPointsDescending () {}
-        }}
       />
     );
   },
 
-  getMenuItemGroupAndMenuItem ({ groupIndex, itemIndex } = {}) {
-    return new ReactWrapper([this.wrapper.node.menuContent], this.wrapper.node)
-      .find('MenuItemGroup')
-      .at(groupIndex)
-      .find('MenuItem')
-      .at(itemIndex);
+  getMenuItem () {
+    const optionsMenu = new ReactWrapper(this.wrapper.node.menuContent, this.wrapper.node);
+    return optionsMenu.findWhere(component => (
+      component.name() === 'MenuItem' && component.text().includes('Unpublished Assignments')
+    ));
   },
 
   teardown () {
@@ -149,14 +221,14 @@ QUnit.module('ViewOptionsMenu - unpublished assignments', {
 test('Unpublished Assignments is selected when showUnpublishedAssignments is true', function () {
   this.wrapper = this.mountViewOptionsMenu({ showUnpublishedAssignments: true });
   this.wrapper.find('button').simulate('click');
-  const menuItemProps = this.getMenuItemGroupAndMenuItem({ groupIndex: 1, itemIndex: 1 }).props();
+  const menuItemProps = this.getMenuItem().props();
   strictEqual(menuItemProps.selected, true);
 });
 
 test('Unpublished Assignments is not selected when showUnpublishedAssignments is false', function () {
   this.wrapper = this.mountViewOptionsMenu({ showUnpublishedAssignments: false });
   this.wrapper.find('button').simulate('click');
-  const menuItemProps = this.getMenuItemGroupAndMenuItem({ groupIndex: 1, itemIndex: 1 }).props();
+  const menuItemProps = this.getMenuItem().props();
   strictEqual(menuItemProps.selected, false);
 });
 
@@ -166,13 +238,14 @@ test('onSelectShowUnpublishedAssignment is called when selected', function () {
     onSelectShowUnpublishedAssignments: onSelectShowUnpublishedAssignmentsStub
   });
   this.wrapper.find('button').simulate('click');
-  this.getMenuItemGroupAndMenuItem({ groupIndex: 1, itemIndex: 1 }).simulate('click');
+  this.getMenuItem().simulate('click');
   strictEqual(onSelectShowUnpublishedAssignmentsStub.callCount, 1);
 });
 
 QUnit.module('ViewOptionsMenu - Column Sorting', {
   getProps (criterion = 'due_date', direction = 'ascending', disabled = false) {
     return {
+      ...createExampleProps(),
       columnSortSettings: {
         criterion,
         direction,
@@ -184,13 +257,6 @@ QUnit.module('ViewOptionsMenu - Column Sorting', {
         onSortByDueDateDescending: this.stub(),
         onSortByPointsAscending: this.stub(),
         onSortByPointsDescending: this.stub()
-      },
-      showUnpublishedAssignments: false,
-      onSelectShowUnpublishedAssignments: () => {},
-      teacherNotes: {
-        disabled: false,
-        onSelect: () => {},
-        selected: true
       }
     };
   },
@@ -457,4 +523,3 @@ test('clicking on "Points - Highest to Lowest" triggers onSortByPointsDescending
 
   strictEqual(props.columnSortSettings.onSortByPointsDescending.callCount, 1);
 });
-

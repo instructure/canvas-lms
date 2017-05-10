@@ -128,6 +128,7 @@ define [
         columnId: sortRowsByColumnId # the column controlling the sort
         settingKey: sortRowsBySettingKey # the key describing the sort criteria
         direction: sortRowsByDirection # the direction of the sort
+      selectedViewOptionsFilters: settings.selected_view_options_filters || []
       showEnrollments:
         concluded: false
         inactive: false
@@ -138,9 +139,15 @@ define [
   getInitialContentLoadStates = ->
     {
       assignmentsLoaded: false
+      contextModulesLoaded: false
       studentsLoaded: false
       submissionsLoaded: false
       teacherNotesColumnUpdating: false
+    }
+
+  getInitialCourseContent = () ->
+    {
+      contextModules: []
     }
 
   class Gradebook
@@ -163,6 +170,7 @@ define [
     constructor: (@options) ->
       @gridDisplaySettings = getInitialGridDisplaySettings(@options.settings)
       @contentLoadStates = getInitialContentLoadStates()
+      @courseContent = getInitialCourseContent()
       @students = {}
       @studentViewStudents = {}
       @rows = []
@@ -210,7 +218,7 @@ define [
       dataLoader = DataLoader.loadGradebookData(
         assignmentGroupsURL: @options.assignment_groups_url
         assignmentGroupsParams: assignmentGroupsParams
-
+        contextModulesURL: @options.context_modules_url
         customColumnsURL: @options.custom_columns_url
 
         sectionsURL: @options.sections_url
@@ -258,11 +266,17 @@ define [
       dataLoader.gotStudents.then () =>
         @contentLoadStates.studentsLoaded = true
         @updateColumnHeaders()
+        @updateSectionFilterVisibility()
 
       dataLoader.gotAssignmentGroups.then () =>
         @contentLoadStates.assignmentsLoaded = true
         @renderViewOptionsMenu()
         @updateColumnHeaders()
+
+      dataLoader.gotContextModules.then (contextModules) =>
+        @setContextModules(contextModules)
+        @contentLoadStates.contextModulesLoaded = true
+        @renderViewOptionsMenu()
 
       dataLoader.gotSubmissions.then () =>
         @contentLoadStates.submissionsLoaded = true
@@ -1012,18 +1026,20 @@ define [
       _.map @sections, (section, id) =>
         { name: section.name, id: id, checked: @sectionToShow == id }
 
-    drawSectionSelectButton: () ->
-      @sectionMenu = new SectionMenuView(
-        el: $('.section-button-placeholder'),
-        sections: @sectionList(),
-        showSections: @showSections(),
-        currentSection: @sectionToShow,
-        disabled: true)
-      @sectionMenu.render()
-
-      @studentsLoaded.then =>
-        @sectionMenu.disabled = false
+    updateSectionFilterVisibility: () ->
+      if @showSections() and 'sections' in @gridDisplaySettings.selectedViewOptionsFilters
+        @sectionMenu ||= new SectionMenuView(
+          tagName: 'span'
+          sections: @sectionList()
+          showSections: true
+          currentSection: @sectionToShow
+        )
+        @sectionMenu.disabled = !@contentLoadStates.studentsLoaded
         @sectionMenu.render()
+        @sectionMenu.$el.appendTo('.section-button-placeholder')
+      else if @sectionMenu
+        @sectionMenu.remove()
+        @sectionMenu = null
 
     updateCurrentSection: (section, author) =>
       @sectionToShow = section
@@ -1039,12 +1055,18 @@ define [
       _.map @gradingPeriods, (period) =>
         { title: period.title, id: period.id, checked: @gradingPeriodToShow == period.id }
 
-    drawGradingPeriodSelectButton: () ->
-      @gradingPeriodMenu = new GradingPeriodMenuView(
-        el: $('.multiple-grading-periods-selector-placeholder'),
-        periods: @gradingPeriodList(),
-        currentGradingPeriod: @gradingPeriodToShow)
-      @gradingPeriodMenu.render()
+    updateGradingPeriodFilterVisibility: () ->
+      if @gradingPeriodSet? and 'gradingPeriods' in @gridDisplaySettings.selectedViewOptionsFilters
+        @gradingPeriodMenu ||= new GradingPeriodMenuView(
+          tagName: 'span'
+          periods: @gradingPeriodList(),
+          currentGradingPeriod: @gradingPeriodToShow
+        )
+        @gradingPeriodMenu.render()
+        @gradingPeriodMenu.$el.appendTo('.multiple-grading-periods-selector-placeholder')
+      else if @gradingPeriodMenu?
+        @gradingPeriodMenu.remove()
+        @gradingPeriodMenu = null
 
     updateCurrentGradingPeriod: (period) ->
       UserSettings.contextSet 'gradebook_current_grading_period', period
@@ -1083,8 +1105,7 @@ define [
 
     initHeader: =>
       @renderGradebookMenus()
-      @drawSectionSelectButton() if @sections_enabled
-      @drawGradingPeriodSelectButton() if @gradingPeriodSet?
+      @renderFilters()
 
       $settingsMenu = $('.gradebook_dropdown')
 
@@ -1201,9 +1222,19 @@ define [
       onSortByPointsDescending: =>
         @arrangeColumnsBy({ sortType: 'points', direction: 'descending' }, false)
 
+    getFilterSettingsViewOptionsMenuProps: =>
+      available: @listAvailableViewOptionsFilters()
+      onSelect: (filters) =>
+        @setSelectedViewOptionsFilters(filters)
+        @renderViewOptionsMenu()
+        @renderFilters()
+        @saveSettings()
+      selected: @listSelectedViewOptionsFilters()
+
     getViewOptionsMenuProps: ->
       teacherNotes: @getTeacherNotesViewOptionsMenuProps()
       columnSortSettings: @getColumnSortSettingsViewOptionsMenuProps()
+      filterSettings: @getFilterSettingsViewOptionsMenuProps()
       showUnpublishedAssignments: @showUnpublishedAssignments
       onSelectShowUnpublishedAssignments: @toggleUnpublishedAssignments
 
@@ -1248,6 +1279,10 @@ define [
       mountPoint = document.querySelector("[data-component='ActionMenu']")
       props = @getActionMenuProps()
       renderComponent(ActionMenu, mountPoint, props)
+
+    renderFilters: =>
+      @updateSectionFilterVisibility()
+      @updateGradingPeriodFilterVisibility()
 
     checkForUploadComplete: () ->
       if UserSettings.contextGet('gradebookUploadComplete')
@@ -1527,6 +1562,7 @@ define [
       $.ajaxJSON(url, 'POST', {column_id: id, column_size: newWidth})
 
     saveSettings: ({
+      selectedViewOptionsFilters = @listSelectedViewOptionsFilters(),
       showConcludedEnrollments = @getEnrollmentFilters().concluded,
       showInactiveEnrollments = @getEnrollmentFilters().inactive,
       showUnpublishedAssignments = @showUnpublishedAssignments,
@@ -1534,8 +1570,10 @@ define [
       studentColumnSecondaryInfo = @getSelectedSecondaryInfo(),
       sortRowsBy = @getSortRowsBySetting()
     } = {}, successFn, errorFn) =>
+      selectedViewOptionsFilters.push('') unless selectedViewOptionsFilters.length > 0
       data =
         gradebook_settings:
+          selected_view_options_filters: selectedViewOptionsFilters
           show_concluded_enrollments: showConcludedEnrollments
           show_inactive_enrollments: showInactiveEnrollments
           show_unpublished_assignments: showUnpublishedAssignments
@@ -2179,6 +2217,20 @@ define [
     getSortRowsBySetting: =>
       @gridDisplaySettings.sortRowsBy
 
+    listAvailableViewOptionsFilters: =>
+      filters = []
+      filters.push('assignmentGroups') if Object.keys(@assignmentGroups || {}).length > 1
+      filters.push('gradingPeriods') if @gradingPeriodSet?
+      filters.push('modules') if @listContextModules().length > 0
+      filters.push('sections') if @sections_enabled
+      filters
+
+    setSelectedViewOptionsFilters: (filters) =>
+      @gridDisplaySettings.selectedViewOptionsFilters = filters
+
+    listSelectedViewOptionsFilters: =>
+      @gridDisplaySettings.selectedViewOptionsFilters
+
     toggleEnrollmentFilter: (enrollmentFilter, skipApply) =>
       @getEnrollmentFilters()[enrollmentFilter] = !@getEnrollmentFilters()[enrollmentFilter]
       @applyEnrollmentFilter() unless skipApply
@@ -2211,6 +2263,12 @@ define [
 
     getAssignmentGroup: (assignmentGroupId) =>
       @assignmentGroups[assignmentGroupId]
+
+    setContextModules: (contextModules) =>
+      @courseContent.contextModules = contextModules
+
+    listContextModules: =>
+      @courseContent.contextModules
 
     ## Gradebook Content Api Methods
 

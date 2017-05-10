@@ -483,10 +483,19 @@ describe GradebooksController do
   end
 
   describe "GET 'show'" do
+    context "as an admin" do
+      it "renders successfully" do
+        account_admin_user(account: @course.root_account)
+        user_session(@admin)
+        get "show", :course_id => @course.id
+        expect(response).to render_template("gradebook")
+      end
+    end
+
     describe "csv" do
       before :once do
-        assignment1 = @course.assignments.create(:title => "Assignment 1")
-        assignment2 = @course.assignments.create(:title => "Assignment 2")
+        @course.assignments.create(:title => "Assignment 1")
+        @course.assignments.create(:title => "Assignment 2")
       end
 
       before :each do
@@ -575,6 +584,10 @@ describe GradebooksController do
         expected_value = new_course_gradebook_upload_path(@course)
 
         expect(actual_value).to eq(expected_value)
+      end
+
+      it "includes the context_modules_url in the ENV" do
+        expect(@gradebook_env[:context_modules_url]).to eq(api_v1_course_context_modules_url(@course))
       end
     end
 

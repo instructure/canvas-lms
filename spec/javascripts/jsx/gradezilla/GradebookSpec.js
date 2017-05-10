@@ -124,6 +124,70 @@ test('when zero sections are loaded and there is secondary info configured, do n
   strictEqual(gradebook.getSelectedSecondaryInfo(), 'login_id');
 });
 
+test('initializes content load state for context modules to false', function () {
+  const gradebook = createGradebook();
+  strictEqual(gradebook.contentLoadStates.contextModulesLoaded, false);
+});
+
+QUnit.module('Gradebook - initial content load', {
+  setup () {
+    this.loaderPromises = {
+      gotAssignmentGroups: $.Deferred(),
+      gotContextModules: $.Deferred(),
+      gotCustomColumns: $.Deferred(),
+      gotStudents: $.Deferred(),
+      gotSubmissions: $.Deferred(),
+      gotCustomColumnData: $.Deferred(),
+      gotEffectiveDueDates: $.Deferred()
+    };
+    this.stub(DataLoader, 'loadGradebookData').returns(this.loaderPromises);
+  }
+});
+
+test('uses the DataLoader', function () {
+  createGradebook();
+  strictEqual(DataLoader.loadGradebookData.callCount, 1);
+});
+
+test('loads context modules', function () {
+  createGradebook({ context_modules_url: '/context-modules' });
+  const [options] = DataLoader.loadGradebookData.lastCall.args;
+  equal(options.contextModulesURL, '/context-modules');
+});
+
+test('stores context modules when loaded', function () {
+  const contextModules = [{ id: '2601' }, { id: '2602' }];
+  const gradebook = createGradebook({ context_modules_url: '/context-modules' });
+  this.stub(gradebook, 'renderViewOptionsMenu');
+  this.loaderPromises.gotContextModules.resolve(contextModules);
+  equal(gradebook.listContextModules(), contextModules);
+});
+
+test('sets context modules as loaded', function () {
+  const contextModules = [{ id: '2601' }, { id: '2602' }];
+  const gradebook = createGradebook({ context_modules_url: '/context-modules' });
+  this.stub(gradebook, 'renderViewOptionsMenu');
+  this.loaderPromises.gotContextModules.resolve(contextModules);
+  strictEqual(gradebook.contentLoadStates.contextModulesLoaded, true);
+});
+
+test('re-renders the view options menu after storing the loaded context modules', function () {
+  const contextModules = [{ id: '2601' }, { id: '2602' }];
+  const gradebook = createGradebook({ context_modules_url: '/context-modules' });
+  this.stub(gradebook, 'renderViewOptionsMenu').callsFake(() => {
+    equal(gradebook.listContextModules(), contextModules);
+  });
+  this.loaderPromises.gotContextModules.resolve(contextModules);
+});
+
+test('updates section filter visibility after loading students', function () {
+  const students = [{ id: '1101' }, { id: '1102' }];
+  const gradebook = createGradebook();
+  this.stub(gradebook, 'updateSectionFilterVisibility');
+  this.loaderPromises.gotStudents.resolve(students);
+  strictEqual(gradebook.updateSectionFilterVisibility.callCount, 1);
+});
+
 QUnit.module('Gradebook#calculateStudentGrade', {
   setupThis (options = {}) {
     const assignments = [
@@ -1562,6 +1626,93 @@ test('sets onSortByPointsAscending to a function that sorts columns by points de
   deepEqual(this.gradebook.arrangeColumnsBy.firstCall.args, this.expectedArgs('points', 'descending'));
 });
 
+QUnit.module('Gradebook#getFilterSettingsViewOptionsMenuProps', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.gradebook.setAssignmentGroups({
+      301: { name: 'Assignments', group_weight: 40 },
+      302: { name: 'Homework', group_weight: 60 }
+    });
+    this.gradebook.gradingPeriodSet = { id: '1501' };
+    this.gradebook.setContextModules([{ id: '2601' }, { id: '2602' }]);
+    this.gradebook.sections_enabled = true;
+    this.stub(this.gradebook, 'renderViewOptionsMenu');
+    this.stub(this.gradebook, 'renderFilters');
+    this.stub(this.gradebook, 'saveSettings');
+  }
+});
+
+test('includes available filters', function () {
+  const props = this.gradebook.getFilterSettingsViewOptionsMenuProps();
+  deepEqual(props.available, ['assignmentGroups', 'gradingPeriods', 'modules', 'sections']);
+});
+
+test('available filters exclude assignment groups when only one exists', function () {
+  this.gradebook.setAssignmentGroups({ 301: { name: 'Assignments' } });
+  const props = this.gradebook.getFilterSettingsViewOptionsMenuProps();
+  deepEqual(props.available, ['gradingPeriods', 'modules', 'sections']);
+});
+
+test('available filters exclude assignment groups when not loaded', function () {
+  this.gradebook.setAssignmentGroups(undefined);
+  const props = this.gradebook.getFilterSettingsViewOptionsMenuProps();
+  deepEqual(props.available, ['gradingPeriods', 'modules', 'sections']);
+});
+
+test('available filters exclude grading periods when no grading period set exists', function () {
+  this.gradebook.gradingPeriodSet = null;
+  const props = this.gradebook.getFilterSettingsViewOptionsMenuProps();
+  deepEqual(props.available, ['assignmentGroups', 'modules', 'sections']);
+});
+
+test('available filters exclude modules when none exist', function () {
+  this.gradebook.setContextModules([]);
+  const props = this.gradebook.getFilterSettingsViewOptionsMenuProps();
+  deepEqual(props.available, ['assignmentGroups', 'gradingPeriods', 'sections']);
+});
+
+test('available filters exclude sections when only one exists', function () {
+  this.gradebook.sections_enabled = false;
+  const props = this.gradebook.getFilterSettingsViewOptionsMenuProps();
+  deepEqual(props.available, ['assignmentGroups', 'gradingPeriods', 'modules']);
+});
+
+test('includes selected filters', function () {
+  this.gradebook.setSelectedViewOptionsFilters(['gradingPeriods', 'modules']);
+  const props = this.gradebook.getFilterSettingsViewOptionsMenuProps();
+  deepEqual(props.selected, ['gradingPeriods', 'modules']);
+});
+
+test('onSelect sets the selected filters', function () {
+  const props = this.gradebook.getFilterSettingsViewOptionsMenuProps();
+  props.onSelect(['gradingPeriods', 'sections']);
+  deepEqual(this.gradebook.listSelectedViewOptionsFilters(), ['gradingPeriods', 'sections']);
+});
+
+test('onSelect renders the view options menu after setting the selected filters', function () {
+  const props = this.gradebook.getFilterSettingsViewOptionsMenuProps();
+  this.gradebook.renderViewOptionsMenu.callsFake(() => {
+    strictEqual(this.gradebook.listSelectedViewOptionsFilters().length, 2, 'filters were updated');
+  });
+  props.onSelect(['gradingPeriods', 'sections']);
+});
+
+test('onSelect renders the filters after setting the selected filters', function () {
+  const props = this.gradebook.getFilterSettingsViewOptionsMenuProps();
+  this.gradebook.renderFilters.callsFake(() => {
+    strictEqual(this.gradebook.listSelectedViewOptionsFilters().length, 2, 'filters were updated');
+  });
+  props.onSelect(['gradingPeriods', 'sections']);
+});
+
+test('onSelect saves settings after setting the selected filters', function () {
+  const props = this.gradebook.getFilterSettingsViewOptionsMenuProps();
+  this.gradebook.saveSettings.callsFake(() => {
+    strictEqual(this.gradebook.listSelectedViewOptionsFilters().length, 2, 'filters were updated');
+  });
+  props.onSelect(['gradingPeriods', 'sections']);
+});
+
 QUnit.module('Gradebook#getViewOptionsMenuProps', {
   setup () {
     this.gradebook = createGradebook();
@@ -1580,6 +1731,13 @@ test('includes teacher notes properties', function () {
 
 test('includes column sort properties', function () {
   strictEqual(this.props.columnSortSettings, this.columnSortSettingProps);
+});
+
+test('includes filter settings', function () {
+  ok('filterSettings' in this.props, 'props include filter settings');
+  ok(Array.isArray(this.props.filterSettings.available), '"available" is an array');
+  equal(typeof this.props.filterSettings.onSelect, 'function', '"onSelect" is a function');
+  ok(Array.isArray(this.props.filterSettings.selected), '"selected" is an array');
 });
 
 QUnit.module('Gradebook#createTeacherNotes', {
@@ -1853,6 +2011,156 @@ test('re-renders the view options menu after request rejects', function () {
   this.promise.catchFn(new Error('FAIL'));
   equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false);
 });
+
+QUnit.module('Gradebook#updateSectionFilterVisibility', {
+  setup () {
+    $fixtures.innerHTML = '<div class="section-button-placeholder"></div>';
+    this.container = $fixtures.querySelector('.section-button-placeholder');
+    const sections = [{ id: '2001', name: 'Freshmen' }, { id: '2002', name: 'Sophomores' }];
+    this.gradebook = createGradebook({ sections });
+    this.gradebook.sections_enabled = true;
+    this.gradebook.setSelectedViewOptionsFilters(['sections']);
+  },
+
+  teardown () {
+    $fixtures.innerHTML = '';
+  }
+});
+
+test('renders the section select when not already rendered', function () {
+  this.gradebook.updateSectionFilterVisibility();
+  ok(this.gradebook.sectionMenu, 'section menu reference has been stored');
+  ok(this.gradebook.sectionMenu.$el.parent().is(this.container), 'element was rendered into the container');
+});
+
+test('does not render when only one section exists', function () {
+  this.gradebook.sections_enabled = false;
+  this.gradebook.updateSectionFilterVisibility();
+  notOk(this.gradebook.sectionMenu, 'section menu reference has not been stored');
+  strictEqual(this.container.children.length, 0, 'nothing was rendered');
+});
+
+test('does not render when filter is not selected', function () {
+  this.gradebook.setSelectedViewOptionsFilters(['assignmentGroups']);
+  this.gradebook.updateSectionFilterVisibility();
+  notOk(this.gradebook.sectionMenu, 'section menu reference has been removed');
+  strictEqual(this.container.children.length, 0, 'rendered elements have been removed');
+});
+
+test('renders the section select with a list of sections', function () {
+  this.gradebook.updateSectionFilterVisibility();
+  const { sections } = this.gradebook.sectionMenu;
+  strictEqual(sections.length, 3, 'includes the "nothing selected" option plus the two sections');
+  deepEqual(sections.slice(1).map(section => section.id), ['2001', '2002']);
+});
+
+test('sets the section select to show sections', function () {
+  this.gradebook.updateSectionFilterVisibility();
+  strictEqual(this.gradebook.sectionMenu.showSections, true);
+});
+
+test('sets the section select to show the defined sectionToShow', function () {
+  this.gradebook.sectionToShow = '2002';
+  this.gradebook.updateSectionFilterVisibility();
+  strictEqual(this.gradebook.sectionMenu.currentSection, '2002');
+});
+
+test('sets the section select as disabled when students are not loaded', function () {
+  this.gradebook.updateSectionFilterVisibility();
+  strictEqual(this.gradebook.sectionMenu.disabled, true);
+});
+
+test('sets the section select as not disabled when students are loaded', function () {
+  this.gradebook.contentLoadStates.studentsLoaded = true;
+  this.gradebook.updateSectionFilterVisibility();
+  strictEqual(this.gradebook.sectionMenu.disabled, false);
+});
+
+test('updates the disabled state of the rendered section select', function () {
+  this.gradebook.updateSectionFilterVisibility();
+  this.gradebook.contentLoadStates.studentsLoaded = true;
+  this.gradebook.updateSectionFilterVisibility();
+  strictEqual(this.gradebook.sectionMenu.disabled, false);
+});
+
+test('renders only one section select when updated', function () {
+  this.gradebook.updateSectionFilterVisibility();
+  this.gradebook.updateSectionFilterVisibility();
+  ok(this.gradebook.sectionMenu, 'section menu reference has been stored');
+  strictEqual(this.container.children.length, 1, 'only one section select is rendered');
+});
+
+test('removes the section select when filter is deselected', function () {
+  this.gradebook.setSelectedViewOptionsFilters(['assignmentGroups']);
+  this.gradebook.updateSectionFilterVisibility();
+  notOk(this.gradebook.sectionMenu, 'section menu reference has been stored');
+  strictEqual(this.container.children.length, 0, 'nothing was rendered');
+});
+
+
+QUnit.module('Gradebook#updateGradingPeriodFilterVisibility', {
+  setup () {
+    $fixtures.innerHTML = '<div class="multiple-grading-periods-selector-placeholder"></div>';
+    this.container = $fixtures.querySelector('.multiple-grading-periods-selector-placeholder');
+    this.gradebook = createGradebook({
+      active_grading_periods: [{ id: '701' }, { id: '702' }],
+      grading_period_set: { id: '1501' }
+    });
+    this.gradebook.setSelectedViewOptionsFilters(['gradingPeriods']);
+  },
+
+  teardown () {
+    $fixtures.innerHTML = '';
+  }
+});
+
+test('renders the grading period select when not already rendered', function () {
+  this.gradebook.updateGradingPeriodFilterVisibility();
+  ok(this.gradebook.gradingPeriodMenu, 'grading period menu reference has been stored');
+  ok(this.gradebook.gradingPeriodMenu.$el.parent().is(this.container), 'element was rendered into the container');
+});
+
+test('does not render when a grading period set does not exist', function () {
+  this.gradebook.gradingPeriodSet = null;
+  this.gradebook.updateGradingPeriodFilterVisibility();
+  notOk(this.gradebook.gradingPeriodMenu, 'grading period menu reference has not been stored');
+  strictEqual(this.container.children.length, 0, 'nothing was rendered');
+});
+
+test('does not render when filter is not selected', function () {
+  this.gradebook.setSelectedViewOptionsFilters(['assignmentGroups']);
+  this.gradebook.updateGradingPeriodFilterVisibility();
+  notOk(this.gradebook.gradingPeriodMenu, 'grading period menu reference has been removed');
+  strictEqual(this.container.children.length, 0, 'rendered elements have been removed');
+});
+
+test('renders the grading period select with a list of grading periods', function () {
+  this.gradebook.updateGradingPeriodFilterVisibility();
+  const { periods } = this.gradebook.gradingPeriodMenu;
+  strictEqual(periods.length, 3, 'includes the "nothing selected" option plus the two grading periods');
+  deepEqual(periods.slice(1).map(gradingPeriod => gradingPeriod.id), ['701', '702']);
+});
+
+test('sets the grading period select to show the defined gradingPeriodToShow', function () {
+  this.gradebook.gradingPeriodToShow = '702';
+  this.gradebook.updateGradingPeriodFilterVisibility();
+  strictEqual(this.gradebook.gradingPeriodMenu.currentGradingPeriod, '702');
+});
+
+test('renders only one grading period select when updated', function () {
+  this.gradebook.updateGradingPeriodFilterVisibility();
+  this.gradebook.updateGradingPeriodFilterVisibility();
+  ok(this.gradebook.gradingPeriodMenu, 'grading period menu reference has been stored');
+  strictEqual(this.container.children.length, 1, 'only one grading period select is rendered');
+});
+
+test('removes the grading period select when filter is deselected', function () {
+  this.gradebook.setSelectedViewOptionsFilters(['assignmentGroups']);
+  this.gradebook.updateGradingPeriodFilterVisibility();
+  notOk(this.gradebook.gradingPeriodMenu, 'grading period menu reference has been stored');
+  strictEqual(this.container.children.length, 0, 'nothing was rendered');
+});
+
 
 QUnit.module('Menus', {
   setup () {
@@ -4152,6 +4460,7 @@ test('calls ajaxJSON as a PUT request', function () {
 
 test('calls ajaxJSON with default gradebook_settings', function () {
   const expectedSettings = {
+    selected_view_options_filters: ['assignmentGroups'],
     show_concluded_enrollments: true,
     show_inactive_enrollments: true,
     show_unpublished_assignments: true,
@@ -4163,6 +4472,7 @@ test('calls ajaxJSON with default gradebook_settings', function () {
   };
   const gradebook = createGradebook({
     settings: {
+      selected_view_options_filters: ['assignmentGroups'],
       show_concluded_enrollments: 'true',
       show_inactive_enrollments: 'true',
       show_unpublished_assignments: 'true',
@@ -4178,6 +4488,28 @@ test('calls ajaxJSON with default gradebook_settings', function () {
   deepEqual(ajaxJSONStub.firstCall.args[2], { gradebook_settings: { ...expectedSettings }});
 });
 
+test('ensures selected_view_options_filters is not empty in order to force the stored value to change', function () {
+  // an empty array will be excluded from the request, which is ignored in the
+  // update, which means the previous setting remains persisted
+  const gradebook = createGradebook({
+    settings: {
+      selected_view_options_filters: [],
+      show_concluded_enrollments: 'true',
+      show_inactive_enrollments: 'true',
+      show_unpublished_assignments: 'true',
+      sort_rows_by_column_id: 'student',
+      sort_rows_by_direction: 'ascending',
+      sort_rows_by_setting_key: 'sortable_name',
+      student_column_display_as: 'first_last',
+      student_column_secondary_info: 'none',
+    }
+  });
+  const ajaxJSONStub = this.stub($, 'ajaxJSON');
+  gradebook.saveSettings();
+  const settings = ajaxJSONStub.firstCall.args[2];
+  deepEqual(settings.gradebook_settings.selected_view_options_filters, ['']);
+});
+
 test('calls ajaxJSON with parameters', function () {
   const gradebook = createGradebook({
     settings: {
@@ -4188,6 +4520,7 @@ test('calls ajaxJSON with parameters', function () {
   });
   const ajaxJSONStub = this.stub($, 'ajaxJSON');
   gradebook.saveSettings({
+    selected_view_options_filters: [],
     showConcludedEnrollments: false,
     showInactiveEnrollments: false,
     showUnpublishedAssignments: false,
@@ -4202,6 +4535,7 @@ test('calls ajaxJSON with parameters', function () {
 
   deepEqual(ajaxJSONStub.firstCall.args[2], {
     gradebook_settings: {
+      selected_view_options_filters: [''],
       show_concluded_enrollments: false,
       show_inactive_enrollments: false,
       show_unpublished_assignments: false,
@@ -4227,6 +4561,7 @@ test('calls successFn when response is successful', function () {
     getEnrollmentFilters () { return {}; },
     getSelectedPrimaryInfo () { return 'first_last'; },
     getSelectedSecondaryInfo () { return 'none'; },
+    listSelectedViewOptionsFilters () { return [] },
     getSortRowsBySetting () {
       return {
         sort_rows_by_column_id: 'student',
@@ -4253,6 +4588,7 @@ test('calls errorFn when response is not successful', function () {
     getEnrollmentFilters () { return {}; },
     getSelectedPrimaryInfo () { return 'first_last'; },
     getSelectedSecondaryInfo () { return 'none'; },
+    listSelectedViewOptionsFilters () { return [] },
     getSortRowsBySetting () {
       return {
         sort_rows_by_column_id: 'student',

@@ -17,14 +17,17 @@
 
 require_relative '../helpers/gradezilla_common'
 require_relative '../grades/page_objects/gradezilla_page'
+require_relative '../grades/setup/gradebook_setup'
 
 describe "outcome gradezilla" do
   include_context "in-process server selenium tests"
   include GradezillaCommon
+  include GradebookSetup
 
   context "as a teacher" do
     before(:once) do
       gradebook_data_setup
+      show_sections_filter(@teacher)
     end
 
     before(:each) do

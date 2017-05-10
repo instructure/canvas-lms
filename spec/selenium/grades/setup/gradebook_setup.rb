@@ -69,19 +69,19 @@ module GradebookSetup
     }
   end
 
-  def update_teacher_course_preferences(preferences)
-    @teacher.update preferences: {
+  def update_display_preferences(concluded, inactive)
+    update_course_preferences(@teacher, {
+      'show_concluded_enrollments' => concluded.to_s,
+      'show_inactive_enrollments' => inactive.to_s
+    })
+  end
+
+  def update_course_preferences(user, preferences)
+    user.update preferences: {
       gradebook_settings: {
         @course.id => preferences
       }
     }
-  end
-
-  def update_display_preferences(concluded, inactive)
-    update_teacher_course_preferences({
-      'show_concluded_enrollments' => concluded.to_s,
-      'show_inactive_enrollments' => inactive.to_s
-    })
   end
 
   def display_concluded_enrollments
@@ -90,5 +90,23 @@ module GradebookSetup
 
   def display_inactive_enrollments
     update_display_preferences(false, true)
+  end
+
+  def show_grading_periods_filter(user)
+    set_filter_visibility(user, 'gradingPeriods', true)
+  end
+
+  def show_sections_filter(user)
+    set_filter_visibility(user, 'sections', true)
+  end
+
+  def set_filter_visibility(user, filter, visible)
+    filters = user.preferences.dig(:gradebook_settings, @course.id, :selected_view_options_filters) || []
+    if visible && !filters.include?(filter)
+      filters << filter
+    elsif !visible && filters.include?(filter)
+      filters.delete(filter)
+    end
+    update_course_preferences(user, selected_view_options_filters: filters)
   end
 end

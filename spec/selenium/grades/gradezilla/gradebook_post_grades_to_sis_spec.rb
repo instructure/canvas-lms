@@ -17,14 +17,17 @@
 
 require_relative '../../helpers/gradezilla_common'
 require_relative '../page_objects/gradezilla_page'
+require_relative '../setup/gradebook_setup'
 
 describe "Gradezilla - post grades to SIS" do
   include GradezillaCommon
+  include GradebookSetup
   include_context "in-process server selenium tests"
 
   before(:once) do
     gradebook_data_setup
     create_sis_assignment
+    show_sections_filter(@teacher)
   end
 
   before(:each) do

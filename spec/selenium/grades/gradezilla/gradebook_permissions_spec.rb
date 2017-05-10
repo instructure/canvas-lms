@@ -26,32 +26,8 @@ describe "Gradezilla - permissions" do
 
     let(:course) { Course.create! }
 
-    it "should display for users with only :view_all_grades permissions" do
-      user_logged_in
-
-      role = custom_account_role('CustomAdmin', :account => Account.default)
-      RoleOverride.create!(:role => role,
-                           :permission => 'view_all_grades',
-                           :context => Account.default,
-                           :enabled => true)
-      AccountUser.create!(:user => @user,
-                          :account => Account.default,
-                          :role => role)
-
-      Gradezilla.visit(course)
-      expect_no_flash_message :error
-    end
-
-    it "should display for users with only :manage_grades permissions" do
-      user_logged_in
-      role = custom_account_role('CustomAdmin', :account => Account.default)
-      RoleOverride.create!(:role => role,
-                           :permission => 'manage_grades',
-                           :context => Account.default,
-                           :enabled => true)
-      AccountUser.create!(:user => @user,
-                          :account => Account.default,
-                          :role => role)
+    it "should display for admins" do
+      admin_logged_in
 
       Gradezilla.visit(course)
       expect_no_flash_message :error

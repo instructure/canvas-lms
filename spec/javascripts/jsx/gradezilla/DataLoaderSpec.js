@@ -23,6 +23,7 @@ define(['jsx/gradezilla/DataLoader', 'underscore'], (DataLoader, _) => {
     let XHRS, XHR_HANDLERS, handlerIndex;
 
     const ASSIGNMENT_GROUPS = [{id: 1}, {id: 4}];
+    const CONTEXT_MODULES = [{id: 1}, {id: 3}];
     const STUDENTS_PAGE_1 = [{id: 2}, {id: 5}];
     const STUDENTS_PAGE_2 = [{id: 3}, {id: 7}];
     const SUBMISSIONS_CHUNK_1 = [{id: 99}];
@@ -60,6 +61,7 @@ define(['jsx/gradezilla/DataLoader', 'underscore'], (DataLoader, _) => {
       const defaults = {
         assignmentGroupsURL: "/ags",
         assignmentGroupsParams: {ag_params: "ok"},
+        contextModulesURL: '/context-modules',
         customColumnsURL: "/customcols",
         studentsURL: "/students",
         studentsPageCb: () => {},
@@ -103,6 +105,26 @@ define(['jsx/gradezilla/DataLoader', 'underscore'], (DataLoader, _) => {
         resolved();
       });
     });
+
+
+    QUnit.module('Context Modules');
+
+    test('resolves promise with data when all modules are loaded', (assert) => {
+      XHR_HANDLERS = [
+        () => {
+          respondToXhr('/context-modules', 200, {Link: ''}, CONTEXT_MODULES);
+        },
+      ];
+
+      const dataLoader = callLoadGradebookData();
+      const resolved = assert.async();
+
+      dataLoader.gotContextModules.then((modules) => {
+        deepEqual(modules, CONTEXT_MODULES);
+        resolved();
+      });
+    });
+
 
     QUnit.module("Students and Submissions");
 

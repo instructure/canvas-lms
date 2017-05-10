@@ -17,15 +17,14 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types'
+import { arrayOf, bool, func, shape, string } from 'prop-types'
 import IconMiniArrowDownSolid from 'instructure-icons/lib/Solid/IconMiniArrowDownSolid'
 import Button from 'instructure-ui/lib/components/Button';
 import { MenuItem, MenuItemGroup, MenuItemSeparator } from 'instructure-ui/lib/components/Menu';
 import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu';
 import Typography from 'instructure-ui/lib/components/Typography';
 import I18n from 'i18n!gradebook';
-
-const { bool, func, shape, string } = PropTypes;
+import { filterLabels } from 'jsx/gradezilla/default_gradebook/constants/ViewOptions';
 
 function renderTriggerButton () {
   return (
@@ -51,18 +50,27 @@ class ViewOptionsMenu extends React.Component {
       onSortByPointsAscending: func.isRequired,
       onSortByPointsDescending: func.isRequired
     }).isRequired,
+    filterSettings: shape({
+      available: arrayOf(string).isRequired,
+      onSelect: func.isRequired,
+      selected: arrayOf(string).isRequired
+    }),
     teacherNotes: shape({
       disabled: bool.isRequired,
       onSelect: func.isRequired,
       selected: bool.isRequired
     }).isRequired,
-    showUnpublishedAssignments: PropTypes.bool.isRequired,
-    onSelectShowUnpublishedAssignments: PropTypes.func.isRequired
+    showUnpublishedAssignments: bool.isRequired,
+    onSelectShowUnpublishedAssignments: func.isRequired
   };
 
   constructor (props) {
     super(props);
+
     this.bindMenuContent = (ref) => { this.menuContent = ref };
+    this.onFilterSelect = (_event, filters) => {
+      this.props.filterSettings.onSelect(filters);
+    };
   }
 
   areColumnsOrderedBy (criterion, direction) {
@@ -141,6 +149,26 @@ class ViewOptionsMenu extends React.Component {
         </MenuItemGroup>
 
         <MenuItemSeparator />
+
+        {
+          this.props.filterSettings.available.length > 0 &&
+          <MenuItemGroup
+            allowMultiple
+            label={I18n.t('Filters')}
+            onSelect={this.onFilterSelect}
+            selected={this.props.filterSettings.selected}
+          >
+            {
+              this.props.filterSettings.available.map(filterKey => (
+                <MenuItem key={filterKey} value={filterKey}>
+                  { filterLabels[filterKey] }
+                </MenuItem>
+              ))
+            }
+          </MenuItemGroup>
+        }
+
+        { this.props.filterSettings.available.length > 0 && <MenuItemSeparator /> }
 
         <MenuItemGroup allowMultiple label={I18n.t('Columns')}>
           <MenuItem

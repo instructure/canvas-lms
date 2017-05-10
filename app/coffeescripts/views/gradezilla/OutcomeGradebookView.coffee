@@ -24,11 +24,10 @@ define [
   'vendor/slickgrid'
   'compiled/gradezilla/OutcomeGradebookGrid'
   'compiled/views/gradezilla/CheckboxView'
-  'compiled/views/gradezilla/SectionMenuView'
   'jst/gradezilla/outcome_gradebook'
   'vendor/jquery.ba-tinypubsub'
   'jquery.instructure_misc_plugins'
-], (I18n, $, _, {View}, Slick, Grid, CheckboxView, SectionMenuView, template, cellTemplate) ->
+], (I18n, $, _, {View}, Slick, Grid, CheckboxView, template, cellTemplate) ->
 
   Dictionary =
     exceedsMastery:
@@ -146,7 +145,6 @@ define [
     render: ->
       $.when(@gradebook.hasSections)
         .then(=> super)
-        .then(@_drawSectionMenu)
       $.when(@hasOutcomes).then(@renderGrid)
       this
 
@@ -160,7 +158,7 @@ define [
       Grid.Util.saveStudents(response.linked.users)
       Grid.Util.saveOutcomePaths(response.linked.outcome_paths)
       Grid.Util.saveSections(@gradebook.sections) # might want to put these into the api results at some point
-      [columns, rows] = Grid.Util.toGrid(response, column: { formatter: Grid.View.cell }, row: { section: @menu.currentSection })
+      [columns, rows] = Grid.Util.toGrid(response, column: { formatter: Grid.View.cell }, row: { section: @gradebook.sectionToShow })
       @grid = new Slick.Grid(
         '.outcome-gradebook-wrapper',
         rows,
@@ -223,18 +221,6 @@ define [
       }
       response.rollups = a.rollups.concat(b.rollups)
       response
-
-    # Internal: Initialize the child SectionMenuView. This happens here because
-    #   the menu needs to wait for relevant course sections to load.
-    #
-    # Returns nothing.
-    _drawSectionMenu: =>
-      @menu = new SectionMenuView(
-        sections: @gradebook.sectionList()
-        currentSection: @gradebook.sectionToShow
-        el: $('.section-button-placeholder'),
-      )
-      @menu.render()
 
     # Internal: Create an event listener function used to filter SlickGrid results.
     #

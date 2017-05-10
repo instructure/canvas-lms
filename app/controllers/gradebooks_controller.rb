@@ -317,6 +317,7 @@ class GradebooksController < ApplicationController
         override_assignment_dates: "false",
         exclude_assignment_submission_types: ['wiki_page']
       ),
+      context_modules_url: api_v1_course_context_modules_url(@context),
       sections_url: api_v1_course_sections_url(@context),
       course_url: api_v1_course_url(@context),
       effective_due_dates_url: api_v1_course_effective_due_dates_url(@context),

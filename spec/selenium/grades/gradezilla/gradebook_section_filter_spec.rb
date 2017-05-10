@@ -18,13 +18,19 @@
 require_relative '../../helpers/gradezilla_common'
 require_relative '../../helpers/groups_common'
 require_relative '../page_objects/gradezilla_page'
+require_relative '../setup/gradebook_setup'
 
 describe "Gradezilla" do
   include_context "in-process server selenium tests"
   include GradezillaCommon
+  include GradebookSetup
   include GroupsCommon
 
-  before(:once) { gradebook_data_setup }
+  before(:once) do
+    gradebook_data_setup
+    show_sections_filter(@teacher)
+  end
+
   before(:each) { user_session(@teacher) }
 
   it "should handle multiple enrollments correctly" do
