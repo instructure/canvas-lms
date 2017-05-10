@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import customTypes from './PropTypes'
 import I18n from 'i18n!theme_editor'
 
@@ -32,9 +33,9 @@ export default React.createClass({
     propTypes: {
       varDef: customTypes.image,
       userInput: customTypes.userVariableInput,
-      onChange: React.PropTypes.func.isRequired,
-      currentValue: React.PropTypes.string,
-      placeholder: React.PropTypes.string
+      onChange: PropTypes.func.isRequired,
+      currentValue: PropTypes.string,
+      placeholder: PropTypes.string
     },
 
     getDefaultProps(){

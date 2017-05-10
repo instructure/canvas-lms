@@ -17,12 +17,13 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!student_context_tray'
 import InstUIMetricsList, { MetricsListItem } from 'instructure-ui/lib/components/MetricsList'
   class MetricsList extends React.Component {
     static propTypes = {
-      analytics: React.PropTypes.object,
-      user: React.PropTypes.object
+      analytics: PropTypes.object,
+      user: PropTypes.object
     }
 
     static defaultProps = {

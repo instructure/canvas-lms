@@ -20,6 +20,7 @@ import $ from 'jquery'
 import _ from 'underscore'
 import I18n from 'i18n!external_tools'
 import React from 'react'
+import PropTypes from 'prop-types'
 import Modal from 'react-modal'
 import store from 'jsx/external_apps/lib/ExternalAppsStore'
 import ConfigurationForm from 'jsx/external_apps/components/ConfigurationForm'
@@ -46,8 +47,8 @@ export default React.createClass({
     displayName: 'EditExternalToolButton',
 
     propTypes: {
-      tool: React.PropTypes.object.isRequired,
-      canAddEdit: React.PropTypes.bool.isRequired
+      tool: PropTypes.object.isRequired,
+      canAddEdit: PropTypes.bool.isRequired
     },
 
     getInitialState() {

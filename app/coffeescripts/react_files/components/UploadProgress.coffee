@@ -18,20 +18,21 @@
 define [
   'i18n!react_files'
   'react'
+  'prop-types'
   'jquery'
   'compiled/jquery.rails_flash_notifications'
-], (I18n, React, $) ->
+], (I18n, React, PropTypes, $) ->
 
 
   UploadProgress =
     displayName: 'UploadProgress'
 
     propTypes:
-      uploader: React.PropTypes.shape({
-        getFileName: React.PropTypes.func.isRequired
-        roundProgress: React.PropTypes.func.isRequired
-        cancel: React.PropTypes.func.isRequired
-        file: React.PropTypes.instanceOf(File).isRequired
+      uploader: PropTypes.shape({
+        getFileName: PropTypes.func.isRequired
+        roundProgress: PropTypes.func.isRequired
+        cancel: PropTypes.func.isRequired
+        file: PropTypes.instanceOf(File).isRequired
       })
 
     getInitialState: ->

@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import Button from 'instructure-ui/lib/components/Button'
 import Tray from 'instructure-ui/lib/components/Tray'
 import IconX from 'instructure-icons/react/Solid/IconXSolid'
@@ -25,7 +26,7 @@ import StudentRangeView from './student-ranges-view'
 import StudentDetailsView from './student-details-view'
 import { assignmentShape, selectedPathShape } from '../shapes/index'
 
-const { array, object, func, bool } = React.PropTypes
+const { array, object, func, bool } = PropTypes
 
 export default class BreakdownDetails extends React.Component {
     static propTypes = {
@@ -87,7 +88,7 @@ export default class BreakdownDetails extends React.Component {
       return (
         <Tray
           isOpen={this.props.showDetails}
-          placement="right"
+          placement="end"
           isDismissable={false}
           trapFocus
           getDefaultFocusElement={() => this.closeButton}

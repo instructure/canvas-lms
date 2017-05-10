@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import CourseHomeDialog from 'jsx/courses/CourseHomeDialog'
 import I18n from 'i18n!home_page_prompt'
 import $ from 'jquery'
@@ -24,13 +25,13 @@ import 'compiled/jquery.rails_flash_notifications'
 
 class HomePagePromptContainer extends React.Component {
   static propTypes = {
-    store: React.PropTypes.object.isRequired,
-    onSubmit: React.PropTypes.func.isRequired,
-    wikiFrontPageTitle: React.PropTypes.string,
-    wikiUrl: React.PropTypes.string.isRequired,
-    courseId: React.PropTypes.string.isRequired,
-    forceOpen: React.PropTypes.bool.isRequired,
-    returnFocusTo: React.PropTypes.instanceOf(Element).isRequired,
+    store: PropTypes.object.isRequired,
+    onSubmit: PropTypes.func.isRequired,
+    wikiFrontPageTitle: PropTypes.string,
+    wikiUrl: PropTypes.string.isRequired,
+    courseId: PropTypes.string.isRequired,
+    forceOpen: PropTypes.bool.isRequired,
+    returnFocusTo: PropTypes.instanceOf(Element).isRequired,
   }
 
   state = {

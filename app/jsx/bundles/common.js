@@ -44,7 +44,6 @@ import 'compiled/behaviors/instructure_inline_media_comment'
 import 'compiled/behaviors/ping'
 import 'LtiThumbnailLauncher'
 import 'compiled/badge_counts'
-import 'instructure-ui/lib/themes/canvas'
 
 // Other stuff several bundles use.
 // If any of these really arn't used on most pages,

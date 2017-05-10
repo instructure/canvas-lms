@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!react_files'
 import React from 'react'
+import PropTypes from 'prop-types'
 import customPropTypes from 'compiled/react_files/modules/customPropTypes'
 import Folder from 'compiled/models/Folder'
 import filesEnv from 'compiled/react_files/modules/filesEnv'
@@ -30,7 +31,7 @@ import FilesystemObjectThumbnail from 'jsx/files/FilesystemObjectThumbnail'
     displayName: 'DialogPreview',
 
     propTypes: {
-      itemsToShow: React.PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired
+      itemsToShow: PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired
     },
 
     renderPreview () {

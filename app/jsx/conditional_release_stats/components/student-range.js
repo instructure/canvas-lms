@@ -17,9 +17,10 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import StudentRangeItem from './student-range-item'
 
-  const { object, func } = React.PropTypes
+  const { object, func } = PropTypes
 
 export default class StudentRange extends React.Component {
     static propTypes = {

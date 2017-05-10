@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import customTypes from './PropTypes'
 import I18n from 'i18n!theme_editor'
 import rgb2hex from 'compiled/util/rgb2hex'
@@ -28,9 +29,9 @@ export default React.createClass({
 
     propTypes: {
       varDef: customTypes.color,
-      onChange: React.PropTypes.func.isRequired,
+      onChange: PropTypes.func.isRequired,
       userInput: customTypes.userVariableInput,
-      placeholder: React.PropTypes.string.isRequired
+      placeholder: PropTypes.string.isRequired
     },
 
     getDefaultProps(){

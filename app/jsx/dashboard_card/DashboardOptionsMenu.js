@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!dashboard'
 import axios from 'axios'
 
@@ -28,10 +29,10 @@ import IconSettings2Solid from 'instructure-icons/react/Solid/IconSettings2Solid
 
 export default class DashboardOptionsMenu extends React.Component {
   static propTypes = {
-    recent_activity_dashboard: React.PropTypes.bool.isRequired,
-    hide_dashcard_color_overlays: React.PropTypes.bool,
-    planner_enabled: React.PropTypes.bool,
-    planner_selected: React.PropTypes.bool
+    recent_activity_dashboard: PropTypes.bool.isRequired,
+    hide_dashcard_color_overlays: PropTypes.bool,
+    planner_enabled: PropTypes.bool,
+    planner_selected: PropTypes.bool
   }
 
   static defaultProps = {

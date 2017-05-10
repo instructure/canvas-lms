@@ -17,7 +17,8 @@
  */
 
 import I18n from 'i18n!blueprint_courses'
-import React, { PropTypes, Component } from 'react'
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import Alert from 'instructure-ui/lib/components/Alert'
 import Typography from 'instructure-ui/lib/components/Typography'
 import $ from 'jquery'

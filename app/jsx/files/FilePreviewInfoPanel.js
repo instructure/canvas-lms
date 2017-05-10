@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!file_preview'
 import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
 import friendlyBytes from 'compiled/util/friendlyBytes'
@@ -29,7 +30,7 @@ import mimeClass from 'compiled/util/mimeClass'
 
     propTypes: {
       displayedItem: customPropTypes.filesystemObject.isRequired,
-      usageRightsRequiredForContext: React.PropTypes.bool
+      usageRightsRequiredForContext: PropTypes.bool
     },
 
     render () {

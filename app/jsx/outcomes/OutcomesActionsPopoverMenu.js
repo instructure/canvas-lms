@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import I18n from 'i18n!outcomes'
 import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
@@ -27,8 +28,8 @@ import AddToCourseModal from 'jsx/outcomes/AddToCourseModal'
 
 export default React.createClass({
     propTypes: {
-      contextUrlRoot: React.PropTypes.string,
-      permissions: React.PropTypes.object
+      contextUrlRoot: PropTypes.string,
+      permissions: PropTypes.object
     },
     getInitialState: function () {
       this._applicationContainer = document.querySelector("#application");

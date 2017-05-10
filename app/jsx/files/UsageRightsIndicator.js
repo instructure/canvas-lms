@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!react_files'
 import React from 'react'
+import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import customPropTypes from 'compiled/react_files/modules/customPropTypes'
 import Folder from 'compiled/models/Folder'
@@ -31,10 +32,10 @@ import UsageRightsDialog from 'jsx/files/UsageRightsDialog'
 
     propTypes: {
       model: customPropTypes.filesystemObject.isRequired,
-      userCanManageFilesForContext: React.PropTypes.bool.isRequired,
-      userCanRestrictFilesForContext: React.PropTypes.bool.isRequired,
-      usageRightsRequiredForContext: React.PropTypes.bool.isRequired,
-      modalOptions: React.PropTypes.object.isRequired
+      userCanManageFilesForContext: PropTypes.bool.isRequired,
+      userCanRestrictFilesForContext: PropTypes.bool.isRequired,
+      usageRightsRequiredForContext: PropTypes.bool.isRequired,
+      modalOptions: PropTypes.object.isRequired
     },
 
     handleClick (event) {

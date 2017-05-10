@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import I18n from 'i18n!external_tools'
 import React from 'react'
+import PropTypes from 'prop-types'
 import Modal from 'react-modal'
 import store from 'jsx/external_apps/lib/ExternalAppsStore'
 
@@ -26,9 +27,9 @@ export default React.createClass({
         displayName: 'Lti2ReregistrationUpdateModal',
 
         propTypes: {
-            tool: React.PropTypes.object.isRequired,
-            closeHandler: React.PropTypes.func,
-            canAddEdit: React.PropTypes.bool.isRequired
+            tool: PropTypes.object.isRequired,
+            closeHandler: PropTypes.func,
+            canAddEdit: PropTypes.bool.isRequired
         },
 
         getInitialState() {

@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!zip_file_options_form'
 import React from 'react'
+import PropTypes from 'prop-types'
 import Modal from 'jsx/shared/modal'
 import ModalContent from 'jsx/shared/modal-content'
 import ModalButtons from 'jsx/shared/modal-buttons'
@@ -25,7 +26,7 @@ import ModalButtons from 'jsx/shared/modal-buttons'
   const modalOverrides = {
     overlay : {
       backgroundColor: 'rgba(0,0,0,0.5)'
-    },  
+    },
     content : {
       position: 'static',
       top: '0',
@@ -42,7 +43,7 @@ import ModalButtons from 'jsx/shared/modal-buttons'
 
     displayName: 'ZipFileOptionsForm',
     propTypes: {
-      onZipOptionsResolved: React.PropTypes.func.isRequired
+      onZipOptionsResolved: PropTypes.func.isRequired
     },
     handleExpandClick: function () {
       this.props.onZipOptionsResolved({file: this.props.fileOptions.file, expandZip: true});

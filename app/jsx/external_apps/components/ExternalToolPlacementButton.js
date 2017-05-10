@@ -20,6 +20,7 @@ import $ from 'jquery'
 import _ from 'underscore'
 import I18n from 'i18n!external_tools'
 import React from 'react'
+import PropTypes from 'prop-types'
 import ReactModal from 'react-modal'
 import store from 'jsx/external_apps/lib/ExternalAppsStore'
 import 'compiled/jquery.rails_flash_notifications'
@@ -54,7 +55,7 @@ export default React.createClass({
     },
 
     propTypes: {
-      tool: React.PropTypes.object.isRequired
+      tool: PropTypes.object.isRequired
     },
 
     getInitialState() {

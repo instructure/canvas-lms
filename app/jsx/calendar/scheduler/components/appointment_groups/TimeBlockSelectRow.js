@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!appointment_groups'
 import Button from 'instructure-ui/lib/components/Button'
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
@@ -41,16 +42,16 @@ import 'jquery.instructure_date_and_time'
   class TimeBlockSelectorRow extends React.Component {
 
     static propTypes = {
-      timeData: React.PropTypes.shape({
-        date: React.PropTypes.date,
-        startTime: React.PropTypes.date,
-        endTime: React.PropTypes.date
+      timeData: PropTypes.shape({
+        date: PropTypes.date,
+        startTime: PropTypes.date,
+        endTime: PropTypes.date
       }).isRequired,
-      slotEventId: React.PropTypes.string,
-      readOnly: React.PropTypes.bool,
-      onBlur: React.PropTypes.func,
-      handleDelete: React.PropTypes.func,
-      setData: React.PropTypes.func
+      slotEventId: PropTypes.string,
+      readOnly: PropTypes.bool,
+      onBlur: PropTypes.func,
+      handleDelete: PropTypes.func,
+      setData: PropTypes.func
     };
 
     constructor (props) {

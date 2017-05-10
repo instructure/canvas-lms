@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import _ from 'underscore'
 import $ from 'jquery'
 import Button from 'instructure-ui/lib/components/Button'
@@ -28,12 +29,12 @@ import 'compiled/jquery.rails_flash_notifications'
 
   let NewGradingPeriodSetForm = React.createClass({
     propTypes: {
-      enrollmentTerms:         React.PropTypes.array.isRequired,
-      closeForm:               React.PropTypes.func.isRequired,
-      addGradingPeriodSet:     React.PropTypes.func.isRequired,
-      readOnly:                React.PropTypes.bool.isRequired,
-      urls:                    React.PropTypes.shape({
-        gradingPeriodSetsURL:  React.PropTypes.string.isRequired
+      enrollmentTerms:         PropTypes.array.isRequired,
+      closeForm:               PropTypes.func.isRequired,
+      addGradingPeriodSet:     PropTypes.func.isRequired,
+      readOnly:                PropTypes.bool.isRequired,
+      urls:                    PropTypes.shape({
+        gradingPeriodSetsURL:  PropTypes.string.isRequired
       }).isRequired
     },
 

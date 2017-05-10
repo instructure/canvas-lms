@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import $ from 'jquery'
 import I18n from 'i18n!eportfolio'
 import Modal, {ModalHeader, ModalBody, ModalFooter } from 'instructure-ui/lib/components/Modal'
@@ -26,13 +27,13 @@ import Select from 'instructure-ui/lib/components/Select'
 
   var MoveToDialog = React.createClass({
     propTypes: {
-      header: React.PropTypes.string.isRequired,
-      source: React.PropTypes.object.isRequired,
-      destinations: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
-      onMove: React.PropTypes.func,
-      onClose: React.PropTypes.func,
-      appElement: React.PropTypes.object,
-      triggerElement: React.PropTypes.object
+      header: PropTypes.string.isRequired,
+      source: PropTypes.object.isRequired,
+      destinations: PropTypes.arrayOf(PropTypes.object).isRequired,
+      onMove: PropTypes.func,
+      onClose: PropTypes.func,
+      appElement: PropTypes.object,
+      triggerElement: PropTypes.object
     },
 
     getInitialState () {

@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!course_wizard'
 import ListItems from './ListItems'
 
@@ -37,8 +38,8 @@ import ListItems from './ListItems'
       displayName: 'InfoFrame',
 
       propTypes: {
-        closeModal: React.PropTypes.func.isRequired,
-        className: React.PropTypes.string
+        closeModal: PropTypes.func.isRequired,
+        className: PropTypes.string
       },
 
       getInitialState: function () {

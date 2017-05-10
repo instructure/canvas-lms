@@ -17,12 +17,13 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import I18n from 'i18n!choose_mastery_path'
 import apiUserContent from 'compiled/str/apiUserContent'
 import assignmentShape from '../shapes/assignment-shape'
 
-const { bool } = React.PropTypes
+const { bool } = PropTypes
 
 export default class Assignment extends React.Component {
     static propTypes = {

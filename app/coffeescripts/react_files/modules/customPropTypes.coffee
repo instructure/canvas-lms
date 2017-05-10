@@ -17,13 +17,14 @@
 
 define [
   'react'
+  'prop-types'
   'compiled/models/Folder'
   'compiled/models/FilesystemObject'
-], (React, Folder, FilesystemObject) ->
+], (React, PropTypes, Folder, FilesystemObject) ->
 
   customPropTypes =
-    contextType: React.PropTypes.oneOf(['users', 'groups', 'accounts', 'courses'])
-    contextId: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number])
-    folder: React.PropTypes.instanceOf(Folder)
-    filesystemObject: React.PropTypes.instanceOf(FilesystemObject)
+    contextType: PropTypes.oneOf(['users', 'groups', 'accounts', 'courses'])
+    contextId: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    folder: PropTypes.instanceOf(Folder)
+    filesystemObject: PropTypes.instanceOf(FilesystemObject)
 

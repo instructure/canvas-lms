@@ -18,20 +18,21 @@
 define [
   'jquery'
   'react'
+  'prop-types'
   'i18n!broccoli_cloud'
   'compiled/models/FilesystemObject'
   '../modules/customPropTypes'
   'compiled/jquery.rails_flash_notifications'
-], ($, React, I18n, FilesystemObject, customPropTypes) ->
+], ($, React, PropTypes, I18n, FilesystemObject, customPropTypes) ->
 
   PublishCloud =
     displayName: 'PublishCloud'
 
     propTypes:
-      togglePublishClassOn: React.PropTypes.object
+      togglePublishClassOn: PropTypes.object
       model: customPropTypes.filesystemObject
-      userCanManageFilesForContext: React.PropTypes.bool.isRequired
-      fileName: React.PropTypes.string
+      userCanManageFilesForContext: PropTypes.bool.isRequired
+      fileName: PropTypes.string
 
     # == React Functions == #
     getInitialState: -> @extractStateFromModel( @props.model )

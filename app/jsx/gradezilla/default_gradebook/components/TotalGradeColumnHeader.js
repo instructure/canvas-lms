@@ -17,13 +17,14 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid'
 import { MenuItem, MenuItemGroup, MenuItemSeparator } from 'instructure-ui/lib/components/Menu'
 import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
 import Typography from 'instructure-ui/lib/components/Typography'
 import I18n from 'i18n!gradebook'
 
-const { bool, func, shape, string } = React.PropTypes;
+const { bool, func, shape, string } = PropTypes;
 
 function renderTrigger () {
   return (

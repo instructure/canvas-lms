@@ -17,6 +17,7 @@
  */
 
 import React from 'react';
+import PropTypes from 'prop-types'
 import IconMiniArrowDownSolid from 'instructure-icons/lib/Solid/IconMiniArrowDownSolid'
 import Button from 'instructure-ui/lib/components/Button';
 import { MenuItem, MenuItemGroup, MenuItemSeparator } from 'instructure-ui/lib/components/Menu';
@@ -24,7 +25,7 @@ import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu';
 import Typography from 'instructure-ui/lib/components/Typography';
 import I18n from 'i18n!gradebook';
 
-const { bool, func, shape, string } = React.PropTypes;
+const { bool, func, shape, string } = PropTypes;
 
 function renderTriggerButton () {
   return (
@@ -55,8 +56,8 @@ class ViewOptionsMenu extends React.Component {
       onSelect: func.isRequired,
       selected: bool.isRequired
     }).isRequired,
-    showUnpublishedAssignments: React.PropTypes.bool.isRequired,
-    onSelectShowUnpublishedAssignments: React.PropTypes.func.isRequired
+    showUnpublishedAssignments: PropTypes.bool.isRequired,
+    onSelectShowUnpublishedAssignments: PropTypes.func.isRequired
   };
 
   constructor (props) {

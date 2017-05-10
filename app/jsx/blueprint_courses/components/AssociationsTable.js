@@ -19,6 +19,7 @@
 import I18n from 'i18n!blueprint_settings'
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import Typography from 'instructure-ui/lib/components/Typography'
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
 import Table from 'instructure-ui/lib/components/Table'
@@ -29,7 +30,7 @@ import 'compiled/jquery.rails_flash_notifications'
 
 import propTypes from '../propTypes'
 
-const { func, arrayOf, string, bool } = React.PropTypes
+const { func, arrayOf, string, bool } = PropTypes
 
 function shortId () {
   const prefix = String.fromCharCode(97 + Math.floor(Math.random() * 26))

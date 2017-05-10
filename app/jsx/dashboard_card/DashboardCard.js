@@ -17,7 +17,8 @@
  */
 
 import _ from 'underscore'
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!dashcards'
 import DashboardCardAction from './DashboardCardAction'
 import DashboardColorPicker from './DashboardColorPicker'
@@ -50,7 +51,7 @@ export default class DashboardCard extends Component {
     connectDropTarget: PropTypes.func,
     moveCard: PropTypes.func,
     totalCards: PropTypes.number,
-    position: PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.func])
+    position: PropTypes.oneOfType([PropTypes.number, PropTypes.func])
   }
 
   static defaultProps = {

@@ -17,15 +17,16 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!webzip_exports'
 import $ from 'jquery'
 import 'jquery.instructure_date_and_time'
   class ExportListItem extends React.Component {
     static propTypes = {
-      date: React.PropTypes.string.isRequired,
-      link: React.PropTypes.string.isRequired,
-      workflowState: React.PropTypes.string.isRequired,
-      newExport: React.PropTypes.bool.isRequired
+      date: PropTypes.string.isRequired,
+      link: PropTypes.string.isRequired,
+      workflowState: PropTypes.string.isRequired,
+      newExport: PropTypes.bool.isRequired
     }
 
     render () {

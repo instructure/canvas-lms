@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import GradingStandardCollection from 'jsx/grading/gradingStandardCollection'
 import GradingPeriodCollection from 'jsx/grading/gradingPeriodCollection'
 import $ from 'jquery'
@@ -24,7 +25,7 @@ import I18n from 'i18n!external_tools'
 import 'jquery.instructure_misc_plugins'
   class CourseTabContainer extends React.Component {
     static propTypes = {
-      hasGradingPeriods: React.PropTypes.bool.isRequired
+      hasGradingPeriods: PropTypes.bool.isRequired
     }
 
     componentDidMount () {

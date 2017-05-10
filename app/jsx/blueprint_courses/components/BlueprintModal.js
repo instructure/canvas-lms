@@ -17,7 +17,8 @@
  */
 
 import I18n from 'i18n!blueprint_settings'
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import Modal, { ModalHeader, ModalBody, ModalFooter } from 'instructure-ui/lib/components/Modal'
 import Heading from 'instructure-ui/lib/components/Heading'
 import Button from 'instructure-ui/lib/components/Button'

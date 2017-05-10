@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
 import TermsStore from './TermsStore'
 import AccountsTreeStore from './AccountsTreeStore'
@@ -25,7 +26,7 @@ import IcInput from './IcInput'
 import IcSelect from './IcSelect'
 import IcCheckbox from './IcCheckbox'
 
-const { string, bool, func, arrayOf, shape } = React.PropTypes
+const { string, bool, func, arrayOf, shape } = PropTypes
 
 
   class CoursesToolbar extends React.Component {

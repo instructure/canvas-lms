@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!outcomes'
 import Button from 'instructure-ui/lib/components/Button'
 import Modal, { ModalHeader, ModalBody, ModalFooter } from 'instructure-ui/lib/components/Modal'
@@ -25,8 +26,8 @@ import Typography from 'instructure-ui/lib/components/Typography'
 
 export default React.createClass({
     proptypes: {
-      onClose: React.PropTypes.func,
-      onReady: React.PropTypes.func
+      onClose: PropTypes.func,
+      onReady: PropTypes.func
     },
     getInitialState: function () {
       return {

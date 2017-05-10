@@ -17,12 +17,13 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!student_context_tray'
 import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
 
   class LastActivity extends React.Component {
     static propTypes = {
-      user: React.PropTypes.object.isRequired
+      user: PropTypes.object.isRequired
     }
 
     get lastActivity () {

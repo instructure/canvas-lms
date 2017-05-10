@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { PropTypes } from 'react'
+import PropTypes from 'prop-types'
+
 const { shape, string, number } = PropTypes
 
 export default shape({

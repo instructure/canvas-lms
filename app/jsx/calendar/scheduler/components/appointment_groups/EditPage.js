@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!appointment_groups'
 import Breadcrumb, { BreadcrumbLink } from 'instructure-ui/lib/components/Breadcrumb'
 import Button from 'instructure-ui/lib/components/Button'
@@ -64,7 +65,7 @@ import 'jquery.instructure_date_and_time'
 
   class EditPage extends React.Component {
     static propTypes = {
-      appointment_group_id: React.PropTypes.string
+      appointment_group_id: PropTypes.string
     }
 
     constructor(props) {

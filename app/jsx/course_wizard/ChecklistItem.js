@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!course_wizard'
 import classnames from 'classnames'
 
@@ -24,12 +25,12 @@ import classnames from 'classnames'
       displayName: 'ChecklistItem',
 
       propTypes: {
-        onClick: React.PropTypes.func.isRequired,
-        stepKey: React.PropTypes.string.isRequired,
-        title: React.PropTypes.string.isRequired,
-        complete: React.PropTypes.bool.isRequired,
-        isSelected: React.PropTypes.bool.isRequired,
-        id: React.PropTypes.string.isRequired
+        onClick: PropTypes.func.isRequired,
+        stepKey: PropTypes.string.isRequired,
+        title: PropTypes.string.isRequired,
+        complete: PropTypes.bool.isRequired,
+        isSelected: PropTypes.bool.isRequired,
+        id: PropTypes.string.isRequired
       },
 
       classNameString: '',

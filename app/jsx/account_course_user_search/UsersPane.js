@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
 import _ from 'underscore'
 import UsersStore from './UsersStore'
@@ -30,7 +31,7 @@ import UserActions from './actions/UserActions'
 
   var UsersPane = React.createClass({
     propTypes: {
-      store: React.PropTypes.object
+      store: PropTypes.object
     },
 
     getInitialState () {

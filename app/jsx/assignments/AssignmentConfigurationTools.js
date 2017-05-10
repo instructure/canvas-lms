@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import I18n from 'i18n!moderated_grading'
 import 'compiled/jquery.rails_flash_notifications'
@@ -26,10 +27,10 @@ import 'compiled/jquery.rails_flash_notifications'
     displayName: 'AssignmentConfigurationTools',
 
     propTypes: {
-      courseId: React.PropTypes.number.isRequired,
-      secureParams: React.PropTypes.string.isRequired,
-      selectedTool: React.PropTypes.number,
-      selectedToolType: React.PropTypes.string
+      courseId: PropTypes.number.isRequired,
+      secureParams: PropTypes.string.isRequired,
+      selectedTool: PropTypes.number,
+      selectedToolType: PropTypes.string
     },
 
     componentWillMount() {

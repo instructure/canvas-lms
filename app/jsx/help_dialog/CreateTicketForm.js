@@ -17,13 +17,14 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!help_dialog'
 import 'jquery.instructure_forms'
 import 'compiled/jquery.rails_flash_notifications'
   const CreateTicketForm = React.createClass({
     propTypes: {
-      onCancel: React.PropTypes.func,
-      onSubmit: React.PropTypes.func
+      onCancel: PropTypes.func,
+      onSubmit: PropTypes.func
     },
     getDefaultProps () {
       return {

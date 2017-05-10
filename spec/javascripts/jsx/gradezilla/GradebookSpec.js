@@ -35,6 +35,7 @@ import Gradebook from 'compiled/gradezilla/Gradebook';
 import UserSettings from 'compiled/userSettings';
 import ActionMenu from 'jsx/gradezilla/default_gradebook/components/ActionMenu';
 import GradebookApi from 'jsx/gradezilla/default_gradebook/GradebookApi';
+import PropTypes from 'prop-types';
 
 const $fixtures = document.getElementById('fixtures');
 
@@ -4559,9 +4560,11 @@ test('sets postGradesLtis to conform to ActionMenu.propTypes.postGradesLtis', fu
       }]
     }
   };
-  Gradebook.prototype.initPostGradesLtis.apply(self);
+  const props = Gradebook.prototype.initPostGradesLtis.apply(self);
 
-  strictEqual(ActionMenu.propTypes.postGradesLtis(self.postGradesLtis), null);
+  this.spy(console, 'error');
+  PropTypes.checkPropTypes({postGradesLtis: ActionMenu.propTypes.postGradesLtis}, props, 'prop', 'ActionMenu');
+  ok(console.error.notCalled);
 });
 
 QUnit.module('Gradebook#getActionMenuProps', {
@@ -4595,11 +4598,9 @@ test('generates props that conform to ActionMenu.propTypes', function () {
 
   const props = Gradebook.prototype.getActionMenuProps.apply(self);
 
-  Object.keys(ActionMenu.propTypes).forEach((propKey) => {
-    const validator = ActionMenu.propTypes[propKey];
-
-    strictEqual(validator(props, propKey, 'ActionMenu'), null);
-  });
+  this.spy(console, 'error');
+  PropTypes.checkPropTypes(ActionMenu.propTypes, props, 'props', 'ActionMenu')
+  ok(console.error.notCalled);
 });
 
 QUnit.module('Gradebook#getInitialGridDisplaySettings');

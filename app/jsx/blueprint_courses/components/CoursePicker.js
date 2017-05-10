@@ -19,6 +19,7 @@
 import I18n from 'i18n!blueprint_settings'
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import ToggleDetails from 'instructure-ui/lib/components/ToggleDetails'
 import Typography from 'instructure-ui/lib/components/Typography'
 import Spinner from 'instructure-ui/lib/components/Spinner'
@@ -27,7 +28,7 @@ import propTypes from '../propTypes'
 import CourseFilter from './CourseFilter'
 import CoursePickerTable from './CoursePickerTable'
 
-const { func, bool, arrayOf, string } = React.PropTypes
+const { func, bool, arrayOf, string } = PropTypes
 
 export default class CoursePicker extends React.Component {
   static propTypes = {
@@ -116,7 +117,7 @@ export default class CoursePicker extends React.Component {
         <div className="bca-course-details__wrapper">
           <ToggleDetails
             ref={(c) => { this.coursesToggle = c }}
-            isExpanded={this.state.isExpanded}
+            expanded={this.state.isExpanded}
             summary={<Typography>{I18n.t('Courses')}</Typography>}
           >
             {this.props.isLoadingCourses && (<div className="bca-course-picker__loading">

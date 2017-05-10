@@ -23,6 +23,7 @@ import $ from 'jquery'
 import I18n from 'i18n!courses_show'
 import axios from 'axios'
 import React from 'react'
+import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 
 const defaultViewStore = createStore({
@@ -78,7 +79,7 @@ class ChooseHomePageButton extends React.Component {
   }
 
   static propTypes = {
-    store: React.PropTypes.object.isRequired,
+    store: PropTypes.object.isRequired,
   }
 
   render() {

@@ -17,12 +17,13 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
 import _ from 'underscore'
 import NewUserModal from './NewUserModal'
 import IcInput from './IcInput'
 
-  const { string, bool, func, object } = React.PropTypes
+  const { string, bool, func, object } = PropTypes
 
   var UsersToolbar = React.createClass({
     propTypes: {

@@ -22,6 +22,7 @@
 */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import I18n from 'i18n!ajaxflashalert'
 import Alert from 'instructure-ui/lib/components/Alert'
@@ -37,10 +38,10 @@ const timeout = 10000
 // Is displayed at the top of the document, and will close itself after a while
 class AjaxFlashAlert extends React.Component {
   static propTypes = {
-    onClose: React.PropTypes.func.isRequired,
-    message: React.PropTypes.string.isRequired,
-    error: React.PropTypes.instanceOf(Error),
-    variant: React.PropTypes.oneOf('info', 'success', 'warning', 'error')
+    onClose: PropTypes.func.isRequired,
+    message: PropTypes.string.isRequired,
+    error: PropTypes.instanceOf(Error),
+    variant: PropTypes.oneOf('info', 'success', 'warning', 'error')
   }
   static defaultProps = {
     error: null,

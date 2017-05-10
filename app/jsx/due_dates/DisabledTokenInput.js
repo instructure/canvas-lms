@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import _ from 'underscore'
 
   const styles = {
@@ -31,7 +32,7 @@ import _ from 'underscore'
 
   class DisabledTokenInput extends React.Component {
     static propTypes = {
-      tokens: React.PropTypes.arrayOf(React.PropTypes.string)
+      tokens: PropTypes.arrayOf(PropTypes.string)
     }
 
     renderTokens() {

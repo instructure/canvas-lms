@@ -157,7 +157,7 @@ import {parseNameList, findEmailInEntry, emailValidator} from '../helpers'
               <div className="peoplesearch__selection">
                 <Select
                   id="peoplesearch_select_role"
-                  label={I18n.t('Role')} isBlock
+                  label={I18n.t('Role')}
                   value={this.props.role}
                   onChange={this.onChangeRole}
                 >
@@ -170,7 +170,6 @@ import {parseNameList, findEmailInEntry, emailValidator} from '../helpers'
                 <Select
                   id="peoplesearch_select_section"
                   label={I18n.t('Section')}
-                  isBlock
                   value={this.props.section}
                   onChange={this.onChangeSection}
                 >
@@ -185,7 +184,7 @@ import {parseNameList, findEmailInEntry, emailValidator} from '../helpers'
                 key="limit_privileges_to_course_section"
                 id="limit_privileges_to_course_section"
                 label={I18n.t('Can interact with users in their section only')}
-                isBlock value={0}
+                value={0}
                 checked={this.props.limitPrivilege}
                 onChange={this.onChangePrivilege}
               />

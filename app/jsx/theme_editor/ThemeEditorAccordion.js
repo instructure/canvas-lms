@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!theme_editor'
 import ThemeEditorColorRow from './ThemeEditorColorRow'
 import ThemeEditorImageRow from './ThemeEditorImageRow'
@@ -33,10 +34,10 @@ export default React.createClass({
 
     propTypes: {
       variableSchema: customTypes.variableSchema,
-      brandConfigVariables: React.PropTypes.object.isRequired,
-      changedValues: React.PropTypes.object.isRequired,
-      changeSomething: React.PropTypes.func.isRequired,
-      getDisplayValue: React.PropTypes.func.isRequired
+      brandConfigVariables: PropTypes.object.isRequired,
+      changedValues: PropTypes.object.isRequired,
+      changeSomething: PropTypes.func.isRequired,
+      getDisplayValue: PropTypes.func.isRequired
     },
 
     componentDidMount() {

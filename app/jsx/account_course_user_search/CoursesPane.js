@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
 import CoursesStore from './CoursesStore'
 import TermsStore from './TermsStore'
@@ -27,7 +28,7 @@ import renderSearchMessage from './renderSearchMessage'
 
   const MIN_SEARCH_LENGTH = 3
   const stores = [CoursesStore, TermsStore, AccountsTreeStore]
-  const { shape, arrayOf, string } = React.PropTypes
+  const { shape, arrayOf, string } = PropTypes
 
   class CoursesPane extends React.Component {
     static propTypes = {

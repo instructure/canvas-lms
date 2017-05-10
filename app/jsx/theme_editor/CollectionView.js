@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!theme_collection_view'
 import React from 'react'
+import PropTypes from 'prop-types'
 import _ from 'underscore'
 import customTypes from './PropTypes'
 import submitHtmlForm from './submitHtmlForm'
@@ -37,9 +38,9 @@ export default React.createClass({
     displayName: 'CollectionView',
 
     propTypes: {
-      sharedBrandConfigs: React.PropTypes.arrayOf(customTypes.sharedBrandConfig).isRequired,
+      sharedBrandConfigs: PropTypes.arrayOf(customTypes.sharedBrandConfig).isRequired,
       activeBrandConfig: customTypes.brandConfig.isRequired,
-      accountID: React.PropTypes.string.isRequired,
+      accountID: PropTypes.string.isRequired,
       brandableVariableDefaults: customTypes.brandableVariableDefaults,
       baseBrandableVariables: customTypes.variables
     },

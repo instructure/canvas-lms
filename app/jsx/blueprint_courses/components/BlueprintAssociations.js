@@ -19,6 +19,7 @@
 import I18n from 'i18n!blueprint_settings'
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import select from 'jsx/shared/select'
@@ -33,7 +34,7 @@ import propTypes from '../propTypes'
 import CoursePicker from './CoursePicker'
 import AssociationsTable from './AssociationsTable'
 
-const { string, arrayOf, func, bool } = React.PropTypes
+const { string, arrayOf, func, bool } = PropTypes
 
 export default class BlueprintAssociations extends React.Component {
   static propTypes = {

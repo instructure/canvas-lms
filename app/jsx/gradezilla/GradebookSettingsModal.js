@@ -1,11 +1,12 @@
 import React from 'react';
+import PropTypes from 'prop-types'
 import Button from 'instructure-ui/lib/components/Button';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from 'instructure-ui/lib/components/Modal';
 import Heading from 'instructure-ui/lib/components/Heading';
 import TabList, { TabPanel } from 'instructure-ui/lib/components/TabList';
 import I18n from 'i18n!gradebook';
 
-const { func } = React.PropTypes;
+const { func } = PropTypes;
 
 class GradebookSettingsModal extends React.Component {
   static propTypes = {

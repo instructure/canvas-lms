@@ -3849,24 +3849,25 @@ install@~0.1.7:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/install/-/install-0.1.8.tgz#9980ef93e30dfb534778d163bc86ddd472ad5fe8"
 
-instructure-icons@2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/instructure-icons/-/instructure-icons-2.2.0.tgz#4106e18536560734fe76d14e658b0664ef0ca7f7"
+instructure-icons@2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/instructure-icons/-/instructure-icons-2.3.0.tgz#fb4806bc8869794f9e0937e396bf35fe204fb941"
   dependencies:
+    prop-types "15.5.8"
     shortid "2.2.8"
 
-instructure-ui@1.4.2:
-  version "1.4.2"
-  resolved "https://registry.yarnpkg.com/instructure-ui/-/instructure-ui-1.4.2.tgz#946573282b8d69397d0e70831246da9cf6d68825"
+instructure-ui@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/instructure-ui/-/instructure-ui-2.0.0.tgz#e6848f497edf88f49c272a2936f6391b4e17aa39"
   dependencies:
     classnames "2.2.5"
     deep-equal "1.0.1"
     glamor "2.20.24"
-    instructure-icons "2.2.0"
     invariant "2.2.2"
     keycode "2.1.8"
     object.omit "2.0.1"
     object.pick "1.2.0"
+    prop-types "15.5.8"
     shortid "2.2.8"
     tinycolor2 "1.4.1"
 
@@ -5928,7 +5929,13 @@ promise@^7.0.3, promise@^7.1.1:
   dependencies:
     asap "~2.0.3"
 
-prop-types@^15.0.0, prop-types@^15.5.8:
+prop-types@15.5.8:
+  version "15.5.8"
+  resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.5.8.tgz#6b7b2e141083be38c8595aa51fc55775c7199394"
+  dependencies:
+    fbjs "^0.8.9"
+
+prop-types@15.5.9, prop-types@^15.0.0, prop-types@^15.5.8:
   version "15.5.9"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.5.9.tgz#d478eef0e761396942f70c78e772f76e8be747c9"
   dependencies:
@@ -6093,9 +6100,9 @@ react-dnd@2.1.4:
     invariant "^2.1.0"
     lodash "^4.2.0"
 
-react-dom@0.14.8:
-  version "0.14.8"
-  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-0.14.8.tgz#0f1c547514263f771bd31814a739e5306575069e"
+react-dom@0.14.9:
+  version "0.14.9"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-0.14.9.tgz#05064a3dcf0fb1880a3b2bfc9d58c55d8d9f6293"
 
 react-modal@1.6.5:
   version "1.6.5"
@@ -6163,9 +6170,9 @@ react-tray@2.0.4:
   dependencies:
     classnames "^2.2.0"
 
-react@0.14.8:
-  version "0.14.8"
-  resolved "https://registry.yarnpkg.com/react/-/react-0.14.8.tgz#078dfa454d4745bcc54a9726311c2bf272c23684"
+react@0.14.9:
+  version "0.14.9"
+  resolved "https://registry.yarnpkg.com/react/-/react-0.14.9.tgz#9110a6497c49d44ba1c0edd317aec29c2e0d91d1"
   dependencies:
     envify "^3.0.0"
     fbjs "^0.6.1"
@@ -6341,7 +6348,7 @@ redux-thunk@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/redux-thunk/-/redux-thunk-2.2.0.tgz#e615a16e16b47a19a515766133d1e3e99b7852e5"
 
-redux@3.5.2, redux@^3.2.0, redux@~3.5.2:
+redux@3.5.2, redux@~3.5.2:
   version "3.5.2"
   resolved "https://registry.yarnpkg.com/redux/-/redux-3.5.2.tgz#4533745e970b647ec26066a83aa30e9e26faf843"
   dependencies:
@@ -6350,7 +6357,7 @@ redux@3.5.2, redux@^3.2.0, redux@~3.5.2:
     loose-envify "^1.1.0"
     symbol-observable "^0.2.3"
 
-redux@^3.6.0:
+redux@^3.2.0, redux@^3.6.0:
   version "3.6.0"
   resolved "https://registry.yarnpkg.com/redux/-/redux-3.6.0.tgz#887c2b3d0b9bd86eca2be70571c27654c19e188d"
   dependencies:

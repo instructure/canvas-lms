@@ -17,7 +17,8 @@
  */
 
 import I18n from 'i18n!blueprint_settings'
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 
 import Tray from 'instructure-ui/lib/components/Tray'
 import Button from 'instructure-ui/lib/components/Button'
@@ -76,7 +77,7 @@ export default class BlueprintCourseSidebar extends Component {
           isDismissable={false}
           trapFocus
           isOpen={this.state.isOpen}
-          placement="right"
+          placement="end"
           onEntering={this.handleOpen}
           onExiting={this.handleClose}
         >

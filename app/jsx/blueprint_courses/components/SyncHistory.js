@@ -17,6 +17,7 @@
  */
 
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import I18n from 'i18n!blueprint_settings'
@@ -29,7 +30,7 @@ import SyncHistoryItem from './SyncHistoryItem'
 import actions from '../actions'
 import propTypes from '../propTypes'
 
-const { func, bool } = React.PropTypes
+const { func, bool } = PropTypes
 
 export default class SyncHistory extends Component {
   static propTypes = {

@@ -17,9 +17,10 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import Typography from 'instructure-ui/lib/components/Typography'
 
-const { string } = React.PropTypes;
+const { string } = PropTypes;
 
 function CustomColumnHeader (props) {
   return (

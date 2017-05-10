@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!theme_editor'
 import React from 'react'
+import PropTypes from 'prop-types'
 import $ from 'jquery'
 import _ from 'underscore'
 import htmlEscape from 'str/htmlEscape'
@@ -74,11 +75,11 @@ export default React.createClass({
 
     propTypes: {
       brandConfig: customTypes.brandConfig,
-      hasUnsavedChanges: React.PropTypes.bool.isRequired,
+      hasUnsavedChanges: PropTypes.bool.isRequired,
       variableSchema: customTypes.variableSchema,
-      allowGlobalIncludes: React.PropTypes.bool,
-      accountID: React.PropTypes.string,
-      useHighContrast: React.PropTypes.bool,
+      allowGlobalIncludes: PropTypes.bool,
+      accountID: PropTypes.string,
+      useHighContrast: PropTypes.bool,
     },
 
     getInitialState() {

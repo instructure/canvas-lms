@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import $ from 'jquery'
 
   const DOCUMENT_NODE = 9;
@@ -24,8 +25,8 @@ import $ from 'jquery'
 
   class SVGWrapper extends React.Component {
     static propTypes = {
-      url: React.PropTypes.string.isRequired,
-      fillColor: React.PropTypes.string
+      url: PropTypes.string.isRequired,
+      fillColor: PropTypes.string
     }
 
     componentDidMount () {

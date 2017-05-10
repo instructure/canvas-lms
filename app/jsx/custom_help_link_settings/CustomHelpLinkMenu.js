@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!custom_help_link'
 import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu';
 import MenuItem from 'instructure-ui/lib/components/Menu/MenuItem';
@@ -29,8 +30,8 @@ import CustomHelpLinkConstants from './CustomHelpLinkConstants'
 
   const CustomHelpLinkMenu = React.createClass({
     propTypes: {
-      links: React.PropTypes.arrayOf(CustomHelpLinkPropTypes.link).isRequired,
-      onChange: React.PropTypes.func
+      links: PropTypes.arrayOf(CustomHelpLinkPropTypes.link).isRequired,
+      onChange: PropTypes.func
     },
     handleChange (e, link) {
       if (link.is_disabled) {

@@ -19,10 +19,11 @@ define [
   'i18n!upload_button'
   'react'
   'react-dom'
+  'prop-types'
   'underscore'
   '../modules/customPropTypes'
   '../modules/FileOptionsCollection'
-], (I18n, React, ReactDOM, _, customPropTypes, FileOptionsCollection) ->
+], (I18n, React, ReactDOM, PropTypes, _, customPropTypes, FileOptionsCollection) ->
 
   resolvedUserAction = false
 
@@ -31,8 +32,8 @@ define [
 
     propTypes:
       currentFolder: customPropTypes.folder # not required as we don't have it on the first render
-      contextId: React.PropTypes.oneOfType [React.PropTypes.string, React.PropTypes.number]
-      contextType: React.PropTypes.string
+      contextId: PropTypes.oneOfType [PropTypes.string, PropTypes.number]
+      contextType: PropTypes.string
 
     getInitialState: ->
       return FileOptionsCollection.getState()

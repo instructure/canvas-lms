@@ -17,15 +17,16 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import _ from 'underscore'
 import ProgressStore from 'jsx/shared/stores/ProgressStore'
 import ProgressBar from 'jsx/shared/ProgressBar'
   var ApiProgressBar = React.createClass({
     displayName: 'ProgressBar',
     propTypes: {
-      progress_id: React.PropTypes.string,
-      onComplete: React.PropTypes.func,
-      delay: React.PropTypes.number
+      progress_id: PropTypes.string,
+      onComplete: PropTypes.func,
+      delay: PropTypes.number
     },
     intervalID: null,
 

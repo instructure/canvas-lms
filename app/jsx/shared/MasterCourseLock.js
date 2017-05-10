@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import axios from 'axios'
 import classnames from 'classnames'
 import I18n from 'i18n!lock_btn_module'
@@ -7,8 +8,8 @@ import ajaxError from 'jsx/shared/AjaxFlashAlert'
 
 class MasterCourseLock extends React.Component {
   static propTypes = {
-    model: React.PropTypes.instanceOf(FilesystemObject).isRequired,
-    canManage: React.PropTypes.bool.isRequired
+    model: PropTypes.instanceOf(FilesystemObject).isRequired,
+    canManage: PropTypes.bool.isRequired
   }
 
   constructor (props) {

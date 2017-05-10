@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!roster'
 import React from 'react'
+import PropTypes from 'prop-types'
 import {personReadyToEnrollShape} from './shapes'
 import Alert from 'instructure-ui/lib/components/Alert'
 import Table from 'instructure-ui/lib/components/Table'
@@ -25,9 +26,9 @@ import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderConte
 
   class PeopleReadyList extends React.Component {
     static propTypes = {
-      nameList: React.PropTypes.arrayOf(React.PropTypes.shape(personReadyToEnrollShape)),
-      defaultInstitutionName: React.PropTypes.string,
-      canReadSIS: React.PropTypes.bool
+      nameList: PropTypes.arrayOf(PropTypes.shape(personReadyToEnrollShape)),
+      defaultInstitutionName: PropTypes.string,
+      canReadSIS: PropTypes.bool
     };
     static defaultProps = {
       nameList: [],

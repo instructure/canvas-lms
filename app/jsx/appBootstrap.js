@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ApplyTheme from 'instructure-ui/lib/components/ApplyTheme'
-import 'instructure-ui/lib/themes/canvas'
+import { canvas } from 'instructure-ui/lib/themes'
 import moment from 'moment'
 import tz from 'timezone_core'
 import './fakeRequireJSFallback'
@@ -36,8 +35,8 @@ if (typeof ENV !== 'undefined') {
 
 // setup the inst-ui default theme
 if (ENV.use_high_contrast) {
-  ApplyTheme.setDefaultTheme('canvas-a11y')
+  canvas.use({ accessible: true })
 } else {
   const brandvars = window.CANVAS_ACTIVE_BRAND_VARIABLES || {}
-  ApplyTheme.setDefaultTheme('canvas', brandvars)
+  canvas.use({ overrides: brandvars })
 }

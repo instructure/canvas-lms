@@ -19,14 +19,15 @@
 import I18n from 'i18n!external_tools'
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 
 export default React.createClass({
     displayName: 'Lti2Iframe',
 
     propTypes: {
-      reregistration: React.PropTypes.bool,
-      registrationUrl: React.PropTypes.string.isRequired,
-      handleInstall: React.PropTypes.func.isRequired
+      reregistration: PropTypes.bool,
+      registrationUrl: PropTypes.string.isRequired,
+      handleInstall: PropTypes.func.isRequired
     },
 
     componentDidMount() {

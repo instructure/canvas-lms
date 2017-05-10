@@ -18,6 +18,7 @@
 
 import _ from 'underscore'
 import React from 'react'
+import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import I18n from 'i18n!restrict_student_access'
 import $ from 'jquery'
@@ -28,8 +29,8 @@ import 'jquery.instructure_date_and_time'
   var RestrictedRadioButtons = React.createClass({
 
     propTypes: {
-      models: React.PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired,
-      radioStateChange: React.PropTypes.func
+      models: PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired,
+      radioStateChange: PropTypes.func
     },
     permissionOptions: [{
         ref: 'publishInput',

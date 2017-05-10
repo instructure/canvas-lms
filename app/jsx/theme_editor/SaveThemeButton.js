@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!theme_editor'
 import React from 'react'
+import PropTypes from 'prop-types'
 import $ from 'jquery'
 import customTypes from './PropTypes'
 import Modal from 'jsx/shared/modal'
@@ -29,10 +30,10 @@ export default React.createClass({
     displayName: 'SaveThemeButton',
 
     propTypes: {
-      accountID: React.PropTypes.string.isRequired,
+      accountID: PropTypes.string.isRequired,
       brandConfigMd5: customTypes.md5,
       sharedBrandConfigBeingEdited: customTypes.sharedBrandConfig.isRequired,
-      onSave: React.PropTypes.func.isRequired
+      onSave: PropTypes.func.isRequired
     },
 
     getInitialState() {

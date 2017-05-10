@@ -17,13 +17,14 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import _ from 'underscore'
 import I18n from 'i18n!grading_periods'
 import SearchHelpers from 'jsx/shared/helpers/searchHelpers'
 
   let SearchGradingPeriodsField = React.createClass({
     propTypes: {
-      changeSearchText: React.PropTypes.func.isRequired
+      changeSearchText: PropTypes.func.isRequired
     },
 
     onChange(event) {

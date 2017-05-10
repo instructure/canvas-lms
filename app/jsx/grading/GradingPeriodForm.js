@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import update from 'react-addons-update'
 import _ from 'underscore'
@@ -27,7 +28,7 @@ import accessibleDateFormat from 'jsx/shared/helpers/accessibleDateFormat'
 import numberHelper from 'jsx/shared/helpers/numberHelper'
 import round from 'compiled/util/round'
 
-  const Types = React.PropTypes;
+  const Types = PropTypes;
 
   function roundWeight (val) {
     const value = numberHelper.parse(val);

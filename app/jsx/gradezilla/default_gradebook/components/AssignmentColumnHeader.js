@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid'
 import IconMutedSolid from 'instructure-icons/lib/Solid/IconMutedSolid'
 import IconWarningSolid from 'instructure-icons/lib/Solid/IconWarningSolid'
@@ -28,7 +29,7 @@ import 'message_students'
 import MessageStudentsWhoHelper from 'jsx/gradezilla/shared/helpers/messageStudentsWhoHelper'
 import I18n from 'i18n!gradebook'
 
-const { arrayOf, bool, func, instanceOf, number, shape, string } = React.PropTypes;
+const { arrayOf, bool, func, instanceOf, number, shape, string } = PropTypes;
 
 class AssignmentColumnHeader extends React.Component {
   static propTypes = {

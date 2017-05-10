@@ -21,9 +21,10 @@ define [
   'underscore'
   'react'
   'react-dom'
+  'prop-types'
   'jsx/files/BreadcrumbCollapsedContainer'
   '../modules/customPropTypes'
-], (I18n, $, _, React, ReactDOM, BreadcrumbCollapsedContainerComponent, customPropTypes) ->
+], (I18n, $, _, React, ReactDOM, PropTypes, BreadcrumbCollapsedContainerComponent, customPropTypes) ->
 
   MAX_CRUMB_WIDTH = 500
   MIN_CRUMB_WIDTH = 80
@@ -34,8 +35,8 @@ define [
     displayName: 'Breadcrumbs'
 
     propTypes:
-      rootTillCurrentFolder: React.PropTypes.arrayOf(customPropTypes.folder)
-      contextAssetString: React.PropTypes.string.isRequired
+      rootTillCurrentFolder: PropTypes.arrayOf(customPropTypes.folder)
+      contextAssetString: PropTypes.string.isRequired
 
     getInitialState: ->
       {

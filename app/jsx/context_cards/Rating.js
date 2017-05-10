@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!student_context_tray'
 import classnames from 'classnames'
 import Heading from 'instructure-ui/lib/components/Heading'
@@ -25,9 +26,9 @@ import Typography from 'instructure-ui/lib/components/Typography'
 
   class Rating extends React.Component {
     static propTypes = {
-      analytics: React.PropTypes.object,
-      label: React.PropTypes.string,
-      metricName: React.PropTypes.string
+      analytics: PropTypes.object,
+      label: PropTypes.string,
+      metricName: PropTypes.string
     }
 
     static defaultProps = {

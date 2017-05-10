@@ -20,6 +20,7 @@ import I18n from 'i18n!external_tools'
 import _ from 'underscore'
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import Modal from 'react-modal'
 import ConfigOptionField from 'jsx/external_apps/components/ConfigOptionField'
 import ExternalTool from 'compiled/models/ExternalTool'
@@ -46,9 +47,9 @@ export default React.createClass({
     displayName: 'AddApp',
 
     propTypes: {
-      handleToolInstalled: React.PropTypes.func.isRequired,
-      app: React.PropTypes.object.isRequired,
-      canAddEdit: React.PropTypes.bool.isRequired
+      handleToolInstalled: PropTypes.func.isRequired,
+      app: PropTypes.object.isRequired,
+      canAddEdit: PropTypes.bool.isRequired
     },
 
     getInitialState() {

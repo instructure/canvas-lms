@@ -17,13 +17,14 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import _ from 'underscore'
 import I18n from 'i18n!grading_periods'
 
   let EnrollmentTermsDropdown = React.createClass({
     propTypes: {
-      terms: React.PropTypes.array.isRequired,
-      changeSelectedEnrollmentTerm: React.PropTypes.func.isRequired
+      terms: PropTypes.array.isRequired,
+      changeSelectedEnrollmentTerm: PropTypes.func.isRequired
     },
 
     sortedTerms(terms) {

@@ -17,15 +17,16 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!webzip_exports'
 import ExportListItem from 'jsx/webzip_export/components/ExportListItem'
   class ExportList extends React.Component {
     static propTypes = {
-      exports: React.PropTypes.arrayOf(React.PropTypes.shape({
-        date: React.PropTypes.string.isRequired,
-        link: React.PropTypes.string,
-        workflowState: React.PropTypes.string.isRequired,
-        newExport: React.PropTypes.bool.isRequired
+      exports: PropTypes.arrayOf(PropTypes.shape({
+        date: PropTypes.string.isRequired,
+        link: PropTypes.string,
+        workflowState: PropTypes.string.isRequired,
+        newExport: PropTypes.bool.isRequired
       })).isRequired
     }
 

@@ -17,9 +17,10 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import MigrationStates from './migrationStates'
 
-const { shape, string, arrayOf, oneOf, bool } = React.PropTypes
+const { shape, string, arrayOf, oneOf, bool } = PropTypes
 const propTypes = {}
 
 propTypes.migrationState = oneOf(Object.keys(MigrationStates.states))

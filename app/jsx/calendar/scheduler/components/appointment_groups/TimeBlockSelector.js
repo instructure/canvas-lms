@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!appointment_groups'
 import Typography from 'instructure-ui/lib/components/Typography'
 import Button from 'instructure-ui/lib/components/Button'
@@ -30,9 +31,9 @@ import 'jquery.instructure_date_and_time'
   class TimeBlockSelector extends React.Component {
 
     static propTypes = {
-      className: React.PropTypes.string,
-      timeData: React.PropTypes.arrayOf(React.PropTypes.object),
-      onChange: React.PropTypes.func.isRequired
+      className: PropTypes.string,
+      timeData: PropTypes.arrayOf(PropTypes.object),
+      onChange: PropTypes.func.isRequired
     };
 
     constructor (props) {

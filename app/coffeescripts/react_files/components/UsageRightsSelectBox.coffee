@@ -21,10 +21,11 @@ define [
   'i18n!react_files'
   'react'
   'react-dom'
+  'prop-types'
   '../modules/customPropTypes'
   '../modules/filesEnv'
   '../utils/omitEmptyValues'
-  ], ($, _, I18n, React, ReactDOM, customPropTypes, filesEnv, omitEmptyValues) ->
+  ], ($, _, I18n, React, ReactDOM, PropTypes, customPropTypes, filesEnv, omitEmptyValues) ->
 
   contentOptions = [{
       display:  I18n.t("Choose usage rights..."),
@@ -50,11 +51,11 @@ define [
     displayName: 'UsageRightsSelectBox'
 
     propTypes:
-      use_justification: React.PropTypes.oneOf(_.pluck(contentOptions, 'value'))
-      copyright: React.PropTypes.string
-      showMessage: React.PropTypes.bool
-      contextType: React.PropTypes.string
-      contextId: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.number])
+      use_justification: PropTypes.oneOf(_.pluck(contentOptions, 'value'))
+      copyright: PropTypes.string
+      showMessage: PropTypes.bool
+      contextType: PropTypes.string
+      contextId: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
 
     getInitialState: ->
       showTextBox: @props.use_justification != 'choose'

@@ -18,13 +18,14 @@
 
 import I18n from 'i18n!blueprint_settings'
 import React from 'react'
+import PropTypes from 'prop-types'
 import TextInput from 'instructure-ui/lib/components/TextInput'
 import Select from 'instructure-ui/lib/components/Select'
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
 import Grid, {GridCol, GridRow} from 'instructure-ui/lib/components/Grid'
 import propTypes from '../propTypes'
 
-const { func } = React.PropTypes
+const { func } = PropTypes
 const MIN_SEACH = 3 // min search term length for API
 
 export default class CourseFilter extends React.Component {

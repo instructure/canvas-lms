@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid'
 import { MenuItem, MenuItemGroup, MenuItemSeparator } from 'instructure-ui/lib/components/Menu'
 import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
@@ -24,7 +25,7 @@ import Typography from 'instructure-ui/lib/components/Typography'
 import StudentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/StudentRowHeaderConstants'
 import I18n from 'i18n!gradebook'
 
-const { arrayOf, bool, func, oneOf, shape, string } = React.PropTypes;
+const { arrayOf, bool, func, oneOf, shape, string } = PropTypes;
 
 export default class StudentColumnHeader extends React.Component {
   static propTypes = {

@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import _ from 'underscore'
 import axios from 'axios'
 import ConvertCase from 'convert_case'
@@ -47,9 +48,9 @@ import TokenInput, {Option as ComboboxOption} from 'react-tokeninput'
   let EnrollmentTermInput = React.createClass({
 
     propTypes: {
-      enrollmentTerms: React.PropTypes.array.isRequired,
-      setSelectedEnrollmentTermIDs: React.PropTypes.func.isRequired,
-      selectedIDs: React.PropTypes.array.isRequired
+      enrollmentTerms: PropTypes.array.isRequired,
+      setSelectedEnrollmentTermIDs: PropTypes.func.isRequired,
+      selectedIDs: PropTypes.array.isRequired
     },
 
     handleChange(termIDs) {

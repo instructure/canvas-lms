@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import IconMiniArrowDownSolid from 'instructure-icons/lib/Solid/IconMiniArrowDownSolid'
 import Button from 'instructure-ui/lib/components/Button'
 import { MenuItem, MenuItemSeparator } from 'instructure-ui/lib/components/Menu'
@@ -24,7 +25,7 @@ import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
 import Typography from 'instructure-ui/lib/components/Typography'
 import I18n from 'i18n!gradebook'
 
-  const { oneOf, bool, string, func } = React.PropTypes;
+  const { oneOf, bool, string, func } = PropTypes;
 
   class GradebookMenu extends React.Component {
     static propTypes = {

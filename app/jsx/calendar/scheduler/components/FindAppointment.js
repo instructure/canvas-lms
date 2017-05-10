@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import Modal from 'react-modal'
 import I18n from 'i18n!react_scheduler'
 import Actions from 'jsx/calendar/scheduler/actions'
@@ -24,8 +25,8 @@ import Actions from 'jsx/calendar/scheduler/actions'
   class FindAppointment extends React.Component {
 
     static propTypes = {
-      courses: React.PropTypes.array.isRequired,
-      store: React.PropTypes.object.isRequired,
+      courses: PropTypes.array.isRequired,
+      store: PropTypes.object.isRequired,
     }
 
     constructor (props) {

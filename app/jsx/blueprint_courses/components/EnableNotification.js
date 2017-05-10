@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!blueprint_settings'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -37,12 +38,12 @@ const MAX_NOTIFICATION_MESSAGE_LENGTH = 140
 export default class EnableNotification extends React.Component {
   static propTypes = {
     migrationStatus: propTypes.migrationState.isRequired,
-    willSendNotification: React.PropTypes.bool.isRequired,
-    willIncludeCustomNotificationMessage: React.PropTypes.bool.isRequired,
-    notificationMessage: React.PropTypes.string.isRequired,
-    enableSendNotification: React.PropTypes.func.isRequired,
-    includeCustomNotificationMessage: React.PropTypes.func.isRequired,
-    setNotificationMessage: React.PropTypes.func.isRequired,
+    willSendNotification: PropTypes.bool.isRequired,
+    willIncludeCustomNotificationMessage: PropTypes.bool.isRequired,
+    notificationMessage: PropTypes.string.isRequired,
+    enableSendNotification: PropTypes.func.isRequired,
+    includeCustomNotificationMessage: PropTypes.func.isRequired,
+    setNotificationMessage: PropTypes.func.isRequired,
   }
 
   handleSendNotificationChange = (event) => {
@@ -82,7 +83,7 @@ export default class EnableNotification extends React.Component {
               label={I18n.t('Add a Message')}
               checked={this.props.willIncludeCustomNotificationMessage}
               onChange={this.handleAddAMessageChange}
-              isBlock={false}
+              inline
               size="small"
               disabled={isDisabled}
             />
@@ -95,7 +96,7 @@ export default class EnableNotification extends React.Component {
               label={<ScreenReaderContent>{I18n.t('Message text')}</ScreenReaderContent>}
               autoGrow={false}
               resize="vertical"
-              isBlock
+              inline
               value={this.props.notificationMessage}
               onChange={this.handleChangeMessage}
               disabled={isDisabled}

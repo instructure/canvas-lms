@@ -17,10 +17,11 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import createStore from './createStore'
 import _ from 'underscore'
 
-  var { string, shape, arrayOf } = React.PropTypes;
+  var { string, shape, arrayOf } = PropTypes;
 
   var AccountsTreeStore = createStore({
     getUrl() {
