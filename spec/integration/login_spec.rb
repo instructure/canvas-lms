@@ -67,7 +67,8 @@ describe 'login' do
 
       delete logout_url
       expect(response).to be_redirect
-      expect(response.location).to match(%r{/cas/logout\?destination=})
+      # we send both url (CAS v2) and service (CAS v3) params
+      expect(response.location).to match(%r{/cas/logout\?url=.*service=})
     end
 
     it "should inform the user CAS validation denied" do
