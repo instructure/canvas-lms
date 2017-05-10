@@ -3648,6 +3648,8 @@ describe AssignmentsApiController, type: :request do
          "user_id" => @observed_student.id,
          "workflow_state" => "submitted",
          "late" => false,
+         "late_policy_status" => nil,
+         "accepted_at" => nil,
          "preview_url" =>
          "http://www.example.com/courses/#{@observer_course.id}/assignments/#{@assignment.id}/submissions/#{@observed_student.id}?preview=1&version=0"
        }]
@@ -3678,6 +3680,8 @@ describe AssignmentsApiController, type: :request do
          "user_id" => @observed_student.id,
          "workflow_state" => "submitted",
          "late" => false,
+         "late_policy_status" => nil,
+         "accepted_at" => nil,
          "preview_url" =>
          "http://www.example.com/courses/#{@observer_course.id}/assignments/#{@assignment.id}/submissions/#{@observed_student.id}?preview=1&version=0"
        }]
