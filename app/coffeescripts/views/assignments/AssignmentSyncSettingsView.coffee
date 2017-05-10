@@ -22,6 +22,7 @@ define [
   'compiled/views/DialogFormView'
   'jst/EmptyDialogFormWrapper'
   'jst/assignments/AssignmentSyncSettings'
+  "compiled/jquery.rails_flash_notifications"
 ], ($, I18n, _, DialogFormView, wrapper, assignmentSyncSettingsTemplate) ->
 
   class AssignmentSyncSettingsView extends DialogFormView
@@ -37,14 +38,15 @@ define [
       'click .dialog_closer': 'cancel'
     )
 
-    @optionProperty 'userIsAdmin'
     @optionProperty 'viewToggle'
+    @optionProperty 'userIsAdmin'
+    @optionProperty 'sisName'
 
     initialize: ->
       @viewToggle = false
       super
 
-    cannotDisableSync: ->
+    canDisableSync: ->
       @userIsAdmin
 
     openDisableSync: ->
@@ -54,24 +56,35 @@ define [
         @viewToggle = true
         @open()
 
-    # Stubbed for ajax call
+    currentGradingPeriod: ->
+      selected_id = $("#grading_period_selector").children(":selected").attr("id")
+      id = if selected_id == undefined then '' else selected_id.split("_").pop()
+      id
+
     submit: (event) ->
+      event?.preventDefault()
       if @canDisableSync()
-        super(event)
+        success_message = I18n.t('Sync to %{name} successfully disabled', name: @sisName)
+        error_message = I18n.t('Disabling Sync to %{name} failed', name: @sisName)
+        $.ajaxJSON '/api/sis/courses/' +
+                   @model.id +
+                   '/disable_post_to_sis', 'PUT',
+                   grading_period_id: @currentGradingPeriod(),
+                   ((data) ->
+                     $.flashMessage success_message
+                   ), ->
+                     $.flashError error_message
+
+        setTimeout(window.location.reload(true))
       else
-        event?.preventDefault()
+        $.flashWarning I18n.t("You are not authorized to disable the Sync to %{name} option.", name: @sisName)
 
     cancel: ->
       @close()
 
-    # Stubbed to handle endpoint
-    # response and display
-    # proper message
-    onSaveSuccess: ->
-      super
-      @tirgger(true)
-
     toJSON: ->
       data = super
       data.course
+      data.canDisableSync = @canDisableSync()
+      data.sisName = @sisName
       data

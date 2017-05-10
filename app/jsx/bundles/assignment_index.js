@@ -77,7 +77,8 @@ if (ENV.PERMISSIONS.manage_course) {
   assignmentSyncSettingsView = new AssignmentSyncSettingsView({
     collection: assignmentGroups,
     model: course,
-    userIsAdmin
+    userIsAdmin,
+    sisName: ENV.SIS_NAME
   })
 
   createGroupView = new CreateGroupView({

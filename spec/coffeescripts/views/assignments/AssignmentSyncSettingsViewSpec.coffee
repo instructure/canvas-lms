@@ -38,7 +38,8 @@ define [
     @course.urlRoot = "/courses/1"
     view = new AssignmentSyncSettingsView
       model: @course
-      userIsAdmin: false
+      userIsAdmin: opts.userIsAdmin
+      sisName: 'PowerSchool'
     view.open()
     view
 
@@ -46,4 +47,40 @@ define [
     setup: -> fakeENV.setup()
     teardown: -> fakeENV.teardown()
 
-  # Add specs when backend is wired up
+  test 'canDisableSync is true if userIsAdmin is true', ->
+    view = createView(userIsAdmin: true)
+    equal view.canDisableSync(), true
+    view.remove()
+
+  test 'canDisableSync is false if userIsAdmin is false', ->
+    view = createView(userIsAdmin: false)
+    equal view.canDisableSync(), false
+    view.remove()
+
+  test 'openDisableSync sets viewToggle to true', ->
+    view = createView()
+    view.openDisableSync()
+    equal view.viewToggle, true
+    view.remove()
+
+  test 'currentGradingPeriod returns "" if a grading period is not selected', ->
+    view = createView()
+    grading_period_id = view.currentGradingPeriod()
+    equal grading_period_id, ""
+    view.remove()
+
+  test 'disables the Save and Cancel buttons', ->
+    view = createView()
+    ok view.$('#cancel-assignment-settings').hasClass('disabled')
+    ok view.$('#update-assignment-settings').hasClass('disabled')
+    view.remove()
+
+  test 'disables the Save and Cancel button handlers', ->
+    view = createView()
+    @spy view, 'saveFormData'
+    @spy view, 'cancel'
+    view.$('#cancel-assignment-settings').click()
+    view.$('#update-assignment-settings').click()
+    notOk view.saveFormData.called
+    notOk view.cancel.called
+    view.remove()

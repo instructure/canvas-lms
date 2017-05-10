@@ -37,7 +37,7 @@ export default React.createClass({
     disableSyncToSis: React.PropTypes.func.isRequired,
     sisName: React.PropTypes.string.isRequired,
     postToSisDefault: React.PropTypes.bool.isRequired,
-    collection: React.PropTypes.shape.isRequired,
+    hasAssignments: React.PropTypes.bool.isRequired,
   },
 
   getInitialState () {
@@ -82,14 +82,6 @@ export default React.createClass({
     };
   },
 
-  assignmentCount () {
-    let count = 0;
-    _.each(this.props.collection.models, (group) => {
-      count += group.groupView.collection.length;
-    });
-    return count;
-  },
-
   closeModal () {
     this.props.store.dispatch(Actions.setModalOpen(false));
   },
@@ -102,7 +94,7 @@ export default React.createClass({
   },
 
   renderDisablePostToSis () {
-    if (this.assignmentCount() > 0 && this.props.postToSisDefault) {
+    if (this.props.hasAssignments && this.props.postToSisDefault) {
       return (
         <li role="menuitem">
           <a

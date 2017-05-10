@@ -63,6 +63,20 @@ describe AssignmentsController do
       expect(assigns[:js_env][:WEIGHT_FINAL_GRADES]).to eq(@course.apply_group_weights?)
     end
 
+    it "js_env HAS_ASSIGNMENTS is true when the course has assignments" do
+      user_session(@teacher)
+      get 'index', :course_id => @course.id
+      expect(assigns[:js_env][:HAS_ASSIGNMENTS]).to eq(true)
+    end
+
+    it "js_env HAS_ASSIGNMENTS is false when the course does not have assignments" do
+      user_session(@teacher)
+      @assignment.workflow_state = 'deleted'
+      @assignment.save!
+      get 'index', :course_id => @course.id
+      expect(assigns[:js_env][:HAS_ASSIGNMENTS]).to eq(false)
+    end
+
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do
       user_session(@teacher)
       AssignmentUtil.stubs(:due_date_required_for_account?).returns(true)

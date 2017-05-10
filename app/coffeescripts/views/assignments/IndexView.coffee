@@ -98,7 +98,7 @@ define [
             disableSyncToSis: @assignmentSyncSettingsView.openDisableSync.bind(@assignmentSyncSettingsView)
             sisName: ENV.SIS_NAME
             postToSisDefault: ENV.POST_TO_SIS_DEFAULT
-            collection: @collection
+            hasAssignments: ENV.HAS_ASSIGNMENTS
           }),
           $('#settingsMountPoint')[0]
         )

@@ -22,72 +22,14 @@ define([
   'react-addons-test-utils',
   'react-modal',
   'jsx/assignments/IndexMenu',
-  'compiled/models/Assignment',
-  'compiled/models/AssignmentGroup',
-  'compiled/views/assignments/AssignmentGroupListView',
-  'compiled/views/assignments/AssignmentGroupListItemView',
-  'compiled/models/Course',
-  'compiled/collections/AssignmentGroupCollection',
   'jsx/assignments/actions/IndexMenuActions',
   './createFakeStore',
   'jquery'
-], (React, ReactDOM, TestUtils, Modal, IndexMenu, Assignment, AssignmentGroup,
-    AssignmentGroupListView, AssignmentGroupListItemView, Course, AssignmentGroupCollection, Actions,
+], (React, ReactDOM, TestUtils, Modal, IndexMenu, Actions,
     createFakeStore, $) => {
   QUnit.module('AssignmentsIndexMenu')
 
   const generateProps = (overrides, initialState = {}) => {
-    const course = new Course({id: 1});
-
-    const assignment1 = new Assignment({
-      id: 1,
-      name: 'Assignment 1',
-      description: 'test',
-      due_at: '2013-08-21T23:59:00-06:00',
-      points_possible: 2
-    });
-    const assignment2 = new Assignment({
-      id: 1,
-      name: 'Assignment 2',
-      description: 'test2',
-      due_at: '2013-08-21T23:59:00-06:00',
-      points_possible: 2
-    });
-    const group1 = new AssignmentGroup({
-      name: 'Group 1',
-      assignments: assignment1
-    });
-    const group2 = new AssignmentGroup({
-      name: 'Group 2',
-      assignments: assignment2
-    });
-    const assignmentGroups = new AssignmentGroupCollection([group1, group2], {
-      course() {}
-    });
-
-    const options = $.extend({canManage: true}, options)
-    ENV.PERMISSIONS = { manage: options.canManage }
-    ENV.SIS_NAME = 'PowerSchool'
-
-    new AssignmentGroupListView({
-      collection: assignmentGroups,
-      sortURL: 'http://localhost:3000/courses/1/assignments/',
-      assignment_sort_base_url: 'http://localhost:3000/courses/1/assignments/',
-      course: course
-    });
-
-    const assignmentGroupListItemView1 = new AssignmentGroupListItemView({
-      model: group1,
-      course: course,
-      userIsAdmin: options.userIsAdmin
-    });
-
-    const assignmentGroupListItemView2 = new AssignmentGroupListItemView({
-      model: group2,
-      course: course,
-      userIsAdmin: options.userIsAdmin
-    });
-
     const state = {
       externalTools: [],
       selectedTool: null,
@@ -101,9 +43,9 @@ define([
       setDisableTrigger: () => {},
       registerWeightToggle: () => {},
       disableSyncToSis: () => {},
-      sisName: ENV.SIS_NAME,
+      sisName: 'PowerSchool',
       postToSisDefault: ENV.POST_TO_SIS_DEFAULT,
-      collection: assignmentGroups,
+      hasAssignments: ENV.HAS_ASSIGNMENTS,
       ...overrides
     };
   };
@@ -225,6 +167,7 @@ define([
 
   testCase('renders a dropdown menu with two options when sync to sis conditions are met', () => {
     ENV.POST_TO_SIS_DEFAULT = true
+    ENV.HAS_ASSIGNMENTS = true
     const component = renderComponent(generateProps({}));
     const options = TestUtils.scryRenderedDOMComponentsWithTag(component, 'li');
 
@@ -233,11 +176,13 @@ define([
     ReactDOM.unmountComponentAtNode(component.node.parentElement);
   });
 
-  testCase('returns the correct number of assignments', () => {
+  testCase('renders a dropdown menu with one option when sync to sis conditions are not met', () => {
+    ENV.POST_TO_SIS_DEFAULT = true
+    ENV.HAS_ASSIGNMENTS = false
     const component = renderComponent(generateProps({}));
-    const result = component.assignmentCount()
+    const options = TestUtils.scryRenderedDOMComponentsWithTag(component, 'li');
 
-    equal(result, 2);
+    equal(options.length, 1);
     component.closeModal();
     ReactDOM.unmountComponentAtNode(component.node.parentElement);
   });
