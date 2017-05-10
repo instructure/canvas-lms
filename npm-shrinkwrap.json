@@ -541,6 +541,11 @@
         }
       }
     },
+    "handlebars-loader": {
+      "version": "1.4.0",
+      "from": "handlebars-loader@1.4.0",
+      "resolved": "https://registry.npmjs.org/handlebars-loader/-/handlebars-loader-1.4.0.tgz"
+    },
     "js-yaml": {
       "version": "3.7.0",
       "from": "js-yaml>=3.5.5 <3.7.1",
