@@ -315,7 +315,7 @@ module Api::V1::AssignmentOverride
 
     if override.set_type == 'ADHOC'
       override.title = override_data[:title] ||
-                         override.title_from_students(override_data[:students]) ||
+                         (override_data[:students] && override.title_from_students(override_data[:students])) ||
                          override.title
     end
 
