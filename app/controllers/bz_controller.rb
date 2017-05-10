@@ -46,6 +46,15 @@ class BzController < ApplicationController
         elsif o.name == "INPUT" && o.attr['type'] == 'radio'
           n = doc.create_element 'span'
           n.inner_html = value == 'yes' ? '[O]' : '[ ]'
+        elsif value =~ /\A#{URI::regexp(['http', 'https'])}\z/
+          # it is a link, limit the length so it doesn't break formats
+          n = doc.create_element 'a'
+          n['href'] = value
+          if value.length > 60
+            n.content = value[0 .. 24] + " ... " + value[value.length - 24 .. -1]
+          else
+            n.content = value
+          end
         else
           n = doc.create_element 'span'
           n.content = value
