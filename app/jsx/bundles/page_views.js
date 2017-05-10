@@ -22,7 +22,7 @@ import PageViewView from 'compiled/views/contexts/PageViewView'
 
 const $container = $('#pageviews')
 const $table = $container.find('table')
-const userId = $table.data('userId')
+const userId = $table.attr('data-user-id')
 
 const pageViews = new PageViewCollection()
 pageViews.url = `/api/v1/users/${userId}/page_views`
