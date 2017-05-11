@@ -69,6 +69,12 @@ describe "master courses sidebar" do
       expect(f('.bcs__content')).to be_displayed
     end
 
+    it "should not show the Associations buton" do
+      get "/courses/#{@master.id}"
+      f('.blueprint__root .bcs__wrapper .bcs__trigger').click
+      expect(f('.bcs__content')).not_to contain_css('button#mcSidebarAsscBtn')
+    end
+
     it "should show Sync History modal when button is clicked" do
       get "/courses/#{@master.id}"
       f('.blueprint__root .bcs__wrapper .bcs__trigger').click
@@ -93,6 +99,12 @@ describe "master courses sidebar" do
 
     before :each do
       user_session(@admin)
+    end
+
+    it "should show the Associations buton" do
+      get "/courses/#{@master.id}"
+      f('.blueprint__root .bcs__wrapper .bcs__trigger').click
+      expect(f('.bcs__content')).to contain_css('button#mcSidebarAsscBtn')
     end
 
     it "should show Associations modal when button is clicked" do

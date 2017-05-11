@@ -31,11 +31,13 @@ export default class BlueprintCourseSidebar extends Component {
   static propTypes = {
     onOpen: PropTypes.func,
     children: PropTypes.node,
+    contentRef: PropTypes.func, //for unit testing
   }
 
   static defaultProps = {
     children: null,
     onOpen: () => {},
+    contentRef: null
   }
 
   constructor (props) {
@@ -81,7 +83,7 @@ export default class BlueprintCourseSidebar extends Component {
           onEntering={this.handleOpen}
           onExiting={this.handleClose}
         >
-          <div className="bcs__content">
+          <div className="bcs__content" ref={this.props.contentRef}>
             <header className="bcs__header">
               <Heading color="primary-inverse" level="h3">
                 <div className="bcs__close-wrapper">

@@ -288,7 +288,8 @@ class ApplicationController < ActionController::Base
       masterCourse: master_course.slice(:id, :name, :enrollment_term_id),
       course: @context.slice(:id, :name, :enrollment_term_id),
       subAccounts: @context.account.sub_accounts.pluck(:id, :name).map{|id, name| {id: id, name: name}},
-      terms: @context.account.root_account.enrollment_terms.active.pluck(:id, :name).map{|id, name| {id: id, name: name}}
+      terms: @context.account.root_account.enrollment_terms.active.pluck(:id, :name).map{|id, name| {id: id, name: name}},
+      canManageCourse: MasterCourses::MasterTemplate.is_master_course?(@context) && @context.account.grants_right?(@current_user, :manage_master_courses)
     }
   end
   helper_method :load_blueprint_courses_ui

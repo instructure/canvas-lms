@@ -42,6 +42,7 @@ let BlueprintAssociations = null
 
 export default class CourseSidebar extends Component {
   static propTypes = {
+    canManageCourse: PropTypes.bool.isRequired,
     hasLoadedAssociations: PropTypes.bool.isRequired,
     associations: propTypes.courseList.isRequired,
     loadAssociations: PropTypes.func.isRequired,
@@ -56,11 +57,13 @@ export default class CourseSidebar extends Component {
     unsyncedChanges: propTypes.unsyncedChanges,
     isLoadingBeginMigration: PropTypes.bool.isRequired,
     migrationStatus: propTypes.migrationState,
+    contentRef: PropTypes.func,   // to get reference to the content of the Tray facilitates unit testing
   }
 
   static defaultProps = {
     unsyncedChanges: [],
     migrationStatus: MigrationStates.unknown,
+    contentRef: null,
   }
 
   constructor (props) {
@@ -236,6 +239,20 @@ export default class CourseSidebar extends Component {
     return null
   }
 
+  maybeRenderAssociationsButon () {
+    if (this.props.canManageCourse) {
+      return (
+        <div className="bcs__row">
+          <Button id="mcSidebarAsscBtn" ref={(c) => { this.asscBtn = c }} variant="link" onClick={this.handleAssociationsClick}>
+            <Typography>{I18n.t('Associations')}</Typography>
+          </Button>
+          <Typography><span className="bcs__row-right-content">{this.props.associations.length}</span></Typography>
+        </div>
+      )
+    }
+    return null
+  }
+
   renderSpinner (title) {
     return (
       <div style={{textAlign: 'center'}}>
@@ -256,13 +273,8 @@ export default class CourseSidebar extends Component {
 
   render () {
     return (
-      <BlueprintSidebar onOpen={this.onOpenSidebar}>
-        <div className="bcs__row">
-          <Button id="mcSidebarAsscBtn" ref={(c) => { this.asscBtn = c }} variant="link" onClick={this.handleAssociationsClick}>
-            <Typography>{I18n.t('Associations')}</Typography>
-          </Button>
-          <Typography><span className="bcs__row-right-content">{this.props.associations.length}</span></Typography>
-        </div>
+      <BlueprintSidebar onOpen={this.onOpenSidebar} contentRef={this.props.contentRef}>
+        {this.maybeRenderAssociationsButon()}
         <div className="bcs__row">
           <Button id="mcSyncHistoryBtn" ref={(c) => { this.syncHistoryBtn = c }} variant="link" onClick={this.handleSyncHistoryClick}>
             <Typography>{I18n.t('Sync History')}</Typography>
@@ -278,6 +290,7 @@ export default class CourseSidebar extends Component {
 
 const connectState = state =>
   Object.assign(select(state, [
+    'canManageCourse',
     'hasLoadedAssociations',
     'isLoadingBeginMigration',
     'hasCheckedMigration',
