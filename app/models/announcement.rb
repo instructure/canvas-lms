@@ -22,6 +22,7 @@ class Announcement < DiscussionTopic
 
   has_a_broadcast_policy
   include HasContentTags
+  include Plannable
 
   sanitize_field :message, CanvasSanitize::SANITIZE
 

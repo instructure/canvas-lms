@@ -25,6 +25,7 @@ class FixDeprecatedPolymorphicNames < ActiveRecord::Migration[4.2]
     end
     reflections.flatten!
     reflections.group_by(&:klass).each do |(klass, klass_reflections)|
+      next unless klass.table_exists?
       klass.find_ids_in_ranges(batch_size: 10000) do |min_id, max_id|
         klass_reflections.each do |reflection|
           klass.where(id: min_id..max_id,

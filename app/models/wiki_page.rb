@@ -31,6 +31,7 @@ class WikiPage < ActiveRecord::Base
   include CopyAuthorizedLinks
   include ContextModuleItem
   include Submittable
+  include Plannable
 
   include SearchTermHelper
 

@@ -1462,7 +1462,7 @@ class User < ActiveRecord::Base
       if opts[:contexts]
         course_ids = Array(opts[:contexts]).map(&:id) & course_ids
       end
-      opts = {limit: 15}.merge(opts.slice(:due_after, :due_before, :limit, :include_ungraded, :ungraded_quizzes))
+      opts = {limit: 15}.merge(opts.slice(:due_after, :due_before, :limit, :include_ungraded, :ungraded_quizzes, :include_ignored))
 
       course_ids_cache_key = Digest::MD5.hexdigest(course_ids.sort.join('/'))
       Rails.cache.fetch([self, "assignments_needing_#{purpose}", course_ids_cache_key, opts].cache_key, :expires_in => expires_in) do
@@ -1470,10 +1470,12 @@ class User < ActiveRecord::Base
           Shard.partition_by_shard(course_ids) do |shard_course_ids|
             if opts[:ungraded_quizzes]
               scope = Quizzes::Quiz.where(context_type: 'Course', context_id: shard_course_ids).
-                not_for_assignment.not_ignored_by(self, purpose)
+                not_for_assignment
+              scope = scope.not_ignored_by(self, purpose) unless opts[:include_ignored]
               yield(scope, opts.merge(:shard_course_ids => shard_course_ids))
             else
-              scope = Assignment.for_course(shard_course_ids).not_ignored_by(self, purpose)
+              scope = Assignment.for_course(shard_course_ids)
+              scope = scope.not_ignored_by(self, purpose) unless opts[:include_ignored]
               yield(scope, opts.merge(:shard_course_ids => shard_course_ids))
             end
           end

@@ -33,6 +33,7 @@ class DiscussionTopic < ActiveRecord::Base
   include ContextModuleItem
   include SearchTermHelper
   include Submittable
+  include Plannable
   include MasterCourses::Restrictor
   restrict_columns :content, [:title, :message]
   restrict_columns :settings, [:delayed_post_at, :require_initial_post, :discussion_type,

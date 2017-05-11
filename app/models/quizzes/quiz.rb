@@ -28,6 +28,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   include ContextModuleItem
   include DatesOverridable
   include SearchTermHelper
+  include Plannable
   include Canvas::DraftStateValidations
 
   attr_readonly :context_id, :context_type

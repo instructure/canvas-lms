@@ -34,6 +34,7 @@ class Assignment < ActiveRecord::Base
   include SearchTermHelper
   include Canvas::DraftStateValidations
   include TurnitinID
+  include Plannable
 
   ALLOWED_GRADING_TYPES = %w(
     pass_fail percent letter_grade gpa_scale points not_graded
