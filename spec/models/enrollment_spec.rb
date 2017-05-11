@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2016 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -101,6 +101,34 @@ describe Enrollment do
     it "should return the sis enrollment type otherwise" do
       e = TaEnrollment.new
       expect(e.sis_role).to eq 'ta'
+    end
+  end
+
+  describe '#destroy' do
+    before(:once) do
+      @enrollment = StudentEnrollment.create!(valid_enrollment_attributes)
+      assignment = @course.assignments.create!
+      @override = assignment.assignment_overrides.create!
+      @override.assignment_override_students.create!(user: @enrollment.user)
+    end
+
+    let(:override_student) { @override.assignment_override_students.find_by(user_id: @enrollment.user) }
+
+    it 'does not destroy assignment override students on the user if other enrollments' \
+    'for the user exist in the course' do
+      @course.enroll_user(
+        @enrollment.user,
+        'StudentEnrollment',
+        section: @course.course_sections.create!,
+        allow_multiple_enrollments: true
+      )
+      @enrollment.destroy
+      expect(override_student).to be_present
+    end
+
+    it 'destroys assignment override students on the user if no other enrollments for the user exist in the course' do
+      @enrollment.destroy
+      expect(override_student).not_to be_present
     end
   end
 

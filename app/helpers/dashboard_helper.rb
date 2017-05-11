@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2012 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,14 +18,18 @@
 
 module DashboardHelper
   def show_recent_activity?
-    @current_user.preferences[:recent_activity_dashboard].present?
+    if @current_user.preferences[:dashboard_view]
+      @current_user.preferences[:dashboard_view] == 'activity'
+    else
+      @current_user.preferences[:recent_activity_dashboard].present?
+    end
   end
 
   def show_dashboard_cards?
-    if planner_enabled?
-      show_planner?
+    if @current_user.preferences[:dashboard_view]
+      @current_user.preferences[:dashboard_view] == 'cards'
     else
-      show_recent_activity?
+      @current_user.preferences[:recent_activity_dashboard].blank?
     end
   end
 

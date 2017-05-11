@@ -1,4 +1,23 @@
-define [], () ->
+#
+# Copyright (C) 2016 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
+define [
+  'compiled/util/fcUtil'
+], (fcUtil) ->
   # We want to filter events received from the datasource. It seems like you should be able
   # to do this at render time as well, and return "false" in eventRender, but on the agenda
   # view that still assumes that the item is taking up space even though it's not displayed.
@@ -35,7 +54,7 @@ define [], () ->
             # appointment slot
             if schedulerState.inFindAppointmentMode && event.isOnCalendar(schedulerState.selectedCourse.asset_string)
               # show it (non-grayed) if it is reservable; filter it out otherwise
-              if event.calendarEvent.reserved || event.calendarEvent.available_slots == 0
+              if event.calendarEvent.reserved || event.calendarEvent.available_slots == 0 || event.endDate() < fcUtil.now()
                 keep = false
               else
                 gray = false

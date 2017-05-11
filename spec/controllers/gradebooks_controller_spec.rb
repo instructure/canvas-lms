@@ -1,6 +1,6 @@
 # encoding: utf-8
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -1042,6 +1042,7 @@ describe GradebooksController do
   describe '#external_tool_detail' do
     let(:tool) do
       {
+        definition_id: 123,
         name: 'test lti',
         placements: {
           post_grades: {
@@ -1055,12 +1056,60 @@ describe GradebooksController do
 
     it 'maps a tool to launch details' do
       expect(@controller.external_tool_detail(tool)).to eql(
+        id: 123,
         data_url: 'http://example.com/lti/post_grades',
         name: 'test lti',
         type: :lti,
         data_width: 100,
         data_height: 100
       )
+    end
+  end
+
+  describe '#post_grades_ltis' do
+    it 'maps #external_tools with #external_tool_detail' do
+      expect(@controller).to receive(:external_tools).and_return([0,1,2,3,4,5,6,7,8,9])
+      expect(@controller).to receive(:external_tool_detail).exactly(10).times
+
+      @controller.post_grades_ltis
+    end
+
+    it 'memoizes' do
+      expect(@controller).to receive(:external_tools).and_return([]).once
+
+      expect(@controller.post_grades_ltis).to eq(@controller.post_grades_ltis)
+    end
+  end
+
+  describe '#post_grades_feature?' do
+    it 'returns false when :post_grades feature disabled for context' do
+      context = object_double(@course, feature_enabled?: false)
+      @controller.instance_variable_set(:@context, context)
+
+      expect(@controller.post_grades_feature?).to eq(false)
+    end
+
+    it 'returns false when context does not allow grade publishing by user' do
+      context = object_double(@course, feature_enabled?: true, allows_grade_publishing_by: false)
+      @controller.instance_variable_set(:@context, context)
+
+      expect(@controller.post_grades_feature?).to eq(false)
+    end
+
+    it 'returns false when #can_do is false' do
+      context = object_double(@course, feature_enabled?: true, allows_grade_publishing_by: true)
+      @controller.instance_variable_set(:@context, context)
+      allow(@controller).to receive(:can_do).and_return(false)
+
+      expect(@controller.post_grades_feature?).to eq(false)
+    end
+
+    it 'returns true when all conditions are met' do
+      context = object_double(@course, feature_enabled?: true, allows_grade_publishing_by: true)
+      @controller.instance_variable_set(:@context, context)
+      allow(@controller).to receive(:can_do).and_return(true)
+
+      expect(@controller.post_grades_feature?).to eq(true)
     end
   end
 end

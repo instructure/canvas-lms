@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -138,6 +138,7 @@ class User < ActiveRecord::Base
   has_one :profile, :class_name => 'UserProfile'
 
   has_many :progresses, :as => :context, :inverse_of => :context
+  has_many :one_time_passwords, -> { order(:id) }, inverse_of: :user
 
   belongs_to :otp_communication_channel, :class_name => 'CommunicationChannel'
 
@@ -224,6 +225,11 @@ class User < ActiveRecord::Base
     end
   }
 
+  def reload(*)
+    @all_active_pseudonyms = nil
+    super
+  end
+
   def assignment_and_quiz_visibilities(context)
     RequestCache.cache("assignment_and_quiz_visibilities", self, context) do
       {assignment_ids: DifferentiableAssignment.scope_filter(context.assignments, self, context).pluck(:id),
@@ -234,6 +240,7 @@ class User < ActiveRecord::Base
   def self.order_by_sortable_name(options = {})
     order_clause = clause = sortable_name_order_by_clause
     order_clause = "#{clause} DESC" if options[:direction] == :descending
+    order_clause += ",users.id"
     scope = self.order(order_clause)
     if scope.select_values.empty?
       scope = scope.select(self.arel_table[Arel.star])
@@ -973,18 +980,6 @@ class User < ActiveRecord::Base
     self.courses
   end
 
-  def courses_with_grades
-    @courses_with_grades ||= self.available_courses.shard(self).select{|c| c.grants_right?(self, :participate_as_student)}
-  end
-
-  def sis_pseudonym_for(context, include_trusted = false, override_deprecation = false)
-    if Rails.env.production? || override_deprecation
-      SisPseudonym.for(self, context, include_trusted)
-    else
-      raise "User#sis_pseudonym_for is deprecated. Use SisPseudonym.for"
-    end
-  end
-
   def check_courses_right?(user, sought_right)
     # Look through the currently enrolled courses first.  This should
     # catch most of the calls.  If none of the current courses grant
@@ -1089,7 +1084,7 @@ class User < ActiveRecord::Base
     # student view should only ever have enrollments in a single course
     return true if self.fake_student? && self.courses.any?{ |c| c.grants_right?(masquerader, :use_student_view) }
     return false unless
-        account.grants_right?(masquerader, nil, :become_user) && self.find_pseudonym_for_account(account, true)
+        account.grants_right?(masquerader, nil, :become_user) && SisPseudonym.for(self, account, type: :implicit, require_sis: false)
     has_subset_of_account_permissions?(masquerader, account)
   end
 
@@ -2299,22 +2294,14 @@ class User < ActiveRecord::Base
   TAB_EPORTFOLIOS = 3
   TAB_HOME = 4
 
-  def roles(root_account)
+  def roles(root_account, exclude_deleted_accounts = nil)
+    # Don't include roles for deleted accounts and don't cache
+    # the results.
+    return user_roles(root_account, true) if exclude_deleted_accounts
+
     return @roles if @roles
     @roles = Rails.cache.fetch(['user_roles_for_root_account3', self, root_account].cache_key) do
-      roles = ['user']
-
-      enrollment_types = root_account.all_enrollments.where(user_id: self, workflow_state: 'active').distinct.pluck(:type)
-      roles << 'student' unless (enrollment_types & %w[StudentEnrollment StudentViewEnrollment]).empty?
-      roles << 'teacher' unless (enrollment_types & %w[TeacherEnrollment TaEnrollment DesignerEnrollment]).empty?
-      roles << 'observer' unless (enrollment_types & %w[ObserverEnrollment]).empty?
-      account_users = root_account.all_account_users_for(self)
-      if account_users.any?
-        roles << 'admin'
-        root_ids = [root_account.id,  Account.site_admin.id]
-        roles << 'root_admin' if account_users.any?{|au| root_ids.include?(au.account_id) }
-      end
-      roles
+      user_roles(root_account)
     end
   end
 
@@ -2516,7 +2503,7 @@ class User < ActiveRecord::Base
   end
 
   def can_be_enrolled_in_course?(course)
-    !!find_pseudonym_for_account(course.root_account, true) ||
+    !!SisPseudonym.for(self, course, type: :implicit, require_sis: false) ||
         (self.creation_pending? && self.enrollments.where(course_id: course).exists?)
   end
 
@@ -2531,42 +2518,15 @@ class User < ActiveRecord::Base
     h
   end
 
-  def find_pseudonym_for_account(account, allow_implicit = false)
-    # try to find one that's already loaded if possible
-    if self.pseudonyms.loaded?
-      result = self.pseudonyms.detect { |p| p.active? && p.works_for_account?(account, allow_implicit) }
-      return result if result || self.associated_shards.length == 1
-    end
-    if @all_active_pseudonyms
-      return @all_active_pseudonyms.detect { |p| p.works_for_account?(account, allow_implicit) }
-    else
-      shards = self.associated_shards
-      unless allow_implicit
-        # only search the shards with trusted accounts
-        trusted_shards = account.root_account.trusted_account_ids.map{|id| Shard.shard_for(id) }
-        trusted_shards << account.root_account.shard
-
-        shards = self.associated_shards & trusted_shards
-      end
-
-      Shard.with_each_shard(shards) do
-        pseudonym = Pseudonym.where(:user_id => self).active.to_a.detect{|p| p.works_for_account?(account, allow_implicit) }
-        return pseudonym if pseudonym
-      end
-
-      nil
-    end
-  end
-
   # account = the account that you want a pseudonym for
   # preferred_template_account = pass in an actual account if you have a preference for which account the new pseudonym gets copied from
   # this may not be able to find a suitable pseudonym to copy, so would still return nil
   # if a pseudonym is created, it is *not* saved, and *not* added to the pseudonyms collection
   def find_or_initialize_pseudonym_for_account(account, preferred_template_account = nil)
-    pseudonym = find_pseudonym_for_account(account)
-    if !pseudonym
+    pseudonym = SisPseudonym.for(self, account, type: :trusted, require_sis: false)
+    unless pseudonym
       # list of copyable pseudonyms
-      active_pseudonyms = self.all_active_pseudonyms(:reload).select { |p|!p.password_auto_generated? && !p.account.delegated_authentication? }
+      active_pseudonyms = self.all_active_pseudonyms(:reload).select { |p| !p.password_auto_generated? && !p.account.delegated_authentication? }
       templates = []
       # re-arrange in the order we prefer
       templates.concat active_pseudonyms.select { |p| p.account_id == preferred_template_account.id } if preferred_template_account
@@ -2779,6 +2739,10 @@ class User < ActiveRecord::Base
     @all_pseudonyms ||= self.pseudonyms.shard(self).to_a
   end
 
+  def all_active_pseudonyms_loaded?
+    !!@all_active_pseudonyms
+  end
+
   def all_active_pseudonyms(reload=false)
     @all_active_pseudonyms = nil if reload
     @all_active_pseudonyms ||= self.pseudonyms.shard(self).active.to_a
@@ -2853,5 +2817,40 @@ class User < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def authenticate_one_time_password(code)
+    result = one_time_passwords.where(code: code, used: false).take
+    return unless result
+    # atomically update used
+    return unless one_time_passwords.where(used: false, id: result).update_all(used: true, updated_at: Time.now.utc) == 1
+    result
+  end
+
+  def generate_one_time_passwords(regenerate: false)
+    regenerate ||= !one_time_passwords.exists?
+    return unless regenerate
+    one_time_passwords.scope.delete_all
+    Setting.get('one_time_password_count', 10).to_i.times { one_time_passwords.create! }
+  end
+
+  def user_roles(root_account, exclude_deleted_accounts = nil)
+    roles = ['user']
+    enrollment_types = root_account.all_enrollments.where(user_id: self, workflow_state: 'active').distinct.pluck(:type)
+    roles << 'student' unless (enrollment_types & %w[StudentEnrollment StudentViewEnrollment]).empty?
+    roles << 'teacher' unless (enrollment_types & %w[TeacherEnrollment TaEnrollment DesignerEnrollment]).empty?
+    roles << 'observer' unless (enrollment_types & %w[ObserverEnrollment]).empty?
+    account_users = root_account.all_account_users_for(self)
+
+    if exclude_deleted_accounts
+      account_users = account_users.select { |a| a.account.workflow_state == 'active' }
+    end
+
+    if account_users.any?
+      roles << 'admin'
+      root_ids = [root_account.id,  Account.site_admin.id]
+      roles << 'root_admin' if account_users.any?{|au| root_ids.include?(au.account_id) }
+    end
+    roles
   end
 end

@@ -12,5 +12,3 @@ http://github.com/mattetti/mimetype-fu
 
 Thanks to forestcarlisle for his big report and patch.
 
-
-Copyright (c) 2008 Matt Aimonetti, released under the MIT license

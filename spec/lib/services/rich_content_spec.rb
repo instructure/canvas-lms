@@ -1,13 +1,32 @@
+#
+# Copyright (C) 2015 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative "../../spec_helper"
 require_dependency "services/rich_content"
 
 module Services
   describe RichContent do
     before do
-      Canvas::DynamicSettings.stubs(:find).with("rich-content-service").returns({
-        "app-host" => "rce-app",
-        "cdn-host" => "rce-cdn"
-      })
+      allow(Canvas::DynamicSettings).to receive(:find)
+        .with('rich-content-service', use_env: false)
+        .and_return({
+          "app-host" => "rce-app",
+          "cdn-host" => "rce-cdn"
+        })
     end
 
     describe ".env_for" do
@@ -25,8 +44,9 @@ module Services
       end
 
       it "populates hosts with an error signal when consul is down" do
-        Canvas::DynamicSettings.stubs(:find).with("rich-content-service").
-          raises(Imperium::UnableToConnectError, "can't talk to consul")
+        allow(Canvas::DynamicSettings).to receive(:find)
+          .with('rich-content-service', use_env: false)
+          .and_raise(Imperium::UnableToConnectError, "can't talk to consul")
         root_account = stub("root_account", feature_enabled?: true)
         env = described_class.env_for(root_account)
         expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_truthy
@@ -35,7 +55,7 @@ module Services
       end
 
       it "logs errors for later consideration" do
-        Canvas::DynamicSettings.stubs(:find).with("rich-content-service").
+        Canvas::DynamicSettings.stubs(:find).with("rich-content-service", use_env: false).
           raises(Canvas::DynamicSettings::ConsulError, "can't talk to consul")
         root_account = stub("root_account", feature_enabled?: true)
         Canvas::Errors.expects(:capture_exception).with do |type, e|

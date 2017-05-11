@@ -1,12 +1,26 @@
+/*
+ * Copyright (C) 2016 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import serviceRCELoader from 'jsx/shared/rce/serviceRCELoader'
 import { send, destroy, focus } from 'jsx/shared/rce/RceCommandShim'
 import Sidebar from 'jsx/shared/rce/Sidebar'
 import featureFlag from 'jsx/shared/rce/featureFlag'
 import $ from 'jquery'
-
-// for legacy pathways
-import 'tinymce.editor_box'
-import 'compiled/tinymce'
 
 function loadServiceRCE (target, tinyMCEInitOptions, callback) {
   serviceRCELoader.loadOnTarget(target, tinyMCEInitOptions, (textarea, remoteEditor) => {
@@ -18,13 +32,42 @@ function loadServiceRCE (target, tinyMCEInitOptions, callback) {
   })
 }
 
+let legacyTinyMCELoaded = false
+function loadLegacyTinyMCE (callback) {
+  if (legacyTinyMCELoaded) {
+    callback()
+    return
+  }
+
+  require.ensure([], (require) => {
+    legacyTinyMCELoaded = true
+    require('tinymce.editor_box')
+    require('compiled/tinymce')
+    callback()
+  }, 'legacyTinymceAsyncChunk')
+}
+
+function hideTextareaWhileLoadingLegacyRCE (target, callback) {
+  if (legacyTinyMCELoaded) {
+    callback()
+    return
+  }
+
+  const previousOpacity = target[0].style.opacity
+  target.css('opacity', 0)
+  loadLegacyTinyMCE(() => {
+    target.css('opacity', previousOpacity)
+    callback()
+  })
+}
+
 function loadLegacyRCE (target, tinyMCEInitOptions, callback) {
-  tinyMCEInitOptions.defaultContent ?
+  hideTextareaWhileLoadingLegacyRCE(target, () => {
+    tinyMCEInitOptions.defaultContent ?
       target.editorBox(tinyMCEInitOptions).editorBox('set_code', tinyMCEInitOptions.defaultContent) :
       target.editorBox(tinyMCEInitOptions)
-  if (callback) {
-    callback()
-  }
+    if (callback) callback()
+  })
 }
 
 function establishParentNode (target) {

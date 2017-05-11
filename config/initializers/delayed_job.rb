@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 Delayed::Job.include(JobLiveEventsContext)
 
 Delayed::Backend::Base.class_eval do
@@ -57,13 +74,16 @@ Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
   starting_mem = Canvas.sample_memory()
   starting_cpu = Process.times()
   lag = ((Time.now - job.run_at) * 1000).round
-  tag = CanvasStatsd::Statsd.escape(job.tag)
+  obj_tag, method_tag = job.tag.split(/[\.#]/, 2).map do |v|
+    CanvasStatsd::Statsd.escape(v).gsub("::", "-")
+  end
+  method_tag ||= "unknown"
   shard_id = job.current_shard.try(:id).to_i
-  stats = ["delayedjob.queue", "delayedjob.queue.tag.#{tag}", "delayedjob.queue.shard.#{shard_id}"]
+  stats = ["delayedjob.queue", "delayedjob.queue.tag.#{obj_tag}.#{method_tag}", "delayedjob.queue.shard.#{shard_id}"]
   stats << "delayedjob.queue.jobshard.#{job.shard.id}" if job.respond_to?(:shard)
   CanvasStatsd::Statsd.timing(stats, lag)
   begin
-    stats = ["delayedjob.perform", "delayedjob.perform.tag.#{tag}", "delayedjob.perform.shard.#{shard_id}"]
+    stats = ["delayedjob.perform", "delayedjob.perform.tag.#{obj_tag}.#{method_tag}", "delayedjob.perform.shard.#{shard_id}"]
     stats << "delayedjob.perform.jobshard.#{job.shard.id}" if job.respond_to?(:shard)
     CanvasStatsd::Statsd.time(stats) do
       block.call(worker, job)

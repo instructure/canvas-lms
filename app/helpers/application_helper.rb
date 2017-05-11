@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -886,10 +886,6 @@ module ApplicationHelper
 
   def planner_enabled?
     @domain_root_account&.feature_enabled?(:student_planner)
-  end
-
-  def show_planner?
-    @current_user.preferences[:dashboard_view] == 'planner'
   end
 
 end

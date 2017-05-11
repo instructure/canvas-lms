@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2017 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 module Lti
   class ToolConsumerProfile < ActiveRecord::Base
 
@@ -11,17 +28,14 @@ module Lti
 
     DEFAULT_TCP_UUID = "339b6700-e4cb-47c5-a54f-3ee0064921a9".freeze
 
-    WEBHOOK_GRANT_ALL_CAPABILITY = 'vnd.Canvas.webhooks.root_account.all'.freeze
+    WEBHOOK_GRANT_ALL_CAPABILITY = 'vnd.instructure.webhooks.root_account.all'.freeze
     WEBHOOK_SUBSCRIPTION_CAPABILITIES = {
       all: [WEBHOOK_GRANT_ALL_CAPABILITY].freeze,
       quiz_submitted: %w(vnd.instructure.webhooks.root_account.quiz_submitted
-                         vnd.instructure.webhooks.course.quiz_submitted
                          vnd.instructure.webhooks.assignment.quiz_submitted).freeze,
       assignment_submitted: %w(vnd.instructure.webhooks.root_account.assignment_submitted
-                               vnd.instructure.webhooks.course.assignment_submitted
                                vnd.instructure.webhooks.assignment.assignment_submitted).freeze,
-      grade_changed: %w(vnd.instructure.webhooks.root_account.grade_changed
-                        vnd.instructure.webhooks.course.grade_changed).freeze,
+      grade_changed: %w(vnd.instructure.webhooks.root_account.grade_changed).freeze,
       attachment_created: %w(vnd.instructure.webhooks.root_account.attachment_created
                              vnd.instructure.webhooks.assignment.attachment_created).freeze,
       submission_created: %w(vnd.instructure.webhooks.root_account.submission_created

@@ -1,3 +1,21 @@
+<%
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
 <% add_crumb t(:sis_import_crumb, "SIS Import") %>
 <% @active_tab = "sis_import" %>
 <% content_for :page_title do %><%= t(:page_title, "SIS Import") %>
@@ -38,6 +56,9 @@
               <%= mt(:batch_import_instructions,
                      "If selected, this will delete everything for this term, which includes all courses and enrollments that are not in the selected import file above.  \nSee the documentation for details.") %>
             </p>
+            <label id="batch_mode_term_id_label" for="batch_mode_term_id">
+              <%= t('Term:') %>
+            </label>
             <select id="batch_mode_term_id" name="batch_mode_term_id">
               <%= options_from_collection_for_select(@terms, :id, :name, @terms.first.try(:id)) %>
             </select>

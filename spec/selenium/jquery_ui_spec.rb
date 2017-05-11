@@ -1,4 +1,20 @@
 # encoding: UTF-8
+#
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require File.expand_path(File.dirname(__FILE__) + "/common")
 
@@ -29,13 +45,13 @@ describe "jquery ui" do
     course_with_teacher_logged_in
     get "/"
   end
-  
+
   it "should make dialogs modal by default" do
     expect(driver.execute_script(<<-JS)).to eq true
       return $('<div />').dialog().dialog('option', 'modal');
     JS
     expect(f(".ui-widget-overlay")).to be_displayed
-    
+
     # make sure that hiding then showing the same dialog again, it still looks modal
     expect(driver.execute_script(<<-JS)).to eq true
       return $('<div />')
@@ -53,7 +69,7 @@ describe "jquery ui" do
     active.send_keys(:tab)
     expect(active.tag_name).to eq 'input'
     active.send_keys(:tab)
-    expect(active.tag_name).to eq 'a'
+    expect(active.tag_name).to eq 'button'
     active.send_keys(:tab)
     expect(active.tag_name).to eq 'select'
   end
@@ -64,17 +80,17 @@ describe "jquery ui" do
     active.click # sometimes the viewport doesn't have focus
     expect(active.tag_name).to eq 'select'
     shift_tab
-    expect(active.tag_name).to eq 'a'
+    expect(active.tag_name).to eq 'button'
     shift_tab
     expect(active.tag_name).to eq 'input'
     shift_tab
     expect(active.tag_name).to eq 'select'
   end
-  
+
   context "calendar widget" do
     it "should let you replace content by selecting and typing instead of appending" do
       get "/courses/#{@course.id}/assignments"
-      
+
       f(".add_assignment").click
       wait_for_ajaximations
       f(".ui-datepicker-trigger").click
@@ -82,23 +98,23 @@ describe "jquery ui" do
       f(".ui-datepicker-time-hour").send_keys("12")
       f(".ui-datepicker-time-minute").send_keys("00")
       f(".ui-datepicker-ok").click
-      
+
       f(".ui-datepicker-trigger").click
       wait_for_ajaximations
-      
+
       driver.execute_script("$('#ui-datepicker-time-hour').select();")
       f("#ui-datepicker-time-hour").send_keys('5')
       expect(f("#ui-datepicker-time-hour")).to have_attribute('value', '5')
     end
   end
-  
+
   context "dialog titles" do
 
     # jquery ui doesn't escape dialog titles by default (even when inferred from
     # title attributes!). our modified ui.dialog does (and hopefully jquery.ui
     # will too in 1.9). to pass in an html title that you don't want escaped,
     # wrap it in a jquery object.
-    # 
+    #
     # see http://bugs.jqueryui.com/ticket/6016
     it "should html-escape inferred dialog titles" do
       title = "<b>this</b> is the title"

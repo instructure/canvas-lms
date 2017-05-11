@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2017 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -229,11 +229,13 @@ class GradebooksController < ApplicationController
     end
   end
 
+  def post_grades_ltis
+    @post_grades_ltis ||= self.external_tools.map { |tool| external_tool_detail(tool) }
+  end
+
   def post_grades_tools
     tool_limit = @context.feature_enabled?(:post_grades) ? MAX_POST_GRADES_TOOLS - 1 : MAX_POST_GRADES_TOOLS
-    external_tools = self.external_tools.map { |tool| external_tool_detail(tool) }
-
-    tools = external_tools[0...tool_limit]
+    tools = post_grades_ltis[0...tool_limit]
     tools.push(type: :post_grades) if @context.feature_enabled?(:post_grades)
     tools
   end
@@ -241,6 +243,7 @@ class GradebooksController < ApplicationController
   def external_tool_detail(tool)
     post_grades_placement = tool[:placements][:post_grades]
     {
+      id: tool[:definition_id],
       data_url: post_grades_placement[:canvas_launch_url],
       name: tool[:name],
       type: :lti,
@@ -407,12 +410,21 @@ class GradebooksController < ApplicationController
       gradebook_column_size_settings_url: change_gradebook_column_size_course_gradebook_url,
       gradebook_column_order_settings: @current_user.preferences[:gradebook_column_order].try(:[], @context.id),
       gradebook_column_order_settings_url: save_gradebook_column_order_course_gradebook_url,
+      post_grades_ltis: post_grades_ltis,
+      post_grades_feature: post_grades_feature?,
       sections: sections_json(@context.active_course_sections, @current_user, session),
       settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
       settings: @current_user.preferences.fetch(:gradebook_settings, {}).fetch(@context.id, {}),
       login_handle_name: @context.root_account.settings[:login_handle_name],
+      sis_name: @context.root_account.settings[:sis_name],
       version: params.fetch(:version, nil)
     }
+  end
+
+  def post_grades_feature?
+    @context.feature_enabled?(:post_grades) &&
+    @context.allows_grade_publishing_by(@current_user) &&
+    can_do(@context, @current_user, :manage_grades)
   end
 
   def history
@@ -820,6 +832,7 @@ class GradebooksController < ApplicationController
   end
 
   def submisions_attachment_crocodocable_in_firefox?(submissions)
+    !(Canvadocs.hijack_crocodoc_sessions? && @assignment.context.account.feature_enabled?(:new_annotations)) &&
     request.user_agent.to_s =~ /Firefox/ &&
     submissions.
       joins("left outer join #{submissions.connection.quote_table_name('canvadocs_submissions')} cs on cs.submission_id = submissions.id").
@@ -830,9 +843,11 @@ class GradebooksController < ApplicationController
   end
 
   def canvadoc_annotations_enabled_in_firefox?
+    # this really means crocodoc enabled in canvadocs while using firefox
     request.user_agent.to_s =~ /Firefox/ &&
     Canvadocs.enabled? &&
     Canvadocs.annotations_supported? &&
+    !@assignment.context.account.feature_enabled?(:new_annotations) &&
     @assignment.submission_types.include?('online_upload')
   end
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -31,6 +31,7 @@ export default class StudentColumnHeader extends React.Component {
     selectedPrimaryInfo: oneOf(StudentRowHeaderConstants.primaryInfoKeys).isRequired,
     onSelectPrimaryInfo: func.isRequired,
     loginHandleName: string,
+    sisName: string,
     selectedSecondaryInfo: oneOf(StudentRowHeaderConstants.secondaryInfoKeys).isRequired,
     sectionsEnabled: bool.isRequired,
     onSelectSecondaryInfo: func.isRequired,
@@ -47,7 +48,8 @@ export default class StudentColumnHeader extends React.Component {
   };
 
   static defaultProps = {
-    loginHandleName: null
+    loginHandleName: null,
+    sisName: null,
   };
 
   constructor (props) {
@@ -174,7 +176,7 @@ export default class StudentColumnHeader extends React.Component {
               selected={this.props.selectedSecondaryInfo === 'sis_id'}
               onSelect={this.onShowSisId}
             >
-              {StudentRowHeaderConstants.secondaryInfoLabels.sis_id}
+              {this.props.sisName || StudentRowHeaderConstants.secondaryInfoLabels.sis_id}
             </MenuItem>
 
             <MenuItem

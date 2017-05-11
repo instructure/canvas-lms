@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2015 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative '../../helpers/gradezilla_common'
 require_relative '../../helpers/assignment_overrides'
 require_relative '../page_objects/gradezilla_page'
@@ -21,14 +38,22 @@ describe "Gradezilla - arrange by due date" do
 
   it "should validate arrange columns by due date option", priority: "1", test_id: 220027 do
     expected_text = "-"
-    f('#gradebook_settings').click
-    arrange_settings = ff('input[name="arrange-columns-by"]')
-    arrange_settings.first.find_element(:xpath, '..').click
+
+    view_menu = gradezilla_page.open_gradebook_menu('View')
+    gradezilla_page.select_gradebook_menu_option('Arrange By > Due Date - Oldest to Newest', container: view_menu)
+
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
     expect(first_row_cells[0]).to include_text expected_text
-    f('#gradebook_settings').click
-    expect(arrange_settings.first.find_element(:xpath, '..')).not_to be_displayed
-    expect(arrange_settings.last.find_element(:xpath, '..')).to be_displayed
+
+    view_menu = gradezilla_page.open_gradebook_menu('View')
+    arrange_by_group = gradezilla_page.gradebook_menu_group('Arrange By', container: view_menu)
+    arrangement_menu_options = gradezilla_page.gradebook_menu_options(arrange_by_group)
+    selected_menu_options = arrangement_menu_options.select do |menu_item|
+      menu_item.attribute('aria-checked') == 'true'
+    end
+
+    expect(selected_menu_options.size).to eq(1)
+    expect(selected_menu_options[0].text.strip).to eq('Due Date - Oldest to Newest')
 
     # Setting should stick after reload
     gradezilla_page.visit(@course)
@@ -40,10 +65,15 @@ describe "Gradezilla - arrange by due date" do
     expect(first_row_cells[1]).to include_text @assignment_1_points
     expect(first_row_cells[2]).to include_text @assignment_2_points
 
-    f('#gradebook_settings').click
-    arrange_settings = ff('input[name="arrange-columns-by"]')
-    expect(arrange_settings.first.find_element(:xpath, '..')).not_to be_displayed
-    expect(arrange_settings.last.find_element(:xpath, '..')).to be_displayed
+    view_menu = gradezilla_page.open_gradebook_menu('View')
+    arrange_by_group = gradezilla_page.gradebook_menu_group('Arrange By', container: view_menu)
+    arrangement_menu_options = gradezilla_page.gradebook_menu_options(arrange_by_group)
+    selected_menu_options = arrangement_menu_options.select do |menu_item|
+      menu_item.attribute('aria-checked') == 'true'
+    end
+
+    expect(selected_menu_options.size).to eq(1)
+    expect(selected_menu_options[0].text.strip).to eq('Due Date - Oldest to Newest')
   end
 
   it "should put assignments with no due date last when sorting by due date and VDD", priority: "2", test_id: 251038 do
@@ -55,8 +85,8 @@ describe "Gradezilla - arrange by due date" do
     assignment2.update_attribute(:due_at, 3.days.from_now)
     create_assignment_override(assignment2, @section_a, 2)
 
-    f('#gradebook_settings').click
-    f("a[data-arrange-columns-by='due_date']").click
+    view_menu = gradezilla_page.open_gradebook_menu('View')
+    gradezilla_page.select_gradebook_menu_option('Arrange By > Due Date - Oldest to Newest', container: view_menu)
     # since due date changes in assignments don't reflect in column sorting without a refresh
     gradezilla_page.visit(@course)
     expect(f('#gradebook_grid .container_1 .slick-header-column:nth-child(1)')).to include_text(assignment3.title)
@@ -76,8 +106,8 @@ describe "Gradezilla - arrange by due date" do
     create_assignment_override(@assignment, @section_a, 5)
     create_assignment_override(assignment3, @section_b, 4)
 
-    f('#gradebook_settings').click
-    f("a[data-arrange-columns-by='due_date']").click
+    view_menu = gradezilla_page.open_gradebook_menu('View')
+    gradezilla_page.select_gradebook_menu_option('Arrange By > Due Date - Oldest to Newest', container: view_menu)
 
     expect(f('#gradebook_grid .container_1 .slick-header-column:nth-child(1)')).to include_text(assignment3.title)
     expect(f('#gradebook_grid .container_1 .slick-header-column:nth-child(2)')).to include_text(@assignment.title)

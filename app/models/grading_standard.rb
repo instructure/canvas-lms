@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -207,6 +207,7 @@ class GradingStandard < ActiveRecord::Base
   def valid_grading_scheme_data
     self.errors.add(:data, 'grading scheme values cannot be negative') if self.data.present? && self.data.any?{ |v| v[1] < 0 }
     self.errors.add(:data, 'grading scheme cannot contain duplicate values') if self.data.present? && self.data.map{|v| v[1]} != self.data.map{|v| v[1]}.uniq
+    self.errors.add(:data, 'a grading scheme name is too long') if self.data.present? && self.data.any?{|v| v[0].length > self.class.maximum_string_length}
   end
 
   def self.default_grading_standard

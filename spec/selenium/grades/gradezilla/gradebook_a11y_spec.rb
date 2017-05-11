@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2016 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative '../../helpers/gradezilla_common'
 require_relative '../page_objects/gradezilla_page'
 
@@ -53,16 +70,17 @@ describe "Gradezilla" do
   end
 
   context "return focus to settings menu when it closes" do
-    before { f('#gradebook_settings').click }
-
     it "after hide/show student names is clicked", priority: "2", test_id: 720461 do
+      f('#gradebook_settings').click
       f(".student_names_toggle").click
       expect(active_element).to have_attribute('id', 'gradebook_settings')
     end
 
     it "after arrange columns is clicked", priority: "2", test_id: 720462 do
-      f("[data-arrange-columns-by='due_date']").click
-      expect(active_element).to have_attribute('id', 'gradebook_settings')
+      view_menu_trigger = gradezilla_page.gradebook_menu('View').find('button')
+      gradezilla_page.open_gradebook_menu('View')
+      gradezilla_page.select_gradebook_menu_option('Arrange By > Due Date - Oldest to Newest')
+      expect(active_element).to eq(view_menu_trigger)
     end
   end
 

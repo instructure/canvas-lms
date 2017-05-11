@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2016 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -106,8 +106,7 @@ class Account < ActiveRecord::Base
   after_save :invalidate_caches_if_changed
   after_update :clear_special_account_cache_if_special
 
-  after_create :default_enrollment_term
-  after_create :enable_canvas_authentication
+  after_create :create_default_objects
 
   serialize :settings, Hash
   include TimeZoneHelper
@@ -1639,5 +1638,14 @@ class Account < ActiveRecord::Base
   def to_param
     return 'site_admin' if site_admin?
     super
+  end
+
+  def create_default_objects
+    work = -> do
+      default_enrollment_term
+      enable_canvas_authentication
+    end
+    return work.call if Rails.env.test?
+    self.class.connection.after_transaction_commit(&work)
   end
 end

@@ -1,4 +1,5 @@
-# Copyright (C) 2013 Instructure, Inc.
+#
+# Copyright (C) 2013 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -229,6 +230,20 @@ describe 'RequestThrottle' do
           Setting.set('request_throttle.hwm', '4.0')
           expect(bucket.full?).to eq true
         end
+
+        it "compares to a customized hwm setting if set" do
+          bucket = RequestThrottle::LeakyBucket.new("test", 5.0)
+          Setting.set('request_throttle.hwm', '4.0')
+          expect(bucket.full?).to eq true
+          Setting.set('request_throttle.custom_settings',
+                      {test: {hwm: '6.0'}}.to_json)
+          RequestThrottle::LeakyBucket.reload!
+          expect(bucket.full?).to eq false
+          Setting.set('request_throttle.custom_settings',
+                      {other: {hwm: '6.0'}}.to_json)
+          RequestThrottle::LeakyBucket.reload!
+          expect(bucket.full?).to eq true
+        end
       end
 
       describe "redis interaction" do
@@ -303,6 +318,20 @@ describe 'RequestThrottle' do
           end
           expect(@bucket.count).to eq 0
           expect(@bucket.redis.hget(@bucket.cache_key, 'count').to_f).to eq 0
+        end
+
+        it "uses custom values if available" do
+          Setting.set('request_throttle.custom_settings',
+                      {test: {up_front_cost: '20.0'}}.to_json)
+          RequestThrottle::LeakyBucket.reload!
+          Timecop.freeze('2012-01-29 12:00:00 UTC') do
+            @bucket.increment(0, 0, @current_time)
+            @bucket.reserve_capacity do
+              expect(@bucket.redis.hget(@bucket.cache_key, 'count').to_f).to be_within(0.1).of(20)
+              5
+            end
+            expect(@bucket.redis.hget(@bucket.cache_key, 'count').to_f).to be_within(0.1).of(5)
+          end
         end
 
         after do

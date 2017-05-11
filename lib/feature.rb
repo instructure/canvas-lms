@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2013 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -322,8 +322,7 @@ END
       applies_to: 'Account',
       state: 'hidden',
       root_opt_in: true,
-      beta: true,
-      development: true
+      beta: true
     },
     'bulk_sis_grade_export' =>
       {

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -392,7 +392,7 @@ class DiscussionTopic < ActiveRecord::Base
   def subscription_hold(user, context_enrollment, session)
     return nil unless user
     case
-    when initial_post_required?(user, context_enrollment, session)
+    when initial_post_required?(user, session)
       :initial_post_required
     when root_topic? && !child_topic_for(user)
       :not_in_group_set
@@ -679,13 +679,14 @@ class DiscussionTopic < ActiveRecord::Base
   def user_ids_who_have_posted_and_admins
     scope = DiscussionEntry.active.select(:user_id).distinct.where(:discussion_topic_id => self)
     ids = scope.pluck(:user_id)
-    ids += self.context.admin_enrollments.active.pluck(:user_id) if self.context.respond_to?(:admin_enrollments)
+    ids += self.course.admin_enrollments.active.pluck(:user_id) if self.course.is_a?(Course)
     ids
   end
 
-  def user_can_see_posts?(user, session=nil)
+  def user_can_see_posts?(user, session=nil, associated_user_ids=[])
     return false unless user
-    !self.require_initial_post? || self.grants_right?(user, session, :update) || user_ids_who_have_posted_and_admins.member?(user.id)
+    !self.require_initial_post? || self.grants_right?(user, session, :update) ||
+      (([user.id] + associated_user_ids) & user_ids_who_have_posted_and_admins).any?
   end
 
   def reply_from(opts)
@@ -1204,14 +1205,10 @@ class DiscussionTopic < ActiveRecord::Base
     end.compact
   end
 
-  def initial_post_required?(user, enrollment, session)
+  def initial_post_required?(user, session=nil)
     if require_initial_post?
-      # check if the user, or the user being observed can see the posts
-      if enrollment && enrollment.respond_to?(:associated_user) && enrollment.associated_user
-        return true if !user_can_see_posts?(enrollment.associated_user)
-      elsif !user_can_see_posts?(user, session)
-        return true
-      end
+      associated_user_ids = user.observer_enrollments.active.where(course_id: self.course).pluck(:associated_user_id).compact
+      return !user_can_see_posts?(user, session, associated_user_ids)
     end
     false
   end

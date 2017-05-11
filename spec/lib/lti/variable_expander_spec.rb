@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 Instructure, Inc.
+# Copyright (C) 2015 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -41,6 +41,7 @@ module Lti
       m.stubs(:id).returns(1)
       m.stubs(:context).returns(root_account)
       m.stubs(:extension_setting).with(nil, :prefer_sis_email).returns(nil)
+      m.stubs(:extension_setting).with(:tool_configuration, :prefer_sis_email).returns(nil)
       shard_mock = mock('shard')
       shard_mock.stubs(:settings).returns({encription_key: 'abc'})
       m.stubs(:shard).returns(shard_mock)
@@ -841,7 +842,7 @@ module Lti
           let(:pseudonym) { Pseudonym.new }
 
           before :each do
-            user.stubs(:find_pseudonym_for_account).returns(pseudonym)
+            allow(SisPseudonym).to receive(:for).with(user, anything, anything).and_return(pseudonym)
           end
 
           it 'has substitution for $Canvas.user.sisSourceId' do

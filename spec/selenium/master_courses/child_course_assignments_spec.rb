@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2017 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative '../common'
 
 describe "master courses - child courses - assignment locking" do
@@ -29,7 +46,16 @@ describe "master courses - child courses - assignment locking" do
     user_session(@teacher)
   end
 
-  it "should not allow the delete cog-menu option on the index when locked" do
+  it "should contain the delete cog-menu option on the index when unlocked" do
+    get "/courses/#{@copy_to.id}/assignments"
+
+    expect(f("#assignment_#{@assmt_copy.id}")).to contain_css('.icon-unlock')
+
+    f('.al-trigger').click
+    expect(f('.assignment')).to contain_css('a.delete_assignment')
+  end
+
+  it "should not contain the delete cog-menu option on the index when locked" do
     @tag.update_attribute(:restrictions, {:content => true})
 
     get "/courses/#{@copy_to.id}/assignments"
@@ -37,7 +63,7 @@ describe "master courses - child courses - assignment locking" do
     expect(f("#assignment_#{@assmt_copy.id}")).to contain_css('.icon-lock')
 
     f('.al-trigger').click
-    expect(f('.assignment')).to contain_css('a.delete_assignment.disabled')
+    expect(f('.assignment')).not_to contain_css('a.delete_assignment')
   end
 
   it "should show the delete cog-menu option on the index when not locked" do
@@ -55,8 +81,8 @@ describe "master courses - child courses - assignment locking" do
 
     get "/courses/#{@copy_to.id}/assignments/#{@assmt_copy.id}/edit"
 
-    f('.al-trigger').click
-    expect(f('#edit_assignment_header')).to contain_css('a.delete_assignment_link.disabled')
+    # when locked, the whole menu is removed
+    expect(f('#edit_assignment_header')).not_to contain_css('.al-trigger')
   end
 
   it "should show the delete cog-menu options on the edit when not locked" do

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2012 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -12,13 +12,15 @@
 # A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
 # details.
 #
-# You should have received a copy of the GNU Affero General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
 require 'crocodoc'
 
 class CrocodocDocument < ActiveRecord::Base
+  include Canvadocs::Session
+
   belongs_to :attachment
 
   has_many :canvadocs_submissions
@@ -58,7 +60,30 @@ class CrocodocDocument < ActiveRecord::Base
     end
   end
 
+  def should_migrate_to_canvadocs?
+    Canvadocs.hijack_crocodoc_sessions? && attachment.context.try(:account)&.feature_enabled?(:new_annotations)
+  end
+  private :should_migrate_to_canvadocs?
+
+  def canvadocs_can_annotate?(user)
+    user != nil
+  end
+  private :canvadocs_can_annotate?
+
+  def document_id
+    uuid
+  end
+  private :document_id
+
+  def canvadoc_options
+    {
+      migrate_crocodoc: true
+    }
+  end
+  private :canvadoc_options
+
   def session_url(opts = {})
+    return canvadocs_session_url opts.merge(canvadoc_options) if should_migrate_to_canvadocs?
     defaults = {
       :annotations => true,
       :downloadable => true,

@@ -1,3 +1,21 @@
+<%
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
 <% content_for :page_title do %><%= join_title(@quiz.quiz_title || @quiz.readable_type, @context.name) %><% end %>
 
 <%
@@ -15,6 +33,8 @@
   admin_delete_title = t('titles.delete', "Delete")
   admin_preview_title = t('links.preview', "Preview")
   admin_show_rubric_title = t('links.show_assignment_rubric', "Show Rubric")
+  is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_content") &&
+              !!js_env.dig(:MASTER_COURSE_DATA, "restricted_by_master_course")
 %>
 
 <% if @headers %>
@@ -214,17 +234,19 @@
               </li>
             <% end %>
 
-            <li role="presentation">
-            <% if @quiz.grants_right?(@current_user, :delete) && !editing_restricted?(@quiz) %>
-              <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="delete_quiz_link" tabindex="-1" role="menuitem">
-                <i class="icon-trash"><span class="screenreader-only"><%= admin_delete_title %></span></i> <%= admin_delete_title %>
-              </a>
-            <% else %>
-              <a class="disabled" tabindex="-1" role="menuitem" aria-disabled=true>
-                <i class="icon-trash"><span class="screenreader-only"><%= admin_delete_title %></span></i> <%= admin_delete_title %>
-              </a>
+            <% unless is_locked %>
+              <li role="presentation">
+              <% if @quiz.grants_right?(@current_user, :delete) && !editing_restricted?(@quiz) %>
+                <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="delete_quiz_link" tabindex="-1" role="menuitem">
+                  <i class="icon-trash"><span class="screenreader-only"><%= admin_delete_title %></span></i> <%= admin_delete_title %>
+                </a>
+              <% else %>
+                <a class="disabled" tabindex="-1" role="menuitem" aria-disabled=true>
+                  <i class="icon-trash"><span class="screenreader-only"><%= admin_delete_title %></span></i> <%= admin_delete_title %>
+                </a>
+              <% end %>
+              </li>
             <% end %>
-            </li>
             <%= external_tools_menu_items((@quiz_menu_tools || []), {link_class: "menu_tool_link", settings_key: :quiz_menu, in_list: true, url_params: {:quizzes => [@quiz.id]}}) %>
           </ul>
         </div>

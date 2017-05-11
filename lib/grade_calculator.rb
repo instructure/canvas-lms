@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2017 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -81,10 +81,8 @@ class GradeCalculator
   end
 
   def compute_and_save_scores
-    RequestCache.enable do
-      calculate_grading_period_scores if @update_all_grading_period_scores
-      compute_scores
-    end
+    calculate_grading_period_scores if @update_all_grading_period_scores
+    compute_scores
     save_scores
     calculate_course_score if @update_course_score
   end

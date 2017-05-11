@@ -1,23 +1,34 @@
 <div class="edit-content">
   <div class="edit-header">
     {{#if CAN.EDIT_TITLE}}
-      <label for="title" class="screenreader-only">{{#t "title_label"}}Page Title{{/t}}</label>
-      <input id="title" name="title" type="text" class="span4 title" value="{{title}}" maxlength="255" autofocus>
+      {{#if content_is_locked}}
+        <h1>{{title}}</h1>
+        <input name="title" type="hidden" value="{{title}}">
+      {{else}}
+        <label for="title" class="screenreader-only">{{#t "title_label"}}Page Title{{/t}}</label>
+        <input id="title" name="title" type="text" class="span4 title" value="{{title}}" maxlength="255" autofocus>
+      {{/if}}
     {{else}}
       <h2>{{title}}</h2>
     {{/if}}
-    <div class="switch_views_container">
-      <div class="help_dialog"></div>
-      <a href="#" class="switch_views">
-        {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
-      </a>
-      <a href="#" class="switch_views" style="display:none;">
-        {{#t "#editor.switch_editor_rich_text"}}Rich Content Editor{{/t}}
-      </a>
-    </div>
+    {{#unless content_is_locked}}
+      <div class="switch_views_container">
+        <div class="help_dialog"></div>
+        <a href="#" class="switch_views">
+          {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
+        </a>
+        <a href="#" class="switch_views" style="display:none;">
+          {{#t "#editor.switch_editor_rich_text"}}Rich Content Editor{{/t}}
+        </a>
+      </div>
+    {{/unless}}
   </div>
 
-  <textarea id="wiki_page_body" rows="20" cols="40" name="body" class="body" aria-hidden="true"{{#unless PAGE_RIGHTS.update}} autofocus{{/unless}}>{{convertApiUserContent body forEditing=1}}</textarea>
+  {{#if content_is_locked}}
+    {{{body}}}
+  {{else}}
+    <textarea id="wiki_page_body" rows="20" cols="40" name="body" class="body" aria-hidden="true"{{#unless PAGE_RIGHTS.update}} autofocus{{/unless}}>{{convertApiUserContent body forEditing=1}}</textarea>
+  {{/if}}
 
   {{#if CAN.EDIT_ROLES}}
     <div class="control-group options">

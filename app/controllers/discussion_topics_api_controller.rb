@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -606,7 +606,7 @@ class DiscussionTopicsApiController < ApplicationController
   end
 
   def require_initial_post
-    return true if !@topic.initial_post_required?(@current_user, @context_enrollment, session)
+    return true if !@topic.initial_post_required?(@current_user, session)
 
     # neither the current user nor the enrollment user (if any) has posted yet,
     # so give them the forbidden status

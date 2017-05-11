@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014 Instructure, Inc.
+# Copyright (C) 2015 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -22,12 +22,12 @@ module LiveEvents
   class << self
     attr_accessor :logger, :cache, :statsd
 
-    def plugin_settings=(settings)
-      @plugin_settings = settings
+    def settings=(settings)
+      @settings = settings
     end
 
-    def plugin_settings
-      @plugin_settings.call
+    def settings
+      @settings.call
     end
 
     def max_queue_size=(size)

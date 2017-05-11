@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -529,7 +529,6 @@ class Attachment < ActiveRecord::Base
   S3_EXPIRATION_TIME = 30.minutes
 
   def ajax_upload_params(pseudonym, local_upload_url, s3_success_url, options = {})
-
     # Build the data that will be needed for the user to upload to s3
     # without us being the middle-man
     sanitized_filename = full_filename.gsub(/\+/, " ")
@@ -543,8 +542,15 @@ class Attachment < ActiveRecord::Base
       ]
     }
 
+    # We don't use a Aws::S3::PresignedPost object to build this for us because
+    # there is no way to add custom parameters to the condition, like we do
+    # with `extras` below.
+    options[:datetime] = Time.now.utc.strftime("%Y%m%dT%H%M%SZ")
     res = self.store.initialize_ajax_upload_params(local_upload_url, s3_success_url, options)
-    policy = self.store.amend_policy_conditions(policy, pseudonym)
+    policy = self.store.amend_policy_conditions(policy,
+      pseudonym: pseudonym,
+      datetime: options[:datetime]
+    )
 
     if res[:upload_params]['folder'].present?
       policy['conditions'] << ['starts-with', '$folder', '']
@@ -565,11 +571,7 @@ class Attachment < ActiveRecord::Base
     policy['conditions'] += extras
 
     policy_encoded = Base64.encode64(policy.to_json).gsub(/\n/, '')
-    signature = Base64.encode64(
-      OpenSSL::HMAC.digest(
-        OpenSSL::Digest.new('sha1'), shared_secret, policy_encoded
-      )
-    ).gsub(/\n/, '')
+    sig_key, sig_val = self.store.sign_policy(policy_encoded, options[:datetime])
 
     res[:id] = id
     res[:upload_params].merge!({
@@ -577,7 +579,7 @@ class Attachment < ActiveRecord::Base
        'key' => sanitized_filename,
        'acl' => 'private',
        'Policy' => policy_encoded,
-       'Signature' => signature,
+       sig_key => sig_val
     })
     extras.map(&:to_a).each{ |extra| res[:upload_params][extra.first.first] = extra.first.last }
     res
@@ -730,8 +732,8 @@ class Attachment < ActiveRecord::Base
     "local_storage" + Canvas::Security.encryption_key
   end
 
-  def shared_secret
-    store.shared_secret
+  def shared_secret(datetime)
+    store.shared_secret(datetime)
   end
 
   def downloadable?
@@ -1615,6 +1617,7 @@ class Attachment < ActiveRecord::Base
 
   def set_publish_state_for_usage_rights
     if self.context &&
+       (!self.folder || !self.folder.for_submissions?) &&
        self.context.respond_to?(:feature_enabled?) &&
        self.context.feature_enabled?(:usage_rights_required)
       self.locked = self.usage_rights.nil?

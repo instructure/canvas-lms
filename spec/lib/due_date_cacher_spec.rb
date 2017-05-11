@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2013 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -40,9 +40,9 @@ describe DueDateCacher do
       DueDateCacher.recompute(@assignment)
     end
 
-    it "should queue a delayed job on a context-specific strand in production" do
+    it "should queue a delayed job in an assignment-specific singleton in production" do
       @instance.expects(:send_later_if_production_enqueue_args).
-        with(:recompute, :strand => "cached_due_date:calculator:Course:#{@course.global_id}")
+        with(:recompute, singleton: "cached_due_date:calculator:Assignment:#{@assignment.global_id}")
       DueDateCacher.recompute(@assignment)
     end
   end

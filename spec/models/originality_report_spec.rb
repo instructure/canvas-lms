@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2016 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe OriginalityReport do
@@ -12,10 +29,22 @@ describe OriginalityReport do
     expect(subject.attachment).to eq attachment
   end
 
-  it 'requires an originality score' do
+  it 'does not require an originality score' do
     subject.originality_score = nil
     subject.valid?
-    expect(subject.errors[:originality_score]).to eq ["can't be blank", "score must be between 0 and 100"]
+    expect(subject.errors[:originality_score]).to be_blank
+  end
+
+  it 'does not allow scores higher than 100' do
+    subject.originality_score = 101
+    subject.valid?
+    expect(subject.errors[:originality_score]).to eq ['score must be between 0 and 100']
+  end
+
+  it 'does not allow scores lower than 0' do
+    subject.originality_score = -1
+    subject.valid?
+    expect(subject.errors[:originality_score]).to eq ['score must be between 0 and 100']
   end
 
   it 'requires an attachment' do

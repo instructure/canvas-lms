@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 Instructure, Inc.
+# Copyright (C) 2015 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -84,8 +84,10 @@ class Login::OtpController < ApplicationController
     drift = 300 if session[:pending_otp_communication_channel_id] ||
         (!session[:pending_otp_secret_key] && @current_user.otp_communication_channel_id)
 
-    if !force_fail && ROTP::TOTP.new(secret_key).verify_with_drift(verification_code, drift)
+    if !force_fail && ROTP::TOTP.new(secret_key).verify_with_drift(verification_code, drift) ||
+      @current_user.authenticate_one_time_password(verification_code)
       if configuring?
+        @current_user.one_time_passwords.scope.delete_all
         @current_user.otp_secret_key = session.delete(:pending_otp_secret_key)
         @current_user.otp_communication_channel_id = session.delete(:pending_otp_communication_channel_id)
         @current_user.otp_communication_channel.try(:confirm)
@@ -128,6 +130,7 @@ class Login::OtpController < ApplicationController
     user.otp_secret_key = nil
     user.otp_communication_channel = nil
     user.save!
+    user.one_time_passwords.scope.delete_all
 
     render :json => {}
   end
@@ -136,9 +139,7 @@ class Login::OtpController < ApplicationController
 
   def send_otp(cc = nil)
     cc ||= @current_user.otp_communication_channel
-    cc.try(:send_later_if_production_enqueue_args, :send_otp!,
-      { :priority => Delayed::HIGH_PRIORITY, :max_attempts => 1 },
-      ROTP::TOTP.new(secret_key).now)
+    cc&.send_otp!(ROTP::TOTP.new(secret_key).now, @domain_root_account)
   end
 
   def secret_key

@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2016 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative '../common'
 
 describe "master courses - child courses - wiki page locking" do
@@ -45,12 +62,11 @@ describe "master courses - child courses - wiki page locking" do
     expect(f('.al-options')).to contain_css('.delete-menu-item')
   end
 
-  it "should not show the edit/delete options on the show page when locked" do
+  it "should not show the delete option on the show page when locked" do
     @tag.update_attribute(:restrictions, {:all => true})
 
     get "/courses/#{@copy_to.id}/pages/#{@page_copy.url}"
 
-    expect(f('#content')).not_to contain_css('.edit-wiki')
     f('.al-trigger').click
     expect(f('.al-options')).not_to contain_css('.delete_page')
   end

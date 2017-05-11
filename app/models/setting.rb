@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2015 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -28,11 +28,12 @@ class Setting < ActiveRecord::Base
     else
       begin
         from_db = Setting.where(name: name).first.try(:value)
-      rescue ActiveRecord::StatementInvalid => e
+        @@cache[name] = from_db || default.try(:to_s)
+      rescue ActiveRecord::StatementInvalid, ActiveRecord::ConnectionNotEstablished => e
         # the db may not exist yet
-        Rails.logger.warn("Unable to read setting: #{e}")
+        Rails.logger.warn("Unable to read setting: #{e}") if Rails.logger
+        default.try(:to_s)
       end
-      @@cache[name] = from_db || default.try(:to_s)
     end
   end
 

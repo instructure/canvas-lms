@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2016 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -37,11 +55,16 @@ import 'jquery.instructure_date_and_time'
     }
 
     getNewSlotData () {
-      return this.state.timeBlockRows.map(tbr => ([
-        tbr.timeData.startTime,
-        tbr.timeData.endTime,
-        false
-      ]));
+      return this.state.timeBlockRows.reduce((acc, tbr) => {
+        if (tbr.timeData.startTime && tbr.timeData.endTime) {
+          acc.push([
+            tbr.timeData.startTime,
+            tbr.timeData.endTime,
+            false
+          ]);
+        }
+        return acc;
+      }, []);
     }
 
     deleteRow = (slotEventId) => {
@@ -68,7 +91,7 @@ import 'jquery.instructure_date_and_time'
       }));
       // Make sure a new blank row is there as well.
       newRows.push({
-        slotEventId: `${this.newIdPrefix}${this.lastNewId}`,
+        slotEventId: `${this.newIdPrefix}${this.lastNewId++}`,
         timeData: {}
       });
       this.setState({
@@ -110,18 +133,20 @@ import 'jquery.instructure_date_and_time'
                                                'TimeBlockSelector';
       return (
         <div className={classes}>
-          {this.props.timeData.map(timeBlock => (
-            <TimeBlockSelectRow {...timeBlock} key={timeBlock.slotEventId} readOnly />
-          ))}
-          {this.state.timeBlockRows.map(timeBlock => (
-            <TimeBlockSelectRow
-              key={timeBlock.slotEventId}
-              handleDelete={this.deleteRow}
-              onBlur={this.addRow}
-              setData={this.handleSetData}
-              {...timeBlock}
-            />
-          ))}
+          <div className="TimeBlockSelector__Rows">
+            {this.props.timeData.map(timeBlock => (
+              <TimeBlockSelectRow {...timeBlock} key={timeBlock.slotEventId} readOnly />
+            ))}
+            {this.state.timeBlockRows.map(timeBlock => (
+              <TimeBlockSelectRow
+                key={timeBlock.slotEventId}
+                handleDelete={this.deleteRow}
+                onBlur={this.addRow}
+                setData={this.handleSetData}
+                {...timeBlock}
+              />
+            ))}
+          </div>
           <div className="TimeBlockSelector__DivideSection">
             <Typography>
               <label

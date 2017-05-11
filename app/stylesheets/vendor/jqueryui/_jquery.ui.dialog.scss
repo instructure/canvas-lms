@@ -15,7 +15,21 @@
   @include fontSize(18px);
   font-weight: normal;
 }
-.ui-dialog .ui-dialog-titlebar-close { position: absolute; right: .3em; top: 50%; width: 19px; margin: -10px 0 0 0; padding: 1px; height: 18px; }
+.ui-dialog .ui-dialog-titlebar-close {
+  position: absolute;
+  right: .3em;
+  top: 50%;
+  width: 19px;
+  margin: -10px 0 0 0;
+  padding: 1px;
+  height: 18px;
+  padding: 0;
+  background: none;
+
+  &:not(.ui-state-focus) {
+    border-color: transparent;
+  }
+}
 .ui-dialog .ui-dialog-titlebar-close span { display: block; margin: 1px; }
 .ui-dialog .ui-dialog-titlebar-close:hover, .ui-dialog .ui-dialog-titlebar-close:focus { padding: 0; }
 .ui-dialog .ui-dialog-content { position: relative; border: 0; padding: .5em 1em; background: none; overflow: auto; zoom: 1; }
@@ -40,7 +54,9 @@
       opacity: 0.6;
     }
     &.ui-state-hover, &.ui-state-focus {
-      border-color: transparent;
+      border: 1px solid;
+      border-color: #16a8ff !important;
+      border-radius: 3px;
       span {
         opacity: 0.8;
       }

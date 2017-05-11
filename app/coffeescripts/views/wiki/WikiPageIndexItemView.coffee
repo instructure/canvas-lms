@@ -1,6 +1,22 @@
+#
+# Copyright (C) 2013 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 define [
   'Backbone'
-  'underscore'
   'i18n!pages'
   'compiled/views/wiki/WikiPageIndexEditDialog'
   'compiled/views/wiki/WikiPageDeleteDialog'
@@ -8,7 +24,7 @@ define [
   'compiled/views/LockIconView'
   'jst/wiki/WikiPageIndexItem'
   'compiled/jquery/redirectClickTo'
-], (Backbone, _, I18n, WikiPageIndexEditDialog, WikiPageDeleteDialog, PublishIconView, LockIconView, template) ->
+], (Backbone, I18n, WikiPageIndexEditDialog, WikiPageDeleteDialog, PublishIconView, LockIconView, template) ->
 
   class WikiPageIndexItemView extends Backbone.View
     template: template
@@ -45,8 +61,8 @@ define [
 
       json.cannot_edit_by_master_course = json.is_master_course_child_content && json.restricted_by_master_course
 
-      json.wiki_page_menu_tools = ENV.wiki_page_menu_tools
-      _.each json.wiki_page_menu_tools, (tool) =>
+      json.wiki_page_menu_tools = ENV.wiki_page_menu_tools || []
+      json.wiki_page_menu_tools.forEach (tool) =>
         tool.url = tool.base_url + "&pages[]=#{@model.get("page_id")}"
       json
 

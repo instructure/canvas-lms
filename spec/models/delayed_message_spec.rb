@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -104,7 +104,7 @@ describe DelayedMessage do
     account = Account.create!(:name => 'new acct')
     user = user_with_pseudonym(:account => account)
     expect(user.pseudonym.account).to eq account
-    SisPseudonym.expects(:for).with(user, Account.default).returns(user.pseudonym)
+    SisPseudonym.expects(:for).with(user, Account.default, type: :implicit, require_sis: false).returns(user.pseudonym)
     HostUrl.expects(:context_host).with(account).at_least(1).returns("dm.dummy.test.host")
     HostUrl.stubs(:default_host).returns("test.host")
     user.communication_channel.confirm!

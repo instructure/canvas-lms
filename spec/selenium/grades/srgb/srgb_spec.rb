@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014 - 2017 Instructure, Inc.
+# Copyright (C) 2014 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -98,11 +98,11 @@ describe "Screenreader Gradebook" do
 
     click_option '#student_select', @students[0].name
     assignment_points = ["(#{@grade_array[0]} / 20)", "(#{@grade_array[2]} / 20)"]
-    expect(ff('#student_information .assignment-group-grade .points').map(&:text)).to eq assignment_points
+    expect(ff('#student_information .assignment-subtotal-grade .points').map(&:text)).to eq assignment_points
 
     click_option '#student_select', @students[1].name
     assignment_points = ["(#{@grade_array[1]} / 20)", "(#{@grade_array[3]} / 20)"]
-    expect(ff('#student_information .assignment-group-grade .points').map(&:text)).to eq assignment_points
+    expect(ff('#student_information .assignment-subtotal-grade .points').map(&:text)).to eq assignment_points
   end
 
   it 'can select a student using buttons', priority: '1', test_id: 163997 do

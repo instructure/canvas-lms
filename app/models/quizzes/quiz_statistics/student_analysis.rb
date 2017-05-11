@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2013 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -231,7 +231,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
           if submission.user
             row << submission.user.name
             row << submission.user_id
-            pseudonym = SisPseudonym.for(submission.user, quiz.context.account, include_root_accounts)
+            pseudonym = SisPseudonym.for(submission.user, quiz.context.account, type: :trusted)
             row << pseudonym.try(:sis_user_id)
             row << (pseudonym && HostUrl.context_host(pseudonym.account)) if include_root_accounts
           else

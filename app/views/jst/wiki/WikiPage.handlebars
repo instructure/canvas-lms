@@ -32,11 +32,9 @@
             {{/if}}
           {{/if}}
         {{/unless}}
-        {{#unless cannot_edit_by_master_course}}
-          {{#if CAN.UPDATE_CONTENT}}
-            <a href="{{wiki_page_edit_path}}" class="btn edit-wiki"><i class="icon-edit"></i> {{#t 'buttons.edit'}}Edit{{/t}}</a>
-          {{/if}}
-        {{/unless}}
+        {{#if CAN.UPDATE_CONTENT}}
+          <a href="{{wiki_page_edit_path}}" class="btn edit-wiki"><i class="icon-edit"></i> {{#t 'buttons.edit'}}Edit{{/t}}</a>
+        {{/if}}
         {{#if CAN.ACCESS_GEAR_MENU}}
           <div class="inline-block">
             <a class="btn al-trigger" tabindex="0" role="button" href="#">

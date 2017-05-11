@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2015 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development'
 
 const glob = require('glob')
@@ -124,6 +142,7 @@ module.exports = {
     // The files are expected to have no call to require, define or similar.
     // They are allowed to use exports and module.exports.
     noParse: [
+      /node_modules\/jquery\//,
       /vendor\/md5/,
       /tinymce\/tinymce/, // has 'require' and 'define' but they are from it's own internal closure
     ],
@@ -195,10 +214,6 @@ module.exports = {
         test: /\.json$/,
         exclude: /public\/javascripts\/vendor/,
         loader: 'json-loader'
-      },
-      {
-        test: require.resolve('../public/javascripts/vendor/jquery-1.7.2'),
-        loader: 'exports-loader?window.jQuery'
       },
       {
         test: /vendor\/md5/,

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -34,4 +34,67 @@ describe DashboardHelper do
       expect(show_welcome_message?()).to be_falsey
     end
   end
+
+  describe "show_recent_activity?" do
+    before(:once) do
+      course_with_student(:active_all => true)
+      @current_user = @student
+    end
+
+    it "should be false if preferences[:dashboard_view] is not set" do
+      @current_user.preferences.delete(:dashboard_view)
+      @current_user.preferences.delete(:recent_activity_dashboard)
+      expect(show_recent_activity?).to be_falsey
+    end
+
+    it "should be false if preferences[:dashboard_view] is not activity" do
+      @current_user.preferences[:dashboard_view] = 'something_that_isnt_activity'
+      @current_user.preferences.delete(:recent_activity_dashboard)
+      expect(show_recent_activity?).to be_falsey
+    end
+
+    it "should be true if preferences[:dashboard_view] is activity" do
+      @current_user.preferences[:dashboard_view] = 'activity'
+      @current_user.preferences.delete(:recent_activity_dashboard)
+      expect(show_recent_activity?).to be_truthy
+    end
+
+    it "should be true if preferences[:recent_activity_dashboard] is true" do
+      @current_user.preferences.delete(:dashboard_view)
+      @current_user.preferences[:recent_activity_dashboard] = true
+      expect(show_recent_activity?).to be_truthy
+    end
+  end
+
+  describe "show_dashboard_cards?" do
+    before(:once) do
+      course_with_student(:active_all => true)
+      @current_user = @student
+    end
+
+    it "should be true if preferences[:dashboard_view] is not set" do
+      @current_user.preferences.delete(:dashboard_view)
+      @current_user.preferences.delete(:recent_activity_dashboard)
+      expect(show_dashboard_cards?).to be_truthy
+    end
+
+    it "should be false if preferences[:dashboard_view] is not cards" do
+      @current_user.preferences[:dashboard_view] = 'something_that_isnt_cards'
+      @current_user.preferences.delete(:recent_activity_dashboard)
+      expect(show_dashboard_cards?).to be_falsey
+    end
+
+    it "should be true if preferences[:dashboard_view] is cards" do
+      @current_user.preferences[:dashboard_view] = 'cards'
+      @current_user.preferences.delete(:recent_activity_dashboard)
+      expect(show_dashboard_cards?).to be_truthy
+    end
+
+    it "should be true if preferences[:recent_activity_dashboard] is false" do
+      @current_user.preferences.delete(:dashboard_view)
+      @current_user.preferences[:recent_activity_dashboard] = false
+      expect(show_dashboard_cards?).to be_truthy
+    end
+  end
+
 end

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2014 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -93,7 +93,7 @@ module Lti
       if @user
         context_roles = course_enrollments.each_with_object(Set.new) { |role, set| set.add([*role_map[role.class]].join(",")) }
 
-        institution_roles = @user.roles(@root_account).map { |role| role_map[role] }
+        institution_roles = @user.roles(@root_account, true).map { |role| role_map[role] }
         if Account.site_admin.account_users_for(@user).present?
           institution_roles << role_map['siteadmin']
         end
@@ -175,7 +175,8 @@ module Lti
 
     def email
       # we are using sis_email for lti2 tools, or if the 'prefer_sis_email' extension is set for LTI 1
-      e = if !lti1? || @tool&.extension_setting(nil, :prefer_sis_email)&.downcase == "true"
+      e = if !lti1? || (@tool&.extension_setting(nil, :prefer_sis_email)&.downcase ||
+            @tool&.extension_setting(:tool_configuration, :prefer_sis_email)&.downcase) == "true"
             sis_email
           end
       e || @user.email

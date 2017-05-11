@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2015 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative '../../helpers/gradezilla_common'
 require_relative '../page_objects/gradezilla_page'
 
@@ -37,28 +54,5 @@ describe "Gradezilla - turnitin" do
     gradezilla_page.visit(@course)
     icons = ff('.gradebook-cell-turnitin')
     expect(icons).to have_size 2
-
-    none        = f('.none-score')       # icons[0]
-    acceptable  = f('.acceptable-score') # icons[1]
-    # make sure it appears in each submission dialog
-
-    cell = none.find_element(:xpath, '..')
-
-    driver.action.move_to(f('#gradebook_settings')).move_to(cell).perform
-    expect(cell.find_element(:css, "a")).to be_displayed
-    cell.find_element(:css, "a").click
-
-    fj('.ui-icon-closethick:visible').click
-
-    cell = acceptable.find_element(:xpath, '..')
-
-    # This is a quick fix to change the keyboard focus so that an accessible
-    # tooltip does not block the visibility of the cell.
-    driver.action.send_keys(:tab).perform
-    driver.action.move_to(f('#gradebook_settings')).move_to(cell).perform
-    expect(cell.find_element(:css, "a")).to be_displayed
-    cell.find_element(:css, "a").click
-
-    fj('.ui-icon-closethick:visible').click
   end
 end

@@ -1,0 +1,18 @@
+#!/bin/bash
+archive_path=$1
+if [[ $archive_path ]]; then
+
+  for dir in /volumes/*_data; do
+    (
+      # wait for it to appear (if this is a CI worker)
+      while ! aws s3 ls --region "$DOCKER_CACHE_S3_REGION" "$archive_path/`basename "$dir"`"; do sleep 10; done
+      aws s3 cp --only-show-errors --region "$DOCKER_CACHE_S3_REGION" "$archive_path/`basename "$dir"`" - | \
+        tar xzpPf - "$dir/"
+    ) &
+  done
+  for job in $(jobs -p); do
+    wait $job || exit 1
+  done
+fi
+
+touch /volumes/.ready

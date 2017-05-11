@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014 Instructure, Inc.
+# Copyright (C) 2014 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -49,14 +49,6 @@ define [
       return if commentingIsDisabled
       $(@slickGrid.getActiveCellNode()).find('.gradebook-cell-comment').click()
 
-    showToolTip: =>
-      node = $(@slickGrid.getActiveCellNode())
-      if node.parent().css('top') == '0px'
-        node.find('div.gradebook-tooltip').addClass('first-row')
-      else
-        node.find('div.gradebook-tooltip').removeClass('first-row')
-      node.toggleClass("hover")
-
     keyBindings:
       #   handler: function
       #   key: the string representation of the key pressed - for use in the help dialog
@@ -88,10 +80,4 @@ define [
         key: I18n.t 'keycodes.comment', 'c'
         desc: I18n.t 'keyboard_comment_desc', 'Comment on the active submission'
         }
-        {
-        handler: 'showToolTip'
-        key: I18n.t 'keycodes.tooltip', 't'
-        desc: I18n.t 'keyboard_tooltip_desc', 'Show the submission type of the active submission'
-        }
       ]
-

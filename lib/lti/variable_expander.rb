@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 Instructure, Inc.
+# Copyright (C) 2015 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -874,7 +874,7 @@ module Lti
     private
 
     def sis_pseudonym
-      @sis_pseudonym ||= @current_user.find_pseudonym_for_account(@root_account) if @current_user
+      @sis_pseudonym ||= SisPseudonym.for(@current_user, @root_account, type: :trusted, require_sis: false) if @current_user
     end
 
     def expand_substring_variables(value)

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2017 Instructure, Inc.
+# Copyright (C) 2017 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,8 +19,6 @@
 require 'spec_helper'
 
 describe LatePolicy do
-  let(:course) { Course.create! }
-
   describe 'relationships' do
     it { is_expected.to belong_to(:course).inverse_of(:late_policy) }
   end
@@ -58,45 +56,45 @@ describe LatePolicy do
 
   describe 'default values' do
     it 'sets the late_submission_interval to "day" if not explicitly set' do
-      policy = LatePolicy.new(course: course)
-      expect(policy.late_submission_interval).to eq('day')
+      policy = LatePolicy.new
+      expect(policy.late_submission_interval).to eq 'day'
     end
 
     it 'sets the late_submission_minimum_percent to 0 if not explicitly set' do
-      policy = LatePolicy.new(course: course)
+      policy = LatePolicy.new
       expect(policy.late_submission_minimum_percent).to be_zero
     end
   end
 
   describe 'rounding' do
     it 'only keeps 2 digits after the decimal for late_submission_minimum_percent' do
-      policy = LatePolicy.new(course: course, late_submission_minimum_percent: 100.223)
-      expect(policy.late_submission_minimum_percent).to eq(100.22)
+      policy = LatePolicy.new(late_submission_minimum_percent: 100.223)
+      expect(policy.late_submission_minimum_percent).to eql BigDecimal.new('100.22')
     end
 
     it 'rounds late_submission_minimum_percent' do
-      policy = LatePolicy.new(course: course, late_submission_minimum_percent: 100.225)
-      expect(policy.late_submission_minimum_percent).to eq(100.23)
+      policy = LatePolicy.new(late_submission_minimum_percent: 100.225)
+      expect(policy.late_submission_minimum_percent).to eql BigDecimal.new('100.23')
     end
 
     it 'only keeps 2 digits after the decimal for missing_submission_deduction' do
-      policy = LatePolicy.new(course: course, missing_submission_deduction: 100.223)
-      expect(policy.missing_submission_deduction).to eq(100.22)
+      policy = LatePolicy.new(missing_submission_deduction: 100.223)
+      expect(policy.missing_submission_deduction).to eql BigDecimal.new('100.22')
     end
 
     it 'rounds missing_submission_deduction' do
-      policy = LatePolicy.new(course: course, missing_submission_deduction: 100.225)
-      expect(policy.missing_submission_deduction).to eq(100.23)
+      policy = LatePolicy.new(missing_submission_deduction: 100.225)
+      expect(policy.missing_submission_deduction).to eql BigDecimal.new('100.23')
     end
 
     it 'only keeps 2 digits after the decimal for late_submission_deduction' do
-      policy = LatePolicy.new(course: course, late_submission_deduction: 100.223)
-      expect(policy.late_submission_deduction).to eq(100.22)
+      policy = LatePolicy.new(late_submission_deduction: 100.223)
+      expect(policy.late_submission_deduction).to eql BigDecimal.new('100.22')
     end
 
     it 'rounds late_submission_deduction' do
-      policy = LatePolicy.new(course: course, late_submission_deduction: 100.225)
-      expect(policy.late_submission_deduction).to eq(100.23)
+      policy = LatePolicy.new(late_submission_deduction: 100.225)
+      expect(policy.late_submission_deduction).to eql BigDecimal.new('100.23')
     end
   end
 end

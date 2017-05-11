@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2015 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 define [
   'jquery'
   'underscore'
@@ -50,6 +67,7 @@ define [
         'js-assignment-overrides': new DueDateOverrideView
           model: dueDateList
           views: {}
+      lockedItems: opts.lockedItems || {}
 
     (app.assignmentGroupCollection = new AssignmentGroupCollection).contextAssetString = ENV.context_asset_string
     app.render()
@@ -78,8 +96,16 @@ define [
 
   test 'tells RCE to manage the parent', ->
     lne = @stub(RichContentEditor, 'loadNewEditor')
-    EditView.prototype.loadNewEditor.call()
+    view = @editView()
+    view.loadNewEditor()
     ok lne.firstCall.args[1].manageParent, 'manageParent flag should be set'
+
+  test 'does not tell RCE to manage the parent of locked content', ->
+    lne = @stub(RichContentEditor, 'loadNewEditor')
+    view = @editView
+      lockedItems: {content: true}
+    view.loadNewEditor()
+    ok lne.callCount==0, 'RCE not called'
 
   test 'shows error message on assignment point change with submissions', ->
     view = @editView

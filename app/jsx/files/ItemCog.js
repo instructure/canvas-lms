@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2015 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import I18n from 'i18n!react_files'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -23,6 +41,11 @@ import $ from 'jquery'
       userCanManageFilesForContext: React.PropTypes.bool,
       userCanRestrictFilesForContext: React.PropTypes.bool.isRequired,
       usageRightsRequiredForContext: React.PropTypes.bool
+    },
+
+    isMasterCourseRestricted () {
+      return this.props.model.get('is_master_course_child_content') &&
+             this.props.model.get('restricted_by_master_course')
     },
 
     downloadFile (file, args) {
@@ -113,7 +136,7 @@ import $ from 'jquery'
         menuItems.push(<li key='download' role='presentation'><a onClick={wrap(this.downloadFile)} href={this.props.model.get('url')} ref='download' role='menuitem' tabIndex='-1'>{I18n.t('Download')}</a></li>);
       }
 
-      if (this.props.userCanManageFilesForContext && !this.props.model.get('restricted_by_master_course')) {
+      if (this.props.userCanManageFilesForContext && !this.isMasterCourseRestricted()) {
         // Rename Link
         menuItems.push(<li key='rename' role='presentation'><a href='#' onClick={preventDefault(this.props.startEditingName)} ref='editName' role='menuitem' tabIndex='-1'>{I18n.t('Rename')}</a></li>);
         // Move Link

@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2016 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Course do
@@ -555,8 +572,7 @@ describe Course do
       it 'uses assigned date instead of submission date even if submission was late' do
         override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
         override.assignment_override_students.create!(user: @student1)
-        @assignment1.submissions.create!(
-          user: @student1,
+        @assignment1.submissions.find_by(user: @student1).update!(
           submitted_at: 1.week.from_now(@now),
           submission_type: 'online_text_entry',
           workflow_state: 'graded'
@@ -618,8 +634,7 @@ describe Course do
       it 'prioritizes the override due date even if it is earlier than the Everyone Else date and the student has a graded submission that does not qualify' do
         override = @assignment2.assignment_overrides.create!(due_at: 3.days.ago(@now), due_at_overridden: true)
         override.assignment_override_students.create!(user: @student1)
-        @assignment2.submissions.create!(
-          user: @student1,
+        @assignment2.submissions.find_by(user: @student1).update!(
           submitted_at: 1.week.from_now(@now),
           submission_type: 'online_text_entry',
           workflow_state: 'graded'

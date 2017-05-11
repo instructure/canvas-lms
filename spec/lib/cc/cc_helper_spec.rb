@@ -1,9 +1,36 @@
 # encoding: utf-8
+#
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require File.expand_path(File.dirname(__FILE__) + '/cc_spec_helper')
 
 require 'nokogiri'
 
 describe CC::CCHelper do
+  context 'map_linked_objects' do
+    it 'should find linked canvas items in exported html content' do
+      content = '<a href="%24CANVAS_OBJECT_REFERENCE%24/assignments/123456789">Link</a>' \
+                '<img src="%24IMS-CC-FILEBASE%24/media/folder%201/file.jpg" />'
+      linked_objects = CC::CCHelper.map_linked_objects(content)
+      expect(linked_objects[0]).to eq({identifier: '123456789', type: 'assignments'})
+      expect(linked_objects[1]).to eq({local_path: '/media/folder 1/file.jpg', type: 'Attachment'})
+    end
+  end
+
   describe CC::CCHelper::HtmlContentExporter do
     before do
       @kaltura = mock('CanvasKaltura::ClientV3')

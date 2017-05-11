@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2016 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 class MasterCourses::MasterMigration < ActiveRecord::Base
   belongs_to :master_template, :class_name => "MasterCourses::MasterTemplate"
   belongs_to :user
@@ -18,13 +35,13 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   end
 
   # create a new migration and queue it up (if we can)
-  def self.start_new_migration!(master_template, user)
+  def self.start_new_migration!(master_template, user, opts = {})
     master_template.class.transaction do
       master_template.lock!
       if master_template.active_migration_running?
         raise "cannot start new migration while another one is running"
       else
-        new_migration = master_template.master_migrations.create!(:user => user)
+        new_migration = master_template.master_migrations.create!({:user => user}.merge(opts))
         master_template.active_migration = new_migration
         master_template.save!
         new_migration.queue_export_job
@@ -105,6 +122,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
       @deletions = self.master_template.deletions_since_last_export
       @creations = {} # will be populated during export
       @updates = {}   # "
+      @export_count = 0
     end
     export = self.create_export(type, export_is_primary, :deletions => @deletions)
 
@@ -160,6 +178,8 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
 
   def add_exported_asset(asset)
     return unless last_export_at
+    @export_count += 1
+    return if @export_count > Setting.get('master_courses_history_count', '150').to_i
     set = asset.created_at >= last_export_at ? @creations : @updates
     set[asset.class.name] ||= []
     set[asset.class.name] << master_template.content_tag_for(asset).migration_id

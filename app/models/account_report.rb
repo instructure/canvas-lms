@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -32,6 +32,7 @@ class AccountReport < ActiveRecord::Base
     state :running
     state :complete
     state :error
+    state :aborted
     state :deleted
   end
 

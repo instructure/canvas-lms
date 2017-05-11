@@ -2,7 +2,7 @@ xAPI with LTI tools
 ===================
 
 Canvas has implemented a small piece of xAPI (Tin Can API).
-<a href="http://www.adlnet.gov/tla/experience-api/">Go here to learn more about xAPI</a>.
+<a href="http://www.adlnet.gov/xAPI">Go here to learn more about xAPI</a>.
 
 An external tool can ask for an xAPI callback URL, and then POST back an interaction
 activity to Canvas. This will update the activity time for the user in Canvas, and add a

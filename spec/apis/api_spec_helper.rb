@@ -90,7 +90,7 @@ def api_call_as_user(user, method, path, params, body_params = {}, headers = {},
   headers['Authorization'] = "Bearer #{token}"
   account = opts[:domain_root_account] || Account.default
   user.pseudonyms.reload
-  account.pseudonyms.create!(:unique_id => "#{user.id}@example.com", :user => user) unless user.find_pseudonym_for_account(account, true)
+  account.pseudonyms.create!(:unique_id => "#{user.id}@example.com", :user => user) unless SisPseudonym.for(user, account, type: :implicit, require_sis: false)
   Pseudonym.any_instance.stubs(:works_for_account?).returns(true)
   api_call(method, path, params, body_params, headers, opts)
 end
@@ -122,7 +122,7 @@ def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {}
         headers['HTTP_AUTHORIZATION'] = "Bearer #{token}"
         account = opts[:domain_root_account] || Account.default
         Pseudonym.any_instance.stubs(:works_for_account?).returns(true)
-        account.pseudonyms.create!(:unique_id => "#{@user.id}@example.com", :user => @user) unless @user.all_active_pseudonyms(:reload) && @user.find_pseudonym_for_account(account, true)
+        account.pseudonyms.create!(:unique_id => "#{@user.id}@example.com", :user => @user) unless @user.all_active_pseudonyms(:reload) && SisPseudonym.for(@user, account, type: :implicit, require_sis: false)
       end
     end
     LoadAccount.stubs(:default_domain_root_account).returns(opts[:domain_root_account]) if opts.has_key?(:domain_root_account)

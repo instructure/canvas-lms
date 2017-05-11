@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -548,7 +548,7 @@ class DiscussionTopicsController < ApplicationController
         end
       end
 
-      @initial_post_required = @topic.initial_post_required?(@current_user, @context_enrollment, session)
+      @initial_post_required = @topic.initial_post_required?(@current_user, session)
 
       @padless = true
 

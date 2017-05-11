@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2017 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 module Lti
   class SubscriptionsValidator
     class InvalidContextType < StandardError
@@ -7,7 +24,10 @@ module Lti
     class ToolNotInContext < StandardError
     end
 
-    CONTEXT_WHITELIST = [Course, Account, Assignment].freeze
+    CONTEXT_WHITELIST = {
+      'root_account' => Account,
+      'assignment' => Assignment
+    }.freeze
 
     attr_reader :subscription, :tool_proxy
 
@@ -43,12 +63,16 @@ module Lti
 
     def subscription_context
       @_subscription_context ||= begin
-        model = subscription[:ContextType].titlecase.constantize
-        raise InvalidContextType unless CONTEXT_WHITELIST.include?(model)
-        model.find(subscription[:ContextId].to_i)
+        model = CONTEXT_WHITELIST[subscription[:ContextType]]
+        raise InvalidContextType unless model
+
+        case subscription[:ContextType]
+        when "root_account"
+          model.find_by(uuid: subscription[:ContextId])
+        else
+          model.find(subscription[:ContextId])
+        end
       end
-    rescue NameError
-      raise InvalidContextType, "ContextType is invalid"
     end
   end
 end
