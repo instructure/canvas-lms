@@ -244,6 +244,18 @@ describe AccountsController do
 
     end
 
+    it "should not list rejected teachers" do
+      account_with_admin_logged_in
+      course_with_teacher(:account => @account)
+      @teacher2 = User.create(:name => "rejected")
+      reject = @course.enroll_user(@teacher2, "TeacherEnrollment")
+      reject.reject!
+
+      get 'show', :id => @account.id, :format => 'html'
+
+      expect(assigns[:courses].find {|c| c.id == @course.id }.teacher_names).to eq [@teacher.name]
+    end
+
     it "should sort courses as specified" do
       account_with_admin_logged_in(account: @account)
       course_with_teacher(:account => @account)
