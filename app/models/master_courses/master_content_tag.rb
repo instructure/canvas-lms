@@ -39,8 +39,6 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
     if self.restrictions_changed? && (self.restrictions.keys != [:all])
       if (self.restrictions.keys - MasterCourses::LOCK_TYPES).any?
         self.errors.add(:restrictions, "Invalid settings")
-      elsif self.restrictions.present? && !self.restrictions[:content]
-        self.errors.add(:restrictions, "Content must be restricted if restrictions are present")
       end
     end
   end
