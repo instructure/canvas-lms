@@ -648,7 +648,8 @@ class ExternalToolsController < ApplicationController
     selection_request = Lti::ContentItemSelectionRequest.new(context: @context,
                                                              domain_root_account: @domain_root_account,
                                                              user: @current_user,
-                                                             host: request.host)
+                                                             host: request.host,
+                                                             tool: tool)
 
     assignment = @context.assignments.active.find(params[:assignment_id]) if params[:assignment_id].present?
 
@@ -662,10 +663,9 @@ class ExternalToolsController < ApplicationController
     collaboration = opts[:content_item_id].present? ? ExternalToolCollaboration.find(opts[:content_item_id]) : nil
     params_helper = content_item_param_helper(placement, collaboration)
 
-    lti_launch = selection_request.generate_lti_launch(placement: placement,
-                                                       tool: @tool,
-                                                       expanded_variables: params_helper.expanded_variables,
-                                                       opts: opts)
+    selection_request.generate_lti_launch(placement: placement,
+                                          expanded_variables: params_helper.expanded_variables,
+                                          opts: opts)
   end
   protected :content_item_selection_request
 

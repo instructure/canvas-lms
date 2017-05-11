@@ -21,23 +21,24 @@ module Lti
     include ActionDispatch::Routing::PolymorphicRoutes
     include Rails.application.routes.url_helpers
 
-    def initialize(context:, domain_root_account:, host:, user: nil)
+    def initialize(context:, domain_root_account:, host:, tool:, user: nil)
       @context = context
       @domain_root_account = domain_root_account
       @user = user
       @host = host
+      @tool = tool
     end
 
-    def generate_lti_launch(placement:, tool:, opts: {}, expanded_variables: {})
+    def generate_lti_launch(placement:, opts: {}, expanded_variables: {})
       lti_launch = Lti::Launch.new(opts)
-      lti_launch.resource_url = opts[:launch_url] || tool.extension_setting(placement, :url)
+      lti_launch.resource_url = opts[:launch_url] || @tool.extension_setting(placement, :url)
       default_params = ContentItemSelectionRequest.default_lti_params(@context, @domain_root_account, @user)
       params = default_params.merge({
         # required params
         lti_message_type: 'ContentItemSelectionRequest',
         lti_version: 'LTI-1p0',
         content_item_return_url: return_url(opts[:content_item_id]),
-        data: data_hash_jwt(tool, placement, opts),
+        data: data_hash_jwt(placement, opts),
         context_title: @context.name,
         # optional params
         accept_multiple: false
@@ -46,12 +47,12 @@ module Lti
       lti_launch.params = Lti::Security.signed_post_params(
         params,
         lti_launch.resource_url,
-        tool.consumer_key,
-        tool.shared_secret,
-        @context.root_account.feature_enabled?(:disable_lti_post_only) || tool.extension_setting(:oauth_compliant)
+        @tool.consumer_key,
+        @tool.shared_secret,
+        @context.root_account.feature_enabled?(:disable_lti_post_only) || @tool.extension_setting(:oauth_compliant)
       )
-      lti_launch.link_text = tool.label_for(placement.to_sym, I18n.locale)
-      lti_launch.analytics_id = tool.tool_id
+      lti_launch.link_text = @tool.label_for(placement.to_sym, I18n.locale)
+      lti_launch.analytics_id = @tool.tool_id
 
       lti_launch
     end
@@ -63,7 +64,7 @@ module Lti
         context_id: Lti::Asset.opaque_identifier_for(context),
         tool_consumer_instance_guid: domain_root_account.lti_guid,
         roles: lti_helper.current_lis_roles,
-        launch_presentation_locale: I18n.locale || I18n.default_locale.to_s,
+        launch_presentation_locale: I18n.locale.to_s || I18n.default_locale.to_s,
         launch_presentation_document_target: 'iframe',
         ext_roles: lti_helper.all_roles,
       }
@@ -74,15 +75,13 @@ module Lti
 
     private
 
-    def data_hash_jwt(tool, placement, opts)
-      launch_url = opts[:launch_url] || tool.extension_setting(placement, :url)
+    def data_hash_jwt(placement, opts)
+      launch_url = opts[:launch_url] || @tool.extension_setting(placement, :url)
 
       data_hash = {default_launch_url: launch_url}
       if opts[:content_item_id]
-        data_hash.merge!({
-          content_item_id: opts[:content_item_id],
-          oauth_consumer_key: tool.consumer_key
-        })
+        data_hash[:content_item_id] = opts[:content_item_id]
+        data_hash[:oauth_consumer_key] = @tool.consumer_key
       end
 
       Canvas::Security.create_jwt(data_hash)

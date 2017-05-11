@@ -25,7 +25,8 @@ describe Lti::ContentItemSelectionRequest do
     described_class.new(context: course,
                         domain_root_account: root_account,
                         user: teacher,
-                        host: test_host)
+                        host: test_host,
+                        tool: tool)
   end
 
   let(:test_host) { 'canvas.test' }
@@ -38,7 +39,7 @@ describe Lti::ContentItemSelectionRequest do
 
   context '#generate_lti_launch' do
     it 'generates an Lti::Launch' do
-      expect(lti_request.generate_lti_launch(placement: placement, tool: tool)).to be_a Lti::Launch
+      expect(lti_request.generate_lti_launch(placement: placement)).to be_a Lti::Launch
     end
 
     it 'sends opts to the Lti::Launch' do
@@ -49,39 +50,38 @@ describe Lti::ContentItemSelectionRequest do
 
       expect(Lti::Launch).to receive(:new).with(opts).and_return(Lti::Launch.new(opts))
 
-      lti_request.generate_lti_launch(placement: placement, tool: tool, opts: opts)
+      lti_request.generate_lti_launch(placement: placement, opts: opts)
     end
 
     it 'generates resource_url based on a launch_url' do
-      lti_launch = lti_request.generate_lti_launch(placement: placement, tool: tool, opts: {launch_url: 'https://www.example.com'})
+      lti_launch = lti_request.generate_lti_launch(placement: placement, opts: {launch_url: 'https://www.example.com'})
       expect(lti_launch.resource_url).to eq 'https://www.example.com'
     end
 
     it 'sets the link text to the placement label' do
-      lti_launch = lti_request.generate_lti_launch(placement: placement, tool: tool, opts: {launch_url: 'https://www.example.com'})
+      lti_launch = lti_request.generate_lti_launch(placement: placement, opts: {launch_url: 'https://www.example.com'})
       expect(lti_launch.link_text).to eq tool.label_for(placement.to_sym, I18n.locale)
     end
 
     it 'sets the analytics id to the tool id' do
-      lti_launch = lti_request.generate_lti_launch(placement: placement, tool: tool, opts: {launch_url: 'https://www.example.com'})
+      lti_launch = lti_request.generate_lti_launch(placement: placement, opts: {launch_url: 'https://www.example.com'})
       expect(lti_launch.analytics_id).to eq tool.tool_id
     end
 
     context 'params' do
       it 'builds a params hash that includes the default lti params' do
-        lti_launch = lti_request.generate_lti_launch(placement: placement, tool: tool)
-        # stringify keys and values before comparing
-        default_params = described_class.default_lti_params(course, root_account, teacher).inject({}){|h,(k,v)| h[k.to_s] = v.to_s; h}
+        lti_launch = lti_request.generate_lti_launch(placement: placement)
+        default_params = described_class.default_lti_params(course, root_account, teacher).stringify_keys
         expect(lti_launch.params).to include(default_params)
       end
 
       it "sets the 'accept_multiple' param to false" do
-        lti_launch = lti_request.generate_lti_launch(placement: placement, tool: tool)
+        lti_launch = lti_request.generate_lti_launch(placement: placement)
         expect(lti_launch.params['accept_multiple']).to eq 'false'
       end
 
       it 'adds message type and version params' do
-        lti_launch = lti_request.generate_lti_launch(placement: placement, tool: tool)
+        lti_launch = lti_request.generate_lti_launch(placement: placement)
         expect(lti_launch.params).to include({
           'lti_message_type' => 'ContentItemSelectionRequest',
           'lti_version' => 'LTI-1p0'
@@ -89,29 +89,37 @@ describe Lti::ContentItemSelectionRequest do
       end
 
       it 'adds context_title param' do
-        lti_launch = lti_request.generate_lti_launch(placement: placement, tool: tool)
+        lti_launch = lti_request.generate_lti_launch(placement: placement)
         expect(lti_launch.params['context_title']).to eq course.name
       end
 
       context 'return_url' do
         it 'properly sets the return URL when no content item id is provided' do
-          lti_launch = lti_request.generate_lti_launch(placement: placement, tool: tool)
-          expected_url = "http://#{test_host}/courses/#{course.id}/external_content/success/external_tool_dialog"
-          expect(lti_launch.params['content_item_return_url']).to eq expected_url
+          lti_launch = lti_request.generate_lti_launch(placement: placement)
+          create_url = Rails.application.routes.url_helpers.course_external_content_success_url(
+            host: test_host,
+            course_id: course.id,
+            service: :external_tool_dialog
+          )
+          expect(lti_launch.params['content_item_return_url']).to eq create_url
         end
 
         it 'properly sets the return URL when a content item id is provided' do
           item_id = 1
-          lti_launch = lti_request.generate_lti_launch(placement: placement, tool: tool, opts: {content_item_id: item_id})
-          expected_url = "http://#{test_host}/courses/#{course.id}/external_content/success/external_tool_dialog/#{item_id}"
-
-          expect(lti_launch.params['content_item_return_url']).to eq expected_url
+          lti_launch = lti_request.generate_lti_launch(placement: placement, opts: {content_item_id: item_id})
+          update_url = Rails.application.routes.url_helpers.course_external_content_update_url(
+            host: test_host,
+            course_id: course.id,
+            service: :external_tool_dialog,
+            id: item_id
+          )
+          expect(lti_launch.params['content_item_return_url']).to eq update_url
         end
       end
 
       context 'data' do
         it 'includes the default launch URL' do
-          lti_launch = lti_request.generate_lti_launch(placement: placement, tool: tool)
+          lti_launch = lti_request.generate_lti_launch(placement: placement)
           decoded_jwt = JSON::JWT.decode(lti_launch.params['data'], :skip_verification)
           expect(decoded_jwt['default_launch_url']).to eq tool.extension_setting(placement, :url)
         end
@@ -119,7 +127,7 @@ describe Lti::ContentItemSelectionRequest do
         it 'includes content_item_id and oauth_consumer_key if content_item_id provided' do
           item_id = 1
           opts = {content_item_id: item_id}
-          lti_launch = lti_request.generate_lti_launch(placement: placement, tool: tool, opts: opts)
+          lti_launch = lti_request.generate_lti_launch(placement: placement, opts: opts)
           decoded_jwt = JSON::JWT.decode(lti_launch.params['data'], :skip_verification)
           expected_hash = { 'default_launch_url' => tool.extension_setting(placement, :url),
                             'content_item_id' => item_id,
@@ -128,7 +136,7 @@ describe Lti::ContentItemSelectionRequest do
         end
 
         it 'does not include content_item_id or oauth_consumer_key if content_item_id is not provided' do
-          lti_launch = lti_request.generate_lti_launch(placement: placement, tool: tool)
+          lti_launch = lti_request.generate_lti_launch(placement: placement)
           decoded_jwt = JSON::JWT.decode(lti_launch.params['data'], :skip_verification)
           expect(decoded_jwt.keys).not_to include ['content_item_id', 'oauth_consumer_key']
         end
@@ -136,7 +144,7 @@ describe Lti::ContentItemSelectionRequest do
 
       context 'placement params' do
         it 'adds params for the migration_selection placement' do
-          lti_launch = lti_request.generate_lti_launch(placement: 'migration_selection', tool: tool, opts:{launch_url: launch_url})
+          lti_launch = lti_request.generate_lti_launch(placement: 'migration_selection', opts:{launch_url: launch_url})
           params = lti_launch.params
           expect(params['accept_media_types']).to include(
             'application/vnd.ims.imsccv1p1',
@@ -152,7 +160,7 @@ describe Lti::ContentItemSelectionRequest do
         end
 
         it 'adds params for the editor_button placement' do
-          lti_launch = lti_request.generate_lti_launch(placement: 'editor_button', tool: tool, opts:{launch_url: launch_url})
+          lti_launch = lti_request.generate_lti_launch(placement: 'editor_button', opts:{launch_url: launch_url})
           params = lti_launch.params
           expect(params['accept_media_types']).to include(
             'image/*',
@@ -169,7 +177,7 @@ describe Lti::ContentItemSelectionRequest do
         end
 
         it 'adds params for the resource_selection placement' do
-          lti_launch = lti_request.generate_lti_launch(placement: 'resource_selection', tool: tool, opts: {launch_url: launch_url})
+          lti_launch = lti_request.generate_lti_launch(placement: 'resource_selection', opts: {launch_url: launch_url})
           params = lti_launch.params
           expect(params['accept_media_types']).to eq 'application/vnd.ims.lti.v1.ltilink'
           expect(params['accept_presentation_document_targets']).to include(
@@ -182,7 +190,7 @@ describe Lti::ContentItemSelectionRequest do
         it 'adds params for the assignment_selection placement'
 
         it 'adds params for the collaboration placement' do
-          lti_launch = lti_request.generate_lti_launch(placement: 'collaboration', tool: tool, opts: {launch_url: launch_url})
+          lti_launch = lti_request.generate_lti_launch(placement: 'collaboration', opts: {launch_url: launch_url})
 
           expect(lti_launch.params).to include({
             'accept_media_types' => 'application/vnd.ims.lti.v1.ltilink',
@@ -198,7 +206,7 @@ describe Lti::ContentItemSelectionRequest do
           it 'adds params for an assignment that can accept an online_url submission' do
             assignment = assignment_model(course: course, submission_types: 'online_url')
             opts = {assignment: assignment, launch_url: launch_url}
-            lti_launch = lti_request.generate_lti_launch(placement: 'homework_submission', tool: tool, opts: opts)
+            lti_launch = lti_request.generate_lti_launch(placement: 'homework_submission', opts: opts)
             expect(lti_launch.params).to include({
               'accept_media_types' => '*/*',
               'accept_presentation_document_targets' => 'window',
@@ -209,7 +217,7 @@ describe Lti::ContentItemSelectionRequest do
           it 'adds params for an assignment that can accept an online_upload submission' do
             assignment = assignment_model(course: course, submission_types: 'online_upload')
             opts = {assignment: assignment, launch_url: launch_url}
-            lti_launch = lti_request.generate_lti_launch(placement: 'homework_submission', tool: tool, opts: opts)
+            lti_launch = lti_request.generate_lti_launch(placement: 'homework_submission', opts: opts)
             expect(lti_launch.params).to include({
               'accept_media_types' => '*/*',
               'accept_presentation_document_targets' => 'none',
@@ -224,7 +232,7 @@ describe Lti::ContentItemSelectionRequest do
               allowed_extensions: %w(txt jpg)
             )
             opts = {assignment: assignment, launch_url: launch_url}
-            lti_launch = lti_request.generate_lti_launch(placement: 'homework_submission', tool: tool, opts: opts)
+            lti_launch = lti_request.generate_lti_launch(placement: 'homework_submission', opts: opts)
             expect(lti_launch.params['accept_media_types']).to include('text/plain', 'image/jpeg')
             expect(lti_launch.params['ext_content_file_extensions']).to include('txt', 'jpg')
           end
@@ -232,7 +240,7 @@ describe Lti::ContentItemSelectionRequest do
           it 'adds params for assignments that accept either an online_upload or online_url' do
             assignment = assignment_model(course: course, submission_types: 'online_upload,online_url')
             opts = {assignment: assignment, launch_url: launch_url}
-            lti_launch = lti_request.generate_lti_launch(placement: 'homework_submission', tool: tool, opts: opts)
+            lti_launch = lti_request.generate_lti_launch(placement: 'homework_submission', opts: opts)
 
             expect(lti_launch.params['accept_presentation_document_targets']).to include(
               'window',
@@ -262,7 +270,7 @@ describe Lti::ContentItemSelectionRequest do
         context_id: 'course_opaque_id',
         tool_consumer_instance_guid: 'account_guid',
         roles: 'urn:lti:sysrole:ims/lis/None',
-        launch_presentation_locale: :de,
+        launch_presentation_locale: 'de',
         launch_presentation_document_target: 'iframe',
         ext_roles: 'urn:lti:sysrole:ims/lis/None'
       })
