@@ -15,16 +15,21 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-import ReactDOM from 'react-dom';
-import React from 'react';
+import Planner from 'canvas-planner';
 
 const element = document.getElementById('dashboard-planner');
 const headerElement = document.getElementById('dashboard-planner-header');
+
+const options = {
+  locale: window.ENV.LOCALE,
+  timeZone: window.ENV.TIMEZONE,
+  theme: (ENV.use_high_contrast) ? 'canvas-a11y' : 'canvas'
+};
+
 if (element) {
-  ReactDOM.render(<div>Planner placeholder</div>, element);
+  Planner.render(element, options);
 }
 
 if (headerElement) {
-  ReactDOM.render(<div>Planner Header Placeholder</div>, headerElement);
+  Planner.renderHeader(headerElement, options);
 }

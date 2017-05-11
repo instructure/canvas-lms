@@ -320,6 +320,12 @@ axios@0.15.2:
   dependencies:
     follow-redirects "0.0.7"
 
+axios@^0.16.0:
+  version "0.16.1"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.16.1.tgz#c0b6d26600842384b8f509e57111f0d2df8223ca"
+  dependencies:
+    follow-redirects "^1.2.3"
+
 babel-cli@^6.10.1:
   version "6.24.1"
   resolved "https://registry.yarnpkg.com/babel-cli/-/babel-cli-6.24.1.tgz#207cd705bba61489b2ea41b5312341cf6aca2283"
@@ -1342,6 +1348,23 @@ caniuse-db@^1.0.30000153, caniuse-db@^1.0.30000187, caniuse-db@^1.0.30000214, ca
   version "1.0.30000665"
   resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000665.tgz#e84f4277935f295f546f8533cb0b410a8415b972"
 
+canvas-planner@^0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/canvas-planner/-/canvas-planner-0.0.1.tgz#7209c07fed029c1a71419c7234735cba45a86160"
+  dependencies:
+    axios "^0.16.0"
+    esrever "^0.2.0"
+    format-message "^5.1.2"
+    format-message-parse "^5.1.2"
+    format-message-print "^5.1.2"
+    moment-timezone "^0.5.13"
+    prop-types "^15.5.8"
+    react-redux "^5.0.3"
+    redux "^3.6.0"
+    redux-actions "^2.0.1"
+    redux-logger "^3.0.1"
+    redux-thunk "^2.2.0"
+
 canvas-rce@1.1.5:
   version "1.1.5"
   resolved "https://registry.yarnpkg.com/canvas-rce/-/canvas-rce-1.1.5.tgz#3eb33f1bea1ffcbcd380cec1fede55bd2e43406e"
@@ -1787,6 +1810,14 @@ create-hmac@^1.1.0, create-hmac@^1.1.2:
     create-hash "^1.1.0"
     inherits "^2.0.1"
 
+create-react-class@^15.5.1:
+  version "15.5.3"
+  resolved "https://registry.yarnpkg.com/create-react-class/-/create-react-class-15.5.3.tgz#fb0f7cae79339e9a179e194ef466efa3923820fe"
+  dependencies:
+    fbjs "^0.8.9"
+    loose-envify "^1.3.1"
+    object-assign "^4.1.1"
+
 cross-spawn@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-3.0.1.tgz#1256037ecb9f0c5f79e3d6ef135e30770184b982"
@@ -2048,7 +2079,7 @@ debug@2.6.3:
   dependencies:
     ms "0.7.2"
 
-debug@^2.1.1, debug@^2.2.0, debug@^2.6.1:
+debug@^2.1.1, debug@^2.2.0, debug@^2.4.5, debug@^2.6.1:
   version "2.6.6"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.6.tgz#a9fa6fbe9ca43cf1e79f73b75c0189cbb7d6db5a"
   dependencies:
@@ -2057,6 +2088,10 @@ debug@^2.1.1, debug@^2.2.0, debug@^2.6.1:
 decamelize@^1.0.0, decamelize@^1.1.1, decamelize@^1.1.2:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/decamelize/-/decamelize-1.2.0.tgz#f6534d15148269b20352e7bee26f501f9a191290"
+
+deep-diff@0.3.4:
+  version "0.3.4"
+  resolved "https://registry.yarnpkg.com/deep-diff/-/deep-diff-0.3.4.tgz#aac5c39952236abe5f037a2349060ba01b00ae48"
 
 deep-equal@1.0.1:
   version "1.0.1"
@@ -2665,6 +2700,10 @@ esrecurse@^4.1.0:
     estraverse "~4.1.0"
     object-assign "^4.0.1"
 
+esrever@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/esrever/-/esrever-0.2.0.tgz#96e9d28f4f1b1a76784cd5d490eaae010e7407b8"
+
 estraverse@^1.9.1:
   version "1.9.3"
   resolved "https://registry.yarnpkg.com/estraverse/-/estraverse-1.9.3.tgz#af67f2dc922582415950926091a4005d29c9bb44"
@@ -2808,7 +2847,7 @@ fbjs@^0.6.1:
     ua-parser-js "^0.7.9"
     whatwg-fetch "^0.9.0"
 
-fbjs@^0.8.8:
+fbjs@^0.8.8, fbjs@^0.8.9:
   version "0.8.12"
   resolved "https://registry.yarnpkg.com/fbjs/-/fbjs-0.8.12.tgz#10b5d92f76d45575fd63a217d4ea02bea2f8ed04"
   dependencies:
@@ -2934,6 +2973,12 @@ follow-redirects@0.0.7:
     debug "^2.2.0"
     stream-consume "^0.1.0"
 
+follow-redirects@^1.2.3:
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.2.3.tgz#01abaeca85e3609837d9fcda3167a7e42fdaca21"
+  dependencies:
+    debug "^2.4.5"
+
 fontfaceobserver@^2.0.8:
   version "2.0.9"
   resolved "https://registry.yarnpkg.com/fontfaceobserver/-/fontfaceobserver-2.0.9.tgz#fb61e1053bd28d38cd4750a05b30f5130b32e97a"
@@ -2988,7 +3033,7 @@ format-message-generate-id@^5.1.0:
     format-message-parse "^5.1.2"
     format-message-print "^5.1.2"
 
-format-message-interpret@^5.1.0:
+format-message-interpret@^5.1.0, format-message-interpret@^5.1.2:
   version "5.1.2"
   resolved "https://registry.yarnpkg.com/format-message-interpret/-/format-message-interpret-5.1.2.tgz#183471d6b8cf048d18d76606fa96a1f2b40e7938"
   dependencies:
@@ -3010,6 +3055,16 @@ format-message@5.1.0:
     format-message-formats "^5.1.0"
     format-message-interpret "^5.1.0"
     format-message-parse "^5.1.0"
+    lookup-closest-locale "^5.1.0"
+    object-assign "^4.0.1"
+
+format-message@^5.1.2:
+  version "5.1.2"
+  resolved "https://registry.yarnpkg.com/format-message/-/format-message-5.1.2.tgz#3e3424a7efa619e4841275fecebedf021c4cb3e6"
+  dependencies:
+    format-message-formats "^5.1.0"
+    format-message-interpret "^5.1.2"
+    format-message-parse "^5.1.2"
     lookup-closest-locale "^5.1.0"
     object-assign "^4.0.1"
 
@@ -3823,7 +3878,7 @@ interpret@^1.0.0:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/interpret/-/interpret-1.0.3.tgz#cbc35c62eeee73f19ab7b10a801511401afc0f90"
 
-invariant@2.2.2, invariant@^2.0.0, invariant@^2.1.0, invariant@^2.2.0:
+invariant@2.2.2, invariant@^2.0.0, invariant@^2.1.0, invariant@^2.2.0, invariant@^2.2.1:
   version "2.2.2"
   resolved "https://registry.yarnpkg.com/invariant/-/invariant-2.2.2.tgz#9e1f56ac0acdb6bf303306f338be3b204ae60360"
   dependencies:
@@ -4459,7 +4514,7 @@ loader-utils@^1.0.2:
     emojis-list "^2.0.0"
     json5 "^0.5.0"
 
-lodash-es@^4.2.1:
+lodash-es@^4.17.4, lodash-es@^4.2.0, lodash-es@^4.2.1:
   version "4.17.4"
   resolved "https://registry.yarnpkg.com/lodash-es/-/lodash-es-4.17.4.tgz#dcc1d7552e150a0640073ba9cb31d70f032950e7"
 
@@ -4691,7 +4746,7 @@ lookup-closest-locale@^5.1.0:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/lookup-closest-locale/-/lookup-closest-locale-5.1.0.tgz#da2f820c31663b3f91e099580d689f0aa774d2d4"
 
-loose-envify@^1.0.0, loose-envify@^1.1.0:
+loose-envify@^1.0.0, loose-envify@^1.1.0, loose-envify@^1.3.1:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/loose-envify/-/loose-envify-1.3.1.tgz#d1a8ad33fa9ce0e713d65fdd0ac8b748d478c848"
   dependencies:
@@ -4883,7 +4938,13 @@ modify-filename@^1.0.0, modify-filename@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/modify-filename/-/modify-filename-1.1.0.tgz#9a2dec83806fbb2d975f22beec859ca26b393aa1"
 
-moment@>=2.5.0, moment@~2.10.6:
+moment-timezone@^0.5.13:
+  version "0.5.13"
+  resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.5.13.tgz#99ce5c7d827262eb0f1f702044177f60745d7b90"
+  dependencies:
+    moment ">= 2.9.0"
+
+"moment@>= 2.9.0", moment@>=2.5.0, moment@~2.10.6:
   version "2.10.6"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.10.6.tgz#6cb21967c79cba7b0ca5e66644f173662b3efa77"
 
@@ -5152,7 +5213,7 @@ oauth-sign@~0.8.1:
   version "0.8.2"
   resolved "https://registry.yarnpkg.com/oauth-sign/-/oauth-sign-0.8.2.tgz#46a6ab7f0aead8deae9ec0565780b7d4efeb9d43"
 
-object-assign@4.x.x, object-assign@^4.0.1, object-assign@^4.1.0:
+object-assign@4.x.x, object-assign@^4.0.1, object-assign@^4.1.0, object-assign@^4.1.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/object-assign/-/object-assign-4.1.1.tgz#2109adc7965887cfc05cbbd442cac8bfbb360863"
 
@@ -5867,6 +5928,13 @@ promise@^7.0.3, promise@^7.1.1:
   dependencies:
     asap "~2.0.3"
 
+prop-types@^15.0.0, prop-types@^15.5.8:
+  version "15.5.9"
+  resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.5.9.tgz#d478eef0e761396942f70c78e772f76e8be747c9"
+  dependencies:
+    fbjs "^0.8.9"
+    loose-envify "^1.3.1"
+
 prr@~0.0.0:
   version "0.0.0"
   resolved "https://registry.yarnpkg.com/prr/-/prr-0.0.0.tgz#1a84b85908325501411853d0081ee3fa86e2926a"
@@ -6045,6 +6113,18 @@ react-redux@4.4.5, react-redux@~4.4.5:
     invariant "^2.0.0"
     lodash "^4.2.0"
     loose-envify "^1.1.0"
+
+react-redux@^5.0.3:
+  version "5.0.4"
+  resolved "https://registry.yarnpkg.com/react-redux/-/react-redux-5.0.4.tgz#1563babadcfb2672f57f9ceaa439fb16bf85d55b"
+  dependencies:
+    create-react-class "^15.5.1"
+    hoist-non-react-statics "^1.0.3"
+    invariant "^2.0.0"
+    lodash "^4.2.0"
+    lodash-es "^4.2.0"
+    loose-envify "^1.1.0"
+    prop-types "^15.0.0"
 
 "react-select-box@https://github.com/instructure-react/react-select-box.git#b1ddd39223d48793fbe3dc4e87aca00d57197b5f":
   version "2.0.1"
@@ -6230,6 +6310,15 @@ redux-actions@0.11.0:
     lodash "^4.13.1"
     reduce-reducers "^0.1.0"
 
+redux-actions@^2.0.1:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/redux-actions/-/redux-actions-2.0.3.tgz#1550aba9def179166ccd234d07672104a736d889"
+  dependencies:
+    invariant "^2.2.1"
+    lodash "^4.13.1"
+    lodash-es "^4.17.4"
+    reduce-reducers "^0.1.0"
+
 redux-batch-middleware@0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/redux-batch-middleware/-/redux-batch-middleware-0.2.0.tgz#c61f7d6354a6422c8fcea6c8c36fb0fcb215ac84"
@@ -6238,9 +6327,19 @@ redux-logger@2.6.1:
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/redux-logger/-/redux-logger-2.6.1.tgz#f558a40e3abd03feaf4e69ace4d71fec09803c74"
 
+redux-logger@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/redux-logger/-/redux-logger-3.0.1.tgz#ae8ae4c3c55ed3dd7aa31509f0856c5d3751057a"
+  dependencies:
+    deep-diff "0.3.4"
+
 redux-thunk@2.1.0, redux-thunk@~2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/redux-thunk/-/redux-thunk-2.1.0.tgz#c724bfee75dbe352da2e3ba9bc14302badd89a98"
+
+redux-thunk@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/redux-thunk/-/redux-thunk-2.2.0.tgz#e615a16e16b47a19a515766133d1e3e99b7852e5"
 
 redux@3.5.2, redux@^3.2.0, redux@~3.5.2:
   version "3.5.2"
@@ -6250,6 +6349,15 @@ redux@3.5.2, redux@^3.2.0, redux@~3.5.2:
     lodash-es "^4.2.1"
     loose-envify "^1.1.0"
     symbol-observable "^0.2.3"
+
+redux@^3.6.0:
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/redux/-/redux-3.6.0.tgz#887c2b3d0b9bd86eca2be70571c27654c19e188d"
+  dependencies:
+    lodash "^4.2.1"
+    lodash-es "^4.2.1"
+    loose-envify "^1.1.0"
+    symbol-observable "^1.0.2"
 
 regenerate@^1.2.1:
   version "1.3.2"
@@ -7021,6 +7129,10 @@ swfobject@^2.2.1:
 symbol-observable@^0.2.3:
   version "0.2.4"
   resolved "https://registry.yarnpkg.com/symbol-observable/-/symbol-observable-0.2.4.tgz#95a83db26186d6af7e7a18dbd9760a2f86d08f40"
+
+symbol-observable@^1.0.2:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/symbol-observable/-/symbol-observable-1.0.4.tgz#29bf615d4aa7121bdd898b22d4b3f9bc4e2aa03d"
 
 synesthesia@^1.0.1:
   version "1.0.1"
