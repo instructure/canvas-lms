@@ -33,11 +33,11 @@ import MigrationStates from '../migrationStates'
 import BlueprintSidebar from './BlueprintSidebar'
 import BlueprintModal from './BlueprintModal'
 import { ConnectedMigrationSync as MigrationSync } from './MigrationSync'
-import { ConnectedBlueprintAssociations as BlueprintAssociations } from './BlueprintAssociations'
-import { ConnectedSyncHistory as SyncHistory } from './SyncHistory'
 import { ConnectedEnableNotification as EnableNotification } from './EnableNotification'
 
 let UnsynchedChanges = null
+let SyncHistory = null
+let BlueprintAssociations = null
 
 export default class CourseSidebar extends Component {
   static propTypes = {
@@ -119,6 +119,7 @@ export default class CourseSidebar extends Component {
     }),
     unsynchedChanges: () => ({
       props: {
+        title: I18n.t('Unsynched Changes'),
         hasChanges: this.props.unsynchedChanges.length > 0,
         willSendNotification: this.props.willSendNotification,
         enableSendNotification: this.props.enableSendNotification,
@@ -145,16 +146,32 @@ export default class CourseSidebar extends Component {
   }
 
   handleAssociationsClick = () => {
-    this.setState({
-      isModalOpen: true,
-      modalId: 'associations',
+    require.ensure([], (require) => {
+      // lazy load BlueprintAssociations component
+      const BlueprintAssociationsModule = require('./BlueprintAssociations')
+      if (BlueprintAssociations === null) {
+        BlueprintAssociations = BlueprintAssociationsModule.ConnectedBlueprintAssociations
+      }
+
+      this.setState({
+        isModalOpen: true,
+        modalId: 'associations',
+      })
     })
   }
 
   handleSyncHistoryClick = () => {
-    this.setState({
-      isModalOpen: true,
-      modalId: 'syncHistory',
+    require.ensure([], (require) => {
+      // lazy load SyncHistory component
+      const SyncHistoryModule = require('./SyncHistory')
+      if (SyncHistory === null) {
+        SyncHistory = SyncHistoryModule.ConnectedSyncHistory
+      }
+
+      this.setState({
+        isModalOpen: true,
+        modalId: 'syncHistory',
+      })
     })
   }
 
