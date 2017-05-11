@@ -355,8 +355,8 @@
   }
 }
 
-/* unsynched changes are a little different than sync history */
-.bcs__history-item__content.bcs__unsynched-change__content {
+/* unsynced changes are a little different than sync history */
+.bcs__history-item__content.bcs__unsynced-change__content {
   .bcs__history-item__uncynched-changes-grid {
     left: 25px;
   }
@@ -365,6 +365,6 @@
   }
 }
 
-.bcs__unsynched-changes .bcs__history-notification {
+.bcs__unsynced-changes .bcs__history-notification {
   padding-top: 1em;
 }

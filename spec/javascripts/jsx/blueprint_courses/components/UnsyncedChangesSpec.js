@@ -20,11 +20,11 @@ import React from 'react'
 import { Provider } from 'react-redux'
 import * as enzyme from 'enzyme'
 import createStore from 'jsx/blueprint_courses/store'
-import {ConnectedUnsynchedChanges} from 'jsx/blueprint_courses/components/UnsynchedChanges'
+import {ConnectedUnsyncedChanges} from 'jsx/blueprint_courses/components/UnsyncedChanges'
 import MigrationStates from 'jsx/blueprint_courses/migrationStates'
 
 const noop = () => {}
-const unsynchedChanges = [
+const unsyncedChanges = [
   {
     asset_id: '22',
     asset_type: 'assignment',
@@ -52,9 +52,9 @@ const unsynchedChanges = [
 ]
 
 const defaultProps = {
-  unsynchedChanges,
-  isLoadingUnsynchedChanges: false,
-  hasLoadedUnsynchedChanges: true,
+  unsyncedChanges,
+  isLoadingUnsyncedChanges: false,
+  hasLoadedUnsyncedChanges: true,
   migrationStatus: MigrationStates.unknown,
 
   willSendNotification: false,
@@ -62,7 +62,7 @@ const defaultProps = {
   notificationMessage: '',
 }
 const actionProps = {
-  loadUnsynchedChanges: noop,
+  loadUnsyncedChanges: noop,
   enableSendNotification: noop,
   includeCustomNotificationMessage: noop,
   setNotificationMessage: noop,
@@ -76,16 +76,16 @@ function connect (props = {...defaultProps}) {
   const store = mockStore()
   return (
     <Provider store={store}>
-      <ConnectedUnsynchedChanges {...props} {...actionProps} />
+      <ConnectedUnsyncedChanges {...props} {...actionProps} />
     </Provider>
   )
 }
 
-QUnit.module('UnsynchedChanges component')
+QUnit.module('UnsyncedChanges component')
 
-test('renders the UnsynchedChanges component', () => {
+test('renders the UnsyncedChanges component', () => {
   const tree = enzyme.mount(connect())
-  let node = tree.find('UnsynchedChanges')
+  let node = tree.find('UnsyncedChanges')
   ok(node.exists())
   node = tree.find('.bcs__history')
   ok(node.exists())

@@ -125,7 +125,7 @@ const ApiClient = {
     })
   },
 
-  loadUnsynchedChanges ({ course }) {
+  loadUnsyncedChanges ({ course }) {
     return axios.get(`/api/v1/courses/${course.id}/blueprint_templates/default/unsynced_changes`)
   },
 }

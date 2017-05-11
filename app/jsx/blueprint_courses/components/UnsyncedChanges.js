@@ -25,26 +25,26 @@ import select from 'jsx/shared/select'
 import Alert from 'instructure-ui/lib/components/Alert'
 import Heading from 'instructure-ui/lib/components/Heading'
 
-import UnsynchedChange from './UnsynchedChange'
+import UnsyncedChange from './UnsyncedChange'
 import { ConnectedEnableNotification as EnableNotification } from './EnableNotification'
 
 import actions from '../actions'
 import propTypes from '../propTypes'
 
-export default class UnsynchedChanges extends Component {
+export default class UnsyncedChanges extends Component {
   static propTypes = {
-    unsynchedChanges: propTypes.unsynchedChanges,
+    unsyncedChanges: propTypes.unsyncedChanges,
   }
 
   static defaultProps = {
-    unsynchedChanges: [],
+    unsyncedChanges: [],
   }
 
   maybeRenderChanges () {
     return (
-      this.props.unsynchedChanges.length === 0
+      this.props.unsyncedChanges.length === 0
       ?
-        <Alert variant="info">{I18n.t('There are no unsynched changes')}</Alert>
+        <Alert variant="info">{I18n.t('There are no unsynced changes')}</Alert>
       :
         this.renderChanges()
     )
@@ -52,14 +52,14 @@ export default class UnsynchedChanges extends Component {
 
   renderChanges () {
     return (
-      <div className="bcs__history-item bcs__unsynched-changes">
+      <div className="bcs__history-item bcs__unsynced-changes">
         <header className="bcs__history-item__title">
           <Heading level="h3">
-            {I18n.t('%{count} Unsynched Changes', {count: this.props.unsynchedChanges.length})}
+            {I18n.t('%{count} Unsynced Changes', {count: this.props.unsyncedChanges.length})}
           </Heading>
         </header>
-        {this.props.unsynchedChanges.map(change =>
-          (<UnsynchedChange key={change.asset_id} change={change} />)
+        {this.props.unsyncedChanges.map(change =>
+          (<UnsyncedChange key={change.asset_id} change={change} />)
         )}
         <EnableNotification />
       </div>
@@ -77,7 +77,7 @@ export default class UnsynchedChanges extends Component {
 
 const connectState = state =>
   select(state, [
-    'unsynchedChanges',
+    'unsyncedChanges',
   ])
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
-export const ConnectedUnsynchedChanges = connect(connectState, connectActions)(UnsynchedChanges)
+export const ConnectedUnsyncedChanges = connect(connectState, connectActions)(UnsyncedChanges)

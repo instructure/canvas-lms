@@ -89,7 +89,7 @@ export default {
       ],
     },
   ],
-  unsynchedChanges: [
+  unsyncedChanges: [
     {
       asset_id: '22',
       asset_type: 'assignment',

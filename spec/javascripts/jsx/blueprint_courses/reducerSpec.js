@@ -219,31 +219,31 @@ test('sets isLoadingHistory to false on LOAD_HISTORY_FAIL', () => {
   equal(newState.isLoadingHistory, false)
 })
 
-test('sets isLoadingUnynchedChanges to true on LOAD_UNSYNCHED_CHANGES_START', () => {
-  const newState = reduce(actions.loadUnsynchedChangesStart())
-  equal(newState.isLoadingUnsynchedChanges, true)
+test('sets isLoadingUnynchedChanges to true on LOAD_UNSYNCED_CHANGES_START', () => {
+  const newState = reduce(actions.loadUnsyncedChangesStart())
+  equal(newState.isLoadingUnsyncedChanges, true)
 })
-test('sets isLoadingUnynchedChanges to false on LOAD_UNSYNCHED_CHANGES_SUCCESS', () => {
-  const newState = reduce(actions.loadUnsynchedChangesSuccess({}))
-  equal(newState.isLoadingUnsynchedChanges, false)
+test('sets isLoadingUnynchedChanges to false on LOAD_UNSYNCED_CHANGES_SUCCESS', () => {
+  const newState = reduce(actions.loadUnsyncedChangesSuccess({}))
+  equal(newState.isLoadingUnsyncedChanges, false)
 })
-test('sets isLoadingUnynchedChanges to alse on LOAD_UNSYNCHED_CHANGES_FAIL', () => {
-  const newState = reduce(actions.loadUnsynchedChangesFail())
-  equal(newState.isLoadingUnsynchedChanges, false)
-})
-
-test('sets hasLoadedUnsynchedChanges to false on LOAD_UNSYNCHED_CHANGES_START', () => {
-  const newState = reduce(actions.loadUnsynchedChangesStart())
-  equal(newState.hasLoadedUnsynchedChanges, false)
-})
-test('sets hasLoadedUnsynchedChanges to true on LOAD_UNSYNCHED_CHANGES_SUCCESS', () => {
-  const newState = reduce(actions.loadUnsynchedChangesSuccess({}))
-  equal(newState.hasLoadedUnsynchedChanges, true)
+test('sets isLoadingUnynchedChanges to alse on LOAD_UNSYNCED_CHANGES_FAIL', () => {
+  const newState = reduce(actions.loadUnsyncedChangesFail())
+  equal(newState.isLoadingUnsyncedChanges, false)
 })
 
-test('sets unsynchedChanges on LOAD_UNSYNCHED_CHANGES_SUCCESS', () => {
-  const newState = reduce(actions.loadUnsynchedChangesSuccess(sampleData.unsynchedChanges))
-  deepEqual(newState.unsynchedChanges, sampleData.unsynchedChanges)
+test('sets hasLoadedUnsyncedChanges to false on LOAD_UNSYNCED_CHANGES_START', () => {
+  const newState = reduce(actions.loadUnsyncedChangesStart())
+  equal(newState.hasLoadedUnsyncedChanges, false)
+})
+test('sets hasLoadedUnsyncedChanges to true on LOAD_UNSYNCED_CHANGES_SUCCESS', () => {
+  const newState = reduce(actions.loadUnsyncedChangesSuccess({}))
+  equal(newState.hasLoadedUnsyncedChanges, true)
+})
+
+test('sets unsyncedChanges on LOAD_UNSYNCED_CHANGES_SUCCESS', () => {
+  const newState = reduce(actions.loadUnsyncedChangesSuccess(sampleData.unsyncedChanges))
+  deepEqual(newState.unsyncedChanges, sampleData.unsyncedChanges)
 })
 
 test('sets willSendNotification on ENABLE_SEND_NOTIFICATION', () => {

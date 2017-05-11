@@ -38,7 +38,7 @@ const types = [
   'ADD_COURSE_ASSOCIATIONS', 'UNDO_ADD_COURSE_ASSOCIATIONS',
   'REMOVE_COURSE_ASSOCIATIONS', 'UNDO_REMOVE_COURSE_ASSOCIATIONS',
   'CLEAR_ASSOCIATIONS',
-  'LOAD_UNSYNCHED_CHANGES_START', 'LOAD_UNSYNCHED_CHANGES_SUCCESS', 'LOAD_UNSYNCHED_CHANGES_FAIL',
+  'LOAD_UNSYNCED_CHANGES_START', 'LOAD_UNSYNCED_CHANGES_SUCCESS', 'LOAD_UNSYNCED_CHANGES_FAIL',
   'ENABLE_SEND_NOTIFICATION', 'INCLUDE_CUSTOM_NOTIFICATION_MESSAGE', 'SET_NOTIFICATION_MESSAGE'
 ]
 const actions = createActions(...types)
@@ -145,11 +145,11 @@ actions.saveAssociations = () => (dispatch, getState) => {
     .catch(handleError(I18n.t('An error occurred while saving associations'), dispatch, actions.saveAssociationsFail))
 }
 
-actions.loadUnsynchedChanges = () => (dispatch, getState) => {
-  dispatch(actions.loadUnsynchedChangesStart())
-  api.loadUnsynchedChanges(getState())
-    .then(res => dispatch(actions.loadUnsynchedChangesSuccess(res.data)))
-    .catch(err => dispatch(actions.loadUnsynchedChangesFail(err)))
+actions.loadUnsyncedChanges = () => (dispatch, getState) => {
+  dispatch(actions.loadUnsyncedChangesStart())
+  api.loadUnsyncedChanges(getState())
+    .then(res => dispatch(actions.loadUnsyncedChangesSuccess(res.data)))
+    .catch(err => dispatch(actions.loadUnsyncedChangesFail(err)))
 }
 
 const actionTypes = types.reduce((typesMap, actionType) =>

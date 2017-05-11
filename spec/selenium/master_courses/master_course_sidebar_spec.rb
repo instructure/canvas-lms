@@ -76,13 +76,13 @@ describe "master courses sidebar" do
       expect(f('div[aria-label="Sync History"]')).to be_displayed
     end
 
-    it "should show Unsynched Changes modal when button is clicked" do
+    it "should show Unsynced Changes modal when button is clicked" do
       get "/courses/#{@master.id}"
       f('.bcs__root .bcs__wrapper .bcs__trigger').click
       wait_for_ajaximations
-      f('button#mcUnsynchedChangesBtn').click
+      f('button#mcUnsyncedChangesBtn').click
       wait_for_ajaximations
-      expect(f('div[aria-label="Unsynched Changes"]')).to be_displayed
+      expect(f('div[aria-label="Unsynced Changes"]')).to be_displayed
     end
   end
 

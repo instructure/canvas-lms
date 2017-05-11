@@ -105,17 +105,17 @@ export default combineReducers({
     [actionTypes.SAVE_ASSOCIATIONS_SUCCESS]: () => false,
     [actionTypes.SAVE_ASSOCIATIONS_FAIL]: () => false,
   }, false),
-  isLoadingUnsynchedChanges: handleActions({
-    [actionTypes.LOAD_UNSYNCHED_CHANGES_START]: () => true,
-    [actionTypes.LOAD_UNSYNCHED_CHANGES_SUCCESS]: () => false,
-    [actionTypes.LOAD_UNSYNCHED_CHANGES_FAIL]: () => false,
+  isLoadingUnsyncedChanges: handleActions({
+    [actionTypes.LOAD_UNSYNCED_CHANGES_START]: () => true,
+    [actionTypes.LOAD_UNSYNCED_CHANGES_SUCCESS]: () => false,
+    [actionTypes.LOAD_UNSYNCED_CHANGES_FAIL]: () => false,
   }, false),
-  hasLoadedUnsynchedChanges: handleActions({
-    [actionTypes.LOAD_UNSYNCHED_CHANGES_START]: () => false,
-    [actionTypes.LOAD_UNSYNCHED_CHANGES_SUCCESS]: () => true,
+  hasLoadedUnsyncedChanges: handleActions({
+    [actionTypes.LOAD_UNSYNCED_CHANGES_START]: () => false,
+    [actionTypes.LOAD_UNSYNCED_CHANGES_SUCCESS]: () => true,
   }, false),
-  unsynchedChanges: handleActions({
-    [actionTypes.LOAD_UNSYNCHED_CHANGES_SUCCESS]: (state, action) => action.payload
+  unsyncedChanges: handleActions({
+    [actionTypes.LOAD_UNSYNCED_CHANGES_SUCCESS]: (state, action) => action.payload
   }, []),
   willSendNotification: handleActions({
     [actionTypes.ENABLE_SEND_NOTIFICATION]: (state, action) => action.payload

@@ -27,13 +27,13 @@ import IconUnlockSolid from 'instructure-icons/lib/Solid/IconUnlockSolid'
 import propTypes from '../propTypes'
 import {itemTypeLabels, changeTypeLabels} from '../labels'
 
-const UnsynchedChange = (props) => {
+const UnsyncedChange = (props) => {
   const {asset_type, asset_name, change_type, locked} = props.change
 
   /* eslint-disable camelcase */
   return (
     <div className="bcs__history-item__change">
-      <div className="bcs__history-item__content bcs__unsynched-change__content">
+      <div className="bcs__history-item__content bcs__unsynced-change__content">
         <div className="bcs__history-item__lock-icon">
           <Typography size="large" color="secondary">{locked ? <IconLockSolid /> : <IconUnlockSolid />}</Typography>
         </div>
@@ -61,8 +61,8 @@ const UnsynchedChange = (props) => {
 }
 
 
-UnsynchedChange.propTypes = {
-  change: propTypes.unsynchedChange.isRequired
+UnsyncedChange.propTypes = {
+  change: propTypes.unsyncedChange.isRequired
 }
 
-export default UnsynchedChange
+export default UnsyncedChange

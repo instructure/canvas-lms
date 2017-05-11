@@ -76,7 +76,7 @@ propTypes.migration = shape({
 })
 propTypes.migrationList = arrayOf(propTypes.migration)
 
-propTypes.unsynchedChange = shape({
+propTypes.unsyncedChange = shape({
   asset_id: string.isRequired,
   asset_type: string.isRequired,
   asset_name: string.isRequired,
@@ -84,6 +84,6 @@ propTypes.unsynchedChange = shape({
   html_url: string.isRequired,
   locked: bool.isRequired
 })
-propTypes.unsynchedChanges = arrayOf(propTypes.unsynchedChange)
+propTypes.unsyncedChanges = arrayOf(propTypes.unsyncedChange)
 
 export default propTypes
