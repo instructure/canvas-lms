@@ -184,6 +184,13 @@ class ErrorReport < ActiveRecord::Base
     write_attribute(:url, LoggingFilter.filter_uri(val))
   end
 
+  def safe_url?
+    uri = URI.parse(url)
+    ['http', 'https'].include?(uri.scheme)
+  rescue
+    false
+  end
+
   def guess_email
     self.email = nil if self.email && self.email.empty?
     self.email ||= self.user.email rescue nil
