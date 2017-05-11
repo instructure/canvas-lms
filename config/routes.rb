@@ -1926,6 +1926,8 @@ CanvasRails::Application.routes.draw do
       get 'accounts/:account_id/rubrics/:id', action: :show
       get 'courses/:course_id/rubrics', action: :index, as: :course_rubrics
       get 'courses/:course_id/rubrics/:id', action: :show
+      post 'courses/:course_id/rubrics', controller: :rubrics, action: :create
+      put 'courses/:course_id/rubrics/:id', controller: :rubrics, action: :update
     end
 
     scope(controller: 'master_courses/master_templates') do

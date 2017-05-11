@@ -109,7 +109,7 @@
 #           "example": "crit1",
 #           "type": "string"
 #         },
-#         "outcome_id": {
+#         "learning_outcome_id": {
 #           "description": "(Optional) The id of the learning outcome this criteria uses, if any.",
 #           "example": "1234",
 #           "type": "string"
