@@ -502,7 +502,7 @@
           <% end %>
           <span class="users_count">
             (
-              <%= t 'enrollment_count', 'User', :count => section.enrollments.not_fake.count %><% if section && section.sis_source_id %>,
+              <%= t 'enrollment_count', 'User', :count => section.enrollments.not_fake.where.not(:workflow_state => "rejected").count %><% if section && section.sis_source_id %>,
                 <%= t 'section_sis_id', 'SIS ID: %{section_sis}', :section_sis => section.sis_source_id %>
               <% end %>
             )
