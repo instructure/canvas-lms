@@ -205,10 +205,8 @@ define [
         @courseView.setValue(@defaultCourse)
       if @model
         @courseView.$picker.css('display', 'none')
-        @recipientView.$input.focus()
       else
         @$messageCourseRO.css('display', 'none')
-        @courseView.focus()
 
       if @tokenInput = @$el.find('.recipients').data('token_input')
         # since it doesn't infer percentage widths, just whatever the current pixels are
