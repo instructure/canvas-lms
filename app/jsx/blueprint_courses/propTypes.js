@@ -50,13 +50,13 @@ propTypes.courseList = arrayOf(propTypes.course)
 
 propTypes.migrationException = shape({
   course_id: string.isRequired,
-  conflicting_changes: arrayOf(oneOf(['points', 'content', 'due_dates', 'availability_dates'])),
+  conflicting_changes: arrayOf(oneOf(['points', 'content', 'due_dates', 'availability_dates', 'settings'])),
 })
 propTypes.migrationExceptionList = arrayOf(propTypes.migrationException)
 
 propTypes.migrationChange = shape({
   asset_id: string.isRequired,
-  asset_type: oneOf(['assignment', 'quiz', 'discussion_topic', 'wiki_page', 'attachment']).isRequired,
+  asset_type: oneOf(['assignment', 'quiz', 'discussion_topic', 'wiki_page', 'attachment', 'context_module']).isRequired,
   asset_name: string.isRequired,
   change_type: oneOf(['created', 'updated', 'deleted']).isRequired,
   htnl_url: string,
