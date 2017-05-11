@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,11 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
-@import "components/context_search";
-@import "pages/course_settings/course_settings";
-@import "pages/course_settings/CourseImageSelector.scss";
-@import "pages/shared/external_tools";
-@import "pages/shared/feature_flags";
-@import "pages/shared/grading_standards";
-@import "pages/course_settings/blueprint_settings";
+import {lockLabels} from './labels'
+
+export function formatLockArray (lockableAttributes) {
+  const items = lockableAttributes.map(item => lockLabels[item])
+  if (items.length > 1) {
+    return `${items.slice(0, -1).join(', ')} & ${items.slice(-1)[0]}`
+  }
+
+  return items[0]
+}
+
+export function formatLockObject (itemLocks) {
+  const items = Object.keys(itemLocks)
+    .filter(item => itemLocks[item])
+  return formatLockArray(items)
+}

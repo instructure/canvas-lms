@@ -41,7 +41,7 @@ import 'jqueryui/tabs'
 
   var GradePublishing = {
     status: null,
-    checkup: function() {
+    checkup: function () {
       $.ajaxJSON($("#publish_to_sis_form").attr('action'), 'GET', {}, function(data) {
         if (!data.hasOwnProperty("sis_publish_overall_status")) return;
         GradePublishing.status = data.sis_publish_overall_status;
@@ -446,13 +446,5 @@ import 'jqueryui/tabs'
 
     $("#course_show_announcements_on_home_page").change(function(event) {
       $("#course_home_page_announcement_limit").prop("disabled", !$(this).prop('checked'))
-    });
-
-    if ($('#course_blueprint').is(':checked')) {
-      $('#master_course_restrictions').show();
-    }
-    $('#course_blueprint').change(function(event) {
-      $('#master_course_restrictions').slideToggle();
-      forceScreenReaderToReparse($('#master_course_restrictions')[0]);
     });
   });

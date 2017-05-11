@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/common')
+require_relative '../common'
 
 describe "course settings/blueprint" do
   include_context "in-process server selenium tests"
@@ -31,30 +31,32 @@ describe "course settings/blueprint" do
       user_session @admin
     end
 
-    it "enables blueprint course and sets default restrictions" do
+    it "enables blueprint course and set default restrictions" do
       get "/courses/#{@course.id}/settings"
-      expect(f('#master_course_restrictions')).not_to be_displayed
-
-      f('label[for="course_blueprint"]').click
+      f('.bcs_check-box').find_element(:xpath, "../div").click
       wait_for_animations
-      expect(f('#master_course_restrictions')).to be_displayed
-      expect(is_checked('#course_blueprint_restrictions_content')).to be
-      expect(is_checked('#course_blueprint_restrictions_points')).not_to be
-      expect(is_checked('#course_blueprint_restrictions_due_dates')).not_to be
-      expect(is_checked('#course_blueprint_restrictions_availability_dates')).not_to be
+      expect(f('.blueprint_setting_options')).to be_displayed
+      expect(is_checked('input[name="course[blueprint_restrictions][content]"]')).not_to be
+      expect(is_checked('input[name="course[blueprint_restrictions][points]"]')).not_to be
+      expect(is_checked('input[name="course[blueprint_restrictions][due_dates]"]')).not_to be
+      expect(is_checked('input[name="course[blueprint_restrictions][availability_dates]"]')).not_to be
+    end
 
-      f('label[for="course_blueprint_restrictions_points"]').click
-      f('label[for="course_blueprint_restrictions_due_dates"]').click
-      f('label[for="course_blueprint_restrictions_availability_dates"]').click
+    it "manipulates checkboxes" do
+      template = MasterCourses::MasterTemplate.set_as_master_course(@course)
+      template.default_restrictions = { :points => true, :due_dates => true, :availability_dates => true, }
+      template.save
+      get "/courses/#{@course.id}/settings"
+
       expect_new_page_load { submit_form('#course_form') }
 
-      expect(f('#master_course_restrictions')).to be_displayed
-      expect(is_checked('#course_blueprint_restrictions_points')).to be
-      expect(is_checked('#course_blueprint_restrictions_due_dates')).to be
-      expect(is_checked('#course_blueprint_restrictions_availability_dates')).to be
+      expect(f('.blueprint_setting_options')).to be_displayed
+      expect(is_checked('input[name="course[blueprint_restrictions][points]"]')).not_to be
+      expect(is_checked('input[name="course[blueprint_restrictions][due_dates]"]')).not_to be
+      expect(is_checked('input[name="course[blueprint_restrictions][availability_dates]"]')).not_to be
 
       expect(MasterCourses::MasterTemplate.full_template_for(@course).default_restrictions).to eq(
-        { :content => true, :points => true, :due_dates => true, :availability_dates => true }
+        { :content => false, :points => true, :due_dates => true, :availability_dates => true }
       )
     end
 
@@ -65,20 +67,15 @@ describe "course settings/blueprint" do
 
       get "/courses/#{@course.id}/settings"
 
-      expect(f('#master_course_restrictions')).to be_displayed
-      expect(is_checked('#course_blueprint_restrictions_points')).not_to be
-      expect(is_checked('#course_blueprint_restrictions_due_dates')).to be
-      expect(is_checked('#course_blueprint_restrictions_availability_dates')).not_to be
+      expect(f('.blueprint_setting_options')).to be_displayed
+      expect(is_checked('input[name="course[blueprint_restrictions][points]"]')).not_to be
+      expect(is_checked('input[name="course[blueprint_restrictions][due_dates]"]')).not_to be
+      expect(is_checked('input[name="course[blueprint_restrictions][availability_dates]"]')).not_to be
 
-      f('label[for="course_blueprint"]').click
+      f('.bcs_check-box').find_element(:xpath, "../div").click
       wait_for_animations
       expect_new_page_load { submit_form('#course_form') }
 
-      expect(f('#master_course_restrictions')).not_to be_displayed
-      # should still be checked even though it's not visible
-      expect(is_checked('#course_blueprint_restrictions_due_dates')).to be
-
-      expect(template.reload).to be_deleted
     end
   end
 

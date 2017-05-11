@@ -27,6 +27,14 @@ const itemTypeLabels = {
   context_module: I18n.t('Module'),
 }
 
+const itemTypeLabelPlurals = {
+  assignment: I18n.t('Assignments'),
+  quiz: I18n.t('Quizzes'),
+  discussion_topic: I18n.t('Discussions'),
+  wiki_page: I18n.t('Pages'),
+  attachment: I18n.t('Files'),
+}
+
 const changeTypeLabels = {
   created: I18n.t('Created'),
   updated: I18n.t('Updated'),
@@ -46,4 +54,12 @@ const lockTypeLabel = {
   unlocked: I18n.t('Unlocked'),
 }
 
-export {itemTypeLabels, changeTypeLabels, exceptionTypeLabels, lockTypeLabel}
+const lockLabels = {
+  content: I18n.t('Content'),
+  points: I18n.t('Points'),
+  settings: I18n.t('Settings'),
+  due_dates: I18n.t('Due Dates'),
+  availability_dates: I18n.t('Availability Dates'),
+}
+
+export {itemTypeLabels, changeTypeLabels, exceptionTypeLabels, lockTypeLabel, lockLabels, itemTypeLabelPlurals}

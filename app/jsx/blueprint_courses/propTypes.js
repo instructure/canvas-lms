@@ -55,9 +55,12 @@ propTypes.courseInfo = shape({
   sis_course_id: string,
 })
 
+propTypes.lockableAttribute = oneOf(['points', 'content', 'due_dates', 'availability_dates', 'settings'])
+propTypes.lockableAttributeList = arrayOf(propTypes.lockableAttribute)
+
 propTypes.migrationException = shape({
   course_id: string.isRequired,
-  conflicting_changes: arrayOf(oneOf(['points', 'content', 'due_dates', 'availability_dates', 'settings'])),
+  conflicting_changes: propTypes.lockableAttributeList,
 })
 propTypes.migrationExceptionList = arrayOf(propTypes.migrationException)
 
@@ -99,5 +102,20 @@ propTypes.notification = shape({
   err: instanceOf(Error),
 })
 propTypes.notificationList = arrayOf(propTypes.notification)
+
+propTypes.itemLocks = shape({
+  content: bool,
+  points: bool,
+  due_dates: bool,
+  availability_dates: bool,
+})
+
+propTypes.itemLocksByObject = shape({
+  assignment: propTypes.itemLocks,
+  discussion_topic: propTypes.itemLocks,
+  wiki_page: propTypes.itemLocks,
+  quiz: propTypes.itemLocks,
+  attachment: propTypes.itemLocks,
+})
 
 export default propTypes
