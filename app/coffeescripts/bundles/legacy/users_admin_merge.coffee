@@ -17,7 +17,7 @@
 
 define [
   "jquery",
-  'compiled/behaviors/autocomplete'
+  'jqueryui/autocomplete'
 ], ($) ->
   $select_name = $("#select_name")
   $selected_name = $("#selected_name")
