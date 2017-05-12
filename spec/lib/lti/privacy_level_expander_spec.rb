@@ -25,14 +25,17 @@ describe Lti::PrivacyLevelExpander do
   let(:placement) {'resource_selection'}
   let(:tool) { new_valid_tool(course) }
   let(:launch_url) { 'http://www.test.com/launch' }
-
-  let(:opts) do
-    {
-      current_user: user,
-      current_pseudonym: user.pseudonyms.first,
-      domain_root_account: course.root_account,
-      controller: double(request: {body: 'body content'})
-    }
+  let(:variable_expander) do
+    Lti::VariableExpander.new(
+      course.root_account,
+      course,
+      double(request: {body: 'body content'}),
+      {
+        current_user: user,
+        current_pseudonym: user.pseudonyms.first,
+        tool: tool
+      }
+    )
   end
 
   before do
@@ -40,15 +43,7 @@ describe Lti::PrivacyLevelExpander do
     tool.save!
   end
 
-  let(:helper) do
-    Lti::PrivacyLevelExpander.new(
-      tool: tool,
-      placement: placement,
-      context: course,
-      collaboration: nil,
-      opts: opts
-    )
-  end
+  let(:helper) { Lti::PrivacyLevelExpander.new(placement, variable_expander) }
 
   describe 'expanded_variables' do
     it 'expands custom fields' do
@@ -56,7 +51,7 @@ describe Lti::PrivacyLevelExpander do
         'custom_context_id' => Lti::Asset.opaque_identifier_for(course)
       }
 
-      expect(helper.expanded_variables).to include expected_params
+      expect(helper.expanded_variables!(tool.set_custom_fields(placement))).to include expected_params
     end
 
     it 'includes supported parameters' do
@@ -64,7 +59,7 @@ describe Lti::PrivacyLevelExpander do
         'context_label' => course.course_code
       }
 
-      expect(helper.expanded_variables).to include expected_params
+      expect(helper.expanded_variables!(Hash.new)).to include expected_params
     end
   end
 
@@ -77,15 +72,7 @@ describe Lti::PrivacyLevelExpander do
         tool
       end
 
-      let(:helper) do
-        Lti::PrivacyLevelExpander.new(
-          tool: tool,
-          placement: placement,
-          context: course,
-          collaboration: nil,
-          opts: opts
-        )
-      end
+      let(:helper) { Lti::PrivacyLevelExpander.new(placement, variable_expander) }
 
       it 'includes all supported parameters if privacy level is public' do
         expected_params = %w(com.instructure.contextLabel
@@ -107,15 +94,7 @@ describe Lti::PrivacyLevelExpander do
         tool
       end
 
-      let(:helper) do
-        Lti::PrivacyLevelExpander.new(
-          tool: tool,
-          placement: placement,
-          context: course,
-          collaboration: nil,
-          opts: opts
-        )
-      end
+      let(:helper) { Lti::PrivacyLevelExpander.new(placement, variable_expander) }
 
       it 'inlcudes anonymous and name only params if privacy level is name only' do
         expected_params = %w(com.instructure.contextLabel
@@ -134,15 +113,7 @@ describe Lti::PrivacyLevelExpander do
         tool
       end
 
-      let(:helper) do
-        Lti::PrivacyLevelExpander.new(
-          tool: tool,
-          placement: placement,
-          context: course,
-          collaboration: nil,
-          opts: opts
-        )
-      end
+      let(:helper) { Lti::PrivacyLevelExpander.new(placement, variable_expander) }
 
       it 'includes anonymous and email only params if privacy level is email only' do
         expected_params = %w(com.instructure.contextLabel
@@ -159,15 +130,7 @@ describe Lti::PrivacyLevelExpander do
         tool
       end
 
-      let(:helper) do
-        Lti::PrivacyLevelExpander.new(
-          tool: tool,
-          placement: placement,
-          context: course,
-          collaboration: nil,
-          opts: opts
-        )
-      end
+      let(:helper) { Lti::PrivacyLevelExpander.new(placement, variable_expander) }
 
       it 'includes anonymouse parameters only if privacy level is anonymous' do
         expected_params = %w(com.instructure.contextLabel)

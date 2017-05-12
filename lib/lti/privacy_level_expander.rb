@@ -30,35 +30,23 @@ module Lti
       anonymous: ANONYMOUS
     }.freeze
 
-    def initialize(tool:, placement:, context:, collaboration: nil, opts: {})
-      @tool = tool
+    def initialize(placement, variable_expander)
       @placement = placement
-      @context = context
-      @collaboration = collaboration
-      @opts = opts.merge({tool: tool, collaboration: collaboration})
+      @variable_expander = variable_expander
     end
 
-    def expanded_variables
-      variable_expander.expand_variables!(@tool.set_custom_fields(@placement)).merge(parameter_hash)
+    def expanded_variables!(var_hash)
+      @variable_expander.expand_variables!(var_hash).merge(parameter_hash)
     end
 
     def supported_parameters
-      SUPPORTED_PARAMETERS_HASH[:anonymous] | SUPPORTED_PARAMETERS_HASH[@tool.workflow_state.to_sym]
+      SUPPORTED_PARAMETERS_HASH[:anonymous] | SUPPORTED_PARAMETERS_HASH[@variable_expander.tool.workflow_state.to_sym]
     end
 
     private
 
     def parameter_hash
-      variable_expander.enabled_capability_params(supported_parameters)
-    end
-
-    def variable_expander
-      @_varaible_expander ||= begin
-        Lti::VariableExpander.new(@opts[:domain_root_account],
-                                  @context,
-                                  @opts[:controller],
-                                  @opts)
-      end
+      @variable_expander.enabled_capability_params(supported_parameters)
     end
   end
 end
