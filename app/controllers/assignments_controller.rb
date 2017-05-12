@@ -123,8 +123,6 @@ class AssignmentsController < ApplicationController
         elsif @context.feature_enabled?(:conditional_release) && @assignment.wiki_page? &&
           @assignment.wiki_page.grants_right?(@current_user, session, :read)
           return redirect_to named_context_url(@context, :context_wiki_page_url, @assignment.wiki_page.id)
-        elsif @assignment.submission_types == 'attendance'
-          return redirect_to named_context_url(@context, :context_attendance_url, :anchor => "assignment/#{@assignment.id}")
         elsif @assignment.submission_types == 'external_tool' && @assignment.external_tool_tag && @unlocked
           tag_type = params[:module_item_id].present? ? :modules : :assignments
           return content_tag_redirect(@context, @assignment.external_tool_tag, :context_url, tag_type)

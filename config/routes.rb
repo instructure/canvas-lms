@@ -227,9 +227,6 @@ CanvasRails::Application.routes.draw do
 
     resource :gradebook_csv, only: [:show]
 
-    get 'attendance' => 'gradebooks#attendance'
-    get 'attendance/:user_id' => 'gradebooks#attendance', as: :attendance_user
-
     # DEPRECATED old migration emails pointed the user to this url, leave so the controller can redirect
     get 'imports/list' => 'content_imports#index', as: :import_list
     # DEPRECATED

@@ -170,32 +170,6 @@ class GradebooksController < ApplicationController
     end
   end
 
-  def attendance
-    @enrollment = @context.all_student_enrollments.where(user_id: params[:user_id]).first if params[:user_id].present?
-    @enrollment ||= @context.all_student_enrollments.where(user_id: @current_user).first if !@context.grants_right?(@current_user, session, :manage_grades)
-    add_crumb t(:crumb, 'Attendance')
-    if !@enrollment && @context.grants_right?(@current_user, session, :manage_grades)
-      @assignments = @context.assignments.active.where(:submission_types => 'attendance').to_a
-      @students = @context.students_visible_to(@current_user).order_by_sortable_name
-      @at_least_one_due_at = @assignments.any?{|a| a.due_at }
-      # Find which assignment group most attendance items belong to,
-      # it'll be a better guess for default assignment group than the first
-      # in the list...
-      @default_group_id = @assignments.to_a.inject(Hash.new(0)){|h,a| h[a.assignment_group_id] += 1; h}.sort_by{|id, cnt| cnt }.reverse.first[0] rescue nil
-    elsif @enrollment && @enrollment.grants_right?(@current_user, session, :read_grades)
-      @assignments = @context.assignments.active.where(:submission_types => 'attendance').to_a
-      @students = @context.students_visible_to(@current_user).order_by_sortable_name
-      @submissions = @context.submissions.where(user_id: @enrollment.user_id).to_a
-      @user = @enrollment.user
-      render :student_attendance
-      # render student_attendance, optional params[:assignment_id] to highlight and scroll to that particular assignment
-    else
-      flash[:notice] = t('notices.unauthorized', "You are not authorized to view attendance for this course")
-      redirect_to named_context_url(@context, :context_url)
-      # redirect
-    end
-  end
-
   def show
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @last_exported_gradebook_csv = GradebookCsv.last_successful_export(course: @context, user: @current_user)

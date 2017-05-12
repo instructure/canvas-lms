@@ -30,7 +30,6 @@ define([
   'jqueryui/draggable',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.doc_previews' /* filePreviewsEnabled, loadDocPreview */,
-  'jquery.dropdownList' /* dropdownList */,
   'jquery.google-analytics' /* trackEvent */,
   'jquery.instructure_date_and_time' /* datetimeString, dateString, fudgeDateForProfileTimezone */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */,
