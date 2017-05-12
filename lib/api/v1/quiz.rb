@@ -31,6 +31,7 @@ module Api::V1::Quiz
       ip_filter
       lock_at
       lockdown_browser_monitor_data
+      locked
       one_question_at_a_time
       one_time_results
       only_visible_to_overrides
