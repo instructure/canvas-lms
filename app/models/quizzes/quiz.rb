@@ -219,18 +219,23 @@ class Quizzes::Quiz < ActiveRecord::Base
     end
   end
 
-  def current_points_possible
-    entries = self.root_entries
-    possible = 0
+  def self.count_points_possible(entries)
+    util = Quizzes::QuizQuestion::AnswerSerializers::Util
+    possible = BigDecimal('0.0')
     entries.each do |e|
-      if e[:question_points]
-        possible += (e[:question_points].to_f * e[:pick_count])
+      if e[:question_points] # QuizGroup
+        possible += (util.to_decimal(e[:question_points].to_s) * util.to_decimal(e[:pick_count].to_s))
       else
-        possible += e[:points_possible].to_f unless e[:unsupported]
+        possible += util.to_decimal(e[:points_possible].to_s) unless e[:unsupported]
       end
     end
-    possible = self.assignment.points_possible if entries.empty? && self.assignment
-    possible
+    possible.to_f
+  end
+
+  def current_points_possible
+    entries = self.root_entries
+    return self.assignment.points_possible if entries.empty? && self.assignment
+    self.class.count_points_possible(entries)
   end
 
   def set_unpublished_question_count
@@ -691,23 +696,17 @@ class Quizzes::Quiz < ActiveRecord::Base
   # be held in Quizzes::Quiz.quiz_data
   def generate_quiz_data(opts={})
     entries = self.root_entries(true)
-    possible = 0
     t = Time.now
     entries.each do |e|
-      if e[:question_points] #QuizGroup
-        possible += (e[:question_points].to_f * e[:pick_count])
-      else
-        possible += e[:points_possible].to_f
-      end
       e[:published_at] = t
     end
-    possible = 0 if possible < 0
     data = entries
     if opts[:persist] != false
       self.quiz_data = data
 
       if !self.survey?
-        self.points_possible = possible
+        possible = self.class.count_points_possible(data)
+        self.points_possible = [possible, 0].max
       end
       self.allowed_attempts ||= 1
       check_if_submissions_need_review
@@ -844,7 +843,9 @@ class Quizzes::Quiz < ActiveRecord::Base
     old_version = self.versions.get(version_number).model
 
     needs_review = false
-    needs_review = true if old_version.points_possible != self.points_possible
+    # Allow for floating point rounding error comparing to versions created before BigDecimal was used
+    needs_review = true if [old_version.points_possible, self.points_possible].select(&:present?).count == 1 ||
+      ((old_version.points_possible || 0) - (self.points_possible || 0)).abs > 0.0001
     needs_review = true if (old_version.quiz_data || []).length != (self.quiz_data || []).length
     if !needs_review
       new_data = self.quiz_data

@@ -660,6 +660,21 @@ describe Quizzes::Quiz do
     expect(data[2][:answers]).not_to be_nil
   end
 
+  it "should not lose precision when calculating points_possible from entries" do
+    # These values create enough error to test comparison but more arithmetic is
+    # necessary to persist error after roundtrip to storage.
+    expect(Array.new(3){ 3.3 }.sum).to be < 9.9
+
+    q = @course.quizzes.create!(title: "floaty quiz")
+    question_data = { points_possible: 3.3, question_type: 'multiple_choice_question' }
+    3.times do |i|
+      q.quiz_questions.create!(question_data: question_data.merge(name: "root #{i}"))
+    end
+
+    possible = Quizzes::Quiz.count_points_possible(q.root_entries(true))
+    expect(possible).to eq 9.9
+  end
+
   describe "#generate_submission" do
     it "should generate a valid submission for a given user" do
       u = User.create!(:name => "some user")
