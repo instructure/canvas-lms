@@ -19,10 +19,10 @@
 module ContextModulesHelper
   include Api::V1::ContextModule
 
-  def cache_if_module(context_module, editable, user, context, &block)
+  def cache_if_module(context_module, editable, is_student, user, context, &block)
     if context_module
       visible_assignments = user ? user.assignment_and_quiz_visibilities(context) : []
-      cache_key_items = ['context_module_render_18_', context_module.cache_key, editable, true, Time.zone, Digest::MD5.hexdigest(visible_assignments.to_s)]
+      cache_key_items = ['context_module_render_19_', context_module.cache_key, editable, is_student, true, Time.zone, Digest::MD5.hexdigest(visible_assignments.to_s)]
       cache_key = cache_key_items.join('/')
       cache_key = add_menu_tools_to_cache_key(cache_key)
       cache_key = add_mastery_paths_to_cache_key(cache_key, context, context_module, user)
