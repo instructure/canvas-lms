@@ -35,7 +35,7 @@ class EnrollmentTerm < ActiveRecord::Base
 
   before_validation :verify_unique_sis_source_id
   after_save :update_courses_later_if_necessary
-  after_save :recompute_course_scores, if: :grading_period_group_id_has_changed?
+  after_save :recompute_course_scores_later, if: :grading_period_group_id_has_changed?
 
   include StickySisFields
   are_sis_sticky :name, :start_at, :end_at
@@ -65,9 +65,24 @@ class EnrollmentTerm < ActiveRecord::Base
     self.courses.touch_all
   end
 
-  def recompute_course_scores(update_all_grading_period_scores: true)
+  def recompute_course_scores_later(update_all_grading_period_scores: true)
+    inst_job_opts = {}
+    if update_all_grading_period_scores
+      # queue in a singleton to avoid duplicates, if updating all grading periods
+      inst_job_opts[:singleton] = "enrollment_term:recompute:EnrollmentTerm:#{global_id}"
+    end
+
+    send_later_if_production_enqueue_args(
+      :recompute_course_scores,
+      inst_job_opts,
+      update_all_grading_period_scores: update_all_grading_period_scores
+    )
+  end
+
+  def recompute_course_scores(opts = {})
+    update_scores = opts.fetch(:update_all_grading_period_scores, true)
     courses.active.each do |course|
-      course.recompute_student_scores(update_all_grading_period_scores: update_all_grading_period_scores)
+      course.recompute_student_scores(update_all_grading_period_scores: update_scores)
       DueDateCacher.recompute_course(course)
     end
   end
