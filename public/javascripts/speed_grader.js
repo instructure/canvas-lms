@@ -56,7 +56,6 @@ define([
   'media_comments' /* mediaComment */,
   'compiled/jquery/mediaCommentThumbnail',
   'compiled/jquery.rails_flash_notifications',
-  'vendor/jquery.ba-hashchange' /* hashchange */,
   'vendor/jquery.elastic' /* elastic */,
   'vendor/jquery.getScrollbarWidth' /* getScrollbarWidth */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,

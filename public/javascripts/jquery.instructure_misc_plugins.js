@@ -24,7 +24,6 @@ define([
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jqueryui/dialog',
   'jquery.scrollToVisible' /* scrollToVisible */,
-  'vendor/jquery.ba-hashchange' /* hashchange */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */
 ], function(I18n, $, htmlEscape, authenticity_token) {
 
