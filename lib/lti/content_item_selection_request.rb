@@ -32,27 +32,15 @@ module Lti
     def generate_lti_launch(placement:, opts: {}, expanded_variables: {})
       lti_launch = Lti::Launch.new(opts)
       lti_launch.resource_url = opts[:launch_url] || @tool.extension_setting(placement, :url)
-      default_params = ContentItemSelectionRequest.default_lti_params(@context, @domain_root_account, @user)
-      params = default_params.merge({
-        # required params
-        lti_message_type: 'ContentItemSelectionRequest',
-        lti_version: 'LTI-1p0',
-        content_item_return_url: return_url(opts[:content_item_id]),
-        data: data_hash_jwt(placement, opts),
-        context_title: @context.name,
-        # optional params
-        accept_multiple: false
-      }).merge(placement_params(placement, assignment: opts[:assignment])).merge(expanded_variables)
-
-      lti_launch.params = Lti::Security.signed_post_params(
-        params,
-        lti_launch.resource_url,
-        @tool.consumer_key,
-        @tool.shared_secret,
-        @context.root_account.feature_enabled?(:disable_lti_post_only) || @tool.extension_setting(:oauth_compliant)
-      )
       lti_launch.link_text = @tool.label_for(placement.to_sym, I18n.locale)
       lti_launch.analytics_id = @tool.tool_id
+      lti_launch.params = launch_params(
+        lti_launch.resource_url,
+        placement,
+        expanded_variables,
+        opts[:content_item_id],
+        opts[:assignment]
+      )
 
       lti_launch
     end
@@ -75,12 +63,40 @@ module Lti
 
     private
 
-    def data_hash_jwt(placement, opts)
-      launch_url = opts[:launch_url] || @tool.extension_setting(placement, :url)
+    def launch_params(resource_url, placement, expanded_variables, content_item_id = nil, assignment = nil)
+      content_item_return_url = return_url(content_item_id)
 
-      data_hash = {default_launch_url: launch_url}
-      if opts[:content_item_id]
-        data_hash[:content_item_id] = opts[:content_item_id]
+      params = ContentItemSelectionRequest.default_lti_params(@context, @domain_root_account, @user).
+        merge(message_params(content_item_return_url)).
+        merge(data: data_hash_jwt(resource_url, content_item_id)).
+        merge(placement_params(placement, assignment: assignment)).
+        merge(expanded_variables)
+
+      Lti::Security.signed_post_params(
+        params,
+        resource_url,
+        @tool.consumer_key,
+        @tool.shared_secret,
+        @context.root_account.feature_enabled?(:disable_lti_post_only) || @tool.extension_setting(:oauth_compliant)
+      )
+    end
+
+    def message_params(content_item_return_url)
+      {
+        # required params
+        lti_message_type: 'ContentItemSelectionRequest',
+        lti_version: 'LTI-1p0',
+        content_item_return_url: content_item_return_url,
+        context_title: @context.name,
+        # optional params
+        accept_multiple: false
+      }
+    end
+
+    def data_hash_jwt(resource_url, content_item_id = nil)
+      data_hash = {default_launch_url: resource_url}
+      if content_item_id
+        data_hash[:content_item_id] = content_item_id
         data_hash[:oauth_consumer_key] = @tool.consumer_key
       end
 
