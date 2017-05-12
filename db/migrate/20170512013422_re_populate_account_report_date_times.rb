@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class PopulateAccountReportDateTimes < ActiveRecord::Migration[4.2]
+class RePopulateAccountReportDateTimes < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def change
