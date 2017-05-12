@@ -400,9 +400,7 @@ define([
     .find(".iframe_placeholder").each(function() {
       var edWidth = $(ed.contentAreaContainer).width();
       var $holder = $(this);
-      if($(ed.contentAreaContainer).hasScrollbar() || true) {
-        edWidth -= $(ed.contentAreaContainer).scrollbarWidth();
-      }
+      edWidth -= $(ed.contentAreaContainer).scrollbarWidth();
       if($holder.width() > edWidth - 40) {
         $holder.width(edWidth - 15);
         if(!$holder.hasClass('fullWidth')) { $holder.addClass('fullWidth'); }
