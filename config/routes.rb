@@ -26,6 +26,9 @@ CanvasRails::Application.routes.draw do
   post 'bz/accessibility_mapper' => 'bz#save_html_changes'
   get 'bz/full_module_view' => 'bz#full_module_view'
   get 'bz/assignment_with_magic_fields' => 'bz#assignment_with_magic_fields'
+
+  get '/nlu', to: redirect('/login/cas/6') # a convenience path for the separate sso people
+
   # IMPORTANT: there are more custom routes below, search for 'bz'
   # end
   resources :epub_exports, only: [:index]
