@@ -614,7 +614,7 @@ class ExternalToolsController < ApplicationController
       media_types,
       params["export_type"]
     )
-    params = default_lti_params.merge(
+    params = Lti::ContentItemSelectionRequest.default_lti_params(@context, @domain_root_account, @current_user).merge(
       {
         #required params
         lti_message_type: message_type,
@@ -1096,10 +1096,6 @@ class ExternalToolsController < ApplicationController
                                           domain_root_account: @domain_root_account,
                                           controller: self
                                         })
-  end
-
-  def default_lti_params
-    Lti::ContentItemSelectionRequest.default_lti_params(@context, @domain_root_account, @current_user)
   end
 
   def placement_from_params
