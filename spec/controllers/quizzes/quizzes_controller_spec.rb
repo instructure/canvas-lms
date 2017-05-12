@@ -1271,6 +1271,13 @@ describe Quizzes::QuizzesController do
       expect(assigns[:quiz].title).to eql("some quiz")
     end
 
+    it "should lock if asked to" do
+      user_session(@teacher)
+      course_quiz
+      post 'update', :course_id => @course.id, :id => @quiz.id, :quiz => {:locked => 'true'}
+      expect(@quiz.reload.locked?).to be(true)
+    end
+
     it "should publish if asked to" do
       user_session(@teacher)
       course_quiz
