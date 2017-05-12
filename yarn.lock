@@ -1365,9 +1365,9 @@ canvas-planner@^0.0.1:
     redux-logger "^3.0.1"
     redux-thunk "^2.2.0"
 
-canvas-rce@1.1.5:
-  version "1.1.5"
-  resolved "https://registry.yarnpkg.com/canvas-rce/-/canvas-rce-1.1.5.tgz#3eb33f1bea1ffcbcd380cec1fede55bd2e43406e"
+canvas-rce@1.1.6:
+  version "1.1.6"
+  resolved "https://registry.yarnpkg.com/canvas-rce/-/canvas-rce-1.1.6.tgz#358b08c747e3bb02903661bad28ede4969472286"
   dependencies:
     aphrodite "^1.1.0"
     bloody-offset "0.0.0"
@@ -1384,7 +1384,7 @@ canvas-rce@1.1.5:
     redux-thunk "~2.1.0"
     scroll-into-view "https://github.com/bkirkby/scroll-into-view.git#588b0ced98eeecf84e6fb2074aa076e80b7cffab"
     tinymce "~4.5.3"
-    tinymce-light-skin "1.2.2"
+    tinymce-light-skin "~1.2.4"
 
 "canvas_offline_course_viewer@https://github.com/instructure/canvas_offline_course_viewer.git#1.1.0":
   version "1.1.0"
@@ -7264,9 +7264,9 @@ tinycolor2@1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/tinycolor2/-/tinycolor2-1.4.1.tgz#f4fad333447bc0b07d4dc8e9209d8f39a8ac77e8"
 
-tinymce-light-skin@1.2.2:
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/tinymce-light-skin/-/tinymce-light-skin-1.2.2.tgz#e6a63050b5ee391b1970e66feb93be91ca539330"
+tinymce-light-skin@1.2.4, tinymce-light-skin@~1.2.4:
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/tinymce-light-skin/-/tinymce-light-skin-1.2.4.tgz#66c380aef453d886428cdc93d9a79e0e1500bb9a"
 
 tinymce@4.5.7, tinymce@~4.5.3:
   version "4.5.7"
