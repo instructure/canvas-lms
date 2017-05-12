@@ -42,6 +42,10 @@ class StudentGradesPage
     f('#submission_final-grade .grade')
   end
 
+  def final_points_possible
+    f('#submission_final-grade .points_possible')
+  end
+
   def grading_period_dropdown
     f('.grading_periods_selector')
   end
