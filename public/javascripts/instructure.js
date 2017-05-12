@@ -16,47 +16,45 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'compiled/views/KeyboardNavDialog',
-  'INST' /* INST */,
-  'i18n!instructure',
-  'jquery' /* $ */,
-  'underscore',
-  'timezone',
-  'compiled/userSettings',
-  'str/htmlEscape',
-  'jsx/shared/rce/RichContentEditor',
-  'instructure_helper',
-  'jqueryui/draggable',
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.doc_previews' /* filePreviewsEnabled, loadDocPreview */,
-  'jquery.google-analytics' /* trackEvent */,
-  'jquery.instructure_date_and_time' /* datetimeString, dateString, fudgeDateForProfileTimezone */,
-  'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */,
-  'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* replaceTags, youTubeID */,
-  'jquery.instructure_misc_plugins' /* ifExists, .dim, confirmDelete, showIf, fillWindowWithMe */,
-  'jquery.keycodes' /* keycodes */,
-  'jquery.loadingImg' /* loadingImage */,
-  'compiled/jquery.rails_flash_notifications',
-  'jquery.templateData' /* fillTemplateData, getTemplateData */,
-  'compiled/jquery/fixDialogButtons',
-  'compiled/jquery/mediaCommentThumbnail',
-  'vendor/date' /* Date.parse */,
-  'vendor/jquery.ba-tinypubsub' /* /\.publish\(/ */,
-  'jqueryui/resizable' /* /\.resizable/ */,
-  'jqueryui/sortable' /* /\.sortable/ */,
-  'jqueryui/tabs' /* /\.tabs/ */,
-  'compiled/behaviors/trackEvent',
-  'compiled/badge_counts',
-  'vendor/jquery.placeholder'
-], function(KeyboardNavDialog, INST, I18n, $, _, tz, userSettings, htmlEscape, RichContentEditor) {
+import KeyboardNavDialog from 'compiled/views/KeyboardNavDialog'
+import INST from 'INST'
+import I18n from 'i18n!instructure'
+import $ from 'jquery'
+import _ from 'underscore'
+import tz from 'timezone'
+import userSettings from 'compiled/userSettings'
+import htmlEscape from 'str/htmlEscape'
+import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
+import 'instructure_helper'
+import 'jqueryui/draggable'
+import 'jquery.ajaxJSON'
+import 'jquery.doc_previews'
+import 'jquery.google-analytics'
+import 'jquery.instructure_date_and_time'
+import 'jquery.instructure_forms'
+import 'jqueryui/dialog'
+import 'jquery.instructure_misc_helpers'
+import 'jquery.instructure_misc_plugins'
+import 'jquery.keycodes'
+import 'jquery.loadingImg'
+import 'compiled/jquery.rails_flash_notifications'
+import 'jquery.templateData'
+import 'compiled/jquery/fixDialogButtons'
+import 'compiled/jquery/mediaCommentThumbnail'
+import 'vendor/date'
+import 'vendor/jquery.ba-tinypubsub'
+import 'jqueryui/resizable'
+import 'jqueryui/sortable'
+import 'jqueryui/tabs'
+import 'compiled/behaviors/trackEvent'
+import 'compiled/badge_counts'
+import 'vendor/jquery.placeholder'
 
   $.trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/');
 
 
   var JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE = '.dialog, .draggable, .resizable, .sortable, .tabs';
-  function enhanceUserContent() {
+  export function enhanceUserContent() {
     var $content = $("#content");
     $(".user_content:not(.enhanced):visible").addClass('unenhanced');
     $(".user_content.unenhanced:visible")
@@ -916,10 +914,3 @@ define([
 
   $('input[placeholder], textarea[placeholder]').placeholder();
 
-  /**
-   * Expose functions for testing
-   */
-  return {
-    enhanceUserContent: enhanceUserContent
-  }
-});

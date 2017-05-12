@@ -167,11 +167,16 @@ module.exports = {
       {
         test: /\.js$/,
         include: [
+          path.resolve(__dirname, '../public/javascripts'),
           path.resolve(__dirname, '../app/jsx'),
           path.resolve(__dirname, '../spec/javascripts/jsx'),
           /gems\/plugins\/.*\/app\/jsx\//
         ],
-        loaders: happify('jsx', [
+        exclude: [
+          path.resolve(__dirname, '../public/javascripts/vendor/mediaelement-and-player.js'), // remove when we use npm version
+          /bower\//,
+        ],
+        loaders: happify('babel', [
           `babel-loader?cacheDirectory=${USE_BABEL_CACHE}`
         ])
       },
