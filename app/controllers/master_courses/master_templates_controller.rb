@@ -308,6 +308,10 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   # @argument send_notification [Optional, Boolean]
   #     Send a notification to the calling user when the sync completes.
   #
+  # @argument copy_settings [Optional, Boolean]
+  #     Whether course settings should be copied over to associated courses.
+  #     Defaults to true for newly associated courses.
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/1/blueprint_templates/default/migrations \
   #     -X POST \
@@ -324,6 +328,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     end
 
     options = params.permit(:comment, :send_notification)
+    options[:copy_settings] = value_to_boolean(params[:copy_settings]) if params.has_key?(:copy_settings)
 
     migration = MasterCourses::MasterMigration.start_new_migration!(@template, @current_user, options)
     render :json => master_migration_json(migration, @current_user, session)

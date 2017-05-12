@@ -21,6 +21,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
 
   serialize :export_results, Hash
   serialize :import_results, Hash
+  serialize :migration_settings, Hash
 
   has_a_broadcast_policy
 
@@ -50,6 +51,10 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
         new_migration
       end
     end
+  end
+
+  def copy_settings=(val)
+    self.migration_settings[:copy_settings] = val
   end
 
   def hours_until_expire

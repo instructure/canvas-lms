@@ -139,8 +139,8 @@ describe MasterCourses::MasterMigration do
       @template.migration_id_for(obj)
     end
 
-    def run_master_migration
-      @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @admin)
+    def run_master_migration(opts={})
+      @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @admin, opts)
       run_jobs
       @migration.reload
     end
@@ -687,15 +687,26 @@ describe MasterCourses::MasterMigration do
       expect(copied_topic_assmt.reload.due_at.to_i).to eq new_master_due_at.to_i
     end
 
-    it "should ignore course settings" do
+    it "should ignore course settings on selective export unless requested" do
       @copy_to = course_factory
       @sub = @template.add_child_course!(@copy_to)
 
+      @copy_from.tab_configuration = [{"id"=>0}, {"id"=>14}, {"id"=>8}, {"id"=>5}, {"id"=>6}, {"id"=>2}, {"id"=>3, "hidden"=>true}]
+      @copy_from.save!
+      run_master_migration(:copy_settings => false) # initial sync with explicit false
+      expect(@copy_to.reload.tab_configuration).to_not eq @copy_from.tab_configuration
+
+      @copy_to2 = course_factory
+      @sub = @template.add_child_course!(@copy_to2)
+      run_master_migration # initial sync by default
+      expect(@copy_to2.reload.tab_configuration).to eq @copy_from.tab_configuration
+
       @copy_from.update_attribute(:is_public, true)
-
-      run_master_migration
-
+      run_master_migration # selective without settings
       expect(@copy_to.reload.is_public).to_not be_truthy
+
+      run_master_migration(:copy_settings => true) # selective with settings
+      expect(@copy_to.reload.is_public).to be_truthy
     end
 
     it "should trigger folder locking data cache invalidation" do

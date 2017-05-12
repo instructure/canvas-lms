@@ -185,10 +185,11 @@ describe MasterCourses::MasterTemplatesController, type: :request do
     end
 
     it "should queue a master migration" do
-      json = api_call(:post, @url, @params.merge(:comment => 'seriously'))
+      json = api_call(:post, @url, @params.merge(:comment => 'seriously', :copy_settings => '1'))
       migration = @template.master_migrations.find(json['id'])
       expect(migration).to be_queued
       expect(migration.comment).to eq 'seriously'
+      expect(migration.migration_settings[:copy_settings]).to eq true
       expect(migration.send_notification).to eq false
     end
 
