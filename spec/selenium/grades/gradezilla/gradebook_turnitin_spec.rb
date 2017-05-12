@@ -22,8 +22,6 @@ describe "Gradezilla - turnitin" do
   include_context "in-process server selenium tests"
   include GradezillaCommon
 
-  let(:gradezilla_page) { Gradezilla::MultipleGradingPeriods.new }
-
   before(:once) { gradebook_data_setup }
   before(:each) { user_session(@teacher) }
 
@@ -51,7 +49,7 @@ describe "Gradezilla - turnitin" do
       }
     }
 
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     icons = ff('.gradebook-cell-turnitin')
     expect(icons).to have_size 2
   end

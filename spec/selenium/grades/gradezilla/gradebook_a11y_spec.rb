@@ -22,8 +22,6 @@ describe "Gradezilla" do
   include_context "in-process server selenium tests"
   include GradezillaCommon
 
-  let(:gradezilla_page) { Gradezilla::MultipleGradingPeriods.new }
-
   let(:extra_setup) { }
   let(:active_element) { driver.switch_to.active_element }
 
@@ -35,7 +33,7 @@ describe "Gradezilla" do
     Account.default.set_feature_flag!('gradezilla', 'on')
     extra_setup
     user_session(@teacher)
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
   end
 
   context "export menu" do
@@ -76,17 +74,17 @@ describe "Gradezilla" do
     end
 
     it "after arrange columns is clicked", priority: "2", test_id: 720462 do
-      view_menu_trigger = gradezilla_page.gradebook_menu('View').find('button')
-      gradezilla_page.open_gradebook_menu('View')
-      gradezilla_page.select_gradebook_menu_option('Arrange By > Due Date - Oldest to Newest')
+      view_menu_trigger = Gradezilla.gradebook_menu('View').find('button')
+      Gradezilla.open_gradebook_menu('View')
+      Gradezilla.select_gradebook_menu_option('Arrange By > Due Date - Oldest to Newest')
       expect(active_element).to eq(view_menu_trigger)
     end
   end
 
   it 'returns focus to the view options menu after clicking the "Notes" option' do
-    gradezilla_page.gradebook_view_options_menu.click
-    gradezilla_page.notes_option.click
-    expect(active_element).to eq(gradezilla_page.gradebook_view_options_menu)
+    Gradezilla.gradebook_view_options_menu.click
+    Gradezilla.notes_option.click
+    expect(active_element).to eq(Gradezilla.gradebook_view_options_menu)
   end
 
   context 'settings menu is accessible' do

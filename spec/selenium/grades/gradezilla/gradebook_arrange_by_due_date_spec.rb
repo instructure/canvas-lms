@@ -24,8 +24,6 @@ describe "Gradezilla - arrange by due date" do
   include AssignmentOverridesSeleniumHelper
   include GradezillaCommon
 
-  let(:gradezilla_page) { Gradezilla::MultipleGradingPeriods.new }
-
   before(:once) do
     gradebook_data_setup
     @assignment = @course.assignments.first
@@ -33,21 +31,21 @@ describe "Gradezilla - arrange by due date" do
 
   before(:each) do
     user_session(@teacher)
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
   end
 
   it "should validate arrange columns by due date option", priority: "1", test_id: 220027 do
     expected_text = "-"
 
-    view_menu = gradezilla_page.open_gradebook_menu('View')
-    gradezilla_page.select_gradebook_menu_option('Arrange By > Due Date - Oldest to Newest', container: view_menu)
+    view_menu = Gradezilla.open_gradebook_menu('View')
+    Gradezilla.select_gradebook_menu_option('Arrange By > Due Date - Oldest to Newest', container: view_menu)
 
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
     expect(first_row_cells[0]).to include_text expected_text
 
-    view_menu = gradezilla_page.open_gradebook_menu('View')
-    arrange_by_group = gradezilla_page.gradebook_menu_group('Arrange By', container: view_menu)
-    arrangement_menu_options = gradezilla_page.gradebook_menu_options(arrange_by_group)
+    view_menu = Gradezilla.open_gradebook_menu('View')
+    arrange_by_group = Gradezilla.gradebook_menu_group('Arrange By', container: view_menu)
+    arrangement_menu_options = Gradezilla.gradebook_menu_options(arrange_by_group)
     selected_menu_options = arrangement_menu_options.select do |menu_item|
       menu_item.attribute('aria-checked') == 'true'
     end
@@ -56,7 +54,7 @@ describe "Gradezilla - arrange by due date" do
     expect(selected_menu_options[0].text.strip).to eq('Due Date - Oldest to Newest')
 
     # Setting should stick after reload
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
     expect(first_row_cells[0]).to include_text expected_text
 
@@ -65,9 +63,9 @@ describe "Gradezilla - arrange by due date" do
     expect(first_row_cells[1]).to include_text @assignment_1_points
     expect(first_row_cells[2]).to include_text @assignment_2_points
 
-    view_menu = gradezilla_page.open_gradebook_menu('View')
-    arrange_by_group = gradezilla_page.gradebook_menu_group('Arrange By', container: view_menu)
-    arrangement_menu_options = gradezilla_page.gradebook_menu_options(arrange_by_group)
+    view_menu = Gradezilla.open_gradebook_menu('View')
+    arrange_by_group = Gradezilla.gradebook_menu_group('Arrange By', container: view_menu)
+    arrangement_menu_options = Gradezilla.gradebook_menu_options(arrange_by_group)
     selected_menu_options = arrangement_menu_options.select do |menu_item|
       menu_item.attribute('aria-checked') == 'true'
     end
@@ -85,10 +83,10 @@ describe "Gradezilla - arrange by due date" do
     assignment2.update_attribute(:due_at, 3.days.from_now)
     create_assignment_override(assignment2, @section_a, 2)
 
-    view_menu = gradezilla_page.open_gradebook_menu('View')
-    gradezilla_page.select_gradebook_menu_option('Arrange By > Due Date - Oldest to Newest', container: view_menu)
+    view_menu = Gradezilla.open_gradebook_menu('View')
+    Gradezilla.select_gradebook_menu_option('Arrange By > Due Date - Oldest to Newest', container: view_menu)
     # since due date changes in assignments don't reflect in column sorting without a refresh
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     expect(f('#gradebook_grid .container_1 .slick-header-column:nth-child(1)')).to include_text(assignment3.title)
     expect(f('#gradebook_grid .container_1 .slick-header-column:nth-child(2)')).to include_text(assignment2.title)
     expect(f('#gradebook_grid .container_1 .slick-header-column:nth-child(3)')).to include_text(@assignment.title)
@@ -106,8 +104,8 @@ describe "Gradezilla - arrange by due date" do
     create_assignment_override(@assignment, @section_a, 5)
     create_assignment_override(assignment3, @section_b, 4)
 
-    view_menu = gradezilla_page.open_gradebook_menu('View')
-    gradezilla_page.select_gradebook_menu_option('Arrange By > Due Date - Oldest to Newest', container: view_menu)
+    view_menu = Gradezilla.open_gradebook_menu('View')
+    Gradezilla.select_gradebook_menu_option('Arrange By > Due Date - Oldest to Newest', container: view_menu)
 
     expect(f('#gradebook_grid .container_1 .slick-header-column:nth-child(1)')).to include_text(assignment3.title)
     expect(f('#gradebook_grid .container_1 .slick-header-column:nth-child(2)')).to include_text(@assignment.title)

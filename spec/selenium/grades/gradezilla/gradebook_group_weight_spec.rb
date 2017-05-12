@@ -22,8 +22,6 @@ describe "Gradezilla - group weights" do
   include_context "in-process server selenium tests"
   include GradezillaCommon
 
-  let(:gradezilla_page) { Gradezilla::MultipleGradingPeriods.new }
-
   def student_totals()
     totals = ff('.total-cell')
     points = []
@@ -74,7 +72,7 @@ describe "Gradezilla - group weights" do
     @course.update_attributes(:group_weighting_scheme => 'points')
 
     # Displays total column as points
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     expect(student_totals).to eq(["25"])
   end
 
@@ -86,7 +84,7 @@ describe "Gradezilla - group weights" do
     @course.update_attributes(:group_weighting_scheme => 'percent')
 
     # Displays total column as points
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     expect(student_totals).to eq(["45%"])
   end
 
@@ -117,19 +115,19 @@ describe "Gradezilla - group weights" do
     end
 
     it 'should display a warning icon for assignments with 0 points possible', priority: '1', test_id: 164013 do
-      gradezilla_page.visit(@course)
+      Gradezilla.visit(@course)
       expect(ff('.Gradebook__ColumnHeaderDetail svg[name="IconWarningSolid"]').size).to eq(1)
     end
 
     it 'should display a warning icon in the total column', priority: '1', test_id: 164013 do
-      gradezilla_page.visit(@course)
+      Gradezilla.visit(@course)
       expect(ff('.gradebook-cell .icon-warning').count).to eq(1)
     end
 
     it 'should not display warning icons if group weights are turned off', priority: "1", test_id: 305579 do
       @course.apply_assignment_group_weights = false
       @course.save!
-      gradezilla_page.visit(@course)
+      Gradezilla.visit(@course)
       expect(f("body")).not_to contain_css('.icon-warning')
     end
 
@@ -140,7 +138,7 @@ describe "Gradezilla - group weights" do
         "svg[name=IconMutedSolid]"
       ].join(' ')
 
-      gradezilla_page.visit(@course)
+      Gradezilla.visit(@course)
       toggle_muting(@assignment2)
       expect(f("#content")).to contain_jqcss('.total-cell .icon-muted')
       expect(f("#content")).to contain_jqcss(header_mute_icon_selector)
@@ -156,7 +154,7 @@ describe "Gradezilla - group weights" do
         "svg[name=IconMutedSolid]"
       ].join(' ')
 
-      gradezilla_page.visit(@course)
+      Gradezilla.visit(@course)
       toggle_muting(@assignment2)
       expect(f("#content")).not_to contain_jqcss('.total-cell .icon-muted')
       expect(f("#content")).not_to contain_jqcss(header_mute_icon_selector)

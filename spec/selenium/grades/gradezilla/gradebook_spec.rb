@@ -25,27 +25,25 @@ describe "Gradezilla" do
   include GradezillaCommon
   include GroupsCommon
 
-  let(:gradezilla_page) { Gradezilla::MultipleGradingPeriods.new }
-
   before(:once) { gradebook_data_setup }
   before(:each) { user_session(@teacher) }
 
   it "shows unpublished assignments", priority: "1", test_id: 210016 do
     assignment = @course.assignments.create! title: 'unpublished'
     assignment.unpublish
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     expect(f('#gradebook_grid .container_1 .slick-header')).to include_text(assignment.title)
   end
 
   it "hides 'not-graded' assignments", priority: "1", test_id: 210017 do
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
     expect(f('.slick-header-columns')).not_to include_text(@ungraded_assignment.title)
   end
 
   it 'filters students', priority: "1", test_id: 210018 do
     visible_students = -> { ff('.student-name') }
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     expect(visible_students.call).to have_size @all_students.size
     f('.gradebook_filter input').send_keys 'student 1'
     sleep 1 # InputFilter has a delay
@@ -55,19 +53,19 @@ describe "Gradezilla" do
   end
 
   it "validates correct number of students showing up in gradebook", priority: "1", test_id: 210019 do
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
     expect(ff('.student-name')).to have_size @course.students.count
   end
 
   it "shows students sorted by their sortable_name", priority: "1", test_id: 210022 do
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     dom_names = ff('.student-name').map(&:text)
     expect(dom_names).to eq @all_students.map(&:name)
   end
 
   it "hides student avatars until they are enabled", priority: "1", test_id: 210023 do
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
     expect(ff('.student-name')).to have_size @all_students.size
     expect(f("body")).not_to contain_css('.avatar img')
@@ -76,7 +74,7 @@ describe "Gradezilla" do
     @account.enable_service(:avatars)
     @account.save!
     expect(@account.service_enabled?(:avatars)).to be_truthy
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
     expect(ff('.student-name')).to have_size @all_students.size
     expect(ff('.avatar')).to have_size @all_students.size
@@ -84,14 +82,14 @@ describe "Gradezilla" do
 
   it "handles muting/unmuting correctly", priority: "1", test_id: 164227 do
     pending('TODO: Refactor this and add it back as part of CNVS-33679')
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     toggle_muting(@second_assignment)
     expect(f(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted")).to be_displayed
     expect(f('.total-cell .icon-muted')).to be_displayed
     expect(@second_assignment.reload).to be_muted
 
     # reload the page and make sure it remembered the setting
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     expect(fj(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted")).to be_displayed
 
     # make sure you can un-mute
@@ -103,7 +101,7 @@ describe "Gradezilla" do
   context "unpublished course" do
     before do
       @course.claim!
-      gradezilla_page.visit(@course)
+      Gradezilla.visit(@course)
     end
 
     it "allows editing grades", priority: "1", test_id: 210026 do
@@ -115,7 +113,7 @@ describe "Gradezilla" do
   end
 
   it "validates that gradebook settings is displayed when button is clicked", priority: "1", test_id: 164217 do
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
     f('#gradebook_settings').click
     expect(f('.gradebook_dropdown')).to be_displayed
@@ -123,7 +121,7 @@ describe "Gradezilla" do
 
   it "View Grading History menu item redirects to grading history page", priority: "2", test_id: 164218 do
     @course.root_account.enable_feature!(:gradezilla)
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
     f('.gradebook-menus [data-component="GradebookMenu"]').click
     f('[data-menu-item-id="grade-history"]').click
@@ -132,7 +130,7 @@ describe "Gradezilla" do
 
   it 'gradebook settings modal is displayed when gradebook settings button is clicked',
     priority: '1', test_id: 164219 do
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
     f('#gradebook-settings-button').click
     expect(f('[aria-label="Gradebook Settings"]')).to be_displayed
@@ -140,7 +138,7 @@ describe "Gradezilla" do
 
   it 'late policies tab is selected by default',
     priority: '1', test_id: 164220 do
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
     f('#gradebook-settings-button').click
     expect(f('[aria-label="Gradebook Settings"]')).to be_displayed
@@ -149,7 +147,7 @@ describe "Gradezilla" do
   end
 
   it 'focus is returned to gradebook settings button when modal is closed', priority: '1', test_id: 164221 do
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
     f('#gradebook-settings-button').click
     expect(f('[aria-label="Gradebook Settings"]')).to be_displayed
@@ -161,9 +159,9 @@ describe "Gradezilla" do
   it "validates assignment details", priority: "1", test_id: 210048 do
     submissions_count = @second_assignment.submissions.count.to_s + ' submissions'
 
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
-    gradezilla_page.open_assignment_options(1)
+    Gradezilla.open_assignment_options(1)
     f('[data-menu-item-id="show-assignment-details"]').click
     details_dialog = f('#assignment-details-dialog')
     expect(details_dialog).to be_displayed
@@ -178,7 +176,7 @@ describe "Gradezilla" do
     @fake_student1.update_attribute :workflow_state, "registered"
     @fake_submission = @first_assignment.submit_homework(@fake_student1, :body => 'fake student submission')
 
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
     fakes = [@fake_student1.name, @fake_student2.name]
     expect(ff('.student-name').last(2).map(&:text)).to eq fakes
@@ -213,7 +211,7 @@ describe "Gradezilla" do
     graded_assignment.grade_student @student_1, grade: 10, grader: @teacher # 10 points possible
     group_assignment.grade_student @student_1, grade: 2, grader: @teacher # 0 points possible
 
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     group_grade = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .assignment-group-cell .percentage')
     total_grade = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .total-cell .percentage')
     expect(group_grade).to include_text('100%') # otherwise 108%
@@ -229,7 +227,7 @@ describe "Gradezilla" do
                                            })
 
     assignment.mute!
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
     expect(f("body")).not_to contain_css(".total-cell .icon-muted")
   end
@@ -243,7 +241,7 @@ describe "Gradezilla" do
       student_toggle.click
     end
 
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
     toggle_hiding_students
     expect(f("#content")).not_to contain_jqcss('.student-name:visible')
@@ -261,7 +259,7 @@ describe "Gradezilla" do
       @first_assignment.submit_homework(@student_2, :submission_type => 'online_upload', :attachments => [a])
 
       # When I go to the gradebook
-      gradezilla_page.visit(@course)
+      Gradezilla.visit(@course)
 
       # chrome fails to find the download submissions link because it does not fit normal screen
       make_full_screen
@@ -298,12 +296,12 @@ describe "Gradezilla" do
   end
 
   it "shows late submissions" do
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     expect(f("body")).not_to contain_css(".late")
 
     @student_3_submission.write_attribute(:cached_due_date, 1.week.ago)
     @student_3_submission.save!
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
     expect(ff('.late')).to have_size(1)
   end
@@ -312,7 +310,7 @@ describe "Gradezilla" do
     pending('TODO: Refactor this and add it back as part of CNVS-32440')
     @course.stubs(:large_roster?).returns(true)
 
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
     f('.Gradebook__ColumnHeaderAction').click
     expect(f('.gradebook-header-menu')).not_to include_text("SpeedGrader")
@@ -368,7 +366,7 @@ describe "Gradezilla" do
       essay_submission.complete!(essay_text)
       user_session(teacher)
 
-      gradezilla_page.visit(test_course)
+      Gradezilla.visit(test_course)
       expect(f('#gradebook_grid .icon-quiz')).to be_truthy
     end
 
@@ -381,7 +379,7 @@ describe "Gradezilla" do
       file_submission.complete!
       user_session(teacher)
 
-      gradezilla_page.visit(test_course)
+      Gradezilla.visit(test_course)
       expect(f('#gradebook_grid .icon-quiz')).to be_truthy
     end
 
@@ -389,7 +387,7 @@ describe "Gradezilla" do
       essay_submission.complete!(essay_text)
       user_session(teacher)
 
-      gradezilla_page.visit(test_course)
+      Gradezilla.visit(test_course)
       # in order to get into edit mode with an icon in the way, a total of 3 clicks are needed
       f('#gradebook_grid .icon-quiz').click
       double_click('.online_quiz')

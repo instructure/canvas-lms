@@ -22,8 +22,6 @@ describe "Gradezilla - post grades to SIS" do
   include GradezillaCommon
   include_context "in-process server selenium tests"
 
-  let(:gradezilla_page) { Gradezilla::MultipleGradingPeriods.new }
-
   before(:once) do
     gradebook_data_setup
     create_sis_assignment
@@ -54,10 +52,10 @@ describe "Gradezilla - post grades to SIS" do
     before(:once) { export_plugin_setting.update(disabled: false) }
 
     it "should not be visible by default", priority: "1", test_id: 244958 do
-      gradezilla_page.visit(@course)
-      gradezilla_page.open_action_menu
+      Gradezilla.visit(@course)
+      Gradezilla.open_action_menu
 
-      expect(f('body')).not_to contain_css(gradezilla_page.action_menu_item_selector('post_grades_feature_tool'))
+      expect(f('body')).not_to contain_css(Gradezilla.action_menu_item_selector('post_grades_feature_tool'))
     end
 
     it "should be visible when enabled on course with sis_source_id" do
@@ -65,10 +63,10 @@ describe "Gradezilla - post grades to SIS" do
       @course.sis_source_id = 'xyz'
       @course.save
 
-      gradezilla_page.visit(@course)
-      gradezilla_page.open_action_menu
+      Gradezilla.visit(@course)
+      Gradezilla.open_action_menu
 
-      expect(f('body')).to contain_css(gradezilla_page.action_menu_item_selector('post_grades_feature_tool'))
+      expect(f('body')).to contain_css(Gradezilla.action_menu_item_selector('post_grades_feature_tool'))
     end
 
     it "containing menu should not be displayed if viewing outcome gradebook", priority: "1", test_id: 244959 do
@@ -77,11 +75,11 @@ describe "Gradezilla - post grades to SIS" do
       @course.sis_source_id = 'xyz'
       @course.save
 
-      gradezilla_page.visit(@course)
-      gradezilla_page.open_gradebook_dropdown_menu
-      gradezilla_page.select_menu_item('learning-mastery')
+      Gradezilla.visit(@course)
+      Gradezilla.open_gradebook_dropdown_menu
+      Gradezilla.select_menu_item('learning-mastery')
 
-      expect(gradezilla_page.action_menu).not_to be_displayed
+      expect(Gradezilla.action_menu).not_to be_displayed
     end
 
     it 'does not show assignment errors when clicking the post grades button if all ' \
@@ -97,9 +95,9 @@ describe "Gradezilla - post grades to SIS" do
           override.due_at_overridden = true
         end
       end
-      gradezilla_page.visit(@course)
-      gradezilla_page.open_action_menu
-      gradezilla_page.select_action_menu_item('post_grades_feature_tool')
+      Gradezilla.visit(@course)
+      Gradezilla.open_action_menu
+      Gradezilla.select_action_menu_item('post_grades_feature_tool')
 
       expect(f('.post-grades-dialog')).not_to contain_css('#assignment-errors')
     end
@@ -127,12 +125,12 @@ describe "Gradezilla - post grades to SIS" do
     let(:tool_name) { "post_grades_lti_#{tool.id}" }
 
     it "should show when a post_grades lti tool is installed", priority: "1", test_id: 244960 do
-      gradezilla_page.visit(@course)
-      gradezilla_page.open_action_menu
+      Gradezilla.visit(@course)
+      Gradezilla.open_action_menu
 
-      expect(gradezilla_page.action_menu_item(tool_name)).to be_displayed
+      expect(Gradezilla.action_menu_item(tool_name)).to be_displayed
 
-      gradezilla_page.select_action_menu_item(tool_name)
+      Gradezilla.select_action_menu_item(tool_name)
 
       expect(f('iframe.post-grades-frame')).to be_displayed
     end
@@ -144,12 +142,12 @@ describe "Gradezilla - post grades to SIS" do
       course.assignments.create!(name: 'Assignment1', post_to_sis: true)
       create_post_grades_tool(course: course)
 
-      gradezilla_page.visit(@course)
-      gradezilla_page.open_action_menu
+      Gradezilla.visit(@course)
+      Gradezilla.open_action_menu
 
-      expect(gradezilla_page.action_menu_item(tool_name)).to be_displayed
+      expect(Gradezilla.action_menu_item(tool_name)).to be_displayed
 
-      gradezilla_page.select_action_menu_item(tool_name)
+      Gradezilla.select_action_menu_item(tool_name)
 
       expect(f('iframe.post-grades-frame')).to be_displayed
     end
@@ -157,16 +155,16 @@ describe "Gradezilla - post grades to SIS" do
     it "should not hide post grades lti button when section selected", priority: "1", test_id: 248027 do
       create_post_grades_tool
 
-      gradezilla_page.visit(@course)
-      gradezilla_page.open_action_menu
+      Gradezilla.visit(@course)
+      Gradezilla.open_action_menu
 
-      expect(gradezilla_page.action_menu_item(tool_name)).to be_displayed
+      expect(Gradezilla.action_menu_item(tool_name)).to be_displayed
 
       f('button.section-select-button').click
       fj('ul#section-to-show-menu li:nth(4)').click
-      gradezilla_page.open_action_menu
+      Gradezilla.open_action_menu
 
-      expect(gradezilla_page.action_menu_item(tool_name)).to be_displayed
+      expect(Gradezilla.action_menu_item(tool_name)).to be_displayed
     end
   end
 end

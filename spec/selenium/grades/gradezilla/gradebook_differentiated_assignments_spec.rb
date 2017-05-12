@@ -22,8 +22,6 @@ describe "Gradezilla" do
   include_context "in-process server selenium tests"
   include GradezillaCommon
 
-  let(:gradezilla_page) { Gradezilla::MultipleGradingPeriods.new }
-
   context "differentiated assignments" do
     before :once do
       gradebook_data_setup
@@ -43,7 +41,7 @@ describe "Gradezilla" do
     end
 
     it "should gray out cells" do
-      gradezilla_page.visit(@course)
+      Gradezilla.visit(@course)
       # student 3, assignment 4
       selector = '#gradebook_grid .container_1 .slick-row:nth-child(3) .l4'
       cell = f(selector)
@@ -59,7 +57,7 @@ describe "Gradezilla" do
       selector = '#gradebook_grid .container_1 .slick-row:nth-child(1) .l4'
       @da_assignment.grade_student(@student_1, grade: 42, grader: @teacher)
       @override.destroy
-      gradezilla_page.visit(@course)
+      Gradezilla.visit(@course)
       edit_grade(selector, '')
       cell = f(selector)
       expect(cell.find_element(:css, '.gradebook-cell')).to have_class('grayed-out')

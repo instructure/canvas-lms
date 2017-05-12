@@ -24,8 +24,6 @@ describe "Gradezilla - assignment column headers" do
   include AssignmentOverridesSeleniumHelper
   include GradezillaCommon
 
-  let(:gradezilla_page) { Gradezilla::MultipleGradingPeriods.new }
-
   before(:once) do
     gradebook_data_setup
     @assignment = @course.assignments.first
@@ -38,7 +36,7 @@ describe "Gradezilla - assignment column headers" do
 
   it "should validate row sorting works when first column is clicked", priority: "1", test_id: 220023 do
     pending("to be added back in with CNVS-31611")
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     first_column = f('.slick-column-name')
     first_column.click
     meta_cells = find_slick_cells(0, f('#gradebook_grid  .container_0'))
@@ -50,13 +48,13 @@ describe "Gradezilla - assignment column headers" do
   end
 
   it "should have a tooltip with the assignment name", priority: "1", test_id: 220025 do
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     expect(f(@header_selector)["title"]).to eq @assignment.title
   end
 
   it "should handle a ton of assignments without wrapping the slick-header", priority: "1", test_id: 220026 do
     create_assignments([@course.id], 100, title: 'a really long assignment name, o look how long I am this is so cool')
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     # being 38px high means it did not wrap
     expect(f("#gradebook_grid .slick-header-columns").size.height).to eq 38
   end
@@ -68,16 +66,16 @@ describe "Gradezilla - assignment column headers" do
       customOrder: ["#{@third_assignment.id}", "#{@second_assignment.id}", "#{@first_assignment.id}"]
     }
     @user.save!
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
     expect(first_row_cells[0]).to include_text '-'
     expect(first_row_cells[1]).to include_text @assignment_2_points
     expect(first_row_cells[2]).to include_text @assignment_1_points
 
     # none of the predefined short orders should be selected.
-    view_menu = gradezilla_page.open_gradebook_menu('View')
-    arrange_by_group = gradezilla_page.gradebook_menu_group('Arrange By', container: view_menu)
-    arrangement_menu_options = gradezilla_page.gradebook_menu_options(arrange_by_group)
+    view_menu = Gradezilla.open_gradebook_menu('View')
+    arrange_by_group = Gradezilla.gradebook_menu_group('Arrange By', container: view_menu)
+    arrangement_menu_options = Gradezilla.gradebook_menu_options(arrange_by_group)
 
     expect(arrangement_menu_options.all? { |menu_item| menu_item.attribute('aria-checked') == 'false'}).to be_truthy
   end
@@ -98,7 +96,7 @@ describe "Gradezilla - assignment column headers" do
       })
     @fourth_assignment.grade_student(@student_1, grade: 150, grader: @teacher)
 
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
     expect(first_row_cells[0]).to include_text '-'
@@ -117,7 +115,7 @@ describe "Gradezilla - assignment column headers" do
 
     @first_assignment.destroy
 
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
     expect(first_row_cells[0]).to include_text '-'
@@ -125,7 +123,7 @@ describe "Gradezilla - assignment column headers" do
   end
 
   it "should validate show attendance columns option", priority: "1", test_id: 220034 do
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     f('#gradebook_settings').click
     f('#show_attendance').find_element(:xpath, '..').click
     headers = ff('.slick-header')
@@ -138,9 +136,9 @@ describe "Gradezilla - assignment column headers" do
     row1_selector = '#gradebook_grid .container_1 .slick-row:nth-child(1) .total-cell .letter-grade-points'
     row2_selector = '#gradebook_grid .container_1 .slick-row:nth-child(2) .total-cell .letter-grade-points'
 
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     expect(f(row1_selector)).to include_text("A")
-    gradezilla_page.enter_grade('50', 0,1)
+    Gradezilla.enter_grade('50', 0,1)
     edit_grade('#gradebook_grid .slick-row:nth-child(2) .l2', '50')
     expect(f(row2_selector)).to include_text("A")
   end

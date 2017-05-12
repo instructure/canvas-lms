@@ -22,8 +22,6 @@ describe "Gradezilla" do
   include_context "in-process server selenium tests"
   include GradezillaCommon
 
-  let(:gradezilla_page) { Gradezilla::MultipleGradingPeriods.new }
-
   before(:once) do
     gradebook_data_setup
     @page_size = 5
@@ -36,7 +34,7 @@ describe "Gradezilla" do
 
   def test_n_students(n)
     create_users_in_course @course, n
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     f('.gradebook_filter input').send_keys n
     expect(ff('.student-name')).to have_size 1
     expect(f('.student-name')).to include_text "user #{n}"

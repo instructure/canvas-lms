@@ -17,8 +17,8 @@
 
 require_relative '../../common'
 
-module Gradezilla
-  class MultipleGradingPeriods
+class Gradezilla
+  class << self
     include SeleniumDependencies
 
     # Assignment Headings

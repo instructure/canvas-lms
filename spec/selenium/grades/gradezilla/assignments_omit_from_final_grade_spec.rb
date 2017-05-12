@@ -23,8 +23,6 @@ describe 'Gradezilla omit from final grade assignments' do
   include_context "in-process server selenium tests"
   include AssignmentsCommon
 
-  let(:gradezilla_page) { Gradezilla::MultipleGradingPeriods.new }
-
   let(:test_course) { course_factory(active_course: true) }
   let(:teacher)     { user_factory(active_all: true) }
   let(:student)     { user_factory(active_all: true) }
@@ -85,7 +83,7 @@ describe 'Gradezilla omit from final grade assignments' do
       assignment_1.grade_student(student, grade: 10, grader: teacher)
       assignment_3.grade_student(student, grade: 5, grader: teacher)
       user_session(teacher)
-      gradezilla_page.visit(test_course)
+      Gradezilla.visit(test_course)
     end
 
     it 'displays triangle warning' do

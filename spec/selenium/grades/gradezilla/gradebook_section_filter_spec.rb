@@ -24,15 +24,13 @@ describe "Gradezilla" do
   include GradezillaCommon
   include GroupsCommon
 
-  let(:gradezilla_page) { Gradezilla::MultipleGradingPeriods.new }
-
   before(:once) { gradebook_data_setup }
   before(:each) { user_session(@teacher) }
 
   it "should handle multiple enrollments correctly" do
     @course.enroll_student(@student_1, :section => @other_section, :allow_multiple_enrollments => true)
 
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
     meta_cells = find_slick_cells(0, f('.grid-canvas'))
     expect(meta_cells[0]).to include_text @course.default_section.display_name
@@ -48,7 +46,7 @@ describe "Gradezilla" do
   end
 
   it "should allow showing only a certain section", priority: "1", test_id: 210024 do
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     # grade the first assignment
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2', 0)
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(2) .l2', 1)
@@ -59,7 +57,7 @@ describe "Gradezilla" do
     expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')).to include_text '1'
 
     # verify that it remembers the section to show across page loads
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     expect(fj('.section-select-button:visible')).to include_text @other_section.name
     expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')).to include_text '1'
 

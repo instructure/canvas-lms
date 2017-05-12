@@ -24,15 +24,14 @@ describe 'gradezilla' do
   include WeightingSetup
 
   let(:total_grade) do
-    gradezilla = Gradezilla::MultipleGradingPeriods.new
     grading_period_ids = [0, @gp1.id, @gp2.id]
     user_session(@teacher)
-    gradezilla.visit(@course)
+    Gradezilla.visit(@course)
 
     if @grading_period_index
-      gradezilla.select_grading_period(grading_period_ids[@grading_period_index])
+      Gradezilla.select_grading_period(grading_period_ids[@grading_period_index])
     end
-    gradezilla.total_score_for_row(1)
+    Gradezilla.total_score_for_row(1)
   end
 
   let(:individual_view) { false }

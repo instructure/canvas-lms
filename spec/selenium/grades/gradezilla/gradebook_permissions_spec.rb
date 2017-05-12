@@ -22,8 +22,6 @@ describe "Gradezilla - permissions" do
   include_context "in-process server selenium tests"
   include GradezillaCommon
 
-  let(:gradezilla_page) { Gradezilla::MultipleGradingPeriods.new }
-
   context "as an admin" do
 
     let(:course) { Course.create! }
@@ -40,7 +38,7 @@ describe "Gradezilla - permissions" do
                           :account => Account.default,
                           :role => role)
 
-      gradezilla_page.visit(course)
+      Gradezilla.visit(course)
       expect_no_flash_message :error
     end
 
@@ -55,7 +53,7 @@ describe "Gradezilla - permissions" do
                           :account => Account.default,
                           :role => role)
 
-      gradezilla_page.visit(course)
+      Gradezilla.visit(course)
       expect_no_flash_message :error
     end
   end
@@ -73,7 +71,7 @@ describe "Gradezilla - permissions" do
       disable_view_all_grades
       concluded_course = course_with_ta_logged_in
       concluded_course.conclude
-      gradezilla_page.visit(@course)
+      Gradezilla.visit(@course)
       expect(f('#unauthorized_message')).to be_displayed
     end
   end

@@ -22,8 +22,6 @@ describe "Gradezilla - custom columns" do
   include_context "in-process server selenium tests"
   include GradezillaCommon
 
-  let(:gradezilla_page) { Gradezilla::MultipleGradingPeriods.new }
-
   before(:once) { gradebook_data_setup }
   before(:each) { user_session(@teacher) }
 
@@ -46,7 +44,7 @@ describe "Gradezilla - custom columns" do
       d.content = "123456"
     end.save!
 
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
     expect(header(2)).to include_text col.title
     expect(ff(".container_0 .slick-header-column").map(&:text).join).not_to include hidden.title
@@ -54,20 +52,20 @@ describe "Gradezilla - custom columns" do
   end
 
   it "lets you show and hide the teacher notes column", priority: "1", test_id: 164008 do
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     # create the notes column
-    gradezilla_page.gradebook_view_options_menu.click
-    gradezilla_page.notes_option.click
+    Gradezilla.gradebook_view_options_menu.click
+    Gradezilla.notes_option.click
     expect(f("#content")).to contain_css('.custom_column')
 
     # hide the notes column
-    gradezilla_page.gradebook_view_options_menu.click
-    gradezilla_page.notes_option.click
+    Gradezilla.gradebook_view_options_menu.click
+    Gradezilla.notes_option.click
     expect(f("#content")).not_to contain_css('.custom_column')
 
     # show the notes column
-    gradezilla_page.gradebook_view_options_menu.click
-    gradezilla_page.notes_option.click
+    Gradezilla.gradebook_view_options_menu.click
+    Gradezilla.notes_option.click
     expect(f("#content")).to contain_css('.custom_column')
   end
 end
