@@ -44,7 +44,6 @@ define([
   'compiled/jquery/mediaCommentThumbnail',
   'vendor/date' /* Date.parse */,
   'vendor/jquery.ba-tinypubsub' /* /\.publish\(/ */,
-  'jqueryui/accordion' /* /\.accordion\(/ */,
   'jqueryui/resizable' /* /\.resizable/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */,
@@ -56,7 +55,7 @@ define([
   $.trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/');
 
 
-  var JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE = '.dialog, .draggable, .resizable, .sortable, .accordion, .tabs';
+  var JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE = '.dialog, .draggable, .resizable, .sortable, .tabs';
   function enhanceUserContent() {
     var $content = $("#content");
     $(".user_content:not(.enhanced):visible").addClass('unenhanced');
@@ -91,7 +90,6 @@ define([
         .filter(".draggable").draggable().end()
         .filter(".resizable").resizable().end()
         .filter(".sortable").sortable().end()
-        .filter(".accordion").accordion().end()
         .filter(".tabs").each(function() {
           $(this).tabs();
         }).end()
