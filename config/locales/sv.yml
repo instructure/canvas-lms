@@ -16905,7 +16905,7 @@ sv:
       peer_review: Recension
       peer_review_not_done: "**Den här recensionen är inte färdig än:** För att den ska anses som färdig måste du lämna minst en kommentar."
       peer_review_not_done_rubric: "**Den här recensionen är inte färdig än:** För att den ska anses som färdig måste du lämna minst en kommentar och fylla i matrisen till höger."
-      peer_review_steps_complete: "Du har inte gjort de nödvändiga stegen för den här recensionen."
+      peer_review_steps_complete: "Du har gjort klart de nödvändiga stegen för den här recensionen."
       see_vericite_results: "Se VeriCite resultat"
       sent_to_whole_group: "Skicka kommentar till hela gruppen"
       show_rubric: "Visa matris"
