@@ -1086,7 +1086,7 @@ class ExternalToolsController < ApplicationController
   end
 
   def content_item_param_helper(placement, collaboration)
-    Lti::ContentItemParameterHelper.new(tool: @tool,
+    Lti::PrivacyLevelParameterHelper.new(tool: @tool,
                                         placement: placement,
                                         collaboration: collaboration,
                                         context: @context,

@@ -1,5 +1,5 @@
 module Lti
-  class ContentItemParameterHelper
+  class PrivacyLevelParameterHelper
     EMAIL_ONLY = %w(Person.email.primary).freeze
     INLCUDE_NAME = %w(Person.name.given Person.name.full Person.name.family).freeze
     PUBLIC = (%w(Person.sourcedId CourseOffering.sourcedId) + EMAIL_ONLY + INLCUDE_NAME).freeze

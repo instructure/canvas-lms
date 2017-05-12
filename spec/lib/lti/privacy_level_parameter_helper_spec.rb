@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
-describe Lti::ContentItemParameterHelper do
+describe Lti::PrivacyLevelParameterHelper do
   include ExternalToolsSpecHelper
   let(:course) { course_model }
   let(:user) { course_with_student(course: course).user }
@@ -23,7 +23,7 @@ describe Lti::ContentItemParameterHelper do
   end
 
   let(:helper) do
-    Lti::ContentItemParameterHelper.new(
+    Lti::PrivacyLevelParameterHelper.new(
       tool: tool,
       placement: placement,
       context: course,
@@ -60,7 +60,7 @@ describe Lti::ContentItemParameterHelper do
       end
 
       let(:helper) do
-        Lti::ContentItemParameterHelper.new(
+        Lti::PrivacyLevelParameterHelper.new(
           tool: tool,
           placement: placement,
           context: course,
@@ -90,7 +90,7 @@ describe Lti::ContentItemParameterHelper do
       end
 
       let(:helper) do
-        Lti::ContentItemParameterHelper.new(
+        Lti::PrivacyLevelParameterHelper.new(
           tool: tool,
           placement: placement,
           context: course,
@@ -117,7 +117,7 @@ describe Lti::ContentItemParameterHelper do
       end
 
       let(:helper) do
-        Lti::ContentItemParameterHelper.new(
+        Lti::PrivacyLevelParameterHelper.new(
           tool: tool,
           placement: placement,
           context: course,
@@ -142,7 +142,7 @@ describe Lti::ContentItemParameterHelper do
       end
 
       let(:helper) do
-        Lti::ContentItemParameterHelper.new(
+        Lti::PrivacyLevelParameterHelper.new(
           tool: tool,
           placement: placement,
           context: course,
