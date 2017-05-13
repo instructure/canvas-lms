@@ -10178,8 +10178,8 @@ zh-Hant:
         html: 
           body2: "您的 *%{course}* 課程導出已完成。"
           link: 按一下檢視導出
-          subject: "課程導出失敗：%{course}"
-        subject: "課程導出失敗：%{course}"
+          subject: "課程導出完成：%{course}"
+        subject: "課程導出完成：%{course}"
     content_locked: 此測驗目前已鎖定。
     content_locked_at: "此內容鎖定於 %{at}。"
     content_locked_module: "此內容是單元 *%{module}* 的一部分，尚未解除鎖定。"
