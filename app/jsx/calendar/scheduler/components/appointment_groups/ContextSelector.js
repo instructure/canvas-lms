@@ -198,7 +198,7 @@ import Grid, { GridCol, GridRow } from 'instructure-ui/lib/components/Grid'
       return (
         <div id={`${context.asset_string}_sections`} className={this.state.expandedContexts.has(context) ? '' : 'hiddenSection'}>
           {
-            context.sections.map(section => {
+            (context.sections || []).map(section => {
               return (
                 <div className="sectionItem" key={section.asset_string}>
                   <input
