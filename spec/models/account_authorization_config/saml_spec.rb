@@ -95,14 +95,6 @@ describe AccountAuthorizationConfig::SAML do
     expect(@account.settings[:saml_entity_id]).to eq "http://bob.cody.instructure.com/saml2"
   end
 
-  it "should not overwrite a specific entity_id" do
-    @aac = @account.authentication_providers.create!(
-      auth_type: "saml",
-      entity_id: "http://wtb.instructure.com/saml2"
-    )
-    expect(@aac.entity_id).to eq "http://wtb.instructure.com/saml2"
-  end
-
   it "uses the entity id set on the account" do
     @account.settings[:saml_entity_id] = 'my_entity'
     @account.save!

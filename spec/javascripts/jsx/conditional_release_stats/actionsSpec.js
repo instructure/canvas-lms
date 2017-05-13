@@ -1,23 +1,20 @@
-define([
-  'jsx/conditional_release_stats/helpers/actions',
-], ({ createAction, createActions }) => {
-  QUnit.module('Conditional Release Stats actions')
+import { actions } from 'jsx/conditional_release_stats/actions'
 
-  test('creates a new action', () => {
-    const actionCreator = createAction('ACTION_ONE')
-    const action = actionCreator('payload')
+QUnit.module('Conditional Release Stats actions')
 
-    equal(action.type, 'ACTION_ONE', 'action type match')
-    equal(action.payload, 'payload', 'action payload match')
-  })
+test('closeSidebar dispatches CLOSE_SIDEBAR action', () => {
+  const trigger = { focus: sinon.stub() }
+  const dispatch = sinon.stub()
+  const getState = sinon.stub().returns({ sidebarTrigger: trigger })
+  actions.closeSidebar()(dispatch, getState)
+  ok(dispatch.calledOnce)
+  equal(dispatch.args[0][0].type, 'CLOSE_SIDEBAR')
+})
 
-  test('creates multiple actions', () => {
-    const actionDefs = ['ACTION_ONE', 'ANOTHER_MORE_COMPLEX_ACTION_NAME']
-    const { actionTypes, actions } = createActions(actionDefs)
-
-    equal(actions.actionOne.type, 'ACTION_ONE')
-    equal(actionTypes.ACTION_ONE, 'ACTION_ONE')
-    equal(actions.anotherMoreComplexActionName.type, 'ANOTHER_MORE_COMPLEX_ACTION_NAME')
-    equal(actionTypes.ANOTHER_MORE_COMPLEX_ACTION_NAME, 'ANOTHER_MORE_COMPLEX_ACTION_NAME')
-  })
+test('closeSidebar focuses sidebar trigger', () => {
+  const trigger = { focus: sinon.stub() }
+  const dispatch = sinon.stub()
+  const getState = sinon.stub().returns({ sidebarTrigger: trigger })
+  actions.closeSidebar()(dispatch, getState)
+  ok(trigger.focus.calledOnce)
 })

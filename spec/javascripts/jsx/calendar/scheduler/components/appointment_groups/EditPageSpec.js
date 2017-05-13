@@ -9,7 +9,7 @@ define([
   'timezone/Europe/London',
   'timezone',
   'helpers/fakeENV',
-  'instructure-ui/Button',
+  'instructure-ui/lib/components/Button',
   'moxios',
   'jquery.instructure_date_and_time'
 ], (React, ReactDOM, TestUtils, $, axios, moment, EditPage, london, tz, fakeENV, { default: Button }, moxios) => {

@@ -144,6 +144,29 @@ module CCHelper
     [title, body]
   end
 
+  def self.map_linked_objects(content)
+    linked_objects = []
+    html = Nokogiri::HTML.fragment(content)
+    html.css('a, img').each do |atag|
+      source = atag['href'] || atag['src']
+      next unless source =~ /%24[^%]*%24/
+      if source.include?(CGI.escape(CC::CCHelper::WEB_CONTENT_TOKEN))
+        attachment_key = source.sub(CGI.escape(CC::CCHelper::WEB_CONTENT_TOKEN), '')
+        attachment_key = attachment_key.split('?').first
+        attachment_key = attachment_key.split('/').map {|ak| CGI.unescape(ak)}.join('/')
+        linked_objects.push({local_path: attachment_key, type: 'Attachment'})
+      else
+        type, object_key = source.split('/').last 2
+        if type =~ /%24[^%]*%24/
+          type = object_key
+          object_key = nil
+        end
+        linked_objects.push({identifier: object_key, type: type})
+      end
+    end
+    linked_objects
+  end
+
   require 'set'
   class HtmlContentExporter
     attr_reader :used_media_objects, :media_object_flavor, :media_object_infos

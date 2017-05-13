@@ -72,6 +72,24 @@ describe "communication channel selenium tests" do
       expect(f('.email_channels')).not_to contain_link('nobody@example.com')
     end
 
+    it 'resends sms confirmations properly' do
+      user_with_pseudonym({active_user: true})
+      create_session(@pseudonym)
+      sms_cc = @user.communication_channels.create(:path => "8011235555@example.com", :path_type => "sms")
+
+      get '/profile/settings'
+      expect(f('.other_channels')).to contain_css('.unconfirmed')
+      f('.other_channels .path').click
+      Notification.create!(name: 'Confirm SMS Communication Channel', category: 'Registration')
+      f('#confirm_communication_channel .re_send_confirmation_link').click
+      wait_for_ajaximations
+
+      expect(@user.messages.count).to eq 1
+      m = @user.messages.first
+      expect(m.subject).to eq('Canvas Alert')
+      expect(m.body).to include(sms_cc.confirmation_code)
+    end
+
     it 'should show the bounce count reset button when a siteadmin is masquerading' do
       u = user_with_pseudonym(active_all: true)
       u.communication_channels.create!(:path => 'test@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active'; cc.bounce_count = 3 }

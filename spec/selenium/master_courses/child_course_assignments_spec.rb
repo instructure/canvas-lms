@@ -6,15 +6,21 @@ describe "master courses - child courses - assignment locking" do
   before :once do
     Account.default.enable_feature!(:master_courses)
 
+    due_date = format_date_for_view(Time.zone.now - 1.month)
     @copy_from = course_factory(:active_all => true)
     @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
-    @original_assmt = @copy_from.assignments.create!(:title => "blah", :description => "bloo")
+    @original_assmt = @copy_from.assignments.create!(
+      :title => "blah", :description => "bloo", :points_possible => 27, :due_at => due_date
+    )
     @tag = @template.create_content_tag_for!(@original_assmt)
 
     course_with_teacher(:active_all => true)
     @copy_to = @course
     @template.add_child_course!(@copy_to)
-    @assmt_copy = @copy_to.assignments.new(:title => "blah", :description => "bloo") # just create a copy directly instead of doing a real migration
+    # just create a copy directly instead of doing a real migration
+    @assmt_copy = @copy_to.assignments.new(
+      :title => "blah", :description => "bloo", :points_possible => 27, :due_at => due_date
+    )
     @assmt_copy.migration_id = @tag.migration_id
     @assmt_copy.save!
   end
@@ -28,7 +34,7 @@ describe "master courses - child courses - assignment locking" do
 
     get "/courses/#{@copy_to.id}/assignments"
 
-    expect(f('.master-course-cell')).to contain_css('.icon-lock')
+    expect(f("#assignment_#{@assmt_copy.id}")).to contain_css('.icon-lock')
 
     f('.al-trigger').click
     expect(f('.assignment')).to contain_css('a.delete_assignment.disabled')
@@ -37,10 +43,10 @@ describe "master courses - child courses - assignment locking" do
   it "should show the delete cog-menu option on the index when not locked" do
     get "/courses/#{@copy_to.id}/assignments"
 
-    expect(f('.master-course-cell')).to contain_css('.icon-unlock')
+    expect(f("#assignment_#{@assmt_copy.id}")).to contain_css('.icon-unlock')
 
     f('.al-trigger').click
-    expect(f('.assignment')).to_not contain_css('a.delete_assignment.disabled')
+    expect(f('.assignment')).not_to contain_css('a.delete_assignment.disabled')
     expect(f('.assignment')).to contain_css('a.delete_assignment')
   end
 
@@ -57,7 +63,34 @@ describe "master courses - child courses - assignment locking" do
     get "/courses/#{@copy_to.id}/assignments/#{@assmt_copy.id}/edit"
 
     f('.al-trigger').click
-    expect(f('#edit_assignment_header')).to_not contain_css('a.delete_assignment_link.disabled')
+    expect(f('#edit_assignment_header')).not_to contain_css('a.delete_assignment_link.disabled')
     expect(f('#edit_assignment_header')).to contain_css('a.delete_assignment_link')
+  end
+
+  it "should not allow editing of restricted items" do
+    # restrict everything
+    @tag.update_attribute(:restrictions, {:content => true, :points => true, :due_dates => true, :availability_dates => true})
+
+    get "/courses/#{@copy_to.id}/assignments/#{@assmt_copy.id}/edit"
+
+    expect(f("#assignment_name").tag_name).to eq 'h1'
+    expect(f("#assignment_description").tag_name).to eq 'div'
+    expect(f("#assignment_points_possible").attribute("readonly")).to eq "true"
+    expect(f("#due_at").attribute("readonly")).to eq "true"
+    expect(f("#unlock_at").attribute("readonly")).to eq "true"
+    expect(f("#lock_at").attribute("readonly")).to eq "true"
+  end
+
+  it "should not allow popup editing of restricted items" do
+    # restrict everything
+    @tag.update_attribute(:restrictions, {:content => true, :points => true, :due_dates => true, :availability_dates => true})
+
+    get "/courses/#{@copy_to.id}/assignments"
+
+    hover_and_click(".edit_assignment")
+    expect(f('.ui-dialog-titlebar .ui-dialog-title').text).to eq "Edit Assignment"
+    expect(f("#assign_#{@assmt_copy.id}_assignment_name").tag_name).to eq "h3"
+    expect(f("#assign_#{@assmt_copy.id}_assignment_due_at").attribute("readonly")).to eq "true"
+    expect(f("#assign_#{@assmt_copy.id}_assignment_points").attribute("readonly")).to eq "true"
   end
 end

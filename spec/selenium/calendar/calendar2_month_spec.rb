@@ -433,7 +433,7 @@ describe "calendar2" do
         quick_jump_to_date(date_due.strftime '%Y-%m-%d')
 
         # verify assignment has line-through
-        expect(find('.fc-title').css_value('text-decoration')).to eql('line-through')
+        expect(find('.fc-title').css_value('text-decoration')).to include('line-through')
       end
 
       it "should strikethrough past due graded discussion", priority: "1", test_id: 518371 do
@@ -447,7 +447,7 @@ describe "calendar2" do
         quick_jump_to_date(date_due.strftime '%Y-%m-%d')
 
         # verify discussion has line-through
-        expect(find('.fc-title').css_value('text-decoration')).to eql('line-through')
+        expect(find('.fc-title').css_value('text-decoration')).to include('line-through')
       end
     end
   end
@@ -479,7 +479,7 @@ describe "calendar2" do
         quick_jump_to_date(date_due.strftime '%Y-%m-%d')
 
         # verify assignment has line-through
-        expect(find('.fc-title').css_value('text-decoration')).to eql('line-through')
+        expect(find('.fc-title').css_value('text-decoration')).to include('line-through')
       end
 
       it "should strikethrough completed graded discussion", priority: "1", test_id: 518373 do
@@ -502,7 +502,7 @@ describe "calendar2" do
         quick_jump_to_date(date_due.strftime '%Y-%m-%d')
 
         # verify discussion has line-through
-        expect(find('.fc-title').css_value('text-decoration')).to eql('line-through')
+        expect(find('.fc-title').css_value('text-decoration')).to include('line-through')
       end
 
       it "should load events from adjacent months correctly" do

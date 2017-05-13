@@ -1,8 +1,8 @@
 <div class="ic-Form-control">
-  <%= f.label :client_id, 'Client ID', class: 'ic-Label' %>
-  <%= f.text_field :client_id, class: 'ic-Input' %>
+  <%= f.label :client_id, 'Client ID', class: 'ic-Label', for: "client_id_#{presenter.id_suffix(aac)}" %>
+  <%= f.text_field :client_id, class: 'ic-Input', id: "client_id_#{presenter.id_suffix(aac)}" %>
 </div>
 <div class="ic-Form-control">
-  <%= f.label :client_secret, 'Client Secret', class: 'ic-Label' %>
-  <%= f.password_field :client_secret, class: 'ic-Input' %>
+  <%= f.label :client_secret, 'Client Secret', class: 'ic-Label', for: "client_secret_#{presenter.id_suffix(aac)}" %>
+  <%= f.password_field :client_secret, class: 'ic-Input', id: "client_secret_#{presenter.id_suffix(aac)}" %>
 </div>

@@ -278,7 +278,7 @@ class Attachment < ActiveRecord::Base
     if context.respond_to?(:log_merge_result)
       context.log_merge_result("File \"#{dup.folder && dup.folder.full_name}/#{dup.display_name}\" created")
     end
-    if context.respond_to?(:root_account_id) && self.namespace != context.root_account.file_namespace
+    if Attachment.s3_storage? && context.respond_to?(:root_account_id) && self.namespace != context.root_account.file_namespace
       dup.save_without_broadcasting!
       dup.make_rootless
       dup.change_namespace(context.root_account.file_namespace)
@@ -660,7 +660,7 @@ class Attachment < ActiveRecord::Base
     end
 
     if method == :overwrite
-      atts = self.shard.activate { self.folder.active_file_attachments.where("display_name=? AND id<>?", self.display_name, self.id) }
+      atts = self.shard.activate { self.folder.active_file_attachments.where("display_name=? AND id<>?", self.display_name, self.id).to_a }
       method = :rename if atts.any? { |att| att.editing_restricted?(:any) }
     end
 
@@ -684,9 +684,9 @@ class Attachment < ActiveRecord::Base
           end
         end
       end
-    elsif method == :overwrite
-      atts.update_all(replacement_attachment_id: self.id) # so we can find the new file in content links
-      copy_access_attributes!(atts) unless atts.empty?
+    elsif method == :overwrite && atts.any?
+      Attachment.where(:id => atts).update_all(replacement_attachment_id: self.id) # so we can find the new file in content links
+      copy_access_attributes!(atts)
       atts.each do |a|
         # update content tags to refer to the new file
         ContentTag.where(:content_id => a, :content_type => 'Attachment').update_all(content_id: self.id)
@@ -1270,7 +1270,7 @@ class Attachment < ActiveRecord::Base
         s3object.copy_to(destination.s3object)
       end
     else
-      return if open == destination.open
+      return if destination.store.exists? && open == destination.open
       old_content_type = self.content_type
       Attachment.where(:id => self).update_all(:content_type => "invalid/invalid") # prevents find_existing_attachment_for_md5 from reattaching the child to the old root
       destination.uploaded_data = open

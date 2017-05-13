@@ -1,9 +1,9 @@
 import React from 'react'
 import I18n from 'i18n!outcomes'
-import Button from 'instructure-ui/Button'
-import Modal, { ModalHeader, ModalBody, ModalFooter } from 'instructure-ui/Modal'
-import Heading from 'instructure-ui/Heading'
-import Typography from 'instructure-ui/Typography'
+import Button from 'instructure-ui/lib/components/Button'
+import Modal, { ModalHeader, ModalBody, ModalFooter } from 'instructure-ui/lib/components/Modal'
+import Heading from 'instructure-ui/lib/components/Heading'
+import Typography from 'instructure-ui/lib/components/Typography'
 
 export default React.createClass({
     proptypes: {
@@ -25,7 +25,6 @@ export default React.createClass({
           size="auto"
           label={I18n.t("Modal Dialog: Add to course")}
           closeButtonLabel={I18n.t("Close")}
-          zIndex="9999"
           ref={this._saveModal}
           onEntering={this._fixFocus}
           onClose={this.props.onClose}

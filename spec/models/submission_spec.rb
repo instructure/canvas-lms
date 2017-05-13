@@ -458,6 +458,21 @@ describe Submission do
         expect(@user.stream_item_instances.last).to be_hidden
       end
 
+      it "should show hidden stream_item_instances when unmuted" do
+        submission_spec_model
+        @cc = @user.communication_channels.create :path => "somewhere"
+        @assignment.mute!
+        expect {
+          @assignment.update_submission(@student, :author => @teacher, :comment => "some comment")
+        }.to change StreamItemInstance, :count
+        expect(@submission.submission_comments.last).to be_hidden
+        expect(@user.stream_item_instances.last).to be_hidden
+        @assignment.unmute!
+        expect(@submission.submission_comments.last).to_not be_hidden
+        expect(@submission.reload.submission_comments_count).to eq 1
+        expect(@user.stream_item_instances.last).to_not be_hidden
+      end
+
       it "should not create hidden stream_item_instances for instructors when muted, graded, and published" do
         submission_spec_model
         @cc = @teacher.communication_channels.create :path => "somewhere"

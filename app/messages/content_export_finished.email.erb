@@ -1,5 +1,12 @@
 <% define_content :link do %>
-  <%= asset.epub_export ? epub_exports_url : polymorphic_url([asset.context, :content_exports]) %>
+  <% link = if asset.is_a? WebZipExport %>
+      <% course_offline_web_exports_path(asset.course) %>
+    <% elsif asset.is_a? EpubExport %>
+      <% epub_exports_url %>
+    <% else %>
+      <% polymorphic_url([asset.context, :content_exports]) %>
+    <% end %>
+  <%= link %>
 <% end %>
 
 <% define_content :subject do %>

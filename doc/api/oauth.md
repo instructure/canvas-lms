@@ -118,7 +118,7 @@ and secret in the Site Admin account of your Canvas install.
 A basic request looks like:
 
 <div class="method_details">
-<h3 class="endpoint">GET https://&lt;canvas-install-url&gt;/login/oauth2/auth?client_id=XXX&response_type=code&redirect_uri=https://example.com/oauth_complete&state=YYY</h3>
+<h3 class="endpoint">GET https://&lt;canvas-install-url&gt;/login/oauth2/auth?client_id=XXX&response_type=code&state=YYY&redirect_uri=https://example.com/oauth_complete</h3>
 </div>
 
 See [GET login/oauth2/auth](file.oauth_endpoints.html#get-login-oauth2-auth) for details.

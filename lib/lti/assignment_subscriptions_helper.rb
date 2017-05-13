@@ -63,7 +63,7 @@ module Lti
     end
 
     def format
-      'caliper'
+      'live-event'
     end
 
     def transport_type

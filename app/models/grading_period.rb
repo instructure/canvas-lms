@@ -171,6 +171,7 @@ class GradingPeriod < ActiveRecord::Base
     scores.find_ids_in_ranges do |min_id, max_id|
       scores.where(id: min_id..max_id).update_all(workflow_state: :deleted)
     end
+    recompute_scores if grading_period_group.weighted
   end
 
   def destroy_grading_period_set
@@ -238,24 +239,32 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   def recompute_scores
+    gp_id = time_boundaries_changed? ? id : nil
     if course_group?
-      courses = [grading_period_group.course]
+      recompute_score_for(grading_period_group.course, gp_id)
     else
-      term_ids = grading_period_group.enrollment_terms.pluck(:id)
-      courses = Course.active.where(enrollment_term_id: term_ids)
+      self.send_later_if_production(:recompute_scores_for_term_courses, gp_id) # there could be a lot of courses here
     end
+  end
 
-    courses.each do |course|
-      course.recompute_student_scores(
-        # different assignments could fall in this period if time
-        # boundaries changed so we need to recalculate scores.
-        # otherwise, weight must have changed, in which case we
-        # do not need to recompute the grading period scores (we
-        # only need to recompute the overall course score)
-        grading_period_id: time_boundaries_changed? ? id : nil,
-        update_all_grading_period_scores: false
-      )
+  def recompute_scores_for_term_courses(grading_period_id)
+    term_ids = grading_period_group.enrollment_terms.pluck(:id)
+    Course.active.where(enrollment_term_id: term_ids).find_in_batches do |courses|
+      courses.each do |course|
+        recompute_score_for(course, grading_period_id)
+      end
     end
+  end
+
+  def recompute_score_for(course, grading_period_id)
+    course.recompute_student_scores(
+      # different assignments could fall in this period if time
+      # boundaries changed so we need to recalculate scores.
+      # otherwise, weight must have changed, in which case we
+      # do not need to recompute the grading period scores (we
+      # only need to recompute the overall course score)
+      grading_period_id: grading_period_id,
+      update_all_grading_period_scores: false)
   end
 
   def weight_actually_changed?

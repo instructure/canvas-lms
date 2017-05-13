@@ -78,6 +78,28 @@ define [
     ok !!view.toJSON().lock_info?.unlock_at.match('Feb'), 'lock_info.unlock_at reformatted and represented in toJSON'
     clock.restore()
 
+  test 'useAsFrontPage for published wiki_pages_path', ->
+    model = new WikiPage
+      front_page: false
+      published: true
+    view = new WikiPageView
+      model: model
+    stub = @stub(model, 'setFrontPage')
+
+    view.useAsFrontPage()
+    ok stub.calledOnce
+
+  test 'useAsFrontPage should not work on unpublished wiki_pages_path', ->
+    model = new WikiPage
+      front_page: false
+      published: false
+    view = new WikiPageView
+      model: model
+    stub = @stub(model, 'setFrontPage')
+
+    view.useAsFrontPage()
+    notOk stub.calledOnce
+
   testRights = (subject, options) ->
     test "#{subject}", ->
       model = new WikiPage options.attributes, contextAssetString: options.contextAssetString

@@ -28,11 +28,8 @@ class AccountAuthorizationConfig::Microsoft < AccountAuthorizationConfig::OpenID
   end
 
   # Rename db fields
-  alias_method :application_id=, :client_id=
-  alias_method :application_id, :client_id
-
-  alias_method :application_secret=, :client_secret=
-  alias_method :application_secret, :client_secret
+  alias_attribute :application_id, :client_id
+  alias_attribute :application_secret, :client_secret
 
   def client_id
     self.class.globally_configured? ? application_id : super

@@ -1,6 +1,6 @@
 import React from 'react'
 import I18n from 'i18n!help_dialog'
-import Spinner from 'instructure-ui/Spinner'
+import Spinner from 'instructure-ui/lib/components/Spinner'
 
   const HelpLinks = React.createClass({
     propTypes: {

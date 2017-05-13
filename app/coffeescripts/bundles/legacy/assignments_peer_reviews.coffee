@@ -1,4 +1,4 @@
-require [
+define [
   "i18n!assignments.peer_reviews",
   "jquery",
   "jquery.ajaxJSON",

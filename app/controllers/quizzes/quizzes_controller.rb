@@ -109,7 +109,7 @@ class Quizzes::QuizzesController < ApplicationController
     due_date_required_for_account = AssignmentUtil.due_date_required_for_account?(@context)
     sis_integration_settings_enabled = AssignmentUtil.sis_integration_settings_enabled?(@context)
 
-    js_env({
+    hash = {
       :QUIZZES => {
         assignment: quizzes_json(assignment_quizzes, *serializer_options),
         open: quizzes_json(open_quizzes, *serializer_options),
@@ -136,7 +136,11 @@ class Quizzes::QuizzesController < ApplicationController
       :MAX_NAME_LENGTH => max_name_length,
       :DUE_DATE_REQUIRED_FOR_ACCOUNT => due_date_required_for_account,
       :SIS_INTEGRATION_SETTINGS_ENABLED => sis_integration_settings_enabled
-    })
+    }
+    if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :read)
+      hash[:COURSE_ID] = @context.id.to_s
+    end
+    js_env(hash)
 
     set_tutorial_js_env
 

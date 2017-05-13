@@ -19,6 +19,7 @@ module.exports = {
     "func-names": [0],
     "max-len": [1, {"code": 140}],
     "no-continue": [0],
+    "no-else-return": [0],
     "no-plusplus": [0],
     "no-underscore-dangle": [0],
     "no-unused-vars": [2, { "argsIgnorePattern": "^_"}],

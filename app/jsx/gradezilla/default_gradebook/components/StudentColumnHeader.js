@@ -17,20 +17,21 @@
  */
 
 import React from 'react'
-import IconMoreSolid from 'instructure-icons/react/Solid/IconMoreSolid'
-import { MenuItem, MenuItemGroup, MenuItemSeparator } from 'instructure-ui/Menu'
-import PopoverMenu from 'instructure-ui/PopoverMenu'
-import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
-import Typography from 'instructure-ui/Typography'
+import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid'
+import { MenuItem, MenuItemGroup, MenuItemSeparator } from 'instructure-ui/lib/components/Menu'
+import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
+import Typography from 'instructure-ui/lib/components/Typography'
 import StudentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/StudentRowHeaderConstants'
 import I18n from 'i18n!gradebook'
 
-const { bool, func, oneOf, shape, string } = React.PropTypes;
+const { arrayOf, bool, func, oneOf, shape, string } = React.PropTypes;
 
 export default class StudentColumnHeader extends React.Component {
   static propTypes = {
     selectedPrimaryInfo: oneOf(StudentRowHeaderConstants.primaryInfoKeys).isRequired,
     onSelectPrimaryInfo: func.isRequired,
+    loginHandleName: string,
+    sisName: string,
     selectedSecondaryInfo: oneOf(StudentRowHeaderConstants.secondaryInfoKeys).isRequired,
     sectionsEnabled: bool.isRequired,
     onSelectSecondaryInfo: func.isRequired,
@@ -42,6 +43,13 @@ export default class StudentColumnHeader extends React.Component {
       onSortBySortableNameDescending: func.isRequired,
       settingKey: string.isRequired
     }).isRequired,
+    selectedEnrollmentFilters: arrayOf(oneOf(StudentRowHeaderConstants.enrollmentFilterKeys)).isRequired,
+    onToggleEnrollmentFilter: func.isRequired
+  };
+
+  static defaultProps = {
+    loginHandleName: null,
+    sisName: null,
   };
 
   constructor (props) {
@@ -56,6 +64,9 @@ export default class StudentColumnHeader extends React.Component {
     this.onShowFirstLastNames = this.onSelectPrimaryInfo.bind(this, 'first_last');
     this.onShowLastFirstNames = this.onSelectPrimaryInfo.bind(this, 'last_first');
     this.onHideStudentNames = this.onSelectPrimaryInfo.bind(this, 'anonymous');
+
+    this.onToggleInactive = this.onToggleEnrollmentFilter.bind(this, 'inactive');
+    this.onToggleConcluded = this.onToggleEnrollmentFilter.bind(this, 'concluded');
   }
 
   onSelectSecondaryInfo (secondaryInfoKey) {
@@ -64,6 +75,10 @@ export default class StudentColumnHeader extends React.Component {
 
   onSelectPrimaryInfo (primaryInfoKey) {
     this.props.onSelectPrimaryInfo(primaryInfoKey);
+  }
+
+  onToggleEnrollmentFilter (enrollmentFilterKey) {
+    this.props.onToggleEnrollmentFilter(enrollmentFilterKey);
   }
 
   render () {
@@ -89,7 +104,7 @@ export default class StudentColumnHeader extends React.Component {
 
         <PopoverMenu
           contentRef={this.bindOptionsMenuContent}
-          zIndex="9999"
+          focusTriggerOnClose={false}
           trigger={
             <span className="Gradebook__ColumnHeaderAction">
               <Typography weight="bold" fontStyle="normal" size="large" color="brand">
@@ -161,7 +176,7 @@ export default class StudentColumnHeader extends React.Component {
               selected={this.props.selectedSecondaryInfo === 'sis_id'}
               onSelect={this.onShowSisId}
             >
-              {StudentRowHeaderConstants.secondaryInfoLabels.sis_id}
+              {this.props.sisName || StudentRowHeaderConstants.secondaryInfoLabels.sis_id}
             </MenuItem>
 
             <MenuItem
@@ -170,7 +185,7 @@ export default class StudentColumnHeader extends React.Component {
               selected={this.props.selectedSecondaryInfo === 'login_id'}
               onSelect={this.onShowLoginId}
             >
-              {StudentRowHeaderConstants.secondaryInfoLabels.login_id}
+              {this.props.loginHandleName || StudentRowHeaderConstants.secondaryInfoLabels.login_id}
             </MenuItem>
 
             <MenuItem
@@ -180,6 +195,28 @@ export default class StudentColumnHeader extends React.Component {
               onSelect={this.onHideSecondaryInfo}
             >
               {StudentRowHeaderConstants.secondaryInfoLabels.none}
+            </MenuItem>
+          </MenuItemGroup>
+
+          <MenuItemSeparator />
+
+          <MenuItemGroup label={I18n.t('Show')} data-menu-item-group-id="enrollment-filter" allowMultiple>
+            <MenuItem
+              key="inactive"
+              data-menu-item-id="inactive"
+              selected={this.props.selectedEnrollmentFilters.includes('inactive')}
+              onSelect={this.onToggleInactive}
+            >
+              {StudentRowHeaderConstants.enrollmentFilterLabels.inactive}
+            </MenuItem>
+
+            <MenuItem
+              key="concluded"
+              data-menu-item-id="concluded"
+              selected={this.props.selectedEnrollmentFilters.includes('concluded')}
+              onSelect={this.onToggleConcluded}
+            >
+              {StudentRowHeaderConstants.enrollmentFilterLabels.concluded}
             </MenuItem>
           </MenuItemGroup>
         </PopoverMenu>

@@ -2,15 +2,17 @@ define [
   'i18n!discussion_topics'
   'Backbone'
   'jquery'
-  'underscore'
+  'compiled/views/LockIconView',
   'jst/DiscussionTopics/SummaryView'
   'jst/_avatar'
-], (I18n, Backbone, $, _, template) ->
+], (I18n, Backbone, $, LockIconView, template) ->
 
   class DiscussionTopicSummaryView extends Backbone.View
 
     tagName: 'li'
     template: template
+
+    @child 'lockIconView', '[data-view=lock-icon]'
 
     attributes: ->
       'class': "discussion-topic #{@model.get('read_state')} #{if @model.selected then 'selected' else '' }"
@@ -33,6 +35,16 @@ define [
       deleteFail: I18n.t('flash.fail', 'Announcement deletion failed.')
 
     initialize: ->
+      @lockIconView = false
+      if ENV.permissions.manage_content
+        @lockIconView = new LockIconView({
+          model: @model,
+          unlockedText: I18n.t("%{name} is unlocked. Click to lock.", name: @model.get('title')),
+          lockedText: I18n.t("%{name} is locked. Click to unlock", name: @model.get('title')),
+          course_id: ENV.COURSE_ID,
+          content_id: @model.get('id'),
+          content_type: 'discussion_topic'
+        })
       super
       @model.on 'change reset', @render, this
       @model.on 'destroy', @remove, this
@@ -40,8 +52,8 @@ define [
 
     toJSON: ->
       json = super
-      _.extend json,
-        permissions: _.extend @options.permissions, json.permissions
+      Object.assign json,
+        permissions: Object.assign @options.permissions, json.permissions
         selected: @model.selected
         unread_count_tooltip: (I18n.t 'unread_count_tooltip', {
           zero: 'No unread replies.'

@@ -56,6 +56,7 @@
 
   content_for :head, include_common_stylesheets
 
+  load_master_course_sidebar
 -%>
 <%= render :partial => "layouts/head" %>
 <body class="<%= (@body_classes).uniq.join(" ") %>">
@@ -198,7 +199,6 @@
     <div class="NewUserTutorialTray__Container"></div>
   <% end %>
   <%= render :partial => 'layouts/foot', :locals => { :include_common_bundle => true } %>
-
 </div> <!-- #application -->
 </body>
 </html>

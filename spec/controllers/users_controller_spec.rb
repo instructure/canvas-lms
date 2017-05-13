@@ -519,6 +519,12 @@ describe UsersController do
           expect(p.user).to be_pre_registered
         end
 
+        it "should create users with non-email pseudonyms and an email" do
+          post 'create', format: 'json', account_id: account.id, pseudonym: { unique_id: 'testid', path: 'testemail@example.com' }, user: { name: 'test' }
+          expect(response).to be_success
+          p = Pseudonym.where(unique_id: 'testid').first
+          expect(p.user.email).to eq "testemail@example.com"
+        end
 
         it "should not require acceptance of the terms" do
           post 'create', :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }
@@ -1334,6 +1340,22 @@ describe UsersController do
       post :toggle_recent_activity_dashboard
 
       expect(@user.reload.preferences[:recent_activity_dashboard]).to be_truthy
+      expect(response).to be_success
+      expect(JSON.parse(response.body)).to be_empty
+    end
+  end
+
+  describe '#toggle_hide_dashcard_color_overlays' do
+    it 'updates user preference based on value provided' do
+      course_factory
+      user_factory(active_all: true)
+      user_session(@user)
+
+      expect(@user.preferences[:hide_dashcard_color_overlays]).to be_falsy
+
+      post :toggle_hide_dashcard_color_overlays
+
+      expect(@user.reload.preferences[:hide_dashcard_color_overlays]).to be_truthy
       expect(response).to be_success
       expect(JSON.parse(response.body)).to be_empty
     end

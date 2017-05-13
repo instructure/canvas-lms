@@ -1,7 +1,14 @@
 import React from 'react'
 import I18n from 'i18n!custom_help_link'
+import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu';
+import MenuItem from 'instructure-ui/lib/components/Menu/MenuItem';
+import MenuItemGroup from 'instructure-ui/lib/components/Menu/MenuItemGroup';
+import Button from 'instructure-ui/lib/components/Button';
+import AccessibleContent from 'instructure-ui/lib/components/AccessibleContent';
+import IconPlusLine from 'instructure-icons/lib/Line/IconPlusLine';
 import CustomHelpLinkPropTypes from './CustomHelpLinkPropTypes'
 import CustomHelpLinkConstants from './CustomHelpLinkConstants'
+
   const CustomHelpLinkMenu = React.createClass({
     propTypes: {
       links: React.PropTypes.arrayOf(CustomHelpLinkPropTypes.link).isRequired,
@@ -23,62 +30,52 @@ import CustomHelpLinkConstants from './CustomHelpLinkConstants'
     focusable () {
       return this.refs.addButton;
     },
+
+    handleAddLinkSelection (e, selected) {
+      const item = selected[0];
+      if (item === 'add_custom_link') {
+        this.handleChange(e, { ...CustomHelpLinkConstants.DEFAULT_LINK });
+      } else {
+        this.handleChange(e, this.props.links.filter(l => l.text === item)[0]);
+      }
+    },
+
     render () {
       return (
-        <div className="al-dropdown__container">
-          <button
-            ref="addButton"
-            type="button"
-            className="Button al-trigger"
-            title={ I18n.t('Add link') }
-            aria-label={ I18n.t('Add link') }
-            aria-haspopup="true"
+        <div className="HelpMenuOptions__Container">
+          <PopoverMenu
+            trigger={
+              <Button>
+                <AccessibleContent alt={I18n.t('Add Link')}>
+                  <IconPlusLine className="HelpMenuOptions__ButtonIcon" />
+                  &nbsp; {I18n.t('Link')}
+                </AccessibleContent>
+              </Button>
+            }
           >
-            <i className="icon-plus" aria-hidden="true"></i>
-            &nbsp;
-            { I18n.t('Link') }
-          </button>
-          <ul
-            className="al-options"
-            role="menu"
-            tabIndex="0"
-            aria-hidden="true"
-            aria-expanded="false"
-            aria-labelledby="CustomHelpLinkMenu__helpText"
-          >
-            <li role="presentation"
-              className="ui-menu-item ui-menu-item--helper-text"
+            <MenuItemGroup
+              label={I18n.t('Add help menu links')}
+              onSelect={this.handleAddLinkSelection}
             >
-              { I18n.t('Add help menu links') }
-            </li>
-            <li role="presentation">
-              <a href="#"
-                tabIndex="-1"
-                role="menuitem"
-                onClick={(e) => this.handleChange(e, { ...CustomHelpLinkConstants.DEFAULT_LINK })}
+              <MenuItem
+                key="add_custom_link"
+                value="add_custom_link"
               >
                 { I18n.t('Add Custom Link') }
-              </a>
-            </li>
+              </MenuItem>
               {
-                this.props.links.map((link, index) => {
-                  return (
-                    <li role="presentation" key={index}>
-                      <a href="#"
-                        tabIndex="-1"
-                        role="menuitem"
-                        onClick={(e) => this.handleChange(e, link)}
-                        aria-disabled={link.is_disabled ? true : null}
-                        className={link.is_disabled ? 'disabled' : null}
-                      >
-                        { link.text }
-                      </a>
-                    </li>
-                  )
-                })
-              }
-
-          </ul>
+                this.props.links.map(link => (
+                  <MenuItem
+                    key={link.text}
+                    value={link.text}
+                    disabled={link.is_disabled}
+                  >
+                    {link.text}
+                  </MenuItem>
+                )
+              )}
+            </MenuItemGroup>
+          </PopoverMenu>
         </div>
       )
     }

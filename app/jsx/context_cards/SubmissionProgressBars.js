@@ -1,7 +1,11 @@
 import React from 'react'
 import I18n from 'i18n!student_context_tray'
 import classnames from 'classnames'
-import { Heading, Progress, Tooltip, Typography, Link } from 'instructure-ui'
+import Heading from 'instructure-ui/lib/components/Heading'
+import Progress from 'instructure-ui/lib/components/Progress'
+import Tooltip from 'instructure-ui/lib/components/Tooltip'
+import Typography from 'instructure-ui/lib/components/Typography'
+import Link from 'instructure-ui/lib/components/Link'
 
   class SubmissionProgressBars extends React.Component {
     static propTypes = {

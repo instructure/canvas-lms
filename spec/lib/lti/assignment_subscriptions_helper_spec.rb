@@ -55,8 +55,8 @@ describe Lti::AssignmentSubscriptionsHelper do
       expect(subscription_helper.assignment_subscription(@assignment.id)[:EventTypes]).to match_array event_types
     end
 
-    it 'uses the caliper format' do
-      expect(subscription_helper.assignment_subscription(@assignment.id)[:Format]).to eq 'caliper'
+    it 'uses the live-event format' do
+      expect(subscription_helper.assignment_subscription(@assignment.id)[:Format]).to eq 'live-event'
     end
 
     it 'uses the https transport type' do

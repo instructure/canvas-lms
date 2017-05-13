@@ -3,23 +3,27 @@ module AddressBook
   # implementation of AddressBook interface backed by MessageableUser
   class MessageableUser < AddressBook::Base
     def known_users(users, options={})
-      # in case we were handed something that's already a messageable user,
-      # pass it in as just the id so we don't modify it in place
-      # (MessageableUser was original built to want that optimization, but
-      # now we don't)
-      users = users.map(&:id) if users.first.is_a?(::MessageableUser)
-      known_users = @sender.load_messageable_users(users,
-        admin_context: options[:include_context],
-        conversation_id: options[:conversation_id])
+      if options[:context]
+        user_ids = users.map{ |user| Shard.global_id_for(user) }.to_set
+        asset_string = options[:context].respond_to?(:asset_string) ? options[:context].asset_string : options[:context]
+        known_users = @sender.messageable_user_calculator.
+          messageable_users_in_context(asset_string, admin_context: admin_context?(options[:context])).
+          select{ |user| user_ids.include?(user.global_id) }
+      else
+        # in case we were handed something that's already a messageable user,
+        # pass it in as just the id so we don't modify it in place
+        # (MessageableUser was original built to want that optimization, but
+        # now we don't)
+        users = users.map(&:id) if users.first.is_a?(::MessageableUser)
+        known_users = @sender.load_messageable_users(users, conversation_id: options[:conversation_id])
+      end
       known_users.each{ |user| @cache.store(user, user.common_courses, user.common_groups) }
       known_users
     end
 
-    def known_in_context(context, is_admin=false)
-      admin_context = context if is_admin
-      known_users = @sender.
-        messageable_user_calculator.
-        messageable_users_in_context(context, admin_context: admin_context)
+    def known_in_context(context)
+      asset_string = context.respond_to?(:asset_string) ? context.asset_string : context
+      known_users = @sender.messageable_users_in_context(asset_string)
       known_users.each{ |user| @cache.store(user, user.common_courses, user.common_groups) }
       known_users
     end
@@ -61,11 +65,12 @@ module AddressBook
     end
 
     def search_users(options={})
+      asset_string = options[:context].respond_to?(:asset_string) ? options[:context].asset_string : options[:context]
       collection = @sender.search_messageable_users(
         search: options[:search],
         exclude_ids: options[:exclude_ids],
-        context: options[:context],
-        admin_context: options[:context] && options[:is_admin],
+        context: asset_string,
+        admin_context: admin_context?(options[:context]),
         strict_checks: !options[:weak_checks]
       )
       Collection.new(collection, @cache)

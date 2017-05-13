@@ -3,10 +3,8 @@ import $ from 'jquery'
 import _ from 'underscore'
 import I18n from 'i18n!common'
 import Backbone from 'Backbone'
-import helpDialog from 'compiled/helpDialog'
 import updateSubnavMenuToggle from 'jsx/subnav_menu/updateSubnavMenuToggle'
-import initializeNewUserTutorials from 'jsx/new_user_tutorial/initializeNewUserTutorials'
-import ApplyTheme from 'instructure-ui/ApplyTheme'
+import splitAssetString from 'compiled/str/splitAssetString'
 
 // modules that do their own thing on every page that simply need to be required
 import 'translations/_core_en'
@@ -29,7 +27,7 @@ import 'compiled/behaviors/instructure_inline_media_comment'
 import 'compiled/behaviors/ping'
 import 'LtiThumbnailLauncher'
 import 'compiled/badge_counts'
-import 'instructure-ui-themes/canvas'
+import 'instructure-ui/lib/themes/canvas'
 
 // Other stuff several bundles use.
 // If any of these really arn't used on most pages,
@@ -42,10 +40,13 @@ import 'jqueryui/tabs'
 import 'compiled/registration/incompleteRegistrationWarning'
 import 'moment'
 
-
-helpDialog.initTriggers()
-
-initializeNewUserTutorials()
+$('.help_dialog_trigger').click((event) => {
+  event.preventDefault()
+  require.ensure([], (require) => {
+    const helpDialog = require('compiled/helpDialog')
+    helpDialog.open()
+  }, 'helpDialogAsyncChunk')
+})
 
 $('#skip_navigation_link').on('click', function (event) {
   // preventDefault so we dont change the hash
@@ -85,3 +86,14 @@ $('body').on('click', '[data-pushstate]', function (event) {
   event.preventDefault()
   Backbone.history.navigate($(this).attr('href'), true)
 })
+
+if (
+  window.ENV.NEW_USER_TUTORIALS &&
+  window.ENV.NEW_USER_TUTORIALS.is_enabled &&
+  (window.ENV.context_asset_string && (splitAssetString(window.ENV.context_asset_string)[0] === 'courses'))
+) {
+  require.ensure([], (require) => {
+    const initializeNewUserTutorials = require('jsx/new_user_tutorial/initializeNewUserTutorials')
+    initializeNewUserTutorials()
+  }, 'NewUserTutorialsAsyncChunk')
+}

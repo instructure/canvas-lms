@@ -1,4 +1,4 @@
-require([ 'jquery', 'canvas_quizzes/apps/statistics' ], function($, app) {
+define([ 'jquery', 'canvas_quizzes/apps/statistics' ], function($, app) {
   app.configure({
     ajax: $.ajax,
     loadOnStartup: true,

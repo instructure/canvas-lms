@@ -154,7 +154,7 @@ describe 'Theme Editor' do
   end
 
   it 'should have validation for every text field', priority: "2", test_id: 241992 do
-    skip_if_firefox('Broken after upgrade to webdriver 2.53 - seems to be a timing issue on jenkins, passes locally')
+    skip('Broken after upgrade to webdriver 2.53 - seems to be a timing issue on jenkins, passes locally')
     open_theme_editor(Account.default.id)
 
     # input invalid text into every text field

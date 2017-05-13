@@ -194,20 +194,4 @@ describe "External Tools" do
       expect(menu_link2.text).to match_ignoring_whitespace(@member_tool.label_for(:global_navigation))
     end
   end
-
-  it "should include the apps tab on account settings even without account settings management rights" do
-    account_admin_user_with_role_changes(:role_changes => {:manage_account_settings => false})
-    user_session(@admin)
-
-    get "/accounts/#{Account.default.id}/settings"
-    expect(response.body).to include("tab-tools-link")
-  end
-
-  it "should not include the apps tab on account settings without lti rights" do
-    account_admin_user_with_role_changes(:role_changes => {:lti_add_edit => false})
-    user_session(@admin)
-
-    get "/accounts/#{Account.default.id}/settings"
-    expect(response.body).to_not include("tab-tools-link")
-  end
 end

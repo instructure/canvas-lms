@@ -794,6 +794,7 @@ ActiveRecord::Relation.class_eval do
     values = Array(args.first.last)
     original_length = values.length
     values = values.compact
+    raise ArgumentError, "need to call polymorphic_where with at least one object" if values.empty?
 
     sql = (["(#{column}_id=? AND #{column}_type=?)"] * values.length).join(" OR ")
     sql << " OR (#{column}_id IS NULL AND #{column}_type IS NULL)" if values.length < original_length
@@ -1367,3 +1368,22 @@ module ReadonlyCloning
   end
 end
 ActiveRecord::Base.prepend(ReadonlyCloning)
+
+if CANVAS_RAILS4_2
+  # https://github.com/rails/rails/commit/696f1766148453160e1f6f21e4d7d7aac1356c7d
+  # the fix was backported into rails 5-0-stable
+  module DecimalCastRescueRuby24
+    def cast_value(value)
+      if value.is_a?(::String)
+        begin
+          super(value)
+        rescue ArgumentError
+          BigDecimal(0)
+        end
+      else
+        super(value)
+      end
+    end
+  end
+  ActiveRecord::Type::Decimal.prepend DecimalCastRescueRuby24
+end

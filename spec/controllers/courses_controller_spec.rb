@@ -185,6 +185,29 @@ describe CoursesController do
         expect(assigns[:future_enrollments]).to be_empty
       end
 
+      it "should do other terrible date logic based on sections" do
+        @student = user_factory
+
+        # section date in past
+        course1 = Account.default.courses.create! start_at: 2.months.ago, conclude_at: 1.month.from_now
+        course1.default_section.update_attributes(:end_at => 1.month.ago)
+        course1.offer!
+        enrollment1 = course_with_student course: course1, user: @student, active_all: true
+
+        # by section date, in future
+        course2 = Account.default.courses.create! start_at: 2.months.ago, conclude_at: 1.month.ago
+        course2.default_section.update_attributes(:end_at => 1.month.from_now)
+        course2.offer!
+        enrollment2 = course_with_student course: course2, user: @student, active_all: true
+
+        user_session(@student)
+        get 'index'
+        expect(response).to be_success
+        expect(assigns[:past_enrollments]).to eq [enrollment1]
+        expect(assigns[:current_enrollments]).to eq [enrollment2]
+        expect(assigns[:future_enrollments]).to be_empty
+      end
+
       it "should not include 'invited' enrollments whose term is past" do
         @student = user_factory
 
@@ -2176,6 +2199,7 @@ describe CoursesController do
       assignment.grade_student test_student, { :grade => 1, :grader => @teacher, :provisional => true }
       file = assignment.attachments.create! uploaded_data: default_uploaded_data
       assignment.submissions.first.add_comment(commenter: @teacher, message: 'blah', provisional: true, attachments: [file])
+      assignment.moderated_grading_selections.create!(:student => test_student, :provisional_grade => ModeratedGrading::ProvisionalGrade.last)
 
       expect(test_student.submissions.size).not_to be_zero
       delete 'reset_test_student', course_id: @course.id

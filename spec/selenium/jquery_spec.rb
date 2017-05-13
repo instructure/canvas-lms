@@ -7,6 +7,7 @@ describe "jquery" do
   # jquery keeps breaking attr() ... see http://bugs.jquery.com/ticket/10278
   # should be fixed in 1.7 (or 1.6.5?)
   it "should return the correct value for attr" do
+    skip_if_chrome('Fragile in chrome')
     get('/login')
     driver.execute_script("$(document.body).append('<input type=\"checkbox\" checked=\"checked\" id=\"checkbox_test\">')")
 

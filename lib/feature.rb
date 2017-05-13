@@ -224,6 +224,15 @@ END
       root_opt_in: true,
       beta: true
     },
+    'duplicate_objects' =>
+    {
+      display_name: -> { I18n.t('Duplicate Objects') },
+      description: -> { I18n.t("Allows the duplicating of objects in Canvas") },
+      applies_to: 'Account',
+      state: 'hidden',
+      root_opt_in: true,
+      beta: true
+    },
     'allow_opt_out_of_inbox' =>
     {
       display_name: -> { I18n.t('features.allow_opt_out_of_inbox', "Allow Users to Opt-out of the Inbox") },
@@ -509,16 +518,18 @@ END
       display_name: -> { I18n.t('Modules Home Page') },
       description: -> { I18n.t('Default to modules for the course home page') },
       applies_to: "RootAccount",
-      state: "allowed",
-      beta: true
+      state: "hidden",
+      beta: true,
+      development: true,
     },
     'new_user_tutorial' =>
     {
       display_name: -> { I18n.t('New User Tutorial')},
       description: -> { I18n.t('Provide tutorial information for new users in a flyout tray.')},
       applies_to: "RootAccount",
-      state: "allowed",
-      beta: true
+      state: "hidden",
+      beta: true,
+      development: true
     },
     'student_planner' =>
     {
@@ -527,7 +538,7 @@ END
       applies_to: "RootAccount",
       state: "hidden",
       beta: true,
-      development: true,
+      development: true
     },
     'quizzes2_exporter' =>
     {

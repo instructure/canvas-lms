@@ -144,6 +144,7 @@ define([
       range: 0,
       student: null,
     },
+    showDetails: true,
     isStudentDetailsLoading: false,
 
     // actions

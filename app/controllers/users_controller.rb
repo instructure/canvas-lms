@@ -158,8 +158,9 @@ class UsersController < ApplicationController
 
   before_action :require_user, :only => [:grades, :merge, :kaltura_session,
     :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image,
-    :user_dashboard, :toggle_recent_activity_dashboard, :masquerade, :external_tool,
-    :dashboard_sidebar, :settings, :activity_stream, :activity_stream_summary]
+    :user_dashboard, :toggle_recent_activity_dashboard, :toggle_hide_dashcard_color_overlays,
+    :masquerade, :external_tool, :dashboard_sidebar, :settings, :activity_stream,
+    :activity_stream_summary]
   before_action :require_registered_user, :only => [:delete_user_service,
     :create_user_service]
   before_action :reject_student_view_student, :only => [:delete_user_service,
@@ -375,8 +376,8 @@ class UsersController < ApplicationController
   #   Note that the API will prefer matching on canonical user ID if the ID has
   #   a numeric form. It will only search against other fields if non-numeric
   #   in form, or if the numeric value doesn't yield any matches. Queries by
-  #   administrative users will search on SIS ID, name, or email address; non-
-  #   administrative queries will only be compared against name.
+  #   administrative users will search on SIS ID, login ID, name, or email
+  #   address; non-administrative queries will only be compared against name.
   #
   #  @example_request
   #    curl https://<canvas>/api/v1/accounts/self/users?search_term=<search value> \
@@ -484,6 +485,7 @@ class UsersController < ApplicationController
       :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url,
       :PREFERENCES => {
         :recent_activity_dashboard => @current_user.preferences[:recent_activity_dashboard],
+        :hide_dashcard_color_overlays => @current_user.preferences[:hide_dashcard_color_overlays],
         :custom_colors => @current_user.custom_colors,
         :show_planner => show_planner?
       },
@@ -540,6 +542,13 @@ class UsersController < ApplicationController
   def toggle_recent_activity_dashboard
     @current_user.preferences[:recent_activity_dashboard] =
       !@current_user.preferences[:recent_activity_dashboard]
+    @current_user.save!
+    render json: {}
+  end
+
+  def toggle_hide_dashcard_color_overlays
+    @current_user.preferences[:hide_dashcard_color_overlays] =
+      !@current_user.preferences[:hide_dashcard_color_overlays]
     @current_user.save!
     render json: {}
   end
@@ -786,7 +795,7 @@ class UsersController < ApplicationController
     }
     if Array(params[:include]).include? 'ungraded_quizzes'
       submitting += @current_user.ungraded_quizzes_needing_submitting.map { |q| todo_item_json(q, @current_user, session, 'submitting') }
-      submitting.sort_by! { |j| (j[:assignment] || j[:quiz])[:due_at] }
+      submitting.sort_by! { |j| (j[:assignment] || j[:quiz])[:due_at] || CanvasSort::Last }
     end
     render :json => (grading + submitting)
   end
@@ -2285,9 +2294,10 @@ class UsersController < ApplicationController
         includes << 'confirmation_url' if value_to_boolean(cc_params[:confirmation_url])
       end
 
-    elsif EmailAddressValidator.valid?(params[:pseudonym][:unique_id])
+    else
       cc_type = CommunicationChannel::TYPE_EMAIL
       cc_addr = params[:pseudonym].delete(:path) || params[:pseudonym][:unique_id]
+      cc_addr = nil unless EmailAddressValidator.valid?(cc_addr)
     end
 
     if params[:user]

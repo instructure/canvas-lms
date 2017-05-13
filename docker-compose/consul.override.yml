@@ -8,7 +8,8 @@ services:
       - consul
 
   consul:
-    image: gliderlabs/consul-server:0.6
-    command: -node canvas-consul -bootstrap
+    image: consul:0.7.2
+    command: agent -dev -client 0.0.0.0 -datacenter canvas-dev -node canvas-consul -bootstrap
     environment:
       GOMAXPROCS: "2"
+      VIRTUAL_PORT: 8500

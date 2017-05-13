@@ -3,7 +3,7 @@ import I18n from 'i18n!course_images'
 import _ from 'underscore'
 import UploadArea from './UploadArea'
 import FlickrSearch from '../../shared/FlickrSearch'
-import Spinner from 'instructure-ui/Spinner'
+import Spinner from 'instructure-ui/lib/components/Spinner'
 
   class CourseImagePicker extends React.Component {
     constructor (props) {

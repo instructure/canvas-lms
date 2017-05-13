@@ -1,11 +1,11 @@
 import I18n from 'i18n!roster'
 import React from 'react'
 import shapes from './shapes'
-import Table from 'instructure-ui/Table'
-import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
-import TextInput from 'instructure-ui/TextInput'
-import Checkbox from 'instructure-ui/Checkbox'
-import Link from 'instructure-ui/Link'
+import Table from 'instructure-ui/lib/components/Table'
+import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
+import TextInput from 'instructure-ui/lib/components/TextInput'
+import Checkbox from 'instructure-ui/lib/components/Checkbox'
+import Link from 'instructure-ui/lib/components/Link'
 
   const namePrompt = I18n.t('Click to add a name');
   const nameLabel = I18n.t("New user's name");

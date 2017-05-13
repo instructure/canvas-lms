@@ -1,4 +1,4 @@
-require [
+define [
   "i18n!rubrics.index",
   "jquery",
   "find_outcome",

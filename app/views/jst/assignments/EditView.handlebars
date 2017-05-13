@@ -12,20 +12,25 @@
 
 
   <div class="control-group">
-    <div>
-      <label for="assignment_name" class="screenreader-only">{{#t}}Assignment Name{{/t}}</label>
-      <input id="assignment_name"
-        name="name"
-        placeholder="{{#t "assignment_name"}}Assignment Name{{/t}}"
-        value="{{name}}"
-        type="text"
-        maxlength="254"
-        class="input-block-level"
-        {{#if inClosedGradingPeriod}}
-          readonly
-        {{/if}}
-        {{disabledIfIncludes frozenAttributes "title"}}/>
-    </div>
+    {{#if lockedItems.content}}
+      <h1 id="assignment_name" class="title">{{name}}</h1>
+      <input type="hidden" name="name" value="{{name}}"/>
+    {{else}}
+      <div>
+        <label for="assignment_name" class="screenreader-only">{{#t}}Assignment Name{{/t}}</label>
+        <input id="assignment_name"
+          name="name"
+          placeholder="{{#t "assignment_name"}}Assignment Name{{/t}}"
+          value="{{name}}"
+          type="text"
+          maxlength="254"
+          class="input-block-level"
+          {{#if inClosedGradingPeriod}}
+            readonly
+          {{/if}}
+          {{disabledIfIncludes frozenAttributes "title"}}/>
+      </div>
+    {{/if}}
   </div>
 
   {{#unless isQuizLTIAssignment}}
@@ -35,21 +40,28 @@
           {{convertApiUserContent description}}
         </div>
       {{else}}
-        <div style="float: right;">
-          <a href="#" class="rte_switch_views_link">
-            {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
-          </a>
-          <a href="#" class="rte_switch_views_link" style="display:none;">
-            {{#t "#editor.switch_editor_rich_text"}}Rich Content Editor{{/t}}
-          </a>
-        </div>
-        <div style="clear:both;"></div>
-        <textarea id="assignment_description"
-          name="description"
-          aria-label="{{#t "description"}}Description{{/t}}"
-          {{disabledIfIncludes frozenAttributes "description"}}>
-          {{convertApiUserContent description forEditing=1}}
-        </textarea>
+        {{#if lockedItems.content}}
+          <div id="assignment_description" class="assignment_description">
+            {{convertApiUserContent description}}
+          </div>
+          <input type="hidden" name="description" value="{{convertApiUserContent description forEditing=1}}"/>
+        {{else}}
+          <div style="float: right;">
+            <a href="#" class="rte_switch_views_link">
+              {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
+            </a>
+            <a href="#" class="rte_switch_views_link" style="display:none;">
+              {{#t "#editor.switch_editor_rich_text"}}Rich Content Editor{{/t}}
+            </a>
+          </div>
+          <div style="clear:both;"></div>
+          <textarea id="assignment_description"
+            name="description"
+            aria-label="{{#t "description"}}Description{{/t}}"
+            {{disabledIfIncludes frozenAttributes "description"}}>
+            {{convertApiUserContent description forEditing=1}}
+          </textarea>
+        {{/if}}
       {{/ifIncludes}}
     </div>
   {{/unless}}
@@ -67,15 +79,18 @@
         name="points_possible"
         value="{{n pointsPossible}}"
         type="text"
-        {{#if inClosedGradingPeriod}}
+        {{#ifAny inClosedGradingPeriod lockedItems.points}}
           readonly
-        {{/if}}
-        {{disabledIfIncludes frozenAttributes "points_possible"}}/>
+        {{/ifAny}}
+        {{disabledIfIncludes frozenAttributes "points_possible"}}
+      />
+      {{#unless lockedItems.points}}
         <div aria-live="polite" role="alert">
           <div id=point_change_warning class="alert">
             {{#t}}If you change an assignment's points possible, you must regrade any submissions.{{/t}}
            </div>
         </div>
+      {{/unless}}
     </div>
 
   </div>

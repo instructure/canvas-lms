@@ -63,7 +63,7 @@ define [ 'INST', 'jquery' ], (INST, $) ->
       if @faye then cb(@faye)
 
       unless @faye
-        require [ INST.pandaPubSettings.push_url + '/client.js' ], =>
+        $.getScript INST.pandaPubSettings.push_url + '/client.js', =>
           @faye = new window.Faye.Client INST.pandaPubSettings.push_url
           @faye.addExtension @authExtension()
           cb @faye

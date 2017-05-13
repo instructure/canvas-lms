@@ -113,7 +113,7 @@ class UserMerge
        'context_module_progressions',
        'group_memberships', 'page_comments',
        'rubric_assessments',
-       'submission_comment_participants', 'user_services', 'web_conferences',
+       'user_services', 'web_conferences',
        'web_conference_participants', 'wiki_pages'].each do |key|
         updates[key] = "user_id"
       end

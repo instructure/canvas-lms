@@ -48,7 +48,7 @@ class CompiledReferencePlugin {
         ) {
           // this is a relative require to  a compiled coffeescript (or hbs) file
           result.request = addExt(requestString)
-        } else if (/jst\//.test(requestString)) {
+        } else if (requestString.includes('jst/') && !requestString.endsWith('.handlebars')) {
           // this is a handlebars file in canvas. We have to require it with its full
           // extension while we still have a require-js build or we risk loading
           // its compiled js instead

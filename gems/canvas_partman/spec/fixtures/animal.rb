@@ -12,6 +12,7 @@ class CanvasPartmanTest::Animal < ActiveRecord::Base
       t.string :race
       t.datetime :created_at
       t.references :zoo
+      t.foreign_key :partman_zoos, column: :zoo_id
     end
   end
 

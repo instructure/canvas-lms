@@ -233,8 +233,12 @@ module AdheresToPolicy
           # Loop through all the conditions until we find the first one that
           # grants us the sought_right.
           conditions.any? do |condition|
-            if condition.applies?(self, user, session)
+            condition_applies = false
+            elapsed_time = Benchmark.realtime do
+              condition_applies = condition.applies?(self, user, session)
+            end
 
+            if condition_applies
               # Since the condition is true we can loop through all the rights
               # that belong to it and cache them.  This will short circut the above
               # Rails.cache.fetch for future checks that we won't have to do again.
@@ -244,6 +248,7 @@ module AdheresToPolicy
                 # The Rails.cache.fetch will take care of caching it for us.
                 if condition_right != sought_right
 
+                  Thread.current[:last_cache_generate] = elapsed_time # so we can record it in the logs
                   # Cache the condition_right since we already know they have access.
                   Cache.write(permission_cache_key_for(user, session, condition_right), true)
                 end

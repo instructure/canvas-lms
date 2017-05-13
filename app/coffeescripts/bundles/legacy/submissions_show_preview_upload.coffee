@@ -1,4 +1,4 @@
-require [
+define [
   "jquery",
   "i18n!submissions.show_preview",
   "vendor/swfobject/swfobject",

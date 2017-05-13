@@ -53,7 +53,7 @@ import axios from 'axios'
     loadUser (studentId, courseId) {
       const includes = [
         'avatar_url',
-        'enrollements',
+        'enrollments',
         'inactive_enrollments',
         'current_grading_period_scores'
       ];

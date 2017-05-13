@@ -37,6 +37,13 @@ const secondaryInfoKeys = ['section', 'sis_id', 'login_id', 'none'];
 const defaultSecondaryInfo = 'none';
 const sectionSecondaryInfo = 'section';
 
+const enrollmentFilterLabels = {
+  inactive: I18n.t('Inactive enrollments'),
+  concluded: I18n.t('Concluded enrollments')
+};
+
+const enrollmentFilterKeys = ['inactive', 'concluded'];
+
 export default {
   primaryInfoKeys,
   primaryInfoLabels,
@@ -45,5 +52,7 @@ export default {
   secondaryInfoKeys,
   secondaryInfoLabels,
   defaultSecondaryInfo,
-  sectionSecondaryInfo
+  sectionSecondaryInfo,
+  enrollmentFilterKeys,
+  enrollmentFilterLabels
 };

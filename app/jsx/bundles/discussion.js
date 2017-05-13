@@ -16,10 +16,14 @@ import DiscussionTopicToolbarView from 'compiled/views/DiscussionTopic/Discussio
 import TopicView from 'compiled/views/DiscussionTopic/TopicView'
 import EntriesView from 'compiled/views/DiscussionTopic/EntriesView'
 import CyoeStats from 'jsx/conditional_release_stats/index'
+import LockManager from 'jsx/blueprint_courses/lockManager'
 import 'rubricEditBinding'
 import 'compiled/jquery/sticky'
 import 'compiled/jquery/ModuleSequenceFooter'
 import 'jsx/context_cards/StudentContextCardTrigger'
+
+const lockManager = new LockManager()
+lockManager.init({ itemType: 'discussion_topic', page: 'show' })
 
 const descendants = 5
 const children = 10

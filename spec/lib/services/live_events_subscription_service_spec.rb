@@ -56,6 +56,12 @@ module Services
         root_account
       end
 
+      let(:root_account_object) do
+        root_account_object = mock()
+        root_account_object.stubs(:uuid).returns('random-account-uuid')
+        root_account_object
+      end
+
       let(:product_family) do
         product_family = mock()
         product_family.stubs(:developer_key).returns(developer_key)
@@ -75,15 +81,33 @@ module Services
         end
       end
 
+      describe '.destroy_all_tool_proxy_subscriptions' do
+        it 'makes the expected request' do
+          tool_proxy.stubs(:context).returns(root_account_context)
+          root_account_context.stubs(:root_account).returns(root_account_object)
+          HTTParty.expects(:send).with do |method, endpoint, options|
+            expect(method).to eq(:delete)
+            expect(endpoint).to eq('http://example.com/api/subscriptions')
+            jwt = Canvas::Security::ServicesJwt.new(options[:headers]['Authorization'].gsub('Bearer ',''), false).original_token
+            expect(jwt["DeveloperKey"]).to eq('10000000000003')
+            expect(jwt["RootAccountId"]).to eq('10000000000004')
+            expect(jwt["sub"]).to eq('ltiToolProxy:151b52cd-d670-49fb-bf65-6a327e3aaca0')
+          end
+          LiveEventsSubscriptionService.destroy_all_tool_proxy_subscriptions(tool_proxy)
+        end
+      end
+
       describe '.destroy_tool_proxy_subscription' do
         it 'makes the expected request' do
           tool_proxy.stubs(:context).returns(root_account_context)
+          root_account_context.stubs(:root_account).returns(root_account_object)
           HTTParty.expects(:send).with do |method, endpoint, options|
             expect(method).to eq(:delete)
             expect(endpoint).to eq('http://example.com/api/subscriptions/subscription_id')
             jwt = Canvas::Security::ServicesJwt.new(options[:headers]['Authorization'].gsub('Bearer ',''), false).original_token
             expect(jwt["DeveloperKey"]).to eq('10000000000003')
             expect(jwt["RootAccountId"]).to eq('10000000000004')
+            expect(jwt["RootAccountUUID"]).to eq('random-account-uuid')
             expect(jwt["sub"]).to eq('ltiToolProxy:151b52cd-d670-49fb-bf65-6a327e3aaca0')
           end
           LiveEventsSubscriptionService.destroy_tool_proxy_subscription(tool_proxy, 'subscription_id')
@@ -93,12 +117,14 @@ module Services
       describe '.tool_proxy_subscription' do
         it 'makes the expected request' do
           tool_proxy.stubs(:context).returns(non_root_account_context)
+          non_root_account_context.stubs(:root_account).returns(root_account_object)
           HTTParty.expects(:send).with do |method, endpoint, options|
             expect(method).to eq(:get)
             expect(endpoint).to eq('http://example.com/api/subscriptions/subscription_id')
             jwt = Canvas::Security::ServicesJwt.new(options[:headers]['Authorization'].gsub('Bearer ',''), false).original_token
             expect(jwt["DeveloperKey"]).to eq('10000000000003')
             expect(jwt["RootAccountId"]).to eq('10000000000007')
+            expect(jwt["RootAccountUUID"]).to eq('random-account-uuid')
             expect(jwt["sub"]).to eq('ltiToolProxy:151b52cd-d670-49fb-bf65-6a327e3aaca0')
           end
           LiveEventsSubscriptionService.tool_proxy_subscription(tool_proxy, 'subscription_id')
@@ -108,12 +134,14 @@ module Services
       describe '.tool_proxy_subscriptions' do
         it 'makes the expected request' do
           tool_proxy.stubs(:context).returns(non_root_account_context)
+          non_root_account_context.stubs(:root_account).returns(root_account_object)
           HTTParty.expects(:send).with do |method, endpoint, options|
             expect(method).to eq(:get)
             expect(endpoint).to eq('http://example.com/api/subscriptions')
             jwt = Canvas::Security::ServicesJwt.new(options[:headers]['Authorization'].gsub('Bearer ',''), false).original_token
             expect(jwt["DeveloperKey"]).to eq('10000000000003')
             expect(jwt["RootAccountId"]).to eq('10000000000007')
+            expect(jwt["RootAccountUUID"]).to eq('random-account-uuid')
             expect(jwt["sub"]).to eq('ltiToolProxy:151b52cd-d670-49fb-bf65-6a327e3aaca0')
           end
           LiveEventsSubscriptionService.tool_proxy_subscriptions(tool_proxy)
@@ -123,6 +151,7 @@ module Services
       describe '.create_tool_proxy_subscription' do
         it 'makes the expected request' do
           tool_proxy.stubs(:context).returns(root_account_context)
+          root_account_context.stubs(:root_account).returns(root_account_object)
           subscription = { 'my' => 'subscription' }
 
           HTTParty.expects(:send).with do |method, endpoint, options|
@@ -132,6 +161,7 @@ module Services
             jwt = Canvas::Security::ServicesJwt.new(options[:headers]['Authorization'].gsub('Bearer ',''), false).original_token
             expect(jwt['DeveloperKey']).to eq('10000000000003')
             expect(jwt["RootAccountId"]).to eq('10000000000004')
+            expect(jwt["RootAccountUUID"]).to eq('random-account-uuid')
             expect(jwt['sub']).to eq('ltiToolProxy:151b52cd-d670-49fb-bf65-6a327e3aaca0')
             expect(JSON.parse(options[:body])).to eq(subscription)
           end
@@ -143,6 +173,7 @@ module Services
       describe '.update_tool_proxy_subscription' do
         it 'makes the expected request' do
           tool_proxy.stubs(:context).returns(root_account_context)
+          root_account_context.stubs(:root_account).returns(root_account_object)
           subscription = { 'my' => 'subscription' }
 
           HTTParty.expects(:send).with do |method, endpoint, options|
@@ -152,6 +183,7 @@ module Services
             jwt = Canvas::Security::ServicesJwt.new(options[:headers]['Authorization'].gsub('Bearer ',''), false).original_token
             expect(jwt['DeveloperKey']).to eq('10000000000003')
             expect(jwt["RootAccountId"]).to eq('10000000000004')
+            expect(jwt["RootAccountUUID"]).to eq('random-account-uuid')
             expect(jwt['sub']).to eq('ltiToolProxy:151b52cd-d670-49fb-bf65-6a327e3aaca0')
             expect(JSON.parse(options[:body])).to eq(subscription)
           end
@@ -163,6 +195,7 @@ module Services
       context 'timeout protection' do
         it 'throws an exception for .tool_proxy_subscriptions' do
           tool_proxy.stubs(:context).returns(root_account_context)
+          root_account_context.stubs(:root_account).returns(root_account_object)
           Timeout.expects(:timeout).raises(Timeout::Error)
           expect { LiveEventsSubscriptionService.tool_proxy_subscriptions(tool_proxy) }.to raise_error(Timeout::Error)
         end

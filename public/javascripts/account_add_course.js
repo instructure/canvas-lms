@@ -1,4 +1,4 @@
-require([
+define([
   'i18n!accounts' /* I18n.t */,
   'jquery' /* $ */,
   'str/htmlEscape',

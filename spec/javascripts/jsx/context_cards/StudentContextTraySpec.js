@@ -3,10 +3,11 @@ define([
   'react',
   'react-dom',
   'react-addons-test-utils',
-  'instructure-ui',
+  'instructure-ui/lib/components/Avatar',
+  'instructure-ui/lib/components/Tray',
   'jsx/context_cards/StudentContextTray',
   'jsx/context_cards/StudentCardStore'
-], ($, React, ReactDOM, TestUtils, { Avatar, Tray }, StudentContextTray, StudentCardStore) => {
+], ($, React, ReactDOM, TestUtils, Avatar, Tray, StudentContextTray, StudentCardStore) => {
   QUnit.module('StudentContextTray', (hooks) => {
     let store, subject
     const courseId = '1'

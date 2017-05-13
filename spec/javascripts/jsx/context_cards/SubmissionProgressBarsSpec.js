@@ -3,8 +3,8 @@ define([
   'react-dom',
   'react-addons-test-utils',
   'jsx/context_cards/SubmissionProgressBars',
-  'instructure-ui'
-], (React, ReactDOM, TestUtils, SubmissionProgressBars, { Progress: InstUIProgress }) => {
+  'instructure-ui/lib/components/Progress'
+], (React, ReactDOM, TestUtils, SubmissionProgressBars, { default: InstUIProgress }) => {
 
   QUnit.module('StudentContextTray/Progress', (hooks) => {
     let grade, score, spy, subject, submission, tag

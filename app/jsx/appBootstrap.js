@@ -1,5 +1,5 @@
-import ApplyTheme from 'instructure-ui/ApplyTheme'
-import 'instructure-ui-themes/canvas'
+import ApplyTheme from 'instructure-ui/lib/components/ApplyTheme'
+import 'instructure-ui/lib/themes/canvas'
 import moment from 'moment'
 import tz from 'timezone_core'
 import './fakeRequireJSFallback'

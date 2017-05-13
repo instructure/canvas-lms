@@ -26,7 +26,7 @@ module Services
 
       it "populates hosts with an error signal when consul is down" do
         Canvas::DynamicSettings.stubs(:find).with("rich-content-service").
-          raises(Faraday::ConnectionFailed, "can't talk to consul")
+          raises(Imperium::UnableToConnectError, "can't talk to consul")
         root_account = stub("root_account", feature_enabled?: true)
         env = described_class.env_for(root_account)
         expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_truthy

@@ -269,6 +269,21 @@ class ApplicationController < ActionController::Base
   end
   helper_method :set_master_course_js_env_data
 
+  def load_master_course_sidebar
+    return unless @context && @context.is_a?(Course) && master_courses? && MasterCourses::MasterTemplate.is_master_course?(@context) && @context.grants_right?(@current_user, :manage)
+    js_bundle :blueprint_course_settings
+    css_bundle :blueprint_course_settings
+    js_env({
+      BLUEPRINT_SETTINGS_DATA: {
+        accountId: @context.account.id,
+        course: @context.slice(:id, :name),
+        subAccounts: @context.account.sub_accounts.pluck(:id, :name).map{|id, name| {id: id, name: name}},
+        terms: @context.account.root_account.enrollment_terms.active.pluck(:id, :name).map{|id, name| {id: id, name: name}}
+      }
+    })
+  end
+  helper_method :load_master_course_sidebar
+
   def editing_restricted?(content, edit_type=:any)
     return false unless master_courses? && content.respond_to?(:editing_restricted?)
     content.editing_restricted?(edit_type)
@@ -964,7 +979,7 @@ class ApplicationController < ActionController::Base
     # We only record page_views for html page requests coming from within the
     # app, or if coming from a developer api request and specified as a
     # page_view.
-    if (@developer_key && params[:user_request]) || (!@developer_key && @current_user && !request.xhr? && request.get?)
+    if @current_user && !request.xhr? && request.get?
       generate_page_view
     end
   end
@@ -981,17 +996,10 @@ class ApplicationController < ActionController::Base
   end
 
   def generate_page_view(user=@current_user)
-    attributes = { :user => user, :developer_key => @developer_key, :real_user => @real_current_user }
+    attributes = { :user => user, :real_user => @real_current_user }
     @page_view = PageView.generate(request, attributes)
     @page_view.user_request = true if params[:user_request] || (user && !request.xhr? && request.get?)
     @page_before_render = Time.now.utc
-  end
-
-  def generate_new_page_view
-    return true if !page_views_enabled?
-
-    generate_page_view
-    @page_view.generated_by_hand = true
   end
 
   def disable_page_views
@@ -1112,7 +1120,8 @@ class ApplicationController < ActionController::Base
   end
 
   def log_gets
-    if @page_view && !request.xhr? && request.get? && ((response.content_type || "").to_s.match(/html/))
+    if @page_view && !request.xhr? && request.get? && (((response.content_type || "").to_s.match(/html/)) ||
+      (Setting.get('create_get_api_page_views', 'true') == 'true') && api_request?)
       @page_view.render_time ||= (Time.now.utc - @page_before_render) rescue nil
       @page_view_update = true
     end
@@ -1329,10 +1338,6 @@ class ApplicationController < ActionController::Base
 
   def verified_file_request?
     params[:controller] == 'files' && params[:action] == 'show' && params[:verifier].present?
-  end
-
-  def session_loaded?
-    session.send(:loaded?) rescue false
   end
 
   # Retrieving wiki pages needs to search either using the id or
@@ -1619,10 +1624,6 @@ class ApplicationController < ActionController::Base
     feature_enabled?(feature) && service_enabled?(feature)
   end
   helper_method :feature_and_service_enabled?
-
-  def show_new_dashboard?
-    @current_user && @current_user.preferences[:new_dashboard]
-  end
 
   def temporary_user_code(generate=true)
     if generate
@@ -2040,11 +2041,11 @@ class ApplicationController < ActionController::Base
       hash[:WIKI_PAGE_SHOW_PATH] = named_context_url(@context, :context_wiki_page_path, @page)
       hash[:WIKI_PAGE_EDIT_PATH] = named_context_url(@context, :edit_context_wiki_page_path, @page)
       hash[:WIKI_PAGE_HISTORY_PATH] = named_context_url(@context, :context_wiki_page_revisions_path, @page)
+    end
 
-      if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :read)
-        hash[:COURSE_ID] = @context.id
-        hash[:MODULES_PATH] = polymorphic_path([@context, :context_modules])
-      end
+    if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :read)
+      hash[:COURSE_ID] = @context.id.to_s
+      hash[:MODULES_PATH] = polymorphic_path([@context, :context_modules])
     end
 
     js_env hash
@@ -2146,8 +2147,6 @@ class ApplicationController < ActionController::Base
     ctx[:user_id] = @current_user.global_id if @current_user
     ctx[:real_user_id] = @real_current_user.global_id if @real_current_user
     ctx[:user_login] = @current_pseudonym.unique_id if @current_pseudonym
-    ctx[:hostname] = request.host
-    ctx[:user_agent] = request.headers['User-Agent']
     ctx[:context_type] = @context.class.to_s if @context
     ctx[:context_id] = @context.global_id if @context
     if @context_membership
@@ -2165,6 +2164,10 @@ class ApplicationController < ActionController::Base
       ctx[:request_id] = tctx[:request_id]
       ctx[:session_id] = tctx[:session_id]
     end
+
+    ctx[:hostname] = request.host
+    ctx[:user_agent] = request.headers['User-Agent']
+    ctx[:producer] = 'canvas'
 
     StringifyIds.recursively_stringify_ids(ctx)
     LiveEvents.set_context(ctx)

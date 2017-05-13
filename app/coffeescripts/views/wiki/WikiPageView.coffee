@@ -28,6 +28,7 @@ define [
 
     events:
       'click .delete_page': 'deleteWikiPage'
+      'click .use-as-front-page-menu-item': 'useAsFrontPage'
 
     @optionProperty 'modules_path'
     @optionProperty 'wiki_pages_path'
@@ -114,6 +115,13 @@ define [
         model: @model
         wiki_pages_path: @wiki_pages_path
       deleteDialog.open()
+
+    useAsFrontPage: (ev) ->
+      ev?.preventDefault()
+      return unless @model.get('published')
+
+      @model.setFrontPage ->
+        $('#wiki_page_show .header-bar-right .al-trigger').focus()
 
     toJSON: ->
       json = super

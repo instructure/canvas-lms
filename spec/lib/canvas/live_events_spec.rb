@@ -27,6 +27,7 @@ describe Canvas::LiveEvents do
 
   describe '.amended_context' do
     it 'pulls the context from the canvas context' do
+      LiveEvents.set_context(nil)
       course = course_model
       amended_context = Canvas::LiveEvents.amended_context(course)
 
@@ -457,6 +458,45 @@ describe Canvas::LiveEvents do
         })).once
 
       Canvas::LiveEvents.assignment_updated(assignment)
+    end
+  end
+
+  describe '.quiz_export_complete' do
+    class FakeExport
+      attr_accessor :context
+
+      def initialize(context)
+        @context = context
+      end
+
+      def settings
+        {
+          quizzes2: {
+            key1: 'val1',
+            key2: 'val2'
+          }
+        }
+      end
+    end
+
+    let(:content_export) { FakeExport.new(course_model) }
+
+    it 'triggers a live event with content export settings and amended context details' do
+      fake_export_context = {key1: 'val1', key2: 'val2'}
+
+      expect_event(
+        'quiz_export_complete',
+        fake_export_context,
+        hash_including({
+          :context_type => "Course",
+          :context_id => content_export.context.global_id,
+          :root_account_id => content_export.context.root_account.global_id,
+          :root_account_uuid => content_export.context.root_account.uuid,
+          :root_account_lti_guid => content_export.context.root_account.lti_guid,
+        })
+      ).once
+
+      Canvas::LiveEvents.quiz_export_complete(content_export)
     end
   end
 end

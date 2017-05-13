@@ -26,15 +26,16 @@ module Services
     # which users:
     #
     #  - does the sender know in the context and what are their roles in that
-    #    context? (is_admin=false)
+    #    context? (sender present)
     #
     #      --OR--
     #
-    #  - have roles in the context and what are those roles? (is_admin=true)
+    #  - have roles in the context and what are those roles? (sender absent;
+    #    admin view)
     #
-    def self.known_in_context(sender, context, is_admin=false, ignore_result=false)
-      params = { context: context, ignore_result: ignore_result }
-      params[:sender] = sender unless is_admin
+    def self.known_in_context(sender, context, user_ids=nil, ignore_result=false)
+      params = { sender: sender, context: context, ignore_result: ignore_result }
+      params[:user_ids] = user_ids if user_ids
       response = recipients(params)
       [response.user_ids, response.common_contexts]
     end
@@ -48,22 +49,20 @@ module Services
     # `search` term, if any, which:
     #
     #  - does the sender know, and what are their common contexts with the
-    #    sender? (no context provided)
+    #    sender? (no context provided, sender must be)
     #
     #  - does the sender know in the context and what are their roles in that
-    #    context? (context provided but not is_admin)
+    #    context? (context provided with sender)
     #
     #      --OR--
     #
     #  - have roles in the context and what are those roles? (context provided
-    #    and is_admin true)
+    #    without sender; admin view)
     #
     def self.search_users(sender, options, service_options, ignore_result=false)
       params = options.slice(:search, :context, :exclude_ids, :weak_checks)
       params[:ignore_result] = ignore_result
-
-      # include sender only if not admin
-      params[:sender] = sender unless options[:context] && options[:is_admin]
+      params[:sender] = sender
 
       # interpret pagination as specified in service_options
       params[:per_page] = service_options[:per_page] if service_options[:per_page]
@@ -96,9 +95,7 @@ module Services
       def setting(key)
         settings = Canvas::DynamicSettings.from_cache("address-book", expires_in: 5.minutes)
         settings[key]
-      rescue Faraday::ConnectionFailed,
-             Faraday::ClientError,
-             Canvas::DynamicSettings::ConsulError => e
+      rescue Imperium::TimeoutError => e
         Canvas::Errors.capture_exception(:address_book, e)
         nil
       end

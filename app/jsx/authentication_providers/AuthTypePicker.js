@@ -1,6 +1,6 @@
 import React from 'react'
 import I18n from 'i18n!account_authorization_configs'
-import Select from 'instructure-ui/Select'
+import Select from 'instructure-ui/lib/components/Select'
 
   class AuthTypePicker extends React.Component {
 

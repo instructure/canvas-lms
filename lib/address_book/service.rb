@@ -7,19 +7,21 @@ module AddressBook
 
     def known_users(users, options={})
       return [] if users.empty?
-
-      # start with users I know directly
       user_ids = users.map{ |user| Shard.global_id_for(user) }
-      common_contexts = Services::AddressBook.common_contexts(@sender, user_ids, @ignore_result)
 
-      if options[:include_context]
-        # add users any admin over the specified context knows indirectly
-        admin_contexts = Services::AddressBook.roles_in_context(options[:include_context], user_ids, @ignore_result)
-        merge_common_contexts(common_contexts, admin_contexts)
+      if admin_context?(options[:context])
+        # users any admin over the specified context knows
+        common_contexts = Services::AddressBook.roles_in_context(options[:context], user_ids, @ignore_result)
+      elsif options[:context]
+        # any of the users I know through the specified context
+        _, common_contexts = Services::AddressBook.known_in_context(@sender, options[:context], user_ids, @ignore_result)
+      else
+        # any of the users I know at all
+        common_contexts = Services::AddressBook.common_contexts(@sender, user_ids, @ignore_result)
       end
 
       # whitelist just those users I know
-      whitelist, unknown = user_ids.partition{ |id| common_contexts.has_key?(id) }
+      whitelist, unknown = user_ids.partition{ |id| common_contexts.key?(id) }
       if unknown.present? && options[:conversation_id]
         conversation = Conversation.find(options[:conversation_id])
         participants = conversation.conversation_participants.where(user_id: [@sender, *unknown]).pluck(:user_id)
@@ -40,9 +42,9 @@ module AddressBook
       users
     end
 
-    def known_in_context(context, is_admin=false)
+    def known_in_context(context)
       # just query, hydrate, and cache
-      user_ids, common_contexts = Services::AddressBook.known_in_context(@sender, context, is_admin, @ignore_result)
+      user_ids, common_contexts = Services::AddressBook.known_in_context(@sender, context, nil, @ignore_result)
       users = hydrate(user_ids)
       cache_contexts(users, common_contexts)
       users
@@ -77,6 +79,11 @@ module AddressBook
     end
 
     def search_users(options={})
+      # if we're querying a specific context and that context is a valid admin
+      # context for the sender, then we want the sender-agnostic search results
+      # (i.e. the results any admin would see). otherwise, include the sender
+      # to tailor the search results
+      sender = admin_context?(options[:context]) ? nil : @sender
       bookmarker = Bookmarker.new
       BookmarkedCollection.build(bookmarker) do |pager|
         # include bookmark info in service call if necessary
@@ -94,7 +101,7 @@ module AddressBook
         end
 
         # query, hydrate, and cache
-        user_ids, common_contexts, cursors = Services::AddressBook.search_users(@sender, options, service_options, @ignore_result)
+        user_ids, common_contexts, cursors = Services::AddressBook.search_users(sender, options, service_options, @ignore_result)
         bookmarker.update(user_ids, cursors)
         users = hydrate(user_ids)
         cache_contexts(users, common_contexts)
@@ -107,6 +114,8 @@ module AddressBook
     end
 
     def preload_users(users)
+      return if users.empty?
+
       # make sure we're dealing with user objects
       users = hydrate(users) unless users.first.is_a?(User)
 
@@ -118,38 +127,10 @@ module AddressBook
 
     private
 
-    # these three methods simplify merging the results of independent service
-    # calls that each give back a hash like:
-    #   {
-    #     user_id => {
-    #       courses: { course_id => roles, ... },
-    #       groups: { group_id => roles, ... }
-    #     },
-    #     ...
-    #   }
-    # modifies the left hash in place, merging the data from the right into it
-    def merge_common_contexts(left, right)
-      right.each do |user_id,common_contexts|
-        left[user_id] ||= { courses: {}, groups: {} }
-        merge_common_contexts_one(left[user_id], common_contexts)
-      end
-    end
-
-    def merge_common_contexts_one(left, right)
-      merge_common_contexts_half(left[:courses], right[:courses])
-      merge_common_contexts_half(left[:groups], right[:groups])
-    end
-
-    def merge_common_contexts_half(left, right)
-      right.each do |context_id,roles|
-        left[context_id] ||= []
-        left[context_id] |= roles
-      end
-    end
-
-    # takes a list of global user ids and returns a corresponding list of
-    # objects, order preserved.
+    # takes a list of user ids and returns a corresponding list of objects,
+    # order preserved.
     def hydrate(ids)
+      ids = ids.map{ |id| Shard.global_id_for(id) }
       hydrated = User.select(::MessageableUser::SELECT).where(id: ids)
       reverse_lookup = hydrated.index_by(&:global_id)
       ids.map{ |id| reverse_lookup[id] }.compact

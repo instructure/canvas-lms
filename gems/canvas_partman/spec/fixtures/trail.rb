@@ -14,6 +14,7 @@ class CanvasPartmanTest::Trail < ActiveRecord::Base
     CanvasPartmanTest::SchemaHelper.create_table :partman_trails do |t|
       t.string :name
       t.references :zoo
+      t.foreign_key :partman_zoos, column: :zoo_id
     end
   end
 

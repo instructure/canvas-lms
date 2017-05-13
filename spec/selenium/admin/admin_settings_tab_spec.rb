@@ -416,8 +416,8 @@ describe "admin settings tab" do
 
     it "adds a custom link" do
       get "/accounts/#{Account.default.id}/settings"
-      f('#custom_help_link_settings .al-trigger').click
-      fln('Add Custom Link', f('#custom_help_link_settings')).click
+      f('.HelpMenuOptions__Container button').click
+      fj('[role="menuitemradio"] span:contains("Add Custom Link")').click
       replace_content fj('#custom_help_link_settings input[name$="[text]"]:visible'), 'text'
       replace_content fj('#custom_help_link_settings textarea[name$="[subtext]"]:visible'), 'subtext'
       replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), 'https://url.example.com'

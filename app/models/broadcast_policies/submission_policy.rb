@@ -74,7 +74,7 @@ module BroadcastPolicies
     end
 
     def just_submitted?
-      (submission.just_created && submission.submitted?) || submission.changed_state_to(:submitted)
+      submission.changed_state_to(:submitted)
     end
 
     def just_submitted_late?

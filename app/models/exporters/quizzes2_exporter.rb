@@ -25,9 +25,7 @@ module Exporters
             external_tool_tag, @assignment.shard
           ),
           title: @quiz.title,
-          context_title: @quiz.context.name,
-          context_type: 'external_url',
-          context_id: @quiz.context_id
+          context_title: @quiz.context.name
         }
       }
     end

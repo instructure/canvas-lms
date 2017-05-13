@@ -973,7 +973,7 @@ class FilesController < ApplicationController
   #
   # @example_request
   #
-  #   curl -XPUT 'https://<canvas>/api/v1/files/<file_id>' \
+  #   curl -X PUT 'https://<canvas>/api/v1/files/<file_id>' \
   #        -F 'name=<new_name>' \
   #        -F 'locked=true' \
   #        -H 'Authorization: Bearer <token>'
@@ -1025,7 +1025,7 @@ class FilesController < ApplicationController
   # @API Delete file
   # Remove the specified file
   #
-  #   curl -XDELETE 'https://<canvas>/api/v1/files/<file_id>' \
+  #   curl -X DELETE 'https://<canvas>/api/v1/files/<file_id>' \
   #        -H 'Authorization: Bearer <token>'
   def destroy
     @attachment = Attachment.find(params[:id])

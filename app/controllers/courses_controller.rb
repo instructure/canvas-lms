@@ -341,6 +341,9 @@ class CoursesController < ApplicationController
   #   When set, only return courses where the user has an enrollment with the given state.
   #   This will respect section/course/term date overrides.
   #
+  # @argument exclude_blueprint_courses [Boolean]
+  #   When set, only return courses that are not configured as blueprint courses.
+  #
   # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"public_description"|"total_scores"|"current_grading_period_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"passback_status"|"favorites"|"teachers"|"observed_users"|"course_image"]
   #   - "needs_grading_count": Optional information to include with each Course.
   #     When needs_grading_count is given, and the current user has grading
@@ -422,6 +425,8 @@ class CoursesController < ApplicationController
         @current_enrollments = []
         @future_enrollments  = []
         Canvas::Builders::EnrollmentDateBuilder.preload(all_enrollments)
+        ActiveRecord::Associations::Preloader.new.preload(all_enrollments, :course_section)
+
         all_enrollments.group_by{|e| [e.course_id, e.type]}.values.each do |enrollments|
           e = enrollments.sort_by{|e| e.state_with_date_sortable}.first
           if enrollments.count > 1
@@ -430,8 +435,7 @@ class CoursesController < ApplicationController
           end
 
           state = e.state_based_on_date
-          if [:completed, :rejected].include?(state) ||
-              (e.course.conclude_at && e.course.conclude_at < Time.now) # strictly speaking, these enrollments are perfectly active but enrollment dates are terrible
+          if [:completed, :rejected].include?(state) || e.section_or_course_date_in_past? # strictly speaking, these enrollments are perfectly active but enrollment dates are terrible
             @past_enrollments << e unless e.workflow_state == "invited"
           else
             start_at, end_at = e.enrollment_dates.first
@@ -1121,28 +1125,6 @@ class CoursesController < ApplicationController
           js_env(:RECENT_STUDENTS_URL => api_v1_course_recent_students_url(@context))
         end
         format.json { render :json => @categories }
-      end
-    end
-  end
-
-  def blueprint_settings
-    get_context
-    if authorized_action(@context.account, @current_user, :manage_master_courses)
-      if master_courses? && MasterCourses::MasterTemplate.is_master_course?(@context)
-        js_env({
-          accountId: @context.account.id,
-          course: @context.slice(:id, :name),
-          subAccounts: @context.account.sub_accounts.pluck(:id, :name).map{|id, name| {id: id, name: name}},
-          terms: @context.account.root_account.enrollment_terms.active.pluck(:id, :name).map{|id, name| {id: id, name: name}}
-        })
-
-        css_bundle :course_blueprint_settings
-        js_bundle :course_blueprint_settings
-
-        @page_title = join_title(t('Blueprint Settings'), @context.name)
-        render html: '', layout: true
-      else
-       render status: 404, template: 'shared/errors/404_message'
       end
     end
   end
@@ -2622,6 +2604,7 @@ class CoursesController < ApplicationController
 
       # destroy these after enrollment so
       # needs_grading_count callbacks work
+      ModeratedGrading::Selection.where(:student_id => @fake_student).delete_all
       pg_scope = ModeratedGrading::ProvisionalGrade.where(:submission_id => @fake_student.submissions)
       SubmissionComment.where(:provisional_grade_id => pg_scope).delete_all
       pg_scope.delete_all
@@ -2813,6 +2796,11 @@ class CoursesController < ApplicationController
     includes.delete 'permissions'
 
     hash = []
+
+    if enrollments.any? && value_to_boolean(params[:exclude_blueprint_courses])
+      mc_ids = MasterCourses::MasterTemplate.active.where(:course_id => enrollments.map(&:course_id)).pluck(:course_id)
+      enrollments.reject!{|e| mc_ids.include?(e.course_id)}
+    end
 
     Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
     enrollments_by_course = enrollments.group_by(&:course_id).values

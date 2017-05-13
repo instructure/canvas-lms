@@ -37,8 +37,8 @@ describe 'Screenreader Gradebook Student Information' do
       srgb_page.select_student(student)
       expect(srgb_page.final_grade.text).to eq("30% (3 / 10 points)")
       expect(srgb_page.assign_group_grade.text).to eq("30% (3 / 10)")
+      expect_new_page_load { srgb_page.switch_to_default_gradebook_link.click }
       gradebook_page = Gradebook::MultipleGradingPeriods.new
-      expect_new_page_load { gradebook_page.visit_gradebook(test_course) }
       expect(gradebook_page.cell_graded?("30%", 4, 0)).to be true
     end
 

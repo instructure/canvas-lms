@@ -36,6 +36,11 @@ module Services
         request(:delete, "/api/subscriptions/#{subscription_id}", options)
       end
 
+      def destroy_all_tool_proxy_subscriptions(tool_proxy)
+        options = { headers: headers(tool_proxy_jwt_body(tool_proxy)) }
+        request(:delete, "/api/subscriptions", options)
+      end
+
       private
       def request(method, endpoint, options = {})
         Canvas.timeout_protection("live-events-subscription-service-session", raise_on_timeout: true) do
@@ -51,10 +56,7 @@ module Services
 
       def settings
         Canvas::DynamicSettings.from_cache("live-events-subscription-service", expires_in: 5.minutes)
-      rescue Faraday::ConnectionFailed,
-             Faraday::ClientError,
-             Canvas::DynamicSettings::ConsulError,
-             Diplomat::KeyNotFound => e
+      rescue Imperium::TimeoutError => e
         Canvas::Errors.capture_exception(:live_events_subscription, e)
         nil
       end
@@ -63,7 +65,8 @@ module Services
         options.merge({
           sub: "ltiToolProxy:#{tool_proxy.guid}",
           DeveloperKey: tool_proxy.product_family.developer_key.global_id.to_s,
-          RootAccountId: (tool_proxy.context.global_root_account_id || tool_proxy.context.global_id).to_s
+          RootAccountId: (tool_proxy.context.global_root_account_id || tool_proxy.context.global_id).to_s,
+          RootAccountUUID: tool_proxy.context.root_account.uuid
         })
       end
     end

@@ -99,6 +99,9 @@ class AssessmentQuestion < ActiveRecord::Base
         path = URI.unescape(id_or_path)
         file = Folder.find_attachment_in_context_with_path(assessment_question_bank.context, path)
       end
+      if file && file.replacement_attachment_id
+        file = file.replacement_attachment
+      end
       begin
         new_file = file.try(:clone_for, self)
       rescue => e

@@ -3,7 +3,11 @@ module.exports = [
   'Backbone',
   'compiled/tinymce',
   'classnames',
-  'handlebars/runtime',
+
+  // This needs to be loaded before all our handlebars templates so they
+  // can have access to these helpers
+  'coffeescripts/handlebars_helpers.coffee',
+
   'jquery',
   'jquery.ajaxJSON',
   'jquery.google-analytics',

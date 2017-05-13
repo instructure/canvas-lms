@@ -20,9 +20,6 @@
 #
 # Query audit log of grade change events.
 #
-# Only available if the server has configured audit logs; will return 404 Not
-# Found response otherwise.
-#
 # For each endpoint, a compound document is returned. The primary collection of
 # event objects is paginated, ordered by date descending. Secondary collections
 # of assignments, courses, students and graders related to the returned events

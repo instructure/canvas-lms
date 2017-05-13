@@ -9,16 +9,12 @@ group :test do
   gem 'gergich', '0.1.13', require: false
   gem 'testingbot', require: false
   gem 'brakeman', require: false
-  # simplecov 0.10.0 shows significantly less coverage.
-  # ensure the coverage build shows accurate data
-  # before upgrading past 0.9.2. (CNVS-32826)
-  gem 'simplecov', '0.9.2', require: false
+  gem 'simplecov', '0.14.1', require: false, github: 'jenseng/simplecov', ref: '78c1171e98b7227f6bdd8f76f4c14666fd7fc5ea'
     gem 'docile', '1.1.5', require: false
   gem 'simplecov-rcov', '0.2.3', require: false
   gem 'mocha', github: 'maneframe/mocha', ref: 'bb8813fbb4cc589d7c58073d93983722d61b6919', require: false
     gem 'metaclass', '0.0.4', require: false
-  gem 'thin', '1.7.0'
-    gem 'eventmachine', '1.2.1', require: false
+  gem 'puma', '3.8.2'
 
   gem 'rspec', '3.5.0'
   gem 'rspec_around_all', '0.2.0'
@@ -43,7 +39,6 @@ group :test do
   gem 'testrailtagging', '0.3.7', require: false
 
   gem 'webmock', '2.3.2', require: false
-    gem 'addressable', '2.5.0', require: false
     gem 'crack', '0.4.3', require: false
   gem 'timecop', '0.8.1'
   gem 'jira_ref_parser', '1.0.1'

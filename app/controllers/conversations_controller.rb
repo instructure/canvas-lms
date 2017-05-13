@@ -1069,7 +1069,7 @@ class ConversationsController < ApplicationController
 
     # unrecognized context codes are ignored
     if AddressBook.valid_context?(params[:context_code])
-      context = Context.find_by_asset_string(params[:context_code])
+      context = AddressBook.load_context(params[:context_code])
       if context.nil?
         # recognized context code must refer to a valid course or group
         return render json: { message: 'invalid context_code' }, status: :bad_request
@@ -1077,16 +1077,7 @@ class ConversationsController < ApplicationController
     end
 
     users, contexts = AddressBook.partition_recipients(params[:recipients])
-    if context
-      user_ids = users.map{ |user| Shard.global_id_for(user) }.to_set
-      is_admin = context.grants_right?(@current_user, :read_as_admin)
-      known = @current_user.address_book.
-        known_in_context(context.asset_string, is_admin).
-        select{ |user| user_ids.include?(user.global_id) }
-    else
-      known = @current_user.address_book.
-        known_users(users, conversation_id: params[:from_conversation_id])
-    end
+    known = @current_user.address_book.known_users(users, context: context, conversation_id: params[:from_conversation_id])
     contexts.each{ |context| known.concat(@current_user.address_book.known_in_context(context)) }
     @recipients = known.uniq(&:id).reject{|u| u.id == @current_user.id}
   end

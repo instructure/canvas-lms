@@ -29,6 +29,12 @@ module Canvas::Redis
     Setting.get('ignore_redis_failures', 'true') == 'true'
   end
 
+  COMPACT_LINE = "Redis (%{request_time_ms}ms) %{command} %{key} [%{host}]".freeze
+  def self.log_style
+    # supported: 'off', 'compact', 'json'
+    Setting.get('redis_log_style', 'compact')
+  end
+
   def self.redis_failure?(redis_name)
     return false unless last_redis_failure[redis_name]
     # i feel this dangling rescue is justifiable, given the try-to-be-failsafe nature of this code
@@ -116,8 +122,11 @@ module Canvas::Redis
       response
     end
 
+    SET_COMMANDS = %i{set setex}.freeze
     def log_request_response(request, response, start_time)
       return if request.nil? # redis client does internal keepalives and connection commands
+      return if Canvas::Redis.log_style == 'off'
+      return unless Rails.logger
 
       command = request.shift
       message = {
@@ -125,7 +134,7 @@ module Canvas::Redis
         command: command,
         # request_size is the sum of all the string parameters send with the command.
         request_size: request.sum { |c| c.to_s.size },
-        request_time_ms: (Time.now - start_time) * 1000,
+        request_time_ms: ((Time.now - start_time) * 1000).round(3),
         host: location,
       }
       unless NON_KEY_COMMANDS.include?(command)
@@ -136,7 +145,7 @@ module Canvas::Redis
         message[:action] = Marginalia::Comment.action
         message[:job_tag] = Marginalia::Comment.job_tag
       end
-      if command == :set && Thread.current[:last_cache_generate]
+      if SET_COMMANDS.include?(command) && Thread.current[:last_cache_generate]
         # :last_cache_generate comes from the instrumentation added in
         # config/initializeers/cache_store_instrumentation.rb
         # This is necessary because the Rails caching layer doesn't pass this
@@ -154,8 +163,17 @@ module Canvas::Redis
         message[:response_size] = response.try(:size) || 0
       end
 
-      logline = JSON.generate(message.compact)
-      Rails.logger.debug(logline) if Rails.logger
+      logline = format_log_message(message)
+      Rails.logger.debug(logline)
+    end
+
+    def format_log_message(message)
+      if Canvas::Redis.log_style == 'json'
+        JSON.generate(message.compact)
+      else
+        message[:key] ||= "-"
+        Canvas::Redis::COMPACT_LINE % message
+      end
     end
 
     def write(command)

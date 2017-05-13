@@ -23,12 +23,13 @@ gem 'authlogic', '3.5.0'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.9.8'
+gem 'switchman', '1.9.9'
   gem 'open4', '1.3.4', require: false
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   # for folio, see the folio README
   gem 'will_paginate', '3.1.5', require: false
 
+gem 'addressable', '2.5.0', require: false
 gem "after_transaction_commit", '1.1.1'
 gem "aws-sdk", '2.6.7', require: false
 gem 'barby', '0.6.5', require: false
@@ -94,8 +95,8 @@ gem 'sentry-raven', '0.15.6', require: false
 gem 'canvas_statsd', '2.0.4'
   gem 'statsd-ruby', '1.4.0', require: false
   gem 'aroi', '0.0.4', require: false
-gem 'diplomat', '1.0.0', require: false
 gem 'gepub', '0.7.0beta3', github: 'ccutrer/gepub', ref: '7cea2f4912f15d89bc9e9cb9d4c51e5f491c2328'
+gem 'imperium', '0.1.3', require: false
 gem 'academic_benchmarks', '0.0.9', require: false
 
 gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbacks'
@@ -136,6 +137,6 @@ gem 'multipart', path: 'gems/multipart'
 gem 'paginated_collection', path: 'gems/paginated_collection'
 gem 'stringify_ids', path: 'gems/stringify_ids'
 gem 'twitter', path: 'gems/twitter'
-gem 'vericite_api', '1.2.0'
+gem 'vericite_api', '1.5.1'
 gem 'utf8_cleaner', path: 'gems/utf8_cleaner'
 gem 'workflow', path: 'gems/workflow'

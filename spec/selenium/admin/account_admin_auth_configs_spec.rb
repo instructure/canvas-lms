@@ -55,14 +55,15 @@ describe 'account authentication' do
 
       it 'should allow update of config', priority: "1", test_id: 250263 do
         add_ldap_config
-        ldap_form = f("#edit_ldap#{ldap_aac.active.last.id}")
-        ldap_form.find_element(:id, 'authentication_provider_auth_host').clear
-        ldap_form.find_element(:id, 'authentication_provider_auth_port').clear
-        f("label[for=no_tls_#{ldap_aac.active.last.id}]").click
-        ldap_form.find_element(:id, 'authentication_provider_auth_base').clear
-        ldap_form.find_element(:id, 'authentication_provider_auth_filter').clear
-        ldap_form.find_element(:id, 'authentication_provider_auth_username').clear
-        ldap_form.find_element(:id, 'authentication_provider_auth_password').send_keys('newpassword')
+        suffix = "ldap_#{ldap_aac.active.last.id}"
+        ldap_form = f("#edit_#{suffix}")
+        ldap_form.find_element(:id, "auth_host_#{suffix}").clear
+        ldap_form.find_element(:id, "auth_port_#{suffix}").clear
+        f("label[for=no_tls_#{suffix}]").click
+        ldap_form.find_element(:id, "auth_base_#{suffix}").clear
+        ldap_form.find_element(:id, "auth_filter_#{suffix}").clear
+        ldap_form.find_element(:id, "auth_username_#{suffix}").clear
+        ldap_form.find_element(:id, "auth_password_#{suffix}").send_keys('newpassword')
         ldap_form.find("button[type='submit']").click
         wait_for_ajax_requests
 
@@ -128,11 +129,12 @@ describe 'account authentication' do
       it 'should allow update of config', priority: "1", test_id: 250267 do
         add_saml_config
         expect { saml_aac.active.count }.to become 1
-        saml_form = f("#edit_saml#{saml_aac.active.last.id}")
-        f("#authentication_provider_idp_entity_id").clear
-        f("#authentication_provider_log_in_url").clear
-        f("#authentication_provider_log_out_url").clear
-        f("#authentication_provider_certificate_fingerprint").clear
+        suffix = "saml_#{saml_aac.active.last.id}"
+        saml_form = f("#edit_#{suffix}")
+        f("#idp_entity_id_#{suffix}").clear
+        f("#log_in_url_#{suffix}").clear
+        f("#log_out_url_#{suffix}").clear
+        f("#certificate_fingerprint_#{suffix}").clear
         saml_form.find("button[type='submit']").click
         wait_for_ajax_requests
 
@@ -222,7 +224,7 @@ describe 'account authentication' do
           click_option("select.canvas_attribute", "locale")
           f(".add_federated_attribute_button").click
           f("input[name='authentication_provider[federated_attributes][locale][attribute]']").send_keys("provider_locale")
-          saml_form = f("#edit_saml#{ap.id}")
+          saml_form = f("#edit_saml_#{ap.id}")
           expect_new_page_load do
             saml_form.find("button[type='submit']").click
           end
@@ -243,7 +245,7 @@ describe 'account authentication' do
           expect(provisioning_only).to be_displayed
           provisioning_only.click
 
-          saml_form = f("#edit_saml#{ap.id}")
+          saml_form = f("#edit_saml_#{ap.id}")
           expect_new_page_load do
             saml_form.find("button[type='submit']").click
           end
@@ -298,7 +300,7 @@ describe 'account authentication' do
           get "/accounts/self/authentication_providers"
 
           fj(".remove_federated_attribute:visible").click
-          saml_form = f("#edit_saml#{ap.id}")
+          saml_form = f("#edit_saml_#{ap.id}")
           expect_new_page_load do
             saml_form.find("button[type='submit']").click
           end
@@ -315,7 +317,7 @@ describe 'account authentication' do
           2.times do
             fj(".remove_federated_attribute:visible").click
           end
-          available = ff("#edit_saml#{ap.id} .federated_attributes_select option")
+          available = ff("#edit_saml_#{ap.id} .federated_attributes_select option")
           expect(available.any? { |attr| attr.text =~ /attribute/i }).to eq false
         end
       end
@@ -334,8 +336,9 @@ describe 'account authentication' do
 
       it 'should allow update of config', priority: "1", test_id: 250273 do
         add_cas_config
-        cas_form = f("#edit_cas#{cas_aac.active.last.id}")
-        cas_form.find('#authentication_provider_auth_base').clear
+        suffix = "cas_#{cas_aac.active.last.id}"
+        cas_form = f("#edit_#{suffix}")
+        cas_form.find("#auth_base_#{suffix}").clear
         cas_form.find("button[type='submit']").click
         wait_for_ajax_requests
 
@@ -369,9 +372,9 @@ describe 'account authentication' do
 
       it 'should allow update of config', priority: "2", test_id: 250276 do
         add_facebook_config
-        config_id = facebook_aac.active.last.id
-        facebook_form = f("#edit_facebook#{config_id}")
-        f("#authentication_provider_app_id").clear
+        suffix = "facebook_#{facebook_aac.active.last.id}"
+        facebook_form = f("#edit_#{suffix}")
+        f("#app_id_#{suffix}").clear
         facebook_form.find("button[type='submit']").click
         wait_for_ajax_requests
 
@@ -406,9 +409,10 @@ describe 'account authentication' do
 
       it 'should allow update of config', priority: "2", test_id: 250279 do
         add_github_config
-        github_form = f("#edit_github#{github_aac.active.last.id}")
-        github_form.find_element(:id, 'authentication_provider_domain').clear
-        github_form.find_element(:id, 'authentication_provider_client_id').clear
+        suffix = "github_#{github_aac.active.last.id}"
+        github_form = f("#edit_#{suffix}")
+        github_form.find_element(:id, "domain_#{suffix}").clear
+        github_form.find_element(:id, "client_id_#{suffix}").clear
         github_form.find("button[type='submit']").click
         wait_for_ajax_requests
 
@@ -444,8 +448,9 @@ describe 'account authentication' do
 
       it 'should allow update of config', priority: "2", test_id: 250282 do
         add_google_config
-        google_form = f("#edit_google#{google_aac.active.last.id}")
-        google_form.find_element(:id, 'authentication_provider_client_id').clear
+        suffix = "google_#{google_aac.active.last.id}"
+        google_form = f("#edit_#{suffix}")
+        google_form.find_element(:id, "client_id_#{suffix}").clear
         google_form.find("button[type='submit']").click
         wait_for_ajax_requests
 
@@ -480,8 +485,9 @@ describe 'account authentication' do
 
       it 'should allow update of config', priority: "2", test_id: 250285 do
         add_linkedin_config
-        linkedin_form = f("#edit_linkedin#{linkedin_aac.active.last.id}")
-        linkedin_form.find_element(:id, 'authentication_provider_client_id').clear
+        suffix = "linkedin_#{linkedin_aac.active.last.id}"
+        linkedin_form = f("#edit_#{suffix}")
+        linkedin_form.find_element(:id, "client_id_#{suffix}").clear
         linkedin_form.find("button[type='submit']").click
         wait_for_ajax_requests
 
@@ -519,11 +525,12 @@ describe 'account authentication' do
 
       it 'should allow update of config', priority: "2", test_id: 250288 do
         add_openid_connect_config
-        openid_connect_form = f("#edit_openid_connect#{openid_aac.active.last.id}")
-        openid_connect_form.find_element(:id, 'authentication_provider_client_id').clear
-        f("#authentication_provider_authorize_url").clear
-        f("#authentication_provider_token_url").clear
-        f("#authentication_provider_scope").clear
+        suffix = "openid_connect_#{openid_aac.active.last.id}"
+        openid_connect_form = f("#edit_#{suffix}")
+        openid_connect_form.find_element(:id, "client_id_#{suffix}").clear
+        f("#authorize_url_#{suffix}").clear
+        f("#token_url_#{suffix}").clear
+        f("#scope_#{suffix}").clear
         openid_connect_form.find("button[type='submit']").click
         wait_for_ajax_requests
 
@@ -561,8 +568,9 @@ describe 'account authentication' do
 
       it 'should allow update of config', priority: "2", test_id: 250291 do
         add_twitter_config
-        twitter_form = f("#edit_twitter#{twitter_aac.active.last.id}")
-        twitter_form.find_element(:id, 'authentication_provider_consumer_key').clear
+        suffix = "twitter_#{twitter_aac.active.last.id}"
+        twitter_form = f("#edit_#{suffix}")
+        twitter_form.find_element(:id, "consumer_key_#{suffix}").clear
         twitter_form.find("button[type='submit']").click
         wait_for_ajax_requests
 
@@ -598,8 +606,9 @@ describe 'account authentication' do
 
       it 'should allow update of config', priority: "2" do
         add_microsoft_config
-        microsoft_form = f("#edit_microsoft#{microsoft_aac.active.last.id}")
-        microsoft_form.find_element(:id, 'authentication_provider_application_id').clear
+        suffix = "microsoft_#{microsoft_aac.active.last.id}"
+        microsoft_form = f("#edit_#{suffix}")
+        microsoft_form.find_element(:id, "application_id_#{suffix}").clear
         microsoft_form.find("button[type='submit']").click
         wait_for_ajax_requests
 

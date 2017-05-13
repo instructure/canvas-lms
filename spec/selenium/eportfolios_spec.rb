@@ -140,6 +140,7 @@ describe "eportfolios" do
     end
 
     it "should have a working flickr search dialog" do
+      skip_if_chrome('fragile in chrome')
       get "/eportfolios/#{@eportfolio.id}"
       f("#page_list a.page_url").click
       expect(f("#page_list a.page_url")).to be_displayed

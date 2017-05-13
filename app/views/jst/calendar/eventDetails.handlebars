@@ -11,7 +11,7 @@
   </div>
   <div class="event-details-content">
     <div class="event-details-timestring">{{{displayTimeString}}}</div>
-    <table cellspacing="0">
+    <table cellspacing="0" role="presentation">
       {{#if contextInfo}}
         <tr>
           <th scope="row">{{#t "calendar"}}Calendar{{/t}}</th>
@@ -55,13 +55,13 @@
             {{#if can_edit}}
               <ul id="attendees">
                 {{#each reservations}}
-                  <li data-url="{{event_url}}">
-                    <div class="ellipsis">{{name}}</div>
-                    <a href="javascript:void(0)" class="cancel_appointment_link" title="{{#t}}Remove attendee {{name}}{{/t}}">
-                      <i class="icon-x" aria-hidden="true"></i>
-                      <span class="screenreader-only">{{#t}}Remove attendee {{name}}{{/t}}</span>
-                    </a>
-                  </li>
+                <li data-url="{{event_url}}">
+                  <div class="ellipsis">{{name}}</div>
+                  <button type="button" class="cancel_appointment_link" title="{{#t}}Remove attendee {{name}}{{/t}}">
+                    <i class="icon-x" aria-hidden="true"></i>
+                    <span class="screenreader-only">{{#t}}Remove attendee {{name}}{{/t}}</span>
+                  </button>
+                </li>
                 {{/each}}
               </ul>
             {{else}}

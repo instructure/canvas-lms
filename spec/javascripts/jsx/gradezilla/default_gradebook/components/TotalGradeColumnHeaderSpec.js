@@ -29,6 +29,18 @@ function createExampleProps () {
       onSortByGradeAscending () {},
       onSortByGradeDescending () {},
       settingKey: 'grade'
+    },
+    gradeDisplay: {
+      currentDisplay: 'points',
+      onSelect () {},
+      disabled: false,
+      hidden: false
+    },
+    position: {
+      isInFront: false,
+      isInBack: false,
+      onMoveToFront () {},
+      onMoveToBack () {}
     }
   };
 }
@@ -36,8 +48,44 @@ function createExampleProps () {
 function mountAndOpenOptions (props) {
   const wrapper = mount(<TotalGradeColumnHeader {...props} />);
   wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
   return wrapper;
 }
+
+QUnit.module('TotalGradeColumnHeader - base behavior', {
+  setup () {
+    this.props = createExampleProps();
+    this.wrapper = mount(<TotalGradeColumnHeader {...this.props} />);
+  },
+
+  teardown () {
+    this.wrapper.unmount();
+  }
+});
+
+test('renders the label Total', function () {
+  const label = this.wrapper.find('.Gradebook__ColumnHeaderDetail');
+
+  equal(label.text().trim(), 'Total');
+});
+
+test('renders a PopoverMenu', function () {
+  const optionsMenu = this.wrapper.find('PopoverMenu');
+
+  equal(optionsMenu.length, 1);
+});
+
+test('renders an IconMoreSolid inside the PopoverMenu', function () {
+  const optionsMenuTrigger = this.wrapper.find('PopoverMenu IconMoreSolid');
+
+  equal(optionsMenuTrigger.length, 1);
+});
+
+test('renders a title for the More icon based on the assignment name', function () {
+  const optionsMenuTrigger = this.wrapper.find('PopoverMenu IconMoreSolid');
+
+  equal(optionsMenuTrigger.props().title, 'Total Options');
+});
 
 QUnit.module('TotalGradeColumnHeader - Sort by Settings', {
   setup () {
@@ -70,7 +118,7 @@ test('includes the "Sort by" group', function () {
 test('includes "Grade - Low to High" sort setting', function () {
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = this.getMenuItem(0);
-  equal(menuItem.text(), 'Grade - Low to High');
+  equal(menuItem.text().trim(), 'Grade - Low to High');
 });
 
 test('selects "Grade - Low to High" when sorting by grade ascending', function () {
@@ -79,7 +127,7 @@ test('selects "Grade - Low to High" when sorting by grade ascending', function (
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = this.getSelectedMenuItem();
   equal(menuItem.length, 1, 'only one menu item is selected');
-  equal(menuItem.text(), 'Grade - Low to High', '"Grade - Low to High" is selected');
+  equal(menuItem.text().trim(), 'Grade - Low to High', '"Grade - Low to High" is selected');
 });
 
 test('does not select "Grade - Low to High" when isSortColumn is false', function () {
@@ -116,7 +164,8 @@ test('clicking "Grade - Low to High" when disabled does not call onSortByGradeAs
 test('includes "Grade - High to Low" sort setting', function () {
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = this.getMenuItem(1);
-  equal(menuItem.text(), 'Grade - High to Low');
+
+  equal(menuItem.text().trim(), 'Grade - High to Low');
 });
 
 test('selects "Grade - High to Low" when sorting by grade descending', function () {
@@ -125,7 +174,8 @@ test('selects "Grade - High to Low" when sorting by grade descending', function 
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = this.getSelectedMenuItem();
   equal(menuItem.length, 1, 'only one menu item is selected');
-  equal(menuItem.text(), 'Grade - High to Low', '"Grade - High to Low" is selected');
+
+  equal(menuItem.text().trim(), 'Grade - High to Low', '"Grade - High to Low" is selected');
 });
 
 test('does not select "Grade - High to Low" when isSortColumn is false', function () {
@@ -157,4 +207,186 @@ test('clicking "Grade - High to Low" when disabled does not call onSortByGradeDe
   this.wrapper = mountAndOpenOptions(this.props);
   this.getMenuItem(1).simulate('click');
   equal(this.props.sortBySetting.onSortByGradeDescending.callCount, 0);
+});
+
+QUnit.module('TotalGradeColumnHeader - Display as Points', {
+  mountAndGetMenuItem () {
+    this.wrapper = mountAndOpenOptions(this.props);
+    this.menuItem = document.querySelector('[data-menu-item-id="grade-display-switcher"]');
+  },
+
+  setup () {
+    this.props = createExampleProps();
+    this.props.gradeDisplay.currentDisplay = 'percentage';
+    this.props.gradeDisplay.onSelect = this.stub();
+  },
+
+  teardown () {
+    this.wrapper.unmount();
+  }
+});
+
+test('the grade display switcher option does not show when hidden is true', function () {
+  this.props.gradeDisplay.hidden = true;
+  this.mountAndGetMenuItem();
+
+  notOk(this.menuItem);
+});
+
+test('the grade display switcher option is disabled when disabled is true', function () {
+  this.props.gradeDisplay.disabled = true;
+  this.mountAndGetMenuItem();
+  this.menuItem.click();
+
+  equal(this.props.gradeDisplay.onSelect.callCount, 0);
+});
+
+test('the grade display switcher option reads "Display as Points"', function () {
+  this.mountAndGetMenuItem();
+
+  equal(this.menuItem.textContent, 'Display as Points');
+});
+
+test('clicking the "Display as Points" option calls the gradeDisplay onSelect callback', function () {
+  this.mountAndGetMenuItem();
+  this.menuItem.click();
+
+  equal(this.props.gradeDisplay.onSelect.callCount, 1);
+});
+
+QUnit.module('TotalGradeColumnHeader - Display as Percentage', {
+  mountAndGetMenuItem () {
+    this.wrapper = mountAndOpenOptions(this.props);
+    this.menuItem = document.querySelector('[data-menu-item-id="grade-display-switcher"]');
+  },
+
+  setup () {
+    this.props = createExampleProps();
+    this.props.gradeDisplay.currentDisplay = 'points';
+    this.props.gradeDisplay.onSelect = this.stub();
+  },
+
+  teardown () {
+    this.wrapper.unmount();
+  }
+});
+
+test('the grade display switcher option does not show when hidden is true', function () {
+  this.props.gradeDisplay.hidden = true;
+  this.mountAndGetMenuItem();
+
+  notOk(this.menuItem);
+});
+
+test('the grade display switcher option is disabled when disabled is true', function () {
+  this.props.gradeDisplay.disabled = true;
+  this.mountAndGetMenuItem();
+  this.menuItem.click();
+
+  equal(this.props.gradeDisplay.onSelect.callCount, 0);
+});
+
+test('the grade display switcher option reads "Display as Percentage"', function () {
+  this.mountAndGetMenuItem();
+
+  equal(this.menuItem.textContent, 'Display as Percentage');
+});
+
+test('clicking the "Display as Percentage" option calls the gradeDisplay onSelect callback', function () {
+  this.mountAndGetMenuItem();
+  this.menuItem.click();
+
+  equal(this.props.gradeDisplay.onSelect.callCount, 1);
+});
+
+QUnit.module('TotalGradeColumnHeader - Move to Front', {
+  setup () {
+    this.props = createExampleProps();
+    this.props.position.isInFront = false;
+    this.props.position.onMoveToFront = this.stub();
+  },
+
+  getMenuItem () {
+    return document.querySelector('[data-menu-item-id="total-grade-move-to-front"]');
+  }
+});
+
+test('the "Move to Front" option does not appear when isInFront is true', function () {
+  this.props.position.isInFront = true;
+  const wrapper = mountAndOpenOptions(this.props);
+
+  notOk(this.getMenuItem());
+
+  wrapper.unmount();
+});
+
+test('the "Move to Front" option shows up when ths isInFront property is false', function () {
+  const wrapper = mountAndOpenOptions(this.props);
+
+  ok(this.getMenuItem());
+
+  wrapper.unmount();
+});
+
+test('the "Move to Front" option reads "Move to Front"', function () {
+  const wrapper = mountAndOpenOptions(this.props);
+
+  strictEqual(this.getMenuItem().textContent, 'Move to Front');
+
+  wrapper.unmount();
+});
+
+test('clicking the "Move to Front" option calls the onMoveToFront callback', function () {
+  const wrapper = mountAndOpenOptions(this.props);
+  this.getMenuItem().click();
+
+  strictEqual(this.props.position.onMoveToFront.callCount, 1);
+
+  wrapper.unmount();
+});
+
+QUnit.module('TotalGradeColumnHeader - Move to Back', {
+  setup () {
+    this.props = createExampleProps();
+    this.props.position.isInBack = false;
+    this.props.position.onMoveToBack = this.stub();
+  },
+
+  getMenuItem () {
+    return document.querySelector('[data-menu-item-id="total-grade-move-to-back"]');
+  }
+});
+
+test('the "Move to Back" option does not appear when isInBack is true', function () {
+  this.props.position.isInBack = true;
+  const wrapper = mountAndOpenOptions(this.props);
+
+  notOk(this.getMenuItem());
+
+  wrapper.unmount();
+});
+
+test('the "Move to Back" option shows up when ths isInBack property is false', function () {
+  const wrapper = mountAndOpenOptions(this.props);
+
+  ok(this.getMenuItem());
+
+  wrapper.unmount();
+});
+
+test('the "Move to Back" option reads "Move to End"', function () {
+  const wrapper = mountAndOpenOptions(this.props);
+
+  strictEqual(this.getMenuItem().textContent, 'Move to End');
+
+  wrapper.unmount();
+});
+
+test('clicking the "Move to Back" option calls the onMoveToBack callback', function () {
+  const wrapper = mountAndOpenOptions(this.props);
+  this.getMenuItem().click();
+
+  strictEqual(this.props.position.onMoveToBack.callCount, 1);
+
+  wrapper.unmount();
 });

@@ -24,11 +24,8 @@ class AccountAuthorizationConfig::Facebook < AccountAuthorizationConfig::Oauth2
 
   SENSITIVE_PARAMS = [ :app_secret ].freeze
 
-  alias_method :app_id=, :client_id=
-  alias_method :app_id, :client_id
-
-  alias_method :app_secret=, :client_secret=
-  alias_method :app_secret, :client_secret
+  alias_attribute :app_id, :client_id
+  alias_attribute :app_secret, :client_secret
 
   def client_id
     self.class.globally_configured? ? app_id : super

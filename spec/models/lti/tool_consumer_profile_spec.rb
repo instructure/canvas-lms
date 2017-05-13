@@ -83,5 +83,15 @@ module Lti
 
     end
 
+    describe 'restricted services' do
+      it "includes 'vnd.Canvas.OriginalityReport'" do
+        service = Lti::ToolConsumerProfile::RESTRICTED_SERVICES.find do |s|
+          s[:id].include? 'vnd.Canvas.submission'
+        end
+
+        expect(service).not_to be_nil
+      end
+    end
+
   end
 end

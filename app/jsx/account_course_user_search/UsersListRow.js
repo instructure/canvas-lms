@@ -4,13 +4,17 @@ import $ from 'jquery'
 import EditUserDetailsDialog from 'jsx/shared/EditUserDetailsDialog'
 import 'jquery.instructure_date_and_time'
 
-  const { object, number, string, func, shape, arrayOf, bool } = React.PropTypes;
+const { object, string, func, shape, bool } = React.PropTypes
 
-  var UsersListRow = React.createClass({
-    propTypes: {
+  export default class UsersListRow extends React.Component {
+    static propTypes = {
       accountId: string,
       timezones: object.isRequired,
-      user: object.isRequired,
+      user: shape({
+        id: string.isRequired,
+        name: string.isRequired,
+        avatar_url: string,
+      }).isRequired,
       handlers: shape({
         handleOpenEditUserDialog: func,
         handleSubmitEditUserForm: func,
@@ -21,7 +25,7 @@ import 'jquery.instructure_date_and_time'
         can_message_users: bool,
         can_edit_users: bool
       }).isRequired
-    },
+    }
 
     renderLinks () {
       const links = [];
@@ -68,13 +72,13 @@ import 'jquery.instructure_date_and_time'
       }
 
       return (
-        <div ref="linksContainer" className="courses-user-list-actions">
+        <div className="courses-user-list-actions">
           {links}
         </div>
       );
-    },
+    }
 
-    render() {
+    render () {
       const { id, name, sis_user_id, email, avatar_url, last_login, editUserDialogOpen } = this.props.user;
       const { handleSubmitEditUserForm, handleCloseEditUserDialog } = this.props.handlers;
       const url = `/accounts/${this.props.accountId}/users/${id}`;
@@ -121,6 +125,4 @@ import 'jquery.instructure_date_and_time'
         </div>
       );
     }
-  });
-
-export default UsersListRow
+  }

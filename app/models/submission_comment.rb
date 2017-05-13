@@ -25,7 +25,6 @@ class SubmissionComment < ActiveRecord::Base
   belongs_to :assessment_request
   belongs_to :context, polymorphic: [:course]
   belongs_to :provisional_grade, :class_name => 'ModeratedGrading::ProvisionalGrade'
-  has_many :submission_comment_participants, :dependent => :destroy
   has_many :messages, :as => :context, :inverse_of => :context, :dependent => :destroy
 
   validates_length_of :comment, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
@@ -34,7 +33,6 @@ class SubmissionComment < ActiveRecord::Base
   before_save :infer_details
   after_save :update_participation
   after_save :check_for_media_object
-  after_create :update_participants
   after_update :publish_other_comments_in_this_group
   after_destroy :delete_other_comments_in_this_group
   after_commit :update_submission
@@ -155,14 +153,6 @@ class SubmissionComment < ActiveRecord::Base
         self.author == user ||
         self.submission.assignment.context.grants_right?(user, session, :view_all_grades) ||
         self.submission.assignment.context.grants_right?(self.author, session, :view_all_grades)
-  end
-
-  def update_participants
-    self.submission_comment_participants.where(user_id: self.submission.user_id, participation_type: 'submitter').first_or_create
-    self.submission_comment_participants.where(user_id: self.author_id, participation_type: 'author').first_or_create
-    (submission.assignment.context.participating_instructors - [author]).each do |user|
-      self.submission_comment_participants.where(user_id: user.id, participation_type: 'admin').first_or_create
-    end
   end
 
   def reply_from(opts)

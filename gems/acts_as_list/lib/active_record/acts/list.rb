@@ -59,7 +59,7 @@ module ActiveRecord
                     when Hash
                       scope
                     else
-                      raise InvalidArgument.new("scope must be nil, a symbol, an array, or a hash")
+                      raise ArgumentError.new("scope must be nil, a symbol, an array, or a hash")
                     end
             # expand assocations to their foreign keys
             new_scope = {}
@@ -126,9 +126,7 @@ module ActiveRecord
           RUBY
 
           if position_column != 'position'
-            class_eval do
-              alias_method :position, self.class.position_column.to_sym
-            end
+            define_method(:position) { read_attribute(self.class.position_column.to_sym) }
           end
         end
       end

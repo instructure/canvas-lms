@@ -1,3 +1,21 @@
+#
+# Copyright (C) 2016 - 2017 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
 require_relative '../../helpers/gradezilla_common'
 require_relative '../page_objects/gradezilla_page'
 require_relative '../../helpers/groups_common'
@@ -13,54 +31,43 @@ describe "Gradezilla" do
   before(:once) { gradebook_data_setup }
   before(:each) { user_session(@teacher) }
 
-  it "hides unpublished/shows published assignments", priority: "1", test_id: 210016 do
+  it "shows unpublished assignments", priority: "1", test_id: 210016 do
     assignment = @course.assignments.create! title: 'unpublished'
     assignment.unpublish
     gradezilla_page.visit(@course)
-    expect(f('#gradebook_grid .container_1 .slick-header')).not_to include_text(assignment.title)
-
-    @first_assignment.publish
-    gradezilla_page.visit(@course)
-    expect(f('#gradebook_grid .container_1 .slick-header')).to include_text(@first_assignment.title)
+    expect(f('#gradebook_grid .container_1 .slick-header')).to include_text(assignment.title)
   end
 
-  it "should not show 'not-graded' assignments", priority: "1", test_id: 210017 do
+  it "hides 'not-graded' assignments", priority: "1", test_id: 210017 do
     gradezilla_page.visit(@course)
 
     expect(f('.slick-header-columns')).not_to include_text(@ungraded_assignment.title)
   end
 
-  def filter_student(text)
-    f('.gradebook_filter input').send_keys text
-    sleep 1 # InputFilter has a delay
-  end
-
-  def visible_students
-    ff('.student-name')
-  end
-
-  it 'should filter students', priority: "1", test_id: 210018 do
+  it 'filters students', priority: "1", test_id: 210018 do
+    visible_students = -> { ff('.student-name') }
     gradezilla_page.visit(@course)
-    expect(visible_students).to have_size @all_students.size
-    filter_student 'student 1'
-    visible_after_filtering = visible_students
+    expect(visible_students.call).to have_size @all_students.size
+    f('.gradebook_filter input').send_keys 'student 1'
+    sleep 1 # InputFilter has a delay
+    visible_after_filtering = visible_students.call
     expect(visible_after_filtering).to have_size 1
     expect(visible_after_filtering[0]).to include_text 'student 1'
   end
 
-  it "should validate correct number of students showing up in gradebook", priority: "1", test_id: 210019 do
+  it "validates correct number of students showing up in gradebook", priority: "1", test_id: 210019 do
     gradezilla_page.visit(@course)
 
     expect(ff('.student-name')).to have_size @course.students.count
   end
 
-  it "should show students sorted by their sortable_name", priority: "1", test_id: 210022 do
+  it "shows students sorted by their sortable_name", priority: "1", test_id: 210022 do
     gradezilla_page.visit(@course)
     dom_names = ff('.student-name').map(&:text)
     expect(dom_names).to eq @all_students.map(&:name)
   end
 
-  it "should not show student avatars until they are enabled", priority: "1", test_id: 210023 do
+  it "hides student avatars until they are enabled", priority: "1", test_id: 210023 do
     gradezilla_page.visit(@course)
 
     expect(ff('.student-name')).to have_size @all_students.size
@@ -76,7 +83,7 @@ describe "Gradezilla" do
     expect(ff('.avatar')).to have_size @all_students.size
   end
 
-  it "should handle muting/unmuting correctly", priority: "1", test_id: 164227 do
+  it "handles muting/unmuting correctly", priority: "1", test_id: 164227 do
     pending('TODO: Refactor this and add it back as part of CNVS-33679')
     gradezilla_page.visit(@course)
     toggle_muting(@second_assignment)
@@ -100,7 +107,7 @@ describe "Gradezilla" do
       gradezilla_page.visit(@course)
     end
 
-    it "should allow editing grades", priority: "1", test_id: 210026 do
+    it "allows editing grades", priority: "1", test_id: 210026 do
       cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l1')
       expect(f('.gradebook-cell', cell)).to include_text '10'
       cell.click
@@ -108,7 +115,7 @@ describe "Gradezilla" do
     end
   end
 
-  it "should validate that gradebook settings is displayed when button is clicked", priority: "1", test_id: 164217 do
+  it "validates that gradebook settings is displayed when button is clicked", priority: "1", test_id: 164217 do
     gradezilla_page.visit(@course)
 
     f('#gradebook_settings').click
@@ -124,7 +131,7 @@ describe "Gradezilla" do
     expect(driver.current_url).to include("/courses/#{@course.id}/gradebook/history")
   end
 
-  it "should validate assignment details", priority: "1", test_id: 210048 do
+  it "validates assignment details", priority: "1", test_id: 210048 do
     submissions_count = @second_assignment.submissions.count.to_s + ' submissions'
 
     gradezilla_page.visit(@course)
@@ -137,7 +144,7 @@ describe "Gradezilla" do
     expect(table_rows[3].find_element(:css, 'td')).to include_text submissions_count
   end
 
-  it "should include student view student for grading" do
+  it "includes student view student for grading" do
     @fake_student1 = @course.student_view_student
     @fake_student1.update_attribute :workflow_state, "deleted"
     @fake_student2 = @course.student_view_student
@@ -149,12 +156,12 @@ describe "Gradezilla" do
     fakes = [@fake_student1.name, @fake_student2.name]
     expect(ff('.student-name').last(2).map(&:text)).to eq fakes
 
-    # test students should always be last
+    # test students will always be last
     f('.slick-header-column').click
     expect(ff('.student-name').last(2).map(&:text)).to eq fakes
   end
 
-  it "should not include non-graded group assignment in group total" do
+  it "excludes non-graded group assignment in group total" do
     gc = group_category
     graded_assignment = @course.assignments.create!({
                                                         :title => 'group assignment 1',
@@ -188,7 +195,7 @@ describe "Gradezilla" do
     expect(total_grade).to include_text('100%') # otherwise 108%
   end
 
-  it "should not show assignment mute warning in total column for 'not_graded', muted assignments" do
+  it "hides assignment mute warning in total column for 'not_graded', muted assignments" do
     assignment = @course.assignments.create!({
                                               title: 'Non Graded Assignment',
                                               due_at: (Time.zone.now + 1.week),
@@ -202,7 +209,7 @@ describe "Gradezilla" do
     expect(f("body")).not_to contain_css(".total-cell .icon-muted")
   end
 
-  it "should hide and show student names", priority: "2", test_id: 164220 do
+  it "hides and shows student names", priority: "2", test_id: 164220 do
 
     def toggle_hiding_students
       f('#gradebook_settings').click
@@ -222,20 +229,6 @@ describe "Gradezilla" do
     expect(f("#content")).not_to contain_jqcss('.student-placeholder:visible')
   end
 
-  it "should hide and show notes", priority: "2", test_id: 164224 do
-    gradezilla_page.visit(@course)
-
-    # show notes column
-    gradebook_settings_cog.click
-    show_notes.click
-    expect(f("#content")).to contain_jqcss('.custom_column:visible')
-
-    # hide notes column
-    gradebook_settings_cog.click
-    hide_notes.click
-    expect(f("#content")).not_to contain_jqcss('.custom_column:visible')
-  end
-
   context "downloading and uploading submissions" do
     it "updates the dropdown menu after downloading and processes submission uploads" do
       # Given I have a student with an uploaded submission
@@ -245,11 +238,16 @@ describe "Gradezilla" do
       # When I go to the gradebook
       gradezilla_page.visit(@course)
 
+      # chrome fails to find the download submissions link because it does not fit normal screen
+      make_full_screen
+
       # And I click the dropdown menu on the assignment
       f(".slick-header-column[id*='assignment_#{@first_assignment.id}'] .Gradebook__ColumnHeaderAction").click
 
       # And I click the download submissions button
-      f('[data-menu-item-id="download-submissions"]').click
+      download_submissions_menu_item = -> { f('[data-menu-item-id="download-submissions"]') }
+      scroll_to(download_submissions_menu_item.call)
+      download_submissions_menu_item.call.click
 
       # And I close the download submissions dialog
       fj("div:contains('Download Assignment Submissions'):first .ui-dialog-titlebar-close").click
@@ -269,12 +267,12 @@ describe "Gradezilla" do
         fj('button:contains("Upload Files")').click
       end
 
-      # Then I should see a message indicating the file was processed
+      # Then I will see a message indicating the file was processed
       expect(f('#content h3')).to include_text 'Attached files to the following user submissions'
     end
   end
 
-  it "should show late submissions" do
+  it "shows late submissions" do
     gradezilla_page.visit(@course)
     expect(f("body")).not_to contain_css(".late")
 
@@ -285,7 +283,7 @@ describe "Gradezilla" do
     expect(ff('.late')).to have_size(1)
   end
 
-  it "should not display a speedgrader link for large courses", priority: "2", test_id: 210099 do
+  it "hides the speedgrader link for large courses", priority: "2", test_id: 210099 do
     pending('TODO: Refactor this and add it back as part of CNVS-32440')
     @course.stubs(:large_roster?).returns(true)
 
@@ -341,7 +339,7 @@ describe "Gradezilla" do
     let(:essay_text) { {"question_#{essay_question.id}" => "Essay Response!"} }
     let(:file_submission) { file_question.generate_submission(student) }
 
-    it 'should display the quiz icon for essay questions', priority: "1", test_id: 229430 do
+    it 'displays the quiz icon for essay questions', priority: "1", test_id: 229430 do
       essay_submission.complete!(essay_text)
       user_session(teacher)
 
@@ -349,7 +347,7 @@ describe "Gradezilla" do
       expect(f('#gradebook_grid .icon-quiz')).to be_truthy
     end
 
-    it 'should display the quiz icon for file_upload questions', priority: "1", test_id: 498844 do
+    it 'displays the quiz icon for file_upload questions', priority: "1", test_id: 498844 do
       file_submission.attachments.create!({
         :filename => "doc.doc",
         :display_name => "doc.doc", :user => @user,
@@ -362,7 +360,7 @@ describe "Gradezilla" do
       expect(f('#gradebook_grid .icon-quiz')).to be_truthy
     end
 
-    it 'should remove the quiz icon when graded manually', priority: "1", test_id: 491040 do
+    it 'removes the quiz icon when graded manually', priority: "1", test_id: 491040 do
       essay_submission.complete!(essay_text)
       user_session(teacher)
 

@@ -106,8 +106,7 @@ class Account < ActiveRecord::Base
   after_save :invalidate_caches_if_changed
   after_update :clear_special_account_cache_if_special
 
-  after_create :default_enrollment_term
-  after_create :enable_canvas_authentication
+  after_create :create_default_objects
 
   serialize :settings, Hash
   include TimeZoneHelper
@@ -985,7 +984,7 @@ class Account < ActiveRecord::Base
     end
 
     given { |user| !self.account_users_for(user).empty? }
-    can :read and can :manage and can :update and can :delete and can :read_outcomes
+    can :read and can :read_as_admin and can :manage and can :update and can :delete and can :read_outcomes
 
     given { |user|
       result = false
@@ -1040,7 +1039,7 @@ class Account < ActiveRecord::Base
   def default_enrollment_term
     return @default_enrollment_term if @default_enrollment_term
     if self.root_account?
-      @default_enrollment_term = self.enrollment_terms.active.where(name: EnrollmentTerm::DEFAULT_TERM_NAME).first_or_create
+      @default_enrollment_term = Shackles.activate(:master) { self.enrollment_terms.active.where(name: EnrollmentTerm::DEFAULT_TERM_NAME).first_or_create }
     end
   end
 
@@ -1535,8 +1534,6 @@ class Account < ActiveRecord::Base
     end
   end
 
-  def self.serialization_excludes; [:uuid]; end
-
   def find_child(child_id)
     return all_accounts.find(child_id) if root_account?
 
@@ -1641,5 +1638,12 @@ class Account < ActiveRecord::Base
   def to_param
     return 'site_admin' if site_admin?
     super
+  end
+
+  def create_default_objects
+    self.class.connection.after_transaction_commit do
+      default_enrollment_term
+      enable_canvas_authentication
+    end
   end
 end

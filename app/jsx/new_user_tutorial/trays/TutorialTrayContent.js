@@ -1,6 +1,6 @@
 import React from 'react'
-import Heading from 'instructure-ui/Heading'
-import Image from 'instructure-ui/Image'
+import Heading from 'instructure-ui/lib/components/Heading'
+import Image from 'instructure-ui/lib/components/Image'
 import SVGWrapper from 'jsx/shared/SVGWrapper'
 
 const TutorialTrayContent = props => (

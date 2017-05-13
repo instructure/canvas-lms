@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import IconMoreSolid from 'instructure-icons/react/Solid/IconMoreSolid'
-import { MenuItem, MenuItemGroup, MenuItemSeparator } from 'instructure-ui/Menu'
-import PopoverMenu from 'instructure-ui/PopoverMenu'
-import Typography from 'instructure-ui/Typography'
+import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid'
+import { MenuItem, MenuItemGroup, MenuItemSeparator } from 'instructure-ui/lib/components/Menu'
+import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
+import Typography from 'instructure-ui/lib/components/Typography'
 import I18n from 'i18n!gradebook'
 
 const { bool, func, shape, string } = React.PropTypes;
@@ -44,7 +44,19 @@ class TotalGradeColumnHeader extends React.Component {
       onSortByGradeAscending: func.isRequired,
       onSortByGradeDescending: func.isRequired,
       settingKey: string.isRequired
-    }).isRequired
+    }).isRequired,
+    gradeDisplay: shape({
+      currentDisplay: string.isRequired,
+      onSelect: func.isRequired,
+      disabled: bool.isRequired,
+      hidden: bool.isRequired
+    }).isRequired,
+    position: shape({
+      isInFront: bool.isRequired,
+      isInBack: bool.isRequired,
+      onMoveToFront: func.isRequired,
+      onMoveToBack: func.isRequired
+    }).isRequired,
   };
 
   constructor (props) {
@@ -54,8 +66,13 @@ class TotalGradeColumnHeader extends React.Component {
   }
 
   render () {
-    const { sortBySetting } = this.props;
+    const { sortBySetting, gradeDisplay, position } = this.props;
     const selectedSortSetting = sortBySetting.isSortColumn && sortBySetting.settingKey;
+    const displayAsPoints = gradeDisplay.currentDisplay === 'points';
+    const showSeparator = !gradeDisplay.hidden;
+    const nowrapStyle = {
+      whiteSpace: 'nowrap'
+    };
 
     return (
       <div className="Gradebook__ColumnHeaderContent">
@@ -67,8 +84,8 @@ class TotalGradeColumnHeader extends React.Component {
 
         <PopoverMenu
           contentRef={this.bindOptionsMenuContent}
+          focusTriggerOnClose={false}
           trigger={renderTrigger()}
-          zIndex="9999"
         >
           <MenuItemGroup label={I18n.t('Sort by')}>
             <MenuItem
@@ -88,12 +105,39 @@ class TotalGradeColumnHeader extends React.Component {
             </MenuItem>
           </MenuItemGroup>
 
-          <MenuItemSeparator />
+          {
+            showSeparator &&
+            <MenuItemSeparator />
+          }
+          {
+            !gradeDisplay.hidden &&
+            <MenuItem
+              disabled={this.props.gradeDisplay.disabled}
+              onSelect={this.props.gradeDisplay.onSelect}
+            >
+              <span data-menu-item-id="grade-display-switcher" style={nowrapStyle}>
+                {displayAsPoints ? I18n.t('Display as Percentage') : I18n.t('Display as Points')}
+              </span>
+            </MenuItem>
+          }
 
-          <MenuItem>{ I18n.t('Message Students Who...') }</MenuItem>
-          <MenuItem>{ I18n.t('Display as Points') }</MenuItem>
-          <MenuItem>{ I18n.t('Move to End') }</MenuItem>
-          <MenuItem>{ I18n.t('Adjust Final Grade') }</MenuItem>
+          {
+            !position.isInFront &&
+            <MenuItem onSelect={position.onMoveToFront}>
+              <span data-menu-item-id="total-grade-move-to-front">
+                {I18n.t('Move to Front')}
+              </span>
+            </MenuItem>
+          }
+
+          {
+            !position.isInBack &&
+            <MenuItem onSelect={position.onMoveToBack}>
+              <span data-menu-item-id="total-grade-move-to-back">
+                {I18n.t('Move to End')}
+              </span>
+            </MenuItem>
+          }
         </PopoverMenu>
       </div>
     );

@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import IconMoreSolid from 'instructure-icons/react/Solid/IconMoreSolid'
-import { MenuItem, MenuItemGroup } from 'instructure-ui/Menu'
-import PopoverMenu from 'instructure-ui/PopoverMenu'
-import Typography from 'instructure-ui/Typography'
+import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid'
+import { MenuItem, MenuItemGroup } from 'instructure-ui/lib/components/Menu'
+import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
+import Typography from 'instructure-ui/lib/components/Typography'
 import I18n from 'i18n!gradebook'
 
 const { bool, func, number, shape, string } = React.PropTypes;
@@ -86,8 +86,8 @@ class AssignmentGroupColumnHeader extends React.Component {
 
         <PopoverMenu
           contentRef={this.bindOptionsMenuContent}
+          focusTriggerOnClose={false}
           trigger={renderTrigger(this.props.assignmentGroup)}
-          zIndex="9999"
         >
           <MenuItemGroup label={I18n.t('Sort by')}>
             <MenuItem

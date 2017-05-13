@@ -4799,9 +4799,10 @@ if (typeof jQuery != 'undefined') {
 				.wrap('<li>')
 				.click(function(e){
 					e.preventDefault();
-					require(['compiled/widget/UploadMediaTrackForm'], function(UploadMediaTrackForm){
+					require.ensure([], function(require){
+            var UploadMediaTrackForm = require('compiled/widget/UploadMediaTrackForm');
 						new UploadMediaTrackForm(t.options.mediaCommentId, t.media.src);
-					});
+					}, 'UploadMediaTrackFormAsyncChunk');
 				});
 		  t.adjustLanguageBox();
 		},

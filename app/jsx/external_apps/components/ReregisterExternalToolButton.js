@@ -99,7 +99,7 @@ export default React.createClass({
 
 
     render() {
-      if (this.props.tool.reregistration_url) {
+      if (this.props.canAddEdit && this.props.tool.reregistration_url) {
         return (
             <li role="presentation" className="ReregisterExternalToolButton">
               { this.getButton() }

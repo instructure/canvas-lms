@@ -1,4 +1,4 @@
-require [
+define [
   "jquery",
   "i18n!context.roster_user",
   "jquery.ajaxJSON",

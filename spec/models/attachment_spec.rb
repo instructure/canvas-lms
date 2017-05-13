@@ -524,6 +524,7 @@ describe Attachment do
       a = attachment_model(filename: "blech.ppt", context: c)
       new_account = Account.create
       c2 = course_factory(account: new_account)
+      Attachment.stubs(:s3_storage?).returns(true)
       Attachment.any_instance.expects(:make_rootless).once
       Attachment.any_instance.expects(:change_namespace).once
       a.clone_for(c2)

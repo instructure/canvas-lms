@@ -22,6 +22,5 @@ module Lti
       end
       authorized
     end
-
   end
 end

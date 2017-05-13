@@ -1,6 +1,6 @@
 # listens to clicks on links that would send you to a url that is handled by a loaded backbone router
 # and bypasses doing a real load to that new page.
-require [
+define [
   'jquery'
   'underscore'
   'Backbone'

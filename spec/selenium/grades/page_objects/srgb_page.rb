@@ -10,7 +10,12 @@ class SRGB
       due_date: 'By Due Date'
     }.freeze
 
-    def assignment_arrangement_dropdown
+
+    def switch_to_default_gradebook_link
+      f('#switch_to_default_gradebook')
+    end
+
+    def assignment_sorting_dropdown
       f(assignment_sort_order_selector)
     end
 
@@ -122,7 +127,7 @@ class SRGB
       opt_name ||= ASSIGNMENT_SORT_ORDER_OPTIONS[ASSIGNMENT_SORT_ORDER_OPTIONS.invert[sort_order]]
       return unless opt_name
 
-      click_option(assignment_arrangement_dropdown, opt_name.to_s)
+      click_option(assignment_sorting_dropdown, opt_name.to_s)
     end
 
     def assignment_sort_order
@@ -138,7 +143,7 @@ class SRGB
     end
 
     def select_grading_period(grading_period)
-      click_option(grading_period_dropdown, grading_period.title)
+      click_option(grading_period_dropdown, grading_period)
     end
 
     def enter_grade(grade)
@@ -168,6 +173,10 @@ class SRGB
       ag = course.assignment_groups.first
       ag.rules_hash = {"drop_lowest"=>num_assignment}
       ag.save!
+    end
+
+    def total_score
+      final_grade.text
     end
 
     private

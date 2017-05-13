@@ -7,7 +7,7 @@ define [
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'
   'compiled/jquery.rails_flash_notifications'
-], (Backbone,$, I18n, template, ValidatedMixin) ->
+], (Backbone, $, I18n, template, ValidatedMixin) ->
   class UserDateRangeSearchFormView extends Backbone.View
     @mixin ValidatedMixin
 

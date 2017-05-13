@@ -54,8 +54,6 @@ define([
   'vendor/jquery.placeholder'
 ], function(KeyboardNavDialog, INST, I18n, $, _, tz, userSettings, htmlEscape, RichContentEditor) {
 
-  RichContentEditor.preloadRemoteModule()
-
   $.trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/');
 
 
@@ -840,13 +838,14 @@ define([
       var sf = $('#sequence_footer')
       if (sf.length) {
         var el = $(sf[0]);
-        require(['compiled/jquery/ModuleSequenceFooter'], function (){
+        require.ensure([], function (require) {
+          require('compiled/jquery/ModuleSequenceFooter')
           el.moduleSequenceFooter({
             courseID: el.attr("data-course-id"),
             assetType: el.attr("data-asset-type"),
             assetID: el.attr("data-asset-id")
           });
-        });
+        }, 'ModuleSequenceFooterAsyncChunk');
       }
     }
 

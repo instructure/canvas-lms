@@ -12,6 +12,7 @@ const I18nPlugin = require('./i18nPlugin')
 const SelinimumManifestPlugin = require('./SelinimumManifestPlugin')
 const WebpackHooks = require('./webpackHooks')
 const webpackPublicPath = require('./webpackPublicPath')
+const WebpackCleanupPlugin = require('webpack-cleanup-plugin')
 const HappyPack = require('happypack')
 require('babel-polyfill')
 
@@ -90,10 +91,10 @@ module.exports = {
       'node_modules-version-of-backbone': require.resolve('backbone'),
       'node_modules-version-of-react-modal': require.resolve('react-modal'),
 
-      // once we are all-webpack we should remove this line and just change all the 'require's
-      // to instructure-ui compnentns to have the right path
-      'instructure-ui': path.resolve(__dirname, '../node_modules/instructure-ui/lib/components'),
-      'instructure-ui-themes': path.resolve(__dirname, '../node_modules/instructure-ui/lib/themes'),
+      // don't let people import these top-level modules, because then you
+      // get :allthethings: ... you need to import particular components
+      'instructure-icons$': 'invalid',
+      'instructure-ui$': 'invalid',
 
       backbone: 'Backbone',
       timezone$: 'timezone_core',
@@ -144,16 +145,6 @@ module.exports = {
         test: /vendor\/i18n/,
         loaders: ['exports-loader?I18n']
       },
-
-
-      {
-        test: /\.js$/,
-        include: path.resolve(__dirname, '../public/javascripts'),
-        loaders: happify('js', [
-          path.join(root, 'frontend_build/jsHandlebarsHelpers'),
-          path.join(root, 'frontend_build/pluginsJstLoader'),
-        ])
-      },
       {
         test: /\.js$/,
         include: [
@@ -179,9 +170,7 @@ module.exports = {
           /gems\/plugins\/.*\/spec_canvas\/coffeescripts\//
         ],
         loaders: happify('coffee', [
-          'coffee-loader',
-          path.join(root, 'frontend_build/jsHandlebarsHelpers'),
-          path.join(root, 'frontend_build/pluginsJstLoader')
+          'coffee-loader'
         ])
       },
       {
@@ -232,6 +221,10 @@ module.exports = {
     // debug/propType checking in prod.
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+    }),
+
+    new WebpackCleanupPlugin({
+      exclude: ["selinimum-manifest.json"]
     }),
 
     // handles our custom i18n stuff

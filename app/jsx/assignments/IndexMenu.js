@@ -81,7 +81,10 @@ export default React.createClass({
 
     render () {
       return (
-        <div className="inline-block">
+        <div
+          className="inline-block"
+          ref={(node) => { this.node = node; }}
+        >
           <a
             className="al-trigger btn"
             id="course_assignment_settings_link"

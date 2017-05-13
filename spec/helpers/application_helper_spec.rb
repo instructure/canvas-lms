@@ -188,22 +188,6 @@ describe ApplicationHelper do
     end
   end
 
-  describe "cache_if" do
-    it "should cache the fragment if the condition is true" do
-      enable_cache do
-        cache_if(true, "t1", :expires_in => 15.minutes, :no_locale => true) { output_buffer.concat "blargh" }
-        expect(@controller.read_fragment("t1")).to eq "blargh"
-      end
-    end
-
-    it "should not cache if the condition is false" do
-      enable_cache do
-        cache_if(false, "t1", :expires_in => 15.minutes, :no_locale => true) { output_buffer.concat "blargh" }
-        expect(@controller.read_fragment("t1")).to be_nil
-      end
-    end
-  end
-
   describe "custom css/js includes" do
 
     def set_up_subaccounts
@@ -448,38 +432,6 @@ describe ApplicationHelper do
       helper.instance_variable_set(:@domain_root_account, Account.default)
 
       expect(helper.help_link_name).to eq link_name
-    end
-  end
-
-  describe "hidden dialogs" do
-    it "should generate empty string when there are no dialogs" do
-      str = render_hidden_dialogs
-      expect(str).to eq ''
-    end
-
-    it "should work with one hidden_dialog" do
-      hidden_dialog('my_test_dialog') { "Hello there!" }
-      str = render_hidden_dialogs
-      expect(str).to eq "<div id='my_test_dialog' style='display: none;''>Hello there!</div>"
-    end
-
-    it "should work with more than one hidden dialog" do
-      hidden_dialog('first_dialog') { "first" }
-      hidden_dialog('second_dialog') { "second" }
-      str = render_hidden_dialogs
-      expect(str).to eq "<div id='first_dialog' style='display: none;''>first</div><div id='second_dialog' style='display: none;''>second</div>"
-    end
-
-    it "should raise an error when a dialog with conflicting content is added" do
-      hidden_dialog('dialog_id') { 'content' }
-      expect { hidden_dialog('dialog_id') { 'different content' } }.to raise_error("Attempted to capture a hidden dialog with dialog_id and different content!")
-    end
-
-    it "should only render a dialog once when it has been added multiple times" do
-      hidden_dialog('dialog_id') { 'content' }
-      hidden_dialog('dialog_id') { 'content' }
-      str = render_hidden_dialogs
-      expect(str).to eq "<div id='dialog_id' style='display: none;''>content</div>"
     end
   end
 

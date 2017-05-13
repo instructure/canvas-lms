@@ -1,7 +1,28 @@
+#
+# Copyright (C) 2016 - 2017 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
 require 'spec_helper'
 
 RSpec.describe GradebookSettingsController, type: :controller do
-  let!(:teacher) { course_with_teacher; @teacher }
+  let!(:teacher) do
+    course_with_teacher
+    @teacher
+  end
 
   before do
     user_session(teacher)
@@ -15,7 +36,8 @@ RSpec.describe GradebookSettingsController, type: :controller do
       let(:show_settings) do
         {
           "show_inactive_enrollments" => "true", # values must be strings
-          "show_concluded_enrollments" => "false"
+          "show_concluded_enrollments" => "false",
+          "show_unpublished_assignments" => "true"
         }
       end
       let(:valid_params) do

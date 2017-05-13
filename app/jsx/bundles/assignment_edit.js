@@ -10,6 +10,10 @@ import GradingTypeSelector from 'compiled/views/assignments/GradingTypeSelector'
 import GroupCategorySelector from 'compiled/views/assignments/GroupCategorySelector'
 import PeerReviewsSelector from 'compiled/views/assignments/PeerReviewsSelector'
 import 'grading_standards'
+import LockManager from 'jsx/blueprint_courses/lockManager'
+
+const lockManager = new LockManager()
+lockManager.init({ itemType: 'assignment', page: 'edit' })
 
 ENV.ASSIGNMENT.assignment_overrides = ENV.ASSIGNMENT_OVERRIDES
 
@@ -39,6 +43,11 @@ const peerReviewsSelector = new PeerReviewsSelector({
 
 const headerEl = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED ? '#edit_assignment_header-cr' : '#edit_assignment_header'
 
+const lockedItems =
+  ((ENV.MASTER_COURSE_DATA && ENV.MASTER_COURSE_DATA.is_master_course_child_content && ENV.MASTER_COURSE_DATA.restricted_by_master_course)
+  ? (ENV.MASTER_COURSE_DATA.master_course_restrictions || ENV.MASTER_COURSE_DATA.default_restrictions)
+  : {}) || {};
+
 const editView = new EditView({
   el: '#edit_assignment_form',
   model: assignment,
@@ -50,9 +59,12 @@ const editView = new EditView({
     'js-assignment-overrides': new DueDateOverride({
       model: dueDateList,
       views: {},
-      postToSIS: assignment.postToSIS()
+      postToSIS: assignment.postToSIS(),
+      dueDatesReadonly: !!lockedItems.due_dates,
+      availabilityDatesReadonly: !!lockedItems.availability_dates
     })
-  }
+  },
+  lockedItems: assignment.id ? lockedItems : {} // if no id, creating a new assignment
 })
 
 const editHeaderView = new EditHeaderView({

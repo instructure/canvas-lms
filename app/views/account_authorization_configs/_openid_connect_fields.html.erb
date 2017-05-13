@@ -5,29 +5,29 @@ obtain a Client ID and Client Secret.
 If the provider can configure valid callback or redirect URIs, use %{callback_url}.
                   TEXT
               %></p>
-  <%= render partial: 'oauth2_fields', locals: { f: f } %>
+<%= render partial: 'oauth2_fields', locals: { aac: aac, presenter: presenter, f: f } %>
 <div class="ic-Form-control">
-  <%= f.label :authorize_url, 'Authorize URL', class: 'ic-Label' %>
-  <%= f.text_field :authorize_url, class: 'ic-Input' %>
+  <%= f.label :authorize_url, 'Authorize URL', class: 'ic-Label', for: "authorize_url_#{presenter.id_suffix(aac)}" %>
+  <%= f.text_field :authorize_url, class: 'ic-Input', id: "authorize_url_#{presenter.id_suffix(aac)}" %>
 </div>
 <div class="ic-Form-control">
-  <%= f.label :token_url, 'Token URL', class: 'ic-Label' %>
-  <%= f.text_field :token_url, class: 'ic-Input' %>
+  <%= f.label :token_url, 'Token URL', class: 'ic-Label', for: "token_url_#{presenter.id_suffix(aac)}" %>
+  <%= f.text_field :token_url, class: 'ic-Input', id: "token_url_#{presenter.id_suffix(aac)}" %>
 </div>
 <div class="ic-Form-control">
-  <%= f.label :end_session_endpoint, 'End Session Endpoint', class: 'ic-Label' %>
-  <%= f.text_field :end_session_endpoint, class: 'ic-Input' %>
+  <%= f.label :end_session_endpoint, 'End Session Endpoint', class: 'ic-Label', for: "end_session_endpoint_#{presenter.id_suffix(aac)}" %>
+  <%= f.text_field :end_session_endpoint, class: 'ic-Input', id: "end_session_endpoint_#{presenter.id_suffix(aac)}" %>
 </div>
 <div class="ic-Form-control">
-  <%= f.label :userinfo_endpoint, 'UserInfo Endpoint', class: 'ic-Label' %>
-  <%= f.text_field :userinfo_endpoint, class: 'ic-Input' %>
+  <%= f.label :userinfo_endpoint, 'UserInfo Endpoint', class: 'ic-Label', for: "userinfo_endpoint_#{presenter.id_suffix(aac)}" %>
+  <%= f.text_field :userinfo_endpoint, class: 'ic-Input', id: "userinfo_endpoint_#{presenter.id_suffix(aac)}" %>
 </div>
 <div class="ic-Form-control">
-  <%= f.label :scope, 'Scope', class: 'ic-Label' %>
-  <%= f.text_field :scope, class: 'ic-Input' %>
+  <%= f.label :scope, 'Scope', class: 'ic-Label', for: "scope_#{presenter.id_suffix(aac)}" %>
+  <%= f.text_field :scope, class: 'ic-Input', id: "scope_#{presenter.id_suffix(aac)}" %>
 </div>
 <div class="ic-Form-control">
-  <%= f.label :login_attribute, 'Login Attribute', class: 'ic-Label' %>
-  <%= f.text_field :login_attribute, value: aac.raw_login_attribute, placeholder: 'sub', class: 'ic-Input' %>
+  <%= f.label :login_attribute, 'Login Attribute', class: 'ic-Label', for: "login_attribute_#{presenter.id_suffix(aac)}" %>
+  <%= f.text_field :login_attribute, value: aac.raw_login_attribute, placeholder: 'sub', class: 'ic-Input', id: "login_attribute_#{presenter.id_suffix(aac)}" %>
 </div>
-<%= render partial: 'jit_provisioning_field', locals: { f: f, aac: aac } %>
+<%= render partial: 'jit_provisioning_field', locals: { aac: aac, presenter: presenter, f: f } %>

@@ -13,7 +13,8 @@ define [
 
   createElement = (data) ->
     React.createElement(ReregisterExternalToolButton, {
-      tool: data.tool
+      tool: data.tool,
+      canAddEdit: true
     })
 
   renderComponent = (data) ->

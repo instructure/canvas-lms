@@ -140,6 +140,8 @@ define [
       if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
         @gradingTypeSelector.on 'change:gradingType', @onChange
 
+      @lockedItems = options.lockedItems || {};
+
     handleCancel: (ev) =>
       ev.preventDefault()
       @redirectAfterCancel()
@@ -309,6 +311,7 @@ define [
 
     toJSON: =>
       data = @assignment.toView()
+
       _.extend data,
         kalturaEnabled: ENV?.KALTURA_ENABLED or false
         postToSISEnabled: ENV?.POST_TO_SIS or false
@@ -316,9 +319,12 @@ define [
         isLargeRoster: ENV?.IS_LARGE_ROSTER or false
         submissionTypesFrozen: _.include(data.frozenAttributes, 'submission_types')
         conditionalReleaseServiceEnabled: ENV?.CONDITIONAL_RELEASE_SERVICE_ENABLED or false
+        lockedItems: @lockedItems
 
 
     _attachEditorToDescription: =>
+      return if @lockedItems.content
+
       RichContentEditor.initSidebar()
       RichContentEditor.loadNewEditor(@$description, { focus: true, manageParent: true })
 
@@ -515,6 +521,7 @@ define [
 
     _validatePointsPossible: (data, errors) =>
       return errors if _.contains(@model.frozenAttributes(), "points_possible")
+      return errors if this.lockedItems.points
 
       if typeof data.points_possible != 'number' or isNaN(data.points_possible)
         errors["points_possible"] = [

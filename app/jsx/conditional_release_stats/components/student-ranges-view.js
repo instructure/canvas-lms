@@ -1,8 +1,10 @@
 import React from 'react'
-import TabList, { TabPanel, Tab } from 'instructure-ui/TabList'
-import ApplyTheme from 'instructure-ui/ApplyTheme'
+import TabList, { TabPanel, Tab } from 'instructure-ui/lib/components/TabList'
+import ApplyTheme from 'instructure-ui/lib/components/ApplyTheme'
+import classNames from 'classnames'
 import I18n from 'i18n!cyoe_assignment_sidebar'
-import scoreHelpers from 'jsx/shared/conditional_release/score'
+import {transformScore} from 'jsx/shared/conditional_release/score'
+import { assignmentShape, studentShape } from '../shapes/index'
 import StudentRange from './student-range'
 
   const { array, func, object } = React.PropTypes
@@ -26,9 +28,10 @@ import StudentRange from './student-range'
 
 export default class StudentRangesView extends React.Component {
     static propTypes = {
-      assignment: object.isRequired,
+      assignment: assignmentShape.isRequired,
       ranges: array.isRequired,
       selectedPath: object.isRequired,
+      student: studentShape,
 
       // actions
       selectStudent: func.isRequired,
@@ -37,8 +40,8 @@ export default class StudentRangesView extends React.Component {
 
     renderTabs () {
       return this.props.ranges.map((range, i) => {
-        const lower = scoreHelpers.transformScore(range.scoring_range.lower_bound, this.props.assignment, false)
-        const upper = scoreHelpers.transformScore(range.scoring_range.upper_bound, this.props.assignment, true)
+        const lower = transformScore(range.scoring_range.lower_bound, this.props.assignment, false)
+        const upper = transformScore(range.scoring_range.upper_bound, this.props.assignment, true)
         const rangeTitle = `> ${lower} - ${upper}`
         return (
           <TabPanel key={i} title={rangeTitle}>
@@ -52,8 +55,14 @@ export default class StudentRangesView extends React.Component {
     }
 
     render () {
+      const isHidden = !!this.props.student
+
+      const classes = classNames({
+        'crs-ranges-view': true,
+        'crs-ranges-view__hidden': isHidden,
+      })
       return (
-        <div className='crs-ranges-view'>
+        <div className={classes}>
           <header className='crs-ranges-view__header'>
             <h4>{I18n.t('Mastery Paths Breakdown')}</h4>
           </header>

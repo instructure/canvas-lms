@@ -347,11 +347,10 @@ module AccountReports
       columns << 'access_tokens.last_used_at'
       columns << 'access_tokens.developer_key_id'
 
-      user_tokens = AccessToken
-                      .select(columns)
-                      .joins(user: {pseudonym: :account})
-                      .where("accounts.id = ? OR accounts.root_account_id = ?", root_account, root_account)
-                      .order("users.id, sortable_name, last_used_at DESC")
+      user_tokens = root_account.pseudonyms.
+        select(columns).
+        joins(user: :access_tokens).order("users.id, sortable_name, last_used_at DESC")
+      user_tokens = user_tokens.where.not(pseudonyms: {workflow_state: 'deleted'}) unless @include_deleted
 
       user_tokens = add_user_sub_account_scope(user_tokens)
 

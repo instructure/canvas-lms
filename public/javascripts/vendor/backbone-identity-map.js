@@ -34,7 +34,7 @@ define(['Backbone', 'underscore'], function(Backbone, _) {
    * returns a constructor function that acts like realConstructor,
    * but returns cached objects if possible.
    */
-  IdentityMap = function(realConstructor) {
+  var IdentityMap = function(realConstructor) {
     var classCacheKey = _.uniqueId();
     var modelConstructor = _.extend(function(attributes, options) {
       // creates a new object (used if the object isn't found in

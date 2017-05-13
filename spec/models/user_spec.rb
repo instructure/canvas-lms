@@ -23,7 +23,7 @@ describe User do
 
   context "validation" do
     it "should create a new instance given valid attributes" do
-      user_model
+      expect(user_model).to be_valid
     end
   end
 
@@ -1029,9 +1029,9 @@ describe User do
       enrollment.workflow_state = 'active'
       enrollment.save
 
-      expect(search_messageable_users(@admin, :context => "course_#{course1.id}", :ids => [@student.id])).to be_empty
-      expect(search_messageable_users(@admin, :context => "course_#{course2.id}", :ids => [@student.id])).not_to be_empty
-      expect(search_messageable_users(@student, :context => "course_#{course2.id}", :ids => [@admin.id])).not_to be_empty
+      expect(search_messageable_users(@admin, :context => "course_#{course1.id}").map(&:id)).not_to include(@student.id)
+      expect(search_messageable_users(@admin, :context => "course_#{course2.id}").map(&:id)).to include(@student.id)
+      expect(search_messageable_users(@student, :context => "course_#{course2.id}").map(&:id)).to include(@admin.id)
     end
 
     it "should not rank results by default" do
@@ -1090,26 +1090,6 @@ describe User do
       end
     end
 
-    context "is_admin" do
-      it "should find users in the course" do
-        expect(search_messageable_users(@admin, context: @course.asset_string, is_admin: true).map(&:id).sort).to eq(
-          [@this_section_teacher.id, @this_section_user.id, @other_section_user.id, @other_section_teacher.id]
-        )
-      end
-
-      it "should find users in the section" do
-        expect(search_messageable_users(@admin, context: "section_#{@course.default_section.id}", is_admin: true).map(&:id).sort).to eq(
-          [@this_section_teacher.id, @this_section_user.id]
-        )
-      end
-
-      it "should find users in the group" do
-        expect(search_messageable_users(@admin, context: @group.asset_string, is_admin: true).map(&:id).sort).to eq(
-          [@this_section_user.id]
-        )
-      end
-    end
-
     context "weak_checks" do
       it "should optionally show invited enrollments" do
         course_factory(active_all: true)
@@ -1119,9 +1099,9 @@ describe User do
 
       it "should optionally show pending enrollments in unpublished courses" do
         course_factory()
-        teacher_in_course(:active_user => true)
+        teacher_in_course(:active_all => true)
         student_in_course()
-        expect(search_messageable_users(@teacher, weak_checks: true, context: @course.asset_string, is_admin: true).map(&:id)).to include @student.id
+        expect(search_messageable_users(@teacher, weak_checks: true, context: @course.asset_string).map(&:id)).to include @student.id
       end
     end
   end
@@ -3182,6 +3162,4 @@ describe User do
       expect(u.feature_enabled?(:new_user_tutorial_on_off)).to be true
     end
   end
-
-  it { is_expected.to have_many(:submission_comment_participants) }
 end

@@ -107,9 +107,7 @@ define([
 
     const childCount = expectedToRender ? 1 : 0
     const renderedGraphs = graphsRoot.getElementsByClassName('crs-breakdown-graph')
-    const renderedDetails = detailsParent.getElementsByClassName('crs-breakdown-details')
     equal(renderedGraphs.length, childCount)
-    equal(renderedDetails.length, childCount)
   }
 
   test('adds the react components in the correct places', () => {

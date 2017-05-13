@@ -65,6 +65,11 @@ See CanvasPartman::Concerns::Partitioned.
       ) INHERITS (#{base_class.quoted_table_name})
 SQL
 
+      # copy foreign keys, since INCLUDING ALL won't bring them along
+      base_class.connection.foreign_keys(base_class.table_name).each do |foreign_key|
+        base_class.connection.add_foreign_key partition_table, foreign_key.to_table, foreign_key.options.except(:name)
+      end
+
       partition_table
     end
 

@@ -46,6 +46,7 @@ event originated as part of a web request:
 | `context_id` | String | The Canvas id of the current context. Always use the `context_type` when using this id to lookup the object. |
 | `role` | String | The role of the current user in the current context.  |
 | `hostname` | String | The hostname of the current request |
+| `producer` | String | The name of the producer of an event. Will always be 'canvas' when an event is originating in canvas. |
 | `request_id` | String | The identifier for this request. |
 | `session_id` | String | The session identifier for this request. Can be used to correlate events in the same session for a user. |
 

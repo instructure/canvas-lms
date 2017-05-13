@@ -60,6 +60,7 @@ define([
     },
     isLoading: false,
     selectRange: () => {},
+    openSidebar: () => {}
   })
 
   const renderComponent = (props) => {

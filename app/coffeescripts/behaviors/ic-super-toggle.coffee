@@ -1,4 +1,4 @@
-require [
+define [
   'jquery'
 ], ($) ->
   # Makes toggle components behave like buttons for a11y

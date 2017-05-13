@@ -25,9 +25,19 @@ define [
   'compiled/util/natcompare'
   'compiled/SubmissionDetailsDialog'
   'jsx/gradebook/CourseGradeCalculator'
+  'jsx/gradebook/shared/helpers/GradeFormatHelper'
 ], (
-  GradeCalculatorSpecHelper, Gradebook, DataLoader, _, tz, natcompare, SubmissionDetailsDialog, CourseGradeCalculator
+  GradeCalculatorSpecHelper, Gradebook, DataLoader, _, tz, natcompare, SubmissionDetailsDialog, CourseGradeCalculator, GradeFormatHelper
 ) ->
+
+  createGradebook = () =>
+    new Gradebook(
+      settings:
+        show_concluded_enrollments: false
+        show_inactive_enrollments: false
+      sections: {}
+    )
+
   exampleGradebookOptions =
     settings:
       show_concluded_enrollments: 'true'
@@ -515,3 +525,32 @@ define [
 
     equal SubmissionDetailsDialog.open.callCount, 1
     deepEqual expectedArguments, @submissionDialogArgs
+
+  QUnit.module 'Gradebook#updateSubmission',
+    setup: ->
+      @gradebook = createGradebook()
+      @gradebook.students = { 1101: { id: '1101' } }
+      @submission =
+        assignment_id: '201',
+        grade: '123.45',
+        gradingType: 'percent',
+        submitted_at: '2015-05-04T12:00:00Z',
+        user_id: '1101'
+
+  test 'formats the grade for the submission', ->
+    @spy(GradeFormatHelper, 'formatGrade')
+    @gradebook.updateSubmission(@submission)
+    equal(GradeFormatHelper.formatGrade.callCount, 1)
+
+  test 'includes submission attributes when formatting the grade', ->
+    @spy(GradeFormatHelper, 'formatGrade')
+    @gradebook.updateSubmission(@submission)
+    [grade, options] = GradeFormatHelper.formatGrade.getCall(0).args
+    equal(grade, '123.45', 'parameter 1 is the submission grade')
+    equal(options.gradingType, 'percent', 'options.gradingType is the submission gradingType')
+    strictEqual(options.delocalize, false, 'submission grades from the server are not localized')
+
+  test 'sets the formatted grade on submission', ->
+    @stub(GradeFormatHelper, 'formatGrade').returns('123.45%')
+    @gradebook.updateSubmission(@submission)
+    equal(@submission.grade, '123.45%')

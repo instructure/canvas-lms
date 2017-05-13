@@ -396,7 +396,7 @@
   padding-left: $ic-sp;
   @include breakpoint(desktop) { padding-left: 0; }
 
-  .publish-icon {
+  .publish-icon, .lock-icon {
     margin-right: $ic-sp/2;
     i[class*=icon-]:before,
     i[class^=icon-]:before { @include fontSize(18px); }

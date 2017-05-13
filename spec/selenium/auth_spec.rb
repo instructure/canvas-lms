@@ -9,7 +9,7 @@ describe "auth" do
       login_as
 
       get "/logout"
-      f('.Button--logout-confirm').click
+      f('#Button--logout-confirm').click
 
       keep_trying_until {
         expect(driver.current_url).to match %r{/login/canvas}

@@ -55,6 +55,9 @@ class FavoritesController < ApplicationController
   # Retrieve the list of favorite courses for the current user. If the user has not chosen
   # any favorites, then a selection of currently enrolled courses will be returned.
   #
+  # @argument exclude_blueprint_courses [Boolean]
+  #   When set, only return courses that are not configured as blueprint courses.
+  #
   # See the {api:CoursesController#index List courses API} for details on accepted include[] parameters.
   #
   # @returns [Course]
@@ -66,7 +69,13 @@ class FavoritesController < ApplicationController
   def list_favorite_courses
     includes = Set.new(Array(params[:include]))
 
-    render :json => @current_user.menu_courses.map { |course|
+    courses = @current_user.menu_courses
+    if courses.any? && value_to_boolean(params[:exclude_blueprint_courses])
+      mc_ids = MasterCourses::MasterTemplate.active.where(:course_id => courses).pluck(:course_id)
+      courses.reject!{|c| mc_ids.include?(c.id)}
+    end
+
+    render :json => courses.map { |course|
       enrollments = nil
       unless Array(params[:exclude]).include?('enrollments')
         enrollments = course.current_enrollments.where(:user_id => @current_user).to_a

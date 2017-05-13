@@ -1,7 +1,7 @@
 import React from 'react'
-import Spinner from 'instructure-ui/Spinner'
+import Spinner from 'instructure-ui/lib/components/Spinner'
 import I18n from 'i18n!cyoe_assignment_sidebar'
-import scoreHelpers from 'jsx/shared/conditional_release/score'
+import {transformScore} from 'jsx/shared/conditional_release/score'
 import BarGraph from './breakdown-graph-bar'
   const { object, array, func, number, bool } = React.PropTypes
 
@@ -13,6 +13,7 @@ import BarGraph from './breakdown-graph-bar'
       isLoading: bool.isRequired,
 
       // actions
+      openSidebar: func.isRequired,
       selectRange: func.isRequired,
     }
 
@@ -30,15 +31,17 @@ import BarGraph from './breakdown-graph-bar'
     }
 
     renderBars () {
-      return this.props.ranges.map((bucket, i, ranges) => (
+      const { ranges, assignment, enrolled, openSidebar, selectRange } = this.props
+      return ranges.map(({ size, scoring_range }, i) => (
         <BarGraph
           key={i}
           rangeIndex={i}
-          rangeStudents={bucket.size}
-          totalStudents={this.props.enrolled}
-          upperBound={scoreHelpers.transformScore(bucket.scoring_range.upper_bound, this.props.assignment, true)}
-          lowerBound={scoreHelpers.transformScore(bucket.scoring_range.lower_bound, this.props.assignment, false)}
-          selectRange={this.props.selectRange}
+          rangeStudents={size}
+          totalStudents={enrolled}
+          upperBound={transformScore(scoring_range.upper_bound, assignment, true)}
+          lowerBound={transformScore(scoring_range.lower_bound, assignment, false)}
+          openSidebar={openSidebar}
+          selectRange={selectRange}
         />
       ))
     }

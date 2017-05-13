@@ -74,7 +74,7 @@ define([
     const tbls = peopleReadyList.querySelector('table');
     equal(tbls, null, 'no tables');
 
-    equal(peopleReadyList.innerText, 'No users were selected to add to the course');
+    equal(peopleReadyList.innerText.trim(), 'No users were selected to add to the course');
   });
   test('hides SIS ID column if not permitted', () => {
     const p = Object.assign({}, props, {canReadSIS: true});

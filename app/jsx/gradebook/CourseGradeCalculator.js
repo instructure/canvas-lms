@@ -65,10 +65,14 @@ function combineAssignmentGroupGrades (assignmentGroupGrades, includeUngraded, o
 }
 
 function combineGradingPeriodGrades (gradingPeriodGradesByPeriodId, includeUngraded) {
-  const scopedGradingPeriodGrades = _.map(gradingPeriodGradesByPeriodId, (gradingPeriodGrade) => {
+  let scopedGradingPeriodGrades = _.map(gradingPeriodGradesByPeriodId, (gradingPeriodGrade) => {
     const gradeVersion = includeUngraded ? gradingPeriodGrade.final : gradingPeriodGrade.current;
     return { ...gradeVersion, weight: gradingPeriodGrade.gradingPeriodWeight };
   });
+
+  if (!includeUngraded) {
+    scopedGradingPeriodGrades = _.filter(scopedGradingPeriodGrades, 'possible');
+  }
 
   const weightedScores = _.map(scopedGradingPeriodGrades, getWeightedPercent);
   const totalWeight = sumBy(scopedGradingPeriodGrades, 'weight');

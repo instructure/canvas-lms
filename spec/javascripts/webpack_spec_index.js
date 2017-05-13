@@ -1,6 +1,6 @@
 import 'vendor/ie11-polyfill.js'
-import ApplyTheme from 'instructure-ui/ApplyTheme'
-import 'instructure-ui-themes/canvas'
+import ApplyTheme from 'instructure-ui/lib/components/ApplyTheme'
+import 'instructure-ui/lib/themes/canvas'
 import './support/sinon/sinon-qunit-1.0.0'
 
 const fixturesDiv = document.createElement('div')

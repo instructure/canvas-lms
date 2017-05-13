@@ -45,18 +45,22 @@ table.report_example, table.report {
 }
 
 table.report.sortable {
-  th.header {
+  th.tablesorter-header {
     padding-right: 20px;
     cursor: pointer;
     background: url(/images/tablesorter/bg.png) no-repeat right center;
     &:hover {
       background-image: url(/images/tablesorter/bg_hover.png);
     }
-    &.headerSortDown {
+    &.tablesorter-headerAsc {
       background-image: url(/images/tablesorter/asc.gif);
     }
-    &.headerSortUp {
+    &.tablesorter-headerDesc {
       background-image: url(/images/tablesorter/desc.gif);
+    }
+    &.sorter-false {
+      background-image: none;
+      cursor: default;
     }
   }
 }

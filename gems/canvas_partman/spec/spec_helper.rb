@@ -46,7 +46,7 @@ RSpec.configure do |config|
   end
 
   config.after :all do
-    [ Zoo, Animal, Trail ].each(&:drop_schema)
+    [ Animal, Trail, Zoo ].each(&:drop_schema)
   end
 
   config.after :each do

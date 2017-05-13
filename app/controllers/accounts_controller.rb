@@ -37,6 +37,11 @@ require 'csv'
 #           "example": "Canvas Account",
 #           "type": "string"
 #         },
+#         "uuid": {
+#           "description": "The UUID of the account",
+#           "example": "WvAHhY5FINzq5IyRIJybGeiXyFkG3SqHUPb7jZY5",
+#           "type": "string"
+#         },
 #         "parent_account_id": {
 #           "description": "The account's parent ID, or null if this is the root account",
 #           "example": 1,

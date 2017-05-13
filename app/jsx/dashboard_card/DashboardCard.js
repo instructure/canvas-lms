@@ -1,257 +1,291 @@
 import _ from 'underscore'
-import React from 'react'
+import React, { Component, PropTypes } from 'react'
 import I18n from 'i18n!dashcards'
 import DashboardCardAction from './DashboardCardAction'
 import DashboardColorPicker from './DashboardColorPicker'
 import CourseActivitySummaryStore from './CourseActivitySummaryStore'
-import ReactDnD from 'react-dnd'
-import ItemTypes from './Types'
-import compose from 'jsx/shared/helpers/compose'
 import DashboardCardMovementMenu from './DashboardCardMovementMenu'
 
-  var DashboardCard = React.createClass({
+export default class DashboardCard extends Component {
 
-    // ===============
-    //     CONFIG
-    // ===============
+  // ===============
+  //     CONFIG
+  // ===============
 
-    displayName: 'DashboardCard',
+  static propTypes = {
+    id: PropTypes.string.isRequired,
+    backgroundColor: PropTypes.string.isRequired,
+    shortName: PropTypes.string.isRequired,
+    originalName: PropTypes.string.isRequired,
+    courseCode: PropTypes.string.isRequired,
+    assetString: PropTypes.string.isRequired,
+    term: PropTypes.string,
+    href: PropTypes.string.isRequired,
+    links: PropTypes.arrayOf(PropTypes.object),
+    imagesEnabled: PropTypes.bool,
+    image: PropTypes.string,
+    handleColorChange: PropTypes.func,
+    hideColorOverlays: PropTypes.bool,
+    reorderingEnabled: PropTypes.bool,
+    isDragging: PropTypes.bool,
+    connectDragSource: PropTypes.func,
+    connectDropTarget: PropTypes.func,
+    moveCard: PropTypes.func,
+    totalCards: PropTypes.number,
+    position: PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.func])
+  }
 
-    propTypes: {
-      backgroundColor: React.PropTypes.string.isRequired,
-      courseId: React.PropTypes.string,
-      shortName: React.PropTypes.string,
-      originalName: React.PropTypes.string,
-      courseCode: React.PropTypes.string,
-      assetString: React.PropTypes.string,
-      term: React.PropTypes.string,
-      href: React.PropTypes.string,
-      links: React.PropTypes.array,
-      reorderingEnabled: React.PropTypes.bool,
-      isDragging: React.PropTypes.bool,
-      connectDragSource: React.PropTypes.func,
-      connectDropTarget: React.PropTypes.func,
-      moveCard: React.PropTypes.func,
-      totalCards: React.PropTypes.number,
-      position: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.func])
-    },
+  static defaultProps = {
+    term: null,
+    links: [],
+    hideColorOverlays: false,
+    imagesEnabled: false,
+    handleColorChange: () => {},
+    image: '',
+    reorderingEnabled: false,
+    isDragging: false,
+    connectDragSource: () => {},
+    connectDropTarget: () => {},
+    moveCard: () => {},
+    totalCards: 0,
+    position: 0
+  }
 
-    getDefaultProps: function () {
-      return {
-        links: []
-      };
-    },
+  constructor (props) {
+    super()
 
-    nicknameInfo: function(nickname) {
-      return {
-        nickname: nickname,
-        originalName: this.props.originalName,
-        courseId: this.props.id,
-        onNicknameChange: this.handleNicknameChange
-      }
-    },
+    this.state = _.extend(
+      { nicknameInfo: this.nicknameInfo(props.shortName, props.originalName, props.id) },
+      CourseActivitySummaryStore.getStateForCourse(props.id)
+    )
+  }
 
-    // ===============
-    //    LIFECYCLE
-    // ===============
+  // ===============
+  //    LIFECYCLE
+  // ===============
 
-    handleNicknameChange: function(nickname){
-      this.setState({ nicknameInfo: this.nicknameInfo(nickname) })
-    },
+  componentDidMount () {
+    CourseActivitySummaryStore.addChangeListener(this.handleStoreChange)
+    this.parentNode = this.cardDiv
+  }
 
-    getInitialState: function() {
-      return _.extend({ nicknameInfo: this.nicknameInfo(this.props.shortName) },
-        CourseActivitySummaryStore.getStateForCourse(this.props.id))
-    },
+  componentWillUnmount () {
+    CourseActivitySummaryStore.removeChangeListener(this.handleStoreChange)
+  }
 
-    componentDidMount: function() {
-      CourseActivitySummaryStore.addChangeListener(this.handleStoreChange)
-      this.parentNode = this.cardDiv
-    },
+  // ===============
+  //    ACTIONS
+  // ===============
 
-    componentWillUnmount: function() {
-      CourseActivitySummaryStore.removeChangeListener(this.handleStoreChange)
-    },
+  settingsClick = (e) => {
+    if (e) { e.preventDefault(); }
+    this.toggleEditing();
+  }
 
-    // ===============
-    //    ACTIONS
-    // ===============
+  handleNicknameChange = (nickname) => {
+    this.setState({ nicknameInfo: this.nicknameInfo(nickname, this.props.originalName, this.props.id) })
+  }
 
-    handleStoreChange: function() {
-      this.setState(
-        CourseActivitySummaryStore.getStateForCourse(this.props.id)
-      );
-    },
+  handleStoreChange = () => {
+    this.setState(
+      CourseActivitySummaryStore.getStateForCourse(this.props.id)
+    );
+  }
 
-    settingsClick: function(e){
-      if(e){ e.preventDefault(); }
-      this.toggleEditing();
-    },
+  toggleEditing = () => {
+    const currentState = !!this.state.editing;
+    this.setState({editing: !currentState});
+  }
 
-    toggleEditing: function(){
-      var currentState = !!this.state.editing;
+  headerClick = (e) => {
+    if (e) { e.preventDefault(); }
+    window.location = this.props.href;
+  }
 
-      if (this.isMounted()) {
-        this.setState({editing: !currentState});
-      }
-    },
+  doneEditing = () => {
+    this.setState({editing: false})
+    this.settingsToggle.focus();
+  }
 
-    headerClick: function(e) {
-      if (e) { e.preventDefault(); }
-      window.location = this.props.href;
-    },
+  handleColorChange = (color) => {
+    const hexColor = `#${color}`;
+    this.props.handleColorChange(hexColor)
+  }
 
-    doneEditing: function(){
-      if(this.isMounted()) {
-        this.setState({editing: false})
-        this.settingsToggle.focus();
-      }
-    },
+  // ===============
+  //    HELPERS
+  // ===============
 
-    handleColorChange: function(color){
-      var hexColor = "#" + color;
-      this.props.handleColorChange(hexColor)
-    },
+  nicknameInfo (nickname, originalName, courseId) {
+    return {
+      nickname,
+      originalName,
+      courseId,
+      onNicknameChange: this.handleNicknameChange
+    }
+  }
 
-    // ===============
-    //    HELPERS
-    // ===============
+  unreadCount (icon, stream) {
+    const activityType = {
+      'icon-announcement': 'Announcement',
+      'icon-assignment': 'Message',
+      'icon-discussion': 'DiscussionTopic'
+    }[icon];
 
-    unreadCount: function(icon, stream){
-      var activityType = {
-        'icon-announcement': 'Announcement',
-        'icon-assignment': 'Message',
-        'icon-discussion': 'DiscussionTopic'
-      }[icon];
+    const itemStream = stream || [];
+    const streamItem = _.find(itemStream, item => (
+      // only return 'Message' type if category is 'Due Date' (for assignments)
+      item.type === activityType &&
+        (activityType !== 'Message' || item.notification_category === I18n.t('Due Date'))
+    ));
 
-      stream = stream || [];
-      var streamItem = _.find(stream, function(item) {
-        // only return 'Message' type if category is 'Due Date' (for assignments)
-        return item.type === activityType &&
-          (activityType !== 'Message' || item.notification_category === I18n.t('Due Date'))
-      });
+    // TODO: unread count is always 0 for assignments (see CNVS-21227)
+    return (streamItem) ? streamItem.unread_count : 0;
+  }
 
-      // TODO: unread count is always 0 for assignments (see CNVS-21227)
-      return (streamItem) ? streamItem.unread_count : 0;
-    },
+  calculateMenuOptions () {
+    const isFirstCard = this.props.position === 0;
+    const isLastCard = this.props.position === this.props.totalCards - 1;
+    return {
+      canMoveLeft: !isFirstCard,
+      canMoveRight: !isLastCard,
+      canMoveToBeginning: !isFirstCard,
+      canMoveToEnd: !isLastCard
+    }
+  }
 
-    calculateMenuOptions () {
-      const isFirstCard = this.props.position === 0;
-      const isLastCard = this.props.position === this.props.totalCards - 1;
-      return {
-        canMoveLeft: !isFirstCard,
-        canMoveRight: !isLastCard,
-        canMoveToBeginning: !isFirstCard,
-        canMoveToEnd: !isLastCard
-      }
-    },
+  // ===============
+  //    RENDERING
+  // ===============
 
-    // ===============
-    //    RENDERING
-    // ===============
+  colorPickerID () {
+    return `DashboardColorPicker-${this.props.assetString}`;
+  }
 
-    colorPickerID: function(){
-      return "DashboardColorPicker-" + this.props.assetString;
-    },
+  colorPickerIfEditing () {
+    return (
+      <DashboardColorPicker
+        isOpen={this.state.editing}
+        elementID={this.colorPickerID()}
+        parentNode={this.parentNode}
+        doneEditing={this.doneEditing}
+        handleColorChange={this.handleColorChange}
+        assetString={this.props.assetString}
+        settingsToggle={this.settingsToggle}
+        backgroundColor={this.props.backgroundColor}
+        nicknameInfo={this.state.nicknameInfo}
+      />
+    );
+  }
 
-    colorPickerIfEditing: function(){
-      return (
-        <DashboardColorPicker
-          isOpen={this.state.editing}
-          elementID={this.colorPickerID()}
-          parentNode={this.parentNode}
-          doneEditing={this.doneEditing}
-          handleColorChange={this.handleColorChange}
-          assetString={this.props.assetString}
-          settingsToggle={this.settingsToggle}
-          backgroundColor={this.props.backgroundColor}
-          nicknameInfo={this.state.nicknameInfo}
-        />
-      );
-    },
-
-    linksForCard: function(){
-      return this.props.links.map((link) => {
-        if (!link.hidden) {
-          const screenReaderLabel = `${link.screenreader} - ${this.state.nicknameInfo.nickname}`;
-          return (
-            <DashboardCardAction
-              unreadCount       = {this.unreadCount(link.icon, this.state.stream)}
-              iconClass         = {link.icon}
-              linkClass         = {link.css_class}
-              path              = {link.path}
-              screenReaderLabel = {screenReaderLabel}
-              key               = {link.path}
-            />
-          );
-        }
-      });
-    },
-
-    renderHeaderHero: function(){
-      if (this.props.imagesEnabled && this.props.image) {
+  linksForCard () {
+    return this.props.links.map((link) => {
+      if (!link.hidden) {
+        const screenReaderLabel = `${link.screenreader} - ${this.state.nicknameInfo.nickname}`;
         return (
-          <div
-            className="ic-DashboardCard__header_image"
-            style={{backgroundImage: `url(${this.props.image})`}}
-          >
-            <div
-              className="ic-DashboardCard__header_hero"
-              style={{backgroundColor: this.props.backgroundColor, opacity: 0.6}}
-              onClick={this.headerClick}
-              aria-hidden="true"
-            >
-            </div>
-          </div>
+          <DashboardCardAction
+            unreadCount={this.unreadCount(link.icon, this.state.stream)}
+            iconClass={link.icon}
+            linkClass={link.css_class}
+            path={link.path}
+            screenReaderLabel={screenReaderLabel}
+            key={link.path}
+          />
         );
       }
-      else {
-        return (
+      return null;
+    });
+  }
+
+  renderHeaderHero () {
+    const {
+      imagesEnabled,
+      image,
+      backgroundColor,
+      hideColorOverlays
+    } = this.props;
+
+    if (imagesEnabled && image) {
+      return (
+        <div
+          className="ic-DashboardCard__header_image"
+          style={{backgroundImage: `url(${image})`}}
+        >
           <div
             className="ic-DashboardCard__header_hero"
-            style={{backgroundColor: this.props.backgroundColor}}
+            style={{backgroundColor, opacity: hideColorOverlays ? 0 : 0.6}}
             onClick={this.headerClick}
-            aria-hidden="true">
-          </div>
-        );
-      }
-    },
+            aria-hidden="true"
+          />
+        </div>
+      );
+    }
 
-    render: function () {
-      const cardStyles = {
-        borderBottomColor: this.props.backgroundColor
-      };
+    return (
+      <div
+        className="ic-DashboardCard__header_hero"
+        style={{backgroundColor}}
+        onClick={this.headerClick}
+        aria-hidden="true"
+      />
+    );
+  }
 
-      if (this.props.reorderingEnabled) {
-        if (this.props.isDragging) {
-          cardStyles.opacity = 0;
-        }
-      }
+  renderHeaderButton () {
+    const {
+      backgroundColor,
+      hideColorOverlays
+    } = this.props;
 
-      const dashboardCard = (
+    return (
+      <div>
         <div
-          className="ic-DashboardCard"
-          ref={(c) => this.cardDiv = c}
-          style={cardStyles}
-          aria-label={this.props.originalName}
+          className="ic-DashboardCard__header-button-bg"
+          style={{backgroundColor, opacity: hideColorOverlays ? 1 : 0}}
+        />
+        <button
+          aria-expanded={this.state.editing}
+          aria-controls={this.colorPickerID()}
+          className="Button Button--icon-action-rev ic-DashboardCard__header-button"
+          onClick={this.settingsClick}
+          ref={(c) => { this.settingsToggle = c; }}
         >
-          <div className="ic-DashboardCard__header">
-            <span className="screenreader-only">
-              {
-                this.props.imagesEnabled && this.props.image ?
-                  I18n.t("Course image for %{course}", {course: this.state.nicknameInfo.nickname})
-                :
-                  I18n.t("Course card color region for %{course}", {course: this.state.nicknameInfo.nickname})
-              }
-            </span>
-            {this.renderHeaderHero()}
+          <i className="icon-more icon-Line" aria-hidden="true" />
+          <span className="screenreader-only">
+            { I18n.t('Choose a color or course nickname for %{course}', { course: this.state.nicknameInfo.nickname}) }
+          </span>
+        </button>
+      </div>
+    )
+  }
+
+  render () {
+    const dashboardCard = (
+      <div
+        className="ic-DashboardCard"
+        ref={(c) => { this.cardDiv = c }}
+        style={{ opacity: (this.props.reorderingEnabled && this.props.isDragging) ? 0 : 1 }}
+        aria-label={this.props.originalName}
+      >
+        <div className="ic-DashboardCard__header">
+          <span className="screenreader-only">
+            {
+              this.props.imagesEnabled && this.props.image ?
+                I18n.t('Course image for %{course}', {course: this.state.nicknameInfo.nickname})
+              :
+                I18n.t('Course card color region for %{course}', {course: this.state.nicknameInfo.nickname})
+            }
+          </span>
+          {this.renderHeaderHero()}
+          <a href={this.props.href} className="ic-DashboardCard__link">
             <div
               className="ic-DashboardCard__header_content"
-              onClick={this.headerClick}>
+              style={{height: (this.props.term ? '75px' : '65px')}}
+            >
               <h2 className="ic-DashboardCard__header-title ellipsis" title={this.props.originalName}>
-                <a className="ic-DashboardCard__link" href={this.props.href}>
+                <span style={{color: this.props.backgroundColor}}>
                   {this.state.nicknameInfo.nickname}
-                </a>
+                </span>
               </h2>
               <p className="ic-DashboardCard__header-subtitle ellipsis" title={this.props.courseCode}>{this.props.courseCode}</p>
               {
@@ -262,47 +296,35 @@ import DashboardCardMovementMenu from './DashboardCardMovementMenu'
                 ) : null
               }
             </div>
-            {this.props.reorderingEnabled && (
-              <DashboardCardMovementMenu
-                cardTitle={this.state.nicknameInfo.nickname}
-                handleMove={this.props.moveCard}
-                currentPosition={this.props.position}
-                lastPosition={this.props.totalCards - 1}
-                assetString={this.props.assetString}
-                menuOptions={this.calculateMenuOptions()}
-              />
-            )}
-            <button
-              aria-expanded={this.state.editing}
-              aria-controls={this.colorPickerID()}
-              className="Button Button--icon-action-rev ic-DashboardCard__header-button"
-              onClick={this.settingsClick}
-              ref={(c) => { this.settingsToggle = c; }}
-            >
-              <i className="icon-compose icon-Line" aria-hidden="true" />
-                <span className="screenreader-only">
-                  { I18n.t("Choose a color or course nickname for %{course}", { course: this.state.nicknameInfo.nickname}) }
-                </span>
-            </button>
+          </a>
+          {this.props.reorderingEnabled && (
+            <DashboardCardMovementMenu
+              cardTitle={this.state.nicknameInfo.nickname}
+              handleMove={this.props.moveCard}
+              currentPosition={this.props.position}
+              lastPosition={this.props.totalCards - 1}
+              assetString={this.props.assetString}
+              menuOptions={this.calculateMenuOptions()}
+            />
+          )}
+          { this.renderHeaderButton() }
 
-          </div>
-          <nav
-            className="ic-DashboardCard__action-container"
-            aria-label={ I18n.t("Actions for %{course}", { course: this.state.nicknameInfo.nickname}) }
-          >
-            { this.linksForCard() }
-          </nav>
-          { this.colorPickerIfEditing() }
         </div>
-      );
+        <nav
+          className="ic-DashboardCard__action-container"
+          aria-label={I18n.t('Actions for %{course}', {course: this.state.nicknameInfo.nickname})}
+        >
+          { this.linksForCard() }
+        </nav>
+        { this.colorPickerIfEditing() }
+      </div>
+    );
 
-      if (this.props.reorderingEnabled) {
-        const { connectDragSource, connectDropTarget } = this.props;
-        return connectDragSource(connectDropTarget(dashboardCard));
-      }
-
-      return dashboardCard;
+    if (this.props.reorderingEnabled) {
+      const { connectDragSource, connectDropTarget } = this.props;
+      return connectDragSource(connectDropTarget(dashboardCard));
     }
-  });
 
-export default DashboardCard
+    return dashboardCard;
+  }
+}

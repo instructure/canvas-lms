@@ -747,7 +747,8 @@ describe ApplicationController do
     let(:non_conditional_values) do
       {
         hostname: 'test.host',
-        user_agent: 'Rails Testing'
+        user_agent: 'Rails Testing',
+        producer: 'canvas'
       }
     end
 

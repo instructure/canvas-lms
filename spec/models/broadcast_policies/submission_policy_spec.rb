@@ -36,7 +36,6 @@ module BroadcastPolicies
       stub("Submission").tap do |s|
         s.stubs(:group_broadcast_submission).returns(false)
         s.stubs(:assignment).returns(assignment)
-        s.stubs(:just_created).returns(true)
         s.stubs(:submitted?).returns(true)
         s.stubs(:changed_state_to).returns(false)
         s.stubs(:submitted_at).returns(submission_time)
@@ -47,6 +46,7 @@ module BroadcastPolicies
         s.stubs(:context).returns(course)
         s.stubs(:submitted_at_was).returns(nil)
         s.stubs(:submitted_at_changed?).returns(false)
+        s.stubs(:changed_state_to).with(:submitted).returns true
       end
     end
 
@@ -77,11 +77,6 @@ module BroadcastPolicies
       specify { wont_send_when { submission.stubs(:has_submission?).returns false } }
       specify { wont_send_when { submission.stubs(:late?).returns false } }
 
-      it "still sends when the state was just changed even when it wasn't just created" do
-        submission.stubs(:just_created).returns false
-        submission.stubs(:changed_state_to).with(:submitted).returns true
-        expect(policy.should_dispatch_assignment_submitted_late?).to be_truthy
-      end
     end
 
     describe '#should_dispatch_assignment_submitted?' do

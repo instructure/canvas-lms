@@ -5,6 +5,7 @@ define [
   'underscore'
   'jsx/shared/conditional_release/CyoeHelper'
   'compiled/views/PublishIconView'
+  'compiled/views/LockIconView'
   'compiled/views/assignments/DateDueColumnView'
   'compiled/views/assignments/DateAvailableColumnView'
   'compiled/views/assignments/CreateAssignmentView'
@@ -18,7 +19,7 @@ define [
   'jqueryui/tooltip'
   'compiled/behaviors/tooltip'
   'compiled/jquery.rails_flash_notifications'
-], (I18n, Backbone, $, _, CyoeHelper, PublishIconView, DateDueColumnView, DateAvailableColumnView, CreateAssignmentView, SisButtonView, MoveDialogView, preventDefault, template, scoreTemplate, round, AssignmentKeyBindingsMixin) ->
+], (I18n, Backbone, $, _, CyoeHelper, PublishIconView, LockIconView, DateDueColumnView, DateAvailableColumnView, CreateAssignmentView, SisButtonView, MoveDialogView, preventDefault, template, scoreTemplate, round, AssignmentKeyBindingsMixin) ->
 
   class AssignmentListItemView extends Backbone.View
     @mixin AssignmentKeyBindingsMixin
@@ -30,6 +31,7 @@ define [
     template: template
 
     @child 'publishIconView',         '[data-view=publish-icon]'
+    @child 'lockIconView',            '[data-view=lock-icon]'
     @child 'dateDueColumnView',       '[data-view=date-due]'
     @child 'dateAvailableColumnView', '[data-view=date-available]'
     @child 'editAssignmentView',      '[data-view=edit-assignment]'
@@ -45,6 +47,8 @@ define [
       'click .tooltip_link': preventDefault ->
       'keydown': 'handleKeys'
       'mousedown': 'stopMoveIfProtected'
+      'click .icon-lock': 'onUnlockAssignment'
+      'click .icon-unlock': 'onLockAssignment'
 
     messages:
       confirm: I18n.t('Are you sure you want to delete this assignment?')
@@ -69,17 +73,26 @@ define [
       @model.on 'change:submission', @updateScore
 
     initializeChildViews: ->
-      @publishIconView    = false
+      @publishIconView = false
+      @lockIconView = false
       @sisButtonView = false
       @editAssignmentView = false
       @dateAvailableColumnView = false
       @moveAssignmentView = false
 
       if @canManage()
-        @publishIconView    = new PublishIconView({
+        @publishIconView = new PublishIconView({
           model: @model,
           publishText: I18n.t("Unpublished. Click to publish %{name}", name: @model.get('name')),
           unpublishText: I18n.t("Published. Click to unpublish %{name}", name: @model.get('name'))
+        })
+        @lockIconView = new LockIconView({
+          model: @model,
+          unlockedText: I18n.t("%{name} is unlocked. Click to lock.", name: @model.get('name')),
+          lockedText: I18n.t("%{name} is locked. Click to unlock", name: @model.get('name')),
+          course_id: @model.get('course_id'),
+          content_id: @model.get('id'),
+          content_type: 'assignment'
         })
         @editAssignmentView = new CreateAssignmentView(model: @model)
         @moveAssignmentView = new MoveDialogView
@@ -105,6 +118,7 @@ define [
     render: ->
       @toggleHidden(@model, @model.get('hidden'))
       @publishIconView.remove()         if @publishIconView
+      @lockIconView.remove()            if @lockIconView
       @sisButtonView.remove()           if @sisButtonView
       @editAssignmentView.remove()      if @editAssignmentView
       @dateDueColumnView.remove()       if @dateDueColumnView
@@ -206,6 +220,12 @@ define [
         id = @model.attributes.assignment_group_id
         @delete()
         @focusOnGroupByID(id)
+
+    onUnlockAssignment: (e) =>
+      e.preventDefault()
+
+    onLockAssignment: (e) =>
+      e.preventDefault()
 
     delete: ->
       @model.destroy success: =>

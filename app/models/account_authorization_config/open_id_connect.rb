@@ -43,13 +43,7 @@ class AccountAuthorizationConfig::OpenIDConnect < AccountAuthorizationConfig::Oa
     nil
   end
 
-  def end_session_endpoint=(value)
-    self.log_out_url = value.presence
-  end
-
-  def end_session_endpoint
-    log_out_url
-  end
+  alias_attribute :end_session_endpoint, :log_out_url
 
   def raw_login_attribute
     read_attribute(:login_attribute).presence

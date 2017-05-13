@@ -1,9 +1,9 @@
 import I18n from 'i18n!roster'
 import React from 'react'
 import {personReadyToEnrollShape} from './shapes'
-import Alert from 'instructure-ui/Alert'
-import Table from 'instructure-ui/Table'
-import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
+import Alert from 'instructure-ui/lib/components/Alert'
+import Table from 'instructure-ui/lib/components/Table'
+import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
 
   class PeopleReadyList extends React.Component {
     static propTypes = {

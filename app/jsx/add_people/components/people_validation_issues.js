@@ -3,7 +3,7 @@ import React from 'react'
 import shapes from './shapes'
 import DuplicateSection from './duplicate_section'
 import MissingPeopleSection from './missing_people_section'
-import Alert from 'instructure-ui/Alert'
+import Alert from 'instructure-ui/lib/components/Alert'
 
   class PeopleValidationIssues extends React.Component {
     static propTypes = {

@@ -59,6 +59,10 @@ class ContextModulesController < ApplicationController
 
       @is_student = @context.grants_right?(@current_user, session, :participate_as_student)
       @is_cyoe_on = ConditionalRelease::Service.enabled_in_context?(@context)
+      if allow_web_export_download?
+        @allow_web_export_download = true
+        @last_web_export = @context.web_zip_exports.visible_to(@current_user).order('epub_exports.created_at').last
+      end
 
       @menu_tools = {}
       placements = [:assignment_menu, :discussion_topic_menu, :file_menu, :module_menu, :quiz_menu, :wiki_page_menu]
@@ -101,11 +105,6 @@ class ContextModulesController < ApplicationController
       if @is_student && tab_enabled?(@context.class::TAB_MODULES)
         @modules.each{|m| m.evaluate_for(@current_user) }
         session[:module_progressions_initialized] = true
-      end
-
-      if allow_web_export_download?
-        @allow_web_export_download = true
-        @last_web_export = @context.web_zip_exports.visible_to(@current_user).order('epub_exports.created_at').last
       end
     end
   end

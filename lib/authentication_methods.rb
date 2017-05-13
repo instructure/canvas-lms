@@ -76,9 +76,7 @@ module AuthenticationMethods
       # and for some normal use cases (old token, access token),
       # so we can return and move on
       return
-    rescue  Faraday::ConnectionFailed,            # consul config present, but couldn't connect
-            Faraday::ClientError,                 # connetion established, but something went wrong
-            Diplomat::KeyNotFound => exception    # talked to consul, but data missing
+    rescue Imperium::TimeoutError => exception # Something went wrong in the Network
       # these are indications of infrastructure of data problems
       # so we should log them for resolution, but recover gracefully
       Canvas::Errors.capture_exception(:jwt_check, exception)

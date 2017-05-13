@@ -155,6 +155,10 @@ module.exports = function i18nLinerHandlebarsLoader (source) {
   if (result.translationCount > 0) {
     dependencies.push('i18n!' + result.scope)
   }
+
+  // make sure the template has access to all our handlebars helpers
+  dependencies.push('coffeescripts/handlebars_helpers.coffee')
+
   const compiledTemplate = emitTemplate(this.resourcePath, name, result, dependencies, cssRegistration, partialRegistration)
   return compiledTemplate
 }

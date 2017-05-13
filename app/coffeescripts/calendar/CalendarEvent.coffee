@@ -1,7 +1,7 @@
 define [
   'react'
   'react-dom'
-  'instructure-ui/Spinner'
+  'instructure-ui/lib/components/Spinner'
   'jquery'
   'underscore'
   'Backbone'

@@ -7,7 +7,11 @@ import OverrideView from 'compiled/views/assignments/DueDateOverride'
 import AssignmentGroupCollection from 'compiled/collections/AssignmentGroupCollection'
 import SectionCollection from 'compiled/collections/SectionCollection'
 import splitAssetString from 'compiled/str/splitAssetString'
+import LockManager from 'jsx/blueprint_courses/lockManager'
 import 'grading_standards'
+
+const lockManager = new LockManager()
+lockManager.init({ itemType: 'discussion_topic', page: 'edit' })
 
 const isAnnouncement = ENV.DISCUSSION_TOPIC.ATTRIBUTES != null ? ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement : undefined
 const model = new (isAnnouncement ? Announcement : DiscussionTopic)(ENV.DISCUSSION_TOPIC.ATTRIBUTES, {parse: true})
@@ -40,4 +44,3 @@ $(() => {
 })
 
 export default view
-

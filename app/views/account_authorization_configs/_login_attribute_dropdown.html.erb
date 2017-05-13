@@ -1,7 +1,8 @@
 <div class="ic-Form-control">
-  <%= f.label :login_attribute, 'Login Attribute', class: 'ic-Label' %>
+  <%= f.label :login_attribute, 'Login Attribute', class: 'ic-Label', for: "login_attributes_#{presenter.id_suffix(aac)}" %>
   <%= f.select(:login_attribute,
                aac.class.login_attributes,
                {},
-               class: 'ic-Input') %>
+               class: 'ic-Input',
+               id: "login_attributes_#{presenter.id_suffix(aac)}") %>
 </div>

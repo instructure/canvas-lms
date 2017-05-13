@@ -172,31 +172,6 @@ module ApplicationHelper
     @wiki_sidebar_data
   end
 
-  def hidden_dialog(id, &block)
-    content = capture(&block)
-    if !Rails.env.production? && hidden_dialogs[id] && hidden_dialogs[id] != content
-      raise "Attempted to capture a hidden dialog with #{id} and different content!"
-    end
-    hidden_dialogs[id] = capture(&block)
-  end
-
-  def hidden_dialogs; @hidden_dialogs ||= {}; end
-
-  def render_hidden_dialogs
-    output = hidden_dialogs.keys.sort.inject('') do |str, id|
-      str << "<div id='#{id}' style='display: none;''>" << hidden_dialogs[id] << "</div>"
-    end
-    raw(output)
-  end
-
-  class << self
-    attr_accessor :cached_translation_blocks
-  end
-
-  def include_js_translations?
-    !!(params[:include_js_translations] || use_optimized_js?)
-  end
-
   # See `js_base_url`
   def use_optimized_js?
     if params.key?(:optimized_js)
@@ -562,14 +537,6 @@ module ApplicationHelper
     mapped
   end
 
-  def cache_if(cond, *args)
-    if cond
-      cache(*args) { yield }
-    else
-      yield
-    end
-  end
-
   def show_feedback_link?
     Setting.get("show_feedback_link", "false") == "true"
   end
@@ -685,43 +652,6 @@ module ApplicationHelper
     account.try(:effective_brand_config)
   end
   private :brand_config_for_account
-
-  def get_global_includes
-    return @global_includes if defined?(@global_includes)
-    @global_includes = if @domain_root_account.try(:sub_account_includes?)
-      # get the deepest account to start looking for branding
-      if (acct = Context.get_account(@context))
-
-        # cache via the id because it could be that the root account js changes
-        # but the cache is for the sub-account, and we'd rather have everything
-        # reset after 15 minutes then have some places update immediately and
-        # some places wait.
-        key = [acct.id, 'account_context_global_includes'].cache_key
-        Rails.cache.fetch(key, :expires_in => 15.minutes) do
-          acct.account_chain(include_site_admin: true).
-            reverse.map(&:global_includes_hash)
-        end
-      elsif @current_user.present?
-        key = [
-          @domain_root_account.id,
-          'common_account_global_includes',
-          @current_user.id
-        ].cache_key
-        Rails.cache.fetch(key, :expires_in => 15.minutes) do
-          chain = @domain_root_account.account_chain(include_site_admin: true).reverse
-          chain.concat(@current_user.common_account_chain(@domain_root_account))
-          chain.uniq.map(&:global_includes_hash)
-        end
-      end
-    end
-
-    @global_includes ||= (@domain_root_account || Account.site_admin).
-      account_chain(include_site_admin: true).
-      reverse.map(&:global_includes_hash)
-    @global_includes.uniq!
-    @global_includes.compact!
-    @global_includes
-  end
 
   def include_account_js(options = {})
     return if params[:global_includes] == '0'

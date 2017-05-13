@@ -16,7 +16,7 @@ module AddressBook
       {}
     end
 
-    def known_in_context(context, is_admin=false)
+    def known_in_context(context)
       []
     end
 

@@ -1,10 +1,12 @@
 define [
+  'compiled/views/tinymce/EquationEditorView',
+  'tinymce_plugins/instructure_links/links',
   'compiled/views/tinymce/InsertUpdateImageView',
   'jsx/shared/rce/loadEventListeners',
   'jquery',
   'jqueryui/tabs',
   'INST'
-], (InsertUpdateImageView, loadEventListeners) ->
+], (EquationEditorView, Links, InsertUpdateImageView, loadEventListeners) ->
   fakeEditor = undefined
 
   QUnit.module 'loadEventListeners',
@@ -23,6 +25,8 @@ define [
         },
         selection: {
           getBookmark: (()=> {})
+          getNode: (()=> {})
+          getContent: (()=> {})
           moveToBookmark: (prevSelect)=>
             fakeEditor.bookmarkMoved = true
         }
@@ -30,9 +34,34 @@ define [
         addButton:(() => {})
       }
 
+      @dispatchEvent = (name) =>
+        event = document.createEvent('CustomEvent')
+        eventData = {'ed': fakeEditor, 'selectNode': "<div></div>"}
+        event.initCustomEvent("tinyRCE/#{name}", true, true, eventData)
+        document.dispatchEvent(event)
+
     teardown: ->
       window.alert.restore && window.alert.restore()
       console.log.restore && console.log.restore()
+
+  test 'initializes equation editor plugin', (assert) ->
+    done = assert.async()
+    loadEventListeners({equationCB: (view) =>
+      ok(view instanceof EquationEditorView)
+      equal(view.$editor.selector, '#someId')
+      done()
+    })
+    @dispatchEvent('initEquation')
+
+  test 'initializes links plugin and renders dialog', (assert) ->
+    done = assert.async()
+    @stub(Links)
+    loadEventListeners({linksCB: () =>
+      ok(Links.initEditor.calledWithExactly(fakeEditor))
+      ok(Links.renderDialog.calledWithExactly(fakeEditor))
+      done()
+    })
+    @dispatchEvent('initLinks')
 
   asyncTest 'builds new image view on RCE event', ->
     expect(1)

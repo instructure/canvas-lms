@@ -17,6 +17,7 @@ module CC::Exporter::WebZip
       @current_progress = Rails.cache.fetch(progress_key)
       @current_progress ||= MustViewModuleProgressor.new(user, course).current_progress
       @html_converter = CC::CCHelper::HtmlContentExporter.new(course, user, for_epub_export: true)
+      @canvas_object_export_hash = map_canvas_objects_to_export_ids
     end
     attr_reader :files, :course, :user, :current_progress
     attr_accessor :file_data
@@ -39,7 +40,8 @@ module CC::Exporter::WebZip
     end
 
     def add_files
-      files.each do |file_data|
+      export_files = tab_hidden?(:files) ? filter_and_clean_files(files) : files
+      export_files.each do |file_data|
         next unless file_data[:exists]
         unless @path_to_files
           match = file_data[:path_to_file].match(%r{.*/web_resources/})
@@ -52,10 +54,25 @@ module CC::Exporter::WebZip
       end
     end
 
+    def filter_and_clean_files(files)
+      export_files = filter_for_export_safe_items(files, :attachments)
+      cleanup_files = files - export_files
+      cleanup_files.each {|file_data| File.delete(file_data[:path_to_file])}
+      export_files
+    end
+
+    def filter_for_export_safe_items(item_list, type)
+      item_list.select do |export_item|
+        ident = type == :attachments ? export_item[:local_path].sub('media', '') : export_item[:identifier]
+        next true if @linked_items.include?(ident)
+        next unless [:quizzes, :discussion_topics].include?(type)
+        !tab_hidden?(:assignments) && @canvas_object_export_hash[type][ident]&.assignment
+      end
+    end
+
     def create
       begin
-        add_files
-        add_course_data
+        add_course_data(parse_course_data)
         pull_dist_package
       ensure
         zip_file&.close
@@ -64,23 +81,100 @@ module CC::Exporter::WebZip
       zip_file.to_s
     end
 
-    def add_course_data
-      f = File.new(@course_data_filename, 'w+')
-      last_web_export_time = course.web_zip_exports.where(user: user).last&.created_at
-      data = {
+    def real_export_id(item)
+      export_id = item[:exportId]
+      real_export_id = @discussion_quiz_export_id_map[export_id] if export_id
+      if real_export_id
+        assignment_export_id = export_id
+        export_id = real_export_id
+      end
+      export_id ||= item[:content]&.sub('viewer/files', '')
+      [export_id, assignment_export_id]
+    end
+
+    def string_to_symbol_type(type)
+      case type
+      when 'pages'
+        :wiki_pages
+      else
+        type.underscore.pluralize.split('/').first.to_sym
+      end
+    end
+
+    def check_for_links_and_mark_exportable(export_item, linked_items, items_to_check)
+      # quizzes and discussions could be linked by assignment or quiz/discussion, so we need
+      #  to find the quiz/discussion export id to match it with the cc data
+      # we're matching files by filename, which is under content instead of exportId
+      export_id, assignment_export_id = real_export_id(export_item)
+      return if linked_items.include?(export_id) || export_item[:locked]
+      linked_items.add(export_id)
+      linked_items.add(assignment_export_id) if assignment_export_id
+      return if export_item[:type] == 'Attachment'
+      type = string_to_symbol_type(export_item[:type])
+      match_item = @export_item_map.dig(type, export_id)
+      return unless match_item
+      content = match_item[:content] || match_item[:text] || match_item[:description]
+      linked_objects = format_linked_objects(CC::CCHelper.map_linked_objects(content))
+      items_to_check.concat(linked_objects)
+    end
+
+    def format_linked_objects(canvas_objects)
+      canvas_objects.map do |lo|
+        key, canvas_key = lo[:type] == 'Attachment' ? [:content, :local_path] : [:exportId, :identifier]
+        lo[key] = lo.delete(canvas_key)
+        lo
+      end
+    end
+
+    def find_linked_items(module_data)
+      linked_items = Set.new
+      items_to_check = []
+      module_data.each do |mod|
+        mod[:items].each do |item|
+          next unless CONTENT_TYPES.include?(item[:type]) || item[:type] == 'Attachment'
+          check_for_links_and_mark_exportable(item, linked_items, items_to_check)
+        end
+      end
+      until items_to_check.empty?
+        item_to_check = items_to_check.shift
+        check_for_links_and_mark_exportable(item_to_check, linked_items, items_to_check)
+      end
+      linked_items
+    end
+
+    def any_hidden_tabs?
+      list = {
+        wiki_pages: @pages,
+        assignments: @assignments,
+        discussion_topics: @topics,
+        quizzes: @quizzes,
+        attachments: files
+      }
+      return unless list.keys.any? {|type| tab_hidden?(type)}
+      list.each {|type, item_list| map_export_item_ids(type, item_list)}
+    end
+
+    def parse_course_data
+      module_data = parse_module_data
+      @linked_items = find_linked_items(module_data) if any_hidden_tabs?
+      course_data = {
         language: course.locale || user.locale || course.account.default_locale(true) || 'en',
-        lastDownload: force_timezone(last_web_export_time),
+        lastDownload: force_timezone(course.web_zip_exports.where(user: user).last&.created_at),
         title: course.name,
-        files: create_tree_data,
-        modules: parse_module_data,
+        modules: module_data,
         pages: parse_non_module_items(:wiki_pages),
         assignments: parse_non_module_items(:assignments),
         discussion_topics: parse_non_module_items(:discussion_topics),
         quizzes: parse_non_module_items(:quizzes)
       }
+      add_files
+      course_data[:files] = create_tree_data
+      course_data
+    end
 
-      f.write("window.COURSE_DATA = #{data.to_json}")
-
+    def add_course_data(course_data)
+      f = File.new(@course_data_filename, 'w+')
+      f.write("window.COURSE_DATA = #{course_data.to_json}")
       zip_file.add("#{@viewer_path_prefix}/#{@course_data_filename}", f)
       f.close
     end
@@ -144,6 +238,12 @@ module CC::Exporter::WebZip
       return :all if modul.completion_requirements.count > 0
     end
 
+    def mod_item_or_content_locked?(item)
+      return true if item.locked_for?(user, deep_check_if_needed: true)
+      locked = !!item.content.locked_for?(user) if item.content.respond_to?(:locked_for?)
+      locked || false
+    end
+
     def parse_module_item_data(modul)
       items = modul.content_tags.active.select{ |item| item.visible_to_user?(user) }
       items.map do |item|
@@ -152,7 +252,7 @@ module CC::Exporter::WebZip
           title: item.title,
           type: item.content_type,
           indent: item.indent,
-          locked: !item.available_for?(user, deep_check_if_needed: true)
+          locked: mod_item_or_content_locked?(item)
         }
         parse_module_item_details(item, item_hash) if item.content_type != 'ContextModuleSubHeader'
         item_hash
@@ -173,7 +273,7 @@ module CC::Exporter::WebZip
     def find_export_id(item)
       case item.content_type
       when 'Assignment', 'DiscussionTopic', 'Quizzes::Quiz'
-        CC::CCHelper.create_key(item.content&.asset_string)
+        CC::CCHelper.create_key(item.content)
       when 'WikiPage'
         item.content&.url
       end
@@ -185,12 +285,16 @@ module CC::Exporter::WebZip
         item_hash[:submissionTypes] = item_content.readable_submission_types
         item_hash[:graded] = item_content.grading_type != 'not_graded'
       when Quizzes::Quiz
+        item_hash[:assignmentExportId] = CC::CCHelper.create_key(item_content.assignment)
         item_hash[:questionCount] = item_content.question_count
         item_hash[:timeLimit] = item_content.time_limit
         item_hash[:attempts] = item_content.allowed_attempts
         item_hash[:graded] = item_content.quiz_type != 'survey'
       when DiscussionTopic
+        item_hash[:lockAt] = force_timezone(item_content.lock_at)
+        item_hash[:unlockAt] = force_timezone(item_content.unlock_at)
         item_content = item_content.assignment
+        item_hash[:assignmentExportId] = CC::CCHelper.create_key(item_content) if item_content.present?
         item_hash[:graded] = item_content.present?
       end
       return unless item_content
@@ -223,20 +327,68 @@ module CC::Exporter::WebZip
       end
     end
 
-    def parse_non_module_items(type)
-      list = {wiki_pages: @pages, assignments: @assignments, discussion_topics: @topics, quizzes: @quizzes}[type]
-      canvas_items = {}
+    def tab_hidden?(type)
+      tab_id = case type
+               when :wiki_pages
+                 Course::TAB_PAGES
+               when :discussion_topics
+                 Course::TAB_DISCUSSIONS
+               when :attachments
+                 Course::TAB_FILES
+               else
+                 "Course::TAB_#{type.upcase}".constantize
+               end
+      course.tab_hidden?(tab_id)
+    end
+
+    def map_canvas_objects_to_export_ids
+      canvas_object_export_hash = {}
+      @discussion_quiz_export_id_map = {}
+      [:wiki_pages, :assignments, :discussion_topics, :quizzes].each do |type|
+        type_export_hash, assignment_export_hash = map_object_type_to_export_ids(type)
+        canvas_object_export_hash[type] = type_export_hash
+        canvas_object_export_hash[:assignments] ||= {}
+        canvas_object_export_hash[:assignments].merge!(assignment_export_hash)
+      end
+      canvas_object_export_hash
+    end
+
+    def map_object_type_to_export_ids(type)
+      type_export_hash = {}
+      assignment_export_hash = {}
       course.send(type).each do |item|
         tag = (type == :wiki_pages ? item.url : CC::CCHelper.create_key(item))
-        canvas_items[tag] = item
+        type_export_hash[tag] = item
+        next unless (type == :discussion_topics || type == :quizzes) && item.assignment
+        assignment_id = CC::CCHelper.create_key(item.assignment)
+        assignment_export_hash[assignment_id] = item
+        @discussion_quiz_export_id_map[assignment_id] = tag
       end
+      [type_export_hash, assignment_export_hash]
+    end
+
+    def map_export_item_ids(type, item_list)
+      @export_item_map ||= {}
+      @export_item_map[type] ||= {}
+      item_list.each {|item| @export_item_map[type][item[:identifier]] = item}
+      @export_item_map
+    end
+
+    def parse_non_module_item(export_item, item)
+      {
+        exportId: export_item[:identifier],
+        title: export_item[:title],
+        type: item.class.name,
+        content: parse_content(item) || export_item[:text]
+      }
+    end
+
+    def parse_non_module_items(type)
+      list = {wiki_pages: @pages, assignments: @assignments, discussion_topics: @topics, quizzes: @quizzes}[type]
+      list = filter_for_export_safe_items(list, type) if tab_hidden?(type)
       list.map do |export_item|
-        item = canvas_items[export_item[:identifier]]
-        item_hash = {
-          exportId: export_item[:identifier],
-          title: export_item[:title],
-          content: parse_content(item) || export_item[:text]
-        }
+        item = @canvas_object_export_hash[type][export_item[:identifier]]
+        item_hash = parse_non_module_item(export_item, item)
         item_hash[:frontPage] = export_item[:front_page] if type == :wiki_pages
         add_assignment_details(item, item_hash) unless type == :wiki_pages
         item_hash
@@ -255,7 +407,7 @@ module CC::Exporter::WebZip
 
     def pull_dist_package
       path = dist_package_path
-      config = ConfigFile.load('offline_web', Rails.env)
+      config = ConfigFile.load('offline_web')
       if config&.fetch('local')
         path = config['path_to_dist']
       end

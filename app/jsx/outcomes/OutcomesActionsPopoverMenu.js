@@ -1,10 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import I18n from 'i18n!outcomes'
-import PopoverMenu from 'instructure-ui/PopoverMenu'
-import Button from 'instructure-ui/Button'
-import Menu, { MenuItem, MenuItemSeparator } from 'instructure-ui/Menu'
-import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
+import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
+import Button from 'instructure-ui/lib/components/Button'
+import { MenuItem } from 'instructure-ui/lib/components/Menu'
+import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
 import AddToCourseModal from 'jsx/outcomes/AddToCourseModal'
 
 export default React.createClass({

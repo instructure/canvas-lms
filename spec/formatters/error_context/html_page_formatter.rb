@@ -1,5 +1,6 @@
 require_relative "./base_formatter"
 require "escape_code"
+require "forwardable"
 
 module ErrorContext
   class HTMLPageFormatter < BaseFormatter

@@ -1,6 +1,6 @@
 import I18n from 'i18n!roster'
 import React from 'react'
-import Alert from 'instructure-ui/Alert'
+import Alert from 'instructure-ui/lib/components/Alert'
 
   class ApiError extends React.Component {
     static propTypes = {

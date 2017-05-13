@@ -3,6 +3,7 @@ require_relative '../page_objects/gradezilla_page'
 
 describe "Gradezilla" do
   include_context "in-process server selenium tests"
+  include_context "gradebook_components"
   include GradezillaCommon
 
   let(:gradezilla_page) { Gradezilla::MultipleGradingPeriods.new }
@@ -63,11 +64,12 @@ describe "Gradezilla" do
       f("[data-arrange-columns-by='due_date']").click
       expect(active_element).to have_attribute('id', 'gradebook_settings')
     end
+  end
 
-    it "after show notes is clicked", priority: "2", test_id: 720463 do
-      f('.create').click
-      expect(active_element).to have_attribute('id', 'gradebook_settings')
-    end
+  it 'returns focus to the view options menu after clicking the "Notes" option' do
+    gradebook_view_options_menu.click
+    notes_option.click
+    expect(active_element).to eq(gradebook_view_options_menu)
   end
 
   context 'settings menu is accessible' do

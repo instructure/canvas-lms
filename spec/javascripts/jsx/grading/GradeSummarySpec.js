@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2016 - 2017 Instructure, Inc.
  *
  * This file is part of Canvas.
@@ -121,6 +121,7 @@ define([
                   <span class="score_value">A</span>
                 </span>
                 <span style="display: none;">
+                  <span class="original_points">10</span>
                   <span class="original_score">10</span>
                   <span class="what_if_score"></span>
                   <span class="assignment_id">201</span>
@@ -293,22 +294,22 @@ define([
     }
   });
 
-  test('parses the text of the .original_score element', function () {
+  test('parses the text of the .original_points element', function () {
     const score = GradeSummary.getOriginalScore(this.$assignment);
     strictEqual(score.numericalValue, 10);
     strictEqual(score.formattedValue, '10');
   });
 
   test('sets "numericalValue" to a default of null', function () {
-    this.$assignment.find('.original_score').text('invalid');
+    this.$assignment.find('.original_points').text('invalid');
     const score = GradeSummary.getOriginalScore(this.$assignment);
     strictEqual(score.numericalValue, null);
   });
 
-  test('sets "formattedValue" to a default of "-"', function () {
-    this.$assignment.find('.original_score').text('invalid');
+  test('sets "formattedValue" to formatted grade', function () {
+    this.$assignment.find('.original_score').text('C+ (78.5)');
     const score = GradeSummary.getOriginalScore(this.$assignment);
-    equal(score.formattedValue, '-');
+    equal(score.formattedValue, 'C+ (78.5)');
   });
 
   QUnit.module('GradeSummary.calculateTotals', {
@@ -970,13 +971,6 @@ define([
     equal(this.$assignment.find('.what_if_score').text(), '5');
   });
 
-  test('uses I18n to parse the .original_score value', function () {
-    this.stub(numberHelper, 'parse').withArgs('1.234,56').returns('654321');
-    this.$assignment.find('.original_score').text('1.234,56');
-    this.onScoreRevert();
-    equal(this.$assignment.find('.what_if_score').text(), '654321');
-  });
-
   test('sets the .assignment_score title to the "Click to test" message', function () {
     this.onScoreRevert();
     equal(this.$assignment.find('.assignment_score').attr('title'), 'Click to test a different score');
@@ -1021,41 +1015,17 @@ define([
     equal($grade.text(), '5');
   });
 
-  test('sets the .grade text to "0" when the .original_score is "0"', function () {
-    this.$assignment.find('.original_score').text('0');
-    this.onScoreRevert();
-    const $grade = this.$assignment.find('.grade');
-    $grade.children().remove(); // remove all content except score text
-    equal($grade.text(), '0');
-  });
-
-  test('sets the .grade text to "-" when the .original_score is blank', function () {
-    this.$assignment.find('.original_score').text('');
-    this.onScoreRevert();
-    const $grade = this.$assignment.find('.grade');
-    $grade.children().remove(); // remove all content except score text
-    equal($grade.text(), '-');
-  });
-
-  test('sets the .grade text to "-" when the .original_score is not a number', function () {
-    this.$assignment.find('.original_score').text('null');
-    this.onScoreRevert();
-    const $grade = this.$assignment.find('.grade');
-    $grade.children().remove(); // remove all content except score text
-    equal($grade.text(), '-');
-  });
-
   test('updates the score for the assignment', function () {
     this.stub(GradeSummary, 'updateScoreForAssignment');
     this.onScoreRevert();
     equal(GradeSummary.updateScoreForAssignment.callCount, 1);
     const [assignmentId, score] = GradeSummary.updateScoreForAssignment.getCall(0).args;
     equal(assignmentId, '201', 'first argument is the assignment id 201');
-    strictEqual(score, 5, 'second argument is the numerical score 5');
+    strictEqual(score, 10, 'second argument is the numerical score 10');
   });
 
-  test('updates the score for the assignment with null when the .original_score is blank', function () {
-    this.$assignment.find('.original_score').text('');
+  test('updates the score for the assignment with null when the .original_points is blank', function () {
+    this.$assignment.find('.original_points').text('');
     this.stub(GradeSummary, 'updateScoreForAssignment');
     this.onScoreRevert();
     const score = GradeSummary.updateScoreForAssignment.getCall(0).args[1];

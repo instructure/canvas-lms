@@ -62,15 +62,7 @@
       {{/if}}
     {{/if}}
 
-    <div class="master-course-cell">
-      {{#if is_master_course_child_content}}
-        {{#if restricted_by_master_course}}
-          <i class="icon-lock"></i>
-        {{else}}
-          <i class="icon-unlock icon-Line"></i>
-        {{/if}}
-      {{/if}}
-    </div>
+    <span data-view="lock-icon" class="lock-icon"></span>
 
     <div class="discussion-status">
       <span id="publish-icon" class="publish-icon" data-view="publishIcon"></span>

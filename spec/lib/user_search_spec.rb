@@ -137,7 +137,7 @@ describe UserSearch do
           end
         end
 
-        describe 'searching on sis ids' do
+        describe 'searching on logins' do
           let(:pseudonym) { user.pseudonyms.build }
 
           before do
@@ -148,6 +148,10 @@ describe UserSearch do
 
           it 'will match against an sis id' do
             expect(UserSearch.for_user_in_context("SOME_SIS", course, user)).to eq [user]
+          end
+
+          it 'will match against a login id' do
+            expect(UserSearch.for_user_in_context("UNIQUE_ID", course, user)).to eq [user]
           end
 
           it 'can match an SIS id and a user name in the same query' do

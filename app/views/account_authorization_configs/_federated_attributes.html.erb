@@ -5,12 +5,15 @@ Federated attributes are information sent from your authentication provider that
 to automatically update corresponding information for users in Canvas each time they log in.
 TEXT
 %></p>
-  <table class="ic-Table">
+  <table class="ic-Table" style="<%= hidden unless aac.federated_attributes.present? %>">
     <thead>
-      <th style="<%= hidden unless aac.jit_provisioning? %>" class="provisioning_only_column">
+      <th scope="col"><%= t 'Canvas Attribute' %></th>
+      <th scope="col"><%= t 'Provider Attribute' %></th>
+      <th scope="col" style="<%= hidden unless aac.jit_provisioning? %>" class="provisioning_only_column">
         <%= t 'Provisioning Only' %>
         <a
           class="icon-info"
+          tabindex="0"
           data-tooltip='{"tooltipClass":"popover popover-padded", "position":"right"}'
           title= "<%= t <<-TEXT
         If an attribute is marked as provisioning only, then it will only be used when Just in Time
@@ -21,31 +24,36 @@ TEXT
           <span class="screenreader-only"><%= t 'What does Provisioning Only mean?' %></span>
         </a>
       </th>
-      <th><%= t 'Canvas Attribute' %></th>
-      <th><%= t 'Provider Attribute' %></th>
-      <th>&nbsp;</th>
+      <td scope="col">&nbsp;</td>
     </thead>
     <tbody>
       <% aac.federated_attributes.each do |(canvas_attribute, provider_attribute)| %>
         <tr>
-          <td class="provisioning_only_column<%= ' federated_attributes_none' unless aac.jit_provisioning? %>">
-            <label class="ic-Label screenreader-only" for="authentication_provider[federated_attributes][<%= canvas_attribute %>][provisioning_only]"><%= t 'Provisioning Only' %></label>
-            <input type="checkbox" id="authentication_provider[federated_attributes][<%= canvas_attribute %>][provisioning_only]" name="authentication_provider[federated_attributes][<%= canvas_attribute %>][provisioning_only]" <%= 'checked="checked"'.html_safe if provider_attribute['provisioning_only'] %>/>
+          <th scope="row" class="canvas_attribute"><span class="canvas_attribute_name"><%= canvas_attribute %></span></th>
+          <td><label class="ic-Label screenreader-only" for="aacfa_<%= canvas_attribute %>_attribute_<%= presenter.id_suffix(aac) %>"><%= t 'Provider Attribute' %></label>
+            <%= presenter.federated_provider_attribute(aac, canvas_attribute, provider_attribute['attribute']) %>
           </td>
-          <td class="canvas_attribute"><span class="screenreader-only"><%= t 'Canvas Attribute' %></span><span class="canvas_attribute_name"><%= canvas_attribute %></span></td>
-          <td><label class="ic-Label screenreader-only" for="authentication_provider[federated_attributes][#{canvas_attribute}][attribute]"><%= t 'Provider Attribute' %></label>
-            <%= presenter.federated_provider_attribute(aac, canvas_attribute, provider_attribute['attribute']) %></td>
+          <td class="provisioning_only_column<%= ' federated_attributes_none' unless aac.jit_provisioning? %>">
+            <label class="ic-Label screenreader-only" for="aacfa_<%= canvas_attribute %>_provisioning_only_<%= presenter.id_suffix(aac) %>"><%= t 'Provisioning Only' %></label>
+            <input type="checkbox" id="aacfa_<%= canvas_attribute %>_provisioning_only_<%= presenter.id_suffix(aac) %>" name="authentication_provider[federated_attributes][<%= canvas_attribute %>][provisioning_only]" <%= 'checked="checked"'.html_safe if provider_attribute['provisioning_only'] %>/>
+          </td>
           <td>
             <button type="button" class="Button Button--icon-action remove_federated_attribute"><i class="icon-trash"><span class="screenreader-only"><%= t 'Remove Attribute' %></span></i></button>
           </td>
         </tr>
       <% end %>
-      <tr style="display: none" class="attribute_template">
+      <tr style="display: none" class="attribute_template" data-idsuffix="<%= presenter.id_suffix(aac) %>">
+        <th scope="row" class="canvas_attribute">
+          <span class="canvas_attribute_name"></span>
+        </th>
+        <td class="provider_attribute_column">
+          <label class="ic-Label screenreader-only"><%= t 'Provider Attribute' %></label>
+          <%= presenter.federated_provider_attribute(aac) %>
+        </td>
         <td class="provisioning_only_column<%= ' federated_attributes_none' unless aac.jit_provisioning? %>">
           <label class="ic-Label screenreader-only"><%= t 'Provisioning Only' %></label>
-          <input type="checkbox" /></td>
-        <td class="canvas_attribute"><span class="screenreader-only"><%= t 'Canvas Attribute' %></span><span class="canvas_attribute_name"></span></td>
-        <td class="provider_attribute_column"><label class="ic-Label screenreader-only"><%= t 'Provider Attribute' %></label><%= presenter.federated_provider_attribute(aac) %></td>
+          <input type="checkbox" />
+        </td>
         <td>
           <button type="button" class="Button Button--icon-action remove_federated_attribute"><i class="icon-trash"><span class="screenreader-only"><%= t 'Remove Attribute' %></span></i></button>
         </td>
@@ -54,8 +62,8 @@ TEXT
   </table>
   <% attrs = presenter.available_federated_attributes(aac) %>
   <div class="<%= attrs.empty? ? 'federated_attributes_none' : 'add_attribute' %>">
-    <label class="ic-Label screenreader-only"><%= t 'Choose attribute to add' %></label>
-    <select class="ic-Input canvas_attribute federated_attributes_select">
+    <label class="ic-Label screenreader-only" for="aacfa_add_attribute_<%= presenter.id_suffix(aac) %>"><%= t 'Choose attribute to add' %></label>
+    <select id="aacfa_add_attribute_<%= presenter.id_suffix(aac) %>" class="ic-Input canvas_attribute federated_attributes_select">
       <% attrs.each do |attr| %>
         <option><%= attr %></option>
       <% end %>
