@@ -39,10 +39,10 @@ describe JobLiveEventsContext do
 
       expect(fake_delayed_instance.live_events_context).to eq(
         {
-          'job_id' => '1',
-          'job_tag' => 'foobar',
-          'root_account_id' => global_id,
-          'root_account_uuid' => uuid,
+          job_id: '1',
+          job_tag: 'foobar',
+          root_account_id: global_id,
+          root_account_uuid: uuid,
         }
       )
     end

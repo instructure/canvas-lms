@@ -18,8 +18,8 @@
 module JobLiveEventsContext
   def live_events_context
     ctx = {
-      'job_id' => global_id,
-      'job_tag' => tag
+      job_id: global_id,
+      job_tag:tag,
     }
 
     ctx['root_account_id'] = Account.default.global_id
