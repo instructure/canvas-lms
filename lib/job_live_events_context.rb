@@ -18,12 +18,12 @@
 module JobLiveEventsContext
   def live_events_context
     ctx = {
-      'job_id' => global_id,
-      'job_tag' => tag,
-      'producer' => 'canvas',
-      'root_account_id' => Account.default.global_id,
-      'root_account_uuid' => Account.default.uuid,
-      'root_account_lti_guid' => Account.default.lti_guid,
+      job_id: global_id,
+      job_tag:tag,
+      producer: 'canvas',
+      root_account_id: Account.default.global_id,
+      root_account_uuid: Account.default.uuid,
+      root_account_lti_guid: Account.default.lti_guid,
     }
     StringifyIds.recursively_stringify_ids(ctx)
   end

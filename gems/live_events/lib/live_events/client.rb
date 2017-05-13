@@ -79,7 +79,7 @@ module LiveEvents
       # let it be the user_id when that's available.
       partition_key ||= (ctx["user_id"] && ctx["user_id"].try(:to_s)) || rand(1000).to_s
 
-      event_json = JSON.dump(event)
+      event_json = event.to_json
 
       job = Proc.new {
         begin
