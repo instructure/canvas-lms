@@ -21,11 +21,11 @@ module Lti
     include ActionDispatch::Routing::PolymorphicRoutes
     include Rails.application.routes.url_helpers
 
-    def initialize(context:, domain_root_account:, host:, tool:, user: nil)
+    def initialize(context:, domain_root_account:, base_url:, tool:, user: nil)
       @context = context
       @domain_root_account = domain_root_account
       @user = user
-      @host = host
+      @base_url = URI.parse(base_url)
       @tool = tool
     end
 
@@ -106,7 +106,9 @@ module Lti
     def return_url(content_item_id)
       return_url_opts = {
         service: 'external_tool_dialog',
-        host: @host
+        host: @base_url.host,
+        protocol: @base_url.scheme,
+        port: @base_url.port
       }
 
       if content_item_id

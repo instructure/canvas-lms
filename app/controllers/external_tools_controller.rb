@@ -648,7 +648,7 @@ class ExternalToolsController < ApplicationController
     selection_request = Lti::ContentItemSelectionRequest.new(context: @context,
                                                              domain_root_account: @domain_root_account,
                                                              user: @current_user,
-                                                             host: request.host,
+                                                             base_url: request.base_url,
                                                              tool: tool)
 
     assignment = @context.assignments.active.find(params[:assignment_id]) if params[:assignment_id].present?

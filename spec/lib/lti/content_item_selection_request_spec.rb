@@ -21,15 +21,19 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 describe Lti::ContentItemSelectionRequest do
   include ExternalToolsSpecHelper
 
-  subject(:lti_request) do
-    described_class.new(context: course,
-                        domain_root_account: root_account,
-                        user: teacher,
-                        host: test_host,
-                        tool: tool)
+  subject(:lti_request) { described_class.new(default_params) }
+
+  let(:default_params) do
+    {
+      context: course,
+      domain_root_account: root_account,
+      user: teacher,
+      base_url: base_url,
+      tool: tool
+    }
   end
 
-  let(:test_host) { 'canvas.test' }
+  let(:base_url) { 'https://canvas.test/' }
   let(:course) { course_model }
   let(:root_account) { course.root_account }
   let(:teacher) { course_with_teacher(course: course).user }
@@ -94,26 +98,65 @@ describe Lti::ContentItemSelectionRequest do
       end
 
       context 'return_url' do
+        let(:base_uri) { URI.parse(base_url) }
+
         it 'properly sets the return URL when no content item id is provided' do
-          lti_launch = lti_request.generate_lti_launch(placement: placement)
           create_url = Rails.application.routes.url_helpers.course_external_content_success_url(
-            host: test_host,
+            host: base_uri.host,
+            protocol: base_uri.scheme,
             course_id: course.id,
             service: :external_tool_dialog
           )
+
+          lti_launch = lti_request.generate_lti_launch(placement: placement)
+
           expect(lti_launch.params['content_item_return_url']).to eq create_url
         end
 
         it 'properly sets the return URL when a content item id is provided' do
           item_id = 1
-          lti_launch = lti_request.generate_lti_launch(placement: placement, opts: {content_item_id: item_id})
           update_url = Rails.application.routes.url_helpers.course_external_content_update_url(
-            host: test_host,
+            host: base_uri.host,
+            protocol: base_uri.scheme,
             course_id: course.id,
             service: :external_tool_dialog,
             id: item_id
           )
+
+          lti_launch = lti_request.generate_lti_launch(placement: placement, opts: {content_item_id: item_id})
+
           expect(lti_launch.params['content_item_return_url']).to eq update_url
+        end
+
+        it 'generates a url a http protocol when the base_uri uses http' do
+          base_uri.scheme = 'http'
+          lti_request_with_scheme = described_class.new(default_params.merge(base_url: base_uri.to_s))
+          create_url = Rails.application.routes.url_helpers.course_external_content_success_url(
+            host: base_uri.host,
+            protocol: base_uri.scheme,
+            course_id: course.id,
+            service: :external_tool_dialog
+          )
+
+          lti_launch = lti_request_with_scheme.generate_lti_launch(placement: placement)
+
+          expect(lti_launch.params['content_item_return_url']).to eq create_url
+        end
+
+        it 'generates a url with a port when there is a port in the base_uri' do
+          base_uri.port = 8080
+          lti_request_with_port = described_class.new(default_params.merge(base_url: base_uri.to_s))
+          create_url = Rails.application.routes.url_helpers.course_external_content_success_url(
+            host: base_uri.host,
+            protocol: base_uri.scheme,
+            port: base_uri.port,
+            course_id: course.id,
+            service: :external_tool_dialog
+          )
+
+          lti_launch = lti_request_with_port.generate_lti_launch(placement: placement)
+
+          expect(lti_launch.params['content_item_return_url']).to eq create_url
         end
       end
 
