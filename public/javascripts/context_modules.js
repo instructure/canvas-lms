@@ -25,7 +25,7 @@ define([
   'compiled/models/PublishableModuleItem',
   'compiled/views/PublishIconView',
   'compiled/views/LockIconView',
-  'compiled/models/MasterCourseModuleLock',
+  'jsx/blueprint_courses/apps/MasterCourseModuleLock',
   'INST' /* INST */,
   'i18n!context_modules',
   'jquery' /* $ */,
@@ -57,7 +57,6 @@ define([
 ], function (_, ModuleFile, PublishCloud, React, ReactDOM, PublishableModuleItem, PublishIconView,
   LockIconView, MasterCourseModuleLock, INST, I18n, $, Helper, CyoeHelper, ContextModulesView, RelockModulesDialog,
   vddTooltip, vddTooltipView, Publishable, PublishButtonView, htmlEscape, setupContentIds, dig) {
-    MasterCourseModuleLock = MasterCourseModuleLock.default
 
   // TODO: AMD don't export global, use as module
   /*global modules*/
