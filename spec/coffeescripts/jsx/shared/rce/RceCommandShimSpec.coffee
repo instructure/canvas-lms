@@ -69,6 +69,22 @@ define [
     @$target.data('remoteEditor', remoteEditor)
     equal RceCommandShim.send(@$target, "get_code"), 'methodResult'
 
+  test "transforms create_link call for remote editor", ->
+    url = 'http://someurl'
+    classes = 'one two'
+    previewAlt = 'alt text for preview'
+    @$target.data('remoteEditor', remoteEditor)
+    RceCommandShim.send(@$target, "create_link",
+      url: url
+      classes: classes
+      dataAttributes: {'preview-alt': previewAlt}
+    )
+    ok remoteEditor.call.calledWithMatch('insertLink',
+      href: url
+      'class': classes
+      'data-preview-alt': previewAlt
+    )
+
   QUnit.module 'RceCommandShim - focus',
     setup: ->
       fixtures.setup()
