@@ -124,6 +124,7 @@ class DiscussionTopicsApiController < ApplicationController
       if new_entries
         new_entries.each do |e|
           e["message"] = resolve_placeholders(e["message"]) if e["message"]
+          e["attachments"].each {|att| att["url"] = resolve_placeholders(att["url"]) if att["url"] } if e["attachments"]
         end
       end
 
