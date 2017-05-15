@@ -176,6 +176,7 @@ module SIS
           @finished = true
         end
       rescue => e
+        return @batch if @batch.workflow_state == 'aborted'
         if @batch
           message = "Importing CSV for account"\
             ": #{@root_account.id} (#{@root_account.name}) "\
@@ -235,7 +236,8 @@ module SIS
           if @parallelism > 1
             begin
               SisBatch.transaction do
-                @batch.reload(select: 'data, progress', lock: :no_key_update)
+                @batch.reload(select: 'data, progress, workflow_state', lock: :no_key_update)
+                raise SisBatch::Aborted if @batch.workflow_state == 'aborted'
                 @current_row += @batch.data[:current_row]
                 @batch.data[:current_row] = @current_row
                 @batch.progress = [calculate_progress, 99].min
@@ -273,6 +275,7 @@ module SIS
           importerObject.process(csv)
           run_next_importer(IMPORTERS[IMPORTERS.index(importer) + 1]) if complete_importer(importer)
         rescue => e
+          return @batch if @batch.workflow_state == 'aborted'
           message = "Importing CSV for account: "\
             "#{@root_account.id} (#{@root_account.name}) sis_batch_id: #{@batch.id}: #{e}"
           err_id = Canvas::Errors.capture(e, {
@@ -297,7 +300,7 @@ module SIS
       private
 
       def run_next_importer(importer)
-        return finish if importer.nil?
+        return finish if importer.nil? || @batch.workflow_state == 'aborted'
         return run_next_importer(IMPORTERS[IMPORTERS.index(importer) + 1]) if @csvs[importer].empty?
         if (importer == :account)
           @csvs[importer].each { |csv| run_single_importer(importer, csv) }

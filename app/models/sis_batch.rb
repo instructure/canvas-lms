@@ -107,6 +107,8 @@ class SisBatch < ActiveRecord::Base
     end
   end
 
+  class Aborted < RuntimeError; end
+
   def add_errors(messages)
     self.processing_errors = (self.processing_errors || []) + messages
   end
@@ -182,7 +184,7 @@ class SisBatch < ActiveRecord::Base
   end
 
   def abort_batch
-    SisBatch.not_started.where(id: self).update_all(workflow_state: 'aborted')
+    SisBatch.not_completed.where(id: self).update_all(workflow_state: 'aborted')
   end
 
   def self.abort_all_pending_for_account(account)
@@ -196,6 +198,7 @@ class SisBatch < ActiveRecord::Base
   scope :not_started, -> { where(workflow_state: ['initializing', 'created']) }
   scope :needs_processing, -> { where(:workflow_state => 'created').order(:created_at) }
   scope :importing, -> { where(workflow_state: ['importing', 'cleanup_batch']) }
+  scope :not_completed, -> { where(workflow_state: %w[initializing created importing cleanup_batch]) }
   scope :succeeded, -> { where(:workflow_state => %w[imported imported_with_messages]) }
 
   def self.process_all_for_account(account)
@@ -217,7 +220,10 @@ class SisBatch < ActiveRecord::Base
   def fast_update_progress(val)
     return true if val == self.progress
     self.progress = val
-    SisBatch.where(id: self).update_all(progress: val)
+    state = SisBatch.connection.select_value(<<-SQL)
+      UPDATE #{SisBatch.quoted_table_name} SET progress=#{val} WHERE id=#{self.id} RETURNING workflow_state
+    SQL
+    raise SisBatch::Aborted if state == 'aborted'
   end
 
   def importing?
@@ -271,6 +277,7 @@ class SisBatch < ActiveRecord::Base
   def finish(import_finished)
     @data_file.close if @data_file
     @data_file = nil
+    return self if workflow_state == 'aborted'
     if import_finished
       remove_previous_imports if self.batch_mode?
       self.workflow_state = :imported
@@ -366,9 +373,13 @@ class SisBatch < ActiveRecord::Base
     count += sections.count if sections
     count += enrollments.count if enrollments
 
-    row = remove_non_batch_courses(courses, count) if courses
-    row = remove_non_batch_sections(sections, count, row) if sections
-    remove_non_batch_enrollments(enrollments, count, row) if enrollments
+    begin
+      row = remove_non_batch_courses(courses, count) if courses
+      row = remove_non_batch_sections(sections, count, row) if sections
+      remove_non_batch_enrollments(enrollments, count, row) if enrollments
+    rescue SisBatch::Aborted
+      return self
+    end
   end
 
   def as_json(options={})
