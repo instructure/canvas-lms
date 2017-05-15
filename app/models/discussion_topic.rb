@@ -895,7 +895,7 @@ class DiscussionTopic < ActiveRecord::Base
       else
         self.context
       end
-    notification_context.available? && !notification_context.concluded?
+    notification_context.available?
   end
 
   has_a_broadcast_policy
@@ -915,7 +915,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def participants(include_observers=false)
     participants = [ self.user ]
-    participants += context.participants(include_observers: include_observers)
+    participants += context.participants(include_observers: include_observers, by_date: true)
     participants.compact.uniq
   end
 
