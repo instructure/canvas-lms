@@ -96,7 +96,7 @@ describe "gradebook" do
 
   it "should handle muting/unmuting correctly", priority: "1", test_id: 164227 do
     @gradebook_page.visit_gradebook(@course)
-    toggle_muting(@second_assignment)
+    @gradebook_page.toggle_assignment_mute_option(@second_assignment.id)
     expect(fj(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted")).to be_displayed
     expect(f('.total-cell .icon-muted')).to be_displayed
     expect(@second_assignment.reload).to be_muted
@@ -106,7 +106,7 @@ describe "gradebook" do
     expect(fj(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted")).to be_displayed
 
     # make sure you can un-mute
-    toggle_muting(@second_assignment)
+    @gradebook_page.toggle_assignment_mute_option(@second_assignment.id)
     expect(f("#content")).not_to contain_jqcss(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted")
     expect(@second_assignment.reload).not_to be_muted
   end
