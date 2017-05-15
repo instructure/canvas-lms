@@ -31,20 +31,21 @@ describe "Common Cartridge exporting" do
     content_export.user = user
     content_export.save!
 
-    content_export.export_without_send_later
+    expect {
+      content_export.export_without_send_later
+    }.to change(ErrorReport, :count).by 1
 
     expect(content_export.error_messages.length).to eq 1
     error = content_export.error_messages.first
     expect(error.first).to eq "Failed to export wiki pages"
     expect(error.last).to match /ErrorReport id: \d*/
-    expect(ErrorReport.count).to eq 1
     expect(ErrorReport.last.message).to eq message
   end
 
   context "creating .zip exports" do
     include WebMock::API
 
-    before do
+    before :once do
       course_with_teacher(:active_all => true)
       @ce = @course.content_exports.build
       @ce.export_type = ContentExport::COURSE_COPY
@@ -559,7 +560,7 @@ describe "Common Cartridge exporting" do
     end
 
     context "considering rights of provided user" do
-      before do
+      before :once do
         @ag = @course.assignment_groups.create!(:name => 'group1')
         @published = @course.assignments.create!({
           :title => 'Assignment 1', :points_possible => 10, :assignment_group => @ag
@@ -643,10 +644,25 @@ describe "Common Cartridge exporting" do
         check_resource_node(topic, CC::CCHelper::DISCUSSION_TOPIC, false)
         check_resource_node(page, CC::CCHelper::WEBCONTENT, false)
       end
+
+      describe 'for teachers in concluded courses' do
+        before :once do
+          teacher_in_course :active_all => true
+          @ce.user = @teacher
+          @ce.save!
+          @course.complete!
+        end
+
+        it "still exports topics that are closed for comments" do
+          topic = @course.discussion_topics.create! :locked => true
+          run_export
+          check_resource_node(topic, CC::CCHelper::DISCUSSION_TOPIC, true)
+        end
+      end
     end
 
     context 'attachment permissions' do
-      before do
+      before :once do
         folder = Folder.root_folders(@course).first
         @visible = Attachment.create!({
           :uploaded_data => stub_png_data('visible.png'),
