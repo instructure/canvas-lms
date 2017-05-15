@@ -44,6 +44,9 @@ export function send ($target, methodName, ...args) {
       // canvas-rce
       methodName = 'insertLink'
       args[0].href = args[0].url
+      args[0].class = args[0].classes
+      const dataAttributes = args[0].dataAttributes
+      args[0]['data-preview-alt'] = dataAttributes && dataAttributes['preview-alt']
     }
     return remoteEditor.call(methodName, ...args)
   } else if ($target.data('rich_text')) {
