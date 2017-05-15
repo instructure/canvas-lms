@@ -162,6 +162,8 @@ class AssignmentsController < ApplicationController
 
       @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)
 
+      @similarity_pledge = pledge_text
+
       respond_to do |format|
         format.html { render }
         format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}) }
@@ -564,5 +566,11 @@ class AssignmentsController < ApplicationController
 
   def index_edit_params
     params.permit(:title, :due_at, :points_possible, :assignment_group_id, :return_to)
+  end
+
+  def pledge_text
+    (@assignment.turnitin_enabled? && @context.turnitin_pledge) ||
+    (@assignment.vericite_enabled? && @context.vericite_pledge) ||
+    @assignment.course.account.closest_turnitin_pledge
   end
 end

@@ -114,6 +114,18 @@
       <% if @assignment.vericite_enabled? %>
         <%= render :partial => "vericite" %>
       <% end %>
+      <% if @assignment.tool_settings_tool.present? ||
+         @assignment.vericite_enabled? ||
+         @assignment.turnitin_enabled? %>
+        <tr>
+          <td colspan="2">
+            <label class='checkbox'>
+              <input type="checkbox" class='turnitin_pledge' name="turnitin_pledge" value="1"/>
+              <%= @similarity_pledge %>
+            </label>
+          </td>
+        </tr>
+      <% end %>
       <tr>
         <td colspan="2" class='button-container'>
           <button type="button" class='cancel_button btn'><%= t '#buttons.cancel', "Cancel" %></button>
