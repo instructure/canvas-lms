@@ -37,22 +37,34 @@ class DueDateCacher
   def recompute
     # in a transaction on the correct shard:
     @course.shard.activate do
-      Assignment.transaction do
-        # Create dummy submissions for caching due date
-        create_missing_submissions
+      # Create dummy submissions for caching due date
+      create_missing_submissions
 
-        # Update each submission with user's calculated due date and grading period
-        queries = effective_due_dates.map do |assignment_id, students|
-          students.map do |student_id, submission_info|
-            due_date = submission_info[:due_at] ? "'#{submission_info[:due_at].iso8601}'::timestamptz" : 'NULL'
-            "UPDATE #{Submission.quoted_table_name} SET
-                cached_due_date = #{due_date},
-                grading_period_id = #{submission_info[:grading_period_id] || 'NULL'}
-              WHERE user_id = #{student_id} AND assignment_id = #{assignment_id};"
-          end
-        end.flatten
+      values = []
+      effective_due_dates.each do |assignment_id, students|
+        students.each do |student_id, submission_info|
+          due_date = submission_info[:due_at] ? "'#{submission_info[:due_at].iso8601}'::timestamptz" : 'NULL'
+          grading_period_id = submission_info[:grading_period_id] || 'NULL'
+          values << [assignment_id, student_id, due_date, grading_period_id]
+        end
+      end
+      return if values.empty?
 
-        Assignment.connection.execute(queries.join("\n")) unless queries.empty?
+      values = values.sort_by(&:first).map { |v| "(#{v.join(',')})" }
+      values.each_slice(1000) do |batch|
+        query = "UPDATE #{Submission.quoted_table_name}" \
+                "  SET" \
+                "    cached_due_date = vals.due_date::timestamptz," \
+                "    grading_period_id = vals.grading_period_id::integer" \
+                "  FROM (" \
+                "    VALUES" \
+                "      #{batch.join(',')}" \
+                "   )" \
+                "   AS vals(assignment_id, student_id, due_date, grading_period_id)" \
+                "  WHERE submissions.user_id = vals.student_id and " \
+                "        submissions.assignment_id = vals.assignment_id"
+
+        Assignment.connection.execute(query)
       end
     end
   end
