@@ -492,7 +492,6 @@ END
       applies_to: 'RootAccount',
       state: 'hidden',
       beta: true,
-      development: true,
     },
     'student_context_cards' =>
     {
