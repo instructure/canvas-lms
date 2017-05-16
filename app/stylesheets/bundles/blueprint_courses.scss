@@ -134,12 +134,13 @@
 
 @keyframes spinning {
   from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  to { transform: rotate(-360deg); }
 }
 
 .bcs__sync-btn-icon {
-  line-height: 2.5em;
-  vertical-align: text-top;
+  line-height: 1;
+  position: relative;
+  top: 2px;
 
   &.bcs__sync-btn-icon__active svg {
     animation: spinning 1.5s infinite linear;
@@ -147,8 +148,8 @@
 }
 
 .bcs__sync-btn-text {
-  line-height: 2.5em;
-  vertical-align: sub;
+  position: relative;
+  top: -4px;
   margin-left: 7px;
   margin-right: 7px;
 }
@@ -158,7 +159,8 @@
   border-top: 1px solid $ic-border-color;
 
   & > button:first-child {
-    padding: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 
   &:first-child {
@@ -348,6 +350,7 @@
 .bcs__history-notification__message {
   margin-bottom:.5em;
 }
+
 .bcs__history-notification__add-message {
   margin-left: 1em;
   label {
