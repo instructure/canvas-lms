@@ -81,4 +81,20 @@ describe GradeSummaryAssignmentPresenter do
       end
     end
   end
+
+  context "#original_points" do
+    it "returns an empty string when assignment is muted" do
+      @assignment.muted = true
+      expect(presenter.original_points).to eq ''
+    end
+
+    it "returns an empty string when submission is nil" do
+      test_presenter = GradeSummaryAssignmentPresenter.new(summary, @student, @assignment, nil)
+      expect(test_presenter.original_points).to eq ''
+    end
+
+    it "returns the published score" do
+      expect(presenter.original_points).to eq @submission.published_score
+    end
+  end
 end
