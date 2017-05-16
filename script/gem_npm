@@ -7,7 +7,9 @@
 # developing one of these, go into the dir and yarn there
 export NODE_ENV=production
 
-for path in $(ls -1 gems/*/package.json); do
+cwd=$(pwd)
+
+for path in $(ls -1 gems/*/package.json gems/plugins/*/package.json); do
   cd ${path:0:${#path}-13}
   if hash yarn 2>/dev/null; then
     echo "running yarn $1 for $path"
@@ -16,5 +18,5 @@ for path in $(ls -1 gems/*/package.json); do
     echo "npm is deprecated in canvas-lms. You should start using yarn instead. see https://yarnpkg.com. Running npm $1 for $path"
     npm $1
   fi
-  cd ../..
+  cd $cwd
 done
