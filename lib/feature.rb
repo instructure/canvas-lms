@@ -483,8 +483,7 @@ END
       applies_to: 'RootAccount',
       state: 'hidden',
       beta: true,
-      root_opt_in: true,
-      development: true,
+      root_opt_in: true
     },
     'master_courses' =>
     {
