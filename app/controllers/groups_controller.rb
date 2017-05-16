@@ -262,6 +262,9 @@ class GroupsController < ApplicationController
         @active_tab = "people"
         @group_user_type = "student"
         @allow_self_signup = true
+        if @context.grants_right? @current_user, session, :read_as_admin
+          js_env STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards)
+        end
       end
 
       add_crumb user_crumb, named_context_url(@context, :context_users_url)
