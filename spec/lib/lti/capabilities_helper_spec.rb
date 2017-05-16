@@ -26,7 +26,7 @@ module Lti
   describe CapabilitiesHelper do
     let(:root_account) { Account.new(lti_guid: 'test-lti-guid') }
     let(:account) { Account.new(root_account: root_account) }
-    let(:course) { Course.new(account: account) }
+    let(:course) { Course.new(account: account, sis_source_id: 12) }
     let(:group_category) { course.group_categories.new(name: 'Category') }
     let(:group) { course.groups.new(name: 'Group', group_category: group_category) }
     let(:user) { User.new }
@@ -114,14 +114,18 @@ module Lti
         expect(params_hash.keys).not_to include(*invalid_enabled_caps)
       end
 
-      it 'does include a valid name (key) for valid capabilities' do
-        params_hash = CapabilitiesHelper.capability_params_hash(invalid_enabled_caps + valid_enabled_caps, variable_expander)
-        expect(params_hash.keys).to include(*valid_keys)
-      end
+      context 'in a course' do
+        let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool: tool) }
 
-      it 'does include a value for each valid capability' do
-        params_hash = CapabilitiesHelper.capability_params_hash(invalid_enabled_caps + valid_enabled_caps, variable_expander)
-        expect(params_hash.values.length).to eq valid_keys.length
+        it 'does include a valid name (key) for valid capabilities' do
+          params_hash = CapabilitiesHelper.capability_params_hash(invalid_enabled_caps + valid_enabled_caps, variable_expander)
+          expect(params_hash.keys).to include(*valid_keys)
+        end
+
+        it 'does include a value for each valid capability' do
+          params_hash = CapabilitiesHelper.capability_params_hash(invalid_enabled_caps + valid_enabled_caps, variable_expander)
+          expect(params_hash.values.length).to eq valid_keys.length
+        end
       end
     end
   end
