@@ -92,6 +92,26 @@ describe Latex::MathMl do
           expect(math_ml.parse).to be_empty
         end
       end
+
+      context 'integral request id' do
+        let(:request_id) { 5 }
+
+        it "doesn't throw an error" do
+          CanvasHttp.expects(:get).
+            with(service_url, {
+              'X-Request-Context-Id' => Canvas::Security.base64_encode('5'),
+              'X-Request-Context-Signature' => Canvas::Security.base64_encode(Canvas::Security.sign_hmac_sha512('5'))
+            }).
+            returns(
+              OpenStruct.new(
+                status: '200',
+                body: mml_doc
+              )
+            )
+
+          math_ml.parse
+        end
+      end
     end
   end
 end
