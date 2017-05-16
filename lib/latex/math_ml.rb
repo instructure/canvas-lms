@@ -40,7 +40,7 @@ module Latex
     private
     def mathman_parse
       url = MathMan.url_for(latex: CGI.escape(latex), target: :mml)
-      request_id = RequestContextGenerator.request_id
+      request_id = RequestContextGenerator.request_id.to_s
       request_id_signature = Canvas::Security.sign_hmac_sha512(request_id)
       Canvas.timeout_protection("mathman") do
         response = CanvasHttp.get(url, {
