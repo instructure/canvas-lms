@@ -65,14 +65,18 @@ FolderChild.isFolder = function () {
     }
   }
   FolderChild.renderMasterCourseIcon = function (canManage) {
-    // do not show the lock of master course folders
-    // because we don't always have it's children
-    if (!this.props.model.get('is_master_course_child_content') && this.isFolder()) {
-      return null
+    // never show if not involved in blueprint courses
+    if (!(this.props.model.get('is_master_course_master_content') || this.props.model.get('is_master_course_child_content'))) {
+      return null;
     }
-    if (this.isFolder() && !this.props.model.get('restricted_by_master_course')) {
-      return null
+    // Never show the lock on master course folders
+    // because we don't always have it's children to know if any are locked
+    if (this.isFolder()) {
+      if (this.props.model.get('is_master_course_master_content') || !this.props.model.get('restricted_by_master_course')) {
+        return null
+      }
     }
+
 
     return <MasterCourseLock model={this.props.model} canManage={canManage} />
   }
