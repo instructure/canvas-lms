@@ -25,6 +25,7 @@ module.exports = {
   ],
   // 0 - off, 1 - warning, 2 - error
   rules: {
+    "camelcase": [0], // because we have a ton of `const $user_name = $('#user_name')`
     "class-methods-use-this": [0],
     "comma-dangle": [2, "only-multiline"],
     "func-names": [0],
