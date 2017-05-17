@@ -9082,7 +9082,7 @@ es:
   last_login_b7bc0479: "Último inicio de sesión:"
   last_modified_by_ca4bb5e1: "Última modificación hecha por"
   last_name_303122f3: Apellido
-  last_post_display_last_reply_at_b9896355: "Ultima publicación %{display_last_reply_at}"
+  last_post_display_last_reply_at_b9896355: "Última publicación %{display_last_reply_at}"
   last_pushed_update_last_export_at_9f634f7c: "Última fecha postergada: %{last_export_at}"
   last_user_access_title: "Acceso del último usuario"
   late_2be42b88: Atrasado
@@ -11533,7 +11533,7 @@ es:
       Los resultados más recientes cuenta como el                    
       %{calculation_int}% del valor del dominio, el promedio de todos los otros resultados cuenta como el %{remainder}% del valor. Debe haber al menos 2 resultados para que aparezca una puntuación.
   most_recent_result_counts_as_calculation_int_of_ma_a734a4db: "La mayoría de los recuentos de resultados recientes como %{calculation_int}% de la poderación del dominio, promedia todos los demás recuentos de resultados como %{remainder}% de la ponderación. Si sólo hay un resultado, se devolverá la puntuación individual."
-  most_recent_result_counts_as_calculation_int_of_ma_d2fc1d19: "El resultado más reciente cuenta como %{calculation_int} de el peso del dominio; el promedio de todos los demás resultados cuenta como %{remainder} de el peso. Si solo hay un resultado, se mostrará una única calificación."
+  most_recent_result_counts_as_calculation_int_of_ma_d2fc1d19: "El resultado más reciente cuenta como %{calculation_int} del peso del dominio; el promedio de todos los demás resultados cuenta como %{remainder} del peso. Si solo hay un resultado, se mostrará una única calificación."
   most_recent_score_13a87e8c: "Puntaje más reciente"
   move_abf00365: Mover
   move_assignment_group_46e09fc3: "Mover grupo de tarea"
@@ -12230,7 +12230,7 @@ es:
       import_outcome: "¿Importar resultado \"%{outcome}\" a grupo \"%{target}\"?"
     criteria: 
       does_not_meet_expectations: "No cumple con las Expectativas"
-      exceeds_expectations: "Excede las Expectaciones"
+      exceeds_expectations: "Excede las Expectativas"
       meets_expectations: "Cumple con las Expectativas"
     criterion: 
       close_rating: Aceptar
@@ -15967,7 +15967,7 @@ es:
         dashboard: Tablero
         skip_to_content: "Saltar al contenido"
     no_recent_activity: 
-      empty_stream_message: "No tiene mensajes que mostrar aún en su stream. Una vez comience a participar en sus cursos verá este stream llenarse de mensajes de los foros, actualizaciones de calificaciones, mensajes privados entre usted y otros usuarios, etc. "
+      empty_stream_message: "No tiene mensajes que mostrar aún en su stream. Una vez que comience a participar en sus cursos verá este stream llenarse de mensajes de los foros, actualizaciones de calificaciones, mensajes privados entre usted y otros usuarios, etc. "
       no_recent_messages: "No hay Mensajes Recientes"
     pending_enrollment: 
       designer: "%{course} como diseñador."
@@ -17988,7 +17988,7 @@ es:
         integration_id: "ID de integración"
         last_ip: "Último IP de ingreso"
         last_login: "Último ingreso"
-        last_request: "Ultima solicitud"
+        last_request: "Última solicitud"
         password: Contraseña
         password_confirmation: "Confirmar contraseña"
         sis_id: "Identificación de SIS"
@@ -18082,7 +18082,7 @@ es:
       headings: 
         current_score: "Calificación actual"
         final_score: "Calificación final"
-        last_interaction: "Ultima interacción de alumnos"
+        last_interaction: "Última interacción de alumnos"
         last_journal_entry: "Última entrada del diario del cuerpo docente"
         student_name: Alumno
         teacher_activity: "Informe de actividad del profesores para %{teacher}"
