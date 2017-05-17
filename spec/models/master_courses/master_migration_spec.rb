@@ -494,6 +494,30 @@ describe MasterCourses::MasterMigration do
       expect(copied_page.title).to eq new_master_title # even the title
     end
 
+    it "overwrites availability dates when pushing a locked quiz" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+      dates1 = [1.day.ago, 1.day.from_now, 2.days.from_now].map(&:beginning_of_day)
+      dates2 = [2.days.ago, 3.days.from_now, 5.days.from_now].map(&:beginning_of_day)
+
+      quiz1 = @copy_from.quizzes.create!(:unlock_at => dates1[0], :due_at => dates1[1], :lock_at => dates1[2])
+      run_master_migration
+
+      cq1 = @copy_to.quizzes.where(migration_id: mig_id(quiz1)).first
+      cq1.update_attributes(:unlock_at => dates2[0], :due_at => dates2[1], :lock_at => dates2[2])
+
+      Timecop.travel(10.minutes.from_now) do
+        @template.content_tag_for(quiz1).update_attribute(:restrictions, {:availability_dates => true, :due_dates => true})
+
+        run_master_migration
+      end
+
+      cq1.reload
+      expect(cq1.due_at).to eq dates1[1]
+      expect(cq1.unlock_at).to eq dates1[0]
+      expect(cq1.lock_at).to eq dates1[2]
+    end
+
     it "should count downstream changes to quiz/assessment questions as changes in quiz/bank content" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
