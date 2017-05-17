@@ -494,20 +494,27 @@ describe MasterCourses::MasterMigration do
       expect(copied_page.title).to eq new_master_title # even the title
     end
 
-    it "overwrites availability dates when pushing a locked quiz" do
+    it "overwrites/removes availability dates when pushing a locked quiz" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
       dates1 = [1.day.ago, 1.day.from_now, 2.days.from_now].map(&:beginning_of_day)
       dates2 = [2.days.ago, 3.days.from_now, 5.days.from_now].map(&:beginning_of_day)
 
       quiz1 = @copy_from.quizzes.create!(:unlock_at => dates1[0], :due_at => dates1[1], :lock_at => dates1[2])
+      quiz2 = @copy_from.quizzes.create!
       run_master_migration
 
       cq1 = @copy_to.quizzes.where(migration_id: mig_id(quiz1)).first
-      cq1.update_attributes(:unlock_at => dates2[0], :due_at => dates2[1], :lock_at => dates2[2])
+      cq2 = @copy_to.quizzes.where(migration_id: mig_id(quiz2)).first
+
+      Timecop.travel(5.minutes.from_now) do
+        cq1.update_attributes(:unlock_at => dates2[0], :due_at => dates2[1], :lock_at => dates2[2])
+        cq2.update_attributes(:unlock_at => dates2[0], :due_at => dates2[1], :lock_at => dates2[2])
+      end
 
       Timecop.travel(10.minutes.from_now) do
         @template.content_tag_for(quiz1).update_attribute(:restrictions, {:availability_dates => true, :due_dates => true})
+        @template.content_tag_for(quiz2).update_attribute(:restrictions, {:availability_dates => true, :due_dates => true})
 
         run_master_migration
       end
@@ -516,6 +523,35 @@ describe MasterCourses::MasterMigration do
       expect(cq1.due_at).to eq dates1[1]
       expect(cq1.unlock_at).to eq dates1[0]
       expect(cq1.lock_at).to eq dates1[2]
+
+      cq2.reload
+      expect(cq2.due_at).to be_nil
+      expect(cq2.unlock_at).to be_nil
+      expect(cq2.lock_at).to be_nil
+    end
+
+    it "removes due/available dates from locked assignments in sync" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+      assmt = @copy_from.assignments.create!(:due_at => 1.day.from_now, :unlock_at => 1.day.ago, :lock_at => 1.day.from_now)
+      run_master_migration
+
+      assmt_to = @copy_to.assignments.where(migration_id: mig_id(assmt)).first
+      expect(assmt_to.due_at).not_to be_nil
+
+      Timecop.travel(5.minutes.from_now) do
+        @template.content_tag_for(assmt).update_attribute(:restrictions, {:availability_dates => true, :due_dates => true})
+        assmt.update_attributes(:due_at => nil, :unlock_at => nil, :lock_at => nil)
+      end
+
+      Timecop.travel(10.minutes.from_now) do
+        run_master_migration
+      end
+
+      assmt_to.reload
+      expect(assmt_to.due_at).to be_nil
+      expect(assmt_to.lock_at).to be_nil
+      expect(assmt_to.unlock_at).to be_nil
     end
 
     it "should count downstream changes to quiz/assessment questions as changes in quiz/bank content" do

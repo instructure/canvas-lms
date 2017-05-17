@@ -208,9 +208,12 @@ module Importers
         item.saved_by = :quiz
       end
 
-      hash[:due_at] ||= hash[:due_date]
+      hash[:due_at] ||= hash[:due_date] if hash.has_key?(:due_date)
+      master_migration = migration&.for_master_course_import?  # propagate null dates only for blueprint syncs
       [:due_at, :lock_at, :unlock_at, :peer_reviews_due_at].each do |key|
-        item.send"#{key}=", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[key]) unless hash[key].nil?
+        if hash.has_key?(key) && (master_migration || hash[key].present?)
+          item.send"#{key}=", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[key])
+        end
       end
 
       if hash[:has_group_category]

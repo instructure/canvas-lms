@@ -117,7 +117,7 @@ module CC::Importer::Standard
       end
       ['due_at', 'lock_at', 'unlock_at', 'peer_reviews_due_at'].each do |date_type|
         val = get_time_val(meta_doc, date_type)
-        assignment[date_type] = val unless val.nil?
+        assignment[date_type] = val
       end
       ['points_possible'].each do |f_type|
         val = get_float_val(meta_doc, f_type)
