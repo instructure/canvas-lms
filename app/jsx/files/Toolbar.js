@@ -202,7 +202,7 @@ import Folder from 'compiled/models/Folder'
       return item.get('for_submissions');
     });
     var restrictedByMasterCourse = this.props.selectedItems.some(function(item) {
-      return item.get('restricted_by_master_course');
+      return item.get('restricted_by_master_course') && item.get('is_master_course_child_content');
     });
     var canManage = this.props.userCanManageFilesForContext && !submissionsFolderSelected && !restrictedByMasterCourse;
 
