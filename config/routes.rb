@@ -300,6 +300,9 @@ CanvasRails::Application.routes.draw do
       end
     end
 
+    get 'lti/message_handler_link/:link_id', controller: 'lti/message',
+        action: 'message_handler_link', as: :message_handler_link,
+        constraints: {link_id: /\w+[.]\w+[.]/ }
     get 'lti/basic_lti_launch_request/:message_handler_id', controller: 'lti/message',
         action: 'basic_lti_launch_request', as: :basic_lti_launch_request
     get 'lti/tool_proxy_registration', controller: 'lti/message', action: 'registration', as: :tool_proxy_registration
@@ -610,6 +613,9 @@ CanvasRails::Application.routes.draw do
       end
     end
 
+    get 'lti/message_handler_link/:link_id', controller: 'lti/message',
+        action: 'message_handler_link', as: :message_handler_link,
+        constraints: {link_id: /\w+[.]\w+[.]/ }
     get 'lti/basic_lti_launch_request/:message_handler_id', controller: 'lti/message',
         action: 'basic_lti_launch_request', as: :basic_lti_launch_request
     get 'lti/tool_proxy_registration', controller: 'lti/message', action: 'registration', as: :tool_proxy_registration
