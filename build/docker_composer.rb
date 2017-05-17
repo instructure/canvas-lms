@@ -43,7 +43,7 @@ class DockerComposer
   class << self
     # :cry: not the same as canvas docker-compose ... yet
     RUNNER_IDS = Array.new(ENV['MASTER_RUNNERS'].to_i) { |i| i == 0 ? "" : i + 1 }
-    COMPOSE_FILES = %w[docker-compose.yml docker-compose.override.yml docker-compose.test.yml]
+    COMPOSE_FILES = %w[docker-compose.yml docker-compose.override.yml docker-compose.jenkins.yml]
 
     def run
       nuke_old_crap
