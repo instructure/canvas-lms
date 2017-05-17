@@ -1216,9 +1216,6 @@ import 'compiled/jquery.rails_flash_notifications'
 
       $("#edit_item_form").dialog({
         title: I18n.t('titles.edit_item', "Edit Item Details"),
-        open: function(){
-          $(this).find('input[type=text],textarea,select').first().focus();
-        },
         close: function () {
           $("#edit_item_form").hideErrors();
            $cogLink.focus();
