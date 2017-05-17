@@ -169,6 +169,8 @@ describe "Default Account Reports" do
 
       @course2.destroy
       @enrollment1.destroy
+      @enrollment2.workflow_state = 'inactive'
+      @enrollment2.save!
 
       parameters = {}
       parameters["include_deleted"] = true
@@ -180,7 +182,7 @@ describe "Default Account Reports" do
                            @term1.id.to_s, "fall12", nil, "88.0", "deleted"]
       expect(parsed[1]).to eq ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "English 101", @course1.id.to_s,
                            "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
-                           @term1.id.to_s, "fall12", nil, "90.0", "concluded"]
+                           @term1.id.to_s, "fall12", nil, "90.0", "inactive"]
       expect(parsed[2]).to eq ["Michael Bolton", @user2.id.to_s, "user_sis_id_02", "Math 101", @course2.id.to_s,
                            nil, "Math 101", @course2.course_sections.first.id.to_s, nil, "Default Term",
                            @default_term.id.to_s, nil, nil, "93.0", "deleted"]
@@ -212,7 +214,8 @@ describe "Default Account Reports" do
     it "should run a grade export on concluded courses with an limiting period given" do
       @course1.complete!
       @enrollment1.conclude
-      @enrollment1.save!
+      @enrollment5.workflow_state = 'inactive'
+      @enrollment5.save!
 
       parameters = {}
       parameters["include_deleted"] = true
@@ -239,7 +242,7 @@ describe "Default Account Reports" do
       expect(parsed[4]).to eq ["Jason Donovan", @user4.id.to_s, "user_sis_id_04",
                            "Math 101", @course2.id.to_s, nil, "Math 101",
                            @course2.course_sections.first.id.to_s, nil, "Default Term",
-                           @default_term.id.to_s, nil, nil, "99.0", "active"]
+                           @default_term.id.to_s, nil, nil, "99.0", "inactive"]
 
     end
 
