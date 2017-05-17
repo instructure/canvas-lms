@@ -155,7 +155,7 @@ class EffectiveDueDates
       if assignment_collection.empty?
         {}
       else
-        ActiveRecord::Base.connection.select_all("
+        ActiveRecord::Base.connection.select_all(<<-SQL)
           -- fetch the assignment itself
           WITH models AS (
             SELECT *
@@ -375,7 +375,7 @@ class EffectiveDueDates
           -- match the effective due date with its grading period
           LEFT OUTER JOIN applied_grading_periods periods ON
               periods.start_date < overrides.due_at AND overrides.due_at <= periods.end_date
-        ")
+        SQL
       end
     end
   end
