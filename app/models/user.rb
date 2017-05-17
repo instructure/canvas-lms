@@ -48,6 +48,7 @@ class User < ActiveRecord::Base
   has_many :notification_policies, through: :communication_channels
   has_one :communication_channel, -> { where("workflow_state<>'retired'").order(:position) }
   has_many :notification_endpoints, :through => :access_tokens
+  has_many :planner_notes, :dependent => :destroy
 
   has_many :enrollments, :dependent => :destroy
 
