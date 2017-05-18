@@ -133,7 +133,7 @@ class PlannerOverridesController < ApplicationController
   #
   # @returns PlannerOverride
   def show
-    planner_override = PlannerOverride.find(params[:override_id])
+    planner_override = PlannerOverride.find(params[:id])
 
     if planner_override.present?
       render json: planner_override
@@ -148,11 +148,11 @@ class PlannerOverridesController < ApplicationController
   #
   # @returns PlannerOverride
   def update
-    planner_override = PlannerOverride.find(params[:override_id])
+    planner_override = PlannerOverride.find(params[:id])
     planner_override.visible = value_to_boolean(params[:visible])
 
     if planner_override.save
-      render json: planner_override, status: :updated
+      render json: planner_override, status: :ok
     else
       render json: planner_override.errors, status: :bad_request
     end
@@ -182,10 +182,10 @@ class PlannerOverridesController < ApplicationController
   #
   # @returns PlannerOverride
   def destroy
-    planner_override = PlannerOverride.find(params[:override_id])
+    planner_override = PlannerOverride.find(params[:id])
 
     if planner_override.destroy
-      render json: planner_override, status: :deleted
+      render json: planner_override, status: :ok
     else
       render json: planner_override.errors, status: :bad_request
     end

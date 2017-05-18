@@ -74,7 +74,7 @@ describe PlannerOverridesController do
 
       describe "GET #show" do
         it "returns http success" do
-          get :show, override_id: @planner_override.id
+          get :show, id: @planner_override.id
           expect(response).to have_http_status(:success)
         end
       end
@@ -82,7 +82,8 @@ describe PlannerOverridesController do
       describe "PUT #update" do
         it "returns http success" do
           expect(@planner_override.visible).to be_truthy
-          put :update, override_id: @planner_override.id, visible: false
+          put :update, id: @planner_override.id, visible: false
+          expect(response).to have_http_status(:success)
           expect(@planner_override.reload.visible).to be_falsey
         end
       end
@@ -97,7 +98,8 @@ describe PlannerOverridesController do
 
       describe "DELETE #destroy" do
         it "returns http success" do
-          delete :destroy, override_id: @planner_override.id
+          delete :destroy, id: @planner_override.id
+          expect(response).to have_http_status(:success)
           expect(@planner_override.reload).to be_deleted
         end
       end
