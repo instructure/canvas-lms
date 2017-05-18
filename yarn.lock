@@ -6388,7 +6388,7 @@ redux-thunk@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/redux-thunk/-/redux-thunk-2.2.0.tgz#e615a16e16b47a19a515766133d1e3e99b7852e5"
 
-redux@3.5.2, redux@^3.2.0, redux@~3.5.2:
+redux@3.5.2, redux@~3.5.2:
   version "3.5.2"
   resolved "https://registry.yarnpkg.com/redux/-/redux-3.5.2.tgz#4533745e970b647ec26066a83aa30e9e26faf843"
   dependencies:
@@ -6397,7 +6397,7 @@ redux@3.5.2, redux@^3.2.0, redux@~3.5.2:
     loose-envify "^1.1.0"
     symbol-observable "^0.2.3"
 
-redux@^3.6.0:
+redux@^3.2.0, redux@^3.6.0:
   version "3.6.0"
   resolved "https://registry.yarnpkg.com/redux/-/redux-3.6.0.tgz#887c2b3d0b9bd86eca2be70571c27654c19e188d"
   dependencies:
