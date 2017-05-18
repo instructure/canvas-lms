@@ -460,10 +460,10 @@ class Assignment < ActiveRecord::Base
   end
 
   def create_in_vericite
-    return false unless Canvas::Plugin.find(:vericite).try(:enabled?)
+    return false unless VeriCite.enabled_for_account?(self.context.account_id)
     return true if self.turnitin_settings[:current] && self.turnitin_settings[:vericite]
     vericite = VeriCite::Client.new()
-    res = vericite.createOrUpdateAssignment(self, self.turnitin_settings)
+    res = vericite.createOrUpdateAssignment(self, self.turnitin_settings, self.context.account_id)
 
     # make sure the defaults get serialized
     self.turnitin_settings = turnitin_settings

@@ -379,6 +379,7 @@ Canvas::Plugin.register('vericite', nil, {
   :settings => {
     :account_id => nil,
     :shared_secret => nil,
+    :subaccount_credentials => nil,
     :host => 'api.vericite.com',
     :comments => nil,
     :pledge => nil,

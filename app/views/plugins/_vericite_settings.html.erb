@@ -35,26 +35,48 @@
     </div>
   </div>
 </div>
+
+  <h3><%= mt :credentials, :en => "Crentials" %></h3>
+  Get your credentials from <a href="http://www.vericite.com" target="_blank">VeriCite</a>.<br/>
+  <%= mt :account_credentials_info, "You can set your credentials for all accounts or enable individual Sub-Accounts. To enable all accounts, just set 'Global VeriCite Account ID' and 'Global VeriCite Shared Secret'. If you want to restrict VeriCite to specific Sub-Accounts, enter each Sub-Account's credentials in 'Account VeriCite Credentials' on a new line in the format: canvas_account_id:vericite_account_id:vericite_shared_secret" %>
+  <br/>
+  <br/>
   <table  class="formtable">
     <tr>
-      <td colspan="2">
-        Get your credentials from <a href="http://www.vericite.com" target="_blank">VeriCite</a>
-      </td>
-    </tr>
-    <tr>
-      <td><%= f.blabel :account_id, :en => "VeriCite Account ID" %></td>
+      <td><%= f.blabel :account_id, :en => "Global VeriCite Account ID" %></td>
       <td>
         <%= f.text_field :account_id %>
       </td>
     </tr>
 
     <tr>
-      <td><%= f.blabel :shared_secret, :en => "VeriCite Shared Secret" %></td>
+      <td><%= f.blabel :shared_secret, :en => "Global VeriCite Shared Secret" %></td>
       <td>
         <%= f.text_field :shared_secret %>
       </td>
     </tr>
 
+    <tr>
+      <td><%= mt :or, "**or**" %>:</td>
+      <td></td>
+    </tr>
+
+    <tr>
+      <td><%= f.blabel :subaccount_credentials, :en => "Account VeriCite Credentials" %></td>
+      <td>
+        <%= f.text_area :subaccount_credentials, :rows => '4' %>
+        <br/>
+        <%= mt :example, "*example*" %>:
+        <br/>
+        <%= mt :subaccount_format, "*canvas_account_id:vericite_account_id:vericite_shared_secret*" %>
+        <br/>
+        <%= mt :subaccount_format, "*canvas_account_id:vericite_account_id:vericite_shared_secret*" %>
+      </td>
+    </tr>
+   </table>
+
+   <h3><%= mt :settings, :en => "Settings" %></h3>
+   <table>
     <tr>
       <td><%= f.blabel :host, :en => "VeriCite Host" %></td>
       <td>

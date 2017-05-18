@@ -630,7 +630,7 @@ class Submission < ActiveRecord::Base
     # check to see if the score is stale, if so, fetch it again
     update_scores = false
     # since there could be multiple versions, let's not waste calls for old versions and use the old score
-    if Canvas::Plugin.find(:vericite).try(:enabled?) && !self.readonly? && lookup_data && self.versions.current && self.versions.current.number == self.version_number
+    if VeriCite.enabled_for_account?(self.context.account_id) && !self.readonly? && lookup_data && self.versions.current && self.versions.current.number == self.version_number
       self.vericite_data_hash.keys.each do |asset_string|
         data = self.vericite_data_hash[asset_string]
         next unless data && data.is_a?(Hash) && data[:object_id]
@@ -707,7 +707,7 @@ class Submission < ActiveRecord::Base
           # keep track of when we asked for this score, so if it fails, we don't keep trying immediately again (i.e. wain 20 sec before trying again)
           data[:similarity_score_check_time] = Time.now.to_i
           vericite ||= VeriCite::Client.new()
-          res = vericite.generateReport(self, asset_string)
+          res = vericite.generateReport(self, asset_string, self.context.account_id)
           if res[:similarity_score]
             # keep track of when we updated the score so that we can ask VC again once it is stale (i.e. cache for 20 mins)
             data[:similarity_score_time] = Time.now.to_i
@@ -754,9 +754,9 @@ class Submission < ActiveRecord::Base
     if self.vericite_data_hash && self.vericite_data_hash[asset_string] && self.vericite_data_hash[asset_string][:similarity_score]
       vericite = VeriCite::Client.new()
       if self.grants_right?(user, :grade)
-        vericite.submissionReportUrl(self, user, asset_string)
+        vericite.submissionReportUrl(self, user, asset_string, self.context.account_id)
       elsif can_view_plagiarism_report('vericite', user, session)
-        vericite.submissionStudentReportUrl(self, user, asset_string)
+        vericite.submissionStudentReportUrl(self, user, asset_string, self.context.account_id)
       end
     else
       nil
@@ -769,9 +769,9 @@ class Submission < ActiveRecord::Base
   def submit_to_vericite(attempt=0)
     Rails.logger.info("VERICITE #submit_to_vericite submission ID: #{self.id}, vericiteable? #{vericiteable?}")
     if vericiteable?
-      Rails.logger.info("VERICITE #submit_to_vericite submission ID: #{self.id}, plugin: #{Canvas::Plugin.find(:vericite)}, vericite plugin enabled? #{Canvas::Plugin.find(:vericite).try(:enabled?)}")
+      Rails.logger.info("VERICITE #submit_to_vericite submission ID: #{self.id}, plugin: #{Canvas::Plugin.find(:vericite)}, vericite plugin enabled? #{VeriCite.enabled_for_account?(self.context.account_id)}")
     end
-    return unless vericiteable? && Canvas::Plugin.find(:vericite).try(:enabled?)
+    return unless vericiteable? && VeriCite.enabled_for_account?(self.context.account_id)
     vericite = VeriCite::Client.new()
     reset_vericite_assets
 
@@ -793,7 +793,7 @@ class Submission < ActiveRecord::Base
     end
     # even if the assignment didn't save, VeriCite will still allow this file to be submitted
     # Submit the file(s)
-    submission_response = vericite.submitPaper(self)
+    submission_response = vericite.submitPaper(self, nil, self.context.account_id)
     # VeriCite will not resubmit a file if it already has a similarity_score (i.e. success)
     update = false
     submission_response.each do |res_asset_string, response|
@@ -899,7 +899,7 @@ class Submission < ActiveRecord::Base
     # Because vericite is new and people are moving to vericite, not
     # moving from vericite to turnitin, we'll give vericite precedence
     # for now.
-    @plagiarism_service_to_use = if Canvas::Plugin.find(:vericite).try(:enabled?)
+    @plagiarism_service_to_use = if VeriCite.enabled_for_account?(self.context.account_id)
       :vericite
     elsif !self.context.turnitin_settings.nil?
       :turnitin
