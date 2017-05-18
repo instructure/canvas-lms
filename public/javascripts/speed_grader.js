@@ -57,7 +57,7 @@ define([
   'compiled/jquery/mediaCommentThumbnail',
   'compiled/jquery.rails_flash_notifications',
   'vendor/jquery.elastic' /* elastic */,
-  'vendor/jquery.getScrollbarWidth' /* getScrollbarWidth */,
+  'jquery-getscrollbarwidth',
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'vendor/ui.selectmenu' /* /\.selectmenu/ */
 ], function (MGP, OutlierScoreHelper, quizzesNextSpeedGrading, numberHelper,
