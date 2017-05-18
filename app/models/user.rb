@@ -1530,6 +1530,19 @@ class User < ActiveRecord::Base
     end
   end
 
+  def submitted_assignments(opts={})
+    assignments_needing('submitted', :student, 120.minutes, opts) do |assignment_scope, options|
+      as = assignment_scope.active.
+              expecting_submission.
+              filter_by_visibilities_in_given_courses(id, options[:shard_course_ids]).
+              published.
+              due_between_with_overrides(options[:due_after], options[:due_before]).
+              with_submissions_for_user(id).
+              group('submissions.id')
+      select_available_assignments(as).select { |a| a.has_submitted_submissions? }
+    end
+  end
+
   def assignments_needing_moderation(opts={})
     assignments_needing('moderation', :instructor, 120.minutes, opts) do |assignment_scope, opts|
       assignment_scope.active.

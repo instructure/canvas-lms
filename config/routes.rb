@@ -1948,8 +1948,8 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :planner_overrides) do
-      get 'planner/items', action: :items_index, as: :planner_overrides
-      get 'planner/overrides', action: :index
+      get 'planner/items', action: :items_index, as: :planner_items
+      get 'planner/overrides', action: :index, as: :planner_overrides
       get 'planner/overrides/:id', action: :show
       put 'planner/overrides/:id', action: :update
       post 'planner/overrides', action: :create

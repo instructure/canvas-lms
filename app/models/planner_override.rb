@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2017 Instructure, Inc.
+# Copyright (C) 2017 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,13 +17,14 @@
 #
 
 class PlannerOverride < ActiveRecord::Base
-  CONTENT_TYPES = %w(Announcement Assignment DiscussionTopic Quizzes::Quiz WikiPage).freeze
+  CONTENT_TYPES = %w(Announcement Assignment DiscussionTopic Quizzes::Quiz WikiPage PlannerNote).freeze
 
   include Workflow
   belongs_to :plannable, polymorphic: true
   belongs_to :user
   validates_inclusion_of :plannable_type, :allow_nil => false, :in => CONTENT_TYPES
   validates_presence_of :plannable_id, :workflow_state, :user_id
+  validates_uniqueness_of :plannable_id, scope: [:user_id, :plannable_type]
 
   scope :active, -> { where workflow_state: 'active' }
   scope :visible, -> { where visible: true }
@@ -70,7 +71,7 @@ class PlannerOverride < ActiveRecord::Base
           workflow_state
         end
       else
-        nil
+        'unpublished'
       end
     end
   end

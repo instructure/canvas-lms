@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2017 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -31,29 +31,32 @@ module Api::V1::PlannerItem
       :visible_in_planner => item.visible_in_planner_for?(user),
       :planner_override => item.planner_override_for(user)
     }).tap do |hash|
-      case item
-      when Assignment, DiscussionTopic
-        assignment = item
-        hash[:assignment] = assignment_json(assignment, user, session, include_discussion_topic: true)
-        hash[:html_url] = todo_type == 'grading' ?
-          speed_grader_course_gradebook_url(assignment.context_id, :assignment_id => assignment.id) :
-          "#{course_assignment_url(assignment.context_id, assignment.id)}#submit"
-
-        if todo_type == 'grading'
-          hash['needs_grading_count'] = Assignments::NeedsGradingCountQuery.new(assignment, user).count
-        end
-      when Quizzes::Quiz
-        quiz = item
-        hash[:quiz] = quiz_json(quiz, quiz.context, user, session)
+      if item.is_a?(Quizzes::Quiz) || item.quiz?
+        quiz = item.is_a?(Quizzes::Quiz) ? item : item.quiz
+        hash[:plannable_type] = 'quiz'
+        hash[:plannable] = quiz_json(quiz, quiz.context, user, session)
         hash[:html_url] = course_quiz_url(quiz.context_id, quiz.id)
-      when WikiPage
-        wiki_page = item
-        hash[:wiki_page] = wiki_page_json(wiki_page, user, session)
-        hash[:html_url] = wiki_page.url
-      when Announcement
-        announcement = item
-        hash[:announcement] = discussion_topic_api_json(announcement, announcement.context, user, session)
-        hash[:html_url] = announcement.topic_pagination_url
+      elsif item.wiki_page?
+        hash[:plannable_type] = 'wiki_page'
+        hash[:plannable] = wiki_page_json(item.wiki_page, user, session)
+        hash[:html_url] = item.wiki_page.url
+      elsif item.discussion_topic? && item.discussion_topic.is_announcement
+        hash[:plannable_type] = 'announcement'
+        hash[:plannable] = discussion_topic_api_json(item.discussion_topic, item.discussion_topic.context, user, session)
+        hash[:html_url] = named_context_url(item.discussion_topic.context, :context_discussion_topic_url, item.discussion_topic.id)
+      elsif item.discussion_topic?
+        hash[:plannable_type] = 'discussion_topic'
+        hash[:plannable] = discussion_topic_api_json(item.discussion_topic, item.discussion_topic.context, user, session)
+        hash[:html_url] = named_context_url(item.discussion_topic.context, :context_discussion_topic_url, item.discussion_topic.id)
+      else
+        hash[:plannable_type] = 'assignment'
+        hash[:plannable] = assignment_json(item, user, session, include_discussion_topic: true)
+        hash[:html_url] = if todo_type == 'grading'
+                            speed_grader_course_gradebook_url(item.context_id, :assignment_id => item.id)
+                          else
+                            "#{course_assignment_url(item.context_id, item.id)}#submit"
+                          end
+        hash[:needs_grading_count] = Assignments::NeedsGradingCountQuery.new(item, user).count if todo_type == 'grading'
       end
     end
   end

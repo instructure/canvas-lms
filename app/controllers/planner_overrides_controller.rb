@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2017 Instructure, Inc.
+# Copyright (C) 2017 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -69,6 +69,10 @@ class PlannerOverridesController < ApplicationController
   include Api::V1::PlannerItem
 
   before_action :require_user
+  before_action :set_date_range
+  before_action :set_assignments, only: [:items_index]
+
+  attr_reader :due_before, :due_after
 
   # @API List planner items
   #
@@ -115,7 +119,7 @@ class PlannerOverridesController < ApplicationController
   #     },
   #   ]
   def items_index
-    render :json => assignments_for_user
+    render :json => @assignments.map { |item| planner_item_json(item, @current_user, session, item.todo_type) }
   end
 
   # @API List planner overrides
@@ -193,17 +197,38 @@ class PlannerOverridesController < ApplicationController
 
   private
 
-  def assignments_for_user
-    grading = @current_user.assignments_needing_grading(include_ignored: true).map { |a| planner_item_json(a, @current_user, session, 'grading') }
-    submitting = @current_user.assignments_needing_submitting(include_ignored: true, include_ungraded: true, limit: ToDoListPresenter::ASSIGNMENT_LIMIT).map { |a|
-      planner_item_json(a, @current_user, session, 'submitting')
-    }
-    submitting += @current_user.ungraded_quizzes_needing_submitting(include_ignored: true).map { |q| planner_item_json(q, @current_user, session, 'submitting') }
-    submitting.sort_by! { |j| (j[:assignment] || j[:quiz])[:due_at] || CanvasSort::Last }
-    moderation = @current_user.assignments_needing_moderation(include_ignored: true).map { |a|
-      planner_item_json(a, @current_user, session, 'moderation')
-    }
-    (grading + submitting + moderation)
+  def set_assignments
+    default_opts = {
+                      include_ignored: true,
+                      include_ungraded: true,
+                      due_before: due_before,
+                      due_after: due_after,
+                      limit: (params[:limit]&.to_i || 50)
+                   }
+    @grading = @current_user.assignments_needing_grading(default_opts).each { |a| a.todo_type = 'grading' }
+    @submitting = @current_user.assignments_needing_submitting(default_opts).each { |a| a.todo_type = 'submitting' }
+    @moderation = @current_user.assignments_needing_moderation(default_opts).each { |a| a.todo_type = 'moderation' }
+    @ungraded_quiz = @current_user.ungraded_quizzes_needing_submitting(default_opts).each { |a| a.todo_type = 'submitting' }
+    @submitted = @current_user.submitted_assignments(default_opts).each { |a| a.todo_type = 'submitted' }
+    all_assignments = (@grading +
+                       @submitted +
+                       @ungraded_quiz +
+                       @submitting +
+                       @moderation)
+    @assignments = Api.paginate(all_assignments, self, api_v1_planner_items_url)
+  end
+
+  def set_date_range
+    @due_before, @due_after = if [params[:due_before], params[:due_after]].all?(&:blank?)
+                                [2.weeks.from_now, 2.weeks.ago]
+                              else
+                                [params[:due_before], params[:due_after]]
+                              end
+    # Since a range is needed, set values that weren't passed to a date
+    # in the far past/future as to get all values before or after whichever
+    # date was passed
+    @due_before ||= 10.years.from_now
+    @due_after ||= 10.years.ago
   end
 
   def require_user

@@ -29,6 +29,7 @@ describe Api::V1::PlannerItem do
     def course_assignment_url(*args); end
     def wiki_page_json(*args); end
     def discussion_topic_api_json(*args); end
+    def named_context_url(*args); end
   end
 
   before :once do
@@ -39,9 +40,9 @@ describe Api::V1::PlannerItem do
     student_in_course
     for_course = { course: @course }
 
+    assignment_quiz [], for_course
+    group_assignment_discussion for_course
     assignment_model for_course
-    discussion_topic_model for_course
-    quiz_model for_course
 
     @teacher_override = planner_override_model(plannable: @assignment, user: @teacher)
     @student_override = planner_override_model(plannable: @assignment, user: @student, visible: false)
@@ -54,7 +55,7 @@ describe Api::V1::PlannerItem do
     before :once do
       @teacher_hash = api.planner_item_json(@assignment, @teacher, session, 'submitting')
       @student_hash = api.planner_item_json(@assignment, @student, session, 'submitting')
-      @hash = api.planner_item_json(@quiz, @student, session, 'submitting')
+      @hash = api.planner_item_json(@quiz.assignment, @student, session, 'submitting')
     end
 
     context 'with an existing planner override' do
@@ -82,15 +83,31 @@ describe Api::V1::PlannerItem do
     describe 'object types' do
       before :once do
         @assignment_hash = api.planner_item_json(@assignment, @student, session, 'submitting')
-        @topic_hash = api.planner_item_json(@topic, @student, session, 'submitting')
-        @quiz_hash = api.planner_item_json(@quiz, @student, session, 'submitting')
+        @topic_hash = api.planner_item_json(@topic.assignment, @student, session, 'submitting')
+        @quiz_hash = api.planner_item_json(@quiz.assignment, @student, session, 'submitting')
       end
 
       it 'should include the respective jsons for the given object type' do
-        expect(@assignment_hash.has_key?(:assignment)).to be_truthy
-        expect(@topic_hash.has_key?(:assignment)).to be_truthy
-        expect(@quiz_hash.has_key?(:quiz)).to be_truthy
+        expect(@assignment_hash.has_key?(:plannable)).to be_truthy
+        expect(@topic_hash.has_key?(:plannable)).to be_truthy
+        expect(@quiz_hash.has_key?(:plannable)).to be_truthy
       end
+    end
+
+    describe 'status' do
+      before :once do
+        @assignment_hash = api.planner_item_json(@assignment, @student, session, 'submitting')
+      end
+
+      it 'should return the statuses for the learning object'
+    end
+
+    describe 'activity' do
+      before :once do
+        @topic_hash = api.planner_item_json(@topic.assignment, @student, session, 'submitting')
+      end
+
+      it 'should return the latest activity for the learning object'
     end
   end
 end

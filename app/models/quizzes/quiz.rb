@@ -32,7 +32,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   include Canvas::DraftStateValidations
 
   attr_readonly :context_id, :context_type
-  attr_accessor :notify_of_update
+  attr_accessor :notify_of_update, :todo_type
 
   has_many :quiz_questions, -> { order(:position) }, dependent: :destroy, class_name: 'Quizzes::QuizQuestion', inverse_of: :quiz
   has_many :quiz_submissions, :dependent => :destroy, :class_name => 'Quizzes::QuizSubmission'
