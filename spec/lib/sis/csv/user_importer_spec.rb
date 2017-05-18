@@ -454,6 +454,20 @@ describe SIS::CSV::UserImporter do
     expect(Pseudonym.where(account_id: @account, sis_user_id: "user_2").first.unique_id).to eq "user2"
   end
 
+  it "should not show error when an integration_id is taken" do
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status,integration_id",
+      "user_1,user1,User,Uno,user1@example.com,active,int_1"
+    )
+
+    importer = process_csv_data(
+      "user_id,login_id,first_name,last_name,email,status,integration_id",
+      "user_2,user2,User,Uno,user2@example.com,active,int_1"
+    )
+    expect(importer.warnings.map {|r| r.last}).to eq ["An existing Canvas user with the SIS ID user_1 has already claimed user_2's requested integration_id, skipping"]
+    expect(importer.errors).to eq []
+  end
+
   it "should allow a secondary user account to change its login id to some other registered login id if the other changes it first" do
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
