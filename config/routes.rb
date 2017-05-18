@@ -1949,6 +1949,14 @@ CanvasRails::Application.routes.draw do
       post 'planner/overrides', action: :create
       delete 'planner/overrides/:id', action: :destroy
     end
+
+    scope(controller: :planner_notes) do
+      get 'planner_notes', action: :index, as: :planner_notes
+      get 'planner_notes/:id', action: :show
+      put 'planner_notes/:id', action: :update
+      post 'planner_notes', action: :create
+      delete 'planner_notes/:id', action: :destroy
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented or
