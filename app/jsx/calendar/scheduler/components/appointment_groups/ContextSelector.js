@@ -1,13 +1,32 @@
+/*
+ * Copyright (C) 2016 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!appointment_groups'
 import Button from 'instructure-ui/lib/components/Button'
 import Grid, { GridCol, GridRow } from 'instructure-ui/lib/components/Grid'
 
   class ContextSelector extends React.Component {
     static propTypes = {
-      appointmentGroup: React.PropTypes.object,
-      contexts: React.PropTypes.array,
-      className: React.PropTypes.string
+      appointmentGroup: PropTypes.object,
+      contexts: PropTypes.array,
+      className: PropTypes.string
     }
 
     constructor () {
@@ -180,7 +199,7 @@ import Grid, { GridCol, GridRow } from 'instructure-ui/lib/components/Grid'
       return (
         <div id={`${context.asset_string}_sections`} className={this.state.expandedContexts.has(context) ? '' : 'hiddenSection'}>
           {
-            context.sections.map(section => {
+            (context.sections || []).map(section => {
               return (
                 <div className="sectionItem" key={section.asset_string}>
                   <input

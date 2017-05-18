@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 Instructure, Inc.
+# Copyright (C) 2015 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -22,7 +22,7 @@ module Lti
   describe VariableExpander do
     let(:root_account) { Account.new(lti_guid: 'test-lti-guid') }
     let(:account) { Account.new(root_account: root_account) }
-    let(:course) { Course.new(account: account) }
+    let(:course) { Course.new(account: account, course_code: 'CS 124', sis_source_id: '1234') }
     let(:group_category) { course.group_categories.new(name: 'Category') }
     let(:group) { course.groups.new(name: 'Group', group_category: group_category) }
     let(:user) { User.new }
@@ -41,6 +41,10 @@ module Lti
       m.stubs(:id).returns(1)
       m.stubs(:context).returns(root_account)
       m.stubs(:extension_setting).with(nil, :prefer_sis_email).returns(nil)
+      m.stubs(:extension_setting).with(:tool_configuration, :prefer_sis_email).returns(nil)
+      m.stubs(:include_email?).returns(true)
+      m.stubs(:include_name?).returns(true)
+      m.stubs(:public?).returns(true)
       shard_mock = mock('shard')
       shard_mock.stubs(:settings).returns({encription_key: 'abc'})
       m.stubs(:shard).returns(shard_mock)
@@ -159,6 +163,7 @@ module Lti
       end
 
       it 'includes CourseSection.sourcedId when in enabled capability' do
+        variable_expander = VariableExpander.new(root_account, course, controller, current_user: user, tool: tool)
         expanded = variable_expander.enabled_capability_params(enabled_capability)
         expect(expanded.keys).to include 'lis_course_section_sourcedid'
       end
@@ -173,23 +178,9 @@ module Lti
         expect(expanded.keys).to include 'lis_person_contact_email_primary'
       end
 
-      it 'includes Person.name.given when in enabled capability' do
-        expanded = variable_expander.enabled_capability_params(enabled_capability)
-        expect(expanded.keys).to include 'lis_person_name_given'
-      end
-
-      it 'includes Person.name.family when in enabled capability' do
-        expanded = variable_expander.enabled_capability_params(enabled_capability)
-        expect(expanded.keys).to include 'lis_person_name_family'
-      end
-
-      it 'includes Person.name.full when in enabled capability' do
-        expanded = variable_expander.enabled_capability_params(enabled_capability)
-        expect(expanded.keys).to include 'lis_person_name_full'
-      end
-
       it 'includes Person.sourcedId when in enabled capability' do
-        expanded = variable_expander.enabled_capability_params(enabled_capability)
+        allow(SisPseudonym).to receive(:for).with(user, anything, anything).and_return(double(sis_user_id: 12))
+        expanded = variable_expander.enabled_capability_params(['Person.sourcedId'])
         expect(expanded.keys).to include 'lis_person_sourcedid'
       end
 
@@ -216,6 +207,23 @@ module Lti
       it 'includes Context.id' do
         expanded = variable_expander.enabled_capability_params(enabled_capability)
         expect(expanded.keys).to include 'context_id'
+      end
+
+      context 'privacy level include_name' do
+        it 'includes Person.name.given when in enabled capability' do
+          expanded = variable_expander.enabled_capability_params(enabled_capability)
+          expect(expanded.keys).to include 'lis_person_name_given'
+        end
+
+        it 'includes Person.name.family when in enabled capability' do
+          expanded = variable_expander.enabled_capability_params(enabled_capability)
+          expect(expanded.keys).to include 'lis_person_name_family'
+        end
+
+        it 'includes Person.name.full when in enabled capability' do
+          expanded = variable_expander.enabled_capability_params(enabled_capability)
+          expect(expanded.keys).to include 'lis_person_name_full'
+        end
       end
     end
 
@@ -401,6 +409,13 @@ module Lti
           expect(exp_hash[:test]).to eq 123
         end
 
+        it 'has substitution for $vnd.instructure.Course.uuid' do
+          course.stubs(:uuid).returns('Ioe3sJPt0KZp9Pw6xAvcHuLCl0z4TvPKP0iIOLbo')
+          exp_hash = {test: '$vnd.instructure.Course.uuid'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'Ioe3sJPt0KZp9Pw6xAvcHuLCl0z4TvPKP0iIOLbo'
+        end
+
         it 'has substitution for $Canvas.course.name' do
           course.stubs(:name).returns('Course 101')
           exp_hash = {test: '$Canvas.course.name'}
@@ -467,6 +482,12 @@ module Lti
           exp_hash = {test: '$Canvas.course.previousCourseIds'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq '1,2'
+        end
+
+        it 'has a substitution for com.instructure.contextLabel' do
+          exp_hash = {test: '$com.instructure.contextLabel'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq course.course_code
         end
       end
 
@@ -784,6 +805,13 @@ module Lti
           expect(exp_hash[:test]).to eq 456
         end
 
+        it 'has substitution for $vnd.instructure.User.uuid' do
+          user.stubs(:uuid).returns('N2ST123dQ9zyhurykTkBfXFa3Vn1RVyaw9Os6vu3')
+          exp_hash = {test: '$vnd.instructure.User.uuid'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'N2ST123dQ9zyhurykTkBfXFa3Vn1RVyaw9Os6vu3'
+        end
+
         it 'has substitution for $Canvas.user.isRootAccountAdmin' do
           user.stubs(:roles).returns(["root_admin"])
           exp_hash = {test: '$Canvas.user.isRootAccountAdmin'}
@@ -841,7 +869,7 @@ module Lti
           let(:pseudonym) { Pseudonym.new }
 
           before :each do
-            user.stubs(:find_pseudonym_for_account).returns(pseudonym)
+            allow(SisPseudonym).to receive(:for).with(user, anything, anything).and_return(pseudonym)
           end
 
           it 'has substitution for $Canvas.user.sisSourceId' do

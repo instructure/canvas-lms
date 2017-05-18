@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2017 Instructure, Inc.
+# Copyright (C) 2017 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -36,13 +36,16 @@ describe JobLiveEventsContext do
     it 'yields a hash with job and default account details' do
       global_id = Account.default.global_id.to_s
       uuid = Account.default.uuid
+      lti_guid = Account.default.lti_guid
 
       expect(fake_delayed_instance.live_events_context).to eq(
         {
-          'job_id' => '1',
-          'job_tag' => 'foobar',
-          'root_account_id' => global_id,
-          'root_account_uuid' => uuid,
+          job_id: '1',
+          job_tag: 'foobar',
+          root_account_id: global_id,
+          root_account_uuid: uuid,
+          root_account_lti_guid: lti_guid,
+          producer: 'canvas',
         }
       )
     end

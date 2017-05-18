@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2011-2013 Instructure, Inc.
+/*
+ * Copyright (C) 2011 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -12,9 +12,10 @@
  * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
  * details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 define([
   'INST' /* INST */,
   'i18n!profile',
@@ -336,6 +337,7 @@ define([
     $.ajaxJSON($disable_mfa_link.attr('href'), 'DELETE', null, function() {
       $.flashMessage(I18n.t('notices.mfa_disabled', "Multi-factor authentication disabled"));
       $disable_mfa_link.remove();
+      $('#otp_backup_codes_link').remove();
     });
     event.preventDefault();
   });

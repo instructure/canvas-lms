@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2017 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 # @API Originality Reports
 # @internal
 #
@@ -117,16 +134,16 @@ module Lti
     SERVICE_DEFINITIONS = [
       {
         id: SUBMISSION_SERVICE,
-        endpoint: 'api/lti/assignments/{:assignment_id}/subscriptions/{:subscription_id}',
+        endpoint: 'api/lti/assignments/{assignment_id}/submissions/{submission_id}',
         format: ['application/json'].freeze,
         action: ['GET'].freeze
       }.freeze,
       {
         id: SUBMISSION_HISTORY_SERVICE,
-        endpoint: 'api/lti/assignments/{:assignment_id}/subscriptions/{:subscription_id}/history',
+        endpoint: 'api/lti/assignments/{assignment_id}/submissions/{submission_id}/history',
         format: ['application/json'].freeze,
         action: ['GET'].freeze
-      }
+      }.freeze
     ].freeze
 
     skip_before_action :load_user

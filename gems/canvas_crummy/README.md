@@ -116,5 +116,3 @@ h2. Credits
 * "Les Hill":http://blog.leshill.org/
 * "Sandro Turriate":http://turriate.com/
 * "Przemysław Kowalczyk":http://szeryf.wordpress.com/2008/06/13/easy-and-flexible-breadcrumbs-for-rails/ - feature ideas
-
-*Copyright (c) 2008 Zach Inglis, released under the MIT license*

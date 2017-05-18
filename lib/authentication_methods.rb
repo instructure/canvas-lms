@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -58,13 +58,13 @@ module AuthenticationMethods
     begin
       services_jwt = Canvas::Security::ServicesJwt.new(token_string)
       @current_user = User.find(services_jwt.user_global_id)
-      @current_pseudonym = @current_user.find_pseudonym_for_account(@domain_root_account, true)
+      @current_pseudonym = SisPseudonym.for(@current_user, @domain_root_account, type: :implicit, require_sis: false)
       unless @current_user && @current_pseudonym
         raise AccessTokenError
       end
       if services_jwt.masquerading_user_global_id
         @real_current_user = User.find(services_jwt.masquerading_user_global_id)
-        @real_current_pseudonym = @real_current_user.find_pseudonym_for_account(@domain_root_account, true)
+        @real_current_pseudonym = SisPseudonym.for(@real_current_user, @domain_root_account, type: :implicit, require_sis: false)
         logger.warn "#{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
       end
       @authenticated_with_jwt = true
@@ -99,7 +99,7 @@ module AuthenticationMethods
       end
 
       @current_user = @access_token.user
-      @current_pseudonym = @current_user.find_pseudonym_for_account(@domain_root_account, true)
+      @current_pseudonym = SisPseudonym.for(@current_user, @domain_root_account, type: :implicit, require_sis: false)
 
       unless @current_user && @current_pseudonym
         raise AccessTokenError
@@ -221,7 +221,7 @@ module AuthenticationMethods
         @real_current_user = @current_user
         @current_user = user
         @real_current_pseudonym = @current_pseudonym
-        @current_pseudonym = @current_user.find_pseudonym_for_account(@domain_root_account, true)
+        @current_pseudonym = SisPseudonym.for(@current_user, @domain_root_account, type: :implicit, require_sis: false)
         logger.warn "#{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
       elsif api_request?
         # fail silently for UI, but not for API

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -104,6 +104,10 @@ class DeveloperKey < ActiveRecord::Base
 
   def account_name
     account.try(:name)
+  end
+
+  def last_used_at
+    self.access_tokens.maximum(:last_used_at)
   end
 
   class << self

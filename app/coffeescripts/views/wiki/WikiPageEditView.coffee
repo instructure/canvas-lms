@@ -1,6 +1,22 @@
+#
+# Copyright (C) 2013 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 define [
   'jquery'
-  'underscore'
   'Backbone'
   'jsx/shared/rce/RichContentEditor'
   'jst/wiki/WikiPageEdit'
@@ -9,7 +25,8 @@ define [
   'compiled/views/wiki/WikiPageReloadView'
   'i18n!pages'
   'compiled/views/editor/KeyboardShortcuts'
-], ($, _, Backbone, RichContentEditor, template, ValidatedFormView, WikiPageDeleteDialog, WikiPageReloadView, I18n, KeyboardShortcuts) ->
+  'jquery.instructure_date_and_time'
+], ($, Backbone, RichContentEditor, template, ValidatedFormView, WikiPageDeleteDialog, WikiPageReloadView, I18n, KeyboardShortcuts) ->
 
   RichContentEditor.preloadRemoteModule()
 
@@ -20,12 +37,15 @@ define [
         '.header-bar-outer-container': '$headerBarOuterContainer'
         '.page-changed-alert': '$pageChangedAlert'
         '.help_dialog': '$helpDialog'
+        '#todo_date': '$studentTodoAt'
+        '#todo_date_container': '$studentTodoAtContainer'
 
       events:
         'click a.switch_views': 'switchViews'
         'click .delete_page': 'deleteWikiPage'
         'click .form-actions .cancel': 'cancel'
         'click .form-actions .save_and_publish': 'saveAndPublish'
+        'click #student_planner_checkbox': 'toggleStudentTodo'
 
     template: template
     className: "form-horizontal edit-form validated-form-view"
@@ -35,11 +55,12 @@ define [
     @optionProperty 'WIKI_RIGHTS'
     @optionProperty 'PAGE_RIGHTS'
 
-    initialize: ->
+    initialize: (options = {}) ->
       super
       @WIKI_RIGHTS ||= {}
       @PAGE_RIGHTS ||= {}
       @on 'success', (args) => window.location.href = @model.get('html_url')
+      @lockedItems = options.lockedItems || {}
 
     toJSON: ->
       json = super
@@ -53,12 +74,12 @@ define [
       # rather than requiring the editing_roles to match a
       # string exactly, we check for individual editing roles
       editing_roles = json.editing_roles || ''
-      editing_roles = _.map(editing_roles.split(','), (s) -> s.trim())
-      if _.contains(editing_roles, 'public')
+      editing_roles = editing_roles.split(',').map (s) -> s.trim()
+      if editing_roles.includes('public')
         IS.ANYONE_ROLE = true
-      else if _.contains(editing_roles, 'members')
+      else if editing_roles.includes('members')
         IS.MEMBER_ROLE = true
-      else if _.contains(editing_roles, 'students')
+      else if editing_roles.includes('students')
         IS.STUDENT_ROLE = true
       else
         IS.TEACHER_ROLE = true
@@ -77,6 +98,8 @@ define [
 
       json.assignment = json.assignment?.toView()
 
+      json.content_is_locked = @lockedItems.content
+
       json
 
     onUnload: (ev) =>
@@ -89,11 +112,20 @@ define [
         return warning
 
 
+    # handles the toggling of the student todo date picker
+    toggleStudentTodo: (e) =>
+      @$studentTodoAtContainer.toggle()
+
+
     # After the page loads, ensure the that wiki sidebar gets initialized
     # correctly.
     # @api custom backbone override
     afterRender: ->
       super
+      @$studentTodoAt.datetime_field()
+      if !@toJSON().todo_date?
+        @$studentTodoAtContainer.hide()
+
       RichContentEditor.initSidebar()
       RichContentEditor.loadNewEditor(@$wikiPageBody, { focus: true, manageParent: true })
 
@@ -137,10 +169,18 @@ define [
       errors = {}
 
       if data.title == ''
-        errors["title"] = [
+        errors['title'] = [
           {
             type: 'required'
-            message: I18n.t("errors.require_title",'You must enter a title')
+            message: I18n.t('errors.require_title','You must enter a title')
+          }
+        ]
+
+      if data.student_planner_checkbox == '1' && !data.student_todo_at?
+        errors['student_todo_at'] = [
+          {
+            type: 'required'
+            message: I18n.t('You must enter a date')
           }
         ]
 

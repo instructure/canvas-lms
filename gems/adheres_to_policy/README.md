@@ -17,7 +17,7 @@ a.check_policy(u)
 License
 =======
 
-Copyright (C) 2014 Instructure, Inc.
+Copyright (C) 2014 - present Instructure, Inc.
 
 This file is part of Canvas.
 

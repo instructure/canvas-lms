@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -22,7 +22,8 @@ class AuditorApiController < ApplicationController
   private
 
   def check_configured
-    not_found unless Canvas::Cassandra::DatabaseBuilder.configured?('auditors')
+    return if Canvas::Cassandra::DatabaseBuilder.configured?('auditors')
+    render json: { message: "Auditors are not configured" }, status: :not_found
   end
 
   def query_options

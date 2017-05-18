@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 - 2014 Instructure, Inc.
+# Copyright (C) 2012 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -142,8 +142,8 @@ module AccountReports
       # Generate the CSV report
       write_report t_headers do |csv|
 
-        @total = students.count(:all)
-        i = 0
+        total = students.count(:all)
+        Shackles.activate(:master) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
         students.find_each do |row|
           row = row.attributes.dup
           row['assignment url'] = "https://#{host}"
@@ -151,15 +151,8 @@ module AccountReports
           row['assignment url'] << "/assignments/#{row['assignment id']}"
           row['submission date']=default_timezone_format(row['submission date'])
           csv << headers.map { |h| row[h] }
-
-          if i % 100 == 0
-            Shackles.activate(:master) do
-              @account_report.update_attribute(:progress, (i.to_f/@total)*100)
-            end
-          end
-          i += 1
         end
-        csv << ['No outcomes found'] if @total == 0
+        csv << ['No outcomes found'] if total == 0
       end
     end
 
@@ -261,22 +254,16 @@ module AccountReports
       # Generate the CSV report
       write_report t_headers do |csv|
 
-        @total = students.count(:all)
-        i = 0
+        total = students.count(:all)
+        Shackles.activate(:master) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
         students.find_each do |row|
           row = row.attributes.dup
           row['submission date']=default_timezone_format(row['submission date'])
 
           csv << headers.map { |h| row[h] }
 
-          if i % 100 == 0
-            Shackles.activate(:master) do
-              @account_report.update_attribute(:progress, (i.to_f/@total)*100)
-            end
-          end
-          i += 1
         end
-        csv << ['No outcomes found'] if @total == 0
+        csv << ['No outcomes found'] if total == 0
       end
     end
   end

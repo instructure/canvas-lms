@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 - 2014 Instructure, Inc.
+# Copyright (C) 2013 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -65,8 +65,8 @@ module AccountReports
       headers << I18n.t('sum of all files in MB')
       write_report headers do |csv|
 
-        @total = courses.count(:all)
-        i = 0
+        total = courses.count(:all)
+        Shackles.activate(:master) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
 
         courses.find_each do |c|
           row = []
@@ -83,12 +83,6 @@ module AccountReports
           all_course_files_size = scope.sum("COALESCE(CASE when size < #{min} THEN #{min} ELSE size END, 0)").to_i
           row << (all_course_files_size.to_f / 1.megabyte).round(2)
           csv << row
-          i += 1
-          if i % 5 == 0
-            Shackles.activate(:master) do
-              @account_report.update_attribute(:progress, (i.to_f/@total)*100)
-            end
-          end
         end
       end
     end
@@ -106,8 +100,8 @@ module AccountReports
       headers << I18n.t('#account_reports.report_header_end_date', 'end date')
       write_report headers do |csv|
 
-        @total = courses.count(:all)
-        i = 0
+        total = courses.count(:all)
+        Shackles.activate(:master) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
 
         courses.find_each do |c|
           row = []
@@ -125,12 +119,6 @@ module AccountReports
           end
 
           csv << row
-          i += 1
-          if i % 5 == 0
-            Shackles.activate(:master) do
-              @account_report.update_attribute(:progress, (i.to_f/@total)*100)
-            end
-          end
         end
       end
     end

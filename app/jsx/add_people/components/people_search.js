@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2016 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import I18n from 'i18n!roster'
 import React from 'react'
 import Typography from 'instructure-ui/lib/components/Typography'
@@ -139,7 +157,7 @@ import {parseNameList, findEmailInEntry, emailValidator} from '../helpers'
               <div className="peoplesearch__selection">
                 <Select
                   id="peoplesearch_select_role"
-                  label={I18n.t('Role')} isBlock
+                  label={I18n.t('Role')}
                   value={this.props.role}
                   onChange={this.onChangeRole}
                 >
@@ -152,7 +170,6 @@ import {parseNameList, findEmailInEntry, emailValidator} from '../helpers'
                 <Select
                   id="peoplesearch_select_section"
                   label={I18n.t('Section')}
-                  isBlock
                   value={this.props.section}
                   onChange={this.onChangeSection}
                 >
@@ -167,7 +184,7 @@ import {parseNameList, findEmailInEntry, emailValidator} from '../helpers'
                 key="limit_privileges_to_course_section"
                 id="limit_privileges_to_course_section"
                 label={I18n.t('Can interact with users in their section only')}
-                isBlock value={0}
+                value={0}
                 checked={this.props.limitPrivilege}
                 onChange={this.onChangePrivilege}
               />

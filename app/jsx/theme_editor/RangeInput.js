@@ -1,16 +1,35 @@
+/*
+ * Copyright (C) 2015 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import React from 'react'
+import PropTypes from 'prop-types'
 import $ from 'jquery'
 
   var RangeInput = React.createClass({
     propTypes: {
-      min:           React.PropTypes.number.isRequired,
-      max:           React.PropTypes.number.isRequired,
-      defaultValue:  React.PropTypes.number.isRequired,
-      labelText:     React.PropTypes.string.isRequired,
-      name:          React.PropTypes.string.isRequired,
-      step:          React.PropTypes.number,
-      formatValue:   React.PropTypes.func,
-      onChange:      React.PropTypes.func
+      min:           PropTypes.number.isRequired,
+      max:           PropTypes.number.isRequired,
+      defaultValue:  PropTypes.number.isRequired,
+      labelText:     PropTypes.string.isRequired,
+      name:          PropTypes.string.isRequired,
+      step:          PropTypes.number,
+      formatValue:   PropTypes.func,
+      onChange:      PropTypes.func
     },
 
     getDefaultProps: function() {

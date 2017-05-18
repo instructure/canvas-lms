@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2013 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 define [
   'Backbone'
   'compiled/models/Quiz'
@@ -87,13 +104,13 @@ define [
   test "initializes sis toggle if post to sis enabled", ->
     quiz = createQuiz(id: 1, title: 'Foo', can_update: true, published: true)
     quiz.set('post_to_sis', true)
-    view = createView(quiz, canManage: true)
+    view = createView(quiz, canManage: true, post_to_sis: true)
     ok view.sisButtonView
 
   test "initializes sis toggle if post to sis disabled", ->
     quiz = createQuiz(id: 1, title: 'Foo', can_update: true, published: true)
     quiz.set('post_to_sis', false)
-    view = createView(quiz, canManage: true)
+    view = createView(quiz, canManage: true, post_to_sis: true)
     ok view.sisButtonView
 
   test "does not initialize sis toggle if post to sis is null", ->

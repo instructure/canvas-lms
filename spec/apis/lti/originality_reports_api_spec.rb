@@ -56,6 +56,13 @@ module Lti
       Account.any_instance.stubs(:feature_enabled?).with(:plagiarism_detection_platform).returns(true)
     end
 
+    describe 'service definition' do
+      it 'uses the correct endpoint' do
+        service = Lti::OriginalityReportsApiController::SERVICE_DEFINITIONS.first
+        expect(service[:endpoint]).to eq "api/lti/assignments/{assignment_id}/submissions/{submission_id}/originality_report"
+      end
+    end
+
     describe "GET assignments/:assignment_id/originality_report/submissions/:submission_id/:id (#show)" do
       before :each do
         report_initial_values = {
@@ -189,11 +196,15 @@ module Lti
       end
 
       it "does not update originality score if out of range" do
-
         put @endpoints[:update], {originality_report: {originality_score: 150}}, request_headers
 
         expect(response.status).to eq 400
         expect(JSON.parse(response.body)['errors'].key? 'originality_score').to be_truthy
+      end
+
+      it "allows setting the originality_report to nil" do
+        put @endpoints[:update], {originality_report: {originality_score: nil}}, request_headers
+        expect(response).to be_ok
       end
 
       it "updates originality report attachment id" do

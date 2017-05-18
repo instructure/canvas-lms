@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -35,6 +35,11 @@ require 'csv'
 #         "name": {
 #           "description": "The display name of the account",
 #           "example": "Canvas Account",
+#           "type": "string"
+#         },
+#         "uuid": {
+#           "description": "The UUID of the account",
+#           "example": "WvAHhY5FINzq5IyRIJybGeiXyFkG3SqHUPb7jZY5",
 #           "type": "string"
 #         },
 #         "parent_account_id": {
@@ -1002,7 +1007,7 @@ class AccountsController < ApplicationController
       end
     end
 
-    teachers = TeacherEnrollment.for_courses_with_user_name(courses_to_fetch_users_for).admin.active
+    teachers = TeacherEnrollment.for_courses_with_user_name(courses_to_fetch_users_for).admin.where.not(:enrollments => {:workflow_state => %w{rejected deleted}})
     course_to_student_counts = StudentEnrollment.student_in_claimed_or_available.where(:course_id => courses_to_fetch_users_for).group(:course_id).distinct.count(:user_id)
     courses_to_teachers = teachers.inject({}) do |result, teacher|
       result[teacher.course_id] ||= []
@@ -1016,14 +1021,6 @@ class AccountsController < ApplicationController
     end
   end
   protected :build_course_stats
-
-  def saml_meta_data
-    # This needs to be publicly available since external SAML
-    # servers need to be able to access it without being authenticated.
-    # It is used to disclose our SAML configuration settings.
-    settings = AccountAuthorizationConfig::SAML.saml_settings_for_account(@domain_root_account, request.host_with_port)
-    render :xml => Onelogin::Saml::MetaData.create(settings)
-  end
 
   # TODO Refactor add_account_user and remove_account_user actions into
   # AdminsController. see https://redmine.instructure.com/issues/6634

@@ -1,5 +1,24 @@
+/*
+ * Copyright (C) 2015 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import I18n from 'i18n!edit_timezone'
 import React from 'react'
+import PropTypes from 'prop-types'
 import Modal from 'jsx/shared/modal'
 import ModalContent from 'jsx/shared/modal-content'
 import ModalButtons from 'jsx/shared/modal-buttons'
@@ -7,7 +26,7 @@ import TimeZoneSelect from 'jsx/shared/TimeZoneSelect'
 import UsersStore from 'jsx/account_course_user_search/UsersStore'
 import IcInput from 'jsx/account_course_user_search/IcInput'
 
-  let { object, bool, number, string, func, shape, arrayOf } = React.PropTypes;
+  let { object, bool, number, string, func, shape, arrayOf } = PropTypes;
 
   class EditUserDetailsDialog extends React.Component{
     constructor (props, context) {

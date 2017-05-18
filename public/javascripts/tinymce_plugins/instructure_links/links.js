@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2017 Instructure, Inc.
+/*
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -12,9 +12,10 @@
  * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
  * details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 define([
   'jquery',
   'str/htmlEscape',
@@ -399,9 +400,7 @@ define([
     .find(".iframe_placeholder").each(function() {
       var edWidth = $(ed.contentAreaContainer).width();
       var $holder = $(this);
-      if($(ed.contentAreaContainer).hasScrollbar() || true) {
-        edWidth -= $(ed.contentAreaContainer).scrollbarWidth();
-      }
+      edWidth -= $(ed.contentAreaContainer).scrollbarWidth();
       if($holder.width() > edWidth - 40) {
         $holder.width(edWidth - 15);
         if(!$holder.hasClass('fullWidth')) { $holder.addClass('fullWidth'); }

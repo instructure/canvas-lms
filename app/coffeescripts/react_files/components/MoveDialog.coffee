@@ -1,21 +1,39 @@
+#
+# Copyright (C) 2014 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 define [
   'i18n!react_files'
   'jquery'
   'react'
+  'prop-types'
   'compiled/fn/preventDefault'
   '../modules/customPropTypes'
   '../utils/moveStuff'
   'compiled/str/splitAssetString'
-], (I18n, $, React, preventDefault,  customPropTypes, moveStuff, splitAssetString) ->
+], (I18n, $, React, PropTypes, preventDefault,  customPropTypes, moveStuff, splitAssetString) ->
 
   MoveDialog =
     displayName: 'MoveDialog'
 
     propTypes:
-      rootFoldersToShow: React.PropTypes.arrayOf(customPropTypes.folder).isRequired
-      thingsToMove: React.PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired
-      onClose: React.PropTypes.func.isRequired
-      onMove: React.PropTypes.func.isRequired
+      rootFoldersToShow: PropTypes.arrayOf(customPropTypes.folder).isRequired
+      thingsToMove: PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired
+      onClose: PropTypes.func.isRequired
+      onMove: PropTypes.func.isRequired
 
     getInitialState: ->
       destinationFolder: null

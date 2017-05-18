@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2017 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 shared_context 'no grading period or assignment group weighting' do
   before(:each) do
     # C3058158
@@ -69,10 +86,6 @@ shared_context 'assign outside of weighted grading period' do
 
     @a2.update_attributes(due_at: 3.weeks.ago)
   end
-
-  after(:all) do
-    @a2.update_attributes(due_at: 1.week.from_now)
-  end
 end
 
 shared_context 'assign outside of unweighted grading period' do
@@ -83,10 +96,6 @@ shared_context 'assign outside of unweighted grading period' do
     @course.update_attributes(group_weighting_scheme: "percent")
 
     @a2.update_attributes(due_at: 3.weeks.ago)
-  end
-
-  after(:all) do
-    @a2.update_attributes(due_at: 1.week.from_now)
   end
 end
 

@@ -1,6 +1,25 @@
+/*
+ * Copyright (C) 2015 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import _ from 'underscore'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import PropTypes from 'prop-types'
 import DueDateRow from 'jsx/due_dates/DueDateRow'
 import DueDateAddRowButton from 'jsx/due_dates/DueDateAddRowButton'
 import OverrideStudentStore from 'jsx/due_dates/OverrideStudentStore'
@@ -17,21 +36,21 @@ import 'compiled/jquery.rails_flash_notifications'
   var DueDates = React.createClass({
 
     propTypes: {
-      overrides: React.PropTypes.array.isRequired,
-      syncWithBackbone: React.PropTypes.func.isRequired,
-      sections: React.PropTypes.array.isRequired,
-      defaultSectionId: React.PropTypes.string.isRequired,
-      hasGradingPeriods: React.PropTypes.bool.isRequired,
-      gradingPeriods: React.PropTypes.array.isRequired,
-      isOnlyVisibleToOverrides: React.PropTypes.bool.isRequired,
+      overrides: PropTypes.array.isRequired,
+      syncWithBackbone: PropTypes.func.isRequired,
+      sections: PropTypes.array.isRequired,
+      defaultSectionId: PropTypes.string.isRequired,
+      hasGradingPeriods: PropTypes.bool.isRequired,
+      gradingPeriods: PropTypes.array.isRequired,
+      isOnlyVisibleToOverrides: PropTypes.bool.isRequired,
       dueAt: function(props) {
         const isDate = props['dueAt'] instanceof Date
         if (!isDate && props['dueAt'] !== null) {
           return new Error('Invalid prop `dueAt` supplied to `DueDates`. Validation failed.')
         }
       },
-      dueDatesReadonly: React.PropTypes.bool,
-      availabilityDatesReadonly: React.PropTypes.bool
+      dueDatesReadonly: PropTypes.bool,
+      availabilityDatesReadonly: PropTypes.bool
     },
 
     getDefaultProps () {

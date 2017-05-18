@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2016 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 class SplitUsers
   ENROLLMENT_DATA_UPDATES = [
     {table: 'asset_user_accesses',
@@ -47,9 +64,6 @@ class SplitUsers
     {table: 'rubric_assessments', foreign_key: :assessor_id,
      scope: -> { joins({submission: :assignment}) },
      context_id: 'assignments.context_id'}.freeze,
-    {table: 'submission_comment_participants',
-     scope: -> { joins(:submission_comment) },
-     context_id: 'submission_comments.context_id'}.freeze,
     {table: 'submission_comments', foreign_key: :author_id}.freeze,
     {table: 'web_conference_participants',
      scope: -> { joins(:web_conference).where(web_conferences: {context_type: 'Course'}) },

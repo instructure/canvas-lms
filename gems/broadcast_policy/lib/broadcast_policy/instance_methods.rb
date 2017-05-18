@@ -1,7 +1,5 @@
-require "active_support/hash_with_indifferent_access"
-
 #
-# Copyright (C) 2011 - 2017 Instructure, Inc.
+# Copyright (C) 2014 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,7 +14,9 @@ require "active_support/hash_with_indifferent_access"
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
+
+require "active_support/hash_with_indifferent_access"
+
 module BroadcastPolicy
   module InstanceMethods
 

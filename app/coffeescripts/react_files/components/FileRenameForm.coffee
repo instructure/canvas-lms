@@ -1,8 +1,26 @@
+#
+# Copyright (C) 2014 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 define [
   'i18n!file_rename_form'
   'react'
-  'react-dom'
-], (I18n, React, ReactDOM) ->
+  'react-dom',
+  'prop-types'
+], (I18n, React, ReactDOM, PropTypes) ->
 
   FileRenameForm =
     displayName: 'FileRenameForm'
@@ -10,8 +28,8 @@ define [
     # dialog for renaming
 
     propType:
-      fileOptions: React.PropTypes.object
-      onNameConflictResolved: React.PropTypes.func.isRequired
+      fileOptions: PropTypes.object
+      onNameConflictResolved: PropTypes.func.isRequired
 
     getInitialState: ->
       isEditing: false

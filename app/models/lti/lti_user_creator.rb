@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2014 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 module Lti
   class LtiUserCreator
     # deprecated mapping
@@ -17,7 +34,6 @@ module Lti
       @canvas_tool = canvas_tool
       @canvas_context = canvas_context
       @opaque_identifier = @canvas_tool.opaque_identifier_for(@canvas_user)
-      @pseudonym = false
     end
 
     def convert
@@ -44,8 +60,8 @@ module Lti
 
     private
     def pseudonym
-      if @pseudonym === false
-        @pseudonym ||= @canvas_user.find_pseudonym_for_account(@canvas_root_account)
+      unless instance_variable_defined?(:@pseudonym)
+        @pseudonym = SisPseudonym.for(@canvas_user, @canvas_root_account, type: :trusted, require_sis: false)
       end
       @pseudonym
     end

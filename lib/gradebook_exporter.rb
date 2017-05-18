@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 Instructure, Inc.
+# Copyright (C) 2015 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -151,9 +151,8 @@ class GradebookExporter
             end
           end
           row = [student_name(student), student.id]
-          pseudonym = SisPseudonym.for(student, @course, include_root_account)
+          pseudonym = SisPseudonym.for(student, @course, type: :implicit, require_sis: false)
           row << pseudonym.try(:sis_user_id) if include_sis_id
-          pseudonym ||= student.find_pseudonym_for_account(@course.root_account, include_root_account)
           row << pseudonym.try(:unique_id)
           row << (pseudonym && HostUrl.context_host(pseudonym.account)) if include_sis_id && include_root_account
           row << student_sections
@@ -175,7 +174,7 @@ class GradebookExporter
     # user: used for name in csv output
     # course_section: used for display_name in csv output
     # user > pseudonyms: used for sis_user_id/unique_id if options[:include_sis_id]
-    # user > pseudonyms > account: used in find_pseudonym_for_account > works_for_account
+    # user > pseudonyms > account: used in SisPseudonym > works_for_account
     includes = {:user => {:pseudonyms => :account}, :course_section => []}
 
     enrollments = scope.preload(includes).eager_load(:user).order_by_sortable_name.to_a

@@ -1,4 +1,22 @@
+#
+# Copyright (C) 2017 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require "rspec/core/formatters/base_formatter"
+require_relative "../rerun_argument"
 
 # Base formatter that doesn't do anything in and of itself, except gather
 # error context-y stuff for subclasses. If you have multiple such
@@ -82,7 +100,7 @@ module ErrorContext
 
       def note_recent_spec_run(example)
         recent_spec_runs << {
-          location: example.location_rerun_argument,
+          location: RerunArgument.for(example),
           exception: example.exception,
           pending: example.pending
         }
@@ -182,7 +200,7 @@ module ErrorContext
     end
 
     def spec_path
-      @spec_path ||= example.location_rerun_argument.sub(/\A[.\/]+/, "")
+      @spec_path ||= RerunArgument.for(example).sub(/\A[.\/]+/, "")
     end
 
     def errors_path

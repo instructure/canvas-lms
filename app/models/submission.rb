@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -52,11 +52,13 @@ class Submission < ActiveRecord::Base
   attr_readonly :assignment_id
   attr_accessor :visible_to_user,
                 :skip_grade_calc
+  attr_writer :versioned_originality_reports
 
   belongs_to :attachment # this refers to the screenshot of the submission if it is a url submission
   belongs_to :assignment
   belongs_to :user
   belongs_to :grader, :class_name => 'User'
+  belongs_to :grading_period
   belongs_to :group
   belongs_to :media_object
   belongs_to :student, :class_name => 'User', :foreign_key => :user_id
@@ -91,6 +93,8 @@ class Submission < ActiveRecord::Base
   validates_length_of :body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :published_grade, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
   validates_as_url :url
+  validates :points_deducted, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  validates :late_policy_status, inclusion: ['none', 'missing', 'late'], allow_nil: true
   validate :ensure_grader_can_grade
 
   scope :with_comments, -> { preload(:submission_comments) }
@@ -127,7 +131,6 @@ class Submission < ActiveRecord::Base
     state :graded
   end
 
-
   # see #needs_grading?
   # When changing these conditions, consider updating index_submissions_on_assignment_id
   # to maintain performance.
@@ -135,7 +138,7 @@ class Submission < ActiveRecord::Base
     conditions = <<-SQL
       submissions.submission_type IS NOT NULL
       AND (submissions.workflow_state = 'pending_review'
-        OR (submissions.workflow_state = 'submitted'
+        OR (submissions.workflow_state IN ('submitted', 'graded')
           AND (submissions.score IS NULL OR NOT submissions.grade_matches_current_submission)
         )
       )
@@ -150,9 +153,9 @@ class Submission < ActiveRecord::Base
 
     !send("submission_type#{suffix}").nil? &&
     (send("workflow_state#{suffix}") == 'pending_review' ||
-      (send("workflow_state#{suffix}") == 'submitted' &&
-        (send("score#{suffix}").nil? || !send("grade_matches_current_submission#{suffix}"))
-      )
+     (['submitted', 'graded'].include?(send("workflow_state#{suffix}")) &&
+      (send("score#{suffix}").nil? || !send("grade_matches_current_submission#{suffix}"))
+     )
     )
   end
 
@@ -184,7 +187,6 @@ class Submission < ActiveRecord::Base
   before_save :prep_for_submitting_to_plagiarism
   before_save :check_url_changed
   before_save :check_reset_graded_anonymously
-  before_create :cache_due_date
   after_save :touch_user
   after_save :touch_graders
   after_save :update_assignment
@@ -399,20 +401,14 @@ class Submission < ActiveRecord::Base
       else
         Rails.logger.info "GRADES: submission #{global_id} score changed. recomputing grade for course #{context.global_id} user #{user_id}."
         self.class.connection.after_transaction_commit do
-          effective_due_dates = EffectiveDueDates.new(self.context, self.assignment_id)
-          grading_period_id = effective_due_dates.grading_period_id_for(
-            student_id: self.user_id,
-            assignment_id: self.assignment_id
-          )
           Enrollment.recompute_final_score_in_singleton(
             self.user_id,
             self.context.id,
-            grading_period_id: grading_period_id,
-            update_all_grading_period_scores: false
+            grading_period_id: grading_period_id
           )
         end
       end
-      self.assignment.send_later_if_production(:multiple_module_actions, [self.user_id], :scored, self.score) if self.assignment
+      self.assignment&.send_later_if_production(:multiple_module_actions, [self.user_id], :scored, self.score)
     end
     true
   end
@@ -1080,12 +1076,17 @@ class Submission < ActiveRecord::Base
   end
 
   def infer_values
+    # we don't want this to be in a before_create because we want cache_due_date
+    # to happen before we infer other values, if it's needed
+    cache_due_date if new_record? && assignment.present?
     if assignment
       self.context_code = assignment.context_code
     end
 
-    self.submitted_at ||= Time.now if self.has_submission? || (self.submission_type && !self.submission_type.empty?)
+    self.accepted_at = nil unless late_policy_status == 'late'
+    self.submitted_at ||= Time.now if self.has_submission?
     self.quiz_submission.reload if self.quiz_submission_id
+    self.workflow_state = 'submitted' if self.unsubmitted? && self.submitted_at
     self.workflow_state = 'unsubmitted' if self.submitted? && !self.has_submission?
     self.workflow_state = 'graded' if self.grade && self.score && self.grade_matches_current_submission
     self.workflow_state = 'pending_review' if self.submission_type == 'online_quiz' && self.quiz_submission.try(:latest_submitted_attempt).try(:pending_review?)
@@ -1224,6 +1225,8 @@ class Submission < ActiveRecord::Base
 
     student_id = user_id || self.user.try(:id)
 
+    # TODO: replace this check with `grading_period&.closed?` once
+    # the populate_grading_period_for_submissions data fixup finishes
     if assignment.in_closed_grading_period_for_student?(student_id)
       :assignment_in_closed_grading_period
     else
@@ -1252,6 +1255,8 @@ class Submission < ActiveRecord::Base
 
     student_id = self.user_id || self.user.try(:id)
 
+    # TODO: replace this check with `grading_period&.closed?` once
+    # the populate_grading_period_for_submissions data fixup finishes
     if assignment.in_closed_grading_period_for_student?(student_id)
       :assignment_in_closed_grading_period
     else
@@ -1274,6 +1279,14 @@ class Submission < ActiveRecord::Base
     write_attribute :attachment_ids, ids
   end
 
+  def versioned_originality_reports
+    @versioned_originality_reports ||= begin
+      ids = (attachment_ids || "").split(",")
+      ids << attachment_id if attachment_id
+      ids.empty? ? [] : OriginalityReport.where(submission_id: id, attachment_id: ids)
+    end
+  end
+
   def versioned_attachments
     if @versioned_attachments
       @versioned_attachments
@@ -1293,10 +1306,8 @@ class Submission < ActiveRecord::Base
     }
   end
 
-  # use this method to pre-load the versioned_attachments for a bunch of
-  # submissions (avoids having O(N) attachment queries)
-  # NOTE: all submissions must belong to the same shard
-  def self.bulk_load_versioned_attachments(submissions, preloads: [:thumbnail, :media_object])
+  # This helper method is used by the bulk_load_versioned_* methods
+  def self.group_attachment_ids_by_submission_and_index(submissions)
     # The index of the submission is considered part of the key for
     # the hash that is built. This is needed for bulk loading
     # submission_histories where multiple submission histories will
@@ -1307,21 +1318,47 @@ class Submission < ActiveRecord::Base
       attachment_ids << s.attachment_id if s.attachment_id
       [[s, index], attachment_ids]
     end
-    attachment_ids_by_submission_and_index = Hash[submissions_with_index_and_attachment_ids]
+    Hash[submissions_with_index_and_attachment_ids]
+  end
+  private_class_method :group_attachment_ids_by_submission_and_index
 
+  # use this method to pre-load the versioned_attachments for a bunch of
+  # submissions (avoids having O(N) attachment queries)
+  # NOTE: all submissions must belong to the same shard
+  def self.bulk_load_versioned_attachments(submissions, preloads: [:thumbnail, :media_object])
+    attachment_ids_by_submission_and_index = group_attachment_ids_by_submission_and_index(submissions)
     bulk_attachment_ids = attachment_ids_by_submission_and_index.values.flatten
 
-    if bulk_attachment_ids.empty?
-      attachments_by_id = {}
+    attachments_by_id = if bulk_attachment_ids.empty?
+      {}
     else
-      attachments_by_id = Attachment.where(:id => bulk_attachment_ids)
-                          .preload(preloads)
-                          .group_by(&:id)
+      Attachment.where(:id => bulk_attachment_ids).preload(preloads).group_by(&:id)
     end
 
     submissions.each_with_index do |s, index|
       s.versioned_attachments =
         attachments_by_id.values_at(*attachment_ids_by_submission_and_index[[s, index]]).flatten
+    end
+  end
+
+  # use this method to pre-load the versioned_originality_reports for a bunch of
+  # submissions (avoids having O(N) originality report queries)
+  # NOTE: all submissions must belong to the same shard
+  def self.bulk_load_versioned_originality_reports(submissions)
+    attachment_ids_by_submission_and_index = group_attachment_ids_by_submission_and_index(submissions)
+    bulk_attachment_ids = attachment_ids_by_submission_and_index.values.flatten
+
+    reports_by_assignment_id = if bulk_attachment_ids.empty?
+      {}
+    else
+      OriginalityReport.where(
+        submission_id: submissions.map(&:id), attachment_id: bulk_attachment_ids
+      ).group_by(&:attachment_id)
+    end
+
+    submissions.each_with_index do |s, index|
+      s.versioned_originality_reports =
+        reports_by_assignment_id.values_at(*attachment_ids_by_submission_and_index[[s, index]]).flatten.compact
     end
   end
 
@@ -1446,7 +1483,7 @@ class Submission < ActiveRecord::Base
     unless submission_type
       self.submission_type ||= "online_url" if self.url
       self.submission_type ||= "online_text_entry" if self.body
-      self.submission_type ||= "online_upload" if !self.attachments.empty?
+      self.submission_type ||= "online_upload" unless self.attachment_ids.blank?
     end
     true
   end
@@ -1469,6 +1506,9 @@ class Submission < ActiveRecord::Base
 
   scope :having_submission, -> { where("submissions.submission_type IS NOT NULL") }
   scope :without_submission, -> { where(submission_type: nil, workflow_state: "unsubmitted") }
+  scope :not_placeholder, -> {
+    where("submissions.submission_type IS NOT NULL or submissions.excused or submissions.score IS NOT NULL")
+  }
 
   scope :include_user, -> { preload(:user) }
 
@@ -1763,18 +1803,17 @@ class Submission < ActiveRecord::Base
   #  * submitted_at (Time)
   #  * score (Integer)
   #  * excused (Boolean)
+  #  * late_policy_status (String)
+  #  * accepted_at (Time)
   #
   module Tardiness
     def past_due?
-      return false if cached_due_date.nil?
-      check_time = submitted_at || Time.now
-      check_time -= 60.seconds if submission_type == 'online_quiz'
-      cached_due_date < check_time
+      minutes_late > 0
     end
     alias_method :past_due, :past_due?
 
     def late?
-      submitted_at.present? && past_due?
+      accepted_at.present? && past_due?
     end
     alias_method :late, :late?
 
@@ -1784,16 +1823,28 @@ class Submission < ActiveRecord::Base
     end
     alias_method :missing, :missing?
 
-    # QUESTIONS ABOUT EXCUSED:
-    #   * what happens for group assignments? excuse individually
-    #     * can't excuse for group assignments in speedgrader 1.0
-    #     * TODO make sure Assignment#representatives is updated accordingly
-    #
-    # QUESTIONS FOR ME:
-    #   * are we messing up graded / not graded counts???
     def graded?
       excused || (!!score && workflow_state == 'graded')
     end
+
+    def minutes_late
+      # the submission cannot be late if it's been marked with 'none' or 'missing'
+      return 0.0 if ['none', 'missing'].include?(late_policy_status)
+      return 0.0 if cached_due_date.nil? || time_of_submission <= cached_due_date
+
+      (time_of_submission - cached_due_date) / 60
+    end
+
+    def accepted_at
+      read_attribute(:accepted_at) || submitted_at
+    end
+
+    def time_of_submission
+      time = accepted_at || Time.zone.now
+      time -= 60.seconds if submission_type == 'online_quiz'
+      time
+    end
+    private :time_of_submission
   end
   include Tardiness
 

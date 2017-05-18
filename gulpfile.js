@@ -13,6 +13,9 @@ const STUFF_TO_REV = [
   'public/javascripts/vendor/ie11-polyfill.js',
   'public/javascripts/vendor/lato-fontfaceobserver.js',
 
+  // this is used by the include_account_js call in mobile_auth.html.erb to make sure '$' is there for accounts' custom js files
+  'public/javascripts/symlink_to_node_modules/jquery/jquery.js',
+
   // when using webpack, we put a script tag for these directly on the page out-of-band from webpack
   'public/javascripts/vendor/timezone/**/*',
 

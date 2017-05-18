@@ -1,11 +1,26 @@
+#
+# Copyright (C) 2015 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative '../../helpers/gradezilla_common'
 require_relative '../page_objects/gradezilla_page'
 
 describe "Gradezilla - permissions" do
   include_context "in-process server selenium tests"
   include GradezillaCommon
-
-  let(:gradezilla_page) { Gradezilla::MultipleGradingPeriods.new }
 
   context "as an admin" do
 
@@ -23,7 +38,7 @@ describe "Gradezilla - permissions" do
                           :account => Account.default,
                           :role => role)
 
-      gradezilla_page.visit(course)
+      Gradezilla.visit(course)
       expect_no_flash_message :error
     end
 
@@ -38,7 +53,7 @@ describe "Gradezilla - permissions" do
                           :account => Account.default,
                           :role => role)
 
-      gradezilla_page.visit(course)
+      Gradezilla.visit(course)
       expect_no_flash_message :error
     end
   end
@@ -56,7 +71,7 @@ describe "Gradezilla - permissions" do
       disable_view_all_grades
       concluded_course = course_with_ta_logged_in
       concluded_course.conclude
-      gradezilla_page.visit(@course)
+      Gradezilla.visit(@course)
       expect(f('#unauthorized_message')).to be_displayed
     end
   end

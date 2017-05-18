@@ -1,4 +1,23 @@
+/*
+ * Copyright (C) 2016 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!custom_help_link'
 import $ from 'jquery'
 import CustomHelpLinkIcons from './CustomHelpLinkIcons'
@@ -13,10 +32,10 @@ import 'compiled/jquery.rails_flash_notifications'
 
   const CustomHelpLinkSettings = React.createClass({
     propTypes: {
-      name: React.PropTypes.string,
-      links: React.PropTypes.arrayOf(CustomHelpLinkPropTypes.link),
-      defaultLinks: React.PropTypes.arrayOf(CustomHelpLinkPropTypes.link),
-      icon: React.PropTypes.string
+      name: PropTypes.string,
+      links: PropTypes.arrayOf(CustomHelpLinkPropTypes.link),
+      defaultLinks: PropTypes.arrayOf(CustomHelpLinkPropTypes.link),
+      icon: PropTypes.string
     },
     getDefaultProps () {
       return {
@@ -56,10 +75,12 @@ import 'compiled/jquery.rails_flash_notifications'
 
     // define handlers here so that we don't create one for each render
     handleMoveUp (link) {
-      this.move(link, -1);
+      // if we are moving an element to the top slot, focus the previous component
+      // instead of moving focus forward to the move-down button (see CNVS-35393)
+      this.move(link, -1, (link.index === 1) ? this.focusPreviousComponent : this.focus.bind(this, link.id, 'moveUp'));
     },
     handleMoveDown (link) {
-      this.move(link, 1, this.focus.bind(this, link.id));
+      this.move(link, 1, this.focus.bind(this, link.id, 'moveDown'));
     },
     handleEdit (link) {
       this.edit(link);
@@ -87,13 +108,13 @@ import 'compiled/jquery.rails_flash_notifications'
       const links = this.state.links;
 
       const nextIndex = function (i) {
-        return (i < links.length - 1) ? i + 1 : 0;
+        return (i > 0) ? i - 1 : null;
       }
 
       let focusable;
       let index = nextIndex(start);
 
-      while (!focusable && index !== start) {
+      while (!focusable && index !== null) {
         const id = links[index].id
 
         if (this.links[id].focusable()) {
@@ -103,13 +124,19 @@ import 'compiled/jquery.rails_flash_notifications'
         index = nextIndex(index);
       }
 
-      return focusable || 'addLink'
+      return focusable;
     },
 
     focus (linkId, action) {
-      const link = this.links[linkId];
-
-      link.focus(action);
+      if (linkId) {
+        const link = this.links[linkId];
+        link.focus(action);
+      } else {
+        this.focusPreviousComponent();
+      }
+    },
+    focusPreviousComponent () {
+      $('#custom_help_link_settings input[name="account[settings][help_link_icon]"]:checked')[0].focus();
     },
     cancelEdit (link) {
       this.setState({
@@ -161,16 +188,16 @@ import 'compiled/jquery.rails_flash_notifications'
       this.setState({
         links,
         editing: (editing === link.id) ? null : editing
-      }, this.focus.bind(this, this.nextFocusable(link.index)));
+      }, this.focus.bind(this, this.nextFocusable(link.index), 'remove'));
     },
-    move (link, change) {
+    move (link, change, callback) {
       const links = [...this.state.links];
 
       links.splice(link.index + change, 0, links.splice(link.index, 1)[0]);
 
       this.setState({
         links: links
-      });
+      }, callback);
     },
 
     validate (link) {

@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2016 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 define([
   'react',
   'react-dom',
@@ -37,14 +55,12 @@ define([
         id: '17'
       }
       subject = TestUtils.renderIntoDocument(
-        <Avatar
-          user={{...user}} courseId="1" canMasquerade
-        />
+        <Avatar user={user} courseId="1" canMasquerade />
       )
 
       const avatar = TestUtils.findRenderedComponentWithType(subject, InstUIAvatar)
-      equal(avatar.props.userName, user.name)
-      equal(avatar.props.userImgUrl, user.avatar_url)
+      equal(avatar.props.name, user.name)
+      equal(avatar.props.src, user.avatar_url)
       const componentNode = ReactDOM.findDOMNode(subject)
       const link = componentNode.querySelector('a')
       equal(link.getAttribute('href'), '/courses/1/users/17')

@@ -748,6 +748,12 @@ describe AssignmentOverridesController, type: :request do
         expect(@override.set).to eq [@other_student]
       end
 
+      it "should not change the title when only changing the due date" do
+        api_update_override(@course, @assignment, @override, :assignment_override => { :due_at => 1.day.from_now })
+        @override.reload
+        expect(@override.title).to eq @title
+      end
+
       it "should relock modules when changing overrides" do
         # but only for the students they affect
         @assignment.only_visible_to_overrides = true

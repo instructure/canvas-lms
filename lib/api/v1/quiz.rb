@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -31,6 +31,7 @@ module Api::V1::Quiz
       ip_filter
       lock_at
       lockdown_browser_monitor_data
+      locked
       one_question_at_a_time
       one_time_results
       only_visible_to_overrides

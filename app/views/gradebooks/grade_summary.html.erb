@@ -1,4 +1,22 @@
 <%
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<%
   js_bundle :grade_summary, :rubric_assessment
   css_bundle :grade_summary
   content_for :page_title, join_title(t(:page_title, "Grades for %{student}", :student => @presenter.student_name), @context.name)
@@ -90,15 +108,8 @@
     <div id="course-selector-dropdown" style="margin-left: 10px; float: left;" class="course_selector">
     <label for="course_url"><%= t(:for_course, "For the course") %></label>
     <select id="course_url">
-      <% @presenter.selectable_courses.each do |course| %>
-        <%
-           url = if course.grants_any_right?(@current_user, :manage_grades, :view_all_grades)
-             context_url(course, :context_student_grades_url, @presenter.student_id)
-           else
-             context_url(course, :context_grades_url)
-           end
-        %>
-        <option value="<%= url %>" <%= 'selected' if course == @context %>><%= course.nickname_for(@current_user) %></option>
+      <% @presenter.courses_with_grades.each do |course| %>
+        <option value="<%= context_url(course, :context_grades_url) %>" <%= 'selected' if course == @context %>><%= course.nickname_for(@current_user) %></option>
       <% end %>
     </select>
     </div>
@@ -230,6 +241,10 @@
             <% end %>
           </span>
           <div style="display: none;">
+            <!-- Store the original points so we don't need to parse and guess at locale -->
+            <span class="original_points">
+              <%= submission&.published_score %>
+            </span>
             <!-- Store the original score so that we can retrieve it after any "What-If" calculations -->
             <span class="original_score">
               <%= assignment_presenter.display_score %>
@@ -251,11 +266,11 @@
           </div>
         </div>
       </td>
-      <td class="possible points_possible" <%= "colspan='2'".html_safe if assignment.special_class %>>
+      <td class="possible points_possible">
         <%= n(round_if_whole(assignment.points_possible)) %>
       </td>
-      <% if !assignment.special_class %>
       <td class="details">
+        <% if !assignment.special_class %>
         <a href="#"
             class="toggle_final_grade_info tooltip"
             aria-label="<%= t('This assignment does not count toward the final grade.') %>"
@@ -381,8 +396,8 @@
             </a>
           </span>
         <% end %>
-      </td>
       <% end %>
+      </td>
     </tr>
     <%# always add row (even if empty) so javascript references work %>
     <tr id="final_grade_info_<%= assignment.id %>"

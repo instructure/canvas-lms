@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -367,6 +367,7 @@ describe ExternalToolsController do
         @tool.save!
 
         @course.name = 'a course'
+        @course.course_code = 'CS 124'
         @course.save!
       end
 
@@ -379,6 +380,7 @@ describe ExternalToolsController do
         expect(lti_launch.params['lti_message_type']).to eq 'ContentItemSelectionRequest'
         expect(lti_launch.params['content_item_return_url']).to eq "http://test.host/courses/#{@course.id}/external_content/success/external_tool_dialog"
         expect(lti_launch.params['accept_multiple']).to eq 'false'
+        expect(lti_launch.params['context_label']).to eq @course.course_code
       end
 
       it "sets proper return data for migration_selection" do
@@ -1206,6 +1208,22 @@ describe ExternalToolsController do
       end
     end
 
+  end
+
+  describe "PUT 'update'" do
+    it 'updates tool with tool_configuration[prefer_sis_email] param' do
+      @tool = new_valid_tool(@course)
+      user_session(@teacher)
+
+      put :update, course_id: @course.id, external_tool_id: @tool.id, external_tool: { tool_configuration: { prefer_sis_email: "true" } }, format: 'json'
+
+      expect(response).to be_success
+
+      json = json_parse(response.body)
+
+      expect(json['tool_configuration']).to be_truthy
+      expect(json['tool_configuration']['prefer_sis_email']).to eq 'true'
+    end
   end
 
   describe "'GET 'generate_sessionless_launch'" do

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -201,7 +201,7 @@ class SubmissionsApiController < ApplicationController
                                                            @current_user, section_ids)
                         .pluck(:user_id)
                     end
-      submissions = @assignment.submissions.where(user_id: student_ids).preload(:originality_reports)
+      submissions = @assignment.submissions.not_placeholder.where(user_id: student_ids).preload(:originality_reports)
 
       if includes.include?("visibility")
         json = bulk_process_submissions_for_visibility(submissions, includes)
@@ -368,7 +368,7 @@ class SubmissionsApiController < ApplicationController
                         "assignments.workflow_state != 'deleted'"
                       )
                     end
-      submissions = submissions_scope.preload(:originality_reports).to_a
+      submissions = submissions_scope.not_placeholder.preload(:originality_reports).to_a
       bulk_load_attachments_and_previews(submissions)
       submissions_for_user = submissions.group_by(&:user_id)
 
@@ -417,7 +417,7 @@ class SubmissionsApiController < ApplicationController
       order_by = params[:order] == "graded_at" ? "graded_at" : :id
       order_direction = params[:order_direction] == "descending" ? "desc nulls last" : "asc"
       order = "#{order_by} #{order_direction}"
-      submissions = @context.submissions.except(:order).where(:user_id => student_ids).order(order)
+      submissions = @context.submissions.not_placeholder.except(:order).where(user_id: student_ids).order(order)
       submissions = submissions.where(:assignment_id => assignments) unless assignments.empty?
       submissions = submissions.preload(:user, :originality_reports)
 
@@ -566,6 +566,12 @@ class SubmissionsApiController < ApplicationController
   # @argument submission[excuse] [Boolean]
   #   Sets the "excused" status of an assignment.
   #
+  # @argument submission[late_policy_status] [String]
+  #   Sets the late policy status to either "late", "missing", "none", or null.
+  #
+  # @argument submission[accepted_at] [iso8601 Timestamp]
+  #   Sets the accepted at if late policy status is "late"
+  #
   # @argument rubric_assessment [RubricAssessment]
   #   Assign a rubric assessment to this assignment submission. The
   #   sub-parameters here depend on the rubric for the assignment. The general
@@ -610,8 +616,7 @@ class SubmissionsApiController < ApplicationController
     @user = get_user_considering_section(params[:user_id])
 
     authorized = false
-    @submission = @assignment.submissions.where(user_id: @user).first ||
-      @assignment.submissions.build(user: @user)
+    @submission = @assignment.submissions.find_or_create_by!(user: @user)
 
     if params[:submission] || params[:rubric_assessment]
       authorized = authorized_action(@submission, @current_user, :grade)
@@ -624,6 +629,12 @@ class SubmissionsApiController < ApplicationController
       if params[:submission].is_a?(ActionController::Parameters)
         submission[:grade] = params[:submission].delete(:posted_grade)
         submission[:excuse] = params[:submission].delete(:excuse)
+        if params[:submission].key?(:late_policy_status)
+          submission[:late_policy_status] = params[:submission].delete(:late_policy_status)
+        end
+        if params[:submission].key?(:accepted_at)
+          submission[:accepted_at] = params[:submission].delete(:accepted_at)
+        end
         submission[:provisional] = value_to_boolean(params[:submission][:provisional])
         submission[:final] = value_to_boolean(params[:submission][:final]) && @context.grants_right?(@current_user, :moderate_grades)
         if params[:submission][:submission_type] == 'basic_lti_launch' && (!@submission.has_submission? || @submission.submission_type == 'basic_lti_launch')
@@ -642,6 +653,13 @@ class SubmissionsApiController < ApplicationController
       else
         @submission = @assignment.find_or_create_submission(@user) if @submission.new_record?
         @submissions ||= [@submission]
+      end
+      if submission.key?(:late_policy_status)
+        @submission.late_policy_status = submission[:late_policy_status]
+        if @submission.late_policy_status == 'late' && submission[:accepted_at].present?
+          @submission.accepted_at = Time.zone.parse(submission[:accepted_at])
+        end
+        @submission.save!
       end
 
       assessment = params[:rubric_assessment]
@@ -732,7 +750,7 @@ class SubmissionsApiController < ApplicationController
       students = Api.paginate(student_scope, self, api_v1_course_assignment_gradeable_students_url(@context, @assignment))
       if (include_pg = includes.include?('provisional_grades'))
         return unless authorized_action(@context, @current_user, :moderate_grades)
-        submissions = @assignment.submissions.where(user_id: students).preload(:provisional_grades).index_by(&:user_id)
+        submissions = @assignment.submissions.not_placeholder.where(user_id: students).preload(:provisional_grades).index_by(&:user_id)
         selections = @assignment.moderated_grading_selections.where(student_id: students).index_by(&:student_id)
       end
       render :json => students.map { |student|
@@ -908,7 +926,7 @@ class SubmissionsApiController < ApplicationController
   def change_topic_read_state(new_state)
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @user = get_user_considering_section(params[:user_id])
-    @submission = @assignment.submissions.where(user_id: @user).first || @assignment.submissions.build(user: @user)
+    @submission = @assignment.submissions.find_or_create_by!(user: @user)
 
     render_state_change_result @submission.change_read_state(new_state, @current_user)
   end

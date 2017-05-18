@@ -1,6 +1,24 @@
+/*
+ * Copyright (C) 2016 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import I18n from 'i18n!roster'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import PropTypes from 'prop-types'
 import Modal, {ModalHeader, ModalBody, ModalFooter} from 'instructure-ui/lib/components/Modal'
 import Heading from 'instructure-ui/lib/components/Heading'
 import Button from 'instructure-ui/lib/components/Button'
@@ -46,25 +64,25 @@ import APIError from './api_error'
     // TODO: deal with defaut props after the warmfix to keep this change small
     /* eslint-disable react/require-default-props */
     static propTypes = {
-      isOpen: React.PropTypes.bool,
-      validateUsers: React.PropTypes.func.isRequired,
-      enrollUsers: React.PropTypes.func.isRequired,
-      onClose: React.PropTypes.func,
+      isOpen: PropTypes.bool,
+      validateUsers: PropTypes.func.isRequired,
+      enrollUsers: PropTypes.func.isRequired,
+      onClose: PropTypes.func,
       // these props are generated from store state
-      courseParams: React.PropTypes.shape(courseParamsShape),
-      apiState: React.PropTypes.shape(apiStateShape),
-      inputParams: React.PropTypes.shape(inputParamsShape),
-      userValidationResult: React.PropTypes.shape(validateResultShape),
-      usersToBeEnrolled: React.PropTypes.arrayOf(React.PropTypes.shape(personReadyToEnrollShape)),
+      courseParams: PropTypes.shape(courseParamsShape),
+      apiState: PropTypes.shape(apiStateShape),
+      inputParams: PropTypes.shape(inputParamsShape),
+      userValidationResult: PropTypes.shape(validateResultShape),
+      usersToBeEnrolled: PropTypes.arrayOf(PropTypes.shape(personReadyToEnrollShape)),
       // these are props generated from actions
-      setInputParams: React.PropTypes.func,
-      chooseDuplicate: React.PropTypes.func,
-      enqueueNewForDuplicate: React.PropTypes.func,
-      skipDuplicate: React.PropTypes.func,
-      enqueueNewForMissing: React.PropTypes.func,
-      resolveValidationIssues: React.PropTypes.func,
-      reset: React.PropTypes.func,
-      usersEnrolled: React.PropTypes.bool // eslint-disable-line react/no-unused-prop-types
+      setInputParams: PropTypes.func,
+      chooseDuplicate: PropTypes.func,
+      enqueueNewForDuplicate: PropTypes.func,
+      skipDuplicate: PropTypes.func,
+      enqueueNewForMissing: PropTypes.func,
+      resolveValidationIssues: PropTypes.func,
+      reset: PropTypes.func,
+      usersEnrolled: PropTypes.bool // eslint-disable-line react/no-unused-prop-types
                                           // it IS used in componentWillReceiveProps.
     };
     /* eslint-enable */

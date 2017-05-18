@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2012 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 module UserSearch
 
   def self.for_user_in_context(search_term, context, searcher, session=nil, options = {})
@@ -21,7 +38,9 @@ module UserSearch
         context.grants_right?(searcher, session, :manage_admin_users)
       restrict_search = true
     end
-    base_scope.where(conditions_statement(search_term, {:restrict_search => restrict_search}))
+    context.shard.activate do
+      base_scope.where(conditions_statement(search_term, {:restrict_search => restrict_search}))
+    end
   end
 
   def self.conditions_statement(search_term, options={})

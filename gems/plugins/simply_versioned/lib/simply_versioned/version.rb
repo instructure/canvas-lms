@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 # SimplyVersioned 0.9.3
 #
 # Simple ActiveRecord versioning
@@ -64,12 +81,26 @@ class Version < ActiveRecord::Base #:nodoc:
   end
 
   def self.preload_version_number(versionables)
-    versionables = Array(versionables)
+    versionables = Array(versionables).select(&:persisted?)
     return unless versionables.any?
-    data = self.all.polymorphic_where(:versionable => versionables).group(:versionable_type, :versionable_id).maximum(:number)
-    versionables.each do |v|
-      count = data[[v.class.base_class.name, v.id]] || 0
-      v.instance_variable_set(:@preloaded_current_version_number, count)
+    Shackles.activate(:slave) do
+      Shard.partition_by_shard(versionables) do |shard_objs|
+        shard_objs.each_slice(100) do |sliced_objs|
+          values = sliced_objs.map{|o| "(#{o.id}, '#{o.class.base_class.name}')"}.join(",")
+          query = "SELECT (SELECT max (vo.number) FROM #{Version.quoted_table_name} vo WHERE vo.versionable_id = v.versionable_id AND vo.versionable_type = v.versionable_type)
+            AS maximum_number, v.versionable_type, v.versionable_id FROM (VALUES #{values}) AS v (versionable_id, versionable_type)"
+
+          data = {}
+          rows = self.connection.select_rows(query)
+          rows.each do |max, v_type, v_id|
+            data[[v_type, v_id.to_i]] = max.to_i
+          end
+          sliced_objs.each do |v|
+            count = data[[v.class.base_class.name, v.id]] || 0
+            v.instance_variable_set(:@preloaded_current_version_number, count)
+          end
+        end
+      end
     end
   end
 

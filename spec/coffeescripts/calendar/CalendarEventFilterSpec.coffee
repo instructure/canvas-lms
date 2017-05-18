@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2016 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 define [
   'compiled/calendar/CommonEvent'
   'compiled/calendar/commonEventFactory'
@@ -5,7 +22,7 @@ define [
   'helpers/fakeENV'
 ], (CommonEvent, commonEventFactory, CalendarEventFilter, fakeENV) ->
 
-  test_events = (can_edit, child_events_count, available_slots = 1, reserved = false) ->
+  test_events = (can_edit, child_events_count, available_slots = 1, reserved = false, past_slot = false) ->
     [
       commonEventFactory
         id: "1"
@@ -29,8 +46,8 @@ define [
       commonEventFactory
         id: "20"
         title: "Appointment Slot"
-        start_at: "2016-08-29T11:00:00Z"
-        end_at: "2016-08-29T11:30:00Z"
+        start_at: "#{(new Date).getFullYear() + (if past_slot then -1 else 1)}-08-29T11:00:00Z"
+        end_at:   "#{(new Date).getFullYear() + (if past_slot then -1 else 1)}-08-29T11:30:00Z"
         workflow_state: "active"
         type: "event"
         description: ""
@@ -103,6 +120,12 @@ define [
 
   test 'CalendarEventFilter: hides already-reserved appointments that still have available slots', ->
     events = test_events(false, 0, 1, true)
+    filteredEvents = CalendarEventFilter(null, events, {inFindAppointmentMode: true, selectedCourse: {id: 1, asset_string: 'course_1'}})
+    equal filteredEvents.length, 1
+    equal filteredEvents[0].id, 'calendar_event_1'
+
+  test 'CalendarEventFilter: hides past appointments', ->
+    events = test_events(false, 0, 1, false, true)
     filteredEvents = CalendarEventFilter(null, events, {inFindAppointmentMode: true, selectedCourse: {id: 1, asset_string: 'course_1'}})
     equal filteredEvents.length, 1
     equal filteredEvents[0].id, 'calendar_event_1'

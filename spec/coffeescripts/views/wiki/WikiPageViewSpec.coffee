@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2013 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 define [
   'underscore'
   'compiled/models/WikiPage'
@@ -77,6 +94,28 @@ define [
       model: model
     ok !!view.toJSON().lock_info?.unlock_at.match('Feb'), 'lock_info.unlock_at reformatted and represented in toJSON'
     clock.restore()
+
+  test 'useAsFrontPage for published wiki_pages_path', ->
+    model = new WikiPage
+      front_page: false
+      published: true
+    view = new WikiPageView
+      model: model
+    stub = @stub(model, 'setFrontPage')
+
+    view.useAsFrontPage()
+    ok stub.calledOnce
+
+  test 'useAsFrontPage should not work on unpublished wiki_pages_path', ->
+    model = new WikiPage
+      front_page: false
+      published: false
+    view = new WikiPageView
+      model: model
+    stub = @stub(model, 'setFrontPage')
+
+    view.useAsFrontPage()
+    notOk stub.calledOnce
 
   testRights = (subject, options) ->
     test "#{subject}", ->

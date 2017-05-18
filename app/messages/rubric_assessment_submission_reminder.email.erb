@@ -3,10 +3,10 @@
 <% end %>
 
 <% define_content :subject do %>
-  <%= t :subject, "Reminder to Assess: %{rubric}, %{context}", :rubric => asset.rubric_association.title, :context => asset.rubric_association.context.name %>
+  <%= t :subject, "Reminder to Assess: %{rubric}, %{context}", :rubric => asset.submission.assignment.title, :context => asset.rubric_association.context.name %>
 <% end %>
 
-<%= t :body, "You've been reminded to assess: %{rubric}, %{context}:", :rubric => asset.rubric_association.title, :context => asset.rubric_association.context.name %>
+<%= t :body, "You've been reminded to assess: %{rubric}, %{context}:", :rubric => asset.submission.assignment.title, :context => asset.rubric_association.context.name %>
 
 <%= t :link_message, "You can review the assessment and submit your entry here:" %>
 <%= content :link %>

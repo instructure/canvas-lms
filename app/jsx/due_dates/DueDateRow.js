@@ -1,5 +1,24 @@
+/*
+ * Copyright (C) 2015 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import _ from 'underscore'
 import React from 'react'
+import PropTypes from 'prop-types'
 import DueDateTokenWrapper from 'jsx/due_dates/DueDateTokenWrapper'
 import DueDateCalendars from 'jsx/due_dates/DueDateCalendars'
 import DueDateRemoveRowLink from 'jsx/due_dates/DueDateRemoveRowLink'
@@ -10,22 +29,22 @@ import $ from 'jquery'
   var DueDateRow = React.createClass({
 
     propTypes: {
-      overrides: React.PropTypes.array.isRequired,
-      rowKey: React.PropTypes.string.isRequired,
-      dates: React.PropTypes.object.isRequired,
-      students: React.PropTypes.object.isRequired,
-      sections: React.PropTypes.object.isRequired,
-      groups: React.PropTypes.object.isRequired,
-      validDropdownOptions: React.PropTypes.array.isRequired,
-      handleDelete: React.PropTypes.func.isRequired,
-      handleTokenAdd: React.PropTypes.func.isRequired,
-      handleTokenRemove: React.PropTypes.func.isRequired,
-      defaultSectionNamer: React.PropTypes.func.isRequired,
-      replaceDate: React.PropTypes.func.isRequired,
-      canDelete: React.PropTypes.bool.isRequired,
-      currentlySearching: React.PropTypes.bool.isRequired,
-      allStudentsFetched: React.PropTypes.bool.isRequired,
-      inputsDisabled: React.PropTypes.bool.isRequired
+      overrides: PropTypes.array.isRequired,
+      rowKey: PropTypes.string.isRequired,
+      dates: PropTypes.object.isRequired,
+      students: PropTypes.object.isRequired,
+      sections: PropTypes.object.isRequired,
+      groups: PropTypes.object.isRequired,
+      validDropdownOptions: PropTypes.array.isRequired,
+      handleDelete: PropTypes.func.isRequired,
+      handleTokenAdd: PropTypes.func.isRequired,
+      handleTokenRemove: PropTypes.func.isRequired,
+      defaultSectionNamer: PropTypes.func.isRequired,
+      replaceDate: PropTypes.func.isRequired,
+      canDelete: PropTypes.bool.isRequired,
+      currentlySearching: PropTypes.bool.isRequired,
+      allStudentsFetched: PropTypes.bool.isRequired,
+      inputsDisabled: PropTypes.bool.isRequired
     },
 
     // --------------------

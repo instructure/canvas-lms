@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -257,32 +257,41 @@ class ApplicationController < ActionController::Base
   helper_method :setup_master_course_restrictions
 
   def set_master_course_js_env_data(object, course)
-    return unless object.respond_to?(:master_course_api_restriction_data)
+    return unless object.respond_to?(:master_course_api_restriction_data) && object.persisted?
     status = setup_master_course_restrictions([object], course)
     return unless status
     # we might have to include more information about the object here to make it easier to plug a common component in
     data = object.master_course_api_restriction_data(status)
     if status == :master
-      data[:default_restrictions] = MasterCourses::MasterTemplate.full_template_for(course).default_restrictions
+      data[:default_restrictions] = MasterCourses::MasterTemplate.full_template_for(course).default_restrictions_for(object)
     end
     js_env(:MASTER_COURSE_DATA => data)
   end
   helper_method :set_master_course_js_env_data
 
-  def load_master_course_sidebar
-    return unless @context && @context.is_a?(Course) && master_courses? && MasterCourses::MasterTemplate.is_master_course?(@context) && @context.grants_right?(@current_user, :manage)
-    js_bundle :blueprint_course_settings
-    css_bundle :blueprint_course_settings
-    js_env({
-      BLUEPRINT_SETTINGS_DATA: {
-        accountId: @context.account.id,
-        course: @context.slice(:id, :name),
-        subAccounts: @context.account.sub_accounts.pluck(:id, :name).map{|id, name| {id: id, name: name}},
-        terms: @context.account.root_account.enrollment_terms.active.pluck(:id, :name).map{|id, name| {id: id, name: name}}
-      }
-    })
+  def load_blueprint_courses_ui
+    return unless @context && @context.is_a?(Course) && master_courses? && @context.grants_right?(@current_user, :manage)
+
+    is_child = MasterCourses::ChildSubscription.is_child_course?(@context)
+    is_master = MasterCourses::MasterTemplate.is_master_course?(@context)
+
+    return unless is_master || is_child
+
+    js_bundle :blueprint_courses
+    css_bundle :blueprint_courses
+
+    master_course = is_master ? @context : @context.master_course_subscriptions.active.first.master_template.course
+    js_env :BLUEPRINT_COURSES_DATA => {
+      isMasterCourse: is_master,
+      isChildCourse: is_child,
+      accountId: @context.account.id,
+      masterCourse: master_course.slice(:id, :name, :enrollment_term_id),
+      course: @context.slice(:id, :name, :enrollment_term_id),
+      subAccounts: @context.account.sub_accounts.pluck(:id, :name).map{|id, name| {id: id, name: name}},
+      terms: @context.account.root_account.enrollment_terms.active.pluck(:id, :name).map{|id, name| {id: id, name: name}}
+    }
   end
-  helper_method :load_master_course_sidebar
+  helper_method :load_blueprint_courses_ui
 
   def editing_restricted?(content, edit_type=:any)
     return false unless master_courses? && content.respond_to?(:editing_restricted?)
@@ -587,7 +596,7 @@ class ApplicationController < ActionController::Base
   def require_context
     get_context
     if !@context
-      if request.path.match(/\A\/profile/)
+      if @context_is_current_user
         store_location
         redirect_to login_url
       elsif params[:context_id]
@@ -664,6 +673,7 @@ class ApplicationController < ActionController::Base
         @context = api_find(CourseSection, params[:course_section_id])
       elsif request.path.match(/\A\/profile/) || request.path == '/' || request.path.match(/\A\/dashboard\/files/) || request.path.match(/\A\/calendar/) || request.path.match(/\A\/assignments/) || request.path.match(/\A\/files/) || request.path == '/api/v1/calendar_events/visible_contexts'
         # ^ this should be split out into things on the individual controllers
+        @context_is_current_user = true
         @context = @current_user
         @context_membership = @context
       end
@@ -1120,7 +1130,8 @@ class ApplicationController < ActionController::Base
   end
 
   def log_gets
-    if @page_view && !request.xhr? && request.get? && ((response.content_type || "").to_s.match(/html/))
+    if @page_view && !request.xhr? && request.get? && (((response.content_type || "").to_s.match(/html/)) ||
+      (Setting.get('create_get_api_page_views', 'true') == 'true') && api_request?)
       @page_view.render_time ||= (Time.now.utc - @page_before_render) rescue nil
       @page_view_update = true
     end
@@ -2025,11 +2036,6 @@ class ApplicationController < ActionController::Base
       hash[:COURSE_TITLE] = @context.name
     end
 
-    if opts[:show_announcements]
-      hash[:SHOW_ANNOUNCEMENTS] = true
-      hash[:ANNOUNCEMENT_LIMIT] = @context.home_page_announcement_limit
-    end
-
     if @page
       if @context.wiki.grants_right?(@current_user, :manage)
         mc_status = setup_master_course_restrictions(@page, @context)
@@ -2040,11 +2046,11 @@ class ApplicationController < ActionController::Base
       hash[:WIKI_PAGE_SHOW_PATH] = named_context_url(@context, :context_wiki_page_path, @page)
       hash[:WIKI_PAGE_EDIT_PATH] = named_context_url(@context, :edit_context_wiki_page_path, @page)
       hash[:WIKI_PAGE_HISTORY_PATH] = named_context_url(@context, :context_wiki_page_revisions_path, @page)
+    end
 
-      if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :read)
-        hash[:COURSE_ID] = @context.id
-        hash[:MODULES_PATH] = polymorphic_path([@context, :context_modules])
-      end
+    if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :read)
+      hash[:COURSE_ID] = @context.id.to_s
+      hash[:MODULES_PATH] = polymorphic_path([@context, :context_modules])
     end
 
     js_env hash

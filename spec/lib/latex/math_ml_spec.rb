@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2016 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require 'spec_helper'
 
 describe Latex::MathMl do
@@ -73,6 +90,26 @@ describe Latex::MathMl do
             body: mml_doc
           ))
           expect(math_ml.parse).to be_empty
+        end
+      end
+
+      context 'integral request id' do
+        let(:request_id) { 5 }
+
+        it "doesn't throw an error" do
+          CanvasHttp.expects(:get).
+            with(service_url, {
+              'X-Request-Context-Id' => Canvas::Security.base64_encode('5'),
+              'X-Request-Context-Signature' => Canvas::Security.base64_encode(Canvas::Security.sign_hmac_sha512('5'))
+            }).
+            returns(
+              OpenStruct.new(
+                status: '200',
+                body: mml_doc
+              )
+            )
+
+          math_ml.parse
         end
       end
     end

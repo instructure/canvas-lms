@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -856,7 +856,7 @@ describe FilesController do
       expect(json['id']).to eql(assigns[:attachment].id)
       expect(json['upload_url']).not_to be_nil
       expect(json['upload_params']).to be_present
-      expect(json['upload_params']['AWSAccessKeyId']).to eq 'stub_id'
+      expect(json['upload_params']['x-amz-credential']).to start_with('stub_id')
     end
 
     it "should not allow going over quota for file uploads" do
@@ -890,7 +890,7 @@ describe FilesController do
       expect(json['id']).to eql(assigns[:attachment].id)
       expect(json['upload_url']).not_to be_nil
       expect(json['upload_params']).to be_present
-      expect(json['upload_params']['AWSAccessKeyId']).to eq 'stub_id'
+      expect(json['upload_params']['x-amz-credential']).to start_with('stub_id')
     end
 
     it "should associate assignment submission for a group assignment with the group" do
@@ -981,6 +981,26 @@ describe FilesController do
       expect(assigns[:attachment]).not_to be_nil
       expect(assigns[:attachment].context).to eq group
       expect(assigns[:attachment].folder).to be_for_submissions
+    end
+
+    it "does not require usage rights for group submissions to be visible to students" do
+      @course.root_account.enable_feature! :submissions_folder
+      @course.root_account.enable_feature! :usage_rights_required
+      user_session(@student)
+      category = group_category
+      assignment = @course.assignments.create(:group_category => category, :submission_types => 'online_upload')
+      group = category.groups.create(:context => @course)
+      group.add_user(@student)
+      user_session(@student)
+      post 'create_pending', {:attachment => {
+        :context_code => @course.asset_string,
+        :asset_string => assignment.asset_string,
+        :intent => 'submit',
+        :filename => "bob.txt"
+      }}
+      expect(response).to be_success
+      expect(assigns[:attachment]).not_to be_nil
+      expect(assigns[:attachment]).not_to be_locked
     end
 
     context "sharding" do

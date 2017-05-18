@@ -26,3 +26,4 @@
 .mce-menu-item:hover .mce-text,.mce-menu-item.mce-selected .mce-text{color:#333}
 .mce-window .mce-container-body { background: #fff; }
 .mce-window .mce-foot .mce-container-body { background: #f3f3f3; }
+.mce-tab:focus {outline: 0.1em solid #3498db; outline-offset: -0.2em;}

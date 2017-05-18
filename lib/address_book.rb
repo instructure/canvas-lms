@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2016 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 # manually require since ::MessageableUser satisfies
 # AddressBook::MessageableUser and prevents the autoload
 require_relative 'address_book/messageable_user'
@@ -51,7 +68,25 @@ module AddressBook
     end
   end
 
+  def self.decompose_context(context_code)
+    context_code &&
+    context_code =~ ::MessageableUser::Calculator::CONTEXT_RECIPIENT &&
+    Regexp.last_match.to_a[1..-1]
+  end
+
   def self.valid_context?(context_code)
-    context_code =~ ::MessageableUser::Calculator::CONTEXT_RECIPIENT
+    decompose_context(context_code).present?
+  end
+
+  def self.load_context(context_code)
+    context_type, context_id = decompose_context(context_code)
+    return nil unless context_id
+    context_class =
+      case context_type
+      when 'course' then Course
+      when 'section' then CourseSection
+      when 'group' then Group
+      end
+    context_class.find(context_id)
   end
 end

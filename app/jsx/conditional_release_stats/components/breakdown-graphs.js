@@ -1,9 +1,28 @@
+/*
+ * Copyright (C) 2016 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import React from 'react'
+import PropTypes from 'prop-types'
 import Spinner from 'instructure-ui/lib/components/Spinner'
 import I18n from 'i18n!cyoe_assignment_sidebar'
 import {transformScore} from 'jsx/shared/conditional_release/score'
 import BarGraph from './breakdown-graph-bar'
-  const { object, array, func, number, bool } = React.PropTypes
+  const { object, array, func, number, bool } = PropTypes
 
   class BreakdownGraphs extends React.Component {
     static propTypes = {
@@ -13,6 +32,7 @@ import BarGraph from './breakdown-graph-bar'
       isLoading: bool.isRequired,
 
       // actions
+      openSidebar: func.isRequired,
       selectRange: func.isRequired,
     }
 
@@ -30,15 +50,17 @@ import BarGraph from './breakdown-graph-bar'
     }
 
     renderBars () {
-      return this.props.ranges.map((bucket, i, ranges) => (
+      const { ranges, assignment, enrolled, openSidebar, selectRange } = this.props
+      return ranges.map(({ size, scoring_range }, i) => (
         <BarGraph
           key={i}
           rangeIndex={i}
-          rangeStudents={bucket.size}
-          totalStudents={this.props.enrolled}
-          upperBound={transformScore(bucket.scoring_range.upper_bound, this.props.assignment, true)}
-          lowerBound={transformScore(bucket.scoring_range.lower_bound, this.props.assignment, false)}
-          selectRange={this.props.selectRange}
+          rangeStudents={size}
+          totalStudents={enrolled}
+          upperBound={transformScore(scoring_range.upper_bound, assignment, true)}
+          lowerBound={transformScore(scoring_range.lower_bound, assignment, false)}
+          openSidebar={openSidebar}
+          selectRange={selectRange}
         />
       ))
     }

@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2017 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative '../../helpers/gradezilla_common'
 require_relative '../../helpers/groups_common'
 require_relative '../page_objects/gradezilla_page'
@@ -6,8 +23,6 @@ describe "Gradezilla - Assignment Column Options" do
   include_context "in-process server selenium tests"
   include GradezillaCommon
   include GroupsCommon
-
-  let(:gradezilla_page) { Gradezilla::MultipleGradingPeriods.new }
 
   before(:once) do
     course_with_teacher(active_all: true)
@@ -37,26 +52,26 @@ describe "Gradezilla - Assignment Column Options" do
     it "sorts by Missing" do
       third_student = @course.students.find_by!(name: 'Student 3')
       @assignment.submissions.find_by!(user: third_student).destroy!
-      gradezilla_page.visit(@course)
-      gradezilla_page.open_assignment_options_and_select_by(
+      Gradezilla.visit(@course)
+      Gradezilla.open_assignment_options_and_select_by(
         assignment_id: @assignment.id,
         menu_item_id: 'sort-by-missing'
       )
 
-      expect(gradezilla_page.student_names).to eq ["Student 3", "Student 1", "Student 2"]
+      expect(Gradezilla.student_names).to eq ["Student 3", "Student 1", "Student 2"]
     end
 
     it "sorts by Late" do
       third_student = @course.students.find_by!(name: 'Student 3')
       submission = @assignment.submissions.find_by!(user: third_student)
       submission.update!(submitted_at: 2.days.from_now) # make late
-      gradezilla_page.visit(@course)
-      gradezilla_page.open_assignment_options_and_select_by(
+      Gradezilla.visit(@course)
+      Gradezilla.open_assignment_options_and_select_by(
         assignment_id: @assignment.id,
         menu_item_id: 'sort-by-late'
       )
 
-      expect(gradezilla_page.student_names).to eq ["Student 3", "Student 1", "Student 2"]
+      expect(Gradezilla.student_names).to eq ["Student 3", "Student 1", "Student 2"]
     end
   end
 end

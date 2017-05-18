@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -182,6 +182,13 @@ class ErrorReport < ActiveRecord::Base
 
   def url=(val)
     write_attribute(:url, LoggingFilter.filter_uri(val))
+  end
+
+  def safe_url?
+    uri = URI.parse(url)
+    ['http', 'https'].include?(uri.scheme)
+  rescue
+    false
   end
 
   def guess_email

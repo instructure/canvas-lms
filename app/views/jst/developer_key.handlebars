@@ -28,23 +28,33 @@
     <td>
         <div class="details">
             <div>
-               {{#t "identifier"}}ID: {{id}}{{/t}}
+               {{#t}}ID: {{id}}{{/t}}
             </div>
             <div>
-               {{#t "api_key"}}Key: <span class='api_key'>{{api_key}}</span>{{/t}}
+               {{#t}}Key: <span class='api_key'>{{api_key}}</span>{{/t}}
             </div>
             <div>
                 {{#if redirect_uri}}
-                    {{#t "redirect_uri"}}URI: {{redirect_uri}}{{/t}}
+                    {{#t}}URI: {{redirect_uri}}{{/t}}
                 {{/if}}
             </div>
         </div>
     </td>
     <td>
         <div>
-            {{#t "created"}}Created:{{/t}} {{datetimeFormatted created_at}}
+          {{#t}}Access Token Count: {{access_token_count}}{{/t}}
         </div>
-        <!-- TODO: Add some better stats here, like token count, last usage, etc. -->
+        <div>
+            {{#t}}Created:{{/t}} {{datetimeFormatted created_at}}
+        </div>
+        <div>
+            {{#t}}Last Used:{{/t}} {{#ifExists last_used_at}}{{last_used_at}}{{else}}Never{{/ifExists}}
+        </div>
+    </td>
+    <td class='notes'>
+      <div>
+        {{#t}}{{notes}}{{/t}}
+      </div>
     </td>
     <td class='links'>
         <a href="#" class="edit_link" aria-label="{{#t}}Edit key {{name}}{{/t}}" title="{{#t "edit_key"}}Edit this key{{/t}}"><i class="icon-edit standalone-icon"></i></a>
@@ -53,6 +63,6 @@
         {{else}}
           <a href="#" role="checkbox" aria-checked="true" aria-label="{{#t}}Activate key {{name}}{{/t}}" class="deactivate_link" title="{{#t}}Deactivate this key{{/t}}"><i class="icon-lock standalone-icon"></i></a>
         {{/if}}
-        <a href="#" class="delete_link" aria-label="{{#t}}Delete key {{name}}{{/t}}" title="{{#t "delete_key"}}Delete this key{{/t}}"><i class="icon-trash standalone-icon"></i></a>
+        <a href="#" class="delete_link" title="{{#t}}Delete this key{{/t}}"><i class="icon-trash standalone-icon"></i></a>
     </td>
 </tr>

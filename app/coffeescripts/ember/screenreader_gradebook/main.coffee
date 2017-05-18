@@ -1,8 +1,25 @@
+#
+# Copyright (C) 2017 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 define [
   "ember",
   "compiled/ember/screenreader_gradebook/config/app",
   "compiled/ember/screenreader_gradebook/config/routes",
-  "compiled/ember/screenreader_gradebook/components/assignment_group_grades_component",
+  "compiled/ember/screenreader_gradebook/components/assignment_subtotal_grades_component",
   "compiled/ember/screenreader_gradebook/components/assignment_muter_component",
   "compiled/ember/screenreader_gradebook/components/custom_column_cell_component",
   "compiled/ember/screenreader_gradebook/components/fast_select_component",
@@ -19,7 +36,7 @@ define [
   "compiled/ember/screenreader_gradebook/templates/assignment_information/details",
   "compiled/ember/screenreader_gradebook/templates/assignment_information/index",
   "compiled/ember/screenreader_gradebook/templates/assignments",
-  "compiled/ember/screenreader_gradebook/templates/components/assignment-group-grades",
+  "compiled/ember/screenreader_gradebook/templates/components/assignment-subtotal-grades",
   "compiled/ember/screenreader_gradebook/templates/components/custom-column-cell",
   "compiled/ember/screenreader_gradebook/templates/components/final-grade",
   "compiled/ember/screenreader_gradebook/templates/components/grading-cell",
@@ -40,14 +57,14 @@ define [
   "compiled/ember/screenreader_gradebook/templates/settings/mastery_toggles_and_actions",
   "compiled/ember/screenreader_gradebook/templates/settings/section_select",
   "compiled/ember/screenreader_gradebook/templates/settings/sort_select",
-  "compiled/ember/screenreader_gradebook/templates/student_information/assignment_groups",
+  "compiled/ember/screenreader_gradebook/templates/student_information/assignment_subtotals",
   "compiled/ember/screenreader_gradebook/templates/student_information/details",
   "compiled/ember/screenreader_gradebook/templates/student_information/index"
 ], (
   Ember,
   App,
   routes,
-  AssignmentGroupGradesComponent,
+  AssignmentSubtotalGradesComponent,
   AssignmentMuterComponent,
   CustomColumnCellComponent,
   FastSelectComponent,
@@ -67,7 +84,7 @@ define [
       application.Router.map(routes)
 
   App.reopen({
-    AssignmentGroupGradesComponent: AssignmentGroupGradesComponent
+    AssignmentSubtotalGradesComponent: AssignmentSubtotalGradesComponent
     AssignmentMuterComponent: AssignmentMuterComponent
     CustomColumnCellComponent: CustomColumnCellComponent
     FastSelectComponent: FastSelectComponent

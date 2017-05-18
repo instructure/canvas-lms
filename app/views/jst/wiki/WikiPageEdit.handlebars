@@ -1,23 +1,34 @@
 <div class="edit-content">
   <div class="edit-header">
     {{#if CAN.EDIT_TITLE}}
-      <label for="title" class="screenreader-only">{{#t "title_label"}}Page Title{{/t}}</label>
-      <input id="title" name="title" type="text" class="span4 title" value="{{title}}" maxlength="255" autofocus>
+      {{#if content_is_locked}}
+        <h1>{{title}}</h1>
+        <input name="title" type="hidden" value="{{title}}">
+      {{else}}
+        <label for="title" class="screenreader-only">{{#t "title_label"}}Page Title{{/t}}</label>
+        <input id="title" name="title" type="text" class="span4 title" value="{{title}}" maxlength="255" autofocus>
+      {{/if}}
     {{else}}
       <h2>{{title}}</h2>
     {{/if}}
-    <div class="switch_views_container">
-      <div class="help_dialog"></div>
-      <a href="#" class="switch_views">
-        {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
-      </a>
-      <a href="#" class="switch_views" style="display:none;">
-        {{#t "#editor.switch_editor_rich_text"}}Rich Content Editor{{/t}}
-      </a>
-    </div>
+    {{#unless content_is_locked}}
+      <div class="switch_views_container">
+        <div class="help_dialog"></div>
+        <a href="#" class="switch_views">
+          {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
+        </a>
+        <a href="#" class="switch_views" style="display:none;">
+          {{#t "#editor.switch_editor_rich_text"}}Rich Content Editor{{/t}}
+        </a>
+      </div>
+    {{/unless}}
   </div>
 
-  <textarea id="wiki_page_body" rows="20" cols="40" name="body" class="body" aria-hidden="true"{{#unless PAGE_RIGHTS.update}} autofocus{{/unless}}>{{convertApiUserContent body forEditing=1}}</textarea>
+  {{#if content_is_locked}}
+    {{{body}}}
+  {{else}}
+    <textarea id="wiki_page_body" rows="20" cols="40" name="body" class="body" aria-hidden="true"{{#unless PAGE_RIGHTS.update}} autofocus{{/unless}}>{{convertApiUserContent body forEditing=1}}</textarea>
+  {{/if}}
 
   {{#if CAN.EDIT_ROLES}}
     <div class="control-group options">
@@ -35,6 +46,29 @@
           {{/if}}
         </select>
       </div>
+      {{#if ENV.student_planner_enabled}}
+        <div class="controls">
+          <label for="student_planner_checkbox" class="checkbox">
+          <input value="1" type="checkbox" id="student_planner_checkbox" name="student_planner_checkbox" {{checkedIf todo_date}} />
+            {{#t}}Add to student to-do{{/t}}
+          </label>
+          <div id="todo_date_container">
+            <label class="screenreader-only" for="todo_date" id="student_planner_accessible_label">
+              {{#t}}Student Planner Date:{{/t}}
+              {{datepickerScreenreaderPrompt}}
+            </label>
+            <input type="text"
+                   class="datetime_field input-medium"
+                   name="student_todo_at"
+                   id="todo_date"
+                   aria-labelledby="student_planner_accessible_label"
+                   {{! TODO: what would be the best way to get this formatted right? }}
+                   value="{{datetimeFormatted todo_date}}"
+                   data-tooltip='{"position":"top","force_position":"true"}'
+                   title="{{accessibleDateFormat}}"/>
+          </div>
+        </div>
+      {{/if}}
       {{#if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED}}
         <div class="controls">
           <label class="checkbox" for="conditional_content">

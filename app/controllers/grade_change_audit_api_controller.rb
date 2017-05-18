@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2013 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,9 +19,6 @@
 # @API Grade Change Log
 #
 # Query audit log of grade change events.
-#
-# Only available if the server has configured audit logs; will return 404 Not
-# Found response otherwise.
 #
 # For each endpoint, a compound document is returned. The primary collection of
 # event objects is paginated, ordered by date descending. Secondary collections

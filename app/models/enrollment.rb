@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2015 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -1305,7 +1305,8 @@ class Enrollment < ActiveRecord::Base
   end
 
   def update_assignment_overrides_if_needed
-    if self.workflow_state == 'deleted' && self.workflow_state_was != 'deleted'
+    being_deleted = self.workflow_state == 'deleted' && self.workflow_state_was != 'deleted'
+    if being_deleted && !enrollments_exist_for_user_in_course?
       assignment_ids = Assignment.where(context_id: self.course_id, context_type: 'Course').pluck(:id)
       return unless assignment_ids
 
@@ -1324,6 +1325,10 @@ class Enrollment < ActiveRecord::Base
   end
 
   private
+
+  def enrollments_exist_for_user_in_course?
+    Enrollment.active.where(user_id: self.user_id, course_id: self.course_id).exists?
+  end
 
   def copy_scores_from_existing_enrollment
     Score.where(enrollment_id: self).each(&:destroy_permanently!)

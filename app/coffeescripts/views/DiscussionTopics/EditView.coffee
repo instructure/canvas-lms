@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2012 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 define [
   'i18n!discussion_topics'
   'compiled/views/ValidatedFormView'
@@ -67,6 +84,9 @@ define [
       '#discussion-edit-view' : '$discussionEditView'
       '#discussion-details-tab' : '$discussionDetailsTab'
       '#conditional-release-target' : '$conditionalReleaseTarget'
+      '#todo_options': '$todoOptions'
+      '#todo_date_input': '$todoDateInput'
+      '#allow_todo_date': '$allowTodoDate'
 
     events: _.extend(@::events,
       'click .removeAttachment' : 'removeAttachment'
@@ -76,6 +96,7 @@ define [
       'change #discussion_topic_assignment_points_possible' : 'handlePointsChange'
       'change' : 'onChange'
       'tabsbeforeactivate #discussion-edit-view' : 'onTabChange'
+      'change #allow_todo_date' : 'toggleTodoDateInput'
     )
 
     messages:
@@ -93,6 +114,8 @@ define [
         @unwatchUnload()
         @redirectAfterSave()
       super
+
+      @lockedItems = options.lockedItems || {}
 
     redirectAfterSave: ->
       window.location = @locationAfterSave(deparam())
@@ -133,6 +156,8 @@ define [
         isLargeRoster: ENV?.IS_LARGE_ROSTER || false
         threaded: data.discussion_type is "threaded"
         inClosedGradingPeriod: @assignment.inClosedGradingPeriod()
+        lockedItems: @lockedItems
+        allow_todo_date: data.todo_date?
       json.assignment = json.assignment.toView()
       json
 
@@ -151,22 +176,24 @@ define [
 
     # also separated for easy stubbing
     loadNewEditor: ($textarea)->
+      return if @lockedItems.content
       RichContentEditor.loadNewEditor($textarea, { focus: true, manageParent: true})
 
     render: =>
       super
       $textarea = @$('textarea[name=message]').attr('id', _.uniqueId('discussion-topic-message'))
 
-      RichContentEditor.initSidebar()
-      _.defer =>
-        @loadNewEditor($textarea)
-        $('.rte_switch_views_link').click (event) ->
-          event.preventDefault()
-          event.stopPropagation()
-          RichContentEditor.callOnRCE($textarea, 'toggle')
-          # hide the clicked link, and show the other toggle link.
-          # todo: replace .andSelf with .addBack when JQuery is upgraded.
-          $(event.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle()
+      unless @lockedItems.content
+        RichContentEditor.initSidebar()
+        _.defer =>
+          @loadNewEditor($textarea)
+          $('.rte_switch_views_link').click (event) ->
+            event.preventDefault()
+            event.stopPropagation()
+            RichContentEditor.callOnRCE($textarea, 'toggle')
+            # hide the clicked link, and show the other toggle link.
+            # todo: replace .andSelf with .addBack when JQuery is upgraded.
+            $(event.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle()
       if @assignmentGroupCollection
         (@assignmentGroupFetchDfd ||= @assignmentGroupCollection.fetch()).done @renderAssignmentGroupOptions
 
@@ -248,13 +275,18 @@ define [
 
     getFormData: ->
       data = super
-      for dateField in ['last_reply_at', 'posted_at', 'delayed_post_at', 'lock_at']
+      dateFields = ['last_reply_at', 'posted_at', 'delayed_post_at', 'lock_at']
+      dateFields.push 'todo_date' if ENV.STUDENT_PLANNER_ENABLED
+      for dateField in dateFields
         data[dateField] = $.unfudgeDateForProfileTimezone(data[dateField])
       data.title ||= I18n.t 'default_discussion_title', 'No Title'
       data.discussion_type = if data.threaded is '1' then 'threaded' else 'side_comment'
       data.podcast_has_student_posts = false unless data.podcast_enabled is '1'
       data.only_graders_can_rate = false unless data.allow_rating is '1'
       data.sort_by_rating = false unless data.allow_rating is '1'
+      data.allow_todo_date = '0' if data.assignment?.set_assignment is '1'
+      data.todo_date = null unless data.allow_todo_date is '1'
+
       unless ENV?.IS_LARGE_ROSTER
         data = @groupCategorySelector.filterFormData data
 
@@ -272,8 +304,8 @@ define [
       if assign_data?.set_assignment is '1'
         data.set_assignment = '1'
         data.assignment = @updateAssignment(assign_data)
-        data.delayed_post_at = ''
-        data.lock_at = ''
+        # code used to set delayed_post_at = locked_at = '', but that broke
+        # saving a locked graded discussion.  Leaving them as they were didn't break anything
       else
         # Announcements don't have assignments.
         # DiscussionTopics get a model created for them in their
@@ -371,6 +403,8 @@ define [
 
       if !ENV?.IS_LARGE_ROSTER && @isTopic()
         errors = @groupCategorySelector.validateBeforeSave(data, errors)
+      if data.allow_todo_date == '1' && data.todo_date == null
+        errors['todo_date'] = [{type: 'date_required_error', message: I18n.t('You must enter a date')}]
 
       if @isAnnouncement()
         unless data.message?.length > 0
@@ -391,6 +425,7 @@ define [
         postToSIS: post_to_sis
         maxNameLength: max_name_length
         name: data.title
+        maxNameLengthRequired: ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT
       })
 
       if validationHelper.nameTooLong()
@@ -425,6 +460,7 @@ define [
     toggleGradingDependentOptions: ->
       @toggleAvailabilityOptions()
       @toggleConditionalReleaseTab()
+      @toggleTodoDateBox()
 
     toggleAvailabilityOptions: ->
       if @$useForGrading.is(':checked')
@@ -442,6 +478,18 @@ define [
         else
           @$discussionEditView.tabs("option", "disabled", [1])
           @$discussionEditView.tabs("option", "active", 0)
+
+    toggleTodoDateBox: ->
+      if @$useForGrading.is(':checked')
+        @$todoOptions.hide()
+      else
+        @$todoOptions.show()
+
+    toggleTodoDateInput: ->
+      if @$allowTodoDate.is(':checked')
+        @$todoDateInput.show()
+      else
+        @$todoDateInput.hide()
 
     onChange: ->
       if @showConditionalRelease() && @assignmentUpToDate

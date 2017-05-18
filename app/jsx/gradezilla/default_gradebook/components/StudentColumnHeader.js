@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid'
 import { MenuItem, MenuItemGroup, MenuItemSeparator } from 'instructure-ui/lib/components/Menu'
 import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
@@ -24,13 +25,14 @@ import Typography from 'instructure-ui/lib/components/Typography'
 import StudentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/StudentRowHeaderConstants'
 import I18n from 'i18n!gradebook'
 
-const { arrayOf, bool, func, oneOf, shape, string } = React.PropTypes;
+const { arrayOf, bool, func, oneOf, shape, string } = PropTypes;
 
 export default class StudentColumnHeader extends React.Component {
   static propTypes = {
     selectedPrimaryInfo: oneOf(StudentRowHeaderConstants.primaryInfoKeys).isRequired,
     onSelectPrimaryInfo: func.isRequired,
     loginHandleName: string,
+    sisName: string,
     selectedSecondaryInfo: oneOf(StudentRowHeaderConstants.secondaryInfoKeys).isRequired,
     sectionsEnabled: bool.isRequired,
     onSelectSecondaryInfo: func.isRequired,
@@ -47,7 +49,8 @@ export default class StudentColumnHeader extends React.Component {
   };
 
   static defaultProps = {
-    loginHandleName: null
+    loginHandleName: null,
+    sisName: null,
   };
 
   constructor (props) {
@@ -174,7 +177,7 @@ export default class StudentColumnHeader extends React.Component {
               selected={this.props.selectedSecondaryInfo === 'sis_id'}
               onSelect={this.onShowSisId}
             >
-              {StudentRowHeaderConstants.secondaryInfoLabels.sis_id}
+              {this.props.sisName || StudentRowHeaderConstants.secondaryInfoLabels.sis_id}
             </MenuItem>
 
             <MenuItem

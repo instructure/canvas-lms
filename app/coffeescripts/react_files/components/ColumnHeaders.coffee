@@ -1,9 +1,27 @@
+#
+# Copyright (C) 2014 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 define [
   'i18n!react_files'
   'underscore'
   'react'
+  'prop-types'
   'compiled/fn/preventDefault'
-], (I18n, _, React, preventDefault) ->
+], (I18n, _, React, PropTypes, preventDefault) ->
 
   columns = [
     displayName: I18n.t('name', 'Name')
@@ -39,9 +57,9 @@ define [
     columns: columns
 
     propTypes:
-      query: React.PropTypes.object.isRequired
-      toggleAllSelected: React.PropTypes.func.isRequired
-      areAllItemsSelected: React.PropTypes.func.isRequired
+      query: PropTypes.object.isRequired
+      toggleAllSelected: PropTypes.func.isRequired
+      areAllItemsSelected: PropTypes.func.isRequired
 
     getInitialState: ->
       return {

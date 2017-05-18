@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2015 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 // we have these mini apps in "client_apps" that used to be ember apps that
 // got built on their own before the primary build ran.  This Plugin
 // takes care of taking their package-specific shims that require Core
@@ -16,6 +34,14 @@ class clientAppPlugin {
           // which added up-to-date normal lodash via 'lodash'
           if (request === 'lodash') {
             request = 'underscore'
+          }
+
+          // Without this, whenever something in canvas_quizzes requires 'jquery' it will get the
+          // jquery 2.0 that is in client_apps/canvas_quizzes/node_modules/jquery (that gets put
+          // there because its a dep of jasmine_react), instead of
+          // the jquery 1.7.2 from canvas' node_modules dir
+          if (request === 'jquery') {
+            request = require.resolve('jquery')
           }
         }
 

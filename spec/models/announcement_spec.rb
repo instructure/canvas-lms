@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -158,6 +158,24 @@ describe Announcement do
       announcement_model(:user => @teacher)
 
       expect(@a.messages_sent[notification_name]).to be_blank
+    end
+
+    it "should not broadcast if student's section is soft-concluded" do
+      course_with_student(:active_all => true)
+      section2 = @course.course_sections.create!
+      other_student = user_factory(:active_all => true)
+      @course.enroll_student(other_student, :section => section2, :enrollment_state => 'active')
+      section2.update_attributes(:start_at => 2.months.ago, :end_at => 1.month.ago, :restrict_enrollments_to_section_dates => true)
+
+      notification_name = "New Announcement"
+      n = Notification.create(:name => notification_name, :category => "TestImmediately")
+      NotificationPolicy.create(:notification => n, :communication_channel => @student.communication_channel, :frequency => "immediately")
+
+      @context = @course
+      announcement_model(:user => @teacher)
+      to_users = @a.messages_sent[notification_name].map(&:user)
+      expect(to_users).to include(@student)
+      expect(to_users).to_not include(other_student)
     end
   end
 end

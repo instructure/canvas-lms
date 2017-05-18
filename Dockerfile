@@ -69,4 +69,4 @@ RUN mkdir -p log \
   && chown -R docker:docker ${APP_HOME} /home/docker
 
 USER docker
-RUN bundle exec rake canvas:compile_assets
+RUN COMPILE_ASSETS_NPM_INSTALL=0 bundle exec rake canvas:compile_assets

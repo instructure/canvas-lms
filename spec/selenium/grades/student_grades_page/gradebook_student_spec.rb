@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2015 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative '../../helpers/gradebook_common'
 require_relative './gradebook_student_common'
 require_relative '../setup/gradebook_setup'
@@ -203,9 +220,13 @@ describe 'Student Gradebook' do
 
     it 'should display comments from a teacher on student grades page', priority: "1", test_id: 537621 do
       user_session(student)
-
       get "/courses/#{published_course.id}/grades"
-      fj('.toggle_comments_link .icon-discussion:first').click
+
+      student_grades_page.toggle_comment_module
+      unless f('.score_details_table').displayed?
+        # 1st click seems to fail on chrome 1 out of 5 times so adding a second click
+        student_grades_page.toggle_comment_module
+      end
       expect(fj('.score_details_table span:first')).to include_text('good job')
     end
 

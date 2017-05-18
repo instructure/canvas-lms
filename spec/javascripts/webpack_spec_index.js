@@ -1,6 +1,23 @@
+/*
+ * Copyright (C) 2015 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import 'vendor/ie11-polyfill.js'
-import ApplyTheme from 'instructure-ui/lib/components/ApplyTheme'
-import 'instructure-ui/lib/themes/canvas'
+import { canvas } from 'instructure-ui/lib/themes'
 import './support/sinon/sinon-qunit-1.0.0'
 
 const fixturesDiv = document.createElement('div')
@@ -10,12 +27,7 @@ document.body.appendChild(fixturesDiv)
 if (!window.ENV) window.ENV = {}
 
 // setup the inst-ui default theme
-if (ENV.use_high_contrast) {
-  ApplyTheme.setDefaultTheme('canvas-a11y')
-} else {
-  const brandvars = window.CANVAS_ACTIVE_BRAND_VARIABLES || {}
-  ApplyTheme.setDefaultTheme('canvas', brandvars)
-}
+canvas.use()
 
 function requireAll (requireContext) {
   return requireContext.keys().map(requireContext);

@@ -1,3 +1,21 @@
+<%
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
 <% 
   content_for :page_title, t("#titles.error_reports", "Error Reports")
   add_crumb t("#crumbs.error_reports", "Error Reports")
@@ -43,7 +61,14 @@
         <%= before_label :user, "user" %> <%= link_to report.user.try(:name), user_url(report.user_id) %><br />
       <% end %>
       <% if report.url.present? %>
-        <%= before_label :url, "url" %> <%= link_to report.url, report.url %><br />
+        <%= before_label :url, "url" %>
+        <%=
+          if report.safe_url?
+            link_to report.url, report.url
+          else
+            report.url
+          end
+        %><br />
       <% end %>
       <% if report.request_context_id %>
         <%= before_label :request_context_id, "request context id" %> <%= report.request_context_id %><br />

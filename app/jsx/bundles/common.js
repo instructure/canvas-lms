@@ -1,9 +1,26 @@
+/*
+ * Copyright (C) 2011 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 // true modules that we use in this file
 import $ from 'jquery'
 import _ from 'underscore'
 import I18n from 'i18n!common'
 import Backbone from 'Backbone'
-import helpDialog from 'compiled/helpDialog'
 import updateSubnavMenuToggle from 'jsx/subnav_menu/updateSubnavMenuToggle'
 import splitAssetString from 'compiled/str/splitAssetString'
 
@@ -11,7 +28,6 @@ import splitAssetString from 'compiled/str/splitAssetString'
 import 'translations/_core_en'
 import 'jquery.ajaxJSON'
 import 'jquery.google-analytics'
-import 'vendor/swfobject/swfobject'
 import 'reminders'
 import 'jquery.instructure_forms'
 import 'instructure'
@@ -28,7 +44,6 @@ import 'compiled/behaviors/instructure_inline_media_comment'
 import 'compiled/behaviors/ping'
 import 'LtiThumbnailLauncher'
 import 'compiled/badge_counts'
-import 'instructure-ui/lib/themes/canvas'
 
 // Other stuff several bundles use.
 // If any of these really arn't used on most pages,
@@ -41,8 +56,15 @@ import 'jqueryui/tabs'
 import 'compiled/registration/incompleteRegistrationWarning'
 import 'moment'
 
+$('html').removeClass('scripts-not-loaded')
 
-helpDialog.initTriggers()
+$('.help_dialog_trigger').click((event) => {
+  event.preventDefault()
+  require.ensure([], (require) => {
+    const helpDialog = require('compiled/helpDialog')
+    helpDialog.open()
+  }, 'helpDialogAsyncChunk')
+})
 
 $('#skip_navigation_link').on('click', function (event) {
   // preventDefault so we dont change the hash

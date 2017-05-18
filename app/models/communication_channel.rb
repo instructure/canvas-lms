@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -105,20 +105,30 @@ class CommunicationChannel < ActiveRecord::Base
     ].sort_by{ |a| Canvas::ICU.collation_key(a[1]) }
   end
 
+  DEFAULT_SMS_CARRIERS = {
+      'txt.att.net' => { name: 'AT&T', country_code: 1 }.with_indifferent_access.freeze,
+      'message.alltel.com' => { name: 'Alltel', country_code: 1 }.with_indifferent_access.freeze,
+      'myboostmobile.com' => { name: 'Boost', country_code: 1 }.with_indifferent_access.freeze,
+      'cspire1.com' => { name: 'C Spire', country_code: 1 }.with_indifferent_access.freeze,
+      'cingularme.com' => { name: 'Cingular', country_code: 1 }.with_indifferent_access.freeze,
+      'mobile.celloneusa.com' => { name: 'CellularOne', country_code: 1 }.with_indifferent_access.freeze,
+      'sms.mycricket.com' => { name: 'Cricket', country_code: 1 }.with_indifferent_access.freeze,
+      'messaging.nextel.com' => { name: 'Nextel', country_code: 1 }.with_indifferent_access.freeze,
+      'messaging.sprintpcs.com' => { name: 'Sprint PCS', country_code: 1 }.with_indifferent_access.freeze,
+      'tmomail.net' => { name: 'T-Mobile', country_code: 1 }.with_indifferent_access.freeze,
+      'vtext.com' => { name: 'Verizon', country_code: 1 }.with_indifferent_access.freeze,
+      'vmobl.com' => { name: 'Virgin Mobile', country_code: 1 }.with_indifferent_access.freeze,
+  }.freeze
+
   def self.sms_carriers
-    @sms_carriers ||= Canvas::ICU.collate_by((ConfigFile.load('sms', false) ||
-        { 'AT&T' => 'txt.att.net',
-          'Alltel' => 'message.alltel.com',
-          'Boost' => 'myboostmobile.com',
-          'C Spire' => 'cspire1.com',
-          'Cingular' => 'cingularme.com',
-          'CellularOne' => 'mobile.celloneusa.com',
-          'Cricket' => 'sms.mycricket.com',
-          'Nextel' => 'messaging.nextel.com',
-          'Sprint PCS' => 'messaging.sprintpcs.com',
-          'T-Mobile' => 'tmomail.net',
-          'Verizon' => 'vtext.com',
-          'Virgin Mobile' => 'vmobl.com' }), &:first)
+    @sms_carriers ||= ConfigFile.load('sms', false) || DEFAULT_SMS_CARRIERS
+  end
+
+  def self.sms_carriers_by_name
+    carriers = sms_carriers.map do |domain, carrier|
+      [carrier['name'], domain]
+    end
+    Canvas::ICU.collate_by(carriers, &:first)
   end
 
   set_policy do
@@ -260,11 +270,26 @@ class CommunicationChannel < ActiveRecord::Base
     @send_merge_notification = false
   end
 
-  def send_otp!(code)
+  def send_otp_via_sms_gateway!(message)
     m = self.messages.temp_record
     m.to = self.path
-    m.body = t :body, "Your Canvas verification code is %{verification_code}", :verification_code => code
+    m.body = message
     Mailer.create_message(m).deliver rescue nil # omg! just ignore delivery failures
+  end
+
+  def send_otp!(code, account = nil)
+    message = t :body, "Your Canvas verification code is %{verification_code}", :verification_code => code
+    if Setting.get('mfa_via_sms', true) == 'true' && e164_path && account&.feature_enabled?(:notification_service)
+      Services::NotificationService.process(
+        "otp:#{global_id}",
+        message,
+        "sms",
+        e164_path
+      )
+    else
+      send_later_if_production_enqueue_args(:send_otp_via_sms_gateway!,
+                                            priority: Delayed::HIGH_PRIORITY, max_attempts: 1)
+    end
   end
 
   # If you are creating a new communication_channel, do nothing, this just
@@ -488,5 +513,12 @@ class CommunicationChannel < ActiveRecord::Base
   def self.find_by_confirmation_code(code)
     where(confirmation_code: code).first
 
+  end
+
+  def e164_path
+    return path if path =~ /^\+\d+$/
+    return nil unless (match = path.match(/^(?<number>\d+)@(?<domain>.+)$/))
+    return nil unless (carrier = CommunicationChannel.sms_carriers[match[:domain]])
+    "+#{carrier['country_code']}#{match[:number]}"
   end
 end

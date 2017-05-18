@@ -1,12 +1,26 @@
+#
+# Copyright (C) 2012 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative '../../helpers/gradezilla_common'
 require_relative '../page_objects/gradezilla_page'
 
 describe "Gradezilla - group weights" do
   include_context "in-process server selenium tests"
-  include_context "gradebook_components"
   include GradezillaCommon
-
-  let(:gradezilla_page) { Gradezilla::MultipleGradingPeriods.new }
 
   def student_totals()
     totals = ff('.total-cell')
@@ -18,10 +32,10 @@ describe "Gradezilla - group weights" do
   end
 
   def toggle_group_weight
-    gradebook_settings_cog.click
+    gradezilla_page.settings_cog_select
     set_group_weights.click
     group_weighting_scheme.click
-    save_button.click
+    gradezilla_page.save_button_click
     wait_for_ajax_requests
   end
 
@@ -58,7 +72,7 @@ describe "Gradezilla - group weights" do
     @course.update_attributes(:group_weighting_scheme => 'points')
 
     # Displays total column as points
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     expect(student_totals).to eq(["25"])
   end
 
@@ -70,7 +84,7 @@ describe "Gradezilla - group weights" do
     @course.update_attributes(:group_weighting_scheme => 'percent')
 
     # Displays total column as points
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     expect(student_totals).to eq(["45%"])
   end
 
@@ -101,19 +115,19 @@ describe "Gradezilla - group weights" do
     end
 
     it 'should display a warning icon for assignments with 0 points possible', priority: '1', test_id: 164013 do
-      gradezilla_page.visit(@course)
+      Gradezilla.visit(@course)
       expect(ff('.Gradebook__ColumnHeaderDetail svg[name="IconWarningSolid"]').size).to eq(1)
     end
 
     it 'should display a warning icon in the total column', priority: '1', test_id: 164013 do
-      gradezilla_page.visit(@course)
+      Gradezilla.visit(@course)
       expect(ff('.gradebook-cell .icon-warning').count).to eq(1)
     end
 
     it 'should not display warning icons if group weights are turned off', priority: "1", test_id: 305579 do
       @course.apply_assignment_group_weights = false
       @course.save!
-      gradezilla_page.visit(@course)
+      Gradezilla.visit(@course)
       expect(f("body")).not_to contain_css('.icon-warning')
     end
 
@@ -124,7 +138,7 @@ describe "Gradezilla - group weights" do
         "svg[name=IconMutedSolid]"
       ].join(' ')
 
-      gradezilla_page.visit(@course)
+      Gradezilla.visit(@course)
       toggle_muting(@assignment2)
       expect(f("#content")).to contain_jqcss('.total-cell .icon-muted')
       expect(f("#content")).to contain_jqcss(header_mute_icon_selector)
@@ -140,7 +154,7 @@ describe "Gradezilla - group weights" do
         "svg[name=IconMutedSolid]"
       ].join(' ')
 
-      gradezilla_page.visit(@course)
+      Gradezilla.visit(@course)
       toggle_muting(@assignment2)
       expect(f("#content")).not_to contain_jqcss('.total-cell .icon-muted')
       expect(f("#content")).not_to contain_jqcss(header_mute_icon_selector)

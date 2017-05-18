@@ -55,8 +55,8 @@ describe 'Submissions API', type: :request do
             :format => 'json', :course_id => @course.id.to_s,
             :assignment_id => @assignment.id.to_s, :user_id => student.id.to_s },
           { :include => %w(submission_history submission_comments rubric_assessment) })
-    expect(json.delete('id')).to eq nil
     expect(json).to eq({
+      "id" => @assignment.submissions.find_by!(user: student).id,
       "assignment_id" => @assignment.id,
       "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}?preview=1&version=0",
       "user_id"=>student.id,
@@ -72,9 +72,11 @@ describe 'Submissions API', type: :request do
       "submission_comments"=>[],
       "grade_matches_current_submission"=>nil,
       "score"=>nil,
-      "workflow_state"=>nil,
+      "workflow_state"=>"unsubmitted",
       "late"=>false,
       "graded_at"=>nil,
+      "late_policy_status"=>nil,
+      "accepted_at"=>nil
     })
   end
 
@@ -698,7 +700,7 @@ describe 'Submissions API', type: :request do
         "body"=>"test!",
         "assignment_id" => a1.id,
         "submitted_at"=>"1970-01-01T01:00:00Z",
-        "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=2",
+        "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=1",
         "grade_matches_current_submission"=>true,
         "attempt"=>1,
         "url"=>nil,
@@ -725,7 +727,9 @@ describe 'Submissions API', type: :request do
            "author_id"=>@teacher.id}],
         "score"=>13.5,
         "workflow_state"=>"graded",
-        "late"=>false})
+        "late"=>false,
+        "late_policy_status"=>nil,
+        "accepted_at"=>"1970-01-01T01:00:00Z"})
 
     # can't access other students' submissions
     @user = student2
@@ -799,7 +803,7 @@ describe 'Submissions API', type: :request do
     mock_kaltura.expects(:media_sources).returns([{:height => "240", :bitrate => "382", :isOriginal => "0", :width => "336", :content_type => "video/mp4",
                                                    :containerFormat => "isom", :url => "https://kaltura.example.com/some/url", :size =>"204", :fileExt=>"mp4"}])
 
-    submit_homework(a1, student1, :media_comment_id => "54321", :media_comment_type => "video")
+    submit_homework(a1, student1, submission_type: 'online_text_entry', media_comment_id: 54321, media_comment_type: "video")
     stub_kaltura
     json = api_call(:get,
           "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions.json",
@@ -866,7 +870,7 @@ describe 'Submissions API', type: :request do
         "body"=>"test!",
         "assignment_id" => a1.id,
         "submitted_at"=>"1970-01-01T03:00:00Z",
-        "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=4",
+        "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=3",
         "grade_matches_current_submission"=>true,
         "attachments" =>
          [
@@ -904,11 +908,13 @@ describe 'Submissions API', type: :request do
            "url"=>nil,
            "submission_type"=>"online_text_entry",
            "user_id"=>student1.id,
-           "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=2",
+           "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=1",
            "grade_matches_current_submission"=>nil,
            "score"=>nil,
            "workflow_state" => "submitted",
-           "late"=>false},
+           "late"=>false,
+           "late_policy_status"=>nil,
+           "accepted_at"=>"1970-01-01T01:00:00Z"},
           {"id"=>sub1.id,
            "grade"=>nil,
            "excused" => nil,
@@ -927,11 +933,13 @@ describe 'Submissions API', type: :request do
            "url"=>nil,
            "submission_type"=>"online_text_entry",
            "user_id"=>student1.id,
-           "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=3",
+           "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=2",
            "grade_matches_current_submission"=>nil,
            "score"=>nil,
            "workflow_state" => "submitted",
-           "late"=>false},
+           "late"=>false,
+           "late_policy_status"=>nil,
+           "accepted_at"=>"1970-01-01T02:00:00Z"},
           {"id"=>sub1.id,
            "grade"=>"A-",
            "excused" => false,
@@ -972,11 +980,13 @@ describe 'Submissions API', type: :request do
            "url"=>nil,
            "submission_type"=>"online_text_entry",
            "user_id"=>student1.id,
-           "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=4",
+           "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=3",
            "grade_matches_current_submission"=>true,
            "score"=>13.5,
            "workflow_state" => "graded",
-           "late"=>false}],
+           "late"=>false,
+           "late_policy_status"=>nil,
+           "accepted_at"=>"1970-01-01T03:00:00Z"}],
         "attempt"=>3,
         "url"=>nil,
         "submission_type"=>"online_text_entry",
@@ -1008,7 +1018,9 @@ describe 'Submissions API', type: :request do
            "display_name" => nil },
         "score"=>13.5,
         "workflow_state"=>"graded",
-        "late"=>false},
+        "late"=>false,
+        "late_policy_status"=>nil,
+        "accepted_at"=>"1970-01-01T03:00:00Z"},
        {"id"=>sub2.id,
         "grade"=>"F",
         "excused" => sub2.excused,
@@ -1016,7 +1028,7 @@ describe 'Submissions API', type: :request do
         "graded_at"=>sub2.graded_at.as_json,
         "assignment_id" => a1.id,
         "body"=>nil,
-        "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?preview=1&version=2",
+        "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?preview=1&version=1",
         "grade_matches_current_submission"=>true,
         "submitted_at"=>"1970-01-01T04:00:00Z",
         "submission_history"=>
@@ -1032,7 +1044,7 @@ describe 'Submissions API', type: :request do
            "url"=>"http://www.instructure.com",
            "submission_type"=>"online_url",
            "user_id"=>student2.id,
-           "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?preview=1&version=2",
+           "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?preview=1&version=1",
            "grade_matches_current_submission"=>true,
            "attachments" =>
             [
@@ -1060,7 +1072,9 @@ describe 'Submissions API', type: :request do
             ],
            "score"=>9,
            "workflow_state" => "graded",
-           "late"=>false}],
+           "late"=>false,
+           "late_policy_status"=>nil,
+           "accepted_at"=>"1970-01-01T04:00:00Z"}],
         "attempt"=>1,
         "url"=>"http://www.instructure.com",
         "submission_type"=>"online_url",
@@ -1094,7 +1108,9 @@ describe 'Submissions API', type: :request do
          {"crit2"=>{"comments"=>"Hmm", "points"=>2},
           "crit1"=>{"comments"=>nil, "points"=>7}},
         "workflow_state"=>"graded",
-        "late"=>false}]
+        "late"=>false,
+        "late_policy_status"=>nil,
+        "accepted_at"=>"1970-01-01T04:00:00Z"}]
     expect(json.sort_by { |h| h['user_id'] }).to eq res.sort_by { |h| h['user_id'] }
   end
 
@@ -2183,6 +2199,112 @@ describe 'Submissions API', type: :request do
       expect(json['excused']).to eq false
     end
 
+    it "can set late policy status on a submission" do
+      json = api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+        {
+          controller: 'submissions_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          user_id: @student.id.to_s
+        }, {
+          submission: {
+            late_policy_status: 'missing'
+          }
+        }
+      )
+
+      submission = @assignment.submission_for_student(@student)
+      expect(submission.late_policy_status).to eq 'missing'
+      expect(json['late_policy_status']).to eq 'missing'
+    end
+
+    it "can set accepted_at on a submission" do
+      accepted_at = 3.days.ago
+      json = api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+        {
+          controller: 'submissions_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          user_id: @student.id.to_s
+        }, {
+          submission: {
+            late_policy_status: 'late',
+            accepted_at: accepted_at.iso8601
+          }
+        }
+      )
+
+      submission = @assignment.submission_for_student(@student)
+      expect(submission.late_policy_status).to eq 'late'
+      expect(submission.accepted_at).to eq accepted_at.change(usec: 0)
+      expect(json['late_policy_status']).to eq 'late'
+      expect(json['accepted_at']).to eq accepted_at.change(usec: 0).iso8601
+    end
+
+    it "ignores accepted_at if late_policy_status is not late" do
+      accepted_at = 3.days.ago
+      json = api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+        {
+          controller: 'submissions_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          user_id: @student.id.to_s
+        }, {
+          submission: {
+            late_policy_status: 'missing',
+            accepted_at: accepted_at.iso8601
+          }
+        }
+      )
+
+      submission = @assignment.submission_for_student(@student)
+      expect(submission.late_policy_status).to eq 'missing'
+      expect(submission.accepted_at).to be_nil
+      expect(json['late_policy_status']).to eq 'missing'
+      expect(json['accepted_at']).to be_nil
+    end
+
+    it "can clear late_policy_status on a submission" do
+      @assignment.submissions.find_or_create_by!(user: @student).update!(
+        late_policy_status: 'late',
+        accepted_at: 3.days.ago
+      )
+      json = api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+        {
+          controller: 'submissions_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          user_id: @student.id.to_s
+        }, {
+          submission: {
+            late_policy_status: nil
+          }
+        }
+      )
+
+      submission = @assignment.submission_for_student(@student)
+      expect(submission.late_policy_status).to be_nil
+      expect(submission.accepted_at).to be_nil
+      expect(json['late_policy_status']).to be_nil
+      expect(json['accepted_at']).to be_nil
+    end
+
     it "creates a provisional grade and comment" do
       @assignment.update_attribute(:moderated_grading, true)
       submission = @assignment.submit_homework(@student, :body => 'what')
@@ -2815,6 +2937,7 @@ describe 'Submissions API', type: :request do
     @enrollment.update_attribute(:limit_privileges_to_course_section, true)
     @teacher = @user
     s1 = submission_model(:course => @course)
+    s1.update!(submission_type: 'online_text_entry')
     section2 = @course.course_sections.create(:name => "another section")
     s2 = submission_model(:course => @course, :username => 'otherstudent@example.com', :section => section2, :assignment => @assignment)
     @user = @teacher
@@ -3324,7 +3447,7 @@ describe 'Submissions API', type: :request do
       progress = Progress.find(json["id"])
       expect(progress.completed?).to be_truthy
 
-      expect(Submission.count).to eq 1
+      expect(Submission.not_placeholder.count).to eq 1
       s1 = student3.submissions.first
       expect(s1.grade).to eq "75%"
     end
@@ -3395,7 +3518,7 @@ describe 'Submissions API', type: :request do
       progress = Progress.find(json["id"])
       expect(progress.completed?).to be_truthy
 
-      expect(Submission.count).to eq 1
+      expect(Submission.not_placeholder.count).to eq 1
       s1 = @student1.submissions.first
       expect(s1.grade).to eq "75%"
     end
@@ -3709,7 +3832,7 @@ describe 'Submissions API', type: :request do
         group.add_user(student1)
         group.add_user(student2)
       end
-      let!(:submit_homework) { assignment.submit_homework(student1) }
+      let!(:submit_homework) { assignment.submit_homework(student1, submission_type: 'online_text_entry') }
 
       let(:path) { "/api/v1/courses/#{test_course.id}/assignments/#{assignment.id}/submissions" }
       let(:params) do

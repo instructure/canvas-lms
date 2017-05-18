@@ -1,4 +1,23 @@
+/*
+ * Copyright (C) 2016 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!student_context_tray'
 import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
 import StudentCardStore from './StudentCardStore'
@@ -20,11 +39,11 @@ import Tray from 'instructure-ui/lib/components/Tray'
 export default class StudentContextTray extends React.Component {
 
     static propTypes = {
-      courseId: React.PropTypes.string.isRequired,
-      studentId: React.PropTypes.string.isRequired,
-      store: React.PropTypes.instanceOf(StudentCardStore).isRequired,
-      onClose: React.PropTypes.func.isRequired,
-      returnFocusTo: React.PropTypes.func.isRequired
+      courseId: PropTypes.string.isRequired,
+      studentId: PropTypes.string.isRequired,
+      store: PropTypes.instanceOf(StudentCardStore).isRequired,
+      onClose: PropTypes.func.isRequired,
+      returnFocusTo: PropTypes.func.isRequired
     }
 
     static renderQuickLink (label, srLabel, url, showIf) {
@@ -34,7 +53,7 @@ export default class StudentContextTray extends React.Component {
             href={url}
             variant="ghost"
             size="small"
-            isBlock
+            fluidWidth
             aria-label={srLabel}
           >
             {label}
@@ -192,7 +211,7 @@ export default class StudentContextTray extends React.Component {
             closeButtonRef={this.getCloseButtonRef}
             isOpen={this.state.isOpen}
             onRequestClose={this.handleRequestClose}
-            placement='right'
+            placement='end'
             zIndex='1000'
             onClose={this.props.onClose}
           >

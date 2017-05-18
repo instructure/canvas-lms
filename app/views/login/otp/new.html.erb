@@ -1,4 +1,22 @@
 <%
+# Copyright (C) 2012 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<%
   css_bundle :otp_login
   js_bundle :otp_login
   @headers = false
@@ -26,7 +44,8 @@ Multi-factor authentication increases security by requiring that you have someth
 in addition to knowing your password, in order to log in to Canvas. This can be a device that can generate
 verification codes, or a phone that can receive text messages. The Google Authenticator app for [iPhone](%{iphone_url}) or
 [Android](%{android_url}) can be configured by scanning the QR Code below. Other tokens can be configured by entering the
-secret key **%{secret_key}**.
+secret key **%{secret_key}**. Once you have configured multi-factor authentication, it's recommend that you go to your
+profile page and print out a set of back up codes, in case your normal multi-factor device is unavailable.
           BODY
       %></p>
 
@@ -47,7 +66,7 @@ secret key **%{secret_key}**.
             </div>
             <div class="ic-Form-control">
               <%= f.blabel :carrier, :en => 'Carrier', :class => 'ic-Label' %>
-              <%= f.select :carrier, CommunicationChannel.sms_carriers, {}, { :class => 'ic-Input' } %>
+              <%= f.select :carrier, CommunicationChannel.sms_carriers_by_name, {}, { :class => 'ic-Input' } %>
             </div>
             <div class="control-group">
               <div class="controls">

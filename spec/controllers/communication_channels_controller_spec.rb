@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -159,6 +159,19 @@ describe CommunicationChannelsController do
         @user.accept_terms
         @user.save
         expect(@user).to be_pre_registered
+
+        post 'confirm', :nonce => @cc.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
+        expect(response).to be_redirect
+        @user.reload
+        expect(@user).to be_registered
+        @cc.reload
+        expect(@cc).to be_active
+      end
+
+      it "should not break when trying to register when psuedonym is not a valid email" do
+        user_with_pseudonym(:password => :autogenerate, :username => 'notanemail')
+        @user.accept_terms
+        @user.save
 
         post 'confirm', :nonce => @cc.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
         expect(response).to be_redirect

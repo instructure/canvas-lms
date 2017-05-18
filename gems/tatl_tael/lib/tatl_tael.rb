@@ -1,1 +1,1 @@
-require_relative 'tatl_tael/linter'
+require_relative 'tatl_tael/linters'

@@ -1,4 +1,22 @@
 /*
+ * Copyright (C) 2016 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
   This shim is to try to not break code of our customers that use RequireJS-style
   `require`s in their Custom JS files from ThemeEditor. It is not meant to be comprehensive.
   There will be some customers that need to change their code, but there was a lot that
@@ -43,15 +61,13 @@ if (!('require' in window)) {
   }
 
   window.require = function fakeRequire (deps, callback) {
-    if (callback.name !== 'fnCanvasUsesToLoadAccountJSAfterJQueryIsReady') {
-      console.warn(
-        '`require`-ing internal Canvas modules comes with no warranty, ' +
-        'things can change in any release and you are responsible for making sure your custom ' +
-        'JavaScript that uses it continues to work.'
-      )
-      if (deps.includes('jquery')) {
-        console.error("You don't need to `require(['jquery...`, just use the global `$` variable directly.")
-      }
+    console.warn(
+      '`require`-ing internal Canvas modules comes with no warranty, ' +
+      'things can change in any release and you are responsible for making sure your custom ' +
+      'JavaScript that uses it continues to work.'
+    )
+    if (deps.includes('jquery')) {
+      console.error("You don't need to `require(['jquery...`, just use the global `$` variable directly.")
     }
     Promise.all(deps.map(getModule)).then((modules) => {
       if (callback) callback(...modules)

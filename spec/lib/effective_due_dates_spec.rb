@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2016 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Course do
@@ -35,6 +52,16 @@ describe Course do
       @deleted_assignment = @test_course.assignments.create!
       @deleted_assignment.destroy
       @assignment_in_other_course = @other_course.assignments.create!
+    end
+
+    it 'properly converts timezones' do
+      Time.zone = 'Alaska'
+      default_due = DateTime.parse("01 Jan 2011 14:00 AKST")
+      @assignment4 = @test_course.assignments.create!(title: "some assignment", due_at: default_due, submission_types: ['online_text_entry'])
+
+      edd = EffectiveDueDates.for_course(@test_course, @assignment4)
+      result = edd.to_hash
+      expect(result[@assignment4.id][@student1.id][:due_at]).to eq default_due
     end
 
     it 'returns the effective due dates per assignment per student' do
@@ -291,12 +318,62 @@ describe Course do
         expect(result).to eq expected
       end
 
-      it 'ignores overrides without due_at_overridden' do
+      it 'includes overrides without due_at_overridden, and uses the due_at from the assignment' do
         override = @assignment1.assignment_overrides.create!(due_at: nil)
         override.assignment_override_students.create!(user: @student3)
 
         edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-        expect(edd.to_hash).to eq({})
+        expect(edd.to_hash[@assignment1.id][@student3.id][:due_at]).to eq(@assignment1.due_at)
+      end
+
+      it 'uses the due_at from the assignment when the assignment is only visible to overrides and no overrides for the student have due_at_overridden' do
+        @assignment1.update!(due_at: @now)
+        override = @assignment1.assignment_overrides.create!(due_at: 2.days.from_now(@now))
+        override.assignment_override_students.create!(user: @student3)
+
+        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+        expect(edd.to_hash[@assignment1.id][@student3.id][:due_at]).to eq(@now)
+      end
+
+      it 'uses the due_at from the assignment when the assignment is visible to everyone and no overrides for the student have due_at_overridden' do
+        @assignment1.update!(only_visible_to_overrides: false, due_at: @now)
+        override = @assignment1.assignment_overrides.create!(due_at: 2.days.from_now(@now))
+        override.assignment_override_students.create!(user: @student3)
+
+        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+        expect(edd.to_hash[@assignment1.id][@student3.id][:due_at]).to eq(@now)
+      end
+
+      it 'does not consider the due_at from overrides without due_at_overridden when the override due_at is nil' do
+        override = @assignment1.assignment_overrides.create!(due_at: nil)
+        override.assignment_override_students.create!(user: @student3)
+
+        section = CourseSection.create!(name: 'My Awesome Section', course: @test_course)
+        student_in_section(section, user: @student3)
+        section_override = @assignment1.assignment_overrides.create!(
+          due_at: 1.day.from_now(@now),
+          due_at_overridden: true,
+          set: section
+        )
+
+        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+        expect(edd.to_hash[@assignment1.id][@student3.id][:due_at]).to eq(1.day.from_now(@now))
+      end
+
+      it 'does not consider the due_at from overrides without due_at_overridden even if the due date is more lenient than other dates' do
+        override = @assignment1.assignment_overrides.create!(due_at: 2.days.from_now(@now))
+        override.assignment_override_students.create!(user: @student3)
+
+        section = CourseSection.create!(name: 'My Awesome Section', course: @test_course)
+        student_in_section(section, user: @student3)
+        section_override = @assignment1.assignment_overrides.create!(
+          due_at: 1.day.from_now(@now),
+          due_at_overridden: true,
+          set: section
+        )
+
+        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+        expect(edd.to_hash[@assignment1.id][@student3.id][:due_at]).to eq(1.day.from_now(@now))
       end
 
       it 'applies adhoc overrides' do
@@ -484,7 +561,10 @@ describe Course do
       end
 
       it 'includes not-assigned students with existing graded submissions' do
-        @assignment1.submissions.create!(user: @student1, submission_type: 'online_text_entry', workflow_state: 'graded')
+        @assignment1.submissions.find_by!(user: @student1).update!(
+          submission_type: 'online_text_entry',
+          workflow_state: 'graded'
+        )
 
         edd = EffectiveDueDates.for_course(@test_course, @assignment1)
         result = edd.to_hash
@@ -505,8 +585,7 @@ describe Course do
       it 'uses assigned date instead of submission date even if submission was late' do
         override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
         override.assignment_override_students.create!(user: @student1)
-        @assignment1.submissions.create!(
-          user: @student1,
+        @assignment1.submissions.find_by!(user: @student1).update!(
           submitted_at: 1.week.from_now(@now),
           submission_type: 'online_text_entry',
           workflow_state: 'graded'
@@ -568,8 +647,7 @@ describe Course do
       it 'prioritizes the override due date even if it is earlier than the Everyone Else date and the student has a graded submission that does not qualify' do
         override = @assignment2.assignment_overrides.create!(due_at: 3.days.ago(@now), due_at_overridden: true)
         override.assignment_override_students.create!(user: @student1)
-        @assignment2.submissions.create!(
-          user: @student1,
+        @assignment2.submissions.find_by!(user: @student1).update!(
           submitted_at: 1.week.from_now(@now),
           submission_type: 'online_text_entry',
           workflow_state: 'graded'
@@ -610,8 +688,7 @@ describe Course do
       it 'prioritizes the Everyone Else due date if it exists over the submission NULL date' do
         @assignment2.due_at = 4.days.from_now(@now)
         @assignment2.save!
-        @assignment2.submissions.create!(
-          user: @student1,
+        @assignment2.submissions.find_by!(user: @student1).update!(
           submitted_at: 1.week.from_now(@now),
           submission_type: 'online_text_entry',
           workflow_state: 'graded'
@@ -648,7 +725,10 @@ describe Course do
       end
 
       it 'ignores not-assigned students with ungraded submissions' do
-        @assignment1.submissions.create!(user: @student1, submission_type: 'online_text_entry', workflow_state: 'submitted')
+        @assignment1.submissions.find_by!(user: @student1).update!(
+          submission_type: 'online_text_entry',
+          workflow_state: 'submitted'
+        )
 
         edd = EffectiveDueDates.for_course(@test_course, @assignment1)
         expect(edd.to_hash).to eq({})
@@ -1279,8 +1359,7 @@ describe Course do
               end_date: 15.days.ago(@now),
               close_date: 10.days.ago(@now)
             })
-            @assignment1.submissions.create!(
-              user: @student1,
+            @assignment1.submissions.find_by!(user: @student1).update!(
               submitted_at: 1.week.from_now(@now),
               submission_type: 'online_text_entry',
               workflow_state: 'graded'

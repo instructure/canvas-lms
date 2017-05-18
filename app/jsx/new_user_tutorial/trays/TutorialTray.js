@@ -1,4 +1,23 @@
+/*
+ * Copyright (C) 2017 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!new_user_tutorial'
 import plainStoreShape from 'jsx/shared/proptypes/plainStoreShape'
 import Tray from 'instructure-ui/lib/components/Tray'
@@ -10,13 +29,13 @@ class TutorialTray extends React.Component {
 
   static propTypes = {
     // Used as a label for the content (screenreader-only)
-    label: React.PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
     // The specific tray that will be wrapped, unusable without this.
-    children: React.PropTypes.node.isRequired,
+    children: PropTypes.node.isRequired,
     // The store to control the status of everything
-    store: React.PropTypes.shape(plainStoreShape).isRequired,
+    store: PropTypes.shape(plainStoreShape).isRequired,
     // Should return an element that focus can be set to
-    returnFocusToFunc: React.PropTypes.func.isRequired
+    returnFocusToFunc: PropTypes.func.isRequired
   }
 
   constructor (props) {
@@ -74,10 +93,12 @@ class TutorialTray extends React.Component {
         label={this.props.label}
         isDismissable={false}
         isOpen={!this.state.isCollapsed}
-        placement="right"
+        placement="end"
         zIndex="100"
         onEntering={this.handleEntering}
         onExiting={this.handleExiting}
+        onEntered={this.handleEntering}
+        trapFocus
       >
         <div className="NewUserTutorialTray">
           <div className="NewUserTutorialTray__ButtonContainer">

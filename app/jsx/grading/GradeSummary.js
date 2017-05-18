@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2011 - 2017 Instructure, Inc.
+/*
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -12,8 +12,8 @@
  * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
  * details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 define([
@@ -60,7 +60,12 @@ define([
     },
 
     getOriginalScore ($assignment) {
-      return GradeSummary.parseScoreText($assignment.find('.original_score').text());
+      let numericalValue = parseFloat($assignment.find('.original_points').text());
+      numericalValue = isNaN(numericalValue) ? null : numericalValue;
+      return {
+        numericalValue,
+        formattedValue: $assignment.find('.original_score').text()
+      }
     },
 
     onEditWhatIfScore ($assignmentScore, $ariaAnnouncer) {
@@ -323,6 +328,7 @@ define([
       const $row = $(subtotals[i].rowElementId);
       $row.find('.grade').text(subtotals[i].gradeText);
       $row.find('.score_teaser').text(subtotals[i].teaserText);
+      $row.find('.points_possible').text(subtotals[i].teaserText);
     }
 
     const finalScore = calculatedGrades[currentOrFinal].score;
@@ -344,6 +350,7 @@ define([
     const $finalGradeRow = $('.student_assignment.final_grade');
     $finalGradeRow.find('.grade').text(finalGrade);
     $finalGradeRow.find('.score_teaser').text(teaserText);
+    $finalGradeRow.find('.points_possible').text(scoreAsPoints);
     if (groupWeightingScheme === 'percent') {
       $finalGradeRow.find('.score_teaser').hide()
     }

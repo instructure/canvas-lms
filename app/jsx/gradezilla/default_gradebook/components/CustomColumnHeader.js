@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Instructure, Inc.
+ * Copyright (C) 2011 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,9 +17,10 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import Typography from 'instructure-ui/lib/components/Typography'
 
-const { string } = React.PropTypes;
+const { string } = PropTypes;
 
 function CustomColumnHeader (props) {
   return (

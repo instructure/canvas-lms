@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2016 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #crs-graphs {
   margin-top: 50px;
 
@@ -21,6 +39,23 @@
       float: left;
     }
   }
+}
+
+.crs-breakdown-details {
+  width: 365px;
+}
+
+.crs-breakdown-details__closeButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 11;
+  color: $ic-color-medium;
+}
+
+.crs-breakdown-details__closeButtonIcon {
+  font-size: 1rem;
+  font-weight: lighter;
 }
 
 .crs-breakdown-details__header {
@@ -90,31 +125,14 @@
   }
 }
 
-.crs-sticky-sidebar {
-  width: 365px;
-  height: 100%;
-  position: fixed;
-  right: 0;
-  top: 0;
-  transition: all .5s;
-  box-shadow: -2px 0px 15px $ic-color-medium;
-  background: $ic-color-light;
-  z-index: 10;
-
-  &.crs-sticky-sidebar__hidden {
-    right: -365px;
-    opacity: 0;
-  }
-
-  .crs-sticky-sidebar__close {
-    position: absolute;
-    top: 20px;
-    right: 15px;
-    z-index: 20;
-  }
-}
-
 .crs-ranges-view {
+  transition: all .5s;
+
+  &.crs-ranges-view__hidden {
+    opacity: 0;
+    visibility: hidden;
+  }
+
   .crs-ranges-view__header {
     font-weight: lighter;
     padding: 15px 10px;
@@ -193,10 +211,6 @@
   }
 }
 
-.crs-icon-x {
-  margin: auto;
-}
-
 .crs-student-details {
   width: 365px;
   height: 100%;
@@ -209,6 +223,7 @@
   &.crs-student-details__hidden {
     right: -365px;
     opacity: 0;
+    visibility: hidden;
   }
 }
 

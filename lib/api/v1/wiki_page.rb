@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -36,6 +36,10 @@ module Api::V1::WikiPage
     hash['hide_from_students'] = !hash['published'] # deprecated, but still here for now
     hash['front_page'] = wiki_page.is_front_page?
     hash['html_url'] = polymorphic_url([wiki_page.context, wiki_page])
+    if wiki_page.context.root_account.feature_enabled?(:student_planner)
+      hash['todo_date'] = wiki_page.todo_date
+    end
+
     hash['updated_at'] = wiki_page.revised_at
     if opts[:include_assignment] && wiki_page.for_assignment?
       hash['assignment'] = assignment_json(wiki_page.assignment, current_user, session)

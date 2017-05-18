@@ -1,7 +1,26 @@
+/*
+ * Copyright (C) 2014 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import I18n from 'i18n!external_tools'
 import _ from 'underscore'
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import TextInput from 'jsx/external_apps/components/TextInput'
 import TextAreaInput from 'jsx/external_apps/components/TextAreaInput'
 import SelectInput from 'jsx/external_apps/components/SelectInput'
@@ -18,14 +37,14 @@ export default React.createClass({
     displayName: 'ConfigurationFormManual',
 
     propTypes: {
-      name         : React.PropTypes.string,
-      consumerKey  : React.PropTypes.string,
-      sharedSecret : React.PropTypes.string,
-      url          : React.PropTypes.string,
-      domain       : React.PropTypes.string,
-      privacyLevel : React.PropTypes.string,
-      customFields : React.PropTypes.object,
-      description  : React.PropTypes.string
+      name         : PropTypes.string,
+      consumerKey  : PropTypes.string,
+      sharedSecret : PropTypes.string,
+      url          : PropTypes.string,
+      domain       : PropTypes.string,
+      privacyLevel : PropTypes.string,
+      customFields : PropTypes.object,
+      description  : PropTypes.string
     },
 
     getInitialState() {

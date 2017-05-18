@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -35,6 +35,22 @@ describe "page views" do
     expect(pv.context).to eq @course
     expect(pv.controller).to eq 'discussion_topics_api'
     expect(pv.action).to eq 'add_entry'
+  end
+
+  it "should record get request for api request" do
+    course_with_teacher(active_all: 1, user: user_with_pseudonym)
+    @topic = @course.discussion_topics.create!
+    get "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries", access_token: @user.access_tokens.create!.full_token
+    pv = PageView.last
+    expect(pv.http_method).to eq 'get'
+  end
+
+  it "should not record gets for api request when setting disabled" do
+    Setting.set('create_get_api_page_views', 'false')
+    course_with_teacher(active_all: 1, user: user_with_pseudonym)
+    @topic = @course.discussion_topics.create!
+    PageView.any_instance.expects(:store).never
+    get "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries", access_token: @user.access_tokens.create!.full_token
   end
 
   it "records the developer key when an access token was used" do

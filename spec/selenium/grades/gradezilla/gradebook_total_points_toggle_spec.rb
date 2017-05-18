@@ -1,11 +1,26 @@
+#
+# Copyright (C) 2015 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative '../../helpers/gradezilla_common'
 require_relative '../page_objects/gradezilla_page'
 
 describe "Gradezilla - total points toggle" do
   include_context "in-process server selenium tests"
   include GradezillaCommon
-
-  let(:gradezilla_page) { Gradezilla::MultipleGradingPeriods.new }
 
   before(:once) { gradebook_data_setup }
   before(:each) { user_session(@teacher) }
@@ -24,7 +39,7 @@ describe "Gradezilla - total points toggle" do
   end
 
   def open_display_dialog
-    gradezilla_page.select_total_column_option('grade-display-switcher')
+    Gradezilla.select_total_column_option('grade-display-switcher')
   end
 
   def close_display_dialog
@@ -47,7 +62,7 @@ describe "Gradezilla - total points toggle" do
     @course.show_total_grade_as_points = true
     @course.save!
     @course.reload
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
     should_show_points(15, 10, 10)
   end
@@ -60,19 +75,19 @@ describe "Gradezilla - total points toggle" do
     group.group_weight = 50
     group.save!
 
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     should_show_percentages
   end
 
   it "should warn the teacher that studens will see a change" do
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     open_display_dialog
     dialog = fj('.ui-dialog:visible')
     expect(dialog).to include_text("Warning")
   end
 
   it 'should allow toggling display by points or percent', priority: "1", test_id: 164012 do
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     should_show_percentages
     toggle_grade_display
 
@@ -85,28 +100,28 @@ describe "Gradezilla - total points toggle" do
   end
 
   it 'should change the text on the toggle option when toggling' do
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     dropdown_text = []
 
-    gradezilla_page.select_total_column_option()
+    Gradezilla.select_total_column_option()
     dropdown_text << f('[data-menu-item-id="grade-display-switcher"]').text
 
-    gradezilla_page.select_total_column_option('grade-display-switcher', already_open: true)
+    Gradezilla.select_total_column_option('grade-display-switcher', already_open: true)
     close_dialog_and_dont_show_again
 
-    gradezilla_page.select_total_column_option()
+    Gradezilla.select_total_column_option()
     dropdown_text << f('[data-menu-item-id="grade-display-switcher"]').text
 
-    gradezilla_page.select_total_column_option('grade-display-switcher', already_open: true)
+    Gradezilla.select_total_column_option('grade-display-switcher', already_open: true)
 
-    gradezilla_page.select_total_column_option()
+    Gradezilla.select_total_column_option()
     dropdown_text << f('[data-menu-item-id="grade-display-switcher"]').text
 
     expect(dropdown_text).to eq ['Display as Points', 'Display as Percentage', 'Display as Points']
   end
 
   it 'should not show the warning once dont show is checked' do
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     open_display_dialog
     close_dialog_and_dont_show_again
 

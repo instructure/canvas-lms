@@ -1,5 +1,24 @@
+/*
+ * Copyright (C) 2015 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import _ from 'underscore'
 import React from 'react'
+import PropTypes from 'prop-types'
 import ModerationActions from './actions/ModerationActions'
 import Constants from './constants'
 import I18n from 'i18n!moderated_grading'
@@ -11,9 +30,9 @@ const PG_THREE_INDEX = 2;
 
 const StudentName = React.createClass({
   propTypes: {
-    course_id: React.PropTypes.string.isRequired,
-    student_id: React.PropTypes.string.isRequired,
-    children: React.PropTypes.node
+    course_id: PropTypes.string.isRequired,
+    student_id: PropTypes.string.isRequired,
+    children: PropTypes.node
   },
 
   getDefaultProps () {
@@ -44,12 +63,12 @@ export default React.createClass({
   displayName: 'ModeratedStudentList',
 
   propTypes: {
-    studentList: React.PropTypes.object.isRequired,
-    assignment: React.PropTypes.object.isRequired,
-    handleCheckbox: React.PropTypes.func.isRequired,
-    includeModerationSetColumns: React.PropTypes.bool,
-    urls: React.PropTypes.object.isRequired,
-    onSelectProvisionalGrade: React.PropTypes.func.isRequired,
+    studentList: PropTypes.object.isRequired,
+    assignment: PropTypes.object.isRequired,
+    handleCheckbox: PropTypes.func.isRequired,
+    includeModerationSetColumns: PropTypes.bool,
+    urls: PropTypes.object.isRequired,
+    onSelectProvisionalGrade: PropTypes.func.isRequired,
   },
 
   generateSpeedgraderUrl (baseSpeedgraderUrl, student) {

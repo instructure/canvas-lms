@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2015 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative "../sharding_spec_helper"
 
 describe SisPseudonym do
@@ -100,7 +117,7 @@ describe SisPseudonym do
     account1.stubs(:trust_exists?).returns(true)
     account1.stubs(:trusted_account_ids).returns([account2.id])
     expect(SisPseudonym.for(u, account1)).to be_nil
-    expect(SisPseudonym.for(u, account1, true)).to eq(pseudonym)
+    expect(SisPseudonym.for(u, account1, type: :trusted)).to eq(pseudonym)
   end
 
   context "with multiple acceptable sis pseudonyms" do
@@ -129,6 +146,54 @@ describe SisPseudonym do
       u.pseudonyms # to get pseudonyms collection pre-loaded
       found_pseudonym = SisPseudonym.for(u, Account.default)
       expect(found_pseudonym.unique_id).to eq("alphabet@example.com")
+    end
+  end
+
+  context "with multiple acceptable pseudonyms" do
+    let_once(:non_sis_pseudo) { u.pseudonyms.create!(pseud_params("a")) }
+    let_once(:sis_pseudo) { u.pseudonyms.create!(pseud_params("user").merge(sis_user_id: 'abc')) }
+
+    it "finds the SIS pseudonym first from db" do
+      u.reload
+      expect(SisPseudonym.for(u, Account.default, require_sis: false)).to eq sis_pseudo
+    end
+
+    it "finds the SIS pseudonym first from collection" do
+      u.reload
+      u.pseudonyms.to_a
+      expect(SisPseudonym.for(u, Account.default, require_sis: false)).to eq sis_pseudo
+    end
+  end
+
+  context "no SIS pseudos" do
+    before(:once) do
+      u.pseudonyms.create!(pseud_params("a"))
+    end
+
+    context "db" do
+      it "finds the non-SIS pseudonym when allowed" do
+        u.reload
+        expect(SisPseudonym.for(u, Account.default, require_sis: false)).not_to be_nil
+      end
+
+      it "doesn't find the non-SIS pseudonym when not allowed" do
+        u.reload
+        expect(SisPseudonym.for(u, Account.default)).to be_nil
+      end
+    end
+
+    context "preloaded" do
+      it "finds the non-SIS pseudonym when allowed" do
+        u.reload
+        u.pseudonyms.to_a
+        expect(SisPseudonym.for(u, Account.default, require_sis: false)).not_to be_nil
+      end
+
+      it "doesn't find the non-SIS pseudonym when not allowed" do
+        u.reload
+        u.pseudonyms.to_a
+        expect(SisPseudonym.for(u, Account.default)).to be_nil
+      end
     end
   end
 

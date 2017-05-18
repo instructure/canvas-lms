@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2013 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 define [
   'jquery'
   'compiled/models/Assignment'
@@ -39,6 +56,63 @@ define [
 
     conditionalToggle = view.$el.find('#conditional_content')
     equal conditionalToggle.length, 0, 'Toggle is hidden'
+
+  QUnit.module 'WikiPageEditView:StudentPlanner',
+    setup: ->
+      fakeENV.setup(student_planner_enabled: true)
+
+    teardown: ->
+      fakeENV.teardown()
+
+  test 'student planner option hidden for insufficient rights', ->
+    view = new WikiPageEditView
+      WIKI_RIGHTS:
+        read: true
+      PAGE_RIGHTS:
+        read: true
+        update_content: true
+    view.render()
+
+    studentPlannerContainer = view.$el.find('#todo_date_container')
+    equal studentPlannerContainer.length, 0, 'Toggle is hidden'
+
+  test 'student planner option appears', ->
+    view = new WikiPageEditView
+      WIKI_RIGHTS:
+        manage: true
+    view.render()
+
+    studentPlannerToggle = view.$el.find('#student_planner_checkbox')
+    equal studentPlannerToggle.length, 1, 'Toggle is visible'
+    equal studentPlannerToggle.prop('checked'), false, 'Toggle is unchecked'
+
+  test 'student planner date picker appears', ->
+    wikiPage = new WikiPage
+      todo_date: "Jan 3"
+    view = new WikiPageEditView
+      model: wikiPage
+      WIKI_RIGHTS:
+        manage: true
+    view.render()
+
+    studentPlannerToggle = view.$el.find('#student_planner_checkbox')
+    studentPlannerDateInput = view.$el.find('#todo_date_container')
+    equal studentPlannerToggle.prop('checked'), true, 'Toggle is checked'
+    equal studentPlannerDateInput.length, 1, 'Date picker is visible'
+
+  test 'student planner option does stuff', ->
+    wikiPage = new WikiPage
+      todo_date: 'Jan 3'
+    view = new WikiPageEditView
+      model: wikiPage
+      WIKI_RIGHTS:
+        manage: true
+    view.render()
+
+    studentPlannerToggle = view.$el.find('#student_planner_checkbox')
+    studentPlannerDateInput = view.$el.find('#todo_date')
+    equal studentPlannerToggle.prop('checked'), true, 'Toggle is checked'
+    equal studentPlannerDateInput.val(), 'Jan 3 at 12am'
 
   QUnit.module 'WikiPageEditView:ConditionalContent',
     setup: ->

@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2014 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 if CANVAS_RAILS4_2
   gem 'rails', '4.2.8'
   gem 'rack', '1.6.5'
@@ -39,8 +56,9 @@ gem 'bcrypt', '3.1.11'
 gem 'canvas_connect', '0.3.10'
   gem 'adobe_connect', '1.0.5', require: false
 gem 'canvas_webex', '0.17'
-gem 'inst-jobs', '0.12.3'
-  gem 'rufus-scheduler', '3.3.3', require: false
+gem 'inst-jobs', '0.13.3'
+  gem 'rufus-scheduler', '3.4.0', require: false
+    gem 'et-orbi', '1.0.3', require: false
 gem 'ffi', '1.9.14', require: false
 gem 'hashery', '2.1.2', require: false
 gem 'highline', '1.7.8', require: false
@@ -78,7 +96,7 @@ gem 'rotp', '3.3.0', require: false
 gem 'net-ldap', '0.10.1', require: false
 gem 'ruby-duration', '3.2.3', require: false
 gem 'ruby-saml-mod', '0.3.5'
-gem 'saml2', '1.0.10', require: false
+gem 'saml2', '1.1.0', require: false
   gem 'nokogiri-xmlsec-me-harder', '0.9.3pre', require: false, github: 'instructure/nokogiri-xmlsec-me-harder', ref: '57d071040cc4649db9f158e09bbcea028271a4a6'
 gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.2.0', require: 'zip'

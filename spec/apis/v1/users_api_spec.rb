@@ -69,7 +69,7 @@ describe Api::V1::User do
     end
 
     it 'only loads pseudonyms for the user once, even if there are multiple enrollments' do
-      sis_stub = SisPseudonym.for(@student, @course, true)
+      sis_stub = SisPseudonym.for(@student, @course, type: :trusted)
       SisPseudonym.expects(:for).once.returns(sis_stub)
       ta_enrollment = ta_in_course(user: @student, course: @course)
       teacher_enrollment = teacher_in_course(user: @student, course: @course)
@@ -209,11 +209,12 @@ describe Api::V1::User do
     it 'should use an sis pseudonym from another account if necessary' do
       @user = User.create!(:name => 'User')
       @account2 = Account.create!
-      @user.pseudonyms.create!(:unique_id => 'abc', :account => @account2) { |p| p.sis_user_id = 'a'}
+      @user.pseudonyms.destroy_all
+      p = @user.pseudonyms.create!(:unique_id => 'abc', :account => @account2) { |p| p.sis_user_id = 'a'}
+      allow(p).to receive(:works_for_account?).with(Account.default, true).and_return(true)
       Account.default.any_instantiation.stubs(:trust_exists?).returns(true)
       Account.default.any_instantiation.stubs(:trusted_account_ids).returns([@account2.id])
       HostUrl.expects(:context_host).with(@account2).returns('school1')
-      @user.stubs(:find_pseudonym_for_account).with(Account.default).returns(@pseudonym)
       expect(@test_api.user_json(@user, @admin, {}, [], Account.default)).to eq({
           'name' => 'User',
           'sortable_name' => 'User',
@@ -233,7 +234,7 @@ describe Api::V1::User do
       @account2 = Account.create!
       @user.pseudonyms.create!(:unique_id => 'abc', :account => @account2)
       @pseudonym = @user.pseudonyms.create!(:unique_id => 'xyz', :account => Account.default)
-      @user.stubs(:find_pseudonym_for_account).with(Account.default).returns(@pseudonym)
+      allow(SisPseudonym).to receive(:for).with(@user, Account.default, type: :implicit, require_sis: false).and_return(@pseudonym)
       expect(@test_api.user_json(@user, @admin, {}, [], Account.default)).to eq({
           'name' => 'User',
           'sortable_name' => 'User',

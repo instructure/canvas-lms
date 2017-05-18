@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2013 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 define [
   'i18n!quizzes.index'
   'jquery'
@@ -5,12 +22,13 @@ define [
   'Backbone'
   'jsx/shared/conditional_release/CyoeHelper'
   'compiled/views/PublishIconView'
+  'compiled/views/LockIconView'
   'compiled/views/assignments/DateDueColumnView'
   'compiled/views/assignments/DateAvailableColumnView'
   'compiled/views/SisButtonView'
   'jst/quizzes/QuizItemView'
   'jquery.disableWhileLoading'
-], (I18n, $, _, Backbone, CyoeHelper, PublishIconView, DateDueColumnView, DateAvailableColumnView, SisButtonView, template) ->
+], (I18n, $, _, Backbone, CyoeHelper, PublishIconView, LockIconView, DateDueColumnView, DateAvailableColumnView, SisButtonView, template) ->
 
   class ItemView extends Backbone.View
 
@@ -20,6 +38,7 @@ define [
     className: 'quiz'
 
     @child 'publishIconView',         '[data-view=publish-icon]'
+    @child 'lockIconView',            '[data-view=lock-icon]'
     @child 'dateDueColumnView',       '[data-view=date-due]'
     @child 'dateAvailableColumnView', '[data-view=date-available]'
     @child 'sisButtonView',           '[data-view=sis-button]'
@@ -42,12 +61,25 @@ define [
 
     initializeChildViews: ->
       @publishIconView = false
+      @lockIconView = false
       @sisButtonView = false
 
       if @canManage()
         @publishIconView = new PublishIconView(model: @model)
+        @lockIconView = new LockIconView({
+          model: @model,
+          unlockedText: I18n.t("%{name} is unlocked. Click to lock.", name: @model.get('title')),
+          lockedText: I18n.t("%{name} is locked. Click to unlock", name: @model.get('title')),
+          course_id: ENV.COURSE_ID,
+          content_id: @model.get('id'),
+          content_type: 'quiz'
+        })
         if @model.postToSIS() != null && @model.attributes.published
-          @sisButtonView = new SisButtonView(model: @model, sisName: @model.postToSISName(), dueDateRequired: @model.dueDateRequiredForAccount())
+          @sisButtonView = new SisButtonView
+            model: @model
+            sisName: @model.postToSISName()
+            dueDateRequired: @model.dueDateRequiredForAccount()
+            maxNameLengthRequired: @model.maxNameLengthRequiredForAccount()
 
       @dateDueColumnView       = new DateDueColumnView(model: @model)
       @dateAvailableColumnView = new DateAvailableColumnView(model: @model)
@@ -126,10 +158,10 @@ define [
         base.link_text = @messages.multipleDates
         base.link_href = @model.get("url")
 
-      if base.permissions?.delete && @model.get('is_master_course_child_content') && @model.get('restricted_by_master_course')
-        base.permissions.delete = false
-
       base.migrateQuizEnabled = @migrateQuizEnabled
       base.showAvailability = @model.multipleDueDates() or not @model.defaultDates().available()
       base.showDueDate = @model.multipleDueDates() or @model.singleSectionDueDate()
+
+      base.is_locked = @model.get('is_master_course_child_content') &&
+                       @model.get('restricted_by_master_course')
       base

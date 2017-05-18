@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -64,6 +64,27 @@ describe AssignmentOverrideStudent do
       @override_student2 = @override.assignment_override_students.build
       @override_student2.user = @student
       expect(@override_student2).not_to be_valid
+    end
+  end
+
+  describe 'recalculation of cached due dates' do
+    before(:once) do
+      course = Course.create!
+      @student = User.create!
+      course.enroll_student(@student, active_all: true)
+      @assignment = course.assignments.create!
+      @assignment_override = @assignment.assignment_overrides.create!
+    end
+
+    it 'on creation, recalculates cached due dates on the assignment' do
+      expect(DueDateCacher).to receive(:recompute).with(@assignment)
+      @assignment_override.assignment_override_students.create!(user: @student)
+    end
+
+    it 'on destroy, recalculates cached due dates on the assignment' do
+      override_student = @assignment_override.assignment_override_students.create!(user: @student)
+      expect(DueDateCacher).to receive(:recompute).with(@assignment)
+      override_student.destroy
     end
   end
 

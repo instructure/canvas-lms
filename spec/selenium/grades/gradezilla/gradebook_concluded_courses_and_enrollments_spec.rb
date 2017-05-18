@@ -1,3 +1,21 @@
+#
+# Copyright (C) 2015 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
 require_relative '../../helpers/gradezilla_common'
 require_relative '../setup/gradebook_setup'
 require_relative '../page_objects/gradezilla_page'
@@ -6,8 +24,6 @@ describe "Gradezilla - concluded courses and enrollments" do
   include_context "in-process server selenium tests"
   include GradezillaCommon
   include GradebookSetup
-
-  let(:gradezilla_page) { Gradezilla::MultipleGradingPeriods.new }
 
   before(:once) { gradebook_data_setup }
   before(:each) { user_session(@teacher) }
@@ -19,17 +35,17 @@ describe "Gradezilla - concluded courses and enrollments" do
       conclude_student_1
       expect(@course.students.count).to eq @all_students.size - 1
       expect(@course.all_students.count).to eq @all_students.size
-      gradezilla_page.visit(@course)
+      Gradezilla.visit(@course)
       expect(ff('.student-name')).to have_size @course.students.count
     end
 
     it "shows concluded enrollments when checked in column header", priority: "1", test_id: 164223 do
       conclude_student_1
-      gradezilla_page.visit(@course)
+      Gradezilla.visit(@course)
 
       expect_new_page_load do
-        gradezilla_page.open_student_column_menu
-        gradezilla_page.select_menu_item 'concluded'
+        Gradezilla.open_student_column_menu
+        Gradezilla.select_menu_item 'concluded'
       end
       expect(ff('.student-name')).to have_size @course.all_students.count
     end
@@ -37,11 +53,11 @@ describe "Gradezilla - concluded courses and enrollments" do
     it "hides concluded enrollments when unchecked in column header", priority: "1", test_id: 3101103 do
       conclude_student_1
       display_concluded_enrollments
-      gradezilla_page.visit(@course)
+      Gradezilla.visit(@course)
 
       expect_new_page_load do
-        gradezilla_page.open_student_column_menu
-        gradezilla_page.select_menu_item 'concluded'
+        Gradezilla.open_student_column_menu
+        Gradezilla.select_menu_item 'concluded'
       end
       expect(ff('.student-name')).to have_size @course.students.count
     end
@@ -50,17 +66,17 @@ describe "Gradezilla - concluded courses and enrollments" do
       deactivate_student_1
       expect(@course.students.count).to eq @all_students.size - 1
       expect(@course.all_students.count).to eq @all_students.size
-      gradezilla_page.visit(@course)
+      Gradezilla.visit(@course)
       expect(ff('.student-name')).to have_size @course.students.count
     end
 
     it "shows inactive enrollments when checked in column header", priority: "1", test_id: 1102066 do
       deactivate_student_1
-      gradezilla_page.visit(@course)
+      Gradezilla.visit(@course)
 
       expect_new_page_load do
-        gradezilla_page.open_student_column_menu
-        gradezilla_page.select_menu_item 'inactive'
+        Gradezilla.open_student_column_menu
+        Gradezilla.select_menu_item 'inactive'
       end
       expect(ff('.student-name')).to have_size @course.all_students.count
     end
@@ -68,11 +84,11 @@ describe "Gradezilla - concluded courses and enrollments" do
     it "hides inactive enrollments when unchecked in column header", priority: "1", test_id: 3101104 do
       deactivate_student_1
       display_inactive_enrollments
-      gradezilla_page.visit(@course)
+      Gradezilla.visit(@course)
 
       expect_new_page_load do
-        gradezilla_page.open_student_column_menu
-        gradezilla_page.select_menu_item 'inactive'
+        Gradezilla.open_student_column_menu
+        Gradezilla.select_menu_item 'inactive'
       end
       expect(ff('.student-name')).to have_size @course.students.count
     end
@@ -81,8 +97,8 @@ describe "Gradezilla - concluded courses and enrollments" do
   context "concluded course" do
     it "does not allow editing grades", priority: "1", test_id: 210027 do
       @course.complete!
-      gradezilla_page.visit(@course)
-      cell = gradezilla_page.grading_cell
+      Gradezilla.visit(@course)
+      cell = Gradezilla.grading_cell
       expect(cell).to include_text '10'
       cell.click
       expect(cell).not_to contain_css('.grade') # no input box for entry

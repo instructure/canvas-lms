@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -30,9 +30,10 @@ module Factories
 
   # just create the object, we don't care about callbacks or usual side effects
   def bare_submission_model(assignment, user, opts = {})
-    opts = (opts.presence || {submission_type: "online_text_entry", body: "o hai"}).merge(user: user, workflow_state: "submitted")
+    opts = (opts.presence || {submission_type: "online_text_entry", body: "o hai"}).merge(workflow_state: "submitted")
     submitted_at = opts.delete(:submitted_at)
-    submission = assignment.submissions.build(opts)
+    submission = assignment.submissions.find_by!(user: user)
+    submission.attributes = opts
     submission.submitted_at = submitted_at if submitted_at
     submission.save_without_callbacks
     submission

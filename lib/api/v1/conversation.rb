@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2012 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -73,8 +73,9 @@ module Api::V1::Conversation
   # ensure the common contexts for those users are fetched and cached in
   # bulk, if not already done
   def preload_common_contexts(current_user, recipients)
-    users = recipients.select{ |recipient| recipient.is_a?(User) }
-    current_user.address_book.preload_users(users)
+    address_book = current_user.address_book
+    users = recipients.select{ |recipient| recipient.is_a?(User) && !address_book.cached?(recipient) }
+    address_book.preload_users(users)
   end
 
   def conversation_recipients_json(recipients, current_user, session)

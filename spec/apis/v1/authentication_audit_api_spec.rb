@@ -174,6 +174,7 @@ describe "AuthenticationAudit API", type: :request do
         it "should be formatted as an array of Account objects" do
           expect(@json).to eq [{
             "id" => @account.id,
+            "uuid" => @account.uuid,
             "name" => @account.name,
             "parent_account_id" => nil,
             "root_account_id" => nil,

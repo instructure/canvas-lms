@@ -1,5 +1,24 @@
+/*
+ * Copyright (C) 2016 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import I18n from 'i18n!roster'
 import React  from 'react'
+import PropTypes from 'prop-types'
 import shapes from './shapes'
 import Table from 'instructure-ui/lib/components/Table'
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
@@ -19,11 +38,11 @@ import Link from 'instructure-ui/lib/components/Link'
 
   class DuplicateSection extends React.Component {
     static propTypes = {
-      duplicates: React.PropTypes.shape(shapes.duplicateSetShape).isRequired,
-      onSelectDuplicate: React.PropTypes.func.isRequired,
-      onNewForDuplicate: React.PropTypes.func.isRequired,
-      onSkipDuplicate: React.PropTypes.func.isRequired,
-      inviteUsersURL: React.PropTypes.string
+      duplicates: PropTypes.shape(shapes.duplicateSetShape).isRequired,
+      onSelectDuplicate: PropTypes.func.isRequired,
+      onNewForDuplicate: PropTypes.func.isRequired,
+      onSkipDuplicate: PropTypes.func.isRequired,
+      inviteUsersURL: PropTypes.string
     };
     static defaultProps = {
       inviteUsersURL: undefined

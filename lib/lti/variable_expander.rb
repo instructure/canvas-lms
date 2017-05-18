@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 Instructure, Inc.
+# Copyright (C) 2015 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -97,10 +97,22 @@ module Lti
     def enabled_capability_params(enabled_capabilities)
       enabled_capabilities.each_with_object({}) do |capability, hash|
         if (expansion = capability.respond_to?(:to_sym) && self.class.expansions["$#{capability}".to_sym])
-          hash[expansion.default_name] = expansion.expand(self) if expansion.default_name.present?
+          value = expansion.expand(self)
+          hash[expansion.default_name] = value if expansion.default_name.present? && value != "$#{capability}"
         end
       end
     end
+
+    # the LIS identifier for the course offering
+    # @launch_parameter lis_course_offering_sourcedid
+    # @example
+    #   ```
+    #   1234
+    #   ```
+    register_expansion 'CourseOffering.sourcedId', [],
+                       -> { @context.sis_source_id },
+                       COURSE_GUARD,
+                       default_name: 'lis_course_offering_sourcedid'
 
     # an opaque identifier that uniquely identifies the context of the tool launch
     # @launch_parameter context_id
@@ -293,6 +305,15 @@ module Lti
     #   ```
     register_expansion 'Canvas.course.id', [],
                        -> { @context.id },
+                       COURSE_GUARD
+
+    # returns the current course uuid.
+    # @example
+    #   ```
+    #   S3vhRY2pBzG8iPdZ3OBPsPrEnqn5sdRoJOLXGbwc
+    #   ```
+    register_expansion 'vnd.instructure.Course.uuid', [],
+                       -> { @context.uuid },
                        COURSE_GUARD
 
     # returns the current course name.
@@ -495,6 +516,16 @@ module Lti
                        -> { @current_user.id },
                        USER_GUARD
 
+    # Returns the Canvas user_uuid of the launching user.
+    # @duplicates User.uuid
+    # @example
+    #   ```
+    #   N2ST123dQ9zyhurykTkBfXFa3Vn1RVyaw9Os6vu3
+    #   ```
+    register_expansion 'vnd.instructure.User.uuid', [],
+                       -> { @current_user.uuid },
+                       USER_GUARD
+
     # Returns the users preference for high contrast colors (an accessibility feature).
     # @example
     #   ```
@@ -683,6 +714,17 @@ module Lti
     register_expansion 'Canvas.course.sectionSisSourceIds', [],
                        -> { lti_helper.section_sis_ids },
                        ENROLLMENT_GUARD
+
+    # Returns the course code
+    #
+    # @example
+    #   ```
+    #   CS 124
+    #   ```
+    register_expansion 'com.instructure.contextLabel', [],
+                       -> { @context.course_code },
+                       COURSE_GUARD,
+                       default_name: 'context_label'
 
     # Returns the module_id that the module item was launched from.
     #
@@ -874,7 +916,7 @@ module Lti
     private
 
     def sis_pseudonym
-      @sis_pseudonym ||= @current_user.find_pseudonym_for_account(@root_account) if @current_user
+      @sis_pseudonym ||= SisPseudonym.for(@current_user, @root_account, type: :trusted, require_sis: false) if @current_user
     end
 
     def expand_substring_variables(value)

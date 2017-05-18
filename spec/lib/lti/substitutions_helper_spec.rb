@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014 Instructure, Inc.
+# Copyright (C) 2014 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -32,13 +32,11 @@ module Lti
         c.account = account
       end
     }
-    let(:root_account) { Account.new }
+    let(:root_account) { Account.create! }
     let(:account) {
-      Account.new.tap do |a|
-        a.root_account = root_account
-      end
+      Account.create!(root_account: root_account)
     }
-    let(:user) { User.new }
+    let(:user) { User.create! }
 
     def set_up_persistance!
       @shard1.activate { user.save! }
@@ -125,7 +123,7 @@ module Lti
 
       it "returns none if no user" do
         helper = SubstitutionsHelper.new(course, root_account, nil)
-        expect(helper.all_roles).to eq [LtiOutbound::LTIRoles::System::NONE]
+        expect(helper.all_roles).to eq LtiOutbound::LTIRoles::System::NONE
       end
 
       it 'converts multiple roles for lis 2' do
@@ -145,7 +143,7 @@ module Lti
 
       it "returns none if no user for lis 2" do
         helper = SubstitutionsHelper.new(course, root_account, nil)
-        expect(helper.all_roles('lis2')).to eq ['http://purl.imsglobal.org/vocab/lis/v2/person#None']
+        expect(helper.all_roles('lis2')).to eq 'http://purl.imsglobal.org/vocab/lis/v2/person#None'
       end
 
       it "includes main and subrole for TeachingAssistant" do
@@ -155,6 +153,14 @@ module Lti
                           "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor",
                           "http://purl.imsglobal.org/vocab/lis/v2/system/person#User"]
         expect(roles.split(',')).to match_array expected_roles
+      end
+
+      it 'does not include admin role if user has a sub-account admin user record in deleted account' do
+        sub_account = account.sub_accounts.create!
+        sub_account.account_users.create!(user: user, role: admin_role)
+        sub_account.destroy!
+        roles = subject.all_roles
+        expect(roles).not_to include 'urn:lti:instrole:ims/lis/Administrator'
       end
     end
 
@@ -440,7 +446,15 @@ module Lti
             expect(substitution_helper.email).to eq sis_email
           end
 
-          it "returns the users email if there isn't an sis email" do
+          it "returns the sis_email when set via tool_configuration" do
+            tool.settings[:prefer_sis_email] = nil
+            tool.settings[:tool_configuration] = { prefer_sis_email: 'true' }
+            tool.save!
+            sis_pseudonym
+            expect(substitution_helper.email).to eq sis_email
+          end
+
+          it "returns the users email if there isn't a sis email" do
             expect(substitution_helper.email).to eq user.email
           end
 
