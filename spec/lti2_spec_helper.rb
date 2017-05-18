@@ -56,7 +56,7 @@ RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
   let(:message_handler) do
     Lti::MessageHandler.create!(
       message_type: 'message_type',
-      launch_path: 'https://samplelaunch/blti',
+      launch_path: 'https://www.samplelaunch.com/blti',
       resource_handler: resource_handler,
       tool_proxy: tool_proxy
     )

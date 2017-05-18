@@ -27,6 +27,21 @@
 # file ID (the file submitted by the student) and an originality score
 # between 0 and 100.
 #
+# Note that when creating or updating an originality report a
+# "tool_setting[resource_type_code]" may be specified as part of the originality report.
+# This parameter should be used if the tool provider wishes to display
+# originality reports as LTI launches.
+#
+# The value of "tool_setting[resource_type_code]" should be a
+# resource_handler's "resource_type" code. Canvas will lookup the resource
+# handler specified and do a launch to the message with the type
+# "basic-lti-launch-request" using its "path". If the optional
+# "tool_setting[resource_url]" parameter is provided, Canvas
+# will use this URL instead of the message's "path" but will
+# still send all the parameters specified by the message. When using the
+# "tool_setting[resource_url]" the "tool_setting[resource_type_code]" must also be
+# specified.
+#
 # @model OriginalityReport
 #     {
 #       "id": "OriginalityReport",
@@ -57,10 +72,17 @@
 #           "example": "http://www.example.com/report",
 #           "type": "string"
 #         },
-#         "originality_report_lti_url" :{
-#           "description": "An LTI url where the originality score of the file may be found",
-#           "example": "http://www.my-tool.com/report",
-#           "type": "string"
+#         "tool_setting" :{
+#            "resource_type_code": {
+#              "description": "the resource type code of the resource handler to use to display originality reports",
+#              "example": "originality-reports",
+#              "type": "string"
+#            },
+#            "resource_url": {
+#              "description": "URL that may be used to override the launch URL inferred by the specified resource_type_code",
+#              "example": "http://www.test.com/originality-report",
+#              "type": "string"
+#            }
 #         }
 #       }
 #     }
@@ -98,22 +120,27 @@ module Lti
     #   The URL where the originality report for the specified
     #   file may be found.
     #
-    # @argument originality_report[originality_report_lti_url] [String]
-    #   The URL of an LTI tool launch where the originality report of
-    #   the specified file may be found. Takes precedence over
-    #   originality_report_url in the Canvas UI.
+    # @argument originality_report[tool_setting][resource_type_code] [String]
+    #   The resource type code of the resource handler Canvas should use for the
+    #   LTI launch for viewing originality reports. If set Canvas will launch
+    #   to the message with type 'basic-lti-launch-request' in the specified
+    #   resource handler rather than using the originality_report_url.
     #
-    # @argument originality_report[originality_report_file_id] [Integer]
-    #    The ID of the file within Canvas that contains the originality
-    #    report for the submitted file provided in the request URL.
+    # @argument originality_report[tool_setting][resource_url] [String]
+    #   The URL Canvas should launch to when showing an LTI originality report.
+    #   Note that this value is inferred from the specified resource handler's
+    #   message "path" value (See originality_report[tool_setting][resource_type_code]) if
+    #   not specified. If this parameter is used a originality_report[tool_setting][resource_type_code]
+    #   must also be specified.
     #
     # @returns OriginalityReport
     def create
       render_unauthorized_action and return unless tool_proxy_associated?
       report_attributes = params.require(:originality_report).permit(create_attributes).to_hash.merge(
-        {submission_id: params.require(:submission_id)})
+        {submission_id: params.require(:submission_id)}
+      )
 
-      @report = OriginalityReport.new(report_attributes)
+      @report = OriginalityReport.new(build_link_id!(report_attributes))
       begin
         successful_save = @report.save
       rescue ActiveRecord::RecordNotUnique
@@ -138,19 +165,27 @@ module Lti
     #   The URL where the originality report for the specified
     #   file may be found.
     #
-    # @argument originality_report[originality_report_lti_url] [String]
-    #   The URL of an LTI tool launch where the originality report of
-    #   the specified file may be found. Takes precedent over
-    #   originality_report_url in the Canvas UI.
-    #
     # @argument originality_report[originality_report_file_id] [Integer]
     #    The ID of the file within Canvas that contains the originality
     #    report for the submitted file provided in the request URL.
     #
+    # @argument originality_report[tool_setting][resource_type_code] [String]
+    #   The resource type code of the resource handler Canvas should use for the
+    #   LTI launch for viewing originality reports. If set Canvas will launch
+    #   to the message with type 'basic-lti-launch-request' in the specified
+    #   resource handler rather than using the originality_report_url.
+    #
+    # @argument originality_report[tool_setting][resource_url] [String]
+    #   The URL Canvas should launch to when showing an LTI originality report.
+    #   Note that this value is inferred from the specified resource handler's
+    #   message "path" value (See originality_report[tool_setting][resource_type_code]) if
+    #   not specified. If this parameter is used a originality_report[tool_setting][resource_type_code]
+    #   must also be specified.
+    #
     # @returns OriginalityReport
     def update
       render_unauthorized_action and return unless tool_proxy_associated?
-      if @report.update_attributes(params.require(:originality_report).permit(update_attributes))
+      if @report.update_attributes(build_link_id!(params.require(:originality_report).permit(update_attributes)))
         render json: api_json(@report, @current_user, session)
       else
         render json: @report.errors, status: :bad_request
@@ -172,6 +207,27 @@ module Lti
 
     private
 
+    def build_link_id!(report_hash)
+      resource_type_code = report_hash.dig('tool_setting', 'resource_type_code')
+      if resource_type_code.present?
+        rh = tool_proxy.resources.find_by(resource_type_code: resource_type_code)
+        link_id = resource_link_id(rh, report_hash.dig('tool_setting', 'resource_url'))
+        report_hash['link_id'] = link_id
+      end
+      report_hash.delete 'tool_setting'
+      report_hash
+    end
+
+    def resource_link_id(resource_handler, lti_url = nil)
+      tool_setting = resource_handler.find_or_create_tool_setting(resource_url: lti_url,
+                                                                  link_fragment: link_fragment)
+      tool_setting.resource_link_id
+    end
+
+    def link_fragment
+      Lti::Asset.global_context_id_for(submission)
+    end
+
     def tool_proxy_associated?
       mh = assignment.tool_settings_tool
       mh.respond_to?(:resource_handler) && mh.resource_handler.tool_proxy.guid == access_token.sub
@@ -186,30 +242,32 @@ module Lti
        :file_id,
        :originality_report_file_id,
        :originality_report_url,
-       :originality_report_lti_url].freeze
+       tool_setting: %i(resource_url resource_type_code)].freeze
     end
 
     def update_attributes
       [:originality_report_file_id,
        :originality_report_url,
-       :originality_report_lti_url,
        :originality_score,
-       :workflow_state].freeze
+       :workflow_state,
+       tool_setting: %i(resource_url resource_type_code)].freeze
     end
 
     def assignment
       @_assignment ||= Assignment.find(params[:assignment_id])
     end
 
+    def submission
+      @_submission ||= Submission.find(params[:submission_id])
+    end
+
     def attachment_in_context
       attachment = Attachment.find(params.require(:originality_report)[:file_id])
-      submission = Submission.find(params[:submission_id])
       verify_submission_attachment(attachment, submission)
     end
 
     def report_in_context
       @report = OriginalityReport.find(params[:id])
-      submission = Submission.find(params[:submission_id])
       verify_submission_attachment(@report.attachment, submission)
     end
 

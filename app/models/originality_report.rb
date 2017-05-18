@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class OriginalityReport < ActiveRecord::Base
+  include Rails.application.routes.url_helpers
+
   belongs_to :submission
   belongs_to :attachment
   belongs_to :originality_report_attachment, class_name: "Attachment"
@@ -35,10 +37,30 @@ class OriginalityReport < ActiveRecord::Base
     super(options).tap do |h|
       h[:file_id] = h.delete :attachment_id
       h[:originality_report_file_id] = h.delete :originality_report_attachment_id
+      if h[:link_id].present?
+        tool_setting = Lti::ToolSetting.find_by(resource_link_id: h.delete(:link_id))
+        h[:tool_setting] = { resource_url: tool_setting.resource_url,
+                             resource_type_code:tool_setting.resource_type_code }
+      end
+    end
+  end
+
+  def report_launch_url
+    if link_id.present?
+      course_assignment_resource_link_id_url(course_id: assignment.context_id,
+                                             assignment_id: assignment.id,
+                                             resource_link_id: link_id,
+                                             host: HostUrl.context_host(assignment.context))
+    else
+      originality_report_url
     end
   end
 
   private
+
+  def assignment
+    submission.assignment
+  end
 
   def infer_workflow_state
     return if self.workflow_state == 'error'

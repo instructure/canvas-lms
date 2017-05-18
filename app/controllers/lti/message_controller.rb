@@ -18,6 +18,9 @@
 require 'ims/lti'
 
 module Lti
+  class InvalidDomain < StandardError
+  end
+
   class MessageController < ApplicationController
 
     before_action :require_context, :require_user
@@ -78,10 +81,7 @@ module Lti
     def resource
       tool_setting = ToolSetting.find_by(resource_link_id: params[:resource_link_id])
       return not_found if tool_setting.blank?
-
-      message_handler = tool_setting.message_handler(@context)
-      return lti2_basic_launch(message_handler) if message_handler.present?
-      not_found
+      basic_launch_by_tool_setting(tool_setting)
     end
 
     def basic_lti_launch_request
@@ -106,16 +106,35 @@ module Lti
 
     private
 
-    def lti2_basic_launch(message_handler)
+    def launch_url(resource_url, message_handler)
+      if resource_url.present?
+        return resource_url if message_handler.valid_resource_url?(resource_url)
+        raise InvalidDomain, I18n.t("resource url must match the resource handler's domain")
+      end
+      message_handler.launch_path
+    end
+
+    def basic_launch_by_tool_setting(tool_setting)
+      message_handler = tool_setting.message_handler(@context)
+      if message_handler.present?
+        return lti2_basic_launch(message_handler, tool_setting.resource_url, tool_setting.resource_link_id)
+      end
+      not_found
+    rescue InvalidDomain => e
+      return render json: {errors: {invalid_launch_url: {message: e.message}}}, status: 400
+    end
+
+    def lti2_basic_launch(message_handler, resource_url = nil, resource_link_id = nil)
       resource_handler = message_handler.resource_handler
       tool_proxy = resource_handler.tool_proxy
       # TODO: create scope for query
       if tool_proxy.workflow_state == 'active'
         launch_params = {
-          launch_url: message_handler.launch_path,
+          launch_url: launch_url(resource_url, message_handler),
           oauth_consumer_key: tool_proxy.guid,
           lti_version: IMS::LTI::Models::LTIModel::LTI_VERSION_2P0,
-          resource_link_id: build_resource_link_id(message_handler),
+          resource_link_id: resource_link_id || message_handler.build_resource_link_id(context: @context,
+                                                                                       link_fragment: params[:resource_link_fragment]),
         }
 
         if params[:secure_params].present?
@@ -186,12 +205,6 @@ module Lti
       binding_lookup = bindings.each_with_object({}) { |binding, hash| hash[binding.context_id] = binding }
       sorted_bindings = account_ids.map { |account_id| binding_lookup[account_id] }
       sorted_bindings.first
-    end
-
-    def build_resource_link_id(message_handler)
-      resource_link_id = "#{@context.class}_#{@context.global_id},MessageHandler_#{message_handler.global_id}"
-      resource_link_id += ",#{params[:resource_link_fragment]}" if params[:resource_link_fragment]
-      Canvas::Security.hmac_sha1(resource_link_id)
     end
 
     def create_variable_expander(opts = {})

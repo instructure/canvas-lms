@@ -280,6 +280,9 @@ CanvasRails::Application.routes.draw do
       member do
         get :list_google_docs
       end
+
+      get 'lti/resource/:resource_link_id', controller: 'lti/message',
+          action: 'resource', as: :resource_link_id
     end
 
     resources :grading_standards, only: [:index, :create, :update, :destroy]
