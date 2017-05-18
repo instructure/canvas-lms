@@ -71,7 +71,7 @@ import IcInput from './IcInput'
                 <div className="users-list-toolbar-form">
                   <IcInput
                     value={this.props.search_term}
-                    placeholder={I18n.t("Search users...")}
+                    placeholder={I18n.t("Search people...")}
                     onChange={(e) => onUpdateFilters({search_term: e.target.value})}
                     error={errors.search_term}
                   />
