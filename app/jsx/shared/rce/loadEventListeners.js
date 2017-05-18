@@ -15,6 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import initializeExternalTools from 'tinymce_plugins/instructure_external_tools/initializeExternalTools'
+import INST from 'INST'
+
 export default function loadEventListeners (callbacks = {}) {
   const validCallbacks = [
     'equationCB',
@@ -36,7 +39,7 @@ export default function loadEventListeners (callbacks = {}) {
       const EquationEditorView = require('compiled/views/tinymce/EquationEditorView')
       const view = new EquationEditorView(detail.ed)
       callbacks.equationCB(view)
-    }, 'initEquationAsyncChunk')
+    }, 'initEquationAsyncChunk2')
   })
 
   document.addEventListener('tinyRCE/initLinks', ({detail}) => {
@@ -65,13 +68,8 @@ export default function loadEventListeners (callbacks = {}) {
   })
 
   document.addEventListener('tinyRCE/initExternalTools', (e) => {
-    require.ensure([], (require) => {
-      const initializeExternalTools = require('tinymce_plugins/instructure_external_tools/initializeExternalTools')
-      const INST = require('INST')
-
-      initializeExternalTools.init(e.detail.ed, e.detail.url, INST)
-      callbacks.externalToolCB()
-    }, 'initExternalToolsAsyncChunk')
+    initializeExternalTools.init(e.detail.ed, e.detail.url, INST)
+    callbacks.externalToolCB()
   })
 
   document.addEventListener('tinyRCE/initRecord', (e) => {
