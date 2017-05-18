@@ -71,6 +71,7 @@
     "jquery": "https://github.com/ryankshaw/jquery.git#1.7.2-with-AMD-and-CommonJS",
     "jquery-getscrollbarwidth": "^1.0.0",
     "jquery.cookie": "^1.4.1",
+    "jquery.elastic": "^1.0.0",
     "json-loader": "^0.5.3",
     "jsx-loader": "0.11.2",
     "karma": "1.3.0",

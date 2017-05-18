@@ -4320,6 +4320,12 @@ jquery.cookie@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/jquery.cookie/-/jquery.cookie-1.4.1.tgz#d63dce209eab691fe63316db08ca9e47e0f9385b"
 
+jquery.elastic@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/jquery.elastic/-/jquery.elastic-1.0.0.tgz#351c99e443344d47b437a6ee8d0b5aab888ccfe8"
+  dependencies:
+    jquery ">=1.5"
+
 jquery@>=1.2.6, jquery@>=1.5, jquery@>=1.7.1, "jquery@https://github.com/ryankshaw/jquery.git#1.7.2-with-AMD-and-CommonJS":
   version "1.7.2"
   resolved "https://github.com/ryankshaw/jquery.git#a755a3e9c99d5a70d8ea570836f94ae1ba56046d"

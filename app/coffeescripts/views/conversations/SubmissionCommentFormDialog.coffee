@@ -30,7 +30,7 @@ define [
   'compiled/views/conversations/AutocompleteView'
   'compiled/views/conversations/CourseSelectionView'
   'compiled/views/conversations/ContextMessagesView'
-  'vendor/jquery.elastic'
+  'jquery.elastic'
 ], (I18n, $, _, {Collection}, DialogBaseView, template, preventDefault, composeTitleBarTemplate, composeButtonBarTemplate, Message, AutocompleteView, CourseSelectionView, ContextMessagesView) ->
 
   ##
