@@ -1950,7 +1950,7 @@ test('re-renders the view options menu after request rejects', function () {
 
 QUnit.module('Gradebook#updateSectionFilterVisibility', {
   setup () {
-    $fixtures.innerHTML = '<div class="section-button-placeholder"></div>';
+    $fixtures.innerHTML = '<div class="assignment-gradebook-container"><div class="section-button-placeholder"></div></div>';
     this.container = $fixtures.querySelector('.section-button-placeholder');
     const sections = [{ id: '2001', name: 'Freshmen' }, { id: '2002', name: 'Sophomores' }];
     this.gradebook = createGradebook({ sections });

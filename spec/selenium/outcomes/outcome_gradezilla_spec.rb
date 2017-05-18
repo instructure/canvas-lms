@@ -84,7 +84,7 @@ describe "outcome gradezilla" do
 
         fj('.section-select-button:visible').click
         expect(fj('.section-select-menu:visible')).to be_displayed
-        f("label[for='section_option_']").click
+        f(".outcome-gradebook-container label[for='section_option_']").click
         expect(fj('.section-select-button:visible')).to include_text "All Sections"
 
         expect(ff('.outcome-student-cell-content')).to have_size 3

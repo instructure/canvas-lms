@@ -27,21 +27,6 @@
 %>
 <div id="keyboard_navigation"></div>
 <div id="gradebook_wrapper">
-  <div class="gradebook-header">
-    <h1>Gradezilla</h1>
-    <div class="accessibility_warning">
-      <%= link_to t('Warning: For improved accessibility, please click here to use the Individual View Gradebook.'), context_url(@context, :change_gradebook_version_context_gradebook_url, :version => "individual"), :id => "accessibility_warning", :class => "screenreader-only" %>
-    </div>
-    <div class="header-buttons">
-      <div class="post-grades-button-placeholder">
-        <button id="keyboard-shortcuts" class="Button--icon-action Button--active" type="button">
-          <span class="screenreader-only"><%= t('Keyboard Shortcuts') %></span>
-          <i class="icon-keyboard-shortcuts"></i>
-        </button>
-      </div>
-      <div class="section-button-placeholder"></div>
-    </div>
-  </div>
 
   <div class="assignment-gradebook-container hidden">
     <div id="gradebook-toolbar" class="toolbar">
@@ -49,15 +34,20 @@
         <span data-component="GradebookMenu" data-variant="DefaultGradebook"></span>
         <span data-component="ViewOptionsMenu"></span>
         <span data-component="ActionMenu"></span>
+      </div>
+      <div class="gradebook_menu">
+        <button id="keyboard-shortcuts" class="Button--icon-action Button--active" type="button">
+          <span class="screenreader-only"><%= t('Keyboard Shortcuts') %></span>
+          <i class="icon-keyboard-shortcuts"></i>
+        </button>
         <% if grading_periods? %>
           <span class="multiple-grading-periods-selector-placeholder"></span>
         <% end %>
-      </div>
-      <div class="gradebook_filter" style="display:none">
-        <% placeholder = t('Filter by student name or secondary ID') %>
-        <input type="text" class="search-query" placeholder="<%= placeholder %>" aria-label="<%= placeholder %>">
-      </div>
-      <div class="gradebook_menu">
+        <div class="section-button-placeholder"></div>
+        <div class="gradebook_filter" style="display:none">
+          <% placeholder = t('Search…') %>
+          <input type="text" class="search-query" placeholder="<%= placeholder %>" aria-label="<%= placeholder %>">
+        </div>
         <span id="gradebook-settings-modal-button-container"></span>
         <span data-component="GradebookSettingsModal"></span>
       </div>
@@ -74,6 +64,7 @@
   <% if @context.feature_enabled?(:outcome_gradebook) %>
     <div class="outcome-gradebook-container">
       <div class="outcome-menus hidden" style="text-align: right;">
+        <div class="section-button-placeholder"></div>
         <span data-component="GradebookMenu" data-variant="DefaultGradebookLearningMastery"></span>
       </div>
       <div class="outcome-gradebook hidden"></div>

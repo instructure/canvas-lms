@@ -27,6 +27,16 @@ a#accessibility_warning {
   display: none;
 }
 
+
+#keyboard-shortcuts:focus {
+  margin: -1px;
+  border-radius: 0.25rem;
+
+  // from app/stylesheets/vendor/bootstrap/_forms.scss .uneditable-input:focus
+  border: 1px solid lighten($ic-link-color, 10%);
+  outline: 0;
+}
+
 $cell_height: 33px;
 
 // ******* overrides of the default slick.grid.css styles ********
@@ -572,6 +582,10 @@ $gradebook_checkbox_size: 16px;
     display: flex;
     align-items: center;
   }
+}
+
+.section-button-placeholder {
+  display: inline-block;
 }
 
 .gradebook-menus {

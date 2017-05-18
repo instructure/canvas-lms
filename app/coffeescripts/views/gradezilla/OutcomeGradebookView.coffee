@@ -24,10 +24,11 @@ define [
   'vendor/slickgrid'
   'compiled/gradezilla/OutcomeGradebookGrid'
   'compiled/views/gradezilla/CheckboxView'
+  'compiled/views/gradezilla/SectionMenuView'
   'jst/gradezilla/outcome_gradebook'
   'vendor/jquery.ba-tinypubsub'
   'jquery.instructure_misc_plugins'
-], (I18n, $, _, {View}, Slick, Grid, CheckboxView, template, cellTemplate) ->
+], (I18n, $, _, {View}, Slick, Grid, CheckboxView, SectionMenuView, template, cellTemplate) ->
 
   Dictionary =
     exceedsMastery:
@@ -145,6 +146,7 @@ define [
     render: ->
       $.when(@gradebook.hasSections)
         .then(=> super)
+        .then(@renderSectionMenu)
       $.when(@hasOutcomes).then(@renderGrid)
       this
 
@@ -177,6 +179,21 @@ define [
         onResize: => @grid.resizeCanvas() if @grid
       })
       $(".post-grades-button-placeholder").hide();
+
+    # Internal: Render Section selector.
+    # Returns nothing.
+    renderSectionMenu: =>
+      if (!@sectionMenu && $('.outcome-gradebook-container .section-button-placeholder').children().length)
+        $('.outcome-gradebook-container .section-button-placeholder').empty()
+      @sectionMenu ||= new SectionMenuView(
+        tagName: 'span'
+        sections: @gradebook.sectionList()
+        showSections: true
+        currentSection: @gradebook.sectionToShow
+      )
+      @sectionMenu.disabled = @gradebook.sectionList().length <= 1
+      @sectionMenu.render()
+      @sectionMenu.$el.appendTo('.outcome-gradebook-container .section-button-placeholder')
 
     # Public: Load all outcome results from API.
     #

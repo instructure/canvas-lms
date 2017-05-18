@@ -1017,7 +1017,7 @@ define [
         )
         @sectionMenu.disabled = !@contentLoadStates.studentsLoaded
         @sectionMenu.render()
-        @sectionMenu.$el.appendTo('.section-button-placeholder')
+        @sectionMenu.$el.appendTo('.assignment-gradebook-container .section-button-placeholder')
       else if @sectionMenu
         @sectionMenu.remove()
         @sectionMenu = null
