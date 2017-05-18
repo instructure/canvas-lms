@@ -58,15 +58,6 @@
         <input type="text" class="search-query" placeholder="<%= placeholder %>" aria-label="<%= placeholder %>">
       </div>
       <div class="gradebook_menu">
-        <button id="gradebook_settings">
-          <i class="icon-settings" aria-hidden="true"></i>
-          <span class="screenreader-only"><%= t('Gradebook Settings') %></span>
-        </button>
-        <ul style="display: none;" class="gradebook_dropdown ui-kyle-menu">
-          <li><a class="student_names_toggle" href="#" role="button"><%= t('Hide Student Names') %></a></li>
-          <li><a href="#"><label><%= t('Show Attendance Columns') %> <input type="checkbox" id="show_attendance" /></label></a></li>
-          <li id="include-ungraded-list-item"><a href="#"><label><%= t("Treat Ungraded as 0") %><input type="checkbox" id="include_ungraded_assignments" /></label></a></li>
-        </ul>
         <span id="gradebook-settings-modal-button-container"></span>
         <span data-component="GrabebookSettingsModal"></span>
       </div>

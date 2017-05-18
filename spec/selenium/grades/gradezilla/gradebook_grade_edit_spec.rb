@@ -74,40 +74,6 @@ describe "Gradezilla editing grades" do
     expect(f('#after_fudge_points_total')).to include_text points.to_s
   end
 
-  it "treats ungraded as 0s when asked, and ignore when not", priority: "1", test_id: 164222 do
-    Gradezilla.visit(@course)
-
-    # make sure it shows like it is not treating ungraded as 0's by default
-    expect(is_checked('#include_ungraded_assignments')).to be_falsey
-    expect(final_score_for_row(0)).to eq @student_1_total_ignoring_ungraded
-    expect(final_score_for_row(1)).to eq @student_2_total_ignoring_ungraded
-
-    # set the "treat ungraded as 0's" option in the header
-
-    f('#gradebook_settings').click
-    f('label[for="include_ungraded_assignments"]').click
-
-    # now make sure that the grades show as if those ungraded assignments had a '0'
-    expect(is_checked('#include_ungraded_assignments')).to be_truthy
-    expect(final_score_for_row(0)).to eq @student_1_total_treating_ungraded_as_zeros
-    expect(final_score_for_row(1)).to eq @student_2_total_treating_ungraded_as_zeros
-
-    # reload the page and make sure it remembered the setting
-    Gradezilla.visit(@course)
-    expect(is_checked('#include_ungraded_assignments')).to be_truthy
-    expect(final_score_for_row(0)).to eq @student_1_total_treating_ungraded_as_zeros
-    expect(final_score_for_row(1)).to eq @student_2_total_treating_ungraded_as_zeros
-
-    # NOTE: gradebook1 does not handle 'remembering' the `include_ungraded_assignments` setting
-
-    # check that reverting back to unchecking 'include_ungraded_assignments' also reverts grades
-    f('#gradebook_settings').click
-    f('label[for="include_ungraded_assignments"]').click
-    expect(is_checked('#include_ungraded_assignments')).to be_falsey
-    expect(final_score_for_row(0)).to eq @student_1_total_ignoring_ungraded
-    expect(final_score_for_row(1)).to eq @student_2_total_ignoring_ungraded
-  end
-
   it "validates initial grade totals are correct", priority: "1", test_id: 220311 do
     Gradezilla.visit(@course)
 

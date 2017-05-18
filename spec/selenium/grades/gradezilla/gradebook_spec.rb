@@ -112,13 +112,6 @@ describe "Gradezilla" do
     end
   end
 
-  it "validates that gradebook settings is displayed when button is clicked", priority: "1", test_id: 164217 do
-    Gradezilla.visit(@course)
-
-    f('#gradebook_settings').click
-    expect(f('.gradebook_dropdown')).to be_displayed
-  end
-
   it "View Grading History menu item redirects to grading history page", priority: "2", test_id: 164218 do
     @course.root_account.enable_feature!(:gradezilla)
     Gradezilla.visit(@course)
@@ -230,26 +223,6 @@ describe "Gradezilla" do
     Gradezilla.visit(@course)
 
     expect(f("body")).not_to contain_css(".total-cell .icon-muted")
-  end
-
-  it "hides and shows student names", priority: "2", test_id: 164220 do
-
-    def toggle_hiding_students
-      f('#gradebook_settings').click
-      student_toggle = f('.student_names_toggle')
-      expect(student_toggle).to be_displayed
-      student_toggle.click
-    end
-
-    Gradezilla.visit(@course)
-
-    toggle_hiding_students
-    expect(f("#content")).not_to contain_jqcss('.student-name:visible')
-    expect(fj('.student-placeholder:visible')).to be
-
-    toggle_hiding_students
-    expect(fj('.student-name:visible')).to be
-    expect(f("#content")).not_to contain_jqcss('.student-placeholder:visible')
   end
 
   context "downloading and uploading submissions" do

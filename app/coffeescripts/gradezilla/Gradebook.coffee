@@ -1107,33 +1107,7 @@ define [
       @renderGradebookMenus()
       @renderFilters()
 
-      $settingsMenu = $('.gradebook_dropdown')
-
-      includeUngradedAssignmentsEl = $settingsMenu.find("#include_ungraded_assignments")
-      includeUngradedAssignmentsEl.prop('checked', @include_ungraded_assignments).change (event) =>
-        @include_ungraded_assignments = includeUngradedAssignmentsEl.is(':checked')
-        UserSettings.contextSet 'include_ungraded_assignments', @include_ungraded_assignments
-        @buildRows()
-
-      showAttendanceEl = $settingsMenu.find("#show_attendance")
-      showAttendanceEl.prop('checked', @show_attendance).change (event) =>
-        @show_attendance = showAttendanceEl.is(':checked')
-        UserSettings.contextSet 'show_attendance', @show_attendance
-        @grid.setColumns @getVisibleGradeGridColumns()
-        @buildRows()
-
-      # don't show the "show attendance" link in the dropdown if there's no attendance assignments
-      unless (_.detect @assignments, (a) -> (''+a.submission_types) == "attendance")
-        $settingsMenu.find('#show_attendance').closest('li').hide()
-
-      if @hideAggregateColumns()
-        $settingsMenu.find('#include-ungraded-list-item').hide()
-
       @arrangeColumnsBy(@getStoredSortOrder(), true)
-
-      $('#gradebook_settings').kyleMenu(returnFocusTo: $('#gradebook_settings'))
-      $('#download_csv').kyleMenu(returnFocusTo: $('#download_csv'))
-      $('#post_grades').kyleMenu()
 
       gradebookSettingsModalMountPoint = document.querySelector("[data-component='GrabebookSettingsModal']")
       @gradebookSettingsModal = renderComponent(
@@ -1150,7 +1124,6 @@ define [
         React.createElement(IconSettingsSolid.default, { title: I18n.t('Gradebook Settings') })
       )
 
-      $settingsMenu.find('.student_names_toggle').click(@studentNamesToggle)
       $('#keyboard-shortcuts').click ->
         questionMarkKeyDown = $.Event('keydown', keyCode: 191)
         $(document).trigger(questionMarkKeyDown)

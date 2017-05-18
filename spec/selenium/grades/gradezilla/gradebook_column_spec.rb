@@ -122,16 +122,6 @@ describe "Gradezilla - assignment column headers" do
     expect(first_row_cells[1]).to include_text @assignment_2_points
   end
 
-  it "should validate show attendance columns option", priority: "1", test_id: 220034 do
-    Gradezilla.visit(@course)
-    f('#gradebook_settings').click
-    f('#show_attendance').find_element(:xpath, '..').click
-    headers = ff('.slick-header')
-    expect(headers[1]).to include_text(@attendance_assignment.title)
-    f('#gradebook_settings').click
-    f('#show_attendance').find_element(:xpath, '..').click
-  end
-
   it "should show letter grade in total column", priority: "1", test_id: 220035 do
     row1_selector = '#gradebook_grid .container_1 .slick-row:nth-child(1) .total-cell .letter-grade-points'
     row2_selector = '#gradebook_grid .container_1 .slick-row:nth-child(2) .total-cell .letter-grade-points'

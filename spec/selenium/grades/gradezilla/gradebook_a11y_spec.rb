@@ -67,12 +67,6 @@ describe "Gradezilla" do
   end
 
   context "return focus to settings menu when it closes" do
-    it "after hide/show student names is clicked", priority: "2", test_id: 720461 do
-      f('#gradebook_settings').click
-      f(".student_names_toggle").click
-      expect(active_element).to have_attribute('id', 'gradebook_settings')
-    end
-
     it "after arrange columns is clicked", priority: "2", test_id: 720462 do
       view_menu_trigger = Gradezilla.gradebook_menu('View').find('button')
       Gradezilla.open_gradebook_menu('View')
@@ -85,15 +79,5 @@ describe "Gradezilla" do
     Gradezilla.gradebook_view_options_menu.click
     Gradezilla.notes_option.click
     expect(active_element).to eq(Gradezilla.gradebook_view_options_menu)
-  end
-
-  context 'settings menu is accessible' do
-    it 'hides the icon from screen readers' do
-      expect(f('#gradebook_settings .icon-settings')).to have_attribute('aria-hidden', 'true')
-    end
-
-    it 'has screen reader only text' do
-      expect(f('#gradebook_settings .screenreader-only').text).to eq('Gradebook Settings')
-    end
   end
 end
