@@ -164,7 +164,7 @@ describe "Gradezilla - post grades to SIS" do
       expect(Gradezilla.action_menu_item(tool_name)).to be_displayed
 
       f('button.section-select-button').click
-      fj('ul#section-to-show-menu li:nth(4)').click
+      fj('ul#section-to-show-menu li:nth(2)').click
       Gradezilla.open_action_menu
 
       expect(Gradezilla.action_menu_item(tool_name)).to be_displayed

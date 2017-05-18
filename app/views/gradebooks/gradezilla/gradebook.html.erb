@@ -27,7 +27,6 @@
 %>
 <div id="keyboard_navigation"></div>
 <div id="gradebook_wrapper">
-
   <div class="assignment-gradebook-container hidden">
     <div id="gradebook-toolbar" class="toolbar">
       <div class="gradebook-menus">
@@ -35,21 +34,28 @@
         <span data-component="ViewOptionsMenu"></span>
         <span data-component="ActionMenu"></span>
       </div>
-      <div class="gradebook_menu">
+
+      <div id="gradebook-actions">
         <button id="keyboard-shortcuts" class="Button--icon-action Button--active" type="button">
           <span class="screenreader-only"><%= t('Keyboard Shortcuts') %></span>
           <i class="icon-keyboard-shortcuts"></i>
         </button>
+
         <% if grading_periods? %>
-          <span class="multiple-grading-periods-selector-placeholder"></span>
+          <div class="gradebook-filter-container" id="grading-periods-filter-container"></div>
         <% end %>
-        <div class="section-button-placeholder"></div>
-        <div class="gradebook_filter" style="display:none">
+
+        <div class="gradebook-filter-container section-button-placeholder"></div>
+
+        <div class="gradebook-filter-container gradebook_filter" style="display:none">
           <% placeholder = t('Search…') %>
           <input type="text" class="search-query" placeholder="<%= placeholder %>" aria-label="<%= placeholder %>">
         </div>
-        <span id="gradebook-settings-modal-button-container"></span>
-        <span data-component="GradebookSettingsModal"></span>
+
+        <div class="gradebook_menu">
+          <span id="gradebook-settings-modal-button-container"></span>
+          <span data-component="GradebookSettingsModal"></span>
+        </div>
       </div>
     </div>
     <div id="gradebook-grid-wrapper" class="use-css-transitions-for-show-hide" style="display:none;">

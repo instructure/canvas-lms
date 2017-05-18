@@ -197,7 +197,7 @@ class Gradezilla
       period = gp_menu_list.find do |item|
         f('label', item).attribute("for") == "period_option_#{grading_period_id}"
       end
-      wait_for_new_page_load { period.click } or raise "page not loaded"
+      period.click
     end
 
     def enter_grade(grade, x_coordinate, y_coordinate)

@@ -29,6 +29,7 @@ import { createGradebook } from 'spec/jsx/gradezilla/default_gradebook/Gradebook
 import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator';
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
 import DataLoader from 'jsx/gradezilla/DataLoader';
+import SubmissionStateMap from 'jsx/gradezilla/SubmissionStateMap';
 import StudentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/StudentRowHeaderConstants';
 import UserSettings from 'compiled/userSettings';
 import ActionMenu from 'jsx/gradezilla/default_gradebook/components/ActionMenu';
@@ -128,6 +129,23 @@ test('initializes content load state for context modules to false', function () 
   strictEqual(gradebook.contentLoadStates.contextModulesLoaded, false);
 });
 
+test('initializes a submission state map', function () {
+  const gradebook = createGradebook();
+  strictEqual(gradebook.submissionStateMap.constructor, SubmissionStateMap);
+});
+
+test('sets the submission state map .hasGradingPeriods to true when a grading period set exists', function () {
+  const gradebook = createGradebook({
+    grading_period_set: { id: '1501', grading_periods: [{ id: '701' }, { id: '702' }] }
+  });
+  strictEqual(gradebook.submissionStateMap.hasGradingPeriods, true);
+});
+
+test('sets the submission state map .selectedGradingPeriodID to the "grading period to show"', function () {
+  const gradebook = createGradebook();
+  strictEqual(gradebook.submissionStateMap.selectedGradingPeriodID, gradebook.getGradingPeriodToShow());
+});
+
 test('calls renderStatusesModal', function () {
   const loaderPromises = {
     gotAssignmentGroups: $.Deferred(),
@@ -203,6 +221,56 @@ test('invalidates rows after updating students', function () {
   this.gradebook.gotCustomColumnDataChunk({ id: '2401' }, data);
 });
 
+QUnit.module('Gradebook - initial .gridDisplaySettings');
+
+test('sets .filterColumnsBy.assignmentGroupId to the value from the given settings', function () {
+  const gradebook = createGradebook({ settings: { filter_columns_by: { assignment_group_id: '2201' } } });
+  strictEqual(gradebook.getFilterColumnsBySetting('assignmentGroupId'), '2201');
+});
+
+test('sets .filterColumnsBy.contextModuleId to the value from the given settings', function () {
+  const gradebook = createGradebook({ settings: { filter_columns_by: { context_module_id: '2601' } } });
+  strictEqual(gradebook.getFilterColumnsBySetting('contextModuleId'), '2601');
+});
+
+test('sets .filterColumnsBy.gradingPeriodId to the value from the given settings', function () {
+  const gradebook = createGradebook({ settings: { filter_columns_by: { grading_period_id: '1401' } } });
+  strictEqual(gradebook.getFilterColumnsBySetting('gradingPeriodId'), '1401');
+});
+
+test('sets .filterColumnsBy.sectionId to the value from the given settings', function () {
+  const gradebook = createGradebook({ settings: { filter_columns_by: { section_id: '2001' } } });
+  strictEqual(gradebook.getFilterColumnsBySetting('sectionId'), '2001');
+});
+
+test('defaults .filterColumnsBy.assignmentGroupId to null when not present in the given settings', function () {
+  const gradebook = createGradebook();
+  strictEqual(gradebook.getFilterColumnsBySetting('assignmentGroupId'), null);
+});
+
+test('defaults .filterColumnsBy.contextModuleId to null when not present in the given settings', function () {
+  const gradebook = createGradebook();
+  strictEqual(gradebook.getFilterColumnsBySetting('contextModuleId'), null);
+});
+
+test('defaults .filterColumnsBy.gradingPeriodId to null when not present in the given settings', function () {
+  const gradebook = createGradebook();
+  strictEqual(gradebook.getFilterColumnsBySetting('gradingPeriodId'), null);
+});
+
+test('defaults .filterColumnsBy.sectionId to null when not present in the given settings', function () {
+  const gradebook = createGradebook();
+  strictEqual(gradebook.getFilterColumnsBySetting('sectionId'), null);
+});
+
+test('updates partial .filterColumnsBy settings with the default values', function () {
+  const gradebook = createGradebook({ settings: { filter_columns_by: { assignment_group_id: '2201' } } });
+  strictEqual(gradebook.getFilterColumnsBySetting('assignmentGroupId'), '2201');
+  strictEqual(gradebook.getFilterColumnsBySetting('contextModuleId'), null);
+  strictEqual(gradebook.getFilterColumnsBySetting('gradingPeriodId'), null);
+  strictEqual(gradebook.getFilterColumnsBySetting('sectionId'), null);
+});
+
 QUnit.module('Gradebook - initial content load', {
   setup () {
     this.loaderPromises = {
@@ -221,6 +289,12 @@ QUnit.module('Gradebook - initial content load', {
 test('uses the DataLoader', function () {
   createGradebook();
   strictEqual(DataLoader.loadGradebookData.callCount, 1);
+});
+
+test('loads assignment groups', function () {
+  createGradebook({ assignment_groups_url: '/assignment-groups' });
+  const [options] = DataLoader.loadGradebookData.lastCall.args;
+  equal(options.assignmentGroupsURL, '/assignment-groups');
 });
 
 test('loads context modules', function () {
@@ -271,7 +345,6 @@ QUnit.module('Gradebook#calculateStudentGrade', {
       { id: '201', points_possible: 10, omit_from_final_grade: false }
     ];
     Object.assign(gradebook, {
-      gradingPeriodToShow: '0',
       assignmentGroups: [
         { id: '301', group_weight: 60, rules: {}, assignments }
       ],
@@ -295,6 +368,7 @@ QUnit.module('Gradebook#calculateStudentGrade', {
       submissionsForStudent: () => this.submissions,
       ...options
     });
+    gradebook.setFilterColumnsBySetting('gradingPeriodId', '0');
     return gradebook;
   },
 
@@ -401,9 +475,9 @@ test('stores the final grade on the student when including ungraded assignments'
 
 test('stores the current grade from the selected grading period when not including ungraded assignments', function () {
   const gradebook = this.createGradebook({
-    gradingPeriodToShow: 701,
     include_ungraded_assignments: false
   });
+  gradebook.setFilterColumnsBySetting('gradingPeriodId', '701');
   this.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades);
   const student = {
     id: '101',
@@ -416,9 +490,9 @@ test('stores the current grade from the selected grading period when not includi
 
 test('stores the final grade from the selected grading period when including ungraded assignments', function () {
   const gradebook = this.createGradebook({
-    gradingPeriodToShow: 701,
     include_ungraded_assignments: true
   });
+  gradebook.setFilterColumnsBySetting('gradingPeriodId', '701');
   this.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades);
   const student = {
     id: '101',
@@ -609,67 +683,45 @@ test('optionally sorts in descending order', function () {
 });
 
 QUnit.module('Gradebook#hideAggregateColumns', {
-  createGradebook (options = {}) {
+  createGradebook () {
     const gradebook = createGradebook({
       all_grading_periods_totals: false
     });
-    Object.assign(gradebook, {
-      gradingPeriodSet: { id: '1' },
-      getGradingPeriodToShow () {
-        return '1';
-      },
-      ...options
-    });
+    gradebook.gradingPeriodSet = { id: '1', gradingPeriods: [{ id: '701' }, { id: '702' }] };
     return gradebook;
   }
 });
 
 test('returns false if there are no grading periods', function () {
-  const gradebook = this.createGradebook({
-    gradingPeriodSet: null,
-    isAllGradingPeriods () {
-      return false;
-    }
-  });
+  const gradebook = this.createGradebook();
+  gradebook.gradingPeriodSet = null;
   notOk(gradebook.hideAggregateColumns());
 });
 
 test('returns false if there are no grading periods, even if isAllGradingPeriods is true', function () {
-  const gradebook = this.createGradebook({
-    gradingPeriodSet: null,
-    getGradingPeriodToShow () {
-      return '0';
-    }
-  });
+  const gradebook = this.createGradebook();
+  gradebook.gradingPeriodSet = null;
+  gradebook.setFilterColumnsBySetting('gradingPeriodId', '0');
   notOk(gradebook.hideAggregateColumns());
 });
 
 test('returns false if "All Grading Periods" is not selected', function () {
-  const gradebook = this.createGradebook({
-    isAllGradingPeriods () {
-      return false;
-    }
-  });
+  const gradebook = this.createGradebook();
+  gradebook.setFilterColumnsBySetting('gradingPeriodId', '701');
   notOk(gradebook.hideAggregateColumns());
 });
 
 test('returns true if "All Grading Periods" is selected', function () {
-  const gradebook = this.createGradebook({
-    getGradingPeriodToShow () {
-      return '0';
-    }
-  });
+  const gradebook = this.createGradebook();
+  gradebook.setFilterColumnsBySetting('gradingPeriodId', '0');
   ok(gradebook.hideAggregateColumns());
 });
 
 test('returns false if "All Grading Periods" is selected and the grading period set has' +
   '"Display Totals for All Grading Periods option" enabled', function () {
-  const gradebook = this.createGradebook({
-    getGradingPeriodToShow () {
-      return '0';
-    },
-    gradingPeriodSet: { displayTotalsForAllGradingPeriods: true }
-  });
+  const gradebook = this.createGradebook();
+  gradebook.setFilterColumnsBySetting('gradingPeriodId', '0');
+  gradebook.gradingPeriodSet.displayTotalsForAllGradingPeriods = true;
   notOk(gradebook.hideAggregateColumns());
 });
 
@@ -1011,32 +1063,40 @@ QUnit.module('Gradebook#getVisibleGradeGridColumns', {
   setup () {
     const allAssignmentColumns = [
       {
+        assignmentId: '2301',
         object: {
           assignment_group: { position: 1 },
+          id: '2301',
           position: 1,
           name: 'published graded',
           published: true,
           submission_types: ['online_text_entry']
         }
       }, {
+        assignmentId: '2302',
         object: {
           assignment_group: { position: 1 },
+          id: '2302',
           position: 2,
           name: 'unpublished',
           published: false,
           submission_types: ['online_text_entry']
         }
       }, {
+        assignmentId: '2303',
         object: {
           assignment_group: { position: 1 },
+          id: '2303',
           position: 3,
           name: 'not graded',
           published: true,
           submission_types: ['not_graded']
         }
       }, {
+        assignmentId: '2304',
         object: {
           assignment_group: { position: 1 },
+          id: '2304',
           position: 4,
           name: 'attendance',
           published: true,
@@ -1099,14 +1159,14 @@ test('does not include ungraded assignments', function () {
   notOk(objectNames.includes('not graded'));
 });
 
-test('does not include attendance assignments when show_attendence is false', function () {
+test('does not include attendance assignments when show_attendance is false', function () {
   this.gradebook.show_attendance = false;
   const columns = this.gradebook.getVisibleGradeGridColumns();
   const objectNames = columns.map(c => c.object.name);
   notOk(objectNames.includes('attendance'));
 });
 
-test('includes attendance assignments when show_attendence is true', function () {
+test('includes attendance assignments when show_attendance is true', function () {
   this.gradebook.show_attendance = true;
   const columns = this.gradebook.getVisibleGradeGridColumns();
   const objectNames = columns.map(c => c.object.name);
@@ -1146,15 +1206,15 @@ test('returns all submissions for the student when there are no grading periods'
 });
 
 test('returns all submissions if "All Grading Periods" is selected', function () {
-  this.gradebook.gradingPeriodSet = { id: '1' };
-  this.gradebook.gradingPeriodToShow = '0'; // value indicates "All Grading Periods"
+  this.gradebook.gradingPeriodSet = { id: '1', gradingPeriods: [{ id: '1' }, { id: '2' }] };
+  this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '0'); // value indicates "All Grading Periods"
   const submissions = this.gradebook.submissionsForStudent(this.student);
   propEqual(_.pluck(submissions, 'assignment_id'), ['1', '2']);
 });
 
 test('only returns submissions due for the student in the selected grading period', function () {
-  this.gradebook.gradingPeriodSet = { id: '1' };
-  this.gradebook.gradingPeriodToShow = '2';
+  this.gradebook.gradingPeriodSet = { id: '1', gradingPeriods: [{ id: '1' }, { id: '2' }] };
+  this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '2');
   const submissions = this.gradebook.submissionsForStudent(this.student);
   propEqual(_.pluck(submissions, 'assignment_id'), ['2']);
 });
@@ -1989,11 +2049,6 @@ test('renders the section select with a list of sections', function () {
   deepEqual(sections.slice(1).map(section => section.id), ['2001', '2002']);
 });
 
-test('sets the section select to show sections', function () {
-  this.gradebook.updateSectionFilterVisibility();
-  strictEqual(this.gradebook.sectionMenu.showSections, true);
-});
-
 test('sets the section select to show the defined sectionToShow', function () {
   this.gradebook.sectionToShow = '2002';
   this.gradebook.updateSectionFilterVisibility();
@@ -2032,14 +2087,12 @@ test('removes the section select when filter is deselected', function () {
   strictEqual(this.container.children.length, 0, 'nothing was rendered');
 });
 
-
 QUnit.module('Gradebook#updateGradingPeriodFilterVisibility', {
   setup () {
-    $fixtures.innerHTML = '<div class="multiple-grading-periods-selector-placeholder"></div>';
-    this.container = $fixtures.querySelector('.multiple-grading-periods-selector-placeholder');
+    $fixtures.innerHTML = '<div id="grading-periods-filter-container"></div>';
+    this.container = $fixtures.querySelector('#grading-periods-filter-container');
     this.gradebook = createGradebook({
-      active_grading_periods: [{ id: '701' }, { id: '702' }],
-      grading_period_set: { id: '1501' }
+      grading_period_set: { id: '1501', grading_periods: [{ id: '701' }, { id: '702' }] }
     });
     this.gradebook.setSelectedViewOptionsFilters(['gradingPeriods']);
   },
@@ -2076,8 +2129,8 @@ test('renders the grading period select with a list of grading periods', functio
   deepEqual(periods.slice(1).map(gradingPeriod => gradingPeriod.id), ['701', '702']);
 });
 
-test('sets the grading period select to show the defined gradingPeriodToShow', function () {
-  this.gradebook.gradingPeriodToShow = '702';
+test('sets the grading period select to show the selected grading period', function () {
+  this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '702');
   this.gradebook.updateGradingPeriodFilterVisibility();
   strictEqual(this.gradebook.gradingPeriodMenu.currentGradingPeriod, '702');
 });
@@ -2185,6 +2238,33 @@ test('invalidates student rows after setting assignment visibility', function ()
     strictEqual(this.gradebook.setAssignmentVisibility.callCount, 1, 'setAssignmentVisibility was already called');
   });
   this.gradebook.setupGrading(this.students);
+});
+
+QUnit.module('resetGrading');
+
+test('initializes a new submission state map', function () {
+  const gradebook = createGradebook();
+  const originalMap = gradebook.submissionStateMap;
+  gradebook.resetGrading();
+  strictEqual(gradebook.submissionStateMap.constructor, SubmissionStateMap);
+  notEqual(originalMap, gradebook.submissionStateMap);
+});
+
+test('calls setupGrading', function () {
+  const gradebook = createGradebook();
+  this.spy(gradebook, 'setupGrading');
+  gradebook.resetGrading();
+  strictEqual(gradebook.setupGrading.callCount, 1);
+});
+
+test('sends all students when calling setupGrading', function () {
+  const allStudents = [{ id: '1101', assignment_201: {}, assignment_202: {} }];
+  const gradebook = createGradebook();
+  this.stub(gradebook, 'listStudents').returns(allStudents);
+  this.spy(gradebook, 'setupGrading');
+  gradebook.resetGrading();
+  const [students] = gradebook.setupGrading.lastCall.args;
+  strictEqual(students, allStudents);
 });
 
 QUnit.module('addRow', {
@@ -2536,6 +2616,108 @@ test('updates the column headers after sorting', function () {
   });
   this.gradebook.sortGridRows();
 })
+
+QUnit.module('Gradebook#filterAssignments', {
+  setup () {
+    this.assignments = [
+      {
+        assignment_group: { position: 1 },
+        id: '2301',
+        position: 1,
+        name: 'published graded',
+        published: true,
+        submission_types: ['online_text_entry']
+      }, {
+        assignment_group: { position: 1 },
+        id: '2302',
+        position: 2,
+        name: 'unpublished',
+        published: false,
+        submission_types: ['online_text_entry']
+      }, {
+        assignment_group: { position: 1 },
+        id: '2303',
+        position: 3,
+        name: 'not graded',
+        published: true,
+        submission_types: ['not_graded']
+      }, {
+        assignment_group: { position: 1 },
+        id: '2304',
+        position: 4,
+        name: 'attendance',
+        published: true,
+        submission_types: ['attendance']
+      }
+    ];
+    this.gradebook = createGradebook();
+    this.gradebook.effectiveDueDates = {
+      2301: {
+        1101: { grading_period_id: '1401' }
+      },
+      2302: {
+        1101: { grading_period_id: '1402' }
+      },
+      2303: {
+        1101: { grading_period_id: '1401' }
+      },
+      2304: {
+        1101: { grading_period_id: '1402' }
+      }
+    };
+    this.gradebook.gradingPeriodSet = { id: '1501', gradingPeriods: [{ id: '1401' }, { id: '1402' }] };
+    this.gradebook.showUnpublishedAssignments = true;
+    this.gradebook.show_attendance = true;
+  }
+});
+
+test('excludes "not_graded" assignments', function () {
+  const assignments = this.gradebook.filterAssignments(this.assignments);
+  strictEqual(assignments.findIndex(assignment => assignment.id === '2303'), -1);
+});
+
+test('excludes "unpublished" assignments when "showUnpublishedAssignments" is false', function () {
+  this.gradebook.showUnpublishedAssignments = false;
+  const assignments = this.gradebook.filterAssignments(this.assignments);
+  strictEqual(assignments.findIndex(assignment => assignment.id === '2302'), -1);
+});
+
+test('includes "unpublished" assignments when "showUnpublishedAssignments" is true', function () {
+  this.gradebook.showUnpublishedAssignments = true;
+  const assignments = this.gradebook.filterAssignments(this.assignments);
+  notEqual(assignments.findIndex(assignment => assignment.id === '2302'), -1);
+});
+
+test('excludes "attendance" assignments when "show_attendance" is false', function () {
+  this.gradebook.show_attendance = false;
+  const assignments = this.gradebook.filterAssignments(this.assignments);
+  strictEqual(assignments.findIndex(assignment => assignment.id === '2304'), -1);
+});
+
+test('includes "attendance" assignments when "show_attendance" is true', function () {
+  this.gradebook.show_attendance = true;
+  const assignments = this.gradebook.filterAssignments(this.assignments);
+  notEqual(assignments.findIndex(assignment => assignment.id === '2304'), -1);
+});
+
+test('includes assignments from all grading periods when not filtering by grading period', function () {
+  this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '0'); // value indicates "All Grading Periods"
+  const assignments = this.gradebook.filterAssignments(this.assignments);
+  deepEqual(_.map(assignments, 'id'), ['2301', '2302', '2304']);
+});
+
+test('excludes assignments from other grading periods when filtering by a grading period', function () {
+  this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '1401');
+  const assignments = this.gradebook.filterAssignments(this.assignments);
+  deepEqual(_.map(assignments, 'id'), ['2301']);
+});
+
+test('includes assignments from all grading periods grading period set has not been assigned', function () {
+  this.gradebook.gradingPeriodSet = null;
+  this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '1401');
+  const assignments = this.gradebook.filterAssignments(this.assignments);
+  deepEqual(_.map(assignments, 'id'), ['2301', '2302', '2304']);
+});
 
 QUnit.module('Gradebook#groupTotalFormatter', {
   setup () {
@@ -4628,6 +4810,12 @@ test('calls ajaxJSON as a PUT request', function () {
 
 test('calls ajaxJSON with default gradebook_settings', function () {
   const expectedSettings = {
+    filter_columns_by: {
+      assignment_group_id: null,
+      context_module_id: null,
+      grading_period_id: null,
+      section_id: null
+    },
     selected_view_options_filters: ['assignmentGroups'],
     show_concluded_enrollments: true,
     show_inactive_enrollments: true,
@@ -4681,6 +4869,12 @@ test('ensures selected_view_options_filters is not empty in order to force the s
 test('calls ajaxJSON with parameters', function () {
   const gradebook = createGradebook({
     settings: {
+      filter_columns_by: {
+        assignment_group_id: '2201',
+        context_module_id: '2601',
+        grading_period_id: '1401',
+        section_id: '2001'
+      },
       show_concluded_enrollments: 'true',
       show_inactive_enrollments: 'true',
       show_unpublished_assignments: 'true'
@@ -4703,6 +4897,12 @@ test('calls ajaxJSON with parameters', function () {
 
   deepEqual(ajaxJSONStub.firstCall.args[2], {
     gradebook_settings: {
+      filter_columns_by: {
+        assignment_group_id: '2201',
+        context_module_id: '2601',
+        grading_period_id: '1401',
+        section_id: '2001'
+      },
       selected_view_options_filters: [''],
       show_concluded_enrollments: false,
       show_inactive_enrollments: false,
@@ -5009,6 +5209,113 @@ test('re-renders all column headers', function () {
   strictEqual(this.gradebook.updateColumnHeaders.callCount, 1);
 });
 
+QUnit.module('Gradebook#updateCurrentGradingPeriod', {
+  setup () {
+    this.gradebook = createGradebook({
+      grading_period_set: {
+        id: '1501',
+        grading_periods: [{ id: '1401' }, { id: '1402' }]
+      },
+      settings: {
+        filter_columns_by: {
+          grading_period_id: '1402'
+        }
+      }
+    });
+    this.stub(this.gradebook, 'saveSettings');
+    this.stub(this.gradebook, 'resetGrading');
+    this.stub(this.gradebook, 'setAssignmentWarnings');
+    this.stub(this.gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+  }
+});
+
+test('updates the filter setting with the given grading period id', function () {
+  this.gradebook.updateCurrentGradingPeriod('1401');
+  strictEqual(this.gradebook.getFilterColumnsBySetting('gradingPeriodId'), '1401');
+});
+
+test('saves settings after updating the filter setting', function () {
+  this.gradebook.saveSettings.callsFake(() => {
+    strictEqual(this.gradebook.getFilterColumnsBySetting('gradingPeriodId'), '1401', 'setting was already updated');
+  });
+  this.gradebook.updateCurrentGradingPeriod('1401');
+});
+
+test('resets grading after updating the filter setting', function () {
+  this.gradebook.resetGrading.callsFake(() => {
+    strictEqual(this.gradebook.getFilterColumnsBySetting('gradingPeriodId'), '1401', 'setting was already updated');
+  });
+  this.gradebook.updateCurrentGradingPeriod('1401');
+});
+
+test('sets assignment warnings after resetting grading', function () {
+  this.gradebook.setAssignmentWarnings.callsFake(() => {
+    strictEqual(this.gradebook.resetGrading.callCount, 1, 'grading was already reset');
+  });
+  this.gradebook.updateCurrentGradingPeriod('1401');
+});
+
+test('updates columns and menus after settings assignment warnings', function () {
+  this.gradebook.updateColumnsAndRenderViewOptionsMenu.callsFake(() => {
+    strictEqual(this.gradebook.setAssignmentWarnings.callCount, 1, 'assignment warnings were already set');
+  });
+  this.gradebook.updateCurrentGradingPeriod('1401');
+});
+
+test('has no effect when the grading period has not changed', function () {
+  this.gradebook.updateCurrentGradingPeriod('1402');
+  strictEqual(this.gradebook.saveSettings.callCount, 0, 'saveSettings was not called');
+  strictEqual(this.gradebook.resetGrading.callCount, 0, 'resetGrading was not called');
+  strictEqual(this.gradebook.setAssignmentWarnings.callCount, 0, 'setAssignmentVisibility was not called');
+  strictEqual(this.gradebook.updateColumnsAndRenderViewOptionsMenu.callCount, 0,
+    'updateColumnsAndRenderViewOptionsMenu was not called');
+});
+
+QUnit.module('Gradebook#initSubmissionStateMap');
+
+test('initializes a new submission state map', function () {
+  const gradebook = createGradebook();
+  const originalMap = gradebook.submissionStateMap;
+  gradebook.initSubmissionStateMap();
+  strictEqual(gradebook.submissionStateMap.constructor, SubmissionStateMap);
+  notEqual(originalMap, gradebook.submissionStateMap);
+});
+
+test('sets the submission state map .hasGradingPeriods to true when a grading period set exists', function () {
+  const gradebook = createGradebook({
+    grading_period_set: { id: '1501', grading_periods: [{ id: '701' }, { id: '702' }] }
+  });
+  gradebook.initSubmissionStateMap();
+  strictEqual(gradebook.submissionStateMap.hasGradingPeriods, true);
+});
+
+test('sets the submission state map .hasGradingPeriods to false when no grading period set exists', function () {
+  const gradebook = createGradebook();
+  gradebook.initSubmissionStateMap();
+  strictEqual(gradebook.submissionStateMap.hasGradingPeriods, false);
+});
+
+test('sets the submission state map .selectedGradingPeriodID to the "grading period to show"', function () {
+  const gradebook = createGradebook();
+  this.stub(gradebook, 'getGradingPeriodToShow').returns('1401');
+  gradebook.initSubmissionStateMap();
+  strictEqual(gradebook.submissionStateMap.selectedGradingPeriodID, '1401');
+});
+
+test('sets the submission state map .isAdmin when the current user roles includes "admin"', function () {
+  fakeENV.setup({ current_user_roles: ['admin'] });
+  const gradebook = createGradebook();
+  gradebook.initSubmissionStateMap();
+  strictEqual(gradebook.submissionStateMap.isAdmin, true);
+  fakeENV.teardown();
+});
+
+test('sets the submission state map .isAdmin when the current user roles do not include "admin"', function () {
+  const gradebook = createGradebook();
+  gradebook.initSubmissionStateMap();
+  strictEqual(gradebook.submissionStateMap.isAdmin, false);
+});
+
 QUnit.module('Gradebook#initPostGradesLtis');
 
 test('sets postGradesLtis as an array', function () {
@@ -5152,6 +5459,82 @@ test('sets showUnpublishedDisplayed to a default value', function () {
   const actualSettings = createGradebook().gridDisplaySettings;
 
   strictEqual(actualSettings.showUnpublishedDisplayed, expectedSettings);
+});
+
+QUnit.module('Gradebook#isFilteringColumnsByGradingPeriod', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.gradebook.gradingPeriodSet = { id: '1501', gradingPeriods: [{ id: '701' }, { id: '702' }] };
+    this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '702');
+  }
+});
+
+test('returns true when the "filter columns by" setting includes a grading period', function () {
+  strictEqual(this.gradebook.isFilteringColumnsByGradingPeriod(), true);
+});
+
+test('returns false when the "filter columns by" setting includes the "all grading periods" value ("0")', function () {
+  this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '0');
+  strictEqual(this.gradebook.isFilteringColumnsByGradingPeriod(), false);
+});
+
+test('returns false when the "filter columns by" setting does not include a grading period', function () {
+  this.gradebook.setFilterColumnsBySetting('gradingPeriodId', null);
+  strictEqual(this.gradebook.isFilteringColumnsByGradingPeriod(), false);
+});
+
+test('returns false when the "filter columns by" setting does not include a valid grading period', function () {
+  this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '799');
+  strictEqual(this.gradebook.isFilteringColumnsByGradingPeriod(), false);
+});
+
+test('returns false when no grading period set exists', function () {
+  this.gradebook.gradingPeriodSet = null;
+  strictEqual(this.gradebook.isFilteringColumnsByGradingPeriod(), false);
+});
+
+test('returns true when the "filter columns by" setting is null and the current_grading_period_id is set', function () {
+  this.gradebook.options.current_grading_period_id = '701';
+  this.gradebook.setFilterColumnsBySetting('gradingPeriodId', null);
+  strictEqual(this.gradebook.isFilteringColumnsByGradingPeriod(), true);
+});
+
+QUnit.module('Gradebook#getGradingPeriodToShow', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.gradebook.gradingPeriodSet = { id: '1501', gradingPeriods: [{ id: '701' }, { id: '702' }] };
+    this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '702');
+  }
+});
+
+test('returns the "filter columns by" setting when it includes a grading period', function () {
+  strictEqual(this.gradebook.getGradingPeriodToShow(), '702');
+});
+
+test('returns "0" when the "filter columns by" setting includes the "all grading periods" value ("0")', function () {
+  this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '0');
+  strictEqual(this.gradebook.getGradingPeriodToShow(), '0');
+});
+
+test('returns "0" when the "filter columns by" setting does not include a grading period', function () {
+  this.gradebook.setFilterColumnsBySetting('gradingPeriodId', null);
+  strictEqual(this.gradebook.getGradingPeriodToShow(), '0');
+});
+
+test('returns "0" when the "filter columns by" setting does not include a valid grading period', function () {
+  this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '799');
+  strictEqual(this.gradebook.getGradingPeriodToShow(), '0');
+});
+
+test('returns "0" when no grading period set exists', function () {
+  this.gradebook.gradingPeriodSet = null;
+  strictEqual(this.gradebook.getGradingPeriodToShow(), '0');
+});
+
+test('returns the current_grading_period_id when set and the "filter columns by" setting is null', function () {
+  this.gradebook.options.current_grading_period_id = '701';
+  this.gradebook.setFilterColumnsBySetting('gradingPeriodId', null);
+  strictEqual(this.gradebook.getGradingPeriodToShow(), '701');
 });
 
 QUnit.module('Gradebook#setSelectedPrimaryInfo', {
