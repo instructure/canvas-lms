@@ -28,11 +28,12 @@ import IconUnlockSolid from 'instructure-icons/lib/Solid/IconUnlockSolid'
 export default class LockToggle extends Component {
   static propTypes = {
     isLocked: PropTypes.bool.isRequired,
-    isToggleable: PropTypes.bool.isRequired,
+    isToggleable: PropTypes.bool,
     onClick: PropTypes.func,
   }
 
   static defaultProps = {
+    isToggleable: false,
     onClick: () => {},
   }
 
@@ -76,11 +77,13 @@ export default class LockToggle extends Component {
 
     return (
       <Toggle>
-        <span className="bpc-lock-toggle">
-          <span style={{verticalAlign: 'sub', lineHeight: '100%'}}>
-            <Icon width="1.5em" height="1.5em" />
+        <span className="bpc-lock-toggle" style={{marginBottom: '1px', display: 'inline-block'}}>
+          <span style={{position: 'relative', top: '2px'}}>
+            <Icon />
           </span>
-          &nbsp;{text}
+          <span style={{margin: '0 4px'}}>
+            &nbsp;{text}
+          </span>
         </span>
       </Toggle>
     )

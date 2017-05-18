@@ -28,6 +28,7 @@ const defaultProps = () => ({
   isLoadingBeginMigration: false,
   checkMigration: () => {},
   beginMigration: () => {},
+  stopMigrationStatusPoll: () => {},
 })
 
 test('renders the MigrationSync component', () => {

@@ -17,7 +17,6 @@
  */
 
 import I18n from 'i18n!blueprint_settings'
-import $ from 'jquery'
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -42,14 +41,13 @@ export default class MigrationSync extends Component {
     isLoadingBeginMigration: PropTypes.bool.isRequired,
     checkMigration: PropTypes.func.isRequired,
     beginMigration: PropTypes.func.isRequired,
-    intervalDuration: PropTypes.number,
+    stopMigrationStatusPoll: PropTypes.func.isRequired,
     showProgress: PropTypes.bool,
     willSendNotification: PropTypes.bool,
     onClick: PropTypes.func
   }
 
   static defaultProps = {
-    intervalDuration: 3000,
     showProgress: true,
     willSendNotification: false,
     onClick: null
@@ -66,38 +64,8 @@ export default class MigrationSync extends Component {
     }
   }
 
-  componentDidUpdate (prevProps) {
-    // if migration is going from a non-loading state to a loading state
-    // aka a migration was started or we just realized a migration is in progres on page load..
-    if (MigrationStates.isLoadingState(this.props.migrationStatus) &&
-        !MigrationStates.isLoadingState(prevProps.migrationStatus)) {
-      // then start an interval to check for updates in the migration state
-      this.clearMigrationInterval()
-      this.intId = setInterval(() => {
-        this.props.checkMigration()
-      }, this.props.intervalDuration)
-      $.screenReaderFlashMessage(I18n.t('Blueprint course sync in progress'))
-    }
-
-    // if migration is going from a loading state to a non-loading state
-    // aka a migration probably just ended..
-    if (!MigrationStates.isLoadingState(this.props.migrationStatus) &&
-        MigrationStates.isLoadingState(prevProps.migrationStatus)) {
-      // then we can stop checking for updates
-      this.clearMigrationInterval()
-      $.screenReaderFlashMessage(I18n.t('Blueprint course sync finished'))
-    }
-  }
-
   componentWillUnmount () {
-    this.clearMigrationInterval()
-  }
-
-  clearMigrationInterval () {
-    if (this.intId !== null) {
-      clearInterval(this.intId)
-      this.intId = null
-    }
+    this.props.stopMigrationStatusPoll()
   }
 
   handleSyncClick = () => {
@@ -126,12 +94,10 @@ export default class MigrationSync extends Component {
               valueNow={MigrationStates.getLoadingValue(migrationStatus)}
               valueMax={MigrationStates.maxLoadingValue}
             />
-            {
-              this.props.willSendNotification &&
-                <Typography as="p" size="small">
-                  {I18n.t('You can leave the page and you will get a notification when the sync process is complete.')}
-                </Typography>
-            }
+            {this.props.willSendNotification &&
+              <Typography as="p" size="small">
+                {I18n.t('You can leave the page and you will get a notification when the sync process is complete.')}
+              </Typography>}
           </div>
         )}
         <div className="bcs__migration-sync__button">

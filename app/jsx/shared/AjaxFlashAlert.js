@@ -28,6 +28,7 @@ import I18n from 'i18n!ajaxflashalert'
 import Alert from 'instructure-ui/lib/components/Alert'
 import Button from 'instructure-ui/lib/components/Button'
 import Typography from 'instructure-ui/lib/components/Typography'
+import Transition from 'instructure-ui/lib/components/Transition'
 
 // const liveRegionId = 'flash_screenreader_holder'  // same ids that jquery flash message uses
 const messageHolderId = 'flash_message_holder'
@@ -41,34 +42,25 @@ class AjaxFlashAlert extends React.Component {
     onClose: PropTypes.func.isRequired,
     message: PropTypes.string.isRequired,
     error: PropTypes.instanceOf(Error),
-    variant: PropTypes.oneOf('info', 'success', 'warning', 'error')
+    variant: PropTypes.oneOf(['info', 'success', 'warning', 'error']),
   }
+
   static defaultProps = {
     error: null,
-    variant: 'info'
+    variant: 'info',
   }
 
   constructor (props) {
     super(props)
 
     this.state = {
-      showDetails: false
+      showDetails: false,
+      isOpen: true,
     }
     this.timerId = 0;
   }
 
   componentDidMount () {
-    this.timerId = setTimeout(() => this.closeAlert(), timeout)
-  }
-
-  shouldComponentUpdate (nextProps, nextState) {
-    return nextProps.message !== this.props.message ||
-      nextProps.error !== this.props.error ||
-      nextState.showDetails !== this.state.showDetails
-  }
-
-  componentDidUpdate () {
-    clearTimeout(this.timerId)
     this.timerId = setTimeout(() => this.closeAlert(), timeout)
   }
 
@@ -84,12 +76,18 @@ class AjaxFlashAlert extends React.Component {
   }
 
   showDetails = () => {
-    this.setState({showDetails: true})
+    this.setState({ showDetails: true })
+    clearTimeout(this.timerId)
+    this.timerId = setTimeout(() => this.closeAlert(), timeout)
   }
 
   closeAlert = () => {
-    clearTimeout(this.timerId)
-    this.props.onClose()
+    this.setState({ isOpen: false }, () => {
+      setTimeout(() => {
+        clearTimeout(this.timerId)
+        this.props.onClose()
+      }, 500)
+    })
   }
 
   findDetailMessage () {
@@ -138,21 +136,25 @@ class AjaxFlashAlert extends React.Component {
     }
 
     return (
-      <Alert
-        variant={this.props.variant}
-        closeButtonLabel={I18n.t('Close')}
-        onClose={this.closeAlert}
-        isDismissable
-        margin="small auto"
-        timeout={timeout}
-        liveRegion={this.getLiveRegion}
-        transitionType="fade"
-      >
-        <div>
-          <Typography as="p">{this.props.message}</Typography>
-          {details}
-        </div>
-      </Alert>
+      <Transition transitionOnMount in={this.state.isOpen} type="slide-down">
+        <Alert
+          variant={this.props.variant}
+          closeButtonLabel={I18n.t('Close')}
+          onClose={this.closeAlert}
+          isDismissable
+          margin="small auto"
+          timeout={timeout}
+          liveRegion={this.getLiveRegion}
+          transitionType="fade"
+        >
+          <div>
+            <p style={{margin: '0 -5px'}}>
+              {this.props.message}
+            </p>
+            {details}
+          </div>
+        </Alert>
+      </Transition>
     )
   }
 }
@@ -163,6 +165,7 @@ function showAjaxFlashAlert (message, errorOrVariant = 'info') {
   if (typeof errorOrVariant === 'string') {
     variant = errorOrVariant
   } else {
+    variant = 'error'
     error = errorOrVariant
   }
 

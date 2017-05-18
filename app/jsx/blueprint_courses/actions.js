@@ -21,6 +21,7 @@ import { createActions } from 'redux-actions'
 import { showAjaxFlashAlert } from 'jsx/shared/AjaxFlashAlert'
 import api from './apiClient'
 import LoadStates from './loadStates'
+import MigrationStates from './migrationStates'
 
 const handleError = (msg, dispatch, actionCreator) => (err) => {
   showAjaxFlashAlert(msg, err)
@@ -75,16 +76,65 @@ actions.loadHistory = () => (dispatch, getState) => {
 }
 
 actions.checkMigration = () => (dispatch, getState) => {
+  const state = getState()
+  // no need to check if another check is in progress
+  if (state.isCheckingMigration) return;
   dispatch(actions.checkMigrationStart())
   api.checkMigration(getState())
     .then(res => dispatch(actions.checkMigrationSuccess(res.data)))
     .catch(handleError(I18n.t('An error occurred while checking the migration status'), dispatch, actions.checkMigrationFail))
 }
 
-actions.beginMigration = () => (dispatch, getState) => {
+// we use a closure to scope migInterval to those two actions only
+(() => {
+  let migInterval = null
+
+  const resetInterval = () => {
+    clearInterval(migInterval)
+    migInterval = null
+  }
+
+  actions.startMigrationStatusPoll = () => (dispatch, getState) => {
+    // don't start a new poll if one is in progress
+    if (migInterval) return;
+    actions.checkMigration()(dispatch, getState)
+    migInterval = setInterval(() => {
+      const state = getState()
+      if (!state.isCheckingMigration && MigrationStates.isLoadingState(state.migrationStatus)) {
+        actions.checkMigration()(dispatch, getState)
+      } else if (MigrationStates.isEndState(state.migrationStatus)) {
+        resetInterval()
+        switch (state.migrationStatus) {
+          case MigrationStates.states.completed:
+            showAjaxFlashAlert(I18n.t('Sync completed successfully'))
+            break
+          case MigrationStates.states.imports_failed:
+          case MigrationStates.states.exports_failed:
+            showAjaxFlashAlert(I18n.t('There was an unexpected problem with the sync', 'error'))
+            break;
+          default:
+            break
+        }
+      }
+    }, 3000)
+  }
+
+  // our function action either needs to return an action object or a function
+  // for thunk to execute, hence the weird looking function-returning-function
+  actions.stopMigrationStatusPoll = () => () => {
+    resetInterval()
+  }
+})()
+
+actions.beginMigration = (startInteval = true) => (dispatch, getState) => {
   dispatch(actions.beginMigrationStart())
   api.beginMigration(getState())
-    .then(res => dispatch(actions.beginMigrationSuccess(res.data)))
+    .then((res) => {
+      dispatch(actions.beginMigrationSuccess(res.data))
+      if (startInteval && MigrationStates.isLoadingState(res.data.workflow_state)) {
+        actions.startMigrationStatusPoll()(dispatch, getState)
+      }
+    })
     .catch(handleError(I18n.t('An error occurred while starting migration'), dispatch, actions.beginMigrationFail))
 }
 
@@ -165,7 +215,13 @@ actions.saveAssociations = () => (dispatch, getState) => {
   dispatch(actions.saveAssociationsStart())
   const state = getState()
   api.saveAssociations(state)
-    .then(() => dispatch(actions.saveAssociationsSuccess({ added: state.addedAssociations, removed: state.removedAssociations })))
+    .then(() => {
+      dispatch(actions.saveAssociationsSuccess({ added: state.addedAssociations, removed: state.removedAssociations }))
+      showAjaxFlashAlert(I18n.t('Associations saved successfully'))
+      if (state.addedAssociations.length > 0) {
+        actions.beginMigration()(dispatch, getState)
+      }
+    })
     .catch(handleError(I18n.t('An error occurred while saving associations'), dispatch, actions.saveAssociationsFail))
 }
 

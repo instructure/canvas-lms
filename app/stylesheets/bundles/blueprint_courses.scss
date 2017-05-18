@@ -192,7 +192,7 @@
     padding-right: 0 !important;
   }
 
-  &:first-child {
+  &.bcs__row__associations {
     border: none;
   }
 
@@ -370,11 +370,13 @@
 }
 
 .bcs__row.bcs__row-sync-holder {
-  padding: 1em 0
+  margin: 0 0 1.5em;
+  padding-top: 0;
+  border: none;
 }
 
 .bcs__migration-sync .bcs__migration-sync__loading {
-  margin-bottom: .5em;
+  margin-bottom: 2em;
 }
 
 /* EnableNotification component styles */

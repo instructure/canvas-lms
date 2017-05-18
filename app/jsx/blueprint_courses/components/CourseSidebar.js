@@ -26,6 +26,7 @@ import select from 'jsx/shared/select'
 import Button from 'instructure-ui/lib/components/Button'
 import Typography from 'instructure-ui/lib/components/Typography'
 import Spinner from 'instructure-ui/lib/components/Spinner'
+import Tooltip from 'instructure-ui/lib/components/Tooltip'
 
 import propTypes from '../propTypes'
 import actions from '../actions'
@@ -42,28 +43,28 @@ let BlueprintAssociations = null
 
 export default class CourseSidebar extends Component {
   static propTypes = {
+    unsyncedChanges: propTypes.unsyncedChanges,
+    associations: propTypes.courseList.isRequired,
+    migrationStatus: propTypes.migrationState,
     canManageCourse: PropTypes.bool.isRequired,
     hasLoadedAssociations: PropTypes.bool.isRequired,
-    associations: propTypes.courseList.isRequired,
+    hasAssociationChanges: PropTypes.bool.isRequired,
+    isSavingAssociations: PropTypes.bool.isRequired,
+    isLoadingUnsyncedChanges: PropTypes.bool.isRequired,
+    hasLoadedUnsyncedChanges: PropTypes.bool.isRequired,
+    isLoadingBeginMigration: PropTypes.bool.isRequired,
     loadAssociations: PropTypes.func.isRequired,
     saveAssociations: PropTypes.func.isRequired,
     clearAssociations: PropTypes.func.isRequired,
-    hasAssociationChanges: PropTypes.bool.isRequired,
-    isSavingAssociations: PropTypes.bool.isRequired,
     enableSendNotification: PropTypes.func.isRequired,
     loadUnsyncedChanges: PropTypes.func.isRequired,
-    isLoadingUnsyncedChanges: PropTypes.bool.isRequired,
-    hasLoadedUnsyncedChanges: PropTypes.bool.isRequired,
-    unsyncedChanges: propTypes.unsyncedChanges,
-    isLoadingBeginMigration: PropTypes.bool.isRequired,
-    migrationStatus: propTypes.migrationState,
-    contentRef: PropTypes.func,   // to get reference to the content of the Tray facilitates unit testing
+    contentRef: PropTypes.func, // to get reference to the content of the Tray facilitates unit testing
   }
 
   static defaultProps = {
     unsyncedChanges: [],
-    migrationStatus: MigrationStates.unknown,
     contentRef: null,
+    migrationStatus: MigrationStates.states.unknown,
   }
 
   constructor (props) {
@@ -196,9 +197,12 @@ export default class CourseSidebar extends Component {
     this.props.enableSendNotification(enabled)
   }
 
-  // if we have unsynced changes, show the sync button
   maybeRenderSyncButton () {
-    if (this.props.hasLoadedUnsyncedChanges && this.props.unsyncedChanges.length > 0) {
+    const hasAssociations = this.props.associations.length > 0
+    const syncIsActive = MigrationStates.isLoadingState(this.props.migrationStatus)
+    const hasUnsyncedChanges = this.props.hasLoadedUnsyncedChanges && this.props.unsyncedChanges.length > 0
+
+    if (hasAssociations && (syncIsActive || hasUnsyncedChanges)) {
       return (
         <div className="bcs__row bcs__row-sync-holder">
           <MigrationSync />
@@ -208,17 +212,20 @@ export default class CourseSidebar extends Component {
     return null
   }
 
-  // if we have unsynced changes, show the button
   maybeRenderUnsyncedChanges () {
+    // if has no associations or sync in progress, hide
+    const hasAssociations = this.props.associations.length > 0
+    const isSyncing = MigrationStates.isLoadingState(this.props.migrationStatus) || this.props.isLoadingBeginMigration
+
+    if (!hasAssociations || isSyncing) {
+      return null
+    }
+
     // if loading changes, show spinner
     if (!this.props.hasLoadedUnsyncedChanges || this.props.isLoadingUnsyncedChanges) {
       return this.renderSpinner(I18n.t('Loading Unsynced Changes'))
     }
-    // if syncing, hide
-    const isSyncing = MigrationStates.isLoadingState(this.props.migrationStatus) || this.props.isLoadingBeginMigration
-    if (isSyncing) {
-      return null
-    }
+
     // if changes are loaded, show me
     if (this.props.hasLoadedUnsyncedChanges && this.props.unsyncedChanges.length > 0) {
       return (
@@ -236,21 +243,27 @@ export default class CourseSidebar extends Component {
         </div>
       )
     }
+
     return null
   }
 
-  maybeRenderAssociationsButon () {
-    if (this.props.canManageCourse) {
-      return (
-        <div className="bcs__row">
-          <Button id="mcSidebarAsscBtn" ref={(c) => { this.asscBtn = c }} variant="link" onClick={this.handleAssociationsClick}>
-            <Typography>{I18n.t('Associations')}</Typography>
-          </Button>
-          <Typography><span className="bcs__row-right-content">{this.props.associations.length}</span></Typography>
-        </div>
-      )
+  maybeRenderAssociations () {
+    if (!this.props.canManageCourse) return null
+    const isSyncing = MigrationStates.isLoadingState(this.props.migrationStatus) || this.props.isLoadingBeginMigration
+    const button = (
+      <div className="bcs__row bcs__row__associations">
+        <Button disabled={isSyncing} id="mcSidebarAsscBtn" ref={(c) => { this.asscBtn = c }} variant="link" onClick={this.handleAssociationsClick}>
+          <Typography>{I18n.t('Associations')}</Typography>
+        </Button>
+        <Typography><span className="bcs__row-right-content">{this.props.associations.length}</span></Typography>
+      </div>
+    )
+
+    if (isSyncing) {
+      return <Tooltip variant="inverse" tip={I18n.t('Not available during sync')} placement="bottom">{button}</Tooltip>
+    } else {
+      return button
     }
-    return null
   }
 
   renderSpinner (title) {
@@ -274,7 +287,7 @@ export default class CourseSidebar extends Component {
   render () {
     return (
       <BlueprintSidebar onOpen={this.onOpenSidebar} contentRef={this.props.contentRef}>
-        {this.maybeRenderAssociationsButon()}
+        {this.maybeRenderAssociations()}
         <div className="bcs__row">
           <Button id="mcSyncHistoryBtn" ref={(c) => { this.syncHistoryBtn = c }} variant="link" onClick={this.handleSyncHistoryClick}>
             <Typography>{I18n.t('Sync History')}</Typography>
@@ -293,7 +306,6 @@ const connectState = state =>
     'canManageCourse',
     'hasLoadedAssociations',
     'isLoadingBeginMigration',
-    'hasCheckedMigration',
     'isSavingAssociations',
     ['existingAssociations', 'associations'],
     'unsyncedChanges',
