@@ -226,22 +226,26 @@ describe "scheduler" do
         load_month_view
 
         f('.fc-event.scheduler-event').click
-        f('.unreserve_event_link').click
-        f('#delete_event_dialog~.ui-dialog-buttonpane .btn-primary').click
-
+        # in Chrome, the event-detail popop flashes and changes size
+        # the expect and explicit search seems to make the spec less fragile
+        expect(f('.event-details .unreserve_event_link')).to be_displayed
+        f('.event-details .unreserve_event_link').click
         wait_for_ajaximations
-
+        f('#delete_event_dialog~.ui-dialog-buttonpane .btn-primary').click
+        
         expect(f("#content")).not_to contain_css('.fc-event.scheduler-event')
       end
 
       it "should let me do so from the week view", priority: "1", test_id: 502483 do
         load_week_view
-
+        
         f('.fc-event.scheduler-event').click
-        f('.unreserve_event_link').click
-        f('#delete_event_dialog~.ui-dialog-buttonpane .btn-primary').click
-
+        # in Chrome, the event-detail popop flashes and changes size
+        # the expect and explicit search seems to make the spec less fragile
+        expect(f('.event-details .unreserve_event_link')).to be_displayed
+        f('.event-details .unreserve_event_link').click
         wait_for_ajaximations
+        f('#delete_event_dialog~.ui-dialog-buttonpane .btn-primary').click
 
         expect(f("#content")).not_to contain_css('.fc-event.scheduler-event')
       end
@@ -250,8 +254,11 @@ describe "scheduler" do
         load_agenda_view
 
         f('.agenda-event__item-container').click
+        # in Chrome, the event-detail popop flashes and changes size
+        # the expect and explicit search seems to make the spec less fragile
+        expect(f('.event-details .unreserve_event_link')).to be_displayed
+        f('.event-details .unreserve_event_link').click
         wait_for_ajaximations
-        f('.unreserve_event_link').click
         f('#delete_event_dialog~.ui-dialog-buttonpane .btn-primary').click
 
         expect(f("#content")).not_to contain_css('.agenda-event__item-container')
