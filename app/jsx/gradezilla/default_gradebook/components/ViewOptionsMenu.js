@@ -26,9 +26,9 @@ import Typography from 'instructure-ui/lib/components/Typography';
 import I18n from 'i18n!gradebook';
 import { filterLabels } from 'jsx/gradezilla/default_gradebook/constants/ViewOptions';
 
-function renderTriggerButton () {
+function renderTriggerButton (bindButton) {
   return (
-    <Button variant="link">
+    <Button ref={bindButton} variant="link">
       <Typography color="primary">
         {I18n.t('View')} <IconMiniArrowDownSolid />
       </Typography>
@@ -60,6 +60,7 @@ class ViewOptionsMenu extends React.Component {
       onSelect: func.isRequired,
       selected: bool.isRequired
     }).isRequired,
+    onSelectShowStatusesModal: func.isRequired,
     showUnpublishedAssignments: bool.isRequired,
     onSelectShowUnpublishedAssignments: func.isRequired
   };
@@ -67,10 +68,12 @@ class ViewOptionsMenu extends React.Component {
   constructor (props) {
     super(props);
 
-    this.bindMenuContent = (ref) => { this.menuContent = ref };
     this.onFilterSelect = (_event, filters) => {
       this.props.filterSettings.onSelect(filters);
     };
+    this.bindMenuContent = (menuContent) => { this.menuContent = menuContent };
+    this.bindButton = (button) => { this.button = button };
+    this.bindStatusesMenuItem = (menuItem) => { this.statusesMenuItem = menuItem };
   }
 
   areColumnsOrderedBy (criterion, direction) {
@@ -84,10 +87,14 @@ class ViewOptionsMenu extends React.Component {
     }
   }
 
+  focus () {
+    this.button.focus();
+  }
+
   render () {
     return (
       <PopoverMenu
-        trigger={renderTriggerButton()}
+        trigger={renderTriggerButton(this.bindButton)}
         contentRef={this.bindMenuContent}
       >
         <MenuItemGroup label={I18n.t('Arrange By')}>
@@ -169,6 +176,12 @@ class ViewOptionsMenu extends React.Component {
         }
 
         { this.props.filterSettings.available.length > 0 && <MenuItemSeparator /> }
+
+        <MenuItem ref={this.bindStausMenuItem} onSelect={this.props.onSelectShowStatusesModal}>
+          {I18n.t('Statuses…')}
+        </MenuItem>
+
+        <MenuItemSeparator />
 
         <MenuItemGroup allowMultiple label={I18n.t('Columns')}>
           <MenuItem

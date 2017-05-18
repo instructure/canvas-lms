@@ -27,7 +27,6 @@ import round from 'compiled/util/round';
 import fakeENV from 'helpers/fakeENV';
 import { createCourseGradesWithGradingPeriods as createGrades } from 'spec/jsx/gradebook/GradeCalculatorSpecHelper';
 import { createGradebook } from 'spec/jsx/gradezilla/default_gradebook/GradebookSpecHelper';
-
 import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator';
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
 import DataLoader from 'jsx/gradezilla/DataLoader';
@@ -36,6 +35,7 @@ import UserSettings from 'compiled/userSettings';
 import ActionMenu from 'jsx/gradezilla/default_gradebook/components/ActionMenu';
 import GradebookApi from 'jsx/gradezilla/default_gradebook/GradebookApi';
 import PropTypes from 'prop-types';
+import Gradebook from 'compiled/gradezilla/Gradebook';
 
 const $fixtures = document.getElementById('fixtures');
 
@@ -2044,6 +2044,7 @@ QUnit.module('Menus', {
       <span data-component="ViewOptionsMenu"></span>
       <span data-component="ActionMenu"></span>
       <span data-component="GradebookMenu" data-variant="DefaultGradebook"></span>
+      <span data-component="StatusesModal" />
     `;
   },
 
@@ -2070,6 +2071,16 @@ test('GradebookMenu is rendered on renderGradebookMenu', function () {
   this.gradebook.renderGradebookMenu();
   const buttonText = document.querySelector('[data-component="GradebookMenu"] Button').innerText.trim();
   equal(buttonText, 'Gradebook');
+});
+
+test('StatusesModal is mounted on renderStatusesModal', function () {
+  const statusModal = this.gradebook.renderStatusesModal();
+  statusModal.open();
+  const header = document.querySelector('h3');
+  equal(header.innerText, 'Statuses');
+
+  const statusesModalMountPoint = document.querySelector("[data-component='StatusesModal']");
+  ReactDOM.unmountComponentAtNode(statusesModalMountPoint);
 });
 
 QUnit.module('addRow', {
@@ -5034,7 +5045,7 @@ test('is rendered on renderGridColor', function () {
   $fixtures.innerHTML = '';
 });
 
-QUnit.module('#updateSubmissionsFromExternal');
+QUnit.module('Gradebook#updateSubmissionsFromExternal');
 
 test('updateCell is called for each assignment in a row', function () {
   const columns = [
@@ -5071,4 +5082,39 @@ test('updateCell is called for each assignment in a row', function () {
   ok(updateCellStub.withArgs(1, 1).calledOnce);
   ok(updateCellStub.withArgs(1, 3).calledOnce);
   strictEqual(updateCellStub.callCount, 4);
+});
+
+QUnit.module('Gradebook - initialization');
+
+test('calls renderStatusesModal', function () {
+  const loaderPromises = {
+    gotAssignmentGroups: $.Deferred(),
+    gotContextModules: $.Deferred(),
+    gotCustomColumns: $.Deferred(),
+    gotStudents: $.Deferred(),
+    gotSubmissions: $.Deferred(),
+    gotCustomColumnData: $.Deferred(),
+    gotEffectiveDueDates: $.Deferred()
+  };
+  this.stub(DataLoader, 'loadGradebookData').returns(loaderPromises);
+  this.stub(Gradebook.prototype, 'gotAllAssignmentGroupsAndEffectiveDueDates');
+  this.stub(Gradebook.prototype, 'renderActionMenu');
+  const gradebook = createGradebook();
+  [
+    'renderViewOptionsMenu',
+    'initGrid',
+    'renderGradebookMenus',
+    'arrangeColumnsBy',
+    'renderGradebookSettingsModal',
+    'renderSettingsButton',
+    'updatePostGradesFeatureButton',
+    'initPostGradesStore',
+  ].forEach(fn => this.stub(gradebook, fn));
+  const renderStatusesModalStub = this.stub(gradebook, 'renderStatusesModal');
+  gradebook.gridReady.reject()
+  loaderPromises.gotCustomColumns.resolve();
+  loaderPromises.gotAssignmentGroups.resolve();
+  loaderPromises.gotEffectiveDueDates.resolve();
+
+  ok(renderStatusesModalStub.calledOnce);
 });

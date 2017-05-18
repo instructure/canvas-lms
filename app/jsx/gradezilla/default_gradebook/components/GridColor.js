@@ -19,14 +19,15 @@
 import React from 'react';
 import { arrayOf, shape, string } from 'prop-types';
 import { getUserColors } from 'jsx/gradezilla/default_gradebook/stores/UserColorStore';
+import { statuses } from 'jsx/gradezilla/default_gradebook/constants/statuses';
 
 function GridColor (props) {
-  const colorsByState = getUserColors(props.colors);
-  const styleRules = props.states.map(state =>
+  const colorsByStatus = getUserColors(props.colors);
+  const styleRules = props.statuses.map(status =>
     [
-      `.even .gradebook-cell.${state} { background-color: ${colorsByState.light[state]}; }`,
-      `.odd .gradebook-cell.${state} { background-color: ${colorsByState.dark[state]}; }`,
-      `.slick-cell.editable .gradebook-cell.${state} { background-color: white; }`
+      `.even .gradebook-cell.${status} { background-color: ${colorsByStatus.light[status]}; }`,
+      `.odd .gradebook-cell.${status} { background-color: ${colorsByStatus.dark[status]}; }`,
+      `.slick-cell.editable .gradebook-cell.${status} { background-color: white; }`
     ].join('')
   ).join('');
 
@@ -45,11 +46,11 @@ GridColor.propTypes = {
     dropped: string,
     excused: string
   }).isRequired,
-  states: arrayOf(string)
+  statuses: arrayOf(string)
 };
 
 GridColor.defaultProps = {
-  states: ['late', 'missing', 'resubmitted', 'dropped', 'excused']
+  statuses
 };
 
 export default GridColor;

@@ -1,14 +1,27 @@
+/*
+ * Copyright (C) 2017 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import React from 'react';
 import { mount } from 'enzyme';
 import GradebookSettingsModal from 'jsx/gradezilla/GradebookSettingsModal';
 import $ from 'jquery';
 
 QUnit.module('GradebookSettingsModal', {
-  setup () {
-    this.qunitTimeout = QUnit.config.testTimeout;
-    QUnit.config.testTimeout = 100;
-  },
-
   mountComponent (props = { onClose: () => {} }) {
     this.wrapper = mount(
       <GradebookSettingsModal {...props} />
@@ -17,7 +30,6 @@ QUnit.module('GradebookSettingsModal', {
   },
 
   teardown () {
-    QUnit.config.testTimeout = this.qunitTimeout;
     this.wrapper.unmount();
   }
 });
@@ -53,15 +65,8 @@ test('clicking cancel closes the modal', function () {
   equal(this.wrapper.find('Modal').prop('isOpen'), false);
 });
 
-test('onClose is called after the modal closes', function (assert) {
-  const done = assert.async();
-  const onClose = () => {
-    equal(this.wrapper.find('Modal').prop('isOpen'), false);
-    done();
-  };
-
-  this.mountComponent({ onClose });
-
-  this.component.open();
-  this.component.close();
+test('onClose is passed to modal onExit', function () {
+  const onCloseStub = this.stub();
+  this.wrapper = mount(<GradebookSettingsModal onClose={onCloseStub} />);
+  equal(this.wrapper.find('Modal').prop('onExited'), onCloseStub);
 });

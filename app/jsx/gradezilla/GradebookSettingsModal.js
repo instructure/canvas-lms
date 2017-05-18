@@ -26,7 +26,6 @@ class GradebookSettingsModal extends React.Component {
 
   close () {
     this.setState({ isOpen: false });
-    this.props.onClose();
   }
 
   render () {

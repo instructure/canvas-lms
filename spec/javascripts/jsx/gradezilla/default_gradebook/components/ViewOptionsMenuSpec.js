@@ -39,6 +39,7 @@ function createExampleProps () {
       onSelect () {},
       selected: []
     },
+    onSelectShowStatusesModal () {},
     onSelectShowUnpublishedAssignments () {},
     showUnpublishedAssignments: false,
     teacherNotes: {
@@ -54,6 +55,17 @@ function mountAndOpenOptions (props) {
   wrapper.find('button').simulate('click');
   return wrapper;
 }
+
+QUnit.module('ViewOptionsMenu#focus');
+
+test('trigger is focused', function () {
+  const props = createExampleProps();
+  const wrapper = mount(<ViewOptionsMenu {...props} />, { attachTo: document.getElementById('fixtures') });
+  wrapper.instance().focus();
+  equal(document.activeElement, wrapper.find('button').node);
+  wrapper.unmount();
+});
+
 
 QUnit.module('ViewOptionsMenu - notes', {
   setup () {
@@ -522,4 +534,20 @@ test('clicking on "Points - Highest to Lowest" triggers onSortByPointsDescending
   specificMenuItem.simulate('click');
 
   strictEqual(props.columnSortSettings.onSortByPointsDescending.callCount, 1);
+});
+
+QUnit.module('ViewOptionsMenu - Statuses');
+
+test('clicking Statuses calls onSelectShowStatusesModal', function () {
+  const props = {
+    ...createExampleProps(),
+    onSelectShowStatusesModal: this.stub()
+  };
+  const wrapper = mountAndOpenOptions(props);
+  const optionsMenu = new ReactWrapper(wrapper.node.menuContent, wrapper.node);
+  const statusesMenuItem = optionsMenu.findWhere(component =>
+    component.name() === 'MenuItem' && component.text() === 'Statuses…'
+  );
+  statusesMenuItem.simulate('click');
+  ok(props.onSelectShowStatusesModal.calledOnce);
 });

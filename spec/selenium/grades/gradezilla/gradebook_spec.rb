@@ -146,7 +146,7 @@ describe "Gradezilla" do
     expect(f('[aria-label="Gradebook Settings"]')).to be_displayed
 
     f('#gradebook-settings-cancel-button').click
-    expect(check_element_has_focus(f('#gradebook-settings-button'))).to be
+    expect { driver.switch_to.active_element }.to become(f('#gradebook-settings-button'))
   end
 
   it "validates assignment details", priority: "1", test_id: 210048 do

@@ -723,3 +723,16 @@ $gradebook_checkbox_size: 16px;
     opacity: 0.8;
   }
 }
+
+.Gradebook__StatusModalListItem {
+  padding: 7px;
+  margin-bottom: 5px;
+  border: 1px solid #C7CDD1;
+  border-radius: 3px;
+}
+
+.Gradebook__StatusModalList {
+  margin: 0px;
+  width: 225px;
+  list-style-type: none;
+}

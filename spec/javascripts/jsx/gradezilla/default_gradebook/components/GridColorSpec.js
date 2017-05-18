@@ -78,8 +78,8 @@ test('it has dark yellow as a default color', function () {
   ok(wrapper.html().includes(dark.yellow));
 });
 
-test('rules are for .gradebook-cell and .`state`', function () {
-  const wrapper = mount(<GridColor colors={{}} states={['late']} />);
+test('rules are for .gradebook-cell and .`statuses`', function () {
+  const wrapper = mount(<GridColor colors={{}} statuses={['late']} />);
   equal(wrapper.html(),
     '<style type="text/css">' +
     `.even .gradebook-cell.late { background-color: ${light.blue}; }` +
@@ -90,7 +90,7 @@ test('rules are for .gradebook-cell and .`state`', function () {
 });
 
 test('multiple state rules are concatenated', function () {
-  const wrapper = shallow(<GridColor colors={{}} states={['late', 'missing']} />);
+  const wrapper = shallow(<GridColor colors={{}} statuses={['late', 'missing']} />);
   const expected = (
     <style type="text/css">
       {

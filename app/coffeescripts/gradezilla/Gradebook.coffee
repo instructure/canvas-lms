@@ -66,6 +66,7 @@ define [
   'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu'
   'jsx/gradezilla/default_gradebook/components/ActionMenu'
   'jsx/gradezilla/default_gradebook/components/GridColor'
+  'jsx/gradezilla/default_gradebook/components/StatusesModal'
   'jsx/gradezilla/SISGradePassback/PostGradesStore'
   'jsx/gradezilla/SISGradePassback/PostGradesApp'
   'jsx/gradezilla/SubmissionStateMap'
@@ -101,10 +102,10 @@ define [
   SubmissionCell, NumberCompare, natcompare, htmlEscape, AssignmentDetailsDialogManager, SetDefaultGradeDialogManager,
   CurveGradesDialogManager, GradebookApi, CellEditorFactory, StudentRowHeaderConstants, AssignmentColumnHeader,
   AssignmentGroupColumnHeader, AssignmentRowCellPropFactory, CustomColumnHeader, StudentColumnHeader, StudentRowHeader,
-  TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, GridColor, PostGradesStore, PostGradesApp,  SubmissionStateMap,
-  DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager, GroupTotalCellTemplate, SectionMenuView,
-  GradingPeriodMenuView, GradebookKeyboardNav, AssignmentMuterDialogManager,
-  assignmentHelper, GradebookSettingsModal, Button, IconSettingsSolid) ->
+  TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, GridColor, StatusesModal, PostGradesStore,
+  PostGradesApp,  SubmissionStateMap, DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager,
+  GroupTotalCellTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, AssignmentMuterDialogManager,
+  assignmentHelper, GradebookSettingsModal, { default: Button }, { default: IconSettingsSolid }) ->
   IS_ADMIN = _.contains(ENV.current_user_roles, 'admin')
 
   renderComponent = (reactClass, mountPoint, props = {}, children = null) ->
@@ -1104,20 +1105,9 @@ define [
 
       @arrangeColumnsBy(@getStoredSortOrder(), true)
 
-      gradebookSettingsModalMountPoint = document.querySelector("[data-component='GrabebookSettingsModal']")
-      @gradebookSettingsModal = renderComponent(
-        GradebookSettingsModal, gradebookSettingsModalMountPoint, {
-          onClose: => @gradebookSettingsModalButton.focus()
-        }
-      )
-
-      gradebookSettingsModalButtonMountPoint = document.getElementById('gradebook-settings-modal-button-container')
-      @gradebookSettingsModalButton = renderComponent(
-        Button.default, gradebookSettingsModalButtonMountPoint, {
-          id: 'gradebook-settings-button', variant: 'icon', onClick: @gradebookSettingsModal.open
-        },
-        React.createElement(IconSettingsSolid.default, { title: I18n.t('Gradebook Settings') })
-      )
+      @renderGradebookSettingsModal()
+      @renderSettingsButton()
+      @renderStatusesModal()
 
       $('#keyboard-shortcuts').click ->
         questionMarkKeyDown = $.Event('keydown', keyCode: 191)
@@ -1205,10 +1195,12 @@ define [
       filterSettings: @getFilterSettingsViewOptionsMenuProps()
       showUnpublishedAssignments: @showUnpublishedAssignments
       onSelectShowUnpublishedAssignments: @toggleUnpublishedAssignments
+      onSelectShowStatusesModal: =>
+        @statusesModal.open()
 
     renderViewOptionsMenu: =>
       mountPoint = document.querySelector("[data-component='ViewOptionsMenu']")
-      renderComponent(ViewOptionsMenu, mountPoint, @getViewOptionsMenuProps())
+      @viewOptionsMenu = renderComponent(ViewOptionsMenu, mountPoint, @getViewOptionsMenuProps())
 
     getActionMenuProps: =>
       focusReturnPoint = document.querySelector("[data-component='ActionMenu'] button")
@@ -1254,8 +1246,34 @@ define [
 
     renderGridColor: =>
       gridColorMountPoint = document.querySelector('[data-component="GridColor"]')
-      gridColorProps = @options.colors
+      gridColorProps =
+        colors: @options.colors
       renderComponent(GridColor, gridColorMountPoint, gridColorProps)
+
+    renderGradebookSettingsModal: =>
+      gradebookSettingsModalMountPoint = document.querySelector("[data-component='GradebookSettingsModal']")
+      gradebookSettingsModalProps =
+        onClose: => @gradebookSettingsModalButton.focus()
+      @gradebookSettingsModal = renderComponent(
+        GradebookSettingsModal,
+        gradebookSettingsModalMountPoint,
+        gradebookSettingsModalProps
+      )
+
+    renderSettingsButton: =>
+      buttonMountPoint = document.getElementById('gradebook-settings-modal-button-container')
+      buttonProps =
+        id: 'gradebook-settings-button',
+        variant: 'icon',
+        onClick: @gradebookSettingsModal.open
+      iconSettingsSolid = React.createElement(IconSettingsSolid, { title: I18n.t('Gradebook Settings') })
+      @gradebookSettingsModalButton = renderComponent(Button, buttonMountPoint, buttonProps, iconSettingsSolid)
+
+    renderStatusesModal: =>
+      statusesModalMountPoint = document.querySelector("[data-component='StatusesModal']")
+      statusesModalProps =
+        onClose: => @viewOptionsMenu.focus()
+      @statusesModal = renderComponent(StatusesModal, statusesModalMountPoint, statusesModalProps)
 
     checkForUploadComplete: () ->
       if UserSettings.contextGet('gradebookUploadComplete')
