@@ -28,12 +28,14 @@ describe 'Canvadoc' do
   before do
     PluginSetting.create! :name => 'canvadocs',
                           :settings => {"api_key" => "blahblahblahblahblah",
-                                        "base_url" => "http://example.com"}
+                                        "base_url" => "http://example.com",
+                                        "annotations_supported" => true}
     stub_upload
     Canvadocs::API.any_instance.stubs(:session).returns "id" => "blah",
       "status" => "pending"
-    @attachment = attachment_model(content_type: "application/pdf")
-    @doc = @attachment.create_canvadoc
+    @user = user_model
+    @attachment = attachment_model(user: @user, content_type: "application/pdf")
+    @doc = @attachment.create_canvadoc()
   end
 
   def disable_canvadocs
@@ -69,6 +71,27 @@ describe 'Canvadoc' do
     it "returns a session_url" do
       @doc.upload
       expect(@doc.session_url).to eq "http://example.com/sessions/blah/view?theme=dark"
+    end
+
+    it "Creates context for annotation session" do
+      @doc.upload
+      @doc.has_annotations = true
+      canvadocs_api = @doc.send(:canvadocs_api)
+      expect(canvadocs_api).to receive(:session).with(anything, hash_including(annotation_context: 'default')).and_call_original
+      @doc.session_url(user: @attachment.user)
+    end
+
+    it "Creates test context for annotation session" do
+      ApplicationController.stubs(:test_cluster?).returns(true)
+      ApplicationController.stubs(:test_cluster_name).returns('super-secret-testing')
+
+      @doc.upload
+      @doc.has_annotations = true
+
+      canvadocs_api = @doc.send(:canvadocs_api)
+
+      expect(canvadocs_api).to receive(:session).with(anything, hash_including(annotation_context: 'default-super-secret-testing')).and_call_original
+      @doc.session_url(user: @attachment.user)
     end
   end
 

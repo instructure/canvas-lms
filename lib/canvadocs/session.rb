@@ -22,8 +22,13 @@ module Canvadocs
     def canvadoc_permissions_for_user(user)
       return {} unless canvadocs_can_annotate? user
 
+      annotation_context = "default"
+      if ApplicationController.respond_to?(:test_cluster?) && ApplicationController.test_cluster?
+        annotation_context = "default-#{ApplicationController.test_cluster_name}"
+      end
+
       opts = {
-        annotation_context: "default",
+        annotation_context: annotation_context,
         permissions: "readwrite",
         user_id: user.global_id.to_s,
         user_name: user.short_name.gsub(",", ""),
