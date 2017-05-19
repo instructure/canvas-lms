@@ -55,8 +55,8 @@ import editorOptions from 'jsx/shared/rce/editorOptions'
 import EditorAccessibility from 'compiled/editor/editorAccessibility'
 import EditorBoxList from 'tinymce.editor_box_list'
 import EditorConfig from 'tinymce.config'
-import EditorCommands from 'tinymce.commands'
 import Utils from 'tinymce.editor_box_utils'
+import {remove, insertLink} from './tinymce.commands'
 
 //'compiled/tinymce', // required, but the bundles that ACTUALLY use
                       // tiny can require it themselves or else we have
@@ -356,7 +356,7 @@ import 'vendor/jquery.ba-tinypubsub'
   };
 
   $.fn._removeEditor = function() {
-    EditorCommands.remove(this, $instructureEditorBoxList)
+    remove(this, $instructureEditorBoxList)
   };
 
   $.fn._setContentCode = function(val) {
@@ -489,7 +489,7 @@ import 'vendor/jquery.ba-tinypubsub'
         tinyMCE.get(id).execCommand('mceInsertContent', false, $div.html());
       }
     } else {
-      EditorCommands.insertLink(id, selectedContent, linkAttrs)
+      insertLink(id, selectedContent, linkAttrs)
     }
 
     var ed = tinyMCE.get(id);
