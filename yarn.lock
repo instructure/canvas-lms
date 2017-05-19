@@ -7643,9 +7643,9 @@ timers-browserify@^2.0.2:
   dependencies:
     setimmediate "^1.0.4"
 
-timezone@1.0.5:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/timezone/-/timezone-1.0.5.tgz#cbe66c27313450ad4e3e39fb965f23548b6bf883"
+timezone@1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/timezone/-/timezone-1.0.6.tgz#d3b50bc35c63a09ed8876a8cc3642628685ccc33"
 
 tinycolor2@1.4.1:
   version "1.4.1"
