@@ -23,7 +23,7 @@ group :test do
     gem 'rails-controller-testing', '1.0.1'
   end
 
-  gem 'gergich', '0.1.13', require: false
+  gem 'gergich', '0.1.14', require: false
   gem 'dotenv', '2.2.1', require: false
   gem 'testingbot', require: false
   gem 'brakeman', require: false
