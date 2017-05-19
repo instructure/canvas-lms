@@ -2057,6 +2057,63 @@ describe User do
     end
   end
 
+  describe "wiki_pages_needing_viewing" do
+    before(:each) do
+      course_with_student(active_all: true)
+      wiki_page_model(course: @course)
+    end
+
+    let(:opts) { {due_after: 1.day.ago, due_before: 2.days.from_now} }
+
+    it 'should show for wiki pages with todo dates within the opts date range' do
+      @page.todo_date = 1.day.from_now
+      @page.save!
+      expect(@student.wiki_pages_needing_viewing(opts)).to eq [@page]
+    end
+
+    it 'should not show for wiki pages with todo dates outside the range' do
+      @page.todo_date = 3.days.ago
+      @page.save!
+      expect(@student.wiki_pages_needing_viewing(opts)).to eq []
+    end
+
+    it 'should not show for wiki pages without todo dates' do
+      expect(@student.wiki_pages_needing_viewing(opts)).to eq []
+    end
+
+    it 'should not show unpublished pages' do
+      teacher_in_course(course: @course)
+      @page.workflow_state = 'unpublished'
+      @page.todo_date = 1.day.from_now
+      @page.save!
+      expect(@student.wiki_pages_needing_viewing(opts)).to eq []
+      expect(@teacher.wiki_pages_needing_viewing(opts)).to eq []
+    end
+
+    it 'should not show for users not enrolled in course' do
+      page1 = @page
+      page1.todo_date = 1.day.from_now
+      page1.save!
+      user1 = @student
+      course_with_student(active_all: true)
+      wiki_page_model(course: @course)
+      expect(user1.wiki_pages_needing_viewing(opts)).to eq [page1]
+      expect(@student.wiki_pages_needing_viewing(opts)).to eq []
+    end
+
+    it 'should not show wiki pages that are not released to the user' do
+      @course.enable_feature!(:conditional_release)
+      @page.todo_date = 1.day.from_now
+      @page.save!
+      add_section('Section 2')
+      student2 = student_in_section(@course_section)
+      wiki_page_assignment_model(wiki_page: @page)
+      differentiated_assignment(assignment: @assignment, course_section: @course_section)
+      expect(@student.wiki_pages_needing_viewing(opts)).to eq []
+      expect(student2.wiki_pages_needing_viewing(opts)).to eq [@page]
+    end
+  end
+
   describe "avatar_key" do
     it "should return a valid avatar key for a valid user id" do
       expect(User.avatar_key(1)).to eq "1-#{Canvas::Security.hmac_sha1('1')[0,10]}"

@@ -70,7 +70,7 @@ class PlannerOverridesController < ApplicationController
 
   before_action :require_user
   before_action :set_date_range
-  before_action :set_assignments, only: [:items_index]
+  before_action :set_planner_items, only: [:items_index]
 
   attr_reader :due_before, :due_after
 
@@ -119,7 +119,8 @@ class PlannerOverridesController < ApplicationController
   #     },
   #   ]
   def items_index
-    render :json => @assignments.map { |item| planner_item_json(item, @current_user, session, item.todo_type) }
+    pi_json = @planner_items.map { |item| planner_item_json(item, @current_user, session, item.todo_type) }
+    render json: pi_json
   end
 
   # @API List planner overrides
@@ -197,25 +198,19 @@ class PlannerOverridesController < ApplicationController
 
   private
 
+  def set_planner_items
+    set_assignments
+    set_pages
+    @planner_items = Api.paginate(@pages + @assignments, self, api_v1_planner_items_url)
+  end
+
   def set_assignments
-    default_opts = {
-                      include_ignored: true,
-                      include_ungraded: true,
-                      due_before: due_before,
-                      due_after: due_after,
-                      limit: (params[:limit]&.to_i || 50)
-                   }
     @grading = @current_user.assignments_needing_grading(default_opts).each { |a| a.todo_type = 'grading' }
     @submitting = @current_user.assignments_needing_submitting(default_opts).each { |a| a.todo_type = 'submitting' }
     @moderation = @current_user.assignments_needing_moderation(default_opts).each { |a| a.todo_type = 'moderation' }
     @ungraded_quiz = @current_user.ungraded_quizzes_needing_submitting(default_opts).each { |a| a.todo_type = 'submitting' }
     @submitted = @current_user.submitted_assignments(default_opts).each { |a| a.todo_type = 'submitted' }
-    all_assignments = (@grading +
-                       @submitted +
-                       @ungraded_quiz +
-                       @submitting +
-                       @moderation)
-    @assignments = Api.paginate(all_assignments, self, api_v1_planner_items_url)
+    @assignments = @grading + @submitted + @ungraded_quiz + @submitting + @moderation
   end
 
   def set_date_range
@@ -231,7 +226,21 @@ class PlannerOverridesController < ApplicationController
     @due_after ||= 10.years.ago
   end
 
+  def set_pages
+    @pages = @current_user.wiki_pages_needing_viewing(default_opts).each { |p| p.todo_type = 'viewing' }
+  end
+
   def require_user
     render_unauthorized_action if !@current_user || !@domain_root_account.feature_enabled?(:student_planner)
+  end
+
+  def default_opts
+    {
+      include_ignored: true,
+      include_ungraded: true,
+      due_before: due_before,
+      due_after: due_after,
+      limit: (params[:limit]&.to_i || 50)
+    }
   end
 end

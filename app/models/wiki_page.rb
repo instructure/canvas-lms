@@ -23,7 +23,7 @@ require_dependency 'assignment_student_visibility'
 
 class WikiPage < ActiveRecord::Base
   attr_readonly :wiki_id
-  attr_accessor :saved_by
+  attr_accessor :saved_by, :todo_type
   validates_length_of :body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_presence_of :wiki_id
   include Canvas::SoftDeletable
@@ -63,8 +63,24 @@ class WikiPage < ActiveRecord::Base
     where(assignment_id: nil).joins(:course).where(courses: {id: course_ids})
   }
 
+  scope :not_ignored_by, -> (user, purpose) do
+    where("NOT EXISTS (?)", Ignore.where(asset_type: 'WikiPage', user_id: user, purpose: purpose, asset_id: :id))
+  end
+  scope :todo_date_between, -> (starting, ending) { where(todo_date: starting...ending) }
+  scope :for_course, -> (course_ids) { joins(:course).where(courses: {id: course_ids}) }
+  scope :for_user, -> (user_id) do
+    joins(course: :enrollments).
+      joins("LEFT JOIN #{Assignment.quoted_table_name} as a on a.context_id = courses.id
+                                                           AND a.id = wiki_pages.assignment_id
+             LEFT JOIN #{AssignmentStudentVisibility.quoted_table_name} as asv on asv.assignment_id = a.id").
+      where(enrollments: {user_id: user_id}).
+      where("a.id IS NULL OR (asv.course_id = courses.id
+             AND asv.assignment_id = a.id
+             AND asv.user_id = ?)", user_id).uniq
+  end
+
   TITLE_LENGTH = 255
-  SIMPLY_VERSIONED_EXCLUDE_FIELDS = [:workflow_state, :editing_roles, :notify_of_update]
+  SIMPLY_VERSIONED_EXCLUDE_FIELDS = [:workflow_state, :editing_roles, :notify_of_update].freeze
 
   def touch_wiki_context
     self.wiki.touch_context if self.wiki && self.wiki.context

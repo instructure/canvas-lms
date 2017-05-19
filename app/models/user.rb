@@ -53,6 +53,7 @@ class User < ActiveRecord::Base
   has_many :enrollments, :dependent => :destroy
 
   has_many :not_ended_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')") }, class_name: 'Enrollment', multishard: true
+  has_many :not_removed_enrollments, -> { where.not(workflow_state: ['rejected', 'deleted', 'inactive']) }, class_name: 'Enrollment', multishard: true
   has_many :observer_enrollments
   has_many :observee_enrollments, :foreign_key => :associated_user_id, :class_name => 'ObserverEnrollment'
   has_many :user_observers, dependent: :destroy, inverse_of: :user
@@ -1585,6 +1586,29 @@ class User < ActiveRecord::Base
     end
   end
 
+  def needing_viewing(object_type, expires_in, opts={})
+    shard.activate do
+      course_ids = participated_course_ids
+      course_ids_cache_key = Digest::MD5.hexdigest(course_ids.sort.join(','))
+      cache_key = [self, "#{object_type.underscore}_needing_viewing", course_ids_cache_key, opts].cache_key
+      Rails.cache.fetch(cache_key, :expires_in => expires_in) do
+        result = Shackles.activate(:slave) do
+          Shard.partition_by_shard(course_ids) do |shard_course_ids|
+            scope = object_type.constantize.for_course(shard_course_ids)
+            scope = scope.not_ignored_by(self, 'viewing') unless opts[:include_ignored]
+            scope.for_user(id).active.todo_date_between(opts[:due_after], opts[:due_before])
+          end
+        end
+        result = result[0...opts[:limit]] if opts[:limit]
+        result
+      end
+    end
+  end
+
+  def wiki_pages_needing_viewing(opts={})
+    needing_viewing('WikiPage', 120.minutes, opts)
+  end
+
   def generate_access_verifier(ts)
     require 'openssl'
     digest = OpenSSL::Digest::MD5.new
@@ -1868,6 +1892,14 @@ class User < ActiveRecord::Base
     @participating_enrollments ||= self.shard.activate do
       Rails.cache.fetch([self, 'participating_enrollments', ApplicationController.region].cache_key) do
         self.enrollments.shard(in_region_associated_shards).current.active_by_date.to_a
+      end
+    end
+  end
+
+  def participated_course_ids
+    @participated_course_ids ||= self.shard.activate do
+      Rails.cache.fetch([self, 'participated_course_ids', ApplicationController.region].cache_key) do
+        self.not_removed_enrollments.shard(in_region_associated_shards).distinct.pluck(:course_id)
       end
     end
   end

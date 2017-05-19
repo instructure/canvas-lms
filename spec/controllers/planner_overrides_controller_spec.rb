@@ -63,6 +63,18 @@ describe PlannerOverridesController do
           get :items_index
           expect(response).to have_http_status(:success)
         end
+
+        it "should show wiki pages with todo dates" do
+          wiki_page_model(course: @course)
+          @page.todo_date = 1.day.from_now
+          @page.save!
+          get :items_index
+          response_json = json_parse(response.body)
+          expect(response_json.length).to eq 3
+          page = response_json.first
+          expect(page["plannable_type"]).to eq 'wiki_page'
+          expect(page["type"]).to eq 'viewing'
+        end
       end
 
       describe "GET #index" do

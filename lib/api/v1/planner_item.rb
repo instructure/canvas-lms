@@ -31,15 +31,16 @@ module Api::V1::PlannerItem
       :visible_in_planner => item.visible_in_planner_for?(user),
       :planner_override => item.planner_override_for(user)
     }).tap do |hash|
-      if item.is_a?(Quizzes::Quiz) || item.quiz?
+      if item.is_a?(Quizzes::Quiz) || (item.respond_to?(:quiz?) && item.quiz?)
         quiz = item.is_a?(Quizzes::Quiz) ? item : item.quiz
         hash[:plannable_type] = 'quiz'
         hash[:plannable] = quiz_json(quiz, quiz.context, user, session)
         hash[:html_url] = course_quiz_url(quiz.context_id, quiz.id)
-      elsif item.wiki_page?
+      elsif item.is_a?(WikiPage) || (item.respond_to?(:wiki_page?) && item.wiki_page?)
+        item = item.wiki_page if item.respond_to?(:wiki_page?) && item.wiki_page?
         hash[:plannable_type] = 'wiki_page'
-        hash[:plannable] = wiki_page_json(item.wiki_page, user, session)
-        hash[:html_url] = item.wiki_page.url
+        hash[:plannable] = wiki_page_json(item, user, session)
+        hash[:html_url] = item.url
       elsif item.discussion_topic? && item.discussion_topic.is_announcement
         hash[:plannable_type] = 'announcement'
         hash[:plannable] = discussion_topic_api_json(item.discussion_topic, item.discussion_topic.context, user, session)
