@@ -26,9 +26,11 @@ import I18n from 'i18n!gradebook'
 
 const { bool, func, shape, string } = PropTypes;
 
-function renderTrigger () {
+function renderTrigger (menuShown) {
+  const classes = `Gradebook__ColumnHeaderAction ${menuShown ? 'menuShown' : ''}`;
+
   return (
-    <span className="Gradebook__ColumnHeaderAction">
+    <span className={classes}>
       <Typography weight="bold" fontStyle="normal" size="large" color="brand">
         <IconMoreSolid title={I18n.t('Total Options')} />
       </Typography>
@@ -63,7 +65,16 @@ class TotalGradeColumnHeader extends React.Component {
   constructor (props) {
     super(props);
 
+    this.state = {
+      menuShown: false
+    };
+
     this.bindOptionsMenuContent = (ref) => { this.optionsMenuContent = ref };
+    this.onToggle = this.onToggle.bind(this);
+  }
+
+  onToggle (show) {
+    this.setState({ menuShown: show });
   }
 
   render () {
@@ -74,6 +85,7 @@ class TotalGradeColumnHeader extends React.Component {
     const nowrapStyle = {
       whiteSpace: 'nowrap'
     };
+    const menuShown = this.state.menuShown;
 
     return (
       <div className="Gradebook__ColumnHeaderContent">
@@ -86,7 +98,8 @@ class TotalGradeColumnHeader extends React.Component {
         <PopoverMenu
           contentRef={this.bindOptionsMenuContent}
           focusTriggerOnClose={false}
-          trigger={renderTrigger()}
+          trigger={renderTrigger(menuShown)}
+          onToggle={this.onToggle}
         >
           <MenuItemGroup label={I18n.t('Sort by')}>
             <MenuItem

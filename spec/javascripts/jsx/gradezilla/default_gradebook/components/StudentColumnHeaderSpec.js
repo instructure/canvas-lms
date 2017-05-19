@@ -67,10 +67,17 @@ test('renders a PopoverMenu', function () {
   equal(selectedElements.length, 1);
 });
 
-test('renders an IconMoreSolid inside the PopoverMenu', function () {
-  const selectedElements = this.wrapper.find('PopoverMenu IconMoreSolid');
+test('renders a PopoverMenu with a trigger', function () {
+  const optionsMenuTrigger = this.wrapper.find('PopoverMenu .Gradebook__ColumnHeaderAction');
 
-  equal(selectedElements.length, 1)
+  equal(optionsMenuTrigger.length, 1);
+});
+
+test('adds a class to the trigger when the PopoverMenu is opened', function () {
+  const optionsMenuTrigger = this.wrapper.find('PopoverMenu .Gradebook__ColumnHeaderAction');
+  optionsMenuTrigger.simulate('click');
+
+  ok(optionsMenuTrigger.hasClass('menuShown'));
 });
 
 test('renders a title for the More icon', function () {

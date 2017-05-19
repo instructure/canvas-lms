@@ -38,6 +38,7 @@ a#accessibility_warning {
 }
 
 $cell_height: 33px;
+$header_height: 38px;
 
 // ******* overrides of the default slick.grid.css styles ********
 .slick-sort-indicator {
@@ -155,81 +156,46 @@ $cell_height: 33px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .gradebook-header-drop {
-    //put it above the "out of"
-    z-index: 1;
-    width: 14px;
-    height: 14px;
+
+  .Gradebook__ColumnHeaderContent {
+    bottom: 0;
+    display: flex;
+    left: 0;
     position: absolute;
-    bottom: 3px;
-    right: 3px;
-    text-indent: 999px;
+    right: 0;
+    top: 0;
+  }
+
+  .Gradebook__ColumnHeaderDetail,
+  .Gradebook__ColumnHeaderAction {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .Gradebook__ColumnHeaderDetail {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .Gradebook__ColumnHeaderAction {
+    flex-shrink: 0;
+    flex-grow: 0;
+    height: $cell_height;
     opacity: 0;
-    //override jqueryui blue border
-    border: 0 none;
 
-    @if $use_high_contrast {
-      background: url("/images/jqueryui/gradebook-header-drop2-high-contrast.png") no-repeat top left;
-      @media (min--moz-device-pixel-ratio: 1.5),
-      (-o-min-device-pixel-ratio: 3/2),
-      (-webkit-min-device-pixel-ratio: 1.5),
-      (min-device-pixel-ratio: 1.5),
-      (min-resolution: 1.5dppx) {
-        background-image: url("/images/jqueryui/gradebook-header-drop2-high-contrast@2x.png");
-        background-size: 14px 28px;
-      }
-    }
-
-    @else {
-      background: url("/images/jqueryui/gradebook-header-drop2.png") no-repeat top left;
-      @media (min--moz-device-pixel-ratio: 1.5),
-      (-o-min-device-pixel-ratio: 3/2),
-      (-webkit-min-device-pixel-ratio: 1.5),
-      (min-device-pixel-ratio: 1.5),
-      (min-resolution: 1.5dppx) {
-        background-image: url("/images/jqueryui/gradebook-header-drop2@2x.png");
-        background-size: 14px 28px;
-      }
-    }
-
-    &:hover, &.ui-menu-trigger-menu-is-open {
-      background-position: bottom left;
+    &:focus, &:hover, &.menuShown {
       opacity: 1;
     }
   }
-  &:hover .gradebook-header-drop {
+
+  &:hover .Gradebook__ColumnHeaderAction {
     opacity: 1;
   }
-}
-
-.Gradebook__ColumnHeaderContent {
-  bottom: 0;
-  display: flex;
-  left: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
-}
-
-.Gradebook__ColumnHeaderDetail {
-  flex-grow: 1;
-  flex-shrink: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.Gradebook__ColumnHeaderAction {
-  flex-shrink: 0;
-  flex-grow: 0;
-}
-
-.Gradebook__ColumnHeaderDetail,
-.Gradebook__ColumnHeaderAction {
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 
 .odd .slick-cell {

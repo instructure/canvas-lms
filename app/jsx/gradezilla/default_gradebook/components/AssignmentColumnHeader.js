@@ -107,8 +107,17 @@ class AssignmentColumnHeader extends React.Component {
   constructor (props) {
     super(props);
 
+    this.state = {
+      menuShown: false
+    };
+
     this.bindOptionsMenuContent = (ref) => { this.optionsMenuContent = ref };
     this.showMessageStudentsWhoDialog = this.showMessageStudentsWhoDialog.bind(this);
+    this.onToggle = this.onToggle.bind(this);
+  }
+
+  onToggle (show) {
+    this.setState({ menuShown: show });
   }
 
   activeStudentDetails () {
@@ -167,8 +176,11 @@ class AssignmentColumnHeader extends React.Component {
 
   renderTrigger () {
     const optionsTitle = I18n.t('%{name} Options', { name: this.props.assignment.name });
+    const menuShown = this.state.menuShown;
+    const classes = `Gradebook__ColumnHeaderAction ${menuShown ? 'menuShown' : ''}`;
+
     return (
-      <span className="Gradebook__ColumnHeaderAction">
+      <span className={classes}>
         <Typography weight="bold" fontStyle="normal" size="large" color="brand">
           <IconMoreSolid title={optionsTitle} />
         </Typography>
@@ -187,6 +199,7 @@ class AssignmentColumnHeader extends React.Component {
         contentRef={this.bindOptionsMenuContent}
         focusTriggerOnClose={false}
         trigger={this.renderTrigger()}
+        onToggle={this.onToggle}
       >
         <MenuItemGroup label={I18n.t('Sort by')}>
           <MenuItem
