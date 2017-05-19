@@ -20,6 +20,7 @@ import Gradebook from 'compiled/gradezilla/Gradebook';
 
 export function createGradebook (options = {}) {
   return new Gradebook({
+    colors: {},
     context_id: '1',
     post_grades_ltis: [],
     sections: [],

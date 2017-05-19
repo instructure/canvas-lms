@@ -32,7 +32,6 @@ import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator';
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
 import DataLoader from 'jsx/gradezilla/DataLoader';
 import StudentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/StudentRowHeaderConstants';
-import Gradebook from 'compiled/gradezilla/Gradebook';
 import UserSettings from 'compiled/userSettings';
 import ActionMenu from 'jsx/gradezilla/default_gradebook/components/ActionMenu';
 import GradebookApi from 'jsx/gradezilla/default_gradebook/GradebookApi';
@@ -190,22 +189,18 @@ test('updates section filter visibility after loading students', function () {
 });
 
 QUnit.module('Gradebook#calculateStudentGrade', {
-  setupThis (options = {}) {
+  createGradebook (options = {}) {
+    const gradebook = createGradebook({
+      group_weighting_scheme: 'points'
+    });
     const assignments = [
       { id: '201', points_possible: 10, omit_from_final_grade: false }
     ];
-    const submissions = [
-      { assignment_id: 201, score: 10 }
-    ];
-    return {
+    Object.assign(gradebook, {
       gradingPeriodToShow: '0',
-      isAllGradingPeriods: Gradebook.prototype.isAllGradingPeriods,
       assignmentGroups: [
         { id: '301', group_weight: 60, rules: {}, assignments }
       ],
-      options: {
-        group_weighting_scheme: 'points'
-      },
       gradingPeriods: [
         { id: '701', weight: 50 },
         { id: '702', weight: 50 }
@@ -223,37 +218,37 @@ QUnit.module('Gradebook#calculateStudentGrade', {
           101: { grading_period_id: '701' }
         }
       },
-      submissionsForStudent () {
-        return submissions;
-      },
+      submissionsForStudent: () => this.submissions,
       ...options
-    };
+    });
+    return gradebook;
   },
 
   setup () {
-    this.calculate = Gradebook.prototype.calculateStudentGrade;
+    this.exampleGrades = createGrades();
+    this.submissions = [{ assignment_id: 201, score: 10 }];
   }
 });
 
 test('calculates grades using properties from the gradebook', function () {
-  const self = this.setupThis();
+  const gradebook = this.createGradebook();
   this.stub(CourseGradeCalculator, 'calculate').returns(createGrades());
-  this.calculate.call(self, {
+  gradebook.calculateStudentGrade({
     id: '101',
     loaded: true,
     initialized: true
   });
   const args = CourseGradeCalculator.calculate.getCall(0).args;
-  equal(args[0], self.submissionsForStudent());
-  equal(args[1], self.assignmentGroups);
-  equal(args[2], self.options.group_weighting_scheme);
-  equal(args[3], self.gradingPeriodSet);
+  equal(args[0], this.submissions);
+  equal(args[1], gradebook.assignmentGroups);
+  equal(args[2], gradebook.options.group_weighting_scheme);
+  equal(args[3], gradebook.gradingPeriodSet);
 });
 
 test('scopes effective due dates to the user', function () {
-  const self = this.setupThis();
+  const gradebook = this.createGradebook();
   this.stub(CourseGradeCalculator, 'calculate').returns(createGrades());
-  this.calculate.call(self, {
+  gradebook.calculateStudentGrade({
     id: '101',
     loaded: true,
     initialized: true
@@ -267,107 +262,103 @@ test('scopes effective due dates to the user', function () {
 });
 
 test('calculates grades without grading period data when grading period set is null', function () {
-  const self = this.setupThis({
+  const gradebook = this.createGradebook({
     gradingPeriodSet: null
   });
   this.stub(CourseGradeCalculator, 'calculate').returns(createGrades());
-  this.calculate.call(self, {
+  gradebook.calculateStudentGrade({
     id: '101',
     loaded: true,
     initialized: true
   });
   const args = CourseGradeCalculator.calculate.getCall(0).args;
-  equal(args[0], self.submissionsForStudent());
-  equal(args[1], self.assignmentGroups);
-  equal(args[2], self.options.group_weighting_scheme);
+  equal(args[0], this.submissions);
+  equal(args[1], gradebook.assignmentGroups);
+  equal(args[2], gradebook.options.group_weighting_scheme);
   equal(typeof args[3], 'undefined');
   equal(typeof args[4], 'undefined');
 });
 
 test('calculates grades without grading period data when effective due dates are not defined', function () {
-  const self = this.setupThis({
+  const gradebook = this.createGradebook({
     effectiveDueDates: null
   });
   this.stub(CourseGradeCalculator, 'calculate').returns(createGrades());
-  this.calculate.call(self, {
+  gradebook.calculateStudentGrade({
     id: '101',
     loaded: true,
     initialized: true
   });
   const args = CourseGradeCalculator.calculate.getCall(0).args;
-  equal(args[0], self.submissionsForStudent());
-  equal(args[1], self.assignmentGroups);
-  equal(args[2], self.options.group_weighting_scheme);
+  equal(args[0], this.submissions);
+  equal(args[1], gradebook.assignmentGroups);
+  equal(args[2], gradebook.options.group_weighting_scheme);
   equal(typeof args[3], 'undefined');
   equal(typeof args[4], 'undefined');
 });
 
 test('stores the current grade on the student when not including ungraded assignments', function () {
-  const exampleGrades = createGrades();
-  const self = this.setupThis({
+  const gradebook = this.createGradebook({
     include_ungraded_assignments: false
   });
-  this.stub(CourseGradeCalculator, 'calculate').returns(exampleGrades);
+  this.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades);
   const student = {
     id: '101',
     loaded: true,
     initialized: true
   };
-  this.calculate.call(self, student);
-  equal(student.total_grade, exampleGrades.current);
+  gradebook.calculateStudentGrade(student);
+  equal(student.total_grade, this.exampleGrades.current);
 });
 
 test('stores the final grade on the student when including ungraded assignments', function () {
-  const exampleGrades = createGrades();
-  const self = this.setupThis({
+  const gradebook = this.createGradebook({
     include_ungraded_assignments: true
   });
-  this.stub(CourseGradeCalculator, 'calculate').returns(exampleGrades);
+  this.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades);
   const student = {
     id: '101',
     loaded: true,
     initialized: true
   };
-  this.calculate.call(self, student);
-  equal(student.total_grade, exampleGrades.final);
+  gradebook.calculateStudentGrade(student);
+  equal(student.total_grade, this.exampleGrades.final);
 });
 
 test('stores the current grade from the selected grading period when not including ungraded assignments', function () {
-  const exampleGrades = createGrades();
-  const self = this.setupThis({
+  const gradebook = this.createGradebook({
     gradingPeriodToShow: 701,
     include_ungraded_assignments: false
   });
-  this.stub(CourseGradeCalculator, 'calculate').returns(exampleGrades);
+  this.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades);
   const student = {
     id: '101',
     loaded: true,
     initialized: true
   };
-  this.calculate.call(self, student);
-  equal(student.total_grade, exampleGrades.gradingPeriods[701].current);
+  gradebook.calculateStudentGrade(student);
+  equal(student.total_grade, this.exampleGrades.gradingPeriods[701].current);
 });
 
 test('stores the final grade from the selected grading period when including ungraded assignments', function () {
-  const exampleGrades = createGrades();
-  const self = this.setupThis({
+  const gradebook = this.createGradebook({
     gradingPeriodToShow: 701,
     include_ungraded_assignments: true
   });
-  this.stub(CourseGradeCalculator, 'calculate').returns(exampleGrades);
+  this.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades);
   const student = {
     id: '101',
     loaded: true,
     initialized: true
   };
-  this.calculate.call(self, student);
-  equal(student.total_grade, exampleGrades.gradingPeriods[701].final);
+  gradebook.calculateStudentGrade(student);
+  equal(student.total_grade, this.exampleGrades.gradingPeriods[701].final);
 });
 
 test('does not calculate when the student is not loaded', function () {
-  const self = this.setupThis();
+  const gradebook = this.createGradebook();
   this.stub(CourseGradeCalculator, 'calculate').returns(createGrades());
-  this.calculate.call(self, {
+  gradebook.calculateStudentGrade({
     id: '101',
     loaded: false,
     initialized: true
@@ -376,9 +367,9 @@ test('does not calculate when the student is not loaded', function () {
 });
 
 test('does not calculate when the student is not initialized', function () {
-  const self = this.setupThis();
+  const gradebook = this.createGradebook();
   this.stub(CourseGradeCalculator, 'calculate').returns(createGrades());
-  this.calculate.call(self, {
+  gradebook.calculateStudentGrade({
     id: '101',
     loaded: true,
     initialized: false
@@ -427,14 +418,16 @@ QUnit.module('Gradebook#localeSort');
 
 test('delegates to natcompare.strings', function () {
   this.spy(natcompare, 'strings');
-  Gradebook.prototype.localeSort('a', 'b');
+  const gradebook = createGradebook();
+  gradebook.localeSort('a', 'b');
   equal(natcompare.strings.callCount, 1);
   deepEqual(natcompare.strings.getCall(0).args, ['a', 'b']);
 });
 
 test('substitutes falsy args with empty string', function () {
   this.spy(natcompare, 'strings');
-  Gradebook.prototype.localeSort(0, false);
+  const gradebook = createGradebook();
+  gradebook.localeSort(0, false);
   equal(natcompare.strings.callCount, 1);
   deepEqual(natcompare.strings.getCall(0).args, ['', '']);
 });
@@ -542,88 +535,68 @@ test('optionally sorts in descending order', function () {
 });
 
 QUnit.module('Gradebook#hideAggregateColumns', {
-  gradebookStubs () {
-    return {
-      indexedOverrides: Gradebook.prototype.indexedOverrides,
-      indexedGradingPeriods: _.indexBy(this.gradingPeriods, 'id')
-    };
-  },
-
-  setupThis (options = {}) {
-    return {
-      ...this.gradebookStubs(),
+  createGradebook (options = {}) {
+    const gradebook = createGradebook({
+      all_grading_periods_totals: false
+    });
+    Object.assign(gradebook, {
       gradingPeriodSet: { id: '1' },
       getGradingPeriodToShow () {
         return '1';
       },
-      options: {
-        all_grading_periods_totals: false
-      },
       ...options
-    };
-  },
-
-  setup () {
-    this.hideAggregateColumns = Gradebook.prototype.hideAggregateColumns;
+    });
+    return gradebook;
   }
 });
 
 test('returns false if there are no grading periods', function () {
-  const self = this.setupThis({
+  const gradebook = this.createGradebook({
     gradingPeriodSet: null,
     isAllGradingPeriods () {
       return false;
     }
   });
-  notOk(this.hideAggregateColumns.call(self));
+  notOk(gradebook.hideAggregateColumns());
 });
 
 test('returns false if there are no grading periods, even if isAllGradingPeriods is true', function () {
-  const self = this.setupThis({
+  const gradebook = this.createGradebook({
     gradingPeriodSet: null,
     getGradingPeriodToShow () {
       return '0';
-    },
-    isAllGradingPeriods () {
-      return true;
     }
   });
-  notOk(this.hideAggregateColumns.call(self));
+  notOk(gradebook.hideAggregateColumns());
 });
 
 test('returns false if "All Grading Periods" is not selected', function () {
-  const self = this.setupThis({
+  const gradebook = this.createGradebook({
     isAllGradingPeriods () {
       return false;
     }
   });
-  notOk(this.hideAggregateColumns.call(self));
+  notOk(gradebook.hideAggregateColumns());
 });
 
 test('returns true if "All Grading Periods" is selected', function () {
-  const self = this.setupThis({
+  const gradebook = this.createGradebook({
     getGradingPeriodToShow () {
       return '0';
-    },
-    isAllGradingPeriods () {
-      return true;
     }
   });
-  ok(this.hideAggregateColumns.call(self));
+  ok(gradebook.hideAggregateColumns());
 });
 
 test('returns false if "All Grading Periods" is selected and the grading period set has' +
   '"Display Totals for All Grading Periods option" enabled', function () {
-  const self = this.setupThis({
+  const gradebook = this.createGradebook({
     getGradingPeriodToShow () {
       return '0';
     },
-    isAllGradingPeriods () {
-      return true;
-    },
     gradingPeriodSet: { displayTotalsForAllGradingPeriods: true }
   });
-  notOk(this.hideAggregateColumns.call(self));
+  notOk(gradebook.hideAggregateColumns());
 });
 
 QUnit.module('Gradebook#makeColumnSortFn', {
@@ -854,31 +827,23 @@ test('comparison is case-insensitive', function () {
 });
 
 QUnit.module('Gradebook#compareAssignmentPointsPossible', {
-  getRecord (pointsPossible) {
-    return {
-      object: {
-        points_possible: pointsPossible
-      }
-    };
-  },
-
   setup () {
-    this.compareAssignmentPointsPossible = Gradebook.prototype.compareAssignmentPointsPossible;
-    this.firstRecord = this.getRecord(1);
-    this.secondRecord = this.getRecord(2);
+    this.gradebook = createGradebook();
+    this.firstRecord = { object: { points_possible: 1 } };
+    this.secondRecord = { object: { points_possible: 2 } };
   }
 });
 
 test('returns a negative number if the points_possible field is smaller in the first record', function () {
-  strictEqual(this.compareAssignmentPointsPossible(this.firstRecord, this.secondRecord), -1);
+  strictEqual(this.gradebook.compareAssignmentPointsPossible(this.firstRecord, this.secondRecord), -1);
 });
 
 test('returns 0 if the points_possible field is the same in both records', function () {
-  strictEqual(this.compareAssignmentPointsPossible(this.firstRecord, this.firstRecord), 0);
+  strictEqual(this.gradebook.compareAssignmentPointsPossible(this.firstRecord, this.firstRecord), 0);
 });
 
 test('returns a positive number if the points_possible field is greater in the first record', function () {
-  strictEqual(this.compareAssignmentPointsPossible(this.secondRecord, this.firstRecord), 1);
+  strictEqual(this.gradebook.compareAssignmentPointsPossible(this.secondRecord, this.firstRecord), 1);
 });
 
 QUnit.module('Gradebook#storeCustomColumnOrder');
@@ -943,41 +908,34 @@ test('returns the default column order settings if the column order has never be
 
 QUnit.module('Gradebook#isDefaultSortOrder', {
   setup () {
-    this.isDefaultSortOrder = Gradebook.prototype.isDefaultSortOrder;
+    this.gradebook = createGradebook();
   }
 });
 
 test('returns false if called with due_date', function () {
-  strictEqual(this.isDefaultSortOrder('due_date'), false);
+  strictEqual(this.gradebook.isDefaultSortOrder('due_date'), false);
 });
 
 test('returns false if called with name', function () {
-  strictEqual(this.isDefaultSortOrder('name'), false);
+  strictEqual(this.gradebook.isDefaultSortOrder('name'), false);
 });
 
 test('returns false if called with points', function () {
-  strictEqual(this.isDefaultSortOrder('points'), false);
+  strictEqual(this.gradebook.isDefaultSortOrder('points'), false);
 });
 
 test('returns false if called with points', function () {
-  strictEqual(this.isDefaultSortOrder('custom'), false);
+  strictEqual(this.gradebook.isDefaultSortOrder('custom'), false);
 });
 
 test('returns true if called with anything else', function () {
-  strictEqual(this.isDefaultSortOrder('alpha'), true);
-  strictEqual(this.isDefaultSortOrder('assignment_group'), true);
+  strictEqual(this.gradebook.isDefaultSortOrder('alpha'), true);
+  strictEqual(this.gradebook.isDefaultSortOrder('assignment_group'), true);
 });
 
 QUnit.module('Gradebook#getVisibleGradeGridColumns', {
   setup () {
-    this.getVisibleGradeGridColumns = Gradebook.prototype.getVisibleGradeGridColumns;
-    this.makeColumnSortFn = Gradebook.prototype.makeColumnSortFn;
-    this.compareAssignmentPositions = Gradebook.prototype.compareAssignmentPositions;
-    this.compareAssignmentDueDates = Gradebook.prototype.compareAssignmentDueDates;
-    this.wrapColumnSortFn = Gradebook.prototype.wrapColumnSortFn;
-    this.getStoredSortOrder = Gradebook.prototype.getStoredSortOrder;
-    this.defaultSortType = 'assignment_group';
-    this.allAssignmentColumns = [
+    const allAssignmentColumns = [
       {
         object: {
           assignment_group: { position: 1 },
@@ -1012,121 +970,76 @@ QUnit.module('Gradebook#getVisibleGradeGridColumns', {
         }
       }
     ];
-    this.aggregateColumns = [];
-    this.parentColumns = [];
-    this.customColumnDefinitions = function () {
-      return [];
-    };
+    this.gradebook = createGradebook();
+    this.gradebook.allAssignmentColumns = allAssignmentColumns;
+    this.gradebook.parentColumns = [];
+    this.gradebook.customColumns = [];
+    this.gradebook.aggregateColumns = [];
   }
 });
 
 test('sorts columns when there is a valid sortType', function () {
-  this.spy(this, 'makeColumnSortFn');
-  this.isInvalidCustomSort = function () {
-    return false;
-  };
-  this.columnOrderHasNotBeenSaved = function () {
-    return false;
-  };
-  this.gradebookColumnOrderSettings = {
-    sortType: 'due_date'
-  };
-  this.getVisibleGradeGridColumns();
-  ok(this.makeColumnSortFn.calledWith({
-    sortType: 'due_date'
-  }));
+  this.spy(this.gradebook, 'makeColumnSortFn');
+  this.gradebook.gradebookColumnOrderSettings = { sortType: 'due_date', customOrder: false };
+  this.gradebook.getVisibleGradeGridColumns();
+  strictEqual(this.gradebook.makeColumnSortFn.callCount, 1);
+  const [sortOrder] = this.gradebook.makeColumnSortFn.lastCall.args;
+  equal(sortOrder.sortType, 'due_date');
 });
 
 test('falls back to the default sort type if the custom sort type does not have a customOrder property', function () {
-  this.spy(this, 'makeColumnSortFn');
-  this.isInvalidCustomSort = function () {
-    return true;
-  };
-  this.gradebookColumnOrderSettings = {
-    sortType: 'custom'
-  };
-  this.makeCompareAssignmentCustomOrderFn = Gradebook.prototype.makeCompareAssignmentCustomOrderFn;
-  this.getVisibleGradeGridColumns();
-  ok(this.makeColumnSortFn.calledWith({
-    sortType: 'assignment_group',
-    direction: 'ascending'
-  }));
+  this.spy(this.gradebook, 'makeColumnSortFn');
+  this.gradebook.gradebookColumnOrderSettings = { sortType: 'custom', customOrder: false };
+  this.gradebook.getVisibleGradeGridColumns();
+  strictEqual(this.gradebook.makeColumnSortFn.callCount, 1);
+  const [sortOrder] = this.gradebook.makeColumnSortFn.lastCall.args;
+  equal(sortOrder.sortType, 'assignment_group');
+  equal(sortOrder.direction, 'ascending');
 });
 
 test('does not sort columns when gradebookColumnOrderSettings is undefined', function () {
-  this.spy(this, 'makeColumnSortFn');
-  this.gradebookColumnOrderSettings = undefined;
-  this.getVisibleGradeGridColumns();
-  notOk(this.makeColumnSortFn.called);
+  this.spy(this.gradebook, 'makeColumnSortFn');
+  this.gradebook.gradebookColumnOrderSettings = undefined;
+  this.gradebook.getVisibleGradeGridColumns();
+  strictEqual(this.gradebook.makeColumnSortFn.callCount, 0);
 });
 
 test('only contains published and graded assignments', function () {
-  const columns = this.getVisibleGradeGridColumns();
+  this.gradebook.showUnpublishedAssignments = false;
+  const columns = this.gradebook.getVisibleGradeGridColumns();
   const objectNames = columns.map(c => c.object.name);
   deepEqual(objectNames, ['published graded']);
 });
 
-test('when showUnpublishedAssignments is true, include published assignments', function () {
-  this.showUnpublishedAssignments = true;
-  const columns = this.getVisibleGradeGridColumns();
+test('when showUnpublishedAssignments is true, include unpublished assignments', function () {
+  this.gradebook.showUnpublishedAssignments = true;
+  const columns = this.gradebook.getVisibleGradeGridColumns();
   const objectNames = columns.map(c => c.object.name);
   deepEqual(objectNames, ['published graded', 'unpublished']);
 });
 
 test('does not include ungraded assignments', function () {
-  this.showUnpublishedAssignments = true;
-  const columns = this.getVisibleGradeGridColumns();
+  this.gradebook.showUnpublishedAssignments = true;
+  const columns = this.gradebook.getVisibleGradeGridColumns();
   const objectNames = columns.map(c => c.object.name);
   notOk(objectNames.includes('not graded'));
 });
 
 test('does not include attendance assignments when show_attendence is false', function () {
-  const columns = this.getVisibleGradeGridColumns();
+  this.gradebook.show_attendance = false;
+  const columns = this.gradebook.getVisibleGradeGridColumns();
   const objectNames = columns.map(c => c.object.name);
   notOk(objectNames.includes('attendance'));
 });
 
 test('includes attendance assignments when show_attendence is true', function () {
-  this.show_attendance = true;
-  const columns = this.getVisibleGradeGridColumns();
+  this.gradebook.show_attendance = true;
+  const columns = this.gradebook.getVisibleGradeGridColumns();
   const objectNames = columns.map(c => c.object.name);
   ok(objectNames.includes('attendance'));
 });
 
-QUnit.module('Gradebook#fieldsToExcludeFromAssignments', {
-  setup () {
-    this.excludedFields = Gradebook.prototype.fieldsToExcludeFromAssignments;
-  }
-});
-
-test('includes "description" in the response', function () {
-  ok(_.contains(this.excludedFields, 'description'));
-});
-
-test('includes "needs_grading_count" in the response', function () {
-  ok(_.contains(this.excludedFields, 'needs_grading_count'));
-});
-
 QUnit.module('Gradebook#submissionsForStudent', {
-  setupThis (options = {}) {
-    return {
-      gradingPeriodSet: null,
-      gradingPeriodToShow: null,
-      isAllGradingPeriods () {
-        return false;
-      },
-      effectiveDueDates: {
-        1: {
-          1: { grading_period_id: '1' }
-        },
-        2: {
-          1: { grading_period_id: '2' }
-        }
-      },
-      ...options
-    };
-  },
-
   setup () {
     this.student = {
       id: '1',
@@ -1141,174 +1054,133 @@ QUnit.module('Gradebook#submissionsForStudent', {
         name: 'froyo'
       }
     };
-    this.submissionsForStudent = Gradebook.prototype.submissionsForStudent;
+    this.gradebook = createGradebook();
+    this.gradebook.effectiveDueDates = {
+      1: {
+        1: { grading_period_id: '1' }
+      },
+      2: {
+        1: { grading_period_id: '2' }
+      }
+    };
   }
 });
 
 test('returns all submissions for the student when there are no grading periods', function () {
-  const self = this.setupThis();
-  const submissions = this.submissionsForStudent.call(self, this.student);
+  const submissions = this.gradebook.submissionsForStudent(this.student);
   propEqual(_.pluck(submissions, 'assignment_id'), ['1', '2']);
 });
 
 test('returns all submissions if "All Grading Periods" is selected', function () {
-  const self = this.setupThis({
-    gradingPeriodSet: { id: '1' },
-    gradingPeriodToShow: '0',
-    isAllGradingPeriods () {
-      return true;
-    }
-  });
-  const submissions = this.submissionsForStudent.call(self, this.student);
+  this.gradebook.gradingPeriodSet = { id: '1' };
+  this.gradebook.gradingPeriodToShow = '0'; // value indicates "All Grading Periods"
+  const submissions = this.gradebook.submissionsForStudent(this.student);
   propEqual(_.pluck(submissions, 'assignment_id'), ['1', '2']);
 });
 
 test('only returns submissions due for the student in the selected grading period', function () {
-  const self = this.setupThis({
-    gradingPeriodSet: { id: '1' },
-    gradingPeriodToShow: '2'
-  });
-  const submissions = this.submissionsForStudent.call(self, this.student);
+  this.gradebook.gradingPeriodSet = { id: '1' };
+  this.gradebook.gradingPeriodToShow = '2';
+  const submissions = this.gradebook.submissionsForStudent(this.student);
   propEqual(_.pluck(submissions, 'assignment_id'), ['2']);
 });
 
 QUnit.module('Gradebook#studentsUrl', {
-  setupThis (options = {}) {
-    return {
-      getEnrollmentFilters: this.stub().returns({ concluded: false, inactive: false }),
-      ...options
-    }
-  },
-
   setup () {
-    this.studentsUrl = Gradebook.prototype.studentsUrl;
+    this.gradebook = createGradebook();
+    this.stub(this.gradebook, 'getEnrollmentFilters').returns({ concluded: false, inactive: false });
   }
 });
 
 test('enrollmentUrl returns "students_url"', function () {
-  equal(this.studentsUrl.call(this.setupThis()), 'students_url');
+  equal(this.gradebook.studentsUrl(), 'students_url');
 });
 
 test('when concluded only, enrollmentUrl returns "students_with_concluded_enrollments_url"', function () {
-  const self = this.setupThis({
-    getEnrollmentFilters: this.stub().returns({ concluded: true, inactive: false })
-  });
-  equal(this.studentsUrl.call(self), 'students_with_concluded_enrollments_url');
+  this.gradebook.getEnrollmentFilters.returns({ concluded: true, inactive: false })
+  equal(this.gradebook.studentsUrl(), 'students_with_concluded_enrollments_url');
 });
 
 test('when inactive only, enrollmentUrl returns "students_with_inactive_enrollments_url"', function () {
-  const self = this.setupThis({
-    getEnrollmentFilters: this.stub().returns({ concluded: false, inactive: true })
-  });
-  equal(this.studentsUrl.call(self), 'students_with_inactive_enrollments_url');
+  this.gradebook.getEnrollmentFilters.returns({ concluded: false, inactive: true })
+  equal(this.gradebook.studentsUrl(), 'students_with_inactive_enrollments_url');
 });
 
 test('when show concluded and hide inactive are true, enrollmentUrl returns ' +
   '"students_with_concluded_and_inactive_enrollments_url"', function () {
-  const self = this.setupThis({
-    getEnrollmentFilters: this.stub().returns({ concluded: true, inactive: true })
-  });
-  equal(this.studentsUrl.call(self), 'students_with_concluded_and_inactive_enrollments_url');
+  this.gradebook.getEnrollmentFilters.returns({ concluded: true, inactive: true })
+  equal(this.gradebook.studentsUrl(), 'students_with_concluded_and_inactive_enrollments_url');
 });
 
 QUnit.module('Gradebook#weightedGroups', {
   setup () {
-    this.weightedGroups = Gradebook.prototype.weightedGroups;
+    this.gradebook = createGradebook();
   }
 });
 
 test('returns true when group_weighting_scheme is "percent"', function () {
-  equal(this.weightedGroups.call({
-    options: {
-      group_weighting_scheme: 'percent'
-    }
-  }), true);
+  this.gradebook.options.group_weighting_scheme = 'percent';
+  equal(this.gradebook.weightedGroups(), true);
 });
 
 test('returns false when group_weighting_scheme is not "percent"', function () {
-  equal(this.weightedGroups.call({
-    options: {
-      group_weighting_scheme: 'points'
-    }
-  }), false);
-  equal(this.weightedGroups.call({
-    options: {
-      group_weighting_scheme: null
-    }
-  }), false);
+  this.gradebook.options.group_weighting_scheme = 'points';
+  equal(this.gradebook.weightedGroups(), false);
+  this.gradebook.options.group_weighting_scheme = null;
+  equal(this.gradebook.weightedGroups(), false);
 });
 
 QUnit.module('Gradebook#weightedGrades', {
-  setupThis (groupWeightingScheme, gradingPeriodSet) {
-    return {
-      options: {
-        group_weighting_scheme: groupWeightingScheme
-      },
-      gradingPeriodSet
-    };
-  },
-
   setup () {
-    this.weightedGrades = Gradebook.prototype.weightedGrades;
+    this.gradebook = createGradebook();
   }
 });
 
 test('returns true when group_weighting_scheme is "percent"', function () {
-  const self = this.setupThis('percent', {
-    weighted: false
-  });
-  equal(this.weightedGrades.call(self), true);
+  this.gradebook.options.group_weighting_scheme = 'percent';
+  this.gradebook.gradingPeriodSet = { weighted: false };
+  equal(this.gradebook.weightedGrades(), true);
 });
 
 test('returns true when the gradingPeriodSet is weighted', function () {
-  const self = this.setupThis('points', {
-    weighted: true
-  });
-  equal(this.weightedGrades.call(self), true);
+  this.gradebook.options.group_weighting_scheme = 'points';
+  this.gradebook.gradingPeriodSet = { weighted: true };
+  equal(this.gradebook.weightedGrades(), true);
 });
 
 test('returns false when group_weighting_scheme is not "percent" and gradingPeriodSet is not weighted', function () {
-  const self = this.setupThis('points', {
-    weighted: false
-  });
-  equal(this.weightedGrades.call(self), false);
+  this.gradebook.options.group_weighting_scheme = 'points';
+  this.gradebook.gradingPeriodSet = { weighted: false };
+  equal(this.gradebook.weightedGrades(), false);
 });
 
 test('returns false when group_weighting_scheme is not "percent" and gradingPeriodSet is not defined', function () {
-  const self = this.setupThis('points', null);
-  equal(this.weightedGrades.call(self), false);
+  this.gradebook.options.group_weighting_scheme = 'points';
+  this.gradebook.gradingPeriodSet = { weighted: null };
+  equal(this.gradebook.weightedGrades(), false);
 });
 
 QUnit.module('Gradebook#displayPointTotals', {
-  setupThis (showTotalGradeAsPoints, weightedGrades) {
-    return {
-      options: {
-        show_total_grade_as_points: showTotalGradeAsPoints
-      },
-      weightedGrades () {
-        return weightedGrades;
-      }
-    };
-  },
-
   setup () {
-    this.displayPointTotals = Gradebook.prototype.displayPointTotals;
+    this.gradebook = createGradebook();
+    this.stub(this.gradebook, 'weightedGrades').returns(false);
   }
 });
 
 test('returns true when grades are not weighted and show_total_grade_as_points is true', function () {
-  const self = this.setupThis(true, false);
-  equal(this.displayPointTotals.call(self), true);
+  this.gradebook.options.show_total_grade_as_points = true;
+  equal(this.gradebook.displayPointTotals(), true);
 });
 
 test('returns false when grades are weighted', function () {
-  const self = this.setupThis(true, true);
-  equal(this.displayPointTotals.call(self), false);
+  this.gradebook.options.show_total_grade_as_points = true;
+  this.gradebook.weightedGrades.returns(true);
+  equal(this.gradebook.displayPointTotals(), false);
 });
 
 test('returns false when show_total_grade_as_points is false', function () {
-  const self = this.setupThis(false, false);
-  equal(this.displayPointTotals.call(self), false);
+  this.gradebook.options.show_total_grade_as_points = false;
+  equal(this.gradebook.displayPointTotals(), false);
 });
 
 QUnit.module('Gradebook#switchTotalDisplay', {
@@ -1417,31 +1289,20 @@ test('when user is not ignoring warnings, the dialog has a save property which i
 QUnit.module('Gradebook#showNotesColumn', {
   setup () {
     this.stub(DataLoader, 'getDataForColumn');
-  },
-
-  setupShowNotesColumn (opts = {}) {
-    const self = {
-      options: {},
-      toggleNotesColumn () {},
-      ...opts
-    };
-    this.showNotesColumn = Gradebook.prototype.showNotesColumn.bind(self);
+    this.gradebook = createGradebook();
+    this.stub(this.gradebook, 'toggleNotesColumn');
   }
 });
 
 test('loads the notes if they have not yet been loaded', function () {
-  this.setupShowNotesColumn({
-    teacherNotesNotYetLoaded: true
-  });
-  this.showNotesColumn();
+  this.gradebook.teacherNotesNotYetLoaded = true;
+  this.gradebook.showNotesColumn();
   equal(DataLoader.getDataForColumn.callCount, 1);
 });
 
 test('does not load the notes if they are already loaded', function () {
-  this.setupShowNotesColumn({
-    teacherNotesNotYetLoaded: false
-  });
-  this.showNotesColumn();
+  this.gradebook.teacherNotesNotYetLoaded = false;
+  this.gradebook.showNotesColumn();
   equal(DataLoader.getDataForColumn.callCount, 0);
 });
 
@@ -2161,7 +2022,6 @@ test('removes the grading period select when filter is deselected', function () 
   strictEqual(this.container.children.length, 0, 'nothing was rendered');
 });
 
-
 QUnit.module('Menus', {
   setup () {
     fakeENV.setup({
@@ -2171,6 +2031,20 @@ QUnit.module('Menus', {
         outcome_gradebook_enabled: true
       }
     });
+    this.gradebook = createGradebook({
+      context_allows_gradebook_uploads: true,
+      export_gradebook_csv_url: 'http://someUrl',
+      gradebook_import_url: 'http://someUrl',
+      gradebook_is_editable: true,
+      navigate () {}
+    });
+    this.gradebook.postGradesLtis = [];
+    this.gradebook.postGradesStore = {};
+    $fixtures.innerHTML = `
+      <span data-component="ViewOptionsMenu"></span>
+      <span data-component="ActionMenu"></span>
+      <span data-component="GradebookMenu" data-variant="DefaultGradebook"></span>
+    `;
   },
 
   teardown () {
@@ -2180,42 +2054,20 @@ QUnit.module('Menus', {
 });
 
 test('ViewOptionsMenu is rendered on renderViewOptionsMenu', function () {
-  $fixtures.innerHTML = '<span data-component="ViewOptionsMenu"></span>';
-  const gradebook = createGradebook();
-  gradebook.renderViewOptionsMenu();
+  this.gradebook.renderViewOptionsMenu();
   const buttonText = document.querySelector('[data-component="ViewOptionsMenu"] Button').innerText.trim();
   equal(buttonText, 'View');
 });
 
 test('ActionMenu is rendered on renderActionMenu', function () {
-  ReactDOM.render(<span data-component="ActionMenu" />, $fixtures);
-  const self = {
-    options: {
-      gradebook_is_editable: true,
-      context_allows_gradebook_uploads: true,
-      gradebook_import_url: 'http://someUrl',
-      export_gradebook_csv_url: 'http://someUrl',
-      post_grades_feature: false,
-      publish_to_sis_enabled: false
-    },
-    postGradesLtis: [],
-    postGradesStore: {},
-    getActionMenuProps: Gradebook.prototype.getActionMenuProps
-  };
-  Gradebook.prototype.renderActionMenu.call(self);
+  this.gradebook.renderActionMenu();
   const buttonText = document.querySelector('[data-component="ActionMenu"] Button').innerText.trim();
   equal(buttonText, 'Actions');
 });
 
 test('GradebookMenu is rendered on renderGradebookMenu', function () {
-  ReactDOM.render(<span data-component="GradebookMenu" data-variant="DefaultGradebook" />, $fixtures);
-  const self = {
-    options: {
-      assignmentOrOutcome: 'assignment',
-      navigate () {}
-    }
-  };
-  Gradebook.prototype.renderGradebookMenu.call(self);
+  this.gradebook.options.assignmentOrOutcome = 'assignment';
+  this.gradebook.renderGradebookMenu();
   const buttonText = document.querySelector('[data-component="GradebookMenu"] Button').innerText.trim();
   equal(buttonText, 'Gradebook');
 });
@@ -2684,6 +2536,7 @@ QUnit.module('Gradebook#onBeforeHeaderCellDestroy', {
         login_handle_name: ''
       }
     });
+    this.gradebook = createGradebook();
   },
 
   teardown () {
@@ -2695,7 +2548,7 @@ QUnit.module('Gradebook#onBeforeHeaderCellDestroy', {
 test('unmounts any component on the cell being destroyed', function () {
   const component = React.createElement('span', {}, 'Example Component');
   ReactDOM.render(component, this.$mountPoint, null);
-  Gradebook.prototype.onBeforeHeaderCellDestroy(null, { node: this.$mountPoint });
+  this.gradebook.onBeforeHeaderCellDestroy(null, { node: this.$mountPoint });
   const componentExistedAtNode = ReactDOM.unmountComponentAtNode(this.$mountPoint);
   equal(componentExistedAtNode, false, 'the component was already unmounted');
 });
@@ -2954,19 +2807,22 @@ test('does not render when aggregate columns are hidden', function () {
 QUnit.module('Gradebook#getCustomColumnId');
 
 test('returns a unique key for the custom column', function () {
-  equal(Gradebook.prototype.getCustomColumnId('2401'), 'custom_col_2401');
+  const gradebook = createGradebook();
+  equal(gradebook.getCustomColumnId('2401'), 'custom_col_2401');
 });
 
 QUnit.module('Gradebook#getAssignmentColumnId');
 
 test('returns a unique key for the assignment column', function () {
-  equal(Gradebook.prototype.getAssignmentColumnId('201'), 'assignment_201');
+  const gradebook = createGradebook();
+  equal(gradebook.getAssignmentColumnId('201'), 'assignment_201');
 });
 
 QUnit.module('Gradebook#getAssignmentGroupColumnId');
 
 test('returns a unique key for the assignment group column', function () {
-  equal(Gradebook.prototype.getAssignmentGroupColumnId('301'), 'assignment_group_301');
+  const gradebook = createGradebook();
+  equal(gradebook.getAssignmentGroupColumnId('301'), 'assignment_group_301');
 });
 
 QUnit.module('Gradebook#updateColumnHeaders', {
@@ -4551,28 +4407,14 @@ test('calls ajaxJSON with parameters', function () {
 });
 
 test('calls successFn when response is successful', function () {
-  // The requests is sent as a PUT but ajaxJSON does not play nice with
+  // The request is sent as a PUT but ajaxJSON does not play nice with
   // sinon.fakeServer's fakeHTTPMethods setting.
   this.server.respondWith('POST', this.options.settings_update_url, [
     200, { 'Content-Type': 'application/json' }, '{}'
   ]);
   const successFn = this.stub();
-  const saveSettings = Gradebook.prototype.saveSettings;
-  const self = {
-    options: this.options,
-    getEnrollmentFilters () { return {}; },
-    getSelectedPrimaryInfo () { return 'first_last'; },
-    getSelectedSecondaryInfo () { return 'none'; },
-    listSelectedViewOptionsFilters () { return [] },
-    getSortRowsBySetting () {
-      return {
-        sort_rows_by_column_id: 'student',
-        sort_rows_by_direction: 'ascending',
-        sort_rows_by_setting_key: 'sortable_name',
-      };
-    },
-  };
-  saveSettings.call(self, {}, successFn, null);
+  const gradebook = createGradebook(this.options);
+  gradebook.saveSettings({}, successFn, null);
 
   strictEqual(successFn.callCount, 1);
 });
@@ -4584,22 +4426,8 @@ test('calls errorFn when response is not successful', function () {
     401, { 'Content-Type': 'application/json' }, '{}'
   ]);
   const errorFn = this.stub();
-  const saveSettings = Gradebook.prototype.saveSettings;
-  const self = {
-    options: this.options,
-    getEnrollmentFilters () { return {}; },
-    getSelectedPrimaryInfo () { return 'first_last'; },
-    getSelectedSecondaryInfo () { return 'none'; },
-    listSelectedViewOptionsFilters () { return [] },
-    getSortRowsBySetting () {
-      return {
-        sort_rows_by_column_id: 'student',
-        sort_rows_by_direction: 'ascending',
-        sort_rows_by_setting_key: 'sortable_name',
-      };
-    },
-  };
-  saveSettings.call(self, {}, null, errorFn);
+  const gradebook = createGradebook(this.options);
+  gradebook.saveSettings({}, null, errorFn);
 
   strictEqual(errorFn.callCount, 1);
 });
@@ -4874,31 +4702,26 @@ test('re-renders all column headers', function () {
 QUnit.module('Gradebook#initPostGradesLtis');
 
 test('sets postGradesLtis as an array', function () {
-  const self = {
-    options: {
-      post_grades_ltis: []
-    }
-  };
-  Gradebook.prototype.initPostGradesLtis.apply(self);
-
-  deepEqual(self.postGradesLtis, []);
+  const gradebook = createGradebook({ post_grades_ltis: [] });
+  deepEqual(gradebook.postGradesLtis, []);
 });
 
 test('sets postGradesLtis to conform to ActionMenu.propTypes.postGradesLtis', function () {
-  const self = {
-    options: {
-      post_grades_ltis: [{
-        id: '1',
-        name: 'Pinnacle',
-        onSelect () {}
-      }, {
-        id: '2',
-        name: 'Kimono',
-        onSelect () {}
-      }]
-    }
+  const options = {
+    post_grades_ltis: [{
+      id: '1',
+      name: 'Pinnacle',
+      onSelect () {}
+    }, {
+      id: '2',
+      name: 'Kimono',
+      onSelect () {}
+    }]
   };
-  const props = Gradebook.prototype.initPostGradesLtis.apply(self);
+
+  const gradebook = createGradebook(options);
+  gradebook.initPostGradesLtis();
+  const props = gradebook.postGradesLtis;
 
   this.spy(console, 'error');
   PropTypes.checkPropTypes({postGradesLtis: ActionMenu.propTypes.postGradesLtis}, props, 'prop', 'ActionMenu');
@@ -4919,22 +4742,18 @@ QUnit.module('Gradebook#getActionMenuProps', {
 });
 
 test('generates props that conform to ActionMenu.propTypes', function () {
-  ReactDOM.render(<span data-component="ActionMenu"><button /></span>, $fixtures);
-  const self = {
-    options: {
-      gradebook_is_editable: true,
-      context_allows_gradebook_uploads: true,
-      gradebook_import_url: 'http://example.com/import',
-      currentUserId: '123',
-      export_gradebook_csv_url: 'http://example.com/export',
-      post_grades_feature: false,
-      publish_to_sis_enabled: false
-    },
-    postGradesLtis: [],
-    postGradesStore: {}
-  };
+  $fixtures.innerHTML = '<span data-component="ActionMenu"><button /></span>';
+  const gradebook = createGradebook({
+    gradebook_is_editable: true,
+    context_allows_gradebook_uploads: true,
+    gradebook_import_url: 'http://example.com/import',
+    currentUserId: '123',
+    export_gradebook_csv_url: 'http://example.com/export',
+    post_grades_feature: false,
+    publish_to_sis_enabled: false
+  });
 
-  const props = Gradebook.prototype.getActionMenuProps.apply(self);
+  const props = gradebook.getActionMenuProps();
 
   this.spy(console, 'error');
   PropTypes.checkPropTypes(ActionMenu.propTypes, props, 'props', 'ActionMenu')
@@ -5192,12 +5011,8 @@ test('is rendered on init', function () {
 
 test('is rendered on renderGridColor', function () {
   $fixtures.innerHTML = '<span data-component="GridColor"></span>';
-  const self = {
-    options: {
-      colors: {}
-    }
-  };
-  Gradebook.prototype.renderGridColor.call(self);
+  const gradebook = createGradebook({ colors: { colors: {} } }); // due to props bug in 'renderGridColor'
+  gradebook.renderGridColor();
   const style = document.querySelector('[data-component="GridColor"] style').innerText;
   equal(style, [
     `.even .gradebook-cell.late { background-color: ${colors.light.blue}; }`,
@@ -5222,7 +5037,6 @@ test('is rendered on renderGridColor', function () {
 QUnit.module('#updateSubmissionsFromExternal');
 
 test('updateCell is called for each assignment in a row', function () {
-  // test data
   const columns = [
     { id: 'student', type: 'student' },
     { id: 'assignment_232', type: 'assignment' },
@@ -5234,7 +5048,6 @@ test('updateCell is called for each assignment in a row', function () {
     { assignment_id: 201, user_id: 123, score: 10, assignment_visible: true }
   ];
 
-  // stubs
   gradebook.students = {
     123: { row: 1, assignment_201: {} }
   };
