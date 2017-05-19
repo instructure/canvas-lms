@@ -281,13 +281,18 @@ module VeriCite
           context_id = course.id
           assignment_id = assignment.id
           user_id = user.id
-          user_score_cache_key = "vericite_scores/#{consumer}/#{context_id}/#{user_id}"
-          # first check if the cache already has the score:
-          user_score_map = Rails.cache.read(user_score_cache_key)
-          if user_score_map == nil
+          user_score_cache_key_prefix =  "vericite_scores/#{consumer}/#{context_id}/#{assignment_id}/"
+          users_score_map = {}
+          # first check if the cache already has the user's score and if we haven't looked up this assignment lately:
+          users_score_map["#{user_id}"] = Rails.cache.read("#{user_score_cache_key_prefix}#{user_id}")
+          if users_score_map["#{user_id}"].nil? && Rails.cache.read(user_score_cache_key_prefix) == nil
+            #we already looked up this user in Redis, don't bother again (by setting {})
+            users_score_map["#{user_id}"] ||= {}
             # we need to look up the user scores in VeriCite for this course
             # @return [Array<ReportScoreReponse>]
-            data, status_code, headers = vericite_client.reports_scores_context_id_get(context_id, consumer, consumer_secret, {:'user_id' => user_id})
+            data, status_code, _headers = vericite_client.reports_scores_context_id_get(context_id, consumer, consumer_secret, {:assignment_id => assignment_id})
+            #keep track of the assignment lookup api call
+            Rails.cache.write(user_score_cache_key_prefix, true, :expires_in => 5.minutes)
             # check status code
             response[:return_code] = status_code
             if !is_response_success?(response)
@@ -296,17 +301,17 @@ module VeriCite
              fail "Failed to get scores for site: #{context_id}, assignment: #{assignment_id}, user: #{user_id},  exId: #{args[:oid]}"
             end
             # create the user scores map and cache it
-            user_score_map = {}
             data.each do |reportScoreReponse|
               if reportScoreReponse.score.is_a?(Integer) && reportScoreReponse.score >= 0 &&
                 (@show_preliminary_score || reportScoreReponse.preliminary.nil? || !reportScoreReponse.preliminary)
-                # since external content id's are unique, we can store it as the key
-                user_score_map[reportScoreReponse.external_content_id] = Float(reportScoreReponse.score)
+                # keep track of this user's report scores
+                users_score_map[reportScoreReponse.user] ||= {}
+                users_score_map[reportScoreReponse.user][reportScoreReponse.external_content_id] = Float(reportScoreReponse.score)
               end
             end
             # cache the user score map for a short period of time
-            Rails.cache.fetch(user_score_cache_key, :expires_in => 5.minutes) do
-              user_score_map
+            users_score_map.keys.each do |key|
+              Rails.cache.write("#{user_score_cache_key_prefix}#{key}", users_score_map[key], :expires_in => 5.minutes)
             end
           else
             # since we didn't have to consult VeriCite, set response status to 200
@@ -314,8 +319,8 @@ module VeriCite
           end
 
           # the user score map shouldn't be empty now (either grabbed from the cache or VeriCite)
-          if user_score_map != nil
-            user_score_map.each do |key, score|
+          unless users_score_map["#{user_id}"].nil?
+            users_score_map["#{user_id}"].each do |key, score|
               if key ==  args[:oid] && score >= 0
                 response[:similarity_score] = score
               end
