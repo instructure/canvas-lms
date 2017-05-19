@@ -707,8 +707,7 @@ class Submission < ActiveRecord::Base
     self.vericite_data_hash ||= {}
     # check to see if the score is stale, if so, fetch it again
     update_scores = false
-    # since there could be multiple versions, let's not waste calls for old versions and use the old score
-    if Canvas::Plugin.find(:vericite).try(:enabled?) && !self.readonly? && lookup_data && self.versions.current && self.versions.current.number == self.version_number
+    if Canvas::Plugin.find(:vericite).try(:enabled?) && !self.readonly? && lookup_data
       self.vericite_data_hash.keys.each do |asset_string|
         data = self.vericite_data_hash[asset_string]
         next unless data && data.is_a?(Hash) && data[:object_id]
@@ -716,7 +715,7 @@ class Submission < ActiveRecord::Base
       end
       # we have found at least one score that is stale, call VeriCite and save the results
       if update_scores
-        check_vericite_status
+        check_vericite_status(0)
       end
     end
     if !self.vericite_data_hash.empty?
@@ -772,8 +771,11 @@ class Submission < ActiveRecord::Base
 
     # flag to make sure that all scores are just updates and not new
     recheck_score_all = true
+    data_changed = false
     self.vericite_data_hash.keys.each do |asset_string|
       data = self.vericite_data_hash[asset_string]
+      # keep track whether the score state changed
+      data_orig = data.dup
       next unless data && data.is_a?(Hash) && data[:object_id]
       # check to see if the score is stale, if so, delete it and fetch again
       recheck_score = vericite_recheck_score(data)
@@ -782,7 +784,6 @@ class Submission < ActiveRecord::Base
       # look up scores if:
       if recheck_score || data[:similarity_score].blank?
         if attempt < VERICITE_STATUS_RETRY
-          # keep track of when we asked for this score, so if it fails, we don't keep trying immediately again (i.e. wain 20 sec before trying again)
           data[:similarity_score_check_time] = Time.now.to_i
           vericite ||= VeriCite::Client.new()
           res = vericite.generateReport(self, asset_string)
@@ -805,26 +806,35 @@ class Submission < ActiveRecord::Base
         data[:status] = 'scored'
       end
       self.vericite_data_hash[asset_string] = data
+      data_changed = data_changed ||
+                      data_orig[:similarity_score] != data[:similarity_score] ||
+                      data_orig[:state] != data[:state] ||
+                      data_orig[:status] != data[:status] ||
+                      data_orig[:public_error_message] != data[:public_error_message]
     end
 
-    if !self.vericite_data_hash.empty?
+    if !self.vericite_data_hash.empty? && self.vericite_data_hash[:provider].nil?
       # only set vericite provider flag if the hash isn't empty
       self.vericite_data_hash[:provider] = :vericite
+      data_changed = true
     end
     retry_mins = 2 ** attempt
     if retry_mins > 240
       #cap the retry max wait to 4 hours
       retry_mins = 240;
     end
-    send_at(retry_mins.minutes.from_now, :check_vericite_status, attempt + 1) if needs_retry
-    self.vericite_data_changed!
+    # if attempt <= 0, then that means no retries should be attempted
+    send_at(retry_mins.minutes.from_now, :check_vericite_status, attempt + 1) if attempt > 0 && needs_retry
     # if all we did was recheck scores, do not version this save (i.e. increase the attempt number)
-    if recheck_score_all
-      self.with_versioning( false ) do |t|
-        t.save!
+    if data_changed
+      self.vericite_data_changed!
+      if recheck_score_all
+        self.with_versioning( false ) do |t|
+          t.save!
+        end
+      else
+        self.save
       end
-    else
-      self.save
     end
   end
 
