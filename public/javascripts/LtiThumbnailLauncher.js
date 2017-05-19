@@ -16,33 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jquery' /* $ */
-], function($) {
+import $ from 'jquery'
 
-  var selector = ".lti-thumbnail-launch";
+const selector = '.lti-thumbnail-launch'
 
-  function handleLaunch(event) {
-    event.preventDefault();
-    ltiThumbnailLauncher.launch($(event.target).closest(selector))
+function handleLaunch (event) {
+  event.preventDefault()
+  ltiThumbnailLauncher.launch($(event.target).closest(selector))
+}
+
+class LtiThumbnailLauncher {
+  constructor () {
+    $(document.body).delegate(selector, 'click', handleLaunch)
   }
 
-  function LtiThumbnailLauncher() {
-    $( document.body ).delegate( selector, 'click', handleLaunch );
+  launch (element) {
+    const placement = JSON.parse(element.attr('target'))
+    const iframe = $('<iframe/>', {
+      src: element.attr('href'),
+      allowfullscreen: '',
+      width: placement.displayWidth || 500,
+      height: placement.displayHeight || 500
+    })
+    element.replaceWith(iframe)
   }
+}
 
-  LtiThumbnailLauncher.prototype.launch = function (element) {
-    var placement = JSON.parse(element.attr('target')),
-      iframe = $("<iframe/>", {
-        src: element.attr('href'),
-        allowfullscreen: '',
-        width: placement.displayWidth || 500,
-        height: placement.displayHeight || 500
-      })
-    element.replaceWith(iframe);
-  };
-
-  // There can be only one LtiThumbnailLauncher
-  var ltiThumbnailLauncher = new LtiThumbnailLauncher(selector);
-  return ltiThumbnailLauncher
-});
+// There can be only one LtiThumbnailLauncher
+const ltiThumbnailLauncher = new LtiThumbnailLauncher(selector)
+export default ltiThumbnailLauncher
