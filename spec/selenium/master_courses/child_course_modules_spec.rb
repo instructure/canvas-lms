@@ -55,11 +55,11 @@ describe "master courses - child courses - module item locking" do
     get "/courses/#{@copy_to.id}/modules"
 
     # objects inherited from master show the lock
-    expect(f("#context_module_item_#{@locked_tag.id} .lock-icon")).to contain_css('.icon-lock')
-    expect(f("#context_module_item_#{@unlocked_tag.id} .lock-icon")).to contain_css('.icon-unlock')
+    expect(f("#context_module_item_#{@locked_tag.id} .lock-icon")).to contain_css('.icon-blueprint-lock')
+    expect(f("#context_module_item_#{@unlocked_tag.id} .lock-icon")).to contain_css('.icon-blueprint')
     # objects aded to the child do not
-    expect(f("#context_module_item_#{@normal_tag.id} .lock-icon")).not_to contain_css('.icon-lock')
-    expect(f("#context_module_item_#{@normal_tag.id} .lock-icon")).not_to contain_css('.icon-unlock')
+    expect(f("#context_module_item_#{@normal_tag.id} .lock-icon")).not_to contain_css('.icon-blueprint-lock')
+    expect(f("#context_module_item_#{@normal_tag.id} .lock-icon")).not_to contain_css('.icon-blueprint')
   end
 
   it "should disable the title edit input for locked items" do
@@ -99,6 +99,6 @@ describe "master courses - child courses - module item locking" do
     expect(new_tag.content).to eq quiz_copy
 
     # does another fetch to get restrictions for the new tag
-    expect(f("#context_module_item_#{new_tag.id} .lock-icon")).to contain_css('.icon-lock')
+    expect(f("#context_module_item_#{new_tag.id} .lock-icon")).to contain_css('.icon-blueprint-lock')
   end
 end

@@ -29,7 +29,17 @@ import propTypes from '../propTypes'
 export default class LockBanner extends Component {
   static propTypes = {
     isLocked: PropTypes.bool.isRequired,
-    itemLocks: propTypes.itemLocks.isRequired,
+    itemLocks: propTypes.itemLocks,
+  }
+
+  static defaultProps = {
+    itemLocks: {
+      content: false,
+      points: false,
+      settings: false,
+      due_dates: false,
+      availability_dates: false,
+    }
   }
 
   static setupRootNode () {

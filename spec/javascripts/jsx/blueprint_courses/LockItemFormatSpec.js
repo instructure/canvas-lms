@@ -26,13 +26,13 @@
    deepEqual(formattedString, 'Content & Due Dates')
  })
 
- test('takes in no items and returns undefined', () => {
+ test('takes in no items and returns "no locks" message', () => {
    const lockArray = []
    const formattedString = formatLockArray(lockArray)
-   deepEqual(formattedString, undefined)
+   deepEqual(formattedString, 'no attributes locked')
  })
 
- test('takes in an object with all items false and returns undefined', () => {
+ test('takes in an object with all items false and returns "no locks" message', () => {
    const lockObject = {
      content: false,
      points: false,
@@ -40,7 +40,7 @@
      availability_dates: false,
    }
    const formattedString = formatLockObject(lockObject)
-   deepEqual(formattedString, undefined)
+   deepEqual(formattedString, 'no attributes locked')
  })
 
  test('takes in an object with multiple items and returns a formatted string', () => {

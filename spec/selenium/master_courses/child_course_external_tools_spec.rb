@@ -47,7 +47,7 @@ describe "master courses - child courses - external tool locking" do
 
     get "/courses/#{@copy_to.id}/settings#tab-tools"
 
-    expect(f('.master-course-cell')).to contain_css('.icon-lock')
+    expect(f('.master-course-cell')).to contain_css('.icon-blueprint-lock')
 
     expect(f('.ExternalToolsTableRow')).to_not contain_css('.al-trigger')
   end
@@ -55,7 +55,7 @@ describe "master courses - child courses - external tool locking" do
   it "should show the cog-menu options on the index when not locked" do
     get "/courses/#{@copy_to.id}/settings#tab-tools"
 
-    expect(f('.master-course-cell')).to contain_css('.icon-unlock')
+    expect(f('.master-course-cell')).to contain_css('.icon-blueprint')
 
     expect(f('.ExternalToolsTableRow')).to contain_css('.al-trigger')
   end

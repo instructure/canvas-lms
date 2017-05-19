@@ -49,8 +49,8 @@ describe "master courses - module locking" do
   it "should show all the icons on the modules index" do
     get "/courses/#{@course.id}/modules"
 
-    expect(f("#context_module_item_#{@assmt_mod_tag.id} .lock-icon")).to contain_css('.icon-unlock')
-    expect(f("#context_module_item_#{@page_mod_tag.id} .lock-icon")).to contain_css('.icon-lock')
-    expect(f("#context_module_item_#{@topic_mod_tag.id} .lock-icon")).to contain_css('.icon-unlock')
+    expect(f("#context_module_item_#{@assmt_mod_tag.id} .lock-icon")).to contain_css('.icon-blueprint')
+    expect(f("#context_module_item_#{@page_mod_tag.id} .lock-icon")).to contain_css('.icon-blueprint-lock')
+    expect(f("#context_module_item_#{@topic_mod_tag.id} .lock-icon")).to contain_css('.icon-blueprint')
   end
 end

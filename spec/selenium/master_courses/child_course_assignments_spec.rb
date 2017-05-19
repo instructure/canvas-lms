@@ -49,7 +49,7 @@ describe "master courses - child courses - assignment locking" do
   it "should contain the delete cog-menu option on the index when unlocked" do
     get "/courses/#{@copy_to.id}/assignments"
 
-    expect(f("#assignment_#{@assmt_copy.id}")).to contain_css('.icon-unlock')
+    expect(f("#assignment_#{@assmt_copy.id}")).to contain_css('.icon-blueprint')
 
     f('.al-trigger').click
     expect(f('.assignment')).to contain_css('a.delete_assignment')
@@ -60,7 +60,7 @@ describe "master courses - child courses - assignment locking" do
 
     get "/courses/#{@copy_to.id}/assignments"
 
-    expect(f("#assignment_#{@assmt_copy.id}")).to contain_css('.icon-lock')
+    expect(f("#assignment_#{@assmt_copy.id}")).to contain_css('.icon-blueprint-lock')
 
     f('.al-trigger').click
     expect(f('.assignment')).not_to contain_css('a.delete_assignment')
@@ -69,7 +69,7 @@ describe "master courses - child courses - assignment locking" do
   it "should show the delete cog-menu option on the index when not locked" do
     get "/courses/#{@copy_to.id}/assignments"
 
-    expect(f("#assignment_#{@assmt_copy.id}")).to contain_css('.icon-unlock')
+    expect(f("#assignment_#{@assmt_copy.id}")).to contain_css('.icon-blueprint')
 
     f('.al-trigger').click
     expect(f('.assignment')).not_to contain_css('a.delete_assignment.disabled')

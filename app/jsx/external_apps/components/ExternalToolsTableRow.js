@@ -106,13 +106,13 @@ export default React.createClass({
         if (this.props.tool.restricted_by_master_course) {
           return (
             <span className="master-course-cell">
-              <i className="icon-lock"></i>
+              <i className="icon-blueprint-lock"></i>
             </span>
           );
         } else {
           return (
             <span className="master-course-cell">
-              <i className="icon-unlock icon-Line"></i>
+              <i className="icon-blueprint"></i>
             </span>
           );
         }

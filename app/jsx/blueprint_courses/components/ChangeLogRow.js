@@ -24,8 +24,8 @@ import shortId from 'jsx/shared/shortid'
 
 import Grid, { GridRow, GridCol } from 'instructure-ui/lib/components/Grid'
 import Typography from 'instructure-ui/lib/components/Typography'
-import IconLockSolid from 'instructure-icons/lib/Solid/IconLockSolid'
-import IconUnlockSolid from 'instructure-icons/lib/Solid/IconUnlockSolid'
+import IconLock from 'instructure-icons/lib/Solid/IconBlueprintLockSolid'
+import IconUnlock from 'instructure-icons/lib/Solid/IconBlueprintSolid'
 
 import propTypes from '../propTypes'
 
@@ -93,7 +93,7 @@ export const ChangeRow = ({ change }) => (
     col4={change.exceptions && change.exceptions.length ? I18n.t('No') : I18n.t('Yes')}
   >
     <div className="bcs__history-item__lock-icon">
-      <Typography size="large" color="secondary">{change.locked ? <IconLockSolid /> : <IconUnlockSolid />}</Typography>
+      <Typography size="large" color="secondary">{change.locked ? <IconLock title={I18n.t('Locked')} /> : <IconUnlock title={I18n.t('Unlocked')} />}</Typography>
     </div>
   </ChangeLogRow>
 )

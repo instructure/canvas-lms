@@ -78,7 +78,7 @@ class MasterCourseLock extends React.Component {
     const fileName = (this.props.model && this.props.model.displayName()) || I18n.t('This file');
     const wrapperClass = classnames('lock-icon', {disabled: !this.canLockUnlock(), 'lock-icon-locked': this.isLocked()})
     const buttonClass = `btn-link ${locked ? 'locked-status locked' : 'unlocked-status unlocked'}`
-    const iconClass = locked ? 'icon-lock' : 'icon-unlock'
+    const iconClass = locked ? 'icon-blueprint-lock' : 'icon-blueprint'
     const title = locked ? I18n.t('Locked') : I18n.t('Unlocked')
     const label = locked
       ? I18n.t('%{fileName}  is Locked - Click to modify', {fileName})

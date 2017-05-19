@@ -300,9 +300,9 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
 
   .discussion-status {
     color: $ic-color-icon-disabled;
-    width: 60px;
+    width: 84px;
 
-    .publish-icon {
+    .publish-icon, .lock-icon {
       margin-right: 10px;
     }
 

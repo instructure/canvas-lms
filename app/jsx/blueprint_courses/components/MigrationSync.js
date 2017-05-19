@@ -28,7 +28,7 @@ import 'compiled/jquery.rails_flash_notifications'
 import Progress from 'instructure-ui/lib/components/Progress'
 import Button from 'instructure-ui/lib/components/Button'
 import Typography from 'instructure-ui/lib/components/Typography'
-import IconRefreshLine from 'instructure-icons/react/Line/IconRefreshLine'
+import IconRefreshLine from 'instructure-icons/lib/Line/IconRefreshLine'
 
 import MigrationStates from '../migrationStates'
 import propTypes from '../propTypes'

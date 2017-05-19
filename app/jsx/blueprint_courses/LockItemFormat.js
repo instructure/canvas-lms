@@ -16,15 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import I18n from 'i18n!blueprint_courses'
 import {lockLabels} from './labels'
 
 export function formatLockArray (lockableAttributes) {
   const items = lockableAttributes.map(item => lockLabels[item])
-  if (items.length > 1) {
-    return `${items.slice(0, -1).join(', ')} & ${items.slice(-1)[0]}`
-  }
 
-  return items[0]
+  switch (items.length) {
+    case 0:
+      return I18n.t('no attributes locked')
+    case 1:
+      return items[0]
+    default:
+      return `${items.slice(0, -1).join(', ')} & ${items.slice(-1)[0]}`
+  }
 }
 
 export function formatLockObject (itemLocks) {

@@ -19,15 +19,18 @@
 import I18n from 'i18n!blueprint_courses'
 import React from 'react'
 import PropTypes from 'prop-types'
+
 import PresentationContent from 'instructure-ui/lib/components/PresentationContent'
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
 import IconArrowOpenRightSolid from 'instructure-icons/lib/Solid/IconArrowOpenRightSolid'
 import IconArrowOpenDownSolid from 'instructure-icons/lib/Solid/IconArrowOpenDownSolid'
-import IconLockSolid from 'instructure-icons/lib/Solid/IconLockSolid'
-import IconUnlockSolid from 'instructure-icons/lib/Solid/IconUnlockSolid'
 import Button from 'instructure-ui/lib/components/Button'
 import Typography from 'instructure-ui/lib/components/Typography'
 import Grid, { GridRow, GridCol } from 'instructure-ui/lib/components/Grid'
+
+import IconLock from 'instructure-icons/lib/Solid/IconBlueprintLockSolid'
+import IconUnlock from 'instructure-icons/lib/Solid/IconBlueprintSolid'
+
 import propTypes from '../propTypes'
 import {formatLockObject} from '../LockItemFormat'
 import {itemTypeLabelPlurals} from '../labels'
@@ -95,10 +98,12 @@ export default class ExpandableLockOptions extends React.Component {
   }
 
   renderLockIcon () {
-    const Icon = formatLockObject(this.state.locks) ? IconLockSolid : IconUnlockSolid
+    const hasLocks = Object.keys(this.state.locks)
+      .reduce((isLocked, lockProp) => isLocked || this.state.locks[lockProp], false)
+    const Icon = hasLocks ? <IconLock title={I18n.t('Locked')} /> : <IconUnlock title={I18n.t('Unlocked')} />
     return (
       <div className="bcs_tab-icon">
-        <Icon />
+        {Icon}
       </div>
     )
   }

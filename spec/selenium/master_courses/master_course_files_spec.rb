@@ -41,7 +41,7 @@ describe "master courses - master courses - file locking" do
 
     get "/courses/#{@copy_from.id}/files"
 
-    expect(f('.ef-directory .ef-item-row .lock-icon')).to contain_css('.icon-lock')
+    expect(f('.ef-directory .ef-item-row .lock-icon')).to contain_css('.icon-blueprint-lock')
 
     f('.ef-item-row .ef-date-created-col').click # select the file
     expect(f('.ef-header')).to contain_css('.btn-delete')
@@ -62,7 +62,7 @@ describe "master courses - master courses - file locking" do
     get "/courses/#{@copy_from.id}/files"
 
     expect(f('.ef-item-row .ef-name-col').text).to include("subfolder") # we're looking at the folder right?
-    expect(f('.ef-directory .ef-item-row')).not_to contain_css('.icon-lock') # master folders never have locks
+    expect(f('.ef-directory .ef-item-row')).not_to contain_css('.icon-blueprint-lock') # master folders never have locks
 
     f('.ef-item-row .ef-date-created-col').click # select the file
     expect(f('.ef-header')).to contain_css('.btn-delete')
@@ -77,7 +77,7 @@ describe "master courses - master courses - file locking" do
   it "should show the manageable cog-menu options when a file is unlocked" do
     get "/courses/#{@copy_from.id}/files"
 
-    expect(f('.ef-directory .ef-item-row .lock-icon')).to contain_css('.icon-unlock')
+    expect(f('.ef-directory .ef-item-row .lock-icon')).to contain_css('.icon-blueprint')
 
     f('.ef-item-row .ef-date-created-col').click # select the file
     expect(f('.ef-header')).to contain_css('.btn-delete')

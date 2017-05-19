@@ -97,12 +97,12 @@ test('renders the migration options component', () => {
   ok(node.exists())
 })
 
-test('renders the changes', () => {
+test('renders the changes properly', () => {
   const tree = enzyme.mount(connect())
   const changes = tree.find('.bcs__history-item__change')
   equal(changes.length, 3)
-  const locks = tree.find('.bcs__history-item__lock-icon IconLockSolid')
+  const locks = tree.find('.bcs__history-item__lock-icon IconBlueprintLockSolid')
   equal(locks.length, 1)
-  const unlocks = tree.find('.bcs__history-item__lock-icon IconUnlockSolid')
+  const unlocks = tree.find('.bcs__history-item__lock-icon IconBlueprintSolid')
   equal(unlocks.length, 2)
 })
