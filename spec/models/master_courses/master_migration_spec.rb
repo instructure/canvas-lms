@@ -726,6 +726,21 @@ describe MasterCourses::MasterMigration do
       [topic_override, normal_override].each { |ao| expect(ao.reload).to be_deleted }
     end
 
+    it "should work with a single full export for a new association" do
+      @copy_to1 = course_factory
+      sub1 = @template.add_child_course!(@copy_to1)
+      topic = @copy_from.discussion_topics.create!(:title => "some title")
+
+      run_master_migration
+
+      sub1.destroy!
+      @copy_to2 = course_factory
+      @template.add_child_course!(@copy_to2)
+
+      run_master_migration
+      expect(@copy_to2.discussion_topics.first).to be_present
+    end
+
     context "master courses + external migrations" do
       class TestExternalContentService
         cattr_reader :course, :imported_content

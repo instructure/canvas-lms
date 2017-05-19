@@ -118,6 +118,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   end
 
   def export_to_child_courses(type, subscriptions, export_is_primary)
+    @export_type = type
     if type == :selective
       @deletions = self.master_template.deletions_since_last_export
       @creations = {} # will be populated during export
@@ -177,7 +178,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   end
 
   def add_exported_asset(asset)
-    return unless last_export_at
+    return unless @export_type == :selective
     @export_count += 1
     return if @export_count > Setting.get('master_courses_history_count', '150').to_i
     set = asset.created_at >= last_export_at ? @creations : @updates
