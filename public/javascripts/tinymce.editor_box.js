@@ -55,8 +55,8 @@ import editorOptions from 'jsx/shared/rce/editorOptions'
 import EditorAccessibility from 'compiled/editor/editorAccessibility'
 import EditorBoxList from 'tinymce.editor_box_list'
 import EditorConfig from 'tinymce.config'
-import Utils from 'tinymce.editor_box_utils'
 import {remove, insertLink} from './tinymce.commands'
+import {cleanUrl} from './tinymce.editor_box_utils'
 
 //'compiled/tinymce', // required, but the bundles that ACTUALLY use
                       // tiny can require it themselves or else we have
@@ -405,7 +405,7 @@ import 'vendor/jquery.ba-tinypubsub'
       options = {url: options};
     }
     var title = options.title;
-    var url = Utils.cleanUrl(options.url || "");
+    var url = cleanUrl(options.url || "");
     var classes = options.classes || "";
     var defaultText = options.text || options.title || "Link";
     var target = options.target || null;
