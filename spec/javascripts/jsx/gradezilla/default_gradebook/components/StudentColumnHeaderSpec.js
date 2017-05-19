@@ -32,7 +32,7 @@ function mountComponent (props, mountOptions = {}) {
 }
 
 function mountAndOpenOptions (props) {
-  const wrapper = mount(<StudentColumnHeader {...props} />);
+  const wrapper = mountComponent(props);
   wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
   return wrapper;
 }
@@ -55,13 +55,23 @@ function defaultProps ({ props, sortBySetting } = {}) {
       settingKey: 'sortable_name',
       ...sortBySetting
     },
+    addGradebookElement () {},
+    removeGradebookElement () {},
+    onMenuClose () {},
     ...props
   };
 }
 
 QUnit.module('StudentColumnHeader', {
   setup () {
-    this.wrapper = mount(<StudentColumnHeader {...defaultProps()} />);
+    this.props = defaultProps({
+      props: {
+        addGradebookElement: this.stub(),
+        removeGradebookElement: this.stub(),
+        onMenuClose: this.stub()
+      }
+    });
+    this.wrapper = mountComponent(this.props);
   },
 
   teardown () {
@@ -98,6 +108,26 @@ test('renders a title for the More icon', function () {
   const selectedElements = this.wrapper.find('PopoverMenu IconMoreSolid');
 
   strictEqual(selectedElements.props().title, 'Student Name Options');
+});
+
+test('calls addGradebookElement prop on open', function () {
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+  strictEqual(this.props.addGradebookElement.callCount, 1);
+});
+
+test('calls removeGradebookElement prop on close', function () {
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+  strictEqual(this.props.removeGradebookElement.callCount, 1);
+});
+
+test('calls onMenuClose prop on close', function () {
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+  strictEqual(this.props.onMenuClose.callCount, 1);
 });
 
 QUnit.module('StudentColumnHeader disabled prop', {

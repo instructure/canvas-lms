@@ -114,6 +114,9 @@ function defaultProps ({ props, sortBySetting, assignment, curveGradesAction } =
     },
     students: createStudentsProp(),
     submissionsLoaded: true,
+    addGradebookElement () {},
+    removeGradebookElement () {},
+    onMenuClose () {},
     ...props
   };
 }
@@ -130,7 +133,14 @@ function mountAndOpenOptions (props, mountOptions = {}) {
 
 QUnit.module('AssignmentColumnHeader', {
   setup () {
-    this.wrapper = mountComponent(defaultProps());
+    this.props = defaultProps({
+      props: {
+        addGradebookElement: this.stub(),
+        removeGradebookElement: this.stub(),
+        onMenuClose: this.stub()
+      }
+    });
+    this.wrapper = mountComponent(this.props);
   },
 
   teardown () {
@@ -170,6 +180,26 @@ test('renders a PopoverMenu with a trigger', function () {
   const optionsMenuTrigger = this.wrapper.find('PopoverMenu .Gradebook__ColumnHeaderAction');
 
   equal(optionsMenuTrigger.length, 1);
+});
+
+test('calls addGradebookElement prop on open', function () {
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+  strictEqual(this.props.addGradebookElement.callCount, 1);
+});
+
+test('calls removeGradebookElement prop on close', function () {
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+  strictEqual(this.props.removeGradebookElement.callCount, 1);
+});
+
+test('calls onMenuClose prop on close', function () {
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+  strictEqual(this.props.onMenuClose.callCount, 1);
 });
 
 test('adds a class to the trigger when the PopoverMenu is opened', function () {

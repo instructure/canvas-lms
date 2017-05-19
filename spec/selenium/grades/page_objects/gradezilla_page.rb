@@ -204,6 +204,26 @@ class Gradezilla
 
     public
 
+    def body
+      f('body')
+    end
+
+    def submission_tray_selector
+      '.SubmissionTray__Container'
+    end
+
+    def submission_tray
+      f(submission_tray_selector)
+    end
+
+    def expanded_popover_menu_selector
+      '[aria-labelledby*="PopoverMenu"][aria-expanded="true"]'
+    end
+
+    def expanded_popover_menu
+      f(expanded_popover_menu_selector)
+    end
+
     # actions
     def visit(course)
       Account.default.enable_feature!(:new_gradebook)
@@ -223,10 +243,43 @@ class Gradezilla
       end
     end
 
-    def grading_cell(x=0, y=0)
+    def open_assignment_options(cell_index)
+      assignment_cell = ff('#gradebook_grid .container_1 .slick-header-column')[cell_index]
+      driver.action.move_to(assignment_cell).perform
+      trigger = assignment_cell.find_element(:css, '.Gradebook__ColumnHeaderAction')
+      trigger.click
+    end
+
+    def grading_cell(x = 0, y = 0)
       row_idx = y + 1
       col_idx = x + 1
       f(".container_1 .slick-row:nth-child(#{row_idx}) .slick-cell:nth-child(#{col_idx})")
+    end
+
+    def gradebook_cell(x = 0, y = 0)
+      grading_cell(x, y).find_element(:css, '.gradebook-cell')
+    end
+
+    def gradebook_cell_percentage(x = 0, y = 0)
+      gradebook_cell(x, y).find_element(:css, '.percentage')
+    end
+
+    def student_cell(y = 0)
+      row_idx = y + 1
+      f(".container_0 .slick-row:nth-child(#{row_idx}) .slick-cell")
+    end
+
+    def student_grades_link(student_cell)
+      student_cell.find_element(:css, '.student-grades-link')
+    end
+
+    def notes_cell(y = 0)
+      row_idx = y + 1
+      f(".container_0 .slick-row:nth-child(#{row_idx}) .slick-cell.slick-cell:nth-child(2)")
+    end
+
+    def notes_save_button
+      fj('button:contains("Save")')
     end
 
     def total_score_for_row(row)
@@ -272,6 +325,27 @@ class Gradezilla
 
     def cell_tooltip(x, y)
       grading_cell(x, y).find('.gradebook-tooltip')
+    end
+
+    def show_notes
+      view_menu = open_gradebook_menu('View')
+      select_gradebook_menu_option('Notes', container: view_menu, role: 'menuitemcheckbox')
+      driver.action.send_keys(:escape).perform
+    end
+
+    def add_notes
+      notes_cell(0).click
+      driver.action.send_keys('B').perform
+      driver.action.send_keys(:tab).perform
+      driver.action.send_keys(:enter).perform
+
+      driver.action.send_keys('A').perform
+      driver.action.send_keys(:tab).perform
+      driver.action.send_keys(:enter).perform
+
+      driver.action.send_keys('C').perform
+      driver.action.send_keys(:tab).perform
+      driver.action.send_keys(:enter).perform
     end
 
     def cell_graded?(grade, x, y)
@@ -352,15 +426,15 @@ class Gradezilla
       slick_custom_col_cell
     end
 
-    def select_gradebook_menu_option(name, container: nil)
-      gradebook_menu_option(name, container: container).click
+    def select_gradebook_menu_option(name, container: nil, role: 'menuitemradio')
+      gradebook_menu_option(name, container: container, role: role).click
     end
 
-    def gradebook_menu_options(container)
-      ff('[role*=menuitemradio]', container)
+    def gradebook_menu_options(container, role = 'menuitemradio')
+      ff("[role*=#{role}]", container)
     end
 
-    def gradebook_menu_option(name = nil, container: nil)
+    def gradebook_menu_option(name = nil, container: nil, role: 'menuitemradio')
       menu_item_name = name
       menu_container = container
 
@@ -370,7 +444,7 @@ class Gradezilla
         menu_container = gradebook_menu_group(menu_item_group_name, container: container)
       end
 
-      gradebook_menu_options(menu_container).find { |el| el.text =~ /#{menu_item_name}/ }
+      fj("[role*=#{role}] *:contains(#{menu_item_name})", menu_container)
     end
 
     def gradebook_menu_group(name, container: nil)
@@ -378,7 +452,7 @@ class Gradezilla
       return unless menu_group
 
       menu_group_id = menu_group.attribute('id')
-      f("[role=group][aria-labelledby=#{menu_group_id}]", container)
+      f("[role=group][aria-labelledby=#{menu_group_id}]")
     end
 
     def menu_item(name)

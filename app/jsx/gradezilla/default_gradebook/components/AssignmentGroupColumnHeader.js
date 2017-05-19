@@ -67,14 +67,14 @@ class AssignmentGroupColumnHeader extends ColumnHeader {
       onSortByGradeDescending: func.isRequired,
       settingKey: string.isRequired
     }).isRequired,
-    weightedGroups: bool.isRequired
+    weightedGroups: bool.isRequired,
+    onMenuClose: func.isRequired,
+    ...ColumnHeader.propTypes
   };
 
-  state = { menuShown: false };
-
-  onToggle = (show) => { this.setState({ menuShown: show }); };
-
-  bindSortByMenuContent = (ref) => { this.sortByMenuContent = ref; };
+  static defaultProps = {
+    ...ColumnHeader.defaultProps
+  };
 
   render () {
     const { assignmentGroup, sortBySetting, weightedGroups } = this.props;
@@ -93,6 +93,7 @@ class AssignmentGroupColumnHeader extends ColumnHeader {
           focusTriggerOnClose={false}
           trigger={renderTrigger(this.props.assignmentGroup, menuShown, this.bindOptionsMenuTrigger)}
           onToggle={this.onToggle}
+          onClose={this.props.onMenuClose}
         >
           <MenuItemFlyout label={I18n.t('Sort by')} contentRef={this.bindSortByMenuContent}>
             <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>

@@ -52,16 +52,15 @@ export default class StudentColumnHeader extends ColumnHeader {
     selectedEnrollmentFilters: arrayOf(oneOf(studentRowHeaderConstants.enrollmentFilterKeys)).isRequired,
     onToggleEnrollmentFilter: func.isRequired,
     disabled: bool.isRequired,
+    onMenuClose: func.isRequired,
+    ...ColumnHeader.propTypes
   };
 
   static defaultProps = {
     loginHandleName: null,
     sisName: null,
+    ...ColumnHeader.defaultProps
   };
-
-  state = { menuShown: false };
-
-  onToggle = (show) => { this.setState({ menuShown: show }); };
 
   onShowSectionNames = () => { this.onSelectSecondaryInfo('section'); };
   onHideSecondaryInfo = () => { this.onSelectSecondaryInfo('none'); };
@@ -75,7 +74,6 @@ export default class StudentColumnHeader extends ColumnHeader {
   onToggleInactive = () => { this.onToggleEnrollmentFilter('inactive'); };
   onToggleConcluded = () => { this.onToggleEnrollmentFilter('concluded'); };
 
-
   onSelectSecondaryInfo (secondaryInfoKey) {
     this.props.onSelectSecondaryInfo(secondaryInfoKey);
   }
@@ -88,7 +86,6 @@ export default class StudentColumnHeader extends ColumnHeader {
     this.props.onToggleEnrollmentFilter(enrollmentFilterKey);
   }
 
-  bindSortByMenuContent = (ref) => { this.sortByMenuContent = ref; };
   bindDisplayAsMenuContent = (ref) => { this.displayAsMenuContent = ref; };
   bindSecondaryInfoMenuContent = (ref) => { this.secondaryInfoMenuContent = ref; };
 
@@ -126,6 +123,7 @@ export default class StudentColumnHeader extends ColumnHeader {
             </span>
           }
           onToggle={this.onToggle}
+          onClose={this.props.onMenuClose}
         >
           <MenuItemFlyout label={I18n.t('Sort by')} contentRef={this.bindSortByMenuContent} disabled={this.props.disabled}>
             <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>

@@ -90,7 +90,13 @@ class AssignmentColumnHeader extends ColumnHeader {
     muteAssignmentAction: shape({
       disabled: bool.isRequired,
       onSelect: func.isRequired
-    }).isRequired
+    }).isRequired,
+    onMenuClose: func.isRequired,
+    ...ColumnHeader.propTypes
+  };
+
+  static defaultProps = {
+    ...ColumnHeader.defaultProps
   };
 
   static renderMutedIcon (screenreaderText) {
@@ -109,13 +115,7 @@ class AssignmentColumnHeader extends ColumnHeader {
     );
   }
 
-  state = { menuShown: false };
-
-  onToggle = (show) => { this.setState({ menuShown: show }); };
-
   bindAssignmentLink = (ref) => { this.assignmentLink = ref };
-  bindSortByMenuContent = (ref) => { this.sortByMenuContent = ref; };
-
   focusAtStart = () => { this.assignmentLink.focus() };
 
   handleKeyDown = (event) => {
@@ -216,6 +216,7 @@ class AssignmentColumnHeader extends ColumnHeader {
         focusTriggerOnClose={false}
         trigger={this.renderTrigger()}
         onToggle={this.onToggle}
+        onClose={this.props.onMenuClose}
       >
         <MenuItemFlyout contentRef={this.bindSortByMenuContent} label={I18n.t('Sort by')}>
           <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>

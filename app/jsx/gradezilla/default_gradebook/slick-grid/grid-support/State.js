@@ -118,11 +118,16 @@ export default class State {
     return null;
   }
 
+  getColumnHeaderNode (cell) {
+    const $gridContainer = this.grid.getContainerNode();
+    const $headers = $gridContainer.querySelectorAll('.slick-header-column');
+
+    return $headers[cell];
+  }
+
   getActiveColumnHeaderNode () {
     if (this.activeLocation.cell != null) {
-      const $gridContainer = this.grid.getContainerNode();
-      const $headers = $gridContainer.querySelectorAll('.slick-header-column');
-      return $headers[this.activeLocation.cell];
+      return this.getColumnHeaderNode(this.activeLocation.cell);
     }
 
     return null;

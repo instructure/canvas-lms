@@ -26,7 +26,7 @@ function mountComponent (props, mountOptions = {}) {
 }
 
 function mountAndOpenOptions (props) {
-  const wrapper = mount(<AssignmentGroupColumnHeader {...props} />);
+  const wrapper = mountComponent(props);
   wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
   return wrapper;
 }
@@ -48,14 +48,23 @@ function defaultProps ({ props, sortBySetting, assignmentGroup } = {}) {
       ...sortBySetting
     },
     weightedGroups: true,
+    addGradebookElement () {},
+    removeGradebookElement () {},
+    onMenuClose () {},
     ...props
   };
 }
 
 QUnit.module('AssignmentGroupColumnHeader - base behavior', {
   setup () {
-    const props = defaultProps();
-    this.wrapper = mount(<AssignmentGroupColumnHeader {...props} />);
+    this.props = defaultProps({
+      props: {
+        addGradebookElement: this.stub(),
+        removeGradebookElement: this.stub(),
+        onMenuClose: this.stub()
+      }
+    });
+    this.wrapper = mountComponent(this.props);
   },
 
   teardown () {
@@ -82,6 +91,26 @@ test('adds a class to the trigger when the PopoverMenu is opened', function () {
   const optionsMenuTrigger = this.wrapper.find('PopoverMenu .Gradebook__ColumnHeaderAction');
   optionsMenuTrigger.simulate('click');
   ok(optionsMenuTrigger.hasClass('menuShown'));
+});
+
+test('calls addGradebookElement prop on open', function () {
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+  strictEqual(this.props.addGradebookElement.callCount, 1);
+});
+
+test('calls removeGradebookElement prop on close', function () {
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+  strictEqual(this.props.removeGradebookElement.callCount, 1);
+});
+
+test('calls onMenuClose prop on close', function () {
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+  strictEqual(this.props.onMenuClose.callCount, 1);
 });
 
 QUnit.module('AssignmentGroupColumnHeader - non-standard assignment group');

@@ -3423,6 +3423,11 @@ test('includes props for the "Sort by" settings', function () {
   equal(typeof props.sortBySetting.onSortBySortableNameDescending, 'function', 'props include "onSortBySortableNameDescending"');
 });
 
+test('includes close handler for popover menu', function () {
+  const props = createGradebook().getStudentColumnHeaderProps();
+  equal(typeof props.onMenuClose, 'function', 'props include "onMenuClose"');
+});
+
 QUnit.module('Gradebook#getStudentColumnSortBySetting', {
   setup () {
     this.gradebook = createGradebook();
@@ -3938,6 +3943,11 @@ test('includes props for the Mute Assignment action', function () {
   equal(typeof props.muteAssignmentAction.onSelect, 'function', 'props include "onSelect"');
 });
 
+test('includes close handler for popover menu', function () {
+  const props = this.createGradebook().getAssignmentColumnHeaderProps('201');
+  equal(typeof props.onMenuClose, 'function', 'props include "onMenuClose"');
+});
+
 QUnit.module('Gradebook#getAssignmentGroupColumnSortBySetting', {
   setup () {
     this.gradebook = createGradebook();
@@ -4070,6 +4080,11 @@ test('includes props for the "Sort by" setting', function () {
   ok(props.sortBySetting, 'Sort by setting is present');
   equal(typeof props.sortBySetting.disabled, 'boolean', 'props include "disabled"');
   equal(typeof props.sortBySetting.onSortByGradeAscending, 'function', 'props include "onSortByGradeAscending"');
+});
+
+test('includes close handler for popover menu', function () {
+  const props = this.createGradebook().getAssignmentGroupColumnHeaderProps('301');
+  equal(typeof props.onMenuClose, 'function', 'props include "onMenuClose"');
 });
 
 QUnit.module('Gradebook#getTotalGradeColumnSortBySetting', {

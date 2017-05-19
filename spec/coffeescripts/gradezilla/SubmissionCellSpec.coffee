@@ -413,6 +413,8 @@ define [
           submission_type: "online_text_entry"
       column:
         field: 'whatever'
+        object:
+          id: '42'
 
     teardown: ->
       @fixtures.innerHTML = ''

@@ -1124,7 +1124,13 @@ define [
           else if columnDef.minimized
             @unminimizeColumn($columnHeader)
 
-      @keyboardNav = new GradebookKeyboardNav(@grid, @$grid)
+      @keyboardNav = new GradebookKeyboardNav({
+        gridSupport: @gridSupport,
+        getColumnTypeForColumnId: @getColumnTypeForColumnId,
+        toggleDefaultSort: @toggleDefaultSort,
+        openSubmissionTray: @openSubmissionTray
+      })
+
       @keyboardNav.init()
       keyBindings = @keyboardNav.keyBindings
       @kbDialog = new KeyboardNavDialog().render(KeyboardNavTemplate({keyBindings}))
@@ -1658,6 +1664,7 @@ define [
 
       gridSupportOptions = {
         activeBorderColor: '#1790DF' # $active-border-color
+        rows: @rows
       }
 
       if ENV.use_high_contrast
@@ -1819,6 +1826,16 @@ define [
       else
         null
 
+    getColumnTypeForColumnId: (columnId) =>
+      if columnId.match /^custom_col/
+        return 'custom_column'
+      else if columnId.match /^assignment_(?!group)/
+        return 'assignment'
+      else if columnId.match /^assignment_group/
+        return 'assignment_group'
+      else
+        return columnId
+
     localeSort: (a, b) ->
       natcompare.strings(a || '', b || '')
 
@@ -1890,16 +1907,14 @@ define [
 
     sortGridRows: =>
       { columnId, settingKey, direction } = @getSortRowsBySetting()
-      if columnId.match /^custom_col/
-        @sortByCustomColumn(columnId, direction)
-      else if columnId.match /^assignment_(?!group)/
-        @sortByAssignmentColumn(columnId, settingKey, direction)
-      else if columnId.match /^assignment_group/
-        @sortByAssignmentGroupColumn(columnId, settingKey, direction)
-      else if columnId == 'total_grade'
-        @sortByTotalGradeColumn(direction)
-      else
-        @sortByStudentColumn(settingKey, direction)
+      columnType = @getColumnTypeForColumnId(columnId)
+
+      switch columnType
+        when 'custom_column' then @sortByCustomColumn(columnId, direction)
+        when 'assignment' then @sortByAssignmentColumn(columnId, settingKey, direction)
+        when 'assignment_group' then @sortByAssignmentGroupColumn(columnId, settingKey, direction)
+        when 'total_grade' then @sortByTotalGradeColumn(direction)
+        else @sortByStudentColumn(settingKey, direction)
 
       @updateColumnHeaders()
 
@@ -1953,6 +1968,9 @@ define [
             @totalGradeWarning =
               warningText: text
               icon: "icon-warning final-warning"
+
+    handleColumnHeaderMenuClose: =>
+      @keyboardNav.handleMenuOrDialogClose()
 
     toggleNotesColumn: (callback) =>
       columnsToReplace = @getFrozenColumnCount()
@@ -2136,6 +2154,9 @@ define [
       selectedEnrollmentFilters: @getSelectedEnrollmentFilters()
       onToggleEnrollmentFilter: @toggleEnrollmentFilter
       disabled: !@contentLoadStates.studentsLoaded
+      addGradebookElement: @keyboardNav.addGradebookElement
+      removeGradebookElement: @keyboardNav.removeGradebookElement
+      onMenuClose: @handleColumnHeaderMenuClose
 
     renderStudentColumnHeader: =>
       mountPoint = @getColumnHeaderNode('student')
@@ -2235,6 +2256,9 @@ define [
       sortBySetting: @getTotalGradeColumnSortBySetting()
       gradeDisplay: @getTotalGradeColumnGradeDisplayProps()
       position: @getTotalGradeColumnPositionProps()
+      addGradebookElement: @keyboardNav.addGradebookElement
+      removeGradebookElement: @keyboardNav.removeGradebookElement
+      onMenuClose: @handleColumnHeaderMenuClose
 
     renderTotalGradeColumnHeader: =>
       return if @hideAggregateColumns()
@@ -2364,6 +2388,9 @@ define [
         muteAssignmentAction:
           disabled: !assignmentMuterDialogManager.isDialogEnabled()
           onSelect: assignmentMuterDialogManager.showDialog
+        addGradebookElement: @keyboardNav.addGradebookElement
+        removeGradebookElement: @keyboardNav.removeGradebookElement
+        onMenuClose: @handleColumnHeaderMenuClose
       }
 
     renderAssignmentColumnHeader: (assignmentId) =>
@@ -2403,6 +2430,9 @@ define [
           groupWeight: assignmentGroup.group_weight
         sortBySetting: @getAssignmentGroupColumnSortBySetting(assignmentGroupId)
         weightedGroups: @weightedGroups()
+        addGradebookElement: @keyboardNav.addGradebookElement
+        removeGradebookElement: @keyboardNav.removeGradebookElement
+        onMenuClose: @handleColumnHeaderMenuClose
       }
 
     renderAssignmentGroupColumnHeader: (assignmentGroupId) =>
@@ -2430,6 +2460,10 @@ define [
 
     toggleSubmissionTrayOpen: (studentId, assignmentId) =>
       @setSubmissionTrayState(!@getSubmissionTrayState().open, studentId, assignmentId)
+      @updateRowAndRenderSubmissionTray(studentId)
+
+    openSubmissionTray: (studentId, assignmentId) =>
+      @setSubmissionTrayState(true, studentId, assignmentId)
       @updateRowAndRenderSubmissionTray(studentId)
 
     closeSubmissionTray: =>
@@ -2502,6 +2536,23 @@ define [
       unless skipRedraw
         @buildRows()
         @renderStudentColumnHeader()
+
+    toggleDefaultSort: (columnId) =>
+      sortSettings = @getSortRowsBySetting()
+      columnType = @getColumnTypeForColumnId(columnId)
+      settingKey = @getDefaultSettingKeyForColumnType(columnType)
+      direction = 'ascending'
+
+      if sortSettings.columnId == columnId && sortSettings.settingKey == settingKey && sortSettings.direction == 'ascending'
+        direction = 'descending'
+
+      @setSortRowsBySetting(columnId, settingKey, direction)
+
+    getDefaultSettingKeyForColumnType: (columnType) =>
+      if columnType == 'assignment' || columnType == 'assignment_group' || columnType == 'total_grade'
+        return 'grade'
+      else if columnType == 'student'
+        return 'sortable_name'
 
     getSelectedPrimaryInfo: () =>
       @gridDisplaySettings.selectedPrimaryInfo

@@ -31,7 +31,7 @@ function mountAndOpenOptions (props) {
   return wrapper;
 }
 
-function defaultProps ({ sortBySetting, gradeDisplay, position } = {}) {
+function defaultProps ({ props, sortBySetting, gradeDisplay, position } = {}) {
   return {
     sortBySetting: {
       direction: 'ascending',
@@ -56,12 +56,22 @@ function defaultProps ({ sortBySetting, gradeDisplay, position } = {}) {
       onMoveToBack () {},
       ...position
     },
+    addGradebookElement () {},
+    removeGradebookElement () {},
+    onMenuClose () {},
+    ...props
   };
 }
 
 QUnit.module('TotalGradeColumnHeader - base behavior', {
   setup () {
-    this.props = defaultProps();
+    this.props = defaultProps({
+      props: {
+        addGradebookElement: this.stub(),
+        removeGradebookElement: this.stub(),
+        onMenuClose: this.stub()
+      }
+    });
     this.wrapper = mount(<TotalGradeColumnHeader {...this.props} />);
   },
 
@@ -100,6 +110,26 @@ test('renders a title for the More icon based on the assignment name', function 
   const optionsMenuTrigger = this.wrapper.find('PopoverMenu IconMoreSolid');
 
   equal(optionsMenuTrigger.props().title, 'Total Options');
+});
+
+test('calls addGradebookElement prop on open', function () {
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+  strictEqual(this.props.addGradebookElement.callCount, 1);
+});
+
+test('calls removeGradebookElement prop on close', function () {
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+  strictEqual(this.props.removeGradebookElement.callCount, 1);
+});
+
+test('calls onMenuClose prop on close', function () {
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+  strictEqual(this.props.onMenuClose.callCount, 1);
 });
 
 QUnit.module('TotalGradeColumnHeader - Sort by Settings', {

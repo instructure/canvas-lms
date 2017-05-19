@@ -65,13 +65,13 @@ class TotalGradeColumnHeader extends ColumnHeader {
       onMoveToFront: func.isRequired,
       onMoveToBack: func.isRequired
     }).isRequired,
+    onMenuClose: func.isRequired,
+    ...ColumnHeader.propTypes
   };
 
-  state = { menuShown: false };
-
-  onToggle = (show) => { this.setState({ menuShown: show }); };
-
-  bindSortByMenuContent = (ref) => { this.sortByMenuContent = ref; };
+  static defaultProps = {
+    ...ColumnHeader.defaultProps
+  };
 
   render () {
     const { sortBySetting, gradeDisplay, position } = this.props;
@@ -97,6 +97,7 @@ class TotalGradeColumnHeader extends ColumnHeader {
           focusTriggerOnClose={false}
           trigger={renderTrigger(menuShown, this.bindOptionsMenuTrigger)}
           onToggle={this.onToggle}
+          onClose={this.props.onMenuClose}
         >
           <MenuItemFlyout contentRef={this.bindSortByMenuContent} label={I18n.t('Sort by')}>
             <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>
