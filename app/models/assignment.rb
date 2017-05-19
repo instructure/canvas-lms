@@ -644,6 +644,24 @@ class Assignment < ActiveRecord::Base
     all_context_module_tags.each { |tag| tag.context_module_action(user, action, points) }
   end
 
+  def recalculate_module_progressions
+    # recalculate the module progressions now that the assignment is unmuted
+    tags = all_context_module_tags
+    return unless tags.any?
+    modules = ContextModule.where(:id => tags.map(&:context_module_id)).order(:position).to_a.select do |mod|
+      mod.completion_requirements && mod.completion_requirements.any?{|req| req[:type] == 'min_score' && tags.map(&:id).include?(req[:id])}
+    end
+    return unless modules.any?
+    student_ids = self.submissions.having_submission.distinct.pluck(:user_id)
+    return unless student_ids.any?
+
+    modules.each do |mod|
+      if mod.context_module_progressions.where(current: true, user_id: student_ids).update_all(current: false) > 0
+        mod.send_later_if_production_enqueue_args(:evaluate_all_progressions, {:strand => "module_reeval_#{mod.global_context_id}"})
+      end
+    end
+  end
+
   def touch_submissions_if_muted_changed
     if muted_changed?
       self.class.connection.after_transaction_commit do
@@ -652,6 +670,8 @@ class Assignment < ActiveRecord::Base
 
         # this ensures live events notifications
         submissions.in_workflow_state('graded').each(&:assignment_muted_changed)
+
+        self.send_later_if_production(:recalculate_module_progressions) unless self.muted?
       end
     end
   end
