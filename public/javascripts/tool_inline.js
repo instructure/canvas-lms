@@ -93,6 +93,20 @@ $(function() {
   var $window = $(window);
   $tool_content_wrapper = $('.tool_content_wrapper');
   const toolResizer = new ToolLaunchResizer(min_tool_height);
+  const $tool_content = $('iframe#tool_content')
+
+  const $external_content_info_alerts = $tool_content_wrapper
+    .find('.before_external_content_info_alert, .after_external_content_info_alert');
+
+  $external_content_info_alerts.on('focus', function(e) {
+    $tool_content_wrapper.find('iframe').css('border', '2px solid #008EE2');
+    $(this).removeClass('screenreader-only');
+  })
+
+  $external_content_info_alerts.on('blur', function(e) {
+    $tool_content_wrapper.find('iframe').css('border', 'none');
+    $(this).addClass('screenreader-only');
+  })
 
   if ( !$('body').hasClass('ic-full-screen-lti-tool') ) {
     canvas_chrome_height = $tool_content_wrapper.offset().top + $('#footer').outerHeight(true);

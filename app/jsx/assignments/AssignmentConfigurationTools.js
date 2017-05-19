@@ -46,7 +46,10 @@ import 'compiled/jquery.rails_flash_notifications'
         toolLaunchUrl: 'none',
         toolType: '',
         tools: [],
-        selectedToolValue: `${this.props.selectedToolType}_${this.props.selectedTool}`
+        selectedToolValue: `${this.props.selectedToolType}_${this.props.selectedTool}`,
+        beforeExternalContentAlertClass: 'screenreader-only',
+        afterExternalContentAlertClass: 'screenreader-only',
+        iframeStyle: {}
       };
     },
 
@@ -120,6 +123,30 @@ import 'compiled/jquery.rails_flash_notifications'
       }, () => this.setToolLaunchUrl());
     },
 
+    handleAlertFocus (event) {
+      const newState = {
+        iframeStyle: { border: '2px solid #008EE2', width: `${(this.iframe.offsetWidth - 4)}px` }
+      }
+      if (event.target.className.search('before') > -1) {
+        newState.beforeExternalContentAlertClass = ''
+      } else if (event.target.className.search('after') > -1) {
+        newState.afterExternalContentAlertClass = ''
+      }
+      this.setState(newState)
+    },
+
+    handleAlertBlur (event) {
+      const newState = {
+        iframeStyle: { border: 'none', width: '100%' }
+      }
+      if (event.target.className.search('before') > -1) {
+        newState.beforeExternalContentAlertClass = 'screenreader-only'
+      } else if (event.target.className.search('after') > -1) {
+        newState.afterExternalContentAlertClass = 'screenreader-only'
+      }
+      this.setState(newState)
+    },
+
     renderOptions () {
       return (
         <select
@@ -162,8 +189,43 @@ import 'compiled/jquery.rails_flash_notifications'
 
     renderConfigTool() {
       if (this.state.toolLaunchUrl !== 'none') {
+        const beforeAlertStyles = `before_external_content_info_alert ${this.state.beforeExternalContentAlertClass}`
+        const afterAlertStyles = `after_external_content_info_alert ${this.state.afterExternalContentAlertClass}`
         return(
-          <iframe src={this.state.toolLaunchUrl} className="tool_launch"></iframe>
+          <div>
+            <div
+              onFocus={this.handleAlertFocus}
+              onBlur={this.handleAlertBlur}
+              className={beforeAlertStyles}
+              tabIndex="0"
+            >
+              <div className="ic-flash-info" style={{ width: 'auto', margin: '20px' }}>
+                <div className="ic-flash__icon" aria-hidden="true">
+                  <i className="icon-info" />
+                </div>
+                {I18n.t('The following content is partner provided')}
+              </div>
+            </div>
+            <iframe
+              src={this.state.toolLaunchUrl}
+              className="tool_launch"
+              style={this.state.iframeStyle}
+              ref={(e) => { this.iframe = e; }}
+            />
+            <div
+              onFocus={this.handleAlertFocus}
+              onBlur={this.handleAlertBlur}
+              className={afterAlertStyles}
+              tabIndex="0"
+            >
+              <div className="ic-flash-info" style={{ width: 'auto', margin: '20px' }}>
+                <div className="ic-flash__icon" aria-hidden="true">
+                  <i className="icon-info" />
+                </div>
+                {I18n.t('The preceding content is partner provided')}
+              </div>
+            </div>
+          </div>
         );
       }
     },

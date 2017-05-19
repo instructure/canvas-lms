@@ -232,4 +232,71 @@ define([
     const selectBox = wrapper.find('#similarity_detection_tool');
     equal(selectBox.props().value, 'ContextExternalTool_5');
   });
+
+  test('shows beginning info alert and adds styles to iframe', () => {
+    const wrapper = mount(
+      <AssignmentConfigurationTools.configTools
+        courseId={1}
+        secureParams={secureParams}
+      />
+    )
+    wrapper.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
+    wrapper.find('.before_external_content_info_alert').simulate('focus')
+    equal(wrapper.state().beforeExternalContentAlertClass, '')
+    deepEqual(wrapper.state().iframeStyle, { border: '2px solid #008EE2', width: '-4px' })
+  })
+
+  test('shows ending info alert and adds styles to iframe', () => {
+    const wrapper = mount(
+      <AssignmentConfigurationTools.configTools
+        courseId={1}
+        secureParams={secureParams}
+      />
+    )
+    wrapper.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
+    wrapper.find('.after_external_content_info_alert').simulate('focus')
+    equal(wrapper.state().afterExternalContentAlertClass, '')
+    deepEqual(wrapper.state().iframeStyle, { border: '2px solid #008EE2', width: '-4px' })
+  })
+
+  test('hides beginning info alert and adds styles to iframe', () => {
+    const wrapper = mount(
+      <AssignmentConfigurationTools.configTools
+        courseId={1}
+        secureParams={secureParams}
+      />
+    )
+    wrapper.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
+    wrapper.find('.before_external_content_info_alert').simulate('focus')
+    wrapper.find('.before_external_content_info_alert').simulate('blur')
+    equal(wrapper.state().beforeExternalContentAlertClass, 'screenreader-only')
+    deepEqual(wrapper.state().iframeStyle, { border: 'none', width: '100%' })
+  })
+
+  test('hides ending info alert and adds styles to iframe', () => {
+    const wrapper = mount(
+      <AssignmentConfigurationTools.configTools
+        courseId={1}
+        secureParams={secureParams}
+      />
+    )
+    wrapper.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
+    wrapper.find('.after_external_content_info_alert').simulate('focus')
+    wrapper.find('.after_external_content_info_alert').simulate('blur')
+    equal(wrapper.state().afterExternalContentAlertClass, 'screenreader-only')
+    deepEqual(wrapper.state().iframeStyle, { border: 'none', width: '100%' })
+  })
+
+  test("doesn't show alerts or add border to iframe by default", () => {
+    const wrapper = mount(
+      <AssignmentConfigurationTools.configTools
+        courseId={1}
+        secureParams={secureParams}
+      />
+    )
+    wrapper.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
+    equal(wrapper.state().beforeExternalContentAlertClass, 'screenreader-only')
+    equal(wrapper.state().afterExternalContentAlertClass, 'screenreader-only')
+    deepEqual(wrapper.state().iframeStyle, {})
+  })
 });
