@@ -492,6 +492,32 @@ describe GradebooksController do
       end
     end
 
+    context "as an admin with new gradebook available" do
+      before :each do
+        account_admin_user(account: @course.root_account)
+        user_session(@admin)
+      end
+
+      it "renders new gradebook when enabled" do
+        @course.enable_feature!(:new_gradebook)
+        get "show", course_id: @course.id
+        expect(response).to render_template("gradebooks/gradezilla/gradebook")
+      end
+
+      it "renders new indidivual view when enabled" do
+        @course.enable_feature!(:new_gradebook)
+        allow(@admin).to receive(:preferred_gradebook_version).and_return('individual')
+        get "show", course_id: @course.id
+        expect(response).to render_template("gradebooks/gradezilla/individual")
+      end
+
+      it "ignores the version parameter outside development environments" do
+        allow(Rails.env).to receive(:development?).and_return(false)
+        get "show", course_id: @course.id, version: 'gradezilla-gradebook'
+        expect(response).to render_template(:gradebook)
+      end
+    end
+
     describe 'js_env' do
       before :each do
         user_session(@teacher)

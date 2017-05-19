@@ -228,3 +228,25 @@ describe "Feature.register" do
     end
   end
 end
+
+describe "new_gradebook" do
+  let(:ngb_trans_proc) { Feature.definitions["new_gradebook"].custom_transition_proc }
+  let(:root_account) { account_model }
+  let(:trans_empty) { { "on" => {}, "allowed" => {}, "off" => {} } }
+  let(:locked) { { "locked" => true } }
+
+  it "only allows admins to enable the new gradebook" do
+    test_course = course_factory(account: root_account, active_all: true)
+    teacher = teacher_in_course(course: test_course)
+    transitions = trans_empty
+    ngb_trans_proc.call(teacher, test_course, nil, transitions)
+    expect(transitions).to include({ "on" => locked, "off" => locked })
+  end
+
+  it "does not allow enabling new gradebook on an entire account" do
+    admin = user_factory(account: root_account)
+    transitions = trans_empty
+    ngb_trans_proc.call(admin, root_account, nil, transitions)
+    expect(transitions).to include({ "on" => locked })
+  end
+end

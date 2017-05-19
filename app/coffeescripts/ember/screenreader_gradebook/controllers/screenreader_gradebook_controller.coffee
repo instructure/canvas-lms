@@ -201,10 +201,6 @@ define [
     ).property()
 
     gradezilla: (->
-      # returning false if version is srgb or 2 is part of the feature to help
-      # developers switch back and forth between views with gradezilla enabled
-      version = get window, 'ENV.GRADEBOOK_OPTIONS.version'
-      return false if version == 'srgb' || version == '2'
       get window, 'ENV.GRADEBOOK_OPTIONS.gradezilla'
     ).property()
 

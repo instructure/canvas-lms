@@ -202,6 +202,28 @@ END
       root_opt_in: true,
       beta: true
     },
+    'new_gradebook' =>
+    {
+      display_name: -> { I18n.t('New Gradebook') },
+      description:  -> { I18n.t(<<-END) },
+New Gradebook enables an early release of new Gradebook enhancements.
+END
+      applies_to: 'Course',
+      state: 'hidden',
+      root_opt_in: true,
+      beta: true,
+      development: true,
+
+      custom_transition_proc: ->(user, context, _from_state, transitions) do
+        if context.is_a?(Course)
+          user_may_change_flag = context.account.grants_right?(user, :manage_account_settings)
+          transitions['on']['locked'] = !user_may_change_flag if transitions&.dig('on')
+          transitions['off']['locked'] = !user_may_change_flag if transitions&.dig('off')
+        elsif context.is_a?(Account)
+          transitions['on']['locked'] = true if transitions&.dig('on')
+        end
+      end
+    },
     'k12' =>
     {
       display_name: -> { I18n.t('features.k12', 'K-12 Specific Features') },
@@ -500,15 +522,6 @@ END
       applies_to: "RootAccount",
       state: "allowed",
       beta: true
-    },
-    'gradezilla' =>
-    {
-      display_name: -> { I18n.t('Gradezilla') },
-      description: -> { I18n.t('Enable Gradezilla (name is only a placeholder as it will replace Gradebook in the future).') },
-      applies_to: "RootAccount",
-      state: "hidden",
-      beta: true,
-      development: true,
     },
     'new_gradebook_history' =>
     {

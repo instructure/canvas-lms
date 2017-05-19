@@ -149,7 +149,7 @@ class Gradezilla
     # actions
 
     def visit(course)
-      Account.default.enable_feature!(:gradezilla)
+      Account.default.enable_feature!(:new_gradebook)
       get "/courses/#{course.id}/gradebook/change_gradebook_version?version=gradezilla"
       # the pop over menus is too lengthy so make screen bigger
       make_full_screen

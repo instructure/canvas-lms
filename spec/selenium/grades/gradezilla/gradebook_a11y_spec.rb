@@ -30,7 +30,7 @@ describe "Gradezilla" do
   end
 
   before do
-    Account.default.set_feature_flag!('gradezilla', 'on')
+    Account.default.set_feature_flag!('new_gradebook', 'on')
     extra_setup
     user_session(@teacher)
     Gradezilla.visit(@course)

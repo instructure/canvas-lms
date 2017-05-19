@@ -113,7 +113,7 @@ describe "Gradezilla" do
   end
 
   it "View Grading History menu item redirects to grading history page", priority: "2", test_id: 164218 do
-    @course.root_account.enable_feature!(:gradezilla)
+    @course.root_account.enable_feature!(:new_gradebook)
     Gradezilla.visit(@course)
 
     f('.gradebook-menus [data-component="GradebookMenu"]').click

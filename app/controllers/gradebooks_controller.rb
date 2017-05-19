@@ -180,27 +180,36 @@ class GradebooksController < ApplicationController
       @post_grades_tools = post_grades_tools
 
       version = @current_user.preferred_gradebook_version
-      if @context.root_account.feature_enabled?(:gradezilla)
-        # params[:version] is a temporary gradezilla feature to help devs flip back and forth
-        # between gradebook versions. This param should never be used in the UI.
-        case params[:version]
-        when 'srgb'
-          render :screenreader and return
-        when '2'
-          render :gradebook and return
-        when 'gradezilla-individual'
-          render 'gradebooks/gradezilla/individual' and return
-        when 'gradezilla-gradebook'
-          render 'gradebooks/gradezilla/gradebook' and return
-        else # fallback to the current user's preferences hash
-          render 'gradebooks/gradezilla/individual' and return if version == 'individual'
+      if @context.feature_enabled?(:new_gradebook)
+        if Rails.env.development?
+          # params[:version] is a temporary gradezilla feature to help devs flip back and forth
+          # between gradebook versions. This param should never be used in the UI.
+          case params[:version]
+          when 'srgb'
+            render :screenreader and return
+          when '2'
+            render :gradebook and return
+          when 'gradezilla-individual'
+            render 'gradebooks/gradezilla/individual' and return
+          when 'gradezilla-gradebook'
+            render 'gradebooks/gradezilla/gradebook' and return
+          else # fallback to the current user's preferences hash
+            render 'gradebooks/gradezilla/individual' and return if individual_view?(version)
+            render 'gradebooks/gradezilla/gradebook' and return
+          end
+        else
+          render 'gradebooks/gradezilla/individual' and return if individual_view?(version)
           render 'gradebooks/gradezilla/gradebook' and return
         end
       else
-        render :screenreader and return if version == 'srgb'
+        render :screenreader and return if individual_view?(version)
         render :gradebook and return
       end
     end
+  end
+
+  def individual_view?(version)
+    %w(individual srgb).include?(version)
   end
 
   def post_grades_ltis
@@ -309,7 +318,7 @@ class GradebooksController < ApplicationController
                  end
     js_env STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards)
     js_env GRADEBOOK_OPTIONS: {
-      gradezilla: @context.root_account.feature_enabled?(:gradezilla),
+      gradezilla: @context.feature_enabled?(:new_gradebook),
       chunk_size: chunk_size,
       assignment_groups_url: api_v1_course_assignment_groups_url(
         @context,
