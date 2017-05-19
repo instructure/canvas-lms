@@ -59,18 +59,22 @@ module Canvas
     describe 'workflows' do
       describe ':rich_content' do
         before(:each) do
-          @c.stubs(:grants_any_right?)
+          @c.stubs(:grants_right?)
           @c.stubs(:feature_enabled?)
+          @wiki = Wiki.new
+          @c.stubs(:wiki).returns(@wiki)
+          @c.stubs(:respond_to?).with(:wiki).returns(true)
+          @wiki.stubs(:grants_right?)
         end
 
         it 'sets can_upload_files to false' do
-          @c.expects(:grants_any_right?).with(@u, :manage_files).returns(false)
+          @c.expects(:grants_right?).with(@u, :manage_files).returns(false)
           state = JWTWorkflow.state_for([:rich_content], @c, @u)
           expect(state[:can_upload_files]).to be false
         end
 
         it 'sets can_upload_files to true' do
-          @c.expects(:grants_any_right?).with(@u, :manage_files).returns(true)
+          @c.expects(:grants_right?).with(@u, :manage_files).returns(true)
           state = JWTWorkflow.state_for([:rich_content], @c, @u)
           expect(state[:can_upload_files]).to be true
         end
@@ -85,6 +89,29 @@ module Canvas
           @c.expects(:feature_enabled?).with(:usage_rights_required).returns(true)
           state = JWTWorkflow.state_for([:rich_content], @c, @u)
           expect(state[:usage_rights_required]).to be true
+        end
+
+        it 'sets can_create_pages to false if context does not have a wiki' do
+          @c.expects(:respond_to?).with(:wiki).returns(false)
+          state = JWTWorkflow.state_for([:rich_content], @c, @u)
+          expect(state[:can_create_pages]).to be false
+          @c.expects(:wiki_id).returns(nil)
+          state = JWTWorkflow.state_for([:rich_content], @c, @u)
+          expect(state[:can_create_pages]).to be false
+        end
+
+        it 'sets can_create_pages to false if user does not have create_page rights' do
+          @c.wiki_id = 1
+          @wiki.expects(:grants_right?).with(@u, :create_page).returns(false)
+          state = JWTWorkflow.state_for([:rich_content], @c, @u)
+          expect(state[:can_create_pages]).to be false
+        end
+
+        it 'sets can_create_pages to true if user has create_page rights' do
+          @c.wiki_id = 1
+          @wiki.expects(:grants_right?).with(@u, :create_page).returns(true)
+          state = JWTWorkflow.state_for([:rich_content], @c, @u)
+          expect(state[:can_create_pages]).to be true
         end
       end
 
