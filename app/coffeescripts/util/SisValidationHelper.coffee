@@ -39,4 +39,4 @@ define [], ->
 
     dueDateMissing: ->
       return false unless @postToSIS
-      @dueDateRequired && (@dueDate == null || @dueDate == undefined)
+      @dueDateRequired && (@dueDate == null || @dueDate == undefined || @dueDate == "")
