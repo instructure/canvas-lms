@@ -1397,9 +1397,9 @@ canvas-planner@^0.0.4:
     redux-promise "^0.5.3"
     redux-thunk "^2.2.0"
 
-canvas-rce@1.1.6:
-  version "1.1.6"
-  resolved "https://registry.yarnpkg.com/canvas-rce/-/canvas-rce-1.1.6.tgz#358b08c747e3bb02903661bad28ede4969472286"
+canvas-rce@2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/canvas-rce/-/canvas-rce-2.1.0.tgz#5530b5b63a87388b146bc69ed031768acc7e6aca"
   dependencies:
     aphrodite "^1.1.0"
     bloody-offset "0.0.0"
@@ -7748,14 +7748,14 @@ ua-parser-js@^0.7.9:
   version "0.7.12"
   resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-0.7.12.tgz#04c81a99bdd5dc52263ea29d24c6bf8d4818a4bb"
 
-uglify-js@^2.6, uglify-js@^2.6.2, uglify-js@^2.7.5, uglify-js@~2.7.3:
-  version "2.7.5"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-2.7.5.tgz#4612c0c7baaee2ba7c487de4904ae122079f2ca8"
+uglify-js@^2.6, uglify-js@^2.6.2, uglify-js@^2.7.5, uglify-js@~2.8.10:
+  version "2.8.27"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-2.8.27.tgz#47787f912b0f242e5b984343be8e35e95f694c9c"
   dependencies:
-    async "~0.2.6"
     source-map "~0.5.1"
-    uglify-to-browserify "~1.0.0"
     yargs "~3.10.0"
+  optionalDependencies:
+    uglify-to-browserify "~1.0.0"
 
 uglify-js@~2.3:
   version "2.3.6"
@@ -7765,14 +7765,14 @@ uglify-js@~2.3:
     optimist "~0.3.5"
     source-map "~0.1.7"
 
-uglify-js@~2.8.10:
-  version "2.8.27"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-2.8.27.tgz#47787f912b0f242e5b984343be8e35e95f694c9c"
+uglify-js@~2.7.3:
+  version "2.7.5"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-2.7.5.tgz#4612c0c7baaee2ba7c487de4904ae122079f2ca8"
   dependencies:
+    async "~0.2.6"
     source-map "~0.5.1"
-    yargs "~3.10.0"
-  optionalDependencies:
     uglify-to-browserify "~1.0.0"
+    yargs "~3.10.0"
 
 uglify-save-license@^0.4.1:
   version "0.4.1"
