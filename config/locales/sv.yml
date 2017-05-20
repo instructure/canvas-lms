@@ -4414,7 +4414,7 @@ sv:
       filter_messages_by_course: "Filtrera meddelanden efter kurser"
       filter_messages_by_type: "Filtrera meddelanden efter typ"
       forward: Vidarebefordra
-      inbox: Brevkorg
+      inbox: Inkorg
       mark_as_read: "Markera som läst"
       mark_as_unread: "Markera som oläst"
       more_options: "Fler alternativ"
@@ -8885,7 +8885,7 @@ sv:
   inactivate_user_35f6d9d7: "Inaktiv användare"
   inactive_cd40317f: inaktiv
   inactive_enrollments_3b84be3d: "Inaktiva inskrivningar"
-  inbox_bb245a60: Brevkorg
+  inbox_bb245a60: Inkorg
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "Inkludera en länk till en skärmdump och använd dig av något som *Jing*."
   include_deleted_enrollments_1c87684a: "Inkludera raderade registreringar"
   include_deleted_objects_3cced3b5: "Inkludera raderade föremål;"
@@ -14932,7 +14932,7 @@ sv:
   read_comments_3fcc7590: "Läs kommentarer"
   ready_to_enroll_panel_46f45abb: "Redo att registrera fält"
   recaptcha_not_configured_3a6ef9ee: "Recaptcha har inte konfigurerats"
-  recent_activity_51239235: "Nylig aktivitet"
+  recent_activity_51239235: "Senaste aktivitet"
   recent_announcements_8becc59c: "Senaste meddelanden"
   recent_student: 
     last_logged_in: "senaste inloggning %{last_login}"
@@ -16132,7 +16132,7 @@ sv:
     recent_activity: 
       date_column: Datum
       message_column: Meddelande
-      recent_activity: "Nylig aktivitet"
+      recent_activity: "Senaste aktivitet"
       recent_activity_in_course: "Senaste aktiviteten i %{course_or_group}"
       unread_column: Oläst
       unread_count_badge: 
