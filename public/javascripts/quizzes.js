@@ -1788,30 +1788,47 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       processData: function(data) {
         $(this).attr('method', 'PUT');
         var quiz_title = $("input[name='quiz[title]']").val();
-        var postToSis = data['quiz[post_to_sis]'] === '1'
+        let postToSIS = data['quiz[post_to_sis]'] === '1'
         var vaildQuizType = data['quiz[quiz_type]'] != 'survey' && data['quiz[quiz_type]'] != 'practice_quiz'
-        var maxNameLength = 256;
+        let maxNameLength = 256;
 
-        if (postToSis && ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT && vaildQuizType){
+        if (postToSIS && ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT && vaildQuizType){
           maxNameLength = ENV.MAX_NAME_LENGTH
         }
 
-        var validationHelper = new SisValidationHelper({
-          postToSIS: postToSis,
+        let valid = true
+        const validationData = {
+          assignment_overrides: overrideView.getAllDates(),
+          postToSIS: data['quiz[post_to_sis]'] == '1'
+        }
+
+        const errs = overrideView.validateBeforeSave(validationData,{})
+
+        let validationHelper = new SisValidationHelper({
+          postToSIS: validationData.postToSIS,
+          maxNameLengthRequired: ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT,
           maxNameLength: maxNameLength,
           name: quiz_title
         })
+
+        if (_.keys(errs).length > 0) {
+          valid = false
+        }
+        if (validationHelper.nameTooLong()) {
+          valid = false
+          let headerOffset = $('#quiz_title').errorBox(I18n.t('The Quiz name must be under %{length} characters', {length: maxNameLength + 1})).offset();
+          $('html,body').scrollTo({top: headerOffset.top, left: 0});
+        }
+        if (!valid) {
+          return false
+        }
 
         if (quiz_title.length == 0) {
           var offset = $("#quiz_title").errorBox(I18n.t('errors.field_is_required', "This field is required")).offset();
           $('html,body').scrollTo({top: offset.top, left:0});
           return false;
         }
-        if (validationHelper.nameTooLong()) {
-          var header_offset = $('#quiz_title').errorBox(I18n.t('The Quiz name must be under %{length} characters', {length: maxNameLength + 1})).offset();
-          $('html,body').scrollTo({top: header_offset.top, left: 0});
-          return false;
-        }
+
         data['quiz[title]'] = quiz_title;
         if (lockedItems.content) {
           data['quiz[description]'] = quizModel.get('description')
@@ -1830,14 +1847,6 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         data['quiz[allowed_attempts]'] = attempts;
         var overrides = overrideView.getOverrides();
         data['quiz[only_visible_to_overrides]'] = overrideView.containsSectionsWithoutOverrides();
-        var validationData = {
-          assignment_overrides: overrideView.getAllDates(),
-          postToSIS: data['quiz[post_to_sis]'] == '1'
-        };
-        var errs = overrideView.validateBeforeSave(validationData,{});
-        if (_.keys(errs).length > 0) {
-          return false;
-        }
         if (overrideView.containsSectionsWithoutOverrides() && !hasCheckedOverrides) {
           var sections = overrideView.sectionsWithoutOverrides();
           var missingDateView = new MissingDateDialog({
