@@ -281,6 +281,7 @@ class ApplicationController < ActionController::Base
     css_bundle :blueprint_courses
 
     master_course = is_master ? @context : @context.master_course_subscriptions.active.first.master_template.course
+    js_env :DEBUG_BLUEPRINT_COURSES => Rails.env.development? || Rails.env.test?
     js_env :BLUEPRINT_COURSES_DATA => {
       isMasterCourse: is_master,
       isChildCourse: is_child,

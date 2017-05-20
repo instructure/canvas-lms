@@ -25,9 +25,9 @@ import { ConnectedChildContent as ChildContent } from '../components/ChildConten
 import createStore from '../store'
 
 export default class ChildCourse {
-  constructor (root, data) {
+  constructor (root, data, debug) {
     this.root = root
-    this.store = createStore(data)
+    this.store = createStore(data, debug)
   }
 
   routes = [

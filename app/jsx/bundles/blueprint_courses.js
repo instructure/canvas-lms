@@ -28,6 +28,6 @@ require.ensure([], (require) => {
   root.className = 'blueprint__root'
   wrapper.appendChild(root)
 
-  const app = new App(root, data)
+  const app = new App(root, data, ENV.DEBUG_BLUEPRINT_COURSES)
   app.start()
 })

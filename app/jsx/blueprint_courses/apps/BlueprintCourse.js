@@ -24,9 +24,9 @@ import createStore from '../store'
 import { ConnectedCourseSidebar } from '../components/CourseSidebar'
 
 export default class BlueprintCourse {
-  constructor (root, data) {
+  constructor (root, data, debug) {
     this.root = root
-    this.store = createStore(data)
+    this.store = createStore(data, debug)
   }
 
   unmount () {
