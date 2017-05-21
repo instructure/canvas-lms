@@ -19,3 +19,57 @@
 ENV['BUNDLE_GEMFILE'] ||= File.expand_path('../../Gemfile', __FILE__)
 
 require 'bundler/setup' if File.exist?(ENV['BUNDLE_GEMFILE'])
+
+if ENV['RAILS_ENV'] != 'production'
+  module BootLib
+    module Require
+      ARCHDIR    = RbConfig::CONFIG['archdir']
+      RUBYLIBDIR = RbConfig::CONFIG['rubylibdir']
+      DLEXT      = RbConfig::CONFIG['DLEXT']
+
+      def self.from_archdir(feature)
+        require(File.join(ARCHDIR, "#{feature}.#{DLEXT}"))
+      end
+
+      def self.from_rubylibdir(feature)
+        require(File.join(RUBYLIBDIR, "#{feature}.rb"))
+      end
+
+      def self.from_gem(gem, feature)
+        match = $LOAD_PATH
+          .select { |e| e.match(gem_pattern(gem)) }
+          .map    { |e| File.join(e, feature) }
+          .detect { |e| File.exist?(e) }
+        if match
+          require(match)
+        else
+          puts "[BootLib::Require warning] couldn't locate #{feature}"
+          require(feature)
+        end
+      end
+
+      def self.gem_pattern(gem)
+        %r{
+          /
+          (gems|extensions/[^/]+/[^/]+)          # "gems" or "extensions/x64_64-darwin16/2.3.0"
+          /
+          #{Regexp.escape(gem)}-(\h{12}|(\d+\.)) # msgpack-1.2.3 or msgpack-1234567890ab
+        }x
+      end
+    end
+  end
+
+  # compilation cache only works on macOS right now
+  on_mac = (/darwin/ =~ RUBY_PLATFORM) != nil
+
+  BootLib::Require.from_gem('bootsnap', 'bootsnap')
+  Bootsnap.setup(
+    cache_dir:            'tmp/cache',
+    development_mode:     true,
+    load_path_cache:      true,
+    autoload_paths_cache: true,
+    disable_trace:        false,
+    compile_cache_iseq:   on_mac,
+    compile_cache_yaml:   on_mac
+  )
+end
