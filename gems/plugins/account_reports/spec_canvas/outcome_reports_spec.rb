@@ -178,8 +178,6 @@ describe "Outcome Reports" do
       outcome_group = sub_account.root_outcome_group
       @course1.account = sub_account
       @course1.save!
-      @outcome.context_id = sub_account.id
-      @outcome.save!
       outcome_group.add_outcome(@outcome)
 
       parsed = read_report(@type, {order: [0, 1], account: sub_account})

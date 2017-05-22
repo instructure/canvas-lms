@@ -221,17 +221,8 @@ class OutcomesApiController < ApplicationController
   def update
     return unless authorized_action(@outcome, @current_user, :update)
 
-    if @outcome.assessed?
-      return render(
-        :json => assessed_outcome_error_message,
-        :status => :bad_request
-      )
-    end
-
-    @outcome.update_attributes(params.permit(*DIRECT_PARAMS))
     update_outcome_criterion(@outcome) if params[:mastery_points] || params[:ratings]
-
-    if @outcome.save
+    if @outcome.update_attributes(params.permit(*DIRECT_PARAMS))
       render :json => outcome_json(@outcome, @current_user, session)
     else
       render :json => @outcome.errors, :status => :bad_request
@@ -256,11 +247,6 @@ class OutcomesApiController < ApplicationController
       criterion[:ratings] = params[:ratings]
     end
     outcome.rubric_criterion = criterion
-  end
-
-  def assessed_outcome_error_message
-    message = t("This outcome has been used to assess a student and can no longer be updated")
-    { errors: message }
   end
 
   # Direct params are those that have a direct correlation to attrs in the model
