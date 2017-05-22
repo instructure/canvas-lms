@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - 2014 Instructure, Inc.
+# Copyright (C) 2013 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -25,6 +25,7 @@ class GradeSummaryPresenter
     @current_user = current_user
     @id_param = id_param
     @groups_assignments = []
+    @periods_assignments = []
     @assignment_order = assignment_order
   end
 
@@ -87,12 +88,6 @@ class GradeSummaryPresenter
     enrollment = course.all_student_enrollments.where(user_id: user)
     enrollment = enrollment.where.not(workflow_state: "inactive") unless user_has_elevated_permissions?
     enrollment.first
-  end
-
-  def selectable_courses
-    courses_with_grades.to_a.select do |course|
-      student_enrollment_for(course, student).grants_right?(@current_user, :read_grades)
-    end
   end
 
   def student_enrollment
@@ -254,10 +249,21 @@ class GradeSummaryPresenter
 
   def courses_with_grades
     @courses_with_grades ||= begin
-      if student_is_user? || user_an_observer_of_student?
-        student.courses_with_grades
-      else
-        nil
+      student.shard.activate do
+        if student_is_user?
+          Course.where(:id => student.participating_student_course_ids).to_a
+        elsif user_an_observer_of_student?
+          observed_courses = []
+          Shard.partition_by_shard(student.participating_student_course_ids) do |student_course_ids|
+            observed_course_ids = ObserverEnrollment.not_deleted.where(:course_id => student_course_ids,
+              :user_id => @current_user, :associated_user_id => student).pluck(:course_id)
+            next unless observed_course_ids.any?
+            observed_courses += Course.where(:id => observed_course_ids).to_a
+          end
+          observed_courses
+        else
+          []
+        end
       end
     end
   end
@@ -276,7 +282,7 @@ class GradeSummaryPresenter
   end
 
   def no_calculations?
-    @groups_assignments.empty?
+    @groups_assignments.empty? && @periods_assignments.empty?
   end
 
   def total_weight
@@ -292,6 +298,15 @@ class GradeSummaryPresenter
   def groups_assignments=(value)
     @groups_assignments = value
     assignments.concat(value)
+  end
+
+  def periods_assignments=(value)
+    @periods_assignments = value
+    assignments.concat(value)
+  end
+
+  def grading_periods
+    @all_grading_periods ||= GradingPeriod.for(@context).to_a
   end
 
   private

@@ -1,4 +1,22 @@
 <%
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<%
     show_google_docs = @assignment.allow_google_docs_submission? &&
                        @real_current_user.blank? &&
                        @domain_root_account &&
@@ -362,7 +380,7 @@
         <%= hidden_field :submission, :content_type, :id => 'external_tool_content_type' %>
         <a href="<%= context_url(@context, :homework_submissions_context_external_tools_url) %>" id="external_tools_url"></a>
         <a href="/api/v1/courses/<%= @context.id %>/assignments/<%= @assignment.id %>/submissions/<%= @current_user.id %>/files" id="homework_file_url"></a>
-        <table class="formtable" style="width: 100%;">
+        <table role="presentation" class="formtable" style="width: 100%;">
           <tr>
             <td colspan="2">
               <%= t 'instructions.from_external_tool', "Select a tool from the list below to load and submit a resource provided by that tool." %>

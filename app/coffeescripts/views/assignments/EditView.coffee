@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2013 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 define [
   'INST'
   'i18n!assignment'
@@ -139,6 +156,8 @@ define [
       @gradingTypeSelector.on 'change:gradingType', @handleGradingTypeChange
       if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
         @gradingTypeSelector.on 'change:gradingType', @onChange
+
+      @lockedItems = options.lockedItems || {};
 
     handleCancel: (ev) =>
       ev.preventDefault()
@@ -309,6 +328,7 @@ define [
 
     toJSON: =>
       data = @assignment.toView()
+
       _.extend data,
         kalturaEnabled: ENV?.KALTURA_ENABLED or false
         postToSISEnabled: ENV?.POST_TO_SIS or false
@@ -316,9 +336,12 @@ define [
         isLargeRoster: ENV?.IS_LARGE_ROSTER or false
         submissionTypesFrozen: _.include(data.frozenAttributes, 'submission_types')
         conditionalReleaseServiceEnabled: ENV?.CONDITIONAL_RELEASE_SERVICE_ENABLED or false
+        lockedItems: @lockedItems
 
 
     _attachEditorToDescription: =>
+      return if @lockedItems.content
+
       RichContentEditor.initSidebar()
       RichContentEditor.loadNewEditor(@$description, { focus: true, manageParent: true })
 
@@ -478,6 +501,7 @@ define [
         postToSIS: post_to_sis
         maxNameLength: max_name_length
         name: data.name
+        maxNameLengthRequired: ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT
       })
 
       if !data.name or $.trim(data.name.toString()).length == 0
@@ -515,6 +539,7 @@ define [
 
     _validatePointsPossible: (data, errors) =>
       return errors if _.contains(@model.frozenAttributes(), "points_possible")
+      return errors if this.lockedItems.points
 
       if typeof data.points_possible != 'number' or isNaN(data.points_possible)
         errors["points_possible"] = [

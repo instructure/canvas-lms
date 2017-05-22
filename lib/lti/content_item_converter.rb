@@ -1,4 +1,5 @@
-# Copyright (C) 2015 Instructure, Inc.
+#
+# Copyright (C) 2015 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #

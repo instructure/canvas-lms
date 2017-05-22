@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -350,7 +350,8 @@ class FilesController < ApplicationController
       css_bundle :react_files
       js_env({
         :FILES_CONTEXTS => files_contexts,
-        :NEW_FOLDER_TREE => @context.feature_enabled?(:use_new_tree)
+        :NEW_FOLDER_TREE => @context.feature_enabled?(:use_new_tree),
+        :COURSE_ID => context.id.to_s
       })
       log_asset_access([ "files", @context ], "files", "other")
 
@@ -798,6 +799,10 @@ class FilesController < ApplicationController
       json_params[:include] << 'usage_rights'
     end
 
+    if @attachment.context.is_a?(Course)
+      json_params[:master_course_status] = setup_master_course_restrictions([@attachment], @attachment.context)
+    end
+
     json = attachment_json(@attachment, @current_user, {}, json_params)
 
     # render as_text for IE, otherwise it'll prompt
@@ -973,7 +978,7 @@ class FilesController < ApplicationController
   #
   # @example_request
   #
-  #   curl -XPUT 'https://<canvas>/api/v1/files/<file_id>' \
+  #   curl -X PUT 'https://<canvas>/api/v1/files/<file_id>' \
   #        -F 'name=<new_name>' \
   #        -F 'locked=true' \
   #        -H 'Authorization: Bearer <token>'
@@ -1025,7 +1030,7 @@ class FilesController < ApplicationController
   # @API Delete file
   # Remove the specified file
   #
-  #   curl -XDELETE 'https://<canvas>/api/v1/files/<file_id>' \
+  #   curl -X DELETE 'https://<canvas>/api/v1/files/<file_id>' \
   #        -H 'Authorization: Bearer <token>'
   def destroy
     @attachment = Attachment.find(params[:id])

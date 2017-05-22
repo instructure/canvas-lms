@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014-2016 Instructure, Inc.
+# Copyright (C) 2014 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -27,6 +27,7 @@ class GradingPeriodGroup < ActiveRecord::Base
   validate :associated_with_course_or_root_account, if: :active?
 
   after_save :recompute_course_scores, if: :weighted_changed?
+  after_save :recache_grading_period, if: :course_id_changed?
   after_destroy :dissociate_enrollment_terms
 
   set_policy do
@@ -73,6 +74,11 @@ class GradingPeriodGroup < ActiveRecord::Base
     return course.recompute_student_scores(update_all_grading_period_scores: false) if course_id.present?
 
     enrollment_terms.each { |term| term.recompute_course_scores(update_all_grading_period_scores: false) }
+  end
+
+  def recache_grading_period
+    DueDateCacher.recompute_course(course) if course
+    DueDateCacher.recompute_course(course_id_was) if course_id_was
   end
 
   def associated_with_course_or_root_account

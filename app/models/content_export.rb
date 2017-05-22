@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -55,7 +55,8 @@ class ContentExport < ActiveRecord::Base
     context_type == 'Course' &&
             export_type != ZIP &&
             content_migration.blank? &&
-            !settings[:skip_notifications]
+            !settings[:skip_notifications] &&
+            !epub_export
   end
 
   set_broadcast_policy do |p|
@@ -375,6 +376,9 @@ class ContentExport < ActiveRecord::Base
     # for integrating selective exports with external content
     if (type = Canvas::Migration::ExternalContent::Translator::CLASSES_TO_TYPES[obj.class])
       exported_assets << "#{type}_#{obj.id}"
+      if obj.respond_to?(:for_assignment?) && obj.for_assignment?
+        exported_assets << "assignment_#{obj.assignment_id}"
+      end
     end
   end
 

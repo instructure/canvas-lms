@@ -7,8 +7,7 @@ gem 'canvas_cassandra', path: '../canvas_cassandra'
 gem 'canvas_statsd', '1.0.0'
 gem 'json_token', path: '../json_token'
 gem 'paginated_collection', path: '../paginated_collection'
-gem 'simplecov', '0.8.2', :require => false
-gem 'simplecov-rcov', '0.2.3', :require => false
+gem 'simplecov', '0.14.1', :require => false
 
 require File.expand_path("../../../config/canvas_rails5", __FILE__)
 

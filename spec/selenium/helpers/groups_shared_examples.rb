@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2015 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative '../common'
 require_relative 'groups_common'
 require_relative 'shared_examples_common'
@@ -82,6 +99,7 @@ shared_examples 'announcements_page' do |context|
 
     get announcements_page
     expect_new_page_load { f('.btn-primary').click }
+    expect(f('#editor_tabs')).to be_displayed
     fj(".ui-accordion-header a:contains('Announcements')").click
     expect(fln('Group Announcement')).to be_displayed
     expect(f("#content")).not_to contain_link('Course Announcement')
@@ -129,6 +147,7 @@ shared_examples 'pages_page' do |context|
     get pages_page
     f('.btn-primary').click
     wait_for_ajaximations
+    expect(f("#pages_accordion")).to be_displayed
     fj(".ui-accordion-header a:contains('Wiki Pages')").click
     expect(fln("#{group_page.title}")).to be_displayed
     expect(f("#content")).not_to contain_link("#{course_page.title}")
@@ -174,6 +193,7 @@ shared_examples 'discussions_page' do |context|
 
     get discussions_page
     expect_new_page_load { f('.btn-primary').click }
+    expect(f('#editor_tabs')).to be_displayed
     fj(".ui-accordion-header a:contains('Discussions')").click
     expect(fln("#{group_dt.title}")).to be_displayed
     expect(f("#content")).not_to contain_link("#{course_dt.title}")
@@ -241,6 +261,7 @@ shared_examples 'conferences_page' do |context|
   end
 
   it "should allow group users to delete an active conference", priority: pick_priority(context, student: "1", teacher: "2"),test_id: pick_test_id(context, student: 323557, teacher: 323558) do
+    skip_if_chrome('delete_conference method is fragile')
     WimbaConference.create!(title: "new conference", user: @user, context: @testgroup.first)
     get conferences_page
 
@@ -249,6 +270,7 @@ shared_examples 'conferences_page' do |context|
   end
 
   it "should allow group users to delete a concluded conference", priority: pick_priority(context, student: "1", teacher: "2"),test_id: pick_test_id(context, student: 323559, teacher: 323560) do
+    skip_if_chrome('delete_conference method is fragile')
     cc = WimbaConference.create!(title: "cncluded conference", user: @user, context: @testgroup.first)
     conclude_conference(cc)
     get conferences_page

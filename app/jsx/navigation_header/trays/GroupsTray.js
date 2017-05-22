@@ -1,7 +1,25 @@
+/*
+ * Copyright (C) 2015 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import I18n from 'i18n!new_nav'
 import React from 'react'
 import SVGWrapper from 'jsx/shared/SVGWrapper'
-import Spinner from 'instructure-ui/Spinner'
+import Spinner from 'instructure-ui/lib/components/Spinner'
 
   var GroupsTray = React.createClass({
     propTypes: {
@@ -24,14 +42,12 @@ import Spinner from 'instructure-ui/Spinner'
           </li>
         );
       }
-      var groups =  this.props.groups.map((group) => {
-        if (group.can_access && !group.concluded) {
-          return (
-            <li className="ic-NavMenu-list-item" key={group.id}>
-              <a href={`/groups/${group.id}`} className='ic-NavMenu-list-item__link'>{group.name}</a>
-            </li>
-          );
-        };
+      var groups = this.props.groups.map((group) => {
+        return (
+          <li className="ic-NavMenu-list-item" key={group.id}>
+            <a href={`/groups/${group.id}`} className='ic-NavMenu-list-item__link'>{group.name}</a>
+          </li>
+        );
       });
       groups.push(
         <li key='allGroupsLink' className='ic-NavMenu-list-item ic-NavMenu-list-item--feature-item'>

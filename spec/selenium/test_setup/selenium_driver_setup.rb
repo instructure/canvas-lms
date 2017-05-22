@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2015 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require "fileutils"
 require_relative "common_helper_methods/custom_alert_actions"
 
@@ -409,12 +426,19 @@ module SeleniumDriverSetup
       end.to_app
     end
 
+    ASSET_PATH = %r{\A/(dist|fonts|images|javascripts)/.*\.[a-z0-9]+\z}
+    def asset_request?(url)
+      url =~ ASSET_PATH
+    end
+
     def spec_safe_rack_app
       app = base_rack_app
 
       lambda do |env|
         nope = [503, {}, [""]]
         return nope unless allow_requests?
+
+        return app.call(env) if asset_request?(env["REQUEST_URI"])
 
         # wrap request in a mutex so we can ensure it doesn't span spec
         # boundaries (see clear_requests!). we also use this mutex to
@@ -438,11 +462,10 @@ module SeleniumDriverSetup
 
     def rack_app
       app = spec_safe_rack_app
-      asset_path = %r{\A/(dist|fonts|images|javascripts)/.*\.[a-z0-9]+\z}
 
       lambda do |env|
         # make legit asset 404s return more quickly
-        asset_request = env["REQUEST_URI"] =~ asset_path
+        asset_request = asset_request?(env["REQUEST_URI"])
         return [404, {}, [""]] if asset_request && !File.exist?("public/#{env["REQUEST_URI"]}")
 
         req = "#{env['REQUEST_METHOD']} #{env['REQUEST_URI']}"
@@ -476,8 +499,8 @@ module SeleniumDriverSetup
     end
 
     def start_in_process_thin_server
-      require File.expand_path(File.dirname(__FILE__) + '/servers/thin_server')
-      self.server = SpecFriendlyThinServer
+      require_relative "spec_friendly_web_server"
+      self.server = SpecFriendlyWebServer
       server.run(rack_app, port: server_port)
     end
   end

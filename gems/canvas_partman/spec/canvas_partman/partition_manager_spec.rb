@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2014 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 describe CanvasPartman::PartitionManager do
   describe '.create' do
     it 'should whine if the target class is not Partitioned' do
@@ -27,6 +44,14 @@ describe CanvasPartman::PartitionManager do
           expect(SchemaHelper.table_exists?('partman_animals_2014_11')).to be true
           expect(SchemaHelper.table_exists?('partman_animals_2014_12')).to be true
         end
+      end
+
+      it "brings along foreign keys" do
+        subject.create_partition(Time.new(2014, 11))
+        parent_foreign_key = Animal.connection.foreign_keys("partman_animals")[0]
+        foreign_key = Animal.connection.foreign_keys("partman_animals_2014_11")[0]
+        expect(foreign_key.to_table).to eq("partman_zoos")
+        expect(foreign_key.options.except(:name)).to eq(parent_foreign_key.options.except(:name))
       end
     end
 
@@ -74,6 +99,14 @@ describe CanvasPartman::PartitionManager do
 
         expect(SchemaHelper.table_exists?('partman_trails_0')).to be true
         expect(SchemaHelper.table_exists?('partman_trails_1')).to be true
+      end
+
+      it "brings along foreign keys" do
+        subject.create_partition(0)
+        parent_foreign_key = Trail.connection.foreign_keys("partman_trails")[0]
+        foreign_key = Trail.connection.foreign_keys("partman_trails_0")[0]
+        expect(foreign_key.to_table).to eq("partman_zoos")
+        expect(foreign_key.options.except(:name)).to eq(parent_foreign_key.options.except(:name))
       end
     end
 

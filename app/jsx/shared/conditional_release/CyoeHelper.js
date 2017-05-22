@@ -1,5 +1,24 @@
+/*
+ * Copyright (C) 2016 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import I18n from 'i18n!format_range'
-import scoreHelper from './score'
+import { transformScore } from './score'
+
   const isEnabled = () => ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED || false
   const parseEnvData = () => {
     const activeRules = ENV.CONDITIONAL_RELEASE_ENV && ENV.CONDITIONAL_RELEASE_ENV.active_rules || []
@@ -38,8 +57,8 @@ import scoreHelper from './score'
     } else if (ranges.length > 0) {
       const range = ranges[0]
       return I18n.t('%{upper} - %{lower}', {
-        upper: scoreHelper.transformScore(range.upper_bound, range.assignment, true),
-        lower: scoreHelper.transformScore(range.lower_bound, range.assignment, false),
+        upper: transformScore(range.upper_bound, range.assignment, true),
+        lower: transformScore(range.lower_bound, range.assignment, false),
       })
     } else {
       return null

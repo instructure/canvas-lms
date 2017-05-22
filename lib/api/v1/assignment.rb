@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2016 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -735,15 +735,15 @@ module Api::V1::Assignment
     assignment = prepared_update[:assignment]
     overrides = prepared_update[:overrides]
 
-    return :forbidden if assignment.is_child_content? && (assignment.editing_restricted?(:due_dates) || assignment.editing_restricted?(:availability_dates))
+    return :forbidden if overrides.any? && assignment.is_child_content? && (assignment.editing_restricted?(:due_dates) || assignment.editing_restricted?(:availability_dates))
 
     prepared_batch = prepare_assignment_overrides_for_batch_update(assignment, overrides, user)
 
     return :forbidden unless grading_periods_allow_assignment_overrides_batch_update?(assignment, prepared_batch)
 
     assignment.transaction do
-      perform_batch_update_assignment_overrides(assignment, prepared_batch)
       assignment.save_without_broadcasting!
+      perform_batch_update_assignment_overrides(assignment, prepared_batch)
     end
 
     assignment.do_notifications!(prepared_update[:old_assignment], prepared_update[:notify_of_update])

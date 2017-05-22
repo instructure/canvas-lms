@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2015 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 module Canvas::LiveEvents
   def self.post_event_stringified(event_name, payload, context = nil)
     StringifyIds.recursively_stringify_ids(payload)
@@ -385,6 +402,6 @@ module Canvas::LiveEvents
 
   def self.quiz_export_complete(content_export)
     payload = content_export.settings[:quizzes2]
-    post_event_stringified('quiz_export_complete', payload)
+    post_event_stringified('quiz_export_complete', payload, amended_context(content_export.context))
   end
 end

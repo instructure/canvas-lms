@@ -1,15 +1,33 @@
+<%
+# Copyright (C) 2012 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
 <div class="ic-Form-control ic-Form-control--radio" %>
-  <%= f.label :self_registration, t('Self Registration'), class: 'ic-Label' %>
+  <span class="ic-Label"><%= t('Self Registration') %></span>
   <div class="ic-Radio">
-    <%= f.radio_button :self_registration, 'none', id: "self_registration_none_#{aac.id}", checked: aac.self_registration == 'none' %>
-    <%= f.label :self_registration, t('Disabled'), for: "self_registration_none_#{aac.id}", class: 'ic-Label' %>
+    <%= f.radio_button :self_registration, 'none', id: "self_registration_none_#{presenter.id_suffix(aac)}", checked: aac.self_registration == 'none' %>
+    <%= f.label :self_registration, t('Disabled'), for: "self_registration_none_#{presenter.id_suffix(aac)}", class: 'ic-Label' %>
   </div>
   <div class="ic-Radio">
-    <%= f.radio_button :self_registration, 'all', id: "self_registration_all_#{aac.id}", checked: aac.self_registration == 'all' %>
-    <%= f.label :self_registration, t('All Account Types'), for: "self_registration_all_#{aac.id}", class: 'ic-Label' %>
+    <%= f.radio_button :self_registration, 'all', id: "self_registration_all_#{presenter.id_suffix(aac)}", checked: aac.self_registration == 'all' %>
+    <%= f.label :self_registration, t('All Account Types'), for: "self_registration_all_#{presenter.id_suffix(aac)}", class: 'ic-Label' %>
   </div>
   <div class="ic-Radio">
-    <%= f.radio_button :self_registration, 'observer', id: "self_registration_observers_#{aac.id}", checked: aac.self_registration == 'observer' %>
-    <%= f.label :self_registration, t('Observer Accounts Only'), for: "self_registration_observers_#{aac.id}", class: 'ic-Label' %>
+    <%= f.radio_button :self_registration, 'observer', id: "self_registration_observers_#{presenter.id_suffix(aac)}", checked: aac.self_registration == 'observer' %>
+    <%= f.label :self_registration, t('Observer Accounts Only'), for: "self_registration_observers_#{presenter.id_suffix(aac)}", class: 'ic-Label' %>
   </div>
 </div>

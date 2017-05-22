@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2011 Instructure, Inc.
+/*
+ * Copyright (C) 2011 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -12,17 +12,16 @@
  * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
  * details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 define([
   'i18n!media_comments',
   'underscore',
   'vendor/jquery.ba-tinypubsub',
   'jquery' /* $ */,
   'str/htmlEscape',
-  'jst/MediaComments',
-  'compiled/media_comments/js_uploader',
   'compiled/jquery/mediaComment' /* $.fn.mediaComment */,
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jqueryui/dialog',
@@ -30,7 +29,10 @@ define([
   'jquery.instructure_misc_plugins' /* .dim, /\.log\(/ */,
   'jqueryui/progressbar' /* /\.progressbar/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, _, pubsub, $, htmlEscape, mediaCommentsTemplate, JsUploader) {
+], function (I18n, _, pubsub, $, htmlEscape) {
+
+  "use strict"
+  var jsUploader
 
   $.mediaComment = function(command, arg1, arg2) {
     var $container = $("<div/>")
@@ -259,6 +261,9 @@ define([
   var reset_selectors = false;
   var lastInit = null;
   $.mediaComment.init = function(mediaType, opts) {
+  require.ensure([], function () {
+    var swfobject = require('swfobject');
+
     lastInit = lastInit || new Date();
     mediaType = mediaType || "any";
     opts = opts || {};
@@ -270,8 +275,8 @@ define([
     var mediaCommentReady = function() {
       var ks, uid;
       if (INST.kalturaSettings.js_uploader) {
-        ks = JsUploader.getKs()
-        uid = JsUploader.getUid();
+        ks = jsUploader.getKs();
+        uid = jsUploader.getUid();
       } else {
         ks = $dialog.data('ks');
         uid = $dialog.data('uid') || "ANONYMOUS"
@@ -478,9 +483,10 @@ define([
 
     // Do JS uploader is appropriate
     if (INST.kalturaSettings.js_uploader) {
+      var JsUploader = require('compiled/media_comments/js_uploader');
       jsUploader = new JsUploader(mediaType, opts);
-      jsUploader.onReady = mediaCommentReady
-      jsUploader.addEntry = addEntry
+      jsUploader.onReady = mediaCommentReady;
+      jsUploader.addEntry = addEntry;
     }
 
     var now = new Date();
@@ -519,6 +525,7 @@ define([
       // **********************************************************************
       var checkForKS = function() {
         if($div.data('ks')) {
+          var mediaCommentsTemplate = require('jst/MediaComments');
           $div.html(mediaCommentsTemplate());
           $div.find("#media_record_tabs").tabs({activate: $.mediaComment.video_delegate.expectReady});
           mediaCommentReady();
@@ -535,7 +542,9 @@ define([
       // only call mediaCommentReady if we are not doing js uploader
       mediaCommentReady();
     }
+  }, 'mediaCommentRecordAsyncChunk')
   } // End of init function
+
   $(document).ready(function() {
     $(document).bind('reset_media_comment_forms', function() {
       $("#audio_record_holder_message,#video_record_holder_message").removeClass('saving')

@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2015 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import React from 'react'
 import $ from 'jquery'
 import _ from 'underscore'
@@ -61,7 +79,7 @@ import ModalButtons from './modal-buttons'
     },
     onSubmit(){
       const promise = this.props.onSubmit();
-      $(this.refs.modal.getDOMNode()).disableWhileLoading(promise);
+      $(this.modal).disableWhileLoading(promise);
     },
     getAppElement () {
       // Need to wait for the dom to load before we can get the default #application dom element
@@ -112,7 +130,7 @@ import ModalButtons from './modal-buttons'
             overlayClassName={this.props.overlayClassName}
             contentLabel={this.props.contentLabel}
             appElement={this.getAppElement()}>
-            <div ref="modal"
+            <div ref={(c) => { this.modal = c }}
               className="ReactModal__Layout"
               style={this.props.style}
             >
@@ -121,7 +139,7 @@ import ModalButtons from './modal-buttons'
                   <h4>{this.props.title}</h4>
                 </div>
                 <div className="ReactModal__Header-Actions">
-                  <button ref="closeWithX" className="Button Button--icon-action" type="button" onClick={this.closeWithX}>
+                  <button ref={(c) => { this.closeBtn = c }} className="Button Button--icon-action" type="button" onClick={this.closeWithX}>
                     <i className="icon-x"></i>
                     <span className="screenreader-only">Close</span>
                   </button>

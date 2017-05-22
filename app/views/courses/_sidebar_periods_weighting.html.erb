@@ -1,0 +1,44 @@
+<%
+# Copyright (C) 2017 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<div role="complementary" aria-label="<%= t('Grading Period Weights') %>">
+  <h2><%= t('Grading periods are weighted') %></h2>
+
+  <table class="summary">
+    <thead>
+    <tr>
+      <th scope='col'><%= t('Grading Period') %></th>
+      <th scope='col'><%= t('Weight') %></th>
+    </tr>
+    </thead>
+    <tbody>
+      <% if sidebar_periods_weighting.empty? %>
+        <tr>
+          <th scope='row' colspan="2"><%= t('No Grading Periods Set Up') %></th>
+        </tr>
+      <% else %>
+        <% sidebar_periods_weighting.each do |period| %>
+          <tr>
+            <th scope='row'><%= period.title || t('Grading Period') %></th>
+            <td><%= period.weight ? n(period.weight, percentage: true) : t('none') %></td>
+          </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>

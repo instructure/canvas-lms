@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -62,7 +62,7 @@ describe EportfoliosController do
       }
 
       before do
-        Canvas::DynamicSettings.stubs(:find).with("canvas").returns(fake_secrets)
+        Canvas::DynamicSettings.stubs(:find).with("canvas", use_env: false).returns(fake_secrets)
       end
 
       after do
@@ -78,7 +78,7 @@ describe EportfoliosController do
 
       it "exposes the feature state for rich content service to js_env" do
         @user.account.root_account.enable_feature!(:rich_content_service)
-        Canvas::DynamicSettings.stubs(:find).with("rich-content-service").returns({
+        Canvas::DynamicSettings.stubs(:find).with("rich-content-service", use_env: false).returns({
           'app-host' => 'rce.docker',
           'cdn-host' => 'rce.docker'
         })

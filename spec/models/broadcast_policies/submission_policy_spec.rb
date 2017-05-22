@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2013 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require File.expand_path('../../spec_helper', File.dirname(__FILE__))
 require_dependency "broadcast_policies/submission_policy"
 
@@ -36,7 +53,6 @@ module BroadcastPolicies
       stub("Submission").tap do |s|
         s.stubs(:group_broadcast_submission).returns(false)
         s.stubs(:assignment).returns(assignment)
-        s.stubs(:just_created).returns(true)
         s.stubs(:submitted?).returns(true)
         s.stubs(:changed_state_to).returns(false)
         s.stubs(:submitted_at).returns(submission_time)
@@ -47,6 +63,7 @@ module BroadcastPolicies
         s.stubs(:context).returns(course)
         s.stubs(:submitted_at_was).returns(nil)
         s.stubs(:submitted_at_changed?).returns(false)
+        s.stubs(:changed_state_to).with(:submitted).returns true
       end
     end
 
@@ -77,11 +94,6 @@ module BroadcastPolicies
       specify { wont_send_when { submission.stubs(:has_submission?).returns false } }
       specify { wont_send_when { submission.stubs(:late?).returns false } }
 
-      it "still sends when the state was just changed even when it wasn't just created" do
-        submission.stubs(:just_created).returns false
-        submission.stubs(:changed_state_to).with(:submitted).returns true
-        expect(policy.should_dispatch_assignment_submitted_late?).to be_truthy
-      end
     end
 
     describe '#should_dispatch_assignment_submitted?' do

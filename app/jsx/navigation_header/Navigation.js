@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2015 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import _ from 'underscore'
 import $ from 'jquery'
 import I18n from 'i18n!new_nav'
@@ -10,6 +28,7 @@ import ProfileTray from 'jsx/navigation_header/trays/ProfileTray'
 import HelpTray from 'jsx/navigation_header/trays/HelpTray'
 import SVGWrapper from 'jsx/shared/SVGWrapper'
 import preventDefault from 'compiled/fn/preventDefault'
+import parseLinkHeader from 'compiled/fn/parseLinkHeader'
 
   var EXTERNAL_TOOLS_REGEX = /^\/accounts\/[^\/]*\/(external_tools)/;
   var ACTIVE_ROUTE_REGEX = /^\/(courses|groups|accounts|grades|calendar|conversations|profile)/;
@@ -23,6 +42,12 @@ import preventDefault from 'compiled/fn/preventDefault'
     accounts: '/api/v1/accounts',
     help: '/help_links'
   };
+
+  const TYPE_FILTER_MAP = {
+    groups: group => group.can_access && !group.concluded
+  };
+
+  const RESOURCE_COUNT = 10;
 
   var Navigation = React.createClass({
     displayName: 'Navigation',
@@ -95,13 +120,37 @@ import preventDefault from 'compiled/fn/preventDefault'
       loadingState[`${type}Loading`] = true;
       this.setState(loadingState);
 
-      $.getJSON(url, (data) => {
-        var newState = {};
-        newState[type] = data;
+      this.loadResourcePage(url, type);
+    },
+
+    loadResourcePage (url, type, previousData = []) {
+      $.getJSON(url, (data, __, xhr) => {
+        const newData = previousData.concat(this.filterDataForType(data, type));
+
+        // queue the next page if we need one
+        if (newData.length < RESOURCE_COUNT) {
+          const link = parseLinkHeader(xhr);
+          if (link.next) {
+            this.loadResourcePage(link.next, type, newData);
+            return;
+          }
+        }
+
+        // finished
+        let newState = {};
+        newState[type] = newData;
         newState[`${type}Loading`] = false;
         newState[`${type}AreLoaded`] = true;
         this.setState(newState);
       });
+    },
+
+    filterDataForType (data, type) {
+      const filterFunc = TYPE_FILTER_MAP[type];
+      if (typeof filterFunc === 'function') {
+        return data.filter(filterFunc);
+      }
+      return data;
     },
 
     pollUnreadCount () {

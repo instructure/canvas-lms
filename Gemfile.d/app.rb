@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2014 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 if CANVAS_RAILS4_2
   gem 'rails', '4.2.8'
   gem 'rack', '1.6.5'
@@ -23,12 +40,13 @@ gem 'authlogic', '3.5.0'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.9.8'
+gem 'switchman', '1.9.9'
   gem 'open4', '1.3.4', require: false
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   # for folio, see the folio README
   gem 'will_paginate', '3.1.5', require: false
 
+gem 'addressable', '2.5.0', require: false
 gem "after_transaction_commit", '1.1.1'
 gem "aws-sdk", '2.6.7', require: false
 gem 'barby', '0.6.5', require: false
@@ -38,8 +56,9 @@ gem 'bcrypt', '3.1.11'
 gem 'canvas_connect', '0.3.10'
   gem 'adobe_connect', '1.0.5', require: false
 gem 'canvas_webex', '0.17'
-gem 'inst-jobs', '0.12.1'
-  gem 'rufus-scheduler', '3.3.3', require: false
+gem 'inst-jobs', '0.13.3'
+  gem 'rufus-scheduler', '3.4.0', require: false
+    gem 'et-orbi', '1.0.3', require: false
 gem 'ffi', '1.9.14', require: false
 gem 'hashery', '2.1.2', require: false
 gem 'highline', '1.7.8', require: false
@@ -93,8 +112,8 @@ gem 'sentry-raven', '0.15.6', require: false
 gem 'canvas_statsd', '2.0.4'
   gem 'statsd-ruby', '1.4.0', require: false
   gem 'aroi', '0.0.4', require: false
-gem 'diplomat', '1.0.0', require: false
 gem 'gepub', '0.7.0beta3', github: 'ccutrer/gepub', ref: '7cea2f4912f15d89bc9e9cb9d4c51e5f491c2328'
+gem 'imperium', '0.1.3', require: false
 gem 'academic_benchmarks', '0.0.9', require: false
 
 gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbacks'
@@ -135,6 +154,6 @@ gem 'multipart', path: 'gems/multipart'
 gem 'paginated_collection', path: 'gems/paginated_collection'
 gem 'stringify_ids', path: 'gems/stringify_ids'
 gem 'twitter', path: 'gems/twitter'
-gem 'vericite_api', '1.2.0'
+gem 'vericite_api', '1.5.1'
 gem 'utf8_cleaner', path: 'gems/utf8_cleaner'
 gem 'workflow', path: 'gems/workflow'

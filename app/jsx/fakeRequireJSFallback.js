@@ -1,4 +1,22 @@
 /*
+ * Copyright (C) 2016 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
   This shim is to try to not break code of our customers that use RequireJS-style
   `require`s in their Custom JS files from ThemeEditor. It is not meant to be comprehensive.
   There will be some customers that need to change their code, but there was a lot that
@@ -23,9 +41,13 @@ if (!('require' in window)) {
   const thingsWeStillAllowThemToRequire = {
     jquery: () => jQuery,
     // load these asynchronously so they are not downloaded unless asked for
-    i18nObj: () => System.import('i18nObj'),
-    underscore: () => System.import('underscore'),
-    'jsx/course_wizard/ListItems': () => System.import('jsx/course_wizard/ListItems')
+    i18nObj: () => import('i18nObj'),
+    underscore: () => import('underscore'),
+    'jsx/course_wizard/ListItems': () => new Promise(resolve => {
+      require.ensure([], require => {
+        resolve(require('jsx/course_wizard/ListItems'))
+      }, 'course_wizardListItemsAsyncChunk')
+    })
   }
 
   const getModule = (module) => {
@@ -40,13 +62,14 @@ if (!('require' in window)) {
 
   window.require = function fakeRequire (deps, callback) {
     if (callback.name !== 'fnCanvasUsesToLoadAccountJSAfterJQueryIsReady') {
-      console.error(
-        'Canvas no longer uses RequireJS. We are providing this global window.require ' +
-        'shim as convenience to try to prevent existing code from breaking, but you should fix your ' +
-        'Custom JS to do you own script loading and not depend on this fallback.\n' +
-        'If you are trying to require jQuery, you can just depend on the global "$" variable directly.\n',
-        'modules required:', deps, 'callback:', callback
+      console.warn(
+        '`require`-ing internal Canvas modules comes with no warranty, ' +
+        'things can change in any release and you are responsible for making sure your custom ' +
+        'JavaScript that uses it continues to work.'
       )
+      if (deps.includes('jquery')) {
+        console.error("You don't need to `require(['jquery...`, just use the global `$` variable directly.")
+      }
     }
     Promise.all(deps.map(getModule)).then((modules) => {
       if (callback) callback(...modules)

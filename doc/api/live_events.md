@@ -46,6 +46,7 @@ event originated as part of a web request:
 | `context_id` | String | The Canvas id of the current context. Always use the `context_type` when using this id to lookup the object. |
 | `role` | String | The role of the current user in the current context.  |
 | `hostname` | String | The hostname of the current request |
+| `producer` | String | The name of the producer of an event. Will always be 'canvas' when an event is originating in canvas. |
 | `request_id` | String | The identifier for this request. |
 | `session_id` | String | The session identifier for this request. Can be used to correlate events in the same session for a user. |
 
@@ -56,7 +57,9 @@ fields may be set:
 | ---- | ---- | ----------- |
 | `job_id` | String | The identifier for the asynchronous job. |
 | `job_tag` | String | A string identifying the type of job being performed. |
-
+| `root_account_uuid` | String | The Canvas uuid of the root account associated with the context of the job. |
+| `root_account_id` | String | The Canvas id of the root account associated with the context of the job. |
+| `root_account_lti_guid` | String | The Canvas lti_guid of the root account associated with the context of the job. |
 
 #### Body (data)
 

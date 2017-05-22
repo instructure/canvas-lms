@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2013 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 define [
   'underscore'
   'compiled/models/Assignment'
@@ -31,8 +48,11 @@ define [
 
     @optionProperty 'assignmentGroup'
 
-    initialize: ->
-      super
+    initialize: (options) ->
+      super(
+        assignmentGroup: options.assignmentGroup,
+        title: if @model? then I18n.t("Edit Assignment") else null    # let title come from trigger (see DialogForm.getDialogTitle)
+      )
       @model ?= @generateNewAssignment()
       @on "close", -> @$el[0].reset()
 
@@ -97,6 +117,15 @@ define [
         postToSISName: ENV.SIS_NAME
         isInClosedPeriod: @model.inClosedGradingPeriod()
 
+      # master_course_restrictions only apply if this is a child course
+      # and is restricted by a master course.
+      # the handlebars template doesn't do logical combinations conditions,
+      # so summarize here
+      doRestrictionsApply = !!json.is_master_course_child_content && !!json.restricted_by_master_course
+      for k, v of json.master_course_restrictions
+        json.master_course_restrictions[k] =  doRestrictionsApply && v
+      json
+
     currentUserIsAdmin: ->
       _.contains(ENV.current_user_roles, "admin")
 
@@ -136,6 +165,7 @@ define [
         postToSIS: post_to_sis
         maxNameLength: max_name_length
         name: data.name
+        maxNameLengthRequired: ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT
       })
 
       if !data.name or $.trim(data.name.toString()).length == 0

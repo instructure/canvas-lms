@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2015 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -93,14 +93,6 @@ describe AccountAuthorizationConfig::SAML do
     expect(@aac.entity_id).to eq "http://bob.cody.instructure.com/saml2"
     @account.reload
     expect(@account.settings[:saml_entity_id]).to eq "http://bob.cody.instructure.com/saml2"
-  end
-
-  it "should not overwrite a specific entity_id" do
-    @aac = @account.authentication_providers.create!(
-      auth_type: "saml",
-      entity_id: "http://wtb.instructure.com/saml2"
-    )
-    expect(@aac.entity_id).to eq "http://wtb.instructure.com/saml2"
   end
 
   it "uses the entity id set on the account" do

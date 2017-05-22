@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -267,18 +267,18 @@ class Attachment < ActiveRecord::Base
     excluded_atts += ["locked", "hidden"] if dup == existing
     dup.assign_attributes(self.attributes.except(*excluded_atts))
 
-    dup.write_attribute(:filename, self.filename)
     # avoid cycles (a -> b -> a) and self-references (a -> a) in root_attachment_id pointers
     if dup.new_record? || ![self.id, self.root_attachment_id].include?(dup.id)
       dup.root_attachment_id = self.root_attachment_id || self.id
     end
+    dup.write_attribute(:filename, self.filename) unless dup.root_attachment_id?
     dup.context = context
     dup.migration_id = options[:migration_id] || CC::CCHelper.create_key(self)
     dup.mark_as_importing!(options[:migration]) if options[:migration]
     if context.respond_to?(:log_merge_result)
       context.log_merge_result("File \"#{dup.folder && dup.folder.full_name}/#{dup.display_name}\" created")
     end
-    if context.respond_to?(:root_account_id) && self.namespace != context.root_account.file_namespace
+    if Attachment.s3_storage? && context.respond_to?(:root_account_id) && self.namespace != context.root_account.file_namespace
       dup.save_without_broadcasting!
       dup.make_rootless
       dup.change_namespace(context.root_account.file_namespace)
@@ -529,7 +529,6 @@ class Attachment < ActiveRecord::Base
   S3_EXPIRATION_TIME = 30.minutes
 
   def ajax_upload_params(pseudonym, local_upload_url, s3_success_url, options = {})
-
     # Build the data that will be needed for the user to upload to s3
     # without us being the middle-man
     sanitized_filename = full_filename.gsub(/\+/, " ")
@@ -543,8 +542,15 @@ class Attachment < ActiveRecord::Base
       ]
     }
 
+    # We don't use a Aws::S3::PresignedPost object to build this for us because
+    # there is no way to add custom parameters to the condition, like we do
+    # with `extras` below.
+    options[:datetime] = Time.now.utc.strftime("%Y%m%dT%H%M%SZ")
     res = self.store.initialize_ajax_upload_params(local_upload_url, s3_success_url, options)
-    policy = self.store.amend_policy_conditions(policy, pseudonym)
+    policy = self.store.amend_policy_conditions(policy,
+      pseudonym: pseudonym,
+      datetime: options[:datetime]
+    )
 
     if res[:upload_params]['folder'].present?
       policy['conditions'] << ['starts-with', '$folder', '']
@@ -565,11 +571,7 @@ class Attachment < ActiveRecord::Base
     policy['conditions'] += extras
 
     policy_encoded = Base64.encode64(policy.to_json).gsub(/\n/, '')
-    signature = Base64.encode64(
-      OpenSSL::HMAC.digest(
-        OpenSSL::Digest.new('sha1'), shared_secret, policy_encoded
-      )
-    ).gsub(/\n/, '')
+    sig_key, sig_val = self.store.sign_policy(policy_encoded, options[:datetime])
 
     res[:id] = id
     res[:upload_params].merge!({
@@ -577,7 +579,7 @@ class Attachment < ActiveRecord::Base
        'key' => sanitized_filename,
        'acl' => 'private',
        'Policy' => policy_encoded,
-       'Signature' => signature,
+       sig_key => sig_val
     })
     extras.map(&:to_a).each{ |extra| res[:upload_params][extra.first.first] = extra.first.last }
     res
@@ -660,7 +662,7 @@ class Attachment < ActiveRecord::Base
     end
 
     if method == :overwrite
-      atts = self.shard.activate { self.folder.active_file_attachments.where("display_name=? AND id<>?", self.display_name, self.id) }
+      atts = self.shard.activate { self.folder.active_file_attachments.where("display_name=? AND id<>?", self.display_name, self.id).to_a }
       method = :rename if atts.any? { |att| att.editing_restricted?(:any) }
     end
 
@@ -684,9 +686,9 @@ class Attachment < ActiveRecord::Base
           end
         end
       end
-    elsif method == :overwrite
-      atts.update_all(replacement_attachment_id: self.id) # so we can find the new file in content links
-      copy_access_attributes!(atts) unless atts.empty?
+    elsif method == :overwrite && atts.any?
+      Attachment.where(:id => atts).update_all(replacement_attachment_id: self.id) # so we can find the new file in content links
+      copy_access_attributes!(atts)
       atts.each do |a|
         # update content tags to refer to the new file
         ContentTag.where(:content_id => a, :content_type => 'Attachment').update_all(content_id: self.id)
@@ -730,8 +732,8 @@ class Attachment < ActiveRecord::Base
     "local_storage" + Canvas::Security.encryption_key
   end
 
-  def shared_secret
-    store.shared_secret
+  def shared_secret(datetime)
+    store.shared_secret(datetime)
   end
 
   def downloadable?
@@ -1259,18 +1261,18 @@ class Attachment < ActiveRecord::Base
     return unless child
     raise "must be a child" unless child.root_attachment_id == id
     child.root_attachment_id = nil
-    child.filename = filename if filename
     copy_attachment_content(child)
     Attachment.where(root_attachment_id: self).where.not(id: child).update_all(root_attachment_id: child.id)
   end
 
   def copy_attachment_content(destination)
+    destination.write_attribute(:filename, filename) if filename
     if Attachment.s3_storage?
       if filename && s3object.exists? && !destination.s3object.exists?
         s3object.copy_to(destination.s3object)
       end
     else
-      return if open == destination.open
+      return if destination.store.exists? && open == destination.open
       old_content_type = self.content_type
       Attachment.where(:id => self).update_all(:content_type => "invalid/invalid") # prevents find_existing_attachment_for_md5 from reattaching the child to the old root
       destination.uploaded_data = open
@@ -1284,7 +1286,6 @@ class Attachment < ActiveRecord::Base
     root = self.root_attachment
     return unless root
     self.root_attachment_id = nil
-    self.write_attribute(:filename, root.filename) if root.filename
     root.copy_attachment_content(self)
   end
 
@@ -1616,6 +1617,7 @@ class Attachment < ActiveRecord::Base
 
   def set_publish_state_for_usage_rights
     if self.context &&
+       (!self.folder || !self.folder.for_submissions?) &&
        self.context.respond_to?(:feature_enabled?) &&
        self.context.feature_enabled?(:usage_rights_required)
       self.locked = self.usage_rights.nil?

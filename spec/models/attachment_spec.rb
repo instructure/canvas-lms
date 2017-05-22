@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -515,6 +515,7 @@ describe Attachment do
       new_a = a.clone_for(@course)
       expect(new_a.context).not_to eql(a.context)
       expect(new_a.filename).to eql(a.filename)
+      expect(new_a.read_attribute(:filename)).to be_nil
       expect(new_a.root_attachment_id).to eql(a.id)
     end
 
@@ -523,6 +524,7 @@ describe Attachment do
       a = attachment_model(filename: "blech.ppt", context: c)
       new_account = Account.create
       c2 = course_factory(account: new_account)
+      Attachment.stubs(:s3_storage?).returns(true)
       Attachment.any_instance.expects(:make_rootless).once
       Attachment.any_instance.expects(:change_namespace).once
       a.clone_for(c2)
@@ -1016,7 +1018,7 @@ describe Attachment do
     before :each do
       s3_storage!
       Attachment.domain_namespace = @old_account.file_namespace
-      @root = attachment_model
+      @root = attachment_model(filename: 'unknown 2.loser')
       @child = attachment_model(:root_attachment => @root)
 
       @old_object = double('old object')
@@ -1049,7 +1051,7 @@ describe Attachment do
       expect(@child.reload.namespace).to eq @root.namespace
     end
 
-    it 'should allow making a root_attachment childess' do
+    it 'should allow making a root_attachment childless' do
       @child.update_attribute(:filename, 'invalid')
       expect(@root.s3object).to receive(:exists?).and_return(true)
       expect(@child).to receive(:s3object).and_return(@old_object)

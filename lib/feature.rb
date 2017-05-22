@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2013 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -161,7 +161,6 @@ END
       description: -> { I18n.t('Course set-up tutorial provides tips on how to leverage the feature opportunities on each page in Canvas. It is especially useful when you are new to Canvas or are setting up a new course for the first time in a long time.') },
       applies_to: 'User',
       state: 'allowed',
-      beta: true
     },
 
     'outcome_gradebook' =>
@@ -220,6 +219,15 @@ END
       display_name: -> { I18n.t('Recurring Calendar Events') },
       description: -> { I18n.t("Allows the scheduling of recurring calendar events") },
       applies_to: 'Course',
+      state: 'hidden',
+      root_opt_in: true,
+      beta: true
+    },
+    'duplicate_objects' =>
+    {
+      display_name: -> { I18n.t('Duplicate Objects') },
+      description: -> { I18n.t("Allows the duplicating of objects in Canvas") },
+      applies_to: 'Account',
       state: 'hidden',
       root_opt_in: true,
       beta: true
@@ -463,7 +471,7 @@ END
     {
       display_name: -> { I18n.t('New Annotations') },
       description: -> { I18n.t('Use the new document annotation tool') },
-      applies_to: 'Course',
+      applies_to: 'Account',
       state: 'hidden',
       beta: true,
       root_opt_in: true
@@ -504,13 +512,21 @@ END
       beta: true,
       development: true,
     },
+    'new_gradebook_history' =>
+    {
+      display_name: -> { I18n.t('New Gradebook History') },
+      description: -> { I18n.t('Enable New Gradebook History page.') },
+      applies_to: "RootAccount",
+      state: "hidden",
+      beta: true,
+      development: true,
+    },
     'modules_home_page' =>
     {
       display_name: -> { I18n.t('Modules Home Page') },
       description: -> { I18n.t('Default to modules for the course home page') },
       applies_to: "RootAccount",
       state: "allowed",
-      beta: true
     },
     'new_user_tutorial' =>
     {
@@ -518,7 +534,6 @@ END
       description: -> { I18n.t('Provide tutorial information for new users in a flyout tray.')},
       applies_to: "RootAccount",
       state: "allowed",
-      beta: true
     },
     'student_planner' =>
     {
@@ -527,7 +542,7 @@ END
       applies_to: "RootAccount",
       state: "hidden",
       beta: true,
-      development: true,
+      development: true
     },
     'quizzes2_exporter' =>
     {

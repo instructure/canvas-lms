@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2012 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 module DiscussionsCommon
@@ -31,7 +48,7 @@ module DiscussionsCommon
     click_entry_option(entry, '.al-options:visible li:eq(1) a')
     wait_for_ajaximations
     type_in_tiny 'textarea', text
-    f('.edit_html_done').click
+    move_to_click('.edit_html_done')
     wait_for_ajaximations
     validate_entry_text(entry, text)
   end
@@ -80,7 +97,7 @@ module DiscussionsCommon
   end
 
   def validate_entry_text(discussion_entry, text)
-    expect(f("#entry-#{discussion_entry.id}")).to include_text(text)
+    expect(f("#entry-#{discussion_entry.id}").text).to include(text)
   end
 
   def check_entry_option(discussion_entry, menu_item_selector)

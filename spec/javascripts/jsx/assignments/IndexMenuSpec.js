@@ -1,11 +1,30 @@
+/*
+ * Copyright (C) 2016 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 define([
   'react',
+  'react-dom',
   'react-addons-test-utils',
   'react-modal',
   'jsx/assignments/IndexMenu',
   'jsx/assignments/actions/IndexMenuActions',
   './createFakeStore',
-], (React, TestUtils, Modal, IndexMenu, Actions, createFakeStore) => {
+], (React, ReactDOM, TestUtils, Modal, IndexMenu, Actions, createFakeStore) => {
   QUnit.module('AssignmentsIndexMenu')
 
   const generateProps = (overrides, initialState = {}) => {
@@ -24,11 +43,10 @@ define([
     };
   };
 
-  const renderComponent = (props) => {
-    return TestUtils.renderIntoDocument(
+  const renderComponent = props =>
+    TestUtils.renderIntoDocument(
       <IndexMenu {...props} />
     );
-  };
 
   const context = {};
 
@@ -57,6 +75,8 @@ define([
 
     const options = TestUtils.scryRenderedDOMComponentsWithClass(component, 'al-options');
     equal(options.length, 1);
+    component.closeModal();
+    ReactDOM.unmountComponentAtNode(component.node.parentElement);
   });
 
   testCase('renders a LTI tool modal', () => {
@@ -64,6 +84,8 @@ define([
 
     const modals = TestUtils.scryRenderedComponentsWithType(component, Modal);
     equal(modals.length, 1);
+    component.closeModal();
+    ReactDOM.unmountComponentAtNode(component.node.parentElement);
   });
 
   testCase('Modal visibility agrees with state modalIsOpen', () => {
@@ -74,12 +96,18 @@ define([
     const component2 = renderComponent(generateProps({}, { modalIsOpen: false }));
     const modal2 = TestUtils.findRenderedComponentWithType(component2, Modal);
     equal(modal2.props.isOpen, false);
+    component1.closeModal();
+    component2.closeModal();
+    ReactDOM.unmountComponentAtNode(component1.node.parentElement);
+    ReactDOM.unmountComponentAtNode(component2.node.parentElement);
   });
 
   testCase('renders no iframe when there is no selectedTool in state', () => {
     const component = renderComponent(generateProps({}, { selectedTool: null }));
     const iframes = TestUtils.scryRenderedDOMComponentsWithTag(component, 'iframe');
     equal(iframes.length, 0);
+    component.closeModal();
+    ReactDOM.unmountComponentAtNode(component.node.parentElement);
   });
 
   testCase('renders iframe when there is a selectedTool in state', () => {
@@ -98,6 +126,8 @@ define([
 
     const iframes = TestUtils.scryRenderedDOMComponentsWithTag(modalPortal, 'iframe');
     equal(iframes.length, 1);
+    component.closeModal();
+    ReactDOM.unmountComponentAtNode(component.node.parentElement);
   });
 
   testCase('onWeightedToggle dispatches expected actions', () => {
@@ -115,5 +145,7 @@ define([
     equal(store.dispatchedActions.length, actionsCount + 2);
     equal(store.dispatchedActions[actionsCount + 1].type, Actions.SET_WEIGHTED);
     equal(store.dispatchedActions[actionsCount + 1].payload, false);
+    component.closeModal();
+    ReactDOM.unmountComponentAtNode(component.node.parentElement);
   });
 });

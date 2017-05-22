@@ -1,3 +1,21 @@
+<%
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
 <% sidebar_weighting ||= nil %>
 <% groups = sidebar_weighting || @context.assignment_groups.active %>
 <div role="complementary" aria-label="<%= t('Assignment Weights') %>">
@@ -21,7 +39,7 @@
       <% groups.each do |group| %>
         <tr>
           <th scope='row'><%= group.name || t('default_name', "Group") %></th>
-          <td><%= group.group_weight ? n(group.group_weight, percentage: true) : "none" %></td>
+          <td><%= group.group_weight ? n(group.group_weight, percentage: true) : t('none') %></td>
           <% tally += group.group_weight || 0 %>
         </tr>
       <% end %>

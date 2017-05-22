@@ -110,6 +110,12 @@ Specs/NoSeleniumWebDriverWait:
   Exclude:
     - "**/spec/selenium/test_setup/**/*.rb"
 
+Specs/NoSkipWithoutTicket:
+  Enabled: true
+  Include:
+    - "**/spec/**/*.rb"
+    - "**/spec_canvas/**/*.rb"
+
 Specs/NoStrftime:
   Enabled: true
   Include:

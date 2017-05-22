@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -130,8 +130,12 @@ module AccountReports
     account_report.parameters["extra_text"] = (I18n.t('account_reports.default.error_text',
       "Failed, please report the following error code to your system administrator: ErrorReport:%{error};",
       :error => @er.id)) if !csv
-    account_report.attachment = attachment
-    account_report.workflow_state = csv ? 'complete' : 'error'
+    if account_report.workflow_state == 'aborted'
+      account_report.parameters["extra_text"] = (I18n.t('Report has been aborted'))
+    else
+      account_report.attachment = attachment
+      account_report.workflow_state = csv ? 'complete' : 'error'
+    end
     account_report.update_attribute(:progress, 100)
     account_report.end_at ||= Time.now
     account_report.save

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -182,6 +182,29 @@ describe CoursesController do
         expect(response).to be_success
         expect(assigns[:past_enrollments]).to match_array([enrollment6, enrollment5, enrollment3, enrollment2, enrollment1])
         expect(assigns[:current_enrollments]).to eq [enrollment4]
+        expect(assigns[:future_enrollments]).to be_empty
+      end
+
+      it "should do other terrible date logic based on sections" do
+        @student = user_factory
+
+        # section date in past
+        course1 = Account.default.courses.create! start_at: 2.months.ago, conclude_at: 1.month.from_now
+        course1.default_section.update_attributes(:end_at => 1.month.ago)
+        course1.offer!
+        enrollment1 = course_with_student course: course1, user: @student, active_all: true
+
+        # by section date, in future
+        course2 = Account.default.courses.create! start_at: 2.months.ago, conclude_at: 1.month.ago
+        course2.default_section.update_attributes(:end_at => 1.month.from_now)
+        course2.offer!
+        enrollment2 = course_with_student course: course2, user: @student, active_all: true
+
+        user_session(@student)
+        get 'index'
+        expect(response).to be_success
+        expect(assigns[:past_enrollments]).to eq [enrollment1]
+        expect(assigns[:current_enrollments]).to eq [enrollment2]
         expect(assigns[:future_enrollments]).to be_empty
       end
 
@@ -1676,15 +1699,43 @@ describe CoursesController do
 
       it "should allow setting of default template restrictions" do
         put 'update', :id => @course.id, :format => 'json', :course => { :blueprint => '1',
-          :blueprint_restrictions => {'content' => '1', 'due_dates' => '1'}}
+          :blueprint_restrictions => {'content' => '0', 'due_dates' => '1'}}
         expect(response).to be_success
         template = MasterCourses::MasterTemplate.full_template_for(@course)
-        expect(template.default_restrictions).to eq({:content => true, :due_dates => true})
+        expect(template.default_restrictions).to eq({:content => false, :due_dates => true})
       end
 
       it "should validate template restrictions" do
         put 'update', :id => @course.id, :format => 'json', :course => { :blueprint => '1',
           :blueprint_restrictions => {'content' => '1', 'doo_dates' => '1'}}
+        expect(response).to_not be_success
+        expect(response.body).to include 'Invalid restrictions'
+      end
+
+      it "should allow setting whether to use template restrictions by object type" do
+        put 'update', :id => @course.id, :format => 'json', :course => { :blueprint => '1',
+          :use_blueprint_restrictions_by_object_type => '1'}
+        expect(response).to be_success
+        template = MasterCourses::MasterTemplate.full_template_for(@course)
+        expect(template.use_default_restrictions_by_type).to be_truthy
+      end
+
+      it "should allow setting default template restrictions by object type" do
+        put 'update', :id => @course.id, :format => 'json', :course => { :blueprint => '1',
+          :blueprint_restrictions_by_object_type =>
+            {'assignment' => {'content' => '1', 'due_dates' => '1'}, 'quiz' => {'content' => '1'}}}
+        expect(response).to be_success
+        template = MasterCourses::MasterTemplate.full_template_for(@course)
+        expect(template.default_restrictions_by_type).to eq ({
+          "Assignment" => {:content => true, :due_dates => true},
+          "Quizzes::Quiz" => {:content => true}
+        })
+      end
+
+      it "should validate default template restrictions by object type" do
+        put 'update', :id => @course.id, :format => 'json', :course => { :blueprint => '1',
+          :blueprint_restrictions_by_object_type =>
+            {'notarealtype' => {'content' => '1', 'due_dates' => '1'}}}
         expect(response).to_not be_success
         expect(response.body).to include 'Invalid restrictions'
       end
@@ -1813,19 +1864,34 @@ describe CoursesController do
       get 'sis_publish_status', :course_id => @course.id
       expect(response).to be_success
       response_body = json_parse(response.body)
-      response_body["sis_publish_statuses"]["Published"].sort_by!{|x|x["id"]}
+      response_body["sis_publish_statuses"]["Synced"].sort_by!{|x| x["id"]}
       expect(response_body).to eq({
-          "sis_publish_overall_status" => "error",
-          "sis_publish_statuses" => {
-              "Error: cause of this reason" => [
-                  {"name"=>"User", "sortable_name"=>"User", "url"=>course_user_url(@course, students[1].user), "id"=>students[1].user.id}
-                ],
-              "Published" => [
-                  {"name"=>"User", "sortable_name"=>"User", "url"=>course_user_url(@course, students[0].user), "id"=>students[0].user.id},
-                  {"name"=>"User", "sortable_name"=>"User", "url"=>course_user_url(@course, students[2].user), "id"=>students[2].user.id}
-                ].sort_by{|x|x["id"]}
+        "sis_publish_overall_status" => "error",
+        "sis_publish_statuses" => {
+          "Error: cause of this reason" => [
+            {
+              "name"=>"User",
+              "sortable_name"=>"User",
+              "url"=>course_user_url(@course, students[1].user),
+              "id"=>students[1].user.id
             }
-        })
+          ],
+          "Synced" => [
+            {
+              "name"=>"User",
+              "sortable_name"=>"User",
+              "url"=>course_user_url(@course, students[0].user),
+              "id"=>students[0].user.id
+            },
+            {
+              "name"=>"User",
+              "sortable_name"=>"User",
+              "url"=>course_user_url(@course, students[2].user),
+              "id"=>students[2].user.id
+            }
+          ].sort_by{|x| x["id"]}
+        }
+      })
     end
   end
 
@@ -1873,17 +1939,32 @@ describe CoursesController do
 
       expect(response).to be_success
       response_body = json_parse(response.body)
-      response_body["sis_publish_statuses"]["Published"].sort_by!{|x|x["id"]}
+      response_body["sis_publish_statuses"]["Synced"].sort_by!{|x| x["id"]}
       expect(response_body).to eq({
-          "sis_publish_overall_status" => "published",
-          "sis_publish_statuses" => {
-              "Published" => [
-                  {"name"=>"User", "sortable_name"=>"User", "url"=>course_user_url(@course, students[0].user), "id"=>students[0].user.id},
-                  {"name"=>"User", "sortable_name"=>"User", "url"=>course_user_url(@course, students[1].user), "id"=>students[1].user.id},
-                  {"name"=>"User", "sortable_name"=>"User", "url"=>course_user_url(@course, students[2].user), "id"=>students[2].user.id}
-                ].sort_by{|x|x["id"]}
+        "sis_publish_overall_status" => "published",
+        "sis_publish_statuses" => {
+          "Synced" => [
+            {
+              "name"=>"User",
+              "sortable_name"=>"User",
+              "url"=>course_user_url(@course, students[0].user),
+              "id"=>students[0].user.id
+            },
+            {
+              "name"=>"User",
+              "sortable_name"=>"User",
+              "url"=>course_user_url(@course, students[1].user),
+              "id"=>students[1].user.id
+            },
+            {
+              "name"=>"User",
+              "sortable_name"=>"User",
+              "url"=>course_user_url(@course, students[2].user),
+              "id"=>students[2].user.id
             }
-        })
+          ].sort_by{|x| x["id"]}
+        }
+      })
     end
   end
 
@@ -2176,6 +2257,7 @@ describe CoursesController do
       assignment.grade_student test_student, { :grade => 1, :grader => @teacher, :provisional => true }
       file = assignment.attachments.create! uploaded_data: default_uploaded_data
       assignment.submissions.first.add_comment(commenter: @teacher, message: 'blah', provisional: true, attachments: [file])
+      assignment.moderated_grading_selections.create!(:student => test_student, :provisional_grade => ModeratedGrading::ProvisionalGrade.last)
 
       expect(test_student.submissions.size).not_to be_zero
       delete 'reset_test_student', course_id: @course.id

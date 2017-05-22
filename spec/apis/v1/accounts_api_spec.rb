@@ -45,6 +45,7 @@ describe "Accounts API", type: :request do
       expect(json.sort_by { |a| a['id'] }).to eq [
         {
           'id' => @a1.id,
+          'uuid' => @a1.uuid,
           'name' => 'root',
           'root_account_id' => nil,
           'parent_account_id' => nil,
@@ -56,6 +57,7 @@ describe "Accounts API", type: :request do
         },
         {
           'id' => @a2.id,
+          'uuid' => @a2.uuid,
           'integration_id' => nil,
           'name' => 'subby',
           'root_account_id' => @a1.id,
@@ -66,7 +68,7 @@ describe "Accounts API", type: :request do
           'default_storage_quota_mb' => 321,
           'default_user_storage_quota_mb' => 54,
           'default_group_storage_quota_mb' => 41,
-          'workflow_state' => 'active',
+          'workflow_state' => 'active'
         },
       ]
     end
@@ -87,6 +89,7 @@ describe "Accounts API", type: :request do
           'default_user_storage_quota_mb' => 45,
           'default_group_storage_quota_mb' => 42,
           'workflow_state' => 'active',
+          'uuid' => @a1.uuid
         },
       ]
     end
@@ -106,6 +109,7 @@ describe "Accounts API", type: :request do
               'parent_account_id' => nil,
               'workflow_state' => 'active',
               'default_time_zone' => 'Etc/UTC',
+              'uuid' => @a1.uuid
             },
             {
               'id' => @a2.id,
@@ -114,6 +118,7 @@ describe "Accounts API", type: :request do
               'parent_account_id' => @a1.id,
               'workflow_state' => 'active',
               'default_time_zone' => 'America/Juneau',
+              'uuid' => @a2.uuid
             },
           ]
     end
@@ -137,6 +142,7 @@ describe "Accounts API", type: :request do
                 'parent_account_id' => nil,
                 'workflow_state' => 'active',
                 'default_time_zone' => 'Etc/UTC',
+                'uuid' => @a1.uuid
             },
             {
                 'id' => @a5.global_id,
@@ -145,6 +151,7 @@ describe "Accounts API", type: :request do
                 'parent_account_id' => nil,
                 'workflow_state' => 'active',
                 'default_time_zone' => 'Etc/UTC',
+                'uuid' => @a5.uuid
             },
         ]
       end
@@ -233,6 +240,7 @@ describe "Accounts API", type: :request do
         {
           'id' => @a1.id,
           'name' => 'root',
+          'uuid' => @a1.uuid,
           'root_account_id' => nil,
           'parent_account_id' => nil,
           'default_time_zone' => 'Etc/UTC',
@@ -258,6 +266,7 @@ describe "Accounts API", type: :request do
               'parent_account_id' => nil,
               'workflow_state' => 'active',
               'default_time_zone' => 'Etc/UTC',
+              'uuid' => limited.uuid
           }
       )
     end

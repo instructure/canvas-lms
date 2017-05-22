@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2015 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -189,6 +189,7 @@ class Course < ActiveRecord::Base
 
   has_many :master_course_templates, :class_name => "MasterCourses::MasterTemplate"
   has_many :master_course_subscriptions, :class_name => "MasterCourses::ChildSubscription", :foreign_key => 'child_course_id'
+  has_one :late_policy, dependent: :destroy, inverse_of: :course
 
   prepend Profile::Association
 
@@ -943,7 +944,7 @@ class Course < ActiveRecord::Base
           enrollment_ids = Enrollment.where(:course_id => self, :workflow_state => ['active', 'invited']).pluck(:id)
           if enrollment_ids.any?
             Enrollment.where(:id => enrollment_ids).update_all(:workflow_state => 'completed', :completed_at => Time.now.utc)
-            EnrollmentState.where(:enrollment_id => enrollment_ids).update_all(:state => 'completed', :state_is_current => true, :access_is_current => false)
+            EnrollmentState.where(:enrollment_id => enrollment_ids).update_all(["state = ?, state_is_current = ?, access_is_current = ?, lock_version = lock_version + 1", 'completed', true, false])
             EnrollmentState.send_later_if_production(:process_states_for_ids, enrollment_ids) # recalculate access
           end
 
@@ -957,7 +958,7 @@ class Course < ActiveRecord::Base
             enrollment_ids = enroll_scope.pluck(:id)
             if enrollment_ids.any?
               Enrollment.where(:id => enrollment_ids).update_all(:workflow_state => 'deleted')
-              EnrollmentState.where(:enrollment_id => enrollment_ids).update_all(:state => 'deleted', :state_is_current => true)
+              EnrollmentState.where(:enrollment_id => enrollment_ids).update_all(["state = ?, state_is_current = ?, lock_version = lock_version + 1", 'deleted', true])
             end
             User.send_later_if_production(:update_account_associations, user_ids)
           end
@@ -1045,9 +1046,11 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def recompute_student_scores(student_ids = nil, grading_period_id: nil, update_all_grading_period_scores: true)
+  def recompute_student_scores(student_ids = nil, grading_period_id: nil,
+                                                  update_all_grading_period_scores: true,
+                                                  update_course_score: true)
     inst_job_opts = {}
-    if student_ids.blank? && grading_period_id.nil? && update_all_grading_period_scores
+    if student_ids.blank? && grading_period_id.nil? && update_all_grading_period_scores && update_course_score
       # if we have all default args, let's queue this job in a singleton to avoid duplicates
       inst_job_opts[:singleton] = "recompute_student_scores:#{global_id}"
     end
@@ -1495,51 +1498,42 @@ class Course < ActiveRecord::Base
 
   def grade_publishing_status_translation(status, message)
     status = "unpublished" if status.blank?
-    case status
-    when 'error'
-      if message.present?
-        message = t('grade_publishing_status.error_with_message', "Error: %{message}", :message => message)
+
+    if message.present?
+      case status
+      when 'error'
+        t("Error: %{message}", message: message)
+      when 'unpublished'
+        t("Not Synced: %{message}", message: message)
+      when 'pending'
+        t("Pending: %{message}", message: message)
+      when 'publishing'
+        t("Syncing: %{message}", message: message)
+      when 'published'
+        t("Synced: %{message}", message: message)
+      when 'unpublishable'
+        t("Unsyncable: %{message}", message: message)
       else
-        message = t('grade_publishing_status.error', "Error")
-      end
-    when 'unpublished'
-      if message.present?
-        message = t('grade_publishing_status.unpublished_with_message', "Unpublished: %{message}", :message => message)
-      else
-        message = t('grade_publishing_status.unpublished', "Unpublished")
-      end
-    when 'pending'
-      if message.present?
-        message = t('grade_publishing_status.pending_with_message', "Pending: %{message}", :message => message)
-      else
-        message = t('grade_publishing_status.pending', "Pending")
-      end
-    when 'publishing'
-      if message.present?
-        message = t('grade_publishing_status.publishing_with_message', "Publishing: %{message}", :message => message)
-      else
-        message = t('grade_publishing_status.publishing', "Publishing")
-      end
-    when 'published'
-      if message.present?
-        message = t('grade_publishing_status.published_with_message', "Published: %{message}", :message => message)
-      else
-        message = t('grade_publishing_status.published', "Published")
-      end
-    when 'unpublishable'
-      if message.present?
-        message = t('grade_publishing_status.unpublishable_with_message', "Unpublishable: %{message}", :message => message)
-      else
-        message = t('grade_publishing_status.unpublishable', "Unpublishable")
+        t("Unknown status, %{status}: %{message}", message: message, status: status)
       end
     else
-      if message.present?
-        message = t('grade_publishing_status.unknown_with_message', "Unknown status, %{status}: %{message}", :message => message, :status => status)
+      case status
+      when 'error'
+        t("Error")
+      when 'unpublished'
+        t("Not Synced")
+      when 'pending'
+        t("Pending")
+      when 'publishing'
+        t("Syncing")
+      when 'published'
+        t("Synced")
+      when 'unpublishable'
+        t("Unsyncable")
       else
-        message = t('grade_publishing_status.unknown', "Unknown status, %{status}", :status => status)
+        t("Unknown status, %{status}", status: status)
       end
     end
-    message
   end
 
   def grade_publishing_statuses
@@ -2351,11 +2345,12 @@ class Course < ActiveRecord::Base
                                            enrollment_state: opts[:enrollment_state])
   end
 
-  def enrollments_visible_to(user)
+  def enrollments_visible_to(user, opts={})
     visibilities = section_visibilities_for(user)
     visibility = enrollment_visibility_level_for(user, visibilities)
 
-    apply_enrollment_visibilities_internal(current_enrollments.except(:preload), user, visibilities, visibility)
+    enrollment_scope = opts[:include_concluded] ? enrollments : current_enrollments
+    apply_enrollment_visibilities_internal(enrollment_scope.except(:preload), user, visibilities, visibility)
   end
 
   def apply_enrollment_visibilities_internal(scope, user, visibilities, visibility, enrollment_state: nil)
@@ -2727,7 +2722,7 @@ class Course < ActiveRecord::Base
       opts[:default] ||= false
       cast_expression = "Canvas::Plugin.value_to_boolean(val)"
     end
-    class_eval <<-CODE
+    class_eval <<-CODE, __FILE__, __LINE__ + 1
       def #{setting}
         if Course.settings_options[#{setting.inspect}][:inherited]
           inherited = RequestCache.cache('inherited_course_setting', #{setting.inspect}, self.global_account_id) do

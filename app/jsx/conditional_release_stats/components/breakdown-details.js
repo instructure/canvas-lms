@@ -1,9 +1,31 @@
+/*
+ * Copyright (C) 2016 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import React from 'react'
+import Button from 'instructure-ui/lib/components/Button'
+import Tray from 'instructure-ui/lib/components/Tray'
+import IconX from 'instructure-icons/react/Solid/IconXSolid'
+import I18n from 'i18n!cyoe_assignment_sidebar'
 import StudentRangeView from './student-ranges-view'
 import StudentDetailsView from './student-details-view'
 import { assignmentShape, selectedPathShape } from '../shapes/index'
 
-  const { array, object, func, bool } = React.PropTypes
+const { array, object, func, bool } = React.PropTypes
 
 export default class BreakdownDetails extends React.Component {
     static propTypes = {
@@ -12,10 +34,12 @@ export default class BreakdownDetails extends React.Component {
       assignment: assignmentShape.isRequired,
       selectedPath: selectedPathShape.isRequired,
       isStudentDetailsLoading: bool.isRequired,
+      showDetails: bool.isRequired,
 
       // actions
       selectRange: func.isRequired,
       selectStudent: func.isRequired,
+      closeSidebar: func.isRequired
     }
 
     constructor () {
@@ -61,26 +85,48 @@ export default class BreakdownDetails extends React.Component {
       const studentDetails = selectedPath.student !== null && selectedStudent ? students[selectedStudent.id] : null
 
       return (
-        <div className='crs-breakdown-details'>
-          <div className='crs-breakdown-details__content'>
-            <StudentRangeView
-              assignment={this.props.assignment}
-              ranges={this.props.ranges}
-              selectedPath={this.props.selectedPath}
-              selectRange={this.props.selectRange}
-              selectStudent={this.props.selectStudent}
-            />
-            <StudentDetailsView
-              isLoading={this.props.isStudentDetailsLoading}
-              student={selectedStudent}
-              triggerAssignment={studentDetails && studentDetails.triggerAssignment}
-              followOnAssignments={studentDetails && studentDetails.followOnAssignments}
-              selectPrevStudent={this.selectPrevStudent}
-              selectNextStudent={this.selectNextStudent}
-              unselectStudent={this.unselectStudent}
-            />
+        <Tray
+          isOpen={this.props.showDetails}
+          placement="right"
+          isDismissable={false}
+          trapFocus
+          getDefaultFocusElement={() => this.closeButton}
+          onReady={() => document.getElementById('application').setAttribute('aria-hidden', true)}
+          onClose={() => document.getElementById('application').setAttribute('aria-hidden', false)}
+        >
+          <div className="crs-breakdown-details">
+            <div className="crs-breakdown-details__content">
+              <span className="crs-breakdown-details__closeButton">
+                <Button
+                  variant="icon"
+                  ref={(e) => { this.closeButton = e }}
+                  onClick={this.props.closeSidebar}
+                >
+                  <span className="crs-breakdown-details__closeButtonIcon">
+                    <IconX title={I18n.t('Close details sidebar')} />
+                  </span>
+                </Button>
+              </span>
+              <StudentRangeView
+                assignment={this.props.assignment}
+                ranges={ranges}
+                selectedPath={selectedPath}
+                selectRange={this.props.selectRange}
+                selectStudent={this.props.selectStudent}
+                student={selectedStudent}
+              />
+              <StudentDetailsView
+                isLoading={this.props.isStudentDetailsLoading}
+                student={selectedStudent}
+                triggerAssignment={studentDetails && studentDetails.triggerAssignment}
+                followOnAssignments={studentDetails && studentDetails.followOnAssignments}
+                selectPrevStudent={this.selectPrevStudent}
+                selectNextStudent={this.selectNextStudent}
+                unselectStudent={this.unselectStudent}
+              />
+            </div>
           </div>
-        </div>
+        </Tray>
       )
     }
   }

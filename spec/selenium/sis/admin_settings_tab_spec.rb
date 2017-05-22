@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2016 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 describe "admin settings tab" do
@@ -74,11 +91,13 @@ describe "admin settings tab" do
     let(:assignment_name_length) { "#account_settings_sis_assignment_name_length_value" }
     let(:assignment_name_length_input) { "#account_settings_sis_assignment_name_length_input_value" }
 
-    def test_checkbox_on_off(id)
+    def test_checkbox_on(id)
       set_checkbox_via_label(id,true)
       click_submit
       expect(get_checkbox(id)).to be_truthy
+    end
 
+    def test_checkbox_off(id)
       set_checkbox_via_label(id,false)
       click_submit
       expect(get_checkbox(id)).to be_falsey
@@ -89,9 +108,14 @@ describe "admin settings tab" do
         account.set_feature_flag! :new_sis_integrations, 'off'
       end
 
-      it "persists SIS import settings on refresh" do
+      it "persists SIS import settings is on" do
         get_settings_page(account)
-        test_checkbox_on_off(allow_sis_import)
+        test_checkbox_on(allow_sis_import)
+      end
+
+      it "persists SIS import setting is off" do
+        get_settings_page(account)
+        test_checkbox_off(allow_sis_import)
       end
 
       it "does not display SIS syncing setting" do
@@ -105,7 +129,7 @@ describe "admin settings tab" do
           get_settings_page(account)
         end
 
-        it "does not display 'Post Grades to SIS'" do
+        it "does not display 'Sync Grades to SIS'" do
           expect(f("body")).not_to contain_css(default_grade_export)
         end
       end
@@ -116,8 +140,12 @@ describe "admin settings tab" do
           get_settings_page(account)
         end
 
-        it "persists 'Post Grades to SIS' on refresh" do
-          test_checkbox_on_off(default_grade_export)
+        it "persists 'Sync Grades to SIS' on" do
+          test_checkbox_on(default_grade_export)
+        end
+
+        it "persists 'Sync Grades to SIS' off" do
+          test_checkbox_off(default_grade_export)
         end
       end
     end
@@ -148,9 +176,14 @@ describe "admin settings tab" do
         expect(f(sis_name)).to have_value(custom_sis_name)
       end
 
-      it "persists SIS import settings on refresh" do
+      it "persists SIS import setting is on" do
         get_settings_page(account)
-        test_checkbox_on_off(allow_sis_import)
+        test_checkbox_on(allow_sis_import)
+      end
+
+      it "persists SIS import setting is off" do
+        get_settings_page(account)
+        test_checkbox_off(allow_sis_import)
       end
 
       context "persists SIS syncing settings on refresh" do
@@ -158,9 +191,14 @@ describe "admin settings tab" do
           account.set_feature_flag! 'post_grades', 'on'
         end
 
-        it do
+        it "persists SIS import setting is on" do
           get_settings_page(account)
-          test_checkbox_on_off(sis_syncing)
+          test_checkbox_on(sis_syncing)
+        end
+
+        it "persists SIS import setting is off" do
+          get_settings_page(account)
+          test_checkbox_off(sis_syncing)
         end
 
         context "SIS syncing => true" do
@@ -170,15 +208,27 @@ describe "admin settings tab" do
             get_settings_page(account)
           end
 
-          it { test_checkbox_on_off(sis_syncing_locked) }
-          it "toggles require assignment due date" do
+          it { test_checkbox_off(sis_syncing_locked) }
+          it { test_checkbox_on(sis_syncing_locked) }
+
+          it "toggles require assignment due date on" do
             set_checkbox_via_label(default_grade_export,true)
-            test_checkbox_on_off(require_assignment_due_date)
+            test_checkbox_on(require_assignment_due_date)
           end
 
-          it "toggles assignment name length" do
+          it "toggles require assignment due date off" do
             set_checkbox_via_label(default_grade_export,true)
-            test_checkbox_on_off(assignment_name_length)
+            test_checkbox_off(require_assignment_due_date)
+          end
+
+          it "toggles assignment name length on" do
+            set_checkbox_via_label(default_grade_export,true)
+            test_checkbox_on(assignment_name_length)
+          end
+
+          it "toggles assignment name length off" do
+            set_checkbox_via_label(default_grade_export,true)
+            test_checkbox_off(assignment_name_length)
           end
 
           it "should test sis assignment name length" do
@@ -202,7 +252,7 @@ describe "admin settings tab" do
           expect(f("body")).not_to contain_css(sis_syncing)
         end
 
-        it "does not display the 'Post Grades to SIS' option" do
+        it "does not display the 'Sync Grades to SIS' option" do
           expect(f("body")).not_to contain_css(default_grade_export)
         end
       end
@@ -219,7 +269,7 @@ describe "admin settings tab" do
             get_settings_page(account)
           end
 
-          it "does not display the 'Post Grades to SIS' option" do
+          it "does not display the 'Sync Grades to SIS' option" do
             expect(f(default_grade_export)).not_to be_displayed
           end
         end
@@ -231,8 +281,12 @@ describe "admin settings tab" do
             get_settings_page(account)
           end
 
-          it "persists 'Post Grades to SIS' settings on refresh" do
-            test_checkbox_on_off(default_grade_export)
+          it "persists 'Sync Grades to SIS' on" do
+            test_checkbox_on(default_grade_export)
+          end
+
+          it "persists 'Sync Grades to SIS' off" do
+            test_checkbox_off(default_grade_export)
           end
         end
       end

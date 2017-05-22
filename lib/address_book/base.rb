@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2016 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 module AddressBook
 
   # base interface and partial implementation of AddressBook, including
@@ -26,12 +43,9 @@ module AddressBook
 
     # filters the list of given users to those actually known.
     #
-    # the :include_context option ensures that the recipients' roles in that
-    # context, if any, are included in the cached common contexts. this is
-    # useful when the sender knows the recipient via and admin relationship
-    # rather than through the context. note that this also causes the
-    # recipients in the given context to be included even if not otherwise
-    # known; pass only if you know the sender is an admin over that context.
+    # the :context option causes the users to be filtered to only those known
+    # through the specified context. passed either as an asset string or an
+    # object (as in `known_in_context`).
     #
     # the :conversation_id option indicates that any participants in the
     # existing conversation should be considered known; ignored if the sender
@@ -70,12 +84,9 @@ module AddressBook
     end
 
     # returns the known users in the given context (passed as an asset string
-    # such as `course_123` or `course_123_teachers`).
-    #
-    # the :is_admin flag causes the sender to be treated as having admin
-    # visibility into the course; when false (default) the sender must have
-    # legitimate visibility into the course to known any of its users.
-    def known_in_context(context, is_admin=false)
+    # such as `course_123` or `course_123_teachers` or as a Course,
+    # CourseSection, or Group object).
+    def known_in_context(context)
       raise NotImplemented
     end
 
@@ -100,14 +111,8 @@ module AddressBook
     #
     #   context:
     #     when present, restricts the results to users known through the
-    #     specified context (passed as an asset string the same as for
-    #     `known_in_context`). defaults to nil
-    #
-    #   is_admin:
-    #     allows searching the specified context even if not otherwise
-    #     connected to the sender. ignored if the :context option is nil, and
-    #     defaults to false. caller is responsible to only pass true after
-    #     checking the sender has admin visibility into the context.
+    #     specified context. passed either as an asset string or an object (as
+    #     in `known_in_context`). defaults to nil
     #
     #   weak_checks:
     #     allows including "weak" users (with a workflow_state of
@@ -137,6 +142,42 @@ module AddressBook
     # returns the groups known to the sender
     def groups
       @sender.messageable_groups
+    end
+
+    protected
+
+    # determines whether the provided context (Course, CourseSection, or Group
+    # object, or an asset_string) is a valid "admin context" for the sender: a
+    # context on which they have :read_as_admin permission but in whose course
+    # (if any) they do not participate.
+    #
+    # senders can see all users in a valid admin context, even if they don't
+    # participate in that context. but if the context is or is in a course in
+    # which the sender participates, then the constraints imposed by their
+    # participation (e.g. section-limited) supercede the :read_as_admin
+    # permission.
+    def admin_context?(context)
+      # expand context-as-asset-string to context-as-object
+      context = AddressBook.load_context(context) if context.is_a?(String)
+
+      # if the context doesn't exist, or the sender does not have read_as_admin
+      # permission, they don't get an admin view
+      return false unless context && context.grants_right?(@sender, :read_as_admin)
+
+      # but even if they have read_as_admin permission, we need to check if the
+      # context is part of a course they participate in. if so, they still
+      # don't get an admin view (since we need to honor any constraints due to
+      # their participation, such as section-limited)
+      course_id =
+        case context
+        when Course then context.id
+        when CourseSection then context.course_id
+        when Group then context.context_type == 'Course' && context.context_id
+        end
+      return false if course_id && @sender.current_and_concluded_courses.where(id: course_id).exists?
+
+      # this is a valid admin context
+      true
     end
   end
 end

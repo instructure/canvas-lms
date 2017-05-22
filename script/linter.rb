@@ -5,17 +5,21 @@ require 'json'
 class Linter
   DEFAULT_OPTIONS = {
     append_files_to_command: false,
+    auto_correct: false,
     boyscout_mode: true,
     campsite_mode: true,
     comment_post_processing: proc { |comments| comments },
+    custom_comment_generation: false,
     env_sha: ENV['SHA'] || ENV['GERRIT_PATCHSET_REVISION'],
     file_regex: /./,
+    generate_comment_proc: proc { },
     gerrit_patchset: !!ENV['GERRIT_PATCHSET_REVISION'],
     heavy_mode: false,
     heavy_mode_proc: proc {},
     include_git_dir_in_output: !!!ENV['GERRIT_PATCHSET_REVISION'],
     plugin: ENV['GERRIT_PROJECT'],
     skip_file_size_check: false,
+    skip_wips: false,
   }.freeze
 
   def initialize(options = {})
@@ -36,6 +40,11 @@ class Linter
       exit 0
     end
 
+    if skip_wips && wip?
+      puts "WIP detected, #{linter_name} will not run."
+      exit 0
+    end
+
     if !skip_file_size_check && files.size == 0
       puts "No #{file_regex} file changes found, skipping #{linter_name} check!"
       exit 0
@@ -50,15 +59,20 @@ class Linter
 
   private
 
+  # TODO: generate from DEFAULT_OPTIONS
   attr_reader :append_files_to_command,
+              :auto_correct,
               :boyscout_mode,
               :campsite_mode,
               :command,
               :comment_post_processing,
               :default_boyscout_mode,
+              :custom_comment_generation,
               :env_sha,
               :file_regex,
               :format,
+              :generate_comment_proc,
+              :gergich_capture,
               :gerrit_patchset,
               :heavy_mode,
               :heavy_mode_proc,
@@ -66,7 +80,8 @@ class Linter
               :linter_name,
               :plugin,
               :severe_levels,
-              :skip_file_size_check
+              :skip_file_size_check,
+              :skip_wips
 
   def git_dir
     @git_dir ||= plugin && "gems/plugins/#{plugin}/"
@@ -78,6 +93,14 @@ class Linter
 
   def dr_diff
     @dr_diff ||= ::DrDiff::Manager.new(git_dir: git_dir, sha: env_sha, campsite: campsite_mode)
+  end
+
+  def wip?
+    dr_diff.wip?
+  end
+
+  def changes
+    dr_diff.changes
   end
 
   def files
@@ -99,8 +122,16 @@ class Linter
                                    severe_levels: severe_levels)
   end
 
+  def generate_comments
+    if custom_comment_generation
+      generate_comment_proc.call(changes: changes, auto_correct: auto_correct)
+    else
+      comments
+    end
+  end
+
   def publish_comments
-    processed_comments = comment_post_processing.call(comments)
+    processed_comments = comment_post_processing.call(generate_comments)
 
     unless processed_comments.size > 0
       puts "-- -- -- -- -- -- -- -- -- -- --"
@@ -113,17 +144,31 @@ class Linter
       publish_gergich_comments(processed_comments)
     else
       publish_local_comments(processed_comments)
+      if auto_correct
+        puts "Errors detected and possibly auto corrected."
+        puts "Fix and/or git add the corrections and try to commit again."
+        exit 1
+      end
     end
   end
 
   def publish_gergich_comments(comments)
     require "gergich"
     draft = Gergich::Draft.new
+
+    cover_comments, comments = comments.partition do |comment|
+      comment[:cover_message]
+    end
+
     comments.each do |comment|
       draft.add_comment comment[:path],
                         comment[:position],
                         comment[:message],
                         comment[:severity]
+    end
+
+    cover_comments.each do |cover_comment|
+      draft.add_message(cover_comment[:message])
     end
   end
 
@@ -135,7 +180,9 @@ class Linter
   def pretty_comment(comment)
     message = ""
     message += "[#{comment[:severity]}]".colorize(:yellow)
-    message += " #{comment[:path].colorize(:light_blue)}:#{comment[:position]}"
+    unless comment[:cover_message]
+      message += " #{comment[:path].colorize(:light_blue)}:#{comment[:position]}"
+    end
     message += " => #{comment[:message].colorize(:green)}"
     puts message
   end

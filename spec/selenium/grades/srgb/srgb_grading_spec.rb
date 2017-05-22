@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2016 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative '../../helpers/gradebook_common'
 require_relative '../page_objects/srgb_page'
 require_relative '../setup/gradebook_setup'
@@ -168,7 +185,7 @@ describe 'Screenreader Gradebook grading' do
     it 'assignment in ended gp should be gradable', test_id: 2947128, priority: "1" do
       assignment = @course.assignments.create!(due_at: 13.days.ago, title: "assign in ended")
       SRGB.visit(@course.id)
-      SRGB.select_grading_period(@gp_ended)
+      SRGB.select_grading_period(@gp_ended.title)
       SRGB.select_student(student)
       SRGB.select_assignment(assignment)
       SRGB.enter_grade(8)
@@ -180,12 +197,12 @@ describe 'Screenreader Gradebook grading' do
     it 'assignment in closed gp should not be gradable', test_id: 2947127, priority: "1" do
       assignment = @course.assignments.create!(due_at: 18.days.ago, title: "assign in closed")
       SRGB.visit(@course.id)
-      SRGB.select_grading_period(@gp_closed)
+      SRGB.select_grading_period(@gp_closed.title)
       SRGB.select_student(student)
       SRGB.select_assignment(assignment)
 
       expect(SRGB.grading_enabled?).to be false
-      expect(Submission.where(assignment_id: assignment.id, user_id: @student.id).first).to eq nil
+      expect(Submission.not_placeholder.where(assignment_id: assignment.id, user_id: @student.id).first).to eq nil
     end
   end
 end

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014 Instructure, Inc.
+# Copyright (C) 2017 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -81,6 +81,16 @@ module Lti
       end
 
 
+    end
+
+    describe 'restricted services' do
+      it "includes 'vnd.Canvas.OriginalityReport'" do
+        service = Lti::ToolConsumerProfile::RESTRICTED_SERVICES.find do |s|
+          s[:id].include? 'vnd.Canvas.submission'
+        end
+
+        expect(service).not_to be_nil
+      end
     end
 
   end

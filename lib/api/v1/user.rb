@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -30,7 +30,7 @@ module Api::V1::User
     # for User#account
     ActiveRecord::Associations::Preloader.new.preload(users, :pseudonym => :account)
 
-    # pseudonyms for User#sis_pseudoym_for and User#find_pseudonym_for_account
+    # pseudonyms for SisPseudonym
     # pseudonyms account for Pseudonym#works_for_account?
     ActiveRecord::Associations::Preloader.new.preload(users, pseudonyms: :account) if user_json_is_admin?
     if preload_email && (no_email_users = users.reject(&:email_cached?)).present?
@@ -49,7 +49,8 @@ module Api::V1::User
       enrollment_json_opts = { current_grading_period_scores: includes.include?('current_grading_period_scores') }
       if !excludes.include?('pseudonym') && user_json_is_admin?(context, current_user)
         include_root_account = @domain_root_account.trust_exists?
-        sis_pseudonym = sis_pseudonym_for(user)
+        pseudonym = SisPseudonym.for(user, @domain_root_account, type: :implicit, require_sis: false)
+        sis_pseudonym = pseudonym if pseudonym&.sis_user_id
         enrollment_json_opts[:sis_pseudonym] = sis_pseudonym
         if sis_pseudonym
           # the sis fields on pseudonym are poorly named -- sis_user_id is
@@ -66,7 +67,7 @@ module Api::V1::User
           json[:root_account] = HostUrl.context_host(sis_pseudonym.account) if include_root_account
         end
 
-        if pseudonym = (sis_pseudonym || user.find_pseudonym_for_account(@domain_root_account))
+        if pseudonym
           json[:login_id] = pseudonym.unique_id
         end
       end
@@ -313,7 +314,7 @@ module Api::V1::User
   end
 
   def sis_pseudonym_for(user)
-    SisPseudonym.for(user, @domain_root_account, @domain_root_account.trust_exists?)
+    SisPseudonym.for(user, @domain_root_account, type: :trusted)
   end
 
   def group_ids(user)

@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2016 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require 'spec_helper'
 
 describe MasterCourses::MasterContentTag do
@@ -45,7 +62,7 @@ describe MasterCourses::MasterContentTag do
     end
   end
 
-  describe "fetch_module_item_restrictions" do
+  describe "fetch_module_item_restrictions_for_child" do
     it "should fetch restrictions for module items in a most fancy fashion" do
       @copy_from = course_factory
       @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
@@ -65,7 +82,26 @@ describe MasterCourses::MasterContentTag do
       tag1 = mod.add_item(:id => copied_topic.id, :type => "discussion_topic")
       tag2 = mod.add_item(:id => copied_assmt.id, :type => "assignment")
 
-      item_restriction_map = MasterCourses::MasterContentTag.fetch_module_item_restrictions([tag1.id, tag2.id])
+      item_restriction_map = MasterCourses::MasterContentTag.fetch_module_item_restrictions_for_child([tag1.id, tag2.id])
+      expect(item_restriction_map).to eq({tag1.id => {}, tag2.id => restrictions})
+    end
+  end
+
+  describe "fetch_module_item_restrictions_for_master" do
+    it "should fetch restrictions for module items on the master-side" do
+      @copy_from = course_factory
+      @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
+      topic = @copy_from.discussion_topics.create!
+      topic_master_tag = @template.create_content_tag_for!(topic)
+      assmt = @copy_from.assignments.create!
+      restrictions = {:content => true}
+      assmt_master_tag = @template.create_content_tag_for!(assmt, {:restrictions => restrictions})
+
+      mod = @copy_from.context_modules.create!(:name => "something")
+      tag1 = mod.add_item(:id => topic.id, :type => "discussion_topic")
+      tag2 = mod.add_item(:id => assmt.id, :type => "assignment")
+
+      item_restriction_map = MasterCourses::MasterContentTag.fetch_module_item_restrictions_for_master([tag1.id, tag2.id])
       expect(item_restriction_map).to eq({tag1.id => {}, tag2.id => restrictions})
     end
   end

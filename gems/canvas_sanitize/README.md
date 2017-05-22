@@ -34,7 +34,7 @@ end
 License
 =======
 
-Copyright (C) 2011 Instructure, Inc.
+Copyright (C) 2011 - present Instructure, Inc.
 
 This file is part of Canvas.
 

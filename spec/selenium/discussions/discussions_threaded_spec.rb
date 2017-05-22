@@ -1,14 +1,35 @@
+#
+# Copyright (C) 2012 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/discussions_common')
 
 describe "threaded discussions" do
   include_context "in-process server selenium tests"
   include DiscussionsCommon
 
-  before(:each) do
+  before :once do
+    course_with_teacher(active_course: true, active_all: true, name: 'teacher')
     @topic_title = 'threaded discussion topic'
-    course_with_teacher_logged_in
     @topic = create_discussion(@topic_title, 'threaded')
-    @student = student_in_course.user
+    @student = student_in_course(course: @course, name: 'student', active_all: true).user
+  end
+
+  before(:each) do
+    user_session(@teacher)
   end
 
   it "should create a threaded discussion", priority: "1", test_id: 150511 do
@@ -51,6 +72,7 @@ describe "threaded discussions" do
   end
 
   it "should allow edits to entries with replies", priority: "2", test_id: 222520 do
+    skip_if_chrome('Type in tiny fails in chrome')
     edit_text = 'edit message'
     entry       = @topic.discussion_entries.create!(user: @student,
                                                     message: 'new threaded reply from student')
@@ -96,6 +118,7 @@ describe "threaded discussions" do
   end
 
   it "should edit a reply", priority: "1", test_id: 150514 do
+    skip_if_chrome('Type in tiny fails in chrome')
     edit_text = 'edit message'
     entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
@@ -116,6 +139,7 @@ describe "threaded discussions" do
   end
 
   it "should show a reply time that is different from the creation time", priority: "2", test_id: 113813 do
+    skip_if_chrome('Type in tiny fails in chrome')
     @enrollment.workflow_state = 'active'
     @enrollment.save!
 
@@ -161,6 +185,7 @@ describe "threaded discussions" do
   end
 
   it "should support repeated editing", priority: "2", test_id: 222523 do
+    skip_if_chrome('Type in tiny fails in chrome')
     entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     edit_entry(entry, 'New text 1')
@@ -172,6 +197,7 @@ describe "threaded discussions" do
   end
 
   it "should re-render replies after editing", priority: "2", test_id: 222524 do
+    skip_if_chrome('Type in tiny fails in chrome')
     edit_text = 'edit message'
     entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
 

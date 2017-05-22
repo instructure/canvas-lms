@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2016 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -101,6 +101,34 @@ describe Enrollment do
     it "should return the sis enrollment type otherwise" do
       e = TaEnrollment.new
       expect(e.sis_role).to eq 'ta'
+    end
+  end
+
+  describe '#destroy' do
+    before(:once) do
+      @enrollment = StudentEnrollment.create!(valid_enrollment_attributes)
+      assignment = @course.assignments.create!
+      @override = assignment.assignment_overrides.create!
+      @override.assignment_override_students.create!(user: @enrollment.user)
+    end
+
+    let(:override_student) { @override.assignment_override_students.find_by(user_id: @enrollment.user) }
+
+    it 'does not destroy assignment override students on the user if other enrollments' \
+    'for the user exist in the course' do
+      @course.enroll_user(
+        @enrollment.user,
+        'StudentEnrollment',
+        section: @course.course_sections.create!,
+        allow_multiple_enrollments: true
+      )
+      @enrollment.destroy
+      expect(override_student).to be_present
+    end
+
+    it 'destroys assignment override students on the user if no other enrollments for the user exist in the course' do
+      @enrollment.destroy
+      expect(override_student).not_to be_present
     end
   end
 
@@ -682,6 +710,17 @@ describe Enrollment do
       expect(Message.last).not_to be_nil
       expect(Message.last.notification).to eql(n)
       expect(Message.last.to).to eql(@user.email)
+    end
+
+    it "should send out notifications for enrollment acceptance correctly" do
+      teacher = user_with_pseudonym(:active_all => true)
+      n = Notification.create!(:name => "Enrollment Accepted")
+      NotificationPolicy.create!(:notification => n, :communication_channel => @user.communication_channel, :frequency => "immediately")
+      course_with_teacher(:active_all => true, :user => teacher)
+      student = user_factory
+      e = @course.enroll_student(student)
+      e.accept!
+      expect(teacher.messages).to be_exists
     end
   end
 

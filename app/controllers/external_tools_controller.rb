@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -886,6 +886,10 @@ class ExternalToolsController < ApplicationController
   # @argument tool_configuration[message_type] [String]
   #   Set this to ContentItemSelectionRequest to tell the tool to use
   #   content-item; otherwise, omit
+  #
+  # @argument tool_configuration[prefer_sis_email] [Boolean]
+  #   Set this to default the lis_person_contact_email_primary to prefer
+  #   provisioned sis_email; otherwise, omit
   #
   # @argument resource_selection[url] [String]
   #   The url of the external tool

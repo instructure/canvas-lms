@@ -1,10 +1,36 @@
+/*
+ * Copyright (C) 2015 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import React from 'react'
 import _ from 'underscore'
 import classnames from 'classnames'
 
-  var { string, any, bool } = React.PropTypes;
-
-  var idCount = 0;
+const { string, any, bool } = React.PropTypes
+let idCount = 0
+const IcInputPropTypes = {
+  error: string,
+  label: string,
+  hint: string,
+  elementType: any,
+  controlClassName: string,
+  appendLabel: bool,
+  noClassName: bool
+}
 
   /**
    * An input wrapped with appropriate ic-Form-* elements and classes,
@@ -13,30 +39,19 @@ import classnames from 'classnames'
    *
    * All other props are passed through to the <input />
    */
-  var IcInput = React.createClass({
-    propTypes: {
-      error: string,
-      label: string,
-      hint: string,
-      elementType: any,
-      controlClassName: string,
-      appendLabel: bool,
-      noClassName: bool
-    },
+  class IcInput extends React.Component {
+    static propTypes = IcInputPropTypes
+    static defaultProps = {
+      elementType: 'input'
+    }
 
-    getDefaultProps() {
-      return {
-        elementType: "input"
-      };
-    },
-
-    componentWillMount() {
+    componentWillMount () {
       this.id = `ic_input_${idCount++}`;
-    },
+    }
 
-    render() {
-      var { error, label, hint, elementType, appendLabel, controlClassName, noClassName } = this.props;
-      var inputProps = _.extend({}, _.omit(this.props, ["error", "label", "elementType"]), {id: this.id});
+    render () {
+      const { error, label, hint, elementType, appendLabel, controlClassName, noClassName } = this.props
+      const inputProps = Object.assign({}, _.omit(this.props, Object.keys(IcInputPropTypes)), {id: this.id})
       if (elementType === "input" && !this.props.type) {
         inputProps.type = "text";
       }
@@ -44,20 +59,20 @@ import classnames from 'classnames'
         inputProps.className = classnames(inputProps.className, "ic-Input");
       }
 
-      var labelElement = label &&
+      const labelElement = label &&
         <label htmlFor={this.id} className="ic-Label">{label}</label>;
 
-      var hintElement = !!hint && <div className="ic-Form-help-text">{hint}</div>
+      const hintElement = !!hint && <div className="ic-Form-help-text">{hint}</div>
 
       return (
-        <div className={classnames("ic-Form-control", controlClassName, {"ic-Form-control--has-error": error})}>
+        <div className={classnames('ic-Form-control', controlClassName, {'ic-Form-control--has-error': error})}>
           {!!label && !appendLabel && labelElement}
           {React.createElement(elementType, inputProps)}
           {!!label && appendLabel && labelElement}
           {!!error &&
             <div className="ic-Form-message ic-Form-message--error">
               <div className="ic-Form-message__Layout">
-                <i className="icon-warning" role="presentation"></i>
+                <i className="icon-warning" role="presentation" />
                 {error}
               </div>
             </div>
@@ -66,5 +81,6 @@ import classnames from 'classnames'
         </div>
       );
     }
-  });
+  }
+
 export default IcInput

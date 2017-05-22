@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -125,7 +125,8 @@ class RoleOverride < ActiveRecord::Base
           'TeacherEnrollment',
           'AccountAdmin'
         ],
-        :restrict_future_enrollments => true
+        :restrict_future_enrollments => true,
+        :applies_to_concluded => ['TeacherEnrollment', 'TaEnrollment']
       },
       :moderate_forum => {
         :label => lambda { t('permissions.moderate_form', "Moderate discussions ( delete / edit other's posts, lock topics)") },

@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2015 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import _ from 'underscore'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -29,6 +47,15 @@ import 'compiled/jquery.rails_flash_notifications'
         if (!isDate && props['dueAt'] !== null) {
           return new Error('Invalid prop `dueAt` supplied to `DueDates`. Validation failed.')
         }
+      },
+      dueDatesReadonly: React.PropTypes.bool,
+      availabilityDatesReadonly: React.PropTypes.bool
+    },
+
+    getDefaultProps () {
+      return {
+        dueDatesReadonly: false,
+        availabilityDatesReadonly: false
       }
     },
 
@@ -473,6 +500,8 @@ import 'compiled/jquery.rails_flash_notifications'
             replaceDate          = {this.replaceDate.bind(this, rowKey)}
             currentlySearching   = {this.state.currentlySearching}
             allStudentsFetched   = {this.state.allStudentsFetched}
+            dueDatesReadonly     = {this.props.dueDatesReadonly}
+            availabilityDatesReadonly = {this.props.availabilityDatesReadonly}
           />
         )
       })
@@ -485,7 +514,11 @@ import 'compiled/jquery.rails_flash_notifications'
           <div id="bordered-wrapper" className="Container__DueDateRow">
             {rowsToRender}
           </div>
-          <DueDateAddRowButton handleAdd={this.addRow} display={true}/>
+          {
+            this.props.dueDatesReadonly || this.props.availabilityDatesReadonly
+            ? null
+            : <DueDateAddRowButton handleAdd={this.addRow} display={true} />
+          }
         </div>
       )
     }

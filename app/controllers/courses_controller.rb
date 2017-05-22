@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2015 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -341,6 +341,9 @@ class CoursesController < ApplicationController
   #   When set, only return courses where the user has an enrollment with the given state.
   #   This will respect section/course/term date overrides.
   #
+  # @argument exclude_blueprint_courses [Boolean]
+  #   When set, only return courses that are not configured as blueprint courses.
+  #
   # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"public_description"|"total_scores"|"current_grading_period_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"passback_status"|"favorites"|"teachers"|"observed_users"|"course_image"]
   #   - "needs_grading_count": Optional information to include with each Course.
   #     When needs_grading_count is given, and the current user has grading
@@ -422,6 +425,8 @@ class CoursesController < ApplicationController
         @current_enrollments = []
         @future_enrollments  = []
         Canvas::Builders::EnrollmentDateBuilder.preload(all_enrollments)
+        ActiveRecord::Associations::Preloader.new.preload(all_enrollments, :course_section)
+
         all_enrollments.group_by{|e| [e.course_id, e.type]}.values.each do |enrollments|
           e = enrollments.sort_by{|e| e.state_with_date_sortable}.first
           if enrollments.count > 1
@@ -430,8 +435,7 @@ class CoursesController < ApplicationController
           end
 
           state = e.state_based_on_date
-          if [:completed, :rejected].include?(state) ||
-              (e.course.conclude_at && e.course.conclude_at < Time.now) # strictly speaking, these enrollments are perfectly active but enrollment dates are terrible
+          if [:completed, :rejected].include?(state) || e.section_or_course_date_in_past? # strictly speaking, these enrollments are perfectly active but enrollment dates are terrible
             @past_enrollments << e unless e.workflow_state == "invited"
           else
             start_at, end_at = e.enrollment_dates.first
@@ -1125,28 +1129,6 @@ class CoursesController < ApplicationController
     end
   end
 
-  def blueprint_settings
-    get_context
-    if authorized_action(@context.account, @current_user, :manage_master_courses)
-      if master_courses? && MasterCourses::MasterTemplate.is_master_course?(@context)
-        js_env({
-          accountId: @context.account.id,
-          course: @context.slice(:id, :name),
-          subAccounts: @context.account.sub_accounts.pluck(:id, :name).map{|id, name| {id: id, name: name}},
-          terms: @context.account.root_account.enrollment_terms.active.pluck(:id, :name).map{|id, name| {id: id, name: name}}
-        })
-
-        css_bundle :course_blueprint_settings
-        js_bundle :course_blueprint_settings
-
-        @page_title = join_title(t('Blueprint Settings'), @context.name)
-        render html: '', layout: true
-      else
-       render status: 404, template: 'shared/errors/404_message'
-      end
-    end
-  end
-
   # @API Get course settings
   # Returns some of a course's settings.
   #
@@ -1682,14 +1664,17 @@ class CoursesController < ApplicationController
         @course_home_view = @context.default_home_page
       end
 
+      if @context.show_announcements_on_home_page? && @context.grants_right?(@current_user, session, :read_announcements)
+        js_env(:SHOW_ANNOUNCEMENTS => true, :ANNOUNCEMENT_COURSE_ID => @context.id, :ANNOUNCEMENT_LIMIT => @context.home_page_announcement_limit)
+      end
+
       @contexts = [@context]
       case @course_home_view
       when "wiki"
         @wiki = @context.wiki
         @page = @wiki.front_page
         set_js_rights [:wiki, :page]
-        show_announcements = @context.show_announcements_on_home_page? && @context.grants_right?(@current_user, session, :read_announcements)
-        set_js_wiki_data :course_home => true, :show_announcements => show_announcements
+        set_js_wiki_data :course_home => true
         @padless = true
       when 'assignments'
         add_crumb(t('#crumbs.assignments', "Assignments"))
@@ -2167,8 +2152,21 @@ class CoursesController < ApplicationController
   #   Sets the course as a blueprint course. NOTE: The Blueprint Courses feature is in beta
   #
   # @argument course[blueprint_restrictions] [BlueprintRestriction]
-  #   Sets a default set to apply to blueprint course objects when restricted.
+  #   Sets a default set to apply to blueprint course objects when restricted,
+  #   unless _use_blueprint_restrictions_by_object_type_ is enabled.
   #   See the {api:Blueprint_Templates:BlueprintRestriction Blueprint Restriction} documentation
+  #
+  # @argument course[use_blueprint_restrictions_by_object_type] [Boolean]
+  #   When enabled, the _blueprint_restrictions_ parameter will be ignored in favor of
+  #   the _blueprint_restrictions_by_object_type_ parameter
+  #
+  # @argument course[blueprint_restrictions_by_object_type] [multiple BlueprintRestrictions]
+  #   Allows setting multiple {api:Blueprint_Templates:BlueprintRestriction Blueprint Restriction}
+  #   to apply to blueprint course objects of the matching type when restricted.
+  #   The possible object types are "assignment", "attachment", "discussion_topic", "quiz" and "wiki_page".
+  #   Example usage:
+  #     course[blueprint_restrictions_by_object_type][assignment][content]=1
+  #
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id> \
@@ -2343,18 +2341,31 @@ class CoursesController < ApplicationController
           end
         end
       end
-      if (mc_restrictions = params[:course][:blueprint_restrictions]) && MasterCourses::MasterTemplate.is_master_course?(@course)
+      blueprint_keys = [:blueprint_restrictions, :use_blueprint_restrictions_by_object_type, :blueprint_restrictions_by_object_type]
+      if blueprint_keys.any?{|k| params[:course].has_key?(k)} && MasterCourses::MasterTemplate.is_master_course?(@course)
         return unless authorized_action(@course.account, @current_user, :manage_master_courses)
         template = MasterCourses::MasterTemplate.full_template_for(@course)
-        restrictions = Hash[mc_restrictions.map{|k, v| [k.to_sym, value_to_boolean(v)]}]
-        if restrictions.has_key?(:content) && !restrictions[:content]
-          @course.errors.add(:master_course_restrictions, t("Content must be restricted"))
-        else
-          restrictions[:content] = true # just default it because whatevs
+
+        if params[:course].has_key?(:use_blueprint_restrictions_by_object_type)
+          template.use_default_restrictions_by_type = value_to_boolean(params[:course][:use_blueprint_restrictions_by_object_type])
+        end
+
+        if (mc_restrictions = params[:course][:blueprint_restrictions])
+          restrictions = Hash[mc_restrictions.map{|k, v| [k.to_sym, value_to_boolean(v)]}]
           template.default_restrictions = restrictions
-          unless template.save
-            @course.errors.add(:master_course_restrictions, t("Invalid restrictions"))
+        end
+
+        if (mc_restrictions_by_type = params[:course][:blueprint_restrictions_by_object_type])
+          parsed_restrictions_by_type = {}
+          mc_restrictions_by_type.each do |type, restrictions|
+            class_name = type == "quiz" ? "Quizzes::Quiz" : type.camelcase
+            parsed_restrictions_by_type[class_name] = Hash[restrictions.map{|k, v| [k.to_sym, value_to_boolean(v)]}]
           end
+          template.default_restrictions_by_type = parsed_restrictions_by_type
+        end
+
+        if template.changed? && !template.save
+          @course.errors.add(:master_course_restrictions, t("Invalid restrictions"))
         end
       end
 
@@ -2622,6 +2633,7 @@ class CoursesController < ApplicationController
 
       # destroy these after enrollment so
       # needs_grading_count callbacks work
+      ModeratedGrading::Selection.where(:student_id => @fake_student).delete_all
       pg_scope = ModeratedGrading::ProvisionalGrade.where(:submission_id => @fake_student.submissions)
       SubmissionComment.where(:provisional_grade_id => pg_scope).delete_all
       pg_scope.delete_all
@@ -2813,6 +2825,11 @@ class CoursesController < ApplicationController
     includes.delete 'permissions'
 
     hash = []
+
+    if enrollments.any? && value_to_boolean(params[:exclude_blueprint_courses])
+      mc_ids = MasterCourses::MasterTemplate.active.where(:course_id => enrollments.map(&:course_id)).pluck(:course_id)
+      enrollments.reject!{|e| mc_ids.include?(e.course_id)}
+    end
 
     Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
     enrollments_by_course = enrollments.group_by(&:course_id).values

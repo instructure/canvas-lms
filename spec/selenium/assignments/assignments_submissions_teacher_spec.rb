@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2012 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative '../common'
 require_relative '../helpers/files_common'
 require_relative '../helpers/submissions_common'
@@ -19,7 +36,6 @@ describe "submissions" do
 
       student_in_course
       assignment = create_assignment
-      assignment.submissions.create(:user => @student)
       get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
 
       # make sure the JS didn't burn any bridges, and submit two
@@ -34,7 +50,6 @@ describe "submissions" do
     it "should display the grade in grade field", priority: "1", test_id: 237033 do
       student_in_course
       assignment = create_assignment
-      assignment.submissions.create(:user => @student)
       assignment.grade_student @student, grade: 2, grader: @teacher
       get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
       expect(f('.grading_value')[:value]).to eq '2'

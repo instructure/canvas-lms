@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -23,7 +23,8 @@ describe 'rubric_assessment_submission_reminder' do
   before :once do
     user_model
     rubric_assessment_model(user: @user)
-    @submission = @course.assignments.first.submissions.create!(user: @user)
+    @course.enroll_student(@user)
+    @submission = @course.assignments.first.submissions.find_by!(user: @user)
     @object = @rubric_association.assessment_requests.create!(user: @user,
                                                               asset: @submission,
                                                               assessor: @user,

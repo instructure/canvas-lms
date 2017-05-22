@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -747,7 +747,8 @@ describe ApplicationController do
     let(:non_conditional_values) do
       {
         hostname: 'test.host',
-        user_agent: 'Rails Testing'
+        user_agent: 'Rails Testing',
+        producer: 'canvas'
       }
     end
 

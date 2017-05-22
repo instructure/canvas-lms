@@ -1,6 +1,6 @@
 # encoding: ASCII-8BIT
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2013 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #

@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2016 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 define [
   'jsx/shared/rce/RichContentEditor',
   'jsx/shared/rce/serviceRCELoader',
@@ -22,15 +39,13 @@ define [
            $(renderingTarget).append("<div id='fake-editor'>" + propsForRCE.toString() + "</div>")
            renderCallback()
       }
-      sinon.stub($, "getScript").callsFake((url, callback) =>
-        window.RceModule = @fakeRceModule
-        callback()
+      @stub(RCELoader, "loadRCE").callsFake((callback) =>
+        callback(@fakeRceModule)
       )
 
     teardown: ->
       fakeENV.teardown()
       $('#fixtures').empty()
-      $.getScript.restore()
       editorUtils.resetRCE()
 
   test "instatiating a remote editor", ->
@@ -38,7 +53,6 @@ define [
     RichContentEditor.preloadRemoteModule()
     target = $("#big_rce_text")
     RichContentEditor.loadNewEditor(target, { manageParent: true })
-    equal(window.RceModule, @fakeRceModule)
     equal(target.parent().attr("id"), "tinymce-parent-of-big_rce_text")
     equal(target.parent().find("#fake-editor").length, 1)
 

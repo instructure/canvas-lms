@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2011 Instructure, Inc.
+/*
+ * Copyright (C) 2011 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -12,8 +12,8 @@
  * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
  * details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 define([
@@ -29,7 +29,7 @@ define([
   'jquery.instructure_misc_plugins' /* /\.log\(/ */,
   'compiled/jquery.rails_flash_notifications',
   'jquery.templateData' /* fillTemplateData */,
-  'tinymce.editor_box',
+  // 'tinymce.editor_box', // required, but not loaded here so that all of tinymce doesn't end up in the common bundle
   'vendor/jquery.pageless' /* pageless */,
   'jqueryui/accordion' /* /\.accordion\(/ */,
   'jqueryui/tabs' /* /\.tabs/ */

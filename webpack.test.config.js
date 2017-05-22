@@ -42,7 +42,7 @@ testWebpackConfig.module.rules.unshift({
 if (process.env.COVERAGE) {
   testWebpackConfig.module.rules.unshift({
     test: /(jsx.*(\.js$|\.jsx$)|\.coffee$|public\/javascripts\/.*\.js$)/,
-    exclude: /(node_modules|spec|public\/javascripts\/(bower|client_apps|compiled|jst|jsx|translations|vendor))/,
+    exclude: /(node_modules|spec|public\/javascripts\/(bower|client_apps|translations|vendor|custom_moment_locales))/,
     loader: 'istanbul-instrumenter-loader'
   })
 }

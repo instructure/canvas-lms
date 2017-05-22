@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2016 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -424,6 +424,7 @@ RSpec.configure do |config|
       simple_cov_cmd = "rspec:#{Process.pid}:#{ENV['TEST_ENV_NUMBER']}"
       puts "Starting SimpleCov command: #{simple_cov_cmd}"
       SimpleCov.command_name(simple_cov_cmd)
+      SimpleCov.pid = Process.pid # because https://github.com/colszowka/simplecov/pull/377
     end
 
     Timecop.safe_mode = true

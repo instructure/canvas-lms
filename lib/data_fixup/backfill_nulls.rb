@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2017 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 module DataFixup
   module BackfillNulls
     # if there are multiple fields, and existing non-NULL values might be toasted
@@ -21,7 +38,7 @@ module DataFixup
         updates = fields.map { |f| "#{f}=COALESCE(#{f},#{klass.connection.quote(default_value)})" }.join(', ')
       end
 
-      scope.find_ids_in_ranges(batch_size: batch_size) do |start_id, end_id|
+      klass.find_ids_in_ranges(batch_size: batch_size) do |start_id, end_id|
         scope.where(id: start_id..end_id).update_all(updates)
         sleep(sleep_interval_per_batch) if sleep_interval_per_batch
       end

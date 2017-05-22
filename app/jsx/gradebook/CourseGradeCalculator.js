@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - 2017 Instructure, Inc.
+ * Copyright (C) 2016 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -65,10 +65,14 @@ function combineAssignmentGroupGrades (assignmentGroupGrades, includeUngraded, o
 }
 
 function combineGradingPeriodGrades (gradingPeriodGradesByPeriodId, includeUngraded) {
-  const scopedGradingPeriodGrades = _.map(gradingPeriodGradesByPeriodId, (gradingPeriodGrade) => {
+  let scopedGradingPeriodGrades = _.map(gradingPeriodGradesByPeriodId, (gradingPeriodGrade) => {
     const gradeVersion = includeUngraded ? gradingPeriodGrade.final : gradingPeriodGrade.current;
     return { ...gradeVersion, weight: gradingPeriodGrade.gradingPeriodWeight };
   });
+
+  if (!includeUngraded) {
+    scopedGradingPeriodGrades = _.filter(scopedGradingPeriodGrades, 'possible');
+  }
 
   const weightedScores = _.map(scopedGradingPeriodGrades, getWeightedPercent);
   const totalWeight = sumBy(scopedGradingPeriodGrades, 'weight');

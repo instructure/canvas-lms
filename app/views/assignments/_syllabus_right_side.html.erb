@@ -1,3 +1,21 @@
+<%
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
 <% course_home ||= false %>
 <div id="sidebar_content">
   <% current = Time.zone.today
@@ -7,7 +25,11 @@
     last_day_of_month = (first_day_of_month >> 1) - 1
     first_day = last_day_of_previous_month - last_day_of_previous_month.wday
   %>
-  <%= render :partial => 'calendars/mini_calendar', :locals => {:current => current, :first_day => first_day, :mini_css => 'static/mini_calendar_sidebar.css' } %>
-  <%= render :partial => "courses/sidebar_weighting", :object => @groups %>
+  <%= render partial: 'calendars/mini_calendar', locals: {current: current, first_day: first_day, mini_css: 'static/mini_calendar_sidebar.css' } %>
+  <% if @context.weighted_grading_periods? %>
+    <%= render partial: 'courses/sidebar_periods_weighting', object: GradingPeriod.for(@context) %>
+  <% else %>
+    <%= render partial: 'courses/sidebar_weighting', object: @groups %>
+  <% end %>
 </div>
-<%= render :partial => "shared/wiki_sidebar" %>
+<%= render partial: 'shared/wiki_sidebar' %>

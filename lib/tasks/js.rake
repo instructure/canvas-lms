@@ -36,7 +36,6 @@ namespace :js do
 
   desc "Build webpack js"
   task :webpack do
-    puts "this webpack rake task is going away. just run `yarn run webpack-production` or `yarn run webpack-development` directly."
     if ENV['RAILS_ENV'] == 'production' || ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
       puts "--> Building PRODUCTION webpack bundles"
       `npm run webpack-production`

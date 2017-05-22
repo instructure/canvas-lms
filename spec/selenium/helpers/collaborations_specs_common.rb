@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2015 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 module CollaborationsSpecsCommon
 
   def ensure_plugin(type)
@@ -15,7 +32,8 @@ module CollaborationsSpecsCommon
     validate_collaborations(%W{/courses/#{@course.id}/collaborations}, false)
 
     new_title = 'Edited collaboration'
-    f('.edit_collaboration_link').click
+    move_to_click('.edit_collaboration_link')
+    wait_for_ajaximations
     replace_content(fj('input[name="collaboration[title]"]:visible'), new_title)
     expect_new_page_load do
       submit_form('.edit_collaboration')
@@ -37,7 +55,7 @@ module CollaborationsSpecsCommon
     create_collaboration!(type, title)
     validate_collaborations(%W{/courses/#{@course.id}/collaborations}, false)
 
-    f('.delete_collaboration_link').click
+    move_to_click('.delete_collaboration_link')
 
     if type == 'google_docs'
       f('#delete_collaboration_dialog .delete_button').click

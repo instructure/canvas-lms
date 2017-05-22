@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2016 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative '../../common'
 
 class SRGB
@@ -10,7 +27,12 @@ class SRGB
       due_date: 'By Due Date'
     }.freeze
 
-    def assignment_arrangement_dropdown
+
+    def switch_to_default_gradebook_link
+      f('#switch_to_default_gradebook')
+    end
+
+    def assignment_sorting_dropdown
       f(assignment_sort_order_selector)
     end
 
@@ -38,8 +60,8 @@ class SRGB
       f('#student_information .total-grade')
     end
 
-    def assign_group_grade
-      f('.assignment-group-grade .grade')
+    def assign_subtotal_grade
+      f('.assignment-subtotal-grade .grade')
     end
 
     def secondary_id_label
@@ -122,7 +144,7 @@ class SRGB
       opt_name ||= ASSIGNMENT_SORT_ORDER_OPTIONS[ASSIGNMENT_SORT_ORDER_OPTIONS.invert[sort_order]]
       return unless opt_name
 
-      click_option(assignment_arrangement_dropdown, opt_name.to_s)
+      click_option(assignment_sorting_dropdown, opt_name.to_s)
     end
 
     def assignment_sort_order
@@ -138,7 +160,7 @@ class SRGB
     end
 
     def select_grading_period(grading_period)
-      click_option(grading_period_dropdown, grading_period.title)
+      click_option(grading_period_dropdown, grading_period)
     end
 
     def enter_grade(grade)
@@ -168,6 +190,10 @@ class SRGB
       ag = course.assignment_groups.first
       ag.rules_hash = {"drop_lowest"=>num_assignment}
       ag.save!
+    end
+
+    def total_score
+      final_grade.text
     end
 
     private

@@ -2081,8 +2081,13 @@ describe AssignmentsApiController, type: :request do
         before :once do
           student_in_course(:course => @course, :active_enrollment => true)
           @assignment = @course.assignments.create!
+          @group_category = @assignment.context.group_categories.create!(name: "foo")
+          @assignment.group_category = @group_category
+          @assignment.save!
+          @group = group_model(:context => @course, :group_category => @assignment.group_category)
           @adhoc_due_at = 5.days.from_now
           @section_due_at = 7.days.from_now
+          @group_due_at = 3.days.from_now
           @user = @teacher
         end
 
@@ -2100,6 +2105,12 @@ describe AssignmentsApiController, type: :request do
                 'due_at' => @section_due_at.iso8601
               },
               '2' => {
+                'title' => 'Group override',
+                'set_id' => @group_category.id,
+                'group_id' => @group.id,
+                'due_at' => @group_due_at.iso8601
+              },
+              '3' => {
                 'title' => 'Helpful Tag',
                 'noop_id' => 999
               }
@@ -2110,7 +2121,7 @@ describe AssignmentsApiController, type: :request do
 
         it "updates any ADHOC overrides" do
           update_assignment
-          expect(@assignment.assignment_overrides.count).to eq 3
+          expect(@assignment.assignment_overrides.count).to eq 4
           @adhoc_override = @assignment.assignment_overrides.where(set_type: 'ADHOC').first
           expect(@adhoc_override).not_to be_nil
           expect(@adhoc_override.set).to eq [@student]
@@ -2125,6 +2136,15 @@ describe AssignmentsApiController, type: :request do
           expect(@section_override.set).to eq @course.default_section
           expect(@section_override.due_at_overridden).to be_truthy
           expect(@section_override.due_at.to_i).to eq @section_due_at.to_i
+        end
+
+        it "updates any Group overrides" do
+          update_assignment
+          @group_override = @assignment.assignment_overrides.where(set_type: 'Group').first
+          expect(@group_override).not_to be_nil
+          expect(@group_override.set).to eq @group
+          expect(@group_override.due_at_overridden).to be_truthy
+          expect(@group_override.due_at.to_i).to eq @group_due_at.to_i
         end
 
         it "updates any Noop overrides" do

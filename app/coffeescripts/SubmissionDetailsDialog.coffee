@@ -46,6 +46,7 @@ define [
         width: 600
         resizable: false
 
+      @dialog.on 'dialogclose', @options.onClose
       @dialog.delegate 'select', 'change', (event) =>
         @dialog.find('.submission_detail').each (index) ->
           $(this).showIf(index == event.currentTarget.selectedIndex)

@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2016 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 module MasterCourses::TagHelper
   # may as well just reuse the code
   def self.included(klass)
@@ -8,11 +25,18 @@ module MasterCourses::TagHelper
     self.send(self.content_tag_association)
   end
 
-  def load_tags!
-    return if @content_tag_index
-    @content_tag_index = {}
-    self.content_tags.to_a.group_by(&:content_type).each do |content_type, typed_tags|
-      @content_tag_index[content_type] = typed_tags.index_by(&:content_id)
+  def load_tags!(objects=nil)
+    return if @content_tag_index && objects
+    @content_tag_index ||= {}
+    tag_scope = self.content_tags
+
+    if objects
+      return unless objects.any?
+      objects_to_load = objects.map{|o| (o.is_a?(Assignment) && o.submittable_object) || o}
+      tag_scope = tag_scope.polymorphic_where(:content => objects_to_load)
+    end
+    tag_scope.to_a.group_by(&:content_type).each do |content_type, typed_tags|
+      @content_tag_index[content_type] = typed_tags.index_by(&:content_id).merge(@content_tag_index[content_type] || {})
     end
     true
   end
@@ -44,5 +68,13 @@ module MasterCourses::TagHelper
       tag ||= self.content_tags.create!(defaults.merge(:content => content))
       tag
     end
+  end
+
+  def cached_content_tag_for(content)
+    raise "must call `load_tags!` first" unless @content_tag_index
+    if content.is_a?(Assignment) && submittable = content.submittable_object
+      content = submittable # use one child tag
+    end
+    @content_tag_index.dig(content.class.base_class.name, content.id)
   end
 end

@@ -11,9 +11,9 @@ rerun_number=0
 runs_remaining=$((1+${RERUNS_RETRY:=3}))
 spec_list=${SPEC_FILES:=spec}
 
-rerun_line="adding spec to rerun (\./.*:[0-9]+)"
+rerun_line="adding spec to rerun (\./[^ ]+)"
 exempt_from_rerun_threshold_line="exceptions are exempt from rerun thresholds"
-failed_relevant_spec_line="\[(.*) is not eligible for rerunning"
+failed_relevant_spec_line="not adding modified spec to rerun (\./.*)"
 
 pipe=/tmp/rspec-queue-pipe
 rm -f $pipe

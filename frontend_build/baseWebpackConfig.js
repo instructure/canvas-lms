@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2015 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development'
 
 const glob = require('glob')
@@ -12,6 +30,7 @@ const I18nPlugin = require('./i18nPlugin')
 const SelinimumManifestPlugin = require('./SelinimumManifestPlugin')
 const WebpackHooks = require('./webpackHooks')
 const webpackPublicPath = require('./webpackPublicPath')
+const WebpackCleanupPlugin = require('webpack-cleanup-plugin')
 const HappyPack = require('happypack')
 require('babel-polyfill')
 
@@ -90,10 +109,10 @@ module.exports = {
       'node_modules-version-of-backbone': require.resolve('backbone'),
       'node_modules-version-of-react-modal': require.resolve('react-modal'),
 
-      // once we are all-webpack we should remove this line and just change all the 'require's
-      // to instructure-ui compnentns to have the right path
-      'instructure-ui': path.resolve(__dirname, '../node_modules/instructure-ui/lib/components'),
-      'instructure-ui-themes': path.resolve(__dirname, '../node_modules/instructure-ui/lib/themes'),
+      // don't let people import these top-level modules, because then you
+      // get :allthethings: ... you need to import particular components
+      'instructure-icons$': 'invalid',
+      'instructure-ui$': 'invalid',
 
       backbone: 'Backbone',
       timezone$: 'timezone_core',
@@ -123,6 +142,7 @@ module.exports = {
     // The files are expected to have no call to require, define or similar.
     // They are allowed to use exports and module.exports.
     noParse: [
+      /node_modules\/jquery\//,
       /vendor\/md5/,
       /tinymce\/tinymce/, // has 'require' and 'define' but they are from it's own internal closure
     ],
@@ -143,16 +163,6 @@ module.exports = {
       {
         test: /vendor\/i18n/,
         loaders: ['exports-loader?I18n']
-      },
-
-
-      {
-        test: /\.js$/,
-        include: path.resolve(__dirname, '../public/javascripts'),
-        loaders: happify('js', [
-          path.join(root, 'frontend_build/jsHandlebarsHelpers'),
-          path.join(root, 'frontend_build/pluginsJstLoader'),
-        ])
       },
       {
         test: /\.js$/,
@@ -179,9 +189,7 @@ module.exports = {
           /gems\/plugins\/.*\/spec_canvas\/coffeescripts\//
         ],
         loaders: happify('coffee', [
-          'coffee-loader',
-          path.join(root, 'frontend_build/jsHandlebarsHelpers'),
-          path.join(root, 'frontend_build/pluginsJstLoader')
+          'coffee-loader'
         ])
       },
       {
@@ -208,10 +216,6 @@ module.exports = {
         loader: 'json-loader'
       },
       {
-        test: require.resolve('../public/javascripts/vendor/jquery-1.7.2'),
-        loader: 'exports-loader?window.jQuery'
-      },
-      {
         test: /vendor\/md5/,
         loader: 'exports-loader?CryptoJS'
       },
@@ -232,6 +236,10 @@ module.exports = {
     // debug/propType checking in prod.
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+    }),
+
+    new WebpackCleanupPlugin({
+      exclude: ["selinimum-manifest.json"]
     }),
 
     // handles our custom i18n stuff

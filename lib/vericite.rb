@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2016 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -273,7 +273,7 @@ module VeriCite
           end
           data.each do |externalContentUploadInfo|
             #API will return an upload URL to store the submission (throws an exception if it fails)
-            res = api_client.uploadfile(externalContentUploadInfo.url_post, args[:pdata])
+            api_client.uploadfile(externalContentUploadInfo.url_post, args[:pdata], externalContentUploadInfo.headers)
           end
           # this is a flag to signal success
           response[:returned_object_id] = external_content_data.external_content_id

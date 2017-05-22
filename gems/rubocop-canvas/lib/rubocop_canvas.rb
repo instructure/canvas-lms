@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2015 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 $LOAD_PATH << File.dirname(__FILE__)
 
 require 'rubocop'
@@ -31,6 +48,7 @@ require 'rubocop_canvas/cops/specs/ensure_spec_extension'
 require 'rubocop_canvas/cops/specs/no_execute_script'
 require 'rubocop_canvas/cops/specs/no_no_such_element_error'
 require 'rubocop_canvas/cops/specs/no_selenium_web_driver_wait.rb'
+require 'rubocop_canvas/cops/specs/no_skip_without_ticket'
 require 'rubocop_canvas/cops/specs/no_strftime'
 require 'rubocop_canvas/cops/specs/no_wait_for_no_such_element'
 require 'rubocop_canvas/cops/specs/prefer_f_over_fj'

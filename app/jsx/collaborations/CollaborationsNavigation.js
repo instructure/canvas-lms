@@ -1,32 +1,55 @@
+/*
+ * Copyright (C) 2016 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import React from 'react'
 import I18n from 'i18n!react_collaborations'
 import NewCollaborationsDropDown from 'jsx/collaborations/NewCollaborationsDropDown'
-import splitAssetString from 'compiled/str/splitAssetString'
-  class CollaborationsNavigation extends React.Component {
 
-    renderNewCollaborationsDropDown () {
-      if(this.props.ltiCollaborators.ltiCollaboratorsData.length > 0) {
-        return (<NewCollaborationsDropDown
-                  ltiCollaborators={this.props.ltiCollaborators.ltiCollaboratorsData} />)
-      }
-    }
+class CollaborationsNavigation extends React.Component {
 
-    render () {
-      const splitString = splitAssetString(ENV.context_asset_string)
-      const url = `/${splitString[0]}/${splitString[1]}/collaborations`;
+  renderNewCollaborationsDropDown () {
+    if (this.props.ltiCollaborators.ltiCollaboratorsData.length > 0) {
       return (
-        <div className="ic-Action-header">
-          <div className="ic-Action-header__Secondary">
-            {this.renderNewCollaborationsDropDown()}
-          </div>
-        </div>
+        <NewCollaborationsDropDown
+          ltiCollaborators={this.props.ltiCollaborators.ltiCollaboratorsData}
+        />
       )
     }
-  };
+    return null;
+  }
 
-  CollaborationsNavigation.propTypes = {
-    ltiCollaborators: React.PropTypes.object.isRequired,
-    actions: React.PropTypes.object
-  };
+  render () {
+    return (
+      <div className="ic-Action-header">
+        <div className="ic-Action-header__Primary">
+          <h1 className="screenreader-only">{I18n.t('Collaborations')}</h1>
+        </div>
+        <div className="ic-Action-header__Secondary">
+          {this.renderNewCollaborationsDropDown()}
+        </div>
+      </div>
+    )
+  }
+}
+
+CollaborationsNavigation.propTypes = {
+  ltiCollaborators: React.PropTypes.object.isRequired,
+  actions: React.PropTypes.object
+};
 
 export default CollaborationsNavigation

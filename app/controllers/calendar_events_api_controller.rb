@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2012 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -514,7 +514,7 @@ class CalendarEventsApiController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   def reserve
     get_event
-    if authorized_action(@event, @current_user, :reserve)
+    if authorized_action(@event, @current_user, :reserve) && check_for_past_signup(@event)
       begin
         participant_id = Shard.relative_id_for(params[:participant_id], Shard.current, Shard.current) if params[:participant_id]
         if participant_id && @event.appointment_group.grants_right?(@current_user, session, :manage)
@@ -539,6 +539,18 @@ class CalendarEventsApiController < ApplicationController
                          }],
                :status => :bad_request
       end
+    end
+  end
+
+  # Pulling participants is done from the parent event that spawns the user's child calendar events
+  def participants
+    get_event
+    if authorized_action(@event, @current_user, :read_child_events)
+      participants = Api.paginate(@event.child_event_participants.order(:id), self, api_v1_calendar_event_participants_url)
+      json = participants.map do |user|
+        user_display_json(user)
+      end
+      render :json => json
     end
   end
 
@@ -632,10 +644,13 @@ class CalendarEventsApiController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   def destroy
     get_event
-    if authorized_action(@event, @current_user, :delete)
+    if authorized_action(@event, @current_user, :delete) && check_for_past_signup(@event.parent_event)
       @event.updating_user = @current_user
       @event.cancel_reason = params[:cancel_reason]
       if @event.destroy
+        if @event.appointment_group && @event.appointment_group.appointments.count == 0 && @event.appointment_group.context.root_account.feature_enabled?(:better_scheduler)
+          @event.appointment_group.destroy
+        end
         render :json => event_json(@event, @current_user, session)
       else
         render :json => @event.errors, :status => :bad_request
@@ -1277,5 +1292,15 @@ class CalendarEventsApiController < ApplicationController
   def calendar_event_params
     params.require(:calendar_event).
       permit(CalendarEvent.permitted_attributes + [:child_event_data => strong_anything])
+  end
+
+  def check_for_past_signup(event)
+    if event && event.end_at < Time.now.utc && event.context.is_a?(AppointmentGroup)
+      unless event.context.grants_right?(@current_user, :manage)
+        render :json => { :message => 'Cannot create or change reservation for past appointment' }, :status => :forbidden
+        return false
+      end
+    end
+    true
   end
 end

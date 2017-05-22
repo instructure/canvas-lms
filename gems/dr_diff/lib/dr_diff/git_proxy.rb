@@ -1,6 +1,33 @@
 require 'shellwords'
 
 module DrDiff
+  class Change
+    attr_reader :git_dir
+    attr_reader :path
+    attr_reader :status
+
+    STATUS_MAP = {
+      "A" => "added",
+      "D" => "deleted",
+      "M" => "modified"
+    }.freeze
+
+    def initialize(status, path, git_dir)
+      @status = STATUS_MAP[status]
+      @path = path
+      @git_dir = git_dir
+    end
+
+    ROOT_DIR = File.expand_path("../../../../../", __FILE__)
+    def path_from_root
+      File.join(ROOT_DIR, git_dir || ".", path)
+    end
+
+    def to_s
+      path
+    end
+  end
+
   class GitProxy
     attr_reader :git_dir
     private :git_dir
@@ -27,7 +54,28 @@ module DrDiff
       change_diff
     end
 
+    def changes
+      command = if run_on_outstanding
+                  "git diff --name-status"
+                else
+                  "git diff-tree --no-commit-id --name-status -r #{sha}"
+                end
+      raw_changes = shell(command)
+      raw_changes.split("\n").map do |raw_change|
+        status, path = raw_change.split("\t")
+        Change.new(status, path, git_dir)
+      end
+    end
+
+    def wip?
+      first_line =~ /\A(\(|\[)?wip\b/i ? true : false
+    end
+
     private
+
+    def first_line
+      shell("git log --pretty=%s -1 #{sha}").strip
+    end
 
     def dirty?
       !shell("git status --porcelain --untracked-files=no").empty?

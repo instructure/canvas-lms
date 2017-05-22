@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2016 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 define [
   'jquery'
   'compiled/views/SisButtonView'
@@ -86,7 +103,7 @@ define [
     ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
     @assignment.set('post_to_sis', false)
     @assignment.set('name', 'Too Much Tuna')
-    @view = new SisButtonView(model: @assignment)
+    @view = new SisButtonView(model: @assignment, maxNameLengthRequired: true)
     @view.render()
     @view.$el.click()
     ok !@assignment.postToSIS()
@@ -96,7 +113,7 @@ define [
     ENV.SIS_INTEGRATION_SETTINGS_ENABLED = false
     @assignment.set('post_to_sis', false)
     @assignment.set('name', 'Too Much Tuna')
-    @view = new SisButtonView(model: @assignment)
+    @view = new SisButtonView(model: @assignment, maxNameLengthRequired: false)
     @view.render()
     @view.$el.click()
     ok @assignment.postToSIS()
@@ -106,7 +123,7 @@ define [
     ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
     @quiz.set('post_to_sis', false)
     @quiz.set('title', 'Too Much Tuna')
-    @view = new SisButtonView(model: @quiz)
+    @view = new SisButtonView(model: @quiz, maxNameLengthRequired: true)
     @view.render()
     @view.$el.click()
     ok !@quiz.postToSIS()
@@ -116,7 +133,7 @@ define [
     ENV.SIS_INTEGRATION_SETTINGS_ENABLED = false
     @quiz.set('post_to_sis', false)
     @quiz.set('title', 'Too Much Tuna')
-    @view = new SisButtonView(model: @quiz)
+    @view = new SisButtonView(model: @quiz, maxNameLengthRequired: false)
     @view.render()
     @view.$el.click()
     ok @quiz.postToSIS()

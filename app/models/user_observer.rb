@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - 2015 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -54,9 +54,15 @@ class UserObserver < ActiveRecord::Base
   end
 
   def create_linked_enrollments
-    user.student_enrollments.all_active_or_pending.order("course_id").each do |enrollment|
-      next unless enrollment.valid?
-      enrollment.create_linked_enrollment_for(observer)
+    self.class.connection.after_transaction_commit do
+      User.skip_updating_account_associations do
+        user.student_enrollments.all_active_or_pending.order("course_id").each do |enrollment|
+          next unless enrollment.valid?
+          enrollment.create_linked_enrollment_for(observer)
+        end
+
+        observer.update_account_associations
+      end
     end
   end
 

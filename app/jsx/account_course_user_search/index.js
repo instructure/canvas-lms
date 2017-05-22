@@ -1,34 +1,51 @@
+/*
+ * Copyright (C) 2015 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import React from 'react'
 import ReactTabs from 'react-tabs'
-import _ from 'underscore'
 import permissionFilter from 'jsx/shared/helpers/permissionFilter'
 import CoursesStore from './CoursesStore'
 import TermsStore from './TermsStore'
 import AccountsTreeStore from './AccountsTreeStore'
 import UsersStore from './UsersStore'
 
-  const { Tab, Tabs, TabList, TabPanel } = ReactTabs;
-  const { string, bool, shape } = React.PropTypes;
+const { Tab, Tabs, TabList, TabPanel } = ReactTabs
+const { string, bool, shape } = React.PropTypes
 
-  const stores = [CoursesStore, TermsStore, AccountsTreeStore, UsersStore];
+const stores = [CoursesStore, TermsStore, AccountsTreeStore, UsersStore]
 
-  const AccountCourseUserSearch = React.createClass({
-    propTypes: {
+  class AccountCourseUserSearch extends React.Component {
+    static propTypes = {
       accountId: string.isRequired,
       permissions: shape({
         theme_editor: bool.isRequired,
         analytics: bool.isRequired
       }).isRequired
-    },
+    }
 
-    componentWillMount() {
+    componentWillMount () {
       stores.forEach((s) => {
         s.reset({ accountId: this.props.accountId });
       });
-    },
+    }
 
-    render() {
-      const { timezones, permissions, accountId, store } = this.props;
+    render () {
+      const { timezones, permissions, store } = this.props
 
       const tabList = store.getState().tabList;
       const tabs = permissionFilter(tabList.tabs, permissions);
@@ -59,6 +76,6 @@ import UsersStore from './UsersStore'
         </Tabs>
       );
     }
-  });
+  }
 
 export default AccountCourseUserSearch

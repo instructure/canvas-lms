@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2014 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/calendar2_common')
 
@@ -433,7 +450,7 @@ describe "calendar2" do
         quick_jump_to_date(date_due.strftime '%Y-%m-%d')
 
         # verify assignment has line-through
-        expect(find('.fc-title').css_value('text-decoration')).to eql('line-through')
+        expect(find('.fc-title').css_value('text-decoration')).to include('line-through')
       end
 
       it "should strikethrough past due graded discussion", priority: "1", test_id: 518371 do
@@ -447,7 +464,7 @@ describe "calendar2" do
         quick_jump_to_date(date_due.strftime '%Y-%m-%d')
 
         # verify discussion has line-through
-        expect(find('.fc-title').css_value('text-decoration')).to eql('line-through')
+        expect(find('.fc-title').css_value('text-decoration')).to include('line-through')
       end
     end
   end
@@ -479,7 +496,7 @@ describe "calendar2" do
         quick_jump_to_date(date_due.strftime '%Y-%m-%d')
 
         # verify assignment has line-through
-        expect(find('.fc-title').css_value('text-decoration')).to eql('line-through')
+        expect(find('.fc-title').css_value('text-decoration')).to include('line-through')
       end
 
       it "should strikethrough completed graded discussion", priority: "1", test_id: 518373 do
@@ -492,8 +509,7 @@ describe "calendar2" do
 
         get "/courses/#{@course.id}/discussion_topics/#{@pub_graded_discussion_due.id}"
         find('.discussion-reply-action').click
-        wait_for_ajaximations
-        driver.execute_script "tinyMCE.activeEditor.setContent('#{reply}')"
+        type_in_tiny(".reply-textarea", reply)
         find('.btn.btn-primary').click
         wait_for_ajaximations
         get '/calendar2'
@@ -502,7 +518,7 @@ describe "calendar2" do
         quick_jump_to_date(date_due.strftime '%Y-%m-%d')
 
         # verify discussion has line-through
-        expect(find('.fc-title').css_value('text-decoration')).to eql('line-through')
+        expect(find('.fc-title').css_value('text-decoration')).to include('line-through')
       end
 
       it "should load events from adjacent months correctly" do

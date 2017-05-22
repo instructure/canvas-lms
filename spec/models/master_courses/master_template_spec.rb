@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2016 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require 'spec_helper'
 
 describe MasterCourses::MasterTemplate do
@@ -110,20 +127,68 @@ describe MasterCourses::MasterTemplate do
       page_tag = @template.content_tag_for(@page)
       expect(page_tag.reload.content).to eq @page
     end
+
+    it "should be able to load tags selectively" do
+      graded_topic = @course.discussion_topics.new
+      graded_topic.assignment = @course.assignments.build
+      graded_topic.save!
+      topic_assmt = graded_topic.assignment.reload
+      normal_topic = @course.discussion_topics.create!
+      other_assmt = @course.assignments.create!
+
+      objects = [topic_assmt, normal_topic, @assignment]
+      objects.each {|o| @template.content_tag_for(o)}
+      @template.load_tags!(objects)
+      objects.each do |o|
+        expect(@template.cached_content_tag_for(o)).to be_present
+      end
+      expect(@template.cached_content_tag_for(graded_topic)).to be_present # should load the submittable
+      expect(@template.cached_content_tag_for(other_assmt)).to be_nil
+    end
   end
 
   describe "default restriction syncing" do
-    it "should keep content tag restrictiosn up to date" do
+    before :once do
       @template = MasterCourses::MasterTemplate.set_as_master_course(@course)
-      tag1 = @template.create_content_tag_for!(@course.discussion_topics.create!)
-      tag2 = @template.create_content_tag_for!(@course.discussion_topics.create!)
+    end
+
+    it "should keep content tag restrictions up to date" do
+      tag1 = @template.create_content_tag_for!(@course.discussion_topics.create!, :use_default_restrictions => true)
+      tag2 = @template.create_content_tag_for!(@course.discussion_topics.create!, :use_default_restrictions => false)
       old_default = tag2.restrictions
-      tag2.update_attributes(:use_default_restrictions => false) # unlink
 
       new_default = {:content => true, :points => true}
       @template.update_attribute(:default_restrictions, new_default)
       expect(tag1.reload.restrictions).to eq new_default
       expect(tag2.reload.restrictions).to eq old_default
+    end
+
+    it "should keep tags up to date when default restrictions are set by object type" do
+      topic_tag1 = @template.create_content_tag_for!(@course.discussion_topics.create!, :use_default_restrictions => true)
+      topic_tag2 = @template.create_content_tag_for!(@course.discussion_topics.create!, :use_default_restrictions => false)
+      assmt_tag1 = @template.create_content_tag_for!(@course.assignments.create!, :use_default_restrictions => true)
+      assmt_tag2 = @template.create_content_tag_for!(@course.assignments.create!, :use_default_restrictions => false)
+
+      assmt_restricts = {:content => true, :points => true}
+      topic_restricts = {:content => true}
+      @template.update_attribute(:default_restrictions_by_type,
+        {'Assignment' => assmt_restricts, 'DiscussionTopic' => topic_restricts})
+
+      expect(topic_tag1.reload.restrictions).to be_blank # shouldn't have updated yet because it's not configured to use per-object defaults
+      expect(assmt_tag1.reload.restrictions).to be_blank
+
+      @template.update_attribute(:use_default_restrictions_by_type, true)
+
+      expect(topic_tag1.reload.restrictions).to eq topic_restricts
+      expect(assmt_tag1.reload.restrictions).to eq assmt_restricts
+
+      expect(topic_tag2.reload.restrictions).to be_blank # shouldn't have updated because use_default_restrictions is not set
+      expect(assmt_tag2.reload.restrictions).to be_blank
+
+      @template.update_attribute(:default_restrictions_by_type, {})
+
+      expect(topic_tag1.reload.restrictions).to be_blank
+      expect(assmt_tag1.reload.restrictions).to be_blank
     end
   end
 

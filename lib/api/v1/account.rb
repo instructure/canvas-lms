@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -37,7 +37,7 @@ module Api::V1::Account
   end
 
   def account_json(account, user, session, includes, read_only=false)
-    attributes = %w(id name parent_account_id root_account_id workflow_state)
+    attributes = %w(id name parent_account_id root_account_id workflow_state uuid)
     if read_only
       return api_json(account, user, session, :only => attributes).tap do |hash|
         hash['default_time_zone'] = account.default_time_zone.tzinfo.name

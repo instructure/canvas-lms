@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2013 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 define [
   'jquery'
   'Backbone'
@@ -46,7 +63,9 @@ define [
         gradingPeriods: @gradingPeriods,
         hasGradingPeriods: @hasGradingPeriods,
         isOnlyVisibleToOverrides: @model.assignment.isOnlyVisibleToOverrides(),
-        dueAt: tz.parse(@model.assignment.get("due_at"))
+        dueAt: tz.parse(@model.assignment.get("due_at")),
+        dueDatesReadonly: @options.dueDatesReadonly,
+        availabilityDatesReadonly: @options.availabilityDatesReadonly
       })
 
       ReactDOM.render(DueDatesElement, div)
@@ -66,7 +85,7 @@ define [
       object_type = @model.assignment.objectType()
       data_post_to_sis = data.postToSIS
       post_to_sis = false
-      if object_type == 'Assignment'
+      if object_type == 'Assignment' || object_type == 'Discussion'
         grading_type = $('#assignment_grading_type').find(":selected").val()
         post_to_sis = grading_type != 'not_graded' && data_post_to_sis
       else if object_type == 'Quiz'

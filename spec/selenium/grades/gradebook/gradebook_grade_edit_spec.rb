@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2012 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative '../../helpers/gradebook_common'
 require_relative '../page_objects/gradebook_page'
 require_relative '../page_objects/grading_curve_page'
@@ -5,6 +22,8 @@ require_relative '../page_objects/grading_curve_page'
 describe "editing grades" do
   include_context "in-process server selenium tests"
   include GradebookCommon
+
+  let(:grade_page) { Gradebook::MultipleGradingPeriods.new }
 
   before(:once) do
     gradebook_data_setup
@@ -112,8 +131,9 @@ describe "editing grades" do
 
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l5', 'A-')
     expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l5')).to include_text('A-')
-    expect(@assignment.reload.submissions.size).to eq 1
-    sub = @assignment.submissions.first
+    submissions = @assignment.submissions.where('grade is not null')
+    expect(submissions.count).to eq 1
+    sub = submissions.first
     expect(sub.grade).to eq 'A-'
     expect(sub.score).to eq 0.0
   end
@@ -252,20 +272,15 @@ describe "editing grades" do
       @second_assignment.reload
     end
 
-    before(:each) do
-      @page = Gradebook::MultipleGradingPeriods.new
-    end
-
     context 'for assignments with at least one due date in a closed grading period' do
       before(:each) do
         get "/courses/#{@course.id}/gradebook?grading_period_id=0"
-
-        @page.assignment_header_menu(@first_assignment.name).click
+        grade_page.assignment_header_menu(@first_assignment.name).click
       end
 
       describe 'the Curve Grades menu item' do
         before(:each) do
-          @curve_grades_menu_item = @page.assignment_header_menu_item('Curve Grades')
+          @curve_grades_menu_item = grade_page.assignment_header_menu_item('Curve Grades')
         end
 
         it 'is disabled' do
@@ -281,7 +296,7 @@ describe "editing grades" do
 
       describe 'the Set Default Grade menu item' do
         before(:each) do
-          @set_default_grade_menu_item = @page.assignment_header_menu_item('Set Default Grade')
+          @set_default_grade_menu_item = grade_page.assignment_header_menu_item('Set Default Grade')
         end
 
         it 'is disabled' do

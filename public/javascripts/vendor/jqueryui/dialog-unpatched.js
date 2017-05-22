@@ -129,10 +129,8 @@ $.widget("ui.dialog", {
 					"ui-corner-all  ui-helper-clearfix" )
 				.prependTo( uiDialog ),
 
-			uiDialogTitlebarClose = $( "<a href='#'></a>" )
+			uiDialogTitlebarClose = $( "<button></button>" )
 				.addClass( "ui-dialog-titlebar-close  ui-corner-all" )
-				.attr( "role", "button" )
-				.attr( "tabindex", 0)
 				.click(function( event ) {
 					event.preventDefault();
 					that.close( event );
@@ -347,7 +345,12 @@ $.widget("ui.dialog", {
 				var targetIndex = index + (event.shiftKey ? -1 : 1);
 				targetIndex = (targetIndex + tabbables.length) % tabbables.length;
 				var target = tabbables.eq(targetIndex)
-				target.focus();
+
+        if (target[0].nodeName.toUpperCase() !== 'IFRAME') {
+          target.focus();
+        } else {
+          return;
+        }
 
 				// when switching to a target for which the browser would select the
 				// full contents on default tab behavior, we still want to do the same.

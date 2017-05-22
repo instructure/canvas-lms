@@ -146,7 +146,7 @@ all docker-compose containers, or when specified explicitly. The selenium
 container needs to be started before running any specs that require selenium.
 
 ```sh
-docker-compose up selenium
+docker-compose up selenium-firefox # or selenium-chrome
 ```
 
 With the container running, you should be able to open a VNC session:

@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 module Mutable
 
   attr_accessor :recently_unmuted
@@ -24,6 +41,7 @@ module Mutable
     self.update_attribute(:muted, true)
     clear_sent_messages
     hide_stream_items
+    true
   end
 
   def unmute!
@@ -31,6 +49,7 @@ module Mutable
     self.update_attribute(:muted, false)
     broadcast_unmute_event
     show_stream_items
+    true
   end
 
   def broadcast_unmute_event
@@ -62,9 +81,9 @@ module Mutable
 
   def show_stream_items
     if self.respond_to? :submissions
-      submissions        = self.submissions.preload(hidden_submission_comments: :author)
+      submission_ids = self.submissions.pluck(:id)
       stream_items = StreamItem.select([:id, :context_type, :context_id]).
-          where(:asset_type => 'Submission', :asset_id => submissions).
+          where(:asset_type => 'Submission', :asset_id => submission_ids).
           preload(:context).to_a
       stream_item_contexts = stream_items.map { |si| [si.context_type, si.context_id] }
       associated_shards = stream_items.inject([]) { |result, si| result | si.associated_shards }
@@ -73,12 +92,14 @@ module Mutable
             update_all_with_invalidation(stream_item_contexts, :hidden => false)
       end
 
-      outstanding = submissions.map{ |submission|
-        comments = submission.hidden_submission_comments.to_a
-        next if comments.empty?
-        [submission, comments.map(&:author_id).uniq.size == 1 ? [comments.last.author] : []]
-      }.compact
-      SubmissionComment.where(:hidden => true, :submission_id => submissions).update_all(:hidden => false)
+      hidden_comment_sub_ids = SubmissionComment.where(:hidden => true, :submission_id => submission_ids).pluck(:submission_id)
+      if hidden_comment_sub_ids.any?
+        SubmissionComment.where(:hidden => true, :submission_id => hidden_comment_sub_ids).update_all(:hidden => false)
+        Submission.where(:id => hidden_comment_sub_ids).
+          update_all(["submission_comments_count = (SELECT COUNT(*) FROM #{SubmissionComment.quoted_table_name} WHERE
+            submissions.id = submission_comments.submission_id AND submission_comments.hidden = ? AND
+            submission_comments.draft IS NOT TRUE AND submission_comments.provisional_grade_id IS NULL)", false])
+      end
     end
   end
 end

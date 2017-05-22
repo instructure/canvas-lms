@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -362,7 +362,7 @@ describe Course do
   end
 
   it 'should be able to i18n without keys' do
-    Importers::CourseContentImporter.translate('stuff')
+    expect { Importers::CourseContentImporter.translate('stuff') }.not_to raise_error
   end
 end
 

@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_dependency 'canvas/draft_state_validations'
 
 module Canvas
@@ -57,15 +74,7 @@ module Canvas
       # Config
       require_dependency 'lib/config_file'
       @cache_stores = {}
-      configs = ConfigFile.load('cache_store', nil) || {}
-
-      # sanity check the file
-      unless configs.is_a?(Hash)
-        raise <<-EOS
-          Invalid config/cache_store.yml: Root is not a hash. See comments in
-          config/cache_store.yml.example
-        EOS
-      end
+      configs = ConfigFile.load('cache_store', false) || {}
 
       non_hashes = configs.keys.select { |k| !configs[k].is_a?(Hash) }
       non_hashes.reject! { |k| configs[k].is_a?(String) && configs[configs[k]].is_a?(Hash) }
@@ -78,19 +87,8 @@ module Canvas
       end
 
       configs.each do |env, config|
-        if config.is_a?(String)
-          # switchman will treat strings as a link to another database server
-          @cache_stores[env] = config
-          next
-        end
-        config = {'cache_store' => 'mem_cache_store'}.merge(config)
+        config = {'cache_store' => 'nil_store'}.merge(config)
         case config.delete('cache_store')
-        when 'mem_cache_store'
-          config['namespace'] ||= config['key']
-          servers = config['servers'] || (ConfigFile.load('memcache', env))
-          if servers
-            @cache_stores[env] = :mem_cache_store, servers, config
-          end
         when 'redis_store'
           Bundler.require 'redis'
           require_dependency 'canvas/redis'

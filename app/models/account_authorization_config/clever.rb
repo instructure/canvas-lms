@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 Instructure, Inc.
+# Copyright (C) 2015 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -39,13 +39,7 @@ class AccountAuthorizationConfig::Clever < AccountAuthorizationConfig::Oauth2
   end
 
   # Rename db field
-  def district_id=(val)
-    self.auth_filter = val.presence
-  end
-
-  def district_id
-    auth_filter
-  end
+  alias_attribute :district_id, :auth_filter
 
   def login_attribute
     super || 'id'.freeze

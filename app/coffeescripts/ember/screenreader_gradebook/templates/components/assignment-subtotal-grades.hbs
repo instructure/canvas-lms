@@ -1,0 +1,36 @@
+<tr>
+  <th scope="row" class="ic-Table--header-row">
+    {{subtotal.name}}
+  </th>
+
+  <td class="assignment-subtotal-grade">
+    <span class="grade">
+      {{#if hasGrade}}
+        <span class="perc">{{percent}}</span>
+        <span class="points">{{scoreDetail}}</span>
+      {{else}}
+        -
+      {{/if}}
+    </span>
+  </td>
+
+  <td>
+    <span class="grade">
+      {{#if letterGrade}}
+        <span class='letter-grade-points'>{{letterGrade}}</span>
+      {{else}}
+        -
+      {{/if}}
+    </span>
+  </td>
+
+  <td>
+    {{#if subtotal.weight}}
+      <span class="weight">
+        {{weight}}
+      </span>
+    {{else}}
+      -
+    {{/if}}
+  </td>
+</tr>

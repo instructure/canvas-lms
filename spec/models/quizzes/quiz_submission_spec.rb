@@ -1,6 +1,6 @@
 # encoding: UTF-8
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -1529,6 +1529,33 @@ describe Quizzes::QuizSubmission do
         other_enrollment = @course.enroll_teacher(other_teacher, :section => other_section, :limit_privileges_to_course_section => true)
         other_enrollment.accept
         expect(@quiz_submission.teachers).to_not include other_teacher
+      end
+    end
+  end
+
+  describe "associated submission" do
+    before(:each) { course_with_student }
+
+    it "assigns minutes_late to zero when not late" do
+      Timecop.freeze do
+        quiz = @course.quizzes.create(due_at: 5.minutes.from_now, quiz_type: "assignment")
+        qs = Quizzes::QuizSubmission.create(
+          finished_at: Time.zone.now, user: @user, quiz: quiz, workflow_state: :complete
+        )
+
+        expect(qs.submission.minutes_late).to be_zero
+      end
+    end
+
+    it "assigns minutes_late with a -1 minute offset" do
+      Timecop.freeze do
+        quiz = @course.quizzes.create(due_at: 5.minutes.ago, quiz_type: "assignment")
+        qs = Quizzes::QuizSubmission.create(
+          finished_at: Time.zone.now, user: @user, quiz: quiz, workflow_state: :complete
+        )
+
+        expected_minutes_late = (Time.zone.now - 60.seconds - 5.minutes.ago.change(sec: 0)) / 60
+        expect(qs.submission.minutes_late).to eq(expected_minutes_late)
       end
     end
   end

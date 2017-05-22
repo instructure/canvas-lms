@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2013 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 class UserMerge
 
   def self.from(user)
@@ -113,7 +130,7 @@ class UserMerge
        'context_module_progressions',
        'group_memberships', 'page_comments',
        'rubric_assessments',
-       'submission_comment_participants', 'user_services', 'web_conferences',
+       'user_services', 'web_conferences',
        'web_conference_participants', 'wiki_pages'].each do |key|
         updates[key] = "user_id"
       end

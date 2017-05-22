@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2016 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 class MasterCourses::MasterContentTag < ActiveRecord::Base
   # i want to get off content tag's wild ride
 
@@ -22,8 +39,6 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
     if self.restrictions_changed? && (self.restrictions.keys != [:all])
       if (self.restrictions.keys - MasterCourses::LOCK_TYPES).any?
         self.errors.add(:restrictions, "Invalid settings")
-      elsif self.restrictions.present? && !self.restrictions[:content]
-        self.errors.add(:restrictions, "Content must be restricted if restrictions are present")
       end
     end
   end
@@ -41,7 +56,7 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
     end
   end
 
-  def self.fetch_module_item_restrictions(item_ids)
+  def self.fetch_module_item_restrictions_for_child(item_ids)
     # does a silly fancy doublejoin so we can get all the restrictions in one query
     data = self.
       joins("INNER JOIN #{MasterCourses::ChildContentTag.quoted_table_name} ON
@@ -49,6 +64,16 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
       joins("INNER JOIN #{ContentTag.quoted_table_name} ON
           #{MasterCourses::ChildContentTag.table_name}.content_type=#{ContentTag.table_name}.content_type AND
           #{MasterCourses::ChildContentTag.table_name}.content_id=#{ContentTag.table_name}.content_id").
+      where(:content_tags => {:id => item_ids}).
+      pluck('content_tags.id', :restrictions)
+    Hash[data]
+  end
+
+  def self.fetch_module_item_restrictions_for_master(item_ids)
+    data = self.
+      joins("INNER JOIN #{ContentTag.quoted_table_name} ON
+          #{self.table_name}.content_type=#{ContentTag.table_name}.content_type AND
+          #{self.table_name}.content_id=#{ContentTag.table_name}.content_id").
       where(:content_tags => {:id => item_ids}).
       pluck('content_tags.id', :restrictions)
     Hash[data]

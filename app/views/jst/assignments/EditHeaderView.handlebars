@@ -24,24 +24,26 @@
         </span>
       {{/if}}
 
-      <span id='assignment-gear-button-cr'>
-        <a role="button" class="al-trigger btn" href="#">
-          <span class="screenreader-only">{{#t}}Manage Assignment{{/t}}</span>
-          <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-        </a>
-        <ul class="al-options">
-          <li>
-          {{#if canDelete}}
-            <a href="#" class="delete_assignment_link">
-          {{else}}
-            <a href="#" class="delete_assignment_link disabled" aria-disabled=true>
-          {{/if}}
-              <i class="icon-trash"></i>
-              {{#t}}Delete{{/t}}
-            </a>
-          </li>
-        </ul>
-      <span>
+      {{#unless is_locked}} <!-- delete is only thing in menu, remove the whole thing if locked -->
+        <span id='assignment-gear-button-cr'>
+          <a role="button" class="al-trigger btn" href="#">
+            <span class="screenreader-only">{{#t}}Manage Assignment{{/t}}</span>
+            <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+          </a>
+          <ul class="al-options">
+            <li>
+            {{#if canDelete}}
+              <a href="#" class="delete_assignment_link">
+            {{else}}
+              <a href="#" class="delete_assignment_link disabled" aria-disabled=true>
+            {{/if}}
+                <i class="icon-trash"></i>
+                {{#t}}Delete{{/t}}
+              </a>
+            </li>
+          </ul>
+        <span>
+      {{/unless}}
 
     </ul>
     <div id="edit-assignment-header-cr-tab-content">
@@ -69,24 +71,26 @@
     {{/if}}
   </div>
   <div class="header-bar-right">
-    <div class="admin-links">
-      <a role="button" class="al-trigger btn" href="#">
-        <span class="screenreader-only">{{#t}}Manage Assignment{{/t}}</span>
-        <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-      </a>
-      <ul class="al-options">
-        <li>
-        {{#if canDelete}}
-          <a href="#" class="delete_assignment_link">
-        {{else}}
-          <a href="#" class="delete_assignment_link disabled" aria-disabled=true>
-        {{/if}}
-            <i class="icon-trash"></i>
-            {{#t}}Delete{{/t}}
-          </a>
-        </li>
-      </ul>
-    </div>
+    {{#unless is_locked}} <!-- delete is only thing in menu, remove the whole thing if locked -->
+      <div class="admin-links">
+        <a role="button" class="al-trigger btn" href="#">
+          <span class="screenreader-only">{{#t}}Manage Assignment{{/t}}</span>
+          <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+        </a>
+        <ul class="al-options">
+          <li>
+          {{#if canDelete}}
+            <a href="#" class="delete_assignment_link">
+          {{else}}
+            <a href="#" class="delete_assignment_link disabled" aria-disabled=true>
+          {{/if}}
+              <i class="icon-trash"></i>
+              {{#t}}Delete{{/t}}
+            </a>
+          </li>
+        </ul>
+      </div>
+    {{/unless}}
   </div>
 </div>
 

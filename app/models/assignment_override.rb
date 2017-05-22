@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2012 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -102,9 +102,19 @@ class AssignmentOverride < ActiveRecord::Base
     students = applies_to_students.map(&:id)
     return true if students.blank?
 
-    [grading_period_was, grading_period].compact.each do |gp|
-      course.recompute_student_scores(students, grading_period_id: gp)
+    if grading_period_was
+      # recalculate just the old grading period's score
+      course.recompute_student_scores(students, grading_period_id: grading_period_was, update_course_score: false)
     end
+    # recalculate the new grading period's score. If the grading period group is
+    # weighted, then we need to recalculate the overall course score too. (If
+    # grading period is nil, make sure we pass true for `update_course_score`
+    # so we can use a singleton job.)
+    course.recompute_student_scores(
+      students,
+      grading_period_id: grading_period,
+      update_course_score: !grading_period || grading_period.grading_period_group&.weighted?
+    )
     true
   end
   private :update_grading_period_grades

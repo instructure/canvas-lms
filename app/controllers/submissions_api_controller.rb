@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -201,7 +201,7 @@ class SubmissionsApiController < ApplicationController
                                                            @current_user, section_ids)
                         .pluck(:user_id)
                     end
-      submissions = @assignment.submissions.where(user_id: student_ids).preload(:originality_reports)
+      submissions = @assignment.submissions.not_placeholder.where(user_id: student_ids).preload(:originality_reports)
 
       if includes.include?("visibility")
         json = bulk_process_submissions_for_visibility(submissions, includes)
@@ -368,7 +368,7 @@ class SubmissionsApiController < ApplicationController
                         "assignments.workflow_state != 'deleted'"
                       )
                     end
-      submissions = submissions_scope.preload(:originality_reports).to_a
+      submissions = submissions_scope.not_placeholder.preload(:originality_reports).to_a
       bulk_load_attachments_and_previews(submissions)
       submissions_for_user = submissions.group_by(&:user_id)
 
@@ -417,7 +417,7 @@ class SubmissionsApiController < ApplicationController
       order_by = params[:order] == "graded_at" ? "graded_at" : :id
       order_direction = params[:order_direction] == "descending" ? "desc nulls last" : "asc"
       order = "#{order_by} #{order_direction}"
-      submissions = @context.submissions.except(:order).where(:user_id => student_ids).order(order)
+      submissions = @context.submissions.not_placeholder.except(:order).where(user_id: student_ids).order(order)
       submissions = submissions.where(:assignment_id => assignments) unless assignments.empty?
       submissions = submissions.preload(:user, :originality_reports)
 
@@ -610,8 +610,7 @@ class SubmissionsApiController < ApplicationController
     @user = get_user_considering_section(params[:user_id])
 
     authorized = false
-    @submission = @assignment.submissions.where(user_id: @user).first ||
-      @assignment.submissions.build(user: @user)
+    @submission = @assignment.submissions.find_or_create_by!(user: @user)
 
     if params[:submission] || params[:rubric_assessment]
       authorized = authorized_action(@submission, @current_user, :grade)
@@ -732,7 +731,7 @@ class SubmissionsApiController < ApplicationController
       students = Api.paginate(student_scope, self, api_v1_course_assignment_gradeable_students_url(@context, @assignment))
       if (include_pg = includes.include?('provisional_grades'))
         return unless authorized_action(@context, @current_user, :moderate_grades)
-        submissions = @assignment.submissions.where(user_id: students).preload(:provisional_grades).index_by(&:user_id)
+        submissions = @assignment.submissions.not_placeholder.where(user_id: students).preload(:provisional_grades).index_by(&:user_id)
         selections = @assignment.moderated_grading_selections.where(student_id: students).index_by(&:student_id)
       end
       render :json => students.map { |student|
@@ -908,7 +907,7 @@ class SubmissionsApiController < ApplicationController
   def change_topic_read_state(new_state)
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @user = get_user_considering_section(params[:user_id])
-    @submission = @assignment.submissions.where(user_id: @user).first || @assignment.submissions.build(user: @user)
+    @submission = @assignment.submissions.find_or_create_by!(user: @user)
 
     render_state_change_result @submission.change_read_state(new_state, @current_user)
   end

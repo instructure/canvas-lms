@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -27,7 +27,22 @@ module Lti
 
     serialize :icon_info
 
-    validates_presence_of :resource_type_code, :name, :tool_proxy
+    validates_presence_of :resource_type_code, :name, :tool_proxy, :lookup_id
+    before_validation :set_lookup_id
 
+    def self.generate_lookup_id_for(resource_handler)
+      tool_proxy = resource_handler.tool_proxy
+      product_family = tool_proxy.product_family
+      components = [product_family.product_code,
+                    product_family.vendor_code,
+                    resource_handler.resource_type_code].join('-')
+      "#{components}-#{Canvas::Security.hmac_sha1(components)}"
+    end
+
+    private
+
+    def set_lookup_id
+      self.lookup_id ||= self.class.generate_lookup_id_for(self)
+    end
   end
 end

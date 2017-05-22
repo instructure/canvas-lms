@@ -22,8 +22,8 @@ module Lti
     let(:subscription) do
       {
         EventTypes:["attachment_created"],
-        ContextType: "account",
-        ContextId: account.id,
+        ContextType: "root_account",
+        ContextId: account.uuid,
         Format: "live-event",
         TransportType: "sqs",
         TransportMetadata: { Url: "http://sqs.docker"}

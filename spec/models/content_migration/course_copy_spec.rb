@@ -1,4 +1,20 @@
 # coding: utf-8
+#
+# Copyright (C) 2014 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require File.expand_path(File.dirname(__FILE__) + '/course_copy_helper.rb')
 
@@ -387,7 +403,7 @@ describe ContentMigration do
       @copy_from.default_wiki_editing_roles = 'teachers'
       @copy_from.allow_student_organized_groups = false
       @copy_from.show_announcements_on_home_page = false
-      @copy_from.home_page_announcement_limit = nil
+      @copy_from.home_page_announcement_limit = 3
       @copy_from.default_view = 'modules'
       @copy_from.open_enrollment = true
       @copy_from.storage_quota = 444

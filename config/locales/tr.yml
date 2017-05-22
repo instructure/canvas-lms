@@ -247,6 +247,7 @@ tr:
   account_name_analytics_62bf60ae: "%{account.name} Analitikleri"
   account_name_bff54ed5: "Hesap Adı"
   account_navigation_80bbefd4: "Hesapta Gezinme"
+  account_navigation_menu_10c05bf9: "Hesap Gezinme Menüsü"
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "Hesap onay son tarihi başlangıç tarihinden sonra olamaz"
@@ -804,6 +805,22 @@ tr:
           group_categories: 
             login: 
               check_box: "Grup Kategorileri CSV"
+          group_membership: 
+            login: 
+              check_box: "Grup Üyeliği CSV"
+          groups: 
+            check_box: "Gruplar CSV"
+          sections: 
+            check_box: "Bölümler CSV"
+          terms: 
+            check_box: "Dönemler CSV"
+          users: 
+            check_box: "Kullanıcılar CSV"
+          xlist: 
+            check_box: "X liste CSV"
+        sis_default: 
+          parameters: 
+            note: "*Dönem ayarları yalnızca Dersleri, Bölümleri, Kayıtları ve CSV dosyalarındaki X listeyi etkiler."
     public_courses_csv_description: 
       account_reports: 
         default: 
@@ -957,6 +974,7 @@ tr:
         help_link_text: "Link için görüntülenecek metin"
         help_link_url: URL
         include_students_in_global_survey: "Genel anketlerde öğrencileri dahil et"
+        lock_all_announcements: "Duyurulara yorum yapılmasını engelle"
         locked: "Alt hesaplar ve dersler için bu ayarı kilitle"
         locked_for_sub_accounts: "Alt hesaplar için bu ayarı kilitle"
         login_handle_name: "Oturum Açma Etiketi"
@@ -985,7 +1003,7 @@ tr:
         sis_source_id: "ÖBS ID"
         start_at: Başlangıç
         students_can_create_courses: Öğrenciler
-        sub_account_includes: "Alt hesaplar ek içerik tanımlayabilsin"
+        sub_account_includes: "Alt hesaplar kendi markaları için Tema Düzenleyiciyi kullanabilsin"
         subject: Konu
         teachers_can_create_courses: Öğretmenler
         trusted_referers: "Güvenilir HTTP Yönlendiricileri"
@@ -1086,6 +1104,10 @@ tr:
             text: "Ödev Grup Id:"
           course_id: 
             text: "Ders Id:"
+    sis_agent_token_auth: 
+      labels: 
+        sis_app_token: "ÖBS Agent Token"
+        sis_app_url: "ÖBS App URL"
     sis_batch_counts: 
       accounts_label: Hesaplar
       courses_label: Dersler
@@ -1160,6 +1182,9 @@ tr:
       started_at_message: "Başladı: %{started_at}"
       title: "ÖBS İçe Aktarımı"
       try_import_again_link: "İçe aktarımı yeniden deneyin"
+    sis_integration_settings: 
+      labels: 
+        value: Karakterler
     site_admin_statistics: 
       page_title: "%{account} için İstatistikler"
     statistics: 
@@ -1205,6 +1230,11 @@ tr:
         orbis: 
           parameters: 
             note: "Askıya alınmış ödev içeren derslerde bu rapordaki notlar doğru görünmeyebilir."
+    student_assignment_grades_csv_parameters: 
+      account_reports: 
+        auburn: 
+          pseudonym_ids: 
+            field: "Oturum Açma IDleri"
     student_assignment_outcome_map_csv_description: 
       account_reports: 
         student_assignment_map: 
@@ -3187,6 +3217,7 @@ tr:
       resolution: "Oluşturan ile iletişime geçip bilgilendirin."
     titles: 
       delete: "Çalışma ekibini sil?"
+  collaborations_5c56c15f: "İşbirliğine Yönelik Çalışmalar"
   collapse_group_c2af7cad: "Grubu Daralt"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "%{groupName} için grup üyeleri listesini daraltın"
   collapse_subdiscussion_89af1f5c: "Alt Tartışmaları Daralt"
@@ -4812,6 +4843,7 @@ tr:
         is_public_to_auth_users: "Bu dersi kimliği doğrulanmış kullanıcılara görünür yap"
         language: Dil
         license: Lisans
+        lock_all_announcements: "Duyurulara yorum yapılmasını engelle"
         open_enrollment: "Dersin ana sayfasına \"Bu Derse Katıl\" bağlantısı ekle"
         public_syllabus: "Bu dersin programı herkes tarafından görülebilsin"
         restrict_enrollments_to_course_dates: "Kullanıcılar derse yalnızca bu tarihler arasında katılabilirler"
@@ -5807,6 +5839,7 @@ tr:
     unsubscribe: "Bu başlığı artık takip etmiyorsunuz"
     unsubscribed: "Takip Edilmiyor"
     unsubscribed_hint: "Bu başlığı takip etmiyorsunuz. Takip etmek için tıklayınız."
+  discussions_a5f96392: Tartışmalar
   dismiss_dacdb625: Yoksay
   display_course_catalog: "Bu kök hesapta \"Bu dersi herkese açık dersler listesi\" işareti etkinleştirilmiş olarak aranabilir ders listesi göster."
   display_name_b80c243e: "Görünen Ad"
@@ -11185,6 +11218,7 @@ tr:
           
           Değişiklikler üzerine yazılsın mı?
       unsaved_changes: "Değişiklikler kaydedilmedi. Değişiklikleri kaydetmeden devam etmek istediğinize emin misiniz?"
+  pages_e5414c2c: Sayfalar
   paginated_collection: 
     no_items: "Öğe bulunamadı."
   paginated_list: 

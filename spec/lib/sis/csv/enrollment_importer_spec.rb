@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2015 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -701,7 +701,7 @@ describe SIS::CSV::EnrollmentImporter do
         account: account2
     )
     user = account2.pseudonyms.where(sis_user_id: 'user_1').first.user
-    user.any_instantiation.expects(:find_pseudonym_for_account).with(@account, true).once.returns(user.pseudonyms.first)
+    expect(SisPseudonym).to receive(:for).with(user, @account, type: :implicit, require_sis: false).and_return(user.pseudonyms.first)
     SIS::EnrollmentImporter::Work.any_instance.expects(:root_account_from_id).with('account2').once.returns(account2)
     # the enrollments
     process_csv_data_cleanly(
@@ -725,7 +725,8 @@ describe SIS::CSV::EnrollmentImporter do
         account: account2
     )
     user = account2.pseudonyms.where(sis_user_id: 'user_1').first.user
-    user.any_instantiation.expects(:find_pseudonym_for_account).with(@account, true).once.returns(nil)
+    expect(SisPseudonym).to receive(:for).with(user, @account, type: :implicit, require_sis: false).once.and_return(nil)
+
     SIS::EnrollmentImporter::Work.any_instance.expects(:root_account_from_id).with('account2').once.returns(account2)
     # the enrollments
     importer = process_csv_data(
@@ -750,7 +751,8 @@ describe SIS::CSV::EnrollmentImporter do
         account: account2
     )
     user = account2.pseudonyms.where(sis_user_id: 'user_1').first.user
-    user.any_instantiation.expects(:find_pseudonym_for_account).with(@account, true).never
+    expect(SisPseudonym).to receive(:for).with(user, @account, type: :implicit, require_sis: false).never
+
     SIS::EnrollmentImporter::Work.any_instance.expects(:root_account_from_id).with('account2').once.returns(nil)
     # the enrollments
     importer = process_csv_data_cleanly(

@@ -1,7 +1,25 @@
+#
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 define [
   'jquery'
   'underscore'
   'i18n!gradebook'
+  'jsx/shared/helpers/numberHelper'
   'jsx/gradebook/shared/helpers/GradeFormatHelper'
   'compiled/gradezilla/GradebookTranslations'
   'jsx/grading/helpers/OutlierScoreHelper'
@@ -10,7 +28,8 @@ define [
   'compiled/util/round'
   'jquery.ajaxJSON'
   'jquery.instructure_misc_helpers' # raw
-], ($, _, I18n, GradeFormatHelper, GRADEBOOK_TRANSLATIONS, OutlierScoreHelper, htmlEscape, {extractDataTurnitin}, round) ->
+], ($, _, I18n, numberHelper, GradeFormatHelper, GRADEBOOK_TRANSLATIONS,
+  OutlierScoreHelper, htmlEscape, {extractDataTurnitin}, round) ->
 
   class SubmissionCell
 
@@ -49,8 +68,9 @@ define [
         submission.excused = true
       else
         submission.grade = htmlEscape state
-        pointsPossible = @opts.column.object.points_possible
-        outlierScoreHelper = new OutlierScoreHelper(state, pointsPossible)
+        pointsPossible = numberHelper.parse(@opts.column.object.points_possible)
+        score = numberHelper.parse(state)
+        outlierScoreHelper = new OutlierScoreHelper(score, pointsPossible)
         $.flashWarning(outlierScoreHelper.warningMessage()) if outlierScoreHelper.hasWarning()
       @wrapper?.remove()
       @postValue(item, state)
@@ -127,17 +147,9 @@ define [
 
       tooltipText = $.map(specialClasses, (c)-> GRADEBOOK_TRANSLATIONS["submission_tooltip_#{c}"]).join ', '
 
-      cellCommentHTML = if !opts.student.isConcluded && !opts.isLocked
-        """
-        <a href="#" data-user-id=#{opts.submission.user_id} data-assignment-id=#{opts.assignment.id} class="gradebook-cell-comment"><span class="gradebook-cell-comment-label">submission comments</span></a>
-        """
-      else
-        ''
-
       """
       #{$.raw if tooltipText then '<div class="gradebook-tooltip">'+ htmlEscape(tooltipText) + '</div>' else ''}
       <div class="gradebook-cell #{htmlEscape if opts.editable then 'gradebook-cell-editable focus' else ''} #{htmlEscape opts.classes} #{htmlEscape specialClasses.join(' ')}">
-        #{$.raw cellCommentHTML}
         #{$.raw innerContents}
       </div>
       """
@@ -287,7 +299,6 @@ define [
       @$input
         .removeClass('gradebook-checkbox-pass gradebook-checkbox-fail')
         .addClass('gradebook-checkbox-' + classFromSubmission(grade: newValue))
-        .addClass('dontblur')
         .attr('aria-label', passFailMessage(newValue))
         .data('value', newValue)
       @$input.find('i')

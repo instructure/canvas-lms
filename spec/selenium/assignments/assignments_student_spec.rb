@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2012 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative '../common'
 require_relative '../helpers/assignments_common'
 require_relative '../helpers/google_drive_common'
@@ -153,12 +170,15 @@ describe "assignments" do
         assignment_form = f('#submit_online_text_entry_form')
         wait_for_tiny(assignment_form)
         wait_for_ajaximations
-        expect {
-          type_in_tiny('#submission_body', 'something to submit')
+        body_text = 'something to submit'
+        expect do
+          type_in_tiny('#submission_body', body_text)
           wait_for_ajaximations
           submit_form(assignment_form)
           wait_for_ajaximations
-        }.to change(Submission, :count).by(1)
+        end.to change {
+          @assignment.submissions.find_by!(user: @student).body
+        }.from(nil).to("<p>#{body_text}</p>")
       end
     end
 

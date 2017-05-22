@@ -1,12 +1,25 @@
+#
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require 'test/unit'
-
-require 'rubygems'
-gem 'activerecord', '>= 1.15.4.7794'
 require 'active_record'
+require 'acts_as_list'
 
-require "#{File.dirname(__FILE__)}/../init"
-
-ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :dbfile => ":memory:")
+ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => ":memory:")
 
 def setup_db
   ActiveRecord::Schema.define(:version => 1) do
@@ -26,12 +39,13 @@ def teardown_db
 end
 
 class Mixin < ActiveRecord::Base
+  def self.nulls(first_or_last, column, direction = nil)
+    "#{column} IS#{" NOT" unless first_or_last == :last} NULL, #{column} #{direction.to_s.upcase}".strip
+  end
 end
 
 class ListMixin < Mixin
-  acts_as_list :column => "pos", :scope => :parent
-
-  def self.table_name() "mixins" end
+  acts_as_list :column => "pos", :scope => :parent_id
 end
 
 class ListMixinSub1 < ListMixin
@@ -40,12 +54,9 @@ end
 class ListMixinSub2 < ListMixin
 end
 
-class ListWithStringScopeMixin < ActiveRecord::Base
-  acts_as_list :column => "pos", :scope => 'parent_id = #{parent_id}'
-
-  def self.table_name() "mixins" end
+class UnscopedListMixin < Mixin
+  acts_as_list :column => "pos"
 end
-
 
 class ListTest < Test::Unit::TestCase
 
@@ -82,7 +93,7 @@ class ListTest < Test::Unit::TestCase
 
   def test_injection
     item = ListMixin.new(:parent_id => 1)
-    assert_equal "parent_id = 1", item.scope_condition
+    assert_equal({parent_id: 1}, item.scope_condition)
     assert_equal "pos", item.class.position_column
   end
 
@@ -155,24 +166,16 @@ class ListTest < Test::Unit::TestCase
     assert_equal 3, ListMixin.find(4).pos
 
     ListMixin.find(1).destroy
-
     assert_equal [3, 4], ListMixin.where('parent_id = 5').order('pos').pluck(:id)
 
     assert_equal 1, ListMixin.find(3).pos
     assert_equal 2, ListMixin.find(4).pos
   end
 
-  def test_with_string_based_scope
-    new = ListWithStringScopeMixin.create(:parent_id => 500)
-    assert_equal 1, new.pos
-    assert new.first?
-    assert new.last?
-  end
-
   def test_nil_scope
-    new1, new2, new3 = ListMixin.create, ListMixin.create, ListMixin.create
+    new1, new2, new3 = UnscopedListMixin.create, UnscopedListMixin.create, UnscopedListMixin.create
     new2.move_to_top
-    assert_equal [new2, new1, new3], ListMixin.where('parent_id IS NULL').order('pos').to_a
+    assert_equal [new2, new1, new3], UnscopedListMixin.where('parent_id IS NULL').order('pos').to_a
   end
 
 
@@ -245,7 +248,7 @@ class ListSubTest < Test::Unit::TestCase
 
   def test_injection
     item = ListMixin.new("parent_id"=>1)
-    assert_equal "parent_id = 1", item.scope_condition
+    assert_equal({parent_id: 1}, item.scope_condition)
     assert_equal "pos", item.class.position_column
   end
 

@@ -1,4 +1,22 @@
 <%
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<%
   @active_tab = "settings"
   add_crumb t(:settings_crumb, "Settings")
   js_bundle :account_settings
@@ -53,7 +71,7 @@
     <% if !@available_reports.blank? %>
       <li><a href="#tab-reports" id="tab-reports-link"><%= t(:tab_reports, "Reports") %></a></li>
     <% end %>
-    <% if can_do(@context, @current_user, :lti_add_edit) %>
+    <% if can_do(@context, @current_user, :read_as_admin) %>
       <li><a href="#tab-tools" id="tab-tools-link"><%= t(:tab_external_tools, "Apps") %></a></li>
     <% end %>
     <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
@@ -1101,7 +1119,7 @@ acknowledge that you have read and agreed to the
       </table>
     </div>
   <% end %>
-  <% if can_do(@context, @current_user, :lti_add_edit) %>
+  <% if can_do(@context, @current_user, :read_as_admin) %>
       <div id="tab-tools">
         <%= render :partial => 'external_tools/external_tools', :object => @context.context_external_tools.active %>
       </div>

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -109,7 +109,7 @@
 #             "type": "string"
 #           },
 #           "limit_privileges_to_course_section": {
-#             "description": "User can only access his or her own course section. Applies to Teacher and TA enrollments.",
+#             "description": "User can only access his or her own course section.",
 #             "example": true,
 #             "type": "boolean"
 #           },

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 Instructure, Inc.
+# Copyright (C) 2016 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -28,11 +28,8 @@ class AccountAuthorizationConfig::Microsoft < AccountAuthorizationConfig::OpenID
   end
 
   # Rename db fields
-  alias_method :application_id=, :client_id=
-  alias_method :application_id, :client_id
-
-  alias_method :application_secret=, :client_secret=
-  alias_method :application_secret, :client_secret
+  alias_attribute :application_id, :client_id
+  alias_attribute :application_secret, :client_secret
 
   def client_id
     self.class.globally_configured? ? application_id : super

@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2015 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import $ from 'jquery'
 import React from 'react'
 import DueDateCalendarPicker from 'jsx/due_dates/DueDateCalendarPicker'
@@ -23,7 +41,7 @@ import cx from 'classnames'
       return "label-for-" + dateType + "-" + this.props.rowKey;
     },
 
-    datePicker(dateType, labelText){
+    datePicker (dateType, labelText, disabled, readonly) {
       const isNotUnlockAt = dateType !== "unlock_at";
 
       return (
@@ -34,14 +52,15 @@ import cx from 'classnames'
           labelledBy      = {this.labelledByForType(dateType)}
           dateValue       = {this.props.dates[dateType]}
           inputClasses    = {this.inputClasses(dateType)}
-          disabled        = {this.props.disabled}
+          disabled        = {disabled}
           labelText       = {labelText}
           isFancyMidnight = {isNotUnlockAt}
+          readonly        = {readonly}
         />
       );
     },
 
-    inputClasses(dateType){
+    inputClasses (dateType) {
       return cx({
         date_field: true,
         datePickerDateField: true,
@@ -55,14 +74,18 @@ import cx from 'classnames'
         <div>
           <div className="ic-Form-group">
             <div className="ic-Form-control">
-              {this.datePicker("due_at", I18n.t("Due"))}
+              {this.datePicker("due_at", I18n.t("Due"), this.props.disabled, this.props.dueDatesReadonly)}
             </div>
           </div>
           <div className="ic-Form-group">
             <div className="ic-Form-control">
               <div className="Available-from-to">
-                <div className="from">{this.datePicker("unlock_at", I18n.t("Available from"))}</div>
-                <div className="to">{this.datePicker("lock_at", I18n.t("Until"))}</div>
+                <div className="from">
+                  {this.datePicker("unlock_at", I18n.t("Available from"), this.props.disabled, this.props.availabilityDatesReadonly)}
+                </div>
+                <div className="to">
+                  {this.datePicker("lock_at", I18n.t("Until"), this.props.disabled, this.props.availabilityDatesReadonly)}
+                </div>
               </div>
             </div>
           </div>

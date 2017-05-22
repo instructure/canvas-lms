@@ -1,21 +1,40 @@
+#
+# Copyright (C) 2013 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 define [
   'compiled/gradezilla/SubmissionCell'
   'str/htmlEscape'
   'jquery'
-], (SubmissionCell, htmlEscape, $) ->
+  'jsx/shared/helpers/numberHelper'
+], (SubmissionCell, htmlEscape, $, numberHelper) ->
 
   dangerousHTML= '"><img src=/ onerror=alert(document.cookie);>'
   escapedDangerousHTML = htmlEscape dangerousHTML
 
   QUnit.module "SubmissionCell",
     setup: ->
+      @pointsPossible = 100
       @opts =
         item:
-            'whatever': {}
+          'whatever': {}
         column:
-            field: 'whatever'
-            object:
-              points_possible: 100
+          field: 'whatever'
+          object:
+            points_possible: @pointsPossible
         container: $('#fixtures')[0]
       @cell = new SubmissionCell @opts
     teardown: -> $('#fixtures').empty()
@@ -32,6 +51,21 @@ define [
     flashWarningStub = @stub $, 'flashWarning'
     @cell.applyValue(@opts.item, '150')
     ok flashWarningStub.calledOnce
+
+  test "#applyValue calls numberHelper with points possible", ->
+    numberHelperStub = @stub(numberHelper, 'parse').withArgs(@pointsPossible)
+    @stub @cell, 'postValue'
+    @cell.applyValue(@opts.item, '10')
+
+    strictEqual numberHelperStub.callCount, 1
+
+  test "#applyValue calls numberHelper with state", ->
+    state = '10'
+    numberHelperStub = @stub(numberHelper, 'parse').withArgs(state)
+    @stub @cell, 'postValue'
+    @cell.applyValue(@opts.item, state)
+
+    strictEqual numberHelperStub.callCount, 1
 
   test "#loadValue escapes html", ->
     @opts.item.whatever.grade = dangerousHTML
@@ -67,10 +101,6 @@ define [
     submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 73 }, {}, {}, { isLocked: true })
     ok submissionCellResponse.indexOf("cannot_edit") > -1
 
-  test "#class.formatter, isLocked: true does not include the cell comment bubble", ->
-    submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 73 }, {}, {}, { isLocked: true })
-    equal submissionCellResponse.indexOf("gradebook-cell-comment"), -1
-
   test "#class.formatter, isLocked: false doesn't add grayed-out", ->
     submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 73 }, {}, {}, { isLocked: false })
     equal submissionCellResponse.indexOf("grayed-out"), -1
@@ -78,10 +108,6 @@ define [
   test "#class.formatter, isLocked: false doesn't add cannot_edit", ->
     submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 73 }, {}, {}, { isLocked: false })
     equal submissionCellResponse.indexOf("cannot_edit"), -1
-
-  test "#class.formatter, isLocked: false includes the cell comment bubble", ->
-    submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 73 }, {}, {}, { isLocked: false })
-    ok submissionCellResponse.indexOf("gradebook-cell-comment") > -1
 
   test "#class.formatter, tooltip adds your text to the special classes", ->
     submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 73 }, {}, {}, { tooltip: "dora_the_explorer" })
@@ -191,10 +217,6 @@ define [
       @cell = new SubmissionCell.pass_fail opts
       @cell.$input = $("<button><i></i></button>")
     teardown: -> $('#fixtures').empty()
-
-  test "#pass_fail#transitionValue adds the 'dontblur' class so the user can continue toggling pass/fail state", ->
-    @cell.transitionValue("pass")
-    ok @cell.$input.hasClass('dontblur')
 
   test "#pass_fail#transitionValue changes the aria-label to match the currently selected option", ->
     @cell.transitionValue('fail')

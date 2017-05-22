@@ -1,4 +1,5 @@
-# Copyright (C) 2014 Instructure, Inc.
+#
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -20,7 +21,7 @@ module Lti
     before_action :require_user
 
     def index
-      if authorized_action(@context, @current_user, :lti_add_edit)
+      if authorized_action(@context, @current_user, :read_as_admin)
         app_collator = AppCollator.new(@context, method(:reregistration_url_builder))
         collection = app_collator.bookmarked_collection
 

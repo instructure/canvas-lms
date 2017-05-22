@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2011 Instructure, Inc.
+/*
+ * Copyright (C) 2015 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -12,12 +12,11 @@
  * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
  * details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 define([
-  'compiled/editor/stocktiny',
   'i18n!editor',
   'jquery',
   'str/htmlEscape',
@@ -27,8 +26,7 @@ define([
   'jquery.instructure_misc_helpers',
   'jqueryui/dialog',
   'jquery.instructure_misc_plugins'
-], function(tinymce, I18n, $, htmlEscape,
-            TinyMCEContentItem, ExternalToolsHelper, RceCommandShim) {
+], function (I18n, $, htmlEscape, TinyMCEContentItem, ExternalToolsHelper, RceCommandShim) {
 
   var TRANSLATIONS = {
     embed_from_external_tool: I18n.t('embed_from_external_tool', '"Embed content from External Tool"'),

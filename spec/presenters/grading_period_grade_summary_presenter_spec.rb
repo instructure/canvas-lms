@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2016 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require 'spec_helper'
 
 describe GradingPeriodGradeSummaryPresenter do
@@ -35,6 +52,26 @@ describe GradingPeriodGradeSummaryPresenter do
       nil,
       grading_period_id: @period.id
     )
+  end
+
+  describe '#no_calculations?' do
+    it 'calculates subtotals when summarizing by grading period' do
+      presenter.periods_assignments = ['dummy']
+      presenter.groups_assignments = []
+      expect(presenter.no_calculations?).to be(false)
+    end
+
+    it 'calculates subtotals when summarizing by assignment group' do
+      presenter.periods_assignments = []
+      presenter.groups_assignments = ['dummy']
+      expect(presenter.no_calculations?).to be(false)
+    end
+
+    it 'no subtotals with no assignment groups nor grading periods' do
+      presenter.periods_assignments = []
+      presenter.groups_assignments = []
+      expect(presenter.no_calculations?).to be(true)
+    end
   end
 
   describe "#assignments_visible_to_student" do

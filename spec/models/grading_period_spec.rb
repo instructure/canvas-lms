@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014 - 2016 Instructure, Inc.
+# Copyright (C) 2014 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -308,6 +308,25 @@ describe GradingPeriod do
       score = enrollment.scores.create!(grading_period: grading_period)
       grading_period.destroy
       expect(score.reload).to be_deleted
+    end
+
+    it 'recalculates course scores if the grading period group is weighted' do
+      course = Course.create!
+      grading_period_group.enrollment_terms << course.enrollment_term
+      enrollment = student_in_course(course: course)
+      enrollment.scores.create!(grading_period: grading_period)
+      grading_period_group.update_column(:weighted, true)
+      expect(GradeCalculator).to receive(:recompute_final_score)
+      grading_period.destroy
+    end
+
+    it 'does not recalculate course scores if the grading period group is not weighted' do
+      course = Course.create!
+      grading_period_group.enrollment_terms << course.enrollment_term
+      enrollment = student_in_course(course: course)
+      enrollment.scores.create!(grading_period: grading_period)
+      expect(GradeCalculator).not_to receive(:recompute_final_score)
+      grading_period.destroy
     end
 
     it 'does not destroy the set when the last grading period is destroyed (account grading periods)' do

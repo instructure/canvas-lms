@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2016 - 2017 Instructure, Inc.
+/*
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -12,8 +12,8 @@
  * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
  * details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 define([
@@ -58,6 +58,32 @@ define([
     };
   }
 
+  function createSubtotalsByAssignmentGroup () {
+    ENV.assignment_groups = [{id: 1}, {id: 2}];
+    ENV.grading_periods = [];
+    const calculatedGrades = {
+      assignmentGroups: {
+        1: {current: {score: 6, possible: 10}},
+        2: {current: {score: 7, possible: 10}}
+      }
+    }
+    const byGradingPeriod = false
+    return GradeSummary.calculateSubtotals(byGradingPeriod, calculatedGrades, 'current');
+  }
+
+  function createSubtotalsByGradingPeriod () {
+    ENV.assignment_groups = [];
+    ENV.grading_periods = [{id: 1}, {id: 2}];
+    const calculatedGrades = {
+      gradingPeriods: {
+        1: {final: {score: 8, possible: 10}},
+        2: {final: {score: 9, possible: 10}}
+      }
+    }
+    const byGradingPeriod = true
+    return GradeSummary.calculateSubtotals(byGradingPeriod, calculatedGrades, 'final');
+  }
+
   function setPageHtmlFixture () {
     $fixtures.html(`
       <div id="grade_summary_fixture">
@@ -95,6 +121,7 @@ define([
                   <span class="score_value">A</span>
                 </span>
                 <span style="display: none;">
+                  <span class="original_points">10</span>
                   <span class="original_score">10</span>
                   <span class="what_if_score"></span>
                   <span class="assignment_id">201</span>
@@ -267,22 +294,22 @@ define([
     }
   });
 
-  test('parses the text of the .original_score element', function () {
+  test('parses the text of the .original_points element', function () {
     const score = GradeSummary.getOriginalScore(this.$assignment);
     strictEqual(score.numericalValue, 10);
     strictEqual(score.formattedValue, '10');
   });
 
   test('sets "numericalValue" to a default of null', function () {
-    this.$assignment.find('.original_score').text('invalid');
+    this.$assignment.find('.original_points').text('invalid');
     const score = GradeSummary.getOriginalScore(this.$assignment);
     strictEqual(score.numericalValue, null);
   });
 
-  test('sets "formattedValue" to a default of "-"', function () {
-    this.$assignment.find('.original_score').text('invalid');
+  test('sets "formattedValue" to formatted grade', function () {
+    this.$assignment.find('.original_score').text('C+ (78.5)');
     const score = GradeSummary.getOriginalScore(this.$assignment);
-    equal(score.formattedValue, '-');
+    equal(score.formattedValue, 'C+ (78.5)');
   });
 
   QUnit.module('GradeSummary.calculateTotals', {
@@ -316,6 +343,56 @@ define([
     GradeSummary.calculateTotals(createExampleGrades(), 'current', 'percent');
     const $teaser = $fixtures.find('.student_assignment.final_grade .score_teaser');
     ok($teaser.text().includes('1,234'), 'includes internationalized score');
+  });
+
+  QUnit.module('GradeSummary.calculateSubtotalsByGradingPeriod', {
+    setup () {
+      this.subtotals = createSubtotalsByGradingPeriod();
+    }
+  });
+
+  test('calculates subtotals by grading period', function () {
+    equal(this.subtotals.length, 2, 'calculates a subtotal for each period');
+  });
+
+  test('creates teaser text for subtotals by grading period', function () {
+    equal(this.subtotals[0].teaserText, '8.00 / 10.00', 'builds teaser text for first period');
+    equal(this.subtotals[1].teaserText, '9.00 / 10.00', 'builds teaser text for second period');
+  });
+
+  test('creates grade text for subtotals by grading period', function () {
+    equal(this.subtotals[0].gradeText, '80%', 'builds grade text for first period');
+    equal(this.subtotals[1].gradeText, '90%', 'builds grade text for second period');
+  });
+
+  test('assigns row element ids for subtotals by grading period', function () {
+    equal(this.subtotals[0].rowElementId, '#submission_period-1', 'builds row element id for first period');
+    equal(this.subtotals[1].rowElementId, '#submission_period-2', 'builds row element id for second period');
+  });
+
+  QUnit.module('GradeSummary.calculateSubtotalsByAssignmentGroup', {
+    setup () {
+      this.subtotals = createSubtotalsByAssignmentGroup();
+    }
+  });
+
+  test('calculates subtotals by assignment group', function () {
+    equal(this.subtotals.length, 2, 'calculates a subtotal for each group');
+  });
+
+  test('calculates teaser text for subtotals by assignment group', function () {
+    equal(this.subtotals[0].teaserText, '6.00 / 10.00', 'builds teaser text for first group');
+    equal(this.subtotals[1].teaserText, '7.00 / 10.00', 'builds teaser text for second group');
+  });
+
+  test('calculates grade text for subtotals by assignment group', function () {
+    equal(this.subtotals[0].gradeText, '60%', 'builds grade text for first group');
+    equal(this.subtotals[1].gradeText, '70%', 'builds grade text for second group');
+  });
+
+  test('calculates row element ids for subtotals by assignment group', function () {
+    equal(this.subtotals[0].rowElementId, '#submission_group-1', 'builds row element id for first group');
+    equal(this.subtotals[1].rowElementId, '#submission_group-2', 'builds row element id for second group');
   });
 
   QUnit.module('GradeSummary.canBeConvertedToGrade');
@@ -894,13 +971,6 @@ define([
     equal(this.$assignment.find('.what_if_score').text(), '5');
   });
 
-  test('uses I18n to parse the .original_score value', function () {
-    this.stub(numberHelper, 'parse').withArgs('1.234,56').returns('654321');
-    this.$assignment.find('.original_score').text('1.234,56');
-    this.onScoreRevert();
-    equal(this.$assignment.find('.what_if_score').text(), '654321');
-  });
-
   test('sets the .assignment_score title to the "Click to test" message', function () {
     this.onScoreRevert();
     equal(this.$assignment.find('.assignment_score').attr('title'), 'Click to test a different score');
@@ -945,41 +1015,17 @@ define([
     equal($grade.text(), '5');
   });
 
-  test('sets the .grade text to "0" when the .original_score is "0"', function () {
-    this.$assignment.find('.original_score').text('0');
-    this.onScoreRevert();
-    const $grade = this.$assignment.find('.grade');
-    $grade.children().remove(); // remove all content except score text
-    equal($grade.text(), '0');
-  });
-
-  test('sets the .grade text to "-" when the .original_score is blank', function () {
-    this.$assignment.find('.original_score').text('');
-    this.onScoreRevert();
-    const $grade = this.$assignment.find('.grade');
-    $grade.children().remove(); // remove all content except score text
-    equal($grade.text(), '-');
-  });
-
-  test('sets the .grade text to "-" when the .original_score is not a number', function () {
-    this.$assignment.find('.original_score').text('null');
-    this.onScoreRevert();
-    const $grade = this.$assignment.find('.grade');
-    $grade.children().remove(); // remove all content except score text
-    equal($grade.text(), '-');
-  });
-
   test('updates the score for the assignment', function () {
     this.stub(GradeSummary, 'updateScoreForAssignment');
     this.onScoreRevert();
     equal(GradeSummary.updateScoreForAssignment.callCount, 1);
     const [assignmentId, score] = GradeSummary.updateScoreForAssignment.getCall(0).args;
     equal(assignmentId, '201', 'first argument is the assignment id 201');
-    strictEqual(score, 5, 'second argument is the numerical score 5');
+    strictEqual(score, 10, 'second argument is the numerical score 10');
   });
 
-  test('updates the score for the assignment with null when the .original_score is blank', function () {
-    this.$assignment.find('.original_score').text('');
+  test('updates the score for the assignment with null when the .original_points is blank', function () {
+    this.$assignment.find('.original_points').text('');
     this.stub(GradeSummary, 'updateScoreForAssignment');
     this.onScoreRevert();
     const score = GradeSummary.updateScoreForAssignment.getCall(0).args[1];

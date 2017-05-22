@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2016 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import React from 'react'
 import I18n from 'i18n!student_context_tray'
 import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
@@ -9,7 +27,13 @@ import Rating from './Rating'
 import SectionInfo from './SectionInfo'
 import SubmissionProgressBars from './SubmissionProgressBars'
 import MessageStudents from 'jsx/shared/MessageStudents'
-import {Heading, Button, Link, Typography, ScreenReaderContent, Spinner, Tray} from 'instructure-ui'
+import Heading from 'instructure-ui/lib/components/Heading'
+import Button from 'instructure-ui/lib/components/Button'
+import Link from 'instructure-ui/lib/components/Link'
+import Typography from 'instructure-ui/lib/components/Typography'
+import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
+import Spinner from 'instructure-ui/lib/components/Spinner'
+import Tray from 'instructure-ui/lib/components/Tray'
 
 export default class StudentContextTray extends React.Component {
 

@@ -1,14 +1,32 @@
+/*
+ * Copyright (C) 2017 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import React from 'react'
 import axios from 'axios'
-import Modal, {ModalHeader, ModalBody, ModalFooter} from 'instructure-ui/Modal'
-import Heading from 'instructure-ui/Heading'
-import RadioInputGroup from 'instructure-ui/RadioInputGroup'
-import RadioInput from 'instructure-ui/RadioInput'
-import Button from 'instructure-ui/Button'
-import Typography from 'instructure-ui/Typography'
-import Link from 'instructure-ui/Link'
-import ScreenReaderContent from 'instructure-ui/ScreenReaderContent'
-import AccessibleContent from 'instructure-ui/AccessibleContent'
+import Modal, {ModalHeader, ModalBody, ModalFooter} from 'instructure-ui/lib/components/Modal'
+import Heading from 'instructure-ui/lib/components/Heading'
+import RadioInputGroup from 'instructure-ui/lib/components/RadioInputGroup'
+import RadioInput from 'instructure-ui/lib/components/RadioInput'
+import Button from 'instructure-ui/lib/components/Button'
+import Typography from 'instructure-ui/lib/components/Typography'
+import Link from 'instructure-ui/lib/components/Link'
+import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
+import AccessibleContent from 'instructure-ui/lib/components/AccessibleContent'
 import I18n from 'i18n!course_home_dialog'
 import plainStoreShape from 'jsx/shared/proptypes/plainStoreShape'
 
@@ -111,7 +129,6 @@ class CourseHomeDialog extends React.Component {
     return (<Modal
       isOpen={this.props.open}
       transition="fade"
-      zIndex={99999}
       label={I18n.t('Choose Course Home Page')}
       closeButtonLabel={I18n.t("Close")}
       onReady={this.onReady}

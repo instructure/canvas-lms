@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -193,27 +193,5 @@ describe Canvas do
         expect(Canvas.redis.ttl(key)).to be_present
       end
     end
-  end
-
-  describe ".cache_stores" do
-    before do
-      @old_cache_stores = Canvas.instance_variable_get(:@cache_stores)
-      Canvas.instance_variable_set(:@cache_stores, nil)
-    end
-
-    after do
-      Canvas.instance_variable_set(:@cache_stores, @old_cache_stores)
-    end
-
-    it "should pass through string links" do
-      ConfigFile.stubs(:load).returns('other' => { 'cache_store' => 'redis_store', 'servers' => ['localhost:6379'] }, 'db1' => 'other')
-      stores = Canvas.cache_stores
-      expect(stores.keys.sort).to eq ['db1', 'other', 'test']
-      expect(stores['other']).to be_a(Array)
-      expect(stores['other'].first).to eq :redis_store
-      expect(stores['db1']).to eq 'other'
-      expect(stores['test']).to eq :null_store
-    end
-
   end
 end

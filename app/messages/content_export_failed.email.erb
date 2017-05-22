@@ -1,12 +1,19 @@
 <% define_content :link do %>
-  <%= asset.epub_export ? epub_exports_url : polymorphic_url([asset.context, :content_exports]) %>
+  <% link = if asset.is_a? WebZipExport %>
+      <% course_offline_web_exports_path(asset.course) %>
+    <% elsif asset.is_a? EpubExport %>
+      <% epub_exports_url %>
+    <% else %>
+      <% polymorphic_url([asset.context, :content_exports]) %>
+    <% end %>
+  <%= link %>
 <% end %>
 
 <% define_content :subject do %>
 <%= t :subject, "Course Export Failed: %{course}", :course => asset.context.name %>
 <% end %>
 
-<%= t :body, <<-BODY, :course => asset.context.name, :id => %{"ContentExport:#{asset.id}"}
+<%= t :body, <<-BODY, :course => asset.context.name, :id => %{"#{asset.class}:#{asset.id}"}
 There was a problem exporting the course "%{course}".
 Please notify your system administrator, and give them the following export identifier: %{id}.
 BODY

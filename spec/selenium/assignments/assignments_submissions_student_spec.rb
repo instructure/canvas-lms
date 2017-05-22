@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2012 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative '../common'
 require_relative '../helpers/files_common'
 require_relative '../helpers/submissions_common'
@@ -29,7 +46,7 @@ describe "submissions" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       f(".submit_assignment_link").click
-      driver.execute_script "tinyMCE.activeEditor.setContent('text')"
+      type_in_tiny("#submission_body", 'text')
       f('button[type="submit"]').click
 
       expect(f("#sidebar_content")).to include_text("Turned In!")
@@ -214,31 +231,32 @@ describe "submissions" do
       f('.submit_assignment_link').click
       assignment_form = f('#submit_online_text_entry_form')
       wait_for_tiny(assignment_form)
-
-      submit_form(assignment_form)
+      submission = @assignment.submissions.find_by!(user_id: @student)
 
       # it should not actually submit and pop up an error message
+      expect { submit_form(assignment_form) }.not_to change { submission.reload.updated_at }
+      expect(submission.reload.body).to be nil
       expect(ff('.error_box')[1]).to include_text('Required')
 
-      expect(Submission.count).to eq 0
-
       # now make sure it works
-      type_in_tiny('#submission_body', 'now it is not blank')
-      submit_form(assignment_form)
-      expect { Submission.count }.to become 1
+      body_text = 'now it is not blank'
+      type_in_tiny('#submission_body', body_text)
+      expect { submit_form(assignment_form) }.to change { submission.reload.updated_at }
+      expect(submission.reload.body).to eq "<p>#{body_text}</p>"
     end
 
     it "should not allow a submission with only comments", priority: "1", test_id: 237027 do
       @assignment.update_attributes(:submission_types => "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       f('.submit_assignment_link').click
-      assignment_form = f('#submit_online_text_entry_form')
-      replace_content(assignment_form.find_element(:id, 'submission_comment'), 'this should not be able to be submitted for grading')
-      submit_form("#submit_online_text_entry_form")
+
+      expect(f('#submission_body_ifr')).to be_displayed
+      replace_content(f('#submit_online_text_entry_form').find_element(:id, 'submission_comment'), 'this should not be able to be submitted for grading')
+      submission = @assignment.submissions.find_by!(user_id: @student)
 
       # it should not actually submit and pop up an error message
+      expect { submit_form("#submit_online_text_entry_form") }.not_to change { submission.reload.updated_at }
       expect(ff('.error_box')[1]).to include_text('Required')
-      expect(Submission.count).to eq 0
 
       # navigate off the page and dismiss the alert box to avoid problems
       # with other selenium tests

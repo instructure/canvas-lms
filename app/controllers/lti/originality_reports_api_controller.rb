@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2016 Instructure, Inc.
+# Copyright (C) 2017 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -73,7 +73,7 @@ module Lti
     SERVICE_DEFINITIONS = [
       {
         id: ORIGINALITY_REPORT_SERVICE,
-        endpoint: 'api/v1/assignments/{assignment_id}/submissions/{submission_id}/originality_report',
+        endpoint: 'api/lti/assignments/{assignment_id}/submissions/{submission_id}/originality_report',
         format: ['application/json'].freeze,
         action: ['POST', 'PUT', 'GET'].freeze
       }.freeze

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 Instructure, Inc.
+# Copyright (C) 2015 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -41,6 +41,7 @@ module Lti
       m.stubs(:id).returns(1)
       m.stubs(:context).returns(root_account)
       m.stubs(:extension_setting).with(nil, :prefer_sis_email).returns(nil)
+      m.stubs(:extension_setting).with(:tool_configuration, :prefer_sis_email).returns(nil)
       shard_mock = mock('shard')
       shard_mock.stubs(:settings).returns({encription_key: 'abc'})
       m.stubs(:shard).returns(shard_mock)
@@ -399,6 +400,13 @@ module Lti
           exp_hash = {test: '$Canvas.course.id'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 123
+        end
+
+        it 'has substitution for $vnd.instructure.Course.uuid' do
+          course.stubs(:uuid).returns('Ioe3sJPt0KZp9Pw6xAvcHuLCl0z4TvPKP0iIOLbo')
+          exp_hash = {test: '$vnd.instructure.Course.uuid'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'Ioe3sJPt0KZp9Pw6xAvcHuLCl0z4TvPKP0iIOLbo'
         end
 
         it 'has substitution for $Canvas.course.name' do
@@ -784,6 +792,13 @@ module Lti
           expect(exp_hash[:test]).to eq 456
         end
 
+        it 'has substitution for $vnd.instructure.User.uuid' do
+          user.stubs(:uuid).returns('N2ST123dQ9zyhurykTkBfXFa3Vn1RVyaw9Os6vu3')
+          exp_hash = {test: '$vnd.instructure.User.uuid'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'N2ST123dQ9zyhurykTkBfXFa3Vn1RVyaw9Os6vu3'
+        end
+
         it 'has substitution for $Canvas.user.isRootAccountAdmin' do
           user.stubs(:roles).returns(["root_admin"])
           exp_hash = {test: '$Canvas.user.isRootAccountAdmin'}
@@ -841,7 +856,7 @@ module Lti
           let(:pseudonym) { Pseudonym.new }
 
           before :each do
-            user.stubs(:find_pseudonym_for_account).returns(pseudonym)
+            allow(SisPseudonym).to receive(:for).with(user, anything, anything).and_return(pseudonym)
           end
 
           it 'has substitution for $Canvas.user.sisSourceId' do
