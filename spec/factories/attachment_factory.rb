@@ -49,7 +49,7 @@ module Factories
 
   def valid_attachment_attributes(opts={})
     @context = opts[:context] || @context || @course || course_model(:reusable => true)
-    if opts[:folder]
+    if opts.has_key?(:folder)
       folder = opts[:folder]
     else
       if @context.respond_to?(:folders)
