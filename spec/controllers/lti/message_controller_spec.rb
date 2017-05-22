@@ -298,6 +298,26 @@ module Lti
         end
       end
 
+      context 'assignment' do
+        let(:assignment) { course.assignments.create!(name: 'test') }
+
+        before { tool_proxy.update_attributes(context: course) }
+
+        it 'finds the specified assignment' do
+          get 'resource', course_id: course.id,
+                          assignment_id: assignment.id,
+                          resource_link_id: link_id
+          expect(assigns[:_assignment]).to eq assignment
+        end
+
+        it 'renders not found if assignment does not exist' do
+          get 'resource', course_id: course.id,
+                          assignment_id: assignment.id + 1,
+                          resource_link_id: link_id
+          expect(response).to be_not_found
+        end
+      end
+
       context 'search account chain' do
         let(:root_account) { Account.create! }
 

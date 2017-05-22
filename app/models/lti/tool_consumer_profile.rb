@@ -70,6 +70,7 @@ module Lti
       ToolConsumerProfile.url
       Security.splitSecret
       Context.id
+      Canvas.assignment.id
     ).concat(CapabilitiesHelper::SUPPORTED_CAPABILITIES).freeze
 
     RESTRICTED_CAPABILITIES = [

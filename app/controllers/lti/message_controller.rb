@@ -106,6 +106,12 @@ module Lti
 
     private
 
+    def assignment
+      if params[:assignment_id].present?
+        @_assignment ||= @context.try(:active_assignments)&.find(params[:assignment_id])
+      end
+    end
+
     def launch_url(resource_url, message_handler)
       if resource_url.present?
         return resource_url if message_handler.valid_resource_url?(resource_url)
@@ -209,7 +215,7 @@ module Lti
       default_opts = {
           current_user: @current_user,
           current_pseudonym: @current_pseudonym,
-          assignment: nil
+          assignment: assignment
       }
       VariableExpander.new(@domain_root_account, @context, self, default_opts.merge(opts))
     end
