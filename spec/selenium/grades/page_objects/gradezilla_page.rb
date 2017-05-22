@@ -40,7 +40,7 @@ class Gradezilla
     MENU_ITEM_SELECTOR = 'span[data-menu-item-id="%s"]'.freeze
 
     def gradebook_settings_cog
-      f('#gradebook_settings')
+      f('#gradebook-settings-button')
     end
 
     def notes_option

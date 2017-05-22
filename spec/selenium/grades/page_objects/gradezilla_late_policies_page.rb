@@ -18,76 +18,67 @@
 require_relative '../../common'
 module MainSettings
   class LatePolicies
-    include SeleniumDependencies
+    class << self
+      include SeleniumDependencies
 
-    private
-    def late_policy_tab
-      # f('#late_policy_tab')
-    end
-
-    def missing_policy_checkbox
-      # f('#missing_policy_checkbox')
-    end
-
-    def missing_policy_percent_input
-      # f('#missing_percentage')
-    end
-
-    def no_late_policy_radio_option
-      # f('.late_policy #none')
-    end
-
-    def late_policy_radio_option
-      # f('.late_policy')
-    end
-
-    def late_policy_percent_input
-      # f('late_percentage')
-    end
-
-    def late_policy_time_increment
-      # f('late_increment')
-    end
-
-    def lowest_possible_grade_checkbox
-      # f('lowest_possible_grade_checkbox')
-    end
-
-    def lowest_grade_percent_input
-      # f('lowest_grade_percent_input')
-    end
-
-    public
-    def open_late_policy_tab
-      late_policy_tab.click
-    end
-
-    def create_missing_policy(percent_per_assignment)
-      unless missing_policy_checkbox.attribute('checked')
-        missing_policy_checkbox.click
+      def late_policy_tab
+        # f('#late_policy_tab')
       end
-      set_value(missing_policy_percent_input, percent_per_assignment)
-    end
 
-    def disable_missing_policy
-      if missing_policy_checkbox.attribute('checked')
-        missing_policy_checkbox.click
+      def missing_policy_checkbox
+        fj('label:contains("Automatically apply grade for missing submissions")')
       end
-    end
 
-    def disable_late_policy
-      no_late_policy_radio_option.click
-    end
+      def missing_policy_percent_input
+        f('#missing-submission-grade')
+      end
 
-    def create_late_policy(percentage, time_increment, lowest_percentage: nil)
-      late_policy_radio_option.click
-      set_value(late_policy_percent_input, percentage)
-      set_time_increment(time_increment)
-      if lowest_percentage
-        unless lowest_possible_grade_checkbox.attribute('checked')
-          lowest_possible_grade_checkbox.click
+      def late_policy_checkbox
+        fj('label:contains("Automatically apply deduction to late submissions")')
+      end
+
+      def late_policy_deduction_input
+        f('#late-submission-deduction')
+      end
+
+      def late_policy_increment_combobox(increment)
+        click_option(f('#late-submission-interval'), increment)
+      end
+
+      def lowest_grade_percent_input
+        f('#late-submission-minimum-percent')
+      end
+
+      def select_late_policy_tab
+        late_policy_tab.click
+      end
+
+      def create_missing_policy(percent_per_assignment)
+        unless missing_policy_checkbox.attribute('checked')
+          missing_policy_checkbox.click
         end
-        set_value(lowest_grade_percent_input, lowest_percentage)
+        set_value(missing_policy_percent_input, percent_per_assignment)
+      end
+
+      def disable_missing_policy
+        if missing_policy_checkbox.attribute('checked')
+          missing_policy_checkbox.click
+        end
+      end
+
+      def disable_late_policy
+        if late_policy_checkbox.attribute('checked')
+          late_policy_checkbox.click
+        end
+      end
+
+      def create_late_policy(percentage, time_increment, lowest_percentage = nil)
+        late_policy_checkbox.click
+        set_value(late_policy_deduction_input, percentage)
+        late_policy_increment_combobox(time_increment)
+        if lowest_percentage
+          set_value(lowest_grade_percent_input, lowest_percentage)
+        end
       end
     end
   end
