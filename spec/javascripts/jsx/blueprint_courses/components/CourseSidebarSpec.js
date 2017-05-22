@@ -82,6 +82,7 @@ test('renders the closed CourseSidebar component', () => {
   const tree = enzyme.mount(connect())
   const node = tree.find('button')
   equal(node.text().trim(), 'Open sidebar')
+  tree.unmount()
 })
 
 test('renders the open CourseSidebar component', () => {
@@ -105,6 +106,7 @@ test('renders the open CourseSidebar component', () => {
   ok(rows.at(2).find('button#mcUnsyncedChangesBtn').exists(), 'unsynced changes button')
   equal(rows.at(2).find('span').at(0).text(), 'Unsynced Changes')
   equal(rows.at(2).find('span').at(1).text(), props.unsyncedChanges.length, 'unsynced changes count')
+  tree.unmount()
 })
 
 test('renders no Uncynced Changes link if there are none', () => {
@@ -119,6 +121,7 @@ test('renders no Uncynced Changes link if there are none', () => {
 
   // no unsynced changes
   notOk(sidebar.find('button#mcUnsyncedChangesBtn').exists())
+  tree.unmount()
 })
 
 test('renders no Associations link if the user not an admin', () => {
@@ -133,4 +136,5 @@ test('renders no Associations link if the user not an admin', () => {
 
   // no unsynced changes
   notOk(sidebar.find('button#mcSidebarAsscBtn').exists())
+  tree.unmount()
 })
