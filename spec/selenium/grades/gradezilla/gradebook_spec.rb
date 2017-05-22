@@ -149,19 +149,6 @@ describe "Gradezilla" do
     expect { driver.switch_to.active_element }.to become(f('#gradebook-settings-button'))
   end
 
-  it "validates assignment details", priority: "1", test_id: 210048 do
-    submissions_count = @second_assignment.submissions.count.to_s + ' submissions'
-
-    Gradezilla.visit(@course)
-
-    Gradezilla.open_assignment_options(1)
-    f('[data-menu-item-id="show-assignment-details"]').click
-    details_dialog = f('#assignment-details-dialog')
-    expect(details_dialog).to be_displayed
-    table_rows = ff('#assignment-details-dialog-stats-table tr')
-    expect(table_rows[3].find_element(:css, 'td')).to include_text submissions_count
-  end
-
   it "includes student view student for grading" do
     @fake_student1 = @course.student_view_student
     @fake_student1.update_attribute :workflow_state, "deleted"

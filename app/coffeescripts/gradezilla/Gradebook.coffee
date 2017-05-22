@@ -49,7 +49,6 @@ define [
   'compiled/util/NumberCompare'
   'compiled/util/natcompare'
   'str/htmlEscape'
-  'jsx/gradezilla/shared/AssignmentDetailsDialogManager'
   'jsx/gradezilla/shared/SetDefaultGradeDialogManager'
   'jsx/gradezilla/default_gradebook/CurveGradesDialogManager'
   'jsx/gradezilla/default_gradebook/GradebookApi'
@@ -99,7 +98,7 @@ define [
   GradingPeriodsApi, GradingPeriodSetsApi, round, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS,
   CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, GradeFormatHelper, UserSettings, Spinner, AssignmentMuter,
   AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
-  SubmissionCell, NumberCompare, natcompare, htmlEscape, AssignmentDetailsDialogManager, SetDefaultGradeDialogManager,
+  SubmissionCell, NumberCompare, natcompare, htmlEscape, SetDefaultGradeDialogManager,
   CurveGradesDialogManager, GradebookApi, CellEditorFactory, StudentRowHeaderConstants, AssignmentColumnHeader,
   AssignmentGroupColumnHeader, AssignmentRowCellPropFactory, CustomColumnHeader, StudentColumnHeader, StudentRowHeader,
   TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, GridColor, StatusesModal, PostGradesStore,
@@ -2040,9 +2039,6 @@ define [
 
         studentRecord
 
-      assignmentDetailsDialogManager = new AssignmentDetailsDialogManager(
-        assignment, students, @contentLoadStates.submissionsLoaded
-      )
       downloadSubmissionsManager = new DownloadSubmissionsDialogManager(
         assignment, @options.download_assignment_submissions_url, @handleSubmissionsDownloading
       )
@@ -2079,9 +2075,6 @@ define [
         students: students
         submissionsLoaded: @contentLoadStates.submissionsLoaded
         sortBySetting: @getAssignmentColumnSortBySetting(assignmentId)
-        assignmentDetailsAction:
-          disabled: !assignmentDetailsDialogManager.isDialogEnabled()
-          onSelect: assignmentDetailsDialogManager.showDialog
         curveGradesAction: CurveGradesDialogManager.createCurveGradesAction(
           assignment, studentsThatCanSeeAssignment, curveGradesActionOptions
         )

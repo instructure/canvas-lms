@@ -427,34 +427,6 @@ test('clicking "Unposted" when disabled does not call onSortByUnposted', functio
   equal(this.props.sortBySetting.onSortByUnposted.callCount, 0);
 });
 
-QUnit.module('AssignmentColumnHeader - Assignment Details Action', {
-  setup () {
-    this.props = createExampleProps();
-  },
-
-  teardown () {
-    this.wrapper.unmount();
-  }
-});
-
-test('shows the menu item in an enabled state', function () {
-  this.wrapper = mountAndOpenOptions(this.props);
-
-  const specificMenuItem = document.querySelector('[data-menu-item-id="show-assignment-details"]');
-
-  equal(specificMenuItem.textContent, 'Assignment Details');
-  notOk(specificMenuItem.parentElement.parentElement.getAttribute('aria-disabled'));
-});
-
-test('disables the menu item when the disabled prop is true', function () {
-  this.props.assignmentDetailsAction.disabled = true;
-  this.wrapper = mountAndOpenOptions(this.props);
-
-  const specificMenuItem = document.querySelector('[data-menu-item-id="show-assignment-details"]');
-
-  equal(specificMenuItem.parentElement.parentElement.getAttribute('aria-disabled'), 'true');
-});
-
 QUnit.module('AssignmentColumnHeader - Curve Grades Dialog', {
   setup () {
     this.props = createExampleProps();

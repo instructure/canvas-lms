@@ -3082,13 +3082,6 @@ test('includes props for the "Sort by" setting', function () {
   equal(typeof props.sortBySetting.onSortByGradeAscending, 'function', 'props include "onSortByGradeAscending"');
 });
 
-test('includes props for the Assignment Details action', function () {
-  const props = this.createGradebook().getAssignmentColumnHeaderProps('201');
-  ok(props.assignmentDetailsAction, 'Assignment Details action config is present');
-  ok('disabled' in props.assignmentDetailsAction, 'props include "disabled"');
-  equal(typeof props.assignmentDetailsAction.onSelect, 'function', 'props include "onSelect"');
-});
-
 test('includes props for the Set Default Grade action', function () {
   const props = this.createGradebook().getAssignmentColumnHeaderProps('201');
   ok(props.setDefaultGradeAction, 'Set Default Grade action config is present');

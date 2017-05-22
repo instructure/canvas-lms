@@ -70,10 +70,6 @@ class AssignmentColumnHeader extends React.Component {
       }).isRequired,
     })).isRequired,
     submissionsLoaded: bool.isRequired,
-    assignmentDetailsAction: shape({
-      disabled: bool.isRequired,
-      onSelect: func.isRequired
-    }).isRequired,
     setDefaultGradeAction: shape({
       disabled: bool.isRequired,
       onSelect: func.isRequired
@@ -235,13 +231,6 @@ class AssignmentColumnHeader extends React.Component {
         </MenuItemGroup>
 
         <MenuItemSeparator />
-
-        <MenuItem
-          disabled={this.props.assignmentDetailsAction.disabled}
-          onSelect={this.props.assignmentDetailsAction.onSelect}
-        >
-          <span data-menu-item-id="show-assignment-details">{I18n.t('Assignment Details')}</span>
-        </MenuItem>
 
         <MenuItem
           disabled={!this.props.submissionsLoaded}
