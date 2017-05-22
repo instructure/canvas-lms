@@ -53,7 +53,6 @@ gem 'barby', '0.6.5', require: false
   gem 'rqrcode', '0.10.1', require: false
   gem 'chunky_png', '1.3.8', require: false
 gem 'bcrypt', '3.1.11'
-gem 'bootsnap', '0.2.14', require: false
 gem 'canvas_connect', '0.3.10'
   gem 'adobe_connect', '1.0.5', require: false
 gem 'canvas_webex', '0.17'
