@@ -78,6 +78,11 @@ define([
         return false;
       }
 
+      if(window.validateMagicFields) {
+        var bzChecks = validateMagicFields();
+        if(!bzChecks) return false;
+      }
+
       var valid = !$(this).is('#submit_online_text_entry_form') || $(this).validateForm({
         object_name: 'submission',
         required: ['body']

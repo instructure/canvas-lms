@@ -154,6 +154,21 @@ function copyAssignmentDescriptionIntoAssignmentSubmission() {
   bod.value = html;
 }
 
+// this is called in the canvas file public/javascripts/submit_assignment.js
+// to be a custom validator
+function validateMagicFields() {
+  var list = document.querySelectorAll("#assignment_show .description input[type=text][data-bz-retained], #assignment_show .description textarea[data-bz-retained]");
+  for(var a = 0; a < list.length; a++) {
+    if(list[a].value == "") {
+      alert('Please fill in all the inline fields.');
+      list[a].focus();
+      return false;
+    }
+  }
+
+  return true;
+}
+
 function prepareAssignmentSubmitWithMagicFields() {
   // only do this if we put magic field editors in the assignment
   if(!document.querySelector("#assignment_show .description input[data-bz-retained], #assignment_show .description textarea[data-bz-retained]"))
@@ -180,7 +195,7 @@ function prepareAssignmentSubmitWithMagicFields() {
   // and copy it again on submit in case it changed in the mean time...
   var form = document.getElementById("submit_online_text_entry_form");
   if(form)
-  form.addEventListener("submit", function() {
+  form.addEventListener("submit", function(event) {
     copyAssignmentDescriptionIntoAssignmentSubmission();
   }, true);
 }
