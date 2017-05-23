@@ -467,6 +467,7 @@ class UsersController < ApplicationController
 
   helper_method :show_planner?
   def show_planner?
+    return false unless @current_user && @current_user.preferences
     if @current_user.preferences[:dashboard_view]
       @current_user.preferences[:dashboard_view] == 'planner'
     else

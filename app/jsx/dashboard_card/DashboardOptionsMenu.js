@@ -86,22 +86,26 @@ export default class DashboardOptionsMenu extends React.Component {
     const dashboardPlannerHeader = document.getElementById('dashboard-planner-header') || fakeObj
     const dashboardActivity = document.getElementById('dashboard-activity')
     const dashboardCards = document.getElementById('DashboardCard_Container')
+    const rightSideContent = document.getElementById('right-side-wrapper') || fakeObj
 
     if (newView[0] === 'planner') {
       dashboardPlanner.style.display = 'block'
       dashboardPlannerHeader.style.display = 'block'
       dashboardActivity.style.display = 'none'
       dashboardCards.style.display = 'none'
+      rightSideContent.style.display = 'none'
     } else if (newView[0] === 'activity') {
       dashboardPlanner.style.display = 'none'
       dashboardPlannerHeader.style.display = 'none'
       dashboardActivity.style.display = 'block'
       dashboardCards.style.display = 'none'
+      rightSideContent.style.display = 'block'
     } else {
       dashboardPlanner.style.display = 'none'
       dashboardPlannerHeader.style.display = 'none'
       dashboardActivity.style.display = 'none'
       dashboardCards.style.display = 'block'
+      rightSideContent.style.display = 'block'
     }
   }
 
