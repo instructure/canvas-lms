@@ -18,7 +18,7 @@
 
 import React from 'react'
 
-import dig from 'jsx/shared/dig'
+import get from 'lodash/get'
 import Grid, { GridRow, GridCol } from 'instructure-ui/lib/components/Grid'
 import Typography from 'instructure-ui/lib/components/Typography'
 import IconLockSolid from 'instructure-icons/lib/Solid/IconLockSolid'
@@ -44,11 +44,11 @@ const UnsyncedChange = (props) => {
                 <Typography size="small" weight="bold">{asset_name}</Typography>
               </GridCol>
               <GridCol width={2}>
-                <Typography size="small" weight="bold">{dig(changeTypeLabels, change_type) || change_type}</Typography>
+                <Typography size="small" weight="bold">{get(changeTypeLabels, change_type) || change_type}</Typography>
               </GridCol>
               <GridCol width={2}>
                 <div style={{textAlign: 'right'}}>
-                  <Typography size="small" weight="bold">{dig(itemTypeLabels, asset_type) || asset_type}</Typography>
+                  <Typography size="small" weight="bold">{get(itemTypeLabels, asset_type) || asset_type}</Typography>
                 </div>
               </GridCol>
             </GridRow>

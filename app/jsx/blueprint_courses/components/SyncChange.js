@@ -20,7 +20,7 @@ import I18n from 'i18n!blueprint_settings'
 import React, { Component } from 'react'
 import cx from 'classnames'
 
-import dig from 'jsx/shared/dig'
+import get from 'lodash/get'
 import Grid, { GridRow, GridCol } from 'instructure-ui/lib/components/Grid'
 import Typography from 'instructure-ui/lib/components/Typography'
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
@@ -58,7 +58,7 @@ class SyncChange extends Component {
         <ul className="bcs__history-item__change-exceps__courses">
           {items.map(item => (
             <li key={item.course_id}>
-              {dig(item, 'term.name') || ''} - {item.name}{this.renderSpace()}{item.sis_course_id}{this.renderSpace()}{item.course_code}
+              {get(item, 'term.name') || ''} - {item.name}{this.renderSpace()}{item.sis_course_id}{this.renderSpace()}{item.course_code}
             </li>
           ))}
         </ul>

@@ -38,7 +38,7 @@ import Publishable from 'compiled/models/Publishable'
 import PublishButtonView from 'compiled/views/PublishButtonView'
 import htmlEscape from './str/htmlEscape'
 import setupContentIds from 'jsx/modules/utils/setupContentIds'
-import dig from 'jsx/shared/dig'
+import get from 'lodash/get'
 import './jquery.ajaxJSON'
 import './jquery.instructure_date_and_time' /* dateString, datetimeString, time_field, datetime_field */
 import './jquery.instructure_forms' /* formSubmit, fillFormData, formErrors, errorBox */
@@ -1211,7 +1211,7 @@ import 'compiled/jquery.rails_flash_notifications'
 
       var $titleInput = $('#edit_item_form #content_tag_title');
       var restrictions = $item.data().master_course_restrictions;
-      var isDisabled = !dig(ENV, 'MASTER_COURSE_SETTINGS.IS_MASTER_COURSE') && !!dig(restrictions, 'content');
+      var isDisabled = !get(ENV, 'MASTER_COURSE_SETTINGS.IS_MASTER_COURSE') && !!get(restrictions, 'content');
       $titleInput.attr('disabled', isDisabled);
 
       $("#edit_item_form").dialog({

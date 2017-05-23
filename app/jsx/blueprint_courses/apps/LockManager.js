@@ -22,7 +22,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import 'jquery.instructure_misc_plugins'
 
-import dig from 'jsx/shared/dig'
+import get from 'lodash/get'
 import buildProps from '../buildLockProps'
 import ApiClient from '../apiClient'
 import LockBanner from '../components/LockBanner'
@@ -60,7 +60,7 @@ export default class LockManager {
       isMasterContent: ENV.MASTER_COURSE_DATA.is_master_course_master_content,
       isChildContent: ENV.MASTER_COURSE_DATA.is_master_course_child_content,
       courseId: ENV.COURSE_ID,
-      itemId: dig(ENV, this.props.itemIdPath),
+      itemId: get(ENV, this.props.itemIdPath),
     }
   }
 
