@@ -138,6 +138,31 @@
 #           "example": true,
 #           "type": "boolean"
 #         },
+#         "missing": {
+#           "description": "Whether the assignment is missing.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "late_policy_status": {
+#           "description": "The status of the submission in relation to the late policy. Can be late, missing, none, or null.",
+#           "example": "missing",
+#           "type": "string"
+#         },
+#         "accepted_at": {
+#           "description": "The date that the submission was accepted at.",
+#           "example": "2012-01-01T01:00:00Z",
+#           "type": "datetime"
+#         },
+#         "points_deducted": {
+#           "description": "The amount of points automatically deducted from the score by the missing/late policy for a late or missing assignment.",
+#           "example": 12.3,
+#           "type": "number"
+#         },
+#         "duration_late": {
+#           "description": "The amount of time, in seconds, that an submission is late by.",
+#           "example": 300.2,
+#           "type": "number"
+#         },
 #         "workflow_state": {
 #           "description": "The current state of the submission",
 #           "example": "submitted",

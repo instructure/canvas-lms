@@ -77,8 +77,10 @@ describe 'Submissions API', type: :request do
       "missing"=>false,
       "graded_at"=>nil,
       "late_policy_status"=>nil,
+      "duration_late"=>0.0,
+      "points_deducted"=>nil,
       "accepted_at"=>nil
-    })
+                       })
   end
 
   describe "using section ids" do
@@ -731,6 +733,8 @@ describe 'Submissions API', type: :request do
         "late"=>false,
         "missing"=>false,
         "late_policy_status"=>nil,
+        "duration_late"=>0.0,
+        "points_deducted"=>0.0,
         "accepted_at"=>"1970-01-01T01:00:00Z"})
 
     # can't access other students' submissions
@@ -917,6 +921,8 @@ describe 'Submissions API', type: :request do
            "late"=>false,
            "missing"=>false,
            "late_policy_status"=>nil,
+           "duration_late"=>0.0,
+           "points_deducted"=>nil,
            "accepted_at"=>"1970-01-01T01:00:00Z"},
           {"id"=>sub1.id,
            "grade"=>nil,
@@ -943,6 +949,8 @@ describe 'Submissions API', type: :request do
            "late"=>false,
            "missing"=>false,
            "late_policy_status"=>nil,
+           "duration_late"=>0.0,
+           "points_deducted"=>nil,
            "accepted_at"=>"1970-01-01T02:00:00Z"},
           {"id"=>sub1.id,
            "grade"=>"A-",
@@ -991,6 +999,8 @@ describe 'Submissions API', type: :request do
            "late"=>false,
            "missing"=>false,
            "late_policy_status"=>nil,
+           "duration_late"=>0.0,
+           "points_deducted"=>0.0,
            "accepted_at"=>"1970-01-01T03:00:00Z"}],
         "attempt"=>3,
         "url"=>nil,
@@ -1026,6 +1036,8 @@ describe 'Submissions API', type: :request do
         "late"=>false,
         "missing"=>false,
         "late_policy_status"=>nil,
+        "duration_late"=>0.0,
+        "points_deducted"=>0.0,
         "accepted_at"=>"1970-01-01T03:00:00Z"},
        {"id"=>sub2.id,
         "grade"=>"F",
@@ -1081,6 +1093,8 @@ describe 'Submissions API', type: :request do
            "late"=>false,
            "missing"=>false,
            "late_policy_status"=>nil,
+           "duration_late"=>0.0,
+           "points_deducted"=>0.0,
            "accepted_at"=>"1970-01-01T04:00:00Z"}],
         "attempt"=>1,
         "url"=>"http://www.instructure.com",
@@ -1118,6 +1132,8 @@ describe 'Submissions API', type: :request do
         "late"=>false,
         "missing"=>false,
         "late_policy_status"=>nil,
+        "duration_late"=>0.0,
+        "points_deducted"=>0.0,
         "accepted_at"=>"1970-01-01T04:00:00Z"}]
     expect(json.sort_by { |h| h['user_id'] }).to eq res.sort_by { |h| h['user_id'] }
   end
