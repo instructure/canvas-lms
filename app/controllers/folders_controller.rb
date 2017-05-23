@@ -279,62 +279,6 @@ class FoldersController < ApplicationController
     end
   end
 
-  def download
-    if authorized_action(@context, @current_user, :read)
-      @folder = @context.folders.find(params[:folder_id])
-      user_id = @current_user && @current_user.id
-
-      # Destroy any previous zip downloads that might exist for this folder,
-      # except the last one (cause we might be able to use it)
-      folder_filename = "#{t :folder_filename, "folder"}.zip"
-
-      @attachments = Attachment.where(context_id: @folder,
-                                      context_type: @folder.class.to_s,
-                                      display_name: folder_filename,
-                                      user_id: user_id,
-                                      workflow_state: ['to_be_zipped', 'zipping', 'zipped', 'unattached', 'errored']).
-          where("file_state<>'deleted'").
-          order(:created_at).to_a
-      @attachment = @attachments.pop
-      @attachments.each{|a| a.destroy_permanently! }
-      last_date = (@folder.active_file_attachments.map(&:updated_at) + @folder.active_sub_folders.by_position.map(&:updated_at)).compact.max
-      if @attachment && last_date && @attachment.created_at < last_date
-        @attachment.destroy_permanently!
-        @attachment = nil
-      end
-
-      if @attachment.nil?
-        @attachment = @folder.file_attachments.build(:display_name => folder_filename)
-        @attachment.user_id = user_id
-        @attachment.workflow_state = 'to_be_zipped'
-        @attachment.file_state = '0'
-        @attachment.context = @folder
-        @attachment.save!
-        ContentZipper.send_later_enqueue_args(:process_attachment, { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1 }, @attachment, @current_user)
-        render :json => @attachment
-      else
-        respond_to do |format|
-          if @attachment.zipped?
-            if Attachment.s3_storage?
-              format.html { redirect_to @attachment.inline_url }
-              format.zip { redirect_to @attachment.inline_url }
-            else
-              cancel_cache_buster
-              format.html { send_file(@attachment.full_filename, :type => @attachment.content_type_with_encoding, :disposition => 'inline') }
-              format.zip { send_file(@attachment.full_filename, :type => @attachment.content_type_with_encoding, :disposition => 'inline') }
-            end
-            format.json { render :json => @attachment.as_json(:methods => :readable_size) }
-          else
-            flash[:notice] = t :file_zip_in_process, "File zipping still in process..."
-            format.html { redirect_to named_context_url(@context, :context_folder_url, @folder.id) }
-            format.zip { redirect_to named_context_url(@context, :context_folder_url, @folder.id) }
-            format.json { render :json => @attachment }
-          end
-        end
-      end
-    end
-  end
-
   # @API Update folder
   # @subtopic Folders
   # Updates a folder

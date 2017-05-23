@@ -123,9 +123,7 @@ CanvasRails::Application.routes.draw do
   end
 
   concern :folders do
-    resources :folders do
-      get :download
-    end
+    resources :folders
   end
 
   concern :media do
