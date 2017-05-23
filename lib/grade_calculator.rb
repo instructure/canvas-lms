@@ -90,7 +90,7 @@ class GradeCalculator
   private
 
   def effective_due_dates
-    @effective_due_dates ||= EffectiveDueDates.for_course(@course, @assignments)
+    @effective_due_dates ||= EffectiveDueDates.for_course(@course, @assignments).filter_students_to(@user_ids)
   end
 
   def compute_scores_and_group_sums_for_batch(user_ids)

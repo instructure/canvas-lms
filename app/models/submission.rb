@@ -1164,9 +1164,6 @@ class Submission < ActiveRecord::Base
   end
 
   def infer_values
-    # we don't want this to be in a before_create because we want cache_due_date
-    # to happen before we infer other values, if it's needed
-    cache_due_date if new_record? && assignment.present?
     if assignment
       self.context_code = assignment.context_code
     end
@@ -1218,8 +1215,8 @@ class Submission < ActiveRecord::Base
     true
   end
 
-  def cache_due_date
-    self.cached_due_date = assignment.overridden_for(user).due_at
+  def just_submitted?
+    @just_submitted || false
   end
 
   def update_admins_if_just_submitted
