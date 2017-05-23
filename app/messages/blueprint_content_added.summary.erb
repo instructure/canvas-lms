@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= polymorphic_url(asset.context, :anchor => asset.master_migration.notification_link_anchor) %>
+  <%= polymorphic_url(asset.context, :anchor => asset.notification_link_anchor) %>
 <% end %>
 
 <% define_content :subject do %>

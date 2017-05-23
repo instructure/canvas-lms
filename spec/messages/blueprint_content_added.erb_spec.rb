@@ -29,7 +29,7 @@ describe 'blueprint_content_added' do
     @cm = @minion.content_migrations.build
     @cm.migration_type = "master_course_import"
     @cm.migration_settings[:master_migration_id] = mm.id
-    @cm.migration_settings[:child_subscription_id] = sub.id
+    @cm.child_subscription_id = sub.id
     @cm.workflow_state = 'imported'
     @cm.save!
   end

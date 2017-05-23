@@ -43,7 +43,9 @@ module YARD::Templates::Helpers::BaseHelper
       if topic
         html_file = "#{topicize topic.first}.html"
         action = $2
-        link_url("#{html_file}#method.#{topicize(controller.name.to_s).sub("_controller", "")}.#{action}", args[1])
+        name = controller.name.to_s
+        name = "#{controller.namespace.name.to_s}/#{name}" if controller.namespace.name != :root
+        link_url("#{html_file}#method.#{topicize(name).sub("_controller", "")}.#{action}", args[1])
       else
         raise "couldn't find API link for #{args.first}"
       end

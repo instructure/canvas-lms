@@ -210,7 +210,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
       cm.migration_settings[:hide_from_index] = true # we may decide we want to show this after all, but hide them for now
       cm.migration_settings[:master_course_export_id] = export.id
       cm.migration_settings[:master_migration_id] = self.id
-      cm.migration_settings[:child_subscription_id] = sub.id
+      cm.child_subscription_id = sub.id
       cm.workflow_state = 'exported'
       cm.exported_attachment = export.attachment
       cm.save!
@@ -258,7 +258,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   end
 
   def notification_link_anchor
-    "!/blueprint/migrations/#{id}"
+    "!/blueprint/blueprint_templates/#{master_template_id}/#{id}"
   end
 
 end

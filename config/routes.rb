@@ -1940,6 +1940,10 @@ CanvasRails::Application.routes.draw do
       get 'courses/:course_id/blueprint_templates/:template_id/migrations/:id/details', action: :migration_details
 
       put 'courses/:course_id/blueprint_templates/:template_id/restrict_item', action: :restrict_item
+
+      get 'courses/:course_id/blueprint_subscriptions/:subscription_id/migrations', action: :imports_index, as: :course_blueprint_imports
+      get 'courses/:course_id/blueprint_subscriptions/:subscription_id/migrations/:id', action: :imports_show
+      get 'courses/:course_id/blueprint_subscriptions/:subscription_id/migrations/:id/details', action: :import_details
     end
 
     scope(controller: :late_policy) do

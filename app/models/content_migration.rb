@@ -555,7 +555,7 @@ class ContentMigration < ActiveRecord::Base
 
   def master_course_subscription
     return unless self.for_master_course_import?
-    @master_course_subscription ||= MasterCourses::ChildSubscription.find(self.migration_settings[:child_subscription_id])
+    @master_course_subscription ||= MasterCourses::ChildSubscription.find(self.child_subscription_id)
   end
 
   def prepare_data(data)
@@ -897,6 +897,10 @@ class ContentMigration < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def notification_link_anchor
+    "!/blueprint/blueprint_subscriptions/#{self.child_subscription_id}/#{id}"
   end
 
   set_broadcast_policy do |p|
