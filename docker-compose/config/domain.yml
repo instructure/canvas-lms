@@ -1,3 +1,6 @@
+production:
+  domain: "canvas.docker"
+
 test:
   domain: localhost
 

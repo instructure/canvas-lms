@@ -27,9 +27,6 @@ RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - \
        libxmlsec1-dev \
        python-lxml \
        libicu-dev \
-       postgresql-client \
-       unzip \
-       fontforge \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /home/docker/.gem/ruby/$RUBY_MAJOR.0
@@ -40,50 +37,51 @@ RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="
   && gem update --system --no-document \
   && find $GEM_HOME ! -user docker | xargs chown docker:docker
 
-# We will need sfnt2woff in order to build fonts
-RUN curl -O https://people-mozilla.org/~jkew/woff/woff-code-latest.zip \
-  && unzip woff-code-latest.zip -d woff \
-  && cd woff \
-  && make \
-  && cp sfnt2woff /usr/local/bin \
-  && cd - \
-  && rm -rf woff*
 
 WORKDIR $APP_HOME
 
-COPY Gemfile      ${APP_HOME}
-COPY Gemfile.d    ${APP_HOME}Gemfile.d
-COPY config       ${APP_HOME}config
-COPY gems         ${APP_HOME}gems
-COPY script       ${APP_HOME}script
-COPY package.json ${APP_HOME}
-COPY yarn.lock    ${APP_HOME}
-RUN find gems -type d ! -user docker -print0 | xargs -0 chown -h docker:docker
-
-# Install deps as docker to avoid sadness w/ npm lifecycle hooks
-USER docker
-RUN bundle install --jobs 8 \
-  && yarn install --pure-lockfile
-USER root
-
 COPY . $APP_HOME
-RUN mkdir -p .yardoc \
-             app/stylesheets/brandable_css_brands \
-             client_apps/canvas_quizzes/node_modules \
-             gems/canvas_i18nliner/node_modules \
-             gems/selinimum/node_modules \
-             log \
-             node_modules \
-             public/dist \
-             public/doc/api \
-             public/javascripts/client_apps \
-             public/javascripts/compiled \
-             tmp \
-             /home/docker/.bundler/ \
-             /home/docker/.cache/yarn \
-             /home/docker/.gem/ \
-  && find ${APP_HOME} /home/docker ! -user docker -print0 | xargs -0 chown -h docker:docker
+
+# optimizing for size here ... get all the dev dependencies so we can
+# compile assets, then throw away everything we don't need
+#
+# the privilege dropping could be slightly less verbose if we ever add
+# gosu (here or upstream)
+#
+# TODO: once we have docker 17.05+ everywhere, do this via multi-stage
+# build
+
+RUN bash -c ' \
+  # bash cuz better globbing and comments \
+  set -e; \
+  \
+  sudo -u docker -E env HOME=/home/docker PATH=$PATH bundle install --jobs 8; \
+  yarn install --pure-lockfile; \
+  COMPILE_ASSETS_NPM_INSTALL=0 bundle exec rake canvas:compile_assets; \
+  \
+  # downgrade to prod dependencies \
+  sudo -u docker -E env HOME=/home/docker PATH=$PATH bundle install --without test development; \
+  sudo -u docker -E env HOME=/home/docker PATH=$PATH bundle clean --force; \
+  yarn install --prod; \
+  \
+  # now some cleanup... \
+  rm -rf \
+    /home/docker/.bundle/cache \
+    $GEM_HOME/cache \
+    $GEM_HOME/bundler/gems/*/{.git,spec,test,features} \
+    $GEM_HOME/gems/*/{spec,test,features} \
+    `yarn cache dir` \
+    /root/.node-gyp \
+    /tmp/phantomjs \
+    .yardoc \
+    client_apps/canvas_quizzes/{tmp,node_modules} \
+    config/locales/generated \
+    gems/*/node_modules \
+    gems/plugins/*/node_modules \
+    log \
+    public/dist/maps \
+    public/doc/api/*.json \
+    public/javascripts/translations \
+    tmp-*.tmp'
 
 USER docker
-# TODO: switch to canvas:compile_assets_dev once we stop using this Dockerfile in production/e2e
-RUN COMPILE_ASSETS_NPM_INSTALL=0 bundle exec rake canvas:compile_assets
