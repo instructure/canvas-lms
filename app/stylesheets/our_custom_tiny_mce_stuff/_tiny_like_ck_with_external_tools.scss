@@ -68,10 +68,35 @@ $menu-item-keyboard-shortcut-color: $ic-font-color-dark;
   overflow: hidden;
 }
 
-@if $use_high_contrast {
-  .mce-toolbar .mce-btn.mce-active {
-    box-shadow: inset 0 0 0 2px $ic-font-color-dark !important;
-  }
+.mce-toolbar .mce-btn {
+  background-color: transparent;
+}
+
+.mce-tinymce .mce-btn.mce-active:after {
+  content: ' ';
+  position: absolute;
+  display: block;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 0;
+  margin-left: -4px;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 4px solid $ic-font-color-dark;
+}
+
+.mce-tinymce .mce-btn.mce-active:focus:after {
+  bottom: 1px;
+  border-bottom-color: $ic-link-color;
+}
+
+.mce-tinymce .mce-active.mce-menubtn:after {
+  display: none;
+}
+
+.mce-statusbar .mce-container-body {
+  overflow: hidden;
 }
 
 .mce-tinymce :focus,
