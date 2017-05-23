@@ -48,7 +48,6 @@ import 'jqueryui/sortable'
 import 'jqueryui/tabs'
 import 'compiled/behaviors/trackEvent'
 import 'compiled/badge_counts'
-import 'vendor/jquery.placeholder'
 
   $.trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/');
 
@@ -911,6 +910,3 @@ import 'vendor/jquery.placeholder'
       });
     }, 2000);
   });
-
-  $('input[placeholder], textarea[placeholder]').placeholder();
-

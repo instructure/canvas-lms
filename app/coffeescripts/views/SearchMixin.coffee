@@ -21,7 +21,6 @@ define [
   'compiled/util/mixin'
   'compiled/views/ValidatedMixin'
   'jquery.instructure_forms'
-  'vendor/jquery.placeholder'
 ], (I18n, $, mixin, ValidatedMixin) ->
 
   mixin {}, ValidatedMixin,
@@ -38,9 +37,6 @@ define [
 
     attach: ->
       @inputFilterView.on 'input', @fetchResults, this
-
-    afterRender: ->
-      @$el.placeholder()
 
     fetchResults: (query) ->
       if query is ''

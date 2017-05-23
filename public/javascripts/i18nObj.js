@@ -17,7 +17,7 @@
  */
 
 define([
-  'vendor/i18n_js_extension',
+  './vendor/i18n_js_extension',
   'jquery',
   'underscore',
   'str/htmlEscape',

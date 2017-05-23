@@ -17,7 +17,6 @@
 
 define [
   'compiled/views/InputView'
-  'vendor/jquery.placeholder'
 ], (InputView) ->
 
   ##
@@ -59,7 +58,3 @@ define [
       null
 
     change: @::keyup
-
-    afterRender: ->
-      @$el.placeholder()
-

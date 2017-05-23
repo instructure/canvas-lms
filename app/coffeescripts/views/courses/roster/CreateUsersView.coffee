@@ -22,7 +22,6 @@ define [
   'compiled/views/DialogFormView'
   'jst/courses/roster/createUsers'
   'jst/EmptyDialogFormWrapper'
-  'vendor/jquery.placeholder'
 ], (CreateUserList, _, I18n, DialogFormView, template, wrapper) ->
 
   class CreateUsersView extends DialogFormView
@@ -98,9 +97,6 @@ define [
       json.limit_privileges_to_course_section = json.limit_privileges_to_course_section == true ||
                                                     json.limit_privileges_to_course_section == "1"
       json
-
-    afterRender: ->
-      @$('[placeholder]').placeholder()
 
     focusX: ->
       $('.ui-dialog-titlebar-close', @el.parentElement).focus()
