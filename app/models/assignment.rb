@@ -282,12 +282,11 @@ class Assignment < ActiveRecord::Base
               :infer_grading_type,
               :process_if_quiz,
               :default_values,
-              :update_submissions_if_details_changed,
               :maintain_group_category_attribute,
               :validate_assignment_overrides
 
 
-  after_save  :update_grades_if_details_changed,
+  after_save  :update_submissions_and_grades_if_details_changed,
               :update_grading_period_grades,
               :touch_assignment_group,
               :touch_context,
@@ -355,28 +354,45 @@ class Assignment < ActiveRecord::Base
       s.graded_at = graded_at
       s.assignment = self
       s.assignment_changed_not_sub = true
+
+      # Skip the grade calculation for now. We'll do it at the end.
+      s.skip_grade_calc = true
       s.with_versioning(:explicit => true) { s.save! }
     end
+
+    context.recompute_student_scores
   end
+
+  def needs_to_update_submissions?
+    !new_record? &&
+      (points_possible_changed? || grading_type_changed? || grading_standard_id_changed?) &&
+      !submissions.graded.empty?
+  end
+  private :needs_to_update_submissions?
 
   # if a teacher changes the settings for an assignment and students have
   # already been graded, then we need to update the "grade" column to
   # reflect the changes
-  def update_submissions_if_details_changed
-    if !new_record? && (points_possible_changed? || grading_type_changed? || grading_standard_id_changed?) && !submissions.graded.empty?
+  def update_submissions_and_grades_if_details_changed
+    if needs_to_update_submissions?
       send_later_if_production(:update_student_submissions)
+    else
+      update_grades_if_details_changed
     end
     true
   end
 
   def needs_to_recompute_grade?
-    points_possible_changed? ||
-    muted_changed? ||
-    workflow_state_changed? ||
-    assignment_group_id_changed? ||
-    only_visible_to_overrides_changed? ||
-    omit_from_final_grade_changed?
+    !new_record? && (
+      points_possible_changed? ||
+      muted_changed? ||
+      workflow_state_changed? ||
+      assignment_group_id_changed? ||
+      only_visible_to_overrides_changed? ||
+      omit_from_final_grade_changed?
+    )
   end
+  private :needs_to_recompute_grade?
 
   def update_grades_if_details_changed
     if needs_to_recompute_grade?
@@ -385,6 +401,7 @@ class Assignment < ActiveRecord::Base
     end
     true
   end
+  private :update_grades_if_details_changed
 
   def update_grading_period_grades
     return true unless due_at_changed? && !id_changed? && context.grading_periods?
@@ -397,14 +414,17 @@ class Assignment < ActiveRecord::Base
       # recalculate just the old grading period's score
       context.recompute_student_scores(grading_period_id: grading_period_was, update_course_score: false)
     end
-    # recalculate the new grading period's score. If the grading period group is
-    # weighted, then we need to recalculate the overall course score too. (If
-    # grading period is nil, make sure we pass true for `update_course_score`
-    # so we can use a singleton job.)
-    context.recompute_student_scores(
-      grading_period_id: grading_period,
-      update_course_score: !grading_period || grading_period.grading_period_group&.weighted?
-    )
+
+    unless needs_to_recompute_grade? || needs_to_update_submissions?
+      # recalculate the new grading period's score. If the grading period group is
+      # weighted, then we need to recalculate the overall course score too. (If
+      # grading period is nil, make sure we pass true for `update_course_score`
+      # so we can use a singleton job.)
+      context.recompute_student_scores(
+        grading_period_id: grading_period,
+        update_course_score: !grading_period || grading_period.grading_period_group&.weighted?
+      )
+    end
     true
   end
   private :update_grading_period_grades
