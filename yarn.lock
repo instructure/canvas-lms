@@ -1580,6 +1580,17 @@ code-point-at@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/code-point-at/-/code-point-at-1.1.0.tgz#0d070b4d043a5bea33a2f1a40e2edb3d9a4ccf77"
 
+codemirror-graphql@^0.6.4:
+  version "0.6.4"
+  resolved "https://registry.yarnpkg.com/codemirror-graphql/-/codemirror-graphql-0.6.4.tgz#df3274b8439175def211d191463725266ddc3059"
+  dependencies:
+    graphql-language-service-interface "0.0.10"
+    graphql-language-service-parser "^0.0.9"
+
+codemirror@^5.25.2:
+  version "5.26.0"
+  resolved "https://registry.yarnpkg.com/codemirror/-/codemirror-5.26.0.tgz#bcbee86816ed123870c260461c2b5c40b68746e5"
+
 coffee-loader@^0.7.2:
   version "0.7.3"
   resolved "https://registry.yarnpkg.com/coffee-loader/-/coffee-loader-0.7.3.tgz#fadbc6efd6fc7ecc88c5b3046a2c292066bcb54a"
@@ -3496,6 +3507,61 @@ graceful-fs@~2.0.3:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/graceful-readlink/-/graceful-readlink-1.0.1.tgz#4cafad76bc62f02fa039b2f94e9a3dd3a391a725"
 
+graphiql@^0.10.2:
+  version "0.10.2"
+  resolved "https://registry.yarnpkg.com/graphiql/-/graphiql-0.10.2.tgz#21f60a26cd3b942e28ce1df6165b002a3e7ad6ab"
+  dependencies:
+    codemirror "^5.25.2"
+    codemirror-graphql "^0.6.4"
+    marked "0.3.6"
+
+graphql-language-service-config@0.0.10:
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/graphql-language-service-config/-/graphql-language-service-config-0.0.10.tgz#356595fc424f9597a865ce2108c2ffb0565c02c2"
+  dependencies:
+    graphql-language-service-types "0.0.15"
+
+graphql-language-service-interface@0.0.10:
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/graphql-language-service-interface/-/graphql-language-service-interface-0.0.10.tgz#925e8205fa45ffa0638639dd6978c278cad95e60"
+  dependencies:
+    graphql "^0.9.6"
+    graphql-language-service-config "0.0.10"
+    graphql-language-service-parser "0.0.9"
+    graphql-language-service-types "0.0.15"
+    graphql-language-service-utils "0.0.9"
+
+graphql-language-service-parser@0.0.9, graphql-language-service-parser@^0.0.9:
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/graphql-language-service-parser/-/graphql-language-service-parser-0.0.9.tgz#522b25554076b46fce8a3e71017b5c6cdb24a676"
+  dependencies:
+    graphql-language-service-types "0.0.15"
+
+graphql-language-service-types@0.0.15:
+  version "0.0.15"
+  resolved "https://registry.yarnpkg.com/graphql-language-service-types/-/graphql-language-service-types-0.0.15.tgz#3f1446beaa78146b78f49c7d7047293301a58393"
+  dependencies:
+    graphql "^0.9.6"
+
+graphql-language-service-utils@0.0.9:
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/graphql-language-service-utils/-/graphql-language-service-utils-0.0.9.tgz#de1b9fdadfa1d59a3c33a96b534b18efea84d0ad"
+  dependencies:
+    graphql "^0.9.6"
+    graphql-language-service-types "0.0.15"
+
+graphql@^0.9.1:
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/graphql/-/graphql-0.9.1.tgz#f4d154cbec054d4a5d3b1be95f23435c09aa86c8"
+  dependencies:
+    iterall "1.0.3"
+
+graphql@^0.9.6:
+  version "0.9.6"
+  resolved "https://registry.yarnpkg.com/graphql/-/graphql-0.9.6.tgz#514421e9d225c29dfc8fd305459abae58815ef2c"
+  dependencies:
+    iterall "^1.0.0"
+
 gulp-file@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/gulp-file/-/gulp-file-0.3.0.tgz#e8c4d763f126fb3332fc416e3d1ef46ed67d8d0d"
@@ -4307,6 +4373,10 @@ istanbul@0.x.x, istanbul@^0.4.0:
     which "^1.1.1"
     wordwrap "^1.0.0"
 
+iterall@1.0.3, iterall@^1.0.0:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/iterall/-/iterall-1.0.3.tgz#e0b31958f835013c323ff0b10943829ac69aa4b7"
+
 jmespath@0.15.0:
   version "0.15.0"
   resolved "https://registry.yarnpkg.com/jmespath/-/jmespath-0.15.0.tgz#a3f222a9aae9f966f5d27c796510e28091764217"
@@ -5078,6 +5148,10 @@ map-cache@^0.2.0:
 map-obj@^1.0.0, map-obj@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/map-obj/-/map-obj-1.0.1.tgz#d933ceb9205d82bdcf4886f6742bdc2b4dea146d"
+
+marked@0.3.6:
+  version "0.3.6"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-0.3.6.tgz#b2c6c618fccece4ef86c4fc6cb8a7cbf5aeda8d7"
 
 math-expression-evaluator@^1.2.14:
   version "1.2.17"

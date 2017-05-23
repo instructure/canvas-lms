@@ -50,6 +50,8 @@
     "fontfaceobserver": "^2.0.8",
     "gglobby": "0.0.3",
     "glob": "^7.0.3",
+    "graphiql": "^0.10.2",
+    "graphql": "^0.9.1",
     "gulp": "^3.9",
     "gulp-file": "^0.3.0",
     "gulp-filter": "^5.0.0",

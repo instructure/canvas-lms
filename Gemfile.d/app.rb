@@ -116,6 +116,9 @@ gem 'gepub', '0.7.0beta3', github: 'ccutrer/gepub', ref: '7cea2f4912f15d89bc9e9c
 gem 'imperium', '0.1.3', require: false
 gem 'academic_benchmarks', '0.0.9', require: false
 
+gem 'graphql', '~>1.5.4'
+gem 'graphql-batch', '~>0.3.1'
+
 gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbacks'
 gem 'acts_as_list', path: 'gems/acts_as_list'
 gem 'adheres_to_policy', path: 'gems/adheres_to_policy'

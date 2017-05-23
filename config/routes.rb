@@ -23,6 +23,9 @@ Dir["{gems,vendor}/plugins/*/config/pre_routes.rb"].each { |pre_routes|
 }
 
 CanvasRails::Application.routes.draw do
+  post "/api/graphql", to: "graphql#execute"
+  get 'graphiql', to: 'graphql#graphiql'
+
   resources :submission_comments, only: [:update, :destroy]
 
   resources :epub_exports, only: [:index]
