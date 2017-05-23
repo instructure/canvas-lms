@@ -16,11 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import PropTypes from 'prop-types'
 import MigrationStates from './migrationStates'
 
-const { shape, string, arrayOf, oneOf, bool } = PropTypes
+const { shape, string, arrayOf, oneOf, bool, instanceOf } = PropTypes
 const propTypes = {}
 
 propTypes.migrationState = oneOf(MigrationStates.statesList)
@@ -93,5 +92,12 @@ propTypes.unsyncedChange = shape({
   locked: bool.isRequired
 })
 propTypes.unsyncedChanges = arrayOf(propTypes.unsyncedChange)
+
+propTypes.notification = shape({
+  id: string.isRequired,
+  message: string.isRequired,
+  err: instanceOf(Error),
+})
+propTypes.notificationList = arrayOf(propTypes.notification)
 
 export default propTypes

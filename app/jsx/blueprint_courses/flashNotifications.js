@@ -16,35 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import ReactDOM from 'react-dom'
-import { Provider } from 'react-redux'
+import { showFlashAlert } from 'jsx/shared/FlashAlert'
+import actions from './actions'
 
-import createStore from '../store'
-import { ConnectedCourseSidebar } from '../components/CourseSidebar'
-import FlashNotifications from '../flashNotifications'
-
-export default class BlueprintCourse {
-  constructor (root, data, debug) {
-    this.root = root
-    this.store = createStore(data, debug)
-  }
-
-  unmount () {
-    ReactDOM.unmountComponentAtNode(this.root)
-  }
-
-  render () {
-    ReactDOM.render(
-      <Provider store={this.store}>
-        <ConnectedCourseSidebar />
-      </Provider>,
-      this.root
-    )
-  }
-
-  start () {
-    FlashNotifications.subscribe(this.store)
-    this.render()
+export default class FlashNotifications {
+  static subscribe (store) {
+    store.subscribe(() => {
+      const nots = store.getState().notifications
+      nots.forEach((not) => {
+        showFlashAlert(not)
+        store.dispatch(actions.clearNotification(not.id))
+      })
+    })
   }
 }

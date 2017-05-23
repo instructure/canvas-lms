@@ -54,7 +54,7 @@ test('showChangeLog calls selectChangeLog prop with argument', () => {
   const tree = enzyme.shallow(<ChildContent {...props} />)
   const instance = tree.instance()
   instance.showChangeLog('5')
-  deepEqual(props.selectChangeLog.getCall(0).args[0], { changeId: '5' })
+  deepEqual(props.selectChangeLog.getCall(0).args[0], '5')
 })
 
 test('hideChangeLog calls selectChangeLog prop with null', () => {
@@ -63,7 +63,7 @@ test('hideChangeLog calls selectChangeLog prop with null', () => {
   const tree = enzyme.shallow(<ChildContent {...props} />)
   const instance = tree.instance()
   instance.hideChangeLog()
-  deepEqual(props.selectChangeLog.getCall(0).args[0], { changeId: null })
+  deepEqual(props.selectChangeLog.getCall(0).args[0], null)
 })
 
 test('realRef gets called with component instance on mount', () => {

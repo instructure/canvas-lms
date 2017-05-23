@@ -22,6 +22,7 @@ import { Provider } from 'react-redux'
 import page from 'page'
 
 import { ConnectedChildContent as ChildContent } from '../components/ChildContent'
+import FlashNotifications from '../flashNotifications'
 import createStore from '../store'
 
 export default class ChildCourse {
@@ -69,6 +70,7 @@ export default class ChildCourse {
   }
 
   start () {
+    FlashNotifications.subscribe(this.store)
     this.render()
     this.setupRoutes()
   }

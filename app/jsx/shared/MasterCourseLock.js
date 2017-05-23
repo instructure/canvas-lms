@@ -4,7 +4,7 @@ import axios from 'axios'
 import classnames from 'classnames'
 import I18n from 'i18n!lock_btn_module'
 import FilesystemObject from 'compiled/models/FilesystemObject'
-import ajaxError from 'jsx/shared/AjaxFlashAlert'
+import { showFlashError } from 'jsx/shared/FlashAlert'
 
 class MasterCourseLock extends React.Component {
   static propTypes = {
@@ -68,7 +68,7 @@ class MasterCourseLock extends React.Component {
       }).then((/* response */) => {
         this.setLocked(!this.isLocked())
       }).catch(
-        ajaxError(I18n.t('An error occurred changing the lock state for "%{fileName}"', {fileName}))
+        showFlashError(I18n.t('An error occurred changing the lock state for "%{fileName}"', {fileName}))
       )
   }
 

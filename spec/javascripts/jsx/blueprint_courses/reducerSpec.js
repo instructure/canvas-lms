@@ -289,3 +289,33 @@ test('sets change log status to not loaded on LOAD_CHANGE_FAILED', () => {
     data: null,
   } })
 })
+
+test('catches any action with err and message and treats it as an error notification', () => {
+  const newState = reduce({ type: '_NOT_A_REAL_ACTION_', payload: { message: 'hello world', err: 'bad things happened' } })
+  equal(newState.notifications.length, 1)
+  equal(newState.notifications[0].type, 'error')
+  equal(newState.notifications[0].message, 'hello world')
+  equal(newState.notifications[0].err, 'bad things happened')
+})
+
+test('adds new info notification on NOTIFY_INFO', () => {
+  const newState = reduce(actions.notifyInfo({ message: 'hello world' }))
+  equal(newState.notifications.length, 1)
+  equal(newState.notifications[0].type, 'info')
+  equal(newState.notifications[0].message, 'hello world')
+})
+
+test('adds new error notification on NOTIFY_ERROR', () => {
+  const newState = reduce(actions.notifyError({ message: 'hello world', err: 'bad things happened' }))
+  equal(newState.notifications.length, 1)
+  equal(newState.notifications[0].type, 'error')
+  equal(newState.notifications[0].message, 'hello world')
+  equal(newState.notifications[0].err, 'bad things happened')
+})
+
+test('clear notification on CLEAR_NOTIFICATION', () => {
+  const newState = reduce(actions.clearNotification('1'), {
+    notifications: [{ id: '1', message: 'hello world', type: 'info' }]
+  })
+  equal(newState.notifications.length, 0)
+})

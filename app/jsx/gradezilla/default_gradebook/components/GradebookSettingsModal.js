@@ -26,7 +26,7 @@ import Modal, { ModalBody, ModalFooter, ModalHeader } from 'instructure-ui/lib/c
 import Heading from 'instructure-ui/lib/components/Heading';
 import TabList, { TabPanel } from 'instructure-ui/lib/components/TabList';
 import I18n from 'i18n!gradebook';
-import { showAjaxFlashAlert } from 'jsx/shared/AjaxFlashAlert';
+import { showFlashAlert } from 'jsx/shared/FlashAlert';
 
 class GradebookSettingsModal extends React.Component {
   static propTypes = {
@@ -49,18 +49,18 @@ class GradebookSettingsModal extends React.Component {
 
   onFetchLatePolicyFailure = () => {
     const message = I18n.t('An error occurred while loading late policies');
-    showAjaxFlashAlert(message, 'error');
+    showFlashAlert({ message, type: 'error' });
   }
 
   onUpdateLatePolicySuccess = () => {
     const message = I18n.t('Late policies updated');
-    showAjaxFlashAlert(message, 'success');
+    showFlashAlert({ message, type: 'success' });
     this.close();
   }
 
   onUpdateLatePolicyFailure = () => {
     const message = I18n.t('An error occurred while updating late policies');
-    showAjaxFlashAlert(message, 'error');
+    showFlashAlert({ message, type: 'error' });
   }
 
   handleUpdateButtonClicked = () => {

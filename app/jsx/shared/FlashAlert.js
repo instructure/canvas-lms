@@ -1,24 +1,44 @@
+/*
+ * Copyright (C) 2017 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /**
-* Flash alerts for ajax error messages
+* Flash alerts, especially for ajax error messages
 * Typical usage:
-* import ajaxError from 'jsx/shared/AjaxFlashAlert'
+* import {showFlashError} from 'jsx/shared/FlashAlert'
 * ...
 * axios.put(url, data).then((response) => {
 *     // do something with response
-*   }).catch(ajaxError(your_error_message))
+*   }).catch(showFlashError(your_error_message))
 *
-* ajaxError() with no argument shows a generic message
+* showFlashError() with no argument shows a generic message
 *
 * On error, will display an inst-ui Alert at the top of the page
 * with an error message and "Details" button. When the user clicks
 * the button, it shows error details extracted from the axios Error
 *
-* You could also import the lower level showAjaxFlashAlert function or
-* the AjaxFlashAlert component if you need more control
+* You could also import the lower level showFlashAlert function or
+* the FlashAlert component if you need more control
 *
-* showAjaxFlashAlert(message, errorOrVariant)
-*  errorOrVariant: if a string, interpreted as the Alert variant,
-*                   otherwise, it's an error object and the variant='error'
+* showFlashAlert({ err, message, type }, onCloseCallback)
+*  err: error object
+*  message: user-facing message
+*  type: one of ['info', 'success', 'warning', 'error']
+*        default is 'info' unless an error object is passed in, else is 'error'
 */
 
 import React from 'react'
@@ -37,7 +57,7 @@ const timeout = 10000
 // An Alert with a message and "Details" button which surfaces
 // more info about the error when pressed.
 // Is displayed at the top of the document, and will close itself after a while
-class AjaxFlashAlert extends React.Component {
+export default class FlashAlert extends React.Component {
   static propTypes = {
     onClose: PropTypes.func.isRequired,
     message: PropTypes.string.isRequired,
@@ -159,16 +179,7 @@ class AjaxFlashAlert extends React.Component {
   }
 }
 
-function showAjaxFlashAlert (message, errorOrVariant = 'info') {
-  let error = null
-  let variant = 'info'
-  if (typeof errorOrVariant === 'string') {
-    variant = errorOrVariant
-  } else {
-    variant = 'error'
-    error = errorOrVariant
-  }
-
+export function showFlashAlert ({ message, err, type = err ? 'error' : 'info' }) {
   function closeAlert (atNode) {
     ReactDOM.unmountComponentAtNode(atNode)
     atNode.parentElement.removeChild(atNode)
@@ -187,10 +198,10 @@ function showAjaxFlashAlert (message, errorOrVariant = 'info') {
 
   function renderAlert (parent) {
     ReactDOM.render(
-      <AjaxFlashAlert
+      <FlashAlert
         message={message}
-        error={error}
-        variant={variant}
+        error={err}
+        variant={type}
         onClose={closeAlert.bind(null, parent)} // eslint-disable-line react/jsx-no-bind
       />, parent
     )
@@ -203,11 +214,11 @@ function showAjaxFlashAlert (message, errorOrVariant = 'info') {
   renderAlert(div)
 }
 
-function ajaxError (message = I18n.t('An error occurred making a network request')) {
-  return function (error) {
-    showAjaxFlashAlert(message, error)
-  }
+export function destroyContainer () {
+  const container = document.getElementById(messageHolderId)
+  if (container) container.remove()
 }
 
-export default ajaxError
-export {showAjaxFlashAlert, AjaxFlashAlert}
+export function showFlashError (message = I18n.t('An error occurred making a network request')) {
+  return err => showFlashAlert({ message, err, type: 'error' })
+}

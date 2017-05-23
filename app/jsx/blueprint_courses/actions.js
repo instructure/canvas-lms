@@ -18,17 +18,10 @@
 
 import I18n from 'i18n!blueprint_settings'
 import { createActions } from 'redux-actions'
-import { showAjaxFlashAlert } from 'jsx/shared/AjaxFlashAlert'
+
 import api from './apiClient'
 import LoadStates from './loadStates'
 import MigrationStates from './migrationStates'
-
-const handleError = (msg, dispatch, actionCreator) => (err) => {
-  showAjaxFlashAlert(msg, err)
-  if (dispatch && actionCreator) {
-    dispatch(actionCreator(err))
-  }
-}
 
 const types = [
   'LOAD_COURSES_START', 'LOAD_COURSES_SUCCESS', 'LOAD_COURSES_FAIL',
@@ -43,22 +36,31 @@ const types = [
   'LOAD_UNSYNCED_CHANGES_START', 'LOAD_UNSYNCED_CHANGES_SUCCESS', 'LOAD_UNSYNCED_CHANGES_FAIL',
   'ENABLE_SEND_NOTIFICATION', 'INCLUDE_CUSTOM_NOTIFICATION_MESSAGE', 'SET_NOTIFICATION_MESSAGE',
   'LOAD_CHANGE_START', 'LOAD_CHANGE_SUCCESS', 'LOAD_CHANGE_FAIL', 'SELECT_CHANGE_LOG',
+  'NOTIFY_INFO', 'NOTIFY_ERROR', 'CLEAR_NOTIFICATION',
 ]
 const actions = createActions(...types)
+
+actions.constants = {
+  MIGRATION_POLL_TIME: 3000,
+}
+
+const { notifyInfo, notifyError } = actions
+actions.notifyInfo = payload => notifyInfo(Object.assign(payload, { type: 'info' }))
+actions.notifyError = payload => notifyError(Object.assign(payload, { type: 'error' }))
 
 actions.loadChange = changeId => (dispatch, getState) => {
   const state = getState()
   const change = state.changeLogs[changeId]
   if (change && LoadStates.isLoading(change.status)) return;
 
-  dispatch(actions.loadChangeStart())
+  dispatch(actions.loadChangeStart({ changeId }))
   api.getFullMigration(state, changeId)
     .then(data => dispatch(actions.loadChangeSuccess(data)))
-    .catch(handleError(I18n.t('An error occurred while loading changes'), dispatch, actions.loadChangeFail))
+    .catch(err => dispatch(actions.loadChangeFail({ err, message: I18n.t('An error occurred while loading changes') })))
 }
 
 actions.realSelectChangeLog = actions.selectChangeLog
-actions.selectChangeLog = ({ changeId }) => (dispatch, getState) => {
+actions.selectChangeLog = changeId => (dispatch, getState) => {
   dispatch(actions.realSelectChangeLog({ changeId }))
   if (changeId === null) return;
   const state = getState()
@@ -72,7 +74,7 @@ actions.loadHistory = () => (dispatch, getState) => {
   dispatch(actions.loadHistoryStart())
   api.getSyncHistory(getState())
     .then(data => dispatch(actions.loadHistorySuccess(data)))
-    .catch(err => dispatch(actions.loadHistoryFail(err)))
+    .catch(err => dispatch(actions.loadHistoryFail({ err, message: I18n.t('An error ocurred while loading sync history') })))
 }
 
 actions.checkMigration = () => (dispatch, getState) => {
@@ -82,47 +84,45 @@ actions.checkMigration = () => (dispatch, getState) => {
   dispatch(actions.checkMigrationStart())
   api.checkMigration(getState())
     .then(res => dispatch(actions.checkMigrationSuccess(res.data)))
-    .catch(handleError(I18n.t('An error occurred while checking the migration status'), dispatch, actions.checkMigrationFail))
+    .catch(err => dispatch(actions.checkMigrationFail({ err, message: I18n.t('An error occurred while checking the migration status') })))
 }
 
 // we use a closure to scope migInterval to those two actions only
 (() => {
   let migInterval = null
 
-  const resetInterval = () => {
+  // our function action either needs to return an action object or a function
+  // for thunk to execute, hence the weird looking function-returning-function
+  actions.stopMigrationStatusPoll = () => () => {
     clearInterval(migInterval)
     migInterval = null
+  }
+
+  actions.pollMigrationStatus = () => (dispatch, getState) => {
+    const state = getState()
+    if (!state.isCheckingMigration && MigrationStates.isLoadingState(state.migrationStatus)) {
+      actions.checkMigration()(dispatch, getState)
+    } else if (MigrationStates.isEndState(state.migrationStatus)) {
+      actions.stopMigrationStatusPoll()(dispatch, getState)
+      switch (state.migrationStatus) {
+        case MigrationStates.states.completed:
+          dispatch(actions.notifyInfo({ message: I18n.t('Sync completed successfully') }))
+          break
+        case MigrationStates.states.imports_failed:
+        case MigrationStates.states.exports_failed:
+          dispatch(actions.notifyError({ message: I18n.t('There was an unexpected problem with the sync') }))
+          break;
+        default:
+          break
+      }
+    }
   }
 
   actions.startMigrationStatusPoll = () => (dispatch, getState) => {
     // don't start a new poll if one is in progress
     if (migInterval) return;
     actions.checkMigration()(dispatch, getState)
-    migInterval = setInterval(() => {
-      const state = getState()
-      if (!state.isCheckingMigration && MigrationStates.isLoadingState(state.migrationStatus)) {
-        actions.checkMigration()(dispatch, getState)
-      } else if (MigrationStates.isEndState(state.migrationStatus)) {
-        resetInterval()
-        switch (state.migrationStatus) {
-          case MigrationStates.states.completed:
-            showAjaxFlashAlert(I18n.t('Sync completed successfully'))
-            break
-          case MigrationStates.states.imports_failed:
-          case MigrationStates.states.exports_failed:
-            showAjaxFlashAlert(I18n.t('There was an unexpected problem with the sync', 'error'))
-            break;
-          default:
-            break
-        }
-      }
-    }, 3000)
-  }
-
-  // our function action either needs to return an action object or a function
-  // for thunk to execute, hence the weird looking function-returning-function
-  actions.stopMigrationStatusPoll = () => () => {
-    resetInterval()
+    migInterval = setInterval(() => actions.pollMigrationStatus()(dispatch, getState), actions.constants.MIGRATION_POLL_TIME)
   }
 })()
 
@@ -135,7 +135,7 @@ actions.beginMigration = (startInteval = true) => (dispatch, getState) => {
         actions.startMigrationStatusPoll()(dispatch, getState)
       }
     })
-    .catch(handleError(I18n.t('An error occurred while starting migration'), dispatch, actions.beginMigrationFail))
+    .catch(err => dispatch(actions.beginMigrationFail({ err, message: I18n.t('An error occurred while starting migration') })))
 }
 
 actions.addAssociations = associations => (dispatch, getState) => {
@@ -188,7 +188,7 @@ actions.loadCourses = filters => (dispatch, getState) => {
   dispatch(actions.loadCoursesStart())
   api.getCourses(getState(), filters)
     .then(res => dispatch(actions.loadCoursesSuccess(res.data)))
-    .catch(handleError(I18n.t('An error occurred while loading courses'), dispatch, actions.loadCoursesFail))
+    .catch(err => dispatch(actions.loadCoursesFail({ err, message: I18n.t('An error occurred while loading courses') })))
 }
 
 actions.loadAssociations = () => (dispatch, getState) => {
@@ -198,17 +198,19 @@ actions.loadAssociations = () => (dispatch, getState) => {
   dispatch(actions.loadAssociationsStart())
   api.getAssociations(state)
     .then((res) => {
-      const data = res.data.map(course =>
-        Object.assign({}, course, {
+      const data = res.data.map((course) => {
+        const parsedCourse = Object.assign(course, {
           term: {
             id: '0',
             name: course.term_name,
           },
-          term_name: undefined,
-        }))
+        })
+        delete parsedCourse.term_name
+        return parsedCourse
+      })
       dispatch(actions.loadAssociationsSuccess(data))
     })
-    .catch(handleError(I18n.t('An error occurred while loading associations'), dispatch, actions.loadAssociationsFail))
+    .catch(err => dispatch(actions.loadAssociationsFail({ err, message: I18n.t('An error occurred while loading associations') })))
 }
 
 actions.saveAssociations = () => (dispatch, getState) => {
@@ -217,19 +219,19 @@ actions.saveAssociations = () => (dispatch, getState) => {
   api.saveAssociations(state)
     .then(() => {
       dispatch(actions.saveAssociationsSuccess({ added: state.addedAssociations, removed: state.removedAssociations }))
-      showAjaxFlashAlert(I18n.t('Associations saved successfully'))
+      dispatch(actions.notifyInfo({ message: I18n.t('Associations saved successfully') }))
       if (state.addedAssociations.length > 0) {
         actions.beginMigration()(dispatch, getState)
       }
     })
-    .catch(handleError(I18n.t('An error occurred while saving associations'), dispatch, actions.saveAssociationsFail))
+    .catch(err => dispatch(actions.saveAssociationsFail({ err, message: I18n.t('An error occurred while saving associations') })))
 }
 
 actions.loadUnsyncedChanges = () => (dispatch, getState) => {
   dispatch(actions.loadUnsyncedChangesStart())
   api.loadUnsyncedChanges(getState())
     .then(res => dispatch(actions.loadUnsyncedChangesSuccess(res.data)))
-    .catch(err => dispatch(actions.loadUnsyncedChangesFail(err)))
+    .catch(err => dispatch(actions.loadUnsyncedChangesFail({ err, message: I18n.t('An error ocurred while loading unsynced changes') })))
 }
 
 const actionTypes = types.reduce((typesMap, actionType) =>

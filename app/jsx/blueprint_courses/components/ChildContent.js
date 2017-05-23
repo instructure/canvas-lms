@@ -53,11 +53,11 @@ export default class ChildContent extends Component {
   }
 
   showChangeLog (changeId) {
-    this.props.selectChangeLog({ changeId })
+    this.props.selectChangeLog(changeId)
   }
 
   hideChangeLog () {
-    this.props.selectChangeLog({ changeId: null })
+    this.props.selectChangeLog(null)
   }
 
   render () {

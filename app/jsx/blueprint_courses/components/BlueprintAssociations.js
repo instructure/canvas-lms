@@ -162,7 +162,6 @@ const connectState = state =>
     'courses',
     'terms',
     'subAccounts',
-    'errors',
     'hasLoadedCourses',
     'isLoadingCourses',
     'isLoadingAssociations',

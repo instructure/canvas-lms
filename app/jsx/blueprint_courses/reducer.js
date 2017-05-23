@@ -38,6 +38,18 @@ const changeLogReducer = combineReducers({
   }, null),
 })
 
+const createNotification = data => ({
+  id: Date.now().toString(),
+  type: data.type || (data.err ? 'error' : 'info'),
+  message: data.message,
+  err: data.err,
+})
+
+const notificationReducer = handleActions({
+  [actionTypes.NOTIFY_INFO]: (state, action) => state.concat([createNotification(action.payload)]),
+  [actionTypes.CLEAR_NOTIFICATION]: (state, action) => state.slice().filter(not => not.id !== action.payload),
+}, [])
+
 export default combineReducers({
   course: identity(null),
   masterCourse: identity(),
@@ -47,6 +59,16 @@ export default combineReducers({
   accountId: identity(),
   terms: identity([]),
   subAccounts: identity([]),
+  notifications: (state, action) => {
+    let newState = notificationReducer(state, action)
+
+    // duck typing error notifications from structure of _FAIL actions
+    if (action.payload && action.payload.err && action.payload.message) {
+      newState = newState.concat([createNotification(action.payload)])
+    }
+
+    return newState
+  },
   selectedChangeLog: handleActions({
     [actionTypes.SELECT_CHANGE_LOG]: (state, action) => action.payload.changeId,
   }, null),
@@ -156,9 +178,4 @@ export default combineReducers({
   notificationMessage: handleActions({
     [actionTypes.SET_NOTIFICATION_MESSAGE]: (state, action) => action.payload
   }, ''),
-  errors: (state = [], action) => (
-    action.error
-      ? state.concat([action.payload.message])
-      : state
-  ),
 })
