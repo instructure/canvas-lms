@@ -265,7 +265,7 @@ nn:
       order: "Rekkefølgje: %{order}"
     ? "report_header_%{header}"
     : "%{header}"
-    report_header_account_id: konto_id
+    report_header_account_id: account_id
     report_header_assessment_id: vurderings-ID
     report_header_assessment_question: vurderingsspørsmål
     report_header_assessment_question_id: "ID for vurderingsspørsmål"
@@ -276,6 +276,7 @@ nn:
     report_header_assignment_url: oppgåve-URL
     report_header_associated_user_id: associated_user_id
     report_header_attempt: forsøk
+    report_header_authentication_provider_id: authentication_provider_id
     report_header_canvas_account_id: canvas_account_id
     report_header_canvas_associated_user_id: canvas_associated_user_id
     report_header_canvas_course_id: canvas_course_id
@@ -304,6 +305,7 @@ nn:
     report_header_full_name: full_name
     report_header_group_id: group_id
     report_header_id: ID
+    report_header_integration_id: integration_id
     report_header_last_access_at: "siste tilgang den"
     report_header_last_activity_at: "siste aktivitet den"
     report_header_last_ip: "siste IP"
@@ -695,6 +697,31 @@ nn:
             header: "Startar den:"
     default_account_quotas_not_updated: "Standard kontokvoter er ikkje oppdaterte"
     default_account_quotas_updated: "Standard kontokvoter er oppdaterte"
+    devry: 
+      dcr2: 
+        parameters: 
+          custom_reports: 
+            start: 
+              parameters: 
+                header: "Dato for aktivitet:"
+      dcr4: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Sluttar den:"
+            start: 
+              parameters: 
+                header: "Startar den:"
+      dcr7: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Sluttar den:"
+            start: 
+              parameters: 
+                header: "Startar den:"
     engagement_report_csv_parameters: 
       account_reports: 
         bryan_engagement: 
@@ -1332,6 +1359,7 @@ nn:
   add_a_comment_872470ac: "Legg til ein kommentar"
   add_a_course_b72b18d7: "Legg til eit emne"
   add_a_custom_help_link_4328252f: "Legg til eigendefinert Hjelp-kopling"
+  add_a_message_a5ed12bf: "Legg til ei melding"
   add_a_new_announcement_878b717f: "Legg til ei ny kunngjering"
   add_a_new_course_4a041207: "Legg til eit nytt emne"
   add_a_new_outcome_cbdbe96c: "Legg til nytt læringsmål"
