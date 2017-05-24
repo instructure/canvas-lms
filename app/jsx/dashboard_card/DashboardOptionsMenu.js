@@ -29,7 +29,7 @@ import IconSettings2Solid from 'instructure-icons/react/Solid/IconSettings2Solid
 
 export default class DashboardOptionsMenu extends React.Component {
   static propTypes = {
-    recent_activity_dashboard: PropTypes.bool.isRequired,
+    recent_activity_dashboard: PropTypes.bool,
     hide_dashcard_color_overlays: PropTypes.bool,
     planner_enabled: PropTypes.bool,
     planner_selected: PropTypes.bool
@@ -38,7 +38,8 @@ export default class DashboardOptionsMenu extends React.Component {
   static defaultProps = {
     hide_dashcard_color_overlays: false,
     planner_enabled: false,
-    planner_selected: false
+    planner_selected: false,
+    recent_activity_dashboard: false
   }
 
   constructor (props) {
