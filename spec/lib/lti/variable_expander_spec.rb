@@ -121,6 +121,16 @@ module Lti
       expect(expanded[:some_name]).to eq "my variable is buried in here ${tests_expan} can you find it?"
     end
 
+    describe '#self.expansion_keys' do
+      let(:expected_keys) do
+        VariableExpander.expansions.keys.map { |c| c.to_s[1..-1] }
+      end
+
+      it 'includes all expansion keys' do
+        expect(VariableExpander.expansion_keys).to eq expected_keys
+      end
+    end
+
     describe '#enabled_capability_params' do
       let(:enabled_capability) {
         %w(TestCapability.Foo

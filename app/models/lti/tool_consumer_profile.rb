@@ -48,30 +48,17 @@ module Lti
 
     DEFAULT_CAPABILITIES = %w(
       basic-lti-launch-request
-      User.id
-      Canvas.api.domain
-      LtiLink.custom.url
-      ToolProxyBinding.custom.url
-      ToolProxy.custom.url
       Canvas.placements.accountNavigation
       Canvas.placements.courseNavigation
       Canvas.placements.assignmentSelection
       Canvas.placements.linkSelection
       Canvas.placements.postGrades
-      User.username
-      Person.email.primary
-      vnd.Canvas.Person.email.sis
-      Person.name.given
-      Person.name.family
-      Person.name.full
-      CourseSection.sourcedId
-      Person.sourcedId
-      Membership.role
-      ToolConsumerProfile.url
       Security.splitSecret
-      Context.id
-      Canvas.assignment.id
-    ).concat(CapabilitiesHelper::SUPPORTED_CAPABILITIES).freeze
+    ).concat(
+      CapabilitiesHelper::SUPPORTED_CAPABILITIES
+    ).concat(
+      Lti::VariableExpander.expansion_keys
+    ).uniq.freeze
 
     RESTRICTED_CAPABILITIES = [
       'Canvas.placements.similarityDetection',

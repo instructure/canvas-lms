@@ -40,6 +40,10 @@ module Lti
       @expansions || {}
     end
 
+    def self.expansion_keys
+      self.expansions.keys.map { |c| c.to_s[1..-1] }
+    end
+
     CONTROLLER_GUARD = -> { !!@controller }
     COURSE_GUARD = -> { @context.is_a? Course }
     TERM_START_DATE_GUARD = -> { @context.is_a?(Course) && @context.enrollment_term &&
