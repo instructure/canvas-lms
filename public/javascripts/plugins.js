@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!plugins'
 import $ from 'jquery'
-import 'jquery.instructure_misc_plugins' /* showIf */
+import './jquery.instructure_misc_plugins' /* showIf */
 
   $("form.edit_plugin_setting").live('submit', function() {
     $(this).find("button").attr('disabled', true).filter(".save_button").text(I18n.t('buttons.saving', "Saving..."));

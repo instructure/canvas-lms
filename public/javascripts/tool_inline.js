@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import 'jquery.google-analytics'
+import './jquery.google-analytics'
 import 'compiled/jquery/ModuleSequenceFooter'
 
 var $toolForm = $("#tool_form")

@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import I18n from 'i18n!user_grades'
-import 'jquery.ajaxJSON'
+import './jquery.ajaxJSON'
   $(document).ready(function() {
     $(".grading_periods_selector").each(function () {
       var $selector = $(this),

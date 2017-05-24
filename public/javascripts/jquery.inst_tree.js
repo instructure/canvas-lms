@@ -19,7 +19,7 @@
 // xsslint jqueryObject.identifier tree
 import $ from 'jquery'
 import _ from 'underscore'
-import htmlEscape from 'str/htmlEscape'
+import htmlEscape from './str/htmlEscape'
 import 'jqueryui/draggable'
 import 'jqueryui/droppable'
   $.fn.instTree = function(options) {

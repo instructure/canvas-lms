@@ -20,7 +20,7 @@
 // ("html,body") to scroll the window.
 
 import $ from 'jquery'
-import 'vendor/jquery.scrollTo'
+import './vendor/jquery.scrollTo'
 
 $.fn.scrollToVisible = function(obj) {
   var options = {};

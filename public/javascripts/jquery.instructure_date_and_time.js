@@ -19,11 +19,11 @@
 import I18n from 'i18n!instructure'
 import $ from 'jquery'
 import tz from 'timezone'
-import htmlEscape from 'str/htmlEscape'
+import htmlEscape from './str/htmlEscape'
 import DatetimeField from 'compiled/widget/DatetimeField'
 import renderDatepickerTime from 'jsx/shared/render-datepicker-time'
-import 'jquery.keycodes'
-import 'vendor/date' /* Date.parse, Date.UTC, Date.today */
+import './jquery.keycodes'
+import './vendor/date' /* Date.parse, Date.UTC, Date.today */
 import 'jqueryui/datepicker'
 import 'jqueryui/sortable'
 import 'jqueryui/widget'

@@ -22,10 +22,10 @@
 import tinymce from 'compiled/editor/stocktiny'
 import I18n from 'i18n!editor'
 import $ from 'jquery'
-import htmlEscape from 'str/htmlEscape'
+import htmlEscape from '../../str/htmlEscape'
 import {send} from 'jsx/shared/rce/RceCommandShim'
 import 'jqueryui/dialog'
-import 'jquery.instructure_misc_helpers'
+import '../../jquery.instructure_misc_helpers'
 
   var $box, $editor, $userURL, $altText, $actions, $flickrLink;
 

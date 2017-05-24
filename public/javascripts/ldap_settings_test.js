@@ -18,9 +18,9 @@
 
 import I18n from 'i18n!accounts'
 import $ from 'jquery'
-import h from 'str/htmlEscape'
+import h from './str/htmlEscape'
 import authenticity_token from 'compiled/behaviors/authenticity_token'
-import 'jquery.ajaxJSON'
+import './jquery.ajaxJSON'
 import 'jqueryui/dialog'
 
   function testLDAP() {

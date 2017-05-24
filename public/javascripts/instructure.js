@@ -17,32 +17,32 @@
  */
 
 import KeyboardNavDialog from 'compiled/views/KeyboardNavDialog'
-import INST from 'INST'
+import INST from './INST'
 import I18n from 'i18n!instructure'
 import $ from 'jquery'
 import _ from 'underscore'
 import tz from 'timezone'
 import userSettings from 'compiled/userSettings'
-import htmlEscape from 'str/htmlEscape'
+import htmlEscape from './str/htmlEscape'
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
-import 'instructure_helper'
+import './instructure_helper'
 import 'jqueryui/draggable'
-import 'jquery.ajaxJSON'
-import 'jquery.doc_previews'
-import 'jquery.google-analytics'
-import 'jquery.instructure_date_and_time'
-import 'jquery.instructure_forms'
+import './jquery.ajaxJSON'
+import './jquery.doc_previews' /* filePreviewsEnabled, loadDocPreview */
+import './jquery.google-analytics' /* trackEvent */
+import './jquery.instructure_date_and_time' /* datetimeString, dateString, fudgeDateForProfileTimezone */
+import './jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
 import 'jqueryui/dialog'
-import 'jquery.instructure_misc_helpers'
-import 'jquery.instructure_misc_plugins'
-import 'jquery.keycodes'
-import 'jquery.loadingImg'
+import './jquery.instructure_misc_helpers' /* replaceTags, youTubeID */
+import './jquery.instructure_misc_plugins' /* ifExists, .dim, confirmDelete, showIf, fillWindowWithMe */
+import './jquery.keycodes'
+import './jquery.loadingImg'
 import 'compiled/jquery.rails_flash_notifications'
-import 'jquery.templateData'
+import './jquery.templateData'
 import 'compiled/jquery/fixDialogButtons'
 import 'compiled/jquery/mediaCommentThumbnail'
-import 'vendor/date'
-import 'vendor/jquery.ba-tinypubsub'
+import './vendor/date'
+import 'vendor/jquery.ba-tinypubsub' /* /\.publish\(/ */
 import 'jqueryui/resizable'
 import 'jqueryui/sortable'
 import 'jqueryui/tabs'

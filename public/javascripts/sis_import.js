@@ -18,10 +18,10 @@
 
 import I18n from 'i18n!sis_import'
 import $ from 'jquery'
-import htmlEscape from 'str/htmlEscape'
-import 'jquery.ajaxJSON'
-import 'jquery.instructure_forms' /* formSubmit, formErrors */
-import 'jquery.instructure_misc_plugins' /* showIf, disableIf */
+import htmlEscape from './str/htmlEscape'
+import './jquery.ajaxJSON'
+import './jquery.instructure_forms' /* formSubmit, formErrors */
+import './jquery.instructure_misc_plugins' /* showIf, disableIf */
 import 'jqueryui/progressbar'
 
 $(document).ready(function(event) {

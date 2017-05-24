@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import INST from 'INST'
+import INST from './INST'
 import I18n from 'i18n!content_locks'
 import $ from 'jquery'
-import htmlEscape from 'str/htmlEscape'
-import 'jquery.instructure_date_and_time' /* datetimeString */
+import htmlEscape from './str/htmlEscape'
+import './jquery.instructure_date_and_time' /* datetimeString */
 import 'jqueryui/dialog'
 
   INST.lockExplanation = function(data, type) {

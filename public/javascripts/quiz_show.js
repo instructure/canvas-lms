@@ -25,12 +25,12 @@ import Quiz from 'compiled/models/Quiz'
 import PublishButtonView from 'compiled/views/PublishButtonView'
 import QuizLogAuditingEventDumper from 'compiled/quizzes/dump_events'
 import CyoeStats from 'jsx/conditional_release_stats/index'
-import 'jquery.instructure_date_and_time' /* dateString, time_field, datetime_field */
+import './jquery.instructure_date_and_time' /* dateString, time_field, datetime_field */
 import 'jqueryui/dialog'
 import 'compiled/jquery/fixDialogButtons'
 import 'compiled/jquery.rails_flash_notifications'
-import 'jquery.instructure_misc_plugins' /* ifExists, confirmDelete */
-import 'jquery.disableWhileLoading'
+import './jquery.instructure_misc_plugins' /* ifExists, confirmDelete */
+import './jquery.disableWhileLoading'
 import 'message_students' /* messageStudents */
 
 

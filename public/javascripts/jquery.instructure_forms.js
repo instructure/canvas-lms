@@ -17,20 +17,20 @@
  */
 
 import {send} from 'jsx/shared/rce/RceCommandShim'
-import INST from 'INST'
+import INST from './INST'
 import I18n from 'i18n!instructure'
 import $ from 'jquery'
 import _ from 'underscore'
 import FakeXHR from 'compiled/xhr/FakeXHR'
 import authenticity_token from 'compiled/behaviors/authenticity_token'
-import htmlEscape from 'str/htmlEscape'
-import 'jquery.ajaxJSON' /* ajaxJSON, defaultAjaxError */
-import 'jquery.disableWhileLoading'
-import 'jquery.google-analytics' /* trackEvent */
-import 'jquery.instructure_date_and_time' /* date_field, time_field, datetime_field */
-import 'jquery.instructure_misc_helpers' /* /\$\.uniq/ */
+import htmlEscape from './str/htmlEscape'
+import './jquery.ajaxJSON' /* ajaxJSON, defaultAjaxError */
+import './jquery.disableWhileLoading'
+import './jquery.google-analytics' /* trackEvent */
+import './jquery.instructure_date_and_time' /* date_field, time_field, datetime_field */
+import './jquery.instructure_misc_helpers' /* /\$\.uniq/ */
 import 'compiled/jquery.rails_flash_notifications'
-import 'vendor/jquery.scrollTo'
+import './vendor/jquery.scrollTo'
 
   // Intercepts the default form submission process.  Uses the form tag's
   // current action and method attributes to know where to submit to.

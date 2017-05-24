@@ -20,7 +20,7 @@
 // when they occur.  Can use text or key codes, passed in as a
 // space-separated string.
 import $ from 'jquery'
-import 'jquery.instructure_date_and_time'
+import './jquery.instructure_date_and_time'
 
 $.fn.keycodes = function(options, fn) {
   /* Based loosely on Tzury Bar Yochay's js-hotkeys:

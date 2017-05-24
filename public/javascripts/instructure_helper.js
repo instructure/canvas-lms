@@ -17,7 +17,7 @@
  */
 
 //create a global object "INST" that we will have be Instructure's namespace.
-import INST from 'INST'
+import INST from './INST'
 import I18n from 'i18n!instructure'
 import $ from 'jquery'
 import 'jqueryui/dialog'

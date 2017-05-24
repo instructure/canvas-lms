@@ -22,19 +22,19 @@ import _ from 'underscore'
 import {tabIdFromElement} from 'course_settings_helper'
 import tz from 'timezone'
 import forceScreenReaderToReparse from 'jsx/shared/helpers/forceScreenreaderToReparse'
-import 'jquery.ajaxJSON'
-import 'jquery.instructure_date_and_time' /* datetimeString, date_field */
-import 'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */
+import './jquery.ajaxJSON'
+import './jquery.instructure_date_and_time' /* datetimeString, date_field */
+import './jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */
 import 'jqueryui/dialog'
 import 'compiled/jquery/fixDialogButtons'
-import 'jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */
-import 'jquery.keycodes'
-import 'jquery.loadingImg'
+import './jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */
+import './jquery.keycodes'
+import './jquery.loadingImg'
 import 'compiled/jquery.rails_flash_notifications'
-import 'jquery.templateData' /* fillTemplateData, getTemplateData */
-import 'link_enrollment' /* global link_enrollment */
+import './jquery.templateData' /* fillTemplateData, getTemplateData */
+import './link_enrollment' /* global link_enrollment */
 import 'vendor/jquery.ba-tinypubsub' /* /\.publish/ */
-import 'vendor/jquery.scrollTo'
+import './vendor/jquery.scrollTo'
 import 'jqueryui/autocomplete'
 import 'jqueryui/sortable'
 import 'jqueryui/tabs'

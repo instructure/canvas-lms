@@ -19,12 +19,12 @@
 import I18n from 'i18n!content_imports'
 import processMigrationItemSelections from 'compiled/util/processMigrationItemSelections'
 import $ from 'jquery'
-import 'jquery.ajaxJSON'
-import 'jquery.instructure_date_and_time' /* dateString, date_field */
-import 'jquery.instructure_forms' /* formSubmit, getFormData, validateForm */
-import 'jquery.instructure_misc_plugins' /* showIf */
+import './jquery.ajaxJSON'
+import './jquery.instructure_date_and_time' /* dateString, date_field */
+import './jquery.instructure_forms' /* formSubmit, getFormData, validateForm */
+import './jquery.instructure_misc_plugins' /* showIf */
 import 'compiled/jquery.rails_flash_notifications'
-import 'vendor/date' /* Date.parse */
+import './vendor/date' /* Date.parse */
 import 'jqueryui/progressbar'
 
   $(function () {

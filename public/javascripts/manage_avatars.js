@@ -18,8 +18,8 @@
 
 import I18n from 'i18n!manage_avatars'
 import $ from 'jquery'
-import 'jquery.ajaxJSON'
-import 'jquery.instructure_misc_plugins' /* showIf */
+import './jquery.ajaxJSON'
+import './jquery.instructure_misc_plugins' /* showIf */
 
 $(document).ready(function() {
   $(".update_avatar_link").live('click', function(event) {

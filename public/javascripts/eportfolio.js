@@ -33,17 +33,17 @@ import userSettings from 'compiled/userSettings'
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
 import MoveToDialog from 'jsx/eportfolios/MoveToDialog'
 import {fetchContent} from 'eportfolios/eportfolio_section'
-import 'jquery.ajaxJSON'
-import 'jquery.inst_tree' /* instTree */
-import 'jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */
+import './jquery.ajaxJSON'
+import './jquery.inst_tree' /* instTree */
+import './jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */
 import 'jqueryui/dialog'
 import 'compiled/jquery/fixDialogButtons'
 import 'compiled/jquery.rails_flash_notifications' /* $.screenReaderFlashMessageExclusive */
-import 'jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar */
-import 'jquery.instructure_misc_plugins' /* confirmDelete, showIf */
-import 'jquery.loadingImg'
-import 'jquery.templateData' /* fillTemplateData, getTemplateData */
-import 'vendor/jquery.scrollTo'
+import './jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar */
+import './jquery.instructure_misc_plugins' /* confirmDelete, showIf */
+import './jquery.loadingImg'
+import './jquery.templateData' /* fillTemplateData, getTemplateData */
+import './vendor/jquery.scrollTo'
 import 'jqueryui/progressbar'
 import 'jqueryui/sortable'
 

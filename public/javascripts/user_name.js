@@ -18,12 +18,12 @@
 
 import I18n from 'i18n!user_name'
 import $ from 'jquery'
-import htmlEscape from 'str/htmlEscape'
-import 'jquery.ajaxJSON'
-import 'jquery.instructure_forms' /* formSubmit */
+import htmlEscape from './str/htmlEscape'
+import './jquery.ajaxJSON'
+import './jquery.instructure_forms' /* formSubmit */
 import 'jqueryui/dialog'
 import 'compiled/jquery/fixDialogButtons'
-import 'jquery.templateData'
+import './jquery.templateData'
 
 $(document).ready(function() {
   $("#name_and_email").delegate('.edit_user_link', 'click', function(event) {

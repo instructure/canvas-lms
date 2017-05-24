@@ -18,11 +18,11 @@
 
 import I18n from 'i18n!link_enrollment'
 import $ from 'jquery'
-import 'jquery.ajaxJSON'
-import 'jquery.instructure_forms' /* formSubmit */
+import './jquery.ajaxJSON'
+import './jquery.instructure_forms' /* formSubmit */
 import 'jqueryui/dialog'
-import 'jquery.instructure_misc_plugins' /* showIf */
-import 'jquery.templateData' /* fillTemplateData */
+import './jquery.instructure_misc_plugins' /* showIf */
+import './jquery.templateData' /* fillTemplateData */
 
   /*global link_enrollment*/
   window.link_enrollment = (function() {

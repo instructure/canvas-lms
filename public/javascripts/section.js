@@ -18,15 +18,15 @@
 
 import I18n from 'i18n!section'
 import $ from 'jquery'
-import 'jquery.ajaxJSON'
-import 'jquery.instructure_date_and_time' /* time_field, datetime_field */
-import 'jquery.instructure_forms' /* formSubmit, formErrors */
+import './jquery.ajaxJSON'
+import './jquery.instructure_date_and_time' /* time_field, datetime_field */
+import './jquery.instructure_forms' /* formSubmit, formErrors */
 import 'jqueryui/dialog'
-import 'jquery.instructure_misc_helpers' /* replaceTags */
-import 'jquery.instructure_misc_plugins' /* confirmDelete, showIf */
-import 'jquery.keycodes'
-import 'jquery.loadingImg'
-import 'jquery.templateData'
+import './jquery.instructure_misc_helpers' /* replaceTags */
+import './jquery.instructure_misc_plugins' /* confirmDelete, showIf */
+import './jquery.keycodes'
+import './jquery.loadingImg'
+import './jquery.templateData'
 import 'jqueryui/autocomplete'
 import PaginatedList from 'compiled/PaginatedList'
 import enrollmentTemplate from 'jst/courses/section/enrollment'

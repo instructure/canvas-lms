@@ -28,13 +28,13 @@ import QuizLogAuditing from 'compiled/quizzes/log_auditing'
 import QuizLogAuditingEventDumper from 'compiled/quizzes/dump_events'
 import KeyboardShortcuts from 'compiled/views/editor/KeyboardShortcuts'
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
-import 'jquery.ajaxJSON'
-import 'jquery.toJSON'
-import 'jquery.instructure_date_and_time' /* friendlyDatetime, friendlyDate */
-import 'jquery.instructure_forms' /* getFormData, errorBox */
+import './jquery.ajaxJSON'
+import './jquery.toJSON'
+import './jquery.instructure_date_and_time' /* friendlyDatetime, friendlyDate */
+import './jquery.instructure_forms' /* getFormData, errorBox */
 import 'jqueryui/dialog'
 import 'compiled/jquery.rails_flash_notifications'
-import 'vendor/jquery.scrollTo'
+import './vendor/jquery.scrollTo'
 import 'compiled/behaviors/quiz_selectmenu'
 
   RichContentEditor.preloadRemoteModule();

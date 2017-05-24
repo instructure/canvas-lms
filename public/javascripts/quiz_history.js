@@ -17,9 +17,9 @@
  */
 
 import $ from 'jquery'
-import 'jquery.instructure_misc_plugins' /* fragmentChange */
-import 'jquery.templateData'
-import 'vendor/jquery.scrollTo'
+import './jquery.instructure_misc_plugins' /* fragmentChange */
+import './jquery.templateData'
+import './vendor/jquery.scrollTo'
 import 'compiled/behaviors/quiz_selectmenu'
 
   var parentWindow = {

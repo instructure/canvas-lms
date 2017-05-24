@@ -16,16 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import INST from 'INST'
+import INST from './INST'
 import I18n from 'i18n!instructure'
 import $ from 'jquery'
 import _ from 'underscore'
-import htmlEscape from 'str/htmlEscape'
+import htmlEscape from './str/htmlEscape'
 import TextHelper from 'compiled/str/TextHelper'
-import 'jquery.ajaxJSON'
-import 'jquery.instructure_forms'
+import './jquery.ajaxJSON'
+import './jquery.instructure_forms'
 import 'jqueryui/dialog'
-import 'vendor/jquery.scrollTo'
+import './vendor/jquery.scrollTo'
 
   // Return the first value which passes a truth test
   $.detect = function(collection, callback) {

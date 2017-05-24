@@ -18,9 +18,9 @@
 
 import I18n from 'i18n!accounts.statistics'
 import $ from 'jquery'
-import 'jquery.ajaxJSON'
+import './jquery.ajaxJSON'
 import 'jqueryui/dialog'
-import 'jquery.instructure_misc_helpers' // replaceTags
+import './jquery.instructure_misc_helpers' // replaceTags
 
   $(document).ready(function() {
     $(".over_time_link").live('click', function(event) {

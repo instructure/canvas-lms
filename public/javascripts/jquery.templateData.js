@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import htmlEscape from 'str/htmlEscape'
-import 'jquery.instructure_misc_helpers' /* replaceTags */
+import htmlEscape from './str/htmlEscape'
+import './jquery.instructure_misc_helpers' /* replaceTags */
 
   // Fills the selected object(s) with data values as specified.  Plaintext values should be specified in the
   //  data: data used to fill template.

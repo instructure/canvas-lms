@@ -34,7 +34,7 @@
  */
 import I18n from 'i18n!mathquill'
 import $ from 'jquery'
-import htmlEscape from 'str/htmlEscape'
+import htmlEscape from './str/htmlEscape'
 
   var undefined,
     _, //temp variable of prototypes

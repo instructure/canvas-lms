@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import INST from 'INST'
+import INST from './INST'
 import I18n from 'i18n!ajax_errors'
 import $ from 'jquery'
-import htmlEscape from 'str/htmlEscape'
-import 'jquery.ajaxJSON' // ajaxJSON, defaultAjaxError
+import htmlEscape from './str/htmlEscape'
+import './jquery.ajaxJSON' // ajaxJSON, defaultAjaxError
 import 'compiled/jquery.rails_flash_notifications' // flashError
 import 'jqueryui/effects/drop'
 

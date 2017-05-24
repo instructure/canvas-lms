@@ -20,14 +20,14 @@ import I18n from 'i18n!media_comments'
 import _ from 'underscore'
 import pubsub from 'vendor/jquery.ba-tinypubsub'
 import $ from 'jquery'
-import htmlEscape from 'str/htmlEscape'
+import htmlEscape from './str/htmlEscape'
 import mediaCommentsTemplate from 'jst/MediaComments'
 import JsUploader from 'compiled/media_comments/js_uploader'
 import 'compiled/jquery/mediaComment'
-import 'jquery.ajaxJSON'
+import './jquery.ajaxJSON'
 import 'jqueryui/dialog'
-import 'jquery.instructure_misc_helpers' /* /\$\.h/, /\$\.fileSize/ */
-import 'jquery.instructure_misc_plugins' /* .dim, /\.log\(/ */
+import './jquery.instructure_misc_helpers' /* /\$\.h/, /\$\.fileSize/ */
+import './jquery.instructure_misc_plugins' /* .dim, /\.log\(/ */
 import 'jqueryui/progressbar'
 import 'jqueryui/tabs'
 

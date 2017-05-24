@@ -16,19 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import INST from 'INST'
+import INST from './INST'
 import I18n from 'i18n!profile'
 import $ from 'jquery'
 import Pseudonym from 'compiled/models/Pseudonym'
 import AvatarWidget from 'compiled/util/AvatarWidget'
-import 'jquery.ajaxJSON'
-import 'jquery.instructure_date_and_time' /* datetimeString, time_field, datetime_field */
-import 'jquery.instructure_forms' /* formSubmit, formErrors, errorBox */
+import './jquery.ajaxJSON'
+import './jquery.instructure_date_and_time' /* datetimeString, time_field, datetime_field */
+import './jquery.instructure_forms' /* formSubmit, formErrors, errorBox */
 import 'jqueryui/dialog'
 import 'compiled/jquery/fixDialogButtons'
-import 'jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */
-import 'jquery.loadingImg'
-import 'jquery.templateData'
+import './jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */
+import './jquery.loadingImg'
+import './jquery.templateData'
 import 'jqueryui/sortable'
 import 'compiled/jquery.rails_flash_notifications'
 

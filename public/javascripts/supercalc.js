@@ -19,9 +19,9 @@
 import I18n from 'i18n!calculator'
 import $ from 'jquery'
 import calcCmd from 'calcCmd'
-import htmlEscape from 'str/htmlEscape'
-import 'jquery.instructure_misc_helpers' /* /\$\.raw/ */
-import 'jquery.instructure_misc_plugins' /* showIf */
+import htmlEscape from './str/htmlEscape'
+import './jquery.instructure_misc_helpers' /* /\$\.raw/ */
+import './jquery.instructure_misc_plugins' /* showIf */
 import 'jqueryui/sortable'
 
   var generateFinds = function($table) {

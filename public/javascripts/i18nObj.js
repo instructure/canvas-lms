@@ -20,9 +20,9 @@ define([
   './vendor/i18n_js_extension',
   'jquery',
   'underscore',
-  'str/htmlEscape',
+  './str/htmlEscape',
   'compiled/str/i18nLolcalize',
-  'vendor/date' /* Date.parse, Date.UTC */
+  './vendor/date' /* Date.parse, Date.UTC */
 ], function(I18n, $, _, htmlEscape, i18nLolcalize) {
 
 /*

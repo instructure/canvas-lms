@@ -18,11 +18,11 @@
 
 import I18n from 'i18n!prerequisites_lookup'
 import $ from 'jquery'
-import htmlEscape from 'str/htmlEscape'
+import htmlEscape from './str/htmlEscape'
 import Spinner from 'spin.js'
-import 'context_modules'
-import 'jquery.ajaxJSON'
-import 'jquery.instructure_misc_helpers'
+import './context_modules'
+import './jquery.ajaxJSON'
+import './jquery.instructure_misc_helpers'
 
   var lookupStarted = false;
 

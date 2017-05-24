@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import INST from 'INST'
+import INST from './INST'
 import I18n from 'i18n!submissions'
 import $ from 'jquery'
-import htmlEscape from 'str/htmlEscape'
-import 'jquery.ajaxJSON'
+import htmlEscape from './str/htmlEscape'
+import './jquery.ajaxJSON'
 import 'jqueryui/dialog'
 import 'jqueryui/progressbar'
 

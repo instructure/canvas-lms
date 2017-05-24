@@ -20,13 +20,13 @@ import round from 'compiled/util/round'
 import I18n from 'i18n!grading_standards'
 import numberHelper from 'jsx/shared/helpers/numberHelper'
 import $ from 'jquery'
-import 'jquery.ajaxJSON'
-import 'jquery.instructure_forms' /* fillFormData, getFormData */
+import './jquery.ajaxJSON'
+import './jquery.instructure_forms' /* fillFormData, getFormData */
 import 'jqueryui/dialog'
-import 'jquery.instructure_misc_plugins' /* ifExists, .dim, undim, confirmDelete */
+import './jquery.instructure_misc_plugins' /* ifExists, .dim, undim, confirmDelete */
 import 'compiled/jquery.rails_flash_notifications'
-import 'jquery.templateData' /* fillTemplateData, getTemplateData */
-import 'vendor/jquery.scrollTo'
+import './jquery.templateData' /* fillTemplateData, getTemplateData */
+import './vendor/jquery.scrollTo'
 
   function roundedNumber (val) {
     return I18n.n(round(val, round.DEFAULT));

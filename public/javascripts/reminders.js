@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import 'jqueryui/draggable'
-import 'jquery.instructure_misc_plugins' /* confirmDelete */
+import './jquery.instructure_misc_plugins' /* confirmDelete */
 
 $(document).ready(function() {
   $("#floating_reminders").draggable();

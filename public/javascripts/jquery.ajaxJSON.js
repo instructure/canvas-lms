@@ -18,7 +18,7 @@
 
 /*jshint evil:true*/
 
-import INST from 'INST'
+import INST from './INST'
 import $ from 'jquery'
 import authenticity_token from 'compiled/behaviors/authenticity_token'
 

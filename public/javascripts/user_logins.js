@@ -19,11 +19,11 @@
 import I18n from 'i18n!user_logins'
 import $ from 'jquery'
 import Pseudonym from 'compiled/models/Pseudonym'
-import 'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
+import './jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
 import 'jqueryui/dialog'
 import 'compiled/jquery/fixDialogButtons'
-import 'jquery.instructure_misc_plugins' /* confirmDelete, showIf */
-import 'jquery.templateData'
+import './jquery.instructure_misc_plugins' /* confirmDelete, showIf */
+import './jquery.templateData'
 
 $(document).ready(function() {
   var $form = $("#edit_pseudonym_form");

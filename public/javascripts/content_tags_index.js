@@ -18,13 +18,13 @@
 
 import I18n from 'i18n!content_tags'
 import $ from 'jquery'
-import 'jquery.instructure_forms' /* formSubmit, fillFormData */
+import './jquery.instructure_forms' /* formSubmit, fillFormData */
 import 'jqueryui/dialog'
-import 'jquery.instructure_misc_helpers' /* replaceTags */
-import 'jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange */
-import 'jquery.loadingImg'
-import 'jquery.templateData' /* getTemplateData */
-import 'vendor/jquery.scrollTo'
+import './jquery.instructure_misc_helpers' /* replaceTags */
+import './jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange */
+import './jquery.loadingImg'
+import './jquery.templateData' /* getTemplateData */
+import './vendor/jquery.scrollTo'
 import 'jqueryui/accordion'
 
   var contentTags = {

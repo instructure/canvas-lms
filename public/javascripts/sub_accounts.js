@@ -18,13 +18,13 @@
 
 import I18n from 'i18n!sub_accounts'
 import jQuery from 'jquery'
-import 'jquery.ajaxJSON'
-import 'jquery.instructure_forms' /* formSubmit, fillFormData */
-import 'jquery.instructure_misc_helpers' /* replaceTags */
-import 'jquery.instructure_misc_plugins' /* confirmDelete, showIf */
-import 'jquery.keycodes'
-import 'jquery.loadingImg'
-import 'jquery.templateData'
+import './jquery.ajaxJSON'
+import './jquery.instructure_forms' /* formSubmit, fillFormData */
+import './jquery.instructure_misc_helpers' /* replaceTags */
+import './jquery.instructure_misc_plugins' /* confirmDelete, showIf */
+import './jquery.keycodes'
+import './jquery.loadingImg'
+import './jquery.templateData'
 
 jQuery(function($){
   

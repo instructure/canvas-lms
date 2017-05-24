@@ -18,13 +18,13 @@
 
 import I18n from 'i18n!question_banks'
 import $ from 'jquery'
-import 'jquery.ajaxJSON'
-import 'jquery.instructure_date_and_time' /* datetimeString */
-import 'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
-import 'jquery.instructure_misc_plugins' /* confirmDelete */
-import 'jquery.keycodes'
-import 'jquery.loadingImg'
-import 'jquery.templateData'
+import './jquery.ajaxJSON'
+import './jquery.instructure_date_and_time' /* datetimeString */
+import './jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
+import './jquery.instructure_misc_plugins' /* confirmDelete */
+import './jquery.keycodes'
+import './jquery.loadingImg'
+import './jquery.templateData'
 
 $(document).ready(function() {
   $(".add_bank_link").click(function(event) {

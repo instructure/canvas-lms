@@ -21,7 +21,7 @@ import $ from 'jquery'
 import addPrivacyLinkToDialog from 'compiled/util/addPrivacyLinkToDialog'
 import _ from 'underscore'
 import 'user_sortable_name'
-import 'jquery.instructure_forms' /* formSubmit */
+import './jquery.instructure_forms' /* formSubmit */
 import 'jqueryui/dialog'
 import 'compiled/jquery/fixDialogButtons'
 import 'compiled/jquery.rails_flash_notifications'

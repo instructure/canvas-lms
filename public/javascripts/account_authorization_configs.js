@@ -17,15 +17,15 @@
  */
 
 import I18n from 'i18n!account_authorization_configs'
-import htmlEscape from 'str/htmlEscape'
+import htmlEscape from './str/htmlEscape'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import AuthTypePicker from 'jsx/authentication_providers/AuthTypePicker'
 import authenticationProviders from 'authentication_providers'
 import $ from 'jquery'
-import 'jquery.instructure_forms' /* formSubmit */
-import 'jquery.keycodes'
-import 'jquery.loadingImg'
+import './jquery.instructure_forms' /* formSubmit */
+import './jquery.keycodes'
+import './jquery.loadingImg'
 
   var Picker = React.createFactory(AuthTypePicker);
   var selectorNode = document.getElementById('add-authentication-provider');

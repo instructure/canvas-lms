@@ -18,10 +18,10 @@
 
 import I18n from 'i18n!alerts'
 import $ from 'jquery'
-import htmlEscape from 'str/htmlEscape'
-import 'jquery.ajaxJSON'
-import 'jquery.instructure_forms' // validateForm, formErrors, errorBox
-import 'jquery.instructure_misc_helpers' // replaceTags
+import htmlEscape from './str/htmlEscape'
+import './jquery.ajaxJSON'
+import './jquery.instructure_forms' // validateForm, formErrors, errorBox
+import './jquery.instructure_misc_helpers' // replaceTags
 import 'vendor/jquery.ba-tinypubsub' // /\.publish/
 import 'jqueryui/button'
 

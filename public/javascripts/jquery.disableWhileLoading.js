@@ -35,7 +35,7 @@ $('#form').disableWhileLoading(promise, {
 import I18n from 'i18n!instructure'
 import objectCollection from 'compiled/util/objectCollection'
 import $ from 'jquery'
-import 'jquery.ajaxJSON'
+import './jquery.ajaxJSON'
 import 'spin.js/jquery.spin'
 
   $.fn.disableWhileLoading = function(deferred, options) {

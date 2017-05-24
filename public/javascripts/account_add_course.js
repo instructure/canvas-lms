@@ -18,12 +18,12 @@
 
 import I18n from 'i18n!accounts'
 import $ from 'jquery'
-import htmlEscape from 'str/htmlEscape'
-import 'jquery.instructure_forms' /* formSubmit */
+import htmlEscape from './str/htmlEscape'
+import './jquery.instructure_forms' /* formSubmit */
 import 'jqueryui/dialog'
 import 'compiled/jquery/fixDialogButtons'
 import 'compiled/jquery.rails_flash_notifications'
-import 'jquery.templateData' /* fillTemplateData */
+import './jquery.templateData' /* fillTemplateData */
 
   $(".add_course_link").click(function(event) {
     event.preventDefault();

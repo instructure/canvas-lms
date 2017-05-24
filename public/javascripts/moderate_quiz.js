@@ -18,18 +18,18 @@
 
 import I18n from 'i18n!quizzes.moderate'
 import $ from 'jquery'
-import timing from 'quiz_timing'
+import timing from './quiz_timing'
 import openModerateStudentDialog from 'jsx/quizzes/moderate/openModerateStudentDialog'
-import 'jquery.ajaxJSON'
-import 'jquery.instructure_date_and_time' /* datetimeString */
-import 'jquery.instructure_forms' /* fillFormData, getFormData */
+import './jquery.ajaxJSON'
+import './jquery.instructure_date_and_time' /* datetimeString */
+import './jquery.instructure_forms' /* fillFormData, getFormData */
 import 'jqueryui/dialog'
 import 'compiled/jquery/fixDialogButtons'
-import 'jquery.instructure_misc_helpers' /* replaceTags */
-import 'jquery.instructure_misc_plugins' /* showIf */
+import './jquery.instructure_misc_helpers' /* replaceTags */
+import './jquery.instructure_misc_plugins' /* showIf */
 import 'compiled/jquery.rails_flash_notifications'
-import 'jquery.templateData' /* fillTemplateData */
-import 'vendor/date' /* Date.parse */
+import './jquery.templateData' /* fillTemplateData */
+import './vendor/date' /* Date.parse */
 
   var DIALOG_WIDTH = 490;
   /**

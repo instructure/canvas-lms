@@ -53,8 +53,8 @@ import I18nObj from 'i18nObj'
 import $ from 'jquery'
 import editorOptions from 'jsx/shared/rce/editorOptions'
 import EditorAccessibility from 'compiled/editor/editorAccessibility'
-import EditorBoxList from 'tinymce.editor_box_list'
-import EditorConfig from 'tinymce.config'
+import EditorBoxList from './tinymce.editor_box_list'
+import EditorConfig from './tinymce.config'
 import {remove, insertLink} from './tinymce.commands'
 import {cleanUrl} from './tinymce.editor_box_utils'
 
@@ -62,11 +62,11 @@ import {cleanUrl} from './tinymce.editor_box_utils'
                       // tiny can require it themselves or else we have
                       // build problems
 
-import INST from 'INST'
+import INST from './INST'
 import decodeString from 'decode_string'
 import 'jqueryui/draggable'
-import 'jquery.instructure_misc_plugins' /* /\.indicate/ */
-import 'vendor/jquery.scrollTo'
+import './jquery.instructure_misc_plugins' /* /\.indicate/ */
+import './vendor/jquery.scrollTo'
 import 'vendor/jquery.ba-tinypubsub'
 
   var enableBookmarking = !!INST.browser.ie;

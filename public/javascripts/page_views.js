@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import INST from 'INST'
+import INST from './INST'
 import $ from 'jquery'
-import 'jquery.ajaxJSON'
+import './jquery.ajaxJSON'
 
   $(document).ready(function(){
     var interactionSeconds = 0,

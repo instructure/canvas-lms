@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!users'
 import $ from 'jquery'
-import 'jquery.instructure_misc_plugins' /* confirmDelete */
+import './jquery.instructure_misc_plugins' /* confirmDelete */
 
 $(function(){
   $(".courses .course,.groups .group").bind('focus mouseover', function(event) {

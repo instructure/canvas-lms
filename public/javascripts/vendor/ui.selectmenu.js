@@ -10,7 +10,7 @@
  */
 
 import $ from 'jquery'
-import 'vendor/jquery.scrollTo'
+import './jquery.scrollTo'
 import 'jqueryui/widget'
 
 $.widget("ui.selectmenu", {

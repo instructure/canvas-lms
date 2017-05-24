@@ -18,14 +18,14 @@
 
 import I18n from 'i18n!profile'
 import $ from 'jquery'
-import 'jquery.ajaxJSON'
-import 'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */
+import './jquery.ajaxJSON'
+import './jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */
 import 'jqueryui/dialog'
-import 'jquery.instructure_misc_helpers' /* replaceTags */
-import 'jquery.instructure_misc_plugins' /* confirmDelete, showIf */
-import 'jquery.loadingImg'
+import './jquery.instructure_misc_helpers' /* replaceTags */
+import './jquery.instructure_misc_plugins' /* confirmDelete, showIf */
+import './jquery.loadingImg'
 import 'compiled/jquery.rails_flash_notifications'
-import 'jquery.templateData' /* fillTemplateData, getTemplateData */
+import './jquery.templateData' /* fillTemplateData, getTemplateData */
 import 'jqueryui/tabs'
 
 $(document).ready(function() {
