@@ -441,20 +441,20 @@ test('Curve Grades menu item is present in the popover menu', function () {
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = document.querySelector('[data-menu-item-id="curve-grades"]');
   equal(menuItem.textContent, 'Curve Grades');
-  notOk(menuItem.parentElement.parentElement.getAttribute('aria-disabled'));
+  notOk(menuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'));
 });
 
 test('Curve Grades menu item is disabled when isDisabled is true', function () {
   this.props.curveGradesAction.isDisabled = true;
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = document.querySelector('[data-menu-item-id="curve-grades"]');
-  ok(menuItem.parentElement.parentElement.getAttribute('aria-disabled'));
+  ok(menuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'));
 });
 
 test('Curve Grades menu item is enabled when isDisabled is false', function () {
   this.wrapper = mountAndOpenOptions(this.props);
   const menuItem = document.querySelector('[data-menu-item-id="curve-grades"]');
-  notOk(menuItem.parentElement.parentElement.getAttribute('aria-disabled'));
+  notOk(menuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'));
 });
 
 test('onSelect is called when menu item is clicked', function () {
@@ -505,7 +505,7 @@ test('shows the menu item in an enabled state', function () {
   const menuItem = document.querySelector('[data-menu-item-id="message-students-who"]');
 
   equal(menuItem.textContent, 'Message Students Who');
-  notOk(menuItem.parentElement.parentElement.getAttribute('aria-disabled'));
+  notOk(menuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'));
 });
 
 test('disables the menu item when submissions are not loaded', function () {
@@ -514,7 +514,7 @@ test('disables the menu item when submissions are not loaded', function () {
 
   const menuItem = document.querySelector('[data-menu-item-id="message-students-who"]');
 
-  equal(menuItem.parentElement.parentElement.getAttribute('aria-disabled'), 'true');
+  equal(menuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'), 'true');
 });
 
 test('clicking the menu item invokes the Message Students Who dialog', function () {
@@ -543,7 +543,7 @@ test('shows the enabled "Mute Assignment" option when assignment is not muted', 
   const specificMenuItem = document.querySelector('[data-menu-item-id="assignment-muter"]');
 
   equal(specificMenuItem.textContent, 'Mute Assignment');
-  notOk(specificMenuItem.parentElement.parentElement.getAttribute('aria-disabled'));
+  notOk(specificMenuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'));
 });
 
 test('shows the enabled "Unmute Assignment" option when assignment is muted', function () {
@@ -553,7 +553,7 @@ test('shows the enabled "Unmute Assignment" option when assignment is muted', fu
   const specificMenuItem = document.querySelector('[data-menu-item-id="assignment-muter"]');
 
   equal(specificMenuItem.textContent, 'Unmute Assignment');
-  notOk(specificMenuItem.parentElement.parentElement.getAttribute('aria-disabled'));
+  notOk(specificMenuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'));
 });
 
 test('disables the option when prop muteAssignmentAction.disabled is truthy', function () {
@@ -562,7 +562,7 @@ test('disables the option when prop muteAssignmentAction.disabled is truthy', fu
 
   const specificMenuItem = document.querySelector('[data-menu-item-id="assignment-muter"]');
 
-  equal(specificMenuItem.parentElement.parentElement.getAttribute('aria-disabled'), 'true');
+  equal(specificMenuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'), 'true');
 });
 
 test('clicking the option invokes prop muteAssignmentAction.onSelect', function () {
@@ -662,7 +662,7 @@ test('shows the menu item in an enabled state', function () {
   const specificMenuItem = document.querySelector('[data-menu-item-id="set-default-grade"]');
 
   equal(specificMenuItem.textContent, 'Set Default Grade');
-  strictEqual(specificMenuItem.parentElement.parentElement.getAttribute('aria-disabled'), null);
+  strictEqual(specificMenuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'), null);
 });
 
 test('disables the menu item when the disabled prop is true', function () {
@@ -671,7 +671,7 @@ test('disables the menu item when the disabled prop is true', function () {
 
   const specificMenuItem = document.querySelector('[data-menu-item-id="set-default-grade"]');
 
-  equal(specificMenuItem.parentElement.parentElement.getAttribute('aria-disabled'), 'true');
+  equal(specificMenuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'), 'true');
 });
 
 test('clicking the menu item invokes the onSelect handler', function () {
@@ -717,7 +717,7 @@ test('shows the menu item in an enabled state', function () {
   const specificMenuItem = document.querySelector('[data-menu-item-id="download-submissions"]');
 
   equal(specificMenuItem.textContent, 'Download Submissions');
-  notOk(specificMenuItem.parentElement.parentElement.getAttribute('aria-disabled'));
+  notOk(specificMenuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'));
 });
 
 test('does not render the menu item when the hidden prop is true', function () {

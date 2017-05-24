@@ -279,7 +279,7 @@ define([
     this.menuItem = document.querySelector('[role="menuitem"] [data-menu-id="export"]');
 
     equal(this.menuItem.textContent, 'Export in progress');
-    equal(this.menuItem.parentElement.parentElement.getAttribute('aria-disabled'), 'true');
+    equal(this.menuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'), 'true');
 
     return exportResult;
   });

@@ -2155,6 +2155,10 @@ decamelize@^1.0.0, decamelize@^1.1.1, decamelize@^1.1.2:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/decamelize/-/decamelize-1.2.0.tgz#f6534d15148269b20352e7bee26f501f9a191290"
 
+decimal.js@7.2.1:
+  version "7.2.1"
+  resolved "https://registry.yarnpkg.com/decimal.js/-/decimal.js-7.2.1.tgz#5766c5424919b3a4dcfba10c34f32c73bc7d3ddf"
+
 deep-diff@0.3.4:
   version "0.3.4"
   resolved "https://registry.yarnpkg.com/deep-diff/-/deep-diff-0.3.4.tgz#aac5c39952236abe5f037a2349060ba01b00ae48"
@@ -4007,15 +4011,18 @@ instructure-icons@2.3.0, instructure-icons@^2.3.0:
     prop-types "15.5.8"
     shortid "2.2.8"
 
-instructure-ui@2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/instructure-ui/-/instructure-ui-2.0.0.tgz#e6848f497edf88f49c272a2936f6391b4e17aa39"
+instructure-ui@2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/instructure-ui/-/instructure-ui-2.2.0.tgz#d9dbb5ab6b67c51ff3356503b9d7091915e4836a"
   dependencies:
     classnames "2.2.5"
+    decimal.js "7.2.1"
     deep-equal "1.0.1"
     glamor "2.20.24"
     invariant "2.2.2"
     keycode "2.1.8"
+    moment "^2.18.1"
+    moment-timezone "^0.5.13"
     object.omit "2.0.1"
     object.pick "1.2.0"
     prop-types "15.5.8"
@@ -5248,7 +5255,11 @@ moment-timezone@^0.5.13:
   dependencies:
     moment ">= 2.9.0"
 
-"moment@>= 2.9.0", moment@>=1.6.0, moment@>=2.5.0, moment@~2.10.6:
+"moment@>= 2.9.0", moment@>=1.6.0, moment@^2.18.1:
+  version "2.18.1"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.18.1.tgz#c36193dd3ce1c2eed2adb7c802dbbc77a81b1c0f"
+
+moment@>=2.5.0, moment@~2.10.6:
   version "2.10.6"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.10.6.tgz#6cb21967c79cba7b0ca5e66644f173662b3efa77"
 

@@ -87,7 +87,8 @@ test('renders the open CourseSidebar component', () => {
   ok(rows.at(2).find('button#mcUnsyncedChangesBtn').exists(), 'unsynced changes button')
   equal(rows.at(2).find('span').at(0).text(), 'Unsynced Changes')
 
-  equal(rows.at(2).find('span').at(1).text(), initialState.unsyncedChanges.length, 'unsynced changes count')
+  const count = rows.at(2).find('.bcs__row-right-content').text()
+  equal(count, initialState.unsyncedChanges.length, 'unsynced changes count')
   tree.unmount()
 })
 
