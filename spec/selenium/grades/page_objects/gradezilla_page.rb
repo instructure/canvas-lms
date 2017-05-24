@@ -239,8 +239,15 @@ class Gradezilla
       trigger = f('button', gradebook_menu(name))
       trigger.click
 
-      # return the id of the popover menu for use elsewhere if needed
+      # return the finder of the popover menu for use elsewhere if needed
       menu_container(trigger.attribute('id'))
+    end
+
+    def open_view_menu_and_arrange_by_menu
+      view_menu = Gradezilla.open_gradebook_menu('View')
+      trigger = ff('button', view_menu).find { |element| element.text == "Arrange By" }
+      trigger.click
+      view_menu
     end
 
     def select_gradebook_menu_option(name, container: nil)
@@ -264,8 +271,16 @@ class Gradezilla
       gradebook_settings_cog.click
     end
 
-    def save_button_click
-      save_button.click
+    def popover_menu_item(name)
+      popover_menu_items.find do |menu_item|
+        menu_item.text == name
+      end
     end
+
+    def popover_menu_items
+      ff('[role=menu][aria-labelledby*=PopoverMenu] [role=menuitemradio]')
+    end
+
+    delegate :click, to: :save_button, prefix: true
   end
 end

@@ -73,11 +73,11 @@ describe "Gradezilla - assignment column headers" do
     expect(first_row_cells[2]).to include_text @assignment_1_points
 
     # none of the predefined short orders should be selected.
-    view_menu = Gradezilla.open_gradebook_menu('View')
-    arrange_by_group = Gradezilla.gradebook_menu_group('Arrange By', container: view_menu)
-    arrangement_menu_options = Gradezilla.gradebook_menu_options(arrange_by_group)
+    Gradezilla.open_view_menu_and_arrange_by_menu
+    arrangement_menu_options_aria_checked =
+      Gradezilla.popover_menu_items.map { |i| i.attribute('aria-checked') }
 
-    expect(arrangement_menu_options.all? { |menu_item| menu_item.attribute('aria-checked') == 'false'}).to be_truthy
+    expect(arrangement_menu_options_aria_checked).to all eq('false')
   end
 
   it "should put new assignments at the end when columns have custom order", priority: "1", test_id: 220032 do

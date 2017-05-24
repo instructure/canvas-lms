@@ -20,11 +20,17 @@ import React from 'react';
 import { arrayOf, bool, func, shape, string } from 'prop-types'
 import IconMiniArrowDownSolid from 'instructure-icons/lib/Solid/IconMiniArrowDownSolid'
 import Button from 'instructure-ui/lib/components/Button';
-import { MenuItem, MenuItemGroup, MenuItemSeparator } from 'instructure-ui/lib/components/Menu';
+import {
+  MenuItem,
+  MenuItemGroup,
+  MenuItemFlyout,
+  MenuItemSeparator
+} from 'instructure-ui/lib/components/Menu';
 import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu';
 import Typography from 'instructure-ui/lib/components/Typography';
 import I18n from 'i18n!gradebook';
 import { filterLabels } from 'jsx/gradezilla/default_gradebook/constants/ViewOptions';
+import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
 
 function renderTriggerButton (bindButton) {
   return (
@@ -68,12 +74,11 @@ class ViewOptionsMenu extends React.Component {
   constructor (props) {
     super(props);
 
-    this.onFilterSelect = (_event, filters) => {
-      this.props.filterSettings.onSelect(filters);
-    };
+    this.onFilterSelect = (_event, filters) => { this.props.filterSettings.onSelect(filters) };
     this.bindMenuContent = (menuContent) => { this.menuContent = menuContent };
     this.bindButton = (button) => { this.button = button };
     this.bindStatusesMenuItem = (menuItem) => { this.statusesMenuItem = menuItem };
+    this.bindArrangeByMenuContent = (menuContent) => { this.arrangeByMenuContent = menuContent };
   }
 
   areColumnsOrderedBy (criterion, direction) {
@@ -97,63 +102,68 @@ class ViewOptionsMenu extends React.Component {
         trigger={renderTriggerButton(this.bindButton)}
         contentRef={this.bindMenuContent}
       >
-        <MenuItemGroup label={I18n.t('Arrange By')}>
-          <MenuItem
-            disabled={this.props.columnSortSettings.disabled}
-            selected={this.areColumnsOrderedBy('default')}
-            onSelect={this.props.columnSortSettings.onSortByDefault}
-          >
-            { I18n.t('Default Order') }
-          </MenuItem>
+        <MenuItemFlyout
+          contentRef={this.bindArrangeByMenuContent}
+          label={I18n.t('Arrange By')}
+        >
+          <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Arrange By')}</ScreenReaderContent>}>
+            <MenuItem
+              disabled={this.props.columnSortSettings.disabled}
+              selected={this.areColumnsOrderedBy('default')}
+              onSelect={this.props.columnSortSettings.onSortByDefault}
+            >
+              { I18n.t('Default Order') }
+            </MenuItem>
 
-          <MenuItem
-            disabled={this.props.columnSortSettings.disabled}
-            selected={this.areColumnsOrderedBy('name', 'ascending')}
-            onSelect={this.props.columnSortSettings.onSortByNameAscending}
-          >
-            { I18n.t('Assignment Name - A-Z') }
-          </MenuItem>
+            <MenuItem
+              disabled={this.props.columnSortSettings.disabled}
+              selected={this.areColumnsOrderedBy('name', 'ascending')}
+              onSelect={this.props.columnSortSettings.onSortByNameAscending}
+            >
+              { I18n.t('Assignment Name - A-Z') }
+            </MenuItem>
 
-          <MenuItem
-            disabled={this.props.columnSortSettings.disabled}
-            selected={this.areColumnsOrderedBy('name', 'descending')}
-            onSelect={this.props.columnSortSettings.onSortByNameDescending}
-          >
-            { I18n.t('Assignment Name - Z-A') }
-          </MenuItem>
+            <MenuItem
+              disabled={this.props.columnSortSettings.disabled}
+              selected={this.areColumnsOrderedBy('name', 'descending')}
+              onSelect={this.props.columnSortSettings.onSortByNameDescending}
+            >
+              { I18n.t('Assignment Name - Z-A') }
+            </MenuItem>
 
-          <MenuItem
-            disabled={this.props.columnSortSettings.disabled}
-            selected={this.areColumnsOrderedBy('due_date', 'ascending')}
-            onSelect={this.props.columnSortSettings.onSortByDueDateAscending}
-          >
-            { I18n.t('Due Date - Oldest to Newest') }
-          </MenuItem>
+            <MenuItem
+              disabled={this.props.columnSortSettings.disabled}
+              selected={this.areColumnsOrderedBy('due_date', 'ascending')}
+              onSelect={this.props.columnSortSettings.onSortByDueDateAscending}
+            >
+              { I18n.t('Due Date - Oldest to Newest') }
+            </MenuItem>
 
-          <MenuItem
-            disabled={this.props.columnSortSettings.disabled}
-            selected={this.areColumnsOrderedBy('due_date', 'descending')}
-            onSelect={this.props.columnSortSettings.onSortByDueDateDescending}
-          >
-            { I18n.t('Due Date - Newest to Oldest') }
-          </MenuItem>
+            <MenuItem
+              disabled={this.props.columnSortSettings.disabled}
+              selected={this.areColumnsOrderedBy('due_date', 'descending')}
+              onSelect={this.props.columnSortSettings.onSortByDueDateDescending}
+            >
+              { I18n.t('Due Date - Newest to Oldest') }
+            </MenuItem>
 
-          <MenuItem
-            disabled={this.props.columnSortSettings.disabled}
-            selected={this.areColumnsOrderedBy('points', 'ascending')}
-            onSelect={this.props.columnSortSettings.onSortByPointsAscending}
-          >
-            { I18n.t('Points - Lowest to Highest') }
-          </MenuItem>
+            <MenuItem
+              disabled={this.props.columnSortSettings.disabled}
+              selected={this.areColumnsOrderedBy('points', 'ascending')}
+              onSelect={this.props.columnSortSettings.onSortByPointsAscending}
+            >
+              { I18n.t('Points - Lowest to Highest') }
+            </MenuItem>
 
-          <MenuItem
-            disabled={this.props.columnSortSettings.disabled}
-            selected={this.areColumnsOrderedBy('points', 'descending')}
-            onSelect={this.props.columnSortSettings.onSortByPointsDescending}
-          >
-            { I18n.t('Points - Highest to Lowest') }
-          </MenuItem>
-        </MenuItemGroup>
+            <MenuItem
+              disabled={this.props.columnSortSettings.disabled}
+              selected={this.areColumnsOrderedBy('points', 'descending')}
+              onSelect={this.props.columnSortSettings.onSortByPointsDescending}
+            >
+              { I18n.t('Points - Highest to Lowest') }
+            </MenuItem>
+          </MenuItemGroup>
+        </MenuItemFlyout>
 
         <MenuItemSeparator />
 

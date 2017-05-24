@@ -69,8 +69,8 @@ describe "Gradezilla" do
   context "return focus to settings menu when it closes" do
     it "after arrange columns is clicked", priority: "2", test_id: 720462 do
       view_menu_trigger = Gradezilla.gradebook_menu('View').find('button')
-      Gradezilla.open_gradebook_menu('View')
-      Gradezilla.select_gradebook_menu_option('Arrange By > Due Date - Oldest to Newest')
+      Gradezilla.open_view_menu_and_arrange_by_menu
+      Gradezilla.select_gradebook_menu_option('Due Date - Oldest to Newest')
       expect(active_element).to eq(view_menu_trigger)
     end
   end
