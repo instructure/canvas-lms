@@ -36,9 +36,6 @@ class Gradezilla
     ACTION_MENU_SELECTOR = '[data-component="ActionMenu"]'.freeze
     ACTION_MENU_ITEM_SELECTOR = '[data-menu-id="%s"]'.freeze
 
-    # Menu Items
-    MENU_ITEM_SELECTOR = 'span [data-menu-item-id="%s"]'.freeze
-
     def gradebook_settings_cog
       f('#gradebook_settings')
     end
@@ -109,7 +106,7 @@ class Gradezilla
     end
 
     def menu_item(name)
-      f(MENU_ITEM_SELECTOR % name)
+      fj("[role*=menuitem]:contains(#{name})")
     end
 
     def action_menu_item(name)
@@ -159,10 +156,13 @@ class Gradezilla
       make_full_screen
     end
 
-    def open_assignment_options_and_select_by(assignment_id:, menu_item_id:)
+    def open_assignment_options_and_select_by(assignment_id:, menu_item:)
       column_header = f("#gradebook_grid .slick-header-column[id*='assignment_#{assignment_id}']")
-      column_header.find_element(:css, '.Gradebook__ColumnHeaderAction').click
-      f("span[data-menu-item-id='#{menu_item_id}']").click
+      action_menu = f('.Gradebook__ColumnHeaderAction', column_header)
+      action_menu.click
+      # open the menu so the menu items are is findable
+      fj('[role=menu][aria-labelledby*=PopoverMenu] button:contains("Sort by")').click
+      fj("[role=menuitemradio]:contains(#{menu_item})").click
     end
 
     def select_total_column_option(menu_item_id = nil, already_open: false)

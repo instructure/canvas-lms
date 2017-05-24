@@ -16,15 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import PropTypes from 'prop-types'
-import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid'
-import { MenuItem, MenuItemGroup, MenuItemSeparator } from 'instructure-ui/lib/components/Menu'
-import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
-import Typography from 'instructure-ui/lib/components/Typography'
-import I18n from 'i18n!gradebook'
-
-const { bool, func, shape, string } = PropTypes;
+import React from 'react';
+import { bool, func, shape, string } from 'prop-types';
+import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid';
+import {
+  MenuItem,
+  MenuItemFlyout,
+  MenuItemGroup,
+  MenuItemSeparator
+} from 'instructure-ui/lib/components/Menu';
+import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu';
+import Typography from 'instructure-ui/lib/components/Typography';
+import I18n from 'i18n!gradebook';
+import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
 
 function renderTrigger (menuShown) {
   const classes = `Gradebook__ColumnHeaderAction ${menuShown ? 'menuShown' : ''}`;
@@ -62,20 +66,12 @@ class TotalGradeColumnHeader extends React.Component {
     }).isRequired,
   };
 
-  constructor (props) {
-    super(props);
+  state = { menuShown: false };
 
-    this.state = {
-      menuShown: false
-    };
+  onToggle = (show) => { this.setState({ menuShown: show }); };
 
-    this.bindOptionsMenuContent = (ref) => { this.optionsMenuContent = ref };
-    this.onToggle = this.onToggle.bind(this);
-  }
-
-  onToggle (show) {
-    this.setState({ menuShown: show });
-  }
+  bindOptionsMenuContent = (ref) => { this.optionsMenuContent = ref; };
+  bindSortByMenuContent = (ref) => { this.sortByMenuContent = ref; };
 
   render () {
     const { sortBySetting, gradeDisplay, position } = this.props;
@@ -101,23 +97,25 @@ class TotalGradeColumnHeader extends React.Component {
           trigger={renderTrigger(menuShown)}
           onToggle={this.onToggle}
         >
-          <MenuItemGroup label={I18n.t('Sort by')}>
-            <MenuItem
-              selected={selectedSortSetting === 'grade' && sortBySetting.direction === 'ascending'}
-              disabled={sortBySetting.disabled}
-              onSelect={sortBySetting.onSortByGradeAscending}
-            >
-              <span>{I18n.t('Grade - Low to High')}</span>
-            </MenuItem>
+          <MenuItemFlyout contentRef={this.bindSortByMenuContent} label={I18n.t('Sort by')}>
+            <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>
+              <MenuItem
+                selected={selectedSortSetting === 'grade' && sortBySetting.direction === 'ascending'}
+                disabled={sortBySetting.disabled}
+                onSelect={sortBySetting.onSortByGradeAscending}
+              >
+                <span>{I18n.t('Grade - Low to High')}</span>
+              </MenuItem>
 
-            <MenuItem
-              selected={selectedSortSetting === 'grade' && sortBySetting.direction === 'descending'}
-              disabled={sortBySetting.disabled}
-              onSelect={sortBySetting.onSortByGradeDescending}
-            >
-              <span>{I18n.t('Grade - High to Low')}</span>
-            </MenuItem>
-          </MenuItemGroup>
+              <MenuItem
+                selected={selectedSortSetting === 'grade' && sortBySetting.direction === 'descending'}
+                disabled={sortBySetting.disabled}
+                onSelect={sortBySetting.onSortByGradeDescending}
+              >
+                <span>{I18n.t('Grade - High to Low')}</span>
+              </MenuItem>
+            </MenuItemGroup>
+          </MenuItemFlyout>
 
           {
             showSeparator &&
@@ -158,4 +156,4 @@ class TotalGradeColumnHeader extends React.Component {
   }
 }
 
-export default TotalGradeColumnHeader
+export default TotalGradeColumnHeader;

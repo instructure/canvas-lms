@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradebook';
 
 const primaryInfoLabels = {
   first_last: I18n.t('First, Last Name'),
@@ -49,7 +49,6 @@ export default {
   primaryInfoKeys,
   primaryInfoLabels,
   defaultPrimaryInfo,
-
   secondaryInfoKeys,
   secondaryInfoLabels,
   defaultSecondaryInfo,

@@ -16,24 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import PropTypes from 'prop-types'
-import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid'
-import { MenuItem, MenuItemGroup, MenuItemSeparator } from 'instructure-ui/lib/components/Menu'
-import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
-import Typography from 'instructure-ui/lib/components/Typography'
-import StudentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/StudentRowHeaderConstants'
-import I18n from 'i18n!gradebook'
-
-const { arrayOf, bool, func, oneOf, shape, string } = PropTypes;
+import React from 'react';
+import { arrayOf, bool, func, oneOf, shape, string } from 'prop-types';
+import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid';
+import {
+  MenuItem,
+  MenuItemFlyout,
+  MenuItemGroup,
+  MenuItemSeparator
+} from 'instructure-ui/lib/components/Menu';
+import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu';
+import Typography from 'instructure-ui/lib/components/Typography';
+import studentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/studentRowHeaderConstants';
+import I18n from 'i18n!gradebook';
+import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
 
 export default class StudentColumnHeader extends React.Component {
   static propTypes = {
-    selectedPrimaryInfo: oneOf(StudentRowHeaderConstants.primaryInfoKeys).isRequired,
+    selectedPrimaryInfo: oneOf(studentRowHeaderConstants.primaryInfoKeys).isRequired,
     onSelectPrimaryInfo: func.isRequired,
     loginHandleName: string,
     sisName: string,
-    selectedSecondaryInfo: oneOf(StudentRowHeaderConstants.secondaryInfoKeys).isRequired,
+    selectedSecondaryInfo: oneOf(studentRowHeaderConstants.secondaryInfoKeys).isRequired,
     sectionsEnabled: bool.isRequired,
     onSelectSecondaryInfo: func.isRequired,
     sortBySetting: shape({
@@ -44,7 +48,7 @@ export default class StudentColumnHeader extends React.Component {
       onSortBySortableNameDescending: func.isRequired,
       settingKey: string.isRequired
     }).isRequired,
-    selectedEnrollmentFilters: arrayOf(oneOf(StudentRowHeaderConstants.enrollmentFilterKeys)).isRequired,
+    selectedEnrollmentFilters: arrayOf(oneOf(studentRowHeaderConstants.enrollmentFilterKeys)).isRequired,
     onToggleEnrollmentFilter: func.isRequired
   };
 
@@ -53,32 +57,22 @@ export default class StudentColumnHeader extends React.Component {
     sisName: null,
   };
 
-  constructor (props) {
-    super(props);
+  state = { menuShown: false };
 
-    this.state = {
-      menuShown: false
-    };
+  onToggle = (show) => { this.setState({ menuShown: show }); };
 
-    this.bindOptionsMenuContent = (ref) => { this.optionsMenuContent = ref };
-    this.onShowSectionNames = this.onSelectSecondaryInfo.bind(this, 'section');
-    this.onHideSecondaryInfo = this.onSelectSecondaryInfo.bind(this, 'none');
-    this.onShowSisId = this.onSelectSecondaryInfo.bind(this, 'sis_id');
-    this.onShowLoginId = this.onSelectSecondaryInfo.bind(this, 'login_id');
+  onShowSectionNames = () => { this.onSelectSecondaryInfo('section'); };
+  onHideSecondaryInfo = () => { this.onSelectSecondaryInfo('none'); };
+  onShowSisId = () => { this.onSelectSecondaryInfo('sis_id'); };
+  onShowLoginId = () => { this.onSelectSecondaryInfo('login_id'); };
 
-    this.onShowFirstLastNames = this.onSelectPrimaryInfo.bind(this, 'first_last');
-    this.onShowLastFirstNames = this.onSelectPrimaryInfo.bind(this, 'last_first');
-    this.onHideStudentNames = this.onSelectPrimaryInfo.bind(this, 'anonymous');
+  onShowFirstLastNames = () => { this.onSelectPrimaryInfo('first_last'); };
+  onShowLastFirstNames = () => { this.onSelectPrimaryInfo('last_first'); };
+  onHideStudentNames = () => { this.onSelectPrimaryInfo('anonymous'); };
 
-    this.onToggleInactive = this.onToggleEnrollmentFilter.bind(this, 'inactive');
-    this.onToggleConcluded = this.onToggleEnrollmentFilter.bind(this, 'concluded');
+  onToggleInactive = () => { this.onToggleEnrollmentFilter('inactive'); };
+  onToggleConcluded = () => { this.onToggleEnrollmentFilter('concluded'); };
 
-    this.onToggle = this.onToggle.bind(this);
-  }
-
-  onToggle (show) {
-    this.setState({ menuShown: show });
-  }
 
   onSelectSecondaryInfo (secondaryInfoKey) {
     this.props.onSelectSecondaryInfo(secondaryInfoKey);
@@ -91,6 +85,11 @@ export default class StudentColumnHeader extends React.Component {
   onToggleEnrollmentFilter (enrollmentFilterKey) {
     this.props.onToggleEnrollmentFilter(enrollmentFilterKey);
   }
+
+  bindOptionsMenuContent = (ref) => { this.optionsMenuContent = ref; };
+  bindSortByMenuContent = (ref) => { this.sortByMenuContent = ref; };
+  bindDisplayAsMenuContent = (ref) => { this.displayAsMenuContent = ref; };
+  bindSecondaryInfoMenuContent = (ref) => { this.secondaryInfoMenuContent = ref; };
 
   render () {
     const {
@@ -127,110 +126,107 @@ export default class StudentColumnHeader extends React.Component {
           }
           onToggle={this.onToggle}
         >
-          <MenuItemGroup label={I18n.t('Sort by')}>
-            <MenuItem
-              selected={selectedSortSetting === 'sortable_name' && direction === 'ascending'}
-              disabled={disabled}
-              onSelect={onSortBySortableNameAscending}
-            >
-              <span>{I18n.t('A–Z')}</span>
-            </MenuItem>
-
-            <MenuItem
-              selected={selectedSortSetting === 'sortable_name' && direction === 'descending'}
-              disabled={disabled}
-              onSelect={onSortBySortableNameDescending}
-            >
-              <span>{I18n.t('Z–A')}</span>
-            </MenuItem>
-          </MenuItemGroup>
-          <MenuItemSeparator />
-          <MenuItemGroup label={I18n.t('Display as')} data-menu-item-group-id="primary-info">
-            <MenuItem
-              key="first_last"
-              data-menu-item-id="first_last"
-              selected={this.props.selectedPrimaryInfo === 'first_last'}
-              onSelect={this.onShowFirstLastNames}
-            >
-              {StudentRowHeaderConstants.primaryInfoLabels.first_last}
-            </MenuItem>
-            <MenuItem
-              key="last_first"
-              data-menu-item-id="last_first"
-              selected={this.props.selectedPrimaryInfo === 'last_first'}
-              onSelect={this.onShowLastFirstNames}
-            >
-              {StudentRowHeaderConstants.primaryInfoLabels.last_first}
-            </MenuItem>
-            <MenuItem
-              key="anonymous"
-              data-menu-item-id="anonymous"
-              selected={this.props.selectedPrimaryInfo === 'anonymous'}
-              onSelect={this.onHideStudentNames}
-            >
-              {StudentRowHeaderConstants.primaryInfoLabels.anonymous}
-            </MenuItem>
-          </MenuItemGroup>
-          <MenuItemSeparator />
-          <MenuItemGroup label={I18n.t('Secondary info')} data-menu-item-group-id="secondary-info">
-            {
-              this.props.sectionsEnabled &&
+          <MenuItemFlyout label={I18n.t('Sort by')} contentRef={this.bindSortByMenuContent}>
+            <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>
               <MenuItem
-                key="section"
-                data-menu-item-id="section"
-                selected={this.props.selectedSecondaryInfo === 'section'}
-                onSelect={this.onShowSectionNames}
+                selected={selectedSortSetting === 'sortable_name' && direction === 'ascending'}
+                disabled={disabled}
+                onSelect={onSortBySortableNameAscending}
               >
-                {StudentRowHeaderConstants.secondaryInfoLabels.section}
+                <span>{I18n.t('A–Z')}</span>
               </MenuItem>
-            }
-            <MenuItem
-              key="sis_id"
-              data-menu-item-id="sis_id"
-              selected={this.props.selectedSecondaryInfo === 'sis_id'}
-              onSelect={this.onShowSisId}
-            >
-              {this.props.sisName || StudentRowHeaderConstants.secondaryInfoLabels.sis_id}
-            </MenuItem>
 
-            <MenuItem
-              key="login_id"
-              data-menu-item-id="login_id"
-              selected={this.props.selectedSecondaryInfo === 'login_id'}
-              onSelect={this.onShowLoginId}
-            >
-              {this.props.loginHandleName || StudentRowHeaderConstants.secondaryInfoLabels.login_id}
-            </MenuItem>
+              <MenuItem
+                selected={selectedSortSetting === 'sortable_name' && direction === 'descending'}
+                disabled={disabled}
+                onSelect={onSortBySortableNameDescending}
+              >
+                <span>{I18n.t('Z–A')}</span>
+              </MenuItem>
+            </MenuItemGroup>
+          </MenuItemFlyout>
 
-            <MenuItem
-              key="none"
-              data-menu-item-id="none"
-              selected={this.props.selectedSecondaryInfo === 'none'}
-              onSelect={this.onHideSecondaryInfo}
-            >
-              {StudentRowHeaderConstants.secondaryInfoLabels.none}
-            </MenuItem>
-          </MenuItemGroup>
+          <MenuItemFlyout label={I18n.t('Display as')} contentRef={this.bindDisplayAsMenuContent}>
+            <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Display as')}</ScreenReaderContent>}>
+              <MenuItem
+                key="first_last"
+                selected={this.props.selectedPrimaryInfo === 'first_last'}
+                onSelect={this.onShowFirstLastNames}
+              >
+                {studentRowHeaderConstants.primaryInfoLabels.first_last}
+              </MenuItem>
+              <MenuItem
+                key="last_first"
+                selected={this.props.selectedPrimaryInfo === 'last_first'}
+                onSelect={this.onShowLastFirstNames}
+              >
+                {studentRowHeaderConstants.primaryInfoLabels.last_first}
+              </MenuItem>
+              <MenuItem
+                key="anonymous"
+                selected={this.props.selectedPrimaryInfo === 'anonymous'}
+                onSelect={this.onHideStudentNames}
+              >
+                {studentRowHeaderConstants.primaryInfoLabels.anonymous}
+              </MenuItem>
+            </MenuItemGroup>
+          </MenuItemFlyout>
+
+          <MenuItemFlyout label={I18n.t('Secondary info')} contentRef={this.bindSecondaryInfoMenuContent}>
+            <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Secondary info')}</ScreenReaderContent>}>
+              {
+                this.props.sectionsEnabled &&
+                <MenuItem
+                  key="section"
+                  selected={this.props.selectedSecondaryInfo === 'section'}
+                  onSelect={this.onShowSectionNames}
+                >
+                  {studentRowHeaderConstants.secondaryInfoLabels.section}
+                </MenuItem>
+              }
+              <MenuItem
+                key="sis_id"
+                selected={this.props.selectedSecondaryInfo === 'sis_id'}
+                onSelect={this.onShowSisId}
+              >
+                {this.props.sisName || studentRowHeaderConstants.secondaryInfoLabels.sis_id}
+              </MenuItem>
+
+              <MenuItem
+                key="login_id"
+                selected={this.props.selectedSecondaryInfo === 'login_id'}
+                onSelect={this.onShowLoginId}
+              >
+                {this.props.loginHandleName || studentRowHeaderConstants.secondaryInfoLabels.login_id}
+              </MenuItem>
+
+              <MenuItem
+                key="none"
+                selected={this.props.selectedSecondaryInfo === 'none'}
+                onSelect={this.onHideSecondaryInfo}
+              >
+                {studentRowHeaderConstants.secondaryInfoLabels.none}
+              </MenuItem>
+            </MenuItemGroup>
+          </MenuItemFlyout>
 
           <MenuItemSeparator />
 
-          <MenuItemGroup label={I18n.t('Show')} data-menu-item-group-id="enrollment-filter" allowMultiple>
+          <MenuItemGroup label={I18n.t('Show')} allowMultiple>
             <MenuItem
               key="inactive"
-              data-menu-item-id="inactive"
               selected={this.props.selectedEnrollmentFilters.includes('inactive')}
               onSelect={this.onToggleInactive}
             >
-              {StudentRowHeaderConstants.enrollmentFilterLabels.inactive}
+              {studentRowHeaderConstants.enrollmentFilterLabels.inactive}
             </MenuItem>
 
             <MenuItem
               key="concluded"
-              data-menu-item-id="concluded"
               selected={this.props.selectedEnrollmentFilters.includes('concluded')}
               onSelect={this.onToggleConcluded}
             >
-              {StudentRowHeaderConstants.enrollmentFilterLabels.concluded}
+              {studentRowHeaderConstants.enrollmentFilterLabels.concluded}
             </MenuItem>
           </MenuItemGroup>
         </PopoverMenu>

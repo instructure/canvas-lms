@@ -80,7 +80,7 @@ describe "Gradezilla - post grades to SIS" do
 
       Gradezilla.visit(@course)
       Gradezilla.open_gradebook_dropdown_menu
-      Gradezilla.select_menu_item('learning-mastery')
+      Gradezilla.select_menu_item('Learning Mastery…')
 
       expect(Gradezilla.action_menu).not_to be_displayed
     end

@@ -54,7 +54,7 @@ define [
   'jsx/gradezilla/default_gradebook/CurveGradesDialogManager'
   'jsx/gradezilla/default_gradebook/apis/GradebookApi'
   'jsx/gradezilla/default_gradebook/slick-grid/CellEditorFactory'
-  'jsx/gradezilla/default_gradebook/constants/StudentRowHeaderConstants'
+  'jsx/gradezilla/default_gradebook/constants/studentRowHeaderConstants'
   'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader'
   'jsx/gradezilla/default_gradebook/components/AssignmentGroupColumnHeader'
   'jsx/gradezilla/default_gradebook/components/AssignmentRowCellPropFactory'
@@ -100,7 +100,7 @@ define [
   CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, GradeFormatHelper, UserSettings, Spinner, AssignmentMuter,
   AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
   SubmissionCell, NumberCompare, natcompare, ConvertCase, htmlEscape, SetDefaultGradeDialogManager,
-  CurveGradesDialogManager, GradebookApi, CellEditorFactory, StudentRowHeaderConstants, AssignmentColumnHeader,
+  CurveGradesDialogManager, GradebookApi, CellEditorFactory, studentRowHeaderConstants, AssignmentColumnHeader,
   AssignmentGroupColumnHeader, AssignmentRowCellPropFactory, CustomColumnHeader, StudentColumnHeader, StudentRowHeader,
   TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, GridColor, StatusesModal, GradebookSettingsModal,
   PostGradesStore, PostGradesApp,  SubmissionStateMap, DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager,
@@ -118,7 +118,7 @@ define [
 
   ## Gradebook Display Settings
   getInitialGridDisplaySettings = (settings) ->
-    selectedPrimaryInfo = settings.student_column_display_as || StudentRowHeaderConstants.defaultPrimaryInfo
+    selectedPrimaryInfo = settings.student_column_display_as || studentRowHeaderConstants.defaultPrimaryInfo
 
     # in case of no user preference, determine the default value after @hasSections has resolved
     selectedSecondaryInfo = settings.student_column_secondary_info

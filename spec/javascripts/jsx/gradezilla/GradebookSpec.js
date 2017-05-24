@@ -30,7 +30,7 @@ import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator';
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
 import DataLoader from 'jsx/gradezilla/DataLoader';
 import SubmissionStateMap from 'jsx/gradezilla/SubmissionStateMap';
-import StudentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/StudentRowHeaderConstants';
+import studentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/studentRowHeaderConstants';
 import UserSettings from 'compiled/userSettings';
 import ActionMenu from 'jsx/gradezilla/default_gradebook/components/ActionMenu';
 import GradebookApi from 'jsx/gradezilla/default_gradebook/apis/GradebookApi';
@@ -4773,7 +4773,7 @@ test('changes the value of @getSelectedEnrollmentFilters', function () {
   const gradebook = createGradebook();
 
   for (let i = 0; i < 2; i++) {
-    StudentRowHeaderConstants.enrollmentFilterKeys.forEach((key) => {
+    studentRowHeaderConstants.enrollmentFilterKeys.forEach((key) => {
       const previousValue = gradebook.getSelectedEnrollmentFilters().includes(key);
       gradebook.toggleEnrollmentFilter(key, true);
       const newValue = gradebook.getSelectedEnrollmentFilters().includes(key);
