@@ -99,9 +99,9 @@ module Lti
       @data = {
           subject: 'lti.lti2Registration',
           status: params[:status],
-          app_id: @tool.id,
-          name: @tool.name,
-          description: @tool.description,
+          app_id: @tool&.id,
+          name: @tool&.name,
+          description: @tool&.description,
           message: params[:lti_errormsg] || params[:lti_msg]
       }
       render layout: false

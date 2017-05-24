@@ -138,6 +138,17 @@ module Lti
 
     end
 
+    describe 'GET #registration_return' do
+      include_context 'lti2_spec_helper'
+
+      before { user_session(account_admin_user) }
+
+      it 'does not 500 if tool registration fails' do
+        get 'registration_return', course_id: course.id, status: 'failure'
+        expect(response).to be_succes
+      end
+    end
+
     describe "GET #reregistration" do
       before(:each) do
         MessageHandler.create!(
