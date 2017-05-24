@@ -319,9 +319,6 @@ define [
       for studentId in _.uniq(studentsWithHiddenAssignments)
         student = @student(studentId)
         @calculateStudentGrade(student)
-        @grid.invalidateRow(student.row)
-
-      @grid.render()
 
     hiddenStudentIdsForAssignment: (studentIds, assignment) ->
       # TODO: _.difference is ridic expensive.  may need to do something else
@@ -365,12 +362,15 @@ define [
       @customColumns = columns
 
     gotCustomColumnDataChunk: (column, columnData) =>
+      studentIds = []
+
       for datum in columnData
         student = @student(datum.user_id)
         if student? #ignore filtered students
           student["custom_col_#{column.id}"] = datum.content
-          @grid?.invalidateRow(student.row)
-      @grid?.render()
+          studentIds.push(student.id)
+
+      @invalidateRowsForStudentIds(_.uniq(studentIds))
 
     doSlickgridStuff: =>
       @initGrid()
@@ -441,13 +441,12 @@ define [
 
         student.initialized = true
         @calculateStudentGrade(student)
-        @grid?.invalidateRow(student.row)
 
-      @setAssignmentVisibility(_.pluck(students, 'id'))
+      studentIds = _.pluck(students, 'id')
+      @setAssignmentVisibility(studentIds)
 
-      @grid.render()
+      @invalidateRowsForStudentIds(studentIds)
 
-    rowIndex: 0
     addRow: (student) =>
       student.computed_current_score ||= 0
       student.computed_final_score ||= 0
@@ -460,8 +459,6 @@ define [
       @setStudentDisplay(student)
 
       if @rowFilter(student)
-        student.row = @rowIndex
-        @rowIndex++
         @rows.push(student)
 
       @grid?.updateRowCount(@rows.length)
@@ -649,12 +646,8 @@ define [
         @$grid.find("##{@uid}#{column.id}").showIf(@show_attendance)
 
       @withAllStudents (students) =>
-        @rowIndex = 0
         for id, student of @students
-          student.row = -1
           if @rowFilter(student)
-            student.row = @rowIndex
-            @rowIndex += 1
             @rows.push(student)
             @calculateStudentGrade(student) # TODO: this may not be necessary
             @setStudentDisplay(student)
@@ -678,20 +671,21 @@ define [
       student.display_name = cell.render()
 
     gotSubmissionsChunk: (student_submissions) =>
+      changedStudentIds = []
+
       for data in student_submissions
+        changedStudentIds.push(data.user_id)
         student = @student(data.user_id)
         for submission in data.submissions
           @updateSubmission(submission)
 
         student.loaded = true
 
-        if @grid
-          @calculateStudentGrade(student)
-          @grid.invalidateRow(student.row)
+        @calculateStudentGrade(student)
 
       # TODO: if gb2 survives long enough, we should consider debouncing all
       # the invalidation/rendering for smoother performance while loading
-      @grid?.render()
+      @invalidateRowsForStudentIds(_.uniq(changedStudentIds))
 
     student: (id) =>
       @students[id] || @studentViewStudents[id]
@@ -725,7 +719,8 @@ define [
     updateSubmissionsFromExternal: (submissions) =>
       columns = @grid.getColumns()
       changedColumnHeaders = {}
-      changedRows = []
+      changedStudentIds = []
+
       for submission in submissions
         student = @student(submission.user_id)
         idToMatch = @getAssignmentColumnId(submission.assignment_id)
@@ -741,21 +736,12 @@ define [
         submissionState = @submissionStateMap.getSubmissionState(submission)
         student["assignment_#{submission.assignment_id}"].gradeLocked = submissionState.locked
         @calculateStudentGrade(student)
-        changedRows.push(student.row)
-        @updateRowTotals student.row
+        changedStudentIds.push(student.id)
 
-      for assignmentId, cell of changedColumnHeaders
+      for assignmentId of changedColumnHeaders
         @renderAssignmentColumnHeader(assignmentId)
 
-      columns = (index for column, index in @grid.getColumns() when column.type is 'assignment')
-      for row in _.uniq(changedRows)
-        for column in columns
-          @grid.updateCell row, column
-
-    updateRowTotals: (rowIndex) ->
-      columns = @grid.getColumns()
-      for column, columnIndex in columns
-        @grid.updateCell rowIndex, columnIndex if column.type isnt 'assignment'
+      @updateRowCellsForStudentIds(_.uniq(changedStudentIds))
 
     cellFormatter: (row, col, submission) =>
       if !@rows[row].loaded or !@rows[row].initialized
@@ -1816,7 +1802,45 @@ define [
       columnPosition = @getColumnPositionById(colId, @parentColumns)
       return columnPosition != null
 
-    ## React Grid Component Rendering Methods
+    ## SlickGrid Data Access Methods
+
+    listRows: =>
+      @rows # currently the source of truth for filtered and sorted rows
+
+    listRowIndicesForStudentIds: (studentIds) =>
+      rowIndicesByStudentId = @listRows().reduce((map, row, index) =>
+        map[row.id] = index
+        map
+      , {})
+      studentIds.map (studentId) => rowIndicesByStudentId[studentId]
+
+    ## SlickGrid Update Methods
+
+    updateRowCellsForStudentIds: (studentIds) =>
+      return unless @grid
+
+      # Update each row without entirely replacing the DOM elements.
+      # This is needed to preserve the editor for the active cell, when present.
+      rowIndices = @listRowIndicesForStudentIds(studentIds)
+      columns = @grid.getColumns()
+      for rowIndex in rowIndices
+        for column, columnIndex in columns
+          @grid.updateCell(rowIndex, columnIndex)
+
+      null # skip building an unused array return value
+
+    invalidateRowsForStudentIds: (studentIds) =>
+      return unless @grid
+
+      rowIndices = @listRowIndicesForStudentIds(studentIds)
+      for rowIndex in rowIndices
+        @grid.invalidateRow(rowIndex)
+
+      @grid.render()
+
+      null # skip building an unused array return value
+
+    ## Gradebook Bulk UI Update Methods
 
     updateFrozenColumnsAndRenderGrid: (newColumns = @getVisibleGradeGridColumns()) ->
       @grid.setNumberOfColumnsToFreeze(@getFrozenColumnCount())

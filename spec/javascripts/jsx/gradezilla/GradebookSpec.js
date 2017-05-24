@@ -129,6 +129,81 @@ test('initializes content load state for context modules to false', function () 
   strictEqual(gradebook.contentLoadStates.contextModulesLoaded, false);
 });
 
+test('calls renderStatusesModal', function () {
+  const loaderPromises = {
+    gotAssignmentGroups: $.Deferred(),
+    gotContextModules: $.Deferred(),
+    gotCustomColumns: $.Deferred(),
+    gotStudents: $.Deferred(),
+    gotSubmissions: $.Deferred(),
+    gotCustomColumnData: $.Deferred(),
+    gotEffectiveDueDates: $.Deferred()
+  };
+  this.stub(DataLoader, 'loadGradebookData').returns(loaderPromises);
+  this.stub(Gradebook.prototype, 'gotAllAssignmentGroupsAndEffectiveDueDates');
+  this.stub(Gradebook.prototype, 'renderActionMenu');
+  const gradebook = createGradebook();
+  [
+    'renderViewOptionsMenu',
+    'initGrid',
+    'renderGradebookMenus',
+    'arrangeColumnsBy',
+    'renderGradebookSettingsModal',
+    'renderSettingsButton',
+    'updatePostGradesFeatureButton',
+    'initPostGradesStore',
+  ].forEach(fn => this.stub(gradebook, fn));
+  const renderStatusesModalStub = this.stub(gradebook, 'renderStatusesModal');
+  gradebook.gridReady.reject()
+  loaderPromises.gotCustomColumns.resolve();
+  loaderPromises.gotAssignmentGroups.resolve();
+  loaderPromises.gotEffectiveDueDates.resolve();
+
+  ok(renderStatusesModalStub.calledOnce);
+});
+
+QUnit.module('Gradebook#gotCustomColumnDataChunk', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.gradebook.students = {
+      1101: { id: '1101', assignment_201: {}, assignment_202: {} },
+      1102: { id: '1102', assignment_201: {} }
+    };
+    this.stub(this.gradebook, 'invalidateRowsForStudentIds')
+  }
+});
+
+test('updates students with custom column data', function () {
+  const data = [{ user_id: '1101', content: 'example' }, { user_id: '1102', content: 'sample' }];
+  this.gradebook.gotCustomColumnDataChunk({ id: '2401' }, data);
+  equal(this.gradebook.students[1101].custom_col_2401, 'example');
+  equal(this.gradebook.students[1102].custom_col_2401, 'sample');
+});
+
+test('invalidates rows for related students', function () {
+  const data = [{ user_id: '1101', content: 'example' }, { user_id: '1102', content: 'sample' }];
+  this.gradebook.gotCustomColumnDataChunk({ id: '2401' }, data);
+  strictEqual(this.gradebook.invalidateRowsForStudentIds.callCount, 1);
+  const [studentIds] = this.gradebook.invalidateRowsForStudentIds.lastCall.args;
+  deepEqual(studentIds, ['1101', '1102'], 'both students had custom column data');
+});
+
+test('ignores students without custom column data', function () {
+  const data = [{ user_id: '1102', content: 'sample' }];
+  this.gradebook.gotCustomColumnDataChunk({ id: '2401' }, data);
+  const [studentIds] = this.gradebook.invalidateRowsForStudentIds.lastCall.args;
+  deepEqual(studentIds, ['1102'], 'only the student 1102 had custom column data');
+});
+
+test('invalidates rows after updating students', function () {
+  const data = [{ user_id: '1101', content: 'example' }, { user_id: '1102', content: 'sample' }];
+  this.gradebook.invalidateRowsForStudentIds.callsFake(() => {
+    equal(this.gradebook.students[1101].custom_col_2401, 'example');
+    equal(this.gradebook.students[1102].custom_col_2401, 'sample');
+  });
+  this.gradebook.gotCustomColumnDataChunk({ id: '2401' }, data);
+});
+
 QUnit.module('Gradebook - initial content load', {
   setup () {
     this.loaderPromises = {
@@ -2083,6 +2158,36 @@ test('StatusesModal is mounted on renderStatusesModal', function () {
   ReactDOM.unmountComponentAtNode(statusesModalMountPoint);
 });
 
+QUnit.module('setupGrading', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.students = [{ id: '1101' }, { id: '1102' }];
+    this.stub(this.gradebook, 'setAssignmentVisibility');
+    this.stub(this.gradebook, 'invalidateRowsForStudentIds');
+  }
+});
+
+test('sets assignment visibility for the given students', function () {
+  this.gradebook.setupGrading(this.students);
+  strictEqual(this.gradebook.setAssignmentVisibility.callCount, 1, 'setAssignmentVisibility was called once');
+  const [studentIds] = this.gradebook.setAssignmentVisibility.lastCall.args;
+  deepEqual(studentIds, ['1101', '1102'], 'both students were updated');
+});
+
+test('invalidates student rows for the given students', function () {
+  this.gradebook.setupGrading(this.students);
+  strictEqual(this.gradebook.invalidateRowsForStudentIds.callCount, 1, 'invalidateRowsForStudentIds was called once');
+  const [studentIds] = this.gradebook.invalidateRowsForStudentIds.lastCall.args;
+  deepEqual(studentIds, ['1101', '1102'], 'both students were updated');
+});
+
+test('invalidates student rows after setting assignment visibility', function () {
+  this.gradebook.invalidateRowsForStudentIds.callsFake(() => {
+    strictEqual(this.gradebook.setAssignmentVisibility.callCount, 1, 'setAssignmentVisibility was already called');
+  });
+  this.gradebook.setupGrading(this.students);
+});
+
 QUnit.module('addRow', {
   setup () {
     fakeENV.setup({
@@ -2109,9 +2214,6 @@ test('does not add filtered out users', function () {
   const student3 = {...student1, sections: ['2']};
   [student1, student2, student3].forEach((student) => { gradebook.addRow(student) });
 
-  ok(student1.row == null, 'filtered out students get no row number');
-  ok(student2.row === 0, 'other students do get a row number');
-  ok(student3.row === 1, 'row number increments');
   ok(_.isEqual(gradebook.rows, [student2, student3]));
 });
 
@@ -3555,6 +3657,111 @@ test('preserves the order of any existing movable columns that have been dragged
   deepEqual(this.gradebook.grid.getColumns().map(item => item.id), expectedColumnOrder);
 });
 
+QUnit.module('Gradebook#listRowIndicesForStudentIds');
+
+test('returns a row index for each student id', function () {
+  const gradebook = createGradebook();
+  gradebook.rows = [
+    { id: '1101' },
+    { id: '1102' },
+    { id: '1103' },
+    { id: '1104' }
+  ];
+  deepEqual(gradebook.listRowIndicesForStudentIds(['1102', '1104']), [1, 3]);
+});
+
+QUnit.module('Gradebook#updateRowCellsForStudentIds', {
+  setup () {
+    const columns = [
+      { id: 'student', type: 'student' },
+      { id: 'assignment_232', type: 'assignment' },
+      { id: 'total_grade', type: 'total_grade' },
+      { id: 'assignment_group_12', type: 'assignment' }
+    ];
+    this.gradebook = createGradebook();
+    this.gradebook.rows = [
+      { id: '1101' },
+      { id: '1102' }
+    ];
+    this.gradebook.grid = {
+      updateCell: this.stub(),
+      getColumns () { return columns },
+    };
+  }
+});
+
+test('updates cells for each column', function () {
+  this.gradebook.updateRowCellsForStudentIds(['1101']);
+  strictEqual(this.gradebook.grid.updateCell.callCount, 4, 'called once per column');
+});
+
+test('includes the row index of the student when updating', function () {
+  this.gradebook.updateRowCellsForStudentIds(['1102']);
+  const rows = _.map(this.gradebook.grid.updateCell.args, args => args[0]); // get the first arg of each call
+  deepEqual(rows, [1, 1, 1, 1], 'each call specified row 1 (student 1102)');
+});
+
+test('includes the index of each column when updating', function () {
+  this.gradebook.updateRowCellsForStudentIds(['1101', '1102']);
+  const rows = _.map(this.gradebook.grid.updateCell.args, args => args[1]); // get the first arg of each call
+  deepEqual(rows, [0, 1, 2, 3, 0, 1, 2, 3]);
+});
+
+test('updates row cells for each student', function () {
+  this.gradebook.updateRowCellsForStudentIds(['1101', '1102']);
+  strictEqual(this.gradebook.grid.updateCell.callCount, 8, 'called once per student, per column');
+});
+
+test('has no effect when the grid has not been initialized', function () {
+  this.gradebook.grid = null;
+  this.gradebook.updateRowCellsForStudentIds(['1101']);
+  ok(true, 'no error was thrown');
+});
+
+QUnit.module('Gradebook#invalidateRowsForStudentIds', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.gradebook.rows = [
+      { id: '1101' },
+      { id: '1102' }
+    ];
+    this.gradebook.grid = {
+      invalidateRow: this.stub(),
+      render: this.stub()
+    };
+  }
+});
+
+test('invalidates each student row', function () {
+  this.gradebook.invalidateRowsForStudentIds(['1101', '1102']);
+  strictEqual(this.gradebook.grid.invalidateRow.callCount, 2, 'called once per student row');
+});
+
+test('includes the row index of the student when invalidating', function () {
+  this.gradebook.invalidateRowsForStudentIds(['1101', '1102']);
+  const rows = _.map(this.gradebook.grid.invalidateRow.args, args => args[0]); // get the first arg of each call
+  deepEqual(rows, [0, 1]);
+});
+
+test('re-renders the grid after invalidating', function () {
+  this.gradebook.grid.render.callsFake(() => {
+    strictEqual(this.gradebook.grid.invalidateRow.callCount, 2, 'both rows have already been validated');
+  });
+  this.gradebook.invalidateRowsForStudentIds(['1101', '1102']);
+});
+
+test('does not invalidate rows for students not included', function () {
+  this.gradebook.invalidateRowsForStudentIds(['1102']);
+  strictEqual(this.gradebook.grid.invalidateRow.callCount, 1, 'called once');
+  strictEqual(this.gradebook.grid.invalidateRow.lastCall.args[0], 1, 'called for the row (1) of student 1102');
+});
+
+test('has no effect when the grid has not been initialized', function () {
+  this.gradebook.grid = null;
+  this.gradebook.invalidateRowsForStudentIds(['1101']);
+  ok(true, 'no error was thrown');
+});
+
 QUnit.module('Gradebook#updateFrozenColumnsAndRenderGrid', {
   setupGradebook () {
     const gradebook = createGradebook();
@@ -4026,6 +4233,39 @@ test('when primaryInfo is set as "anonymous", sets display_name without other va
 
   notOk(student.display_name.includes(student.name));
   notOk(student.display_name.includes(student.sortable_name));
+});
+
+QUnit.module('Gradebook#gotSubmissionsChunk', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.gradebook.students = {
+      1101: { id: '1101', assignment_201: {}, assignment_202: {} },
+      1102: { id: '1102', assignment_201: {} }
+    };
+    this.stub(this.gradebook, 'updateSubmission');
+    this.stub(this.gradebook, 'invalidateRowsForStudentIds');
+  }
+});
+
+test('invalidates rows for related students', function () {
+  const studentSubmissions = [
+    {
+      submissions: [
+        { assignment_id: '201', user_id: '1101', score: 10, assignment_visible: true },
+        { assignment_id: '202', user_id: '1101', score: 9, assignment_visible: true }
+      ],
+      user_id: '1101'
+    },
+    {
+      submissions: [
+        { assignment_id: '201', user_id: '1102', score: 8, assignment_visible: true }
+      ],
+      user_id: '1102'
+    }
+  ];
+  this.gradebook.gotSubmissionsChunk(studentSubmissions);
+  const [studentIds] = this.gradebook.invalidateRowsForStudentIds.lastCall.args;
+  deepEqual(studentIds, ['1101', '1102']);
 });
 
 QUnit.module('Gradebook#setSortRowsBySetting');
@@ -5038,76 +5278,51 @@ test('is rendered on renderGridColor', function () {
   $fixtures.innerHTML = '';
 });
 
-QUnit.module('Gradebook#updateSubmissionsFromExternal');
-
-test('updateCell is called for each assignment in a row', function () {
-  const columns = [
-    { id: 'student', type: 'student' },
-    { id: 'assignment_232', type: 'assignment' },
-    { id: 'total_grade', type: 'total_grade' },
-    { id: 'assignment_group_12', type: 'assignment' }
-  ];
-  const gradebook = createGradebook();
-  const submissions = [
-    { assignment_id: 201, user_id: 123, score: 10, assignment_visible: true }
-  ];
-
-  gradebook.students = {
-    123: { row: 1, assignment_201: {} }
-  };
-  gradebook.assignments = []
-  gradebook.submissionStateMap = {
-    setSubmissionCellState () {},
-    getSubmissionState () { return { locked: false } }
-  };
-  gradebook.grid = {
-    updateCell: this.stub(),
-    getColumns () { return columns },
-  };
-  const updateCellStub = gradebook.grid.updateCell;
-  this.stub(gradebook, 'renderAssignmentColumnHeader')
-  this.stub(gradebook, 'updateSubmission');
-
-  gradebook.updateSubmissionsFromExternal(submissions);
-
-  ok(updateCellStub.withArgs(1, 0).calledOnce);
-  ok(updateCellStub.withArgs(1, 2).calledOnce);
-  ok(updateCellStub.withArgs(1, 1).calledOnce);
-  ok(updateCellStub.withArgs(1, 3).calledOnce);
-  strictEqual(updateCellStub.callCount, 4);
+QUnit.module('Gradebook#updateSubmissionsFromExternal', {
+  setup () {
+    const columns = [
+      { id: 'student', type: 'student' },
+      { id: 'assignment_232', type: 'assignment' },
+      { id: 'total_grade', type: 'total_grade' },
+      { id: 'assignment_group_12', type: 'assignment' }
+    ];
+    this.gradebook = createGradebook();
+    this.gradebook.students = {
+      1101: { id: '1101', assignment_201: {}, assignment_202: {} },
+      1102: { id: '1102', assignment_201: {} }
+    };
+    this.gradebook.assignments = []
+    this.gradebook.submissionStateMap = {
+      setSubmissionCellState () {},
+      getSubmissionState () { return { locked: false } }
+    };
+    this.gradebook.grid = {
+      updateCell: this.stub(),
+      getColumns () { return columns },
+    };
+    this.stub(this.gradebook, 'renderAssignmentColumnHeader')
+    this.stub(this.gradebook, 'updateSubmission');
+  }
 });
 
-QUnit.module('Gradebook - initialization');
+test('updates row cells', function () {
+  const submissions = [
+    { assignment_id: '201', user_id: '1101', score: 10, assignment_visible: true },
+    { assignment_id: '201', user_id: '1102', score: 8, assignment_visible: true }
+  ];
+  this.stub(this.gradebook, 'updateRowCellsForStudentIds');
+  this.gradebook.updateSubmissionsFromExternal(submissions);
+  strictEqual(this.gradebook.updateRowCellsForStudentIds.callCount, 1);
+});
 
-test('calls renderStatusesModal', function () {
-  const loaderPromises = {
-    gotAssignmentGroups: $.Deferred(),
-    gotContextModules: $.Deferred(),
-    gotCustomColumns: $.Deferred(),
-    gotStudents: $.Deferred(),
-    gotSubmissions: $.Deferred(),
-    gotCustomColumnData: $.Deferred(),
-    gotEffectiveDueDates: $.Deferred()
-  };
-  this.stub(DataLoader, 'loadGradebookData').returns(loaderPromises);
-  this.stub(Gradebook.prototype, 'gotAllAssignmentGroupsAndEffectiveDueDates');
-  this.stub(Gradebook.prototype, 'renderActionMenu');
-  const gradebook = createGradebook();
-  [
-    'renderViewOptionsMenu',
-    'initGrid',
-    'renderGradebookMenus',
-    'arrangeColumnsBy',
-    'renderGradebookSettingsModal',
-    'renderSettingsButton',
-    'updatePostGradesFeatureButton',
-    'initPostGradesStore',
-  ].forEach(fn => this.stub(gradebook, fn));
-  const renderStatusesModalStub = this.stub(gradebook, 'renderStatusesModal');
-  gradebook.gridReady.reject()
-  loaderPromises.gotCustomColumns.resolve();
-  loaderPromises.gotAssignmentGroups.resolve();
-  loaderPromises.gotEffectiveDueDates.resolve();
-
-  ok(renderStatusesModalStub.calledOnce);
+test('updates row cells only once for each student', function () {
+  const submissions = [
+    { assignment_id: '201', user_id: '1101', score: 10, assignment_visible: true },
+    { assignment_id: '202', user_id: '1101', score: 9, assignment_visible: true },
+    { assignment_id: '201', user_id: '1102', score: 8, assignment_visible: true }
+  ];
+  this.stub(this.gradebook, 'updateRowCellsForStudentIds');
+  this.gradebook.updateSubmissionsFromExternal(submissions);
+  const [studentIds] = this.gradebook.updateRowCellsForStudentIds.lastCall.args;
+  deepEqual(studentIds, ['1101', '1102']);
 });
