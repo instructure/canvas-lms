@@ -403,7 +403,9 @@ describe ContextModulesController do
       expect(tagA).to be_unpublished
       expect(m1.reload.content_tags.order(:position).pluck(:id)).to eq [tagB.id, tagA.id]
       post 'reorder_items', course_id: @course.id, context_module_id: m1.id, order: "#{tagA.id},#{tagB.id}"
-      expect(m1.reload.content_tags.order(:position).pluck(:id)).to eq [tagA.id, tagB.id]
+      tags = m1.reload.content_tags.order(:position).to_a
+      expect(tags.map(&:position)).to eq [1, 2]
+      expect(tags.map(&:id)).to eq [tagA.id, tagB.id]
     end
 
     it "should only touch module once on reorder" do

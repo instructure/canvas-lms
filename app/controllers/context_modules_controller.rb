@@ -443,7 +443,7 @@ class ContextModulesController < ApplicationController
       affected_items = []
       items = order.map{|id| tags.detect{|t| t.id == id.to_i } }.compact.uniq
       items.each_with_index do |item, idx|
-        item.position = idx
+        item.position = idx + 1
         item.context_module_id = @module.id
         if item.changed?
           item.skip_touch = true
