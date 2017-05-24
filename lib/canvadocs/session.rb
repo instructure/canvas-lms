@@ -36,6 +36,10 @@ module Canvadocs
         user_filter: user.global_id.to_s,
       }
 
+      if user.crocodoc_id != nil
+        opts[:user_crocodoc_id] = user.crocodoc_id
+      end
+
       return opts if submissions.empty?
 
       if submissions.any? { |s| s.grants_right? user, :read_grade }

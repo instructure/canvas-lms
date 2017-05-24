@@ -93,6 +93,16 @@ describe 'Canvadoc' do
       expect(canvadocs_api).to receive(:session).with(anything, hash_including(annotation_context: 'default-super-secret-testing')).and_call_original
       @doc.session_url(user: @attachment.user)
     end
+
+    it "Session creation sends users crocodoc id" do
+      @doc.upload
+      @doc.has_annotations = true
+      @attachment.user.crocodoc_id = 6
+      canvadocs_api = @doc.send(:canvadocs_api)
+
+      expect(canvadocs_api).to receive(:session).with(anything, hash_including(user_crocodoc_id: @attachment.user.crocodoc_id)).and_call_original
+      @doc.session_url(user: @attachment.user)
+    end
   end
 
   describe "#available?" do
