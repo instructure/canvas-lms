@@ -1359,7 +1359,7 @@ define [
 
       @allAssignmentColumns = for id, assignment of @assignments
         shrinkForOutOfText = assignment && assignment.grading_type == 'points' && assignment.points_possible?
-        minWidth = if shrinkForOutOfText then 70 else 90
+        minWidth = if shrinkForOutOfText then 140 else 90
 
         fieldName = @getAssignmentColumnId(id)
 
