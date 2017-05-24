@@ -468,6 +468,21 @@ describe SIS::CSV::UserImporter do
     expect(importer.errors).to eq []
   end
 
+  it "should process user row when integration_id is not set" do
+    importer1 = process_csv_data(
+      "user_id,login_id,first_name,last_name,email,status,integration_id",
+      "user_1,user1,User,Uno,user1@example.com,active,int_1",
+      "user_2,user2,User,dos,user2@example.com,active,"
+    )
+    importer2 = process_csv_data(
+      "user_id,login_id,first_name,last_name,email,status,integration_id",
+      "user_1,user1,User,Uno,user1@example.com,active,int_1",
+      "user_2,user2,User,dos,user2@example.com,active,"
+    )
+    expect(importer1.warnings).to eq []
+    expect(importer2.warnings).to eq []
+  end
+
   it "should allow a secondary user account to change its login id to some other registered login id if the other changes it first" do
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
