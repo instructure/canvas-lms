@@ -267,7 +267,7 @@ module QuizzesCommon
 
   def click_questions_tab
     wait_for_ajaximations
-    fj('#quiz_tabs ul:first a:eq(1)').click
+    f("a[href='#questions_tab']").click
   end
 
   # Locate an anchor using its text() node value. The anchor is expected to
@@ -321,6 +321,18 @@ module QuizzesCommon
     quiz_model
     open_quiz_edit_form
     click_questions_tab
+    click_new_question_button
+    wait_for_ajaximations
+    Quizzes::Quiz.last
+  end
+
+  def rcs_start_quiz_question
+    @context = @course
+    quiz_model
+    open_quiz_edit_form
+    wait_for_ajaximations
+    click_questions_tab
+    wait_for_ajaximations
     click_new_question_button
     wait_for_ajaximations
     Quizzes::Quiz.last
