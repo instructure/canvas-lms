@@ -104,7 +104,7 @@ module Lti
           post auth_endpoint, params
           file_host, _ = HostUrl.file_host_with_shard(@domain_root_account || Account.default, request.host_with_port)
           jwt = JSON::JWT.decode(JSON.parse(response.body)["access_token"], :skip_verification)
-          expect(jwt["aud"]).to match_array [request.host, request.protocol + file_host]
+          expect(jwt["aud"]).to match_array [request.host, file_host]
         end
 
         context "reg_key" do
