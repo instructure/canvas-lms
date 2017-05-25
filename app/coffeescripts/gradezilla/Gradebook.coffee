@@ -1265,16 +1265,6 @@ define [
         $.flashMessage I18n.t('Upload successful')
         UserSettings.contextRemove('gradebookUploadComplete')
 
-    studentNamesToggle: (e) =>
-      e.preventDefault()
-      $wrapper = @$grid.find('.grid-canvas')
-      $wrapper.toggleClass('hide-students')
-
-      if $wrapper.hasClass('hide-students')
-        $(e.currentTarget).text I18n.t('show_student_names', 'Show Student Names')
-      else
-        $(e.currentTarget).text I18n.t('hide_student_names', 'Hide Student Names')
-
     weightedGroups: =>
       @options.group_weighting_scheme == "percent"
 
@@ -1475,16 +1465,28 @@ define [
       # this is a faux blur event for SlickGrid.
       $('#application').on('click', @onGridBlur)
 
+      # Grid Events
+      @grid.onKeyDown.subscribe @onGridKeyDown
+
+      # Grid Header Events
       @grid.onHeaderCellRendered.subscribe @onHeaderCellRendered
       @grid.onBeforeHeaderCellDestroy.subscribe @onBeforeHeaderCellDestroy
       @grid.onColumnsReordered.subscribe @onColumnsReordered
       @grid.onColumnsResized.subscribe @onColumnsResized
 
       # Grid Body Cell Events
+      @grid.onActiveCellChanged.subscribe @onActiveCellChanged
       @grid.onBeforeEditCell.subscribe @onBeforeEditCell
       @grid.onCellChange.subscribe @onCellChange
 
       @onGridInit()
+
+    # Grid Event Handlers
+
+    onGridKeyDown: (event, obj) =>
+      column = obj.grid.getColumns()[obj.cell]
+      if column.type == 'student' and event.which == 13
+        event.originalEvent.skipSlickGridDefaults = true
 
     # Column Header Cell Event Handlers
 
@@ -1503,7 +1505,14 @@ define [
     onBeforeHeaderCellDestroy: (event, obj) =>
       ReactDOM.unmountComponentAtNode(obj.node)
 
-    ## Column Event Handlers
+    ## Grid Body Event Handlers
+
+    onActiveCellChanged: (event, obj) =>
+      return unless obj.row? and obj.cell?
+
+      column = obj.grid.getColumns()[obj.cell]
+      if column.type == 'student'
+        $(obj.grid.getActiveCellNode()).find('.student-grades-link').focus()
 
     # The target cell will enter editing mode
     onBeforeEditCell: (event, obj) =>

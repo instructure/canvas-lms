@@ -20,7 +20,6 @@ import $ from 'jquery';
 import _ from 'underscore';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Slick from 'vendor/slickgrid';
 import colors from 'jsx/gradezilla/default_gradebook/constants/colors';
 import natcompare from 'compiled/util/natcompare';
 import round from 'compiled/util/round';
@@ -2579,6 +2578,37 @@ test('displays percentage as "-" when group total score is not a number', functi
   ok(groupTotalOutput.includes('-'));
 });
 
+QUnit.module('Gradebook#onGridKeyDown', {
+  setup () {
+    const columns = [
+      { id: 'student', type: 'student' },
+      { id: 'assignment_2301', type: 'assignment' }
+    ];
+    this.gradebook = createGradebook();
+    this.grid = {
+      getColumns () { return columns }
+    };
+  }
+});
+
+test('skips SlickGrid default behavior when pressing "enter" on a "student" cell', function () {
+  const event = { which: 13, originalEvent: {} };
+  this.gradebook.onGridKeyDown(event, { grid: this.grid, cell: 0 }); // 0 is the index of the 'student' column
+  strictEqual(event.originalEvent.skipSlickGridDefaults, true);
+});
+
+test('does not skip SlickGrid default behavior when pressing other keys on a "student" cell', function () {
+  const event = { which: 27, originalEvent: {} };
+  this.gradebook.onGridKeyDown(event, { grid: this.grid, cell: 0 }); // 0 is the index of the 'student' column
+  notOk('skipSlickGridDefaults' in event.originalEvent, 'skipSlickGridDefaults is not applied');
+});
+
+test('does not skip SlickGrid default behavior when pressing "enter" on other cells', function () {
+  const event = { which: 27, originalEvent: {} };
+  this.gradebook.onGridKeyDown(event, { grid: this.grid, cell: 1 }); // 1 is the index of the 'assignment' column
+  notOk('skipSlickGridDefaults' in event.originalEvent, 'skipSlickGridDefaults is not applied');
+});
+
 QUnit.module('Gradebook#onHeaderCellRendered');
 
 test('renders the student column header for the "student" column type', function () {
@@ -2664,6 +2694,42 @@ test('unmounts any component on the cell being destroyed', function () {
   this.gradebook.onBeforeHeaderCellDestroy(null, { node: this.$mountPoint });
   const componentExistedAtNode = ReactDOM.unmountComponentAtNode(this.$mountPoint);
   equal(componentExistedAtNode, false, 'the component was already unmounted');
+});
+
+QUnit.module('Gradebook#onActiveCellChanged', {
+  setup () {
+    $fixtures.innerHTML = '<div id="example-gradebook-cell"><a class="student-grades-link" href="#">Student Name</a></div>';
+    this.$studentGradesLink = $fixtures.querySelector('.student-grades-link');
+    const columns = [
+      { id: 'student', type: 'student' },
+      { id: 'assignment_2301', type: 'assignment' }
+    ];
+    this.gradebook = createGradebook();
+    this.grid = {
+      getActiveCellNode () { return $fixtures.querySelector('#example-gradebook-cell') },
+      getColumns () { return columns }
+    };
+  },
+
+  teardown () {
+    $fixtures.innerHTML = '';
+  }
+});
+
+test('sets focus on the student grades link when a "student" cell becomes active', function () {
+  this.gradebook.onActiveCellChanged(event, { grid: this.grid, cell: 0, row: 0 }); // 0 is the index of the 'student' column
+  strictEqual(document.activeElement, this.$studentGradesLink);
+});
+
+test('does not change focus when cells of another type become active', function () {
+  this.gradebook.onActiveCellChanged(event, { grid: this.grid, cell: 1, row: 0 }); // 1 is the index of the 'assignment' column
+  notEqual(document.activeElement, this.$studentGradesLink);
+});
+
+test('has no effect when no cell is becoming active', function () {
+  // This occurs primarily when clicking off the grid.
+  this.gradebook.onActiveCellChanged(event, { grid: this.grid, cell: undefined, row: undefined });
+  notEqual(document.activeElement, this.$studentGradesLink);
 });
 
 QUnit.module('Gradebook#renderStudentColumnHeader', {
@@ -5228,33 +5294,30 @@ test('does not prevent default when clicking within the active cell', function (
   equal(typeof returnValue, 'undefined', 'jQuery event handlers prevent default when returning false');
 });
 
-QUnit.module('GridColor');
+QUnit.module('GridColor', {
+  setup () {
+    $fixtures.innerHTML = `
+      <span data-component="GridColor"></span>
+      <div id="gradebook_grid"></div>
+    `;
+  },
+
+  teardown () {
+    $fixtures.innerHTML = '';
+  }
+});
 
 test('is rendered on init', function () {
   const gradebook = createGradebook();
   const renderGridColorStub = this.stub(gradebook, 'renderGridColor');
   this.stub(gradebook, 'getFrozenColumnCount');
-  this.stub(gradebook, 'getVisibleGradeGridColumns');
-  const subscribe = () => {};
-  this.stub(Slick, 'Grid').returns({
-    setSortColumn () {},
-    onKeyDown: { subscribe },
-    onHeaderCellRendered: { subscribe },
-    onBeforeHeaderCellDestroy: { subscribe },
-    onColumnsReordered: { subscribe },
-    onColumnsResized: { subscribe },
-    onBeforeEditCell: { subscribe },
-    onCellChange: { subscribe },
-    getUID () {},
-  });
+  this.stub(gradebook, 'getVisibleGradeGridColumns').returns([]);
   this.stub(gradebook, 'onGridInit');
-
   gradebook.initGrid();
   ok(renderGridColorStub.called);
 });
 
 test('is rendered on renderGridColor', function () {
-  $fixtures.innerHTML = '<span data-component="GridColor"></span>';
   const gradebook = createGradebook({ colors: { colors: {} } }); // due to props bug in 'renderGridColor'
   gradebook.renderGridColor();
   const style = document.querySelector('[data-component="GridColor"] style').innerText;
