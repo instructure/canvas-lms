@@ -67,22 +67,26 @@ class AssignmentRowCell extends React.Component {
     this.submissionCell.destroy();
   }
 
-  handleKeyDown = (jQueryEvent) => {
+  handleKeyDown = (event) => {
     const submissionCellHasFocus = this.container.contains(document.activeElement);
     const popoverTriggerHasFocus = this.trayButton.focused;
 
-    /* eslint-disable no-param-reassign */
-    if (jQueryEvent.keyCode === 9) { // tab
-      if (!jQueryEvent.shiftKey && submissionCellHasFocus) {
-        jQueryEvent.originalEvent.skipSlickGridDefaults = true;
-      } else if (jQueryEvent.shiftKey && popoverTriggerHasFocus) {
-        jQueryEvent.originalEvent.skipSlickGridDefaults = true;
+    if (event.which === 9) { // Tab
+      if (!event.shiftKey && submissionCellHasFocus) {
+        // browser will set focus on the tray button
+        return false; // prevent Grid behavior
+      } else if (event.shiftKey && popoverTriggerHasFocus) {
+        // browser will set focus on the submission cell
+        return false; // prevent Grid behavior
       }
     }
-    if (jQueryEvent.keyCode === 13 && popoverTriggerHasFocus) { // enter
-      jQueryEvent.originalEvent.skipSlickGridDefaults = true;
+
+    if (event.which === 13 && popoverTriggerHasFocus) { // Enter
+      // browser will activate the tray button
+      return false; // prevent Grid behavior
     }
-    /* eslint-enable no-param-reassign */
+
+    return undefined;
   }
 
   handleToggleTrayButtonClick = () => {

@@ -54,6 +54,7 @@ define [
   'jsx/gradezilla/default_gradebook/CurveGradesDialogManager'
   'jsx/gradezilla/default_gradebook/apis/GradebookApi'
   'jsx/gradezilla/default_gradebook/slick-grid/CellEditorFactory'
+  'jsx/gradezilla/default_gradebook/slick-grid/grid-support'
   'jsx/gradezilla/default_gradebook/constants/studentRowHeaderConstants'
   'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader'
   'jsx/gradezilla/default_gradebook/components/AssignmentGroupColumnHeader'
@@ -102,7 +103,7 @@ define [
   CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, GradeFormatHelper, UserSettings, Spinner, AssignmentMuter,
   AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
   SubmissionCell, NumberCompare, natcompare, ConvertCase, htmlEscape, SetDefaultGradeDialogManager,
-  CurveGradesDialogManager, GradebookApi, CellEditorFactory, studentRowHeaderConstants, AssignmentColumnHeader,
+  CurveGradesDialogManager, GradebookApi, CellEditorFactory, GridSupport, studentRowHeaderConstants, AssignmentColumnHeader,
   AssignmentGroupColumnHeader, AssignmentRowCellPropFactory, CustomColumnHeader, StudentColumnHeader, StudentRowHeader,
   TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, ModuleFilter, GridColor, StatusesModal,
   SubmissionTray, GradebookSettingsModal, PostGradesStore, PostGradesApp,  SubmissionStateMap,
@@ -194,6 +195,7 @@ define [
       @gridDisplaySettings = getInitialGridDisplaySettings(@options.settings)
       @contentLoadStates = getInitialContentLoadStates()
       @courseContent = getInitialCourseContent()
+      @headerComponentRefs = {}
 
       if @options.grading_period_set
         @gradingPeriodSet = GradingPeriodSetsApi.deserializeSet(@options.grading_period_set)
@@ -993,9 +995,12 @@ define [
     # conjunction with a click listener on <body />. When we 'blur' the grid
     # by clicking outside of it, save the current field.
     onGridBlur: (e) =>
-      # Prevent exiting the cell editor when clicking in the cell being edited
-      activeCell = document.querySelector('.slick-cell.active')
-      return if activeCell and $.contains(activeCell, e.target)
+      # Prevent exiting the cell editor when clicking in the cell being edited.
+      return if @gridSupport.state.getActiveNode()?.contains(e.target)
+
+      # Finish editing
+      # * This currently ignores validation, which Gradebook does not use.
+      @gridSupport.helper.commitCurrentEdit()
 
       className = e.target.className
 
@@ -1007,10 +1012,10 @@ define [
         else
           className = ''
 
-      # This allows single-click-to-edit in editable cells
-      return if className.match(/cell|slick/) or !@grid.getActiveCell()
+      # Do nothing if clicking on another cell
+      return if className.match(/cell|slick/)
 
-      @grid.getEditorLock().commitCurrentEdit()
+      @gridSupport.state.blur()
 
     onGridInit: () ->
       tooltipTexts = {}
@@ -1468,6 +1473,7 @@ define [
           name: assignment.name
           object: assignment
           formatter: this.cellFormatter
+          getGridSupport: => @gridSupport
           propFactory: new AssignmentRowCellPropFactory(assignment, @)
           minWidth: columnWidths.assignment.min
           maxWidth: columnWidths.assignment.max
@@ -1540,6 +1546,10 @@ define [
 
       $widthTester.remove()
 
+      @renderGridColor()
+      @createGrid()
+
+    createGrid: () =>
       options = $.extend({
         enableCellNavigation: true
         enableColumnReorder: true
@@ -1552,13 +1562,13 @@ define [
         numberOfColumnsToFreeze: @getFrozenColumnCount()
       }, @options)
 
-      @renderGridColor()
-
       @grid = new Slick.Grid('#gradebook_grid', @rows, @getVisibleGradeGridColumns(), options)
       @grid.setSortColumn('student')
 
-      # this is a faux blur event for SlickGrid.
-      $('#application').on('click', @onGridBlur)
+      # This is a faux blur event for SlickGrid.
+      # Use capture to preempt SlickGrid's internal handlers.
+      document.getElementById('application')
+        .addEventListener('click', @onGridBlur, true)
 
       # Grid Events
       @grid.onKeyDown.subscribe @onGridKeyDown
@@ -1570,17 +1580,55 @@ define [
       @grid.onColumnsResized.subscribe @onColumnsResized
 
       # Grid Body Cell Events
-      @grid.onActiveCellChanged.subscribe @onActiveCellChanged
       @grid.onBeforeEditCell.subscribe @onBeforeEditCell
       @grid.onCellChange.subscribe @onCellChange
+
+      # Improved SlickGrid Management
+      @gridSupport = new GridSupport(@grid)
+      @gridSupport.initialize()
+
+      @gridSupport.events.onActiveLocationChanged.subscribe (event, location) =>
+        @closeSubmissionTray() if @getSubmissionTrayState().open
+        if location.columnId == 'student' && location.region == 'body'
+          @gridSupport.state.getActiveNode().querySelector('.student-grades-link')?.focus()
+
+      @gridSupport.events.onKeyDown.subscribe (event, location) =>
+        if (location.region == 'header')
+          @getHeaderComponentRef(location.columnId)?.handleKeyDown(event)
+
+      @gridSupport.events.onNavigatePrev.subscribe (event, location) =>
+        if (location.region == 'header')
+          @getHeaderComponentRef(location.columnId)?.focusAtEnd()
+
+      @gridSupport.events.onNavigateNext.subscribe (event, location) =>
+        if (location.region == 'header')
+          @getHeaderComponentRef(location.columnId)?.focusAtStart()
+
+      @gridSupport.events.onNavigateLeft.subscribe (event, location) =>
+        if (location.region == 'header')
+          @getHeaderComponentRef(location.columnId)?.focusAtStart()
+
+      @gridSupport.events.onNavigateRight.subscribe (event, location) =>
+        if (location.region == 'header')
+          @getHeaderComponentRef(location.columnId)?.focusAtStart()
+
+      @gridSupport.events.onNavigateUp.subscribe (event, location) =>
+        if (location.region == 'header')
+          @getHeaderComponentRef(location.columnId)?.focusAtStart()
 
       @onGridInit()
 
     # Grid Event Handlers
 
     onGridKeyDown: (event, obj) =>
-      column = obj.grid.getColumns()[obj.cell]
-      if column?.type == 'student' and event.which == 13
+      return unless obj.row? and obj.cell?
+
+      columns = obj.grid.getColumns()
+      column = columns[obj.cell]
+
+      return unless column
+
+      if column.type == 'student' and event.which == 13 # activate link
         event.originalEvent.skipSlickGridDefaults = true
 
     # Column Header Cell Event Handlers
@@ -1601,14 +1649,6 @@ define [
       ReactDOM.unmountComponentAtNode(obj.node)
 
     ## Grid Body Event Handlers
-
-    onActiveCellChanged: (event, obj) =>
-      return unless obj.row? and obj.cell?
-      @closeSubmissionTray() if @getSubmissionTrayState().open
-
-      column = obj.grid.getColumns()[obj.cell]
-      if column.type == 'student'
-        $(obj.grid.getActiveCellNode()).find('.student-grades-link').focus()
 
     # The target cell will enter editing mode
     onBeforeEditCell: (event, obj) =>
@@ -1890,7 +1930,7 @@ define [
       "assignment_group_#{assignmentGroupId}"
 
     getColumnHeaderNode: (columnId) =>
-      document.getElementById(@grid.getUID() + columnId)
+      @gridSupport.helper.getColumnHeaderNode(columnId)
 
     getColumnPositionById: (colId, columnGroup = @grid.getColumns()) ->
       position = null
@@ -1956,6 +1996,17 @@ define [
       @updateColumnHeaders()
       @renderViewOptionsMenu()
 
+    ## React Header Component Ref Methods
+
+    setHeaderComponentRef: (columnId, ref) =>
+      @headerComponentRefs[columnId] = ref
+
+    getHeaderComponentRef: (columnId) =>
+      @headerComponentRefs[columnId]
+
+    removeHeaderComponentRef: (columnId) =>
+      delete @headerComponentRefs[columnId]
+
     ## React Grid Component Rendering Methods
 
     updateColumnHeaders: ->
@@ -1989,6 +2040,8 @@ define [
       }
 
     getStudentColumnHeaderProps: ->
+      ref: (ref) =>
+        @setHeaderComponentRef('student', ref)
       selectedPrimaryInfo: @getSelectedPrimaryInfo()
       onSelectPrimaryInfo: @setSelectedPrimaryInfo
       loginHandleName: @options.login_handle_name
@@ -2093,6 +2146,8 @@ define [
         , 10)
 
     getTotalGradeColumnHeaderProps: ->
+      ref: (ref) =>
+        @setHeaderComponentRef('total_grade', ref)
       sortBySetting: @getTotalGradeColumnSortBySetting()
       gradeDisplay: @getTotalGradeColumnGradeDisplayProps()
       position: @getTotalGradeColumnPositionProps()
@@ -2108,6 +2163,8 @@ define [
     getCustomColumnHeaderProps: (customColumnId) =>
       customColumn = _.find(@customColumns, id: customColumnId)
       {
+        ref: (ref) =>
+          @setHeaderComponentRef(@getCustomColumnId(customColumnId), ref)
         title: customColumn.title
       }
 
@@ -2189,6 +2246,8 @@ define [
       )
 
       {
+        ref: (ref) =>
+          @setHeaderComponentRef(@getAssignmentColumnId(assignmentId), ref)
         assignment:
           htmlUrl: assignment.html_url
           id: assignment.id
@@ -2253,6 +2312,8 @@ define [
     getAssignmentGroupColumnHeaderProps: (assignmentGroupId) =>
       assignmentGroup = @getAssignmentGroup(assignmentGroupId)
       {
+        ref: (ref) =>
+          @setHeaderComponentRef(@getAssignmentGroupColumnId(assignmentGroupId), ref)
         assignmentGroup:
           name: assignmentGroup.name
           groupWeight: assignmentGroup.group_weight

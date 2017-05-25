@@ -34,8 +34,9 @@ import 'message_students';
 import MessageStudentsWhoHelper from 'jsx/gradezilla/shared/helpers/messageStudentsWhoHelper';
 import I18n from 'i18n!gradebook';
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
+import ColumnHeader from 'jsx/gradezilla/default_gradebook/components/ColumnHeader';
 
-class AssignmentColumnHeader extends React.Component {
+class AssignmentColumnHeader extends ColumnHeader {
   static propTypes = {
     assignment: shape({
       courseId: string.isRequired,
@@ -112,8 +113,28 @@ class AssignmentColumnHeader extends React.Component {
 
   onToggle = (show) => { this.setState({ menuShown: show }); };
 
-  bindOptionsMenuContent = (ref) => { this.optionsMenuContent = ref; };
+  bindAssignmentLink = (ref) => { this.assignmentLink = ref };
   bindSortByMenuContent = (ref) => { this.sortByMenuContent = ref; };
+
+  focusAtStart = () => { this.assignmentLink.focus() };
+
+  handleKeyDown = (event) => {
+    if (event.which === 9) {
+      if (this.assignmentLink.focused && !event.shiftKey) {
+        event.preventDefault();
+        this.optionsMenuTrigger.focus();
+        return false; // prevent Grid behavior
+      }
+
+      if (document.activeElement === this.optionsMenuTrigger && event.shiftKey) {
+        event.preventDefault();
+        this.assignmentLink.focus();
+        return false; // prevent Grid behavior
+      }
+    }
+
+    return ColumnHeader.prototype.handleKeyDown.call(this, event);
+  };
 
   showMessageStudentsWhoDialog = () => {
     const settings = MessageStudentsWhoHelper.settings(this.props.assignment, this.activeStudentDetails());
@@ -151,7 +172,7 @@ class AssignmentColumnHeader extends React.Component {
 
     return (
       <span className="assignment-name">
-        <Link title={assignmentTitle} href={assignment.htmlUrl}>
+        <Link ref={this.bindAssignmentLink} title={assignmentTitle} href={assignment.htmlUrl}>
           {assignmentIcon}
           {assignment.name}
         </Link>
@@ -175,7 +196,7 @@ class AssignmentColumnHeader extends React.Component {
     const classes = `Gradebook__ColumnHeaderAction ${menuShown ? 'menuShown' : ''}`;
 
     return (
-      <span className={classes}>
+      <span ref={this.bindOptionsMenuTrigger} className={classes}>
         <Typography weight="bold" fontStyle="normal" size="large" color="brand">
           <IconMoreSolid title={optionsTitle} />
         </Typography>

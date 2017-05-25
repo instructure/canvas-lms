@@ -16,29 +16,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import PropTypes from 'prop-types'
-import Typography from 'instructure-ui/lib/components/Typography'
-import ColumnHeader from 'jsx/gradezilla/default_gradebook/components/ColumnHeader'
+export default class GridEvent {
+  handlers = [];
 
-const { string } = PropTypes;
+  subscribe (handler) {
+    if (!this.handlers.includes(handler)) {
+      this.handlers.push(handler);
+    }
+  }
 
-class CustomColumnHeader extends ColumnHeader {
-  render () {
-    return (
-      <div className="Gradebook__ColumnHeaderContent">
-        <span className="Gradebook__ColumnHeaderDetail">
-          <Typography tag="span" size="small">
-            { this.props.title }
-          </Typography>
-        </span>
-      </div>
-    );
+  unsubscribe (handler) {
+    const index = this.handlers.indexOf(handler);
+    if (index !== -1) {
+      this.handlers.splice(index, 1);
+    }
+  }
+
+  trigger (event, data) {
+    for (let i = 0; i < this.handlers.length; i++) {
+      if (this.handlers[i](event, data) === false) {
+        return false; // prevent additional handlers from continuing
+      }
+    }
+
+    return true; // continue handling
   }
 }
-
-CustomColumnHeader.propTypes = {
-  title: string.isRequired
-};
-
-export default CustomColumnHeader

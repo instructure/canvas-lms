@@ -20,9 +20,73 @@ import React from 'react'
 import { mount } from 'enzyme'
 import CustomColumnHeader from 'jsx/gradezilla/default_gradebook/components/CustomColumnHeader'
 
+function mountComponent (props, mountOptions = {}) {
+  return mount(<CustomColumnHeader {...props} />, mountOptions);
+}
+
 QUnit.module('CustomColumnHeader');
 
 test('displays the given title', function () {
   const wrapper = mount(<CustomColumnHeader title="Notes" />);
   equal(wrapper.text(), 'Notes');
+});
+
+QUnit.module('CustomColumnHeader#handleKeyDown', {
+  setup () {
+    this.wrapper = mountComponent({ title: 'Notes' }, { attachTo: document.querySelector('#fixtures') });
+  },
+
+  handleKeyDown (which, shiftKey = false) {
+    return this.wrapper.node.handleKeyDown({ which, shiftKey, preventDefault: this.preventDefault });
+  },
+
+  teardown () {
+    this.wrapper.unmount();
+  }
+});
+
+test('does not handle Tab', function () {
+  // This ensures no issues calling .handleKeyDown for Tab on an instance of
+  // this component.
+  const returnValue = this.handleKeyDown(9, false); // Tab
+  equal(typeof returnValue, 'undefined');
+});
+
+test('does not handle Shift+Tab', function () {
+  // This ensures no issues calling .handleKeyDown for Shift+Tab on an instance
+  // of this component.
+  const returnValue = this.handleKeyDown(9, true); // Shift+Tab
+  equal(typeof returnValue, 'undefined');
+});
+
+test('does not handle Enter', function () {
+  // This ensures no issues calling .handleKeyDown for Enter on an instance of
+  // this component.
+  const returnValue = this.handleKeyDown(13); // Enter
+  equal(typeof returnValue, 'undefined');
+});
+
+QUnit.module('CustomColumnHeader: focus', {
+  setup () {
+    this.wrapper = mountComponent({ title: 'Notes' }, { attachTo: document.querySelector('#fixtures') });
+    this.activeElement = document.activeElement;
+  },
+
+  teardown () {
+    this.wrapper.unmount();
+  }
+});
+
+test('#focusAtStart has no effect', function () {
+  // This ensures no issues calling .focusAtStart on an instance of this
+  // component.
+  this.wrapper.node.focusAtStart();
+  equal(document.activeElement, this.activeElement);
+});
+
+test('#focusAtEnd has no effect', function () {
+  // This ensures no issues calling .focusAtEnd on an instance of this
+  // component.
+  this.wrapper.node.focusAtEnd();
+  equal(document.activeElement, this.activeElement);
 });

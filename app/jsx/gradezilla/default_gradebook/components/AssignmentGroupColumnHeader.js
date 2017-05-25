@@ -24,12 +24,13 @@ import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu';
 import Typography from 'instructure-ui/lib/components/Typography';
 import I18n from 'i18n!gradebook';
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
+import ColumnHeader from 'jsx/gradezilla/default_gradebook/components/ColumnHeader';
 
-function renderTrigger (assignmentGroup, menuShown) {
+function renderTrigger (assignmentGroup, menuShown, ref) {
   const classes = `Gradebook__ColumnHeaderAction ${menuShown ? 'menuShown' : ''}`;
 
   return (
-    <span className={classes}>
+    <span ref={ref} className={classes}>
       <Typography weight="bold" fontStyle="normal" size="large" color="brand">
         <IconMoreSolid title={I18n.t('%{name} Options', { name: assignmentGroup.name })} />
       </Typography>
@@ -52,7 +53,7 @@ function renderAssignmentGroupWeight (assignmentGroup, weightedGroups) {
   );
 }
 
-class AssignmentGroupColumnHeader extends React.Component {
+class AssignmentGroupColumnHeader extends ColumnHeader {
   static propTypes = {
     assignmentGroup: shape({
       name: string.isRequired,
@@ -73,7 +74,6 @@ class AssignmentGroupColumnHeader extends React.Component {
 
   onToggle = (show) => { this.setState({ menuShown: show }); };
 
-  bindOptionsMenuContent = (ref) => { this.optionsMenuContent = ref; };
   bindSortByMenuContent = (ref) => { this.sortByMenuContent = ref; };
 
   render () {
@@ -91,7 +91,7 @@ class AssignmentGroupColumnHeader extends React.Component {
         <PopoverMenu
           contentRef={this.bindOptionsMenuContent}
           focusTriggerOnClose={false}
-          trigger={renderTrigger(this.props.assignmentGroup, menuShown)}
+          trigger={renderTrigger(this.props.assignmentGroup, menuShown, this.bindOptionsMenuTrigger)}
           onToggle={this.onToggle}
         >
           <MenuItemFlyout label={I18n.t('Sort by')} contentRef={this.bindSortByMenuContent}>

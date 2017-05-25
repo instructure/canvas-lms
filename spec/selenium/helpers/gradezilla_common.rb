@@ -119,7 +119,7 @@ module GradezillaCommon
   end
 
   def edit_grade(cell, grade)
-    hover_and_click cell
+    fj(cell).click
     grade_input = fj("#{cell} .grade")
     set_value(grade_input, grade)
     grade_input.send_keys(:return)

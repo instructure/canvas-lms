@@ -17,7 +17,6 @@
  */
 
 import React from 'react';
-import $ from 'jquery';
 import { mount } from 'enzyme';
 import SubmissionCell from 'compiled/gradezilla/SubmissionCell';
 import AssignmentRowCell from 'jsx/gradezilla/default_gradebook/components/AssignmentRowCell';
@@ -60,16 +59,10 @@ QUnit.module('AssignmentRowCell', {
   },
 
   simulateKeyDown (keyCode, shiftKey = false) {
-    $($fixtures).on('keydown', (event) => {
-      this.event = event;
-      this.wrapper.node.handleKeyDown(event);
-      $($fixtures).off('keydown');
-    });
-
     const event = new Event('keydown');
-    event.keyCode = keyCode
+    event.which = keyCode
     event.shiftKey = shiftKey;
-    $fixtures.dispatchEvent(event);
+    return this.wrapper.node.handleKeyDown(event);
   },
 
   teardown () {
@@ -130,43 +123,43 @@ test('renders a SubmissionCell when the assignment grading type is "percent"', f
 test('#handleKeyDown skips SlickGrid default behavior when tabbing from grade input', function () {
   this.wrapper = mountComponent(this.props);
   this.wrapper.node.submissionCell.focus();
-  this.simulateKeyDown(9, false); // tab to options menu trigger
-  strictEqual(this.event.originalEvent.skipSlickGridDefaults, true);
+  const continueHandling = this.simulateKeyDown(9, false); // tab to tray button trigger
+  strictEqual(continueHandling, false);
 });
 
-test('#handleKeyDown skips SlickGrid default behavior when shift-tabbing from options menu', function () {
+test('#handleKeyDown skips SlickGrid default behavior when shift-tabbing from tray button', function () {
   this.wrapper = mountComponent(this.props);
   this.wrapper.node.trayButton.focus();
-  this.simulateKeyDown(9, true); // shift+tab back to grade input
-  strictEqual(this.event.originalEvent.skipSlickGridDefaults, true);
+  const continueHandling = this.simulateKeyDown(9, true); // shift+tab back to grade input
+  strictEqual(continueHandling, false);
 });
 
-test('#handleKeyDown does not skip SlickGrid default behavior when tabbing from options menu', function () {
+test('#handleKeyDown does not skip SlickGrid default behavior when tabbing from tray button', function () {
   this.wrapper = mountComponent(this.props);
   this.wrapper.node.trayButton.focus();
-  this.simulateKeyDown(9, false); // tab into next cell
-  equal(typeof this.event.originalEvent.skipSlickGridDefaults, 'undefined');
+  const continueHandling = this.simulateKeyDown(9, false); // tab into next cell
+  equal(typeof continueHandling, 'undefined');
 });
 
-test('#handleKeyDown does not skip SlickGrid default behavior when tabbing from options menu', function () {
+test('#handleKeyDown does not skip SlickGrid default behavior when shift-tabbing from grade input', function () {
   this.wrapper = mountComponent(this.props);
   this.wrapper.node.submissionCell.focus();
-  this.simulateKeyDown(9, true); // shift+tab back to previous cell
-  equal(typeof this.event.originalEvent.skipSlickGridDefaults, 'undefined');
+  const continueHandling = this.simulateKeyDown(9, true); // shift+tab back to previous cell
+  equal(typeof continueHandling, 'undefined');
 });
 
-test('#handleKeyDown skips SlickGrid default behavior when entering into options menu', function () {
+test('#handleKeyDown skips SlickGrid default behavior when entering into tray button', function () {
   this.wrapper = mountComponent(this.props);
   this.wrapper.node.trayButton.focus();
-  this.simulateKeyDown(13); // enter into options menu
-  strictEqual(this.event.originalEvent.skipSlickGridDefaults, true);
+  const continueHandling = this.simulateKeyDown(13); // enter into tray button
+  strictEqual(continueHandling, false);
 });
 
 test('#handleKeyDown does not skip SlickGrid default behavior when pressing enter on grade input', function () {
   this.wrapper = mountComponent(this.props);
   this.wrapper.node.submissionCell.focus();
-  this.simulateKeyDown(13); // enter on grade input (commit editor)
-  equal(typeof this.event.originalEvent.skipSlickGridDefaults, 'undefined');
+  const continueHandling = this.simulateKeyDown(13); // enter on grade input (commit editor)
+  equal(typeof continueHandling, 'undefined');
 });
 
 test('#focus delegates to the SubmissionCell', function () {

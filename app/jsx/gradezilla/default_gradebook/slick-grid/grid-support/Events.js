@@ -16,29 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import PropTypes from 'prop-types'
-import Typography from 'instructure-ui/lib/components/Typography'
-import ColumnHeader from 'jsx/gradezilla/default_gradebook/components/ColumnHeader'
+import GridEvent from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support/GridEvent';
 
-const { string } = PropTypes;
+export default class Events {
+  // State Changes
+  onActiveLocationChanged = new GridEvent();
 
-class CustomColumnHeader extends ColumnHeader {
-  render () {
-    return (
-      <div className="Gradebook__ColumnHeaderContent">
-        <span className="Gradebook__ColumnHeaderDetail">
-          <Typography tag="span" size="small">
-            { this.props.title }
-          </Typography>
-        </span>
-      </div>
-    );
-  }
+  // Keyboard Interaction
+  onKeyDown = new GridEvent();
+
+  // Keyboard Navigation
+  onNavigatePrev = new GridEvent();
+  onNavigateNext = new GridEvent();
+  onNavigateLeft = new GridEvent();
+  onNavigateRight = new GridEvent();
+  onNavigateUp = new GridEvent();
+  onNavigateDown = new GridEvent();
 }
-
-CustomColumnHeader.propTypes = {
-  title: string.isRequired
-};
-
-export default CustomColumnHeader

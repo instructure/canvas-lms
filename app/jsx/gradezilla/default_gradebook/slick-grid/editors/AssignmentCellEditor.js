@@ -26,8 +26,7 @@ class AssignmentCellEditor {
     this.container = options.container;
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.renderComponent();
-    options.grid.onKeyDown.subscribe(this.handleKeyDown);
-
+    options.column.getGridSupport().events.onKeyDown.subscribe(this.handleKeyDown);
   }
 
   renderComponent () {
@@ -44,13 +43,13 @@ class AssignmentCellEditor {
 
   handleKeyDown (event) {
     if (this.component) {
-      this.component.handleKeyDown(event);
+      return this.component.handleKeyDown(event);
     }
   }
 
   destroy () {
     this.component = null;
-    this.options.grid.onKeyDown.unsubscribe(this.handleKeyDown);
+    this.options.column.getGridSupport().events.onKeyDown.unsubscribe(this.handleKeyDown);
     ReactDOM.unmountComponentAtNode(this.container);
   }
 

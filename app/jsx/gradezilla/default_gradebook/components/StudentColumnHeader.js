@@ -30,8 +30,9 @@ import Typography from 'instructure-ui/lib/components/Typography';
 import studentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/studentRowHeaderConstants';
 import I18n from 'i18n!gradebook';
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
+import ColumnHeader from 'jsx/gradezilla/default_gradebook/components/ColumnHeader';
 
-export default class StudentColumnHeader extends React.Component {
+export default class StudentColumnHeader extends ColumnHeader {
   static propTypes = {
     selectedPrimaryInfo: oneOf(studentRowHeaderConstants.primaryInfoKeys).isRequired,
     onSelectPrimaryInfo: func.isRequired,
@@ -86,7 +87,6 @@ export default class StudentColumnHeader extends React.Component {
     this.props.onToggleEnrollmentFilter(enrollmentFilterKey);
   }
 
-  bindOptionsMenuContent = (ref) => { this.optionsMenuContent = ref; };
   bindSortByMenuContent = (ref) => { this.sortByMenuContent = ref; };
   bindDisplayAsMenuContent = (ref) => { this.displayAsMenuContent = ref; };
   bindSecondaryInfoMenuContent = (ref) => { this.secondaryInfoMenuContent = ref; };
@@ -118,7 +118,7 @@ export default class StudentColumnHeader extends React.Component {
           contentRef={this.bindOptionsMenuContent}
           focusTriggerOnClose={false}
           trigger={
-            <span className={classes}>
+            <span ref={this.bindOptionsMenuTrigger} className={classes}>
               <Typography weight="bold" fontStyle="normal" size="large" color="brand">
                 <IconMoreSolid title={I18n.t('Student Name Options')} />
               </Typography>

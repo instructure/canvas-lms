@@ -2818,6 +2818,204 @@ test('displays percentage as "-" when group total score is not a number', functi
   ok(groupTotalOutput.includes('-'));
 });
 
+QUnit.module('Gradebook Grid Events', function (hooks) {
+  hooks.beforeEach(function () {
+    $fixtures.innerHTML = `
+      <div id="application">
+        <span data-component="GridColor"></span>
+        <div id="gradebook_grid"></div>
+        <div id="example-gradebook-cell">
+          <a class="student-grades-link" href="#">Student Name</a>
+        </div>
+      </div>
+    `;
+
+    this.studentColumnHeader = {
+      focusAtEnd: sinon.spy(),
+      focusAtStart: sinon.spy(),
+      handleKeyDown: sinon.stub()
+    };
+
+    this.gradebook = createGradebook();
+    sinon.stub(this.gradebook, 'getVisibleGradeGridColumns').returns([]);
+    sinon.stub(this.gradebook, 'getFrozenColumnCount').returns(0);
+    sinon.stub(this.gradebook, 'onGridInit');
+
+    this.gradebook.createGrid();
+    this.gradebook.setHeaderComponentRef('student', this.studentColumnHeader);
+  });
+
+  this.triggerEvent = function (eventName, event, location) {
+    return this.gradebook.gridSupport.events[eventName].trigger(event, location);
+  };
+
+  QUnit.module('onActiveLocationChanged', {
+    setup () {
+      this.$studentGradesLink = $fixtures.querySelector('.student-grades-link');
+    }
+  });
+
+  test('closes the submission tray if it is open', function () {
+    this.stub(this.gradebook, 'closeSubmissionTray');
+    this.gradebook.setSubmissionTrayState(true, '1', '2');
+    this.triggerEvent('onActiveLocationChanged', {}, { columnId: 'student', region: 'header' });
+    strictEqual(this.gradebook.closeSubmissionTray.callCount, 1);
+  });
+
+  test('does not attempt to close the submission tray if it is already closed', function () {
+    this.stub(this.gradebook, 'closeSubmissionTray');
+    this.triggerEvent('onActiveLocationChanged', {}, { columnId: 'student', region: 'header' });
+    strictEqual(this.gradebook.closeSubmissionTray.callCount, 0);
+  });
+
+  test('sets focus on the student grades link when a "student" body cell becomes active', function () {
+    this.stub(this.gradebook.gridSupport.state, 'getActiveNode')
+      .returns($fixtures.querySelector('#example-gradebook-cell'));
+    this.triggerEvent('onActiveLocationChanged', {}, { columnId: 'student', region: 'body' });
+    strictEqual(document.activeElement, this.$studentGradesLink);
+  });
+
+  test('does nothing when a "student" body cell without a student grades link becomes active', function () {
+    const previousActiveElement = document.activeElement;
+    $fixtures.querySelector('#example-gradebook-cell').innerHTML = 'Student Name';
+    this.stub(this.gradebook.gridSupport.state, 'getActiveNode')
+      .returns($fixtures.querySelector('#example-gradebook-cell'));
+    this.triggerEvent('onActiveLocationChanged', {}, { columnId: 'student', region: 'body' });
+    strictEqual(document.activeElement, previousActiveElement);
+  });
+
+  test('does not change focus when a "student" header cell becomes active', function () {
+    this.triggerEvent('onActiveLocationChanged', {}, { columnId: 'student', region: 'header' });
+    notEqual(document.activeElement, this.$studentGradesLink);
+  });
+
+  test('does not change focus when body cells of other columns become active', function () {
+    this.triggerEvent('onActiveLocationChanged', {}, { columnId: 'total_grade', region: 'body' });
+    notEqual(document.activeElement, this.$studentGradesLink);
+  });
+
+  QUnit.module('onKeyDown');
+
+  test('calls handleKeyDown on the column header component associated with the event location', function () {
+    this.triggerEvent('onKeyDown', {}, { columnId: 'student', region: 'header' });
+    strictEqual(this.studentColumnHeader.handleKeyDown.callCount, 1);
+  });
+
+  test('does nothing when the location region is not "header"', function () {
+    this.triggerEvent('onKeyDown', {}, { columnId: 'student', region: 'body' });
+    strictEqual(this.studentColumnHeader.handleKeyDown.callCount, 0);
+  });
+
+  test('does nothing when no component is referenced for the given column', function () {
+    this.gradebook.removeHeaderComponentRef('student');
+    this.triggerEvent('onKeyDown', {}, { columnId: 'student', region: 'header' });
+    strictEqual(this.studentColumnHeader.handleKeyDown.callCount, 0);
+  });
+
+  test('includes the event when calling handleKeyDown', function () {
+    const event = {};
+    this.triggerEvent('onKeyDown', event, { columnId: 'student', region: 'header' });
+    const { args } = this.studentColumnHeader.handleKeyDown.lastCall;
+    equal(args[0], event);
+  });
+
+  test('returns the return value of the handled event', function () {
+    this.studentColumnHeader.handleKeyDown.returns(false);
+    const returnValue = this.triggerEvent('onKeyDown', {}, { columnId: 'student', region: 'header' });
+    strictEqual(returnValue, false);
+  });
+
+  QUnit.module('onNavigatePrev');
+
+  test('calls focusAtEnd on the column header component associated with the event location', function () {
+    this.triggerEvent('onNavigatePrev', {}, { columnId: 'student', region: 'header' });
+    strictEqual(this.studentColumnHeader.focusAtEnd.callCount, 1);
+  });
+
+  test('does nothing when the location region is not "header"', function () {
+    this.triggerEvent('onNavigatePrev', {}, { columnId: 'student', region: 'body' });
+    strictEqual(this.studentColumnHeader.focusAtEnd.callCount, 0);
+  });
+
+  test('does nothing when no component is referenced for the given column', function () {
+    this.gradebook.removeHeaderComponentRef('student');
+    this.triggerEvent('onNavigatePrev', {}, { columnId: 'student', region: 'header' });
+    strictEqual(this.studentColumnHeader.focusAtEnd.callCount, 0);
+  });
+
+  QUnit.module('onNavigateNext');
+
+  test('calls focusAtStart on the column header component associated with the event location', function () {
+    this.triggerEvent('onNavigateNext', {}, { columnId: 'student', region: 'header' });
+    strictEqual(this.studentColumnHeader.focusAtStart.callCount, 1);
+  });
+
+  test('does nothing when the location region is not "header"', function () {
+    this.triggerEvent('onNavigateNext', {}, { columnId: 'student', region: 'body' });
+    strictEqual(this.studentColumnHeader.focusAtStart.callCount, 0);
+  });
+
+  test('does nothing when no component is referenced for the given column', function () {
+    this.gradebook.removeHeaderComponentRef('student');
+    this.triggerEvent('onNavigateNext', {}, { columnId: 'student', region: 'header' });
+    strictEqual(this.studentColumnHeader.focusAtStart.callCount, 0);
+  });
+
+  QUnit.module('onNavigateLeft');
+
+  test('calls focusAtStart on the column header component associated with the event location', function () {
+    this.triggerEvent('onNavigateLeft', {}, { columnId: 'student', region: 'header' });
+    strictEqual(this.studentColumnHeader.focusAtStart.callCount, 1);
+  });
+
+  test('does nothing when the location region is not "header"', function () {
+    this.triggerEvent('onNavigateLeft', {}, { columnId: 'student', region: 'body' });
+    strictEqual(this.studentColumnHeader.focusAtStart.callCount, 0);
+  });
+
+  test('does nothing when no component is referenced for the given column', function () {
+    this.gradebook.removeHeaderComponentRef('student');
+    this.triggerEvent('onNavigateLeft', {}, { columnId: 'student', region: 'header' });
+    strictEqual(this.studentColumnHeader.focusAtStart.callCount, 0);
+  });
+
+  QUnit.module('onNavigateRight');
+
+  test('calls focusAtStart on the column header component associated with the event location', function () {
+    this.triggerEvent('onNavigateRight', {}, { columnId: 'student', region: 'header' });
+    strictEqual(this.studentColumnHeader.focusAtStart.callCount, 1);
+  });
+
+  test('does nothing when the location region is not "header"', function () {
+    this.triggerEvent('onNavigateRight', {}, { columnId: 'student', region: 'body' });
+    strictEqual(this.studentColumnHeader.focusAtStart.callCount, 0);
+  });
+
+  test('does nothing when no component is referenced for the given column', function () {
+    this.gradebook.removeHeaderComponentRef('student');
+    this.triggerEvent('onNavigateRight', {}, { columnId: 'student', region: 'header' });
+    strictEqual(this.studentColumnHeader.focusAtStart.callCount, 0);
+  });
+
+  QUnit.module('onNavigateUp');
+
+  test('calls focusAtStart on the column header component associated with the event location', function () {
+    this.triggerEvent('onNavigateUp', {}, { columnId: 'student', region: 'header' });
+    strictEqual(this.studentColumnHeader.focusAtStart.callCount, 1);
+  });
+
+  test('does nothing when the location region is not "header"', function () {
+    this.triggerEvent('onNavigateUp', {}, { columnId: 'student', region: 'body' });
+    strictEqual(this.studentColumnHeader.focusAtStart.callCount, 0);
+  });
+
+  test('does nothing when no component is referenced for the given column', function () {
+    this.gradebook.removeHeaderComponentRef('student');
+    this.triggerEvent('onNavigateUp', {}, { columnId: 'student', region: 'header' });
+    strictEqual(this.studentColumnHeader.focusAtStart.callCount, 0);
+  });
+});
+
 QUnit.module('Gradebook#onGridKeyDown', {
   setup () {
     const columns = [
@@ -2833,19 +3031,25 @@ QUnit.module('Gradebook#onGridKeyDown', {
 
 test('skips SlickGrid default behavior when pressing "enter" on a "student" cell', function () {
   const event = { which: 13, originalEvent: {} };
-  this.gradebook.onGridKeyDown(event, { grid: this.grid, cell: 0 }); // 0 is the index of the 'student' column
+  this.gradebook.onGridKeyDown(event, { grid: this.grid, cell: 0, row: 0 }); // 0 is the index of the 'student' column
   strictEqual(event.originalEvent.skipSlickGridDefaults, true);
 });
 
 test('does not skip SlickGrid default behavior when pressing other keys on a "student" cell', function () {
   const event = { which: 27, originalEvent: {} };
-  this.gradebook.onGridKeyDown(event, { grid: this.grid, cell: 0 }); // 0 is the index of the 'student' column
+  this.gradebook.onGridKeyDown(event, { grid: this.grid, cell: 0, row: 0 }); // 0 is the index of the 'student' column
   notOk('skipSlickGridDefaults' in event.originalEvent, 'skipSlickGridDefaults is not applied');
 });
 
 test('does not skip SlickGrid default behavior when pressing "enter" on other cells', function () {
   const event = { which: 27, originalEvent: {} };
-  this.gradebook.onGridKeyDown(event, { grid: this.grid, cell: 1 }); // 1 is the index of the 'assignment' column
+  this.gradebook.onGridKeyDown(event, { grid: this.grid, cell: 1, row: 0 }); // 1 is the index of the 'assignment' column
+  notOk('skipSlickGridDefaults' in event.originalEvent, 'skipSlickGridDefaults is not applied');
+});
+
+test('does not skip SlickGrid default behavior when pressing "enter" off the grid', function () {
+  const event = { which: 27, originalEvent: {} };
+  this.gradebook.onGridKeyDown(event, { grid: this.grid, cell: undefined, row: undefined });
   notOk('skipSlickGridDefaults' in event.originalEvent, 'skipSlickGridDefaults is not applied');
 });
 
@@ -2936,55 +3140,6 @@ test('unmounts any component on the cell being destroyed', function () {
   equal(componentExistedAtNode, false, 'the component was already unmounted');
 });
 
-QUnit.module('Gradebook#onActiveCellChanged', {
-  setup () {
-    $fixtures.innerHTML = '<div id="example-gradebook-cell"><a class="student-grades-link" href="#">Student Name</a></div>';
-    this.$studentGradesLink = $fixtures.querySelector('.student-grades-link');
-    const columns = [
-      { id: 'student', type: 'student' },
-      { id: 'assignment_2301', type: 'assignment' }
-    ];
-    this.gradebook = createGradebook();
-    this.grid = {
-      getActiveCellNode () { return $fixtures.querySelector('#example-gradebook-cell') },
-      getColumns () { return columns }
-    };
-  },
-
-  teardown () {
-    $fixtures.innerHTML = '';
-  }
-});
-
-test('sets focus on the student grades link when a "student" cell becomes active', function () {
-  this.gradebook.onActiveCellChanged(event, { grid: this.grid, cell: 0, row: 0 }); // 0 is the index of the 'student' column
-  strictEqual(document.activeElement, this.$studentGradesLink);
-});
-
-test('does not change focus when cells of another type become active', function () {
-  this.gradebook.onActiveCellChanged(event, { grid: this.grid, cell: 1, row: 0 }); // 1 is the index of the 'assignment' column
-  notEqual(document.activeElement, this.$studentGradesLink);
-});
-
-test('closes the submission tray if it is open', function () {
-  this.stub(this.gradebook, 'closeSubmissionTray');
-  this.gradebook.setSubmissionTrayState(true, '1', '2');
-  this.gradebook.onActiveCellChanged({}, { grid: this.grid, cell: 1, row: 0 });
-  strictEqual(this.gradebook.closeSubmissionTray.callCount, 1);
-});
-
-test('does not attempt to close the submission tray if it is already closed', function () {
-  this.stub(this.gradebook, 'closeSubmissionTray');
-  this.gradebook.onActiveCellChanged({}, { grid: this.grid, cell: 1, row: 0 });
-  strictEqual(this.gradebook.closeSubmissionTray.callCount, 0);
-});
-
-test('has no effect when no cell is becoming active', function () {
-  // This occurs primarily when clicking off the grid.
-  this.gradebook.onActiveCellChanged(event, { grid: this.grid, cell: undefined, row: undefined });
-  notEqual(document.activeElement, this.$studentGradesLink);
-});
-
 QUnit.module('Gradebook#renderStudentColumnHeader', {
   setup () {
     this.$mountPoint = document.createElement('div');
@@ -3025,6 +3180,14 @@ test('includes properties from gradebook', function () {
   equal(typeof props.onSelectPrimaryInfo, 'function');
   equal(props.loginHandleName, 'foo');
   equal(props.sisName, 'bar');
+});
+
+test('includes a ref callback to store the component reference', function () {
+  const gradebook = createGradebook();
+  const props = gradebook.getStudentColumnHeaderProps();
+  const mockComponent = { column: 'student' };
+  props.ref(mockComponent);
+  equal(gradebook.getHeaderComponentRef('student'), mockComponent);
 });
 
 test('includes props for the "Sort by" settings', function () {
@@ -3111,6 +3274,16 @@ test('includes the custom column title', function () {
   gradebook.customColumns = [{ id: '2401', title: 'Notes' }, { id: '2402', title: 'Other Notes' }];
   const props = gradebook.getCustomColumnHeaderProps('2401');
   equal(props.title, 'Notes');
+});
+
+test('includes a ref callback to store the component reference', function () {
+  const gradebook = createGradebook();
+  gradebook.customColumns = [{ id: '2401', title: 'Notes' }, { id: '2402', title: 'Other Notes' }];
+  const props = gradebook.getCustomColumnHeaderProps('2401');
+  const mockComponent = { column: 'customColumn' };
+  props.ref(mockComponent);
+  const columnId = gradebook.getCustomColumnId('2401');
+  equal(gradebook.getHeaderComponentRef(columnId), mockComponent);
 });
 
 QUnit.module('Gradebook#renderCustomColumnHeader', {
@@ -3496,6 +3669,15 @@ test('includes published status for an unpublished assignment', function () {
   strictEqual(published, false);
 });
 
+test('includes a ref callback to store the component reference', function () {
+  const gradebook = this.createGradebook();
+  const props = gradebook.getAssignmentColumnHeaderProps('201');
+  const mockComponent = { column: 'assignment' };
+  props.ref(mockComponent);
+  const columnId = gradebook.getAssignmentColumnId('201');
+  equal(gradebook.getHeaderComponentRef(columnId), mockComponent);
+});
+
 test('includes props for the "Sort by" setting', function () {
   const props = this.createGradebook().getAssignmentColumnHeaderProps('201');
   ok(props.sortBySetting, 'Sort by setting is present');
@@ -3647,6 +3829,15 @@ test('sets weightedGroups to false when assignment group weighting scheme is not
   const options = { group_weighting_scheme: 'equal' };
   const props = this.createGradebook(options).getAssignmentGroupColumnHeaderProps('301');
   equal(props.weightedGroups, false);
+});
+
+test('includes a ref callback to store the component reference', function () {
+  const gradebook = this.createGradebook();
+  const props = gradebook.getAssignmentGroupColumnHeaderProps('301');
+  const mockComponent = { column: 'assignmentGroup' };
+  props.ref(mockComponent);
+  const columnId = gradebook.getAssignmentGroupColumnId('301');
+  equal(gradebook.getHeaderComponentRef(columnId), mockComponent);
 });
 
 test('includes props for the "Sort by" setting', function () {
@@ -4411,6 +4602,14 @@ QUnit.module('Gradebook#getTotalGradeColumnHeaderProps', {
   }
 });
 
+test('includes a ref callback to store the component reference', function () {
+  const gradebook = this.createGradebook();
+  const props = gradebook.getTotalGradeColumnHeaderProps();
+  const mockComponent = { column: 'total_grade' };
+  props.ref(mockComponent);
+  equal(gradebook.getHeaderComponentRef('total_grade'), mockComponent);
+});
+
 test('includes props for the "Sort by" setting', function () {
   const props = this.createGradebook().getTotalGradeColumnHeaderProps();
   ok(props.sortBySetting, 'Sort by setting is present');
@@ -5055,6 +5254,35 @@ test('calls renderViewOptionsMenu', function () {
   gradebook.updateColumnsAndRenderViewOptionsMenu();
 
   strictEqual(renderViewOptionsMenuStub.callCount, 1);
+});
+
+QUnit.module('Gradebook React Header Component References', {
+  setup () {
+    this.gradebook = createGradebook();
+  }
+});
+
+test('#setHeaderComponentRef stores a reference by a column id', function () {
+  const studentRef = { column: 'student' };
+  const totalGradeRef = { column: 'total_grade' };
+  this.gradebook.setHeaderComponentRef('student', studentRef);
+  this.gradebook.setHeaderComponentRef('total_grade', totalGradeRef);
+  equal(this.gradebook.getHeaderComponentRef('student'), studentRef);
+  equal(this.gradebook.getHeaderComponentRef('total_grade'), totalGradeRef);
+});
+
+test('#setHeaderComponentRef replaces an existing reference', function () {
+  const ref = { column: 'student' };
+  this.gradebook.setHeaderComponentRef('student', { column: 'previous' });
+  this.gradebook.setHeaderComponentRef('student', ref);
+  equal(this.gradebook.getHeaderComponentRef('student'), ref);
+});
+
+test('#removeHeaderComponentRef removes an existing reference', function () {
+  const ref = { column: 'student' };
+  this.gradebook.setHeaderComponentRef('student', ref);
+  this.gradebook.removeHeaderComponentRef('student');
+  equal(typeof this.gradebook.getHeaderComponentRef('student'), 'undefined');
 });
 
 QUnit.module('Gradebook#initShowUnpublishedAssignments');
@@ -5770,21 +5998,22 @@ test('re-sorts the grid rows', function () {
 
 QUnit.module('Gradebook#onGridBlur', {
   setup () {
-    this.editorLock = {
-      commitCurrentEdit () {}
-    };
     this.gradebook = createGradebook();
-    this.gradebook.grid = {
-      getActiveCell () {
-        return { row: 0, cell: 0 };
+    this.gradebook.gridSupport = {
+      helper: {
+        commitCurrentEdit: this.stub()
       },
-      getEditorLock: () => this.editorLock
-    }
+      state: {
+        blur: this.stub(),
+        getActiveNode () {
+          return $fixtures.querySelector('#cell-1');
+        }
+      }
+    };
 
     $fixtures.innerHTML = `
-      <div class="slick-cell active">
-        <div class="example-target"></div>
-      </div>
+      <div id="cell-1" class="slick-cell editable"></div>
+      <div id="cell-2" class="slick-cell"></div>
     `;
   },
 
@@ -5794,29 +6023,43 @@ QUnit.module('Gradebook#onGridBlur', {
   }
 });
 
-test('commits the current edit when clicking off the active cell', function () {
-  this.spy(this.editorLock, 'commitCurrentEdit');
-  this.gradebook.onGridBlur({ target: document.querySelector('body') });
-  equal(this.editorLock.commitCurrentEdit.callCount, 1);
+test('commits the current edit when clicking off the grid', function () {
+  this.gradebook.onGridBlur({ target: document.body });
+  strictEqual(this.gradebook.gridSupport.helper.commitCurrentEdit.callCount, 1);
 });
 
-test('commits the current edit when clicking within the active cell', function () {
-  this.spy(this.editorLock, 'commitCurrentEdit');
-  this.gradebook.onGridBlur({ target: $fixtures.querySelector('.example-target') });
-  equal(this.editorLock.commitCurrentEdit.callCount, 0);
+test('commits the current edit when clicking on another grid cell', function () {
+  this.gradebook.onGridBlur({ target: $fixtures.querySelector('#cell-2') });
+  strictEqual(this.gradebook.gridSupport.helper.commitCurrentEdit.callCount, 1);
 });
 
-test('does not prevent default when clicking within the active cell', function () {
-  this.spy(this.editorLock, 'commitCurrentEdit');
-  const returnValue = this.gradebook.onGridBlur({ target: $fixtures.querySelector('.example-target') });
-  equal(typeof returnValue, 'undefined', 'jQuery event handlers prevent default when returning false');
+test('does not commit the current edit when clicking on the active cell', function () {
+  this.gradebook.onGridBlur({ target: $fixtures.querySelector('#cell-1') });
+  strictEqual(this.gradebook.gridSupport.helper.commitCurrentEdit.callCount, 0);
+});
+
+test('blurs the grid when clicking off grid cells', function () {
+  this.gradebook.onGridBlur({ target: document.body });
+  strictEqual(this.gradebook.gridSupport.state.blur.callCount, 1);
+});
+
+test('does not blur the grid when clicking on the active cell', function () {
+  this.gradebook.onGridBlur({ target: $fixtures.querySelector('#cell-1') });
+  strictEqual(this.gradebook.gridSupport.state.blur.callCount, 0);
+});
+
+test('does not blur the grid when clicking on another grid cell', function () {
+  this.gradebook.onGridBlur({ target: $fixtures.querySelector('#cell-2') });
+  strictEqual(this.gradebook.gridSupport.state.blur.callCount, 0);
 });
 
 QUnit.module('GridColor', {
   setup () {
     $fixtures.innerHTML = `
-      <span data-component="GridColor"></span>
-      <div id="gradebook_grid"></div>
+      <div id="application">
+        <span data-component="GridColor"></span>
+        <div id="gradebook_grid"></div>
+      </div>
     `;
   },
 

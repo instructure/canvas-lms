@@ -684,3 +684,123 @@ test('clicking the menu item invokes the onSelect property', function () {
 
   equal(this.props.reuploadSubmissionsAction.onSelect.callCount, 1);
 });
+
+QUnit.module('AssignmentColumnHeader#handleKeyDown', function (hooks) {
+  hooks.beforeEach(function () {
+    this.wrapper = mountComponent(defaultProps(), { attachTo: document.querySelector('#fixtures') });
+    this.preventDefault = sinon.spy();
+  });
+
+  hooks.afterEach(function () {
+    this.wrapper.unmount();
+  });
+
+  this.handleKeyDown = function (which, shiftKey = false) {
+    return this.wrapper.node.handleKeyDown({ which, shiftKey, preventDefault: this.preventDefault });
+  };
+
+  QUnit.module('with focus on assignment link', {
+    setup () {
+      this.wrapper.node.assignmentLink.focus();
+    }
+  });
+
+  test('Tab sets focus on options menu trigger', function () {
+    this.handleKeyDown(9, false); // Tab
+    equal(document.activeElement, this.wrapper.node.optionsMenuTrigger);
+  });
+
+  test('prevents default behavior for Tab', function () {
+    this.handleKeyDown(9, false); // Tab
+    strictEqual(this.preventDefault.callCount, 1);
+  });
+
+  test('returns false for Tab', function () {
+    // This prevents additional behavior in Grid Support Navigation.
+    const returnValue = this.handleKeyDown(9, false); // Tab
+    strictEqual(returnValue, false);
+  });
+
+  test('does not handle Shift+Tab', function () {
+    // This allows Grid Support Navigation to handle navigation.
+    const returnValue = this.handleKeyDown(9, true); // Shift+Tab
+    equal(typeof returnValue, 'undefined');
+  });
+
+  QUnit.module('with focus on options menu trigger', {
+    setup () {
+      this.wrapper.node.optionsMenuTrigger.focus();
+    }
+  });
+
+  test('Shift+Tab sets focus on assignment link', function () {
+    this.handleKeyDown(9, true); // Shift+Tab
+    strictEqual(this.wrapper.node.assignmentLink.focused, true);
+  });
+
+  test('prevents default behavior for Shift+Tab', function () {
+    this.handleKeyDown(9, true); // Shift+Tab
+    strictEqual(this.preventDefault.callCount, 1);
+  });
+
+  test('returns false for Shift+Tab', function () {
+    // This prevents additional behavior in Grid Support Navigation.
+    const returnValue = this.handleKeyDown(9, true); // Shift+Tab
+    strictEqual(returnValue, false);
+  });
+
+  test('does not handle Tab', function () {
+    // This allows Grid Support Navigation to handle navigation.
+    const returnValue = this.handleKeyDown(9, false); // Tab
+    equal(typeof returnValue, 'undefined');
+  });
+
+  test('Enter opens the options menu', function () {
+    this.handleKeyDown(13); // Enter
+    const optionsMenu = this.wrapper.find('PopoverMenu');
+    strictEqual(optionsMenu.node.show, true);
+  });
+
+  test('returns false for Enter on options menu', function () {
+    // This prevents additional behavior in Grid Support Navigation.
+    const returnValue = this.handleKeyDown(13); // Enter
+    strictEqual(returnValue, false);
+  });
+
+  QUnit.module('without focus');
+
+  test('does not handle Tab', function () {
+    const returnValue = this.handleKeyDown(9, false); // Tab
+    equal(typeof returnValue, 'undefined');
+  });
+
+  test('does not handle Shift+Tab', function () {
+    const returnValue = this.handleKeyDown(9, true); // Shift+Tab
+    equal(typeof returnValue, 'undefined');
+  });
+
+  test('does not handle Enter', function () {
+    const returnValue = this.handleKeyDown(13); // Enter
+    equal(typeof returnValue, 'undefined');
+  });
+});
+
+QUnit.module('AssignmentColumnHeader: focus', {
+  setup () {
+    this.wrapper = mountComponent(defaultProps(), { attachTo: document.querySelector('#fixtures') });
+  },
+
+  teardown () {
+    this.wrapper.unmount();
+  }
+});
+
+test('#focusAtStart sets focus on the assignment link', function () {
+  this.wrapper.node.focusAtStart();
+  strictEqual(this.wrapper.node.assignmentLink.focused, true);
+});
+
+test('#focusAtEnd sets focus on the options menu trigger', function () {
+  this.wrapper.node.focusAtEnd();
+  equal(document.activeElement, this.wrapper.node.optionsMenuTrigger);
+});

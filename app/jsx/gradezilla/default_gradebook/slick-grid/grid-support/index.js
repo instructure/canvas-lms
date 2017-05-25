@@ -16,29 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import PropTypes from 'prop-types'
-import Typography from 'instructure-ui/lib/components/Typography'
-import ColumnHeader from 'jsx/gradezilla/default_gradebook/components/ColumnHeader'
+import Events from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support/Events';
+import GridHelper from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support/GridHelper';
+import Navigation from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support/Navigation';
+import State from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support/State';
 
-const { string } = PropTypes;
+export default class GridSupport {
+  constructor (grid) {
+    this.grid = grid;
 
-class CustomColumnHeader extends ColumnHeader {
-  render () {
-    return (
-      <div className="Gradebook__ColumnHeaderContent">
-        <span className="Gradebook__ColumnHeaderDetail">
-          <Typography tag="span" size="small">
-            { this.props.title }
-          </Typography>
-        </span>
-      </div>
-    );
+    this.events = new Events();
+    this.state = new State(grid, this);
+    this.navigation = new Navigation(grid, this);
+    this.helper = new GridHelper(grid);
+  }
+
+  initialize () {
+    this.state.initialize();
+    this.navigation.initialize();
   }
 }
-
-CustomColumnHeader.propTypes = {
-  title: string.isRequired
-};
-
-export default CustomColumnHeader

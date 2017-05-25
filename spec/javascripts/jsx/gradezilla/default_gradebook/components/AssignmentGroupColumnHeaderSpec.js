@@ -21,6 +21,10 @@ import { mount } from 'enzyme';
 import AssignmentGroupColumnHeader from 'jsx/gradezilla/default_gradebook/components/AssignmentGroupColumnHeader';
 import { findMenuItem, findFlyout } from './helpers/columnHeaderHelpers';
 
+function mountComponent (props, mountOptions = {}) {
+  return mount(<AssignmentGroupColumnHeader {...props} />, mountOptions);
+}
+
 function mountAndOpenOptions (props) {
   const wrapper = mount(<AssignmentGroupColumnHeader {...props} />);
   wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
@@ -168,4 +172,86 @@ test('"Grade - High to Low" is optionally disabled', function () {
   const props = defaultProps({ sortBySetting: { disabled: true } });
   const onSortByGradeDescendingMenuItem = findMenuItem.call(this, props, 'Sort by', 'Grade - High to Low');
   equal(onSortByGradeDescendingMenuItem.prop('disabled'), true);
+});
+
+QUnit.module('AssignmentGroupColumnHeader#handleKeyDown', function (hooks) {
+  hooks.beforeEach(function () {
+    this.wrapper = mountComponent(defaultProps(), { attachTo: document.querySelector('#fixtures') });
+    this.preventDefault = sinon.spy();
+  });
+
+  hooks.afterEach(function () {
+    this.wrapper.unmount();
+  });
+
+  this.handleKeyDown = function (which, shiftKey = false) {
+    return this.wrapper.node.handleKeyDown({ which, shiftKey, preventDefault: this.preventDefault });
+  };
+
+  QUnit.module('with focus on options menu trigger', {
+    setup () {
+      this.wrapper.node.optionsMenuTrigger.focus();
+    }
+  });
+
+  test('does not handle Tab', function () {
+    // This allows Grid Support Navigation to handle navigation.
+    const returnValue = this.handleKeyDown(9, false); // Tab
+    equal(typeof returnValue, 'undefined');
+  });
+
+  test('does not handle Shift+Tab', function () {
+    // This allows Grid Support Navigation to handle navigation.
+    const returnValue = this.handleKeyDown(9, true); // Shift+Tab
+    equal(typeof returnValue, 'undefined');
+  });
+
+  test('Enter opens the options menu', function () {
+    this.handleKeyDown(13); // Enter
+    const optionsMenu = this.wrapper.find('PopoverMenu');
+    strictEqual(optionsMenu.node.show, true);
+  });
+
+  test('returns false for Enter on options menu', function () {
+    // This prevents additional behavior in Grid Support Navigation.
+    const returnValue = this.handleKeyDown(13); // Enter
+    strictEqual(returnValue, false);
+  });
+
+  QUnit.module('without focus');
+
+  test('does not handle Tab', function () {
+    const returnValue = this.handleKeyDown(9, false); // Tab
+    equal(typeof returnValue, 'undefined');
+  });
+
+  test('does not handle Shift+Tab', function () {
+    const returnValue = this.handleKeyDown(9, true); // Shift+Tab
+    equal(typeof returnValue, 'undefined');
+  });
+
+  test('does not handle Enter', function () {
+    const returnValue = this.handleKeyDown(13); // Enter
+    equal(typeof returnValue, 'undefined');
+  });
+});
+
+QUnit.module('AssignmentGroupColumnHeader: focus', {
+  setup () {
+    this.wrapper = mountComponent(defaultProps(), { attachTo: document.querySelector('#fixtures') });
+  },
+
+  teardown () {
+    this.wrapper.unmount();
+  }
+});
+
+test('#focusAtStart sets focus on the options menu trigger', function () {
+  this.wrapper.node.focusAtStart();
+  equal(document.activeElement, this.wrapper.node.optionsMenuTrigger);
+});
+
+test('#focusAtEnd sets focus on the options menu trigger', function () {
+  this.wrapper.node.focusAtEnd();
+  equal(document.activeElement, this.wrapper.node.optionsMenuTrigger);
 });

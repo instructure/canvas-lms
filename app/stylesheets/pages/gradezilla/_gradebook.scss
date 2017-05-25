@@ -139,8 +139,10 @@ $header_height: 38px;
   &.ui-state-default {
     height: 30px;
   }
-  &.hovered-column,
-  &.slick-header-column-active,
+  &.active-header, // the column header is active
+  &.active-column-header, // a cell within the column is active
+  &.hovered-column, // an element in the column is being hovered
+  &.slick-header-column-active, // the column is being dragged or resized
   &.ui-state-hover {
     background-color: $ic-bg-light-primary;
   }
