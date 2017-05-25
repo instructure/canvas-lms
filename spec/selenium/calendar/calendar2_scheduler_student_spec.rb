@@ -215,6 +215,9 @@ describe "scheduler" do
       before :once do
         create_appointment_group(
           max_appointments_per_participant: 1,
+          # if participant_visibility is 'private', the event_details popup resizes, 
+          # causing fragile tests in Chrome
+          participant_visibility: 'protected',
           new_appointments: [
             [ 30.minutes.from_now, 1.hour.from_now ]
           ]
@@ -226,10 +229,7 @@ describe "scheduler" do
         load_month_view
 
         f('.fc-event.scheduler-event').click
-        # in Chrome, the event-detail popop flashes and changes size
-        # the expect and explicit search seems to make the spec less fragile
-        expect(f('.event-details .unreserve_event_link')).to be_displayed
-        f('.event-details .unreserve_event_link').click
+        move_to_click('.event-details .unreserve_event_link')
         wait_for_ajaximations
         f('#delete_event_dialog~.ui-dialog-buttonpane .btn-primary').click
         
@@ -240,10 +240,7 @@ describe "scheduler" do
         load_week_view
         
         f('.fc-event.scheduler-event').click
-        # in Chrome, the event-detail popop flashes and changes size
-        # the expect and explicit search seems to make the spec less fragile
-        expect(f('.event-details .unreserve_event_link')).to be_displayed
-        f('.event-details .unreserve_event_link').click
+        move_to_click('.event-details .unreserve_event_link')
         wait_for_ajaximations
         f('#delete_event_dialog~.ui-dialog-buttonpane .btn-primary').click
 
@@ -254,10 +251,7 @@ describe "scheduler" do
         load_agenda_view
 
         f('.agenda-event__item-container').click
-        # in Chrome, the event-detail popop flashes and changes size
-        # the expect and explicit search seems to make the spec less fragile
-        expect(f('.event-details .unreserve_event_link')).to be_displayed
-        f('.event-details .unreserve_event_link').click
+        move_to_click('.event-details .unreserve_event_link')
         wait_for_ajaximations
         f('#delete_event_dialog~.ui-dialog-buttonpane .btn-primary').click
 
