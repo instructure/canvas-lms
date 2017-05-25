@@ -23,7 +23,7 @@ describe "Tutorials" do
 
     before(:once) do
       Account.default.enable_feature!(:new_user_tutorial)
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
     end
 
     before(:each) do
@@ -31,16 +31,18 @@ describe "Tutorials" do
       get "/profile/settings"
     end
 
-    it "Should check that the course setup tutorial checkbox is checked", :priority => "1", test_id: 3165148 do
-      f('.ic-Super-toggle__switch').click
-      expect(f('.ic-Super-toggle__input')[:checked]).to eq "true"
+    it "the course setup tutorial checkbox is uncheckable", :priority => "1", test_id: 3165147 do
+      element = f('#ff_toggle_new_user_tutorial_on_off')
+      element.find_element(:xpath, "../../label").click
+      expect(element[:checked]).to eq nil
     end
 
-    it "Should check that the course setup tutorial checkbox is unchecked", :priority => "1", test_id: 3165147 do
-      f('.ic-Super-toggle__switch').click
-      expect(f('.ic-Super-toggle__input')[:checked]).to eq "true"
-      f('.ic-Super-toggle__switch').click
-      expect(f('.ic-Super-toggle__input')[:checked]).to eq nil
+    it "the course setup tutorial checkbox is checkable", :priority => "1", test_id: 3165148 do
+      element = f('#ff_toggle_new_user_tutorial_on_off')
+      button = element.find_element(:xpath, "../../label")
+      button.click # Disable the button to check that it enables properly
+      button.click
+      expect(element[:checked]).to eq "true"
     end
   end
 
@@ -48,14 +50,14 @@ describe "Tutorials" do
 
     before(:once) do
       Account.default.enable_feature!(:new_user_tutorial)
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
     end
 
     before(:each) do
       user_session(@teacher)
     end
 
-    it "Should check that the tray appears on the home page", :priority => "1", test_id: 3165149 do
+    it "the tutorial tray appears on the home page", :priority => "1", test_id: 3165149 do
       get "/courses/#{@course.id}"
       element = f('.NewUserTutorialTray')
       expect(element).to include_text("Home")
@@ -64,7 +66,7 @@ describe "Tutorials" do
       expect(element).to include_text("You can publish your course from the home page")
     end
 
-    it "Should check that the tray appears on the assignments page", :priority => "1", test_id: 3165163 do
+    it "the tutorial tray appears on the assignments page", :priority => "1", test_id: 3165163 do
       get "/courses/#{@course.id}/assignments"
       element = f('.NewUserTutorialTray')
       expect(element).to include_text("Assignments")
@@ -73,7 +75,7 @@ describe "Tutorials" do
       expect(element).to include_text("Organize assignments into groups like Homework, In-class Work")
     end
 
-    it "Should check that the tray appears on the announcements page", :priority => "1", test_id: 3165168 do
+    it "the tutorial tray appears on the announcements page", :priority => "1", test_id: 3165168 do
       get "/courses/#{@course.id}/announcements"
       element = f('.NewUserTutorialTray')
       expect(element).to include_text("Announcements")
@@ -82,7 +84,7 @@ describe "Tutorials" do
       expect(element).to include_text("Choose to get a copy of your own announcements")
     end
 
-    it "Should check that the tray appears on the discussions page", :priority => "1", test_id: 3165160 do
+    it "the tutorial tray appears on the discussions page", :priority => "1", test_id: 3165160 do
       get "/courses/#{@course.id}/discussion_topics"
       element = f('.NewUserTutorialTray')
       expect(element).to include_text("Discussions")
@@ -91,7 +93,7 @@ describe "Tutorials" do
       expect(element).to include_text("assignments for grading or as a forum for shared ideas")
     end
 
-    it "Should check that the tray appears on the grades page", :priority => "1", test_id: 3165169 do
+    it "the tutorial tray appears on the grades page", :priority => "1", test_id: 3165169 do
       get "/courses/#{@course.id}/gradebook"
       element = f('.NewUserTutorialTray')
       expect(element).to include_text("Grades")
@@ -100,7 +102,7 @@ describe "Tutorials" do
       expect(element).to include_text("Group assignments for grade weighting")
     end
 
-    it "Should check that the tray appears on the users page", :priority => "1", test_id: 3165167 do
+    it "the tutorial tray appears on the users page", :priority => "1", test_id: 3165167 do
       get "/courses/#{@course.id}/users"
       element = f('.NewUserTutorialTray')
       expect(element).to include_text("People")
@@ -108,7 +110,7 @@ describe "Tutorials" do
       expect(element).to include_text("Manage enrollment status, create groups, and add users")
     end
 
-    it "Should check that the tray appears on the pages page", :priority => "1", test_id: 3165162 do
+    it "the tutorial tray appears on the pages page", :priority => "1", test_id: 3165162 do
       get "/courses/#{@course.id}/pages"
       element = f('.NewUserTutorialTray')
       expect(element).to include_text("Pages")
@@ -117,7 +119,7 @@ describe "Tutorials" do
       expect(element).to include_text("Include text, multimedia, and links")
     end
 
-    it "Should check that the tray appears on the files page", :priority => "1", test_id: 3165166 do
+    it "the tutorial tray appears on the files page", :priority => "1", test_id: 3165166 do
       get "/courses/#{@course.id}/files"
       element = f('.NewUserTutorialTray')
       expect(element).to include_text("Files")
@@ -126,7 +128,7 @@ describe "Tutorials" do
       expect(element).to include_text("Lock folders to keep them hidden from students")
     end
 
-    it "Should check that the tray appears on the syllabus page", :priority => "1", test_id: 3165150 do
+    it "the tutorial tray appears on the syllabus page", :priority => "1", test_id: 3165150 do
       get "/courses/#{@course.id}/assignments/syllabus"
       element = f('.NewUserTutorialTray')
       expect(element).to include_text("Syllabus")
@@ -135,7 +137,7 @@ describe "Tutorials" do
       expect(element).to include_text("Generate a built-in Syllabus based on Assignments")
     end
 
-    it "Should check that the tray appears on the quizzes page", :priority => "1", test_id: 3165164 do
+    it "the tutorial tray appears on the quizzes page", :priority => "1", test_id: 3165164 do
       get "/courses/#{@course.id}/quizzes"
       element = f('.NewUserTutorialTray')
       expect(element).to include_text("Quizzes")
@@ -143,7 +145,7 @@ describe "Tutorials" do
       expect(element).to include_text("Create and administer online quizzes and surveys")
     end
 
-    it "Should check that the tray appears on the modules page", :priority => "1", test_id: 3165260 do
+    it "the tutorial tray appears on the modules page", :priority => "1", test_id: 3165260 do
       get "/courses/#{@course.id}/modules"
       element = f('.NewUserTutorialTray')
       expect(element).to include_text("Modules")
@@ -152,13 +154,43 @@ describe "Tutorials" do
       expect(element).to include_text("Sequence select modules by defining criteria")
     end
 
-    it "Should check that the tray appears on the settings page", :priority => "1", test_id: 3165165 do
+    it "the tutorial tray appears on the settings page", :priority => "1", test_id: 3165165 do
       get "/courses/#{@course.id}/settings#!/configurations"
       element = f('.NewUserTutorialTray')
       expect(element).to include_text("Settings")
       expect(element).to include_text("Manage your course details")
       expect(element).to include_text("Update and view sections, course details")
       expect(element).to include_text("navigation, feature options and external app integrations")
+    end
+
+    it "the 'End Tutorial' button ends the tutorial", :priority => "1", test_id: 3189025 do
+      get "/courses/#{@course.id}"
+      elements = ff('button')
+      elements.select{|element| element.text == 'End Tutorial'}.first.click
+      elements = ff('button')
+      elements.select{|element| element.text == 'Okay'}.first.click
+      get "/profile/settings"
+      expect(f('#ff_toggle_new_user_tutorial_on_off')[:checked]).to eq nil
+    end
+
+    it "the end tutorial 'x' button closes the modal", :priority => "1", test_id: 3165170 do
+      get "/courses/#{@course.id}"
+      elements = ff('button')
+      elements.select{|element| element.text == 'End Tutorial'}.first.click
+      elements = ff('button')
+      elements.select{|element| element.text == 'Close'}.first.click
+      expect(f('.NewUserTutorialTray')).to be_displayed
+      expect(driver).not_to contain_css("End Course Set-up Tutorial")
+    end
+
+    it "the end tutorial 'Cancel' button closes the modal", :priority => "1", test_id: 3189026 do
+      get "/courses/#{@course.id}"
+      elements = ff('button')
+      elements.select{|element| element.text == 'End Tutorial'}.first.click
+      elements = ff('button')
+      elements.select{|element| element.text == 'Cancel'}.first.click
+      expect(f('.NewUserTutorialTray')).to be_displayed
+      expect(driver).not_to contain_css("End Course Set-up Tutorial")
     end
   end
 end
