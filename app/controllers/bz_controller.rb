@@ -74,6 +74,20 @@ class BzController < ApplicationController
     end
   end
 
+  def user_linkedin_url
+    result = {}
+    result['linkedin_url'] = ''
+
+    @current_user.user_services.each do |service|
+      if service.service == "linked_in"
+        result['linkedin_url'] = service.service_user_link
+        break
+      end
+    end
+
+    render :json => result
+  end
+
   def accessibility_mapper
     @items = []
     WikiPage.all.each do |page|
