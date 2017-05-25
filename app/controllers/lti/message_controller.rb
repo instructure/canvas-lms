@@ -75,15 +75,12 @@ module Lti
     end
     private :reregistration_message
 
-    def message_handler_link
-      link_id_hash = JSON::JWT.decode(params[:link_id]).with_indifferent_access
-      message_handler = MessageHandler.by_resource_codes(vendor_code: link_id_hash[:vendor_code],
-                                                         product_code: link_id_hash[:product_code],
-                                                         resource_type_code: link_id_hash[:resource_type_code],
-                                                         context: @context)
-      if message_handler.present?
-        return lti2_basic_launch(message_handler)
-      end
+    def resource
+      tool_setting = ToolSetting.find_by(resource_link_id: params[:resource_link_id])
+      return not_found if tool_setting.blank?
+
+      message_handler = tool_setting.message_handler(@context)
+      return lti2_basic_launch(message_handler) if message_handler.present?
       not_found
     end
 

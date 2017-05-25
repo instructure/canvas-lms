@@ -234,39 +234,42 @@ module Lti
       end
     end
 
-    describe "GET #message_handler_link" do
+    describe "GET #resource_link_id" do
       include_context 'lti2_spec_helper'
 
-      let(:jwt_body) do
-        {
-          vendor_code: product_family.vendor_code,
-          product_code: product_family.product_code,
-          resource_type_code: resource_handler.resource_type_code
-        }
+      let(:link_id) { SecureRandom.uuid }
+
+      let(:tool_setting) do
+        ToolSetting.new(tool_proxy: tool_proxy,
+                        context: course,
+                        resource_link_id: link_id,
+                        vendor_code: product_family.vendor_code,
+                        product_code: product_family.product_code,
+                        resource_type_code: resource_handler.resource_type_code)
       end
-      let(:link_id) { JSON::JWT.new(jwt_body).to_s }
 
       before do
         message_handler.update_attributes(message_type: MessageHandler::BASIC_LTI_LAUNCH_REQUEST)
         resource_handler.message_handlers = [message_handler]
         resource_handler.save!
+        tool_setting.save!
         user_session(account_admin_user)
       end
 
       it 'succeeds if tool is installed in the current account' do
-        get 'message_handler_link', account_id: account.id, link_id: link_id
+        get 'resource', account_id: account.id, resource_link_id: link_id
         expect(response).to be_ok
       end
 
       it 'succeeds if the tool is installed in the current course' do
         tool_proxy.update_attributes(context: course)
-        get 'message_handler_link', course_id: course.id, link_id: link_id
+        get 'resource', course_id: course.id, resource_link_id: link_id
         expect(response).to be_ok
       end
 
       it "succeeds if the tool is installed in the current course's account" do
         tool_proxy.update_attributes(context: account)
-        get 'message_handler_link', course_id: course.id, link_id: link_id
+        get 'resource', course_id: course.id, resource_link_id: link_id
         expect(response).to be_ok
       end
 
@@ -277,13 +280,13 @@ module Lti
 
         it "succeeds if the tool is installed in the current account's root account" do
           tool_proxy.update_attributes(context: root_account)
-          get 'message_handler_link', account_id: account.id, link_id: link_id
+          get 'resource', account_id: account.id, resource_link_id: link_id
           expect(response).to be_ok
         end
 
         it "succeeds if the tool is installed in the current course's root account" do
           tool_proxy.update_attributes(context: root_account)
-          get 'message_handler_link', course_id: course.id, link_id: link_id
+          get 'resource', course_id: course.id, resource_link_id: link_id
           expect(response).to be_ok
         end
       end
@@ -291,7 +294,7 @@ module Lti
       it "renders 'not found' no message handler is found" do
         resource_handler.message_handlers = []
         resource_handler.save!
-        get 'message_handler_link', account_id: account.id, link_id: link_id
+        get 'resource', account_id: account.id, resource_link_id: link_id
         expect(response).to be_not_found
       end
     end
