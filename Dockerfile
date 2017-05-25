@@ -66,6 +66,7 @@ RUN mkdir -p log \
              public/assets \
              client_apps/canvas_quizzes/node_modules \
              /home/docker/.cache/yarn/.tmp \
+             app/stylesheets/brandable_css_brands \
   && chown -R docker:docker ${APP_HOME} /home/docker
 
 USER docker
