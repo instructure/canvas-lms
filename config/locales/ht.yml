@@ -271,6 +271,7 @@ ht:
     report_header_assignment_url: "url sesyon"
     report_header_associated_user_id: associated_user_id
     report_header_attempt: tantativ
+    report_header_authentication_provider_id: authentication_provider_id
     report_header_canvas_account_id: canvas_account_id
     report_header_canvas_associated_user_id: canvas_associated_user_id
     report_header_canvas_course_id: canvas_course_id
@@ -299,6 +300,7 @@ ht:
     report_header_full_name: full_name
     report_header_group_id: group_id
     report_header_id: id
+    report_header_integration_id: integration_id
     report_header_last_access_at: "dènye aksè a"
     report_header_last_activity_at: "dènye aktivite a"
     report_header_last_ip: "dènye ip"
@@ -8369,6 +8371,7 @@ ht:
       miscellaneous: Divès
       operators: Operatè
       relationships: Relasyon
+  max_membership_bd0ddc68: max_membership
   max_users_groups_per_appointment_867c505b: "Maksimòm itilizatè/gwoup pa randevou"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Kantite maksimòn randevou yon patisipan ka asiste"
   media_comment_e494a952: "Kòmantè Medya"
@@ -10348,6 +10351,7 @@ ht:
   note_this_is_not_your_official_score_f2d4582f: "*NÒT*: Sa a pa nòt ofisyèl ou."
   note_this_login_s_account_uses_delegated_authentic_89227914: "Nòt: Kont koneksyon sa a itilize kominikasyon delege, men li pèmèt otantifikasyon pa modpas de sekou Canvas. Espas pou modpas nan fòmilè sa a aktyalize modpas de sekou Canvas la, se *pa* otantifikasyon delege a."
   notes_c42e0fd5: Nòt
+  notes_d5339f17: "%{notes}"
   nothing_to_split_off_of_this_user_28ba9dd5: "Pa gen anyen pou separe de itilizatè sa a."
   notice_concluded_student_6d416c4: "Avi: Elèv ki Fini"
   notice_inactive_student_bcc4248a: "Avi: Elèv Inaktif"
