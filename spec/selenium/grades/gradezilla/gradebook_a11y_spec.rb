@@ -16,28 +16,30 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../../helpers/gradezilla_common'
+require_relative '../../helpers/color_common'
 require_relative '../page_objects/gradezilla_page'
 
 describe "Gradezilla" do
   include_context "in-process server selenium tests"
   include GradezillaCommon
+  include ColorCommon
 
   let(:extra_setup) { }
   let(:active_element) { driver.switch_to.active_element }
 
-  before(:once) do
-    gradebook_data_setup
-  end
+  before(:once) { gradebook_data_setup }
 
   before do
     Account.default.set_feature_flag!('new_gradebook', 'on')
     extra_setup
     user_session(@teacher)
-    Gradezilla.visit(@course)
   end
 
   context "export menu" do
-    before { f('span[data-component="ActionMenu"] button').click }
+    before do
+      Gradezilla.visit(@course)
+      f('span[data-component="ActionMenu"] button').click
+    end
 
     it "moves focus to Actions menu trigger button during current export", priority: "2", test_id: 720459 do
       f('span[data-menu-id="export"]').click
@@ -67,6 +69,8 @@ describe "Gradezilla" do
   end
 
   context "return focus to settings menu when it closes" do
+    before { Gradezilla.visit(@course) }
+
     it "after arrange columns is clicked", priority: "2", test_id: 720462 do
       view_menu_trigger = Gradezilla.gradebook_menu('View').find('button')
       Gradezilla.open_view_menu_and_arrange_by_menu
@@ -75,9 +79,44 @@ describe "Gradezilla" do
     end
   end
 
-  it 'returns focus to the view options menu after clicking the "Notes" option' do
-    Gradezilla.gradebook_view_options_menu.click
-    Gradezilla.notes_option.click
-    expect(active_element).to eq(Gradezilla.gradebook_view_options_menu)
+  context "return focus to view options menu when it closes" do
+    before { Gradezilla.visit(@course) }
+    it 'after clicking the "Notes" option' do
+      Gradezilla.gradebook_view_options_menu.click
+      Gradezilla.notes_option.click
+      expect(active_element).to eq(Gradezilla.gradebook_view_options_menu)
+    end
+  end
+
+  context "assignment header contrast" do
+    let(:assignment_title) { @course.assignments.first.title }
+
+    context "without high contrast mode" do
+      before do
+        @teacher.disable_feature!(:high_contrast)
+        Gradezilla.visit(@course)
+      end
+
+      it 'meets 3:1 contrast for column headers' do
+        bg_color = rgba_to_hex Gradezilla.assignment_header(assignment_title).style('background-color')
+        text_color = rgba_to_hex Gradezilla.assignment_header_label(assignment_title).style('color')
+
+        expect(LuminosityContrast.ratio(bg_color, text_color).round(2)).to be >= 3
+      end
+    end
+
+    context "with high contrast mode" do
+      before do
+        @teacher.enable_feature!(:high_contrast)
+        Gradezilla.visit(@course)
+      end
+
+      it 'meets 4.5:1 contrast for column headers' do
+        bg_color = rgba_to_hex Gradezilla.assignment_header(assignment_title).style('background-color')
+        text_color = rgba_to_hex Gradezilla.assignment_header_label(assignment_title).style('color')
+
+        expect(LuminosityContrast.ratio(bg_color, text_color).round(2)).to be >= 4.5
+      end
+    end
   end
 end

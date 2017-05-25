@@ -59,6 +59,10 @@ class Gradezilla
       ".cannot_edit"
     end
 
+    def assignment_header_label(name)
+      assignment_header(name).find('.assignment-name')
+    end
+
     def assignment_header(name)
       f(assignment_header_selector(name))
     end

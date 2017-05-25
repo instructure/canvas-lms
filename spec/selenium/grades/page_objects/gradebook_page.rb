@@ -61,10 +61,6 @@ module Gradebook
       f(".grade", cell)
     end
 
-    def assignment_header(name)
-      f(assignment_header_selector(name))
-    end
-
     def assignment_header_menu(id)
       f("a[data-assignment-id='#{id}']")
     end
@@ -95,9 +91,17 @@ module Gradebook
       f('a', parent_element)
     end
 
-    # actions
     public
 
+    def assignment_header_label(name)
+      assignment_header(name).find('.assignment-name')
+    end
+
+    def assignment_header(name)
+      f(assignment_header_selector(name))
+    end
+
+    # actions
     def visit_gradebook(course, user = nil)
       if user
         user.preferences[:gradebook_version] = '2'
