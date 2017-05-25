@@ -313,7 +313,11 @@ module AuthenticationMethods
           #... so if SSO is set, we can send them there directly, instead of through
           # two other Canvas middleman pages, shaving a noticiable amount of time off
           # for the user to experience
-          redirect_to delegated_auth_redirect_uri(url_for({ controller: 'login/cas', action: :new }.merge(params.slice(:id))))
+          if @domain_root_account.auth_discovery_url
+            redirect_to @domain_root_account.auth_discovery_url
+          else
+            redirect_to delegated_auth_redirect_uri(url_for({ controller: 'login/cas', action: :new }.merge(params.slice(:id))))
+          end
           return
         end
       }
