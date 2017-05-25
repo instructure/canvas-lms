@@ -1,7 +1,7 @@
 /*
     Built by: build_media_element_js.rake
     from https://github.com/instructure/mediaelement.git
-    revision: a84fd12157c225714283bffc053ba17e1eea6c0c
+    revision: 1a177ed2cc3d51689a210d5c034c88112d5a2e42
 
     YOU SHOULDN'T EDIT ME DIRECTLY
   */
@@ -1707,29 +1707,6 @@ mejs.HtmlMediaElementShim = {
  - determine when to use iframe (Firefox, Safari, Mobile) vs. Flash (Chrome, IE)
  - fullscreen?
 */
-function createToggleTimeupdate() {
-  var intervalId = null;
-
-  var clear = function() {
-    clearInterval(intervalId);
-    intervalId = null;
-  };
-
-  return function(player, pluginMediaElement, shouldBeOn) {
-    if (!intervalId && shouldBeOn) {
-      intervalId = setInterval(function() {
-        // stop timeupdates when the iframe is no longer in the dom
-        if (document.body.contains(pluginMediaElement.pluginElement)) {
-          mejs.YouTubeApi.createEvent(player, pluginMediaElement, 'timeupdate');
-        } else {
-          clear();
-        }
-      }, 250);
-    } else if (intervalId && !shouldBeOn) {
-      clear();
-    }
-  };
-}
 
 // YouTube Flash and Iframe API
 mejs.YouTubeApi = {
@@ -1779,17 +1756,11 @@ mejs.YouTubeApi = {
 					pluginMediaElement.success(pluginMediaElement, pluginMediaElement.pluginElement);
 
 					mejs.YouTubeApi.createEvent(player, pluginMediaElement, 'canplay');
-
-					var originalSeekTo = settings.pluginMediaElement.pluginApi.seekTo.bind(player);
-
-					settings.pluginMediaElement.pluginApi.seekTo = function(seconds, allowSeekAhead) {
-						originalSeekTo(seconds, allowSeekAhead);
-						// Allow player to update before triggering timeupdate event
-						setTimeout(function() {
-							mejs.YouTubeApi.createEvent(player, pluginMediaElement, 'seeked');
-							mejs.YouTubeApi.createEvent(player, pluginMediaElement, 'timeupdate');
-						}, 100);
-					}
+					
+					// create timer
+					setInterval(function() {
+						mejs.YouTubeApi.createEvent(player, pluginMediaElement, 'timeupdate');
+					}, 250);
 
 					if (typeof pluginMediaElement.attributes.autoplay !== 'undefined') {
 						player.playVideo();
@@ -1920,45 +1891,42 @@ mejs.YouTubeApi = {
 		}
 		
 		player.addEventListener('onStateChange', callbackName);
-
+		
+		setInterval(function() {
+			mejs.YouTubeApi.createEvent(player, pluginMediaElement, 'timeupdate');
+		}, 250);
+		
 		mejs.YouTubeApi.createEvent(player, pluginMediaElement, 'canplay');
 	},
 	
-
-	toggleTimeupdates: createToggleTimeupdate(),
-
 	handleStateChange: function(youTubeState, player, pluginMediaElement) {
 		switch (youTubeState) {
-			case YT.PlayerState.UNSTARTED:
+			case -1: // not started
 				pluginMediaElement.paused = true;
 				pluginMediaElement.ended = true;
 				mejs.YouTubeApi.createEvent(player, pluginMediaElement, 'loadedmetadata');
-				mejs.YouTubeApi.createEvent(player, pluginMediaElement, 'unstarted');
-				mejs.YouTubeApi.toggleTimeupdates(player, pluginMediaElement, false);
+				//createYouTubeEvent(player, pluginMediaElement, 'loadeddata');
 				break;
-			case YT.PlayerState.ENDED:
+			case 0:
 				pluginMediaElement.paused = false;
 				pluginMediaElement.ended = true;
 				mejs.YouTubeApi.createEvent(player, pluginMediaElement, 'ended');
-				mejs.YouTubeApi.toggleTimeupdates(player, pluginMediaElement, false);
 				break;
-			case YT.PlayerState.PLAYING:
+			case 1:
 				pluginMediaElement.paused = false;
 				pluginMediaElement.ended = false;				
 				mejs.YouTubeApi.createEvent(player, pluginMediaElement, 'play');
 				mejs.YouTubeApi.createEvent(player, pluginMediaElement, 'playing');
-				mejs.YouTubeApi.toggleTimeupdates(player, pluginMediaElement, true);
 				break;
-			case YT.PlayerState.PAUSED:
+			case 2:
 				pluginMediaElement.paused = true;
 				pluginMediaElement.ended = false;				
 				mejs.YouTubeApi.createEvent(player, pluginMediaElement, 'pause');
-				mejs.YouTubeApi.toggleTimeupdates(player, pluginMediaElement, false);
 				break;
-			case YT.PlayerState.BUFFERING:
+			case 3: // buffering
 				mejs.YouTubeApi.createEvent(player, pluginMediaElement, 'progress');
 				break;
-			case YT.PlayerState.CUED:
+			case 5:
 				// cued?
 				break;						
 			
@@ -2190,8 +2158,6 @@ function isAfter(sourceNode, targetNode) {
 	mejs.MepDefaults = {
 		// url to poster (to fix iOS 3.x)
 		poster: '',
-		// Whether to hide the poster on play (useful for audio files)
-		hidePosterOnPlay: true,
 		// When the video is ended, we can show the poster.
 		showPosterWhenEnded: false,
 		// default if the <video width> is not specified
@@ -2513,11 +2479,6 @@ function isAfter(sourceNode, targetNode) {
 				t.$media.removeAttr('controls');
 				var videoPlayerTitle = t.isVideo ?
 					mejs.i18n.t('Video Player') : mejs.i18n.t('Audio Player');
-
-				if (t.options.titleText) {
-					videoPlayerTitle = t.options.titleText;
-				}
-
 				// insert description for screen readers
 				$('<span class="mejs-offscreen">' + videoPlayerTitle + '</span>').insertBefore(t.$media);
 				// build container
@@ -2939,7 +2900,7 @@ function isAfter(sourceNode, targetNode) {
 
 						}
 					}
-					t.media.stop();
+					t.media.pause();
 
 					if (t.setProgressRail) {
 						t.setProgressRail();
@@ -3325,7 +3286,7 @@ function isAfter(sourceNode, targetNode) {
 			}
 
 			media.addEventListener('play',function() {
-				if (player.options.hidePosterOnPlay) { poster.hide(); }
+				poster.hide();
 			}, false);
 
 			if(player.options.showPosterWhenEnded && player.options.autoRewind){
@@ -3812,9 +3773,6 @@ function isAfter(sourceNode, targetNode) {
 			media.addEventListener('paused',function() {
 				togglePlayPause('pse');
 			}, false);
-			media.addEventListener('unstarted',function() {
-				togglePlayPause('pse');
-			}, false);
 		}
 	});
 	
@@ -3927,7 +3885,7 @@ function isAfter(sourceNode, targetNode) {
 
 						pos = x - offset.left;
 						percentage = (pos / width);
-						newTime = percentage * media.duration;
+						newTime = (percentage <= 0.02) ? 0 : percentage * media.duration;
 
 						// seek to where the mouse is
 						if (mouseIsDown && newTime !== media.currentTime) {
@@ -4097,7 +4055,7 @@ function isAfter(sourceNode, targetNode) {
 			if (target && target.buffered && target.buffered.length > 0 && target.buffered.end && target.duration) {
 				// account for a real array with multiple values - always read the end of the last buffer
 				percent = target.buffered.end(target.buffered.length - 1) / target.duration;
-			}
+			} 
 			// Some browsers (e.g., FF3.6 and Safari 5) cannot calculate target.bufferered.end()
 			// to be anything other than 0. If the byte count is available we use this instead.
 			// Browsers that support the else if do not seem to have the bufferedBytes value and
@@ -4122,12 +4080,12 @@ function isAfter(sourceNode, targetNode) {
 		setCurrentRail: function() {
 
 			var t = this;
-
+		
 			if (t.media.currentTime !== undefined && t.media.duration) {
 
 				// update bar and handle
 				if (t.total && t.handle) {
-					var
+					var 
 						newWidth = Math.round(t.total.width() * t.media.currentTime / t.media.duration),
 						handlePos = newWidth - Math.round(t.handle.outerWidth(true) / 2);
 
@@ -4383,6 +4341,9 @@ function isAfter(sourceNode, targetNode) {
 				volume = Math.max(0,volume);
 				volume = Math.min(volume,1);
 				
+				// position the slider and handle
+				positionVolumeHandle(volume);
+				
 				// set the media object (this will trigger the volumechanged event)
 				if (volume === 0) {
 					media.setMuted(true);
@@ -4390,9 +4351,6 @@ function isAfter(sourceNode, targetNode) {
 					media.setMuted(false);
 				}
 				media.setVolume(volume);
-
-				// position the slider and handle
-				positionVolumeHandle(volume);
 			},
 			mouseIsDown = false,
 			mouseIsOver = false;
@@ -4530,6 +4488,8 @@ function isAfter(sourceNode, targetNode) {
 
 		isNativeFullScreen: false,
 
+		isInIframe: false,
+
 		// Possible modes
 		// (1) 'native-native' 	HTML5 video  + browser fullscreen (IE10+, etc.)
 		// (2) 'plugin-native' 	plugin video + browser fullscreen (fails in some versions of Firefox)
@@ -4543,6 +4503,8 @@ function isAfter(sourceNode, targetNode) {
 
 			if (!player.isVideo)
 				return;
+
+			player.isInIframe = (window.location != window.parent.location);
 
 			// detect on start
 			media.addEventListener('loadstart', function() { player.detectFullscreenMode(); });
@@ -4849,10 +4811,38 @@ function isAfter(sourceNode, targetNode) {
 			t.normalHeight = t.container.height();
 			t.normalWidth = t.container.width();
 
+
+
 			// attempt to do true fullscreen
 			if (t.fullscreenMode === 'native-native' || t.fullscreenMode === 'plugin-native') {
 
 				mejs.MediaFeatures.requestFullScreen(t.container[0]);
+				//return;
+
+				if (t.isInIframe) {
+					// sometimes exiting from fullscreen doesn't work
+					// notably in Chrome <iframe>. Fixed in version 17
+					setTimeout(function checkFullscreen() {
+
+						if (t.isNativeFullScreen) {
+							var percentErrorMargin = 0.002, // 0.2%
+								windowWidth = $(window).width(),
+								screenWidth = screen.width,
+								absDiff = Math.abs(screenWidth - windowWidth),
+								marginError = screenWidth * percentErrorMargin;
+
+							// check if the video is suddenly not really fullscreen
+							if (absDiff > marginError) {
+								// manually exit
+								t.exitFullScreen();
+							} else {
+								// test again
+								setTimeout(checkFullscreen, 500);
+							}
+						}
+
+					}, 1000);
+				}
 
 			} else if (t.fullscreeMode == 'fullwindow') {
 				// move into position
@@ -4985,6 +4975,7 @@ function isAfter(sourceNode, targetNode) {
 //   <(curl -s "${upstream_url}") \
 //   public/javascripts/mediaelement/mep-feature-tracks-instructure.js
 //
+/*global mejs, MediaElementPlayer*/
 (function($) {
 
   // add extra default options
@@ -5069,13 +5060,12 @@ function isAfter(sourceNode, targetNode) {
         }
       }
       // if only one language then just make the button a toggle
+      var lang = 'none';
       if (t.options.toggleCaptionsButtonWhenOnlyOne && subtitleCount == 1){
         // click
         player.captionsButton.on('click',function() {
           if (player.selectedTrack === null) {
             lang = player.tracks[0].srclang;
-          } else {
-            lang = 'none';
           }
           player.setTrack(lang);
         });
@@ -5083,8 +5073,6 @@ function isAfter(sourceNode, targetNode) {
         // hover or keyboard focus
         player.captionsButton.on( 'mouseenter focusin', function() {
           $(this).find('.mejs-captions-selector').removeClass('mejs-offscreen');
-          // INSTRUCTURE CUSTOMIZATION - Show on focus
-          $(this).find(".mejs-captions-selector").css("visibility", "visible");
         })
 
         // handle clicks to the language radio buttons
@@ -5716,7 +5704,6 @@ function isAfter(sourceNode, targetNode) {
       return parts;
     };
   }
-
 })(mejs.$);
 
 //
@@ -5749,16 +5736,7 @@ function isAfter(sourceNode, targetNode) {
 
   $.extend(MediaElementPlayer.prototype, {
 
-    // INSTRUCTURE CUSTOMIZATION - pulling latest definition of isIE from ME.js master with IE11 fixes
-    isIE: function() {
-      return (window.navigator.appName.match(/microsoft/gi) !== null) || (window.navigator.userAgent.match(/trident/gi) !== null);
-    },
-
     buildspeed: function(player, controls, layers, media) {
-      // INSTRUCTURE CUSTOMIZATION: enable playback speed controls for both audio and video
-      // if (!player.isVideo)
-      //   return;
-
       var t = this;
       var hoverTimeout;
 
@@ -5822,8 +5800,7 @@ function isAfter(sourceNode, targetNode) {
         for (i = 0, il = speeds.length; i<il; i++) {
           inputId = t.id + '-speed-' + speeds[i].value;
           isCurrent = (speeds[i].value === t.options.defaultSpeed);
-          // INSTRUCTURE CUSTOMIZATION - Added href for tab navigation
-          html += '<li><a href="#">' +
+          html += '<li>' +
                 '<input type="radio" name="speed" role="menuitemradio"' +
                       'value="' + speeds[i].value + '" ' +
                       'id="' + inputId + '" ' +
@@ -5834,7 +5811,7 @@ function isAfter(sourceNode, targetNode) {
                 '<label for="' + inputId + '" ' + 'aria-hidden="true"' +
                       (isCurrent ? ' class="mejs-speed-selected"' : '') +
                       '>' + speeds[i].name + '</label>' +
-              '</a></li>';
+              '</li>';
         }
         html += '</ul></div></div>';
 
@@ -5864,7 +5841,6 @@ function isAfter(sourceNode, targetNode) {
             speedButton.find('.mejs-speed-selected').removeClass('mejs-speed-selected');
             speedButton.find('input[type="radio"]:checked').next().addClass('mejs-speed-selected');
           });
-
         speedButton
         // set size on demand
           .one( 'mouseenter focusin', function() {
@@ -5924,73 +5900,20 @@ function isAfter(sourceNode, targetNode) {
             }, 0);
           }, 100))
 
-          // Handle focus so that screen readers can toggle the menu
-          .on('focus', 'button', function (e) {
-
-            //
-            // INSTRUCTURE CUSTOMIZATION - IE fixes
-            //
-            if (t.isIE()) {
-              // After playback completes, IE will reset the rate to the
-              // defaultPlaybackRate of 1.00 (with the UI still reflecting the
-              // selected value) unless we set defaultPlaybackRate as well.
-              media.defaultPlaybackRate = media.playbackRate;
-
-              // Internet Explorer fires a 'waiting' event in addition to the
-              // 'ratechange' event when the playback speed is changed, even though
-              // the HTML5 standard says not to. >_<
-              //
-              // Even worse, the 'waiting' state does not resolve with any other
-              // event that would indicate that we are done waiting, like 'playing'
-              // or 'seeked', so we are left with nothing to hook on but ye olde
-              // arbitrary point in the future.
-              $(media).one('waiting', function() {
-                setTimeout(function() {
-                  layers.find('.mejs-overlay-loading').parent().hide();
-                  controls.find('.mejs-time-buffering').hide();
-                }, 500);
-              });
-            }
-
+          // Handle click so that screen readers can toggle the menu
+          .on('click', 'button', function (e) {
             if ($(this).siblings('.mejs-speed-selector').hasClass('mejs-offscreen')) {
               player.showSpeedSelector();
-              // INSTRUCTURE CUSTOMIZATION - focus now handled with anchors vs non visible radios
-              // $(this).siblings('.mejs-speed-selector').find('input[type=radio]:checked').first().focus();
+              $(this).siblings('.mejs-speed-selector').find('input[type=radio]:checked').first().focus();
             } else {
               player.hideSpeedSelector();
             }
           });
-        // INSTRUCTURE CUSTOMIZATION - make speed selectors keyboard accessible
-        player.setTabNavigation();
       }
-    },
-
-    // INSTRUCTURE CUSTOMIZATION - make speed selectors keyboard accessible
-    setTabNavigation: function () {
-      this.speedButton.find('a').on('focusin', function (e) {
-        $(e.target.closest('li')).addClass('focus');
-      });
-
-      this.speedButton.find('a').on('focusout', function (e) {
-        $(e.target.closest('li')).removeClass('focus');
-      });
-
-      this.speedButton.find('a').on('keydown', function (e) {
-        var keyCode = e.keyCode;
-        switch (keyCode) {
-          case 13:
-            $(e.target).find('input[type="radio"]:first').click();
-            return false;
-          default:
-            return true;
-        }
-      });
     },
 
     hideSpeedSelector: function () {
       this.speedButton.find('.mejs-speed-selector')
-      // INSTRUCTURE CUSTOMIZATION - toggle css visibility
-        .css('visibility', 'hidden')
         .addClass('mejs-offscreen')
         .attr('aria-expanded', 'false')
         .attr('aria-hidden', 'true')
@@ -6000,8 +5923,6 @@ function isAfter(sourceNode, targetNode) {
 
     showSpeedSelector: function () {
       this.speedButton.find('.mejs-speed-selector')
-      // INSTRUCTURE CUSTOMIZATION - toggle css visibility
-        .css('visibility', 'visible')
         .removeClass('mejs-offscreen')
         .attr('aria-expanded', 'true')
         .attr('aria-hidden', 'false')
@@ -6033,6 +5954,8 @@ function isAfter(sourceNode, targetNode) {
    sources: [],
 
    buildsourcechooser: function(player, controls, layers, media) {
+     // INSTRUCTURE ADDED
+     if (!player.isVideo) { return; }
 
      var t = this;
      var hoverTimeout;
@@ -6127,10 +6050,11 @@ function isAfter(sourceNode, targetNode) {
            t.setAriaLabel(media);
          })
 
-         // Handle focus so that screen readers can toggle the menu
-         .delegate('button', 'focus', function (e) {
+         // Handle click so that screen readers can toggle the menu
+         .delegate('button', 'click', function (e) {
            if ($(this).siblings('.mejs-sourcechooser-selector').hasClass('mejs-offscreen')) {
              player.showSourcechooserSelector();
+             $(this).siblings('.mejs-sourcechooser-selector').find('input[type=radio]:checked').first().focus();
            } else {
              player.hideSourcechooserSelector();
            }
@@ -6201,8 +6125,6 @@ function isAfter(sourceNode, targetNode) {
 
    hideSourcechooserSelector: function () {
      this.sourcechooserButton.find('.mejs-sourcechooser-selector')
-      // INSTRUCTURE added css visibility toggle
-       .css('visibility', 'hidden')
        .addClass('mejs-offscreen')
        .attr('aria-expanded', 'false')
        .attr('aria-hidden', 'true')
@@ -6212,8 +6134,6 @@ function isAfter(sourceNode, targetNode) {
 
    showSourcechooserSelector: function () {
      this.sourcechooserButton.find('.mejs-sourcechooser-selector')
-     // INSTRUCTURE added css visibility toggle
-       .css('visibility', 'visible')
        .removeClass('mejs-offscreen')
        .attr('aria-expanded', 'true')
        .attr('aria-hidden', 'false')
