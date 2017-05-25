@@ -290,6 +290,7 @@ en-GB:
     report_header_assignment_url: "assignment url"
     report_header_associated_user_id: associated_user_id
     report_header_attempt: attempt
+    report_header_authentication_provider_id: authentication_provider_id
     report_header_canvas_account_id: canvas_account_id
     report_header_canvas_associated_user_id: canvas_associated_user_id
     report_header_canvas_course_id: canvas_course_id
@@ -318,6 +319,7 @@ en-GB:
     report_header_full_name: full_name
     report_header_group_id: group_id
     report_header_id: id
+    report_header_integration_id: integration_id
     report_header_last_access_at: "last access at"
     report_header_last_activity_at: "last activity at"
     report_header_last_ip: "last ip"
@@ -9545,6 +9547,7 @@ en-GB:
       miscellaneous: Misc
       operators: Operators
       relationships: Relationships
+  max_membership_bd0ddc68: max_membership
   max_users_groups_per_appointment_867c505b: "Maximum users/groups per appointment"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Maximum number of appointments a participant may attend"
   media_comment_e494a952: "Media comment"
@@ -11830,6 +11833,7 @@ en-GB:
   note_this_is_not_your_official_score_f2d4582f: "*NOTE*: This is NOT your official score."
   note_this_login_s_account_uses_delegated_authentic_89227914: "Note: This login's account uses delegated authentication, but allows fallback Canvas password authentication. The password fields in this form update the fallback Canvas password, *not* the delegated authentication."
   notes_c42e0fd5: Notes
+  notes_d5339f17: "%{notes}"
   notes_for_name_2eefac11: "Notes for %{name}"
   nothing_to_split_off_of_this_user_28ba9dd5: "Nothing to split off from this user"
   notice_concluded_student_6d416c4: "Notice: concluded student"
