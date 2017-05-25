@@ -4077,9 +4077,9 @@ instructure-icons@2.3.0, instructure-icons@^2.3.0:
     prop-types "15.5.8"
     shortid "2.2.8"
 
-instructure-ui@2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/instructure-ui/-/instructure-ui-2.2.0.tgz#d9dbb5ab6b67c51ff3356503b9d7091915e4836a"
+instructure-ui@2.2.2:
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/instructure-ui/-/instructure-ui-2.2.2.tgz#2080c11abaeac96cd8c99fab4010a96c7f7b3f7b"
   dependencies:
     classnames "2.2.5"
     decimal.js "7.2.1"
@@ -5333,13 +5333,13 @@ moment-timezone@^0.5.13:
   dependencies:
     moment ">= 2.9.0"
 
-"moment@>= 2.9.0", moment@>=1.6.0, moment@^2.18.1:
-  version "2.18.1"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.18.1.tgz#c36193dd3ce1c2eed2adb7c802dbbc77a81b1c0f"
-
-moment@>=2.5.0, moment@~2.10.6:
+"moment@>= 2.9.0", moment@>=1.6.0, moment@>=2.5.0, moment@~2.10.6:
   version "2.10.6"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.10.6.tgz#6cb21967c79cba7b0ca5e66644f173662b3efa77"
+
+moment@^2.18.1:
+  version "2.18.1"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.18.1.tgz#c36193dd3ce1c2eed2adb7c802dbbc77a81b1c0f"
 
 moxios@^0.3.0:
   version "0.3.0"
