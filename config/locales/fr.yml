@@ -6407,6 +6407,8 @@ fr:
   due_date_cannot_fall_in_a_closed_grading_period_e4336124: "La date limite ne peut être fixée à une période non ouverte à la notation"
   due_date_falls_in_a_closed_grading_period_e447ff2f: "Cette date limite se trouve dans une période non ouverte à la notation"
   due_date_field_for_styleguide_a88e02d6: "Champ 'Échéance' du guide stylistique"
+  due_date_newest_to_oldest_35cffef9: "Date limite – Du plus récent au plus ancien"
+  due_date_oldest_to_newest_73e62815: "Date limite – Du plus ancien au plus récent"
   due_date_set_1c6364db: "Fixer la date d'échéance"
   due_dates: 
     due_at: "échéance : %{assignment_due_date_time}"
