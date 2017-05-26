@@ -149,6 +149,7 @@ define [
           @$el.find('a.btn').addClass 'default_permission'
           @setSystemDefault()
           break
+      return
 
     handleKeydown: (event) ->
       if (event.keyCode == 32 || event.keyCode == 13)

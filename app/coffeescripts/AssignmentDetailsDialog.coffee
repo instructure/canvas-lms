@@ -34,10 +34,7 @@ define [
         width: 500
         close: -> $(this).remove()
 
-    compute: (opts={
-      students: @students
-      assignment: @assignment
-    })=>
+    compute: (opts={students: @students, assignment: @assignment})=>
       {students, assignment} = opts
       scores = (student["assignment_#{assignment.id}"].score for idx, student of students when student["assignment_#{assignment.id}"]?.score?)
       locals =

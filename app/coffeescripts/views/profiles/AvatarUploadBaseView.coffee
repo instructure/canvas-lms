@@ -19,9 +19,9 @@ define ['jquery', 'Backbone'], ($, Backbone) ->
 
   class AvatarUploadBaseView extends Backbone.View
 
-    setup: $.noop
+    setup: ->
 
-    teardown: $.noop
+    teardown: ->
 
     render: ->
       super

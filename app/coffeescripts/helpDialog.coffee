@@ -49,9 +49,10 @@ define [
         title: @defaultTitle
         close: => @switchTo('#help-dialog-options')
 
-      @$dialog.dialog('widget').delegate 'a[href="#teacher_feedback"],
-                                          a[href="#create_ticket"],
-                                          a[href="#help-dialog-options"]', 'click', preventDefault ({currentTarget}) =>
+      switchingLinks = 'a[href="#teacher_feedback"],
+                        a[href="#create_ticket"],
+                        a[href="#help-dialog-options"]'
+      @$dialog.dialog('widget').delegate switchingLinks, 'click', preventDefault ({currentTarget}) =>
         @switchTo $(currentTarget).attr('href')
 
       @helpLinksDfd = $.getJSON('/help_links').done (links) =>
