@@ -17,12 +17,14 @@
 #
 
 module Plannable
+  ACTIVE_WORKFLOW_STATES = ['active', 'published'].freeze
 
   def self.included(base)
     base.class_eval do
       has_many :planner_overrides, as: :plannable
       after_save :update_associated_planner_overrides
       before_save :check_if_associated_planner_overrides_need_updating
+      scope :available_to_planner, -> { where(workflow_state: ACTIVE_WORKFLOW_STATES) }
     end
   end
 

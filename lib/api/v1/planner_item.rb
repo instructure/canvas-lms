@@ -46,14 +46,15 @@ module Api::V1::PlannerItem
         hash[:plannable_type] = 'wiki_page'
         hash[:plannable] = wiki_page_json(item, user, session)
         hash[:html_url] = item.url
-      elsif item.discussion_topic? && item.discussion_topic.is_announcement
+      elsif item.is_a?(Announcement)
         hash[:plannable_type] = 'announcement'
         hash[:plannable] = discussion_topic_api_json(item.discussion_topic, item.discussion_topic.context, user, session)
         hash[:html_url] = named_context_url(item.discussion_topic.context, :context_discussion_topic_url, item.discussion_topic.id)
-      elsif item.discussion_topic?
+      elsif item.is_a?(DiscussionTopic) || (item.respond_to?(:discussion_topic?) && item.discussion_topic?)
+        topic = item.is_a?(DiscussionTopic) ? item : item.discussion_topic
         hash[:plannable_type] = 'discussion_topic'
-        hash[:plannable] = discussion_topic_api_json(item.discussion_topic, item.discussion_topic.context, user, session)
-        hash[:html_url] = named_context_url(item.discussion_topic.context, :context_discussion_topic_url, item.discussion_topic.id)
+        hash[:plannable] = discussion_topic_api_json(topic, topic.context, user, session)
+        hash[:html_url] = named_context_url(topic.context, :context_discussion_topic_url, topic.id)
       else
         hash[:plannable_type] = 'assignment'
         hash[:plannable] = assignment_json(item, user, session, include_discussion_topic: true)

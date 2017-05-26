@@ -40,7 +40,7 @@ class DiscussionTopic < ActiveRecord::Base
                                :lock_at, :pinned, :locked, :allow_rating, :only_graders_can_rate, :sort_by_rating]
   restrict_assignment_columns
 
-  attr_accessor :user_has_posted, :saved_by, :total_root_discussion_entries
+  attr_accessor :user_has_posted, :saved_by, :total_root_discussion_entries, :todo_type
 
   module DiscussionTypes
     SIDE_COMMENT = 'side_comment'
@@ -480,6 +480,19 @@ class DiscussionTopic < ActiveRecord::Base
     end
     topic_participant
   end
+
+  scope :not_ignored_by, -> (user, purpose) do
+    where("NOT EXISTS (?)", Ignore.where(asset_type: 'DiscussionTopic', user_id: user, purpose: purpose).where("asset_id=discussion_topics.id"))
+  end
+
+  scope :todo_date_between, -> (starting, ending) { where(todo_date: starting...ending) }
+  scope :for_course, -> (course_ids) { joins(:course).where(courses: {id: course_ids}) }
+  scope :for_courses_and_groups, -> (course_ids, group_ids) {
+    where("(discussion_topics.context_type = 'Course'
+          AND discussion_topics.context_id IN (?))
+          OR (discussion_topics.context_type = 'Group'
+          AND discussion_topics.context_id IN (?))", course_ids, group_ids)
+  }
 
   scope :recent, -> { where("discussion_topics.last_reply_at>?", 2.weeks.ago).order("discussion_topics.last_reply_at DESC") }
   scope :only_discussion_topics, -> { where(:type => nil) }

@@ -202,7 +202,8 @@ class PlannerOverridesController < ApplicationController
     set_assignments
     set_pages
     set_planner_notes
-    @planner_items = Api.paginate(@pages + @assignments + @planner_notes, self, api_v1_planner_items_url)
+    set_ungraded_discussions
+    @planner_items = Api.paginate(@discussions + @pages + @assignments + @planner_notes, self, api_v1_planner_items_url)
   end
 
   def set_assignments
@@ -233,6 +234,10 @@ class PlannerOverridesController < ApplicationController
 
   def set_pages
     @pages = @current_user.wiki_pages_needing_viewing(default_opts).each { |p| p.todo_type = 'viewing' }
+  end
+
+  def set_ungraded_discussions
+    @discussions = @current_user.discussion_topics_needing_viewing(default_opts).each { |t| t.todo_type = 'viewing' }
   end
 
   def require_user
