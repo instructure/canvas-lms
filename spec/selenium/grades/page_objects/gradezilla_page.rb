@@ -213,6 +213,18 @@ class Gradezilla
       wait_for_ajax_requests
     end
 
+    def cell_hover(x, y)
+      hover(grading_cell(x, y))
+    end
+
+    def cell_click(x, y)
+      grading_cell(x, y).click
+    end
+
+    def cell_tooltip(x, y)
+      grading_cell(x, y).find('.gradebook-tooltip')
+    end
+
     def cell_graded?(grade, x, y)
       cell = f('.gradebook-cell', grading_cell(x, y))
       cell.text == grade

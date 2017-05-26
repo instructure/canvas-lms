@@ -150,4 +150,18 @@ describe "gradebook" do
       end
     end
   end
+
+  context 'cell tooltip' do
+    before { page.visit_gradebook(@course) }
+
+    it 'is shown on hover' do
+      page.cell_hover(0, 0)
+      expect(page.cell_tooltip(0, 0)).to be_displayed
+    end
+
+    it 'is shown on focus' do
+      page.cell_click(0, 0)
+      expect(page.cell_tooltip(0, 0)).to be_displayed
+    end
+  end
 end

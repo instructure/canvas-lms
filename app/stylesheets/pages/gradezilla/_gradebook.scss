@@ -260,38 +260,22 @@ $header_height: 38px;
 @mixin first-row-tooltip() {
   top: 35px;
   &:after {
+    display: none;
+  }
+  &:before {
+    border-color: #444444 transparent;
+    border-style: solid;
+    border-width: 5px 5px 0;
+    position: absolute;
+    width: 0;
+    left: 15px;
+    content: "";
     border-top-color: transparent;
     border-left-color: transparent;
     border-right-color: transparent;
     border-bottom: 5px solid #444444;
-    bottom: 30px;
+    top: -10px;
   }
-}
-
-// We need both visibility and opacity because visibility is binary but opacity will allow fading in/out
-@keyframes fade-in-and-out {
-  0%   { opacity: 0; visibility: hidden; }
-  1%   { opacity: 0; visibility: visible; }
-  75%  { opacity: 1; visibility: visible; }
-  100% { opacity: 0; visibility: hidden; }
-}
-@-o-keyframes fade-in-and-out {
-  0%   { opacity: 0; visibility: hidden; }
-  1%   { opacity: 0; visibility: visible; }
-  75%  { opacity: 1; visibility: visible; }
-  100% { opacity: 0; visibility: hidden; }
-}
-@-moz-keyframes fade-in-and-out {
-  0%   { opacity: 0; visibility: hidden; }
-  1%   { opacity: 0; visibility: visible; }
-  75%  { opacity: 1; visibility: visible; }
-  100% { opacity: 0; visibility: hidden; }
-}
-@-webkit-keyframes fade-in-and-out {
-  0%   { opacity: 0; visibility: hidden; }
-  1%   { opacity: 0; visibility: visible; }
-  75%  { opacity: 1; visibility: visible; }
-  100% { opacity: 0; visibility: hidden; }
 }
 
 .gradebook-tooltip {
@@ -306,6 +290,7 @@ $header_height: 38px;
   font-size: 0.8em;
   left: 0;
   top: -30px;
+  line-height: 1rem;
   &:after {
     border-color: #444444 transparent;
     border-style: solid;
@@ -323,10 +308,6 @@ $header_height: 38px;
   .slick-cell.active &, .slick-cell.editable & {
     visibility: visible;
     opacity: 1;
-    -webkit-animation: fade-in-and-out 2s 1 forwards;
-    -moz-animation: fade-in-and-out 2s 1 forwards;
-    -o-animation: fade-in-and-out 2s 1 forwards;
-    animation: fade-in-and-out 2s 1 forwards;
   }
   &.first-row {
     @include first-row-tooltip();

@@ -131,6 +131,18 @@ module Gradebook
       grade_input(cell).send_keys(:return)
     end
 
+    def cell_hover(x, y)
+      hover(grading_cell(x, y))
+    end
+
+    def cell_click(x, y)
+      grading_cell(x, y).click
+    end
+
+    def cell_tooltip(x, y)
+      grading_cell(x, y).find('.gradebook-tooltip')
+    end
+
     def cell_graded?(grade, x_coordinate, y_coordinate)
       cell = grading_cell(x_coordinate, y_coordinate)
       if cell.text == grade
