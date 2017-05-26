@@ -13,16 +13,7 @@ CanvasSchema = GraphQL::Schema.define do
   object_from_id ->(relay_id, ctx) {
     type, id = GraphQL::Schema::UniqueWithinType.decode(relay_id)
 
-    check_read_permission = ->(o) {
-      o.grants_right?(ctx[:current_user], ctx[:session], :read) ? o : nil
-    }
-
-    case type
-    when "Course"
-      Loaders::IDLoader.for(Course).load(id).then(check_read_permission)
-    when "Assignment"
-      Loaders::IDLoader.for(Assignment).load(id).then(check_read_permission)
-    end
+    GqlNodeLoader.load(type, id, ctx)
   }
 
   resolve_type ->(obj, ctx) {
