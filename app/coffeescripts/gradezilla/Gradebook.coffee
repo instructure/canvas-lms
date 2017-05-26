@@ -1530,7 +1530,7 @@ define [
 
     onGridKeyDown: (event, obj) =>
       column = obj.grid.getColumns()[obj.cell]
-      if column.type == 'student' and event.which == 13
+      if column?.type == 'student' and event.which == 13
         event.originalEvent.skipSlickGridDefaults = true
 
     # Column Header Cell Event Handlers
