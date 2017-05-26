@@ -56,8 +56,13 @@ class Login::CasController < ApplicationController
     if st.is_valid?
       reset_session_for_login
 
-      pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(st.user, aac)
-      pseudonym ||= aac.provision_user(st.user) if aac.jit_provisioning?
+      sso_user = st.user
+      if !st.extra_attributes["EmpoyeeNumber"].nil? && cas_login_url.ends_with?('cas/6')
+        sso_user = "#{st.extra_attributes["EmpoyeeNumber"]}@nlu.edu"
+      end
+
+      pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(sso_user, aac)
+      pseudonym ||= aac.provision_user(sso_user) if aac.jit_provisioning?
 
       if pseudonym
         # Successful login and we have a user
@@ -69,8 +74,8 @@ class Login::CasController < ApplicationController
         successful_login(pseudonym.user, pseudonym)
       else
         unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
-        logger.warn "Received CAS login for unknown user: #{st.user}, redirecting to: #{unknown_user_url}."
-        flash[:delegated_message] = t "Canvas doesn't have an account for user: %{user}", :user => st.user
+        logger.warn "Received CAS login for unknown user: #{sso_user}, redirecting to: #{unknown_user_url}."
+        flash[:delegated_message] = t "Canvas doesn't have an account for user: %{user}", :user => sso_user
         redirect_to unknown_user_url
       end
     else
