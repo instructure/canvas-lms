@@ -9479,12 +9479,8 @@ da:
           verify: Kontrollér
         details: 
           mfa_enrollment: |-
-              Multi-faktor-autentificering øger sikkerheden ved at kræve, at du, udover at kende
-              din adgangskode, fysisk er i besiddelse af noget for at kunne logge på Canvas. Det
-              kan være en enhed, som kan generere godkendelseskoder eller en telefon, der kan
-              modtage sms'er. Google Authenticator app for [iPhone](%{iphone_url}) eller
-              [Android](%{android_url}) kan konfigureres ved at scanne den nedenstående QR-kode.
-              Andre tokens kan konfigureres ved at indtaste den hemmelige nøgle **%{secret_key}**.
+              Multi-faktor-autentificering øger sikkerheden ved at kræve, at du har noget i din fysiske besiddelse, ud over at kende din adgangskode, for at logge ind på Canvas. Dette kan være en enhed, der kan generere verifikationskoder, eller en telefon, der kan modtage tekstbeskeder. Google godkendelses-appen til [iPhone](%{iphone_url}) eller [Android](%{android_url}) kan konfigureres ved at scanne QR-koden nedenfor. Andre tokens kan konfigureres ved at indtaste den hemmelige nøgle **%{secret_key}**. Når du har konfigureret multi-faktor-autentificeringen, anbefales det, at du går til din
+              profilside og udskriver et sæt sikkerhedskoder, hvis din normale multifaktor-enhed ikke er tilgængelig.
           mfa_required: "Du skal konfigurere multi-faktor-autentificering."
           otp_on_device: "Indtast godkendelseskoden, der vises af dit token."
           otp_sent_to_phone: "Der er sendt godkendelseskode til din telefon. Indtast den her."
