@@ -72,6 +72,19 @@ describe Attachment do
     end
   end
 
+  context "authenticated_s3_url s3_storage" do
+    before :each do
+      s3_storage!
+    end
+
+    it "should give back a signed s3 url" do
+      a = attachment_model
+      s3object = a.s3object
+      expect(a.authenticated_s3_url(expires_in: 1.day)).to match(/^https:\/\//)
+      a.destroy_permanently!
+    end
+  end
+
   def configure_crocodoc
     PluginSetting.create! :name => 'crocodoc',
                           :settings => { :api_key => "blahblahblahblahblah" }
