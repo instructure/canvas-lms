@@ -2091,13 +2091,11 @@ describe User do
     end
 
     it 'should not show for users not enrolled in course' do
-      page1 = @page
-      page1.todo_date = 1.day.from_now
-      page1.save!
+      @page.todo_date = 1.day.from_now
+      @page.save!
       user1 = @student
       course_with_student(active_all: true)
-      wiki_page_model(course: @course)
-      expect(user1.wiki_pages_needing_viewing(opts)).to eq [page1]
+      expect(user1.wiki_pages_needing_viewing(opts)).to eq [@page]
       expect(@student.wiki_pages_needing_viewing(opts)).to eq []
     end
 
@@ -2115,13 +2113,76 @@ describe User do
   end
 
   describe "discussion_topics_needing_viewing" do
-    before(:each) do
-      course_with_student(active_all: true)
-      discussion_topic_model(context: @course)
-      @topic.publish!
-    end
-
     let(:opts) { {due_after: 1.day.ago, due_before: 2.days.from_now} }
+
+    context 'course discussions' do
+      before(:each) do
+        course_with_student(active_all: true)
+        discussion_topic_model(context: @course)
+        group_discussion_topic_model(context: @course)
+        announcement_model(context: @course)
+        @topic.publish!
+        @group_topic.publish!
+        @a.publish!
+      end
+
+      it 'should show for ungraded discussion topics with todo dates within the opts date range' do
+        @topic.todo_date = 1.day.from_now
+        @topic.save!
+        @group_topic.todo_date = 1.day.from_now
+        @group_topic.save!
+        expect(@student.discussion_topics_needing_viewing(opts).sort_by(&:id)).to eq [@topic, @group_topic, @a]
+      end
+
+      it 'should not show for ungraded discussion topics with todo dates outside the range' do
+        @topic.todo_date = 3.days.ago
+        @topic.save!
+        @group_topic.todo_date = 3.days.ago
+        @group_topic.save!
+        @a.posted_at = 3.days.ago
+        @a.save!
+        expect(@student.discussion_topics_needing_viewing(opts)).to eq []
+      end
+
+      it 'should not show for ungraded discussion topics without todo dates' do
+        expect(@student.discussion_topics_needing_viewing(opts)).to eq [@a]
+      end
+
+      it 'should not show unpublished discussion topics' do
+        teacher_in_course(course: @course)
+        @topic.workflow_state = 'unpublished'
+        @topic.todo_date = 1.day.from_now
+        @topic.save!
+        @group_topic.workflow_state = 'unpublished'
+        @group_topic.todo_date = 1.day.from_now
+        @group_topic.save!
+        @a.delayed_post_at = 1.day.from_now
+        @a.workflow_state = 'post_delayed'
+        @a.save!
+        expect(@student.discussion_topics_needing_viewing(opts)).to eq []
+        expect(@teacher.discussion_topics_needing_viewing(opts)).to eq []
+      end
+
+      it 'should not show for users not enrolled in course' do
+        @topic.todo_date = 1.day.from_now
+        @topic.save!
+        @group_topic.todo_date = 1.day.from_now
+        @group_topic.save!
+        user1 = @student
+        course_with_student(active_all: true)
+        expect(user1.discussion_topics_needing_viewing(opts).sort_by(&:id)).to eq [@topic, @group_topic, @a]
+        expect(@student.discussion_topics_needing_viewing(opts)).to eq []
+      end
+
+      it 'should not show discussions that are graded' do
+        a = @course.assignments.create!(title: "some assignment", points_possible: 5)
+        t = @course.discussion_topics.build(assignment: a, title: "some topic", message: "a little bit of content")
+        t.save
+        expect(t.assignment_id).to eql(a.id)
+        expect(t.assignment).to eql(a)
+        expect(@student.discussion_topics_needing_viewing(opts)).not_to include t
+      end
+    end
 
     context 'discussions made within groups' do
       before(:each) do
@@ -2144,7 +2205,7 @@ describe User do
         @course_topic.save!
         @account_topic.todo_date = 1.day.from_now
         @account_topic.save!
-        topics = [@course_topic, @account_topic].sort_by(&:id)
+        topics = [@course_topic, @course_announcement, @account_topic, @account_announcement]
         expect(@student.discussion_topics_needing_viewing(opts).sort_by(&:id)).to eq topics
       end
 
@@ -2161,7 +2222,8 @@ describe User do
       end
 
       it 'should not show for ungraded discussion topics without todo dates' do
-        expect(@student.discussion_topics_needing_viewing(opts)).to eq []
+        topics = [@course_announcement, @account_announcement]
+        expect(@student.discussion_topics_needing_viewing(opts).sort_by(&:id)).to eq topics
       end
 
       it 'should not show unpublished discussion topics' do
@@ -2189,62 +2251,12 @@ describe User do
         @course_topic.save!
         @account_topic.todo_date = 1.day.from_now
         @account_topic.save!
-        @course_announcement.todo_date = 1.day.from_now
-        @course_announcement.save!
-        @account_announcement.todo_date = 1.day.from_now
-        @account_announcement.save!
         user1 = @student
         course_with_student(active_all: true)
-        topics = [@course_topic, @course_announcement, @account_topic, @account_announcement].sort_by(&:id)
+        topics = [@course_topic, @course_announcement, @account_topic, @account_announcement]
         expect(user1.discussion_topics_needing_viewing(opts).sort_by(&:id)).to eq topics
         expect(@student.discussion_topics_needing_viewing(opts)).to eq []
       end
-    end
-
-    it 'should show for ungraded discussion topics with todo dates within the opts date range' do
-      @topic.todo_date = 1.day.from_now
-      @topic.save!
-      expect(@student.discussion_topics_needing_viewing(opts)).to eq [@topic]
-    end
-
-    it 'should not show for ungraded discussion topics with todo dates outside the range' do
-      @topic.todo_date = 3.days.ago
-      @topic.save!
-      expect(@student.discussion_topics_needing_viewing(opts)).to eq []
-    end
-
-    it 'should not show for ungraded discussion topics without todo dates' do
-      expect(@student.discussion_topics_needing_viewing(opts)).to eq []
-    end
-
-    it 'should not show unpublished discussion topics' do
-      teacher_in_course(course: @course)
-      @topic.workflow_state = 'unpublished'
-      @topic.todo_date = 1.day.from_now
-      @topic.save!
-      expect(@student.discussion_topics_needing_viewing(opts)).to eq []
-      expect(@teacher.discussion_topics_needing_viewing(opts)).to eq []
-    end
-
-    it 'should not show discussions that are graded' do
-      a = @course.assignments.create!(:title => "some assignment", :points_possible => 5)
-      t = @course.discussion_topics.build(:assignment => a, :title => "some topic", :message => "a little bit of content")
-      t.save
-      expect(t.assignment_id).to eql(a.id)
-      expect(t.assignment).to eql(a)
-      expect(@student.discussion_topics_needing_viewing(opts)).to eq []
-    end
-
-    it 'should not show for users not enrolled in course' do
-      discussion1 = @topic
-      discussion1.todo_date = 1.day.from_now
-      discussion1.save!
-      discussion1.publish!
-      user1 = @student
-      course_with_student(active_all: true)
-      discussion_topic_model(:context => @course)
-      expect(user1.discussion_topics_needing_viewing(opts)).to eq [discussion1]
-      expect(@student.discussion_topics_needing_viewing(opts)).to eq []
     end
   end
 

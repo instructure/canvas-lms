@@ -482,17 +482,21 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   scope :not_ignored_by, -> (user, purpose) do
-    where("NOT EXISTS (?)", Ignore.where(asset_type: 'DiscussionTopic', user_id: user, purpose: purpose).where("asset_id=discussion_topics.id"))
+    where("NOT EXISTS (?)", Ignore.where(asset_type: 'DiscussionTopic', user_id: user, purpose: purpose).
+      where("asset_id=discussion_topics.id"))
   end
 
-  scope :todo_date_between, -> (starting, ending) { where(todo_date: starting...ending) }
+  scope :todo_date_between, -> (starting, ending) do
+    where("(discussion_topics.type = 'Announcement' AND posted_at BETWEEN :start_at and :end_at)
+           OR todo_date BETWEEN :start_at and :end_at", {start_at: starting, end_at: ending})
+  end
   scope :for_course, -> (course_ids) { joins(:course).where(courses: {id: course_ids}) }
-  scope :for_courses_and_groups, -> (course_ids, group_ids) {
+  scope :for_courses_and_groups, -> (course_ids, group_ids) do
     where("(discussion_topics.context_type = 'Course'
           AND discussion_topics.context_id IN (?))
           OR (discussion_topics.context_type = 'Group'
           AND discussion_topics.context_id IN (?))", course_ids, group_ids)
-  }
+  end
 
   scope :recent, -> { where("discussion_topics.last_reply_at>?", 2.weeks.ago).order("discussion_topics.last_reply_at DESC") }
   scope :only_discussion_topics, -> { where(:type => nil) }
