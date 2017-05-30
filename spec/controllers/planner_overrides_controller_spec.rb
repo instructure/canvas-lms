@@ -75,6 +75,16 @@ describe PlannerOverridesController do
           expect(page["plannable_type"]).to eq 'wiki_page'
           expect(page["type"]).to eq 'viewing'
         end
+
+        it "should show planner notes for the user" do
+          planner_note_model(course: @course)
+          get :items_index
+          response_json = json_parse(response.body)
+          expect(response_json.length).to eq 3
+          note = response_json.select { |i| i["plannable_type"] == 'planner_note' }.first
+          expect(note["type"]).to eq 'viewing'
+          expect(note["plannable"]["title"]).to eq @planner_note.title
+        end
       end
 
       describe "GET #index" do

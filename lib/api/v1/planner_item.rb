@@ -17,6 +17,7 @@
 #
 
 module Api::V1::PlannerItem
+  include Api::V1::Json
   include Api::V1::Assignment
   include Api::V1::Quiz
   include Api::V1::Context
@@ -31,7 +32,11 @@ module Api::V1::PlannerItem
       :visible_in_planner => item.visible_in_planner_for?(user),
       :planner_override => item.planner_override_for(user)
     }).tap do |hash|
-      if item.is_a?(Quizzes::Quiz) || (item.respond_to?(:quiz?) && item.quiz?)
+      if item.is_a?(PlannerNote)
+        hash[:plannable_type] = 'planner_note'
+        hash[:plannable] = api_json(item, user, session)
+        hash[:html_url] = api_v1_planner_notes_url(item.id)
+      elsif item.is_a?(Quizzes::Quiz) || (item.respond_to?(:quiz?) && item.quiz?)
         quiz = item.is_a?(Quizzes::Quiz) ? item : item.quiz
         hash[:plannable_type] = 'quiz'
         hash[:plannable] = quiz_json(quiz, quiz.context, user, session)

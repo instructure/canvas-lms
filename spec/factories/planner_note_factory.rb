@@ -15,14 +15,20 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-#
-class PlannerNote < ActiveRecord::Base
-  include Canvas::SoftDeletable
-  include Plannable
-  belongs_to :user
-  belongs_to :course
-  validates_presence_of :user_id, :title, :todo_date, :workflow_state
 
-  attr_accessor :todo_type
+module Factories
+  def planner_note_model(opts={})
+    user = opts[:user] || @user || user_model
+    attrs = { user_id: user.id }.merge(opts)
+    @planner_note = PlannerNote.create!(valid_planner_note_attributes.merge(attrs))
+  end
+
+  def valid_planner_note_attributes
+    {
+      :title => 'note title',
+      :details => 'note details',
+      :workflow_state => 'active',
+      :todo_date => Date.today
+    }
+  end
 end
-

@@ -59,12 +59,14 @@ module Plannable
     root_account_for_model(self).feature_enabled?(:student_planner)
   end
 
-  def root_account_for_model(klass)
-    case klass
+  def root_account_for_model(base)
+    case base
+    when PlannerNote
+      base.user.account
     when Assignment
-      klass.context.root_account
+      base.context.root_account
     else
-      klass.course.root_account
+      base.course.root_account
     end
   end
 end

@@ -201,7 +201,8 @@ class PlannerOverridesController < ApplicationController
   def set_planner_items
     set_assignments
     set_pages
-    @planner_items = Api.paginate(@pages + @assignments, self, api_v1_planner_items_url)
+    set_planner_notes
+    @planner_items = Api.paginate(@pages + @assignments + @planner_notes, self, api_v1_planner_items_url)
   end
 
   def set_assignments
@@ -211,6 +212,10 @@ class PlannerOverridesController < ApplicationController
     @ungraded_quiz = @current_user.ungraded_quizzes_needing_submitting(default_opts).each { |a| a.todo_type = 'submitting' }
     @submitted = @current_user.submitted_assignments(default_opts).each { |a| a.todo_type = 'submitted' }
     @assignments = @grading + @submitted + @ungraded_quiz + @submitting + @moderation
+  end
+
+  def set_planner_notes
+    @planner_notes = PlannerNote.where(user: @current_user, todo_date: @due_after...@due_before).each { |pn| pn.todo_type = 'viewing' }
   end
 
   def set_date_range
