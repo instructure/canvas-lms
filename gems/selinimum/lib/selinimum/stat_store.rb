@@ -84,9 +84,7 @@ module Selinimum
         objects.each do |object|
           file_name = object.key.sub(prefix, "")
           File.open("#{dest}/#{file_name}", "wb") do |file|
-            object.get do |chunk|
-              file.write(chunk)
-            end
+            file.write object.get.body.read
           end
         end
       end
