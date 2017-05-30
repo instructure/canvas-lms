@@ -1549,7 +1549,7 @@ nn:
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "Det oppstod ein feil under førebuing av nedlasting. Prøv på nytt seinare."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Det oppstod ein feil under innstilling av bruksretten for %{filename}"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "Ein feil oppstod ved forsøk på å kontakte Turnitin"
-  an_error_occurred_while_migrating_405ac0b5: "Det oppstod ein feil under migreringa."
+  an_error_occurred_while_migrating_405ac0b5: "Det oppstod ein feil under overføringa."
   an_error_ocurred_while_deleting_the_appointment_gr_4948bbc5: "Det oppstod eit problem under sletting av avtalegruppa"
   an_error_ocurred_while_saving_the_appointment_grou_e19452cd: "Det oppstod eit problem under lagring av avtalegruppa"
   an_export_is_already_in_progress_54270f01: "Ein eksport er allereie i gang."
