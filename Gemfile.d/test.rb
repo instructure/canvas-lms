@@ -51,6 +51,7 @@ group :test do
   gem 'selenium-webdriver', '2.53.4'
     gem 'childprocess', '0.5.9', require: false
     gem 'websocket', '1.2.3', require: false
+  gem 'chromedriver-helper', require: false
   gem 'selinimum', '0.0.1', require: false, path: 'gems/selinimum'
   gem 'test_after_commit', '1.1.0' if CANVAS_RAILS4_2
   gem 'test-queue', github: 'jenseng/test-queue', ref: '1b92ebbca70705599c78a1bad5b16d6a37f741f2', require: false
