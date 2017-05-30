@@ -43,6 +43,9 @@ class GradingPeriod < ActiveRecord::Base
     )
   end
 
+  scope :closed, -> { where("grading_periods.close_date < ?", Time.zone.now) }
+  scope :open, -> { where("grading_periods.close_date IS NULL OR grading_periods.close_date >= ?", Time.zone.now) }
+
   scope :grading_periods_by, ->(context_with_ids) do
     joins(:grading_period_group).where(grading_period_groups: context_with_ids).readonly(false)
   end

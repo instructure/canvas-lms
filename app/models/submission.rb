@@ -182,6 +182,7 @@ class Submission < ActiveRecord::Base
       late_policy_status is distinct from 'missing' and
       (
         -- submission is not past due or
+        cached_due_date is null or
         COALESCE(submitted_at, CURRENT_TIMESTAMP) < cached_due_date +
           CASE submission_type WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END or
         -- submission is submitted or
@@ -233,21 +234,25 @@ class Submission < ActiveRecord::Base
   #
   # y = A + B'CDE + BCDF
   #
-  def self.late
-    submissions_that_could_be_late = where(late_policy_status: nil).
-      where.not(submitted_at: nil).
-      where.not(cached_due_date: nil)
+  scope :late, -> do
+    left_joins(:quiz_submission).
+    where("
+      submissions.late_policy_status = 'late' OR
+      (submissions.late_policy_status IS NULL AND submissions.submitted_at >= submissions.cached_due_date +
+         CASE submissions.submission_type WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END
+         AND (submissions.quiz_submission_id IS NULL OR quiz_submissions.workflow_state = 'complete'))
+    ")
+  end
 
-    late_quizzes = submissions_that_could_be_late.
-      where(submission_type: 'online_quiz').
-      where("submissions.submitted_at - '60 seconds'::INTERVAL > submissions.cached_due_date").
-      joins(:quiz_submission).merge(Quizzes::QuizSubmission.completed)
-
-    late_non_quizzes = submissions_that_could_be_late.
-      where.not(submission_type: 'online_quiz').
-      where("submissions.submitted_at > submissions.cached_due_date")
-
-    where(late_policy_status: 'late').union(late_quizzes.union(late_non_quizzes))
+  scope :not_late, -> do
+    left_joins(:quiz_submission).
+    where("
+      submissions.late_policy_status is distinct from 'late' AND
+      (submissions.submitted_at IS NULL OR submissions.cached_due_date IS NULL OR
+        submissions.submitted_at < submissions.cached_due_date +
+          CASE submissions.submission_type WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END
+        OR quiz_submissions.workflow_state <> 'complete')
+    ")
   end
 
   workflow do
@@ -1323,7 +1328,7 @@ class Submission < ActiveRecord::Base
 
   # apply_late_policy is called directly by bulk update processes, or indirectly by before_save on a Submission
   def apply_late_policy(late_policy=nil, points_possible=nil, grading_type=nil)
-    return if points_deducted_changed?
+    return if points_deducted_changed? || grading_period&.closed?
     late_policy ||= assignment.course.late_policy
     points_possible ||= assignment.points_possible
     grading_type ||= assignment.grading_type
@@ -1364,7 +1369,7 @@ class Submission < ActiveRecord::Base
 
   def late_policy_relevant_changes?
     return false unless grade_matches_current_submission
-    changes.slice(:score, :submitted_at, :seconds_late_override, :late_policy_status, :cached_due_date).any?
+    changes.slice(:score, :submitted_at, :seconds_late_override, :late_policy_status).any?
   end
   private :late_policy_relevant_changes?
 
@@ -1403,9 +1408,7 @@ class Submission < ActiveRecord::Base
 
     student_id = user_id || self.user.try(:id)
 
-    # TODO: replace this check with `grading_period&.closed?` once
-    # the populate_grading_period_for_submissions data fixup finishes
-    if assignment.in_closed_grading_period_for_student?(student_id)
+    if grading_period&.closed?
       :assignment_in_closed_grading_period
     else
       :success
@@ -1433,9 +1436,7 @@ class Submission < ActiveRecord::Base
 
     student_id = self.user_id || self.user.try(:id)
 
-    # TODO: replace this check with `grading_period&.closed?` once
-    # the populate_grading_period_for_submissions data fixup finishes
-    if assignment.in_closed_grading_period_for_student?(student_id)
+    if grading_period&.closed?
       :assignment_in_closed_grading_period
     else
       :success

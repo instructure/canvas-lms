@@ -4181,54 +4181,30 @@ describe Assignment do
     end
   end
 
-  describe '#effective_due_dates' do
-    before(:each) do
-      @assignment = @course.assignments.new(id: 42)
-    end
-
-    it 'returns an instance of EffectiveDueDates' do
-      expected_result = mock()
-      EffectiveDueDates.expects(:for_course).with(@course, 42).returns(expected_result)
-
-      expect(@assignment.effective_due_dates).to eq(expected_result)
-    end
-
-    it 'memoizes the EffectiveDueDates object' do
-      expected_result = mock()
-      EffectiveDueDates.expects(:for_course).with(@course, 42).returns(expected_result).once
-
-      expect(@assignment.effective_due_dates).to eq(expected_result)
-      expect(@assignment.effective_due_dates).to eq(expected_result)
-    end
-  end
-
   describe '#in_closed_grading_period?' do
-    before(:each) do
-      @assignment = @course.assignments.new(id: 42)
-      @edd_double = mock()
-      @assignment.expects(:effective_due_dates).returns(@edd_double)
+    it 'returns true if any submissions are in a closed grading period' do
+      create_grading_periods_for(@course, grading_periods: [:old, :current])
+      assignment_model(course: @course, due_at: 3.months.ago)
+      expect(@assignment.in_closed_grading_period?).to be true
     end
 
-    it 'delegates to EffectiveDueDates#in_closed_grading_period?' do
-      @edd_status = mock()
-      @edd_double.expects(:in_closed_grading_period?).with(42).returns(@edd_status)
-
-      expect(@assignment.in_closed_grading_period?).to eq(@edd_status)
-    end
-  end
-
-  describe '#in_closed_grading_period_for_student?' do
-    before(:each) do
-      @assignment = @course.assignments.new(id: 42)
-      @edd_double = mock()
-      @assignment.expects(:effective_due_dates).returns(@edd_double)
+    it 'returns false if no submissions are in a closed grading period' do
+      create_grading_periods_for(@course, grading_periods: [:old, :current])
+      assignment_model(course: @course)
+      expect(@assignment.in_closed_grading_period?).to be false
     end
 
-    it 'delegates to EffectiveDueDates#in_closed_grading_period?' do
-      @edd_status = mock()
-      @edd_double.expects(:in_closed_grading_period?).with(42, 41).returns(@edd_status)
+    it 'returns false if there are no grading periods' do
+      assignment_model(course: @course, due_at: 3.months.ago)
+      expect(@assignment.in_closed_grading_period?).to be false
+    end
 
-      expect(@assignment.in_closed_grading_period_for_student?(41)).to eq(@edd_status)
+    it 'returns true if a single submission is in a closed grading period' do
+      create_grading_periods_for(@course, grading_periods: [:old, :current])
+      assignment_model(course: @course)
+      @u2 = student_in_course(active_all: true, user_name: 'another student').user
+      create_adhoc_override_for_assignment(@assignment, @u2, due_at: 3.months.ago)
+      expect(@assignment.in_closed_grading_period?).to be true
     end
   end
 

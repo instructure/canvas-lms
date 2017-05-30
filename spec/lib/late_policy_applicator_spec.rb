@@ -153,6 +153,7 @@ describe LatePolicyApplicator do
           submitted_at: @now - 3.months + 1.hour,
           cached_due_date: @now - 3.months,
           score: 20,
+          grade: 20,
           submission_type: 'online_text_entry'
         )
 
@@ -162,6 +163,7 @@ describe LatePolicyApplicator do
           submitted_at: @now,
           cached_due_date: @now + 1.hour,
           score: 20,
+          grade: 20,
           submission_type: 'online_text_entry'
         )
 
@@ -170,7 +172,8 @@ describe LatePolicyApplicator do
         update_all(
           submitted_at: nil,
           cached_due_date: 1.month.ago(@now),
-          score: nil
+          score: nil,
+          grade: nil
         )
 
       @assignment_in_open_gp = @course.assignments.create!(
@@ -183,6 +186,7 @@ describe LatePolicyApplicator do
           submitted_at: @now - 1.month + 1.hour,
           cached_due_date: @now - 1.month,
           score: 20,
+          grade: 20,
           submission_type: 'online_text_entry'
         )
 
@@ -192,6 +196,7 @@ describe LatePolicyApplicator do
           submitted_at: @now,
           cached_due_date: @now + 1.hour,
           score: 20,
+          grade: 20,
           submission_type: 'online_text_entry'
         )
 
@@ -200,7 +205,8 @@ describe LatePolicyApplicator do
         update_all(
           submitted_at: nil,
           cached_due_date: @now - 1.month,
-          score: nil
+          score: nil,
+          grade: nil
         )
 
       @previously_late_submission = @assignment_in_open_gp.submissions.find_by(user: @students[3])
@@ -209,6 +215,7 @@ describe LatePolicyApplicator do
           submitted_at: @now,
           cached_due_date: @now + 1.hour,
           score: 10,
+          grade: 10,
           points_deducted: 10,
           submission_type: 'online_text_entry'
         )
@@ -216,7 +223,7 @@ describe LatePolicyApplicator do
     end
 
     context 'when the course has no late policy' do
-      it 'applies the late policy to late submissions in the open grading period' do
+      it 'does not apply a late policy to late submissions' do
         @course.late_policy = nil
         @course.save!
         @late_policy_applicator = LatePolicyApplicator.new(@course, [@assignment_in_open_gp])
@@ -228,6 +235,30 @@ describe LatePolicyApplicator do
     end
 
     context 'when the course has a late policy' do
+      it 'does not apply the late policy to submissions unless late_submission_deduction_enabled or missing_submission_deduction_enabled' do
+        @late_policy_applicator = LatePolicyApplicator.new(@course)
+        @late_policy.update_columns(late_submission_deduction_enabled: false, missing_submission_deduction_enabled: false)
+
+        expect(@late_policy_applicator).not_to receive(:process_submission)
+        @late_policy_applicator.process
+      end
+
+      it 'applies the late policy to submissions if late_submission_deduction_enabled' do
+        @late_policy_applicator = LatePolicyApplicator.new(@course)
+        @late_policy.update_columns(late_submission_deduction_enabled: true, missing_submission_deduction_enabled: false)
+
+        expect(@late_policy_applicator).to receive(:process_submission).at_least(:once)
+        @late_policy_applicator.process
+      end
+
+      it 'applies the late policy to submissions if missing_submission_deduction_enabled' do
+        @late_policy_applicator = LatePolicyApplicator.new(@course)
+        @late_policy.update_columns(late_submission_deduction_enabled: false, missing_submission_deduction_enabled: true)
+
+        expect(@late_policy_applicator).to receive(:process_submission).at_least(:once)
+        @late_policy_applicator.process
+      end
+
       it 'applies the late policy to late submissions in the open grading period' do
         @late_policy_applicator = LatePolicyApplicator.new(@course)
 
@@ -238,6 +269,13 @@ describe LatePolicyApplicator do
         @late_policy_applicator = LatePolicyApplicator.new(@course)
 
         expect { @late_policy_applicator.process }.to change { @previously_late_submission.reload.score }.by(+10)
+      end
+
+      it 'does not recalculate late penalties with current due date in the open grading period if late deductions are disabled' do
+        @late_policy.update_column(:late_submission_deduction_enabled, false)
+        @late_policy_applicator = LatePolicyApplicator.new(@course)
+
+        expect { @late_policy_applicator.process }.not_to change { @previously_late_submission.reload.score }
       end
 
       it 'applies the missing policy to missing submissions in the open grading period' do

@@ -49,7 +49,7 @@ class Assignment < ActiveRecord::Base
   restrict_columns :content, [:title, :description]
   restrict_assignment_columns
 
-  has_many :submissions, -> { active }
+  has_many :submissions, -> { active.preload(:grading_period) }
   has_many :all_submissions, class_name: 'Submission', dependent: :destroy
   has_many :provisional_grades, :through => :submissions
   has_many :attachments, :as => :context, :inverse_of => :context, :dependent => :destroy
@@ -81,15 +81,6 @@ class Assignment < ActiveRecord::Base
   validate :moderation_setting_ok?
   validate :assignment_name_length_ok?
   validates :lti_context_id, presence: true, uniqueness: true
-
-  after_save :clear_effective_due_dates_memo
-
-  def clear_effective_due_dates_memo
-    return if @effective_due_dates.nil?
-    if due_at_changed? || active_assignment_overrides.any?(&:due_at_changed?)
-      @effective_due_dates = nil
-    end
-  end
 
   accepts_nested_attributes_for :external_tool_tag, :update_only => true, :reject_if => proc { |attrs|
     # only accept the url, content_tyupe, content_id, and new_tab params, the other accessible
@@ -2443,16 +2434,12 @@ class Assignment < ActiveRecord::Base
     s.excused?
   end
 
-  def effective_due_dates
-    @effective_due_dates ||= EffectiveDueDates.for_course(context, id)
-  end
-
   def in_closed_grading_period?
-    effective_due_dates.in_closed_grading_period?(id)
-  end
-
-  def in_closed_grading_period_for_student?(student)
-    effective_due_dates.in_closed_grading_period?(id, student)
+    if submissions.loaded?
+      submissions.map(&:grading_period).compact.any?(&:closed?)
+    else
+      GradingPeriod.where(id: submissions.except(:preload).select(:grading_period_id)).closed.exists?
+    end
   end
 
   # simply versioned models are always marked new_record, but for our purposes

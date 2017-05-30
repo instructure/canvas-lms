@@ -119,8 +119,8 @@ class GradebookImporter
     effective_due_dates = EffectiveDueDates.for_course(@context, @all_assignments.values)
 
     @original_submissions = @context.submissions
-      .preload(assignment: { context: :account })
-      .select(['submissions.id', :assignment_id, :user_id, :score, :excused, :cached_due_date, 'submissions.updated_at'])
+      .preload(:grading_period, assignment: { context: :account })
+      .select(['submissions.id', :assignment_id, :user_id, :grading_period_id, :score, :excused, :cached_due_date, 'submissions.updated_at'])
       .where(assignment_id: assignment_ids, user_id: user_ids)
       .map do |submission|
         is_gradeable = gradeable?(submission: submission, is_admin: is_admin)
@@ -156,9 +156,10 @@ class GradebookImporter
           new_submission = Submission.new
           new_submission.user = student
           new_submission.assignment = assignment
-          new_submission.cached_due_date =
-            effective_due_dates.find_effective_due_date(student.id, assignment.id).fetch(:due_at, nil)
-          submission['gradeable'] = gradeable?(
+          edd = effective_due_dates.find_effective_due_date(student.id, assignment.id)
+          new_submission.cached_due_date = edd.fetch(:due_at, nil)
+          new_submission.grading_period_id = edd.fetch(:grading_period_id, nil)
+          submission['gradeable'] = !edd.fetch(:in_closed_grading_period, false) && gradeable?(
             submission: new_submission,
             is_admin: is_admin
           )
