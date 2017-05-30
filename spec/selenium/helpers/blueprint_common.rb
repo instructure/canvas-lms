@@ -18,8 +18,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 module BlueprintCourseCommon
-    def change_blueprint_settings(new_default={})
-        @template.update(default_restrictions: new_default)
+    # call this via change_blueprint_settings(content: false,points: true,due_dates: true,availability_dates: true)
+    def change_blueprint_settings(master_blueprint_settings={})
+        @template.update(default_restrictions: master_blueprint_settings)
         @master.reload
     end
 end
