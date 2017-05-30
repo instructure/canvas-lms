@@ -637,6 +637,7 @@ TEXT
   </div>
 </div>
 <% else %>
+  <% js_bundle :confirm_email %>
   <p class="alert alert-info">
     <%= t <<-TEXT, :email => @current_user.email, :wrapper => {'*' => '<a href="' + re_send_confirmation_path(@current_user, @current_user.communication_channel) + '" class="re_send_confirmation_link">\1</a>'}
       Before you can edit your profile, you need to verify your email address (%{email}) by clicking the link in the email we sent you.
