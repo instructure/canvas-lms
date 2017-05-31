@@ -168,7 +168,9 @@ describe "Tutorials" do
       elements = ff('button')
       elements.select{|element| element.text == 'End Tutorial'}.first.click
       elements = ff('button')
-      elements.select{|element| element.text == 'Okay'}.first.click
+      expect_new_page_load do
+        elements.select{|element| element.text == 'Okay'}.first.click
+      end
       get "/profile/settings"
       expect(f('#ff_toggle_new_user_tutorial_on_off')[:checked]).to eq nil
     end
