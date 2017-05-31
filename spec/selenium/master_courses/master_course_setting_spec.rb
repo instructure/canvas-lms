@@ -47,4 +47,11 @@ describe "master courses - settings" do
     f('#account_role_link.ui-tabs-anchor').click()
     expect(driver.find_element(:xpath, "//th[text()[contains(., 'Blueprint')]]")).not_to be nil
   end
+
+  it "prevents creating a blueprint course from associated course", priority: "2", test_id: 3097364 do
+    @associated_course = @template.add_child_course!(course_factory(name: "ac1", active_all: true)).child_course
+    get "/courses/#{@associated_course.id}/settings"
+    expect(f('input[name="course[blueprint]"]').attribute('disabled')).to eq("true")
+  end
 end
+
