@@ -687,16 +687,18 @@ class Attachment < ActiveRecord::Base
         end
       end
     elsif method == :overwrite && atts.any?
-      Attachment.where(:id => atts).update_all(replacement_attachment_id: self.id) # so we can find the new file in content links
-      copy_access_attributes!(atts)
-      atts.each do |a|
-        # update content tags to refer to the new file
-        ContentTag.where(:content_id => a, :content_type => 'Attachment').update_all(content_id: self.id)
-        # update replacement pointers pointing at the overwritten file
-        context.attachments.where(:replacement_attachment_id => a).update_all(replacement_attachment_id: self.id)
-        # delete the overwritten file (unless the caller is queueing them up)
-        a.destroy unless opts[:caller_will_destroy]
-        deleted_attachments << a
+      shard.activate do
+        Attachment.where(:id => atts).update_all(replacement_attachment_id: self.id) # so we can find the new file in content links
+        copy_access_attributes!(atts)
+        atts.each do |a|
+          # update content tags to refer to the new file
+          ContentTag.where(:content_id => a, :content_type => 'Attachment').update_all(content_id: self.id)
+          # update replacement pointers pointing at the overwritten file
+          context.attachments.where(:replacement_attachment_id => a).update_all(replacement_attachment_id: self.id)
+          # delete the overwritten file (unless the caller is queueing them up)
+          a.destroy unless opts[:caller_will_destroy]
+          deleted_attachments << a
+        end
       end
     end
     return deleted_attachments

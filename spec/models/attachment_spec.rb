@@ -871,6 +871,22 @@ describe Attachment do
       expect(a2.display_name).not_to eq 'a1.txt'
       expect(a2.display_name).not_to eq 'a2.txt'
     end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "forms proper queries when run from a different shard" do
+        @shard1.activate do
+          @a.display_name = 'a1'
+          deleted = @a.handle_duplicates(:overwrite)
+          expect(@a.file_state).to eq 'available'
+          @a1.reload
+          expect(@a1.file_state).to eq 'deleted'
+          expect(@a1.replacement_attachment).to eql @a
+          expect(deleted).to eq [ @a1 ]
+        end
+      end
+    end
   end
 
   describe "make_unique_filename" do
