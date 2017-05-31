@@ -26,7 +26,7 @@ import Alert from 'instructure-ui/lib/components/Alert'
 import Heading from 'instructure-ui/lib/components/Heading'
 
 import UnsyncedChange from './UnsyncedChange'
-import { ConnectedEnableNotification as EnableNotification } from './EnableNotification'
+import { ConnectedMigrationOptions as MigrationOptions } from './MigrationOptions'
 
 import actions from '../actions'
 import propTypes from '../propTypes'
@@ -61,7 +61,7 @@ export default class UnsyncedChanges extends Component {
         {this.props.unsyncedChanges.map(change =>
           (<UnsyncedChange key={change.asset_id} change={change} />)
         )}
-        <EnableNotification />
+        <MigrationOptions />
       </div>
     )
   }

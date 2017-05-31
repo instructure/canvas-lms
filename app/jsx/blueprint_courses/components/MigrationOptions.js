@@ -35,19 +35,25 @@ import MigrationStates from '../migrationStates'
 
 const MAX_NOTIFICATION_MESSAGE_LENGTH = 140
 
-export default class EnableNotification extends React.Component {
+export default class MigrationOptions extends React.Component {
   static propTypes = {
     migrationStatus: propTypes.migrationState.isRequired,
     willSendNotification: PropTypes.bool.isRequired,
     willIncludeCustomNotificationMessage: PropTypes.bool.isRequired,
+    willIncludeCourseSettings: PropTypes.bool.isRequired,
     notificationMessage: PropTypes.string.isRequired,
     enableSendNotification: PropTypes.func.isRequired,
     includeCustomNotificationMessage: PropTypes.func.isRequired,
+    includeCourseSettings: PropTypes.func.isRequired,
     setNotificationMessage: PropTypes.func.isRequired,
   }
 
   handleSendNotificationChange = (event) => {
     this.props.enableSendNotification(event.target.checked)
+  }
+
+  handleIncludeCourseSettingsChange = (event) => {
+    this.props.includeCourseSettings(event.target.checked)
   }
 
   handleAddAMessageChange = (event) => {
@@ -68,7 +74,14 @@ export default class EnableNotification extends React.Component {
     const isDisabled = MigrationStates.isLoadingState(this.props.migrationStatus)
     return (
       <div className="bcs__history-notification">
-        <div className="bcs__history-notification__enable">
+        <div className="bcs__history-settings">
+          <Checkbox
+            label={I18n.t('Include Course Settings')}
+            checked={this.props.willIncludeCourseSettings}
+            onChange={this.handleIncludeCourseSettingsChange}
+            size="small"
+            disabled={isDisabled}
+          />
           <Checkbox
             label={I18n.t('Send Notification')}
             checked={this.props.willSendNotification}
@@ -114,6 +127,7 @@ const connectState = state =>
     'willSendNotification',
     'willIncludeCustomNotificationMessage',
     'notificationMessage',
+    'willIncludeCourseSettings'
   ])
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
-export const ConnectedEnableNotification = connect(connectState, connectActions)(EnableNotification)
+export const ConnectedMigrationOptions = connect(connectState, connectActions)(MigrationOptions)

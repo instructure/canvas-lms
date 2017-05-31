@@ -35,7 +35,7 @@ import MigrationStates from '../migrationStates'
 import BlueprintSidebar from './BlueprintSidebar'
 import BlueprintModal from './BlueprintModal'
 import { ConnectedMigrationSync as MigrationSync } from './MigrationSync'
-import { ConnectedEnableNotification as EnableNotification } from './EnableNotification'
+import { ConnectedMigrationOptions as MigrationOptions } from './MigrationOptions'
 
 let UnsyncedChanges = null
 let SyncHistory = null
@@ -262,7 +262,7 @@ export default class CourseSidebar extends Component {
             <Typography>{I18n.t('Unsynced Changes')}</Typography>
           </Button>
           <Typography><span className="bcs__row-right-content">{this.props.unsyncedChanges.length}</span></Typography>
-          <EnableNotification />
+          <MigrationOptions />
         </div>
       )
     }

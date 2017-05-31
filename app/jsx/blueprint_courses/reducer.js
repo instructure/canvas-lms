@@ -178,4 +178,7 @@ export default combineReducers({
   notificationMessage: handleActions({
     [actionTypes.SET_NOTIFICATION_MESSAGE]: (state, action) => action.payload
   }, ''),
+  willIncludeCourseSettings: handleActions({
+    [actionTypes.INCLUDE_COURSE_SETTINGS]: (state, action) => action.payload
+  }, false),
 })

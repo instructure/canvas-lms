@@ -77,9 +77,12 @@ const ApiClient = {
     return axios.get(`/api/v1/courses/${masterCourse.id}/blueprint_templates/default/migrations`)
   },
 
-  beginMigration ({ masterCourse, willSendNotification, willIncludeCustomNotificationMessage, notificationMessage}) {
+  beginMigration ({ masterCourse, willSendNotification, willIncludeCustomNotificationMessage, notificationMessage, willIncludeCourseSettings}) {
     const params = {
-      send_notification: willSendNotification
+      send_notification: willSendNotification,
+    }
+    if (willIncludeCourseSettings) {
+      params.copy_settings = true // don't send parameter if not checked
     }
     if (willIncludeCustomNotificationMessage && notificationMessage) {
       params.comment = notificationMessage

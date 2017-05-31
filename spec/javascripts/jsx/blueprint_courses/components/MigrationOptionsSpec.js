@@ -18,45 +18,48 @@
 
 import React from 'react'
 import * as enzyme from 'enzyme'
-import EnableNotification from 'jsx/blueprint_courses/components/EnableNotification'
+import MigrationOptions from 'jsx/blueprint_courses/components/MigrationOptions'
 import MigrationStates from 'jsx/blueprint_courses/migrationStates'
 
 const noop = () => {}
 
-QUnit.module('EnableNotification component')
+QUnit.module('MigrationOptions component')
 
 const defaultProps = {
   migrationStatus: MigrationStates.states.unknown,
   willSendNotification: false,
   willIncludeCustomNotificationMessage: false,
+  willIncludeCourseSettings: false,
   notificationMessage: '',
   enableSendNotification: noop,
   includeCustomNotificationMessage: noop,
   setNotificationMessage: noop,
+  includeCourseSettings: noop,
 }
 
-test('renders the EnableNotification component', () => {
-  const tree = enzyme.shallow(<EnableNotification {...defaultProps} />)
-  const node = tree.find('.bcs__history-notification')
+test('renders the MigrationOptions component', () => {
+  const tree = enzyme.shallow(<MigrationOptions {...defaultProps} />)
+  const node = tree.find('.bcs__history-settings')
   ok(node.exists())
 })
 
-test('renders the enable checkbox', () => {
-  const tree = enzyme.mount(<EnableNotification {...defaultProps} />)
+test('renders the course-settings and notification-enable checkboxes', () => {
+  const tree = enzyme.mount(<MigrationOptions {...defaultProps} />)
   const checkboxes = tree.find('input[type="checkbox"]')
-  equal(checkboxes.length, 1)
-  equal(checkboxes.node.checked, false)
+  equal(checkboxes.length, 2)
+  equal(checkboxes.get(0).checked, false)
+  equal(checkboxes.get(1).checked, false)
 })
 
 test('renders the add a message checkbox', () => {
   const props = {...defaultProps}
   props.willSendNotification = true
 
-  const tree = enzyme.mount(<EnableNotification {...props} />)
+  const tree = enzyme.mount(<MigrationOptions {...props} />)
   const checkboxes = tree.find('Checkbox')
-  equal(checkboxes.length, 2)
-  equal(checkboxes.get(0).checked, true)
-  equal(checkboxes.get(1).checked, false)
+  equal(checkboxes.length, 3)
+  equal(checkboxes.get(1).checked, true)
+  equal(checkboxes.get(2).checked, false)
   const messagebox = tree.find('TextArea')
   ok(!messagebox.exists())
 })
@@ -66,11 +69,11 @@ test('renders the message text area', () => {
   props.willSendNotification = true
   props.willIncludeCustomNotificationMessage = true
 
-  const tree = enzyme.mount(<EnableNotification {...props} />)
+  const tree = enzyme.mount(<MigrationOptions {...props} />)
   const checkboxes = tree.find('Checkbox')
-  equal(checkboxes.length, 2)
-  equal(checkboxes.get(0).checked, true)
+  equal(checkboxes.length, 3)
   equal(checkboxes.get(1).checked, true)
+  equal(checkboxes.get(2).checked, true)
   const messagebox = tree.find('TextArea')
   ok(messagebox.exists())
 })

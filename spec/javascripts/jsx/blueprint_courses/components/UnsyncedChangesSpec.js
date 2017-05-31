@@ -91,9 +91,9 @@ test('renders the UnsyncedChanges component', () => {
   ok(node.exists())
 })
 
-test('renders the enable notification component', () => {
+test('renders the migration options component', () => {
   const tree = enzyme.mount(connect())
-  const node = tree.find('EnableNotification')
+  const node = tree.find('MigrationOptions')
   ok(node.exists())
 })
 

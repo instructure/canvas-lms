@@ -254,6 +254,13 @@ test('sets willSendNotification on ENABLE_SEND_NOTIFICATION', () => {
   equal(newState.willSendNotification, false)
 })
 
+test('sets willIncludeCourseSettings on INCLUDE_COURSE_SETTINGS', () => {
+  let newState = reduce(actions.includeCourseSettings(true))
+  equal(newState.willIncludeCourseSettings, true)
+  newState = reduce(actions.includeCourseSettings(false))
+  equal(newState.willIncludeCourseSettings, false)
+})
+
 test('creates empty change log entry on SELECT_CHANGE_LOG', () => {
   const newState = reduce(actions.realSelectChangeLog({ changeId: '5' }))
   deepEqual(newState.changeLogs, { 5: {
