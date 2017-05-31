@@ -53,5 +53,13 @@ describe "master courses - settings" do
     get "/courses/#{@associated_course.id}/settings"
     expect(f('input[name="course[blueprint]"]').attribute('disabled')).to eq("true")
   end
+
+  it "prevents blueprinting a course with students", priority: "1", test_id: 3097365 do
+    student1 = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
+    course2 = course_factory(active_all: true)
+    course2.enroll_user(student1, "StudentEnrollment", :enrollment_state => 'active')
+    get "/courses/#{course2.id}/settings"
+    expect(f('input[name="course[blueprint]"]').attribute('disabled')).to eq("true")
+  end
 end
 
