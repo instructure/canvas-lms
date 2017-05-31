@@ -72,7 +72,7 @@ class PlannerOverridesController < ApplicationController
   before_action :set_date_range
   before_action :set_planner_items, only: [:items_index]
 
-  attr_reader :due_before, :due_after
+  attr_reader :start_date, :end_date
 
   # @API List planner items
   #
@@ -216,20 +216,20 @@ class PlannerOverridesController < ApplicationController
   end
 
   def set_planner_notes
-    @planner_notes = PlannerNote.where(user: @current_user, todo_date: @due_after...@due_before).each { |pn| pn.todo_type = 'viewing' }
+    @planner_notes = PlannerNote.where(user: @current_user, todo_date: @start_date...@end_date).each { |pn| pn.todo_type = 'viewing' }
   end
 
   def set_date_range
-    @due_before, @due_after = if [params[:due_before], params[:due_after]].all?(&:blank?)
+    @end_date, @start_date = if [params[:end_date], params[:start_date]].all?(&:blank?)
                                 [2.weeks.from_now, 2.weeks.ago]
                               else
-                                [params[:due_before], params[:due_after]]
+                                [params[:end_date], params[:start_date]]
                               end
     # Since a range is needed, set values that weren't passed to a date
     # in the far past/future as to get all values before or after whichever
     # date was passed
-    @due_before ||= 10.years.from_now
-    @due_after ||= 10.years.ago
+    @end_date ||= 10.years.from_now
+    @start_date ||= 10.years.ago
   end
 
   def set_pages
@@ -248,8 +248,8 @@ class PlannerOverridesController < ApplicationController
     {
       include_ignored: true,
       include_ungraded: true,
-      due_before: due_before,
-      due_after: due_after,
+      due_before: end_date,
+      due_after: start_date,
       limit: (params[:limit]&.to_i || 50)
     }
   end
