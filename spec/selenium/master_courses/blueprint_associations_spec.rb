@@ -37,7 +37,7 @@ describe "master courses sidebar" do
     @minion.enroll_teacher(@master_teacher).accept!
 
     # sets up the assignment that gets blueprinted
-    @original_assmt = @master.assignments.create! title: 'Blah', points_possible: 10, due_at: 5.days.from_now
+    @original_assmt = @master.assignments.create! title: 'Blah', points_possible: 10, due_at: 5.days.from_now, description: 'this is the original content'
     run_master_migration
     @copy_assmt = @minion.assignments.last
   end
@@ -48,7 +48,7 @@ describe "master courses sidebar" do
       user_session(@master_teacher)
     end
 
-    it "locks down the associated course's assignment", priority: "1", test_id: 3127590 do
+    it "locks down the associated course's assignment fields", priority: "1", test_id: 3127590 do
       change_blueprint_settings(points: true, due_dates: true, availability_dates: true)
       get "/courses/#{@master.id}/assignments/#{@original_assmt.id}"
       f('.assignment-buttons').find_element(:xpath, "./span/button/span/span").click
@@ -61,6 +61,19 @@ describe "master courses sidebar" do
       expect(f('#due_at').attribute('readonly')).to be_truthy
       expect(f('#unlock_at').attribute('readonly')).to be_truthy
       expect(f('#lock_at').attribute('readonly')).to be_truthy
+    end
+
+    it "locks down the associated course's assignment content and show banner", priority: "2", test_id: 3127585 do
+      change_blueprint_settings(content: true)
+      get "/courses/#{@master.id}/assignments/#{@original_assmt.id}"
+      f('.assignment-buttons').find_element(:xpath, "./span/button/span/span").click
+      expect { f('.bpc-lock-toggle').text }.to become(' Locked')
+      expect(f('#blueprint-lock-banner').text).to include('Content')
+      run_master_migration
+      get "/courses/#{@minion.id}/assignments/#{@copy_assmt.id}/edit"
+      expect(f('#edit_assignment_wrapper')).not_to contain_css('#mceu_24')
+      expect(f('.bpc-lock-toggle').text).to eq(' Locked')
+      expect(f('#blueprint-lock-banner').text).to include('Content')
     end
   end
 end
