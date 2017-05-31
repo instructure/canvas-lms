@@ -157,7 +157,7 @@ function copyAssignmentDescriptionIntoAssignmentSubmission() {
 // this is called in the canvas file public/javascripts/submit_assignment.js
 // to be a custom validator
 function validateMagicFields() {
-  var list = document.querySelectorAll("#assignment_show .description input[type=text][data-bz-retained], #assignment_show .description textarea[data-bz-retained]");
+  var list = document.querySelectorAll("#assignment_show .description input[type=text][data-bz-retained], #assignment_show .description input[type=url][data-bz-retained], #assignment_show .description textarea[data-bz-retained]");
   for(var a = 0; a < list.length; a++) {
     if(list[a].value == "") {
       alert('Please fill in all the inline fields.');
