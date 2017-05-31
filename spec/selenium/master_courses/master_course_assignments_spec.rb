@@ -16,9 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../common'
+require_relative '../helpers/blueprint_common'
 
 describe "master courses - assignment locking" do
   include_context "in-process server selenium tests"
+  include BlueprintCourseCommon
 
   before :once do
     Account.default.enable_feature!(:master_courses)
@@ -40,9 +42,18 @@ describe "master courses - assignment locking" do
 
   it "should show locked button on index page for locked assignment" do
     # restrict something
-    @tag.update_attribute(:restrictions, {:content => true})
-
+    @tag.update(restrictions: {content: true})
     get "/courses/#{@course.id}/assignments"
     expect(f('[data-view="lock-icon"] i.icon-blueprint-lock')).to be_displayed
+  end
+
+  it "shows locked banner when locking an assignment", priority:"1", test_id: 3127589 do
+    change_blueprint_settings(@course, content: true, points: true, due_dates: true, availability_dates: true)
+    get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+    span_element = f('.assignment-buttons').find_element(:xpath, "//span/span[text()[contains(.,'Unlocked')]]")
+    span_element.find_element(:xpath, "//span/button").click
+    result = driver.find_elements(:xpath, "//div[@id='blueprint-lock-banner']//div[2]/span")
+    result = result.map(&:text)
+    expect(result).to eq(['Locked: ', 'Content, Points, Due Dates & Availability Dates'])
   end
 end
