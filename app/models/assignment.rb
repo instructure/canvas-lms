@@ -73,7 +73,7 @@ class Assignment < ActiveRecord::Base
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :inverse_of => :context, :dependent => :destroy
   validates_associated :external_tool_tag, :if => :external_tool?
   validate :group_category_changes_ok?
-  validate :due_date_ok?
+  validate :due_date_ok?, :unless => :has_active_assignment_overrides?
   validate :assignment_overrides_due_date_ok?
   validate :discussion_group_ok?
   validate :positive_points_possible?
@@ -2437,6 +2437,10 @@ class Assignment < ActiveRecord::Base
         errors.add(:due_at, I18n.t("cannot be blank for any assignees when Post to Sis is checked"))
       end
     end
+  end
+
+  def has_active_assignment_overrides?
+    active_assignment_overrides.count > 0
   end
 
   def assignment_name_length_ok?
