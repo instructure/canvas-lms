@@ -198,6 +198,7 @@ class Gradezilla
         f('label', item).attribute("for") == "period_option_#{grading_period_id}"
       end
       period.click
+      wait_for_animations
     end
 
     def enter_grade(grade, x_coordinate, y_coordinate)
