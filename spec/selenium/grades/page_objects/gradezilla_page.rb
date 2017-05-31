@@ -206,6 +206,7 @@ class Gradezilla
       cell.click
       set_value(grade_input(cell), grade)
       grade_input(cell).send_keys(:return)
+      wait_for_ajax_requests
     end
 
     def cell_graded?(grade, x, y)
