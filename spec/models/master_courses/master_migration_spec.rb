@@ -709,6 +709,33 @@ describe MasterCourses::MasterMigration do
       expect(@copy_to.reload.is_public).to be_truthy
     end
 
+    it "shouldn't overwrite syllabus body if already present or changed" do
+      @copy_to1 = course_factory
+      @template.add_child_course!(@copy_to1)
+
+      @copy_to2 = course_factory
+      child_syllabus1 = "<p>some child syllabus</p>"
+      @copy_to2.update_attribute(:syllabus_body, child_syllabus1)
+      @template.add_child_course!(@copy_to2)
+
+      master_syllabus1 = "<p>some original syllabus</p>"
+      @copy_from.update_attribute(:syllabus_body, master_syllabus1)
+      run_master_migration
+      expect(@copy_to1.reload.syllabus_body).to eq master_syllabus1 # use the master syllabus
+      expect(@copy_to2.reload.syllabus_body).to eq child_syllabus1 # keep the existing one
+
+      master_syllabus2 = "<p>some new syllabus</p>"
+      @copy_from.update_attribute(:syllabus_body, master_syllabus2)
+      run_master_migration
+      expect(@copy_to1.reload.syllabus_body).to eq master_syllabus2 # keep syncing
+      expect(@copy_to2.reload.syllabus_body).to eq child_syllabus1
+
+      child_syllabus2 = "<p>syllabus is a weird word</p>"
+      @copy_to1.update_attribute(:syllabus_body, child_syllabus2)
+      run_master_migration
+      expect(@copy_to1.reload.syllabus_body).to eq child_syllabus2 # preserve the downstream change
+    end
+
     it "should trigger folder locking data cache invalidation" do
       @copy_to = course_factory
       @sub = @template.add_child_course!(@copy_to)
