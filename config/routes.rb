@@ -18,6 +18,8 @@ CanvasRails::Application.routes.draw do
   get 'bz/retained_data_stats' => 'bz#retained_data_stats'
   get 'bz/retained_data_export' => 'bz#retained_data_export'
 
+  get 'bz/user_linkedin_url' => 'bz#user_linkedin_url'
+
   get 'bz/linked_in_auth' => 'bz#linked_in_auth'
   get 'bz/linked_in_export' => 'bz#linked_in_export'
   post 'bz/linked_in_export' => 'bz#do_linked_in_export'
@@ -27,6 +29,9 @@ CanvasRails::Application.routes.draw do
   post 'bz/accessibility_mapper' => 'bz#save_html_changes'
   get 'bz/full_module_view' => 'bz#full_module_view'
   get 'bz/assignment_with_magic_fields' => 'bz#assignment_with_magic_fields'
+
+  get '/nlu', to: redirect('/login/cas/6') # a convenience path for the separate sso people
+
   # IMPORTANT: there are more custom routes below, search for 'bz'
   # end
   resources :epub_exports, only: [:index]

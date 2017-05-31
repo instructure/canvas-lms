@@ -141,7 +141,9 @@ class Rubric < ActiveRecord::Base
   end
 
   def criteria_object
-    OpenObject.process(self.data)
+    OpenObject.process(self.data.sort { |a, b|
+      a[:description] <=> b[:description]
+    } )
   end
 
   def display_name

@@ -21,11 +21,11 @@ class BzController < ApplicationController
   def assignment_with_magic_fields
     course_id = params[:course]
     assignment_id = params[:assignment]
-    student_id = params[:student]
+    student_id = params[:student] || @current_user.id
 
     @assignment = Assignment.find(assignment_id)
     @context = Course.find(course_id)
-    if @assignment.rubric_association || can_do(@context, @current_user, :manage_grades)
+    if @assignment.rubric_association || can_do(@context, @current_user, :manage_grades) || student_id == @current_user.id
       @assignment_html = @assignment.description
 
       # this is basically a port of the getInnerHtmlWithMagicFieldsReplaced function
@@ -72,6 +72,20 @@ class BzController < ApplicationController
     else
       @permission = false
     end
+  end
+
+  def user_linkedin_url
+    result = {}
+    result['linkedin_url'] = ''
+
+    @current_user.user_services.each do |service|
+      if service.service == "linked_in"
+        result['linkedin_url'] = service.service_user_link
+        break
+      end
+    end
+
+    render :json => result
   end
 
   def accessibility_mapper
