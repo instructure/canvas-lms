@@ -18,7 +18,6 @@
 
 import RowStudentNameTemplate from 'jst/gradezilla/row_student_name';
 import I18n from 'i18n!gradebook';
-import 'jst/_avatar';
 
 function getPrimaryDisplayInfo (student, displayAs) {
   return {
@@ -63,7 +62,6 @@ class StudentRowHeader {
     return RowStudentNameTemplate({
       student_id: student.id,
       course_id: opts.courseId,
-      avatar_url: student.avatar_url,
       display_name: displayName,
       enrollment_status: getEnrollmentLabel(student),
       alreadyEscaped: true,

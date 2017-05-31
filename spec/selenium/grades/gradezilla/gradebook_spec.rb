@@ -64,22 +64,6 @@ describe "Gradezilla" do
     expect(dom_names).to eq @all_students.map(&:name)
   end
 
-  it "hides student avatars until they are enabled", priority: "1", test_id: 210023 do
-    Gradezilla.visit(@course)
-
-    expect(ff('.student-name')).to have_size @all_students.size
-    expect(f("body")).not_to contain_css('.avatar img')
-
-    @account = Account.default
-    @account.enable_service(:avatars)
-    @account.save!
-    expect(@account.service_enabled?(:avatars)).to be_truthy
-    Gradezilla.visit(@course)
-
-    expect(ff('.student-name')).to have_size @all_students.size
-    expect(ff('.avatar')).to have_size @all_students.size
-  end
-
   it "handles muting/unmuting correctly", priority: "1", test_id: 164227 do
     pending('TODO: Refactor this and add it back as part of CNVS-33679')
     Gradezilla.visit(@course)
