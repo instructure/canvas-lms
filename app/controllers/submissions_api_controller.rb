@@ -949,6 +949,40 @@ class SubmissionsApiController < ApplicationController
     Api.map_ids(user_ids, User, @domain_root_account, @current_user)
   end
 
+  # @API Submission Summary
+  #
+  # Returns the number of submissions for the given assignment based on gradeable students
+  # that fall into three categories: graded, ungraded, not submitted.
+  #
+  # @example_response
+  #   {
+  #     "graded": 5,
+  #     "ungraded": 10,
+  #     "not_submitted": 42
+  #   }
+  def submission_summary
+    if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
+      @assignment = @context.assignments.active.find(params[:assignment_id])
+      student_scope = @context.students_visible_to(@current_user, include: :inactive)
+      student_scope = @assignment.students_with_visibility(student_scope)
+      student_ids = student_scope.pluck(:id)
+
+      graded = @context.submissions.in_workflow_state('graded').where(user_id: student_ids, assignment_id: @assignment).count
+      ungraded = @context.submissions.
+        ungraded.having_submission.
+        where(user_id: student_ids, assignment_id: @assignment, excused: [nil, false]).
+        count
+      pending_quizzes = @context.submissions.
+        in_workflow_state('pending_review').having_submission.
+        where(user_id: student_ids, assignment_id: @assignment, excused: [nil, false]).
+        count
+      ungraded += pending_quizzes
+      not_submitted = student_ids.count - graded - ungraded
+
+      render json: {graded: graded, ungraded: ungraded, not_submitted: not_submitted}
+    end
+  end
+
   private
 
   def change_topic_read_state(new_state)

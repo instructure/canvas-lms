@@ -3924,4 +3924,94 @@ describe 'Submissions API', type: :request do
       end
     end
   end
+
+  describe '#submission_summary' do
+    before(:once) do
+      course_with_teacher :active_all => true
+      @student1 = student_in_course(:active_all => true).user
+      @student2 = student_in_course(:active_all => true).user
+      @student3 = student_in_course(:active_all => true).user
+      @assignment = @course.assignments.create(points_possible: 100)
+      @assignment.submit_homework @student1, :body => 'EHLO'
+      @assignment.submit_homework @student2, :body => 'EHLO'
+      @assignment.grade_student @student1, score: 99, grader: @teacher
+      @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submission_summary"
+      @params = { :controller => 'submissions_api', :action => 'submission_summary',
+                  :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.to_param }
+    end
+
+    it 'summarizes submissions' do
+      json = api_call_as_user(@teacher, :get, @path, @params)
+      expect(json['graded']).to eq 1
+      expect(json['ungraded']).to eq 1
+      expect(json['not_submitted']).to eq 1
+    end
+
+    it 'summarizes submissions with multiple submissions by the same student' do
+      @assignment.submit_homework @student2, :body => 'EHLO2'
+      @assignment.submit_homework @student2, :body => 'EHLO3'
+      @assignment.submit_homework @student2, :body => 'EHLO4'
+      json = api_call_as_user(@teacher, :get, @path, @params)
+      expect(json['graded']).to eq 1
+      expect(json['ungraded']).to eq 1
+      expect(json['not_submitted']).to eq 1
+    end
+
+    it 'summarizes submissions with multiple submissions by the same student but one of them graded' do
+      @assignment.submit_homework @student2, :body => 'EHLO2'
+      @assignment.grade_student @student2, score: 98, grader: @teacher
+      json = api_call_as_user(@teacher, :get, @path, @params)
+      expect(json['graded']).to eq 2
+      expect(json['ungraded']).to eq 0
+      expect(json['not_submitted']).to eq 1
+    end
+
+    it 'is unauthorized as a student' do
+      json = api_call_as_user(@student1, :get, @path, @params)
+      expect(json['status']).to eq 'unauthorized'
+      expect(json['errors'][0]['message']).to eq 'user not authorized to perform that action'
+    end
+
+    it 'counts excused as graded' do
+      @assignment.grade_student @student2, excused: true, grader: @teacher
+      json = api_call_as_user(@teacher, :get, @path, @params)
+      expect(json['graded']).to eq 2
+      expect(json['ungraded']).to eq 0
+      expect(json['not_submitted']).to eq 1
+    end
+
+    it 'counts quiz submissions in pending_review as not_graded' do
+      quiz = @course.quizzes.create! title: 'title'
+      quiz.quiz_questions.create!(question_data: { question_type: 'essay' })
+      quiz.quiz_questions.create!(question_data: { question_type: 'multiple_choice', answers: [{'id' => 1}, {'id' => 2}] })
+      quiz.generate_quiz_data
+      quiz.save!
+      asg = quiz.assignment
+      asg.publish
+
+      sub1 = quiz.generate_submission(@student3)
+      sub1.start_grading
+      sub1.update_attribute(:workflow_state, 'pending_review')
+      sub1.update_attribute(:score, 1.0)
+
+      @path = "/api/v1/courses/#{@course.id}/assignments/#{asg.id}/submission_summary"
+      @params = { :controller => 'submissions_api', :action => 'submission_summary',
+                  :format => 'json', :course_id => @course.to_param, :assignment_id => asg.to_param }
+
+      json = api_call_as_user(@teacher, :get, @path, @params)
+      expect(json['graded']).to eq 0
+      expect(json['ungraded']).to eq 1
+      expect(json['not_submitted']).to eq 2
+    end
+
+    it 'returns a 404' do
+      assg_id = @assignment.id + 100
+      @path = "/api/v1/courses/#{@course.id}/assignments/#{assg_id}/submission_summary"
+      @params = { :controller => 'submissions_api', :action => 'submission_summary',
+                  :format => 'json', :course_id => @course.to_param, :assignment_id => assg_id.to_s }
+      response = api_call_as_user(@teacher, :get, @path, @params)
+      assert_status(404)
+      expect(response['errors'][0]['message']).to eq 'The specified resource does not exist.'
+    end
+  end
 end
