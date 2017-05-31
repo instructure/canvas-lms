@@ -1594,11 +1594,7 @@ class User < ActiveRecord::Base
       Rails.cache.fetch(cache_key, :expires_in => expires_in) do
         result = Shackles.activate(:slave) do
           Shard.partition_by_shard(course_ids) do |shard_course_ids|
-            scope = if opts[:include_group_topics]
-                      object_type.constantize.for_courses_and_groups(shard_course_ids, cached_current_group_memberships.map(&:group_id))
-                    else
-                      object_type.constantize.for_course(shard_course_ids)
-                    end
+            scope = object_type.constantize.for_courses_and_groups(shard_course_ids, cached_current_group_memberships.map(&:group_id))
             scope = scope.not_ignored_by(self, 'viewing') unless opts[:include_ignored]
             scope = scope.available_to_planner.todo_date_between(opts[:due_after], opts[:due_before])
             yield(scope, opts.merge(shard_course_ids: shard_course_ids))
@@ -1611,14 +1607,14 @@ class User < ActiveRecord::Base
   end
 
   def discussion_topics_needing_viewing(opts={})
-    needing_viewing('DiscussionTopic', 120.minutes, opts.merge(include_group_topics: true)) do |topics_context, _options|
+    needing_viewing('DiscussionTopic', 120.minutes, opts) do |topics_context, _options|
       topics_context.to_a
     end
   end
 
   def wiki_pages_needing_viewing(opts={})
     needing_viewing('WikiPage', 120.minutes, opts) do |wiki_pages_context, _options|
-      wiki_pages_context.for_user(self).to_a
+      wiki_pages_context.visible_to_user(self).to_a
     end
   end
 

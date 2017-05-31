@@ -2060,20 +2060,35 @@ describe User do
   describe "wiki_pages_needing_viewing" do
     before(:each) do
       course_with_student(active_all: true)
-      wiki_page_model(course: @course)
+      @course_page = wiki_page_model(course: @course)
+      @group_category = @course.group_categories.create(name: 'Project Group')
+      @group1 = group_model(name: 'Project Group 1', group_category: @group_category, context: @course)
+      group_membership_model(group: @group1, user: @student)
+      @group_page = wiki_page_model(course: @group1)
+      account = @course.account
+      @group_category = account.group_categories.create(name: 'Project Group')
+      @group2 = group_model(name: 'Project Group 1', group_category: @group_category, context: account)
+      group_membership_model(group: @group2, user: @student)
+      @account_page = wiki_page_model(course: @group2)
     end
 
     let(:opts) { {due_after: 1.day.ago, due_before: 2.days.from_now} }
 
     it 'should show for wiki pages with todo dates within the opts date range' do
-      @page.todo_date = 1.day.from_now
-      @page.save!
-      expect(@student.wiki_pages_needing_viewing(opts)).to eq [@page]
+      @course_page.todo_date = 1.day.from_now
+      @group_page.todo_date = 1.day.from_now
+      @account_page.todo_date = 1.day.from_now
+      pages = [@course_page, @group_page, @account_page]
+      pages.each(&:save!)
+      expect(@student.wiki_pages_needing_viewing(opts).sort_by(&:id)).to eq pages
     end
 
     it 'should not show for wiki pages with todo dates outside the range' do
-      @page.todo_date = 3.days.ago
-      @page.save!
+      @course_page.todo_date = 3.days.ago
+      @group_page.todo_date = 3.days.ago
+      @account_page.todo_date = 3.days.ago
+      pages = [@course_page, @group_page, @account_page]
+      pages.each(&:save!)
       expect(@student.wiki_pages_needing_viewing(opts)).to eq []
     end
 
@@ -2083,32 +2098,41 @@ describe User do
 
     it 'should not show unpublished pages' do
       teacher_in_course(course: @course)
-      @page.workflow_state = 'unpublished'
-      @page.todo_date = 1.day.from_now
-      @page.save!
+      @course_page.workflow_state = 'unpublished'
+      @course_page.todo_date = 1.day.from_now
+      @course_page.save!
+      @group_page.workflow_state = 'unpublished'
+      @group_page.todo_date = 1.day.from_now
+      @account_page.workflow_state = 'unpublished'
+      @account_page.todo_date = 1.day.from_now
+      pages = [@course_page, @group_page, @account_page]
+      pages.each(&:save!)
       expect(@student.wiki_pages_needing_viewing(opts)).to eq []
       expect(@teacher.wiki_pages_needing_viewing(opts)).to eq []
     end
 
     it 'should not show for users not enrolled in course' do
-      @page.todo_date = 1.day.from_now
-      @page.save!
+      @course_page.todo_date = 1.day.from_now
+      @group_page.todo_date = 1.day.from_now
+      @account_page.todo_date = 1.day.from_now
+      pages = [@course_page, @group_page, @account_page]
+      pages.each(&:save!)
       user1 = @student
       course_with_student(active_all: true)
-      expect(user1.wiki_pages_needing_viewing(opts)).to eq [@page]
+      expect(user1.wiki_pages_needing_viewing(opts).sort_by(&:id)).to eq pages
       expect(@student.wiki_pages_needing_viewing(opts)).to eq []
     end
 
     it 'should not show wiki pages that are not released to the user' do
       @course.enable_feature!(:conditional_release)
-      @page.todo_date = 1.day.from_now
-      @page.save!
+      @course_page.todo_date = 1.day.from_now
+      @course_page.save!
       add_section('Section 2')
       student2 = student_in_section(@course_section)
-      wiki_page_assignment_model(wiki_page: @page)
+      wiki_page_assignment_model(wiki_page: @course_page)
       differentiated_assignment(assignment: @assignment, course_section: @course_section)
       expect(@student.wiki_pages_needing_viewing(opts)).to eq []
-      expect(student2.wiki_pages_needing_viewing(opts)).to eq [@page]
+      expect(student2.wiki_pages_needing_viewing(opts)).to eq [@course_page]
     end
   end
 
@@ -2232,16 +2256,14 @@ describe User do
         group_membership_model(group: @group2, user: @teacher)
         @course_topic.workflow_state = 'unpublished'
         @course_topic.todo_date = 1.day.from_now
-        @course_topic.save!
         @account_topic.workflow_state = 'unpublished'
         @account_topic.todo_date = 1.day.from_now
-        @account_topic.save!
         @course_announcement.delayed_post_at = 1.day.from_now
         @course_announcement.workflow_state = 'post_delayed'
-        @course_announcement.save!
         @account_announcement.delayed_post_at = 1.day.from_now
         @account_announcement.workflow_state = 'post_delayed'
-        @account_announcement.save!
+        topics = [@course_topic, @account_topic, @course_announcement, @account_announcement]
+        topics.each(&:save!)
         expect(@student.discussion_topics_needing_viewing(opts)).to eq []
         expect(@teacher.discussion_topics_needing_viewing(opts)).to eq []
       end

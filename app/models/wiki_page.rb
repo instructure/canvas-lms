@@ -64,19 +64,17 @@ class WikiPage < ActiveRecord::Base
   }
 
   scope :not_ignored_by, -> (user, purpose) do
-    where("NOT EXISTS (?)", Ignore.where(asset_type: 'WikiPage', user_id: user, purpose: purpose, asset_id: :id))
+    where("NOT EXISTS (?)", Ignore.where(asset_type: 'WikiPage', user_id: user, purpose: purpose).where("asset_id=wiki_pages.id"))
   end
   scope :todo_date_between, -> (starting, ending) { where(todo_date: starting...ending) }
-  scope :for_course, -> (course_ids) { joins(:course).where(courses: {id: course_ids}) }
-  scope :for_user, -> (user_id) do
-    joins(course: :enrollments).
-      joins("LEFT JOIN #{Assignment.quoted_table_name} as a on a.context_id = courses.id
-                                                           AND a.id = wiki_pages.assignment_id
-             LEFT JOIN #{AssignmentStudentVisibility.quoted_table_name} as asv on asv.assignment_id = a.id").
-      where(enrollments: {user_id: user_id}).
-      where("a.id IS NULL OR (asv.course_id = courses.id
-             AND asv.assignment_id = a.id
-             AND asv.user_id = ?)", user_id).uniq
+  scope :for_courses_and_groups, -> (course_ids, group_ids) do
+    joins("LEFT JOIN #{Course.quoted_table_name} on wiki_pages.wiki_id = courses.wiki_id
+           LEFT JOIN #{Group.quoted_table_name} on wiki_pages.wiki_id = groups.wiki_id").
+      where("courses.id IN (?) OR groups.id IN (?)", course_ids, group_ids)
+  end
+  scope :visible_to_user, -> (user_id) do
+    joins("LEFT JOIN #{AssignmentStudentVisibility.quoted_table_name} as asv on wiki_pages.assignment_id = asv.assignment_id").
+      where("wiki_pages.assignment_id IS NULL OR asv.user_id = ?", user_id)
   end
 
   TITLE_LENGTH = 255

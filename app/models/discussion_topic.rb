@@ -490,7 +490,6 @@ class DiscussionTopic < ActiveRecord::Base
     where("(discussion_topics.type = 'Announcement' AND posted_at BETWEEN :start_at and :end_at)
            OR todo_date BETWEEN :start_at and :end_at", {start_at: starting, end_at: ending})
   end
-  scope :for_course, -> (course_ids) { joins(:course).where(courses: {id: course_ids}) }
   scope :for_courses_and_groups, -> (course_ids, group_ids) do
     where("(discussion_topics.context_type = 'Course'
           AND discussion_topics.context_id IN (?))

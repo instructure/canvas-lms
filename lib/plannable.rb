@@ -65,10 +65,8 @@ module Plannable
     case base
     when PlannerNote
       base.user.account
-    when Assignment
-      base.context.root_account
     else
-      base.course.root_account
+      base.context.root_account
     end
   end
 end
