@@ -198,6 +198,7 @@ class Course < ActiveRecord::Base
   before_validation :assert_defaults
   before_save :update_enrollments_later
   before_save :update_show_total_grade_as_on_weighting_scheme_change
+  after_save :update_cached_due_dates
   after_save :update_final_scores_on_weighting_scheme_change
   after_save :update_account_associations_if_changed
   after_save :update_enrollment_states_if_necessary
@@ -1040,6 +1041,10 @@ class Course < ActiveRecord::Base
       Folder.root_folders(self).each { |f| f.touch } if files_tab_was_hidden != tab_hidden?(TAB_FILES)
     end
     true
+  end
+
+  def update_cached_due_dates
+    DueDateCacher.recompute_course(self) if enrollment_term_id_changed?
   end
 
   def update_final_scores_on_weighting_scheme_change
