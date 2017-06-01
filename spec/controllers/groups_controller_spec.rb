@@ -443,6 +443,15 @@ describe GroupsController do
       expect(response).not_to be_success
     end
 
+    it "should be able to unset a leader" do
+      user_session(@teacher)
+      @group = @course.groups.create!(:name => "some group")
+      @group.add_user(@student1)
+      @group.update_attribute(:leader, @student1)
+      put 'update', :course_id => @course.id, :id => @group.id, :group => {:leader => nil}
+      expect(@group.reload.leader).to be_nil
+    end
+
     describe "quota" do
       before :once do
         @group = @course.groups.build(:name => "teh gruop")
