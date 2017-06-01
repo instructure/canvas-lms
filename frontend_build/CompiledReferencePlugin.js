@@ -28,11 +28,20 @@
 // a compile step ahead of time.
 
 const path = require('path')
+const fs = require('fs')
 
 const specRoot = path.resolve(__dirname, '../spec')
 
-function addExt (requestString) {
-  const ext = /\/templates\//.test(requestString) ? '.hbs' : '.coffee'
+function addExt (requestString, context='') {
+  let ext = /\/templates\//.test(requestString) ? '.hbs' : '.coffee'
+  // temporarily handle .js files in app/coffeescripts. if there is a .js file with the same name,
+  // it takes precedence
+  if (ext === '.coffee') {
+    const jsFileToStat = path.join((requestString.startsWith('.') ? context : 'app'), requestString) + '.js'
+    if (fs.existsSync(jsFileToStat)) {
+      ext = '.js'
+    }
+  }
   return requestString + ext
 }
 
@@ -65,7 +74,7 @@ class CompiledReferencePlugin {
           !/\.coffee$/.test(requestString)
         ) {
           // this is a relative require to  a compiled coffeescript (or hbs) file
-          result.request = addExt(requestString)
+          result.request = addExt(requestString, input.context)
         } else if (requestString.includes('jst/') && !requestString.endsWith('.handlebars')) {
           // this is a handlebars file in canvas. We have to require it with its full
           // extension while we still have a require-js build or we risk loading

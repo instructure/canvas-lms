@@ -170,6 +170,7 @@ module.exports = {
         include: [
           path.resolve(__dirname, '../public/javascripts'),
           path.resolve(__dirname, '../app/jsx'),
+          path.resolve(__dirname, '../app/coffeescripts'),
           path.resolve(__dirname, '../spec/javascripts/jsx'),
           /gems\/plugins\/.*\/app\/jsx\//
         ],
