@@ -47,7 +47,7 @@ module CC
       resources << File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::MEDIA_TRACKS)
 
       # Create the syllabus resource
-      if export_symbol?(:syllabus_body) || export_symbol?(:all_syllabus_body)
+      if @course.syllabus_body && (export_symbol?(:syllabus_body) || export_symbol?(:all_syllabus_body))
         syl_rel_path = create_syllabus
         @resources.resource(
           :identifier => migration_id + "_syllabus",
