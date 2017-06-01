@@ -15,27 +15,27 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# @API Webhooks Subscriptions
-# @internal
-#
-# API for WebhooksSubscriptions
-# Webhooks from Canvas are your way to know that a change (new or updated
-# submission, or change to assignment) has taken place.
-#
-# Webhooks are available via HTTPS to an endpoint you own and specify, or via
-# an AWS SQS queue that you provision, own, and specify. We recommend SQS for
-# the most robust integration, but do support HTTPS for lower volume applications.
-#
-# We do not deduplicate or batch messages before transmission. Avoid
-# creating multiple identical subscriptions. Webhooks always identify the ID
-# of the subscription that caused them to be sent, allowing you to identify
-# problematic or high volume subscriptions.
-#
-# We cannot guarantee the transmission order of webhooks. If order is important
-# to your application, you must check the "event_time" attribute in the
-# "metadata" hash to determine sequence.
-
 module Lti
+  # @API Webhooks Subscriptions
+  # **LTI API for Webhook Subscriptions (Must use <a href="jwt_access_tokens.html">JWT access tokens</a> with this API).**
+  #
+  # The tool proxy must also have the appropriate enabled capabilities (See appendix).
+  #
+  # Webhooks from Canvas are your way to know that a change (e.g. new or updated submission,
+  # new or updated assignment, etc.) has taken place.
+  #
+  # Webhooks are available via HTTPS to an endpoint you own and specify, or via
+  # an AWS SQS queue that you provision, own, and specify. We recommend SQS for
+  # the most robust integration, but do support HTTPS for lower volume applications.
+  #
+  # We do not deduplicate or batch messages before transmission. Avoid
+  # creating multiple identical subscriptions. Webhooks always identify the ID
+  # of the subscription that caused them to be sent, allowing you to identify
+  # problematic or high volume subscriptions.
+  #
+  # We cannot guarantee the transmission order of webhooks. If order is important
+  # to your application, you must check the "event_time" attribute in the
+  # "metadata" hash to determine sequence.
   class SubscriptionsApiController < ApplicationController
     include Lti::Ims::AccessTokenHelper
 
@@ -67,6 +67,8 @@ module Lti
     end
 
     # @API Create a Webhook Subscription
+    # Creates a webook subscription for the specified event type and
+    # context.
     #
     # @argument submission[ContextId] [Required, String]
     #   The id of the context for the subscription.
@@ -96,7 +98,6 @@ module Lti
       forward_service_response(response)
     end
 
-
     # @API Delete a Webhook Subscription
     def destroy
       service_response = Services::LiveEventsSubscriptionService.destroy_tool_proxy_subscription(tool_proxy, params.require(:id))
@@ -110,7 +111,7 @@ module Lti
     end
 
     # @API Update a Webhook Subscription
-    # Same parameters as create
+    # This endpoint uses the same parameters as the create endpoint
     def update
       subscription = params.require(:subscription)
       subscription['Id'] = params.require(:id)
@@ -141,5 +142,8 @@ module Lti
       render json: service_response.body, status: service_response.code
     end
 
+    # @!appendix Webhook Subscription Required Capabilities
+    #
+    #  {include:file:doc/api/subscriptions_appendix.md}
   end
 end
