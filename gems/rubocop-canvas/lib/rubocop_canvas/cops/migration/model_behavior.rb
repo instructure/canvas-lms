@@ -101,17 +101,24 @@ module RuboCop
 
           # If receiver is in the whitelist we good
           joined_receiver = receiver.join("::").to_sym
-          receiver_list_item = whitelist[joined_receiver]
-          # require 'pry'
-          # binding.pry
-          # Did we find a receiver in the whitelist?
-          if receiver_list_item
-            # "Receiver.some_method" pattern
-            if receiver_list_item.receivers_method == methods[0].to_s
-              return
-            # "Receiver" pattern
-            elsif receiver_list_item.receivers_method == ""
-              return
+
+          # Build up the receiver checking if any portion of it is in the whitelist
+          accumulated_receiver = ''
+          receiver.each_with_index do |val, ind|
+            # Add to the receiver so it is of the format (Module1, Module1::Module2, etc.)
+            join_character = (ind == 0) ? '' : '::'
+            accumulated_receiver = (accumulated_receiver.to_s + join_character + val.to_s).to_sym
+            receiver_list_item = whitelist[accumulated_receiver]
+
+            # Did we find a receiver in the whitelist?
+            if receiver_list_item
+              # "Receiver.some_method" pattern
+              if receiver_list_item.receivers_method == methods[0].to_s
+                return
+              # "Receiver" pattern
+              elsif receiver_list_item.receivers_method == ""
+                return
+              end
             end
           end
 

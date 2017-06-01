@@ -23,6 +23,7 @@ describe RuboCop::Cop::Migration::ModelBehavior do
         "Included" => ["- db/migrate/*"],
         "Whitelist" => [
           "Account.default",
+          "DataFixup",
           "Migrations::FooFix",
           "update_all",
           "delete_all",
@@ -50,6 +51,17 @@ describe RuboCop::Cop::Migration::ModelBehavior do
       class Foo < ActiveRecord::Migration
         def up
           Account.default.lol.InstructureRules
+        end
+      end
+    })
+    expect(subject.offenses.size).to eq(0)
+  end
+
+  it "should find no offenses when a portion of the receiver is whitelisted" do
+    inspect_source(subject, %{
+      class Foo < ActiveRecord::Migration
+        def up
+          DataFixup::Module1::Module2::DeleteInvalidCommunicationChannels.send_now.blah
         end
       end
     })
