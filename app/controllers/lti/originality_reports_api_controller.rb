@@ -16,10 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+module Lti
 # @API Originality Reports
-# @internal
-#
-# API for OriginalityReports
+# **LTI API for OriginalityReports (Must use <a href="jwt_access_tokens.html">JWT access tokens</a> with this API).**
 #
 # Originality reports may be used by external tools providing plagiarism
 # detection services to give an originality score to an assignment
@@ -28,19 +27,37 @@
 # between 0 and 100.
 #
 # Note that when creating or updating an originality report a
-# "tool_setting[resource_type_code]" may be specified as part of the originality report.
+# `tool_setting[resource_type_code]` may be specified as part of the originality report.
 # This parameter should be used if the tool provider wishes to display
 # originality reports as LTI launches.
 #
-# The value of "tool_setting[resource_type_code]" should be a
+# The value of `tool_setting[resource_type_code]` should be a
 # resource_handler's "resource_type" code. Canvas will lookup the resource
 # handler specified and do a launch to the message with the type
 # "basic-lti-launch-request" using its "path". If the optional
-# "tool_setting[resource_url]" parameter is provided, Canvas
-# will use this URL instead of the message's "path" but will
+# `tool_setting[resource_url]` parameter is provided, Canvas
+# will use this URL instead of the message's `path` but will
 # still send all the parameters specified by the message. When using the
-# "tool_setting[resource_url]" the "tool_setting[resource_type_code]" must also be
+# `tool_setting[resource_url]` the `tool_setting[resource_type_code]` must also be
 # specified.
+#
+# @model ToolSetting
+#     {
+#       "id": "ToolSetting",
+#       "description": "",
+#       "properties": {
+#          "resource_type_code": {
+#            "description": "the resource type code of the resource handler to use to display originality reports",
+#            "example": "originality-reports",
+#            "type": "string"
+#          },
+#          "resource_url": {
+#            "description": "a URL that may be used to override the launch URL inferred by the specified resource_type_code. If used a 'resource_type_code' must also be specified.",
+#            "example": "http://www.test.com/originality-report",
+#            "type": "string"
+#          }
+#       }
+#     }
 #
 # @model OriginalityReport
 #     {
@@ -72,21 +89,12 @@
 #           "example": "http://www.example.com/report",
 #           "type": "string"
 #         },
-#         "tool_setting" :{
-#            "resource_type_code": {
-#              "description": "the resource type code of the resource handler to use to display originality reports",
-#              "example": "originality-reports",
-#              "type": "string"
-#            },
-#            "resource_url": {
-#              "description": "URL that may be used to override the launch URL inferred by the specified resource_type_code",
-#              "example": "http://www.test.com/originality-report",
-#              "type": "string"
-#            }
+#         "tool_setting": {
+#            "description": "A ToolSetting object containing optional 'resource_type_code' and 'resource_url'",
+#            "type": "ToolSetting"
 #         }
 #       }
 #     }
-module Lti
   class OriginalityReportsApiController < ApplicationController
     include Lti::Ims::AccessTokenHelper
 
@@ -129,8 +137,8 @@ module Lti
     # @argument originality_report[tool_setting][resource_url] [String]
     #   The URL Canvas should launch to when showing an LTI originality report.
     #   Note that this value is inferred from the specified resource handler's
-    #   message "path" value (See originality_report[tool_setting][resource_type_code]) if
-    #   not specified. If this parameter is used a originality_report[tool_setting][resource_type_code]
+    #   message "path" value (See `resource_type_code`) unless
+    #   it is specified. If this parameter is used a `resource_type_code`
     #   must also be specified.
     #
     # @returns OriginalityReport
@@ -178,8 +186,8 @@ module Lti
     # @argument originality_report[tool_setting][resource_url] [String]
     #   The URL Canvas should launch to when showing an LTI originality report.
     #   Note that this value is inferred from the specified resource handler's
-    #   message "path" value (See originality_report[tool_setting][resource_type_code]) if
-    #   not specified. If this parameter is used a originality_report[tool_setting][resource_type_code]
+    #   message "path" value (See `resource_type_code`) unless
+    #   it is specified. If this parameter is used a `resource_type_code`
     #   must also be specified.
     #
     # @returns OriginalityReport
@@ -192,7 +200,7 @@ module Lti
       end
     end
 
-    # @API Show an Originality ReportN
+    # @API Show an Originality Report
     # Get a single originality report
     #
     # @returns OriginalityReport
@@ -276,5 +284,9 @@ module Lti
         head :unauthorized
       end
     end
+
+    # @!appendix Originality Report UI Locations
+    #
+    #  {include:file:doc/api/originality_report_appendix.md}
   end
 end
