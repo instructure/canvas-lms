@@ -477,7 +477,11 @@ class ContextExternalTool < ActiveRecord::Base
   def matches_url?(url, match_queries_exactly=true)
     if match_queries_exactly
       url = ContextExternalTool.standardize_url(url)
-      return true if url == standard_url
+      if url == standard_url
+        return true
+      else 
+        return false
+      end
     elsif standard_url.present?
       if !defined?(@url_params)
         res = Addressable::URI.parse(standard_url)
