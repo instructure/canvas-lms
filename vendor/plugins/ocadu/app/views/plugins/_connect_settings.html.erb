@@ -1,0 +1,30 @@
+<% fields_for :settings, OpenObject.new(settings) do |f| %>
+  <table style="width: 500px;" class="formtable">
+    <tr>
+      <td><%= f.label :domain, "Domain:" %></td>
+      <td>
+        <%= f.text_field :domain %><br>
+        <b>Protocol</b> and <b>hostname</b> or <b>IP address</b> of your Adobe Connect installation (e.g. https://connect.mycompany.com)
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.label :meeting_container, "Meeting Folder:" %></td>
+      <td>
+        <%= f.text_field :meeting_container %><br>
+        The name of a folder, inside the "User Meetings" folder, where Canvas meetings will be stored. Create this folder before creating any meetings. 
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.label :login, "Login ID:" %></td>
+      <td>
+        <%= f.text_field :login, :autocomplete => false %><br>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.label :password, "Password:" %></td>
+      <td>
+        <%= f.password_field :password, :autocomplete => false %><br>
+      </td>
+    </tr>
+  </table>
+<% end %>
