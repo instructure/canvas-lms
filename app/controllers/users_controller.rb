@@ -906,12 +906,15 @@ class UsersController < ApplicationController
     user = api_find(User, params[:user_id])
     return render_unauthorized_action unless @current_user && user.grants_right?(@current_user, :read)
 
-    assignments = []
+    submissions = []
     Shackles.activate(:slave) do
-      preloaded_submitted_assignment_ids = user.submissions.not_missing.pluck(:assignment_id)
-      assignments = user.assignments_needing_submitting due_before: Time.zone.now
-      assignments.reject {|as| preloaded_submitted_assignment_ids.include? as.id }
+      course_ids = user.participating_student_course_ids
+      Shard.partition_by_shard(course_ids) do |shard_course_ids|
+        submissions = Submission.preload(:assignment).missing.
+          where(user_id: user.id, assignments: {context_id: shard_course_ids}).order(:cached_due_date)
+      end
     end
+    assignments = Api.paginate(submissions, self, api_v1_user_missing_submissions_url).map(&:assignment)
 
     render json: assignments.map {|as| assignment_json(as, user, session) }
   end
