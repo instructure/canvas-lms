@@ -49,7 +49,7 @@ describe "master courses sidebar" do
     end
 
     it "locks down the associated course's assignment fields", priority: "1", test_id: 3127590 do
-      change_blueprint_settings(points: true, due_dates: true, availability_dates: true)
+      change_blueprint_settings(@master, points: true, due_dates: true, availability_dates: true)
       get "/courses/#{@master.id}/assignments/#{@original_assmt.id}"
       f('.assignment-buttons').find_element(:xpath, "./span/button/span/span").click
       expect { f('.bpc-lock-toggle').text }.to become(' Locked')
@@ -64,7 +64,7 @@ describe "master courses sidebar" do
     end
 
     it "locks down the associated course's assignment content and show banner", priority: "2", test_id: 3127585 do
-      change_blueprint_settings(content: true)
+      change_blueprint_settings(@master, content: true)
       get "/courses/#{@master.id}/assignments/#{@original_assmt.id}"
       f('.assignment-buttons').find_element(:xpath, "./span/button/span/span").click
       expect { f('.bpc-lock-toggle').text }.to become(' Locked')
