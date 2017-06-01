@@ -147,39 +147,24 @@ describe LatePolicy do
   describe '#points_for_missing' do
     it 'returns 0 when assignment grading_type is pass_fail' do
       policy = late_policy_model
-      assignment = instance_double('Assignment')
-      allow(assignment).to receive(:grading_type).and_return('pass_fail')
-
-      expect(policy.points_for_missing(assignment)).to eq(0)
+      expect(policy.points_for_missing(100, 'pass_fail')).to eq(0)
     end
 
     it 'computes expected value' do
-      policy = late_policy_model(missing_submission_deduction: 60)
-      assignment = instance_double('Assignment')
-      allow(assignment).to receive(:grading_type).and_return('foo')
-      allow(assignment).to receive(:points_possible).and_return(100)
-
-      expect(policy.points_for_missing(assignment)).to eq(40)
+      policy = late_policy_model(missing: 60)
+      expect(policy.points_for_missing(100, 'foo')).to eq(40)
     end
   end
 
   describe '#missing_points_deducted' do
     it 'returns points_possible when assignment grading_type is pass_fail' do
       policy = late_policy_model
-      assignment = instance_double('Assignment')
-      allow(assignment).to receive(:grading_type).and_return('pass_fail')
-      allow(assignment).to receive(:points_possible).and_return(100)
-
-      expect(policy.missing_points_deducted(assignment)).to eq(100)
+      expect(policy.missing_points_deducted(100, 'pass_fail')).to eq(100)
     end
 
     it 'computes expected value' do
-      policy = late_policy_model(missing_submission_deduction: 60)
-      assignment = instance_double('Assignment')
-      allow(assignment).to receive(:grading_type).and_return('foo')
-      allow(assignment).to receive(:points_possible).and_return(100)
-
-      expect(policy.missing_points_deducted(assignment)).to eq(60)
+      policy = late_policy_model(missing: 60)
+      expect(policy.missing_points_deducted(100, 'foo')).to eq(60)
     end
   end
 

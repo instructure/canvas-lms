@@ -41,7 +41,7 @@ class MissingPolicyApplicator
 
   # Given submissions must all be for the same assignment
   def apply_missing_deduction(assignment, submissions)
-    score = assignment.course.late_policy.points_for_missing(assignment)
+    score = assignment.course.late_policy.points_for_missing(assignment.points_possible, assignment.grading_type)
     grade = assignment.score_to_grade(score)
 
     # We are using update_all here for performance reasons

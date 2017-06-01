@@ -29,7 +29,7 @@ module Factories
 
   private
 
-  def late_policy_params(course: nil, deduct: 0, every: :hour, down_to: 0, missing_submission_deduction: 100)
+  def late_policy_params(course: nil, deduct: 0, every: :hour, down_to: 0, missing: 100)
     {
       course_id: course && course[:id],
       late_submission_deduction_enabled: deduct.positive?,
@@ -37,7 +37,8 @@ module Factories
       late_submission_interval: every,
       late_submission_minimum_percent_enabled: down_to.positive?,
       late_submission_minimum_percent: down_to,
-      missing_submission_deduction: missing_submission_deduction
+      missing_submission_deduction_enabled: !!missing,
+      missing_submission_deduction: missing
     }
   end
 end

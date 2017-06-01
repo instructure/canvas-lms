@@ -1325,15 +1325,30 @@ class Submission < ActiveRecord::Base
   end
 
   # apply_late_policy is called directly by bulk update processes, or indirectly by before_save on a Submission
-  def apply_late_policy(late_policy=nil, points_possible=nil)
-    return if score.nil? || points_deducted_changed?
+  def apply_late_policy(late_policy=nil, points_possible=nil, grading_type=nil)
+    return if points_deducted_changed?
     late_policy ||= assignment.course.late_policy
     points_possible ||= assignment.points_possible
+    grading_type ||= assignment.grading_type
+    return score_missing(late_policy, points_possible, grading_type) if missing?
+    score_late_or_none(late_policy, points_possible) if score
+  end
+
+  def score_missing(late_policy, points_possible, grading_type)
+    return unless late_policy&.missing_submission_deduction_enabled
+    self.points_deducted = nil
+    self.score = late_policy.points_for_missing(points_possible, grading_type)
+  end
+  private :score_missing
+
+  def score_late_or_none(late_policy, points_possible)
     raw_score = score_changed? ? score : originally_entered_score
     deducted = late_points_deducted(raw_score, late_policy, points_possible)
+    new_score = raw_score - deducted
     self.points_deducted = deducted
-    self.score = raw_score - deducted
+    self.score = new_score
   end
+  private :score_late_or_none
 
   def originally_entered_score
     score + (points_deducted || 0)

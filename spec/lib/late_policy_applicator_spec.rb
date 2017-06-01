@@ -22,7 +22,7 @@ describe LatePolicyApplicator do
     before :once do
       course_factory(active_all: true)
 
-      @published_assignment = @course.assignments.create(workflow_state: 'published')
+      @published_assignment = @course.assignments.create!(workflow_state: 'published')
     end
 
     it 'instantiates an applicator for the course' do
@@ -65,7 +65,7 @@ describe LatePolicyApplicator do
     before :once do
       course_factory(active_all: true)
 
-      @published_assignment = @course.assignments.create(workflow_state: 'published', points_possible: 20)
+      @published_assignment = @course.assignments.create!(workflow_state: 'published', points_possible: 20)
     end
 
     it 'instantiates an applicator for the assignment' do
@@ -130,21 +130,18 @@ describe LatePolicyApplicator do
       @now = Time.zone.now
       course_factory(active_all: true, grading_periods: [:old, :current])
 
-      @late_policy = LatePolicy.new(
-        course: @course,
-        late_submission_deduction_enabled: true,
-        late_submission_deduction: 50.0
-      )
+      @late_policy = late_policy_factory(course: @course, deduct: 50.0, every: :day, missing: 95.0)
       @course.late_policy = @late_policy
+      @course.save!
 
-      @students = Array.new(2) do
-        user = User.create
+      @students = Array.new(3) do
+        user = User.create!
         @course.enroll_student(user, enrollment_state: 'active')
 
         user
       end
 
-      @assignment_in_closed_gp = @course.assignments.create(
+      @assignment_in_closed_gp = @course.assignments.create!(
         points_possible: 20, due_at: @now - 3.months, submission_types: 'online_text_entry'
       )
 
@@ -168,7 +165,15 @@ describe LatePolicyApplicator do
           submission_type: 'online_text_entry'
         )
 
-      @assignment_in_open_gp = @course.assignments.create(
+      @missing_submission1 = @assignment_in_closed_gp.submissions.find_by(user: @students[2])
+      Submission.where(id: @missing_submission1).
+        update_all(
+          submitted_at: nil,
+          cached_due_date: 1.month.ago(@now),
+          score: nil
+        )
+
+      @assignment_in_open_gp = @course.assignments.create!(
         points_possible: 20, due_at: @now - 1.month, submission_types: 'online_text_entry'
       )
 
@@ -188,6 +193,14 @@ describe LatePolicyApplicator do
           cached_due_date: @now + 1.hour,
           score: 20,
           submission_type: 'online_text_entry'
+        )
+
+      @missing_submission2 = @assignment_in_open_gp.submissions.find_by(user: @students[2])
+      Submission.where(id: @missing_submission2).
+        update_all(
+          submitted_at: nil,
+          cached_due_date: @now - 1.month,
+          score: nil
         )
       # rubocop:enable Rails/SkipsModelValidations
     end
@@ -211,6 +224,12 @@ describe LatePolicyApplicator do
         expect { @late_policy_applicator.process }.to change { @late_submission2.reload.score }.by(-10)
       end
 
+      it 'applies the missing policy to missing submissions in the open grading period' do
+        @late_policy_applicator = LatePolicyApplicator.new(@course)
+
+        expect { @late_policy_applicator.process }.to change { @missing_submission2.reload.score }.to(1)
+      end
+
       it 'does not apply the late policy to timely submissions in the open grading period' do
         @late_policy_applicator = LatePolicyApplicator.new(@course)
 
@@ -223,6 +242,12 @@ describe LatePolicyApplicator do
         expect { @late_policy_applicator.process }.not_to change { @late_submission1.reload.score }
       end
 
+      it 'does not apply the late policy to missing submissions in the closed grading period' do
+        @late_policy_applicator = LatePolicyApplicator.new(@course)
+
+        expect { @late_policy_applicator.process }.not_to change { @missing_submission1.reload.score }
+      end
+
       it 'does not apply the late policy to timely submissions in the closed grading period' do
         @late_policy_applicator = LatePolicyApplicator.new(@course)
 
@@ -231,8 +256,11 @@ describe LatePolicyApplicator do
 
       it 'calls re-calculates grades in bulk after processing all submissions' do
         @late_policy_applicator = LatePolicyApplicator.new(@course)
+        student_ids = [0,2].map { |i| @students[i].id }
 
-        expect(@course).to receive(:recompute_student_scores).with([@students[0].id])
+        expect(@course).to receive(:recompute_student_scores).
+          with(array_including(student_ids)).
+          with(Array.new(2, kind_of(Integer)))
 
         @late_policy_applicator.process
       end

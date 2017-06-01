@@ -529,7 +529,7 @@ describe Submission do
     before(:once) do
       @date = Time.zone.local(2017, 1, 15, 12)
       @assignment.update!(due_at: 3.hours.ago(@date), points_possible: 1000, submission_types: "online_text_entry")
-      @late_policy = late_policy_model(deduct: 10.0, every: :hour)
+      @late_policy = late_policy_model(deduct: 10.0, every: :hour, missing: 80.0)
     end
 
     let(:submission) { @assignment.submissions.find_by(user_id: @student) }
@@ -554,6 +554,16 @@ describe Submission do
       end
     end
 
+    it "does not round decimal places in the score" do
+      Timecop.freeze(2.days.ago(@date)) do
+        @assignment.submit_homework(@student, body: "a body")
+        original_score = 1.3800000000000001
+        submission.score = original_score
+        submission.apply_late_policy(@late_policy, 1000)
+        expect(submission.score).to eq original_score
+      end
+    end
+
     it "deducts only once even if called twice" do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
@@ -564,6 +574,14 @@ describe Submission do
         submission.apply_late_policy(@late_policy, 1000)
         expect(submission.score).to eq 500
         expect(submission.points_deducted).to eq 300
+      end
+    end
+
+    it "applies missing policy if submission is missing" do
+      Timecop.freeze(1.day.from_now(@date)) do
+        submission.score = nil
+        submission.apply_late_policy(@late_policy, 1000)
+        expect(submission.score).to eq 200
       end
     end
   end
