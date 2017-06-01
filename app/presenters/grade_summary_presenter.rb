@@ -233,7 +233,7 @@ class GradeSummaryPresenter
   end
 
   def real_and_active_student_ids
-    @context.all_real_student_enrollments.active_or_pending.pluck(:user_id).uniq
+    @context.all_real_student_enrollments.active_or_pending.select(:user_id).distinct
   end
 
   def assignment_presenters
