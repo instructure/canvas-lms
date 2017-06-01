@@ -70,7 +70,7 @@ export default combineReducers({
     return newState
   },
   selectedChangeLog: handleActions({
-    [actionTypes.SELECT_CHANGE_LOG]: (state, action) => action.payload.changeId,
+    [actionTypes.SELECT_CHANGE_LOG]: (state, action) => (action.payload && action.payload.changeId) || null,
   }, null),
   changeLogs: (state = {}, action) => {
     let newState = state

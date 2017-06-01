@@ -48,25 +48,25 @@ const { notifyInfo, notifyError } = actions
 actions.notifyInfo = payload => notifyInfo(Object.assign(payload, { type: 'info' }))
 actions.notifyError = payload => notifyError(Object.assign(payload, { type: 'error' }))
 
-actions.loadChange = changeId => (dispatch, getState) => {
+actions.loadChange = params => (dispatch, getState) => {
   const state = getState()
-  const change = state.changeLogs[changeId]
+  const change = state.changeLogs[params.changeId]
   if (change && LoadStates.isLoading(change.status)) return;
 
-  dispatch(actions.loadChangeStart({ changeId }))
-  api.getFullMigration(state, changeId)
+  dispatch(actions.loadChangeStart(params))
+  api.getFullMigration(state, params)
     .then(data => dispatch(actions.loadChangeSuccess(data)))
     .catch(err => dispatch(actions.loadChangeFail({ err, message: I18n.t('An error occurred while loading changes') })))
 }
 
 actions.realSelectChangeLog = actions.selectChangeLog
-actions.selectChangeLog = changeId => (dispatch, getState) => {
-  dispatch(actions.realSelectChangeLog({ changeId }))
-  if (changeId === null) return;
+actions.selectChangeLog = params => (dispatch, getState) => {
+  dispatch(actions.realSelectChangeLog(params))
+  if (params === null) return;
   const state = getState()
-  const change = state.changeLogs[changeId]
+  const change = state.changeLogs[params.changeId]
   if (!change || LoadStates.isNotLoaded(change.status)) {
-    actions.loadChange(changeId)(dispatch, getState)
+    actions.loadChange(params)(dispatch, getState)
   }
 }
 
@@ -77,13 +77,19 @@ actions.loadHistory = () => (dispatch, getState) => {
     .catch(err => dispatch(actions.loadHistoryFail({ err, message: I18n.t('An error ocurred while loading sync history') })))
 }
 
-actions.checkMigration = () => (dispatch, getState) => {
+actions.checkMigration = (startInterval = false) => (dispatch, getState) => {
   const state = getState()
   // no need to check if another check is in progress
   if (state.isCheckingMigration) return;
   dispatch(actions.checkMigrationStart())
   api.checkMigration(getState())
-    .then(res => dispatch(actions.checkMigrationSuccess(res.data)))
+    .then((res) => {
+      dispatch(actions.checkMigrationSuccess(res.data))
+      if (startInterval && MigrationStates.isLoadingState(res.data)) {
+        actions.startMigrationStatusPoll()(dispatch, getState)
+      }
+    })
+
     .catch(err => dispatch(actions.checkMigrationFail({ err, message: I18n.t('An error occurred while checking the migration status') })))
 }
 
@@ -126,12 +132,12 @@ actions.checkMigration = () => (dispatch, getState) => {
   }
 })()
 
-actions.beginMigration = (startInteval = true) => (dispatch, getState) => {
+actions.beginMigration = (startInterval = true) => (dispatch, getState) => {
   dispatch(actions.beginMigrationStart())
   api.beginMigration(getState())
     .then((res) => {
       dispatch(actions.beginMigrationSuccess(res.data))
-      if (startInteval && MigrationStates.isLoadingState(res.data.workflow_state)) {
+      if (startInterval && MigrationStates.isLoadingState(res.data.workflow_state)) {
         actions.startMigrationStatusPoll()(dispatch, getState)
       }
     })

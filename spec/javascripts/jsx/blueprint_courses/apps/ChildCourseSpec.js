@@ -52,15 +52,26 @@ test('unmounts ChildContent from container component', () => {
   notOk(document.querySelector('.bcc__wrapper'))
 })
 
-test('change log route onEnter calls app showChangeLog with changeId from URL', () => {
+test('change log route onEnter calls app showChangeLog with params from URL', () => {
   child = new ChildCourse(container, defaultData())
   child.render()
   child.app.showChangeLog = sinon.spy()
-  child.routes[0].onEnter({ params: { id: '3' } }, () => {})
+  child.routes[0].onEnter({ params: { blueprintType: 'template', templateId: '2', changeId: '3' } }, () => {})
   equal(child.app.showChangeLog.callCount, 1)
-  equal(child.app.showChangeLog.getCall(0).args[0], '3')
+  deepEqual(child.app.showChangeLog.getCall(0).args[0], { blueprintType: 'template', templateId: '2', changeId: '3' })
 
   child.app.hideChangeLog = sinon.spy()
   child.routes[0].onExit({}, () => {})
   equal(child.app.hideChangeLog.callCount, 1)
+})
+
+test('start calls render() and setupRouter()', () => {
+  child = new ChildCourse(container, defaultData())
+  const renderStub = sinon.stub(child, 'render')
+  const setupRouterStub = sinon.stub(child, 'setupRouter')
+
+  child.start()
+
+  equal(renderStub.callCount, 1)
+  equal(setupRouterStub.callCount, 1)
 })

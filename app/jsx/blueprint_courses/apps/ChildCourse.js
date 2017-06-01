@@ -19,51 +19,39 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-import page from 'page'
 
 import { ConnectedChildContent as ChildContent } from '../components/ChildContent'
 import FlashNotifications from '../flashNotifications'
 import createStore from '../store'
+import Router from '../router'
 
 export default class ChildCourse {
   constructor (root, data, debug) {
     this.root = root
     this.store = createStore(data, debug)
+    this.router = new Router()
   }
 
-  routes = [
-    {
-      path: '/blueprint/migrations/:id',
-      onEnter: (ctx, next) => {
-        this.app.showChangeLog(ctx.params.id)
-        next()
-      },
-      onExit: (ctx, next) => {
-        this.app.hideChangeLog()
-        next()
-      },
-    }
-  ]
+  routes = [{
+    path: Router.PATHS.singleMigration,
+    onEnter: ({ params }) => this.app.showChangeLog(params),
+    onExit: () => this.app.hideChangeLog(),
+  }]
 
-  setupRoutes () {
-    this.routes.forEach((route) => {
-      page(route.path, route.onEnter)
-      page.exit(route.path, route.onExit)
-    })
-
-    page.base(location.pathname)
-    page({ hashbang: true })
+  setupRouter () {
+    this.router.registerRoutes(this.routes)
+    this.router.start()
   }
 
   unmount () {
     ReactDOM.unmountComponentAtNode(this.root)
-    page.stop()
+    this.router.stop()
   }
 
   render () {
     ReactDOM.render(
       <Provider store={this.store}>
-        <ChildContent goTo={page} realRef={(c) => { this.app = c }} />
+        <ChildContent routeTo={this.router.page} realRef={(c) => { this.app = c }} />
       </Provider>,
       this.root
     )
@@ -72,6 +60,6 @@ export default class ChildCourse {
   start () {
     FlashNotifications.subscribe(this.store)
     this.render()
-    this.setupRoutes()
+    this.setupRouter()
   }
 }

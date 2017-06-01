@@ -31,11 +31,13 @@ export default class BlueprintCourseSidebar extends Component {
   static propTypes = {
     onOpen: PropTypes.func,
     children: PropTypes.node,
-    contentRef: PropTypes.func, //for unit testing
+    detachedChildren: PropTypes.node,
+    contentRef: PropTypes.func, // for unit testing
   }
 
   static defaultProps = {
     children: null,
+    detachedChildren: null,
     onOpen: () => {},
     contentRef: null
   }
@@ -101,6 +103,7 @@ export default class BlueprintCourseSidebar extends Component {
             </div>
           </div>
         </Tray>
+        {this.props.detachedChildren}
       </div>
     )
   }

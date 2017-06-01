@@ -32,8 +32,8 @@ import propTypes from '../propTypes'
 export default class ChildContent extends Component {
   static propTypes = {
     realRef: PropTypes.func,
+    routeTo: PropTypes.func.isRequired,
     isChangeLogOpen: PropTypes.bool.isRequired,
-    goTo: PropTypes.func.isRequired,
     selectChangeLog: PropTypes.func.isRequired,
     terms: propTypes.termList.isRequired,
     childCourse: propTypes.courseInfo.isRequired,
@@ -49,11 +49,11 @@ export default class ChildContent extends Component {
   }
 
   clearRoutes = () => {
-    this.props.goTo('')
+    this.props.routeTo('#!/')
   }
 
-  showChangeLog (changeId) {
-    this.props.selectChangeLog(changeId)
+  showChangeLog (params) {
+    this.props.selectChangeLog(params)
   }
 
   hideChangeLog () {

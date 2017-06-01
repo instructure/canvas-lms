@@ -29,6 +29,7 @@ import SyncHistoryItem from './SyncHistoryItem'
 
 import actions from '../actions'
 import propTypes from '../propTypes'
+import LoadStates from '../loadStates'
 
 const { func, bool } = PropTypes
 
@@ -109,14 +110,24 @@ export default class SyncHistory extends Component {
   }
 }
 
-const connectState = state =>
-  select(state, [
+const connectState = (state) => {
+  const selectedChange = state.selectedChangeLog && state.changeLogs[state.selectedChangeLog]
+  const historyState = selectedChange
+  ? {
+    hasLoadedHistory: LoadStates.hasLoaded(selectedChange.status),
+    isLoadingHistory: LoadStates.isLoading(selectedChange.status),
+    migrations: selectedChange.data ? [selectedChange.data] : [],
+  } : select(state, [
     'hasLoadedHistory',
     'isLoadingHistory',
+    'migrations',
+  ])
+
+  return Object.assign(select(state, [
     'hasLoadedAssociations',
     'isLoadingAssociations',
-    'migrations',
     ['existingAssociations', 'associations'],
-  ])
+  ]), historyState)
+}
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
 export const ConnectedSyncHistory = connect(connectState, connectActions)(SyncHistory)

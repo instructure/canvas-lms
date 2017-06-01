@@ -54,7 +54,7 @@ test('loadChange dispatches LOAD_CHANGE_START if not already loading', () => {
   const dispatchSpy = sinon.spy()
 
   mockSuccess('getFullMigration')
-  actions.loadChange(changeId)(dispatchSpy, getState)
+  actions.loadChange({ changeId })(dispatchSpy, getState)
 
   equal(dispatchSpy.callCount, 1)
   deepEqual(dispatchSpy.firstCall.args, [{ type: 'LOAD_CHANGE_START', payload: { changeId } }])
@@ -66,7 +66,7 @@ test('loadChange does not dispatch LOAD_CHANGE_START if change is already loadin
   const dispatchSpy = sinon.spy()
 
   mockSuccess('getFullMigration')
-  actions.loadChange(changeId)(dispatchSpy, getState)
+  actions.loadChange({ changeId })(dispatchSpy, getState)
 
   equal(dispatchSpy.callCount, 0)
 })
@@ -78,7 +78,7 @@ test('loadChange dispatches LOAD_CHANGE_SUCCESS if API returns successfully', (a
   const dispatchSpy = sinon.spy()
 
   mockSuccess('getFullMigration', { foo: 'bar' })
-  actions.loadChange(changeId)(dispatchSpy, getState)
+  actions.loadChange({ changeId })(dispatchSpy, getState)
 
   setTimeout(() => {
     equal(dispatchSpy.callCount, 2)
@@ -95,7 +95,7 @@ test('loadChange dispatches LOAD_CHANGE_FAIL if API returns error', (assert) => 
   const dispatchSpy = sinon.spy()
 
   mockFail('getFullMigration')
-  actions.loadChange(changeId)(dispatchSpy, getState)
+  actions.loadChange({ changeId })(dispatchSpy, getState)
 
   setTimeout(() => {
     equal(dispatchSpy.callCount, 2)
@@ -111,7 +111,7 @@ test('selectChangeLog dispatches SELECT_CHANGE_LOG with changeId', () => {
   const dispatchSpy = sinon.spy()
 
   mockSuccess('getFullMigration')
-  actions.selectChangeLog(changeId)(dispatchSpy, getState)
+  actions.selectChangeLog({ changeId })(dispatchSpy, getState)
 
   deepEqual(dispatchSpy.firstCall.args, [{ type: 'SELECT_CHANGE_LOG', payload: { changeId } }])
 })
@@ -122,7 +122,7 @@ test('selectChangeLog dispatches LOAD_CHANGE_START if change not already loaded'
   const dispatchSpy = sinon.spy()
 
   mockSuccess('getFullMigration')
-  actions.selectChangeLog(changeId)(dispatchSpy, getState)
+  actions.selectChangeLog({ changeId })(dispatchSpy, getState)
 
   deepEqual(dispatchSpy.secondCall.args, [{ type: 'LOAD_CHANGE_START', payload: { changeId } }])
 })
@@ -133,22 +133,21 @@ test('selectChangeLog does not dispatch LOAD_CHANGE_START if change already load
   const dispatchSpy = sinon.spy()
 
   mockSuccess('getFullMigration')
-  actions.selectChangeLog(changeId)(dispatchSpy, getState)
+  actions.selectChangeLog({ changeId })(dispatchSpy, getState)
 
   equal(dispatchSpy.callCount, 1)
   deepEqual(dispatchSpy.firstCall.args, [{ type: 'SELECT_CHANGE_LOG', payload: { changeId } }])
 })
 
 test('selectChangeLog does not dispatch LOAD_CHANGE_START if changeId is null', () => {
-  const changeId = null
   const getState = () => ({ changeLogs: {} })
   const dispatchSpy = sinon.spy()
 
   mockSuccess('getFullMigration')
-  actions.selectChangeLog(changeId)(dispatchSpy, getState)
+  actions.selectChangeLog(null)(dispatchSpy, getState)
 
   equal(dispatchSpy.callCount, 1)
-  deepEqual(dispatchSpy.firstCall.args, [{ type: 'SELECT_CHANGE_LOG', payload: { changeId } }])
+  deepEqual(dispatchSpy.firstCall.args, [{ type: 'SELECT_CHANGE_LOG' }])
 })
 
 test('loadHistory dispatches LOAD_HISTORY_START', () => {

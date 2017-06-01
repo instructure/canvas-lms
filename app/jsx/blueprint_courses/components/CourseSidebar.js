@@ -43,6 +43,8 @@ let BlueprintAssociations = null
 
 export default class CourseSidebar extends Component {
   static propTypes = {
+    realRef: PropTypes.func,
+    routeTo: PropTypes.func.isRequired,
     unsyncedChanges: propTypes.unsyncedChanges,
     associations: propTypes.courseList.isRequired,
     migrationStatus: propTypes.migrationState,
@@ -53,6 +55,7 @@ export default class CourseSidebar extends Component {
     isLoadingUnsyncedChanges: PropTypes.bool.isRequired,
     hasLoadedUnsyncedChanges: PropTypes.bool.isRequired,
     isLoadingBeginMigration: PropTypes.bool.isRequired,
+    selectChangeLog: PropTypes.func.isRequired,
     loadAssociations: PropTypes.func.isRequired,
     saveAssociations: PropTypes.func.isRequired,
     clearAssociations: PropTypes.func.isRequired,
@@ -65,14 +68,16 @@ export default class CourseSidebar extends Component {
     unsyncedChanges: [],
     contentRef: null,
     migrationStatus: MigrationStates.states.unknown,
+    realRef: () => {},
   }
 
-  constructor (props) {
-    super(props)
-    this.state = {
-      isModalOpen: false,
-      modalId: null,
-    }
+  state = {
+    isModalOpen: false,
+    modalId: null,
+  }
+
+  componentDidMount () {
+    this.props.realRef(this)
   }
 
   componentWillReceiveProps (nextProps) {
@@ -116,7 +121,7 @@ export default class CourseSidebar extends Component {
       props: {
         title: I18n.t('Sync History'),
         onCancel: () => this.closeModal(() => {
-          this.syncHistoryBtn.focus()
+          if (this.syncHistoryBtn) this.syncHistoryBtn.focus()
         }),
       },
       children: <SyncHistory />,
@@ -144,6 +149,7 @@ export default class CourseSidebar extends Component {
   }
 
   closeModal = (cb) => {
+    this.clearRoutes()
     this.setState({ isModalOpen: false }, cb)
   }
 
@@ -163,18 +169,7 @@ export default class CourseSidebar extends Component {
   }
 
   handleSyncHistoryClick = () => {
-    require.ensure([], (require) => {
-      // lazy load SyncHistory component
-      const SyncHistoryModule = require('./SyncHistory')
-      if (SyncHistory === null) {
-        SyncHistory = SyncHistoryModule.ConnectedSyncHistory
-      }
-
-      this.setState({
-        isModalOpen: true,
-        modalId: 'syncHistory',
-      })
-    })
+    this.openHistoryModal()
   }
 
   handleUnsyncedChangesClick = () => {
@@ -195,6 +190,34 @@ export default class CourseSidebar extends Component {
   handleSendNotificationClick = (event) => {
     const enabled = event.target.checked
     this.props.enableSendNotification(enabled)
+  }
+
+  clearRoutes = () => {
+    this.props.routeTo('#!/')
+  }
+
+  openHistoryModal () {
+    require.ensure([], (require) => {
+      // lazy load SyncHistory component
+      const SyncHistoryModule = require('./SyncHistory')
+      if (SyncHistory === null) {
+        SyncHistory = SyncHistoryModule.ConnectedSyncHistory
+      }
+
+      this.setState({
+        isModalOpen: true,
+        modalId: 'syncHistory',
+      })
+    })
+  }
+
+  showChangeLog (params) {
+    this.props.selectChangeLog(params)
+    this.openHistoryModal()
+  }
+
+  hideChangeLog () {
+    this.props.selectChangeLog(null)
   }
 
   maybeRenderSyncButton () {
@@ -286,7 +309,11 @@ export default class CourseSidebar extends Component {
 
   render () {
     return (
-      <BlueprintSidebar onOpen={this.onOpenSidebar} contentRef={this.props.contentRef}>
+      <BlueprintSidebar
+        onOpen={this.onOpenSidebar}
+        contentRef={this.props.contentRef}
+        detachedChildren={this.renderModal()}
+      >
         {this.maybeRenderAssociations()}
         <div className="bcs__row">
           <Button id="mcSyncHistoryBtn" ref={(c) => { this.syncHistoryBtn = c }} variant="link" onClick={this.handleSyncHistoryClick}>
@@ -295,7 +322,7 @@ export default class CourseSidebar extends Component {
         </div>
         {this.maybeRenderUnsyncedChanges()}
         {this.maybeRenderSyncButton()}
-        {this.renderModal()}
+        {}
       </BlueprintSidebar>
     )
   }

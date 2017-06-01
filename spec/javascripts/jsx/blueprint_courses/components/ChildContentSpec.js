@@ -21,7 +21,7 @@ import * as enzyme from 'enzyme'
 import ChildContent from 'jsx/blueprint_courses/components/ChildContent'
 import sampleData from '../sampleData'
 
-QUnit.module('ChildContent component')
+QUnit.module('ChildContent app')
 
 const defaultProps = () => ({
   isChangeLogOpen: false,
@@ -29,7 +29,7 @@ const defaultProps = () => ({
   childCourse: sampleData.childCourse,
   masterCourse: sampleData.masterCourse,
   realRef: () => {},
-  goTo: () => {},
+  routeTo: () => {},
   selectChangeLog: () => {},
 })
 
@@ -41,11 +41,11 @@ test('renders the ChildContent component', () => {
 
 test('clearRoutes removes blueprint path', () => {
   const props = defaultProps()
-  props.goTo = sinon.spy()
+  props.routeTo = sinon.spy()
   const tree = enzyme.shallow(<ChildContent {...props} />)
   const instance = tree.instance()
   instance.clearRoutes()
-  equal(props.goTo.getCall(0).args[0], '')
+  equal(props.routeTo.getCall(0).args[0], '#!/')
 })
 
 test('showChangeLog calls selectChangeLog prop with argument', () => {

@@ -19,6 +19,7 @@
 import React from 'react'
 import * as enzyme from 'enzyme'
 import SyncHistory from 'jsx/blueprint_courses/components/SyncHistory'
+import sampleData from '../sampleData'
 
 QUnit.module('SyncHistory component')
 
@@ -29,6 +30,7 @@ const defaultProps = () => ({
   loadAssociations: () => {},
   isLoadingAssociations: false,
   hasLoadedAssociations: false,
+  migrations: sampleData.history,
 })
 
 test('renders the SyncHistory component', () => {
@@ -43,4 +45,10 @@ test('displays spinner when loading courses', () => {
   const tree = enzyme.shallow(<SyncHistory {...props} />)
   const node = tree.find('.bcs__history Spinner')
   ok(node.exists())
+})
+
+test('renders SyncHistoryItem components for each migration', () => {
+  const tree = enzyme.mount(<SyncHistory {...defaultProps()} />)
+  const node = tree.find('SyncHistoryItem')
+  equal(node.length, 1)
 })

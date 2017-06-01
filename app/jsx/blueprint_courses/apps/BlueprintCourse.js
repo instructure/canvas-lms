@@ -20,14 +20,27 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 
-import createStore from '../store'
 import { ConnectedCourseSidebar } from '../components/CourseSidebar'
 import FlashNotifications from '../flashNotifications'
+import createStore from '../store'
+import Router from '../router'
 
 export default class BlueprintCourse {
   constructor (root, data, debug) {
     this.root = root
     this.store = createStore(data, debug)
+    this.router = new Router()
+  }
+
+  routes = [{
+    path: Router.PATHS.singleMigration,
+    onEnter: ({ params }) => this.app.showChangeLog(params),
+    onExit: () => this.app.hideChangeLog(),
+  }]
+
+  setupRouter () {
+    this.router.registerRoutes(this.routes)
+    this.router.start()
   }
 
   unmount () {
@@ -37,7 +50,7 @@ export default class BlueprintCourse {
   render () {
     ReactDOM.render(
       <Provider store={this.store}>
-        <ConnectedCourseSidebar />
+        <ConnectedCourseSidebar routeTo={this.router.page} realRef={(c) => { this.app = c }} />
       </Provider>,
       this.root
     )
@@ -46,5 +59,6 @@ export default class BlueprintCourse {
   start () {
     FlashNotifications.subscribe(this.store)
     this.render()
+    this.setupRouter()
   }
 }

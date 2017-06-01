@@ -101,20 +101,20 @@ const ApiClient = {
       })
   },
 
-  getMigration ({ masterCourse }, migrationId) {
-    return axios.get(`/api/v1/courses/${masterCourse.id}/blueprint_templates/default/migrations/${migrationId}`)
+  getMigration ({ course }, { blueprintType = 'blueprint_templates', templateId = 'default', changeId }) {
+    return axios.get(`/api/v1/courses/${course.id}/${blueprintType}/${templateId}/migrations/${changeId}`)
   },
 
-  getMigrationDetails ({ masterCourse }, migrationId) {
-    return axios.get(`/api/v1/courses/${masterCourse.id}/blueprint_templates/default/migrations/${migrationId}/details`)
+  getMigrationDetails ({ course }, { blueprintType = 'blueprint_templates', templateId = 'default', changeId }) {
+    return axios.get(`/api/v1/courses/${course.id}/${blueprintType}/${templateId}/migrations/${changeId}/details`)
   },
 
-  getFullMigration ({ masterCourse }, migrationId) {
-    return this.getMigration({ masterCourse }, migrationId)
+  getFullMigration ({ course }, params) {
+    return this.getMigration({ course }, params)
       .then(({ data }) =>
-        this.getMigrationDetails({ masterCourse }, data.id)
+        this.getMigrationDetails({ course }, params)
           .then(res => Object.assign(data, {
-            changeId: migrationId,
+            changeId: params.changeId,
             changes: res.data,
           })
         ))
@@ -127,7 +127,7 @@ const ApiClient = {
           // limit to last 5 migrations
           data.slice(0, 5)
             .map(mig =>
-              this.getMigrationDetails({ masterCourse }, mig.id)
+              this.getMigrationDetails({ course: masterCourse }, { changeId: mig.id })
                 .then(res => Object.assign(mig, { changes: res.data }))
             )))
   },

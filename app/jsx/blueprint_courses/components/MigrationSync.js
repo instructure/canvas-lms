@@ -60,7 +60,7 @@ export default class MigrationSync extends Component {
 
   componentWillMount () {
     if (!this.props.hasCheckedMigration) {
-      this.props.checkMigration()
+      this.props.checkMigration(true)
     }
   }
 
