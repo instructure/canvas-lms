@@ -33,16 +33,18 @@ describe Api::V1::PlannerItem do
   end
 
   before :once do
-    course_factory
+    course_factory active_all: true
     @course.root_account.enable_feature!(:student_planner)
 
-    teacher_in_course
-    student_in_course
+    teacher_in_course active_all: true
+    student_in_course active_all: true
     for_course = { course: @course }
 
     assignment_quiz [], for_course
     group_assignment_discussion for_course
-    assignment_model for_course
+    assignment_model for_course.merge(submission_types: 'online_text_entry')
+    @assignment.workflow_state = "published"
+    @assignment.save!
 
     @teacher_override = planner_override_model(plannable: @assignment, user: @teacher)
     @student_override = planner_override_model(plannable: @assignment, user: @student, visible: false)
@@ -60,19 +62,19 @@ describe Api::V1::PlannerItem do
 
     context 'with an existing planner override' do
       it 'should return the planner visibility state' do
-        expect(@teacher_hash[:visible_in_planner]).to eq true
-        expect(@student_hash[:visible_in_planner]).to eq false
+        expect(@teacher_hash[:visible_in_planner]).to be true
+        expect(@student_hash[:visible_in_planner]).to be false
       end
 
       it 'should return the planner override id' do
-        expect(@teacher_hash[:planner_override].id).to eq @teacher_override.id
-        expect(@student_hash[:planner_override].id).to eq @student_override.id
+        expect(@teacher_hash[:planner_override][:id]).to eq @teacher_override.id
+        expect(@student_hash[:planner_override][:id]).to eq @student_override.id
       end
     end
 
     context 'without an existing planner override' do
       it 'should return true for `visible_in_planner`' do
-        expect(@hash[:visible_in_planner]).to eq true
+        expect(@hash[:visible_in_planner]).to be true
       end
 
       it 'should have a nil planner_override value' do
@@ -88,26 +90,67 @@ describe Api::V1::PlannerItem do
       end
 
       it 'should include the respective jsons for the given object type' do
-        expect(@assignment_hash.has_key?(:plannable)).to be_truthy
-        expect(@topic_hash.has_key?(:plannable)).to be_truthy
-        expect(@quiz_hash.has_key?(:plannable)).to be_truthy
+        expect(@assignment_hash.has_key?(:plannable)).to be true
+        expect(@topic_hash.has_key?(:plannable)).to be true
+        expect(@quiz_hash.has_key?(:plannable)).to be true
       end
     end
 
-    describe 'status' do
-      before :once do
-        @assignment_hash = api.planner_item_json(@assignment, @student, session, 'submitting')
+    describe '#submission_statuses_for' do
+      it 'should return the submission statuses for the learning object' do
+        json = api.planner_item_json(@assignment, @student, session, 'submitting')
+        expect(json.has_key?(:submissions)).to be true
+        expect([:excused, :graded, :late, :missing, :needs_grading, :has_feedback].all? { |k| json[:submissions].has_key?(k) }).to be true
       end
 
-      it 'should return the statuses for the learning object'
-    end
+      it 'should indicate that an assignment is missing' do
+        @assignment.update!(due_at: 1.week.ago)
 
-    describe 'activity' do
-      before :once do
-        @topic_hash = api.planner_item_json(@topic.assignment, @student, session, 'submitting')
+        json = api.planner_item_json(@assignment, @student, session, 'submitting')
+        expect(json[:submissions][:missing]).to be true
       end
 
-      it 'should return the latest activity for the learning object'
+      it 'should indicate that an assignment is excused' do
+        submission = @assignment.submit_homework(@student, body: "b")
+        submission.excused = true
+        submission.save!
+
+        json = api.planner_item_json(@assignment, @student, session, 'submitting')
+        expect(json[:submissions][:excused]).to be true
+      end
+
+      it 'should indicate that an assignment is graded' do
+        submission = @assignment.submit_homework(@student, body: "o")
+        submission.update(score: 10)
+        submission.grade_it!
+
+        json = api.planner_item_json(@assignment, @student, session, 'submitting')
+        expect(json[:submissions][:graded]).to be true
+      end
+
+      it 'should indicate that an assignment is late' do
+        @assignment.update!(due_at: 1.week.ago)
+        submission = @assignment.submit_homework(@student, body: "d")
+
+        json = api.planner_item_json(@assignment, @student, session, 'submitting')
+        expect(json[:submissions][:late]).to be true
+      end
+
+      it 'should indicate that an assignment needs grading' do
+        submission = @assignment.submit_homework(@student, body: "y")
+
+        json = api.planner_item_json(@assignment, @student, session, 'submitted')
+        expect(json[:submissions][:needs_grading]).to be true
+      end
+
+      it 'should indicate that an assignment has feedback' do
+        submission = @assignment.submit_homework(@student, body: "the stuff")
+        submission.add_comment(user: @teacher, comment: "nice work, fam")
+        submission.grade_it!
+
+        json = api.planner_item_json(@assignment, @student, session, 'submitted', { start_at: 1.week.ago })
+        expect(json[:submissions][:has_feedback]).to be true
+      end
     end
   end
 end

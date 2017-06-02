@@ -1618,6 +1618,19 @@ class User < ActiveRecord::Base
     end
   end
 
+  def submission_statuses(opts = {})
+    Rails.cache.fetch(['assignment_submission_statuses', self].cache_key, :expires_in => 120.minutes) do
+        {
+          excused: Set.new(Submission.with_assignment.where(excused: true, user_id: self).pluck(:assignment_id)),
+          graded: Set.new(Submission.with_assignment.where(user_id: self).where("submissions.excused = true OR (submissions.score IS NOT NULL AND submissions.workflow_state = 'graded')").pluck(:assignment_id)),
+          late: Set.new(Submission.with_assignment.late.where(user_id: self).pluck(:assignment_id)),
+          missing: Set.new(Submission.with_assignment.missing.where(user_id: self).pluck(:assignment_id)),
+          needs_grading: Set.new(Submission.with_assignment.needs_grading.where(user_id: self).pluck(:assignment_id)),
+          has_feedback: Set.new(self.recent_feedback(start_at: opts[:start_at]).map(&:assignment_id))
+        }.with_indifferent_access
+    end
+  end
+
   def generate_access_verifier(ts)
     require 'openssl'
     digest = OpenSSL::Digest::MD5.new

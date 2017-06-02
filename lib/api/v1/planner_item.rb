@@ -24,14 +24,14 @@ module Api::V1::PlannerItem
   include Api::V1::DiscussionTopics
   include Api::V1::WikiPage
 
-  def planner_item_json(item, user, session, todo_type)
+  def planner_item_json(item, user, session, todo_type, opts = {})
     context_data(item).merge({
       :type => todo_type,
       :ignore => api_v1_users_todo_ignore_url(item.asset_string, todo_type, :permanent => '0'),
       :ignore_permanently => api_v1_users_todo_ignore_url(item.asset_string, todo_type, :permanent => '1'),
       :visible_in_planner => item.visible_in_planner_for?(user),
-      :planner_override => item.planner_override_for(user)
-    }).tap do |hash|
+      :planner_override => api_json(item.planner_override_for(user), user, session)
+    }).merge(submission_statuses_for(user, item, opts)).tap do |hash|
       if item.is_a?(PlannerNote)
         hash[:plannable_type] = 'planner_note'
         hash[:plannable] = api_json(item, user, session)
@@ -66,5 +66,21 @@ module Api::V1::PlannerItem
         hash[:needs_grading_count] = Assignments::NeedsGradingCountQuery.new(item, user).count if todo_type == 'grading'
       end
     end
+  end
+
+  def submission_statuses_for(user, item, opts = {})
+    submission_status = {submissions: false}
+    return submission_status unless item.is_a?(Assignment)
+    ss = user.submission_statuses(opts)
+    submission_status[:submissions] = {
+      excused: ss[:excused].include?(item.id),
+      graded: ss[:graded].include?(item.id),
+      late: ss[:late].include?(item.id),
+      missing: ss[:missing].include?(item.id),
+      needs_grading: ss[:needs_grading].include?(item.id),
+      has_feedback: ss[:has_feedback].include?(item.id)
+    }
+
+    submission_status
   end
 end

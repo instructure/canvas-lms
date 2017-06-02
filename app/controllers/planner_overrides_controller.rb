@@ -56,9 +56,19 @@
 #           "example": false,
 #           "type": "boolean"
 #         },
+#         "created_at": {
+#           "description": "The datetime of when the planner override was created",
+#           "example": "2017-05-09T10:12:00Z",
+#           "type": "datetime"
+#         },
+#         "updated_at": {
+#           "description": "The datetime of when the planner override was updated",
+#           "example": "2017-05-09T10:12:00Z",
+#           "type": "datetime"
+#         },
 #         "deleted_at": {
 #           "description": "The datetime of when the planner override was deleted, if applicable",
-#           "example": "2017-05-09T10:12:00Z",
+#           "example": "2017-05-15T12:12:00Z",
 #           "type": "datetime"
 #         }
 #       }
@@ -70,10 +80,8 @@ class PlannerOverridesController < ApplicationController
 
   before_action :require_user
   before_action :set_date_range
-  before_action :set_planner_items, only: [:items_index]
 
   attr_reader :start_date, :end_date
-
   # @API List planner items
   #
   # Retrieve the list of objects to be shown on the planner for the current user
@@ -84,43 +92,75 @@ class PlannerOverridesController < ApplicationController
   #   The value should be formatted as: yyyy-mm-dd or ISO 8601 YYYY-MM-DDTHH:MM:SSZ.
   #
   # @example_response
-  #   [
-  #     {
-  #       'type': 'grading',        // an assignment that needs grading
-  #       'assignment': { .. assignment object .. },
-  #       'ignore': '.. url ..',
-  #       'ignore_permanently': '.. url ..',
-  #       'visible_in_planner': true
-  #       'html_url': '.. url ..',
-  #       'needs_grading_count': 3, // number of submissions that need grading
-  #       'context_type': 'course', // course|group
-  #       'course_id': 1,
-  #       'group_id': null,
+  # [
+  #   {
+  #     "context_type": "Course",
+  #     "course_id": 1,
+  #     "type": "viewing", // Whether it has been or needs to be graded, submitted, viewed (e.g. ungraded)
+  #     "ignore": "http://canvas.instructure.com/api/v1/users/self/todo/discussion_topic_8/viewing?permanent=0", // For hiding on the todo list
+  #     "ignore_permanently": "http://canvas.instructure.com/api/v1/users/self/todo/discussion_topic_8/viewing?permanent=1",
+  #     "visible_in_planner": true, // Whether or not it is displayed on the student planner
+  #     "planner_override": { ... planner override object ... }, // Associated PlannerOverride object if user has toggled visibility for the object on the planner
+  #     "submissions": false, // The statuses of the user's submissions for this object
+  #     "plannable_type": "discussion_topic",
+  #     "plannable": { ... discussion topic object },
+  #     "html_url": "/courses/1/discussion_topics/8"
+  #   },
+  #   {
+  #     "context_type": "Course",
+  #     "course_id": 1,
+  #     "type": "submitting",
+  #     "ignore": "http://canvas.instructure.com/api/v1/users/self/todo/assignment_1/submitting?permanent=0",
+  #     "ignore_permanently": "http://canvas.instructure.com/api/v1/users/self/todo/assignment_1/submitting?permanent=1",
+  #     "visible_in_planner": true,
+  #     "planner_override": {
+  #         "id": 3,
+  #         "plannable_type": "Assignment",
+  #         "plannable_id": 1,
+  #         "user_id": 2,
+  #         "workflow_state": "active",
+  #         "visible": true, // A user-defined setting for minimizing/hiding objects on the planner
+  #         "deleted_at": null,
+  #         "created_at": "2017-05-18T18:35:55Z",
+  #         "updated_at": "2017-05-18T18:35:55Z"
   #     },
-  #     {
-  #       'type' => 'submitting',   // an assignment that needs submitting soon
-  #       'assignment' => { .. assignment object .. },
-  #       'ignore' => '.. url ..',
-  #       'ignore_permanently' => '.. url ..',
-  #       'visible_in_planner': true
-  #       'html_url': '.. url ..',
-  #       'context_type': 'course',
-  #       'course_id': 1,
+  #     "submissions": { // The status as it pertains to the current user
+  #       "excused": false,
+  #       "graded": false,
+  #       "late": false,
+  #       "missing": true,
+  #       "needs_grading": false,
+  #       "with_feedback": false
   #     },
-  #     {
-  #       'type' => 'submitting',   // a quiz that needs submitting soon
-  #       'quiz' => { .. quiz object .. },
-  #       'ignore' => '.. url ..',
-  #       'ignore_permanently' => '.. url ..',
-  #       'visible_in_planner': true
-  #       'html_url': '.. url ..',
-  #       'context_type': 'course',
-  #       'course_id': 1,
+  #     "plannable_type": "assignment",
+  #     "plannable": { ... assignment object ...  },
+  #     "html_url": "http://canvas.instructure.com/courses/1/assignments/1#submit"
+  #   },
+  #   {
+  #     "type": "viewing",
+  #     "ignore": "http://canvas.instructure.com/api/v1/users/self/todo/planner_note_1/viewing?permanent=0",
+  #     "ignore_permanently": "http://canvas.instructure.com/api/v1/users/self/todo/planner_note_1/viewing?permanent=1",
+  #     "visible_in_planner": true,
+  #     "planner_override": null,
+  #     "submissions": false,
+  #     "plannable_type": "planner_note",
+  #     "plannable": {
+  #       "id": 1,
+  #       "todo_date": "2017-05-30T06:00:00Z",
+  #       "title": "hello",
+  #       "details": "world",
+  #       "user_id": 2,
+  #       "course_id": null,
+  #       "workflow_state": "active",
+  #       "created_at": "2017-05-30T16:29:04Z",
+  #       "updated_at": "2017-05-30T16:29:15Z"
   #     },
-  #   ]
+  #     "html_url": "http://canvas.instructure.com/api/v1/planner_notes.1"
+  #   }
+  # ]
   def items_index
-    pi_json = @planner_items.map { |item| planner_item_json(item, @current_user, session, item.todo_type) }
-    render json: pi_json
+    items_json = planner_items.map { |item| planner_item_json(item, @current_user, session, item.todo_type, {start_at: start_date}) }
+    render json: items_json
   end
 
   # @API List planner overrides
@@ -198,25 +238,29 @@ class PlannerOverridesController < ApplicationController
 
   private
 
-  def set_planner_items
-    set_assignments
-    set_pages
-    set_planner_notes
-    set_ungraded_discussions
-    @planner_items = Api.paginate(@discussions + @pages + @assignments + @planner_notes, self, api_v1_planner_items_url)
+  def planner_items
+    @planner_items ||= Api.paginate(ungraded_discussion_items + page_items + assignment_items + planner_note_items, self, api_v1_planner_items_url)
   end
 
-  def set_assignments
-    @grading = @current_user.assignments_needing_grading(default_opts).each { |a| a.todo_type = 'grading' }
-    @submitting = @current_user.assignments_needing_submitting(default_opts).each { |a| a.todo_type = 'submitting' }
-    @moderation = @current_user.assignments_needing_moderation(default_opts).each { |a| a.todo_type = 'moderation' }
-    @ungraded_quiz = @current_user.ungraded_quizzes_needing_submitting(default_opts).each { |a| a.todo_type = 'submitting' }
-    @submitted = @current_user.submitted_assignments(default_opts).each { |a| a.todo_type = 'submitted' }
-    @assignments = @grading + @submitted + @ungraded_quiz + @submitting + @moderation
+  def assignment_items
+    grading = @current_user.assignments_needing_grading(default_opts).each { |a| a.todo_type = 'grading' }
+    submitting = @current_user.assignments_needing_submitting(default_opts).each { |a| a.todo_type = 'submitting' }
+    moderation = @current_user.assignments_needing_moderation(default_opts).each { |a| a.todo_type = 'moderation' }
+    ungraded_quiz = @current_user.ungraded_quizzes_needing_submitting(default_opts).each { |a| a.todo_type = 'submitting' }
+    submitted = @current_user.submitted_assignments(default_opts).each { |a| a.todo_type = 'submitted' }
+    @assignments ||= grading + submitted + ungraded_quiz + submitting + moderation
   end
 
-  def set_planner_notes
-    @planner_notes = PlannerNote.where(user: @current_user, todo_date: @start_date...@end_date).each { |pn| pn.todo_type = 'viewing' }
+  def planner_note_items
+    @planner_notes ||= PlannerNote.where(user: @current_user, todo_date: @start_date...@end_date).each { |pn| pn.todo_type = 'viewing' }
+  end
+
+  def page_items
+    @pages ||= @current_user.wiki_pages_needing_viewing(default_opts).each { |p| p.todo_type = 'viewing' }
+  end
+
+  def ungraded_discussion_items
+    @ungraded_discussions ||= @current_user.discussion_topics_needing_viewing(default_opts).each { |t| t.todo_type = 'viewing' }
   end
 
   def set_date_range
@@ -230,14 +274,6 @@ class PlannerOverridesController < ApplicationController
     # date was passed
     @end_date ||= 10.years.from_now
     @start_date ||= 10.years.ago
-  end
-
-  def set_pages
-    @pages = @current_user.wiki_pages_needing_viewing(default_opts).each { |p| p.todo_type = 'viewing' }
-  end
-
-  def set_ungraded_discussions
-    @discussions = @current_user.discussion_topics_needing_viewing(default_opts).each { |t| t.todo_type = 'viewing' }
   end
 
   def require_user

@@ -2282,6 +2282,59 @@ describe User do
     end
   end
 
+  describe "submission_statuses" do
+    before :once do
+      course_factory active_all: true
+      student_in_course active_all: true
+      assignment_model(course: @course, submission_types: 'online_text_entry')
+      @assignment.workflow_state = "published"
+      @assignment.save!
+    end
+
+    it 'should indicate that an assignment is missing' do
+      @assignment.update!(due_at: 1.week.ago)
+
+      expect(@student.submission_statuses[:missing]).to match_array([@assignment.id])
+    end
+
+    it 'should indicate that an assignment is excused' do
+      submission = @assignment.submit_homework(@student, body: "b")
+      submission.excused = true
+      submission.save!
+
+      expect(@student.submission_statuses[:excused]).to match_array([@assignment.id])
+    end
+
+    it 'should indicate that an assignment is graded' do
+      submission = @assignment.submit_homework(@student, body: "o")
+      submission.update(score: 10)
+      submission.grade_it!
+
+      expect(@student.submission_statuses[:graded]).to match_array([@assignment.id])
+    end
+
+    it 'should indicate that an assignment is late' do
+      @assignment.update!(due_at: 1.week.ago)
+      submission = @assignment.submit_homework(@student, body: "d")
+
+      expect(@student.submission_statuses[:late]).to match_array([@assignment.id])
+    end
+
+    it 'should indicate that an assignment needs grading' do
+      submission = @assignment.submit_homework(@student, body: "y")
+
+      expect(@student.submission_statuses[:needs_grading]).to match_array([@assignment.id])
+    end
+
+    it 'should indicate that an assignment has feedback' do
+      submission = @assignment.submit_homework(@student, body: "the stuff")
+      submission.add_comment(user: @teacher, comment: "nice work, fam")
+      submission.grade_it!
+
+      expect(@student.submission_statuses[:has_feedback]).to match_array([@assignment.id])
+    end
+  end
+
   describe "avatar_key" do
     it "should return a valid avatar key for a valid user id" do
       expect(User.avatar_key(1)).to eq "1-#{Canvas::Security.hmac_sha1('1')[0,10]}"
