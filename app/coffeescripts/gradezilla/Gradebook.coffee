@@ -1292,6 +1292,7 @@ define [
         courseId: @options.context_id
         locale: @options.locale
         onClose: => @gradebookSettingsModalButton.focus()
+        newGradebookDevelopmentEnabled: @options.new_gradebook_development_enabled
       @gradebookSettingsModal = renderComponent(
         GradebookSettingsModal,
         gradebookSettingsModalMountPoint,

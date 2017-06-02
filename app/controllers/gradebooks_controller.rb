@@ -376,6 +376,7 @@ class GradebooksController < ApplicationController
       grading_period_set: grading_period_group_json,
       current_grading_period_id: @current_grading_period_id,
       outcome_gradebook_enabled: @context.feature_enabled?(:outcome_gradebook),
+      new_gradebook_development_enabled: @context.root_account.feature_enabled?(:new_gradebook_development),
       custom_columns_url: api_v1_course_custom_gradebook_columns_url(@context),
       custom_column_url: api_v1_course_custom_gradebook_column_url(@context, ":id"),
       custom_column_data_url: api_v1_course_custom_gradebook_column_data_url(@context, ":id", per_page: per_page),

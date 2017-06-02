@@ -24,6 +24,7 @@ import FormFieldGroup from 'instructure-ui/lib/components/FormFieldGroup';
 import NumberInput from 'instructure-ui/lib/components/NumberInput';
 import PresentationContent from 'instructure-ui/lib/components/PresentationContent';
 import Spinner from 'instructure-ui/lib/components/Spinner';
+import SVGWrapper from 'jsx/shared/SVGWrapper'
 import Typography from 'instructure-ui/lib/components/Typography';
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
 import Checkbox from 'instructure-ui/lib/components/Checkbox';
@@ -107,7 +108,8 @@ class LatePoliciesTabPanel extends React.Component {
       })
     }).isRequired,
     changeLatePolicy: func.isRequired,
-    locale: string.isRequired
+    locale: string.isRequired,
+    hideContent: bool.isRequired
   };
 
   constructor (props) {
@@ -202,9 +204,22 @@ class LatePoliciesTabPanel extends React.Component {
   }
 
   render () {
+    if (this.props.hideContent) {
+      return (
+        <div id="late-policies-tab-panel-no-content">
+          <div id="content-coming-soon">
+            <SVGWrapper url="/images/gift_closed.svg" />
+            <Typography size="xx-large" weight="light">{I18n.t('New goodies coming soon!')}</Typography>
+            <br />
+            <Typography weight="bold">{I18n.t('Check back in a little while.')}</Typography>
+          </div>
+        </div>
+      );
+    }
+
     if (!this.props.latePolicy.data) {
       return (
-        <div id="late-policies-tab-panel-loading">
+        <div id="late-policies-tab-panel-no-content">
           <Spinner title={I18n.t('Loading')} size="large" margin="small" />
         </div>
       );

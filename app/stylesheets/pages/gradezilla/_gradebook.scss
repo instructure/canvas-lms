@@ -730,7 +730,13 @@ $gradebook_checkbox_size: 16px;
   list-style-type: none;
 }
 
-#late-policies-tab-panel-loading {
+#content-coming-soon {
+  display: inline-block;
+  margin-top: 2rem;
+  width: 30rem;
+}
+
+#late-policies-tab-panel-no-content {
   min-height: 30rem;
   text-align: center;
 }

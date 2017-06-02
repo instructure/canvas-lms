@@ -28,7 +28,12 @@ QUnit.module('GradebookSettingsModal', {
   },
 
   mountComponent (customProps = {}) {
-    const defaultProps = { courseId: '1', locale: 'en', onClose: () => {} };
+    const defaultProps = {
+      courseId: '1',
+      locale: 'en',
+      newGradebookDevelopmentEnabled: true,
+      onClose: () => {}
+    };
     const props = { ...defaultProps, ...customProps };
     this.wrapper = mount(<GradebookSettingsModal {...props} />);
     return this.wrapper.get(0);
