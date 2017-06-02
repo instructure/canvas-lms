@@ -17,7 +17,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper.rb')
 
-RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
+RSpec.shared_context "lti2_course_spec_helper", :shared_context => :metadata do
 
   let(:account) { Account.create! }
   let(:course) { Course.create!(account: account) }
@@ -33,7 +33,7 @@ RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
   end
   let(:tool_proxy) do
     tp = Lti::ToolProxy.create!(
-      context: account,
+      context: course,
       guid: SecureRandom.uuid,
       shared_secret: 'abc',
       product_family: product_family,
@@ -92,7 +92,7 @@ RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
                   'path' => 'https://www.samplelaunch.com/blti'
                 }
               ]
-            },
+            }
           ],
           'service_offered' => []
         }
@@ -118,9 +118,8 @@ RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
       tool_proxy: tool_proxy
     )
   end
-  let(:tool_proxy_binding) {
+  let(:tool_proxy_binding) do
     Lti::ToolProxyBinding.where(context_id: account, context_type: account.class.to_s,
                                 tool_proxy_id: tool_proxy).first_or_create!
-  }
-
+  end
 end

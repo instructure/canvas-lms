@@ -133,6 +133,7 @@ module Importers
       Importers::ExternalFeedImporter.process_migration(data, migration); migration.update_import_progress(56)
       Importers::GradingStandardImporter.process_migration(data, migration); migration.update_import_progress(58)
       Importers::ContextExternalToolImporter.process_migration(data, migration); migration.update_import_progress(60)
+      Importers::ToolProfileImporter.process_migration(data, migration); migration.update_import_progress(61)
       Importers::QuizImporter.process_migration(data, migration, question_data); migration.update_import_progress(65)
       Importers::DiscussionTopicImporter.process_migration(data, migration); migration.update_import_progress(70)
       Importers::WikiPageImporter.process_migration(data, migration); migration.update_import_progress(75)

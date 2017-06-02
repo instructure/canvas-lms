@@ -60,6 +60,9 @@ describe Course do
       }}.with_indifferent_access
       migration.migration_ids_to_import = params
 
+      # tool profile tests
+      Importers::ToolProfileImporter.expects(:process_migration)
+
       Importers::CourseContentImporter.import_content(@course, data, params, migration)
       @course.reload
 

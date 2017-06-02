@@ -22,6 +22,7 @@ module CC::Importer::Canvas
     include WikiConverter
     include AssignmentConverter
     include TopicConverter
+    include ToolProfileConverter
     include WebcontentConverter
     include QuizConverter
     include MediaTrackConverter
@@ -58,6 +59,8 @@ module CC::Importer::Canvas
       res = lti.get_blti_resources(@manifest)
       @course[:external_tools] = lti.convert_blti_links(res, self)
       set_progress(50)
+      @course[:tool_profiles] = convert_tool_profiles
+      set_progress(52)
       @course[:file_map] = create_file_map
       set_progress(60)
       @course[:all_files_zip] = package_course_files
