@@ -85,15 +85,15 @@ export default class BlueprintCourseSidebar extends Component {
         >
           <div className="bcs__content" ref={this.props.contentRef}>
             <header className="bcs__header">
+              <div className="bcs__close-wrapper">
+                <Button variant="icon-inverse" onClick={this.close} ref={(c) => { this.closeBtn = c }}>
+                  <Typography color="primary-inverse" size="small">
+                    <IconXSolid title={I18n.t('Close sidebar')} />
+                  </Typography>
+                </Button>
+              </div>
               <Heading color="primary-inverse" level="h3">
-                <div className="bcs__close-wrapper">
-                  <Button variant="icon-inverse" onClick={this.close} ref={(c) => { this.closeBtn = c }}>
-                    <Typography color="primary-inverse" size="small">
-                      <IconXSolid title={I18n.t('Close sidebar')} />
-                    </Typography>
-                  </Button>
-                </div>
-                <IconCopyLine />&nbsp;{I18n.t('Blueprint')}
+                <IconCopyLine /><span style={{marginLeft: '10px'}}>{I18n.t('Blueprint')}</span>
               </Heading>
             </header>
             <div className="bcs__body">
