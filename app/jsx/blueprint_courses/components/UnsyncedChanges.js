@@ -59,7 +59,7 @@ export default class UnsyncedChanges extends Component {
           </Heading>
         </header>
         {this.props.unsyncedChanges.map(change =>
-          (<UnsyncedChange key={change.asset_id} change={change} />)
+          (<UnsyncedChange key={`${change.asset_type}_${change.asset_id}`} change={change} />)
         )}
         <MigrationOptions />
       </div>

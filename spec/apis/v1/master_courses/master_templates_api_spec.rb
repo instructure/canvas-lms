@@ -469,7 +469,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
         @master = @course
         @template.add_child_course!(course_factory(:name => 'Minion'))
         @page = @master.wiki.wiki_pages.create! :title => 'Old News'
-        @asmt = @master.assignments.create! :title => 'Boring'
+        @ann = @master.announcements.create! :title => 'Boring', :message => 'Yawn'
         @file = attachment_model(:context => @master, :display_name => 'Some File')
         @template.content_tag_for(@file).update_attribute(:restrictions, {:content => true})
         run_master_migration
@@ -477,7 +477,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
     end
 
     it 'detects creates, updates, and deletes since the last sync' do
-      @asmt.destroy
+      @ann.destroy
       @file.update_attribute(:display_name, 'Renamed')
       @new_page = @master.wiki.wiki_pages.create! :title => 'New News'
 
@@ -485,8 +485,8 @@ describe MasterCourses::MasterTemplatesController, type: :request do
         :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',
         :course_id => @master.to_param, :action => 'unsynced_changes')
       expect(json).to match_array([
-       {"asset_id"=>@asmt.id,"asset_type"=>"assignment","asset_name"=>"Boring","change_type"=>"deleted",
-        "html_url"=>"http://www.example.com/courses/#{@master.id}/assignments/#{@asmt.id}","locked"=>false},
+       {"asset_id"=>@ann.id,"asset_type"=>"announcement","asset_name"=>"Boring","change_type"=>"deleted",
+        "html_url"=>"http://www.example.com/courses/#{@master.id}/announcements/#{@ann.id}","locked"=>false},
        {"asset_id"=>@file.id,"asset_type"=>"attachment","asset_name"=>"Renamed","change_type"=>"updated",
         "html_url"=>"http://www.example.com/courses/#{@master.id}/files/#{@file.id}","locked"=>true},
        {"asset_id"=>@new_page.id,"asset_type"=>"wiki_page","asset_name"=>"New News","change_type"=>"created",

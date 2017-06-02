@@ -25,6 +25,12 @@ const itemTypeLabels = {
   wiki_page: I18n.t('Page'),
   attachment: I18n.t('File'),
   context_module: I18n.t('Module'),
+  announcement: I18n.t('Announcement'),
+  assessment_question_bank: I18n.t('Question Bank'),
+  calendar_event: I18n.t('Event'),
+  learning_outcome: I18n.t('Outcome'),
+  rubric: I18n.t('Rubric'),
+  context_external_tool: I18n.t('External Tool')
 }
 
 const itemTypeLabelPlurals = {

@@ -109,7 +109,7 @@ export default {
       locked: false
     },
     {
-      asset_id: '96',
+      asset_id: '22',
       asset_type: 'attachment',
       asset_name: 'Bulldog.png',
       change_type: 'updated',

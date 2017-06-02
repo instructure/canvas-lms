@@ -434,6 +434,8 @@ class MasterCourses::MasterTemplatesController < ApplicationController
         @course.wiki.wiki_pages
       when 'Assignment'
         @course.assignments.include_submittables
+      when 'DiscussionTopic'
+        @course.discussion_topics.only_discussion_topics
       else
         klass.constantize.where(:context_id => @course, :context_type => 'Course')
       end

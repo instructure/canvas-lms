@@ -42,7 +42,7 @@ const SyncHistoryItem = ({ migration, heading, ChangeComponent }) => {
       {comment && <Typography as="p" color="secondary" size="small">{`"${comment}"`}</Typography>}
       <div role="grid">
         {changes.length ? heading : null}
-        {changes.length ? changes.map(change => <ChangeComponent key={change.html_url} change={change} />) : null}
+        {changes.length ? changes.map(change => <ChangeComponent key={`${change.asset_type}_${change.asset_id}`} change={change} />) : null}
       </div>
     </div>
   )
