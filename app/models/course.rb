@@ -117,6 +117,7 @@ class Course < ActiveRecord::Base
   has_many :course_account_associations
   has_many :non_unique_associated_accounts, -> { order('course_account_associations.depth') }, source: :account, through: :course_account_associations
   has_many :users, -> { distinct }, through: :enrollments, source: :user
+  has_many :all_users, -> { distinct }, through: :all_enrollments, source: :user
   has_many :current_users, -> { distinct }, through: :current_enrollments, source: :user
   has_many :all_current_users, -> { distinct }, through: :all_current_enrollments, source: :user
   has_many :group_categories, -> {where(deleted_at: nil) }, as: :context, inverse_of: :context

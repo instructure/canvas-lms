@@ -1015,6 +1015,20 @@ CanvasRails::Application.routes.draw do
       get 'audit/grade_change/courses/:course_id', action: :for_course, as: 'audit_grade_change_course'
       get 'audit/grade_change/students/:student_id', action: :for_student, as: 'audit_grade_change_student'
       get 'audit/grade_change/graders/:grader_id', action: :for_grader, as: 'audit_grade_change_grader'
+      get 'audit/grade_change/courses/:course_id/assignments/:assignment_id',
+          action: :for_course_and_other_parameters, as: 'audit_grade_change_course_assignment'
+      get 'audit/grade_change/courses/:course_id/assignments/:assignment_id/graders/:grader_id',
+          action: :for_course_and_other_parameters, as: 'audit_grade_change_course_assignment_grader'
+      get 'audit/grade_change/courses/:course_id/assignments/:assignment_id/graders/:grader_id/students/:student_id',
+          action: :for_course_and_other_parameters, as: 'audit_grade_change_course_assignment_grader_student'
+      get 'audit/grade_change/courses/:course_id/assignments/:assignment_id/students/:student_id',
+          action: :for_course_and_other_parameters, as: 'audit_grade_change_course_assignment_student'
+      get 'audit/grade_change/courses/:course_id/graders/:grader_id',
+          action: :for_course_and_other_parameters, as: 'audit_grade_change_course_grader'
+      get 'audit/grade_change/courses/:course_id/graders/:grader_id/students/:student_id',
+          action: :for_course_and_other_parameters, as: 'audit_grade_change_course_grader_student'
+      get 'audit/grade_change/courses/:course_id/students/:student_id',
+          action: :for_course_and_other_parameters, as: 'audit_grade_change_course_student'
     end
 
     scope(controller: :course_audit_api) do

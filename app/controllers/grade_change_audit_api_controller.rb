@@ -136,16 +136,15 @@ class GradeChangeAuditApiController < AuditorApiController
   # @returns [GradeChangeEvent]
   #
   def for_assignment
+    return render_unauthorized_action unless authorize
+
     @assignment = Assignment.active.find(params[:assignment_id])
     unless @assignment.context.root_account == @domain_root_account
       raise ActiveRecord::RecordNotFound, "Couldn't find assignment with API id '#{params[:assignment_id]}'"
     end
-    if authorize
-      events = Auditors::GradeChange.for_assignment(@assignment, query_options)
-      render_events(events, polymorphic_url([:api_v1, :audit_grade_change, @assignment]))
-    else
-      render_unauthorized_action
-    end
+
+    events = Auditors::GradeChange.for_assignment(@assignment, query_options)
+    render_events(events, polymorphic_url([:api_v1, :audit_grade_change, @assignment]))
   end
 
   # @API Query by course.
@@ -161,13 +160,11 @@ class GradeChangeAuditApiController < AuditorApiController
   # @returns [GradeChangeEvent]
   #
   def for_course
-    @course = @domain_root_account.all_courses.active.find(params[:course_id])
-    if authorize
-      events = Auditors::GradeChange.for_course(@course, query_options)
-      render_events(events, polymorphic_url([:api_v1, :audit_grade_change, @course]))
-    else
-      render_unauthorized_action
-    end
+    return render_unauthorized_action unless authorize
+
+    @course = @domain_root_account.all_courses.find(params[:course_id])
+    events = Auditors::GradeChange.for_course(@course, query_options)
+    render_events(events, polymorphic_url([:api_v1, :audit_grade_change, @course]))
   end
 
   # @API Query by student.
@@ -183,16 +180,15 @@ class GradeChangeAuditApiController < AuditorApiController
   # @returns [GradeChangeEvent]
   #
   def for_student
+    return render_unauthorized_action unless authorize
+
     @student = User.active.find(params[:student_id])
     unless @domain_root_account.associated_user?(@student)
       raise ActiveRecord::RecordNotFound, "Couldn't find user with API id '#{params[:student_id]}'"
     end
-    if authorize
-      events = Auditors::GradeChange.for_root_account_student(@domain_root_account, @student, query_options)
-      render_events(events, api_v1_audit_grade_change_student_url(@student))
-    else
-      render_unauthorized_action
-    end
+
+    events = Auditors::GradeChange.for_root_account_student(@domain_root_account, @student, query_options)
+    render_events(events, api_v1_audit_grade_change_student_url(@student))
   end
 
   # @API Query by grader.
@@ -208,16 +204,45 @@ class GradeChangeAuditApiController < AuditorApiController
   # @returns [GradeChangeEvent]
   #
   def for_grader
+    return render_unauthorized_action unless authorize
+
     @grader = User.active.find(params[:grader_id])
     unless @domain_root_account.associated_user?(@grader)
       raise ActiveRecord::RecordNotFound, "Couldn't find user with API id '#{params[:grader_id]}'"
     end
-    if authorize
-      events = Auditors::GradeChange.for_root_account_grader(@domain_root_account, @grader, query_options)
-      render_events(events, api_v1_audit_grade_change_grader_url(@grader))
-    else
-      render_unauthorized_action
+
+    events = Auditors::GradeChange.for_root_account_grader(@domain_root_account, @grader, query_options)
+    render_events(events, api_v1_audit_grade_change_grader_url(@grader))
+  end
+
+  def for_course_and_other_parameters
+    return render_unauthorized_action unless authorize
+
+    course = @domain_root_account.all_courses.find(params[:course_id])
+
+    args = { course: course }
+    args[:assignment] = course.assignments.find(params[:assignment_id]) if params[:assignment_id]
+    args[:grader] = course.all_users.find(params[:grader_id]) if params[:grader_id]
+    args[:student] = course.all_users.find(params[:student_id]) if params[:student_id]
+
+    url_method = if args[:assignment] && args[:grader] && args[:student]
+      :api_v1_audit_grade_change_course_assignment_grader_student_url
+    elsif args[:assignment] && args[:grader]
+      :api_v1_audit_grade_change_course_assignment_grader_url
+    elsif args[:assignment] && args[:student]
+      :api_v1_audit_grade_change_course_assignment_student_url
+    elsif args[:assignment]
+      :api_v1_audit_grade_change_course_assignment_url
+    elsif args[:grader] && args[:student]
+      :api_v1_audit_grade_change_course_grader_student_url
+    elsif args[:grader]
+      :api_v1_audit_grade_change_course_grader_url
+    elsif args[:student]
+      :api_v1_audit_grade_change_course_student_url
     end
+
+    events = Auditors::GradeChange.for_course_and_other_arguments(course, args, query_options)
+    render_events(events, send(url_method, args))
   end
 
   private

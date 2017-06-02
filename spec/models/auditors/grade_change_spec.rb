@@ -48,13 +48,44 @@ describe Auditors::GradeChange do
     Timecop.freeze(@event_time) { @event = Auditors::GradeChange.record(@submission) }
   end
 
+  def test_course_and_other_contexts
+    # course assignment
+    contexts = { assignment: @assignment }
+    yield contexts
+    # course assignment grader
+    contexts[:grader] = @teacher
+    yield contexts
+    # course assignment grader student
+    contexts[:student] = @student
+    yield contexts
+    # course assignment student
+    contexts.delete(:grader)
+    yield contexts
+    # course grader
+    contexts = { grader: @teacher }
+    yield contexts
+    # course grader student
+    contexts[:student] = @student
+    yield contexts
+    # course student
+    contexts.delete(:grader)
+    yield contexts
+  end
+
   context "nominal cases" do
     it "should include event" do
       expect(@event.created_at).to eq @event_time
       expect(Auditors::GradeChange.for_assignment(@assignment).paginate(:per_page => 5)).to include(@event)
       expect(Auditors::GradeChange.for_course(@course).paginate(:per_page => 5)).to include(@event)
-      expect(Auditors::GradeChange.for_root_account_student(@account, @student).paginate(:per_page => 5)).to include(@event)
-      expect(Auditors::GradeChange.for_root_account_grader(@account, @teacher).paginate(:per_page => 5)).to include(@event)
+      expect(Auditors::GradeChange.for_root_account_student(@account, @student).
+               paginate(:per_page => 5)).to include(@event)
+      expect(Auditors::GradeChange.for_root_account_grader(@account, @teacher).
+               paginate(:per_page => 5)).to include(@event)
+
+      test_course_and_other_contexts do |contexts|
+        expect(Auditors::GradeChange.for_course_and_other_arguments(@course, contexts).
+          paginate(:per_page => 5)).to include(@event)
+      end
     end
 
     it "should include event for nil grader" do
@@ -65,7 +96,14 @@ describe Auditors::GradeChange do
 
       expect(Auditors::GradeChange.for_assignment(@assignment).paginate(:per_page => 5)).to include(@event)
       expect(Auditors::GradeChange.for_course(@course).paginate(:per_page => 5)).to include(@event)
-      expect(Auditors::GradeChange.for_root_account_student(@account, @student).paginate(:per_page => 5)).to include(@event)
+      expect(Auditors::GradeChange.for_root_account_student(@account, @student).
+        paginate(:per_page => 5)).to include(@event)
+      expect(Auditors::GradeChange.for_course_and_other_arguments(@course, {assignment: @assignment}).
+        paginate(:per_page => 5)).to include(@event)
+      expect(Auditors::GradeChange.for_course_and_other_arguments(@course, {assignment: @assignment,
+        student: @student}).paginate(:per_page => 5)).to include(@event)
+      expect(Auditors::GradeChange.for_course_and_other_arguments(@course, {student: @student}).
+        paginate(:per_page => 5)).to include(@event)
     end
 
     it "should include event for auto grader" do
@@ -77,7 +115,14 @@ describe Auditors::GradeChange do
 
       expect(Auditors::GradeChange.for_assignment(@assignment).paginate(:per_page => 5)).to include(@event)
       expect(Auditors::GradeChange.for_course(@course).paginate(:per_page => 5)).to include(@event)
-      expect(Auditors::GradeChange.for_root_account_student(@account, @student).paginate(:per_page => 5)).to include(@event)
+      expect(Auditors::GradeChange.for_root_account_student(@account, @student).
+        paginate(:per_page => 5)).to include(@event)
+      expect(Auditors::GradeChange.for_course_and_other_arguments(@course, {assignment: @assignment}).
+        paginate(:per_page => 5)).to include(@event)
+      expect(Auditors::GradeChange.for_course_and_other_arguments(@course, {assignment: @assignment,
+        student: @student}).paginate(:per_page => 5)).to include(@event)
+      expect(Auditors::GradeChange.for_course_and_other_arguments(@course, {student: @student}).
+        paginate(:per_page => 5)).to include(@event)
     end
 
     it "should set request_id" do
@@ -92,10 +137,14 @@ describe Auditors::GradeChange do
     for_assignment = Auditors::GradeChange.for_assignment(@assignment)
     for_course = Auditors::GradeChange.for_course(@course)
     for_root_account_student = Auditors::GradeChange.for_root_account_student(@account, @student)
-
     expect(for_assignment.paginate(per_page: 5)).to include(@event)
     expect(for_course.paginate(per_page: 5)).to include(@event)
     expect(for_root_account_student.paginate(per_page: 5)).to include(@event)
+
+    test_course_and_other_contexts do |contexts|
+      expect(Auditors::GradeChange.for_course_and_other_arguments(@course, contexts).paginate(per_page: 5)).
+        to include(@event)
+    end
   end
 
   it "reports formerly excused submissions" do
@@ -111,6 +160,10 @@ describe Auditors::GradeChange do
     expect(for_assignment.paginate(per_page: 5)).to include(@event)
     expect(for_course.paginate(per_page: 5)).to include(@event)
     expect(for_root_account_student.paginate(per_page: 5)).to include(@event)
+    test_course_and_other_contexts do |contexts|
+      expect(Auditors::GradeChange.for_course_and_other_arguments(@course, contexts).paginate(per_page: 5)).
+        to include(@event)
+    end
   end
 
   it "records excused_before and excused_after as booleans on initial grading" do
