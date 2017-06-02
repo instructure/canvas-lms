@@ -16,18 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import I18n from 'i18n!gradebook_history';
+import { createStore, applyMiddleware } from 'redux';
+import thunkMiddleware from 'redux-thunk';
+import gradebookHistory from 'jsx/gradebook-history/reducers/Reducer';
 
-/* eslint-disable react/prefer-stateless-function */
-class GradebookHistoryApp extends React.Component {
-  render () {
-    return (
-      <div>
-        <h1>{I18n.t('Grade History')}</h1>
-      </div>
-    );
-  }
-}
+const GradebookHistoryStore = createStore(
+  gradebookHistory,
+  applyMiddleware(
+    thunkMiddleware
+  )
+);
 
-export default GradebookHistoryApp;
+export default GradebookHistoryStore;

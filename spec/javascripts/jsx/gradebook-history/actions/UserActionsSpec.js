@@ -16,8 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import GradebookHistoryApp from 'jsx/gradebook-history/GradebookHistoryApp';
+import { FETCH_USERS_SUCCESS, fetchUsersSuccess } from 'jsx/gradebook-history/actions/UserActions';
 
-ReactDOM.render(<GradebookHistoryApp />, document.getElementById('content'));
+QUnit.module('UserActions');
+
+test('fetchUsersSuccess creates an action with type FETCH_USERS_SUCCESS', function () {
+  const data = {
+    1: 'some data'
+  };
+  const expectedValue = {
+    type: FETCH_USERS_SUCCESS,
+    payload: data
+  };
+  deepEqual(fetchUsersSuccess(data), expectedValue);
+});

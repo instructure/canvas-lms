@@ -16,8 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import GradebookHistoryApp from 'jsx/gradebook-history/GradebookHistoryApp';
+import history from 'jsx/gradebook-history/reducers/HistoryReducer';
+import users from 'jsx/gradebook-history/reducers//UsersReducer';
+import { allReducers } from 'jsx/gradebook-history/reducers/Reducer';
 
-ReactDOM.render(<GradebookHistoryApp />, document.getElementById('content'));
+QUnit.module('Reducer');
+
+test('should combine all the reducers available', function () {
+  const expectedReducers = {
+    history, users
+  };
+
+  deepEqual(allReducers(), expectedReducers);
+});

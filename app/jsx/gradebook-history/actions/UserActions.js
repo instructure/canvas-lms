@@ -16,8 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import GradebookHistoryApp from 'jsx/gradebook-history/GradebookHistoryApp';
+export const FETCH_USERS_SUCCESS = 'RECEIVED_USERS';
 
-ReactDOM.render(<GradebookHistoryApp />, document.getElementById('content'));
+export function fetchUsersSuccess (data) {
+  return {
+    type: FETCH_USERS_SUCCESS,
+    payload: data
+  };
+}

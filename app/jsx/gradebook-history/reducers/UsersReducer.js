@@ -16,15 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { mount } from 'enzyme';
-import GradebookHistoryApp from 'jsx/gradebook_history/GradebookHistoryApp';
+import { FETCH_USERS_SUCCESS } from 'jsx/gradebook-history/actions/UserActions';
 
-QUnit.module('GradebookHistoryApp');
+function getUsers (arr) {
+  return arr.reduce((acc, user) => {
+    acc[user.id] = user.name;
+    return acc;
+  }, {});
+}
 
-// Placeholder test, please replace me with something useful as we build this out
-test('returns default text', function () {
-  const wrapper = mount(<GradebookHistoryApp />);
+export default function users (state = {}, action) {
+  switch (action.type) {
+    case FETCH_USERS_SUCCESS:
+      return {
+        ...state,
+        users: getUsers(action.payload)
+      };
 
-  equal(wrapper.text(), 'Grade History');
-});
+    default:
+      return state;
+  }
+}

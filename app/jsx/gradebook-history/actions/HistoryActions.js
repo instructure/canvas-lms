@@ -16,8 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import GradebookHistoryApp from 'jsx/gradebook-history/GradebookHistoryApp';
+export const FETCH_HISTORY_STARTED = 'FETCH_HISTORY_STARTED';
+export const FETCH_HISTORY_SUCCESS = 'FETCH_HISTORY_SUCCESS';
+export const FETCH_HISTORY_FAILURE = 'FETCH_HISTORY_FAILURE';
 
-ReactDOM.render(<GradebookHistoryApp />, document.getElementById('content'));
+export function fetchHistoryStarted () {
+  return {
+    type: FETCH_HISTORY_STARTED
+  };
+}
+
+export function fetchHistorySuccess (data) {
+  return {
+    type: FETCH_HISTORY_SUCCESS,
+    payload: data
+  };
+}
+
+export function fetchHistoryFailure () {
+  return {
+    type: FETCH_HISTORY_FAILURE
+  };
+}
