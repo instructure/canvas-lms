@@ -2966,6 +2966,19 @@ test('does not change focus when cells of another type become active', function 
   notEqual(document.activeElement, this.$studentGradesLink);
 });
 
+test('closes the submission tray if it is open', function () {
+  this.stub(this.gradebook, 'closeSubmissionTray');
+  this.gradebook.setSubmissionTrayState(true, '1', '2');
+  this.gradebook.onActiveCellChanged({}, { grid: this.grid, cell: 1, row: 0 });
+  strictEqual(this.gradebook.closeSubmissionTray.callCount, 1);
+});
+
+test('does not attempt to close the submission tray if it is already closed', function () {
+  this.stub(this.gradebook, 'closeSubmissionTray');
+  this.gradebook.onActiveCellChanged({}, { grid: this.grid, cell: 1, row: 0 });
+  strictEqual(this.gradebook.closeSubmissionTray.callCount, 0);
+});
+
 test('has no effect when no cell is becoming active', function () {
   // This occurs primarily when clicking off the grid.
   this.gradebook.onActiveCellChanged(event, { grid: this.grid, cell: undefined, row: undefined });
@@ -5135,6 +5148,7 @@ test('calls saveSettings successfully', function () {
   gradebook.toggleUnpublishedAssignments();
 
   strictEqual(saveSettingsStub.callCount, 1);
+  server.restore()
 });
 
 test('calls saveSettings and rollsback on failure', function () {
@@ -5155,6 +5169,7 @@ test('calls saveSettings and rollsback on failure', function () {
   });
   gradebook.toggleUnpublishedAssignments();
   strictEqual(stubFn.callCount, 2);
+  server.restore()
 });
 
 QUnit.module('Gradebook#renderViewOptionsMenu');
@@ -5891,4 +5906,139 @@ test('updates row cells only once for each student', function () {
   this.gradebook.updateSubmissionsFromExternal(submissions);
   const [studentIds] = this.gradebook.updateRowCellsForStudentIds.lastCall.args;
   deepEqual(studentIds, ['1101', '1102']);
+});
+
+QUnit.module('Gradebook#renderSubmissionTray', {
+  setup () {
+    this.mountPointId = 'StudentTray__Container';
+    $fixtures.innerHTML = `<div id=${this.mountPointId}></div>`;
+    this.gradebook = createGradebook();
+    this.server = sinon.fakeServer.create({ respondImmediately: true });
+    this.server.respondWith('GET', /^\/images\/.*\.svg$/, [
+      200, { 'Content-Type': 'img/svg+xml' }, '{}'
+    ]);
+  },
+
+  teardown () {
+    this.server.restore();
+    const node = document.getElementById(this.mountPointId);
+    ReactDOM.unmountComponentAtNode(node);
+    $fixtures.innerHTML = '';
+  }
+});
+
+test('shows a submission tray on the page when rendering an open tray', function () {
+  this.gradebook.setSubmissionTrayState(true, '1', '2');
+  this.gradebook.renderSubmissionTray();
+  ok(document.querySelector('div[aria-label="Submission tray"]'));
+});
+
+test('does not show a submission tray on the page when rendering a closed tray', function () {
+  this.gradebook.renderSubmissionTray();
+  notOk(document.querySelector('div[aria-label="Submission tray"]'));
+});
+
+QUnit.module('Gradebook#updateRowAndRenderSubmissionTray', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.stub(this.gradebook, 'updateRowCellsForStudentIds');
+    this.stub(this.gradebook, 'renderSubmissionTray');
+  }
+});
+
+test('updates the row cell for the given student id', function () {
+  this.gradebook.updateRowAndRenderSubmissionTray('1');
+  strictEqual(this.gradebook.updateRowCellsForStudentIds.callCount, 1);
+  deepEqual(
+    this.gradebook.updateRowCellsForStudentIds.getCall(0).args[0],
+    ['1']
+  );
+});
+
+test('renders the submission tray', function () {
+  this.gradebook.updateRowAndRenderSubmissionTray('1');
+  strictEqual(this.gradebook.renderSubmissionTray.callCount, 1);
+});
+
+QUnit.module('Gradebook#toggleSubmissionTrayOpen', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.stub(this.gradebook, 'updateRowAndRenderSubmissionTray');
+  }
+});
+
+test('sets the tray state to open if it was closed', function () {
+  const openState = { before: this.gradebook.getSubmissionTrayState().open };
+  this.gradebook.toggleSubmissionTrayOpen('1', '2');
+  openState.after = this.gradebook.getSubmissionTrayState().open;
+  deepEqual(openState, { before: false, after: true });
+});
+
+test('sets the tray state to closed if it was open', function () {
+  this.gradebook.setSubmissionTrayState(true, '1', '2');
+  const openState = { before: this.gradebook.getSubmissionTrayState().open };
+  this.gradebook.toggleSubmissionTrayOpen('1', '2');
+  openState.after = this.gradebook.getSubmissionTrayState().open;
+  deepEqual(openState, { before: true, after: false });
+});
+
+test('sets the studentId and assignmentId state for the tray', function () {
+  this.gradebook.toggleSubmissionTrayOpen('1', '2');
+  const { studentId, assignmentId } = this.gradebook.getSubmissionTrayState();
+  deepEqual({ studentId, assignmentId }, { studentId: '1', assignmentId: '2' });
+});
+
+QUnit.module('Gradebook#closeSubmissionTray', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.activeStudentId = '1101';
+    this.gradebook.rows = [{ id: this.activeStudentId }];
+    this.gradebook.grid = { getActiveCell () { return { row: 0 } } };
+    this.gradebook.setSubmissionTrayState(true, '1101', '2')
+    this.stub(this.gradebook, 'updateRowAndRenderSubmissionTray');
+  }
+});
+
+test('sets the state of the tray to closed', function () {
+  const openState = { before: this.gradebook.getSubmissionTrayState().open };
+  this.gradebook.closeSubmissionTray();
+  openState.after = this.gradebook.getSubmissionTrayState().open;
+  deepEqual(openState, { before: true, after: false });
+});
+
+test('calls updateRowAndRenderSubmissionTray with the student id for the active row', function () {
+  this.gradebook.closeSubmissionTray();
+  strictEqual(this.gradebook.updateRowAndRenderSubmissionTray.callCount, 1);
+  strictEqual(
+    this.gradebook.updateRowAndRenderSubmissionTray.getCall(0).args[0],
+    this.activeStudentId
+  );
+});
+
+QUnit.module('Gradebook#setSubmissionTrayState', {
+  setup () {
+    this.gradebook = createGradebook();
+  }
+});
+
+test('sets the state of the submission tray', function () {
+  this.gradebook.setSubmissionTrayState(true, '1', '2');
+  const expected = { open: true, studentId: '1', assignmentId: '2' };
+  deepEqual(this.gradebook.gridDisplaySettings.submissionTray, expected);
+});
+
+QUnit.module('Gradebook#getSubmissionTrayState', {
+  setup () {
+    this.gradebook = createGradebook();
+  }
+});
+
+test('returns the state of the submission tray', function () {
+  let expected = { open: false, studentId: null, assignmentId: null };
+  deepEqual(this.gradebook.getSubmissionTrayState(), expected);
+  this.gradebook.gridDisplaySettings.submissionTray.open = true;
+  this.gradebook.gridDisplaySettings.submissionTray.studentId = '1';
+  this.gradebook.gridDisplaySettings.submissionTray.assignmentId = '2';
+  expected = { open: true, studentId: '1', assignmentId: '2' };
+  deepEqual(this.gradebook.getSubmissionTrayState(), expected);
 });

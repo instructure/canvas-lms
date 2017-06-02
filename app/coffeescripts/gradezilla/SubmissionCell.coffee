@@ -57,7 +57,6 @@ define [
         @val = htmlEscape(formattedGrade)
       @$input.val(@val)
       @$input[0].defaultValue = @val
-      @$input.select()
 
     serializeValue: () ->
       @$input.val()

@@ -39,25 +39,6 @@ describe "Gradezilla editing grades" do
     clear_local_storage
   end
 
-  context 'submission details dialog', priority: "1", test_id: 220305 do
-    it 'successfully grades a submission' do
-      skip_if_chrome('issue with set_value')
-      Gradezilla.visit(@course)
-      open_comment_dialog(0, 0)
-      grade_box = f("form.submission_details_grade_form input.grading_value")
-      expect(grade_box).to have_value @assignment_1_points
-      set_value(grade_box, 7)
-      f("form.submission_details_grade_form button").click
-
-      # wait for the request to complete and the dialog to close
-      wait_for_ajax_requests
-
-      input = f('#gradebook_grid .container_1 .slick-cell.active input')
-      expect(input.attribute("value")).to eql "7"
-      expect(final_score_for_row(0)).to eq "80%"
-    end
-  end
-
   it "updates a graded quiz and have the points carry over to the quiz attempts page", priority: "1", test_id: 220310 do
     points = 50
     q = factory_with_protected_attributes(@course.quizzes, :title => "new quiz", :points_possible => points, :quiz_type => 'assignment', :workflow_state => 'available')

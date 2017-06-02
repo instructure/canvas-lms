@@ -16,23 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-class AssignmentRowCellPropFactory {
-  constructor (assignment, gradebook) {
-    this.assignment = assignment;
-    this.gradebook = gradebook;
-  }
+import React from 'react';
+import SVGWrapper from 'jsx/shared/SVGWrapper';
+import Typography from 'instructure-ui/lib/components/Typography';
+import I18n from 'i18n!gradebook';
 
-  isTrayOpenForThisCell = (student) => {
-    const { open, studentId, assignmentId } = this.gradebook.getSubmissionTrayState();
-    return open && studentId === student.id && assignmentId === this.assignment.id;
-  }
-
-  getProps (student) {
-    return {
-      isSubmissionTrayOpen: this.isTrayOpenForThisCell(student),
-      onToggleSubmissionTrayOpen: this.gradebook.toggleSubmissionTrayOpen
-    };
-  }
+export default function ContentComingSoon () {
+  return (
+    <div className="ComingSoonContent__Container">
+      <div className="ComingSoonContent__Body">
+        <SVGWrapper url="/images/gift_closed.svg" />
+        <Typography size="xx-large" weight="light">{I18n.t('New goodies coming soon!')}</Typography>
+        <br />
+        <Typography weight="bold">{I18n.t('Check back in a little while.')}</Typography>
+      </div>
+    </div>
+  );
 }
-
-export default AssignmentRowCellPropFactory;

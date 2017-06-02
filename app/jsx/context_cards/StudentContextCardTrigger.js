@@ -27,7 +27,7 @@ import StudentCardStore from 'jsx/context_cards/StudentCardStore'
     const courseId = $(event.target).attr('data-course_id');
     if (ENV.STUDENT_CONTEXT_CARDS_ENABLED && studentId && courseId) {
       event.preventDefault();
-      const container = document.getElementById('StudentContextTray__Container')
+      const container = document.getElementById('StudentTray__Container')
       const store = new StudentCardStore(studentId, courseId)
       store.load()
 

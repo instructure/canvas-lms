@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="15px" height="17px" viewBox="0 0 15 17" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 44.1 (41455) - http://www.bohemiancoding.com/sketch -->
+    <title>expand-right</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Artboards-" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="GB-Assignment-Tray-01" transform="translate(-783.000000, -317.000000)" fill-rule="nonzero" fill="#008EE2">
+            <g id="expand-right" transform="translate(783.000000, 317.000000)">
+                <path d="M5.20710678,8 L11,8 L11,9 L5.20710678,9 L7.35355339,11.1464466 L6.64644661,11.8535534 L3.29289322,8.5 L6.64644661,5.14644661 L7.35355339,5.85355339 L5.20710678,8 Z M12,16 L12,17 L1.5,17 C0.671589379,17 0,16.3288744 0,15.5 L0,1.5 C0,0.671125574 0.671589379,0 1.5,0 L12,0 L12,1 L1.5,1 C1.22371954,1 1,1.22356503 1,1.5 L1,15.5 C1,15.776435 1.22371954,16 1.5,16 L12,16 Z M14,0 L15,0 L15,17 L14,17 L14,0 Z"></path>
+            </g>
+        </g>
+    </g>
+</svg>

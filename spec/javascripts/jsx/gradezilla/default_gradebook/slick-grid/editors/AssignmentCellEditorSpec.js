@@ -28,11 +28,15 @@ QUnit.module('AssignmentCellEditor', {
       points_possible: 10
     };
     this.$fixtures = document.querySelector('#fixtures');
+    const getSubmissionTrayState = () => ({ open: false, studentId: '1101', assignmentId: '2301' });
     this.options = {
       column: {
         field: 'assignment_2301',
         object: assignment,
-        propFactory: new AssignmentRowCellPropFactory(assignment, { options: {} })
+        propFactory: new AssignmentRowCellPropFactory(
+          assignment,
+          { options: {}, getSubmissionTrayState, toggleSubmissionTrayOpen () {} }
+        )
       },
       grid: {
         onKeyDown: {
@@ -148,6 +152,13 @@ test('#loadValue delegates to the AssignmentRowCell component', function () {
   strictEqual(this.editor.component.loadValue.callCount, 1);
   const [value] = this.editor.component.loadValue.lastCall.args;
   strictEqual(value, '9.7');
+});
+
+test('#loadValue renders the component', function () {
+  this.createEditor();
+  this.stub(this.editor, 'renderComponent');
+  this.editor.loadValue('9.7');
+  strictEqual(this.editor.renderComponent.callCount, 1);
 });
 
 test('#applyValue delegates to the AssignmentRowCell component', function () {

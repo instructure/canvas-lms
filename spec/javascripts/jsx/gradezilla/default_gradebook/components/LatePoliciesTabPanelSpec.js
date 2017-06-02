@@ -33,13 +33,13 @@ const latePolicyData = {
   lateSubmissionMinimumPercent: 0
 };
 
-function mountComponent (latePolicyProps = {}, hideContent = false, changeLatePolicyFn = () => {}) {
+function mountComponent (latePolicyProps = {}, showContentComingSoon = false, changeLatePolicyFn = () => {}) {
   const defaultProps = { changes: {}, validationErrors: {}, data: latePolicyData };
   const props = {
     latePolicy: { ...defaultProps, ...latePolicyProps },
     changeLatePolicy: changeLatePolicyFn,
     locale: 'en',
-    hideContent
+    showContentComingSoon
   };
   return mount(<LatePoliciesTabPanel {...props} />);
 }
@@ -77,7 +77,7 @@ function missingDeductionInput (wrapper) {
 }
 
 function comingSoonBanner (wrapper) {
-  return wrapper.find('#content-coming-soon');
+  return wrapper.find('.ComingSoonContent__Container');
 }
 
 function spinner (wrapper) {
@@ -90,12 +90,17 @@ QUnit.module('LatePoliciesTabPanel: New Gradebook Development flag', {
   }
 });
 
-test('shows a "Coming Soon" banner if hideContent is true', function () {
+test('shows a "Coming Soon" banner if showContentComingSoon is true', function () {
+  const server = sinon.fakeServer.create({ respondImmediately: true });
+  server.respondWith('GET', /^\/images\/.*\.svg$/, [
+    200, { 'Content-Type': 'img/svg+xml' }, '{}'
+  ]);
   this.wrapper = mountComponent({}, true);
   strictEqual(comingSoonBanner(this.wrapper).length, 1);
+  server.restore();
 });
 
-test('does not show a "Coming Soon" banner if hideContent is false', function () {
+test('does not show a "Coming Soon" banner if showContentComingSoon is false', function () {
   this.wrapper = mountComponent();
   strictEqual(comingSoonBanner(this.wrapper).length, 0);
 });

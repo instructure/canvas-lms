@@ -140,7 +140,7 @@ class GradebookSettingsModal extends React.Component {
                 latePolicy={latePolicy}
                 changeLatePolicy={this.changeLatePolicy}
                 locale={this.props.locale}
-                hideContent={!this.props.newGradebookDevelopmentEnabled}
+                showContentComingSoon={!this.props.newGradebookDevelopmentEnabled}
               />
             </TabPanel>
           </TabList>

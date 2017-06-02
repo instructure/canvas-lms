@@ -68,6 +68,7 @@ define [
   'jsx/gradezilla/default_gradebook/components/ModuleFilter'
   'jsx/gradezilla/default_gradebook/components/GridColor'
   'jsx/gradezilla/default_gradebook/components/StatusesModal'
+  'jsx/gradezilla/default_gradebook/components/SubmissionTray'
   'jsx/gradezilla/default_gradebook/components/GradebookSettingsModal'
   'jsx/gradezilla/SISGradePassback/PostGradesStore'
   'jsx/gradezilla/SISGradePassback/PostGradesApp'
@@ -104,9 +105,10 @@ define [
   CurveGradesDialogManager, GradebookApi, CellEditorFactory, studentRowHeaderConstants, AssignmentColumnHeader,
   AssignmentGroupColumnHeader, AssignmentRowCellPropFactory, CustomColumnHeader, StudentColumnHeader, StudentRowHeader,
   TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, ModuleFilter, GridColor, StatusesModal,
-  GradebookSettingsModal, PostGradesStore, PostGradesApp,  SubmissionStateMap, DownloadSubmissionsDialogManager,
-  ReuploadSubmissionsDialogManager, GroupTotalCellTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav,
-  AssignmentMuterDialogManager, assignmentHelper, { default: Button }, { default: IconSettingsSolid }) ->
+  SubmissionTray, GradebookSettingsModal, PostGradesStore, PostGradesApp,  SubmissionStateMap,
+  DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager, GroupTotalCellTemplate, SectionMenuView,
+  GradingPeriodMenuView, GradebookKeyboardNav, AssignmentMuterDialogManager, assignmentHelper, { default: Button },
+  { default: IconSettingsSolid }) ->
 
   isAdmin = =>
     _.contains(ENV.current_user_roles, 'admin')
@@ -150,6 +152,10 @@ define [
         concluded: false
         inactive: false
       showUnpublishedDisplayed: false
+      submissionTray:
+        open: false
+        studentId: null
+        assignmentId: null
     }
 
   ## Gradebook Application State
@@ -1598,6 +1604,7 @@ define [
 
     onActiveCellChanged: (event, obj) =>
       return unless obj.row? and obj.cell?
+      @closeSubmissionTray() if @getSubmissionTrayState().open
 
       column = obj.grid.getColumns()[obj.cell]
       if column.type == 'student'
@@ -2258,6 +2265,40 @@ define [
       mountPoint = @getColumnHeaderNode(columnId)
       props = @getAssignmentGroupColumnHeaderProps(assignmentGroupId)
       renderComponent(AssignmentGroupColumnHeader, mountPoint, props)
+
+    # Submission Tray
+
+    renderSubmissionTray: () =>
+      mountPoint = document.getElementById('StudentTray__Container')
+      { open, studentId, assignmentId } = @getSubmissionTrayState()
+      props =
+        key: "submission_tray_#{studentId}_#{assignmentId}"
+        isOpen: open
+        onRequestClose: @closeSubmissionTray
+        showContentComingSoon: !@options.new_gradebook_development_enabled
+      renderComponent(SubmissionTray, mountPoint, props)
+
+    updateRowAndRenderSubmissionTray: (studentId) =>
+      @updateRowCellsForStudentIds([studentId])
+      @renderSubmissionTray()
+
+    toggleSubmissionTrayOpen: (studentId, assignmentId) =>
+      @setSubmissionTrayState(!@getSubmissionTrayState().open, studentId, assignmentId)
+      @updateRowAndRenderSubmissionTray(studentId)
+
+    closeSubmissionTray: =>
+      @setSubmissionTrayState(false)
+      rowIndex = @grid.getActiveCell().row
+      studentId = @rows[rowIndex].id
+      @updateRowAndRenderSubmissionTray(studentId)
+
+    getSubmissionTrayState: =>
+      @gridDisplaySettings.submissionTray
+
+    setSubmissionTrayState: (open, studentId, assignmentId) =>
+      @gridDisplaySettings.submissionTray.open = open
+      @gridDisplaySettings.submissionTray.studentId = studentId if studentId
+      @gridDisplaySettings.submissionTray.assignmentId = assignmentId if assignmentId
 
     ## Gradebook Application State
 

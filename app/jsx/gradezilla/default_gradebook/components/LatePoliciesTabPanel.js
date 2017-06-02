@@ -19,12 +19,12 @@
 import React from 'react';
 import { bool, func, number, shape, string } from 'prop-types';
 import Alert from 'instructure-ui/lib/components/Alert';
+import ComingSoonContent from 'jsx/gradezilla/default_gradebook/components/ComingSoonContent';
 import Container from 'instructure-ui/lib/components/Container';
 import FormFieldGroup from 'instructure-ui/lib/components/FormFieldGroup';
 import NumberInput from 'instructure-ui/lib/components/NumberInput';
 import PresentationContent from 'instructure-ui/lib/components/PresentationContent';
 import Spinner from 'instructure-ui/lib/components/Spinner';
-import SVGWrapper from 'jsx/shared/SVGWrapper'
 import Typography from 'instructure-ui/lib/components/Typography';
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
 import Checkbox from 'instructure-ui/lib/components/Checkbox';
@@ -109,7 +109,7 @@ class LatePoliciesTabPanel extends React.Component {
     }).isRequired,
     changeLatePolicy: func.isRequired,
     locale: string.isRequired,
-    hideContent: bool.isRequired
+    showContentComingSoon: bool.isRequired
   };
 
   constructor (props) {
@@ -204,22 +204,17 @@ class LatePoliciesTabPanel extends React.Component {
   }
 
   render () {
-    if (this.props.hideContent) {
+    if (this.props.showContentComingSoon) {
       return (
-        <div id="late-policies-tab-panel-no-content">
-          <div id="content-coming-soon">
-            <SVGWrapper url="/images/gift_closed.svg" />
-            <Typography size="xx-large" weight="light">{I18n.t('New goodies coming soon!')}</Typography>
-            <br />
-            <Typography weight="bold">{I18n.t('Check back in a little while.')}</Typography>
-          </div>
+        <div id="LatePoliciesTabPanel__Container-noContent">
+          <ComingSoonContent />
         </div>
       );
     }
 
     if (!this.props.latePolicy.data) {
       return (
-        <div id="late-policies-tab-panel-no-content">
+        <div id="LatePoliciesTabPanel__Container-noContent">
           <Spinner title={I18n.t('Loading')} size="large" margin="small" />
         </div>
       );
@@ -227,7 +222,7 @@ class LatePoliciesTabPanel extends React.Component {
 
     const { data, validationErrors } = this.props.latePolicy;
     return (
-      <div id="late-policies-tab-panel">
+      <div id="LatePoliciesTabPanel__Container">
         {this.state.showAlert &&
           <Alert
             variant="warning"
