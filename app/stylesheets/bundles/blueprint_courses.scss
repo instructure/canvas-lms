@@ -25,7 +25,7 @@
   z-index: 10;
   padding: 10px 3px;
   border-bottom-left-radius: 5px;
-  background-color: $ic-brand-primary;
+  background-color: $electric;
   box-shadow: -1px 1px 2px 0 rgba(0,0,0,.2);
 
   &:after {
@@ -36,7 +36,7 @@
     right: 0;
     bottom: 0;
     width: 8px;
-    background-color: $ic-brand-primary;
+    background-color: $electric;
     box-shadow: -1px 0 1px 0 rgba(0,0,0,.2)
   }
 }
@@ -204,7 +204,7 @@
 }
 
 .bcs__header {
-  background: $ic-brand-primary;
+  background: $electric;
   position: relative;
   text-align: center;
   padding: 1.2em 1.75em 1.2em 0;
