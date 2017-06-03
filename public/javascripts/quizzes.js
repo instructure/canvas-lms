@@ -73,7 +73,7 @@ define([
   var dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility,
       scoreValidation;
 
-  const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : {}
+  var lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : {}
 
 
   RichContentEditor.preloadRemoteModule();
