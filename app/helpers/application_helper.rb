@@ -885,7 +885,7 @@ module ApplicationHelper
   end
 
   def planner_enabled?
-    @domain_root_account&.feature_enabled?(:student_planner)
+    @domain_root_account&.feature_enabled?(:student_planner) && @current_user.participating_student_course_ids.any?
   end
 
 end
