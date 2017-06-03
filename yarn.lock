@@ -7747,9 +7747,9 @@ tinycolor2@1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/tinycolor2/-/tinycolor2-1.4.1.tgz#f4fad333447bc0b07d4dc8e9209d8f39a8ac77e8"
 
-tinymce-light-skin@1.2.4, tinymce-light-skin@~1.2.4:
-  version "1.2.4"
-  resolved "https://registry.yarnpkg.com/tinymce-light-skin/-/tinymce-light-skin-1.2.4.tgz#66c380aef453d886428cdc93d9a79e0e1500bb9a"
+tinymce-light-skin@1.2.5, tinymce-light-skin@~1.2.4:
+  version "1.2.5"
+  resolved "https://registry.yarnpkg.com/tinymce-light-skin/-/tinymce-light-skin-1.2.5.tgz#3d37f1628ef737432c725eed1b226b6c8d275b0c"
 
 tinymce@4.5.7, tinymce@~4.5.3:
   version "4.5.7"
