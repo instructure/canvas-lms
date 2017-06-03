@@ -167,9 +167,10 @@ describe MasterCourses::MasterTemplatesController, type: :request do
     end
 
     it "should queue a master migration" do
-      json = api_call(:post, @url, @params)
+      json = api_call(:post, @url, @params.merge(:comment => 'seriously'))
       migration = @template.master_migrations.find(json['id'])
       expect(migration).to be_queued
+      expect(migration.comment).to eq 'seriously'
     end
   end
 
@@ -178,13 +179,14 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       setup_template
       @child_course = Account.default.courses.create!
       @sub = @template.add_child_course!(@child_course)
-      @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @user)
+      @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @user, :comment => 'Hark!')
     end
 
     it "should show a migration" do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/blueprint_templates/default/migrations/#{@migration.id}",
         @base_params.merge(:action => 'migrations_show', :id => @migration.to_param))
       expect(json['workflow_state']).to eq 'queued'
+      expect(json['comment']).to eq 'Hark!'
     end
 
     it "should show migrations" do
@@ -203,6 +205,18 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       setup_template
       @url = "/api/v1/courses/#{@course.id}/blueprint_templates/default/restrict_item"
       @params = @base_params.merge(:action => 'restrict_item')
+    end
+
+    it "should validate content type" do
+      json = api_call(:put, @url, @params, {:content_type => 'passignment', :content_id => "2", :restricted => '1'}, {}, {:expected_status => 400})
+      expect(json['message']).to include("Must be a valid content type")
+    end
+
+    it "should give a useful error when content is missing" do
+      other_course = Course.create!
+      other_assmt = other_course.assignments.create!
+      json = api_call(:put, @url, @params, {:content_type => 'assignment', :content_id => other_assmt.id, :restricted => '1'}, {}, {:expected_status => 404})
+      expect(json['message']).to include("Could not find content")
     end
 
     it "should be able to find all the (currently) supported types" do
@@ -250,6 +264,178 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       mc_tag.reload
       expect(mc_tag.restrictions).to be_blank
       expect(mc_tag.use_default_restrictions).to be_falsey
+    end
+
+    it "should use default restrictions by object type if enabled" do
+      assmt = @course.assignments.create!
+      assmt_tag = @template.content_tag_for(assmt)
+      page = @course.wiki.wiki_pages.create!(:title => "blah")
+      page_tag = @template.content_tag_for(page)
+
+      assmt_restricts = {:content => true, :points => true}
+      page_restricts = {:content => true}
+      @template.update_attributes(:use_default_restrictions_by_type => true,
+        :default_restrictions_by_type => {'Assignment' => assmt_restricts, 'WikiPage' => page_restricts})
+
+      api_call(:put, @url, @params, {:content_type => 'assignment', :content_id => assmt.id, :restricted => '1'}, {}, {:expected_status => 200})
+      expect(assmt_tag.reload.restrictions).to eq assmt_restricts
+
+      api_call(:put, @url, @params, {:content_type => 'wiki_page', :content_id => page.id, :restricted => '1'}, {}, {:expected_status => 200})
+      expect(page_tag.reload.restrictions).to eq page_restricts
+    end
+  end
+
+  def run_master_migration
+    @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @admin)
+    run_jobs
+    @migration.reload
+  end
+
+  describe "migration_details" do
+    before :once do
+      setup_template
+      @master = @course
+      @minions = (1..2).map do |n|
+        @template.add_child_course!(course_factory(:name => "Minion #{n}", :active_all => true)).child_course
+      end
+
+      # set up some stuff
+      @file = attachment_model(:context => @master, :display_name => 'Some File')
+      @assignment = @master.assignments.create! :title => 'Blah', :points_possible => 10
+      @full_migration = run_master_migration
+
+      # prepare some exceptions
+      @minions.first.attachments.first.update_attribute :display_name, 'Some Renamed Nonsense'
+      @minions.last.assignments.first.update_attribute :points_possible, 11
+
+      # now push some incremental changes
+      @page = @master.wiki.wiki_pages.create! :title => 'Unicorn'
+      page_tag = @template.content_tag_for(@page)
+      page_tag.restrictions = @template.default_restrictions
+      page_tag.save!
+      @quiz = @master.quizzes.create! :title => 'TestQuiz'
+      @file.update_attribute :display_name, 'I Can Rename Files Too'
+      @assignment.destroy
+      run_master_migration
+    end
+
+    it "returns change information from the blueprint side" do
+      json = api_call_as_user(@admin, :get, "/api/v1/courses/#{@master.id}/blueprint_templates/default/migrations/#{@migration.id}/details",
+                 :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',
+                 :id => @migration.to_param, :course_id => @master.to_param, :action => 'migration_details')
+      expect(json).to match_array([
+         {"asset_id"=>@page.id,"asset_type"=>"wiki_page","asset_name"=>"Unicorn","change_type"=>"created",
+          "html_url"=>"http://www.example.com/courses/#{@master.id}/pages/unicorn","locked"=>true,"exceptions"=>[]},
+         {"asset_id"=>@quiz.id,"asset_type"=>"quiz","asset_name"=>"TestQuiz","change_type"=>"created",
+          "html_url"=>"http://www.example.com/courses/#{@master.id}/quizzes/#{@quiz.id}","locked"=>false,"exceptions"=>[]},
+         {"asset_id"=>@assignment.id,"asset_type"=>"assignment","asset_name"=>"Blah","change_type"=>"deleted",
+          "html_url"=>"http://www.example.com/courses/#{@master.id}/assignments/#{@assignment.id}",
+          "locked"=>false,"exceptions"=>[{"course_id"=>@minions.last.id, "conflicting_changes"=>["points"]}]},
+         {"asset_id"=>@file.id,"asset_type"=>"attachment","asset_name"=>"I Can Rename Files Too",
+          "change_type"=>"updated","html_url"=>"http://www.example.com/courses/#{@master.id}/files/#{@file.id}",
+          "locked"=>false,"exceptions"=>[{"course_id"=>@minions.first.id, "conflicting_changes"=>["content"]}]}
+      ])
+    end
+
+    it "returns change information from the minion side" do
+      minion = @minions.first
+      minion_page = minion.wiki.wiki_pages.where(migration_id: @template.migration_id_for(@page)).first
+      minion_assignment = minion.assignments.where(migration_id: @template.migration_id_for(@assignment)).first
+      minion_file = minion.attachments.where(migration_id: @template.migration_id_for(@file)).first
+      minion_quiz = minion.quizzes.where(migration_id: @template.migration_id_for(@quiz)).first
+      json = api_call_as_user(minion.teachers.first, :get,
+                 "/api/v1/courses/#{minion.id}/blueprint_templates/default/migrations/#{@migration.id}/details",
+                 :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',
+                 :id => @migration.to_param, :course_id => minion.to_param, :action => 'migration_details')
+      expect(json).to match_array([
+         {"asset_id"=>minion_page.id,"asset_type"=>"wiki_page","asset_name"=>"Unicorn","change_type"=>"created",
+          "html_url"=>"http://www.example.com/courses/#{minion.id}/pages/unicorn","locked"=>true,"exceptions"=>[]},
+         {"asset_id"=>minion_quiz.id,"asset_type"=>"quiz","asset_name"=>"TestQuiz","change_type"=>"created",
+          "html_url"=>"http://www.example.com/courses/#{minion.id}/quizzes/#{minion_quiz.id}","locked"=>false,"exceptions"=>[]},
+         {"asset_id"=>minion_assignment.id,"asset_type"=>"assignment","asset_name"=>"Blah","change_type"=>"deleted",
+          "html_url"=>"http://www.example.com/courses/#{minion.id}/assignments/#{minion_assignment.id}","locked"=>false,"exceptions"=>[]},
+         {"asset_id"=>minion_file.id,"asset_type"=>"attachment","asset_name"=>"Some Renamed Nonsense",
+          "change_type"=>"updated","html_url"=>"http://www.example.com/courses/#{minion.id}/files/#{minion_file.id}",
+          "locked"=>false,"exceptions"=>[{"course_id"=>minion.id, "conflicting_changes"=>["content"]}]}
+      ])
+    end
+
+    it "returns empty for a non-selective migration" do
+      @template.add_child_course!(course_factory(:name => 'Minion 3'))
+      json = api_call_as_user(@admin, :get, "/api/v1/courses/#{@master.id}/blueprint_templates/default/migrations/#{@full_migration.id}/details",
+                 :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',
+                 :id => @full_migration.to_param, :course_id => @master.to_param, :action => 'migration_details')
+      expect(json).to eq([])
+    end
+
+    it "is not tripped up by subscriptions created after the sync" do
+      @template.add_child_course!(course_factory(:name => 'Minion 3'))
+      api_call_as_user(@admin, :get, "/api/v1/courses/#{@master.id}/blueprint_templates/default/migrations/#{@migration.id}/details",
+                 :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',
+                 :id => @migration.to_param, :course_id => @master.to_param, :action => 'migration_details')
+      expect(response).to be_success
+    end
+
+    it "requires manage rights on the course" do
+      api_call_as_user(@minions.last.teachers.first, :get,
+                 "/api/v1/courses/#{@minions.first.id}/blueprint_templates/default/migrations/#{@migration.id}/details",
+                 { :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',
+                   :id => @migration.to_param, :course_id => @minions.first.to_param, :action => 'migration_details' },
+                 {}, {}, { :expected_status => 401 })
+    end
+
+    it "complains if the course isn't a minion" do
+      other_course = course_factory
+      api_call_as_user(@admin, :get,
+                 "/api/v1/courses/#{other_course.id}/blueprint_templates/default/migrations/#{@migration.id}/details",
+                 { :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',
+                   :id => @migration.to_param, :course_id => other_course.to_param, :action => 'migration_details' },
+                 {}, {}, { :expected_status => 404 })
+    end
+  end
+
+  describe 'unsynced_changes' do
+    before :once do
+      Timecop.travel(1.hour.ago) do
+        setup_template
+        @master = @course
+        @template.add_child_course!(course_factory(:name => 'Minion'))
+        @page = @master.wiki.wiki_pages.create! :title => 'Old News'
+        @asmt = @master.assignments.create! :title => 'Boring'
+        @file = attachment_model(:context => @master, :display_name => 'Some File')
+        @template.content_tag_for(@file).update_attribute(:restrictions, {:content => true})
+        run_master_migration
+      end
+    end
+
+    it 'detects creates, updates, and deletes since the last sync' do
+      @asmt.destroy
+      @file.update_attribute(:display_name, 'Renamed')
+      @new_page = @master.wiki.wiki_pages.create! :title => 'New News'
+
+      json = api_call_as_user(@admin, :get, "/api/v1/courses/#{@master.id}/blueprint_templates/default/unsynced_changes",
+        :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',
+        :course_id => @master.to_param, :action => 'unsynced_changes')
+      expect(json).to match_array([
+       {"asset_id"=>@asmt.id,"asset_type"=>"assignment","asset_name"=>"Boring","change_type"=>"deleted",
+        "html_url"=>"http://www.example.com/courses/#{@master.id}/assignments/#{@asmt.id}","locked"=>false},
+       {"asset_id"=>@file.id,"asset_type"=>"attachment","asset_name"=>"Renamed","change_type"=>"updated",
+        "html_url"=>"http://www.example.com/courses/#{@master.id}/files/#{@file.id}","locked"=>true},
+       {"asset_id"=>@new_page.id,"asset_type"=>"wiki_page","asset_name"=>"New News","change_type"=>"created",
+        "html_url"=>"http://www.example.com/courses/#{@master.id}/pages/new-news","locked"=>false}
+      ])
+    end
+
+    it "limits result size" do
+      Setting.set('master_courses_history_count', '2')
+
+      3.times { |x| @master.wiki.wiki_pages.create! :title => "Page #{x}" }
+
+      json = api_call_as_user(@admin, :get, "/api/v1/courses/#{@master.id}/blueprint_templates/default/unsynced_changes",
+        :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',
+        :course_id => @master.to_param, :action => 'unsynced_changes')
+
+      expect(json.length).to eq 2
     end
   end
 end

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -129,7 +129,7 @@ module Api::V1::DiscussionTopics
         elsif opts[:plain_messages]
           topic.message # used for searching by body on index
         elsif opts[:text_only]
-          html_to_text(topic.message)
+          html_to_text(topic.message, :preserve_links => true)
         else
           api_user_content(topic.message, context)
         end

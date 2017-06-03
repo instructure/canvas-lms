@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2015 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative '../../helpers/gradezilla_common'
 require_relative '../../helpers/groups_common'
 require_relative '../page_objects/gradezilla_page'
@@ -6,8 +23,6 @@ describe "Gradezilla - message students who" do
   include_context "in-process server selenium tests"
   include GradezillaCommon
   include GroupsCommon
-
-  let(:gradezilla_page) { Gradezilla::MultipleGradingPeriods.new }
 
   before(:once) { gradebook_data_setup }
   before do
@@ -18,9 +33,9 @@ describe "Gradezilla - message students who" do
   it "should send messages" do
     message_text = "This is a message"
 
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
-    gradezilla_page.open_assignment_options(2)
+    Gradezilla.open_assignment_options(2)
     f('[data-menu-item-id="message-students-who"]').click
     expect do
       message_form = f('#message_assignment_recipients')
@@ -42,8 +57,8 @@ describe "Gradezilla - message students who" do
     # student 3 has neither submitted nor been graded
 
     message_text = "This is a message"
-    gradezilla_page.visit(@course)
-    gradezilla_page.open_assignment_options(2)
+    Gradezilla.visit(@course)
+    Gradezilla.open_assignment_options(2)
     f('[data-menu-item-id="message-students-who"]').click
     expect do
       message_form = f('#message_assignment_recipients')
@@ -57,9 +72,9 @@ describe "Gradezilla - message students who" do
 
   it "should send messages when Scored more than X points" do
     message_text = "This is a message"
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
-    gradezilla_page.open_assignment_options(1)
+    Gradezilla.open_assignment_options(1)
     f('[data-menu-item-id="message-students-who"]').click
 
     expect do
@@ -78,10 +93,10 @@ describe "Gradezilla - message students who" do
     submission = @third_assignment.submit_homework(@student_2, :body => 'student 2 submission assignment 3')
     submission.save!
 
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     # set grade for first student, 3rd assignment
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l3', 0)
-    gradezilla_page.open_assignment_options(2)
+    Gradezilla.open_assignment_options(2)
 
     # expect dialog to show 1 more student with the "Haven't been graded" option
     f('[data-menu-item-id="message-students-who"]').click
@@ -98,9 +113,9 @@ describe "Gradezilla - message students who" do
   it "should create separate conversations" do
     message_text = "This is a message"
 
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
-    gradezilla_page.open_assignment_options(2)
+    Gradezilla.open_assignment_options(2)
     f('[data-menu-item-id="message-students-who"]').click
     expect do
       message_form = f('#message_assignment_recipients')
@@ -112,9 +127,9 @@ describe "Gradezilla - message students who" do
   end
 
   it "allows the teacher to remove students from the message" do
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
-    gradezilla_page.open_assignment_options(1)
+    Gradezilla.open_assignment_options(1)
     f('[data-menu-item-id="message-students-who"]').click
 
     message_form = f('#message_assignment_recipients')
@@ -143,9 +158,9 @@ describe "Gradezilla - message students who" do
   end
 
   it "disables the submit button if all students are filtered out" do
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
-    gradezilla_page.open_assignment_options(1)
+    Gradezilla.open_assignment_options(1)
     f('[data-menu-item-id="message-students-who"]').click
 
     message_form = f('#message_assignment_recipients')
@@ -160,9 +175,9 @@ describe "Gradezilla - message students who" do
   end
 
   it "disables the submit button if all students are manually removed" do
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
-    gradezilla_page.open_assignment_options(1)
+    Gradezilla.open_assignment_options(1)
     f('[data-menu-item-id="message-students-who"]').click
 
     message_form = f('#message_assignment_recipients')
@@ -189,9 +204,9 @@ describe "Gradezilla - message students who" do
     en.deactivate
 
     message_text = "This is a message"
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
-    gradezilla_page.open_assignment_options(1)
+    Gradezilla.open_assignment_options(1)
     f('[data-menu-item-id="message-students-who"]').click
 
     message_form = f('#message_assignment_recipients')

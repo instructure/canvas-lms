@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2015 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
@@ -32,7 +50,7 @@ import RestrictedDialogForm from 'jsx/files/RestrictedDialogForm'
   };
 
   PublishCloud.render = function () {
-    var fileName = this.props.fileName || I18n.t('This file');
+    const fileName = (this.props.model && this.props.model.displayName()) || I18n.t('This file');
     if (this.props.userCanManageFilesForContext) {
       if (this.state.published && this.state.restricted) {
         return (
@@ -43,7 +61,7 @@ import RestrictedDialogForm from 'jsx/files/RestrictedDialogForm'
             ref='publishCloud'
             className='btn-link published-status restricted'
             title={this.getRestrictedText()}
-            aria-label={`${fileName} is ${this.getRestrictedText()} - ${I18n.t('Click to modify')}`}
+            aria-label={I18n.t('%{fileName} is %{restricted} - Click to modify', {fileName, restricted: this.getRestrictedText()})}
           >
             <i className='icon-cloud-lock' />
           </button>
@@ -57,7 +75,7 @@ import RestrictedDialogForm from 'jsx/files/RestrictedDialogForm'
             ref='publishCloud'
             className='btn-link published-status hiddenState'
             title={I18n.t('Hidden. Available with a link')}
-            aria-label={`${fileName} is ${I18n.t('Hidden. Available with a link - Click to modify')}`}
+            aria-label={I18n.t('%{fileName} is Hidden. Available with a link - Click to modify', {fileName})}
           >
             <i className='icon-cloud-lock' />
           </button>
@@ -71,7 +89,7 @@ import RestrictedDialogForm from 'jsx/files/RestrictedDialogForm'
             ref='publishCloud'
             className='btn-link published-status published'
             title={I18n.t('Published')}
-            aria-label={`${fileName} is ${I18n.t('Published - Click to modify')}`}
+            aria-label={I18n.t('%{fileName} is Published - Click to modify', {fileName})}
           >
             <i className='icon-publish' />
           </button>
@@ -85,7 +103,7 @@ import RestrictedDialogForm from 'jsx/files/RestrictedDialogForm'
             ref='publishCloud'
             className='btn-link published-status unpublished'
             title={I18n.t('Unpublished')}
-            aria-label={`${fileName} is ${I18n.t('Unpublished - Click to modify')}`}
+            aria-label={I18n.t('%{fileName} is Unpublished - Click to modify', {fileName})}
           >
             <i className='icon-unpublish' />
           </button>
@@ -100,7 +118,7 @@ import RestrictedDialogForm from 'jsx/files/RestrictedDialogForm'
             ref='publishCloud'
             className='published-status restricted'
             title={this.getRestrictedText()}
-            aria-label={`${fileName} is ${this.getRestrictedText()}`}
+            aria-label={I18n.t('%{fileName} is %{restricted}', {fileName, restricted: this.getRestrictedText()})}
           >
             <i className='icon-calendar-day' />
           </div>

@@ -1,11 +1,28 @@
+#
+# Copyright (C) 2012 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative '../../helpers/gradebook_common'
+require_relative '../page_objects/gradebook_page'
 
 describe "group weights" do
   include_context "in-process server selenium tests"
-  include_context "gradebook_components"
   include GradebookCommon
 
-  def student_totals()
+  def student_totals
     totals = ff('.total-cell')
     points = []
     for i in totals do
@@ -15,10 +32,10 @@ describe "group weights" do
   end
 
   def toggle_group_weight
-    gradebook_settings_cog.click
+    gradebook_page.settings_cog.click
     set_group_weights.click
     group_weighting_scheme.click
-    save_button.click
+    gradebook_page.save_button_click
     wait_for_ajax_requests
   end
 

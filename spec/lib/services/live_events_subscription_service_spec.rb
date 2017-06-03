@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2017 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative "../../spec_helper"
 require_dependency "services/live_events_subscription_service"
 
@@ -7,11 +24,9 @@ module Services
 
     context 'service unavailable' do
       before do
-        Canvas::DynamicSettings.stubs(:find).with('live-events-subscription-service').returns(nil)
-      end
-
-      after do
-        Canvas::DynamicSettings.unstub(:find)
+        allow(Canvas::DynamicSettings).to receive(:find)
+          .with('live-events-subscription-service', {use_env: false})
+          .and_return(nil)
       end
 
       describe '.available?' do
@@ -23,14 +38,17 @@ module Services
 
     context 'service available' do
       before do
-        Canvas::DynamicSettings.stubs(:find).with('live-events-subscription-service').returns({
-          "app-host" => "http://example.com",
-          "sad-panda" => nil
-        })
-        Canvas::DynamicSettings.stubs(:find).with('canvas').returns({
-          "signing-secret" => "astringthatisactually32byteslong",
-          "encryption-secret" => "astringthatisactually32byteslong"
-        })
+        allow(Canvas::DynamicSettings).to receive(:find)
+          .with('live-events-subscription-service', {use_env: false})
+          .and_return({
+            'app-host' => 'http://example.com',
+          })
+        allow(Canvas::DynamicSettings).to receive(:find)
+          .with('canvas', {use_env: false})
+          .and_return({
+            'signing-secret' => 'astringthatisactually32byteslong',
+            'encryption-secret' => 'astringthatisactually32byteslong'
+          })
       end
 
       after do

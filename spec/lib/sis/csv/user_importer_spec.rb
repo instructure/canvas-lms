@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -429,7 +429,7 @@ describe SIS::CSV::UserImporter do
       "user_2,user1,User,Uno,user@example.com,active"
     )
     expect(importer.errors).to eq []
-    expect(importer.warnings.map{|r|r.last}).to eq ["user user_1 has already claimed user_2's requested login information, skipping"]
+    expect(importer.warnings.map{|r|r.last}).to eq ["An existing Canvas user with the SIS ID user_1 has already claimed user_2's user_id requested login information, skipping"]
     user = CommunicationChannel.by_path('user@example.com').first.user
     expect(user.pseudonyms.count).to eq 1
     expect(user.pseudonyms.by_unique_id('user1').first.sis_user_id).to eq 'user_1'
@@ -448,10 +448,39 @@ describe SIS::CSV::UserImporter do
       "user_2,user1,User,Dos,user2@example.com,active",
       "user_1,user3,User,Uno,user1@example.com,active"
     )
-    expect(importer.warnings.map{|r|r.last}).to eq ["user user_1 has already claimed user_2's requested login information, skipping"]
+    expect(importer.warnings.map{|r|r.last}).to eq ["An existing Canvas user with the SIS ID user_1 has already claimed user_2's user_id requested login information, skipping"]
     expect(importer.errors).to eq []
     expect(Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.unique_id).to eq "user3"
     expect(Pseudonym.where(account_id: @account, sis_user_id: "user_2").first.unique_id).to eq "user2"
+  end
+
+  it "should not show error when an integration_id is taken" do
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status,integration_id",
+      "user_1,user1,User,Uno,user1@example.com,active,int_1"
+    )
+
+    importer = process_csv_data(
+      "user_id,login_id,first_name,last_name,email,status,integration_id",
+      "user_2,user2,User,Uno,user2@example.com,active,int_1"
+    )
+    expect(importer.warnings.map {|r| r.last}).to eq ["An existing Canvas user with the SIS ID user_1 has already claimed user_2's requested integration_id, skipping"]
+    expect(importer.errors).to eq []
+  end
+
+  it "should process user row when integration_id is not set" do
+    importer1 = process_csv_data(
+      "user_id,login_id,first_name,last_name,email,status,integration_id",
+      "user_1,user1,User,Uno,user1@example.com,active,int_1",
+      "user_2,user2,User,dos,user2@example.com,active,"
+    )
+    importer2 = process_csv_data(
+      "user_id,login_id,first_name,last_name,email,status,integration_id",
+      "user_1,user1,User,Uno,user1@example.com,active,int_1",
+      "user_2,user2,User,dos,user2@example.com,active,"
+    )
+    expect(importer1.warnings).to eq []
+    expect(importer2.warnings).to eq []
   end
 
   it "should allow a secondary user account to change its login id to some other registered login id if the other changes it first" do
@@ -766,7 +795,7 @@ describe SIS::CSV::UserImporter do
       "user_2,user1,User,Dos,user2@example.com,active"
     )
     expect(importer.errors).to eq []
-    expect(importer.warnings.map{|x| x[1]}).to eq ["user user_1 has already claimed user_2's requested login information, skipping"]
+    expect(importer.warnings.map{|x| x[1]}).to eq ["An existing Canvas user with the SIS ID user_1 has already claimed user_2's user_id requested login information, skipping"]
     expect(Pseudonym.by_unique_id('user1').first).not_to be_nil
     expect(Pseudonym.by_unique_id('user2').first).to be_nil
   end
@@ -1329,7 +1358,7 @@ describe SIS::CSV::UserImporter do
     )
     expect(importer.errors).to eq []
     expect(importer.warnings.length).to eq 1
-    expect(importer.warnings.last.last).to eq "user #{@non_sis_user.id} has already claimed user_1's requested login information, skipping"
+    expect(importer.warnings.last.last).to eq "An existing Canvas user with the Canvas ID #{@non_sis_user.id} has already claimed user_1's user_id requested login information, skipping"
   end
 
   it "sets authentication providers" do

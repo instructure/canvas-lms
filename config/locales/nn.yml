@@ -265,7 +265,7 @@ nn:
       order: "Rekkefølgje: %{order}"
     ? "report_header_%{header}"
     : "%{header}"
-    report_header_account_id: konto_id
+    report_header_account_id: account_id
     report_header_assessment_id: vurderings-ID
     report_header_assessment_question: vurderingsspørsmål
     report_header_assessment_question_id: "ID for vurderingsspørsmål"
@@ -276,6 +276,7 @@ nn:
     report_header_assignment_url: oppgåve-URL
     report_header_associated_user_id: associated_user_id
     report_header_attempt: forsøk
+    report_header_authentication_provider_id: authentication_provider_id
     report_header_canvas_account_id: canvas_account_id
     report_header_canvas_associated_user_id: canvas_associated_user_id
     report_header_canvas_course_id: canvas_course_id
@@ -304,6 +305,7 @@ nn:
     report_header_full_name: full_name
     report_header_group_id: group_id
     report_header_id: ID
+    report_header_integration_id: integration_id
     report_header_last_access_at: "siste tilgang den"
     report_header_last_activity_at: "siste aktivitet den"
     report_header_last_ip: "siste IP"
@@ -695,6 +697,31 @@ nn:
             header: "Startar den:"
     default_account_quotas_not_updated: "Standard kontokvoter er ikkje oppdaterte"
     default_account_quotas_updated: "Standard kontokvoter er oppdaterte"
+    devry: 
+      dcr2: 
+        parameters: 
+          custom_reports: 
+            start: 
+              parameters: 
+                header: "Dato for aktivitet:"
+      dcr4: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Sluttar den:"
+            start: 
+              parameters: 
+                header: "Startar den:"
+      dcr7: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Sluttar den:"
+            start: 
+              parameters: 
+                header: "Startar den:"
     engagement_report_csv_parameters: 
       account_reports: 
         bryan_engagement: 
@@ -1332,6 +1359,7 @@ nn:
   add_a_comment_872470ac: "Legg til ein kommentar"
   add_a_course_b72b18d7: "Legg til eit emne"
   add_a_custom_help_link_4328252f: "Legg til eigendefinert Hjelp-kopling"
+  add_a_message_a5ed12bf: "Legg til ei melding"
   add_a_new_announcement_878b717f: "Legg til ei ny kunngjering"
   add_a_new_course_4a041207: "Legg til eit nytt emne"
   add_a_new_outcome_cbdbe96c: "Legg til nytt læringsmål"
@@ -1512,6 +1540,7 @@ nn:
   an_error_occured_while_fetching_enrollment_terms_1b7b4ac: "Det oppstod eit problem under importeringa av påmeldingssemester. "
   an_error_occured_while_fetching_grading_period_set_b4f12aa5: "Det oppstod eit problem under importeringa av setta med karaktersetjingsperiodar"
   an_error_occured_while_updating_the_grading_period_9e024cd1: "Det oppstod eit problem under oppdateringa av setta med karaktersetjingsperiodar"
+  an_error_occurred_making_a_network_request_d1bda348: "Det oppstod ein feil ved nettverksførespurnaden. "
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Det oppstod ein feil*, legg inn svaret ditt på nytt seinare"
   an_error_occurred_please_try_again_later_84223241: "Det oppstod ein feil. Prøv på nytt seinare."
   an_error_occurred_publishing_grades_cfdf7631: "Det oppstod ein feil under publisering av karakterar."
@@ -1521,7 +1550,10 @@ nn:
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "Det oppstod ein feil under førebuing av nedlasting. Prøv på nytt seinare."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Det oppstod ein feil under innstilling av bruksretten for %{filename}"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "Ein feil oppstod ved forsøk på å kontakte Turnitin"
-  an_error_occurred_while_migrating_405ac0b5: "Det oppstod ein feil under migreringa."
+  an_error_occurred_while_checking_the_migration_sta_d17035b1: "Det oppstod ein feil ved sjekk av overføringsstatus."
+  an_error_occurred_while_loading_courses_11d4571e: "Det oppstod ein feil under emneinnlastinga. "
+  an_error_occurred_while_migrating_405ac0b5: "Det oppstod ein feil under overføringa."
+  an_error_occurred_while_starting_migration_8e6015e2: "Det oppstod ein feil i starten av overføringa."
   an_error_ocurred_while_deleting_the_appointment_gr_4948bbc5: "Det oppstod eit problem under sletting av avtalegruppa"
   an_error_ocurred_while_saving_the_appointment_grou_e19452cd: "Det oppstod eit problem under lagring av avtalegruppa"
   an_export_is_already_in_progress_54270f01: "Ein eksport er allereie i gang."
@@ -1669,6 +1701,7 @@ nn:
     wiki_front_page_default_content_group: "Velkomen til din nye gruppewiki."
   application_id_2aa1640f: Applikasjons-ID
   application_secret_e6803c7e: Applikasjonshemmelegheit
+  applied_cc7be774: Brukt
   apply_781a2546: Bruk
   apply_theme_7af08387: "Bruk tema"
   applying_new_styles_to_subaccounts_e8aeeef2: "Legg til nye stilar til underkontoar"
@@ -1715,6 +1748,7 @@ nn:
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Er du sikker på at du vil fjerne verktøyet?"
   are_you_sure_you_want_to_remove_this_user_8d1a8295: "Er du sikker på at du vil fjerne denne brukaren?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Er du sikker på at du vil rapportere profilbilde?"
+  are_you_sure_you_want_to_resync_these_grades_to_th_e509cb9e: "Er du sikker på at du vil synkronisere karakterane på nytt til studentinformasjonssystemet?"
   are_you_sure_you_want_to_submit_this_comment_fbe76ba6: "Er du sikker på at du vil sende denne kommentaren?"
   argentina_3257a200: Argentina
   argentina_54_375d6af4: "Argentina (+54)"
@@ -1724,6 +1758,7 @@ nn:
   arrange_columns_by_assignment_group_59bbddd0: "Ordne kolonnar etter oppgåvegruppe"
   arrange_columns_by_due_date_888f2551: "Ordne kolonnar etter forfallsdato"
   arrange_columns_by_due_date_f74f9e2d: "Ordne kolonnar etter forfallsdato"
+  arrange_columns_by_points_48da9ba3: "Ordne kolonnar etter poeng"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Når du skriv i dette feltet, blir gruppelistene automatisk filtrerte slik at dei berre inkluderer gruppenamna som samsvarer med dine inndata."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "Når du skriv i dette feltet, blir resultatlistene automatisk oppdaterte."
   ask_your_instructor_a_question_a61ca5e9: "Spør faglærar eit spørsmål"
@@ -1833,12 +1868,14 @@ nn:
     unmute_button: "Opphev skjuling av oppgåve"
     unmute_dialog: "Denne oppgåva er skjult. Det betyr at studentane ikkje kan sjå karakterane og tilbakemeldingane. Vil du oppheve skjuling?"
     unmuting_assignment: "Opphevar skjuling av oppgåva..."
+  assignment_name_a_z_aeefaa36: "Oppgåvenamn - A-Å"
   assignment_name_b2d87383: Oppgåvenamn
   assignment_name_course_name_is_now_due_55613e9b: "%{assignment_name}, %{course_name}, skal leverast"
   assignment_name_course_name_no_longer_has_a_due_da_a37b6a7c: "%{assignment_name}, %{course_name}, har ikkje lenger ein leveringsfrist"
   assignment_name_course_name_override_is_now_due_ed5ce1e: "%{assignment_name}, %{course_name} (%{override}), skal leverast"
   assignment_name_course_name_override_no_longer_has_5a94da2b: "%{assignment_name}, %{course_name} (%{override}), har ikkje lenger ein leveringsfrist"
   assignment_name_grade_history_b506426c: "%{assignment_name}, karakterhistorikk"
+  assignment_name_z_a_34f92f4b: "Oppgåvenamn - Å-A"
   assignment_options_1e5b7074: Oppgåvealternativ
   assignment_override: 
     student_count: 

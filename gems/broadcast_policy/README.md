@@ -34,7 +34,7 @@ for integrating with the notification system
 License
 =======
 
-Copyright (C) 2014 Instructure, Inc.
+Copyright (C) 2014 - present Instructure, Inc.
 
 This file is part of Canvas.
 

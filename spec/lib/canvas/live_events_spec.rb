@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2015 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -215,7 +215,7 @@ describe Canvas::LiveEvents do
       submission.grader = @teacher
       submission.grade = '10'
       submission.score = 10
-      Canvas::LiveEvents.grade_changed(submission, submission.versions.current.model)
+      Canvas::LiveEvents.grade_changed(submission)
     end
 
     it "should include the user_id and assignment_id" do

@@ -76,5 +76,3 @@ A collection of extensions on Ruby's String class. Please see the documentation 
 == Thanks & Acknowledgements
 
 If it's not obvious, some of the code for ActsAsUrl is based on Rick Olsen's permalink_fu[http://svn.techno-weenie.net/projects/plugins/permalink_fu/] plugin. Unidecoder is a Ruby port of Sean Burke's Text::Unidecode[http://interglacial.com/~sburke/tpj/as_html/tpj22.html] module for Perl. And, finally, the bulk of strip_html_tags[link:classes/LuckySneaks/StringExtensions.html#M000005] in StringExtensions was stolen from Tobias Lütke's Regex in Typo[http://typosphere.org/].
-
-copyright (c) 2008 Lucky Sneaks, released under the MIT license

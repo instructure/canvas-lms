@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 Instructure, Inc.
+# Copyright (C) 2015 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -31,6 +31,10 @@ class AccountAuthorizationConfig::Google < AccountAuthorizationConfig::OpenIDCon
 
   # Rename db field
   alias_attribute :hosted_domain, :auth_filter
+
+  def hosted_domain=(domain)
+    self.auth_filter = domain.presence
+  end
 
   def self.login_attributes
     ['sub'.freeze, 'email'.freeze].freeze

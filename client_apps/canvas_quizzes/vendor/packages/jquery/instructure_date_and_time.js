@@ -10,7 +10,6 @@ requirejs.config({
       'moment_formats': 'canvas/moment_formats',
       'bower': 'canvas/bower',
       'compiled': 'canvas/compiled',
-      'jquery': 'canvas/vendor/jquery-1.7.2',
       'jqueryui': 'canvas/vendor/jqueryui',
       'vendor': 'canvas/vendor',
       'timezone': 'canvas/timezone_core',
@@ -36,10 +35,6 @@ requirejs.config({
 
     'canvas/str/htmlEscape': {
       'INST': 'canvas/INST',
-    },
-
-    'canvas/jquery': {
-      'jquery.instructure_jquery_patches': 'canvas/jquery.instructure_jquery_patches'
     },
 
     'canvas/jquery.instructure_jquery_patches': {

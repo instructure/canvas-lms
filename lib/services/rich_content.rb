@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2015 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 module Services
   class RichContent
     def self.env_for(root_account, risk_level: :highrisk, user: nil, domain: nil, real_user: nil, context: nil)
@@ -33,7 +50,7 @@ module Services
       end
 
       def service_settings
-        settings = Canvas::DynamicSettings.from_cache("rich-content-service", expires_in: 5.minutes)
+        settings = Canvas::DynamicSettings.from_cache("rich-content-service", expires_in: 5.minutes, use_env: false)
         {
           RICH_CONTENT_APP_HOST: settings["app-host"],
           RICH_CONTENT_CDN_HOST: settings["cdn-host"]

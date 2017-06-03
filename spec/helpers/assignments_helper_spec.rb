@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -34,7 +34,7 @@ describe AssignmentsHelper do
     end
 
     it "is false if the assignment already has submissions" do
-      @assignment.submissions.create!(user_id: @student, submission_type: 'online_url')
+      @assignment.submissions.find_by!(user_id: @student).update!(submission_type: 'online_url')
       expect(assignment_publishing_enabled?(@assignment, @teacher)).to be_falsey
     end
 

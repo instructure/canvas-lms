@@ -1,4 +1,22 @@
 <%
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<%
   title = @context.is_a?(Course) ? t('content_exports', "Content Exports") : t('user_data_exports', "Download Submissions")
   friendly_message = @context.is_a?(Course) ? nil : t("Creating a Submission Export will allow you to download a zip file of all your assignment submissions in all of your present and past courses. This could be a big file, so it may take a while. You can navigate away from the page and come back later.")
 %>
@@ -27,7 +45,9 @@
           <p>
             <% date = "<span class=\"created_at time_ago_date\" data-timestamp=\"#{export.created_at.iso8601}\">#{datetime_string export.created_at}</span>".html_safe %>
             <% wrapper = link_to('\1', export.attachment ? verified_file_download_url(export.attachment) : nil) %>
-            <% if export.export_type == ContentExport::COMMON_CARTRIDGE %>
+            <% if export.expired? %>
+              <%= t "Course Export from %{date} (expired)", :date => date %>
+            <% elsif export.export_type == ContentExport::COMMON_CARTRIDGE %>
               <%= t 'links.download', "Course Export from %{date}: *Click here to download*", :date => date, :wrapper => wrapper %>
             <% elsif export.export_type == ContentExport::QTI %>
               <%= t 'links.download_qti', "QTI Export from %{date}: *Click here to download*", :date => date, :wrapper => wrapper %>
@@ -41,6 +61,10 @@
       <% end %>
     <% end %>
   </div>
+
+  <% if ContentExport.expire? %>
+    <p><em><%= t "Content exports expire after %{days} days.", days: ContentExport.expire_days %></em></p>
+  <% end %>
 
   <hr />
 

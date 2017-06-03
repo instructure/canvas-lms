@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 Instructure, Inc.
+# Copyright (C) 2015 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -44,5 +44,11 @@ describe AccountAuthorizationConfig::Google do
     token = stub('token', params: {}, options: {})
 
     expect(ap.unique_id(token)).to eq '123'
+  end
+
+  it "it sets hosted domain to nil if empty string" do
+    ap = AccountAuthorizationConfig::Google.new
+    ap.hosted_domain = ''
+    expect(ap.hosted_domain).to be_nil
   end
 end

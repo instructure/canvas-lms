@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -48,22 +48,5 @@ describe "/users/user_dashboard" do
                                                           :subject => "My Global Announcement", :account => Account.default)])
     render "users/user_dashboard"
     expect(response.body).to match /My Global Announcement/
-  end
-
-  context "with Student Planner enabled" do
-    it "should render out a div with id of dashboard-planner" do
-      course_with_student
-      view_context
-      @course.account.enable_feature!(:student_planner)
-      assign(:courses, [@course])
-      assign(:enrollments, [@enrollment])
-      assign(:group_memberships, [])
-      assign(:topics, [])
-      assign(:upcoming_events, [])
-      assign(:stream_items, [])
-
-      render "users/user_dashboard"
-      expect(response.body).to match /id="dashboard-planner"/
-    end
   end
 end

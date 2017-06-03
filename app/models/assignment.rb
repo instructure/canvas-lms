@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2016 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -392,9 +392,18 @@ class Assignment < ActiveRecord::Base
     grading_period = GradingPeriod.for_date_in_course(date: due_at, course: context)
     return true if grading_period_was&.id == grading_period&.id
 
-    [grading_period_was, grading_period].compact.each do |gp|
-      context.recompute_student_scores(grading_period_id: gp)
+    if grading_period_was
+      # recalculate just the old grading period's score
+      context.recompute_student_scores(grading_period_id: grading_period_was, update_course_score: false)
     end
+    # recalculate the new grading period's score. If the grading period group is
+    # weighted, then we need to recalculate the overall course score too. (If
+    # grading period is nil, make sure we pass true for `update_course_score`
+    # so we can use a singleton job.)
+    context.recompute_student_scores(
+      grading_period_id: grading_period,
+      update_course_score: !grading_period || grading_period.grading_period_group&.weighted?
+    )
     true
   end
   private :update_grading_period_grades

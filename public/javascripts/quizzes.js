@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2011 Instructure, Inc.
+/*
+ * Copyright (C) 2011 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -12,8 +12,8 @@
  * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
  * details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 // xsslint jqueryObject.function makeFormAnswer makeDisplayAnswer
@@ -45,7 +45,7 @@ define([
   'jsx/shared/conditional_release/ConditionalRelease',
   'compiled/util/deparam',
   'compiled/util/SisValidationHelper',
-  'jsx/blueprint_courses/lockManager',
+  'jsx/blueprint_courses/apps/LockManager',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */,
@@ -72,6 +72,9 @@ define([
 
   var dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility,
       scoreValidation;
+
+  const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : {}
+
 
   RichContentEditor.preloadRemoteModule();
 
@@ -128,7 +131,9 @@ define([
       overrideView = window.overrideView = new DueDateOverrideView({
         el: '.js-assignment-overrides',
         model: dueDateList,
-        views: {}
+        views: {},
+        dueDatesReadonly: lockedItems.due_dates,
+        availabilityDatesReadonly: lockedItems.availability_dates
       });
       overrideView.render()
     }
@@ -1793,7 +1798,7 @@ define([
 
       processData: function(data) {
         $(this).attr('method', 'PUT');
-        var quiz_title = $("#quiz_title").val();
+        var quiz_title = $("input[name='quiz[title]']").val();
         var postToSis = data['quiz[post_to_sis]'] === '1'
         var vaildQuizType = data['quiz[quiz_type]'] != 'survey' && data['quiz[quiz_type]'] != 'practice_quiz'
         var maxNameLength = 256;
@@ -1819,7 +1824,11 @@ define([
           return false;
         }
         data['quiz[title]'] = quiz_title;
-        data['quiz[description]'] = RichContentEditor.callOnRCE($("#quiz_description"), 'get_code');
+        if (lockedItems.content) {
+          data['quiz[description]'] = quizModel.get('description')
+        } else {
+          data['quiz[description]'] = RichContentEditor.callOnRCE($('#quiz_description'), 'get_code');
+        }
         if ($("#quiz_notify_of_update").is(':checked')) {
           data['quiz[notify_of_update]'] = $("#quiz_notify_of_update").val();
         }
@@ -3834,13 +3843,15 @@ define([
 
     var keyboardShortcutsView = new RCEKeyboardShortcuts();
 
-    RichContentEditor.loadNewEditor($("#quiz_description"), {
-      focus: true,
-      manageParent: true,
-      tinyOptions: {
-        aria_label: I18n.t('label.quiz.instructions', 'Quiz instructions, rich text area')
-      }
-    })
+    if (!lockedItems.content) {
+      RichContentEditor.loadNewEditor($('#quiz_description'), {
+        focus: true,
+        manageParent: true,
+        tinyOptions: {
+          aria_label: I18n.t('label.quiz.instructions', 'Quiz instructions, rich text area')
+        }
+      })
+    }
     keyboardShortcutsView.render().$el.insertBefore($(".toggle_description_views_link:first"));
 
     $(".toggle_description_views_link").click(function(event) {

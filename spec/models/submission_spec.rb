@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,9 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
-require File.expand_path(File.dirname(__FILE__) + '/../lib/validates_as_url.rb')
+require_relative '../spec_helper'
+require_relative '../sharding_spec_helper'
+require_relative '../lib/validates_as_url'
 
 describe Submission do
   before(:once) do
@@ -29,13 +29,17 @@ describe Submission do
     @assignment.workflow_state = "published"
     @assignment.save
     @valid_attributes = {
-      assignment_id: @assignment.id,
-      user_id: @user.id,
+      assignment: @assignment,
+      user: @user,
       grade: "1.5",
       grader: @teacher,
-      url: "www.instructure.com"
+      url: "www.instructure.com",
+      workflow_state: "submitted"
     }
   end
+
+  it { is_expected.to validate_numericality_of(:points_deducted).is_greater_than_or_equal_to(0).allow_nil }
+  it { is_expected.to validate_inclusion_of(:late_policy_status).in_array(["none", "missing", "late"]).allow_nil }
 
   describe "with grading periods" do
     let(:in_closed_grading_period) { 9.days.ago }
@@ -73,7 +77,7 @@ describe Submission do
           before(:once) do
             @assignment.due_at = in_open_grading_period
             @assignment.save!
-            @submission = Submission.create!(@valid_attributes)
+            submission_spec_model
           end
 
           it "has grade permissions if the user is a root account admin" do
@@ -95,7 +99,7 @@ describe Submission do
           before(:once) do
             @assignment.due_at = outside_of_any_grading_period
             @assignment.save!
-            @submission = Submission.create!(@valid_attributes)
+            submission_spec_model
           end
 
           it "has grade permissions if the user is a root account admin" do
@@ -116,17 +120,418 @@ describe Submission do
     end
   end
 
-  it "should create a new instance given valid attributes" do
-    Submission.create!(@valid_attributes)
+  describe 'cached_due_date' do
+    before(:once) do
+      @now = Time.zone.local(2013, 10, 18)
+    end
+
+    let(:submission) { @assignment.submissions.find_by!(user_id: @student) }
+
+    it "gets initialized during submission creation" do
+      # create an invited user, so that the submission is not automatically
+      # created by the DueDateCacher
+      student_in_course
+      @assignment.update_attribute(:due_at, Time.zone.now - 1.day)
+
+      override = @assignment.assignment_overrides.build
+      override.title = "Some Title"
+      override.set = @course.default_section
+      override.override_due_at(Time.zone.now + 1.day)
+      override.save!
+
+      submission = @assignment.submissions.find_by!(user: @user)
+      expect(submission.cached_due_date).to eq override.reload.due_at.change(sec: 0)
+    end
+
+    context 'due date changes after student submits' do
+      before(:once) do
+        Timecop.freeze(@now) do
+          @assignment.update!(due_at: 20.minutes.ago, submission_types: "online_text_entry")
+          @assignment.submit_homework(@student, body: "a body")
+        end
+      end
+
+      it 'changes if the assignment due date changes' do
+        expect { @assignment.update!(due_at: 15.minutes.ago(@now)) }.to change {
+          submission.reload.cached_due_date
+        }.from(20.minutes.ago(@now)).to(15.minutes.ago(@now))
+      end
+
+      context 'student overrides' do
+        before(:once) do
+          @override = @assignment.assignment_overrides.create!(due_at: 15.minutes.ago(@now), due_at_overridden: true)
+        end
+
+        it 'changes if an override is added for the student' do
+          expect { @override.assignment_override_students.create!(user: @student) }.to change {
+            submission.reload.cached_due_date
+          }.from(20.minutes.ago(@now)).to(15.minutes.ago(@now))
+        end
+
+        it "does not change if an override is added for the student and the due date is earlier" \
+        " than an existing override that applies to the student for the assignment" do
+          section = @course.course_sections.create!(name: "My Awesome Section")
+          student_in_section(section, user: @student)
+          @assignment.assignment_overrides.create!(
+            due_at: 10.minutes.ago(@now),
+            due_at_overridden: true,
+            set: section
+          )
+
+          override = @assignment.assignment_overrides.create!(
+            due_at: 15.minutes.ago(@now),
+            due_at_overridden: true
+          )
+
+          expect { override.assignment_override_students.create!(user: @student) }.not_to change {
+            submission.reload.cached_due_date
+          }
+        end
+
+        it 'changes if an override is removed for the student' do
+          other_student = User.create!
+          @course.enroll_student(other_student, active_all: true)
+          @override.assignment_override_students.create!(user: @student)
+          # need two students for this spec. if there's only one student and we remove the
+          # assignment_override_student, the entire assignment_override gets wiped out and
+          # we're testing something completely different.
+          @override.assignment_override_students.create!(user: other_student)
+          expect { @override.assignment_override_students.find_by(user_id: @student).destroy }.to change {
+            submission.reload.cached_due_date
+          }.from(15.minutes.ago(@now)).to(20.minutes.ago(@now))
+        end
+
+        it 'changes if the due date for the override is changed' do
+          @override.assignment_override_students.create!(user: @student)
+          expect { @override.update!(due_at: 14.minutes.ago(@now)) }.to change {
+            submission.reload.cached_due_date
+          }.from(15.minutes.ago(@now)).to(14.minutes.ago(@now))
+        end
+      end
+
+      context 'section overrides' do
+        before(:once) do
+          @section = @course.course_sections.create!(name: 'My Awesome Section')
+        end
+
+        it 'changes if an override is added for the section the student is in' do
+          student_in_section(@section, user: @student)
+          expect do
+            @assignment.assignment_overrides.create!(
+              due_at: 15.minutes.ago(@now),
+              due_at_overridden: true,
+              set: @section
+            )
+          end.to change {
+            submission.reload.cached_due_date
+          }.from(20.minutes.ago(@now)).to(15.minutes.ago(@now))
+        end
+
+        it 'changes if a student is added to the section after the override is added for the section' do
+          @assignment.assignment_overrides.create!(
+            due_at: 15.minutes.ago(@now),
+            due_at_overridden: true,
+            set: @section
+          )
+
+          expect { student_in_section(@section, user: @student) }.to change {
+            submission.reload.cached_due_date
+          }.from(20.minutes.ago(@now)).to(15.minutes.ago(@now))
+        end
+
+        it 'changes if a student is removed from a section with a due date for the assignment' do
+          @assignment.assignment_overrides.create!(
+            due_at: 15.minutes.ago(@now),
+            due_at_overridden: true,
+            set: @section
+          )
+
+          @course.enroll_student(@student, section: @section, allow_multiple_enrollments: true).accept!
+          expect { @student.enrollments.find_by(course_section_id: @section).destroy }.to change {
+            submission.reload.cached_due_date
+          }.from(15.minutes.ago(@now)).to(20.minutes.ago(@now))
+        end
+
+        it 'changes if the due date for the override is changed' do
+          student_in_section(@section, user: @student)
+          override = @assignment.assignment_overrides.create!(
+            due_at: 15.minutes.ago(@now),
+            due_at_overridden: true,
+            set: @section
+          )
+          expect { override.update!(due_at: 14.minutes.ago(@now)) }.to change {
+            submission.reload.cached_due_date
+          }.from(15.minutes.ago(@now)).to(14.minutes.ago(@now))
+        end
+      end
+
+      context 'group overrides' do
+        before(:once) do
+          category = @course.group_categories.create!(name: 'New Group Category')
+          @group = @course.groups.create!(group_category: category)
+          @assignment = @course.assignments.create!(group_category: category, due_at: 20.minutes.ago(@now))
+          @assignment.submit_homework(@student, body: "a body")
+        end
+
+        it 'changes if an override is added for the group the student is in' do
+          @group.add_user(@student, 'active')
+
+          expect do
+            @assignment.assignment_overrides.create!(
+              due_at: 15.minutes.ago(@now),
+              due_at_overridden: true,
+              set: @group
+            )
+          end.to change {
+            submission.reload.cached_due_date
+          }.from(20.minutes.ago(@now)).to(15.minutes.ago(@now))
+        end
+
+        it 'changes if a student is added to the group after the override is added for the group' do
+          @assignment.assignment_overrides.create!(
+            due_at: 15.minutes.ago(@now),
+            due_at_overridden: true,
+            set: @group
+          )
+
+          expect { @group.add_user(@student, 'active') }.to change {
+            submission.reload.cached_due_date
+          }.from(20.minutes.ago(@now)).to(15.minutes.ago(@now))
+        end
+
+        it 'changes if a student is removed from a group with a due date for the assignment' do
+          @group.add_user(@student, 'active')
+          @assignment.assignment_overrides.create!(
+            due_at: 15.minutes.ago(@now),
+            due_at_overridden: true,
+            set: @group
+          )
+
+          expect { @group.group_memberships.find_by(user_id: @student).destroy }.to change {
+            submission.reload.cached_due_date
+          }.from(15.minutes.ago(@now)).to(20.minutes.ago(@now))
+        end
+
+        it 'changes if the due date for the override is changed' do
+          @group.add_user(@student, 'active')
+          override = @assignment.assignment_overrides.create!(
+            due_at: 15.minutes.ago(@now),
+            due_at_overridden: true,
+            set: @group
+          )
+
+          expect { override.update!(due_at: 14.minutes.ago(@now)) }.to change {
+            submission.reload.cached_due_date
+          }.from(15.minutes.ago(@now)).to(14.minutes.ago(@now))
+        end
+      end
+
+      it 'uses the most lenient due date if there are multiple overrides' do
+        category = @course.group_categories.create!(name: 'New Group Category')
+        group = @course.groups.create!(group_category: category)
+        assignment = @course.assignments.create!(group_category: category, due_at: 20.minutes.ago(@now))
+        assignment.submit_homework(@student, body: "a body")
+
+        section = @course.course_sections.create!(name: 'My Awesome Section')
+        @course.enroll_student(@student, section: section, allow_multiple_enrollments: true).accept!
+        assignment.assignment_overrides.create!(
+          due_at: 6.minutes.ago(@now),
+          due_at_overridden: true,
+          set: section
+        )
+
+        group.add_user(@student, 'active')
+        assignment.assignment_overrides.create!(
+          due_at: 21.minutes.ago(@now),
+          due_at_overridden: true,
+          set: group
+        )
+
+        student_override = assignment.assignment_overrides.create!(
+          due_at: 14.minutes.ago(@now),
+          due_at_overridden: true
+        )
+        override_student = student_override.assignment_override_students.create!(user: @student)
+
+        submission = assignment.submissions.find_by!(user: @student)
+        expect { @student.enrollments.find_by(course_section: section).destroy }.to change {
+          submission.reload.cached_due_date
+        }.from(6.minutes.ago(@now)).to(14.minutes.ago(@now))
+
+        expect { override_student.destroy }.to change {
+          submission.reload.cached_due_date
+        }.from(14.minutes.ago(@now)).to(21.minutes.ago(@now))
+      end
+
+      it 'uses override due dates instead of assignment due dates, even if the assignment due date is more lenient' do
+        student_override = @assignment.assignment_overrides.create!(
+          due_at: 21.minutes.ago(@now),
+          due_at_overridden: true
+        )
+
+        student_override.assignment_override_students.create!(user: @student)
+        expect(submission.cached_due_date).to eq(21.minutes.ago(@now))
+      end
+
+      it 'falls back to use the assignment due date if all overrides are destroyed' do
+        student_override = @assignment.assignment_overrides.create!(
+          due_at: 21.minutes.ago(@now),
+          due_at_overridden: true
+        )
+
+        override_student = student_override.assignment_override_students.create!(user: @student)
+        expect { override_student.destroy }.to change {
+          submission.reload.cached_due_date
+        }.from(21.minutes.ago(@now)).to(20.minutes.ago(@now))
+      end
+    end
+  end
+
+  describe "accepted_at" do
+    before(:once) do
+      @now = Time.zone.now
+      Timecop.freeze(2.days.ago(@now)) do
+        @submission = @assignment.submit_homework(@student, body: "a body")
+        @submission.update!(late_policy_status: "late", accepted_at: 1.day.ago(@now))
+      end
+    end
+
+    it "returns the accepted_at attribute if it is not nil" do
+      expect(@submission.accepted_at).to eq 1.day.ago(@now)
+    end
+
+    it "returns the submitted_at if the accepted_at attribute is nil" do
+      @submission.update!(late_policy_status: nil, accepted_at: nil)
+      expect(@submission.accepted_at).to eq 2.days.ago(@now)
+    end
+
+    it "sets the accepted_at attribute to nil if the late_policy_status is set to anything other than 'late'" do
+      @submission.update!(late_policy_status: "missing")
+      expect(@submission.read_attribute(:accepted_at)).to be_nil
+    end
+  end
+
+  describe "minutes_late" do
+    before(:once) do
+      @date = Time.zone.local(2017, 1, 15, 12)
+      @assignment.update!(due_at: 1.hour.ago(@date), submission_types: "online_text_entry")
+    end
+
+    let(:submission) { @assignment.submissions.find_by!(user_id: @student) }
+
+    it "returns time between submitted_at and cached_due_date" do
+      Timecop.freeze(@date) do
+        @assignment.submit_homework(@student, body: "a body")
+        expect(submission.minutes_late).to eq 60
+      end
+    end
+
+    it "is adjusted if the student resubmits" do
+      Timecop.freeze(@date) { @assignment.submit_homework(@student, body: "a body") }
+      Timecop.freeze(30.minutes.from_now(@date)) do
+        @assignment.submit_homework(@student, body: "a body")
+        expect(submission.minutes_late).to eq 90
+      end
+    end
+
+    it "returns time between accepted_at and cached_due_date if the submission has a" \
+    " late_policy_status of 'late' and an accepted_at" do
+      Timecop.freeze(@date) do
+        @assignment.submit_homework(@student, body: "a body")
+        submission.update!(late_policy_status: "late", accepted_at: 30.minutes.from_now(@date))
+        expect(submission.minutes_late).to eq 90
+      end
+    end
+
+    it "is not adjusted if the student resubmits and the submission has a late_policy_status" \
+    " of 'late' and an accepted_at" do
+      Timecop.freeze(@date) { @assignment.submit_homework(@student, body: "a body") }
+      submission.update!(late_policy_status: "late", accepted_at: 30.minutes.from_now(@date))
+      Timecop.freeze(40.minutes.from_now(@date)) do
+        @assignment.submit_homework(@student, body: "a body")
+        expect(submission.minutes_late).to eq 90
+      end
+    end
+
+    it "returns time between submitted_at and cached_due_date if the submission has a" \
+    " late_policy_status of 'late' but no accepted_at is present" do
+      Timecop.freeze(@date) do
+        @assignment.submit_homework(@student, body: "a body")
+        submission.update!(late_policy_status: "late")
+        expect(submission.minutes_late).to eq 60
+      end
+    end
+
+    it "is zero if it is not late" do
+      Timecop.freeze(2.hours.ago(@date)) do
+        @assignment.submit_homework(@student, body: "a body")
+        expect(submission.minutes_late).to be_zero
+      end
+    end
+
+    it "is zero if it was turned in late but the teacher sets the late_policy_status to 'none'" do
+      Timecop.freeze(@date) do
+        @assignment.submit_homework(@student, body: "a body")
+        submission.update!(late_policy_status: "none")
+        expect(submission.minutes_late).to be_zero
+      end
+    end
+
+    it "is zero if it was turned in late but the teacher sets the late_policy_status to 'missing'" do
+      Timecop.freeze(@date) do
+        @assignment.submit_homework(@student, body: "a body")
+        submission.update!(late_policy_status: "missing")
+        expect(submission.minutes_late).to be_zero
+      end
+    end
+
+    it "is zero if it was turned in late but the teacher sets the late_policy_status to 'late'" \
+    " and sets the accepted_at to the due date" do
+      Timecop.freeze(@date) do
+        @assignment.submit_homework(@student, body: "a body")
+        submission.update!(late_policy_status: "late", accepted_at: submission.cached_due_date)
+        expect(submission.minutes_late).to be_zero
+      end
+    end
+
+    it "is zero if cached_due_date is nil" do
+      Timecop.freeze(@date) do
+        @assignment.update!(due_at: nil)
+        @assignment.submit_homework(@student, body: "a body")
+        expect(submission.minutes_late).to be_zero
+      end
+    end
+
+    it "subtracts 60 seconds from the time of submission when submission_type is 'online_quiz'" do
+      Timecop.freeze(@date) do
+        @assignment.update!(submission_types: "online_quiz")
+        @assignment.submit_homework(@student, submission_type: "online_quiz", body: "a body")
+        expect(submission.minutes_late).to eq 59
+      end
+    end
+
+    it "includes seconds" do
+      Timecop.freeze(30.seconds.from_now(@date)) do
+        @assignment.submit_homework(@student, body: "a body")
+        expect(submission.minutes_late).to be 60.5
+      end
+    end
+
+    it "uses the current time if submitted_at is nil" do
+      Timecop.freeze(1.day.from_now(@date)) do
+        @assignment.grade_student(@student, score: 10, grader: @teacher)
+        expect(submission.minutes_late).to eq 1500 # 25 hours * 60
+      end
+    end
   end
 
   include_examples "url validation tests"
   it "should check url validity" do
-    test_url_validation(Submission.create!(@valid_attributes))
+    test_url_validation(submission_spec_model)
   end
 
   it "should add http:// to the body for long urls, too" do
-    s = Submission.create!(@valid_attributes)
+    s = submission_spec_model
     expect(s.url).to eq 'http://www.instructure.com'
 
     long_url = ("a"*300 + ".com")
@@ -645,7 +1050,7 @@ describe Submission do
   describe 'computation of scores' do
     before(:once) do
       @assignment.update!(points_possible: 10)
-      @submission = Submission.create!(@valid_attributes)
+      submission_spec_model
     end
 
     let(:scores) do
@@ -1316,19 +1721,13 @@ describe Submission do
   end
 
   it "should return the correct quiz_submission_version" do
-    # see redmine #6048
-
     # set up the data to have a submission with a quiz submission with multiple versions
     course_factory
     quiz = @course.quizzes.create!
     quiz_submission = quiz.generate_submission @user, false
     quiz_submission.save
 
-    submission = Submission.create!({
-      :assignment_id => @assignment.id,
-      :user_id => @user.id,
-      :quiz_submission_id => quiz_submission.id
-    })
+    @assignment.submissions.find_by!(user: @user).update!(quiz_submission_id: quiz_submission.id)
 
     submission = @assignment.submit_homework @user, :submission_type => 'online_quiz'
     submission.quiz_submission_id = quiz_submission.id
@@ -1582,15 +1981,15 @@ describe Submission do
       submission_spec_model
     end
 
-    it "should be false if not past due" do
+    it 'should be false if not past due' do
       @submission.submitted_at = 2.days.ago
       @submission.cached_due_date = 1.day.ago
       expect(@submission).not_to be_late
     end
 
-    it "should be false if not submitted, even if past due" do
-      @submission.submission_type = nil # forces submitted_at to be nil
-      @submission.cached_due_date = 1.day.ago
+    it 'should be false if not submitted, even if past due' do
+      @submission.submission_type = nil
+      @submission.cached_due_date = 1.day.ago # forces submitted_at to be nil
       expect(@submission).not_to be_late
     end
 
@@ -1649,26 +2048,6 @@ describe Submission do
     end
   end
 
-  describe "cached_due_date" do
-    it "should get initialized during submission creation" do
-      # create an invited user, so that the submission is not automatically
-      # created by the DueDateCacher
-      student_in_course
-      @assignment.update_attribute(:due_at, Time.zone.now - 1.day)
-
-      override = @assignment.assignment_overrides.build
-      override.title = "Some Title"
-      override.set = @course.default_section
-      override.override_due_at(Time.zone.now + 1.day)
-      override.save!
-      # mysql just truncated the timestamp
-      override.reload
-
-      submission = @assignment.submissions.create(:user => @user)
-      expect(submission.cached_due_date).to eq override.due_at
-    end
-  end
-
   describe "update_attachment_associations" do
     before do
       course_with_student active_all: true
@@ -1723,7 +2102,119 @@ describe Submission do
     end
   end
 
-  context "bulk loading" do
+  describe "#versioned_originality_reports" do
+    it "loads originality reports for the submission" do
+      student_in_course(active_all: true)
+      attachment = attachment_model(filename: "submission.doc", :context => @student)
+      submission = @assignment.submit_homework(@student, attachments: [attachment])
+      report = OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
+
+      expect(submission.versioned_originality_reports).to eq [report]
+    end
+
+    it "memoizes the loaded originality reports" do
+      student_in_course(active_all: true)
+      attachment = attachment_model(filename: "submission.doc", :context => @student)
+      submission = @assignment.submit_homework(@student, attachments: [attachment])
+      OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
+
+      submission.versioned_originality_reports
+      OriginalityReport.expects(:where).never
+      submission.versioned_originality_reports
+    end
+
+    it "returns an empty array when there are no reports" do
+      student_in_course(active_all: true)
+      attachment = attachment_model(filename: "submission.doc", :context => @student)
+      submission = @assignment.submit_homework(@student, attachments: [attachment])
+
+      expect(submission.versioned_originality_reports).to eq []
+    end
+
+    it "returns an empty array when there are no attachments" do
+      student_in_course(active_all: true)
+      submission = @assignment.submit_homework(@student, body: "Oh my!")
+
+      expect(submission.versioned_originality_reports).to eq []
+    end
+  end
+
+  describe "#bulk_load_versioned_originality_reports" do
+    it "bulk loads originality reports for many submissions at once" do
+      originality_reports = []
+      submissions = Array.new(3) do |i|
+        student_in_course(active_all: true)
+        attachments = [
+          attachment_model(filename: "submission#{i}-a.doc", :context => @student),
+          attachment_model(filename: "submission#{i}-b.doc", :context => @student)
+        ]
+
+        sub = @assignment.submit_homework(@student, attachments: attachments)
+        originality_reports << attachments.map do |a|
+          OriginalityReport.create!(attachment: a, originality_score: '1', submission: sub)
+        end
+        sub
+      end
+
+      Submission.bulk_load_versioned_originality_reports(submissions)
+      submissions.each_with_index do |s, i|
+        expect(s.versioned_originality_reports).to eq originality_reports[i]
+      end
+    end
+
+    it "avoids N+1s in the bulk load" do
+      student_in_course(active_all: true)
+      attachment = attachment_model(filename: "submission.doc", :context => @student)
+      submission = @assignment.submit_homework(@student, attachments: [attachment])
+      OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
+
+      Submission.bulk_load_versioned_originality_reports([submission])
+      OriginalityReport.expects(:where).never
+      submission.versioned_originality_reports
+    end
+
+    it "ignores invalid attachment ids" do
+      student_in_course(active_all: true)
+      s = @assignment.submit_homework(@student, submission_type: "online_url", url: "http://example.com")
+      s.update_attribute(:attachment_ids, '99999999')
+      Submission.bulk_load_versioned_originality_reports([s])
+      expect(s.versioned_originality_reports).to eq []
+    end
+
+    it "loads only the originality reports that pertain to that version" do
+      student_in_course(active_all: true)
+      originality_reports = []
+      attachment = attachment_model(filename: "submission-a.doc", context: @student)
+      Timecop.freeze(10.seconds.ago) do
+        sub = @assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [attachment])
+        originality_reports <<
+          OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: sub)
+      end
+
+      attachment = attachment_model(filename: "submission-b.doc", :context => @student)
+      Timecop.freeze(5.seconds.ago) do
+        sub = @assignment.submit_homework(@student, attachments: [attachment])
+        originality_reports <<
+          OriginalityReport.create!(attachment: attachment, originality_score: '1',submission: sub)
+      end
+
+      attachment = attachment_model(filename: "submission-c.doc", :context => @student)
+      Timecop.freeze(1.second.ago) do
+        sub = @assignment.submit_homework(@student, attachments: [attachment])
+        originality_reports <<
+          OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: sub)
+      end
+
+      submission = @assignment.submission_for_student(@student)
+      Submission.bulk_load_versioned_originality_reports(submission.submission_history)
+
+      submission.submission_history.each_with_index do |s, index|
+        expect(s.versioned_originality_reports.first).to eq originality_reports[index]
+      end
+    end
+  end
+
+  context "bulk loading attachments" do
     def ensure_attachments_arent_queried
       Attachment.expects(:where).never
     end
@@ -1859,7 +2350,7 @@ describe Submission do
 
   describe "#get_web_snapshot" do
     it "should not blow up if web snapshotting fails" do
-      sub = Submission.new(@valid_attributes)
+      sub = submission_spec_model
       CutyCapt.expects(:enabled?).returns(true)
       CutyCapt.expects(:snapshot_attachment_for_url).with(sub.url).returns(nil)
       sub.get_web_snapshot
@@ -2311,7 +2802,7 @@ describe Submission do
 
   describe '#add_comment' do
     before(:once) do
-      @submission = Submission.create!(@valid_attributes)
+      submission_spec_model
     end
 
     it 'creates a draft comment when passed true in the draft_comment option' do
@@ -2339,12 +2830,12 @@ describe Submission do
     end
 
     it "returns the last published comment made by the teacher" do
-      @submission.add_comment(author: @teacher, comment: "how is babby formed")
+      @submission.add_comment(author: @teacher, comment: 'a comment')
       expect(@submission.last_teacher_comment).to be_present
     end
 
     it "does not include draft comments" do
-      @submission.add_comment(author: @teacher, comment: "how is babby formed", draft_comment: true)
+      @submission.add_comment(author: @teacher, comment: 'a comment', draft_comment: true)
       expect(@submission.last_teacher_comment).to be_nil
     end
   end
@@ -2448,7 +2939,7 @@ describe Submission do
 
   describe ".needs_grading" do
     before :once do
-      @submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry', body: 'asdf')
+      @submission = @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "a body")
     end
 
     it "includes submission that has not been graded" do
@@ -2473,10 +2964,49 @@ describe Submission do
       expect(Submission.needs_grading.count).to eq(0)
     end
 
+    it "does include submissions that have been graded but the score was reset to nil" do
+      @assignment.grade_student(@student, grade: '100', grader: @teacher)
+      @assignment.grade_student(@student, grade: nil, grader: @teacher)
+      expect(Submission.needs_grading.count).to eq(1)
+    end
+
     it "does not include submission by non-student user" do
       @student.enrollments.take!.complete
       @course.enroll_user(@student, 'TaEnrollment').accept
       expect(Submission.needs_grading.count).to eq(0)
+    end
+  end
+
+  describe "#needs_grading?" do
+    before :once do
+      @submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry', body: 'asdf')
+    end
+
+    it "returns true for submission that has not been graded" do
+      expect(@submission.needs_grading?).to be true
+    end
+
+    it "returns false for submission that has been graded" do
+      @assignment.grade_student(@student, grade: '100', grader: @teacher)
+      @submission.reload
+      expect(@submission.needs_grading?).to be false
+    end
+
+    it "returns true for submission that has been graded but the score was reset to nil" do
+      @assignment.grade_student(@student, grade: '100', grader: @teacher)
+      @assignment.grade_student(@student, grade: nil, grader: @teacher)
+      @submission.reload
+      expect(@submission.needs_grading?).to be true
+    end
+
+    it "returns true for submission that is pending review" do
+      @submission.workflow_state = 'pending_review'
+      expect(@submission.needs_grading?).to be true
+    end
+
+    it "returns false for submission with nil submission_type" do
+      @submission.submission_type = nil
+      expect(@submission.needs_grading?).to be false
     end
   end
 
@@ -2533,8 +3063,12 @@ describe Submission do
 
 
   def submission_spec_model(opts={})
-    @submission = Submission.new(@valid_attributes.merge(opts))
-    @submission.save!
+    opts = @valid_attributes.merge(opts)
+    assignment = opts.delete(:assignment) || Assignment.find(opts.delete(:assignment_id))
+    user = opts.delete(:user) || User.find(opts.delete(:user_id))
+    @submission = assignment.submissions.find_by!(user: user)
+    @submission.update!(opts)
+    @submission
   end
 
   def setup_account_for_turnitin(account)

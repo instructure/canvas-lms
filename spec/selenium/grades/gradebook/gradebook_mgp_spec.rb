@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015-2016 Instructure, Inc.
+# Copyright (C) 2016 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -42,7 +42,7 @@ describe "gradebook with grading periods" do
 
       it 'assignment in ended grading period should be gradable', test_id: 2947119, priority: "1" do
         @course.assignments.create!(due_at: 13.days.ago(now), title: "assign in ended")
-        page.visit_gradebook(@teacher, @course)
+        page.visit_gradebook(@course, @teacher)
 
         page.select_grading_period(0)
         page.enter_grade("10", 0, 0)
@@ -63,7 +63,7 @@ describe "gradebook with grading periods" do
       it 'assignment in closed grading period should be gradable', test_id: 2947126, priority: "1" do
 
         assignment = @course.assignments.create!(due_at: 18.days.ago(now), title: "assign in closed")
-        page.visit_gradebook(@admin, @course)
+        page.visit_gradebook(@course, @admin)
 
         page.select_grading_period(@gp_closed.id)
         page.enter_grade("10", 0, 0)
@@ -76,7 +76,7 @@ describe "gradebook with grading periods" do
       user_session(@teacher)
 
       @course.assignments.create!(due_at: 18.days.ago, title: "assign in closed")
-      page.visit_gradebook(@teacher, @course)
+      page.visit_gradebook(@course, @teacher)
 
       page.select_grading_period(0)
       expect(page.grading_cell(0, 0)).to contain_css(page.ungradable_selector)

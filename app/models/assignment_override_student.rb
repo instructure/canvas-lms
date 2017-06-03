@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2012 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -23,6 +23,8 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   belongs_to :quiz, class_name: 'Quizzes::Quiz'
 
   after_save :destroy_override_if_needed
+  after_create :update_cached_due_dates
+  after_destroy :update_cached_due_dates
   after_destroy :destroy_override_if_needed
 
   validates_presence_of :assignment_override, :user
@@ -90,5 +92,11 @@ class AssignmentOverrideStudent < ActiveRecord::Base
       .where(assignment: assignment)
       .where.not(user_id: valid_student_ids)
       .each(&:destroy)
+  end
+
+  private
+
+  def update_cached_due_dates
+    DueDateCacher.recompute(assignment) if assignment.present?
   end
 end

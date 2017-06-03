@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -426,6 +426,19 @@ class ContentExport < ActiveRecord::Base
     self.job_progress.try(:update_completion!, val)
   end
 
+  def self.expire_days
+    Setting.get('content_exports_expire_after_days', '30').to_i
+  end
+
+  def self.expire?
+    ContentExport.expire_days > 0
+  end
+
+  def expired?
+    return false unless ContentExport.expire?
+    created_at < ContentExport.expire_days.days.ago
+  end
+
   scope :active, -> { where("content_exports.workflow_state<>'deleted'") }
   scope :not_for_copy, -> { where("content_exports.export_type NOT IN (?)", [COURSE_COPY, MASTER_COURSE_COPY]) }
   scope :common_cartridge, -> { where(export_type: COMMON_CARTRIDGE) }
@@ -444,6 +457,13 @@ class ContentExport < ActiveRecord::Base
     ], user)
   }
   scope :without_epub, -> {eager_load(:epub_export).where(epub_exports: {id: nil})}
+  scope :expired, -> {
+    if ContentExport.expire?
+      where('created_at < ?', ContentExport.expire_days.days.ago)
+    else
+      none
+    end
+  }
 
   private
   def is_set?(option)

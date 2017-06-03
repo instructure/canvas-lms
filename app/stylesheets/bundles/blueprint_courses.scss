@@ -1,0 +1,370 @@
+/*
+ * Copyright (C) 2017 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import "base/environment";
+
+.bcs__trigger {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 10;
+  padding: 10px 3px;
+  border-bottom-left-radius: 5px;
+  background-color: $ic-brand-primary;
+  box-shadow: -1px 1px 2px 0 rgba(0,0,0,.2);
+
+  &:after {
+    content: '';
+    display: block;
+    position: fixed;
+    top: 58px;
+    right: 0;
+    bottom: 0;
+    width: 8px;
+    background-color: $ic-brand-primary;
+    box-shadow: -1px 0 1px 0 rgba(0,0,0,.2)
+  }
+}
+
+.bcs__content {
+  width: 270px;
+  border-bottom: 2px solid $ic-border-color;
+
+  .bcs__body {
+    margin: 0 1.5em;
+  }
+}
+
+.bcs__history-item {
+  margin-bottom: 3em;
+}
+
+.bcs__history-item__title {
+  border-bottom: 2px solid $ic-color-medium;
+  padding-bottom: 0.5em;
+  margin-bottom: 1.5em;
+
+  & > * {
+    display: inline-block;
+    margin-left: 1em;
+  }
+}
+
+.bcs__history-item__change {
+  padding: 1em;
+  border: 1px solid $ic-border-color;
+
+  & + & {
+    border-top: none;
+  }
+
+  &:first-of-type {
+    border-top-right-radius: 3px;
+    border-top-left-radius: 3px;
+  }
+
+  &:last-of-type {
+    border-bottom-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+  }
+
+  &.bcs__history-item__change__expanded {
+    .pill {
+      background-color: $ic-color-medium;
+      color: $ic-color-light;
+    }
+  }
+
+  .pill {
+    text-transform: uppercase;
+    padding: 0.1em 0.75em;
+  }
+}
+
+.bcs__history-item__content {
+  min-height: 1.5em;
+  position: relative;
+}
+
+.bcs__history-item__content-grid {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 50px;
+}
+
+.bcs__history-item__change-exceps {
+  margin: 0 2em;
+  list-style: none;
+}
+
+.bcs__history-item__change-exceps__group {
+    margin: 1.5em 0 1em;
+}
+
+.bcs__history-item__change-exceps__courses {
+  margin: 0.5em 0 0;
+  list-style: none;
+
+  > li {
+    margin-bottom: 5px;
+  }
+}
+
+.bcs__history-item__lock-icon {
+  position: absolute;
+  top: -5px;
+  left: 20px;
+}
+
+@keyframes spinning {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.bcs__sync-btn-icon {
+  line-height: 2.5em;
+  vertical-align: text-top;
+
+  &.bcs__sync-btn-icon__active svg {
+    animation: spinning 1.5s infinite linear;
+  }
+}
+
+.bcs__sync-btn-text {
+  line-height: 2.5em;
+  vertical-align: sub;
+  margin-left: 7px;
+  margin-right: 7px;
+}
+
+.bcs__row {
+  padding: 0.5em 0;
+  border-top: 1px solid $ic-border-color;
+
+  & > button:first-child {
+    padding: 0 !important;
+  }
+
+  &:first-child {
+    border: none;
+  }
+
+  .bcs__row-right-content {
+    float: right;
+    line-height: 2.5em;
+    vertical-align: middle;
+  }
+}
+
+.bcs__header {
+  background: $ic-brand-primary;
+  position: relative;
+  text-align: center;
+  padding: 1.2em 0;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .2)
+}
+
+.bcs__close-wrapper {
+  position: absolute;
+  top: 0.5em;
+  left: 0.5em;
+}
+
+.bcs__modal-content-wrapper {
+  margin: 0 auto;
+  max-width: 850px;
+  position: relative;
+}
+
+.bca__overlay {
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255,255,255,.85);
+  text-align: center;
+}
+
+.bca__overlay__save-wrapper {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.bca__footer {
+  display: flex; justify-content: flex-end; flex: 0 0 auto;
+}
+
+.bca-course-filter {
+  border: 1px solid $ic-border-color;
+  border-radius: $ic-border-radius;
+
+  input, select {
+    // overwrite instui borders to match design
+    border: none !important;
+  }
+
+  select {
+    // use box shadow magic to create fancy border effect, overwriting instui
+    box-shadow: inset -10px 0 0 7px $ic-color-light, inset 1px 0 0 0 $ic-border-color !important;
+  }
+}
+
+.bca-course-details__wrapper {
+  margin-top: 1em;
+  position: relative;
+
+  &> div > div {
+    // overwrite instui padding to match design
+    padding-left: 0 !important;
+  }
+}
+
+.bca-course-picker__loading {
+  position: absolute;
+  z-index: 10;
+  top: 28px;
+  left: 1px;
+  right: 1px;
+  bottom: 1px;
+  background: rgba(255,255,255,.65);
+  text-align: center;
+  padding-top: 100px;
+  border-radius: $ic-border-radius;
+}
+
+.bca-table__wrapper {
+  border: 1px solid $ic-border-color;
+  border-radius: $ic-border-radius;
+  padding: 78px 0 0;
+  position: relative;
+  overflow: hidden;
+
+  .btps-table__header-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    .bca-table__head {
+      background: $ic-color-medium-light;
+
+      th {
+        line-height: 180%;
+      }
+    }
+  }
+
+  .bca-table__select-all {
+    padding: 8px 2px;
+    border-bottom: 1px solid $ic-border-color;
+    margin: 0 10px;
+
+    label > span > span:last-child {
+      margin-left: 22px;
+    }
+  }
+
+  .bca-table__content-wrapper {
+    height: 270px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 30px;
+
+    .bca-table__body {
+      tr {
+        // overwrite instui borders to match design
+        border-left: none !important;
+
+        td:first-child {
+          // overwrite instui borders to match design
+          border-bottom: none !important;
+
+          // recreate the borders using box shadow
+          box-shadow: -42px 1px 0 0 $ic-color-light, 0 1px 0 0 $ic-border-color;
+        }
+
+        &.bca-table__no-results {
+          td {
+           box-shadow: none;
+         }
+        }
+      }
+    }
+  }
+}
+
+.bca-associations-table {
+  padding-left: 10px;
+  margin-bottom: 40px;
+  position: relative;
+  min-height: 75px;
+
+  .bca-associations__course-row {
+    form {
+      margin: 0;
+    }
+  }
+}
+
+.bcs__history-notification {
+  margin-bottom: 1em;
+}
+
+.bcs__migration-sync__button {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.bcs__row.bcs__row-sync-holder {
+  padding: 1em 0
+}
+
+.bcs__migration-sync .bcs__migration-sync__loading {
+  margin-bottom: .5em;
+}
+
+/* EnableNotification component styles */
+.bcs__history-notification__enable,
+.bcs__history-notification__add-message,
+.bcs__history-notification__message {
+  margin-bottom:.5em;
+}
+.bcs__history-notification__add-message {
+  margin-left: 1em;
+  label {
+    margin-right: .5em;
+  }
+}
+
+/* unsynched changes are a little different than sync history */
+.bcs__history-item__content.bcs__unsynched-change__content {
+  .bcs__history-item__uncynched-changes-grid {
+    left: 25px;
+  }
+  .bcs__history-item__lock-icon {
+    left: 0
+  }
+}
+
+.bcs__unsynched-changes .bcs__history-notification {
+  padding-top: 1em;
+}

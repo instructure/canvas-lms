@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2017 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -485,10 +485,9 @@ define [
 
     makeColumnSortFn: (sortOrder) =>
       fn = switch sortOrder.sortType
-        when 'assignment_group', 'alpha' then @compareAssignmentPositions
         when 'due_date' then @compareAssignmentDueDates
         when 'custom' then @makeCompareAssignmentCustomOrderFn(sortOrder)
-        else throw "unhandled column sort condition"
+        else @compareAssignmentPositions
       @wrapColumnSortFn(fn)
 
     compareAssignmentPositions: (a, b) ->
@@ -1064,7 +1063,7 @@ define [
         app = React.createElement(PostGradesApp, {
           store: @postGradesStore
           renderAsButton: !$placeholder.hasClass('in-menu')
-          labelText: if $placeholder.hasClass('in-menu') then I18n.t 'PowerSchool' else I18n.t 'Post Grades',
+          labelText: if $placeholder.hasClass('in-menu') then I18n.t 'PowerSchool' else I18n.t 'Sync Grades',
           returnFocusTo: $('#post_grades')
         })
         ReactDOM.render(app, $placeholder[0])

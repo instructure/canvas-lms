@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2015 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import I18n from 'i18n!react_files'
 import React from 'react'
 import FolderChild from 'compiled/react_files/components/FolderChild'
@@ -5,12 +23,17 @@ import filesEnv from 'compiled/react_files/modules/filesEnv'
 import classnames from 'classnames'
 import ItemCog from 'jsx/files/ItemCog'
 import PublishCloud from 'jsx/shared/PublishCloud'
+import MasterCourseLock from 'jsx/shared/MasterCourseLock'
 import FilesystemObjectThumbnail from 'jsx/files/FilesystemObjectThumbnail'
 import UsageRightsIndicator from 'jsx/files/UsageRightsIndicator'
 import Folder from 'compiled/models/Folder'
 import preventDefault from 'compiled/fn/preventDefault'
 import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
 import friendlyBytes from 'compiled/util/friendlyBytes'
+
+FolderChild.isFolder = function () {
+  return this.props.model instanceof Folder
+}
 
   FolderChild.renderItemCog = function (canManage) {
     if (!this.props.model.isNew() || this.props.model.get('locked_for_user')) {
@@ -42,21 +65,20 @@ import friendlyBytes from 'compiled/util/friendlyBytes'
     }
   }
   FolderChild.renderMasterCourseIcon = function (canManage) {
-    if (canManage && this.props.model.get('is_master_course_child_content')) {
-      if (this.props.model.get('restricted_by_master_course')) {
-        return (
-          <span className="master-course-cell">
-            <i className="icon-lock"></i>
-          </span>
-        );
-      } else {
-        return (
-          <span className="master-course-cell">
-            <i className="icon-unlock icon-Line"></i>
-          </span>
-        );
+    // never show if not involved in blueprint courses
+    if (!(this.props.model.get('is_master_course_master_content') || this.props.model.get('is_master_course_child_content'))) {
+      return null;
+    }
+    // Never show the lock on master course folders
+    // because we don't always have it's children to know if any are locked
+    if (this.isFolder()) {
+      if (this.props.model.get('is_master_course_master_content') || !this.props.model.get('restricted_by_master_course')) {
+        return null
       }
     }
+
+
+    return <MasterCourseLock model={this.props.model} canManage={canManage} />
   }
 
   FolderChild.renderEditingState = function () {
@@ -70,7 +92,7 @@ import friendlyBytes from 'compiled/util/friendlyBytes'
               ref='newName'
               className='ic-Input ef-edit-name-form__input'
               placeholder={I18n.t('name', 'Name')}
-              aria-label={(this.props.model instanceof Folder) ? I18n.t('folder_name', 'Folder Name') : I18n.t('File Name')}
+              aria-label={this.isFolder() ? I18n.t('folder_name', 'Folder Name') : I18n.t('File Name')}
               defaultValue={this.props.model.displayName()}
               maxLength='255'
               onKeyUp={function (event){ if (event.keyCode === 27) {this.cancelEditingName()} }.bind(this)}
@@ -94,7 +116,7 @@ import friendlyBytes from 'compiled/util/friendlyBytes'
           </div>
         </form>
       );
-    }else if(this.props.model instanceof Folder) {
+    } else if (this.isFolder()) {
       return (
         <a
           ref= 'nameLink'
@@ -185,7 +207,7 @@ import friendlyBytes from 'compiled/util/friendlyBytes'
         </div>
 
         <div className='ef-date-modified-col' role= 'gridcell'>
-          {!(this.props.model instanceof Folder) && (
+          {!(this.isFolder()) && (
             <FriendlyDatetime dateTime={this.props.model.get('modified_at')} />
           )}
         </div>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -116,6 +116,7 @@ test('renders a MenuItem for each secondary info option', function () {
 
   StudentRowHeaderConstants.secondaryInfoKeys.forEach((key) => {
     const menuItem = document.querySelector(`[data-menu-item-id="${key}"]`);
+
     ok(menuItem);
   });
 });

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -282,8 +282,8 @@ This text has a http://www.google.com link in it...
     context 'given a submission with several group comments' do
       let!(:assignment) { @course.assignments.create! }
       let!(:unrelated_assignment) { @course.assignments.create! }
-      let!(:submission) { assignment.submissions.create!(user: @user) }
-      let!(:unrelated_submission) { unrelated_assignment.submissions.create!(user: @user) }
+      let!(:submission) { assignment.submissions.find_by!(user: @user) }
+      let!(:unrelated_submission) { unrelated_assignment.submissions.find_by!(user: @user) }
       let!(:first_comment) do
         submission.submission_comments.create!(
           group_comment_id: 'uuid',
@@ -327,8 +327,8 @@ This text has a http://www.google.com link in it...
     context 'given a submission with several group comments' do
       let!(:assignment) { @course.assignments.create! }
       let!(:unrelated_assignment) { @course.assignments.create! }
-      let!(:submission) { assignment.submissions.create!(user: @user) }
-      let!(:unrelated_submission) { unrelated_assignment.submissions.create!(user: @user) }
+      let!(:submission) { assignment.submissions.find_by!(user: @user) }
+      let!(:unrelated_submission) { unrelated_assignment.submissions.find_by!(user: @user) }
       let!(:first_comment) do
         submission.submission_comments.create!(
           group_comment_id: 'uuid',

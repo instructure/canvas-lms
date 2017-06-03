@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2016 - 2017 Instructure, Inc.
+# Copyright (C) 2016 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -35,18 +35,46 @@ module Gradebook
       f(assignment_header_selector(name))
     end
 
-    def assignment_header_menu(name)
-      f(assignment_header_menu_selector(name))
-    end
-
     def assignment_header_menu_item(name)
       parent_element = ff(ASSIGNMENT_HEADER_MENU_ITEM_SELECTOR).find { |el| el.text == name }
 
       f('a', parent_element)
     end
 
-    def visit_gradebook(user, course)
-      user.preferences[:gradebook_version] = '2'
+    def settings_cog
+      f('#gradebook_settings')
+    end
+
+    def show_notes
+      fj('li a:contains("Show Notes Column")')
+    end
+
+    def save_button
+      fj('button span:contains("Save")')
+    end
+
+    def hide_notes
+      f(".hide")
+    end
+
+    def gp_dropdown
+      f(".grading-period-select-button")
+    end
+
+    def gp_menu_list
+      ff("#grading-period-to-show-menu li")
+    end
+
+    def grade_input(cell)
+      f(".grade", cell)
+    end
+
+    # actions
+
+    def visit_gradebook(course, user = nil)
+      if user
+        user.preferences[:gradebook_version] = '2'
+      end
       get "/courses/#{course.id}/gradebook"
     end
 
@@ -87,28 +115,35 @@ module Gradebook
       end
     end
 
-    private
-
-    def gp_dropdown
-      f(".grading-period-select-button")
-    end
-
-    def gp_menu_list
-      ff("#grading-period-to-show-menu li")
-    end
-
-    def grade_input(cell)
-      f(".grade", cell)
-    end
-
     def assignment_header_selector(name)
       return ASSIGNMENT_HEADER_SELECTOR unless name
 
       ASSIGNMENT_HEADER_SELECTOR + "[title=\"#{name}\"]"
     end
 
+    def assignment_header_menu(name)
+      f(assignment_header_menu_selector(name))
+    end
+
     def assignment_header_menu_selector(name)
       [assignment_header_selector(name), ASSIGNMENT_HEADER_MENU_SELECTOR].join(' ')
     end
-  end
+
+    def gb_settings_cog_select
+      settings_cog.click
+    end
+
+    def show_notes_select
+      show_notes.click
+    end
+
+    def hide_notes_select
+      hide_notes.click
+    end
+
+    def save_button_click
+      save_button.click
+    end
+
+   end
 end

@@ -273,14 +273,14 @@ describe CalendarEventsApiController, type: :request do
 
     it "should allow anonymous users to access public context" do
       @user = nil
-      public_course_query() do |c|
+      public_course_query(:opts => {:expected_status => 200}) do |c|
         c.is_public = true
       end
     end
 
     it "should allow anonymous users to access a public syllabus" do
       @user = nil
-      public_course_query() do |c|
+      public_course_query(:opts => {:expected_status => 200}) do |c|
         c.public_syllabus = true
       end
     end
@@ -590,7 +590,8 @@ describe CalendarEventsApiController, type: :request do
 
           student_in_course(:course => @course, :user => (@other_guy = user_factory), :active_all => true)
 
-          @ag1 = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 4, :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00", "2012-01-01 13:00:00", "2012-01-01 14:00:00"]], :contexts => [@course])
+          year = Time.now.year + 1
+          @ag1 = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 4, :new_appointments => [["#{year}-01-01 12:00:00", "#{year}-01-01 13:00:00", "#{year}-01-01 13:00:00", "#{year}-01-01 14:00:00"]], :contexts => [@course])
           @ag1.publish!
           @event1 = @ag1.appointments.first
           @event2 = @ag1.appointments.last
@@ -601,7 +602,7 @@ describe CalendarEventsApiController, type: :request do
           @group.users << @other_guy
           @other_group = cat.groups.create(:context => @course)
           @me.reload
-          @ag2 = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 4, :sub_context_codes => [cat.asset_string], :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
+          @ag2 = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 4, :sub_context_codes => [cat.asset_string], :new_appointments => [["#{year}-01-01 12:00:00", "#{year}-01-01 13:00:00"]], :contexts => [@course])
           @ag2.publish!
           @event3 = @ag2.appointments.first
 
@@ -708,6 +709,38 @@ describe CalendarEventsApiController, type: :request do
             expect(message.to).to eq "test_#{@teacher.id}@example.com"
             expect(message.body).to match(/Too busy/)
           end
+
+          describe "past appointments" do
+            before do
+              @past_ag = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 4, :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
+              @past_ag.publish!
+              @past_slot = @past_ag.appointments.first
+            end
+
+            it "does not allow a student to reserve a time slot in the past" do
+              json = api_call(:post, "/api/v1/calendar_events/#{@past_slot.id}/reservations", {
+                :controller => 'calendar_events_api', :action => 'reserve', :format => 'json', :id => @past_slot.id.to_s },
+                   {}, {}, { :expected_status => 403 })
+              expect(json['message']).to eq("Cannot create or change reservation for past appointment")
+            end
+
+            it "does not allow a student to delete a past reservation" do
+              reservation = @past_slot.reserve_for(@user, @teacher)
+              json = api_call(:delete, "/api/v1/calendar_events/#{reservation.id}", {
+                :controller => 'calendar_events_api', :action => 'destroy', :format => 'json', :id => reservation.id.to_s },
+                   {}, {}, { :expected_status => 403 })
+              expect(json['message']).to eq("Cannot create or change reservation for past appointment")
+              expect(reservation.reload).not_to be_deleted
+            end
+
+            it "allows a teacher to delete a student's past reservation" do
+              reservation = @past_slot.reserve_for(@user, @teacher)
+              json = api_call_as_user(@teacher, :delete, "/api/v1/calendar_events/#{reservation.id}", {
+                :controller => 'calendar_events_api', :action => 'destroy', :format => 'json', :id => reservation.id.to_s },
+                   {}, {}, { :expected_status => 200 })
+              expect(reservation.reload).to be_deleted
+            end
+          end
         end
 
         context "as an admin" do
@@ -734,6 +767,117 @@ describe CalendarEventsApiController, type: :request do
             expect(error.slice("attribute", "type", "message")).to eql({"attribute" => "reservation", "type" => "calendar_event", "message" => "invalid participant"})
             expect(error['reservations'].size).to eql 0
           end
+        end
+      end
+
+      context 'participants' do
+        before :each do
+          course_with_teacher(:active_all => true)
+          @ag = AppointmentGroup.create!(title: "something", participants_per_appointment: 4, contexts: [@course],
+            participant_visibility: "protected", new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"],
+                                                                    ["2012-01-01 13:00:00", "2012-01-01 14:00:00"]])
+          @ag.publish!
+          @event = @ag.appointments.first
+          course_with_student(course: @course, active_all: true)
+          @student1 = @student
+          @event.reserve_for(@student1, @student1)
+          course_with_student(course: @course, active_all: true)
+          @student2 = @student
+          @event.reserve_for(@student2, @student2)
+        end
+
+        it 'should return participants in the same appointment group slot for a student' do
+          json = api_call_as_user(@student1, :get, "/api/v1/calendar_events/#{@event.id}/participants",
+            {controller: 'calendar_events_api', action: 'participants', id: @event.id.to_s, format: 'json'})
+          expect(json).to eq [
+            {
+              "id" => @student1.id,
+              "display_name" => @student1.short_name,
+              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
+              "html_url" => "http://www.example.com/about/#{@student1.id}"
+            },
+            {
+              "id" => @student2.id,
+              "display_name" => @student2.short_name,
+              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
+              "html_url" => "http://www.example.com/users/#{@student2.id}"
+            }
+          ]
+        end
+
+        it 'should return participants in the same appointment group slot for a teacher' do
+          json = api_call_as_user(@teacher, :get, "/api/v1/calendar_events/#{@event.id}/participants",
+            {controller: 'calendar_events_api', action: 'participants', id: @event.id.to_s, format: 'json'})
+          expect(json).to eq [
+            {
+              "id" => @student1.id,
+              "display_name" => @student1.short_name,
+              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
+              "html_url" => "http://www.example.com/users/#{@student1.id}"
+            },
+            {
+              "id" => @student2.id,
+              "display_name" => @student2.short_name,
+              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
+              "html_url" => "http://www.example.com/users/#{@student2.id}"
+            }
+          ]
+        end
+
+        it 'should paginate participants' do
+          @ag.participants_per_appointment = 15
+          @ag.save!
+          students = create_users_in_course(@course, 10, active_all: true)
+          students.each do |student_id|
+            student = User.find(student_id)
+            @event.reserve_for(student, student)
+          end
+          json = api_call(:get, "/api/v1/calendar_events/#{@event.id}/participants",
+            {controller: 'calendar_events_api', action: 'participants', id: @event.id.to_s, format: 'json'})
+          expect(json.length).to eq 10
+          json = api_call(:get, "/api/v1/calendar_events/#{@event.id}/participants?page=2",
+            {controller: 'calendar_events_api', action: 'participants', id: @event.id.to_s, format: 'json', page: 2})
+          expect(json.length).to eq 2
+        end
+
+        it 'should not list users participating in other appointment group slots' do
+          course_with_student(course: @course, active_all: true)
+          event2 = @ag.appointments.last
+          event2.reserve_for(@student, @student)
+          json = api_call_as_user(@student1, :get, "/api/v1/calendar_events/#{@event.id}/participants",
+            {controller: 'calendar_events_api', action: 'participants', id: @event.id.to_s, format: 'json'})
+          expect(json).to eq [
+            {
+              "id" => @student1.id,
+              "display_name" => @student1.short_name,
+              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
+              "html_url" => "http://www.example.com/about/#{@student1.id}"
+            },
+            {
+              "id" => @student2.id,
+              "display_name" => @student2.short_name,
+              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
+              "html_url" => "http://www.example.com/users/#{@student2.id}"
+            }
+          ]
+          json = api_call(:get, "/api/v1/calendar_events/#{event2.id}/participants",
+            {controller: 'calendar_events_api', action: 'participants', id: event2.id.to_s, format: 'json'})
+          expect(json).to eq [
+            {
+              "id" => @student.id,
+              "display_name" => @student.short_name,
+              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
+              "html_url" => "http://www.example.com/about/#{@student.id}"
+            }
+          ]
+        end
+
+        it 'should return 401 if not allowed to view participants' do
+          @ag.participant_visibility = "private"
+          @ag.save!
+          api_call_as_user(@student1, :get, "/api/v1/calendar_events/#{@event.id}/participants",
+            {controller: 'calendar_events_api', action: 'participants', id: @event.id.to_s, format: 'json'})
+          expect(response.code).to eq '401'
         end
       end
     end
@@ -877,7 +1021,7 @@ describe CalendarEventsApiController, type: :request do
           api_call(:put, "/api/v1/calendar_events/#{@event.id}",
                           {:controller => 'calendar_events_api', :action => 'update', :id => @event.to_param, :format => 'json'},
                           {:calendar_event => {:context_code => @course.asset_string}})
-
+          expect(response).to be_success
         end
       end
 
@@ -906,6 +1050,22 @@ describe CalendarEventsApiController, type: :request do
                       {:controller => 'calendar_events_api', :action => 'destroy', :id => event.id.to_s, :format => 'json'})
       expect(json.keys).to match_array expected_fields
       expect(event.reload).to be_deleted
+    end
+
+    it 'should delete the appointment group if it has no appointments' do
+      @course.root_account.enable_feature!(:better_scheduler)
+      time = Time.utc(Time.now.year, Time.now.month, Time.now.day, 4, 20)
+      @appointment_group = AppointmentGroup.create!(
+        :title => "appointment group", :participants_per_appointment => 4,
+        :new_appointments => [
+          [time + 3.days, time + 3.days + 1.hour]
+        ],
+        :contexts => [@course]
+      )
+
+      api_call(:delete, "/api/v1/calendar_events/#{@appointment_group.appointments.first.id}",
+                      {:controller => 'calendar_events_api', :action => 'destroy', :id => @appointment_group.appointments.first.id.to_s, :format => 'json'})
+      expect(@appointment_group.reload).to be_deleted
     end
 
     it 'should api translate event descriptions' do

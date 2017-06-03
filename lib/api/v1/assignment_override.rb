@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2016 Instructure, Inc.
+# Copyright (C) 2012 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -315,7 +315,7 @@ module Api::V1::AssignmentOverride
 
     if override.set_type == 'ADHOC'
       override.title = override_data[:title] ||
-                         override.title_from_students(override_data[:students]) ||
+                         (override_data[:students] && override.title_from_students(override_data[:students])) ||
                          override.title
     end
 

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014 Instructure, Inc.
+# Copyright (C) 2014 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -223,9 +223,12 @@ module Lti
     end
 
     describe "GET #basic_lti_launch_request" do
+      before(:each) do
+        course_with_student(account: account, active_all: true)
+        user_session(@student)
+      end
 
       context 'account' do
-
         before do
           ToolProxyBinding.create(context: account, tool_proxy: tool_proxy)
         end
@@ -268,6 +271,12 @@ module Lti
           expect(response.code).to eq "404"
         end
 
+        it 'redirects to login page if there is no session' do
+          PseudonymSession.stubs(:find).returns(nil)
+          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id
+          expect(response).to redirect_to(login_url)
+        end
+
         it 'does custom variable expansion for tool settings' do
           parameters = %w( LtiLink.custom.url ToolProxyBinding.custom.url ToolProxy.custom.url ).map do |key|
             IMS::LTI::Models::Parameter.new(name: key.underscore, variable: key )
@@ -285,8 +294,6 @@ module Lti
         end
 
         it 'returns the roles' do
-          course_with_student(account: account, active_all: true)
-          user_session(@student)
           get 'basic_lti_launch_request', wrap_params(account_id: account.id, message_handler_id: message_handler.id,
               params: {tool_launch_context: 'my_custom_context'})
           params = assigns[:lti_launch].params.with_indifferent_access
@@ -294,18 +301,17 @@ module Lti
         end
 
         it 'adds module item substitutions' do
-          course = Course.create!
           parameters = %w( Canvas.module.id Canvas.moduleItem.id ).map do |key|
             IMS::LTI::Models::Parameter.new(name: key.underscore, variable: key )
           end
           message_handler.parameters = parameters.as_json
           message_handler.save
 
-          tag = message_handler.context_module_tags.create!(context: course, tag_type: 'context_module')
-          tag.context_module = ContextModule.create!(context: course)
+          tag = message_handler.context_module_tags.create!(context: @course, tag_type: 'context_module')
+          tag.context_module = ContextModule.create!(context: @course)
           tag.save!
 
-          get 'basic_lti_launch_request', wrap_params(course_id: course.id, message_handler_id: message_handler.id,
+          get 'basic_lti_launch_request', wrap_params(course_id: @course.id, message_handler_id: message_handler.id,
               module_item_id: tag.id, params: {tool_launch_context: 'my_custom_context' })
           expect(response.code).to eq "200"
 
@@ -315,11 +321,10 @@ module Lti
         end
 
         it 'sets the launch to window' do
-          course = Course.create!
-          tag = message_handler.context_module_tags.create!(context: course, tag_type: 'context_module', new_tab: true)
-          tag.context_module = ContextModule.create!(context: course)
+          tag = message_handler.context_module_tags.create!(context: @course, tag_type: 'context_module', new_tab: true)
+          tag.context_module = ContextModule.create!(context: @course)
           tag.save!
-          get 'basic_lti_launch_request', wrap_params(course_id: course.id, message_handler_id: message_handler.id,
+          get 'basic_lti_launch_request', wrap_params(course_id: @course.id, message_handler_id: message_handler.id,
               module_item_id: tag.id, params: {tool_launch_context: 'my_custom_context' })
           expect(response.code).to eq "200"
           expect(assigns[:lti_launch].launch_type).to eq 'window'

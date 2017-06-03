@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -654,7 +654,7 @@ module ApplicationHelper
   private :brand_config_for_account
 
   def include_account_js(options = {})
-    return if params[:global_includes] == '0'
+    return if params[:global_includes] == '0' || !@domain_root_account
 
     includes = if @domain_root_account.allow_global_includes? && (abc = active_brand_config(ignore_high_contrast_preference: true))
       abc.css_and_js_overrides[:js_overrides]
@@ -688,7 +688,7 @@ module ApplicationHelper
   end
 
   def disable_account_css?
-    @disable_account_css || params[:global_includes] == '0'
+    @disable_account_css || params[:global_includes] == '0' || !@domain_root_account
   end
 
   def include_account_css
@@ -886,10 +886,6 @@ module ApplicationHelper
 
   def planner_enabled?
     @domain_root_account&.feature_enabled?(:student_planner)
-  end
-
-  def show_planner?
-    @current_user.preferences[:dashboard_view] == 'planner'
   end
 
 end

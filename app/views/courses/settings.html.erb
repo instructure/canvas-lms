@@ -1,4 +1,22 @@
 <%
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<%
   content_for :page_title, join_title(t(:page_title, "Course Details"), @context.name)
   css_bundle :course_settings
   js_bundle :course_settings
@@ -32,7 +50,7 @@
       <li id="external_tools_tab"><a href="#tab-tools" id="tab-tools-link"><%= t('tabs.tools', %{Apps}) %></a></li>
     <% end %>
     <% if @publishing_enabled %>
-      <li id="grade_publishing_tab"><a href="#tab-grade-publishing" id="tab-grade-publishing-link"><%= t('tabs.grade_publishing', %{Grade Publishing}) %></a></li>
+      <li id="grade_publishing_tab"><a href="#tab-grade-publishing" id="tab-grade-publishing-link"><%= t('Grade Syncing') %></a></li>
     <% end %>
     <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
       <li id="alerts_tab"><a href="#tab-alerts" id="tab-alerts-link"><%= t('tabs.alerts', %{Alerts}) %></a></li>
@@ -484,7 +502,7 @@
           <% end %>
           <span class="users_count">
             (
-              <%= t 'enrollment_count', 'User', :count => section.enrollments.not_fake.count %><% if section && section.sis_source_id %>,
+              <%= t 'enrollment_count', 'User', :count => section.enrollments.not_fake.where.not(:workflow_state => "rejected").count %><% if section && section.sis_source_id %>,
                 <%= t 'section_sis_id', 'SIS ID: %{section_sis}', :section_sis => section.sis_source_id %>
               <% end %>
             )
@@ -657,7 +675,7 @@
 
   <% if @publishing_enabled %>
     <div id="tab-grade-publishing">
-      <h2><%= t('headings.grade_publishing', %{Grade Publishing}) %></h2>
+      <h2><%= t('Grade Syncing') %></h2>
       <%= form_tag context_url(@context, :context_publish_to_sis_url), { :id => "publish_to_sis_form", :style => "display: none;" } do %><% end %>
       <a href="#" id="publish_grades_link" class="btn disabled">...</a>
       <ul id="publish_grades_messages"></ul>

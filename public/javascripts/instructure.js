@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2011 Instructure, Inc.
+/*
+ * Copyright (C) 2011 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -12,8 +12,8 @@
  * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
  * details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 define([
@@ -152,7 +152,7 @@ define([
           var $after = $('<a href="'+ htmlEscape(href) +'" class="youtubed"><img src="/images/play_overlay.png" class="media_comment_thumbnail" style="background-image: url(//img.youtube.com/vi/' + htmlEscape(id) + '/2.jpg)"' + altHtml + '/></a>')
             .click(function(event) {
               event.preventDefault();
-              var $video = $("<span class='youtube_holder' style='display: block;'><iframe src='//www.youtube.com/embed/" + htmlEscape(id) + "?autoplay=1&rel=0&hl=en_US&fs=1' frameborder='0' width='425' height='344'></iframe><br/><a href='#' style='font-size: 0.8em;' class='hide_youtube_embed_link'>" + htmlEscape(I18n.t('links.minimize_youtube_video', "Minimize Video")) + "</a></span>");
+              var $video = $("<span class='youtube_holder' style='display: block;'><iframe src='//www.youtube.com/embed/" + htmlEscape(id) + "?autoplay=1&rel=0&hl=en_US&fs=1' frameborder='0' width='425' height='344' allowfullscreen></iframe><br/><a href='#' style='font-size: 0.8em;' class='hide_youtube_embed_link'>" + htmlEscape(I18n.t('links.minimize_youtube_video', "Minimize Video")) + "</a></span>");
               $video.find(".hide_youtube_embed_link").click(function(event) {
                 event.preventDefault();
                 $video.remove();

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011-2016 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -68,6 +68,7 @@ class EnrollmentTerm < ActiveRecord::Base
   def recompute_course_scores(update_all_grading_period_scores: true)
     courses.active.each do |course|
       course.recompute_student_scores(update_all_grading_period_scores: update_all_grading_period_scores)
+      DueDateCacher.recompute_course(course)
     end
   end
 

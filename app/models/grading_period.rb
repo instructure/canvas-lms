@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 - 2016 Instructure, Inc.
+# Copyright (C) 2014 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -242,6 +242,7 @@ class GradingPeriod < ActiveRecord::Base
     gp_id = time_boundaries_changed? ? id : nil
     if course_group?
       recompute_score_for(grading_period_group.course, gp_id)
+      DueDateCacher.recompute_course(grading_period_group.course) if gp_id
     else
       self.send_later_if_production(:recompute_scores_for_term_courses, gp_id) # there could be a lot of courses here
     end

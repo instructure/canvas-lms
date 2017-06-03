@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2011 Instructure, Inc.
+/*
+ * Copyright (C) 2011 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -12,8 +12,8 @@
  * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
  * details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 define([
@@ -28,11 +28,12 @@ define([
 
 $(document).ready(function(event) {
   var state = 'nothing';
-  
+
   $("#batch_mode").change(function(event) {
-    $("#batch_mode_term_id").showIf($(this).attr('checked'));
+    $('#batch_mode_term_id_label').showIf($(this).attr('checked'));
+    $('#batch_mode_term_id').showIf($(this).attr('checked'));
   }).change();
-  
+
   var $override_sis_stickiness = $("#override_sis_stickiness");
   var $add_sis_stickiness = $("#add_sis_stickiness");
   var $clear_sis_stickiness = $("#clear_sis_stickiness");

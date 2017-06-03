@@ -1,12 +1,26 @@
+#
+# Copyright (C) 2015 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative '../../helpers/gradezilla_common'
 require_relative '../page_objects/gradezilla_page'
 
 describe "Gradezilla - custom columns" do
   include_context "in-process server selenium tests"
   include GradezillaCommon
-  include_context "gradebook_components"
-
-  let(:gradezilla_page) { Gradezilla::MultipleGradingPeriods.new }
 
   before(:once) { gradebook_data_setup }
   before(:each) { user_session(@teacher) }
@@ -30,7 +44,7 @@ describe "Gradezilla - custom columns" do
       d.content = "123456"
     end.save!
 
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
 
     expect(header(2)).to include_text col.title
     expect(ff(".container_0 .slick-header-column").map(&:text).join).not_to include hidden.title
@@ -38,20 +52,20 @@ describe "Gradezilla - custom columns" do
   end
 
   it "lets you show and hide the teacher notes column", priority: "1", test_id: 164008 do
-    gradezilla_page.visit(@course)
+    Gradezilla.visit(@course)
     # create the notes column
-    gradebook_view_options_menu.click
-    notes_option.click
+    Gradezilla.gradebook_view_options_menu.click
+    Gradezilla.notes_option.click
     expect(f("#content")).to contain_css('.custom_column')
 
     # hide the notes column
-    gradebook_view_options_menu.click
-    notes_option.click
+    Gradezilla.gradebook_view_options_menu.click
+    Gradezilla.notes_option.click
     expect(f("#content")).not_to contain_css('.custom_column')
 
     # show the notes column
-    gradebook_view_options_menu.click
-    notes_option.click
+    Gradezilla.gradebook_view_options_menu.click
+    Gradezilla.notes_option.click
     expect(f("#content")).to contain_css('.custom_column')
   end
 end

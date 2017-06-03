@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2013 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -161,7 +161,6 @@ END
       description: -> { I18n.t('Course set-up tutorial provides tips on how to leverage the feature opportunities on each page in Canvas. It is especially useful when you are new to Canvas or are setting up a new course for the first time in a long time.') },
       applies_to: 'User',
       state: 'allowed',
-      beta: true
     },
 
     'outcome_gradebook' =>
@@ -513,23 +512,28 @@ END
       beta: true,
       development: true,
     },
+    'new_gradebook_history' =>
+    {
+      display_name: -> { I18n.t('New Gradebook History') },
+      description: -> { I18n.t('Enable New Gradebook History page.') },
+      applies_to: "RootAccount",
+      state: "hidden",
+      beta: true,
+      development: true,
+    },
     'modules_home_page' =>
     {
       display_name: -> { I18n.t('Modules Home Page') },
       description: -> { I18n.t('Default to modules for the course home page') },
       applies_to: "RootAccount",
-      state: "hidden",
-      beta: true,
-      development: true,
+      state: "allowed",
     },
     'new_user_tutorial' =>
     {
       display_name: -> { I18n.t('New User Tutorial')},
       description: -> { I18n.t('Provide tutorial information for new users in a flyout tray.')},
       applies_to: "RootAccount",
-      state: "hidden",
-      beta: true,
-      development: true
+      state: "allowed",
     },
     'student_planner' =>
     {

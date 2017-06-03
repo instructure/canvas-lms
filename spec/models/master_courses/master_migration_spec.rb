@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2016 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require 'spec_helper'
 
 describe MasterCourses::MasterMigration do
@@ -289,6 +306,20 @@ describe MasterCourses::MasterMigration do
         expect(mm.export_results[:selective][:created]['WikiPage']).to eq([mig_id(page)])
         expect(mm.export_results[:selective][:created]['Attachment']).to eq([mig_id(file)])
         expect(mm.export_results[:selective][:updated]['Assignment']).to eq([mig_id(assmt)])
+      end
+    end
+
+    it "limits the number of items to track" do
+      Setting.set('master_courses_history_count', '2')
+
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+      run_master_migration
+
+      Timecop.travel(10.minutes.from_now) do
+        3.times { |x| @copy_from.wiki.wiki_pages.create! :title => "Page #{x}" }
+        mm = run_master_migration
+        expect(mm.export_results[:selective][:created]['WikiPage'].length).to eq 2
       end
     end
 

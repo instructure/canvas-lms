@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 Instructure, Inc.
+# Copyright (C) 2015 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -79,6 +79,22 @@ describe GradeSummaryAssignmentPresenter do
       it "returns nil when a summary's assignment_stats is empty" do
         expect(presenter.grade_distribution).to be_nil
       end
+    end
+  end
+
+  context "#original_points" do
+    it "returns an empty string when assignment is muted" do
+      @assignment.muted = true
+      expect(presenter.original_points).to eq ''
+    end
+
+    it "returns an empty string when submission is nil" do
+      test_presenter = GradeSummaryAssignmentPresenter.new(summary, @student, @assignment, nil)
+      expect(test_presenter.original_points).to eq ''
+    end
+
+    it "returns the published score" do
+      expect(presenter.original_points).to eq @submission.published_score
     end
   end
 end

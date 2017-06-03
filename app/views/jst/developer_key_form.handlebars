@@ -21,6 +21,10 @@
         <td><input type='text' id='icon_url' name='developer_key[icon_url]' value='{{ icon_url }}'/>
     </tr>
     <tr>
+        <td><label for='notes'>{{#t "notes"}}Notes:{{/t}}</label></td>
+        <td><textarea id='notes' name='developer_key[notes]' class="input-block-level">{{ notes }}</textarea>
+    </tr>
+    <tr>
         <td colspan='2'>
             <div class='button-container'>
               <button type='button' class='btn dialog_closer cancel'>{{#t "cancel"}}Cancel{{/t}}</button>

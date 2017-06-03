@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 - 2014 Instructure, Inc.
+# Copyright (C) 2013 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -30,7 +30,8 @@ end
 
 describe "report helper" do
   let(:account) { Account.default }
-  let(:account_report) { AccountReport.new(:report_type => 'test_report', :account => account) }
+  let(:user) { User.create }
+  let(:account_report) { AccountReport.new(report_type: 'test_report', account: account, user: user) }
   let(:report) { AccountReports::TestReport.new(account_report) }
 
   describe "#send_report" do
@@ -42,6 +43,12 @@ describe "report helper" do
     it "Should not break for nil parameters" do
       AccountReports.expects(:message_recipient)
       report.send_report
+    end
+
+    it "Should allow aborting" do
+      account_report.workflow_state = 'deleted'
+      account_report.save!
+      expect{report.write_report(['header']) { |csv| csv << 'hi' }}.to raise_error(/aborted/)
     end
   end
 

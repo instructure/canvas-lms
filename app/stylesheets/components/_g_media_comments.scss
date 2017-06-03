@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2015 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import "base/environment";
+
 #media_record_option_holder .record_option {
   display: block;
   margin: 0 2px 2px 2px;
@@ -213,11 +233,15 @@ div#audio_upload, div#video_upload {
   width: 140px;
   height: 100px;
   margin: 3px 5px;
+  box-sizing: border-box;
   background: url(/images/blank.png) no-repeat center center;
-  background-color: #222;
-  border: 0px solid #000;
-  display: block;
-  padding: 2px;
+  background-color: $electric;
+  background-size: cover;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  align-content: center;
+  padding: 0;
   &.media_comment_thumbnail-small {
     width: 70px;
     height: 50px;
@@ -225,18 +249,18 @@ div#audio_upload, div#video_upload {
 }
 
 .media_comment_thumbnail_play_button {
-  display: inline-block;
-  // these are the height/width of "play_overlay.png"
-  height: 100px;
-  width: 140px;
-  // accessibly hide text
-  text-indent: -999px;
-  overflow: hidden;
-  background-image: url(/images/play_overlay.png);
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  background-image: url(/images/icon-arrow-right-white.svg);
+  background-repeat: no-repeat;
+  background-size: 40%;
+  background-position: 55%;
+  background-color: $electric;
+  border-radius: 50%;
+
   .media_comment_thumbnail-small & {
-    // these are the height/width of "play_overlay_small.png"
-    height: 50px;
-    width: 70px;
-    background-image: url(/images/play_overlay_small.png);
+    width: 25px;
+    height: 25px;
   }
 }

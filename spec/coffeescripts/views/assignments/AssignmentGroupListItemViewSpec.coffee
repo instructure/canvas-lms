@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2013 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 define [
   'Backbone'
   'compiled/collections/AssignmentGroupCollection'
@@ -122,12 +139,19 @@ define [
     assignmentGroupsView.$el.appendTo $('#fixtures')
     assignmentGroupsView.render()
     assignmentGroupsView
-    
+
   test "shows imported icon when integration_data is not empty", ->
     model = createAssignmentGroup()
     model.set('integration_data', { property: 'value' })
     view = createView(model)
     ok view.$("#assignment_group_#{model.id} .ig-header-title .icon-sis-imported").length
+
+  test "shows imported icon with custom SIS_NAME when integration_data is not empty", ->
+    ENV.SIS_NAME = 'PowerSchool'
+    model = createAssignmentGroup()
+    model.set('integration_data', { property: 'value' })
+    view = createView(model)
+    equal view.$("#assignment_group_#{model.id} .ig-header-title .icon-sis-imported")[0].title, 'Imported from PowerSchool'
 
   test "does not show imported icon when integration_data is not set", ->
     model = createAssignmentGroup()

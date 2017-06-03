@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -242,6 +242,18 @@ describe AccountsController do
       expect(assigns[:courses].find {|c| c.id == c1.id }.student_count).to eq c1.student_enrollments.count
       expect(assigns[:courses].find {|c| c.id == c2.id }.student_count).to eq c2.student_enrollments.count
 
+    end
+
+    it "should not list rejected teachers" do
+      account_with_admin_logged_in
+      course_with_teacher(:account => @account)
+      @teacher2 = User.create(:name => "rejected")
+      reject = @course.enroll_user(@teacher2, "TeacherEnrollment")
+      reject.reject!
+
+      get 'show', :id => @account.id, :format => 'html'
+
+      expect(assigns[:courses].find {|c| c.id == @course.id }.teacher_names).to eq [@teacher.name]
     end
 
     it "should sort courses as specified" do

@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2014 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import _ from 'underscore'
 import I18n from 'i18n!modules'
 import React from 'react'
@@ -12,9 +30,9 @@ import React from 'react'
             className="lead"
           >
             <span className="assignments-to-post-count">
-              {I18n.t('assignments_to_post', {
-                 one: 'You are ready to post 1 assignment.',
-                 other: 'You are ready to post %{count} assignments.'
+              {I18n.t({
+                one: 'You are ready to sync 1 assignment.',
+                other: 'You are ready to sync %{count} assignments.'
               }, { count: this.props.postCount })}
             </span>
           </h1>
@@ -40,7 +58,7 @@ import React from 'react'
                 className="btn btn-primary"
                 onClick={ this.props.postGrades }
               >
-                {I18n.t("Post Grades")}
+                {I18n.t('Sync Grades')}
               </button>
             </div>
           </form>

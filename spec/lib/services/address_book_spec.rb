@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2016 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative "../../spec_helper"
 require_dependency "services/address_book"
 
@@ -7,7 +24,7 @@ module Services
       @app_host = "address-book"
       @secret = "opensesame"
       allow(Canvas::DynamicSettings).to receive(:find).
-        with("address-book").
+        with("address-book", use_env: false).
         and_return({ "app-host" => @app_host, "secret" => Canvas::Security.base64_encode(@secret) })
       @sender = user_model
       @course = course_model

@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2016 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import axios from 'axios'
 import $ from 'jquery'
 import I18n from 'i18n!actions'
@@ -164,15 +182,19 @@ import 'compiled/jquery.rails_flash_notifications'
             name: file.name,
             size: file.size,
             parent_folder_path: 'course_image',
-            type
+            type,
+            no_redirect: true
           };
           ajaxLib.post(`/api/v1/courses/${courseId}/files`, data)
                  .then((response) => {
                     const formData = Helpers.createFormData(response.data.upload_params);
+                    const successUrl = response.data.upload_params.success_url
                     formData.append('file', file);
                     ajaxLib.post(response.data.upload_url, formData)
                            .then((response) => {
-                             dispatch(this.prepareSetImage(response.data.url, response.data.id, courseId, ajaxLib));
+                             return ajaxLib.get(successUrl).then((successResp) => {
+                               dispatch(this.prepareSetImage(successResp.data.url, successResp.data.id, courseId, ajaxLib));
+                             })
                            })
                            .catch((response) => {
                               dispatch(this.errorUploadingImage());

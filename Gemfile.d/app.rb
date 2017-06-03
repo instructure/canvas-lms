@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2014 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 if CANVAS_RAILS4_2
   gem 'rails', '4.2.8'
   gem 'rack', '1.6.5'
@@ -30,7 +47,7 @@ gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   gem 'will_paginate', '3.1.5', require: false
 
 gem 'addressable', '2.5.0', require: false
-gem "after_transaction_commit", '1.1.1'
+gem "after_transaction_commit", '1.1.2'
 gem "aws-sdk", '2.6.7', require: false
 gem 'barby', '0.6.5', require: false
   gem 'rqrcode', '0.10.1', require: false

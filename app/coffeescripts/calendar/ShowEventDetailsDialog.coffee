@@ -1,7 +1,25 @@
+#
+# Copyright (C) 2012 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 define [
   'jquery'
   'i18n!calendar'
   'compiled/util/Popover'
+  'compiled/util/fcUtil'
   'compiled/calendar/CommonEvent'
   'compiled/calendar/commonEventFactory'
   'compiled/calendar/EditEventDetailsDialog'
@@ -11,11 +29,12 @@ define [
   'compiled/calendar/MessageParticipantsDialog'
   'compiled/fn/preventDefault'
   'underscore'
+  'axios'
   'vendor/jquery.ba-tinypubsub'
   'jquery.ajaxJSON'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
-], ($, I18n, Popover, CommonEvent, commonEventFactory, EditEventDetailsDialog, eventDetailsTemplate, deleteItemTemplate, reservationOverLimitDialog, MessageParticipantsDialog, preventDefault, _, {publish}) ->
+], ($, I18n, Popover, fcUtil, CommonEvent, commonEventFactory, EditEventDetailsDialog, eventDetailsTemplate, deleteItemTemplate, reservationOverLimitDialog, MessageParticipantsDialog, preventDefault, _, axios, {publish}) ->
 
   destroyArguments = (fn) => -> fn.apply(this, [])
 
@@ -151,7 +170,7 @@ define [
 
       if @event.object?.child_events
         if @event.object.reserved || (@event.object.parent_event_id && @event.object.appointment_group_id)
-          params.can_unreserve = true
+          params.can_unreserve = (@event.endDate() > fcUtil.now())
           params.can_reserve = false
 
         for e in @event.object.child_events
@@ -165,6 +184,20 @@ define [
             (params.reserved_users ?= []).push reservation
           if e.group
             (params.reserved_groups ?= []).push reservation
+
+      if (!params.reservations? || params.reservations == []) && @event.object.parent_event_id?
+        axios.get("api/v1/calendar_events/#{@event.object.parent_event_id}/participants")
+         .then((response) =>
+            if (response.data?)
+              $ul = $("<ul>")
+              for p in response.data
+                $li = $("<li>").text(p.display_name)
+                $ul.append($li)
+              $("#reservations").append($ul)
+            else
+              $("#reservations").remove()
+         ).catch( -> $("#reservations").remove())
+
 
       if @event.object?.available_slots == 0
         params.can_reserve = false

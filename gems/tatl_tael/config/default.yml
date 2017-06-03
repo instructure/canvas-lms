@@ -1,0 +1,218 @@
+---
+CopyrightLinter:
+  Severity: "warn" # TODO: change to severe once autocorrect is implemented
+  Precondition:
+    # TODO: add "modified" once the initial autocorrect sweep is complete
+    Statuses:
+      - added
+    Include:
+      - "*.coffee"
+      - "*.js"
+      - "*.rb"
+      # TODO: add the following once the initial autocorrect sweep is complete
+#      - "*.css"
+#      - "*.scss"
+#      - "*.erb"
+#      - "*.handlebars"
+#      - "*.hbs"
+    Whitelist:
+      - "**/bower/**"
+      - "**/mediaelement/**"
+      - "**/shims/**"
+      - "**/vendor/**"
+      - "**/symlink_to_node_modules/**"
+      - "gems/tatl_tael/spec/lib/tatl_tael/linters/fixtures/**"
+  Regexes:
+    FirstLineExceptions:
+      - !ruby/regexp '/^#!/' # e.g. "#!/usr/bin/env ruby"
+      - !ruby/regexp '/coding:/' # encodings
+      - !ruby/regexp '/@jsx React\.DOM/' # jsx header (see client_apps/quizzes)
+    CommentPrefixRegex: !ruby/regexp '/^( *)?(#|\/\/|\/?\*+|<%|\{\{\!)( *)?/'
+  CopyrightYearPlaceholder: "CURRENT_YEAR"
+  Copyright: |-
+    Copyright (C) CURRENT_YEAR - present Instructure, Inc.
+
+    This file is part of Canvas.
+
+    Canvas is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Affero General Public License as published by the Free
+    Software Foundation, version 3 of the License.
+
+    Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+    A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+    details.
+
+    You should have received a copy of the GNU Affero General Public License along
+    with this program. If not, see <http://www.gnu.org/licenses/>.
+  CopyrightEndingToken: "<http://www.gnu.org/licenses/>."
+  CommentSymbols:
+    Js:
+      Block: true
+      BlockStart: "/*"
+      Line: " *"
+      BlockEnd: " */"
+    Rb:
+      Block: false
+      BlockStart: "#" # empty first line
+      Line: "#"
+    Coffee:
+      Block: false
+      BlockStart: "#"
+      Line: "#"
+  Message: |-
+    Please prefix source files with our COPYRIGHT header. i.e.:
+    Copyright (C) CURRENT_YEAR - present Instructure, Inc.
+
+    This file is part of Canvas... (rest of copyright found in ./COPYRIGHT)
+    Tired of seeing this? Install the pre-commit auto-correct script in bin/lint.
+  AutoCorrect:
+    Message: "Corrected missing copyright header."
+    RaiseIfTwoLinesWith: "Copyright (C)" # after auto correct
+
+RubySpecsLinter:
+  Severity: "warn"
+  Globs:
+    Ruby:
+      # TODO: gems, plugins, etc?
+      - "app/**.rb"
+      - "lib/**.rb"
+    RubySpec: # excludes SeleniumSpec globs
+      # canvas proper
+      - "spec/**.rb"
+      - "spec_canvas/**.rb"
+      - "test/**.rb"
+      # gems, plugins, etc.
+      - "**/spec/**.rb"
+      - "**/spec_canvas/**.rb"
+      - "**/test/**.rb"
+    SeleniumSpec:
+      # canvas proper
+      - "spec/selenium/**"
+      - "spec_canvas/selenium/**"
+      - "test/selenium/**"
+      # gems, plugins, etc.
+      - "**/spec/selenium/**"
+      - "**/spec_canvas/selenium/**"
+      - "**/test/selenium/**"
+  Messages:
+    RubyChangesWithOnlySelenium: Your commit includes ruby changes, but does not include
+      non-selenium specs (model, controller, etc). Please add some to verify your changes.
+    RubyChangesWithNoRubySpecs: Your commit includes ruby changes, but does not include ruby specs.
+      Please add some to verify your changes.
+
+SeleniumSpecsLinter:
+  Severity: "warn"
+  Globs:
+    Ruby:
+      # TODO: gems, plugins, etc?
+      - "app/**.rb"
+      - "lib/**.rb"
+    RubySpec: # excludes SeleniumSpec globs
+      # canvas proper
+      - "spec/**.rb"
+      - "spec_canvas/**.rb"
+      - "test/**.rb"
+      # gems, plugins, etc.
+      - "**/spec/**.rb"
+      - "**/spec_canvas/**.rb"
+      - "**/test/**.rb"
+    SeleniumSpec:
+      # canvas proper
+      - "spec/selenium/**"
+      - "spec_canvas/selenium/**"
+      - "test/selenium/**"
+      # gems, plugins, etc.
+      - "**/spec/selenium/**"
+      - "**/spec_canvas/selenium/**"
+      - "**/test/selenium/**"
+    # the following globs are used to determine if there are unnecessary selenium specs.
+    # i.e., the code changes could/should be tested at a lower level.
+    PublicJs:
+      - "public/javascripts/**.js"
+    PublicJsWhitelist:
+      - "**/bower/**"
+      - "**/mediaelement/**"
+      - "**/shims/**"
+      - "**/vendor/**"
+      - "**/symlink_to_node_modules/**"
+    PublicJsSpec:
+      - "spec/coffeescripts/**"
+      - "spec/javascripts/**"
+    Coffee:
+      - "app/coffeescripts/**.coffee"
+    CoffeeWhitelist:
+      - "app/coffeescripts/bundles/**"
+    CoffeeSpec:
+      - "spec/coffeescripts/**.coffee"
+    Jsx:
+      - "app/jsx/**.js"
+    JsxSpec:
+      - "spec/coffeescripts/jsx/**"
+      - "spec/javascripts/jsx/**"
+  Message: Your commit modifies selenium specs, when your changes might be more appropriately
+      tested at a lower level. Please limit your selenium specs to happy-path scenarios.
+
+Simple/CoffeeSpecsLinter:
+  Severity: "warn"
+  Precondition:
+    Include:
+    - "app/coffeescripts/**.coffee"
+    Whitelist:
+    - "app/coffeescripts/bundles/**"
+  Requirement:
+    Include:
+    - "spec/coffeescripts/**.coffee"
+    - "spec/coffeescripts/jsx/**"
+    - "spec/javascripts/jsx/**"
+  Message: Your commit includes coffee changes, but does not include coffee or jsx
+    specs. Please add some to verify your changes.
+
+Simple/JsxSpecsLinter:
+  Severity: "warn"
+  Precondition:
+    Include:
+    - "app/jsx/**.js"
+  Requirement:
+    Include:
+    - "spec/coffeescripts/jsx/**"
+    - "spec/javascripts/jsx/**"
+  Message: Your commit includes coffee changes, but does not include coffee or jsx
+    specs. Please add some to verify your changes.
+
+Simple/PublicJsSpecsLinter:
+  Severity: "warn"
+  Precondition:
+    Include:
+    - "public/javascripts/**.js"
+    Whitelist:
+    - "**/bower/**"
+    - "**/mediaelement/**"
+    - "**/shims/**"
+    - "**/vendor/**"
+    - "**/symlink_to_node_modules/**"
+  Requirement:
+    Include:
+    - "spec/coffeescripts/**"
+    - "spec/javascripts/**"
+  Message: Your commit includes changes to public/javascripts, but does not include
+    specs (coffee or jsx). Please add some to verify your changes. Even $.fn.crazyMethods
+    can and should be tested (and not via selenium).
+
+Simple/NewErbLinter:
+  Severity: "warn"
+  Precondition:
+    Include:
+    - "app/views/**.erb"
+    Statuses:
+    - added
+  Message: |-
+    Your commit includes new ERB files, which has been a no-no in Canvas since 2011. All new UI should be built in React on top of documented APIs.
+    Maybe try doing something like this in your controller instead:
+
+        @page_title = t('Your Page Title')
+        @body_classes << 'whatever-classes you-want-to-add-to-body'
+        js_bundle :your_js_bundle
+        css_bundle :any_css_bundles_you_want
+        js_env({whatever: 'you need to put in window.ENV'})
+        render :text => "".html_safe, :layout => true

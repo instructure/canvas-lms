@@ -197,5 +197,17 @@ module Lti
 
     end
 
+    describe 'service' do
+      it 'has the correct endpoint for submission service' do
+        service_url = SubmissionsApiController::SERVICE_DEFINITIONS.first[:endpoint]
+        expect(service_url).to eq 'api/lti/assignments/{assignment_id}/submissions/{submission_id}'
+      end
+
+      it 'has the correct endpoint for submission history service' do
+        service_url = SubmissionsApiController::SERVICE_DEFINITIONS.last[:endpoint]
+        expect(service_url).to eq 'api/lti/assignments/{assignment_id}/submissions/{submission_id}/history'
+      end
+    end
+
   end
 end

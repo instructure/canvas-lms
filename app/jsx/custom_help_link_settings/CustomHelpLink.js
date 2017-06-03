@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2016 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import React from 'react'
 import ReactDOM from 'react-dom'
 import I18n from 'i18n!custom_help_link'
@@ -19,19 +37,22 @@ import CustomHelpLinkAction from './CustomHelpLinkAction'
       };
     },
     focus (action) {
-      const ref = this.actions[action];
+      // screenreaders are the worst
+      setTimeout(() => {
+        const ref = this.actions[action];
 
-      if (ref) {
-        ref.focus();
-      } else { // focus the first focusable element
-        const focusable = this.focusable();
-        if (focusable) {
-          focusable.focus();
+        if (ref && ref.props.onClick) {
+          ref.focus();
+        } else {
+          const focusable = this.focusable();
+          if (focusable) {
+            focusable.focus();
+          }
         }
-      }
+      }, 100);
     },
     focusable () {
-      const focusable = ReactDOM.findDOMNode(this).querySelectorAll('button:not([aria-disabled])');
+      const focusable = this.rootElement.querySelectorAll('button:not([disabled])');
       return focusable[0];
     },
     render () {
@@ -42,7 +63,10 @@ import CustomHelpLinkAction from './CustomHelpLinkAction'
       this.actions = {};
 
       return (
-        <li className="ic-Sortable-item">
+        <li
+          className="ic-Sortable-item"
+          ref={(c) => { this.rootElement = c }}
+        >
           <div className="ic-Sortable-item__Text">
             {text}
           </div>

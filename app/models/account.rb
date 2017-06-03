@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2016 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -521,14 +521,14 @@ class Account < ActiveRecord::Base
   end
 
   def self.account_lookup_cache_key(id)
-    ['_account_lookup4', id].cache_key
+    ['_account_lookup5', id].cache_key
   end
 
   def self.invalidate_cache(id)
     return unless id
-    birth_id = Shard.relative_id_for(id, Shard.current, Shard.birth)
-    Shard.birth.activate do
-      Rails.cache.delete(account_lookup_cache_key(birth_id)) if birth_id
+    default_id = Shard.relative_id_for(id, Shard.current, Shard.default)
+    Shard.default.activate do
+      Rails.cache.delete(account_lookup_cache_key(default_id)) if default_id
     end
   rescue
     nil
@@ -1170,11 +1170,11 @@ class Account < ActiveRecord::Base
   class ::Canvas::AccountCacheError < StandardError; end
 
   def self.find_cached(id)
-    birth_id = Shard.relative_id_for(id, Shard.current, Shard.birth)
-    Shard.birth.activate do
-      Rails.cache.fetch(account_lookup_cache_key(birth_id)) do
+    default_id = Shard.relative_id_for(id, Shard.current, Shard.default)
+    Shard.default.activate do
+      Rails.cache.fetch(account_lookup_cache_key(default_id)) do
         begin
-          account = Account.find(birth_id)
+          account = Account.find(default_id)
         rescue ActiveRecord::RecordNotFound => e
           raise ::Canvas::AccountCacheError, e.message
         end
@@ -1641,9 +1641,11 @@ class Account < ActiveRecord::Base
   end
 
   def create_default_objects
-    self.class.connection.after_transaction_commit do
+    work = -> do
       default_enrollment_term
       enable_canvas_authentication
     end
+    return work.call if Rails.env.test?
+    self.class.connection.after_transaction_commit(&work)
   end
 end

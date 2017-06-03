@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2016 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -2577,7 +2577,7 @@ describe Assignment do
 
       it "should include re-submitted submissions in the list of submissions needing grading" do
         expect(@assignment).to be_published
-        expect(@assignment.submissions.size).to eq 1
+        expect(@assignment.submissions.not_placeholder.size).to eq 1
         expect(Assignment.need_grading_info.where(id: @assignment).first).to be_nil
         @assignment.submit_homework(@stu1, :body => "Changed my mind!")
         @sub1.reload
@@ -2822,7 +2822,7 @@ describe Assignment do
       sub = @a.submit_homework(@u1, :submission_type => "online_text_entry", :body => "Some text for you")
       expect(sub.user_id).to eql(@u1.id)
       @a.reload
-      subs = @a.submissions
+      subs = @a.submissions.not_placeholder
       expect(subs.length).to eql(2)
       expect(subs.map(&:group_id).uniq).to eql([@group.id])
       expect(subs.map(&:submission_type).uniq).to eql(['online_text_entry'])
@@ -2833,7 +2833,7 @@ describe Assignment do
       @a.update_attribute(:grade_group_students_individually, true)
       res = @a.submit_homework(@u1, :submission_type => "online_text_entry", :body => "Test submission")
       @a.reload
-      submissions = @a.submissions
+      submissions = @a.submissions.not_placeholder
       expect(submissions.length).to eql 2
       expect(submissions.map(&:group_id).uniq).to eql [@group.id]
       expect(submissions.map(&:submission_type).uniq).to eql ["online_text_entry"]
@@ -2882,7 +2882,7 @@ describe Assignment do
       expect(sub.user_id).to eql(@u1.id)
       expect(sub.submission_comments.size).to eql 1
       @a.reload
-      other_sub = (@a.submissions - [sub])[0]
+      other_sub = (@a.submissions.not_placeholder - [sub])[0]
       expect(other_sub.submission_comments.size).to eql 1
     end
 
@@ -2919,7 +2919,7 @@ describe Assignment do
         context: @u1,
         filename: 'blah.txt'
       @a.submit_homework(@u1, attachments: [f])
-      @a.submissions.reload.each { |s|
+      @a.submissions.reload.not_placeholder.each { |s|
         expect(s.attachments).to eq [f]
       }
     end
@@ -4090,7 +4090,7 @@ describe Assignment do
 
     context "when the student is not in a group" do
       let!(:associate_student_and_submission) {
-        assignment.submissions.create user: @student
+        assignment.submissions.find_by user: @student
       }
       let(:update_submission_response) { assignment.update_submission(@student) }
 

@@ -1,4 +1,22 @@
 <%
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<%
   display_question ||= nil
   question = display_question
   question_type = answer_type(question)
@@ -25,6 +43,9 @@
     right_answers = hash_get(question, :answers, {})
     right_answers = (hash_get(question, :matches) || hash_get(question, :answers).sort_by{|a| rand }) if question_type.entry_type == "matching" rescue {}
   end
+  content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_content") &&
+                      !!js_env.dig(:MASTER_COURSE_DATA, "restricted_by_master_course") &&
+                        js_env.dig(:MASTER_COURSE_DATA, "master_course_restrictions", :content)
 %>
 <div role="region" aria-label="<%= t("Question") %>" class="quiz_sortable question_holder <%= "group" if in_group %>" id="<%= "question_template" unless question %>" style="<%= hidden unless question %>" data-group-id="<%= group_id %>">
   <div style="display: block; height: 1px; overflow: hidden;">&nbsp;</div>
@@ -78,12 +99,14 @@
       <% end %>
     </span>
     </div>
-    <div class="links" style="<%= hidden if user_answer || assessing %>">
-      <% edit_question_title = t('links.edit_question', 'Edit this Question') %>
-      <% delete_question_title = t('links.delete_question', 'Delete this Question') %>
-      <a href="#" class="edit_question_link no-hover" title="<%= edit_question_title %>"><i class="icon-edit standalone-icon"><span class="screenreader-only"><%= edit_question_title %></span></i></a>
-      <a href="#" class="delete_question_link no-hover" title="<%= delete_question_title %>"><i class="icon-end standalone-icon"><span class="screenreader-only"><%= delete_question_title %></span></i></a>
-    </div>
+    <% if !content_is_locked  %>
+      <div class="links" style="<%= hidden if user_answer || assessing %>">
+        <% edit_question_title = t('links.edit_question', 'Edit this Question') %>
+        <% delete_question_title = t('links.delete_question', 'Delete this Question') %>
+        <a href="#" class="edit_question_link no-hover" title="<%= edit_question_title %>"><i class="icon-edit standalone-icon"><span class="screenreader-only"><%= edit_question_title %></span></i></a>
+        <a href="#" class="delete_question_link no-hover" title="<%= delete_question_title %>"><i class="icon-end standalone-icon"><span class="screenreader-only"><%= delete_question_title %></span></i></a>
+      </div>
+    <% end %>
     <div style="display: none;">
       <span class="regrade_option"><%= hash_get(question, :regrade_option) %></span>
       <span class="regrade_disabled"><%= hash_get(question, :regrade_option) == 'disabled' ? 1 : 0 %></span>

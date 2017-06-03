@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2016 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -108,7 +108,7 @@ describe GradeCalculator do
           @group = @course.assignment_groups.create!(name: "some group", group_weight: 100)
           @assignment = @course.assignments.create!(title: "Some Assignment", points_possible: 10, assignment_group: @group)
           @assignment2 = @course.assignments.create!(title: "Some Assignment2", points_possible: 10, assignment_group: @group)
-          @submission = @assignment2.submissions.create!(user: @user)
+          @submission = @assignment2.submissions.find_by!(user: @user)
         end
 
         @submission.update_column(:score, 5)
@@ -137,8 +137,8 @@ describe GradeCalculator do
           @course.assignments.create!(title: "Some Assignment2", due_at: now, points_possible: 10, assignment_group: @group)
           @assignment_in_period = @course.assignments.create!(title: 'In a Grading Period', due_at: 2.months.from_now(now), points_possible: 10)
           @course.assignments.create!(title: 'In a Grading Period', due_at: 2.months.from_now(now), points_possible: 10)
-          @submission = @assignment.submissions.create!(user: @user)
-          @submission_in_period = @assignment_in_period.submissions.create!(user: @user)
+          @submission = @assignment.submissions.find_by!(user: @user)
+          @submission_in_period = @assignment_in_period.submissions.find_by!(user: @user)
         end
 
         @submission.update_column(:score, 5)

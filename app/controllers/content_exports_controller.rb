@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -94,7 +94,7 @@ class ContentExportsController < ApplicationController
 
   def render_export(export)
     json = export.as_json(:only => [:id, :progress, :workflow_state],:methods => [:error_message])
-    json['content_export']['download_url'] = verified_file_download_url(export.attachment, export) if export.attachment
+    json['content_export']['download_url'] = verified_file_download_url(export.attachment, export) if export.attachment && !export.expired?
     render :json => json
   end
 end

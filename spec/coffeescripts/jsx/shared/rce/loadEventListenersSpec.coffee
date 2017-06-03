@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2015 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 define [
   'compiled/views/tinymce/EquationEditorView',
   'tinymce_plugins/instructure_links/links',
@@ -88,18 +105,14 @@ define [
     event.initCustomEvent("tinyRCE/initEquella", true, true, eventData)
     document.dispatchEvent(event)
 
-  asyncTest 'initializes external tools plugin', ->
+  test 'initializes external tools plugin', ->
     commandSpy = sinon.spy(fakeEditor, "addCommand")
-    expect(1)
-    loadEventListeners({externalToolCB:()->
-      start()
-      ok commandSpy.calledWith("instructureExternalButton__BUTTON_ID__")
-    })
-
+    loadEventListeners()
     event = document.createEvent('CustomEvent')
     eventData = {'ed': fakeEditor, 'url': "someurl.com"}
     event.initCustomEvent("tinyRCE/initExternalTools", true, true, eventData)
     document.dispatchEvent(event)
+    ok commandSpy.calledWith("instructureExternalButton__BUTTON_ID__")
 
   asyncTest 'initializes recording plugin', ->
     logSpy = sinon.spy(console, "log")

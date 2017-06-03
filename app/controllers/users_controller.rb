@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -465,6 +465,15 @@ class UsersController < ApplicationController
     end
   end
 
+  helper_method :show_planner?
+  def show_planner?
+    if @current_user.preferences[:dashboard_view]
+      @current_user.preferences[:dashboard_view] == 'planner'
+    else
+      false
+    end
+  end
+
   def user_dashboard
     session.delete(:parent_registration) if session[:parent_registration]
     check_incomplete_registration
@@ -484,7 +493,7 @@ class UsersController < ApplicationController
     js_env({
       :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url,
       :PREFERENCES => {
-        :recent_activity_dashboard => @current_user.preferences[:recent_activity_dashboard],
+        :recent_activity_dashboard => @current_user.preferences[:dashboard_view] == 'activity' || @current_user.preferences[:recent_activity_dashboard],
         :hide_dashcard_color_overlays => @current_user.preferences[:hide_dashcard_color_overlays],
         :custom_colors => @current_user.custom_colors,
         :show_planner => show_planner?
@@ -539,6 +548,8 @@ class UsersController < ApplicationController
     render :layout => false
   end
 
+  # This should be considered as deprecated in favor of the dashboard_view endpoint
+  # instead. DON'T USE THIS AGAIN
   def toggle_recent_activity_dashboard
     @current_user.preferences[:recent_activity_dashboard] =
       !@current_user.preferences[:recent_activity_dashboard]

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - 2015 Instructure, Inc.
+# Copyright (C) 2012 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -955,13 +955,13 @@ describe "Default Account Reports" do
         parsed = read_report("provisioning_csv", {params: parameters, order: 4})
         expect(parsed.length).to eq 4
         expect(parsed[0]).to eq [@group1.id.to_s, "group1sis", @account.id.to_s,
-                                 nil, "group1name", "available", "true", @account.id.to_s, 'Account', @group1.group_category.id.to_s]
+                                 nil, "group1name", "available", "true", @account.id.to_s, 'Account', @group1.group_category.id.to_s, nil]
         expect(parsed[1]).to eq [@group2.id.to_s, "group2sis", @sub_account.id.to_s,
-                                 "sub1", "group2name", "available", "true", @sub_account.id.to_s, 'Account', @group2.group_category.id.to_s]
+                                 "sub1", "group2name", "available", "true", @sub_account.id.to_s, 'Account', @group2.group_category.id.to_s, "2"]
         expect(parsed[2]).to eq [@group3.id.to_s, nil, @sub_account.id.to_s,
-                                 "sub1", "group3name", "available", "false", @sub_account.id.to_s,'Account', nil]
+                                 "sub1", "group3name", "available", "false", @sub_account.id.to_s,'Account', nil, nil]
         expect(parsed[3]).to eq [@group5.id.to_s, "group5sis", @sub_account.id.to_s,
-                                 "sub1", "group5name", "available", "true", @course1.id.to_s,'Course', @group5.group_category.id.to_s]
+                                 "sub1", "group5name", "available", "true", @course1.id.to_s,'Course', @group5.group_category.id.to_s, nil]
       end
 
       it "should run the provisioning report on a sub account" do
@@ -970,11 +970,11 @@ describe "Default Account Reports" do
         parsed = read_report("provisioning_csv", {params: parameters, account: @sub_account, order: 4})
         expect(parsed.length).to eq 3
         expect(parsed[0]).to eq [@group2.id.to_s, "group2sis", @sub_account.id.to_s,
-                                 "sub1", "group2name", "available", "true", @sub_account.id.to_s, 'Account', @group2.group_category.id.to_s]
+                                 "sub1", "group2name", "available", "true", @sub_account.id.to_s, 'Account', @group2.group_category.id.to_s, "2"]
         expect(parsed[1]).to eq [@group3.id.to_s, nil, @sub_account.id.to_s,
-                                 "sub1", "group3name", "available", "false", @sub_account.id.to_s, 'Account', nil]
+                                 "sub1", "group3name", "available", "false", @sub_account.id.to_s, 'Account', nil, nil]
         expect(parsed[2]).to eq [@group5.id.to_s, "group5sis", @sub_account.id.to_s,
-                                 "sub1", "group5name", "available", "true", @course1.id.to_s, 'Course', @group5.group_category.id.to_s]
+                                 "sub1", "group5name", "available", "true", @course1.id.to_s, 'Course', @group5.group_category.id.to_s, nil]
       end
 
       it "includes sub-sub-account groups when run on a sub account" do
@@ -985,13 +985,13 @@ describe "Default Account Reports" do
         parsed = read_report("provisioning_csv", {params: parameters, account: @sub_account, order: 4})
         expect(parsed.length).to eq 4
         expect(parsed[0]).to eq [@group2.id.to_s, "group2sis", @sub_account.id.to_s,
-                                 "sub1", "group2name", "available", "true", @sub_account.id.to_s, 'Account', @group2.group_category.id.to_s]
+                                 "sub1", "group2name", "available", "true", @sub_account.id.to_s, 'Account', @group2.group_category.id.to_s, "2"]
         expect(parsed[1]).to eq [@group3.id.to_s, nil, @sub_account.id.to_s,
-                                 "sub1", "group3name", "available", "false", @sub_account.id.to_s, 'Account', nil]
+                                 "sub1", "group3name", "available", "false", @sub_account.id.to_s, 'Account', nil, nil]
         expect(parsed[2]).to eq [@group5.id.to_s, "group5sis", @sub_account.id.to_s,
-                                 "sub1", "group5name", "available", "true", @course1.id.to_s, 'Course', @group5.group_category.id.to_s]
+                                 "sub1", "group5name", "available", "true", @course1.id.to_s, 'Course', @group5.group_category.id.to_s, nil]
         expect(parsed[3]).to eq [group6.id.to_s, nil, sub_sub_account.id.to_s,
-                                 nil, "group6name", "available", "false", sub_sub_account.id.to_s, 'Account', nil]
+                                 nil, "group6name", "available", "false", sub_sub_account.id.to_s, 'Account', nil, nil]
       end
     end
 

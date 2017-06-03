@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -975,6 +975,15 @@ describe DiscussionTopic do
       expect(@topic.user_can_see_posts?(@teacher)).to eq true
     end
 
+    it "should allow course admins to see posts in concluded group topics without posting" do
+      group_category = @course.group_categories.create(:name => "category")
+      @group = @course.groups.create(:name => "group", :group_category => group_category)
+      @topic.update_attribute(:group_category, group_category)
+      subtopic = @topic.child_topics.first
+      @course.complete!
+      expect(subtopic.user_can_see_posts?(@teacher)).to eq true
+    end
+
     it "should only allow active admins to see posts without posting" do
       @ta_enrollment = course_with_ta(:course => @course, :active_enrollment => true)
       # TA should be able to see
@@ -988,7 +997,7 @@ describe DiscussionTopic do
       expect(@topic.user_can_see_posts?(@ta)).to eq false
     end
 
-    it "shouldn't allow student (and observer) who hasn't posted to see" do
+    it "shouldn't allow student who hasn't posted to see" do
       expect(@topic.user_can_see_posts?(@student)).to eq false
     end
 
@@ -1004,7 +1013,7 @@ describe DiscussionTopic do
       expect { @topic.reply_from(:user => @student, :text => "hai") }.to raise_error(IncomingMail::Errors::ReplyToDeletedDiscussion)
     end
 
-    it "should allow student (and observer) who has posted to see" do
+    it "should allow student who has posted to see" do
       @topic.reply_from(:user => @student, :text => 'hai')
       expect(@topic.user_can_see_posts?(@student)).to eq true
     end
@@ -1019,6 +1028,33 @@ describe DiscussionTopic do
       ct.reply_from(user: @student, text: 'ohai')
       ct.user_ids_who_have_posted_and_admins
       expect(ct.user_can_see_posts?(@student)).to be_truthy
+    end
+
+    describe "observers" do
+      before :once do
+        @other_student = user_factory(:active_all => true)
+        @course.enroll_student(@other_student, :enrollment_state => 'active')
+        @course.enroll_user(@observer, 'ObserverEnrollment',
+                            :associated_user_id => @student, :enrollment_state => 'active')
+        @course.enroll_user(@observer, 'ObserverEnrollment',
+                            :associated_user_id => @other_student, :enrollment_state => 'active')
+      end
+
+      it "does not allow observers to see replies to a discussion linked students haven't posted in" do
+        expect(@topic.initial_post_required?(@observer)).to be
+      end
+
+      # previously this worked for exactly one observer enrollment, whichever became @context_enrollment
+      # so test both ways
+      it "allows observers to see replies in a discussion a linked student has posted in (1/2)" do
+        @topic.reply_from(:user => @student, :text => 'wat')
+        expect(@topic.initial_post_required?(@observer)).not_to be
+      end
+
+      it "allows observers to see replies in a discussion a linked student has posted in (2/2)" do
+        @topic.reply_from(:user => @other_student, :text => 'wat')
+        expect(@topic.initial_post_required?(@observer)).not_to be
+      end
     end
   end
 
@@ -1993,5 +2029,15 @@ describe DiscussionTopic do
         expect(topic.messages_sent["New Discussion Topic"]).to be_blank
       end
     end
+  end
+
+  it "should let course admins reply to concluded topics" do
+    course_with_teacher(:active_all => true)
+    topic = @course.discussion_topics.create!
+    group_model(:context => @course)
+    group_topic = @group.discussion_topics.create!
+    @course.complete!
+    expect(topic.grants_right?(@teacher, :reply)).to be_truthy
+    expect(group_topic.grants_right?(@teacher, :reply)).to be_truthy
   end
 end

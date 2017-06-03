@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -29,6 +29,18 @@ function mountAndOpenOptions (props) {
 QUnit.module('ViewOptionsMenu - notes', {
   setup () {
     this.props = {
+      columnSortSettings: {
+        criterion: 'due_date',
+        direction: 'ascending',
+        disabled: false,
+        onSortByDefault () {},
+        onSortByNameAscending () {},
+        onSortByNameDescending () {},
+        onSortByDueDateAscending () {},
+        onSortByDueDateDescending () {},
+        onSortByPointsAscending () {},
+        onSortByPointsDescending () {}
+      },
       showUnpublishedAssignments: false,
       onSelectShowUnpublishedAssignments: () => {},
       teacherNotes: {
@@ -103,6 +115,18 @@ QUnit.module('ViewOptionsMenu - unpublished assignments', {
           onSelect: () => {},
           selected: false
         }}
+        columnSortSettings={{
+          criterion: 'due_date',
+          direction: 'ascending',
+          disabled: false,
+          onSortByDefault () {},
+          onSortByNameAscending () {},
+          onSortByNameDescending () {},
+          onSortByDueDateAscending () {},
+          onSortByDueDateDescending () {},
+          onSortByPointsAscending () {},
+          onSortByPointsDescending () {}
+        }}
       />
     );
   },
@@ -114,6 +138,12 @@ QUnit.module('ViewOptionsMenu - unpublished assignments', {
       .find('MenuItem')
       .at(itemIndex);
   },
+
+  teardown () {
+    if (this.wrapper) {
+      this.wrapper.unmount();
+    }
+  }
 });
 
 test('Unpublished Assignments is selected when showUnpublishedAssignments is true', function () {
@@ -139,3 +169,292 @@ test('onSelectShowUnpublishedAssignment is called when selected', function () {
   this.getMenuItemGroupAndMenuItem({ groupIndex: 1, itemIndex: 1 }).simulate('click');
   strictEqual(onSelectShowUnpublishedAssignmentsStub.callCount, 1);
 });
+
+QUnit.module('ViewOptionsMenu - Column Sorting', {
+  getProps (criterion = 'due_date', direction = 'ascending', disabled = false) {
+    return {
+      columnSortSettings: {
+        criterion,
+        direction,
+        disabled,
+        onSortByDefault: this.stub(),
+        onSortByNameAscending: this.stub(),
+        onSortByNameDescending: this.stub(),
+        onSortByDueDateAscending: this.stub(),
+        onSortByDueDateDescending: this.stub(),
+        onSortByPointsAscending: this.stub(),
+        onSortByPointsDescending: this.stub()
+      },
+      showUnpublishedAssignments: false,
+      onSelectShowUnpublishedAssignments: () => {},
+      teacherNotes: {
+        disabled: false,
+        onSelect: () => {},
+        selected: true
+      }
+    };
+  },
+
+  getMenuContainer () {
+    return new ReactWrapper(this.wrapper.node.menuContent, this.wrapper.node);
+  },
+
+  getMenuItemGroup (name) {
+    let selectedMenuItemGroup;
+    const menuContainer = this.getMenuContainer();
+    const menuItemGroups = menuContainer.find('MenuItemGroup');
+    const menuItemGroupCount = menuItemGroups.length;
+
+    for (let groupIdx = 0; groupIdx < menuItemGroupCount; groupIdx++) {
+      const group = menuItemGroups.at(groupIdx);
+
+      if (group.props().label === name) {
+        selectedMenuItemGroup = group;
+        break;
+      }
+    }
+
+    return selectedMenuItemGroup;
+  },
+
+  getMenuItem (name, menuItemContainer) {
+    let selectedMenuItem;
+    const container = menuItemContainer || this.getMenuContainer();
+    const menuItems = container.find('MenuItem');
+    const menuItemCount = menuItems.length;
+
+    for (let menuItemIdx = 0; menuItemIdx < menuItemCount; menuItemIdx++) {
+      const menuItem = menuItems.at(menuItemIdx);
+
+      if (menuItem.text().trim() === name) {
+        selectedMenuItem = menuItem;
+        break;
+      }
+    }
+
+    return selectedMenuItem;
+  },
+
+  getMenuItems (filterProp, filterValue, menuItemContainer) {
+    const selectedMenuItems = [];
+    const container = menuItemContainer || this.getMenuContainer();
+    const menuItems = container.find('MenuItem');
+    const menuItemCount = menuItems.length;
+
+    for (let menuItemIdx = 0; menuItemIdx < menuItemCount; menuItemIdx++) {
+      const menuItem = menuItems.at(menuItemIdx);
+
+      if (filterProp === undefined || menuItem.props()[filterProp] === filterValue) {
+        selectedMenuItems.push(menuItem);
+      }
+    }
+
+    return selectedMenuItems;
+  },
+
+  teardown () {
+    if (this.wrapper) {
+      this.wrapper.unmount();
+    }
+  }
+});
+
+test('Default Order is selected when criterion is default and direction is ascending', function () {
+  const props = this.getProps('default', 'ascending');
+
+  this.wrapper = mountAndOpenOptions(props);
+
+  const arrangeByMenuItemGroup = this.getMenuItemGroup('Arrange By');
+  const selectedMenuItems = this.getMenuItems('selected', true, arrangeByMenuItemGroup);
+
+  strictEqual(selectedMenuItems.length, 1, 'only one menu item should be selected');
+  strictEqual(selectedMenuItems[0].text().trim(), 'Default Order');
+});
+
+test('Default Order is selected when criterion is default and direction is descending', function () {
+  const props = this.getProps('default', 'descending');
+
+  this.wrapper = mountAndOpenOptions(props);
+
+  const arrangeByMenuItemGroup = this.getMenuItemGroup('Arrange By');
+  const selectedMenuItems = this.getMenuItems('selected', true, arrangeByMenuItemGroup);
+
+  strictEqual(selectedMenuItems.length, 1, 'only one menu item should be selected');
+  strictEqual(selectedMenuItems[0].text().trim(), 'Default Order');
+});
+
+test('Assignment Name - A-Z is selected when criterion is name and direction is ascending', function () {
+  const props = this.getProps('name', 'ascending');
+
+  this.wrapper = mountAndOpenOptions(props);
+
+  const arrangeByMenuItemGroup = this.getMenuItemGroup('Arrange By');
+  const selectedMenuItems = this.getMenuItems('selected', true, arrangeByMenuItemGroup);
+
+  strictEqual(selectedMenuItems.length, 1, 'only one menu item should be selected');
+  strictEqual(selectedMenuItems[0].text().trim(), 'Assignment Name - A-Z');
+});
+
+test('Assignment Name - Z-A is selected when criterion is name and direction is ascending', function () {
+  const props = this.getProps('name', 'descending');
+
+  this.wrapper = mountAndOpenOptions(props);
+
+  const arrangeByMenuItemGroup = this.getMenuItemGroup('Arrange By');
+  const selectedMenuItems = this.getMenuItems('selected', true, arrangeByMenuItemGroup);
+
+  strictEqual(selectedMenuItems.length, 1, 'only one menu item should be selected');
+  strictEqual(selectedMenuItems[0].text().trim(), 'Assignment Name - Z-A');
+});
+
+test('Due Date - Oldest to Newest is selected when criterion is name and direction is ascending', function () {
+  const props = this.getProps('due_date', 'ascending');
+
+  this.wrapper = mountAndOpenOptions(props);
+
+  const arrangeByMenuItemGroup = this.getMenuItemGroup('Arrange By');
+  const selectedMenuItems = this.getMenuItems('selected', true, arrangeByMenuItemGroup);
+
+  strictEqual(selectedMenuItems.length, 1, 'only one menu item should be selected');
+  strictEqual(selectedMenuItems[0].text().trim(), 'Due Date - Oldest to Newest');
+});
+
+test('Due Date - Oldest to Newest is selected when criterion is name and direction is ascending', function () {
+  const props = this.getProps('due_date', 'descending');
+
+  this.wrapper = mountAndOpenOptions(props);
+
+  const arrangeByMenuItemGroup = this.getMenuItemGroup('Arrange By');
+  const selectedMenuItems = this.getMenuItems('selected', true, arrangeByMenuItemGroup);
+
+  strictEqual(selectedMenuItems.length, 1, 'only one menu item should be selected');
+  strictEqual(selectedMenuItems[0].text().trim(), 'Due Date - Newest to Oldest');
+});
+
+test('Points - Lowest to Highest is selected when criterion is name and direction is ascending', function () {
+  const props = this.getProps('points', 'ascending');
+
+  this.wrapper = mountAndOpenOptions(props);
+
+  const arrangeByMenuItemGroup = this.getMenuItemGroup('Arrange By');
+  const selectedMenuItems = this.getMenuItems('selected', true, arrangeByMenuItemGroup);
+
+  strictEqual(selectedMenuItems.length, 1, 'only one menu item should be selected');
+  strictEqual(selectedMenuItems[0].text().trim(), 'Points - Lowest to Highest');
+});
+
+test('Points - Lowest to Highest is selected when criterion is name and direction is ascending', function () {
+  const props = this.getProps('points', 'descending');
+
+  this.wrapper = mountAndOpenOptions(props);
+
+  const arrangeByMenuItemGroup = this.getMenuItemGroup('Arrange By');
+  const selectedMenuItems = this.getMenuItems('selected', true, arrangeByMenuItemGroup);
+
+  strictEqual(selectedMenuItems.length, 1, 'only one menu item should be selected');
+  strictEqual(selectedMenuItems[0].text().trim(), 'Points - Highest to Lowest');
+});
+
+test('all column ordering options are disabled when the column ordering settings are disabled', function () {
+  const props = this.getProps();
+  props.columnSortSettings.disabled = true;
+
+  this.wrapper = mountAndOpenOptions(props);
+
+  const arrangeByMenuItemGroup = this.getMenuItemGroup('Arrange By');
+  const disabledMenuItems = this.getMenuItems('disabled', true, arrangeByMenuItemGroup);
+
+  strictEqual(disabledMenuItems.length, 7, 'all column ordering menu items are disabled');
+});
+
+test('clicking on "Default Order" triggers onSortByDefault', function () {
+  const props = this.getProps();
+
+  this.wrapper = mountAndOpenOptions(props);
+
+  const arrangeByMenuItemGroup = this.getMenuItemGroup('Arrange By');
+  const specificMenuItem = this.getMenuItem('Default Order', arrangeByMenuItemGroup);
+
+  specificMenuItem.simulate('click');
+
+  strictEqual(props.columnSortSettings.onSortByDefault.callCount, 1);
+});
+
+test('clicking on "Assignments - A-Z" triggers onSortByNameAscending', function () {
+  const props = this.getProps();
+
+  this.wrapper = mountAndOpenOptions(props);
+
+  const arrangeByMenuItemGroup = this.getMenuItemGroup('Arrange By');
+  const specificMenuItem = this.getMenuItem('Assignment Name - A-Z', arrangeByMenuItemGroup);
+
+  specificMenuItem.simulate('click');
+
+  strictEqual(props.columnSortSettings.onSortByNameAscending.callCount, 1);
+});
+
+test('clicking on "Assignments - Z-A" triggers onSortByNameDescending', function () {
+  const props = this.getProps();
+
+  this.wrapper = mountAndOpenOptions(props);
+
+  const arrangeByMenuItemGroup = this.getMenuItemGroup('Arrange By');
+  const specificMenuItem = this.getMenuItem('Assignment Name - Z-A', arrangeByMenuItemGroup);
+
+  specificMenuItem.simulate('click');
+
+  strictEqual(props.columnSortSettings.onSortByNameDescending.callCount, 1);
+});
+
+test('clicking on "Due Date - Oldest to Newest" triggers onSortByDueDateAscending', function () {
+  const props = this.getProps();
+
+  this.wrapper = mountAndOpenOptions(props);
+
+  const arrangeByMenuItemGroup = this.getMenuItemGroup('Arrange By');
+  const specificMenuItem = this.getMenuItem('Due Date - Oldest to Newest', arrangeByMenuItemGroup);
+
+  specificMenuItem.simulate('click');
+
+  strictEqual(props.columnSortSettings.onSortByDueDateAscending.callCount, 1);
+});
+
+test('clicking on "Due Date - Newest to Oldest" triggers onSortByDueDateDescending', function () {
+  const props = this.getProps();
+
+  this.wrapper = mountAndOpenOptions(props);
+
+  const arrangeByMenuItemGroup = this.getMenuItemGroup('Arrange By');
+  const specificMenuItem = this.getMenuItem('Due Date - Newest to Oldest', arrangeByMenuItemGroup);
+
+  specificMenuItem.simulate('click');
+
+  strictEqual(props.columnSortSettings.onSortByDueDateDescending.callCount, 1);
+});
+
+test('clicking on "Points - Lowest to Highest" triggers onSortByPointsAscending', function () {
+  const props = this.getProps();
+
+  this.wrapper = mountAndOpenOptions(props);
+
+  const arrangeByMenuItemGroup = this.getMenuItemGroup('Arrange By');
+  const specificMenuItem = this.getMenuItem('Points - Lowest to Highest', arrangeByMenuItemGroup);
+
+  specificMenuItem.simulate('click');
+
+  strictEqual(props.columnSortSettings.onSortByPointsAscending.callCount, 1);
+});
+
+test('clicking on "Points - Highest to Lowest" triggers onSortByPointsDescending', function () {
+  const props = this.getProps();
+
+  this.wrapper = mountAndOpenOptions(props);
+
+  const arrangeByMenuItemGroup = this.getMenuItemGroup('Arrange By');
+  const specificMenuItem = this.getMenuItem('Points - Highest to Lowest', arrangeByMenuItemGroup);
+
+  specificMenuItem.simulate('click');
+
+  strictEqual(props.columnSortSettings.onSortByPointsDescending.callCount, 1);
+});
+

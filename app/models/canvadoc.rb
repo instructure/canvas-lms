@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014 Instructure, Inc.
+# Copyright (C) 2014 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -12,11 +12,14 @@
 # A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
 # details.
 #
-# You should have received a copy of the GNU Affero General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
 class Canvadoc < ActiveRecord::Base
+  include Canvadocs::Session
+  alias_method :session_url, :canvadocs_session_url
+
   belongs_to :attachment
 
   has_many :canvadocs_submissions
@@ -44,43 +47,6 @@ class Canvadoc < ActiveRecord::Base
     end
   end
 
-  def session_url(opts = {})
-    user = opts.delete(:user)
-    opts.merge! annotation_opts(user)
-
-    Canvas.timeout_protection("canvadocs", raise_on_timeout: true) do
-      session = canvadocs_api.session(document_id, opts)
-      canvadocs_api.view(session["id"])
-    end
-  end
-
-  def annotation_opts(user)
-    return {} if !user || !has_annotations?
-
-    opts = {
-      annotation_context: "default",
-      permissions: "readwrite",
-      user_id: user.global_id.to_s,
-      user_name: user.short_name.gsub(",", ""),
-      user_role: "",
-      user_filter: user.global_id.to_s,
-    }
-
-    return opts if submissions.empty?
-
-    if submissions.any? { |s| s.grants_right? user, :read_grade }
-      opts.delete :user_filter
-    end
-
-    # no commenting when anonymous peer reviews are enabled
-    if submissions.map(&:assignment).any? { |a| a.peer_reviews? && a.anonymous_peer_reviews? }
-      opts = {}
-    end
-
-    opts
-  end
-  private :annotation_opts
-
   def submissions
     self.canvadocs_submissions.
       preload(submission: :assignment).
@@ -104,10 +70,9 @@ class Canvadoc < ActiveRecord::Base
     ].to_json)
   end
 
-  def canvadocs_api
+  def self.canvadocs_api
     raise "Canvadocs isn't enabled" unless Canvadocs.enabled?
     Canvadocs::API.new(token: Canvadocs.config['api_key'],
                        base_url: Canvadocs.config['base_url'])
   end
-  private :canvadocs_api
 end

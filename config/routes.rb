@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 full_path_glob = '(/*full_path)'
 
 # allow plugins to prepend routes
@@ -712,6 +729,8 @@ CanvasRails::Application.routes.draw do
   get 'login/otp' => 'login/otp#new', as: :otp_login
   post 'login/otp/sms' => 'login/otp#send_via_sms', as: :send_otp_via_sms
   post 'login/otp' => 'login/otp#create'
+  get 'users/self/otps' => 'one_time_passwords#index', as: :one_time_passwords
+  delete 'users/self/otps' => 'one_time_passwords#destroy_all', as: :destroy_all_one_time_passwords
 
   # deprecated redirect
   get 'login/:id' => 'login#new'
@@ -849,9 +868,14 @@ CanvasRails::Application.routes.draw do
   get 'equation_images/:id' => 'equation_images#show', as: :equation_images, id: /.+/
 
   # assignments at the top level (without a context) -- we have some specs that
-  # assert these routes exist, but just 404. I'm not sure we ever actually want
-  # top-level assignments available, maybe we should change the specs instead.
-  resources :assignments, only: [:index, :show]
+  # assert these routes exist, but just 404 unless it is a download from local
+  # storage. I'm not sure we ever actually want top-level assignments available,
+  # maybe we should change the specs instead.
+  # Note, if local storage is used, a file is fetched from this top level
+  # (i.e. SpeedGrader document preview with Google Docs viewer)
+  resources :assignments, only: [:index, :show] do
+    get "files/:id/download" => 'files#show', download: '1'
+  end
 
   resources :files, :except => [:new] do
     get 'download' => 'files#show', download: '1'
@@ -1373,6 +1397,7 @@ CanvasRails::Application.routes.draw do
       delete 'calendar_events/:id', action: :destroy
       post 'calendar_events/:id/reservations', action: :reserve
       post 'calendar_events/:id/reservations/:participant_id', action: :reserve, as: 'calendar_event_reserve'
+      get 'calendar_events/:id/participants', action: :participants, as: 'calendar_event_participants'
       post 'calendar_events/save_selected_contexts', action: :save_selected_contexts
 
       get 'courses/:course_id/calendar_events/timetable', action: :get_course_timetable
@@ -1904,12 +1929,20 @@ CanvasRails::Application.routes.draw do
       get 'courses/:course_id/blueprint_templates/:template_id', action: :show
       get 'courses/:course_id/blueprint_templates/:template_id/associated_courses', action: :associated_courses, as: :course_blueprint_associated_courses
       put 'courses/:course_id/blueprint_templates/:template_id/update_associations', action: :update_associations
+      get 'courses/:course_id/blueprint_templates/:template_id/unsynced_changes', action: :unsynced_changes, as: :course_blueprint_unsynced_changes
 
       post 'courses/:course_id/blueprint_templates/:template_id/migrations', action: :queue_migration
       get 'courses/:course_id/blueprint_templates/:template_id/migrations', action: :migrations_index, as: :course_blueprint_migrations
       get 'courses/:course_id/blueprint_templates/:template_id/migrations/:id', action: :migrations_show
+      get 'courses/:course_id/blueprint_templates/:template_id/migrations/:id/details', action: :migration_details
 
       put 'courses/:course_id/blueprint_templates/:template_id/restrict_item', action: :restrict_item
+    end
+
+    scope(controller: :late_policy) do
+      get 'courses/:id/late_policy', action: :show
+      post 'courses/:id/late_policy', action: :create
+      patch 'courses/:id/late_policy', action: :update
     end
   end
 

@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012 Instructure, Inc.
+/*
+ * Copyright (C) 2011 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -12,8 +12,8 @@
  * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
  * details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 define([
@@ -1018,7 +1018,8 @@ define([
       var $optgroups = {};
       $module.find(".content .context_module_item").not('.context_module_sub_header').each(function() {
         var displayType;
-        var data = $(this).getTemplateData({textValues: ['id', 'title', 'type']});
+        var data = $(this).getTemplateData({textValues: ['id', 'type']});
+        data.title = $(this).find('.title').attr('title');
         if (data.type == 'assignment') {
           displayType = I18n.t('optgroup.assignments', "Assignments");
         } else if (data.type == 'attachment') {
@@ -1177,7 +1178,8 @@ define([
       event.preventDefault();
       var $cogLink = $(this).closest('.cog-menu-container').children('.al-trigger');
       var $item = $(this).parents(".context_module_item");
-      var data = $item.getTemplateData({textValues: ['title', 'url', 'indent', 'new_tab']});
+      var data = $item.getTemplateData({textValues: ['url', 'indent', 'new_tab']});
+      data.title = $item.find('.title').attr('title');
       data.indent = modules.currentIndent($item);
       $("#edit_item_form").find(".external").showIf($item.hasClass('external_url') || $item.hasClass('context_external_tool'));
       $("#edit_item_form").attr('action', $(this).attr('href'));

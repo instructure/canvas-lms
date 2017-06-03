@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,12 +19,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ContentExport do
+  before :once do
+    course_with_teacher(:active_all => true)
+    @ce = @course.content_exports.create!
+  end
 
   context "export_object?" do
-    before :once do
-      course = Account.default.courses.create!
-      @ce = course.content_exports.create!
-    end
 
     it "should return true for everything if there are no copy options" do
       expect(@ce.export_object?(@ce)).to eq true
@@ -63,7 +63,6 @@ describe ContentExport do
 
   context "Quizzes2 Export" do
     before :once do
-      course_with_teacher(:active_all => true)
       quiz = @course.quizzes.create!(:title => 'quiz1')
       Account.default.context_external_tools.create!(
         name: 'Quizzes.Next',
@@ -134,11 +133,6 @@ describe ContentExport do
   end
 
   context "add_item_to_export" do
-    before :once do
-      course = Account.default.courses.create!
-      @ce = course.content_exports.create!
-    end
-
     it "should not add nil" do
       @ce.add_item_to_export(nil)
       expect(@ce.selected_content).to be_empty
@@ -171,9 +165,7 @@ describe ContentExport do
 
   context "notifications" do
     before :once do
-      course_with_teacher(:active_all => true)
-      @ce = @course.content_exports.create! { |ce| ce.user = @user }
-
+      @ce.update_attribute(:user_id, @user.id)
       Notification.create!(:name => 'Content Export Finished', :category => 'Migration')
       Notification.create!(:name => 'Content Export Failed', :category => 'Migration')
     end
@@ -209,6 +201,40 @@ describe ContentExport do
       @ce.workflow_state = 'failed'
       expect { @ce.save! }.to change(DelayedMessage, :count).by 0
       expect(@ce.messages_sent['Content Export Failed']).to be_blank
+    end
+  end
+
+  describe "#expired?" do
+    it "marks as expired after X days" do
+      ContentExport.where(id: @ce.id).update_all(created_at: 35.days.ago)
+      expect(@ce.reload).to be_expired
+    end
+
+    it "does not mark new exports as expired" do
+      expect(@ce.reload).not_to be_expired
+    end
+
+    it "does not mark as expired if setting is 0" do
+      Setting.set('content_exports_expire_after_days', '0')
+      ContentExport.where(id: @ce.id).update_all(created_at: 35.days.ago)
+      expect(@ce.reload).not_to be_expired
+    end
+  end
+
+  describe "#expired" do
+    it "marks as expired after X days" do
+      ContentExport.where(id: @ce.id).update_all(created_at: 35.days.ago)
+      expect(ContentExport.expired.pluck(:id)).to eq [@ce.id]
+    end
+
+    it "does not mark new exports as expired" do
+      expect(ContentExport.expired.pluck(:id)).to be_empty
+    end
+
+    it "does not mark as expired if setting is 0" do
+      Setting.set('content_exports_expire_after_days', '0')
+      ContentExport.where(id: @ce.id).update_all(created_at: 35.days.ago)
+      expect(ContentExport.expired.pluck(:id)).to be_empty
     end
   end
 end

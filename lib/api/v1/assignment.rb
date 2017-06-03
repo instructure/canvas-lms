@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2016 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -742,8 +742,8 @@ module Api::V1::Assignment
     return :forbidden unless grading_periods_allow_assignment_overrides_batch_update?(assignment, prepared_batch)
 
     assignment.transaction do
-      perform_batch_update_assignment_overrides(assignment, prepared_batch)
       assignment.save_without_broadcasting!
+      perform_batch_update_assignment_overrides(assignment, prepared_batch)
     end
 
     assignment.do_notifications!(prepared_update[:old_assignment], prepared_update[:notify_of_update])

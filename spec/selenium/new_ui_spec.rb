@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2015 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative 'common'
 require_relative 'helpers/files_common'
 
@@ -121,6 +138,7 @@ describe 'new ui' do
 
     it 'should not break equation editor css', priority: "2", test_id: 273600 do
       get "/courses/#{@course.id}/assignments/new"
+      wait_for_tiny(f('#assignment_description'))
       f('div#mceu_19.mce-widget.mce-btn').click
       wait_for_ajaximations
       expect(f('.mathquill-toolbar-panes, .mathquill-tab-bar')).to be_displayed

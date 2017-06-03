@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2013 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -30,7 +30,7 @@ describe DataFixup::PopulateSubmissionVersions do
 
   it "should not migrate a submission version already having a submission_version" do
     course_with_student
-    submission = @user.submissions.create(:assignment => @course.assignments.create!)
+    @course.assignments.create!
     expect{
       DataFixup::PopulateSubmissionVersions.run
     }.not_to change(SubmissionVersion, :count)
@@ -39,9 +39,7 @@ describe DataFixup::PopulateSubmissionVersions do
   it "should migrate all submission version rows without submission_versions" do
     n = 5
     course_with_student
-    submission = @user.submissions.build(:assignment => @course.assignments.create!)
-    submission.without_versioning{ submission.save! }
-    expect(submission.versions.exists?).to be_falsey
+    submission = @user.submissions.find_by(assignment: @course.assignments.create!)
     n.times { |x| Version.create(:versionable => submission, :yaml => submission.attributes.to_yaml) }
     expect{
       DataFixup::PopulateSubmissionVersions.run
@@ -50,12 +48,8 @@ describe DataFixup::PopulateSubmissionVersions do
 
   it "should skip submission version rows without a corresponding submission object" do
     course_with_student
-    submission = @user.submissions.build(:assignment => @course.assignments.create!)
-    submission.without_versioning{ submission.save! }
+    submission = @user.submissions.find_by(assignment: @course.assignments.create!)
     Version.create(:versionable => submission, :yaml => submission.attributes.to_yaml)
-
-    submission.reload
-    expect(submission.versions.exists?).to be_truthy
     submission.delete
 
     expect{

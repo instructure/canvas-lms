@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2017 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require 'json/jwt'
 
 module Lti
@@ -103,7 +120,7 @@ module Lti
         )
         jwt_validator.validate!
         file_host, _ = HostUrl.file_host_with_shard(@domain_root_account || Account.default, request.host_with_port)
-        aud = [request.host, request.protocol + file_host]
+        aud = [request.host, file_host]
         reg_key = code || jwt_validator.sub
         render json: {
           access_token: Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: jwt_validator.sub, reg_key: reg_key).to_s,

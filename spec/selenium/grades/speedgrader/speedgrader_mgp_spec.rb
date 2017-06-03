@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015-2016 Instructure, Inc.
+# Copyright (C) 2016 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -51,7 +51,7 @@ describe "speedgrader with grading periods" do
       Speedgrader.enter_grade(8)
 
       expect(Speedgrader.current_grade).to eq ""
-      expect(Submission.where(assignment_id: assignment.id, user_id: @student.id).first).to eq nil
+      expect(Submission.where(assignment_id: assignment.id, user_id: @student.id).first).not_to be_graded
       expect(Speedgrader.top_bar).to contain_css(Speedgrader.closed_gp_notice_selector)
     end
   end

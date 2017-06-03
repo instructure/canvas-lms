@@ -91,6 +91,7 @@ sv:
   accepted_user_role_type_course_course_2ce91589: "Accepterad: %{user}, %{role_type}, kurs, %{course}"
   access_report_80d28095: "Tillgång till rapporten"
   access_token_3be22221: Tillgångstoken
+  access_token_count_access_token_count_dfb5463c: "Åtkomst Symbolberäkning %{access_token_count}"
   access_token_is_valid_until_d2f048cf: "Tillgångstoken tillgänglig tills"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Tillgångstokens kan användas för att tillåta andra ansökare göra API-åtgärder åt dig. Du kan också generera tillgångstokens och *använda Canvas Open API* för att skapa dina egna integrationer."
   accordion_section_1_7888782d: "Rullgardinssmeny 1"
@@ -288,6 +289,7 @@ sv:
     report_header_assignment_url: "uppgiftss url"
     report_header_associated_user_id: associated_user_id
     report_header_attempt: försök
+    report_header_authentication_provider_id: authentication_provider_id
     report_header_canvas_account_id: canvas_account_id
     report_header_canvas_associated_user_id: canvas_associated_user_id
     report_header_canvas_course_id: canvas_course_id
@@ -316,6 +318,7 @@ sv:
     report_header_full_name: full_name
     report_header_group_id: group_id
     report_header_id: id
+    report_header_integration_id: integration_id
     report_header_last_access_at: "senaste tillgång"
     report_header_last_activity_at: "senaste aktivitet kl."
     report_header_last_ip: "senaste ip"
@@ -709,6 +712,31 @@ sv:
             header: "Börjar:"
     default_account_quotas_not_updated: "Förinställda kontokvoter uppdaterades inte"
     default_account_quotas_updated: "Förinställda kontokvoter uppdaterades"
+    devry: 
+      dcr2: 
+        parameters: 
+          custom_reports: 
+            start: 
+              parameters: 
+                header: "Aktivitetsdatum:"
+      dcr4: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Avslutas:"
+            start: 
+              parameters: 
+                header: "Börjar:"
+      dcr7: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Avslutas:"
+            start: 
+              parameters: 
+                header: "Börjar:"
     engagement_report_csv_parameters: 
       account_reports: 
         bryan_engagement: 
@@ -1377,6 +1405,7 @@ sv:
   add_a_comment_872470ac: "Lägg till en kommentar"
   add_a_course_b72b18d7: "Lägg till en kurs"
   add_a_custom_help_link_4328252f: "Lägg till en egen hjälplänk"
+  add_a_message_a5ed12bf: "Lägg till ett meddelande"
   add_a_new_announcement_878b717f: "Lägg till nytt meddelande"
   add_a_new_course_4a041207: "Lägg till en ny kurs"
   add_a_new_outcome_cbdbe96c: "Lägg till nytt resultat"
@@ -1572,6 +1601,8 @@ sv:
   an_error_occured_while_fetching_enrollment_terms_1b7b4ac: "Ett fel uppstod när registrerings villkoren hämtades"
   an_error_occured_while_fetching_grading_period_set_b4f12aa5: "Ett fel uppstod när uppsättningen med betygsperioden hämtades"
   an_error_occured_while_updating_the_grading_period_9e024cd1: "Ett fel uppstod när uppsättningen med betygsperioder uppdaterades"
+  an_error_occurred_changing_the_lock_state_for_file_77443f15: "Ett fel uppstod vid ändring av låsstatusen för \"%{fileName}\""
+  an_error_occurred_making_a_network_request_d1bda348: "Ett fel uppstod vid försök att göra en nätverksförfrågan"
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Ett fel uppstod*, vänligen skicka in ditt svar igen senare."
   an_error_occurred_please_try_again_later_84223241: "Ett fel inträffade. Försök igen senare."
   an_error_occurred_publishing_grades_cfdf7631: "Ett fel uppstod när betygen publicerades."
@@ -1581,9 +1612,16 @@ sv:
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "Ett fel uppstod vid förberedelse inför nedladdning, vänligen försök igen."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Ett fel uppstod när användarens rätt för %{filename} ställdes in"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "Ett fel inträffade när Turnitin kontaktades."
+  an_error_occurred_while_checking_the_migration_sta_d17035b1: "Ett fel uppstod när du kontrollerade migrationsstatusen"
+  an_error_occurred_while_loading_associations_9699b3ee: "Ett fel uppstod vid laddning av associationer"
+  an_error_occurred_while_loading_courses_11d4571e: "Ett fel uppstod vid laddning av kurser"
   an_error_occurred_while_migrating_405ac0b5: "Ett fel uppstod vid migreringen."
+  an_error_occurred_while_saving_associations_bd66f3f4: "Ett fel uppstod när du sparade associationer"
+  an_error_occurred_while_starting_migration_8e6015e2: "Ett fel uppstod när migreringen startades"
   an_error_ocurred_while_deleting_the_appointment_gr_4948bbc5: "Ett fel uppstod vid radering av mötesgruppen"
   an_error_ocurred_while_saving_the_appointment_grou_e19452cd: "Ett fel uppstod vid sparande av mötesgruppen"
+  an_existing_canvas_user_with_the_sis_id_user_id_ha_4b64d1c1: "En befintlig Canvas användare med SIS ID %{user_id} har redan begärt %{other_user_id}’s user_id inloggningsinformation, hoppa över"
+  an_existing_canvas_user_with_the_user_id_has_alrea_aabbea6e: "En existerande Canvas användare %{user_id} har redan begärt %{other_user_id}’s user_id inloggningsinformation, hoppa över"
   an_export_is_already_in_progress_54270f01: "En export pågår redan."
   an_internal_error_occurred_83b8a685: "Ett internt fel inträffade."
   an_item_named_name_already_exists_in_this_location_147b7312: "En föremål med namnet \"%{name}\" finns redan på den här platsen. Vill du ersätta den existerande filen?"
@@ -1741,6 +1779,7 @@ sv:
     wiki_front_page_default_content_group: "Välkommen till din nya grupp wiki!"
   application_id_2aa1640f: "Applikation ID"
   application_secret_e6803c7e: "Applikations hemlighet"
+  applied_cc7be774: Tillämpad
   apply_781a2546: Tillämpa
   apply_changes_b1dffc70: "Tillämpa ändringar"
   apply_theme_7af08387: " Tillämpa tema"
@@ -1789,7 +1828,9 @@ sv:
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Är du säker på att du vill ta bort det här verktyget?"
   are_you_sure_you_want_to_remove_this_user_8d1a8295: "Är du säker på att du vill ta bort den här användaren?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Är du säker på att du vill rapportera den här profilbilden?"
+  are_you_sure_you_want_to_resync_these_grades_to_th_e509cb9e: "Är du säker på att du vill återsynkronisera dessa betyg till student-informationssystemet?"
   are_you_sure_you_want_to_submit_this_comment_fbe76ba6: "Är du säker på att du vill posta den här kommentaren?"
+  are_you_sure_you_want_to_sync_these_grades_to_the__ca3c28a4: "Är du säker på att du vill synkronisera dessa betyg till student-informationssystemet? Du bör endast göra detta om alla dina betyg har slutförts."
   argentina_3257a200: Argentina
   argentina_54_375d6af4: "Argentina (+54)"
   arrange_by_34a545de: "Ordna efter"
@@ -1798,6 +1839,7 @@ sv:
   arrange_columns_by_assignment_group_59bbddd0: "Ordna kolumner efter uppgiftsgrupper"
   arrange_columns_by_due_date_888f2551: "Ordna kolumner enligt sista inlämningsdatum"
   arrange_columns_by_due_date_f74f9e2d: "Ordna kolumner enligt sista inlämningsdatum"
+  arrange_columns_by_points_48da9ba3: "Organisera kolumner efter poäng"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Medan du skriver i det här filtret kommer listan av grupper automatiskt filtreras för att endast inkludera de namn som matchar vad du skriver."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "Medan du skriver i det här fältet kommer listan med resultat automatiskt uppdateras."
   ask_your_instructor_a_question_a61ca5e9: "Ställ en fråga till din lärare"
@@ -1910,12 +1952,14 @@ sv:
         Uppgiften är nu tystad. Det betyder att studenterna inte kan se 
         sitt betyg och sin feedback. Vill du av-tysta den nu?
     unmuting_assignment: "Av-tystar uppgiften"
+  assignment_name_a_z_aeefaa36: "Namn för uppgiften - A-Ö"
   assignment_name_b2d87383: Uppgiftsnamn
   assignment_name_course_name_is_now_due_55613e9b: "%{assignment_name}, %{course_name}, ska lämnas in"
   assignment_name_course_name_no_longer_has_a_due_da_a37b6a7c: "%{assignment_name}, %{course_name}, har inte längre något inlämningsdatum"
   assignment_name_course_name_override_is_now_due_ed5ce1e: "%{assignment_name}, %{course_name} (%{override}) ska lämnas in nu"
   assignment_name_course_name_override_no_longer_has_5a94da2b: "%{assignment_name}, %{course_name} (%{override}) har inte längre något inlämningsdatum"
   assignment_name_grade_history_b506426c: "%{assignment_name} betygshistorik"
+  assignment_name_z_a_34f92f4b: "Namn för uppgiften - Ö-A"
   assignment_options_1e5b7074: Uppgiftsalternativ
   assignment_override: 
     student_count: 
@@ -2577,6 +2621,7 @@ sv:
   authorize_e3f25bb4: Godkänn
   auto_leader_7791c30a: auto_leader
   availability_dates_438d71e0: "Tillgängliga datum"
+  availability_dates_changed_exceptions_465ba375: "Tillgänglighetsdatum ändrade undantag:"
   available_8606e40c: Tillgänglig
   available_after_unlock_at_b5682224: "Tillgänglig efter %{unlock_at}"
   available_after_unlock_at_until_lock_at_499e8092: "Tillgänglig efter %{unlock_at} till %{lock_at}"
@@ -3269,6 +3314,7 @@ sv:
   canvas_error_report_ff678539: "Canvas felrapport"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_introduction_video_2d81f3ad: "Canvas introduktionsvideo"
+  canvas_multi_factor_authentication_backup_codes_4bd08f93: "Canvas multi-faktor autentiserings säkerhetskopierings koder"
   canvas_observer_id_59db0918: canvas_observer_id
   canvas_parent_description: "Den här inställningen kontrollerar om föräldrar kan koppla sig mot studenter på din institution genom att använda Canvas Parent mobilapp."
   canvas_parent_improved_description: "Denna inställning kontrollerar om föräldrar som skapar deras egna Canvas Parent konto kan ansluta till studenter på din institution med Canvas Parent mobilapp. Notera: Föräldrar som registrerats som Canvas Observer kan använda Canvas Parent mobilapp när denna funktion är flaggad som avaktiverad."
@@ -3278,6 +3324,7 @@ sv:
   canvas_ticketing_web_post_connector_11158897: "Canvas Ticketing Web Post Connector"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas omklassa alla svar efter att du har detta Quiz, det kan ta ett par minuter."
   card_movement_menu_for_title_b94c09af: "Kort förflyttningsmeny för %{title}"
+  card_view_eaf73185: kortvy
   careful_changes_to_group_membership_will_apply_to__19a9089c: "Försiktigt! Ändringar till gruppers medlemskap kommer tillämpas på grupper som redan har uppgiftsinlämningar. Det är inte säkert att Gruppuppgifts-inlämningar behålls som ett resultat. Vill du skapa en ny grupp för framtida uppgifter? "
   cas_url_4ba2843e: "CAS URL"
   catalog_already_enabled_56478a3c: "Katalogen är redan aktiverad"
@@ -3710,6 +3757,7 @@ sv:
   consumer_key_57d9fcf1: Konsumentnyckel
   consumer_key_6f94ba11: Konsumentnyckel
   content_1440204b: Innehåll
+  content_changed_exceptions_e8bff81e: "Innehållsförändrade undantag:"
   content_choice_51f4ca0f: Innehållsval
   content_exports: 
     buttons: 
@@ -4414,7 +4462,7 @@ sv:
       filter_messages_by_course: "Filtrera meddelanden efter kurser"
       filter_messages_by_type: "Filtrera meddelanden efter typ"
       forward: Vidarebefordra
-      inbox: Brevkorg
+      inbox: Inkorg
       mark_as_read: "Markera som läst"
       mark_as_unread: "Markera som oläst"
       more_options: "Fler alternativ"
@@ -4548,6 +4596,9 @@ sv:
   count_criteria_22927713: 
     one: "1 kriterium"
     other: "%{count} kriterier"
+  count_exceptions_1176c596: 
+    one: "%{count} undantag"
+    other: "%{count} undantag"
   count_files_updated_4570a8a: 
     one: "1 uppdaterad fil"
     other: "%{count} uppdaterade filer"
@@ -4578,6 +4629,7 @@ sv:
   count_points_4735a2e8: 
     one: "1 poäng"
     other: "%{count} poäng"
+  count_pushed_changes_6fe7fba: "%{count} påtryckta förändringar"
   count_quizzes_found_e5e29bb4: 
     one: "1 test hittades."
     other: "%{count} test hittades."
@@ -4607,6 +4659,7 @@ sv:
   count_submissions_need_grading_d34bae25: 
     one: "1 inlämning måste betygsättas"
     other: "%{count} inlämningar måste bedömas"
+  count_unsynched_changes_3a1249ba: "%{count} Osynkroniserade förändringar"
   country_is_required_b0afbf52: "Land krävs"
   course: 
     access_denied: "Tillgång nekad"
@@ -4895,6 +4948,7 @@ sv:
   course_setup_wizard_is_showing_a7c087c1: "Kursinställning Wizard visas."
   course_sis_7ae8f649: "kurs sis"
   course_sis_df8b379: Kurs-Sis
+  course_sis_id_sis_id_or_canvas_id_4d323f5c: "Kurs SIS ID (SIS_ID:####) ELLER Canvas ID: (###)"
   course_starts_at_3a01f9da: "Kursen börjar den"
   course_statistics: 
     unknown: okänd
@@ -5479,6 +5533,8 @@ sv:
   create_theme_based_on_40651ed3: "Skapa tema baserat på"
   create_users_view: 
     required: "Vänligen uppge några e-postadresser"
+  created_58b8a75a: Skapad
+  created_6ee36dff: "Skapad:"
   created_at_73839757: "Skapad den"
   created_by_b39b9c8b: "Skapad av"
   created_by_sis_93fbb66b: created_by_sis
@@ -5800,6 +5856,7 @@ sv:
   default_conference_title: "%{course_name} Konferens"
   default_email_9efb7fbd: "Standard e-post"
   default_grade_cannot_be_set_to_ex_723caa59: "Förinställt betyg kan inte ställas in som %{ex}"
+  default_order_8c409051: "Standard beställning"
   default_question_name: Fråga
   default_question_text: Frågetext
   default_sis_sync_for_assignments_quizzes_grade_dis_3b2b4878: "Standard SIS synkronisering för uppgifter, quiz, betygsdiskussioner"
@@ -5840,6 +5897,7 @@ sv:
   delete_this_answer_f1802eaa: "Radera det här svaret"
   delete_this_collaboration_4f20b698: "Ta bort det här samarbetet"
   delete_this_feed_67d5d924: "Ta bort det här Flödet"
+  delete_this_key_70f74aa1: "Radera den här nyckeln"
   delete_this_page_509f2baf: "Radera den här sidan"
   delete_this_question_8f955ceb: "Ta bort den här frågan"
   delete_this_section_380338: "Radera den här sektionen"
@@ -5850,6 +5908,7 @@ sv:
   delete_tool_90ca44da: "Ta bort Verktyg"
   delete_tool_app_9c9f6d35: "Radera %{tool} App?"
   delete_toolname_app_85f9d4ee: "Radera %{toolName} app"
+  deleted_1be5ed1: Raderad
   deleted_ce03674d: raderad
   deleting_6421031e: raderar...
   delicious_7f9ac66f: Utsökt
@@ -5947,6 +6006,7 @@ sv:
     cancel: Avbryt
     icon_url: "Ikon URL:"
     key_name: "Nyckelnamn:"
+    notes: "Anteckningar:"
     owner_email: "Ägarens e-post:"
     redirect_uri: "Omdirigera URI (ark):"
     redirect_uris: "Omdirigering URI:"
@@ -5962,6 +6022,7 @@ sv:
       developer_keys: Utvecklarnycklar
       key_settings: Nyckelinställningar
       name: Namn
+      notes: Anteckningar
       show_all: "Visa alla %{count} nycklar"
       stats: Statistik
       title: Utvecklarnycklar
@@ -6380,12 +6441,15 @@ sv:
   due_date_cannot_fall_in_a_closed_grading_period_e4336124: "Inlämningsdatum kan inte infalla i en stängd betygsperiod"
   due_date_falls_in_a_closed_grading_period_e447ff2f: "Inlämningsdatum infaller i en stängd betygsperiod"
   due_date_field_for_styleguide_a88e02d6: "Inlämningsdatum -fält för stilguide"
+  due_date_newest_to_oldest_35cffef9: "Slutdatum - nyaste till äldsta"
+  due_date_oldest_to_newest_73e62815: "Slutdatum - äldsta till nyaste"
   due_date_set_1c6364db: "Inlämningsdatum inställd"
   due_dates: 
     due_at: "färdig: %{assignment_due_date_time}"
     multiple_due_dates: "färdig: flera sista dagar"
     no_due_date: "färdig: Ingen sista dag"
   due_dates_520a6c08: Förfallodatum
+  due_dates_changed_exceptions_ddb028: "Slutdatum förändrade undantag:"
   due_datetime_f5a81b81: "Slutdatum: %{dateTime}"
   due_dueat_39d7d6c2: "Slutdatum %{dueAt}"
   due_dueat_ef67f6f4: "Slutdatum: %{dueAt}"
@@ -6567,6 +6631,7 @@ sv:
   enable_multiple_grading_periods: |-
       Flera betygsperioder tillåter lärare och administratörer att skapa betygsperioder med
       avbrytande datum. Uppgifter kan filtreras efter dessa betygsperioderna i betygsboken.
+  enable_new_gradebook_history_page_e0fd9d02: "Aktivera ny sida för betygshistorik"
   enable_new_sis_integration_settings_ab6780a4: "Aktivera nya SIS integreringsinställningar"
   enable_or_condition_for_modules_a16f02d8: "Aktivera \"ELLER\" skick för moduler"
   enable_reregistration_for_lti_2_b2a10444: "Aktivera omregistrering för LTI 2"
@@ -7234,6 +7299,7 @@ sv:
   field_name_31fff38e: Fältnamn
   file_a_ticket_for_a_personal_response_from_our_sup_1e1ffaff: "Skicka en biljett för ett personligt svar från vårt support-team."
   file_attachment_8e7dbfd1: "Bifogad fil"
+  file_c851020d: Fil
   file_content_a99b5c6b: Filinnehåll
   file_filename_could_not_be_included_in_the_epub_do_4bf71a87: "Filen %{filename} kunder inte inkluderas i ePub dokumentet. Vänligen se separata zip-filer för tillgång."
   file_list_350d08df: Fil-lista
@@ -7282,6 +7348,13 @@ sv:
     unpublished_status: Avpublicerad
   file_upload_submission_740711f: Fil-uppladdningsinlämning
   filename_has_been_published_with_the_following_usa_fbd8b39f: "%{filename} har publicerats med följande nyttjanderätt: %{usage_right}"
+  filename_is_hidden_available_with_a_link_click_to__3e328e8f: "%{fileName} är dold. Tillgängliga med en länk - klicka för att modifiera"
+  filename_is_locked_click_to_modify_bf711763: "%{fileName}  är låst - klicka för att modifiera"
+  filename_is_published_click_to_modify_38a4a269: "%{fileName} är publicerad - klicka för att modifiera"
+  filename_is_restricted_9aaf9250: "%{fileName} är %{restricted}"
+  filename_is_restricted_click_to_modify_c0bb77f8: "%{fileName} är %{restricted} - klicka för att modifiera"
+  filename_is_unlocked_click_to_modify_99e847be: "%{fileName}  Är låst - klicka för att modifiera"
+  filename_is_unpublished_click_to_modify_7e731102: "%{fileName} Är opublicerad - klicka för att modifiera"
   filename_progress_percent_uploaded_1f465e66: "%{fileName} - %{progress} procent som laddats upp"
   filename_uploaded_successfully_edd8e825: "%{fileName} laddades upp!"
   files: 
@@ -7477,6 +7550,7 @@ sv:
   grade_export_title: "Export av betyg"
   grade_high_to_low_1cea0381: "Betyg - Högt till lågt"
   grade_history_9c51ad49: Betygshistorik...
+  grade_history_ccc09fde: Betygshistorik
   grade_info_19fb9875: Betygsinformation
   grade_low_to_high_1678b713: "Betyg - Lågt till högt"
   grade_summary: 
@@ -7488,6 +7562,7 @@ sv:
       alignment_count_summary: "*8* av *%{count}* grupperingar"
     ? "yes"
     : ja
+  grade_syncing_e78475e8: "Betygs synkronisering"
   gradebook: 
     alerts: 
       no_active_students: "Ursäkta, antingen finns det inga aktiva studenter i kursen eller så är inga graderbara för dig."
@@ -7755,6 +7830,7 @@ sv:
     grades_filename: Betyg
   gradebook_export_failed_reason_2b0f6c53: "Betygsbok export misslyckades: %{reason}"
   gradebook_export_started_723461b9: "Betygsbok export påbörjades"
+  gradebook_history_a3e8e0b4: Betygshistorik
   gradebook_individual_view_8846598e: "betygsbok: Individuell vy"
   gradebook_performance_764d8b3d: "Betygsboks prestanda"
   gradebook_settings_b45c6df9: "Betygboks inställningar"
@@ -8785,6 +8861,7 @@ sv:
     text_entry_submission: Textinmatnings-inlämning
   id_ac7afadf: id
   id_already_in_use_for_this_account_and_authenticat_dc3a7d65: "ID används redan för detta kontot och verifieringsleverantören"
+  id_id_4e148481: "ID: %{id}"
   idp_entity_id_25c51837: "IdP Företags ID"
   idp_metadata_uri_dae5314a: "IdP Metadata URI"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Om ett attribut är markerat som endast tillfälligt, kommer det endast att användas som tillfällig inloggning när en ny användare skapas, och kommer inte att hållas uppdaterat varje gång en användare loggar in."
@@ -8847,6 +8924,7 @@ sv:
       ett 3:1 förhållande, text-till-bakgrund proportion för att göra 
       er text läsbar. Testa dina kontrast proportioner enkelt med 
       **WebAIM Color Contrast Checker***.
+  imported_from_posttosisname_f7cc9258: "Importerad från %{postToSISName}"
   imported_from_sis_3006b19c: "Importerades från SIS"
   importers/assignment_importer: 
     errors: 
@@ -8885,7 +8963,7 @@ sv:
   inactivate_user_35f6d9d7: "Inaktiv användare"
   inactive_cd40317f: inaktiv
   inactive_enrollments_3b84be3d: "Inaktiva inskrivningar"
-  inbox_bb245a60: Brevkorg
+  inbox_bb245a60: Inkorg
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "Inkludera en länk till en skärmdump och använd dig av något som *Jing*."
   include_deleted_enrollments_1c87684a: "Inkludera raderade registreringar"
   include_deleted_objects_3cced3b5: "Inkludera raderade föremål;"
@@ -8895,6 +8973,7 @@ sv:
       Inkludera poäng vid larm om betyg
       Om din e-post inte är en e-post från institutionen betyder det att känsligt innehåll skickas utanför institutionen.
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Inkludera betyget på den här uppgiften när du postar till din skolas studentinformationssystem"
+  include_this_assignment_s_grades_when_syncing_to_y_55bfa487: "Inkludera betyg av denna uppgift när du synkroniserar med skolans student-informationssystem"
   include_unpublished_assignments_83ebbaec: "Inkludera opublicerade uppgifter"
   include_unpublished_courses_7a0e7aab: "Inkludera avpublicerade kurser"
   incomplete_da3c2ea2: Ofärdig
@@ -9016,6 +9095,7 @@ sv:
   invalid_points_possible: "Värdet för möjliga poäng på den här uppgiften måste vara noll eller högre."
   invalid_recipient_name_56b22b86: "Ogiltig mottagarnamn"
   invalid_restrictions_316cd740: "Ogiltiga begränsningar"
+  invalid_sis_sync_status_b68db497: "ogiltig SIS synkroniserings status"
   invalid_state_parameter_7a5aa108: "Ogiltiga tillstånds-parametrar"
   invalid_url_in_xml: "Ogiltig url i xml. Et-tecknet måste undvikas."
   invalid_username_or_password_b60aa240: "Ogiltigt användarnamn eller lösenord"
@@ -9128,6 +9208,7 @@ sv:
       bara för vissa stiländringar, men fler K-12 saker kan läggas till i framtiden.
   k_2521301c: k
   keep_submissions_anonymous_5cbaf419: "Håll inlämningarna anonyma"
+  key_api_key_68bf80ae: "Nyckel: *%{api_key}*"
   keyboard_instructions_e032939f: tangentbordsinstruktioner
   keyboard_nav_dialog: 
     esc_key_notification: "Tryck på escape-knappen innan du använder snabbkommandon i betygboken."
@@ -9147,9 +9228,11 @@ sv:
   last_name_303122f3: Efternamn
   last_post_display_last_reply_at_b9896355: "Senaste inlägg %{display_last_reply_at}"
   last_pushed_update_last_export_at_9f634f7c: "Senaste påtvingade uppdatering: %{last_export_at}"
+  last_used_f9457313: "Senast använd:"
   last_user_access_title: "Senaste Användarinloggning"
   late_2be42b88: Sen
   late_percent_b91d01b3: "Sen: %{percent}"
+  late_policies_42bac80: "Senaste policys"
   latest_assessment_a85280ef: "Senaste utvärdering"
   latest_f604a75: Senaste
   latest_score_905aa87b: "Senaste poäng"
@@ -9166,7 +9249,7 @@ sv:
     fixed_bottom: 
       masquerading: 
         stop: "Stoppa maskering"
-        warning_title: "Du maskerar dig just nu som %{user_name}"
+        warning_title: "Du är för närvarande maskerad som %{user_name}"
       student_view: 
         leave: "Lämna Studentvyn"
         reset: "Återställ student"
@@ -9334,6 +9417,7 @@ sv:
       feedback: "Klicka här för att berätta för oss vad som hände."
     show_me_where: "Visa mig var"
   links_14b70841: Länkar
+  list_view_430aecce: "List vy"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "Live evenemangs prenumerationstjänsten är inte konfigurerad"
   load_bank: 
     error_loading_banks: "Fel banker laddades"
@@ -9356,6 +9440,8 @@ sv:
   loading_data_ecd89ba: "Laddar data.."
   loading_mastery_paths_c558a766: "Laddar Mastery Paths..."
   loading_more_results_def6df65: "Ladda fler resultat.."
+  loading_sync_history_9f342cbf: "Laddar synkroniseringshistorik"
+  loading_unsynched_changes_688434f2: "Laddar osynkroniserade förändringar"
   locales: 
     sv: Svenska
   location_e17bd402: Plats
@@ -9446,11 +9532,12 @@ sv:
           verify: Verifiera
         details: 
           mfa_enrollment: |-
-              En flerstegs-verifiering ökar säkerheten genom att kräva en materiell sak från dig,
-              utöver ditt lösenord för att logga in på Canvas. Det kan t.ex vara en apparat som genererar
-              verifieringskoder, eller en telefon som kan ta emot textmeddelanden. The Google Authenticator appen för [iPhone](%{iphone_url}) eller
-              [Android](%{android_url}) kan användas genom att scanna QR-koden nedanför. Andra tokens kan konfigureras genom att uppge
-              den hemliga nyckeln **%{secret_key}**.
+              Multifaktorautentisering ökar säkerheten genom att kräva att du har något i din fysiska besittning,
+              utöver att veta ditt lösenord, för att logga in på Canvas. Detta kan vara en enhet som kan generera
+              verifieringskoder, eller en telefon som kan ta emot textmeddelanden Google Authenticator-appen för [iPhone](%{iphone_url}) eller
+              [Android](%{android_url}) Kan konfigureras genom att skanna QR-koden nedan. Andra tokens kan konfigureras genom att ange den
+              hemliga nyckeln **%{secret_key}**. När du har konfigurerat multi-faktor autentisering rekommenderas att du går till din
+              profilsida och skriver ut en uppsättning säkerhetskoder, om din normala multi-faktor enhet är otillgänglig.
           mfa_required: "Det krävs att du använder en flerstegs-verifiering"
           otp_on_device: "Vänligen uppge verifieringskoden som din token visar."
           otp_sent_to_phone: "En verifieringskod har skickats till din telefon. Vänligen uppge den här."
@@ -9553,7 +9640,7 @@ sv:
   mark_done_9d81bcd9: "Markering färdig "
   marked_done_8f61ebb8: "markerad som färdig"
   marked_done_9fd646f: "Markering är färdig"
-  masquerade_as_name_8bb004c5: "Maskera som %{name}"
+  masquerade_as_name_8bb004c5: "Maskerad som %{name}"
   masquerade_fdbc9594: Maskering
   master_courses_2aaa4841: Huvudkurser
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "Måluppfyllelse: %{n_mastery_points_precision_2_str} Poäng"
@@ -9576,6 +9663,7 @@ sv:
       miscellaneous: Misc
       operators: Operatörer
       relationships: Relationer
+  max_membership_bd0ddc68: max_membership
   max_users_groups_per_appointment_867c505b: "Max användare/grupper per bokat möte"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Maximalt antal bokade möten en deltagare kan delta i"
   media_comment_e494a952: Mediakommentar
@@ -9652,6 +9740,7 @@ sv:
     recipients: "Mottagare:"
   message_students_who_369b8488: "Meddela studenter som..."
   message_students_who_57f07a41: "Meddela stunder som"
+  message_text_5f692459: Meddelandetext
   message_this_student_6d14043d: "Meddela den här studenten"
   message_will_be_sent_to_all_the_teachers_and_teach_1b8d17c1: "Meddelandet kommer skickas till alla lärare och lärarassistenter i kursen."
   messageableuser_library_767eed20: "MessageableUser bibliotek"
@@ -11653,6 +11742,7 @@ sv:
   move_to_the_beginning_636b342c: "Flytta till början"
   move_to_the_end_bc05abf6: "Flytta till slutet"
   moving_a4d552df: Flyttar...
+  multi_factor_authentication_backup_codes_4d781044: "Multi-faktor autentiserings säkerhetskopierings koder"
   multi_factor_authentication_configured_865b1bde: "Flerstegs-verifiering konfigurerad"
   multiple_ba5220cd: Flera
   multiple_canvas_accounts_are_associated_with_cleve_c1739660: "Flera Canvas konton är associerade med Clever District %{district_id}"
@@ -11766,6 +11856,7 @@ sv:
   new_export_3ab758: "Ny export"
   new_file_135ae520: "[Ny fil]"
   new_file_added_for_name_a5ec3156: "En ny fil har lagts till %{name}"
+  new_gradebook_history_b4367fc7: "Ny betygboks historik"
   new_group_category_66be9cbd: "Ny gruppkategori"
   new_group_set_7241a581: "Ny gruppuppsättning"
   new_module_4e9287e4: "Ny modul"
@@ -11854,6 +11945,8 @@ sv:
   not_starred_no_subject_click_to_star_dc91380: "Ej stjärnmärkt \"(No Subject)\", klicka för att stjärnmarkera."
   not_starred_subject_click_to_star_4ea6eb64: "Ej stjärnmärkt \"%{subject}\", klicka för att stjärnmarkera."
   not_submitted_7d05fdb4: "Inte inskickad"
+  not_synced_529cbf29: "Ej synkroniserad"
+  not_synced_message_a343fe5e: "Ej synkroniserad: %{message}"
   not_yet_completed_345a0bca: "Inte färdig än"
   note_8b73ce09: Anteckning
   note_for_differentiated_group_topics_some_threads__90adbb21: "Observera: vissa ämnen har inte några studenter tilldelade vid differentierade gruppämnen. "
@@ -11869,6 +11962,7 @@ sv:
   note_this_is_not_your_official_score_f2d4582f: "*OBS*: Detta är INTE din officiella poäng."
   note_this_login_s_account_uses_delegated_authentic_89227914: "Observera: Inloggningens konto använder delegerad verifiering, men tillåter  nödlösningsverifiering av Canvaslösenord. Lösenordsfälten i det här formuläret uppdaterar nödlösning för Canvaslösenordet, *inte* den delegerade verifieringen. "
   notes_c42e0fd5: Anteckningar
+  notes_d5339f17: "%{notes}"
   notes_for_name_2eefac11: "Anteckningar för %{name}"
   nothing_to_split_off_of_this_user_28ba9dd5: "Inget att knoppa av från den här användaren"
   notice_concluded_student_6d416c4: "Meddelande: färdig student"
@@ -12437,6 +12531,7 @@ sv:
   own_copyright_cc59db55: Upphovsrättshavande
   package_error: "Fel vid identifiering av pakettyp: %{error}"
   package_export_from_d6e2b073: "Paket exporterades från"
+  page_50c4823d: Sida
   page_comment: 
     default_user_name: Anonym
   page_comments: 
@@ -12519,6 +12614,8 @@ sv:
     errors: 
       delete_reminder_failed: "Radering misslyckades"
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "Granskningar kan inte aktiveras för modererade uppgifter"
+  pending_3e506a5b: Väntar
+  pending_message_2d9a8796: "Väntar: %{message}"
   people_b4ebb13c: Personer
   people_options_cfb419a6: Personalternativ
   people_tutorial_tray_a87a6c48: "Människor handledning"
@@ -12629,6 +12726,7 @@ sv:
         annotations_supported: "Annontering stödjs"
         api_key: API-nyckel
         base_url: "Bas URL"
+        hijack_crocodoc_sessions: "Hijack Crocodoc Sessions"
     canvas_webhooks: 
       description: "Beteendemönster för webbsida plugin för Canvas"
       name: "Canvas beteendemönster för webbsida"
@@ -12858,6 +12956,7 @@ sv:
         aws_region: "AWS region"
         aws_secret_access_key: "AWS hemlig tillgångsnyckel"
         kinesis_stream_name: "Kinesis Ström Namn"
+        use_consul: "Konfigurera med konsul istället för den här sidan"
     lockdown_browser: 
       labels: 
         download_url: "LockDown Webb-läsare ladda ner URL"
@@ -13005,6 +13104,9 @@ sv:
         username: Användarnamn
   points_bb475533: Poäng
   points_bceb5005: poäng
+  points_changed_exceptions_b0c771f7: "Poäng förändrade undantag:"
+  points_highest_to_lowest_87f1b143: "Poäng - högsta till lägsta"
+  points_lowest_to_highest_45089e82: "Poäng - lägsta till högsta"
   points_n_e0b20623: "Poäng %{n}"
   points_out_of_total_24f61148: "*%{points}* av **%{total}**"
   points_points_b6b422e2: "Poäng: %{points}"
@@ -13254,6 +13356,7 @@ sv:
         google_drive: "Google Drive"
         linkedin: LinkedIn
         more_options: "fler alternativ"
+        otp_backup_codes: "Multi-faktor autentiserings säkerhetskopierings koder"
         reconfigure_mfa: "Omkunfigurerar flerstegs-verifiering"
         skype: Skype
         twitter: Twitter
@@ -14932,7 +15035,7 @@ sv:
   read_comments_3fcc7590: "Läs kommentarer"
   ready_to_enroll_panel_46f45abb: "Redo att registrera fält"
   recaptcha_not_configured_3a6ef9ee: "Recaptcha har inte konfigurerats"
-  recent_activity_51239235: "Nylig aktivitet"
+  recent_activity_51239235: "Senaste aktivitet"
   recent_announcements_8becc59c: "Senaste meddelanden"
   recent_student: 
     last_logged_in: "senaste inloggning %{last_login}"
@@ -14958,6 +15061,7 @@ sv:
   red_8258edf3: Röd
   reference_code_3e8355dd: Referenskod
   reference_code_is_required_c32c757f: "Referenskod krävs"
+  regenerate_3e4679f8: Regenerera
   regenerate_epub_395c8e56: "Omgenerera ePub"
   region_47e29025: "Region:"
   region_939f2a6c: Region
@@ -15041,6 +15145,7 @@ sv:
   reply_to_current_message_55391f5b: "Svara på nuvarande meddelande"
   reply_to_main_discussion_29823888: "Svara på huvuddiskussionen"
   reply_to_topic_12412b0f: "Svara på ämnet"
+  report_has_been_aborted_2b5763ed: "Rapporten har avbrutits"
   reported_3de7086a: Rapporterad
   require_an_access_code_600e06e8: "Kräver en tillgångskod"
   require_assignment_due_date_778b200d: "Kräv uppgifter om slutdatum"
@@ -15090,6 +15195,7 @@ sv:
   resubmitted_since_last_graded_8484d285: "Inlämnad igen sedan den senaste betygssättningen"
   resume_quiz_afeceb87: "Fortsätt quiz"
   resume_survey_58dce775: "Fortsätt undersökning"
+  resync_grades_to_sis_d4dcfe12: "Omsynkronisering betyg till SIS"
   retrieve_timeout: "kunde inte hämta konfiguration, serverns responstid tog slut"
   retry_ebd5f8ba: "Testa igen"
   revert_to_actual_score_f665eea9: "Återgå till den verkliga poängen"
@@ -15438,6 +15544,10 @@ sv:
         ag_group_name: Uppgiftsgrupp
         ag_group_percent_grade: "% av betyg"
         ag_letter_grade: Bokstavsbetyg
+      assignment_subtotals: 
+        ag_group_grade: Betyg
+        ag_group_percent_grade: "% av betyg"
+        ag_letter_grade: Bokstavsbetyg
       details: 
         hidden: dold
         secondary_id: "Sekundärt ID:"
@@ -15692,6 +15802,7 @@ sv:
   send_e3bd0ed0: Skicka
   send_message_6ccc90e8: "Skicka meddelande"
   send_message_to_name_c8ac05fc: "Skicka meddelande till %{name}"
+  send_notification_81773687: "Skicka avisering"
   send_only_to_the_following_types_of_users_d8465c11: "Skicka enbart till följande typer av användare:"
   send_this_announcement_to_unenrolled_users_4ea549d7: |-
       Skicka det här meddelandet till icke-inregistrerade 
@@ -16132,7 +16243,7 @@ sv:
     recent_activity: 
       date_column: Datum
       message_column: Meddelande
-      recent_activity: "Nylig aktivitet"
+      recent_activity: "Senaste aktivitet"
       recent_activity_in_course: "Senaste aktiviteten i %{course_or_group}"
       unread_column: Oläst
       unread_count_badge: 
@@ -16473,6 +16584,7 @@ sv:
   show_dashboard_card_view_41ebd6c6: "Visa översikts-korts-vy"
   show_dashcard_view_76078ecb: "Visa dashcard vy"
   show_deleted_replies_a2e0a36f: "Visa borttagna svar"
+  show_exceptions_270ea1c5: "Visa undantag"
   show_final_grade_a95e14dc: "Visa slutbetyg"
   show_groups_navigation_menu_1521d38d: "Visa grupp-navigeringsmeny"
   show_inactive_enrollments_8f4c4824: "Visa inaktiva registreringar"
@@ -16500,6 +16612,7 @@ sv:
   simple_tls_45df2648: "Enkel TLS"
   singapore_65_b4927585: "Singapore (+65)"
   singapore_a145e422: Singapore
+  sis_2164965: SIS
   sis_agent_token_authentication_2a0b29e3: "SIS Agent Token verifiering"
   sis_batch: 
     diff_filename: "sis_upload_diffed_%{id}.zip"
@@ -16614,6 +16727,7 @@ sv:
   something_went_wrong_please_try_again_6d337b6c: "Nägot fick fel, vänligen försök igen."
   something_went_wrong_re_activating_the_user_please_82c3e7a: "Något gick fel när användaren återaktiverades. Vänligen försök igen senare."
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "Något gick fel när användarens roll uppdaterades. Vänligen försök igen senare."
+  something_went_wrong_when_trying_to_sync_grades_to_592c4c35: "Något gick fel när du försökte synkronisera betyg till student-informationssystemet. Försök igen senare."
   something_went_wrong_while_deactivating_the_user_p_8ff3e261: "Något gick fel när användaren avaktiverades. Försök igen senare."
   sort_40afa70: "Sortera:"
   sort_by_72dbba9c: "Sortera efter"
@@ -16836,6 +16950,7 @@ sv:
     go_to_submission_url: "Gå till inlämnings URL"
     no_submission: "Ingen inlämning"
     submitted_files: "Inlämnade filer:"
+  submission_details_1d2e8a78: Inlämningsuppgifter...
   submission_details_dialog: 
     add_a_comment: "Lägg till en kommentar"
     comments: Kommentarer
@@ -16853,6 +16968,7 @@ sv:
     update_grade: "Uppdatera betyg"
     view_rubric_assessment_in_the_speedgrader: "Visa matris utvärdering i SpeedGrader"
   submission_in_another_grading_period_e754b329: "Inläming i annan betygsperiod"
+  submission_options_5184a65b: Inlämningsalternativ
   submissions: 
     assignment_submit_success: "Uppgiften har lämnats in."
     assignment_submitted: "Uppgiften inlämnad."
@@ -17011,13 +17127,24 @@ sv:
   syllabus_tutorial_tray_97e8ef82: "Syllabus handledning"
   syllabus_visibility_options_a81ef419: "Syllabus synliga alternativ"
   sync_68e5c167: Synkronisera
+  sync_grades_a16622ca: "Synkronisera betyg"
+  sync_grades_to_sis_4e7fbc08: "Synkronisera betyg till SIS"
+  sync_grades_to_sis_checkbox_is_enabled_by_default__fad7a785: "”Synkronisa betyg till SIS” är aktiverat som standard för uppgifter, betygsdiskussioner och frågesporter"
+  sync_grades_to_sis_fd01f7fd: "Synkronisera betyg till SIS"
+  sync_history_3d46eb19: Synkroniseringshistorik
   sync_in_progress_12ff1d3c: "Synkronisering pågår"
   sync_to_name_6f04716d: "Synkronisera till %{name}"
   sync_to_name_disabled_click_to_toggle_53a1396f: "Synkronisera till %{name} avlägsnad. Klicka för att toogle"
   sync_to_name_enabled_click_to_toggle_ddaef134: "Synkronisera till %{name} aktiverad. Klicka för att toogle"
   sync_to_posttosisname_9837a8bf: "Synkronisera till %{postToSISName}:"
   sync_to_posttosisname_dffd5c9: "Synkronisera till %{postToSISName}"
+  sync_to_sisname_f343e59: "Synkronisera till %{sisName}"
+  synced_97764882: Synkroniserad
+  synced_message_20469c8f: "Synkroniserad: %{message}"
   syncing_3061cc8d: Synkroniserar...
+  syncing_e67b8a9f: Synkroniserar
+  syncing_grades_to_sis_d63112e0: "Synkroniserar betyg till SIS..."
+  syncing_message_416fdc58: "Synkroniserar: %{message}"
   system_default_language_28a1052d: "Systeminställning (%{language})"
   tab_1_3d6b3fb: "Flik 1"
   tab_1_content_8944c219: "Flik 1 innehåll"
@@ -17069,6 +17196,7 @@ sv:
   templates_4ca13d07: Mallar
   tenant_d2a41f78: Användare
   term_41f37cae: termin
+  term_42976f1c: "Termin:"
   term_created_27d27c2b: "Termin skapades"
   term_e1c1d390: Termin
   term_id_2e802ed1: Term-Id
@@ -17230,6 +17358,7 @@ sv:
   there_are_no_available_signups_for_this_course_26b05c56: "Det finns inte tillgängliga registreringar för denna kurs."
   there_are_no_configured_ltis_that_interact_with_co_8c780ce6: "Det finns inga konfigurerade LTI:er som interagerar med samarbeten"
   there_are_no_unsaved_changes_9276e87c: "Det finns inga osparade ändringar"
+  there_are_no_unsynched_changes_d208547c: "Det finns inga osynkade ändringar"
   there_was_a_failure_logging_out_at_your_idp_30070527: "Ett fel inträffade när du loggades ut på din IdP"
   there_was_a_problem_creating_the_teacher_notes_col_dd73456f: "Det uppstod ett problem med att skapa kolumnen för lärarkommentarer."
   there_was_a_problem_deleting_the_grading_period_50ce07c5: "Ett problem uppstod när betygsperioden raderades"
@@ -17258,6 +17387,7 @@ sv:
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "Ett fel uppstod med ditt ärende, vänligen försök att söka efter något annat"
   there_were_errors_with_the_form_errors_ab5b559a: "Där fanns fel i formuläret: %{errors}"
   there_were_several_possible_matches_with_the_impor_ad58bcd0: "Det fanns flera möjliga matchningar i importen. Vänligen lös dem nedan."
+  these_backup_codes_can_be_used_if_your_multi_facto_ca30a3df: "Dessa säkerhetskoder kan användas om din multi-faktor autentiseringsenhet är otillgänglig. Vänligen skriv ut dem och förvara dem på en säker plats, till exempel i din plånbok."
   these_credentials_are_for_academic_benchmark_api_v_324baaa4: "Dessa identiteter är för Academic Benchmark API v3. Om partner nyckeln lämnas tom kommer användaren tvingas använda Academic Benchmark API v1."
   these_credentials_are_for_academic_benchmark_api_v_952718b1: "Dessa identiteter är för Academic Benchmark API v1, och kommer förringas i framtida utgåvor."
   these_grading_periods_were_created_for_you_by_an_a_e977c2b5: "Betygspreioderna skapades åt dig av en administratör."
@@ -17289,6 +17419,7 @@ sv:
   this_field_is_required_fa58c4a: "Det här fältet är nödvändigt"
   this_field_name_is_required_988caebc: "Det här fältet \"%{name}\" krävs"
   this_field_name_is_required_b9196401: "Fältet \"namn\" krävs."
+  this_file_16b24f02: "den här filen"
   this_file_9443cda1: "Denna filen"
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "Den här filen måste ha usage_rights inställda innan den kan publiceras."
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Mappen är för tillfället låst och inte möjlig att visa."
@@ -17373,7 +17504,7 @@ sv:
       long: "%d %B %Y %H:%M"
       short: "%d %b %H:%M"
       tiny: "%k:%M"
-      tiny_on_the_hour: "%-k:%M"
+      tiny_on_the_hour: "%k:%M"
     less_than_a_minute_ago: "mindre än en minut sen"
     pm: pm
     ranges: 
@@ -17708,6 +17839,8 @@ sv:
   unknown_content_type_ae6d08e8: "Okänd innehållstyp"
   unknown_question_bank: "Okänd frågebank"
   unknown_quiz: "Okänd quiz"
+  unknown_status_status_35331e1d: "Okänd status, %{status}"
+  unknown_status_status_message_3a4ed4d5: "Okänd status, %{status}: %{message}"
   unknown_user_url_82196ba7: "Okänd användar-URL"
   unlock_562bc4cb: "Lås upp"
   unlock_at_bb930b34: "Lås upp kl."
@@ -17745,6 +17878,9 @@ sv:
   unselected_course_course_89995a83: "Ej valda kurser %{course}"
   unstarted_932f2990: "Ej startad"
   unsupported_package: "Innehållspaket som inte kan hanteras"
+  unsyncable_4bf11ee6: "Ej synkroniseringsbar"
+  unsyncable_message_95faa75d: "Ej synkroniseringsbar %{message}"
+  unsynched_changes_867a1790: "Osynkroniserade förändringar"
   until_4a1f8cda: Tills
   until_8bdea3de: tills
   until_date_949017c4: "Tills %{date}"
@@ -17761,6 +17897,7 @@ sv:
   update_details_6abfed16: "Uppdatera detaljer"
   update_link_b7cab181: "Uppdatera länk"
   update_tool_7d48ef2a: "Uppdatera %{tool}"
+  updated_2c1e8615: Uppdaterad
   updated_current_grade_to_be_empty_c2ce1d13: "Uppdaterat nuvarande betyg är tomt "
   updated_current_grade_to_currentgrade_bfe2ea14: "Uppdatera nuvarande betyg till %{currentGrade}"
   updated_group_group_name_727b1d98: "Uppdaterade gruppen %{group_name}"
@@ -17790,6 +17927,7 @@ sv:
   upload_successful_ca47465f: "Laddades upp"
   upper_limit_of_range_c454a8f2: "Räckviddens övre gräns"
   upper_lower_56cad16c: "%{upper} - %{lower}"
+  uri_redirect_uri_d4aad2b9: "URI: %{redirect_uri}"
   url_cc9398ca: "URL:"
   url_is_required_4689ed84: "URL krävs"
   url_submission_f76327e3: URL-inlämning
@@ -18133,11 +18271,10 @@ sv:
       are_you_sure_start: "Är du säker på att du vill maskeras som den här användaren?"
       are_you_sure_stop: "Är du säker på att du vill stoppa maskering?"
       details: |-
-          Maskering betyder att du utan lösenord loggar in som en användare.
-          Du kommer kunna ta åtgärder som om du vore användaren, och från andra användares sätt att se,
-          precis som om användaren gjorde det. Däremot kommer historiks-loggen spara att
-          **du** var den som faktiskt utförde åtgärderna i användarens namn.
-      masquerade_as: "Maskera som %{user_name}"
+          Maskering loggar i huvudsak in som den här användaren utan lösenord.
+          Du kommer att kunna vidta åtgärder som om du var den här användaren, och från andra användares synpunkter framstår det som om den här användaren utförde dem. Men granskningsloggar registrerar det faktum att det var
+          **du** som utförde åtgärderna å den andre användarens vägnar.
+      masquerade_as: "Maskerad som %{user_name}"
       page_title_header: "Maskerad som användare"
     merge_results: 
       action: Åtgärd
@@ -18573,6 +18710,9 @@ sv:
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "Du är inloggad på %{institution1} och använder dina inloggningsuppgifter från %{institution2}"
   you_are_not_enrolled_in_any_courses_a5c63286: "Du är inte registrerad i några kurser."
   you_are_not_subscribed_to_this_topic_click_to_subs_38ce1f37: "Du prenumererar inte på det här ämnet. Klicka för att prenumerera."
+  you_are_ready_to_sync_count_assignments_525eb8b1: 
+    one: "Du är redo att synkronisera 1 uppgift."
+    other: "Du är redo att synkronisera %{count} uppgifter."
   you_are_subscribed_and_will_be_notified_of_new_com_60b5b62b: "Du prenumererar och kommer bli meddelad om nya kommentarer. Klicka för att avsluta prenumeration"
   you_are_subscribed_to_this_topic_click_to_unsubscr_d6c09364: "Du prenumererar på det här ämnet. Klicka för att avbryta prenumerationen."
   you_are_the_group_leader_for_this_group_b8629b70: "du är gruppledaren i den här gruppen"
@@ -18621,6 +18761,7 @@ sv:
   you_have_no_ltis_configured_to_create_collaboratio_5cad28dd: "Du har inga LTI:er konfigurerade att skapa samarbeten med. Prata med dina lärare för att ställa in några."
   you_have_no_outcomes_click_here_to_create_one_ebf262a3: "Du har inga lärandemål. *Klicka här* för att skapa ett."
   you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "Du har inga lärandemål. Klicka här för att gå till resutlatssidan."
+  you_have_reached_the_limit_of_len_characters_in_th_babea8fe: "Du har nått gränsen för %{len} tecknen i aviseringsmeddelandet"
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "Du har nått det högsta antalet beteedendemönster för webbsida för varje konto (%{max})"
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "Du har nått det högsta antalet beteedendemönster för webbsida per användare (%{max})"
   you_have_submitted_the_assignment_7ef8a51a: "Du har lämnat in uppgiften"

@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2014 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import I18n from 'i18n!external_tools'
 import $ from 'jquery'
 import React from 'react'
@@ -26,14 +44,17 @@ export default React.createClass({
     getInitialState() {
       var _state = this.defaultState();
       if (this.props.tool) {
-        _state.name          = this.props.tool.name;
-        _state.consumerKey   = this.props.tool.consumer_key;
-        _state.sharedSecret  = this.props.tool.shared_secret;
-        _state.url           = this.props.tool.url;
-        _state.domain        = this.props.tool.domain;
+        _state.name = this.props.tool.name;
+        _state.consumerKey = this.props.tool.consumer_key;
+        _state.sharedSecret = this.props.tool.shared_secret;
+        _state.url = this.props.tool.url;
+        _state.domain = this.props.tool.domain;
         _state.privacy_level = this.props.tool.privacy_level;
-        _state.customFields  = this.props.tool.custom_fields;
-        _state.description   = this.props.tool.description;
+        _state.customFields = this.props.tool.custom_fields;
+        _state.description = this.props.tool.description;
+        _state.configUrl = this.props.tool.config_url;
+        _state.xml = this.props.tool.xml;
+        _state.registrationUrl = this.props.tool.registration_url;
       }
 
       return _state;
@@ -98,7 +119,20 @@ export default React.createClass({
       }
 
       if (form.isValid()) {
+        const strip = (obj) => {
+          const newObj = {};
+
+          for (const prop in obj) {
+            if (obj[prop]) {
+              newObj[prop] = obj[prop].trim();
+            } else {
+              newObj[prop] = obj[prop];
+            }
+          }
+          return newObj;
+        };
         var formData = form.getFormData();
+        formData = strip(formData);
         this.props.handleSubmit(this.state.configurationType, formData);
       } else {
         $('.ReactModal__Overlay').animate({ scrollTop: 0 }, 'slow');

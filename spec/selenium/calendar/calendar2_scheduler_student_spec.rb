@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2012 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/calendar2_common')
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/scheduler_common')
@@ -9,13 +26,17 @@ describe "scheduler" do
 
   context "as a student" do
 
-    before(:each) do
+    before(:once) do
       Account.default.tap do |a|
         a.settings[:show_scheduler]   = true
         a.settings[:agenda_view]      = true
         a.save!
       end
-      course_with_student_logged_in
+      course_with_student(:active_all => true)
+    end
+
+    before(:each) do
+      user_session(@student)
       make_full_screen
     end
 
@@ -191,28 +212,14 @@ describe "scheduler" do
     end
 
     context "when un-reserving appointments" do
-      # Today at 8am
-      let(:now) { Time.zone.now.beginning_of_day + 8.hours }
-
-      around :each do |example|
-        Timecop.freeze(now, &example)
-      end
-
-      before do
+      before :once do
         create_appointment_group(
           max_appointments_per_participant: 1,
           new_appointments: [
-            [
-              now.strftime("%Y-%m-%d 12:00:00"), # noon
-              now.strftime("%Y-%m-%d 13:00:00") # 1pm
-            ]
+            [ 30.minutes.from_now, 1.hour.from_now ]
           ]
         )
-        get "/calendar2"
-        click_scheduler_link
-        click_appointment_link
-
-        reserve_appointment_manual(0)
+        AppointmentGroup.last.appointments.first.reserve_for(@student, @teacher)
       end
 
       it "should let me do so from the month view", priority: "1", test_id: 140200 do
@@ -251,6 +258,10 @@ describe "scheduler" do
       end
 
       it "should let me do so from the scheduler", priority: "1", test_id: 502485 do
+        get "/calendar2"
+        click_scheduler_link
+        click_appointment_link
+
         f('.agenda-event__item .agenda-event__item-container').click
         f('.unreserve_event_link').click
         f('#delete_event_dialog~.ui-dialog-buttonpane .btn-primary').click
@@ -259,6 +270,21 @@ describe "scheduler" do
 
         expect(f('.agenda-event__item .agenda-event__item-container')).to include_text "Available"
       end
+    end
+
+    it "does not allow unreserving past appointments" do
+      create_appointment_group(
+        max_appointments_per_participant: 1,
+        new_appointments: [
+          [ 1.hour.ago, 30.minutes.ago ]
+        ]
+      )
+      AppointmentGroup.last.appointments.first.reserve_for(@student, @teacher)
+
+      load_month_view
+
+      f('.fc-event.scheduler-event').click
+      expect(f('.event-details')).not_to contain_css('.unreserve_event_link')
     end
   end
 end

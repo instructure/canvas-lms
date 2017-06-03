@@ -1345,7 +1345,7 @@ describe DiscussionTopicsController, type: :request do
       @topic.save
 
       student_in_course(:active_all => true)
-      expect(@user.submissions).to be_empty
+      expect(@user.submissions.not_placeholder).to be_empty
 
       json = api_call(
         :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
@@ -1354,8 +1354,8 @@ describe DiscussionTopicsController, type: :request do
         {:message => @message})
 
       @user.reload
-      expect(@user.submissions.size).to eq 1
-      expect(@user.submissions.first.submission_type).to eq 'discussion_topic'
+      expect(@user.submissions.not_placeholder.size).to eq 1
+      expect(@user.submissions.not_placeholder.first.submission_type).to eq 'discussion_topic'
     end
 
     it "should create a submission from a reply on a graded topic" do
@@ -1365,7 +1365,7 @@ describe DiscussionTopicsController, type: :request do
       @topic.save
 
       student_in_course(:active_all => true)
-      expect(@user.submissions).to be_empty
+      expect(@user.submissions.not_placeholder).to be_empty
 
       json = api_call(
         :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{top_entry.id}/replies.json",
@@ -1374,8 +1374,8 @@ describe DiscussionTopicsController, type: :request do
         {:message => @message})
 
       @user.reload
-      expect(@user.submissions.size).to eq 1
-      expect(@user.submissions.first.submission_type).to eq 'discussion_topic'
+      expect(@user.submissions.not_placeholder.size).to eq 1
+      expect(@user.submissions.not_placeholder.first.submission_type).to eq 'discussion_topic'
     end
   end
 
@@ -2425,14 +2425,21 @@ describe DiscussionTopicsController, type: :request do
         # make everything slightly in the past to test updating
         DiscussionEntry.update_all(:updated_at => 5.minutes.ago)
         @reply1 = @root1.reply_from(:user => @teacher, :html => "<a href='#{link}'>locallink</a>")
+        attachment = create_attachment(@course)
+        @reply1.attachment = attachment
+        @reply1.save!
       end
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/view",
         {:controller => "discussion_topics_api", :action => "view", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s}, {:include_new_entries => '1'})
 
-      message = json['new_entries'].first['message']
+      new_entry = json['new_entries'].first
+      message = new_entry['message']
       expect(message).to_not include("placeholder.invalid")
       expect(message).to include("www.example.com#{link}")
+      att_url = new_entry['attachments'].first['url']
+      expect(att_url).to_not include("placeholder.invalid")
+      expect(att_url).to include("www.example.com")
     end
   end
 

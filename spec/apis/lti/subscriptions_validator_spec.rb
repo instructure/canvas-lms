@@ -6,10 +6,10 @@ module Lti
 
     let(:subscription) do
       {
-        RootAccountId: account.id,
+        RootAccountUUID: account.uuid,
         EventTypes:["submission_created"],
-        ContextType: "account",
-        ContextId: account.id,
+        ContextType: "root_account",
+        ContextId: account.uuid,
         Format: "live-event",
         TransportType: "sqs",
         TransportMetadata: { Url: "http://sqs.docker"},
@@ -27,7 +27,7 @@ module Lti
             product_family: product_family,
             product_version: '1',
             workflow_state: 'active',
-            raw_data: {'enabled_capability' => ['vnd.Canvas.webhooks.root_account.all']},
+            raw_data: {'enabled_capability' => ['vnd.instructure.webhooks.root_account.all']},
             lti_version: '1'
           )
         end
@@ -41,10 +41,10 @@ module Lti
       context "QUIZ_SUBMITTED" do
         let(:subscription) do
           {
-            RootAccountId: account.id,
+            RootAccountUUID: account.uuid,
             EventTypes:["quiz_submitted"],
-            ContextType: "account",
-            ContextId: account.id,
+            ContextType: "root_account",
+            ContextId: account.uuid,
             Format: "live-event",
             TransportType: "sqs",
             TransportMetadata: { Url: "http://sqs.docker"},
@@ -69,19 +69,13 @@ module Lti
           expect { validator.check_required_capabilities! }.not_to raise_error
         end
 
-        it 'allows subscription if vnd.instructure.webhooks.course.quiz_submitted enabled' do
-          tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.course.quiz_submitted)
-          validator = SubscriptionsValidator.new(subscription, tool_proxy)
-          expect { validator.check_required_capabilities! }.not_to raise_error
-        end
-
         it 'allows subscription if vnd.instructure.webhooks.assignment.quiz_submitted enabled' do
           tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.quiz_submitted)
           validator = SubscriptionsValidator.new(subscription, tool_proxy)
           expect { validator.check_required_capabilities! }.not_to raise_error
         end
 
-        it 'raises MissingCapability if missing capaiblities' do
+        it 'raises MissingCapability if missing capabilities' do
           tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.assignment_submitted)
           validator = SubscriptionsValidator.new(subscription, tool_proxy)
           expect { validator.check_required_capabilities! }.to raise_error SubscriptionsValidator::MissingCapability
@@ -91,10 +85,10 @@ module Lti
       context "ASSIGNMENT_SUBMITTED" do
         let(:subscription) do
           {
-            RootAccountId: account.id,
+            RootAccountUUID: account.uuid,
             EventTypes:["assignment_submitted"],
-            ContextType: "account",
-            ContextId: account.id,
+            ContextType: "root_account",
+            ContextId: account.uuid,
             Format: "live-event",
             TransportType: "sqs",
             TransportMetadata: { Url: "http://sqs.docker"},
@@ -119,19 +113,13 @@ module Lti
           expect { validator.check_required_capabilities! }.not_to raise_error
         end
 
-        it 'allows subscription if vnd.instructure.webhooks.course.assignment_submitted enabled' do
-          tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.course.assignment_submitted)
-          validator = SubscriptionsValidator.new(subscription, tool_proxy)
-          expect { validator.check_required_capabilities! }.not_to raise_error
-        end
-
         it 'allows subscription if vnd.instructure.webhooks.assignment.assignment_submitted enabled' do
           tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.assignment_submitted)
           validator = SubscriptionsValidator.new(subscription, tool_proxy)
           expect { validator.check_required_capabilities! }.not_to raise_error
         end
 
-        it 'raises MissingCapability if missing capaiblities' do
+        it 'raises MissingCapability if missing capabilities' do
           tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.quiz_submitted)
           validator = SubscriptionsValidator.new(subscription, tool_proxy)
           expect { validator.check_required_capabilities! }.to raise_error SubscriptionsValidator::MissingCapability
@@ -141,10 +129,10 @@ module Lti
       context "GRADE_CHANGED" do
         let(:subscription) do
           {
-            RootAccountId: account.id,
+            RootAccountUUID: account.uuid,
             EventTypes:["grade_changed"],
-            ContextType: "account",
-            ContextId: account.id,
+            ContextType: "root_account",
+            ContextId: account.uuid,
             Format: "live-event",
             TransportType: "sqs",
             TransportMetadata: { Url: "http://sqs.docker"},
@@ -169,13 +157,7 @@ module Lti
           expect { validator.check_required_capabilities! }.not_to raise_error
         end
 
-        it 'allows subscription if vnd.instructure.webhooks.course.grade_changed' do
-          tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.course.grade_changed)
-          validator = SubscriptionsValidator.new(subscription, tool_proxy)
-          expect { validator.check_required_capabilities! }.not_to raise_error
-        end
-
-        it 'raises MissingCapability if missing capaiblities' do
+        it 'raises MissingCapability if missing capabilities' do
           tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.quiz_submitted)
           validator = SubscriptionsValidator.new(subscription, tool_proxy)
           expect { validator.check_required_capabilities! }.to raise_error SubscriptionsValidator::MissingCapability
@@ -185,10 +167,10 @@ module Lti
       context "ATTACHMENT_CREATED" do
         let(:subscription) do
           {
-            RootAccountId: account.id,
+            RootAccountUUID: account.uuid,
             EventTypes:["attachment_created"],
-            ContextType: "account",
-            ContextId: account.id,
+            ContextType: "root_account",
+            ContextId: account.uuid,
             Format: "live-event",
             TransportType: "sqs",
             TransportMetadata: { Url: "http://sqs.docker"},
@@ -219,7 +201,7 @@ module Lti
           expect { validator.check_required_capabilities! }.not_to raise_error
         end
 
-        it 'raises MissingCapability if missing capaiblities' do
+        it 'raises MissingCapability if missing capabilities' do
           tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.quiz_submitted)
           validator = SubscriptionsValidator.new(subscription, tool_proxy)
           expect { validator.check_required_capabilities! }.to raise_error SubscriptionsValidator::MissingCapability
@@ -229,10 +211,10 @@ module Lti
       context "SUBMISSION_CREATED" do
         let(:subscription) do
           {
-            RootAccountId: account.id,
+            RootAccountUUID: account.uuid,
             EventTypes:["submission_created"],
-            ContextType: "account",
-            ContextId: account.id,
+            ContextType: "root_account",
+            ContextId: account.uuid,
             Format: "live-event",
             TransportType: "sqs",
             TransportMetadata: { Url: "http://sqs.docker"},
@@ -263,7 +245,7 @@ module Lti
           expect { validator.check_required_capabilities! }.not_to raise_error
         end
 
-        it 'raises MissingCapability if missing capaiblities' do
+        it 'raises MissingCapability if missing capabilities' do
           tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.quiz_submitted)
           validator = SubscriptionsValidator.new(subscription, tool_proxy)
           expect { validator.check_required_capabilities! }.to raise_error SubscriptionsValidator::MissingCapability
@@ -273,10 +255,10 @@ module Lti
       context "SUBMISSION_UPDATED" do
         let(:subscription) do
           {
-            RootAccountId: account.id,
+            RootAccountUUID: account.uuid,
             EventTypes:["submission_updated"],
-            ContextType: "account",
-            ContextId: account.id,
+            ContextType: "root_account",
+            ContextId: account.uuid,
             Format: "live-event",
             TransportType: "sqs",
             TransportMetadata: { Url: "http://sqs.docker"},
@@ -307,7 +289,7 @@ module Lti
           expect { validator.check_required_capabilities! }.not_to raise_error
         end
 
-        it 'raises MissingCapability if missing capaiblities' do
+        it 'raises MissingCapability if missing capabilities' do
           tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.quiz_submitted)
           validator = SubscriptionsValidator.new(subscription, tool_proxy)
           expect { validator.check_required_capabilities! }.to raise_error SubscriptionsValidator::MissingCapability
@@ -317,10 +299,10 @@ module Lti
       context "PLAGIARISM_RESUBMIT" do
         let(:subscription) do
           {
-            RootAccountId: account.id,
+            RootAccountUUID: account.uuid,
             EventTypes:["plagiarism_resubmit"],
-            ContextType: "account",
-            ContextId: account.id,
+            ContextType: "root_account",
+            ContextId: account.uuid,
             Format: "live-event",
             TransportType: "sqs",
             TransportMetadata: { Url: "http://sqs.docker"},
@@ -351,7 +333,7 @@ module Lti
           expect { validator.check_required_capabilities! }.not_to raise_error
         end
 
-        it 'raises MissingCapability if missing capaiblities' do
+        it 'raises MissingCapability if missing capabilities' do
           tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.quiz_submitted)
           validator = SubscriptionsValidator.new(subscription, tool_proxy)
           expect { validator.check_required_capabilities! }.to raise_error SubscriptionsValidator::MissingCapability
@@ -362,10 +344,10 @@ module Lti
     describe "#check_tool_context!" do
       let(:subscription) do
         {
-          RootAccountId: account.id,
+          RootAccountUUID: account.uuid,
           EventTypes:["grade_changed"],
-          ContextType: "account",
-          ContextId: account.id,
+          ContextType: "root_account",
+          ContextId: account.uuid,
           Format: "live-event",
           TransportType: "sqs",
           TransportMetadata: { Url: "http://sqs.docker"},
@@ -380,7 +362,7 @@ module Lti
           product_family: product_family,
           product_version: '1',
           workflow_state: 'active',
-          raw_data: {'enabled_capability' => ['vnd.Canvas.webhooks.root_account.all']},
+          raw_data: {'enabled_capability' => ['vnd.instructure.webhooks.root_account.all']},
           lti_version: '1'
         )
       end
@@ -403,12 +385,12 @@ module Lti
 
       it "raises ToolNotInContext if ToolProxy::active_in_context? returns false" do
         a = Account.create!
-        subscription[:ContextId] = a.id
+        subscription[:ContextId] = a.uuid
         expect { validator.check_tool_context! }.to raise_error(SubscriptionsValidator::ToolNotInContext)
       end
 
       it "raises InvalidContextType if a non-whilelisted context is requested" do
-        subscription[:ContextType] = 'User'
+        subscription[:ContextType] = 'user'
         subscription[:ContextId] = '2'
         expect { validator.check_tool_context! }.to raise_error(SubscriptionsValidator::InvalidContextType)
       end

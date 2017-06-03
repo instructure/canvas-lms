@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -230,11 +230,26 @@ module AccountReports::ReportHelper
 
   def generate_and_run_report(headers = nil, extention = 'csv')
     file = AccountReports.generate_file(@account_report, extention)
-    CSV.open(file, "w") do |csv|
+    ExtendedCSV.open(file, "w") do |csv|
+      csv.instance_variable_set(:@account_report, @account_report)
       csv << headers unless headers.nil?
       Shackles.activate(:slave) { yield csv }
     end
     file
+  end
+
+  class ExtendedCSV < CSV
+    def <<(row)
+      if @lineno % 1000 == 0
+        report = self.instance_variable_get(:@account_report).reload
+        if report.workflow_state == 'deleted'
+          report.workflow_state = 'aborted'
+          report.save!
+          raise 'aborted'
+        end
+      end
+      super(row)
+    end
   end
 
   def read_csv_in_chunks(filename, chunk_size = 1000)
@@ -257,6 +272,7 @@ module AccountReports::ReportHelper
     else
       @account_report.parameters["extra_text"] = text
     end
+    @account_report.save!
   end
 
 end

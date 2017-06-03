@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2015 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe 'Global Navigation' do
@@ -38,6 +55,29 @@ describe 'Global Navigation' do
         wait_for_ajaximations
         links = ff('.ic-NavMenu__link-list li')
         expect(links.count).to eql 2
+      end
+    end
+
+    describe 'Groups Link' do
+      it 'filters concluded groups and loads additional pages if necessary' do
+        Setting.set('api_per_page', 2)
+
+        student = user_factory
+        2.times do |x|
+          course = course_with_student(:user => student, :active_all => true).course
+          group_with_user(:user => student, :group_context => course, :name => "A Old Group #{x}")
+          course.complete!
+        end
+
+        course = course_with_student(:user => student, :active_all => true).course
+        group_with_user(:user => student, :group_context => course, :name => "Z Current Group")
+
+        user_session(student)
+        get "/"
+        f('#global_nav_groups_link').click
+        wait_for_ajaximations
+        links = ff('.ic-NavMenu__link-list li')
+        expect(links.map(&:text)).to eq(['Z Current Group', 'All Groups'])
       end
     end
 

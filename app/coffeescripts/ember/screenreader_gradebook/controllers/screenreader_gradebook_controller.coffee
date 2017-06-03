@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 - 2017 Instructure, Inc.
+# Copyright (C) 2013 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -353,6 +353,10 @@ define [
         id != userId
       set(assignment, 'assignment_visibility', filteredVisibilities)
 
+    subtotalByGradingPeriod: ->
+      selectedPeriodID = @get('selectedGradingPeriod.id')
+      selectedPeriodID and selectedPeriodID == '0' and @periodsAreWeighted()
+
     calculate: (student) ->
       submissions = @submissionsForStudent(student)
       assignmentGroups = @assignmentGroupsHash()
@@ -380,6 +384,12 @@ define [
         studentPeriodInfo = @get('effectiveDueDates').get(submission.assignment_id)?[submission.user_id]
         studentPeriodInfo and studentPeriodInfo.grading_period_id == selectedPeriodID
 
+    calculateSingleGrade: (student, key, gradeFinalOrCurrent) ->
+      set(student, key, gradeFinalOrCurrent)
+      if gradeFinalOrCurrent?.submissions
+        for submissionData in gradeFinalOrCurrent.submissions
+          set(submissionData.submission, 'drop', submissionData.drop)
+
     calculateStudentGrade: (student) ->
       if student.isLoaded
         grades = @calculate(student)
@@ -390,10 +400,13 @@ define [
 
         finalOrCurrent = if @get('includeUngradedAssignments') then 'final' else 'current'
 
-        for assignmentGroupId, grade of grades.assignmentGroups
-          set(student, "assignment_group_#{assignmentGroupId}", grade[finalOrCurrent])
-          for submissionData in grade[finalOrCurrent].submissions
-            set(submissionData.submission, 'drop', submissionData.drop)
+        if @subtotalByGradingPeriod()
+          for gradingPeriodId, grade of grades.gradingPeriods
+            @calculateSingleGrade(student, "grading_period_#{gradingPeriodId}", grade[finalOrCurrent])
+        else
+          for assignmentGroupId, grade of grades.assignmentGroups
+            @calculateSingleGrade(student, "assignment_group_#{assignmentGroupId}", grade[finalOrCurrent])
+
         grades = grades[finalOrCurrent]
 
         percent = round (grades.score / grades.possible * 100), 2
@@ -406,7 +419,7 @@ define [
       @get('students').forEach (student) => @calculateStudentGrade student
     ).observes(
       'includeUngradedAssignments','groupsAreWeighted', 'assignment_groups.@each.group_weight',
-      'effectiveDueDates.isLoaded'
+      'effectiveDueDates.isLoaded', 'selectedGradingPeriod', 'gradingPeriods.@each.weight'
     )
 
     sectionSelectDefaultLabel: I18n.t "all_sections", "All Sections"
@@ -417,6 +430,8 @@ define [
     submissionStateMap: null
 
     assignment_groups: []
+    assignment_subtotals: []
+    subtotal_by_period: false
 
     fetchAssignmentGroups: (->
       params = { exclude_response_fields: ['in_closed_grading_period'] }
@@ -428,6 +443,36 @@ define [
       Ember.run.once =>
         fetchAllPages(get(window, 'ENV.GRADEBOOK_OPTIONS.assignment_groups_url'), records: @get('assignment_groups'), data: params)
     ).observes('selectedGradingPeriod').on('init')
+
+    pushAssignmentGroups: (subtotals) ->
+      @set('subtotal_by_period', false)
+      weighted = @get('groupsAreWeighted')
+      for group in @get('assignment_groups')
+        subtotal =
+          name: group.name
+          key: "assignment_group_#{group.id}"
+          weight: weighted && group.group_weight
+        subtotals.push(subtotal)
+
+    pushGradingPeriods: (subtotals) ->
+      @set('subtotal_by_period', true)
+      weighted = @periodsAreWeighted()
+      for period in @get('gradingPeriods')
+        if period.id > 0
+          subtotal =
+            name: period.title
+            key: "grading_period_#{period.id}"
+            weight: weighted && period.weight
+          subtotals.push(subtotal)
+
+    assignmentSubtotals: (->
+      subtotals = []
+      if @subtotalByGradingPeriod()
+        @pushGradingPeriods(subtotals)
+      else
+        @pushAssignmentGroups(subtotals)
+      @set('assignment_subtotals', subtotals)
+    ).observes('assignment_groups', 'gradingPeriods', 'selectedGradingPeriod', 'students.@each', 'selectedStudent').on('init')
 
     students: studentsUniqByEnrollments('enrollments')
 
@@ -524,6 +569,9 @@ define [
     groupsAreWeighted: (->
       @get("weightingScheme") == "percent"
     ).property("weightingScheme")
+
+    periodsAreWeighted: ->
+      !!@getGradingPeriodSet()?.weighted
 
     gradesAreWeighted: (->
       @get('groupsAreWeighted') or !!@getGradingPeriodSet()?.weighted

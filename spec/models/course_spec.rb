@@ -1,4 +1,5 @@
-# Copyright (C) 2011 - 2015 Instructure, Inc.
+#
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -1515,6 +1516,7 @@ describe Course, "gradebook_to_csv" do
     @course.reload
     @course.root_account.stubs(:trust_exists?).returns(true)
     @course.root_account.any_instantiation.stubs(:trusted_account_ids).returns([account2.id])
+    allow(@user2.pseudonyms.first.any_instantiation).to receive(:works_for_account?).and_return(true)
     HostUrl.expects(:context_host).with(@course.root_account).returns('school1')
     HostUrl.expects(:context_host).with(account2).returns('school2')
 
@@ -2157,37 +2159,39 @@ describe Course, 'grade_publishing' do
 
     context 'grade_publishing_status_translation' do
       it 'should work with nil statuses and messages' do
-        expect(@course.grade_publishing_status_translation(nil, nil)).to eq "Unpublished"
-        expect(@course.grade_publishing_status_translation(nil, "hi")).to eq "Unpublished: hi"
-        expect(@course.grade_publishing_status_translation("published", nil)).to eq "Published"
-        expect(@course.grade_publishing_status_translation("published", "hi")).to eq "Published: hi"
+        expect(@course.grade_publishing_status_translation(nil, nil)).to eq "Not Synced"
+        expect(@course.grade_publishing_status_translation(nil, "hi")).to eq "Not Synced: hi"
+        expect(@course.grade_publishing_status_translation("published", nil)).to eq "Synced"
+        expect(@course.grade_publishing_status_translation("published", "hi")).to eq "Synced: hi"
       end
 
       it 'should work with invalid statuses' do
-        expect(@course.grade_publishing_status_translation("invalid_status", nil)).to eq "Unknown status, invalid_status"
-        expect(@course.grade_publishing_status_translation("invalid_status", "what what")).to eq "Unknown status, invalid_status: what what"
+        expect(@course.grade_publishing_status_translation("bad_status", nil)).to eq "Unknown status, bad_status"
+        expect(@course.grade_publishing_status_translation("bad_status", "what what")).to eq(
+          "Unknown status, bad_status: what what"
+        )
       end
 
       it "should work with empty string statuses and messages" do
-        expect(@course.grade_publishing_status_translation("", "")).to eq "Unpublished"
-        expect(@course.grade_publishing_status_translation("", "hi")).to eq "Unpublished: hi"
-        expect(@course.grade_publishing_status_translation("published", "")).to eq "Published"
-        expect(@course.grade_publishing_status_translation("published", "hi")).to eq "Published: hi"
+        expect(@course.grade_publishing_status_translation("", "")).to eq "Not Synced"
+        expect(@course.grade_publishing_status_translation("", "hi")).to eq "Not Synced: hi"
+        expect(@course.grade_publishing_status_translation("published", "")).to eq "Synced"
+        expect(@course.grade_publishing_status_translation("published", "hi")).to eq "Synced: hi"
       end
 
       it 'should work with all known statuses' do
         expect(@course.grade_publishing_status_translation("error", nil)).to eq "Error"
         expect(@course.grade_publishing_status_translation("error", "hi")).to eq "Error: hi"
-        expect(@course.grade_publishing_status_translation("unpublished", nil)).to eq "Unpublished"
-        expect(@course.grade_publishing_status_translation("unpublished", "hi")).to eq "Unpublished: hi"
+        expect(@course.grade_publishing_status_translation("unpublished", nil)).to eq "Not Synced"
+        expect(@course.grade_publishing_status_translation("unpublished", "hi")).to eq "Not Synced: hi"
         expect(@course.grade_publishing_status_translation("pending", nil)).to eq "Pending"
         expect(@course.grade_publishing_status_translation("pending", "hi")).to eq "Pending: hi"
-        expect(@course.grade_publishing_status_translation("publishing", nil)).to eq "Publishing"
-        expect(@course.grade_publishing_status_translation("publishing", "hi")).to eq "Publishing: hi"
-        expect(@course.grade_publishing_status_translation("published", nil)).to eq "Published"
-        expect(@course.grade_publishing_status_translation("published", "hi")).to eq "Published: hi"
-        expect(@course.grade_publishing_status_translation("unpublishable", nil)).to eq "Unpublishable"
-        expect(@course.grade_publishing_status_translation("unpublishable", "hi")).to eq "Unpublishable: hi"
+        expect(@course.grade_publishing_status_translation("publishing", nil)).to eq "Syncing"
+        expect(@course.grade_publishing_status_translation("publishing", "hi")).to eq "Syncing: hi"
+        expect(@course.grade_publishing_status_translation("published", nil)).to eq "Synced"
+        expect(@course.grade_publishing_status_translation("published", "hi")).to eq "Synced: hi"
+        expect(@course.grade_publishing_status_translation("unpublishable", nil)).to eq "Unsyncable"
+        expect(@course.grade_publishing_status_translation("unpublishable", "hi")).to eq "Unsyncable: hi"
       end
     end
 
@@ -2243,24 +2247,24 @@ describe Course, 'grade_publishing' do
         messages, overall_status = @course.grade_publishing_statuses
         expect(overall_status).to eq "error"
         expect(messages.count).to eq 5
-        expect(messages["Unpublished"].sort_by(&:id)).to eq [
-            @student_enrollments[7],
-            @student_enrollments[8]
-          ].sort_by(&:id)
-        expect(messages["Published"]).to eq [
-            @student_enrollments[0]
-          ]
+        expect(messages["Not Synced"].sort_by(&:id)).to eq [
+          @student_enrollments[7],
+          @student_enrollments[8]
+        ].sort_by(&:id)
+        expect(messages["Synced"]).to eq [
+          @student_enrollments[0]
+        ]
         expect(messages["Error: cause of this reason"]).to eq [
-            @student_enrollments[1]
-          ]
+          @student_enrollments[1]
+        ]
         expect(messages["Error: cause of that reason"]).to eq [
-            @student_enrollments[3]
-          ]
-        expect(messages["Unpublishable"].sort_by(&:id)).to eq [
-            @student_enrollments[2],
-            @student_enrollments[4],
-            @student_enrollments[5]
-          ].sort_by(&:id)
+          @student_enrollments[3]
+        ]
+        expect(messages["Unsyncable"].sort_by(&:id)).to eq [
+          @student_enrollments[2],
+          @student_enrollments[4],
+          @student_enrollments[5]
+        ].sort_by(&:id)
       end
 
       it 'should correctly figure out the overall status with no enrollments' do

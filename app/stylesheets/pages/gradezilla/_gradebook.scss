@@ -1,20 +1,20 @@
-//
-// Copyright (C) 2014 - 2017 Instructure, Inc.
-//
-// This file is part of Canvas.
-//
-// Canvas is free software: you can redistribute it and/or modify it under
-// the terms of the GNU Affero General Public License as published by the Free
-// Software Foundation, version 3 of the License.
-//
-// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-// details.
-//
-// You should have received a copy of the GNU Affero General Public License along
-// with this program. If not, see <http://www.gnu.org/licenses/>.
-//
+/*
+ * Copyright (C) 2014 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 $gradebook_letter-grade-font: lighten($ic-color-dark, 8%);
 
@@ -440,71 +440,6 @@ $gradebook_cell_padding_top: 8px;
   }
 }
 
-.gradebook-cell-comment {
-  position: absolute;
-  top: -1px;
-  right: -1px;
-  height: 12px;
-  width: 12px;
-  visibility: hidden;
-  //needs to be above "normal but below tooltips"
-  z-index: 2;
-  overflow: hidden;
-
-  @if $use_high_contrast {
-    background: url("/images/gradebook-comments-sprite3-high-contrast.png") no-repeat 100% 0;
-    @media (min--moz-device-pixel-ratio: 1.5),
-    (-o-min-device-pixel-ratio: 3/2),
-    (-webkit-min-device-pixel-ratio: 1.5),
-    (min-device-pixel-ratio: 1.5),
-    (min-resolution: 1.5dppx) {
-      background-image: url("/images/gradebook-comments-sprite3-high-contrast@2x.png");
-      background-size: 17px 105px;
-    }
-  }
-
-  @else {
-    background: url("/images/gradebook-comments-sprite3.png") no-repeat 100% 0;
-    @media (min--moz-device-pixel-ratio: 1.5),
-    (-o-min-device-pixel-ratio: 3/2),
-    (-webkit-min-device-pixel-ratio: 1.5),
-    (min-device-pixel-ratio: 1.5),
-    (min-resolution: 1.5dppx) {
-      background-image: url("/images/gradebook-comments-sprite3@2x.png");
-      background-size: 17px 105px;
-    }
-  }
-
-
-  #gradebook_grid.editable &:hover,
-  #gradebook_grid.editable &:focus {
-    visibility: visible;
-    background-position: 100% -88px !important;
-    width: 17px;
-    height: 17px;
-  }
-  .slick-cell.with-comments & {
-    visibility: visible;
-  }
-  #gradebook_grid.editable .slick-cell.focus &,
-  #gradebook_grid.editable .slick-cell.hover &,
-  #gradebook_grid.editable .slick-cell.active & {
-    visibility: visible;
-    background-position: 100% -41px;
-    width: 25px;
-    height: 25px;
-  }
-
-  .slick-cell.cannot_edit & {
-    display: none;
-  }
-}
-
-.gradebook-cell-comment-label {
-  @include hide-text;
-  display: inline-block;
-}
-
 .gradebook-cell-editable {
   height: $cell_height - 1px -8px;
   padding-top: 8px;
@@ -599,6 +534,27 @@ $gradebook_checkbox_size: 16px;
   top: 50%;
   margin-top: -($gradebook_checkbox_size / 2) - ( $gradebook_cell_padding_top / 2 );
   margin-left: -$gradebook_checkbox_size / 2;
+}
+
+.Grid__AssignmentRowCell {
+  display: flex;
+  flex-direction: row;
+  height: $cell_height;
+  line-height: $cell_height;
+}
+
+.Grid__AssignmentRowCell__Notifications {
+  flex-grow: 0;
+  width: $cell_height;
+}
+
+.Grid__AssignmentRowCell__Content {
+  flex-grow: 1;
+}
+
+.Grid__AssignmentRowCell__Options {
+  flex-grow: 0;
+  width: $cell_height;
 }
 
 #hide_warning {

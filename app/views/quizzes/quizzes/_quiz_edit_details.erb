@@ -1,18 +1,53 @@
+<%
+# Copyright (C) 2016 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<%
+content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_content") &&
+                    !!js_env.dig(:MASTER_COURSE_DATA, "restricted_by_master_course") &&
+                      js_env.dig(:MASTER_COURSE_DATA, "master_course_restrictions", :content)
+%>
 <div id="options_tab">
   <%= form_tag context_url(@context, :context_quiz_url, @quiz.id), {:method => :put, :id => "quiz_options_form", :class => 'form-horizontal bootstrap-form'} do %>
     <div style="position: relative;">
       <div class="title">
-        <label for="quiz_title" class="screenreader-only"><%= t('Quiz Title') %></label>
-        <%= text_field :quiz, :title, :placeholder => "Quiz Title", :maxlength => "254" %>
+        <% if content_is_locked %>
+          <h1 id="quiz_title" class="title"><%= @quiz.title.html_safe %></h1>
+          <input type="hidden" name="quiz[title]" value="<%=@quiz.title%>"/>
+        <% else %>
+          <label for="quiz_title" class="screenreader-only"><%= t('Quiz Title') %></label>
+          <%= text_field :quiz, :title, :placeholder => "Quiz Title", :maxlength => "254" %>
+        <% end %>
       </div>
 
       <div style="margin: 15px 0 25px;">
-        <%= before_label(:quiz_instructions, "Quiz Instructions") %>
-        <div style="float: right; font-size: 0.8em; cursor: pointer;">
-          <a href="#" class="toggle_description_views_link"><%= t "HTML Editor" %></a>
-          <a href="#" class="toggle_description_views_link" style="display:none;"><%= t "Rich Content Editor" %></a>
-        </div>
-        <textarea id="quiz_description" style="display: block;width: 100%;margin: 0px auto;height: 125px"><%= @quiz.description %></textarea>
+        <% if content_is_locked %>
+          <div id="quiz_description" class="quiz_description">
+            <%= @quiz.description.html_safe %>
+          </div>
+          <input type="hidden" name="description" value="<%=@quiz.description%>"/>
+        <% else %>
+          <%= before_label(:quiz_instructions, "Quiz Instructions") %>
+          <div style="float: right; font-size: 0.8em; cursor: pointer;">
+            <a href="#" class="toggle_description_views_link"><%= t "HTML Editor" %></a>
+            <a href="#" class="toggle_description_views_link" style="display:none;"><%= t "Rich Content Editor" %></a>
+          </div>
+          <textarea id="quiz_description" style="display: block;width: 100%;margin: 0px auto;height: 125px"><%= @quiz.description %></textarea>
+        <% end %>
       </div>
 
       <fieldset>

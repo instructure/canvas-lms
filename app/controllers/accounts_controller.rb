@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -1007,7 +1007,7 @@ class AccountsController < ApplicationController
       end
     end
 
-    teachers = TeacherEnrollment.for_courses_with_user_name(courses_to_fetch_users_for).admin.active
+    teachers = TeacherEnrollment.for_courses_with_user_name(courses_to_fetch_users_for).admin.where.not(:enrollments => {:workflow_state => %w{rejected deleted}})
     course_to_student_counts = StudentEnrollment.student_in_claimed_or_available.where(:course_id => courses_to_fetch_users_for).group(:course_id).distinct.count(:user_id)
     courses_to_teachers = teachers.inject({}) do |result, teacher|
       result[teacher.course_id] ||= []

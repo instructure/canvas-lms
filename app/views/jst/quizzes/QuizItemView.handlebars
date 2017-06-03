@@ -66,13 +66,15 @@
               <a href="{{edit_url}}?return_to={{return_to}}#mastery-paths-editor" class="icon-mastery-path" tabindex="-1" role="menuitem" title="{{#t}}Edit Mastery Paths for {{title_label}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
           </li>
           {{/if}}
-          <li role="presentation">
-          {{#if permissions.delete}}
-            <a href="{{url}}" id="ui-id-{{id}}-3" class="delete-item icon-trash" tabindex="-1" role="menuitem" title='{{#t}}Delete Quiz{{/t}}'>{{#t}}Delete{{/t}}</a>
-          {{else}}
-            <a id="ui-id-{{id}}-3" class="delete-item icon-trash disabled" aria-disabled="true" tabindex="-1" role="menuitem" title='{{#t}}Delete Quiz{{/t}}'>{{#t}}Delete{{/t}}</a>
-          {{/if}}
-          </li>
+          {{#unless is_locked}}
+            <li role="presentation">
+            {{#if permissions.delete}}
+              <a href="{{url}}" id="ui-id-{{id}}-3" class="delete-item icon-trash" tabindex="-1" role="menuitem" title='{{#t}}Delete Quiz{{/t}}'>{{#t}}Delete{{/t}}</a>
+            {{else}}
+              <a id="ui-id-{{id}}-3" class="delete-item icon-trash disabled" aria-disabled="true" tabindex="-1" role="menuitem" title='{{#t}}Delete Quiz{{/t}}'>{{#t}}Delete{{/t}}</a>
+            {{/if}}
+            </li>
+          {{/unless}}
           {{#if migrateQuizEnabled}}
             <li role="presentation">
               <a href="#" id="ui-id-{{id}}-4" class="icon-export migrate" tabindex="-1" role="menuitem" title='{{#t}}Migrate Quiz{{/t}}'>{{#t}}Migrate{{/t}}</a>

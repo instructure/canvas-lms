@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2017 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -26,8 +26,5 @@ class LatePolicy < ActiveRecord::Base
     numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }
   validates :late_submission_interval,
     presence: true,
-    inclusion: {
-      in: %w/day hour/,
-      message: "'%{value}' is not a valid interval"
-    }
+    inclusion: { in: %w(day hour) }
 end

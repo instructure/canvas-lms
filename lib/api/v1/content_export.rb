@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -23,7 +23,7 @@ module Api::V1::ContentExport
   def content_export_json(export, current_user, session)
     json = api_json(export, current_user, session, :only => %w(id user_id created_at workflow_state export_type))
     json['course_id'] = export.context_id if export.context_type == 'Course'
-    if export.attachment && !export.for_course_copy?
+    if export.attachment && !export.for_course_copy? && !export.expired?
       json[:attachment] = attachment_json(export.attachment, current_user, {}, {:can_view_hidden_files => true})
     end
     if export.job_progress

@@ -55,8 +55,8 @@ describe 'Submissions API', type: :request do
             :format => 'json', :course_id => @course.id.to_s,
             :assignment_id => @assignment.id.to_s, :user_id => student.id.to_s },
           { :include => %w(submission_history submission_comments rubric_assessment) })
-    expect(json.delete('id')).to eq nil
     expect(json).to eq({
+      "id" => @assignment.submissions.find_by!(user: student).id,
       "assignment_id" => @assignment.id,
       "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}?preview=1&version=0",
       "user_id"=>student.id,
@@ -72,7 +72,7 @@ describe 'Submissions API', type: :request do
       "submission_comments"=>[],
       "grade_matches_current_submission"=>nil,
       "score"=>nil,
-      "workflow_state"=>nil,
+      "workflow_state"=>"unsubmitted",
       "late"=>false,
       "graded_at"=>nil,
     })
@@ -698,7 +698,7 @@ describe 'Submissions API', type: :request do
         "body"=>"test!",
         "assignment_id" => a1.id,
         "submitted_at"=>"1970-01-01T01:00:00Z",
-        "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=2",
+        "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=1",
         "grade_matches_current_submission"=>true,
         "attempt"=>1,
         "url"=>nil,
@@ -799,7 +799,7 @@ describe 'Submissions API', type: :request do
     mock_kaltura.expects(:media_sources).returns([{:height => "240", :bitrate => "382", :isOriginal => "0", :width => "336", :content_type => "video/mp4",
                                                    :containerFormat => "isom", :url => "https://kaltura.example.com/some/url", :size =>"204", :fileExt=>"mp4"}])
 
-    submit_homework(a1, student1, :media_comment_id => "54321", :media_comment_type => "video")
+    submit_homework(a1, student1, submission_type: 'online_text_entry', media_comment_id: 54321, media_comment_type: "video")
     stub_kaltura
     json = api_call(:get,
           "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions.json",
@@ -866,7 +866,7 @@ describe 'Submissions API', type: :request do
         "body"=>"test!",
         "assignment_id" => a1.id,
         "submitted_at"=>"1970-01-01T03:00:00Z",
-        "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=4",
+        "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=3",
         "grade_matches_current_submission"=>true,
         "attachments" =>
          [
@@ -904,7 +904,7 @@ describe 'Submissions API', type: :request do
            "url"=>nil,
            "submission_type"=>"online_text_entry",
            "user_id"=>student1.id,
-           "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=2",
+           "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=1",
            "grade_matches_current_submission"=>nil,
            "score"=>nil,
            "workflow_state" => "submitted",
@@ -927,7 +927,7 @@ describe 'Submissions API', type: :request do
            "url"=>nil,
            "submission_type"=>"online_text_entry",
            "user_id"=>student1.id,
-           "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=3",
+           "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=2",
            "grade_matches_current_submission"=>nil,
            "score"=>nil,
            "workflow_state" => "submitted",
@@ -972,7 +972,7 @@ describe 'Submissions API', type: :request do
            "url"=>nil,
            "submission_type"=>"online_text_entry",
            "user_id"=>student1.id,
-           "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=4",
+           "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=3",
            "grade_matches_current_submission"=>true,
            "score"=>13.5,
            "workflow_state" => "graded",
@@ -1016,7 +1016,7 @@ describe 'Submissions API', type: :request do
         "graded_at"=>sub2.graded_at.as_json,
         "assignment_id" => a1.id,
         "body"=>nil,
-        "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?preview=1&version=2",
+        "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?preview=1&version=1",
         "grade_matches_current_submission"=>true,
         "submitted_at"=>"1970-01-01T04:00:00Z",
         "submission_history"=>
@@ -1032,7 +1032,7 @@ describe 'Submissions API', type: :request do
            "url"=>"http://www.instructure.com",
            "submission_type"=>"online_url",
            "user_id"=>student2.id,
-           "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?preview=1&version=2",
+           "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?preview=1&version=1",
            "grade_matches_current_submission"=>true,
            "attachments" =>
             [
@@ -2815,6 +2815,7 @@ describe 'Submissions API', type: :request do
     @enrollment.update_attribute(:limit_privileges_to_course_section, true)
     @teacher = @user
     s1 = submission_model(:course => @course)
+    s1.update!(submission_type: 'online_text_entry')
     section2 = @course.course_sections.create(:name => "another section")
     s2 = submission_model(:course => @course, :username => 'otherstudent@example.com', :section => section2, :assignment => @assignment)
     @user = @teacher
@@ -3324,7 +3325,7 @@ describe 'Submissions API', type: :request do
       progress = Progress.find(json["id"])
       expect(progress.completed?).to be_truthy
 
-      expect(Submission.count).to eq 1
+      expect(Submission.not_placeholder.count).to eq 1
       s1 = student3.submissions.first
       expect(s1.grade).to eq "75%"
     end
@@ -3395,7 +3396,7 @@ describe 'Submissions API', type: :request do
       progress = Progress.find(json["id"])
       expect(progress.completed?).to be_truthy
 
-      expect(Submission.count).to eq 1
+      expect(Submission.not_placeholder.count).to eq 1
       s1 = @student1.submissions.first
       expect(s1.grade).to eq "75%"
     end
@@ -3709,7 +3710,7 @@ describe 'Submissions API', type: :request do
         group.add_user(student1)
         group.add_user(student2)
       end
-      let!(:submit_homework) { assignment.submit_homework(student1) }
+      let!(:submit_homework) { assignment.submit_homework(student1, submission_type: 'online_text_entry') }
 
       let(:path) { "/api/v1/courses/#{test_course.id}/assignments/#{assignment.id}/submissions" }
       let(:params) do

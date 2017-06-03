@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -24,7 +24,7 @@ import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu';
 import Typography from 'instructure-ui/lib/components/Typography';
 import I18n from 'i18n!gradebook';
 
-const { bool, func, shape } = React.PropTypes;
+const { bool, func, shape, string } = React.PropTypes;
 
 function renderTriggerButton () {
   return (
@@ -38,6 +38,18 @@ function renderTriggerButton () {
 
 class ViewOptionsMenu extends React.Component {
   static propTypes = {
+    columnSortSettings: shape({
+      criterion: string.isRequired,
+      direction: string.isRequired,
+      disabled: bool.isRequired,
+      onSortByDefault: func.isRequired,
+      onSortByNameAscending: func.isRequired,
+      onSortByNameDescending: func.isRequired,
+      onSortByDueDateAscending: func.isRequired,
+      onSortByDueDateDescending: func.isRequired,
+      onSortByPointsAscending: func.isRequired,
+      onSortByPointsDescending: func.isRequired
+    }).isRequired,
     teacherNotes: shape({
       disabled: bool.isRequired,
       onSelect: func.isRequired,
@@ -52,6 +64,17 @@ class ViewOptionsMenu extends React.Component {
     this.bindMenuContent = (ref) => { this.menuContent = ref };
   }
 
+  areColumnsOrderedBy (criterion, direction) {
+    const sortSettings = this.props.columnSortSettings;
+    const result = sortSettings.criterion === criterion;
+
+    if (direction === undefined) {
+      return result;
+    } else {
+      return result && sortSettings.direction === direction;
+    }
+  }
+
   render () {
     return (
       <PopoverMenu
@@ -59,16 +82,60 @@ class ViewOptionsMenu extends React.Component {
         contentRef={this.bindMenuContent}
       >
         <MenuItemGroup label={I18n.t('Arrange By')}>
-          <MenuItem defaultSelected>
-            { I18n.t('Assignment Name') }
+          <MenuItem
+            disabled={this.props.columnSortSettings.disabled}
+            selected={this.areColumnsOrderedBy('default')}
+            onSelect={this.props.columnSortSettings.onSortByDefault}
+          >
+            { I18n.t('Default Order') }
           </MenuItem>
 
-          <MenuItem>
-            { I18n.t('Due Date') }
+          <MenuItem
+            disabled={this.props.columnSortSettings.disabled}
+            selected={this.areColumnsOrderedBy('name', 'ascending')}
+            onSelect={this.props.columnSortSettings.onSortByNameAscending}
+          >
+            { I18n.t('Assignment Name - A-Z') }
           </MenuItem>
 
-          <MenuItem>
-            { I18n.t('Points') }
+          <MenuItem
+            disabled={this.props.columnSortSettings.disabled}
+            selected={this.areColumnsOrderedBy('name', 'descending')}
+            onSelect={this.props.columnSortSettings.onSortByNameDescending}
+          >
+            { I18n.t('Assignment Name - Z-A') }
+          </MenuItem>
+
+          <MenuItem
+            disabled={this.props.columnSortSettings.disabled}
+            selected={this.areColumnsOrderedBy('due_date', 'ascending')}
+            onSelect={this.props.columnSortSettings.onSortByDueDateAscending}
+          >
+            { I18n.t('Due Date - Oldest to Newest') }
+          </MenuItem>
+
+          <MenuItem
+            disabled={this.props.columnSortSettings.disabled}
+            selected={this.areColumnsOrderedBy('due_date', 'descending')}
+            onSelect={this.props.columnSortSettings.onSortByDueDateDescending}
+          >
+            { I18n.t('Due Date - Newest to Oldest') }
+          </MenuItem>
+
+          <MenuItem
+            disabled={this.props.columnSortSettings.disabled}
+            selected={this.areColumnsOrderedBy('points', 'ascending')}
+            onSelect={this.props.columnSortSettings.onSortByPointsAscending}
+          >
+            { I18n.t('Points - Lowest to Highest') }
+          </MenuItem>
+
+          <MenuItem
+            disabled={this.props.columnSortSettings.disabled}
+            selected={this.areColumnsOrderedBy('points', 'descending')}
+            onSelect={this.props.columnSortSettings.onSortByPointsDescending}
+          >
+            { I18n.t('Points - Highest to Lowest') }
           </MenuItem>
         </MenuItemGroup>
 

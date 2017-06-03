@@ -1,3 +1,21 @@
+<%
+# Copyright (C) 2012 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
 <%-
   @locale = raw I18n.locale.to_json
   @body_classes ||= []
@@ -49,21 +67,22 @@
   <%= yield :stylesheets %>
   <%= include_account_css %>
   <script>
-    // listen for any clicks on links that have href="#" or data-method set and queue them to be fired on dom ready.
-    // note: the events targeted for a[data-method] elems don't get properly replayed, but
-    // at least we can gobble them up here to prevent errors.
-      function _earlyClick(e){
-        var cur = e.target;
-        while ( cur && cur.ownerDocument ) {
-          if ( cur.getAttribute('href') === '#' || cur.getAttribute('data-method') ) {
-            e.preventDefault();
-            _earlyClick.clicks = _earlyClick.clicks || [];
-            _earlyClick.clicks.push(cur);
-            break;
-          }
-          cur = cur.parentNode;
+    <%# 
+      listen for any clicks on links that have href="#" or data-method set and queue them to be fired on dom ready.
+      note: the events targeted for a[data-method] elems don't get properly replayed, but
+      at least we can gobble them up here to prevent errors.
+    %>
+    function _earlyClick(e){
+      var c = e.target
+      while (c && c.ownerDocument) {
+        if (c.getAttribute('href') == '#' || c.getAttribute('data-method')) {
+          e.preventDefault()
+          (_earlyClick.clicks = _earlyClick.clicks || []).push(c)
+          break
         }
+        c = c.parentNode
       }
-      document.addEventListener('click', _earlyClick);
+    }
+    document.addEventListener('click', _earlyClick)
   </script>
 </head>

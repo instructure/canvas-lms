@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2016 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -157,6 +157,20 @@ describe Quizzes::QuizzesController do
       AssignmentUtil.stubs(:due_date_required_for_account?).returns(false)
       get 'index', :course_id => @course.id
       expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(false)
+    end
+
+    it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:name_length_required_for_account?).returns(true)
+      get 'index', :course_id => @course.id
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(true)
+    end
+
+    it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.name_length_required_for_account? == false" do
+      user_session(@teacher)
+      AssignmentUtil.stubs(:name_length_required_for_account?).returns(false)
+      get 'index', :course_id => @course.id
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(false)
     end
   end
 

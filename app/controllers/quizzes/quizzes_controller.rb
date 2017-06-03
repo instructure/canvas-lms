@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2016 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -107,6 +107,7 @@ class Quizzes::QuizzesController < ApplicationController
     max_name_length = AssignmentUtil.assignment_max_name_length(@context)
     sis_name = AssignmentUtil.post_to_sis_friendly_name(@context)
     due_date_required_for_account = AssignmentUtil.due_date_required_for_account?(@context)
+    max_name_length_required_for_account = AssignmentUtil.name_length_required_for_account?(@context)
     sis_integration_settings_enabled = AssignmentUtil.sis_integration_settings_enabled?(@context)
 
     hash = {
@@ -135,6 +136,7 @@ class Quizzes::QuizzesController < ApplicationController
       :SIS_NAME => sis_name,
       :MAX_NAME_LENGTH => max_name_length,
       :DUE_DATE_REQUIRED_FOR_ACCOUNT => due_date_required_for_account,
+      :MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT => max_name_length_required_for_account,
       :SIS_INTEGRATION_SETTINGS_ENABLED => sis_integration_settings_enabled
     }
     if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :read)

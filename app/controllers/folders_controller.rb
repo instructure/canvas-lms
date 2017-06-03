@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -136,7 +136,6 @@ class FoldersController < ApplicationController
     if authorized_action(folder, @current_user, :read_contents)
       can_view_hidden_files = can_view_hidden_files?(folder.context, @current_user, session)
       opts = {:can_view_hidden_files => can_view_hidden_files, :context => folder.context}
-
       if can_view_hidden_files && folder.context.is_a?(Course) &&
           master_courses? && MasterCourses::ChildSubscription.is_child_course?(folder.context)
         opts[:master_course_restricted_folder_ids] = MasterCourses::FolderLockingHelper.locked_folder_ids_for_course(folder.context)
