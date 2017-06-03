@@ -7268,6 +7268,10 @@ tinymce-light-skin@1.2.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/tinymce-light-skin/-/tinymce-light-skin-1.2.2.tgz#e6a63050b5ee391b1970e66feb93be91ca539330"
 
+tinymce-light-skin@1.2.5:
+  version "1.2.5"
+  resolved "https://registry.yarnpkg.com/tinymce-light-skin/-/tinymce-light-skin-1.2.5.tgz#3d37f1628ef737432c725eed1b226b6c8d275b0c"
+
 tinymce@4.5.7, tinymce@~4.5.3:
   version "4.5.7"
   resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-4.5.7.tgz#e1f5cd286ec3c9977bd672a4c14e496f63bc4fef"
