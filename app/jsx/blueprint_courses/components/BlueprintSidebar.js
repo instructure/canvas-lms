@@ -24,7 +24,7 @@ import Tray from 'instructure-ui/lib/components/Tray'
 import Button from 'instructure-ui/lib/components/Button'
 import Typography from 'instructure-ui/lib/components/Typography'
 import Heading from 'instructure-ui/lib/components/Heading'
-import IconCopyLine from 'instructure-icons/lib/Line/IconCopyLine'
+import IconBlueprintSolid from 'instructure-icons/lib/Solid/IconBlueprintSolid'
 import IconXSolid from 'instructure-icons/lib/Solid/IconXSolid'
 
 export default class BlueprintCourseSidebar extends Component {
@@ -72,7 +72,7 @@ export default class BlueprintCourseSidebar extends Component {
         <div className="bcs__trigger">
           <Button ref={(c) => { this.openBtn = c }} variant="icon-inverse" onClick={this.open}>
             <Typography color="primary-inverse" size="large">
-              <IconCopyLine title={I18n.t('Open sidebar')} />
+              <IconBlueprintSolid title={I18n.t('Open sidebar')} />
             </Typography>
           </Button>
         </div>
@@ -95,7 +95,7 @@ export default class BlueprintCourseSidebar extends Component {
                 </Button>
               </div>
               <Heading color="primary-inverse" level="h3">
-                <IconCopyLine /><span style={{marginLeft: '10px'}}>{I18n.t('Blueprint')}</span>
+                <IconBlueprintSolid /><span style={{marginLeft: '10px'}}>{I18n.t('Blueprint')}</span>
               </Heading>
             </header>
             <div className="bcs__body">
