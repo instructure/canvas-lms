@@ -442,7 +442,6 @@ describe Attachment do
       s3object = a.s3object
       s3object.expects(:delete).never
       a.destroy_content
-    end
 
     it 'should destroy all crocodocs even from children attachments' do
       local_storage!
