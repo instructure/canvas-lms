@@ -1303,7 +1303,7 @@ class Attachment < ActiveRecord::Base
     raise 'must be a root_attachment' if self.root_attachment_id
     return unless self.filename
     if Attachment.s3_storage?
-      self.s3object.delete
+      self.s3object.delete unless ApplicationController.try(:test_cluster?)
     else
       FileUtils.rm full_filename
     end
