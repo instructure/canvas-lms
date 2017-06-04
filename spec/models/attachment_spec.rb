@@ -447,6 +447,16 @@ describe Attachment do
       expect(a.content_type).to eq 'unknown/unknown'
     end
 
+    it 'should not delete s3objects if it is not production for destroy_content' do
+      ApplicationController.stubs(:test_cluster?).returns(true)
+      s3_storage!
+      a = attachment_model
+      a.stubs(:s3object).returns(mock('s3object'))
+      s3object = a.s3object
+      s3object.expects(:delete).never
+      a.destroy_content
+    end
+
     shared_examples_for "purgatory" do
       it 'should save file in purgatory and then restore and back again' do
         a = attachment_model(uploaded_data: default_uploaded_data)
