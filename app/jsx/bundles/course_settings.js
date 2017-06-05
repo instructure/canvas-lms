@@ -56,7 +56,5 @@ if (ENV.COURSE_IMAGES_ENABLED) {
       store={courseImageStore}
       name="course[image]"
       courseId={ENV.COURSE_ID}
-    />,
-    $('.CourseImageSelector__Container')[0]
-  )
+    />, $('.CourseImageSelector__Container')[0])
 }

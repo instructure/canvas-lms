@@ -19,6 +19,8 @@
 import I18n from 'i18n!blueprint_courses'
 import React from 'react'
 import PropTypes from 'prop-types'
+import cx from 'classnames'
+
 import Typography from 'instructure-ui/lib/components/Typography'
 import RadioInput from 'instructure-ui/lib/components/RadioInput'
 import Checkbox from 'instructure-ui/lib/components/Checkbox'
@@ -82,48 +84,52 @@ export default class BlueprintLockOptions extends React.Component {
   }
 
   renderGeneralMenu (lock) {
-    if (lock === general) {
-      return (
-        <div>
-          <div className="bcs_sub-menu-item">
-            <Typography size="x-small" lineHeight="condensed">{generalDescription + standardDescription}</Typography>
-          </div>
-          <LockCheckList
-            formName="[blueprint_restrictions]"
-            lockableAttributes={this.props.lockableAttributes}
-            locks={this.state.generalRestrictions}
-          />
+    const viewableClasses = cx({
+      'bcs_sub-menu': true,
+      'bcs_sub-menu-viewable': lock === general,
+    })
+    return (
+      <div className={viewableClasses}>
+        <div className="bcs_sub-menu-item">
+          <Typography size="x-small" lineHeight="condensed">{generalDescription + standardDescription}</Typography>
         </div>
-      )
-    } else {
-      return null
-    }
+        <LockCheckList
+          formName="[blueprint_restrictions]"
+          lockableAttributes={this.props.lockableAttributes}
+          locks={this.state.generalRestrictions}
+        />
+      </div>
+    )
   }
 
   renderGranularMenu (lock) {
-    if (lock === granular) {
-      return (
-        <div>
-          <div className="bcs_sub-menu-item">
-            <Typography size="x-small">{granularDescription + standardDescription}</Typography>
-            {keys.map(item =>
-              <ExpandableLockOptions
-                key={item.objectType}
-                objectType={item.objectType}
-                locks={this.state.objectRestrictions[item.objectType]}
-                lockableAttributes={item.lockableAttributes || this.props.lockableAttributes}
-              />)}
-          </div>
+    const viewableClasses = cx({
+      'bcs_sub-menu': true,
+      'bcs_sub-menu-viewable': lock === granular,
+    })
+    return (
+      <div className={viewableClasses}>
+        <div className="bcs_sub-menu-item">
+          <Typography size="x-small">{granularDescription + standardDescription}</Typography>
+          {keys.map(item =>
+            <ExpandableLockOptions
+              key={item.objectType}
+              objectType={item.objectType}
+              locks={this.state.objectRestrictions[item.objectType]}
+              lockableAttributes={item.lockableAttributes || this.props.lockableAttributes}
+            />)}
         </div>
-      )
-    } else {
-      return null
-    }
+      </div>
+    )
   }
 
   renderOptionMenu () {
-    if (this.state.courseEnabled) {
-      return (
+    const viewableClasses = cx({
+      'bcs_sub-menu': true,
+      'bcs_sub-menu-viewable': this.state.courseEnabled,
+    })
+    return (
+      <div className={viewableClasses}>
         <div className="blueprint_setting_options">
           <div className="bcs_radio_input-group">
             <RadioInput
@@ -147,14 +153,14 @@ export default class BlueprintLockOptions extends React.Component {
             {this.renderGranularMenu(this.state.lockType)}
           </div>
         </div>
-      )
-    }
-    return null
+      </div>
+    )
   }
 
   render () {
     const disabled = !!this.props.disabledMessage
-    let checkBox = (
+    let checkBox = (<div>
+      <input type="hidden" name="course[blueprint]" value={false} />
       <Checkbox
         name="course[blueprint]"
         checked={this.state.courseEnabled}
@@ -162,9 +168,18 @@ export default class BlueprintLockOptions extends React.Component {
         label={blueprintDescription}
         onChange={this.enableCourse}
       />
-    )
+    </div>)
     if (disabled) {
-      checkBox = <Tooltip tip={this.props.disabledMessage} placement="top start" variant="inverse"><div>{checkBox}</div></Tooltip>
+      checkBox =
+      (<div className="disabled_message">
+        <Tooltip
+          tip={this.props.disabledMessage}
+          placement="top start"
+          variant="inverse"
+        >
+          <div>{checkBox}</div>
+        </Tooltip>
+      </div>)
     }
     return (
       <div>
