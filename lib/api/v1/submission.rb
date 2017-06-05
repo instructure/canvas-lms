@@ -121,6 +121,9 @@ module Api::V1::Submission
     end
 
     hash['group'] = submission_minimal_group_json(attempt) if includes.include?("group")
+    if hash.key?('grade_matches_current_submission')
+      hash['grade_matches_current_submission'] = hash['grade_matches_current_submission'] != false
+    end
 
     unless params[:exclude_response_fields] && params[:exclude_response_fields].include?('preview_url')
       preview_args = { 'preview' => '1' }
