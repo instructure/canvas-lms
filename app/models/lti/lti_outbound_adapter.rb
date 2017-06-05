@@ -75,9 +75,10 @@ module Lti
       self
     end
 
-    def generate_post_payload
+    def generate_post_payload(assignment: nil)
       raise('Called generate_post_payload before calling prepare_tool_launch') unless @tool_launch
       hash = @tool_launch.generate(@overrides)
+      hash[:ext_lti_assignment_id] = assignment&.lti_context_id if assignment&.lti_context_id.present?
       Lti::Security.signed_post_params(
         hash,
         @tool_launch.url,
@@ -90,7 +91,7 @@ module Lti
       raise('Called generate_post_payload_for_assignment before calling prepare_tool_launch') unless @tool_launch
       lti_assignment = Lti::LtiAssignmentCreator.new(assignment, encode_source_id(assignment)).convert
       @tool_launch.for_assignment!(lti_assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
-      generate_post_payload
+      generate_post_payload(assignment: assignment)
     end
 
     def generate_post_payload_for_homework_submission(assignment)

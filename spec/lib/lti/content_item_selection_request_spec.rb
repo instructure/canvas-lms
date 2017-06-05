@@ -97,6 +97,15 @@ describe Lti::ContentItemSelectionRequest do
         expect(lti_launch.params['context_title']).to eq course.name
       end
 
+      it "adds the 'ext_lti_assignment_id' if available" do
+        lti_assignment_id = SecureRandom.uuid
+        body = {lti_assignment_id: lti_assignment_id}
+        secure_params = Canvas::Security.create_jwt(body)
+        lti_request = described_class.new(default_params.merge({secure_params: secure_params}))
+        lti_launch = lti_request.generate_lti_launch(placement: placement)
+        expect(lti_launch.params['ext_lti_assignment_id']).to eq lti_assignment_id
+      end
+
       context 'return_url' do
         let(:base_uri) { URI.parse(base_url) }
 

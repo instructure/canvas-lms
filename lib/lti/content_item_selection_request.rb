@@ -21,12 +21,13 @@ module Lti
     include ActionDispatch::Routing::PolymorphicRoutes
     include Rails.application.routes.url_helpers
 
-    def initialize(context:, domain_root_account:, base_url:, tool:, user: nil)
+    def initialize(context:, domain_root_account:, base_url:, tool:, user: nil, secure_params: nil)
       @context = context
       @domain_root_account = domain_root_account
       @user = user
       @base_url = URI.parse(base_url)
       @tool = tool
+      @secure_params = secure_params
     end
 
     def generate_lti_launch(placement:, opts: {}, expanded_variables: {})
@@ -72,6 +73,8 @@ module Lti
         merge(placement_params(placement, assignment: assignment)).
         merge(expanded_variables)
 
+      params[:ext_lti_assignment_id] = lti_assignment_id(assignment: assignment)
+
       Lti::Security.signed_post_params(
         params,
         resource_url,
@@ -79,6 +82,10 @@ module Lti
         @tool.shared_secret,
         @context.root_account.feature_enabled?(:disable_lti_post_only) || @tool.extension_setting(:oauth_compliant)
       )
+    end
+
+    def lti_assignment_id(assignment: nil)
+      assignment.try(:lti_context_id) || Lti::Security.decoded_lti_assignment_id(@secure_params)
     end
 
     def message_params(content_item_return_url)

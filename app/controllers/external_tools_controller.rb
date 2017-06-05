@@ -649,7 +649,8 @@ class ExternalToolsController < ApplicationController
                                                              domain_root_account: @domain_root_account,
                                                              user: @current_user,
                                                              base_url: request.base_url,
-                                                             tool: tool)
+                                                             tool: tool,
+                                                             secure_params: params[:secure_params])
 
     assignment = @context.assignments.active.find(params[:assignment_id]) if params[:assignment_id].present?
 

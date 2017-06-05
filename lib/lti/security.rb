@@ -115,6 +115,10 @@ module Lti
       valid
     end
 
-
+    def self.decoded_lti_assignment_id(secure_params)
+      return if secure_params.blank?
+      secure_params = Canvas::Security.decode_jwt(secure_params)
+      secure_params[:lti_assignment_id]
+    end
   end
 end

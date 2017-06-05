@@ -150,7 +150,7 @@ import './jquery.templateData'
           .dialog('open');
         $dialog.triggerHandler('dialogresize');
         var url = $.replaceTags($("#select_content_resource_selection_url").attr('href'), 'id', tool.definition_id);
-        url = url + '?placement=' + placement_type;
+        url = url + '?placement=' + placement_type + '&secure_params=' + $('#secure_params').val();
         $dialog.find("iframe").attr('src', url);
         $(window).on('beforeunload', beforeUnloadHandler);
       } else {

@@ -137,10 +137,8 @@ module Lti
                                                                                        link_fragment: params[:resource_link_fragment]),
         }
 
-        if params[:secure_params].present?
-          secure_params = Canvas::Security.decode_jwt(params[:secure_params])
-          launch_params.merge!({ext_lti_assignment_id: secure_params[:lti_assignment_id]}) if secure_params[:lti_assignment_id].present?
-        end
+        lti_assignment_id = Lti::Security.decoded_lti_assignment_id(params[:secure_params])
+        launch_params[:ext_lti_assignment_id] = lti_assignment_id
 
         @lti_launch = Launch.new
         tag = find_tag
