@@ -38,7 +38,7 @@ define [
 
     constructor: (options) ->
       super
-      @periods.unshift(title: @defaultPeriod, id:0, checked: !options.currentGradingPeriod)
+      @periods.unshift(title: @defaultPeriod, id: '0', checked: options.currentGradingPeriod == '0')
 
     render: ->
       @detachEvents()
@@ -57,6 +57,7 @@ define [
         period = @$('[aria-checked=true] input[name=period_to_show_radio]').val() || undefined
         $.publish('currentGradingPeriod/change', [period, @cid])
         @trigger('menuselect', event, ui, @currentGradingPeriod)
+        @$('button').focus()
       )
 
     onGradingPeriodChange: (period) =>

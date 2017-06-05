@@ -1,14 +1,15 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import axios from 'axios'
 import classnames from 'classnames'
 import I18n from 'i18n!lock_btn_module'
 import FilesystemObject from 'compiled/models/FilesystemObject'
-import ajaxError from 'jsx/shared/AjaxFlashAlert'
+import { showFlashError } from 'jsx/shared/FlashAlert'
 
 class MasterCourseLock extends React.Component {
   static propTypes = {
-    model: React.PropTypes.instanceOf(FilesystemObject).isRequired,
-    canManage: React.PropTypes.bool.isRequired
+    model: PropTypes.instanceOf(FilesystemObject).isRequired,
+    canManage: PropTypes.bool.isRequired
   }
 
   constructor (props) {
@@ -67,7 +68,7 @@ class MasterCourseLock extends React.Component {
       }).then((/* response */) => {
         this.setLocked(!this.isLocked())
       }).catch(
-        ajaxError(I18n.t('An error occurred changing the lock state for "%{fileName}"', {fileName}))
+        showFlashError(I18n.t('An error occurred changing the lock state for "%{fileName}"', {fileName}))
       )
   }
 
@@ -77,7 +78,7 @@ class MasterCourseLock extends React.Component {
     const fileName = (this.props.model && this.props.model.displayName()) || I18n.t('This file');
     const wrapperClass = classnames('lock-icon', {disabled: !this.canLockUnlock(), 'lock-icon-locked': this.isLocked()})
     const buttonClass = `btn-link ${locked ? 'locked-status locked' : 'unlocked-status unlocked'}`
-    const iconClass = locked ? 'icon-lock' : 'icon-unlock'
+    const iconClass = locked ? 'icon-blueprint-lock' : 'icon-blueprint'
     const title = locked ? I18n.t('Locked') : I18n.t('Unlocked')
     const label = locked
       ? I18n.t('%{fileName}  is Locked - Click to modify', {fileName})

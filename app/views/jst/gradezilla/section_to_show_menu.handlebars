@@ -1,15 +1,8 @@
 <button type="button" class="section-select-button">
-  {{#t "showing_sections"}}
-    Showing <span class="selected-section">{{currentSection}}</span>
-  {{/t}}
+  <span class="selected-section">{{currentSection}}</span>
 </button>
 
 <ul class="section-select-menu" id="section-to-show-menu">
-  {{#if showSections}}
-    <li>{{#t "choose_a_section_to_show"}}Choose a section to show{{/t}}</li>
-  {{else}}
-    <li>{{#t "showing_course"}}Showing Course{{/t}}</li>
-  {{/if}}
   {{#each sections}}
     <li>
       <a href="#">

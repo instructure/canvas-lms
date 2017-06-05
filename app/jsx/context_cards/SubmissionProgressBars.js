@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!student_context_tray'
 import classnames from 'classnames'
 import Heading from 'instructure-ui/lib/components/Heading'
@@ -27,7 +28,7 @@ import Link from 'instructure-ui/lib/components/Link'
 
   class SubmissionProgressBars extends React.Component {
     static propTypes = {
-      submissions: React.PropTypes.array.isRequired
+      submissions: PropTypes.array.isRequired
     }
 
     static displayGrade (submission) {
@@ -101,7 +102,7 @@ import Link from 'instructure-ui/lib/components/Link'
                     tip={submission.assignment.name}
                     as={Link}
                     href={`${submission.assignment.html_url}/submissions/${submission.user_id}`}
-                    placement="left"
+                    placement="start"
                   >
                     <Progress
                       size="small"

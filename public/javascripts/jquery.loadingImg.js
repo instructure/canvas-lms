@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define(['jquery'], function($){
+import $ from 'jquery'
 
   // Shows an ajax-loading image on the given object.
   $.fn.loadingImg = function(options) {
@@ -123,4 +123,3 @@ define(['jquery'], function($){
   };
   $.fn.loadingImage = $.fn.loadingImg;
   
-});

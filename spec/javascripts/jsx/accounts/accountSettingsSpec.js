@@ -16,10 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jquery',
-  'account_settings'
-], ($, {addUsersLink, openReportDescriptionLink}) => {
+import $ from 'jquery'
+import {addUsersLink, openReportDescriptionLink} from 'account_settings'
+
   QUnit.module('AccountSettings.openReportDescriptionLink', {
     setup () {
       const $html = $('<div>').addClass('title').addClass('reports')
@@ -60,4 +59,3 @@ define([
     $('#fixtures .trigger').click();
     equal(document.activeElement, $('#admin_role_id')[0]);
   });
-})

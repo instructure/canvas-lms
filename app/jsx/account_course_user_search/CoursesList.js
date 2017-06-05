@@ -17,13 +17,14 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import $ from 'jquery'
 import I18n from 'i18n!account_course_user_search'
 import natcompare from 'compiled/util/natcompare'
 import axios from 'axios'
 import CoursesListRow from './CoursesListRow'
 
-const { string, shape, arrayOf } = React.PropTypes
+const { string, shape, arrayOf } = PropTypes
 
   class CoursesList extends React.Component {
     static propTypes = {

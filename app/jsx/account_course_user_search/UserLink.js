@@ -17,13 +17,14 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
 
   var UserLink = React.createClass({
     propTypes: {
-      id: React.PropTypes.string.isRequired,
-      display_name: React.PropTypes.string.isRequired,
-      avatar_image_url: React.PropTypes.string
+      id: PropTypes.string.isRequired,
+      display_name: PropTypes.string.isRequired,
+      avatar_image_url: PropTypes.string
     },
 
     render() {

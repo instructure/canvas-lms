@@ -38,10 +38,10 @@ namespace :js do
   task :webpack do
     if ENV['RAILS_ENV'] == 'production' || ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
       puts "--> Building PRODUCTION webpack bundles"
-      `npm run webpack-production`
+      system "npm run webpack-production"
     else
       puts "--> Building DEVELOPMENT webpack bundles"
-      `npm run webpack-development`
+      system "npm run webpack-development"
     end
     raise "Error running js:webpack: \nABORTING" if $?.exitstatus != 0
   end

@@ -17,21 +17,62 @@
  */
 
 import I18n from 'i18n!blueprint_courses'
-import React, { PropTypes, Component } from 'react'
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
+
 import Button from 'instructure-ui/lib/components/Button'
+import Tooltip from 'instructure-ui/lib/components/Tooltip'
 import Typography from 'instructure-ui/lib/components/Typography'
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
-import IconLockSolid from 'instructure-icons/lib/Solid/IconLockSolid'
-import IconUnlockSolid from 'instructure-icons/lib/Solid/IconUnlockSolid'
+import PresentationContent from 'instructure-ui/lib/components/PresentationContent'
+
+import IconLock from 'instructure-icons/lib/Solid/IconBlueprintLockSolid'
+import IconUnlock from 'instructure-icons/lib/Solid/IconBlueprintSolid'
+
+const modes = {
+  ADMIN_LOCKED: {
+    label: I18n.t('Locked'),
+    icon: IconLock,
+    tooltip: I18n.t('Unlock'),
+    variant: 'primary'
+  },
+  ADMIN_UNLOCKED: {
+    label: I18n.t('Blueprint'),
+    icon: IconUnlock,
+    tooltip: I18n.t('Lock'),
+    variant: 'default'
+  },
+  ADMIN_WILLUNLOCK: {
+    label: I18n.t('Blueprint'),
+    icon: IconUnlock,
+    tooltip: I18n.t('Unlock'),
+    variant: 'default'
+  },
+  ADMIN_WILLLOCK: {
+    label: I18n.t('Locked'),
+    icon: IconLock,
+    tooltip: I18n.t('Lock'),
+    variant: 'primary'
+  },
+  TEACH_LOCKED: {
+    label: I18n.t('Locked'),
+    icon: IconLock
+  },
+  TEACH_UNLOCKED: {
+    label: I18n.t('Blueprint'),
+    icon: IconUnlock
+  }
+}
 
 export default class LockToggle extends Component {
   static propTypes = {
     isLocked: PropTypes.bool.isRequired,
-    isToggleable: PropTypes.bool.isRequired,
+    isToggleable: PropTypes.bool,
     onClick: PropTypes.func,
   }
 
   static defaultProps = {
+    isToggleable: false,
     onClick: () => {},
   }
 
@@ -48,40 +89,71 @@ export default class LockToggle extends Component {
     }, 200)
   }
 
-  getToggleComponent () {
-    if (this.props.isToggleable) {
-      const variant = this.props.isLocked ? 'primary' : 'default'
-      const srLabel = this.props.isLocked ? I18n.t('Locked. Click to unlock.') : I18n.t('Unlocked. Click to lock.')
+  constructor (props) {
+    super(props)
+    this.state = {}
 
-      return ({ children }) => (
-        <Button variant={variant} onClick={this.props.onClick} aria-pressed={this.props.isLocked} aria-label={srLabel}>
-          {children}
-          <ScreenReaderContent>{srLabel}</ScreenReaderContent>
-        </Button>
-      )
+    if (props.isToggleable) {
+      this.state.mode = props.isLocked ? modes.ADMIN_LOCKED : modes.ADMIN_UNLOCKED
+    } else {
+      this.state.mode = props.isLocked ? modes.TEACH_LOCKED : modes.TEACH_UNLOCKED
     }
+  }
 
-    return ({ children }) => (
-      <Typography size="small" color="brand">
-        &nbsp;{children}&nbsp;
-      </Typography>
-    )
+  onEnter = () => {
+    if (this.props.isToggleable) {
+      this.setState({
+        mode: this.props.isLocked ? modes.ADMIN_WILLUNLOCK : modes.ADMIN_WILLLOCK
+      })
+    }
+  }
+
+  onExit = () => {
+    if (this.props.isToggleable) {
+      this.setState({
+        mode: this.props.isLocked ? modes.ADMIN_LOCKED : modes.ADMIN_UNLOCKED
+      })
+    }
   }
 
   render () {
-    const Icon = this.props.isLocked ? IconLockSolid : IconUnlockSolid
-    const Toggle = this.getToggleComponent()
-    const text = this.props.isLocked ? I18n.t('Locked') : I18n.t('Unlocked')
+    const Icon = this.state.mode.icon
+    const text = <span className="bpc-lock-toggle__label">{this.state.mode.label || '-'}</span>
+    let toggle = null
+
+    if (this.props.isToggleable) {
+      const variant = this.state.mode.variant
+      const tooltip = this.state.mode.tooltip
+      const srLabel = this.props.isLocked ? I18n.t('Locked. Click to unlock.') : I18n.t('Unlocked. Click to lock.')
+
+      toggle = (
+        <Tooltip tip={tooltip} placement="top" variant="inverse" on={['hover', 'focus']}>
+          <Button
+            variant={variant}
+            onClick={this.props.onClick}
+            onFocus={this.onEnter}
+            onBlur={this.onExit}
+            onMouseEnter={this.onEnter}
+            onMouseLeave={this.onExit}
+            aria-pressed={this.props.isLocked}
+          >
+            <Icon />
+            <PresentationContent>{text}</PresentationContent>
+            <ScreenReaderContent>{srLabel}</ScreenReaderContent>
+          </Button>
+        </Tooltip>
+      )
+    } else {
+      toggle = (
+        <span className="bpc__lock-no__toggle">
+          <span className="bpc__lock-no__toggle-icon"><Icon /></span>
+          <Typography size="small">{text}</Typography>
+        </span>
+      )
+    }
 
     return (
-      <Toggle>
-        <span className="bpc-lock-toggle">
-          <span style={{verticalAlign: 'sub', lineHeight: '100%'}}>
-            <Icon width="1.5em" height="1.5em" />
-          </span>
-          &nbsp;{text}
-        </span>
-      </Toggle>
+      <span className="bpc-lock-toggle">{toggle}</span>
     )
   }
 }

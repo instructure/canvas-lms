@@ -74,6 +74,9 @@ class WikiPagesController < ApplicationController
     if authorized_action(@context.wiki, @current_user, :read) && tab_enabled?(@context.class::TAB_PAGES)
       log_asset_access([ "pages", @context ], "pages", "other")
       js_env ConditionalRelease::Service.env_for @context
+      if @context.root_account.feature_enabled?(:student_planner)
+        js_env :student_planner_enabled => @context.grants_any_right?(@current_user, session, :manage)
+      end
       js_env :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu)
       set_tutorial_js_env
       @padless = true
@@ -115,6 +118,9 @@ class WikiPagesController < ApplicationController
       set_master_course_js_env_data(@page, @context)
 
       js_env ConditionalRelease::Service.env_for @context
+      if @context.root_account.feature_enabled?(:student_planner)
+        js_env :student_planner_enabled => @page.context.grants_any_right?(@current_user, session, :manage)
+      end
       if !ConditionalRelease::Service.enabled_in_context?(@context) ||
         enforce_assignment_visible(@page)
         add_crumb(@page.title)

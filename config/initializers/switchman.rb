@@ -168,7 +168,7 @@ Rails.application.config.after_initialize do
     end
 
     def in_region?(region)
-      !config[:region] || config[:region] == region
+      !config[:region] || (region.is_a?(Array) ? region.include?(config[:region]) : config[:region] == region)
     end
 
     def in_current_region?

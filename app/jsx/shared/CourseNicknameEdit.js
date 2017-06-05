@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!course_nickname_edit'
 
   var CourseNicknameEdit = React.createClass({
@@ -29,8 +30,8 @@ import I18n from 'i18n!course_nickname_edit'
     displayName: 'CourseNicknameEdit',
 
     propTypes: {
-      nicknameInfo: React.PropTypes.object.isRequired,
-      onEnter: React.PropTypes.func
+      nicknameInfo: PropTypes.object.isRequired,
+      onEnter: PropTypes.func
     },
 
     // ===============

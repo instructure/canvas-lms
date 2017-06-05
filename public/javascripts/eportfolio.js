@@ -25,29 +25,27 @@
 // settings on their own personal eportfolio, they can't
 // affect anyone else
 
-define([
-  'i18n!eportfolio',
-  'jquery' /* $ */,
-  'react',
-  'react-dom',
-  'compiled/userSettings',
-  'jsx/shared/rce/RichContentEditor',
-  'jsx/eportfolios/MoveToDialog',
-  'eportfolios/eportfolio_section',
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.inst_tree' /* instTree */,
-  'jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */,
-  'jqueryui/dialog',
-  'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
-  'compiled/jquery.rails_flash_notifications' /* $.screenReaderFlashMessageExclusive */,
-  'jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar */,
-  'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
-  'jquery.loadingImg' /* loadingImage */,
-  'jquery.templateData' /* fillTemplateData, getTemplateData */,
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'jqueryui/progressbar' /* /\.progressbar/ */,
-  'jqueryui/sortable' /* /\.sortable/ */
-], function(I18n, $, React, ReactDOM, userSettings, RichContentEditor, MoveToDialog, EportfolioSection) {
+import I18n from 'i18n!eportfolio'
+import $ from 'jquery'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import userSettings from 'compiled/userSettings'
+import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
+import MoveToDialog from 'jsx/eportfolios/MoveToDialog'
+import {fetchContent} from 'eportfolios/eportfolio_section'
+import './jquery.ajaxJSON'
+import './jquery.inst_tree' /* instTree */
+import './jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */
+import 'jqueryui/dialog'
+import 'compiled/jquery/fixDialogButtons'
+import 'compiled/jquery.rails_flash_notifications' /* $.screenReaderFlashMessageExclusive */
+import './jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar */
+import './jquery.instructure_misc_plugins' /* confirmDelete, showIf */
+import './jquery.loadingImg'
+import './jquery.templateData' /* fillTemplateData, getTemplateData */
+import './vendor/jquery.scrollTo'
+import 'jqueryui/progressbar'
+import 'jqueryui/sortable'
 
   // optimization so user isn't waiting on RCS to
   // respond when they hit edit
@@ -75,7 +73,7 @@ define([
       if(section_type == "rich_text" || section_type == "html" || $section.hasClass('read_only')) {
         idx++;
         var name = "section_" + idx;
-        var sectionContent = EportfolioSection.fetchContent($section, section_type, name)
+        var sectionContent = fetchContent($section, section_type, name)
         data = $.extend(data, sectionContent)
       }
     });
@@ -1119,4 +1117,3 @@ define([
       });
     });
   });
-});

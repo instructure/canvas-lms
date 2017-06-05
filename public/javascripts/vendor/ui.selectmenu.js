@@ -9,11 +9,9 @@
  * https://github.com/fnagel/jquery-ui/wiki/Selectmenu
  */
 
-define([
-  'jquery' /* jQuery, $ */,
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'jqueryui/widget' /* /\.widget/ */
-], function($) {
+import $ from 'jquery'
+import './jquery.scrollTo'
+import 'jqueryui/widget'
 
 $.widget("ui.selectmenu", {
 	getter: "value",
@@ -880,4 +878,4 @@ $.widget("ui.selectmenu", {
 	}
 });
 
-});
+

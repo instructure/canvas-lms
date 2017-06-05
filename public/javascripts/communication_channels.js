@@ -16,19 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-require([
-  'i18n!profile' /* I18n.t */,
-  'jquery' /* $ */,
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */,
-  'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* replaceTags */,
-  'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
-  'jquery.loadingImg' /* loadingImage */,
-  'compiled/jquery.rails_flash_notifications',
-  'jquery.templateData' /* fillTemplateData, getTemplateData */,
-  'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, $) {
+import I18n from 'i18n!profile'
+import $ from 'jquery'
+import './jquery.ajaxJSON'
+import './jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */
+import 'jqueryui/dialog'
+import './jquery.instructure_misc_helpers' /* replaceTags */
+import './jquery.instructure_misc_plugins' /* confirmDelete, showIf */
+import './jquery.loadingImg'
+import 'compiled/jquery.rails_flash_notifications'
+import './jquery.templateData' /* fillTemplateData, getTemplateData */
+import 'jqueryui/tabs'
 
 $(document).ready(function() {
   $("#communication_channels").tabs();
@@ -361,5 +359,4 @@ $(document).ready(function() {
   $("#confirm_email_channel .cancel_button").click(function() {
     $("#confirm_email_channel").dialog('close');
   });
-});
 });

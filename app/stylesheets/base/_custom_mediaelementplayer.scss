@@ -33,6 +33,16 @@
   }
 }
 
+/* Subtitile upload link */
+.mejs-captions-selector .upload-track {
+  color: white;
+  outline: none;
+}
+
+.mejs-captions-selector .upload-track:focus {
+  color: rgba(33, 248, 248, 1);
+}
+
 //
 // Playback speed control is based on code from an as-yet-unmerged pull request to mediaelement.js
 // See: https://github.com/matthillman/mediaelement/commit/e9efc9473ca38c240b712a11ba4c035651c204d4
@@ -115,6 +125,15 @@ div.mejs-speed-button {
 }
 
 .mejs-controls .mejs-speed-button .mejs-speed-selector ul li:hover {
+  background-color: rgb(200, 200, 200) !important;
+  background-color: rgba(255,255,255,.4) !important;
+}
+
+.mejs-controls .mejs-speed-button .mejs-speed-selector a:focus {
+  outline: none;
+}
+
+.mejs-controls .mejs-speed-button .mejs-speed-selector .focus {
   background-color: rgb(200, 200, 200) !important;
   background-color: rgba(255,255,255,.4) !important;
 }

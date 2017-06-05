@@ -16,13 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jquery', /* $ */
-  'str/htmlEscape',
-  'vendor/ui.selectmenu' /* /\.selectmenu/ */
-], function($, htmlEscape) {
+import $ from 'jquery'
+import htmlEscape from './str/htmlEscape'
+import 'vendor/ui.selectmenu'
 
-  var speedgraderSelectMenu = function(optionsHtml, delimiter){
+export default function speedgraderSelectMenu (optionsHtml, delimiter){
     this.html = "<select id='students_selectmenu'>" + optionsHtml + "</select>";
 
     this.option_index = 0;
@@ -146,5 +144,3 @@ define([
     };
   };
 
-  return speedgraderSelectMenu;
-});

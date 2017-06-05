@@ -17,13 +17,14 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!epub_exports'
 import _ from 'underscore'
 
   var DownloadLink = React.createClass({
     displayName: 'DownloadLink',
     propTypes: {
-      course: React.PropTypes.object.isRequired
+      course: PropTypes.object.isRequired
     },
 
     epubExport () {

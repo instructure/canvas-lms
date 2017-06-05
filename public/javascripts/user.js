@@ -16,11 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!users',
-  'jquery' /* $ */,
-  'jquery.instructure_misc_plugins' /* confirmDelete */
-], function(I18n, $) {
+import I18n from 'i18n!users'
+import $ from 'jquery'
+import './jquery.instructure_misc_plugins' /* confirmDelete */
+
 $(function(){
   $(".courses .course,.groups .group").bind('focus mouseover', function(event) {
     $(this).find(".info").addClass('info_hover');
@@ -41,4 +40,3 @@ $(function(){
     });
   });
 })
-});

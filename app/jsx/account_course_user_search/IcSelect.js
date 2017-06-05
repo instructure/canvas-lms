@@ -17,9 +17,10 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import IcInput from './IcInput'
 
-  var { string } = React.PropTypes;
+  var { string } = PropTypes;
 
   /**
    * A select wrapped with appropriate ic-Form-* elements and classes,

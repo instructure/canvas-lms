@@ -16,15 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!user_notes',
-  'jquery',
-  'jquery.instructure_forms',
-  'jquery.loadingImg',
-  'jquery.instructure_date_and_time',
-  'jquery.instructure_misc_plugins',
-  'vendor/jquery.pageless' /* pageless */
-], function(I18n, $) {
+import I18n from 'i18n!user_notes'
+import $ from 'jquery'
+import './jquery.instructure_forms'
+import './jquery.loadingImg'
+import './jquery.instructure_date_and_time'
+import './jquery.instructure_misc_plugins'
+import './vendor/jquery.pageless'
 
   if (ENV.user_note_list_pageless_options) {
     $('#user_note_list').pageless(ENV.user_note_list_pageless_options);
@@ -104,4 +102,3 @@ define([
       }
     });
   });
-});

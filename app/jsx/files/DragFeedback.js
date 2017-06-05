@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import FilesystemObjectThumbnail from 'jsx/files/FilesystemObjectThumbnail'
 import customPropTypes from 'compiled/react_files/modules/customPropTypes'
 
@@ -26,9 +27,9 @@ import customPropTypes from 'compiled/react_files/modules/customPropTypes'
     displayName: 'DragFeedback',
 
     propTypes: {
-      itemsToDrag: React.PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired,
-      pageX: React.PropTypes.number.isRequired,
-      pageY: React.PropTypes.number.isRequired
+      itemsToDrag: PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired,
+      pageX: PropTypes.number.isRequired,
+      pageY: PropTypes.number.isRequired
     },
 
     render () {

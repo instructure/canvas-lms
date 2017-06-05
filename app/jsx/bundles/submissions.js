@@ -16,6 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import submissions from 'submissions'
+import {setup} from 'submissions'
 
-submissions.setup()
+setup()

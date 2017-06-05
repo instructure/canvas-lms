@@ -16,9 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jquery' /* $ */
-], function($) {
+import $ from 'jquery'
 
   /**
    * TL;DR: Remove this file when possible.
@@ -150,4 +148,3 @@ define([
   };
   $.fn.dropdownList.defaults = {height: 250, width: "auto"};
   
-});

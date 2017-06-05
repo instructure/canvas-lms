@@ -17,11 +17,12 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import categoryHelper from 'jsx/shared/helpers/assignment-categories'
 import {transformScore} from 'jsx/shared/conditional_release/score'
 import assignmentShape from '../shapes/assignment'
-  const { object, number } = React.PropTypes
+  const { object, number } = PropTypes
 
 export default class StudentAssignmentItem extends React.Component {
     static propTypes = {

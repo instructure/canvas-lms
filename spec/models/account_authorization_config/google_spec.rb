@@ -45,4 +45,10 @@ describe AccountAuthorizationConfig::Google do
 
     expect(ap.unique_id(token)).to eq '123'
   end
+
+  it "it sets hosted domain to nil if empty string" do
+    ap = AccountAuthorizationConfig::Google.new
+    ap.hosted_domain = ''
+    expect(ap.hosted_domain).to be_nil
+  end
 end

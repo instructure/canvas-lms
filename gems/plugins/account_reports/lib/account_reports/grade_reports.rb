@@ -218,6 +218,7 @@ module AccountReports
                 sc.final_score,
            CASE WHEN e.workflow_state = 'active' THEN 'active'
                 WHEN e.workflow_state = 'completed' THEN 'concluded'
+                WHEN e.workflow_state = 'inactive' THEN 'inactive'
                 WHEN e.workflow_state = 'deleted' THEN 'deleted' END AS enroll_state").
         order("t.id, c.id, e.id").
         joins("INNER JOIN #{User.quoted_table_name} u ON pseudonyms.user_id = u.id
@@ -229,12 +230,12 @@ module AccountReports
                LEFT JOIN #{Score.quoted_table_name} sc ON sc.enrollment_id = e.id AND sc.grading_period_id IS NULL")
 
       if @include_deleted
-        students = students.where("e.workflow_state IN ('active', 'completed', 'deleted')")
+        students = students.where("e.workflow_state IN ('active', 'completed', 'inactive', 'deleted')")
         if @account_report.parameters.has_key? 'limiting_period'
           limiting_period = @account_report.parameters['limiting_period'].to_i
           students = students.where("e.workflow_state = 'active'
                                     OR c.conclude_at >= ?
-                                    OR (e.workflow_state = 'deleted'
+                                    OR (e.workflow_state IN ('inactive', 'deleted')
                                     AND e.updated_at >= ?)",
                                     limiting_period.days.ago, limiting_period.days.ago)
         end

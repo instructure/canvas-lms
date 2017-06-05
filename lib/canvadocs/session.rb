@@ -22,14 +22,23 @@ module Canvadocs
     def canvadoc_permissions_for_user(user)
       return {} unless canvadocs_can_annotate? user
 
+      annotation_context = "default"
+      if ApplicationController.respond_to?(:test_cluster?) && ApplicationController.test_cluster?
+        annotation_context = "default-#{ApplicationController.test_cluster_name}"
+      end
+
       opts = {
-        annotation_context: "default",
+        annotation_context: annotation_context,
         permissions: "readwrite",
         user_id: user.global_id.to_s,
         user_name: user.short_name.gsub(",", ""),
         user_role: "",
         user_filter: user.global_id.to_s,
       }
+
+      if user.crocodoc_id != nil
+        opts[:user_crocodoc_id] = user.crocodoc_id
+      end
 
       return opts if submissions.empty?
 

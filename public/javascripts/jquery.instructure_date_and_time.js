@@ -16,19 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!instructure',
-  'jquery',
-  'timezone',
-  'str/htmlEscape',
-  'compiled/widget/DatetimeField',
-  'jsx/shared/render-datepicker-time',
-  'jquery.keycodes' /* keycodes */,
-  'vendor/date' /* Date.parse, Date.UTC, Date.today */,
-  'jqueryui/datepicker' /* /\.datepicker/ */,
-  'jqueryui/sortable' /* /\.sortable/ */,
-  'jqueryui/widget' /* /\.widget/ */
-], function(I18n, $, tz, htmlEscape, DatetimeField, renderDatepickerTime) {
+import I18n from 'i18n!instructure'
+import $ from 'jquery'
+import tz from 'timezone'
+import htmlEscape from './str/htmlEscape'
+import DatetimeField from 'compiled/widget/DatetimeField'
+import renderDatepickerTime from 'jsx/shared/render-datepicker-time'
+import './jquery.keycodes'
+import './vendor/date' /* Date.parse, Date.UTC, Date.today */
+import 'jqueryui/datepicker'
+import 'jqueryui/sortable'
+import 'jqueryui/widget'
+
   // fudgeDateForProfileTimezone is used to apply an offset to the date which represents the
   // difference between the user's configured timezone in their profile, and the timezone
   // of the browser. We want to display times in the timezone of their profile. Use
@@ -462,5 +461,3 @@ define([
     });
     return $picker;
   };
-
-});

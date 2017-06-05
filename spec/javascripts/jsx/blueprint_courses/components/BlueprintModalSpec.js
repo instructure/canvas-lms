@@ -26,7 +26,7 @@ const defaultProps = () => ({
   isOpen: true,
 })
 
-const render = (props = defaultProps(), children = () => <p>content</p>) => (
+const render = (props = defaultProps(), children = <p>content</p>) => (
   <BlueprintModal {...props}>{children}</BlueprintModal>
 )
 
@@ -34,14 +34,17 @@ test('renders the BlueprintModal component', () => {
   const tree = enzyme.shallow(render())
   const node = tree.find('Modal')
   ok(node.exists())
+  tree.unmount()
 })
 
 test('renders the Done button when there are no changes', () => {
-  const modal = enzyme.mount(render()).instance()
+  const wrapper = enzyme.mount(render())
+  const modal = wrapper.instance()
   const footer = new enzyme.ReactWrapper(modal.footer, modal.footer)
   const buttons = footer.find('button')
   equal(buttons.length, 1)
   equal(buttons.at(0).text(), 'Done')
+  wrapper.unmount()
 })
 
 test('renders the Save + Cancel buttons when there are changes', () => {
@@ -49,12 +52,14 @@ test('renders the Save + Cancel buttons when there are changes', () => {
     ...defaultProps(),
     hasChanges: true,
   }
-  const modal = enzyme.mount(render(props)).instance()
+  const wrapper = enzyme.mount(render(props))
+  const modal = wrapper.instance()
   const footer = new enzyme.ReactWrapper(modal.footer, modal.footer)
   const buttons = footer.find('button')
   equal(buttons.length, 2)
   equal(buttons.at(0).text(), 'Cancel')
   equal(buttons.at(1).text(), 'Save')
+  wrapper.unmount()
 })
 
 test('renders the Done button when there are changes, but is in the process of saving', () => {
@@ -63,9 +68,11 @@ test('renders the Done button when there are changes, but is in the process of s
     hasChanges: true,
     isSaving: true,
   }
-  const modal = enzyme.mount(render(props)).instance()
+  const wrapper = enzyme.mount(render(props))
+  const modal = wrapper.instance()
   const footer = new enzyme.ReactWrapper(modal.footer, modal.footer)
   const buttons = footer.find('button')
   equal(buttons.length, 1)
   equal(buttons.at(0).text(), 'Done')
+  wrapper.unmount()
 })

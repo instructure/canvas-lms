@@ -17,7 +17,7 @@
 #
 
 require 'spec_helper'
-require 'aws-sdk'
+require 'aws-sdk-kinesis'
 
 describe LiveEvents::Client do
   def stub_config(opts = {})

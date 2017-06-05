@@ -75,7 +75,13 @@ export default React.createClass({
     },
 
     handleLti2ToolInstalled(toolData) {
-      this.setState({ tool: toolData });
+      if (toolData.status === 'failure') {
+        this.setState({ modalIsOpen: false }, () => {
+          $.flashMessage(toolData.message);
+        });
+      } else {
+        this.setState({ tool: toolData });
+      }
     },
 
     _successHandler() {

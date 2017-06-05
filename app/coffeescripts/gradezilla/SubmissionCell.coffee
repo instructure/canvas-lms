@@ -130,26 +130,30 @@ define [
       }, options)
       opts.submission ||= @opts.item[@opts.column.field]
       opts.assignment ||= @opts.column.object
-      submission_type = opts.submission.submission_type if opts.submission?.submission_type || null
-      specialClasses = SubmissionCell.classesBasedOnSubmission(opts.submission, opts.assignment)
-      specialClasses.push("grayed-out") if opts.student.isInactive || opts.student.isConcluded || opts.isLocked
-      specialClasses.push("cannot_edit") if opts.student.isConcluded || opts.isLocked
-      specialClasses.push(opts.tooltip) if opts.tooltip
       opts.editable = false if opts.student.isConcluded
+      submission_type = opts.submission.submission_type if opts.submission?.submission_type || null
+      styles = SubmissionCell.styles(opts.submission, opts.assignment)
+      tooltips = SubmissionCell.tooltips(opts.submission, opts.assignment)
+
+      styles.push("grayed-out") if opts.student.isInactive || opts.student.isConcluded || opts.isLocked
+      styles.push("cannot_edit") if opts.student.isConcluded || opts.isLocked
+      if opts.tooltip
+        styles.push(opts.tooltip)
+        tooltips.push(opts.tooltip)
 
       opts.classes += ' no_grade_yet ' unless opts.submission.grade && opts.submission.workflow_state != 'pending_review'
       innerContents = null if opts.submission.workflow_state == 'pending_review' && !isNaN(innerContents)
       innerContents ?= if submission_type then SubmissionCell.submissionIcon(submission_type) else '-'
 
       if turnitin = extractDataTurnitin(opts.submission)
-        specialClasses.push('turnitin')
+        styles.push('turnitin')
         innerContents += "<span class='gradebook-cell-turnitin #{htmlEscape turnitin.state}-score' />"
 
-      tooltipText = $.map(specialClasses, (c)-> GRADEBOOK_TRANSLATIONS["submission_tooltip_#{c}"]).join ', '
+      tooltipText = $.map(tooltips, (t)-> GRADEBOOK_TRANSLATIONS["submission_tooltip_#{t}"]).join(', ')
 
       """
       #{$.raw if tooltipText then '<div class="gradebook-tooltip">'+ htmlEscape(tooltipText) + '</div>' else ''}
-      <div class="gradebook-cell #{htmlEscape if opts.editable then 'gradebook-cell-editable focus' else ''} #{htmlEscape opts.classes} #{htmlEscape specialClasses.join(' ')}">
+      <div class="gradebook-cell #{htmlEscape if opts.editable then 'gradebook-cell-editable focus' else ''} #{htmlEscape opts.classes} #{htmlEscape styles.join(' ')}">
         #{$.raw innerContents}
       </div>
       """
@@ -161,10 +165,33 @@ define [
       else
         ""
 
-    @classesBasedOnSubmission: (submission={}, assignment={}) ->
+    @tooltips: (submission = {}, assignment = {}) ->
       classes = []
+      classes.push('dropped') if submission.drop
+      classes.push('excused') if submission.excused
       classes.push('resubmitted') if submission.grade_matches_current_submission == false
+      classes.push('missing') if submission.missing
       classes.push('late') if submission.late
+      classes.push('ungraded') if ''+assignment.submission_types is "not_graded"
+      classes.push('muted') if assignment.muted
+      classes.push(submission.submission_type) if submission.submission_type
+      classes
+
+    @styles: (submission = {}, assignment = {}) ->
+      classes = []
+
+      # only one of these can be present for styling
+      if submission.drop
+        classes.push('dropped')
+      else if submission.excused
+        classes.push('excused')
+      else if submission.grade_matches_current_submission == false
+        classes.push('resubmitted')
+      else if submission.missing
+        classes.push('missing')
+      else if submission.late
+        classes.push('late')
+
       classes.push('ungraded') if ''+assignment.submission_types is "not_graded"
       classes.push('muted') if assignment.muted
       classes.push(submission.submission_type) if submission.submission_type

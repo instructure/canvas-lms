@@ -253,3 +253,10 @@
   notifications:
     - name: Web Conference Recording Ready
       delay_for: 0
+
+- category: Blueprint
+  notifications:
+    - name: Blueprint Content Added
+      delay_for: 0
+    - name: Blueprint Sync Complete
+      delay_for: 0

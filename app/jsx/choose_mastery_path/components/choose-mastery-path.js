@@ -17,10 +17,11 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!choose_mastery_path'
 import PathOption from './path-option'
 import optionShape from '../shapes/option-shape'
-  const { func, number, arrayOf } = React.PropTypes
+  const { func, number, arrayOf } = PropTypes
 
 export default class ChooseMasteryPath extends React.Component {
     static propTypes = {

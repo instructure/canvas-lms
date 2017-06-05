@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!theme_editor'
 import React from 'react'
+import PropTypes from 'prop-types'
 import Modal from 'react-modal'
 import ProgressBar from 'jsx/shared/ProgressBar'
 
@@ -26,7 +27,7 @@ import ProgressBar from 'jsx/shared/ProgressBar'
   const modalOverrides = {
     overlay : {
       backgroundColor: 'rgba(0,0,0,0.5)'
-    },  
+    },
     content : {
       position: 'static',
       top: '0',
@@ -43,10 +44,10 @@ export default React.createClass({
     displayName: 'ThemeEditorModal',
 
     propTypes: {
-      showProgressModal: React.PropTypes.bool,
-      showSubAccountProgress: React.PropTypes.bool,
-      progress: React.PropTypes.number,
-      activeSubAccountProgresses: React.PropTypes.array,
+      showProgressModal: PropTypes.bool,
+      showSubAccountProgress: PropTypes.bool,
+      progress: PropTypes.number,
+      activeSubAccountProgresses: PropTypes.array,
     },
 
     modalOpen(){
@@ -131,8 +132,8 @@ export default React.createClass({
       return (
         <Modal
           isOpen={this.modalOpen()}
-          className={ 
-            (this.props.showProgressModal ? 'ReactModal__Content--canvas ReactModal__Content--mini-modal' : 'ReactModal__Content--canvas') 
+          className={
+            (this.props.showProgressModal ? 'ReactModal__Content--canvas ReactModal__Content--mini-modal' : 'ReactModal__Content--canvas')
           }
           style={modalOverrides}
         >

@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import customTypes from './PropTypes'
 import I18n from 'i18n!theme_editor'
 
@@ -25,11 +26,11 @@ export default React.createClass({
     displayName: 'ThemeEditorFileUpload',
 
     propTypes: {
-      label: React.PropTypes.string,
-      accept: React.PropTypes.string,
-      name: React.PropTypes.string,
-      onChange: React.PropTypes.func.isRequired,
-      currentValue: React.PropTypes.string,
+      label: PropTypes.string,
+      accept: PropTypes.string,
+      name: PropTypes.string,
+      onChange: PropTypes.func.isRequired,
+      currentValue: PropTypes.string,
       userInput: customTypes.userVariableInput
     },
 

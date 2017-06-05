@@ -17,17 +17,20 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid'
 import { MenuItem, MenuItemGroup } from 'instructure-ui/lib/components/Menu'
 import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
 import Typography from 'instructure-ui/lib/components/Typography'
 import I18n from 'i18n!gradebook'
 
-const { bool, func, number, shape, string } = React.PropTypes;
+const { bool, func, number, shape, string } = PropTypes;
 
-function renderTrigger (assignmentGroup) {
+function renderTrigger (assignmentGroup, menuShown) {
+  const classes = `Gradebook__ColumnHeaderAction ${menuShown ? 'menuShown' : ''}`;
+
   return (
-    <span className="Gradebook__ColumnHeaderAction">
+    <span className={classes}>
       <Typography weight="bold" fontStyle="normal" size="large" color="brand">
         <IconMoreSolid title={I18n.t('%{name} Options', { name: assignmentGroup.name })} />
       </Typography>
@@ -70,12 +73,22 @@ class AssignmentGroupColumnHeader extends React.Component {
   constructor (props) {
     super(props);
 
+    this.state = {
+      menuShown: false
+    };
+
     this.bindOptionsMenuContent = (ref) => { this.optionsMenuContent = ref };
+    this.onToggle = this.onToggle.bind(this);
+  }
+
+  onToggle (show) {
+    this.setState({ menuShown: show });
   }
 
   render () {
     const { assignmentGroup, sortBySetting, weightedGroups } = this.props;
     const selectedSortSetting = sortBySetting.isSortColumn && sortBySetting.settingKey;
+    const menuShown = this.state.menuShown;
 
     return (
       <div className="Gradebook__ColumnHeaderContent">
@@ -87,7 +100,8 @@ class AssignmentGroupColumnHeader extends React.Component {
         <PopoverMenu
           contentRef={this.bindOptionsMenuContent}
           focusTriggerOnClose={false}
-          trigger={renderTrigger(this.props.assignmentGroup)}
+          trigger={renderTrigger(this.props.assignmentGroup, menuShown)}
+          onToggle={this.onToggle}
         >
           <MenuItemGroup label={I18n.t('Sort by')}>
             <MenuItem

@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!roster'
 import React  from 'react'
+import PropTypes from 'prop-types'
 import shapes from './shapes'
 import Table from 'instructure-ui/lib/components/Table'
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
@@ -37,11 +38,11 @@ import Link from 'instructure-ui/lib/components/Link'
 
   class DuplicateSection extends React.Component {
     static propTypes = {
-      duplicates: React.PropTypes.shape(shapes.duplicateSetShape).isRequired,
-      onSelectDuplicate: React.PropTypes.func.isRequired,
-      onNewForDuplicate: React.PropTypes.func.isRequired,
-      onSkipDuplicate: React.PropTypes.func.isRequired,
-      inviteUsersURL: React.PropTypes.string
+      duplicates: PropTypes.shape(shapes.duplicateSetShape).isRequired,
+      onSelectDuplicate: PropTypes.func.isRequired,
+      onNewForDuplicate: PropTypes.func.isRequired,
+      onSkipDuplicate: PropTypes.func.isRequired,
+      inviteUsersURL: PropTypes.string
     };
     static defaultProps = {
       inviteUsersURL: undefined

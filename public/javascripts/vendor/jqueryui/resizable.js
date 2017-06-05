@@ -12,12 +12,10 @@
  *	jquery.ui.mouse.js
  *	jquery.ui.widget.js
  */
-define([
-  'jquery',
-  'jqueryui/core',
-  'jqueryui/mouse',
-  'jqueryui/widget'
-], function( $ ) {
+import $ from 'jquery'
+import 'jqueryui/core'
+import 'jqueryui/mouse'
+import 'jqueryui/widget'
 
 $.widget("ui.resizable", $.ui.mouse, {
 	version: "@VERSION",
@@ -803,4 +801,4 @@ var isNumber = function(value) {
 	return !isNaN(parseInt(value, 10));
 };
 
-});
+

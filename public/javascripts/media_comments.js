@@ -16,20 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!media_comments',
-  'underscore',
-  'vendor/jquery.ba-tinypubsub',
-  'jquery' /* $ */,
-  'str/htmlEscape',
-  'compiled/jquery/mediaComment' /* $.fn.mediaComment */,
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* /\$\.h/, /\$\.fileSize/ */,
-  'jquery.instructure_misc_plugins' /* .dim, /\.log\(/ */,
-  'jqueryui/progressbar' /* /\.progressbar/ */,
-  'jqueryui/tabs' /* /\.tabs/ */
-], function (I18n, _, pubsub, $, htmlEscape) {
+import I18n from 'i18n!media_comments'
+import _ from 'underscore'
+import pubsub from 'vendor/jquery.ba-tinypubsub'
+import $ from 'jquery'
+import htmlEscape from './str/htmlEscape'
+import mediaCommentsTemplate from 'jst/MediaComments'
+import JsUploader from 'compiled/media_comments/js_uploader'
+import 'compiled/jquery/mediaComment'
+import './jquery.ajaxJSON'
+import 'jqueryui/dialog'
+import './jquery.instructure_misc_helpers' /* /\$\.h/, /\$\.fileSize/ */
+import './jquery.instructure_misc_plugins' /* .dim, /\.log\(/ */
+import 'jqueryui/progressbar'
+import 'jqueryui/tabs'
 
   "use strict"
   var jsUploader
@@ -637,7 +637,7 @@ define([
       alert(I18n.t('errors.save_failed_try_again', "Entry failed to save.  Please try again."));
     }
   }
-});
+
 
 // Debugging methods for kaltura record widget. If These exist they'll be called.
 //function deviceDetected(){

@@ -55,14 +55,12 @@ define([
         id: '17'
       }
       subject = TestUtils.renderIntoDocument(
-        <Avatar
-          user={{...user}} courseId="1" canMasquerade
-        />
+        <Avatar user={user} courseId="1" canMasquerade />
       )
 
       const avatar = TestUtils.findRenderedComponentWithType(subject, InstUIAvatar)
-      equal(avatar.props.userName, user.name)
-      equal(avatar.props.userImgUrl, user.avatar_url)
+      equal(avatar.props.name, user.name)
+      equal(avatar.props.src, user.avatar_url)
       const componentNode = ReactDOM.findDOMNode(subject)
       const link = componentNode.querySelector('a')
       equal(link.getAttribute('href'), '/courses/1/users/17')

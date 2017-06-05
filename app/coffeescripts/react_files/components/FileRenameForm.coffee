@@ -18,8 +18,9 @@
 define [
   'i18n!file_rename_form'
   'react'
-  'react-dom'
-], (I18n, React, ReactDOM) ->
+  'react-dom',
+  'prop-types'
+], (I18n, React, ReactDOM, PropTypes) ->
 
   FileRenameForm =
     displayName: 'FileRenameForm'
@@ -27,8 +28,8 @@ define [
     # dialog for renaming
 
     propType:
-      fileOptions: React.PropTypes.object
-      onNameConflictResolved: React.PropTypes.func.isRequired
+      fileOptions: PropTypes.object
+      onNameConflictResolved: PropTypes.func.isRequired
 
     getInitialState: ->
       isEditing: false

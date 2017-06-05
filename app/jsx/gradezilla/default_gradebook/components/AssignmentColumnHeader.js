@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid'
 import IconMutedSolid from 'instructure-icons/lib/Solid/IconMutedSolid'
 import IconWarningSolid from 'instructure-icons/lib/Solid/IconWarningSolid'
@@ -28,7 +29,7 @@ import 'message_students'
 import MessageStudentsWhoHelper from 'jsx/gradezilla/shared/helpers/messageStudentsWhoHelper'
 import I18n from 'i18n!gradebook'
 
-const { arrayOf, bool, func, instanceOf, number, shape, string } = React.PropTypes;
+const { arrayOf, bool, func, instanceOf, number, shape, string } = PropTypes;
 
 class AssignmentColumnHeader extends React.Component {
   static propTypes = {
@@ -69,10 +70,6 @@ class AssignmentColumnHeader extends React.Component {
       }).isRequired,
     })).isRequired,
     submissionsLoaded: bool.isRequired,
-    assignmentDetailsAction: shape({
-      disabled: bool.isRequired,
-      onSelect: func.isRequired
-    }).isRequired,
     setDefaultGradeAction: shape({
       disabled: bool.isRequired,
       onSelect: func.isRequired
@@ -110,8 +107,17 @@ class AssignmentColumnHeader extends React.Component {
   constructor (props) {
     super(props);
 
+    this.state = {
+      menuShown: false
+    };
+
     this.bindOptionsMenuContent = (ref) => { this.optionsMenuContent = ref };
     this.showMessageStudentsWhoDialog = this.showMessageStudentsWhoDialog.bind(this);
+    this.onToggle = this.onToggle.bind(this);
+  }
+
+  onToggle (show) {
+    this.setState({ menuShown: show });
   }
 
   activeStudentDetails () {
@@ -170,8 +176,11 @@ class AssignmentColumnHeader extends React.Component {
 
   renderTrigger () {
     const optionsTitle = I18n.t('%{name} Options', { name: this.props.assignment.name });
+    const menuShown = this.state.menuShown;
+    const classes = `Gradebook__ColumnHeaderAction ${menuShown ? 'menuShown' : ''}`;
+
     return (
-      <span className="Gradebook__ColumnHeaderAction">
+      <span className={classes}>
         <Typography weight="bold" fontStyle="normal" size="large" color="brand">
           <IconMoreSolid title={optionsTitle} />
         </Typography>
@@ -190,6 +199,7 @@ class AssignmentColumnHeader extends React.Component {
         contentRef={this.bindOptionsMenuContent}
         focusTriggerOnClose={false}
         trigger={this.renderTrigger()}
+        onToggle={this.onToggle}
       >
         <MenuItemGroup label={I18n.t('Sort by')}>
           <MenuItem
@@ -234,13 +244,6 @@ class AssignmentColumnHeader extends React.Component {
         </MenuItemGroup>
 
         <MenuItemSeparator />
-
-        <MenuItem
-          disabled={this.props.assignmentDetailsAction.disabled}
-          onSelect={this.props.assignmentDetailsAction.onSelect}
-        >
-          <span data-menu-item-id="show-assignment-details">{I18n.t('Assignment Details')}</span>
-        </MenuItem>
 
         <MenuItem
           disabled={!this.props.submissionsLoaded}

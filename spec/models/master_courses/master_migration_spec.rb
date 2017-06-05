@@ -139,8 +139,8 @@ describe MasterCourses::MasterMigration do
       @template.migration_id_for(obj)
     end
 
-    def run_master_migration
-      @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @admin)
+    def run_master_migration(opts={})
+      @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @admin, opts)
       run_jobs
       @migration.reload
     end
@@ -494,6 +494,66 @@ describe MasterCourses::MasterMigration do
       expect(copied_page.title).to eq new_master_title # even the title
     end
 
+    it "overwrites/removes availability dates when pushing a locked quiz" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+      dates1 = [1.day.ago, 1.day.from_now, 2.days.from_now].map(&:beginning_of_day)
+      dates2 = [2.days.ago, 3.days.from_now, 5.days.from_now].map(&:beginning_of_day)
+
+      quiz1 = @copy_from.quizzes.create!(:unlock_at => dates1[0], :due_at => dates1[1], :lock_at => dates1[2])
+      quiz2 = @copy_from.quizzes.create!
+      run_master_migration
+
+      cq1 = @copy_to.quizzes.where(migration_id: mig_id(quiz1)).first
+      cq2 = @copy_to.quizzes.where(migration_id: mig_id(quiz2)).first
+
+      Timecop.travel(5.minutes.from_now) do
+        cq1.update_attributes(:unlock_at => dates2[0], :due_at => dates2[1], :lock_at => dates2[2])
+        cq2.update_attributes(:unlock_at => dates2[0], :due_at => dates2[1], :lock_at => dates2[2])
+      end
+
+      Timecop.travel(10.minutes.from_now) do
+        @template.content_tag_for(quiz1).update_attribute(:restrictions, {:availability_dates => true, :due_dates => true})
+        @template.content_tag_for(quiz2).update_attribute(:restrictions, {:availability_dates => true, :due_dates => true})
+
+        run_master_migration
+      end
+
+      cq1.reload
+      expect(cq1.due_at).to eq dates1[1]
+      expect(cq1.unlock_at).to eq dates1[0]
+      expect(cq1.lock_at).to eq dates1[2]
+
+      cq2.reload
+      expect(cq2.due_at).to be_nil
+      expect(cq2.unlock_at).to be_nil
+      expect(cq2.lock_at).to be_nil
+    end
+
+    it "removes due/available dates from locked assignments in sync" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+      assmt = @copy_from.assignments.create!(:due_at => 1.day.from_now, :unlock_at => 1.day.ago, :lock_at => 1.day.from_now)
+      run_master_migration
+
+      assmt_to = @copy_to.assignments.where(migration_id: mig_id(assmt)).first
+      expect(assmt_to.due_at).not_to be_nil
+
+      Timecop.travel(5.minutes.from_now) do
+        @template.content_tag_for(assmt).update_attribute(:restrictions, {:availability_dates => true, :due_dates => true})
+        assmt.update_attributes(:due_at => nil, :unlock_at => nil, :lock_at => nil)
+      end
+
+      Timecop.travel(10.minutes.from_now) do
+        run_master_migration
+      end
+
+      assmt_to.reload
+      expect(assmt_to.due_at).to be_nil
+      expect(assmt_to.lock_at).to be_nil
+      expect(assmt_to.unlock_at).to be_nil
+    end
+
     it "should count downstream changes to quiz/assessment questions as changes in quiz/bank content" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
@@ -627,15 +687,53 @@ describe MasterCourses::MasterMigration do
       expect(copied_topic_assmt.reload.due_at.to_i).to eq new_master_due_at.to_i
     end
 
-    it "should ignore course settings" do
+    it "should ignore course settings on selective export unless requested" do
       @copy_to = course_factory
       @sub = @template.add_child_course!(@copy_to)
 
+      @copy_from.tab_configuration = [{"id"=>0}, {"id"=>14}, {"id"=>8}, {"id"=>5}, {"id"=>6}, {"id"=>2}, {"id"=>3, "hidden"=>true}]
+      @copy_from.save!
+      run_master_migration(:copy_settings => false) # initial sync with explicit false
+      expect(@copy_to.reload.tab_configuration).to_not eq @copy_from.tab_configuration
+
+      @copy_to2 = course_factory
+      @sub = @template.add_child_course!(@copy_to2)
+      run_master_migration # initial sync by default
+      expect(@copy_to2.reload.tab_configuration).to eq @copy_from.tab_configuration
+
       @copy_from.update_attribute(:is_public, true)
-
-      run_master_migration
-
+      run_master_migration # selective without settings
       expect(@copy_to.reload.is_public).to_not be_truthy
+
+      run_master_migration(:copy_settings => true) # selective with settings
+      expect(@copy_to.reload.is_public).to be_truthy
+    end
+
+    it "shouldn't overwrite syllabus body if already present or changed" do
+      @copy_to1 = course_factory
+      @template.add_child_course!(@copy_to1)
+
+      @copy_to2 = course_factory
+      child_syllabus1 = "<p>some child syllabus</p>"
+      @copy_to2.update_attribute(:syllabus_body, child_syllabus1)
+      @template.add_child_course!(@copy_to2)
+
+      master_syllabus1 = "<p>some original syllabus</p>"
+      @copy_from.update_attribute(:syllabus_body, master_syllabus1)
+      run_master_migration
+      expect(@copy_to1.reload.syllabus_body).to eq master_syllabus1 # use the master syllabus
+      expect(@copy_to2.reload.syllabus_body).to eq child_syllabus1 # keep the existing one
+
+      master_syllabus2 = "<p>some new syllabus</p>"
+      @copy_from.update_attribute(:syllabus_body, master_syllabus2)
+      run_master_migration
+      expect(@copy_to1.reload.syllabus_body).to eq master_syllabus2 # keep syncing
+      expect(@copy_to2.reload.syllabus_body).to eq child_syllabus1
+
+      child_syllabus2 = "<p>syllabus is a weird word</p>"
+      @copy_to1.update_attribute(:syllabus_body, child_syllabus2)
+      run_master_migration
+      expect(@copy_to1.reload.syllabus_body).to eq child_syllabus2 # preserve the downstream change
     end
 
     it "should trigger folder locking data cache invalidation" do
@@ -700,6 +798,21 @@ describe MasterCourses::MasterMigration do
       run_master_migration
 
       [topic_override, normal_override].each { |ao| expect(ao.reload).to be_deleted }
+    end
+
+    it "should work with a single full export for a new association" do
+      @copy_to1 = course_factory
+      sub1 = @template.add_child_course!(@copy_to1)
+      topic = @copy_from.discussion_topics.create!(:title => "some title")
+
+      run_master_migration
+
+      sub1.destroy!
+      @copy_to2 = course_factory
+      @template.add_child_course!(@copy_to2)
+
+      run_master_migration
+      expect(@copy_to2.discussion_topics.first).to be_present
     end
 
     context "master courses + external migrations" do

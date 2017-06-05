@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!external_tools'
 import React from 'react'
+import PropTypes from 'prop-types'
 import Modal from 'react-modal'
 import ConfigOptionField from 'jsx/external_apps/components/ConfigOptionField'
 
@@ -41,8 +42,8 @@ export default React.createClass({
     displayName: 'ManageAppListButton',
 
     propTypes: {
-      onUpdateAccessToken: React.PropTypes.func.isRequired,
-      extAppStore: React.PropTypes.object
+      onUpdateAccessToken: PropTypes.func.isRequired,
+      extAppStore: PropTypes.object
     },
 
     getInitialState() {

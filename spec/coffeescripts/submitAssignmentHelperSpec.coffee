@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define ['submit_assignment_helper','jquery'], (SubmitAssignmentHelper, $) ->
+define ['submit_assignment_helper','jquery'], ({submitContentItem}, $) ->
   formHtml = """
             <div id="form-container">
             <form accept-charset="UTF-8" action="/courses/2/assignments/1/submissions" id="submit_online_url_form" method="post">
@@ -86,7 +86,7 @@ define ['submit_assignment_helper','jquery'], (SubmitAssignmentHelper, $) ->
       ENV = originalEnv
 
   test "correctly populates form values for LtiLinkItem", ->
-    SubmitAssignmentHelper.submitContentItem(contentItem)
+    submitContentItem(contentItem)
     equal $("#external_tool_url").val(), url
     equal $("#external_tool_submission_type").val(), 'basic_lti_launch'
 
@@ -95,7 +95,7 @@ define ['submit_assignment_helper','jquery'], (SubmitAssignmentHelper, $) ->
     fileItem['@type'] = 'FileItem'
     fileItem['@id'] = fileUrl
     fileItem.url = fileUrl
-    SubmitAssignmentHelper.submitContentItem(fileItem)
+    submitContentItem(fileItem)
     equal $("#external_tool_url").val(), fileUrl
     equal $("#external_tool_submission_type").val(), "online_url_to_file"
 
@@ -104,7 +104,7 @@ define ['submit_assignment_helper','jquery'], (SubmitAssignmentHelper, $) ->
     unsupportedItem['@type'] = 'FileItem'
     unsupportedItem.url = 'https://lti-tool-provider-example.herokuapp.com/test_file.jpg'
 
-    result = SubmitAssignmentHelper.submitContentItem(unsupportedItem)
+    result = submitContentItem(unsupportedItem)
     equal result, false
 
   test "accepts supported file types", ->
@@ -112,17 +112,17 @@ define ['submit_assignment_helper','jquery'], (SubmitAssignmentHelper, $) ->
     supportedItem['@type'] = 'FileItem'
     supportedItem.url = fileUrl
 
-    result = SubmitAssignmentHelper.submitContentItem(supportedItem)
+    result = submitContentItem(supportedItem)
     equal result, true
 
   test "correctly populates form values for FileItem", ->
     unsupportedItem = contentItem
     unsupportedItem['@type'] = 'UnsupportedType'
-    result = SubmitAssignmentHelper.submitContentItem(unsupportedItem)
+    result = submitContentItem(unsupportedItem)
     equal result, false
 
   test "returns false if not given an item", ->
-    result = SubmitAssignmentHelper.submitContentItem(undefined)
+    result = submitContentItem(undefined)
     equal result, false
 
 

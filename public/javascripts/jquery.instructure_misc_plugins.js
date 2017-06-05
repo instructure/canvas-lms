@@ -15,18 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-define([
-  'i18n!instructure',
-  'jquery' /* $ */,
-  'str/htmlEscape',
-  'compiled/behaviors/authenticity_token',
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jqueryui/dialog',
-  'jquery.scrollToVisible' /* scrollToVisible */,
-  'vendor/jquery.ba-hashchange' /* hashchange */,
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */
-], function(I18n, $, htmlEscape, authenticity_token) {
+import I18n from 'i18n!instructure'
+import $ from 'jquery'
+import htmlEscape from './str/htmlEscape'
+import authenticity_token from 'compiled/behaviors/authenticity_token'
+import './jquery.ajaxJSON'
+import 'jqueryui/dialog'
+import './jquery.scrollToVisible'
+import './vendor/jquery.scrollTo'
 
   $.fn.setOptions = function(prompt, options) {
     var result = prompt ? "<option value=''>" + htmlEscape(prompt) + "</option>" : "";
@@ -421,5 +417,4 @@ define([
 
   };
 
-  return $;
-});
+export default $;

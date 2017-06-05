@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import Modal from 'react-modal'
 import classNames from 'classnames'
@@ -31,8 +32,8 @@ import 'jquery.instructure_forms'
     displayName: 'ConditionalReleaseEditor',
 
     propTypes: {
-      env: React.PropTypes.object.isRequired,
-      type: React.PropTypes.string.isRequired
+      env: PropTypes.object.isRequired,
+      type: PropTypes.string.isRequired
     },
 
     getInitialState() {

@@ -198,6 +198,13 @@
     <% if editable || module_item.nil? %>
       <div class="ig-admin">
         <span
+          data-module-item-id="<%= module_item && module_item.id %>"
+          data-module-type="<%= module_item && module_item.content_type_class %>"
+          data-content-id="<%= module_item && module_item.content_id %>"
+          class="lock-icon"
+        >
+        </span>
+        <span
           data-module-item-name="<%= module_item && module_item.title %>"
           data-module-type="<%= module_item && module_item.content_type_class %>"
           data-content-id="<%= module_item && module_item.content_id %>"

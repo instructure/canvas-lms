@@ -19,6 +19,7 @@ define [
   'jquery'
   'react'
   'react-dom'
+  'prop-types'
   'i18n!restrict_student_access'
   'compiled/models/Folder'
   '../modules/customPropTypes'
@@ -26,7 +27,7 @@ define [
   '../utils/updateModelsUsageRights'
   'jquery.instructure_date_and_time'
   'jquery.instructure_forms'
-], ($, React, ReactDOM, I18n, Folder, customPropTypes, setUsageRights, updateModelsUsageRights) ->
+], ($, React, ReactDOM, PropTypes, I18n, Folder, customPropTypes, setUsageRights, updateModelsUsageRights) ->
 
   RestrictedDialogForm =
 
@@ -34,9 +35,9 @@ define [
     displayName: 'RestrictedDialogForm'
 
     propTypes:
-      closeDialog: React.PropTypes.func.isRequired,
-      models: React.PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired
-      usageRightsRequiredForContext: React.PropTypes.bool.isRequired
+      closeDialog: PropTypes.func.isRequired,
+      models: PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired
+      usageRightsRequiredForContext: PropTypes.bool.isRequired
 
     getInitialState: ->
       submitable: false

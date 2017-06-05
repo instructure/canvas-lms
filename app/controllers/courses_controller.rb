@@ -1194,9 +1194,27 @@ class CoursesController < ApplicationController
 
       set_tutorial_js_env
 
-      @course_settings_sub_navigation_tools = ContextExternalTool.all_tools_for(@context, :type => :course_settings_sub_navigation, :root_account => @domain_root_account, :current_user => @current_user)
+      if @context.root_account.feature_enabled?(:master_courses)
+        master_template = @context.master_course_templates.for_full_course.first
+        restrictions_by_object_type = master_template&.default_restrictions_by_type || {}
+        cleaned_restrictions = restrictions_by_object_type.map{|k, v| [k.sub(/^.+::/, '').underscore, v] }.to_h
+        message =!MasterCourses::MasterTemplate.is_master_course?(@context) && why_cant_i_enable_master_course(@context)
+        message ||= ''
+        js_env({
+          IS_MASTER_COURSE: MasterCourses::MasterTemplate.is_master_course?(@context),
+          DISABLED_BLUEPRINT_MESSAGE: message,
+          BLUEPRINT_RESTRICTIONS: master_template&.default_restrictions || { :content => true },
+          USE_BLUEPRINT_RESTRICTIONS_BY_OBJECT_TYPE: master_template&.use_default_restrictions_by_type || false,
+          BLUEPRINT_RESTRICTIONS_BY_OBJECT_TYPE: cleaned_restrictions
+        })
+      end
+
+      @course_settings_sub_navigation_tools = ContextExternalTool.all_tools_for(@context,
+        :type => :course_settings_sub_navigation,
+        :root_account => @domain_root_account,
+        :current_user => @current_user)
       unless @context.grants_right?(@current_user, session, :read_as_admin)
-        @course_settings_sub_navigation_tools.reject! { |tool| tool.course_settings_sub_navigation(:visibility) == 'admins' }
+        @course_settings_sub_navigation_tools.reject!{|tool| tool.course_settings_sub_navigation(:visibility)=='admins'}
       end
     end
   end

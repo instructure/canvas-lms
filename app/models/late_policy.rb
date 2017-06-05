@@ -20,11 +20,57 @@ class LatePolicy < ActiveRecord::Base
   belongs_to :course, inverse_of: :late_policy
 
   validates :course_id,
-    presence: true
+    presence: true,
+    uniqueness: true
   validates :late_submission_minimum_percent, :missing_submission_deduction, :late_submission_deduction,
     presence: true,
     numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }
   validates :late_submission_interval,
     presence: true,
     inclusion: { in: %w(day hour) }
+
+  after_save :update_late_submissions, if: :late_policy_attributes_changed?
+
+  def points_deducted(score: nil, possible: 0.0, late_for: 0.0)
+    return 0.0 unless late_submission_deduction_enabled && score && possible&.positive? && late_for&.positive?
+
+    intervals_late = (late_for / interval_seconds).ceil
+    minimum_percent = late_submission_minimum_percent_enabled ? late_submission_minimum_percent : 0.0
+    raw_score_percent = score * 100.0 / possible
+    maximum_deduct = [raw_score_percent - minimum_percent, 0.0].max
+    late_percent_deduct = late_submission_deduction * intervals_late
+    possible * [late_percent_deduct, maximum_deduct].min / 100
+  end
+
+  def missing_points_deducted(assignment)
+    return assignment.points_possible.to_f if assignment.grading_type == 'pass_fail'
+    assignment.points_possible.to_f * missing_submission_deduction.to_f / 100
+  end
+
+  def points_for_missing(assignment)
+    return 0 if assignment.grading_type == 'pass_fail'
+    assignment.points_possible.to_f * (100 - missing_submission_deduction.to_f) / 100
+  end
+
+  private
+
+  def interval_seconds
+    { 'hour' => 1.hour, 'day' => 1.day }[late_submission_interval].to_f
+  end
+
+  def update_late_submissions
+    LatePolicyApplicator.for_course(course)
+  end
+
+  def late_policy_attributes_changed?
+    (
+      [
+        'late_submission_deduction_enabled',
+        'late_submission_deduction',
+        'late_submission_interval',
+        'late_submission_minimum_percent_enabled',
+        'late_submission_minimum_percent'
+      ] & changed
+    ).present?
+  end
 end

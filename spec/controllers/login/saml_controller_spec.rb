@@ -288,9 +288,9 @@ describe Login::SamlController do
     end
 
     it "should saml_logout with multiple authorization configs" do
-      Onelogin::Saml::LogoutResponse.stubs(:parse).returns(
-        stub('response', @stub_hash)
-      )
+      logout_response = SAML2::LogoutResponse.new
+      logout_response.issuer = SAML2::NameID.new(@aac2.idp_entity_id)
+      expect(SAML2::Bindings::HTTPRedirect).to receive(:decode).and_return(logout_response)
       controller.request.env['canvas.domain_root_account'] = @account
       get :destroy, :SAMLResponse => "foo", :RelayState => "/courses"
 
@@ -407,12 +407,12 @@ describe Login::SamlController do
         end
 
         it "should find the correct AAC" do
-          @aac1.any_instantiation.expects(:saml_settings).never
-          @aac2.any_instantiation.expects(:saml_settings).at_least_once
+          expect(@aac1.any_instantiation).to receive(:debugging?).never
+          expect(@aac2.any_instantiation).to receive(:debugging?).at_least(1)
 
-          Onelogin::Saml::LogoutResponse.stubs(:parse).returns(
-            stub('response', @stub_hash)
-          )
+          logout_response = SAML2::LogoutResponse.new
+          logout_response.issuer = SAML2::NameID.new(@aac2.idp_entity_id)
+          expect(SAML2::Bindings::HTTPRedirect).to receive(:decode).and_return(logout_response)
 
           controller.request.env['canvas.domain_root_account'] = @account
           get :destroy, :SAMLResponse => "foo"
@@ -421,11 +421,9 @@ describe Login::SamlController do
 
         it "should redirect a response to idp on logout with a SAMLRequest parameter" do
           controller.expects(:logout_current_user)
-          @stub_hash[:id] = '_42'
-
-          Onelogin::Saml::LogoutRequest.stubs(:parse).returns(
-            stub('request', @stub_hash)
-          )
+          logout_request = SAML2::LogoutRequest.new
+          logout_request.issuer = SAML2::NameID.new(@aac2.idp_entity_id)
+          expect(SAML2::Bindings::HTTPRedirect).to receive(:decode).and_return(logout_request)
 
           controller.request.env['canvas.domain_root_account'] = @account
           get :destroy, :SAMLRequest => "foo"
@@ -435,11 +433,9 @@ describe Login::SamlController do
         end
 
         it "returns bad request if SAMLRequest parameter doesn't match an AAC" do
-          @stub_hash[:id] = '_42'
-          @stub_hash[:issuer] = "hahahahahahaha"
-          Onelogin::Saml::LogoutRequest.stubs(:parse).returns(
-            stub('request', @stub_hash)
-          )
+          logout_request = SAML2::LogoutRequest.new
+          logout_request.issuer = SAML2::NameID.new("hahahahahahaha")
+          expect(SAML2::Bindings::HTTPRedirect).to receive(:decode).and_return(logout_request)
 
           controller.request.env['canvas.domain_root_account'] = @account
           get :destroy, :SAMLRequest => "foo"
@@ -452,9 +448,9 @@ describe Login::SamlController do
 
   context "/saml_logout" do
     it "should return bad request if SAML is not configured for account" do
-      Onelogin::Saml::LogoutResponse.expects(:parse).returns(
-        stub('response', issuer: 'entity')
-      )
+      logout_response = SAML2::LogoutResponse.new
+      logout_response.issuer = SAML2::NameID.new('entity')
+      expect(SAML2::Bindings::HTTPRedirect).to receive(:decode).and_return(logout_response)
 
       controller.expects(:logout_user_action).never
       controller.request.env['canvas.domain_root_account'] = @account

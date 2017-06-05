@@ -140,7 +140,7 @@ module AttachmentFu # :nodoc:
       mattr_reader :bucket
 
       def self.included(base) #:nodoc:
-        require 'aws-sdk'
+        require 'aws-sdk-s3'
 
         s3_config_path = base.attachment_options[:s3_config_path] || (Rails.root + 'config/amazon_s3.yml')
         s3_config = YAML.load(ERB.new(File.read(s3_config_path)).result)[Rails.env].symbolize_keys
@@ -247,6 +247,11 @@ module AttachmentFu # :nodoc:
       def authenticated_s3_url(*args)
         thumbnail = args.first.is_a?(String) ? args.first : nil
         options   = args.last.is_a?(Hash)    ? args.last  : {}
+        unless options[:expires_in].nil?
+          if options[:expires_in].is_a? ActiveSupport::Duration
+            options[:expires_in] = options[:expires_in].to_i
+          end
+        end
         s3object(thumbnail).presigned_url(:get, options)
       end
 

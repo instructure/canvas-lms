@@ -13,7 +13,7 @@
  **************************************************************
  */
  
-define(['vendor/date-js/core'], function() {
+import 'vendor/date-js/core'
 (function () {
     var $D = Date, $P = $D.prototype, $C = $D.CultureInfo, $N = Number.prototype;
 
@@ -474,4 +474,3 @@ define(['vendor/date-js/core'], function() {
         $P[nth[l]] = (l === 0) ? nthfn(-1) : nthfn(l);
     }
 }());
-});

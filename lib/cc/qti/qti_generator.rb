@@ -182,9 +182,9 @@ module CC
         ) do |q_node|
           q_node.title quiz.title
           q_node.description @html_exporter.html_content(quiz.description || '')
-          q_node.lock_at ims_datetime(quiz.lock_at) if quiz.lock_at
-          q_node.unlock_at ims_datetime(quiz.unlock_at) if quiz.unlock_at
-          q_node.due_at ims_datetime(quiz.due_at) if quiz.due_at
+          q_node.lock_at ims_datetime(quiz.lock_at, nil) if quiz.lock_at
+          q_node.unlock_at ims_datetime(quiz.unlock_at, nil) if quiz.unlock_at
+          q_node.due_at ims_datetime(quiz.due_at, nil) if quiz.due_at
           q_node.shuffle_answers quiz.shuffle_answers unless quiz.shuffle_answers.nil?
           q_node.scoring_policy quiz.scoring_policy
           q_node.hide_results quiz.hide_results unless quiz.hide_results.nil?

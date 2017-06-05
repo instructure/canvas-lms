@@ -111,4 +111,30 @@ describe ErrorReport do
     expect(report.id).to be_nil
     expect(report.data["id"]).to eq 1
   end
+
+  describe "#safe_url?" do
+    it "allows a 'normal' URL" do
+      report = described_class.new
+      report.url = "https://canvas.instructure.com/courses/1?enrollment_uuid=abc"
+      expect(report.safe_url?).to eq true
+    end
+
+    it "sanitizes javascript" do
+      report = described_class.new
+      report.url = "javascript:window.close()"
+      expect(report.safe_url?).to eq false
+    end
+
+    it "sanitizes ftp" do
+      report = described_class.new
+      report.url = "ftp://badserver.com/somewhere"
+      expect(report.safe_url?).to eq false
+    end
+
+    it "sanitizes something that's not a URI at all" do
+      report = described_class.new
+      report.url = "<bogus>"
+      expect(report.safe_url?).to eq false
+    end
+  end
 end

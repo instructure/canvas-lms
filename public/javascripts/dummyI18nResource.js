@@ -22,6 +22,4 @@
 // We need to give webpack a resource that exists on the Filesystem
 // before the pitching i18n loader catches it, so we replace
 // i18n!some-scope requires with i18n?some-scope!dummyI18nResource
-define([],function(){
   throw "Should never actually call this module";
-});

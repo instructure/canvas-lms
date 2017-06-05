@@ -62,6 +62,7 @@ describe 'Account Reports API', type: :request do
       expect(report.key?('id')).to be_truthy
       expect(report.key?('status')).to be_truthy
       expect(report.key?('progress')).to be_truthy
+      expect(report.key?('current_line')).to be_truthy
       expect(report.key?('file_url')).to be_truthy
     end
 

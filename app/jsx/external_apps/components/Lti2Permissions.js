@@ -18,15 +18,16 @@
 
 import I18n from 'i18n!external_tools'
 import React from 'react'
+import PropTypes from 'prop-types'
 import htmlEscape from 'str/htmlEscape'
 
 export default React.createClass({
     displayName: 'Lti2Permissions',
 
     propTypes: {
-      tool: React.PropTypes.object.isRequired,
-      handleCancelLti2: React.PropTypes.func.isRequired,
-      handleActivateLti2: React.PropTypes.func.isRequired
+      tool: PropTypes.object.isRequired,
+      handleCancelLti2: PropTypes.func.isRequired,
+      handleActivateLti2: PropTypes.func.isRequired
     },
 
     render() {

@@ -17,12 +17,13 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!assignments'
 
   var DueDateAddRowButton = React.createClass({
 
     propTypes: {
-      display: React.PropTypes.bool.isRequired
+      display: PropTypes.bool.isRequired
     },
 
     render(){

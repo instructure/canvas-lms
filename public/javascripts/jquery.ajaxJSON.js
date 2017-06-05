@@ -18,11 +18,9 @@
 
 /*jshint evil:true*/
 
-define([
-  'INST' /* INST */,
-  'jquery' /* $ */,
-  'compiled/behaviors/authenticity_token'
-], function(INST, $, authenticity_token) {
+import INST from './INST'
+import $ from 'jquery'
+import authenticity_token from 'compiled/behaviors/authenticity_token'
 
   var _getJSON = $.getJSON;
   $.getJSON = function(url, data, callback) {
@@ -164,4 +162,3 @@ define([
     };
     this.ajaxError($.fn.defaultAjaxError.func);
   };
-});

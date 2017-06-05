@@ -16,14 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!content_exports',
-  'jquery' /* $ */,
-  'str/htmlEscape',
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_forms' /* formSubmit */,
-  'jqueryui/progressbar' /* /\.progressbar/ */
-], function(I18n, $, htmlEscape) {
+import I18n from 'i18n!content_exports'
+import $ from 'jquery'
+import htmlEscape from './str/htmlEscape'
+import './jquery.ajaxJSON'
+import './jquery.instructure_forms' /* formSubmit */
+import 'jqueryui/progressbar'
 
 $(document).ready(function(event) {
   var state = 'nothing';
@@ -137,5 +135,4 @@ $(document).ready(function(event) {
   }
   check_if_exporting();
 
-});
 });

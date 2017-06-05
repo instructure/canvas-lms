@@ -22,6 +22,8 @@ module Gradebook
   class MultipleGradingPeriods
     include SeleniumDependencies
 
+    private
+
     # Assignment Headings
     ASSIGNMENT_HEADER_SELECTOR = '.slick-header-column'.freeze
     ASSIGNMENT_HEADER_MENU_SELECTOR = '.gradebook-header-drop'.freeze
@@ -29,16 +31,6 @@ module Gradebook
 
     def ungradable_selector
       ".cannot_edit"
-    end
-
-    def assignment_header(name)
-      f(assignment_header_selector(name))
-    end
-
-    def assignment_header_menu_item(name)
-      parent_element = ff(ASSIGNMENT_HEADER_MENU_ITEM_SELECTOR).find { |el| el.text == name }
-
-      f('a', parent_element)
     end
 
     def settings_cog
@@ -69,7 +61,42 @@ module Gradebook
       f(".grade", cell)
     end
 
+    def assignment_header(name)
+      f(assignment_header_selector(name))
+    end
+
+    def assignment_header_menu(id)
+      f("a[data-assignment-id='#{id}']")
+    end
+
+    def assignment_menu_toggle_muting
+      f("a[data-action='toggleMuting']")
+    end
+
+    def save_mute_option
+      f("button[data-action$='mute']")
+    end
+
+    def grading_cell(x=0, y=0)
+      cell = f(".container_1")
+      cell = f(".slick-row:nth-child(#{y+1})", cell)
+      f(".slick-cell:nth-child(#{x+1})", cell)
+    end
+
+    def assignment_header_selector(name)
+      return ASSIGNMENT_HEADER_SELECTOR unless name
+
+      ASSIGNMENT_HEADER_SELECTOR + "[title=\"#{name}\"]"
+    end
+
+    def assignment_header_menu_item(name)
+      parent_element = ff(ASSIGNMENT_HEADER_MENU_ITEM_SELECTOR).find { |el| el.text == name }
+
+      f('a', parent_element)
+    end
+
     # actions
+    public
 
     def visit_gradebook(course, user = nil)
       if user
@@ -93,12 +120,6 @@ module Gradebook
       wait_for_new_page_load { period.click } or raise "page not loaded"
     end
 
-    def grading_cell(x=0, y=0)
-      cell = f(".container_1")
-      cell = f(".slick-row:nth-child(#{y+1})", cell)
-      f(".slick-cell:nth-child(#{x+1})", cell)
-    end
-
     def enter_grade(grade, x_coordinate, y_coordinate)
       cell = grading_cell(x_coordinate, y_coordinate)
       cell.click
@@ -113,16 +134,6 @@ module Gradebook
       else
         return false
       end
-    end
-
-    def assignment_header_selector(name)
-      return ASSIGNMENT_HEADER_SELECTOR unless name
-
-      ASSIGNMENT_HEADER_SELECTOR + "[title=\"#{name}\"]"
-    end
-
-    def assignment_header_menu(name)
-      f(assignment_header_menu_selector(name))
     end
 
     def assignment_header_menu_selector(name)
@@ -145,5 +156,23 @@ module Gradebook
       save_button.click
     end
 
-   end
+    def assignment_header_menu_select(id)
+      assignment_header_menu(id).click
+    end
+
+    def assignment_header_menu_item_find(name)
+      assignment_header_menu_item(name)
+    end
+
+    def toggle_assignment_mute_option(id)
+      assignment_header_menu(id).click
+      assignment_menu_toggle_muting.click
+      save_mute_option.click
+      wait_for_ajaximations
+    end
+
+    def grading_cell_attributes(x, y)
+      grading_cell(x, y)
+    end
+  end
 end

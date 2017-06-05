@@ -16,22 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'compiled/util/round',
-  'i18n!submissions',
-  'jquery',
-  'jsx/gradebook/shared/helpers/GradeFormatHelper',
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_forms' /* ajaxJSONFiles */,
-  'jquery.instructure_date_and_time' /* datetimeString */,
-  'jquery.instructure_misc_plugins' /* fragmentChange, showIf */,
-  'jquery.loadingImg' /* loadingImg, loadingImage */,
-  'jquery.templateData' /* fillTemplateData, getTemplateData */,
-  'media_comments' /* mediaComment */,
-  'compiled/jquery/mediaCommentThumbnail',
-  'vendor/jquery.scrollTo', /* /\.scrollTo/ */
-  'rubric_assessment' /*global rubricAssessment*/
-], function (round, I18n, $, GradeFormatHelper) {
+import round from 'compiled/util/round'
+import I18n from 'i18n!submissions'
+import $ from 'jquery'
+import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
+import './jquery.ajaxJSON'
+import './jquery.instructure_forms' /* ajaxJSONFiles */
+import './jquery.instructure_date_and_time' /* datetimeString */
+import './jquery.instructure_misc_plugins' /* fragmentChange, showIf */
+import './jquery.loadingImg'
+import './jquery.templateData'
+import './media_comments'
+import 'compiled/jquery/mediaCommentThumbnail'
+import './vendor/jquery.scrollTo'
+import './rubric_assessment' /*global rubricAssessment*/
 
   var rubricAssessments = ENV.rubricAssessments;
 
@@ -165,11 +163,11 @@ define([
     $("#rubric_holder").css({'maxHeight': height - 50, 'overflow': 'auto', 'zIndex': 5});
     $(".comments").height(height);
   };
-  var SubmissionsObj = {};
+
   // This `setup` function allows us to control when the setup is triggered.
   // submissions.coffee requires this file and then immediately triggers it,
   // while submissionsSpec.jsx triggers it after setup is complete.
-  SubmissionsObj.setup = function() {
+  export function setup () {
     $(document).ready(function() {
       $(".comments .comment_list .play_comment_link").mediaCommentThumbnail('small');
       $(window).bind('resize', windowResize).triggerHandler('resize');
@@ -365,7 +363,7 @@ define([
     });
   };
   // necessary for tests
-  SubmissionsObj.teardown = function() {
+  export function teardown () {
     $(window).unbind('resize', windowResize);
     $(document).unbind('comment_change');
     $(document).unbind('grading_change');
@@ -390,6 +388,3 @@ define([
       $.ajaxJSON(url, 'GET', {}, submissionLoaded);
     }, 500);
   };
-
-  return SubmissionsObj;
-});

@@ -25,7 +25,7 @@
   z-index: 10;
   padding: 10px 3px;
   border-bottom-left-radius: 5px;
-  background-color: $ic-brand-primary;
+  background-color: $electric;
   box-shadow: -1px 1px 2px 0 rgba(0,0,0,.2);
 
   &:after {
@@ -36,7 +36,7 @@
     right: 0;
     bottom: 0;
     width: 8px;
-    background-color: $ic-brand-primary;
+    background-color: $electric;
     box-shadow: -1px 0 1px 0 rgba(0,0,0,.2)
   }
 }
@@ -68,6 +68,35 @@
 .bcs__history-item__change {
   padding: 1em;
   border: 1px solid $ic-border-color;
+
+  &.bcs__history-item__change-log-row {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    padding: 0.8em 0;
+
+    &.bcs__history-item__change-log-row__heading {
+      padding-bottom: 0.5em;
+
+      .bcs__history-item__content-grid {
+        > span > span > span:first-child {
+          padding-left: 0,
+        }
+      }
+    }
+
+    .bcs__history-item__content-grid {
+      left: 0;
+
+      > span > span > span:first-child {
+        padding-left: 30px,
+      }
+    }
+
+    .bcs__history-item__lock-icon {
+      left: 0;
+    }
+  }
 
   & + & {
     border-top: none;
@@ -129,17 +158,17 @@
 .bcs__history-item__lock-icon {
   position: absolute;
   top: -5px;
-  left: 20px;
+  left: 10px;
 }
 
 @keyframes spinning {
   from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  to { transform: rotate(-360deg); }
 }
 
 .bcs__sync-btn-icon {
-  line-height: 2.5em;
-  vertical-align: text-top;
+  position: relative;
+  top: 2px;
 
   &.bcs__sync-btn-icon__active svg {
     animation: spinning 1.5s infinite linear;
@@ -147,8 +176,6 @@
 }
 
 .bcs__sync-btn-text {
-  line-height: 2.5em;
-  vertical-align: sub;
   margin-left: 7px;
   margin-right: 7px;
 }
@@ -158,10 +185,11 @@
   border-top: 1px solid $ic-border-color;
 
   & > button:first-child {
-    padding: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 
-  &:first-child {
+  &.bcs__row__associations {
     border: none;
   }
 
@@ -173,23 +201,31 @@
 }
 
 .bcs__header {
-  background: $ic-brand-primary;
+  background: $electric;
   position: relative;
   text-align: center;
-  padding: 1.2em 0;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .2)
+  padding: 1.2em 1.75em 1.2em 0;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .2);
 }
 
 .bcs__close-wrapper {
-  position: absolute;
-  top: 0.5em;
-  left: 0.5em;
+  float: left;
+
+  button {
+    position: relative;
+    top: -0.25em;
+    left: 0.5em;
+  }
 }
 
 .bcs__modal-content-wrapper {
   margin: 0 auto;
   max-width: 850px;
   position: relative;
+
+  &.bcs__modal-content-wrapper__wide {
+    max-width: 1200px;
+  }
 }
 
 .bca__overlay {
@@ -332,22 +368,29 @@
 .bcs__migration-sync__button {
   display: flex;
   justify-content: flex-end;
+
+  button {
+    padding: 22px 15px;
+  }
 }
 
 .bcs__row.bcs__row-sync-holder {
-  padding: 1em 0
+  margin: 0 0 1.5em;
+  padding-top: 0;
+  border: none;
 }
 
 .bcs__migration-sync .bcs__migration-sync__loading {
-  margin-bottom: .5em;
+  margin-bottom: 2em;
 }
 
-/* EnableNotification component styles */
-.bcs__history-notification__enable,
+/* MigrationOptions component styles */
+.bcs__history-settings > label,
 .bcs__history-notification__add-message,
 .bcs__history-notification__message {
   margin-bottom:.5em;
 }
+
 .bcs__history-notification__add-message {
   margin-left: 1em;
   label {
@@ -355,16 +398,70 @@
   }
 }
 
-/* unsynched changes are a little different than sync history */
-.bcs__history-item__content.bcs__unsynched-change__content {
+/* unsynced changes are a little different than sync history */
+.bcs__history-item__content.bcs__unsynced-change__content {
   .bcs__history-item__uncynched-changes-grid {
     left: 25px;
   }
-  .bcs__history-item__lock-icon {
-    left: 0
+}
+
+.bcs__unsynced-changes .bcs__history-notification {
+  padding-top: 1em;
+}
+
+
+.bcc__master-child-stack {
+  position: relative;
+
+  &:before {
+      content: '';
+      background: $ic-color-medium;
+      width: 1px;
+      display: block;
+      position: absolute;
+      top: 10px;
+      bottom: 100px;
+      left: 50%;
   }
 }
 
-.bcs__unsynched-changes .bcs__history-notification {
-  padding-top: 1em;
+.bcc__master-child-stack__box {
+  padding: 1em;
+  background: $ic-color-medium-light;
+  width: 235px;
+  box-shadow: 0 1px 2px 1px rgba(0, 0, 0, .2);
+  position: relative;
+
+  header {
+    text-transform: uppercase;
+  }
+
+  &.bcc__master-child-stack__box__master {
+    background: $electric;
+    color: $ic-color-light;
+    margin-bottom: 30px;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.bcc__master-child-stack__box__footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5em;
+}
+
+.bpc__lock-no__toggle {
+  padding-right: 12px;
+  position: relative;
+  top: 2px;
+  font-size: 1.25em;
+
+  .bpc__lock-no__toggle-icon  {
+    position: relative;
+    top: 4px;
+    margin-right: 6px
+  }
 }

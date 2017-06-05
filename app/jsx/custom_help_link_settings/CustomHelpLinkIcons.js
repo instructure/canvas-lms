@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!custom_help_link'
 import CustomHelpLinkIconInput from './CustomHelpLinkIconInput'
 import IconCog from 'jsx/shared/icons/IconCog'
@@ -27,7 +28,7 @@ import IconQuestionMark from 'jsx/shared/icons/IconQuestionMark'
 
   const CustomHelpLinkIcons = React.createClass({
     propTypes: {
-      defaultValue: React.PropTypes.string
+      defaultValue: PropTypes.string
     },
     render () {
       const {

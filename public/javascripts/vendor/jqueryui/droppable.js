@@ -13,13 +13,11 @@
  *	jquery.ui.mouse.js
  *	jquery.ui.draggable.js
  */
-define([
-	'jquery',
-	'jqueryui/core',
-	'jqueryui/widget',
-	'jqueryui/mouse',
-	'jqueryui/draggable',
-], function( $ ) {
+import $ from 'jquery'
+import 'jqueryui/core'
+import 'jqueryui/widget'
+import 'jqueryui/mouse'
+import 'jqueryui/draggable'
 
 $.widget("ui.droppable", {
 	version: "@VERSION",
@@ -291,4 +289,4 @@ $.ui.ddmanager = {
 	}
 };
 
-});
+

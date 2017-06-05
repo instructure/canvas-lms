@@ -36,7 +36,7 @@ gem 'encrypted_cookie_store-instructure', '1.2.4', require: 'encrypted_cookie_st
 gem 'active_model_serializers',   '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
 gem 'authlogic', '3.5.0'
-  gem 'scrypt', '3.0.3'
+  gem 'scrypt', '3.0.5'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
@@ -47,8 +47,11 @@ gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   gem 'will_paginate', '3.1.5', require: false
 
 gem 'addressable', '2.5.0', require: false
-gem "after_transaction_commit", '1.1.1'
-gem "aws-sdk", '2.6.7', require: false
+gem "after_transaction_commit", '1.1.2'
+gem "aws-sdk-s3", '1.0.0.rc3', require: false
+gem "aws-sdk-sns", '1.0.0.rc1', require: false
+gem "aws-sdk-sqs", '1.0.0.rc3', require: false
+gem "aws-sdk-kinesis", '1.0.0.rc1', require: false
 gem 'barby', '0.6.5', require: false
   gem 'rqrcode', '0.10.1', require: false
   gem 'chunky_png', '1.3.8', require: false
@@ -96,7 +99,7 @@ gem 'rotp', '3.3.0', require: false
 gem 'net-ldap', '0.10.1', require: false
 gem 'ruby-duration', '3.2.3', require: false
 gem 'ruby-saml-mod', '0.3.5'
-gem 'saml2', '1.0.10', require: false
+gem 'saml2', '1.1.0', require: false
   gem 'nokogiri-xmlsec-me-harder', '0.9.3pre', require: false, github: 'instructure/nokogiri-xmlsec-me-harder', ref: '57d071040cc4649db9f158e09bbcea028271a4a6'
 gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.2.0', require: 'zip'
@@ -115,6 +118,9 @@ gem 'canvas_statsd', '2.0.4'
 gem 'gepub', '0.7.0beta3', github: 'ccutrer/gepub', ref: '7cea2f4912f15d89bc9e9cb9d4c51e5f491c2328'
 gem 'imperium', '0.1.3', require: false
 gem 'academic_benchmarks', '0.0.9', require: false
+
+gem 'graphql', '~>1.5.4'
+gem 'graphql-batch', '~>0.3.1'
 
 gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbacks'
 gem 'acts_as_list', path: 'gems/acts_as_list'

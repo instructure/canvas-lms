@@ -96,12 +96,12 @@ module CCHelper
   ASSIGNMENT_XML = 'assignment.xml'
   EXTERNAL_CONTENT_FOLDER = 'external_content'
 
-  def ims_date(date=nil)
-    CCHelper.ims_date(date)
+  def ims_date(date=nil,default=Time.now)
+    CCHelper.ims_date(date, default)
   end
 
-  def ims_datetime(date=nil)
-    CCHelper.ims_datetime(date)
+  def ims_datetime(date=nil,default=Time.now)
+    CCHelper.ims_datetime(date, default)
   end
 
   def self.create_key(object, prepend="")
@@ -113,13 +113,15 @@ module CCHelper
     "i" + Digest::MD5.hexdigest(prepend + key)
   end
 
-  def self.ims_date(date=nil)
-    date ||= Time.now
+  def self.ims_date(date=nil,default=Time.now)
+    date ||= default
+    return nil unless date
     date.respond_to?(:utc) ? date.utc.strftime(IMS_DATE) : date.strftime(IMS_DATE)
   end
 
-  def self.ims_datetime(date=nil)
-    date ||= Time.now
+  def self.ims_datetime(date=nil,default=Time.now)
+    date ||= default
+    return nil unless date
     date.respond_to?(:utc) ? date.utc.strftime(IMS_DATETIME) : date.strftime(IMS_DATETIME)
   end
 

@@ -97,10 +97,22 @@ module Lti
     def enabled_capability_params(enabled_capabilities)
       enabled_capabilities.each_with_object({}) do |capability, hash|
         if (expansion = capability.respond_to?(:to_sym) && self.class.expansions["$#{capability}".to_sym])
-          hash[expansion.default_name] = expansion.expand(self) if expansion.default_name.present?
+          value = expansion.expand(self)
+          hash[expansion.default_name] = value if expansion.default_name.present? && value != "$#{capability}"
         end
       end
     end
+
+    # the LIS identifier for the course offering
+    # @launch_parameter lis_course_offering_sourcedid
+    # @example
+    #   ```
+    #   1234
+    #   ```
+    register_expansion 'CourseOffering.sourcedId', [],
+                       -> { @context.sis_source_id },
+                       COURSE_GUARD,
+                       default_name: 'lis_course_offering_sourcedid'
 
     # an opaque identifier that uniquely identifies the context of the tool launch
     # @launch_parameter context_id
@@ -702,6 +714,17 @@ module Lti
     register_expansion 'Canvas.course.sectionSisSourceIds', [],
                        -> { lti_helper.section_sis_ids },
                        ENROLLMENT_GUARD
+
+    # Returns the course code
+    #
+    # @example
+    #   ```
+    #   CS 124
+    #   ```
+    register_expansion 'com.instructure.contextLabel', [],
+                       -> { @context.course_code },
+                       COURSE_GUARD,
+                       default_name: 'context_label'
 
     # Returns the module_id that the module item was launched from.
     #

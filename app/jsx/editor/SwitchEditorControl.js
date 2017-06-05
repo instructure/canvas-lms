@@ -17,13 +17,14 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!editor'
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
 
   var SwitchEditorControl = React.createClass({
     displayName: 'SwitchEditor',
     propTypes: {
-      textarea: React.PropTypes.object.isRequired
+      textarea: PropTypes.object.isRequired
     },
 
     getInitialState () {

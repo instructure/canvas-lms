@@ -118,6 +118,25 @@ describe ContentExportsApiController, type: :request do
       expect(json.size).to eql 5
       expect(json.map{ |el| el['id'] }).to eql exports.map(&:id).sort.reverse
     end
+
+    it "should not return attachments for expired exports" do
+      @past = past_export
+      ContentExport.where(id: @past.id).update_all(created_at: 35.days.ago)
+
+      json = api_call_as_user(
+        t_teacher,
+        :get,
+        "/api/v1/courses/#{t_course.id}/content_exports",
+        {
+          controller: 'content_exports_api',
+          action: 'index',
+          format: 'json',
+          course_id: t_course.to_param
+        }
+      )
+
+      expect(json[0]['attachment']).to be_nil
+    end
   end
 
   describe "show" do

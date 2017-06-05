@@ -16,9 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'vendor/ie11-polyfill.js'
-import ApplyTheme from 'instructure-ui/lib/components/ApplyTheme'
-import 'instructure-ui/lib/themes/canvas'
+import { canvas } from 'instructure-ui/lib/themes'
 import './support/sinon/sinon-qunit-1.0.0'
 
 const fixturesDiv = document.createElement('div')
@@ -28,12 +26,7 @@ document.body.appendChild(fixturesDiv)
 if (!window.ENV) window.ENV = {}
 
 // setup the inst-ui default theme
-if (ENV.use_high_contrast) {
-  ApplyTheme.setDefaultTheme('canvas-a11y')
-} else {
-  const brandvars = window.CANVAS_ACTIVE_BRAND_VARIABLES || {}
-  ApplyTheme.setDefaultTheme('canvas', brandvars)
-}
+canvas.use()
 
 function requireAll (requireContext) {
   return requireContext.keys().map(requireContext);

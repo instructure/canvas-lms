@@ -19,61 +19,52 @@
 // xsslint jqueryObject.function makeFormAnswer makeDisplayAnswer
 // xsslint jqueryObject.property sortable placeholder
 // xsslint safeString.property question_text
-define([
-  'jst/quiz/regrade',
-  'i18n!quizzes',
-  'underscore',
-  'jquery' /* $ */,
-  'calcCmd',
-  'str/htmlEscape',
-  'str/pluralize',
-  'compiled/handlebars_helpers',
-  'compiled/views/assignments/DueDateOverride',
-  'compiled/models/Quiz',
-  'compiled/models/DueDateList',
-  'compiled/views/quizzes/QuizRegradeView',
-  'compiled/collections/SectionCollection',
-  'compiled/views/calendar/MissingDateDialogView',
-  'compiled/editor/MultipleChoiceToggle',
-  'compiled/editor/EditorToggle',
-  'compiled/str/TextHelper',
-  'compiled/views/editor/KeyboardShortcuts',
-  'INST', // safari sniffing for VO workarounds
-  'quiz_formula_solution',
-  'quiz_labels',
-  'jsx/shared/rce/RichContentEditor',
-  'jsx/shared/conditional_release/ConditionalRelease',
-  'compiled/util/deparam',
-  'compiled/util/SisValidationHelper',
-  'jsx/blueprint_courses/apps/LockManager',
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_date_and_time' /* time_field, datetime_field */,
-  'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */,
-  'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* replaceTags, /\$\.underscore/ */,
-  'jquery.instructure_misc_plugins' /* .dim, confirmDelete, showIf */,
-  'jquery.keycodes' /* keycodes */,
-  'jquery.loadingImg' /* loadingImage */,
-  'compiled/jquery.rails_flash_notifications',
-  'jquery.templateData' /* fillTemplateData, getTemplateData */,
-  'supercalc' /* superCalc */,
-  'vendor/jquery.placeholder' /* /\.placeholder/ */,
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'jqueryui/sortable' /* /\.sortable/ */,
-  'jqueryui/tabs' /* /\.tabs/ */
-], function (regradeTemplate, I18n, _, $, calcCmd, htmlEscape, pluralize,
-            Handlebars, DueDateOverrideView, Quiz,
-            DueDateList, QuizRegradeView, SectionList,
-            MissingDateDialog,MultipleChoiceToggle,EditorToggle,TextHelper,
-            RCEKeyboardShortcuts, INST, QuizFormulaSolution, addAriaDescription,
-            RichContentEditor, ConditionalRelease, deparam, SisValidationHelper, LockManager) {
-  var lockManager = new LockManager()
-  lockManager.init({ itemType: 'quiz', page: 'edit' })
+import regradeTemplate from 'jst/quiz/regrade'
+import I18n from 'i18n!quizzes'
+import _ from 'underscore'
+import $ from 'jquery'
+import calcCmd from './calcCmd'
+import htmlEscape from './str/htmlEscape'
+import pluralize from './str/pluralize'
+import Handlebars from 'compiled/handlebars_helpers'
+import DueDateOverrideView from 'compiled/views/assignments/DueDateOverride'
+import Quiz from 'compiled/models/Quiz'
+import DueDateList from 'compiled/models/DueDateList'
+import QuizRegradeView from 'compiled/views/quizzes/QuizRegradeView'
+import SectionList from 'compiled/collections/SectionCollection'
+import MissingDateDialog from 'compiled/views/calendar/MissingDateDialogView'
+import MultipleChoiceToggle from 'compiled/editor/MultipleChoiceToggle'
+import EditorToggle from 'compiled/editor/EditorToggle'
+import TextHelper from 'compiled/str/TextHelper'
+import RCEKeyboardShortcuts from 'compiled/views/editor/KeyboardShortcuts'
+import INST from './INST' // safari sniffing for VO workarounds
+import QuizFormulaSolution from './quiz_formula_solution'
+import addAriaDescription from './quiz_labels'
+import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
+import ConditionalRelease from 'jsx/shared/conditional_release/ConditionalRelease'
+import deparam from 'compiled/util/deparam'
+import SisValidationHelper from 'compiled/util/SisValidationHelper'
+import LockManager from 'jsx/blueprint_courses/apps/LockManager'
+import './jquery.ajaxJSON'
+import './jquery.instructure_date_and_time' /* time_field, datetime_field */
+import './jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */
+import 'jqueryui/dialog'
+import './jquery.instructure_misc_helpers' /* replaceTags, /\$\.underscore/ */
+import './jquery.instructure_misc_plugins' /* .dim, confirmDelete, showIf */
+import './jquery.keycodes'
+import './jquery.loadingImg'
+import 'compiled/jquery.rails_flash_notifications'
+import './jquery.templateData'
+import './supercalc'
+import './vendor/jquery.scrollTo'
+import 'jqueryui/sortable'
+import 'jqueryui/tabs'
 
-  var dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility,
-      scoreValidation;
+var dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility, scoreValidation;
 
-  const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : {}
+var lockManager = new LockManager()
+lockManager.init({ itemType: 'quiz', page: 'edit' })
+const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : {}
 
 
   RichContentEditor.preloadRemoteModule();
@@ -172,7 +163,7 @@ define([
     }
   }
 
-  function isChangeMultiFuncBound ($questionContent) {
+  export function isChangeMultiFuncBound ($questionContent) {
     var ret = false;
     var events = $._data($questionContent[0], 'events');
     if (events && events.change) {
@@ -231,8 +222,7 @@ define([
   // TODO: refactor this... it's not going to be horrible, but it will
   // take a little bit of work.  I just wrapped it in a closure for now
   // to not pollute the global namespace, but it could use more.
-  var quiz = window.quiz = {};
-  quiz = {
+  export const quiz = window.quiz = {
     uniqueLocalIDStore: {},
 
     // Should cache any elements used throughout the object here
@@ -1371,7 +1361,6 @@ define([
 
     if (isNaN(answer.answer_weight)) { answer.answer_weight = 0; }
     quiz.updateFormAnswer($answer, answer, true);
-    $answer.find('input[placeholder]').placeholder();
     $answer.show();
     return $answer;
   }
@@ -1799,30 +1788,47 @@ define([
       processData: function(data) {
         $(this).attr('method', 'PUT');
         var quiz_title = $("input[name='quiz[title]']").val();
-        var postToSis = data['quiz[post_to_sis]'] === '1'
+        let postToSIS = data['quiz[post_to_sis]'] === '1'
         var vaildQuizType = data['quiz[quiz_type]'] != 'survey' && data['quiz[quiz_type]'] != 'practice_quiz'
-        var maxNameLength = 256;
+        let maxNameLength = 256;
 
-        if (postToSis && ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT && vaildQuizType){
+        if (postToSIS && ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT && vaildQuizType){
           maxNameLength = ENV.MAX_NAME_LENGTH
         }
 
-        var validationHelper = new SisValidationHelper({
-          postToSIS: postToSis,
+        let valid = true
+        const validationData = {
+          assignment_overrides: overrideView.getAllDates(),
+          postToSIS: data['quiz[post_to_sis]'] == '1'
+        }
+
+        const errs = overrideView.validateBeforeSave(validationData,{})
+
+        let validationHelper = new SisValidationHelper({
+          postToSIS: validationData.postToSIS,
+          maxNameLengthRequired: ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT,
           maxNameLength: maxNameLength,
           name: quiz_title
         })
+
+        if (_.keys(errs).length > 0) {
+          valid = false
+        }
+        if (validationHelper.nameTooLong()) {
+          valid = false
+          let headerOffset = $('#quiz_title').errorBox(I18n.t('The Quiz name must be under %{length} characters', {length: maxNameLength + 1})).offset();
+          $('html,body').scrollTo({top: headerOffset.top, left: 0});
+        }
+        if (!valid) {
+          return false
+        }
 
         if (quiz_title.length == 0) {
           var offset = $("#quiz_title").errorBox(I18n.t('errors.field_is_required', "This field is required")).offset();
           $('html,body').scrollTo({top: offset.top, left:0});
           return false;
         }
-        if (validationHelper.nameTooLong()) {
-          var header_offset = $('#quiz_title').errorBox(I18n.t('The Quiz name must be under %{length} characters', {length: maxNameLength + 1})).offset();
-          $('html,body').scrollTo({top: header_offset.top, left: 0});
-          return false;
-        }
+
         data['quiz[title]'] = quiz_title;
         if (lockedItems.content) {
           data['quiz[description]'] = quizModel.get('description')
@@ -1841,14 +1847,6 @@ define([
         data['quiz[allowed_attempts]'] = attempts;
         var overrides = overrideView.getOverrides();
         data['quiz[only_visible_to_overrides]'] = overrideView.containsSectionsWithoutOverrides();
-        var validationData = {
-          assignment_overrides: overrideView.getAllDates(),
-          postToSIS: data['quiz[post_to_sis]'] == '1'
-        };
-        var errs = overrideView.validateBeforeSave(validationData,{});
-        if (_.keys(errs).length > 0) {
-          return false;
-        }
         if (overrideView.containsSectionsWithoutOverrides() && !hasCheckedOverrides) {
           var sections = overrideView.sectionsWithoutOverrides();
           var missingDateView = new MissingDateDialog({
@@ -4294,8 +4292,3 @@ define([
     }).triggerHandler('change');
   });
 
-  return {
-    quiz: quiz,
-    isChangeMultiFuncBound: isChangeMultiFuncBound
-  }
-});

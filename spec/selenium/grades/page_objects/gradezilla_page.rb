@@ -149,7 +149,7 @@ class Gradezilla
     # actions
 
     def visit(course)
-      Account.default.enable_feature!(:gradezilla)
+      Account.default.enable_feature!(:new_gradebook)
       get "/courses/#{course.id}/gradebook/change_gradebook_version?version=gradezilla"
       # the pop over menus is too lengthy so make screen bigger
       make_full_screen
@@ -180,11 +180,9 @@ class Gradezilla
     end
 
     def grading_cell(x=0, y=0)
-      row_idx, col_idx = y + 1, x + 1
-
-      cell = f('.container_1')
-      cell = f(".slick-row:nth-child(#{row_idx})", cell)
-      f(".slick-cell:nth-child(#{col_idx})", cell)
+      row_idx = y + 1
+      col_idx = x + 1
+      f(".container_1 .slick-row:nth-child(#{row_idx}) .slick-cell:nth-child(#{col_idx})")
     end
 
     def total_score_for_row(row)
@@ -199,7 +197,8 @@ class Gradezilla
       period = gp_menu_list.find do |item|
         f('label', item).attribute("for") == "period_option_#{grading_period_id}"
       end
-      wait_for_new_page_load { period.click } or raise "page not loaded"
+      period.click
+      wait_for_animations
     end
 
     def enter_grade(grade, x_coordinate, y_coordinate)
@@ -207,15 +206,12 @@ class Gradezilla
       cell.click
       set_value(grade_input(cell), grade)
       grade_input(cell).send_keys(:return)
+      wait_for_ajax_requests
     end
 
-    def cell_graded?(grade, x_coordinate, y_coordinate)
-      cell = grading_cell(x_coordinate, y_coordinate)
-      if cell.text == grade
-        return true
-      else
-        return false
-      end
+    def cell_graded?(grade, x, y)
+      cell = f('.gradebook-cell', grading_cell(x, y))
+      cell.text == grade
     end
 
     def open_student_column_menu
@@ -244,8 +240,15 @@ class Gradezilla
       trigger = f('button', gradebook_menu(name))
       trigger.click
 
-      # return the id of the popover menu for use elsewhere if needed
+      # return the finder of the popover menu for use elsewhere if needed
       menu_container(trigger.attribute('id'))
+    end
+
+    def open_view_menu_and_arrange_by_menu
+      view_menu = Gradezilla.open_gradebook_menu('View')
+      trigger = ff('button', view_menu).find { |element| element.text == "Arrange By" }
+      trigger.click
+      view_menu
     end
 
     def select_gradebook_menu_option(name, container: nil)
@@ -269,8 +272,16 @@ class Gradezilla
       gradebook_settings_cog.click
     end
 
-    def save_button_click
-      save_button.click
+    def popover_menu_item(name)
+      popover_menu_items.find do |menu_item|
+        menu_item.text == name
+      end
     end
+
+    def popover_menu_items
+      ff('[role=menu][aria-labelledby*=PopoverMenu] [role=menuitemradio]')
+    end
+
+    delegate :click, to: :save_button, prefix: true
   end
 end

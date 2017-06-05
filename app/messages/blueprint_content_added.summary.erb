@@ -1,0 +1,14 @@
+<% define_content :link do %>
+  <%= polymorphic_url(asset.context, :anchor => asset.notification_link_anchor) %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t :subject, "Blueprint Sync: %{name}", :name => asset.context.name %>
+<% end %>
+
+<%= t :body, "Blueprint Sync: Changes synced to %{name}.", :name => asset.context.name %>
+
+<% if asset.master_migration.comment.present? %>
+"<%= asset.master_migration.comment %>"
+<% end %>
+

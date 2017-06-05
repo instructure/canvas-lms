@@ -16,23 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'INST' /* INST */,
-  'i18n!profile',
-  'jquery' /* $ */,
-  'compiled/models/Pseudonym',
-  'compiled/util/AvatarWidget',
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_date_and_time' /* datetimeString, time_field, datetime_field */,
-  'jquery.instructure_forms' /* formSubmit, formErrors, errorBox */,
-  'jqueryui/dialog',
-  'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
-  'jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */,
-  'jquery.loadingImg' /* loadingImage */,
-  'jquery.templateData' /* fillTemplateData */,
-  'jqueryui/sortable' /* /\.sortable/ */,
-  'compiled/jquery.rails_flash_notifications'
-], function(INST, I18n, $, Pseudonym, AvatarWidget) {
+import INST from './INST'
+import I18n from 'i18n!profile'
+import $ from 'jquery'
+import Pseudonym from 'compiled/models/Pseudonym'
+import AvatarWidget from 'compiled/util/AvatarWidget'
+import './jquery.ajaxJSON'
+import './jquery.instructure_date_and_time' /* datetimeString, time_field, datetime_field */
+import './jquery.instructure_forms' /* formSubmit, formErrors, errorBox */
+import 'jqueryui/dialog'
+import 'compiled/jquery/fixDialogButtons'
+import './jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */
+import './jquery.loadingImg'
+import './jquery.templateData'
+import 'jqueryui/sortable'
+import 'compiled/jquery.rails_flash_notifications'
 
   var $edit_settings_link = $(".edit_settings_link");
 
@@ -341,4 +339,3 @@ define([
     });
     event.preventDefault();
   });
-});

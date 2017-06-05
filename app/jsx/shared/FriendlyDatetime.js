@@ -18,6 +18,7 @@
 
 import I18n from 'i18nObj'
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import tz from 'timezone'
 import _ from 'underscore'
 import $ from 'jquery'
@@ -25,11 +26,11 @@ import 'jquery.instructure_date_and_time'
 
 class FriendlyDatetime extends Component {
   static propTypes = {
-    dateTime: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.instanceOf(Date)
+    dateTime: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.instanceOf(Date)
     ]).isRequired,
-    format: React.PropTypes.string,
+    format: PropTypes.string,
   }
 
   static defaultProps = {

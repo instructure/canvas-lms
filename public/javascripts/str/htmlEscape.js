@@ -16,58 +16,54 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define(['INST'], function(INST) {
-  function SafeString(string) {
-    this.string = (typeof string === 'string' ? string : "" + string);
+import INST from '../INST'
+
+class SafeString {
+  constructor (string) {
+    this.string = (typeof string === 'string' ? string : `${string}`)
   }
-  SafeString.prototype.toString = function() {
-    return this.string;
-  };
+  toString () {
+    return this.string
+  }
+}
 
-  var ENTITIES = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#x27;',
-    '/': '&#x2F;',
-    '`': '&#x60;',  // for old versions of IE
-    '=': '&#x3D;'   // in case of unquoted attributes
-  };
+const ENTITIES = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#x27;',
+  '/': '&#x2F;',
+  '`': '&#x60;',  // for old versions of IE
+  '=': '&#x3D;'   // in case of unquoted attributes
+}
 
-  var htmlEscape = function(str) {
-    // ideally we should wrap this in a SafeString, but this is how it has
-    // always worked :-/
-    return str.replace(/[&<>"'\/`=]/g, function(c) {
-        return ENTITIES[c];
-    });
+function htmlEscape (str) {
+  // ideally we should wrap this in a SafeString, but this is how it has
+  // always worked :-/
+  return str.replace(/[&<>"'\/`=]/g, c => ENTITIES[c])
+}
+
+// Escapes HTML tags from string, or object string props of `strOrObject`.
+// returns the new string, or the object with escaped properties
+export default function escape (strOrObject) {
+  if (typeof strOrObject === 'string') {
+    return htmlEscape(strOrObject)
+  } else if (strOrObject instanceof SafeString) {
+    return strOrObject
+  } else if (typeof strOrObject === 'number') {
+    return escape(strOrObject.toString())
   }
 
-  // Escapes HTML tags from string, or object string props of `strOrObject`.
-  // returns the new string, or the object with escaped properties
-  var escape = function(strOrObject) {
-    if (typeof strOrObject === 'string') {
-      return htmlEscape(strOrObject);
-    } else if (strOrObject instanceof SafeString) {
-      return strOrObject;
-    } else if (typeof strOrObject === 'number') {
-      return escape(strOrObject.toString())
+  for (let k in strOrObject) {
+    let v = strOrObject[k]
+    if (typeof v === 'string') {
+      strOrObject[k] = htmlEscape(v)
     }
+  }
+  return strOrObject
+}
+escape.SafeString = SafeString
 
-    var k, v;
-    for (k in strOrObject) {
-      v = strOrObject[k];
-      if (typeof v === "string") {
-        strOrObject[k] = htmlEscape(v);
-      }
-    }
-    return strOrObject;
-  };
-  escape.SafeString = SafeString;
-
-  // tinymce plugins use this and they need it global :(
-  INST.htmlEscape = escape;
-
-  return escape;
-});
-
+// tinymce plugins use this and they need it global :(
+INST.htmlEscape = escape

@@ -31,7 +31,7 @@ define [
   'compiled/views/conversations/AutocompleteView'
   'compiled/views/conversations/CourseSelectionView'
   'compiled/views/conversations/ContextMessagesView'
-  'vendor/jquery.elastic'
+  'jquery.elastic'
 ], (I18n, $, _, {Collection}, DialogBaseView, template, preventDefault, composeTitleBarTemplate, composeButtonBarTemplate, addAttachmentTemplate, Message, AutocompleteView, CourseSelectionView, ContextMessagesView) ->
 
   ##
@@ -205,10 +205,8 @@ define [
         @courseView.setValue(@defaultCourse)
       if @model
         @courseView.$picker.css('display', 'none')
-        @recipientView.$input.focus()
       else
         @$messageCourseRO.css('display', 'none')
-        @courseView.focus()
 
       if @tokenInput = @$el.find('.recipients').data('token_input')
         # since it doesn't infer percentage widths, just whatever the current pixels are

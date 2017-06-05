@@ -115,6 +115,81 @@ define([
     sinon.assert.calledTwice($.fn.append);
   });
 
+  QUnit.module('SpeedGrader#refreshSubmissionToView', {
+    setup () {
+      fakeENV.setup();
+      this.stub($, 'ajaxJSON');
+      this.spy($.fn, 'append');
+      this.originalWindowJSONData = window.jsonData;
+      window.jsonData = {
+        id: 27,
+        GROUP_GRADING_MODE: false,
+        points_possible: 10
+      };
+      SpeedGrader.EG.currentStudent = {
+        id: 4,
+        name: 'Guy B. Studying',
+        submission_state: 'not_graded',
+        submission: {
+          score: 7,
+          grade: 70,
+          submission_history: [
+            {
+              submission_type: 'basic_lti_launch',
+              external_tool_url: 'foo'
+            },
+            {
+              submission_type: 'basic_lti_launch',
+              external_tool_url: 'bar'
+            }
+          ]
+        }
+      };
+    },
+
+    teardown () {
+      fakeENV.teardown();
+    }
+  })
+
+  test('can handle non-nested submission history', () => {
+    SpeedGrader.EG.refreshSubmissionsToView()
+    ok(true, 'should not throw an exception')
+  })
+
+  QUnit.module('SpeedGrader#refreshGrades', {
+    setup () {
+      fakeENV.setup();
+      this.spy($.fn, 'append');
+      this.originalWindowJSONData = window.jsonData;
+      window.jsonData = {
+        id: 27,
+        GROUP_GRADING_MODE: false,
+        points_possible: 10
+      };
+      SpeedGrader.EG.currentStudent = {
+        id: 4,
+        name: 'Guy B. Studying',
+        submission_state: 'graded',
+        submission: {
+          score: 7,
+          grade: 70
+        }
+      };
+      sinon.stub($, 'getJSON')
+    },
+
+    teardown () {
+      fakeENV.teardown();
+      $.getJSON.restore()
+    }
+  })
+
+  test('makes request to API', () => {
+    SpeedGrader.EG.refreshGrades()
+    ok($.getJSON.calledWithMatch('submission_history'))
+  })
+
   let commentRenderingOptions;
   QUnit.module('SpeedGrader#renderComment', {
     setup () {

@@ -16,34 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!course_settings',
-  'jquery' /* $ */,
-  'underscore',
-  'course_settings_helper' /* tabIdFromElement */,
-  'timezone',
-  'jsx/shared/helpers/forceScreenreaderToReparse',
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_date_and_time' /* datetimeString, date_field */,
-  'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */,
-  'jqueryui/dialog',
-  'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
-  'jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */,
-  'jquery.keycodes' /* keycodes */,
-  'jquery.loadingImg' /* loadingImage */,
-  'compiled/jquery.rails_flash_notifications',
-  'jquery.templateData' /* fillTemplateData, getTemplateData */,
-  'link_enrollment' /* global link_enrollment */,
-  'vendor/jquery.ba-tinypubsub' /* /\.publish/ */,
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'jqueryui/autocomplete' /* /\.autocomplete/ */,
-  'jqueryui/sortable' /* /\.sortable/ */,
-  'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, $, _, CourseSettingsHelper, tz, forceScreenReaderToReparse) {
+import I18n from 'i18n!course_settings'
+import $ from 'jquery'
+import _ from 'underscore'
+import {tabIdFromElement} from 'course_settings_helper'
+import tz from 'timezone'
+import forceScreenReaderToReparse from 'jsx/shared/helpers/forceScreenreaderToReparse'
+import './jquery.ajaxJSON'
+import './jquery.instructure_date_and_time' /* datetimeString, date_field */
+import './jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */
+import 'jqueryui/dialog'
+import 'compiled/jquery/fixDialogButtons'
+import './jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */
+import './jquery.keycodes'
+import './jquery.loadingImg'
+import 'compiled/jquery.rails_flash_notifications'
+import './jquery.templateData' /* fillTemplateData, getTemplateData */
+import './link_enrollment' /* global link_enrollment */
+import 'vendor/jquery.ba-tinypubsub' /* /\.publish/ */
+import './vendor/jquery.scrollTo'
+import 'jqueryui/autocomplete'
+import 'jqueryui/sortable'
+import 'jqueryui/tabs'
 
   var GradePublishing = {
     status: null,
-    checkup: function() {
+    checkup: function () {
       $.ajaxJSON($("#publish_to_sis_form").attr('action'), 'GET', {}, function(data) {
         if (!data.hasOwnProperty("sis_publish_overall_status")) return;
         GradePublishing.status = data.sis_publish_overall_status;
@@ -218,11 +216,11 @@ define([
 
       var tabs = [];
       $("#nav_enabled_list li").each(function() {
-        var tab_id = CourseSettingsHelper.tabIdFromElement(this);
+        var tab_id = tabIdFromElement(this);
         if (tab_id !== null) { tabs.push({ id: tab_id }); }
       });
       $("#nav_disabled_list li").each(function() {
-        var tab_id = CourseSettingsHelper.tabIdFromElement(this);
+        var tab_id = tabIdFromElement(this);
         if (tab_id !== null) { tabs.push({ id: tab_id, hidden: true }); }
       });
 
@@ -449,13 +447,4 @@ define([
     $("#course_show_announcements_on_home_page").change(function(event) {
       $("#course_home_page_announcement_limit").prop("disabled", !$(this).prop('checked'))
     });
-
-    if ($('#course_blueprint').is(':checked')) {
-      $('#master_course_restrictions').show();
-    }
-    $('#course_blueprint').change(function(event) {
-      $('#master_course_restrictions').slideToggle();
-      forceScreenReaderToReparse($('#master_course_restrictions')[0]);
-    });
   });
-});

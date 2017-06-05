@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import Spinner from 'instructure-ui/lib/components/Spinner'
 import I18n from 'i18n!cyoe_assignment_sidebar'
@@ -24,7 +25,7 @@ import { i18nGrade } from 'jsx/shared/conditional_release/score'
 import StudentAssignmentItem from './student-assignment-item'
 import { assignmentShape, studentShape } from '../shapes/index'
 
-const { shape, string, number, arrayOf, func, bool } = React.PropTypes
+const { shape, string, number, arrayOf, func, bool } = PropTypes
 
 export default class StudentDetailsView extends React.Component {
   static propTypes = {

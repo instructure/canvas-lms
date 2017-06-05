@@ -70,6 +70,10 @@ class GradeSummaryAssignmentPresenter
     assignment.muted? || submission.nil?
   end
 
+  def original_points
+    has_no_score_display? ? '' : submission.published_score
+  end
+
   def unchangeable?
     (!@summary.editable? || assignment.special_class)
   end

@@ -17,6 +17,8 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../../lti2_spec_helper')
+
 require_dependency "lti/message_handler"
 
 module Lti
@@ -190,6 +192,71 @@ module Lti
         expect(tab2).to_not be_nil
       end
 
+    end
+
+    describe '#self.by_resource_codes' do
+      include_context 'lti2_spec_helper'
+
+      let(:jwt_body) do
+        {
+          vendor_code: product_family.vendor_code,
+          product_code: product_family.product_code,
+          resource_type_code: resource_handler.resource_type_code
+        }
+      end
+
+      before do
+        message_handler.update_attributes(message_type: MessageHandler::BASIC_LTI_LAUNCH_REQUEST)
+      end
+
+      it 'finds message handlers when tool is installed in current account' do
+        tool_proxy.update_attributes(context: account)
+        mh = MessageHandler.by_resource_codes(vendor_code: jwt_body[:vendor_code],
+                                              product_code: jwt_body[:product_code],
+                                              resource_type_code: jwt_body[:resource_type_code],
+                                              context: tool_proxy.context)
+        expect(mh).to eq message_handler
+      end
+
+      it 'finds message handlers when tool is installed in current course' do
+        tool_proxy.update_attributes(context: course)
+        mh = MessageHandler.by_resource_codes(vendor_code: jwt_body[:vendor_code],
+                                              product_code: jwt_body[:product_code],
+                                              resource_type_code: jwt_body[:resource_type_code],
+                                              context: tool_proxy.context)
+        expect(mh).to eq message_handler
+      end
+
+      it 'does not return message handlers with a different message_type' do
+        message_handler.update_attributes(message_type: 'banana')
+        mh = MessageHandler.by_resource_codes(vendor_code: jwt_body[:vendor_code],
+                                              product_code: jwt_body[:product_code],
+                                              resource_type_code: jwt_body[:resource_type_code],
+                                              context: tool_proxy.context)
+        expect(mh).to be_nil
+      end
+
+      context 'account chain search' do
+        it 'finds message handlers when tool is installed in course root account' do
+          course.update_attributes(root_account: account)
+          tool_proxy.update_attributes(context: account)
+          mh = MessageHandler.by_resource_codes(vendor_code: jwt_body[:vendor_code],
+                                                product_code: jwt_body[:product_code],
+                                                resource_type_code: jwt_body[:resource_type_code],
+                                                context: course)
+          expect(mh).to eq message_handler
+        end
+
+        it 'finds message handlers when tool is installed in account root account' do
+          root_account = Account.create!
+          account.update_attributes(root_account: root_account)
+          mh = MessageHandler.by_resource_codes(vendor_code: jwt_body[:vendor_code],
+                                                product_code: jwt_body[:product_code],
+                                                resource_type_code: jwt_body[:resource_type_code],
+                                                context: account)
+          expect(mh).to eq message_handler
+        end
+      end
     end
 
 

@@ -50,7 +50,7 @@ describe "master courses - child courses - quiz locking" do
 
     get "/courses/#{@copy_to.id}/quizzes"
 
-    expect(f("#summary_quiz_#{@quiz_copy.id}")).to contain_css('.icon-lock')
+    expect(f("#summary_quiz_#{@quiz_copy.id}")).to contain_css('.icon-blueprint-lock')
 
     f('.quiz .al-trigger').click
     expect(f('.quiz')).not_to contain_css('a.delete-item')
@@ -59,7 +59,7 @@ describe "master courses - child courses - quiz locking" do
   it "should show the cog-menu options on the index when not locked" do
     get "/courses/#{@copy_to.id}/quizzes"
 
-    expect(f("#summary_quiz_#{@quiz_copy.id}")).to contain_css('.icon-unlock')
+    expect(f("#summary_quiz_#{@quiz_copy.id}")).to contain_css('.icon-blueprint')
 
     f('.quiz .al-trigger').click
     expect(f('.quiz')).to contain_css('a.delete-item')

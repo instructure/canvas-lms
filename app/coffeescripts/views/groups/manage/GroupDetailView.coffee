@@ -23,6 +23,7 @@ define [
   'compiled/views/groups/manage/GroupCategoryCloneView'
   'jst/groups/manage/groupDetail'
   'compiled/jquery.rails_flash_notifications'
+  'jsx/context_cards/StudentContextCardTrigger'
 ], (I18n, $, {View}, GroupEditView, GroupCategoryCloneView, template) ->
 
   class GroupDetailView extends View
@@ -89,6 +90,9 @@ define [
 
     closeMenu: ->
       @$groupActions.data('kyleMenu')?.$menu.popup 'close'
+
+    course_id: ->
+      @model.get('course_id')
 
     toJSON: ->
       json = @model.toJSON()

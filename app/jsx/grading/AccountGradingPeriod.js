@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import $ from 'jquery'
 import Button from 'instructure-ui/lib/components/Button'
 import axios from 'axios'
@@ -25,7 +26,7 @@ import tz from 'timezone'
 import DateHelper from 'jsx/shared/helpers/dateHelper'
 import 'jquery.instructure_misc_helpers'
 
-  const Types = React.PropTypes;
+  const Types = PropTypes;
 
   let AccountGradingPeriod = React.createClass({
     propTypes: {

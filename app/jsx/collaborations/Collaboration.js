@@ -18,6 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import PropTypes from 'prop-types'
 import DatetimeDisplay from 'jsx/shared/DatetimeDisplay'
 import DeleteConfirmation from './DeleteConfirmation'
 import i18n from 'i18n!react_collaborations'
@@ -91,8 +92,8 @@ import store from 'jsx/collaborations/store/store'
   };
 
   Collaboration.propTypes = {
-    collaboration: React.PropTypes.object,
-    deleteCollaboration: React.PropTypes.func
+    collaboration: PropTypes.object,
+    deleteCollaboration: PropTypes.func
   };
 
 export default Collaboration

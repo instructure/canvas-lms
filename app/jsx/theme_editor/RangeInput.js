@@ -17,18 +17,19 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import $ from 'jquery'
 
   var RangeInput = React.createClass({
     propTypes: {
-      min:           React.PropTypes.number.isRequired,
-      max:           React.PropTypes.number.isRequired,
-      defaultValue:  React.PropTypes.number.isRequired,
-      labelText:     React.PropTypes.string.isRequired,
-      name:          React.PropTypes.string.isRequired,
-      step:          React.PropTypes.number,
-      formatValue:   React.PropTypes.func,
-      onChange:      React.PropTypes.func
+      min:           PropTypes.number.isRequired,
+      max:           PropTypes.number.isRequired,
+      defaultValue:  PropTypes.number.isRequired,
+      labelText:     PropTypes.string.isRequired,
+      name:          PropTypes.string.isRequired,
+      step:          PropTypes.number,
+      formatValue:   PropTypes.func,
+      onChange:      PropTypes.func
     },
 
     getDefaultProps: function() {

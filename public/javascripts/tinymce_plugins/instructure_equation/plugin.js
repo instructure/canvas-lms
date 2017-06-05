@@ -16,11 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'compiled/editor/stocktiny',
-  'i18n!editor',
-  'str/htmlEscape'
-], function(tinymce, I18n, htmlEscape) {
+import tinymce from 'compiled/editor/stocktiny'
+import I18n from 'i18n!editor'
+import htmlEscape from  '../../str/htmlEscape'
 
   tinymce.create('tinymce.plugins.InstructureEquation', {
     init : function(ed, url) {
@@ -46,4 +44,3 @@ define([
 
   // Register plugin
   tinymce.PluginManager.add('instructure_equation', tinymce.plugins.InstructureEquation);
-});

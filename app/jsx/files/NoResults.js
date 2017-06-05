@@ -18,12 +18,13 @@
 
 import I18n from 'i18n!react_files'
 import React from 'react'
+import PropTypes from 'prop-types'
 
   var NoResults = React.createClass({
     displayName: 'NoResults',
 
     propTypes: {
-      search_term: React.PropTypes.string
+      search_term: PropTypes.string
     },
 
     render: function () {

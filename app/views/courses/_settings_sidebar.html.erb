@@ -17,23 +17,23 @@
 %>
 
 <div>
-  <%= external_tools_menu_items(@course_settings_sub_navigation_tools, {link_class: "btn button-sidebar-wide course-settings-sub-navigation-lti", settings_key: :course_settings_sub_navigation}) %>
+  <%= external_tools_menu_items(@course_settings_sub_navigation_tools, {link_class: "Button Button--link Button--link--has-divider course-settings-sub-navigation-lti", settings_key: :course_settings_sub_navigation}) %>
   <% if can_do(@context, @current_user, :use_student_view) %>
-    <%= link_to course_student_view_path(@context), :method => :post, :class => 'btn button-sidebar-wide student_view_button' do %>
+    <%= link_to course_student_view_path(@context), :method => :post, :class => 'Button Button--link Button--link--has-divider student_view_button' do %>
       <i class="icon-student-view"></i>
       <%= t('links.student_view', 'Student View') %>
     <% end %>
   <% end %>
 
   <% if can_do(@context, @current_user, :read_reports) %>
-    <%= link_to context_url(@context, :context_statistics_url), :class => 'btn button-sidebar-wide' do %>
+    <%= link_to context_url(@context, :context_statistics_url), :class => ' Button Button--link Button--link--has-divider' do %>
       <i class="icon-stats"></i>
       <%= t('links.stats', 'Course Statistics') %>
     <% end %>
   <% end %>
 
   <% if can_do(@context, @current_user, :read) %>
-    <%= link_to calendar_url_for(@context), :class => 'btn button-sidebar-wide', :id => 'course_calendar_link' do %>
+    <%= link_to calendar_url_for(@context), :class => 'Button Button--link Button--link--has-divider', :id => 'course_calendar_link' do %>
       <i class="icon-calendar-day"></i>
       <%= t('links.calendar', 'Course Calendar') %>
     <% end %>
@@ -42,13 +42,13 @@
   <% if can_do(@context, @current_user, :change_course_state) %>
     <% if @context.completed? %>
       <%= form_tag context_url(@context, :context_unconclude_url) do %>
-        <button class="btn button-sidebar-wide" type="submit">
+        <button class="Button Button--link Button--link--has-divider" type="submit">
           <i class="icon-add"></i>
           <%= t('buttons.unconclude', 'Un-Conclude Course') %>
         </button>
       <% end %>
     <% elsif !@context.soft_concluded? %>
-      <%= link_to context_url(@context, :context_confirm_action_url, :event => 'conclude'), :class => 'btn button-sidebar-wide' do %>
+      <%= link_to context_url(@context, :context_confirm_action_url, :event => 'conclude'), :class => 'Button Button--link Button--link--has-divider' do %>
         <i class="icon-lock"></i>
         <%= t('links.conclude', 'Conclude this Course') %>
       <% end %>
@@ -56,35 +56,35 @@
   <% end %>
 
   <% if can_do(@context, @current_user, :delete) && !@context.deleted? %>
-    <%= link_to context_url(@context, :context_confirm_action_url, :event => 'delete'), :class => 'btn button-sidebar-wide delete_course_link' do %>
+    <%= link_to context_url(@context, :context_confirm_action_url, :event => 'delete'), :class => 'Button Button--link Button--link--has-divider' do %>
       <i class="icon-trash"></i>
-      <%= t('links.delete', 'Permanently Delete this Course') %>
+      <%= t('links.delete', 'Delete this Course') %>
     <% end %>
   <% end %>
 
   <% if can_do(@context, @current_user, :read) && show_user_create_course_button(@current_user, @context.account) %>
-    <%= link_to context_url(@context, :context_start_copy_url), :class => 'btn button-sidebar-wide copy_course_link' do %>
+    <%= link_to context_url(@context, :context_start_copy_url), :class => 'Button Button--link Button--link--has-divider copy_course_link' do %>
       <i class="icon-copy-course"></i>
       <%= t('links.copy', 'Copy this Course') %>
     <% end %>
   <% end %>
 
   <% if can_do(@context, @current_user, :manage_content, :manage_files, :manage_quizzes) %>
-    <%= link_to context_url(@context, :context_content_migrations_url), :class => 'btn button-sidebar-wide import_content' do %>
+    <%= link_to context_url(@context, :context_content_migrations_url), :class => 'Button Button--link Button--link--has-divider import_content' do %>
       <i class="icon-upload"></i>
-      <%= t('links.import', 'Import Content into this Course') %>
+      <%= t('links.import', 'Import Course Content') %>
     <% end %>
   <% end %>
 
   <% if can_do(@context, @current_user, :read) %>
-    <%= link_to context_url(@context, :course_content_exports_url), :class => 'btn button-sidebar-wide' do %>
+    <%= link_to context_url(@context, :course_content_exports_url), :class => 'Button Button--link Button--link--has-divider' do %>
       <i class="icon-download"></i>
       <%= t('links.export_content', 'Export Course Content') %>
     <% end %>
   <% end %>
 
   <% if can_do(@context, @current_user, :reset_content) %>
-    <%= link_to context_url(@context, :course_reset_url), :class => 'btn button-sidebar-wide reset_course_content_button' do %>
+    <%= link_to context_url(@context, :course_reset_url), :class => ' Button Button--link Button--link--has-divider reset_course_content_button' do %>
       <i class="icon-reset"></i>
       <%= t('links.reset', 'Reset Course Content') %>
     <% end %>
@@ -106,7 +106,7 @@
   <% end %>
 
   <% if can_do(@context, @current_user, :manage_content) %>
-    <%= link_to context_url(@context, :course_link_validator_url), :class => 'btn button-sidebar-wide validator_link' do %>
+    <%= link_to context_url(@context, :course_link_validator_url), :class => 'Button Button--link Button--link--has-divider validator_link' do %>
       <i class="icon-link"></i>
       <%= t('Validate Links in Content') %>
     <% end %>

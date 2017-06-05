@@ -127,6 +127,9 @@ describe DiscussionTopicsController, type: :request do
 
   before(:once) do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+    user = @user
+    student_in_course(:active_all => true, :course => @course)
+    @user = user
   end
 
   # need for user_display_json
@@ -187,12 +190,16 @@ describe DiscussionTopicsController, type: :request do
     end
 
     it "should create a topic with all the bells and whistles" do
+      @course.root_account.enable_feature!(:student_planner)
       post_at = 1.month.from_now
       lock_at = 2.months.from_now
+      todo_date = 1.day.from_now.change(sec: 0)
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
-               {:controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param},
-               {:title => "test title", :message => "test <b>message</b>", :discussion_type => "threaded", :published => true,
-                :delayed_post_at => post_at.as_json, :lock_at => lock_at.as_json, :podcast_has_student_posts => '1', :require_initial_post => '1'})
+               {:controller => "discussion_topics", :action => "create", :format => "json",
+                :course_id => @course.to_param},
+               {:title => "test title", :message => "test <b>message</b>", :discussion_type => "threaded",
+                :published => true, todo_date: todo_date, :delayed_post_at => post_at.as_json,
+                :lock_at => lock_at.as_json, :podcast_has_student_posts => '1', :require_initial_post => '1'})
       @topic = @course.discussion_topics.order(:id).last
       expect(@topic.title).to eq "test title"
       expect(@topic.message).to eq "test <b>message</b>"
@@ -204,6 +211,7 @@ describe DiscussionTopicsController, type: :request do
       expect(@topic.podcast_enabled?).to eq true
       expect(@topic.podcast_has_student_posts?).to eq true
       expect(@topic.require_initial_post?).to eq true
+      expect(@topic.todo_date).to eq todo_date
     end
 
     context "publishing" do
@@ -468,9 +476,9 @@ describe DiscussionTopicsController, type: :request do
 
       it "should require course to be published for students" do
         @course.claim
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                        {:controller => 'discussion_topics_api', :action => 'show', :format => 'json', :course_id => @course.id.to_s, :topic_id => @topic.id.to_s},
-                        {}, :expected_status => 401)
+        api_call_as_user(@student, :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                        {:controller => 'discussion_topics_api', :action => 'show', :format => 'json',
+                         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s}, {}, {}, :expected_status => 401)
       end
 
       it "should properly translate a video media comment in the discussion topic's message" do

@@ -20,20 +20,21 @@ define [
   'i18n!folder_tree'
   'react'
   'react-dom'
+  'prop-types'
   '../modules/BBTreeBrowserView'
   'compiled/views/RootFoldersFinder'
   '../modules/customPropTypes'
   'compiled/react_files/modules/filesEnv',
   'page',
   'compiled/jquery.rails_flash_notifications'
-], ($, I18n, React, ReactDOM, BBTreeBrowserView, RootFoldersFinder, customPropTypes, filesEnv, page) ->
+], ($, I18n, React, ReactDOM, PropTypes, BBTreeBrowserView, RootFoldersFinder, customPropTypes, filesEnv, page) ->
 
   FolderTree =
     displayName: 'FolderTree'
 
     propTypes:
-      rootFoldersToShow: React.PropTypes.arrayOf(customPropTypes.folder).isRequired
-      rootTillCurrentFolder: React.PropTypes.arrayOf(customPropTypes.folder)
+      rootFoldersToShow: PropTypes.arrayOf(customPropTypes.folder).isRequired
+      rootTillCurrentFolder: PropTypes.arrayOf(customPropTypes.folder)
 
     componentDidMount: ->
       rootFoldersFinder = new RootFoldersFinder({

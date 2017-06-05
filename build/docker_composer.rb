@@ -18,6 +18,7 @@
 require "yaml"
 require "fileutils"
 require "English"
+require_relative "./docker_utils"
 
 Thread.abort_on_exception = true
 
@@ -43,7 +44,7 @@ class DockerComposer
   class << self
     # :cry: not the same as canvas docker-compose ... yet
     RUNNER_IDS = Array.new(ENV['MASTER_RUNNERS'].to_i) { |i| i == 0 ? "" : i + 1 }
-    COMPOSE_FILES = %w[docker-compose.yml docker-compose.override.yml docker-compose.test.yml]
+    COMPOSE_FILES = %w[docker-compose.yml docker-compose.override.yml docker-compose.jenkins.yml]
 
     def run
       nuke_old_crap
@@ -243,23 +244,11 @@ class DockerComposer
     end
 
     def own_config
-      @own_config ||= YAML.load_file(COMPOSE_FILES.last)
+      @own_config ||= DockerUtils.compose_config(COMPOSE_FILES.last)
     end
 
     def config
-      @config ||= begin
-        merger = proc do |key, v1, v2|
-          Hash === v1 && Hash === v2 ?
-            v1.merge(v2, &merger) :
-          Array === v1 && Array === v2 ?
-            v1.concat(v2) :
-            v2
-        end
-
-        COMPOSE_FILES.inject({}) do |config, file|
-          config.merge(YAML.load_file(file), &merger)
-        end
-      end
+      @config ||= DockerUtils.compose_config(*COMPOSE_FILES)
     end
   end
 end

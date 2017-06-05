@@ -91,7 +91,7 @@ describe BrandableCSS do
 
     it 'uploads json file to s3 if cdn is enabled' do
       Canvas::Cdn.stubs(:enabled?).returns(true)
-      Canvas::Cdn.stubs(:config).returns(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1'))
+      Canvas::Cdn.stubs(:config).returns(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1', aws_access_key_id: 'id', aws_secret_access_key: 'secret', bucket: 'cdn'))
 
       file = StringIO.new
       BrandableCSS.stubs(:default_brand_json_file).returns(file)
@@ -102,7 +102,7 @@ describe BrandableCSS do
 
     it 'deletes the local json file if cdn is enabled' do
       Canvas::Cdn.stubs(:enabled?).returns(true)
-      Canvas::Cdn.stubs(:config).returns(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1'))
+      Canvas::Cdn.stubs(:config).returns(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1', aws_access_key_id: 'id', aws_secret_access_key: 'secret', bucket: 'cdn'))
       file = StringIO.new
       BrandableCSS.stubs(:default_brand_json_file).returns(file)
       File.expects(:delete).with(BrandableCSS.default_brand_json_file)
@@ -122,7 +122,7 @@ describe BrandableCSS do
 
     it 'uploads javascript file to s3 if cdn is enabled' do
       Canvas::Cdn.stubs(:enabled?).returns(true)
-      Canvas::Cdn.stubs(:config).returns(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1'))
+      Canvas::Cdn.stubs(:config).returns(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1', aws_access_key_id: 'id', aws_secret_access_key: 'secret', bucket: 'cdn'))
 
       file = StringIO.new
       BrandableCSS.stubs(:default_brand_js_file).returns(file)
@@ -133,7 +133,7 @@ describe BrandableCSS do
 
     it 'delete the local javascript file if cdn is enabled' do
       Canvas::Cdn.stubs(:enabled?).returns(true)
-      Canvas::Cdn.stubs(:config).returns(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1'))
+      Canvas::Cdn.stubs(:config).returns(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1', aws_access_key_id: 'id', aws_secret_access_key: 'secret', bucket: 'cdn'))
       file = StringIO.new
       BrandableCSS.stubs(:default_brand_js_file).returns(file)
       File.expects(:delete).with(BrandableCSS.default_brand_js_file)

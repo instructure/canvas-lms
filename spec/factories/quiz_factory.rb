@@ -35,17 +35,16 @@ module Factories
   end
 
   def quiz_with_submission(complete_quiz = true)
-    test_data = [{:correct_comments=>"", :assessment_question_id=>nil, :incorrect_comments=>"", :question_name=>"Question 1", :points_possible=>1, :question_text=>"Which book(s) are required for this course?", :name=>"Question 1", :id=>128, :answers=>[{:weight=>100, :text=>"A", :comments=>"", :id=>1490}, {:weight=>0, :text=>"B", :comments=>"", :id=>1020}, {:weight=>0, :text=>"C", :comments=>"", :id=>7051}], :question_type=>"multiple_choice_question"}]
     @course ||= course_model(:reusable => true)
     @student ||= user_model
     @course.enroll_student(@student).accept
     @quiz = @course.quizzes.create
     @quiz.workflow_state = "available"
-    @quiz.quiz_questions.create!({ question_data: test_data.first })
+    @quiz.quiz_questions.create!({ question_data: test_quiz_data.first })
     @quiz.save!
 
     @qsub = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student)
-    @qsub.quiz_data = test_data
+    @qsub.quiz_data = test_quiz_data
     @qsub.started_at = 1.minute.ago
     @qsub.attempt = 1
     if complete_quiz
@@ -61,6 +60,60 @@ module Factories
       @qsub.save!
     end
     @qsub
+  end
+
+  def test_quiz_data
+    [
+      {
+        correct_comments: '',
+        assessment_question_id: nil,
+        incorrect_comments: '',
+        question_name: 'Question 1',
+        points_possible: 1,
+        question_text: 'Which book(s) are required for this course?',
+        name: 'Question 1',
+        id: 128,
+        answers: [
+          { weight: 100, text: 'A', comments: '', id: 1490 },
+          { weight: 0, text: 'B', comments: '', id: 1020 },
+          { weight: 0, text: 'C', comments: '', id: 7051 }
+        ],
+        question_type: 'multiple_choice_question'
+      }
+    ]
+  end
+
+  def generate_quiz(course)
+    quiz = course.quizzes.create(workflow_state: 'available')
+    quiz.quiz_questions.create!(question_data: test_quiz_data().first)
+    quiz.save!
+
+    quiz
+  end
+
+  def generate_quiz_submission(quiz, student:, finished_at: nil)
+    qsub = Quizzes::SubmissionManager.new(quiz).find_or_create_submission(student)
+    qsub.quiz_data = test_quiz_data()
+    qsub.started_at = 1.minute.ago
+    qsub.attempt = 1
+
+    if finished_at.nil?
+      qsub.submission_data = {}
+    else
+      qsub.submission_data = [{ points: 0, text: "7051", question_id: 128, correct: false, answer_id: 7051 }]
+      qsub.score = 0
+      qsub.finished_at = finished_at || Time.now.utc
+      qsub.workflow_state = 'complete'
+    end
+
+    qsub.submission = quiz.assignment.find_or_create_submission(student.id)
+    qsub.submission.quiz_submission = qsub
+    qsub.submission.submission_type = 'online_quiz'
+    qsub.submission.submitted_at = qsub.finished_at
+
+    qsub.save!
+
+    qsub
   end
 
   def multiple_choice_question_data

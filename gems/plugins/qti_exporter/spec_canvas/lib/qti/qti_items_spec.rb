@@ -62,6 +62,23 @@ describe "Converting QTI items" do
     expect(hash[:question_text]).to include("I have an [RESPONSE_1]")
   end
 
+  it "should get answers and text correctly for other weird multiple dropdown questions" do
+    file_path = File.join(BASE_FIXTURE_DIR, 'qti')
+    manifest_node=get_manifest_node('inline_choice_interaction_2')
+    hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>file_path)
+
+    # the old code was terrible and doubled the text when it hit html tags and also ignored them... srsly who wrote it? ugh
+    expect(hash[:question_text]).to_not include("sillynode")
+    expect(hash[:question_text]).to include("I have a whole bunch of html that is <p>super nested</p> and stuff <br></br>")
+
+    expect(hash[:answers].select{|a| a[:blank_id] == "RESPONSE"}.map{|a| a[:text]}).to match_array(["pen", "pan", "ten"])
+    expect(hash[:answers].select{|a| a[:blank_id] == "RESPONSE_1"}.map{|a| a[:text]}).to match_array(["apple", "ant", "ape"])
+    # also make sure we get correct answers even when they reuse the choice identifiers
+    expect(hash[:answers].select{|a| a[:weight] == 100}.map{|a| a[:text]}).to match_array(["pen", "apple"])
+    expect(hash[:question_text]).to include("I have a [RESPONSE]")
+    expect(hash[:question_text]).to include("I have an [RESPONSE_1]")
+  end
+
   it "should get feedback with accents correctly even when people write gross xml" do
     file_path = File.join(BASE_FIXTURE_DIR, 'qti')
     manifest_node=get_manifest_node('weird_html')

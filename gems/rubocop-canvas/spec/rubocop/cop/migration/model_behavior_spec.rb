@@ -22,10 +22,12 @@ describe RuboCop::Cop::Migration::ModelBehavior do
         "Enabled" => true,
         "Included" => ["- db/migrate/*"],
         "Whitelist" => [
+          "Account.default",
+          "DataFixup",
           "Migrations::FooFix",
-          "*.update_all",
-          "*.delete_all",
-          "*.connection"
+          "update_all",
+          "delete_all",
+          "connection.*"
         ]
       }
     )
@@ -38,6 +40,28 @@ describe RuboCop::Cop::Migration::ModelBehavior do
       class Foo < ActiveRecord::Migration
         def up
           Migrations::FooFix.run
+        end
+      end
+    })
+    expect(subject.offenses.size).to eq(0)
+  end
+
+  it "should find no offenses when calling whitelisted Receiver/method combination" do
+    inspect_source(subject, %{
+      class Foo < ActiveRecord::Migration
+        def up
+          Account.default.lol.InstructureRules
+        end
+      end
+    })
+    expect(subject.offenses.size).to eq(0)
+  end
+
+  it "should find no offenses when a portion of the receiver is whitelisted" do
+    inspect_source(subject, %{
+      class Foo < ActiveRecord::Migration
+        def up
+          DataFixup::Module1::Module2::DeleteInvalidCommunicationChannels.send_now.blah
         end
       end
     })
@@ -59,7 +83,7 @@ describe RuboCop::Cop::Migration::ModelBehavior do
     inspect_source(subject, %{
       class Foo < ActiveRecord::Migration
         def up
-          User.foo.bar.baz.update_all(name: "sally")
+          User.update_all(name: "sally")
           Course.where(id: [1,2,3]).delete_all
         end
       end

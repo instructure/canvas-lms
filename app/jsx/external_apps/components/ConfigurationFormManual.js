@@ -20,6 +20,7 @@ import I18n from 'i18n!external_tools'
 import _ from 'underscore'
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import TextInput from 'jsx/external_apps/components/TextInput'
 import TextAreaInput from 'jsx/external_apps/components/TextAreaInput'
 import SelectInput from 'jsx/external_apps/components/SelectInput'
@@ -36,14 +37,14 @@ export default React.createClass({
     displayName: 'ConfigurationFormManual',
 
     propTypes: {
-      name         : React.PropTypes.string,
-      consumerKey  : React.PropTypes.string,
-      sharedSecret : React.PropTypes.string,
-      url          : React.PropTypes.string,
-      domain       : React.PropTypes.string,
-      privacyLevel : React.PropTypes.string,
-      customFields : React.PropTypes.object,
-      description  : React.PropTypes.string
+      name         : PropTypes.string,
+      consumerKey  : PropTypes.string,
+      sharedSecret : PropTypes.string,
+      url          : PropTypes.string,
+      domain       : PropTypes.string,
+      privacyLevel : PropTypes.string,
+      customFields : PropTypes.object,
+      description  : PropTypes.string
     },
 
     getInitialState() {

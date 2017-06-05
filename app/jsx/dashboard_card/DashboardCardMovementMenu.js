@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!dashcards'
 import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
 import { MenuItem, MenuItemSeparator } from 'instructure-ui/lib/components/Menu'
@@ -26,17 +27,17 @@ import Button from 'instructure-ui/lib/components/Button'
   class DashboardCardMovementMenu extends React.Component {
 
     static propTypes = {
-      cardTitle: React.PropTypes.string.isRequired,
-      assetString: React.PropTypes.string.isRequired,
-      handleMove: React.PropTypes.func.isRequired,
-      menuOptions: React.PropTypes.shape({
-        canMoveLeft: React.PropTypes.bool,
-        canMoveRight: React.PropTypes.bool,
-        canMoveToBeginning: React.PropTypes.bool,
-        canMoveToEnd: React.PropTypes.bool
+      cardTitle: PropTypes.string.isRequired,
+      assetString: PropTypes.string.isRequired,
+      handleMove: PropTypes.func.isRequired,
+      menuOptions: PropTypes.shape({
+        canMoveLeft: PropTypes.bool,
+        canMoveRight: PropTypes.bool,
+        canMoveToBeginning: PropTypes.bool,
+        canMoveToEnd: PropTypes.bool
       }).isRequired,
-      lastPosition: React.PropTypes.number,
-      currentPosition: React.PropTypes.number
+      lastPosition: PropTypes.number,
+      currentPosition: PropTypes.number
     };
 
     handleMoveCard = positionToMoveTo => () => this.props.handleMove(this.props.assetString, positionToMoveTo);

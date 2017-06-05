@@ -16,24 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jsx/shared/rce/RceCommandShim',
-  'INST' /* INST */,
-  'i18n!instructure',
-  'jquery' /* jQuery, $ */,
-  'underscore',
-  'compiled/xhr/FakeXHR',
-  'compiled/behaviors/authenticity_token',
-  'str/htmlEscape',
-  'jquery.ajaxJSON' /* ajaxJSON, defaultAjaxError */,
-  'jquery.disableWhileLoading' /* disableWhileLoading */,
-  'jquery.google-analytics' /* trackEvent */,
-  'jquery.instructure_date_and_time' /* date_field, time_field, datetime_field */,
-  'jquery.instructure_misc_helpers' /* /\$\.uniq/ */,
-  'jquery.instructure_misc_plugins' /* /\.log\(/ */,
-  'compiled/jquery.rails_flash_notifications',
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */
-], function(RceCommandShim, INST, I18n, $, _, FakeXHR, authenticity_token, htmlEscape) {
+import {send} from 'jsx/shared/rce/RceCommandShim'
+import INST from './INST'
+import I18n from 'i18n!instructure'
+import $ from 'jquery'
+import _ from 'underscore'
+import FakeXHR from 'compiled/xhr/FakeXHR'
+import authenticity_token from 'compiled/behaviors/authenticity_token'
+import htmlEscape from './str/htmlEscape'
+import './jquery.ajaxJSON' /* ajaxJSON, defaultAjaxError */
+import './jquery.disableWhileLoading'
+import './jquery.google-analytics' /* trackEvent */
+import './jquery.instructure_date_and_time' /* date_field, time_field, datetime_field */
+import './jquery.instructure_misc_helpers' /* /\$\.uniq/ */
+import 'compiled/jquery.rails_flash_notifications'
+import './vendor/jquery.scrollTo'
 
   // Intercepts the default form submission process.  Uses the form tag's
   // current action and method attributes to know where to submit to.
@@ -688,7 +685,7 @@ define([
       }
       try {
         if($input.data('rich_text')) {
-          val = RceCommandShim.send($input, "get_code", false);
+          val = send($input, "get_code", false);
         }
       } catch(e) {}
       var attr = $input.prop('name') || '';
@@ -1163,4 +1160,3 @@ define([
     if (!label.length) {return;}
     return label[0].firstChild.textContent;
   };
-});

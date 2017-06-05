@@ -18,6 +18,7 @@
 
 import _ from 'underscore'
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!moderated_grading'
 import ModeratedStudentList from './ModeratedStudentList'
 import Header from './ModerationHeader'
@@ -29,10 +30,10 @@ export default React.createClass({
   displayName: 'ModerationApp',
 
   propTypes: {
-    store: React.PropTypes.object.isRequired,
-    permissions: React.PropTypes.shape({
-      viewGrades: React.PropTypes.bool.isRequired,
-      editGrades: React.PropTypes.bool.isRequired
+    store: PropTypes.object.isRequired,
+    permissions: PropTypes.shape({
+      viewGrades: PropTypes.bool.isRequired,
+      editGrades: PropTypes.bool.isRequired
     }).isRequired
   },
 

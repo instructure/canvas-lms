@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import ChecklistItem from './ChecklistItem'
 import ListItems from './ListItems'
 import I18n from 'i18n!course_wizard'
@@ -25,9 +26,9 @@ import I18n from 'i18n!course_wizard'
       displayName: 'Checklist',
 
       propTypes: {
-        selectedItem: React.PropTypes.string.isRequired,
-        clickHandler: React.PropTypes.func.isRequired,
-        className: React.PropTypes.string.isRequired
+        selectedItem: PropTypes.string.isRequired,
+        clickHandler: PropTypes.func.isRequired,
+        className: PropTypes.string.isRequired
       },
 
       getInitialState: function () {

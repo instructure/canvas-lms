@@ -138,6 +138,31 @@
 #           "example": true,
 #           "type": "boolean"
 #         },
+#         "missing": {
+#           "description": "Whether the assignment is missing.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "late_policy_status": {
+#           "description": "The status of the submission in relation to the late policy. Can be late, missing, none, or null.",
+#           "example": "missing",
+#           "type": "string"
+#         },
+#         "accepted_at": {
+#           "description": "The date that the submission was accepted at.",
+#           "example": "2012-01-01T01:00:00Z",
+#           "type": "datetime"
+#         },
+#         "points_deducted": {
+#           "description": "The amount of points automatically deducted from the score by the missing/late policy for a late or missing assignment.",
+#           "example": 12.3,
+#           "type": "number"
+#         },
+#         "duration_late": {
+#           "description": "The amount of time, in seconds, that an submission is late by.",
+#           "example": 300.2,
+#           "type": "number"
+#         },
 #         "workflow_state": {
 #           "description": "The current state of the submission",
 #           "example": "submitted",
@@ -566,6 +591,12 @@ class SubmissionsApiController < ApplicationController
   # @argument submission[excuse] [Boolean]
   #   Sets the "excused" status of an assignment.
   #
+  # @argument submission[late_policy_status] [String]
+  #   Sets the late policy status to either "late", "missing", "none", or null.
+  #
+  # @argument submission[accepted_at] [iso8601 Timestamp]
+  #   Sets the accepted at if late policy status is "late"
+  #
   # @argument rubric_assessment [RubricAssessment]
   #   Assign a rubric assessment to this assignment submission. The
   #   sub-parameters here depend on the rubric for the assignment. The general
@@ -623,6 +654,12 @@ class SubmissionsApiController < ApplicationController
       if params[:submission].is_a?(ActionController::Parameters)
         submission[:grade] = params[:submission].delete(:posted_grade)
         submission[:excuse] = params[:submission].delete(:excuse)
+        if params[:submission].key?(:late_policy_status)
+          submission[:late_policy_status] = params[:submission].delete(:late_policy_status)
+        end
+        if params[:submission].key?(:accepted_at)
+          submission[:accepted_at] = params[:submission].delete(:accepted_at)
+        end
         submission[:provisional] = value_to_boolean(params[:submission][:provisional])
         submission[:final] = value_to_boolean(params[:submission][:final]) && @context.grants_right?(@current_user, :moderate_grades)
         if params[:submission][:submission_type] == 'basic_lti_launch' && (!@submission.has_submission? || @submission.submission_type == 'basic_lti_launch')
@@ -641,6 +678,13 @@ class SubmissionsApiController < ApplicationController
       else
         @submission = @assignment.find_or_create_submission(@user) if @submission.new_record?
         @submissions ||= [@submission]
+      end
+      if submission.key?(:late_policy_status)
+        @submission.late_policy_status = submission[:late_policy_status]
+        if @submission.late_policy_status == 'late' && submission[:accepted_at].present?
+          @submission.accepted_at = Time.zone.parse(submission[:accepted_at])
+        end
+        @submission.save!
       end
 
       assessment = params[:rubric_assessment]
@@ -833,6 +877,9 @@ class SubmissionsApiController < ApplicationController
   # @argument grade_data[<student_id>][file_ids][] [Integer]
   #   See documentation for the comment[] arguments in the
   #   {api:SubmissionsApiController#update Submissions Update} documentation
+  # @argument grade_data[<student_id>][assignment_id] [Integer]
+  #   Specifies which assignment to grade.  This argument is not necessary when
+  #   using the assignment-specific endpoints.
   #
   # @example_request
   #

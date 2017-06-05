@@ -483,10 +483,58 @@ describe GradebooksController do
   end
 
   describe "GET 'show'" do
+    context "as an admin" do
+      it "renders successfully" do
+        account_admin_user(account: @course.root_account)
+        user_session(@admin)
+        get "show", :course_id => @course.id
+        expect(response).to render_template("gradebook")
+      end
+    end
+
+    context "as an admin with new gradebook available" do
+      before :each do
+        account_admin_user(account: @course.root_account)
+        user_session(@admin)
+      end
+
+      it "renders new gradebook when enabled" do
+        @course.enable_feature!(:new_gradebook)
+        get "show", course_id: @course.id
+        expect(response).to render_template("gradebooks/gradezilla/gradebook")
+      end
+
+      it "renders new indidivual view when enabled" do
+        @course.enable_feature!(:new_gradebook)
+        allow(@admin).to receive(:preferred_gradebook_version).and_return('individual')
+        get "show", course_id: @course.id
+        expect(response).to render_template("gradebooks/gradezilla/individual")
+      end
+
+      it "ignores the version parameter outside development environments" do
+        allow(Rails.env).to receive(:development?).and_return(false)
+        get "show", course_id: @course.id, version: 'gradezilla-gradebook'
+        expect(response).to render_template(:gradebook)
+      end
+    end
+
+    describe 'js_env' do
+      before :each do
+        user_session(@teacher)
+      end
+
+      it "includes colors" do
+        get :show, course_id: @course.id
+
+        gradebook_options = controller.js_env.fetch(:GRADEBOOK_OPTIONS)
+        expect(gradebook_options).to have_key :colors
+      end
+    end
+
     describe "csv" do
       before :once do
-        assignment1 = @course.assignments.create(:title => "Assignment 1")
-        assignment2 = @course.assignments.create(:title => "Assignment 2")
+        @course.assignments.create(:title => "Assignment 1")
+        @course.assignments.create(:title => "Assignment 2")
       end
 
       before :each do
@@ -575,6 +623,10 @@ describe GradebooksController do
         expected_value = new_course_gradebook_upload_path(@course)
 
         expect(actual_value).to eq(expected_value)
+      end
+
+      it "includes the context_modules_url in the ENV" do
+        expect(@gradebook_env[:context_modules_url]).to eq(api_v1_course_context_modules_url(@course))
       end
     end
 

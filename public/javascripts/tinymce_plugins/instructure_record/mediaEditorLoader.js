@@ -16,18 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jquery',
-  'str/htmlEscape',
-  'jsx/shared/rce/RceCommandShim',
-  'media_comments'
-], function($, htmlEscape, RceCommandShim) {
+import $ from 'jquery'
+import htmlEscape from '../../str/htmlEscape'
+import {send} from 'jsx/shared/rce/RceCommandShim'
+import '../../media_comments'
 
   var mediaEditorLoader = {
     insertCode: function(ed, mediaCommentId, mediaType){
       var $editor = $("#" + ed.id);
       var linkCode = this.makeLinkHtml(mediaCommentId, mediaType)
-      RceCommandShim.send($editor, 'insert_code', linkCode);
+      send($editor, 'insert_code', linkCode);
     },
 
     makeLinkHtml: function(mediaCommentId, mediaType) {
@@ -60,5 +58,4 @@ define([
     }
   }
 
-  return mediaEditorLoader;
-});
+export default mediaEditorLoader;

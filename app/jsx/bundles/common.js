@@ -44,7 +44,6 @@ import 'compiled/behaviors/instructure_inline_media_comment'
 import 'compiled/behaviors/ping'
 import 'LtiThumbnailLauncher'
 import 'compiled/badge_counts'
-import 'instructure-ui/lib/themes/canvas'
 
 // Other stuff several bundles use.
 // If any of these really arn't used on most pages,
@@ -56,6 +55,8 @@ import 'jqueryui/progressbar'
 import 'jqueryui/tabs'
 import 'compiled/registration/incompleteRegistrationWarning'
 import 'moment'
+
+$('html').removeClass('scripts-not-loaded')
 
 $('.help_dialog_trigger').click((event) => {
   event.preventDefault()

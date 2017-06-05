@@ -18,16 +18,16 @@
 
 const data = ENV.BLUEPRINT_COURSES_DATA
 
-if (data.isMasterCourse) {
-  require.ensure([], (require) => {
-    // lazy load SettingsSidebar since this bundle is shared across master & child
-    const App = require('../blueprint_courses/apps/SettingsSidebar')
-    const wrapper = document.getElementById('wrapper')
-    const root = document.createElement('div')
-    root.className = 'bcs__root'
-    wrapper.appendChild(root)
+require.ensure([], (require) => {
+  const App = data.isMasterCourse
+    ? require('../blueprint_courses/apps/BlueprintCourse')
+    : require('../blueprint_courses/apps/ChildCourse')
 
-    const app = new App(root, data)
-    app.render()
-  })
-}
+  const wrapper = document.getElementById('wrapper')
+  const root = document.createElement('div')
+  root.className = 'blueprint__root'
+  wrapper.appendChild(root)
+
+  const app = new App(root, data, ENV.DEBUG_BLUEPRINT_COURSES)
+  app.start()
+})

@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define ['react', 'jquery'], (React, $) ->
+define ['react', 'jquery', 'prop-types'], (React, $, PropTypes) ->
   stubRouterContext = (Component, props, stubs) ->
 
     RouterStub = ->
@@ -35,8 +35,8 @@ define ['react', 'jquery'], (React, $) ->
 
     React.createClass
       childContextTypes:
-        router: React.PropTypes.func,
-        routeDepth: React.PropTypes.number
+        router: PropTypes.func,
+        routeDepth: PropTypes.number
 
       getChildContext: ->
         router: RouterStub,

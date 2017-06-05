@@ -17,10 +17,11 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import I18n from 'i18n!cyoe_assignment_sidebar'
 
-  const { object, func, number } = React.PropTypes
+  const { object, func, number } = PropTypes
 
 export default class StudentRangeItem extends React.Component {
     static propTypes = {

@@ -13,11 +13,9 @@
  *	jquery.ui.widget.js
  *	jquery.ui.position.js
  */
-define([
-  'jquery',
-  'jqueryui/core',
-  'jqueryui/widget'
-], function( $ ) {
+import $ from 'jquery'
+import 'jqueryui/core'
+import 'jqueryui/widget'
 
 function thisOrParentIsHidden() {
   return [].some.call($(this).parents().andSelf(), function(el) {
@@ -611,4 +609,4 @@ $.widget( "ui.menu", {
 	}
 });
 
-});
+

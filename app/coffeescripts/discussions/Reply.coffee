@@ -115,7 +115,6 @@ define [
     # @api private
     submit: =>
       @hide()
-      RichContentEditor.callOnRCE(@textArea, 'set_code', '')
       @view.model.set 'notification', "<div class='alert alert-info'>#{htmlEscape I18n.t 'saving_reply', 'Saving reply...'}</div>"
       entry = new Entry @getModelAttributes()
       entry.save null,

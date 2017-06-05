@@ -17,7 +17,10 @@
  */
 
 import I18n from 'i18n!blueprint_settings'
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
+import cx from 'classnames'
+
 import Modal, { ModalHeader, ModalBody, ModalFooter } from 'instructure-ui/lib/components/Modal'
 import Heading from 'instructure-ui/lib/components/Heading'
 import Button from 'instructure-ui/lib/components/Button'
@@ -28,10 +31,11 @@ export default class BlueprintModal extends Component {
     title: PropTypes.string,
     onCancel: PropTypes.func,
     onSave: PropTypes.func,
-    children: PropTypes.func.isRequired,
+    children: PropTypes.element.isRequired,
     hasChanges: PropTypes.bool,
     isSaving: PropTypes.bool,
-    doneButton: PropTypes.element,
+    saveButton: PropTypes.element,
+    wide: PropTypes.bool,
   }
 
   static defaultProps = {
@@ -40,7 +44,8 @@ export default class BlueprintModal extends Component {
     isSaving: false,
     onSave: () => {},
     onCancel: () => {},
-    doneButton: null,
+    saveButton: null,
+    wide: false,
   }
 
   componentDidUpdate (prevProps) {
@@ -56,6 +61,9 @@ export default class BlueprintModal extends Component {
   }
 
   render () {
+    const classes = cx('bcs__modal-content-wrapper',
+      { 'bcs__modal-content-wrapper__wide': this.props.wide })
+
     return (
       <Modal
         isOpen={this.props.isOpen}
@@ -70,17 +78,17 @@ export default class BlueprintModal extends Component {
           <Heading level="h3">{this.props.title}</Heading>
         </ModalHeader>
         <ModalBody>
-          <div className="bcs__modal-content-wrapper">
-            {this.props.children()}
+          <div className={classes}>
+            {this.props.children}
           </div>
         </ModalBody>
         <ModalFooter ref={(c) => { this.footer = c }}>
           {this.props.hasChanges && !this.props.isSaving ? [
-            <Button onClick={this.props.onCancel}>{I18n.t('Cancel')}</Button>,
-            <span>&nbsp;</span>,
-            this.props.doneButton
-              ? this.props.doneButton
-              : <Button onClick={this.props.onSave} variant="primary">{I18n.t('Save')}</Button>
+            <Button key="cancel" onClick={this.props.onCancel}>{I18n.t('Cancel')}</Button>,
+            <span key="space">&nbsp;</span>,
+            this.props.saveButton
+              ? this.props.saveButton
+              : <Button key="save" onClick={this.props.onSave} variant="primary">{I18n.t('Save')}</Button>
           ] : (
             <Button ref={(c) => { this.doneBtn = c }} onClick={this.props.onCancel} variant="primary">{I18n.t('Done')}</Button>
           )}

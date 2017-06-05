@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!external_tools'
 import React from 'react'
+import PropTypes from 'prop-types'
 import Header from 'jsx/external_apps/components/Header'
 import ExternalToolsTable from 'jsx/external_apps/components/ExternalToolsTable'
 import AddExternalToolButton from 'jsx/external_apps/components/AddExternalToolButton'
@@ -26,7 +27,7 @@ export default React.createClass({
     displayName: 'Configurations',
 
     propTypes: {
-        env: React.PropTypes.object.isRequired
+        env: PropTypes.object.isRequired
     },
 
     canAddEdit() {

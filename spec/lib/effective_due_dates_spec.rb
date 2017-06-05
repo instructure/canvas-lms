@@ -37,6 +37,40 @@ describe Course do
     end
   end
 
+  describe '#filter_students_to' do
+    let(:edd) { EffectiveDueDates.for_course(@test_course) }
+
+    it 'defaults to no filtered students' do
+      expect(edd.filtered_students).to be_nil
+    end
+
+    it 'saves an array of students' do
+      user1, user2 = User.create, User.create
+      edd.filter_students_to([user1, user2])
+      expect(edd.filtered_students).to eq [user1.id, user2.id]
+    end
+
+    it 'saves a list of students' do
+      user1, user2 = User.create, User.create
+      edd.filter_students_to(user1, user2)
+      expect(edd.filtered_students).to eq [user1.id, user2.id]
+    end
+
+    it 'saves a list of student ids' do
+      edd.filter_students_to(15, 20, 2)
+      expect(edd.filtered_students).to eq [15, 20, 2]
+    end
+
+    it 'does nothing if no students are passed' do
+      edd.filter_students_to
+      expect(edd.filtered_students).to be_nil
+    end
+
+    it 'allows chaining' do
+      expect(edd.filter_students_to(5)).to eq edd
+    end
+  end
+
   describe '#to_hash' do
     before(:once) do
       @now = Time.zone.now.change(sec: 0)
@@ -123,6 +157,62 @@ describe Course do
             override_source: 'Everyone Else'
           },
           @student2.id => {
+            due_at: nil,
+            grading_period_id: nil,
+            in_closed_grading_period: false,
+            override_id: nil,
+            override_source: 'Everyone Else'
+          },
+          @student3.id => {
+            due_at: nil,
+            grading_period_id: nil,
+            in_closed_grading_period: false,
+            override_id: nil,
+            override_source: 'Everyone Else'
+          }
+        }
+      }
+      expect(result).to eq expected
+    end
+
+    it 'returns the effective due dates per assignment for select students when filtered' do
+      edd = EffectiveDueDates.for_course(@test_course).filter_students_to(@student1, @student3)
+      result = edd.to_hash
+      expected = {
+        @assignment1.id => {
+          @student1.id => {
+            due_at: 2.weeks.from_now(@now),
+            grading_period_id: nil,
+            in_closed_grading_period: false,
+            override_id: nil,
+            override_source: 'Everyone Else'
+          },
+          @student3.id => {
+            due_at: 2.weeks.from_now(@now),
+            grading_period_id: nil,
+            in_closed_grading_period: false,
+            override_id: nil,
+            override_source: 'Everyone Else'
+          }
+        },
+        @assignment2.id => {
+          @student1.id => {
+            due_at: nil,
+            grading_period_id: nil,
+            in_closed_grading_period: false,
+            override_id: nil,
+            override_source: 'Everyone Else'
+          },
+          @student3.id => {
+            due_at: nil,
+            grading_period_id: nil,
+            in_closed_grading_period: false,
+            override_id: nil,
+            override_source: 'Everyone Else'
+          }
+        },
+        @assignment3.id => {
+          @student1.id => {
             due_at: nil,
             grading_period_id: nil,
             in_closed_grading_period: false,
@@ -1524,6 +1614,15 @@ describe Course do
         it 'returns true if the specified student has a due date for this assignment' do
           expect(@edd.in_closed_grading_period?(@assignment2, @student2)).to be true
           expect(@edd.in_closed_grading_period?(@assignment2, @student2.id)).to be true
+        end
+
+        it 'raises error if the specified student was filtered out of the query' do
+          expect { @edd.filter_students_to(@student1).in_closed_grading_period?(@assignment2, @student2) }.
+            to raise_error("Student #{@student2.id} was not included in this query")
+        end
+
+        it 'returns true if the specified student was included in the query and has a due date for this assignment' do
+          expect(@edd.filter_students_to(@student2).in_closed_grading_period?(@assignment2, @student2)).to be true
         end
 
         it 'returns false if the specified student has a due date in an open grading period' do

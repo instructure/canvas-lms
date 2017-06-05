@@ -1,0 +1,15 @@
+<%#
+    THIS MIGHT BE A DUMB WAY TO DO THIS
+
+    There's a graphiql gem that runs graphiql in a rails engine, but i think
+    it only works with the standard rails asset pipeline.
+%>
+<% content_for :head do %>
+  <%= include_head_js %>
+  <style>
+    html, body, #graphiql { height: 100% }
+    body { margin: 0 }
+  </style>
+<% end %>
+<div id=graphiql></div>
+<%= js_bundle :graphiql %>

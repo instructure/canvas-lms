@@ -1,1 +1,0 @@
-!function(){var e={zones:{EST:["z",{wallclock:-1.7976931348623157e308,format:"EST",abbrev:"EST",offset:-18e6,posix:-1.7976931348623157e308,save:0}]},rules:{}};"function"==typeof define&&define.amd?define(e):("undefined"==typeof __PRELOADED_TIMEZONE_DATA__&&(__PRELOADED_TIMEZONE_DATA__={}),__PRELOADED_TIMEZONE_DATA__.EST=e)}();

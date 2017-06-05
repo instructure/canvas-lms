@@ -109,7 +109,7 @@
 #           "example": "crit1",
 #           "type": "string"
 #         },
-#         "outcome_id": {
+#         "learning_outcome_id": {
 #           "description": "(Optional) The id of the learning outcome this criteria uses, if any.",
 #           "example": "1234",
 #           "type": "string"
@@ -1049,8 +1049,8 @@ class AssignmentsApiController < ApplicationController
   end
 
   def render_create_or_update_result(result, opts = {})
-    if result == :success
-      render json: assignment_json(@assignment, @current_user, session, opts), status: :created
+    if [:created, :ok].include?(result)
+      render json: assignment_json(@assignment, @current_user, session, opts), status: result
     else
       status = result == :forbidden ? :forbidden : :bad_request
       errors = @assignment.errors.as_json[:errors]

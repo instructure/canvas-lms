@@ -19,6 +19,7 @@
 import I18n from 'i18n!blueprint_settings'
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import Typography from 'instructure-ui/lib/components/Typography'
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
 import PresentationContent from 'instructure-ui/lib/components/PresentationContent'
@@ -28,13 +29,13 @@ import 'compiled/jquery.rails_flash_notifications'
 
 import propTypes from '../propTypes'
 
-const { arrayOf, string } = React.PropTypes
+const { arrayOf, string } = PropTypes
 
 export default class CoursePickerTable extends React.Component {
   static propTypes = {
     courses: propTypes.courseList.isRequired,
     selectedCourses: arrayOf(string).isRequired,
-    onSelectedChanged: React.PropTypes.func,
+    onSelectedChanged: PropTypes.func,
   }
 
   static defaultProps = {

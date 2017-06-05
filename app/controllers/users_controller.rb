@@ -467,6 +467,7 @@ class UsersController < ApplicationController
 
   helper_method :show_planner?
   def show_planner?
+    return false unless @current_user && @current_user.preferences
     if @current_user.preferences[:dashboard_view]
       @current_user.preferences[:dashboard_view] == 'planner'
     else
@@ -907,7 +908,7 @@ class UsersController < ApplicationController
 
     assignments = []
     Shackles.activate(:slave) do
-      preloaded_submitted_assignment_ids = user.submissions.pluck(:assignment_id)
+      preloaded_submitted_assignment_ids = user.submissions.not_missing.pluck(:assignment_id)
       assignments = user.assignments_needing_submitting due_before: Time.zone.now
       assignments.reject {|as| preloaded_submitted_assignment_ids.include? as.id }
     end

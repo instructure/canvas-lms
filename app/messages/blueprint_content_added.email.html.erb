@@ -1,0 +1,19 @@
+<% define_content :link do %>
+  <%= polymorphic_url(asset.context, :anchor => asset.notification_link_anchor) %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t :subject, "Blueprint Sync: %{name}", :name => asset.context.name %>
+<% end %>
+
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :details_link, "View changes"%>
+  </a>
+<% end %>
+
+<p><%= t :body, "Blueprint course changes have been synced to %{name}.", :name => asset.context.name %></p>
+
+<% if asset.master_migration.comment.present? %>
+<p>"<%= asset.master_migration.comment %>"</p>
+<% end %>

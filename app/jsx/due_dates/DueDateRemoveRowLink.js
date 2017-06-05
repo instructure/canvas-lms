@@ -17,12 +17,13 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!assignments'
 
   var DueDateRemoveRowLink = React.createClass({
 
     propTypes: {
-      handleClick: React.PropTypes.func.isRequired
+      handleClick: PropTypes.func.isRequired
     },
 
     render(){

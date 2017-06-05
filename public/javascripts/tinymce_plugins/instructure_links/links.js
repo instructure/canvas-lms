@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jquery',
-  'str/htmlEscape',
-  'tinymce_plugins/instructure_links/linkable_editor',
-  'jsx/shared/rce/RceCommandShim',
-  'jquery.instructure_misc_helpers',
-  'jqueryui/dialog',
-  'jquery.instructure_misc_plugins'
-], function ($, htmlEscape, LinkableEditor, RceCommandShim) {
+import $ from 'jquery'
+import htmlEscape from '../../str/htmlEscape'
+import LinkableEditor from './linkable_editor'
+import {send} from 'jsx/shared/rce/RceCommandShim'
+import '../../jquery.instructure_misc_helpers'
+import 'jqueryui/dialog'
+import '../../jquery.instructure_misc_plugins'
+
+
   // TODO: Allow disabling of inline media as well.  Right now
   // the link is just '#' so disabling it actually ruins it.  It'd
   // be nice if the link were a URL to download the media file.
@@ -167,7 +167,7 @@ define([
               $("#instructure_link_prompt").dialog('close');
               $.findLinkForService($(this).data('service').service, function(data) {
                 $("#instructure_link_prompt").dialog('close');
-                RceCommandShim.send($editor, 'create_link', {
+                send($editor, 'create_link', {
                   title: data.title,
                   url: data.url,
                   classes: priorClasses
@@ -400,9 +400,7 @@ define([
     .find(".iframe_placeholder").each(function() {
       var edWidth = $(ed.contentAreaContainer).width();
       var $holder = $(this);
-      if($(ed.contentAreaContainer).hasScrollbar() || true) {
-        edWidth -= $(ed.contentAreaContainer).scrollbarWidth();
-      }
+      edWidth -= $(ed.contentAreaContainer).scrollbarWidth();
       if($holder.width() > edWidth - 40) {
         $holder.width(edWidth - 15);
         if(!$holder.hasClass('fullWidth')) { $holder.addClass('fullWidth'); }
@@ -438,7 +436,7 @@ define([
     initializedEditors.set(ed, true)
   }
 
-  return {
+  export default {
     buttonToImg: buttonToImg,
     prepEditorForDialog: prepEditorForDialog,
     buildLinkClasses: buildLinkClasses,
@@ -446,5 +444,4 @@ define([
     renderDialog: renderDialog,
     updateLinks: updateLinks,
     initEditor: initEditor
-  };
-})
+  }

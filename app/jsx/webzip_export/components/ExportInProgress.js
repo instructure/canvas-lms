@@ -17,14 +17,15 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import ApiProgressBar from 'jsx/shared/ApiProgressBar'
 import I18n from 'i18n!webzip_exports'
   class ExportInProgress extends React.Component {
     static propTypes = {
-      webzip: React.PropTypes.shape({
-        progressId: React.PropTypes.string.isRequired
+      webzip: PropTypes.shape({
+        progressId: PropTypes.string.isRequired
       }),
-      loadExports: React.PropTypes.func.isRequired
+      loadExports: PropTypes.func.isRequired
     }
 
     constructor (props) {

@@ -18,14 +18,15 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!custom_help_link'
 import CustomHelpLinkPropTypes from './CustomHelpLinkPropTypes'
 import CustomHelpLinkConstants from './CustomHelpLinkConstants'
   const CustomHelpLinkForm = React.createClass({
     propTypes: {
       link: CustomHelpLinkPropTypes.link.isRequired,
-      onSave: React.PropTypes.func,
-      onCancel: React.PropTypes.func
+      onSave: PropTypes.func,
+      onCancel: PropTypes.func
     },
     getInitialState () {
       return {

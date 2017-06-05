@@ -16,24 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!quizzes.show',
-  'jquery' /* $ */,
-  'compiled/views/MessageStudentsDialog',
-  'quiz_arrows',
-  'quiz_inputs',
-  'compiled/models/Quiz',
-  'compiled/views/PublishButtonView',
-  'compiled/quizzes/dump_events',
-  'jsx/conditional_release_stats/index',
-  'jquery.instructure_date_and_time' /* dateString, time_field, datetime_field */,
-  'jqueryui/dialog',
-  'compiled/jquery/fixDialogButtons',
-  'compiled/jquery.rails_flash_notifications',
-  'jquery.instructure_misc_plugins' /* ifExists, confirmDelete */,
-  'jquery.disableWhileLoading',
-  'message_students' /* messageStudents */
-], function(I18n, $, MessageStudentsDialog, QuizArrowApplicator, inputMethods, Quiz, PublishButtonView, QuizLogAuditingEventDumper, CyoeStats) {
+import I18n from 'i18n!quizzes.show'
+import $ from 'jquery'
+import MessageStudentsDialog from 'compiled/views/MessageStudentsDialog'
+import QuizArrowApplicator from 'quiz_arrows'
+import inputMethods from 'quiz_inputs'
+import Quiz from 'compiled/models/Quiz'
+import PublishButtonView from 'compiled/views/PublishButtonView'
+import QuizLogAuditingEventDumper from 'compiled/quizzes/dump_events'
+import CyoeStats from 'jsx/conditional_release_stats/index'
+import './jquery.instructure_date_and_time' /* dateString, time_field, datetime_field */
+import 'jqueryui/dialog'
+import 'compiled/jquery/fixDialogButtons'
+import 'compiled/jquery.rails_flash_notifications'
+import './jquery.instructure_misc_plugins' /* ifExists, confirmDelete */
+import './jquery.disableWhileLoading'
+import 'message_students' /* messageStudents */
 
 
   $(document).ready(function () {
@@ -213,5 +211,3 @@ define([
     var detailsParent = document.getElementById('not_right_side')
     CyoeStats.init(graphsRoot, detailsParent)
   });
-
-});

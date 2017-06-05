@@ -85,7 +85,7 @@ describe ContextController do
       expect(assigns[:primary_users].each_value.first.collect(&:id)).to match_array [@student.id, active_student.id, inactive_student.id]
     end
 
-    context "student content cards" do
+    context "student context cards" do
       before(:once) do
         @course.root_account.enable_feature! :student_context_cards
       end

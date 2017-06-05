@@ -2057,6 +2057,231 @@ describe User do
     end
   end
 
+  describe "wiki_pages_needing_viewing" do
+    before(:each) do
+      course_with_student(active_all: true)
+      @course_page = wiki_page_model(course: @course)
+      @group_category = @course.group_categories.create(name: 'Project Group')
+      @group1 = group_model(name: 'Project Group 1', group_category: @group_category, context: @course)
+      group_membership_model(group: @group1, user: @student)
+      @group_page = wiki_page_model(course: @group1)
+      account = @course.account
+      @group_category = account.group_categories.create(name: 'Project Group')
+      @group2 = group_model(name: 'Project Group 1', group_category: @group_category, context: account)
+      group_membership_model(group: @group2, user: @student)
+      @account_page = wiki_page_model(course: @group2)
+    end
+
+    let(:opts) { {due_after: 1.day.ago, due_before: 2.days.from_now} }
+
+    it 'should show for wiki pages with todo dates within the opts date range' do
+      @course_page.todo_date = 1.day.from_now
+      @group_page.todo_date = 1.day.from_now
+      @account_page.todo_date = 1.day.from_now
+      pages = [@course_page, @group_page, @account_page]
+      pages.each(&:save!)
+      expect(@student.wiki_pages_needing_viewing(opts).sort_by(&:id)).to eq pages
+    end
+
+    it 'should not show for wiki pages with todo dates outside the range' do
+      @course_page.todo_date = 3.days.ago
+      @group_page.todo_date = 3.days.ago
+      @account_page.todo_date = 3.days.ago
+      pages = [@course_page, @group_page, @account_page]
+      pages.each(&:save!)
+      expect(@student.wiki_pages_needing_viewing(opts)).to eq []
+    end
+
+    it 'should not show for wiki pages without todo dates' do
+      expect(@student.wiki_pages_needing_viewing(opts)).to eq []
+    end
+
+    it 'should not show unpublished pages' do
+      teacher_in_course(course: @course)
+      @course_page.workflow_state = 'unpublished'
+      @course_page.todo_date = 1.day.from_now
+      @course_page.save!
+      @group_page.workflow_state = 'unpublished'
+      @group_page.todo_date = 1.day.from_now
+      @account_page.workflow_state = 'unpublished'
+      @account_page.todo_date = 1.day.from_now
+      pages = [@course_page, @group_page, @account_page]
+      pages.each(&:save!)
+      expect(@student.wiki_pages_needing_viewing(opts)).to eq []
+      expect(@teacher.wiki_pages_needing_viewing(opts)).to eq []
+    end
+
+    it 'should not show for users not enrolled in course' do
+      @course_page.todo_date = 1.day.from_now
+      @group_page.todo_date = 1.day.from_now
+      @account_page.todo_date = 1.day.from_now
+      pages = [@course_page, @group_page, @account_page]
+      pages.each(&:save!)
+      user1 = @student
+      course_with_student(active_all: true)
+      expect(user1.wiki_pages_needing_viewing(opts).sort_by(&:id)).to eq pages
+      expect(@student.wiki_pages_needing_viewing(opts)).to eq []
+    end
+
+    it 'should not show wiki pages that are not released to the user' do
+      @course.enable_feature!(:conditional_release)
+      @course_page.todo_date = 1.day.from_now
+      @course_page.save!
+      add_section('Section 2')
+      student2 = student_in_section(@course_section)
+      wiki_page_assignment_model(wiki_page: @course_page)
+      differentiated_assignment(assignment: @assignment, course_section: @course_section)
+      expect(@student.wiki_pages_needing_viewing(opts)).to eq []
+      expect(student2.wiki_pages_needing_viewing(opts)).to eq [@course_page]
+    end
+  end
+
+  describe "discussion_topics_needing_viewing" do
+    let(:opts) { {due_after: 1.day.ago, due_before: 2.days.from_now} }
+
+    context 'course discussions' do
+      before(:each) do
+        course_with_student(active_all: true)
+        discussion_topic_model(context: @course)
+        group_discussion_topic_model(context: @course)
+        announcement_model(context: @course)
+        @topic.publish!
+        @group_topic.publish!
+        @a.publish!
+      end
+
+      it 'should show for ungraded discussion topics with todo dates within the opts date range' do
+        @topic.todo_date = 1.day.from_now
+        @topic.save!
+        @group_topic.todo_date = 1.day.from_now
+        @group_topic.save!
+        expect(@student.discussion_topics_needing_viewing(opts).sort_by(&:id)).to eq [@topic, @group_topic, @a]
+      end
+
+      it 'should not show for ungraded discussion topics with todo dates outside the range' do
+        @topic.todo_date = 3.days.ago
+        @topic.save!
+        @group_topic.todo_date = 3.days.ago
+        @group_topic.save!
+        @a.posted_at = 3.days.ago
+        @a.save!
+        expect(@student.discussion_topics_needing_viewing(opts)).to eq []
+      end
+
+      it 'should not show for ungraded discussion topics without todo dates' do
+        expect(@student.discussion_topics_needing_viewing(opts)).to eq [@a]
+      end
+
+      it 'should not show unpublished discussion topics' do
+        teacher_in_course(course: @course)
+        @topic.workflow_state = 'unpublished'
+        @topic.todo_date = 1.day.from_now
+        @topic.save!
+        @group_topic.workflow_state = 'unpublished'
+        @group_topic.todo_date = 1.day.from_now
+        @group_topic.save!
+        @a.delayed_post_at = 1.day.from_now
+        @a.workflow_state = 'post_delayed'
+        @a.save!
+        expect(@student.discussion_topics_needing_viewing(opts)).to eq []
+        expect(@teacher.discussion_topics_needing_viewing(opts)).to eq []
+      end
+
+      it 'should not show for users not enrolled in course' do
+        @topic.todo_date = 1.day.from_now
+        @topic.save!
+        @group_topic.todo_date = 1.day.from_now
+        @group_topic.save!
+        user1 = @student
+        course_with_student(active_all: true)
+        expect(user1.discussion_topics_needing_viewing(opts).sort_by(&:id)).to eq [@topic, @group_topic, @a]
+        expect(@student.discussion_topics_needing_viewing(opts)).to eq []
+      end
+
+      it 'should not show discussions that are graded' do
+        a = @course.assignments.create!(title: "some assignment", points_possible: 5)
+        t = @course.discussion_topics.build(assignment: a, title: "some topic", message: "a little bit of content")
+        t.save
+        expect(t.assignment_id).to eql(a.id)
+        expect(t.assignment).to eql(a)
+        expect(@student.discussion_topics_needing_viewing(opts)).not_to include t
+      end
+    end
+
+    context 'discussions made within groups' do
+      before(:each) do
+        course_with_student(active_all: true)
+        @group_category = @course.group_categories.create(name: 'Project Group')
+        @group1 = group_model(name: 'Project Group 1', group_category: @group_category, context: @course)
+        group_membership_model(group: @group1, user: @student)
+        @course_topic = discussion_topic_model(context: @group1)
+        @course_announcement = announcement_model(context: @group1)
+        @account = @course.account
+        @group_category = @account.group_categories.create(name: 'Project Group')
+        @group2 = group_model(name: 'Project Group 1', group_category: @group_category, context: @account)
+        group_membership_model(group: @group2, user: @student)
+        @account_topic = discussion_topic_model(context: @group2)
+        @account_announcement = announcement_model(context: @group2)
+      end
+
+      it 'should show discussions with dates in the range' do
+        @course_topic.todo_date = 1.day.from_now
+        @course_topic.save!
+        @account_topic.todo_date = 1.day.from_now
+        @account_topic.save!
+        topics = [@course_topic, @course_announcement, @account_topic, @account_announcement]
+        expect(@student.discussion_topics_needing_viewing(opts).sort_by(&:id)).to eq topics
+      end
+
+      it 'should not show for ungraded discussion topics with todo dates outside the range' do
+        @course_topic.todo_date = 3.days.ago
+        @course_topic.save!
+        @course_announcement.posted_at = 3.days.ago
+        @course_announcement.save!
+        @account_topic.todo_date = 3.days.ago
+        @account_topic.save!
+        @account_announcement.posted_at = 3.days.ago
+        @account_announcement.save!
+        expect(@student.discussion_topics_needing_viewing(opts)).to eq []
+      end
+
+      it 'should not show for ungraded discussion topics without todo dates' do
+        topics = [@course_announcement, @account_announcement]
+        expect(@student.discussion_topics_needing_viewing(opts).sort_by(&:id)).to eq topics
+      end
+
+      it 'should not show unpublished discussion topics' do
+        teacher_in_course(course: @course)
+        group_membership_model(group: @group1, user: @teacher)
+        group_membership_model(group: @group2, user: @teacher)
+        @course_topic.workflow_state = 'unpublished'
+        @course_topic.todo_date = 1.day.from_now
+        @account_topic.workflow_state = 'unpublished'
+        @account_topic.todo_date = 1.day.from_now
+        @course_announcement.delayed_post_at = 1.day.from_now
+        @course_announcement.workflow_state = 'post_delayed'
+        @account_announcement.delayed_post_at = 1.day.from_now
+        @account_announcement.workflow_state = 'post_delayed'
+        topics = [@course_topic, @account_topic, @course_announcement, @account_announcement]
+        topics.each(&:save!)
+        expect(@student.discussion_topics_needing_viewing(opts)).to eq []
+        expect(@teacher.discussion_topics_needing_viewing(opts)).to eq []
+      end
+
+      it 'should not show for users not in group' do
+        @course_topic.todo_date = 1.day.from_now
+        @course_topic.save!
+        @account_topic.todo_date = 1.day.from_now
+        @account_topic.save!
+        user1 = @student
+        course_with_student(active_all: true)
+        topics = [@course_topic, @course_announcement, @account_topic, @account_announcement]
+        expect(user1.discussion_topics_needing_viewing(opts).sort_by(&:id)).to eq topics
+        expect(@student.discussion_topics_needing_viewing(opts)).to eq []
+      end
+    end
+  end
+
   describe "avatar_key" do
     it "should return a valid avatar key for a valid user id" do
       expect(User.avatar_key(1)).to eq "1-#{Canvas::Security.hmac_sha1('1')[0,10]}"

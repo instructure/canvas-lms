@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!new_user_tutorial'
 import plainStoreShape from 'jsx/shared/proptypes/plainStoreShape'
 import Tray from 'instructure-ui/lib/components/Tray'
@@ -28,13 +29,13 @@ class TutorialTray extends React.Component {
 
   static propTypes = {
     // Used as a label for the content (screenreader-only)
-    label: React.PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
     // The specific tray that will be wrapped, unusable without this.
-    children: React.PropTypes.node.isRequired,
+    children: PropTypes.node.isRequired,
     // The store to control the status of everything
-    store: React.PropTypes.shape(plainStoreShape).isRequired,
+    store: PropTypes.shape(plainStoreShape).isRequired,
     // Should return an element that focus can be set to
-    returnFocusToFunc: React.PropTypes.func.isRequired
+    returnFocusToFunc: PropTypes.func.isRequired
   }
 
   constructor (props) {
@@ -92,7 +93,7 @@ class TutorialTray extends React.Component {
         label={this.props.label}
         isDismissable={false}
         isOpen={!this.state.isCollapsed}
-        placement="right"
+        placement="end"
         zIndex="100"
         onEntering={this.handleEntering}
         onExiting={this.handleExiting}

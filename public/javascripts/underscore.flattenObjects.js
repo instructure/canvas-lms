@@ -16,9 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'underscore'
-], function(_) {
+import _ from 'underscore'
   // backward is a stupid requirement for discussions
   _.flattenObjects = function(array, key, backward, output) {
     if (!_.isArray(array)) {array = [array];}
@@ -36,4 +34,3 @@ define([
     });
     return output;
   };
-});

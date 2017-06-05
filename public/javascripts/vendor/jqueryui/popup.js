@@ -13,12 +13,10 @@
  *	jquery.ui.position.js
  */
 // INSTRUCTURE modified
-define([
-	'jquery',
-	'jqueryui/core',
-	'jqueryui/widget',
-	'jqueryui/position'
-], function( $ ) {
+import $ from 'jquery'
+import 'jqueryui/core'
+import 'jqueryui/widget'
+import 'jqueryui/position'
 
 var idIncrement = 0,
 	suppressExpandOnFocus = false;
@@ -287,4 +285,3 @@ $.widget( "ui.popup", {
 	}
 });
 
-});

@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import {Model} from 'Backbone'
 import I18n from 'i18n!account_course_user_search'
 import _ from 'underscore'
@@ -29,7 +30,7 @@ import RolesCollection from 'compiled/collections/RolesCollection'
 import Role from 'compiled/models/Role'
 import CreateUserList from 'compiled/models/CreateUserList'
 
-  var { number, string, func, shape, arrayOf } = React.PropTypes;
+  var { number, string, func, shape, arrayOf } = PropTypes;
 
   var CoursesListRow = React.createClass({
     propTypes: {

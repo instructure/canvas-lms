@@ -16,13 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!account_settings',
-  'jquery',
-  'jsx/shared/rce/RichContentEditor',
-  'jquery.instructure_forms', // errorBox, validateForm
-  'jquery.instructure_misc_plugins' // confirmDelete, showIf
-], function(I18n, $, RichContentEditor) {
+import I18n from 'i18n!account_settings'
+import $ from 'jquery'
+import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
+import './jquery.instructure_forms'
+import './jquery.instructure_misc_plugins'
+
   // optimization so user isn't waiting on RCS to
   // respond when they hit announcements
   RichContentEditor.preloadRemoteModule()
@@ -30,7 +29,7 @@ define([
   // account_settings.js mixes a lot of dom management for each of it's
   // tabs, so this file is meant to encapsulate just the javascript
   // used for working with the Announcements tab
-  return {
+export default {
     bindDomEvents: function(){
       $(".add_notification_toggle_focus").click(function() {
         var aria_expanded = $('add_notification_form').attr('aria-expanded') === "true";
@@ -106,4 +105,3 @@ define([
       })
     }
   };
-});

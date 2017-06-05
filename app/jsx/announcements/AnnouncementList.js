@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!announcements'
 import FriendlyDatetime from '../shared/FriendlyDatetime'
 import ToggleDetails from 'instructure-ui/lib/components/ToggleDetails'
@@ -29,13 +30,13 @@ import 'jquery.instructure_date_and_time'
 export default class AnnouncementList extends React.Component {
 
     static propTypes = {
-      announcements: React.PropTypes.arrayOf(
-        React.PropTypes.shape({
-          id: React.PropTypes.number.isRequired,
-          title: React.PropTypes.string.isRequired,
-          message: React.PropTypes.string.isRequired,
-          posted_at: React.PropTypes.string.isRequired,
-          url: React.PropTypes.string.isRequired
+      announcements: PropTypes.arrayOf(
+        PropTypes.shape({
+          id: PropTypes.number.isRequired,
+          title: PropTypes.string.isRequired,
+          message: PropTypes.string.isRequired,
+          posted_at: PropTypes.string.isRequired,
+          url: PropTypes.string.isRequired
         })
       )
     }

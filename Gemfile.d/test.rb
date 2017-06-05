@@ -23,7 +23,7 @@ group :test do
     gem 'rails-controller-testing', '1.0.1'
   end
 
-  gem 'gergich', '0.1.13', require: false
+  gem 'gergich', '0.1.15', require: false
   gem 'dotenv', '2.2.1', require: false
   gem 'testingbot', require: false
   gem 'brakeman', require: false
@@ -51,6 +51,7 @@ group :test do
   gem 'selenium-webdriver', '2.53.4'
     gem 'childprocess', '0.5.9', require: false
     gem 'websocket', '1.2.3', require: false
+  gem 'chromedriver-helper', require: false
   gem 'selinimum', '0.0.1', require: false, path: 'gems/selinimum'
   gem 'test_after_commit', '1.1.0' if CANVAS_RAILS4_2
   gem 'test-queue', github: 'jenseng/test-queue', ref: '1b92ebbca70705599c78a1bad5b16d6a37f741f2', require: false

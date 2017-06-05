@@ -17,7 +17,7 @@
  */
 
 define([
-  'INST' /* INST */,
+  './INST' /* INST */,
   'jquery' /* $ */
 ], function(INST, $) {
 

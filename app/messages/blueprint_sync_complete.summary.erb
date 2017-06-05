@@ -1,0 +1,14 @@
+<% define_content :link do %>
+  <%= polymorphic_url(asset.master_template.course, :anchor => asset.notification_link_anchor) %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t :subject, "Blueprint Sync Finished: %{name}", :name => asset.master_template.course.name %>
+<% end %>
+
+<%= t :body, "Blueprint Sync: Changes synced from %{name}.", :name => asset.master_template.course.name %>
+
+<% if asset.comment.present? %>
+"<%= asset.comment %>"
+<% end %>
+

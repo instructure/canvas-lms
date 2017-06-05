@@ -23,6 +23,11 @@ import _ from 'underscore'
   const getAssignmentGroups = (url, params) => {
     return cheaterDepaginate(url, params);
   };
+
+function getContextModules (url) {
+  return cheaterDepaginate(url);
+}
+
   const getCustomColumns = (url) => {
     return $.ajaxJSON(url, "GET", {});
   };
@@ -126,7 +131,7 @@ import _ from 'underscore'
     if (opts.onlyLoadAssignmentGroups) {
       return { gotAssignmentGroups };
     }
-
+    const gotContextModules = getContextModules(opts.contextModulesURL);
     const gotEffectiveDueDates = getEffectiveDueDates(opts.effectiveDueDatesURL);
     const gotCustomColumns = getCustomColumns(opts.customColumnsURL);
     const gotStudents = getStudents(opts.studentsURL, opts.studentsParams, opts.studentsPageCb);
@@ -138,12 +143,13 @@ import _ from 'underscore'
         [gotSubmissions]);
 
     return {
-      gotAssignmentGroups: gotAssignmentGroups,
-      gotCustomColumns: gotCustomColumns ,
-      gotStudents: gotStudents,
-      gotSubmissions: gotSubmissions,
-      gotCustomColumnData: gotCustomColumnData,
-      gotEffectiveDueDates: gotEffectiveDueDates,
+      gotAssignmentGroups,
+      gotContextModules,
+      gotCustomColumns,
+      gotStudents,
+      gotSubmissions,
+      gotCustomColumnData,
+      gotEffectiveDueDates
     };
   };
 

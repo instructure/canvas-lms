@@ -16,15 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!calculator',
-  'jquery' /* $ */,
-  'calcCmd',
-  'str/htmlEscape',
-  'jquery.instructure_misc_helpers' /* /\$\.raw/ */,
-  'jquery.instructure_misc_plugins' /* showIf */,
-  'jqueryui/sortable' /* /\.sortable/ */
-], function(I18n, $, calcCmd, htmlEscape) {
+import I18n from 'i18n!calculator'
+import $ from 'jquery'
+import calcCmd from 'calcCmd'
+import htmlEscape from './str/htmlEscape'
+import './jquery.instructure_misc_helpers' /* /\$\.raw/ */
+import './jquery.instructure_misc_plugins' /* showIf */
+import 'jqueryui/sortable'
 
   var generateFinds = function($table) {
     var finds = {};
@@ -160,4 +158,3 @@ define([
       });
     }
   };
-});

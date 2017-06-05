@@ -25,6 +25,14 @@ module Lti
     validates_presence_of :context, if: :has_resource_link_id?
 
     serialize :custom
+    serialize :custom_parameters
+
+    def message_handler(mh_context)
+      MessageHandler.by_resource_codes(vendor_code: vendor_code,
+                                       product_code: product_code,
+                                       resource_type_code: resource_type_code,
+                                       context: mh_context)
+    end
 
     private
     def has_resource_link_id?

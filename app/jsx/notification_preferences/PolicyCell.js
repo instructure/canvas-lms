@@ -18,12 +18,11 @@
 
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import RadioInput from 'instructure-ui/lib/components/RadioInput'
 import RadioInputGroup from 'instructure-ui/lib/components/RadioInputGroup'
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
-
-const PropTypes = React.PropTypes
 
 export default class PolicyCell extends React.Component {
   static renderAt (elt, props) {

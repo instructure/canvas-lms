@@ -10,7 +10,7 @@
  * Depends:
  *	jquery.ui.core.js
  */
-define(['jquery'], function( $ ) {
+import $ from 'jquery'
 
 $.extend($.ui, { datepicker: { version: "@VERSION" } });
 
@@ -1842,4 +1842,4 @@ $.datepicker.version = "@VERSION";
 // Add another global to avoid noConflict issues with inline event handlers
 window['DP_jQuery_' + dpuuid] = $;
 
-});
+

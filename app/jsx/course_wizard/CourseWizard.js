@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!course_wizard'
 import ReactModal from 'react-modal'
 import InfoFrame from './InfoFrame'
@@ -28,7 +29,7 @@ import 'compiled/jquery.rails_flash_notifications'
   const modalOverrides = {
     overlay : {
       backgroundColor: 'transparent'
-    },  
+    },
     content : {
       position: 'static',
       top: '0',
@@ -45,8 +46,8 @@ import 'compiled/jquery.rails_flash_notifications'
       displayName: 'CourseWizard',
 
       propTypes: {
-        showWizard: React.PropTypes.bool,
-        overlayClassName: React.PropTypes.string
+        showWizard: PropTypes.bool,
+        overlayClassName: PropTypes.string
       },
 
       getInitialState: function () {

@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([ 'jquery', 'canvas_quizzes/apps/statistics' ], function($, app) {
+import $ from 'jquery'
+import app from 'canvas_quizzes/apps/statistics'
   app.configure({
     ajax: $.ajax,
     loadOnStartup: true,
@@ -28,4 +29,3 @@ define([ 'jquery', 'canvas_quizzes/apps/statistics' ], function($, app) {
   app.mount(document.body.querySelector('#content')).then(function() {
     console.log('Yeah!!!');
   });
-});

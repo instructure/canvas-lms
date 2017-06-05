@@ -29,7 +29,7 @@ describe AccountsController do
     end
 
     it 'should render for non SAML configured accounts' do
-      get "/saml_meta_data"
+      get "/saml2"
       expect(response).to be_success
       expect(response.body).not_to eq ""
     end
@@ -38,12 +38,20 @@ describe AccountsController do
       HostUrl.stubs(:default_host).returns('bob.cody.instructure.com')
       @aac = @account.authentication_providers.create!(:auth_type => "saml")
 
-      get "/saml_meta_data"
+      get "/saml2"
       expect(response).to be_success
       doc = Nokogiri::XML(response.body)
-      expect(doc.at_css("EntityDescriptor")['entityID']).to eq "http://bob.cody.instructure.com/saml2"
+      expect(doc.at_xpath("md:EntityDescriptor", SAML2::Namespaces::ALL)['entityID']).to eq "http://bob.cody.instructure.com/saml2"
     end
 
+    it "renders valid schema" do
+      allow(HostUrl).to receive(:context_hosts).and_return(['bob.cody.instructure.com'])
+      get "/saml2"
+      expect(response).to be_success
+
+      entity = SAML2::Entity.parse(response.body)
+      expect(entity).to be_valid_schema
+    end
   end
 
   context "section tabs" do

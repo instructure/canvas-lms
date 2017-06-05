@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!react_files'
 import React from 'react'
+import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import preventDefault from 'compiled/fn/preventDefault'
 import customPropTypes from 'compiled/react_files/modules/customPropTypes'
@@ -36,11 +37,11 @@ import $ from 'jquery'
 
     propTypes: {
       model: customPropTypes.filesystemObject,
-      modalOptions: React.PropTypes.object.isRequired,
-      externalToolsForContext: React.PropTypes.arrayOf(React.PropTypes.object),
-      userCanManageFilesForContext: React.PropTypes.bool,
-      userCanRestrictFilesForContext: React.PropTypes.bool.isRequired,
-      usageRightsRequiredForContext: React.PropTypes.bool
+      modalOptions: PropTypes.object.isRequired,
+      externalToolsForContext: PropTypes.arrayOf(PropTypes.object),
+      userCanManageFilesForContext: PropTypes.bool,
+      userCanRestrictFilesForContext: PropTypes.bool.isRequired,
+      usageRightsRequiredForContext: PropTypes.bool
     },
 
     isMasterCourseRestricted () {

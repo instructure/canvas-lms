@@ -32,7 +32,7 @@ define [
       @groups =
         Course: ['due_date', 'grading_policies', 'course_content', 'files', 'announcement',
                  'announcement_created_by_you', 'announcement_reply', 'grading', 'invitation',
-                 'all_submissions', 'late_grading', 'submission_comment']
+                 'all_submissions', 'late_grading', 'submission_comment', 'blueprint']
         Discussions: ['discussion', 'discussion_entry']
         Communication: ['added_to_conversation', 'conversation_message', 'conversation_created']
         Scheduling: ['student_appointment_signups', 'appointment_signups', 'appointment_cancelations',

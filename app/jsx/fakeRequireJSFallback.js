@@ -61,15 +61,13 @@ if (!('require' in window)) {
   }
 
   window.require = function fakeRequire (deps, callback) {
-    if (callback.name !== 'fnCanvasUsesToLoadAccountJSAfterJQueryIsReady') {
-      console.warn(
-        '`require`-ing internal Canvas modules comes with no warranty, ' +
-        'things can change in any release and you are responsible for making sure your custom ' +
-        'JavaScript that uses it continues to work.'
-      )
-      if (deps.includes('jquery')) {
-        console.error("You don't need to `require(['jquery...`, just use the global `$` variable directly.")
-      }
+    console.warn(
+      '`require`-ing internal Canvas modules comes with no warranty, ' +
+      'things can change in any release and you are responsible for making sure your custom ' +
+      'JavaScript that uses it continues to work.'
+    )
+    if (deps.includes('jquery')) {
+      console.error("You don't need to `require(['jquery...`, just use the global `$` variable directly.")
     }
     Promise.all(deps.map(getModule)).then((modules) => {
       if (callback) callback(...modules)

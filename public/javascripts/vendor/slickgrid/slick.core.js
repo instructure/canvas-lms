@@ -1,4 +1,5 @@
-define(['jquery','vendor/slickgrid/lib/jquery.event.drag-2.2'],function($) {
+import $ from 'jquery'
+import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
 
 /***
  * Contains core SlickGrid classes.
@@ -457,5 +458,3 @@ define(['jquery','vendor/slickgrid/lib/jquery.event.drag-2.2'],function($) {
     };
   }
 })($);
-
-});

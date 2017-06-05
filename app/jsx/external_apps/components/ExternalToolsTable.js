@@ -19,6 +19,7 @@
 import _ from 'underscore'
 import I18n from 'i18n!external_tools'
 import React from 'react'
+import PropTypes from 'prop-types'
 import store from 'jsx/external_apps/lib/ExternalAppsStore'
 import ExternalToolsTableRow from 'jsx/external_apps/components/ExternalToolsTableRow'
 import InfiniteScroll from 'jsx/external_apps/components/InfiniteScroll'
@@ -27,7 +28,7 @@ export default React.createClass({
     displayName: 'ExternalToolsTable',
 
     propTypes: {
-      canAddEdit: React.PropTypes.bool.isRequired
+      canAddEdit: PropTypes.bool.isRequired
     },
 
     getInitialState() {

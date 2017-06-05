@@ -38,13 +38,14 @@ define([
     addEventListener: addEventListenerStub
   }
 
-  let refreshSubmissionsToViewStub = sinon.stub()
-  let showGradeStub = sinon.stub()
-  let showDiscussionStub = sinon.stub()
-  let showRubricStub = sinon.stub()
-  let updateStatsInHeaderStub = sinon.stub()
-  let refreshFullRubricStub = sinon.stub()
-  let setGradeReadOnlStub = sinon.stub()
+  const refreshSubmissionsToViewStub = sinon.stub()
+  const showGradeStub = sinon.stub()
+  const showDiscussionStub = sinon.stub()
+  const showRubricStub = sinon.stub()
+  const updateStatsInHeaderStub = sinon.stub()
+  const refreshFullRubricStub = sinon.stub()
+  const setGradeReadOnlStub = sinon.stub()
+  const showSubmissionDetailsStub = sinon.stub()
 
   let fakeEG = {
     refreshSubmissionsToView: refreshSubmissionsToViewStub,
@@ -53,7 +54,8 @@ define([
     showRubric: showRubricStub,
     updateStatsInHeader: updateStatsInHeaderStub,
     refreshFullRubric: refreshFullRubricStub,
-    setGradeReadOnly: setGradeReadOnlStub
+    setGradeReadOnly: setGradeReadOnlStub,
+    showSubmissionDetails: showSubmissionDetailsStub
   }
 
   let resetStubs = function () {
@@ -67,6 +69,7 @@ define([
     updateStatsInHeaderStub.reset()
     refreshFullRubricStub.reset()
     setGradeReadOnlStub.reset()
+    showSubmissionDetailsStub.reset()
   }
 
   QUnit.module("quizzesNextSpeedGrading", {
@@ -122,6 +125,7 @@ define([
     let fns = quizzesNextSpeedGrading(fakeEG, fakeIframeHolder, registerCbStub, refreshGradesCbStub, speedGraderWindow)
     let arbitrarySubmissionData = {}
     fns.postChangeSubmissionMessage(arbitrarySubmissionData)
+    ok(showSubmissionDetailsStub.called)
     ok(postMessageStub.calledWith({
       submission: arbitrarySubmissionData,
       subject: 'canvas.speedGraderSubmissionChange'

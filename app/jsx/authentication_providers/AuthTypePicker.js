@@ -17,17 +17,18 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!account_authorization_configs'
 import Select from 'instructure-ui/lib/components/Select'
 
   class AuthTypePicker extends React.Component {
 
     static propTypes = {
-      authTypes: React.PropTypes.arrayOf(React.PropTypes.shape({
-        value: React.PropTypes.string,
-        name: React.PropTypes.string
+      authTypes: PropTypes.arrayOf(PropTypes.shape({
+        value: PropTypes.string,
+        name: PropTypes.string
       })).isRequired,
-      onChange: React.PropTypes.func
+      onChange: PropTypes.func
     };
 
     static defaultProps = {

@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import autocompleteItemTemplate from 'jst/courses/autocomplete_item'
-import 'compiled/behaviors/autocomplete'
+import 'jqueryui/autocomplete'
 
 $(document).ready(() => {
   const $courseSearchField = $('#course_name')

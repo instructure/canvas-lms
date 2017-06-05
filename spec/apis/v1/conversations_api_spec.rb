@@ -569,6 +569,15 @@ describe ConversationsController, type: :request do
           end
         end
 
+        it "allows users to send messages to themselves" do
+          json = api_call(:post, "/api/v1/conversations",
+            { :controller => 'conversations', :action => 'create', :format => 'json' },
+            { :recipients => [@user.id], :body => "hello, me", :context_code => @course.asset_string }
+          )
+          expect(response).to be_success
+          expect(json[0]['messages'][0]['participating_user_ids']).to eq([@user.id])
+        end
+
         it "should allow site admin to set any account context" do
           site_admin_user(name: "site admin", active_all: true)
           json = api_call(:post, "/api/v1/conversations",

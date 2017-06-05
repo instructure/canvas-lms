@@ -269,6 +269,35 @@ describe AssignmentsController do
       expect(assigns[:unlocked]).not_to be_nil
     end
 
+    it "should assign 'similarity_pledge'" do
+      user_session(@student)
+      a = @course.assignments.create(:title => "some assignment")
+      pledge = 'I made this'
+      @course.account.update_attributes(turnitin_pledge: pledge)
+      get 'show', :course_id => @course.id, :id => a.id
+      expect(assigns[:similarity_pledge]).to eq pledge
+    end
+
+    it 'uses the vericite pledge if vericite is enabled' do
+      user_session(@student)
+      a = @course.assignments.create(:title => "some assignment")
+      pledge = 'vericite pledge'
+      allow_any_instance_of(Assignment).to receive(:vericite_enabled?).and_return(true)
+      allow_any_instance_of(Course).to receive(:vericite_pledge).and_return(pledge)
+      get 'show', :course_id => @course.id, :id => a.id
+      expect(assigns[:similarity_pledge]).to eq pledge
+    end
+
+    it 'uses the turnitin pledge if turnitin is enabled' do
+      user_session(@student)
+      a = @course.assignments.create(:title => "some assignment")
+      pledge = 'tii pledge'
+      allow_any_instance_of(Assignment).to receive(:turnitin_enabled?).and_return(true)
+      @course.account.update_attributes(turnitin_pledge: pledge)
+      get 'show', :course_id => @course.id, :id => a.id
+      expect(assigns[:similarity_pledge]).to eq pledge
+    end
+
     it "should assign submission variable if current user and submitted" do
       user_session(@student)
       @assignment.submit_homework(@student, :submission_type => 'online_url', :url => 'http://www.google.com')

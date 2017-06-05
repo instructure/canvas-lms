@@ -4043,9 +4043,12 @@ describe Assignment do
     end
   end
 
-  describe '#update_grades_if_details_changed' do
+  describe '#update_submissions_and_grades_if_details_changed' do
     before :once do
-      assignment_model(course: @course)
+      @assignment = @course.assignments.create! grading_type: "points", points_possible: 5
+      student1, student2 = create_users_in_course(@course, 2, return_type: :record)
+      @assignment.grade_student(student1, grade: 3, grader: @teacher).first
+      @assignment.grade_student(student2, grade: 2, grader: @teacher).first
     end
 
     it "should update grades if points_possible changes" do
@@ -4068,6 +4071,11 @@ describe Assignment do
     it "updates when omit_from_final_grade changes" do
       @assignment.context.expects(:recompute_student_scores).once
       @assignment.update_attribute :omit_from_final_grade, true
+    end
+
+    it "updates when grading_type changes" do
+      @assignment.context.expects(:recompute_student_scores).once
+      @assignment.update_attribute :grading_type, "percent"
     end
 
     it "should not update grades otherwise" do

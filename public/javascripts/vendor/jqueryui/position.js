@@ -7,9 +7,7 @@
  *
  * http://docs.jquery.com/UI/Position
  */
-define([
-  'jquery'
-], function( $ ) {
+import $ from 'jquery'
   
 $.ui = $.ui || {};
 
@@ -518,4 +516,4 @@ if ( $.uiBackCompat !== false ) {
 	}( jQuery ) );
 }
 
-});
+

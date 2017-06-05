@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!moderated_grading'
 import 'compiled/jquery.rails_flash_notifications'
 
@@ -25,11 +26,11 @@ import 'compiled/jquery.rails_flash_notifications'
     displayName: 'FlashMessageHolder',
 
     propTypes: {
-      time: React.PropTypes.number.isRequired,
-      message: React.PropTypes.string.isRequired,
-      error: React.PropTypes.bool,
-      onError: React.PropTypes.func,
-      onSuccess: React.PropTypes.func
+      time: PropTypes.number.isRequired,
+      message: PropTypes.string.isRequired,
+      error: PropTypes.bool,
+      onError: PropTypes.func,
+      onSuccess: PropTypes.func
     },
 
     shouldComponentUpdate (nextProps, nextState) {

@@ -18,9 +18,10 @@
 
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import _ from 'underscore'
 import I18n from 'i18n!account_course_user_search'
-import userUtils from 'user_utils'
+import {firstNameFirst, lastNameFirst, nameParts} from 'user_utils'
 import Modal from 'jsx/shared/modal'
 import ModalContent from 'jsx/shared/modal-content'
 import ModalButtons from 'jsx/shared/modal-buttons'
@@ -29,7 +30,7 @@ import IcInput from './IcInput'
 import IcCheckbox from './IcCheckbox'
 import 'compiled/jquery.rails_flash_notifications'
 
-  const { object, string } = React.PropTypes
+  const { object, string } = PropTypes
 
   const modalOverrides = {
     overlay : {
@@ -75,10 +76,10 @@ import 'compiled/jquery.rails_flash_notifications'
       newData[field] = value;
       if (field === 'name') {
         // shamelessly copypasted from user_sortable_name.js
-        var sortable_name_parts = userUtils.nameParts(data.sortable_name);
-        if ($.trim(data.sortable_name) == '' || userUtils.firstNameFirst(sortable_name_parts) == $.trim(data.name)) {
-          var parts = userUtils.nameParts(value, sortable_name_parts[1]);
-          newData.sortable_name = userUtils.lastNameFirst(parts);
+        var sortable_name_parts = nameParts(data.sortable_name);
+        if ($.trim(data.sortable_name) == '' || firstNameFirst(sortable_name_parts) == $.trim(data.name)) {
+          var parts = nameParts(value, sortable_name_parts[1]);
+          newData.sortable_name = lastNameFirst(parts);
         }
 
         if ($.trim(data.short_name) == '' || data.short_name == data.name) {

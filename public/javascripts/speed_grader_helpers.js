@@ -16,12 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jquery',
-  'underscore',
-  'i18n!gradebook',
-  'jquery.instructure_date_and_time'
-], function($, _, I18n) {
+import $ from 'jquery'
+import _ from 'underscore'
+import I18n from 'i18n!gradebook'
+import './jquery.instructure_date_and_time'
   var speedgraderHelpers = {
     urlContainer: function(submission, defaultEl, originalityReportEl) {
       if (submission.has_originality_report) {
@@ -135,5 +133,4 @@ define([
 
   }
 
-  return speedgraderHelpers;
-});
+export default speedgraderHelpers;

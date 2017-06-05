@@ -22,7 +22,7 @@ import GradingPeriod from 'jsx/grading/gradingPeriod'
 import $ from 'jquery'
 import I18n from 'i18n!external_tools'
 import _ from 'underscore'
-import ConvertCase from 'convert_case'
+import {camelize} from 'convert_case'
 import 'jquery.instructure_misc_plugins'
 
   const periodsAreLoaded = (state) => {
@@ -66,7 +66,7 @@ import 'jquery.instructure_misc_plugins'
 
     deserializePeriods: function(periods) {
       return _.map(periods.grading_periods, period => {
-        let newPeriod = ConvertCase.camelize(period);
+        let newPeriod = camelize(period);
         newPeriod.startDate = new Date(period.start_date);
         newPeriod.endDate = new Date(period.end_date);
         newPeriod.closeDate = new Date(period.close_date || period.end_date);

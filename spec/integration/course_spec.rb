@@ -91,6 +91,23 @@ describe "course" do
     expect(course_rows[2].to_s).to include 'Course 1'
   end
 
+  it "should not show links to unpublished courses in course index" do
+    course_with_student(:course_name => "Course 1")
+    c1 = @course
+    @student.enrollments.first.update_attribute(:workflow_state, "active") # force active, like with sis
+    course_with_student(:user => @student, :active_all => true, :course_name => "Course 2")
+    c2 = @course
+    user_session(@student)
+    get "/courses"
+    doc = Nokogiri::HTML(response.body)
+    course_rows = doc.css('#my_courses_table tr')
+    expect(course_rows.size).to eq 3
+    expect(course_rows[1].to_s).to include 'Course 1'
+    expect(course_rows[1].to_s).to_not include("href=\"/courses/#{c1.id}\"") # unpublished
+    expect(course_rows[2].to_s).to include 'Course 2'
+    expect(course_rows[2].to_s).to include("href=\"/courses/#{c2.id}\"") # published
+  end
+
   it "should not show students' nicknames to admins on the student's account profile page" do
     course_with_student(:active_all => true)
     @student.course_nicknames[@course.id] = 'STUDENT_NICKNAME'; @student.save!

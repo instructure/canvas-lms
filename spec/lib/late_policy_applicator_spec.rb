@@ -1,0 +1,241 @@
+#
+# Copyright (C) 2017 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
+require 'spec_helper'
+
+describe LatePolicyApplicator do
+  describe '.for_course' do
+    before :once do
+      course_factory(active_all: true)
+
+      @published_assignment = @course.assignments.create(workflow_state: 'published')
+    end
+
+    it 'instantiates an applicator for the course' do
+      expect(LatePolicyApplicator).to receive(:new).with(@course).and_call_original
+
+      LatePolicyApplicator.for_course(@course)
+    end
+
+    it 'does not instantiate an applicator for an unpublished course' do
+      expect(LatePolicyApplicator).not_to receive(:new)
+
+      @course.workflow_state = 'created'
+      LatePolicyApplicator.for_course(@course)
+    end
+
+    it 'does not instantiate an applicator for a course with no published assignments' do
+      expect(LatePolicyApplicator).not_to receive(:new)
+
+      @published_assignment.unpublish!
+      LatePolicyApplicator.for_course(@course)
+    end
+
+    it 'kicks off a singleton background job with an identifier based on the course id' do
+      queueing_args = [
+        :process,
+        singleton: "late_policy_applicator:calculator:Course:#{@course.global_id}"
+      ]
+
+      applicator_double = instance_double('LatePolicyApplicator')
+      allow(LatePolicyApplicator).to receive(:new).and_return(applicator_double)
+
+      expect(applicator_double).to receive(:send_later_if_production_enqueue_args).
+        with(*queueing_args)
+
+      LatePolicyApplicator.for_course(@course)
+    end
+  end
+
+  describe '.for_assignment' do
+    before :once do
+      course_factory(active_all: true)
+
+      @published_assignment = @course.assignments.create(workflow_state: 'published', points_possible: 20)
+    end
+
+    it 'instantiates an applicator for the assignment' do
+      expect(LatePolicyApplicator).to receive(:new).with(@course, [@published_assignment]).and_call_original
+
+      LatePolicyApplicator.for_assignment(@published_assignment)
+    end
+
+    it 'does not instantiate an applicator for an unpublished assignment' do
+      expect(LatePolicyApplicator).not_to receive(:new)
+
+      @published_assignment.unpublish!
+      LatePolicyApplicator.for_assignment(@published_assignment)
+    end
+
+    it 'does not instantiate an applicator for an assignment with no points possible' do
+      expect(LatePolicyApplicator).not_to receive(:new)
+
+      @published_assignment.points_possible = nil
+      LatePolicyApplicator.for_assignment(@published_assignment)
+    end
+
+    it 'does not instantiate an applicator for an assignment with zero points possible' do
+      expect(LatePolicyApplicator).not_to receive(:new)
+
+      @published_assignment.points_possible = 0
+      LatePolicyApplicator.for_assignment(@published_assignment)
+    end
+
+    it 'does not instantiate an applicator for an assignment with negative points possible' do
+      expect(LatePolicyApplicator).not_to receive(:new)
+
+      @published_assignment.points_possible = -1
+      LatePolicyApplicator.for_assignment(@published_assignment)
+    end
+
+    it 'does not instantiate an applicator for an assignment without a course' do
+      expect(LatePolicyApplicator).not_to receive(:new)
+
+      @published_assignment.course = nil
+      LatePolicyApplicator.for_assignment(@published_assignment)
+    end
+
+    it 'kicks off a singleton background job with an identifier based on the assignment id' do
+      queueing_args = [
+        :process,
+        singleton: "late_policy_applicator:calculator:Assignment:#{@published_assignment.global_id}"
+      ]
+
+      applicator_double = instance_double('LatePolicyApplicator')
+      allow(LatePolicyApplicator).to receive(:new).and_return(applicator_double)
+
+      expect(applicator_double).to receive(:send_later_if_production_enqueue_args).
+        with(*queueing_args)
+
+      LatePolicyApplicator.for_assignment(@published_assignment)
+    end
+  end
+
+  describe '#process' do
+    before :once do
+      @now = Time.zone.now
+      course_factory(active_all: true, grading_periods: [:old, :current])
+
+      @late_policy = LatePolicy.new(
+        course: @course,
+        late_submission_deduction_enabled: true,
+        late_submission_deduction: 50.0
+      )
+      @course.late_policy = @late_policy
+
+      @students = Array.new(2) do
+        user = User.create
+        @course.enroll_student(user, enrollment_state: 'active')
+
+        user
+      end
+
+      @assignment_in_closed_gp = @course.assignments.create(
+        points_possible: 20, due_at: @now - 3.months, submission_types: 'online_text_entry'
+      )
+
+      @late_submission1 = @assignment_in_closed_gp.submissions.find_by(user: @students[0])
+      # Update using update_all to prevent any callbacks that already apply late policies
+      # rubocop:disable Rails/SkipsModelValidations
+      Submission.where(id: @late_submission1.id).
+        update_all(
+          submitted_at: @now - 3.months + 1.hour,
+          cached_due_date: @now - 3.months,
+          score: 20,
+          submission_type: 'online_text_entry'
+        )
+
+      @timely_submission1 = @assignment_in_closed_gp.submissions.find_by(user: @students[1])
+      Submission.where(id: @timely_submission1).
+        update_all(
+          submitted_at: @now,
+          cached_due_date: @now + 1.hour,
+          score: 20,
+          submission_type: 'online_text_entry'
+        )
+
+      @assignment_in_open_gp = @course.assignments.create(
+        points_possible: 20, due_at: @now - 1.month, submission_types: 'online_text_entry'
+      )
+
+      @late_submission2 = @assignment_in_open_gp.submissions.find_by(user: @students[0])
+      Submission.where(id: @late_submission2.id).
+        update_all(
+          submitted_at: @now - 1.month + 1.hour,
+          cached_due_date: @now - 1.month,
+          score: 20,
+          submission_type: 'online_text_entry'
+        )
+
+      @timely_submission2 = @assignment_in_open_gp.submissions.find_by(user: @students[1])
+      Submission.where(id: @timely_submission2).
+        update_all(
+          submitted_at: @now,
+          cached_due_date: @now + 1.hour,
+          score: 20,
+          submission_type: 'online_text_entry'
+        )
+      # rubocop:enable Rails/SkipsModelValidations
+    end
+
+    context 'when the course has no late policy' do
+      it 'applies the late policy to late submissions in the open grading period' do
+        @course.late_policy = nil
+        @course.save!
+        @late_policy_applicator = LatePolicyApplicator.new(@course, [@assignment_in_open_gp])
+
+        expect(@late_policy_applicator).not_to receive(:process_submission)
+
+        @late_policy_applicator.process
+      end
+    end
+
+    context 'when the course has a late policy' do
+      it 'applies the late policy to late submissions in the open grading period' do
+        @late_policy_applicator = LatePolicyApplicator.new(@course)
+
+        expect { @late_policy_applicator.process }.to change { @late_submission2.reload.score }.by(-10)
+      end
+
+      it 'does not apply the late policy to timely submissions in the open grading period' do
+        @late_policy_applicator = LatePolicyApplicator.new(@course)
+
+        expect { @late_policy_applicator.process }.not_to change { @timely_submission2.reload.score }
+      end
+
+      it 'does not apply the late policy to late submissions in the closed grading period' do
+        @late_policy_applicator = LatePolicyApplicator.new(@course)
+
+        expect { @late_policy_applicator.process }.not_to change { @late_submission1.reload.score }
+      end
+
+      it 'does not apply the late policy to timely submissions in the closed grading period' do
+        @late_policy_applicator = LatePolicyApplicator.new(@course)
+
+        expect { @late_policy_applicator.process }.not_to change { @timely_submission1.reload.score }
+      end
+
+      it 'calls re-calculates grades in bulk after processing all submissions' do
+        @late_policy_applicator = LatePolicyApplicator.new(@course)
+
+        expect(@course).to receive(:recompute_student_scores).with([@students[0].id])
+
+        @late_policy_applicator.process
+      end
+    end
+  end
+end

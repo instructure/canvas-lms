@@ -45,6 +45,25 @@ class RubricsController < ApplicationController
     end
   end
 
+  # @API Create a single rubric
+  # Returns the rubric with the given id.
+  # @argument id [Integer]
+  #   The id of the rubric
+  # @argument rubric_association_id [Integer]
+  #   The id of the object with which this rubric is associated
+  # @argument rubric[title] [String]
+  # @argument rubric[free_form_criterion_comments] [Boolean]
+  # @argument rubric_association[association_id] [Integer]
+  #   The id of the object with which this rubric is associated
+  # @argument rubric_association[association_type] ["Assignment"|"Course"|"Account"]
+  #   The type of object this rubric is associated with
+  # @argument rubric_association[use_for_grading] [Boolean]
+  # @argument rubric_association[hide_score_total] [Boolean]
+  # @argument rubric_association[purpose] [String]
+  # @argument rubric[criteria] [Hash]
+  #   An indexed Hash of RubricCriteria objects where the keys are integer ids and the values are the RubricCriteria objects
+  # @returns Rubric
+
   def create
     update
   end
@@ -55,6 +74,29 @@ class RubricsController < ApplicationController
   # the old rubric and return that one instead.  If you pass it a rubric_association_id
   # parameter, then it will point the rubric_association to the new rubric
   # instead of the old one.
+
+
+  # @API Update a single rubric
+  # Returns the rubric with the given id.
+  # @argument id [Integer]
+  #   The id of the rubric
+  # @argument rubric_association_id [Integer]
+  #   The id of the object with which this rubric is associated
+  # @argument rubric[title] [String]
+  # @argument rubric[free_form_criterion_comments] [Boolean]
+  # @argument rubric[skip_updating_points_possible] [Boolean]
+  #   Whether or not to update the points possible
+  # @argument rubric_association[association_id] [Integer]
+  #   The id of the object with which this rubric is associated
+  # @argument rubric_association[association_type] ["Assignment"|"Course"|"Account"]
+  #   The type of object this rubric is associated with
+  # @argument rubric_association[use_for_grading] [Boolean]
+  # @argument rubric_association[hide_score_total] [Boolean]
+  # @argument rubric_association[purpose] [String]
+  # @argument rubric[criteria] [Hash]
+  #   An indexed Hash of RubricCriteria objects where the keys are integer ids and the values are the RubricCriteria objects
+  # @returns Rubric
+
   def update
     association_params = params[:rubric_association] ?
       params[:rubric_association].permit(:use_for_grading, :title, :purpose, :url, :hide_score_total, :bookmarked) : {}

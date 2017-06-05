@@ -19,8 +19,9 @@ define [
   'i18n!react_files'
   'underscore'
   'react'
+  'prop-types'
   'compiled/fn/preventDefault'
-], (I18n, _, React, preventDefault) ->
+], (I18n, _, React, PropTypes, preventDefault) ->
 
   columns = [
     displayName: I18n.t('name', 'Name')
@@ -56,9 +57,9 @@ define [
     columns: columns
 
     propTypes:
-      query: React.PropTypes.object.isRequired
-      toggleAllSelected: React.PropTypes.func.isRequired
-      areAllItemsSelected: React.PropTypes.func.isRequired
+      query: PropTypes.object.isRequired
+      toggleAllSelected: PropTypes.func.isRequired
+      areAllItemsSelected: PropTypes.func.isRequired
 
     getInitialState: ->
       return {

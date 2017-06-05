@@ -176,6 +176,7 @@ describe "accounts/settings.html.erb" do
         before do
           @account.stubs(:feature_enabled?).with(:new_sis_integrations).returns(false)
           @account.stubs(:grants_right?).with(current_user, :manage_account_memberships).returns(true)
+          @account.stubs(:feature_enabled?).with(:plagiarism_detection_platform).returns(true)
         end
 
         context "show old version of settings to regular admin user" do
@@ -203,6 +204,7 @@ describe "accounts/settings.html.erb" do
 
         before do
           @account.stubs(:feature_enabled?).with(:new_sis_integrations).returns(true)
+          @account.stubs(:feature_enabled?).with(:plagiarism_detection_platform).returns(true)
         end
 
         context "should show settings to regular admin user" do
@@ -230,6 +232,7 @@ describe "accounts/settings.html.erb" do
           context "for root account" do
             before do
               @account.stubs(:sis_syncing).returns({value: true, locked: true})
+              @account.stubs(:feature_enabled?).with(:plagiarism_detection_platform).returns(true)
               do_render(current_user)
             end
 
@@ -263,6 +266,7 @@ describe "accounts/settings.html.erb" do
             context "not locked" do
               before do
                 @account.stubs(:sis_syncing).returns({value: true, locked: false, inherited: true })
+                @account.stubs(:feature_enabled?).with(:plagiarism_detection_platform).returns(true)
                 do_render(current_user)
               end
 

@@ -2371,7 +2371,7 @@ describe AssignmentsApiController, type: :request do
         raw_api_update_assignment(@course, @assignment, {
           :points_possible => 15
         })
-        expect(response.code).to eql '201'
+        assert_status(200)
         expect(@assignment.reload.points_possible).to eq 15
       end
     end
@@ -2387,7 +2387,7 @@ describe AssignmentsApiController, type: :request do
           'name' => "This changes!"
         })
         expect(@assignment.title).to eq "This changes!"
-        expect(response.code.to_i).to eql 201
+        assert_status(200)
       end
     end
 
@@ -2608,38 +2608,38 @@ describe AssignmentsApiController, type: :request do
         it "allows changing the due date to another date in an open grading period" do
           due_date = 7.days.from_now.iso8601
           @assignment = create_assignment(due_at: 3.days.from_now)
-          call_update({ due_at: due_date }, 201)
+          call_update({ due_at: due_date }, 200)
           expect(@assignment.reload.due_at).to eq due_date
         end
 
         it "allows changing the due date when the assignment is only visible to overrides" do
           due_date = 3.days.from_now.iso8601
           @assignment = create_assignment(due_at: 3.days.ago, only_visible_to_overrides: true)
-          call_update({ due_at: due_date }, 201)
+          call_update({ due_at: due_date }, 200)
           expect(@assignment.reload.due_at).to eq due_date
         end
 
         it "allows disabling only_visible_to_overrides when due in an open grading period" do
           @assignment = create_assignment(due_at: 3.days.from_now, only_visible_to_overrides: true)
-          call_update({ only_visible_to_overrides: false }, 201)
+          call_update({ only_visible_to_overrides: false }, 200)
           expect(@assignment.reload.only_visible_to_overrides).to eql false
         end
 
         it "allows enabling only_visible_to_overrides when due in an open grading period" do
           @assignment = create_assignment(due_at: 3.days.from_now, only_visible_to_overrides: false)
-          call_update({ only_visible_to_overrides: true }, 201)
+          call_update({ only_visible_to_overrides: true }, 200)
           expect(@assignment.reload.only_visible_to_overrides).to eql true
         end
 
         it "allows disabling post_to_sis when due in a closed grading period" do
           @assignment = create_assignment(due_at: 3.days.ago, post_to_sis: true)
-          call_update({ post_to_sis: false }, 201)
+          call_update({ post_to_sis: false }, 200)
           expect(@assignment.reload.post_to_sis).to eq(false)
         end
 
         it "allows enabling post_to_sis when due in a closed grading period" do
           @assignment = create_assignment(due_at: 3.days.ago, post_to_sis: false)
-          call_update({ post_to_sis: true }, 201)
+          call_update({ post_to_sis: true }, 200)
           expect(@assignment.reload.post_to_sis).to eq(true)
         end
 
@@ -2662,7 +2662,7 @@ describe AssignmentsApiController, type: :request do
         it "allows disabling only_visible_to_overrides when changing due date to an open grading period" do
           due_date = 3.days.from_now.iso8601
           @assignment = create_assignment(due_at: 3.days.ago, only_visible_to_overrides: true)
-          call_update({ due_at: due_date, only_visible_to_overrides: false }, 201)
+          call_update({ due_at: due_date, only_visible_to_overrides: false }, 200)
           expect(@assignment.reload.only_visible_to_overrides).to eql false
           expect(@assignment.due_at).to eq due_date
         end
@@ -2697,27 +2697,27 @@ describe AssignmentsApiController, type: :request do
         it "succeeds when the assignment due date is set to the same value" do
           due_date = 3.days.ago
           @assignment = create_assignment(due_at: due_date.iso8601, time_zone_edited: due_date.zone)
-          call_update({ due_at: due_date.iso8601 }, 201)
+          call_update({ due_at: due_date.iso8601 }, 200)
           expect(@assignment.reload.due_at).to eq due_date.iso8601
         end
 
         it "succeeds when the assignment due date is not changed" do
           due_date = 3.days.ago.iso8601
           @assignment = create_assignment(due_at: due_date)
-          call_update({ description: "Updated Description" }, 201)
+          call_update({ description: "Updated Description" }, 200)
           expect(@assignment.reload.due_at).to eq due_date
         end
 
         it "allows changing the due date when the assignment is not graded" do
           due_date = 3.days.ago.iso8601
           @assignment = create_assignment(due_at: 7.days.from_now, submission_types: "not_graded")
-          call_update({ due_at: due_date }, 201)
+          call_update({ due_at: due_date }, 200)
           expect(@assignment.reload.due_at).to eq due_date
         end
 
         it "allows unsetting the due date when not graded and the last grading period is closed" do
           @assignment = create_assignment(due_at: 7.days.from_now, submission_types: "not_graded")
-          call_update({ due_at: nil }, 201)
+          call_update({ due_at: nil }, 200)
           expect(@assignment.reload.due_at).to be_nil
         end
 
@@ -2725,7 +2725,7 @@ describe AssignmentsApiController, type: :request do
           due_date = 7.days.from_now
           @assignment = create_assignment(due_at: 3.days.from_now.iso8601, time_zone_edited: due_date.zone)
           override_for_date(3.days.ago)
-          call_update({ due_at: due_date.iso8601 }, 201)
+          call_update({ due_at: due_date.iso8601 }, 200)
           expect(@assignment.reload.due_at).to eq due_date.iso8601
         end
 
@@ -2736,7 +2736,7 @@ describe AssignmentsApiController, type: :request do
           override_due_date = 3.days.from_now.iso8601
           @assignment = create_assignment(due_at: 7.days.from_now, only_visible_to_overrides: true)
           override_params = [{ student_ids: [@student.id], due_at: override_due_date }]
-          call_update({ assignment_overrides: override_params }, 201)
+          call_update({ assignment_overrides: override_params }, 200)
           overrides = @assignment.reload.assignment_overrides
           expect(overrides.count).to eq 1
           expect(overrides.first.due_at).to eq override_due_date
@@ -2766,7 +2766,7 @@ describe AssignmentsApiController, type: :request do
           @assignment = create_assignment(due_at: 7.days.from_now)
           override = override_for_date(override_due_date)
           override_params = [{ id: override.id, due_at: override_due_date.iso8601 }]
-          call_update({ assignment_overrides: override_params }, 201)
+          call_update({ assignment_overrides: override_params }, 200)
           expect(override.reload.due_at).to eq override_due_date.iso8601
         end
 
@@ -2808,33 +2808,33 @@ describe AssignmentsApiController, type: :request do
 
         it "allows disabling only_visible_to_overrides when due in a closed grading period" do
           @assignment = create_assignment(due_at: 3.days.ago, only_visible_to_overrides: true)
-          call_update({ only_visible_to_overrides: false }, 201)
+          call_update({ only_visible_to_overrides: false }, 200)
           expect(@assignment.reload.only_visible_to_overrides).to eql false
         end
 
         it "allows enabling only_visible_to_overrides when due in a closed grading period" do
           @assignment = create_assignment(due_at: 3.days.ago, only_visible_to_overrides: false)
-          call_update({ only_visible_to_overrides: true }, 201)
+          call_update({ only_visible_to_overrides: true }, 200)
           expect(@assignment.reload.only_visible_to_overrides).to eql true
         end
 
         it "allows changing the due date on an assignment due in a closed grading period" do
           due_date = 3.days.from_now
           @assignment = create_assignment(due_at: 3.days.ago.iso8601, time_zone_edited: due_date.zone)
-          call_update({ due_at: due_date.iso8601 }, 201)
+          call_update({ due_at: due_date.iso8601 }, 200)
           expect(@assignment.reload.due_at).to eq due_date.iso8601
         end
 
         it "allows changing the due date to a date within a closed grading period" do
           due_date = 3.days.ago.iso8601
           @assignment = create_assignment(due_at: 3.days.from_now)
-          call_update({ due_at: due_date }, 201)
+          call_update({ due_at: due_date }, 200)
           expect(@assignment.reload.due_at).to eq due_date
         end
 
         it "allows unsetting the due date when the last grading period is closed" do
           @assignment = create_assignment(due_at: 3.days.from_now)
-          call_update({ due_at: nil }, 201)
+          call_update({ due_at: nil }, 200)
           expect(@assignment.reload.due_at).to eq nil
         end
 
@@ -2842,7 +2842,7 @@ describe AssignmentsApiController, type: :request do
           due_date = 3.days.from_now
           @assignment = create_assignment(due_at: 7.days.from_now.iso8601, time_zone_edited: due_date.zone)
           override_for_date(3.days.ago)
-          call_update({ due_at: due_date.iso8601 }, 201)
+          call_update({ due_at: due_date.iso8601 }, 200)
           expect(@assignment.reload.due_at).to eq due_date.iso8601
         end
 
@@ -2850,7 +2850,7 @@ describe AssignmentsApiController, type: :request do
           override_due_date = 3.days.ago.iso8601
           @assignment = create_assignment(due_at: 7.days.from_now, only_visible_to_overrides: true)
           override_params = [{ student_ids: [@student.id], due_at: override_due_date }]
-          call_update({ assignment_overrides: override_params }, 201)
+          call_update({ assignment_overrides: override_params }, 200)
           overrides = @assignment.reload.assignment_overrides
           expect(overrides.count).to eq 1
           expect(overrides.first.due_at).to eq override_due_date
@@ -2861,7 +2861,7 @@ describe AssignmentsApiController, type: :request do
           @assignment = create_assignment(due_at: 7.days.from_now)
           override = override_for_date(3.days.ago)
           override_params = [{ id: override.id, due_at: override_due_date }]
-          call_update({ assignment_overrides: override_params }, 201)
+          call_update({ assignment_overrides: override_params }, 200)
           expect(override.reload.due_at).to eq override_due_date
         end
 
@@ -2870,7 +2870,7 @@ describe AssignmentsApiController, type: :request do
           @assignment = create_assignment(due_at: 7.days.from_now)
           override = override_for_date(3.days.from_now)
           override_params = [{ id: override.id, due_at: override_due_date }]
-          call_update({ assignment_overrides: override_params }, 201)
+          call_update({ assignment_overrides: override_params }, 200)
           expect(override.reload.due_at).to eq override_due_date
         end
 
@@ -2878,7 +2878,7 @@ describe AssignmentsApiController, type: :request do
           @assignment = create_assignment(due_at: 7.days.from_now)
           override = override_for_date(3.days.from_now)
           override_params = [{ id: override.id, due_at: nil }]
-          call_update({ assignment_overrides: override_params }, 201)
+          call_update({ assignment_overrides: override_params }, 200)
           expect(override.reload.due_at).to eq nil
         end
 
@@ -2886,7 +2886,7 @@ describe AssignmentsApiController, type: :request do
           @assignment = create_assignment(due_at: 7.days.from_now)
           override = override_for_date(3.days.ago)
           override_params = [{ student_ids: [@student.id], due_at: 3.days.from_now.iso8601 }]
-          call_update({ assignment_overrides: override_params }, 201)
+          call_update({ assignment_overrides: override_params }, 200)
           expect(override.reload).to be_deleted
         end
       end
@@ -3648,6 +3648,11 @@ describe AssignmentsApiController, type: :request do
          "user_id" => @observed_student.id,
          "workflow_state" => "submitted",
          "late" => false,
+         "missing" => false,
+         "late_policy_status" => nil,
+         "accepted_at" => nil,
+         "points_deducted" => nil,
+         "duration_late" => 0.0,
          "preview_url" =>
          "http://www.example.com/courses/#{@observer_course.id}/assignments/#{@assignment.id}/submissions/#{@observed_student.id}?preview=1&version=0"
        }]
@@ -3678,6 +3683,11 @@ describe AssignmentsApiController, type: :request do
          "user_id" => @observed_student.id,
          "workflow_state" => "submitted",
          "late" => false,
+         "missing" => false,
+         "late_policy_status" => nil,
+         "accepted_at" => nil,
+         "points_deducted" => nil,
+         "duration_late" => 0.0,
          "preview_url" =>
          "http://www.example.com/courses/#{@observer_course.id}/assignments/#{@assignment.id}/submissions/#{@observed_student.id}?preview=1&version=0"
        }]

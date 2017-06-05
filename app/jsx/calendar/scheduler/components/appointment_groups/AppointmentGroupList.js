@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import I18n from 'i18n!appointment_groups'
 import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
@@ -75,7 +76,7 @@ import 'jquery.instructure_date_and_time'
 
 export default class AppointmentGroupList extends React.Component {
     static propTypes = {
-      appointmentGroup: React.PropTypes.object,
+      appointmentGroup: PropTypes.object,
     }
 
     renderAppointmentList () {

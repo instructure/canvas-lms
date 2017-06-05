@@ -32,6 +32,7 @@ describe "Gradezilla with grading periods" do
       create_grading_periods(term_name, now)
       add_teacher_and_student
       associate_course_to_term(term_name)
+      show_grading_periods_filter(@teacher)
     end
 
     context 'as a teacher' do
@@ -57,10 +58,10 @@ describe "Gradezilla with grading periods" do
       before(:each) do
         account_admin_user(account: Account.site_admin)
         user_session(@admin)
+        show_grading_periods_filter(@admin)
       end
 
       it 'assignment in closed grading period should be gradable', test_id: 2947126, priority: "1" do
-
         assignment = @course.assignments.create!(due_at: 18.days.ago(now), title: "assign in closed")
         Gradezilla.visit(@course)
 

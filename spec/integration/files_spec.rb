@@ -48,8 +48,8 @@ describe FilesController do
       remove_user_session
 
       get location
-      expect(response).to be_success
-      expect(response.content_type).to eq 'image/png'
+      # could be success or redirect, depending on S3 config
+      expect([200, 302]).to be_include(response.status)
       # ensure that the user wasn't logged in by the normal means
       expect(controller.instance_variable_get(:@current_user)).to be_nil
     end
@@ -57,8 +57,8 @@ describe FilesController do
     it "without safefiles" do
       HostUrl.stubs(:file_host_with_shard).returns(['test.host', Shard.default])
       get "http://test.host/files/#{@submission.attachment.id}/download", :inline => '1', :verifier => @submission.attachment.uuid
-      expect(response).to be_success
-      expect(response.content_type).to eq 'image/png'
+      # could be success or redirect, depending on S3 config
+      expect([200, 302]).to be_include(response.status)
       expect(response['Pragma']).to be_nil
       expect(response['Cache-Control']).not_to match(/no-cache/)
     end
@@ -164,8 +164,8 @@ describe FilesController do
     remove_user_session
 
     get location
-    expect(response).to be_success
-    expect(response.content_type).to eq 'image/png'
+    # could be success or redirect, depending on S3 config
+    expect([200, 302]).to be_include(response.status)
     # ensure that the user wasn't logged in by the normal means
     expect(controller.instance_variable_get(:@current_user)).to be_nil
   end
@@ -258,7 +258,8 @@ describe FilesController do
     # and verify the module progress was recorded
     remove_user_session
     get location
-    expect(response).to be_success
+    # could be success or redirect, depending on S3 config
+    expect([200, 302]).to be_include(response.status)
     expect(@module.evaluate_for(@user).state).to eql(:completed)
   end
 

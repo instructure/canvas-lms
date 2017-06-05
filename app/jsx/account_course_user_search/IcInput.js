@@ -17,10 +17,11 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import _ from 'underscore'
 import classnames from 'classnames'
 
-const { string, any, bool } = React.PropTypes
+const { string, any, bool } = PropTypes
 let idCount = 0
 const IcInputPropTypes = {
   error: string,

@@ -170,32 +170,6 @@ class GradebooksController < ApplicationController
     end
   end
 
-  def attendance
-    @enrollment = @context.all_student_enrollments.where(user_id: params[:user_id]).first if params[:user_id].present?
-    @enrollment ||= @context.all_student_enrollments.where(user_id: @current_user).first if !@context.grants_right?(@current_user, session, :manage_grades)
-    add_crumb t(:crumb, 'Attendance')
-    if !@enrollment && @context.grants_right?(@current_user, session, :manage_grades)
-      @assignments = @context.assignments.active.where(:submission_types => 'attendance').to_a
-      @students = @context.students_visible_to(@current_user).order_by_sortable_name
-      @at_least_one_due_at = @assignments.any?{|a| a.due_at }
-      # Find which assignment group most attendance items belong to,
-      # it'll be a better guess for default assignment group than the first
-      # in the list...
-      @default_group_id = @assignments.to_a.inject(Hash.new(0)){|h,a| h[a.assignment_group_id] += 1; h}.sort_by{|id, cnt| cnt }.reverse.first[0] rescue nil
-    elsif @enrollment && @enrollment.grants_right?(@current_user, session, :read_grades)
-      @assignments = @context.assignments.active.where(:submission_types => 'attendance').to_a
-      @students = @context.students_visible_to(@current_user).order_by_sortable_name
-      @submissions = @context.submissions.where(user_id: @enrollment.user_id).to_a
-      @user = @enrollment.user
-      render :student_attendance
-      # render student_attendance, optional params[:assignment_id] to highlight and scroll to that particular assignment
-    else
-      flash[:notice] = t('notices.unauthorized', "You are not authorized to view attendance for this course")
-      redirect_to named_context_url(@context, :context_url)
-      # redirect
-    end
-  end
-
   def show
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @last_exported_gradebook_csv = GradebookCsv.last_successful_export(course: @context, user: @current_user)
@@ -206,27 +180,36 @@ class GradebooksController < ApplicationController
       @post_grades_tools = post_grades_tools
 
       version = @current_user.preferred_gradebook_version
-      if @context.root_account.feature_enabled?(:gradezilla)
-        # params[:version] is a temporary gradezilla feature to help devs flip back and forth
-        # between gradebook versions. This param should never be used in the UI.
-        case params[:version]
-        when 'srgb'
-          render :screenreader and return
-        when '2'
-          render :gradebook and return
-        when 'gradezilla-individual'
-          render 'gradebooks/gradezilla/individual' and return
-        when 'gradezilla-gradebook'
-          render 'gradebooks/gradezilla/gradebook' and return
-        else # fallback to the current user's preferences hash
-          render 'gradebooks/gradezilla/individual' and return if version == 'individual'
+      if @context.feature_enabled?(:new_gradebook)
+        if Rails.env.development?
+          # params[:version] is a temporary gradezilla feature to help devs flip back and forth
+          # between gradebook versions. This param should never be used in the UI.
+          case params[:version]
+          when 'srgb'
+            render :screenreader and return
+          when '2'
+            render :gradebook and return
+          when 'gradezilla-individual'
+            render 'gradebooks/gradezilla/individual' and return
+          when 'gradezilla-gradebook'
+            render 'gradebooks/gradezilla/gradebook' and return
+          else # fallback to the current user's preferences hash
+            render 'gradebooks/gradezilla/individual' and return if individual_view?(version)
+            render 'gradebooks/gradezilla/gradebook' and return
+          end
+        else
+          render 'gradebooks/gradezilla/individual' and return if individual_view?(version)
           render 'gradebooks/gradezilla/gradebook' and return
         end
       else
-        render :screenreader and return if version == 'srgb'
+        render :screenreader and return if individual_view?(version)
         render :gradebook and return
       end
     end
+  end
+
+  def individual_view?(version)
+    %w(individual srgb).include?(version)
   end
 
   def post_grades_ltis
@@ -335,7 +318,7 @@ class GradebooksController < ApplicationController
                  end
     js_env STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards)
     js_env GRADEBOOK_OPTIONS: {
-      gradezilla: @context.root_account.feature_enabled?(:gradezilla),
+      gradezilla: @context.feature_enabled?(:new_gradebook),
       chunk_size: chunk_size,
       assignment_groups_url: api_v1_course_assignment_groups_url(
         @context,
@@ -343,6 +326,7 @@ class GradebooksController < ApplicationController
         override_assignment_dates: "false",
         exclude_assignment_submission_types: ['wiki_page']
       ),
+      context_modules_url: api_v1_course_context_modules_url(@context),
       sections_url: api_v1_course_sections_url(@context),
       course_url: api_v1_course_url(@context),
       effective_due_dates_url: api_v1_course_effective_due_dates_url(@context),
@@ -414,10 +398,11 @@ class GradebooksController < ApplicationController
       post_grades_feature: post_grades_feature?,
       sections: sections_json(@context.active_course_sections, @current_user, session),
       settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
-      settings: @current_user.preferences.fetch(:gradebook_settings, {}).fetch(@context.id, {}),
+      settings: gradebook_settings.fetch(@context.id, {}),
       login_handle_name: @context.root_account.settings[:login_handle_name],
       sis_name: @context.root_account.settings[:sis_name],
-      version: params.fetch(:version, nil)
+      version: params.fetch(:version, nil),
+      colors: gradebook_settings.fetch(:colors, {})
     }
   end
 
@@ -699,6 +684,8 @@ class GradebooksController < ApplicationController
     redirect_to polymorphic_url([@context, 'gradebook'])
   end
 
+  private
+
   def set_gradebook_warnings(groups, assignments)
     @assignments_in_bad_groups = Set.new
 
@@ -735,9 +722,6 @@ class GradebooksController < ApplicationController
 
     js_env :total_grade_warning => warning if warning
   end
-  private :set_gradebook_warnings
-
-  private
 
   def new_history
     @page_title = t("Gradebook History")
@@ -912,5 +896,9 @@ class GradebooksController < ApplicationController
       state: state,
       per_page: per_page
     )
+  end
+
+  def gradebook_settings
+    @current_user.preferences.fetch(:gradebook_settings, {})
   end
 end

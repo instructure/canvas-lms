@@ -610,7 +610,7 @@ module AccountReports
       end
 
       gm = root_account.all_groups.
-        select("group_id, sis_source_id, group_memberships.user_id, pseudonyms.sis_user_id AS user_sis_id,
+        select("group_id, groups.sis_source_id, group_memberships.user_id, pseudonyms.sis_user_id AS user_sis_id,
                   group_memberships.workflow_state, group_memberships.sis_batch_id").
         joins("INNER JOIN #{GroupMembership.quoted_table_name} ON groups.id = group_memberships.group_id
                INNER JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id=group_memberships.user_id").
@@ -633,7 +633,14 @@ module AccountReports
       end
 
       if account != root_account
-        gm.where!(:groups => {:context_id => account, :context_type => 'Account'})
+        gm = gm.joins("INNER JOIN #{Account.quoted_table_name} ON accounts.id = groups.account_id
+                       LEFT JOIN #{Course.quoted_table_name} ON groups.context_type = 'Course' AND groups.context_id = courses.id")
+        gm.where!("(groups.context_type = 'Account'
+                         AND (accounts.id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
+                           OR accounts.id = :account_id))
+                       OR (groups.context_type = 'Course'
+                         AND (courses.account_id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
+                           OR courses.account_id = :account_id))", { account_id: account.id })
       end
 
       generate_and_run_report headers do |csv|

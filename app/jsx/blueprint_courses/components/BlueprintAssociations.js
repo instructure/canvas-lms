@@ -19,6 +19,7 @@
 import I18n from 'i18n!blueprint_settings'
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import select from 'jsx/shared/select'
@@ -27,13 +28,14 @@ import 'compiled/jquery.rails_flash_notifications'
 import Heading from 'instructure-ui/lib/components/Heading'
 import Typography from 'instructure-ui/lib/components/Typography'
 import Spinner from 'instructure-ui/lib/components/Spinner'
+import Alert from 'instructure-ui/lib/components/Alert'
 
 import actions from '../actions'
 import propTypes from '../propTypes'
 import CoursePicker from './CoursePicker'
 import AssociationsTable from './AssociationsTable'
 
-const { string, arrayOf, func, bool } = React.PropTypes
+const { string, arrayOf, func, bool } = PropTypes
 
 export default class BlueprintAssociations extends React.Component {
   static propTypes = {
@@ -52,6 +54,7 @@ export default class BlueprintAssociations extends React.Component {
     isLoadingCourses: bool.isRequired,
     isLoadingAssociations: bool.isRequired,
     isSavingAssociations: bool.isRequired,
+    hasUnsyncedChanges: bool.isRequired,
 
     isExpanded: bool,
   }
@@ -101,9 +104,26 @@ export default class BlueprintAssociations extends React.Component {
     return null
   }
 
+  maybeRenderSyncWarning () {
+    const { hasUnsyncedChanges, existingAssociations, addedAssociations } = this.props
+    if (hasUnsyncedChanges && existingAssociations.length > 0 && addedAssociations.length > 0) {
+      return (
+        <Alert variant="warning" closeButtonLabel={I18n.t('Close')} margin="0 0 large">
+          <p style={{margin: '0 -10px'}}>
+            <Typography weight="bold">{I18n.t('Warning:')}</Typography>&nbsp;
+            <Typography>{I18n.t('You have unsynced changes that will sync to all associated courses when a new association is saved.')}</Typography>
+          </p>
+        </Alert>
+      )
+    }
+
+    return null
+  }
+
   render () {
     return (
       <div className="bca__wrapper">
+        {this.maybeRenderSyncWarning()}
         {this.renderLoadingOverlay()}
         <Heading level="h3">{I18n.t('Search Courses')}</Heading>
         <br />
@@ -135,18 +155,19 @@ export default class BlueprintAssociations extends React.Component {
 }
 
 const connectState = state =>
-  select(state, [
+  Object.assign(select(state, [
     'existingAssociations',
     'addedAssociations',
     'removedAssociations',
     'courses',
     'terms',
     'subAccounts',
-    'errors',
     'hasLoadedCourses',
     'isLoadingCourses',
     'isLoadingAssociations',
     'isSavingAssociations',
-  ])
+  ]), {
+    hasUnsyncedChanges: !state.hasLoadedUnsyncedChanges || state.unsyncedChanges.length > 0,
+  })
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
 export const ConnectedBlueprintAssociations = connect(connectState, connectActions)(BlueprintAssociations)

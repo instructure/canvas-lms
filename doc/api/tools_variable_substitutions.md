@@ -108,6 +108,15 @@ particular placement:
 ```
 
 # Supported Substitutions
+## CourseOffering.sourcedId
+the LIS identifier for the course offering.
+
+**Availability**: *when launched in a course*  
+**Launch Parameter**: *lis_course_offering_sourcedid*  
+
+```
+1234
+```
 ## Context.id
 an opaque identifier that uniquely identifies the context of the tool launch.
 
@@ -299,6 +308,15 @@ returns the current course id.
 ```
 1234
 ```
+## vnd.instructure.Course.uuid
+returns the current course uuid.
+
+**Availability**: *when launched in a course*  
+
+
+```
+S3vhRY2pBzG8iPdZ3OBPsPrEnqn5sdRoJOLXGbwc
+```
 ## Canvas.course.name
 returns the current course name.
 
@@ -481,6 +499,15 @@ Returns the Canvas user_id of the launching user.
 ```
 420000000000042
 ```
+## vnd.instructure.User.uuid [duplicates User.uuid]
+Returns the Canvas user_uuid of the launching user.
+
+**Availability**: *when launched by a logged in user*  
+
+
+```
+N2ST123dQ9zyhurykTkBfXFa3Vn1RVyaw9Os6vu3
+```
 ## Canvas.user.prefersHighContrast
 Returns the users preference for high contrast colors (an accessibility feature).
 
@@ -653,6 +680,15 @@ Returns a comma separated list of section sis_id's that the user is enrolled in.
 
 ```
 section_sis_id_1, section_sis_id_2
+```
+## com.instructure.contextLabel
+Returns the course code.
+
+**Availability**: *when launched in a course*  
+**Launch Parameter**: *context_label*  
+
+```
+CS 124
 ```
 ## Canvas.module.id
 Returns the module_id that the module item was launched from.

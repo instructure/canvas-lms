@@ -49,27 +49,25 @@
 //   options.url is used for the href of the link, and options.title
 //   will be the body of the link if no text is currently selected.
 
-define([
-  'i18nObj',
-  'jquery',
-  'jsx/shared/rce/editorOptions',
-  'compiled/editor/editorAccessibility', /* editorAccessibility */
-  'tinymce.editor_box_list',
-  'tinymce.config',
-  'tinymce.commands',
-  'tinymce.editor_box_utils',
-  //'compiled/tinymce', // required, but the bundles that ACTUALLY use
-                        // tiny can require it themselves or else we have
-                        // build problems
-  'INST', // for IE detection; need to handle links in a special way
-  'decode_string',
-  'jqueryui/draggable' /* /\.draggable/ */,
-  'jquery.instructure_misc_plugins' /* /\.indicate/ */,
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'vendor/jquery.ba-tinypubsub'
-], function(I18nObj, $, editorOptions,
-            EditorAccessibility, EditorBoxList, EditorConfig, EditorCommands,
-            Utils, INST, decodeString) {
+import I18nObj from 'i18nObj'
+import $ from 'jquery'
+import editorOptions from 'jsx/shared/rce/editorOptions'
+import EditorAccessibility from 'compiled/editor/editorAccessibility'
+import EditorBoxList from './tinymce.editor_box_list'
+import EditorConfig from './tinymce.config'
+import {remove, insertLink} from './tinymce.commands'
+import {cleanUrl} from './tinymce.editor_box_utils'
+
+//'compiled/tinymce', // required, but the bundles that ACTUALLY use
+                      // tiny can require it themselves or else we have
+                      // build problems
+
+import INST from './INST'
+import decodeString from 'decode_string'
+import 'jqueryui/draggable'
+import './jquery.instructure_misc_plugins' /* /\.indicate/ */
+import './vendor/jquery.scrollTo'
+import 'vendor/jquery.ba-tinypubsub'
 
   var enableBookmarking = !!INST.browser.ie;
   $(document).ready(function() {
@@ -358,7 +356,7 @@ define([
   };
 
   $.fn._removeEditor = function() {
-    EditorCommands.remove(this, $instructureEditorBoxList)
+    remove(this, $instructureEditorBoxList)
   };
 
   $.fn._setContentCode = function(val) {
@@ -407,7 +405,7 @@ define([
       options = {url: options};
     }
     var title = options.title;
-    var url = Utils.cleanUrl(options.url || "");
+    var url = cleanUrl(options.url || "");
     var classes = options.classes || "";
     var defaultText = options.text || options.title || "Link";
     var target = options.target || null;
@@ -491,7 +489,7 @@ define([
         tinyMCE.get(id).execCommand('mceInsertContent', false, $div.html());
       }
     } else {
-      EditorCommands.insertLink(id, selectedContent, linkAttrs)
+      insertLink(id, selectedContent, linkAttrs)
     }
 
     var ed = tinyMCE.get(id);
@@ -521,5 +519,3 @@ define([
       $(e).indicate({offset: offset, singleFlash: true, scroll: true, container: $(box).find('iframe')});
     }
   };
-
-});

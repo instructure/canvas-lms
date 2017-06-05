@@ -18,17 +18,18 @@
 
 import I18n from 'i18n!new_nav'
 import React from 'react'
+import PropTypes from 'prop-types'
 import SVGWrapper from 'jsx/shared/SVGWrapper'
 import PreventDefault from 'compiled/fn/preventDefault'
 
   var ProfileTray = React.createClass({
 
     propTypes: {
-      closeTray: React.PropTypes.func.isRequired,
-      userDisplayName: React.PropTypes.string.isRequired,
-      userAvatarURL: React.PropTypes.string.isRequired,
-      profileEnabled: React.PropTypes.bool.isRequired,
-      eportfoliosEnabled: React.PropTypes.bool.isRequired
+      closeTray: PropTypes.func.isRequired,
+      userDisplayName: PropTypes.string.isRequired,
+      userAvatarURL: PropTypes.string.isRequired,
+      profileEnabled: PropTypes.bool.isRequired,
+      eportfoliosEnabled: PropTypes.bool.isRequired
     },
 
     render() {

@@ -16,11 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jquery' /* jQuery, $ */,
-  'jquery.instructure_misc_plugins' /* fillWindowWithMe */
-], function(jQuery) {
+import jQuery from 'jquery'
+import './jquery.instructure_misc_plugins' /* fillWindowWithMe */
+
 jQuery(function($) {
   $("#file_content").css('width', '100%').fillWindowWithMe();
-});
 });

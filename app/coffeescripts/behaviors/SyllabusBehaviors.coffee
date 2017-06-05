@@ -27,7 +27,7 @@ define [
   'jquery.loadingImg' # loadingImage #
   'vendor/jquery.scrollTo' # /\.scrollTo/ #
   'jqueryui/datepicker' # /\.datepicker/ #
-], ($, calendarMonths, RichContentEditor, KeyboardShortcuts) ->
+], ($, {changeMonth}, RichContentEditor, KeyboardShortcuts) ->
 
   specialDatesAreHidden = false
 
@@ -141,14 +141,14 @@ define [
     prev_next_links = $mini_month.find('.next_month_link, .prev_month_link')
     prev_next_links.on 'click', (ev) ->
       ev.preventDefault()
-      calendarMonths.changeMonth $mini_month, if $(this).hasClass('next_month_link') then 1 else -1
+      changeMonth $mini_month, if $(this).hasClass('next_month_link') then 1 else -1
       highlightDaysWithEvents()
 
     miniCalendarDayClick = (ev) ->
       ev.preventDefault()
       date = $(ev.target).closest('.mini_calendar_day')[0].id.slice(9)
       [year, month, day] = date.split('_')
-      calendarMonths.changeMonth $mini_month, "#{month}/#{day}/#{year}"
+      changeMonth $mini_month, "#{month}/#{day}/#{year}"
       highlightDaysWithEvents()
       selectDate(date)
       $(".events_#{date}").ifExists ($events) ->
@@ -173,7 +173,7 @@ define [
         return false if !dateString || dateString > todayString
         $lastBefore = $(this)
 
-      calendarMonths.changeMonth $mini_month, $.datepicker.formatDate 'mm/dd/yy', new Date
+      changeMonth $mini_month, $.datepicker.formatDate 'mm/dd/yy', new Date
       highlightDaysWithEvents()
 
       $lastBefore ||= $('tr.date:first')

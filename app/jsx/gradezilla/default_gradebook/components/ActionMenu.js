@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import IconMiniArrowDownSolid from 'instructure-icons/lib/Solid/IconMiniArrowDownSolid'
 import Button from 'instructure-ui/lib/components/Button'
 import { MenuItem, MenuItemSeparator } from 'instructure-ui/lib/components/Menu'
@@ -30,7 +31,7 @@ import DateHelper from 'jsx/shared/helpers/dateHelper'
 import I18n from 'i18n!gradebook'
 import 'compiled/jquery.rails_flash_notifications'
 
-const { arrayOf, bool, func, object, shape, string } = React.PropTypes;
+const { arrayOf, bool, func, object, shape, string } = PropTypes;
 
   class ActionMenu extends React.Component {
     static defaultProps = {

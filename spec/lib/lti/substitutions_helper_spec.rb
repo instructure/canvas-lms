@@ -123,7 +123,7 @@ module Lti
 
       it "returns none if no user" do
         helper = SubstitutionsHelper.new(course, root_account, nil)
-        expect(helper.all_roles).to eq [LtiOutbound::LTIRoles::System::NONE]
+        expect(helper.all_roles).to eq LtiOutbound::LTIRoles::System::NONE
       end
 
       it 'converts multiple roles for lis 2' do
@@ -143,7 +143,7 @@ module Lti
 
       it "returns none if no user for lis 2" do
         helper = SubstitutionsHelper.new(course, root_account, nil)
-        expect(helper.all_roles('lis2')).to eq ['http://purl.imsglobal.org/vocab/lis/v2/person#None']
+        expect(helper.all_roles('lis2')).to eq 'http://purl.imsglobal.org/vocab/lis/v2/person#None'
       end
 
       it "includes main and subrole for TeachingAssistant" do

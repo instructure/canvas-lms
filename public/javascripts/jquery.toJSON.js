@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define(['jquery', 'compiled/jquery/serializeForm'], function ($){
+import $ from 'jquery'
+import 'compiled/jquery/serializeForm'
 
   var patterns = {
     validate: /^[a-zA-Z][a-zA-Z0-9_-]*(?:\[(?:\d*|[a-zA-Z0-9_-]+)\])*$/,
@@ -87,5 +88,3 @@ define(['jquery', 'compiled/jquery/serializeForm'], function ($){
 
     return json;
   };
-});
-

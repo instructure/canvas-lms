@@ -19,11 +19,14 @@
 module Api::V1::Context
 
   def context_data(obj)
-    if obj.context_type.present?
+    if obj.respond_to?(:context_type) && obj.context_type.present?
       context_type = obj.context_type
       id = obj.context_id
     elsif (obj.respond_to?(:context_code) || obj.is_a?(OpenObject)) && obj.context_code.present?
       context_type, id = obj.context_code.split("_", 2)
+    elsif obj.respond_to?(:context) && obj.context.present?
+      context_type = obj.context.class.to_s
+      id = obj.context.id
     else
       return {}
     end

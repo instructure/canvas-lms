@@ -146,7 +146,7 @@ define [
     render: ->
       $.when(@gradebook.hasSections)
         .then(=> super)
-        .then(@_drawSectionMenu)
+        .then(@renderSectionMenu)
       $.when(@hasOutcomes).then(@renderGrid)
       this
 
@@ -160,7 +160,7 @@ define [
       Grid.Util.saveStudents(response.linked.users)
       Grid.Util.saveOutcomePaths(response.linked.outcome_paths)
       Grid.Util.saveSections(@gradebook.sections) # might want to put these into the api results at some point
-      [columns, rows] = Grid.Util.toGrid(response, column: { formatter: Grid.View.cell }, row: { section: @menu.currentSection })
+      [columns, rows] = Grid.Util.toGrid(response, column: { formatter: Grid.View.cell }, row: { section: @gradebook.sectionToShow })
       @grid = new Slick.Grid(
         '.outcome-gradebook-wrapper',
         rows,
@@ -179,6 +179,21 @@ define [
         onResize: => @grid.resizeCanvas() if @grid
       })
       $(".post-grades-button-placeholder").hide();
+
+    # Internal: Render Section selector.
+    # Returns nothing.
+    renderSectionMenu: =>
+      if (!@sectionMenu && $('.outcome-gradebook-container .section-button-placeholder').children().length)
+        $('.outcome-gradebook-container .section-button-placeholder').empty()
+      @sectionMenu ||= new SectionMenuView(
+        tagName: 'span'
+        sections: @gradebook.sectionList()
+        showSections: true
+        currentSection: @gradebook.sectionToShow
+      )
+      @sectionMenu.disabled = @gradebook.sectionList().length <= 1
+      @sectionMenu.render()
+      @sectionMenu.$el.appendTo('.outcome-gradebook-container .section-button-placeholder')
 
     # Public: Load all outcome results from API.
     #
@@ -223,18 +238,6 @@ define [
       }
       response.rollups = a.rollups.concat(b.rollups)
       response
-
-    # Internal: Initialize the child SectionMenuView. This happens here because
-    #   the menu needs to wait for relevant course sections to load.
-    #
-    # Returns nothing.
-    _drawSectionMenu: =>
-      @menu = new SectionMenuView(
-        sections: @gradebook.sectionList()
-        currentSection: @gradebook.sectionToShow
-        el: $('.section-button-placeholder'),
-      )
-      @menu.render()
 
     # Internal: Create an event listener function used to filter SlickGrid results.
     #

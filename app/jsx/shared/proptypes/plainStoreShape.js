@@ -17,12 +17,13 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 
   const plainStoreShape = {
-    getState: React.PropTypes.func,
-    addChangeListener: React.PropTypes.func,
-    removeChangeListener: React.PropTypes.func,
-    setState: React.PropTypes.func
+    getState: PropTypes.func,
+    addChangeListener: PropTypes.func,
+    removeChangeListener: PropTypes.func,
+    setState: PropTypes.func
   };
 
 export default plainStoreShape

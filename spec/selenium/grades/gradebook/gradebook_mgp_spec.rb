@@ -79,10 +79,11 @@ describe "gradebook with grading periods" do
       page.visit_gradebook(@course, @teacher)
 
       page.select_grading_period(0)
-      expect(page.grading_cell(0, 0)).to contain_css(page.ungradable_selector)
+      # expect(page.grading_cell(0, 0)).to contain_css(page.ungradable_selector)
+      expect(page.grading_cell_attributes(0, 0)).to contain_css(".cannot_edit")
 
       page.select_grading_period(@gp_closed.id)
-      expect(page.grading_cell(0, 0)).to contain_css(page.ungradable_selector)
+      expect(page.grading_cell_attributes(0, 0)).to contain_css(".cannot_edit")
     end
   end
 end

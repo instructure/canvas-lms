@@ -11,11 +11,9 @@
  *	jquery.ui.core.js
  *	jquery.ui.widget.js
  */
-define([
-  'jquery',
-  'jqueryui/core',
-  'jqueryui/widget'
-], function( $ ) {
+import $ from 'jquery'
+import 'jqueryui/core'
+import 'jqueryui/widget'
   
 var tabId = 0,
 	rhash = /#.*$/;
@@ -1361,4 +1359,4 @@ if ( $.uiBackCompat !== false ) {
 	});
 }
 
-});
+

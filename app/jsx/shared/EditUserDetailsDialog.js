@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!edit_timezone'
 import React from 'react'
+import PropTypes from 'prop-types'
 import Modal from 'jsx/shared/modal'
 import ModalContent from 'jsx/shared/modal-content'
 import ModalButtons from 'jsx/shared/modal-buttons'
@@ -25,7 +26,7 @@ import TimeZoneSelect from 'jsx/shared/TimeZoneSelect'
 import UsersStore from 'jsx/account_course_user_search/UsersStore'
 import IcInput from 'jsx/account_course_user_search/IcInput'
 
-  let { object, bool, number, string, func, shape, arrayOf } = React.PropTypes;
+  let { object, bool, number, string, func, shape, arrayOf } = PropTypes;
 
   class EditUserDetailsDialog extends React.Component{
     constructor (props, context) {

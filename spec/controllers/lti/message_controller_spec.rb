@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../lti2_spec_helper')
 require_dependency "lti/message_controller"
 
 module Lti
@@ -137,6 +138,17 @@ module Lti
 
     end
 
+    describe 'GET #registration_return' do
+      include_context 'lti2_spec_helper'
+
+      before { user_session(account_admin_user) }
+
+      it 'does not 500 if tool registration fails' do
+        get 'registration_return', course_id: course.id, status: 'failure'
+        expect(response).to be_succes
+      end
+    end
+
     describe "GET #reregistration" do
       before(:each) do
         MessageHandler.create!(
@@ -219,6 +231,71 @@ module Lti
           expect(response.code).to eq '404'
         end
 
+      end
+    end
+
+    describe "GET #resource_link_id" do
+      include_context 'lti2_spec_helper'
+
+      let(:link_id) { SecureRandom.uuid }
+
+      let(:tool_setting) do
+        ToolSetting.new(tool_proxy: tool_proxy,
+                        context: course,
+                        resource_link_id: link_id,
+                        vendor_code: product_family.vendor_code,
+                        product_code: product_family.product_code,
+                        resource_type_code: resource_handler.resource_type_code)
+      end
+
+      before do
+        message_handler.update_attributes(message_type: MessageHandler::BASIC_LTI_LAUNCH_REQUEST)
+        resource_handler.message_handlers = [message_handler]
+        resource_handler.save!
+        tool_setting.save!
+        user_session(account_admin_user)
+      end
+
+      it 'succeeds if tool is installed in the current account' do
+        get 'resource', account_id: account.id, resource_link_id: link_id
+        expect(response).to be_ok
+      end
+
+      it 'succeeds if the tool is installed in the current course' do
+        tool_proxy.update_attributes(context: course)
+        get 'resource', course_id: course.id, resource_link_id: link_id
+        expect(response).to be_ok
+      end
+
+      it "succeeds if the tool is installed in the current course's account" do
+        tool_proxy.update_attributes(context: account)
+        get 'resource', course_id: course.id, resource_link_id: link_id
+        expect(response).to be_ok
+      end
+
+      context 'search account chain' do
+        let(:root_account) { Account.create! }
+
+        before { account.update_attributes(root_account: root_account) }
+
+        it "succeeds if the tool is installed in the current account's root account" do
+          tool_proxy.update_attributes(context: root_account)
+          get 'resource', account_id: account.id, resource_link_id: link_id
+          expect(response).to be_ok
+        end
+
+        it "succeeds if the tool is installed in the current course's root account" do
+          tool_proxy.update_attributes(context: root_account)
+          get 'resource', course_id: course.id, resource_link_id: link_id
+          expect(response).to be_ok
+        end
+      end
+
+      it "renders 'not found' no message handler is found" do
+        resource_handler.message_handlers = []
+        resource_handler.save!
+        get 'resource', account_id: account.id, resource_link_id: link_id
+        expect(response).to be_not_found
       end
     end
 

@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import DashboardCard from './DashboardCard'
 import DraggableDashboardCard from './DraggableDashboardCard'
 import DashboardCardBackgroundStore from './DashboardCardBackgroundStore'
@@ -27,10 +28,10 @@ import MovementUtils from './MovementUtils'
     displayName: 'DashboardCardBox',
 
     propTypes: {
-      courseCards: React.PropTypes.array,
-      reorderingEnabled: React.PropTypes.bool,
-      hideColorOverlays: React.PropTypes.bool,
-      connectDropTarget: React.PropTypes.func
+      courseCards: PropTypes.array,
+      reorderingEnabled: PropTypes.bool,
+      hideColorOverlays: PropTypes.bool,
+      connectDropTarget: PropTypes.func
     },
 
     componentWillMount () {

@@ -105,18 +105,14 @@ define [
     event.initCustomEvent("tinyRCE/initEquella", true, true, eventData)
     document.dispatchEvent(event)
 
-  asyncTest 'initializes external tools plugin', ->
+  test 'initializes external tools plugin', ->
     commandSpy = sinon.spy(fakeEditor, "addCommand")
-    expect(1)
-    loadEventListeners({externalToolCB:()->
-      start()
-      ok commandSpy.calledWith("instructureExternalButton__BUTTON_ID__")
-    })
-
+    loadEventListeners()
     event = document.createEvent('CustomEvent')
     eventData = {'ed': fakeEditor, 'url': "someurl.com"}
     event.initCustomEvent("tinyRCE/initExternalTools", true, true, eventData)
     document.dispatchEvent(event)
+    ok commandSpy.calledWith("instructureExternalButton__BUTTON_ID__")
 
   asyncTest 'initializes recording plugin', ->
     logSpy = sinon.spy(console, "log")

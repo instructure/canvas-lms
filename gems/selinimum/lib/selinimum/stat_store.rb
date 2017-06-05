@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-gem "aws-sdk", "=2.6.7" unless defined? Bundler
+gem "aws-sdk-s3", "1.0.0.rc3" unless defined? Bundler
 require "json"
-require "aws-sdk"
+require "aws-sdk-s3"
 require "fileutils"
 require "tmpdir"
 require 'yaml'
@@ -84,9 +84,7 @@ module Selinimum
         objects.each do |object|
           file_name = object.key.sub(prefix, "")
           File.open("#{dest}/#{file_name}", "wb") do |file|
-            object.get do |chunk|
-              file.write(chunk)
-            end
+            file.write object.get.body.read
           end
         end
       end

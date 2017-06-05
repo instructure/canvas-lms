@@ -1075,14 +1075,17 @@ describe "Default Account Reports" do
       end
 
       it "should run the provisioning report for a subaccount" do
+        @gm5 = GroupMembership.create(:group => @group5,:user => @user3,:workflow_state => "accepted")
         parameters = {}
         parameters["group_membership"] = true
         parsed = read_report("provisioning_csv", {params: parameters, account: @sub_account, order: [1, 3]})
-        expect(parsed.length).to eq 2
+        expect(parsed.length).to eq 3
         expect(parsed[0]).to eq [@group3.id.to_s, nil, @user3.id.to_s,
                                  "user_sis_id_03", "accepted", "false"]
         expect(parsed[1]).to eq [@group2.id.to_s, @group2.sis_source_id,
                                  @user2.id.to_s, "user_sis_id_02", "accepted", "true"]
+        expect(parsed[2]).to eq [@group5.id.to_s, @group5.sis_source_id,
+                                 @user3.id.to_s, "user_sis_id_03", "accepted", "false"]
       end
     end
 

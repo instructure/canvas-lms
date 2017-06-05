@@ -18,6 +18,7 @@
 
 import _ from 'underscore'
 import React from 'react'
+import PropTypes from 'prop-types'
 import $ from 'jquery'
 import I18n from 'i18n!dashcards'
 import ColorPicker from 'jsx/shared/ColorPicker'
@@ -33,8 +34,8 @@ import cx from 'classnames'
   var ColorPickerTooltip = React.createClass({
 
     propTypes: {
-      elementID: React.PropTypes.string,
-      isOpen: React.PropTypes.bool,
+      elementID: PropTypes.string,
+      isOpen: PropTypes.bool,
       settingsToggle: DOMElement
     },
 

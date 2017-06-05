@@ -16,29 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'context_modules_helper'
-], (Helper) => {
-  QUnit.module('ContextModulesHelper', {
-    setup() {
-      sinon.stub(Helper, 'setWindowLocation')
-    },
+import Helper from 'context_modules_helper'
 
-    teardown() {
-      Helper.setWindowLocation.restore()
-    },
-  })
+QUnit.module('ContextModulesHelper', {
+  setup () {
+    sinon.stub(Helper, 'setWindowLocation')
+  },
 
-  test('externalUrlLinkClick', () => {
-    const event = {
-      preventDefault: sinon.spy()
-    }
-    const elt = {
-      attr: sinon.spy()
-    }
-    Helper.externalUrlLinkClick(event, elt)
-    ok(event.preventDefault.calledOnce, 'preventDefault not called')
-    ok(elt.attr.calledWith('data-item-href'), 'elt.attr not called')
-    ok(Helper.setWindowLocation.calledOnce, 'window redirected')
-  })
+  teardown () {
+    Helper.setWindowLocation.restore()
+  },
+})
+
+test('externalUrlLinkClick', () => {
+  const event = {
+    preventDefault: sinon.spy()
+  }
+  const elt = {
+    attr: sinon.spy()
+  }
+  Helper.externalUrlLinkClick(event, elt)
+  ok(event.preventDefault.calledOnce, 'preventDefault not called')
+  ok(elt.attr.calledWith('data-item-href'), 'elt.attr not called')
+  ok(Helper.setWindowLocation.calledOnce, 'window redirected')
 })

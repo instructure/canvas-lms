@@ -94,21 +94,50 @@ RSpec::Matchers.define :have_value do |value_attribute|
   end
 end
 
-# assert the presence (or absence) of a value within an element's
-# attribute. will return as soon as the expectation is met, e.g.
+# assert the presence (or absence) of an attribute, optionally asserting
+# its exact value or against a regex. will return as soon as the
+# expectation is met, e.g.
 #
+#   # must have something set
+#   expect(f('.fc-event .fc-time')).to have_attribute('data-start')
+#
+#   # must have a particular value set
 #   expect(f('.fc-event .fc-time')).to have_attribute('data-start', '11:45')
 #
-RSpec::Matchers.define :have_attribute do |attribute, attribute_value|
+#   # must match a regex
+#   expect(f('.fc-event .fc-time')).to have_attribute('data-start', /\A\d\d?:\d\d\z/)
+#
+#   # must not have anything set
+#   expect(f('.fc-event .fc-time')).not_to have_attribute('data-start')
+#
+#   # must not have this particular value set (can be a different value, or no value)
+#   expect(f('.fc-event .fc-time')).not_to have_attribute('data-start', '11:45')
+#
+#   # must not match a regex
+#   expect(f('.fc-event .fc-time')).not_to have_attribute('data-start', /\A\d\d?:\d\d\z/)
+#
+RSpec::Matchers.define :have_attribute do |*args|
+  attribute = args.first
+  expected_specified = args.size > 1
+  expected = args[1]
+
+  attribute_matcher = -> (actual) do
+    if expected_specified
+      actual.respond_to?(:match) ? actual.match(expected) : actual == expected
+    else
+      !actual.nil?
+    end
+  end
+
   match do |element|
     wait_for(method: :have_attribute) do
-      element.attribute(attribute).match(attribute_value)
+      attribute_matcher.call(element.attribute(attribute))
     end
   end
 
   match_when_negated do |element|
     wait_for(method: :have_attribute) do
-      !element.attribute(attribute).match(attribute_value)
+      !attribute_matcher.call(element.attribute(attribute))
     end
   end
 

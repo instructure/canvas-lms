@@ -17,17 +17,18 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 
 export default React.createClass({
     displayName: 'ConfigOptionField',
 
     propTypes: {
-      handleChange: React.PropTypes.func.isRequired,
-      name: React.PropTypes.string.isRequired,
-      type: React.PropTypes.string.isRequired,
-      value: React.PropTypes.any,
-      required: React.PropTypes.bool,
-      description: React.PropTypes.string.isRequired
+      handleChange: PropTypes.func.isRequired,
+      name: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
+      value: PropTypes.any,
+      required: PropTypes.bool,
+      description: PropTypes.string.isRequired
     },
 
     checkbox() {

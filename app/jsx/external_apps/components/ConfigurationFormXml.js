@@ -20,6 +20,7 @@ import $ from 'jquery'
 import I18n from 'i18n!external_tools'
 import _ from 'underscore'
 import React from 'react'
+import PropTypes from 'prop-types'
 import TextInput from 'jsx/external_apps/components/TextInput'
 import TextAreaInput from 'jsx/external_apps/components/TextAreaInput'
 import 'compiled/jquery.rails_flash_notifications'
@@ -28,10 +29,10 @@ export default React.createClass({
     displayName: 'ConfigurationFormXml',
 
     propTypes: {
-      name         : React.PropTypes.string,
-      consumerKey  : React.PropTypes.string,
-      sharedSecret : React.PropTypes.string,
-      xml          : React.PropTypes.string
+      name         : PropTypes.string,
+      consumerKey  : PropTypes.string,
+      sharedSecret : PropTypes.string,
+      xml          : PropTypes.string
     },
 
     getInitialState: function() {

@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import PropTypes from 'prop-types'
 import MigrationStates from './migrationStates'
 
-const { shape, string, arrayOf, oneOf, bool } = React.PropTypes
+const { shape, string, arrayOf, oneOf, bool, instanceOf } = PropTypes
 const propTypes = {}
 
-propTypes.migrationState = oneOf(Object.keys(MigrationStates.states))
+propTypes.migrationState = oneOf(MigrationStates.statesList)
 
 propTypes.term = shape({
   id: string.isRequired,
@@ -48,15 +48,25 @@ propTypes.course = shape({
 })
 propTypes.courseList = arrayOf(propTypes.course)
 
+propTypes.courseInfo = shape({
+  id: string.isRequired,
+  name: string.isRequired,
+  enrollment_term_id: string.isRequired,
+  sis_course_id: string,
+})
+
+propTypes.lockableAttribute = oneOf(['points', 'content', 'due_dates', 'availability_dates', 'settings'])
+propTypes.lockableAttributeList = arrayOf(propTypes.lockableAttribute)
+
 propTypes.migrationException = shape({
   course_id: string.isRequired,
-  conflicting_changes: arrayOf(oneOf(['points', 'content', 'due_dates', 'availability_dates'])),
+  conflicting_changes: propTypes.lockableAttributeList,
 })
 propTypes.migrationExceptionList = arrayOf(propTypes.migrationException)
 
 propTypes.migrationChange = shape({
   asset_id: string.isRequired,
-  asset_type: oneOf(['assignment', 'quiz', 'discussion_topic', 'wiki_page', 'attachment']).isRequired,
+  asset_type: oneOf(['assignment', 'quiz', 'discussion_topic', 'wiki_page', 'attachment', 'context_module']).isRequired,
   asset_name: string.isRequired,
   change_type: oneOf(['created', 'updated', 'deleted']).isRequired,
   htnl_url: string,
@@ -76,7 +86,7 @@ propTypes.migration = shape({
 })
 propTypes.migrationList = arrayOf(propTypes.migration)
 
-propTypes.unsynchedChange = shape({
+propTypes.unsyncedChange = shape({
   asset_id: string.isRequired,
   asset_type: string.isRequired,
   asset_name: string.isRequired,
@@ -84,6 +94,28 @@ propTypes.unsynchedChange = shape({
   html_url: string.isRequired,
   locked: bool.isRequired
 })
-propTypes.unsynchedChanges = arrayOf(propTypes.unsynchedChange)
+propTypes.unsyncedChanges = arrayOf(propTypes.unsyncedChange)
+
+propTypes.notification = shape({
+  id: string.isRequired,
+  message: string.isRequired,
+  err: instanceOf(Error),
+})
+propTypes.notificationList = arrayOf(propTypes.notification)
+
+propTypes.itemLocks = shape({
+  content: bool,
+  points: bool,
+  due_dates: bool,
+  availability_dates: bool,
+})
+
+propTypes.itemLocksByObject = shape({
+  assignment: propTypes.itemLocks,
+  discussion_topic: propTypes.itemLocks,
+  wiki_page: propTypes.itemLocks,
+  quiz: propTypes.itemLocks,
+  attachment: propTypes.itemLocks,
+})
 
 export default propTypes

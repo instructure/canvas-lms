@@ -16,18 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!account_authorization_configs',
-  'str/htmlEscape',
-  'react',
-  'react-dom',
-  'jsx/authentication_providers/AuthTypePicker',
-  'authentication_providers',
-  'jquery' /* $ */,
-  'jquery.instructure_forms' /* formSubmit */,
-  'jquery.keycodes' /* keycodes */,
-  'jquery.loadingImg' /* loadingImage */
-], function (I18n, htmlEscape, React, ReactDOM, AuthTypePicker, authenticationProviders, $) {
+import I18n from 'i18n!account_authorization_configs'
+import htmlEscape from './str/htmlEscape'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import AuthTypePicker from 'jsx/authentication_providers/AuthTypePicker'
+import authenticationProviders from 'authentication_providers'
+import $ from 'jquery'
+import './jquery.instructure_forms' /* formSubmit */
+import './jquery.keycodes'
+import './jquery.loadingImg'
+
   var Picker = React.createFactory(AuthTypePicker);
   var selectorNode = document.getElementById('add-authentication-provider');
   var authTypeOptions = JSON.parse(selectorNode.getAttribute('data-options'));
@@ -122,4 +121,3 @@ define([
       $provisioning_elements.find("input[type='checkbox']").removeAttr('checked');
     }
   });
-});

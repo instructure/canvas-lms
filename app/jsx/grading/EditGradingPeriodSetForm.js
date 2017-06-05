@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import _ from 'underscore'
 import $ from 'jquery'
@@ -26,7 +27,7 @@ import I18n from 'i18n!grading_periods'
 import EnrollmentTermInput from 'jsx/grading/EnrollmentTermInput'
 import 'compiled/jquery.rails_flash_notifications'
 
-  const { array, bool, func, shape, string } = React.PropTypes;
+  const { array, bool, func, shape, string } = PropTypes;
 
   const buildSet = function(attr = {}) {
     return {

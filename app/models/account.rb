@@ -521,14 +521,14 @@ class Account < ActiveRecord::Base
   end
 
   def self.account_lookup_cache_key(id)
-    ['_account_lookup4', id].cache_key
+    ['_account_lookup5', id].cache_key
   end
 
   def self.invalidate_cache(id)
     return unless id
-    birth_id = Shard.relative_id_for(id, Shard.current, Shard.birth)
-    Shard.birth.activate do
-      Rails.cache.delete(account_lookup_cache_key(birth_id)) if birth_id
+    default_id = Shard.relative_id_for(id, Shard.current, Shard.default)
+    Shard.default.activate do
+      Rails.cache.delete(account_lookup_cache_key(default_id)) if default_id
     end
   rescue
     nil
@@ -1170,11 +1170,11 @@ class Account < ActiveRecord::Base
   class ::Canvas::AccountCacheError < StandardError; end
 
   def self.find_cached(id)
-    birth_id = Shard.relative_id_for(id, Shard.current, Shard.birth)
-    Shard.birth.activate do
-      Rails.cache.fetch(account_lookup_cache_key(birth_id)) do
+    default_id = Shard.relative_id_for(id, Shard.current, Shard.default)
+    Shard.default.activate do
+      Rails.cache.fetch(account_lookup_cache_key(default_id)) do
         begin
-          account = Account.find(birth_id)
+          account = Account.find(default_id)
         rescue ActiveRecord::RecordNotFound => e
           raise ::Canvas::AccountCacheError, e.message
         end
@@ -1364,7 +1364,7 @@ class Account < ActiveRecord::Base
       tabs = []
       if user && self.grants_right?(user, :read_roster)
         if feature_enabled?(:course_user_search)
-          tabs << { :id => TAB_SEARCH, :label => t("Search"), :css_class => 'search', :href => :account_course_user_search_path }
+          tabs << { :id => TAB_SEARCH, :label => t("Courses & People"), :css_class => 'search', :href => :account_course_user_search_path }
         else
           tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :css_class => 'users', :href => :account_users_path }
         end
@@ -1377,7 +1377,7 @@ class Account < ActiveRecord::Base
     else
       tabs = []
       if feature_enabled?(:course_user_search)
-        tabs << { :id => TAB_SEARCH, :label => t("Search"), :css_class => 'search', :href => :account_path } if user && (grants_right?(user, :read_course_list) || grants_right?(user, :read_roster))
+        tabs << { :id => TAB_SEARCH, :label => t("Courses & People"), :css_class => 'search', :href => :account_path } if user && (grants_right?(user, :read_course_list) || grants_right?(user, :read_roster))
       else
         tabs << { :id => TAB_COURSES, :label => t('#account.tab_courses', "Courses"), :css_class => 'courses', :href => :account_path } if user && self.grants_right?(user, :read_course_list)
         tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :css_class => 'users', :href => :account_users_path } if user && self.grants_right?(user, :read_roster)

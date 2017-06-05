@@ -41,6 +41,7 @@ test('clicking open button sets isOpen to true', () => {
 
   const instance = tree.instance()
   equal(instance.state.isOpen, true)
+  tree.unmount()
 })
 
 test('clicking close button sets isOpen to false', () => {
@@ -55,4 +56,5 @@ test('clicking close button sets isOpen to false', () => {
   btnWrapper.at(0).simulate('click')
 
   equal(instance.state.isOpen, false)
+  tree.unmount()
 })

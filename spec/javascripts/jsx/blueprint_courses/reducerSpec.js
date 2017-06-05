@@ -19,6 +19,7 @@
 import actions from 'jsx/blueprint_courses/actions'
 import reducer from 'jsx/blueprint_courses/reducer'
 import MigrationStates from 'jsx/blueprint_courses/migrationStates'
+import LoadStates from 'jsx/blueprint_courses/loadStates'
 import sampleData from './sampleData'
 
 QUnit.module('Blurpint Courses reducer')
@@ -219,31 +220,31 @@ test('sets isLoadingHistory to false on LOAD_HISTORY_FAIL', () => {
   equal(newState.isLoadingHistory, false)
 })
 
-test('sets isLoadingUnynchedChanges to true on LOAD_UNSYNCHED_CHANGES_START', () => {
-  const newState = reduce(actions.loadUnsynchedChangesStart())
-  equal(newState.isLoadingUnsynchedChanges, true)
+test('sets isLoadingUnynchedChanges to true on LOAD_UNSYNCED_CHANGES_START', () => {
+  const newState = reduce(actions.loadUnsyncedChangesStart())
+  equal(newState.isLoadingUnsyncedChanges, true)
 })
-test('sets isLoadingUnynchedChanges to false on LOAD_UNSYNCHED_CHANGES_SUCCESS', () => {
-  const newState = reduce(actions.loadUnsynchedChangesSuccess({}))
-  equal(newState.isLoadingUnsynchedChanges, false)
+test('sets isLoadingUnynchedChanges to false on LOAD_UNSYNCED_CHANGES_SUCCESS', () => {
+  const newState = reduce(actions.loadUnsyncedChangesSuccess({}))
+  equal(newState.isLoadingUnsyncedChanges, false)
 })
-test('sets isLoadingUnynchedChanges to alse on LOAD_UNSYNCHED_CHANGES_FAIL', () => {
-  const newState = reduce(actions.loadUnsynchedChangesFail())
-  equal(newState.isLoadingUnsynchedChanges, false)
-})
-
-test('sets hasLoadedUnsynchedChanges to false on LOAD_UNSYNCHED_CHANGES_START', () => {
-  const newState = reduce(actions.loadUnsynchedChangesStart())
-  equal(newState.hasLoadedUnsynchedChanges, false)
-})
-test('sets hasLoadedUnsynchedChanges to true on LOAD_UNSYNCHED_CHANGES_SUCCESS', () => {
-  const newState = reduce(actions.loadUnsynchedChangesSuccess({}))
-  equal(newState.hasLoadedUnsynchedChanges, true)
+test('sets isLoadingUnynchedChanges to alse on LOAD_UNSYNCED_CHANGES_FAIL', () => {
+  const newState = reduce(actions.loadUnsyncedChangesFail())
+  equal(newState.isLoadingUnsyncedChanges, false)
 })
 
-test('sets unsynchedChanges on LOAD_UNSYNCHED_CHANGES_SUCCESS', () => {
-  const newState = reduce(actions.loadUnsynchedChangesSuccess(sampleData.unsynchedChanges))
-  deepEqual(newState.unsynchedChanges, sampleData.unsynchedChanges)
+test('sets hasLoadedUnsyncedChanges to false on LOAD_UNSYNCED_CHANGES_START', () => {
+  const newState = reduce(actions.loadUnsyncedChangesStart())
+  equal(newState.hasLoadedUnsyncedChanges, false)
+})
+test('sets hasLoadedUnsyncedChanges to true on LOAD_UNSYNCED_CHANGES_SUCCESS', () => {
+  const newState = reduce(actions.loadUnsyncedChangesSuccess({}))
+  equal(newState.hasLoadedUnsyncedChanges, true)
+})
+
+test('sets unsyncedChanges on LOAD_UNSYNCED_CHANGES_SUCCESS', () => {
+  const newState = reduce(actions.loadUnsyncedChangesSuccess(sampleData.unsyncedChanges))
+  deepEqual(newState.unsyncedChanges, sampleData.unsyncedChanges)
 })
 
 test('sets willSendNotification on ENABLE_SEND_NOTIFICATION', () => {
@@ -251,4 +252,77 @@ test('sets willSendNotification on ENABLE_SEND_NOTIFICATION', () => {
   equal(newState.willSendNotification, true)
   newState = reduce(actions.enableSendNotification(false))
   equal(newState.willSendNotification, false)
+})
+
+test('sets willIncludeCourseSettings on INCLUDE_COURSE_SETTINGS', () => {
+  let newState = reduce(actions.includeCourseSettings(true))
+  equal(newState.willIncludeCourseSettings, true)
+  newState = reduce(actions.includeCourseSettings(false))
+  equal(newState.willIncludeCourseSettings, false)
+})
+
+test('creates empty change log entry on SELECT_CHANGE_LOG', () => {
+  const newState = reduce(actions.realSelectChangeLog({ changeId: '5' }))
+  deepEqual(newState.changeLogs, { 5: {
+    changeId: '5',
+    status: LoadStates.states.not_loaded,
+    data: null,
+  } })
+})
+
+test('sets change log status to loading on LOAD_CHANGE_START', () => {
+  const newState = reduce(actions.loadChangeStart({ changeId: '5' }))
+  deepEqual(newState.changeLogs, { 5: {
+    changeId: '5',
+    status: LoadStates.states.loading,
+    data: null,
+  } })
+})
+
+test('sets change log data and status to loaded on LOAD_CHANGE_SUCCESS', () => {
+  const newState = reduce(actions.loadChangeSuccess({ changeId: '5', changes: ['1', '2'] }))
+  deepEqual(newState.changeLogs, { 5: {
+    changeId: '5',
+    status: LoadStates.states.loaded,
+    data: { changeId: '5', changes: ['1', '2'] },
+  } })
+})
+
+test('sets change log status to not loaded on LOAD_CHANGE_FAILED', () => {
+  const newState = reduce(actions.loadChangeFail({ changeId: '5' }))
+  deepEqual(newState.changeLogs, { 5: {
+    changeId: '5',
+    status: LoadStates.states.not_loaded,
+    data: null,
+  } })
+})
+
+test('catches any action with err and message and treats it as an error notification', () => {
+  const newState = reduce({ type: '_NOT_A_REAL_ACTION_', payload: { message: 'hello world', err: 'bad things happened' } })
+  equal(newState.notifications.length, 1)
+  equal(newState.notifications[0].type, 'error')
+  equal(newState.notifications[0].message, 'hello world')
+  equal(newState.notifications[0].err, 'bad things happened')
+})
+
+test('adds new info notification on NOTIFY_INFO', () => {
+  const newState = reduce(actions.notifyInfo({ message: 'hello world' }))
+  equal(newState.notifications.length, 1)
+  equal(newState.notifications[0].type, 'info')
+  equal(newState.notifications[0].message, 'hello world')
+})
+
+test('adds new error notification on NOTIFY_ERROR', () => {
+  const newState = reduce(actions.notifyError({ message: 'hello world', err: 'bad things happened' }))
+  equal(newState.notifications.length, 1)
+  equal(newState.notifications[0].type, 'error')
+  equal(newState.notifications[0].message, 'hello world')
+  equal(newState.notifications[0].err, 'bad things happened')
+})
+
+test('clear notification on CLEAR_NOTIFICATION', () => {
+  const newState = reduce(actions.clearNotification('1'), {
+    notifications: [{ id: '1', message: 'hello world', type: 'info' }]
+  })
+  equal(newState.notifications.length, 0)
 })

@@ -17,9 +17,10 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import I18n from 'i18n!choose_mastery_path'
-  const { func, bool } = React.PropTypes
+  const { func, bool } = PropTypes
 
 export default class SelectButton extends React.Component {
     static propTypes = {

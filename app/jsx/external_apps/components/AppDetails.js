@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!external_tools'
 import React from 'react'
+import PropTypes from 'prop-types'
 import page from 'page'
 import Header from 'jsx/external_apps/components/Header'
 import AddApp from 'jsx/external_apps/components/AddApp'
@@ -27,9 +28,9 @@ export default React.createClass({
     displayName: 'AppDetails',
 
     propTypes: {
-      store: React.PropTypes.object.isRequired,
-      baseUrl: React.PropTypes.string.isRequired,
-      shortName: React.PropTypes.string.isRequired
+      store: PropTypes.object.isRequired,
+      baseUrl: PropTypes.string.isRequired,
+      shortName: PropTypes.string.isRequired
     },
 
     getInitialState() {

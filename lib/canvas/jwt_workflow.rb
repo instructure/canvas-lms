@@ -55,7 +55,14 @@ module Canvas
         can_upload_files: (
           user &&
           context &&
-          context.grants_any_right?(user, :manage_files)
+          context.grants_right?(user, :manage_files)
+        ) || false,
+        can_create_pages: (
+          user &&
+          context &&
+          context.respond_to?(:wiki) &&
+          context.wiki_id &&
+          context.wiki.grants_right?(user, :create_page)
         ) || false
       }
     end

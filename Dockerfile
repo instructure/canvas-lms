@@ -1,3 +1,7 @@
+# GENERATED FILE, DO NOT MODIFY!
+# To update this file please edit the relevant template and run the generation
+# task `build/dockerfile_writer.rb`
+
 # See doc/docker/README.md or https://github.com/instructure/canvas-lms/tree/master/doc/docker
 FROM instructure/ruby-passenger:2.4
 
@@ -12,37 +16,41 @@ ENV DISABLE_V8_COMPILE_CACHE 1
 
 USER root
 WORKDIR /root
-RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -\
-  && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -\
+RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - \
+  && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - \
   && echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list \
+  && printf 'path-exclude /usr/share/doc/*\npath-exclude /usr/share/man/*' > /etc/dpkg/dpkg.cfg.d/01_nodoc \
   && apt-get update -qq \
-  && apt-get install -qqy \
+  && apt-get install -qqy --no-install-recommends \
        nodejs \
        yarn \
-       postgresql-client \
        libxmlsec1-dev \
-       unzip \
-       fontforge \
        python-lxml \
        libicu-dev \
-  && yarn global add gulp \
-  && rm -rf /var/lib/apt/lists/*\
+       postgresql-client \
+       unzip \
+       fontforge \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /home/docker/.gem/ruby/$RUBY_MAJOR.0
 
-# We will need sfnt2woff in order to build fonts
 RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="-i /var/lib/gems/$RUBY_MAJOR.0"; fi \
-  && curl -O  https://people-mozilla.org/~jkew/woff/woff-code-latest.zip \
-  && unzip woff-code-latest.zip \
-  && make \
-  && cp sfnt2woff /usr/local/bin \
   && gem uninstall --all --ignore-dependencies --force $BUNDLER_INSTALL bundler \
   && gem install bundler --no-document -v 1.14.3 \
   && gem update --system --no-document \
   && find $GEM_HOME ! -user docker | xargs chown docker:docker
 
+# We will need sfnt2woff in order to build fonts
+RUN curl -O https://people-mozilla.org/~jkew/woff/woff-code-latest.zip \
+  && unzip woff-code-latest.zip -d woff \
+  && cd woff \
+  && make \
+  && cp sfnt2woff /usr/local/bin \
+  && cd - \
+  && rm -rf woff*
+
 WORKDIR $APP_HOME
 
-USER root
 COPY Gemfile      ${APP_HOME}
 COPY Gemfile.d    ${APP_HOME}Gemfile.d
 COPY config       ${APP_HOME}config
@@ -50,7 +58,7 @@ COPY gems         ${APP_HOME}gems
 COPY script       ${APP_HOME}script
 COPY package.json ${APP_HOME}
 COPY yarn.lock    ${APP_HOME}
-RUN chown -R docker:docker ${APP_HOME} /home/docker
+RUN find gems -type d ! -user docker -print0 | xargs -0 chown -h docker:docker
 
 # Install deps as docker to avoid sadness w/ npm lifecycle hooks
 USER docker
@@ -59,14 +67,23 @@ RUN bundle install --jobs 8 \
 USER root
 
 COPY . $APP_HOME
-RUN mkdir -p log \
-             tmp \
-             public/javascripts/client_apps \
-             public/dist \
-             public/assets \
+RUN mkdir -p .yardoc \
+             app/stylesheets/brandable_css_brands \
              client_apps/canvas_quizzes/node_modules \
-             /home/docker/.cache/yarn/.tmp \
-  && chown -R docker:docker ${APP_HOME} /home/docker
+             gems/canvas_i18nliner/node_modules \
+             gems/selinimum/node_modules \
+             log \
+             node_modules \
+             public/dist \
+             public/doc/api \
+             public/javascripts/client_apps \
+             public/javascripts/compiled \
+             tmp \
+             /home/docker/.bundler/ \
+             /home/docker/.cache/yarn \
+             /home/docker/.gem/ \
+  && find ${APP_HOME} /home/docker ! -user docker -print0 | xargs -0 chown -h docker:docker
 
 USER docker
-RUN bundle exec rake canvas:compile_assets
+# TODO: switch to canvas:compile_assets_dev once we stop using this Dockerfile in production/e2e
+RUN COMPILE_ASSETS_NPM_INSTALL=0 bundle exec rake canvas:compile_assets

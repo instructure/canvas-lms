@@ -17,10 +17,11 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import IcInput from './IcInput'
 import classnames from 'classnames'
 
-  var { string } = React.PropTypes;
+  var { string } = PropTypes;
 
   /**
    * A checkbox input wrapped with appropriate ic-Form-* elements and

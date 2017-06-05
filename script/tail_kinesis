@@ -2,7 +2,7 @@
 
 require File.expand_path('../../config/boot',  __FILE__)
 
-require 'aws-sdk'
+require 'aws-sdk-kinesis'
 require 'json'
 require 'pp'
 
