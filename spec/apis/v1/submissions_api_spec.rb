@@ -70,7 +70,7 @@ describe 'Submissions API', type: :request do
       "url"=>nil,
       "submission_type"=>nil,
       "submission_comments"=>[],
-      "grade_matches_current_submission"=>nil,
+      "grade_matches_current_submission"=>true,
       "score"=>nil,
       "workflow_state"=>"unsubmitted",
       "late"=>false,
@@ -915,7 +915,7 @@ describe 'Submissions API', type: :request do
            "submission_type"=>"online_text_entry",
            "user_id"=>student1.id,
            "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=1",
-           "grade_matches_current_submission"=>nil,
+           "grade_matches_current_submission"=>true,
            "score"=>nil,
            "workflow_state" => "submitted",
            "late"=>false,
@@ -943,7 +943,7 @@ describe 'Submissions API', type: :request do
            "submission_type"=>"online_text_entry",
            "user_id"=>student1.id,
            "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=2",
-           "grade_matches_current_submission"=>nil,
+           "grade_matches_current_submission"=>true,
            "score"=>nil,
            "workflow_state" => "submitted",
            "late"=>false,
@@ -1359,7 +1359,7 @@ describe 'Submissions API', type: :request do
               :format => 'json', :course_id => @course.to_param },
             { :student_ids => [@student1.to_param, @student2.to_param] })
 
-      expect(json.size).to eq 3
+      expect(json.size).to eq 4
 
       json = api_call(:get,
             "/api/v1/courses/#{@course.id}/students/submissions.json",
@@ -1797,7 +1797,7 @@ describe 'Submissions API', type: :request do
           { :student_ids => [student1.to_param, student2.to_param], :grouped => '1' })
 
     expect(json.size).to eq 2
-    expect(json.map { |u| u['submissions'] }.flatten.size).to eq 3
+    expect(json.map { |u| u['submissions'] }.flatten.size).to eq 4
 
     json = api_call(:get,
           "/api/v1/courses/#{@course.id}/students/submissions.json",
@@ -1808,33 +1808,6 @@ describe 'Submissions API', type: :request do
 
     expect(json.size).to eq 2
     json.each { |user| user['submissions'].each { |s| expect(s['assignment_id']).to eq a1.id } }
-  end
-
-  it "returns students with no submissions when grouped" do
-    student1 = user_factory(active_all: true)
-    student2 = user_with_pseudonym(:active_all => true)
-    student2.pseudonym.update_attribute(:sis_user_id, 'my-student-id')
-
-    course_with_teacher(:active_all => true)
-
-    @course.enroll_student(student1).accept!
-    @course.enroll_student(student2).accept!
-
-    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
-    a2 = @course.assignments.create!(:title => 'assignment2', :grading_type => 'letter_grade', :points_possible => 25)
-
-    submit_homework(a1, student1)
-    submit_homework(a2, student1)
-
-    json = api_call(:get,
-          "/api/v1/courses/#{@course.id}/students/submissions.json",
-          { :controller => 'submissions_api', :action => 'for_students',
-            :format => 'json', :course_id => @course.to_param },
-          { :student_ids => [student1.to_param, student2.to_param], :grouped => '1' })
-
-    expect(json.size).to eq 2
-    expect(json.detect { |u| u['user_id'] == student1.id }['submissions'].size).to eq 2
-    expect(json.detect { |u| u['user_id'] == student2.id }['submissions'].size).to eq 0
   end
 
   context "with grading periods" do
@@ -1876,7 +1849,7 @@ describe 'Submissions API', type: :request do
         { :student_ids => [@student1.to_param, @student2.to_param], :grouped => '1',
           :grading_period_id => @gp2.to_param})
       expect(json.detect { |u| u['user_id'] == @student1.id }['submissions'].size).to eq 1
-      expect(json.detect { |u| u['user_id'] == @student2.id }['submissions'].size).to eq 0
+      expect(json.detect { |u| u['user_id'] == @student2.id }['submissions'].size).to eq 1
     end
 
     it "does not return an error when no grading_period_id is provided" do
@@ -1958,6 +1931,7 @@ describe 'Submissions API', type: :request do
             { 'user_id' => @student2.id, 'assignment_id' => @assignment1.id, 'score' => 10 },
             { 'user_id' => @student2.id, 'assignment_id' => @assignment2.id, 'score' => 20 },
             { 'user_id' => @student3.id, 'assignment_id' => @assignment1.id, 'score' => 20 },
+            { 'user_id' => @student3.id, 'assignment_id' => @assignment2.id, 'score' => nil },
         ]
       end
     end
@@ -2113,7 +2087,8 @@ describe 'Submissions API', type: :request do
           expect(json.map { |entry| entry.slice('user_id', 'assignment_id', 'score') }.sort_by { |entry| [entry['user_id'], entry['assignment_id']] }).to eq [
               { 'user_id' => @student1.id, 'assignment_id' => @assignment1.id, 'score' => 15 },
               { 'user_id' => @student1.id, 'assignment_id' => @assignment2.id, 'score' => 25 },
-              { 'user_id' => @observer.id, 'assignment_id' => @assignment1.id, 'score' => 5 }
+              { 'user_id' => @observer.id, 'assignment_id' => @assignment1.id, 'score' => 5 },
+              { 'user_id' => @observer.id, 'assignment_id' => @assignment2.id, 'score' => nil }
           ]
         end
 
@@ -2129,7 +2104,8 @@ describe 'Submissions API', type: :request do
               { 'user_id' => @student1.id, 'assignment_id' => @assignment2.id, 'score' => 25 },
               { 'user_id' => @student2.id, 'assignment_id' => @assignment1.id, 'score' => 10 },
               { 'user_id' => @student2.id, 'assignment_id' => @assignment2.id, 'score' => 20 },
-              { 'user_id' => @observer.id, 'assignment_id' => @assignment1.id, 'score' => 5 }
+              { 'user_id' => @observer.id, 'assignment_id' => @assignment1.id, 'score' => 5 },
+              { 'user_id' => @observer.id, 'assignment_id' => @assignment2.id, 'score' => nil }
           ]
         end
       end
