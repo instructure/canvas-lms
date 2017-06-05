@@ -18,7 +18,7 @@
 
 require_relative '../helpers/blueprint_common'
 
-describe "master courses sidebar" do
+describe "master courses banner" do
   include_context "in-process server selenium tests"
 
   # copied from spec/apis/v1/master_templates_api_spec.rb
@@ -48,19 +48,29 @@ describe "master courses sidebar" do
       user_session(@master_teacher)
     end
 
-    it "locks down the associated course's assignment fields", priority: "1", test_id: 3127590 do
-      change_blueprint_settings(@master, points: true, due_dates: true, availability_dates: true)
-      get "/courses/#{@master.id}/assignments/#{@original_assmt.id}"
-      f('.bpc-lock-toggle button').click
-      expect { f('.bpc-lock-toggle__label').text }.to become('Locked')
-      run_master_migration
-      get "/courses/#{@minion.id}/assignments/#{@copy_assmt.id}/edit"
-      expect(f('#mceu_24')).not_to be nil
-      expect(f('.bpc-lock-toggle__label').text).to eq('Locked')
-      expect(f('#assignment_points_possible').attribute('readonly')).to be_truthy
-      expect(f('#due_at').attribute('readonly')).to be_truthy
-      expect(f('#unlock_at').attribute('readonly')).to be_truthy
-      expect(f('#lock_at').attribute('readonly')).to be_truthy
+    context "for assignments" do
+      it "locks down the content and show banner", priority: "2", test_id: 3127585 do
+        change_blueprint_settings(@master, content: true)
+        get "/courses/#{@master.id}/assignments/#{@original_assmt.id}"
+        f('.bpc-lock-toggle button').click
+        expect { f('.bpc-lock-toggle__label').text }.to become('Locked')
+        expect(f('#blueprint-lock-banner')).to include_text('Content')
+        run_master_migration
+        get "/courses/#{@minion.id}/assignments/#{@copy_assmt.id}/edit"
+        expect(f('#edit_assignment_wrapper')).not_to contain_css('#mceu_24')
+        expect(f('.bpc-lock-toggle__label').text).to eq('Locked')
+        expect(f('#blueprint-lock-banner')).to include_text('Content')
+      end
+
+      it "shows locked banner when locking", priority:"1", test_id: 3127589 do
+        change_blueprint_settings(@master, content: true, points: true, due_dates: true, availability_dates: true)
+        get "/courses/#{@master.id}/assignments/#{@original_assmt.id}"
+        span_element = f('.assignment-buttons').find_element(:xpath, "//span/span[text()[contains(.,'Unlocked')]]")
+        span_element.find_element(:xpath, "//span/button").click
+        result = driver.find_elements(:xpath, "//div[@id='blueprint-lock-banner']//div[2]/span")
+        result = result.map(&:text)
+        expect(result).to eq(['Locked: ', 'Content, Points, Due Dates & Availability Dates'])
+      end
     end
   end
 end

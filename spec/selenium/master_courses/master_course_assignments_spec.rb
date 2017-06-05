@@ -46,14 +46,4 @@ describe "master courses - assignment locking" do
     get "/courses/#{@course.id}/assignments"
     expect(f('[data-view="lock-icon"] i.icon-blueprint-lock')).to be_displayed
   end
-
-  it "shows locked banner when locking an assignment", priority:"1", test_id: 3127589 do
-    change_blueprint_settings(@course, content: true, points: true, due_dates: true, availability_dates: true)
-    get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-    span_element = f('.assignment-buttons').find_element(:xpath, "//span/span[text()[contains(.,'Unlocked')]]")
-    span_element.find_element(:xpath, "//span/button").click
-    result = driver.find_elements(:xpath, "//div[@id='blueprint-lock-banner']//div[2]/span")
-    result = result.map(&:text)
-    expect(result).to eq(['Locked: ', 'Content, Points, Due Dates & Availability Dates'])
-  end
 end
