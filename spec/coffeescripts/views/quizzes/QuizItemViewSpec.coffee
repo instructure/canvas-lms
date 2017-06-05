@@ -113,6 +113,13 @@ define [
     view = createView(quiz, canManage: true, post_to_sis: true)
     ok view.sisButtonView
 
+  test "does not initialize sis toggle if post_to_sis feature option disabled", ->
+    quiz = createQuiz(id: 1, title: 'Foo', can_update: true, published: true)
+    quiz.set('post_to_sis', true)
+    view = createView(quiz, canManage: true, post_to_sis: false)
+    console.log('end spec')
+    ok !view.sisButtonView
+
   test "does not initialize sis toggle if post to sis is null", ->
     quiz = createQuiz(id: 1, title: 'Foo', can_update: true)
     quiz.set('post_to_sis', null)
