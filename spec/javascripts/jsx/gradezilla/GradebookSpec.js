@@ -1399,31 +1399,43 @@ test('only returns submissions due for the student in the selected grading perio
   propEqual(_.pluck(submissions, 'assignment_id'), ['2']);
 });
 
-QUnit.module('Gradebook#studentsUrl', {
+QUnit.module('Gradebook#studentsParams', {
   setup () {
     this.gradebook = createGradebook();
-    this.stub(this.gradebook, 'getEnrollmentFilters').returns({ concluded: false, inactive: false });
+    this.gradebook.fetchedEnrollmentStates = []
   }
 });
 
-test('enrollmentUrl returns "students_url"', function () {
-  equal(this.gradebook.studentsUrl(), 'students_url');
+test('enrollment_state includes "completed" when concluded filter is on', function () {
+  this.stub(this.gradebook, 'getEnrollmentFilters').returns({ concluded: true, inactive: false });
+  ok(this.gradebook.studentsParams().enrollment_state.includes('completed'));
 });
 
-test('when concluded only, enrollmentUrl returns "students_with_concluded_enrollments_url"', function () {
-  this.gradebook.getEnrollmentFilters.returns({ concluded: true, inactive: false })
-  equal(this.gradebook.studentsUrl(), 'students_with_concluded_enrollments_url');
+test('enrollment_state excludes "completed" when concluded filter is off', function () {
+  this.stub(this.gradebook, 'getEnrollmentFilters').returns({ concluded: false, inactive: false });
+  notOk(this.gradebook.studentsParams().enrollment_state.includes('completed'));
 });
 
-test('when inactive only, enrollmentUrl returns "students_with_inactive_enrollments_url"', function () {
-  this.gradebook.getEnrollmentFilters.returns({ concluded: false, inactive: true })
-  equal(this.gradebook.studentsUrl(), 'students_with_inactive_enrollments_url');
+test('enrollment_state includes "inactive" when inactive filter is on', function () {
+  this.stub(this.gradebook, 'getEnrollmentFilters').returns({ concluded: false, inactive: true });
+  ok(this.gradebook.studentsParams().enrollment_state.includes('inactive'));
 });
 
-test('when show concluded and hide inactive are true, enrollmentUrl returns ' +
-  '"students_with_concluded_and_inactive_enrollments_url"', function () {
-  this.gradebook.getEnrollmentFilters.returns({ concluded: true, inactive: true })
-  equal(this.gradebook.studentsUrl(), 'students_with_concluded_and_inactive_enrollments_url');
+test('enrollment_state excludes "inactive" when inactive filter is off', function () {
+  this.stub(this.gradebook, 'getEnrollmentFilters').returns({ concluded: false, inactive: false });
+  notOk(this.gradebook.studentsParams().enrollment_state.includes('inactive'));
+});
+
+test('enrollment_state includes "active" and "invited" by default', function () {
+  this.stub(this.gradebook, 'getEnrollmentFilters').returns({ concluded: false, inactive: false });
+  ok(this.gradebook.studentsParams().enrollment_state.includes('active'));
+  ok(this.gradebook.studentsParams().enrollment_state.includes('invited'));
+});
+
+test('enrollment_state excludes values present in fetchedEnrollmentStates', function () {
+  this.gradebook.fetchedEnrollmentStates = ['active']
+  this.stub(this.gradebook, 'getEnrollmentFilters').returns({ concluded: false, inactive: false });
+  notOk(this.gradebook.studentsParams().enrollment_state.includes('active'));
 });
 
 QUnit.module('Gradebook#weightedGroups', {
@@ -3380,6 +3392,7 @@ test('includes properties from gradebook', function () {
     login_handle_name: 'foo',
     sis_name: 'bar'
   });
+  gradebook.setStudentsLoaded(false);
   const props = gradebook.getStudentColumnHeaderProps();
   ok(props.selectedSecondaryInfo, 'selectedSecondaryInfo is present');
   ok(props.selectedPrimaryInfo, 'selectedPrimaryInfo is present');
@@ -3388,6 +3401,7 @@ test('includes properties from gradebook', function () {
   equal(typeof props.onSelectPrimaryInfo, 'function');
   equal(props.loginHandleName, 'foo');
   equal(props.sisName, 'bar');
+  equal(props.disabled, true);
 });
 
 test('includes a ref callback to store the component reference', function () {

@@ -338,6 +338,7 @@ class GradebooksController < ApplicationController
         enrollments_with_concluded_and_inactive_url:
           custom_course_enrollments_api_url(include_concluded: true, include_inactive: true, per_page: per_page),
         students_url: custom_course_users_api_url(per_page: per_page),
+        students_stateless_url: custom_course_users_api_url(exclude_states: true, per_page: per_page),
         students_with_concluded_enrollments_url:
           custom_course_users_api_url(include_concluded: true, per_page: per_page),
         students_with_inactive_enrollments_url:
@@ -897,10 +898,12 @@ class GradebooksController < ApplicationController
     options
   end
 
-  def custom_course_users_api_url(include_concluded: false, include_inactive: false, per_page:)
+  def custom_course_users_api_url(include_concluded: false, include_inactive: false, exclude_states: false, per_page:)
     state = %w[active invited]
     state << 'completed' if include_concluded
     state << 'inactive'  if include_inactive
+    state = [] if exclude_states
+
     api_v1_course_users_url(
       @context,
       include: %i[avatar_url group_ids enrollments],

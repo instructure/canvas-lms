@@ -100,6 +100,54 @@ test('renders a title for the More icon', function () {
   strictEqual(selectedElements.props().title, 'Student Name Options');
 });
 
+QUnit.module('StudentColumnHeader disabled prop', {
+  setup () {
+    this.mountAndOpenOptions = mountAndOpenOptions;
+  }
+});
+
+test('renders flyout menus disabled when prop is true', function () {
+  this.wrapper = findMenuContent.call(this, defaultProps({props: {disabled: true}}));
+  const flyoutMenus = this.wrapper.find('MenuItemFlyout');
+
+  flyoutMenus.forEach((flyoutMenu) => {
+    ok(flyoutMenu.prop('disabled'));
+  });
+});
+
+test('renders menu items disabled when prop is true', function () {
+  this.wrapper = findMenuContent.call(this, defaultProps({props: {disabled: true}}));
+  const menuItemGroups = this.wrapper.find('MenuItemGroup');
+
+  menuItemGroups.forEach((menuItemGroup) => {
+    const menuItems = menuItemGroup.find('MenuItem');
+    menuItems.forEach((menuItem) => {
+      ok(menuItem.prop('disabled'));
+    })
+  });
+});
+
+test('renders flyout menus enabled when prop is false', function () {
+  this.wrapper = findMenuContent.call(this, defaultProps({props: {disabled: false}}));
+  const flyoutMenus = this.wrapper.find('MenuItemFlyout');
+
+  flyoutMenus.forEach((flyoutMenu) => {
+    notOk(flyoutMenu.prop('disabled'));
+  });
+});
+
+test('renders menu items enabled when prop is false', function () {
+  this.wrapper = findMenuContent.call(this, defaultProps({props: {disabled: false}}));
+  const menuItemGroups = this.wrapper.find('MenuItemGroup');
+
+  menuItemGroups.forEach((menuItemGroup) => {
+    const menuItems = menuItemGroup.find('MenuItem');
+    menuItems.forEach((menuItem) => {
+      notOk(menuItem.prop('disabled'));
+    })
+  });
+});
+
 QUnit.module('StudentColumnHeader: Secondary info', {
   setup () {
     this.mountAndOpenOptions = mountAndOpenOptions;

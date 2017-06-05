@@ -192,6 +192,24 @@ define [
     gridReady: $.Deferred()
 
     constructor: (@options) ->
+      # emitted by AssignmentGroupWeightsDialog
+      $.subscribe 'assignment_group_weights_changed', @handleAssignmentGroupWeightChange
+
+      $.subscribe 'assignment_muting_toggled',        @handleAssignmentMutingChange
+      $.subscribe 'submissions_updated',              @updateSubmissionsFromExternal
+
+      # emitted by SectionMenuView; also subscribed in OutcomeGradebookView
+      $.subscribe 'currentSection/change',            @updateCurrentSection
+
+      # emitted by GradingPeriodMenuView
+      $.subscribe 'currentGradingPeriod/change',      @updateCurrentGradingPeriod
+
+      @loadSettings()
+      @loadData()
+
+    # End of constructor
+
+    loadSettings: ->
       @gridDisplaySettings = getInitialGridDisplaySettings(@options.settings)
       @contentLoadStates = getInitialContentLoadStates()
       @courseContent = getInitialCourseContent()
@@ -201,16 +219,11 @@ define [
         @gradingPeriodSet = GradingPeriodSetsApi.deserializeSet(@options.grading_period_set)
       else
         @gradingPeriodSet = null
-
-      @students = {}
-      @studentViewStudents = {}
-      @rows = []
       @assignmentsToHide = UserSettings.contextGet('hidden_columns') || []
       @sectionToShow = UserSettings.contextGet 'grading_show_only_section'
       @sectionToShow = @sectionToShow && String(@sectionToShow)
       @show_attendance = !!UserSettings.contextGet 'show_attendance'
       @include_ungraded_assignments = UserSettings.contextGet 'include_ungraded_assignments'
-      @userFilterRemovedRows = []
       # preferences serialization causes these to always come
       # from the database as strings
       if @options.course_is_concluded || @options.settings.show_concluded_enrollments == 'true'
@@ -223,17 +236,16 @@ define [
       @gradebookColumnOrderSettings = @options.gradebook_column_order_settings
       @teacherNotesNotYetLoaded = !@options.teacher_notes? || @options.teacher_notes.hidden
 
-      # emitted by AssignmentGroupWeightsDialog
-      $.subscribe 'assignment_group_weights_changed', @handleAssignmentGroupWeightChange
+    loadData: ->
+      @students = {}
+      @studentViewStudents = {}
+      @rows = []
+      @fetchedEnrollmentStates = []
+      @fetchData()
 
-      $.subscribe 'assignment_muting_toggled',        @handleAssignmentMutingChange
-      $.subscribe 'submissions_updated',              @updateSubmissionsFromExternal
-
-      # emitted by SectionMenuView; also subscribed in OutcomeGradebookView
-      $.subscribe 'currentSection/change',            @updateCurrentSection
-
-      # emitted by GradingPeriodMenuView
-      $.subscribe 'currentGradingPeriod/change',      @updateCurrentGradingPeriod
+    fetchData: ->
+      return @buildRows() unless @studentsParams().enrollment_state.length
+      @setStudentsLoaded(false)
 
       submissionParams =
         response_fields: ['id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id', 'grade_matches_current_submission', 'attachments', 'late', 'missing', 'workflow_state', 'excused']
@@ -249,8 +261,9 @@ define [
 
         sectionsURL: @options.sections_url
 
-        studentsURL: @options[@studentsUrl()]
+        studentsURL: @options.students_stateless_url
         studentsPageCb: @gotChunkOfStudents
+        studentsParams: @studentsParams()
 
         submissionsURL: @options.submissions_url
         submissionsParams: submissionParams
@@ -261,6 +274,10 @@ define [
         effectiveDueDatesURL: @options.effective_due_dates_url
       )
 
+      # remember loaded states so we don't fetch them again
+      @studentsParams().enrollment_state.forEach (state) =>
+        @fetchedEnrollmentStates.push(state) unless @fetchedEnrollmentStates.includes(state)
+
       gotGroupsAndDueDates = $.when(
         dataLoader.gotAssignmentGroups,
         dataLoader.gotEffectiveDueDates
@@ -269,7 +286,7 @@ define [
       dataLoader.gotCustomColumns.then @gotCustomColumns
       dataLoader.gotStudents.then @gotAllStudents
 
-      $.when(
+      @renderedGrid = $.when(
         dataLoader.gotCustomColumns,
         gotGroupsAndDueDates
       ).then(@doSlickgridStuff)
@@ -309,7 +326,6 @@ define [
         @sortGridRows()
         @updateColumnHeaders()
 
-    # End of constructor
 
     loadOverridesForSIS: ->
       return unless @options.post_grades_feature
@@ -482,6 +498,9 @@ define [
       _.each _.values(@studentViewStudents), (testStudent) =>
         @addRow(testStudent)
 
+      @setStudentsLoaded(true)
+      @renderedGrid.then @renderStudentColumnHeader
+
     studentsThatCanSeeAssignment: (potential_students, assignment) ->
       if assignment.only_visible_to_overrides
         _.pick potential_students, assignment.assignment_visibility...
@@ -653,6 +672,12 @@ define [
     ## Filtering
 
     rowFilter: (student) =>
+      includeByInactive = student.isInactive && @getEnrollmentFilters().inactive
+      includeByConcluded = student.isConcluded && @getEnrollmentFilters().concluded
+      includeByNormal = !student.isConcluded && !student.isInactive
+
+      return false unless includeByInactive || includeByConcluded || includeByNormal
+
       matchingSection = !@sectionToShow || (@sectionToShow in student.sections)
       matchingFilter = if @userFilterTerm == ""
         true
@@ -1946,15 +1971,15 @@ define [
     fieldsToExcludeFromAssignments: ['description', 'needs_grading_count', 'in_closed_grading_period']
     fieldsToIncludeWithAssignments: ['module_ids']
 
-    studentsUrl: ->
-      switch
-        when @getEnrollmentFilters().inactive && @getEnrollmentFilters().concluded
-          'students_with_concluded_and_inactive_enrollments_url'
-        when @getEnrollmentFilters().concluded
-          'students_with_concluded_enrollments_url'
-        when @getEnrollmentFilters().inactive
-          'students_with_inactive_enrollments_url'
-        else 'students_url'
+    studentsParams: ->
+      enrollmentStates = ['invited', 'active']
+
+      if @getEnrollmentFilters().concluded
+        enrollmentStates.push('completed')
+      if @getEnrollmentFilters().inactive
+        enrollmentStates.push('inactive')
+
+      { enrollment_state: _.difference(enrollmentStates, @fetchedEnrollmentStates) }
 
     ## Grid DOM Access/Reference Methods
 
@@ -2090,6 +2115,7 @@ define [
       sortBySetting: @getStudentColumnSortBySetting()
       selectedEnrollmentFilters: @getSelectedEnrollmentFilters()
       onToggleEnrollmentFilter: @toggleEnrollmentFilter
+      disabled: !@contentLoadStates.studentsLoaded
 
     renderStudentColumnHeader: =>
       mountPoint = @getColumnHeaderNode('student')
@@ -2499,7 +2525,7 @@ define [
     applyEnrollmentFilter: () =>
       showInactive = @getEnrollmentFilters().inactive
       showConcluded = @getEnrollmentFilters().concluded
-      @saveSettings({ showInactive, showConcluded }, -> window.location.reload())
+      @saveSettings({ showInactive, showConcluded }, => @fetchData())
 
     getEnrollmentFilters: () =>
       @gridDisplaySettings.showEnrollments

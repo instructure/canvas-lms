@@ -50,7 +50,8 @@ export default class StudentColumnHeader extends ColumnHeader {
       settingKey: string.isRequired
     }).isRequired,
     selectedEnrollmentFilters: arrayOf(oneOf(studentRowHeaderConstants.enrollmentFilterKeys)).isRequired,
-    onToggleEnrollmentFilter: func.isRequired
+    onToggleEnrollmentFilter: func.isRequired,
+    disabled: bool.isRequired,
   };
 
   static defaultProps = {
@@ -126,7 +127,7 @@ export default class StudentColumnHeader extends ColumnHeader {
           }
           onToggle={this.onToggle}
         >
-          <MenuItemFlyout label={I18n.t('Sort by')} contentRef={this.bindSortByMenuContent}>
+          <MenuItemFlyout label={I18n.t('Sort by')} contentRef={this.bindSortByMenuContent} disabled={this.props.disabled}>
             <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>
               <MenuItem
                 selected={selectedSortSetting === 'sortable_name' && direction === 'ascending'}
@@ -146,7 +147,7 @@ export default class StudentColumnHeader extends ColumnHeader {
             </MenuItemGroup>
           </MenuItemFlyout>
 
-          <MenuItemFlyout label={I18n.t('Display as')} contentRef={this.bindDisplayAsMenuContent}>
+          <MenuItemFlyout label={I18n.t('Display as')} contentRef={this.bindDisplayAsMenuContent} disabled={this.props.disabled}>
             <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Display as')}</ScreenReaderContent>}>
               <MenuItem
                 key="first_last"
@@ -172,7 +173,7 @@ export default class StudentColumnHeader extends ColumnHeader {
             </MenuItemGroup>
           </MenuItemFlyout>
 
-          <MenuItemFlyout label={I18n.t('Secondary info')} contentRef={this.bindSecondaryInfoMenuContent}>
+          <MenuItemFlyout label={I18n.t('Secondary info')} contentRef={this.bindSecondaryInfoMenuContent} disabled={this.props.disabled}>
             <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Secondary info')}</ScreenReaderContent>}>
               {
                 this.props.sectionsEnabled &&
@@ -217,6 +218,7 @@ export default class StudentColumnHeader extends ColumnHeader {
               key="inactive"
               selected={this.props.selectedEnrollmentFilters.includes('inactive')}
               onSelect={this.onToggleInactive}
+              disabled={this.props.disabled}
             >
               {studentRowHeaderConstants.enrollmentFilterLabels.inactive}
             </MenuItem>
@@ -225,6 +227,7 @@ export default class StudentColumnHeader extends ColumnHeader {
               key="concluded"
               selected={this.props.selectedEnrollmentFilters.includes('concluded')}
               onSelect={this.onToggleConcluded}
+              disabled={this.props.disabled}
             >
               {studentRowHeaderConstants.enrollmentFilterLabels.concluded}
             </MenuItem>
