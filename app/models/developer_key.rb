@@ -149,7 +149,7 @@ class DeveloperKey < ActiveRecord::Base
   # verify that the given uri has the same domain as this key's
   # redirect_uri domain.
   def redirect_domain_matches?(redirect_uri)
-    return true if redirect_uris.include?(redirect_uri)
+    return true if redirect_uris.include?(redirect_uri.to_s.split('?').first)
 
     # legacy deprecated
     self_domain = URI.parse(self.redirect_uri).host
