@@ -2149,6 +2149,48 @@ test('removes the grading period select when filter is deselected', function () 
   strictEqual(this.container.children.length, 0, 'nothing was rendered');
 });
 
+QUnit.module('Gradebook#updateModulesFilterVisibility', {
+  setup () {
+    const modulesFilterContainerSelector = 'modules-filter-container';
+    $fixtures.innerHTML = `<div id="${modulesFilterContainerSelector}"></div>`;
+    this.container = $fixtures.querySelector(`#${modulesFilterContainerSelector}`);
+    this.gradebook = createGradebook();
+    this.gradebook.setContextModules([
+      { id: '1', name: 'Module 1', position: 1 },
+      { id: '2', name: 'Module 2', position: 2 }
+    ]);
+    this.gradebook.setSelectedViewOptionsFilters(['modules']);
+  },
+
+  teardown () {
+    $fixtures.innerHTML = '';
+  }
+});
+
+test('renders the module select when not already rendered', function () {
+  this.gradebook.updateModulesFilterVisibility();
+  ok(this.container.children.length > 0, 'something was rendered');
+});
+
+test('stores a reference to the module select when it is rendered', function () {
+  this.gradebook.updateModulesFilterVisibility();
+  ok(this.gradebook.moduleFilterMenu);
+});
+
+test('does not render when modules do not exist', function () {
+  this.gradebook.setContextModules(undefined);
+  this.gradebook.updateModulesFilterVisibility();
+  notOk(this.gradebook.moduleFilterMenu, 'module filter menu reference has not been stored');
+  strictEqual(this.container.children.length, 0, 'nothing was rendered');
+});
+
+test('does not render when filter is not selected', function () {
+  this.gradebook.setSelectedViewOptionsFilters(['assignmentGroups']);
+  this.gradebook.updateModulesFilterVisibility();
+  notOk(this.gradebook.moduleFilterMenu, 'grading period menu reference has been removed');
+  strictEqual(this.container.children.length, 0, 'rendered elements have been removed');
+});
+
 QUnit.module('Menus', {
   setup () {
     fakeENV.setup({
@@ -2626,28 +2668,32 @@ QUnit.module('Gradebook#filterAssignments', {
         position: 1,
         name: 'published graded',
         published: true,
-        submission_types: ['online_text_entry']
+        submission_types: ['online_text_entry'],
+        module_ids: ['2']
       }, {
         assignment_group: { position: 1 },
         id: '2302',
         position: 2,
         name: 'unpublished',
         published: false,
-        submission_types: ['online_text_entry']
+        submission_types: ['online_text_entry'],
+        module_ids: ['1']
       }, {
         assignment_group: { position: 1 },
         id: '2303',
         position: 3,
         name: 'not graded',
         published: true,
-        submission_types: ['not_graded']
+        submission_types: ['not_graded'],
+        module_ids: ['2']
       }, {
         assignment_group: { position: 1 },
         id: '2304',
         position: 4,
         name: 'attendance',
         published: true,
-        submission_types: ['attendance']
+        submission_types: ['attendance'],
+        module_ids: ['1']
       }
     ];
     this.gradebook = createGradebook();
@@ -2717,6 +2763,18 @@ test('includes assignments from all grading periods grading period set has not b
   this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '1401');
   const assignments = this.gradebook.filterAssignments(this.assignments);
   deepEqual(_.map(assignments, 'id'), ['2301', '2302', '2304']);
+});
+
+test('includes assignments from all modules when not filtering by module', function () {
+  this.gradebook.setFilterColumnsBySetting('contextModuleId', '0'); // All Modules
+  const assignments = this.gradebook.filterAssignments(this.assignments);
+  deepEqual(_.map(assignments, 'id'), ['2301', '2302', '2304']);
+});
+
+test('excludes assignments from other modules when filtering by a module', function () {
+  this.gradebook.setFilterColumnsBySetting('contextModuleId', '2');
+  const assignments = this.gradebook.filterAssignments(this.assignments);
+  deepEqual(_.map(assignments, 'id'), ['2301']);
 });
 
 QUnit.module('Gradebook#groupTotalFormatter', {
@@ -5266,6 +5324,68 @@ test('has no effect when the grading period has not changed', function () {
   this.gradebook.updateCurrentGradingPeriod('1402');
   strictEqual(this.gradebook.saveSettings.callCount, 0, 'saveSettings was not called');
   strictEqual(this.gradebook.resetGrading.callCount, 0, 'resetGrading was not called');
+  strictEqual(this.gradebook.setAssignmentWarnings.callCount, 0, 'setAssignmentVisibility was not called');
+  strictEqual(this.gradebook.updateColumnsAndRenderViewOptionsMenu.callCount, 0,
+    'updateColumnsAndRenderViewOptionsMenu was not called');
+});
+
+QUnit.module('Gradebook#updateCurrentModule', {
+  setup () {
+    this.gradebook = createGradebook({
+      settings: {
+        filter_columns_by: {
+          context_module_id: '2'
+        }
+      }
+    });
+    this.spy(this.gradebook, 'setFilterColumnsBySetting');
+    this.stub($, 'ajaxJSON');
+    this.stub(this.gradebook, 'setAssignmentWarnings');
+    this.stub(this.gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+  }
+});
+
+test('updates the filter setting with the given module id', function () {
+  this.gradebook.updateCurrentModule('1');
+  strictEqual(this.gradebook.getFilterColumnsBySetting('contextModuleId'), '1');
+});
+
+test('saves settings with the new filter setting', function () {
+  this.gradebook.updateCurrentModule('1');
+
+  strictEqual($.ajaxJSON.getCall(0).args[2].gradebook_settings.filter_columns_by.context_module_id, '1');
+});
+
+test('saves settings after updating the filter setting', function () {
+  this.gradebook.updateCurrentModule('1');
+
+  const settingUpdateCallId = this.gradebook.setFilterColumnsBySetting.getCall(0).callId;
+  const settingSaveCallId = $.ajaxJSON.getCall(0).callId;
+
+  ok(settingUpdateCallId < settingSaveCallId, 'settings were saved on the backend after being updated on the front end');
+});
+
+test('sets assignment warnings after updating the filter setting', function () {
+  this.gradebook.updateCurrentModule('1');
+
+  const settingUpdateCallId = this.gradebook.setFilterColumnsBySetting.getCall(0).callId;
+  const setAssignmentWarningsCallId = this.gradebook.setAssignmentWarnings.getCall(0).callId;
+
+  ok(settingUpdateCallId < setAssignmentWarningsCallId, 'grading was reset after setting was updated');
+});
+
+test('updates columns and menus after setting assignment warnings', function () {
+  this.gradebook.updateCurrentModule('1');
+
+  const setAssignmentWarningsCallId = this.gradebook.setAssignmentWarnings.getCall(0).callId;
+  const updateColumnsAndMenusCallId = this.gradebook.updateColumnsAndRenderViewOptionsMenu.getCall(0).callId;
+
+  ok(setAssignmentWarningsCallId < updateColumnsAndMenusCallId, 'columns and menus were updated after setting assignment warnings');
+});
+
+test('has no effect when the module has not changed', function () {
+  this.gradebook.updateCurrentModule('2');
+  strictEqual($.ajaxJSON.callCount, 0, 'saveSettings was not called');
   strictEqual(this.gradebook.setAssignmentWarnings.callCount, 0, 'setAssignmentVisibility was not called');
   strictEqual(this.gradebook.updateColumnsAndRenderViewOptionsMenu.callCount, 0,
     'updateColumnsAndRenderViewOptionsMenu was not called');

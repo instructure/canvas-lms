@@ -45,6 +45,10 @@
           <div class="gradebook-filter-container" id="grading-periods-filter-container"></div>
         <% end %>
 
+        <% if visible_modules? %>
+          <div class="gradebook-filter-container" id="modules-filter-container"></div>
+        <% end %>
+
         <div class="gradebook-filter-container section-button-placeholder"></div>
 
         <div class="gradebook-filter-container gradebook_filter" style="display:none">

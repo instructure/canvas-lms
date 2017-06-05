@@ -65,6 +65,7 @@ define [
   'jsx/gradezilla/default_gradebook/components/GradebookMenu'
   'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu'
   'jsx/gradezilla/default_gradebook/components/ActionMenu'
+  'jsx/gradezilla/default_gradebook/components/ModuleFilter'
   'jsx/gradezilla/default_gradebook/components/GridColor'
   'jsx/gradezilla/default_gradebook/components/StatusesModal'
   'jsx/gradezilla/default_gradebook/components/GradebookSettingsModal'
@@ -102,10 +103,10 @@ define [
   SubmissionCell, NumberCompare, natcompare, ConvertCase, htmlEscape, SetDefaultGradeDialogManager,
   CurveGradesDialogManager, GradebookApi, CellEditorFactory, studentRowHeaderConstants, AssignmentColumnHeader,
   AssignmentGroupColumnHeader, AssignmentRowCellPropFactory, CustomColumnHeader, StudentColumnHeader, StudentRowHeader,
-  TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, GridColor, StatusesModal, GradebookSettingsModal,
-  PostGradesStore, PostGradesApp,  SubmissionStateMap, DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager,
-  GroupTotalCellTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, AssignmentMuterDialogManager,
-  assignmentHelper, { default: Button }, { default: IconSettingsSolid }) ->
+  TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, ModuleFilter, GridColor, StatusesModal,
+  GradebookSettingsModal, PostGradesStore, PostGradesApp,  SubmissionStateMap, DownloadSubmissionsDialogManager,
+  ReuploadSubmissionsDialogManager, GroupTotalCellTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav,
+  AssignmentMuterDialogManager, assignmentHelper, { default: Button }, { default: IconSettingsSolid }) ->
 
   isAdmin = =>
     _.contains(ENV.current_user_roles, 'admin')
@@ -232,7 +233,9 @@ define [
 
       dataLoader = DataLoader.loadGradebookData(
         assignmentGroupsURL: @options.assignment_groups_url
-        assignmentGroupsParams: { exclude_response_fields: @fieldsToExcludeFromAssignments }
+        assignmentGroupsParams:
+          exclude_response_fields: @fieldsToExcludeFromAssignments
+          include: @fieldsToIncludeWithAssignments
         contextModulesURL: @options.context_modules_url
         customColumnsURL: @options.custom_columns_url
 
@@ -633,7 +636,8 @@ define [
       assignmentFilters = [
         @filterAssignmentBySubmissionTypes,
         @filterAssignmentByPublishedStatus,
-        @filterAssignmentByGradingPeriod
+        @filterAssignmentByGradingPeriod,
+        @filterAssignmentByModule
       ]
 
       matchesAllFilters = (assignment) =>
@@ -652,6 +656,15 @@ define [
     filterAssignmentByGradingPeriod: (assignment) =>
       return true unless @isFilteringColumnsByGradingPeriod()
       @getGradingPeriodToShow() in @listGradingPeriodsForAssignment(assignment.id)
+
+    filterAssignmentByModule: (assignment) =>
+      contextModuleFilterSetting = @getFilterColumnsBySetting('contextModuleId')
+      return true unless contextModuleFilterSetting
+      # Firefox returns a value of "null" (String) for this when nothing is set.  The comparison
+      # to 'null' below is a result of that
+      return true if contextModuleFilterSetting == '0' || contextModuleFilterSetting == 'null'
+
+      @getFilterColumnsBySetting('contextModuleId') in (assignment.module_ids || [])
 
     ## Course Content Event Handlers
 
@@ -1098,6 +1111,35 @@ define [
         @setAssignmentWarnings()
         @updateColumnsAndRenderViewOptionsMenu()
 
+    updateCurrentModule: (moduleId) =>
+      if @getFilterColumnsBySetting('contextModuleId') != moduleId
+        @setFilterColumnsBySetting('contextModuleId', moduleId)
+        @saveSettings()
+        @setAssignmentWarnings()
+        @updateColumnsAndRenderViewOptionsMenu()
+        @updateModulesFilterVisibility()
+
+    updateModulesFilterVisibility: () ->
+      mountPoint = document.getElementById('modules-filter-container')
+
+      if @listContextModules()?.length > 0 and 'modules' in @gridDisplaySettings.selectedViewOptionsFilters
+        modules = [
+          {
+            id: '0'
+            name: I18n.t('All Modules')
+            position: -1
+          }
+        ].concat(@listContextModules())
+        props =
+          modules: modules
+          onSelect: @updateCurrentModule
+          selectedModuleId: @getFilterColumnsBySetting('contextModuleId') || '0'
+
+        @moduleFilterMenu = renderComponent(ModuleFilter, mountPoint, props)
+      else if @moduleFilterMenu?
+        ReactDOM.unmountComponentAtNode(mountPoint)
+        @moduleFilterMenu = null
+
     initSubmissionStateMap: =>
       @submissionStateMap = new SubmissionStateMap
         hasGradingPeriods: @gradingPeriodSet?
@@ -1279,6 +1321,7 @@ define [
     renderFilters: =>
       @updateSectionFilterVisibility()
       @updateGradingPeriodFilterVisibility()
+      @updateModulesFilterVisibility()
 
     renderGridColor: =>
       gridColorMountPoint = document.querySelector('[data-component="GridColor"]')
@@ -1816,6 +1859,7 @@ define [
       not @isFilteringColumnsByGradingPeriod()
 
     fieldsToExcludeFromAssignments: ['description', 'needs_grading_count', 'in_closed_grading_period']
+    fieldsToIncludeWithAssignments: ['module_ids']
 
     studentsUrl: ->
       switch

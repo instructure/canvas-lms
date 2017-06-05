@@ -685,6 +685,11 @@ class GradebooksController < ApplicationController
     redirect_to polymorphic_url([@context, 'gradebook'])
   end
 
+  def visible_modules?
+    @visible_modules ||= @context.modules_visible_to(@current_user)
+  end
+  helper_method :visible_modules?
+
   private
 
   def set_gradebook_warnings(groups, assignments)
