@@ -30,24 +30,24 @@ describe "master courses sidebar" do
 
   before :once do
     Account.default.enable_feature!(:master_courses)
-    @master = course_factory(:active_all => true)
+    @master = course_factory(active_all: true)
     @master_teacher = @teacher
     @template = MasterCourses::MasterTemplate.set_as_master_course(@master)
-    @minion =  @template.add_child_course!(course_factory(:name => "Minion", :active_all => true)).child_course
+    @minion = @template.add_child_course!(course_factory(name: "Minion", active_all: true)).child_course
 
     # setup some stuff
-    @file = attachment_model(:context => @master, :display_name => 'Some File')
-    @assignment = @master.assignments.create! :title => 'Blah', :points_possible => 10
+    @file = attachment_model(context: @master, display_name: 'Some File')
+    @assignment = @master.assignments.create! title: 'Blah', points_possible: 10
     run_master_migration
 
     # now push some incremental changes
     Timecop.freeze(2.seconds.from_now) do
-      @page = @master.wiki.wiki_pages.create! :title => 'Unicorn'
+      @page = @master.wiki.wiki_pages.create! title: 'Unicorn'
       page_tag = @template.content_tag_for(@page)
       page_tag.restrictions = @template.default_restrictions
       page_tag.save!
-      @quiz = @master.quizzes.create! :title => 'TestQuiz'
-      @file = attachment_model(:context => @master, :display_name => 'Some File')
+      @quiz = @master.quizzes.create! title: 'TestQuiz'
+      @file = attachment_model(context: @master, display_name: 'Some File')
       @file.update_attribute :display_name, 'I Can Rename Files Too'
       @assignment.destroy
     end
@@ -69,7 +69,7 @@ describe "master courses sidebar" do
       expect(f('.bcs__content')).to be_displayed
     end
 
-    it "should not show the Associations buton" do
+    it "should not show the Associations button" do
       get "/courses/#{@master.id}"
       f('.blueprint__root .bcs__wrapper .bcs__trigger').click
       expect(f('.bcs__content')).not_to contain_css('button#mcSidebarAsscBtn')
@@ -94,14 +94,14 @@ describe "master courses sidebar" do
 
   describe "as a master course admin" do
     before :once do
-      account_admin_user(:active_all => true)
+      account_admin_user(active_all: true)
     end
 
     before :each do
       user_session(@admin)
     end
 
-    it "should show the Associations buton" do
+    it "should show the Associations button" do
       get "/courses/#{@master.id}"
       f('.blueprint__root .bcs__wrapper .bcs__trigger').click
       expect(f('.bcs__content')).to contain_css('button#mcSidebarAsscBtn')
@@ -112,6 +112,22 @@ describe "master courses sidebar" do
       f('.blueprint__root .bcs__wrapper .bcs__trigger').click
       f('button#mcSidebarAsscBtn').click
       expect(f('div[aria-label="Associations"]')).to be_displayed
+    end
+
+    it "limits notification message to 140 characters", priority: "2", test_id: 3186725 do
+      msg = '1234567890123456789012345678901234567890123456789012345678901234567890'
+      get "/courses/#{@master.id}"
+      f('.blueprint__root .bcs__wrapper .bcs__trigger').click
+      f('.bcs__history-settings')
+        .find_element(:xpath, "//label/span/span[text()[contains(., 'Notification')]]").click
+      f('.bcs__history-notification__add-message')
+        .find_element(:xpath, "//label/span/span[text()[contains(., 'Message')]]").click
+      f('.bcs__history-notification__add-message')
+        .find_element(:xpath, "//label/span/span/span/textarea").send_keys(msg+msg+"A")
+      box = f('.bcs__history-notification__add-message').find_element(:xpath, "//label/span/span/span/textarea")
+      expect(f('.bcs__history-notification__add-message').find_element(:xpath, "span"))
+        .to include_text('(140/140)')
+      expect(box).not_to have_value('A')
     end
   end
 end
