@@ -186,7 +186,8 @@ describe 'Screenreader Gradebook grading' do
       assignment = @course.assignments.create!(due_at: 13.days.ago, title: "assign in ended")
       SRGB.visit(@course.id)
       SRGB.select_grading_period(@gp_ended.title)
-      SRGB.select_student(student)
+      SRGB.visit(@course.id) # TODO: delete this line when fixing CNVS-37376
+      SRGB.select_student(@student)
       SRGB.select_assignment(assignment)
       SRGB.enter_grade(8)
 
@@ -198,7 +199,8 @@ describe 'Screenreader Gradebook grading' do
       assignment = @course.assignments.create!(due_at: 18.days.ago, title: "assign in closed")
       SRGB.visit(@course.id)
       SRGB.select_grading_period(@gp_closed.title)
-      SRGB.select_student(student)
+      SRGB.visit(@course.id) # TODO: delete this line when fixing CNVS-37376
+      SRGB.select_student(@student)
       SRGB.select_assignment(assignment)
 
       expect(SRGB.grading_enabled?).to be false
