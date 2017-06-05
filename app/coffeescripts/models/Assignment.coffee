@@ -514,6 +514,12 @@ define [
     disabledMessage: ->
       I18n.t("Can't unpublish %{name} if there are student submissions", name: @get('name'))
 
+    duplicate: (callback) =>
+      course_id = @courseID()
+      assignment_id = @id
+      $.ajaxJSON "/api/v1/courses/#{course_id}/assignments/#{assignment_id}/duplicate", 'POST',
+        {}, callback
+
     isOnlyVisibleToOverrides: (override_flag) ->
       return @get('only_visible_to_overrides') || false unless arguments.length > 0
       @set 'only_visible_to_overrides', override_flag

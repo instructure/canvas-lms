@@ -126,6 +126,38 @@ class Assignment < ActiveRecord::Base
     )
   end
 
+  # NOTE: This does not do a "deep copy", so any "has_" relations will
+  # not duplicate the other underlying entity.  In some cases this may
+  # result in unexpected behavior (though at least in the case of rubric,
+  # the UI is smart enough to forbid that)
+  #
+  # The relevant associations that are copied are:
+  #
+  # learning_outcome_alignments, rubric_association
+  #
+  # Other has_ relations are not duplicated for various reasons.
+  # These are:
+  #
+  # attachments, submissions, provisional_grades, lti stuff, discussion_topic
+  # ignores, moderated_grading_selections, wiki_page, teacher_enrollment
+  # TODO: Try to get more of that stuff duplicated
+  def duplicate
+    result = self.clone
+    result.submissions.clear
+    result.attachments.clear
+    result.ignores.clear
+    result.moderated_grading_selections.clear
+    result.lti_context_id = nil
+    result.discussion_topic = nil
+    result.wiki_page = nil
+    result.title = result.title + " " + t("Copy")
+    # Learning outcome alignments seem to get copied magically, possibly
+    # through the rubric
+    result.rubric_association = self.rubric_association.clone
+    result.workflow_state = "unpublished"
+    result
+  end
+
   def group_category_changes_ok?
     return if new_record?
     return unless has_submitted_submissions?

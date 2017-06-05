@@ -284,6 +284,34 @@ describe Assignment do
     end
   end
 
+  it "duplicate works properly" do
+   assignment = @course.assignments.create!(assignment_valid_attributes)
+   rubric = @course.rubrics.create! { |r| r.user = @teacher }
+   rubric_association_params =
+     HashWithIndifferentAccess.new({
+       hide_score_total: "0",
+       purpose: "grading",
+       skip_updating_points_possible: false,
+       update_if_existing: true,
+       use_for_grading: "1",
+       association_object: assignment
+     })
+
+   rubric_assoc = RubricAssociation.generate(@teacher, rubric, @course,
+    rubric_association_params)
+   assignment.rubric_association = rubric_assoc
+   assignment.attachments.push(Attachment.new)
+   assignment.submissions.push(Submission.new)
+   assignment.ignores.push(Ignore.new)
+   new_assignment = assignment.duplicate
+   expect(new_assignment.id).to be_nil
+   expect(new_assignment.new_record?).to be true
+   expect(new_assignment.attachments.length).to be(0)
+   expect(new_assignment.submissions.length).to be(0)
+   expect(new_assignment.ignores.length).to be(0)
+   expect(new_assignment.rubric_association).not_to be_nil
+  end
+
   describe "#representatives" do
     context "individual students" do
       it "sorts by sortable_name" do

@@ -101,6 +101,16 @@
                 data-focus-returns-to="assign_{{id}}_manage_link"
               >{{#t}}Edit{{/t}}</a>
             </li>
+            {{#if canDuplicate}}
+            <li>
+              <a
+                class="duplicate_assignment icon-copy-course"
+                id="assignment_{{id}}_settings_duplicate_item"
+                aria-label="{{#t}}Duplicate Assignment {{name}}{{/t}}"
+                data-focus-returns-to"assign_{{id}}_manage_link"
+              >{{#t}}Duplicate{{/t}}</a>
+            </li>
+            {{/if}}
             {{#if canMove}}
             <li>
               <a
