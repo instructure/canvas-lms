@@ -2459,9 +2459,10 @@ describe 'Submissions API', type: :request do
         }
       )
 
+      expected_url = "http://www.example.com/courses/#{@course.id}/external_tools/retrieve?assignment_id=#{@assignment.id}&url=http%3A%2F%2Fexample.test"
       expect(Submission.count).to eq 1
       expect(json['submission_type']).to eql 'basic_lti_launch'
-      expect(json['url']).to eql 'http://example.test'
+      expect(json['url']).to eq expected_url
     end
 
     it 'does not allow a submission to be overwritten if type is a non-lti type' do
@@ -3900,6 +3901,26 @@ describe 'Submissions API', type: :request do
         json = api_call_as_user(teacher, :get, path, params)
         expect(json.first.fetch('group').fetch('id')).to eq group.id
         expect(json.first.fetch('group').fetch('name')).to eq group.name
+      end
+
+      context "submission of type basic_lti_launch" do
+        let(:external_tool_url) { 'http://www.test.com/basic-launch' }
+        let(:assignment) do
+          test_course.assignments.create!(
+            title: 'group assignment',
+            grading_type: 'points',
+            points_possible: 10,
+            submission_types: 'basic_lti_launch',
+            group_category: group.group_category
+          )
+        end
+        let!(:submit_homework) { assignment.submit_homework(student1, submission_type: 'basic_lti_launch', url: external_tool_url) }
+
+        it 'includes the submission launch URL' do
+          expected_url = "http://www.example.com/courses/#{assignment.course.id}/external_tools/retrieve?assignment_id=#{assignment.id}&url=http%3A%2F%2Fwww.test.com%2Fbasic-launch"
+          submission_json = api_call_as_user(teacher, :get, path, params)
+          expect(submission_json.first['url']).to eq expected_url
+        end
       end
     end
   end
