@@ -75,7 +75,7 @@ test('doesnt render the sub list initially', () => {
 
 test('renders the unlocked lock Icon when unlocked', () => {
   const tree = enzyme.shallow(<ExpandableLockOptions {...defaultProps()} />)
-  const icon = tree.find('.bcs_tab-icon IconBlueprintSolid')
+  const icon = tree.find('.bcs_tab-icon IconUnlock')
   equal(icon.length, 1)
 })
 
@@ -83,6 +83,6 @@ test('renders the locked lock Icon when locked', () => {
   const props = defaultProps()
   props.locks.content = true
   const tree = enzyme.shallow(<ExpandableLockOptions {...props} />)
-  const icon = tree.find('.bcs_tab-icon IconBlueprintLockSolid')
+  const icon = tree.find('.bcs_tab-icon IconLock')
   equal(icon.length, 1)
 })

@@ -25,8 +25,7 @@ import Grid, { GridRow, GridCol } from 'instructure-ui/lib/components/Grid'
 import Typography from 'instructure-ui/lib/components/Typography'
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
 import ToggleDetails from 'instructure-ui/lib/components/ToggleDetails'
-import IconLock from 'instructure-icons/lib/Solid/IconBlueprintLockSolid'
-import IconUnlock from 'instructure-icons/lib/Solid/IconBlueprintSolid'
+import { IconLock, IconUnlock } from './BlueprintLocks'
 
 import propTypes from '../propTypes'
 
@@ -102,7 +101,7 @@ class SyncChange extends Component {
               {this.renderExceptions()}
             </ToggleDetails>}
           <div className="bcs__history-item__lock-icon">
-            <Typography size="large" color="secondary">{locked ? <IconLock title={I18n.t('Locked')} /> : <IconUnlock title={I18n.t('Unlocked')} />}</Typography>
+            <Typography size="large" color="secondary">{locked ? <IconLock /> : <IconUnlock />}</Typography>
           </div>
           <div className="bcs__history-item__content-grid">
             <Grid colSpacing="none">

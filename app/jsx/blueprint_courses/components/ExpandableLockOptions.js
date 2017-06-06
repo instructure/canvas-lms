@@ -28,13 +28,13 @@ import Button from 'instructure-ui/lib/components/Button'
 import Typography from 'instructure-ui/lib/components/Typography'
 import Grid, { GridRow, GridCol } from 'instructure-ui/lib/components/Grid'
 
-import IconLock from 'instructure-icons/lib/Solid/IconBlueprintLockSolid'
-import IconUnlock from 'instructure-icons/lib/Solid/IconBlueprintSolid'
+import { IconLock, IconUnlock } from './BlueprintLocks'
+import LockCheckList from './LockCheckList'
 
 import propTypes from '../propTypes'
 import {formatLockObject} from '../LockItemFormat'
 import {itemTypeLabelPlurals} from '../labels'
-import LockCheckList from './LockCheckList'
+
 
 export default class ExpandableLockOptions extends React.Component {
   static propTypes = {
@@ -100,7 +100,7 @@ export default class ExpandableLockOptions extends React.Component {
   renderLockIcon () {
     const hasLocks = Object.keys(this.state.locks)
       .reduce((isLocked, lockProp) => isLocked || this.state.locks[lockProp], false)
-    const Icon = hasLocks ? <IconLock title={I18n.t('Locked')} /> : <IconUnlock title={I18n.t('Unlocked')} />
+    const Icon = hasLocks ? <IconLock /> : <IconUnlock />
     return (
       <div className="bcs_tab-icon">
         {Icon}
