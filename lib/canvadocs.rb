@@ -138,13 +138,27 @@ module Canvadocs
     #
     # Returns the json parsed response body of the call
     def api_call(method, endpoint, params={})
-      # dispatch to the right method, with the full path (/api/v2 + endpoint)
-      request = self.send("format_#{method}", "#{@url.path}/#{endpoint}", params)
-      request["Authorization"] = "Token #{token}"
-      response = @http.request(request)
+      responsewait = true
+      while responsewait == true
+        # dispatch to the right method, with the full path (/api/v2 + endpoint)
+        request = self.send("format_#{method}", "#{@url.path}/#{endpoint}", params)
+        request["Authorization"] = "Token #{token}"
+        response = @http.request(request)
 
-      unless response.code =~ /\A20./
-        raise Canvadocs::Error, "HTTP Error #{response.code}: #{response.body}"
+        case response.code
+        # Accepted and in queue
+        when /\A202/
+          retryafter = response['Retry-After'].to_i
+          sleep retryafter == 0 ? 2 : retryafter
+        # Throttled back off 2 seconds
+        when /\A429/
+          sleep 2
+        # Document ready
+        when /\A20./
+          responsewait = false
+        else
+          raise Canvadocs::Error, "HTTP Error #{response.code}: #{response.body}"
+        end
       end
       response.body
     end
