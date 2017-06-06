@@ -212,7 +212,6 @@ END
       state: 'hidden',
       root_opt_in: true,
       beta: true,
-      development: true,
 
       custom_transition_proc: ->(user, context, _from_state, transitions) do
         if context.is_a?(Course)
