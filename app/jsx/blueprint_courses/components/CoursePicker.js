@@ -39,10 +39,12 @@ export default class CoursePicker extends React.Component {
     loadCourses: func.isRequired,
     isLoadingCourses: bool.isRequired,
     onSelectedChanged: func,
+    detailsRef: func,
     isExpanded: bool,
   }
 
   static defaultProps = {
+    detailsRef: () => {},
     onSelectedChanged: () => {},
     isExpanded: true,
   }
@@ -139,7 +141,7 @@ export default class CoursePicker extends React.Component {
           <ToggleDetails
             ref={(c) => { this.coursesToggle = c }}
             expanded={this.state.isExpanded}
-            summary={<Typography>{I18n.t('Courses')}</Typography>}
+            summary={<span ref={(c) => { if (c) this.props.detailsRef(c.parentElement.parentElement) }}><Typography>{I18n.t('Courses')}</Typography></span>}
           >
             {this.props.isLoadingCourses && (<div className="bca-course-picker__loading">
               <Spinner title={I18n.t('Loading Courses')} />

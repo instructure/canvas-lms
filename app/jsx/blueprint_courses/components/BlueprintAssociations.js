@@ -30,10 +30,12 @@ import Typography from 'instructure-ui/lib/components/Typography'
 import Spinner from 'instructure-ui/lib/components/Spinner'
 import Alert from 'instructure-ui/lib/components/Alert'
 
-import actions from '../actions'
-import propTypes from '../propTypes'
 import CoursePicker from './CoursePicker'
 import AssociationsTable from './AssociationsTable'
+
+import actions from '../actions'
+import propTypes from '../propTypes'
+import FocusManager from '../focusManager'
 
 const { string, arrayOf, func, bool } = PropTypes
 
@@ -88,21 +90,7 @@ export default class BlueprintAssociations extends React.Component {
     if (removed.length) this.props.removeAssociations(removed)
   }
 
-  renderLoadingOverlay () {
-    if (this.props.isSavingAssociations) {
-      const title = I18n.t('Saving Associations')
-      return (
-        <div className="bca__overlay">
-          <div className="bca__overlay__save-wrapper">
-            <Spinner title={title} />
-            <Typography as="p">{title}</Typography>
-          </div>
-        </div>
-      )
-    }
-
-    return null
-  }
+  focusManager = new FocusManager()
 
   maybeRenderSyncWarning () {
     const { hasUnsyncedChanges, existingAssociations, addedAssociations } = this.props
@@ -114,6 +102,22 @@ export default class BlueprintAssociations extends React.Component {
             <Typography>{I18n.t('You have unsynced changes that will sync to all associated courses when a new association is saved.')}</Typography>
           </p>
         </Alert>
+      )
+    }
+
+    return null
+  }
+
+  renderLoadingOverlay () {
+    if (this.props.isSavingAssociations) {
+      const title = I18n.t('Saving Associations')
+      return (
+        <div className="bca__overlay">
+          <div className="bca__overlay__save-wrapper">
+            <Spinner title={title} />
+            <Typography as="p">{title}</Typography>
+          </div>
+        </div>
       )
     }
 
@@ -138,6 +142,7 @@ export default class BlueprintAssociations extends React.Component {
             selectedCourses={this.props.addedAssociations.map(course => course.id)}
             onSelectedChanged={this.onSelectedChanged}
             isExpanded={this.props.isExpanded}
+            detailsRef={this.focusManager.registerBeforeRef}
           />
           <hr />
           <Heading level="h3">{I18n.t('Associated')}</Heading>
@@ -147,6 +152,8 @@ export default class BlueprintAssociations extends React.Component {
             removedAssociations={this.props.removedAssociations}
             onRemoveAssociations={this.props.removeAssociations}
             isLoadingAssociations={this.props.isLoadingAssociations}
+            handleFocusLoss={this.catchAssociationsFocus}
+            focusManager={this.focusManager}
           />
         </div>
       </div>
