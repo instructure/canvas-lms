@@ -79,6 +79,8 @@ body {
   margin: 0;
   line-height: $ic-line-height;
   color: $ic-font-color-dark;
+  -webkit-font-smoothing: antialiased; // needed to help render the iconFont clearer
+  -moz-osx-font-smoothing: grayscale; // needed to help render the iconFont clearer
 }
 
 p {
@@ -140,15 +142,15 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-h1 { font-size: $ic-font-size * 2.75; } // ~38px
-h2 { font-size: $ic-font-size * 2.25; } // ~32px
-h3 { font-size: $ic-font-size * 1.75; } // ~24px
-h4 { font-size: $ic-font-size * 1.25; } // ~18px
+h1 { font-size: $ic-font-size * 2.375; } // ~38px
+h2 { font-size: $ic-font-size * 2.00; } // ~32px
+h3 { font-size: $ic-font-size * 1.50; } // ~24px
+h4 { font-size: $ic-font-size * 1.125; } // ~18px
 h5 { font-size: $ic-font-size; }
-h6 { font-size: $ic-font-size * 0.85; } // ~12px
+h6 { font-size: $ic-font-size * 0.75; } // ~12px
 
-h1 small { font-size: $ic-font-size * 1.75; } // ~24px
-h2 small { font-size: $ic-font-size * 1.25; } // ~18px
+h1 small { font-size: $ic-font-size * 1.50; } // ~24px
+h2 small { font-size: $ic-font-size * 1.125; } // ~18px
 h3 small { font-size: $ic-font-size; }
 h4 small { font-size: $ic-font-size; }
 

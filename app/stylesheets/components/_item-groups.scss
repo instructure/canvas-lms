@@ -274,7 +274,7 @@
   min-width: 1px; // firefox flex breaks the parent container
   margin: 0 $ic-sp;
   @include breakpoint(desktop) {
-    margin-left: $ic-sp*1.5;
+    margin-left: $ic-sp;
     margin-right: $ic-sp*2;
   }
 }
@@ -350,23 +350,12 @@
 .ig-type-icon {
   width: 1.875rem;
   height: 1.875rem;
-  border-radius: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: $ic-font-color--subdued;
-  color: $ic-color-light;
-  &::before {
-    font-size: 1rem;
-  }
+
   .ig-published:not(.student-view) & {
-    background-color: $ic-color-success;
-  }
-  & i[class*=icon-],
-  & i[class^=icon-], {
-    &::before {
-      top: 0;
-    }
+    color: $ic-color-success;
   }
 }
 

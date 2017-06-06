@@ -165,14 +165,14 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       wysiwyg_state_setup
 
       # I'm so, so sorry...
-      driver.find_element(:xpath, "//button/span[text()[contains(.,'11pt')]]").click
+      driver.find_element(:xpath, "//button/span[text()[contains(.,'12pt')]]").click
       driver.find_element(:xpath, "//span[text()[contains(.,'36pt')]]").click
       validate_wiki_style_attrib("font-size", "36pt", "p span")
     end
 
     it "should change and remove all custom formatting on selected text", priority: "1", test_id: 298748 do
       wysiwyg_state_setup
-      driver.find_element(:xpath, "//button/span[text()[contains(.,'11pt')]]").click
+      driver.find_element(:xpath, "//button/span[text()[contains(.,'12pt')]]").click
       driver.find_element(:xpath, "//span[text()[contains(.,'36pt')]]").click
       validate_wiki_style_attrib("font-size", "36pt", "p span")
       f(".mce-i-removeformat").click
