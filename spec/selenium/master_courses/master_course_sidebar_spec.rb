@@ -18,6 +18,32 @@
 require_relative '../common'
 require_relative '../../apis/api_spec_helper'
 
+
+shared_context "blueprint sidebar context" do
+  let(:sync_button) {'.bcs__migration-sync__button button'}
+  let(:unsynced_changes_link) {'#mcUnsyncedChangesBtn'}
+  let(:blueprint_open_sidebar_button){f('.blueprint__root .bcs__wrapper .bcs__trigger') }
+  let(:send_notification_checkbox) do
+    f('.bcs__history-settings')
+      .find_element(:xpath, "//span[text()[contains(., 'Send Notification')]]")
+  end
+  let(:add_message_checkbox) do
+    f('.bcs__history-notification__add-message')
+      .find_element(:xpath, "//label/span/span[text()[contains(., 'Add a Message')]]")
+  end
+  let(:notification_message_text_box) do
+    f('.bcs__history-notification__add-message')
+      .find_element(:xpath, "//label/span/span/span/textarea")
+  end
+  let(:character_count) { f('.bcs__history-notification__add-message').find_element(:xpath, "span") }
+
+  def open_blueprint_sidebar
+    get "/courses/#{@master.id}"
+    blueprint_open_sidebar_button.click
+  end
+end
+
+
 describe "master courses sidebar" do
   include_context "in-process server selenium tests"
 
@@ -48,7 +74,7 @@ describe "master courses sidebar" do
       page_tag.save!
       @quiz = @master.quizzes.create! title: 'TestQuiz'
       @file = attachment_model(context: @master, display_name: 'Some File')
-      @file.update_attribute :display_name, 'I Can Rename Files Too'
+      @file.update(display_name: 'I Can Rename Files Too')
       @assignment.destroy
     end
   end
@@ -98,6 +124,7 @@ describe "master courses sidebar" do
   end
 
   describe "as a master course admin" do
+    include_context "blueprint sidebar context"
     before :once do
       account_admin_user(active_all: true)
     end
@@ -121,18 +148,31 @@ describe "master courses sidebar" do
 
     it "limits notification message to 140 characters", priority: "2", test_id: 3186725 do
       msg = '1234567890123456789012345678901234567890123456789012345678901234567890'
-      get "/courses/#{@master.id}"
-      f('.blueprint__root .bcs__wrapper .bcs__trigger').click
-      f('.bcs__history-settings')
-        .find_element(:xpath, "//label/span/span[text()[contains(., 'Notification')]]").click
-      f('.bcs__history-notification__add-message')
-        .find_element(:xpath, "//label/span/span[text()[contains(., 'Message')]]").click
-      f('.bcs__history-notification__add-message')
-        .find_element(:xpath, "//label/span/span/span/textarea").send_keys(msg+msg+"A")
-      box = f('.bcs__history-notification__add-message').find_element(:xpath, "//label/span/span/span/textarea")
-      expect(f('.bcs__history-notification__add-message').find_element(:xpath, "span"))
-        .to include_text('(140/140)')
-      expect(box).not_to have_value('A')
+      open_blueprint_sidebar
+      send_notification_checkbox.click
+      add_message_checkbox.click
+      notification_message_text_box.send_keys(msg+msg+"A")
+      expect(character_count).to include_text('(140/140)')
+      expect(notification_message_text_box).not_to have_value('A')
+    end
+
+    it "removes sync button after sync", priority: "2", test_id: 3186726 do
+      open_blueprint_sidebar
+      send_notification_checkbox.click
+      add_message_checkbox.click
+      notification_message_text_box.send_keys("sync that!")
+      f(sync_button).click
+      run_jobs
+      open_blueprint_sidebar
+      begin
+        f(sync_button) # button found ? go to the rescue statement : fail immediately
+        error_text = "Sync button should not be in Blueprint sidebar when nothing is to be synced"
+        expect(error_text).to eq(nil)
+      rescue
+        expect(f('.bcs__content')).not_to contain_css(unsynced_changes_link)
+        expect(f('.bcs__content')).not_to include_text("Include Course Settings")
+        expect(f('.bcs__content')).not_to include_text("Send Notification")
+      end
     end
   end
 end
