@@ -20,6 +20,7 @@
 import MGP from 'jsx/speed_grader/gradingPeriod'
 import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper'
 import quizzesNextSpeedGrading from 'jsx/grading/quizzesNextSpeedGrading'
+import StatusPill from 'jsx/grading/StatusPill'
 import numberHelper from 'jsx/shared/helpers/numberHelper'
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
 import studentViewedAtTemplate from 'jst/speed_grader/student_viewed_at'
@@ -1751,9 +1752,11 @@ import './vendor/ui.selectmenu'
                           s.show_grade_in_dropdown)) {
             grade = GradeFormatHelper.formatGrade(s.grade);
           }
+
           return {
             value: i,
             late: s.late,
+            missing: s.missing,
             selected: selectedIndex === i,
             submittedAt: $.datetimeString(s.submitted_at) || noSubmittedAt,
             grade: grade
@@ -1769,12 +1772,13 @@ import './vendor/ui.selectmenu'
         });
       }
       $multiple_submissions.html($.raw(innerHTML));
+      StatusPill.renderPills();
     },
 
     showSubmissionDetails: function(){
       //if there is a submission
       var currentSubmission = this.currentStudent.submission;
-      if (currentSubmission && currentSubmission.submitted_at) {
+      if (currentSubmission) {
         this.refreshSubmissionsToView();
         var lastIndex = currentSubmission.submission_history.length - 1;
         $("#submission_to_view option:eq(" + lastIndex + ")").attr("selected", "selected");

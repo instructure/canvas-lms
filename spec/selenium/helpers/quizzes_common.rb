@@ -850,8 +850,8 @@ module QuizzesCommon
 
   def verify_quiz_submission_late_status(late)
     open_student_quiz_submission
-    submission_page_info = fj('.submission_details', '#not_right_side')
-    late_status = '(late)'
+    submission_page_info = f('.submission_details', f('#not_right_side'))
+    late_status = 'LATE'
 
     if late
       expect(submission_page_info).to include_text late_status

@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {setup} from 'submissions'
+import { setup } from 'submissions';
+import StatusPill from 'jsx/grading/StatusPill';
 
 setup()
+StatusPill.renderPills()

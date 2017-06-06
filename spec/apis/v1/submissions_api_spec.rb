@@ -44,45 +44,6 @@ describe 'Submissions API', type: :request do
     sub
   end
 
-  it "does not 404 if there is no submission" do
-    student = user_factory(active_all: true)
-    course_with_teacher(:active_all => true)
-    @course.enroll_student(student).accept!
-    @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
-    json = api_call(:get,
-          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}.json",
-          { :controller => 'submissions_api', :action => 'show',
-            :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => @assignment.id.to_s, :user_id => student.id.to_s },
-          { :include => %w(submission_history submission_comments rubric_assessment) })
-    expect(json).to eq({
-      "id" => @assignment.submissions.find_by!(user: student).id,
-      "assignment_id" => @assignment.id,
-      "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}?preview=1&version=0",
-      "user_id"=>student.id,
-      "grade"=>nil,
-      "excused" => nil,
-      "grader_id"=>nil,
-      "body"=>nil,
-      "submitted_at"=>nil,
-      "submission_history"=>[],
-      "attempt"=>nil,
-      "url"=>nil,
-      "submission_type"=>nil,
-      "submission_comments"=>[],
-      "grade_matches_current_submission"=>true,
-      "score"=>nil,
-      "workflow_state"=>"unsubmitted",
-      "late"=>false,
-      "missing"=>false,
-      "graded_at"=>nil,
-      "late_policy_status"=>nil,
-      "duration_late"=>0.0,
-      "points_deducted"=>nil,
-      "accepted_at"=>nil
-                       })
-  end
-
   describe "using section ids" do
     before :once do
       @student1 = user_factory(active_all: true)

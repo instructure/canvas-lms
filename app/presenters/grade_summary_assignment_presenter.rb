@@ -118,6 +118,14 @@ class GradeSummaryAssignmentPresenter
     classes.join(" ")
   end
 
+  def missing?
+    submission.try(:missing?)
+  end
+
+  def late?
+    submission.try(:late?)
+  end
+
   def excused?
     submission.try(:excused?)
   end

@@ -26,6 +26,7 @@ import CourseGradeCalculator from '../gradebook/CourseGradeCalculator'
 import {scopeToUser} from '../gradebook/EffectiveDueDates'
 import {scoreToGrade} from '../gradebook/GradingSchemeHelper'
 import GradeFormatHelper from '../gradebook/shared/helpers/GradeFormatHelper'
+import StatusPill from '../grading/StatusPill'
 import gradingPeriodSetsApi from 'compiled/api/gradingPeriodSetsApi'
 import 'jquery.ajaxJSON'
 import 'jquery.instructure_misc_helpers'  /* replaceTags */
@@ -587,6 +588,7 @@ function setup () {
     })
 
     bindShowAllDetailsButton($ariaAnnouncer)
+    StatusPill.renderPills()
   })
 
   $(document).on('change', '.grading_periods_selector', function () {
