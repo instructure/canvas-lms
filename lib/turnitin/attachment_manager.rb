@@ -42,6 +42,7 @@ module Turnitin
       Dir.mktmpdir do |dirname|
         turnitin_client.original_submission do |response|
           filename = response.headers['content-disposition'].match(/filename=(\"?)(.+)\1/)[2]
+          filename.tr!('/','-')
           path = File.join(dirname, filename)
           File.open(path, 'wb') do |f|
             f.write(response.body)

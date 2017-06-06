@@ -57,7 +57,7 @@ RSpec.shared_context "shared_tii_lti", :shared_context => :metadata do
     tii_mock.stubs(:original_submission).yields(response_mock)
     tii_mock
   end
-  let(:filename) { 'my_new_filename.txt' }
+  let(:filename) { 'my/new/filename.txt' }
   let(:response_mock) do
     r_mock = mock('response')
     r_mock.stubs(:headers).
@@ -129,4 +129,3 @@ RSpec.shared_context "shared_tii_lti", :shared_context => :metadata do
   end
 
 end
-

@@ -31,9 +31,9 @@ module Turnitin
         end.to change{lti_assignment.attachments.count}.by(1)
       end
 
-      it 'uses the filename from the tii client' do
+      it 'uses the filename from the tii client and replaces forward slashes with dashes' do
         subject.class.create_attachment(lti_student, lti_assignment, tool, outcome_response_json)
-        expect(lti_assignment.attachments.first.display_name).to eq filename
+        expect(lti_assignment.attachments.first.display_name).to eq "my-new-filename.txt"
       end
 
       it 'assigns the correct user' do
@@ -57,7 +57,7 @@ module Turnitin
 
       it 'updates the submission' do
         updated_attachment = Turnitin::AttachmentManager.update_attachment(submission, attachment)
-        expect(updated_attachment.display_name).to eq filename
+        expect(updated_attachment.display_name).to eq "my-new-filename.txt"
       end
 
       it 'works when there is only a url in the content_tag' do
@@ -65,7 +65,7 @@ module Turnitin
         tag.content_id = nil
         tag.save!
         updated_attachment = Turnitin::AttachmentManager.update_attachment(submission, attachment)
-        expect(updated_attachment.display_name).to eq filename
+        expect(updated_attachment.display_name).to eq "my-new-filename.txt"
       end
 
     end
