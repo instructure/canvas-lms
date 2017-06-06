@@ -626,10 +626,10 @@ module UsefulFindInBatches
   def find_in_batches(options = {}, &block)
     # already in a transaction (or transactions don't matter); cursor is fine
     if can_use_cursor? && !options[:start]
-      self.activate { find_in_batches_with_cursor(options, &block) }
+      self.activate { |r| r.find_in_batches_with_cursor(options, &block) }
     elsif find_in_batches_needs_temp_table?
       raise ArgumentError.new("GROUP and ORDER are incompatible with :start, as is an explicit select without the primary key") if options[:start]
-      self.activate { find_in_batches_with_temp_table(options, &block) }
+      self.activate { |r| r.find_in_batches_with_temp_table(options, &block) }
     else
       super
     end
