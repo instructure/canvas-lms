@@ -438,8 +438,8 @@ module CC::Exporter::WebZip
         if File.directory?(path)
           add_dir_to_zip(path, base_path)
         else
-          path_in_zip = path.sub(base_path, '')
-          zip_file.add("#{@filename_prefix}/#{path_in_zip}", path)
+          path_in_zip = Pathname(path).relative_path_from(Pathname(base_path))
+          zip_file.add(File.join(@filename_prefix, path_in_zip), path)
         end
       end
     end

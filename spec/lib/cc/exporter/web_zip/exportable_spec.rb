@@ -155,6 +155,7 @@ describe "Exportable" do
       it "should insert the index.html file" do
         Zip::File.open(zip_path) do |zip_file|
           file = zip_file.glob('**/index.html').first
+          expect(file.name).not_to include '//'
           expect(file).not_to be_nil
           contents = file.get_input_stream.read
           expect(contents).not_to be_nil
@@ -164,6 +165,7 @@ describe "Exportable" do
       it "should insert the viewer/bundle.js file" do
         Zip::File.open(zip_path) do |zip_file|
           file = zip_file.glob('**/viewer/bundle.js').first
+          expect(file.name).not_to include '//'
           expect(file).not_to be_nil
           contents = file.get_input_stream.read
           expect(contents).not_to be_nil
