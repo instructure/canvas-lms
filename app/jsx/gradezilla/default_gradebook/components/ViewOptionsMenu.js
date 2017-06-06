@@ -48,13 +48,16 @@ class ViewOptionsMenu extends React.Component {
       criterion: string.isRequired,
       direction: string.isRequired,
       disabled: bool.isRequired,
+      modulesEnabled: bool.isRequired,
       onSortByDefault: func.isRequired,
       onSortByNameAscending: func.isRequired,
       onSortByNameDescending: func.isRequired,
       onSortByDueDateAscending: func.isRequired,
       onSortByDueDateDescending: func.isRequired,
       onSortByPointsAscending: func.isRequired,
-      onSortByPointsDescending: func.isRequired
+      onSortByPointsDescending: func.isRequired,
+      onSortByModuleAscending: func.isRequired,
+      onSortByModuleDescending: func.isRequired
     }).isRequired,
     filterSettings: shape({
       available: arrayOf(string).isRequired,
@@ -159,6 +162,28 @@ class ViewOptionsMenu extends React.Component {
             >
               { I18n.t('Points - Highest to Lowest') }
             </MenuItem>
+
+            {
+              this.props.columnSortSettings.modulesEnabled &&
+              <MenuItem
+                disabled={this.props.columnSortSettings.disabled}
+                selected={this.areColumnsOrderedBy('module_position', 'ascending')}
+                onSelect={this.props.columnSortSettings.onSortByModuleAscending}
+              >
+                { I18n.t('Module - First to Last') }
+              </MenuItem>
+            }
+
+            {
+              this.props.columnSortSettings.modulesEnabled &&
+              <MenuItem
+                disabled={this.props.columnSortSettings.disabled}
+                selected={this.areColumnsOrderedBy('module_position', 'descending')}
+                onSelect={this.props.columnSortSettings.onSortByModuleDescending}
+              >
+                { I18n.t('Module - Last to First') }
+              </MenuItem>
+            }
           </MenuItemGroup>
         </MenuItemFlyout>
 

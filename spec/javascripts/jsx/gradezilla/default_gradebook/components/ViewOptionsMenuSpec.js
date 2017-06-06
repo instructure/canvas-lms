@@ -26,13 +26,16 @@ function defaultProps ({ props, filterSettings } = {}) {
       criterion: 'due_date',
       direction: 'ascending',
       disabled: false,
+      modulesEnabled: true,
       onSortByDefault () {},
       onSortByDueDateAscending () {},
       onSortByDueDateDescending () {},
       onSortByNameAscending () {},
       onSortByNameDescending () {},
       onSortByPointsAscending () {},
-      onSortByPointsDescending () {}
+      onSortByPointsDescending () {},
+      onSortByModuleAscending () {},
+      onSortByModuleDescending () {}
     },
     filterSettings: {
       available: ['assignmentGroups', 'gradingPeriods', 'modules', 'sections'],
@@ -284,13 +287,14 @@ test('onSelectShowUnpublishedAssignment is called when selected', function () {
 });
 
 QUnit.module('ViewOptionsMenu - Column Sorting', {
-  props (criterion = 'due_date', direction = 'ascending', disabled = false) {
+  props (criterion = 'due_date', direction = 'ascending', disabled = false, modulesEnabled = true) {
     return {
       ...defaultProps(),
       columnSortSettings: {
         criterion,
         direction,
         disabled,
+        modulesEnabled,
         onSortByDefault: this.stub(),
         onSortByNameAscending: this.stub(),
         onSortByNameDescending: this.stub(),
@@ -298,6 +302,8 @@ QUnit.module('ViewOptionsMenu - Column Sorting', {
         onSortByDueDateDescending: this.stub(),
         onSortByPointsAscending: this.stub(),
         onSortByPointsDescending: this.stub(),
+        onSortByModuleAscending: this.stub(),
+        onSortByModuleDescending: this.stub(),
       }
     };
   },
@@ -311,7 +317,7 @@ test('Arrange By menu does not allow multiple selections', function () {
 });
 
 test('Default Order is selected when criterion is default and direction is ascending', function () {
-  const wrapper = openArrangeBy(this.props('default', 'acending'));
+  const wrapper = openArrangeBy(this.props('default', 'ascending'));
   const arrangeByMenu = new ReactWrapper(wrapper.node.arrangeByMenuContent, wrapper.node);
   const arrangeByMenuItems = arrangeByMenu.find('MenuItem').map(menuItem => menuItem);
   const selectedMenuItem = arrangeByMenuItems.find(menuItem => menuItem.props().selected);
@@ -346,7 +352,7 @@ test('Assignment Name - Z-A is selected when criterion is name and direction is 
   equal(selectedMenuItem.text().trim(), 'Assignment Name - Z-A');
 });
 
-test('Due Date - Oldest to Newest is selected when criterion is name and direction is ascending', function () {
+test('Due Date - Oldest to Newest is selected when criterion is due_date and direction is ascending', function () {
   const wrapper = openArrangeBy(this.props('due_date', 'ascending'));
   const arrangeByMenu = new ReactWrapper(wrapper.node.arrangeByMenuContent, wrapper.node);
   const arrangeByMenuItems = arrangeByMenu.find('MenuItem').map(menuItem => menuItem);
@@ -355,7 +361,7 @@ test('Due Date - Oldest to Newest is selected when criterion is name and directi
   equal(selectedMenuItem.text().trim(), 'Due Date - Oldest to Newest');
 });
 
-test('Due Date - Oldest to Newest is selected when criterion is name and direction is ascending', function () {
+test('Due Date - Oldest to Newest is selected when criterion is due_date and direction is ascending', function () {
   const wrapper = openArrangeBy(this.props('due_date', 'descending'));
   const arrangeByMenu = new ReactWrapper(wrapper.node.arrangeByMenuContent, wrapper.node);
   const arrangeByMenuItems = arrangeByMenu.find('MenuItem').map(menuItem => menuItem);
@@ -364,7 +370,7 @@ test('Due Date - Oldest to Newest is selected when criterion is name and directi
   equal(selectedMenuItem.text().trim(), 'Due Date - Newest to Oldest');
 });
 
-test('Points - Lowest to Highest is selected when criterion is name and direction is ascending', function () {
+test('Points - Lowest to Highest is selected when criterion is points and direction is ascending', function () {
   const wrapper = openArrangeBy(this.props('points', 'ascending'));
   const arrangeByMenu = new ReactWrapper(wrapper.node.arrangeByMenuContent, wrapper.node);
   const arrangeByMenuItems = arrangeByMenu.find('MenuItem').map(menuItem => menuItem);
@@ -373,13 +379,49 @@ test('Points - Lowest to Highest is selected when criterion is name and directio
   equal(selectedMenuItem.text().trim(), 'Points - Lowest to Highest');
 });
 
-test('Points - Lowest to Highest is selected when criterion is name and direction is ascending', function () {
+test('Points - Lowest to Highest is selected when criterion is points and direction is ascending', function () {
   const wrapper = openArrangeBy(this.props('points', 'descending'));
   const arrangeByMenu = new ReactWrapper(wrapper.node.arrangeByMenuContent, wrapper.node);
   const arrangeByMenuItems = arrangeByMenu.find('MenuItem').map(menuItem => menuItem);
   const selectedMenuItem = arrangeByMenuItems.find(menuItem => menuItem.props().selected);
 
   equal(selectedMenuItem.text().trim(), 'Points - Highest to Lowest');
+});
+
+test('Module - First to Last is selected when criterion is module_position and direction is ascending', function () {
+  const wrapper = openArrangeBy(this.props('module_position', 'ascending'));
+  const arrangeByMenu = new ReactWrapper(wrapper.node.arrangeByMenuContent, wrapper.node);
+  const arrangeByMenuItems = arrangeByMenu.find('MenuItem').map(menuItem => menuItem);
+  const selectedMenuItem = arrangeByMenuItems.find(menuItem => menuItem.text().trim() === 'Module - First to Last');
+
+  strictEqual(selectedMenuItem.prop('selected'), true);
+});
+
+test('Module - Last to First is selected when criterion is module_position and direction is ascending', function () {
+  const wrapper = openArrangeBy(this.props('module_position', 'descending'));
+  const arrangeByMenu = new ReactWrapper(wrapper.node.arrangeByMenuContent, wrapper.node);
+  const arrangeByMenuItems = arrangeByMenu.find('MenuItem').map(menuItem => menuItem);
+  const selectedMenuItem = arrangeByMenuItems.find(menuItem => menuItem.text().trim() === 'Module - Last to First');
+
+  strictEqual(selectedMenuItem.prop('selected'), true);
+});
+
+test('Module - First to Last is not shown when modules are not enabled', function () {
+  const wrapper = openArrangeBy(this.props('default', 'ascending', false, false));
+  const arrangeByMenu = new ReactWrapper(wrapper.node.arrangeByMenuContent, wrapper.node);
+  const arrangeByMenuItems = arrangeByMenu.find('MenuItem').map(menuItem => menuItem);
+  const selectedMenuItem = arrangeByMenuItems.find(menuItem => menuItem.text().trim() === 'Module - First to Last');
+
+  strictEqual(selectedMenuItem, undefined);
+});
+
+test('Module - Last to First is not shown when modules are not enabled', function () {
+  const wrapper = openArrangeBy(this.props('default', 'ascending', false, false));
+  const arrangeByMenu = new ReactWrapper(wrapper.node.arrangeByMenuContent, wrapper.node);
+  const arrangeByMenuItems = arrangeByMenu.find('MenuItem').map(menuItem => menuItem);
+  const selectedMenuItem = arrangeByMenuItems.find(menuItem => menuItem.text().trim() === 'Module - Last to First');
+
+  strictEqual(selectedMenuItem, undefined);
 });
 
 test('all column ordering options are disabled when the column ordering settings are disabled', function () {
@@ -390,7 +432,7 @@ test('all column ordering options are disabled when the column ordering settings
   const disabledMenuItems =
     arrangeByMenu.find('MenuItem').findWhere(menuItem => menuItem.props().disabled);
 
-  strictEqual(disabledMenuItems.length, 7);
+  strictEqual(disabledMenuItems.length, 9);
 });
 
 test('clicking on "Default Order" triggers onSortByDefault', function () {

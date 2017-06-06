@@ -280,15 +280,19 @@ module Api::V1::Assignment
     end
 
     if opts[:include_module_ids]
-      thing_in_module = case assignment.submission_types
-                        when "online_quiz" then assignment.quiz
-                        when "discussion_topic" then assignment.discussion_topic
-                        else assignment
-                        end
-      hash['module_ids'] = thing_in_module.context_module_tags.map(&:context_module_id) if thing_in_module
+      modulable = case assignment.submission_types
+                  when 'online_quiz' then assignment.quiz
+                  when 'discussion_topic' then assignment.discussion_topic
+                  else assignment
+                  end
+
+      if modulable
+        hash['module_ids'] = modulable.context_module_tags.map(&:context_module_id)
+        hash['module_positions'] = modulable.context_module_tags.map(&:position)
+      end
     end
 
-    hash['published'] = ! assignment.unpublished?
+    hash['published'] = !assignment.unpublished?
     if can_manage
       hash['unpublishable'] = assignment.can_unpublish?
     end

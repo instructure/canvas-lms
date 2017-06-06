@@ -488,18 +488,28 @@ define [
       else
         potential_students
 
-    isInvalidCustomSort: =>
+    isInvalidSort: =>
       sortSettings = @gradebookColumnOrderSettings
-      sortSettings && sortSettings.sortType == 'custom' && !sortSettings.customOrder
+
+      # This course was sorted by a custom column sort at some point but no longer has any stored
+      # column order to sort by
+      # let's mark it invalid so it reverts to default sort
+      return true if sortSettings?.sortType == 'custom' && !sortSettings?.customOrder
+
+      # This course was sorted by module_position at some point but no longer contains modules
+      # let's mark it invalid so it reverts to default sort
+      return true if sortSettings?.sortType == 'module_position' && @listContextModules().length == 0
+
+      false
 
     columnOrderHasNotBeenSaved: =>
       !@gradebookColumnOrderSettings
 
     isDefaultSortOrder: (sortOrder) =>
-      not (['due_date', 'name', 'points', 'custom'].includes(sortOrder))
+      not (['due_date', 'name', 'points', 'module_position', 'custom'].includes(sortOrder))
 
     getStoredSortOrder: =>
-      if @isInvalidCustomSort() || @columnOrderHasNotBeenSaved()
+      if @isInvalidSort() || @columnOrderHasNotBeenSaved()
         sortType: @defaultSortType
         direction: 'ascending'
       else
@@ -507,7 +517,7 @@ define [
 
     setStoredSortOrder: (newSortOrder) ->
       @gradebookColumnOrderSettings = newSortOrder
-      unless @isInvalidCustomSort()
+      unless @isInvalidSort()
         url = @options.gradebook_column_order_settings_url
         $.ajaxJSON(url, 'POST', {column_order: newSortOrder})
 
@@ -557,6 +567,7 @@ define [
     makeColumnSortFn: (sortOrder) =>
       switch sortOrder.sortType
         when 'due_date' then @wrapColumnSortFn(@compareAssignmentDueDates, sortOrder.direction)
+        when 'module_position' then @wrapColumnSortFn(@compareAssignmentModulePositions, sortOrder.direction)
         when 'name' then @wrapColumnSortFn(@compareAssignmentNames, sortOrder.direction)
         when 'points' then @wrapColumnSortFn(@compareAssignmentPointsPossible, sortOrder.direction)
         when 'custom' then @makeCompareAssignmentCustomOrderFn(sortOrder)
@@ -574,6 +585,27 @@ define [
       firstAssignment = a.object
       secondAssignment = b.object
       assignmentHelper.compareByDueDate(firstAssignment, secondAssignment)
+
+    compareAssignmentModulePositions: (a, b) =>
+      firstAssignmentModulePosition = @getContextModule(a.object.module_ids[0])?.position
+      secondAssignmentModulePosition = @getContextModule(b.object.module_ids[0])?.position
+
+      if firstAssignmentModulePosition? && secondAssignmentModulePosition?
+        if firstAssignmentModulePosition == secondAssignmentModulePosition
+          # let's determine their order in the module because both records are in the same module
+          firstPositionInModule = a.object.module_positions[0]
+          secondPositionInModule = b.object.module_positions[0]
+
+          firstPositionInModule - secondPositionInModule
+        else
+          # let's determine the order of their modules because both records are in different modules
+          firstAssignmentModulePosition - secondAssignmentModulePosition
+      else if !firstAssignmentModulePosition? && secondAssignmentModulePosition?
+        1
+      else if firstAssignmentModulePosition? && !secondAssignmentModulePosition?
+        -1
+      else
+        @compareAssignmentPositions(a, b)
 
     compareAssignmentNames: (a, b) =>
       @localeSort(a.object.name, b.object.name)
@@ -1254,6 +1286,7 @@ define [
       criterion: criterion
       direction: storedSortOrder.direction || 'ascending'
       disabled: not @contentLoadStates.assignmentsLoaded
+      modulesEnabled: @listContextModules().length > 0
       onSortByDefault: =>
         @arrangeColumnsBy({ sortType: 'default', direction: 'ascending' }, false)
       onSortByNameAscending: =>
@@ -1268,6 +1301,10 @@ define [
         @arrangeColumnsBy({ sortType: 'points', direction: 'ascending' }, false)
       onSortByPointsDescending: =>
         @arrangeColumnsBy({ sortType: 'points', direction: 'descending' }, false)
+      onSortByModuleAscending: =>
+        @arrangeColumnsBy({ sortType: 'module_position', direction: 'ascending' }, false)
+      onSortByModuleDescending: =>
+        @arrangeColumnsBy({ sortType: 'module_position', direction: 'descending' }, false)
 
     getFilterSettingsViewOptionsMenuProps: =>
       available: @listAvailableViewOptionsFilters()
@@ -2490,6 +2527,16 @@ define [
 
     setContextModules: (contextModules) =>
       @courseContent.contextModules = contextModules
+      @courseContent.modulesById = {}
+
+      if contextModules?.length
+        for contextModule in contextModules
+          @courseContent.modulesById[contextModule.id] = contextModule
+
+      contextModules
+
+    getContextModule: (contextModuleId) =>
+      @courseContent.modulesById?[contextModuleId] if contextModuleId?
 
     listContextModules: =>
       @courseContent.contextModules

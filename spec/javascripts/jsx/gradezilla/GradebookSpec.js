@@ -740,6 +740,7 @@ QUnit.module('Gradebook#makeColumnSortFn', {
     this.stub(this.gradebook, 'compareAssignmentDueDates');
     this.stub(this.gradebook, 'compareAssignmentNames');
     this.stub(this.gradebook, 'compareAssignmentPointsPossible');
+    this.stub(this.gradebook, 'compareAssignmentModulePositions');
   }
 });
 
@@ -778,6 +779,14 @@ test('wraps compareAssignmentDueDates when called with a sortType of due_date', 
 test('wraps compareAssignmentPointsPossible when called with a sortType of points', function () {
   this.gradebook.makeColumnSortFn(this.sortOrder('points', 'ascending'));
   const expectedArgs = [this.gradebook.compareAssignmentPointsPossible, 'ascending'];
+
+  strictEqual(this.gradebook.wrapColumnSortFn.callCount, 1);
+  deepEqual(this.gradebook.wrapColumnSortFn.firstCall.args, expectedArgs);
+});
+
+test('wraps compareAssignmentModulePositions when called with a sortType of module_position', function () {
+  this.gradebook.makeColumnSortFn(this.sortOrder('module_position', 'ascending'));
+  const expectedArgs = [this.gradebook.compareAssignmentModulePositions, 'ascending'];
 
   strictEqual(this.gradebook.wrapColumnSortFn.callCount, 1);
   deepEqual(this.gradebook.wrapColumnSortFn.firstCall.args, expectedArgs);
@@ -972,6 +981,133 @@ test('returns a positive number if the points_possible field is greater in the f
   strictEqual(this.gradebook.compareAssignmentPointsPossible(this.secondRecord, this.firstRecord), 1);
 });
 
+QUnit.module('Gradebook#compareAssignmentModulePositions - when both records have module info', {
+  createRecord (moduleId, positionInModule) {
+    return {
+      object: {
+        module_ids: [moduleId],
+        module_positions: [positionInModule],
+      }
+    };
+  },
+
+  setup () {
+    this.gradebook = createGradebook();
+    this.gradebook.setContextModules([
+      { id: '1', name: 'Module 1', position: 1 },
+      { id: '2', name: 'Another Module', position: 2 },
+      { id: '3', name: 'Module 2', position: 3 },
+    ]);
+  }
+});
+
+test("returns a negative number if the position of the first record's module comes first", function () {
+  const firstRecord = this.createRecord('1', 1);
+  const secondRecord = this.createRecord('2', 1);
+
+  ok(this.gradebook.compareAssignmentModulePositions(firstRecord, secondRecord) < 0);
+});
+
+test("returns a positive number if the position of the first record's module comes later", function () {
+  const firstRecord = this.createRecord('2', 1);
+  const secondRecord = this.createRecord('1', 1);
+
+  ok(this.gradebook.compareAssignmentModulePositions(firstRecord, secondRecord) > 0);
+});
+
+test('returns a negative number if within the same module the position of the first record comes first', function () {
+  const firstRecord = this.createRecord('1', 1);
+  const secondRecord = this.createRecord('1', 2);
+
+  ok(this.gradebook.compareAssignmentModulePositions(firstRecord, secondRecord) < 0);
+});
+
+test('returns a positive number if within the same module the position of the first record comes later', function () {
+  const firstRecord = this.createRecord('1', 2);
+  const secondRecord = this.createRecord('1', 1);
+
+  ok(this.gradebook.compareAssignmentModulePositions(firstRecord, secondRecord) > 0);
+});
+
+test('returns a zero if both records are in the same module at the same position', function () {
+  const firstRecord = this.createRecord('1', 1);
+  const secondRecord = this.createRecord('1', 1);
+
+  strictEqual(this.gradebook.compareAssignmentModulePositions(firstRecord, secondRecord), 0);
+});
+
+QUnit.module('Gradebook#compareAssignmentModulePositions - when only one record has module info', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.gradebook.setContextModules([
+      { id: '1', name: 'Module 1', position: 1 },
+    ]);
+    this.firstRecord = {
+      object: {
+        module_ids: ['1'],
+        module_positions: [1],
+      }
+    };
+    this.secondRecord = {
+      object: {
+        module_ids: [],
+        module_positions: [],
+      }
+    };
+  }
+});
+
+test('returns a negative number when the first record has module information but the second does not', function () {
+  ok(this.gradebook.compareAssignmentModulePositions(this.firstRecord, this.secondRecord) < 0);
+});
+
+test('returns a positive number when the first record has no module information but the second does', function () {
+  ok(this.gradebook.compareAssignmentModulePositions(this.secondRecord, this.firstRecord) > 0);
+});
+
+QUnit.module('Gradebook#compareAssignmentModulePositions - when neither record has module info', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.gradebook.setContextModules([
+      { id: '1', name: 'Module 1', position: 1 },
+    ]);
+    this.spy(this.gradebook, 'compareAssignmentPositions');
+
+    this.firstRecord = {
+      object: {
+        module_ids: [],
+        module_positions: [],
+        assignment_group: {
+          position: 1,
+        },
+        position: 1
+      }
+    };
+    this.secondRecord = {
+      object: {
+        module_ids: [],
+        module_positions: [],
+        assignment_group: {
+          position: 1,
+        },
+        position: 2
+      },
+    };
+
+    this.comparisonResult = this.gradebook.compareAssignmentModulePositions(this.firstRecord, this.secondRecord);
+  }
+});
+
+test('calls compareAssignmentPositions', function () {
+  strictEqual(this.gradebook.compareAssignmentPositions.callCount, 1);
+  deepEqual(this.gradebook.compareAssignmentPositions.getCall(0).args[0], this.firstRecord);
+  deepEqual(this.gradebook.compareAssignmentPositions.getCall(0).args[1], this.secondRecord);
+});
+
+test('returns the result of compareAssignmentPositions', function () {
+  strictEqual(this.comparisonResult, -1);
+});
+
 QUnit.module('Gradebook#storeCustomColumnOrder');
 
 test('stores the custom column order (ignoring frozen columns)', function () {
@@ -1054,9 +1190,53 @@ test('returns false if called with points', function () {
   strictEqual(this.gradebook.isDefaultSortOrder('custom'), false);
 });
 
+test('returns false if called with module_position', function () {
+  strictEqual(this.gradebook.isDefaultSortOrder('module_position'), false);
+});
+
 test('returns true if called with anything else', function () {
   strictEqual(this.gradebook.isDefaultSortOrder('alpha'), true);
   strictEqual(this.gradebook.isDefaultSortOrder('assignment_group'), true);
+});
+
+QUnit.module('Gradebook#isInvalidSort', {
+  setup () {
+    this.gradebook = createGradebook();
+  }
+});
+
+test('returns false if sorting by any valid criterion', function () {
+  this.gradebook.setStoredSortOrder({ sortType: 'name', direction: 'ascending' });
+
+  strictEqual(this.gradebook.isInvalidSort(), false);
+});
+
+test('returns true if sorting by module position but there are no modules in the course any more', function () {
+  this.gradebook.setStoredSortOrder({ sortType: 'module_position', direction: 'ascending' });
+  this.gradebook.courseContent.contextModules = [];
+
+  strictEqual(this.gradebook.isInvalidSort(), true);
+});
+
+test('returns false if sorting by module position and there are modules in the course', function () {
+  this.gradebook.setStoredSortOrder({ sortType: 'module_position', direction: 'ascending' });
+  this.gradebook.courseContent.contextModules = [
+    { id: '1', name: 'Module 1', position: 1 }
+  ];
+
+  strictEqual(this.gradebook.isInvalidSort(), false);
+});
+
+test('returns true if sorting by custom but there is no custom column order stored', function () {
+  this.gradebook.gradebookColumnOrderSettings = { sortType: 'custom' };
+
+  strictEqual(this.gradebook.isInvalidSort(), true);
+});
+
+test('returns false if sorting by custom and there is a custom column order stored', function () {
+  this.gradebook.gradebookColumnOrderSettings = { sortType: 'custom', customOrder: [1, 2, 3] };
+
+  strictEqual(this.gradebook.isInvalidSort(), false);
 });
 
 QUnit.module('Gradebook#getVisibleGradeGridColumns', {
@@ -1579,6 +1759,20 @@ test('sets disabled to false when assignments have been loaded', function () {
   strictEqual(this.getProps().disabled, false);
 });
 
+test('sets modulesEnabled to true when there are modules in the current course', function () {
+  this.gradebook.setContextModules([
+    { id: '1', name: 'Module 1', position: 1 },
+  ]);
+
+  strictEqual(this.getProps().modulesEnabled, true);
+});
+
+test('sets modulesEnabled to false when there are no modules in the current course', function () {
+  this.gradebook.setContextModules([]);
+
+  strictEqual(this.getProps().modulesEnabled, false);
+});
+
 test('sets onSortByNameAscending to a function that sorts columns by name ascending', function () {
   this.getProps().onSortByNameAscending();
 
@@ -1586,7 +1780,7 @@ test('sets onSortByNameAscending to a function that sorts columns by name ascend
   deepEqual(this.gradebook.arrangeColumnsBy.firstCall.args, this.expectedArgs('name', 'ascending'));
 });
 
-test('sets onSortByNameAscending to a function that sorts columns by name descending', function () {
+test('sets onSortByNameDescending to a function that sorts columns by name descending', function () {
   this.getProps().onSortByNameDescending();
 
   strictEqual(this.gradebook.arrangeColumnsBy.callCount, 1);
@@ -1600,7 +1794,7 @@ test('sets onSortByDueDateAscending to a function that sorts columns by due date
   deepEqual(this.gradebook.arrangeColumnsBy.firstCall.args, this.expectedArgs('due_date', 'ascending'));
 });
 
-test('sets onSortByDueDateAscending to a function that sorts columns by due date descending', function () {
+test('sets onSortByDueDateDescending to a function that sorts columns by due date descending', function () {
   this.getProps().onSortByDueDateDescending();
 
   strictEqual(this.gradebook.arrangeColumnsBy.callCount, 1);
@@ -1614,11 +1808,25 @@ test('sets onSortByPointsAscending to a function that sorts columns by points as
   deepEqual(this.gradebook.arrangeColumnsBy.firstCall.args, this.expectedArgs('points', 'ascending'));
 });
 
-test('sets onSortByPointsAscending to a function that sorts columns by points descending', function () {
+test('sets onSortByPointsDescending to a function that sorts columns by points descending', function () {
   this.getProps().onSortByPointsDescending();
 
   strictEqual(this.gradebook.arrangeColumnsBy.callCount, 1);
   deepEqual(this.gradebook.arrangeColumnsBy.firstCall.args, this.expectedArgs('points', 'descending'));
+});
+
+test('sets onSortByModuleAscending to a function that sorts columns by module position ascending', function () {
+  this.getProps().onSortByModuleAscending();
+
+  strictEqual(this.gradebook.arrangeColumnsBy.callCount, 1);
+  deepEqual(this.gradebook.arrangeColumnsBy.firstCall.args, this.expectedArgs('module_position', 'ascending'));
+});
+
+test('sets onSortByModuleDescending to a function that sorts columns by module position descending', function () {
+  this.getProps().onSortByModuleDescending();
+
+  strictEqual(this.gradebook.arrangeColumnsBy.callCount, 1);
+  deepEqual(this.gradebook.arrangeColumnsBy.firstCall.args, this.expectedArgs('module_position', 'descending'));
 });
 
 QUnit.module('Gradebook#getFilterSettingsViewOptionsMenuProps', {
