@@ -98,7 +98,7 @@ describe "admin settings tab" do
   end
 
   def click_submit
-    f("#account_settings button[type=submit]").click
+    move_to_click("#account_settings button[type=submit]")
     wait_for_ajax_requests
   end
 
@@ -453,6 +453,7 @@ describe "admin settings tab" do
       replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), 'https://whatever.example.com'
       f('#custom_help_link_settings button[type="submit"]').click
       click_submit
+      expect(fj('.ic-Sortable-item:last .ic-Sortable-item__Text')).to include_text('custom-link-text-frd')
       cl = Account.default.help_links.detect { |hl| hl['url'] == 'https://whatever.example.com' }
       expect(cl).not_to be_blank
     end
@@ -465,6 +466,7 @@ describe "admin settings tab" do
       fj('#custom_help_link_settings fieldset .ic-Label:contains("Teachers"):visible').click
       f('#custom_help_link_settings button[type="submit"]').click
       click_submit
+      expect(f('.ic-Sortable-item:nth-of-type(3) .ic-Sortable-item__Text')).to include_text('Report a Problem')
       cl = Account.default.help_links.detect { |hl| hl['url'] == '#create_ticket' }
       expect(cl['available_to']).not_to include('teacher')
     end
