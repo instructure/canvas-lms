@@ -16,14 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!blueprint_courses'
 import React from 'react'
 import get from 'lodash/get'
 
 import Grid, { GridRow, GridCol } from 'instructure-ui/lib/components/Grid'
 import Typography from 'instructure-ui/lib/components/Typography'
-import IconLock from 'instructure-icons/lib/Solid/IconBlueprintLockSolid'
-import IconUnlock from 'instructure-icons/lib/Solid/IconBlueprintSolid'
+import { IconLock, IconUnlock } from './BlueprintLocks'
 
 import propTypes from '../propTypes'
 import {itemTypeLabels, changeTypeLabels} from '../labels'
@@ -36,7 +34,7 @@ const UnsyncedChange = (props) => {
     <div className="bcs__history-item__change">
       <div className="bcs__history-item__content bcs__unsynced-change__content">
         <div className="bcs__history-item__lock-icon">
-          <Typography size="large" color="secondary">{locked ? <IconLock title={I18n.t('Locked')} /> : <IconUnlock title={I18n.t('Unlocked')} />}</Typography>
+          <Typography size="large" color="secondary">{locked ? <IconLock /> : <IconUnlock />}</Typography>
         </div>
         <div className="bcs__history-item__content-grid">
           <Grid colSpacing="none">
