@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!blueprint_settings'
 import $ from 'jquery'
+import _ from 'underscore'
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -137,7 +138,7 @@ export default class BlueprintAssociations extends React.Component {
             courses={this.props.courses}
             terms={this.props.terms}
             subAccounts={this.props.subAccounts}
-            loadCourses={this.props.loadCourses}
+            loadCourses={_.debounce(this.props.loadCourses, 200)}
             isLoadingCourses={this.props.isLoadingCourses}
             selectedCourses={this.props.addedAssociations.map(course => course.id)}
             onSelectedChanged={this.onSelectedChanged}
