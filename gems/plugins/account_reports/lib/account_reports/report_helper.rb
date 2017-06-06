@@ -277,7 +277,9 @@ module AccountReports::ReportHelper
     else
       @account_report.parameters["extra_text"] = text
     end
-    @account_report.save!
+    Shackles.activate(:master) do
+      @account_report.save!
+    end
   end
 
 end
