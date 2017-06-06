@@ -92,6 +92,7 @@ describe 'quizzes question creation' do
       wait_for_ajax_requests
 
       # check to see if the questions displays correctly
+      dismiss_flash_messages
       move_to_click('label[for=show_question_details]')
       quiz.reload
       finished_question = f("#question_#{quiz.quiz_questions[0].id}")

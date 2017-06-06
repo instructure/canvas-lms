@@ -19,12 +19,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!custom_help_link'
+import IconSettingsLine from 'instructure-icons/lib/Line/IconSettingsLine'
+import IconFolderLine from 'instructure-icons/lib/Line/IconFolderLine'
+import IconInfoLine from 'instructure-icons/lib/Line/IconInfoLine'
+import IconLifePreserverLine from 'instructure-icons/lib/Line/IconLifePreserverLine'
+import IconQuestionLine from 'instructure-icons/lib/Line/IconQuestionLine'
 import CustomHelpLinkIconInput from './CustomHelpLinkIconInput'
-import IconCog from 'jsx/shared/icons/IconCog'
-import IconFolder from 'jsx/shared/icons/IconFolder'
-import IconInformation from 'jsx/shared/icons/IconInformation'
-import IconLifePreserver from 'jsx/shared/icons/IconLifePreserver'
-import IconQuestionMark from 'jsx/shared/icons/IconQuestionMark'
 
   const CustomHelpLinkIcons = React.createClass({
     propTypes: {
@@ -43,36 +43,41 @@ import IconQuestionMark from 'jsx/shared/icons/IconQuestionMark'
             <CustomHelpLinkIconInput
               value="help"
               defaultChecked={defaultValue === 'help'}
-              label={I18n.t('Question mark icon')}>
-              <IconQuestionMark />
+              label={I18n.t('Question mark icon')}
+            >
+              <IconQuestionLine />
             </CustomHelpLinkIconInput>
 
             <CustomHelpLinkIconInput
               value="information"
               defaultChecked={defaultValue === 'information'}
-              label={I18n.t('Information icon')}>
-              <IconInformation />
+              label={I18n.t('Information icon')}
+            >
+              <IconInfoLine />
             </CustomHelpLinkIconInput>
 
             <CustomHelpLinkIconInput
               value="folder"
               defaultChecked={defaultValue === 'folder'}
-              label={I18n.t('Folder icon')}>
-              <IconFolder />
+              label={I18n.t('Folder icon')}
+            >
+              <IconFolderLine />
             </CustomHelpLinkIconInput>
 
             <CustomHelpLinkIconInput
               value="cog"
               defaultChecked={defaultValue === 'cog'}
-              label={I18n.t('Cog icon')}>
-              <IconCog />
+              label={I18n.t('Cog icon')}
+            >
+              <IconSettingsLine />
             </CustomHelpLinkIconInput>
 
             <CustomHelpLinkIconInput
               value="lifepreserver"
               defaultChecked={defaultValue === 'lifepreserver'}
-              label={I18n.t('Life preserver icon')}>
-              <IconLifePreserver />
+              label={I18n.t('Life preserver icon')}
+            >
+              <IconLifePreserverLine />
             </CustomHelpLinkIconInput>
           </div>
         </fieldset>

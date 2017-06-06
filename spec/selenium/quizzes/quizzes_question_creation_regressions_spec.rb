@@ -86,6 +86,7 @@ describe 'quizzes question creation' do
       wait_for_ajax_requests
 
       # check to see if the questions displays correctly
+      dismiss_flash_messages
       move_to_click('label[for=show_question_details]')
       quiz.reload
       finished_question = f("#question_#{quiz.quiz_questions[0].id}")
@@ -161,6 +162,7 @@ describe 'quizzes question creation' do
 
     it 'should show errors for graded quizzes', priority: "1", test_id: 197491 do
       open_quiz_edit_form
+      dismiss_flash_messages
       click_questions_tab
       edit_first_question
       delete_first_multiple_choice_answer
@@ -171,6 +173,7 @@ describe 'quizzes question creation' do
     it 'should not show errors for surveys', priority: "1", test_id: 197491 do
       @quiz.update_attribute :quiz_type, "graded_survey"
       open_quiz_edit_form
+      dismiss_flash_messages
       click_questions_tab
       edit_and_save_first_multiple_choice_answer 'instructure!'
       expect(error_displayed?).to be_falsey

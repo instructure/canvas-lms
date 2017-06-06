@@ -45,6 +45,8 @@
   }
   .icon-folder:before, .icon-folder-locked:before {
     @include fontSize(11px);
+    padding-right: $ic-sp/2;
+    vertical-align: middle;
   }
 
   i[class*=icon-], i[class^=icon-] { color: $ic-font-color-dark }
