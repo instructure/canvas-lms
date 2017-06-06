@@ -133,3 +133,10 @@ define [
     @$target.data('rich_text', true)
     RceCommandShim.destroy(@$target)
     ok @$target.editorBox.calledWith("destroy")
+
+  test "does not except if remoteEditor and editorBox are not set", ->
+    # sinon.spy(@$target, 'editorBox')
+    @$target.data('remoteEditor', null)
+    @$target.data('rich_text', true)
+    RceCommandShim.destroy(@$target)
+    ok true, 'function did not throw an exception'

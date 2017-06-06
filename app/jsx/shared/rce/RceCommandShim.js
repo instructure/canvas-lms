@@ -82,7 +82,7 @@ export function destroy ($target) {
     remoteEditor.destroy()
     $target.data('remoteEditor', null)
   } else if ($target.data('rich_text')) {
-    $target.editorBox('destroy')
+    $target.editorBox && $target.editorBox('destroy')
   } else {
     console.warn("called destroy() on an RCE instance that hasn't fully loaded, ignored")
   }
