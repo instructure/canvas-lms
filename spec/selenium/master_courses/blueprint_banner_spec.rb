@@ -35,11 +35,6 @@ describe "master courses banner" do
     @template = MasterCourses::MasterTemplate.set_as_master_course(@master)
     @minion = @template.add_child_course!(course_factory(name: "Minion", active_all: true)).child_course
     @minion.enroll_teacher(@master_teacher).accept!
-
-    # sets up the assignment that gets blueprinted
-    @original_assmt = @master.assignments.create! title: 'Blah', points_possible: 10, due_at: 5.days.from_now, description: 'this is the original content'
-    run_master_migration
-    @copy_assmt = @minion.assignments.last
   end
 
   describe "as a master course teacher" do
@@ -48,28 +43,63 @@ describe "master courses banner" do
       user_session(@master_teacher)
     end
 
+    context "for pages" do
+      before :once do
+        # sets up the page that gets blueprinted
+        @original_page = @master.wiki.wiki_pages.create! title: 'Unicorn', body: 'don\'t exist! Sorry James'
+        run_master_migration
+        @copy_page = @minion.wiki.wiki_pages.last
+      end
+
+      it "locks down the content and shows banner", priority:"2", test_id: 3248172 do
+        change_blueprint_settings(@master, content: true)
+        get "/courses/#{@master.id}/pages/#{@original_page.id}"
+        f('.bpc-lock-toggle button').click
+        expect(f('.bpc-lock-toggle__label')).to include_text('Locked')
+        expect(f('#blueprint-lock-banner')).to include_text('Content')
+        run_master_migration
+        get "/courses/#{@minion.id}/pages/#{@copy_page.id}/edit"
+        expect(f('.edit-content')).not_to contain_css('#tinymce')
+        expect(f('#blueprint-lock-banner')).to include_text('Content')
+      end
+
+      it "shows locked banner when locking", priority:"2", test_id: 3248173 do
+        change_blueprint_settings(@master, content: true, points: true, due_dates: true, availability_dates: true)
+        get "/courses/#{@master.id}/pages/#{@original_page.id}"
+        f('.bpc-lock-toggle button').click
+        expect(f('.bpc-lock-toggle__label')).to include_text('Locked')
+        expect(f('#blueprint-lock-banner')).to include_text('Content, Points, Due Dates & Availability Dates')
+      end
+    end
+
     context "for assignments" do
+      before :once do
+        # sets up the assignment that gets blueprinted
+        @original_assmt = @master.assignments.create! title: 'Blah', points_possible: 10, due_at: 5.days.from_now
+        @original_assmt.description = 'this is the original content'
+        run_master_migration
+        @copy_assmt = @minion.assignments.last
+      end
+
       it "locks down the content and show banner", priority: "2", test_id: 3127585 do
         change_blueprint_settings(@master, content: true)
         get "/courses/#{@master.id}/assignments/#{@original_assmt.id}"
         f('.bpc-lock-toggle button').click
-        expect { f('.bpc-lock-toggle__label').text }.to become('Locked')
+        expect(f('.bpc-lock-toggle__label')).to include_text('Locked')
         expect(f('#blueprint-lock-banner')).to include_text('Content')
         run_master_migration
         get "/courses/#{@minion.id}/assignments/#{@copy_assmt.id}/edit"
-        expect(f('#edit_assignment_wrapper')).not_to contain_css('#mceu_24')
-        expect(f('.bpc-lock-toggle__label').text).to eq('Locked')
+        expect(f('#edit_assignment_wrapper')).not_to contain_css('#tinymce')
+        expect(f('.bpc-lock-toggle__label')).to include_text('Locked')
         expect(f('#blueprint-lock-banner')).to include_text('Content')
       end
 
       it "shows locked banner when locking", priority:"1", test_id: 3127589 do
         change_blueprint_settings(@master, content: true, points: true, due_dates: true, availability_dates: true)
         get "/courses/#{@master.id}/assignments/#{@original_assmt.id}"
-        span_element = f('.assignment-buttons').find_element(:xpath, "//span/span[text()[contains(.,'Unlocked')]]")
-        span_element.find_element(:xpath, "//span/button").click
-        result = driver.find_elements(:xpath, "//div[@id='blueprint-lock-banner']//div[2]/span")
-        result = result.map(&:text)
-        expect(result).to eq(['Locked: ', 'Content, Points, Due Dates & Availability Dates'])
+        f('.bpc-lock-toggle button').click
+        expect(f('.bpc-lock-toggle__label')).to include_text('Locked')
+        expect(f('#blueprint-lock-banner')).to include_text('Content, Points, Due Dates & Availability Dates')
       end
     end
   end
