@@ -7,6 +7,7 @@ module Canvadocs
       user = opts.delete(:user)
       opts.merge! canvadoc_permissions_for_user(user)
       opts[:url] = attachment.authenticated_s3_url(expires_in: 7.days)
+      opts[:locale] = I18n.locale || I18n.default_locale
 
       Canvas.timeout_protection("canvadocs", raise_on_timeout: true) do
         session = canvadocs_api.session(document_id, opts)
