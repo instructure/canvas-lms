@@ -38,6 +38,13 @@ describe "add content box" do
     expect(f("#wizard_box .wizard_options_list")).to be_displayed
   end
 
+  it "should preview rich text content" do
+    f(".add_rich_content_link").click
+    type_in_tiny "textarea", "hello preview"
+    fj(".preview_button:not('.btn-small')").click
+    expect(fj(".preview_content.preview_section")).to include_text("hello preview")
+  end
+
   it "should add rich text content" do
     f(".add_rich_content_link").click
     type_in_tiny "textarea", "hello student"
