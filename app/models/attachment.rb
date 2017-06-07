@@ -1239,8 +1239,8 @@ class Attachment < ActiveRecord::Base
     self.send_to_purgatory(deleted_by_user)
     self.destroy_content
     self.uploaded_data = File.open Rails.root.join('public', 'file_removed', 'file_removed.pdf')
-    CrocodocDocument.where(attachment_id: self).delete_all
-    Canvadoc.where(attachment_id: self).delete_all
+    CrocodocDocument.where(attachment_id: self.related_attachments.select(:id)).delete_all
+    Canvadoc.where(attachment_id: self.related_attachments.select(:id)).delete_all
     self.save!
   end
 
