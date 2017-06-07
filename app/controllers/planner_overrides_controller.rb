@@ -142,7 +142,7 @@ class PlannerOverridesController < ApplicationController
   #     "ignore_permanently": "http://canvas.instructure.com/api/v1/users/self/todo/planner_note_1/viewing?permanent=1",
   #     "visible_in_planner": true,
   #     "planner_override": null,
-  #     "submissions": false,
+  #     "submissions": false, // false if no associated assignment exists for the plannable item
   #     "plannable_type": "planner_note",
   #     "plannable": {
   #       "id": 1,
@@ -284,6 +284,7 @@ class PlannerOverridesController < ApplicationController
     {
       include_ignored: true,
       include_ungraded: true,
+      include_concluded: true,
       due_before: end_date,
       due_after: start_date,
       limit: (params[:limit]&.to_i || 50)

@@ -2795,6 +2795,189 @@ describe User do
     end
   end
 
+  describe "#submitted_assignments" do
+    context "assignment locking" do
+      before :once do
+        course_with_student(:active_all => true)
+        assignment_quiz([], :course => @course, :user => @user)
+      end
+
+      before :each do
+        user_session(@student)
+        # Setup default values for tests (leave unsaved for easy changes)
+        @quiz.unlock_at = nil
+        @quiz.lock_at = nil
+        @quiz.due_at = 2.days.from_now
+      end
+
+      it "includes assignments with no due date but have overrides that are due" do
+        @quiz.due_at = nil
+        @quiz.save!
+        section = @course.course_sections.create! :name => "Test"
+        @student = student_in_section section
+        create_section_override_for_assignment @quiz.assignment, course_section: section
+        @quiz.assignment.submit_homework(@student, body: 'pineapple')
+        expect(@student.submitted_assignments(:contexts => [@course]).map(&:id)).
+          to be_include @quiz.assignment.id
+      end
+
+      it "should include assignments with no locks" do
+        @quiz.save!
+        @quiz.assignment.submit_homework(@student, body: 'ello')
+        list = @student.submitted_assignments(:contexts => [@course])
+        expect(list.size).to eql 1
+        expect(list.first.title).to eql 'Test Assignment'
+      end
+
+      it "should include assignments with unlock_at in the past" do
+        @quiz.unlock_at = 1.hour.ago
+        @quiz.save!
+        @quiz.assignment.submit_homework(@student, body: 'pink floyd')
+        list = @student.submitted_assignments(:contexts => [@course])
+        expect(list.size).to eql 1
+        expect(list.first.title).to eql 'Test Assignment'
+      end
+
+      it "should include assignments with lock_at in the future" do
+        @quiz.lock_at = 1.hour.from_now
+        @quiz.save!
+        @quiz.assignment.submit_homework(@student, body: 'quizzy mcquizzertons')
+        list = @student.submitted_assignments(:contexts => [@course])
+        expect(list.size).to eql 1
+        expect(list.first.title).to eql 'Test Assignment'
+      end
+
+      it "should not include assignments where unlock_at is in future" do
+        @quiz.unlock_at = 1.hour.from_now
+        @quiz.save!
+        @quiz.assignment.submit_homework(@student, body: 'peter pan')
+        expect(@student.submitted_assignments(:contexts => [@course]).count).to eq 0
+      end
+
+      it "should not include assignments where lock_at is in past" do
+        @quiz.lock_at = 1.hour.ago
+        @quiz.save!
+        @quiz.assignment.submit_homework(@student, body: 'peanut butter')
+        expect(@student.submitted_assignments(:contexts => [@course]).count).to eq 0
+      end
+    end
+
+    context "soft concluded courses" do
+      before :once do
+        course_with_student(:active_all => true)
+        @course.enrollment_term.update_attribute(:end_at, 1.day.from_now)
+        assignment_quiz([], :course => @course, :user => @user)
+        @assignment.submit_homework(@student, body: 'content')
+        @quiz.unlock_at = nil
+        @quiz.lock_at = nil
+        @quiz.due_at = 3.days.from_now
+        @quiz.save!
+      end
+
+      it "should not include assignments from soft concluded courses by default" do
+        Timecop.travel(2.days) do
+          EnrollmentState.recalculate_expired_states
+          expect(@student.submitted_assignments.count).to eq 0
+        end
+      end
+
+      it "should include assignments from soft concluded courses if specified" do
+        Timecop.travel(2.days) do
+          EnrollmentState.recalculate_expired_states
+          expect(@student.submitted_assignments(:include_concluded => true).count).to eq 1
+        end
+      end
+    end
+
+
+    def assignment_with_submissions(with_override: true, student: nil)
+      course_with_student(:active_all => true)
+      student ||= @student
+      @course.enrollments.each(&:destroy_permanently!) #student removed from default section
+      section = @course.course_sections.create!
+      student_in_section(section, user: student)
+      assignment_quiz([], :course => @course, :user => student)
+      @assignment.only_visible_to_overrides = true
+      @assignment.publish
+      @assignment.submit_homework(student, body: 'jefferson airplane')
+      @quiz.due_at = 2.days.from_now
+      @quiz.save!
+      if with_override
+        create_section_override_for_assignment(@assignment, {course_section: section})
+      end
+      @assignment
+    end
+
+    context "differentiated_assignments" do
+      it "should not return assignments without an override present for the student" do
+        assignment = assignment_with_submissions(with_override: false)
+        expect(@student.submitted_assignments(contexts: Course.all).map(&:id)).not_to be_include assignment.id
+      end
+
+      it "should return the assignments with an override" do
+        assignment = assignment_with_submissions
+        expect(@student.submitted_assignments(contexts: Course.all).map(&:id)).to be_include assignment.id
+      end
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "includes assignments from other shards" do
+        student = @shard1.activate { user_factory }
+        assignment = assignment_with_submissions(student: student)
+        expect(student.submitted_assignments.map(&:id)).to be_include assignment.id
+      end
+    end
+
+    context "ungraded assignments" do
+      before :once do
+        course_with_student :active_all => true
+        @assignment = @course.assignments.create! title: 'blah!', due_at: 1.day.from_now, submission_types: 'not_graded'
+        @past_assignment = @course.assignments.create! title: 'blah!', due_at: 1.day.ago, submission_types: 'not_graded'
+        @assignment.submit_homework(@student, body: 'content')
+        @past_assignment.submit_homework(@student, body: 'content')
+      end
+
+      it "doesn't include ungraded assignments by default" do
+        expect(@student.submitted_assignments.map(&:id)).not_to be_include @assignment.id
+        expect(@student.submitted_assignments.map(&:id)).not_to be_include @past_assignment.id
+      end
+
+      it "includes ungraded assignments when specified" do
+        expect(@student.submitted_assignments(include_ungraded: true).map(&:id)).to be_include @assignment.id
+        expect(@student.submitted_assignments(include_ungraded: true).map(&:id)).to be_include @past_assignment.id
+      end
+    end
+  end
+
+  describe "select_available_assignments" do
+    before :once do
+      course_with_student :active_all => true
+      @assignment = @course.assignments.create! title: 'blah!', due_at: 1.day.from_now, submission_types: 'not_graded'
+    end
+
+    it "should not include concluded enrollments by default" do
+      expect(@student.select_available_assignments([@assignment]).count).to eq 1
+      @course.enrollment_term.update_attribute(:end_at, 1.day.from_now)
+
+      Timecop.travel(2.days) do
+        EnrollmentState.recalculate_expired_states
+        expect(@student.select_available_assignments([@assignment]).count).to eq 0
+      end
+    end
+
+    it "should included concluded enrollments if specified" do
+      @course.enrollment_term.update_attribute(:end_at, 1.day.from_now)
+
+      Timecop.travel(2.days) do
+        EnrollmentState.recalculate_expired_states
+        expect(@student.select_available_assignments([@assignment], :include_concluded => true).count).to eq 1
+      end
+    end
+
+  end
+
   describe ".initial_enrollment_type_from_type" do
     it "should return supported initial_enrollment_type values" do
       expect(User.initial_enrollment_type_from_text('StudentEnrollment')).to eq 'student'

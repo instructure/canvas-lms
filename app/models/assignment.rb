@@ -1970,6 +1970,10 @@ class Assignment < ActiveRecord::Base
     eager_load(:submissions).where(submissions: {user_id: user})
   }
 
+  scope :with_non_placeholder_submissions_for_user, lambda { |user|
+    with_submissions_for_user(user).merge(Submission.not_placeholder)
+  }
+
   scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
   scope :for_course, lambda { |course_id| where(:context_type => 'Course', :context_id => course_id) }
   scope :for_group_category, lambda { |group_category_id| where(:group_category_id => group_category_id) }
