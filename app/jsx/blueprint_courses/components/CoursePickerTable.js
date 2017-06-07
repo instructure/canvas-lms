@@ -48,6 +48,11 @@ export default class CoursePickerTable extends React.Component {
       selected: this.parseSelectedCourses(props.selectedCourses),
       selectedAll: false,
     }
+    this._tableRef = null;
+  }
+
+  componentDidMount () {
+    this.fixIcons()
   }
 
   componentWillReceiveProps (nextProps) {
@@ -55,6 +60,10 @@ export default class CoursePickerTable extends React.Component {
       selected: this.parseSelectedCourses(nextProps.selectedCourses),
       selectedAll: nextProps.selectedCourses.length === nextProps.courses.length,
     })
+  }
+
+  componentDidUpdate () {
+    this.fixIcons()
   }
 
   onSelectToggle = (e) => {
@@ -82,6 +91,18 @@ export default class CoursePickerTable extends React.Component {
       return selectedMap
     }, {})
     this.updateSelected(selected, e.target.checked)
+  }
+
+  // in IE, instui icons are in the tab order and get focus, even if hidden
+  // this fixes them up so that doesn't happen.
+  // Eventually this should get folded into instui via INSTUI-572
+  fixIcons () {
+    if (this._tableRef) {
+      Array.prototype.forEach.call(
+        this._tableRef.querySelectorAll('svg[aria-hidden]'),
+        (el) => { el.setAttribute('focusable', 'false') }
+      )
+    }
   }
 
   parseSelectedCourses (courses = []) {
@@ -219,7 +240,7 @@ export default class CoursePickerTable extends React.Component {
 
   render () {
     return (
-      <div className="bca-table__wrapper">
+      <div className="bca-table__wrapper" ref={(el) => { this._tableRef = el }}>
         {this.renderStickyHeaders()}
         <div className="bca-table__content-wrapper">
           <Table caption={<ScreenReaderContent>{I18n.t('Blueprint Courses')}</ScreenReaderContent>}>

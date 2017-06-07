@@ -50,6 +50,10 @@ export default class AssociationsTable extends React.Component {
     }
   }
 
+  componentDidMount () {
+    this.fixIcons()
+  }
+
   componentWillReceiveProps (nextProps) {
     this.setState({
       visibleExisting: nextProps.existingAssociations.filter(assoc => !nextProps.removedAssociations.includes(assoc.id)),
@@ -62,6 +66,10 @@ export default class AssociationsTable extends React.Component {
     if (this.props.isLoadingAssociations && !nextProps.isLoadingAssociations) {
       $.screenReaderFlashMessageExclusive(I18n.t('Loading associations complete'))
     }
+  }
+
+  componentDidUpdate () {
+    this.fixIcons()
   }
 
   onRemove = (e) => {
@@ -79,6 +87,17 @@ export default class AssociationsTable extends React.Component {
     focusTo.focus()
   }
 
+  // in IE, instui icons are in the tab order and get focus, even if hidden
+  // this fixes them up so that doesn't happen.
+  // Eventually this should get folded into instui via INSTUI-572
+  fixIcons () {
+    if (this.wrapper) {
+      Array.prototype.forEach.call(
+        this.wrapper.querySelectorAll('svg[aria-hidden]'),
+        (el) => { el.setAttribute('focusable', 'false') }
+      )
+    }
+  }
   renderColGroup () {
     return (
       <colgroup>
