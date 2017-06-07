@@ -433,6 +433,30 @@ describe Attachment do
       a.destroy_content_and_replace
       expect(a.content_type).to eq 'unknown/unknown'
     end
+
+    it 'should not delete s3objects if it is not production for destroy_content' do
+      ApplicationController.stubs(:test_cluster?).returns(true)
+      s3_storage!
+      a = attachment_model
+      a.stubs(:s3object).returns(mock('s3object'))
+      s3object = a.s3object
+      s3object.expects(:delete).never
+      a.destroy_content
+    end
+
+    it 'should destroy all crocodocs even from children attachments' do
+      local_storage!
+      configure_crocodoc
+
+      a = crocodocable_attachment_model(uploaded_data: default_uploaded_data)
+      a2 = attachment_model(root_attachment: a)
+      a2.submit_to_canvadocs 1, wants_annotation: true
+      run_jobs
+
+      expect(a2.crocodoc_document).not_to be_nil
+      a.destroy_content_and_replace
+      expect(a2.reload.crocodoc_document).to be_nil
+    end
   end
 
   context "restore" do

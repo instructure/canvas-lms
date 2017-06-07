@@ -1235,9 +1235,9 @@ class Attachment < ActiveRecord::Base
   def destroy_content_and_replace
     raise 'must be a root_attachment' if self.root_attachment_id
     self.destroy_content
-    self.uploaded_data = File.open Rails.root.join('public/file_removed/file_removed.pdf')
-    CrocodocDocument.where(attachment_id: self).delete_all
-    Canvadoc.where(attachment_id: self).delete_all
+    self.uploaded_data = File.open Rails.root.join('public', 'file_removed', 'file_removed.pdf')
+    CrocodocDocument.where(attachment_id: self.related_attachments.select(:id)).delete_all
+    Canvadoc.where(attachment_id: self.related_attachments.select(:id)).delete_all
     self.save!
   end
 
