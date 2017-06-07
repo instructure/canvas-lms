@@ -41,6 +41,7 @@
 *        default is 'info' unless an error object is passed in, else is 'error'
 */
 
+import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
@@ -82,6 +83,12 @@ export default class FlashAlert extends React.Component {
 
   componentDidMount () {
     this.timerId = setTimeout(() => this.closeAlert(), timeout)
+    let dets = ''
+    if (this.props.error) {
+      const {a, b} = this.findDetailMessage()
+      dets = `${a} ${b || ''}`
+    }
+    $.screenReaderFlashMessage(`${this.props.message}. ${dets}`)
   }
 
   getLiveRegion () {
