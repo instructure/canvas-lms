@@ -105,13 +105,6 @@ module Login::Shared
     true
   end
 
-  def check_sa_delegated_cookie
-    if cookies['canvas_sa_delegated']
-      @real_domain_root_account = @domain_root_account
-      @domain_root_account = Account.site_admin
-    end
-  end
-
   include PseudonymSessionsController
   def remember_me_cookie_domain
     otp_remember_me_cookie_domain
