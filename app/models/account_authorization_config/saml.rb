@@ -130,6 +130,10 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     super
   end
 
+  def signing_certificates
+    settings['signing_certificates'] ||= []
+  end
+
   def populate_from_metadata(entity)
     idps = entity.identity_providers
     raise "Must provide exactly one IDPSSODescriptor; found #{idps.length}" unless idps.length == 1
@@ -139,6 +143,7 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     self.log_out_url = idp.single_logout_services.find { |ep| ep.binding == SAML2::Endpoint::Bindings::HTTP_REDIRECT }.try(:location)
     self.certificate_fingerprint = (idp.signing_keys.first || idp.keys.first).try(:fingerprint)
     self.identifier_format = (idp.name_id_formats & Onelogin::Saml::NameIdentifiers::ALL_IDENTIFIERS).first
+    self.settings[:signing_certificates] = idp.signing_keys.map(&:x509)
   end
 
   def populate_from_metadata_xml(xml)

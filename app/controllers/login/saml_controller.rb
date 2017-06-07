@@ -199,13 +199,35 @@ class Login::SamlController < ApplicationController
   end
 
   def destroy
-    message, relay_state = SAML2::Bindings::HTTPRedirect.decode(request.url)
+    aac = message = nil
+    key_to_certificate = {}
+    log_key_used = ->(key) do
+      fingerprint = Digest::SHA1.hexdigest(key_to_certificate[key].to_der).gsub(/(\h{2})(?=\h)/, '\1:')
+      logger.info "Received signed SAML LogoutRequest from #{message.issuer.id} using certificate #{fingerprint}"
+    end
+
+    message, relay_state = SAML2::Bindings::HTTPRedirect.decode(request.url, public_key_used: log_key_used) do |m|
+      message = m
+      aac = @domain_root_account.authentication_providers.active.where(idp_entity_id: message.issuer.id).first
+      return render status: :bad_request, plain: "Could not find SAML Entity" unless aac
+
+      # only require signatures for LogoutRequests, and only if the provider has a certificate on file
+      next unless message.is_a?(SAML2::LogoutRequest)
+      next if (certificates = aac.signing_certificates).blank?
+      certificates.map do |cert_base64|
+        certificate = OpenSSL::X509::Certificate.new(Base64.decode64(cert_base64))
+        key = certificate.public_key
+        key_to_certificate[key] = certificate
+        key
+      end
+    end
+    # the above block may have been skipped in specs due to stubbing
+    aac ||= @domain_root_account.authentication_providers.active.where(idp_entity_id: message.issuer.id).first
+    return render status: :bad_request, plain: "Could not find SAML Entity" unless aac
+
     case message
     when SAML2::LogoutResponse
       increment_saml_stat("logout_response_received")
-
-      aac = @domain_root_account.authentication_providers.active.where(idp_entity_id: message.issuer.id).first
-      return render status: :bad_request, plain: "Could not find SAML Entity" unless aac
 
       if aac.debugging? && aac.debug_get(:logout_request_id) == message.in_response_to
         aac.debug_set(:idp_logout_response_encoded, params[:SAMLResponse])
@@ -259,8 +281,6 @@ class Login::SamlController < ApplicationController
       return redirect_to saml_login_url(id: aac.id)
     when SAML2::LogoutRequest
       increment_saml_stat("logout_request_received")
-      aac = @domain_root_account.authentication_providers.active.where(idp_entity_id: message.issuer.id).first
-      return render status: :bad_request, plain: "Could not find SAML Entity" unless aac
 
       if aac.debugging? && aac.debug_get(:logged_in_user_id) == @current_user.id
         aac.debug_set(:idp_logout_request_encoded, params[:SAMLRequest])
