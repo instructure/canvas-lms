@@ -16,24 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { FETCH_USERS_SUCCESS } from 'jsx/gradebook-history/actions/UserActions';
+import I18n from 'i18n!gradebook_history';
+import splitAssetString from 'coffeescripts/str/splitAssetString';
 
-function getUsers (arr) {
-  return arr.reduce((acc, user) => {
-    acc[user.id] = user.name;
-    return acc;
-  }, {});
+const colHeaders = [
+  I18n.t('Date'),
+  I18n.t('Time'),
+  I18n.t('From'),
+  I18n.t('To'),
+  I18n.t('Grader'),
+  I18n.t('Student'),
+  I18n.t('Assignment'),
+  I18n.t('Anonymous')
+];
+
+function courseId () {
+  return ENV.context_asset_string ? splitAssetString(ENV.context_asset_string)[1] : '';
 }
 
-export default function users (state = {}, action) {
-  switch (action.type) {
-    case FETCH_USERS_SUCCESS:
-      return {
-        ...state,
-        users: getUsers(action.payload)
-      };
+function timezone () {
+  return ENV.TIMEZONE;
+}
 
-    default:
-      return state;
-  }
+export default {
+  colHeaders,
+  courseId,
+  timezone
 }

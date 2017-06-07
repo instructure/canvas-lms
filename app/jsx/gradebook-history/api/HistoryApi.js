@@ -24,7 +24,7 @@ function toParams (id, timeFrame) {
       id,
       start_time: timeFrame.from,
       end_time: timeFrame.to,
-      per_page: 20
+      per_page: 10
     }
   };
 }
@@ -50,4 +50,8 @@ function getByStudent (studentId, timeFrame = {from: '', to: ''}) {
   return axios.get(url, params);
 }
 
-export default { getByAssignment, getByGrader, getByStudent };
+export default {
+  getByAssignment,
+  getByGrader,
+  getByStudent
+}

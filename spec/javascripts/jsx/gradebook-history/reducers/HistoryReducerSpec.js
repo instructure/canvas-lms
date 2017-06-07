@@ -15,12 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+import Fixtures from 'spec/jsx/gradebook-history/Fixtures';
 import {
-  FETCH_HISTORY_STARTED,
+  FETCH_HISTORY_START,
   FETCH_HISTORY_SUCCESS,
   FETCH_HISTORY_FAILURE
 } from 'jsx/gradebook-history/actions/HistoryActions';
-import reducer from 'jsx/gradebook-history/reducers/HistoryReducer';
+import reducer, { formatHistoryItems } from 'jsx/gradebook-history/reducers/HistoryReducer';
 
 QUnit.module('HistoryReducer');
 
@@ -33,7 +35,7 @@ test('returns the current state by default', function () {
   deepEqual(reducer(initialState, {}), initialState);
 });
 
-test('should handle FETCH_HISTORY_STARTED', function () {
+test('should handle FETCH_HISTORY_START', function () {
   const initialState = {
     loading: false,
     items: [],
@@ -45,11 +47,11 @@ test('should handle FETCH_HISTORY_STARTED', function () {
     items: null,
     fetchHistoryStatus: 'started'
   };
-  deepEqual(reducer(initialState, { type: FETCH_HISTORY_STARTED }), newState);
+  deepEqual(reducer(initialState, { type: FETCH_HISTORY_START }), newState);
 });
 
 test('should handle FETCH_HISTORY_SUCCESS', function () {
-  const data = { 1: 'some data' };
+  const payload = Fixtures.payload();
   const initialState = {
     loading: false,
     items: [],
@@ -58,10 +60,10 @@ test('should handle FETCH_HISTORY_SUCCESS', function () {
   const newState = {
     ...initialState,
     loading: false,
-    items: data,
+    items: formatHistoryItems(payload),
     fetchHistoryStatus: 'success'
   };
-  deepEqual(reducer(initialState, { type: FETCH_HISTORY_SUCCESS, payload: data }), newState);
+  deepEqual(reducer(initialState, { type: FETCH_HISTORY_SUCCESS, payload }), newState);
 });
 
 test('should handle FETCH_HISTORY_FAILURE', function () {

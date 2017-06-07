@@ -18,12 +18,14 @@
 
 import { combineReducers } from 'redux';
 import history from 'jsx/gradebook-history/reducers/HistoryReducer';
-import users from 'jsx/gradebook-history/reducers/UsersReducer';
+import searchForm from 'jsx/gradebook-history/reducers/SearchFormReducer';
 
-export const allReducers = () => (
-  { history, users }
-);
+const allReducers = () => (
+  { history, searchForm }
+)
 
 const gradebookHistory = combineReducers(allReducers());
 
 export default gradebookHistory;
+
+export { allReducers };

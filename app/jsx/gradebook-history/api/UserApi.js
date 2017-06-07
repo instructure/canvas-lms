@@ -16,34 +16,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const FETCH_HISTORY_START = 'FETCH_HISTORY_START';
-const FETCH_HISTORY_SUCCESS = 'FETCH_HISTORY_SUCCESS';
-const FETCH_HISTORY_FAILURE = 'FETCH_HISTORY_FAILURE';
+import axios from 'axios';
+import constants from 'jsx/gradebook-history/constants';
 
-function fetchHistoryStarted () {
-  return {
-    type: FETCH_HISTORY_START
-  };
+const userMetaTypes = {
+  graders: ['teacher', 'ta'],
+  students: ['student', 'student_view']
+};
+
+function getUsersByName (userType, searchTerm) {
+  if (searchTerm.length < 3) {
+    // the endpoint doesn't allow searching by 2 letters or less
+    return Promise.resolve({ response: {data: []} });
+  }
+
+  const params = {
+    params: {
+      search_term: searchTerm,
+      enrollment_type: userMetaTypes[userType]
+    }
+  }
+  const url = encodeURI(`/api/v1/courses/${constants.courseId()}/users`);
+
+  return axios.get(url, params);
 }
 
-function fetchHistorySuccess ({ events, linked: { users }}, { link }) {
-  return {
-    type: FETCH_HISTORY_SUCCESS,
-    payload: { events, users, link }
-  };
-}
-
-function fetchHistoryFailure () {
-  return {
-    type: FETCH_HISTORY_FAILURE
-  };
+function getUsersNextPage (url) {
+  return axios.get(url);
 }
 
 export default {
-  FETCH_HISTORY_START,
-  FETCH_HISTORY_SUCCESS,
-  FETCH_HISTORY_FAILURE,
-  fetchHistoryStarted,
-  fetchHistorySuccess,
-  fetchHistoryFailure
-};
+  getUsersByName,
+  getUsersNextPage
+}
