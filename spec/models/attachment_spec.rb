@@ -457,6 +457,20 @@ describe Attachment do
       a.destroy_content
     end
 
+    it 'should destroy all crocodocs even from children attachments' do
+      local_storage!
+      configure_crocodoc
+
+      a = crocodocable_attachment_model(uploaded_data: default_uploaded_data)
+      a2 = attachment_model(root_attachment: a)
+      a2.submit_to_canvadocs 1, wants_annotation: true
+      run_jobs
+
+      expect(a2.crocodoc_document).not_to be_nil
+      a.destroy_content_and_replace
+      expect(a2.reload.crocodoc_document).to be_nil
+    end
+
     shared_examples_for "purgatory" do
       it 'should save file in purgatory and then restore and back again' do
         a = attachment_model(uploaded_data: default_uploaded_data)
