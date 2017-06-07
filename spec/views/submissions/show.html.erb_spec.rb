@@ -35,7 +35,7 @@ describe "/submissions/show" do
 
   context 'when assignment has a rubric' do
     before :once do
-      assignment_model
+      assignment_model(course: @course)
       rubric_association_model association_object: @assignment, purpose: 'grading'
       @submission = @assignment.submit_homework(@user)
     end

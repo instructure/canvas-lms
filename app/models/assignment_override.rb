@@ -121,7 +121,8 @@ class AssignmentOverride < ActiveRecord::Base
 
   def update_cached_due_dates
     return unless assignment?
-    if due_at_overridden_changed? ||
+    if due_at_overridden_changed? || set_id_changed? ||
+      (set_type_changed? && set_type != 'ADHOC') ||
       (due_at_overridden && due_at_changed?) ||
       (due_at_overridden && workflow_state_changed?)
       DueDateCacher.recompute(assignment)

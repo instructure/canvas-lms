@@ -195,7 +195,7 @@ module Lti
     end
 
     def submission
-      @_submission ||= Submission.find(params[:submission_id])
+      @_submission ||= Submission.active.find(params[:submission_id])
     end
 
     def authorized?

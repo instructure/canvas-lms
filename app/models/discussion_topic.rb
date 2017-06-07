@@ -907,7 +907,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def ensure_submission(user)
-    submission = Submission.where(assignment_id: self.assignment_id, user_id: user).first
+    submission = Submission.active.where(assignment_id: self.assignment_id, user_id: user).first
     unless submission && submission.submission_type == 'discussion_topic' && submission.workflow_state != 'unsubmitted'
       submission = self.assignment.submit_homework(user, :submission_type => 'discussion_topic')
     end

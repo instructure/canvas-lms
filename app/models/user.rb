@@ -81,7 +81,8 @@ class User < ActiveRecord::Base
   has_many :student_enrollments
   has_many :ta_enrollments
   has_many :teacher_enrollments, -> { where(enrollments: { type: 'TeacherEnrollment' })}, class_name: 'TeacherEnrollment'
-  has_many :submissions, -> { preload(:assignment, :submission_comments).order('submissions.updated_at DESC') }, dependent: :destroy
+  has_many :all_submissions, -> { preload(:assignment, :submission_comments).order('submissions.updated_at DESC') }, class_name: 'Submission', dependent: :destroy
+  has_many :submissions, -> { active.preload(:assignment, :submission_comments).order('submissions.updated_at DESC') }
   has_many :pseudonyms, -> { order(:position) }, dependent: :destroy
   has_many :active_pseudonyms, -> { where("pseudonyms.workflow_state<>'deleted'") }, class_name: 'Pseudonym'
   has_many :pseudonym_accounts, :source => :account, :through => :pseudonyms
@@ -1355,7 +1356,7 @@ class User < ActiveRecord::Base
 
   def assignments_recently_graded(opts={})
     opts = { :start_at => 1.week.ago, :limit => 10 }.merge(opts)
-    Submission.recently_graded_assignments(id, opts[:start_at], opts[:limit])
+    Submission.active.recently_graded_assignments(id, opts[:start_at], opts[:limit])
   end
 
   def preferences
@@ -1666,11 +1667,11 @@ class User < ActiveRecord::Base
 
         {
           submitted: Set.new(submitted_assignments(opts).map(&:id)),
-          excused: Set.new(Submission.with_assignment.where(excused: true, user_id: self).pluck(:assignment_id)),
-          graded: Set.new(Submission.with_assignment.where(user_id: self).where("submissions.excused = true OR (submissions.score IS NOT NULL AND submissions.workflow_state = 'graded')").pluck(:assignment_id)),
-          late: Set.new(Submission.with_assignment.late.where(user_id: self).pluck(:assignment_id)),
-          missing: Set.new(Submission.with_assignment.missing.where(user_id: self).pluck(:assignment_id)),
-          needs_grading: Set.new(Submission.with_assignment.needs_grading.where(user_id: self).pluck(:assignment_id)),
+          excused: Set.new(Submission.active.with_assignment.where(excused: true, user_id: self).pluck(:assignment_id)),
+          graded: Set.new(Submission.active.with_assignment.where(user_id: self).where("submissions.excused = true OR (submissions.score IS NOT NULL AND submissions.workflow_state = 'graded')").pluck(:assignment_id)),
+          late: Set.new(Submission.active.with_assignment.late.where(user_id: self).pluck(:assignment_id)),
+          missing: Set.new(Submission.active.with_assignment.missing.where(user_id: self).pluck(:assignment_id)),
+          needs_grading: Set.new(Submission.active.with_assignment.needs_grading.where(user_id: self).pluck(:assignment_id)),
           has_feedback: Set.new(self.recent_feedback(start_at: opts[:due_after]).map(&:assignment_id))
         }.with_indifferent_access
     end
@@ -1987,7 +1988,7 @@ class User < ActiveRecord::Base
             order('submissions.created_at DESC').
             limit(opts[:limit]).to_a
 
-          subs_with_comment_scope = Submission.where(:user_id => self).for_context_codes(context_codes).
+          subs_with_comment_scope = Submission.active.where(user_id: self).for_context_codes(context_codes).
             joins(:submission_comments, :assignment).
             where(assignments: {muted: false, workflow_state: 'published'}).
             where.not(:submission_comments => {:author_id => self, :draft => true}).

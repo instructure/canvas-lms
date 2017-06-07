@@ -21,7 +21,7 @@ class TurnitinFix < ActiveRecord::Migration[4.2]
   def self.up
     Assignment.record_timestamps = false
     Assignment.where("turnitin_enabled AND EXISTS (?)",
-                     Submission.where("assignment_id = assignments.id AND turnitin_data IS NOT NULL")).
+                     Submission.active.where("assignment_id = assignments.id AND turnitin_data IS NOT NULL")).
         find_each do |assignment|
       assignment.turnitin_settings = assignment.turnitin_settings
       assignment.turnitin_settings[:created] = true

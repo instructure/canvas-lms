@@ -380,12 +380,12 @@ class SubmissionsApiController < ApplicationController
           where("users.id" => student_ids)
 
       submissions_scope = if requested_assignment_ids.present?
-                      Submission.where(
+                      Submission.active.where(
                         :user_id => student_ids,
                         :assignment_id => assignments
                       )
                     else
-                      Submission.joins(:assignment).where(
+                      Submission.active.joins(:assignment).where(
                         :user_id => student_ids,
                         "assignments.context_type" => @context.class.name,
                         "assignments.context_id" => @context.id

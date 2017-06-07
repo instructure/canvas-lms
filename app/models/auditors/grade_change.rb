@@ -56,7 +56,7 @@ class Auditors::GradeChange
     end
 
     def submission
-      @submission ||= Submission.find(submission_id)
+      @submission ||= Submission.active.find(submission_id)
     end
 
     def previous_submission

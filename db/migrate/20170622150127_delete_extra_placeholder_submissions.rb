@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - present Instructure, Inc.
+# Copyright (C) 2017 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,18 +15,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class SubmissionCommentConversationFix < ActiveRecord::Migration[4.2]
+class DeleteExtraPlaceholderSubmissions < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
-  def self.up
-    Submission.active.where(id: ConversationMessage.select(:asset_id).
-                         where("asset_id IS NOT NULL").
-                         where(body: '')).each do |submission|
-      submission.create_or_update_conversations!(:destroy) if submission.visible_submission_comments.empty?
-    end
-  end
-
-  def self.down
-    raise ActiveRecord::IrreversibleMigration
+  def change
+    DataFixup::DeleteExtraPlaceholderSubmissions.send_later_if_production_enqueue_args(
+      :run,
+      priority: Delayed::LOW_PRIORITY,
+      strand: "DataFixup:DeleteExtraPlaceholderSubmissions:Migration:#{Shard.current.database_server.id}"
+    )
   end
 end

@@ -60,7 +60,7 @@ class Attachment < ActiveRecord::Base
   belongs_to :user
   has_one :account_report
   has_one :media_object
-  has_many :submissions
+  has_many :submissions, -> { active }
   has_many :attachment_associations
   belongs_to :root_attachment, :class_name => 'Attachment'
   belongs_to :replacement_attachment, :class_name => 'Attachment'

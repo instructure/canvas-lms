@@ -49,7 +49,8 @@ class Assignment < ActiveRecord::Base
   restrict_columns :content, [:title, :description]
   restrict_assignment_columns
 
-  has_many :submissions, :dependent => :destroy
+  has_many :submissions, -> { active }
+  has_many :all_submissions, class_name: 'Submission', dependent: :destroy
   has_many :provisional_grades, :through => :submissions
   has_many :attachments, :as => :context, :inverse_of => :context, :dependent => :destroy
   has_many :assignment_student_visibilities
@@ -164,7 +165,7 @@ class Assignment < ActiveRecord::Base
 
     result = self.clone
     result.migration_id = nil
-    result.submissions.clear
+    result.all_submissions.clear
     result.attachments.clear
     result.ignores.clear
     result.moderated_grading_selections.clear
@@ -1284,7 +1285,7 @@ class Assignment < ActiveRecord::Base
       submissions_to_save.concat(submissions.select  { !submissions.score || (options[:overwrite_existing_grades] && submissions.score != score) })
     end
 
-    Submission.where(:id => submissions_to_save).update_all({
+    Submission.active.where(id: submissions_to_save).update_all({
       :score => score,
       :grade => grade,
       :published_score => score,
@@ -1340,7 +1341,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def submission_for_student(user)
-    self.submissions.where(user_id: user.id).first_or_initialize
+    self.all_submissions.where(user_id: user.id).first_or_initialize
   end
 
   class GradeError < StandardError
@@ -1476,7 +1477,7 @@ class Assignment < ActiveRecord::Base
 
   def find_or_create_submission(user)
     Assignment.unique_constraint_retry do
-      s = submissions.where(user_id: user).first
+      s = all_submissions.where(user_id: user).first
       if !s
         s = submissions.build
         user.is_a?(User) ? s.user = user : s.user_id = user
@@ -1487,7 +1488,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def find_or_create_submissions(students)
-    submissions = self.submissions.where(user_id: students).order(:user_id).to_a
+    submissions = self.all_submissions.where(user_id: students).order(:user_id).to_a
     submissions_hash = submissions.index_by(&:user_id)
     # we touch the user in an after_save; the FK causes a read lock
     # to be taken on the user during submission INSERT, so to avoid
@@ -1519,7 +1520,7 @@ class Assignment < ActiveRecord::Base
             submissions << submission
           end
         rescue ActiveRecord::RecordNotUnique
-          submission = self.submissions.where(user_id: student).first
+          submission = self.all_submissions.where(user_id: student).first
           raise unless submission
           submissions << submission
           submission.assignment = self
@@ -2016,12 +2017,14 @@ class Assignment < ActiveRecord::Base
   scope :include_submitted_count, -> { select(
     "assignments.*, (SELECT COUNT(*) FROM #{Submission.quoted_table_name}
     WHERE assignments.id = submissions.assignment_id
-    AND submissions.submission_type IS NOT NULL) AS submitted_count") }
+    AND submissions.submission_type IS NOT NULL
+    AND submissions.workflow_state <> 'deleted') AS submitted_count") }
 
   scope :include_graded_count, -> { select(
     "assignments.*, (SELECT COUNT(*) FROM #{Submission.quoted_table_name}
     WHERE assignments.id = submissions.assignment_id
-    AND submissions.grade IS NOT NULL) AS graded_count") }
+    AND submissions.grade IS NOT NULL
+    AND submissions.workflow_state <> 'deleted') AS graded_count") }
 
   scope :include_submittables, -> { preload(:quiz, :discussion_topic, :wiki_page) }
 
@@ -2118,6 +2121,7 @@ class Assignment < ActiveRecord::Base
     chain = api_needed_fields.
       where("(SELECT COUNT(id) FROM #{Submission.quoted_table_name}
             WHERE assignment_id = assignments.id
+            AND submissions.workflow_state <> 'deleted'
             AND (submission_type IS NOT NULL OR excused = ?)
             AND user_id = ?) = 0", true, user_id).
       limit(limit).
@@ -2133,7 +2137,7 @@ class Assignment < ActiveRecord::Base
   scope :need_grading_info, lambda {
     chain = api_needed_fields.
       where("EXISTS (?)",
-        Submission.where("assignment_id=assignments.id").
+        Submission.active.where("assignment_id=assignments.id").
           where(Submission.needs_grading_conditions)).
       order("assignments.due_at")
 
@@ -2256,7 +2260,7 @@ class Assignment < ActiveRecord::Base
 
     if user_id
       user = User.where(id: user_id).first
-      submission = Submission.where(user_id: user_id, assignment_id: self).first
+      submission = Submission.active.where(user_id: user_id, assignment_id: self).first
     end
     attachment = Attachment.where(id: attachment_id).first if attachment_id
 
@@ -2330,7 +2334,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def update_cached_due_dates
-    if due_at_changed? || workflow_state_changed?
+    if due_at_changed? || workflow_state_changed? || only_visible_to_overrides_changed?
       DueDateCacher.recompute(self)
     end
   end
@@ -2377,7 +2381,8 @@ class Assignment < ActiveRecord::Base
     all.primary_shard.activate do
       joins("LEFT OUTER JOIN #{Submission.quoted_table_name} s ON
              s.assignment_id = assignments.id AND
-             s.submission_type IS NOT NULL")
+             s.submission_type IS NOT NULL AND
+             s.workflow_state <> 'deleted'")
       .group("assignments.id")
       .select("assignments.*, count(s.assignment_id) AS student_submission_count")
     end
@@ -2401,7 +2406,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.assignment_ids_with_submissions(assignment_ids)
-    Submission.having_submission.where(:assignment_id => assignment_ids).distinct.pluck(:assignment_id)
+    Submission.active.having_submission.where(:assignment_id => assignment_ids).distinct.pluck(:assignment_id)
   end
 
   # override so validations are called

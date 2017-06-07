@@ -474,7 +474,7 @@ describe FilesController do
         attachment_model context: @student
         @assignment.submit_homework @student, attachments: [@attachment]
         # create an orphaned attachment_association
-        @assignment.submissions.delete_all
+        @assignment.all_submissions.delete_all
         get 'show', user_id: @student.id, id: @attachment.id, download_frd: 1
         expect(response).to be_success
       end

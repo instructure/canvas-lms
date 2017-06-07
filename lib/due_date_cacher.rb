@@ -17,6 +17,7 @@
 
 class DueDateCacher
   def self.recompute(assignment)
+    return unless assignment.active?
     recompute_course(assignment.context, [assignment.id],
       singleton: "cached_due_date:calculator:Assignment:#{assignment.global_id}")
   end
@@ -24,56 +25,95 @@ class DueDateCacher
   def self.recompute_course(course, assignments = nil, inst_jobs_opts = {})
     course = Course.find(course) unless course.is_a?(Course)
     inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Course:#{course.global_id}" if assignments.nil?
-    assignments ||= Assignment.where(context: course).pluck(:id)
+    assignments ||= Assignment.active.where(context: course).pluck(:id)
     return if assignments.empty?
     new(course, assignments).send_later_if_production_enqueue_args(:recompute, inst_jobs_opts)
   end
 
   def initialize(course, assignments)
     @course = course
-    @assignments = assignments
+    @assignment_ids = Array(assignments).map { |a| a.is_a?(Assignment) ? a.id : a }
   end
 
   def recompute
     # in a transaction on the correct shard:
     @course.shard.activate do
-      # Create dummy submissions for caching due date
-      create_missing_submissions
-
       values = []
-      effective_due_dates.each do |assignment_id, students|
+      effective_due_dates.to_hash.each do |assignment_id, students|
         students.each do |student_id, submission_info|
           due_date = submission_info[:due_at] ? "'#{submission_info[:due_at].iso8601}'::timestamptz" : 'NULL'
           grading_period_id = submission_info[:grading_period_id] || 'NULL'
           values << [assignment_id, student_id, due_date, grading_period_id]
         end
       end
+      # Delete submissions for students who don't have visibility to this assignment anymore
+      @assignment_ids.each do |assignment_id|
+        students = effective_due_dates.find_effective_due_dates_for_assignment(assignment_id).keys
+        deletable_submissions = Submission.active.where(assignment_id: assignment_id)
+        deletable_submissions = deletable_submissions.where.not(user_id: students) unless students.blank?
+        deletable_submissions.update_all(workflow_state: :deleted)
+      end
+
       return if values.empty?
 
       values = values.sort_by(&:first).map { |v| "(#{v.join(',')})" }
       values.each_slice(1000) do |batch|
-        query = "UPDATE #{Submission.quoted_table_name}" \
-                "  SET" \
-                "    cached_due_date = vals.due_date::timestamptz," \
-                "    grading_period_id = vals.grading_period_id::integer" \
-                "  FROM (" \
-                "    VALUES" \
-                "      #{batch.join(',')}" \
-                "   )" \
-                "   AS vals(assignment_id, student_id, due_date, grading_period_id)" \
-                "  WHERE submissions.user_id = vals.student_id and " \
-                "        submissions.assignment_id = vals.assignment_id"
+        # Construct upsert statement to update existing Submissions or create them if needed.
+        query = <<-SQL
+          UPDATE #{Submission.quoted_table_name}
+            SET
+              cached_due_date = vals.due_date::timestamptz,
+              grading_period_id = vals.grading_period_id::integer,
+              workflow_state = COALESCE(NULLIF(workflow_state, 'deleted'), (
+                -- infer actual workflow state
+                CASE
+                WHEN grade IS NOT NULL OR excused THEN
+                  'graded'
+                WHEN submission_type = 'online_quiz' AND quiz_submission_id IS NOT NULL THEN
+                  'pending_review'
+                WHEN submission_type IS NOT NULL AND submitted_at IS NOT NULL THEN
+                  'submitted'
+                ELSE
+                  'unsubmitted'
+                END
+              ))
+            FROM (
+              VALUES
+                #{batch.join(',')}
+             )
+             AS vals(assignment_id, student_id, due_date, grading_period_id)
+            WHERE submissions.user_id = vals.student_id AND
+                  submissions.assignment_id = vals.assignment_id;
+          INSERT INTO #{Submission.quoted_table_name}
+           (assignment_id, user_id, workflow_state, created_at, updated_at, context_code, process_attempts,
+            cached_due_date, grading_period_id)
+            SELECT
+              assignments.id, vals.student_id, 'unsubmitted',
+              now() AT TIME ZONE 'UTC', now() AT TIME ZONE 'UTC',
+              assignments.context_code, 0, vals.due_date::timestamptz, vals.grading_period_id::integer
+            FROM (
+              VALUES
+                #{batch.join(',')}
+             )
+             AS vals(assignment_id, student_id, due_date, grading_period_id)
+            INNER JOIN #{Assignment.quoted_table_name} assignments
+              ON assignments.id = vals.assignment_id
+            LEFT OUTER JOIN #{Submission.quoted_table_name} submissions
+              ON submissions.assignment_id = assignments.id
+              AND submissions.user_id = vals.student_id
+            WHERE submissions.id IS NULL;
+        SQL
 
         Assignment.connection.execute(query)
       end
     end
 
-    if @assignments.size == 1
+    if @assignment_ids.size == 1
       # Only changes to LatePolicy or (sometimes) Assignment records can result in a re-calculation
       # of student scores.  No changes to the Course record can trigger such re-calculations so
       # let's ensure this is triggered only when DueDateCacher is called for a Assignment-level
       # changes and not for Course-level changes
-      assignment = Assignment.find(@assignments.first)
+      assignment = Assignment.find(@assignment_ids.first)
 
       LatePolicyApplicator.for_assignment(assignment)
     end
@@ -82,31 +122,6 @@ class DueDateCacher
   private
 
   def effective_due_dates
-    @effective_due_dates ||= EffectiveDueDates.for_course(@course, @assignments).to_hash
-  end
-
-  def student_ids
-    @students ||= effective_due_dates.map { |_, assignment| assignment.keys }.flatten.uniq
-  end
-
-  def create_missing_submissions
-    return if student_ids.empty?
-
-    # Create insert scope
-    insert_scope = Course
-      .select("DISTINCT assignments.id, enrollments.user_id, 'unsubmitted',
-               now() AT TIME ZONE 'UTC', now() AT TIME ZONE 'UTC', assignments.context_code, 0")
-      .joins("INNER JOIN #{Assignment.quoted_table_name} ON assignments.context_id = courses.id
-                AND assignments.context_type = 'Course'
-              LEFT OUTER JOIN #{Submission.quoted_table_name} ON submissions.user_id = enrollments.user_id
-                AND submissions.assignment_id = assignments.id")
-      .joins(:current_enrollments)
-      .where("courses.id = ? AND enrollments.user_id IN (?) AND assignments.id IN (?) AND submissions.id IS NULL",
-        @course.id, student_ids, @assignments)
-
-    # Create submissions that do not exist yet to calculate due dates for non submitted assignments.
-    Assignment.connection.update("INSERT INTO #{Submission.quoted_table_name} (assignment_id,
-                                  user_id, workflow_state, created_at, updated_at, context_code,
-                                  process_attempts) #{insert_scope.to_sql}")
+    @effective_due_dates ||= EffectiveDueDates.for_course(@course, @assignment_ids)
   end
 end

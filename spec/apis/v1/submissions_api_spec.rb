@@ -1678,7 +1678,18 @@ describe 'Submissions API', type: :request do
           json.each { |submission| expect(submission['user_id']).to eq @student.id }
         end
 
-        it "returns the submissons even if the student is not in the overriden section" do
+        it "does not return the submisson if the student is not in the overriden section" do
+          Score.where(enrollment_id: @student.enrollments).delete_all
+          @student.enrollments.each(&:destroy_permanently!)
+          student_in_section(@section2, user: @student)
+
+          json = call_to_for_students(as_student: false)
+
+          expect(json.size).to eq 0
+        end
+
+        it "returns the graded submisson even if the student is not in the overriden section" do
+          @assignment.grade_student(@student, grade: 5, grader: @teacher)
           Score.where(enrollment_id: @student.enrollments).delete_all
           @student.enrollments.each(&:destroy_permanently!)
           student_in_section(@section2, user: @student)

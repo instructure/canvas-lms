@@ -348,13 +348,13 @@ class CalendarEventsApiController < ApplicationController
       mark_submitted_assignments(user, events)
       includes = Array(params[:include])
       if includes.include?("submission")
-        submissions = Submission.where(assignment_id: events, user_id: user)
+        submissions = Submission.active.where(assignment_id: events, user_id: user)
           .group_by(&:assignment_id)
       end
       # preload data used by assignment_json
       ActiveRecord::Associations::Preloader.new.preload(events, :discussion_topic)
       Shard.partition_by_shard(events) do |shard_events|
-        having_submission = Submission.having_submission.
+        having_submission = Submission.active.having_submission.
             where(assignment_id: shard_events).
             distinct.
             pluck(:assignment_id).to_set
@@ -362,7 +362,7 @@ class CalendarEventsApiController < ApplicationController
           event.has_submitted_submissions = having_submission.include?(event.id)
         end
 
-        having_student_submission = Submission.having_submission.
+        having_student_submission = Submission.active.having_submission.
             where(assignment_id: shard_events).
             where.not(user_id: nil).
             distinct.
@@ -1173,7 +1173,7 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def mark_submitted_assignments(user, assignments)
-    submitted_ids = Submission.where("submission_type IS NOT NULL").
+    submitted_ids = Submission.active.where("submission_type IS NOT NULL").
       where(user_id: user, assignment_id: assignments).
       pluck(:assignment_id)
     assignments.each do |assignment|

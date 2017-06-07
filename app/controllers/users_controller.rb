@@ -520,7 +520,7 @@ class UsersController < ApplicationController
       :expires_in => 3.minutes) do
       assignments = upcoming_events.select{ |e| e.is_a?(Assignment) }
       Shard.partition_by_shard(assignments) do |shard_assignments|
-        Submission.
+        Submission.active.
           select([:id, :assignment_id, :score, :grade, :workflow_state, :updated_at]).
           where(:assignment_id => shard_assignments, :user_id => user)
       end
@@ -915,7 +915,7 @@ class UsersController < ApplicationController
     Shackles.activate(:slave) do
       course_ids = user.participating_student_course_ids
       Shard.partition_by_shard(course_ids) do |shard_course_ids|
-        submissions = Submission.preload(:assignment).
+        submissions = Submission.active.preload(:assignment).
                       missing.
                       where(user_id: user.id,
                             assignments: {context_id: shard_course_ids}).

@@ -97,6 +97,7 @@ class Submission < ActiveRecord::Base
   validates :late_policy_status, inclusion: ['none', 'missing', 'late'], allow_nil: true
   validate :ensure_grader_can_grade
 
+  scope :active, -> { where("submissions.workflow_state <> 'deleted'") }
   scope :with_comments, -> { preload(:submission_comments) }
   scope :after, lambda { |date| where("submissions.created_at>?", date) }
   scope :before, lambda { |date| where("submissions.created_at<?", date) }
@@ -255,6 +256,7 @@ class Submission < ActiveRecord::Base
     state :unsubmitted
     state :pending_review
     state :graded
+    state :deleted
   end
 
   # see #needs_grading?
