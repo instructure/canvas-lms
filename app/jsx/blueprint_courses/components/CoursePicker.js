@@ -54,6 +54,11 @@ export default class CoursePicker extends React.Component {
       isManuallyExpanded: props.isExpanded,
       announceChanges: false,
     }
+    this._homeRef = null;
+  }
+
+  componentDidMount () {
+    this.fixIcons()
   }
 
   componentWillReceiveProps (nextProps) {
@@ -68,6 +73,10 @@ export default class CoursePicker extends React.Component {
         other: 'Loading courses complete: %{count} courses found'
       }, { count: nextProps.courses.length }))
     }
+  }
+
+  componentDidUpdate () {
+    this.fixIcons()
   }
 
   onFilterActivate = () => {
@@ -99,13 +108,25 @@ export default class CoursePicker extends React.Component {
     })
   }
 
+  // in IE, instui icons are in the tab order and get focus, even if hidden
+  // this fixes them up so that doesn't happen.
+  // Eventually this should get folded into instui via INSTUI-572
+  fixIcons () {
+    if (this._homeRef) {
+      Array.prototype.forEach.call(
+        this._homeRef.querySelectorAll('svg[aria-hidden]'),
+        (el) => { el.setAttribute('focusable', 'false') }
+      )
+    }
+  }
+
   reloadCourses () {
     this.props.loadCourses(this.state.filters)
   }
 
   render () {
     return (
-      <div className="bca-course-picker">
+      <div className="bca-course-picker" ref={(el) => { this._homeRef = el }}>
         <CourseFilter
           ref={(c) => { this.filter = c }}
           terms={this.props.terms}
