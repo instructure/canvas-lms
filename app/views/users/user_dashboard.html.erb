@@ -36,16 +36,10 @@
   <%= render :partial => 'shared/dashboard_invitation', :collection => @pending_invitations %>
   <%= render :partial => 'shared/dashboard_messages' %>
 
-  <div class="ic-Dashboard-header">
+  <div id="dashboard_header_container" class="ic-Dashboard-header">
     <div class="grid-row bottom-xs">
       <div class="col-xs-9">
-        <h1 class="ic-Dashboard-header_title"><%= t :dashboard, "Dashboard" %></h1>
-      </div>
-      <div class="col-xs-3 end-xs ic-Dashboard-content--align-right">
-      <% if planner_enabled? %>
-        <div id="dashboard-planner-header" class="CanvasPlanner__HeaderContainer" style="display: <%= show_planner? ? 'block' : 'none' %>"></div>
-      <% end %>
-      <div id="DashboardOptionsMenu_Container"></div>
+        <h1 class="ic-Dashboard-header_title"><%= t "Dashboard" %></h1>
       </div>
     </div>
   </div>
