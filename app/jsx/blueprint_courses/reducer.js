@@ -122,7 +122,8 @@ export default combineReducers({
     [actionTypes.LOAD_ASSOCIATIONS_SUCCESS]: (state, action) => action.payload,
     [actionTypes.SAVE_ASSOCIATIONS_SUCCESS]: (state, action) => {
       const { added = [], removed = [] } = action.payload
-      return state.filter(course => !removed.includes(course.id)).concat(added)
+      const removedIds = removed.map(course => course.id)
+      return state.filter(course => !removedIds.includes(course.id)).concat(added)
     },
   }, []),
   addedAssociations: handleActions({
@@ -135,7 +136,7 @@ export default combineReducers({
     [actionTypes.CLEAR_ASSOCIATIONS]: () => [],
     [actionTypes.SAVE_ASSOCIATIONS_SUCCESS]: () => [],
     [actionTypes.REMOVE_COURSE_ASSOCIATIONS]: (state, action) => state.concat(action.payload),
-    [actionTypes.UNDO_REMOVE_COURSE_ASSOCIATIONS]: (state, action) => state.filter(courseId => !action.payload.includes(courseId)),
+    [actionTypes.UNDO_REMOVE_COURSE_ASSOCIATIONS]: (state, action) => state.filter(course => !action.payload.includes(course.id)),
   }, []),
   isLoadingBeginMigration: handleActions({
     [actionTypes.BEGIN_MIGRATION_START]: () => true,
