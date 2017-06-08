@@ -13,7 +13,7 @@
 # details.
 #
 # You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+# with this program. If not, see <http://www.gnu.org/licenses/>
 #
 
 require_relative '../../helpers/gradezilla_common'
@@ -259,7 +259,7 @@ describe "Gradezilla editing grades" do
       before(:each) do
         get "/courses/#{@course.id}/gradebook?grading_period_id=0"
 
-        Gradezilla.assignment_header_menu(@first_assignment.name).click
+        Gradezilla.select_assignment_header_by_name(@first_assignment.name)
       end
 
       describe 'the Curve Grades menu item' do

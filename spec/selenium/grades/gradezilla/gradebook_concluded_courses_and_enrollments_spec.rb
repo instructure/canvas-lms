@@ -35,7 +35,9 @@ describe "Gradezilla - concluded courses and enrollments" do
       conclude_student_1
       expect(@course.students.count).to eq @all_students.size - 1
       expect(@course.all_students.count).to eq @all_students.size
+
       Gradezilla.visit(@course)
+
       expect(ff('.student-name')).to have_size @course.students.count
     end
 
@@ -43,10 +45,9 @@ describe "Gradezilla - concluded courses and enrollments" do
       conclude_student_1
       Gradezilla.visit(@course)
 
-      expect_new_page_load do
-        Gradezilla.open_student_column_menu
-        Gradezilla.select_menu_item 'Concluded enrollments'
-      end
+      Gradezilla.open_student_column_menu
+      Gradezilla.student_header_menu_option_selector('Concluded enrollments')
+
       expect(ff('.student-name')).to have_size @course.all_students.count
     end
 
@@ -55,10 +56,9 @@ describe "Gradezilla - concluded courses and enrollments" do
       display_concluded_enrollments
       Gradezilla.visit(@course)
 
-      expect_new_page_load do
-        Gradezilla.open_student_column_menu
-        Gradezilla.select_menu_item 'Concluded enrollments'
-      end
+      Gradezilla.open_student_column_menu
+      Gradezilla.student_header_menu_option_selector('Concluded enrollments')
+
       expect(ff('.student-name')).to have_size @course.students.count
     end
 
@@ -66,7 +66,9 @@ describe "Gradezilla - concluded courses and enrollments" do
       deactivate_student_1
       expect(@course.students.count).to eq @all_students.size - 1
       expect(@course.all_students.count).to eq @all_students.size
+
       Gradezilla.visit(@course)
+
       expect(ff('.student-name')).to have_size @course.students.count
     end
 
@@ -74,10 +76,9 @@ describe "Gradezilla - concluded courses and enrollments" do
       deactivate_student_1
       Gradezilla.visit(@course)
 
-      expect_new_page_load do
-        Gradezilla.open_student_column_menu
-        Gradezilla.select_menu_item 'Inactive enrollments'
-      end
+      Gradezilla.open_student_column_menu
+      Gradezilla.student_header_menu_option_selector('Inactive enrollments')
+
       expect(ff('.student-name')).to have_size @course.all_students.count
     end
 
@@ -86,10 +87,9 @@ describe "Gradezilla - concluded courses and enrollments" do
       display_inactive_enrollments
       Gradezilla.visit(@course)
 
-      expect_new_page_load do
-        Gradezilla.open_student_column_menu
-        Gradezilla.select_menu_item 'Inactive enrollments'
-      end
+      Gradezilla.open_student_column_menu
+      Gradezilla.student_header_menu_option_selector('Inactive enrollments')
+
       expect(ff('.student-name')).to have_size @course.students.count
     end
   end
@@ -99,8 +99,10 @@ describe "Gradezilla - concluded courses and enrollments" do
       @course.complete!
       Gradezilla.visit(@course)
       cell = Gradezilla.grading_cell
+
       expect(cell).to include_text '10'
       cell.click
+
       expect(cell).not_to contain_css('.grade') # no input box for entry
     end
   end

@@ -13,7 +13,7 @@
 # details.
 #
 # You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+# with this program. If not, see <http://www.gnu.org/licenses/>
 
 require_relative '../../helpers/gradezilla_common'
 require_relative '../../helpers/color_common'
@@ -25,7 +25,6 @@ describe "Gradezilla" do
   include ColorCommon
 
   let(:extra_setup) { }
-  let(:active_element) { driver.switch_to.active_element }
 
   before(:once) { gradebook_data_setup }
 
@@ -38,14 +37,14 @@ describe "Gradezilla" do
   context "export menu" do
     before do
       Gradezilla.visit(@course)
-      f('span[data-component="ActionMenu"] button').click
+      Gradezilla.open_action_menu
     end
 
     it "moves focus to Actions menu trigger button during current export", priority: "2", test_id: 720459 do
-      f('span[data-menu-id="export"]').click
+      Gradezilla.action_menu_item_selector("export").click
 
-      expect(active_element.tag_name).to eq('button')
-      expect(active_element.text).to eq('Actions')
+      expect(current_active_element.tag_name).to eq('button')
+      expect(current_active_element.text).to eq('Actions')
     end
 
     context "when a csv already exists" do
@@ -60,10 +59,10 @@ describe "Gradezilla" do
       end
 
       it "maintains focus to Actions menu trigger during past csv export", priority: "2", test_id: 720460 do
-        f('span[data-menu-id="previous-export"]').click
+        Gradezilla.select_previous_grade_export
 
-        expect(active_element.tag_name).to eq('button')
-        expect(active_element.text).to eq('Actions')
+        expect(current_active_element.tag_name).to eq('button')
+        expect(current_active_element.text).to eq('Actions')
       end
     end
   end
@@ -72,19 +71,20 @@ describe "Gradezilla" do
     before { Gradezilla.visit(@course) }
 
     it "after arrange columns is clicked", priority: "2", test_id: 720462 do
-      view_menu_trigger = Gradezilla.gradebook_menu('View').find('button')
       Gradezilla.open_view_menu_and_arrange_by_menu
       Gradezilla.select_gradebook_menu_option('Due Date - Oldest to Newest')
-      expect(active_element).to eq(view_menu_trigger)
+      expect(check_element_has_focus(Gradezilla.view_options_menu_selector)).to be true
     end
   end
 
   context "return focus to view options menu when it closes" do
+
     before { Gradezilla.visit(@course) }
-    it 'after clicking the "Notes" option' do
-      Gradezilla.gradebook_view_options_menu.click
-      Gradezilla.notes_option.click
-      expect(active_element).to eq(Gradezilla.gradebook_view_options_menu)
+
+    it 'returns focus to the view options menu after clicking the "Notes" option' do
+      Gradezilla.select_gradebook_view_option
+      Gradezilla.select_notes_option
+      expect(check_element_has_focus(Gradezilla.view_options_menu_selector)).to be true
     end
   end
 

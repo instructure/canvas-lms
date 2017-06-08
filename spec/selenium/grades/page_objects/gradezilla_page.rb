@@ -21,6 +21,8 @@ class Gradezilla
   class << self
     include SeleniumDependencies
 
+    private
+
     # Assignment Headings
     ASSIGNMENT_HEADER_SELECTOR = '.slick-header-column'.freeze
     ASSIGNMENT_HEADER_MENU_SELECTOR = '.gradebook-header-drop'.freeze
@@ -34,14 +36,13 @@ class Gradezilla
 
     # Action Menu
     ACTION_MENU_SELECTOR = '[data-component="ActionMenu"]'.freeze
-    ACTION_MENU_ITEM_SELECTOR = '[data-menu-id="%s"]'.freeze
+    ACTION_MENU_ITEM_SELECTOR = 'body [data-menu-id="%s"]'.freeze
+
+    # Menu Items
+    MENU_ITEM_SELECTOR = 'span[data-menu-item-id="%s"]'.freeze
 
     def gradebook_settings_cog
       f('#gradebook_settings')
-    end
-
-    def gradebook_view_options_menu
-      f('[data-component="ViewOptionsMenu"] button')
     end
 
     def notes_option
@@ -52,26 +53,8 @@ class Gradezilla
       fj('button span:contains("Save")')
     end
 
-    def ungradable_selector
-      ".cannot_edit"
-    end
-
-    def assignment_header_label(name)
-      assignment_header(name).find('.assignment-name')
-    end
-
-    def assignment_header(name)
-      f(assignment_header_selector(name))
-    end
-
     def assignment_header_menu(name)
       f(assignment_header_menu_selector(name))
-    end
-
-    def assignment_header_menu_item(name)
-      parent_element = ff(ASSIGNMENT_HEADER_MENU_ITEM_SELECTOR).find { |el| el.text == name }
-
-      f('a', parent_element)
     end
 
     def menu_container(container_id)
@@ -81,20 +64,8 @@ class Gradezilla
       f(selector)
     end
 
-    def gradebook_menu_group(name, container: nil)
-      menu_group = ff('[id*=MenuItemGroup]', container).find { |el| el.text.strip =~ /#{name}/ }
-      return unless menu_group
-
-      menu_group_id = menu_group.attribute('id')
-      f("[role=group][aria-labelledby=#{menu_group_id}]", container)
-    end
-
     def student_names
-      ff('#gradebook_grid .student-name').map(&:text)
-    end
-
-    def gradebook_menu_options(container)
-      ff('[role*=menuitem]', container)
+      ff('#gradebook_grid .student-name')
     end
 
     def gradebook_menu(name)
@@ -105,20 +76,8 @@ class Gradezilla
       f(STUDENT_COLUMN_MENU_SELECTOR)
     end
 
-    def menu_item(name)
-      fj("[role*=menuitem]:contains(#{name})")
-    end
-
     def action_menu_item(name)
       f(action_menu_item_selector(name))
-    end
-
-    def action_menu_item_selector(name)
-      ACTION_MENU_ITEM_SELECTOR % name
-    end
-
-    def action_menu
-      f(ACTION_MENU_SELECTOR)
     end
 
     def gradebook_dropdown_menu
@@ -146,6 +105,64 @@ class Gradezilla
     def assignment_header_menu_selector(name)
       [assignment_header_selector(name), ASSIGNMENT_HEADER_MENU_SELECTOR].join(' ')
     end
+
+    def dialog_save_mute_setting
+      f("button[data-action$='mute']")
+    end
+
+    def assignment_header_menu_by_id(id)
+      f(".slick-header-column[id*='assignment_#{id}'] .Gradebook__ColumnHeaderAction")
+    end
+
+    def assignment_header_menu_item_by_id(id)
+      f("span[data-menu-item-id=\"#{id}\"]")
+    end
+
+    def gradebook_menu_open
+      gradebook_menu.click
+    end
+
+    def link_previous_grade_export
+      f('span[data-menu-id="previous-export"]')
+    end
+
+    def popover_menu_items
+      ff('[role=menu][aria-labelledby*=PopoverMenu] [role=menuitemradio]')
+    end
+
+    def slick_custom_col_cell
+      ff(".slick-cell.custom_column")
+    end
+
+    def slick_header
+      ff(".container_0 .slick-header-column")
+    end
+
+    def gradebook_view_menu_button
+      f('[data-component="ViewOptionsMenu"] button')
+    end
+
+    def total_cell_mute_icon
+      f('.total-cell .icon-muted')
+    end
+
+    def grade_history
+      f('[data-menu-item-id="grade-history"]')
+    end
+
+    def gradebook_menu_element
+      f('.gradebook-menus [data-component="GradebookMenu"]')
+    end
+
+    def gradebook_settings_button
+      f('#gradebook-settings-button')
+    end
+
+    def student_header_show_menu_option(menu_item)
+      fj("[role=menuitemcheckbox]:contains(#{menu_item})")
+    end
+
+    public
 
     # actions
 
@@ -250,7 +267,68 @@ class Gradezilla
       action_menu_item(name).click
     end
 
+    def action_menu_item_selector(name)
+      f(ACTION_MENU_ITEM_SELECTOR % name)
+    end
+
+    def action_menu
+      f(ACTION_MENU_SELECTOR)
+    end
+
+    def select_notes_option
+      notes_option.click
+    end
+
+    def notes_content_selector
+      f("#content")
+    end
+
+    def select_previous_grade_export
+      link_previous_grade_export.click
+    end
+
+    def fetch_student_names
+      student_names.map(&:text)
+    end
+
+    def header_selector_by_col_index(n)
+      f(".container_0 .slick-header-column:nth-child(#{n})")
+    end
+
+    def assignment_header_label(name)
+      assignment_header(name).find('.assignment-name')
+    end
+
+    def assignment_header(name)
+      f(assignment_header_selector(name))
+    end
+
+    def select_assignment_header_by_name(name)
+      assignment_header_menu(name).click
+    end
+
+    def select_assignment_header_menu_by_id(id)
+      assignment_header_menu_by_id(id).click
+    end
+
+    def assignment_header_menu_item(name)
+      parent_element = ff(ASSIGNMENT_HEADER_MENU_ITEM_SELECTOR).find { |el| el.text == name }
+
+      f('a', parent_element)
+    end
+
+    def assignment_header_mute_icon_selector(assignment_id)
+      ".container_1 .slick-header-column[id*=assignment_#{assignment_id}] svg[name=IconMutedSolid]"
+    end
+
     # Semantic Methods for Gradebook Menus
+
+    def toggle_assignment_muting(assignment_id)
+      select_assignment_header_menu_by_id(assignment_id)
+      select_menu_item('assignment-muter')
+      dialog_save_mute_setting.click
+      wait_for_ajaximations
+    end
 
     def open_gradebook_menu(name)
       trigger = f('button', gradebook_menu(name))
@@ -260,15 +338,45 @@ class Gradezilla
       menu_container(trigger.attribute('id'))
     end
 
+    def view_options_menu_selector
+      gradebook_view_menu_button
+    end
+
+    def open_view_gradebook_menu
+      trigger = view_options_menu_selector
+      trigger.click
+
+      # return the finder of the popover menu for use elsewhere if needed
+      menu_container(trigger.attribute('id'))
+    end
+
     def open_view_menu_and_arrange_by_menu
       view_menu = Gradezilla.open_gradebook_menu('View')
-      trigger = ff('button', view_menu).find { |element| element.text == "Arrange By" }
+      trigger = ff('button', view_menu).find {
+        |element| element.text == "Arrange By"
+      }
       trigger.click
       view_menu
     end
 
+    def select_gradebook_view_option
+      view_options_menu_selector.click
+    end
+
+    def slick_headers_selector
+      slick_header
+    end
+
+    def slick_custom_column_cell_selector
+      slick_custom_col_cell
+    end
+
     def select_gradebook_menu_option(name, container: nil)
       gradebook_menu_option(name, container: container).click
+    end
+
+    def gradebook_menu_options(container)
+      ff('[role*=menuitem]', container)
     end
 
     def gradebook_menu_option(name = nil, container: nil)
@@ -284,6 +392,18 @@ class Gradezilla
       gradebook_menu_options(menu_container).find { |el| el.text =~ /#{menu_item_name}/ }
     end
 
+    def gradebook_menu_group(name, container: nil)
+      menu_group = ff('[id*=MenuItemGroup]', container).find { |el| el.text.strip =~ /#{name}/ }
+      return unless menu_group
+
+      menu_group_id = menu_group.attribute('id')
+      f("[role=group][aria-labelledby=#{menu_group_id}]", container)
+    end
+
+    def menu_item(name)
+      f(MENU_ITEM_SELECTOR % name)
+    end
+
     def settings_cog_select
       gradebook_settings_cog.click
     end
@@ -294,8 +414,40 @@ class Gradezilla
       end
     end
 
-    def popover_menu_items
-      ff('[role=menu][aria-labelledby*=PopoverMenu] [role=menuitemradio]')
+    def popover_menu_items_select
+      popover_menu_items
+    end
+
+    def total_cell_mute_icon_select
+      total_cell_mute_icon
+    end
+
+    def content_selector
+      f("#content")
+    end
+
+    def assignment_mute_icon_class_selector(id)
+      ".slick-header-column[id*='assigment_#{id}'] .icon-muted"
+    end
+
+    def grade_history_select
+      grade_history.click
+    end
+
+    def gradebook_menu_open
+      gradebook_menu_element.click
+    end
+
+    def gradebook_settings_btn_select
+      gradebook_settings_button.click
+    end
+
+    def ungradable_selector
+      ".cannot_edit"
+    end
+
+    def student_header_menu_option_selector(name)
+      student_header_show_menu_option(name).click
     end
 
     delegate :click, to: :save_button, prefix: true

@@ -13,7 +13,7 @@
 # details.
 #
 # You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+# with this program. If not, see <http://www.gnu.org/licenses/>
 
 module CustomSeleniumActions
 
@@ -405,6 +405,10 @@ module CustomSeleniumActions
 
   def replace_value(selector, value)
     driver.execute_script("$('#{selector}').val(#{value})")
+  end
+
+  def current_active_element
+    driver.switch_to.active_element
   end
 
   def move_to_click(selector)
