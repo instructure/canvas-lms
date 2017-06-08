@@ -96,6 +96,7 @@ module Importers
 
       item.set_as_front_page! if !!hash[:front_page] && context.wiki.has_no_front_page
       item.migration_id = hash[:migration_id]
+      item.todo_date = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:todo_date])
 
       migration.add_imported_item(item)
 
