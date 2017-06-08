@@ -1886,6 +1886,7 @@ describe 'Submissions API', type: :request do
     end
 
     it "applies late policy when grading the submission twice with the same raw score" do
+      @late_assignment.submit_homework(@student, submission_type: "online_text_entry")
       2.times do
         json = api_call(
           :put,

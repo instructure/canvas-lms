@@ -584,6 +584,23 @@ describe Submission do
         expect(submission.score).to eq 200
       end
     end
+
+    context "assignment on paper" do
+      before(:once) do
+        @date = Time.zone.local(2017, 1, 15, 12)
+        @assignment.update!(due_at: 3.hours.ago(@date), points_possible: 1000, submission_types: "on_paper")
+        @late_policy = late_policy_model(deduct: 10.0, every: :hour, missing: 80.0)
+      end
+
+      it "does not deduct from assignment on paper" do
+        Timecop.freeze(@date) do
+          @assignment.submit_homework(@student, body: "a body")
+          @assignment.grade_student(@student, grade: 700, grader: @teacher)
+          expect(submission.score).to eq 700
+          expect(submission.points_deducted).to eq 0
+        end
+      end
+    end
   end
 
   describe "#apply_late_policy_before_save" do

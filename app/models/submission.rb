@@ -1357,7 +1357,7 @@ class Submission < ActiveRecord::Base
   private :originally_entered_score
 
   def late_points_deducted(raw_score, late_policy, points_possible)
-    return 0 unless late_policy && points_possible && past_due?
+    return 0 unless late_policy && points_possible && late?
     late_policy.points_deducted(score: raw_score, possible: points_possible, late_for: duration_late)
   end
   private :late_points_deducted
