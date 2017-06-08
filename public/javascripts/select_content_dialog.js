@@ -351,6 +351,9 @@ import './jquery.templateData'
               submit(item_data);
             };
 
+            //Force the new assignment to set post_to_sis to false so that possible
+            //account validations do not prevent saving
+            data['assignment[post_to_sis]'] = false
             if(item_data['item[type]'] == 'attachment') {
               data['duplicate_handling'] = 'rename';
               $.ajaxJSONFiles(url, 'POST', data, $("#module_attachment_uploaded_data"), function(data) {
