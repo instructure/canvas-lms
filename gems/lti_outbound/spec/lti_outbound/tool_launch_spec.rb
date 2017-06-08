@@ -115,42 +115,47 @@ describe LtiOutbound::ToolLaunch do
   end
 
   describe '#generate' do
+    let(:expected_hash) do
+      {
+        'lti_message_type' => "basic-lti-launch-request",
+        'lti_version' => "LTI-1p0",
+        'resource_link_id' => "123456",
+        'resource_link_title' => "tool_name",
+        'user_id' => "user_opaque_identifier",
+        'roles' => "Instructor",
+        'ext_roles' => "$Canvas.xuser.allRoles",
+        'custom_canvas_enrollment_state' => "$Canvas.enrollment.enrollmentState",
+        'lis_person_name_given' => "first_name",
+        'lis_person_name_family' => "last_name",
+        'lis_person_name_full' => "user_name",
+        'lis_person_contact_email_primary' => "nobody@example.com",
+        'user_image' => "avatar_url",
+        'custom_canvas_user_id' => "$Canvas.user.id",
+        'lis_person_sourcedid' => "$Person.sourcedId",
+        'custom_canvas_user_login_id' => "$Canvas.user.loginId",
+        'custom_canvas_course_id' => "$Canvas.course.id",
+        'custom_canvas_workflow_state' => "$Canvas.course.workflowState",
+        'lis_course_offering_sourcedid' => "$CourseSection.sourcedId",
+        'custom_canvas_api_domain' => "$Canvas.api.domain",
+        'context_id' => "course_opaque_identifier",
+        'context_title' => "course_name",
+        'context_label' => "course_code",
+        'launch_presentation_locale' => :en,
+        'launch_presentation_document_target' => "iframe",
+        'launch_presentation_return_url' => "http://www.google.com",
+        'tool_consumer_instance_guid' => "root_account_lti_guid",
+        'tool_consumer_instance_name' => "root_account_name",
+        'tool_consumer_instance_contact_email' => "outgoing_email_address",
+        'tool_consumer_info_product_family_code' => "canvas",
+        'tool_consumer_info_version' => "cloud",
+        'oauth_callback' => "about:blank"
+     }
+    end
+
     it 'generates correct parameters' do
       I18n.config.available_locales_set << :en
       allow(I18n).to receive(:localizer).and_return(-> { :en })
-
-      hash = tool_launch.generate
-
-      expect(hash['lti_message_type']).to eq 'basic-lti-launch-request'
-      expect(hash['lti_version']).to eq 'LTI-1p0'
-      expect(hash['resource_link_id']).to eq '123456'
-      expect(hash['resource_link_title']).to eq 'tool_name'
-      expect(hash['user_id']).to eq 'user_opaque_identifier'
-      expect(hash['user_image']).to eq 'avatar_url'
-      expect(hash['roles']).to eq 'Instructor'
-      expect(hash['context_id']).to eq 'course_opaque_identifier'
-      expect(hash['context_title']).to eq 'course_name'
-      expect(hash['context_label']).to eq 'course_code'
-      expect(hash['custom_canvas_user_id']).to eq '$Canvas.user.id'
-      expect(hash['custom_canvas_user_login_id']).to eq '$Canvas.user.loginId'
-      expect(hash['custom_canvas_course_id']).to eq '$Canvas.course.id'
-      expect(hash['custom_canvas_api_domain']).to eq '$Canvas.api.domain'
-      expect(hash['custom_canvas_workflow_state']).to eq '$Canvas.course.workflowState'
-      expect(hash['lis_course_offering_sourcedid']).to eq '$CourseSection.sourcedId'
-      expect(hash['lis_person_contact_email_primary']).to eq 'nobody@example.com'
-      expect(hash['lis_person_name_full']).to eq 'user_name'
-      expect(hash['lis_person_name_family']).to eq 'last_name'
-      expect(hash['lis_person_name_given']).to eq 'first_name'
-      expect(hash['lis_person_sourcedid']).to eq '$Person.sourcedId'
-      expect(hash['launch_presentation_locale']).to eq :en #was I18n.default_locale.to_s
-      expect(hash['launch_presentation_document_target']).to eq 'iframe'
-      expect(hash['launch_presentation_return_url']).to eq 'http://www.google.com'
-      expect(hash['tool_consumer_instance_guid']).to eq 'root_account_lti_guid'
-      expect(hash['tool_consumer_instance_name']).to eq 'root_account_name'
-      expect(hash['tool_consumer_instance_contact_email']).to eq 'outgoing_email_address'
-      expect(hash['tool_consumer_info_product_family_code']).to eq 'canvas'
-      expect(hash['tool_consumer_info_version']).to eq 'cloud'
-      expect(hash['oauth_callback']).to eq 'about:blank'
+      expect(tool_launch.generate).to eq expected_hash
     end
 
     it 'allows resource_link_title to be overrriden' do
