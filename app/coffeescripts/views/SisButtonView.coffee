@@ -69,6 +69,7 @@ define [
       if errors['has_error'] == true && @model.sisIntegrationSettingsEnabled()
         $.flashWarning(errors['message'])
       else if sisUrl
+        @toggleAriaPressed(post_to_sis)
         @model.postToSIS(!post_to_sis)
         @model.save({ override_dates: false }, {
           type: 'POST',
@@ -77,11 +78,16 @@ define [
             @setAttributes()
         })
       else
+        @toggleAriaPressed(post_to_sis)
         @model.postToSIS(!post_to_sis)
         @model.save({ override_dates: false }, {
           success: =>
             @setAttributes()
         })
+
+    toggleAriaPressed: (post_to_sis) =>
+      label = @$el.find('label')
+      label.attr 'aria-pressed', !post_to_sis
 
     errorsExist: (validationHelper) =>
       errors = {}
@@ -120,3 +126,6 @@ define [
       @$input.attr('aria-describedby': labelId)
       @$label.attr('id', labelId)
       @setAttributes()
+
+    toJSON: ->
+      postToSIS: @model.postToSIS()
