@@ -17,46 +17,39 @@
  */
 
 import React from 'react'
-import get from 'lodash/get'
 
-import Grid, { GridRow, GridCol } from 'instructure-ui/lib/components/Grid'
 import Typography from 'instructure-ui/lib/components/Typography'
-import { IconLock, IconUnlock } from './BlueprintLocks'
+import Container from 'instructure-ui/lib/components/Container'
 
+import { IconLock, IconUnlock } from './BlueprintLocks'
 import propTypes from '../propTypes'
 import {itemTypeLabels, changeTypeLabels} from '../labels'
 
 const UnsyncedChange = (props) => {
   const {asset_type, asset_name, change_type, locked} = props.change
+  const changeLabel = changeTypeLabels[change_type] || change_type
+  const typeLabel = itemTypeLabels[asset_type] || asset_type
 
-  /* eslint-disable camelcase */
   return (
-    <div className="bcs__history-item__change">
-      <div className="bcs__history-item__content bcs__unsynced-change__content">
-        <div className="bcs__history-item__lock-icon">
-          <Typography size="large" color="secondary">{locked ? <IconLock /> : <IconUnlock />}</Typography>
+    <tr className="bcs__unsynced-item">
+      <td>
+        <div className="bcs__unsynced-item__name">
+          <Typography size="large" color="secondary">
+            {locked ? <IconLock /> : <IconUnlock />}
+          </Typography>
+          <Container padding="0 0 0 small">
+            <Typography size="small" weight="bold">{asset_name}</Typography>
+          </Container>
         </div>
-        <div className="bcs__history-item__content-grid">
-          <Grid colSpacing="none">
-            <GridRow>
-              <GridCol width={8}>
-                <Typography size="small" weight="bold">{asset_name}</Typography>
-              </GridCol>
-              <GridCol width={2}>
-                <Typography size="small" weight="bold">{get(changeTypeLabels, change_type) || change_type}</Typography>
-              </GridCol>
-              <GridCol width={2}>
-                <div style={{textAlign: 'right'}}>
-                  <Typography size="small" weight="bold">{get(itemTypeLabels, asset_type) || asset_type}</Typography>
-                </div>
-              </GridCol>
-            </GridRow>
-          </Grid>
-        </div>
-      </div>
-    </div>
+      </td>
+      <td>
+        <Typography size="small" weight="bold">{changeLabel}</Typography>
+      </td>
+      <td>
+        <Typography size="small" weight="bold">{typeLabel}</Typography>
+      </td>
+    </tr>
   )
-  /* eslint-disable */
 }
 
 
