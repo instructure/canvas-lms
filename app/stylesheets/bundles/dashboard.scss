@@ -18,21 +18,88 @@
 
 @import "pages/dashboard/dashboard_activity";
 
+
+// Note: all the calculations in the following 20+ lines are done to give IE
+// a sticky header through fixed positioning. Once all browsers support position: sticky,
+// we can remove all this and use the CSS under @supports (position: sticky)
+
+$nav-collapsed-width: $ic-header-primary-width - 30 + ($ic-sp * 4);
+$nav-expanded-width: $ic-header-primary-width + ($ic-sp * 4);
+$right-side-content-width: $ic-right-side-width;
+$non-main-content-width-collapsed: $nav-collapsed-width + $right-side-content-width;
+$non-main-content-width-expanded: $nav-expanded-width + $right-side-content-width;
+
+.ic-dashboard-app {
+  padding-top: $ic-sp * 4;
+}
+
 .ic-Dashboard-content--align-right {
   align-items: flex-end;
   flex-direction: row;
 }
+
 .ic-Dashboard-header {
+  width: calc(100% - #{$nav-collapsed-width});
+  position: fixed;
+  top: 0;
+  left: $nav-collapsed-width - ($ic-sp * 2);
   border-bottom: 1px solid $ic-border-light;
-  margin: 0 0 $ic-sp;
-  padding-bottom: $ic-sp;
+  z-index: 20;
+  background: rgba($ic-color-light, 0.95);
+  box-sizing: border-box;
+  padding: $ic-sp 0 ($ic-sp * 0.75);
+
+  @include breakpoint(desktop) {
+    width: calc(100% - #{$non-main-content-width-collapsed});
+  }
+
+  body.primary-nav-expanded & {
+    width: calc(100% - #{$nav-expanded-width});
+    left: $nav-expanded-width - ($ic-sp * 2);
+
+    @include breakpoint(desktop) {
+      width: calc(100% - #{$non-main-content-width-expanded});
+    }
+  }
+
   > div {
     padding-left: 0;
     padding-right: 0;
   }
+
   .ic-Dashboard-header_title {
     margin-top: 0;
     margin-bottom: 0;
+  }
+}
+
+@supports (position: sticky) or (position: -webkit-sticky) {
+  .ic-dashboard-app {
+    padding-top: 0;
+  }
+
+  .ic-Dashboard-header {
+    position: sticky;
+    left: auto;
+    width: auto;
+    z-index: 5;
+    padding: 0 0 $ic-sp * 0.75;
+    margin-top: -($ic-sp);
+    margin-bottom: $ic-sp;
+
+    @include breakpoint(desktop) {
+      width: auto;
+    }
+
+    body.primary-nav-expanded & {
+      width: auto;
+      left: auto;
+
+      @include breakpoint(desktop) {
+        width: auto;
+      }
+    }
+
   }
 }
 

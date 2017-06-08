@@ -28,7 +28,7 @@
   min-width: 1px;
 }
 @mixin shared-secondary {
-  flex: 0 0 $ic-sp*24;
+  width: $ic-right-side-width;
   padding-left: $ic-sp*2;
 }
 

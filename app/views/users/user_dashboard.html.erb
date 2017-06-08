@@ -32,7 +32,7 @@
   <% end %>
 <% end %>
 
-<div id="dashboard">
+<div id="dashboard" class="ic-dashboard-app">
   <%= render :partial => 'shared/dashboard_invitation', :collection => @pending_invitations %>
   <%= render :partial => 'shared/dashboard_messages' %>
 
@@ -50,7 +50,6 @@
   <div id="dashboard-activity" class="ic-Dashboard-Activity" style="display: <%= show_recent_activity? ? 'block' : 'none' %>">
     <%= render :partial => 'shared/recent_activity' %>
   </div>
-
 
   <%= render :partial => 'shared/dashboard_card' %>
 </div>
