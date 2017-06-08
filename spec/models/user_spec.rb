@@ -2332,6 +2332,12 @@ describe User do
       @assignment.save!
     end
 
+    it 'should indicate that an assignment is submitted' do
+      @assignment.submit_homework(@student, body: "/shrug")
+
+      expect(@student.submission_statuses[:submitted]).to match_array([@assignment.id])
+    end
+
     it 'should indicate that an assignment is missing' do
       @assignment.update!(due_at: 1.week.ago)
 

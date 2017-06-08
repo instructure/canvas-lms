@@ -85,6 +85,70 @@ describe PlannerOverridesController do
           expect(note["type"]).to eq 'viewing'
           expect(note["plannable"]["title"]).to eq @planner_note.title
         end
+
+        context "new activity filter" do
+          it "should return newly created & unseen items" do
+            dt = discussion_topic_model(context: @course)
+            get :items_index, filter: "new_activity"
+            response_json = json_parse(response.body)
+            expect(response_json.length).to eq 1
+            expect(response_json.map { |i| i["plannable"]["id"] }).to be_include(dt.id)
+          end
+
+          it "should return newly graded items" do
+            @assignment.grade_student @student, grade: 10, grader: @teacher
+            get :items_index, filter: "new_activity"
+            response_json = json_parse(response.body)
+            expect(response_json.length).to eq 1
+            expect(response_json.first["plannable"]["id"]).to eq @assignment.id
+          end
+
+          it "should return items with new submission comments" do
+            @sub = @assignment2.submit_homework(@student)
+            @sub.submission_comments.create!(comment: "hello", author: @teacher)
+            get :items_index, filter: "new_activity"
+            response_json = json_parse(response.body)
+            expect(response_json.length).to eq 1
+            expect(response_json.first["plannable"]["id"]).to eq @assignment2.id
+          end
+
+
+          context "discussion topic read/unread states" do
+            before :once do
+              discussion_topic_model context: @course
+              @topic.todo_date = Time.zone.now
+              @topic.save!
+            end
+
+            it "should return new discussion topics" do
+              get :items_index, filter: "new_activity"
+              response_json = json_parse(response.body)
+              expect(response_json.length).to eq 1
+              expect(response_json.first["plannable"]["id"]).to eq @topic.id
+            end
+
+            it "should not return read discussion topics" do
+              @topic.change_read_state("read", @student)
+              get :items_index, filter: "new_activity"
+              response_json = json_parse(response.body)
+              expect(response_json.length).to eq 0
+            end
+
+            it "should return discussion topics with unread replies" do
+              expect(@topic.unread_count(@student)).to eq 0
+              @entry = @topic.discussion_entries.create!(:message => "Hello!", :user => @student)
+              @reply = @entry.reply_from(:user => @teacher, :text => "ohai!")
+              @topic.reload
+              expect(@topic.unread?(@student)).to eq true
+              expect(@topic.unread_count(@student)).to eq 1
+
+              get :items_index, filter: "new_activity"
+              response_json = json_parse(response.body)
+              expect(response_json.length).to eq 1
+              expect(response_json.first["plannable"]["id"]).to eq @topic.id
+            end
+          end
+        end
       end
 
       describe "GET #index" do

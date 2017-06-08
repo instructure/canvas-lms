@@ -87,9 +87,16 @@ class PlannerOverridesController < ApplicationController
   # Retrieve the list of objects to be shown on the planner for the current user
   # with the associated planner override to override an item's visibility if set.
   #
-  # @argument date [Date]
-  #   Only return items since the given date.
+  # @argument start_date [Date]
+  #   Only return items starting from the given date.
   #   The value should be formatted as: yyyy-mm-dd or ISO 8601 YYYY-MM-DDTHH:MM:SSZ.
+  #
+  # @argument end_date [Date]
+  #   Only return items up to the given date.
+  #   The value should be formatted as: yyyy-mm-dd or ISO 8601 YYYY-MM-DDTHH:MM:SSZ.
+  #
+  # @argument filter [String, "new_activity"]
+  #   Only return items that have new or unread activity
   #
   # @example_response
   # [
@@ -159,7 +166,14 @@ class PlannerOverridesController < ApplicationController
   #   }
   # ]
   def items_index
-    items_json = planner_items.map { |item| planner_item_json(item, @current_user, session, item.todo_type, {start_at: start_date}) }
+    items = if params[:filter] == 'new_activity'
+              unread_items
+            else
+              planner_items
+            end
+
+    items_json = items.map { |item| planner_item_json(item, @current_user, session, item.todo_type, default_opts) }
+
     render json: items_json
   end
 
@@ -240,6 +254,23 @@ class PlannerOverridesController < ApplicationController
 
   def planner_items
     @planner_items ||= Api.paginate(ungraded_discussion_items + page_items + assignment_items + planner_note_items, self, api_v1_planner_items_url)
+  end
+
+  def unread_items
+    # Combines unread items from the Recent Activity stream (which doesn't
+    # contain submission data) with unread submission updates,
+    # like new grades or comments.
+    supported_types = %w(Assignment DiscussionTopic Announcement Quizzes::Quiz WikiPage)
+    stream_items = @current_user.cached_recent_stream_items.
+                    select { |si| si.unread && supported_types.include?(si.asset_type) }.
+                    map { |si| si.data(@current_user.id) }.
+                    each { |si| si.todo_type = 'viewing' }
+    submitted_assignment_items = Submission.with_assignment.
+                                  where(user_id: @current_user).
+                                  select { |s| s.unread?(@current_user) }.
+                                  map(&:assignment).
+                                  each { |a| a.todo_type = 'viewing' }
+    @unread_items ||= Api.paginate(stream_items + submitted_assignment_items, self, api_v1_planner_items_url)
   end
 
   def assignment_items

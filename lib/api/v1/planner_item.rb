@@ -73,6 +73,7 @@ module Api::V1::PlannerItem
     return submission_status unless item.is_a?(Assignment)
     ss = user.submission_statuses(opts)
     submission_status[:submissions] = {
+      submitted: ss[:submitted].include?(item.id),
       excused: ss[:excused].include?(item.id),
       graded: ss[:graded].include?(item.id),
       late: ss[:late].include?(item.id),
