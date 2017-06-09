@@ -117,7 +117,7 @@ describe "Gradezilla" do
      priority: '1', test_id: 164219 do
     Gradezilla.visit(@course)
 
-    f('#gradebook-settings-button').click
+    Gradezilla.gradebook_settings_btn_select
     expect(f('[aria-label="Gradebook Settings"]')).to be_displayed
   end
 
@@ -125,7 +125,7 @@ describe "Gradezilla" do
      priority: '1', test_id: 164220 do
     Gradezilla.visit(@course)
 
-    f('#gradebook-settings-button').click
+    Gradezilla.gradebook_settings_btn_select
     expect(f('[aria-label="Gradebook Settings"]')).to be_displayed
     late_policies_tab = fj('[aria-label="Gradebook Settings"] [role="tablist"] [role="tab"]:first')
     expect(late_policies_tab.attribute('aria-selected')).to eq('true')
@@ -217,18 +217,16 @@ describe "Gradezilla" do
       make_full_screen
 
       # And I click the dropdown menu on the assignment
-      Gradezilla.select_assignment_header_menu_by_id(@first_assignment.id)
+      Gradezilla.click_assignment_header_menu(@first_assignment.id)
 
       # And I click the download submissions button
-      download_submissions_menu_item = -> { f('[data-menu-item-id="download-submissions"]') }
-      scroll_to(download_submissions_menu_item.call)
-      download_submissions_menu_item.call.click
+      Gradezilla.click_assignment_header_menu_element("download submissions")
 
       # And I close the download submissions dialog
       fj("div:contains('Download Assignment Submissions'):first .ui-dialog-titlebar-close").click
 
       # And I click the dropdown menu on the assignment again
-      Gradezilla.select_assignment_header_menu_by_id(@first_assignment.id)
+      Gradezilla.click_assignment_header_menu(@first_assignment.id)
 
       # And I click the re-upload submissions link
       f('[data-menu-item-id="reupload-submissions"]').click

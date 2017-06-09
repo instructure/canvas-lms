@@ -53,10 +53,8 @@ describe "Gradezilla - Assignment Column Options" do
       third_student = @course.students.find_by!(name: 'Student 3')
       @assignment.submissions.find_by!(user: third_student).destroy!
       Gradezilla.visit(@course)
-      Gradezilla.open_assignment_options_and_select_by(
-        assignment_id: @assignment.id,
-        menu_item: 'Missing'
-      )
+      Gradezilla.click_assignment_header_menu(@assignment.id)
+      Gradezilla.click_assignment_popover_sort_by('Missing')
 
       expect(Gradezilla.fetch_student_names).to eq ["Student 3", "Student 1", "Student 2"]
     end
@@ -66,10 +64,8 @@ describe "Gradezilla - Assignment Column Options" do
       submission = @assignment.submissions.find_by!(user: third_student)
       submission.update!(submitted_at: 2.days.from_now) # make late
       Gradezilla.visit(@course)
-      Gradezilla.open_assignment_options_and_select_by(
-        assignment_id: @assignment.id,
-        menu_item: 'Late'
-      )
+      Gradezilla.click_assignment_header_menu(@assignment.id)
+      Gradezilla.click_assignment_popover_sort_by('Late')
 
       expect(Gradezilla.fetch_student_names).to eq ["Student 3", "Student 1", "Student 2"]
     end

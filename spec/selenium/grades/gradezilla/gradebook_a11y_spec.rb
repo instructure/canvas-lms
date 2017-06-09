@@ -8,7 +8,7 @@
 # Software Foundation, version 3 of the License.
 #
 # Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# WARRANTY; wthout even the implied warranty of MERCHANTABILITY or FITNESS FOR
 # A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
 # details.
 #
@@ -98,8 +98,8 @@ describe "Gradezilla" do
       end
 
       it 'meets 3:1 contrast for column headers' do
-        bg_color = rgba_to_hex Gradezilla.assignment_header(assignment_title).style('background-color')
-        text_color = rgba_to_hex Gradezilla.assignment_header_label(assignment_title).style('color')
+        bg_color = rgba_to_hex Gradezilla.select_assignment_header_cell_element(assignment_title).style('background-color')
+        text_color = rgba_to_hex Gradezilla.select_assignment_header_cell_label_element(assignment_title).style('color')
 
         expect(LuminosityContrast.ratio(bg_color, text_color).round(2)).to be >= 3
       end
@@ -112,8 +112,8 @@ describe "Gradezilla" do
       end
 
       it 'meets 4.5:1 contrast for column headers' do
-        bg_color = rgba_to_hex Gradezilla.assignment_header(assignment_title).style('background-color')
-        text_color = rgba_to_hex Gradezilla.assignment_header_label(assignment_title).style('color')
+        bg_color = rgba_to_hex Gradezilla.select_assignment_header_cell_element(assignment_title).style('background-color')
+        text_color = rgba_to_hex Gradezilla.select_assignment_header_cell_label_element(assignment_title).style('color')
 
         expect(LuminosityContrast.ratio(bg_color, text_color).round(2)).to be >= 4.5
       end

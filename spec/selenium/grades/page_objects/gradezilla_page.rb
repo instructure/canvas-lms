@@ -23,11 +23,6 @@ class Gradezilla
 
     private
 
-    # Assignment Headings
-    ASSIGNMENT_HEADER_SELECTOR = '.slick-header-column'.freeze
-    ASSIGNMENT_HEADER_MENU_SELECTOR = '.gradebook-header-drop'.freeze
-    ASSIGNMENT_HEADER_MENU_ITEM_SELECTOR = 'ul.gradebook-header-menu li.ui-menu-item'.freeze
-
     # Student Headings
     STUDENT_COLUMN_MENU_SELECTOR = '.container_0 .Gradebook__ColumnHeaderAction'.freeze
 
@@ -53,9 +48,37 @@ class Gradezilla
       fj('button span:contains("Save")')
     end
 
-    def assignment_header_menu(name)
-      f(assignment_header_menu_selector(name))
+    # ---------------------NEW-----------------------
+    # elements
+    def assignment_header_menu_element(id)
+      f(".container_1 .slick-header-columns .slick-header-column[id*='assignment_#{id}'] .Gradebook__ColumnHeaderAction[id*='PopoverMenu']")
     end
+
+    def assignment_header_menu_item_element(item_name)
+      f("span[data-menu-item-id=#{item_name}]")
+    end
+
+    def assignment_header_menu_sort_by_element
+      fj('[role=menu][aria-labelledby*=PopoverMenu] button:contains("Sort by")')
+    end
+
+    def assignment_header_sort_by_item_element(item)
+      fj("span[role=menuitemradio] span:contains(#{item})")
+    end
+
+    def assignment_header_cell_element(title)
+      f(".slick-header-column[title=\"#{title}\"]")
+    end
+
+    def assignment_header_cell_label_element(title)
+      assignment_header_cell_element(title).find('.assignment-name')
+    end
+
+    def assignment_header_warning_icon_element
+      ff('.Gradebook__ColumnHeaderDetail svg[name="IconWarningSolid"]')
+    end
+
+    # ---------------------END NEW-----------------------
 
     def menu_container(container_id)
       selector = '[aria-expanded=true][role=menu]'
@@ -65,7 +88,7 @@ class Gradezilla
     end
 
     def student_names
-      ff('#gradebook_grid .student-name')
+      ff('.student-name')
     end
 
     def gradebook_menu(name)
@@ -96,26 +119,8 @@ class Gradezilla
       f(".grade", cell)
     end
 
-    def assignment_header_selector(name)
-      return ASSIGNMENT_HEADER_SELECTOR unless name
-
-      ASSIGNMENT_HEADER_SELECTOR + "[title=\"#{name}\"]"
-    end
-
-    def assignment_header_menu_selector(name)
-      [assignment_header_selector(name), ASSIGNMENT_HEADER_MENU_SELECTOR].join(' ')
-    end
-
     def dialog_save_mute_setting
       f("button[data-action$='mute']")
-    end
-
-    def assignment_header_menu_by_id(id)
-      f(".slick-header-column[id*='assignment_#{id}'] .Gradebook__ColumnHeaderAction")
-    end
-
-    def assignment_header_menu_item_by_id(id)
-      f("span[data-menu-item-id=\"#{id}\"]")
     end
 
     def gradebook_menu_open
@@ -146,6 +151,10 @@ class Gradezilla
       f('.total-cell .icon-muted')
     end
 
+    def total_cell_warning_icon
+      ff('.gradebook-cell .icon-warning')
+    end
+
     def grade_history
       f('[data-menu-item-id="grade-history"]')
     end
@@ -162,6 +171,10 @@ class Gradezilla
       fj("[role=menuitemcheckbox]:contains(#{menu_item})")
     end
 
+    def grading_period_filter_element
+      fj('span[role=menuitemcheckbox] span:contains(Grading Periods)')
+    end
+
     public
 
     # actions
@@ -173,15 +186,6 @@ class Gradezilla
       make_full_screen
     end
 
-    def open_assignment_options_and_select_by(assignment_id:, menu_item:)
-      column_header = f("#gradebook_grid .slick-header-column[id*='assignment_#{assignment_id}']")
-      action_menu = f('.Gradebook__ColumnHeaderAction', column_header)
-      action_menu.click
-      # open the menu so the menu items are is findable
-      fj('[role=menu][aria-labelledby*=PopoverMenu] button:contains("Sort by")').click
-      fj("[role=menuitemradio]:contains(#{menu_item})").click
-    end
-
     def select_total_column_option(menu_item_id = nil, already_open: false)
       unless already_open
         total_grade_column_header = f("#gradebook_grid .slick-header-column[id*='total_grade']")
@@ -191,13 +195,6 @@ class Gradezilla
       if menu_item_id
         f("span[data-menu-item-id='#{menu_item_id}']").click
       end
-    end
-
-    def open_assignment_options(cell_index)
-      assignment_cell = ff('#gradebook_grid .container_1 .slick-header-column')[cell_index]
-      driver.action.move_to(assignment_cell).perform
-      trigger = assignment_cell.find_element(:css, '.Gradebook__ColumnHeaderAction')
-      trigger.click
     end
 
     def grading_cell(x=0, y=0)
@@ -279,10 +276,6 @@ class Gradezilla
       notes_option.click
     end
 
-    def notes_content_selector
-      f("#content")
-    end
-
     def select_previous_grade_export
       link_previous_grade_export.click
     end
@@ -295,40 +288,7 @@ class Gradezilla
       f(".container_0 .slick-header-column:nth-child(#{n})")
     end
 
-    def assignment_header_label(name)
-      assignment_header(name).find('.assignment-name')
-    end
-
-    def assignment_header(name)
-      f(assignment_header_selector(name))
-    end
-
-    def select_assignment_header_by_name(name)
-      assignment_header_menu(name).click
-    end
-
-    def select_assignment_header_menu_by_id(id)
-      assignment_header_menu_by_id(id).click
-    end
-
-    def assignment_header_menu_item(name)
-      parent_element = ff(ASSIGNMENT_HEADER_MENU_ITEM_SELECTOR).find { |el| el.text == name }
-
-      f('a', parent_element)
-    end
-
-    def assignment_header_mute_icon_selector(assignment_id)
-      ".container_1 .slick-header-column[id*=assignment_#{assignment_id}] svg[name=IconMutedSolid]"
-    end
-
     # Semantic Methods for Gradebook Menus
-
-    def toggle_assignment_muting(assignment_id)
-      select_assignment_header_menu_by_id(assignment_id)
-      select_menu_item('assignment-muter')
-      dialog_save_mute_setting.click
-      wait_for_ajaximations
-    end
 
     def open_gradebook_menu(name)
       trigger = f('button', gradebook_menu(name))
@@ -351,7 +311,7 @@ class Gradezilla
     end
 
     def open_view_menu_and_arrange_by_menu
-      view_menu = Gradezilla.open_gradebook_menu('View')
+      view_menu = open_gradebook_menu('View')
       trigger = ff('button', view_menu).find {
         |element| element.text == "Arrange By"
       }
@@ -376,7 +336,7 @@ class Gradezilla
     end
 
     def gradebook_menu_options(container)
-      ff('[role*=menuitem]', container)
+      ff('[role*=menuitemradio]', container)
     end
 
     def gradebook_menu_option(name = nil, container: nil)
@@ -422,12 +382,12 @@ class Gradezilla
       total_cell_mute_icon
     end
 
-    def content_selector
-      f("#content")
+    def total_cell_warning_icon_select
+      total_cell_warning_icon
     end
 
-    def assignment_mute_icon_class_selector(id)
-      ".slick-header-column[id*='assigment_#{id}'] .icon-muted"
+    def content_selector
+      f("#content")
     end
 
     def grade_history_select
@@ -449,6 +409,93 @@ class Gradezilla
     def student_header_menu_option_selector(name)
       student_header_show_menu_option(name).click
     end
+
+    # ----------------------NEW----------------------------
+    # css selectors
+    def assignment_header_menu_selector(id)
+      assignment_header_menu_element(id)
+    end
+
+    def assignment_header_menu_item_selector(item)
+      menu_item_id = ""
+
+      if item =~ /curve(\-?\s?grade)?/i
+        menu_item_id = 'curve-grades'
+      elsif item =~ /set(\-?\s?default\-?\s?grade)?/i
+        menu_item_id = 'set-default-grade'
+      end
+
+      assignment_header_menu_item_element(menu_item_id)
+    end
+
+    def assignment_header_mute_icon_selector(assignment_id)
+      ".container_1 .slick-header-column[id*=assignment_#{assignment_id}] svg[name=IconMutedSolid]"
+    end
+
+    def select_assignment_header_warning_icon
+      assignment_header_warning_icon_element
+    end
+
+    # methods
+    def select_view_grading_period_filter
+      grading_period_filter_element.click
+    end
+
+    def click_assignment_header_menu(assignment_id)
+      assignment_header_menu_element(assignment_id).click
+    end
+
+    def click_assignment_header_menu_element(menuitem)
+      menu_item_id = ""
+
+      if menuitem =~ /message(\-?\s?student)?/i
+        menu_item_id = 'message-students-who'
+      elsif menuitem =~ /curve(\-?\s?grade)?/i
+        menu_item_id = 'curve-grades'
+      elsif menuitem =~ /set(\-?\s?default\-?\s?grade)?/i
+        menu_item_id = 'set-default-grade'
+      elsif menuitem =~ /mute/i
+        menu_item_id = 'assignment-muter'
+      elsif menuitem =~ /download(\-?\s?submission)?/i
+        menu_item_id = 'download-submissions'
+      end
+      assignment_header_menu_item_element(menu_item_id).click
+    end
+
+    def click_assignment_popover_sort_by(sort_type)
+      assignment_header_menu_sort_by_element.click
+      sort_by_item = ""
+
+      if sort_type =~ /low[\s\-]to[\s\-]high/i
+        sort_by_item = 'Grade - Low to High'
+      elsif sort_type =~ /high[\s\-]to[\s\-]low/i
+        sort_by_item = 'Grade - High to Low'
+      elsif sort_type =~ /missing/i
+        sort_by_item = 'Missing'
+      elsif sort_type =~ /late/i
+        sort_by_item = 'Late'
+      elsif sort_type =~ /unposted/i
+        sort_by_item = 'Unposted'
+      end
+      assignment_header_sort_by_item_element(sort_by_item).click
+    end
+
+    def select_assignment_header_cell_element(name)
+      assignment_header_cell_element(name)
+    end
+
+    def select_assignment_header_cell_label_element(name)
+      assignment_header_cell_label_element(name)
+    end
+
+    def toggle_assignment_muting(assignment_id)
+      click_assignment_header_menu(assignment_id)
+      click_assignment_header_menu_element('mute')
+      dialog_save_mute_setting.click
+      wait_for_ajaximations
+    end
+
+    # ----------------------END NEW----------------------------
 
     delegate :click, to: :save_button, prefix: true
   end

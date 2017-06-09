@@ -87,7 +87,7 @@ describe 'Gradezilla omit from final grade assignments' do
     end
 
     it 'displays triangle warning' do
-      expect(ff('.Gradebook__ColumnHeaderDetail svg[name="IconWarningSolid"]').size).to eq(1)
+      expect(Gradezilla.select_assignment_header_warning_icon.size).to eq(1)
     end
 
     it 'does not include omitted assignment in final' do

@@ -52,16 +52,16 @@ describe "Gradezilla - custom columns" do
     # create the notes column
     Gradezilla.select_gradebook_view_option
     Gradezilla.select_notes_option
-    expect(Gradezilla.notes_content_selector).to contain_css('.custom_column')
+    expect(Gradezilla.content_selector).to contain_css('.custom_column')
 
     # hide the notes column
     Gradezilla.select_gradebook_view_option
     Gradezilla.select_notes_option
-    expect(Gradezilla.notes_content_selector).not_to contain_css('.custom_column')
+    expect(Gradezilla.content_selector).not_to contain_css('.custom_column')
 
     # show the notes column
     Gradezilla.select_gradebook_view_option
     Gradezilla.select_notes_option
-    expect(Gradezilla.notes_content_selector).to contain_css('.custom_column')
+    expect(Gradezilla.content_selector).to contain_css('.custom_column')
   end
 end

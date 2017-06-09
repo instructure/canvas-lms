@@ -116,12 +116,12 @@ describe "Gradezilla - group weights" do
 
     it 'should display a warning icon for assignments with 0 points possible', priority: '1', test_id: 164013 do
       Gradezilla.visit(@course)
-      expect(ff('.Gradebook__ColumnHeaderDetail svg[name="IconWarningSolid"]').size).to eq(1)
+      expect(Gradezilla.select_assignment_header_warning_icon.size).to eq(1)
     end
 
     it 'should display a warning icon in the total column', priority: '1', test_id: 164013 do
       Gradezilla.visit(@course)
-      expect(ff('.gradebook-cell .icon-warning').count).to eq(1)
+      expect(Gradezilla.total_cell_warning_icon_select.size).to eq(1)
     end
 
     it 'should not display warning icons if group weights are turned off', priority: "1", test_id: 305579 do
@@ -136,8 +136,8 @@ describe "Gradezilla - group weights" do
       Gradezilla.visit(@course)
       Gradezilla.toggle_assignment_muting(@assignment2.id)
 
-      expect(f("#content")).to contain_jqcss('.total-cell .icon-muted')
-      expect(f("#content")).to contain_jqcss(Gradezilla.assignment_header_mute_icon_selector(@assignment2.id))
+      expect(Gradezilla.content_selector).to contain_jqcss('.total-cell .icon-muted')
+      expect(Gradezilla.content_selector).to contain_jqcss(Gradezilla.assignment_header_mute_icon_selector(@assignment2.id))
     end
 
     it 'should not display mute icon if an assignment is unmuted in both header and total column' do
@@ -147,8 +147,8 @@ describe "Gradezilla - group weights" do
       Gradezilla.visit(@course)
       Gradezilla.toggle_assignment_muting(@assignment2.id)
 
-      expect(f("#content")).not_to contain_jqcss('.total-cell .icon-muted')
-      expect(f("#content")).not_to contain_jqcss('.svg[name=IconWarningSolid]')
+      expect(Gradezilla.content_selector).not_to contain_jqcss('.total-cell .icon-muted')
+      expect(Gradezilla.content_selector).not_to contain_jqcss('.svg[name=IconWarningSolid]')
     end
   end
 end
