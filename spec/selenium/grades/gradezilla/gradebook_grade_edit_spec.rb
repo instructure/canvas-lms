@@ -246,7 +246,7 @@ describe "Gradezilla editing grades" do
 
         Gradezilla.visit(@course)
 
-        Gradezilla.select_grading_period(0)
+        Gradezilla.select_grading_period('All Grading Periods')
 
         Gradezilla.click_assignment_header_menu(@first_assignment.id)
       end

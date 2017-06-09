@@ -697,6 +697,11 @@ class GradebooksController < ApplicationController
   end
   helper_method :visible_modules?
 
+  def visible_sections?
+    @visible_sections ||= @context.multiple_sections?
+  end
+  helper_method :visible_sections?
+
   private
 
   def new_gradebook_env(env)

@@ -49,7 +49,9 @@
           <div class="gradebook-filter-container" id="modules-filter-container"></div>
         <% end %>
 
-        <div class="gradebook-filter-container section-button-placeholder"></div>
+        <% if visible_sections? %>
+          <div class="gradebook-filter-container" id="sections-filter-container"></div>
+        <% end %>
 
         <div class="gradebook-filter-container gradebook_filter" style="display:none">
           <% placeholder = t('Search…') %>
@@ -74,7 +76,7 @@
   <% if @context.feature_enabled?(:outcome_gradebook) %>
     <div class="outcome-gradebook-container">
       <div class="outcome-menus hidden" style="text-align: right;">
-        <div class="section-button-placeholder"></div>
+        <span data-component="SectionFilter"></span>
         <span data-component="GradebookMenu" data-variant="DefaultGradebookLearningMastery"></span>
       </div>
       <div class="outcome-gradebook hidden"></div>

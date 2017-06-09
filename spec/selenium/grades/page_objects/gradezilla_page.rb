@@ -224,12 +224,21 @@ class Gradezilla
       total.text
     end
 
-    def select_grading_period(grading_period_id)
+    def select_section(section=nil)
+      section = section.name if section.is_a?(CourseSection)
+      section ||= ''
+      section_dropdown.click
+      section_menu_item = ff('option', section_dropdown).find { |opt| opt.text == section }
+      section_menu_item.click
+      section_dropdown.click
+      wait_for_ajaximations
+    end
+
+    def select_grading_period(grading_period_name)
       grading_period_dropdown.click
-      period = gp_menu_list.find do |item|
-        f('label', item).attribute("for") == "period_option_#{grading_period_id}"
-      end
+      period = ff('option', grading_period_dropdown).find { |opt| opt.text == grading_period_name }
       period.click
+      grading_period_dropdown.click
       wait_for_animations
     end
 
@@ -401,15 +410,15 @@ class Gradezilla
     end
 
     def grading_period_dropdown
-      f(".grading-period-select-button")
+      f('#grading-periods-filter-container select')
     end
 
     def section_dropdown
-      f(".section-select-button")
+      f('#sections-filter-container select')
     end
 
     def module_dropdown
-      fj('button:contains("Module")')
+      f('#modules-filter-container select')
     end
 
     def gradebook_dropdown_item_click(menu_item_name)

@@ -58,21 +58,19 @@ describe "Gradezilla" do
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(2) .l2', 1)
 
     switch_to_section(@other_section)
-    expect(fj('.section-select-button:visible')).to include_text(@other_section.name)
+    expect(ff('option', Gradezilla.section_dropdown).find(&:selected?)).to include_text @other_section.name
 
     expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')).to include_text '1'
 
     # verify that it remembers the section to show across page loads
     Gradezilla.visit(@course)
-    expect(fj('.section-select-button:visible')).to include_text @other_section.name
+    expect(ff('option', Gradezilla.section_dropdown).find(&:selected?)).to include_text @other_section.name
     expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')).to include_text '1'
 
     # now verify that you can set it back
 
-    fj('.section-select-button:visible').click
-    expect(fj('.section-select-menu:visible')).to be_displayed
-    f("label[for='section_option_']").click
-    expect(fj('.section-select-button:visible')).to include_text "All Sections"
+    switch_to_section('All Sections')
+    expect(ff('option', Gradezilla.section_dropdown).find(&:selected?)).to include_text 'All Sections'
 
     # validate all grades (i.e. submissions) were loaded
     expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')).to include_text '0'

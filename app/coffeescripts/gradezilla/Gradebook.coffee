@@ -66,7 +66,9 @@ define [
   'jsx/gradezilla/default_gradebook/components/GradebookMenu'
   'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu'
   'jsx/gradezilla/default_gradebook/components/ActionMenu'
+  'jsx/gradezilla/default_gradebook/components/GradingPeriodFilter'
   'jsx/gradezilla/default_gradebook/components/ModuleFilter'
+  'jsx/gradezilla/default_gradebook/components/SectionFilter'
   'jsx/gradezilla/default_gradebook/components/GridColor'
   'jsx/gradezilla/default_gradebook/components/StatusesModal'
   'jsx/gradezilla/default_gradebook/components/SubmissionTray'
@@ -78,8 +80,6 @@ define [
   'jsx/gradezilla/shared/DownloadSubmissionsDialogManager'
   'jsx/gradezilla/shared/ReuploadSubmissionsDialogManager'
   'jst/gradezilla/group_total_cell'
-  'compiled/views/gradezilla/SectionMenuView'
-  'compiled/views/gradezilla/GradingPeriodMenuView'
   'compiled/gradezilla/GradebookKeyboardNav'
   'jsx/gradezilla/shared/AssignmentMuterDialogManager'
   'jsx/gradezilla/shared/helpers/assignmentHelper'
@@ -106,11 +106,10 @@ define [
   SubmissionCell, NumberCompare, natcompare, ConvertCase, htmlEscape, SetDefaultGradeDialogManager,
   CurveGradesDialogManager, GradebookApi, CellEditorFactory, GridSupport, studentRowHeaderConstants, AssignmentColumnHeader,
   AssignmentGroupColumnHeader, AssignmentRowCellPropFactory, CustomColumnHeader, StudentColumnHeader, StudentRowHeader,
-  TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, ModuleFilter, GridColor, StatusesModal,
-  SubmissionTray, GradebookSettingsModal, { statusColors }, PostGradesStore, PostGradesApp,  SubmissionStateMap,
-  DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager, GroupTotalCellTemplate, SectionMenuView,
-  GradingPeriodMenuView, GradebookKeyboardNav, AssignmentMuterDialogManager, assignmentHelper, { default: Button },
-  { default: IconSettingsSolid }) ->
+  TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, GradingPeriodFilter, ModuleFilter, SectionFilter,
+  GridColor, StatusesModal, SubmissionTray, GradebookSettingsModal, { statusColors }, PostGradesStore, PostGradesApp, SubmissionStateMap,
+  DownloadSubmissionsDialogManager,ReuploadSubmissionsDialogManager, GroupTotalCellTemplate, GradebookKeyboardNav,
+  AssignmentMuterDialogManager, assignmentHelper, { default: Button }, { default: IconSettingsSolid }) ->
 
   isAdmin = =>
     _.contains(ENV.current_user_roles, 'admin')
@@ -1130,50 +1129,53 @@ define [
       @kbDialog = new KeyboardNavDialog().render(KeyboardNavTemplate({keyBindings}))
       $(document).trigger('gridready')
 
-    sectionList: ->
-      _.map @sections, (section, id) =>
-        { name: section.name, id: id, checked: @sectionToShow == id }
+    sectionList: () ->
+      _.values(@sections).sort((a, b) => (a.id - b.id))
 
     updateSectionFilterVisibility: () ->
-      if @showSections() and 'sections' in @gridDisplaySettings.selectedViewOptionsFilters
-        @sectionMenu ||= new SectionMenuView(
-          tagName: 'span'
-          sections: @sectionList()
-          currentSection: @sectionToShow
-        )
-        @sectionMenu.disabled = !@contentLoadStates.studentsLoaded
-        @sectionMenu.render()
-        @sectionMenu.$el.appendTo('.assignment-gradebook-container .section-button-placeholder')
-      else if @sectionMenu
-        @sectionMenu.remove()
-        @sectionMenu = null
+      mountPoint = document.getElementById('sections-filter-container')
 
-    updateCurrentSection: (section, author) =>
-      @sectionToShow = section
-      @postGradesStore.setSelectedSection @sectionToShow
-      UserSettings[if @sectionToShow then 'contextSet' else 'contextRemove']('grading_show_only_section', @sectionToShow)
-      @updateColumnHeaders()
-      @buildRows() if @grid
+      if @showSections() and 'sections' in @gridDisplaySettings.selectedViewOptionsFilters
+        sectionList = @sectionList()
+        props =
+          items: sectionList
+          onSelect: @updateCurrentSection
+          selectedItemId: @sectionToShow || '0'
+          disabled: !@contentLoadStates.studentsLoaded
+
+        @sectionFilterMenu = renderComponent(SectionFilter, mountPoint, props)
+      else if @sectionFilterMenu
+        ReactDOM.unmountComponentAtNode(mountPoint)
+        @sectionFilterMenu = null
+
+    updateCurrentSection: (sectionId) =>
+      if @sectionToShow != sectionId
+        @sectionToShow = if sectionId == '0' then undefined else sectionId
+        @postGradesStore.setSelectedSection @sectionToShow
+        UserSettings[if @sectionToShow then 'contextSet' else 'contextRemove']('grading_show_only_section', @sectionToShow)
+        @updateColumnHeaders()
+        @buildRows() if @grid
+        @updateSectionFilterVisibility()
 
     showSections: ->
       @sections_enabled
 
     gradingPeriodList: ->
-      _.map @gradingPeriodSet.gradingPeriods, (period) =>
-        { title: period.title, id: period.id, checked: @getGradingPeriodToShow() == period.id }
+      @gradingPeriodSet.gradingPeriods.sort((a, b) => (a.startDate - b.startDate))
 
     updateGradingPeriodFilterVisibility: () ->
+      mountPoint = document.getElementById('grading-periods-filter-container')
+
       if @gradingPeriodSet? and 'gradingPeriods' in @gridDisplaySettings.selectedViewOptionsFilters
-        @gradingPeriodMenu ||= new GradingPeriodMenuView(
-          tagName: 'span'
-          periods: @gradingPeriodList(),
-          currentGradingPeriod: @getGradingPeriodToShow()
-        )
-        @gradingPeriodMenu.render()
-        @gradingPeriodMenu.$el.appendTo('#grading-periods-filter-container')
-      else if @gradingPeriodMenu?
-        @gradingPeriodMenu.remove()
-        @gradingPeriodMenu = null
+        props =
+          items: @gradingPeriodList().map((item) => { id: item.id, name: item.title })
+          onSelect: @updateCurrentGradingPeriod
+          selectedItemId: @getGradingPeriodToShow()
+
+        @gradingPeriodFilterMenu = renderComponent(GradingPeriodFilter, mountPoint, props)
+      else if @gradingPeriodFilterMenu?
+        ReactDOM.unmountComponentAtNode(mountPoint)
+        @gradingPeriodFilterMenu = null
 
     updateCurrentGradingPeriod: (period) =>
       if @getFilterColumnsBySetting('gradingPeriodId') != period
@@ -1182,6 +1184,7 @@ define [
         @resetGrading()
         @setAssignmentWarnings()
         @updateColumnsAndRenderViewOptionsMenu()
+        @updateGradingPeriodFilterVisibility()
 
     updateCurrentModule: (moduleId) =>
       if @getFilterColumnsBySetting('contextModuleId') != moduleId
@@ -1191,21 +1194,17 @@ define [
         @updateColumnsAndRenderViewOptionsMenu()
         @updateModulesFilterVisibility()
 
+    moduleList: ->
+      @listContextModules().sort((a, b) => (a.position - b.position))
+
     updateModulesFilterVisibility: () ->
       mountPoint = document.getElementById('modules-filter-container')
 
       if @listContextModules()?.length > 0 and 'modules' in @gridDisplaySettings.selectedViewOptionsFilters
-        modules = [
-          {
-            id: '0'
-            name: I18n.t('All Modules')
-            position: -1
-          }
-        ].concat(@listContextModules())
         props =
-          modules: modules
+          items: @moduleList()
           onSelect: @updateCurrentModule
-          selectedModuleId: @getFilterColumnsBySetting('contextModuleId') || '0'
+          selectedItemId: @getFilterColumnsBySetting('contextModuleId') || '0'
 
         @moduleFilterMenu = renderComponent(ModuleFilter, mountPoint, props)
       else if @moduleFilterMenu?

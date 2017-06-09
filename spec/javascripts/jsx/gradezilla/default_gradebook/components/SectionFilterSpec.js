@@ -18,23 +18,23 @@
 
 import React from 'react';
 import { mount } from 'enzyme';
-import ModuleFilter from 'jsx/gradezilla/default_gradebook/components/ModuleFilter';
+import SectionFilter from 'jsx/gradezilla/default_gradebook/components/SectionFilter';
 
 function defaultProps () {
   return {
     items: [
-      { id: '1', name: 'Module 1', position: 2 },
-      { id: '2', name: 'Module 2', position: 1 },
+      { id: '1', name: 'Section 1', position: 2 },
+      { id: '2', name: 'Section 2', position: 1 },
     ],
     onSelect: () => {},
     selectedItemId: '0',
   }
 }
 
-QUnit.module('Module Filter - subclass functionality', {
+QUnit.module('Section Filter - subclass functionality', {
   setup () {
     const props = defaultProps();
-    this.wrapper = mount(<ModuleFilter {...props} />);
+    this.wrapper = mount(<SectionFilter {...props} />);
   },
 
   teardown () {
@@ -43,12 +43,12 @@ QUnit.module('Module Filter - subclass functionality', {
 });
 
 test('renders a screenreader-friendly label', function () {
-  strictEqual(this.wrapper.find('ScreenReaderContent').at(1).text(), 'Module Filter');
+  strictEqual(this.wrapper.find('ScreenReaderContent').at(1).text(), 'Section Filter');
 });
 
 test('the options are displayed in the same order as they were sent in', function () {
   const actualOptionIds = this.wrapper.find('option').map(opt => opt.text());
-  const expectedOptionIds = ['All Modules', 'Module 1', 'Module 2'];
+  const expectedOptionIds = ['All Sections', 'Section 1', 'Section 2'];
 
   deepEqual(actualOptionIds, expectedOptionIds);
 });

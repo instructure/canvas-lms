@@ -19,12 +19,12 @@
 import I18n from 'i18n!gradebook';
 import GradebookFilter from './GradebookFilter';
 
-class ModuleFilter extends GradebookFilter {
+class GradingPeriodFilter extends GradebookFilter {
   static defaultProps = {
     disabled: false,
-    filterLabel: I18n.t('Module Filter'),
-    allItemsLabel: I18n.t('All Modules')
+    filterLabel: I18n.t('Grading Period Filter'),
+    allItemsLabel: I18n.t('All Grading Periods')
   };
 }
 
-export default ModuleFilter;
+export default GradingPeriodFilter;

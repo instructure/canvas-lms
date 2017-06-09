@@ -16,25 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery';
-import GradingPeriodMenuView from 'compiled/views/gradezilla/GradingPeriodMenuView';
+import I18n from 'i18n!gradebook';
+import GradebookFilter from './GradebookFilter';
 
-QUnit.module('GradingPeriodMenuView', {
-  setup () {
-    this.stub($, 'publish');
-    const periods = [{ id: '1401' }, { id: '1402' }];
-    this.view = new GradingPeriodMenuView({ periods, currentGradingPeriod: '1401' });
-    this.view.render();
-    this.view.$el.appendTo('#fixtures');
-  },
+class SectionFilter extends GradebookFilter {
+  static defaultProps = {
+    disabled: false,
+    filterLabel: I18n.t('Section Filter'),
+    allItemsLabel: I18n.t('All Sections')
+  };
+}
 
-  teardown () {
-    $('#fixtures').empty();
-  }
-});
-
-test('sets focus on the button after changing grading periods', function () {
-  this.view.$el.find('button').click();
-  $('input[value=1402]').parent().click();
-  equal(document.activeElement, this.view.$('button')[0]);
-});
+export default SectionFilter;

@@ -2229,8 +2229,9 @@ test('re-renders the view options menu after request rejects', function () {
 
 QUnit.module('Gradebook#updateSectionFilterVisibility', {
   setup () {
-    $fixtures.innerHTML = '<div class="assignment-gradebook-container"><div class="section-button-placeholder"></div></div>';
-    this.container = $fixtures.querySelector('.section-button-placeholder');
+    const sectionsFilterContainerSelector = 'sections-filter-container';
+    $fixtures.innerHTML = `<div id="${sectionsFilterContainerSelector}"></div>`;
+    this.container = $fixtures.querySelector(`#${sectionsFilterContainerSelector}`);
     const sections = [{ id: '2001', name: 'Freshmen' }, { id: '2002', name: 'Sophomores' }];
     this.gradebook = createGradebook({ sections });
     this.gradebook.sections_enabled = true;
@@ -2244,75 +2245,86 @@ QUnit.module('Gradebook#updateSectionFilterVisibility', {
 
 test('renders the section select when not already rendered', function () {
   this.gradebook.updateSectionFilterVisibility();
-  ok(this.gradebook.sectionMenu, 'section menu reference has been stored');
-  ok(this.gradebook.sectionMenu.$el.parent().is(this.container), 'element was rendered into the container');
+  ok(this.container.children.length > 0, 'section menu was rendered');
+});
+
+test('stores a reference to the section select when it is rendered', function () {
+  this.gradebook.updateSectionFilterVisibility();
+  ok(this.gradebook.sectionFilterMenu, 'section menu reference has been stored');
 });
 
 test('does not render when only one section exists', function () {
   this.gradebook.sections_enabled = false;
   this.gradebook.updateSectionFilterVisibility();
-  notOk(this.gradebook.sectionMenu, 'section menu reference has not been stored');
+  notOk(this.gradebook.sectionFilterMenu, 'section menu reference has not been stored');
   strictEqual(this.container.children.length, 0, 'nothing was rendered');
 });
 
 test('does not render when filter is not selected', function () {
   this.gradebook.setSelectedViewOptionsFilters(['assignmentGroups']);
   this.gradebook.updateSectionFilterVisibility();
-  notOk(this.gradebook.sectionMenu, 'section menu reference has been removed');
+  notOk(this.gradebook.sectionFilterMenu, 'section menu reference has been removed');
   strictEqual(this.container.children.length, 0, 'rendered elements have been removed');
 });
 
 test('renders the section select with a list of sections', function () {
   this.gradebook.updateSectionFilterVisibility();
-  const { sections } = this.gradebook.sectionMenu;
-  strictEqual(sections.length, 3, 'includes the "nothing selected" option plus the two sections');
-  deepEqual(sections.slice(1).map(section => section.id), ['2001', '2002']);
+  const sections = this.gradebook.sectionFilterMenu.props.items;
+  strictEqual(sections.length, 2, 'includes the "nothing selected" option plus the two sections');
+  deepEqual(sections.map(section => section.id), ['2001', '2002']);
 });
 
 test('sets the section select to show the defined sectionToShow', function () {
   this.gradebook.sectionToShow = '2002';
   this.gradebook.updateSectionFilterVisibility();
-  strictEqual(this.gradebook.sectionMenu.currentSection, '2002');
+  strictEqual(this.gradebook.sectionFilterMenu.props.selectedItemId, '2002');
 });
 
 test('sets the section select as disabled when students are not loaded', function () {
   this.gradebook.updateSectionFilterVisibility();
-  strictEqual(this.gradebook.sectionMenu.disabled, true);
+  strictEqual(this.gradebook.sectionFilterMenu.props.disabled, true);
 });
 
 test('sets the section select as not disabled when students are loaded', function () {
   this.gradebook.contentLoadStates.studentsLoaded = true;
   this.gradebook.updateSectionFilterVisibility();
-  strictEqual(this.gradebook.sectionMenu.disabled, false);
+  strictEqual(this.gradebook.sectionFilterMenu.props.disabled, false);
 });
 
 test('updates the disabled state of the rendered section select', function () {
   this.gradebook.updateSectionFilterVisibility();
   this.gradebook.contentLoadStates.studentsLoaded = true;
   this.gradebook.updateSectionFilterVisibility();
-  strictEqual(this.gradebook.sectionMenu.disabled, false);
+  strictEqual(this.gradebook.sectionFilterMenu.props.disabled, false);
 });
 
 test('renders only one section select when updated', function () {
   this.gradebook.updateSectionFilterVisibility();
   this.gradebook.updateSectionFilterVisibility();
-  ok(this.gradebook.sectionMenu, 'section menu reference has been stored');
+  ok(this.gradebook.sectionFilterMenu, 'section menu reference has been stored');
   strictEqual(this.container.children.length, 1, 'only one section select is rendered');
 });
 
 test('removes the section select when filter is deselected', function () {
   this.gradebook.setSelectedViewOptionsFilters(['assignmentGroups']);
   this.gradebook.updateSectionFilterVisibility();
-  notOk(this.gradebook.sectionMenu, 'section menu reference has been stored');
+  notOk(this.gradebook.sectionFilterMenu, 'section menu reference has been stored');
   strictEqual(this.container.children.length, 0, 'nothing was rendered');
 });
 
 QUnit.module('Gradebook#updateGradingPeriodFilterVisibility', {
   setup () {
-    $fixtures.innerHTML = '<div id="grading-periods-filter-container"></div>';
-    this.container = $fixtures.querySelector('#grading-periods-filter-container');
+    const sectionsFilterContainerSelector = 'grading-periods-filter-container';
+    $fixtures.innerHTML = `<div id="${sectionsFilterContainerSelector}"></div>`;
+    this.container = $fixtures.querySelector(`#${sectionsFilterContainerSelector}`);
     this.gradebook = createGradebook({
-      grading_period_set: { id: '1501', grading_periods: [{ id: '701' }, { id: '702' }] }
+      grading_period_set: {
+        id: '1501',
+        grading_periods: [
+          { id: '701', title: 'Grading Period 1', startDate: new Date(1) },
+          { id: '702', title: 'Grading Period 2', startDate: new Date(2) }
+        ]
+      }
     });
     this.gradebook.setSelectedViewOptionsFilters(['gradingPeriods']);
   },
@@ -2324,48 +2336,52 @@ QUnit.module('Gradebook#updateGradingPeriodFilterVisibility', {
 
 test('renders the grading period select when not already rendered', function () {
   this.gradebook.updateGradingPeriodFilterVisibility();
-  ok(this.gradebook.gradingPeriodMenu, 'grading period menu reference has been stored');
-  ok(this.gradebook.gradingPeriodMenu.$el.parent().is(this.container), 'element was rendered into the container');
+  ok(this.container.children.length > 0, 'grading period menu was rendered');
+});
+
+test('stores a reference to the grading period select when it is rendered', function () {
+  this.gradebook.updateGradingPeriodFilterVisibility();
+  ok(this.gradebook.gradingPeriodFilterMenu, 'grading period menu reference has been stored');
 });
 
 test('does not render when a grading period set does not exist', function () {
   this.gradebook.gradingPeriodSet = null;
   this.gradebook.updateGradingPeriodFilterVisibility();
-  notOk(this.gradebook.gradingPeriodMenu, 'grading period menu reference has not been stored');
+  notOk(this.gradebook.gradingPeriodFilterMenu, 'grading period menu reference has not been stored');
   strictEqual(this.container.children.length, 0, 'nothing was rendered');
 });
 
 test('does not render when filter is not selected', function () {
   this.gradebook.setSelectedViewOptionsFilters(['assignmentGroups']);
   this.gradebook.updateGradingPeriodFilterVisibility();
-  notOk(this.gradebook.gradingPeriodMenu, 'grading period menu reference has been removed');
+  notOk(this.gradebook.gradingPeriodFilterMenu, 'grading period menu reference has been removed');
   strictEqual(this.container.children.length, 0, 'rendered elements have been removed');
 });
 
 test('renders the grading period select with a list of grading periods', function () {
   this.gradebook.updateGradingPeriodFilterVisibility();
-  const { periods } = this.gradebook.gradingPeriodMenu;
-  strictEqual(periods.length, 3, 'includes the "nothing selected" option plus the two grading periods');
-  deepEqual(periods.slice(1).map(gradingPeriod => gradingPeriod.id), ['701', '702']);
+  const periods = this.gradebook.gradingPeriodFilterMenu.props.items;
+  strictEqual(periods.length, 2, 'includes the "nothing selected" option plus the two grading periods');
+  deepEqual(periods.map(gradingPeriod => gradingPeriod.id), ['701', '702']);
 });
 
 test('sets the grading period select to show the selected grading period', function () {
   this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '702');
   this.gradebook.updateGradingPeriodFilterVisibility();
-  strictEqual(this.gradebook.gradingPeriodMenu.currentGradingPeriod, '702');
+  strictEqual(this.gradebook.gradingPeriodFilterMenu.props.selectedItemId, '702');
 });
 
 test('renders only one grading period select when updated', function () {
   this.gradebook.updateGradingPeriodFilterVisibility();
   this.gradebook.updateGradingPeriodFilterVisibility();
-  ok(this.gradebook.gradingPeriodMenu, 'grading period menu reference has been stored');
+  ok(this.gradebook.gradingPeriodFilterMenu, 'grading period menu reference has been stored');
   strictEqual(this.container.children.length, 1, 'only one grading period select is rendered');
 });
 
 test('removes the grading period select when filter is deselected', function () {
   this.gradebook.setSelectedViewOptionsFilters(['assignmentGroups']);
   this.gradebook.updateGradingPeriodFilterVisibility();
-  notOk(this.gradebook.gradingPeriodMenu, 'grading period menu reference has been stored');
+  notOk(this.gradebook.gradingPeriodFilterMenu, 'grading period menu reference has been stored');
   strictEqual(this.container.children.length, 0, 'nothing was rendered');
 });
 

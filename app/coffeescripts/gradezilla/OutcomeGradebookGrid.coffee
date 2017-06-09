@@ -235,6 +235,7 @@ define [
       # Returns a boolean.
       sectionFilter: (section, row)->
         return true unless section
+        return true if section == '0'
         return true if _.find row,(r) -> r.links.section == section
 
       # Public: Parse and store a list of outcomes from the outcome rollups API.

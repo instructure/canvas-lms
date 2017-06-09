@@ -144,12 +144,7 @@ module GradezillaCommon
   end
 
   def switch_to_section(section=nil)
-    section = section.id if section.is_a?(CourseSection)
-    section ||= ""
-    fj('.section-select-button:visible').click
-    expect(fj('.section-select-menu:visible')).to be_displayed
-    fj("label[for='section_option_#{section}']").click
-    wait_for_ajaximations
+    ::Gradezilla.select_section(section)
   end
 
   def gradebook_column_array(css_row_class)
