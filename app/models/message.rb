@@ -558,7 +558,8 @@ class Message < ActiveRecord::Base
       return nil
     end
 
-    if user && user.account.feature_enabled?(:notification_service) && path_type != "yo"
+    check_acct = (user && user.account) || Account.site_admin
+    if check_acct.feature_enabled?(:notification_service) && path_type != "yo"
       enqueue_to_sqs
     else
       send(delivery_method)
