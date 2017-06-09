@@ -19,6 +19,14 @@ module Types
         Assignments::ScopedToUser.new(course, ctx[:current_user]).scope
       }
     end
+
+    connection :sectionsConnection do
+      type SectionType.connection_type
+      resolve -> (course, _, ctx) {
+        course.active_course_sections.
+          order(CourseSection.best_unicode_collation_key('name'))
+      }
+    end
   end
 
   CourseWorkflowState = GraphQL::EnumType.define do

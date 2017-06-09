@@ -28,4 +28,13 @@ describe Types::CourseType do
       expect(course_type.assignmentsConnection(current_user: student).size).to eq 0
     end
   end
+
+  describe "sectionsConnection" do
+    it "only includes active sections" do
+      section1 = course.course_sections.create!(name: "Delete Me")
+      section2 = course.course_sections.create!(name: "Keep Me")
+      section1.destroy
+      expect(course_type.sectionsConnection.size).to eq 1
+    end
+  end
 end

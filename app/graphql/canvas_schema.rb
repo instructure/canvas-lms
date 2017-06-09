@@ -20,6 +20,7 @@ CanvasSchema = GraphQL::Schema.define do
     case obj
     when Course then Types::CourseType
     when Assignment then Types::AssignmentType
+    when CourseSection then Types::SectionType
     else raise "I don't know how to resolve #{obj.inspect}"
     end
   }
