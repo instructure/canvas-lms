@@ -793,6 +793,19 @@ describe DiscussionTopicsController, type: :request do
         expect(@assignment).to be_deleted
       end
 
+      it "nulls availability dates on the topic if assignment ones are provided" do
+        api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                 {:delayed_post_at => 2.weeks.ago.as_json, :lock_at => 1.week.ago.as_json,
+                  :assignment => {:unlock_at => 1.week.from_now.as_json, :lock_at => 2.weeks.from_now.as_json}})
+
+        expect(@topic.reload.assignment.reload.unlock_at).to be > Time.now
+        expect(@topic.assignment.lock_at).to be > Time.now
+        expect(@topic).not_to be_locked
+        expect(@topic.delayed_post_at).to be_nil
+        expect(@topic.lock_at).to be_nil
+      end
+
       it "should update due dates with cache enabled" do
         old_due_date = 1.day.ago
         @assignment = @topic.context.assignments.build
