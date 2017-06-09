@@ -90,6 +90,11 @@ describe "master courses sidebar" do
       wait_for_ajaximations
       expect(f('div[aria-label="Unsynced Changes"]')).to be_displayed
     end
+
+    it "should not show the tutorial sidebar button" do
+      get "/courses/#{@master.id}"
+      expect(f('body')).not_to contain_css('.TutorialToggleHolder button')
+    end
   end
 
   describe "as a master course admin" do

@@ -292,6 +292,9 @@ class ApplicationController < ActionController::Base
       terms: @context.account.root_account.enrollment_terms.active.pluck(:id, :name).map{|id, name| {id: id, name: name}},
       canManageCourse: MasterCourses::MasterTemplate.is_master_course?(@context) && @context.account.grants_right?(@current_user, :manage_master_courses)
     }
+    if is_master && js_env.key?(:NEW_USER_TUTORIALS)
+      js_env[:NEW_USER_TUTORIALS][:is_enabled] = false
+    end
   end
   helper_method :load_blueprint_courses_ui
 
