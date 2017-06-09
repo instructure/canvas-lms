@@ -18,7 +18,7 @@
 
 require_relative '../helpers/blueprint_common'
 
-describe "master courses sidebar" do
+describe "master courses banner" do
   include_context "in-process server selenium tests"
 
   # copied from spec/apis/v1/master_templates_api_spec.rb
@@ -36,10 +36,10 @@ describe "master courses sidebar" do
     @minion = @template.add_child_course!(course_factory(name: "Minion", active_all: true)).child_course
     @minion.enroll_teacher(@master_teacher).accept!
 
-    # sets up the assignment that gets blueprinted
-    @original_assmt = @master.assignments.create! title: 'Blah', points_possible: 10, due_at: 5.days.from_now, description: 'this is the original content'
+    # sets up the page that gets blueprinted
+    @original_page = @master.wiki.wiki_pages.create! title: 'Unicorn', body: 'don\'t exist! Sorry James'
     run_master_migration
-    @copy_assmt = @minion.assignments.last
+    @copy_page = @minion.wiki.wiki_pages.last
   end
 
   describe "as a master course teacher" do
@@ -48,19 +48,15 @@ describe "master courses sidebar" do
       user_session(@master_teacher)
     end
 
-    it "locks down the associated course's assignment fields", priority: "1", test_id: 3127590 do
-      change_blueprint_settings(@master, points: true, due_dates: true, availability_dates: true)
-      get "/courses/#{@master.id}/assignments/#{@original_assmt.id}"
+    it "can lock down associated course's page content", priority: "1", test_id: 3127591 do
+      change_blueprint_settings(@master, content: true)
+      get "/courses/#{@master.id}/pages/#{@original_page.id}"
       f('.bpc-lock-toggle button').click
       expect { f('.bpc-lock-toggle__label').text }.to become('Locked')
       run_master_migration
-      get "/courses/#{@minion.id}/assignments/#{@copy_assmt.id}/edit"
-      expect(f('#mceu_24')).not_to be nil
-      expect(f('.bpc-lock-toggle__label').text).to eq('Locked')
-      expect(f('#assignment_points_possible').attribute('readonly')).to be_truthy
-      expect(f('#due_at').attribute('readonly')).to be_truthy
-      expect(f('#unlock_at').attribute('readonly')).to be_truthy
-      expect(f('#lock_at').attribute('readonly')).to be_truthy
+      get "/courses/#{@minion.id}/pages/#{@copy_page.id}/edit"
+      expect(f('#content-wrapper')).not_to contain_css('#tinymce')
     end
+
   end
 end
