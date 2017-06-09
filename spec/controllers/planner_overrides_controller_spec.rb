@@ -26,7 +26,7 @@ describe PlannerOverridesController do
     @assignment2 = course_assignment
     @planner_override = PlannerOverride.create!(plannable_id: @assignment.id,
                                                 plannable_type: "Assignment",
-                                                visible: true,
+                                                marked_complete: false,
                                                 user_id: @student.id)
   end
 
@@ -44,9 +44,9 @@ describe PlannerOverridesController do
       get :index
       assert_unauthorized
 
-      post :create, :plannable_type => "Assignment",
+      post :create, :plannable_type => "assignment",
                      :plannable_id => @assignment.id,
-                     :visible => true
+                     :marked_complete => false
       assert_unauthorized
     end
   end
@@ -167,16 +167,16 @@ describe PlannerOverridesController do
 
       describe "PUT #update" do
         it "returns http success" do
-          expect(@planner_override.visible).to be_truthy
-          put :update, id: @planner_override.id, visible: false
+          expect(@planner_override.marked_complete).to be_falsey
+          put :update, id: @planner_override.id, marked_complete: true
           expect(response).to have_http_status(:success)
-          expect(@planner_override.reload.visible).to be_falsey
+          expect(@planner_override.reload.marked_complete).to be_truthy
         end
       end
 
       describe "POST #create" do
         it "returns http success" do
-          post :create, plannable_type: "Assignment", plannable_id: @assignment2.id, visible: false
+          post :create, plannable_type: "assignment", plannable_id: @assignment2.id, marked_complete: true
           expect(response).to have_http_status(:created)
           expect(PlannerOverride.where(user_id: @student.id).count).to be 2
         end

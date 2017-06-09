@@ -45,10 +45,7 @@ module Plannable
 
   def visible_in_planner_for?(user)
     return true unless planner_enabled?
-    self.planner_overrides.where(user_id: user,
-                                 visible: false,
-                                 workflow_state: 'active'
-                                ).blank?
+    self.planner_overrides.where(user_id: user, marked_complete: true, workflow_state: 'active').blank?
   end
 
   def planner_override_for(user)

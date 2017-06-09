@@ -26,11 +26,11 @@ describe PlannerOverride do
     @student_planner_override = PlannerOverride.create!(user_id: @student.id,
                                                         plannable_id: @assignment.id,
                                                         plannable_type: "Assignment",
-                                                        visible: false)
+                                                        marked_complete: true)
     @teacher_planner_override = PlannerOverride.create!(user_id: @teacher.id,
                                                         plannable_id: @assignment.id,
                                                         plannable_type: "Assignment",
-                                                        visible: true)
+                                                        marked_complete: false)
   end
 
 

@@ -51,8 +51,8 @@
 #           "example": "published",
 #           "type": "string"
 #         },
-#         "visible": {
-#           "description": "Controls whether or not the associated plannable item is displayed on the planner",
+#         "marked_complete": {
+#           "description": "Controls whether or not the associated plannable item is marked complete on the planner",
 #           "example": false,
 #           "type": "boolean"
 #         },
@@ -205,10 +205,13 @@ class PlannerOverridesController < ApplicationController
   #
   # Update a planner override's visibilty for the current user
   #
+  # @argument marked_complete
+  #   determines whether the planner item is marked as completed
+  #
   # @returns PlannerOverride
   def update
     planner_override = PlannerOverride.find(params[:id])
-    planner_override.visible = value_to_boolean(params[:visible])
+    planner_override.marked_complete = value_to_boolean(params[:marked_complete])
 
     if planner_override.save
       render json: planner_override, status: :ok
@@ -221,12 +224,22 @@ class PlannerOverridesController < ApplicationController
   #
   # Create a planner override for the current user
   #
+  # @argument plannable_type [String, "announcement"|"assignment"|"discussion_topic"|"quiz"|"wiki_page"|"planner_note"]
+  #   Type of the item that you are overriding in the planner
+  #
+  # @argument plannable_id [Integer]
+  #   ID of the item that you are overriding in the planner
+  #
+  # @argument marked_complete [Boolean]
+  #   If this is true, the item will show in the planner as completed
+  #
+  #
   # @returns PlannerOverride
   def create
-    planner_override = PlannerOverride.new(plannable_type: params[:plannable_type],
-                                       plannable_id: params[:plannable_id],
-                                       visible: value_to_boolean(params[:visible]),
-                                       user: @current_user)
+    plannable_type = params[:plannable_type] == 'quiz' ? Quizzes::Quiz : params[:plannable_type]&.camelize
+    planner_override = PlannerOverride.new(plannable_type: plannable_type,
+      plannable_id: params[:plannable_id], marked_complete: value_to_boolean(params[:marked_complete]),
+      user: @current_user)
 
     if planner_override.save
       render json: planner_override, status: :created

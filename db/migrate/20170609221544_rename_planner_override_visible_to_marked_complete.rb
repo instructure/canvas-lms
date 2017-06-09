@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2017 - present Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,23 +14,17 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-module Factories
-  def planner_override_model(opts={})
-    user = opts[:user] || @user || user_model
-    plannable = opts[:plannable] || assignment_model
-    visibility = opts.key?(:marked_complete) ? opts[:marked_complete] : false
-    attrs = { user_id: user.id,
-              plannable_type: plannable.class.to_s,
-              plannable_id: plannable.id,
-              marked_complete: visibility }
-    @planner_override = PlannerOverride.create!(valid_planner_override_attributes.merge(attrs))
+class RenamePlannerOverrideVisibleToMarkedComplete < ActiveRecord::Migration[4.2]
+  tag :predeploy
+
+  def self.up
+    rename_column :planner_overrides, :visible, :marked_complete
+    change_column_default :planner_overrides, :marked_complete, false
   end
 
-  def valid_planner_override_attributes
-    {
-      :marked_complete => false
-    }
+  def self.down
+    rename_column :planner_overrides, :marked_complete, :visible
+    change_column_default :planner_overrides, :visible, true
   end
 end

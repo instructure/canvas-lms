@@ -47,7 +47,7 @@ describe Api::V1::PlannerItem do
     @assignment.save!
 
     @teacher_override = planner_override_model(plannable: @assignment, user: @teacher)
-    @student_override = planner_override_model(plannable: @assignment, user: @student, visible: false)
+    @student_override = planner_override_model(plannable: @assignment, user: @student, marked_complete: true)
   end
 
   describe '.planner_item_json' do
