@@ -141,6 +141,7 @@ class Course < ActiveRecord::Base
   has_many :active_folders, -> { where("folders.workflow_state<>'deleted'").order('folders.name') }, class_name: 'Folder', as: :context, inverse_of: :context
   has_many :messages, :as => :context, :inverse_of => :context, :dependent => :destroy
   has_many :context_external_tools, -> { order('name') }, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :tool_proxies, class_name: 'Lti::ToolProxy', as: :context, inverse_of: :context, dependent: :destroy
   belongs_to :wiki
   has_many :wiki_pages, foreign_key: 'wiki_id', primary_key: 'wiki_id'
   has_many :quizzes, -> { order('lock_at, title, id') }, class_name: 'Quizzes::Quiz', as: :context, inverse_of: :context, dependent: :destroy

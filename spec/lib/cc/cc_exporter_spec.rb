@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require File.expand_path(File.dirname(__FILE__) + '/cc_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../lti2_course_spec_helper')
 
 require 'nokogiri'
 
@@ -427,6 +428,24 @@ describe "Common Cartridge exporting" do
 
       run_export
       expect(@manifest_doc.at_css('resource[href="course_settings/syllabus.html"]')).not_to be_nil
+    end
+
+    describe "tool proxies" do
+      include_context "lti2_course_spec_helper"
+
+      before(:each) do
+        tool_proxy.context = @course
+        tool_proxy.save!
+      end
+
+      it "should export tool profiles" do
+        run_export
+
+        resource = @manifest_doc.at_css('resource[type="tool_profile"]')
+        expect(resource).not_to be_nil
+        file_path = resource.at_css('file').attribute('href')
+        expect(@zip_file.find_entry(file_path)).not_to be_nil
+      end
     end
 
     it "should use canvas_export.txt as flag" do

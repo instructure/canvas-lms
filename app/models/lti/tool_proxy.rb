@@ -27,6 +27,8 @@ module Lti
     belongs_to :context, polymorphic: [:course, :account]
     belongs_to :product_family, class_name: 'Lti::ProductFamily'
 
+    scope :active, -> { where("lti_tool_proxies.workflow_state = ?", 'active') }
+
     serialize :raw_data
     serialize :update_payload
 

@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../lti2_course_spec_helper.rb')
 
 require 'csv'
 require 'socket'
@@ -24,6 +25,15 @@ require 'socket'
 describe Course do
   describe 'relationships' do
     it { is_expected.to have_one(:late_policy).dependent(:destroy).inverse_of(:course) }
+  end
+
+  describe 'lti2 proxies' do
+    include_context 'lti2_course_spec_helper'
+
+    it 'has many tool proxies' do
+      tool_proxy # need to do this so that the tool_proxy is instantiated
+      expect(course.tool_proxies.size).to eq 1
+    end
   end
 end
 

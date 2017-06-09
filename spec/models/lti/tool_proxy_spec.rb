@@ -106,6 +106,25 @@ module Lti
         expect(subject.errors[:raw_data]).to include("can't be blank")
       end
 
+      describe "#active" do
+        let(:root_account) { Account.create }
+
+        it "returns active tool proxies" do
+          create_tool_proxy(context: root_account)
+          expect(Lti::ToolProxy.active.size).to eq(1)
+        end
+
+        it "doesn't return disabled tool proxies" do
+          create_tool_proxy(context: root_account, workflow_state: 'disabled')
+          expect(Lti::ToolProxy.active.size).to eq(0)
+        end
+
+        it "doesn't return deleted tool proxies" do
+          create_tool_proxy(context: root_account, workflow_state: 'deleted')
+          expect(Lti::ToolProxy.active.size).to eq(0)
+        end
+      end
+
       describe "#find_proxies_for_context" do
         let(:root_account) { Account.create }
         let(:sub_account_1_1) { Account.create(parent_account: root_account) }
