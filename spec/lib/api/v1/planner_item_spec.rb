@@ -52,53 +52,47 @@ describe Api::V1::PlannerItem do
 
   describe '.planner_item_json' do
     let(:api) { PlannerItemHarness.new }
-    let(:session) { Object.new }
-
-    before :once do
-      @teacher_hash = api.planner_item_json(@assignment, @teacher, session, 'submitting')
-      @student_hash = api.planner_item_json(@assignment, @student, session, 'submitting')
-      @hash = api.planner_item_json(@quiz.assignment, @student, session, 'submitting')
-    end
+    let(:session) { stub }
 
     context 'with an existing planner override' do
       it 'should return the planner visibility state' do
-        expect(@teacher_hash[:visible_in_planner]).to be true
-        expect(@student_hash[:visible_in_planner]).to be false
+        @assignment.context.stubs(:grants_right?).returns(false)
+        teacher_hash = api.planner_item_json(@assignment, @teacher, session)
+        student_hash = api.planner_item_json(@assignment, @student, session)
+
+        expect(teacher_hash[:visible_in_planner]).to be true
+        expect(student_hash[:visible_in_planner]).to be false
       end
 
       it 'should return the planner override id' do
-        expect(@teacher_hash[:planner_override][:id]).to eq @teacher_override.id
-        expect(@student_hash[:planner_override][:id]).to eq @student_override.id
+        @assignment.context.stubs(:grants_right?).returns(false)
+        teacher_hash = api.planner_item_json(@assignment, @teacher, session)
+        student_hash = api.planner_item_json(@assignment, @student, session)
+
+        expect(teacher_hash[:planner_override][:id]).to eq @teacher_override.id
+        expect(student_hash[:planner_override][:id]).to eq @student_override.id
       end
     end
 
     context 'without an existing planner override' do
       it 'should return true for `visible_in_planner`' do
-        expect(@hash[:visible_in_planner]).to be true
+        json = api.planner_item_json(@quiz.assignment, @student, session)
+        expect(json[:visible_in_planner]).to be true
       end
 
       it 'should have a nil planner_override value' do
-        expect(@hash[:planner_override]).to be_nil
-      end
-    end
-
-    describe 'object types' do
-      before :once do
-        @assignment_hash = api.planner_item_json(@assignment, @student, session, 'submitting')
-        @topic_hash = api.planner_item_json(@topic.assignment, @student, session, 'submitting')
-        @quiz_hash = api.planner_item_json(@quiz.assignment, @student, session, 'submitting')
-      end
-
-      it 'should include the respective jsons for the given object type' do
-        expect(@assignment_hash.has_key?(:plannable)).to be true
-        expect(@topic_hash.has_key?(:plannable)).to be true
-        expect(@quiz_hash.has_key?(:plannable)).to be true
+        json = api.planner_item_json(@quiz.assignment, @student, session)
+        expect(json[:planner_override]).to be_nil
       end
     end
 
     describe '#submission_statuses_for' do
+      before :each do
+        @assignment.context.stubs(:grants_right?).returns(false)
+      end
+
       it 'should return the submission statuses for the learning object' do
-        json = api.planner_item_json(@assignment, @student, session, 'submitting')
+        json = api.planner_item_json(@assignment, @student, session)
         expect(json.has_key?(:submissions)).to be true
         expect([:submitted, :excused, :graded, :late, :missing, :needs_grading, :has_feedback].all? { |k| json[:submissions].has_key?(k) }).to be true
       end
@@ -106,14 +100,14 @@ describe Api::V1::PlannerItem do
       it 'should indicate that an assignment is submitted' do
         @assignment.submit_homework(@student, body: "b")
 
-        json = api.planner_item_json(@assignment, @student, session, 'submitted')
+        json = api.planner_item_json(@assignment, @student, session)
         expect(json[:submissions][:submitted]).to be true
       end
 
       it 'should indicate that an assignment is missing' do
         @assignment.update!(due_at: 1.week.ago)
 
-        json = api.planner_item_json(@assignment, @student, session, 'submitting')
+        json = api.planner_item_json(@assignment, @student, session)
         expect(json[:submissions][:missing]).to be true
       end
 
@@ -122,7 +116,7 @@ describe Api::V1::PlannerItem do
         submission.excused = true
         submission.save!
 
-        json = api.planner_item_json(@assignment, @student, session, 'submitting')
+        json = api.planner_item_json(@assignment, @student, session)
         expect(json[:submissions][:excused]).to be true
       end
 
@@ -131,7 +125,7 @@ describe Api::V1::PlannerItem do
         submission.update(score: 10)
         submission.grade_it!
 
-        json = api.planner_item_json(@assignment, @student, session, 'submitting')
+        json = api.planner_item_json(@assignment, @student, session)
         expect(json[:submissions][:graded]).to be true
       end
 
@@ -139,14 +133,14 @@ describe Api::V1::PlannerItem do
         @assignment.update!(due_at: 1.week.ago)
         submission = @assignment.submit_homework(@student, body: "d")
 
-        json = api.planner_item_json(@assignment, @student, session, 'submitting')
+        json = api.planner_item_json(@assignment, @student, session)
         expect(json[:submissions][:late]).to be true
       end
 
       it 'should indicate that an assignment needs grading' do
         submission = @assignment.submit_homework(@student, body: "y")
 
-        json = api.planner_item_json(@assignment, @student, session, 'submitted')
+        json = api.planner_item_json(@assignment, @student, session)
         expect(json[:submissions][:needs_grading]).to be true
       end
 
@@ -155,7 +149,7 @@ describe Api::V1::PlannerItem do
         submission.add_comment(user: @teacher, comment: "nice work, fam")
         submission.grade_it!
 
-        json = api.planner_item_json(@assignment, @student, session, 'submitted', { start_at: 1.week.ago })
+        json = api.planner_item_json(@assignment, @student, session, { start_at: 1.week.ago })
         expect(json[:submissions][:has_feedback]).to be true
       end
     end

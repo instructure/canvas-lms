@@ -1696,6 +1696,37 @@ class Submission < ActiveRecord::Base
   scope :speed_grader_includes, -> { preload(:versions, :submission_comments, :attachments, :rubric_assessment) }
   scope :for_user, lambda { |user| where(:user_id => user) }
   scope :needing_screenshot, -> { where("submissions.submission_type='online_url' AND submissions.attachment_id IS NULL AND submissions.process_attempts<3").order(:updated_at) }
+  scope :read_for, lambda { |user = nil|
+    return all unless user
+    eager_load(:content_participations, :assignment, :submission_comments).
+    where("CASE WHEN content_participations IS NULL THEN
+            (submission_comments IS NULL
+            OR (submission_comments.draft IS NOT TRUE
+              AND submission_comments.provisional_grade_id IS NULL
+              AND submission_comments.hidden = 'f'
+              AND submission_comments.author_id = :user))
+          ELSE (content_participations.user_id = :user
+            AND content_participations.workflow_state = 'read')
+           END
+          OR (assignments.workflow_state = 'deleted'
+            OR assignments.muted IS TRUE OR submissions.user_id IS NULL)",
+          user: user).distinct
+  }
+  scope :unread_for, lambda { |user = nil|
+    eager_load(:content_participations, :assignment, :submission_comments).
+    where("CASE WHEN content_participations IS NULL THEN
+            ((submission_comments.draft IS NOT TRUE
+              AND submission_comments.provisional_grade_id IS NULL
+              AND submission_comments.hidden = 'f'
+              AND submission_comments.author_id <> :user)
+            OR submissions.grade IS NOT NULL OR submissions.score IS NOT NULL)
+          ELSE (content_participations.user_id = :user
+              AND content_participations.workflow_state = 'unread')
+           END
+          AND (assignments.workflow_state <> 'deleted'
+            AND assignments.muted IS NOT TRUE AND submissions.user_id IS NOT NULL)",
+          user: user).distinct
+  }
 
   def assignment_visible_to_user?(user, opts={})
     return visible_to_user unless visible_to_user.nil?

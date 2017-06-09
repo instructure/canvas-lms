@@ -24,11 +24,8 @@ module Api::V1::PlannerItem
   include Api::V1::DiscussionTopics
   include Api::V1::WikiPage
 
-  def planner_item_json(item, user, session, todo_type, opts = {})
+  def planner_item_json(item, user, session, opts = {})
     context_data(item).merge({
-      :type => todo_type,
-      :ignore => api_v1_users_todo_ignore_url(item.asset_string, todo_type, :permanent => '0'),
-      :ignore_permanently => api_v1_users_todo_ignore_url(item.asset_string, todo_type, :permanent => '1'),
       :plannable_id => item.id,
       :visible_in_planner => item.visible_in_planner_for?(user),
       :planner_override => api_json(item.planner_override_for(user), user, session)
@@ -36,17 +33,17 @@ module Api::V1::PlannerItem
       if item.is_a?(PlannerNote)
         hash[:plannable_type] = 'planner_note'
         hash[:plannable] = api_json(item, user, session)
-        hash[:html_url] = api_v1_planner_notes_url(item.id)
+        hash[:html_url] = api_v1_planner_notes_show_path(item)
       elsif item.is_a?(Quizzes::Quiz) || (item.respond_to?(:quiz?) && item.quiz?)
         quiz = item.is_a?(Quizzes::Quiz) ? item : item.quiz
         hash[:plannable_type] = 'quiz'
         hash[:plannable] = quiz_json(quiz, quiz.context, user, session)
-        hash[:html_url] = course_quiz_url(quiz.context_id, quiz.id)
+        hash[:html_url] = named_context_url(quiz.context, :context_quiz_url, quiz.id)
       elsif item.is_a?(WikiPage) || (item.respond_to?(:wiki_page?) && item.wiki_page?)
         item = item.wiki_page if item.respond_to?(:wiki_page?) && item.wiki_page?
         hash[:plannable_type] = 'wiki_page'
         hash[:plannable] = wiki_page_json(item, user, session)
-        hash[:html_url] = item.url
+        hash[:html_url] = named_context_url(item.context, :context_wiki_page_url, item.id)
       elsif item.is_a?(Announcement)
         hash[:plannable_type] = 'announcement'
         hash[:plannable] = discussion_topic_api_json(item.discussion_topic, item.discussion_topic.context, user, session)
@@ -59,13 +56,14 @@ module Api::V1::PlannerItem
       else
         hash[:plannable_type] = 'assignment'
         hash[:plannable] = assignment_json(item, user, session, include_discussion_topic: true)
-        hash[:html_url] = if todo_type == 'grading'
-                            speed_grader_course_gradebook_url(item.context_id, :assignment_id => item.id)
-                          else
-                            "#{course_assignment_url(item.context_id, item.id)}#submit"
-                          end
-        hash[:needs_grading_count] = Assignments::NeedsGradingCountQuery.new(item, user).count if todo_type == 'grading'
+        hash[:html_url] = named_context_url(item.context, :context_assignment_url, item.id)
       end
+    end
+  end
+
+  def planner_items_json(items, user, session, opts = {})
+    items.map do |item|
+      planner_item_json(item, user, session, opts)
     end
   end
 

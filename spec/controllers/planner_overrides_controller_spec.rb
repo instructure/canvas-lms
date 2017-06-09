@@ -71,18 +71,16 @@ describe PlannerOverridesController do
           get :items_index
           response_json = json_parse(response.body)
           expect(response_json.length).to eq 3
-          page = response_json.first
+          page = response_json.detect { |i| i["plannable_id"] == @page.id }
           expect(page["plannable_type"]).to eq 'wiki_page'
-          expect(page["type"]).to eq 'viewing'
         end
 
         it "should show planner notes for the user" do
           planner_note_model(course: @course)
           get :items_index
           response_json = json_parse(response.body)
+          note = response_json.detect { |i| i["plannable_type"] == 'planner_note' }
           expect(response_json.length).to eq 3
-          note = response_json.select { |i| i["plannable_type"] == 'planner_note' }.first
-          expect(note["type"]).to eq 'viewing'
           expect(note["plannable"]["title"]).to eq @planner_note.title
         end
 
@@ -93,7 +91,7 @@ describe PlannerOverridesController do
             get :items_index, filter: "new_activity"
             response_json = json_parse(response.body)
             expect(response_json.length).to eq 1
-            expect(response_json.map { |i| i["plannable"]["id"] }).to be_include(dt.id)
+            expect(response_json.map { |i| i["plannable"]["id"].to_s }).to be_include(dt.id.to_s)
           end
 
           it "should return newly graded items" do

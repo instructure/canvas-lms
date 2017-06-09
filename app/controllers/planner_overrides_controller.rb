@@ -169,15 +169,13 @@ class PlannerOverridesController < ApplicationController
   def items_index
     ensure_valid_params or return
 
-    items = if params[:filter] == 'new_activity'
-              unread_items
-            else
-              planner_items
-            end
+    items_json = Rails.cache.fetch(['planner_items', @current_user, page, params[:filter], default_opts].cache_key, raw: true, expires_in: 120.minutes) do
+      items = params[:filter] == 'new_activity' ? unread_items : planner_items
+      items = Api.paginate(items, self, api_v1_planner_items_url)
+      planner_items_json(items, @current_user, session, {start_at: start_date})
+    end
 
-    items_json = items.map { |item| planner_item_json(item, @current_user, session, item.todo_type, default_opts) }
-
-    render json: Api.paginate(items_json, self, api_v1_planner_items_url)
+    render json: items_json
   end
 
   # @API List planner overrides
@@ -269,45 +267,82 @@ class PlannerOverridesController < ApplicationController
   private
 
   def planner_items
-    @planner_items ||= (ungraded_discussion_items + page_items + assignment_items + planner_note_items)
+    collections = [*assignment_collections,
+                    planner_note_collection,
+                    page_collection,
+                    ungraded_discussion_collection]
+
+    BookmarkedCollection.concat(*collections)
   end
 
   def unread_items
-    # Combines unread items from the Recent Activity stream (which doesn't
-    # contain submission data) with unread submission updates,
-    # like new grades or comments.
-    supported_types = %w(Assignment DiscussionTopic Announcement Quizzes::Quiz WikiPage)
-    stream_items = @current_user.cached_recent_stream_items.
-                    select { |si| si.unread && supported_types.include?(si.asset_type) }.
-                    map { |si| si.data(@current_user.id) }.
-                    each { |si| si.todo_type = 'viewing' }
-    submitted_assignment_items = Submission.with_assignment.
-                                  where(user_id: @current_user).
-                                  select { |s| s.unread?(@current_user) }.
-                                  map(&:assignment).
-                                  each { |a| a.todo_type = 'viewing' }
-    @unread_items ||= (stream_items + submitted_assignment_items) & planner_items
+    collections = [unread_discussion_topic_collection,
+                   unread_submission_collection]
+    BookmarkedCollection.concat(*collections)
   end
 
-  def assignment_items
-    grading = @current_user.assignments_needing_grading(default_opts).each { |a| a.todo_type = 'grading' }
-    submitting = @current_user.assignments_needing_submitting(default_opts).each { |a| a.todo_type = 'submitting' }
-    moderation = @current_user.assignments_needing_moderation(default_opts).each { |a| a.todo_type = 'moderation' }
-    ungraded_quiz = @current_user.ungraded_quizzes_needing_submitting(default_opts).each { |a| a.todo_type = 'submitting' }
-    submitted = @current_user.submitted_assignments(default_opts).each { |a| a.todo_type = 'submitted' }
-    @assignments ||= grading + submitted + ungraded_quiz + submitting + moderation
+  def assignment_collections
+    grading = @current_user.assignments_needing_grading(default_opts) if @domain_root_account.grants_right?(@current_user, :manage_grades)
+    submitting = @current_user.assignments_needing_submitting(default_opts)
+    # TODO: Check moderation rights...
+    moderation = @current_user.assignments_needing_moderation(default_opts)
+    ungraded_quiz = @current_user.ungraded_quizzes_needing_submitting(default_opts)
+    submitted = @current_user.submitted_assignments(default_opts)
+    scopes = {submitted: submitted, ungraded_quiz: ungraded_quiz,
+              submitting: submitting, moderation: moderation}
+    scopes[:grading] = grading if grading
+    scopes = scopes.
+             each_with_object([]) do |(scope_name, scope), all_scopes|
+               base_model = scope_name == :ungraded_quiz ? Quizzes::Quiz : Assignment
+               collection = item_collection(scope_name.to_s, scope, base_model, :id)
+               all_scopes << collection if collection
+             end
+    scopes
   end
 
-  def planner_note_items
-    @planner_notes ||= PlannerNote.where(user: @current_user, todo_date: @start_date...@end_date).each { |pn| pn.todo_type = 'viewing' }
+  def unread_discussion_topic_collection
+    item_collection('unread_discussion_topics',
+                    DiscussionTopic.active.todo_date_between(start_date, end_date).
+                    unread_for(@current_user),
+                    DiscussionTopic, :id)
   end
 
-  def page_items
-    @pages ||= @current_user.wiki_pages_needing_viewing(default_opts).each { |p| p.todo_type = 'viewing' }
+  def unread_submission_collection
+    item_collection('unread_assignment_submissions',
+                    Assignment.active.joins(:submissions).
+                    where(submissions: {id: Submission.unread_for(@current_user).pluck(:id)}).
+                    due_between_with_overrides(start_date, end_date),
+                    Assignment, :id)
   end
 
-  def ungraded_discussion_items
-    @ungraded_discussions ||= @current_user.discussion_topics_needing_viewing(default_opts).each { |t| t.todo_type = 'viewing' }
+  def planner_note_collection
+    item_collection('planner_notes',
+                    PlannerNote.where(user: @current_user, todo_date: @start_date...@end_date),
+                    PlannerNote, :id)
+  end
+
+  def page_collection
+    item_collection('pages',
+                    @current_user.wiki_pages_needing_viewing(default_opts),
+                    WikiPage, :id)
+  end
+
+  def ungraded_discussion_collection
+    item_collection('ungraded_discussions',
+                    @current_user.discussion_topics_needing_viewing(default_opts),
+                    DiscussionTopic, :id)
+  end
+
+  def item_collection(label, scope, base_model, *order_by)
+    bookmark = BookmarkedCollection::SimpleBookmarker.new(base_model, *order_by)
+    return nil unless bookmark.present?
+    [
+      label,
+      BookmarkedCollection.wrap(
+        bookmark,
+        scope
+      )
+    ]
   end
 
   def set_date_range
@@ -341,7 +376,7 @@ class PlannerOverridesController < ApplicationController
 
   def set_pagination
     @per_page = params[:per_page] || 50
-    @page = params[:page] || 1
+    @page = params[:page] || 'first'
   end
 
   def require_user
@@ -365,7 +400,8 @@ class PlannerOverridesController < ApplicationController
       include_locked: true,
       due_before: end_date,
       due_after: start_date,
-      limit: (params[:limit]&.to_i || 50)
+      scope_only: true,
+      limit: per_page
     }
   end
 end

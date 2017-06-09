@@ -1969,7 +1969,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :planner_notes) do
       get 'planner_notes', action: :index, as: :planner_notes
-      get 'planner_notes/:id', action: :show
+      get 'planner_notes/:id', action: :show, as: :planner_notes_show
       put 'planner_notes/:id', action: :update
       post 'planner_notes', action: :create
       delete 'planner_notes/:id', action: :destroy

@@ -1469,7 +1469,7 @@ class User < ActiveRecord::Base
       if opts[:contexts]
         course_ids = Array(opts[:contexts]).map(&:id) & course_ids
       end
-      opts = {limit: 15}.merge(opts.slice(:due_after, :due_before, :limit, :include_ungraded, :ungraded_quizzes, :include_ignored, :include_concluded))
+      opts = {limit: 15}.merge(opts.slice(:due_after, :due_before, :limit, :include_ungraded, :ungraded_quizzes, :include_ignored, :include_locked, :include_concluded, :scope_only))
 
       course_ids_cache_key = Digest::MD5.hexdigest(course_ids.sort.join('/'))
       Rails.cache.fetch([self, "assignments_needing_#{purpose}", course_ids_cache_key, opts].cache_key, :expires_in => expires_in) do
@@ -1487,7 +1487,7 @@ class User < ActiveRecord::Base
             end
           end
         end
-        result = result[0...opts[:limit]] if opts[:limit]
+        result = result[0...opts[:limit]] if opts[:limit] && !opts[:scope_only]
         result
       end
     end
@@ -1503,8 +1503,9 @@ class User < ActiveRecord::Base
         published.
         due_between_with_overrides(due_after, due_before).
         need_submitting_info(id, options[:limit])
-      assignments = assignments.expecting_submission unless opts[:include_ungraded]
-      assignments = assignments.not_locked unless opts[:include_locked]
+      assignments = assignments.expecting_submission unless options[:include_ungraded]
+      assignments = assignments.not_locked unless options[:include_locked]
+      return assignments.for_course(options[:shard_course_ids]) if options[:scope_only]
       select_available_assignments(assignments, options).reject { |a| a.due_at && a.due_at < Time.now && !a.expects_submission? }
     end
   end
@@ -1522,6 +1523,7 @@ class User < ActiveRecord::Base
                   due_between_with_overrides(due_after, due_before).
                   need_submitting_info(id, options[:limit]).
                   preload(:context)
+      return quizzes.for_course(options[:shard_course_ids]) if options[:scope_only]
       select_available_assignments(quizzes, options)
     end
   end
@@ -1533,6 +1535,7 @@ class User < ActiveRecord::Base
         expecting_submission.
         need_grading_info
       ActiveRecord::Associations::Preloader.new.preload(as, :context)
+      return as if opts[:scope_only] # This needs the below `select` somehow to work
       as.lazy.select{|a| Assignments::NeedsGradingCountQuery.new(a, self).count != 0 }.take(opts[:limit]).to_a
     end
   end
@@ -1543,26 +1546,28 @@ class User < ActiveRecord::Base
       due_before = options[:due_before] || 2.weeks.from_now
 
       as = assignment_scope.active
-      as = as.expecting_submission unless opts[:include_ungraded]
-      as = as.not_locked unless opts[:include_locked]
+      as = as.expecting_submission unless options[:include_ungraded]
+      as = as.not_locked unless options[:include_locked]
       as = as.filter_by_visibilities_in_given_courses(id, options[:shard_course_ids]).
             published.
             due_between_with_overrides(due_after, due_before).
             with_non_placeholder_submissions_for_user(id).
             group('submissions.id')
+      return as if options[:scope_only]
       select_available_assignments(as, options)
     end
   end
 
   def assignments_needing_moderation(opts={})
     assignments_needing('moderation', :instructor, 120.minutes, opts) do |assignment_scope, opts|
-      assignment_scope.active.
+      scope = assignment_scope.active.
         expecting_submission.
         where(:moderated_grading => true).
         where("assignments.grades_published_at IS NULL").
         joins(:provisional_grades).distinct.preload(:context).
-        need_grading_info.
-        lazy.select{|a| a.context.grants_right?(self, :moderate_grades)}.take(opts[:limit]).to_a
+        need_grading_info
+      return scope if opts[:scope_only] # Also need to check the rights like below
+      scope.lazy.select{|a| a.context.grants_right?(self, :moderate_grades)}.take(opts[:limit]).to_a
     end
   end
 
@@ -1589,7 +1594,7 @@ class User < ActiveRecord::Base
               for_context_codes(shard_course_context_codes)
           end
           # outer limit, since there could be limit * n_shards results
-          result = result[0...limit] if limit
+          result = result[0...limit] if limit && !opts[:scope_only]
           result
         end
       end
@@ -1610,20 +1615,23 @@ class User < ActiveRecord::Base
             yield(scope, opts.merge(shard_course_ids: shard_course_ids))
           end
         end
-        result = result[0...opts[:limit]] if opts[:limit]
+        result = result[0...opts[:limit]] if opts[:limit] && !opts[:scope_only]
         result
       end
     end
   end
 
   def discussion_topics_needing_viewing(opts={})
-    needing_viewing('DiscussionTopic', 120.minutes, opts) do |topics_context, _options|
-      topics_context.to_a.select { |dt| dt.active? }
+    needing_viewing('DiscussionTopic', 120.minutes, opts) do |topics_context, options|
+      topics_context = topics_context.active.published
+      return topics_context if options[:scope_only]
+      topics_context.to_a
     end
   end
 
   def wiki_pages_needing_viewing(opts={})
-    needing_viewing('WikiPage', 120.minutes, opts) do |wiki_pages_context, _options|
+    needing_viewing('WikiPage', 120.minutes, opts) do |wiki_pages_context, options|
+      return wiki_pages_context.available_to_planner.visible_to_user(self) if options[:scope_only]
       wiki_pages_context.available_to_planner.visible_to_user(self).to_a
     end
   end
