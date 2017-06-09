@@ -1502,9 +1502,9 @@ class User < ActiveRecord::Base
         filter_by_visibilities_in_given_courses(id, options[:shard_course_ids]).
         published.
         due_between_with_overrides(due_after, due_before).
-        need_submitting_info(id, options[:limit]).
-        not_locked
+        need_submitting_info(id, options[:limit])
       assignments = assignments.expecting_submission unless opts[:include_ungraded]
+      assignments = assignments.not_locked unless opts[:include_locked]
       select_available_assignments(assignments, options).reject { |a| a.due_at && a.due_at < Time.now && !a.expects_submission? }
     end
   end
@@ -1515,12 +1515,13 @@ class User < ActiveRecord::Base
       due_before = options[:due_before] || 1.week.from_now
 
       quizzes = quiz_scope.
-        visible_to_students_in_course_with_da(self.id, options[:shard_course_ids]).
-        available.
-        due_between_with_overrides(due_after, due_before).
-        need_submitting_info(id, options[:limit]).
-        not_locked.
-        preload(:context)
+                  visible_to_students_in_course_with_da(self.id, options[:shard_course_ids])
+      quizzes = quizzes.not_locked unless opts[:include_locked]
+      quizzes = quizzes.
+                  available.
+                  due_between_with_overrides(due_after, due_before).
+                  need_submitting_info(id, options[:limit]).
+                  preload(:context)
       select_available_assignments(quizzes, options)
     end
   end
@@ -1543,9 +1544,9 @@ class User < ActiveRecord::Base
 
       as = assignment_scope.active
       as = as.expecting_submission unless opts[:include_ungraded]
+      as = as.not_locked unless opts[:include_locked]
       as = as.filter_by_visibilities_in_given_courses(id, options[:shard_course_ids]).
             published.
-            not_locked.
             due_between_with_overrides(due_after, due_before).
             with_non_placeholder_submissions_for_user(id).
             group('submissions.id')
@@ -1605,7 +1606,7 @@ class User < ActiveRecord::Base
           Shard.partition_by_shard(course_ids) do |shard_course_ids|
             scope = object_type.constantize.for_courses_and_groups(shard_course_ids, cached_current_group_memberships.map(&:group_id))
             scope = scope.not_ignored_by(self, 'viewing') unless opts[:include_ignored]
-            scope = scope.available_to_planner.todo_date_between(opts[:due_after], opts[:due_before])
+            scope = scope.todo_date_between(opts[:due_after], opts[:due_before])
             yield(scope, opts.merge(shard_course_ids: shard_course_ids))
           end
         end
@@ -1617,13 +1618,13 @@ class User < ActiveRecord::Base
 
   def discussion_topics_needing_viewing(opts={})
     needing_viewing('DiscussionTopic', 120.minutes, opts) do |topics_context, _options|
-      topics_context.to_a
+      topics_context.to_a.select { |dt| dt.active? }
     end
   end
 
   def wiki_pages_needing_viewing(opts={})
     needing_viewing('WikiPage', 120.minutes, opts) do |wiki_pages_context, _options|
-      wiki_pages_context.visible_to_user(self).to_a
+      wiki_pages_context.available_to_planner.visible_to_user(self).to_a
     end
   end
 

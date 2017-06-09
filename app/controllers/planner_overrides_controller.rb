@@ -285,6 +285,7 @@ class PlannerOverridesController < ApplicationController
       include_ignored: true,
       include_ungraded: true,
       include_concluded: true,
+      include_locked: true,
       due_before: end_date,
       due_after: start_date,
       limit: (params[:limit]&.to_i || 50)

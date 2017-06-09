@@ -1878,6 +1878,19 @@ describe User do
         @quiz.save!
         expect(@student.assignments_needing_submitting(:contexts => [@course]).count).to eq 0
       end
+
+      context "include_locked" do
+        it "should include assignments where unlock_at is in future" do
+          @quiz.unlock_at = 1.hour.from_now
+          @quiz.save!
+          expect(@student.assignments_needing_submitting(:include_locked => true, :contexts => [@course]).count).to eq 1
+        end
+        it "should include assignments where lock_at is in past" do
+          @quiz.lock_at = 1.hour.ago
+          @quiz.save!
+          expect(@student.assignments_needing_submitting(:include_locked => true, :contexts => [@course]).count).to eq 1
+        end
+      end
     end
 
     it "should not include unpublished assignments" do
@@ -2007,6 +2020,12 @@ describe User do
       @quiz.unlock_at = 1.day.from_now
       @quiz.save!
       expect(@student.ungraded_quizzes_needing_submitting).not_to include @quiz
+    end
+
+    it "includes locked quizzes if requested" do
+      @quiz.unlock_at = 1.day.from_now
+      @quiz.save!
+      expect(@student.ungraded_quizzes_needing_submitting(include_locked: true)).to include @quiz
     end
 
     it "filters by due date" do
@@ -2205,6 +2224,28 @@ describe User do
         expect(t.assignment_id).to eql(a.id)
         expect(t.assignment).to eql(a)
         expect(@student.discussion_topics_needing_viewing(opts)).not_to include t
+      end
+
+      context "locked discussion topics" do
+        it 'should show for ungraded discussion topics with unlock dates and todo dates within the opts date range' do
+          @topic.unlock_at = 1.day.from_now
+          @topic.todo_date = 1.day.from_now
+          @topic.save!
+          @group_topic.unlock_at = 1.day.from_now
+          @group_topic.todo_date = 1.day.from_now
+          @group_topic.save!
+          expect(@student.discussion_topics_needing_viewing(opts).sort_by(&:id)).to eq [@topic, @group_topic, @a]
+        end
+
+        it 'should show for ungraded discussion topics with lock dates and todo dates within the opts date range' do
+          @topic.lock_at = 1.day.ago
+          @topic.todo_date = 1.day.from_now
+          @topic.save!
+          @group_topic.lock_at = 1.day.ago
+          @group_topic.todo_date = 1.day.from_now
+          @group_topic.save!
+          expect(@student.discussion_topics_needing_viewing(opts).sort_by(&:id)).to eq [@topic, @group_topic, @a]
+        end
       end
     end
 
@@ -2859,6 +2900,22 @@ describe User do
         @quiz.save!
         @quiz.assignment.submit_homework(@student, body: 'peanut butter')
         expect(@student.submitted_assignments(:contexts => [@course]).count).to eq 0
+      end
+
+      context "include_locked" do
+        it "should include assignments where unlock_at is in future" do
+          @quiz.unlock_at = 1.hour.from_now
+          @quiz.save!
+          @quiz.assignment.submit_homework(@student, body: 'jelly')
+          expect(@student.submitted_assignments(:include_locked => true, :contexts => [@course]).count).to eq 1
+        end
+
+        it "should include assignments where lock_at is in past" do
+          @quiz.lock_at = 1.hour.ago
+          @quiz.save!
+          @quiz.assignment.submit_homework(@student, body: 'time')
+          expect(@student.submitted_assignments(:include_locked => true, :contexts => [@course]).count).to eq 1
+        end
       end
     end
 
