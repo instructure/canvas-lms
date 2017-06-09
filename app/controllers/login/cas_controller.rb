@@ -57,8 +57,8 @@ class Login::CasController < ApplicationController
       reset_session_for_login
 
       sso_user = st.user
-      if !st.extra_attributes["EmpoyeeNumber"].nil? && cas_login_url.ends_with?('cas/6')
-        sso_user = "#{st.extra_attributes["EmpoyeeNumber"]}@nlu.edu"
+      if !st.extra_attributes["EmployeeNumber"].nil? && cas_login_url.ends_with?('cas/6')
+        sso_user = "#{st.extra_attributes["EmployeeNumber"]}@nlu.edu"
       end
 
       pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(sso_user, aac)
