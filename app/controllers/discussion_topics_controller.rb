@@ -953,6 +953,8 @@ class DiscussionTopicsController < ApplicationController
       discussion_topic_hash[:message] = process_incoming_html_content(discussion_topic_hash[:message])
     end
 
+    prefer_assignment_availability_dates(discussion_topic_hash)
+
     unless process_future_date_parameters(discussion_topic_hash)
       process_lock_parameters(discussion_topic_hash)
     end
@@ -1029,6 +1031,12 @@ class DiscussionTopicsController < ApplicationController
     elsif (@topic.assignment || params[:assignment]) && !remove_assign
       @errors[:todo_date] = t(:error_todo_date_assignment, 'Date cannot be added if discussion topic is graded')
     end
+  end
+
+  def prefer_assignment_availability_dates(discussion_topic_hash)
+    return unless params[:assignment]
+    discussion_topic_hash['delayed_post_at'] = nil if params[:assignment][:unlock_at].present?
+    discussion_topic_hash['lock_at'] = nil if params[:assignment][:lock_at].present?
   end
 
   # Internal: detetermines if the delayed_post_at or lock_at dates were changed
