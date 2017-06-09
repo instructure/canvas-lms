@@ -1933,28 +1933,30 @@ import './vendor/ui.selectmenu'
         attachment_preview_processing: attachment.workflow_state == 'pending_upload' || attachment.workflow_state == 'processing'
       };
 
-      if (attachment.submitted_to_crocodoc && !attachment.crocodoc_url) {
+      if (!attachment.hijack_crocodoc_session && attachment.submitted_to_crocodoc && !attachment.crocodoc_url) {
         $("#crocodoc_pending").show();
       }
 
       if (attachment.crocodoc_url) {
-        var crocodocStart = new Date()
-        ,   sessionLimit = 60 * 60 * 1000
-        ,   aggressiveWarnings = [50 * 60 * 1000,
-                                  55 * 60 * 1000,
-                                  58 * 60 * 1000,
-                                  59 * 60 * 1000];
-        crocodocSessionTimer = window.setInterval(function() {
-          var elapsed = new Date() - crocodocStart;
-          if (elapsed > sessionLimit) {
-            window.location.reload();
-          } else if (elapsed > aggressiveWarnings[0]) {
-            alert(I18n.t("crocodoc_expiring",
-                         "Your Crocodoc session is expiring soon.  Please reload " +
-                         "the window to avoid losing any work."));
-            aggressiveWarnings.shift();
-          }
-        }, 1000);
+        if (!attachment.hijack_crocodoc_session) {
+          var crocodocStart = new Date()
+          ,   sessionLimit = 60 * 60 * 1000
+          ,   aggressiveWarnings = [50 * 60 * 1000,
+                                    55 * 60 * 1000,
+                                    58 * 60 * 1000,
+                                    59 * 60 * 1000];
+            crocodocSessionTimer = window.setInterval(function() {
+              var elapsed = new Date() - crocodocStart;
+              if (elapsed > sessionLimit) {
+                window.location.reload();
+              } else if (elapsed > aggressiveWarnings[0]) {
+                alert(I18n.t("crocodoc_expiring",
+                             "Your Crocodoc session is expiring soon.  Please reload " +
+                             "the window to avoid losing any work."));
+                aggressiveWarnings.shift();
+              }
+            }, 1000);
+        }
 
         $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
           crocodoc_session_url: (attachment.provisional_crocodoc_url || attachment.crocodoc_url)
