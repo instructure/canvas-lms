@@ -90,6 +90,7 @@ tr:
   accepted_user_role_type_course_course_2ce91589: "Kabul edilen: %{user}, %{role_type}, course, %{course}"
   access_report_80d28095: "Erişim Raporu"
   access_token_3be22221: "Access Token"
+  access_token_count_access_token_count_dfb5463c: "Erişim Token Sayısı: %{access_token_count}"
   access_token_is_valid_until_d2f048cf: "Erişim dizgesi şu tarihe kadar geçerli"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Access token'lar diğer uygulamaların sizin adınıza API iletişimi kurmalarına izin vermek için kullanılır. Kendi entegrasyonlarınız için access tokenlar üretip *Canvas Açık API'yi de kullanabilirsiniz.*"
   accordion_section_1_7888782d: "Akordiyon Bölüm 1"
@@ -285,6 +286,7 @@ tr:
     report_header_assignment_url: "ödev url'si"
     report_header_associated_user_id: associated_user_id
     report_header_attempt: girişim
+    report_header_authentication_provider_id: authentication_provider_id
     report_header_canvas_account_id: canvas_account_id
     report_header_canvas_associated_user_id: canvas_associated_user_id
     report_header_canvas_course_id: canvas_course_id
@@ -313,6 +315,7 @@ tr:
     report_header_full_name: full_name
     report_header_group_id: group_id
     report_header_id: id
+    report_header_integration_id: integration_id
     report_header_last_access_at: "en son erişim"
     report_header_last_activity_at: "en son etkinlik"
     report_header_last_ip: "son ip"
@@ -704,6 +707,31 @@ tr:
             header: "Şu zaman başlat:"
     default_account_quotas_not_updated: "Varsayılan hesap kotaları güncellenmedi"
     default_account_quotas_updated: "Varsayılan hesap kotaları güncellendi"
+    devry: 
+      dcr2: 
+        parameters: 
+          custom_reports: 
+            start: 
+              parameters: 
+                header: "Etkinlik Tarihi:"
+      dcr4: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Bitiş:"
+            start: 
+              parameters: 
+                header: "Başlangıç:"
+      dcr7: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Bitiş:"
+            start: 
+              parameters: 
+                header: "Başlangıç:"
     engagement_report_csv_parameters: 
       account_reports: 
         bryan_engagement: 
@@ -1011,9 +1039,10 @@ tr:
         turnitin_account_id: "Turnitin Hesap ID'si"
         turnitin_comments: "Gönderim Yorumları"
         turnitin_host: "Turnitin Sunucusu"
-        turnitin_pledge: "Turnitin Taahhütü"
+        turnitin_pledge: "Benzerlik Taahhüdü"
         turnitin_shared_secret: "Turnitin Gizli Anahtarı"
         users_can_edit_name: "Kullanıcılar kendi isimlerini düzenleyebilirler"
+        value: "Duyurulara yorum yapılmasını engelle"
       links: 
         add_admins: "Hesap Yöneticileri"
         configure_report: Yapılandır...
@@ -1245,6 +1274,11 @@ tr:
         auburn: 
           pseudonym_ids: 
             field: "Takma isim IDler"
+    student_progress_custom_report_csv_parameters: 
+      account_reports: 
+        pearson: 
+          outcome: 
+            text: "Ders ÖBS ID:"
     students_with_no_submissions_csv_description: 
       account_reports: 
         default: 
@@ -1332,8 +1366,10 @@ tr:
   actions_efcde10d: Eylemler
   actions_for_course_312ff446: "%{course} için Eylemler"
   actions_taken_6fb20fd0: "Gerçekleştirilen Eylemler"
+  activate_key_name_a99df672: "Anahtarı etkinleştir %{name}"
   activate_this_key_6cd98f4b: "Bu anahtarı etkinleştir"
   active_d7e32718: Etkin
+  active_terms_83df727e: "Aktif Dönemler"
   activerecord: 
     errors: 
       messages: 
@@ -1350,6 +1386,7 @@ tr:
   add_a_comment_872470ac: "Yorum Ekle"
   add_a_course_b72b18d7: "Ders Ekle"
   add_a_custom_help_link_4328252f: "Özel yardım linki ekle"
+  add_a_message_a5ed12bf: "Mesaj Ekle"
   add_a_new_announcement_878b717f: "Yeni Duyuru Ekle"
   add_a_new_course_4a041207: "Yeni Ders Ekle"
   add_a_new_outcome_cbdbe96c: "Yeni Öğrenme Çıktısı Ekle"
@@ -1358,7 +1395,9 @@ tr:
   add_a_reviewer_for_the_selected_students_1c7b5d6f: "Seçilen öğrenciler için gözlemci ekle"
   add_account_admins_99c03c9e: "Hesap Yöneticileri Ekle"
   add_alert_b2729c99: "Uyarı Ekle"
+  add_an_assignment_fb73942e: "Ödev ekle"
   add_an_identity_provider_to_this_account_c2644478: "Bu hesap için bir kimlik sağlayıcı ekleyin:"
+  add_another_assignment_fc5c908f: "Başka ödev ekle"
   add_app_baf540f: "Uygulama Ekle"
   add_assignment_to_name_caf173b0: "%{name}'a Ödev Ekle"
   add_attachment_93868828: "Dosya Ekle"
@@ -1374,11 +1413,14 @@ tr:
   add_criterion_eb9587ef: "Kriter Ekle"
   add_custom_link_22059c0: "Özel Link Ekle"
   add_email_address_aef3b61: "Eposta Adresi Ekle"
+  add_existing_content_7e36da66: "Varolan bir içeriği ekle"
   add_files_to_the_course_da6ffd32: "Derse Dosya Ekle"
   add_folder_ba50d107: "Klasör Ekle"
   add_grading_period_6f774dc3: "Notlandırma Peryodu Ekleyin"
   add_grading_scheme_81e23c05: "Notlandırma şeması ekle"
+  add_help_menu_links_de9fc34f: "Yardım menüsü bağlantılarını ekle"
   add_icon_567dbcaa: "simge ekle"
+  add_link_5c01c1e8: "Bağlantı Ekle"
   add_link_fc336ed6: "Bağlantı ekle"
   add_moderator_review_copy_1st_a484c813: "Moderatör İncelemesi Ekle (1. Kopyala)"
   add_moderator_review_copy_2nd_e80d458f: "Moderatör İncelemesi Ekle (2. Kopyala)"
@@ -1389,15 +1431,20 @@ tr:
     add_page_to: "%{module} modülüne sayfa ekle"
     add_quiz_to: "%{module} modülüne kısa sınav ekle"
     add_topic_to: "%{module} modülüne tartışma başlığı ekle"
+  add_more_e1ffaa65: "Daha Fazla Ekle"
   add_new_announcement_ddacd624: "Yeni Duyuru Ekle"
   add_new_group_7ac49f31: "Yeni grup ekle"
   add_new_set_of_due_dates_e8e240f: "Son tarih dizesi ekleyin"
+  add_new_term_d2217c0d: "Yeni Dönem Ekle"
   add_people_7ee4b2ec: "Katılımcı Ekle"
+  add_quiz_ip_filter_c7b37dc5: "Kısa Sınav IP Filtresi Ekle"
   add_recipient_ff135ed7: "Alıcı Ekle"
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "Bu portfolyoya bölüm ekleyin, silin veya yeniden ayarlayın"
   add_review_2fb1590c: "Değerlendirme Ekle"
   add_rubric_3636d9a6: "Değerlendirme Listesi Ekle"
   add_section_8b027a1c: "Bölüm Ekle"
+  add_set_of_grading_periods_5b4d6e51: "Notlandırma Peryodu Seti Ekle"
+  add_students_tas_and_observers_to_your_course_e84692dd: "Dersinize Öğrenci, Asistan Öğretmen ve Gözlemci ekleyin"
   add_students_to_the_course_874be8fb: "Derse Öğrenci Ekle"
   add_tas_to_the_course_2aac6e02: "Derse Öğretim Elemanı Yardımcıları Ekle"
   add_theme_32fa3d50: "Tema Ekle"
@@ -2581,7 +2628,7 @@ tr:
     send: Gönder
     send_message: "Mesaj Gönder"
     sending: Gönderiliyor...
-    sent: Gönder!
+    sent: Gönderildi!
     show_all_artifacts: "Tüm Eserleri Göster"
     submit: Gönder
     unmasquerade: "Rolüme Geri Dön"
@@ -4086,7 +4133,7 @@ tr:
       search_for_recipients: "Alıcılar içinde ara"
       search_names_groups_courses: "İsim, grup ve derse göre ara"
       sending: gönderiliyor
-      sent: Gönder
+      sent: Gönderilmiş
       settings: Ayarlar
       starred: "Yıldız konulmuş"
       submission_comments: "Gönderi Yorumları"
@@ -13542,6 +13589,7 @@ tr:
   role: 
     duplicate_role: "Bu isimle bir rol zaten var"
   role_7c0b7eaa: "Rol:"
+  role_b3951149: rol
   role_override: 
     permission: 
       read_sis: "ÖBS verisini oku"
