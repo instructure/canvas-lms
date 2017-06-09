@@ -441,7 +441,8 @@ describe UsersController, type: :request do
         'storage_quota_mb' => @course.storage_quota_mb,
         'apply_assignment_group_weights' => false,
         'restrict_enrollments_to_course_dates' => false,
-        'time_zone' => 'America/Denver'
+        'time_zone' => 'America/Denver',
+        'uuid' => @course.uuid
       },
 
       'user' => {
@@ -558,7 +559,8 @@ describe UsersController, type: :request do
         'storage_quota_mb' => @course.storage_quota_mb,
         'apply_assignment_group_weights' => false,
         'restrict_enrollments_to_course_dates' => false,
-        'time_zone' => 'America/Denver'
+        'time_zone' => 'America/Denver',
+        'uuid' => @course.uuid
       },
 
       'user' => {

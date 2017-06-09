@@ -88,6 +88,11 @@ require 'securerandom'
 #           "description": "the SIS identifier for the course, if defined. This field is only included if the user has permission to view SIS information.",
 #           "type": "string"
 #         },
+#         "uuid": {
+#           "description": "the UUID of the course",
+#           "example": "WvAHhY5FINzq5IyRIJybGeiXyFkG3SqHUPb7jZY5",
+#           "type": "string"
+#         },
 #         "integration_id": {
 #           "description": "the integration identifier for the course, if defined. This field is only included if the user has permission to view SIS information.",
 #           "type": "string"
