@@ -13869,7 +13869,7 @@ nb:
       quiz_score_too_short: "Resultatet må være høyere enn 0."
       retrieving_filters_failed: "Henting av filtre mislyktes"
     ? "false"
-    : Feil
+    : Usant
     file_uploaded_or_removed: 
       quizzes: 
         file_successfully_uploaded: "Filen din ble lastet opp."
@@ -14180,7 +14180,7 @@ nb:
               Skriv inn spørsmålsteksten din, og angi så alle mulige svar i den tomme boksen.
               Studenten vil se spørsmålet etterfulgt av en liten tekstboks å skrive svaret i.
           text_only: "Dette \"spørsmålet\" vil ikke få poeng, men kan være nyttig ved introdusering av et sett med relaterte spørsmål."
-          true_false: "Skriv inn spørsmålsteksten, og velg så om Sant eller Ikke sant er korrekt svar."
+          true_false: "Skriv inn spørsmålsteksten, og velg så om Sant eller Usant er korrekt svar."
           variable_definitions: "Når du har skrevet inn variablene ovenfor bør du se dem listet opp her. Du kan angi området for mulige verdier for hver variabel nedenfor."
         general_answer_comments: "Generelle kommentarer til svarene"
         headers: 
@@ -14224,7 +14224,7 @@ nb:
           numerical: "Numeriske svar"
           short_answer: "Fyll inn tomrommet"
           text_only: "Tekst (ingen spørsmål)"
-          true_false: "Sant/ikke sant"
+          true_false: Sant/Usant
         show_possible_answers: "Vis mulige svar for %{question}"
         show_possible_answers_no_question: "Vis mulige svar for"
         titles: 
