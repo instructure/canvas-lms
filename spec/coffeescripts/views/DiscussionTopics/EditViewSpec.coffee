@@ -85,7 +85,9 @@ define [
   QUnit.module 'EditView',
     setup: ->
       fakeENV.setup()
+      @server = sinon.fakeServer.create(respondImmediately: true)
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
     editView: ->
       editView.apply(this, arguments)
@@ -228,7 +230,9 @@ define [
       ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
       ENV.CONDITIONAL_RELEASE_ENV = { assignment: { id: 1 }, jwt: 'foo' }
       $(document).on 'submit', -> false
+      @server = sinon.fakeServer.create(respondImmediately: true)
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
       $(document).off 'submit'
     editView: ->
