@@ -3174,6 +3174,11 @@ describe Submission do
       @course.enroll_user(@student, 'TaEnrollment').accept
       expect(Submission.needs_grading.count).to eq(0)
     end
+
+    it "does not include excused submissions" do
+      @assignment.grade_student(@student, excused: true, grader: @teacher)
+      expect(Submission.needs_grading.count).to eq(0)
+    end
   end
 
   describe "#needs_grading?" do
