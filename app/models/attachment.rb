@@ -345,6 +345,10 @@ class Attachment < ActiveRecord::Base
     end
   end
 
+  def children_and_self
+    Attachment.where("id=? OR root_attachment_id=?", id, id)
+  end
+
   TURNITINABLE_MIME_TYPES = %w[
     application/msword
     application/vnd.openxmlformats-officedocument.wordprocessingml.document
@@ -1239,8 +1243,8 @@ class Attachment < ActiveRecord::Base
     self.send_to_purgatory(deleted_by_user)
     self.destroy_content
     self.uploaded_data = File.open Rails.root.join('public', 'file_removed', 'file_removed.pdf')
-    CrocodocDocument.where(attachment_id: self.related_attachments.select(:id)).delete_all
-    Canvadoc.where(attachment_id: self.related_attachments.select(:id)).delete_all
+    CrocodocDocument.where(attachment_id: self.children_and_self.select(:id)).delete_all
+    Canvadoc.where(attachment_id: self.children_and_self.select(:id)).delete_all
     self.save!
   end
 

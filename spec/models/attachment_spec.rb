@@ -464,10 +464,13 @@ describe Attachment do
       a = crocodocable_attachment_model(uploaded_data: default_uploaded_data)
       a2 = attachment_model(root_attachment: a)
       a2.submit_to_canvadocs 1, wants_annotation: true
+      a.submit_to_canvadocs 1, wants_annotation: true
       run_jobs
 
+      expect(a.crocodoc_document).not_to be_nil
       expect(a2.crocodoc_document).not_to be_nil
       a.destroy_content_and_replace
+      expect(a.reload.crocodoc_document).to be_nil
       expect(a2.reload.crocodoc_document).to be_nil
     end
 
