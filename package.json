@@ -26,7 +26,7 @@
     "babel-preset-stage-1": "^6.5.0",
     "babel-register": "^6.9.0",
     "backbone": "1.1.1",
-    "canvas-planner": "^0.0.4",
+    "canvas-planner": "0.0.6",
     "canvas-rce": "2.1.0",
     "canvas_offline_course_viewer": "https://github.com/instructure/canvas_offline_course_viewer.git#1.1.0",
     "classnames": "~2.2.5",
