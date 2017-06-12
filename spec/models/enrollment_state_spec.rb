@@ -296,6 +296,30 @@ describe EnrollmentState do
       enroll.reload
       expect(enroll).to be_inactive
     end
+
+    it "should invalidate access properly if dates and access settings are changed simultaneously" do
+      course_factory(active_all: true)
+      @course.start_at = 3.days.from_now
+      @course.conclude_at = 4.days.from_now
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+      enroll = student_in_course(:course => @course)
+      enroll_state = enroll.enrollment_state
+
+      expect(enroll_state.state).to eq 'pending_invited'
+
+      EnrollmentState.expects(:update_enrollment).at_least_once.with {|e| e.course == @course}
+      @course.start_at = 2.days.from_now
+      @course.restrict_student_future_view = true
+      @course.save!
+
+      enroll_state.reload
+      expect(enroll_state.access_is_current).to be_falsey
+      expect(enroll_state.state_is_current).to be_falsey
+
+      enroll_state.ensure_current_state
+      expect(enroll_state.restricted_access).to be_truthy
+    end
   end
 
   describe "#recalculate_expired_states" do
