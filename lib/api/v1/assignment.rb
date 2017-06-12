@@ -99,7 +99,8 @@ module Api::V1::Assignment
       include_all_dates: false,
       override_dates: true,
       needs_grading_count_by_section: false,
-      exclude_response_fields: []
+      exclude_response_fields: [],
+      include_planner_override: false
     )
 
     if opts[:override_dates] && !assignment.new_record?
@@ -318,6 +319,15 @@ module Api::V1::Assignment
 
     if opts[:master_course_status]
       hash.merge!(assignment.master_course_api_restriction_data(opts[:master_course_status]))
+    end
+
+    if opts[:include_planner_override]
+      override = assignment.planner_override_for(user)
+      hash['planner_override'] =  if override.present?
+                                    api_json(override, user, session)
+                                  else
+                                    nil
+                                  end
     end
 
     hash

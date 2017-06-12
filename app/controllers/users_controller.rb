@@ -901,6 +901,10 @@ class UsersController < ApplicationController
   # @argument user_id
   #   the student's ID
   #
+  # @argument include[] [String, "planner_overrides"]
+  #   "planner_overrides":: Optionally include the assignment's associated planner override, if it exists, for the current user.
+  #                         These will be returned under a +planner_override+ key
+  #
   # @returns [Assignment]
   def missing_submissions
     user = api_find(User, params[:user_id])
@@ -916,7 +920,9 @@ class UsersController < ApplicationController
     end
     assignments = Api.paginate(submissions, self, api_v1_user_missing_submissions_url).map(&:assignment)
 
-    render json: assignments.map {|as| assignment_json(as, user, session) }
+    planner_overrides = Array(params[:include]).include?('planner_overrides')
+
+    render json: assignments.map {|as| assignment_json(as, user, session, include_planner_override: planner_overrides) }
   end
 
   def ignore_item

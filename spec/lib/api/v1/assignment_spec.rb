@@ -68,6 +68,15 @@ describe "Api::V1::Assignment" do
       expect(json["needs_grading_count_by_section"]).to eq []
     end
 
+    it "includes an associated planner override when flag is passed" do
+      assignment.context.root_account.enable_feature!(:student_planner)
+      po = planner_override_model(user: user, plannable: assignment)
+      json = api.assignment_json(assignment, user, session,
+                                 {include_planner_override: true})
+      expect(json.key?('planner_override')).to be_present
+      expect(json['planner_override']['id']).to eq po.id
+    end
+
     context "for an assignment" do
       it "provides a submissions download URL" do
         json = api.assignment_json(assignment, user, session)
