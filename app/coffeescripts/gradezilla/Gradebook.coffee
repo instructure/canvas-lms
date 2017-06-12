@@ -1347,6 +1347,7 @@ define [
         locale: @options.locale
         onClose: => @gradebookSettingsModalButton.focus()
         newGradebookDevelopmentEnabled: @options.new_gradebook_development_enabled
+        gradedLateOrMissingSubmissionsExist: @options.graded_late_or_missing_submissions_exist
       @gradebookSettingsModal = renderComponent(
         GradebookSettingsModal,
         gradebookSettingsModalMountPoint,

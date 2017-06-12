@@ -523,11 +523,78 @@ describe GradebooksController do
         user_session(@teacher)
       end
 
-      it "includes colors" do
-        get :show, course_id: @course.id
+      let(:gradebook_options) { controller.js_env.fetch(:GRADEBOOK_OPTIONS) }
 
-        gradebook_options = controller.js_env.fetch(:GRADEBOOK_OPTIONS)
+      it "includes colors if New Gradebook is enabled" do
+        @course.enable_feature!(:new_gradebook)
+        get :show, course_id: @course.id
         expect(gradebook_options).to have_key :colors
+      end
+
+      it "does not include colors if New Gradebook is disabled" do
+        get :show, course_id: @course.id
+        expect(gradebook_options).not_to have_key :colors
+      end
+
+      describe "graded_late_or_missing_submissions_exist" do
+        it "is not included if New Gradebook is disabled" do
+          get :show, course_id: @course.id
+          expect(gradebook_options).not_to have_key :graded_late_or_missing_submissions_exist
+        end
+
+        context "New Gradebook is enabled" do
+          before(:once) do
+            @course.enable_feature!(:new_gradebook)
+          end
+
+          let(:assignment) do
+            @course.assignments.create!(
+              due_at: 3.days.ago,
+              points_possible: 10,
+              submission_types: "online_text_entry"
+            )
+          end
+
+          let(:graded_late_or_missing_submissions_exist) do
+            gradebook_options.fetch(:graded_late_or_missing_submissions_exist)
+          end
+
+          it "is included if New Gradebook is enabled" do
+            get :show, course_id: @course.id
+            gradebook_options = controller.js_env.fetch(:GRADEBOOK_OPTIONS)
+            expect(gradebook_options).to have_key :graded_late_or_missing_submissions_exist
+          end
+
+          it "is true if graded late submissions exist" do
+            assignment.submit_homework(@student, body: "a body")
+            assignment.grade_student(@student, grader: @teacher, grade: 8)
+            get :show, course_id: @course.id
+            expect(graded_late_or_missing_submissions_exist).to eq(true)
+          end
+
+          it "is false if late submissions exist, but they are not graded" do
+            assignment.submit_homework(@student, body: "a body")
+            get :show, course_id: @course.id
+            expect(graded_late_or_missing_submissions_exist).to eq(false)
+          end
+
+          it "is true if graded missing submissions exist" do
+            assignment.grade_student(@student, grader: @teacher, grade: 8)
+            get :show, course_id: @course.id
+            expect(graded_late_or_missing_submissions_exist).to eq(true)
+          end
+
+          it "is false if missing submissions exist, but they are not graded" do
+            assignment # create the assignment so that missing submissions exist
+            get :show, course_id: @course.id
+            expect(graded_late_or_missing_submissions_exist).to eq(false)
+          end
+
+          it "is false if there are no graded late or missing submissions" do
+            get :show, course_id: @course.id
+            expect(graded_late_or_missing_submissions_exist).to eq(false)
+          end
+        end
       end
     end
 

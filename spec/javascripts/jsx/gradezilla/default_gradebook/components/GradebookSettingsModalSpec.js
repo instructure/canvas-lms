@@ -33,7 +33,8 @@ QUnit.module('GradebookSettingsModal', {
       courseId: '1',
       locale: 'en',
       newGradebookDevelopmentEnabled: true,
-      onClose: () => {}
+      onClose: () => {},
+      gradedLateOrMissingSubmissionsExist: true
     };
     const props = { ...defaultProps, ...customProps };
     this.wrapper = mount(<GradebookSettingsModal {...props} />);
