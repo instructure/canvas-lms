@@ -41,7 +41,7 @@ describe "Gradezilla - concluded courses and enrollments" do
       expect(ff('.student-name')).to have_size @course.students.count
     end
 
-    it "shows concluded enrollments when checked in column header", priority: "1", test_id: 164223 do
+    it "shows concluded enrollments when checked in column header", priority: "1", test_id: 3253331 do
       conclude_student_1
       Gradezilla.visit(@course)
 
@@ -51,7 +51,7 @@ describe "Gradezilla - concluded courses and enrollments" do
       expect(ff('.student-name')).to have_size @course.all_students.count
     end
 
-    it "hides concluded enrollments when unchecked in column header", priority: "1", test_id: 3101103 do
+    it "hides concluded enrollments when unchecked in column header", priority: "1", test_id: 3253332 do
       conclude_student_1
       display_concluded_enrollments
       Gradezilla.visit(@course)
@@ -72,7 +72,7 @@ describe "Gradezilla - concluded courses and enrollments" do
       expect(ff('.student-name')).to have_size @course.students.count
     end
 
-    it "shows inactive enrollments when checked in column header", priority: "1", test_id: 1102066 do
+    it "shows inactive enrollments when checked in column header", priority: "1", test_id: 3253329 do
       deactivate_student_1
       Gradezilla.visit(@course)
 
@@ -82,7 +82,7 @@ describe "Gradezilla - concluded courses and enrollments" do
       expect(ff('.student-name')).to have_size @course.all_students.count
     end
 
-    it "hides inactive enrollments when unchecked in column header", priority: "1", test_id: 3101104 do
+    it "hides inactive enrollments when unchecked in column header", priority: "1", test_id: 3253330 do
       deactivate_student_1
       display_inactive_enrollments
       Gradezilla.visit(@course)

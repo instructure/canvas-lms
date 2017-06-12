@@ -51,7 +51,7 @@ describe "Gradezilla" do
     expect(meta_cells[0]).to include_text @student_name_1
   end
 
-  it "should allow showing only a certain section", priority: "1", test_id: 210024 do
+  it "should allow showing only a certain section", priority: "1", test_id: 3253291 do
     Gradezilla.visit(@course)
     # grade the first assignment
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2', 0)

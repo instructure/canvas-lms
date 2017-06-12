@@ -47,7 +47,7 @@ describe "Gradezilla - arrange by assignment group" do
     expect(Gradezilla.popover_menu_item('Default Order').attribute('aria-checked')).to eq 'true'
   end
 
-  it "validates arrange columns by assignment group option", priority: "1", test_id: 220029 do
+  it "validates arrange columns by assignment group option", priority: "1", test_id: 3253267 do
     Gradezilla.open_view_menu_and_arrange_by_menu
     Gradezilla.popover_menu_item('Default Order').click
 

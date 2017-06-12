@@ -72,7 +72,7 @@ describe "Gradezilla - post grades to SIS" do
       expect(f('body')).to contain_css("[data-menu-id='post_grades_feature_tool']")
     end
 
-    it "containing menu should not be displayed if viewing outcome gradebook", priority: "1", test_id: 244959 do
+    it "containing menu should not be displayed if viewing outcome gradebook", priority: "1", test_id: 3253266 do
       Account.default.set_feature_flag!('post_grades', 'on')
       Account.default.set_feature_flag!('outcome_gradebook', 'on')
       @course.sis_source_id = 'xyz'

@@ -47,7 +47,7 @@ describe "Gradezilla - custom columns" do
     expect((Gradezilla.slick_custom_column_cell_selector).count { |c| c.text == "123456" }).to eq 1
   end
 
-  it "lets you show and hide the teacher notes column", priority: "1", test_id: 164008 do
+  it "lets you show and hide the teacher notes column", priority: "1", test_id: 3253279 do
     Gradezilla.visit(@course)
     # create the notes column
     Gradezilla.select_gradebook_view_option

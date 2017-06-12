@@ -28,7 +28,7 @@ describe "Gradezilla" do
   before(:once) { gradebook_data_setup }
   before(:each) { user_session(@teacher) }
 
-  it "shows unpublished assignments", priority: "1", test_id: 210016 do
+  it "shows unpublished assignments", priority: "1", test_id: 3253281 do
     assignment = @course.assignments.create! title: 'unpublished'
     assignment.unpublish
     Gradezilla.visit(@course)
@@ -104,7 +104,7 @@ describe "Gradezilla" do
     end
   end
 
-  it "View Grading History menu item redirects to grading history page", priority: "2", test_id: 164218 do
+  it "View Grading History menu item redirects to grading history page", priority: "2", test_id: 3253265 do
     @course.root_account.enable_feature!(:new_gradebook)
     Gradezilla.visit(@course)
 
@@ -205,7 +205,7 @@ describe "Gradezilla" do
   end
 
   context "downloading and uploading submissions" do
-    it "updates the dropdown menu after downloading and processes submission uploads" do
+    it "updates the dropdown menu after downloading and processes submission uploads", test_id: 3253285, priority: "1" do
       # Given I have a student with an uploaded submission
       a = attachment_model(:context => @student_2, :content_type => 'text/plain')
       @first_assignment.submit_homework(@student_2, :submission_type => 'online_upload', :attachments => [a])

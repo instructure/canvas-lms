@@ -49,7 +49,7 @@ describe "Gradezilla - Assignment Column Options" do
   before(:each) { user_session(@teacher) }
 
   describe "Sorting" do
-    it "sorts by Missing" do
+    it "sorts by Missing", test_id: 3253336, priority: "1" do
       third_student = @course.students.find_by!(name: 'Student 3')
       @assignment.submissions.find_by!(user: third_student).destroy!
       Gradezilla.visit(@course)
