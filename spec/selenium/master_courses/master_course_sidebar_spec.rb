@@ -106,6 +106,7 @@ describe "master courses sidebar" do
       f('.blueprint__root .bcs__wrapper .bcs__trigger').click
       f('button#mcSyncHistoryBtn').click
       expect(f('div[aria-label="Sync History"]')).to be_displayed
+      expect(f('#application')).to have_attribute('aria-hidden', 'true')
     end
 
     it "should show Unsynced Changes modal when button is clicked" do
@@ -115,12 +116,14 @@ describe "master courses sidebar" do
       f('button#mcUnsyncedChangesBtn').click
       wait_for_ajaximations
       expect(f('div[aria-label="Unsynced Changes"]')).to be_displayed
+      expect(f('#application')).to have_attribute('aria-hidden', 'true')
     end
 
     it "should not show the tutorial sidebar button" do
       get "/courses/#{@master.id}"
       expect(f('body')).not_to contain_css('.TutorialToggleHolder button')
     end
+
   end
 
   describe "as a master course admin" do

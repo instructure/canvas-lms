@@ -91,7 +91,24 @@ export default class CourseSidebar extends Component {
     }
   }
 
-  onOpenSidebar = () => {
+  componentWillUpdate (nextProps, nextState) {
+    if (this.state.isModalOpen !== nextState.isModalOpen) {
+      if (nextState.isModalOpen) {
+        document.getElementById('application').setAttribute('aria-hidden', 'true')
+        if (this.sidebarRef) {
+          this.sidebarRef.setAttribute('aria-hidden', 'true')
+        }
+      } else {
+        document.getElementById('application').removeAttribute('aria-hidden')
+        if (this.sidebarRef) {
+          this.sidebarRef.removeAttribute('aria-hidden')
+        }
+      }
+    }
+  }
+
+  onOpenSidebar = (trayRef) => {
+    this.sidebarRef = trayRef
     if (!this.props.hasLoadedAssociations) {
       this.props.loadAssociations()
     }
@@ -100,6 +117,11 @@ export default class CourseSidebar extends Component {
     }
   }
 
+  onCloseSidebar = () => {
+    this.sidebarRef = null
+  }
+
+  sidebarRef = null
   modals = {
     associations: () => ({
       props: {
@@ -325,18 +347,20 @@ export default class CourseSidebar extends Component {
     return (
       <BlueprintSidebar
         onOpen={this.onOpenSidebar}
+        onClose={this.onCloseSidebar}
         contentRef={this.props.contentRef}
         detachedChildren={this.renderModal()}
       >
-        {this.maybeRenderAssociations()}
-        <div className="bcs__row">
-          <Button id="mcSyncHistoryBtn" ref={(c) => { this.syncHistoryBtn = c }} variant="link" onClick={this.handleSyncHistoryClick}>
-            <Typography>{I18n.t('Sync History')}</Typography>
-          </Button>
+        <div>
+          {this.maybeRenderAssociations()}
+          <div className="bcs__row">
+            <Button id="mcSyncHistoryBtn" ref={(c) => { this.syncHistoryBtn = c }} variant="link" onClick={this.handleSyncHistoryClick}>
+              <Typography>{I18n.t('Sync History')}</Typography>
+            </Button>
+          </div>
+          {this.maybeRenderUnsyncedChanges()}
+          {this.maybeRenderSyncButton()}
         </div>
-        {this.maybeRenderUnsyncedChanges()}
-        {this.maybeRenderSyncButton()}
-        {}
       </BlueprintSidebar>
     )
   }
