@@ -184,7 +184,7 @@ class ConferencesController < ApplicationController
     log_asset_access([ "conferences", @context ], "conferences", "other")
     case @context
     when Course
-      @users = User.where(:id => @context.typical_current_enrollments.active_by_date.where.not(:user_id => @current_user).select(:user_id)).
+      @users = User.where(:id => @context.current_enrollments.not_fake.active_by_date.where.not(:user_id => @current_user).select(:user_id)).
         order(User.sortable_name_order_by_clause).to_a
     when Group
       @users = @context.participating_users_in_context.where("users.id<>?", @current_user).order(User.sortable_name_order_by_clause).to_a.uniq
