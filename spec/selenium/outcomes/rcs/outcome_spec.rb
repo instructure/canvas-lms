@@ -47,12 +47,10 @@ describe "outcomes" do
     context "create/edit/delete outcomes" do
 
       it "should create a learning outcome with a new rating (root level)", priority: "1", test_id: 250533 do
-        skip 'timeout problems with RCS enabled. remove this skip when wrking on CNVS-37279'
         should_create_a_learning_outcome_with_a_new_rating_root_level
       end
 
       it "should create a learning outcome (nested)", priority: "1", test_id: 250534 do
-        skip 'timeout problems with RCS enabled. remove this skip when wrking on CNVS-37279'
         should_create_a_learning_outcome_nested
       end
 
@@ -80,19 +78,16 @@ describe "outcomes" do
         end
 
         it "should validate decaying average_range", priority: "2", test_id: 261708 do
-          skip 'error text problems with RCS enabled. remove this skip when wrking on CNVS-37282'
           should_validate_decaying_average_range
         end
 
         it "should validate calculation int accepatble values", priority: "1", test_id: 261709 do
-          skip 'timeout problems with RCS enabled. remove this skip when wrking on CNVS-37279'
           save_without_error(1)
           f('.edit_button').click
           save_without_error(99)
         end
 
         it "should retain the settings after saving", priority: "1", test_id: 261710 do
-          skip 'timeout problems with RCS enabled. remove this skip when wrking on CNVS-37279'
           save_without_error(rand(99) + 1, 'Decaying Average')
           expect(f('#calculation_method').text).to include('Decaying Average')
         end
@@ -114,12 +109,10 @@ describe "outcomes" do
         end
 
         it "should validate n mastery_range", priority: "2", test_id: 303711 do
-          skip 'error text problems with RCS enabled. remove this skip when wrking on CNVS-37282'
           should_validate_n_mastery_range
         end
 
         it "should validate calculation int acceptable range values", priority: "1", test_id: 261713 do
-          skip 'timeout problems with RCS enabled. remove this skip when wrking on CNVS-37279'
           click_option('#calculation_method', "n Number of Times")
           save_without_error(2)
           f('.edit_button').click
@@ -127,7 +120,6 @@ describe "outcomes" do
         end
 
         it "should retain the settings after saving", priority: "1", test_id: 261714 do
-          skip 'timeout problems with RCS enabled. remove this skip when wrking on CNVS-37279'
           click_option('#calculation_method', "n Number of Times")
           save_without_error(3, 'n Number of Times')
           refresh_page
@@ -139,12 +131,10 @@ describe "outcomes" do
 
       context "create/edit/delete outcome groups" do
         it "should create an outcome group (root level)", priority: "2", test_id: 560586 do
-          skip 'timeout problems with RCS enabled. remove this skip when wrking on CNVS-37279'
           should_create_an_outcome_group_root_level
         end
 
         it "should create an outcome group (nested)", priority: "1", test_id: 250237 do
-          skip 'timeout problems with RCS enabled. remove this skip when wrking on CNVS-37279'
           should_create_an_outcome_group_nested
         end
 

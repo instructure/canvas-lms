@@ -40,12 +40,10 @@ describe "sub account outcomes" do
       context "create/edit/delete outcomes" do
 
         it "should create a learning outcome with a new rating (root level)", priority: "2", test_id: 263461 do
-          skip 'timeout problems with RCS enabled. remove this skip when wrking on CNVS-37279'
           should_create_a_learning_outcome_with_a_new_rating_root_level
         end
 
         it "should create a learning outcome (nested)", priority: "2", test_id: 263680 do
-          skip 'timeout problems with RCS enabled. remove this skip when wrking on CNVS-37279'
           should_create_a_learning_outcome_nested
         end
 
@@ -54,24 +52,20 @@ describe "sub account outcomes" do
         end
 
         it "should validate decaying average_range", priority: "2", test_id: 250518 do
-          skip 'error text problems with RCS enabled. remove this skip when wrking on CNVS-37282'
           should_validate_decaying_average_range
         end
 
         it "should validate n mastery_range", priority: "2", test_id: 303714 do
-          skip 'error text problems with RCS enabled. remove this skip when wrking on CNVS-37282'
           should_validate_n_mastery_range
         end
       end
 
       context "create/edit/delete outcome groups" do
         it "should create an outcome group (root level)", priority: "1", test_id: 263902 do
-          skip 'timeout problems with RCS enabled. remove this skip when wrking on CNVS-37279'
           should_create_an_outcome_group_root_level
         end
 
         it "should create an outcome group (nested)", priority: "1", test_id: 250521 do
-          skip 'timeout problems with RCS enabled. remove this skip when wrking on CNVS-37279'
           should_create_an_outcome_group_nested
         end
 
