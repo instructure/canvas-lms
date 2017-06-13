@@ -116,7 +116,6 @@ describe 'quizzes question with html answers' do
   end
 
   it 'populates the editor and input elements properly', priority: "1", test_id: 209360 do
-    skip "this test is failing due to RCS issue CNVS-37274 . once that is fixed, remove this skip"
     quiz_with_new_questions
     click_questions_tab
 
@@ -130,7 +129,7 @@ describe 'quizzes question with html answers' do
 
     # open it up in the editor, make sure the text matches the input
     edit_first_html_answer
-    content = driver.execute_script "return $('.answer:eq(3) textarea')[0].value"
+    content = driver.execute_script "return tinyMCE.activeEditor.getContent()"
     expect(content).to eq '<p>ohai</p>'
 
     # clear it out, make sure the original input is empty also
