@@ -681,6 +681,7 @@ CanvasRails::Application.routes.draw do
   get 'grades_for_student' => 'users#grades_for_student'
 
   get 'login' => 'login#new'
+  get 'login/session_token' => 'login#session_token'
   delete 'logout' => 'login#destroy'
   get 'logout' => 'login#logout_confirm'
 

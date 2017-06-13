@@ -68,6 +68,7 @@ class ApplicationController < ActionController::Base
   after_action :log_page_view
   after_action :discard_flash_if_xhr
   after_action :cache_buster
+  before_action :initiate_session_from_token
   # Yes, we're calling this before and after so that we get the user id logged
   # on events that log someone in and log someone out.
   after_action :set_user_id_header
@@ -976,6 +977,55 @@ class ApplicationController < ActionController::Base
     # to tell the browser to ALWAYS check back other than to disable caching...
     return true if @cancel_cache_buster || request.xhr? || api_request?
     set_no_cache_headers
+  end
+
+  def initiate_session_from_token
+    # Login from a token generated via API
+    if params[:session_token]
+      token = SessionToken.parse(params[:session_token])
+      if token&.valid?
+        pseudonym = Pseudonym.active.find_by(id: token.pseudonym_id)
+
+        if pseudonym
+          unless pseudonym.works_for_account?(@domain_root_account, true)
+            # if the logged in pseudonym doesn't work, we can only switch to another pseudonym
+            # that does work if it's the same password, and it's not a managed pseudonym
+            alternates = pseudonym.user.all_active_pseudonyms.select { |p|
+              !p.managed_password? &&
+                p.works_for_account?(@domain_root_account, true) &&
+                p.password_salt == pseudonym.password_salt &&
+                p.crypted_password == pseudonym.crypted_password }
+            # prefer a site admin pseudonym, then a pseudonym in this account, and then any old
+            # pseudonym
+            pseudonym = alternates.find { |p| p.account_id == Account.site_admin.id }
+            pseudonym ||= alternates.find { |p| p.account_id == @domain_root_account.id }
+            pseudonym ||= alternates.first
+          end
+          if pseudonym && pseudonym != @current_pseudonym
+            return_to = session.delete(:return_to)
+            reset_session
+            PseudonymSession.create!(pseudonym)
+            session[:used_remember_me_token] = true if token.used_remember_me_token
+          end
+          if pseudonym && token.current_user_id
+            target_user = User.find(token.current_user_id)
+            session[:become_user_id] = token.current_user_id if target_user.can_masquerade?(pseudonym.user, @domain_root_account)
+          end
+        end
+        return redirect_to return_to if return_to
+        # do one final redirect to get the token out of the URL
+        redirect_to remove_query_params(request.original_url, 'session_token')
+      end
+    end
+  end
+
+  def remove_query_params(url, *params)
+    uri = URI.parse(url)
+    return url unless uri.query
+    qs = Rack::Utils.parse_query(uri.query)
+    qs.except!(*params)
+    uri.query = qs.empty? ? nil : Rack::Utils.build_query(qs)
+    uri.to_s
   end
 
   def set_no_cache_headers

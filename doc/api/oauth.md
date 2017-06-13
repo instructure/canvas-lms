@@ -23,6 +23,7 @@ for authentication and authorization of the Canvas API.
   - [GET login/oauth2/auth](file.oauth_endpoints.html#get-login-oauth2-auth)
   - [POST login/oauth2/token](file.oauth_endpoints.html#post-login-oauth2-token)
   - [DELETE login/oauth2/token](file.oauth_endpoints.html#delete-login-oauth2-token)
+  - [GET login/session_token](file.oauth_endpoints.html#get-login-session-token)
 
 <a name="storing-access-tokens"></a>
 ## [Storing Tokens](#storing-access-tokens)
