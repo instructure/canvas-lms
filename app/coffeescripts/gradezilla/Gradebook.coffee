@@ -66,6 +66,7 @@ define [
   'jsx/gradezilla/default_gradebook/components/GradebookMenu'
   'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu'
   'jsx/gradezilla/default_gradebook/components/ActionMenu'
+  'jsx/gradezilla/default_gradebook/components/AssignmentGroupFilter'
   'jsx/gradezilla/default_gradebook/components/GradingPeriodFilter'
   'jsx/gradezilla/default_gradebook/components/ModuleFilter'
   'jsx/gradezilla/default_gradebook/components/SectionFilter'
@@ -107,7 +108,7 @@ define [
   SubmissionCell, NumberCompare, natcompare, ConvertCase, htmlEscape, SetDefaultGradeDialogManager,
   CurveGradesDialogManager, GradebookApi, CellEditorFactory, GridSupport, studentRowHeaderConstants, AssignmentColumnHeader,
   AssignmentGroupColumnHeader, AssignmentRowCellPropFactory, CustomColumnHeader, StudentColumnHeader, StudentRowHeader,
-  TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, GradingPeriodFilter, ModuleFilter, SectionFilter,
+  TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, AssignmentGroupFilter, GradingPeriodFilter, ModuleFilter, SectionFilter,
   GridColor, StatusesModal, SubmissionTray, GradebookSettingsModal, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp,
   SubmissionStateMap,
   DownloadSubmissionsDialogManager,ReuploadSubmissionsDialogManager, GroupTotalCellTemplate, GradebookKeyboardNav,
@@ -734,6 +735,7 @@ define [
       assignmentFilters = [
         @filterAssignmentBySubmissionTypes,
         @filterAssignmentByPublishedStatus,
+        @filterAssignmentByAssignmentGroup,
         @filterAssignmentByGradingPeriod,
         @filterAssignmentByModule
       ]
@@ -750,6 +752,10 @@ define [
 
     filterAssignmentByPublishedStatus: (assignment) =>
       assignment.published or @showUnpublishedAssignments
+
+    filterAssignmentByAssignmentGroup: (assignment) =>
+      return true unless @isFilteringColumnsByAssignmentGroup()
+      @getAssignmentGroupToShow() == assignment.assignment_group_id
 
     filterAssignmentByGradingPeriod: (assignment) =>
       return true unless @isFilteringColumnsByGradingPeriod()
@@ -1131,6 +1137,34 @@ define [
     showSections: ->
       @sections_enabled
 
+    assignmentGroupList: ->
+      return [] unless @assignmentGroups
+      Object.values(@assignmentGroups).sort((a, b) => (a.position - b.position))
+
+    updateAssignmentGroupFilterVisibility: ->
+      mountPoint = document.getElementById('assignment-group-filter-container')
+      groups = @assignmentGroupList()
+
+      if groups.length > 1 and 'assignmentGroups' in @gridDisplaySettings.selectedViewOptionsFilters
+        props =
+          items: groups
+          onSelect: @updateCurrentAssignmentGroup
+          selectedItemId: @getAssignmentGroupToShow()
+
+        @assignmentGroupFilterMenu = renderComponent(AssignmentGroupFilter, mountPoint, props)
+      else if @assignmentGroupFilterMenu?
+        ReactDOM.unmountComponentAtNode(mountPoint)
+        @assignmentGroupFilterMenu = null
+
+    updateCurrentAssignmentGroup: (group) =>
+      if @getFilterColumnsBySetting('assignmentGroupId') != group
+        @setFilterColumnsBySetting('assignmentGroupId', group)
+        @saveSettings()
+        @resetGrading()
+        @setAssignmentWarnings()
+        @updateColumnsAndRenderViewOptionsMenu()
+        @updateAssignmentGroupFilterVisibility()
+
     gradingPeriodList: ->
       @gradingPeriodSet.gradingPeriods.sort((a, b) => (a.startDate - b.startDate))
 
@@ -1356,6 +1390,7 @@ define [
 
     renderFilters: =>
       @updateSectionFilterVisibility()
+      @updateAssignmentGroupFilterVisibility()
       @updateGradingPeriodFilterVisibility()
       @updateModulesFilterVisibility()
       @renderSearchFilter()
@@ -1981,7 +2016,7 @@ define [
       not @isFilteringColumnsByGradingPeriod()
 
     fieldsToExcludeFromAssignments: ['description', 'needs_grading_count', 'in_closed_grading_period']
-    fieldsToIncludeWithAssignments: ['module_ids']
+    fieldsToIncludeWithAssignments: ['module_ids', 'assignment_group_id']
 
     studentsParams: ->
       enrollmentStates = ['invited', 'active']
@@ -2527,6 +2562,13 @@ define [
 
     setFilterRowsBySetting: (filterKey, value) =>
       @gridDisplaySettings.filterRowsBy[filterKey] = value
+
+    isFilteringColumnsByAssignmentGroup: =>
+      @getAssignmentGroupToShow() != '0'
+
+    getAssignmentGroupToShow: () =>
+      groupId = @getFilterColumnsBySetting('assignmentGroupId') || '0'
+      if groupId in _.pluck(@assignmentGroups, 'id') then groupId else '0'
 
     isFilteringColumnsByGradingPeriod: =>
       @getGradingPeriodToShow() != '0'

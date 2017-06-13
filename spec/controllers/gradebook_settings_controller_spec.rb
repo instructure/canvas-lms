@@ -36,7 +36,8 @@ RSpec.describe GradebookSettingsController, type: :controller do
       let(:show_settings) do
         {
           "filter_columns_by" => {
-            "grading_period_id" => "1401"
+            "grading_period_id" => "1401",
+            "assignment_group_id" => "888"
           },
           "selected_view_options_filters" => ["assignmentGroups"],
           "show_inactive_enrollments" => "true", # values must be strings

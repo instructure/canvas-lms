@@ -701,14 +701,19 @@ class GradebooksController < ApplicationController
   end
 
   def visible_modules?
-    @visible_modules ||= @context.modules_visible_to(@current_user)
+    @visible_modules ||= @context.modules_visible_to(@current_user).any?
   end
   helper_method :visible_modules?
 
-  def visible_sections?
-    @visible_sections ||= @context.multiple_sections?
+  def multiple_sections?
+    @multiple_sections ||= @context.multiple_sections?
   end
-  helper_method :visible_sections?
+  helper_method :multiple_sections?
+
+  def multiple_assignment_groups?
+    @multiple_assignment_groups ||= @context.assignment_groups.many?
+  end
+  helper_method :multiple_assignment_groups?
 
   private
 

@@ -40,7 +40,8 @@ class GradebookSettingsController < ApplicationController
       {
         filter_columns_by: [
           :context_module_id,
-          :grading_period_id
+          :grading_period_id,
+          :assignment_group_id
         ],
         selected_view_options_filters: []
       },

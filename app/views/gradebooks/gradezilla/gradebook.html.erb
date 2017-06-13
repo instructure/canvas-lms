@@ -41,6 +41,10 @@
           <i class="icon-keyboard-shortcuts"></i>
         </button>
 
+        <% if multiple_assignment_groups? %>
+            <div class="gradebook-filter-container" id="assignment-group-filter-container"></div>
+        <% end %>
+
         <% if grading_periods? %>
           <div class="gradebook-filter-container" id="grading-periods-filter-container"></div>
         <% end %>
@@ -49,7 +53,7 @@
           <div class="gradebook-filter-container" id="modules-filter-container"></div>
         <% end %>
 
-        <% if visible_sections? %>
+        <% if multiple_sections? %>
           <div class="gradebook-filter-container" id="sections-filter-container"></div>
         <% end %>
 
