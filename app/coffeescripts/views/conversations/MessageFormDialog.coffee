@@ -71,6 +71,7 @@ define [
       minHeight: 500
       height: 550
       resizable: true
+      title: I18n.t 'Compose Message'
       # Event handler for catching when the dialog is closed.
       # Overridding @close() or @cancel() doesn't work alone since
       # hitting ESC doesn't trigger either of those events.
