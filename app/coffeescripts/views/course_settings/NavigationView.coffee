@@ -51,6 +51,7 @@ define [
         .attr('class', '')
         .attr('class', 'icon-plus enable_nav_item_link')
         .text("Enable")
+      $targetItem.find('a.al-trigger').focus()
 
     enableNavLink: (e) ->
       $targetItem = $(e.currentTarget).closest('.navitem')
@@ -59,6 +60,7 @@ define [
         .attr('class', '')
         .attr('class', 'icon-x disable_nav_item_link')
         .text("Disable")
+      $targetItem.find('a.al-trigger').focus()
 
     moveNavLink: (e) ->
       dialog = @$move_dialog
@@ -85,6 +87,7 @@ define [
         height: 300
         close: ->
           dialog.dialog('close')
+          which_item.find('a.al-trigger').focus()
         )
 
     moveSubmit: (e) ->
@@ -98,11 +101,13 @@ define [
         selected_item.after current_item
       $('#move_nav_item_form').attr('aria-hidden', 'true')
       $('#move_nav_item_form').dialog('close')
-      current_item.focus()
+      current_item.find('a.al-trigger').focus()
 
     cancelMove: ->
+      current_item = $('#move_nav_item_form').data 'current_item'
       $('#move_nav_item_form').attr('aria-hidden', 'true')
       $('#move_nav_item_form').dialog('close')
+      current_item.find('a.al-trigger').focus()
 
     focusKeyboardHelp: (e) ->
       $('.drag_and_drop_warning').removeClass('screenreader-only')
