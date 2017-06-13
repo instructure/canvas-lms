@@ -104,15 +104,6 @@ describe "Gradezilla" do
     end
   end
 
-  it "View Grading History menu item redirects to grading history page", priority: "2", test_id: 3253265 do
-    @course.root_account.enable_feature!(:new_gradebook)
-    Gradezilla.visit(@course)
-
-    Gradezilla.gradebook_menu_open
-    Gradezilla.grade_history_select
-    expect(driver.current_url).to include("/courses/#{@course.id}/gradebook/history")
-  end
-
   it 'gradebook settings modal is displayed when gradebook settings button is clicked',
      priority: '1', test_id: 164219 do
     Gradezilla.visit(@course)

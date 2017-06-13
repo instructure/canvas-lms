@@ -28,13 +28,16 @@ class Gradezilla
 
     # Gradebook Menu
     GRADEBOOK_MENU_SELECTOR = '[data-component="GradebookMenu"]'.freeze
+    INDIVIDUAL_VIEW_ITEM_SELECTOR = 'individual-gradebook'.freeze
+    GRADE_HISTORY_ITEM_SELECTOR = 'grade-history'.freeze
+    LEARING_MASTERY_ITEM_SELECTOR = 'learning-mastery'.freeze
 
     # Action Menu
     ACTION_MENU_SELECTOR = '[data-component="ActionMenu"]'.freeze
     ACTION_MENU_ITEM_SELECTOR = 'body [data-menu-id="%s"]'.freeze
 
     # Menu Items
-    MENU_ITEM_SELECTOR = 'span[data-menu-item-id="%s"]'.freeze
+    MENU_ITEM_SELECTOR = '[data-menu-item-id="%s"]'.freeze
 
     def gradebook_settings_cog
       f('#gradebook_settings')
@@ -252,10 +255,6 @@ class Gradezilla
       action_menu.click
     end
 
-    def open_gradebook_dropdown_menu
-      gradebook_dropdown_menu.click
-    end
-
     def select_menu_item(name)
       menu_item(name).click
     end
@@ -390,12 +389,16 @@ class Gradezilla
       f("#content")
     end
 
-    def grade_history_select
-      grade_history.click
-    end
-
-    def gradebook_menu_open
+    def gradebook_dropdown_item_click(menu_item_name)
       gradebook_menu_element.click
+
+      if menu_item_name == "Individual View"
+        menu_item(INDIVIDUAL_VIEW_ITEM_SELECTOR).click
+      elsif menu_item_name == "Learning Mastery"
+        menu_item(LEARING_MASTERY_ITEM_SELECTOR).click
+      elsif menu_item_name == "Grading History"
+        menu_item(GRADE_HISTORY_ITEM_SELECTOR).click
+      end
     end
 
     def gradebook_settings_btn_select

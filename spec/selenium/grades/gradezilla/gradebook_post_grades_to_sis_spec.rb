@@ -72,19 +72,6 @@ describe "Gradezilla - post grades to SIS" do
       expect(f('body')).to contain_css("[data-menu-id='post_grades_feature_tool']")
     end
 
-    it "containing menu should not be displayed if viewing outcome gradebook", priority: "1", test_id: 3253266 do
-      Account.default.set_feature_flag!('post_grades', 'on')
-      Account.default.set_feature_flag!('outcome_gradebook', 'on')
-      @course.sis_source_id = 'xyz'
-      @course.save
-
-      Gradezilla.visit(@course)
-      Gradezilla.open_gradebook_dropdown_menu
-      Gradezilla.select_menu_item('learning-mastery')
-
-      expect(Gradezilla.action_menu).not_to be_displayed
-    end
-
     it 'does not show assignment errors when clicking the post grades button if all ' \
       'assignments have due dates for each section', priority: '1', test_id: 3036003 do
       Account.default.set_feature_flag!('post_grades', 'on')
