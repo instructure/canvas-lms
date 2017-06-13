@@ -76,51 +76,7 @@ module Lti
         end
 
         it 'raises MissingCapability if missing capabilities' do
-          tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.assignment_submitted)
-          validator = SubscriptionsValidator.new(subscription, tool_proxy)
-          expect { validator.check_required_capabilities! }.to raise_error SubscriptionsValidator::MissingCapability
-        end
-      end
-
-      context "ASSIGNMENT_SUBMITTED" do
-        let(:subscription) do
-          {
-            RootAccountUUID: account.uuid,
-            EventTypes:["assignment_submitted"],
-            ContextType: "root_account",
-            ContextId: account.uuid,
-            Format: "live-event",
-            TransportType: "sqs",
-            TransportMetadata: { Url: "http://sqs.docker"},
-            UserId: "2"
-          }
-        end
-        let(:tool_proxy) do
-          Lti::ToolProxy.create!(
-            context: account,
-            guid: SecureRandom.uuid,
-            shared_secret: 'abc',
-            product_family: product_family,
-            product_version: '1',
-            workflow_state: 'active',
-            raw_data: {'enabled_capability' => ['vnd.instructure.webhooks.root_account.assignment_submitted']},
-            lti_version: '1'
-          )
-        end
-
-        it 'allows subscription if vnd.instructure.webhooks.root_account.assignment_submitted' do
-          validator = SubscriptionsValidator.new(subscription, tool_proxy)
-          expect { validator.check_required_capabilities! }.not_to raise_error
-        end
-
-        it 'allows subscription if vnd.instructure.webhooks.assignment.assignment_submitted enabled' do
-          tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.assignment_submitted)
-          validator = SubscriptionsValidator.new(subscription, tool_proxy)
-          expect { validator.check_required_capabilities! }.not_to raise_error
-        end
-
-        it 'raises MissingCapability if missing capabilities' do
-          tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.quiz_submitted)
+          tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.submission_created)
           validator = SubscriptionsValidator.new(subscription, tool_proxy)
           expect { validator.check_required_capabilities! }.to raise_error SubscriptionsValidator::MissingCapability
         end

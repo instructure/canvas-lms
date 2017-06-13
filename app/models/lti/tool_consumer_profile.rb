@@ -33,8 +33,6 @@ module Lti
       all: [WEBHOOK_GRANT_ALL_CAPABILITY].freeze,
       quiz_submitted: %w(vnd.instructure.webhooks.root_account.quiz_submitted
                          vnd.instructure.webhooks.assignment.quiz_submitted).freeze,
-      assignment_submitted: %w(vnd.instructure.webhooks.root_account.assignment_submitted
-                               vnd.instructure.webhooks.assignment.assignment_submitted).freeze,
       grade_changed: %w(vnd.instructure.webhooks.root_account.grade_changed).freeze,
       attachment_created: %w(vnd.instructure.webhooks.root_account.attachment_created
                              vnd.instructure.webhooks.assignment.attachment_created).freeze,
