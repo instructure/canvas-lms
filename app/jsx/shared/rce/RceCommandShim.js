@@ -50,7 +50,7 @@ export function send ($target, methodName, ...args) {
     }
     return remoteEditor.call(methodName, ...args)
   } else if ($target.data('rich_text')) {
-    return $target.editorBox(methodName, ...args)
+    return $target.editorBox && $target.editorBox(methodName, ...args)
   } else {
     // we're not set up, so tell the caller that `exists?` is false,
     // `get_code` is the textarea value, and ignore anything else.
