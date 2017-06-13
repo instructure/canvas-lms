@@ -4343,6 +4343,38 @@ describe Assignment do
     end
   end
 
+  describe "validate_overrides_for_sis" do
+    def api_create_assignment_in_course(course,assignment_params)
+      api_call(:post,
+               "/api/v1/courses/#{course.id}/assignments.json",
+               {
+                 :controller => 'assignments_api',
+                 :action => 'create',
+                 :format => 'json',
+                 :course_id => course.id.to_s
+               }, {:assignment => assignment_params })
+    end
+
+    let(:assignment) do
+      @course.assignments.new(assignment_valid_attributes)
+    end
+
+    before do
+      assignment.post_to_sis = true
+      assignment.context.account.stubs(:sis_syncing).returns({value: true})
+      assignment.context.account.stubs(:feature_enabled?).with('new_sis_integrations').returns(true)
+      assignment.context.account.stubs(:sis_require_assignment_due_date).returns({value: true})
+    end
+
+    it "raises an invalid record error if overrides are invalid" do
+      overrides = [{
+          'course_section_id' => @course.default_section.id,
+          'due_at' => nil
+      }]
+      expect{assignment.validate_overrides_for_sis(overrides)}.to raise_error(ActiveRecord::RecordInvalid)
+    end
+  end
+
   describe "max_name_length" do
     let(:assignment) do
       @course.assignments.new(assignment_valid_attributes)

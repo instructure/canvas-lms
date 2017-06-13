@@ -734,6 +734,7 @@ module Api::V1::Assignment
     return :forbidden unless grading_periods_allow_assignment_overrides_batch_create?(assignment, overrides)
 
     assignment.transaction do
+      assignment.validate_overrides_for_sis(overrides)
       assignment.save_without_broadcasting!
       batch_update_assignment_overrides(assignment, overrides, user)
     end
@@ -753,6 +754,7 @@ module Api::V1::Assignment
     return :forbidden unless grading_periods_allow_assignment_overrides_batch_update?(assignment, prepared_batch)
 
     assignment.transaction do
+      assignment.validate_overrides_for_sis(prepared_batch)
       assignment.save_without_broadcasting!
       perform_batch_update_assignment_overrides(assignment, prepared_batch)
     end

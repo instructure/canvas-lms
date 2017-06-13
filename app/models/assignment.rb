@@ -75,7 +75,7 @@ class Assignment < ActiveRecord::Base
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :inverse_of => :context, :dependent => :destroy
   validates_associated :external_tool_tag, :if => :external_tool?
   validate :group_category_changes_ok?
-  validate :due_date_ok?, :unless => :has_active_assignment_overrides?
+  validate :due_date_ok?, :unless => :active_assignment_overrides?
   validate :assignment_overrides_due_date_ok?
   validate :discussion_group_ok?
   validate :positive_points_possible?
@@ -2518,6 +2518,15 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  def validate_overrides_for_sis(overrides)
+    unless AssignmentUtil.sis_integration_settings_enabled?(context) && AssignmentUtil.due_date_required_for_account?(context)
+      @skip_due_date_validation = true
+      return
+    end
+    raise ActiveRecord::RecordInvalid unless assignment_overrides_due_date_ok?(overrides)
+    @skip_due_date_validation = true
+  end
+
   private
 
   def due_date_ok?
@@ -2526,16 +2535,19 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def assignment_overrides_due_date_ok?
+  def assignment_overrides_due_date_ok?(overrides={})
     if AssignmentUtil.due_date_required?(self)
-      if active_assignment_overrides.where(due_at: nil).count > 0
+      overrides = self.assignment_overrides.empty? ? overrides : self.assignment_overrides
+      if overrides.select{|o| o['due_at'].nil?}.length > 0
         errors.add(:due_at, I18n.t("cannot be blank for any assignees when Post to Sis is checked"))
+        return false
       end
+      return true
     end
   end
 
-  def has_active_assignment_overrides?
-    active_assignment_overrides.count > 0
+  def active_assignment_overrides?
+    @skip_due_date_validation || self.assignment_overrides.length > 0
   end
 
   def assignment_name_length_ok?

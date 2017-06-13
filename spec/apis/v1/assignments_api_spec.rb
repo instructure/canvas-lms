@@ -1909,13 +1909,15 @@ describe AssignmentsApiController, type: :request do
     end
 
     context "sis validations enabled" do
-      it 'saves with a section with a valid due_date' do
+      before do
         a = @course.account
         a.enable_feature!(:new_sis_integrations)
         a.settings[:sis_syncing] = {value: true}
         a.settings[:sis_require_assignment_due_date] = {value: true}
         a.save!
+      end
 
+      it 'saves with a section override with a valid due_date' do
         assignment_params = {
           'post_to_sis' => true,
           'assignment_overrides' => {
@@ -1928,8 +1930,29 @@ describe AssignmentsApiController, type: :request do
 
         json = api_create_assignment_in_course(@course, assignment_params)
 
-        # expect(json["errors"]).to be_nil
-        expect(json["errors"]).to have_key('due_at')
+        expect(json["errors"]).to be_nil
+      end
+
+      it 'does not save with a section override without a due date' do
+        assignment_params = {
+          'post_to_sis' => true,
+          'assignment_overrides' => {
+            '0' => {
+                'course_section_id' => @course.default_section.id,
+                'due_at' => nil
+            }
+          }
+        }
+
+        json = api_create_assignment_in_course(@course, assignment_params)
+
+        expect(json["errors"]&.keys).to eq ['due_at']
+      end
+
+      it 'does not save without a due date' do
+        json = api_create_assignment_in_course(@course, 'post_to_sis' => true)
+
+        expect(json["errors"]&.keys).to eq ['due_at']
       end
     end
   end
