@@ -20,7 +20,7 @@ import React from 'react';
 import { mount, ReactWrapper } from 'enzyme';
 import ViewOptionsMenu from 'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu';
 
-function createExampleProps () {
+function defaultProps ({ props, filterSettings } = {}) {
   return {
     columnSortSettings: {
       criterion: 'due_date',
@@ -37,7 +37,8 @@ function createExampleProps () {
     filterSettings: {
       available: ['assignmentGroups', 'gradingPeriods', 'modules', 'sections'],
       onSelect () {},
-      selected: []
+      selected: [],
+      ...filterSettings
     },
     onSelectShowStatusesModal () {},
     onSelectShowUnpublishedAssignments () {},
@@ -46,7 +47,8 @@ function createExampleProps () {
       disabled: false,
       onSelect () {},
       selected: true
-    }
+    },
+    ...props
   };
 }
 
@@ -59,15 +61,26 @@ function mountAndOpenOptions (props) {
 function openArrangeBy (props) {
   const wrapper = mountAndOpenOptions(props);
   const menuContent = new ReactWrapper(wrapper.node.menuContent, wrapper.node);
-  const flyout = menuContent.find('MenuItemFlyout');
+  const flyouts = menuContent.find('MenuItemFlyout').map(flyout => flyout);
+  const flyout = flyouts.find(menuItem => menuItem.text().trim() === 'Arrange By')
   flyout.find('button').simulate('mouseOver');
   return wrapper;
 }
 
+function openFilters (props) {
+  const wrapper = mountAndOpenOptions(props);
+  const menuContent = new ReactWrapper(wrapper.node.menuContent, wrapper.node);
+  const flyouts = menuContent.find('MenuItemFlyout').map(flyout => flyout);
+  const flyout = flyouts.find(menuItem => menuItem.text().trim() === 'Filters')
+  flyout.find('button').simulate('mouseOver');
+  return wrapper;
+}
+
+
 QUnit.module('ViewOptionsMenu#focus');
 
 test('trigger is focused', function () {
-  const props = createExampleProps();
+  const props = defaultProps();
   const wrapper = mount(<ViewOptionsMenu {...props} />, { attachTo: document.getElementById('fixtures') });
   wrapper.instance().focus();
   equal(document.activeElement, wrapper.find('button').node);
@@ -77,7 +90,7 @@ test('trigger is focused', function () {
 
 QUnit.module('ViewOptionsMenu - notes', {
   setup () {
-    this.props = createExampleProps();
+    this.props = defaultProps();
   },
 
   getMenuItemGroup () {
@@ -134,78 +147,87 @@ test('the "Notes" option is optionally deselected', function () {
 });
 
 QUnit.module('ViewOptionsMenu - Filters', {
-  setup () {
-    this.props = createExampleProps();
-  },
-
-  findMenuItemGroup (text) {
-    const optionsMenu = new ReactWrapper(this.wrapper.node.menuContent, this.wrapper.node);
-    return optionsMenu.findWhere(component => (
-      component.name() === 'MenuItemGroup' && component.text().includes(text)
-    ));
-  },
-
-  findMenuItem (text) {
-    return this.findMenuItemGroup('Filters').findWhere(component => (
-      component.name() === 'MenuItem' && component.text().includes(text)
-    ));
-  },
-
   teardown () {
     this.wrapper.unmount();
   }
 });
 
+test('Filters menu does allows multiple selections', function () {
+  this.wrapper = openFilters(defaultProps());
+  const menuContent = new ReactWrapper(this.wrapper.node.filtersMenuContent, this.wrapper.node);
+  const group = menuContent.find('MenuItemGroup');
+  strictEqual(group.prop('allowMultiple'), true);
+});
+
 test('includes each available filter', function () {
-  this.wrapper = mountAndOpenOptions(this.props);
-  const group = this.findMenuItemGroup('Filters');
+  this.wrapper = openFilters(defaultProps());
+  const menuContent = new ReactWrapper(this.wrapper.node.filtersMenuContent, this.wrapper.node);
+  const group = menuContent.find('MenuItemGroup');
   strictEqual(group.find('MenuItem').length, 4);
 });
 
 test('displays filters by name', function () {
-  this.wrapper = mountAndOpenOptions(this.props);
-  const filters = this.findMenuItemGroup('Filters').find('MenuItem');
+  this.wrapper = openFilters(defaultProps());
+  const menuContent = new ReactWrapper(this.wrapper.node.filtersMenuContent, this.wrapper.node);
+  const filters = menuContent.find('MenuItem');
   const names = filters.map(filter => filter.text());
   deepEqual(names, ['Assignment Groups', 'Grading Periods', 'Modules', 'Sections']);
 });
 
 test('includes only available filters', function () {
-  this.props.filterSettings.available = ['gradingPeriods', 'modules'];
-  this.wrapper = mountAndOpenOptions(this.props);
-  const filters = this.findMenuItemGroup('Filters').find('MenuItem');
+  const props = defaultProps({ filterSettings: { available: ['gradingPeriods', 'modules'] } });
+  this.wrapper = openFilters(props);
+  const menuContent = new ReactWrapper(this.wrapper.node.filtersMenuContent, this.wrapper.node);
+  const filters = menuContent.find('MenuItem');
   const names = filters.map(filter => filter.text());
   deepEqual(names, ['Grading Periods', 'Modules']);
 });
 
 test('does not display filters group when no filters are available', function () {
-  this.props.filterSettings.available = [];
-  this.wrapper = mountAndOpenOptions(this.props);
-  const group = this.findMenuItemGroup('Filters');
-  strictEqual(group.length, 0);
+  const props = defaultProps({ filterSettings: { available: [] } });
+  this.wrapper = mountAndOpenOptions(props);
+  const menuContent = new ReactWrapper(this.wrapper.node.menuContent, this.wrapper.node);
+  const flyouts = menuContent.find('MenuItemFlyout').map(flyout => flyout);
+  const flyout = flyouts.find(menuItem => menuItem.text().trim() === 'Filters')
+  strictEqual(flyout, undefined);
 });
 
 test('onSelect is called when a filter is selected', function () {
-  this.props.filterSettings.onSelect = this.stub();
-  this.wrapper = mountAndOpenOptions(this.props);
-  this.findMenuItem('Grading Periods').simulate('click');
-  strictEqual(this.props.filterSettings.onSelect.callCount, 1);
+  const onSelect = this.stub();
+  const props = defaultProps({ filterSettings: { onSelect } });
+  this.wrapper = openFilters(props);
+  const menuContent = new ReactWrapper(this.wrapper.node.filtersMenuContent, this.wrapper.node);
+  const menuItems = menuContent.find('MenuItem').map(menuItem => menuItem);
+  const filter = menuItems.find(menuItem => menuItem.text().trim() === 'Grading Periods')
+  filter.simulate('click');
+  strictEqual(onSelect.callCount, 1);
 });
 
 test('onSelect is called with the selected filter', function () {
-  this.props.filterSettings.onSelect = this.stub();
-  this.wrapper = mountAndOpenOptions(this.props);
-  this.findMenuItem('Modules').simulate('click');
-  const [filters] = this.props.filterSettings.onSelect.lastCall.args;
-  deepEqual(filters, ['modules']);
+  const onSelect = this.stub();
+  const props = defaultProps({ filterSettings: { onSelect } });
+  this.wrapper = openFilters(props);
+  const menuContent = new ReactWrapper(this.wrapper.node.filtersMenuContent, this.wrapper.node);
+  const menuItems = menuContent.find('MenuItem').map(menuItem => menuItem);
+  const filter = menuItems.find(menuItem => menuItem.text().trim() === 'Modules')
+  filter.simulate('click');
+  strictEqual(onSelect.calledWithExactly(['modules']), true);
 });
 
 test('onSelect is called with list of selected filters upon any selection change', function () {
-  this.props.filterSettings.selected = ['assignmentGroups', 'sections'];
-  this.props.filterSettings.onSelect = this.stub();
-  this.wrapper = mountAndOpenOptions(this.props);
-  this.findMenuItem('Grading Periods').simulate('click');
-  const [filters] = this.props.filterSettings.onSelect.lastCall.args;
-  deepEqual(filters.sort(), ['assignmentGroups', 'gradingPeriods', 'sections']);
+  const onSelect = this.stub();
+  const props = defaultProps({
+    filterSettings: {
+      onSelect,
+      selected: ['assignmentGroups', 'sections']
+    }
+  });
+  this.wrapper = openFilters(props);
+  const menuContent = new ReactWrapper(this.wrapper.node.filtersMenuContent, this.wrapper.node);
+  const menuItems = menuContent.find('MenuItem').map(menuItem => menuItem);
+  const filter = menuItems.find(menuItem => menuItem.text().trim() === 'Grading Periods')
+  filter.simulate('click');
+  strictEqual(onSelect.calledWithExactly(['assignmentGroups', 'sections', 'gradingPeriods']), true);
 });
 
 QUnit.module('ViewOptionsMenu - unpublished assignments', {
@@ -213,7 +235,7 @@ QUnit.module('ViewOptionsMenu - unpublished assignments', {
     showUnpublishedAssignments = true,
     onSelectShowUnpublishedAssignments = () => {}
   } = {}) {
-    const props = createExampleProps();
+    const props = defaultProps();
     return mount(
       <ViewOptionsMenu
         {...props}
@@ -264,7 +286,7 @@ test('onSelectShowUnpublishedAssignment is called when selected', function () {
 QUnit.module('ViewOptionsMenu - Column Sorting', {
   props (criterion = 'due_date', direction = 'ascending', disabled = false) {
     return {
-      ...createExampleProps(),
+      ...defaultProps(),
       columnSortSettings: {
         criterion,
         direction,
@@ -459,7 +481,7 @@ QUnit.module('ViewOptionsMenu - Statuses');
 
 test('clicking Statuses calls onSelectShowStatusesModal', function () {
   const props = {
-    ...createExampleProps(),
+    ...defaultProps(),
     onSelectShowStatusesModal: this.stub()
   };
   const wrapper = mountAndOpenOptions(props);

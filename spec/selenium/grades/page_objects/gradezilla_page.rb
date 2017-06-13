@@ -174,6 +174,10 @@ class Gradezilla
       fj("[role=menuitemcheckbox]:contains(#{menu_item})")
     end
 
+    def filters_element
+      fj('[role=button] span:contains(Filters)')
+    end
+
     def grading_period_filter_element
       fj('span[role=menuitemcheckbox] span:contains(Grading Periods)')
     end
@@ -441,6 +445,7 @@ class Gradezilla
 
     # methods
     def select_view_grading_period_filter
+      filters_element.click
       grading_period_filter_element.click
     end
 
