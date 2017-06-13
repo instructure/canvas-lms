@@ -20,7 +20,7 @@ import $ from 'jquery';
 import _ from 'underscore';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import colors from 'jsx/gradezilla/default_gradebook/constants/colors';
+import { darken, statusColors, defaultColors } from 'jsx/gradezilla/default_gradebook/constants/colors';
 import natcompare from 'compiled/util/natcompare';
 import round from 'compiled/util/round';
 import fakeENV from 'helpers/fakeENV';
@@ -5302,6 +5302,13 @@ test('calls ajaxJSON as a PUT request', function () {
 
 test('calls ajaxJSON with default gradebook_settings', function () {
   const expectedSettings = {
+    colors: {
+      dropped: '#FEF0E5',
+      excused: '#FEF7E5',
+      late: '#E5F3FC',
+      missing: '#FFE8E5',
+      resubmitted: '#E5F7E5'
+    },
     filter_columns_by: {
       assignment_group_id: null,
       context_module_id: null,
@@ -5389,6 +5396,13 @@ test('calls ajaxJSON with parameters', function () {
 
   deepEqual(ajaxJSONStub.firstCall.args[2], {
     gradebook_settings: {
+      colors: {
+        dropped: '#FEF0E5',
+        excused: '#FEF7E5',
+        late: '#E5F3FC',
+        missing: '#FFE8E5',
+        resubmitted: '#E5F7E5'
+      },
       filter_columns_by: {
         assignment_group_id: '2201',
         context_module_id: '2601',
@@ -5403,7 +5417,7 @@ test('calls ajaxJSON with parameters', function () {
       sort_rows_by_direction: 'ascending',
       sort_rows_by_setting_key: 'late',
       student_column_display_as: 'last_first',
-      student_column_secondary_info: 'login_id',
+      student_column_secondary_info: 'login_id'
     }
   });
 });
@@ -6301,24 +6315,24 @@ test('is rendered on init', function () {
 });
 
 test('is rendered on renderGridColor', function () {
-  const gradebook = createGradebook({ colors: { colors: {} } }); // due to props bug in 'renderGridColor'
+  const gradebook = createGradebook({ colors: statusColors() });
   gradebook.renderGridColor();
   const style = document.querySelector('[data-component="GridColor"] style').innerText;
   equal(style, [
-    `.even .gradebook-cell.late { background-color: ${colors.light.blue}; }`,
-    `.odd .gradebook-cell.late { background-color: ${colors.dark.blue}; }`,
+    `.even .gradebook-cell.late { background-color: ${defaultColors.blue}; }`,
+    `.odd .gradebook-cell.late { background-color: ${darken(defaultColors.blue, 5)}; }`,
     '.slick-cell.editable .gradebook-cell.late { background-color: white; }',
-    `.even .gradebook-cell.missing { background-color: ${colors.light.purple}; }`,
-    `.odd .gradebook-cell.missing { background-color: ${colors.dark.purple}; }`,
+    `.even .gradebook-cell.missing { background-color: ${defaultColors.salmon}; }`,
+    `.odd .gradebook-cell.missing { background-color: ${darken(defaultColors.salmon, 5)}; }`,
     '.slick-cell.editable .gradebook-cell.missing { background-color: white; }',
-    `.even .gradebook-cell.resubmitted { background-color: ${colors.light.green}; }`,
-    `.odd .gradebook-cell.resubmitted { background-color: ${colors.dark.green}; }`,
+    `.even .gradebook-cell.resubmitted { background-color: ${defaultColors.green}; }`,
+    `.odd .gradebook-cell.resubmitted { background-color: ${darken(defaultColors.green, 5)}; }`,
     '.slick-cell.editable .gradebook-cell.resubmitted { background-color: white; }',
-    `.even .gradebook-cell.dropped { background-color: ${colors.light.orange}; }`,
-    `.odd .gradebook-cell.dropped { background-color: ${colors.dark.orange}; }`,
+    `.even .gradebook-cell.dropped { background-color: ${defaultColors.orange}; }`,
+    `.odd .gradebook-cell.dropped { background-color: ${darken(defaultColors.orange, 5)}; }`,
     '.slick-cell.editable .gradebook-cell.dropped { background-color: white; }',
-    `.even .gradebook-cell.excused { background-color: ${colors.light.yellow}; }`,
-    `.odd .gradebook-cell.excused { background-color: ${colors.dark.yellow}; }`,
+    `.even .gradebook-cell.excused { background-color: ${defaultColors.yellow}; }`,
+    `.odd .gradebook-cell.excused { background-color: ${darken(defaultColors.yellow, 5)}; }`,
     '.slick-cell.editable .gradebook-cell.excused { background-color: white; }'
   ].join(''));
   $fixtures.innerHTML = '';

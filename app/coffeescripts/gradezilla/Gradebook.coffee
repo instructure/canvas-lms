@@ -71,6 +71,7 @@ define [
   'jsx/gradezilla/default_gradebook/components/StatusesModal'
   'jsx/gradezilla/default_gradebook/components/SubmissionTray'
   'jsx/gradezilla/default_gradebook/components/GradebookSettingsModal'
+  'jsx/gradezilla/default_gradebook/constants/colors'
   'jsx/gradezilla/SISGradePassback/PostGradesStore'
   'jsx/gradezilla/SISGradePassback/PostGradesApp'
   'jsx/gradezilla/SubmissionStateMap'
@@ -106,7 +107,7 @@ define [
   CurveGradesDialogManager, GradebookApi, CellEditorFactory, GridSupport, studentRowHeaderConstants, AssignmentColumnHeader,
   AssignmentGroupColumnHeader, AssignmentRowCellPropFactory, CustomColumnHeader, StudentColumnHeader, StudentRowHeader,
   TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, ModuleFilter, GridColor, StatusesModal,
-  SubmissionTray, GradebookSettingsModal, PostGradesStore, PostGradesApp,  SubmissionStateMap,
+  SubmissionTray, GradebookSettingsModal, { statusColors }, PostGradesStore, PostGradesApp,  SubmissionStateMap,
   DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager, GroupTotalCellTemplate, SectionMenuView,
   GradingPeriodMenuView, GradebookKeyboardNav, AssignmentMuterDialogManager, assignmentHelper, { default: Button },
   { default: IconSettingsSolid }) ->
@@ -121,7 +122,7 @@ define [
     ReactDOM.render(component, mountPoint)
 
   ## Gradebook Display Settings
-  getInitialGridDisplaySettings = (settings) ->
+  getInitialGridDisplaySettings = (settings, colors) ->
     selectedPrimaryInfo = settings.student_column_display_as || studentRowHeaderConstants.defaultPrimaryInfo
 
     # in case of no user preference, determine the default value after @hasSections has resolved
@@ -141,6 +142,7 @@ define [
       Object.assign(filterColumnsBy, ConvertCase.camelize(settings.filter_columns_by))
 
     {
+      colors
       filterColumnsBy
       selectedPrimaryInfo
       selectedSecondaryInfo
@@ -210,7 +212,7 @@ define [
     # End of constructor
 
     loadSettings: ->
-      @gridDisplaySettings = getInitialGridDisplaySettings(@options.settings)
+      @gridDisplaySettings = getInitialGridDisplaySettings(@options.settings, @options.colors)
       @contentLoadStates = getInitialContentLoadStates()
       @courseContent = getInitialCourseContent()
       @headerComponentRefs = {}
@@ -1399,7 +1401,7 @@ define [
     renderGridColor: =>
       gridColorMountPoint = document.querySelector('[data-component="GridColor"]')
       gridColorProps =
-        colors: @options.colors
+        colors: @getGridColors()
       renderComponent(GridColor, gridColorMountPoint, gridColorProps)
 
     renderGradebookSettingsModal: =>
@@ -1429,6 +1431,8 @@ define [
       statusesModalMountPoint = document.querySelector("[data-component='StatusesModal']")
       statusesModalProps =
         onClose: => @viewOptionsMenu.focus()
+        colors: @getGridColors()
+        afterUpdateStatusColors: @updateGridColors
       @statusesModal = renderComponent(StatusesModal, statusesModalMountPoint, statusesModalProps)
 
     checkForUploadComplete: () ->
@@ -1769,7 +1773,8 @@ define [
       showUnpublishedAssignments = @showUnpublishedAssignments,
       studentColumnDisplayAs = @getSelectedPrimaryInfo(),
       studentColumnSecondaryInfo = @getSelectedSecondaryInfo(),
-      sortRowsBy = @getSortRowsBySetting()
+      sortRowsBy = @getSortRowsBySetting(),
+      colors = @getGridColors()
     } = {}, successFn, errorFn) =>
       selectedViewOptionsFilters.push('') unless selectedViewOptionsFilters.length > 0
       data =
@@ -1784,6 +1789,7 @@ define [
           sort_rows_by_column_id: sortRowsBy.columnId
           sort_rows_by_setting_key: sortRowsBy.settingKey
           sort_rows_by_direction: sortRowsBy.direction
+          colors: colors
 
       $.ajaxJSON(@options.settings_update_url, 'PUT', data, successFn, errorFn)
 
@@ -2518,6 +2524,20 @@ define [
 
     getSortRowsBySetting: =>
       @gridDisplaySettings.sortRowsBy
+
+    updateGridColors: (colors, successFn, errorFn) =>
+      setAndRenderColors = =>
+        @setGridColors(colors)
+        @renderGridColor()
+        successFn()
+
+      @saveSettings({ colors }, setAndRenderColors, errorFn)
+
+    setGridColors: (colors) =>
+      @gridDisplaySettings.colors = colors
+
+    getGridColors: =>
+      statusColors @gridDisplaySettings.colors
 
     listAvailableViewOptionsFilters: =>
       filters = []

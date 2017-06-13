@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import React from 'react'
+import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import ReactModal from 'react-modal'
 import I18n from 'i18n!calendar_color_picker'
@@ -43,6 +44,14 @@ import 'compiled/jquery.rails_flash_notifications'
     {hexcode: '#F06291', name: I18n.t('Light Pink')}
   ];
 
+  function shouldApplySwatchBorderColor (color) {
+    return this.props.withBoxShadow || this.state.currentColor !== color.hexcode
+  }
+
+  function shouldApplySelectedStyle (color) {
+    return this.state.currentColor === color.hexcode;
+  }
+
   var ColorPicker = React.createClass({
 
     // ===============
@@ -52,16 +61,39 @@ import 'compiled/jquery.rails_flash_notifications'
     displayName: 'ColorPicker',
 
     propTypes: {
+      parentComponent: PropTypes.string.isRequired,
+      colors: PropTypes.arrayOf(
+        PropTypes.shape({
+          hexcode: PropTypes.string.isRequired,
+          name: PropTypes.string.isRequired
+        }).isRequired
+      ),
       isOpen: PropTypes.bool,
       afterUpdateColor: PropTypes.func,
       afterClose: PropTypes.func,
-      assetString: PropTypes.string.isRequired,
+      assetString: (props, propName, componentName) => {
+        if (props.parentComponent === 'DashboardColorPicker' && props[propName] == null) {
+          return new Error(
+            `Invalid prop '${propName}' supplied to '${componentName}'. ` +
+            `Prop '${propName}' must be present when 'parentComponent' ` +
+            "is 'DashboardColorPicker'. Vaidation failed."
+          );
+        }
+        return undefined;
+      },
       hideOnScroll: PropTypes.bool,
       positions: PropTypes.object,
       nonModal: PropTypes.bool,
       hidePrompt: PropTypes.bool,
       currentColor: PropTypes.string,
-      nicknameInfo: PropTypes.object
+      nicknameInfo: PropTypes.object,
+      withAnimation: PropTypes.bool,
+      withArrow: PropTypes.bool,
+      withBorder: PropTypes.bool,
+      withBoxShadow: PropTypes.bool,
+      withDarkCheck: PropTypes.bool,
+      setStatusColor: PropTypes.func,
+      allowWhite: PropTypes.bool
     },
 
     // ===============
@@ -79,7 +111,15 @@ import 'compiled/jquery.rails_flash_notifications'
     getDefaultProps () {
       return {
         currentColor: "#efefef",
-        hideOnScroll: true
+        hideOnScroll: true,
+        withAnimation: true,
+        withArrow: true,
+        withBorder: true,
+        withBoxShadow: true,
+        withDarkCheck: false,
+        colors: PREDEFINED_COLORS,
+        setStatusColor: () => {},
+        allowWhite: false
       }
     },
 
@@ -113,7 +153,7 @@ import 'compiled/jquery.rails_flash_notifications'
       if (this.refs.courseNicknameEdit) {
         this.refs.courseNicknameEdit.focus();
       } else if (this.refs.colorSwatch0) {
-        this.refs.colorSwatch0.getDOMNode().focus();
+        ReactDOM.findDOMNode(this.refs.colorSwatch0).focus();
       }
     },
 
@@ -134,9 +174,7 @@ import 'compiled/jquery.rails_flash_notifications'
     },
 
     setCurrentColor (color) {
-      this.setState({
-        currentColor: color
-      });
+      this.setState({ currentColor: color });
     },
 
     setInputColor (event) {
@@ -165,10 +203,12 @@ import 'compiled/jquery.rails_flash_notifications'
     },
 
     isValidHex (color) {
-      // prevent selection of white (#fff or #ffffff)
-      const whiteHexRe = /^#?([fF]{3}|[fF]{6})$/;
-      if (whiteHexRe.test(color)) {
-        return false;
+      if (!this.props.allowWhite) {
+        // prevent selection of white (#fff or #ffffff)
+        const whiteHexRe = /^#?([fF]{3}|[fF]{6})$/;
+        if (whiteHexRe.test(color)) {
+          return false;
+        }
       }
 
       // ensure hex is valid
@@ -182,37 +222,39 @@ import 'compiled/jquery.rails_flash_notifications'
       }
     },
 
-    onApply (color, event) {
+    onApply (color, _event) {
+      const doneSaving = () => {
+        if (this.isMounted()) {
+          this.setState({ saveInProgress: false });
+        }
+      };
+
+      const handleSuccess = () => {
+        doneSaving();
+        this.closeModal();
+      };
+
+      const handleFailure = () => {
+        doneSaving();
+        $.flashError(I18n.t("Could not save '%{chosenColor}'", {chosenColor: color}));
+      };
+
       if (this.isValidHex(color)) {
-        this.setState({ saveInProgress: true });
-
-        const doneSaving = () => {
-          if (this.isMounted()) {
-            this.setState({
-              saveInProgress: false
-            });
+        this.setState({ saveInProgress: true }, () => {
+          // this is pretty hacky, however until ColorPicker is extracted into an instructure-ui
+          // component this is the simplest way to avoid extracting Course Color specific code
+          if (this.props.parentComponent === 'StatusColorListItem') {
+            this.props.setStatusColor(this.state.currentColor, handleSuccess, handleFailure);
+          } else {
+            // both API calls update the same User model and thus need to be performed serially
+            $.when(this.setColorForCalendar(color)).then( () => {
+              $.when(this.setCourseNickname()).then(
+                handleSuccess,
+                handleFailure
+              );
+            }, handleFailure);
           }
-        };
-
-        const handleSuccess = () => {
-          doneSaving();
-          this.closeModal();
-        };
-
-        const handleFailure = () => {
-          doneSaving();
-          $.flashError(I18n.t("Could not save '%{chosenColor}'", {chosenColor: this.state.currentColor}));
-        };
-
-        // both API calls update the same User model and thus need to be performed serially
-        $.when(this.setColorForCalendar(color)).then( () => {
-          $.when(this.setCourseNickname()).then(
-            handleSuccess,
-            handleFailure
-          );
-        },
-          handleFailure
-        );
+        });
       } else {
         $.flashWarning(I18n.t("'%{chosenColor}' is not a valid color.", {chosenColor: this.state.currentColor}));
       }
@@ -237,16 +279,26 @@ import 'compiled/jquery.rails_flash_notifications'
     },
 
     renderColorRows () {
-      return PREDEFINED_COLORS.map( (color, idx) => {
-        var colorSwatchStyle = {
-          borderColor: color.hexcode,
-          backgroundColor: color.hexcode
-        };
-
+      return this.props.colors.map( (color, idx) => {
+        var colorSwatchStyle = { backgroundColor: color.hexcode };
+        if (color.hexcode !== '#FFFFFF') {
+          if (shouldApplySwatchBorderColor.call(this, color)) {
+            colorSwatchStyle.borderColor = color.hexcode;
+          }
+        }
+        if (shouldApplySelectedStyle.call(this, color)) {
+          colorSwatchStyle.borderColor = '#73818C';
+          colorSwatchStyle.borderWidth = '2px';
+        }
         var title = color.name + ' (' + color.hexcode + ')';
         var ref = "colorSwatch" + idx;
+        const colorBlockStyles = classnames({
+          ColorPicker__ColorBlock: true,
+          'with-dark-check': this.props.withDarkCheck,
+          white: color.hexcode === '#FFFFFF'
+        })
         return (
-          <button className = "ColorPicker__ColorBlock"
+          <button className = {colorBlockStyles}
                   ref = {ref}
                   role = "radio"
                   aria-checked = {this.state.currentColor === color.hexcode}
@@ -303,10 +355,8 @@ import 'compiled/jquery.rails_flash_notifications'
              aria-hidden = "true"
              tabIndex = "-1"
         >
-        { !this.isValidHex(this.state.currentColor) ?
+        { !this.isValidHex(this.state.currentColor) &&
           <i className="icon-warning" role="presentation"></i>
-          :
-          null
         }
         </div>
       );
@@ -319,10 +369,18 @@ import 'compiled/jquery.rails_flash_notifications'
         'ic-Input--has-warning': !this.isValidHex(this.state.currentColor)
       });
 
+      const containerClasses = classnames({
+        ColorPicker__Container: true,
+        'with-animation': this.props.withAnimation,
+        'with-arrow': this.props.withArrow,
+        'with-border': this.props.withBorder,
+        'with-box-shadow': this.props.withBoxShadow
+      });
+
       var inputId = "ColorPickerCustomInput-" + this.props.assetString;
 
       return (
-        <div className="ColorPicker__Container" ref="pickerBody">
+        <div className={containerClasses} ref="pickerBody">
           {this.prompt()}
           {this.nicknameEdit()}
           <div className  = "ColorPicker__ColorContainer"

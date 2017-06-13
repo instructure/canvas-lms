@@ -19,89 +19,112 @@
 import React from 'react';
 import { mount, shallow } from 'enzyme';
 import GridColor from 'jsx/gradezilla/default_gradebook/components/GridColor';
-import { light, dark } from 'jsx/gradezilla/default_gradebook/constants/colors';
+import { darken, defaultColors, statusColors } from 'jsx/gradezilla/default_gradebook/constants/colors';
 
-QUnit.module('GridColor');
+function defaultProps (props = {}) {
+  return {
+    colors: statusColors(),
+    ...props
+  };
+}
+
+QUnit.module('GridColor', {
+  setup () {
+    this.wrapper = shallow(<GridColor colors={{}} />);
+  },
+  teardown () {
+    this.wrapper.unmount();
+  }
+});
 
 test('it renders style', function () {
-  const wrapper = shallow(<GridColor colors={{}} />);
-  strictEqual(wrapper.find('style[type="text/css"]').length, 1);
+  strictEqual(this.wrapper.find('style[type="text/css"]').length, 1);
 });
 
-test('it has light blue as a default color', function () {
-  const wrapper = mount(<GridColor colors={{}} />);
-  ok(wrapper.html().includes(light.blue));
+QUnit.module('GridColor rendered html', {
+  setup () {
+    this.wrapper = mount(<GridColor {...defaultProps()} />);
+  },
+  teardown () {
+    this.wrapper.unmount();
+  }
 });
 
-test('it has light purple as a default color', function () {
-  const wrapper = mount(<GridColor colors={{}} />);
-  ok(wrapper.html().includes(light.purple));
+test('it has blue as a default color', function () {
+  ok(this.wrapper.html().includes(defaultColors.blue));
 });
 
-test('it has light green as a default color', function () {
-  const wrapper = mount(<GridColor colors={{}} />);
-  ok(wrapper.html().includes(light.green));
+test('it has salmon as a default color', function () {
+  ok(this.wrapper.html().includes(defaultColors.salmon));
 });
 
-test('it has light orange as a default color', function () {
-  const wrapper = mount(<GridColor colors={{}} />);
-  ok(wrapper.html().includes(light.orange));
+test('it has green as a default color', function () {
+  ok(this.wrapper.html().includes(defaultColors.green));
 });
 
-test('it has light yellow as a default color', function () {
-  const wrapper = mount(<GridColor colors={{}} />);
-  ok(wrapper.html().includes(light.yellow));
+test('it has orange as a default color', function () {
+  ok(this.wrapper.html().includes(defaultColors.orange));
 });
 
-test('it has dark blue as a default color', function () {
-  const wrapper = mount(<GridColor colors={{}} />);
-  ok(wrapper.html().includes(dark.blue));
+test('it has yellow as a default color', function () {
+  ok(this.wrapper.html().includes(defaultColors.yellow));
 });
 
-test('it has dark purple as a default color', function () {
-  const wrapper = mount(<GridColor colors={{}} />);
-  ok(wrapper.html().includes(dark.purple));
+test('it has darker blue as a default color', function () {
+  const color = darken(defaultColors.blue, 5);
+  ok(this.wrapper.html().includes(color));
+});
+
+test('it has dark salmon as a default color', function () {
+  const color = darken(defaultColors.salmon, 5);
+  ok(this.wrapper.html().includes(color));
 });
 
 test('it has dark green as a default color', function () {
-  const wrapper = mount(<GridColor colors={{}} />);
-  ok(wrapper.html().includes(dark.green));
+  const color = darken(defaultColors.green, 5);
+  ok(this.wrapper.html().includes(color));
 });
 
 test('it has dark orange as a default color', function () {
-  const wrapper = mount(<GridColor colors={{}} />);
-  ok(wrapper.html().includes(dark.orange));
+  const color = darken(defaultColors.orange, 5);
+  ok(this.wrapper.html().includes(color));
 });
 
 test('it has dark yellow as a default color', function () {
-  const wrapper = mount(<GridColor colors={{}} />);
-  ok(wrapper.html().includes(dark.yellow));
+  const color = darken(defaultColors.yellow, 5);
+  ok(this.wrapper.html().includes(color));
 });
 
+QUnit.module('GridColor css rules');
+
 test('rules are for .gradebook-cell and .`statuses`', function () {
-  const wrapper = mount(<GridColor colors={{}} statuses={['late']} />);
+  const props = defaultProps({ statuses: ['late'] });
+  const wrapper = mount(<GridColor {...props} />);
   equal(wrapper.html(),
     '<style type="text/css">' +
-    `.even .gradebook-cell.late { background-color: ${light.blue}; }` +
-    `.odd .gradebook-cell.late { background-color: ${dark.blue}; }` +
+    `.even .gradebook-cell.late { background-color: ${defaultColors.blue}; }` +
+    `.odd .gradebook-cell.late { background-color: ${darken(defaultColors.blue, 5)}; }` +
     '.slick-cell.editable .gradebook-cell.late { background-color: white; }' +
     '</style>'
   );
+  wrapper.unmount();
 });
 
 test('multiple state rules are concatenated', function () {
-  const wrapper = shallow(<GridColor colors={{}} statuses={['late', 'missing']} />);
+  const props = defaultProps({ statuses: ['late', 'missing'] });
+  const wrapper = shallow(<GridColor {...props} />);
   const expected = (
     <style type="text/css">
       {
-        `.even .gradebook-cell.late { background-color: ${light.blue}; }` +
-        `.odd .gradebook-cell.late { background-color: ${dark.blue}; }` +
+        `.even .gradebook-cell.late { background-color: ${defaultColors.blue}; }` +
+        `.odd .gradebook-cell.late { background-color: ${darken(defaultColors.blue, 5)}; }` +
         '.slick-cell.editable .gradebook-cell.late { background-color: white; }' +
-        `.even .gradebook-cell.missing { background-color: ${light.purple}; }` +
-        `.odd .gradebook-cell.missing { background-color: ${dark.purple}; }` +
+        `.even .gradebook-cell.missing { background-color: ${defaultColors.salmon}; }` +
+        `.odd .gradebook-cell.missing { background-color: ${darken(defaultColors.salmon, 5)}; }` +
         '.slick-cell.editable .gradebook-cell.missing { background-color: white; }'
       }
     </style>
   );
   ok(wrapper.equals(expected));
+  wrapper.unmount();
 });

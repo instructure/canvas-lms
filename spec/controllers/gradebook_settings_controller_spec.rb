@@ -46,7 +46,14 @@ RSpec.describe GradebookSettingsController, type: :controller do
           "student_column_secondary_info" => "login_id",
           "sort_rows_by_column_id" => "student",
           "sort_rows_by_setting_key" => "sortable_name",
-          "sort_rows_by_direction" => "descending"
+          "sort_rows_by_direction" => "descending",
+          "colors" => {
+            "late" => "#000000",
+            "missing" => "#000001",
+            "resubmitted" => "#000002",
+            "dropped" => "#000003",
+            "excused" => "#000004"
+          }
         }
       end
       let(:valid_params) do
@@ -60,28 +67,36 @@ RSpec.describe GradebookSettingsController, type: :controller do
         put :update, valid_params
         expect(response).to be_ok
 
-        expected_settings = { @course.id => show_settings }
+        expected_settings = {
+          @course.id => show_settings.except("colors"),
+          colors: show_settings.fetch("colors")
+        }
         expect(teacher.preferences[:gradebook_settings]).to eq expected_settings
         expect(json_response["gradebook_settings"]).to eql expected_settings.as_json
       end
 
       it "allows saving gradebook settings for multiple courses" do
         previous_course = Course.create!(name: 'Previous Course')
-        teacher.preferences[:gradebook_settings] = { previous_course.id => show_settings }
-        teacher.save
+        teacher.preferences[:gradebook_settings] = {
+          previous_course.id => show_settings.except("colors"),
+          colors: show_settings.fetch("colors")
+        }
+        teacher.save!
 
-        put :update, valid_params.merge({ "course_id" => @course.id })
+        put :update, valid_params
 
         expected_user_settings = {
-          @course.id => show_settings,
-          previous_course.id => show_settings
+          @course.id => show_settings.except("colors"),
+          previous_course.id => show_settings.except("colors"),
+          colors: show_settings.fetch("colors")
         }
         expected_response = {
-          @course.id.to_s => show_settings
+          @course.id => show_settings.except("colors"),
+          colors: show_settings.fetch("colors")
         }
 
         expect(teacher.reload.preferences[:gradebook_settings]).to eq(expected_user_settings)
-        expect(json_response["gradebook_settings"]).to eq(expected_response)
+        expect(json_response["gradebook_settings"]).to eql(expected_response.as_json)
       end
 
       it "is allowed for courses in concluded enrollment terms" do
@@ -92,7 +107,10 @@ RSpec.describe GradebookSettingsController, type: :controller do
         put :update, valid_params
         expect(response).to be_ok
 
-        expected_settings = { @course.id => show_settings }
+        expected_settings = {
+          @course.id => show_settings.except("colors"),
+          colors: show_settings.fetch("colors")
+        }
         expect(teacher.preferences[:gradebook_settings]).to eq expected_settings
         expect(json_response["gradebook_settings"]).to eql expected_settings.as_json
       end
@@ -104,7 +122,10 @@ RSpec.describe GradebookSettingsController, type: :controller do
         put :update, valid_params
         expect(response).to be_ok
 
-        expected_settings = { @course.id => show_settings }
+        expected_settings = {
+          @course.id => show_settings.except("colors"),
+          colors: show_settings.fetch("colors")
+        }
         expect(teacher.preferences[:gradebook_settings]).to eq expected_settings
         expect(json_response["gradebook_settings"]).to eql expected_settings.as_json
       end
