@@ -474,6 +474,15 @@ describe Attachment do
       expect(a2.reload.crocodoc_document).to be_nil
     end
 
+    it 'should allow destroy_content_and_replace on children attachments' do
+      a = attachment_model(uploaded_data: default_uploaded_data)
+      a2 = attachment_model(root_attachment: a)
+      a2.destroy_content_and_replace
+      purgatory = Purgatory.where(attachment_id: [a.id, a2.id])
+      expect(purgatory.count).to eq 1
+      expect(purgatory.take.attachment_id).to eq a.id
+    end
+
     shared_examples_for "purgatory" do
       it 'should save file in purgatory and then restore and back again' do
         a = attachment_model(uploaded_data: default_uploaded_data)
