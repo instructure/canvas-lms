@@ -593,9 +593,6 @@ class AssignmentsApiController < ApplicationController
       return render json: { error: 'assignment does not exist' }, status: 400
     end
 
-    # Duplicating is basically creating, so the same authorization conditions
-    # appear on both
-    return unless authorized_action(old_assignment, @current_user, :create)
     if old_assignment.quiz
       return render json: { error: 'quiz duplication not implemented' }, status: 400
     end
@@ -604,8 +601,10 @@ class AssignmentsApiController < ApplicationController
       return render json: { error: 'discussion topic duplication not implemented' }, status: 400
     end
 
-    if old_assignment.wiki_page
-      return render json: { error: 'wiki page duplication not implemented' }, status: 400
+    return unless authorized_action(old_assignment, @current_user, :create)
+
+    if !@context.root_account.feature_enabled?(:duplicate_objects)
+      return render json: { error: 'duplicating objects not enabled' }, status: 400
     end
 
     new_assignment = old_assignment.duplicate

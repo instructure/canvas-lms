@@ -32,7 +32,7 @@ class WikiPage < ActiveRecord::Base
   include ContextModuleItem
   include Submittable
   include Plannable
-
+  include DuplicatingObjects
   include SearchTermHelper
 
   include MasterCourses::Restrictor
@@ -61,6 +61,10 @@ class WikiPage < ActiveRecord::Base
 
   scope :without_assignment_in_course, lambda { |course_ids|
     where(assignment_id: nil).joins(:course).where(courses: {id: course_ids})
+  }
+
+  scope :starting_with_title, lambda { |title|
+    where('title ILIKE ?', "#{title}%")
   }
 
   scope :not_ignored_by, -> (user, purpose) do
@@ -366,6 +370,11 @@ class WikiPage < ActiveRecord::Base
     res.flatten.uniq
   end
 
+  def get_potentially_conflicting_titles(title_base)
+    WikiPage.not_deleted.where(wiki_id: self.wiki_id).starting_with_title(title_base)
+      .pluck("title").to_set
+  end
+
   def to_atom(opts={})
     context = opts[:context]
     Atom::Entry.new do |entry|
@@ -414,6 +423,38 @@ class WikiPage < ActiveRecord::Base
     return unless wiki_pages.any?
     front_page_url = context.wiki.get_front_page_url
     wiki_pages.each{|wp| wp.can_unpublish = !(wp.url == front_page_url)}
+  end
+
+  # opts contains a set of related entities that should be duplicated.
+  # By default, all associated entities are duplicated.
+  def duplicate(opts = {})
+    # Don't clone a new record
+    return self if self.new_record?
+    default_opts = {
+      :duplicate_assignment => true,
+      :copy_title => nil
+    }
+    opts_with_default = default_opts.merge(opts)
+    result = WikiPage.new({
+      :title => opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy")),
+      :wiki_id => self.wiki_id,
+      :body => self.body,
+      :workflow_state => "unpublished",
+      :user_id => self.user_id,
+      :protected_editing => self.protected_editing,
+      :editing_roles => self.editing_roles,
+      :view_count => 0,
+      :todo_date => self.todo_date
+    })
+    if self.assignment
+      if opts_with_default[:duplicate_assignment]
+        result.assignment = self.assignment.duplicate({
+          :duplicate_wiki_page => false,
+          :copy_title => result.title
+        })
+      end
+    end
+    result
   end
 
   def initialize_wiki_page(user)

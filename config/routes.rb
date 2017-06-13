@@ -1518,6 +1518,7 @@ CanvasRails::Application.routes.draw do
       get "groups/:group_id/front_page", action: :show_front_page
       put "courses/:course_id/front_page", action: :update_front_page
       put "groups/:group_id/front_page", action: :update_front_page
+      post "courses/:course_id/pages/:url/duplicate", action: :duplicate
 
       get "courses/:course_id/pages", action: :index, as: 'course_wiki_pages'
       get "groups/:group_id/pages", action: :index, as: 'group_wiki_pages'

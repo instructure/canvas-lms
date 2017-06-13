@@ -562,15 +562,15 @@ define [
     notOk json.canDuplicate
     equal view.$('.duplicate_assignment').length, 0
 
-  test 'cannot duplicate when assignment is wiki page', ->
+  test 'can duplicate when assignment is wiki page', ->
     model = buildAssignment
       id: 1
       title: 'Foo'
       submission_types: ['wiki_page']
     view = createView(model, userIsAdmin: true, canManage: true, duplicateEnabled: true)
     json = view.toJSON()
-    notOk json.canDuplicate
-    equal view.$('.duplicate_assignment').length, 0
+    ok json.canDuplicate
+    equal view.$('.duplicate_assignment').length, 1
 
   test 'can move when userIsAdmin is true', ->
     view = createView(@model, userIsAdmin: true, canManage: false)

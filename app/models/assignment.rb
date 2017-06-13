@@ -35,6 +35,7 @@ class Assignment < ActiveRecord::Base
   include Canvas::DraftStateValidations
   include TurnitinID
   include Plannable
+  include DuplicatingObjects
 
   ALLOWED_GRADING_TYPES = %w(
     pass_fail percent letter_grade gpa_scale points not_graded
@@ -126,35 +127,66 @@ class Assignment < ActiveRecord::Base
     )
   end
 
-  # NOTE: This does not do a "deep copy", so any "has_" relations will
-  # not duplicate the other underlying entity.  In some cases this may
-  # result in unexpected behavior (though at least in the case of rubric,
-  # the UI is smart enough to forbid that)
-  #
+  def get_potentially_conflicting_titles(title_base)
+    assignment_titles = Assignment.active.for_course(self.context_id)
+      .starting_with_title(title_base).pluck("title").to_set
+    if self.wiki_page
+      wiki_titles = self.wiki_page.get_potentially_conflicting_titles(title_base)
+    else
+      wiki_titles = [].to_set
+    end
+    assignment_titles.union(wiki_titles)
+  end
+
   # The relevant associations that are copied are:
   #
-  # learning_outcome_alignments, rubric_association
+  # learning_outcome_alignments, rubric_association, wiki_page
+  #
+  # In the case of wiki_page, a new wiki_page will be created.  The underlying
+  # rubric association, however, will simply point to the original rubric
+  # rather than copying the rubric.
   #
   # Other has_ relations are not duplicated for various reasons.
   # These are:
   #
   # attachments, submissions, provisional_grades, lti stuff, discussion_topic
-  # ignores, moderated_grading_selections, wiki_page, teacher_enrollment
+  # ignores, moderated_grading_selections, teacher_enrollment
   # TODO: Try to get more of that stuff duplicated
-  def duplicate
+  def duplicate(opts = {})
+    # Don't clone a new record
+    return self if self.new_record?
+
+    default_opts = {
+      :duplicate_wiki_page => true,
+      :copy_title => nil
+    }
+    opts_with_default = default_opts.merge(opts)
+
     result = self.clone
+    result.migration_id = nil
     result.submissions.clear
     result.attachments.clear
     result.ignores.clear
     result.moderated_grading_selections.clear
     result.lti_context_id = nil
     result.discussion_topic = nil
-    result.wiki_page = nil
-    result.title = result.title + " " + t("Copy")
+    result.peer_review_count = 0
+    result.workflow_state = "unpublished"
+
+    result.title =
+      opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy"))
+
+    if self.wiki_page
+      if opts_with_default[:duplicate_wiki_page]
+        result.wiki_page = self.wiki_page.duplicate({
+          :duplicate_assignment => false,
+          :copy_title => result.title
+        })
+      end
+    end
     # Learning outcome alignments seem to get copied magically, possibly
     # through the rubric
     result.rubric_association = self.rubric_association.clone
-    result.workflow_state = "unpublished"
     result
   end
 
@@ -2000,6 +2032,10 @@ class Assignment < ActiveRecord::Base
 
   scope :with_submissions_for_user, lambda { |user|
     eager_load(:submissions).where(submissions: {user_id: user})
+  }
+
+  scope :starting_with_title, lambda { |title|
+    where('title ILIKE ?', "#{title}%")
   }
 
   scope :with_non_placeholder_submissions_for_user, lambda { |user|
