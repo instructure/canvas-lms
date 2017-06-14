@@ -49,7 +49,7 @@ module Gradebook
       f(".hide")
     end
 
-    def gp_dropdown
+    def grading_period_dropdown
       f(".grading-period-select-button")
     end
 
@@ -117,7 +117,7 @@ module Gradebook
     end
 
     def select_grading_period(grading_period_id)
-      gp_dropdown.click
+      grading_period_dropdown.click
       period = gp_menu_list.find do |item|
         f('label', item).attribute("for") == "period_option_#{grading_period_id}"
       end

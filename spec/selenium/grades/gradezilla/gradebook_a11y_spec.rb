@@ -82,7 +82,7 @@ describe "Gradezilla" do
     before { Gradezilla.visit(@course) }
 
     it 'returns focus to the view options menu after clicking the "Notes" option' do
-      Gradezilla.select_gradebook_view_option
+      Gradezilla.select_view_dropdown
       Gradezilla.select_notes_option
       expect(check_element_has_focus(Gradezilla.view_options_menu_selector)).to be true
     end

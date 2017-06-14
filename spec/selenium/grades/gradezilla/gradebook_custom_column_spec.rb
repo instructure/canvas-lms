@@ -50,17 +50,17 @@ describe "Gradezilla - custom columns" do
   it "lets you show and hide the teacher notes column", priority: "1", test_id: 3253279 do
     Gradezilla.visit(@course)
     # create the notes column
-    Gradezilla.select_gradebook_view_option
+    Gradezilla.select_view_dropdown
     Gradezilla.select_notes_option
     expect(Gradezilla.content_selector).to contain_css('.custom_column')
 
     # hide the notes column
-    Gradezilla.select_gradebook_view_option
+    Gradezilla.select_view_dropdown
     Gradezilla.select_notes_option
     expect(Gradezilla.content_selector).not_to contain_css('.custom_column')
 
     # show the notes column
-    Gradezilla.select_gradebook_view_option
+    Gradezilla.select_view_dropdown
     Gradezilla.select_notes_option
     expect(Gradezilla.content_selector).to contain_css('.custom_column')
   end

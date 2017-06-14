@@ -242,10 +242,10 @@ describe "Gradezilla editing grades" do
     context 'for assignments with at least one due date in a closed grading period' do
       before(:each) do
         user_session(@teacher)
+        show_grading_periods_filter(@teacher)
+
         Gradezilla.visit(@course)
 
-        Gradezilla.select_gradebook_view_option
-        Gradezilla.select_view_grading_period_filter
         Gradezilla.select_grading_period(0)
 
         Gradezilla.click_assignment_header_menu(@first_assignment.id)

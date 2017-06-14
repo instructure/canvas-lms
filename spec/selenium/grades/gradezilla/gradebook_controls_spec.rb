@@ -16,9 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../page_objects/gradezilla_page'
+require_relative '../setup/gradebook_setup'
 
 describe 'Gradebook Controls' do
   include_context "in-process server selenium tests"
+  include GradebookSetup
 
   before(:once) do
     course_with_teacher(active_all: true)
@@ -46,6 +48,53 @@ describe 'Gradebook Controls' do
       Gradezilla.visit(@course)
       Gradezilla.gradebook_dropdown_item_click("Learning Mastery")
       expect(fj('button:contains("Learning Mastery")')).to be_displayed
+    end
+  end
+
+  context 'using View dropdown' do
+    it 'shows Grading Period dropdown', test_id: 3253277, priority: '1' do
+      create_grading_periods('Fall Term')
+      associate_course_to_term("Fall Term")
+
+      Gradezilla.visit(@course)
+      Gradezilla.select_view_dropdown
+      Gradezilla.select_filters
+      Gradezilla.select_view_filter("Grading Periods")
+      expect(Gradezilla.grading_period_dropdown).to be_displayed
+    end
+
+    it 'shows Module dropdown', test_id: 3253275, priority: '1' do
+      @mods = Array.new(2) { |i| @course.context_modules.create! name: "Mod#{i}" }
+
+      Gradezilla.visit(@course)
+      Gradezilla.select_view_dropdown
+      Gradezilla.select_filters
+      Gradezilla.select_view_filter("Modules")
+
+      expect(Gradezilla.module_dropdown).to be_displayed
+    end
+
+    it 'shows Section dropdown', test_id: 3253276, priority: '1' do
+      @section1 = @course.course_sections.create!(name: 'Section One')
+
+      Gradezilla.visit(@course)
+      Gradezilla.select_view_dropdown
+      Gradezilla.select_filters
+      Gradezilla.select_view_filter("Sections")
+
+      expect(Gradezilla.section_dropdown).to be_displayed
+    end
+
+    it 'hides unpublished assignments', test_id: 3253282, priority: '1' do
+      title = "I am unpublished"
+      assign = @course.assignments.create! title: title
+      assign.unpublish
+
+      Gradezilla.visit(@course)
+      Gradezilla.select_view_dropdown
+      Gradezilla.select_show_unpublished_assignments
+
+      expect(Gradezilla.content_selector).not_to contain_css('.assignment-name')
     end
   end
 end

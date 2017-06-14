@@ -110,10 +110,6 @@ class Gradezilla
       fj(GRADEBOOK_MENU_SELECTOR + ':visible')
     end
 
-    def gp_dropdown
-      f(".grading-period-select-button")
-    end
-
     def gp_menu_list
       ff("#grading-period-to-show-menu li")
     end
@@ -175,17 +171,28 @@ class Gradezilla
     end
 
     def filters_element
-      fj('[role=button] span:contains(Filters)')
+      fj('li:contains(Filters)')
     end
 
-    def grading_period_filter_element
-      fj('span[role=menuitemcheckbox] span:contains(Grading Periods)')
+    def show_grading_period_filter_element
+      fj('li:contains("Grading Periods")')
+    end
+
+    def show_module_filter_element
+      fj('li li:contains("Modules")')
+    end
+
+    def show_section_filter_element
+      fj('li:contains("Sections")')
+    end
+
+    def show_unpublished_assignments
+      fj('li li:contains("Unpublished Assignments")')
     end
 
     public
 
     # actions
-
     def visit(course)
       Account.default.enable_feature!(:new_gradebook)
       get "/courses/#{course.id}/gradebook/change_gradebook_version?version=gradezilla"
@@ -218,7 +225,7 @@ class Gradezilla
     end
 
     def select_grading_period(grading_period_id)
-      gp_dropdown.click
+      grading_period_dropdown.click
       period = gp_menu_list.find do |item|
         f('label', item).attribute("for") == "period_option_#{grading_period_id}"
       end
@@ -322,7 +329,7 @@ class Gradezilla
       view_menu
     end
 
-    def select_gradebook_view_option
+    def select_view_dropdown
       view_options_menu_selector.click
     end
 
@@ -393,6 +400,18 @@ class Gradezilla
       f("#content")
     end
 
+    def grading_period_dropdown
+      f(".grading-period-select-button")
+    end
+
+    def section_dropdown
+      f(".section-select-button")
+    end
+
+    def module_dropdown
+      fj('button:contains("Module")')
+    end
+
     def gradebook_dropdown_item_click(menu_item_name)
       gradebook_menu_element.click
 
@@ -443,10 +462,22 @@ class Gradezilla
       assignment_header_warning_icon_element
     end
 
-    # methods
-    def select_view_grading_period_filter
+    def select_filters
       filters_element.click
-      grading_period_filter_element.click
+    end
+
+    def select_view_filter(filter)
+      if filter == "Grading Periods"
+        show_grading_period_filter_element.click
+      elsif filter == "Modules"
+        show_module_filter_element.click
+      elsif filter == "Sections"
+        show_section_filter_element.click
+      end
+    end
+
+    def select_show_unpublished_assignments
+      show_unpublished_assignments.click
     end
 
     def click_assignment_header_menu(assignment_id)
