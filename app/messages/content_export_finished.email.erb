@@ -1,6 +1,6 @@
 <% define_content :link do %>
   <% link = if asset.is_a? WebZipExport %>
-      <% course_offline_web_exports_path(asset.course) %>
+      <% course_offline_web_exports_url(asset.course) %>
     <% elsif asset.is_a? EpubExport %>
       <% epub_exports_url %>
     <% else %>
