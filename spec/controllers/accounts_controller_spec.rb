@@ -654,8 +654,8 @@ describe AccountsController do
   describe "#account_courses" do
     before do
       @account = Account.create!
-      @c1 = course_factory(account: @account, name: "foo")
-      @c2 = course_factory(account: @account, name: "bar")
+      @c1 = course_factory(account: @account, course_name: "foo", sis_source_id: 42)
+      @c2 = course_factory(account: @account, course_name: "bar", sis_source_id: 31)
     end
 
     it "should not allow get a list of courses with no permissions" do
@@ -688,5 +688,212 @@ describe AccountsController do
       expect(response).to be_success
       expect(response.body).not_to match(/sections/)
     end
+
+    it "should be able to sort courses by name ascending" do
+      @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
+      @c4 = course_factory(account: @account, course_name: "xylophone", sis_source_id: 52)
+      admin_logged_in(@account)
+      get 'courses_api', :account_id => @account.id, :sort => "course_name", :order => "asc"
+
+      expect(response).to be_success
+      expect(response.body).to match(/\"name\":\"apple\".+\"name\":\"bar\".+\"name\":\"foo\".+\"name\":\"xylophone\"/)
+    end
+
+    it "should be able to sort courses by name descending" do
+      @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
+      @c4 = course_factory(account: @account, course_name: "xylophone", sis_source_id: 52)
+      admin_logged_in(@account)
+      get 'courses_api', :account_id => @account.id, :sort => "course_name", :order => "desc"
+
+      expect(response).to be_success
+      expect(response.body).to match(/\"name\":\"xylophone\".+\"name\":\"foo\".+\"name\":\"bar\".+\"name\":\"apple\"/)
+    end
+
+    it "should be able to sort courses by id ascending" do
+      @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
+      @c4 = course_factory(account: @account, course_name: "xylophone", sis_source_id: 52)
+      admin_logged_in(@account)
+      get 'courses_api', :account_id => @account.id, :sort => "sis_course_id", :order => "asc"
+
+      expect(response).to be_success
+      expect(response.body).to match(/\"sis_course_id\":\"30\".+\"sis_course_id\":\"31\".+\"sis_course_id\":\"42\".+\"sis_course_id\":\"52\"/)
+    end
+
+    it "should be able to sort courses by id descending" do
+      @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
+      @c4 = course_factory(account: @account, course_name: "xylophone", sis_source_id: 52)
+      admin_logged_in(@account)
+      get 'courses_api', :account_id => @account.id, :sort => "sis_course_id", :order => "desc"
+
+      expect(response).to be_success
+      expect(response.body).to match(/\"sis_course_id\":\"52\".+\"sis_course_id\":\"42\".+\"sis_course_id\":\"31\".+\"sis_course_id\":\"30\"/)
+    end
+
+    it "should be able to sort courses by teacher ascending" do
+      @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
+
+      user = @c3.shard.activate { user_factory(name: 'Zach Zachary') }
+      enrollment = @c3.enroll_user(user, 'TeacherEnrollment')
+      user.save!
+      enrollment.course = @c3
+      enrollment.workflow_state = 'active'
+      enrollment.save!
+      @c3.reload
+
+      user2 = @c3.shard.activate { user_factory(name: 'Example Another') }
+      enrollment2 = @c3.enroll_user(user2, 'TeacherEnrollment')
+      user2.save!
+      enrollment2.course = @c3
+      enrollment2.workflow_state = 'active'
+      enrollment2.save!
+      @c3.reload
+
+      @c4 = course_with_teacher(name: 'Teach Teacherson', course: course_factory(account: @account, course_name: "xylophone", sis_source_id: 52))
+
+      admin_logged_in(@account)
+      get 'courses_api', :account_id => @account.id, :sort => "teacher", :order => "asc"
+
+      expect(response).to be_success
+      expect(response.body).to match(/\"name\":\"apple\".+\"name\":\"xylophone\".+\"name\":\"foo\".+\"name\":\"bar\"/)
+    end
+
+    it "should be able to sort courses by teacher descending" do
+      @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
+
+      user = @c3.shard.activate { user_factory(name: 'Zach Zachary') }
+      enrollment = @c3.enroll_user(user, 'TeacherEnrollment')
+      user.save!
+      enrollment.course = @c3
+      enrollment.workflow_state = 'active'
+      enrollment.save!
+      @c3.reload
+
+      user2 = @c3.shard.activate { user_factory(name: 'Example Another') }
+      enrollment2 = @c3.enroll_user(user2, 'TeacherEnrollment')
+      user2.save!
+      enrollment2.course = @c3
+      enrollment2.workflow_state = 'active'
+      enrollment2.save!
+      @c3.reload
+
+      @c4 = course_with_teacher(name: 'Teach Teacherson', course: course_factory(account: @account, course_name: "xylophone", sis_source_id: 52))
+
+      admin_logged_in(@account)
+      get 'courses_api', :account_id => @account.id, :sort => "teacher", :order => "desc"
+
+      expect(response).to be_success
+      expect(response.body).to match(/\"name\":\"bar\".+\"name\":\"foo\".+\"name\":\"xylophone\".+\"name\":\"apple\"/)
+    end
+
+    it "should be able to sort courses by subaccount ascending" do
+      @account.name = "Default"
+      @account.save
+
+      @a3 = Account.create!
+      @a3.name = "Whatever University"
+      @a3.root_account_id = @account.id
+      @a3.parent_account_id = @account.id
+      @a3.workflow_state = 'active'
+      @a3.save
+
+      @a4 = Account.create!
+      @a4.name = "A University"
+      @a4.root_account_id = @account.id
+      @a4.parent_account_id = @account.id
+      @a4.workflow_state = 'active'
+      @a4.save
+
+      @c3 = course_factory(account: @a3, course_name: "apple", sis_source_id: 30)
+      @c4 = course_factory(account: @a4, course_name: "xylophone", sis_source_id: 52)
+      admin_logged_in(@account)
+      get 'courses_api', :account_id => @account.id, :sort => "subaccount", :order => "asc"
+
+      expect(response).to be_success
+      expect(response.body).to match(/\"sis_course_id\":\"52\".+\"sis_course_id\":\"42\".+\"sis_course_id\":\"31\".+\"sis_course_id\":\"30\"/)
+    end
+
+    it "should be able to sort courses by subaccount descending" do
+      @account.name = "Default"
+      @account.save
+
+      @a3 = Account.create!
+      @a3.name = "Whatever University"
+      @a3.root_account_id = @account.id
+      @a3.parent_account_id = @account.id
+      @a3.workflow_state = 'active'
+      @a3.save
+
+      @a4 = Account.create!
+      @a4.name = "A University"
+      @a4.root_account_id = @account.id
+      @a4.parent_account_id = @account.id
+      @a4.workflow_state = 'active'
+      @a4.save
+
+      @c3 = course_factory(account: @a3, course_name: "apple", sis_source_id: 30)
+      @c4 = course_factory(account: @a4, course_name: "xylophone", sis_source_id: 52)
+      admin_logged_in(@account)
+      get 'courses_api', :account_id => @account.id, :sort => "subaccount", :order => "desc"
+
+      expect(response).to be_success
+      expect(response.body).to match(/\"sis_course_id\":\"30\".+\"sis_course_id\":\"31\".+\"sis_course_id\":\"42\".+\"sis_course_id\":\"52\"/)
+    end
+
+    it "should be able to sort courses by enrollments ascending" do
+      @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
+
+      user = @c3.shard.activate { user_factory() }
+      enrollment = @c3.enroll_user(user, 'StudentEnrollment')
+      user.save!
+      enrollment.course = @c3
+      enrollment.workflow_state = 'active'
+      enrollment.save!
+      @c3.reload
+
+      user2 = @c3.shard.activate { user_factory() }
+      enrollment2 = @c3.enroll_user(user2, 'StudentEnrollment')
+      user2.save!
+      enrollment2.course = @c3
+      enrollment2.workflow_state = 'active'
+      enrollment2.save!
+      @c3.reload
+
+      @c4 = course_with_student(course: course_factory(account: @account, course_name: "xylophone", sis_source_id: 52))
+
+      admin_logged_in(@account)
+      get 'courses_api', :account_id => @account.id, :sort => "enrollments", :order => "asc"
+
+      expect(response).to be_success
+      expect(response.body).to match(/\"name\":\"foo\".+\"name\":\"bar\".+\"name\":\"xylophone\".+\"name\":\"apple\"/)
+    end
+
+    it "should be able to sort courses by enrollments descending" do
+      @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
+
+      user = @c3.shard.activate { user_factory() }
+      enrollment = @c3.enroll_user(user, 'StudentEnrollment')
+      user.save!
+      enrollment.course = @c3 
+      enrollment.workflow_state = 'active'
+      enrollment.save!
+      @c3.reload
+
+      user2 = @c3.shard.activate { user_factory() }
+      enrollment2 = @c3.enroll_user(user2, 'StudentEnrollment')
+      user2.save!
+      enrollment2.course = @c3
+      enrollment2.workflow_state = 'active'
+      enrollment2.save!
+      @c3.reload
+
+      @c4 = course_with_student(course: course_factory(account: @account, course_name: "xylophone", sis_source_id: 52))
+
+      admin_logged_in(@account)
+      get 'courses_api', :account_id => @account.id, :sort => "enrollments", :order => "desc"
+
+      expect(response).to be_success
+      expect(response.body).to match(/\"name\":\"apple\".+\"name\":\"xylophone\".+\"name\":\"bar\".+\"name\":\"foo\"/)
+    end
+
   end
 end

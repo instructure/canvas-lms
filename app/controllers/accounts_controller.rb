@@ -330,6 +330,12 @@ class AccountsController < ApplicationController
   #   - All explanations can be seen in the {api:CoursesController#index Course API index documentation}
   #   - "sections", "needs_grading_count" and "total_scores" are not valid options at the account level
   #
+  # @argument sort [String, "course_name"|"sis_course_id"|"teacher"|"subaccount"|"enrollments"]
+  #   The column to sort results by.
+  #
+  # @argument order [String, "asc"|"desc"]
+  #   The order to sort the given column by.
+  #
   # @returns [Course]
   def courses_api
     return unless authorized_action(@account, @current_user, :read_course_list)
@@ -342,7 +348,39 @@ class AccountsController < ApplicationController
       params[:state] -= %w{available}
     end
 
-    @courses = @account.associated_courses.order(:id).where(:workflow_state => params[:state])
+    order = if params[:sort] == 'course_name'
+              "name, id"
+            elsif params[:sort] == 'sis_course_id'
+              "#{Course.quoted_table_name}.sis_source_id, id"
+            elsif params[:sort] == 'teacher'
+              "(SELECT sortable_name FROM #{User.quoted_table_name}
+                JOIN #{Enrollment.quoted_table_name} on #{User.quoted_table_name}.id
+                = #{Enrollment.quoted_table_name}.user_id
+                WHERE #{Enrollment.quoted_table_name}.workflow_state <> 'deleted'
+                AND #{Enrollment.quoted_table_name}.type = 'TeacherEnrollment'
+                AND #{Enrollment.quoted_table_name}.course_id = #{Course.quoted_table_name}.id
+                ORDER BY #{User.quoted_table_name}.sortable_name
+                LIMIT 1), id"
+            elsif params[:sort] == 'enrollments'
+              "(SELECT DISTINCT COUNT(DISTINCT #{Enrollment.quoted_table_name}.user_id)
+                AS count_user_id FROM #{Enrollment.quoted_table_name}
+                WHERE #{Enrollment.quoted_table_name}.type = 'StudentEnrollment'
+                AND (#{Enrollment.quoted_table_name}.workflow_state
+                NOT IN ('rejected', 'completed', 'deleted', 'inactive'))
+                AND #{Enrollment.quoted_table_name}.course_id
+                = #{Course.quoted_table_name}.id)
+                #{params[:order] == 'desc' ? 'DESC, id DESC' : 'ASC, id ASC'}"
+            elsif params[:sort] == 'subaccount' 
+                "(SELECT #{Account.quoted_table_name}.name FROM #{Account.quoted_table_name}
+                WHERE #{Account.quoted_table_name}.id
+                = #{Course.quoted_table_name}.account_id), id"
+            else
+              "id"
+            end
+
+    @courses = @account.associated_courses.order(order).where(:workflow_state => params[:state])
+    @courses = @courses.reverse_order if params[:order] == 'desc' && params[:sort] != 'enrollments'
+
     if params[:hide_enrollmentless_courses] || value_to_boolean(params[:with_enrollments])
       @courses = @courses.with_enrollments
     elsif !params[:with_enrollments].nil? && !value_to_boolean(params[:with_enrollments])

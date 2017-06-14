@@ -30,6 +30,8 @@ import createStore from './createStore'
       } else {
         payload = Object.assign({}, params)
       }
+      if (params.sort) payload.sort = params.sort
+      if (params.order) payload.order = params.order
       payload.include = ['last_login', 'avatar_url', 'email', 'time_zone']
       return payload
     }
