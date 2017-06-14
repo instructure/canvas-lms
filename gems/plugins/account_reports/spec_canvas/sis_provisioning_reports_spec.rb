@@ -920,6 +920,32 @@ describe "Default Account Reports" do
                                  "teacher", teacher_role.id.to_s, @enrollment6.course_section_id.to_s,
                                  nil, "deleted", nil, nil, "true", 'TeacherEnrollment', "false"]
       end
+
+      describe "sharding" do
+        specs_require_sharding
+
+        it "should run with cross shard pseudonyms" do
+          @shard1.activate do
+            @root = Account.create
+            @user = user_with_managed_pseudonym(active_all: true, account: @root, name: 'Jimmy John',
+                                                username: 'other_shard@example.com', sis_user_id: 'other_shard')
+          end
+          @account.stubs(:trusted_account_ids).returns([@account.id, @root.id])
+          @account.stubs(:trust_exists?).returns(true)
+          @course1.enroll_user(@user)
+
+          parameters = {}
+          parameters["enrollments"] = true
+          parsed = read_report("provisioning_csv", {params: parameters, order: [3, 1, 8]})
+          expect(parsed.length).to eq 10
+
+          expect(parsed[0]).to eq [@course1.id.to_s, "SIS_COURSE_ID_1", @user.id.to_s,
+                                   'other_shard', "student", student_role.id.to_s,
+                                   @course1.enrollments.where(user_id: @user).take.course_section_id.to_s,
+                                   nil, "invited", nil, nil, "false", 'StudentEnrollment',
+                                   "false", HostUrl.context_host(@root)]
+        end
+      end
     end
 
     describe "Groups" do
