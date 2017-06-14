@@ -42,26 +42,22 @@ describe "Gradezilla" do
   end
 
   it 'filters students', priority: "1", test_id: 210018 do
-    visible_students = -> { ff('.student-name') }
     Gradezilla.visit(@course)
-    expect(visible_students.call).to have_size @all_students.size
-    f('.gradebook_filter input').send_keys 'student 1'
+    expect(Gradezilla.fetch_student_names.size).to eq(@all_students.size)
+    f('.gradebook_filter input').send_keys @course.students[0].name
     sleep 1 # InputFilter has a delay
-    visible_after_filtering = visible_students.call
-    expect(visible_after_filtering).to have_size 1
-    expect(visible_after_filtering[0]).to include_text 'student 1'
+    expect(Gradezilla.fetch_student_names.size).to eq(1)
+    expect(Gradezilla.fetch_student_names[0]).to eq(@course.students[0].name)
   end
 
   it "validates correct number of students showing up in gradebook", priority: "1", test_id: 210019 do
     Gradezilla.visit(@course)
-
-    expect(ff('.student-name')).to have_size @course.students.count
+    expect(Gradezilla.fetch_student_names.size).to eq(@course.students.count)
   end
 
   it "shows students sorted by their sortable_name", priority: "1", test_id: 210022 do
     Gradezilla.visit(@course)
-    dom_names = ff('.student-name').map(&:text)
-    expect(dom_names).to eq @all_students.map(&:name)
+    expect(Gradezilla.fetch_student_names).to eq @all_students.map(&:name)
   end
 
   context "muting/un-muting assignment" do
@@ -69,6 +65,7 @@ describe "Gradezilla" do
       Gradezilla.visit(@course)
       Gradezilla.toggle_assignment_muting(@second_assignment.id)
     end
+
     it "handles muting correctly", priority: "1", test_id: 164227 do
       # TODO "change test ids when Gradezilla test cases are created"
       expect(fj(Gradezilla.assignment_header_mute_icon_selector(@second_assignment.id))).to be_displayed

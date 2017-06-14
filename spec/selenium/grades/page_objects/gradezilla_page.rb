@@ -37,7 +37,7 @@ class Gradezilla
     ACTION_MENU_ITEM_SELECTOR = 'body [data-menu-id="%s"]'.freeze
 
     # Menu Items
-    MENU_ITEM_SELECTOR = '[data-menu-item-id="%s"]'.freeze
+    MENU_ITEM_SELECTOR = 'span[data-menu-item-id="%s"]'.freeze
 
     def gradebook_settings_cog
       f('#gradebook_settings')
@@ -52,9 +52,9 @@ class Gradezilla
     end
 
     # ---------------------NEW-----------------------
-    # elements
+    # assignment header column elements
     def assignment_header_menu_element(id)
-      f(".container_1 .slick-header-columns .slick-header-column[id*='assignment_#{id}'] .Gradebook__ColumnHeaderAction[id*='PopoverMenu']")
+      f(".slick-header-column[id*='assignment_#{id}'] .Gradebook__ColumnHeaderAction[id*='PopoverMenu']")
     end
 
     def assignment_header_menu_item_element(item_name)
@@ -62,7 +62,7 @@ class Gradezilla
     end
 
     def assignment_header_menu_sort_by_element
-      fj('[role=menu][aria-labelledby*=PopoverMenu] button:contains("Sort by")')
+      fj('button:contains("Sort by")')
     end
 
     def assignment_header_sort_by_item_element(item)
@@ -81,6 +81,34 @@ class Gradezilla
       ff('.Gradebook__ColumnHeaderDetail svg[name="IconWarningSolid"]')
     end
 
+    # student header column elements
+    def student_column_menu
+      f("span .Gradebook__ColumnHeaderAction")
+    end
+
+    def student_header_menu_main_element(menu)
+      fj("[role=menu][aria-labelledby*=PopoverMenu] button:contains('#{menu}')")
+    end
+
+    def student_header_submenu_item_element(sub_menu_item)
+      fj("[role=menuitemradio]:contains('#{sub_menu_item}')")
+    end
+
+    def student_header_show_menu_option(menu_item)
+      fj("[role=menuitemcheckbox]:contains(#{menu_item})")
+    end
+
+    def student_names
+      ff('.student-name')
+    end
+
+    def student_column_cell_element(x,y)
+      f("div .slick-cell.l#{x}.r#{y}.meta-cell")
+    end
+
+    def assignment_group_options_element(group_name)
+      fj(".Gradebook__ColumnHeaderAction span:contains(#{group_name})")
+    end
     # ---------------------END NEW-----------------------
 
     def menu_container(container_id)
@@ -90,16 +118,8 @@ class Gradezilla
       f(selector)
     end
 
-    def student_names
-      ff('.student-name')
-    end
-
     def gradebook_menu(name)
       ff(".gradebook-menus [data-component]").find { |el| el.text.strip =~ /#{name}/ }
-    end
-
-    def student_column_menu
-      f(STUDENT_COLUMN_MENU_SELECTOR)
     end
 
     def action_menu_item(name)
@@ -120,10 +140,6 @@ class Gradezilla
 
     def dialog_save_mute_setting
       f("button[data-action$='mute']")
-    end
-
-    def gradebook_menu_open
-      gradebook_menu.click
     end
 
     def link_previous_grade_export
@@ -164,10 +180,6 @@ class Gradezilla
 
     def gradebook_settings_button
       f('#gradebook-settings-button')
-    end
-
-    def student_header_show_menu_option(menu_item)
-      fj("[role=menuitemcheckbox]:contains(#{menu_item})")
     end
 
     def filters_element
@@ -267,10 +279,6 @@ class Gradezilla
       cell.text == grade
     end
 
-    def open_student_column_menu
-      student_column_menu.click
-    end
-
     def open_action_menu
       action_menu.click
     end
@@ -297,10 +305,6 @@ class Gradezilla
 
     def select_previous_grade_export
       link_previous_grade_export.click
-    end
-
-    def fetch_student_names
-      student_names.map(&:text)
     end
 
     def header_selector_by_col_index(n)
@@ -331,9 +335,7 @@ class Gradezilla
 
     def open_view_menu_and_arrange_by_menu
       view_menu = open_gradebook_menu('View')
-      trigger = ff('button', view_menu).find {
-        |element| element.text == "Arrange By"
-      }
+      trigger = ff('button', view_menu).find { |element| element.text == "Arrange By" }
       trigger.click
       view_menu
     end
@@ -441,11 +443,67 @@ class Gradezilla
       ".cannot_edit"
     end
 
-    def student_header_menu_option_selector(name)
+    # -----------------------NEW-----------------------
+
+    # STUDENT COLUMN HEADER OPTIONS
+    def student_header_menu_option_select(name)
       student_header_show_menu_option(name).click
     end
 
-    # ----------------------NEW----------------------------
+    def click_student_menu_sort_by(menu_option)
+      student_column_menu.click
+      scroll_page_to_top
+      # sort by scrolls out of view and does not get selected correctly on jenkins, so..
+      ff("[role=menu][aria-labelledby*=PopoverMenu] [role=button]")[0].click
+      if menu_option == "A-Z"
+        student_header_submenu_item_element('A–Z').click
+      elsif menu_option == "Z-A"
+        student_header_submenu_item_element('Z–A').click
+      end
+    end
+
+    def click_student_menu_display_as(menu_option)
+      student_column_menu.click
+      student_header_menu_main_element("Display as").click
+
+      if menu_option == "First,Last"
+        student_header_submenu_item_element('First, Last Name').click
+      elsif menu_option == "Last,First"
+        student_header_submenu_item_element('Last, First Name').click
+      elsif menu_option == "Anonymous"
+        student_header_submenu_item_element('Anonymous').click
+      end
+    end
+
+    def click_student_menu_secondary_info(menu_option)
+      student_column_menu.click
+      student_header_menu_main_element("Secondary info").click
+
+      if menu_option == "Section"
+        student_header_submenu_item_element('Section').click
+      elsif menu_option == "SIS"
+        student_header_submenu_item_element('SIS ID').click
+      elsif menu_option == "Login"
+        student_header_submenu_item_element('Login ID').click
+      elsif menu_option == "None"
+        student_header_submenu_item_element('None').click
+      end
+    end
+
+    def click_student_header_menu_show_option(name)
+      student_column_menu.click
+      student_header_show_menu_option(name).click
+    end
+
+    def fetch_student_names
+      student_names.map(&:text)
+    end
+
+    def student_column_cell_select(x,y)
+      student_column_cell_element(x,y)
+    end
+
+    # ASSIGNMENT COLUMN HEADER OPTIONS
     # css selectors
     def assignment_header_menu_selector(id)
       assignment_header_menu_element(id)
@@ -496,15 +554,15 @@ class Gradezilla
     def click_assignment_header_menu_element(menuitem)
       menu_item_id = ""
 
-      if menuitem =~ /message(\-?\s?student)?/i
+      if menuitem =~ /(message(\-?\s?student)?)/i
         menu_item_id = 'message-students-who'
-      elsif menuitem =~ /curve(\-?\s?grade)?/i
+      elsif menuitem =~ /(curve(\-?\s?grade)?)/i
         menu_item_id = 'curve-grades'
-      elsif menuitem =~ /set(\-?\s?default\-?\s?grade)?/i
+      elsif menuitem =~ /(set(\-?\s?default\-?\s?grade)?)/i
         menu_item_id = 'set-default-grade'
-      elsif menuitem =~ /mute/i
+      elsif menuitem =~ /(mute)/i
         menu_item_id = 'assignment-muter'
-      elsif menuitem =~ /download(\-?\s?submission)?/i
+      elsif menuitem =~ /(download(\-?\s?submission)?)/i
         menu_item_id = 'download-submissions'
       end
       assignment_header_menu_item_element(menu_item_id).click
@@ -514,15 +572,15 @@ class Gradezilla
       assignment_header_menu_sort_by_element.click
       sort_by_item = ""
 
-      if sort_type =~ /low[\s\-]to[\s\-]high/i
+      if sort_type =~ /(low[\s\-]to[\s\-]high)/i
         sort_by_item = 'Grade - Low to High'
-      elsif sort_type =~ /high[\s\-]to[\s\-]low/i
+      elsif sort_type =~ /(high[\s\-]to[\s\-]low)/i
         sort_by_item = 'Grade - High to Low'
-      elsif sort_type =~ /missing/i
+      elsif sort_type =~ /(missing)/i
         sort_by_item = 'Missing'
-      elsif sort_type =~ /late/i
+      elsif sort_type =~ /(late)/i
         sort_by_item = 'Late'
-      elsif sort_type =~ /unposted/i
+      elsif sort_type =~ /(unposted)/i
         sort_by_item = 'Unposted'
       end
       assignment_header_sort_by_item_element(sort_by_item).click
@@ -536,6 +594,7 @@ class Gradezilla
       assignment_header_cell_label_element(name)
     end
 
+    # assignment mute toggle
     def toggle_assignment_muting(assignment_id)
       click_assignment_header_menu(assignment_id)
       click_assignment_header_menu_element('mute')

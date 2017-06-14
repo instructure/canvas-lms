@@ -19,57 +19,40 @@ require_relative '../../helpers/gradezilla_common'
 require_relative '../../helpers/assignment_overrides'
 require_relative '../page_objects/gradezilla_page'
 
-describe "Gradezilla - arrange by assignment group" do
+describe "Gradezilla view menu" do
   include_context "in-process server selenium tests"
   include AssignmentOverridesSeleniumHelper
   include GradezillaCommon
 
-  before(:once) do
-    gradebook_data_setup
-    @assignment = @course.assignments.first
-  end
+  before(:once) { gradebook_data_setup }
+  before(:each) { user_session(@teacher) }
 
-  before(:each) do
-    user_session(@teacher)
-    Gradezilla.visit(@course)
-  end
+  context "sort by assignment group order" do
+    before(:each) do
+      Gradezilla.visit(@course)
+    end
 
-  it "defaults arrange by to assignment group in the grid", priority: "1", test_id: 220028 do
-    first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    expect(first_row_cells[0]).to include_text @assignment_1_points
-    expect(first_row_cells[1]).to include_text @assignment_2_points
-    expect(first_row_cells[2]).to include_text "-"
-  end
+    it "defaults arrange by to assignment group in the grid", priority: "1", test_id: 220028 do
+      first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
+      expect(first_row_cells[0]).to include_text @assignment_1_points
+      expect(first_row_cells[1]).to include_text @assignment_2_points
+      expect(first_row_cells[2]).to include_text "-"
+    end
 
-  it "shows default arrange by in the view menu" do
-    Gradezilla.open_view_menu_and_arrange_by_menu
+    it "shows default arrange by in the menu" do
+      Gradezilla.open_view_menu_and_arrange_by_menu
 
-    expect(Gradezilla.popover_menu_item('Default Order').attribute('aria-checked')).to eq 'true'
-  end
+      expect(Gradezilla.popover_menu_item('Default Order').attribute('aria-checked')).to eq 'true'
+    end
 
-  it "validates arrange columns by assignment group option", priority: "1", test_id: 3253267 do
-    Gradezilla.open_view_menu_and_arrange_by_menu
-    Gradezilla.popover_menu_item('Default Order').click
+    it "validates arrange columns by assignment group option", priority: "1", test_id: 3253267 do
+      Gradezilla.open_view_menu_and_arrange_by_menu
+      Gradezilla.popover_menu_item('Default Order').click
 
-    first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    expect(first_row_cells[0]).to include_text @assignment_1_points
-    expect(first_row_cells[1]).to include_text @assignment_2_points
-    expect(first_row_cells[2]).to include_text "-"
-
-    Gradezilla.open_view_menu_and_arrange_by_menu
-
-    expect(Gradezilla.popover_menu_item('Default Order').attribute('aria-checked')).to eq 'true'
-
-    # Setting should stick (not be messed up) after reload
-    Gradezilla.visit(@course)
-
-    first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    expect(first_row_cells[0]).to include_text @assignment_1_points
-    expect(first_row_cells[1]).to include_text @assignment_2_points
-    expect(first_row_cells[2]).to include_text "-"
-
-    Gradezilla.open_view_menu_and_arrange_by_menu
-
-    expect(Gradezilla.popover_menu_item('Default Order').attribute('aria-checked')).to eq 'true'
+      first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
+      expect(first_row_cells[0]).to include_text @assignment_1_points
+      expect(first_row_cells[1]).to include_text @assignment_2_points
+      expect(first_row_cells[2]).to include_text "-"
+    end
   end
 end

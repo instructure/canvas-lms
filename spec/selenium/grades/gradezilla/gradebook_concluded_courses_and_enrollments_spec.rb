@@ -45,8 +45,7 @@ describe "Gradezilla - concluded courses and enrollments" do
       conclude_student_1
       Gradezilla.visit(@course)
 
-      Gradezilla.open_student_column_menu
-      Gradezilla.student_header_menu_option_selector('Concluded enrollments')
+      Gradezilla.click_student_header_menu_show_option('Concluded enrollments')
 
       expect(ff('.student-name')).to have_size @course.all_students.count
     end
@@ -56,8 +55,7 @@ describe "Gradezilla - concluded courses and enrollments" do
       display_concluded_enrollments
       Gradezilla.visit(@course)
 
-      Gradezilla.open_student_column_menu
-      Gradezilla.student_header_menu_option_selector('Concluded enrollments')
+      Gradezilla.click_student_header_menu_show_option('Concluded enrollments')
 
       expect(ff('.student-name')).to have_size @course.students.count
     end
@@ -76,8 +74,7 @@ describe "Gradezilla - concluded courses and enrollments" do
       deactivate_student_1
       Gradezilla.visit(@course)
 
-      Gradezilla.open_student_column_menu
-      Gradezilla.student_header_menu_option_selector('Inactive enrollments')
+      Gradezilla.click_student_header_menu_show_option('Inactive enrollments')
 
       expect(ff('.student-name')).to have_size @course.all_students.count
     end
@@ -87,8 +84,7 @@ describe "Gradezilla - concluded courses and enrollments" do
       display_inactive_enrollments
       Gradezilla.visit(@course)
 
-      Gradezilla.open_student_column_menu
-      Gradezilla.student_header_menu_option_selector('Inactive enrollments')
+      Gradezilla.click_student_header_menu_show_option('Inactive enrollments')
 
       expect(ff('.student-name')).to have_size @course.students.count
     end
