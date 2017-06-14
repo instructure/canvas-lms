@@ -85,7 +85,7 @@ module Lti
     #   Format to deliver the live events. Must be 'live-event' or 'caliper'.
     #
     # @argument subscription[TransportMetadata] [Required, Object]
-    #   An object with a single key: 'Url'. Example: '{ "Url" => "http://sqs.example"}'
+    #   An object with a single key: 'Url'. Example: '{"Url" => "http://sqs.example"}'
     #
     # @argument subscription[TransportType] [Required, String]
     #   Must be either 'sqs' or 'https'.
@@ -125,8 +125,16 @@ module Lti
 
 
     # @API List all Webhook Subscription for a tool proxy
+    #
+    # This endpoint returns a paginated list with a default limit of 100 items per result set.
+    # You can retrieve the next result set by setting a `StartKey` header in your next request
+    # with the value of the `EndKey` header in the response.
+    #
+    # Example `EndKey` header value: '{"Id":"71d6dfba-0547-477d-b41d-db8cb528c6d1","DeveloperKey":"10000000000001"}'
     def index
-      service_response = Services::LiveEventsSubscriptionService.tool_proxy_subscriptions(tool_proxy)
+      headers = request.headers['StartKey'] ? { 'StartKey' => request.headers['StartKey'] } : {}
+      service_response = Services::LiveEventsSubscriptionService.tool_proxy_subscriptions(tool_proxy, headers)
+      response.headers['EndKey'] = service_response.headers['endkey'] if service_response.headers['endkey']
       forward_service_response(service_response)
     end
 
@@ -139,7 +147,7 @@ module Lti
     end
 
     def forward_service_response(service_response)
-      render json: service_response.body, status: service_response.code
+      render json: service_response, status: service_response.code
     end
 
     # @!appendix Webhook Subscription Required Capabilities
