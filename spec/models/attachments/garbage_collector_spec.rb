@@ -77,6 +77,15 @@ describe Attachments::GarbageCollector do
       expect { att.reload }.to raise_error(ActiveRecord::RecordNotFound)
       expect(att2.reload).not_to be_deleted
     end
+
+    it "doesn't change anything with dry_run: true" do
+      dry_run_gc = Attachments::GarbageCollector::FolderContextType.new(dry_run: true)
+      expect(FileUtils).not_to receive(:rm).with(att.full_filename)
+
+      dry_run_gc.delete_content
+      expect(att.reload).not_to be_deleted
+      expect(att.store.exists?).to be_truthy
+    end
   end
 
   describe 'ContentExportContextType' do
