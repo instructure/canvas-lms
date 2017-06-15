@@ -18,7 +18,8 @@
 require 'active_support/callbacks/suspension'
 
 class ActiveRecord::Base
-  self.cache_timestamp_format = :usec
+  # CANVAS_RAILS4_2 - set this back to :usec once we're on Rails 5 for good
+  self.cache_timestamp_format = :bogus
 
   public :write_attribute
 
