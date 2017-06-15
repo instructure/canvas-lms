@@ -42,6 +42,13 @@ class ActiveRecord::Base
       # transactions due to spec fixtures are _not_in the callstack, so we only need to find 1
       !!caller.find { |s| s =~ transaction_regex && !s.include?('spec_helper.rb') }
     end
+
+    def default_scope(*)
+      # Profile is using default_scope to do faux STI. I don't know why they don't just do real STI, but
+      # I'll whitelist them for now
+      return super if self < Profile
+      raise "please don't ever use default_scope. it may seem like a great solution, but I promise, it isn't"
+    end
   end
 
   def read_or_initialize_attribute(attr_name, default_value)
