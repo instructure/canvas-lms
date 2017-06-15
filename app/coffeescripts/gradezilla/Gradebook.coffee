@@ -74,6 +74,7 @@ define [
   'jsx/gradezilla/default_gradebook/components/SubmissionTray'
   'jsx/gradezilla/default_gradebook/components/GradebookSettingsModal'
   'jsx/gradezilla/default_gradebook/constants/colors'
+  'jsx/gradezilla/default_gradebook/stores/StudentDatastore'
   'jsx/gradezilla/SISGradePassback/PostGradesStore'
   'jsx/gradezilla/SISGradePassback/PostGradesApp'
   'jsx/gradezilla/SubmissionStateMap'
@@ -107,7 +108,8 @@ define [
   CurveGradesDialogManager, GradebookApi, CellEditorFactory, GridSupport, studentRowHeaderConstants, AssignmentColumnHeader,
   AssignmentGroupColumnHeader, AssignmentRowCellPropFactory, CustomColumnHeader, StudentColumnHeader, StudentRowHeader,
   TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, GradingPeriodFilter, ModuleFilter, SectionFilter,
-  GridColor, StatusesModal, SubmissionTray, GradebookSettingsModal, { statusColors }, PostGradesStore, PostGradesApp, SubmissionStateMap,
+  GridColor, StatusesModal, SubmissionTray, GradebookSettingsModal, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp,
+  SubmissionStateMap,
   DownloadSubmissionsDialogManager,ReuploadSubmissionsDialogManager, GroupTotalCellTemplate, GradebookKeyboardNav,
   AssignmentMuterDialogManager, assignmentHelper, { default: Button }, { default: IconSettingsSolid }) ->
 
@@ -135,14 +137,20 @@ define [
       assignmentGroupId: null
       contextModuleId: null
       gradingPeriodId: null
-      sectionId: null
 
     if settings.filter_columns_by?
       Object.assign(filterColumnsBy, ConvertCase.camelize(settings.filter_columns_by))
 
+    filterRowsBy =
+      sectionId: null
+
+    if settings.filter_rows_by?
+      Object.assign(filterRowsBy, ConvertCase.camelize(settings.filter_rows_by))
+
     {
       colors
       filterColumnsBy
+      filterRowsBy
       selectedPrimaryInfo
       selectedSecondaryInfo
       sortRowsBy:
@@ -205,15 +213,27 @@ define [
       # emitted by GradingPeriodMenuView
       $.subscribe 'currentGradingPeriod/change',      @updateCurrentGradingPeriod
 
+      @setInitialState()
       @loadSettings()
-      @loadData()
 
     # End of constructor
+
+    setInitialState: =>
+      @courseContent = getInitialCourseContent()
+
+      @students = {}
+      @studentViewStudents = {}
+      @courseContent.students = new StudentDatastore(@students, @studentViewStudents)
+
+      @rows = []
+
+      @initPostGradesStore()
+      @initPostGradesLtis()
+      @checkForUploadComplete()
 
     loadSettings: ->
       @gridDisplaySettings = getInitialGridDisplaySettings(@options.settings, @options.colors)
       @contentLoadStates = getInitialContentLoadStates()
-      @courseContent = getInitialCourseContent()
       @headerComponentRefs = {}
 
       if @options.grading_period_set
@@ -237,22 +257,21 @@ define [
       @gradebookColumnOrderSettings = @options.gradebook_column_order_settings
       @teacherNotesNotYetLoaded = !@options.teacher_notes? || @options.teacher_notes.hidden
 
-    loadData: ->
-      @students = {}
-      @studentViewStudents = {}
-      @rows = []
-      @fetchedEnrollmentStates = []
-      @fetchData()
+      @gotSections(@options.sections)
+      @hasSections.then () =>
+        if !@getSelectedSecondaryInfo()
+          if @sections_enabled
+            @gridDisplaySettings.selectedSecondaryInfo = 'section'
+          else
+            @gridDisplaySettings.selectedSecondaryInfo = 'none'
 
-    fetchData: ->
-      return @buildRows() unless @studentsParams().enrollment_state.length
+    initialize: ->
       @setStudentsLoaded(false)
-
-      submissionParams =
-        response_fields: ['id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id', 'grade_matches_current_submission', 'attachments', 'late', 'missing', 'workflow_state', 'excused']
-        exclude_response_fields: ['preview_url']
+      @setSubmissionsLoaded(false)
 
       dataLoader = DataLoader.loadGradebookData(
+        courseId: @options.context_id
+        perPage: @options.api_max_per_page
         assignmentGroupsURL: @options.assignment_groups_url
         assignmentGroupsParams:
           exclude_response_fields: @fieldsToExcludeFromAssignments
@@ -265,9 +284,9 @@ define [
         studentsURL: @options.students_stateless_url
         studentsPageCb: @gotChunkOfStudents
         studentsParams: @studentsParams()
+        loadedStudentIds: []
 
         submissionsURL: @options.submissions_url
-        submissionsParams: submissionParams
         submissionsChunkCb: @gotSubmissionsChunk
         submissionsChunkSize: @options.chunk_size
         customColumnDataURL: @options.custom_column_data_url
@@ -275,11 +294,11 @@ define [
         effectiveDueDatesURL: @options.effective_due_dates_url
       )
 
-      # remember loaded states so we don't fetch them again
-      @studentsParams().enrollment_state.forEach (state) =>
-        @fetchedEnrollmentStates.push(state) unless @fetchedEnrollmentStates.includes(state)
+      dataLoader.gotStudentIds.then (response) =>
+        @courseContent.students.setStudentIds(response.user_ids)
+        @buildRows()
 
-      gotGroupsAndDueDates = $.when(
+      $.when(
         dataLoader.gotAssignmentGroups,
         dataLoader.gotEffectiveDueDates
       ).then(@gotAllAssignmentGroupsAndEffectiveDueDates)
@@ -288,29 +307,16 @@ define [
       dataLoader.gotStudents.then @gotAllStudents
 
       @renderedGrid = $.when(
+        dataLoader.gotStudentIds,
         dataLoader.gotCustomColumns,
-        gotGroupsAndDueDates
+        dataLoader.gotAssignmentGroups,
+        dataLoader.gotEffectiveDueDates
       ).then(@doSlickgridStuff)
 
-      @studentsLoaded = dataLoader.gotStudents
-      @allSubmissionsLoaded = dataLoader.gotSubmissions
-
-      @initPostGradesStore()
-      @initPostGradesLtis()
-      @checkForUploadComplete()
-
-      @gotSections(@options.sections)
-      @hasSections.then () =>
-        if !@getSelectedSecondaryInfo()
-          if @sections_enabled
-            @setSelectedSecondaryInfo 'section', true
-          else
-            @setSelectedSecondaryInfo 'none', true
-
       dataLoader.gotStudents.then () =>
-        @contentLoadStates.studentsLoaded = true
+        @setStudentsLoaded(true)
         @updateColumnHeaders()
-        @updateSectionFilterVisibility()
+        @renderFilters()
 
       dataLoader.gotAssignmentGroups.then () =>
         @contentLoadStates.assignmentsLoaded = true
@@ -323,10 +329,40 @@ define [
         @renderViewOptionsMenu()
 
       dataLoader.gotSubmissions.then () =>
-        @contentLoadStates.submissionsLoaded = true
-        @sortGridRows()
+        @setSubmissionsLoaded(true)
         @updateColumnHeaders()
+        @renderFilters()
 
+    reloadStudentData: =>
+      @setStudentsLoaded(false)
+      @setSubmissionsLoaded(false)
+      @renderFilters()
+
+      dataLoader = DataLoader.loadGradebookData(
+        courseId: @options.context_id
+        perPage: @options.api_max_per_page
+        studentsURL: @options.students_stateless_url
+        studentsPageCb: @gotChunkOfStudents
+        studentsParams: @studentsParams()
+        loadedStudentIds: @courseContent.students.listStudentIds()
+        submissionsURL: @options.submissions_url
+        submissionsChunkCb: @gotSubmissionsChunk
+        submissionsChunkSize: @options.chunk_size
+      )
+
+      dataLoader.gotStudentIds.then (response) =>
+        @courseContent.students.setStudentIds(response.user_ids)
+        @buildRows()
+
+      dataLoader.gotStudents.then () =>
+        @setStudentsLoaded(true)
+        @updateColumnHeaders()
+        @renderFilters()
+
+      dataLoader.gotSubmissions.then () =>
+        @setSubmissionsLoaded(true)
+        @updateColumnHeaders()
+        @renderFilters()
 
     loadOverridesForSIS: ->
       return unless @options.post_grades_feature
@@ -442,15 +478,22 @@ define [
         student.sections = student.enrollments.map (e) -> e.course_section_id
 
         if isStudentView
-          @studentViewStudents[student.id] ||= htmlEscape(student)
+          @studentViewStudents[student.id] = htmlEscape(student)
         else
-          @students[student.id] ||= htmlEscape(student)
-          @addRow(student)  # not adding student view students until all students have loaded
+          @students[student.id] = htmlEscape(student)
+
+        @updateStudentAttributes(student)
+        @updateStudentRow(student)
 
       @gridReady.then =>
         @setupGrading(students)
 
-      @grid?.render()
+      if @isFilteringRowsBySearchTerm()
+        # When filtering, students cannot be matched until loaded. The grid must
+        # be re-rendered more aggressively to ensure new rows are inserted.
+        @buildRows()
+      else
+        @grid?.render()
 
     isStudentEnrollment: (e) =>
       e.type == "StudentEnrollment" || e.type == "StudentViewEnrollment"
@@ -476,9 +519,9 @@ define [
 
     resetGrading: =>
       @initSubmissionStateMap()
-      @setupGrading(@listStudents())
+      @setupGrading(@courseContent.students.listStudents())
 
-    addRow: (student) =>
+    updateStudentAttributes: (student) =>
       student.computed_current_score ||= 0
       student.computed_final_score ||= 0
 
@@ -487,19 +530,17 @@ define [
       student.isInactive = _.all student.enrollments, (e) ->
         e.enrollment_state == 'inactive'
 
+      student.cssClass = "student_#{student.id}"
+
       @setStudentDisplay(student)
 
-      if @rowFilter(student)
-        student.cssClass = "student_#{student.id}"
-        @rows.push(student)
-
-      @grid?.updateRowCount(@rows.length)
+    updateStudentRow: (student) =>
+      index = @rows.findIndex (row) => row.id == student.id
+      if index != -1
+        @rows[index] = student
+        @grid?.invalidateRow(index)
 
     gotAllStudents: =>
-      # add test students
-      _.each _.values(@studentViewStudents), (testStudent) =>
-        @addRow(testStudent)
-
       @setStudentsLoaded(true)
       @renderedGrid.then @renderStudentColumnHeader
 
@@ -674,22 +715,12 @@ define [
     ## Filtering
 
     rowFilter: (student) =>
-      includeByInactive = student.isInactive && @getEnrollmentFilters().inactive
-      includeByConcluded = student.isConcluded && @getEnrollmentFilters().concluded
-      includeByNormal = !student.isConcluded && !student.isInactive
+      return true unless @isFilteringRowsBySearchTerm()
 
-      return false unless includeByInactive || includeByConcluded || includeByNormal
-
-      matchingSection = !@sectionToShow || (@sectionToShow in student.sections)
-      matchingFilter = if @userFilterTerm == ""
-        true
-      else
-        propertiesToMatch = ['name', 'login_id', 'short_name', 'sortable_name']
-        pattern = new RegExp @userFilterTerm, 'i'
-        matched = _.any propertiesToMatch, (prop) ->
-          student[prop]?.match pattern
-
-      matchingSection and matchingFilter
+      propertiesToMatch = ['name', 'login_id', 'short_name', 'sortable_name']
+      pattern = new RegExp(@userFilterTerm, 'i')
+      _.any propertiesToMatch, (prop) ->
+        student[prop]?.match pattern
 
     filterAssignmentColumns: (columns) =>
       columnsByAssignmentId = _.indexBy(columns, 'assignmentId')
@@ -757,24 +788,24 @@ define [
     # filter, sort, and build the dataset for slickgrid to read from, then
     # force a full redraw
     buildRows: =>
-      @rows.length = 0
+      @rows.length = 0 # empty the list of rows
+
+      for student in @courseContent.students.listStudents()
+        if @rowFilter(student)
+          @rows.push(student)
+          @calculateStudentGrade(student) # TODO: this may not be necessary
+          @setStudentDisplay(student) unless student.isPlaceholder
+
+      return unless @grid
 
       for id, column of @grid.getColumns() when ''+column.object?.submission_types is "attendance"
         column.unselectable = !@show_attendance
         column.cssClass = if @show_attendance then '' else 'completely-hidden'
         @$grid.find("##{@uid}#{column.id}").showIf(@show_attendance)
 
-      @withAllStudents (students) =>
-        for id, student of @students
-          if @rowFilter(student)
-            student.cssClass = "student_#{student.id}"
-            @rows.push(student)
-            @calculateStudentGrade(student) # TODO: this may not be necessary
-            @setStudentDisplay(student)
-
-      @grid.updateRowCount(@rows.length)
-
-      @sortGridRows()
+      @grid.invalidateAllRows()
+      @grid.updateRowCount()
+      @grid.render()
 
     setStudentDisplay: (student) =>
       if @sections_enabled
@@ -785,7 +816,7 @@ define [
         selectedPrimaryInfo: @getSelectedPrimaryInfo()
         selectedSecondaryInfo: @getSelectedSecondaryInfo()
         sectionNames: sectionNames
-        courseId: ENV.GRADEBOOK_OPTIONS.context_id
+        courseId: @options.context_id
 
       cell = new StudentRowHeader(student, options)
       student.display_name = cell.render()
@@ -806,21 +837,10 @@ define [
       # TODO: if gb2 survives long enough, we should consider debouncing all
       # the invalidation/rendering for smoother performance while loading
       @invalidateRowsForStudentIds(_.uniq(changedStudentIds))
+      @grid?.render()
 
     student: (id) =>
       @students[id] || @studentViewStudents[id]
-
-    # @students contains all *real* students (e.g., not the student view student)
-    # when you do need to operate on *all* students (like for rendering the grid), use
-    # function
-    withAllStudents: (f) =>
-      for id, s of @studentViewStudents
-        @students[id] = s
-
-      f(@students)
-
-      for id, s of @studentViewStudents
-        delete @students[id]
 
     updateSubmission: (submission) =>
       student = @student(submission.user_id)
@@ -1133,6 +1153,7 @@ define [
         @setFilterColumnsBySetting('gradingPeriodId', period)
         @saveSettings()
         @resetGrading()
+        @sortGridRows()
         @setAssignmentWarnings()
         @updateColumnsAndRenderViewOptionsMenu()
         @updateGradingPeriodFilterVisibility()
@@ -1212,16 +1233,6 @@ define [
       $('#keyboard-shortcuts').click ->
         questionMarkKeyDown = $.Event('keydown', keyCode: 191)
         $(document).trigger(questionMarkKeyDown)
-
-      # turn on stuff that starts out hidden/disabled
-      @studentsLoaded.then =>
-        $(".gradebook_filter").show()
-
-        cols = @grid.getColumns()
-        @grid.setColumns(cols)
-
-      @userFilter = new InputFilterView el: '.gradebook_filter input'
-      @userFilter.on 'input', @onUserFilterInput
 
     renderGradebookMenus: =>
       @renderGradebookMenu()
@@ -1347,6 +1358,7 @@ define [
       @updateSectionFilterVisibility()
       @updateGradingPeriodFilterVisibility()
       @updateModulesFilterVisibility()
+      @renderSearchFilter()
 
     renderGridColor: =>
       gridColorMountPoint = document.querySelector('[data-component="GridColor"]')
@@ -1420,6 +1432,15 @@ define [
     onUserFilterInput: (term) =>
       @userFilterTerm = term
       @buildRows()
+
+    renderSearchFilter: =>
+      unless @userFilter
+        @userFilter = new InputFilterView(el: '#search-filter-container input')
+        @userFilter.on('input', @onUserFilterInput)
+
+      disabled = !@contentLoadStates.studentsLoaded or !@contentLoadStates.submissionsLoaded
+      @userFilter.el.disabled = disabled
+      @userFilter.el.setAttribute('aria-disabled', disabled)
 
     getVisibleGradeGridColumns: ->
       assignmentColumns = @filterAssignmentColumns(@allAssignmentColumns)
@@ -1736,10 +1757,20 @@ define [
           show_unpublished_assignments: showUnpublishedAssignments
           student_column_display_as: studentColumnDisplayAs
           student_column_secondary_info: studentColumnSecondaryInfo
+          filter_rows_by: ConvertCase.underscore(@gridDisplaySettings.filterRowsBy)
           sort_rows_by_column_id: sortRowsBy.columnId
           sort_rows_by_setting_key: sortRowsBy.settingKey
           sort_rows_by_direction: sortRowsBy.direction
           colors: colors
+
+      # TODO: include the "sort rows by" setting for Assignment Groups and Total
+      # Grade when fully supported by the Gradebook `user_ids` endpoint.
+      sortingByIncompleteSortFeature = data.gradebook_settings.sort_rows_by_column_id.match(/^assignment_group_/)
+      sortingByIncompleteSortFeature ||= data.gradebook_settings.sort_rows_by_column_id == 'total_grade'
+      if sortingByIncompleteSortFeature
+        delete data.gradebook_settings.sort_rows_by_column_id
+        delete data.gradebook_settings.sort_rows_by_setting_key
+        delete data.gradebook_settings.sort_rows_by_direction
 
       $.ajaxJSON(@options.settings_update_url, 'PUT', data, successFn, errorFn)
 
@@ -1759,6 +1790,7 @@ define [
           sortFn
 
       @rows.sort respectorOfPersonsSort()
+      @courseContent.students.setStudentIds(_.map(@rows, 'id'))
       @grid?.invalidate()
 
     getStudentGradeForColumn: (student, field) =>
@@ -1957,7 +1989,7 @@ define [
       if @getEnrollmentFilters().inactive
         enrollmentStates.push('inactive')
 
-      { enrollment_state: _.difference(enrollmentStates, @fetchedEnrollmentStates) }
+      { enrollment_state: enrollmentStates }
 
     ## Grid DOM Access/Reference Methods
 
@@ -2462,8 +2494,17 @@ define [
     setFilterColumnsBySetting: (filterKey, value) =>
       @gridDisplaySettings.filterColumnsBy[filterKey] = value
 
+    getFilterRowsBySetting: (filterKey) =>
+      @gridDisplaySettings.filterRowsBy[filterKey]
+
+    setFilterRowsBySetting: (filterKey, value) =>
+      @gridDisplaySettings.filterRowsBy[filterKey] = value
+
     isFilteringColumnsByGradingPeriod: =>
       @getGradingPeriodToShow() != '0'
+
+    isFilteringRowsBySearchTerm: =>
+      @userFilterTerm? and @userFilterTerm != ''
 
     getGradingPeriodToShow: () =>
       return '0' unless @gradingPeriodSet?
@@ -2552,7 +2593,10 @@ define [
     applyEnrollmentFilter: () =>
       showInactive = @getEnrollmentFilters().inactive
       showConcluded = @getEnrollmentFilters().concluded
-      @saveSettings({ showInactive, showConcluded }, => @fetchData())
+      @saveSettings({ showInactive, showConcluded }, =>
+        @renderStudentColumnHeader()
+        @reloadStudentData()
+      )
 
     getEnrollmentFilters: () =>
       @gridDisplaySettings.showEnrollments
@@ -2597,11 +2641,6 @@ define [
     listGradingPeriodsForAssignment: (assignmentId) =>
       effectiveDueDates = @effectiveDueDates[assignmentId] || {}
       _.uniq((effectiveDueDate.grading_period_id for userId, effectiveDueDate of effectiveDueDates))
-
-    listStudents: =>
-      regularStudents = (student for studentId, student of @students)
-      testStudents = (student for studentId, student of @studentViewStudents)
-      [regularStudents..., testStudents...]
 
     ## Gradebook Content Api Methods
 

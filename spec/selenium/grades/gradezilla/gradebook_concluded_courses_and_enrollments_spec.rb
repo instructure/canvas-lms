@@ -91,7 +91,7 @@ describe "Gradezilla - concluded courses and enrollments" do
   end
 
   context "concluded course" do
-    it "does not allow editing grades", priority: "1", test_id: 210027 do
+    xit "does not allow editing grades", priority: "1", test_id: 210027 do
       @course.complete!
       Gradezilla.visit(@course)
       cell = Gradezilla.grading_cell

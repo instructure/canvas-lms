@@ -58,6 +58,10 @@ $gradebook_cell_padding_top: 8px;
   height: $row-height - 4px;
 }
 
+.slick-row.active .slick-cell.primary-column {
+  background-color: $ic-bg-light-primary;
+}
+
 .container_0,
 .container_1 {
   .slick-header.ui-state-default { // header container with full width of grid

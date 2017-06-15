@@ -146,11 +146,26 @@ test('sets the submission state map .selectedGradingPeriodID to the "grading per
   strictEqual(gradebook.submissionStateMap.selectedGradingPeriodID, gradebook.getGradingPeriodToShow());
 });
 
-test('calls renderStatusesModal', function () {
+QUnit.module('Gradebook - when grid-required data is loaded', {
+  setup () {
+    $fixtures.innerHTML = `
+      <div id="search-filter-container">
+        <input type="text" />
+      </div>
+    `;
+  },
+
+  teardown () {
+    $fixtures.innerHTML = '';
+  }
+});
+
+test('renders the StatusesModal', function () {
   const loaderPromises = {
     gotAssignmentGroups: $.Deferred(),
     gotContextModules: $.Deferred(),
     gotCustomColumns: $.Deferred(),
+    gotStudentIds: $.Deferred(),
     gotStudents: $.Deferred(),
     gotSubmissions: $.Deferred(),
     gotCustomColumnData: $.Deferred(),
@@ -171,10 +186,12 @@ test('calls renderStatusesModal', function () {
     'initPostGradesStore',
   ].forEach(fn => this.stub(gradebook, fn));
   const renderStatusesModalStub = this.stub(gradebook, 'renderStatusesModal');
-  gradebook.gridReady.reject()
+  gradebook.gridReady.reject();
+  gradebook.initialize();
   loaderPromises.gotCustomColumns.resolve();
   loaderPromises.gotAssignmentGroups.resolve();
   loaderPromises.gotEffectiveDueDates.resolve();
+  loaderPromises.gotStudentIds.resolve({ user_ids: [] });
 
   ok(renderStatusesModalStub.calledOnce);
 });
@@ -258,9 +275,9 @@ test('defaults .filterColumnsBy.gradingPeriodId to null when not present in the 
   strictEqual(gradebook.getFilterColumnsBySetting('gradingPeriodId'), null);
 });
 
-test('defaults .filterColumnsBy.sectionId to null when not present in the given settings', function () {
+test('defaults .filterRowsBy.sectionId to null when not present in the given settings', function () {
   const gradebook = createGradebook();
-  strictEqual(gradebook.getFilterColumnsBySetting('sectionId'), null);
+  strictEqual(gradebook.getFilterRowsBySetting('sectionId'), null);
 });
 
 test('updates partial .filterColumnsBy settings with the default values', function () {
@@ -268,44 +285,95 @@ test('updates partial .filterColumnsBy settings with the default values', functi
   strictEqual(gradebook.getFilterColumnsBySetting('assignmentGroupId'), '2201');
   strictEqual(gradebook.getFilterColumnsBySetting('contextModuleId'), null);
   strictEqual(gradebook.getFilterColumnsBySetting('gradingPeriodId'), null);
-  strictEqual(gradebook.getFilterColumnsBySetting('sectionId'), null);
 });
 
-QUnit.module('Gradebook - initial content load', {
+QUnit.module('Gradebook#initialize', {
   setup () {
     this.loaderPromises = {
       gotAssignmentGroups: $.Deferred(),
       gotContextModules: $.Deferred(),
       gotCustomColumns: $.Deferred(),
+      gotStudentIds: $.Deferred(),
       gotStudents: $.Deferred(),
       gotSubmissions: $.Deferred(),
       gotCustomColumnData: $.Deferred(),
       gotEffectiveDueDates: $.Deferred()
     };
     this.stub(DataLoader, 'loadGradebookData').returns(this.loaderPromises);
+    $fixtures.innerHTML = `
+      <div id="search-filter-container">
+        <input type="text" />
+      </div>
+    `;
+  },
+
+  createInitializedGradebook (options) {
+    const gradebook = createGradebook(options);
+    gradebook.initialize();
+    return gradebook;
+  },
+
+  teardown () {
+    $fixtures.innerHTML = '';
   }
 });
 
-test('uses the DataLoader', function () {
-  createGradebook();
+test('sets the students as not loaded', function () {
+  const gradebook = this.createInitializedGradebook();
+  strictEqual(gradebook.contentLoadStates.studentsLoaded, false);
+});
+
+test('sets the submissions as not loaded', function () {
+  const gradebook = this.createInitializedGradebook();
+  strictEqual(gradebook.contentLoadStates.submissionsLoaded, false);
+});
+
+test('calls DataLoader.loadGradebookData', function () {
+  this.createInitializedGradebook();
   strictEqual(DataLoader.loadGradebookData.callCount, 1);
 });
 
+test('includes the course id when calling DataLoader.loadGradebookData', function () {
+  this.createInitializedGradebook();
+  const [options] = DataLoader.loadGradebookData.lastCall.args;
+  equal(options.courseId, '1');
+});
+
+test('includes the per page api request setting when calling DataLoader.loadGradebookData', function () {
+  this.createInitializedGradebook({ api_max_per_page: 50 });
+  const [options] = DataLoader.loadGradebookData.lastCall.args;
+  equal(options.perPage, 50);
+});
+
 test('loads assignment groups', function () {
-  createGradebook({ assignment_groups_url: '/assignment-groups' });
+  this.createInitializedGradebook({ assignment_groups_url: '/assignment-groups' });
   const [options] = DataLoader.loadGradebookData.lastCall.args;
   equal(options.assignmentGroupsURL, '/assignment-groups');
 });
 
 test('loads context modules', function () {
-  createGradebook({ context_modules_url: '/context-modules' });
+  this.createInitializedGradebook({ context_modules_url: '/context-modules' });
   const [options] = DataLoader.loadGradebookData.lastCall.args;
   equal(options.contextModulesURL, '/context-modules');
 });
 
+test('stores student ids when loaded', function () {
+  const gradebook = this.createInitializedGradebook();
+  const studentIds = ['1101', '1102', '1103'];
+  this.loaderPromises.gotStudentIds.resolve({ user_ids: studentIds });
+  equal(gradebook.courseContent.students.listStudentIds(), studentIds);
+});
+
+test('builds rows when student ids are loaded', function () {
+  const gradebook = this.createInitializedGradebook();
+  const studentIds = ['1101', '1102', '1103'];
+  this.loaderPromises.gotStudentIds.resolve({ user_ids: studentIds });
+  deepEqual(gradebook.rows.map(row => row.id), studentIds);
+});
+
 test('stores context modules when loaded', function () {
   const contextModules = [{ id: '2601' }, { id: '2602' }];
-  const gradebook = createGradebook({ context_modules_url: '/context-modules' });
+  const gradebook = this.createInitializedGradebook({ context_modules_url: '/context-modules' });
   this.stub(gradebook, 'renderViewOptionsMenu');
   this.loaderPromises.gotContextModules.resolve(contextModules);
   equal(gradebook.listContextModules(), contextModules);
@@ -313,7 +381,7 @@ test('stores context modules when loaded', function () {
 
 test('sets context modules as loaded', function () {
   const contextModules = [{ id: '2601' }, { id: '2602' }];
-  const gradebook = createGradebook({ context_modules_url: '/context-modules' });
+  const gradebook = this.createInitializedGradebook({ context_modules_url: '/context-modules' });
   this.stub(gradebook, 'renderViewOptionsMenu');
   this.loaderPromises.gotContextModules.resolve(contextModules);
   strictEqual(gradebook.contentLoadStates.contextModulesLoaded, true);
@@ -321,19 +389,392 @@ test('sets context modules as loaded', function () {
 
 test('re-renders the view options menu after storing the loaded context modules', function () {
   const contextModules = [{ id: '2601' }, { id: '2602' }];
-  const gradebook = createGradebook({ context_modules_url: '/context-modules' });
+  const gradebook = this.createInitializedGradebook({ context_modules_url: '/context-modules' });
   this.stub(gradebook, 'renderViewOptionsMenu').callsFake(() => {
     equal(gradebook.listContextModules(), contextModules);
   });
   this.loaderPromises.gotContextModules.resolve(contextModules);
 });
 
-test('updates section filter visibility after loading students', function () {
-  const students = [{ id: '1101' }, { id: '1102' }];
+test('updates students load state when loaded', function () {
+  const gradebook = this.createInitializedGradebook();
+  this.loaderPromises.gotStudents.resolve();
+  strictEqual(gradebook.contentLoadStates.studentsLoaded, true);
+});
+
+test('re-renders the column headers when students are loaded', function () {
+  const gradebook = this.createInitializedGradebook();
+  this.stub(gradebook, 'updateColumnHeaders');
+  this.loaderPromises.gotStudents.resolve();
+  strictEqual(gradebook.updateColumnHeaders.callCount, 1);
+});
+
+test('re-renders the column headers after updating students load state', function () {
+  const gradebook = this.createInitializedGradebook();
+  this.stub(gradebook, 'updateColumnHeaders').callsFake(() => {
+    strictEqual(gradebook.contentLoadStates.studentsLoaded, true, 'students load state was already updated');
+  });
+  this.loaderPromises.gotStudents.resolve();
+});
+
+test('re-renders the filters when students are loaded', function () {
+  const gradebook = this.createInitializedGradebook();
+  this.stub(gradebook, 'renderFilters');
+  this.loaderPromises.gotStudents.resolve();
+  strictEqual(gradebook.renderFilters.callCount, 1);
+});
+
+test('re-renders the filters after updating students load state', function () {
+  const gradebook = this.createInitializedGradebook();
+  this.stub(gradebook, 'renderFilters').callsFake(() => {
+    strictEqual(gradebook.contentLoadStates.studentsLoaded, true, 'students load state was already updated');
+  });
+  this.loaderPromises.gotStudents.resolve();
+});
+
+test('updates submissions load state when loaded', function () {
+  const gradebook = this.createInitializedGradebook();
+  this.loaderPromises.gotSubmissions.resolve();
+  strictEqual(gradebook.contentLoadStates.submissionsLoaded, true);
+});
+
+test('re-renders the column headers when submissions are loaded', function () {
+  const gradebook = this.createInitializedGradebook();
+  this.stub(gradebook, 'updateColumnHeaders');
+  this.loaderPromises.gotSubmissions.resolve();
+  strictEqual(gradebook.updateColumnHeaders.callCount, 1);
+});
+
+test('re-renders the column headers after updating submissions load state', function () {
+  const gradebook = this.createInitializedGradebook();
+  this.stub(gradebook, 'updateColumnHeaders').callsFake(() => {
+    strictEqual(gradebook.contentLoadStates.submissionsLoaded, true, 'submissions load state was already updated');
+  });
+  this.loaderPromises.gotSubmissions.resolve();
+});
+
+test('re-renders the filters when submissions are loaded', function () {
+  const gradebook = this.createInitializedGradebook();
+  this.stub(gradebook, 'renderFilters');
+  this.loaderPromises.gotSubmissions.resolve();
+  strictEqual(gradebook.renderFilters.callCount, 1);
+});
+
+test('re-renders the filters after updating submissions load state', function () {
+  const gradebook = this.createInitializedGradebook();
+  this.stub(gradebook, 'renderFilters').callsFake(() => {
+    strictEqual(gradebook.contentLoadStates.submissionsLoaded, true, 'submissions load state was already updated');
+  });
+  this.loaderPromises.gotSubmissions.resolve();
+});
+
+QUnit.module('Gradebook#reloadStudentData', {
+  setup () {
+    this.loaderPromises = {
+      gotStudentIds: $.Deferred(),
+      gotStudents: $.Deferred(),
+      gotSubmissions: $.Deferred(),
+    };
+    this.stub(DataLoader, 'loadGradebookData').returns(this.loaderPromises);
+    $fixtures.innerHTML = `
+      <div id="search-filter-container">
+        <input type="text" />
+      </div>
+    `;
+  },
+
+  teardown () {
+    $fixtures.innerHTML = '';
+  }
+});
+
+test('sets the students as not loaded', function () {
   const gradebook = createGradebook();
-  this.stub(gradebook, 'updateSectionFilterVisibility');
-  this.loaderPromises.gotStudents.resolve(students);
-  strictEqual(gradebook.updateSectionFilterVisibility.callCount, 1);
+  gradebook.setStudentsLoaded(true);
+  gradebook.reloadStudentData();
+  strictEqual(gradebook.contentLoadStates.studentsLoaded, false);
+});
+
+test('sets the submissions as not loaded', function () {
+  const gradebook = createGradebook();
+  gradebook.setSubmissionsLoaded(true);
+  gradebook.reloadStudentData();
+  strictEqual(gradebook.contentLoadStates.submissionsLoaded, false);
+});
+
+test('re-renders the filters', function () {
+  const gradebook = createGradebook();
+  this.stub(gradebook, 'renderFilters');
+  gradebook.reloadStudentData();
+  strictEqual(gradebook.renderFilters.callCount, 1);
+});
+
+test('re-renders the filters after students load status is updated', function () {
+  const gradebook = createGradebook();
+  this.stub(gradebook, 'renderFilters').callsFake(() => {
+    strictEqual(gradebook.contentLoadStates.studentsLoaded, false);
+  });
+  gradebook.reloadStudentData();
+});
+
+test('re-renders the filters after submissions load status is updated', function () {
+  const gradebook = createGradebook();
+  this.stub(gradebook, 'renderFilters').callsFake(() => {
+    strictEqual(gradebook.contentLoadStates.submissionsLoaded, false);
+  });
+  gradebook.reloadStudentData();
+});
+
+test('calls DataLoader.loadGradebookData', function () {
+  const gradebook = createGradebook();
+  gradebook.reloadStudentData();
+  strictEqual(DataLoader.loadGradebookData.callCount, 1);
+});
+
+test('includes the course id when calling DataLoader.loadGradebookData', function () {
+  const gradebook = createGradebook();
+  gradebook.reloadStudentData();
+  const [options] = DataLoader.loadGradebookData.lastCall.args;
+  equal(options.courseId, '1');
+});
+
+test('includes the per page api request setting when calling DataLoader.loadGradebookData', function () {
+  const gradebook = createGradebook({ api_max_per_page: 50 });
+  gradebook.reloadStudentData();
+  const [options] = DataLoader.loadGradebookData.lastCall.args;
+  equal(options.perPage, 50);
+});
+
+test('includes the students url when calling DataLoader.loadGradebookData', function () {
+  const gradebook = createGradebook({ students_stateless_url: '/students-url' });
+  gradebook.reloadStudentData();
+  const [options] = DataLoader.loadGradebookData.lastCall.args;
+  equal(options.studentsURL, '/students-url');
+});
+
+test('includes the students page callback when calling DataLoader.loadGradebookData', function () {
+  const gradebook = createGradebook();
+  gradebook.reloadStudentData();
+  const [options] = DataLoader.loadGradebookData.lastCall.args;
+  strictEqual(options.studentsPageCb, gradebook.gotChunkOfStudents);
+});
+
+test('includes students params when calling DataLoader.loadGradebookData', function () {
+  const exampleStudentsParams = { example: true };
+  const gradebook = createGradebook();
+  this.stub(gradebook, 'studentsParams').returns(exampleStudentsParams);
+  gradebook.reloadStudentData();
+  const [options] = DataLoader.loadGradebookData.lastCall.args;
+  equal(options.studentsParams, exampleStudentsParams);
+});
+
+test('includes the loaded student ids when calling DataLoader.loadGradebookData', function () {
+  const studentIds = ['1101', '1102', '1103'];
+  const gradebook = createGradebook();
+  gradebook.courseContent.students.setStudentIds(studentIds);
+  gradebook.reloadStudentData();
+  const [options] = DataLoader.loadGradebookData.lastCall.args;
+  deepEqual(options.loadedStudentIds, studentIds);
+});
+
+test('includes the submissions url when calling DataLoader.loadGradebookData', function () {
+  const gradebook = createGradebook({ submissions_url: '/submissions-url' });
+  gradebook.reloadStudentData();
+  const [options] = DataLoader.loadGradebookData.lastCall.args;
+  equal(options.submissionsURL, '/submissions-url');
+});
+
+test('includes the submissions chunk callback when calling DataLoader.loadGradebookData', function () {
+  const gradebook = createGradebook();
+  gradebook.reloadStudentData();
+  const [options] = DataLoader.loadGradebookData.lastCall.args;
+  strictEqual(options.submissionsChunkCb, gradebook.gotSubmissionsChunk);
+});
+
+test('includes the submissions chunk size when calling DataLoader.loadGradebookData', function () {
+  const gradebook = createGradebook({ chunk_size: 10 });
+  gradebook.reloadStudentData();
+  const [options] = DataLoader.loadGradebookData.lastCall.args;
+  equal(options.submissionsChunkSize, 10);
+});
+
+test('stores student ids when loaded', function () {
+  const gradebook = createGradebook();
+  gradebook.reloadStudentData();
+  const studentIds = ['1101', '1102', '1103'];
+  this.loaderPromises.gotStudentIds.resolve({ user_ids: studentIds });
+  equal(gradebook.courseContent.students.listStudentIds(), studentIds);
+});
+
+test('builds rows when student ids are loaded', function () {
+  const gradebook = createGradebook();
+  gradebook.reloadStudentData();
+  const studentIds = ['1101', '1102', '1103'];
+  this.loaderPromises.gotStudentIds.resolve({ user_ids: studentIds });
+  deepEqual(gradebook.rows.map(row => row.id), studentIds);
+});
+
+test('updates students load state when loaded', function () {
+  const gradebook = createGradebook();
+  gradebook.reloadStudentData();
+  this.loaderPromises.gotStudents.resolve();
+  strictEqual(gradebook.contentLoadStates.studentsLoaded, true);
+});
+
+test('re-renders the column headers when students are loaded', function () {
+  const gradebook = createGradebook();
+  gradebook.reloadStudentData();
+  this.stub(gradebook, 'updateColumnHeaders');
+  this.loaderPromises.gotStudents.resolve();
+  strictEqual(gradebook.updateColumnHeaders.callCount, 1);
+});
+
+test('re-renders the column headers after updating students load state', function () {
+  const gradebook = createGradebook();
+  gradebook.reloadStudentData();
+  this.stub(gradebook, 'updateColumnHeaders').callsFake(() => {
+    strictEqual(gradebook.contentLoadStates.studentsLoaded, true, 'students load state was already updated');
+  });
+  this.loaderPromises.gotStudents.resolve();
+});
+
+test('re-renders the filters when students are loaded', function () {
+  const gradebook = createGradebook();
+  gradebook.reloadStudentData();
+  this.stub(gradebook, 'renderFilters');
+  this.loaderPromises.gotStudents.resolve();
+  strictEqual(gradebook.renderFilters.callCount, 1);
+});
+
+test('re-renders the filters after updating students load state', function () {
+  const gradebook = createGradebook();
+  gradebook.reloadStudentData();
+  this.stub(gradebook, 'renderFilters').callsFake(() => {
+    strictEqual(gradebook.contentLoadStates.studentsLoaded, true, 'students load state was already updated');
+  });
+  this.loaderPromises.gotStudents.resolve();
+});
+
+test('updates submissions load state when loaded', function () {
+  const gradebook = createGradebook();
+  gradebook.reloadStudentData();
+  this.loaderPromises.gotSubmissions.resolve();
+  strictEqual(gradebook.contentLoadStates.submissionsLoaded, true);
+});
+
+test('re-renders the column headers when submissions are loaded', function () {
+  const gradebook = createGradebook();
+  gradebook.reloadStudentData();
+  this.stub(gradebook, 'updateColumnHeaders');
+  this.loaderPromises.gotSubmissions.resolve();
+  strictEqual(gradebook.updateColumnHeaders.callCount, 1);
+});
+
+test('re-renders the column headers after updating submissions load state', function () {
+  const gradebook = createGradebook();
+  gradebook.reloadStudentData();
+  this.stub(gradebook, 'updateColumnHeaders').callsFake(() => {
+    strictEqual(gradebook.contentLoadStates.submissionsLoaded, true, 'submissions load state was already updated');
+  });
+  this.loaderPromises.gotSubmissions.resolve();
+});
+
+test('re-renders the filters when submissions are loaded', function () {
+  const gradebook = createGradebook();
+  gradebook.reloadStudentData();
+  this.stub(gradebook, 'renderFilters');
+  this.loaderPromises.gotSubmissions.resolve();
+  strictEqual(gradebook.renderFilters.callCount, 1);
+});
+
+test('re-renders the filters after updating submissions load state', function () {
+  const gradebook = createGradebook();
+  gradebook.reloadStudentData();
+  this.stub(gradebook, 'renderFilters').callsFake(() => {
+    strictEqual(gradebook.contentLoadStates.submissionsLoaded, true, 'submissions load state was already updated');
+  });
+  this.loaderPromises.gotSubmissions.resolve();
+});
+
+QUnit.module('Gradebook#gotChunkOfStudents', {
+  setup () {
+    const placeholderStudent = { id: '1101' };
+    this.gradebook = createGradebook();
+    this.gradebook.courseContent.students.addUserStudents([placeholderStudent]);
+    this.gradebook.rows.push(placeholderStudent);
+    this.gradebook.grid = {
+      invalidateRow () {},
+      render: this.stub()
+    };
+    this.students = [
+      {
+        id: '1101',
+        name: 'Adam Jones',
+        enrollments: [{ type: 'StudentEnrollment', grades: { html_url: 'http://example.url/' } }]
+      },
+      {
+        id: '1102',
+        name: 'Betty Ford',
+        enrollments: [{ type: 'StudentEnrollment', grades: { html_url: 'http://example.url/' } }]
+      },
+      {
+        id: '1199',
+        name: 'Test Student',
+        enrollments: [{ type: 'StudentViewEnrollment', grades: { html_url: 'http://example.url/' } }]
+      }
+    ];
+  }
+});
+
+test('updates the student map with each student', function () {
+  this.gradebook.gotChunkOfStudents(this.students);
+  ok(this.gradebook.students[1101], 'student map includes Adam Jones');
+  ok(this.gradebook.students[1102], 'student map includes Betty Ford');
+});
+
+test('replaces matching students in the student map', function () {
+  this.gradebook.gotChunkOfStudents(this.students);
+  equal(this.gradebook.students[1101].name, 'Adam Jones');
+});
+
+test('updates the test student map with each test student', function () {
+  this.gradebook.gotChunkOfStudents(this.students);
+  ok(this.gradebook.studentViewStudents[1199], 'test student map includes Test Student');
+});
+
+test('replaces matching students in the test student map', function () {
+  this.gradebook.courseContent.students.addTestStudents([{ id: '1199' }]);
+  this.gradebook.gotChunkOfStudents(this.students);
+  equal(this.gradebook.studentViewStudents[1199].name, 'Test Student');
+});
+
+test('updates attributes of each student', function () {
+  this.gradebook.gotChunkOfStudents(this.students);
+  strictEqual(this.gradebook.students[1101].isConcluded, false, 'isConcluded is set to false');
+  strictEqual(this.gradebook.students[1101].isInactive, false, 'isInactive is set to false');
+});
+
+test('updates the row for each student', function () {
+  this.gradebook.gotChunkOfStudents(this.students);
+  strictEqual(this.gradebook.rows[0], this.students[0]);
+});
+
+test('builds rows when filtering with search', function () {
+  this.gradebook.userFilterTerm = 'searching';
+  this.stub(this.gradebook, 'buildRows');
+  this.gradebook.gotChunkOfStudents(this.students);
+  strictEqual(this.gradebook.buildRows.callCount, 1);
+});
+
+test('does not build rows when not filtering with search', function () {
+  this.stub(this.gradebook, 'buildRows');
+  this.gradebook.gotChunkOfStudents(this.students);
+  strictEqual(this.gradebook.buildRows.callCount, 0);
+});
+
+test('renders the grid when not filtering with search', function () {
+  this.gradebook.gotChunkOfStudents(this.students);
+  strictEqual(this.gradebook.grid.render.callCount, 1);
 });
 
 QUnit.module('Gradebook#calculateStudentGrade', {
@@ -868,6 +1309,53 @@ test('calls wrapped function with arguments in reverse order when direction is d
   deepEqual(wrappedFn.firstCall.args, expectedArgs);
 });
 
+QUnit.module('Gradebook#rowFilter', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.student = {
+      login_id: 'charlie.xi@example.com',
+      name: 'Charlie Xi',
+      short_name: 'Chuck Xi',
+      sortable_name: 'Xi, Charlie'
+    };
+  }
+});
+
+test('returns true when search term matches the student name', function () {
+  this.gradebook.userFilterTerm = 'charlie Xi';
+  strictEqual(this.gradebook.rowFilter(this.student), true);
+});
+
+test('returns true when search term matches the student login id', function () {
+  this.gradebook.userFilterTerm = 'example.com';
+  strictEqual(this.gradebook.rowFilter(this.student), true);
+});
+
+test('returns true when search term matches the student short name', function () {
+  this.gradebook.userFilterTerm = 'chuck';
+  strictEqual(this.gradebook.rowFilter(this.student), true);
+});
+
+test('returns true when search term matches the student sortable name', function () {
+  this.gradebook.userFilterTerm = 'Xi, Charlie';
+  strictEqual(this.gradebook.rowFilter(this.student), true);
+});
+
+test('returns false when search term does not match', function () {
+  this.gradebook.userFilterTerm = 'Betty';
+  strictEqual(this.gradebook.rowFilter(this.student), false);
+});
+
+test('returns true when not filtering by a search term', function () {
+  this.gradebook.userFilterTerm = '';
+  strictEqual(this.gradebook.rowFilter(this.student), true);
+});
+
+test('returns true when search term is not defined', function () {
+  this.gradebook.userFilterTerm = null;
+  strictEqual(this.gradebook.rowFilter(this.student), true);
+});
+
 QUnit.module('Gradebook#makeCompareAssignmentCustomOrderFn');
 
 test('returns position difference if both are defined in the index', function () {
@@ -1239,6 +1727,56 @@ test('returns false if sorting by custom and there is a custom column order stor
   strictEqual(this.gradebook.isInvalidSort(), false);
 });
 
+QUnit.module('Gradebook#renderSearchFilter', {
+  setup () {
+    $fixtures.innerHTML = `
+      <div id="search-filter-container">
+        <input type="text" />
+      </div>
+    `;
+    this.gradebook = createGradebook();
+    this.gradebook.setStudentsLoaded(true);
+    this.gradebook.setSubmissionsLoaded(true);
+    this.gradebook.renderSearchFilter();
+  },
+
+  teardown () {
+    $fixtures.innerHTML = '';
+  }
+});
+
+test('binds an InputFilterView to the search filter markup', function () {
+  equal(this.gradebook.userFilter.constructor.name, 'InputFilterView');
+});
+
+test('does not create a new InputFilterView when already bound', function () {
+  const userFilter = this.gradebook.userFilter;
+  this.gradebook.renderSearchFilter();
+  strictEqual(this.gradebook.userFilter, userFilter);
+});
+
+test('enables the input when students and submissions are loaded', function () {
+  const input = document.querySelector('#search-filter-container input');
+  strictEqual(input.disabled, false, 'input is not disabled');
+  strictEqual(input.getAttribute('aria-disabled'), 'false', 'input is not aria-disabled');
+});
+
+test('disables the input when students are not loaded', function () {
+  this.gradebook.setStudentsLoaded(false);
+  this.gradebook.renderSearchFilter();
+  const input = document.querySelector('#search-filter-container input');
+  strictEqual(input.disabled, true, 'input is disabled');
+  strictEqual(input.getAttribute('aria-disabled'), 'true', 'input is aria-disabled');
+});
+
+test('disables the input when submissions are not loaded', function () {
+  this.gradebook.setSubmissionsLoaded(false);
+  this.gradebook.renderSearchFilter();
+  const input = document.querySelector('#search-filter-container input');
+  strictEqual(input.disabled, true, 'input is disabled');
+  strictEqual(input.getAttribute('aria-disabled'), 'true', 'input is aria-disabled');
+});
+
 QUnit.module('Gradebook#getVisibleGradeGridColumns', {
   setup () {
     const allAssignmentColumns = [
@@ -1402,7 +1940,6 @@ test('only returns submissions due for the student in the selected grading perio
 QUnit.module('Gradebook#studentsParams', {
   setup () {
     this.gradebook = createGradebook();
-    this.gradebook.fetchedEnrollmentStates = []
   }
 });
 
@@ -1430,12 +1967,6 @@ test('enrollment_state includes "active" and "invited" by default', function () 
   this.stub(this.gradebook, 'getEnrollmentFilters').returns({ concluded: false, inactive: false });
   ok(this.gradebook.studentsParams().enrollment_state.includes('active'));
   ok(this.gradebook.studentsParams().enrollment_state.includes('invited'));
-});
-
-test('enrollment_state excludes values present in fetchedEnrollmentStates', function () {
-  this.gradebook.fetchedEnrollmentStates = ['active']
-  this.stub(this.gradebook, 'getEnrollmentFilters').returns({ concluded: false, inactive: false });
-  notOk(this.gradebook.studentsParams().enrollment_state.includes('active'));
 });
 
 QUnit.module('Gradebook#weightedGroups', {
@@ -2286,14 +2817,14 @@ test('sets the section select as disabled when students are not loaded', functio
 });
 
 test('sets the section select as not disabled when students are loaded', function () {
-  this.gradebook.contentLoadStates.studentsLoaded = true;
+  this.gradebook.setStudentsLoaded(true);
   this.gradebook.updateSectionFilterVisibility();
   strictEqual(this.gradebook.sectionFilterMenu.props.disabled, false);
 });
 
 test('updates the disabled state of the rendered section select', function () {
   this.gradebook.updateSectionFilterVisibility();
-  this.gradebook.contentLoadStates.studentsLoaded = true;
+  this.gradebook.setStudentsLoaded(true);
   this.gradebook.updateSectionFilterVisibility();
   strictEqual(this.gradebook.sectionFilterMenu.props.disabled, false);
 });
@@ -2538,40 +3069,104 @@ test('calls setupGrading', function () {
 test('sends all students when calling setupGrading', function () {
   const allStudents = [{ id: '1101', assignment_201: {}, assignment_202: {} }];
   const gradebook = createGradebook();
-  this.stub(gradebook, 'listStudents').returns(allStudents);
+  this.stub(gradebook.courseContent.students, 'listStudents').returns(allStudents);
   this.spy(gradebook, 'setupGrading');
   gradebook.resetGrading();
   const [students] = gradebook.setupGrading.lastCall.args;
   strictEqual(students, allStudents);
 });
 
-QUnit.module('addRow', {
+QUnit.module('Gradebook#updateStudentAttributes', {
   setup () {
-    fakeENV.setup({
-      GRADEBOOK_OPTIONS: { context_id: 1 },
-    });
-  },
-
-  teardown () {
-    fakeENV.teardown();
+    this.gradebook = createGradebook();
+    this.student = { id: '1101', enrollments: [{ grades: { html_url: 'http://example.url/' } }] };
   }
 });
 
-test('does not add filtered out users', function () {
-  const gradebook = createGradebook({ sections: { 1: { name: 'Section 1' }, 2: { name: 'Section 2' }} });
-  gradebook.sections_enabled = true;
-  gradebook.sectionToShow = '2';
+test('sets .computed_current_score to 0', function () {
+  this.gradebook.updateStudentAttributes(this.student);
+  strictEqual(this.student.computed_current_score, 0);
+});
 
-  const student1 = {
-    enrollments: [{grades: {}}],
-    sections: ['1'],
-    name: 'student',
-  };
-  const student2 = {...student1, sections: ['2']};
-  const student3 = {...student1, sections: ['2']};
-  [student1, student2, student3].forEach((student) => { gradebook.addRow(student) });
+test('sets .computed_final_score to 0', function () {
+  this.gradebook.updateStudentAttributes(this.student);
+  strictEqual(this.student.computed_final_score, 0);
+});
 
-  ok(_.isEqual(gradebook.rows, [student2, student3]));
+test('sets .isConcluded to true when all enrollments are "completed"', function () {
+  this.student.enrollments[0].enrollment_state = 'completed';
+  this.student.enrollments.push({ enrollment_state: 'completed', grades: { html_url: 'http://example.url/' } });
+  this.gradebook.updateStudentAttributes(this.student);
+  strictEqual(this.student.isConcluded, true);
+});
+
+test('sets .isConcluded to false when any enrollments are not "completed"', function () {
+  this.student.enrollments.push({ enrollment_state: 'completed', grades: { html_url: 'http://example.url/' } });
+  this.gradebook.updateStudentAttributes(this.student);
+  strictEqual(this.student.isConcluded, false);
+});
+
+test('sets .isInactive to true when all enrollments are "inactive"', function () {
+  this.student.enrollments[0].enrollment_state = 'inactive';
+  this.student.enrollments.push({ enrollment_state: 'inactive', grades: { html_url: 'http://example.url/' } });
+  this.gradebook.updateStudentAttributes(this.student);
+  strictEqual(this.student.isInactive, true);
+});
+
+test('sets .isInactive to false when any enrollments are not "inactive"', function () {
+  this.student.enrollments.push({ enrollment_state: 'inactive', grades: { html_url: 'http://example.url/' } });
+  this.gradebook.updateStudentAttributes(this.student);
+  strictEqual(this.student.isInactive, false);
+});
+
+test('sets .cssClass using the id of the student', function () {
+  this.gradebook.updateStudentAttributes(this.student);
+  equal(this.student.cssClass, 'student_1101');
+});
+
+QUnit.module('Gradebook#updateStudentRow', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.gradebook.grid = {
+      invalidateRow: this.stub()
+    };
+    this.gradebook.rows = [{ id: '1101' }, { id: '1102' }, { id: '1103' }];
+  }
+});
+
+test('updates the associated row with the given student', function () {
+  const student = { id: '1102', name: 'Adam Jones' };
+  this.gradebook.updateStudentRow(student);
+  strictEqual(this.gradebook.rows[1], student);
+});
+
+test('invalidates the associated grid row', function () {
+  this.gradebook.updateStudentRow({ id: '1102', name: 'Adam Jones' });
+  strictEqual(this.gradebook.grid.invalidateRow.callCount, 1);
+});
+
+test('includes the row index when invalidating the grid row', function () {
+  this.gradebook.updateStudentRow({ id: '1102', name: 'Adam Jones' });
+  const [row] = this.gradebook.grid.invalidateRow.lastCall.args;
+  strictEqual(row, 1);
+});
+
+test('does not update rows when the given student is not already included', function () {
+  this.gradebook.updateStudentRow({ id: '1104', name: 'Dana Smith' });
+  equal(typeof this.gradebook.rows[-1], 'undefined');
+  deepEqual(this.gradebook.rows.map(row => row.id), ['1101', '1102', '1103']);
+});
+
+test('does not invalidate rows when the given student is not already included', function () {
+  this.gradebook.updateStudentRow({ id: '1104', name: 'Dana Smith' });
+  strictEqual(this.gradebook.grid.invalidateRow.callCount, 0);
+});
+
+test('does not invalidate rows when the grid is not defined', function () {
+  const invalidateRow = this.gradebook.grid.invalidateRow;
+  this.gradebook.grid = null;
+  this.gradebook.updateStudentRow({ id: '1102', name: 'Adam Jones' });
+  strictEqual(invalidateRow.callCount, 0);
 });
 
 QUnit.module('sortByStudentColumn', {
@@ -4996,10 +5591,11 @@ test('when primaryInfo is set as "anonymous", sets display_name without other va
 QUnit.module('Gradebook#gotSubmissionsChunk', {
   setup () {
     this.gradebook = createGradebook();
-    this.gradebook.students = {
-      1101: { id: '1101', assignment_201: {}, assignment_202: {} },
-      1102: { id: '1102', assignment_201: {} }
-    };
+    this.gradebook.grid = { render: this.stub() };
+    this.gradebook.courseContent.students.addUserStudents([
+      { id: '1101', assignment_201: {}, assignment_202: {} },
+      { id: '1102', assignment_201: {} }
+    ]);
     this.stub(this.gradebook, 'updateSubmission');
     this.stub(this.gradebook, 'invalidateRowsForStudentIds');
   }
@@ -5024,6 +5620,18 @@ test('invalidates rows for related students', function () {
   this.gradebook.gotSubmissionsChunk(studentSubmissions);
   const [studentIds] = this.gradebook.invalidateRowsForStudentIds.lastCall.args;
   deepEqual(studentIds, ['1101', '1102']);
+});
+
+test('renders the grid', function () {
+  this.gradebook.gotSubmissionsChunk([]);
+  strictEqual(this.gradebook.grid.render.callCount, 1);
+});
+
+test('does not attempt to render the grid when not defined', function () {
+  const render = this.gradebook.grid.render;
+  this.gradebook.grid = null;
+  this.gradebook.gotSubmissionsChunk([]);
+  strictEqual(render.callCount, 0);
 });
 
 QUnit.module('Gradebook#setSortRowsBySetting');
@@ -5269,13 +5877,9 @@ test('returns array including multiple values when settings are on', function ()
 
 QUnit.module('Gradebook#toggleEnrollmentFilter', {
   setup () {
-    fakeENV.setup({
-      GRADEBOOK_OPTIONS: { context_id: 10 },
-    });
-  },
-
-  teardown () {
-    fakeENV.teardown();
+    this.gradebook = createGradebook();
+    this.stub(this.gradebook, 'renderStudentColumnHeader');
+    this.stub(this.gradebook, 'reloadStudentData');
   }
 });
 
@@ -5284,12 +5888,30 @@ test('changes the value of @getSelectedEnrollmentFilters', function () {
 
   for (let i = 0; i < 2; i++) {
     studentRowHeaderConstants.enrollmentFilterKeys.forEach((key) => {
-      const previousValue = gradebook.getSelectedEnrollmentFilters().includes(key);
-      gradebook.toggleEnrollmentFilter(key, true);
-      const newValue = gradebook.getSelectedEnrollmentFilters().includes(key);
+      const previousValue = this.gradebook.getSelectedEnrollmentFilters().includes(key);
+      this.gradebook.toggleEnrollmentFilter(key, true);
+      const newValue = this.gradebook.getSelectedEnrollmentFilters().includes(key);
       notEqual(previousValue, newValue);
     });
   }
+});
+
+test('saves settings', function () {
+  this.stub(this.gradebook, 'saveSettings');
+  this.gradebook.toggleEnrollmentFilter('inactive');
+  strictEqual(this.gradebook.saveSettings.callCount, 1);
+});
+
+test('renders the student column header after saving settings', function () {
+  this.stub(this.gradebook, 'saveSettings').callsFake((_data, callback) => { callback() });
+  this.gradebook.toggleEnrollmentFilter('inactive');
+  strictEqual(this.gradebook.renderStudentColumnHeader.callCount, 1);
+});
+
+test('reloads student data after saving settings', function () {
+  this.stub(this.gradebook, 'saveSettings').callsFake((_data, callback) => { callback() });
+  this.gradebook.toggleEnrollmentFilter('inactive');
+  strictEqual(this.gradebook.reloadStudentData.callCount, 1);
 });
 
 QUnit.module('Gradebook#saveSettings', {
@@ -5330,7 +5952,9 @@ test('calls ajaxJSON with default gradebook_settings', function () {
     filter_columns_by: {
       assignment_group_id: null,
       context_module_id: null,
-      grading_period_id: null,
+      grading_period_id: null
+    },
+    filter_rows_by: {
       section_id: null
     },
     selected_view_options_filters: ['assignmentGroups'],
@@ -5389,7 +6013,9 @@ test('calls ajaxJSON with parameters', function () {
       filter_columns_by: {
         assignment_group_id: '2201',
         context_module_id: '2601',
-        grading_period_id: '1401',
+        grading_period_id: '1401'
+      },
+      filter_rows_by: {
         section_id: '2001'
       },
       show_concluded_enrollments: 'true',
@@ -5424,7 +6050,9 @@ test('calls ajaxJSON with parameters', function () {
       filter_columns_by: {
         assignment_group_id: '2201',
         context_module_id: '2601',
-        grading_period_id: '1401',
+        grading_period_id: '1401'
+      },
+      filter_rows_by: {
         section_id: '2001'
       },
       selected_view_options_filters: [''],
@@ -5464,6 +6092,30 @@ test('calls errorFn when response is not successful', function () {
   gradebook.saveSettings({}, null, errorFn);
 
   strictEqual(errorFn.callCount, 1);
+});
+
+test('excludes "sort rows by" settings when sorting by an assignment group', function () {
+  // This is temporary until the Gradebook `user_ids` supports this sorting.
+  const ajaxJSONStub = this.stub($, 'ajaxJSON');
+  const gradebook = createGradebook();
+  gradebook.setSortRowsBySetting('assignment_group_2301', 'grade', 'ascending');
+  gradebook.saveSettings();
+  const requestData = ajaxJSONStub.firstCall.args[2];
+  notOk('sort_rows_by_column_id' in requestData.gradebook_settings, 'request excludes "sort_rows_by_column_id"');
+  notOk('sort_rows_by_setting_key' in requestData.gradebook_settings, 'request excludes "sort_rows_by_setting_key"');
+  notOk('sort_rows_by_direction' in requestData.gradebook_settings, 'request excludes "sort_rows_by_direction"');
+});
+
+test('excludes "sort rows by" settings when sorting by total grade', function () {
+  // This is temporary until the Gradebook `user_ids` supports this sorting.
+  const ajaxJSONStub = this.stub($, 'ajaxJSON');
+  const gradebook = createGradebook();
+  gradebook.gridDisplaySettings.sortRowsBy = { columnId: 'total_grade', settingKey: 'grade', direction: 'direction' };
+  gradebook.saveSettings();
+  const requestData = ajaxJSONStub.firstCall.args[2];
+  notOk('sort_rows_by_column_id' in requestData.gradebook_settings, 'request excludes "sort_rows_by_column_id"');
+  notOk('sort_rows_by_setting_key' in requestData.gradebook_settings, 'request excludes "sort_rows_by_setting_key"');
+  notOk('sort_rows_by_direction' in requestData.gradebook_settings, 'request excludes "sort_rows_by_direction"');
 });
 
 QUnit.module('Gradebook#updateColumnsAndRenderViewOptionsMenu');
@@ -5779,6 +6431,7 @@ QUnit.module('Gradebook#updateCurrentGradingPeriod', {
     });
     this.stub(this.gradebook, 'saveSettings');
     this.stub(this.gradebook, 'resetGrading');
+    this.stub(this.gradebook, 'sortGridRows');
     this.stub(this.gradebook, 'setAssignmentWarnings');
     this.stub(this.gradebook, 'updateColumnsAndRenderViewOptionsMenu');
   }
@@ -5799,6 +6452,13 @@ test('saves settings after updating the filter setting', function () {
 test('resets grading after updating the filter setting', function () {
   this.gradebook.resetGrading.callsFake(() => {
     strictEqual(this.gradebook.getFilterColumnsBySetting('gradingPeriodId'), '1401', 'setting was already updated');
+  });
+  this.gradebook.updateCurrentGradingPeriod('1401');
+});
+
+test('sorts grid grows after resetting grading', function () {
+  this.gradebook.sortGridRows.callsFake(() => {
+    strictEqual(this.gradebook.resetGrading.callCount, 1, 'grading was already reset');
   });
   this.gradebook.updateCurrentGradingPeriod('1401');
 });

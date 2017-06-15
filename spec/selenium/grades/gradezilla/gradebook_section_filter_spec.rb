@@ -54,18 +54,18 @@ describe "Gradezilla" do
   it "should allow showing only a certain section", priority: "1", test_id: 3253291 do
     Gradezilla.visit(@course)
     # grade the first assignment
-    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2', 0)
-    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(2) .l2', 1)
+    edit_grade(".slick-row.student_#{@student_1.id} .slick-cell.assignment_#{@first_assignment.id}", 0)
+    edit_grade(".slick-row.student_#{@student_2.id} .slick-cell.assignment_#{@first_assignment.id}", 1)
 
     switch_to_section(@other_section)
     expect(ff('option', Gradezilla.section_dropdown).find(&:selected?)).to include_text @other_section.name
 
-    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')).to include_text '1'
+    expect(f(".slick-row.student_#{@student_2.id} .slick-cell.assignment_#{@first_assignment.id}")).to include_text '1'
 
     # verify that it remembers the section to show across page loads
     Gradezilla.visit(@course)
     expect(ff('option', Gradezilla.section_dropdown).find(&:selected?)).to include_text @other_section.name
-    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')).to include_text '1'
+    expect(f(".slick-row.student_#{@student_2.id} .slick-cell.assignment_#{@first_assignment.id}")).to include_text '1'
 
     # now verify that you can set it back
 
@@ -73,7 +73,7 @@ describe "Gradezilla" do
     expect(ff('option', Gradezilla.section_dropdown).find(&:selected?)).to include_text 'All Sections'
 
     # validate all grades (i.e. submissions) were loaded
-    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')).to include_text '0'
-    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(2) .l2')).to include_text '1'
+    expect(f(".slick-row.student_#{@student_1.id} .slick-cell.assignment_#{@first_assignment.id}")).to include_text '0'
+    expect(f(".slick-row.student_#{@student_2.id} .slick-cell.assignment_#{@first_assignment.id}")).to include_text '1'
   end
 end

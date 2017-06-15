@@ -319,6 +319,7 @@ class GradebooksController < ApplicationController
     js_env STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards)
     env = {
       GRADEBOOK_OPTIONS: {
+        api_max_per_page: per_page,
         chunk_size: chunk_size,
         assignment_groups_url: api_v1_course_assignment_groups_url(
           @context,

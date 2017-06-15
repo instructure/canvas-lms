@@ -536,6 +536,13 @@ describe GradebooksController do
         expect(gradebook_options).not_to have_key :colors
       end
 
+      it 'includes api_max_per_page' do
+        Setting.set('api_max_per_page', 50)
+        get :show, course_id: @course.id
+        api_max_per_page = assigns[:js_env][:GRADEBOOK_OPTIONS][:api_max_per_page]
+        expect(api_max_per_page).to eq(50)
+      end
+
       describe "graded_late_or_missing_submissions_exist" do
         it "is not included if New Gradebook is disabled" do
           get :show, course_id: @course.id

@@ -53,9 +53,16 @@
           <div class="gradebook-filter-container" id="sections-filter-container"></div>
         <% end %>
 
-        <div class="gradebook-filter-container gradebook_filter" style="display:none">
+        <div class="gradebook-filter-container gradebook_filter" id="search-filter-container">
           <% placeholder = t('Search…') %>
-          <input type="text" class="search-query" placeholder="<%= placeholder %>" aria-label="<%= placeholder %>">
+          <input
+            type="text"
+            class="search-query"
+            placeholder="<%= placeholder %>"
+            aria-label="<%= placeholder %>"
+            aria-disabled="true"
+            disabled
+          >
         </div>
 
         <div class="gradebook_menu">
