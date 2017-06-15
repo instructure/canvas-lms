@@ -33,11 +33,7 @@ describe Lti::LtiOutboundAdapter do
     end
   }
 
-  let(:user) {
-    User.new.tap do |user|
-      user.stubs(:id).returns('user_id')
-    end
-  }
+  let(:user) { User.create! }
 
   let(:context) {
     Course.new.tap do |course|
@@ -263,7 +259,7 @@ describe Lti::LtiOutboundAdapter do
     it "generates the correct source_id for the assignment" do
       generated_sha = 'generated_sha'
       Canvas::Security.stubs(:hmac_sha1).returns(generated_sha)
-      source_id = "tool_id-course_id-assignment_id-user_id-#{generated_sha}"
+      source_id = "tool_id-course_id-assignment_id-#{user.id}-#{generated_sha}"
       tool_launch.stubs(:for_assignment!)
       assignment_creator = mock
       assignment_creator.stubs(:convert).returns(tool_launch)
