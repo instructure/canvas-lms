@@ -1042,7 +1042,7 @@ module UpdateAndDeleteWithJoins
 end
 ActiveRecord::Relation.prepend(UpdateAndDeleteWithJoins)
 
-module DeleteAllWithLimit
+module UpdateAndDeleteAllWithLimit
   def delete_all(*args)
     if limit_value || offset_value
       scope = except(:select).select("#{quoted_table_name}.#{primary_key}")
@@ -1050,8 +1050,16 @@ module DeleteAllWithLimit
     end
     super
   end
+
+  def update_all(updates, *args)
+    if limit_value || offset_value
+      scope = except(:select).select("#{quoted_table_name}.#{primary_key}")
+      return unscoped.where(primary_key => scope).update_all(updates)
+    end
+    super
+  end
 end
-ActiveRecord::Relation.prepend(DeleteAllWithLimit)
+ActiveRecord::Relation.prepend(UpdateAndDeleteAllWithLimit)
 
 ActiveRecord::Associations::CollectionProxy.class_eval do
   def respond_to?(name, include_private = false)
