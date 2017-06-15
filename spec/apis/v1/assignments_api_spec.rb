@@ -973,6 +973,16 @@ describe AssignmentsApiController, type: :request do
       expect(json['post_to_sis']).to eq false
     end
 
+    it "accepts a value for post_to_sis" do
+      a = @course.account
+      a.settings[:sis_default_grade_export] = {locked: false, value: false}
+      a.save!
+      json = api_create_assignment_in_course(@course, {'post_to_sis' => true})
+
+      assignment = Assignment.find(json['id'])
+      expect(assignment.post_to_sis).to eq true
+    end
+
     it "should not overwrite post_to_sis with default if missing in update params" do
       a = @course.account
       a.settings[:sis_default_grade_export] = {locked: false, value: true}
@@ -1753,6 +1763,31 @@ describe AssignmentsApiController, type: :request do
           assignment = Assignment.find(json["id"])
           expect(assignment.assignment_overrides.first.due_at).to eql nil
         end
+      end
+    end
+
+    context "sis validations enabled" do
+      it 'saves with a section with a valid due_date' do
+        a = @course.account
+        a.enable_feature!(:new_sis_integrations)
+        a.settings[:sis_syncing] = {value: true}
+        a.settings[:sis_require_assignment_due_date] = {value: true}
+        a.save!
+
+        assignment_params = {
+          'post_to_sis' => true,
+          'assignment_overrides' => {
+            '0' => {
+                'course_section_id' => @course.default_section.id,
+                'due_at' => 7.days.from_now.iso8601
+            }
+          }
+        }
+
+        json = api_create_assignment_in_course(@course, assignment_params)
+
+        # expect(json["errors"]).to be_nil
+        expect(json["errors"]).to have_key('due_at')
       end
     end
   end

@@ -623,11 +623,11 @@ module Api::V1::Assignment
     end
 
     post_to_sis = assignment_params.key?('post_to_sis') ? value_to_boolean(assignment_params['post_to_sis']) : nil
-    if assignment.new_record? && (post_to_sis.nil? || !Assignment.sis_grade_export_enabled?(context))
+    if !post_to_sis.nil?
+      assignment.post_to_sis = post_to_sis
+    elsif assignment.new_record? && !Assignment.sis_grade_export_enabled?(context)
       # set the default setting if it is not included.
       assignment.post_to_sis = context.account.sis_default_grade_export[:value]
-    elsif !post_to_sis.nil?
-      assignment.post_to_sis = post_to_sis
     end
 
     if assignment_params.key?('moderated_grading')
