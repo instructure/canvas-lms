@@ -18,7 +18,9 @@
 require 'active_record/migration'
 
 module CanvasPartman
-  class Migration < ActiveRecord::Migration
+  parent = ActiveRecord::Migration.respond_to?(:[]) ? ActiveRecord::Migration[4.2] : ActiveRecord::Migration
+
+  class Migration < parent
     class << self
       # @attr [CanvasPartman::Partitioned] base_class
       #  The partitioned ActiveRecord::Base model _class_ we're modifying
