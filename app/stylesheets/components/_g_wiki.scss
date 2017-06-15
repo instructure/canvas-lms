@@ -76,12 +76,13 @@ $revision-button-hover-color: $ic-brand-primary;
 }
 
 .add_prerequisite_or_requirement_link {
-  color: #0088cc;
+  color: $ic-link-color;
   border: none;
   background: none;
   padding: 0px;
   &:hover {
-    color: #005580;
+    color: $ic-link-color-hover;
+    background: none;
     text-decoration: underline;
   }
 }
