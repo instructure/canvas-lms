@@ -486,7 +486,7 @@ describe "courses" do
 
         # manually trigger a stale enrollment - should recalculate on visit if it didn't already in the background
         Course.where(:id => @course).update_all(:start_at => 1.day.ago)
-        Enrollment.where(:id => @student.student_enrollments).update_all(:updated_at => 1.second.from_now) # because of enrollment date caching
+        Enrollment.where(:id => @student.student_enrollments).update_all(:updated_at => 1.minute.from_now) # because of enrollment date caching
         EnrollmentState.where(:enrollment_id => @student.student_enrollments).update_all(:state_is_current => false)
 
         refresh_page
