@@ -184,16 +184,20 @@ test('renders a PopoverMenu with a trigger', function () {
 });
 
 test('calls addGradebookElement prop on open', function () {
+  notOk(this.props.addGradebookElement.called);
+
   this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
 
-  strictEqual(this.props.addGradebookElement.callCount, 1);
+  ok(this.props.addGradebookElement.called);
 });
 
 test('calls removeGradebookElement prop on close', function () {
+  notOk(this.props.removeGradebookElement.called);
+
   this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
   this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
 
-  strictEqual(this.props.removeGradebookElement.callCount, 1);
+  ok(this.props.removeGradebookElement.called);
 });
 
 test('calls onMenuClose prop on close', function () {
@@ -219,13 +223,6 @@ test('renders a title for the More icon based on the assignment name', function 
 QUnit.module('AssignmentColumnHeader: Sort by Settings', {
   setup () {
     this.mountAndOpenOptions = mountAndOpenOptions;
-  },
-
-  openSortByMenu (wrapper) {
-    const menuContent = new ReactWrapper([wrapper.node.optionsMenuContent], wrapper.node);
-    const flyout = menuContent.find('MenuItemFlyout');
-    flyout.find('button').simulate('mouseOver');
-    return new ReactWrapper([wrapper.node.sortByMenuContent], wrapper.node);
   },
 
   teardown () {
@@ -257,6 +254,17 @@ test('clicking "Grade - Low to High" calls onSortByGradeAscending', function () 
   strictEqual(onSortByGradeAscending.callCount, 1);
 });
 
+test('clicking "Grade - Low to High" focuses menu trigger', function () {
+  const onSortByGradeAscending = this.stub();
+  const props = defaultProps({ sortBySetting: { onSortByGradeAscending } });
+  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Grade - Low to High');
+  const focusStub = this.stub(this.wrapper.instance(), 'focusAtEnd')
+
+  menuItem.simulate('click');
+
+  equal(focusStub.callCount, 1);
+});
+
 test('"Grade - Low to High" is optionally disabled', function () {
   const props = defaultProps({ sortBySetting: { disabled: true } });
   const menuItem = findMenuItem.call(this, props, 'Sort by', 'Grade - Low to High');
@@ -280,6 +288,17 @@ test('clicking "Grade - High to Low" calls onSortByGradeDescending', function ()
   const props = defaultProps({ sortBySetting: { onSortByGradeDescending } });
   findMenuItem.call(this, props, 'Sort by', 'Grade - High to Low').simulate('click');
   strictEqual(onSortByGradeDescending.callCount, 1);
+});
+
+test('clicking "Grade - High to Low" focuses menu trigger', function () {
+  const onSortByGradeDescending = this.stub();
+  const props = defaultProps({ sortBySetting: { onSortByGradeDescending } });
+  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Grade - High to Low');
+  const focusStub = this.stub(this.wrapper.instance(), 'focusAtEnd')
+
+  menuItem.simulate('click');
+
+  equal(focusStub.callCount, 1);
 });
 
 test('"Grade - High to Low" is optionally disabled', function () {
@@ -307,6 +326,17 @@ test('clicking "Missing" calls onSortByMissing', function () {
   strictEqual(onSortByMissing.callCount, 1);
 });
 
+test('clicking "Missing" focuses menu trigger', function () {
+  const onSortByMissing = this.stub();
+  const props = defaultProps({ sortBySetting: { onSortByMissing } });
+  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Missing');
+  const focusStub = this.stub(this.wrapper.instance(), 'focusAtEnd')
+
+  menuItem.simulate('click');
+
+  equal(focusStub.callCount, 1);
+});
+
 test('"Missing" is optionally disabled', function () {
   const props = defaultProps({ sortBySetting: { disabled: true } });
   const menuItem = findMenuItem.call(this, props, 'Sort by', 'Missing');
@@ -332,6 +362,17 @@ test('clicking "Late" calls onSortByLate', function () {
   strictEqual(onSortByLate.callCount, 1);
 });
 
+test('clicking "Late" focuses menu trigger', function () {
+  const onSortByLate = this.stub();
+  const props = defaultProps({ sortBySetting: { onSortByLate } });
+  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Late');
+  const focusStub = this.stub(this.wrapper.instance(), 'focusAtEnd')
+
+  menuItem.simulate('click');
+
+  equal(focusStub.callCount, 1);
+});
+
 test('"Late" is optionally disabled', function () {
   const props = defaultProps({ sortBySetting: { disabled: true } });
   const menuItem = findMenuItem.call(this, props, 'Sort by', 'Late');
@@ -355,6 +396,17 @@ test('clicking "Unposted" calls onSortByUnposted', function () {
   const props = defaultProps({ sortBySetting: { onSortByUnposted } });
   findMenuItem.call(this, props, 'Sort by', 'Unposted').simulate('click');
   strictEqual(onSortByUnposted.callCount, 1);
+});
+
+test('clicking "Unposted" focuses menu trigger', function () {
+  const onSortByUnposted = this.stub();
+  const props = defaultProps({ sortBySetting: { onSortByUnposted } });
+  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Unposted');
+  const focusStub = this.stub(this.wrapper.instance(), 'focusAtEnd')
+
+  menuItem.simulate('click');
+
+  equal(focusStub.callCount, 1);
 });
 
 test('"Unposted" is optionally disabled', function () {
@@ -395,13 +447,16 @@ test('Curve Grades menu item is enabled when isDisabled is false', function () {
   notOk(menuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'));
 });
 
-test('onSelect is called when menu item is clicked', function () {
+test('clicking the menu item invokes onSelect with correct callback', function () {
   const onSelect = this.stub();
   const props = defaultProps({ curveGradesAction: { onSelect } });
   this.wrapper = mountAndOpenOptions(props);
   const menuItem = document.querySelector('[data-menu-item-id="curve-grades"]');
+
   menuItem.click();
+
   equal(onSelect.callCount, 1);
+  equal(onSelect.getCall(0).args[0], this.wrapper.instance().focusAtEnd);
 });
 
 test('the Curve Grades dialog has focus when it is invoked', function () {
@@ -457,14 +512,15 @@ test('disables the menu item when submissions are not loaded', function () {
   equal(menuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'), 'true');
 });
 
-test('clicking the menu item invokes the Message Students Who dialog', function () {
+test('clicking the menu item invokes the Message Students Who dialog with correct callback', function () {
   this.wrapper = mountAndOpenOptions(this.props);
-  this.stub(window, 'messageStudents');
-
+  const messageStudents = this.stub(window, 'messageStudents');
   const menuItem = document.querySelector('[data-menu-item-id="message-students-who"]');
+
   menuItem.click();
 
-  equal(window.messageStudents.callCount, 1);
+  equal(messageStudents.callCount, 1);
+  equal(messageStudents.getCall(0).args[0].onClose, this.wrapper.instance().focusAtEnd);
 });
 
 QUnit.module('AssignmentColumnHeader: Mute/Unmute Assignment Action', {
@@ -505,7 +561,7 @@ test('disables the option when prop muteAssignmentAction.disabled is truthy', fu
   equal(specificMenuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'), 'true');
 });
 
-test('clicking the option invokes prop muteAssignmentAction.onSelect', function () {
+test('clicking the menu item invokes onSelect with correct callback', function () {
   this.props.muteAssignmentAction.onSelect = this.stub();
   this.wrapper = mountAndOpenOptions(this.props);
 
@@ -513,6 +569,7 @@ test('clicking the option invokes prop muteAssignmentAction.onSelect', function 
   specificMenuItem.click();
 
   equal(this.props.muteAssignmentAction.onSelect.callCount, 1);
+  equal(this.props.muteAssignmentAction.onSelect.getCall(0).args[0], this.wrapper.instance().focusAtEnd);
 });
 
 test('the Assignment Muting dialog has focus when it is invoked', function () {
@@ -618,7 +675,7 @@ test('disables the menu item when the disabled prop is true', function () {
   equal(specificMenuItem.parentElement.parentElement.parentElement.getAttribute('aria-disabled'), 'true');
 });
 
-test('clicking the menu item invokes the onSelect handler', function () {
+test('clicking the menu item invokes onSelect with correct callback', function () {
   this.props.setDefaultGradeAction.onSelect = this.stub();
   this.wrapper = mountAndOpenOptions(this.props);
 
@@ -626,6 +683,7 @@ test('clicking the menu item invokes the onSelect handler', function () {
   specificMenuItem.click();
 
   equal(this.props.setDefaultGradeAction.onSelect.callCount, 1);
+  equal(this.props.setDefaultGradeAction.onSelect.getCall(0).args[0], this.wrapper.instance().focusAtEnd);
 });
 
 test('the Set Default Grade dialog has focus when it is invoked', function () {
@@ -674,7 +732,7 @@ test('does not render the menu item when the hidden prop is true', function () {
   equal(specificMenuItem, null);
 });
 
-test('clicking the menu item invokes the onSelect handler', function () {
+test('clicking the menu item invokes onSelect with correct callback', function () {
   this.props.downloadSubmissionsAction.onSelect = this.stub();
   this.wrapper = mountAndOpenOptions(this.props);
 
@@ -682,6 +740,7 @@ test('clicking the menu item invokes the onSelect handler', function () {
   specificMenuItem.click();
 
   equal(this.props.downloadSubmissionsAction.onSelect.callCount, 1);
+  equal(this.props.downloadSubmissionsAction.onSelect.getCall(0).args[0], this.wrapper.instance().focusAtEnd);
 });
 
 QUnit.module('AssignmentColumnHeader: Reupload Submissions Action', {
@@ -712,7 +771,7 @@ test('does not render the menu item when the hidden prop is true', function () {
   equal(specificMenuItem, null);
 });
 
-test('clicking the menu item invokes the onSelect property', function () {
+test('clicking the menu item invokes the onSelect property with correct callback', function () {
   this.props.reuploadSubmissionsAction.onSelect = this.stub();
   this.wrapper = mountAndOpenOptions(this.props);
 
@@ -720,6 +779,7 @@ test('clicking the menu item invokes the onSelect property', function () {
   specificMenuItem.click();
 
   equal(this.props.reuploadSubmissionsAction.onSelect.callCount, 1);
+  equal(this.props.reuploadSubmissionsAction.onSelect.getCall(0).args[0], this.wrapper.instance().focusAtEnd);
 });
 
 QUnit.module('AssignmentColumnHeader#handleKeyDown', function (hooks) {

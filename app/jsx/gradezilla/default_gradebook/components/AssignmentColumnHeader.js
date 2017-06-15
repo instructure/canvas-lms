@@ -38,6 +38,7 @@ import ColumnHeader from 'jsx/gradezilla/default_gradebook/components/ColumnHead
 
 class AssignmentColumnHeader extends ColumnHeader {
   static propTypes = {
+    ...ColumnHeader.propTypes,
     assignment: shape({
       courseId: string.isRequired,
       htmlUrl: string.isRequired,
@@ -92,8 +93,7 @@ class AssignmentColumnHeader extends ColumnHeader {
       onSelect: func.isRequired
     }).isRequired,
     onMenuClose: func.isRequired,
-    showUnpostedMenuItem: bool.isRequired,
-    ...ColumnHeader.propTypes
+    showUnpostedMenuItem: bool.isRequired
   };
 
   static defaultProps = {
@@ -117,6 +117,18 @@ class AssignmentColumnHeader extends ColumnHeader {
   }
 
   bindAssignmentLink = (ref) => { this.assignmentLink = ref };
+
+  curveGrades = () => { this.invokeAndSkipFocus(this.props.curveGradesAction) };
+  setDefaultGrades = () => { this.invokeAndSkipFocus(this.props.setDefaultGradeAction) };
+  muteAssignment = () => { this.invokeAndSkipFocus(this.props.muteAssignmentAction) };
+  downloadSubmissions = () => { this.invokeAndSkipFocus(this.props.downloadSubmissionsAction) };
+  reuploadSubmissions = () => { this.invokeAndSkipFocus(this.props.reuploadSubmissionsAction) };
+
+  invokeAndSkipFocus (action) {
+    this.setState({ skipFocusOnClose: true });
+    action.onSelect(this.focusAtEnd);
+  }
+
   focusAtStart = () => { this.assignmentLink.focus() };
 
   handleKeyDown = (event) => {
@@ -138,7 +150,9 @@ class AssignmentColumnHeader extends ColumnHeader {
   };
 
   showMessageStudentsWhoDialog = () => {
+    this.setState({ skipFocusOnClose: true });
     const settings = MessageStudentsWhoHelper.settings(this.props.assignment, this.activeStudentDetails());
+    settings.onClose = this.focusAtEnd;
     window.messageStudents(settings);
   }
 
@@ -266,7 +280,6 @@ class AssignmentColumnHeader extends ColumnHeader {
           </MenuItemGroup>
         </MenuItemFlyout>
 
-
         <MenuItem
           disabled={!this.props.submissionsLoaded}
           onSelect={this.showMessageStudentsWhoDialog}
@@ -276,21 +289,21 @@ class AssignmentColumnHeader extends ColumnHeader {
 
         <MenuItem
           disabled={this.props.curveGradesAction.isDisabled}
-          onSelect={this.props.curveGradesAction.onSelect}
+          onSelect={this.curveGrades}
         >
           <span data-menu-item-id="curve-grades">{I18n.t('Curve Grades')}</span>
         </MenuItem>
 
         <MenuItem
           disabled={this.props.setDefaultGradeAction.disabled}
-          onSelect={this.props.setDefaultGradeAction.onSelect}
+          onSelect={this.setDefaultGrades}
         >
           <span data-menu-item-id="set-default-grade">{I18n.t('Set Default Grade')}</span>
         </MenuItem>
 
         <MenuItem
           disabled={this.props.muteAssignmentAction.disabled}
-          onSelect={this.props.muteAssignmentAction.onSelect}
+          onSelect={this.muteAssignment}
         >
           <span data-menu-item-id="assignment-muter">
             {this.props.assignment.muted ? I18n.t('Unmute Assignment') : I18n.t('Mute Assignment')}
@@ -306,14 +319,14 @@ class AssignmentColumnHeader extends ColumnHeader {
 
         {
           !this.props.downloadSubmissionsAction.hidden &&
-          <MenuItem onSelect={this.props.downloadSubmissionsAction.onSelect}>
+          <MenuItem onSelect={this.downloadSubmissions}>
             <span data-menu-item-id="download-submissions">{I18n.t('Download Submissions')}</span>
           </MenuItem>
         }
 
         {
           !this.props.reuploadSubmissionsAction.hidden &&
-          <MenuItem onSelect={this.props.reuploadSubmissionsAction.onSelect}>
+          <MenuItem onSelect={this.reuploadSubmissions}>
             <span data-menu-item-id="reupload-submissions">{I18n.t('Re-Upload Submissions')}</span>
           </MenuItem>
         }

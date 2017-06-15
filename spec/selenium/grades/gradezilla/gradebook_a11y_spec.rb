@@ -355,4 +355,26 @@ describe "Gradezilla" do
       end
     end
   end
+
+  context "assignment header focus" do
+    before { Gradezilla.visit(@course)}
+    let(:assignment) { @course.assignments.first }
+
+    it 'is placed on assignment header trigger upon sort' do
+      Gradezilla.click_assignment_header_menu(assignment.id)
+      Gradezilla.click_assignment_popover_sort_by('low-to-high')
+
+      check_element_has_focus Gradezilla.assignment_header_menu_trigger_element(assignment.title)
+    end
+
+    %w[message-students-who curve-grades set-default-grade assignment-muter download-submissions].each do |dialog|
+      it "is placed on assignment header trigger upon #{dialog} dialog close" do
+        Gradezilla.click_assignment_header_menu(assignment.id)
+        Gradezilla.click_assignment_header_menu_element(dialog)
+        Gradezilla.close_open_dialog
+
+        check_element_has_focus Gradezilla.assignment_header_menu_trigger_element(assignment.title)
+      end
+    end
+  end
 end

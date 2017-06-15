@@ -27,11 +27,11 @@ import AssignmentMuter from 'compiled/AssignmentMuter'
       this.isDialogEnabled = this.isDialogEnabled.bind(this);
     }
 
-    showDialog () {
+    showDialog (cb) {
       const assignmentMuter = new AssignmentMuter(
         null, this.assignment, this.url, null, { openDialogInstantly: true }
       );
-      assignmentMuter.show();
+      assignmentMuter.show(cb);
     }
 
     isDialogEnabled () {

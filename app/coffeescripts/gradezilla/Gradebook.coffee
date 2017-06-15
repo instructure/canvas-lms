@@ -1420,13 +1420,15 @@ define [
       @grid.invalidate()
       @renderTotalGradeColumnHeader()
 
-    togglePointsOrPercentTotals: =>
+    togglePointsOrPercentTotals: (cb) =>
       if UserSettings.contextGet('warned_about_totals_display')
         @switchTotalDisplay()
+        cb() if typeof cb == 'function'
       else
         dialog_options =
           showing_points: @options.show_total_grade_as_points
           save: @switchTotalDisplay
+          onClose: cb
         new GradeDisplayWarningDialog(dialog_options)
 
     onUserFilterInput: (term) =>
@@ -2095,6 +2097,13 @@ define [
       @renderStudentColumnHeader()
       @renderTotalGradeColumnHeader()
 
+    # Column Header Helpers
+    handleHeaderKeyDown: (e, columnId) =>
+      @gridSupport.navigation.handleHeaderKeyDown e,
+        region: 'header'
+        cell: @grid.getColumnIndex(columnId)
+        columnId: columnId
+
     # Student Column Header
 
     getStudentColumnSortBySetting: =>
@@ -2129,6 +2138,8 @@ define [
       addGradebookElement: @keyboardNav.addGradebookElement
       removeGradebookElement: @keyboardNav.removeGradebookElement
       onMenuClose: @handleColumnHeaderMenuClose
+      onHeaderKeyDown: (e) =>
+        @handleHeaderKeyDown(e, 'student')
 
     renderStudentColumnHeader: =>
       mountPoint = @getColumnHeaderNode('student')
@@ -2138,6 +2149,7 @@ define [
     # Total Grade Column Header
 
     freezeTotalGradeColumn: =>
+      @totalColumnPositionChanged = true
       allColumns = @grid.getColumns()
 
       # Remove total_grade column from aggregate section
@@ -2159,6 +2171,7 @@ define [
       @updateFrozenColumnsAndRenderGrid(allColumns)
 
     moveTotalGradeColumnToEnd: =>
+      @totalColumnPositionChanged = true
       allColumns = @grid.getColumns()
 
       # Remove total_grade column from aggregate or frozen section as needed
@@ -2222,6 +2235,13 @@ define [
           @moveTotalGradeColumnToEnd()
         , 10)
 
+    totalColumnShouldFocus: ->
+      if @totalColumnPositionChanged
+        @totalColumnPositionChanged = false
+        true
+      else
+        false
+
     getTotalGradeColumnHeaderProps: ->
       ref: (ref) =>
         @setHeaderComponentRef('total_grade', ref)
@@ -2231,6 +2251,9 @@ define [
       addGradebookElement: @keyboardNav.addGradebookElement
       removeGradebookElement: @keyboardNav.removeGradebookElement
       onMenuClose: @handleColumnHeaderMenuClose
+      grabFocus: @totalColumnShouldFocus()
+      onHeaderKeyDown: (e) =>
+        @handleHeaderKeyDown(e, 'total_grade')
 
     renderTotalGradeColumnHeader: =>
       return if @hideAggregateColumns()
@@ -2364,6 +2387,8 @@ define [
         removeGradebookElement: @keyboardNav.removeGradebookElement
         onMenuClose: @handleColumnHeaderMenuClose
         showUnpostedMenuItem: @options.new_gradebook_development_enabled
+        onHeaderKeyDown: (e) =>
+          @handleHeaderKeyDown(e, @getAssignmentColumnId(assignmentId))
       }
 
     renderAssignmentColumnHeader: (assignmentId) =>
@@ -2406,6 +2431,8 @@ define [
         addGradebookElement: @keyboardNav.addGradebookElement
         removeGradebookElement: @keyboardNav.removeGradebookElement
         onMenuClose: @handleColumnHeaderMenuClose
+        onHeaderKeyDown: (e) =>
+          @handleHeaderKeyDown(e, @getAssignmentGroupColumnId(assignmentGroupId))
       }
 
     renderAssignmentGroupColumnHeader: (assignmentGroupId) =>

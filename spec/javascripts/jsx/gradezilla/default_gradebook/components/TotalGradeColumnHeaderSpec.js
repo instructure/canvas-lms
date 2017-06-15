@@ -113,16 +113,20 @@ test('renders a title for the More icon based on the assignment name', function 
 });
 
 test('calls addGradebookElement prop on open', function () {
+  notOk(this.props.addGradebookElement.called);
+
   this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
 
-  strictEqual(this.props.addGradebookElement.callCount, 1);
+  ok(this.props.addGradebookElement.called);
 });
 
 test('calls removeGradebookElement prop on close', function () {
+  notOk(this.props.removeGradebookElement.called);
+
   this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
   this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
 
-  strictEqual(this.props.removeGradebookElement.callCount, 1);
+  ok(this.props.removeGradebookElement.called);
 });
 
 test('calls onMenuClose prop on close', function () {

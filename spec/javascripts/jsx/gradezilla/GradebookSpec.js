@@ -2124,6 +2124,15 @@ test('when user is ignoring warnings, immediately toggles the total grade displa
   equal(this.gradebook.switchTotalDisplay.callCount, 1, 'toggles the total grade display');
 });
 
+test('when user is ignoring warnings and a callback is given, immediately invokes callback', function () {
+  const callback = this.stub();
+  UserSettings.contextSet('warned_about_totals_display', true);
+
+  this.gradebook.togglePointsOrPercentTotals(callback);
+
+  equal(callback.callCount, 1);
+});
+
 test('when user is not ignoring warnings, return a dialog', function () {
   UserSettings.contextSet('warned_about_totals_display', false);
 
@@ -2139,6 +2148,16 @@ test('when user is not ignoring warnings, the dialog has a save property which i
   const dialog = this.gradebook.togglePointsOrPercentTotals();
 
   equal(dialog.options.save, this.gradebook.switchTotalDisplay);
+
+  dialog.cancel();
+});
+
+test('when user is not ignoring warnings, the dialog has a onClose property which is the callback function', function () {
+  const callback = this.stub();
+  this.stub(UserSettings, 'contextGet').withArgs('warned_about_totals_display').returns(false);
+  const dialog = this.gradebook.togglePointsOrPercentTotals(callback);
+
+  equal(dialog.options.onClose, callback);
 
   dialog.cancel();
 });
@@ -5468,6 +5487,13 @@ test('includes props for the "Position" settings', function () {
   strictEqual(typeof props.position.isInBack, 'boolean', 'props include "isInBack"');
   strictEqual(typeof props.position.onMoveToFront, 'function', 'props include "onMoveToFront"');
   strictEqual(typeof props.position.onMoveToBack, 'function', 'props include "onMoveToBack"');
+});
+
+test('includes prop for focusing the column header', function () {
+  const gradebook = this.createGradebook();
+  this.stub(gradebook, 'totalColumnShouldFocus').returns(true);
+  const props = gradebook.getTotalGradeColumnHeaderProps();
+  equal(typeof props.grabFocus, 'boolean');
 });
 
 QUnit.module('Gradebook#setStudentDisplay', {

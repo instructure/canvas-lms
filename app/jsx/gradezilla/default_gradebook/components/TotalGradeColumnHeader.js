@@ -66,12 +66,29 @@ class TotalGradeColumnHeader extends ColumnHeader {
       onMoveToBack: func.isRequired
     }).isRequired,
     onMenuClose: func.isRequired,
+    grabFocus: bool,
     ...ColumnHeader.propTypes
   };
 
   static defaultProps = {
+    grabFocus: false,
     ...ColumnHeader.defaultProps
   };
+
+  state = { menuShown: false, skipFocusOnClose: false };
+
+  switchGradeDisplay = () => { this.invokeAndSkipFocus(this.props.gradeDisplay) };
+
+  invokeAndSkipFocus (action) {
+    this.setState({ skipFocusOnClose: true });
+    action.onSelect(this.focusAtEnd);
+  }
+
+  componentDidMount () {
+    if (this.props.grabFocus) {
+      this.focusAtEnd();
+    }
+  }
 
   render () {
     const { sortBySetting, gradeDisplay, position } = this.props;
@@ -127,7 +144,7 @@ class TotalGradeColumnHeader extends ColumnHeader {
             !gradeDisplay.hidden &&
             <MenuItem
               disabled={this.props.gradeDisplay.disabled}
-              onSelect={this.props.gradeDisplay.onSelect}
+              onSelect={this.switchGradeDisplay}
             >
               <span data-menu-item-id="grade-display-switcher" style={nowrapStyle}>
                 {displayAsPoints ? I18n.t('Display as Percentage') : I18n.t('Display as Points')}

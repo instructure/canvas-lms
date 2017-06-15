@@ -86,8 +86,15 @@ export default class StudentColumnHeader extends ColumnHeader {
     this.props.onToggleEnrollmentFilter(enrollmentFilterKey);
   }
 
-  bindDisplayAsMenuContent = (ref) => { this.displayAsMenuContent = ref; };
-  bindSecondaryInfoMenuContent = (ref) => { this.secondaryInfoMenuContent = ref; };
+  bindDisplayAsMenuContent = (ref) => {
+    this.displayAsMenuContent = ref;
+    this.bindFlyoutMenu(ref, this.displayAsMenuContent);
+  };
+
+  bindSecondaryInfoMenuContent = (ref) => {
+    this.secondaryInfoMenuContent = ref;
+    this.bindFlyoutMenu(ref, this.secondaryInfoMenuContent);
+  };
 
   render () {
     const {

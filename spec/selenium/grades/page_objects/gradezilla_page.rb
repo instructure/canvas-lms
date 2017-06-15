@@ -592,6 +592,10 @@ class Gradezilla
       assignment_header_menu_element(id)
     end
 
+    def assignment_header_menu_trigger_element(assignment_name)
+      assignment_header_cell_element(assignment_name).find_element(:css, '.Gradebook__ColumnHeaderAction')
+    end
+
     def assignment_header_menu_item_selector(item)
       menu_item_id = ""
 
@@ -606,6 +610,10 @@ class Gradezilla
 
     def assignment_header_mute_icon_selector(assignment_id)
       ".container_1 .slick-header-column[id*=assignment_#{assignment_id}] svg[name=IconMutedSolid]"
+    end
+
+    def close_open_dialog
+      fj('.ui-dialog-titlebar-close:visible').click
     end
 
     def select_assignment_header_warning_icon

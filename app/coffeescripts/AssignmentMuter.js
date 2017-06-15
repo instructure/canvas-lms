@@ -16,12 +16,12 @@ export default class AssignmentMuter {
     this.options = options
   }
 
-  show () {
+  show (onClose) {
     if (this.options && this.options.openDialogInstantly) {
       if (this.assignment.muted) {
         this.confirmUnmute()
       } else {
-        this.showDialog()
+        this.showDialog(onClose)
       }
     } else {
       this.$link = $(this.$link)
@@ -31,7 +31,7 @@ export default class AssignmentMuter {
         if (this.assignment.muted) {
           this.confirmUnmute()
         } else {
-          this.showDialog()
+          this.showDialog(onClose)
         }
       })
     }
@@ -41,7 +41,7 @@ export default class AssignmentMuter {
     this.$link.text(this.assignment.muted ? I18n.t('Unmute Assignment') : I18n.t('Mute Assignment'))
   }
 
-  showDialog () {
+  showDialog (onClose) {
     this.$dialog = $(mute_dialog_template()).dialog({
       buttons: [{
         text: I18n.t('Cancel'),
@@ -61,6 +61,7 @@ export default class AssignmentMuter {
       resizable: false,
       width: 400
     })
+    this.$dialog.on('dialogclose', onClose)
   }
 
   afterUpdate (serverResponse) {
@@ -92,7 +93,7 @@ export default class AssignmentMuter {
           click: () => this.$dialog.disableWhileLoading($.ajaxJSON(this.url, 'put', {status: false}, this.afterUpdate))
         }],
         open: () => setTimeout(() => this.$dialog.parent().find('.ui-dialog-titlebar-close').focus(), 100),
-        close: () => this.$dialog.remove(),
+        close: () => this.$dialog.dialog('close'),
         resizable: false,
         title: I18n.t('unmute_assignment', 'Unmute Assignment'),
         width: 400,

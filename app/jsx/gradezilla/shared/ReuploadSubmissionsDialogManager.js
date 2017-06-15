@@ -33,7 +33,7 @@ import 'jquery.instructure_misc_helpers'
       return this.assignment.hasDownloadedSubmissions;
     }
 
-    getReuploadForm () {
+    getReuploadForm (cb) {
       if (ReuploadSubmissionsDialogManager.reuploadForm) {
         return ReuploadSubmissionsDialogManager.reuploadForm;
       }
@@ -45,7 +45,12 @@ import 'jquery.instructure_misc_helpers'
           width: 400,
           modal: true,
           resizable: false,
-          autoOpen: false
+          autoOpen: false,
+          close: () => {
+            if (typeof cb === 'function') {
+              cb();
+            }
+          }
         }
       ).submit(function () {
         const data = $(this).getFormData();
@@ -64,8 +69,8 @@ import 'jquery.instructure_misc_helpers'
       return ReuploadSubmissionsDialogManager.reuploadForm;
     }
 
-    showDialog () {
-      const form = this.getReuploadForm();
+    showDialog (cb) {
+      const form = this.getReuploadForm(cb);
       form.attr('action', this.reuploadUrl).dialog('open');
     }
   }

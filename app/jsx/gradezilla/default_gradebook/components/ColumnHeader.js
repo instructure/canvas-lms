@@ -23,12 +23,14 @@ import { func } from 'prop-types';
 export default class ColumnHeader extends React.Component {
   static propTypes = {
     addGradebookElement: func,
-    removeGradebookElement: func
+    removeGradebookElement: func,
+    onHeaderKeyDown: func
   };
 
   static defaultProps = {
     addGradebookElement () {},
-    removeGradebookElement () {}
+    removeGradebookElement () {},
+    onHeaderKeyDown () {}
   };
 
   constructor (props) {
@@ -37,33 +39,30 @@ export default class ColumnHeader extends React.Component {
     this.handleKeyDown = this.handleKeyDown.bind(this);
   }
 
-  state = { menuShown: false };
+  state = { menuShown: false, skipFocusOnClose: false };
 
   bindOptionsMenuTrigger = (ref) => { this.optionsMenuTrigger = ref };
 
-  bindSortByMenuContent = (ref) => {
+  bindFlyoutMenu = (ref, savedRef) => {
     // instructure-ui components return references to react components.
     // At this time the only way to get dom node refs is via findDOMNode.
     if (ref) {
       // eslint-disable-next-line react/no-find-dom-node
-      this.props.addGradebookElement(ReactDOM.findDOMNode(ref));
-    } else {
+      const domNode = ReactDOM.findDOMNode(ref);
+      this.props.addGradebookElement(domNode);
+      domNode.addEventListener('keydown', this.handleMenuKeyDown);
+    } else if (savedRef) {
       // eslint-disable-next-line react/no-find-dom-node
-      this.props.removeGradebookElement(ReactDOM.findDOMNode(this.sortByMenuContent));
+      this.props.removeGradebookElement(ReactDOM.findDOMNode(savedRef));
     }
+  }
 
+  bindSortByMenuContent = (ref) => {
+    this.bindFlyoutMenu(ref, this.sortByMenuContent);
     this.sortByMenuContent = ref;
   };
 
   bindOptionsMenuContent = (ref) => {
-    // Dealing with add/removeGradebookElement in a convoluted combination of
-    // this method and onToggle rather than the simpler way of calling those
-    // methods directly (like in bindSortByMenuContent) because this method is
-    // called by PopoverMenu three times when opening the menu. First with a ref
-    // to the content, then with null, then again with a ref to the content.
-    // We MUST get the DOM node here, rather than in onToggle because by the
-    // time onToggle is called when closing the menu, the component has already
-    // been unmounted and an error will be thrown if you attempt access.
     // instructure-ui components return references to react components.
     // At this time the only way to get dom node refs is via findDOMNode.
     if (ref) {
@@ -71,6 +70,7 @@ export default class ColumnHeader extends React.Component {
       // eslint-disable-next-line react/no-find-dom-node
       this.optionsMenuContentDOMNode = ReactDOM.findDOMNode(ref);
     }
+    this.bindFlyoutMenu(ref, this.optionsMenuContent);
   };
 
   focusAtStart = () => {
@@ -85,16 +85,41 @@ export default class ColumnHeader extends React.Component {
     }
   };
 
-  onToggle = (show) => {
-    this.setState({ menuShown: show }, () => {
-      if (show) {
-        this.props.addGradebookElement(this.optionsMenuContentDOMNode);
+  onToggle = (menuShown) => {
+    const newState = { menuShown };
+    let callback;
+
+    if (this.state.menuShown && !menuShown) {
+      if (this.state.skipFocusOnClose) {
+        newState.skipMenuOnClose = false;
       } else {
-        this.props.removeGradebookElement(this.optionsMenuContentDOMNode);
+        callback = this.focusAtEnd;
+      }
+    }
+
+    if (!this.state.menuShown && menuShown) {
+      newState.skipFocusOnClose = false;
+    }
+
+    this.setState(newState, () => {
+      if (typeof callback === 'function') {
+        callback();
+      }
+
+      if (!menuShown) {
         this.optionsMenuContent = null;
         this.optionsMenuContentDOMNode = null;
       }
     });
+  };
+
+  handleMenuKeyDown = (event) => {
+    if (event.which === 9) { // Tab
+      this.setState({ menuShown: false, skipFocusOnClose: true });
+      this.props.onHeaderKeyDown(event);
+      return false;
+    }
+    return true;
   };
 
   handleKeyDown (event) {

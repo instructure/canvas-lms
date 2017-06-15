@@ -95,7 +95,10 @@ import './jquery.instructure_misc_plugins' /* showIf */
     $message_students_dialog.dialog({
       width: 600,
       modal: true
-    }).dialog('open').dialog('option', 'title', I18n.t("message_student", "Message Students for %{course_name}", {course_name: title}));
+    })
+    .dialog('open')
+    .dialog('option', 'title', I18n.t('message_student', 'Message Students for %{course_name}', {course_name: title}))
+    .on('dialogclose', settings.onClose);
   };
 
   $(document).ready(function() {

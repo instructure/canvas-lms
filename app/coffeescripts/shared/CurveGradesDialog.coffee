@@ -32,7 +32,7 @@ define [
   class CurveGradesDialog
     constructor: ({@assignment, @students, @context_url}) ->
 
-    show: =>
+    show: (onClose) =>
       locals =
         assignment: @assignment
         action: "#{@context_url}/gradebook/update_submission"
@@ -90,6 +90,7 @@ define [
           close: => @$dialog.remove()
         .fixDialogButtons()
 
+      @$dialog.on 'dialogclose', onClose
       @$dialog.parent().find('.ui-dialog-titlebar-close').focus()
       @$dialog.find("#middle_score").bind "blur change keyup focus", @curve
       @$dialog.find("#assign_blanks").change @curve
