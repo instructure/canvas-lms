@@ -48,12 +48,12 @@ module Lti
 #       "properties": {
 #          "resource_type_code": {
 #            "description": "the resource type code of the resource handler to use to display originality reports",
-#            "example": "originality-reports",
+#            "example": "originality_reports",
 #            "type": "string"
 #          },
 #          "resource_url": {
 #            "description": "a URL that may be used to override the launch URL inferred by the specified resource_type_code. If used a 'resource_type_code' must also be specified.",
-#            "example": "http://www.test.com/originality-report",
+#            "example": "http://www.test.com/originality_report",
 #            "type": "string"
 #          }
 #       }
@@ -128,6 +128,10 @@ module Lti
     #   The URL where the originality report for the specified
     #   file may be found.
     #
+    # @argument originality_report[originality_report_file_id] [Integer]
+    #    The ID of the file within Canvas that contains the originality
+    #    report for the submitted file provided in the request URL.
+    #
     # @argument originality_report[tool_setting][resource_type_code] [String]
     #   The resource type code of the resource handler Canvas should use for the
     #   LTI launch for viewing originality reports. If set Canvas will launch
@@ -140,6 +144,10 @@ module Lti
     #   message "path" value (See `resource_type_code`) unless
     #   it is specified. If this parameter is used a `resource_type_code`
     #   must also be specified.
+    #
+    # @argument originality_report[workflow_state] [String]
+    #   May be set to "pending", "error", or "scored". If an originality score
+    #   is provided a workflow state of "scored" will be inferred.
     #
     # @returns OriginalityReport
     def create
@@ -189,6 +197,10 @@ module Lti
     #   message "path" value (See `resource_type_code`) unless
     #   it is specified. If this parameter is used a `resource_type_code`
     #   must also be specified.
+    #
+    # @argument originality_report[workflow_state] [String]
+    #   May be set to "pending", "error", or "scored". If an originality score
+    #   is provided a workflow state of "scored" will be inferred.
     #
     # @returns OriginalityReport
     def update
@@ -250,6 +262,7 @@ module Lti
        :file_id,
        :originality_report_file_id,
        :originality_report_url,
+       :workflow_state,
        tool_setting: %i(resource_url resource_type_code)].freeze
     end
 

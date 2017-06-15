@@ -288,6 +288,20 @@ module Lti
         expect(response_body['tool_setting']['resource_type_code']).to eq resource_handler.resource_type_code
       end
 
+      it 'sets the workflow state' do
+        put @endpoints[:update],
+             {
+                originality_report: {
+                  file_id: @attachment.id,
+                  originality_score: nil,
+                  workflow_state: 'pending'
+                }
+             },
+             request_headers
+        response_body = JSON.parse(response.body)
+        expect(response_body['workflow_state']).to eq 'pending'
+      end
+
       it 'sets the resource_url of the associated tool setting' do
         score = 0.25
         launch_url = 'http://www.my-launch.com'
@@ -421,6 +435,19 @@ module Lti
              request_headers
         response_body = JSON.parse(response.body)
         expect(response_body['tool_setting']['resource_type_code']).to eq resource_handler.resource_type_code
+      end
+
+      it 'sets the workflow state' do
+        post @endpoints[:create],
+             {
+                originality_report: {
+                  file_id: @attachment.id,
+                  workflow_state: 'pending'
+                }
+             },
+             request_headers
+        response_body = JSON.parse(response.body)
+        expect(response_body['workflow_state']).to eq 'pending'
       end
 
       it 'sets the link_id resource_url' do
