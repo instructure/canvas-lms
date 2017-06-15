@@ -39,6 +39,7 @@ QUnit.module('AssignmentCellEditor', {
     };
     this.options = {
       column: {
+        assignmentId: '2301',
         field: 'assignment_2301',
         getGridSupport: () => this.gridSupport,
         object: assignment,
@@ -54,6 +55,7 @@ QUnit.module('AssignmentCellEditor', {
         }
       },
       item: { // student row object
+        id: '1101',
         assignment_2301: { // submission
           user_id: '1101'
         }

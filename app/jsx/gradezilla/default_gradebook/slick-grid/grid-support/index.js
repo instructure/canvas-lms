@@ -20,19 +20,28 @@ import Events from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support/Eve
 import GridHelper from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support/GridHelper';
 import Navigation from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support/Navigation';
 import State from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support/State';
+import Style from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support/Style';
 
 export default class GridSupport {
-  constructor (grid) {
+  constructor (grid, options = {}) {
     this.grid = grid;
+    this.options = options;
 
     this.events = new Events();
+    this.helper = new GridHelper(grid);
+
     this.state = new State(grid, this);
     this.navigation = new Navigation(grid, this);
-    this.helper = new GridHelper(grid);
+    this.style = new Style(grid, this);
   }
 
   initialize () {
     this.state.initialize();
     this.navigation.initialize();
+    this.style.initialize();
+  }
+
+  destroy () {
+    this.style.destroy();
   }
 }

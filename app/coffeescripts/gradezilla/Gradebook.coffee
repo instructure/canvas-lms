@@ -489,6 +489,7 @@ define [
       @setStudentDisplay(student)
 
       if @rowFilter(student)
+        student.cssClass = "student_#{student.id}"
         @rows.push(student)
 
       @grid?.updateRowCount(@rows.length)
@@ -765,6 +766,7 @@ define [
       @withAllStudents (students) =>
         for id, student of @students
           if @rowFilter(student)
+            student.cssClass = "student_#{student.id}"
             @rows.push(student)
             @calculateStudentGrade(student) # TODO: this may not be necessary
             @setStudentDisplay(student)
@@ -1093,14 +1095,14 @@ define [
           onResize: => @grid.resizeCanvas()
         })
         .delegate '.slick-cell',
-          'mouseenter.gradebook focusin.gradebook' : @highlightColumn
-          'mouseleave.gradebook focusout.gradebook' : @unhighlightColumns
-          'mouseenter focusin' : (event) ->
+          'mouseenter.gradebook' : @highlightColumn
+          'mouseleave.gradebook' : @unhighlightColumns
+          'mouseenter' : (event) ->
             grid.find('.hover, .focus').removeClass('hover focus')
             if $(this).parent().css('top') == '0px'
               $(this).find('div.gradebook-tooltip').addClass('first-row')
             $(this).addClass (if event.type == 'mouseenter' then 'hover' else 'focus')
-          'mouseleave focusout' : (event) ->
+          'mouseleave' : (event) ->
             $(this).removeClass('hover focus')
             $(this).find('div.gradebook-tooltip').removeClass('first-row')
         .delegate '.minimized',
@@ -1264,8 +1266,6 @@ define [
         $(".gradebook_filter").show()
 
         cols = @grid.getColumns()
-        for col in cols
-          col.sortable = true unless col.neverSort
         @grid.setColumns(cols)
 
       @userFilter = new InputFilterView el: '.gradebook_filter input'
@@ -1479,12 +1479,15 @@ define [
 
     customColumnDefinitions: =>
       @customColumns.map (c) =>
-        id: @getCustomColumnId(c.id)
+        columnId = @getCustomColumnId(c.id)
+
+        id: columnId
         type: 'custom_column'
         name: htmlEscape c.title
         field: "custom_col_#{c.id}"
         width: 100
-        cssClass: "meta-cell custom_column"
+        cssClass: "meta-cell custom_column #{columnId}"
+        headerCssClass: columnId
         resizable: true
         editor: LongTextEditor
         customColumnId: c.id
@@ -1512,9 +1515,9 @@ define [
         type: 'student'
         field: 'display_name'
         width: studentColumnWidth
-        cssClass: "meta-cell"
+        cssClass: 'meta-cell primary-column student'
+        headerCssClass: 'primary-column student'
         resizable: true
-        neverSort: true
         formatter: @htmlContentFormatter
       ]
 
@@ -1524,14 +1527,15 @@ define [
         shrinkForOutOfText = assignment && assignment.grading_type == 'points' && assignment.points_possible?
         minWidth = if shrinkForOutOfText then 140 else 90
 
-        fieldName = @getAssignmentColumnId(id)
+        columnId = @getAssignmentColumnId(id)
+        fieldName = "assignment_#{id}"
 
         assignmentWidth = testWidth(assignment.name, minWidth, columnWidths.assignment.default_max)
         if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings[fieldName]
           assignmentWidth = parseInt(@gradebookColumnSizeSettings[fieldName])
 
         columnDef =
-          id: fieldName
+          id: columnId
           field: fieldName
           name: assignment.name
           object: assignment
@@ -1541,10 +1545,11 @@ define [
           minWidth: columnWidths.assignment.min
           maxWidth: columnWidths.assignment.max
           width: assignmentWidth
+          cssClass: "assignment #{columnId}"
+          headerCssClass: columnId
           toolTip: assignment.name
           type: 'assignment'
           assignmentId: assignment.id
-          neverSort: true
 
         if fieldName in @assignmentsToHide
           columnDef.width = 10
@@ -1563,6 +1568,7 @@ define [
         # Assignment Group Column Definitions
 
         @aggregateColumns = for id, group of @assignmentGroups
+          columnId = @getAssignmentGroupColumnId(id)
           fieldName = "assignment_group_#{id}"
 
           aggregateWidth = testWidth(group.name, columnWidths.assignmentGroup.min, columnWidths.assignmentGroup.default_max)
@@ -1570,7 +1576,7 @@ define [
             aggregateWidth = parseInt(@gradebookColumnSizeSettings[fieldName])
 
           {
-            id: fieldName
+            id: columnId
             field: fieldName
             formatter: @groupTotalFormatter
             name: group.name
@@ -1579,10 +1585,10 @@ define [
             minWidth: columnWidths.assignmentGroup.min
             maxWidth: columnWidths.assignmentGroup.max
             width: aggregateWidth
-            cssClass: "meta-cell assignment-group-cell"
+            cssClass: "meta-cell assignment-group-cell #{columnId}"
+            headerCssClass: columnId
             type: 'assignment_group'
             assignmentGroupId: group.id
-            neverSort: true
           }
 
         label = I18n.t "Total"
@@ -1601,9 +1607,9 @@ define [
           minWidth: columnWidths.total.min
           maxWidth: columnWidths.total.max
           width: totalWidth
-          cssClass: 'total-cell'
+          cssClass: 'total-cell total_grade'
+          headerCssClass: 'total_grade'
           type: 'total_grade'
-          neverSort: true
 
         @aggregateColumns.push total_column
 
@@ -1646,8 +1652,17 @@ define [
       @grid.onBeforeEditCell.subscribe @onBeforeEditCell
       @grid.onCellChange.subscribe @onCellChange
 
+      gridSupportOptions = {
+        activeBorderColor: '#1790DF' # $active-border-color
+      }
+
+      if ENV.use_high_contrast
+        gridSupportOptions.activeHeaderBackground = '#E6F1F7' # $ic-bg-light-primary
+      else
+        gridSupportOptions.activeHeaderBackground = '#E5F2F8' # $ic-bg-light-primary
+
       # Improved SlickGrid Management
-      @gridSupport = new GridSupport(@grid)
+      @gridSupport = new GridSupport(@grid, gridSupportOptions)
       @gridSupport.initialize()
 
       @gridSupport.events.onActiveLocationChanged.subscribe (event, location) =>

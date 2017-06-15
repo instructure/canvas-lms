@@ -36,6 +36,7 @@ function createRows () {
   return ['A', 'B'].map(id => (
     {
       id: `row${id}`,
+      cssClass: `row_${id}`,
       columnData1: `${id}1`,
       columnData2: `${id}2`,
       columnData3: `${id}3`,
@@ -66,9 +67,11 @@ QUnit.module('GridSupport State', function (hooks) {
     $fixtures.appendChild($gridContainer);
     this.grid = createGrid();
     this.gridSupport = new GridSupport(this.grid);
+    this.gridSupport.initialize();
   });
 
   hooks.afterEach(function () {
+    this.gridSupport.destroy();
     this.grid.destroy();
     $fixtures.innerHTML = '';
   });
@@ -100,20 +103,6 @@ QUnit.module('GridSupport State', function (hooks) {
     equal(activeLocation.region, 'beforeGrid');
     equal(typeof activeLocation.cell, 'undefined');
     equal(typeof activeLocation.row, 'undefined');
-  });
-
-  test('removes the "active header" style from a previous header cell', function () {
-    this.gridSupport.state.setActiveLocation('header', { cell: 0 });
-    this.gridSupport.state.setActiveLocation('beforeGrid');
-    const $headerCells = document.querySelectorAll('.slick-header-column.active-header');
-    strictEqual($headerCells.length, 0);
-  });
-
-  test('removes the "active column header" style from a previous header cell', function () {
-    this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 0 });
-    this.gridSupport.state.setActiveLocation('beforeGrid');
-    const $headerCells = document.querySelectorAll('.slick-header-column.active-column-header');
-    strictEqual($headerCells.length, 0);
   });
 
   test('deactivates an active cell within the grid', function () {
@@ -157,27 +146,6 @@ QUnit.module('GridSupport State', function (hooks) {
     equal(typeof activeLocation.row, 'undefined');
   });
 
-  test('applies the "active header" style to the header cell', function () {
-    this.gridSupport.state.setActiveLocation('header', { cell: 1 });
-    const $headerCell = this.gridSupport.state.getActiveNode();
-    ok($headerCell.classList.contains('active-header'),
-      '"active-header" class is applied to active header cell');
-  });
-
-  test('removes the "active header" style from a previous header cell', function () {
-    this.gridSupport.state.setActiveLocation('header', { cell: 0 });
-    this.gridSupport.state.setActiveLocation('header', { cell: 1 });
-    const $headerCells = document.querySelectorAll('.slick-header-column.active-header');
-    strictEqual($headerCells.length, 1, 'only the current header cell is active');
-  });
-
-  test('removes the "active column header" style from a previous header cell', function () {
-    this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 0 });
-    this.gridSupport.state.setActiveLocation('header', { cell: 1 });
-    const $headerCells = document.querySelectorAll('.slick-header-column.active-column-header');
-    strictEqual($headerCells.length, 0, 'the current header is the active cell within the column');
-  });
-
   test('deactivates an active cell within the grid', function () {
     this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 0 });
     this.gridSupport.state.setActiveLocation('header', { cell: 1 });
@@ -200,27 +168,6 @@ QUnit.module('GridSupport State', function (hooks) {
     strictEqual(activeLocation.row, 0);
   });
 
-  test('applies the "active column header" style to the header cell', function () {
-    this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 1 });
-    const $headerCell = this.gridSupport.state.getActiveColumnHeaderNode();
-    ok($headerCell.classList.contains('active-column-header'),
-      '"active-column-header" class is applied to active header cell');
-  });
-
-  test('removes the "active header" style from a previous header cell', function () {
-    this.gridSupport.state.setActiveLocation('header', { cell: 0 });
-    this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 1 });
-    const $headerCells = document.querySelectorAll('.slick-header-column.active-header');
-    strictEqual($headerCells.length, 0, 'the active column header is not itself active');
-  });
-
-  test('removes the "active column header" style from a previous header cell', function () {
-    this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 0 });
-    this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 1 });
-    const $headerCells = document.querySelectorAll('.slick-header-column.active-column-header');
-    strictEqual($headerCells.length, 1, 'only the current header cell has this style');
-  });
-
   test('activates the cell within the grid', function () {
     this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 1 });
     deepEqual(this.grid.getActiveCell(), { row: 0, cell: 1 });
@@ -239,20 +186,6 @@ QUnit.module('GridSupport State', function (hooks) {
     equal(activeLocation.region, 'afterGrid');
     equal(typeof activeLocation.cell, 'undefined');
     equal(typeof activeLocation.row, 'undefined');
-  });
-
-  test('removes the "active header" style from a previous header cell', function () {
-    this.gridSupport.state.setActiveLocation('header', { cell: 0 });
-    this.gridSupport.state.setActiveLocation('afterGrid');
-    const $headerCells = document.querySelectorAll('.slick-header-column.active-header');
-    strictEqual($headerCells.length, 0);
-  });
-
-  test('removes the "active column header" style from a previous header cell', function () {
-    this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 0 });
-    this.gridSupport.state.setActiveLocation('afterGrid');
-    const $headerCells = document.querySelectorAll('.slick-header-column.active-column-header');
-    strictEqual($headerCells.length, 0);
   });
 
   test('deactivates an active cell within the grid', function () {
@@ -275,20 +208,6 @@ QUnit.module('GridSupport State', function (hooks) {
     equal(activeLocation.region, 'unknown');
     equal(typeof activeLocation.cell, 'undefined');
     equal(typeof activeLocation.row, 'undefined');
-  });
-
-  test('removes the "active header" style from a previous header cell', function () {
-    this.gridSupport.state.setActiveLocation('header', { cell: 0 });
-    this.gridSupport.state.setActiveLocation('unknown');
-    const $headerCells = document.querySelectorAll('.slick-header-column.active-header');
-    strictEqual($headerCells.length, 0);
-  });
-
-  test('removes the "active column header" style from a previous header cell', function () {
-    this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 0 });
-    this.gridSupport.state.setActiveLocation('unknown');
-    const $headerCells = document.querySelectorAll('.slick-header-column.active-column-header');
-    strictEqual($headerCells.length, 0);
   });
 
   test('deactivates an active cell within the grid', function () {
@@ -354,7 +273,7 @@ QUnit.module('GridSupport State', function (hooks) {
 
   test('returns the element for an active header cell', function () {
     this.gridSupport.state.setActiveLocation('header', { cell: 1 });
-    const $headerCell = document.querySelector('.slick-header-column.active-header');
+    const $headerCell = document.querySelectorAll('.slick-header-column')[1];
     strictEqual(this.gridSupport.state.getActiveNode(), $headerCell);
   });
 
@@ -382,13 +301,13 @@ QUnit.module('GridSupport State', function (hooks) {
 
   test('returns the element for an active header cell', function () {
     this.gridSupport.state.setActiveLocation('header', { cell: 1 });
-    const $headerCell = document.querySelector('.slick-header-column.active-header');
+    const $headerCell = document.querySelectorAll('.slick-header-column')[1];
     strictEqual(this.gridSupport.state.getActiveColumnHeaderNode(), $headerCell);
   });
 
   test('returns the header element associated with an active body cell', function () {
     this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 1 });
-    const $headerCell = document.querySelector('.slick-header-column.active-column-header');
+    const $headerCell = document.querySelectorAll('.slick-header-column')[1];
     strictEqual(this.gridSupport.state.getActiveColumnHeaderNode(), $headerCell);
   });
 
@@ -430,5 +349,26 @@ QUnit.module('GridSupport State', function (hooks) {
     equal(activeLocation.region, 'unknown');
     equal(typeof activeLocation.cell, 'undefined');
     equal(typeof activeLocation.row, 'undefined');
+  });
+
+  QUnit.module('with item metadata');
+
+  test('applies the "first-row" class to the first row of data', function () {
+    this.grid.invalidate();
+    const $rows = document.querySelectorAll('.slick-row');
+    strictEqual($rows[0], document.querySelector('.slick-row.first-row'));
+  });
+
+  test('applies the "last-row" class to the last row of data', function () {
+    this.grid.invalidate();
+    const $rows = document.querySelectorAll('.slick-row');
+    strictEqual($rows[1], document.querySelector('.slick-row.last-row'));
+  });
+
+  test('applies the row "cssClass" to each row', function () {
+    this.grid.invalidate();
+    const $rows = document.querySelectorAll('.slick-row');
+    strictEqual($rows[0], document.querySelector('.slick-row.row_A'), '"row_A" is applied to the first row');
+    strictEqual($rows[1], document.querySelector('.slick-row.row_B'), '"row_B" is applied to the second row');
   });
 });

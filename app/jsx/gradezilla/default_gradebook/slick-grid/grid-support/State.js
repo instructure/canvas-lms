@@ -18,7 +18,27 @@
 
 import GridHelper from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support/GridHelper';
 
-class State {
+function getItemMetadata (data, rowIndex) {
+  const classes = [];
+
+  if (rowIndex === 0) {
+    classes.push('first-row');
+  }
+
+  if (rowIndex === data.length - 1) {
+    classes.push('last-row');
+  }
+
+  if (data[rowIndex].cssClass) {
+    classes.push(data[rowIndex].cssClass);
+  }
+
+  return {
+    cssClasses: classes.join(' ')
+  };
+}
+
+export default class State {
   activeLocation = { region: 'unknown' };
 
   constructor (grid, gridSupport) {
@@ -34,6 +54,9 @@ class State {
         this.triggerActiveLocationChange();
       }
     });
+
+    const data = this.grid.getData();
+    data.getItemMetadata = rowIndex => getItemMetadata(data, rowIndex);
   }
 
   getActiveLocation () {
@@ -68,36 +91,10 @@ class State {
   }
 
   setActiveLocationInternal (region, attr = {}) {
-    this.removeClassesForActiveLocation();
-
     this.activeLocation = { region, ...attr };
-
-    this.addClassesForActiveLocation();
 
     if (attr.cell != null) {
       this.activeLocation.columnId = this.grid.getColumns()[attr.cell].id;
-    }
-  }
-
-  addClassesForActiveLocation () {
-    if (this.activeLocation.region === 'header') {
-      const $activeNode = this.getActiveColumnHeaderNode();
-      $activeNode.classList.add('active-header');
-    }
-    if (this.activeLocation.region === 'body') {
-      const $activeNode = this.getActiveColumnHeaderNode();
-      $activeNode.classList.add('active-column-header');
-    }
-  }
-
-  removeClassesForActiveLocation () {
-    if (this.activeLocation.region === 'header') {
-      const $activeNode = this.getActiveColumnHeaderNode();
-      $activeNode.classList.remove('active-header');
-    }
-    if (this.activeLocation.region === 'body') {
-      const $activeNode = this.getActiveColumnHeaderNode();
-      $activeNode.classList.remove('active-column-header');
     }
   }
 
@@ -135,5 +132,3 @@ class State {
     this.gridSupport.events.onActiveLocationChanged.trigger(null, this.activeLocation);
   }
 }
-
-export default State;

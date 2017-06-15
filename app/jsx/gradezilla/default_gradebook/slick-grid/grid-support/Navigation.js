@@ -59,9 +59,15 @@ class Navigation {
     const $gridContainer = this.grid.getContainerNode();
     const $headers = $gridContainer.querySelectorAll('.slick-header');
     Array.prototype.forEach.call($headers, ($header) => {
+      $header.addEventListener('click', this.handleClick, false);
       $header.addEventListener('keydown', this.handleKeyDown, false);
     });
   }
+
+  handleClick = (event) => {
+    const { region, ...location } = this.getEventLocation(event);
+    this.gridSupport.state.setActiveLocation(region, location);
+  };
 
   handleKeyDown = (sourceEvent, obj = {}) => {
     const event = sourceEvent.originalEvent || sourceEvent;
@@ -277,7 +283,7 @@ class Navigation {
     return undefined;
   }
 
-  getEventLocation (event, obj) {
+  getEventLocation (event, obj = {}) {
     const columns = this.grid.getColumns();
 
     if (typeof obj.row === 'number' && typeof obj.cell === 'number') {

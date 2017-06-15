@@ -77,7 +77,7 @@ function simulateKeyDown ($element, keyCode, shiftKey = false) {
   return event;
 }
 
-QUnit.module('Navigation', function (hooks) {
+QUnit.module('GridSupport Navigation', function (hooks) {
   hooks.beforeEach(function () {
     const $gridContainer = document.createElement('div');
     $gridContainer.id = 'example-grid';
@@ -103,6 +103,7 @@ QUnit.module('Navigation', function (hooks) {
 
   hooks.afterEach(function () {
     document.body.removeEventListener('keydown', this.onKeyDown, false);
+    this.gridSupport.destroy();
     this.grid.destroy();
     $fixtures.innerHTML = '';
   });
@@ -1663,5 +1664,23 @@ QUnit.module('Navigation', function (hooks) {
     this.gridSupport.state.setActiveLocation('afterGrid');
     this.simulateKeyDown('Tab');
     equal(typeof this.handledLocation.columnId, 'undefined');
+  });
+
+  QUnit.module('Click on a header');
+
+  test('activates the header location being clicked', function () {
+    document.querySelectorAll('.slick-header-column')[1].click();
+    const activeLocation = this.gridSupport.state.getActiveLocation();
+    equal(activeLocation.region, 'header');
+    strictEqual(activeLocation.cell, 1);
+    equal(typeof activeLocation.row, 'undefined');
+  });
+
+  test('activates the header location when handling click on a header child element', function () {
+    document.querySelectorAll('.slick-column-name')[1].click();
+    const activeLocation = this.gridSupport.state.getActiveLocation();
+    equal(activeLocation.region, 'header');
+    strictEqual(activeLocation.cell, 1);
+    equal(typeof activeLocation.row, 'undefined');
   });
 });
