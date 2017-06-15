@@ -45,9 +45,6 @@ class ActiveRecord::Base
     end
 
     def default_scope(*)
-      # Profile is using default_scope to do faux STI. I don't know why they don't just do real STI, but
-      # I'll whitelist them for now
-      return super if self < Profile
       raise "please don't ever use default_scope. it may seem like a great solution, but I promise, it isn't"
     end
   end

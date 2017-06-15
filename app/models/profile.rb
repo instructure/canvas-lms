@@ -30,9 +30,6 @@ class Profile < ActiveRecord::Base
   validates_uniqueness_of :context_id, :scope => :context_type
   validates_inclusion_of :visibility, :in => %w{ public unlisted private }
 
-  self.abstract_class = true
-  self.table_name = 'profiles'
-
   def title=(title)
     write_attribute(:title, title)
     write_attribute(:path, infer_path) if path.nil?
@@ -87,8 +84,6 @@ class Profile < ActiveRecord::Base
     super
     context_type = klass.name.sub(/Profile\z/, '')
     klass.class_eval { alias_method context_type.downcase.underscore, :context }
-    klass.instance_eval { def table_name; "profiles"; end }
-    klass.default_scope -> { where(:context_type => context_type) }
   end
 
   self.inheritance_column = :context_type
