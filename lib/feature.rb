@@ -347,7 +347,15 @@ END
     'new_sis_integrations' =>
     {
       display_name: -> { I18n.t('Enable new SIS integration settings') },
-      description:  -> { I18n.t('Make new settings for SIS integrations visible and active') },
+      description:  -> { I18n.t('new_sis_integrations', <<-END) },
+This feature applies to institutions with an existing SIS Canvas integration.
+Any customers that are currently using grade passback solutions in Canvas or
+partner products should enable this feature for enhanced assignment data
+validation workflows. When enabled, this feature displays the new SIS
+Integration settings for SIS Sync (Assignment Level Grade Passback) in Account
+Settings. The Post to SIS feature option has been incorporated into this new
+setting and will be enabled by default.
+END
       applies_to: 'Account',
       state: 'hidden',
       root_opt_in: true,
