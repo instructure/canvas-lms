@@ -233,14 +233,12 @@ describe "Standard Common Cartridge importing" do
     end
 
     it "should import webcontent" do
-      expect(@course.attachments.count).to eq 20
       expect(@course.attachments.active.count).to eq 10
       mig_ids = %w{I_00001_R I_00006_Media I_media_R f3 f4 I_00003_R_IMAGERESOURCE 7acb90d1653008e73753aa2cafb16298 6a35b0974f59819404dc86d48fe39fc3}
       mig_ids.each do |mig_id|
         atts = @course.attachments.where(migration_id: mig_id).to_a
-        expect(atts.length).to eq 2
-        expect(atts.any?{|a|a.file_state = 'deleted'}).to eq true
-        expect(atts.any?{|a|a.file_state = 'available'}).to eq true
+        expect(atts.length).to eq 1
+        expect(atts.first.file_state).to eq 'available'
       end
     end
 

@@ -112,11 +112,13 @@ class UnzipAttachment
         # have to worry about what this name actually is.
         Tempfile.open(filename) do |f|
           begin
-            entry.extract(f.path, true) do |bytes|
-              zip_stats.charge_quota(bytes)
+            file_size = 0
+            md5 = entry.extract(f.path, true) do |bytes|
+              file_size += bytes
             end
+            zip_stats.charge_quota(file_size)
             # This is where the attachment actually happens.  See file_in_context.rb
-            attachment = attach(f.path, entry, folder)
+            attachment = attach(f.path, entry, folder, md5)
             id_positions[attachment.id] = path_positions[entry.name]
             if migration_id = @migration_id_map[entry.name]
               attachment.update_attribute(:migration_id, migration_id)
@@ -151,11 +153,11 @@ class UnzipAttachment
     end
   end
 
-  def attach(path, entry, folder)
+  def attach(path, entry, folder, md5)
     begin
-      FileInContext.attach(self.context, path, display_name(entry.name), folder, File.split(entry.name).last, @rename_files)
+      FileInContext.attach(self.context, path, display_name(entry.name), folder, File.split(entry.name).last, @rename_files, md5)
     rescue
-      FileInContext.attach(self.context, path, display_name(entry.name), folder, File.split(entry.name).last, @rename_files)
+      FileInContext.attach(self.context, path, display_name(entry.name), folder, File.split(entry.name).last, @rename_files, md5)
     end
   end
 
@@ -235,7 +237,7 @@ end
 #this is just a helper class that wraps an archive
 #for just the duration of this operation; it doesn't
 #quite seem appropriate to move it to it's own file
-#since it's such an integral part of the unzipping 
+#since it's such an integral part of the unzipping
 #process
 class ZipFileStats
   attr_reader :file_count, :total_size, :paths, :filename, :quota_remaining

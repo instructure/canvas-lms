@@ -190,6 +190,7 @@ class CanvasUnzip
         raise DestinationFileExists, "Destination '#{dest_path}' already exists"
       end
 
+      digest = Digest::MD5.new
       ::File.open(dest_path, "wb") do |os|
         if type == :zip
           entry.get_input_stream do |is|
@@ -197,16 +198,19 @@ class CanvasUnzip
             buf = ''
             while buf = is.sysread(::Zip::Decompressor::CHUNK_SIZE, buf)
               os << buf
+              digest.update(buf)
               yield(buf.size) if block_given?
             end
           end
         elsif type == :tar
           while buf = entry.read(BUFFER_SIZE)
             os << buf
+            digest.update(buf)
             yield(buf.size) if block_given?
           end
         end
       end
+      digest.hexdigest
     end
 
     # forces name to UTF-8, converting from fallback_encoding if it isn't UTF-8 to begin with
