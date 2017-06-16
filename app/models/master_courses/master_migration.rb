@@ -111,13 +111,15 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     # if any changes are made between the selective export and the full export, then we'll carry those in the next selective export
     # and the ones that got the full export will get the changes twice
     # the primary export is the one we'll use to mark the content tags as exported (i.e. the first one)
-    export_to_child_courses(:selective, up_to_date_subs, true) if up_to_date_subs.any?
-    export_to_child_courses(:full, new_subs, !up_to_date_subs.any?) if new_subs.any?
+    cms = []
+    cms += export_to_child_courses(:selective, up_to_date_subs, true).to_a if up_to_date_subs.any?
+    cms += export_to_child_courses(:full, new_subs, !up_to_date_subs.any?).to_a if new_subs.any?
 
     unless self.workflow_state == 'exports_failed'
       self.workflow_state = 'imports_queued'
       self.imports_queued_at = Time.now
       self.save!
+      self.queue_imports(cms)
     end
   rescue => e
     self.fail_export_with_error!(e)
@@ -141,9 +143,10 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
         self.export_results[type][:created] = @creations
         self.export_results[type][:updated] = @updates
       end
-      self.queue_imports(type, export, subscriptions)
+      self.generate_imports(type, export, subscriptions)
     else
       self.fail_export_with_error!("#{type} content export #{export.id} failed")
+      return nil
     end
   end
 
@@ -199,9 +202,8 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     end
   end
 
-  def queue_imports(type, export, subscriptions)
-    imports_expire_at = self.created_at + hours_until_expire.hours # tighten the limit until the import jobs expire
-
+  def generate_imports(type, export, subscriptions)
+    # generate all the content_migrations right now (and mark them in import_results) - queue afterwards
     cms = []
     subscriptions.each do |sub|
       cm = sub.child_course.content_migrations.build
@@ -219,8 +221,11 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
       cms << cm
     end
     self.save!
+    cms
+  end
 
-    # just queue them all at once afterwards so we don't have to queue them in a transaction
+  def queue_imports(cms)
+    imports_expire_at = self.created_at + hours_until_expire.hours # tighten the limit until the import jobs expire
     cms.each { |cm| cm.queue_migration(MigrationPluginStub, expires_at: imports_expire_at) }
     # this job is finished now but we won't mark ourselves as "completed" until all the import migrations are finished
   end
