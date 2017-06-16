@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import Planner from 'canvas-planner';
+import $ from 'jquery';
+import 'compiled/jquery.rails_flash_notifications';
 
 const element = document.getElementById('dashboard-planner');
 const headerElement = document.getElementById('dashboard-planner-header');
@@ -27,6 +29,11 @@ const courses = window.ENV.DASHBOARD_COURSES.map(dc => ({
 
 
 const options = {
+  flashAlertFunctions: {
+    visualErrorCallback: $.flashError,
+    visualSuccessCallback: $.flashMessage,
+    srAlertCallback: $.screenReaderFlashMessage
+  },
   locale: window.ENV.LOCALE,
   timeZone: window.ENV.TIMEZONE,
   theme: (ENV.use_high_contrast) ? 'canvas-a11y' : 'canvas',
