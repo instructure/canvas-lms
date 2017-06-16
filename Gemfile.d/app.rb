@@ -59,7 +59,7 @@ gem 'bcrypt', '3.1.11'
 gem 'canvas_connect', '0.3.12'
   gem 'adobe_connect', '1.0.5', require: false
 gem 'canvas_webex', '0.17'
-gem 'inst-jobs', '0.13.3'
+gem 'inst-jobs', '0.13.4'
   gem 'rufus-scheduler', '3.4.0', require: false
     gem 'et-orbi', '1.0.3', require: false
 gem 'ffi', '1.9.14', require: false
