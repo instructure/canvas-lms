@@ -177,6 +177,11 @@ CanvasRails::Application.routes.draw do
   # and the application_helper method :context_url to make retrieving
   # these contexts, and also generating context-specific urls, easier.
   resources :courses do
+    resources :orders do
+      post :paytm_integration, on: :collection
+      post :check_paytm, on: :collection
+    end
+
     # DEPRECATED
     get 'self_enrollment/:self_enrollment' => 'courses#self_enrollment', as: :self_enrollment
     post 'self_unenrollment/:self_unenrollment' => 'courses#self_unenrollment', as: :self_unenrollment
@@ -200,10 +205,9 @@ CanvasRails::Application.routes.draw do
       post :crosslist
       delete 'crosslist' => 'sections#uncrosslist', as: :uncrosslist
     end
-
     get 'undelete' => 'context#undelete_index', as: :undelete_items
     post 'undelete/:asset_string' => 'context#undelete_item', as: :undelete_item
-
+    get 'fee_payment'
     get "settings#{full_path_glob}", action: :settings
     get :settings
     get 'details' => 'courses#settings'
@@ -2026,6 +2030,7 @@ CanvasRails::Application.routes.draw do
       get "assignments/:assignment_id/submissions/:submission_id/originality_report/:id", action: :show
     end
 
+
   end
 
   ApiRouteSet.draw(self, '/api/sis') do
@@ -2034,4 +2039,7 @@ CanvasRails::Application.routes.draw do
       get 'courses/:course_id/assignments', action: 'sis_assignments', as: :sis_course_assignments
     end
   end
+
+
+  get '/courses/:id/order/express' => 'orders#express', :as => :pay
 end

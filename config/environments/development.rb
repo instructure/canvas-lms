@@ -66,6 +66,18 @@ environment_configuration(defined?(config) && config) do |config|
 
   config.eager_load = false
 
+
+  config.after_initialize do
+    ActiveMerchant::Billing::Base.mode = :test
+    paypal = {
+      :login => "jagtar.lakheyan-facilitator_api1.gmail.com" ,
+      :password => "YPRW7NQ2TVNKWQTM",
+      :signature => "AFcWxV21C7fd0v3bYYYRCpSSRl31AQCx.LnjWbofy36VRCSBm3dZG-Z3"
+    }
+    ::EXPRESS = ActiveMerchant::Billing::PaypalExpressGateway.new(paypal)
+  end
+
+
   # eval <env>-local.rb if it exists
   Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) }
 end

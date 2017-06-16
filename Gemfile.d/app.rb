@@ -157,3 +157,7 @@ gem 'twitter', path: 'gems/twitter'
 gem 'vericite_api', '1.5.1'
 gem 'utf8_cleaner', path: 'gems/utf8_cleaner'
 gem 'workflow', path: 'gems/workflow'
+
+gem 'activemerchant'
+
+gem 'pry'

@@ -2442,14 +2442,15 @@ class Course < ActiveRecord::Base
   end
 
   TAB_HOME = 0
-  TAB_SYLLABUS = 1
-  TAB_PAGES = 2
-  TAB_ASSIGNMENTS = 3
-  TAB_QUIZZES = 4
-  TAB_GRADES = 5
-  TAB_PEOPLE = 6
-  TAB_GROUPS = 7
-  TAB_DISCUSSIONS = 8
+  TAB_FEE = 1
+  TAB_SYLLABUS = 2
+  TAB_PAGES = 3
+  TAB_ASSIGNMENTS = 4
+  TAB_QUIZZES = 5
+  TAB_GRADES = 6
+  TAB_PEOPLE = 7
+  TAB_GROUPS = 8
+  TAB_DISCUSSIONS = 9
   TAB_MODULES = 10
   TAB_FILES = 11
   TAB_CONFERENCES = 12
@@ -2458,13 +2459,19 @@ class Course < ActiveRecord::Base
   TAB_OUTCOMES = 15
   TAB_COLLABORATIONS = 16
   TAB_COLLABORATIONS_NEW = 17
-
+  TAB_SETTINGS_NEW = 18
   def self.default_tabs
     [{
         :id => TAB_HOME,
         :label => t('#tabs.home', "Home"),
         :css_class => 'home',
         :href => :course_path
+      }, {
+        :id => TAB_FEE,
+        :label => t('#tabs.fee_payment', "Fee Payment"),
+        :css_class => 'fee_payment',
+        :href => :course_fee_payment_path,
+        :screenreader => t('#tabs.course_settings', "Fee Payment")
       }, {
         :id => TAB_ANNOUNCEMENTS,
         :label => t('#tabs.announcements', "Announcements"),
@@ -3139,6 +3146,13 @@ class Course < ActiveRecord::Base
     context_external_tools.active.find_by(query) ||
       account.context_external_tools.active.find_by(query) ||
         root_account.context_external_tools.active.find_by(query)
+  end
+
+  def courese_details
+    [{
+      "amount" => self.amount,
+      "name" => self.name
+      }]
   end
 
   private
