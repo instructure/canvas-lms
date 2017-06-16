@@ -86,8 +86,7 @@ describe 'Gradebook Controls' do
     end
 
     it 'hides unpublished assignments', test_id: 3253282, priority: '1' do
-      title = "I am unpublished"
-      assign = @course.assignments.create! title: title
+      assign = @course.assignments.create! title: "I am unpublished"
       assign.unpublish
 
       Gradezilla.visit(@course)

@@ -44,7 +44,7 @@ describe "Gradezilla with grading periods" do
         @course.assignments.create!(due_at: 13.days.ago(now), title: "assign in ended")
         Gradezilla.visit(@course)
 
-        Gradezilla.select_grading_period('All Grading Periods')
+        Gradezilla.select_grading_period("All Grading Periods")
         Gradezilla.enter_grade("10", 0, 0)
         expect(Gradezilla.cell_graded?("10", 0, 0)).to be true
 
@@ -78,7 +78,7 @@ describe "Gradezilla with grading periods" do
       @course.assignments.create!(due_at: 18.days.ago, title: "assign in closed")
       Gradezilla.visit(@course)
 
-      Gradezilla.select_grading_period('All Grading Periods')
+      Gradezilla.select_grading_period("All Grading Periods")
       expect(Gradezilla.grading_cell(0, 0)).to contain_css(Gradezilla.ungradable_selector)
 
       Gradezilla.select_grading_period(@gp_closed.title)

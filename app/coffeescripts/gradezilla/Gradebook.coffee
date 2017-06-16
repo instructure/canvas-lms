@@ -328,6 +328,7 @@ define [
         @setContextModules(contextModules)
         @contentLoadStates.contextModulesLoaded = true
         @renderViewOptionsMenu()
+        @renderFilters()
 
       dataLoader.gotSubmissions.then () =>
         @setSubmissionsLoaded(true)

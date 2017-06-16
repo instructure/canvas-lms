@@ -24,7 +24,7 @@ describe 'gradezilla' do
   include WeightingSetup
 
   let(:total_grade) do
-    grading_period_names = ['All Grading Periods', @gp1.title, @gp2.title]
+    grading_period_names = ["All Grading Periods", @gp1.title, @gp2.title]
     user_session(@teacher)
     Gradezilla.visit(@course)
 
