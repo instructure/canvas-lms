@@ -18,6 +18,7 @@
 import Planner from 'canvas-planner';
 import $ from 'jquery';
 import 'compiled/jquery.rails_flash_notifications';
+import {sharedDashboardInstance} from '../dashboardPlannerHelper';
 
 const stickyElement = document.getElementById('dashboard_header_container');
 const element = document.getElementById('dashboard-planner');
@@ -30,6 +31,10 @@ const courses = window.ENV.DASHBOARD_COURSES.map(dc => ({
 
 const stickyElementRect = stickyElement.getBoundingClientRect()
 const stickyOffset = stickyElementRect.bottom - stickyElementRect.top
+
+const changeToDashboardCardView = () => {
+  sharedDashboardInstance.changeToCardView();
+}
 
 const options = {
   flashAlertFunctions: {
@@ -44,7 +49,8 @@ const options = {
   // under the header that is sticky in IE
   stickyZIndex: 3,
   stickyOffset,
-  courses
+  courses,
+  changeToDashboardCardView
 };
 
 if (element) {

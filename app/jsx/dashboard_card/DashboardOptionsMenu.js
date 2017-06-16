@@ -27,6 +27,8 @@ import { MenuItem, MenuItemGroup, MenuItemSeparator } from 'instructure-ui/lib/c
 import Button from 'instructure-ui/lib/components/Button'
 import IconSettings2Solid from 'instructure-icons/lib/Solid/IconSettings2Solid'
 
+import {sharedDashboardInstance} from '../dashboardPlannerHelper'
+
 export default class DashboardOptionsMenu extends React.Component {
   static propTypes = {
     recent_activity_dashboard: PropTypes.bool,
@@ -44,6 +46,7 @@ export default class DashboardOptionsMenu extends React.Component {
 
   constructor (props) {
     super(props)
+    sharedDashboardInstance.init(this.changeToCardView)
 
     let view;
     if (props.planner_enabled && props.planner_selected) {
@@ -58,6 +61,13 @@ export default class DashboardOptionsMenu extends React.Component {
       view,
       colorOverlays: props.hide_dashcard_color_overlays ? [] : ['colorOverlays']
     }
+  }
+
+  changeToCardView = () => {
+    this.setState({view: ['cards']}, () => {
+      this.toggleDashboardView(this.state.view)
+      this.postDashboardToggle()
+    })
   }
 
   handleViewOptionSelect = (e, newSelected) => {
