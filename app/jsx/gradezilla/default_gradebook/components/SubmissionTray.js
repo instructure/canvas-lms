@@ -20,6 +20,7 @@ import React from 'react';
 import { bool, func, number, shape, string } from 'prop-types';
 import ComingSoonContent from 'jsx/gradezilla/default_gradebook/components/ComingSoonContent';
 import LatePolicyGrade from 'jsx/gradezilla/default_gradebook/components/LatePolicyGrade';
+import SubmissionTrayRadioInputGroup from 'jsx/gradezilla/default_gradebook/components/SubmissionTrayRadioInputGroup';
 import Tray from 'instructure-ui/lib/components/Tray';
 import Avatar from 'instructure-ui/lib/components/Avatar';
 import I18n from 'i18n!gradebook';
@@ -32,33 +33,13 @@ function renderAvatar (name, avatarUrl) {
   );
 }
 
-function renderTrayContent (showContentComingSoon, student, submission) {
-  if (showContentComingSoon) {
-    return (<ComingSoonContent />);
-  }
-
-  const { name, avatarUrl } = student;
-
-  return (
-    <div id="SubmissionTray__Content">
-      {avatarUrl && renderAvatar(name, avatarUrl)}
-      <div id="SubmissionTray__StudentName">
-        {name}
-      </div>
-
-      {!!submission.pointsDeducted && <LatePolicyGrade submission={submission} />}
-    </div>
-  );
-}
-
 export default function SubmissionTray (props) {
-  const { showContentComingSoon, student, submission } = props;
-
+  const { name, avatarUrl } = props.student;
   return (
     <Tray
       contentRef={props.contentRef}
       label={I18n.t('Submission tray')}
-      dismissable
+      isDismissable
       closeButtonLabel={I18n.t('Close submission tray')}
       isOpen={props.isOpen}
       trapFocus
@@ -67,19 +48,48 @@ export default function SubmissionTray (props) {
       onClose={props.onClose}
     >
       <div className="SubmissionTray__Container">
-        {renderTrayContent(showContentComingSoon, student, submission)}
+        {
+          props.showContentComingSoon ?
+            <ComingSoonContent /> :
+            <div>
+              <div id="SubmissionTray__Content">
+                {avatarUrl && renderAvatar(name, avatarUrl)}
+
+                <div id="SubmissionTray__StudentName">
+                  {name}
+                </div>
+
+                {!!props.submission.pointsDeducted && <LatePolicyGrade submission={props.submission} />}
+
+                <div id="SubmissionTray__RadioInputGroup">
+                  <SubmissionTrayRadioInputGroup
+                    colors={props.colors}
+                    locale={props.locale}
+                    latePolicy={props.latePolicy}
+                    submission={props.submission}
+                  />
+                </div>
+              </div>
+            </div>
+        }
       </div>
     </Tray>
   );
 }
 
 SubmissionTray.defaultProps = {
-  contentRef: undefined
+  contentRef: undefined,
+  latePolicy: { lateSubmissionInterval: 'day' }
 }
 
 SubmissionTray.propTypes = {
   contentRef: func,
   isOpen: bool.isRequired,
+  colors: shape({
+    late: string.isRequired,
+    missing: string.isRequired,
+    excused: string.isRequired
+  }).isRequired,
   onClose: func.isRequired,
   onRequestClose: func.isRequired,
   showContentComingSoon: bool.isRequired,
@@ -88,7 +98,15 @@ SubmissionTray.propTypes = {
     avatarUrl: string
   }).isRequired,
   submission: shape({
+    excused: bool.isRequired,
     grade: string,
-    pointsDeducted: number
+    late: bool.isRequired,
+    missing: bool.isRequired,
+    pointsDeducted: number,
+    secondsLate: number.isRequired
+  }),
+  locale: string.isRequired,
+  latePolicy: shape({
+    lateSubmissionInterval: string
   }).isRequired
 };

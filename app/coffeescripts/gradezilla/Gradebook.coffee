@@ -861,6 +861,7 @@ define [
     updateSubmission: (submission) =>
       student = @student(submission.user_id)
       submission.submitted_at = tz.parse(submission.submitted_at)
+      submission.excused = !!submission.excused
       submission.grade = GradeFormatHelper.formatGrade(submission.grade, {
         gradingType: submission.gradingType, delocalize: false
       })
@@ -2517,22 +2518,24 @@ define [
     renderSubmissionTray: (student) =>
       mountPoint = document.getElementById('StudentTray__Container')
       { open, studentId, assignmentId } = @getSubmissionTrayState()
-      # get the student's submission, or use an empty object in case the
+      # get the student's submission, or use a fake submission object in case the
       # submission has not yet loaded
-      submission = @getSubmission(studentId, assignmentId) || {}
+      fakeSubmission = { late: false, missing: false, excused: false, seconds_late: 0 }
+      submission = @getSubmission(studentId, assignmentId) || fakeSubmission
 
       props =
         key: "submission_tray_#{studentId}_#{assignmentId}"
+        colors: @getGridColors()
         isOpen: open
+        locale: @options.locale
         onRequestClose: @closeSubmissionTray
         onClose: => @gridSupport.helper.focus()
         showContentComingSoon: !@options.new_gradebook_development_enabled
         student:
           name: student.name,
           avatarUrl: htmlDecode(student.avatar_url)
-        submission:
-          grade: submission.grade
-          pointsDeducted: submission.points_deducted
+        submission: ConvertCase.camelize(submission)
+      props.latePolicy = ConvertCase.camelize(@options.late_policy) if @options.late_policy
       renderComponent(SubmissionTray, mountPoint, props)
 
     updateRowAndRenderSubmissionTray: (studentId) =>

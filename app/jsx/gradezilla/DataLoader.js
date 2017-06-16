@@ -25,7 +25,7 @@ const submissionsParams = {
   response_fields: [
     'id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id',
     'grade_matches_current_submission', 'attachments', 'late', 'missing', 'workflow_state', 'excused',
-    'points_deducted'
+    'points_deducted', 'seconds_late'
   ]
 };
 

@@ -536,6 +536,17 @@ describe GradebooksController do
         expect(gradebook_options).not_to have_key :colors
       end
 
+      it "includes late_policy if New Gradebook is enabled" do
+        @course.enable_feature!(:new_gradebook)
+        get :show, params: { course_id: @course.id }
+        expect(gradebook_options).to have_key :late_policy
+      end
+
+      it "does not include late_policy if New Gradebook is disabled" do
+        get :show, params: { course_id: @course.id }
+        expect(gradebook_options).not_to have_key :late_policy
+      end
+
       it 'includes api_max_per_page' do
         Setting.set('api_max_per_page', 50)
         get :show, course_id: @course.id

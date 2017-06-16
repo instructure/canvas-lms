@@ -7484,7 +7484,7 @@ QUnit.module('Gradebook#renderSubmissionTray', {
     $fixtures.innerHTML = `<div id=${this.mountPointId}></div>`;
     this.gradebook = createGradebook();
     this.gradebook.students = {
-      1101: { id: '1101', name: 'Adam Jones', assignment_2301: {} }
+      1101: { id: '1101', name: 'Adam Jones', assignment_2301: { late: false, missing: false, excused: false, seconds_late: 0 } }
     };
     this.gradebook.gridSupport = {
       helper: {

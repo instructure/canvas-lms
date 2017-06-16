@@ -33,16 +33,24 @@ QUnit.module('SubmissionTray', function (hooks) {
       contentRef (ref) {
         content = ref;
       },
+      colors: {
+        late: '#FEF7E5',
+        missing: '#F99',
+        excused: '#E5F3FC'
+      },
+      locale: 'en',
       onRequestClose () {},
       onClose () {},
       showContentComingSoon: false,
       isOpen: true,
-      student: {
-        name: 'Jane Doe'
-      },
+      student: { name: 'Jane Doe' },
       submission: {
         grade: '100%',
-        pointsDeducted: 3
+        excused: false,
+        late: false,
+        missing: false,
+        pointsDeducted: 3,
+        secondsLate: 0
       }
     };
     wrapper = mount(<SubmissionTray {...defaultProps} {...props} />);
@@ -58,6 +66,10 @@ QUnit.module('SubmissionTray', function (hooks) {
 
   function wrapContent () {
     return new ReactWrapper(content, wrapper.node);
+  }
+
+  function radioInputGroupDiv () {
+    return document.querySelector('#SubmissionTray__RadioInputGroup');
   }
 
   test('shows "Content Coming Soon" content if showContentComingSoon is true', function () {
@@ -100,12 +112,23 @@ QUnit.module('SubmissionTray', function (hooks) {
   });
 
   test('does not show the late policy grade when zero points have been deducted', function () {
-    mountComponent({ submission: { pointsDeducted: 0 } });
+    mountComponent({ submission: { excused: false, late: true, missing: false, pointsDeducted: 0, secondsLate: 0 } });
     strictEqual(wrapContent().find('LatePolicyGrade').length, 0);
   });
 
   test('does not show the late policy grade when points deducted is null', function () {
-    mountComponent({ submission: { pointsDeducted: null } });
+    mountComponent({ submission: { excused: false, late: true, missing: false, pointsDeducted: null, secondsLate: 0 } });
     strictEqual(wrapContent().find('LatePolicyGrade').length, 0);
   });
+
+  test('shows a radio input group if showContentComingSoon is false', function () {
+    mountComponent();
+    ok(radioInputGroupDiv());
+  });
+
+  test('does not show a radio input group if showContentComingSoon is true', function () {
+    mountComponent({ showContentComingSoon: true });
+    notOk(radioInputGroupDiv());
+  });
 });
+
