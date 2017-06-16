@@ -223,6 +223,7 @@ CanvasRails::Application.routes.draw do
         post :update_submission
         post :change_gradebook_column_size
         post :save_gradebook_column_order
+        get :user_ids
       end
     end
 

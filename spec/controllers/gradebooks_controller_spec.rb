@@ -776,6 +776,37 @@ describe GradebooksController do
     end
   end
 
+  describe "GET 'user_ids'" do
+    it "returns unauthorized if there is no current user" do
+      get :user_ids, course_id: @course.id, format: :json
+      assert_status(401)
+    end
+
+    it "returns unauthorized if the user is not authorized to manage grades" do
+      user_session(@student)
+      get :user_ids, course_id: @course.id, format: :json
+      assert_status(401)
+    end
+
+    it "returns an array of user ids sorted according to the user's preferences" do
+      student1 = @student
+      student1.update!(name: "Jon")
+      student2 = student_in_course(active_all: true, name: "Ron").user
+      student3 = student_in_course(active_all: true, name: "Don").user
+      @teacher.preferences[:gradebook_settings] = {}
+      @teacher.preferences[:gradebook_settings][@course.id] = {
+        "sort_rows_by_column_id": "student",
+        "sort_rows_by_setting_key": "name",
+        "sort_rows_by_direction": "descending"
+      }
+
+      user_session(@teacher)
+      get :user_ids, course_id: @course.id, format: :json
+      user_ids = json_parse(response.body)["user_ids"]
+      expect(user_ids).to eq([student2.id, student1.id, student3.id])
+    end
+  end
+
   describe "GET 'change_gradebook_version'" do
     it 'switches to gradebook if clicked' do
       user_session(@teacher)

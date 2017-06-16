@@ -686,6 +686,13 @@ class GradebooksController < ApplicationController
     end
   end
 
+  def user_ids
+    return unless authorized_action(@context, @current_user, :manage_grades)
+
+    gradebook_user_ids = GradebookUserIds.new(@context, @current_user)
+    render json: { user_ids: gradebook_user_ids.user_ids }
+  end
+
   def change_gradebook_version
     @current_user.preferences[:gradebook_version] = params[:version]
     @current_user.save!
