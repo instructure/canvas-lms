@@ -95,13 +95,13 @@ define [
 
     onCompose:     (e) -> @trigger('compose')
 
-    onReply:       (e) -> @trigger('reply')
+    onReply:       (e) -> @trigger('reply', null, '#reply-btn')
 
-    onReplyAll:    (e) -> @trigger('reply-all')
+    onReplyAll:    (e) -> @trigger('reply-all', null, '#reply-all-btn')
 
     onArchive:     (e) -> @trigger('archive')
 
-    onDelete:      (e) -> @trigger('delete')
+    onDelete:      (e) -> @trigger('delete', '#compose-btn', '#delete-btn')
 
     onMarkUnread: (e) ->
       e.preventDefault()
@@ -113,7 +113,7 @@ define [
 
     onForward: (e) ->
       e.preventDefault()
-      @trigger('forward')
+      @trigger('forward', null, '#admin-btn')
 
     onStarToggle: (e) ->
       e.preventDefault()
