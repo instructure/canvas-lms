@@ -17,9 +17,9 @@
 
 require_relative '../../../spec_helper'
 
-describe Api::V1::PlannerItem do
-  class PlannerItemHarness
-    include Api::V1::PlannerItem
+describe Api::V1::PlannerOverride do
+  class PlannerOverrideHarness
+    include Api::V1::PlannerOverride
 
     def api_v1_users_todo_ignore_url(*args); end
     def assignment_json(*args); end
@@ -51,7 +51,7 @@ describe Api::V1::PlannerItem do
   end
 
   describe '.planner_item_json' do
-    let(:api) { PlannerItemHarness.new }
+    let(:api) { PlannerOverrideHarness.new }
     let(:session) { stub }
 
     it 'should return with a plannable_date for the respective item' do
@@ -147,14 +147,14 @@ describe Api::V1::PlannerItem do
 
       it 'should indicate that an assignment is late' do
         @assignment.update!(due_at: 1.week.ago)
-        submission = @assignment.submit_homework(@student, body: "d")
+        @assignment.submit_homework(@student, body: "d")
 
         json = api.planner_item_json(@assignment, @student, session)
         expect(json[:submissions][:late]).to be true
       end
 
       it 'should indicate that an assignment needs grading' do
-        submission = @assignment.submit_homework(@student, body: "y")
+        @assignment.submit_homework(@student, body: "y")
 
         json = api.planner_item_json(@assignment, @student, session)
         expect(json[:submissions][:needs_grading]).to be true
@@ -167,6 +167,18 @@ describe Api::V1::PlannerItem do
 
         json = api.planner_item_json(@assignment, @student, session, { start_at: 1.week.ago })
         expect(json[:submissions][:has_feedback]).to be true
+      end
+    end
+
+    describe '.planner_override_json' do
+      let(:api) { PlannerOverrideHarness.new }
+      let(:session) { stub }
+
+      it 'should show plannable_type as a string' do
+        assignment_model
+        po = PlannerOverride.create!(plannable_id: @assignment.id, plannable_type: Assignment, user_id: @student.id)
+        json = api.planner_override_json(po, @student, session)
+        expect(json['plannable_type']).to eq 'assignment'
       end
     end
   end

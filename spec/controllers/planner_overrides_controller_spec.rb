@@ -84,6 +84,36 @@ describe PlannerOverridesController do
           expect(note["plannable"]["title"]).to eq @planner_note.title
         end
 
+        it "should show planner overrides created on quizzes" do
+          quiz = quiz_model(course: @course, due_at: 1.day.from_now)
+          PlannerOverride.create!(plannable_id: quiz.id, plannable_type: Quizzes::Quiz, user_id: @student.id)
+          get :items_index
+          response_json = json_parse(response.body)
+          quiz_json = response_json.find {|rj| rj['plannable_id'] == quiz.id}
+          expect(quiz_json['planner_override']['plannable_id']).to eq quiz.id
+          expect(quiz_json['planner_override']['plannable_type']).to eq 'quiz'
+        end
+
+        it "should show planner overrides created on discussions" do
+          discussion = discussion_topic_model(context: @course, todo_date: 1.day.from_now)
+          PlannerOverride.create!(plannable_id: discussion.id, plannable_type: DiscussionTopic, user_id: @student.id)
+          get :items_index
+          response_json = json_parse(response.body)
+          disc_json = response_json.find {|rj| rj['plannable_id'] == discussion.id}
+          expect(disc_json['planner_override']['plannable_id']).to eq discussion.id
+          expect(disc_json['planner_override']['plannable_type']).to eq 'discussion_topic'
+        end
+
+        it "should show planner overrides created on wiki pages" do
+          page = wiki_page_model(course: @course, todo_date: 1.day.from_now)
+          PlannerOverride.create!(plannable_id: page.id, plannable_type: WikiPage, user_id: @student.id)
+          get :items_index
+          response_json = json_parse(response.body)
+          page_json = response_json.find {|rj| rj['plannable_id'] == page.id}
+          expect(page_json['planner_override']['plannable_id']).to eq page.id
+          expect(page_json['planner_override']['plannable_type']).to eq 'wiki_page'
+        end
+
         context "include_concluded" do
           before :once do
             @u = User.create!
@@ -266,6 +296,13 @@ describe PlannerOverridesController do
           post :create, plannable_type: "assignment", plannable_id: @assignment2.id, marked_complete: true
           expect(response).to have_http_status(:created)
           expect(PlannerOverride.where(user_id: @student.id).count).to be 2
+        end
+
+        it "should save announcement overrides with a plannable_type of discussion_topic" do
+          announcement_model(context: @course)
+          post :create, plannable_type: 'announcement', plannable_id: @a.id, user_id: @student.id, marked_complete: true
+          json = json_parse(response.body)
+          expect(json["plannable_type"]).to eq 'discussion_topic'
         end
       end
 

@@ -76,7 +76,7 @@
 #
 
 class PlannerOverridesController < ApplicationController
-  include Api::V1::PlannerItem
+  include Api::V1::PlannerOverride
 
   before_action :require_user
   before_action :set_date_range
@@ -179,7 +179,8 @@ class PlannerOverridesController < ApplicationController
   #
   # @returns [PlannerOverride]
   def index
-    render :json => PlannerOverride.for_user(@current_user)
+    planner_overrides = Api.paginate(PlannerOverride.for_user(@current_user).active, self, api_v1_planner_overrides_url)
+    render :json => planner_overrides.map { |po| planner_override_json(po, @current_user, session) }
   end
 
   # @API Show a planner override
@@ -188,12 +189,12 @@ class PlannerOverridesController < ApplicationController
   #
   # @returns PlannerOverride
   def show
-    planner_override = PlannerOverride.find(params[:id])
+    planner_override = PlannerOverride.find_by_id(params[:id])
 
     if planner_override.present?
-      render json: planner_override
+      render json: planner_override_json(planner_override, @current_user, session)
     else
-      not_found
+      render json: { message: "No object of type #{plannable_override.class} with that ID" }, status: :not_found
     end
   end
 
@@ -210,7 +211,7 @@ class PlannerOverridesController < ApplicationController
     planner_override.marked_complete = value_to_boolean(params[:marked_complete])
 
     if planner_override.save
-      render json: planner_override, status: :ok
+      render json: planner_override_json(planner_override, @current_user, session), status: :ok
     else
       render json: planner_override.errors, status: :bad_request
     end
@@ -232,13 +233,17 @@ class PlannerOverridesController < ApplicationController
   #
   # @returns PlannerOverride
   def create
-    plannable_type = params[:plannable_type] == 'quiz' ? Quizzes::Quiz : params[:plannable_type]&.camelize
+    plannable_type = PLANNABLE_TYPES[params[:plannable_type]]
+    plannable = plannable_type.constantize.find_by_id(params[:plannable_id])
+    unless plannable
+      return render json: { message: "No object of type #{plannable_type} with that ID" }, status: :not_found
+    end
     planner_override = PlannerOverride.new(plannable_type: plannable_type,
       plannable_id: params[:plannable_id], marked_complete: value_to_boolean(params[:marked_complete]),
       user: @current_user)
 
     if planner_override.save
-      render json: planner_override, status: :created
+      render json: planner_override_json(planner_override, @current_user, session), status: :created
     else
       render json: planner_override.errors, status: :bad_request
     end
@@ -253,7 +258,7 @@ class PlannerOverridesController < ApplicationController
     planner_override = PlannerOverride.find(params[:id])
 
     if planner_override.destroy
-      render json: planner_override, status: :ok
+      render json: planner_override_json(planner_override, @current_user, session), status: :ok
     else
       render json: planner_override.errors, status: :bad_request
     end
