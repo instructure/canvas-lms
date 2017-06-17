@@ -32,6 +32,7 @@ export default function SubmissionTray (props) {
       trapFocus
       placement="end"
       onRequestClose={props.onRequestClose}
+      onClose={props.onClose}
     >
       <div className="SubmissionTray__Container">
         {props.showContentComingSoon && <ComingSoonContent />}
@@ -42,6 +43,7 @@ export default function SubmissionTray (props) {
 
 SubmissionTray.propTypes = {
   onRequestClose: func.isRequired,
+  onClose: func.isRequired,
   showContentComingSoon: bool.isRequired,
   isOpen: bool.isRequired
 };

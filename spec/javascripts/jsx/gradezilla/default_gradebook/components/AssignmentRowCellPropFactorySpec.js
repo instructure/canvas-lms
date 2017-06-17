@@ -23,6 +23,12 @@ QUnit.module('AssignmentRowCellPropFactory#getProps', {
   setup () {
     this.assignment = { id: '2301' };
     this.gradebook = createGradebook({ context_id: '1201' });
+    this.gradebook.gridSupport = {
+      helper: {
+        commitCurrentEdit: this.stub(),
+        focus: this.stub()
+      }
+    };
     this.factory = new AssignmentRowCellPropFactory(this.assignment, this.gradebook);
     this.student = { id: '1101', isConcluded: false };
   }
@@ -49,6 +55,13 @@ test('onToggleSubmissionTrayOpen sets the tray state', function () {
     this.gradebook.getSubmissionTrayState(),
     { open: true, studentId: this.student.id, assignmentId: this.assignment.id }
   );
+});
+
+test('onToggleSubmissionTrayOpen cancels current cell edit', function () {
+  const props = this.factory.getProps(this.student);
+  this.stub(this.gradebook, 'renderSubmissionTray');
+  props.onToggleSubmissionTrayOpen(this.student.id, this.assignment.id);
+  strictEqual(this.gradebook.gridSupport.helper.commitCurrentEdit.callCount, 1);
 });
 
 test('isSubmissionTrayOpen is true if the tray is open for the cell', function () {

@@ -24,6 +24,7 @@ QUnit.module('SubmissionTray', {
   mountComponent (props) {
     const defaultProps = {
       onRequestClose () {},
+      onClose () {},
       showContentComingSoon: false,
       isOpen: true
     };

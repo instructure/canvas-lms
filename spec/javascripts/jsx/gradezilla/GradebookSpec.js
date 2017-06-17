@@ -6392,6 +6392,12 @@ QUnit.module('Gradebook#renderSubmissionTray', {
     this.mountPointId = 'StudentTray__Container';
     $fixtures.innerHTML = `<div id=${this.mountPointId}></div>`;
     this.gradebook = createGradebook();
+    this.gradebook.gridSupport = {
+      helper: {
+        commitCurrentEdit () {},
+        focus () {}
+      }
+    };
     this.server = sinon.fakeServer.create({ respondImmediately: true });
     this.server.respondWith('GET', /^\/images\/.*\.svg$/, [
       200, { 'Content-Type': 'img/svg+xml' }, '{}'
@@ -6442,6 +6448,12 @@ test('renders the submission tray', function () {
 QUnit.module('Gradebook#toggleSubmissionTrayOpen', {
   setup () {
     this.gradebook = createGradebook();
+    this.gradebook.gridSupport = {
+      helper: {
+        commitCurrentEdit () {},
+        focus () {}
+      }
+    };
     this.stub(this.gradebook, 'updateRowAndRenderSubmissionTray');
   }
 });
@@ -6473,7 +6485,13 @@ QUnit.module('Gradebook#closeSubmissionTray', {
     this.activeStudentId = '1101';
     this.gradebook.rows = [{ id: this.activeStudentId }];
     this.gradebook.grid = { getActiveCell () { return { row: 0 } } };
-    this.gradebook.setSubmissionTrayState(true, '1101', '2')
+    this.gradebook.gridSupport = {
+      helper: {
+        commitCurrentEdit () {},
+        focus () {}
+      }
+    };
+    this.gradebook.setSubmissionTrayState(true, '1101', '2');
     this.stub(this.gradebook, 'updateRowAndRenderSubmissionTray');
   }
 });
@@ -6497,6 +6515,12 @@ test('calls updateRowAndRenderSubmissionTray with the student id for the active 
 QUnit.module('Gradebook#setSubmissionTrayState', {
   setup () {
     this.gradebook = createGradebook();
+    this.gradebook.gridSupport = {
+      helper: {
+        commitCurrentEdit: this.stub(),
+        focus: this.stub()
+      }
+    };
   }
 });
 
@@ -6504,6 +6528,16 @@ test('sets the state of the submission tray', function () {
   this.gradebook.setSubmissionTrayState(true, '1', '2');
   const expected = { open: true, studentId: '1', assignmentId: '2' };
   deepEqual(this.gradebook.gridDisplaySettings.submissionTray, expected);
+});
+
+test('puts cell in view mode when tray is opened', function () {
+  this.gradebook.setSubmissionTrayState(true, '1', '2');
+  strictEqual(this.gradebook.gridSupport.helper.commitCurrentEdit.callCount, 1);
+});
+
+test('does not put cell in view mode when tray is closed', function () {
+  this.gradebook.setSubmissionTrayState(false, '1', '2');
+  strictEqual(this.gradebook.gridSupport.helper.commitCurrentEdit.callCount, 0);
 });
 
 QUnit.module('Gradebook#getSubmissionTrayState', {

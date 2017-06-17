@@ -2421,6 +2421,7 @@ define [
         key: "submission_tray_#{studentId}_#{assignmentId}"
         isOpen: open
         onRequestClose: @closeSubmissionTray
+        onClose: => @gridSupport.helper.focus()
         showContentComingSoon: !@options.new_gradebook_development_enabled
       renderComponent(SubmissionTray, mountPoint, props)
 
@@ -2445,6 +2446,7 @@ define [
       @gridDisplaySettings.submissionTray.open = open
       @gridDisplaySettings.submissionTray.studentId = studentId if studentId
       @gridDisplaySettings.submissionTray.assignmentId = assignmentId if assignmentId
+      @gridSupport.helper.commitCurrentEdit() if open
 
     ## Gradebook Application State
 

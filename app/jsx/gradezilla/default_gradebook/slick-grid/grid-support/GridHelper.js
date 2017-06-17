@@ -47,6 +47,10 @@ class GridHelper {
   commitCurrentEdit () {
     return this.grid.getEditorLock().commitCurrentEdit();
   }
+
+  focus () {
+    this.grid.focus();
+  }
 }
 
 export default GridHelper;
