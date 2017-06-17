@@ -1044,7 +1044,7 @@ fr:
         turnitin_account_id: "ID de compte Turnitin"
         turnitin_comments: "Envoi à Turnitin - Commentaires"
         turnitin_host: "Hôte Turnitin"
-        turnitin_pledge: "Engagement Turnitin"
+        turnitin_pledge: "Engagement de similarité"
         turnitin_shared_secret: "Secret partagé Turnitin"
         users_can_edit_name: "Les utilisateurs peuvent modifier leur nom"
         value: "Désactiver les commentaires dans les annonces"
@@ -1465,6 +1465,7 @@ fr:
   add_tas_to_the_course_2aac6e02: "Ajouter des AE au cours"
   add_theme_32fa3d50: "Ajouter un thème"
   add_to_course_481a51c4: "Ajouter au cours..."
+  add_to_student_to_do_58e66b4b: "Ajouter à la liste des choses à faire de l’étudiant"
   add_trigger_bc1a0fae: "Ajouter un déclencheur"
   add_user_by_email_address_login_id_or_sis_id_7dd370dd: "Ajouter un utilisateur par adresse email, identifiant ou ID SIS."
   add_user_e73e8e50: "Ajouter l'utilisateur"
@@ -1606,14 +1607,20 @@ fr:
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "Une erreur est survenue lors de la tentative de contacter Turnitin."
   an_error_occurred_while_checking_the_migration_sta_d17035b1: "Une erreur est survenue pendant la vérification de l’état de la migration"
   an_error_occurred_while_loading_associations_9699b3ee: "Une erreur est survenue pendant le chargement des associations"
+  an_error_occurred_while_loading_changes_9851b56f: "Une erreur s'est produite lors du téléchargement des modifications"
   an_error_occurred_while_loading_courses_11d4571e: "Une erreur est survenue pendant le chargement des cours"
+  an_error_occurred_while_loading_late_policies_c415f676: "Une erreur s'est produite lors du téléchargement des politiques tardives"
   an_error_occurred_while_migrating_405ac0b5: "Une erreur est survenue pendant la migration."
   an_error_occurred_while_saving_associations_bd66f3f4: "Une erreur est survenue pendant l’enregistrement des associations"
   an_error_occurred_while_starting_migration_8e6015e2: "Une erreur est survenue lors du démarrage de la migration"
+  an_error_occurred_while_updating_late_policies_a95b707f: "Une erreur s'est produite lors de la mise à jour des politiques tardives"
   an_error_ocurred_while_deleting_the_appointment_gr_4948bbc5: "Une erreur est survenue lors de la suppression d'un groupe de rendez-vous"
+  an_error_ocurred_while_loading_sync_history_ad9dc6df: "Une erreur s'est produite lors du téléchargement de l'historique de synchronisation"
+  an_error_ocurred_while_loading_unsynced_changes_aed0d04d: "Une erreur s'est produite lors du téléchargement des modifications non synchronisées"
   an_error_ocurred_while_saving_the_appointment_grou_e19452cd: "Une erreur est survenue pendant l'enregistrement d'un groupe de rendez-vous"
   an_existing_canvas_user_with_the_sis_id_user_id_ha_4b64d1c1: "Un utilisateur Canvas existant avec l’ID SIS %{user_id} a déjà revendiqué les informations d’identification user_id pour %{other_user_id}."
   an_existing_canvas_user_with_the_user_id_has_alrea_aabbea6e: "Un utilisateur Canvas existant %{user_id} a déjà revendiqué les informations d’identification user_id pour  %{other_user_id}."
+  an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "Un utilisateur existant de Canvas avec le %{user_id} a déjà réclamé %{other_user_id} demandé integration_id, ignoré"
   an_export_is_already_in_progress_54270f01: "Un export est déjà en cours."
   an_internal_error_occurred_83b8a685: "Une erreur interne est survenue."
   an_item_named_name_already_exists_in_this_location_147b7312: "Un élément nommé « %{name} » existe déjà dans cet emplacement. Voulez-vous remplacer le fichier existant ?"
@@ -1907,6 +1914,7 @@ fr:
     scores_lower_than_the_average: "Notes inférieures à la moyenne de %{average}"
     total_graded_submissions: "Total des envois notés :"
   assignment_details_expanded_20c6f0c7: "détails de la tâche étendus"
+  assignment_excused_eb6c08fa: "Tâche excusée"
   assignment_grades_have_already_been_published_ff2d84c6: "Les notes d'évaluation ont déjà été publiées."
   assignment_group: 
     default_name: Travaux
@@ -1932,9 +1940,11 @@ fr:
   assignment_groups_api: 
     errors: 
       frozen_assignments_error: "Vous ne pouvez pas supprimer un groupe contenant une activité verrouillée."
+  assignment_groups_bc9cc3c9: "Groupes de tâches"
   assignment_groups_weight_2f1a5a7c: "Poids du groupe de travail"
   assignment_menu_91fe3716: "Menu du travail"
   assignment_muted_4cb590a4: "Travail assigné silencieux"
+  assignment_muted_8d74bfa0: "Tâche silencieuse"
   assignment_muter: 
     mute_assignment: "Tâche silencieuse"
     muting_assignment: "Tâche en mode silencieux..."
@@ -2559,6 +2569,7 @@ fr:
   associated_course_name_9b5b1945: "Nom du cours associé"
   associated_courses_1fbc6202: "cours associés"
   associations_3fd4abe8: Associations
+  associations_saved_successfully_48b9eae3: "Associations enregistrées avec succès"
   at_least_one_term_must_be_attached_24fd2bf5: "Un trimestre au minimum doit être joint"
   attach_terms_2b8770a5: "Joindre des périodes"
   attached_display_name_afa00c2e: "Joint : %{display_name}"
@@ -2605,6 +2616,8 @@ fr:
   author_s_name_b35e905a: "Nom de l'auteur"
   authorize_e3f25bb4: Autoriser
   auto_leader_7791c30a: auto_leader
+  automatically_apply_deduction_to_late_submissions_2b68166e: "Appliquer automatiquement la déduction aux tâches tardives"
+  automatically_apply_grade_for_missing_submissions_2b5c1a72: "Appliquer automatiquement la note pour les envois manquants"
   availability_dates_438d71e0: "Dates de disponibilité"
   availability_dates_changed_exceptions_465ba375: "Exceptions de changement de dates de disponibilité :"
   available_8606e40c: Disponible
@@ -2679,6 +2692,7 @@ fr:
   blueprint_5cca2ef: Projet
   blueprint_course_associations_72c9609: "Associations de projets de cours"
   blueprint_course_e16ed131: "Projet de cours"
+  blueprint_course_information_term_course_10d5cf30: "Informations sur le modèle du cours : %{term} - %{course}"
   blueprint_course_sync_finished_80cd9509: "Synchro des projets de cours terminée"
   blueprint_course_sync_in_progress_a1e2622b: "Synchro des projets de cours en cours"
   blueprint_courses_9dd321b8: "Projets de cours"
@@ -3324,6 +3338,7 @@ fr:
   cell_number_is_invalid_bd6faee0: "Le numéro de téléphone portable n'est pas valide !"
   cell_number_is_required_2edcee60: "Le numéro de téléphone portable est requis"
   certificate_fingerprint_b376df90: "Empreinte digitale du Certificat"
+  change_applied_89d1aa5a: "Modification appliquée"
   change_beginning_date_to_39dbd06e: "Changer la date de début par"
   change_dcaa253a: Modifier
   change_ending_date_to_d2cebd54: "Changer la date de fin par"
@@ -3339,6 +3354,7 @@ fr:
       update_assignment_points: "Modifier le nombre de points du travail pour l'aligner avec la rubrique ?"
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Les modifications s'appliqueront même si vous quittez cette page."
   changes_you_made_may_not_be_saved_4e8db973: "Les changements effectués ne seront peut-être pas sauvegardés."
+  changing_your_policy_now_will_affect_previously_gr_62063898: "La modification de votre politique affectera maintenant les envois notés précédemment."
   chart_of_the_student_s_grades_on_each_assignment_a1fb1908: "Charte des notes de l'élève pour chaque devoir"
   chat_2153c6b7: Clavardage
   check_to_add_a_user_for_loginid_6cd25597: "Cochez pour ajouter un utilisateur pour %{loginid}"
@@ -3771,6 +3787,7 @@ fr:
       labels: 
         all_quizzes: "Tous les quizz"
       select_quizzes: "Sélectionnez les quizz à exporter"
+  content_exports_expire_after_days_days_9bffa557: "Les exportations du contenu expirent après %{days} jours."
   content_for_section_1_7ecfb319: "Contenu pour la section 1"
   content_for_section_2_e7c6e2a3: "Contenu pour la section 2"
   content_for_section_3_90c1d235: "Contenu pour la section 3"
@@ -4632,6 +4649,7 @@ fr:
   count_submissions_need_grading_d34bae25: 
     one: "1 soumission doit être notée"
     other: "%{count} soumissions doivent être notées"
+  count_unsynced_changes_1fc147e5: "%{count} Modifications non synchronisées"
   count_unsynched_changes_3a1249ba: "%{count} Changements non synchronisés"
   country_is_required_b0afbf52: "Le pays est requis"
   course: 
@@ -4702,6 +4720,7 @@ fr:
   course_assignments_menu_fa6aeb23: "Menu des devoirs de cours"
   course_atom_feed_9d95214e: "Flux Atom du cours"
   course_calendar_7d3cba7b: "Calendrier du cours"
+  course_canvas_id_9e36b24c: "ID du cours Canvas"
   course_card_color_region_for_course_c356a69c: "Colorisation de la carte de cours pour %{course}"
   course_cards_6029a05c: "Cartes de cours"
   course_catalog_4cc7c8ce: "Catalogue du cours"
@@ -4719,6 +4738,7 @@ fr:
   course_copy_not_allowed_error: "Vous n’avez pas l’autorisation requise pour copier le cours source."
   course_discussions_38c0b74f: "Discussions de cours"
   course_ends_at_e8b166df: "Le cours se termine à"
+  course_export_from_date_expired_ebb0fe15: "Exportation du cours à partir de %{date} (expiré)"
   course_exports: 
     errors: 
       assignment: "L’exportation de la tâche %{title} a échoué"
@@ -5332,9 +5352,9 @@ fr:
         calendar: "Calendrier du cours"
         conclude: "Terminer ce cours"
         copy: "Copier ce cours"
-        delete: "Supprimer définitivement ce cours"
+        delete: "Supprimer ce cours"
         export_content: "Exporter le contenu du cours"
-        import: "Importer le contenu dans ce cours"
+        import: "Importer le contenu du cours"
         new_badge: Nouveau
         reset: "Réinitialiser le contenu du cours"
         stats: "Statistiques du cours"
@@ -5455,6 +5475,7 @@ fr:
       invalid_link: "Le lien d’inscription utilisé semble n’être plus valide. Contactez le formateur du cours pour vérifier si vous êtes toujours inscrit."
   courses_43204aae: Cours
   courses_navigation_menu_b3638384: "Menu de navigation de cours"
+  courses_people_680bb173: "Cours et personnes"
   create_132b3be1: Créer
   create_a_new_account_4cf7c0f9: "Créer un nouveau compte"
   create_a_new_module_6f31b0fe: "Créer un nouveau module"
@@ -5813,12 +5834,14 @@ fr:
       month: Mois
       second: Secondes
       year: Année
+  day_9d999bec: Jour
   day_s_7cc1231f: Jour(s)
   deactivate_this_key_3e79a2b5: "Désactiver cette clé"
   deactivate_user_86c09036: "Désactiver l'utilisateur"
   decaying_average_8bf6a0dd: "Moyenne de décroissance"
   decrease_indent_d9cf469d: "Diminuer le retrait"
   decrease_indent_de6343ab: "Diminuer le retrait"
+  deduct_104e8866: Déduire
   deep_orange_4c7eea99: "Orange foncé"
   deep_purple_bb3e2907: "Violet foncé"
   default_conference_title: "Conférence %{course_name}"
@@ -5831,6 +5854,8 @@ fr:
   default_template_f2a759ed: "Modèle par défaut"
   default_templates_are_used_as_starting_points_for__f06f9e33: "Les modèles par défaut sont utilisés comme points de départ pour tous les nouveaux thèmes et ne peuvent pas être supprimés."
   default_to_modules_for_the_course_home_page_d6a951a7: "Par défaut, afficher les modules pour la page d’accueil du cours"
+  define_general_settings_for_locked_objects_in_this_20da2981: "Définir les paramètres généraux pour les objets verrouillés dans ce cours. "
+  define_settings_by_type_for_locked_objects_in_this_676197bf: "Définir les paramètres par type pour les objets verrouillés dans ce cours. "
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Définissez le texte qui s’affichera avant et après le déroulant et créez un ensemble de réponses possibles."
   delay_posting_this_topic_until_aa483eec: "Retarder la publication de ce sujet jusqu'à/au "
   delete_a6efa79d: Supprimer
@@ -6037,6 +6062,7 @@ fr:
   discussion_topic_menu_3d4684c6: "Menu des sujets de discussion"
   discussion_topic_will_be_available_starting_at_46aa7477: "Le sujet de discussion sera disponible dès/le"
   discussion_topic_will_be_available_until_f5e3abc8: "Le sujet de discussion sera disponible jusqu'à/au"
+  discussion_topic_will_show_on_student_to_do_list_f_1c9e6286: "Le sujet de discussion s’affichera sur la liste des choses à faire de l’étudiant"
   discussion_topics: 
     assignment_details: 
       available_from: "Disponible depuis"
@@ -6128,6 +6154,8 @@ fr:
     error_draft_state_with_posts: "Ce sujet ne peut pas être défini comme brouillon, car il contient des billets."
     error_group_announcement: "Vous ne pouvez pas utiliser une discussion groupée dans une annonce."
     error_group_change: "Vous ne pouvez pas changer les groupes si une discussion contient des réponses."
+    error_todo_date_assignment: "La date ne peut pas être ajoutée si le sujet de la discussion est noté"
+    error_todo_date_unauthorized: "Vous n’êtes pas autorisé à ajouter ce sujet à la liste des choses à faire de l’étudiant."
     flash: 
       fail: "La suppression de l'annonce a échoué."
       removed: "L'annonce a été supprimée avec succès."
@@ -6384,6 +6412,7 @@ fr:
   drop_image_62a2a071: "Déposer une image"
   dropdown_option_1_e6ff2fc: "Option 1 de la liste déroulante"
   dropdown_option_2_9766a346: "Option 2 de la liste déroulante"
+  dropped_38031953: Abandonné
   dropped_for_grading_purposes_46256461: "Abandonné pour des raisons de notation"
   due_a73610f6: Échéance
   due_assignment_due_date_time_5acdf3cf: "Dû le : %{assignment_due_date_time}"
@@ -6590,6 +6619,7 @@ fr:
   ember_modules_description: "Modules réécrits dans Ember. L’API glisser-déposer native est utilisée, ce qui permet de faire glisser des éléments depuis des emplacements externes."
   empty_stub_for_testing_only_37aad38: "Vider le talon (uniquement pour les tests)"
   enable_6f5d1328: Activer
+  enable_course_as_a_blueprint_course_8515ffd5: "Activer le cours comme cours modèle"
   enable_dashboard_images_for_courses_5af458b0: "Autoriser les images du tableau de bord pour les cours"
   enable_feature_title_987d8e9a: "Activer la fonctionnalité : %{title}"
   enable_gradebook_list_students_by_sortable_name: "Affichez la liste des étudiants triée d’après leur nom dans le relevé de notes. Par défaut, le tri s’effectue d’après les données « Nom, prénom », mais vous pouvez modifier ces paramètres."
@@ -6617,6 +6647,7 @@ fr:
   end_tutorial_7fb16b6f: "Terminer le didacticiel"
   ending_date_e1ea13a4: "Date de fin"
   ends_4fcb632: "Se termine :"
+  enrolled_a6a517cd: Enrôlé(e)
   enrolled_as_272da3b9: "Inscrit comme"
   enrollment: 
     default_course_name: Cours
@@ -7003,6 +7034,7 @@ fr:
   event_date_c9459fe3: "Date de l'événement"
   event_date_f05219e7: "Date de l'événement : "
   event_end_time_ef830e66: "Heure de fin de l'événement"
+  event_fe9ba3fe: Événement
   event_start_time_441b491f: "Heure de début de l'événement"
   event_title_course_name_changed_to_37510fbb: "%{event_title}, %{course_name} a changé. il est à présent "
   every_665d821e: Chacun
@@ -7037,6 +7069,7 @@ fr:
   expand_subdiscussion_cd226ed4: "Développer la sous-discussion"
   expand_tutorial_tray_22630c49: "Étendre le tiroir à didacticiel"
   expanded_f4493860: Développé(e)
+  experimental_graphql_api_75c5eb8f: "API EXPÉRIMENTAL GraphQL."
   export_an_existing_quiz_to_new_quizzes_2_format_8fd08a23: "Exportez un quiz existant au nouveau format Quiz 2."
   export_course_content_f4774b74: "Exporter le contenu du cours"
   export_de71cd8e: Exporter
@@ -7383,6 +7416,7 @@ fr:
   filter_ip_addresses_2f296bd2: "Filtrer les adresses IP"
   filter_replies_by_unread_342e8e90: "Filtrer les réponses par état \"non lu\""
   filter_replies_by_unread_caf870ea: "filtrer les réponses par état « non lu »"
+  filters_92f2776f: Filtres
   final_grade_info_2aa35d25: "Informations sur la note finale"
   final_grade_score_fe69a301: "Note finale : %{score}"
   final_letter_grade_80dccec1: "Note finale (en lettre)"
@@ -7438,6 +7472,7 @@ fr:
   for_all_devices_1f603968: "Pour tous les appareils"
   for_an_instant_answer_see_if_your_issue_is_address_48280e89: "Pour obtenir une réponse instantanée, veuillez vérifier que votre problème n'est pas déjà traité dans les *Guides Canvas*. "
   for_best_results_crop_image_to_262px_wide_by_146px_af81a540: "Pour des résultats optimaux, raccourcissez l'image à 262px de large sur 146px de haut. Formats acceptés : JPG, PNG ou GIF."
+  for_each_late_62aecf41: "Pour chaque retard"
   forgot_password_url_3f9c04b: "URL d'oubli du mot de passe"
   form_background_fb654518: "Former l'arrière plan"
   form_border_f61f12dc: "Former la bordure"
@@ -7459,6 +7494,7 @@ fr:
   full_name_is_required_8efbdc84: "Le nom complet est requis"
   future_5416ea92: Futur
   future_terms_7fba2ae6: "Trimestres à venir"
+  general_locked_objects_6a9adafb: "Objets généraux verrouillés"
   generate_epub_80e89ea4: "Générer au format ePub"
   generate_item_analysis_report_statuslabel_16e02c8: "Générer le rapport d'analyse d'élément %{statusLabel}"
   generate_student_analysis_report_statuslabel_aecdc4dc: "Générer le rapport d'analyse d'étudiant %{statusLabel}"
@@ -7788,6 +7824,7 @@ fr:
     ungraded: "Pas pris en compte dans la notation"
   gradebook_1620a0aa: "Carnet de notes"
   gradebook_5fd8ef0: "Carnet de notes..."
+  gradebook_context_name_9dbae5bc: "Carnet de notes - %{context_name}"
   gradebook_csvs: 
     grades_filename: Notes
   gradebook_export_failed_reason_2b0f6c53: "Échec de l'export du carnet de notes : %{reason}"
@@ -8258,6 +8295,7 @@ fr:
   graph_of_student_page_views_by_category_7cb49887: "Graphique des pages visitées par l'étudiant organisées par catégorie"
   graph_of_the_distribution_of_grades_in_the_departm_30445777: "Graphique de la distribution des notes dans le département"
   graph_showing_the_fraction_of_on_time_submissions__735e47db: "Graphique démontrant la fraction de soumissions effectuées dans le temps imparti pour chaque devoir"
+  graphql_api_af4deb45: "GraphQL API"
   graphs_89fcfeb: Graphiques
   great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "Parfait, vous avez donc un cours. Et maintenant ? Eh bien, avant de le dévoiler au monde entier, vous voulez peut-être le vérifier et vous assurer que vous avez bien présenté les bases. Parcourez la liste sur la gauche pour garantir que votre cours est prêt à être utilisé."
   green_15af4778: Vert
@@ -8790,6 +8828,7 @@ fr:
   hong_kong_852_98e3b3fe: "Hongkong (+852)"
   host_8be927e0: Accueillir
   host_is_unreachable_or_not_pointing_to_catalog_fb3fc082: "L'hôte est inaccessible ou injoignable par le catalogue"
+  hour_34d02553: Heure
   hover_over_me_496521b9: Survolez-moi
   how_is_this_affecting_you_b3b6a639: "Dans quelle mesure cela vous affecte-t-il ?"
   how_many_minutes_ecca5ee7: "Combien de minutes ? "
@@ -8915,6 +8954,7 @@ fr:
   inactive_enrollments_3b84be3d: "Participants inactifs"
   inbox_bb245a60: "Boîte de réception"
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "Inclure un lien de capture vidéo/d’écran en utilisant *Jing* par exemple."
+  include_course_settings_c4c08764: "Inclure les paramètres du cours"
   include_deleted_enrollments_1c87684a: "Inclure les inscriptions supprimées"
   include_deleted_objects_3cced3b5: "Inclure les objets supprimés ; "
   include_scores_when_alerting_about_grade_changes_623ec201: "Inclure les résultats dans les alertes de modification de notes."
@@ -9183,6 +9223,12 @@ fr:
   late_2be42b88: "En retard"
   late_percent_b91d01b3: "En retard : %{percent}"
   late_policies_42bac80: "Pratiques en cas de retard"
+  late_policies_fd5dced6: "Politiques tardives"
+  late_policies_updated_2ecf9aff: "Politiques tardives mises à jour"
+  late_submission_deduction_interval_b9fca334: "Intervalle de déduction d’envoi tardif"
+  late_submission_deduction_must_be_between_0_and_10_9cde872d: "La déduction d’envoi tardif doit être comprise entre 0 et 100"
+  late_submission_deduction_must_be_numeric_5b3f468e: "La déduction d’envoi tardif doit être numérique"
+  late_submission_deduction_percent_52516a62: "Pourcentage de déduction d’envoi tardif"
   latest_assessment_a85280ef: "Dernière évaluation"
   latest_f604a75: "La dernière"
   latest_score_905aa87b: "Dernière note"
@@ -9220,6 +9266,7 @@ fr:
       Le relevé de notes pour la maîtrise de l’apprentissage permet aux enseignants de voir rapidement
       la progression des étudiants et du cours dans les différents apprentissages.
       Les acquis sont présentés comme un relevé de notes et les progrès des étudiants sont exprimés à la fois sous la forme d’une valeur numérique et avec les appréciations maîtrisé/presque maîtrisé/soutien.
+  learning_object_1f9e5dd8: "Objet d'apprentissage"
   learning_outcome: 
     no_comment: "Aucun commentaire"
     no_description: "Pas de description"
@@ -9380,6 +9427,7 @@ fr:
   loading_associations_complete_b93a9c6e: "Chargement des associations terminé"
   loading_associations_started_1f65d8d: "Chargement des associations démarré"
   loading_bde52856: "En cours de chargement"
+  loading_change_log_94ac6073: "Téléchargement du journal des modifications"
   loading_courses_409a3641: "Chargement des cours..."
   loading_courses_bd1bffe: "Chargement des cours..."
   loading_courses_complete_count_courses_found_6768d9e1: 
@@ -9390,6 +9438,7 @@ fr:
   loading_mastery_paths_c558a766: "Chargement des parcours de maîtrise..."
   loading_more_results_def6df65: "Chargement de résultats supplémentaires..."
   loading_sync_history_9f342cbf: "Chargement de l’historique de synchro"
+  loading_unsynced_changes_b5d7b202: "Téléchargement des modifications non synchronisées"
   loading_unsynched_changes_688434f2: "Chargement des changements non synchronisés"
   locales: 
     fr: Français
@@ -9408,6 +9457,8 @@ fr:
   locked_click_to_unlock_50747e11: "Verrouillé. Cliquez pour déverrouiller."
   locked_content_f4ef2968: "Contenu verrouillé"
   locked_object_configuration_d1fb1b82: "Configuration d'objet verrouillé :"
+  locked_objects_by_type_ff376c6c: "Objets verrouillés par type"
+  locked_objects_cannot_be_edited_in_associated_cour_1af858c8: "Les objets verrouillés ne peuvent pas être modifiés dans les cours associés."
   locked_until_item_name_is_graded_3b8d967f: "Verrouillé jusqu'à ce que « %{item_name} » soit classé"
   locked_until_unlock_date_498ead5f: "Verrouillé jusqu'au %{unlock_date}"
   locking_91f476a5: Verrouillage...
@@ -9528,6 +9579,10 @@ fr:
   lower_bound_to_upper_bound_48d093c2: "%{lower_bound} à %{upper_bound}"
   lower_limit_of_range_6ddd4983: "Limite inférieure de la plage"
   lowerbound_to_upperbound_352a3c0b: "de %{lowerBound}+ à %{upperBound}"
+  lowest_possible_grade_ae5510be: "Note la plus basse possible"
+  lowest_possible_grade_must_be_between_0_and_100_51256ea5: "La note la plus basse possible doit être comprise entre 0 et 100"
+  lowest_possible_grade_must_be_numeric_3d97659d: "La note la plus basse possible doit être numérique"
+  lowest_possible_grade_percent_20474418: "Pourcentage de note le plus bas possible"
   lti: 
     lti_message: 
       load_tool_new_tab_button: "Ouvrir %{tool} dans une nouvelle fenêtre"
@@ -10234,6 +10289,40 @@ fr:
       summary: 
         subject: "Notes et commentaires publiés pour : %{title}, %{course}"
     assignment_unpublished_module: "Cette tâche fait partie d’un module non publié et n’est pas encore disponible."
+    blueprint_content_added: 
+      email: 
+        body: "Les modifications apportées au modèle du cours ont été synchronisées avec %{name}."
+        details_link: "Afficher les modifications : %{link}"
+        html: 
+          body: "Les modifications apportées au modèle du cours ont été synchronisées avec %{name}."
+          details_link: "Afficher les modifications"
+          subject: "Synchronisation du modèle : %{name}"
+        subject: "Synchronisation du modèle : %{name}"
+      sms: 
+        body: "Les modifications apportées au modèle du cours synchronisées avec %{name}."
+        link_message: "Informations complémentaires sur %{url}"
+      summary: 
+        body: "Synchronisation du modèle : Modifications synchronisées avec %{name}."
+        subject: "Synchronisation du modèle : %{name}"
+      twitter: 
+        tweet: "Alerte Canvas - les modifications apportées au modèle synchronisées avec %{name}"
+    blueprint_sync_complete: 
+      email: 
+        body: "Votre modèle de cours, %{name}, a synchronisé les modifications apportées à tous les cours associés."
+        details_link: "Informations complémentaires : %{link}"
+        html: 
+          body: "Votre modèle de cours, %{name}, a synchronisé les modifications apportées à tous les cours associés."
+          details_link: "Informations complémentaires"
+          subject: "Synchronisation du modèle terminée : %{name}"
+        subject: "Synchronisation du modèle terminée : %{name}"
+      sms: 
+        body: "Les modifications apportées au modèle du cours synchronisées à partir de %{name}."
+        link_message: "Informations complémentaires sur %{url}"
+      summary: 
+        body: "Synchronisation du modèle : Modifications synchronisées à partir de %{name}."
+        subject: "Synchronisation du modèle terminée : %{name}"
+      twitter: 
+        tweet: "Alerte Canvas - modifications du modèle du cours  synchronisées à partir de %{name}."
     collaboration_invitation: 
       email: 
         body: |-
@@ -11442,6 +11531,12 @@ fr:
   minutes_per_slot_5b7169e5: "Minutes par créneau horaire"
   missing_1a256b3b: Manquant
   missing_percent_94534638: "Manquants : %{percent}"
+  missing_policies_4f195e0b: "Politiques manquantes"
+  missing_submission_ec204c33: "Envois manquants"
+  missing_submission_grade_ed2756d1: "Note d’envoi manquant"
+  missing_submission_grade_must_be_between_0_and_100_ae0dd8bd: "La note d’envoi manquant doit être comprise entre 0 et 100"
+  missing_submission_grade_must_be_numeric_1a142ef2: "La note d’envoi manquant doit être numérique"
+  missing_submission_grade_percent_34428feb: "Pourcentage de note d’envoi manquant"
   mobile_app_css_file_abbf06bd: "Fichier CSS de l'application mobile"
   mobile_app_javascript_file_faea55d5: "Fichier Javascript de l'application mobile"
   mobile_css_file_b86ded7f: "Fichier CSS mobile"
@@ -11793,6 +11888,8 @@ fr:
   new_export_3ab758: "Nouvel export"
   new_file_135ae520: "[ Nouveau fichier ]"
   new_file_added_for_name_a5ec3156: "Nouveau fichier ajouté pour %{name}"
+  new_gradebook_297f7e2d: "Nouveau carnet de notes"
+  new_gradebook_enables_an_early_release_of_new_grad_76b8bf45: "Le nouveau carnet de notes permet une publication anticipée des nouvelles améliorations du carnet de notes."
   new_gradebook_history_b4367fc7: "Nouvel historique du carnet de notes"
   new_group_category_66be9cbd: "Nouvelle catégorie de groupe"
   new_group_set_7241a581: "Nouvel ensemble de groupes"
@@ -11820,6 +11917,7 @@ fr:
   nickname_7df95b09: "Surnom : "
   no_assignment_name_adbb215b: "Pas de nom de travail"
   no_associated_terms_13bacefc: "Aucune période associée"
+  no_attributes_locked_611c5cc: "aucun attribut verrouillé"
   no_broken_links_found_38d951e3: "Tous les liens semblent fonctionner"
   no_collaboration_apps_3bbd30ce: "Pas d'application de collaboration"
   no_content_has_been_added_f36bab43: "* Aucun contenu n’a été ajouté"
@@ -11870,6 +11968,7 @@ fr:
   norway_c11471b3: Norvège
   not_a_number: "doit être un nombre positif"
   not_available_487d3648: Indisponible
+  not_available_during_sync_ae645e8c: "Non disponible durant la synchronisation"
   not_available_until_next_submission_2175158: "Non disponible avant l'envoi suivant"
   not_completed_d70acea3: "Non terminé"
   not_factored_into_grading_455dcf6a: "Non pris en compte dans la notation"
@@ -11928,6 +12027,11 @@ fr:
     appointment_cancelations_display: "Annulations de rendez-vous"
     appointment_signups_description: "Nouveau rendez-vous dans votre calendrier"
     appointment_signups_display: "Inscriptions aux rendez-vous"
+    blueprint_description: |-
+        *Instructeur et administrateur uniquement :*
+        
+        Le contenu a été synchronisé à partir d’un modèle de cours avec les cours associés
+    blueprint_display: "Synchronisation du modèle"
     calendar_description: "Éléments nouveaux et modifiés dans le calendrier de votre cours"
     calendar_display: Calendrier
     categories: 
@@ -11936,6 +12040,7 @@ fr:
       appointment_availability: "Disponibilité pour les rendez-vous"
       appointment_cancelations: "Annulations de rendez-vous"
       appointment_signups: "Inscriptions aux rendez-vous"
+      blueprint: Modèle
       calendar: Calendrier
       course_content: "Contenu du cours"
       discussion: Discussion
@@ -12027,6 +12132,8 @@ fr:
       assignment_resubmitted: "La tâche a été renvoyée"
       assignment_submitted: "La tâche a été envoyée"
       assignment_submitted_late: "La tâche a été envoyé en retard"
+      blueprint_content_added: "Contenu du modèle ajouté"
+      blueprint_sync_complete: "Synchronisation du modèle terminée"
       collaboration_invitation: "Invitation de collaboration"
       confirm_email_communication_channel: "Confirmer le canal de communication par e-mail"
       confirm_registration: "Confirmer l’inscription"
@@ -12224,6 +12331,7 @@ fr:
       login: Connexion
       page_title: "Connexion à l’application"
       remember_auth: "Mémoriser l'autorisation"
+  object_type_e4f3bbeb: "Type d'objet"
   observees: 
     being_observed: "Étudiants observés"
     new_observee_password: "Mot de passe"
@@ -12315,6 +12423,7 @@ fr:
   out_of_points_37a749d7: "(sur %{points})"
   out_of_points_possible_8ab14f7: "sur %{points_possible}"
   out_of_pointspossible_3fb5ee20: "Sur %{pointsPossible}"
+  outcome_da397d20: Acquis
   outcome_groups: 
     invalid_file: "Fichier de groupe d'acquis non valide"
   outcome_groups_api: 
@@ -12976,7 +13085,7 @@ fr:
       default_assignment_settings: "**Paramètres de tâche par défaut**"
       default_comments_settings: "*Le texte entré ici sera affiché aux élèves lorsqu'ils soumettront un travail.*"
       labels: 
-        account_id: "VeriCite Identifiant du compte"
+        account_id: "VeriCite Clé du consommateur"
         comments: "Commentaires sur la soumission"
         exclude_quotes: "Exclure les citations"
         exclude_self_plag: "Exclure l'auto-plagiat"
@@ -13592,6 +13701,7 @@ fr:
       move_copy_questions: "Déplacer/Copier les questions"
     update_outcomes_fail: "Échec de la mise à jour des acquis"
     updating_outcomes: "Mise à jour des acquis..."
+  question_bank_f6c44d62: "Banque de questions"
   question_banks: 
     bank_fail: "Échec de création de la banque de questions."
     bank_success: "La banque de questions a été créée."
@@ -15127,6 +15237,7 @@ fr:
   restrict_students_from_accessing_courses_after_end_7dd66bce: "Empêcher les élèves d'accéder aux cours après leurs dates de fin"
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Empêcher les élèves d'accéder aux cours avant leurs dates de début"
   restricted_access_d3e99a39: "Accès restreint"
+  resubmitted_2080646f: Renvoyer
   resubmitted_since_last_graded_8484d285: "Soumis à nouveau depuis la dernière notation"
   resume_quiz_afeceb87: "Reprendre le questionnaire"
   resume_survey_58dce775: "Reprendre l’enquête"
@@ -15302,6 +15413,7 @@ fr:
     unknown_user: "Utilisateur inconnu"
   rubric_association: 
     no_details: "Aucune information"
+  rubric_fc39da76: Rubrique
   rubrics: 
     index: 
       account_rubrics: "À propos des barêmes"
@@ -15510,6 +15622,7 @@ fr:
     enrollments_tas: "Assistants d’enseignement"
     enrollments_teachers: Enseignants
     student_groups: "Groupes d’étudiants"
+  search_23a88d5c: Rechercher...
   search_280d00bd: Chercher
   search_by_title_short_name_or_sis_id_fe84aa12: "Rechercher par titre, nom court, ou identifiant SIS"
   search_by_user_dd3ad189: "Rechercher par utilisateur"
@@ -15520,6 +15633,7 @@ fr:
   search_for_files_7541fb28: "Chercher des fichiers"
   search_grading_periods_e947a3e9: "Rechercher les périodes de notation..."
   search_groups_or_people_6c15d6ad: "Rechercher des groupes ou des personnes"
+  search_people_44f36cd2: "Rechercher des personnes..."
   search_people_4782671a: "Rechercher des personnes"
   search_people_as_you_type_in_this_field_the_list_o_5755e8ad: "Rechercher des personnes. Lorsque vous écrivez dans ce champ, la liste de personnes est automatiquement filtrée pour n'y inclure que les noms qui correspondent à votre saisie."
   search_term_must_be_at_least_num_characters_669098ed: "Le terme de recherche doit être long d'au moins %{num} caractères"
@@ -15623,6 +15737,7 @@ fr:
         crosslist_this_section: "Transférer cette section"
         current_enrollments: "Inscriptions actuelles"
         decrosslist_section: "Supprimer le transfert de cette section"
+  sections_94731e51: Sections
   see_rubric_results_62a6447d: "Voir les résultats de la rubrique"
   see_scoring_details_f7fd1f3b: "Voir les détails de la notation"
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Voir quelques outils LTI* qui fonctionnent bien avec Canvas."
@@ -15801,6 +15916,7 @@ fr:
         record_type: "Type d'enregistrement"
         ret_val: "URL de retour"
   settings_5aa0fd0c: Paramètres
+  settings_changed_exceptions_e5247936: "Les paramètres modifient les exceptions :"
   settings_for_assignment_name_c19565e1: "Réglages pour le devoir %{name} "
   settings_for_tab_label_3bff4468: "Paramètres pour %{tab_label}"
   settings_for_title_d3ca495: "Paramètres pour %{title}"
@@ -16536,6 +16652,7 @@ fr:
   shuffle_answers_edb602b7: "Mélanger les réponses"
   signup_type_8b4506f3: "Type d’inscription"
   similarity_detection_dcada48: "Détection de similitude"
+  similarity_detection_platform_9e424d70: "Plateforme de détection de similarité"
   similarity_score_more_information_b7010a87: "Note de similitude -- informations complémentaires"
   simple_tls_45df2648: "TLS simple"
   singapore_65_b4927585: "Singapour (+65)"
@@ -16754,6 +16871,8 @@ fr:
     no_answer: "Aucune réponse"
   status_e051bb30: statut
   status_e7fdbe06: Statut
+  statuses_497dfa15: États...
+  statuses_f41543d8: États
   step: Étape
   stop_acting_as_user_8809a97f: "Cesser d'agir en tant qu'utilisateur"
   storage_used_in_mb_c75fbd9c: "stockage utilisé en MB"
@@ -16790,6 +16909,7 @@ fr:
       dans un format analogue à un relevé de notes et la progression est indiquée à la fois sous la
       forme d’une valeur numérique et avec les appréciations maîtrisé/presque maîtrisé/soutien.
   student_planner_aee76000: "Planificateur élève"
+  student_planner_date_4cc73abb: "Date de l'agenda étudiant :"
   student_sis_6721040e: "Sis de l'élève"
   student_sis_d9f0cd39: "sis de l'étudiant"
   student_summary: 
@@ -17004,6 +17124,7 @@ fr:
   submitted_datetime_fa2e9287: "Envoyé : %{dateTime}"
   submitted_files_82dd3009: "Fichiers envoyés"
   submitted_late_3741af29: "Soumis tardivement"
+  submitted_late_97730017: "Envoyé tard"
   submitted_submitdate_bdd3bf09: "Soumis : %{submitDate}"
   submitting_types_7c5a7096: "Soumettant : %{types}"
   success_all_users_on_this_domain_will_now_see_this_4681b85d: "Succès ! Tous les utilisateurs de ce domaine vont maintenant voir ce marquage. "
@@ -17054,6 +17175,7 @@ fr:
   syllabus_tutorial_tray_97e8ef82: "Bac du didacticiel sur les programmes"
   syllabus_visibility_options_a81ef419: "Options de visibilité du cursus"
   sync_68e5c167: Synchro
+  sync_completed_successfully_8f68b542: "La synchronisation s'est terminée avec succès"
   sync_grades_a16622ca: "Synchroniser les notes"
   sync_grades_to_sis_4e7fbc08: "Synchroniser les notes vers SIS"
   sync_grades_to_sis_checkbox_is_enabled_by_default__fad7a785: "La case à cocher « Synchroniser les notes vers SIS » est cochée par défaut pour les devoirs, discussions notées et quiz. "
@@ -17283,6 +17405,7 @@ fr:
   there_are_no_available_signups_for_this_course_26b05c56: "Aucune inscription disponible pour ce cours."
   there_are_no_configured_ltis_that_interact_with_co_8c780ce6: "Il n'y a pas de LTI configurés qui intéragissent avec les collaborations."
   there_are_no_unsaved_changes_9276e87c: "Il n'y a aucun changement non sauvegardé"
+  there_are_no_unsynced_changes_4e8f0838: "Il n'y a aucune modification non synchronisée"
   there_are_no_unsynched_changes_d208547c: "Aucune changement non synchronisé"
   there_was_a_failure_logging_out_at_your_idp_30070527: " Il y a eu un échec de déconnexion avec votre fournisseur d’identités"
   there_was_a_problem_creating_the_teacher_notes_col_dd73456f: "La création de la colonne de notes de l'enseignant a rencontré un problème."
@@ -17310,6 +17433,7 @@ fr:
   there_was_an_error_updating_this_assignment_please_59fc608d: "Une erreur s’est produite pendant la mise à jour de ce travail assigné. Veuillez réactualiser la page et réessayer."
   there_was_an_error_uploading_the_image_932fc4ce: "Une erreur est survenue lors du téléchargement de l'image"
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "Une erreur s’est produite avec votre requête ; veuillez essayer une recherche différente."
+  there_was_an_unexpected_problem_with_the_sync_be079a67: "Un problème inattendu est survenu lors de la synchronisation"
   there_were_errors_with_the_form_errors_ab5b559a: "Des erreurs se sont produites avec le formulaire : %{errors}"
   there_were_several_possible_matches_with_the_impor_ad58bcd0: "Il y avait plusieurs correspondances possibles pour cet import. Veuillez les résoudre ci-dessous."
   these_backup_codes_can_be_used_if_your_multi_facto_ca30a3df: "Ces codes de secours peuvent être utilisés si votre appareil d’authentification à plusieurs facteurs n’est pas disponible. Veuillez les imprimer et les garder dans un endroit sûr, par exemple dans votre porte-feuille."
@@ -17374,6 +17498,7 @@ fr:
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: "Ce nom sera utilisé par les enseignants pour la notation."
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "Cet acquis a été utilisé pour évaluer un étudiant et ne peut plus être mis à jour"
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Cet acquis a été utilisé pour évaluer un étudiant et ne peut ni être modifié, ni être supprimé. "
+  this_outcome_has_been_used_to_assess_a_student_onl_4b4c1e95: "Cet acquis a été utilisé pour évaluer un étudiant. Seuls les champs de texte peuvent être mis à jour"
   this_package_includes_apip_file_s_which_are_not_co_b50b30a7: "Ce paquet contient des fichiers APIP, incompatibles avec Canvas. Ces fichiers n'ont pas été inclus dans l'import."
   this_package_includes_curriculum_standards_which_a_1a137060: "Ce paquet contient des normes de cursus, incompatibles avec Canvas. Elles n'ont pas été incluses dans l'import."
   this_package_includes_epub3_file_s_which_are_not_c_bbafef30: "Ce paquet contient des fichiers EPub3, incompatibles avec Canvas. Ces fichiers n'ont pas été inclus dans l'import."
@@ -17774,6 +17899,7 @@ fr:
   unlock_date_cannot_be_before_course_start_9c7b8524: "La date du déverrouillage ne peut pas être antérieure à la date de début du cours."
   unlock_date_cannot_be_before_section_start_793ddc66: "La date du déverrouillage ne peut pas se situer avant le début de la section"
   unlock_date_cannot_be_before_term_start_d3c01813: "La date du déverrouillage ne peut pas se situer avant le début du trimestre"
+  unlock_f6196bf5: Déverrouiller
   unlock_module_on_date_17144fbd: "Déverrouiller le module à la date"
   unlocked_beee43de: Déverrouillé
   unlocked_click_to_lock_53262ce7: "Déverrouillé. Cliquez pour verrouiller."
@@ -17804,6 +17930,7 @@ fr:
   unsupported_package: "Package de contenu non pris en charge"
   unsyncable_4bf11ee6: "Impossible à synchroniser"
   unsyncable_message_95faa75d: "Impossible à synchroniser : %{message}"
+  unsynced_changes_4ddaec76: "Modifications non synchronisées"
   unsynched_changes_867a1790: "Changements impossibles à synchroniser"
   until_4a1f8cda: Jusqu'à
   until_8bdea3de: jusqu'à/au
@@ -18371,6 +18498,7 @@ fr:
   warning_6576b5b8: avertissement
   warning_aacb8c24: Avertissement
   warning_crocodoc_has_limitations_when_used_in_fire_8ab414e6: "Avertissement : Crocodoc est limité lorsqu'il est utilisé avec Firefox. Les commentaires ne seront pas toujours sauvegardés. "
+  warning_d9ac42ef: "Avertissement :"
   warning_for_improved_accessibility_in_moving_files_71e1028b: "Avertissement : pour une meilleure accessibilité lors du déplacement des fichiers, utilisez l’option Accéder à la boîte de dialogue figurant dans le menu."
   warning_for_improved_accessibility_of_calendar_eve_da54b4e2: "Avertissement : pour une meilleure accessibilité aux événements du calendrier, veuillez utiliser le mode agenda."
   warning_for_improved_accessibility_of_reordering_a_5d0206c7: "Avertissement : pour une meilleure accessibilité lors de la réorganisation des devoirs et des groupes, utilisez l’option Déplacer dans le dialogue située dans le menu."
@@ -18603,6 +18731,7 @@ fr:
   windows_tile_color_2b786bd9: "Couleur de la mosaïque Windows "
   windows_tile_square_b91d2b33: "Mosaïque Windows : Carrée"
   windows_tile_wide_4d40910: "Mosaïque Windows : Large"
+  withdrawn_4c838347: Retiré
   work_and_create_together_c65f358b: "Travaillez et créez ensemble"
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "Désirez-vous accepter ou ignorer cette mise à jour ?"
   would_you_like_to_enable_this_app_ccdf735d: "Voulez-vous activer cette application ?"
@@ -18684,6 +18813,7 @@ fr:
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "Vous avez atteint le nombre maximum de webhooks défini par la limite du compte (%{max})"
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "Vous avez atteint le nombre maximum de webhooks défini par la limite de l’utilisateur (%{max})"
   you_have_submitted_the_assignment_7ef8a51a: "Vous avez envoyé le travail"
+  you_have_unsynced_changes_that_will_sync_to_all_as_9028e711: "Vous avez des modifications non synchronisées qui seront synchronisées avec tous les cours associés lorsqu'une nouvelle association est enregistrée."
   you_just_sent_a_message_in_canvas_86b4945c: "Vous venez juste d’envoyer un message dans Canvas"
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "Vous en voudrez vous aussi. Quel est l’intérêt de dispenser un cours si personne n’écoute ?"
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: "Vous aurez besoin d'un jeton d'actualisation, suivez les étapes présentées à ce lien, vous pourriez vouloir l'aide d'un expert technique"
@@ -18698,6 +18828,7 @@ fr:
   you_must_allow_at_least_one_appointment_per_partic_c142139c: "Vous devez autoriser au moins un rendez-vous par participant."
   you_must_allow_at_least_one_appointment_per_time_s_76e22300: "Vous devez autoriser au moins un rendez-vous par créneau."
   you_must_allow_at_least_one_group_to_attend_68531eab: "Vous devez autoriser au moins un groupe à participer"
+  you_must_enter_a_date_f8eabfb1: "Vous devez entrer une date"
   you_must_log_in_to_view_replies_9ccd4da0: "Vous devez vous connecter pour voir les réponses"
   you_must_provide_a_value_or_unselect_the_option_3b28b754: "Vous devez indiquer une valeur ou désélectionner l'option."
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Vous devez sélectionner un cours pour pouvoir copier du contenu à partir de celui-ci."
@@ -18777,6 +18908,7 @@ fr:
   your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: "Votre navigateur ne répond pas aux exigences minimales pour Canvas. Veuillez visiter la *Communauté Canvas* pour y trouver la liste complète des navigateurs pris en charge."
   your_comment_was_auto_saved_as_a_draft_c49d3510: "Votre commentaire a été sauvegardé automatiquement comme brouillon."
   your_content_has_been_exported_bbb57764: "Votre contenu a été exporté."
+  your_course_db806851: "Votre cours"
   your_custom_theme_has_been_successfully_applied_eaa0fc82: "Votre thème personnalisé a été appliqué avec succès."
   your_email_address_f881e583: "Votre adresse courriel"
   your_email_b5364bee: "Votre Courriel"
