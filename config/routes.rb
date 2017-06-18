@@ -178,7 +178,7 @@ CanvasRails::Application.routes.draw do
   # these contexts, and also generating context-specific urls, easier.
   resources :courses do
     resources :orders do
-      post :paytm_integration, on: :collection
+      get :paytm_integration, on: :collection
       post :check_paytm, on: :collection
     end
 

@@ -4,8 +4,8 @@ class OrdersController < ApplicationController
   skip_before_action :verify_authenticity_token, only: :check_paytm
 
   def express
-   @course = Course.find(params[:course_id])
-    response = EXPRESS.setup_purchase(@course.amount * 100,
+   @course = Course.find(params[:id])
+    response = EXPRESS.setup_purchase(20 * 100,
       :ip => request.remote_ip,
       :return_url => new_course_order_url(@course),
       :cancel_return_url => root_url,
