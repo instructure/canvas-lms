@@ -16,10 +16,12 @@
 
 
 require_relative '../common'
+require_relative '../helpers/blueprint_common'
 require_relative '../../apis/api_spec_helper'
 
 describe "master courses - locked items" do
   include_context "in-process server selenium tests"
+  include BlueprintCourseCommon
 
   before :once do
 
@@ -38,7 +40,7 @@ describe "master courses - locked items" do
     @quiz = @master.quizzes.create!(title: 'TestQuiz')
     @discussion = @master.discussion_topics.create!(title: 'My discussion')
 
-    run_master_migration
+    run_master_course_migration(@master)
   end
 
   context "on the index page," do
@@ -134,13 +136,6 @@ describe "master courses - locked items" do
   end
 
   private
-
-  # copied from spec/apis/v1/master_templates_api_spec.rb
-  def run_master_migration
-    @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @master_teacher)
-    run_jobs
-    @migration.reload
-  end
 
   # item is the specific item to lock, unlock.
   # navigation_string is the string to navigate to

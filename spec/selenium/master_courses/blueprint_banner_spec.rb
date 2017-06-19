@@ -20,13 +20,7 @@ require_relative '../helpers/blueprint_common'
 
 describe "master courses banner" do
   include_context "in-process server selenium tests"
-
-  # copied from spec/apis/v1/master_templates_api_spec.rb
-  def run_master_migration
-    @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @master_teacher)
-    run_jobs
-    @migration.reload
-  end
+  include BlueprintCourseCommon
 
   before :once do
     Account.default.enable_feature!(:master_courses)
@@ -38,7 +32,6 @@ describe "master courses banner" do
   end
 
   describe "as a master course teacher" do
-    include BlueprintCourseCommon
     before :each do
       user_session(@master_teacher)
     end
@@ -47,7 +40,7 @@ describe "master courses banner" do
       before :once do
         # sets up the page that gets blueprinted
         @original_page = @master.wiki.wiki_pages.create! title: 'Unicorn', body: 'don\'t exist! Sorry James'
-        run_master_migration
+        run_master_course_migration(@master)
         @copy_page = @minion.wiki.wiki_pages.last
       end
 
@@ -57,7 +50,7 @@ describe "master courses banner" do
         f('.bpc-lock-toggle button').click
         expect(f('.bpc-lock-toggle__label')).to include_text('Locked')
         expect(f('#blueprint-lock-banner')).to include_text('Content')
-        run_master_migration
+        run_master_course_migration(@master)
         get "/courses/#{@minion.id}/pages/#{@copy_page.id}/edit"
         expect(f('.edit-content')).not_to contain_css('#tinymce')
         expect(f('#blueprint-lock-banner')).to include_text('Content')
@@ -77,7 +70,7 @@ describe "master courses banner" do
         # sets up the assignment that gets blueprinted
         @original_assmt = @master.assignments.create! title: 'Blah', points_possible: 10, due_at: 5.days.from_now
         @original_assmt.description = 'this is the original content'
-        run_master_migration
+        run_master_course_migration(@master)
         @copy_assmt = @minion.assignments.last
       end
 
@@ -87,7 +80,7 @@ describe "master courses banner" do
         f('.bpc-lock-toggle button').click
         expect(f('.bpc-lock-toggle__label')).to include_text('Locked')
         expect(f('#blueprint-lock-banner')).to include_text('Content')
-        run_master_migration
+        run_master_course_migration(@master)
         get "/courses/#{@minion.id}/assignments/#{@copy_assmt.id}/edit"
         expect(f('#edit_assignment_wrapper')).not_to contain_css('#tinymce')
         expect(f('.bpc-lock-toggle__label')).to include_text('Locked')

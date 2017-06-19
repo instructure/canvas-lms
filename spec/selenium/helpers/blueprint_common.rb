@@ -25,6 +25,7 @@ module BlueprintCourseCommon
         course.reload
     end
 
+    # built upon the method in spec/apis/v1/master_templates_api_spec.rb
     def run_master_course_migration(master)
       template = master.master_course_templates.first
       master_teacher = master.teachers.first

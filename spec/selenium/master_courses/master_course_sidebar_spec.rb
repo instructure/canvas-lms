@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../common'
-require_relative '../../apis/api_spec_helper'
+require_relative '../helpers/blueprint_common'
 
 
 shared_context "blueprint sidebar context" do
@@ -46,13 +46,7 @@ end
 
 describe "master courses sidebar" do
   include_context "in-process server selenium tests"
-
-  # copied from spec/apis/v1/master_templates_api_spec.rb
-  def run_master_migration
-    @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @master_teacher)
-    run_jobs
-    @migration.reload
-  end
+  include BlueprintCourseCommon
 
   before :once do
     Account.default.enable_feature!(:master_courses)
@@ -64,7 +58,7 @@ describe "master courses sidebar" do
     # setup some stuff
     @file = attachment_model(context: @master, display_name: 'Some File')
     @assignment = @master.assignments.create! title: 'Blah', points_possible: 10
-    run_master_migration
+    run_master_course_migration(@master)
 
     # now push some incremental changes
     Timecop.freeze(2.seconds.from_now) do

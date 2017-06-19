@@ -20,13 +20,7 @@ require_relative '../helpers/blueprint_common'
 
 describe "blueprint courses quizzes" do
   include_context "in-process server selenium tests"
-
-  # copied from spec/apis/v1/master_templates_api_spec.rb
-  def run_master_migration
-    @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @master_teacher)
-    run_jobs
-    @migration.reload
-  end
+  include BlueprintCourseCommon
 
   before :once do
     Account.default.enable_feature!(:master_courses)
@@ -39,12 +33,11 @@ describe "blueprint courses quizzes" do
     # sets up the quiz that gets blueprinted
     @original_quiz = @master.quizzes.create!(title: 'Discussion time!', due_at: 5.days.from_now)
     @original_quiz.description = 'this is the original content for the quiz'
-    run_master_migration
+    run_master_course_migration(@master)
     @copy_quiz = @minion.quizzes.last
   end
 
   describe "as a blueprint's teacher" do
-    include BlueprintCourseCommon
     before :each do
       user_session(@master_teacher)
     end
@@ -54,7 +47,7 @@ describe "blueprint courses quizzes" do
       get "/courses/#{@master.id}/quizzes/#{@original_quiz.id}"
       f('.bpc-lock-toggle button').click
       expect(f('.bpc-lock-toggle__label')).to include_text('Locked')
-      run_master_migration
+      run_master_course_migration(@master)
       get "/courses/#{@minion.id}/quizzes/#{@copy_quiz.id}/edit"
       expect(f('#quiz_options_form')).to contain_css('.mce-tinymce.mce-container.mce-panel')
       expect(f('.bpc-lock-toggle__label')).to include_text('Locked')
