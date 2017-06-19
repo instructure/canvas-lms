@@ -157,7 +157,7 @@ export default class AssociationsTable extends React.Component {
       const label = I18n.t('Remove course association %{name}', { name: course.name })
 
       return (
-        <tr key={course.id} className="bca-associations__course-row">
+        <tr id={`course_${course.id}`} key={course.id} className="bca-associations__course-row">
           <td>{this.renderCellText(course.name)}</td>
           <td>{this.renderCellText(course.course_code)}</td>
           <td>{this.renderCellText(course.term.name)}</td>
