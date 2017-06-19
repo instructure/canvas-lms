@@ -21,30 +21,17 @@ $menu-item-text-hover-focus-color: $ic-font-color-dark;
 $menu-item-text-disabled-color: $ic-font-color-dark;
 $menu-item-keyboard-shortcut-color: $ic-font-color-dark;
 
-.mce-tinymce,
-.mce-tinyrce{
-  .mce-container-body {
-    overflow: auto;
-  }
-
-  :focus {
-    outline: dotted 1px;
-  }
-}
-
 // puts the blue glow around each little color sqare in the tinyMCE text/bg color picker
-.mce-grid td.mce-grid-cell div:focus{
+.mce-container .mce-grid td.mce-grid-cell div:focus{
   @include tab-focus();
-  outline-offset: 0px;
-
 }
 
-.mce-primary {
+.mce-container .mce-primary {
   @include canvas-button($button--primary-bgd, $button--primary-text);
 }
 
-.mce-tinymce .mce-menu-item,
-.mce-tinyrce .mce-menu-item {
+.mce-container.mce-tinymce .mce-menu-item,
+.mce-container.mce-tinyrce .mce-menu-item {
   .mce-disabled {
     .mce-text {
       color: $menu-item-text-disabled-color;
@@ -64,44 +51,16 @@ $menu-item-keyboard-shortcut-color: $ic-font-color-dark;
   }
 }
 
-.mce-statusbar .mce-container-body {
-  overflow: hidden;
-}
-
-.mce-toolbar .mce-btn {
-  background-color: transparent;
-}
-
-.mce-tinymce .mce-btn.mce-active:after {
-  content: ' ';
-  position: absolute;
-  display: block;
-  bottom: 0;
-  left: 50%;
-  width: 0;
-  height: 0;
-  margin-left: -4px;
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
+.mce-container.mce-tinymce .mce-btn.mce-active:after {
   border-bottom: 4px solid $ic-font-color-dark;
 }
 
-.mce-tinymce .mce-btn.mce-active:focus:after {
-  bottom: 1px;
+.mce-container.mce-tinymce .mce-btn.mce-active:focus:after {
   border-bottom-color: $ic-link-color;
 }
 
-.mce-tinymce .mce-active.mce-menubtn:after {
-  display: none;
-}
-
-.mce-statusbar .mce-container-body {
-  overflow: hidden;
-}
-
-.mce-tinymce :focus,
-.mce-tinyrce :focus{
+.mce-container.mce-tinymce :focus,
+.mce-container.mce-tinyrce :focus{
   outline: 2px solid $ic-link-color;
-  outline-offset: -2px;
 }
 

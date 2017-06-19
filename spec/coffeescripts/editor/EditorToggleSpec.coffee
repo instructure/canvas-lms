@@ -89,16 +89,18 @@ define [
     @stub($.fn, 'insertBefore')
     @stub($.fn, 'detach')
 
+    textArea = $('<textarea/>')
     et =
       el: $('<div/>')
       textAreaContainer: $('<div/>')
-      textArea: $('<textarea/>')
+      textArea: textArea
+      createTextArea: () => {}
 
     EditorToggle::replaceTextArea.call(et)
 
     ok $.fn.insertBefore.calledOn(et.el), 'inserts el'
     ok $.fn.insertBefore.calledWith(et.textAreaContainer), 'before container'
-    ok RichContentEditor.destroyRCE.calledWith(et.textArea), 'destroys rce'
+    ok RichContentEditor.destroyRCE.calledWith(textArea), 'destroys rce'
     ok $.fn.detach.calledOn(et.textAreaContainer), 'removes container'
 
   test 'edit', ->

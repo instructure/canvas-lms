@@ -113,6 +113,8 @@ define [
     replaceTextArea: ->
       @el.insertBefore @textAreaContainer
       RichContentEditor.destroyRCE(@textArea)
+      @textArea = @createTextArea()
+      @textAreaContainer.append(@textArea)
       @textAreaContainer.detach()
 
     renewTextAreaID: ->
