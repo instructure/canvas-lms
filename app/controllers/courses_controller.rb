@@ -2907,10 +2907,6 @@ class CoursesController < ApplicationController
     end
   end
 
-  def fee_payment
-    @context = Course.find(params[:course_id])
-  end
-
   private
 
   def effective_due_dates_params

@@ -2470,7 +2470,7 @@ class Course < ActiveRecord::Base
         :id => TAB_FEE,
         :label => t('#tabs.fee_payment', "Fee Payment"),
         :css_class => 'fee_payment',
-        :href => :course_fee_payment_path,
+        :href => :course_fee_payment_index_path,
         :screenreader => t('#tabs.course_settings', "Fee Payment")
       }, {
         :id => TAB_ANNOUNCEMENTS,
@@ -2652,7 +2652,9 @@ class Course < ActiveRecord::Base
         unless self.grants_any_right?(user, opts[:session], :read, :read_syllabus, :manage_content, :manage_assignments)
           tabs.delete_if { |t| t[:id] == TAB_SYLLABUS }
         end
-        tabs.delete_if {|t| t[:id] == TAB_FEE } unless self.grants_right?(user, :participate_as_student)
+        unless (self.grants_right?(user, :participate_as_student) && self.amount && self.amount > 0)
+          tabs.delete_if {|t| t[:id] == TAB_FEE }
+        end
         tabs.delete_if{ |t| t[:visibility] == 'admins' } unless self.grants_right?(user, opts[:session], :read_as_admin)
         if self.grants_any_right?(user, opts[:session], :manage_content, :manage_assignments)
           tabs.detect { |t| t[:id] == TAB_ASSIGNMENTS }[:manageable] = true

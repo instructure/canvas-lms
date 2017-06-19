@@ -181,6 +181,8 @@ CanvasRails::Application.routes.draw do
       get :paytm_integration, on: :collection
       post :check_paytm, on: :collection
     end
+    
+    resources :fee_payment, only: :index
 
     # DEPRECATED
     get 'self_enrollment/:self_enrollment' => 'courses#self_enrollment', as: :self_enrollment
@@ -207,7 +209,6 @@ CanvasRails::Application.routes.draw do
     end
     get 'undelete' => 'context#undelete_index', as: :undelete_items
     post 'undelete/:asset_string' => 'context#undelete_item', as: :undelete_item
-    get 'fee_payment'
     get "settings#{full_path_glob}", action: :settings
     get :settings
     get 'details' => 'courses#settings'
