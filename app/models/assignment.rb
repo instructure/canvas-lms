@@ -153,7 +153,9 @@ class Assignment < ActiveRecord::Base
 
     default_opts = {
       :duplicate_wiki_page => true,
-      :copy_title => nil
+      :duplicate_discussion_topic => true,
+      :copy_title => nil,
+      :user => nil
     }
     opts_with_default = default_opts.merge(opts)
 
@@ -174,14 +176,23 @@ class Assignment < ActiveRecord::Base
     result.title =
       opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy"))
 
-    if self.wiki_page
-      if opts_with_default[:duplicate_wiki_page]
-        result.wiki_page = self.wiki_page.duplicate({
-          :duplicate_assignment => false,
-          :copy_title => result.title
-        })
-      end
+    if self.wiki_page && opts_with_default[:duplicate_wiki_page]
+      result.wiki_page = self.wiki_page.duplicate({
+        :duplicate_assignment => false,
+        :copy_title => result.title
+      })
     end
+
+    if self.discussion_topic && opts_with_default[:duplicate_discussion_topic]
+      result.discussion_topic = self.discussion_topic.duplicate({
+        :duplicate_assignment => false,
+        :copy_title => result.title,
+        :user => opts_with_default[:user]
+      })
+    end
+
+    result.discussion_topic&.assignment = result
+
     # Learning outcome alignments seem to get copied magically, possibly
     # through the rubric
     result.rubric_association = self.rubric_association.clone

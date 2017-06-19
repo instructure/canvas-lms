@@ -602,15 +602,10 @@ class AssignmentsApiController < ApplicationController
       return render json: { error: 'quiz duplication not implemented' }, status: :bad_request
     end
 
-    if old_assignment.discussion_topic
-      return render json: { error: 'discussion topic duplication not implemented' }, status: :bad_request
-    end
-
     return unless authorized_action(old_assignment, @current_user, :create)
 
-    new_assignment = old_assignment.duplicate
-    # insert_at seems to do the right thing only on already saved entities, so
-    # save than insert into the proper position.
+    new_assignment = old_assignment.duplicate({ :user => @current_user })
+
     new_assignment.save!
     new_assignment.insert_at(old_assignment.position + 1)
     if new_assignment

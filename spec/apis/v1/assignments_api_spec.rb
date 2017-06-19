@@ -1024,7 +1024,7 @@ describe AssignmentsApiController, type: :request do
           { :expected_status => 400 })
     end
 
-    it "should require non-discussion topic" do
+    it "should duplicate discussion topic" do
       assignment = group_discussion_assignment.assignment
       api_call_as_user(@teacher, :post,
         "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json",
@@ -1035,7 +1035,7 @@ describe AssignmentsApiController, type: :request do
           :assignment_id => assignment.id.to_s },
         {},
         {},
-        { :expected_status => 400 })
+        { :expected_status => 200 })
     end
 
     it "should duplicate wiki page assignment" do

@@ -436,13 +436,11 @@ class WikiPage < ActiveRecord::Base
       :view_count => 0,
       :todo_date => self.todo_date
     })
-    if self.assignment
-      if opts_with_default[:duplicate_assignment]
+    if self.assignment && opts_with_default[:duplicate_assignment]
         result.assignment = self.assignment.duplicate({
           :duplicate_wiki_page => false,
           :copy_title => result.title
         })
-      end
     end
     result
   end

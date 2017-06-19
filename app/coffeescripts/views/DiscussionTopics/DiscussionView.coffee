@@ -23,12 +23,13 @@ define [
   'jsx/shared/conditional_release/CyoeHelper'
   'jsx/move_item_tray/NewMoveDialogView'
   'jst/DiscussionTopics/discussion'
+  'compiled/models/DiscussionTopic'
   'compiled/views/PublishIconView'
   'compiled/views/LockIconView'
   'compiled/views/ToggleableSubscriptionIconView'
   'compiled/views/assignments/DateDueColumnView'
   'compiled/views/MoveDialogView'
-], (I18n, $, _, {View}, CyoeHelper, NewMoveDialogView, template, PublishIconView, LockIconView, ToggleableSubscriptionIconView, DateDueColumnView, MoveDialogView) ->
+], (I18n, $, _, {View}, CyoeHelper, NewMoveDialogView, template, DiscussionTopic, PublishIconView, LockIconView, ToggleableSubscriptionIconView, DateDueColumnView, MoveDialogView) ->
 
   class DiscussionView extends View
     # Public: View template (discussion).
@@ -50,11 +51,12 @@ define [
       deleteFail: I18n.t('flash.fail', 'Discussion Topic deletion failed.')
 
     events:
-      'click .icon-lock':    'toggleLocked'
-      'click .icon-pin':     'togglePinned'
-      'click .icon-trash':   'onDelete'
-      'click .icon-updown':  'onMove'
-      'click':               'onClick'
+      'click .icon-lock':            'toggleLocked'
+      'click .icon-pin':             'togglePinned'
+      'click .icon-trash':           'onDelete'
+      'click .icon-updown':          'onMove'
+      'click .duplicate-discussion': 'onDuplicate'
+      'click':                       'onClick'
 
     # Public: Option defaults.
     defaults:
@@ -163,6 +165,21 @@ define [
       # finally, call reset to trigger a re-render
       newCollection.reset newCollection.models
 
+    insertDuplicatedDiscussion: (response) =>
+      index = @model.collection.indexOf(@model) + 1
+      # TODO: Figure out how to get rid of this hack.  Don't understand why
+      # the Backbone models aren't reading the JSON properly.
+      topic = new DiscussionTopic(response.data)
+      fixedJSON = topic.parse(response.data)
+      topic = new DiscussionTopic(fixedJSON)
+
+      @model.collection.add(topic, { at: index })
+      @focusOnModel(@model.collection.at(index))
+
+    onDuplicate: (e) =>
+      e.preventDefault()
+      @model.duplicate(ENV.COURSE_ID, @insertDuplicatedDiscussion)
+
     # Public: Delete the model and update the server.
     #
     # Returns nothing.
@@ -175,7 +192,7 @@ define [
 
     goToPrevItem: =>
       if @previousDiscussionInGroup()?
-        $('#' + @previousDiscussionInGroup().id + '_discussion_content').attr("tabindex",-1).focus()
+        @focusOnModel(@previousDiscussionInGroup())
       else if @model.get('pinned')
         $('.pinned&.discussion-list').attr("tabindex",-1).focus()
       else if @model.get('locked')
@@ -186,6 +203,9 @@ define [
     previousDiscussionInGroup: =>
       current_index = @model.collection.models.indexOf(@model)
       @model.collection.models[current_index - 1]
+
+    focusOnModel: (discussionTopic) =>
+      $("##{discussionTopic.id}_discussion_content").attr("tabindex",-1).focus()
 
     # Public: Pin or unpin the model and update it on the server.
     #
