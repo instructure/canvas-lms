@@ -61,4 +61,10 @@ describe "master courses - settings" do
     get "/courses/#{course2.id}/settings"
     expect(f('.disabled_message')).to be
   end
+
+  it "prevents adding students to blueprint course", priority: "1", test_id: 3078983 do
+    get "/courses/#{@course.id}/users"
+    f('#addUsers').click
+    expect(f('#peoplesearch_select_role')).not_to include_text("Student")
+  end
 end
