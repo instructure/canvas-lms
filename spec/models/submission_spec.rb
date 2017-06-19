@@ -1455,6 +1455,11 @@ describe Submission do
                                                   })
       end
 
+      it 'does not cause error if originality score is nil' do
+        originality_report.update_attributes(originality_score: nil)
+        expect{submission.originality_data}.not_to raise_error
+      end
+
       it "rounds the score to 2 decimal places" do
         originality_report.originality_score = 2.94997
         originality_report.save!

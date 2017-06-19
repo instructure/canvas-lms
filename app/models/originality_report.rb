@@ -30,6 +30,10 @@ class OriginalityReport < ActiveRecord::Base
   before_validation :infer_workflow_state
 
   def state
+    if workflow_state != 'scored'
+      return workflow_state
+    end
+
     Turnitin.state_from_similarity_score(originality_score)
   end
 

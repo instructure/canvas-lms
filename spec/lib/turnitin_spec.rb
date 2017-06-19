@@ -38,6 +38,28 @@ describe Turnitin::Client do
     Net::HTTP.any_instance.expects(:start).returns(fake_response)
   end
 
+  describe '#state_from_similarity_score' do
+    it "returns 'none' if the similarity score is zero" do
+      expect(Turnitin.state_from_similarity_score(0)).to eq 'none'
+    end
+
+    it "returns 'acceptable' if similarity score is less than 25" do
+      expect(Turnitin.state_from_similarity_score(24)).to eq 'acceptable'
+    end
+
+    it "returns 'warning' if similarity score is between 25 and 50" do
+      expect(Turnitin.state_from_similarity_score(49)).to eq 'warning'
+    end
+
+    it "returns 'problem' if similarity score is between 50 and 75" do
+      expect(Turnitin.state_from_similarity_score(74)).to eq 'problem'
+    end
+
+    it "returns 'failure' if score is greater or equal to 75" do
+      expect(Turnitin.state_from_similarity_score(75)).to eq 'failure'
+    end
+  end
+
   describe "initialize" do
     it "defaults to using api.turnitin.com" do
       expect(Turnitin::Client.new('test_account', 'sekret').host).to eq "api.turnitin.com"

@@ -409,6 +409,12 @@ $gradebook_cell_padding_top: 8px;
   &.failure-score {
     background-image: url(/images/turnitin_failure_score.png);
   }
+  &.pending-score {
+    background-image: url(/images/turnitin_submission_pending.png);
+  }
+  &.error-score {
+    background-image: url(/images/turnitin_submission_error.png);
+  }
 }
 
 .gradebook-cell-comment {

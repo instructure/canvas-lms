@@ -671,7 +671,7 @@ class Submission < ActiveRecord::Base
   def originality_data
     data = self.originality_reports.each_with_object({}) do |originality_report, hash|
       hash[Attachment.asset_string(originality_report.attachment_id)] = {
-        similarity_score: originality_report.originality_score.round(2),
+        similarity_score: originality_report.originality_score&.round(2),
         state: originality_report.state,
         report_url: originality_report.originality_report_url,
         status: originality_report.workflow_state

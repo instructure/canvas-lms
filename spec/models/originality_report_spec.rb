@@ -155,4 +155,17 @@ describe OriginalityReport do
       expect(report.report_launch_url).to eq non_lti_url
     end
   end
+
+  describe '#state' do
+    let(:report) { OriginalityReport.new(workflow_state: 'pending') }
+
+    it "returns the workflow state unless it is 'scored'" do
+      expect(report.state).to eq 'pending'
+    end
+
+    it "returns the state from similarity score if workflow state is 'scored'" do
+      report.update_attributes(originality_score: '25')
+      expect(report.state).to eq 'warning'
+    end
+  end
 end
