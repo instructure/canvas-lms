@@ -9,7 +9,7 @@ class Order < ActiveRecord::Base
       process_payment
     rescue => e
       logger.error("Order failed with error message #{e} ")
-      self.update_attributes(:txn_amount => price, :status => false, :message => e)
+      self.update_attributes(:txn_amount => price, :status => "Failure", :message => e)
     end
     save
   end
@@ -33,7 +33,7 @@ class Order < ActiveRecord::Base
   def process_payment
     ActiveMerchant::Billing::Base.mode = :test
     response = process_purchase
-    self.update_attributes(:txn_amount => price, :status => response.success?, :authorization => response.authorization, :message => response.message, :params => response.params)
+    self.update_attributes(:txn_amount => price, :status => "Success", :authorization => response.authorization, :message => response.message, :params => response.params)
   end
 
   private
