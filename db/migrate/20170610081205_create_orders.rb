@@ -7,7 +7,7 @@ class CreateOrders < ActiveRecord::Migration[4.2]
       t.string :ip_address
       t.string :first_name
       t.string :last_name
-      t.boolean :status
+      t.string :status
       t.string :authorization
       t.text :message
       t.text :params

@@ -4,7 +4,7 @@ class OrdersController < ApplicationController
   skip_before_action :verify_authenticity_token, only: :check_paytm
 
   def express
-   @course = Course.find(params[:id])
+    @course = Course.find(params[:id])
     response = EXPRESS.setup_purchase(20 * 100,
       :ip => request.remote_ip,
       :return_url => new_course_order_url(@course),
@@ -24,7 +24,7 @@ class OrdersController < ApplicationController
     @course = Course.find(params[:course_id])
     @order = Order.new(params_order.merge(user_id: @current_user, course_id: @course.id))
     if @order.purchase && @order.status == true
-       redirect_to '/'
+      redirect_to '/'
     else
       render :action => "new"
     end
@@ -39,17 +39,18 @@ class OrdersController < ApplicationController
 
   def paytm_integration
     @course = Course.find params[:course_id]
+    order_id = rand(100000)
 
     @paramList = Hash.new
 
     @paramList["MID"] = MID
-    @paramList["ORDER_ID"] = "a_#{@course.id}"
+    @paramList["ORDER_ID"] = "a_#{order_id}"
     @paramList["CUST_ID"] = "a-#{@course.id}"
     @paramList["INDUSTRY_TYPE_ID"] = INDUSTRY_TYPE_ID
     @paramList["CHANNEL_ID"] = CHANNEL_ID
     @paramList["TXN_AMOUNT"] = 12
-    @paramList["MSISDN"] = ''
-    @paramList["EMAIL"] = @current_user.name
+    @paramList["MSISDN"] = '7799565116'
+    @paramList["EMAIL"] = 'kapilkumar660@gmail.com'
     @paramList["WEBSITE"] = WEBSITE
     @paramList["CALLBACK_URL"] = "http://localhost:3000/courses/#{@course.id}/orders/check_paytm"
 
@@ -61,28 +62,28 @@ class OrdersController < ApplicationController
 
   def check_paytm
     puts "Checksum matched and following are the transaction details:";
+    binding.pry
     if request.params["STATUS"] == "TXN_SUCCESS"
-      PaytmOrder.create( mid: request.params["MID"],
-                         order_id: request.params["ORDERID"],
-                         txn_amount: request.params["TXNAMOUNT"],
-                         currency: request.params["CURRENCY"],
-                         txn_id: request.params["TXNID"],
-                         bank_txn_id: request.params["BANKTXNID"],
-                         status: request.params["STATUS"],
-                         resp_code: request.params["RESPCODE"],
-                         resp_msg: request.params["RESPMSG"],
-                         txn_date: request.params["TXNDATE"],
-                         gateway_name: request.params["GATEWAYNAME"],
-                         bank_name: request.params["BANKNAME"],
-                         payment_mode: request.params["PAYMENTMODE"],
-                         checksum_hash: request.params["CHECKSUMHASH"],
-                         course_id: request.params["course_id"],
-                         user_id: @current_user.id )
-      puts "Transaction status is success"
+      Order.create( mid: request.params["MID"],
+        order_id: request.params["ORDERID"],
+        txn_amount: request.params["TXNAMOUNT"],
+        currency: request.params["CURRENCY"],
+        txn_id: request.params["TXNID"],
+        bank_txn_id: request.params["BANKTXNID"],
+        status: request.params["STATUS"],
+        resp_code: request.params["RESPCODE"],
+        resp_msg: request.params["RESPMSG"],
+        txn_date: request.params["TXNDATE"],
+        gateway_name: request.params["GATEWAYNAME"],
+        bank_name: request.params["BANKNAME"],
+        payment_mode: request.params["PAYMENTMODE"],
+        checksum_hash: request.params["CHECKSUMHASH"],
+        course_id: request.params["course_id"],
+        user_id: @current_user.id )
+      redirect_to "/courses/#{request.params["course_id"]}"
     else
-      puts "Transaction status is failure"
+      redirect_to root_path
     end
-    render text: :nothing
   end
 
   private
