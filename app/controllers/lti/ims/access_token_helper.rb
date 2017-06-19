@@ -17,7 +17,9 @@
 
 module Lti::Ims::AccessTokenHelper
   def authorized_lti2_tool
-    validate_access_token!
+    Shard.lookup(access_token.shard_id).activate do
+      validate_access_token!
+    end
     true
   rescue Lti::Oauth2::InvalidTokenError
     render_unauthorized_action
