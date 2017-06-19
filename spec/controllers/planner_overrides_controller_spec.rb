@@ -88,7 +88,8 @@ describe PlannerOverridesController do
 
         context "new activity filter" do
           it "should return newly created & unseen items" do
-            dt = discussion_topic_model(context: @course)
+            dt = @course.discussion_topics.create!(title: "Yes", message: "Please", user: @teacher, todo_date: Time.zone.now)
+            dt.change_all_read_state("unread", @student)
             get :items_index, filter: "new_activity"
             response_json = json_parse(response.body)
             expect(response_json.length).to eq 1
@@ -112,6 +113,34 @@ describe PlannerOverridesController do
             expect(response_json.first["plannable"]["id"]).to eq @assignment2.id
           end
 
+          context "date range" do
+            it "should not return items before the specified start_date" do
+              dt = @course.discussion_topics.create!(title: "Yes", message: "Please", user: @teacher, todo_date: 1.week.ago)
+              dt.change_all_read_state("unread", @student)
+              get :items_index, filter: "new_activity", start_date: 1.week.from_now.to_date.to_s
+              response_json = json_parse(response.body)
+              expect(response_json.length).to eq 0
+            end
+
+            it "should not return items after the specified end_date" do
+              dt = @course.discussion_topics.create!(title: "Yes", message: "Please", user: @teacher, todo_date: 1.week.from_now)
+              dt.change_all_read_state("unread", @student)
+              get :items_index, filter: "new_activity", end_date: 1.week.ago.to_date.to_s
+              response_json = json_parse(response.body)
+              expect(response_json.length).to eq 0
+            end
+
+            it "should return items within the start_date and end_date" do
+              dt = @course.discussion_topics.create!(title: "Yes", message: "Please", user: @student, todo_date: Time.zone.now)
+              dt.change_all_read_state("unread", @student)
+              get :items_index, filter: "new_activity",
+                                start_date: 1.week.ago.to_date.to_s,
+                                end_date: 1.week.from_now.to_date.to_s
+              response_json = json_parse(response.body)
+              expect(response_json.length).to eq 1
+              expect(response_json.map { |i| i["plannable_id"] }).to be_include dt.id
+            end
+          end
 
           context "discussion topic read/unread states" do
             before :once do

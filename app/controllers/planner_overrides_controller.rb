@@ -80,8 +80,9 @@ class PlannerOverridesController < ApplicationController
 
   before_action :require_user
   before_action :set_date_range
+  before_action :set_pagination, only: [:items_index]
 
-  attr_reader :start_date, :end_date
+  attr_reader :start_date, :end_date, :page, :per_page
   # @API List planner items
   #
   # Retrieve the list of objects to be shown on the planner for the current user
@@ -166,6 +167,8 @@ class PlannerOverridesController < ApplicationController
   #   }
   # ]
   def items_index
+    ensure_valid_params or return
+
     items = if params[:filter] == 'new_activity'
               unread_items
             else
@@ -174,7 +177,7 @@ class PlannerOverridesController < ApplicationController
 
     items_json = items.map { |item| planner_item_json(item, @current_user, session, item.todo_type, default_opts) }
 
-    render json: items_json
+    render json: Api.paginate(items_json, self, api_v1_planner_items_url)
   end
 
   # @API List planner overrides
@@ -266,7 +269,7 @@ class PlannerOverridesController < ApplicationController
   private
 
   def planner_items
-    @planner_items ||= Api.paginate(ungraded_discussion_items + page_items + assignment_items + planner_note_items, self, api_v1_planner_items_url)
+    @planner_items ||= (ungraded_discussion_items + page_items + assignment_items + planner_note_items)
   end
 
   def unread_items
@@ -283,7 +286,7 @@ class PlannerOverridesController < ApplicationController
                                   select { |s| s.unread?(@current_user) }.
                                   map(&:assignment).
                                   each { |a| a.todo_type = 'viewing' }
-    @unread_items ||= Api.paginate(stream_items + submitted_assignment_items, self, api_v1_planner_items_url)
+    @unread_items ||= (stream_items + submitted_assignment_items) & planner_items
   end
 
   def assignment_items
@@ -308,20 +311,50 @@ class PlannerOverridesController < ApplicationController
   end
 
   def set_date_range
-    @end_date, @start_date = if [params[:end_date], params[:start_date]].all?(&:blank?)
-                                [2.weeks.from_now, 2.weeks.ago]
+    @start_date, @end_date = if [params[:start_date], params[:end_date]].all?(&:blank?)
+                                [2.weeks.ago.beginning_of_day,
+                                 2.weeks.from_now.beginning_of_day]
                               else
-                                [params[:end_date], params[:start_date]]
+                                [params[:start_date], params[:end_date]]
                               end
     # Since a range is needed, set values that weren't passed to a date
     # in the far past/future as to get all values before or after whichever
     # date was passed
-    @end_date ||= 10.years.from_now
-    @start_date ||= 10.years.ago
+    @start_date = formatted_date('start_date', @start_date, 10.years.ago)
+    @end_date   = formatted_date('end_date', @end_date, 10.years.from_now)
+  end
+
+  def formatted_date(input, val, default)
+    @errors ||= {}
+    if val.present? && val.is_a?(String)
+      if val =~ Api::DATE_REGEX
+        Time.zone.parse(val).beginning_of_day
+      elsif val =~ Api::ISO8601_REGEX
+        Time.zone.parse(val)
+      else
+        @errors[input] = t('Invalid date or invalid datetime for %{attr}', attr: input)
+      end
+    else
+      default
+    end
+  end
+
+  def set_pagination
+    @per_page = params[:per_page] || 50
+    @page = params[:page] || 1
   end
 
   def require_user
     render_unauthorized_action if !@current_user || !@domain_root_account.feature_enabled?(:student_planner)
+  end
+
+  def ensure_valid_params
+    if @errors.empty?
+      true
+    else
+      render json: {errors: @errors.as_json}, status: :bad_request
+      false
+    end
   end
 
   def default_opts

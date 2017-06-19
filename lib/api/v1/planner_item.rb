@@ -29,6 +29,7 @@ module Api::V1::PlannerItem
       :type => todo_type,
       :ignore => api_v1_users_todo_ignore_url(item.asset_string, todo_type, :permanent => '0'),
       :ignore_permanently => api_v1_users_todo_ignore_url(item.asset_string, todo_type, :permanent => '1'),
+      :plannable_id => item.id,
       :visible_in_planner => item.visible_in_planner_for?(user),
       :planner_override => api_json(item.planner_override_for(user), user, session)
     }).merge(submission_statuses_for(user, item, opts)).tap do |hash|
