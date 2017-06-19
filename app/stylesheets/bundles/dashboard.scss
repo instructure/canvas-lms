@@ -85,7 +85,6 @@ $non-main-content-width-expanded: $nav-expanded-width + $right-side-content-widt
     z-index: 5;
     padding: 0 0 $ic-sp * 0.75;
     margin-top: -($ic-sp);
-    margin-bottom: $ic-sp;
 
     @include breakpoint(desktop) {
       width: auto;
