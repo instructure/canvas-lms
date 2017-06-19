@@ -1,10 +1,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/lti2_api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 require_dependency "lti/ims/access_token_helper"
 require_dependency "lti/submissions_api_controller"
 module Lti
   describe SubmissionsApiController, type: :request do
+    specs_require_sharding
     include_context 'lti2_api_spec_helper'
 
     let(:service_name) { SubmissionsApiController::SUBMISSION_SERVICE }
@@ -98,7 +100,7 @@ module Lti
                      {
                        "id" => attachment.id,
                        "size" => attachment.size,
-                       "url" => controller.attachment_url(attachment.id),
+                       "url" => controller.attachment_url(attachment),
                        "filename" => attachment.filename,
                        "display_name" => attachment.display_name,
                        "created_at" => now.iso8601,
@@ -110,7 +112,14 @@ module Lti
         end
       end
 
-
+      it 'uses global ids in the attachment download URL' do
+        get endpoint, {}, request_headers
+        expect(JSON.parse(response.body)['attachments'].first['url']).to include(
+          attachment.global_id.to_s,
+          assignment.global_id.to_s,
+          submission.global_id.to_s
+        )
+      end
     end
 
     describe "#history" do
@@ -138,7 +147,7 @@ module Lti
                      {
                        "id" => attachment.id,
                        "size" => attachment.size,
-                       "url" => controller.attachment_url(attachment.id),
+                       "url" => controller.attachment_url(attachment),
                        "filename" => attachment.filename,
                        "display_name" => attachment.display_name,
                        "created_at" => now.iso8601,
@@ -191,7 +200,7 @@ module Lti
         get "/api/lti/assignments/#{assignment.id}/submissions/#{submission.id}", {}, request_headers
         attachment1 = Attachment.create!(context: Account.create!, filename: "test.txt", content_type: "text/plain")
         endpoint = "/api/lti/assignments/#{assignment.id}/submissions/#{submission.id}/attachment/#{attachment1.id}"
-        get controller.attachment_url(attachment1.id), {}, request_headers
+        get controller.attachment_url(attachment1), {}, request_headers
         expect(response.code).to eq "401"
       end
 

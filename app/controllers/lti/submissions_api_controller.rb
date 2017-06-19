@@ -177,12 +177,12 @@ module Lti
     end
 
 
-    def attachment_url(attachment_id)
+    def attachment_url(attachment)
       account = @domain_root_account || Account.default
       host, shard = HostUrl.file_host_with_shard(account, request.host_with_port)
       res = "#{request.protocol}#{host}"
       shard.activate do
-        res + lti_submission_attachment_download_path(params[:assignment_id], params[:submission_id], attachment_id)
+        res + lti_submission_attachment_download_path(submission.assignment.global_id, submission.global_id, attachment.global_id)
       end
     end
 
@@ -216,7 +216,7 @@ module Lti
     def attachment_json(attachment)
       attachment_attributes = %w(id display_name filename content-type size created_at updated_at)
       attach = filtered_json(model: attachment, whitelist: attachment_attributes)
-      attach[:url] = attachment_url(attachment.id)
+      attach[:url] = attachment_url(attachment)
       attach
     end
 

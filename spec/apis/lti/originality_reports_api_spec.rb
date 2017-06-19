@@ -17,9 +17,12 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/lti2_api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 require_dependency "lti/ims/access_token_helper"
 module Lti
   describe 'Originality Reports API', type: :request do
+    specs_require_sharding
+
     include_context 'lti2_api_spec_helper'
     let(:service_name) { OriginalityReportsApiController::ORIGINALITY_REPORT_SERVICE }
     before :each do
