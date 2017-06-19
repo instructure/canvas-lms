@@ -121,20 +121,6 @@ describe "Gradezilla" do
     end
   end
 
-  context 'cell tooltip' do
-    before { Gradezilla.visit(@course) }
-
-    it 'is shown on hover' do
-      Gradezilla.cell_hover(0, 0)
-      expect(Gradezilla.cell_tooltip(0, 0)).to be_displayed
-    end
-
-    it 'is shown on focus' do
-      Gradezilla.cell_click(0, 0)
-      expect(Gradezilla.cell_tooltip(0, 0)).to be_displayed
-    end
-  end
-
   context 'keyboard shortcut "c"' do
     before do
       Gradezilla.visit(@course)

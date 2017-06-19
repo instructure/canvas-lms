@@ -869,13 +869,12 @@ define [
       else
         cellAttributes = @submissionStateMap.getSubmissionState(submission)
         if cellAttributes.hideGrade
-          @lockedAndHiddenGradeCellFormatter(row, col, cellAttributes.tooltip)
+          @lockedAndHiddenGradeCellFormatter(row, col)
         else
           assignment = @assignments[submission.assignment_id]
           student = @students[submission.user_id]
           formatterOpts =
             isLocked: cellAttributes.locked
-            tooltip: cellAttributes.tooltip
 
           if !assignment?
             @staticCellFormatter(row, col, '')
@@ -889,17 +888,8 @@ define [
     staticCellFormatter: (row, col, val) ->
       "<div class='cell-content gradebook-cell'>#{htmlEscape(val)}</div>"
 
-    lockedAndHiddenGradeCellFormatter: (row, col, tooltipKey) ->
-      if tooltipKey
-        tooltip = GRADEBOOK_TRANSLATIONS["submission_tooltip_#{tooltipKey}"]
-        """
-          <div class='gradebook-tooltip'>
-            #{htmlEscape(tooltip)}
-          </div>
-          <div class='cell-content gradebook-cell grayed-out cannot_edit'></div>
-        """
-      else
-        "<div class='cell-content gradebook-cell grayed-out cannot_edit'></div>"
+    lockedAndHiddenGradeCellFormatter: (row, col) ->
+      "<div class='cell-content gradebook-cell grayed-out cannot_edit'></div>"
 
     groupTotalFormatter: (row, col, val, columnDef, student) =>
       return '' unless val?
@@ -1003,46 +993,6 @@ define [
       @assignmentsToHide = $.grep @assignmentsToHide, (el) -> el != columnDef.id
       UserSettings.contextSet('hidden_columns', _.uniq(@assignmentsToHide))
 
-    hoverMinimizedCell: (event) =>
-      $hoveredCell = $(event.currentTarget)
-                     # get rid of hover class so that no other tooltips show up
-                     .removeClass('hover')
-      cell = @grid.getCellFromEvent(event)
-      # cell will be null when hovering a header cell
-      return unless cell
-      columnDef = @grid.getColumns()[cell.cell]
-      assignment = columnDef.object
-      offset = $hoveredCell.offset()
-      htmlLines = [assignment.name]
-      if $hoveredCell.hasClass('slick-cell')
-        submission = @rows[cell.row][columnDef.id]
-        if assignment.points_possible?
-          htmlLines.push "#{submission.score ? '--'} / #{assignment.points_possible}"
-        else if submission.score?
-          htmlLines.push submission.score
-        # add lines for dropped, late, resubmitted
-        Array::push.apply htmlLines, $.map(SubmissionCell.classesBasedOnSubmission(submission, assignment), (c)-> GRADEBOOK_TRANSLATIONS["#submission_tooltip_#{c}"])
-      else if assignment.points_possible?
-        htmlLines.push htmlEscape(I18n.t('points_out_of', "out of %{points_possible}", points_possible: assignment.points_possible))
-
-      $hoveredCell.data 'tooltip', $("<span />",
-        class: 'gradebook-tooltip'
-        css:
-          left: offset.left - 15
-          top: offset.top
-          zIndex: 10000
-          display: 'block'
-        html: $.raw(htmlLines.join('<br />'))
-      ).appendTo('body')
-      .css('top', (i, top) -> parseInt(top) - $(this).outerHeight())
-
-    unhoverMinimizedCell: (event) ->
-      if $tooltip = $(this).data('tooltip')
-        if event.toElement == $tooltip[0]
-          $tooltip.mouseleave -> $tooltip.remove()
-        else
-          $tooltip.remove()
-
     # this is because of a limitation with SlickGrid,
     # when it makes the header row it does this:
     # $("<div class='slick-header-columns' style='width:10000px; left:-1000px' />")
@@ -1101,15 +1051,9 @@ define [
           'mouseleave.gradebook' : @unhighlightColumns
           'mouseenter' : (event) ->
             grid.find('.hover, .focus').removeClass('hover focus')
-            if $(this).parent().css('top') == '0px'
-              $(this).find('div.gradebook-tooltip').addClass('first-row')
             $(this).addClass (if event.type == 'mouseenter' then 'hover' else 'focus')
           'mouseleave' : (event) ->
             $(this).removeClass('hover focus')
-            $(this).find('div.gradebook-tooltip').removeClass('first-row')
-        .delegate '.minimized',
-          'mouseenter' : @hoverMinimizedCell,
-          'mouseleave' : @unhoverMinimizedCell
 
       @$grid.addClass('editable') if @options.gradebook_is_editable
 
