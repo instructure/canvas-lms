@@ -41,8 +41,8 @@ describe "sync history modal" do
     end
 
     it "shows sync history modal for assignment", priority: "2", test_id: 3178864 do
-      update_child_assignment(@minion)
-      update_master_assignment_and_migrate(@master)
+      update_child_assignment(@minion, :points_possible, 8.0)
+      update_master_assignment_and_migrate(@master, :points_possible, 15.0)
       get "/courses/#{@master.id}"
       f('.blueprint__root .bcs__wrapper .bcs__trigger').click
       f('#mcSyncHistoryBtn').click
@@ -80,6 +80,33 @@ describe "sync history modal" do
       f('.bcs__history-item:nth-of-type(1) .pill').click
       expect(f('.bcs__history-item__change-exceps').
                find_element(:xpath, "//span[text()[contains(., 'Settings changed exceptions')]]")).to be_displayed
+    end
+  end
+
+  context "availability dates exception" do
+    before :once do
+      create_and_migrate_master_assignments(@master)
+    end
+
+    before :each do
+      user_session(@master_teacher)
+    end
+
+    it "shows sync history for availability dates exception in assignments", priority: "2", test_id: 3179204 do
+      update_child_assignment(@minion, :unlock_at, Time.zone.now + 1.day)
+      update_master_assignment_and_migrate(@master, :unlock_at, Time.zone.now + 3.days)
+      get "/courses/#{@master.id}"
+      f('.blueprint__root .bcs__wrapper .bcs__trigger').click
+      f('#mcSyncHistoryBtn').click
+      run_jobs
+      second_migration = f('.bcs__history-item:nth-of-type(2)')
+      expect(second_migration.find_element(:xpath, "//span[text()[contains(.,'Created')]]")).to be_displayed
+      first_migration = f('.bcs__history-item:nth-of-type(1)')
+      expect(first_migration.find_element(:xpath, "//span[text()[contains(.,'Updated')]]")).to be_displayed
+      f('.bcs__history-item:nth-of-type(1) .pill').click
+      expect(f('.bcs__history-item__change-exceps').
+             find_element(:xpath, "//span[text()[contains(., 'Availability Dates changed exceptions')]]")).
+             to be_displayed
     end
   end
 
@@ -134,6 +161,4 @@ describe "sync history modal" do
                find_element(:xpath, "//span[text()[contains(., 'Due Dates changed exceptions')]]")).to be_displayed
     end
   end
-
-
 end
