@@ -447,7 +447,11 @@ describe "admin settings tab" do
       replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), 'https://url.example.com'
       f('#custom_help_link_settings button[type="submit"]').click
       click_submit
-      cl = Account.default.help_links.detect { |hl| hl['url'] == 'https://url.example.com' }
+      wait_for_ajax_requests
+      cl = Account.default.help_links.detect do |hl|
+        hl_indifferent = HashWithIndifferentAccess.new(hl)
+        hl_indifferent['url'] == 'https://url.example.com'
+      end
       expect(cl).to eq({"text"=>"text", "subtext"=>"subtext", "url"=>"https://url.example.com", "type"=>"custom", "available_to"=>["user", "student", "teacher", "admin"]})
     end
 
@@ -460,7 +464,11 @@ describe "admin settings tab" do
       replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), 'https://whatever.example.com'
       f('#custom_help_link_settings button[type="submit"]').click
       click_submit
-      cl = Account.default.help_links.detect { |hl| hl['url'] == 'https://whatever.example.com' }
+      wait_for_ajax_requests
+      cl = Account.default.help_links.detect do |hl|
+        hl_indifferent = HashWithIndifferentAccess.new(hl)
+        hl_indifferent['url'] == 'https://whatever.example.com'
+      end
       expect(cl).not_to be_blank
     end
 
@@ -472,7 +480,11 @@ describe "admin settings tab" do
       fj('#custom_help_link_settings fieldset .ic-Label:contains("Teachers"):visible').click
       f('#custom_help_link_settings button[type="submit"]').click
       click_submit
-      cl = Account.default.help_links.detect { |hl| hl['url'] == '#create_ticket' }
+      wait_for_ajax_requests
+      cl = Account.default.help_links.detect do |hl|
+        hl_indifferent = HashWithIndifferentAccess.new(hl)
+        hl_indifferent['url'] == '#create_ticket'
+      end
       expect(cl['available_to']).not_to include('teacher')
     end
   end
