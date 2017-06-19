@@ -430,7 +430,7 @@ class GradebooksController < ApplicationController
       # in large courses in a performant manner. Until that happens, we're
       # disabling it over a certain threshold.
       #
-      submissions_count = @context.submissions.count
+      submissions_count = @context.submissions.not_placeholder.count
       submissions_limit = Setting.get('gradebook_history_submission_count_threshold', '0').to_i
       if submissions_limit == 0 || submissions_count <= submissions_limit
         # TODO this whole thing could go a LOT faster if you just got ALL the versions of ALL the submissions in this course then did a ruby sort_by day then grader
