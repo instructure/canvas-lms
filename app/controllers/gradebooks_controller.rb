@@ -118,11 +118,7 @@ class GradebooksController < ApplicationController
       @current_user.preferences[:course_grades_assignment_order] ||= {}
       @current_user.preferences[:course_grades_assignment_order][@context.id] = assignment_order
       @current_user.save!
-      if CANVAS_RAILS4_2
-        redirect_to :back
-      else
         redirect_back(fallback_location: course_grades_url(@context))
-      end
     end
   end
 

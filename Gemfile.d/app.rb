@@ -15,16 +15,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-if CANVAS_RAILS4_2
-  gem 'rails', '4.2.8'
-  gem 'rack', '1.6.5'
-  gem 'activesupport-json_encoder', '1.1.0'
-  gem 'oauth2', '1.0.0', require: false
-else
+if CANVAS_RAILS5_0
   gem 'rails', '5.0.2'
-  gem 'rack', '2.0.1'
-  gem 'oauth2', '1.2.0', require: false
+else
+  gem 'rails', '5.1.1'
 end
+
+gem 'rack', '2.0.1'
+gem 'oauth2', '1.2.0', require: false
 
 gem 'rails-observers', '0.1.4', github: 'rails/rails-observers', ref: '206cb17bc14f4f5ac6f83da4204013a69549b9dc'
 

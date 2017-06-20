@@ -2612,11 +2612,7 @@ describe Submission do
       a2 = crocodocable_attachment_model context: @user
       s.attachments = [a1, a2]
       s.save
-      if CANVAS_RAILS4_2
-        expect(a1.crocodoc_document(true)).to eq cd
-      else
-        expect(a1.reload_crocodoc_document).to eq cd
-      end
+      expect(a1.reload_crocodoc_document).to eq cd
       expect(a2.crocodoc_document).to eq a2.crocodoc_document
     end
 

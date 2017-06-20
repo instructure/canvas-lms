@@ -29,11 +29,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
   def csv(opts = {}, quiz = @quiz)
     stats = quiz.statistics_csv('student_analysis', opts)
     run_jobs
-    if CANVAS_RAILS4_2
-      stats.csv_attachment(true).open.read
-    else
-      stats.reload_csv_attachment.open.read
-    end
+    stats.reload_csv_attachment.open.read
   end
 
   it 'should calculate mean/stddev as expected with no submissions' do

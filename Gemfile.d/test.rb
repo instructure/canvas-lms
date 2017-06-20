@@ -16,12 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 group :test do
-  if CANVAS_RAILS4_2
-    gem 'rails-dom-testing', '1.0.8'
-  else
-    gem 'rails-dom-testing', '2.0.2'
-    gem 'rails-controller-testing', '1.0.1'
-  end
+  gem 'rails-dom-testing', '2.0.2'
+  gem 'rails-controller-testing', '1.0.1'
 
   gem 'gergich', '0.1.15', require: false
   gem 'dotenv', '2.2.1', require: false
@@ -53,7 +49,6 @@ group :test do
     gem 'websocket', '1.2.3', require: false
   gem 'chromedriver-helper', require: false
   gem 'selinimum', '0.0.1', require: false, path: 'gems/selinimum'
-  gem 'test_after_commit', '1.1.0' if CANVAS_RAILS4_2
   gem 'test-queue', github: 'jenseng/test-queue', ref: '1b92ebbca70705599c78a1bad5b16d6a37f741f2', require: false
   gem 'testrailtagging', '0.3.7', require: false
 

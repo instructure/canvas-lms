@@ -1727,11 +1727,7 @@ class UsersController < ApplicationController
           session.delete(:require_terms)
           flash[:notice] = t('user_updated', 'User was successfully updated.')
           unless params[:redirect_to_previous].blank?
-            if CANVAS_RAILS4_2
-              return redirect_to :back
-            else
-              return redirect_back fallback_location: user_url(@user)
-            end
+            return redirect_back fallback_location: user_url(@user)
           end
           format.html { redirect_to user_url(@user) }
           format.json {

@@ -323,8 +323,7 @@ class Attachment < ActiveRecord::Base
   def assert_attachment
     if !self.to_be_zipped? && !self.zipping? && !self.errored? && !self.deleted? && (!filename || !content_type || !downloadable?)
       self.errors.add(:base, t('errors.not_found', "File data could not be found"))
-      throw :abort unless CANVAS_RAILS4_2
-      return false
+      throw :abort
     end
   end
 

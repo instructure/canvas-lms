@@ -357,8 +357,7 @@ class Course < ActiveRecord::Base
       end
     end
 
-    throw :abort if !is_unique && !CANVAS_RAILS4_2
-    is_unique
+    throw :abort unless is_unique
   end
 
   def validate_course_dates

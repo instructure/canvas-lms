@@ -460,11 +460,7 @@ class Group < ActiveRecord::Base
   def account_id=(new_account_id)
     write_attribute(:account_id, new_account_id)
     if self.account_id_changed?
-      if CANVAS_RAILS4_2
-        self.root_account = self.account(true)&.root_account
-      else
-        self.root_account = self.reload_account&.root_account
-      end
+      self.root_account = self.reload_account&.root_account
     end
   end
 

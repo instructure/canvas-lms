@@ -83,8 +83,7 @@ class Role < ActiveRecord::Base
   def infer_root_account_id
     unless self.account
       self.errors.add(:account_id)
-      throw :abort unless CANVAS_RAILS4_2
-      return false
+      throw :abort
     end
     self.root_account_id = self.account.root_account_id || self.account.id
   end
@@ -258,7 +257,6 @@ class Role < ActiveRecord::Base
       base_type[:count] = base_counts[base_type[:name]] || 0
       base_type[:custom_roles].each do |custom_role|
         id = custom_role[:id]
-        id = id.to_s if CANVAS_RAILS4_2
         custom_role[:count] = role_counts[id] || 0
       end
     end

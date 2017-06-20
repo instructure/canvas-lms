@@ -30,13 +30,13 @@ else
   ruby '2.4.0', :engine => 'ruby', :engine_version => '2.4.0'
 end
 
-# force a different lockfile for rails 5
-unless CANVAS_RAILS4_2
+# force a different lockfile for rails 5.1
+unless CANVAS_RAILS5_0
   Bundler::SharedHelpers.class_eval do
     class << self
       def default_lockfile
         lockfile = "#{Bundler.default_gemfile}.lock"
-        lockfile << ".5" unless CANVAS_RAILS4_2
+        lockfile << ".51" unless CANVAS_RAILS5_0
         Pathname.new(lockfile)
       end
     end

@@ -47,8 +47,7 @@ class PluginSetting < ActiveRecord::Base
     if @posted_settings
       plugin = Canvas::Plugin.find(name.to_s)
       result = plugin.validate_settings(self, @posted_settings)
-      throw :abort if !CANVAS_RAILS4_2 && result == false
-      result
+      throw :abort if result == false
     end
   end
 
