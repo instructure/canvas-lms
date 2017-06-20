@@ -1712,10 +1712,6 @@ class User < ActiveRecord::Base
     ]
   end
 
-  def migrate_content_links(html, from_course)
-    Course.migrate_content_links(html, from_course, self)
-  end
-
   attr_accessor :merge_mappings
   attr_accessor :merge_results
   def merge_mapped_id(*args)

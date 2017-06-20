@@ -1966,30 +1966,6 @@ class Course < ActiveRecord::Base
     User.file_structure_for(self, user)
   end
 
-  def self.copy_authorized_content(html, to_context, user)
-    return html unless to_context
-    pairs = []
-    content_types_to_copy = ['files']
-    matches = html.scan(/\/(courses|groups|users)\/(\d+)\/(\w+)/) do |match|
-      pairs << [match[0].singularize, match[1].to_i] if content_types_to_copy.include?(match[2])
-    end
-    pairs = pairs.select{|p| p[0] != to_context.class.to_s || p[1] != to_context.id }
-    pairs.uniq.each do |context_type, id|
-      context = Context.find_by_asset_string("#{context_type}_#{id}") rescue nil
-      if context
-        next if context.respond_to?(:context) && to_context == context.context
-        next if to_context.respond_to?(:context) && context == to_context.context
-
-        if context.grants_right?(user, :manage_content)
-          html = self.migrate_content_links(html, context, to_context, content_types_to_copy)
-        else
-          html = self.migrate_content_links(html, context, to_context, content_types_to_copy, user)
-        end
-      end
-    end
-    html
-  end
-
   def turnitin_settings
     # check if somewhere up the account chain turnitin is enabled and
     # has valid settings
@@ -2032,53 +2008,6 @@ class Course < ActiveRecord::Base
     if vericite_enabled?
       Canvas::Plugin.find(:vericite).settings[:comments]
     end
-  end
-
-  def self.migrate_content_links(html, from_context, to_context, supported_types=nil, user_to_check_for_permission=nil)
-    return html unless html.present? && to_context
-
-    from_name = from_context.class.name.tableize
-    to_name = to_context.class.name.tableize
-
-    @merge_mappings ||= {}
-    rewriter = UserContent::HtmlRewriter.new(from_context, user_to_check_for_permission)
-    limit_migrations_to_listed_types = !!supported_types
-    rewriter.allowed_types = %w(assignments calendar_events discussion_topics collaborations files conferences quizzes groups modules)
-
-    rewriter.set_default_handler do |match|
-      new_url = match.url
-      next(new_url) if supported_types && !supported_types.include?(match.type)
-      if match.obj_id
-        new_id = @merge_mappings["#{match.obj_class.name.underscore}_#{match.obj_id}"]
-        next(new_url) unless rewriter.user_can_view_content? { match.obj_class.where(id: match.obj_id).first }
-        if !limit_migrations_to_listed_types || new_id
-          new_url = new_url.gsub("#{match.type}/#{match.obj_id}", new_id ? "#{match.type}/#{new_id}" : "#{match.type}")
-        end
-      end
-      new_url.gsub("/#{from_name}/#{from_context.id}", "/#{to_name}/#{to_context.id}")
-    end
-
-    rewriter.set_unknown_handler do |match|
-      match.url.gsub("/#{from_name}/#{from_context.id}", "/#{to_name}/#{to_context.id}")
-    end
-
-    html = rewriter.translate_content(html)
-
-    if !limit_migrations_to_listed_types
-      # for things like calendar urls, swap out the old context id with the new one
-      regex = Regexp.new("include_contexts=[^\\s&]*#{from_context.asset_string}")
-      html = html.gsub(regex) do |match|
-        match.gsub("#{from_context.asset_string}", "#{to_context.asset_string}")
-      end
-      # swap out the old host with the new host
-      html = html.gsub(HostUrl.context_host(from_context), HostUrl.context_host(to_context))
-    end
-
-    html
-  end
-
-  def migrate_content_links(html, from_course)
-    Course.migrate_content_links(html, from_course, self)
   end
 
   attr_accessor :merge_results

@@ -857,30 +857,6 @@ class Quizzes::Quiz < ActiveRecord::Base
     @significant_version[version_number] = needs_review
   end
 
-  def migrate_content_links_by_hand(user)
-    self.quiz_questions.active.each do |question|
-      data = Quizzes::QuizQuestion.migrate_question_hash(question.question_data, :context => self.context, :user => user)
-      question.write_attribute(:question_data, data)
-      question.save
-    end
-    data = self.quiz_data
-    if data
-      data.each_with_index do |obj, idx|
-        if obj[:answers]
-          data[idx] = Quizzes::QuizQuestion.migrate_question_hash(data[idx], :context => self.context, :user => user)
-        elsif val.questions
-          questions = []
-          obj[:questions].each do |question|
-            questions << Quizzes::QuizQuestion.migrate_question_hash(question, :context => self.context, :user => user)
-          end
-          obj[:questions] = questions
-          data[idx] = obj
-        end
-      end
-    end
-    self.quiz_data = data
-  end
-
   def validate_quiz_type
     return if self.quiz_type.blank?
     unless valid_quiz_type_values.include?(self.quiz_type)

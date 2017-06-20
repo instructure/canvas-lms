@@ -200,20 +200,6 @@ describe WikiPage do
     expect(p1.url).to eql('asdf-2')
   end
 
-  it "should preserve course links when in a group belonging to the course" do
-    other_course = Course.create!
-    course_with_teacher
-    group(:group_context => @course)
-    page = @group.wiki.wiki_pages.create(:title => "poni3s")
-    page.user = @teacher
-    page.update_attribute(:body, %{<a href='/courses/#{@course.id}/files#oops'>click meh</a>
-                                  <a href='/courses/#{other_course.id}/files#whoops'>click meh too</a>})
-
-    page.reload
-    expect(page.body).to include("/courses/#{@course.id}/files#oops")
-    expect(page.body).to include("/groups/#{@group.id}/files#whoops")
-  end
-
   context "unpublished" do
     before :once do
       teacher_in_course(:active_all => true)
