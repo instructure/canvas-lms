@@ -75,6 +75,8 @@
 </div>
 
 <script>
+  var BZ_AuthToken = "<%= form_authenticity_token %>";
+
   if(ENV["TIMEZONE_OFFSET"] && localStorage.skipTzWarning != "yes" && ENV["current_user_id"] != 1) {
     function showBzTzWarning() {
       var t = document.getElementById("bz-tz-warning");

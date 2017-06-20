@@ -1,0 +1,46 @@
+#bz-fullscreen_modal {
+  position: fixed;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  top: 0px;
+  margin: 0px;
+  padding: 0px;
+  background-color: black;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 9001; /* OVER NINE THOUSAAAAAAAAAAAD! */
+}
+
+#bz-fullscreen_modal > div {
+  position: fixed;
+  margin: 4em auto;
+  left: 10vw;
+  width: 800px;
+  width: 80vw;
+  background-color: white;
+}
+
+#bz-fullscreen_modal > div > h1 {
+  height: 2em;
+  vertical-align: middle;
+  padding: 0px 1em;
+
+}
+
+#bz-fullscreen_modal .bz-fullscreen_modal-body_holder {
+  height: 720px;
+  height: calc(100vh - 8em /* margin of inner div */ - 2em /* header */ - 3em /* buttons */);
+  padding: 0px 2em;
+}
+
+#bz-fullscreen_modal .bz-fullscreen_modal-buttons_holder {
+  height: 3em;
+  line-height: 3em;
+  vertical-align: middle;
+  text-align: right;
+}
+
+#bz-fullscreen_modal .bz-fullscreen_modal-buttons_holder > button {
+  vertical-align: middle;
+  margin-right: 2em;
+}

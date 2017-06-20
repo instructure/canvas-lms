@@ -290,3 +290,116 @@ function bzInitializeInstantSurvey() {
 	http.send();
 
 }
+
+function BZ_ModalDialog(titleString, bodyElement, onOK) {
+  var holder = document.createElement("div");
+  holder.setAttribute("id", "bz-fullscreen_modal");
+  var inner = document.createElement("div");
+  holder.appendChild(inner);
+
+  var title = document.createElement("h1");
+  title.textContent = titleString;
+  inner.appendChild(title);
+
+  var bodyHolder = document.createElement("div");
+  bodyHolder.className = "bz-fullscreen_modal-body_holder";
+  inner.appendChild(bodyHolder);
+
+  var buttonsHolder = document.createElement("div");
+  buttonsHolder.className = "bz-fullscreen_modal-buttons_holder";
+  inner.appendChild(buttonsHolder);
+
+  var cancelButton = document.createElement("button");
+  cancelButton.setAttribute("type", "button");
+  cancelButton.className = "bz-fullscreen_modal-cancel_button";
+  cancelButton.textContent = "Cancel";
+  cancelButton.onclick = function() {
+    document.body.removeChild(holder);
+  };
+  buttonsHolder.appendChild(cancelButton);
+
+  var okButton = document.createElement("button");
+  okButton.setAttribute("type", "button");
+  okButton.className = "bz-fullscreen_modal-ok_button";
+  okButton.textContent = "OK";
+  okButton.onclick = function() {
+    onOK();
+    document.body.removeChild(holder);
+  };
+  buttonsHolder.appendChild(okButton);
+
+  document.body.appendChild(holder);
+
+  bodyHolder.appendChild(bodyElement);
+}
+
+var BZ_MasterBankCourseId = 28;
+
+function BZ_SetupMasterPageClone(page_id) {
+    var req = new XMLHttpRequest();
+    req.open("GET", "/api/v1/courses/"+BZ_MasterBankCourseId+"/pages", true);
+    req.onload = function(e) {
+      if(req.status == 200) {
+        var obj = JSON.parse(req.responseText.substring(9));
+        var select = document.createElement("select");
+        for(var i = 0; i < obj.length; i++) {
+          var option = document.createElement("option");
+          option.setAttribute("value", obj[i].page_id);
+          option.textContent = obj[i].title;
+          select.appendChild(option);
+        }
+
+        BZ_ModalDialog("Choose a page to clone", select, function() {
+          var pid = select.options[select.selectedIndex].value;
+          BZ_SetCloneMasterPage(page_id, pid);
+        });
+
+      } else {
+        console.log(req.status);
+        alert("Failure to load: " + req.status);
+      }
+    };
+    req.send('');
+
+}
+
+function BZ_DetachFromMasterPage(page_id) {
+  BZ_SetCloneMasterPage(page_id, '');
+}
+
+function BZ_SetCloneMasterPage(page_id, new_master) {
+    var req = new XMLHttpRequest();
+    var data = new FormData();
+    data.append("utf8", "\u2713");
+    data.append("authenticity_token", BZ_AuthToken);
+    data.append("wiki_page[clone_of_id]", new_master);
+    req.open("PUT", "/api/v1/courses/"+BZ_MasterBankCourseId+"/pages/" + page_id, true);
+    req.onload = function(e) {
+      if(req.status == 200) {
+        var obj = JSON.parse(req.responseText);
+
+        location.reload();
+      } else {
+        console.log(req.status);
+        alert("Failure to save: " + req.status + " on " + page_id);
+      }
+    };
+    req.send(data);
+
+}
+
+function BZ_GoToMasterPage(master_page_id) {
+    var req = new XMLHttpRequest();
+    req.open("GET", "/api/v1/courses/"+BZ_MasterBankCourseId+"/pages/" + master_page_id, true);
+    req.onload = function(e) {
+      if(req.status == 200) {
+        var obj = JSON.parse(req.responseText);
+
+        location.href = "/courses/" + BZ_MasterBankCourseId + "/pages/" + obj.url;
+      } else {
+        console.log(req.status);
+        alert("Failure to load: " + req.status);
+      }
+    };
+    req.send('');
+}

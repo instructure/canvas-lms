@@ -30,6 +30,7 @@ module Api::V1::WikiPage
 
     hash = api_json(wiki_page, current_user, session, :only => WIKI_PAGE_JSON_ATTRS)
     hash['page_id'] = wiki_page.id
+    hash['clone_of_id'] = wiki_page.clone_of_id
     hash['editing_roles'] ||= 'teachers'
     hash['last_edited_by'] = user_display_json(wiki_page.user, wiki_page.context) if wiki_page.user
     hash['published'] = wiki_page.active?
