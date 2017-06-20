@@ -1358,7 +1358,7 @@ class Submission < ActiveRecord::Base
   private :late_points_deducted
 
   def late_policy_relevant_changes?
-    # can treat change of late_policy_status 'none' <--> 'missing' as irrelevant if needed for performance
+    return false unless grade_matches_current_submission
     changes.slice(:score, :submitted_at, :accepted_at, :late_policy_status, :cached_due_date).any?
   end
   private :late_policy_relevant_changes?

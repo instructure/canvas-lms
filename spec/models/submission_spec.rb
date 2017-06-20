@@ -607,7 +607,7 @@ describe Submission do
     before(:once) do
       @date = Time.zone.local(2017, 3, 25, 11)
       @assignment.update!(due_at: 4.days.ago(@date), points_possible: 1000, submission_types: "online_text_entry")
-      @late_policy = late_policy_factory(course: @course, deduct: 5.0, every: :day)
+      @late_policy = late_policy_factory(course: @course, deduct: 5.0, every: :day, missing: 80.0)
     end
 
     let(:submission) { @assignment.submissions.find_by(user_id: @student) }
@@ -615,7 +615,7 @@ describe Submission do
     it "applies the late policy when score changes" do
       Timecop.freeze(2.days.ago(@date)) do
         @assignment.submit_homework(@student, body: "a body")
-        submission.update!(score: 600)
+        @assignment.grade_student(@student, grade: 600, grader: @teacher)
         expect(submission.score).to eq 500
         expect(submission.points_deducted).to eq 100
       end
@@ -624,7 +624,7 @@ describe Submission do
     it "does not apply the late policy when what-if score changes" do
       Timecop.freeze(2.days.ago(@date)) do
         @assignment.submit_homework(@student, body: "a body")
-        submission.update!(score: 600)
+        @assignment.grade_student(@student, grade: 600, grader: @teacher)
       end
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
@@ -634,10 +634,28 @@ describe Submission do
       end
     end
 
+    it "does not change a previous grade when student submits ungraded work" do
+      asg = @course.assignments.create!(points_possible: 1000, submission_types: "online_text_entry")
+      Timecop.freeze(2.days.ago(@date)) do
+        asg.update!(due_at: 4.days.ago(@date))
+        ph = asg.submissions.last
+        expect(ph.missing?).to be true
+        expect(ph.score).to eq 200
+        expect(ph.points_deducted).to be nil
+      end
+      Timecop.freeze(@date) do
+        hw = asg.submit_homework(@student, body: "a body", submission_type: "online_text_entry")
+        hw.save!
+        expect(hw.late?).to be true
+        expect(hw.score).to eq 200
+        expect(hw.points_deducted).to be nil
+      end
+    end
+
     it "re-applies the late policy when accepted_at changes" do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
-        submission.update!(score: 800)
+        @assignment.grade_student(@student, grade: 800, grader: @teacher)
       end
       submission.update!(accepted_at: @assignment.due_at + 3.days)
       expect(submission.score).to eq 650
