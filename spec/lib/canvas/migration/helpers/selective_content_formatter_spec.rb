@@ -16,7 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../../../../lti2_course_spec_helper')
 
 describe Canvas::Migration::Helpers::SelectiveContentFormatter do
   context "overview json data" do
@@ -26,6 +27,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
         'modules' => [{'title' => 'a1', 'migration_id' => 'a1'}],
         'wikis' => [{'title' => 'a1', 'migration_id' => 'a1'}],
         'external_tools' => [{'title' => 'a1', 'migration_id' => 'a1'}],
+        'tool_profiles' => [{'title' => 'a1', 'migration_id' => 'a1'}],
         'outcomes' => [{'title' => 'a1', 'migration_id' => 'a1'}],
         'file_map' => {'oi' => {'title' => 'a1', 'migration_id' => 'a1'}},
         'assignments' => [{'title' => 'a1', 'migration_id' => 'a1'},{'title' => 'a2', 'migration_id' => 'a2', 'assignment_group_migration_id' => 'a1'}],
@@ -56,6 +58,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
                                              {:type=>"quizzes", :property=>"copy[all_quizzes]", :title=>"Quizzes", :count=>1, :sub_items_url=>"https://example.com?type=quizzes"},
                                              {:type=>"wiki_pages", :property=>"copy[all_wiki_pages]", :title=>"Wiki Pages", :count=>1, :sub_items_url=>"https://example.com?type=wiki_pages"},
                                              {:type=>"context_external_tools", :property=>"copy[all_context_external_tools]", :title=>"External Tools", :count=>1, :sub_items_url=>"https://example.com?type=context_external_tools"},
+                                             {:type=>"tool_profiles", :property=>"copy[all_tool_profiles]", :title=>"Tool Profiles", :count=>1, :sub_items_url=>"https://example.com?type=tool_profiles"},
                                              {:type=>"learning_outcomes", :property=>"copy[all_learning_outcomes]", :title=>"Learning Outcomes", :count=>1},
                                              {:type=>"attachments", :property=>"copy[all_attachments]", :title=>"Files", :count=>1, :sub_items_url=>"https://example.com?type=attachments"}]
     end
@@ -171,10 +174,13 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
   end
 
   context "course copy" do
+    include_context "lti2_course_spec_helper"
     let(:formatter) { Canvas::Migration::Helpers::SelectiveContentFormatter.new(@migration) }
 
     before do
       course_model
+      tool_proxy.context = @course
+      tool_proxy.save!
       @topic = @course.discussion_topics.create!(:message => "hi", :title => "discussion title")
       @cm = @course.context_modules.create!(:name => "some module")
       attachment_model(:context => @course, :filename => 'a5.html')
@@ -191,9 +197,10 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
 
     it "should list top-level items" do
       #groups should not show up even though there are some
-      expect(formatter.get_content_list).to eq [{:type=>"course_settings", :property=>"copy[all_course_settings]", :title=>"Course Settings"},
+      expect(formatter.get_content_list).to match_array [{:type=>"course_settings", :property=>"copy[all_course_settings]", :title=>"Course Settings"},
                                              {:type=>"syllabus_body", :property=>"copy[all_syllabus_body]", :title=>"Syllabus Body"},
                                              {:type=>"context_modules", :property=>"copy[all_context_modules]", :title=>"Modules", :count=>1},
+                                             {:type=>"tool_profiles", :property=>"copy[all_tool_profiles]", :title=>"Tool Profiles", :count=>1},
                                              {:type=>"discussion_topics", :property=>"copy[all_discussion_topics]", :title=>"Discussion Topics", :count=>1},
                                              {:type=>"wiki_pages", :property=>"copy[all_wiki_pages]", :title=>"Wiki Pages", :count=>1},
                                              {:type=>"announcements", :property=>"copy[all_announcements]", :title=>"Announcements", :count=>1},
@@ -236,6 +243,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
         @topic.destroy
         @course_outcome.destroy
         @account_outcome.destroy
+        tool_proxy.destroy
 
         @course.require_assignment_group
         @course.assignments.create!.destroy

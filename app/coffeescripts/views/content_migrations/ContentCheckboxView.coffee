@@ -92,6 +92,7 @@ define [
       discussion_topics:            "icon-discussion"
       wiki_pages:                   "icon-note-light"
       context_external_tools:       "icon-lti"
+      tool_profiles:                "icon-lti"
       announcements:                "icon-announcement"
       calendar_events:              "icon-calendar-days"
       rubrics:                      "icon-rubric"

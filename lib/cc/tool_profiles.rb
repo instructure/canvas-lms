@@ -20,7 +20,12 @@ module CC
   module ToolProfiles
     def create_tool_profiles
       @course.tool_proxies.active.each do |tool_proxy|
-        next unless export_object?(tool_proxy)
+        # This is grossness that I added until we have a proper
+        # ToolProfile ActiveRecord class
+        tool_proxy.define_singleton_method(:asset_string) do
+          "tool_profile_#{id}"
+        end
+        next unless export_object?(tool_proxy, 'tool_profiles')
         migration_id = create_key(tool_proxy)
 
         file_name = "#{migration_id}.json"
