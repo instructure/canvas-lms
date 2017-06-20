@@ -500,7 +500,14 @@ class WikiPagesApiController < ApplicationController
     if is_front_page_action?
       @page = @wiki.front_page
     else
-      @page = @wiki.find_page(url)
+      # adr: I need to be able to get things from ID via the api
+      # so just going to hack this in.
+      id = Integer(url) rescue false
+      if id
+        @page = WikiPage.find(id)
+      else
+        @page = @wiki.find_page(url)
+      end
     end
 
     # create a new page if the page was not found
@@ -533,7 +540,7 @@ class WikiPagesApiController < ApplicationController
 
   def get_update_params(allowed_fields=Set[])
     # normalize parameters
-    page_params = (params[:wiki_page] || {}).slice(*%w(title body notify_of_update published front_page editing_roles))
+    page_params = (params[:wiki_page] || {}).slice(*%w(title body notify_of_update published front_page editing_roles clone_of_id))
 
     if page_params.has_key?(:published)
       published_value = page_params.delete(:published)

@@ -1,3 +1,17 @@
+{{#if clone_of_id}}
+<div class="edit-content">
+  <div>
+    <p>This is set to track changes to <abbr title="{{clone_of_id}}">a page</abbr> from the Braven content bank.</p>
+
+    <p>You can edit the other page and have changes appear here (as well as any other course with the cloned page), or you can detach this page and edit it independently.</p>
+
+    <p>If you detach it, it will no longer track changes from the Braven content bank.</p>
+
+    <button onclick="BZ_GoToMasterPage({{clone_of_id}});" type="button">Go to the master page</button>
+    <button onclick="BZ_DetachFromMasterPage({{page_id}});" type="button">Detach and edit independently</button>
+  </div>
+</div>
+{{else}}
 <div class="edit-content">
   <div class="edit-header">
     {{#if CAN.EDIT_TITLE}}
@@ -58,6 +72,9 @@
     </label>
     <a class="btn cancel" tabindex="0" role="button">{{#t "buttons.cancel"}}Cancel{{/t}}</a>
     {{#if CAN.PUBLISH_NOW}}
+      {{#if page_id}}
+      <button type="button" class="btn clone" onclick="BZ_SetupMasterPageClone({{page_id}});">Setup Cloning</button>
+      {{/if}}
       <button class="btn btn-default save_and_publish">{{#t "buttons.save_and_publish"}}Save & Publish{{/t}}</button>
     {{/if}}
     <button class="btn btn-primary submit">{{#t "buttons.save"}}Save{{/t}}</button>
@@ -65,3 +82,4 @@
 </div>
 
 <a href="/bz/retained_data_stats?name=instant-survey-{{page_id}}">See Instant Survey results</a>
+{{/if}}
