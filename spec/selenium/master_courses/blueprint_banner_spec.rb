@@ -95,5 +95,40 @@ describe "master courses banner" do
         expect(f('#blueprint-lock-banner')).to include_text('Content, Points, Due Dates & Availability Dates')
       end
     end
+
+    context "for discussions" do
+      before :once do
+        # sets up the assignment that gets blueprinted
+        @original_disc = @master.discussion_topics.create!(title: 'Discussion time!')
+        run_master_course_migration(@master)
+        @copy_disc = @minion.discussion_topics.last
+      end
+
+      it "shows locked banner when locking", priority:"2", test_id: 3263121 do
+        change_blueprint_settings(@master, content: true, points: true, due_dates: true, availability_dates: true)
+        get "/courses/#{@master.id}/discussion_topics/#{@original_disc.id}"
+        f('.bpc-lock-toggle button').click
+        expect(f('.bpc-lock-toggle__label')).to include_text('Locked')
+        expect(f('#blueprint-lock-banner')).to include_text('Content, Points, Due Dates & Availability Dates')
+      end
+    end
+
+    context "for quizzes" do
+      before :once do
+        # sets up the quiz that gets blueprinted
+        @original_quiz = @master.quizzes.create!(title: 'Discussion time!', due_at: 5.days.from_now)
+        @original_quiz.description = 'this is the original content for the quiz'
+        run_master_course_migration(@master)
+        @copy_quiz = @minion.quizzes.last
+      end
+
+      it "shows locked banner when locking", priority:"2", test_id: 3263119 do
+        change_blueprint_settings(@master, content: true, points: true, due_dates: true, availability_dates: true)
+        get "/courses/#{@master.id}/quizzes/#{@original_quiz.id}"
+        f('.bpc-lock-toggle button').click
+        expect(f('.bpc-lock-toggle__label')).to include_text('Locked')
+        expect(f('#blueprint-lock-banner')).to include_text('Content, Points, Due Dates & Availability Dates')
+      end
+    end
   end
 end
