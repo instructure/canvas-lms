@@ -151,8 +151,9 @@ module Lti
         tag = find_tag
         custom_param_opts = prep_tool_settings(message_handler.parameters, tool_proxy, launch_params[:resource_link_id])
         custom_param_opts[:content_tag] = tag if tag
-
-        variable_expander = create_variable_expander(custom_param_opts.merge(tool: tool_proxy))
+        tool_setting = ToolSetting.find_by(resource_link_id: resource_link_id)
+        variable_expander = create_variable_expander(custom_param_opts.merge(tool: tool_proxy,
+                                                                             tool_setting: tool_setting))
         launch_params.merge! enabled_parameters(tool_proxy, message_handler, variable_expander)
 
         message = IMS::LTI::Models::Messages::BasicLTILaunchRequest.new(launch_params)

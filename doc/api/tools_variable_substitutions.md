@@ -108,6 +108,36 @@ particular placement:
 ```
 
 # Supported Substitutions
+## com.instructure.OriginalityReport.id
+The Canvas id of the Originality Report associated
+with the launch.
+
+**Availability**: **  
+**Launch Parameter**: *com_instructure_originality_report_id*  
+
+```
+23
+```
+## com.instructure.Submission.id
+The Canvas id of the submission associated with the
+launch.
+
+**Availability**: **  
+**Launch Parameter**: *com_instructure_submission_id*  
+
+```
+23
+```
+## com.instructure.File.id
+The Canvas id of the file associated with the submission
+in the launch.
+
+**Availability**: **  
+**Launch Parameter**: *com_instructure_file_id*  
+
+```
+23
+```
 ## CourseOffering.sourcedId
 the LIS identifier for the course offering.
 
