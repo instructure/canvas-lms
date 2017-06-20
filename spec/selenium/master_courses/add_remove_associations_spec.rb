@@ -95,7 +95,7 @@ describe "master courses - add and remove course associations" do
     expect(minions[1].attribute('id')).to eq(course1_id)
   end
 
-  it "should remove an associated course", priority: "1", test_id: "3078972" do
+  it "should remove an associated course", priority: "1", test_id: "3077488" do
     get "/courses/#{@master_course.id}"
     open_associations
     open_courses_list
@@ -138,7 +138,7 @@ describe "master courses - add and remove course associations" do
     expect(f("##{course0_id}", table)).to be_displayed
   end
 
-  it "should add and remove a to-be-added course", priority: "1", test_id: "3078972" do
+  it "should add and remove a to-be-added course", priority: "1", test_id: "3077487" do
     get "/courses/#{@master_course.id}"
     open_associations
     open_courses_list
