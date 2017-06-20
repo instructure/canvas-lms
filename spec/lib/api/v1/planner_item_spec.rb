@@ -54,9 +54,30 @@ describe Api::V1::PlannerItem do
     let(:api) { PlannerItemHarness.new }
     let(:session) { stub }
 
+    it 'should return with a plannable_date for the respective item' do
+      asg_due_at = 1.week.ago
+      asg = assignment_model course: @couse, submission_types: 'online_text_entry', due_at: asg_due_at
+      asg_hash = api.planner_item_json(asg, @student, session)
+      expect(asg_hash[:plannable_date]).to eq asg_due_at
+
+      dt_todo_date = 1.week.from_now
+      dt = discussion_topic_model course: @couse, todo_date: dt_todo_date
+      dt_hash = api.planner_item_json(dt, @student, session)
+      expect(dt_hash[:plannable_date]).to eq dt_todo_date
+
+      wiki_todo_date = 1.day.ago
+      wiki = wiki_page_model course: @couse, todo_date: wiki_todo_date
+      wiki_hash = api.planner_item_json(wiki, @student, session)
+      expect(wiki_hash[:plannable_date]).to eq wiki_todo_date
+
+      annc_post_date = 1.day.from_now
+      annc = announcement_model context: @couse, posted_at: annc_post_date
+      annc_hash = api.planner_item_json(annc, @student, session)
+      expect(annc_hash[:plannable_date]).to eq annc_post_date
+    end
+
     context 'with an existing planner override' do
       it 'should return the planner visibility state' do
-        @assignment.context.stubs(:grants_right?).returns(false)
         teacher_hash = api.planner_item_json(@assignment, @teacher, session)
         student_hash = api.planner_item_json(@assignment, @student, session)
 
@@ -65,7 +86,6 @@ describe Api::V1::PlannerItem do
       end
 
       it 'should return the planner override id' do
-        @assignment.context.stubs(:grants_right?).returns(false)
         teacher_hash = api.planner_item_json(@assignment, @teacher, session)
         student_hash = api.planner_item_json(@assignment, @student, session)
 
@@ -87,10 +107,6 @@ describe Api::V1::PlannerItem do
     end
 
     describe '#submission_statuses_for' do
-      before :each do
-        @assignment.context.stubs(:grants_right?).returns(false)
-      end
-
       it 'should return the submission statuses for the learning object' do
         json = api.planner_item_json(@assignment, @student, session)
         expect(json.has_key?(:submissions)).to be true

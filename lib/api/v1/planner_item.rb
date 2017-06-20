@@ -27,6 +27,7 @@ module Api::V1::PlannerItem
   def planner_item_json(item, user, session, opts = {})
     context_data(item).merge({
       :plannable_id => item.id,
+      :plannable_date => item.planner_date,
       :visible_in_planner => item.visible_in_planner_for?(user),
       :planner_override => api_json(item.planner_override_for(user), user, session)
     }).merge(submission_statuses_for(user, item, opts)).tap do |hash|
