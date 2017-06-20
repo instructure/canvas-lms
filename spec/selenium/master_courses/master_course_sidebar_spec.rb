@@ -20,22 +20,37 @@ require_relative '../helpers/blueprint_common'
 
 
 shared_context "blueprint sidebar context" do
-  let(:sync_button) {'.bcs__migration-sync__button button'}
-  let(:unsynced_changes_link) {'#mcUnsyncedChangesBtn'}
-  let(:blueprint_open_sidebar_button){f('.blueprint__root .bcs__wrapper .bcs__trigger') }
-  let(:send_notification_checkbox) do
+  def sync_button
+    f('.bcs__migration-sync__button button')
+  end
+
+  def unsynced_changes_link
+    f('.bcs__content button#mcUnsyncedChangesBtn')
+  end
+
+  def blueprint_open_sidebar_button
+    f('.blueprint__root .bcs__wrapper .bcs__trigger')
+  end
+
+  def send_notification_checkbox
     f('.bcs__history-settings')
       .find_element(:xpath, "//span[text()[contains(., 'Send Notification')]]")
   end
-  let(:add_message_checkbox) do
+
+  def add_message_checkbox
     f('.bcs__history-notification__add-message')
       .find_element(:xpath, "//label/span/span[text()[contains(., 'Add a Message')]]")
   end
-  let(:notification_message_text_box) do
+
+  def notification_message_text_box
     f('.bcs__history-notification__add-message')
       .find_element(:xpath, "//label/span/span/span/textarea")
   end
-  let(:character_count) { f('.bcs__history-notification__add-message').find_element(:xpath, "span") }
+
+  def character_count
+    f('.bcs__history-notification__add-message')
+      .find_element(:xpath, "span")
+  end
 
   def open_blueprint_sidebar
     get "/courses/#{@master.id}"
@@ -47,6 +62,7 @@ end
 describe "master courses sidebar" do
   include_context "in-process server selenium tests"
   include BlueprintCourseCommon
+
 
   before :once do
     Account.default.enable_feature!(:master_courses)
@@ -117,8 +133,8 @@ describe "master courses sidebar" do
       get "/courses/#{@master.id}"
       expect(f('body')).not_to contain_css('.TutorialToggleHolder button')
     end
-
   end
+
 
   describe "as a master course admin" do
     include_context "blueprint sidebar context"
@@ -153,22 +169,57 @@ describe "master courses sidebar" do
       expect(notification_message_text_box).not_to have_value('A')
     end
 
-    it "removes sync button after sync", priority: "2", test_id: 3186726 do
-      open_blueprint_sidebar
-      send_notification_checkbox.click
-      add_message_checkbox.click
-      notification_message_text_box.send_keys("sync that!")
-      f(sync_button).click
-      run_jobs
-      open_blueprint_sidebar
-      begin
-        f(sync_button) # button found ? go to the rescue statement : fail immediately
-        error_text = "Sync button should not be in Blueprint sidebar when nothing is to be synced"
-        expect(error_text).to eq(nil)
-      rescue
-        expect(f('.bcs__content')).not_to contain_css(unsynced_changes_link)
-        expect(f('.bcs__content')).not_to include_text("Include Course Settings")
-        expect(f('.bcs__content')).not_to include_text("Send Notification")
+
+    context "before sync" do
+
+      it "shows sync button and options before sync", priority: "2", test_id: 3186721 do
+        open_blueprint_sidebar
+        bcs_content = f('.bcs__content')
+        expect(bcs_content).to include_text("Unsynced Changes")
+        expect(bcs_content).to contain_css('.bcs__row-right-content')
+        expect(bcs_content).to include_text("Include Course Settings")
+        expect(bcs_content).to include_text("Send Notification")
+        expect(bcs_content).to contain_css('.bcs__migration-sync__button')
+      end
+    end
+
+
+    context "after sync" do
+      before :each do
+        open_blueprint_sidebar
+        send_notification_checkbox.click
+        add_message_checkbox.click
+        notification_message_text_box.send_keys("sync that!")
+        sync_button.click
+        run_jobs
+        open_blueprint_sidebar
+      end
+
+      it "removes sync button after sync", priority: "2", test_id: 3186726 do
+        test_var = false
+        begin
+          sync_button
+        rescue
+          test_var = true
+        end
+        expect(test_var).to be_truthy, "Sync button should not appear"
+        expect(f('.bcs__content')).not_to contain_css('button#mcUnsyncedChangesBtn')
+      end
+
+      it "removes notification options after sync", priority: "2", test_id: 3256295 do
+        test_var = false
+        begin
+          unsynced_changes_link
+        rescue
+          test_var = true
+        end
+        expect(test_var).to be_truthy, "Unsynced changes link should not appear"
+        bcs_content = f('.bcs__content')
+        expect(bcs_content).not_to include_text("Include Course Settings")
+        expect(bcs_content).not_to include_text("Send Notification")
+        expect(bcs_content).not_to contain_css('bcs__row-right-content')
+        expect(bcs_content).not_to include_text("Add a Message")
+        expect(bcs_content).not_to contain_css('.bcs__history-notification__message')
       end
     end
   end
