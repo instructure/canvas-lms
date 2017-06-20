@@ -19,6 +19,7 @@ import Planner from 'canvas-planner';
 import $ from 'jquery';
 import 'compiled/jquery.rails_flash_notifications';
 
+const stickyElement = document.getElementById('dashboard_header_container');
 const element = document.getElementById('dashboard-planner');
 const headerElement = document.getElementById('dashboard-planner-header');
 
@@ -27,6 +28,8 @@ const courses = window.ENV.DASHBOARD_COURSES.map(dc => ({
   color: window.ENV.PREFERENCES.custom_colors[dc.assetString]
 }));
 
+const stickyElementRect = stickyElement.getBoundingClientRect()
+const stickyOffset = stickyElementRect.bottom - stickyElementRect.top
 
 const options = {
   flashAlertFunctions: {
@@ -37,6 +40,10 @@ const options = {
   locale: window.ENV.LOCALE,
   timeZone: window.ENV.TIMEZONE,
   theme: (ENV.use_high_contrast) ? 'canvas-a11y' : 'canvas',
+  // the new activity button isn't sticky in IE yet, so make sure it slides
+  // under the header that is sticky in IE
+  stickyZIndex: 3,
+  stickyOffset,
   courses
 };
 
