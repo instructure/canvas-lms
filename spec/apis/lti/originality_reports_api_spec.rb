@@ -217,7 +217,6 @@ module Lti
         report_file.save!
 
         put @endpoints[:update], {originality_report: {originality_report_file_id: report_file.id}}, request_headers
-
         expect(response).to be_success
         expect(OriginalityReport.find(@report.id).originality_report_file_id).to eq report_file.id
       end
@@ -241,7 +240,6 @@ module Lti
               }
             },
             request_headers
-
         expect(response).to be_success
         tool_setting = Lti::ToolSetting.find_by(resource_link_id: OriginalityReport.find(@report.id).link_id)
         expect(tool_setting.resource_url).to eq "http://www.lti-test.com"
@@ -289,6 +287,26 @@ module Lti
              request_headers
         response_body = JSON.parse(response.body)
         expect(response_body['tool_setting']['resource_type_code']).to eq resource_handler.resource_type_code
+      end
+
+      it 'sets the context for the associated tool setting' do
+        score = 0.25
+        put @endpoints[:update],
+             {
+                originality_report: {
+                  file_id: @attachment.id,
+                  originality_score: score,
+                  tool_setting: {
+                    resource_type_code: resource_handler.resource_type_code
+                  }
+                }
+             },
+             request_headers
+        response_body = JSON.parse(response.body)
+        report = OriginalityReport.find(response_body['id'])
+        tool_setting = Lti::ToolSetting.find_by(resource_link_id: report.link_id)
+        attachment_association = report.attachment.attachment_associations.first
+        expect(tool_setting.context).to eq attachment_association
       end
 
       it 'sets the workflow state' do
@@ -394,7 +412,7 @@ module Lti
 
         post @endpoints[:create], {originality_report: {file_id: @attachment.id, originality_score: 0.4}}, request_headers
         expect(response.status).to eq 400
-        expect(JSON.parse(response.body)['errors'].key?('base')).to be_truthy
+        expect(JSON.parse(response.body)['error']['type']).to eq 'RecordNotUnique'
       end
 
       it "requires the plagiarism feature flag" do
@@ -438,6 +456,24 @@ module Lti
              request_headers
         response_body = JSON.parse(response.body)
         expect(response_body['tool_setting']['resource_type_code']).to eq resource_handler.resource_type_code
+      end
+
+      it 'sets the context for the associated tool setting' do
+        post @endpoints[:create],
+             {
+                originality_report: {
+                  file_id: @attachment.id,
+                  tool_setting: {
+                    resource_type_code: resource_handler.resource_type_code
+                  }
+                }
+             },
+             request_headers
+        response_body = JSON.parse(response.body)
+        report = OriginalityReport.find(response_body['id'])
+        tool_setting = Lti::ToolSetting.find_by(resource_link_id: report.link_id)
+        attachment_association = report.attachment.attachment_associations.first
+        expect(tool_setting.context).to eq attachment_association
       end
 
       it 'sets the workflow state' do

@@ -68,8 +68,17 @@ module Lti
       m.stubs(:view_context).returns(view_context_mock)
       m
     end
-
-    let(:variable_expander) { VariableExpander.new(root_account, account, controller, current_user: user, tool: tool) }
+    let(:attachment) { attachment_model }
+    let(:submission) { submission_model }
+    let(:resource_link_id) { SecureRandom.uuid }
+    let(:originality_report) do
+      OriginalityReport.create!(attachment: attachment,
+                                submission: submission,
+                                link_id: resource_link_id)
+    end
+    let(:attachment_association) { AttachmentAssociation.create!(context: submission, attachment: attachment) }
+    let(:tool_setting) { Lti::ToolSetting.create!(context: attachment_association, resource_link_id: resource_link_id) }
+    let(:variable_expander) { VariableExpander.new(root_account, account, controller, current_user: user, tool: tool, tool_setting: tool_setting) }
 
     it 'clears the lti_helper instance variable when you set the current_user' do
       expect(variable_expander.lti_helper).not_to be nil
@@ -128,6 +137,16 @@ module Lti
 
       it 'includes all expansion keys' do
         expect(VariableExpander.expansion_keys).to eq expected_keys
+      end
+    end
+
+    describe '#self.default_name_expansions' do
+      let(:expected_keys) do
+        VariableExpander.expansions.values.select { |v| v.default_name.present? }.map(&:name)
+      end
+
+      it 'includes all expansion keys that have default names' do
+        expect(VariableExpander.default_name_expansions).to eq expected_keys
       end
     end
 
