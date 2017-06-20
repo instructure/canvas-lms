@@ -3091,19 +3091,6 @@ QUnit.module('Gradebook Grid Events', function (hooks) {
     }
   });
 
-  test('closes the submission tray if it is open', function () {
-    this.stub(this.gradebook, 'closeSubmissionTray');
-    this.gradebook.setSubmissionTrayState(true, '1', '2');
-    this.triggerEvent('onActiveLocationChanged', {}, { columnId: 'student', region: 'header' });
-    strictEqual(this.gradebook.closeSubmissionTray.callCount, 1);
-  });
-
-  test('does not attempt to close the submission tray if it is already closed', function () {
-    this.stub(this.gradebook, 'closeSubmissionTray');
-    this.triggerEvent('onActiveLocationChanged', {}, { columnId: 'student', region: 'header' });
-    strictEqual(this.gradebook.closeSubmissionTray.callCount, 0);
-  });
-
   test('sets focus on the student grades link when a "student" body cell becomes active', function () {
     this.stub(this.gradebook.gridSupport.state, 'getActiveNode')
       .returns($fixtures.querySelector('#example-gradebook-cell'));
@@ -6251,6 +6238,13 @@ test('re-sorts the grid rows', function () {
 QUnit.module('Gradebook#onGridBlur', {
   setup () {
     this.gradebook = createGradebook();
+    this.gradebook.rows = [{ id: 123 }];
+    this.gradebook.grid = {
+      getActiveCell () {
+        return { row: 0 };
+      }
+    };
+    this.stub(this.gradebook, 'updateRowAndRenderSubmissionTray');
     this.gradebook.gridSupport = {
       helper: {
         commitCurrentEdit: this.stub()
@@ -6303,6 +6297,19 @@ test('does not blur the grid when clicking on the active cell', function () {
 test('does not blur the grid when clicking on another grid cell', function () {
   this.gradebook.onGridBlur({ target: $fixtures.querySelector('#cell-2') });
   strictEqual(this.gradebook.gridSupport.state.blur.callCount, 0);
+});
+
+test('closes grid details tray when open', function () {
+  this.gradebook.gridDisplaySettings.submissionTray.open = true;
+  this.gradebook.onGridBlur({ target: document.body });
+  strictEqual(this.gradebook.gridDisplaySettings.submissionTray.open, false);
+});
+
+test('does not close grid details tray when not open', function () {
+  const closeSubmissionTrayStub = this.stub(this.gradebook, 'closeSubmissionTray');
+  this.gradebook.gridDisplaySettings.submissionTray.open = false;
+  this.gradebook.onGridBlur({ target: document.body });
+  strictEqual(closeSubmissionTrayStub.callCount, 0);
 });
 
 QUnit.module('GridColor', {

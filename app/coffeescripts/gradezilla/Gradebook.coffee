@@ -1055,6 +1055,7 @@ define [
     # conjunction with a click listener on <body />. When we 'blur' the grid
     # by clicking outside of it, save the current field.
     onGridBlur: (e) =>
+      @closeSubmissionTray() if @getSubmissionTrayState().open
       # Prevent exiting the cell editor when clicking in the cell being edited.
       return if @gridSupport.state.getActiveNode()?.contains(e.target)
 
@@ -1669,7 +1670,6 @@ define [
       @gridSupport.initialize()
 
       @gridSupport.events.onActiveLocationChanged.subscribe (event, location) =>
-        @closeSubmissionTray() if @getSubmissionTrayState().open
         if location.columnId == 'student' && location.region == 'body'
           @gridSupport.state.getActiveNode().querySelector('.student-grades-link')?.focus()
 
