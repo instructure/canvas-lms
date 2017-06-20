@@ -333,7 +333,7 @@ function BZ_ModalDialog(titleString, bodyElement, onOK) {
   bodyHolder.appendChild(bodyElement);
 }
 
-var BZ_MasterBankCourseId = 28;
+var BZ_MasterBankCourseId = 1;
 
 function BZ_SetupMasterPageClone(page_id) {
     var req = new XMLHttpRequest();
