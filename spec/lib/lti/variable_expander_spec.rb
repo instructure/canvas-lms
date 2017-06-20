@@ -419,6 +419,13 @@ module Lti
           expect(exp_hash[:test]).to eq 123
         end
 
+        it 'has substitution for $Context.sourcedId' do
+          course.stubs(:sis_source_id).returns('123')
+          exp_hash = {test: '$Context.sourcedId'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq '123'
+        end
+
         it 'has substitution for $vnd.instructure.Course.uuid' do
           course.stubs(:uuid).returns('Ioe3sJPt0KZp9Pw6xAvcHuLCl0z4TvPKP0iIOLbo')
           exp_hash = {test: '$vnd.instructure.Course.uuid'}

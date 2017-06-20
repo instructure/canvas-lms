@@ -20,7 +20,7 @@ module Lti
 
     belongs_to :developer_key
 
-    before_validation { self.uuid ||= SecureRandom.uuid }
+    before_validation {self.uuid ||= SecureRandom.uuid}
     after_update :clear_cache
 
     serialize :services
@@ -46,12 +46,14 @@ module Lti
 
     DEFAULT_CAPABILITIES = %w(
       basic-lti-launch-request
+      ToolProxyRegistrationRequest
       Canvas.placements.accountNavigation
       Canvas.placements.courseNavigation
       Canvas.placements.assignmentSelection
       Canvas.placements.linkSelection
       Canvas.placements.postGrades
       Security.splitSecret
+      Context.sourcedId
     ).concat(
       CapabilitiesHelper::SUPPORTED_CAPABILITIES
     ).concat(
