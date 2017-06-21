@@ -86,6 +86,10 @@ class Gradezilla
       f("span .Gradebook__ColumnHeaderAction")
     end
 
+    def student_header_main_menu_sort_by_element
+      fj("[role=menu][aria-labelledby*=PopoverMenu] button:contains('Sort by')")
+    end
+
     def student_header_menu_main_element(menu)
       fj("[role=menu][aria-labelledby*=PopoverMenu] button:contains('#{menu}')")
     end
@@ -106,9 +110,10 @@ class Gradezilla
       f("div .slick-cell.l#{x}.r#{y}.meta-cell")
     end
 
-    def assignment_group_options_element(group_name)
-      fj(".Gradebook__ColumnHeaderAction span:contains(#{group_name})")
+    def assignment_group_header_options_element(group_name)
+      fj("[title='#{group_name}'] .Gradebook__ColumnHeaderAction")
     end
+
     # ---------------------END NEW-----------------------
 
     def menu_container(container_id)
@@ -528,10 +533,11 @@ class Gradezilla
       student_column_menu.click
       scroll_page_to_top
       # sort by scrolls out of view and does not get selected correctly on jenkins, so..
-      ff("[role=menu][aria-labelledby*=PopoverMenu] [role=button]")[0].click
       if menu_option == "A-Z"
+        ff("[role=menu][aria-labelledby*='PopoverMenu'] button")[0].click
         student_header_submenu_item_element('A–Z').click
       elsif menu_option == "Z-A"
+        ff("[role=menu][aria-labelledby*='PopoverMenu'] button")[0].click
         student_header_submenu_item_element('Z–A').click
       end
     end
@@ -676,6 +682,16 @@ class Gradezilla
       wait_for_ajaximations
     end
 
+    def click_assignment_group_header_options(group_name, sort_type)
+      assignment_group_header_options_element(group_name).click
+      student_header_menu_main_element('Sort by').click
+
+      if sort_type == 'Grade - High to Low'
+        student_header_submenu_item_element('Grade - High to Low').click
+      elsif sort_type == 'Grade - Low to High'
+        student_header_submenu_item_element('Grade - Low to High').click
+      end
+    end
     # ----------------------END NEW----------------------------
 
     delegate :click, to: :save_button, prefix: true

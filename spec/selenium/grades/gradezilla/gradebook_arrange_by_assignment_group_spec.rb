@@ -55,4 +55,28 @@ describe "Gradezilla view menu" do
       expect(first_row_cells[2]).to include_text "-"
     end
   end
+
+  context "assignment group dropdown" do
+    before(:each) do
+      Gradezilla.visit(@course)
+    end
+
+    it "sorts assignments by grade - Low to High", priority: "1", test_id: 3253345 do
+      Gradezilla.click_assignment_group_header_options(@group.name,'Grade - Low to High')
+      gradebook_student_names = Gradezilla.fetch_student_names
+
+      expect(gradebook_student_names[0]).to eq(@course.students[1].name)
+      expect(gradebook_student_names[1]).to eq(@course.students[2].name)
+      expect(gradebook_student_names[2]).to eq(@course.students[0].name)
+    end
+
+    it "sorts assignments by grade - High to Low", priority: "1", test_id: 3253346 do
+      Gradezilla.click_assignment_group_header_options(@group.name,'Grade - High to Low')
+      gradebook_student_names = Gradezilla.fetch_student_names
+
+      expect(gradebook_student_names[0]).to eq(@course.students[0].name)
+      expect(gradebook_student_names[1]).to eq(@course.students[1].name)
+      expect(gradebook_student_names[2]).to eq(@course.students[2].name)
+    end
+  end
 end

@@ -37,30 +37,6 @@ describe "Student column header options" do
       Gradezilla.click_student_menu_display_as('First,Last')
       expect(Gradezilla.fetch_student_names[0]).to eq(@course.students[0].name)
     end
-
-    it "displays student names as Last,First", priority: "2", test_id: 3253320 do
-      Gradezilla.click_student_menu_display_as('Last,First')
-
-      student_name = @course.students[0].last_name + ", " + @course.students[0].first_name
-      expect(Gradezilla.fetch_student_names[0]).to eq(student_name)
-    end
-
-    it "first,last display name persists", priority: "2", test_id: 3253322 do
-      Gradezilla.click_student_menu_display_as('Last,First')
-      Gradezilla.visit(@course)
-
-      student_name = @course.students[0].last_name + ", " + @course.students[0].first_name
-      expect(Gradezilla.fetch_student_names[0]).to eq(student_name)
-    end
-
-    it "hides student names with anonymous", priority: "2", test_id: 3253321 do
-      Gradezilla.click_student_menu_display_as('Anonymous')
-      Gradezilla.visit(@course)
-
-      # the student real name element and "Student"(aka anonymous) are different elements
-      # so test to see if the student's real name is empty
-      expect(Gradezilla.fetch_student_names[0]).to eq("")
-    end
   end
 
   context "Secondary Info" do
