@@ -42,7 +42,10 @@ class WikiPage < ActiveRecord::Base
     if self.body_changed?
       WikiPage.where(:clone_of_id => id).each do |page|
         page.body = body
-        page.title = title
+        # Syncing titles changes the page URL which has a
+        # major risk of breaking links in the courses. I
+        # am thus going to leave that manual - adr
+        # page.title = title
         page.save
       end
     end
@@ -53,7 +56,8 @@ class WikiPage < ActiveRecord::Base
     if self.clone_of_id_changed? && !self.clone_of_id.nil?
       master = WikiPage.find(self.clone_of_id)
       self.body = master.body
-      self.title = master.title
+      # see above
+      # self.title = master.title
     end
   end
 
