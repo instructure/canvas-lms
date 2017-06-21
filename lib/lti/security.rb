@@ -119,6 +119,8 @@ module Lti
       return if secure_params.blank?
       secure_params = Canvas::Security.decode_jwt(secure_params)
       secure_params[:lti_assignment_id]
+    rescue Canvas::Security::InvalidToken
+      return nil
     end
   end
 end
