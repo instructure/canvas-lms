@@ -127,7 +127,7 @@ import 'compiled/badge_counts'
           });
       }
 
-    $(".user_content.unenhanced a")
+    $('.user_content.unenhanced a,.user_content.unenhanced+div.answers a')
       .find("img.media_comment_thumbnail").each(function() {
         $(this).closest("a").addClass('instructure_inline_media_comment');
       }).end()
