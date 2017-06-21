@@ -68,7 +68,7 @@ describe PlannerOverridesController do
           wiki_page_model(course: @course)
           @page.todo_date = 1.day.from_now
           @page.save!
-          get :items_index
+          get :items_index, include: %w{concluded unfavorited}
           response_json = json_parse(response.body)
           expect(response_json.length).to eq 3
           page = response_json.detect { |i| i["plannable_id"] == @page.id }
@@ -77,7 +77,7 @@ describe PlannerOverridesController do
 
         it "should show planner notes for the user" do
           planner_note_model(course: @course)
-          get :items_index
+          get :items_index, include: %w{concluded unfavorited}
           response_json = json_parse(response.body)
           note = response_json.detect { |i| i["plannable_type"] == 'planner_note' }
           expect(response_json.length).to eq 3

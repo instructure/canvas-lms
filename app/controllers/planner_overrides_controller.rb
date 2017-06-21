@@ -80,9 +80,10 @@ class PlannerOverridesController < ApplicationController
 
   before_action :require_user
   before_action :set_date_range
-  before_action :set_pagination, only: [:items_index]
+  before_action :set_params, only: [:items_index]
 
-  attr_reader :start_date, :end_date, :page, :per_page
+  attr_reader :start_date, :end_date, :page, :per_page,
+              :include_concluded, :only_favorites
   # @API List planner items
   #
   # Retrieve the list of objects to be shown on the planner for the current user
@@ -104,12 +105,10 @@ class PlannerOverridesController < ApplicationController
   #   {
   #     "context_type": "Course",
   #     "course_id": 1,
-  #     "type": "viewing", // Whether it has been or needs to be graded, submitted, viewed (e.g. ungraded)
-  #     "ignore": "http://canvas.instructure.com/api/v1/users/self/todo/discussion_topic_8/viewing?permanent=0", // For hiding on the todo list
-  #     "ignore_permanently": "http://canvas.instructure.com/api/v1/users/self/todo/discussion_topic_8/viewing?permanent=1",
   #     "visible_in_planner": true, // Whether or not it is displayed on the student planner
   #     "planner_override": { ... planner override object ... }, // Associated PlannerOverride object if user has toggled visibility for the object on the planner
   #     "submissions": false, // The statuses of the user's submissions for this object
+  #     "plannable_id": "123",
   #     "plannable_type": "discussion_topic",
   #     "plannable": { ... discussion topic object },
   #     "html_url": "/courses/1/discussion_topics/8"
@@ -117,9 +116,6 @@ class PlannerOverridesController < ApplicationController
   #   {
   #     "context_type": "Course",
   #     "course_id": 1,
-  #     "type": "submitting",
-  #     "ignore": "http://canvas.instructure.com/api/v1/users/self/todo/assignment_1/submitting?permanent=0",
-  #     "ignore_permanently": "http://canvas.instructure.com/api/v1/users/self/todo/assignment_1/submitting?permanent=1",
   #     "visible_in_planner": true,
   #     "planner_override": {
   #         "id": 3,
@@ -140,17 +136,16 @@ class PlannerOverridesController < ApplicationController
   #       "needs_grading": false,
   #       "with_feedback": false
   #     },
+  #     "plannable_id": "456",
   #     "plannable_type": "assignment",
   #     "plannable": { ... assignment object ...  },
   #     "html_url": "http://canvas.instructure.com/courses/1/assignments/1#submit"
   #   },
   #   {
-  #     "type": "viewing",
-  #     "ignore": "http://canvas.instructure.com/api/v1/users/self/todo/planner_note_1/viewing?permanent=0",
-  #     "ignore_permanently": "http://canvas.instructure.com/api/v1/users/self/todo/planner_note_1/viewing?permanent=1",
   #     "visible_in_planner": true,
   #     "planner_override": null,
   #     "submissions": false, // false if no associated assignment exists for the plannable item
+  #     "plannable_id": "789",
   #     "plannable_type": "planner_note",
   #     "plannable": {
   #       "id": 1,
@@ -278,14 +273,14 @@ class PlannerOverridesController < ApplicationController
   def unread_items
     collections = [unread_discussion_topic_collection,
                    unread_submission_collection]
+
     BookmarkedCollection.concat(*collections)
   end
 
   def assignment_collections
     grading = @current_user.assignments_needing_grading(default_opts) if @domain_root_account.grants_right?(@current_user, :manage_grades)
     submitting = @current_user.assignments_needing_submitting(default_opts)
-    # TODO: Check moderation rights...
-    moderation = @current_user.assignments_needing_moderation(default_opts)
+    moderation = @current_user.assignments_needing_moderation(default_opts) if @current_user.courses.any? {|c| c.grants_right?(@current_user, :moderate_grades)}
     ungraded_quiz = @current_user.ungraded_quizzes_needing_submitting(default_opts)
     submitted = @current_user.submitted_assignments(default_opts)
     scopes = {submitted: submitted, ungraded_quiz: ungraded_quiz,
@@ -293,9 +288,10 @@ class PlannerOverridesController < ApplicationController
     scopes[:grading] = grading if grading
     scopes = scopes.
              each_with_object([]) do |(scope_name, scope), all_scopes|
+               next if scope.blank?
                base_model = scope_name == :ungraded_quiz ? Quizzes::Quiz : Assignment
                collection = item_collection(scope_name.to_s, scope, base_model, :id)
-               all_scopes << collection if collection
+               all_scopes << collection
              end
     scopes
   end
@@ -334,15 +330,8 @@ class PlannerOverridesController < ApplicationController
   end
 
   def item_collection(label, scope, base_model, *order_by)
-    bookmark = BookmarkedCollection::SimpleBookmarker.new(base_model, *order_by)
-    return nil unless bookmark.present?
-    [
-      label,
-      BookmarkedCollection.wrap(
-        bookmark,
-        scope
-      )
-    ]
+    bookmarker = BookmarkedCollection::SimpleBookmarker.new(base_model, *order_by)
+    [label, BookmarkedCollection.wrap(bookmarker, scope)]
   end
 
   def set_date_range
@@ -374,9 +363,12 @@ class PlannerOverridesController < ApplicationController
     end
   end
 
-  def set_pagination
+  def set_params
+    includes = (params[:include] || []) & %w{concluded unfavorited}
     @per_page = params[:per_page] || 50
     @page = params[:page] || 'first'
+    @include_concluded = includes.include? 'concluded'
+    @only_favorites = !(includes.include? 'unfavorited')
   end
 
   def require_user
@@ -396,7 +388,8 @@ class PlannerOverridesController < ApplicationController
     {
       include_ignored: true,
       include_ungraded: true,
-      include_concluded: true,
+      include_concluded: include_concluded,
+      only_favorites: only_favorites,
       include_locked: true,
       due_before: end_date,
       due_after: start_date,

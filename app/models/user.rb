@@ -1466,10 +1466,16 @@ class User < ActiveRecord::Base
         course_ids = participated_course_ids
       end
 
+      if opts[:only_favorites]
+        course_ids = course_ids & favorite_context_ids("Course")
+      end
+
       if opts[:contexts]
         course_ids = Array(opts[:contexts]).map(&:id) & course_ids
       end
-      opts = {limit: 15}.merge(opts.slice(:due_after, :due_before, :limit, :include_ungraded, :ungraded_quizzes, :include_ignored, :include_locked, :include_concluded, :scope_only))
+      opts = {limit: 15}.merge(opts.slice(:due_after, :due_before, :limit, :include_ungraded, :ungraded_quizzes, :include_ignored, :include_locked, :include_concluded, :scope_only, :only_favorites))
+
+      return Assignment.none if opts[:scope_only] && course_ids.blank?
 
       course_ids_cache_key = Digest::MD5.hexdigest(course_ids.sort.join('/'))
       Rails.cache.fetch([self, "assignments_needing_#{purpose}", course_ids_cache_key, opts].cache_key, :expires_in => expires_in) do
@@ -1559,15 +1565,15 @@ class User < ActiveRecord::Base
   end
 
   def assignments_needing_moderation(opts={})
-    assignments_needing('moderation', :instructor, 120.minutes, opts) do |assignment_scope, opts|
+    assignments_needing('moderation', :instructor, 120.minutes, opts) do |assignment_scope, options|
       scope = assignment_scope.active.
         expecting_submission.
         where(:moderated_grading => true).
         where("assignments.grades_published_at IS NULL").
         joins(:provisional_grades).distinct.preload(:context).
         need_grading_info
-      return scope if opts[:scope_only] # Also need to check the rights like below
-      scope.lazy.select{|a| a.context.grants_right?(self, :moderate_grades)}.take(opts[:limit]).to_a
+      return scope if options[:scope_only] # Also need to check the rights like below
+      scope.lazy.select{|a| a.context.grants_right?(self, :moderate_grades)}.take(options[:limit]).to_a
     end
   end
 
@@ -1601,9 +1607,27 @@ class User < ActiveRecord::Base
     end
   end
 
-  def needing_viewing(object_type, expires_in, opts={})
+  def needing_viewing(object_type, participation_type, expires_in, opts={})
     shard.activate do
-      course_ids = participated_course_ids
+      course_ids = Shackles.activate(:slave) do
+        case participation_type
+        when :student
+          participating_student_course_ids
+        when :instructor
+          participating_instructor_course_ids
+        end
+      end
+
+      if opts[:include_concluded]
+        course_ids = participated_course_ids
+      end
+
+      if opts[:only_favorites]
+        course_ids = course_ids & favorite_context_ids("Course")
+      end
+
+      return object_type.constantize.none if opts[:scope_only] && course_ids.blank?
+
       course_ids_cache_key = Digest::MD5.hexdigest(course_ids.sort.join(','))
       cache_key = [self, "#{object_type.underscore}_needing_viewing", course_ids_cache_key, opts].cache_key
       Rails.cache.fetch(cache_key, :expires_in => expires_in) do
@@ -1622,7 +1646,7 @@ class User < ActiveRecord::Base
   end
 
   def discussion_topics_needing_viewing(opts={})
-    needing_viewing('DiscussionTopic', 120.minutes, opts) do |topics_context, options|
+    needing_viewing('DiscussionTopic', :student, 120.minutes, opts) do |topics_context, options|
       topics_context = topics_context.active.published
       return topics_context if options[:scope_only]
       topics_context.to_a
@@ -1630,7 +1654,7 @@ class User < ActiveRecord::Base
   end
 
   def wiki_pages_needing_viewing(opts={})
-    needing_viewing('WikiPage', 120.minutes, opts) do |wiki_pages_context, options|
+    needing_viewing('WikiPage', :student, 120.minutes, opts) do |wiki_pages_context, options|
       return wiki_pages_context.available_to_planner.visible_to_user(self) if options[:scope_only]
       wiki_pages_context.available_to_planner.visible_to_user(self).to_a
     end

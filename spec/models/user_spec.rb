@@ -1891,6 +1891,52 @@ describe User do
           expect(@student.assignments_needing_submitting(:include_locked => true, :contexts => [@course]).count).to eq 1
         end
       end
+
+      context "include_concluded" do
+        before :once do
+          @u = User.create!
+
+          @c1 = course_with_student(:active_all => true, :user => @u).course
+          @q1 = assignment_quiz([], :course => @c1, :user => @user)
+
+          @e2 = course_with_student(:active_all => true, :user => @u)
+          @c2 = @e2.course
+          @q2 = assignment_quiz([], :course => @c2, :user => @user)
+          @e2.conclude
+        end
+
+        it "should not include assignments from concluded enrollments by default" do
+          expect(@u.assignments_needing_submitting().count).to eq 1
+        end
+
+        it "should include assignments from concluded enrollments if requested" do
+          expect(@u.assignments_needing_submitting(include_concluded: true).count).to eq 2
+          expect(@u.assignments_needing_submitting(include_concluded: true).map(&:id).sort).to eq [@q1.assignment.id, @q2.assignment.id].sort
+        end
+      end
+
+      context "only_favorites" do
+        before :once do
+          @u = User.create!
+
+          @c1 = course_with_student(:active_all => true, :user => @u).course
+          @u.favorites.create!(:context_type => "Course", :context_id => @c1)
+          @q1 = assignment_quiz([], :course => @c1, :user => @user)
+
+          @c2 = course_with_student(:active_all => true, :user => @u).course
+          @u.favorites.where(:context_type => "Course", :context_id => @c2).first.destroy
+          @q2 = assignment_quiz([], :course => @c2, :user => @user)
+        end
+
+        it "should include assignments from all courses by default" do
+          expect(@u.assignments_needing_submitting().count).to eq 2
+        end
+
+        it "should not include assignments from unfavorited courses if requested" do
+          expect(@u.assignments_needing_submitting(only_favorites: true).count).to eq 1
+          expect(@u.assignments_needing_submitting(only_favorites: true).map(&:id)).to be_include @q1.assignment.id
+        end
+      end
     end
 
     it "should not include unpublished assignments" do
@@ -2153,6 +2199,60 @@ describe User do
       expect(@student.wiki_pages_needing_viewing(opts)).to eq []
       expect(student2.wiki_pages_needing_viewing(opts)).to eq [@course_page]
     end
+
+    context "include_concluded" do
+      before :once do
+        @u = User.create!
+
+        @c1 = course_with_student(:active_all => true, :user => @u).course
+        @wp1 = wiki_page_model(:course => @c1)
+        @wp1.todo_date = Time.zone.now
+        @wp1.save!
+
+        @e2 = course_with_student(:active_all => true, :user => @u)
+        @c2 = @e2.course
+        @wp2 = wiki_page_model(:course => @c2)
+        @wp2.todo_date = Time.zone.now
+        @wp2.save!
+        @e2.conclude
+      end
+
+      it "should not include pages from concluded enrollments by default" do
+        expect(@u.wiki_pages_needing_viewing(opts).count).to eq 1
+      end
+
+      it "should include pages from concluded enrollments if requested" do
+        expect(@u.wiki_pages_needing_viewing(opts.merge(include_concluded: true)).count).to eq 2
+        expect(@u.wiki_pages_needing_viewing(opts.merge(include_concluded: true)).map(&:id).sort).to eq [@wp1.id, @wp2.id].sort
+      end
+    end
+
+    context "only_favorites" do
+      before :once do
+        @u = User.create!
+
+        @c1 = course_with_student(:active_all => true, :user => @u).course
+        @u.favorites.create!(:context_type => "Course", :context_id => @c1)
+        @wp1 = wiki_page_model(:course => @c1)
+        @wp1.todo_date = Time.zone.now
+        @wp1.save!
+
+        @c2 = course_with_student(:active_all => true, :user => @u).course
+        @u.favorites.where(:context_type => "Course", :context_id => @c2).first.destroy
+        @wp2 = wiki_page_model(:course => @c2)
+        @wp2.todo_date = Time.zone.now
+        @wp2.save!
+      end
+
+      it "should include pages from all courses by default" do
+        expect(@u.wiki_pages_needing_viewing(opts).count).to eq 2
+      end
+
+      it "should not include pages from unfavorited courses if requested" do
+        expect(@u.wiki_pages_needing_viewing(opts.merge(only_favorites: true)).count).to eq 1
+        expect(@u.wiki_pages_needing_viewing(opts.merge(only_favorites: true)).map(&:id)).to be_include @wp1.id
+      end
+    end
   end
 
   describe "discussion_topics_needing_viewing" do
@@ -2245,6 +2345,64 @@ describe User do
           @group_topic.todo_date = 1.day.from_now
           @group_topic.save!
           expect(@student.discussion_topics_needing_viewing(opts).sort_by(&:id)).to eq [@topic, @group_topic, @a]
+        end
+      end
+
+      context "include_concluded" do
+        before :once do
+          @u = User.create!
+
+          @c1 = course_with_student(:active_all => true, :user => @u).course
+          @dt1 = discussion_topic_model(:context => @c1)
+          @dt1.todo_date = Time.zone.now
+          @dt1.save!
+          @dt1.publish!
+
+          @e2 = course_with_student(:active_all => true, :user => @u)
+          @c2 = @e2.course
+          @dt2 = discussion_topic_model(:context => @c2)
+          @dt2.todo_date = Time.zone.now
+          @dt2.save!
+          @dt2.publish!
+          @e2.conclude
+        end
+
+        it "should not include topics from concluded enrollments by default" do
+          expect(@u.discussion_topics_needing_viewing(opts).count).to eq 1
+        end
+
+        it "should include topics from concluded enrollments if requested" do
+          expect(@u.discussion_topics_needing_viewing(opts.merge(include_concluded: true)).count).to eq 2
+          expect(@u.discussion_topics_needing_viewing(opts.merge(include_concluded: true)).map(&:id).sort).to eq [@dt1.id, @dt2.id].sort
+        end
+      end
+
+      context "only_favorites" do
+        before :once do
+          @u = User.create!
+
+          @c1 = course_with_student(:active_all => true, :user => @u).course
+          @u.favorites.create!(:context_type => "Course", :context_id => @c1)
+          @dt1 = discussion_topic_model(:context => @c1)
+          @dt1.todo_date = Time.zone.now
+          @dt1.save!
+          @dt1.publish!
+
+          @c2 = course_with_student(:active_all => true, :user => @u).course
+          @u.favorites.where(:context_type => "Course", :context_id => @c2).first.destroy
+          @dt2 = discussion_topic_model(:context => @c2)
+          @dt2.todo_date = Time.zone.now
+          @dt2.save!
+          @dt2.publish!
+        end
+
+        it "should include topics from all courses by default" do
+          expect(@u.discussion_topics_needing_viewing(opts).count).to eq 2
+        end
+
+        it "should not include topics from unfavorited courses if requested" do
+          expect(@u.discussion_topics_needing_viewing(opts.merge(only_favorites: true)).count).to eq 1
+          expect(@u.discussion_topics_needing_viewing(opts.merge(only_favorites: true)).map(&:id)).to be_include @dt1.id
         end
       end
     end
