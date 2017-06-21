@@ -42,8 +42,9 @@ module BookmarkedCollection
     end
 
     TYPE_MAP = {
-      string: String,
-      integer: Integer
+      string: -> (val) { val.is_a?(String) },
+      integer: -> (val) { val.is_a?(Integer) },
+      datetime: -> (val) { val.is_a?(String) && !!(DateTime.parse(val) rescue false) }
     }
 
     def validate(bookmark)
@@ -51,7 +52,8 @@ module BookmarkedCollection
       bookmark.size == @columns.size &&
       @columns.each.with_index.all? do |col, i|
         type = TYPE_MAP[@model.columns_hash[col].type]
-        type && bookmark[i].is_a?(type)
+        nullable = @model.columns_hash[col].null
+        type && (nullable && bookmark[i].nil? || type.(bookmark[i]))
       end
     end
 
@@ -63,20 +65,46 @@ module BookmarkedCollection
     end
 
     def order_by
-      @order_by ||= @columns.map { |col| column_comparand(col) }.join(', ')
+      @order_by ||= @columns.map { |col| column_order(col) }.join(', ')
     end
 
-    def column_comparand(col_name, placeholder = nil)
+    def column_order(col_name)
+      order = column_comparand(col_name)
+      if @model.columns_hash[col_name].null
+        order = "#{column_comparand(col_name, '=')} IS NULL, #{order}"
+      end
+      order
+    end
+
+    def column_comparand(col_name, comparator = '>', placeholder = nil)
       col = @model.columns_hash[col_name]
       col_name = placeholder || "#{@model.table_name}.#{col_name}"
-      if col.type == :string
+      if col.type == :string && comparator != "="
         col_name = BookmarkedCollection.best_unicode_collation_key(col_name)
       end
       col_name
     end
 
-    def column_comparison(column, comparator = ">")
-      "#{column_comparand(column)} #{comparator} #{column_comparand(column, '?')}"
+    def column_comparison(column, comparator, value)
+      # comparator is only ever '>', '>=', or '='. never '<' or '<='
+      if value.nil? && comparator == ">"
+        # sorting by a nullable column puts nulls last, so for our sort order
+        # 'column > NULL' is universally false
+        ["0=1"]
+      elsif value.nil?
+        # likewise only NULL values in column satisfy 'column = NULL' and
+        # 'column >= NULL'
+        ["#{column_comparand(column, '=')} IS NULL"]
+      else
+        sql = "#{column_comparand(column, comparator)} #{comparator} #{column_comparand(column, comparator, '?')}"
+        if @model.columns_hash[column].null && comparator != '='
+          # our sort order wants "NULL > ?" to be universally true for non-NULL
+          # values (we already handle NULL values above). but it is false in
+          # SQL, so we need to include "column IS NULL" with > or >=
+          sql = "(#{sql} OR #{column_comparand(column, '=')} IS NULL)"
+        end
+        [sql, value]
+      end
     end
 
     # Generate a sql comparison like so:
@@ -90,41 +118,32 @@ module BookmarkedCollection
     # Technically there's an extra check in the actual result (for index
     # happiness), but it's logically equivalent to the example above
     def comparison(bookmark, include_bookmark)
-      sql = comparison_sql % {last_comparator: (include_bookmark ? ">=" : ">")}
-      [sql, *comparison_args(bookmark)]
-    end
-
-    # DRY alert: needs to match placeholder order (see comparison_sql)
-    def comparison_args(bookmark)
-      values = bookmark.dup
+      top_clauses = []
       args = []
       visited = []
-      while values.present?
-        visited.push values.shift
-        args.concat visited
-      end
-      args << bookmark.first # for index happiness
-    end
-
-    # DRY alert: needs to match argument order (see comparison_args)
-    def comparison_sql
-      @comparison_sql ||= begin
-        parts = []
-        visited = []
-        columns = @columns.dup
-        comparator = ">"
-        while columns.present?
-          col = columns.shift
-          comparator = "%{last_comparator}" if columns.empty?
-          part = ""
-          visited.each{ |v| part << "#{@model.table_name}.#{v} = ? AND " }
-          part << column_comparison(col, comparator)
-          parts << part
-          visited << col
+      pairs = @columns.zip(bookmark)
+      comparator = ">"
+      while pairs.present?
+        col, val = pairs.shift
+        comparator = ">=" if pairs.empty? && include_bookmark
+        clauses = []
+        visited.each do |c,v|
+          clause, *clause_args = column_comparison(c, "=", v)
+          clauses << clause
+          args.concat(clause_args)
         end
-        "(" << parts.join(" OR ") << ") AND " <<
-          column_comparison(@columns.first, ">=") # for index happiness
+        clause, *clause_args = column_comparison(col, comparator, val)
+        clauses << clause
+        top_clauses << clauses.join(" AND ")
+        args.concat(clause_args)
+        visited << [col, val]
       end
+      sql = "(" << top_clauses.join(" OR ") << ")"
+      # one additional clause for index happiness
+      index_sql, *index_args = column_comparison(@columns.first, ">=", bookmark.first)
+      sql = [sql, index_sql].join(" AND ")
+      args.concat(index_args)
+      return [sql, *args]
     end
   end
 end

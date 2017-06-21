@@ -24,6 +24,7 @@ ActiveRecord::Schema.define(version: 1) do
   create_table :examples, force: true do |t|
     t.string :state
     t.string :name
+    t.datetime :date, null: true
   end
 
   create_table :users, force: true do |t|
