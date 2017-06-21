@@ -82,7 +82,7 @@ describe 'quizzes question creation' do
       replace_content(answers[1].find_element(:css, '.select_answer input'), 'b')
 
       # save the question
-      submit_form(question)
+      driver.execute_script("$('.question_form:visible button[type=\"submit\"]').click();")
       wait_for_ajax_requests
 
       # check to see if the questions displays correctly

@@ -183,7 +183,7 @@ describe 'quizzes question creation' do
       replace_content(answers[2].find_element(:css, '.select_answer input'), 'blue')
       replace_content(answers[3].find_element(:css, '.select_answer input'), 'purple')
 
-      submit_form(question)
+      driver.execute_script("$('.question_form:visible button[type=\"submit\"]').click();")
       wait_for_ajax_requests
 
       driver.execute_script("$('#show_question_details').click();")
