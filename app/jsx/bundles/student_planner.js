@@ -24,7 +24,7 @@ const stickyElement = document.getElementById('dashboard_header_container');
 const element = document.getElementById('dashboard-planner');
 const headerElement = document.getElementById('dashboard-planner-header');
 
-const courses = window.ENV.DASHBOARD_COURSES.map(dc => ({
+const courses = window.ENV.STUDENT_PLANNER_COURSES.map(dc => ({
   ...dc,
   color: window.ENV.PREFERENCES.custom_colors[dc.assetString]
 }));
