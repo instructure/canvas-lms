@@ -104,7 +104,7 @@ describe "admin settings tab" do
   end
 
   def click_submit
-    f("#account_settings button[type=submit]").click
+    move_to_click("#account_settings button[type=submit]")
     wait_for_ajax_requests
   end
 
@@ -445,9 +445,8 @@ describe "admin settings tab" do
       replace_content fj('#custom_help_link_settings input[name$="[text]"]:visible'), 'text'
       replace_content fj('#custom_help_link_settings textarea[name$="[subtext]"]:visible'), 'subtext'
       replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), 'https://url.example.com'
-      f('#custom_help_link_settings button[type="submit"]').click
+      move_to_click('#custom_help_link_settings button[type="submit"]')
       click_submit
-      wait_for_ajax_requests
       cl = Account.default.help_links.detect do |hl|
         hl_indifferent = HashWithIndifferentAccess.new(hl)
         hl_indifferent['url'] == 'https://url.example.com'
