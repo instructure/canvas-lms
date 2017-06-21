@@ -181,6 +181,17 @@ describe "master courses sidebar" do
         expect(bcs_content).to include_text("Send Notification")
         expect(bcs_content).to contain_css('.bcs__migration-sync__button')
       end
+
+      it "shows sync options in modal", priority: "2", test_id: 3186721 do
+        open_blueprint_sidebar
+        unsynced_changes_link.click
+        bcs_content = f('.bcs__content')
+        expect(bcs_content).to include_text("Unsynced Changes")
+        expect(bcs_content).to contain_css('.bcs__row-right-content')
+        expect(bcs_content).to include_text("Include Course Settings")
+        expect(bcs_content).to include_text("Send Notification")
+        expect(bcs_content).to contain_css('.bcs__migration-sync__button')
+      end
     end
 
 
