@@ -593,6 +593,17 @@ babel-plugin-check-es2015-constants@^6.22.0:
   dependencies:
     babel-runtime "^6.22.0"
 
+babel-plugin-inline-react-svg@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-inline-react-svg/-/babel-plugin-inline-react-svg-0.4.0.tgz#940f77be66324f2c75a0fb64f287f459c40602a7"
+  dependencies:
+    babel-template "^6.15.0"
+    babel-traverse "^6.15.0"
+    babylon "^6.10.0"
+    lodash.isplainobject "^4.0.6"
+    resolve-from "^2.0.0"
+    svgo "^0.7.0"
+
 babel-plugin-syntax-async-functions@^6.8.0:
   version "6.13.0"
   resolved "https://registry.yarnpkg.com/babel-plugin-syntax-async-functions/-/babel-plugin-syntax-async-functions-6.13.0.tgz#cad9cad1191b5ad634bf30ae0872391e0647be95"
@@ -1034,7 +1045,7 @@ babel-runtime@^6.18.0, babel-runtime@^6.22.0:
     core-js "^2.4.0"
     regenerator-runtime "^0.10.0"
 
-babel-template@^6.24.1:
+babel-template@^6.15.0, babel-template@^6.24.1:
   version "6.24.1"
   resolved "https://registry.yarnpkg.com/babel-template/-/babel-template-6.24.1.tgz#04ae514f1f93b3a2537f2a0f60a5a45fb8308333"
   dependencies:
@@ -1044,7 +1055,7 @@ babel-template@^6.24.1:
     babylon "^6.11.0"
     lodash "^4.2.0"
 
-babel-traverse@^6.0.0, babel-traverse@^6.23.1, babel-traverse@^6.24.1:
+babel-traverse@^6.0.0, babel-traverse@^6.15.0, babel-traverse@^6.23.1, babel-traverse@^6.24.1:
   version "6.24.1"
   resolved "https://registry.yarnpkg.com/babel-traverse/-/babel-traverse-6.24.1.tgz#ab36673fd356f9a0948659e7b338d5feadb31695"
   dependencies:
@@ -1067,7 +1078,7 @@ babel-types@^6.19.0, babel-types@^6.23.0, babel-types@^6.24.1:
     lodash "^4.2.0"
     to-fast-properties "^1.0.1"
 
-babylon@^6.0.0, babylon@^6.11.0, babylon@^6.15.0, babylon@^6.17.0:
+babylon@^6.0.0, babylon@^6.10.0, babylon@^6.11.0, babylon@^6.15.0, babylon@^6.17.0:
   version "6.17.2"
   resolved "https://registry.yarnpkg.com/babylon/-/babylon-6.17.2.tgz#201d25ef5f892c41bae49488b08db0dd476e9f5c"
 
@@ -1194,11 +1205,7 @@ boom@2.x.x:
   dependencies:
     hoek "2.x.x"
 
-bowser@1.7.0:
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/bowser/-/bowser-1.7.0.tgz#169de4018711f994242bff9a8009e77a1f35e003"
-
-bowser@^1.6.0:
+bowser@1.7.0, bowser@^1.6.0:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/bowser/-/bowser-1.7.0.tgz#169de4018711f994242bff9a8009e77a1f35e003"
 
@@ -1400,11 +1407,12 @@ caniuse-lite@^1.0.30000670:
   version "1.0.30000671"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000671.tgz#c206c2f1a1feb34de46064407c4356818389bf1e"
 
-canvas-planner@0.0.6:
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/canvas-planner/-/canvas-planner-0.0.6.tgz#be631519021451fc2ba0164e34098f6c0a4f98e2"
+canvas-planner@0.0.7:
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/canvas-planner/-/canvas-planner-0.0.7.tgz#d00b1bfbcdf33c5ebd94b9349926245e2890e518"
   dependencies:
     axios "^0.16.0"
+    babel-plugin-inline-react-svg "^0.4.0"
     classnames "^2.2.5"
     esrever "^0.2.0"
     format-message "^5.1.2"
@@ -1412,7 +1420,9 @@ canvas-planner@0.0.6:
     format-message-print "^5.1.2"
     instructure-icons "^3.0.1"
     instructure-ui "^2.3.0"
+    keycode "^2.1.9"
     moment-timezone "^0.5.13"
+    parse-link-header "^1.0.1"
     prop-types "^15.5.8"
     react-moment-proptypes "^1.4.0"
     react-redux "^5.0.3"
@@ -1422,6 +1432,8 @@ canvas-planner@0.0.6:
     redux-logger "^3.0.1"
     redux-promise "^0.5.3"
     redux-thunk "^2.2.0"
+    reselect "^3.0.1"
+    velocity-animate "^1.5.0"
 
 canvas-rce@2.1.0:
   version "2.1.0"
@@ -4092,29 +4104,11 @@ instructure-icons@3.0.1, instructure-icons@^3.0.1:
     prop-types "15.5.8"
     shortid "2.2.8"
 
-instructure-ui@2.4.0:
+instructure-ui@2.4.0, instructure-ui@^2.3.0:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/instructure-ui/-/instructure-ui-2.4.0.tgz#87b25d1a8bdd27d6884a263176b3d47585c6bcf6"
   dependencies:
     bowser "1.7.0"
-    classnames "2.2.5"
-    decimal.js "7.2.1"
-    deep-equal "1.0.1"
-    glamor "2.20.24"
-    invariant "2.2.2"
-    keycode "2.1.8"
-    moment-timezone "0.5.13"
-    numeral "2.0.6"
-    object.omit "2.0.1"
-    object.pick "1.2.0"
-    prop-types "15.5.8"
-    shortid "2.2.8"
-    tinycolor2 "1.4.1"
-
-instructure-ui@^2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/instructure-ui/-/instructure-ui-2.3.0.tgz#bb08d3cb1b8d77b374b649f95ff652cba8a7e9d5"
-  dependencies:
     classnames "2.2.5"
     decimal.js "7.2.1"
     deep-equal "1.0.1"
@@ -4687,6 +4681,10 @@ keycode@2.1.8:
   version "2.1.8"
   resolved "https://registry.yarnpkg.com/keycode/-/keycode-2.1.8.tgz#94d2b7098215eff0e8f9a8931d5a59076c4532fb"
 
+keycode@^2.1.9:
+  version "2.1.9"
+  resolved "https://registry.yarnpkg.com/keycode/-/keycode-2.1.9.tgz#964a23c54e4889405b4861a5c9f0480d45141dfa"
+
 kind-of@^3.0.2:
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-3.2.2.tgz#31ea21a734bab9bbb0f32466d893aea51e4a3c64"
@@ -4983,7 +4981,7 @@ lodash.isplainobject@^3.2.0:
     lodash.isarguments "^3.0.0"
     lodash.keysin "^3.0.0"
 
-lodash.isplainobject@^4.0.4:
+lodash.isplainobject@^4.0.4, lodash.isplainobject@^4.0.6:
   version "4.0.6"
   resolved "https://registry.yarnpkg.com/lodash.isplainobject/-/lodash.isplainobject-4.0.6.tgz#7c526a52d89b45c45cc690b88163be0497f550cb"
 
@@ -5889,6 +5887,12 @@ parse-json@^2.2.0:
   dependencies:
     error-ex "^1.2.0"
 
+parse-link-header@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/parse-link-header/-/parse-link-header-1.0.1.tgz#bedfe0d2118aeb84be75e7b025419ec8a61140a7"
+  dependencies:
+    xtend "~4.0.1"
+
 parse-passwd@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/parse-passwd/-/parse-passwd-1.0.0.tgz#6d5b934a456993b23d37f40a382d6f1666a8e5c6"
@@ -6418,7 +6422,7 @@ prop-types@15.5.9, prop-types@^15.5.8:
     fbjs "^0.8.9"
     loose-envify "^1.3.1"
 
-prop-types@^15.5.10:
+prop-types@^15.0.0, prop-types@^15.5.10:
   version "15.5.10"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.5.10.tgz#2797dfc3126182e3a95e3dfbb2e893ddd7456154"
   dependencies:
@@ -6867,7 +6871,7 @@ redux-thunk@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/redux-thunk/-/redux-thunk-2.2.0.tgz#e615a16e16b47a19a515766133d1e3e99b7852e5"
 
-redux@3.5.2, redux@~3.5.2:
+redux@3.5.2, redux@^3.2.0, redux@~3.5.2:
   version "3.5.2"
   resolved "https://registry.yarnpkg.com/redux/-/redux-3.5.2.tgz#4533745e970b647ec26066a83aa30e9e26faf843"
   dependencies:
@@ -6876,7 +6880,7 @@ redux@3.5.2, redux@~3.5.2:
     loose-envify "^1.1.0"
     symbol-observable "^0.2.3"
 
-redux@^3.2.0, redux@^3.6.0:
+redux@^3.6.0:
   version "3.6.0"
   resolved "https://registry.yarnpkg.com/redux/-/redux-3.6.0.tgz#887c2b3d0b9bd86eca2be70571c27654c19e188d"
   dependencies:
@@ -7062,6 +7066,10 @@ requirejs@~2.2.0:
 requires-port@1.x.x:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/requires-port/-/requires-port-1.0.0.tgz#925d2601d39ac485e091cf0da5c6e694dc3dcaff"
+
+reselect@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/reselect/-/reselect-3.0.1.tgz#efdaa98ea7451324d092b2b2163a6a1d7a9a2147"
 
 resolve-dir@^0.1.0:
   version "0.1.1"
@@ -7850,7 +7858,7 @@ timezone@1.0.6:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/timezone/-/timezone-1.0.6.tgz#d3b50bc35c63a09ed8876a8cc3642628685ccc33"
 
-tinycolor2@1.4.1, tinycolor2@^1.4.1:
+tinycolor2@1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/tinycolor2/-/tinycolor2-1.4.1.tgz#f4fad333447bc0b07d4dc8e9209d8f39a8ac77e8"
 
@@ -8096,6 +8104,10 @@ validate-npm-package-license@^3.0.1:
   dependencies:
     spdx-correct "~1.0.0"
     spdx-expression-parse "~1.0.0"
+
+velocity-animate@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/velocity-animate/-/velocity-animate-1.5.0.tgz#fc8771d8dfe1136ff02a707e10fbb0957c4b030f"
 
 vendors@^1.0.0:
   version "1.0.1"
