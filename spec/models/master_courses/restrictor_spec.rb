@@ -188,4 +188,19 @@ describe MasterCourses::Restrictor do
     expect(item.save).to be_falsey
     expect(item.errors[:title].first.to_s).to include("locked by Master Course")
   end
+
+  it "should prevent updating assignment points via rubric" do
+    original_assmt = @copy_from.assignments.create!
+    assmt_tag = @template.create_content_tag_for!(original_assmt, {:restrictions => {:content => true, :points => true}})
+
+    assmt_copy = @copy_to.assignments.create!(:points_possible => 1)
+    assmt_copy.migration_id = assmt_tag.migration_id
+    assmt_copy.save!
+    assmt_copy.child_content_restrictions = nil
+
+    rubric = Rubric.create!(:context => @copy_to, :points_possible => 3)
+    rubric.associate_with(assmt_copy, @copy_to, :purpose => 'grading', :use_for_grading => true)
+
+    expect(assmt_copy.reload.points_possible).to eq 1 # don't change the points via the rubric
+  end
 end
