@@ -20,11 +20,11 @@ define([
   'react',
   'react-dom',
   'react-addons-test-utils',
-  'jquery',
   'underscore',
   'compiled/api/gradingPeriodSetsApi',
-  'jsx/grading/NewGradingPeriodSetForm'
-], (React, ReactDOM, {Simulate}, $, _, setsApi, NewSetForm) => {
+  'jsx/grading/NewGradingPeriodSetForm',
+  'jsx/shared/FlashAlert'
+], (React, ReactDOM, {Simulate}, _, setsApi, NewSetForm, FlashAlert) => {
   const wrapper = document.getElementById('fixtures');
 
   const assertDisabled = function(component) {
@@ -76,6 +76,7 @@ define([
     },
 
     teardown() {
+      FlashAlert.destroyContainer();
       ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
@@ -162,5 +163,64 @@ define([
     Simulate.change(form.refs.titleInput, { target: { value: ':D' } });
     Simulate.click(ReactDOM.findDOMNode(form.refs.createButton));
     assertEnabled(form.refs.createButton);
+  });
+
+  test('showFlashAlert is not called when title is present', function () {
+    const form = this.renderComponent();
+    form.setState({ title: 'foo' });
+    const showFlashAlertStub = this.stub(FlashAlert, 'showFlashAlert');
+    form.isTitlePresent();
+    strictEqual(showFlashAlertStub.callCount, 0);
+  });
+
+  test('showFlashAlert called when title is not present', function () {
+    const form = this.renderComponent();
+    const showFlashAlertStub = this.stub(FlashAlert, 'showFlashAlert');
+    form.isTitlePresent();
+    strictEqual(showFlashAlertStub.callCount, 1);
+  });
+
+  test('showFlashAlert called with message when title is not present', function () {
+    const form = this.renderComponent();
+    const showFlashAlertStub = this.stub(FlashAlert, 'showFlashAlert');
+    form.isTitlePresent();
+    deepEqual(showFlashAlertStub.firstCall.args[0], {
+      type: 'error',
+      message: 'A name for this set is required'
+    });
+  });
+
+  test('submitSucceeded calls showFlashAlert once', function () {
+    const form = this.renderComponent();
+    const showFlashAlertStub = this.stub(FlashAlert, 'showFlashAlert');
+    form.submitSucceeded({});
+    deepEqual(showFlashAlertStub.callCount, 1);
+  });
+
+  test('submitSucceeded calls showFlashAlert with message', function () {
+    const form = this.renderComponent();
+    const showFlashAlertStub = this.stub(FlashAlert, 'showFlashAlert');
+    form.submitSucceeded();
+    deepEqual(showFlashAlertStub.firstCall.args[0], {
+      type: 'success',
+      message: 'Successfully created a set'
+    });
+  });
+
+  test('submitFailed calls showFlashAlert once', function () {
+    const form = this.renderComponent();
+    const showFlashAlertStub = this.stub(FlashAlert, 'showFlashAlert');
+    form.submitFailed();
+    deepEqual(showFlashAlertStub.callCount, 1);
+  });
+
+  test('submitFailed calls showFlashAlert with message', function () {
+    const form = this.renderComponent();
+    const showFlashAlertStub = this.stub(FlashAlert, 'showFlashAlert');
+    form.submitFailed();
+    deepEqual(showFlashAlertStub.firstCall.args[0], {
+      type: 'error',
+      message: 'There was a problem submitting your set'
+    });
   });
 });
