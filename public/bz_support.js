@@ -393,7 +393,7 @@ function BZ_GoToMasterPage(master_page_id) {
     req.open("GET", "/api/v1/courses/"+BZ_MasterBankCourseId+"/pages/" + master_page_id, true);
     req.onload = function(e) {
       if(req.status == 200) {
-        var obj = JSON.parse(req.responseText);
+        var obj = JSON.parse(req.responseText.substring(9));
 
         location.href = "/courses/" + BZ_MasterBankCourseId + "/pages/" + obj.url;
       } else {
