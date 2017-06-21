@@ -34,7 +34,7 @@ describe "master courses - module locking" do
     @page_tag = @template.create_content_tag_for!(@page, :restrictions => {:all => true})
 
     @topic = @course.discussion_topics.create!(:title => "topic blah", :message => "bloo")
-    @topic_tag = @template.create_content_tag_for!(@topic)
+    # note the lack of a content tag
 
     @mod = @course.context_modules.create!(:name => "modle")
     @assmt_mod_tag = @mod.add_item(:id => @assmt.id, :type => "assignment")
@@ -51,6 +51,6 @@ describe "master courses - module locking" do
 
     expect(f("#context_module_item_#{@assmt_mod_tag.id} .lock-icon")).to contain_css('.icon-blueprint')
     expect(f("#context_module_item_#{@page_mod_tag.id} .lock-icon")).to contain_css('.icon-blueprint-lock')
-    expect(f("#context_module_item_#{@topic_mod_tag.id} .lock-icon")).to contain_css('.icon-blueprint')
+    expect(f("#context_module_item_#{@topic_mod_tag.id} .lock-icon")).to contain_css('.icon-blueprint') # should still have icon even without tag
   end
 end
