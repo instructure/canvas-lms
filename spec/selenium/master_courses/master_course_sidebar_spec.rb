@@ -32,6 +32,18 @@ shared_context "blueprint sidebar context" do
     f('.blueprint__root .bcs__wrapper .bcs__trigger')
   end
 
+  def sync_modal_send_notification_checkbox
+    fj("span:contains('Send Notification')", f('.bcs__modal-content-wrapper'))
+  end
+
+  def sync_modal_add_message_checkbox
+    fj("span:contains('Add a Message')", f('.bcs__modal-content-wrapper'))
+  end
+
+  def sync_modal_message_text_box
+    f("textarea", f('.bcs__modal-content-wrapper'))
+  end
+
   def send_notification_checkbox
     f('.bcs__history-settings')
       .find_element(:xpath, "//span[text()[contains(., 'Send Notification')]]")
@@ -50,6 +62,10 @@ shared_context "blueprint sidebar context" do
   def character_count
     f('.bcs__history-notification__add-message')
       .find_element(:xpath, "span")
+  end
+
+  def modal_sync_button
+    f('#unsynced_changes_modal_sync .bcs__migration-sync__button')
   end
 
   def open_blueprint_sidebar
@@ -237,6 +253,17 @@ describe "master courses sidebar" do
         expect(bcs_content).not_to include_text("Add a Message")
         expect(bcs_content).not_to contain_css('.bcs__history-notification__message')
       end
+    end
+
+    it "closes modal after sync", priority: "2", test_id: 3186727 do
+      open_blueprint_sidebar
+      unsynced_changes_link.click
+      sync_modal_send_notification_checkbox.click
+      sync_modal_add_message_checkbox.click
+      sync_modal_message_text_box.send_keys("sync that!")
+      modal_sync_button.click
+      run_jobs
+      expect(f('.bcs__content')).not_to contain_css('.bcs__content button#mcUnsyncedChangesBtn')
     end
   end
 end
