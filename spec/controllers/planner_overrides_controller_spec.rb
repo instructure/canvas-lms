@@ -68,7 +68,7 @@ describe PlannerOverridesController do
           wiki_page_model(course: @course)
           @page.todo_date = 1.day.from_now
           @page.save!
-          get :items_index, include: %w{concluded unfavorited}
+          get :items_index
           response_json = json_parse(response.body)
           expect(response_json.length).to eq 3
           page = response_json.detect { |i| i["plannable_id"] == @page.id }
@@ -77,11 +77,71 @@ describe PlannerOverridesController do
 
         it "should show planner notes for the user" do
           planner_note_model(course: @course)
-          get :items_index, include: %w{concluded unfavorited}
+          get :items_index
           response_json = json_parse(response.body)
           note = response_json.detect { |i| i["plannable_type"] == 'planner_note' }
           expect(response_json.length).to eq 3
           expect(note["plannable"]["title"]).to eq @planner_note.title
+        end
+
+        context "include_concluded" do
+          before :once do
+            @u = User.create!
+
+            @c1 = course_with_student(:active_all => true, :user => @u).course
+            @a1 = course_assignment
+
+            @e2 = course_with_student(:active_all => true, :user => @u)
+            @c2 = @e2.course
+            @a2 = course_assignment
+            @e2.conclude
+          end
+
+          before :each do
+            user_session(@u)
+          end
+
+          it "should not include objects from concluded courses by default" do
+            get :items_index
+            response_json = json_parse(response.body)
+            expect(response_json.map { |i| i["plannable"]["id"] }).not_to be_include(@a2.id)
+          end
+
+          it "should include objects from concluded courses if specified" do
+            get :items_index, include: %w{concluded}
+            response_json = json_parse(response.body)
+            expect(response_json.map { |i| i["plannable"]["id"] }).to be_include(@a2.id)
+          end
+        end
+
+        context "only_favorites" do
+          before :once do
+            @u = User.create!
+
+            @c1 = course_with_student(:active_all => true, :user => @u).course
+            @u.favorites.create!(:context_type => "Course", :context_id => @c1)
+            @a1 = course_assignment
+
+            @c2 = course_with_student(:active_all => true, :user => @u).course
+            @u.favorites.where(:context_type => "Course", :context_id => @c2).first.destroy
+            @a2 = course_assignment
+          end
+
+          before :each do
+            user_session(@u)
+          end
+
+          it "should include all course data by default" do
+            get :items_index
+            response_json = json_parse(response.body)
+            expect(response_json.map { |i| i["plannable"]["id"] }).to be_include(@a2.id)
+          end
+
+          it "should only return data from favorite courses if specified" do
+            get :items_index, include: %w{only_favorites}
+            response_json = json_parse(response.body)
+            expect(response_json.map { |i| i["plannable"]["id"] }).not_to be_include(@a2.id)
+          end
         end
 
         context "new activity filter" do

@@ -364,11 +364,11 @@ class PlannerOverridesController < ApplicationController
   end
 
   def set_params
-    includes = (params[:include] || []) & %w{concluded unfavorited}
+    includes = Array.wrap(params[:include]) & %w{concluded only_favorites}
     @per_page = params[:per_page] || 50
     @page = params[:page] || 'first'
     @include_concluded = includes.include? 'concluded'
-    @only_favorites = !(includes.include? 'unfavorited')
+    @only_favorites = includes.include? 'only_favorites'
   end
 
   def require_user
