@@ -114,6 +114,9 @@ class Gradezilla
       fj("[title='#{group_name}'] .Gradebook__ColumnHeaderAction")
     end
 
+    def total_header_options_menu_item_element(menu_item)
+      fj("[role=menuitem]:contains('#{menu_item}')")
+    end
     # ---------------------END NEW-----------------------
 
     def menu_container(container_id)
@@ -691,6 +694,32 @@ class Gradezilla
       elsif sort_type == 'Grade - Low to High'
         student_header_submenu_item_element('Grade - Low to High').click
       end
+    end
+
+    def click_total_header_sort_by(sort_type)
+      select_total_column_option
+      student_header_menu_main_element('Sort by').click
+
+      if sort_type == 'Grade - High to Low'
+        student_header_submenu_item_element('Grade - High to Low').click
+      elsif sort_type == 'Grade - Low to High'
+        student_header_submenu_item_element('Grade - Low to High').click
+      end
+    end
+
+    def click_total_header_menu_option(main_menu)
+      select_total_column_option
+      if main_menu == "Move to Front"
+        total_header_options_menu_item_element('Move to Front').click
+      elsif main_menu == "Move to End"
+        total_header_options_menu_item_element('Move to End').click
+      elsif main_menu == "Display as Points"
+        total_header_options_menu_item_element('Display as Points').click
+      end
+    end
+
+    def gradebook_slick_header_columns
+      ff(".slick-header-column").map(&:text)
     end
     # ----------------------END NEW----------------------------
 
