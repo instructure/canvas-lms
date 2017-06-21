@@ -255,6 +255,24 @@ module Lti
     end
 
     describe "#variable expansions" do
+      it 'has substitution for vnd.Canvas.OriginalityReport.url' do
+        exp_hash = {test: '$vnd.Canvas.OriginalityReport.url'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq 'api/lti/assignments/{assignment_id}/submissions/{submission_id}/originality_report'
+      end
+
+      it 'has substitution for vnd.Canvas.submission.url' do
+        exp_hash = {test: '$vnd.Canvas.submission.url'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq 'api/lti/assignments/{assignment_id}/submissions/{submission_id}'
+      end
+
+      it 'has substitution for vnd.Canvas.submission.history.url' do
+        exp_hash = {test: '$vnd.Canvas.submission.history.url'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq 'api/lti/assignments/{assignment_id}/submissions/{submission_id}/history'
+      end
+
       it 'has substitution for Message.documentTarget' do
         exp_hash = {test: '$Message.documentTarget'}
         variable_expander.expand_variables!(exp_hash)

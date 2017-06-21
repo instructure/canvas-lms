@@ -893,6 +893,48 @@ module Lti
                        CONTROLLER_GUARD,
                        -> { @tool && @tool.is_a?(Lti::ToolProxy) }
 
+    # The originality report LTI2 service endpoint
+    # @launch_parameter vnd_canvas_originality_report_url
+    # @example
+    #   ```
+    #   api/lti/assignments/{assignment_id}/submissions/{submission_id}/originality_report
+    #   ```
+    register_expansion 'vnd.Canvas.OriginalityReport.url', [],
+                        -> do
+                          OriginalityReportsApiController::SERVICE_DEFINITIONS.find do |s|
+                            s[:id] == 'vnd.Canvas.OriginalityReport'
+                          end[:endpoint]
+                        end,
+                        default_name: 'vnd_canvas_originality_report_url'
+
+    # The submission LTI2 service endpoint
+    # @launch_parameter vnd_canvas_submission_url
+    # @example
+    #   ```
+    #   api/lti/assignments/{assignment_id}/submissions/{submission_id}
+    #   ```
+    register_expansion 'vnd.Canvas.submission.url', [],
+                        -> do
+                          SubmissionsApiController::SERVICE_DEFINITIONS.find do |s|
+                            s[:id] == 'vnd.Canvas.submission'
+                          end[:endpoint]
+                        end,
+                        default_name: 'vnd_canvas_submission_url'
+
+    # The submission history LTI2 service endpoint
+    # @launch_parameter vnd_canvas_submission_history_url
+    # @example
+    #   ```
+    #   api/lti/assignments/{assignment_id}/submissions/{submission_id}/history
+    #   ```
+    register_expansion 'vnd.Canvas.submission.history.url', [],
+                        -> do
+                          SubmissionsApiController::SERVICE_DEFINITIONS.find do |s|
+                            s[:id] == 'vnd.Canvas.submission.history'
+                          end[:endpoint]
+                        end,
+                        default_name: 'vnd_canvas_submission_history_url'
+
     register_expansion 'Canvas.file.media.id', [],
                        -> { (@attachment.media_object && @attachment.media_object.media_id) || @attachment.media_entry_id },
                        MEDIA_OBJECT_ID_GUARD
