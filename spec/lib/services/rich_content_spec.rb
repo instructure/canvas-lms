@@ -21,6 +21,7 @@ require_dependency "services/rich_content"
 module Services
   describe RichContent do
     before do
+      allow(Services::RichContent).to receive(:contextually_on).and_call_original
       allow(Canvas::DynamicSettings).to receive(:find)
         .with('rich-content-service', use_env: false)
         .and_return({
@@ -113,42 +114,10 @@ module Services
         expect(env2[:RICH_CONTENT_CAN_UPLOAD_FILES]).to eq(false)
       end
 
-      context "with only lowest level flag on" do
-        let(:root_account){ stub("root_account") }
-
-        before(:each) do
-          root_account.stubs(:feature_enabled?).with(:rich_content_service).returns(true)
-          root_account.stubs(:feature_enabled?).with(:rich_content_service_with_sidebar).returns(false)
-          root_account.stubs(:feature_enabled?).with(:rich_content_service_high_risk).returns(false)
-        end
-
-        it "assumes high risk without being specified" do
-          env = described_class.env_for(root_account)
-          expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_falsey
-        end
-
-        it "is contextually on for low risk areas" do
-          env = described_class.env_for(root_account, risk_level: :basic)
-          expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_truthy
-        end
-
-        it "is contextually off for medium risk areas" do
-          env = described_class.env_for(root_account, risk_level: :sidebar)
-          expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_falsey
-        end
-
-        it "is contextually off for high risk areas" do
-          env = described_class.env_for(root_account, risk_level: :highrisk)
-          expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_falsey
-        end
-      end
-
       context "with all flags on" do
         let(:root_account){ stub("root_account") }
 
         before(:each) do
-          root_account.stubs(:feature_enabled?).with(:rich_content_service).returns(true)
-          root_account.stubs(:feature_enabled?).with(:rich_content_service_with_sidebar).returns(true)
           root_account.stubs(:feature_enabled?).with(:rich_content_service_high_risk).returns(true)
         end
 
@@ -168,7 +137,7 @@ module Services
         end
       end
 
-      context "with all flags off" do
+      context "with flag off" do
         let(:root_account){ stub("root_account") }
 
         before(:each) do
@@ -180,24 +149,20 @@ module Services
           expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_falsey
         end
 
-        it "is contextually off even for low risk areas" do
+        it "is contextually on for low risk areas" do
           env = described_class.env_for(root_account, risk_level: :basic)
-          expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_falsey
+          expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_truthy
         end
-      end
 
-      it "can be totally disabled with the lowest flag" do
-        root_account = stub("root_account")
-        root_account.stubs(:feature_enabled?).with(:rich_content_service).returns(false)
-        root_account.stubs(:feature_enabled?).with(:rich_content_service_with_sidebar).returns(true)
-        root_account.stubs(:feature_enabled?).with(:rich_content_service_high_risk).returns(true)
-        env = described_class.env_for(root_account)
-        expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_falsey
+        it "is contextually on for lower risk areas with sidebar" do
+          env = described_class.env_for(root_account, risk_level: :sidebar)
+          expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_truthy
+        end
       end
 
       it "treats nil feature values as false" do
         root_account = stub("root_account")
-        root_account.stubs(:feature_enabled?).with(:rich_content_service).returns(nil)
+        root_account.stubs(:feature_enabled?).with(:rich_content_service_high_risk).returns(nil)
         env = described_class.env_for(root_account)
         expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to eq(false)
       end
@@ -205,11 +170,30 @@ module Services
       context "integrating with a real account and feature flags" do
         it "sets all levels to true when all flags set" do
           account = account_model
-          account.enable_feature!(:rich_content_service)
-          account.enable_feature!(:rich_content_service_with_sidebar)
           account.enable_feature!(:rich_content_service_high_risk)
           env = described_class.env_for(account)
           expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_truthy
+        end
+
+        it "on for basic if flag is disabled" do
+          account = account_model
+          account.disable_feature!(:rich_content_service_high_risk)
+          env = described_class.env_for(account, risk_level: :basic)
+          expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_truthy
+        end
+
+        it "on for sidebar if flag is disabled" do
+          account = account_model
+          account.disable_feature!(:rich_content_service_high_risk)
+          env = described_class.env_for(account, risk_level: :sidebar)
+          expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_truthy
+        end
+
+        it "off for high risk if flag is disabled" do
+          account = account_model
+          account.disable_feature!(:rich_content_service_high_risk)
+          env = described_class.env_for(account)
+          expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_falsey
         end
       end
     end

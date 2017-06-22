@@ -483,6 +483,14 @@ RSpec.configure do |config|
     Canvas.redis_used = false
   end
 
+  # This should be removed once all tests using the legacy rce have been removed
+  # Only use RCS in tests if high risk flag is enabled
+  config.before :each do
+    allow(Services::RichContent).to receive(:contextually_on) do |root_account|
+      root_account.feature_enabled?(:rich_content_service_high_risk)
+    end
+  end
+
   #****************************************************************
   # There used to be a lot of factory methods here!
   # In an effort to move us toward a nicer test factory solution,
