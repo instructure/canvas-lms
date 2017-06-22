@@ -168,7 +168,7 @@ export default class FlashAlert extends React.Component {
           variant={this.props.variant}
           closeButtonLabel={I18n.t('Close')}
           onClose={this.closeAlert}
-          isDismissable
+          dismissable
           margin="small auto"
           timeout={timeout}
           liveRegion={this.getLiveRegion}

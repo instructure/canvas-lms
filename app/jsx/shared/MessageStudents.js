@@ -216,7 +216,7 @@ import Alert from 'instructure-ui/lib/components/Alert'
           <div className="MessageStudents__Alert">
             <Alert variant={variant}
               closeButtonLabel={I18n.t('Close')}
-              isDismissable
+              dismissable
               onClose={this.handleAlertClose}
             >
               {message}

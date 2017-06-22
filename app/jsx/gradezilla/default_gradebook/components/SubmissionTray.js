@@ -26,7 +26,7 @@ export default function SubmissionTray (props) {
   return (
     <Tray
       label={I18n.t('Submission tray')}
-      isDismissable
+      dismissable
       closeButtonLabel={I18n.t('Close submission tray')}
       isOpen={props.isOpen}
       trapFocus

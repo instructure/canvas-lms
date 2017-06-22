@@ -89,7 +89,7 @@ export default class BreakdownDetails extends React.Component {
         <Tray
           isOpen={this.props.showDetails}
           placement="end"
-          isDismissable={false}
+          dismissable={false}
           trapFocus
           getDefaultFocusElement={() => this.closeButton}
           onReady={() => document.getElementById('application').setAttribute('aria-hidden', true)}

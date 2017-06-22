@@ -91,7 +91,7 @@ class TutorialTray extends React.Component {
     return (
       <Tray
         label={this.props.label}
-        isDismissable={false}
+        dismissable={false}
         isOpen={!this.state.isCollapsed}
         placement="end"
         zIndex="100"

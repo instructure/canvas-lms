@@ -4119,9 +4119,9 @@ instructure-icons@^3.0.1:
     prop-types "15.5.8"
     shortid "2.2.8"
 
-instructure-ui@2.4.0, instructure-ui@^2.3.0:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/instructure-ui/-/instructure-ui-2.4.0.tgz#87b25d1a8bdd27d6884a263176b3d47585c6bcf6"
+instructure-ui@2.5.0:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/instructure-ui/-/instructure-ui-2.5.0.tgz#ba92a3975721334c7edc171b997461ac2940dab8"
   dependencies:
     bowser "1.7.0"
     classnames "2.2.5"
