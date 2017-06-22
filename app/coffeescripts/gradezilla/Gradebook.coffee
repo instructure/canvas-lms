@@ -1811,11 +1811,7 @@ define [
       )
 
     missingSort: (columnId) =>
-      @sortRowsWithFunction((row) =>
-        submission = row[columnId]
-        # if there are no submissions the usual case here is that workflow_state is undefined
-        submission.workflow_state == undefined || submission.workflow_state == 'unsubmitted'
-      )
+      @sortRowsWithFunction((row) => !!row[columnId]?.missing)
 
     lateSort: (columnId) =>
       @sortRowsWithFunction((row) => row[columnId].late)

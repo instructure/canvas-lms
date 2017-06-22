@@ -5107,8 +5107,8 @@ QUnit.module('Gradebook#missingSort', {
   setup () {
     this.gradebook = createGradebook();
     this.gradebook.rows = [
-      { id: '3', sortable_name: 'Z Lastington', assignment_201: { workflow_state: 'graded' }},
-      { id: '4', sortable_name: 'A Firstington', assignment_201: { workflow_state: 'unsubmitted' }}
+      { id: '3', sortable_name: 'Z Lastington', assignment_201: { missing: false }},
+      { id: '4', sortable_name: 'A Firstington', assignment_201: { missing: true }}
     ];
     this.gradebook.grid = { // stubs for slickgrid
       removeCellCssStyles () {},
@@ -5128,10 +5128,10 @@ test('sorts by missing', function () {
 
 test('relies on localeSort when rows have equal sorting criteria results', function () {
   this.gradebook.rows = [
-    { id: '1', sortable_name: 'Z Last Graded', assignment_201: { workflow_state: 'graded' }},
-    { id: '3', sortable_name: 'Z Last Missing', assignment_201: { workflow_state: 'unsubmitted' }},
-    { id: '2', sortable_name: 'A First Graded', assignment_201: { workflow_state: 'graded' }},
-    { id: '4', sortable_name: 'A First Missing', assignment_201: { workflow_state: 'unsubmitted' }}
+    { id: '1', sortable_name: 'Z Last Graded', assignment_201: { missing: false }},
+    { id: '3', sortable_name: 'Z Last Missing', assignment_201: { missing: true }},
+    { id: '2', sortable_name: 'A First Graded', assignment_201: { missing: false }},
+    { id: '4', sortable_name: 'A First Missing', assignment_201: { missing: true }}
   ];
   this.gradebook.missingSort('assignment_201');
   const [firstRow, secondRow, thirdRow, fourthRow] = this.gradebook.rows;
@@ -5145,9 +5145,9 @@ test('relies on localeSort when rows have equal sorting criteria results', funct
 test('when no submission is found, it is missing', function () {
   // Since SubmissionStateMap always creates an assignment key even when there
   // is no corresponding submission, the correct way to test this is to have a
-  // key for the assignment with a missing criteria key (e.g. `workflow_state`)
+  // key for the assignment with a missing criteria key
   this.gradebook.rows = [
-    { id: '3', sortable_name: 'Z Lastington', assignment_201: { workflow_state: 'graded'}},
+    { id: '3', sortable_name: 'Z Lastington', assignment_201: { missing: false }},
     { id: '4', sortable_name: 'A Firstington', assignment_201: {} }
   ];
   this.gradebook.lateSort('assignment_201');

@@ -51,7 +51,7 @@ describe "Gradezilla - Assignment Column Options" do
   describe "Sorting" do
     it "sorts by Missing", test_id: 3253336, priority: "1" do
       third_student = @course.students.find_by!(name: 'Student 3')
-      @assignment.submissions.find_by!(user: third_student).destroy!
+      @assignment.submissions.find_by!(user: third_student).update!(late_policy_status: "missing")
       Gradezilla.visit(@course)
       Gradezilla.click_assignment_header_menu(@assignment.id)
       Gradezilla.click_assignment_popover_sort_by('Missing')
