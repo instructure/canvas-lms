@@ -1069,7 +1069,7 @@ class Course < ActiveRecord::Base
   end
 
   def recompute_student_scores_without_send_later(student_ids = nil, opts = {})
-    student_ids ||= self.student_ids
+    student_ids ||= self.admin_visible_student_ids
     Rails.logger.info "GRADES: recomputing scores in course=#{global_id} students=#{student_ids.inspect}"
     Enrollment.recompute_final_score(
       student_ids,
