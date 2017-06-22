@@ -161,6 +161,9 @@
 #           "example": "100",
 #           "type": "string"
 #         },
+#         // The errors_attachment api object of the SIS import. Only available if there are errors or warning and import has completed.
+#         // Abbreviated file object File (see files API).
+#         "errors_attachment": {},
 #         "processing_warnings": {
 #           "description": "Only imports that are complete will get this data. An array of CSV_file/warning_message pairs.",
 #           "example": [["students.csv","user John Doe has already claimed john_doe's requested login information, skipping"]],
@@ -220,6 +223,7 @@
 class SisImportsApiController < ApplicationController
   before_action :get_context
   before_action :check_account
+  include Api::V1::SisImport
 
   def check_account
     return render json: {errors: ["SIS imports can only be executed on root accounts"]}, status: :bad_request unless @account.root_account?
@@ -245,7 +249,7 @@ class SisImportsApiController < ApplicationController
         scope = scope.where("created_at > ?", created_since)
       end
       @batches = Api.paginate(scope, self, api_v1_account_sis_imports_url)
-      render :json => ({sis_imports: @batches})
+      render json: {sis_imports: sis_imports_json(@batches, @current_user, session)}
     end
   end
 
@@ -428,7 +432,7 @@ class SisImportsApiController < ApplicationController
         @account.save
       end
 
-      render :json => batch
+      render json: sis_import_json(batch, @current_user, session)
     end
   end
 
@@ -444,7 +448,7 @@ class SisImportsApiController < ApplicationController
   def show
     if authorized_action(@account, @current_user, [:import_sis, :manage_sis])
       @batch = @account.sis_batches.find(params[:id])
-      render json: @batch
+      render json: sis_import_json(@batch, @current_user, session)
     end
   end
 
@@ -463,7 +467,7 @@ class SisImportsApiController < ApplicationController
         @batch = @account.sis_batches.not_completed.lock.find(params[:id])
         @batch.abort_batch
       end
-      render json: @batch.reload
+      render json: sis_import_json(@batch.reload, @current_user, session)
     end
   end
 

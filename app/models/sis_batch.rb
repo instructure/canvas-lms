@@ -414,7 +414,7 @@ class SisBatch < ActiveRecord::Base
   end
 
   def self.max_messages
-    Setting.get('sis_batch_max_messages', '1000').to_i
+    Setting.get('sis_batch_max_messages', '50').to_i
   end
 
   def write_warnings_and_errors_to_file
