@@ -214,6 +214,9 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
   def default_restrictions_for(object)
     if self.use_default_restrictions_by_type
+      if object.is_a?(Assignment) && submittable = object.submittable_object
+        object = submittable
+      end
       self.default_restrictions_by_type[object.class.base_class.name] || {}
     else
       self.default_restrictions
