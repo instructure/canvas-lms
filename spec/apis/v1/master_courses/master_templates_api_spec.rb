@@ -358,6 +358,20 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       api_call(:put, @url, @params, {:content_type => 'wiki_page', :content_id => page.id, :restricted => '1'}, {}, {:expected_status => 200})
       expect(page_tag.reload.restrictions).to eq page_restricts
     end
+
+    it "should use quiz object type restrictions if the quiz assignment is locked" do
+      quiz_assmt = @course.assignments.create!(:submission_types => 'online_quiz').reload
+      quiz = quiz_assmt.quiz
+      quiz_tag = @template.content_tag_for(quiz)
+
+      assmt_restricts = {:content => true, :points => true}
+      quiz_restricts = {:content => true}
+      @template.update_attributes(:use_default_restrictions_by_type => true,
+        :default_restrictions_by_type => {'Assignment' => assmt_restricts, 'Quizzes::Quiz' => quiz_restricts})
+
+      api_call(:put, @url, @params, {:content_type => 'assignment', :content_id => quiz_assmt.id, :restricted => '1'}, {}, {:expected_status => 200})
+      expect(quiz_tag.reload.restrictions).to eq quiz_restricts
+    end
   end
 
   def run_master_migration
