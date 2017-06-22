@@ -76,7 +76,7 @@ describe "master courses - course picker" do
     available_courses
   end
 
-  it "should show all courses by default", priority: "1", test_id: "3072438" do
+  it "should show all courses by default", priority: "1", test_id: "3077485" do
     get "/courses/#{@master.id}"
     open_associations
     open_courses_list
@@ -84,17 +84,17 @@ describe "master courses - course picker" do
     expect(available_courses().length).to eq(5)
   end
 
-  it "should filter the course list by name", priority: "1", test_id: "3072438" do
+  it "should filter the course list by name", priority: "1", test_id: "3265699" do
     matches = test_filter('Alpha')
     expect(matches.length).to eq(3)
   end
 
-  it "should filter the course list by short name", priority: "1", test_id: "3072438" do
+  it "should filter the course list by short name", priority: "1", test_id: "3265700" do
     matches = test_filter('CCC')
     expect(matches.length).to eq(3)
   end
 
-  it "should filter the course list by SIS ID", priority: "1", test_id: "3072438" do
+  it "should filter the course list by SIS ID", priority: "1", test_id: "3265701" do
     matches = test_filter('SIS_B')
     expect(matches.length).to eq(2)
   end
