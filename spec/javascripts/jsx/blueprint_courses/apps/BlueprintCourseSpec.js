@@ -65,7 +65,19 @@ test('change log route onEnter calls app showChangeLog with params from URL', ()
   equal(blueprint.app.hideChangeLog.callCount, 1)
 })
 
-test('start calls render() and setupRouter()', () => {
+test('start does not call setupRouter() when shabang is missing in the URL', function () {
+  blueprint = new BlueprintCourse(container, defaultData())
+  const renderStub = sinon.stub(blueprint, 'render')
+  const setupRouterStub = sinon.stub(blueprint, 'setupRouter')
+
+  blueprint.start()
+
+  equal(renderStub.callCount, 1)
+  equal(setupRouterStub.callCount, 0)
+})
+
+test('start calls render() and setupRouter() when shabang is in the URL', function () {
+  window.location.hash = '#!/blueprint'
   blueprint = new BlueprintCourse(container, defaultData())
   const renderStub = sinon.stub(blueprint, 'render')
   const setupRouterStub = sinon.stub(blueprint, 'setupRouter')

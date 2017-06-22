@@ -60,6 +60,8 @@ export default class ChildCourse {
   start () {
     FlashNotifications.subscribe(this.store)
     this.render()
-    this.setupRouter()
+    if (window.location.hash.indexOf('#!/blueprint') === 0) {
+      this.setupRouter()
+    }
   }
 }
