@@ -23,88 +23,99 @@
 // a sticky header through fixed positioning. Once all browsers support position: sticky,
 // we can remove all this and use the CSS under @supports (position: sticky)
 
-$nav-collapsed-width: $ic-header-primary-width - 30 + ($ic-sp * 4);
-$nav-expanded-width: $ic-header-primary-width + ($ic-sp * 4);
-$right-side-content-width: $ic-right-side-width;
-$non-main-content-width-collapsed: $nav-collapsed-width + $right-side-content-width;
-$non-main-content-width-expanded: $nav-expanded-width + $right-side-content-width;
+$nav-collapsed-width: $ic-header-primary-width - 30;
+$nav-expanded-width: $ic-header-primary-width;
+$content-padding: $ic-sp * 4;
+$non-main-content-width-collapsed: $nav-collapsed-width + $content-padding;
+$non-main-content-width-expanded: $nav-expanded-width + $content-padding;
 
-.ic-dashboard-app {
-  padding-top: $ic-sp * 4;
-}
-
-.ic-Dashboard-content--align-right {
-  align-items: flex-end;
-  flex-direction: row;
-}
-
-.ic-Dashboard-header {
-  width: calc(100% - #{$nav-collapsed-width});
-  position: fixed;
-  top: 0;
-  left: $nav-collapsed-width - ($ic-sp * 2);
-  border-bottom: 1px solid $ic-border-light;
-  z-index: 20;
-  background: rgba($ic-color-light, 0.95);
-  box-sizing: border-box;
-  padding: $ic-sp 0 ($ic-sp * 0.75);
-
-  @include breakpoint(desktop) {
-    width: calc(100% - #{$non-main-content-width-collapsed});
+// If the planner is showing, serve up a fixed-position header
+body.dashboard-is-planner {
+  .ic-dashboard-app {
+    padding-top: $ic-sp * 4;
   }
 
-  body.primary-nav-expanded & {
-    width: calc(100% - #{$nav-expanded-width});
-    left: $nav-expanded-width - ($ic-sp * 2);
+  .ic-Dashboard-header {
+    position: fixed;
+    top: 0;
+    z-index: 20;
+    left: $nav-collapsed-width + ($ic-sp * 2);
+    width: calc(100% - #{$non-main-content-width-collapsed});
+    margin-top: 0;
+  }
 
-    @include breakpoint(desktop) {
+  &.primary-nav-expanded {
+    .ic-Dashboard-header {
+      left: $nav-expanded-width + ($ic-sp * 2);
       width: calc(100% - #{$non-main-content-width-expanded});
     }
   }
 
-  > div {
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  .ic-Dashboard-header_title {
-    margin-top: 0;
-    margin-bottom: 0;
+  .ic-Dashboard-header__layout {
+    padding-top: $ic-sp;
   }
 }
 
 @supports (position: sticky) or (position: -webkit-sticky) {
-  .ic-dashboard-app {
-    padding-top: 0;
+  // If the browser supports sticky positioning:
+  // 1) Give ALL dashboard headers sticky positioning per product design
+  .ic-Dashboard-header,
+  body.dashboard-is-planner .ic-Dashboard-header {
+    position: sticky;
+    top: 0;
+    z-index: 5;
   }
 
-  .ic-Dashboard-header {
-    position: sticky;
-    left: auto;
-    width: auto;
-    z-index: 5;
-    padding: 0 0 $ic-sp * 0.75;
-    margin-top: -($ic-sp);
-
-    @include breakpoint(desktop) {
-      width: auto;
+  // 2) Undo all the fixed positioning CSS rules we needed for IE
+  body.dashboard-is-planner {
+    .ic-dashboard-app {
+      padding-top: 0;
     }
 
-    body.primary-nav-expanded & {
-      width: auto;
+    .ic-Dashboard-header {
       left: auto;
+      width: auto;
+      margin-top: -($ic-sp / 2);
+    }
 
-      @include breakpoint(desktop) {
+    &.primary-nav-expanded {
+      .ic-Dashboard-header {
+        left: auto;
         width: auto;
       }
     }
 
+    .ic-Dashboard-header__layout {
+      padding-top: 0;
+    }
   }
 }
 
-// fix awkward spacing when a notification appears above the dashboard
-.ic-notification {
-  + .ic-Dashboard-header { margin-top: $ic-sp*2; }
+.ic-Dashboard-header {
+  margin-top: -($ic-sp / 2);
+}
+
+.ic-Dashboard-header__layout {
+  display: flex;
+  align-items: center;
+  padding: 0 0 ($ic-sp * 0.75);
+  border-bottom: 1px solid $ic-border-light;
+  background: rgba($ic-color-light, 0.95);
 }
 
 .ic-Dashboard-Activity { padding: $ic-sp; }
+
+.ic-Dashboard-header__title {
+  margin-top: 0;
+  margin-bottom: 0;
+  flex: 1;
+  padding-right: $ic-sp;
+  box-sizing: border-box;
+}
+
+.ic-Dashboard-header__actions {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}

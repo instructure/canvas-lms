@@ -19,6 +19,7 @@
 <% content_for :page_title do %><%= t('user_dashboard', 'User Dashboard') %><% end %>
 <% css_bundle :dashboard %>
 <% js_bundle :dashboard %>
+<% @body_classes << "dashboard-is-planner" if show_planner? %>
 
 <% content_for :auto_discovery do %>
   <% if @current_user %>
@@ -37,11 +38,7 @@
   <%= render :partial => 'shared/dashboard_messages' %>
 
   <div id="dashboard_header_container" class="ic-Dashboard-header">
-    <div class="grid-row bottom-xs">
-      <div class="col-xs-9">
-        <h1 class="ic-Dashboard-header_title"><%= t "Dashboard" %></h1>
-      </div>
-    </div>
+    <h1 class="ic-Dashboard-header__title"><%= t "Dashboard" %></h1>
   </div>
   <% if planner_enabled? %>
     <% js_bundle :student_planner %>

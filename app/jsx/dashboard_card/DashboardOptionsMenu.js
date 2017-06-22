@@ -34,14 +34,16 @@ export default class DashboardOptionsMenu extends React.Component {
     recent_activity_dashboard: PropTypes.bool,
     hide_dashcard_color_overlays: PropTypes.bool,
     planner_enabled: PropTypes.bool,
-    planner_selected: PropTypes.bool
+    planner_selected: PropTypes.bool,
+    onDashboardChange: PropTypes.func
   }
 
   static defaultProps = {
     hide_dashcard_color_overlays: false,
     planner_enabled: false,
     planner_selected: false,
-    recent_activity_dashboard: false
+    recent_activity_dashboard: false,
+    onDashboardChange: () => {}
   }
 
   constructor (props) {
@@ -117,6 +119,8 @@ export default class DashboardOptionsMenu extends React.Component {
       dashboardCards.style.display = 'block'
       rightSideContent.style.display = 'block'
     }
+
+    this.props.onDashboardChange(newView[0]);
   }
 
   toggleColorOverlays () {

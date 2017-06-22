@@ -24,30 +24,58 @@ import { bool } from 'prop-types';
 /**
  * This component renders the header for the user dashboard.
  */
-const DashboardHeader = props => (
-  <div className="grid-row bottom-xs">
-    <div className="col-xs-9">
-      <h1 className="ic-Dashboard-header_title">{I18n.t('Dashboard')}</h1>
-    </div>
-    <div className="col-xs-3 end-xs ic-Dashboard-content--align-right">
-      {props.planner_enabled && (
-        <div
-          id="dashboard-planner-header"
-          className="CanvasPlanner__HeaderContainer"
-          style={{ display: (props.planner_selected) ? 'block' : 'none' }}
-        />
-      )}
-      <div id="DashboardOptionsMenu_Container">
-        <DashboardOptionsMenu
-          recent_activity_dashboard={props.recent_activity_dashboard}
-          hide_dashcard_color_overlays={props.hide_dashcard_color_overlays}
-          planner_enabled={props.planner_enabled}
-          planner_selected={props.planner_selected}
-        />
+class DashboardHeader extends React.Component {
+
+  constructor (props) {
+    super(props);
+
+    let currentDashboard;
+
+    if (props.show_planner) {
+      currentDashboard = 'planner';
+    } else if (props.show_recent_activity) {
+      currentDashboard = 'activity';
+    } else {
+      currentDashboard = 'cards';
+    }
+
+    this.state = { currentDashboard };
+  }
+
+  render () {
+    return (
+      <div className="ic-Dashboard-header__layout">
+        <h1 className="ic-Dashboard-header__title">{I18n.t('Dashboard')}</h1>
+        <div className="ic-Dashboard-header__actions">
+          {this.props.planner_enabled && (
+            <div
+              id="dashboard-planner-header"
+              className="CanvasPlanner__HeaderContainer"
+              style={{ display: (this.props.planner_selected) ? 'block' : 'none' }}
+            />
+          )}
+          <div id="DashboardOptionsMenu_Container">
+            <DashboardOptionsMenu
+              recent_activity_dashboard={this.props.recent_activity_dashboard}
+              hide_dashcard_color_overlays={this.props.hide_dashcard_color_overlays}
+              planner_enabled={this.props.planner_enabled}
+              planner_selected={this.props.planner_selected}
+              onDashboardChange={(newDashboard) => {
+                this.setState({ currentDashboard: newDashboard }, function afterDashboardChange () {
+                  if (this.state.currentDashboard === 'planner') {
+                    document.body.classList.add('dashboard-is-planner');
+                  } else if (document.body.classList.contains('dashboard-is-planner')) {
+                    document.body.classList.remove('dashboard-is-planner');
+                  }
+                });
+              }}
+            />
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-);
+    );
+  }
+}
 
 DashboardHeader.propTypes = {
   recent_activity_dashboard: bool.isRequired,
