@@ -570,8 +570,8 @@ END
     },
     'student_planner' =>
     {
-      display_name: -> { I18n.t('Student Planner')},
-      description: -> { I18n.t('Provides users with a planner dashboard option.')},
+      display_name: -> { I18n.t('To Do List Dashboard')},
+      description: -> { I18n.t('Provides users with a To Do List Dashboard option.')},
       applies_to: "RootAccount",
       state: "hidden",
       beta: true,
