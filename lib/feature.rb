@@ -567,7 +567,7 @@ END
       applies_to: "RootAccount",
       state: "hidden",
       beta: true,
-      development: true
+      development: false
     },
     'quizzes2_exporter' =>
     {
