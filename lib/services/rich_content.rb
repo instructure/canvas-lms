@@ -67,11 +67,7 @@ module Services
       end
 
       def contextually_on(root_account, risk_level)
-          check_feature_flag(root_account, :rich_content_service) && (
-            risk_level == :basic ||
-            (risk_level == :sidebar && check_feature_flag(root_account, :rich_content_service_with_sidebar)) ||
-            check_feature_flag(root_account, :rich_content_service_high_risk)
-          )
+        risk_level == :basic || risk_level == :sidebar || check_feature_flag(root_account, :rich_content_service_high_risk)
       end
     end
   end

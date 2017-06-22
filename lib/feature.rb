@@ -432,33 +432,13 @@ END
       root_opt_in: true,
       touch_context: true
     },
-    'rich_content_service' =>
-    {
-      display_name: -> { I18n.t('Use remote version of Rich Content Editor') },
-      description: -> { I18n.t('In cases where it is available, load the RCE from a canvas rich content service') },
-      applies_to: 'RootAccount',
-      state: 'allowed',
-      beta: true,
-      development: false,
-      root_opt_in: false
-    },
-    'rich_content_service_with_sidebar' =>
-    {
-      display_name: -> { I18n.t('Use remote version of Rich Content Editor AND sidebar') },
-      description: -> { I18n.t('In cases where it is available, load the RCE and the wiki sidebar from a canvas rich content service') },
-      applies_to: 'RootAccount',
-      state: 'hidden',
-      beta: true,
-      development: false,
-      root_opt_in: false
-    },
     'rich_content_service_high_risk' =>
     {
-      display_name: -> { I18n.t('Use remote version of Rich Content Editor AND sidebar in high-risk areas like quizzes') },
-      description: -> { I18n.t('Always load the RCE and Sidebar from a canvas rich content service everywhere') },
+      display_name: -> { I18n.t('Rich Content Editor Sidebar Enhancements') },
+      description: -> { I18n.t('Use new rich content editor with enhanced sidebar everywhere') },
       applies_to: 'RootAccount',
       state: 'hidden',
-      beta: true,
+      beta: false,
       development: false,
       root_opt_in: false
     },
