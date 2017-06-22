@@ -575,5 +575,18 @@ test_4,TC 104,Test Course 104b,,term1,active
       expect(b3.data[:diffed_against_sis_batch_id]).to be_nil
       expect(b3.generated_diff_id).to be_nil
     end
+
+    it 'should set batch_ids on change_sis_id' do
+      course1 = @account.courses.build
+      course1.sis_source_id = 'test_1'
+      course1.save!
+      b1 = process_csv_data([
+%{old_id,new_id,type
+test_1,test_a,course
+}])
+      expect(course1.reload.sis_batch_id).to eq b1.id
+      expect(b1.processing_errors).to eq []
+      expect(b1.processing_warnings).to eq []
+    end
   end
 end

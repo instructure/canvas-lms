@@ -834,3 +834,50 @@ u411208,u411222,active
 u411208,u411295,active
 u413405,u411385,deleted
 </pre>
+
+change_sis_id.csv
+----------
+
+<table class="sis_csv">
+<tr>
+<th>Field Name</th>
+<th>Data Type</th>
+<th>Required</th>
+<th>Sticky</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>old_id</td>
+<td>text</td>
+<td>✓</td>
+<td></td>
+<td>The current sis_id of the object that should be changed.</td>
+</tr>
+<tr>
+<td>new_id</td>
+<td>text</td>
+<td>✓</td>
+<td></td>
+<td>The desired sis_id of the object. This id must be currently unique to the
+object type and the root_account</td>
+</tr>
+<tr>
+<td>type</td>
+<td>text</td>
+<td>✓</td>
+<td></td>
+<td>account, term, course, section, group, user</td>
+</tr>
+</table>
+
+change_sis_id.csv is optional. The goal of change_sis_id.csv is to provide a
+way to change sis_ids of existing objects. If included in a zip file this file
+will process first. All other files should include the new ids.
+
+Sample:
+
+<pre>old_id,new_id,type
+u001,u001a,user
+couse1,old_course1,course
+term1,fall17,term
+</pre>

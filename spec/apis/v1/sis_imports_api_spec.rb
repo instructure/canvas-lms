@@ -132,7 +132,8 @@ describe SisImportsApiController, type: :request do
     expect(json).to eq({
           "data" => { "import_type" => "instructure_csv",
                       "supplied_batches" => ["user"],
-                      "counts" => { "abstract_courses" => 0,
+                      "counts" => { "change_sis_ids"=>0,
+                                    "abstract_courses" => 0,
                                     "courses" => 0,
                                     "sections" => 0,
                                     "accounts" => 0,
@@ -585,7 +586,8 @@ describe SisImportsApiController, type: :request do
     expect(json).to eq({"sis_imports"=>[{
                       "data" => { "import_type" => "instructure_csv",
                                   "supplied_batches" => ["account"],
-                                  "counts" => { "abstract_courses" => 0,
+                                  "counts" => { "change_sis_ids"=>0,
+                                                "abstract_courses" => 0,
                                                 "courses" => 0,
                                                 "sections" => 0,
                                                 "accounts" => 1,
