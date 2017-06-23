@@ -162,7 +162,7 @@ module Services
             expect(jwt["RootAccountUUID"]).to eq('random-account-uuid')
             expect(jwt["sub"]).to eq('ltiToolProxy:151b52cd-d670-49fb-bf65-6a327e3aaca0')
           end
-          LiveEventsSubscriptionService.tool_proxy_subscriptions(tool_proxy, {})
+          LiveEventsSubscriptionService.tool_proxy_subscriptions(tool_proxy)
         end
       end
 
@@ -215,7 +215,7 @@ module Services
           tool_proxy.stubs(:context).returns(root_account_context)
           root_account_context.stubs(:root_account).returns(root_account_object)
           Timeout.expects(:timeout).raises(Timeout::Error)
-          expect { LiveEventsSubscriptionService.tool_proxy_subscriptions(tool_proxy, {}) }.to raise_error(Timeout::Error)
+          expect { LiveEventsSubscriptionService.tool_proxy_subscriptions(tool_proxy) }.to raise_error(Timeout::Error)
         end
       end
     end

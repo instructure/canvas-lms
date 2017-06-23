@@ -27,7 +27,7 @@ module Services
         request(:get, "/api/subscriptions/#{subscription_id}", options)
       end
 
-      def tool_proxy_subscriptions(tool_proxy, optional_headers)
+      def tool_proxy_subscriptions(tool_proxy, optional_headers = {})
         options = { headers: headers(tool_proxy_jwt_body(tool_proxy), optional_headers) }
         request(:get, '/api/subscriptions', options)
       end
