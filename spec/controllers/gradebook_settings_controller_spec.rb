@@ -39,6 +39,9 @@ RSpec.describe GradebookSettingsController, type: :controller do
             "grading_period_id" => "1401",
             "assignment_group_id" => "888"
           },
+          "filter_rows_by" => {
+            "section_id" => "2001"
+          },
           "selected_view_options_filters" => ["assignmentGroups"],
           "show_inactive_enrollments" => "true", # values must be strings
           "show_concluded_enrollments" => "false",

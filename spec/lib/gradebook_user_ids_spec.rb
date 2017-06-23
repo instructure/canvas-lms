@@ -28,7 +28,8 @@ describe GradebookUserIds do
       sort_rows_by_column_id: "student",
       sort_rows_by_setting_key: "name",
       sort_rows_by_direction: "ascending",
-      filter_columns_by: {}
+      filter_columns_by: {},
+      filter_rows_by: {}
     }
     @student1 = student_in_course(
       course: @course,
@@ -98,7 +99,7 @@ describe GradebookUserIds do
       active_all: true,
       allow_multiple_enrollments: true
     )
-    @teacher.preferences[:gradebook_settings][@course.id][:filter_columns_by][:section_id] = section.id.to_s
+    @teacher.preferences[:gradebook_settings][@course.id][:filter_rows_by][:section_id] = section.id.to_s
     expect(gradebook_user_ids.user_ids).to eq([@student1.id])
   end
 

@@ -43,6 +43,9 @@ class GradebookSettingsController < ApplicationController
           :grading_period_id,
           :assignment_group_id
         ],
+        filter_rows_by: [
+          :section_id
+        ],
         selected_view_options_filters: []
       },
       :show_concluded_enrollments,

@@ -2824,8 +2824,8 @@ test('renders the section select with a list of sections', function () {
   deepEqual(sections.map(section => section.id), ['2001', '2002']);
 });
 
-test('sets the section select to show the defined sectionToShow', function () {
-  this.gradebook.sectionToShow = '2002';
+test('sets the section select to show the saved "filter rows by" setting', function () {
+  this.gradebook.setFilterRowsBySetting('sectionId', '2002');
   this.gradebook.updateSectionFilterVisibility();
   strictEqual(this.gradebook.sectionFilterMenu.props.selectedItemId, '2002');
 });
@@ -2860,6 +2860,72 @@ test('removes the section select when filter is deselected', function () {
   this.gradebook.updateSectionFilterVisibility();
   notOk(this.gradebook.sectionFilterMenu, 'section menu reference has been stored');
   strictEqual(this.container.children.length, 0, 'nothing was rendered');
+});
+
+QUnit.module('Gradebook#updateCurrentSection', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.gradebook.postGradesStore = {
+      setSelectedSection: this.stub()
+    };
+    this.stub(this.gradebook, 'reloadStudentData');
+    this.stub(this.gradebook, 'saveSettings');
+    this.stub(this.gradebook, 'updateSectionFilterVisibility');
+  }
+});
+
+test('updates the filter setting with the given section id', function () {
+  this.gradebook.updateCurrentSection('2001');
+  strictEqual(this.gradebook.getFilterRowsBySetting('sectionId'), '2001');
+});
+
+test('sets the selected section on the post grades store', function () {
+  this.gradebook.updateCurrentSection('2001');
+  strictEqual(this.gradebook.postGradesStore.setSelectedSection.callCount, 1);
+});
+
+test('includes the selected section when updating the post grades store', function () {
+  this.gradebook.updateCurrentSection('2001');
+  const [sectionId] = this.gradebook.postGradesStore.setSelectedSection.firstCall.args;
+  strictEqual(sectionId, '2001');
+});
+
+test('re-renders the section filter', function () {
+  this.gradebook.updateCurrentSection('2001');
+  strictEqual(this.gradebook.updateSectionFilterVisibility.callCount, 1);
+});
+
+test('re-renders the section filter after setting the selected section', function () {
+  this.gradebook.updateSectionFilterVisibility.callsFake(() => {
+    strictEqual(this.gradebook.getFilterRowsBySetting('sectionId'), '2001', 'section was already updated');
+  });
+  this.gradebook.updateCurrentSection('2001');
+});
+
+test('saves settings', function () {
+  this.gradebook.updateCurrentSection('2001');
+  strictEqual(this.gradebook.saveSettings.callCount, 1);
+});
+
+test('saves settings after updating the filter setting', function () {
+  this.gradebook.saveSettings.callsFake(() => {
+    strictEqual(this.gradebook.getFilterRowsBySetting('sectionId'), '2001', 'section was already updated');
+  });
+  this.gradebook.updateCurrentSection('2001');
+});
+
+test('has no effect when the section has not changed', function () {
+  this.gradebook.setFilterRowsBySetting('sectionId', '2001');
+  this.gradebook.updateCurrentSection('2001');
+  strictEqual(this.gradebook.saveSettings.callCount, 0, 'saveSettings was not called');
+  strictEqual(this.gradebook.updateSectionFilterVisibility.callCount, 0,
+    'updateSectionFilterVisibility was not called');
+});
+
+test('reloads student data after saving settings', function () {
+  this.gradebook.saveSettings.callsFake((_data, callback) => { callback() });
+  this.gradebook.updateCurrentSection('2001');
+  strictEqual(this.gradebook.reloadStudentData.callCount, 1);
 });
 
 QUnit.module('Gradebook#updateGradingPeriodFilterVisibility', {

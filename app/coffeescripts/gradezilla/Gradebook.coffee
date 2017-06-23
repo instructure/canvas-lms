@@ -221,6 +221,9 @@ define [
 
     setInitialState: =>
       @courseContent = getInitialCourseContent()
+      @gridDisplaySettings = getInitialGridDisplaySettings(@options.settings, @options.colors)
+      @contentLoadStates = getInitialContentLoadStates()
+      @headerComponentRefs = {}
 
       @students = {}
       @studentViewStudents = {}
@@ -233,17 +236,11 @@ define [
       @checkForUploadComplete()
 
     loadSettings: ->
-      @gridDisplaySettings = getInitialGridDisplaySettings(@options.settings, @options.colors)
-      @contentLoadStates = getInitialContentLoadStates()
-      @headerComponentRefs = {}
-
       if @options.grading_period_set
         @gradingPeriodSet = GradingPeriodSetsApi.deserializeSet(@options.grading_period_set)
       else
         @gradingPeriodSet = null
       @assignmentsToHide = UserSettings.contextGet('hidden_columns') || []
-      @sectionToShow = UserSettings.contextGet 'grading_show_only_section'
-      @sectionToShow = @sectionToShow && String(@sectionToShow)
       @show_attendance = !!UserSettings.contextGet 'show_attendance'
       @include_ungraded_assignments = UserSettings.contextGet 'include_ungraded_assignments'
       # preferences serialization causes these to always come
@@ -1117,7 +1114,7 @@ define [
         props =
           items: sectionList
           onSelect: @updateCurrentSection
-          selectedItemId: @sectionToShow || '0'
+          selectedItemId: @getFilterRowsBySetting('sectionId') || '0'
           disabled: !@contentLoadStates.studentsLoaded
 
         @sectionFilterMenu = renderComponent(SectionFilter, mountPoint, props)
@@ -1126,13 +1123,15 @@ define [
         @sectionFilterMenu = null
 
     updateCurrentSection: (sectionId) =>
-      if @sectionToShow != sectionId
-        @sectionToShow = if sectionId == '0' then undefined else sectionId
-        @postGradesStore.setSelectedSection @sectionToShow
-        UserSettings[if @sectionToShow then 'contextSet' else 'contextRemove']('grading_show_only_section', @sectionToShow)
-        @updateColumnHeaders()
-        @buildRows() if @grid
+      sectionId = if sectionId == '0' then null else sectionId
+      currentSection = @getFilterRowsBySetting('sectionId')
+      if currentSection != sectionId
+        @setFilterRowsBySetting('sectionId', sectionId)
+        @postGradesStore.setSelectedSection(sectionId)
         @updateSectionFilterVisibility()
+        @saveSettings({}, =>
+          @reloadStudentData()
+        )
 
     showSections: ->
       @sections_enabled
@@ -1230,7 +1229,8 @@ define [
           sis_id: @options.context_sis_id
       @postGradesStore.addChangeListener(@updatePostGradesFeatureButton)
 
-      @postGradesStore.setSelectedSection @sectionToShow
+      sectionId = @getFilterRowsBySetting('sectionId')
+      @postGradesStore.setSelectedSection(sectionId)
 
     delayedCall: (delay, fn) =>
       setTimeout fn, delay
@@ -2374,8 +2374,8 @@ define [
         contextUrl: contextUrl
         submissionsLoaded: @contentLoadStates.submissionsLoaded
       setDefaultGradeDialogManager = new SetDefaultGradeDialogManager(
-        assignment, studentsThatCanSeeAssignment, @options.context_id, @sectionToShow,
-        IS_ADMIN, @contentLoadStates.submissionsLoaded
+        assignment, studentsThatCanSeeAssignment, @options.context_id,
+        @getFilterRowsBySetting('sectionId'), isAdmin(), @contentLoadStates.submissionsLoaded
       )
       assignmentMuterDialogManager = new AssignmentMuterDialogManager(
         assignment,

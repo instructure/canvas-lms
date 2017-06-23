@@ -24,7 +24,7 @@ class GradebookUserIds
     @column = settings[:sort_rows_by_column_id] || "student"
     @sort_by = settings[:sort_rows_by_setting_key] || "name"
     @selected_grading_period_id = settings.dig(:filter_columns_by, :grading_period_id)
-    @selected_section_id = settings.dig(:filter_columns_by, :section_id)
+    @selected_section_id = settings.dig(:filter_rows_by, :section_id)
     @direction = settings[:sort_rows_by_direction] || "ascending"
   end
 
@@ -126,7 +126,7 @@ class GradebookUserIds
   end
 
   def section_id
-    return nil if @selected_section_id.nil? || @selected_section_id == "null"
+    return nil if @selected_section_id.nil? || @selected_section_id == "null" || @section_section_id == "0"
     @selected_section_id
   end
 end
