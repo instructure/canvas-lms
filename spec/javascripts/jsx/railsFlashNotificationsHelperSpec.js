@@ -357,6 +357,20 @@ define([
     equal(screenreaderHolder.childNodes.length, 1);
   });
 
+  test('does not toggles polite aria-live when polite is false', () => {
+    const polite = false;
+    helper.createScreenreaderNodeExclusive('a message', polite);
+    const screenreaderHolder = document.getElementById('flash_screenreader_holder');
+    equal(screenreaderHolder.getAttribute('aria-live'), 'assertive');
+  });
+
+  test('optionally toggles polite aria-live', () => {
+    const polite = true;
+    helper.createScreenreaderNodeExclusive('a message', polite);
+    const screenreaderHolder = document.getElementById('flash_screenreader_holder');
+    equal(screenreaderHolder.getAttribute('aria-live'), 'polite');
+  });
+
   QUnit.module('RailsFlashNotificationsHelper#escapeContent', {
     setup: function() {
       helper = new NotificationsHelper();
