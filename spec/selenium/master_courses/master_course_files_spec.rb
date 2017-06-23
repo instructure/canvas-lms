@@ -17,8 +17,20 @@
 
 require_relative '../common'
 
+shared_context "blueprint courses files context" do
+
+  def options_panel_text
+    f('.al-options').text
+  end
+
+  def options_button
+    f('.ef-item-row .al-trigger')
+  end
+end
+
 describe "master courses - master courses - file locking" do
   include_context "in-process server selenium tests"
+  include_context "blueprint courses files context"
 
   before :once do
     Account.default.enable_feature!(:master_courses)
@@ -46,11 +58,12 @@ describe "master courses - master courses - file locking" do
     f('.ef-item-row .ef-date-created-col').click # select the file
     expect(f('.ef-header')).to contain_css('.btn-delete')
 
-    f('.ef-item-row .al-trigger').click
-    expect(f('.al-options').text).to include("Download")
-    expect(f('.al-options').text).to include("Rename")
-    expect(f('.al-options').text).to include("Move")
-    expect(f('.al-options').text).to include("Delete")
+    options_button.click
+    options_text = options_panel_text
+    expect(options_text).to include("Download")
+    expect(options_text).to include("Rename")
+    expect(options_text).to include("Move")
+    expect(options_text).to include("Delete")
   end
 
   it "should show the manageable cog-menu options when a folder contains a locked file" do
@@ -67,11 +80,12 @@ describe "master courses - master courses - file locking" do
     f('.ef-item-row .ef-date-created-col').click # select the file
     expect(f('.ef-header')).to contain_css('.btn-delete')
 
-    f('.ef-item-row .al-trigger').click
-    expect(f('.al-options').text).to include("Download")
-    expect(f('.al-options').text).to include("Rename")
-    expect(f('.al-options').text).to include("Move")
-    expect(f('.al-options').text).to include("Delete")
+    options_button.click
+    options_text = options_panel_text
+    expect(options_text).to include("Download")
+    expect(options_text).to include("Rename")
+    expect(options_text).to include("Move")
+    expect(options_text).to include("Delete")
   end
 
   it "should show the manageable cog-menu options when a file is unlocked" do
@@ -82,11 +96,12 @@ describe "master courses - master courses - file locking" do
     f('.ef-item-row .ef-date-created-col').click # select the file
     expect(f('.ef-header')).to contain_css('.btn-delete')
 
-    f('.ef-item-row .al-trigger').click
-    expect(f('.al-options').text).to include("Download")
-    expect(f('.al-options').text).to include("Rename")
-    expect(f('.al-options').text).to include("Move")
-    expect(f('.al-options').text).to include("Delete")
+    options_button.click
+    options_text = options_panel_text
+    expect(options_text).to include("Download")
+    expect(options_text).to include("Rename")
+    expect(options_text).to include("Move")
+    expect(options_text).to include("Delete")
   end
 
   it "should show the manageable cog-menu options when a folder contains an unlocked file" do
@@ -95,10 +110,11 @@ describe "master courses - master courses - file locking" do
     @original_file.save!
     get "/courses/#{@copy_from.id}/files"
 
-    f('.ef-item-row .al-trigger').click
-    expect(f('.al-options').text).to include("Download")
-    expect(f('.al-options').text).to include("Rename")
-    expect(f('.al-options').text).to include("Move")
-    expect(f('.al-options').text).to include("Delete")
+    options_button.click
+    options_text = options_panel_text
+    expect(options_text).to include("Download")
+    expect(options_text).to include("Rename")
+    expect(options_text).to include("Move")
+    expect(options_text).to include("Delete")
   end
 end

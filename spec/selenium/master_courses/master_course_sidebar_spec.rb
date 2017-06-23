@@ -56,11 +56,16 @@ shared_context "blueprint sidebar context" do
     get "/courses/#{@master.id}"
     blueprint_open_sidebar_button.click
   end
+
+  def bcs_content_panel
+    f('.bcs__content')
+  end
 end
 
 
 describe "master courses sidebar" do
   include_context "in-process server selenium tests"
+  include_context "blueprint sidebar context"
   include BlueprintCourseCommon
 
 
@@ -96,24 +101,24 @@ describe "master courses sidebar" do
 
     it "should show sidebar trigger tab" do
      get "/courses/#{@master.id}"
-     expect(f('.blueprint__root .bcs__wrapper .bcs__trigger')).to be_displayed
+     expect(blueprint_open_sidebar_button).to be_displayed
     end
 
     it "should show sidebar when trigger is clicked" do
       get "/courses/#{@master.id}"
-      f('.blueprint__root .bcs__wrapper .bcs__trigger').click
-      expect(f('.bcs__content')).to be_displayed
+      blueprint_open_sidebar_button.click
+      expect(bcs_content_panel).to be_displayed
     end
 
     it "should not show the Associations button" do
       get "/courses/#{@master.id}"
-      f('.blueprint__root .bcs__wrapper .bcs__trigger').click
-      expect(f('.bcs__content')).not_to contain_css('button#mcSidebarAsscBtn')
+      blueprint_open_sidebar_button.click
+      expect(bcs_content_panel).not_to contain_css('button#mcSidebarAsscBtn')
     end
 
     it "should show Sync History modal when button is clicked" do
       get "/courses/#{@master.id}"
-      f('.blueprint__root .bcs__wrapper .bcs__trigger').click
+      blueprint_open_sidebar_button.click
       f('button#mcSyncHistoryBtn').click
       expect(f('div[aria-label="Sync History"]')).to be_displayed
       expect(f('#application')).to have_attribute('aria-hidden', 'true')
@@ -121,7 +126,7 @@ describe "master courses sidebar" do
 
     it "should show Unsynced Changes modal when button is clicked" do
       get "/courses/#{@master.id}"
-      f('.blueprint__root .bcs__wrapper .bcs__trigger').click
+      blueprint_open_sidebar_button.click
       wait_for_ajaximations
       f('button#mcUnsyncedChangesBtn').click
       wait_for_ajaximations
@@ -137,7 +142,7 @@ describe "master courses sidebar" do
 
 
   describe "as a master course admin" do
-    include_context "blueprint sidebar context"
+
     before :once do
       account_admin_user(active_all: true)
     end
@@ -148,13 +153,13 @@ describe "master courses sidebar" do
 
     it "should show the Associations button" do
       get "/courses/#{@master.id}"
-      f('.blueprint__root .bcs__wrapper .bcs__trigger').click
-      expect(f('.bcs__content')).to contain_css('button#mcSidebarAsscBtn')
+      blueprint_open_sidebar_button.click
+      expect(bcs_content_panel).to contain_css('button#mcSidebarAsscBtn')
     end
 
     it "should show Associations modal when button is clicked" do
       get "/courses/#{@master.id}"
-      f('.blueprint__root .bcs__wrapper .bcs__trigger').click
+      blueprint_open_sidebar_button.click
       f('button#mcSidebarAsscBtn').click
       expect(f('div[aria-label="Associations"]')).to be_displayed
     end
@@ -174,7 +179,7 @@ describe "master courses sidebar" do
 
       it "shows sync button and options before sync", priority: "2", test_id: 3186721 do
         open_blueprint_sidebar
-        bcs_content = f('.bcs__content')
+        bcs_content = bcs_content_panel
         expect(bcs_content).to include_text("Unsynced Changes")
         expect(bcs_content).to contain_css('.bcs__row-right-content')
         expect(bcs_content).to include_text("Include Course Settings")
@@ -185,7 +190,7 @@ describe "master courses sidebar" do
       it "shows sync options in modal", priority: "2", test_id: 3186721 do
         open_blueprint_sidebar
         unsynced_changes_link.click
-        bcs_content = f('.bcs__content')
+        bcs_content = bcs_content_panel
         expect(bcs_content).to include_text("Unsynced Changes")
         expect(bcs_content).to contain_css('.bcs__row-right-content')
         expect(bcs_content).to include_text("Include Course Settings")
@@ -214,7 +219,7 @@ describe "master courses sidebar" do
           test_var = true
         end
         expect(test_var).to be_truthy, "Sync button should not appear"
-        expect(f('.bcs__content')).not_to contain_css('button#mcUnsyncedChangesBtn')
+        expect(bcs_content_panel).not_to contain_css('button#mcUnsyncedChangesBtn')
       end
 
       it "removes notification options after sync", priority: "2", test_id: 3256295 do
@@ -225,7 +230,7 @@ describe "master courses sidebar" do
           test_var = true
         end
         expect(test_var).to be_truthy, "Unsynced changes link should not appear"
-        bcs_content = f('.bcs__content')
+        bcs_content = bcs_content_panel
         expect(bcs_content).not_to include_text("Include Course Settings")
         expect(bcs_content).not_to include_text("Send Notification")
         expect(bcs_content).not_to contain_css('bcs__row-right-content')

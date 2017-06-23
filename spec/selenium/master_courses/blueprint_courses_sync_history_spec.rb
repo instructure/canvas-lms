@@ -18,8 +18,34 @@
 require_relative '../common'
 require_relative '../helpers/blueprint_common'
 
+shared_context "Blueprint Sync History Context" do
+
+  def verify_sync_history
+    second_migration = f('.bcs__history-item:nth-of-type(2)')
+    expect(fj("span:contains('Created')", second_migration)).to be_displayed
+    first_migration = f('.bcs__history-item:nth-of-type(1)')
+    expect(fj("span:contains('Updated')", first_migration)).to be_displayed
+  end
+
+  def open_sync_history
+    get "/courses/#{@master.id}"
+    f('.blueprint__root .bcs__wrapper .bcs__trigger').click
+    f('#mcSyncHistoryBtn').click
+  end
+
+  def open_item_history
+    f('.bcs__history-item:nth-of-type(1) .pill').click
+  end
+
+  def exceptions_frame
+    f('.bcs__history-item__change-exceps')
+  end
+end
+
+
 describe "sync history modal" do
   include_context "in-process server selenium tests"
+  include_context "Blueprint Sync History Context"
   include BlueprintCourseCommon
 
   before :once do
@@ -43,17 +69,12 @@ describe "sync history modal" do
     it "shows sync history modal for assignment", priority: "2", test_id: 3178864 do
       update_child_assignment(@minion, :points_possible, 8.0)
       update_master_assignment_and_migrate(@master, :points_possible, 15.0)
-      get "/courses/#{@master.id}"
-      f('.blueprint__root .bcs__wrapper .bcs__trigger').click
-      f('#mcSyncHistoryBtn').click
+      open_sync_history
       run_jobs
-      second_migration = f('.bcs__history-item:nth-of-type(2)')
-      expect(second_migration.find_element(:xpath, "//span[text()[contains(.,'Created')]]")).to be_displayed
-      first_migration = f('.bcs__history-item:nth-of-type(1)')
-      expect(first_migration.find_element(:xpath, "//span[text()[contains(.,'Updated')]]")).to be_displayed
-      f('.bcs__history-item:nth-of-type(1) .pill').click
-      expect(f('.bcs__history-item__change-exceps').
-               find_element(:xpath, "//span[text()[contains(., 'Points changed exceptions')]]")).to be_displayed
+      verify_sync_history
+      open_item_history
+      frame = exceptions_frame
+      expect(fj("span:contains('Points changed exceptions')", frame)).to be_displayed
     end
   end
 
@@ -69,17 +90,12 @@ describe "sync history modal" do
     it "shows sync history modal for discussions", priority: "2", test_id: 3179204 do
       update_child_discussion(@minion)
       update_master_discussion_and_migrate(@master)
-      get "/courses/#{@master.id}"
-      f('.blueprint__root .bcs__wrapper .bcs__trigger').click
-      f('#mcSyncHistoryBtn').click
+      open_sync_history
       run_jobs
-      second_migration = f('.bcs__history-item:nth-of-type(2)')
-      expect(second_migration.find_element(:xpath, "//span[text()[contains(.,'Created')]]")).to be_displayed
-      first_migration = f('.bcs__history-item:nth-of-type(1)')
-      expect(first_migration.find_element(:xpath, "//span[text()[contains(.,'Updated')]]")).to be_displayed
-      f('.bcs__history-item:nth-of-type(1) .pill').click
-      expect(f('.bcs__history-item__change-exceps').
-               find_element(:xpath, "//span[text()[contains(., 'Settings changed exceptions')]]")).to be_displayed
+      verify_sync_history
+      open_item_history
+      frame = exceptions_frame
+      expect(fj("span:contains('Settings changed exceptions')", frame)).to be_displayed
     end
   end
 
@@ -95,18 +111,12 @@ describe "sync history modal" do
     it "shows sync history for availability dates exception in assignments", priority: "2", test_id: 3179204 do
       update_child_assignment(@minion, :unlock_at, Time.zone.now + 1.day)
       update_master_assignment_and_migrate(@master, :unlock_at, Time.zone.now + 3.days)
-      get "/courses/#{@master.id}"
-      f('.blueprint__root .bcs__wrapper .bcs__trigger').click
-      f('#mcSyncHistoryBtn').click
+      open_sync_history
       run_jobs
-      second_migration = f('.bcs__history-item:nth-of-type(2)')
-      expect(second_migration.find_element(:xpath, "//span[text()[contains(.,'Created')]]")).to be_displayed
-      first_migration = f('.bcs__history-item:nth-of-type(1)')
-      expect(first_migration.find_element(:xpath, "//span[text()[contains(.,'Updated')]]")).to be_displayed
-      f('.bcs__history-item:nth-of-type(1) .pill').click
-      expect(f('.bcs__history-item__change-exceps').
-             find_element(:xpath, "//span[text()[contains(., 'Availability Dates changed exceptions')]]")).
-             to be_displayed
+      verify_sync_history
+      open_item_history
+      frame = exceptions_frame
+      expect(fj("span:contains('Availability Dates changed exceptions')", frame)).to be_displayed
     end
   end
 
@@ -122,17 +132,12 @@ describe "sync history modal" do
     it "shows sync history modal for pages", priority: "2", test_id: 3179205 do
       update_child_page(@minion)
       update_master_page_and_migrate(@master)
-      get "/courses/#{@master.id}"
-      f('.blueprint__root .bcs__wrapper .bcs__trigger').click
-      f('#mcSyncHistoryBtn').click
+      open_sync_history
       run_jobs
-      second_migration = f('.bcs__history-item:nth-of-type(2)')
-      expect(second_migration.find_element(:xpath, "//span[text()[contains(.,'Created')]]")).to be_displayed
-      first_migration = f('.bcs__history-item:nth-of-type(1)')
-      expect(first_migration.find_element(:xpath, "//span[text()[contains(.,'Updated')]]")).to be_displayed
-      f('.bcs__history-item:nth-of-type(1) .pill').click
-      expect(f('.bcs__history-item__change-exceps').
-               find_element(:xpath, "//span[text()[contains(., 'Content changed exceptions')]]")).to be_displayed
+      verify_sync_history
+      open_item_history
+      frame = exceptions_frame
+      expect(fj("span:contains('Content changed exceptions')", frame)).to be_displayed
     end
   end
 
@@ -148,17 +153,12 @@ describe "sync history modal" do
     it "shows sync history modal for quizzes", priority: "2", test_id: 3179206 do
       update_child_quiz(@minion)
       update_master_quiz_and_migrate(@master)
-      get "/courses/#{@master.id}"
-      f('.blueprint__root .bcs__wrapper .bcs__trigger').click
-      f('#mcSyncHistoryBtn').click
+      open_sync_history
       run_jobs
-      second_migration = f('.bcs__history-item:nth-of-type(2)')
-      expect(second_migration.find_element(:xpath, "//span[text()[contains(.,'Created')]]")).to be_displayed
-      first_migration = f('.bcs__history-item:nth-of-type(1)')
-      expect(first_migration.find_element(:xpath, "//span[text()[contains(.,'Updated')]]")).to be_displayed
-      f('.bcs__history-item:nth-of-type(1) .pill').click
-      expect(f('.bcs__history-item__change-exceps').
-               find_element(:xpath, "//span[text()[contains(., 'Due Dates changed exceptions')]]")).to be_displayed
+      verify_sync_history
+      open_item_history
+      frame = exceptions_frame
+      expect(fj("span:contains('Due Dates changed exceptions')", frame)).to be_displayed
     end
   end
 end

@@ -17,8 +17,33 @@
 
 require_relative '../common'
 
+shared_context "blueprint course settings context" do
+
+  def blueprint_settings_options
+    f('.blueprint_setting_options')
+  end
+
+  def content_checkbox_state
+    is_checked('input[name="course[blueprint_restrictions][content]"][type=checkbox]')
+  end
+
+  def points_checkbox_state
+    is_checked('input[name="course[blueprint_restrictions][points]"][type=checkbox]')
+  end
+
+  def due_dates_checkbox_state
+    is_checked('input[name="course[blueprint_restrictions][due_dates]"][type=checkbox]')
+  end
+
+  def availability_dates_checkbox_state
+    is_checked('input[name="course[blueprint_restrictions][availability_dates]"][type=checkbox]')
+  end
+
+end
+
 describe "course settings/blueprint" do
   include_context "in-process server selenium tests"
+  include_context "blueprint course settings context"
 
   before :once do
     Account.default.enable_feature! :master_courses
@@ -35,11 +60,12 @@ describe "course settings/blueprint" do
       get "/courses/#{@course.id}/settings"
       f('.bcs_check-box').find_element(:xpath, "../div").click
       wait_for_animations
-      expect(f('.blueprint_setting_options')).to be_displayed
-      expect(is_checked('input[name="course[blueprint_restrictions][content]"][type=checkbox]')).to be # checked by default
-      expect(is_checked('input[name="course[blueprint_restrictions][points]"][type=checkbox]')).not_to be
-      expect(is_checked('input[name="course[blueprint_restrictions][due_dates]"][type=checkbox]')).not_to be
-      expect(is_checked('input[name="course[blueprint_restrictions][availability_dates]"][type=checkbox]')).not_to be
+      expect(blueprint_settings_options).to be_displayed
+
+      expect(content_checkbox_state).to eq true # checked by default
+      expect(points_checkbox_state).to eq false
+      expect(due_dates_checkbox_state).to eq false
+      expect(availability_dates_checkbox_state).to eq false
       expect_new_page_load { submit_form('#course_form') }
       expect(MasterCourses::MasterTemplate.full_template_for(@course).default_restrictions).to eq(
         { :content => true, :points => false, :due_dates => false, :availability_dates => false }
@@ -54,11 +80,12 @@ describe "course settings/blueprint" do
 
       expect_new_page_load { submit_form('#course_form') }
 
-      expect(f('.blueprint_setting_options')).to be_displayed
-      expect(is_checked('input[name="course[blueprint_restrictions][content]"][type=checkbox]')).to_not be
-      expect(is_checked('input[name="course[blueprint_restrictions][points]"][type=checkbox]')).to be
-      expect(is_checked('input[name="course[blueprint_restrictions][due_dates]"][type=checkbox]')).to be
-      expect(is_checked('input[name="course[blueprint_restrictions][availability_dates]"][type=checkbox]')).to be
+      expect(blueprint_settings_options).to be_displayed
+
+      expect(content_checkbox_state).to eq false
+      expect(points_checkbox_state).to eq true
+      expect(due_dates_checkbox_state).to eq true
+      expect(availability_dates_checkbox_state).to eq true
 
       expect(MasterCourses::MasterTemplate.full_template_for(@course).default_restrictions).to eq(
         { :content => false, :points => true, :due_dates => true, :availability_dates => true }
@@ -72,11 +99,12 @@ describe "course settings/blueprint" do
 
       get "/courses/#{@course.id}/settings"
 
-      expect(f('.blueprint_setting_options')).to be_displayed
-      expect(is_checked('input[name="course[blueprint_restrictions][content]"][type=checkbox]')).to be
-      expect(is_checked('input[name="course[blueprint_restrictions][points]"][type=checkbox]')).not_to be
-      expect(is_checked('input[name="course[blueprint_restrictions][due_dates]"][type=checkbox]')).to be
-      expect(is_checked('input[name="course[blueprint_restrictions][availability_dates]"][type=checkbox]')).not_to be
+      expect(blueprint_settings_options).to be_displayed
+
+      expect(content_checkbox_state).to eq true
+      expect(points_checkbox_state).to eq false
+      expect(due_dates_checkbox_state).to eq true
+      expect(availability_dates_checkbox_state).to eq false
 
       f('.bcs_check-box').find_element(:xpath, "../div").click
       wait_for_animations
