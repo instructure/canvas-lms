@@ -21,7 +21,7 @@ module Factories
     enroll_user = !(opts[:user] && (opts[:assignment] || opts[:course]))
     assignment = opts[:assignment] || assignment_model(:course => opts[:course])
     @student = opts.delete(:user) || @user = create_users(1, return_type: :record)[0]
-    create_enrollments @course, [@student], opts.slice(:section) if enroll_user
+    @course.enroll_student(@student, section: opts[:section], enrollment_state: :active) if enroll_user
     assignment.reload # it caches the course pre-student enrollment
     @submission = assignment.submit_homework(@student, (opts.presence || { :url => "http://www.instructure.com/" }))
     @submission.save!

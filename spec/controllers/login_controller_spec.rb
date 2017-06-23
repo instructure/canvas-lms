@@ -113,6 +113,15 @@ describe LoginController do
       expect(response).to redirect_to(
         controller.url_for(controller: 'login/canvas', action: :new)+'?pseudonym_session%5Bunique_id%5D=test')
     end
+
+    it "should pass pseudonym_session[unique_id] to redirect from current username" do
+      user_with_pseudonym(unique_id: 'test', active: 1)
+      user_session(@user, @pseudonym)
+      get 'new', "pseudonym_session" => {"unique_id"=>"test"}, force_login: 1
+      expect(response).to redirect_to(
+                            controller.url_for(controller: 'login/canvas', action: :new)+'?pseudonym_session%5Bunique_id%5D=test')
+    end
+
   end
 
   describe "#logout" do

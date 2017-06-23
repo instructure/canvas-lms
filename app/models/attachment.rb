@@ -345,6 +345,10 @@ class Attachment < ActiveRecord::Base
     end
   end
 
+  def children_and_self
+    Attachment.where("id=? OR root_attachment_id=?", id, id)
+  end
+
   TURNITINABLE_MIME_TYPES = %w[
     application/msword
     application/vnd.openxmlformats-officedocument.wordprocessingml.document
@@ -1232,13 +1236,13 @@ class Attachment < ActiveRecord::Base
 
   # this will delete the content of the attachment but not delete the attachment
   # object. It will replace the attachment content with a file_removed file.
-  def destroy_content_and_replace
-    raise 'must be a root_attachment' if self.root_attachment_id
-    self.destroy_content
-    self.uploaded_data = File.open Rails.root.join('public/file_removed/file_removed.pdf')
-    CrocodocDocument.where(attachment_id: self).delete_all
-    Canvadoc.where(attachment_id: self).delete_all
-    self.save!
+  def destroy_content_and_replace(deleted_by_user = nil)
+    att = self.root_attachment_id? ? self.root_attachment : self
+    att.destroy_content
+    att.uploaded_data = File.open Rails.root.join('public', 'file_removed', 'file_removed.pdf')
+    CrocodocDocument.where(attachment_id: att.children_and_self.select(:id)).delete_all
+    Canvadoc.where(attachment_id: att.children_and_self.select(:id)).delete_all
+    att.save!
   end
 
   def dmca_file_removal
@@ -1249,7 +1253,7 @@ class Attachment < ActiveRecord::Base
     raise 'must be a root_attachment' if self.root_attachment_id
     return unless self.filename
     if Attachment.s3_storage?
-      self.s3object.delete
+      self.s3object.delete unless ApplicationController.try(:test_cluster?)
     else
       FileUtils.rm full_filename
     end

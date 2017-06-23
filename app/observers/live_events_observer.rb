@@ -73,7 +73,11 @@ class LiveEventsObserver < ActiveRecord::Observer
         end
       end
     when Submission
-      Canvas::LiveEvents.submission_updated(obj)
+      if obj.just_submitted?
+        Canvas::LiveEvents.submission_created(obj)
+      elsif !obj.unsubmitted?
+        Canvas::LiveEvents.submission_updated(obj)
+      end
     when User
       Canvas::LiveEvents.user_updated(obj)
     end

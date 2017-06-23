@@ -206,6 +206,7 @@ class Assignment
                     json[:attachment][:canvadoc_url] = a.canvadoc_url(@user)
                     json[:attachment][:crocodoc_url] = a.crocodoc_url(@user, crocodoc_user_ids)
                     json[:attachment][:submitted_to_crocodoc] = a.crocodoc_document.present?
+                    json[:attachment][:hijack_crocodoc_session] = a.crocodoc_document&.should_migrate_to_canvadocs?
                   end
                 end
               end

@@ -947,6 +947,8 @@ class DiscussionTopicsController < ApplicationController
       discussion_topic_hash[:message] = process_incoming_html_content(discussion_topic_hash[:message])
     end
 
+    prefer_assignment_availability_dates(discussion_topic_hash)
+
     unless process_future_date_parameters(discussion_topic_hash)
       process_lock_parameters(discussion_topic_hash)
     end
@@ -1003,6 +1005,12 @@ class DiscussionTopicsController < ApplicationController
       discussion_topic_hash.delete :podcast_enabled
       discussion_topic_hash.delete :podcast_has_student_posts
     end
+  end
+
+  def prefer_assignment_availability_dates(discussion_topic_hash)
+    return unless params[:assignment]
+    discussion_topic_hash['delayed_post_at'] = nil if params[:assignment][:unlock_at].present?
+    discussion_topic_hash['lock_at'] = nil if params[:assignment][:lock_at].present?
   end
 
   # Internal: detetermines if the delayed_post_at or lock_at dates were changed

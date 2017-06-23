@@ -13,7 +13,7 @@
     "instructure-icons": "2.2.0",
     "instructure-ui": "1.4.2",
     "tinymce": "4.5.7",
-    "tinymce-light-skin": "1.2.2"
+    "tinymce-light-skin": "1.2.5"
   },
   "devDependencies": {
     "axe-core": "2.1.7",
