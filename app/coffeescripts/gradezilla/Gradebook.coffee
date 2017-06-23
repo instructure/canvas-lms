@@ -1485,7 +1485,11 @@ define [
       if @gradebookColumnOrderSettings?.sortType
         assignmentColumns.sort @makeColumnSortFn(@getStoredSortOrder())
 
-      scrollableColumns = assignmentColumns.concat(@aggregateColumns)
+      scrollableColumns = if @hideAggregateColumns()
+        assignmentColumns
+      else
+        assignmentColumns.concat(@aggregateColumns)
+
       frozenColumns = @parentColumns.concat(@customColumnDefinitions())
       frozenColumns.concat(scrollableColumns)
 
@@ -1574,56 +1578,53 @@ define [
               .bind('gridready.render', => @grid.invalidate() )
         columnDef
 
-      if @hideAggregateColumns()
-        @aggregateColumns = []
-      else
-        # Assignment Group Column Definitions
+      # Assignment Group Column Definitions
 
-        @aggregateColumns = for id, group of @assignmentGroups
-          columnId = @getAssignmentGroupColumnId(id)
-          fieldName = "assignment_group_#{id}"
+      @aggregateColumns = for id, group of @assignmentGroups
+        columnId = @getAssignmentGroupColumnId(id)
+        fieldName = "assignment_group_#{id}"
 
-          aggregateWidth = testWidth(group.name, columnWidths.assignmentGroup.min, columnWidths.assignmentGroup.default_max)
-          if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings[fieldName]
-            aggregateWidth = parseInt(@gradebookColumnSizeSettings[fieldName])
+        aggregateWidth = testWidth(group.name, columnWidths.assignmentGroup.min, columnWidths.assignmentGroup.default_max)
+        if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings[fieldName]
+          aggregateWidth = parseInt(@gradebookColumnSizeSettings[fieldName])
 
-          {
-            id: columnId
-            field: fieldName
-            formatter: @groupTotalFormatter
-            name: group.name
-            toolTip: group.name
-            object: group
-            minWidth: columnWidths.assignmentGroup.min
-            maxWidth: columnWidths.assignmentGroup.max
-            width: aggregateWidth
-            cssClass: "meta-cell assignment-group-cell #{columnId}"
-            headerCssClass: columnId
-            type: 'assignment_group'
-            assignmentGroupId: group.id
-          }
-
-        label = I18n.t "Total"
-
-        totalWidth = testWidth(label, columnWidths.total.min, columnWidths.total.max)
-        if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings['total_grade']
-          totalWidth = parseInt(@gradebookColumnSizeSettings['total_grade'])
-
-        # Total Grade Column Definition
-
-        total_column =
-          id: "total_grade"
-          field: "total_grade"
+        {
+          id: columnId
+          field: fieldName
           formatter: @groupTotalFormatter
-          toolTip: label
-          minWidth: columnWidths.total.min
-          maxWidth: columnWidths.total.max
-          width: totalWidth
-          cssClass: 'total-cell total_grade'
-          headerCssClass: 'total_grade'
-          type: 'total_grade'
+          name: group.name
+          toolTip: group.name
+          object: group
+          minWidth: columnWidths.assignmentGroup.min
+          maxWidth: columnWidths.assignmentGroup.max
+          width: aggregateWidth
+          cssClass: "meta-cell assignment-group-cell #{columnId}"
+          headerCssClass: columnId
+          type: 'assignment_group'
+          assignmentGroupId: group.id
+        }
 
-        @aggregateColumns.push total_column
+      label = I18n.t "Total"
+
+      totalWidth = testWidth(label, columnWidths.total.min, columnWidths.total.max)
+      if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings['total_grade']
+        totalWidth = parseInt(@gradebookColumnSizeSettings['total_grade'])
+
+      # Total Grade Column Definition
+
+      total_column =
+        id: "total_grade"
+        field: "total_grade"
+        formatter: @groupTotalFormatter
+        toolTip: label
+        minWidth: columnWidths.total.min
+        maxWidth: columnWidths.total.max
+        width: totalWidth
+        cssClass: 'total-cell total_grade'
+        headerCssClass: 'total_grade'
+        type: 'total_grade'
+
+      @aggregateColumns.push total_column
 
       $widthTester.remove()
 
@@ -2129,8 +2130,10 @@ define [
           @renderAssignmentColumnHeader(column.assignmentId)
         else if column.type == 'assignment_group'
           @renderAssignmentGroupColumnHeader(column.assignmentGroupId)
+        else if column.type == 'total_grade'
+          @renderTotalGradeColumnHeader()
+
       @renderStudentColumnHeader()
-      @renderTotalGradeColumnHeader()
 
     # Column Header Helpers
     handleHeaderKeyDown: (e, columnId) =>

@@ -146,6 +146,31 @@ test('sets the submission state map .selectedGradingPeriodID to the "grading per
   strictEqual(gradebook.submissionStateMap.selectedGradingPeriodID, gradebook.getGradingPeriodToShow());
 });
 
+QUnit.module('Gradebook#initGrid', {
+  setup () {
+    $fixtures.innerHTML = `
+      <div id="application">
+        <span data-component="GridColor"></span>
+        <div id="gradebook_grid"></div>
+        <div id="example-gradebook-cell">
+          <a class="student-grades-link" href="#">Student Name</a>
+        </div>
+      </div>
+    `;
+
+    this.gradebook = createGradebook();
+    this.stub(this.gradebook, 'renderGridColor');
+    this.stub(this.gradebook, 'getFrozenColumnCount');
+    this.stub(this.gradebook, 'getVisibleGradeGridColumns').returns([]);
+    this.stub(this.gradebook, 'onGridInit');
+    this.gradebook.initGrid();
+  }
+});
+
+test('initializes aggregateColumns with at least the total_grade column', function () {
+  ok(this.gradebook.aggregateColumns.find(col => col.type === 'total_grade'), 'contains total_grade column');
+});
+
 QUnit.module('Gradebook - when grid-required data is loaded', {
   setup () {
     $fixtures.innerHTML = `
@@ -1889,6 +1914,22 @@ test('includes attendance assignments when show_attendance is true', function ()
   const columns = this.gradebook.getVisibleGradeGridColumns();
   const objectNames = columns.map(c => c.object.name);
   ok(objectNames.includes('attendance'));
+});
+
+test('when asked to hide aggregate columns, does not append aggregate columns', function () {
+  this.stub(this.gradebook, 'hideAggregateColumns').returns(true);
+  this.gradebook.aggregateColumns = [{ type: 'total_grade' }];
+  const columns = this.gradebook.getVisibleGradeGridColumns();
+
+  notOk(columns.find(col => col.type === 'total_grade'), 'total_grade column is not returned');
+});
+
+test('when asked to show aggregate columns, appends aggregate columns', function () {
+  this.stub(this.gradebook, 'hideAggregateColumns').returns(false);
+  this.gradebook.aggregateColumns = [{ type: 'total_grade' }];
+  const columns = this.gradebook.getVisibleGradeGridColumns();
+
+  ok(columns.find(col => col.type === 'total_grade'), 'total_grade column is returned');
 });
 
 QUnit.module('Gradebook#submissionsForStudent', {
@@ -4410,7 +4451,8 @@ QUnit.module('Gradebook#updateColumnHeaders', {
     const columns = [
       { type: 'assignment_group', assignmentGroupId: '2201' },
       { type: 'assignment', assignmentId: '2301' },
-      { type: 'custom_column', customColumnId: '2401' }
+      { type: 'custom_column', customColumnId: '2401' },
+      { type: 'total_grade' }
     ];
     this.gradebook = createGradebook();
     this.gradebook.grid = {

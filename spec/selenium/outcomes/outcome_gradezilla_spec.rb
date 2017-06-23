@@ -62,33 +62,25 @@ describe "outcome gradezilla" do
 
         expect(ff('.outcome-student-cell-content')).to have_size 3
 
-        choose_section = ->(name) do
-          section_dropdown = f('[data-component="SectionFilter"] select')
-          section_dropdown.click
-          section_menu_item = ff('option', section_dropdown).find { |opt| opt.text == name }
-          section_menu_item.click
-          section_dropdown.click
-        end
+        click_option('[data-component="SectionFilter"] select', 'All Sections')
+        wait_for_ajaximations
+        expect(f('[data-component="SectionFilter"] select').attribute('value')).to eq('0')
 
-        choose_section.call "All Sections"
-        selected_section_name = ff('option', f('[data-component="SectionFilter"] select')).find(&:selected?)
-        expect(selected_section_name).to include_text("All Sections")
-
-        choose_section.call @other_section.name
-        selected_section_name = ff('option', f('[data-component="SectionFilter"] select')).find(&:selected?)
-        expect(selected_section_name).to include_text(@other_section.name)
+        click_option('[data-component="SectionFilter"] select', @other_section.name)
+        wait_for_ajaximations
+        expect(f('[data-component="SectionFilter"] select').attribute('value')).to eq(@other_section.id.to_s)
 
         expect(ff('.outcome-student-cell-content')).to have_size 1
 
         # verify that it remembers the section to show across page loads
         Gradezilla.visit(@course)
-        selected_section_name = ff('option', f('[data-component="SectionFilter"] select')).find(&:selected?)
-        expect(selected_section_name).to include_text @other_section.name
+        expect(f('[data-component="SectionFilter"] select').attribute('value')).to eq(@other_section.id.to_s)
         expect(ff('.outcome-student-cell-content')).to have_size 1
 
         # now verify that you can set it back
 
-        choose_section.call "All Sections"
+        click_option('[data-component="SectionFilter"] select', 'All Sections')
+        wait_for_ajaximations
 
         expect(ff('.outcome-student-cell-content')).to have_size 3
       end

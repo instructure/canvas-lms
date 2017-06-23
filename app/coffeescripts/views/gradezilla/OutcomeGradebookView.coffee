@@ -127,7 +127,7 @@ define [
       view.on('togglestate', @_createFilter(name)) for name, view of @checkboxes
       $.subscribe('currentSection/change', Grid.Events.sectionChangeFunction(@grid))
       $.subscribe('currentSection/change', @updateExportLink)
-      @updateExportLink(@gradebook.sectionToShow)
+      @updateExportLink(@gradebook.getFilterRowsBySetting('sectionId'))
 
     # Internal: Listen for events on grid.
     #
@@ -163,7 +163,7 @@ define [
       Grid.Util.saveStudents(response.linked.users)
       Grid.Util.saveOutcomePaths(response.linked.outcome_paths)
       Grid.Util.saveSections(@gradebook.sections) # might want to put these into the api results at some point
-      [columns, rows] = Grid.Util.toGrid(response, column: { formatter: Grid.View.cell }, row: { section: @gradebook.sectionToShow })
+      [columns, rows] = Grid.Util.toGrid(response, column: { formatter: Grid.View.cell }, row: { section: @gradebook.getFilterRowsBySetting('sectionId') })
       @grid = new Slick.Grid(
         '.outcome-gradebook-wrapper',
         rows,
@@ -189,7 +189,7 @@ define [
       sectionList = @gradebook.sectionList()
       mountPoint = document.querySelector('[data-component="SectionFilter"]')
       if sectionList.length > 1
-        selectedSectionId = @gradebook.sectionToShow || '0'
+        selectedSectionId = @gradebook.getFilterRowsBySetting('sectionId') || '0'
         props =
           items: sectionList
           onSelect: @updateCurrentSection
