@@ -88,7 +88,7 @@ class LatePolicyApplicator
 
   def relevant_student_ids(assignment)
     @relevant_student_ids[assignment.id] ||= relevant_due_dates(assignment).
-      reduce([]) do |memo, (student_id, submission)|
+      each_with_object([]) do |(student_id, submission), memo|
       memo << student_id unless submission[:in_closed_grading_period]
     end
   end

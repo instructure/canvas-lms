@@ -202,6 +202,7 @@ describe LatePolicyApplicator do
           cached_due_date: @now - 1.month,
           score: nil
         )
+
       # rubocop:enable Rails/SkipsModelValidations
     end
 
@@ -259,10 +260,32 @@ describe LatePolicyApplicator do
         student_ids = [0,2].map { |i| @students[i].id }
 
         expect(@course).to receive(:recompute_student_scores).
-          with(array_including(student_ids)).
-          with(Array.new(2, kind_of(Integer)))
+                             with(array_including(student_ids)).
+                             with(Array.new(2, kind_of(Integer)))
 
         @late_policy_applicator.process
+      end
+
+      it 'processes differentiated assignments that have a student in a closed grading period without error' do
+        # turn off the late policy without calling callbacks
+        @course.update_attribute(:late_policy, nil)
+
+        # Build an assignment with two students in an open grading period and one in a closed
+        assignment_to_override = @course.assignments.create!(
+          points_possible: 20, due_at: @now - 1.month, submission_types: 'online_text_entry',
+          workflow_state: 'published'
+        )
+        override = assignment_to_override.assignment_overrides.create(
+          due_at_overridden: true, due_at: @now - 3.months, set_type: 'ADHOC'
+        )
+        override.assignment_override_students.create!(user: @students[1])
+        override.assignment_override_students.create!(user: @students[0])
+
+        # turn on the late policy without calling callbacks
+        @course.update_attribute(:late_policy, @late_policy)
+
+        late_policy_applicator = LatePolicyApplicator.new(@course, [assignment_to_override])
+        expect { late_policy_applicator.process }.not_to raise_error
       end
     end
   end
