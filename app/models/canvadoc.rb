@@ -57,6 +57,13 @@ class Canvadoc < ActiveRecord::Base
     !!(document_id && process_state != 'error' && Canvadocs.enabled?)
   end
 
+  def has_annotations?
+    account_context = attachment.context.try(:account)
+    account_context ||= attachment.context.try(:root_account)
+    new_annotations_enabled = account_context&.feature_enabled?(:new_annotations)
+    new_annotations_enabled || annotations == true
+  end
+
   def self.mime_types
     JSON.parse Setting.get('canvadoc_mime_types', %w[
       application/excel
