@@ -56,6 +56,23 @@ describe SplitUsers do
       expect(pseudonym2.reload.user).to eq user1
     end
 
+    it 'should use the setting for split time.' do
+      pseudonym1 = user1.pseudonyms.create!(unique_id: 'sam1@example.com')
+      pseudonym2 = user2.pseudonyms.create!(unique_id: 'sam2@example.com')
+      Setting.set('user_merge_to_split_time', '12')
+      Timecop.travel(15.days.ago) do
+        UserMerge.from(user2).into(user1)
+      end
+
+      expect(SplitUsers.split_db_users(user1)).to eq []
+
+      Setting.set('user_merge_to_split_time', '30')
+
+      SplitUsers.split_db_users(user1)
+      expect(pseudonym1.reload.user).to eq user1
+      expect(pseudonym2.reload.user).to eq user2
+    end
+
     describe 'with merge data' do
 
       it 'should split multiple users if no merge_data is specified' do
