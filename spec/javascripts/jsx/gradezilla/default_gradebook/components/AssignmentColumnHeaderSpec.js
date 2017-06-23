@@ -100,6 +100,7 @@ function defaultProps ({ props, sortBySetting, assignment, curveGradesAction } =
       disabled: false,
       onSelect () {}
     },
+    showUnpostedMenuItem: true,
     sortBySetting: {
       direction: 'ascending',
       disabled: false,
@@ -360,6 +361,12 @@ test('"Unposted" is optionally disabled', function () {
   const props = defaultProps({ sortBySetting: { disabled: true } });
   const menuItem = findMenuItem.call(this, props, 'Sort by', 'Unposted');
   strictEqual(menuItem.prop('disabled'), true);
+});
+
+test('"Unposted" menu item is optionally excluded from the menu', function () {
+  const props = defaultProps({ props: { showUnpostedMenuItem: false } });
+  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Unposted');
+  notOk(menuItem);
 });
 
 QUnit.module('AssignmentColumnHeader: Curve Grades Dialog', {

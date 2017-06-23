@@ -2363,6 +2363,7 @@ define [
         addGradebookElement: @keyboardNav.addGradebookElement
         removeGradebookElement: @keyboardNav.removeGradebookElement
         onMenuClose: @handleColumnHeaderMenuClose
+        showUnpostedMenuItem: @options.new_gradebook_development_enabled
       }
 
     renderAssignmentColumnHeader: (assignmentId) =>

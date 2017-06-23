@@ -92,6 +92,7 @@ class AssignmentColumnHeader extends ColumnHeader {
       onSelect: func.isRequired
     }).isRequired,
     onMenuClose: func.isRequired,
+    showUnpostedMenuItem: bool.isRequired,
     ...ColumnHeader.propTypes
   };
 
@@ -252,13 +253,16 @@ class AssignmentColumnHeader extends ColumnHeader {
               {I18n.t('Late')}
             </MenuItem>
 
-            <MenuItem
-              selected={selectedSortSetting === 'unposted'}
-              disabled={sortBySetting.disabled}
-              onSelect={sortBySetting.onSortByUnposted}
-            >
-              {I18n.t('Unposted')}
-            </MenuItem>
+            {
+              this.props.showUnpostedMenuItem &&
+                <MenuItem
+                  selected={selectedSortSetting === 'unposted'}
+                  disabled={sortBySetting.disabled}
+                  onSelect={sortBySetting.onSortByUnposted}
+                >
+                  {I18n.t('Unposted')}
+                </MenuItem>
+            }
           </MenuItemGroup>
         </MenuItemFlyout>
 
