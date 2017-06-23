@@ -19,6 +19,7 @@
 import I18n from 'i18n!blueprint_courses'
 import React from 'react'
 import PropTypes from 'prop-types'
+import cx from 'classnames'
 
 import PresentationContent from 'instructure-ui/lib/components/PresentationContent'
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
@@ -28,13 +29,13 @@ import Button from 'instructure-ui/lib/components/Button'
 import Typography from 'instructure-ui/lib/components/Typography'
 import Grid, { GridRow, GridCol } from 'instructure-ui/lib/components/Grid'
 
-import IconLock from 'instructure-icons/lib/Solid/IconBlueprintLockSolid'
-import IconUnlock from 'instructure-icons/lib/Solid/IconBlueprintSolid'
+import { IconLock, IconUnlock } from './BlueprintLocks'
+import LockCheckList from './LockCheckList'
 
 import propTypes from '../propTypes'
 import {formatLockObject} from '../LockItemFormat'
 import {itemTypeLabelPlurals} from '../labels'
-import LockCheckList from './LockCheckList'
+
 
 export default class ExpandableLockOptions extends React.Component {
   static propTypes = {
@@ -100,7 +101,7 @@ export default class ExpandableLockOptions extends React.Component {
   renderLockIcon () {
     const hasLocks = Object.keys(this.state.locks)
       .reduce((isLocked, lockProp) => isLocked || this.state.locks[lockProp], false)
-    const Icon = hasLocks ? <IconLock title={I18n.t('Locked')} /> : <IconUnlock title={I18n.t('Unlocked')} />
+    const Icon = hasLocks ? <IconLock /> : <IconUnlock />
     return (
       <div className="bcs_tab-icon">
         {Icon}
@@ -109,20 +110,22 @@ export default class ExpandableLockOptions extends React.Component {
   }
 
   renderSubList () {
-    if (this.state.open) {
-      return (
+    const viewableClasses = cx({
+      'bcs_sub-menu': true,
+      'bcs_sub-menu-viewable': this.state.open,
+    })
+    return (
+      <div className={viewableClasses}>
         <LockCheckList
           formName={`[blueprint_restrictions_by_object_type][${this.props.objectType}]`}
           locks={this.state.locks}
           lockableAttributes={this.props.lockableAttributes}
           onChange={this.onChange}
-
         />
-      )
-    } else {
-      return null
-    }
+      </div>
+    )
   }
+
 
   render () {
     return (

@@ -161,6 +161,22 @@ describe ActiveRecord::Base do
         end
       }.to raise_error(ArgumentError)
     end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "properly transposes a cursor query across multiple shards" do
+        u1 = User.create!
+        u2 = @shard1.activate { User.create! }
+        User.transaction do
+          users = []
+          User.preload(:pseudonyms).where(id: [u1, u2]).find_each do |u|
+            users << u
+          end
+          expect(users.sort).to eq [u1, u2].sort
+        end
+      end
+    end
   end
 
   describe "#remove_dropped_columns" do

@@ -16,7 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-
 module ConfigFile
   class << self
     def unstub
@@ -25,7 +24,7 @@ module ConfigFile
     end
 
     Canvas::Reloader.on_reload do
-      unstub
+      ConfigFile.unstub
     end
 
     def stub(config_name, value)

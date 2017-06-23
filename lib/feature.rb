@@ -496,7 +496,13 @@ END
       applies_to: 'Account',
       state: 'hidden',
       beta: true,
-      root_opt_in: true
+      root_opt_in: true,
+      custom_transition_proc: ->(_, _, from_state, transitions) do
+        if from_state == 'on'
+          transitions['off'] = { 'locked' => true, 'message' => I18n.t('This feature cannot be disabled once it has been turned on.') }
+          transitions['allowed'] = { 'locked' => true, 'message' => I18n.t('This feature cannot be disabled once it has been turned on.') }
+        end
+      end
     },
     'plagiarism_detection_platform' =>
     {
@@ -512,7 +518,7 @@ END
       display_name: -> { I18n.t('Blueprint Courses') }, # this won't be confusing at all
       description: -> { I18n.t('Enable the creation of Blueprint Courses') },
       applies_to: 'RootAccount',
-      state: 'hidden',
+      state: 'allowed',
       beta: true,
     },
     'student_context_cards' =>

@@ -40,7 +40,7 @@ gem 'authlogic', '3.5.0'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.9.9'
+gem 'switchman', '1.9.14'
   gem 'open4', '1.3.4', require: false
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   # for folio, see the folio README
@@ -56,7 +56,7 @@ gem 'barby', '0.6.5', require: false
   gem 'rqrcode', '0.10.1', require: false
   gem 'chunky_png', '1.3.8', require: false
 gem 'bcrypt', '3.1.11'
-gem 'canvas_connect', '0.3.10'
+gem 'canvas_connect', '0.3.12'
   gem 'adobe_connect', '1.0.5', require: false
 gem 'canvas_webex', '0.17'
 gem 'inst-jobs', '0.13.3'

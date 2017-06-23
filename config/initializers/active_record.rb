@@ -18,7 +18,8 @@
 require 'active_support/callbacks/suspension'
 
 class ActiveRecord::Base
-  self.cache_timestamp_format = :usec
+  # CANVAS_RAILS4_2 - set this back to :usec once we're on Rails 5 for good
+  self.cache_timestamp_format = :bogus
 
   public :write_attribute
 
@@ -626,10 +627,10 @@ module UsefulFindInBatches
   def find_in_batches(options = {}, &block)
     # already in a transaction (or transactions don't matter); cursor is fine
     if can_use_cursor? && !options[:start]
-      self.activate { find_in_batches_with_cursor(options, &block) }
+      self.activate { |r| r.find_in_batches_with_cursor(options, &block) }
     elsif find_in_batches_needs_temp_table?
       raise ArgumentError.new("GROUP and ORDER are incompatible with :start, as is an explicit select without the primary key") if options[:start]
-      self.activate { find_in_batches_with_temp_table(options, &block) }
+      self.activate { |r| r.find_in_batches_with_temp_table(options, &block) }
     else
       super
     end
@@ -1189,7 +1190,7 @@ class ActiveRecord::Migration
 end
 
 class ActiveRecord::MigrationProxy
-  delegate :connection, :tags, to: :migration
+  delegate :connection, :tags, :cassandra_cluster, to: :migration
 
   def runnable?
     !migration.respond_to?(:runnable?) || migration.runnable?

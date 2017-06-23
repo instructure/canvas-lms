@@ -163,14 +163,24 @@ describe SisImportsApiController, type: :request do
     expect(batch.reload.workflow_state).to eq 'aborted'
   end
 
-  it 'should not asploid if there is no batch' do
+  it 'should allow aborting an importing batch' do
     batch = @account.sis_batches.create
     SisBatch.where(id: batch).update_all(workflow_state: 'importing')
+    api_call(:put, "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}/abort",
+             {controller: 'sis_imports_api', action: 'abort', format: 'json',
+              account_id: @account.id.to_s, id: batch.id.to_s})
+    expect(batch.reload.workflow_state).to eq 'aborted'
+  end
+
+  it 'should not explode if there is no batch' do
+    batch = @account.sis_batches.create
+    SisBatch.where(id: batch).update_all(workflow_state: 'imported')
     raw_api_call(:put,
                  "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}/abort",
                  {controller: 'sis_imports_api', action: 'abort', format: 'json',
                   account_id: @account.id.to_s, id: batch.id.to_s})
     assert_status(404)
+    expect(batch.reload.workflow_state).to eq 'imported'
   end
 
   it 'should abort all pending batches on abort' do

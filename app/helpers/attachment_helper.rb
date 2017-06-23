@@ -64,6 +64,9 @@ module AttachmentHelper
     elsif Attachment.local_storage?
       @headers = false if @files_domain
       send_file(attachment.full_filename, :type => attachment.content_type_with_encoding, :disposition => (inline ? 'inline' : 'attachment'), :filename => attachment.display_name)
+    elsif inline && attachment.mime_class == 'html' && attachment.size < Setting.get('max_inline_html_proxy_size', 128 * 1024).to_i
+      send_file_headers!( :length=> attachment.s3object.content_length, :filename=>attachment.filename, :disposition => 'inline', :type => attachment.content_type_with_encoding)
+      render body: attachment.s3object.get.body.read
     else
       redirect_to(inline ? attachment.inline_url : attachment.download_url)
     end

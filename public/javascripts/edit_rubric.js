@@ -753,7 +753,10 @@ import 'compiled/jquery/fixDialogButtons'
         var $rubric = $(this).parents(".rubric");
         if (!$rubric.find(".criterion:not(.blank)").length) return false;
         var data = rubricEditing.rubricData($rubric);
-        if (data['rubric_association[use_for_grading]'] == '1') {
+        if (ENV.MASTER_COURSE_DATA && ENV.MASTER_COURSE_DATA.restricted_by_master_course &&
+          ENV.MASTER_COURSE_DATA.is_master_course_child_content && ENV.MASTER_COURSE_DATA.master_course_restrictions.points) {
+          skipPointsUpdate = true;
+        } else if (data['rubric_association[use_for_grading]'] == '1') {
           var assignmentPoints = numberHelper.parse($("#assignment_show .points_possible, .discussion-title .discussion-points").text());
           var rubricPoints = parseFloat(data.points_possible);
           if (assignmentPoints != null && assignmentPoints != undefined && rubricPoints != assignmentPoints && !forceSubmit) {

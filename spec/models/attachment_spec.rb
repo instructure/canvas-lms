@@ -447,6 +447,42 @@ describe Attachment do
       expect(a.content_type).to eq 'unknown/unknown'
     end
 
+    it 'should not delete s3objects if it is not production for destroy_content' do
+      ApplicationController.stubs(:test_cluster?).returns(true)
+      s3_storage!
+      a = attachment_model
+      a.stubs(:s3object).returns(mock('s3object'))
+      s3object = a.s3object
+      s3object.expects(:delete).never
+      a.destroy_content
+    end
+
+    it 'should destroy all crocodocs even from children attachments' do
+      local_storage!
+      configure_crocodoc
+
+      a = crocodocable_attachment_model(uploaded_data: default_uploaded_data)
+      a2 = attachment_model(root_attachment: a)
+      a2.submit_to_canvadocs 1, wants_annotation: true
+      a.submit_to_canvadocs 1, wants_annotation: true
+      run_jobs
+
+      expect(a.crocodoc_document).not_to be_nil
+      expect(a2.crocodoc_document).not_to be_nil
+      a.destroy_content_and_replace
+      expect(a.reload.crocodoc_document).to be_nil
+      expect(a2.reload.crocodoc_document).to be_nil
+    end
+
+    it 'should allow destroy_content_and_replace on children attachments' do
+      a = attachment_model(uploaded_data: default_uploaded_data)
+      a2 = attachment_model(root_attachment: a)
+      a2.destroy_content_and_replace
+      purgatory = Purgatory.where(attachment_id: [a.id, a2.id])
+      expect(purgatory.count).to eq 1
+      expect(purgatory.take.attachment_id).to eq a.id
+    end
+
     shared_examples_for "purgatory" do
       it 'should save file in purgatory and then restore and back again' do
         a = attachment_model(uploaded_data: default_uploaded_data)

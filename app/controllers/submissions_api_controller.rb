@@ -226,7 +226,7 @@ class SubmissionsApiController < ApplicationController
                                                            @current_user, section_ids)
                         .pluck(:user_id)
                     end
-      submissions = @assignment.submissions.not_placeholder.where(user_id: student_ids).preload(:originality_reports)
+      submissions = @assignment.submissions.where(user_id: student_ids).preload(:originality_reports)
 
       if includes.include?("visibility")
         json = bulk_process_submissions_for_visibility(submissions, includes)
@@ -393,7 +393,7 @@ class SubmissionsApiController < ApplicationController
                         "assignments.workflow_state != 'deleted'"
                       )
                     end
-      submissions = submissions_scope.not_placeholder.preload(:originality_reports).to_a
+      submissions = submissions_scope.preload(:originality_reports).to_a
       bulk_load_attachments_and_previews(submissions)
       submissions_for_user = submissions.group_by(&:user_id)
 
@@ -442,7 +442,7 @@ class SubmissionsApiController < ApplicationController
       order_by = params[:order] == "graded_at" ? "graded_at" : :id
       order_direction = params[:order_direction] == "descending" ? "desc nulls last" : "asc"
       order = "#{order_by} #{order_direction}"
-      submissions = @context.submissions.not_placeholder.except(:order).where(user_id: student_ids).order(order)
+      submissions = @context.submissions.except(:order).where(user_id: student_ids).order(order)
       submissions = submissions.where(:assignment_id => assignments) unless assignments.empty?
       submissions = submissions.preload(:user, :originality_reports)
 
@@ -775,7 +775,7 @@ class SubmissionsApiController < ApplicationController
       students = Api.paginate(student_scope, self, api_v1_course_assignment_gradeable_students_url(@context, @assignment))
       if (include_pg = includes.include?('provisional_grades'))
         return unless authorized_action(@context, @current_user, :moderate_grades)
-        submissions = @assignment.submissions.not_placeholder.where(user_id: students).preload(:provisional_grades).index_by(&:user_id)
+        submissions = @assignment.submissions.where(user_id: students).preload(:provisional_grades).index_by(&:user_id)
         selections = @assignment.moderated_grading_selections.where(student_id: students).index_by(&:student_id)
       end
       render :json => students.map { |student|
@@ -947,6 +947,40 @@ class SubmissionsApiController < ApplicationController
 
   def map_user_ids(user_ids)
     Api.map_ids(user_ids, User, @domain_root_account, @current_user)
+  end
+
+  # @API Submission Summary
+  #
+  # Returns the number of submissions for the given assignment based on gradeable students
+  # that fall into three categories: graded, ungraded, not submitted.
+  #
+  # @example_response
+  #   {
+  #     "graded": 5,
+  #     "ungraded": 10,
+  #     "not_submitted": 42
+  #   }
+  def submission_summary
+    if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
+      @assignment = @context.assignments.active.find(params[:assignment_id])
+      student_scope = @context.students_visible_to(@current_user, include: :inactive)
+      student_scope = @assignment.students_with_visibility(student_scope)
+      student_ids = student_scope.pluck(:id)
+
+      graded = @context.submissions.in_workflow_state('graded').where(user_id: student_ids, assignment_id: @assignment).count
+      ungraded = @context.submissions.
+        ungraded.having_submission.
+        where(user_id: student_ids, assignment_id: @assignment, excused: [nil, false]).
+        count
+      pending_quizzes = @context.submissions.
+        in_workflow_state('pending_review').having_submission.
+        where(user_id: student_ids, assignment_id: @assignment, excused: [nil, false]).
+        count
+      ungraded += pending_quizzes
+      not_submitted = student_ids.count - graded - ungraded
+
+      render json: {graded: graded, ungraded: ungraded, not_submitted: not_submitted}
+    end
   end
 
   private

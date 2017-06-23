@@ -192,8 +192,15 @@ actions.removeAssociations = associations => (dispatch, getState) => {
 
 actions.loadCourses = filters => (dispatch, getState) => {
   dispatch(actions.loadCoursesStart())
+  // responses may come out of order. only display results from the most recent query
+  actions.loadCoursesSequence = (actions.loadCoursesSequence || 0) + 1
+  const currentSequence = actions.loadCoursesSequence
   api.getCourses(getState(), filters)
-    .then(res => dispatch(actions.loadCoursesSuccess(res.data)))
+    .then((res) => {
+      if (currentSequence === actions.loadCoursesSequence) {
+        dispatch(actions.loadCoursesSuccess(res.data))
+      }
+    })
     .catch(err => dispatch(actions.loadCoursesFail({ err, message: I18n.t('An error occurred while loading courses') })))
 }
 

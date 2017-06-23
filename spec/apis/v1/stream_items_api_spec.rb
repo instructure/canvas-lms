@@ -496,7 +496,7 @@ describe UsersController, type: :request do
       'assignment_id' => @assignment.id,
       'attempt' => nil,
       'body' => nil,
-      'grade_matches_current_submission' => nil,
+      'grade_matches_current_submission' => true,
       'preview_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}?preview=1&version=1",
       'submission_type' => nil,
       'submitted_at' => nil,

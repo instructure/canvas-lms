@@ -408,7 +408,8 @@ define [
 
       if @isAnnouncement()
         unless data.message?.length > 0
-          errors['message'] = [{type: 'message_required_error', message: I18n.t("A message is required")}]
+          unless @lockedItems.content
+            errors['message'] = [{type: 'message_required_error', message: I18n.t("A message is required")}]
       if @showConditionalRelease()
         crErrors = @conditionalReleaseEditor.validateBeforeSave()
         errors['conditional_release'] = crErrors if crErrors

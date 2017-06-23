@@ -22,7 +22,7 @@ class Login::SamlController < ApplicationController
   protect_from_forgery except: [:create, :destroy], with: :exception
 
   before_action :forbid_on_files_domain
-  before_action :run_login_hooks, :check_sa_delegated_cookie, only: [:new, :create]
+  before_action :run_login_hooks, only: [:new, :create]
   before_action :fix_ms_office_redirects, only: :new
 
   def new

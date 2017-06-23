@@ -36,7 +36,7 @@ module Lti
     def self.by_product_family(product_family, context)
       tool_proxies = ToolProxy.find_active_proxies_for_context(context)
       tool_proxies = tool_proxies.where(product_family: product_family)
-      tool_proxies.map { |tp| tp.resources.flatten }.flatten
+      tool_proxies.map { |tp| tp.resources.to_a.flatten }.flatten
     end
 
 

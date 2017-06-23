@@ -18,6 +18,15 @@
 
 @import "base/environment";
 
+.bcs_sub-menu {
+  display: none;
+}
+
+.bcs_sub-menu-viewable {
+  display: block;
+}
+
+
 .bcs_sub-menu-item {
     margin-left: 2.5em;
     margin-bottom: .75em;

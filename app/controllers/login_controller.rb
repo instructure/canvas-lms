@@ -23,7 +23,6 @@ class LoginController < ApplicationController
 
   before_action :forbid_on_files_domain, except: :clear_file_session
   before_action :run_login_hooks, only: :new
-  before_action :check_sa_delegated_cookie, only: :new
   before_action :fix_ms_office_redirects, only: :new
   skip_before_action :require_reacceptance_of_terms
 
@@ -79,8 +78,8 @@ class LoginController < ApplicationController
 
     unless flash[:delegated_message]
       return redirect_to url_for({ controller: "login/#{auth_type}", action: :new }
-                                     .merge(params.slice(:id))
-                                     .merge(params.slice(:pseudonym_session)))
+                                     .merge(params.permit(:id))
+                                     .merge(params.permit(pseudonym_session: :unique_id).to_h))
     end
 
     # we had an error from an SSO - we need to show it
