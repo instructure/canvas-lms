@@ -295,7 +295,7 @@ class PlannerOverridesController < ApplicationController
              each_with_object([]) do |(scope_name, scope), all_scopes|
                next if scope.blank?
                base_model = scope_name == :ungraded_quiz ? Quizzes::Quiz : Assignment
-               collection = item_collection(scope_name.to_s, scope, base_model, :id)
+               collection = item_collection(scope_name.to_s, scope, base_model, :due_at, :created_at, :id)
                all_scopes << collection
              end
     scopes
@@ -305,7 +305,7 @@ class PlannerOverridesController < ApplicationController
     item_collection('unread_discussion_topics',
                     DiscussionTopic.active.todo_date_between(start_date, end_date).
                     unread_for(@current_user),
-                    DiscussionTopic, :id)
+                    DiscussionTopic, :todo_date, :posted_at, :delayed_post_at, :last_reply_at, :created_at, :id)
   end
 
   def unread_submission_collection
@@ -313,25 +313,25 @@ class PlannerOverridesController < ApplicationController
                     Assignment.active.joins(:submissions).
                     where(submissions: {id: Submission.unread_for(@current_user).pluck(:id)}).
                     due_between_with_overrides(start_date, end_date),
-                    Assignment, :id)
+                    Assignment, :due_at, :created_at, :id)
   end
 
   def planner_note_collection
     item_collection('planner_notes',
                     PlannerNote.where(user: @current_user, todo_date: @start_date...@end_date),
-                    PlannerNote, :id)
+                    PlannerNote, :todo_date, :created_at, :id)
   end
 
   def page_collection
     item_collection('pages',
                     @current_user.wiki_pages_needing_viewing(default_opts),
-                    WikiPage, :id)
+                    WikiPage, :todo_date, :created_at, :id)
   end
 
   def ungraded_discussion_collection
     item_collection('ungraded_discussions',
                     @current_user.discussion_topics_needing_viewing(default_opts),
-                    DiscussionTopic, :id)
+                    DiscussionTopic, :todo_date, :posted_at, :delayed_post_at, :last_reply_at, :created_at, :id)
   end
 
   def item_collection(label, scope, base_model, *order_by)

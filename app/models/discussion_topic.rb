@@ -521,8 +521,7 @@ class DiscussionTopic < ActiveRecord::Base
     where("discussion_topic_participants.id IS NOT NULL
           AND (discussion_topic_participants.user_id = :user
             AND discussion_topic_participants.workflow_state = 'read')",
-          user: user).
-    distinct
+          user: user)
   }
   scope :unread_for, lambda { |user|
     # TODO: Fix for when participants doesn't include user
@@ -530,8 +529,7 @@ class DiscussionTopic < ActiveRecord::Base
     where("discussion_topic_participants.id IS NULL
           OR (discussion_topic_participants.user_id = :user
             AND discussion_topic_participants.workflow_state <> 'read')",
-          user: user).
-    distinct
+          user: user)
   }
   scope :published, -> { where("discussion_topics.workflow_state = 'active'") }
 

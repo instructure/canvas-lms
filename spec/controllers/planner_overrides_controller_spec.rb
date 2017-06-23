@@ -174,6 +174,67 @@ describe PlannerOverridesController do
           end
         end
 
+        context "date sorting" do
+          it "should return results in order by object type then date" do
+            wiki_page_model(course: @course)
+            @page.todo_date = 1.day.from_now
+            @page.save!
+            @assignment3 = course_assignment
+            @assignment3.due_at = 1.week.ago
+            @assignment3.save!
+            get :items_index
+            response_json = json_parse(response.body)
+            expect(response_json.length).to eq 4
+            expect(response_json.map { |i| i["plannable_id"] }).to eq [@assignment3.id, @assignment.id, @assignment2.id, @page.id]
+          end
+        end
+
+        context "pagination" do
+          PER_PAGE = 5
+
+          def test_page(idx = 0, bookmark = nil)
+            opts = { per_page: PER_PAGE }
+            opts.merge(page: bookmark) if bookmark.present?
+
+            page =  get :items_index, opts
+            links = Api.parse_pagination_links(page.headers['Link'])
+            response_json = json_parse(page.body)
+            expect(response_json.length).to eq PER_PAGE
+            ids = response_json.map { |i| i["plannable_id"] }
+            expected_ids = []
+            PER_PAGE.times.with_index(idx) {|i| expected_ids << @assignments[i].id}
+            expect(ids).to eq expected_ids
+
+            links.detect { |l| l[:rel] == "next" }["page"]
+          end
+
+          before :once do
+            @assignments = []
+            20.downto(0) do |i|
+              asg = course_assignment
+              asg.due_at = i.days.ago
+              asg.save!
+              @assignments << asg
+            end
+          end
+
+          it "should adhere to per_page" do
+            get :items_index, per_page: 2
+            response_json = json_parse(response.body)
+            expect(response_json.length).to eq 2
+            expect(response_json.map { |i| i["plannable_id"] }).to eq [@assignments[0].id, @assignments[1].id]
+          end
+
+          it "should paginate results in correct order" do
+            next_page = ''
+            10.times do |i|
+              next_page = test_page(i, next_page)
+            end
+          end
+
+        end
+
+
         context "new activity filter" do
           it "should return newly created & unseen items" do
             dt = @course.discussion_topics.create!(title: "Yes", message: "Please", user: @teacher, todo_date: Time.zone.now)
