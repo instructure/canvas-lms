@@ -34,62 +34,8 @@ describe WikiPagesApiController, type: :request do
       wiki_page_model({ :title => "Wiki Page" })
     end
 
-    describe 'duplicate feature enabled' do
-      before :once do
-        a = @course.account
-        a.enable_feature!(:duplicate_objects)
-        a.save!
-      end
-
-      it "returns unauthorized if not a teacher" do
-        api_call_as_user(@student, :post,
-          "/api/v1/courses/#{@course.id}/pages/#{@page.url}/duplicate.json",
-          { :controller => "wiki_pages_api",
-            :action => "duplicate",
-            :format => "json",
-            :course_id => @course.id.to_s,
-            :url => @page.url },
-          {},
-          {},
-          { :expected_status => 401 })
-      end
-
-      it "can duplicate wiki non-assignment if teacher" do
-        json = api_call_as_user(@teacher, :post,
-          "/api/v1/courses/#{@course.id}/pages/#{@page.url}/duplicate.json",
-          { :controller => "wiki_pages_api",
-            :action => "duplicate",
-            :format => "json",
-            :course_id => @course.id.to_s,
-            :url => @page.url },
-          {},
-          {},
-          { :expected_status => 200 })
-        expect(json["title"]).to eq "Wiki Page Copy"
-      end
-
-      it "can duplicate wiki assignment if teacher" do
-        wiki_page_assignment_model({ :title => "Assignment Wiki" })
-        json = api_call_as_user(@teacher, :post,
-          "/api/v1/courses/#{@course.id}/pages/#{@page.url}/duplicate.json",
-          { :controller => "wiki_pages_api",
-            :action => "duplicate",
-            :format => "json",
-            :course_id => @course.id.to_s,
-            :url => @page.url },
-          {},
-          {},
-          { :expected_status => 200 })
-        expect(json["title"]).to eq "Assignment Wiki Copy"
-      end
-    end
-
-    it 'duplicate feature disabled' do
-      a = @course.account
-      a.disable_feature!(:duplicate_objects)
-      a.save!
-      wiki_page_assignment_model({ :title => "Assignment Wiki" })
-      api_call_as_user(@teacher, :post,
+    it "returns unauthorized if not a teacher" do
+      api_call_as_user(@student, :post,
         "/api/v1/courses/#{@course.id}/pages/#{@page.url}/duplicate.json",
         { :controller => "wiki_pages_api",
           :action => "duplicate",
@@ -98,7 +44,36 @@ describe WikiPagesApiController, type: :request do
           :url => @page.url },
         {},
         {},
-        { :expected_status => 400 })
+        { :expected_status => 401 })
+    end
+
+    it "can duplicate wiki non-assignment if teacher" do
+      json = api_call_as_user(@teacher, :post,
+        "/api/v1/courses/#{@course.id}/pages/#{@page.url}/duplicate.json",
+        { :controller => "wiki_pages_api",
+          :action => "duplicate",
+          :format => "json",
+          :course_id => @course.id.to_s,
+          :url => @page.url },
+        {},
+        {},
+        { :expected_status => 200 })
+      expect(json["title"]).to eq "Wiki Page Copy"
+    end
+
+    it "can duplicate wiki assignment if teacher" do
+      wiki_page_assignment_model({ :title => "Assignment Wiki" })
+      json = api_call_as_user(@teacher, :post,
+        "/api/v1/courses/#{@course.id}/pages/#{@page.url}/duplicate.json",
+        { :controller => "wiki_pages_api",
+          :action => "duplicate",
+          :format => "json",
+          :course_id => @course.id.to_s,
+          :url => @page.url },
+        {},
+        {},
+        { :expected_status => 200 })
+      expect(json["title"]).to eq "Assignment Wiki Copy"
     end
   end
 end

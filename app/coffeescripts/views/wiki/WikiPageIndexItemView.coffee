@@ -59,7 +59,6 @@ define [
       json.CAN =
         MANAGE: !!@WIKI_RIGHTS.manage
         PUBLISH: !!@WIKI_RIGHTS.manage && @contextName == 'courses'
-        DUPLICATE: !!ENV.DUPLICATE_ENABLED
 
       json.cannot_edit_by_master_course = json.is_master_course_child_content && json.restricted_by_master_course
 

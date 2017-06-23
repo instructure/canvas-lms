@@ -274,7 +274,7 @@ define [
 
     canDuplicate: ->
       # For now, forbid duplicating quizzes. We will implement that later.
-      (@userIsAdmin || @canManage()) && ENV.DUPLICATE_ENABLED && @isDuplicableAssignment()
+      (@userIsAdmin || @canManage()) && @isDuplicableAssignment()
 
     canMove: ->
       @userIsAdmin or (@canManage() and @model.canMove())

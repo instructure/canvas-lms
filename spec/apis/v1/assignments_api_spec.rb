@@ -925,147 +925,119 @@ describe AssignmentsApiController, type: :request do
       student_in_course(active_all: true)
     end
 
-    describe 'duplicating enabled' do
-      before :once do
-        a = @course.account
-        a.enable_feature!(:duplicate_objects)
-        a.save!
-      end
-
-      it "students cannot duplicate" do
-        assignment = @course.assignments.create(
-          :title => "some assignment",
-          :assignment_group => @group,
-          :due_at => Time.zone.now + 1.week
-        )
-        api_call_as_user(@student, :post,
-          "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json",
-          { :controller => "assignments_api",
-            :action => "duplicate",
-            :format => "json",
-            :course_id => @course.id.to_s,
-            :assignment_id => assignment.id.to_s },
-          {},
-          {},
-          { :expected_status => 401 })
-      end
-
-      it "should duplicate if teacher" do
-        assignment = @course.assignments.create(
-          :title => "some assignment",
-          :assignment_group => @group,
-          :due_at => Time.zone.now + 1.week
-        )
-        json = api_call_as_user(@teacher, :post,
-          "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json",
-          { :controller => "assignments_api",
-            :action => "duplicate",
-            :format => "json", :course_id => @course.id.to_s,
-            :assignment_id => assignment.id.to_s },
-          {},
-          {},
-          { :expected_status => 200 })
-        expect(json["name"]).to eq "some assignment Copy"
-      end
-
-      it "should require non-quiz" do
-        assignment = @course.assignments.create(:title => "some assignment")
-        assignment.quiz = @course.quizzes.create
-        api_call_as_user(@teacher, :post,
-          "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json",
-          { :controller => "assignments_api",
-            :action => "duplicate",
-            :format => "json",
-            :course_id => @course.id.to_s,
-            :assignment_id => assignment.id.to_s },
-            {},
-            {},
-            { :expected_status => 400 })
-      end
-
-      it "should require non-discussion topic" do
-        assignment = group_discussion_assignment.assignment
-        api_call_as_user(@teacher, :post,
-          "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json",
-          { :controller => "assignments_api",
-            :action => "duplicate",
-            :format => "json",
-            :course_id => @course.id.to_s,
-            :assignment_id => assignment.id.to_s },
-          {},
-          {},
-          { :expected_status => 400 })
-      end
-
-      it "should duplicate wiki page assignment" do
-        assignment = wiki_page_assignment_model({ :title => "Wiki Page Assignment" })
-        assignment.save!
-        json = api_call_as_user(@teacher, :post,
-          "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json",
-          { :controller => "assignments_api",
-            :action => "duplicate",
-            :format => "json",
-            :course_id => @course.id.to_s,
-            :assignment_id => assignment.id.to_s },
-          {},
-          {},
-          { :expected_status => 200 })
-        expect(json["name"]).to eq "Wiki Page Assignment Copy"
-      end
-
-      it "should require non-deleted assignment" do
-        assignment = @course.assignments.create(
-          :title => "some assignment",
-          :workflow_state => "deleted"
-        )
-        # assignment.save!
-        api_call_as_user(@teacher, :post,
-          "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json",
-          { :controller => "assignments_api",
-            :action => "duplicate",
-            :format => "json",
-            :course_id => @course.id.to_s,
-            :assignment_id => assignment.id.to_s },
-          {},
-          {},
-          { :expected_status => 400 })
-      end
-
-      it "should require existing assignment" do
-        assignment = @course.assignments.create(
-          :title => "some assignment",
-          :workflow_state => "deleted"
-        )
-        assignment.save!
-        assignment_id = Assignment.maximum(:id) + 100
-        api_call_as_user(@teacher, :post,
-          "/api/v1/courses/#{@course.id}/assignments/#{assignment_id}/duplicate.json",
-          { :controller => "assignments_api",
-            :action => "duplicate",
-            :format => "json",
-            :course_id => @course.id.to_s,
-            :assignment_id => assignment_id.to_s },
-          {},
-          {},
-          { :expected_status => 400 })
-      end
-    end
-
-    it 'should not duplicate if feature disabled' do
-      a = @course.account
-      a.disable_feature!(:duplicate_objects)
-      a.save!
+    it "students cannot duplicate" do
       assignment = @course.assignments.create(
         :title => "some assignment",
         :assignment_group => @group,
         :due_at => Time.zone.now + 1.week
       )
-      api_call_as_user(@teacher, :post,
+      api_call_as_user(@student, :post,
+        "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json",
+        { :controller => "assignments_api",
+          :action => "duplicate",
+          :format => "json",
+          :course_id => @course.id.to_s,
+          :assignment_id => assignment.id.to_s },
+        {},
+        {},
+        { :expected_status => 401 })
+    end
+
+    it "should duplicate if teacher" do
+      assignment = @course.assignments.create(
+        :title => "some assignment",
+        :assignment_group => @group,
+        :due_at => Time.zone.now + 1.week
+      )
+      json = api_call_as_user(@teacher, :post,
         "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json",
         { :controller => "assignments_api",
           :action => "duplicate",
           :format => "json", :course_id => @course.id.to_s,
           :assignment_id => assignment.id.to_s },
+        {},
+        {},
+        { :expected_status => 200 })
+      expect(json["name"]).to eq "some assignment Copy"
+    end
+
+    it "should require non-quiz" do
+      assignment = @course.assignments.create(:title => "some assignment")
+      assignment.quiz = @course.quizzes.create
+      api_call_as_user(@teacher, :post,
+        "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json",
+        { :controller => "assignments_api",
+          :action => "duplicate",
+          :format => "json",
+          :course_id => @course.id.to_s,
+          :assignment_id => assignment.id.to_s },
+          {},
+          {},
+          { :expected_status => 400 })
+    end
+
+    it "should require non-discussion topic" do
+      assignment = group_discussion_assignment.assignment
+      api_call_as_user(@teacher, :post,
+        "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json",
+        { :controller => "assignments_api",
+          :action => "duplicate",
+          :format => "json",
+          :course_id => @course.id.to_s,
+          :assignment_id => assignment.id.to_s },
+        {},
+        {},
+        { :expected_status => 400 })
+    end
+
+    it "should duplicate wiki page assignment" do
+      assignment = wiki_page_assignment_model({ :title => "Wiki Page Assignment" })
+      assignment.save!
+      json = api_call_as_user(@teacher, :post,
+        "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json",
+        { :controller => "assignments_api",
+          :action => "duplicate",
+          :format => "json",
+          :course_id => @course.id.to_s,
+          :assignment_id => assignment.id.to_s },
+        {},
+        {},
+        { :expected_status => 200 })
+      expect(json["name"]).to eq "Wiki Page Assignment Copy"
+    end
+
+    it "should require non-deleted assignment" do
+      assignment = @course.assignments.create(
+        :title => "some assignment",
+        :workflow_state => "deleted"
+      )
+      # assignment.save!
+      api_call_as_user(@teacher, :post,
+        "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json",
+        { :controller => "assignments_api",
+          :action => "duplicate",
+          :format => "json",
+          :course_id => @course.id.to_s,
+          :assignment_id => assignment.id.to_s },
+        {},
+        {},
+        { :expected_status => 400 })
+    end
+
+    it "should require existing assignment" do
+      assignment = @course.assignments.create(
+        :title => "some assignment",
+        :workflow_state => "deleted"
+      )
+      assignment.save!
+      assignment_id = Assignment.maximum(:id) + 100
+      api_call_as_user(@teacher, :post,
+        "/api/v1/courses/#{@course.id}/assignments/#{assignment_id}/duplicate.json",
+        { :controller => "assignments_api",
+          :action => "duplicate",
+          :format => "json",
+          :course_id => @course.id.to_s,
+          :assignment_id => assignment_id.to_s },
         {},
         {},
         { :expected_status => 400 })

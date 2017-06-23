@@ -603,10 +603,6 @@ class AssignmentsApiController < ApplicationController
 
     return unless authorized_action(old_assignment, @current_user, :create)
 
-    if !@context.root_account.feature_enabled?(:duplicate_objects)
-      return render json: { error: 'duplicating objects not enabled' }, status: 400
-    end
-
     new_assignment = old_assignment.duplicate
     new_assignment.save!
     render :json => assignment_json(new_assignment, @current_user, session)

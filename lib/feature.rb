@@ -253,15 +253,6 @@ END
       root_opt_in: true,
       beta: true
     },
-    'duplicate_objects' =>
-    {
-      display_name: -> { I18n.t('Duplicate Objects') },
-      description: -> { I18n.t("Allows the duplicating of objects in Canvas") },
-      applies_to: 'Account',
-      state: 'hidden',
-      root_opt_in: true,
-      beta: true
-    },
     'allow_opt_out_of_inbox' =>
     {
       display_name: -> { I18n.t('features.allow_opt_out_of_inbox', "Allow Users to Opt-out of the Inbox") },

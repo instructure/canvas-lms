@@ -79,10 +79,6 @@ class WikiPagesController < ApplicationController
       end
       js_env :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu)
       set_tutorial_js_env
-      hash = {
-       DUPLICATE_ENABLED: @domain_root_account.feature_enabled?(:duplicate_objects)
-      }
-      js_env(hash)
       @padless = true
     end
   end

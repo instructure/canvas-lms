@@ -171,10 +171,6 @@ class WikiPagesApiController < ApplicationController
   # @returns the page that was created
   def duplicate
     return unless authorized_action(@page, @current_user, :create)
-    if !@context.root_account.feature_enabled?(:duplicate_objects)
-      return render json: { error: 'duplicating objects not enabled' }, status: :bad_request
-    end
-
     if @page.deleted?
       return render json: { error: 'cannot duplicate deleted page' }, status: :bad_request
     end
