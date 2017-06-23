@@ -45,6 +45,7 @@ const options = {
   locale: window.ENV.LOCALE,
   timeZone: window.ENV.TIMEZONE,
   userId: window.ENV.current_user_id,
+  ariaHideElement: document.getElementById('application'),
   theme: (ENV.use_high_contrast) ? 'canvas-a11y' : 'canvas',
   // the new activity button isn't sticky in IE yet, so make sure it slides
   // under the header that is sticky in IE
