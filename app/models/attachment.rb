@@ -1640,27 +1640,31 @@ class Attachment < ActiveRecord::Base
     "/#{context_url_prefix}/files/#{self.id}/inline_view"
   end
 
-  def canvadoc_url(user)
+  def canvadoc_url(user, opts={})
     return unless canvadocable?
-    "/api/v1/canvadoc_session?#{preview_params(user, "canvadoc")}"
+    "/api/v1/canvadoc_session?#{preview_params(user, "canvadoc", opts)}"
   end
 
   def crocodoc_url(user, crocodoc_ids = nil)
+    opts = {
+      enable_annotations: true
+    }
+    opts[:crocodoc_ids] = crocodoc_ids if crocodoc_ids.present?
     return unless crocodoc_available?
-    "/api/v1/crocodoc_session?#{preview_params(user, "crocodoc", crocodoc_ids)}"
+    "/api/v1/crocodoc_session?#{preview_params(user, "crocodoc", opts)}"
   end
 
   def previewable_media?
     self.content_type && self.content_type.match(/\A(video|audio)/)
   end
 
-  def preview_params(user, type, crocodoc_ids = nil)
-    h = {
+  def preview_params(user, type, opts = {})
+    h = opts.merge({
       user_id: user.try(:global_id),
       attachment_id: id,
       type: type
-    }
-    h.merge!(crocodoc_ids: crocodoc_ids) if crocodoc_ids.present?
+    })
+
     blob = h.to_json
     hmac = Canvas::Security.hmac_sha1(blob)
     "blob=#{URI.encode blob}&hmac=#{URI.encode hmac}"

@@ -19,6 +19,7 @@
 module AttachmentHelper
   # returns a string of html attributes suitable for use with $.loadDocPreview
   def doc_preview_attributes(attachment, attrs={})
+    enable_annotations = attrs.delete(:enable_annotations)
     if attachment.crocodoc_available?
       begin
         attrs[:crocodoc_session_url] = attachment.crocodoc_url(@current_user, attrs[:crocodoc_ids])
@@ -26,7 +27,7 @@ module AttachmentHelper
         Canvas::Errors.capture_exception(:crocodoc, e)
       end
     elsif attachment.canvadocable?
-      attrs[:canvadoc_session_url] = attachment.canvadoc_url(@current_user)
+      attrs[:canvadoc_session_url] = attachment.canvadoc_url(@current_user, enable_annotations: enable_annotations)
     end
     attrs[:attachment_id] = attachment.id
     attrs[:mimetype] = attachment.mimetype

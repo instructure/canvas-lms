@@ -5,7 +5,8 @@ module Canvadocs
 
     def canvadocs_session_url(opts = {})
       user = opts.delete(:user)
-      opts.merge! canvadoc_permissions_for_user(user)
+      enable_annotations = opts.delete(:enable_annotations)
+      opts.merge! canvadoc_permissions_for_user(user, enable_annotations)
       opts[:url] = attachment.authenticated_s3_url(expires_in: 7.days)
       opts[:locale] = I18n.locale || I18n.default_locale
 
@@ -20,8 +21,8 @@ module Canvadocs
     end
     private :canvadocs_api
 
-    def canvadoc_permissions_for_user(user)
-      return {} unless canvadocs_can_annotate? user
+    def canvadoc_permissions_for_user(user, enable_annotations)
+      return {} unless enable_annotations && canvadocs_can_annotate?(user)
 
       annotation_context = "default"
       if ApplicationController.respond_to?(:test_cluster?) && ApplicationController.test_cluster?
@@ -57,9 +58,8 @@ module Canvadocs
     private :canvadoc_permissions_for_user
 
     def canvadocs_can_annotate?(user)
-      user && has_annotations?
+      user.present?
     end
     private :canvadocs_can_annotate?
-
   end
 end
