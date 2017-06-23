@@ -27,7 +27,8 @@
         <option value="attachment"><%= t :file_item, "File" %></option>
         <% end %>
         <% if !only || only.include?(:wiki_pages) %>
-        <option value="wiki_page"><%= t :content_page_item, "Content Page" %></option>
+        <option value="wiki_page"><%= t :content_page_item, "Content Page - Local" %></option>
+        <option value="cloned_wiki_page"><%= t :content_page_item, "Content Page - From Library" %></option>
         <% end %>
         <% if !only || only.include?(:discussion_topics) %>
         <option value="discussion_topic"><%= t :discussion_item, "Discussion" %></option>
@@ -151,6 +152,28 @@
           <input type="text" name="wiki_page[title]" class="item_title" aria-label="<%= before_label :page_name, "Page Name" %>"/>
           <a href="<%= polymorphic_url([:api_v1, @context, :wiki_pages]) %>" style="display: none;" class="add_item_url">&nbsp;</a>
         </div>
+      </div>
+      <div id="cloned_wiki_pages_select" class="module_item_option">
+        <div style="font-size: 0.8em;">
+          <i class="icon-document"></i>
+          <%= t :wiki_page_notice_cloned, 'Select the content bank page you want to associate with this *module*.', :wrapper => '<span class="holder_type">\1</span>' %>
+        </div>
+        <div style="margin-top: 5px;">
+        <select class="module_item_select" aria-label="<%= t 'wiki_page_select_label_cloned', 'Select the content bank page you want to associate.' %>" multiple>
+          <%# cache on the context.wiki instead of just the context because even though it will require a db query, we will get a much better cache hit rate %>
+          <% cache([Course.find(1).wiki, 'non_deleted_bank_wiki_pages']) do  %>
+            <% Course.find(1).wiki.wiki_pages.not_deleted.select([:id, :title]).each do |page| %>
+              <% if page && !page.new_record? %>
+                <option value="<%= page.id %>"><%= page.title %></option>
+              <% end %>
+            <% end %>
+          <% end %>
+        </select>
+        </div>
+        <div class="new" style="margin-top: 5px;">
+          <a href="<%= polymorphic_url([:api_v1, @context, :wiki_pages]) %>" style="display: none;" class="add_item_url">&nbsp;</a>
+        </div>
+
       </div>
       <% end %>
       <% if !only || only.include?(:attachments) %>

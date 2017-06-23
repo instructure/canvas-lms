@@ -349,7 +349,13 @@ function BZ_SetupMasterPageClone(page_id) {
           select.appendChild(option);
         }
 
-        BZ_ModalDialog("Choose a page to clone", select, function() {
+        var div = document.createElement("div");
+        var p = document.createElement("p");
+        p.textContent = "Warning: This will erase all existing content and replace it with the bank content!";
+        div.appendChild(p);
+        div.appendChild(select);
+
+        BZ_ModalDialog("Choose a page to clone", div, function() {
           var pid = select.options[select.selectedIndex].value;
           BZ_SetCloneMasterPage(page_id, pid);
         });

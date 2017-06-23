@@ -52,6 +52,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   before_update :clone_from_master_bank
+  before_create :clone_from_master_bank
   def clone_from_master_bank
     if self.clone_of_id_changed? && !self.clone_of_id.nil?
       master = WikiPage.find(self.clone_of_id)
