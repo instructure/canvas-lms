@@ -33,7 +33,17 @@ describe "master courses - settings" do
 
   it "blueprint course selected in settings", priority: "1", test_id: 3097363 do
     get "/courses/#{@test_course.id}/settings"
-    expect(f('.disabled_message')).to be
+    expect(is_checked('input[type=checkbox][name=course[blueprint]]')).to be_truthy
+  end
+
+  it "blueprint course un-selected in settings", priority: "1", test_id: 3077134 do
+    get "/courses/#{@test_course.id}/settings"
+    fj('label:contains("Enable course as a Blueprint Course")').click
+    wait_for_ajaximations
+    submit_form('#course_form')
+    wait_for_ajaximations
+    expect(MasterCourses::MasterTemplate).not_to be_is_master_course @course
+    expect(is_checked('input[type=checkbox][name=course[blueprint]]')).not_to be_truthy
   end
 
   it "leaves box unchecked for non-blueprint course", priority: "1", test_id: 3138089 do
