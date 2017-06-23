@@ -61,18 +61,20 @@ describe GradebookUserIds do
     concluded_enrollment.conclude
     @concluded_student = concluded_enrollment.user
     @concluded_student.update!(sortable_name: "Concluded Student")
+    @fake_student_enrollment = course_with_user('StudentViewEnrollment', course: @course, active_all: true)
+    @fake_student = @fake_student_enrollment.user
   end
 
   let(:gradebook_user_ids) { GradebookUserIds.new(@course, @teacher) }
 
   it "sorts by sortable name ascending if the user does not have any saved sort preferences" do
     @teacher.preferences[:gradebook_settings] = {}
-    expect(gradebook_user_ids.user_ids).to eq([@student1.id, @student3.id, @student2.id])
+    expect(gradebook_user_ids.user_ids).to eq([@student1.id, @student3.id, @student2.id, @fake_student.id])
   end
 
   it "sorts by sortable name ascending if the user's sort preferences are not supported" do
     @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_column_id] = "some_new_column"
-    expect(gradebook_user_ids.user_ids).to eq([@student1.id, @student3.id, @student2.id])
+    expect(gradebook_user_ids.user_ids).to eq([@student1.id, @student3.id, @student2.id, @fake_student.id])
   end
 
   it "does not return duplicate user ids for students with multiple enrollments" do
@@ -84,7 +86,7 @@ describe GradebookUserIds do
       active_all: true,
       allow_multiple_enrollments: true
     )
-    expect(gradebook_user_ids.user_ids).to eq([@student1.id, @student3.id, @student2.id])
+    expect(gradebook_user_ids.user_ids).to eq([@student1.id, @student3.id, @student2.id, @fake_student.id])
   end
 
   it "only returns users belonging to the selected section" do
@@ -101,13 +103,18 @@ describe GradebookUserIds do
   end
 
   describe "student sortable name sorting" do
-    it "sorts by student sortbale name ascending" do
-      expect(gradebook_user_ids.user_ids).to eq([@student1.id, @student3.id, @student2.id])
+    it "sorts by student sortable name ascending" do
+      expect(gradebook_user_ids.user_ids).to eq([@student1.id, @student3.id, @student2.id, @fake_student.id])
     end
 
-    it "sorts by student sortbale name descending" do
+    it "excludes fake students if they are deactivated" do
+      @fake_student_enrollment.deactivate
+      expect(gradebook_user_ids.user_ids).not_to include @fake_student.id
+    end
+
+    it "sorts by student sortable name descending" do
       @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_direction] = "descending"
-      expect(gradebook_user_ids.user_ids).to eq([@student2.id, @student3.id, @student1.id])
+      expect(gradebook_user_ids.user_ids).to eq([@student2.id, @student3.id, @student1.id, @fake_student.id])
     end
 
     it "includes inactive student ids if the user preferences include show_inactive_enrollments" do
@@ -140,6 +147,11 @@ describe GradebookUserIds do
         expect(gradebook_user_ids.user_ids.first).to eq(@student3.id)
       end
 
+      it "excludes fake students if they are deactivated" do
+        @fake_student_enrollment.deactivate
+        expect(gradebook_user_ids.user_ids).not_to include @fake_student.id
+      end
+
       it "includes inactive student ids if the user preferences include show_inactive_enrollments" do
         @teacher.preferences[:gradebook_settings][@course.id][:show_inactive_enrollments] = "true"
         expect(gradebook_user_ids.user_ids).to include @inactive_student.id
@@ -163,6 +175,11 @@ describe GradebookUserIds do
       it "returns user ids for users with late submissions first" do
         @assignment.submissions.find_by(user_id: @student3).update!(late_policy_status: "late")
         expect(gradebook_user_ids.user_ids.first).to eq(@student3.id)
+      end
+
+      it "excludes fake students if they are deactivated" do
+        @fake_student_enrollment.deactivate
+        expect(gradebook_user_ids.user_ids).not_to include @fake_student.id
       end
 
       it "includes inactive student ids if the user preferences include show_inactive_enrollments" do
@@ -190,24 +207,33 @@ describe GradebookUserIds do
         end
 
         it "returns user ids sorted by grade on the assignment" do
-          expect(gradebook_user_ids.user_ids).to eq([@student2.id, @student1.id, @student3.id])
+          expect(gradebook_user_ids.user_ids).to eq([@student2.id, @student1.id, @student3.id, @fake_student.id])
         end
 
-        it "places students without submissions at the end" do
-          student3 = student_in_course(course: @course, active_all: true).user
-          expect(gradebook_user_ids.user_ids).to eq([@student2.id, @student1.id, @student3.id, student3.id])
+        it "excludes fake students if they are deactivated" do
+          @fake_student_enrollment.deactivate
+          expect(gradebook_user_ids.user_ids).not_to include @fake_student.id
         end
 
-        it "places students that have been graded with nil grades at the end" do
+        it "places students without submissions at the end, but before fake students" do
+          student4 = student_in_course(course: @course, active_all: true).user
+          expect(gradebook_user_ids.user_ids).to eq(
+            [@student2.id, @student1.id, @student3.id, student4.id, @fake_student.id]
+          )
+        end
+
+        it "places students that have been graded with nil grades at the end, but before fake students" do
           @assignment.grade_student(@student1, grade: nil, grader: @teacher)
-          expect(gradebook_user_ids.user_ids).to eq([@student2.id, @student3.id, @student1.id])
+          expect(gradebook_user_ids.user_ids).to eq([@student2.id, @student3.id, @student1.id, @fake_student.id])
         end
 
-        it "places students that are not assigned at the end" do
+        it "places students that are not assigned at the end, but before fake students" do
           @assignment.update!(only_visible_to_overrides: true)
           create_adhoc_override_for_assignment(@assignment, [@student1, @student3, @student2], due_at: nil)
-          student3 = student_in_course(course: @course, active_all: true).user
-          expect(gradebook_user_ids.user_ids).to eq([@student2.id, @student1.id, @student3.id, student3.id])
+          student4 = student_in_course(course: @course, active_all: true).user
+          expect(gradebook_user_ids.user_ids).to eq(
+            [@student2.id, @student1.id, @student3.id, student4.id, @fake_student.id]
+          )
         end
       end
 
@@ -219,25 +245,36 @@ describe GradebookUserIds do
         end
 
         it "returns user ids sorted by grade on the assignment" do
-          expect(gradebook_user_ids.user_ids).to eq([@student3.id, @student1.id, @student2.id])
+          expect(gradebook_user_ids.user_ids).to eq([@student3.id, @student1.id, @student2.id, @fake_student.id])
         end
 
-        it "places students without submissions at the end" do
-          student3 = student_in_course(course: @course, active_all: true).user
-          expect(gradebook_user_ids.user_ids).to eq([@student3.id, @student1.id, @student2.id, student3.id])
+        it "excludes fake students if they are deactivated" do
+          @fake_student_enrollment.deactivate
+          expect(gradebook_user_ids.user_ids).not_to include @fake_student.id
         end
 
-        it "places students that have been graded with a nil grade at the end" do
+        it "places students without submissions at the end, but before fake students" do
+          student4 = student_in_course(course: @course, active_all: true).user
+          expect(gradebook_user_ids.user_ids).to eq(
+            [@student3.id, @student1.id, @student2.id, student4.id, @fake_student.id]
+          )
+        end
+
+        it "places students that have been graded with a nil grade at the end, but before fake students" do
           student3 = student_in_course(course: @course, active_all: true).user
           @assignment.grade_student(student3, grade: nil, grader: @teacher)
-          expect(gradebook_user_ids.user_ids).to eq([@student3.id, @student1.id, @student2.id, student3.id])
+          expect(gradebook_user_ids.user_ids).to eq(
+            [@student3.id, @student1.id, @student2.id, student3.id, @fake_student.id]
+          )
         end
 
-        it "places students that are not assigned at the end" do
+        it "places students that are not assigned at the end, but before fake students" do
           @assignment.update!(only_visible_to_overrides: true)
           create_adhoc_override_for_assignment(@assignment, [@student1, @student3, @student2], due_at: nil)
           student3 = student_in_course(course: @course, active_all: true).user
-          expect(gradebook_user_ids.user_ids).to eq([@student3.id, @student1.id, @student2.id, student3.id])
+          expect(gradebook_user_ids.user_ids).to eq(
+            [@student3.id, @student1.id, @student2.id, student3.id, @fake_student.id]
+          )
         end
       end
 
@@ -272,12 +309,17 @@ describe GradebookUserIds do
     end
 
     it "sorts by total grade ascending" do
-      expect(gradebook_user_ids.user_ids).to eq([@student1.id, @student2.id, @student3.id])
+      expect(gradebook_user_ids.user_ids).to eq([@student1.id, @student2.id, @student3.id, @fake_student.id])
+    end
+
+    it "excludes fake students if they are deactivated" do
+      @fake_student_enrollment.deactivate
+      expect(gradebook_user_ids.user_ids).not_to include @fake_student.id
     end
 
     it "sorts by total grade descending" do
       @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_direction] = "descending"
-      expect(gradebook_user_ids.user_ids).to eq([@student3.id, @student2.id, @student1.id])
+      expect(gradebook_user_ids.user_ids).to eq([@student3.id, @student2.id, @student1.id, @fake_student.id])
     end
 
     it "includes inactive student ids if the user preferences include show_inactive_enrollments" do
@@ -310,25 +352,26 @@ describe GradebookUserIds do
       context "ascending" do
         it "sorts by the current grading period totals if no selected grading period is in user preferences" do
           @course.stubs(:grading_periods?).returns(true)
-          expect(gradebook_user_ids.user_ids).to eq([@student1.id, @student3.id, @student2.id])
+          expect(gradebook_user_ids.user_ids).to eq([@student1.id, @student3.id, @student2.id, @fake_student.id])
         end
 
         it "sorts by the current grading period totals if a grading period ID of 'null' is in user preferences" do
           @course.stubs(:grading_periods?).returns(true)
           @teacher.preferences[:gradebook_settings][@course.id][:filter_columns_by][:grading_period_id] = "null"
-          expect(gradebook_user_ids.user_ids).to eq([@student1.id, @student3.id, @student2.id])
+          expect(gradebook_user_ids.user_ids).to eq([@student1.id, @student3.id, @student2.id, @fake_student.id])
         end
 
         it "sorts by the selected grading period totals if a selected grading period is in user preferences" do
           @course.stubs(:grading_periods?).returns(true)
-          @teacher.preferences[:gradebook_settings][@course.id][:filter_columns_by][:grading_period_id] = @future_period.id.to_s
-          expect(gradebook_user_ids.user_ids).to eq([@student2.id, @student1.id, @student3.id])
+          @teacher.preferences[:gradebook_settings][@course.id][:filter_columns_by][:grading_period_id] =
+            @future_period.id.to_s
+          expect(gradebook_user_ids.user_ids).to eq([@student2.id, @student1.id, @student3.id, @fake_student.id])
         end
 
         it "sorts by 'All Grading Periods' if a grading period ID of '0' is in user preferences" do
           @course.stubs(:grading_periods?).returns(true)
           @teacher.preferences[:gradebook_settings][@course.id][:filter_columns_by][:grading_period_id] = "0"
-          expect(gradebook_user_ids.user_ids).to eq([@student1.id, @student2.id, @student3.id])
+          expect(gradebook_user_ids.user_ids).to eq([@student1.id, @student2.id, @student3.id, @fake_student.id])
         end
       end
 
@@ -339,25 +382,26 @@ describe GradebookUserIds do
 
         it "sorts by the current grading period totals if no selected grading period is in user preferences" do
           @course.stubs(:grading_periods?).returns(true)
-          expect(gradebook_user_ids.user_ids).to eq([@student2.id, @student3.id, @student1.id])
+          expect(gradebook_user_ids.user_ids).to eq([@student2.id, @student3.id, @student1.id, @fake_student.id])
         end
 
         it "sorts by the current grading period totals if a grading period ID of 'null' is in user preferences" do
           @course.stubs(:grading_periods?).returns(true)
           @teacher.preferences[:gradebook_settings][@course.id][:filter_columns_by][:grading_period_id] = "null"
-          expect(gradebook_user_ids.user_ids).to eq([@student2.id, @student3.id, @student1.id])
+          expect(gradebook_user_ids.user_ids).to eq([@student2.id, @student3.id, @student1.id, @fake_student.id])
         end
 
         it "sorts by the selected grading period totals if a selected grading period is in user preferences" do
           @course.stubs(:grading_periods?).returns(true)
-          @teacher.preferences[:gradebook_settings][@course.id][:filter_columns_by][:grading_period_id] = @future_period.id.to_s
-          expect(gradebook_user_ids.user_ids).to eq([@student3.id, @student1.id, @student2.id])
+          @teacher.preferences[:gradebook_settings][@course.id][:filter_columns_by][:grading_period_id] =
+            @future_period.id.to_s
+          expect(gradebook_user_ids.user_ids).to eq([@student3.id, @student1.id, @student2.id, @fake_student.id])
         end
 
         it "sorts by 'All Grading Periods' if a grading period ID of '0' is in user preferences" do
           @course.stubs(:grading_periods?).returns(true)
           @teacher.preferences[:gradebook_settings][@course.id][:filter_columns_by][:grading_period_id] = "0"
-          expect(gradebook_user_ids.user_ids).to eq([@student3.id, @student2.id, @student1.id])
+          expect(gradebook_user_ids.user_ids).to eq([@student3.id, @student2.id, @student1.id, @fake_student.id])
         end
       end
     end

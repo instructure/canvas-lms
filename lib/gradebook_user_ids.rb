@@ -44,7 +44,11 @@ class GradebookUserIds
   private
 
   def sort_by_student_name
-    students.order_by_sortable_name(direction: @direction.to_sym).pluck(:id)
+    students.joins(:enrollments).
+      order("enrollments.type = 'StudentViewEnrollment'").
+      order_by_sortable_name(direction: @direction.to_sym).
+      pluck(:id).
+      uniq
   end
 
   def sort_by_assignment_grade(assignment_id)
@@ -54,21 +58,27 @@ class GradebookUserIds
           ON submissions.user_id = enrollments.user_id
           AND submissions.assignment_id = #{assignment_id}
       ").
-      order("submissions.score #{sort_direction} NULLS LAST").
+      order("enrollments.type = 'StudentViewEnrollment'", "submissions.score #{sort_direction} NULLS LAST").
       pluck(:user_id).
       uniq
   end
 
   def sort_by_assignment_missing(assignment_id)
     all_user_ids = student_enrollments_scope.pluck(:user_id)
-    user_ids_for_missing = Submission.missing.where(assignment_id: assignment_id, user_id: all_user_ids).pluck(:user_id)
-    user_ids_for_missing.concat(all_user_ids).uniq
+    fake_user_ids = student_enrollments_scope.where(type: "StudentViewEnrollment").pluck(:user_id)
+    real_user_ids = all_user_ids - fake_user_ids
+    user_ids_for_missing = Submission.missing.
+      where(assignment_id: assignment_id, user_id: real_user_ids).
+      pluck(:user_id)
+    user_ids_for_missing.concat(real_user_ids).concat(fake_user_ids).uniq
   end
 
   def sort_by_assignment_late(assignment_id)
     all_user_ids = student_enrollments_scope.pluck(:user_id)
-    user_ids_for_late = Submission.late.where(assignment_id: assignment_id, user_id: all_user_ids).pluck(:user_id)
-    user_ids_for_late.concat(all_user_ids).uniq
+    fake_user_ids = student_enrollments_scope.where(type: "StudentViewEnrollment").pluck(:user_id)
+    real_user_ids = all_user_ids - fake_user_ids
+    user_ids_for_late = Submission.late.where(assignment_id: assignment_id, user_id: real_user_ids).pluck(:user_id)
+    user_ids_for_late.concat(real_user_ids).concat(fake_user_ids).uniq
   end
 
   def sort_by_total_grade
@@ -78,7 +88,7 @@ class GradebookUserIds
           ON enrollments.id = scores.enrollment_id
           AND scores.grading_period_id #{grading_period_id ? "= #{grading_period_id}" : 'IS NULL'}
       ").
-      order("scores.current_score #{sort_direction} NULLS LAST").
+      order("enrollments.type = 'StudentViewEnrollment'", "scores.current_score #{sort_direction} NULLS LAST").
       pluck(:user_id).
       uniq
   end

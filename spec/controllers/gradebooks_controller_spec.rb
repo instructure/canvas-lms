@@ -788,6 +788,19 @@ describe GradebooksController do
       assert_status(401)
     end
 
+    it "grants authorization to teachers in active courses" do
+      user_session(@teacher)
+      get :user_ids, course_id: @course.id, format: :json
+      expect(response).to be_ok
+    end
+
+    it "grants authorization to teachers in concluded courses" do
+      @course.complete!
+      user_session(@teacher)
+      get :user_ids, course_id: @course.id, format: :json
+      expect(response).to be_ok
+    end
+
     it "returns an array of user ids sorted according to the user's preferences" do
       student1 = @student
       student1.update!(name: "Jon")

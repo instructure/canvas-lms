@@ -687,7 +687,7 @@ class GradebooksController < ApplicationController
   end
 
   def user_ids
-    return unless authorized_action(@context, @current_user, :manage_grades)
+    return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
 
     gradebook_user_ids = GradebookUserIds.new(@context, @current_user)
     render json: { user_ids: gradebook_user_ids.user_ids }
