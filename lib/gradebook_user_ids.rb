@@ -96,7 +96,7 @@ class GradebookUserIds
   def student_enrollments_scope
     workflow_states = [:active, :invited]
     workflow_states << :inactive if @include_inactive
-    workflow_states << :completed if @include_concluded
+    workflow_states << :completed if @include_concluded || @course.concluded?
     student_enrollments = @course.enrollments.where(
       workflow_state: workflow_states,
       type: [:StudentEnrollment, :StudentViewEnrollment]

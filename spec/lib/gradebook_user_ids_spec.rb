@@ -126,6 +126,13 @@ describe GradebookUserIds do
       @teacher.preferences[:gradebook_settings][@course.id][:show_concluded_enrollments] = "true"
       expect(gradebook_user_ids.user_ids).to include @concluded_student.id
     end
+
+    it "includes concluded students ids if the course is concluded" do
+      @course.complete!
+      expect(gradebook_user_ids.user_ids).to eq(
+        [@student1.id, @student3.id, @concluded_student.id, @student2.id, @fake_student.id]
+      )
+    end
   end
 
   describe "assignment sorting" do
@@ -161,6 +168,13 @@ describe GradebookUserIds do
         @teacher.preferences[:gradebook_settings][@course.id][:show_concluded_enrollments] = "true"
         expect(gradebook_user_ids.user_ids).to include @concluded_student.id
       end
+
+      it "includes concluded students ids if the course is concluded" do
+        @course.complete!
+        expect(gradebook_user_ids.user_ids).to match_array(
+          [@student1.id, @student2.id, @student3.id, @concluded_student.id, @fake_student.id]
+        )
+      end
     end
 
     describe "sort by late" do
@@ -191,6 +205,13 @@ describe GradebookUserIds do
         @teacher.preferences[:gradebook_settings][@course.id][:show_concluded_enrollments] = "true"
         expect(gradebook_user_ids.user_ids).to include @concluded_student.id
       end
+
+      it "includes concluded students ids if the course is concluded" do
+        @course.complete!
+        expect(gradebook_user_ids.user_ids).to match_array(
+          [@student1.id, @student2.id, @student3.id, @concluded_student.id, @fake_student.id]
+        )
+      end
     end
 
     describe "sort by grade" do
@@ -198,12 +219,20 @@ describe GradebookUserIds do
         @assignment.grade_student(@student1, grade: 8, grader: @teacher)
         @assignment.grade_student(@student2, grade: 1, grader: @teacher)
         @assignment.grade_student(@student3, grade: 9, grader: @teacher)
+        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_column_id] = "assignment_#{@assignment.id}"
+        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_setting_key] = "grade"
+      end
+
+      it "includes concluded students ids if the course is concluded" do
+        @course.complete!
+        expect(gradebook_user_ids.user_ids).to match_array(
+          [@student1.id, @student2.id, @student3.id, @concluded_student.id, @fake_student.id]
+        )
       end
 
       context "ascending" do
         before(:once) do
-          @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_column_id] = "assignment_#{@assignment.id}"
-          @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_setting_key] = "grade"
+          @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_direction] = "ascending"
         end
 
         it "returns user ids sorted by grade on the assignment" do
@@ -239,8 +268,6 @@ describe GradebookUserIds do
 
       context "descending" do
         before(:once) do
-          @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_column_id] = "assignment_#{@assignment.id}"
-          @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_setting_key] = "grade"
           @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_direction] = "descending"
         end
 
@@ -306,6 +333,13 @@ describe GradebookUserIds do
 
       @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_column_id] = "total_grade"
       @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_setting_key] = "grade"
+    end
+
+    it "includes concluded students ids if the course is concluded" do
+      @course.complete!
+      expect(gradebook_user_ids.user_ids).to match_array(
+        [@student1.id, @student2.id, @student3.id, @concluded_student.id, @fake_student.id]
+      )
     end
 
     it "sorts by total grade ascending" do
