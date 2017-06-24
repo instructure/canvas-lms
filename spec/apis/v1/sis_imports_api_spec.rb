@@ -70,6 +70,7 @@ describe SisImportsApiController, type: :request do
           "clear_sis_stickiness" => opts[:clear_sis_stickiness] ? true : nil,
           "diffing_data_set_identifier" => nil,
           "diffed_against_import_id" => nil,
+          "change_threshold" => nil,
     })
     batch.process_without_send_later
     return batch
@@ -107,6 +108,7 @@ describe SisImportsApiController, type: :request do
           "clear_sis_stickiness" => nil,
           "diffing_data_set_identifier" => nil,
           "diffed_against_import_id" => nil,
+          "change_threshold" => nil,
     })
 
     expect(SisBatch.count).to eq @batch_count + 1
@@ -152,6 +154,7 @@ describe SisImportsApiController, type: :request do
           "clear_sis_stickiness" => nil,
           "diffing_data_set_identifier" => nil,
           "diffed_against_import_id" => nil,
+          "change_threshold" => nil,
     })
   end
 
@@ -252,9 +255,12 @@ describe SisImportsApiController, type: :request do
       { import_type: 'instructure_csv',
         attachment: fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
         diffing_data_set_identifier: 'my-users-data',
+        change_threshold: 7,
       })
     batch = SisBatch.find(json["id"])
     expect(batch.batch_mode).to be_falsey
+    expect(batch.change_threshold).to eq 7
+    expect(json['change_threshold']).to eq 7
     expect(batch.diffing_data_set_identifier).to eq 'my-users-data'
   end
 
@@ -601,6 +607,7 @@ describe SisImportsApiController, type: :request do
           "clear_sis_stickiness" => nil,
           "diffing_data_set_identifier" => nil,
           "diffed_against_import_id" => nil,
+          "change_threshold" => nil,
       }]
     })
 

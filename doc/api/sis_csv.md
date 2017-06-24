@@ -96,6 +96,14 @@ rather than applying just the diff.  To enable this mode, set the
 will be applied without diffing. The next import for the same data
 set will still diff against that import.
 
+If using automated systems and diffing and there is an issue where the system
+sends a partial or an empty file, diffing would see that all users not included
+should be removed. Using `change_threshold=10` will then not perform diffing if
+the files being compared are greater than 10% different. The threshold can be
+set to help prevent removing objects unintentionally. When set and the file is
+over 10% different it will be the same as if `diffing_remaster_data_set=true`.
+The change_threshold can be set to any integer between 1 and 100.
+
 Stickiness
 ----------
 When a user makes a change to imported data in Canvas (e.g., changes a name),

@@ -343,6 +343,13 @@ class SisImportsApiController < ApplicationController
   #   part of the data set, but diffing will not be performed. See the SIS CSV
   #   Format documentation for details.
   #
+  # @argument change_threshold [Integer]
+  #   If set, diffing will not be performed if the files are greater than the
+  #   threshold as a percent. If set to 5 and the file is more than 5% smaller
+  #   or more than 5% larger than the file that is being compared to, diffing
+  #   will not be performed. If the files are less than 5%, diffing will be
+  #   performed. See the SIS CSV Format documentation for more details.
+  #
   # @returns SisImport
   def create
     if authorized_action(@account, @current_user, :import_sis)
@@ -411,6 +418,7 @@ class SisImportsApiController < ApplicationController
           batch.batch_mode_term = batch_mode_term
         elsif params[:diffing_data_set_identifier].present?
           batch.enable_diffing(params[:diffing_data_set_identifier],
+                               change_threshold: params[:change_threshold],
                                remaster: value_to_boolean(params[:diffing_remaster_data_set]))
         end
 

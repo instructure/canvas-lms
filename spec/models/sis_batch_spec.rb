@@ -549,5 +549,30 @@ test_4,TC 104,Test Course 104,,term1,active
 test_4,TC 104,Test Course 104,,term1,active
 })
     end
+
+    it 'should not diff outside of diff threshold' do
+      b1 = process_csv_data([
+%{course_id,short_name,long_name,account_id,term_id,status
+test_1,TC 101,Test Course 101,,term1,active
+test_4,TC 104,Test Course 104,,term1,active
+}], diffing_data_set_identifier: 'default', change_threshold: 1)
+
+      # small change, less than 1% difference
+      b2 = process_csv_data([
+%{course_id,short_name,long_name,account_id,term_id,status
+test_1,TC 101,Test Course 101,,term1,active
+test_4,TC 104,Test Course 104b,,term1,active
+}], diffing_data_set_identifier: 'default', change_threshold: 1)
+
+      # whoops left out the whole file, don't delete everything.
+      b3 = process_csv_data([
+%{course_id,short_name,long_name,account_id,term_id,status
+}], diffing_data_set_identifier: 'default', change_threshold: 1)
+
+      expect(b2.data[:diffed_against_sis_batch_id]).to eq b1.id
+      expect(b2.generated_diff_id).not_to be_nil
+      expect(b3.data[:diffed_against_sis_batch_id]).to be_nil
+      expect(b3.generated_diff_id).to be_nil
+    end
   end
 end
