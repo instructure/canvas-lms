@@ -63,24 +63,24 @@ describe "outcome gradezilla" do
         expect(ff('.outcome-student-cell-content')).to have_size 3
 
         click_option('[data-component="SectionFilter"] select', 'All Sections')
-        wait_for_ajaximations
-        expect(f('[data-component="SectionFilter"] select').attribute('value')).to eq('0')
+        selected_section_name = ff('option', f('[data-component="SectionFilter"] select')).find(&:selected?)
+        expect(selected_section_name).to include_text("All Sections")
 
         click_option('[data-component="SectionFilter"] select', @other_section.name)
-        wait_for_ajaximations
-        expect(f('[data-component="SectionFilter"] select').attribute('value')).to eq(@other_section.id.to_s)
+        selected_section_name = ff('option', f('[data-component="SectionFilter"] select')).find(&:selected?)
+        expect(selected_section_name).to include_text(@other_section.name)
 
         expect(ff('.outcome-student-cell-content')).to have_size 1
 
         # verify that it remembers the section to show across page loads
         Gradezilla.visit(@course)
-        expect(f('[data-component="SectionFilter"] select').attribute('value')).to eq(@other_section.id.to_s)
+        selected_section_name = ff('option', f('[data-component="SectionFilter"] select')).find(&:selected?)
+        expect(selected_section_name).to include_text(@other_section.name)
         expect(ff('.outcome-student-cell-content')).to have_size 1
 
         # now verify that you can set it back
 
         click_option('[data-component="SectionFilter"] select', 'All Sections')
-        wait_for_ajaximations
 
         expect(ff('.outcome-student-cell-content')).to have_size 3
       end
