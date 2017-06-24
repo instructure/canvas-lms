@@ -525,13 +525,6 @@ END
       beta: true,
       development: true,
     },
-    'modules_home_page' =>
-    {
-      display_name: -> { I18n.t('Modules Home Page') },
-      description: -> { I18n.t('Default to modules for the course home page') },
-      applies_to: "RootAccount",
-      state: "allowed",
-    },
     'new_user_tutorial' =>
     {
       display_name: -> { I18n.t('New User Tutorial')},

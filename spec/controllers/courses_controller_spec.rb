@@ -644,7 +644,7 @@ describe CoursesController do
       get 'show', :id => @course.id
       expect(response).to be_success
       expect(assigns[:context]).to eql(@course)
-      expect(assigns[:stream_items]).to eql([])
+      expect(assigns[:modules].to_a).to eql([])
     end
 
     it "should give a helpful error message for students that can't access yet" do

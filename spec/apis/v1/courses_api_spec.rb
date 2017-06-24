@@ -531,7 +531,7 @@ describe CoursesController, type: :request do
           'start_at' => '2011-01-01T07:00:00Z',
           'end_at' => '2011-05-01T07:00:00Z',
           'workflow_state' => 'available',
-          'default_view' => 'feed',
+          'default_view' => 'modules',
           'storage_quota_mb' => @account.default_storage_quota_mb
         })
         Auditors::Course.expects(:record_created).once
@@ -596,7 +596,7 @@ describe CoursesController, type: :request do
           'start_at' => '2011-01-01T07:00:00Z',
           'end_at' => '2011-05-01T07:00:00Z',
           'workflow_state' => 'available',
-          'default_view' => 'feed',
+          'default_view' => 'modules',
           'storage_quota_mb' => @account.default_storage_quota_mb
         })
         json = api_call(:post, @resource_path, @resource_params, post_params)
