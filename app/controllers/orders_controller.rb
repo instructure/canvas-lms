@@ -7,7 +7,7 @@ class OrdersController < ApplicationController
     @course = Course.find(params[:id])
     response = EXPRESS.setup_purchase(20 * 100,
       :ip => request.remote_ip,
-      :return_url => new_course_order_url(@course),
+      :return_url => payment_course_orders_url(@course),
       :cancel_return_url => root_url,
       :allow_note => true,
       :items => @course.courese_details
@@ -20,13 +20,13 @@ class OrdersController < ApplicationController
     @order = Order.new(:express_token => params[:token])
   end
 
-  def create
+  def payment
     @course = Course.find(params[:course_id])
-    @order = Order.new(params_order.merge(user_id: @current_user, course_id: @course.id))
-    if @order.purchase && @order.status == true
+    @order = Order.create(express_token: params[:token], user_id: @current_user, course_id: @course.id)
+    if @order.purchase && @order.status == "Success"
       redirect_to '/'
     else
-      render :action => "new"
+      redirect_to '/'
     end
   end
 
