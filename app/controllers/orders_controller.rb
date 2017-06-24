@@ -62,9 +62,8 @@ class OrdersController < ApplicationController
 
   def check_paytm
     puts "Checksum matched and following are the transaction details:";
-    binding.pry
     if request.params["STATUS"] == "TXN_SUCCESS"
-      Order.create( mid: request.params["MID"],
+      Order.create(mid: request.params["MID"],
         order_id: request.params["ORDERID"],
         txn_amount: request.params["TXNAMOUNT"],
         currency: request.params["CURRENCY"],
