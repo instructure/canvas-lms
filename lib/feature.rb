@@ -557,7 +557,7 @@ END
       display_name: -> { I18n.t('New User Tutorial')},
       description: -> { I18n.t('Provide tutorial information for new users in a flyout tray.')},
       applies_to: "RootAccount",
-      state: "allowed",
+      state: "on",
     },
     'student_planner' =>
     {

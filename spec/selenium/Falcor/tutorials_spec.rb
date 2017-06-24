@@ -23,7 +23,7 @@ describe "Tutorials" do
 
     before(:once) do
       Account.default.enable_feature!(:new_user_tutorial)
-      course_with_teacher(active_all: true)
+      course_with_teacher(active_all: true, new_user: true)
     end
 
     before(:each) do
@@ -50,7 +50,7 @@ describe "Tutorials" do
 
     before(:once) do
       Account.default.enable_feature!(:new_user_tutorial)
-      course_with_teacher(active_all: true)
+      course_with_teacher(active_all: true, new_user: true)
     end
 
     before(:each) do

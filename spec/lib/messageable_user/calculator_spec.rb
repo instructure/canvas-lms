@@ -1183,7 +1183,7 @@ describe "MessageableUser::Calculator" do
           end
 
           it "should only return the user once" do
-            expect(messageable_user_ids).to eq [@viewing_user.id, @teacher.id]
+            expect(messageable_user_ids.sort).to eq [@viewing_user.id, @teacher.id]
           end
 
           it "should have combined common contexts" do

@@ -742,12 +742,6 @@ describe ApplicationHelper do
         expect(tutorials_enabled?).to be false
       end
     end
-
-    context "with new_users_tutorial feature flag disabled" do
-      it "returns false" do
-        expect(tutorials_enabled?).to be false
-      end
-    end
   end
 
   describe "planner_enabled?" do
