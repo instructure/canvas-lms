@@ -335,7 +335,7 @@ class SisImportsApiController < ApplicationController
   # @argument diffing_data_set_identifier [String]
   #   If set on a CSV import, Canvas will attempt to optimize the SIS import by
   #   comparing this set of CSVs to the previous set that has the same data set
-  #   identifier, and only appliying the difference between the two. See the
+  #   identifier, and only applying the difference between the two. See the
   #   SIS CSV Format documentation for more details.
   #
   # @argument diffing_remaster_data_set [Boolean]
