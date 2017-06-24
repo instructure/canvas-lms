@@ -1484,7 +1484,16 @@ describe Attachment do
 
       it "should stream data to the block given" do
         callback = false
-        @attachment.s3object.class.any_instance.expects(:get).yields("test")
+        data = ["test", false]
+        Tempfile.any_instance.expects(:binmode).once
+        Tempfile.any_instance.expects(:rewind).once
+        Tempfile.any_instance.expects(:path).once
+
+        # We specify at_least(2) here because the stub will return "test"
+        # first, then on the second run will be falsey, therefore
+        # ending the loop and stopping the calls
+        File.expects(:open).at_least(2).yields(stub(read: -> {data.shift}))
+        @attachment.s3object.class.any_instance.expects(:get).with(has_key(:response_target))
         @attachment.open { |data| expect(data).to eq "test"; callback = true }
         expect(callback).to eq true
       end
