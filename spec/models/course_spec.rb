@@ -4933,16 +4933,11 @@ end
 describe Course, "#default_home_page" do
   let(:course) { Course.create! }
 
-  it "defaults to 'feed'" do
-    expect(course.default_home_page).to eq "feed"
-  end
-
-  it "is 'modules' if feature flag enabled" do
-    course.root_account.enable_feature! :modules_home_page
+  it "defaults to 'modules'" do
     expect(course.default_home_page).to eq "modules"
   end
 
   it "is set assigned to 'default_view' on creation'" do
-    expect(course.default_view).to eq 'feed'
+    expect(course.default_view).to eq 'modules'
   end
 end

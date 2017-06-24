@@ -190,7 +190,7 @@ module BlueprintCourseCommon
 
     # return the Done/Save button (which is the last button on the page)
     def save_button
-      buttons = ff('button')
+      buttons = ff('span button')
       buttons[buttons.length - 1] # last button on the page
     end
 

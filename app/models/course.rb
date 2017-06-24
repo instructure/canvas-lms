@@ -2880,7 +2880,7 @@ class Course < ActiveRecord::Base
   end
 
   def default_home_page
-    root_account.feature_enabled?(:modules_home_page) ? "modules" : "feed"
+    "modules"
   end
 
   def participating_users(user_ids)
