@@ -17,14 +17,17 @@
 
 require_relative '../helpers/gradezilla_common'
 require_relative '../grades/page_objects/gradezilla_page'
+require_relative '../grades/setup/gradebook_setup'
 
 describe "outcome gradezilla" do
   include_context "in-process server selenium tests"
   include GradezillaCommon
+  include GradebookSetup
 
   context "as a teacher" do
     before(:once) do
       gradebook_data_setup
+      show_sections_filter(@teacher)
     end
 
     before(:each) do
@@ -81,7 +84,7 @@ describe "outcome gradezilla" do
 
         fj('.section-select-button:visible').click
         expect(fj('.section-select-menu:visible')).to be_displayed
-        f("label[for='section_option_']").click
+        f(".outcome-gradebook-container label[for='section_option_']").click
         expect(fj('.section-select-button:visible')).to include_text "All Sections"
 
         expect(ff('.outcome-student-cell-content')).to have_size 3

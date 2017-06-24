@@ -20,6 +20,7 @@ define [
   'underscore'
   'react'
   'react-addons-pure-render-mixin'
+  'prop-types'
   'page'
   'react-modal'
   '../modules/customPropTypes'
@@ -36,7 +37,7 @@ define [
   '../modules/FocusStore'
   'jsx/files/codeToRemoveLater'
   'compiled/jquery.rails_flash_notifications'
-], ($, _, React, PureRenderMixin, page, ReactModal, customPropTypes, Backbone, I18n, friendlyBytes, Folder, File, FilesystemObject, preventDefault, collectionHandler, FilePreviewInfoPanel, filesEnv, FocusStore, codeToRemoveLater) ->
+], ($, _, React, PureRenderMixin, PropTypes, page, ReactModal, customPropTypes, Backbone, I18n, friendlyBytes, Folder, File, FilesystemObject, preventDefault, collectionHandler, FilePreviewInfoPanel, filesEnv, FocusStore, codeToRemoveLater) ->
 
   FilePreview =
 
@@ -46,11 +47,11 @@ define [
 
     propTypes:
       currentFolder: customPropTypes.folder
-      query: React.PropTypes.object
-      collection: React.PropTypes.object
-      params: React.PropTypes.object
-      isOpen: React.PropTypes.bool
-      closePreview: React.PropTypes.func
+      query: PropTypes.object
+      collection: PropTypes.object
+      params: PropTypes.object
+      isOpen: PropTypes.bool
+      closePreview: PropTypes.func
 
     getInitialState: ->
       showInfoPanel: false

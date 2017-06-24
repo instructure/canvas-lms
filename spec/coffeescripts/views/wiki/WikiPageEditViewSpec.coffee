@@ -57,6 +57,63 @@ define [
     conditionalToggle = view.$el.find('#conditional_content')
     equal conditionalToggle.length, 0, 'Toggle is hidden'
 
+  QUnit.module 'WikiPageEditView:StudentPlanner',
+    setup: ->
+      fakeENV.setup(student_planner_enabled: true)
+
+    teardown: ->
+      fakeENV.teardown()
+
+  test 'student planner option hidden for insufficient rights', ->
+    view = new WikiPageEditView
+      WIKI_RIGHTS:
+        read: true
+      PAGE_RIGHTS:
+        read: true
+        update_content: true
+    view.render()
+
+    studentPlannerContainer = view.$el.find('#todo_date_container')
+    equal studentPlannerContainer.length, 0, 'Toggle is hidden'
+
+  test 'student planner option appears', ->
+    view = new WikiPageEditView
+      WIKI_RIGHTS:
+        manage: true
+    view.render()
+
+    studentPlannerToggle = view.$el.find('#student_planner_checkbox')
+    equal studentPlannerToggle.length, 1, 'Toggle is visible'
+    equal studentPlannerToggle.prop('checked'), false, 'Toggle is unchecked'
+
+  test 'student planner date picker appears', ->
+    wikiPage = new WikiPage
+      todo_date: "Jan 3"
+    view = new WikiPageEditView
+      model: wikiPage
+      WIKI_RIGHTS:
+        manage: true
+    view.render()
+
+    studentPlannerToggle = view.$el.find('#student_planner_checkbox')
+    studentPlannerDateInput = view.$el.find('#todo_date_container')
+    equal studentPlannerToggle.prop('checked'), true, 'Toggle is checked'
+    equal studentPlannerDateInput.length, 1, 'Date picker is visible'
+
+  test 'student planner option does stuff', ->
+    wikiPage = new WikiPage
+      todo_date: 'Jan 3'
+    view = new WikiPageEditView
+      model: wikiPage
+      WIKI_RIGHTS:
+        manage: true
+    view.render()
+
+    studentPlannerToggle = view.$el.find('#student_planner_checkbox')
+    studentPlannerDateInput = view.$el.find('#todo_date')
+    equal studentPlannerToggle.prop('checked'), true, 'Toggle is checked'
+    equal studentPlannerDateInput.val(), 'Jan 3 at 12am'
+
   QUnit.module 'WikiPageEditView:ConditionalContent',
     setup: ->
       fakeENV.setup(CONDITIONAL_RELEASE_SERVICE_ENABLED: true)

@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!dashboard'
 import axios from 'axios'
 
@@ -24,20 +25,21 @@ import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderConte
 import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
 import { MenuItem, MenuItemGroup, MenuItemSeparator } from 'instructure-ui/lib/components/Menu'
 import Button from 'instructure-ui/lib/components/Button'
-import IconSettings2Solid from 'instructure-icons/react/Solid/IconSettings2Solid'
+import IconSettings2Solid from 'instructure-icons/lib/Solid/IconSettings2Solid'
 
 export default class DashboardOptionsMenu extends React.Component {
   static propTypes = {
-    recent_activity_dashboard: React.PropTypes.bool.isRequired,
-    hide_dashcard_color_overlays: React.PropTypes.bool,
-    planner_enabled: React.PropTypes.bool,
-    planner_selected: React.PropTypes.bool
+    recent_activity_dashboard: PropTypes.bool,
+    hide_dashcard_color_overlays: PropTypes.bool,
+    planner_enabled: PropTypes.bool,
+    planner_selected: PropTypes.bool
   }
 
   static defaultProps = {
     hide_dashcard_color_overlays: false,
     planner_enabled: false,
-    planner_selected: false
+    planner_selected: false,
+    recent_activity_dashboard: false
   }
 
   constructor (props) {
@@ -84,22 +86,26 @@ export default class DashboardOptionsMenu extends React.Component {
     const dashboardPlannerHeader = document.getElementById('dashboard-planner-header') || fakeObj
     const dashboardActivity = document.getElementById('dashboard-activity')
     const dashboardCards = document.getElementById('DashboardCard_Container')
+    const rightSideContent = document.getElementById('right-side-wrapper') || fakeObj
 
     if (newView[0] === 'planner') {
       dashboardPlanner.style.display = 'block'
       dashboardPlannerHeader.style.display = 'block'
       dashboardActivity.style.display = 'none'
       dashboardCards.style.display = 'none'
+      rightSideContent.style.display = 'none'
     } else if (newView[0] === 'activity') {
       dashboardPlanner.style.display = 'none'
       dashboardPlannerHeader.style.display = 'none'
       dashboardActivity.style.display = 'block'
       dashboardCards.style.display = 'none'
+      rightSideContent.style.display = 'block'
     } else {
       dashboardPlanner.style.display = 'none'
       dashboardPlannerHeader.style.display = 'none'
       dashboardActivity.style.display = 'none'
       dashboardCards.style.display = 'block'
+      rightSideContent.style.display = 'block'
     }
   }
 

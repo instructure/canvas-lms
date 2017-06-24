@@ -1,4 +1,12 @@
-define(['jquery'],function($) {
+(function (factory) { // UMD wrapper
+  if (typeof module === 'object' && module.exports) {
+    factory(require('jquery'))
+  } else if (typeof define === 'function' && define.amd) {
+    define(['jquery'], factory)
+  } else {
+    factory(jQuery)
+  }
+})(function ($) {
 
 /* ============================================================
  * bootstrap-dropdown.js v2.3.2
@@ -21,7 +29,6 @@ define(['jquery'],function($) {
 
 // INSTRUCTURE modified
 
-!function ($) {
 
   "use strict"; // jshint ;_;
 
@@ -276,7 +283,5 @@ define(['jquery'],function($) {
     .on('focus.dropdown.data-api', '.dropdown-submenu', Dropdown.prototype.focusSubmenu)
     .on('blur.dropdown.data-api', '.dropdown-submenu', Dropdown.prototype.blurSubmenu)
     .on('click.dropdown.data-api', '.dropdown-submenu', Dropdown.prototype.clickSubmenu)
-
-}(window.jQuery);
 
 });

@@ -16,15 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!link_enrollment',
-  'jquery' /* $ */,
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_forms' /* formSubmit */,
-  'jqueryui/dialog',
-  'jquery.instructure_misc_plugins' /* showIf */,
-  'jquery.templateData' /* fillTemplateData */
-], function(I18n, $) {
+import I18n from 'i18n!link_enrollment'
+import $ from 'jquery'
+import './jquery.ajaxJSON'
+import './jquery.instructure_forms' /* formSubmit */
+import 'jqueryui/dialog'
+import './jquery.instructure_misc_plugins' /* showIf */
+import './jquery.templateData' /* fillTemplateData */
 
   /*global link_enrollment*/
   window.link_enrollment = (function() {
@@ -115,4 +113,3 @@ define([
       }
     });
   });
-});

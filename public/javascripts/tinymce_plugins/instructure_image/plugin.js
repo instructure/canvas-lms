@@ -16,13 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'compiled/editor/stocktiny',
-  'i18n!editor',
-  'jquery',
-  'str/htmlEscape',
-  'jqueryui/dialog'
-], function(tinymce, I18n, $, htmlEscape) {
+import tinymce from 'compiled/editor/stocktiny'
+import I18n from 'i18n!editor'
+import $ from 'jquery'
+import htmlEscape from '../../str/htmlEscape'
+import 'jqueryui/dialog'
 
   tinymce.create('tinymce.plugins.InstructureImagePlugin', {
     init : function(ed, url) {
@@ -68,4 +66,3 @@ define([
 
   // Register plugin
   tinymce.PluginManager.add('instructure_image', tinymce.plugins.InstructureImagePlugin);
-});

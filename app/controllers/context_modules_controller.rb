@@ -317,13 +317,9 @@ class ContextModulesController < ApplicationController
         tag_ids = tag_scope.pluck(:id)
         restriction_info = {}
         if tag_ids.any?
-          if is_child_course
-            MasterCourses::MasterContentTag.fetch_module_item_restrictions_for_child(tag_ids).each do |tag_id, restrictions|
-              restriction_info[tag_id] = restrictions.any?{|k, v| v} ? 'locked' : 'unlocked' # might need to elaborate in the future
-            end
-          elsif is_master_course
-            restriction_info = MasterCourses::MasterContentTag.fetch_module_item_restrictions_for_master(tag_ids)
-          end
+          restriction_info = is_child_course ?
+            MasterCourses::MasterContentTag.fetch_module_item_restrictions_for_child(tag_ids) :
+            MasterCourses::MasterContentTag.fetch_module_item_restrictions_for_master(tag_ids)
         end
         info[:tag_restrictions] = restriction_info
       end
@@ -447,7 +443,7 @@ class ContextModulesController < ApplicationController
       affected_items = []
       items = order.map{|id| tags.detect{|t| t.id == id.to_i } }.compact.uniq
       items.each_with_index do |item, idx|
-        item.position = idx
+        item.position = idx + 1
         item.context_module_id = @module.id
         if item.changed?
           item.skip_touch = true

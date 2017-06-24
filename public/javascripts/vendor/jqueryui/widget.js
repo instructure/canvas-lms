@@ -1,4 +1,5 @@
-define(['jquery', 'jqueryui/widget-unpatched'], function ($, returnValueOfUnpatchedWidget) {
+import $ from 'jquery'
+import returnValueOfUnpatchedWidget from 'jqueryui/widget-unpatched'
 
   // This function is the same as $.widget.extend
   // except for this additional check on the target:
@@ -31,5 +32,5 @@ define(['jquery', 'jqueryui/widget-unpatched'], function ($, returnValueOfUnpatc
     return target;
   };
 
-  return returnValueOfUnpatchedWidget;
-});
+  export default returnValueOfUnpatchedWidget;
+

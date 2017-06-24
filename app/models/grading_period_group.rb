@@ -26,7 +26,7 @@ class GradingPeriodGroup < ActiveRecord::Base
 
   validate :associated_with_course_or_root_account, if: :active?
 
-  after_save :recompute_course_scores, if: :weighted_changed?
+  after_save :recompute_course_scores, if: :weighted_actually_changed?
   after_save :recache_grading_period, if: :course_id_changed?
   after_destroy :dissociate_enrollment_terms
 
@@ -74,6 +74,15 @@ class GradingPeriodGroup < ActiveRecord::Base
     return course.recompute_student_scores(update_all_grading_period_scores: false) if course_id.present?
 
     enrollment_terms.each { |term| term.recompute_course_scores(update_all_grading_period_scores: false) }
+  end
+
+  handle_asynchronously_if_production(
+    :recompute_course_scores,
+    singleton: proc { |g| "grading_period_group:recompute:GradingPeriodGroup:#{g.global_id}" }
+  )
+
+  def weighted_actually_changed?
+    !self.new_record? && weighted_changed?
   end
 
   def recache_grading_period

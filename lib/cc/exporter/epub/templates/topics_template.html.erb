@@ -2,9 +2,9 @@
 <p><%= convert_placeholder_paths_from_string!(item[:description]) %></p>
 <% if item[:assignment] && item_details_present?(item[:assignment]) %>
   <div class="item_details">
-    <p><%= item[:assignment][:due_at] ? I18n.t("Due at: %{time}",{time: friendly_date(item[:assignment][:due_at])}) : nil%></p>
-    <p><%= item[:assignment][:unlock_at] ? I18n.t("Unlock at: %{time}",{time: friendly_date(item[:assignment][:unlock_at])}) : nil %></p>
-    <p><%= item[:assignment][:lock_at] ? I18n.t("Lock at: %{time}",{time: friendly_date(item[:assignment][:lock_at])}) : nil %></p>
+    <p><%= item[:assignment][:due_at].present? ? I18n.t("Due at: %{time}",{time: friendly_date(item[:assignment][:due_at])}) : nil%></p>
+    <p><%= item[:assignment][:unlock_at].present? ? I18n.t("Unlock at: %{time}",{time: friendly_date(item[:assignment][:unlock_at])}) : nil %></p>
+    <p><%= item[:assignment][:lock_at].present? ? I18n.t("Lock at: %{time}",{time: friendly_date(item[:assignment][:lock_at])}) : nil %></p>
     <p><%= item[:assignment][:grading_type] ? I18n.t("Grading Type: %{type}",{type: item[:assignment][:grading_type]}) : nil %></p>
     <p><%= item[:assignment][:points_possible] ? I18n.t("Points: %{points}",{points: item[:assignment][:points_possible]}) : nil %></p>
   </div>

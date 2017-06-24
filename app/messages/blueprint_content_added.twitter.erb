@@ -1,0 +1,4 @@
+<% define_content :link do %>
+  <%= polymorphic_url(asset.context, :anchor => asset.notification_link_anchor) %>
+<% end %>
+<%= t :tweet, "Canvas Alert - Blueprint course changes synced to %{name}", :name => asset.context.name %>

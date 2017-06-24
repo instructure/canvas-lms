@@ -19,20 +19,21 @@ define [
   'i18n!react_files'
   'jquery'
   'react'
+  'prop-types'
   'compiled/fn/preventDefault'
   '../modules/customPropTypes'
   '../utils/moveStuff'
   'compiled/str/splitAssetString'
-], (I18n, $, React, preventDefault,  customPropTypes, moveStuff, splitAssetString) ->
+], (I18n, $, React, PropTypes, preventDefault,  customPropTypes, moveStuff, splitAssetString) ->
 
   MoveDialog =
     displayName: 'MoveDialog'
 
     propTypes:
-      rootFoldersToShow: React.PropTypes.arrayOf(customPropTypes.folder).isRequired
-      thingsToMove: React.PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired
-      onClose: React.PropTypes.func.isRequired
-      onMove: React.PropTypes.func.isRequired
+      rootFoldersToShow: PropTypes.arrayOf(customPropTypes.folder).isRequired
+      thingsToMove: PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired
+      onClose: PropTypes.func.isRequired
+      onMove: PropTypes.func.isRequired
 
     getInitialState: ->
       destinationFolder: null

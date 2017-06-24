@@ -69,6 +69,19 @@ test('renders the assignment groupWeight percentage', function () {
   equal(groupWeight.text().trim(), '42.50% of grade');
 });
 
+test('renders a PopoverMenu with a trigger', function () {
+  const optionsMenuTrigger = this.wrapper.find('PopoverMenu .Gradebook__ColumnHeaderAction');
+
+  equal(optionsMenuTrigger.length, 1);
+});
+
+test('adds a class to the trigger when the PopoverMenu is opened', function () {
+  const optionsMenuTrigger = this.wrapper.find('PopoverMenu .Gradebook__ColumnHeaderAction');
+  optionsMenuTrigger.simulate('click');
+
+  ok(optionsMenuTrigger.hasClass('menuShown'));
+});
+
 QUnit.module('AssignmentGroupColumnHeader - non-standard assignment group', {
   setup () {
     this.props = createExampleProps();

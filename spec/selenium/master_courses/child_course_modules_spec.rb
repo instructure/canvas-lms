@@ -27,7 +27,7 @@ describe "master courses - child courses - module item locking" do
     @copy_from = course_factory(:active_all => true)
     @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
     @original_page = @copy_from.wiki.wiki_pages.create!(:title => "blah", :body => "bloo")
-    @page_mc_tag = @template.create_content_tag_for!(@original_page, :restrictions => {:all => true})
+    @page_mc_tag = @template.create_content_tag_for!(@original_page, :restrictions => {:content => true})
 
     @original_topic = @copy_from.discussion_topics.create!(:title => "blah", :message => "bloo")
     @topic_mc_tag = @template.create_content_tag_for!(@original_topic)
@@ -54,9 +54,12 @@ describe "master courses - child courses - module item locking" do
   it "should show all the icons on the modules index" do
     get "/courses/#{@copy_to.id}/modules"
 
-    expect(f("#context_module_item_#{@locked_tag.id} .master-course-cell")).to contain_css('.icon-lock')
-    expect(f("#context_module_item_#{@unlocked_tag.id} .master-course-cell")).to contain_css('.icon-unlock')
-    expect(f("#context_module_item_#{@normal_tag.id}")).to_not contain_css('.master-course-cell')
+    # objects inherited from master show the lock
+    expect(f("#context_module_item_#{@locked_tag.id} .lock-icon")).to contain_css('.icon-blueprint-lock')
+    expect(f("#context_module_item_#{@unlocked_tag.id} .lock-icon")).to contain_css('.icon-blueprint')
+    # objects aded to the child do not
+    expect(f("#context_module_item_#{@normal_tag.id} .lock-icon")).not_to contain_css('.icon-blueprint-lock')
+    expect(f("#context_module_item_#{@normal_tag.id} .lock-icon")).not_to contain_css('.icon-blueprint')
   end
 
   it "should disable the title edit input for locked items" do
@@ -72,13 +75,13 @@ describe "master courses - child courses - module item locking" do
 
     f("#context_module_item_#{@unlocked_tag.id} .al-trigger").click
     f("#context_module_item_#{@unlocked_tag.id} .al-options .edit_link").click
-    expect(f("#content_tag_title")).to_not be_disabled
+    expect(f("#content_tag_title")).not_to be_disabled
   end
 
   it "loads new restriction info as needed when adding an item" do
     title = "new quiz"
     original_quiz = @copy_from.quizzes.create!(:title => title)
-    quiz_mc_tag = @template.create_content_tag_for!(original_quiz, :restrictions => {:all => true})
+    quiz_mc_tag = @template.create_content_tag_for!(original_quiz, :restrictions => {:content => true})
 
     quiz_copy = @copy_to.quizzes.create!(:title => title, :migration_id => quiz_mc_tag.migration_id)
     @sub.create_content_tag_for!(quiz_copy)
@@ -96,6 +99,6 @@ describe "master courses - child courses - module item locking" do
     expect(new_tag.content).to eq quiz_copy
 
     # does another fetch to get restrictions for the new tag
-    expect(f("#context_module_item_#{new_tag.id} .master-course-cell")).to contain_css('.icon-lock')
+    expect(f("#context_module_item_#{new_tag.id} .lock-icon")).to contain_css('.icon-blueprint-lock')
   end
 end

@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!react_collaborations'
 import NewCollaborationsDropDown from 'jsx/collaborations/NewCollaborationsDropDown'
 
@@ -48,8 +49,8 @@ class CollaborationsNavigation extends React.Component {
 }
 
 CollaborationsNavigation.propTypes = {
-  ltiCollaborators: React.PropTypes.object.isRequired,
-  actions: React.PropTypes.object
+  ltiCollaborators: PropTypes.object.isRequired,
+  actions: PropTypes.object
 };
 
 export default CollaborationsNavigation

@@ -16,14 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!message_students',
-  'jquery' /* $ */,
-  'jsx/shared/helpers/numberHelper',
-  'jquery.instructure_forms' /* formSubmit */,
-  'jqueryui/dialog',
-  'jquery.instructure_misc_plugins', /* showIf */
-], function (I18n, $, numberHelper) {
+import I18n from 'i18n!message_students'
+import $ from 'jquery'
+import numberHelper from 'jsx/shared/helpers/numberHelper'
+import './jquery.instructure_forms' /* formSubmit */
+import 'jqueryui/dialog'
+import './jquery.instructure_misc_plugins' /* showIf */
+
   var $message_students_dialog = $("#message_students_dialog");
   var $sendButton = $message_students_dialog.find(".send_button");
   var currentSettings = {};
@@ -198,5 +197,4 @@ define([
     disableButtons(disabled, $sendButton);
   }
 
-  return messageStudents;
-});
+export default messageStudents;

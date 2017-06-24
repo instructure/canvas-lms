@@ -20,10 +20,10 @@ define [
   'jquery'
   'compiled/views/profiles/AvatarUploadBaseView'
   'jst/profiles/gravatarView'
-  'vendor/md5'
+  'md5'
   'jquery.ajaxJSON'
 
-], ($, AvatarUploadBaseView, template, CryptoJS) ->
+], ($, AvatarUploadBaseView, template, md5) ->
 
   class GravatarView extends AvatarUploadBaseView
 
@@ -68,7 +68,7 @@ define [
 
     _gravatarHashFromInput: () ->
       email = @_prepareEmail(@$gravatarPreviewInput.val())
-      CryptoJS.MD5(email)
+      md5(email)
 
     _gravatarUrl: (hash, size=200, fallback="identicon") ->
       "https://secure.gravatar.com/avatar/#{hash}?s=#{size}&d=#{fallback}"

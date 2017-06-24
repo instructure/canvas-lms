@@ -27,22 +27,24 @@ module Lti
 
     serialize :icon_info
 
-    validates_presence_of :resource_type_code, :name, :tool_proxy, :lookup_id
-    before_validation :set_lookup_id
+    validates :resource_type_code, :name, :tool_proxy, presence: true
 
-    def self.generate_lookup_id_for(resource_handler)
-      tool_proxy = resource_handler.tool_proxy
-      product_family = tool_proxy.product_family
-      components = [product_family.product_code,
-                    product_family.vendor_code,
-                    resource_handler.resource_type_code].join('-')
-      "#{components}-#{Canvas::Security.hmac_sha1(components)}"
+    def find_message_by_type(message_type)
+      message_handlers.by_message_types(message_type).first
     end
 
-    private
+    def self.by_product_family(product_family, context)
+      tool_proxies = ToolProxy.find_active_proxies_for_context(context)
+      tool_proxies = tool_proxies.where(product_family: product_family)
+      tool_proxies.map { |tp| tp.resources.to_a.flatten }.flatten
+    end
 
-    def set_lookup_id
-      self.lookup_id ||= self.class.generate_lookup_id_for(self)
+
+    def self.by_resource_codes(vendor_code:, product_code:, resource_type_code:, context:)
+      product_family = ProductFamily.find_by(vendor_code: vendor_code,
+                                             product_code: product_code)
+      possible_handlers = ResourceHandler.by_product_family(product_family, context)
+      possible_handlers.select { |rh| rh.resource_type_code == resource_type_code}
     end
   end
 end

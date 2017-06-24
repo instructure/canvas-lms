@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid'
 import { MenuItem, MenuItemGroup, MenuItemSeparator } from 'instructure-ui/lib/components/Menu'
 import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
@@ -24,7 +25,7 @@ import Typography from 'instructure-ui/lib/components/Typography'
 import StudentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/StudentRowHeaderConstants'
 import I18n from 'i18n!gradebook'
 
-const { arrayOf, bool, func, oneOf, shape, string } = React.PropTypes;
+const { arrayOf, bool, func, oneOf, shape, string } = PropTypes;
 
 export default class StudentColumnHeader extends React.Component {
   static propTypes = {
@@ -55,6 +56,10 @@ export default class StudentColumnHeader extends React.Component {
   constructor (props) {
     super(props);
 
+    this.state = {
+      menuShown: false
+    };
+
     this.bindOptionsMenuContent = (ref) => { this.optionsMenuContent = ref };
     this.onShowSectionNames = this.onSelectSecondaryInfo.bind(this, 'section');
     this.onHideSecondaryInfo = this.onSelectSecondaryInfo.bind(this, 'none');
@@ -67,6 +72,12 @@ export default class StudentColumnHeader extends React.Component {
 
     this.onToggleInactive = this.onToggleEnrollmentFilter.bind(this, 'inactive');
     this.onToggleConcluded = this.onToggleEnrollmentFilter.bind(this, 'concluded');
+
+    this.onToggle = this.onToggle.bind(this);
+  }
+
+  onToggle (show) {
+    this.setState({ menuShown: show });
   }
 
   onSelectSecondaryInfo (secondaryInfoKey) {
@@ -93,6 +104,8 @@ export default class StudentColumnHeader extends React.Component {
       }
     } = this.props;
     const selectedSortSetting = isSortColumn && settingKey;
+    const menuShown = this.state.menuShown;
+    const classes = `Gradebook__ColumnHeaderAction ${menuShown ? 'menuShown' : ''}`;
 
     return (
       <div className="Gradebook__ColumnHeaderContent">
@@ -106,12 +119,13 @@ export default class StudentColumnHeader extends React.Component {
           contentRef={this.bindOptionsMenuContent}
           focusTriggerOnClose={false}
           trigger={
-            <span className="Gradebook__ColumnHeaderAction">
+            <span className={classes}>
               <Typography weight="bold" fontStyle="normal" size="large" color="brand">
                 <IconMoreSolid title={I18n.t('Student Name Options')} />
               </Typography>
             </span>
           }
+          onToggle={this.onToggle}
         >
           <MenuItemGroup label={I18n.t('Sort by')}>
             <MenuItem

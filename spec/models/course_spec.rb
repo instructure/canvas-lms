@@ -40,6 +40,19 @@ describe Course do
     @course.enrollment_term = Account.default.default_enrollment_term
   end
 
+  it "should re-run DueDateCacher if enrollment term changes" do
+    @course.save!
+    @course.enrollment_term = EnrollmentTerm.create!(root_account: Account.default, workflow_state: :active)
+    expect(DueDateCacher).to receive(:recompute_course).with(@course)
+    @course.save!
+  end
+
+  it "should not re-run DueDateCacher if enrollment term does not change" do
+    @course.save!
+    expect(DueDateCacher).not_to receive(:recompute_course)
+    @course.save!
+  end
+
   it "should properly determine if group weights are active" do
     @course.update_attribute(:group_weighting_scheme, nil)
     expect(@course.apply_group_weights?).to eq false
@@ -315,7 +328,7 @@ describe Course do
 
   context "validation" do
     it "should create a new instance given valid attributes" do
-      course_model
+      expect{course_model}.not_to raise_error
     end
 
     it "should require unique sis_source_id" do
@@ -1028,9 +1041,9 @@ describe Course do
 
   it "should be marshal-able" do
     c = Course.new(:name => 'c1')
-    Marshal.dump(c)
+    expect { Marshal.dump(c) }.not_to raise_error
     c.save!
-    Marshal.dump(c)
+    expect { Marshal.dump(c) }.not_to raise_error
   end
 end
 
@@ -1793,9 +1806,6 @@ describe Course, "tabs_available" do
       tab_id = "context_external_tool_#{@tool.id}"
 
       @course.tab_configuration = [{"id" => tab_id}]
-      @course.tabs_available(@user).each do |tab|
-        puts tab.inspect
-      end
       tab = @course.tabs_available(@user).select { |t| t[:id] == tab_id }.first
       expect(tab[:target]).to eq("_blank")
     end

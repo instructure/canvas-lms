@@ -16,30 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'compiled/views/quizzes/FileUploadQuestionView',
-  'compiled/models/File',
-  'i18n!quizzes.take_quiz',
-  'jquery' /* $ */,
-  'compiled/behaviors/autoBlurActiveInput',
-  'underscore',
-  'compiled/views/quizzes/LDBLoginPopup',
-  'quizzes/quiz_taking_police',
-  'compiled/quizzes/log_auditing',
-  'compiled/quizzes/dump_events',
-  'compiled/views/editor/KeyboardShortcuts',
-  'jsx/shared/rce/RichContentEditor',
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.toJSON',
-  'jquery.instructure_date_and_time' /* friendlyDatetime, friendlyDate */,
-  'jquery.instructure_forms' /* getFormData, errorBox */,
-  'jqueryui/dialog',
-  'compiled/jquery.rails_flash_notifications',
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'compiled/behaviors/quiz_selectmenu'
-], function(FileUploadQuestionView, File, I18n, $, autoBlurActiveInput, _,
-            LDBLoginPopup, quizTakingPolice, QuizLogAuditing,
-            QuizLogAuditingEventDumper, KeyboardShortcuts, RichContentEditor) {
+import FileUploadQuestionView from 'compiled/views/quizzes/FileUploadQuestionView'
+import File from 'compiled/models/File'
+import I18n from 'i18n!quizzes.take_quiz'
+import $ from 'jquery'
+import autoBlurActiveInput from 'compiled/behaviors/autoBlurActiveInput'
+import _ from 'underscore'
+import LDBLoginPopup from 'compiled/views/quizzes/LDBLoginPopup'
+import quizTakingPolice from 'quizzes/quiz_taking_police'
+import QuizLogAuditing from 'compiled/quizzes/log_auditing'
+import QuizLogAuditingEventDumper from 'compiled/quizzes/dump_events'
+import KeyboardShortcuts from 'compiled/views/editor/KeyboardShortcuts'
+import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
+import './jquery.ajaxJSON'
+import './jquery.toJSON'
+import './jquery.instructure_date_and_time' /* friendlyDatetime, friendlyDate */
+import './jquery.instructure_forms' /* getFormData, errorBox */
+import 'jqueryui/dialog'
+import 'compiled/jquery.rails_flash_notifications'
+import './vendor/jquery.scrollTo'
+import 'compiled/behaviors/quiz_selectmenu'
 
   RichContentEditor.preloadRemoteModule();
 
@@ -797,4 +793,3 @@ define([
   });
 
   $('.essay_question .answers .rce_links').append((new KeyboardShortcuts()).render().el);
-});

@@ -50,7 +50,7 @@ class Attachment < ActiveRecord::Base
   belongs_to :context, exhaustive: false, polymorphic:
       [:account, :assessment_question, :assignment, :attachment,
        :content_export, :content_migration, :course, :eportfolio, :epub_export,
-       :gradebook_upload, :group, :submission,
+       :gradebook_upload, :group, :submission, :purgatory,
        { context_folder: 'Folder', context_sis_batch: 'SisBatch',
          context_user: 'User', quiz: 'Quizzes::Quiz',
          quiz_statistics: 'Quizzes::QuizStatistics',
@@ -691,16 +691,18 @@ class Attachment < ActiveRecord::Base
         end
       end
     elsif method == :overwrite && atts.any?
-      Attachment.where(:id => atts).update_all(replacement_attachment_id: self.id) # so we can find the new file in content links
-      copy_access_attributes!(atts)
-      atts.each do |a|
-        # update content tags to refer to the new file
-        ContentTag.where(:content_id => a, :content_type => 'Attachment').update_all(content_id: self.id)
-        # update replacement pointers pointing at the overwritten file
-        context.attachments.where(:replacement_attachment_id => a).update_all(replacement_attachment_id: self.id)
-        # delete the overwritten file (unless the caller is queueing them up)
-        a.destroy unless opts[:caller_will_destroy]
-        deleted_attachments << a
+      shard.activate do
+        Attachment.where(:id => atts).update_all(replacement_attachment_id: self.id) # so we can find the new file in content links
+        copy_access_attributes!(atts)
+        atts.each do |a|
+          # update content tags to refer to the new file
+          ContentTag.where(:content_id => a, :content_type => 'Attachment').update_all(content_id: self.id)
+          # update replacement pointers pointing at the overwritten file
+          context.attachments.where(:replacement_attachment_id => a).update_all(replacement_attachment_id: self.id)
+          # delete the overwritten file (unless the caller is queueing them up)
+          a.destroy unless opts[:caller_will_destroy]
+          deleted_attachments << a
+        end
       end
     end
     return deleted_attachments
@@ -1238,11 +1240,63 @@ class Attachment < ActiveRecord::Base
   # object. It will replace the attachment content with a file_removed file.
   def destroy_content_and_replace(deleted_by_user = nil)
     att = self.root_attachment_id? ? self.root_attachment : self
+    att.send_to_purgatory(deleted_by_user)
     att.destroy_content
     att.uploaded_data = File.open Rails.root.join('public', 'file_removed', 'file_removed.pdf')
     CrocodocDocument.where(attachment_id: att.children_and_self.select(:id)).delete_all
     Canvadoc.where(attachment_id: att.children_and_self.select(:id)).delete_all
     att.save!
+  end
+
+  # this method does not destroy anything. It copies the content to a new s3object
+  def send_to_purgatory(deleted_by_user = nil)
+    make_rootless
+    if Attachment.s3_storage?
+      s3object.copy_to(bucket.object(purgatory_filename))
+    else
+      FileUtils.mkdir(local_purgatory_directory) unless File.exist?(local_purgatory_directory)
+      FileUtils.cp full_filename, local_purgatory_file
+    end
+    if Purgatory.where(attachment_id: self).exists?
+      p = Purgatory.where(attachment_id: self).take
+      p.deleted_by_user = deleted_by_user
+      p.old_filename = filename
+      p.workflow_state = 'active'
+      p.save!
+    else
+      Purgatory.create!(attachment: self, old_filename: filename, deleted_by_user: deleted_by_user)
+    end
+  end
+
+  def purgatory_filename
+    File.join('purgatory', global_id.to_s)
+  end
+
+  def local_purgatory_file
+    File.join(local_purgatory_directory, global_id.to_s)
+  end
+
+  def local_purgatory_directory
+    Rails.root.join(attachment_options[:path_prefix].to_s, 'purgatory')
+  end
+
+  def resurrect_from_purgatory
+    p = Purgatory.where(attachment_id: id).take
+    raise 'must have been sent to purgatory first' unless p
+    write_attribute(:filename, p.old_filename)
+    write_attribute(:root_attachment_id, nil)
+
+    if Attachment.s3_storage?
+      old_s3object = self.bucket.object(purgatory_filename)
+      raise Attachment::FileDoesNotExist unless old_s3object.exists?
+      old_s3object.copy_to(bucket.object(full_filename))
+    else
+      raise Attachment::FileDoesNotExist unless File.exist?(local_purgatory_file)
+      FileUtils.mv local_purgatory_file, full_filename
+    end
+    save! if changed?
+    p.workflow_state = 'restored'
+    p.save!
   end
 
   def dmca_file_removal

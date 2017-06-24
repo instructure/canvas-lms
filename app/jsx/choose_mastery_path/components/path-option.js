@@ -17,12 +17,13 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import I18n from 'i18n!choose_mastery_path'
 import Assignment from './assignment'
 import SelectButton from './select-button'
 import assignmentShape from '../shapes/assignment-shape'
-  const { func, number, arrayOf } = React.PropTypes
+  const { func, number, arrayOf } = PropTypes
 
 export default class PathOption extends React.Component {
     static propTypes = {

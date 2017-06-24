@@ -19,6 +19,7 @@
 import I18n from 'i18n!blueprint_settings'
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import ToggleDetails from 'instructure-ui/lib/components/ToggleDetails'
 import Typography from 'instructure-ui/lib/components/Typography'
 import Spinner from 'instructure-ui/lib/components/Spinner'
@@ -27,7 +28,7 @@ import propTypes from '../propTypes'
 import CourseFilter from './CourseFilter'
 import CoursePickerTable from './CoursePickerTable'
 
-const { func, bool, arrayOf, string } = React.PropTypes
+const { func, bool, arrayOf, string } = PropTypes
 
 export default class CoursePicker extends React.Component {
   static propTypes = {
@@ -38,10 +39,12 @@ export default class CoursePicker extends React.Component {
     loadCourses: func.isRequired,
     isLoadingCourses: bool.isRequired,
     onSelectedChanged: func,
+    detailsRef: func,
     isExpanded: bool,
   }
 
   static defaultProps = {
+    detailsRef: () => {},
     onSelectedChanged: () => {},
     isExpanded: true,
   }
@@ -53,6 +56,11 @@ export default class CoursePicker extends React.Component {
       isManuallyExpanded: props.isExpanded,
       announceChanges: false,
     }
+    this._homeRef = null;
+  }
+
+  componentDidMount () {
+    this.fixIcons()
   }
 
   componentWillReceiveProps (nextProps) {
@@ -67,6 +75,10 @@ export default class CoursePicker extends React.Component {
         other: 'Loading courses complete: %{count} courses found'
       }, { count: nextProps.courses.length }))
     }
+  }
+
+  componentDidUpdate () {
+    this.fixIcons()
   }
 
   onFilterActivate = () => {
@@ -98,13 +110,25 @@ export default class CoursePicker extends React.Component {
     })
   }
 
+  // in IE, instui icons are in the tab order and get focus, even if hidden
+  // this fixes them up so that doesn't happen.
+  // Eventually this should get folded into instui via INSTUI-572
+  fixIcons () {
+    if (this._homeRef) {
+      Array.prototype.forEach.call(
+        this._homeRef.querySelectorAll('svg[aria-hidden]'),
+        (el) => { el.setAttribute('focusable', 'false') }
+      )
+    }
+  }
+
   reloadCourses () {
     this.props.loadCourses(this.state.filters)
   }
 
   render () {
     return (
-      <div className="bca-course-picker">
+      <div className="bca-course-picker" ref={(el) => { this._homeRef = el }}>
         <CourseFilter
           ref={(c) => { this.filter = c }}
           terms={this.props.terms}
@@ -116,8 +140,8 @@ export default class CoursePicker extends React.Component {
         <div className="bca-course-details__wrapper">
           <ToggleDetails
             ref={(c) => { this.coursesToggle = c }}
-            isExpanded={this.state.isExpanded}
-            summary={<Typography>{I18n.t('Courses')}</Typography>}
+            expanded={this.state.isExpanded}
+            summary={<span ref={(c) => { if (c) this.props.detailsRef(c.parentElement.parentElement) }}><Typography>{I18n.t('Courses')}</Typography></span>}
           >
             {this.props.isLoadingCourses && (<div className="bca-course-picker__loading">
               <Spinner title={I18n.t('Loading Courses')} />

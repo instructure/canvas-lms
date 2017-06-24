@@ -16,16 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!accounts' /* I18n.t */,
-  'jquery' /* $ */,
-  'str/htmlEscape',
-  'jquery.instructure_forms' /* formSubmit */,
-  'jqueryui/dialog',
-  'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
-  'compiled/jquery.rails_flash_notifications',
-  'jquery.templateData' /* fillTemplateData */
-], function(I18n, $, htmlEscape) {
+import I18n from 'i18n!accounts'
+import $ from 'jquery'
+import htmlEscape from './str/htmlEscape'
+import './jquery.instructure_forms' /* formSubmit */
+import 'jqueryui/dialog'
+import 'compiled/jquery/fixDialogButtons'
+import 'compiled/jquery.rails_flash_notifications'
+import './jquery.templateData' /* fillTemplateData */
 
   $(".add_course_link").click(function(event) {
     event.preventDefault();
@@ -71,5 +69,3 @@ define([
   $("#add_course_dialog .cancel_button").click(function() {
     $("#add_course_dialog").dialog('close');
   });
-});
-

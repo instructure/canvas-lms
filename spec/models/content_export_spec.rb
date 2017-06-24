@@ -96,6 +96,12 @@ describe ContentExport do
       expect(@ce.settings[:quizzes2][:assignment]).not_to be_empty
     end
 
+    it "composes the payload with course UUID" do
+      Account.default.enable_feature!(:quizzes2_exporter)
+      @ce.export_without_send_later
+      expect(@ce.settings[:quizzes2][:assignment][:course_uuid]).to eq(@course.uuid)
+    end
+
     it "composes the payload with qti details" do
       Account.default.enable_feature!(:quizzes2_exporter)
       @ce.export_without_send_later

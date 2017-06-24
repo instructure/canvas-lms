@@ -626,12 +626,12 @@ class FilesController < ApplicationController
         redirect_to(named_context_url(@context, :context_file_url, attachment.id))
       end
     else
-      send_stored_file(attachment, false, true)
+      send_stored_file(attachment, false)
     end
   end
   protected :send_attachment
 
-  def send_stored_file(attachment, inline=true, redirect_to_s3=false)
+  def send_stored_file(attachment, inline=true)
     user = @current_user
     user ||= api_find(User, params[:user_id]) if params[:user_id].present?
     attachment.context_module_action(user, :read) if user && !params[:preview]
@@ -639,8 +639,7 @@ class FilesController < ApplicationController
     render_or_redirect_to_stored_file(
       attachment: attachment,
       verifier: params[:verifier],
-      inline: inline,
-      redirect_to_s3: redirect_to_s3
+      inline: inline
     )
   end
   protected :send_stored_file
@@ -1032,8 +1031,26 @@ class FilesController < ApplicationController
   #
   #   curl -X DELETE 'https://<canvas>/api/v1/files/<file_id>' \
   #        -H 'Authorization: Bearer <token>'
+  #
+  #  @argument replace [boolean]
+  #    This action is irreversible.
+  #    If replace is set to true the file contents will be replaced with a
+  #    generic "file has been removed" file. This also destroys any previews
+  #    that have been generated for the file.
+  #    Must have manage files and become other users permissions
+  #
   def destroy
     @attachment = Attachment.find(params[:id])
+    if value_to_boolean(params[:replace])
+      @context = @attachment.context
+      if @context.grants_right?(@current_user, nil, :manage_files) &&
+        @domain_root_account.grants_right?(@current_user, nil, :become_user)
+        @attachment.destroy_content_and_replace(@current_user)
+        return format.json { render json: attachment_json(@attachment, @current_user, {}, {omit_verifier_in_app: true}) }
+      else
+        return render_unauthorized_action
+      end
+    end
     if can_do(@attachment, @current_user, :delete)
       return render_unauthorized_action if master_courses? && editing_restricted?(@attachment)
       @attachment.destroy

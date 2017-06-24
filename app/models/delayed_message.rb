@@ -25,9 +25,12 @@ class DelayedMessage < ActiveRecord::Base
      :attachment, :assignment_override, :group_membership, :calendar_event,
      :wiki_page, :assessment_request, :account_user, :web_conference,
      :account, :user, :appointment_group, :collaborator, :account_report,
-     :alert, { context_communication_channel: 'CommunicationChannel',
+     :alert, :content_migration,
+     { context_communication_channel: 'CommunicationChannel',
        quiz_submission: 'Quizzes::QuizSubmission',
-       quiz_regrade_run: 'Quizzes::QuizRegradeRun'}]
+       quiz_regrade_run: 'Quizzes::QuizRegradeRun',
+       master_migration: 'MasterCourses::MasterMigration' }
+    ]
   belongs_to :communication_channel
 
   validates_length_of :summary, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true

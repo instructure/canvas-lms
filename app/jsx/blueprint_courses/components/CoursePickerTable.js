@@ -19,6 +19,7 @@
 import I18n from 'i18n!blueprint_settings'
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import Typography from 'instructure-ui/lib/components/Typography'
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
 import PresentationContent from 'instructure-ui/lib/components/PresentationContent'
@@ -28,13 +29,13 @@ import 'compiled/jquery.rails_flash_notifications'
 
 import propTypes from '../propTypes'
 
-const { arrayOf, string } = React.PropTypes
+const { arrayOf, string } = PropTypes
 
 export default class CoursePickerTable extends React.Component {
   static propTypes = {
     courses: propTypes.courseList.isRequired,
     selectedCourses: arrayOf(string).isRequired,
-    onSelectedChanged: React.PropTypes.func,
+    onSelectedChanged: PropTypes.func,
   }
 
   static defaultProps = {
@@ -47,6 +48,11 @@ export default class CoursePickerTable extends React.Component {
       selected: this.parseSelectedCourses(props.selectedCourses),
       selectedAll: false,
     }
+    this._tableRef = null;
+  }
+
+  componentDidMount () {
+    this.fixIcons()
   }
 
   componentWillReceiveProps (nextProps) {
@@ -54,6 +60,10 @@ export default class CoursePickerTable extends React.Component {
       selected: this.parseSelectedCourses(nextProps.selectedCourses),
       selectedAll: nextProps.selectedCourses.length === nextProps.courses.length,
     })
+  }
+
+  componentDidUpdate () {
+    this.fixIcons()
   }
 
   onSelectToggle = (e) => {
@@ -81,6 +91,18 @@ export default class CoursePickerTable extends React.Component {
       return selectedMap
     }, {})
     this.updateSelected(selected, e.target.checked)
+  }
+
+  // in IE, instui icons are in the tab order and get focus, even if hidden
+  // this fixes them up so that doesn't happen.
+  // Eventually this should get folded into instui via INSTUI-572
+  fixIcons () {
+    if (this._tableRef) {
+      Array.prototype.forEach.call(
+        this._tableRef.querySelectorAll('svg[aria-hidden]'),
+        (el) => { el.setAttribute('focusable', 'false') }
+      )
+    }
   }
 
   parseSelectedCourses (courses = []) {
@@ -218,7 +240,7 @@ export default class CoursePickerTable extends React.Component {
 
   render () {
     return (
-      <div className="bca-table__wrapper">
+      <div className="bca-table__wrapper" ref={(el) => { this._tableRef = el }}>
         {this.renderStickyHeaders()}
         <div className="bca-table__content-wrapper">
           <Table caption={<ScreenReaderContent>{I18n.t('Blueprint Courses')}</ScreenReaderContent>}>

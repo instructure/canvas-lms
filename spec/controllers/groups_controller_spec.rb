@@ -27,6 +27,35 @@ describe GroupsController do
   end
 
   describe "GET context_index" do
+    context "student context cards" do
+      before(:once) do
+        @course.root_account.enable_feature! :student_context_cards
+      end
+
+      it "is disabled when feature_flag is off" do
+        @course.root_account.disable_feature! :student_context_cards
+        user_session(@teacher)
+        get 'index', :course_id => @course.id
+        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be_falsey
+      end
+
+      it "is enabled for teachers when feature_flag is on" do
+        %w[manage_students manage_admin_users].each do |perm|
+          RoleOverride.manage_role_override(Account.default, teacher_role, perm, override: false)
+        end
+        user_session(@teacher)
+        get 'index', :course_id => @course.id
+        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be true
+      end
+
+      it "is always disabled for students" do
+        user_session(@student)
+        get 'index', :course_id => @course.id
+        cards_enabled = assigns[:js_env] && assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]
+        expect(cards_enabled).to be_falsey
+      end
+    end
+
     it "should require authorization" do
       user_session(user_factory) # logged in user_factory without course access
       category1 = @course.group_categories.create(:name => "category 1")
@@ -412,6 +441,15 @@ describe GroupsController do
       @group = @course.groups.create!(:name => "some group", :group_category => group_category)
       put 'update', :course_id => @course.id, :id => @group.id, :group => {:group_category_id => 11235}
       expect(response).not_to be_success
+    end
+
+    it "should be able to unset a leader" do
+      user_session(@teacher)
+      @group = @course.groups.create!(:name => "some group")
+      @group.add_user(@student1)
+      @group.update_attribute(:leader, @student1)
+      put 'update', :course_id => @course.id, :id => @group.id, :group => {:leader => nil}
+      expect(@group.reload.leader).to be_nil
     end
 
     describe "quota" do

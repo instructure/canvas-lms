@@ -52,7 +52,12 @@
 #         "progress": {
 #           "description": "The progress of the report",
 #           "example": "100",
-#           "type": "string"
+#           "type": "integer"
+#         },
+#         "current_line": {
+#           "description": "This is the current line count being written to the report. It updates every 1000 records.",
+#           "example": "12000",
+#           "type": "integer"
 #         }
 #       }
 #     }

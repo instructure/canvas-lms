@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../../lti2_spec_helper.rb')
 require_dependency "lti/tool_setting"
 
 module Lti
@@ -24,7 +25,7 @@ module Lti
     let (:account) { Account.create }
     let (:product_family) { ProductFamily.create(vendor_code: '123', product_code: 'abc', vendor_name: 'acme', root_account: account) }
     let (:resource_handler) { ResourceHandler.create(resource_type_code: 'code', name: 'resource name', tool_proxy: tool_proxy) }
-    let (:message_handler) { MessageHandler.create(message_type: 'message_type', launch_path: 'https://samplelaunch/blti', resource: resource_handler) }
+    let (:message_handler) { MessageHandler.create(message_type: 'basic-lti-launch-request', launch_path: 'https://samplelaunch/blti', resource_handler: resource_handler) }
     let (:tool_proxy) { ToolProxy.create(
       shared_secret: 'shared_secret',
       guid: 'guid',
@@ -63,6 +64,25 @@ module Lti
 
 
 
+    end
+
+    describe '#message_handler' do
+      include_context 'lti2_spec_helper'
+      let(:tool_setting) { subject }
+
+      before do
+        message_handler.update_attributes(message_type: MessageHandler::BASIC_LTI_LAUNCH_REQUEST)
+        resource_handler.message_handlers = [message_handler]
+        resource_handler.save!
+
+        tool_setting.update_attributes(resource_type_code: resource_handler.resource_type_code,
+                                       product_code: product_family.product_code,
+                                       vendor_code: product_family.vendor_code)
+      end
+
+      it 'looks up the message handler identified by the codes' do
+        expect(tool_setting.message_handler(account)).to eq message_handler
+      end
     end
 
 

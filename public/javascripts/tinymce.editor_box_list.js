@@ -31,55 +31,47 @@
 //       from the registry
 //   'editorBox/removeAll' ()-> fires if all editors have been removed
 //
-define([
-  'jquery',
-  'compiled/editor/stocktiny',
-  'vendor/jquery.ba-tinypubsub'
-], function($, tinymce){
+import $ from 'jquery'
+import tinymce from 'compiled/editor/stocktiny'
+import 'vendor/jquery.ba-tinypubsub'
 
-  var EditorBoxList = function(){
-    this._textareas = {};
-    this._editors = {};
-    this._editor_boxes = {};
-  };
+export default class EditorBoxList {
+  constructor () {
+    this._textareas = {}
+    this._editors = {}
+    this._editor_boxes = {}
+  }
 
+  _addEditorBox (id, box) {
+    $.publish('editorBox/add', id, box)
+    this._editor_boxes[id] = box
+    this._editors[id] = tinymce.get(id)
+    this._textareas[id] = $(`textarea#${id}`)
+  }
 
-  $.extend(EditorBoxList.prototype, {
+  _removeEditorBox (id) {
+    delete this._editor_boxes[id]
+    delete this._editors[id]
+    delete this._textareas[id]
+    $.publish('editorBox/remove', id)
+    if ($.isEmptyObject(this._editors)) $.publish('editorBox/removeAll')
+  }
 
-    _addEditorBox: function(id, box) {
-      $.publish('editorBox/add', id, box);
-      this._editor_boxes[id] = box;
-      this._editors[id] = tinymce.get(id);
-      this._textareas[id] = $("textarea#" + id);
-    },
-
-    _removeEditorBox: function(id) {
-      delete this._editor_boxes[id];
-      delete this._editors[id];
-      delete this._textareas[id];
-      $.publish('editorBox/remove', id);
-      if ($.isEmptyObject(this._editors)) $.publish('editorBox/removeAll');
-    },
-
-    _getTextArea: function(id) {
-      if(!this._textareas[id]) {
-        this._textareas[id] = $("textarea#" + id);
-      }
-      return this._textareas[id];
-    },
-
-    _getEditor: function(id) {
-      if(!this._editors[id]) {
-        this._editors[id] = tinymce.get(id);
-      }
-      return this._editors[id];
-    },
-
-    _getEditorBox: function(id) {
-      return this._editor_boxes[id];
+  _getTextArea (id) {
+    if (!this._textareas[id]) {
+      this._textareas[id] = $(`textarea#${id}`)
     }
-  });
+    return this._textareas[id]
+  }
 
+  _getEditor (id) {
+    if (!this._editors[id]) {
+      this._editors[id] = tinymce.get(id)
+    }
+    return this._editors[id]
+  }
 
-  return EditorBoxList;
-});
+  _getEditorBox (id) {
+    return this._editor_boxes[id]
+  }
+}

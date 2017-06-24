@@ -17,17 +17,18 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import _ from 'underscore'
   var BaseIcon = React.createClass({
     propTypes: {
-      name: React.PropTypes.string.isRequired,
-      content: React.PropTypes.string.isRequired,
-      viewBox: React.PropTypes.string.isRequired,
-      title: React.PropTypes.string,
-      desc: React.PropTypes.string,
-      width: React.PropTypes.string,
-      height: React.PropTypes.string
+      name: PropTypes.string.isRequired,
+      content: PropTypes.string.isRequired,
+      viewBox: PropTypes.string.isRequired,
+      title: PropTypes.string,
+      desc: PropTypes.string,
+      width: PropTypes.string,
+      height: PropTypes.string
     },
 
     componentWillMount () {

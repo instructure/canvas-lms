@@ -15,18 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-define([
-  'i18n!collaborations',
-  'jquery' /* $ */,
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_forms' /* fillFormData, getFormData, errorBox */,
-  'jqueryui/dialog',
-  'jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChange, showIf */,
-  'jquery.templateData' /* getTemplateData */,
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'compiled/jquery.rails_flash_notifications' /* screen reader notifications*/
-], function(I18n, $) {
+import I18n from 'i18n!collaborations'
+import $ from 'jquery'
+import './jquery.ajaxJSON'
+import './jquery.instructure_forms' /* fillFormData, getFormData, errorBox */
+import 'jqueryui/dialog'
+import './jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChange, showIf */
+import './jquery.templateData' /* getTemplateData */
+import './vendor/jquery.scrollTo'
+import 'compiled/jquery.rails_flash_notifications'
 
   var CollaborationsPage = {};
 
@@ -168,6 +165,4 @@ define([
 
   $(document).ready(CollaborationsPage.Events.init.bind(CollaborationsPage.Events));
 
-  return CollaborationsPage;
-});
-
+export default CollaborationsPage;

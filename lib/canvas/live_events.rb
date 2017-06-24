@@ -18,6 +18,7 @@
 module Canvas::LiveEvents
   def self.post_event_stringified(event_name, payload, context = nil)
     StringifyIds.recursively_stringify_ids(payload)
+    StringifyIds.recursively_stringify_ids(context)
     LiveEvents.post_event(event_name, payload, Time.zone.now, context)
   end
 
@@ -36,6 +37,7 @@ module Canvas::LiveEvents
   def self.get_course_data(course)
     {
       course_id: course.global_id,
+      uuid: course.uuid,
       account_id: course.global_account_id,
       name: course.name,
       created_at: course.created_at,
@@ -128,6 +130,7 @@ module Canvas::LiveEvents
       group_category_id: group.global_group_category_id,
       group_category_name: group.group_category.try(:name),
       group_id: group.global_id,
+      uuid: group.uuid,
       group_name: group.name,
       context_type: group.context_type,
       context_id: group.global_context_id,
@@ -218,6 +221,7 @@ module Canvas::LiveEvents
   def self.get_user_data(user)
     {
       user_id: user.global_id,
+      uuid: user.uuid,
       name: user.name,
       short_name: user.short_name,
       workflow_state: user.workflow_state,
@@ -284,6 +288,7 @@ module Canvas::LiveEvents
     post_event_stringified('user_account_association_created', {
       user_id: assoc.global_user_id,
       account_id: assoc.global_account_id,
+      account_uuid: assoc.account.uuid,
       created_at: assoc.created_at,
       updated_at: assoc.updated_at,
       is_admin: !(assoc.account.root_account.all_account_users_for(assoc.user).empty?),

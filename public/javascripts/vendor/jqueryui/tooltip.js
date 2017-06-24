@@ -10,12 +10,10 @@
  *	jquery.ui.widget.js
  *	jquery.ui.position.js
  */
-define([
-  'jquery',
-  'jqueryui/core',
-  'jqueryui/widget',
-  'jqueryui/position'
-], function( $ ) {
+import $ from 'jquery'
+import 'jqueryui/core'
+import 'jqueryui/widget'
+import 'jqueryui/position'
 
 var increments = 0;
 
@@ -304,4 +302,4 @@ $.widget( "ui.tooltip", {
 	}
 });
 
-});
+

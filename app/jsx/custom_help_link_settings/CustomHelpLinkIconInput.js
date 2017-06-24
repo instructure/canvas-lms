@@ -17,13 +17,14 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 
   const CustomHelpLinkIconInput = React.createClass({
     propTypes: {
-      value: React.PropTypes.string.isRequired,
-      children: React.PropTypes.node.isRequired,
-      label: React.PropTypes.string.isRequired,
-      defaultChecked: React.PropTypes.bool
+      value: PropTypes.string.isRequired,
+      children: PropTypes.node.isRequired,
+      label: PropTypes.string.isRequired,
+      defaultChecked: PropTypes.bool
     },
     getDefaultProps () {
       return {

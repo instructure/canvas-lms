@@ -17,13 +17,14 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import _ from 'underscore'
 import I18n from 'i18n!student_context_tray'
 
   class SectionInfo extends React.Component {
     static propTypes = {
-      course: React.PropTypes.object,
-      user: React.PropTypes.object
+      course: PropTypes.object,
+      user: PropTypes.object
     }
 
     static defaultProps = {

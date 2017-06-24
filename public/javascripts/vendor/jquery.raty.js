@@ -19,7 +19,7 @@
  *
  */
 
-define(['jquery'], function($){
+import $ from 'jquery'
 
   var methods = {
     init: function(settings) {
@@ -469,5 +469,3 @@ define(['jquery'], function($){
     targetType    : 'hint',
     width         : undefined
   };
-
-});

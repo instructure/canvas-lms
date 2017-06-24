@@ -20,6 +20,7 @@ define [
   'underscore'
   'react'
   'react-dom'
+  'prop-types'
   'i18n!usage_rights_modal'
   'compiled/fn/preventDefault'
   '../modules/customPropTypes'
@@ -29,14 +30,14 @@ define [
   '../utils/updateModelsUsageRights'
   'compiled/jquery.rails_flash_notifications'
   'jquery.instructure_forms'
-], ($, _, React, ReactDOM, I18n, preventDefault, customPropTypes, Folder, filesEnv, setUsageRights, updateModelsUsageRights) ->
+], ($, _, React, ReactDOM, PropTypes, I18n, preventDefault, customPropTypes, Folder, filesEnv, setUsageRights, updateModelsUsageRights) ->
 
   ManageUsageRightsModal =
     displayName: 'ManageUsageRightsModal'
 
     propTypes:
-      closeModal: React.PropTypes.func
-      itemsToManage: React.PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired
+      closeModal: PropTypes.func
+      itemsToManage: PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired
 
 
     componentWillMount: ->

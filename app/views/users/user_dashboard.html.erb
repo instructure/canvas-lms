@@ -27,7 +27,9 @@
 <% end %>
 
 <% content_for :right_side do %>
-  <div class="placeholder"></div>
+  <% if !show_planner? %>
+    <div class="placeholder"></div>
+  <% end %>
 <% end %>
 
 <div id="dashboard">

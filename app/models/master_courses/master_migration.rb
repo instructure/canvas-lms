@@ -21,6 +21,9 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
 
   serialize :export_results, Hash
   serialize :import_results, Hash
+  serialize :migration_settings, Hash
+
+  has_a_broadcast_policy
 
   include Workflow
   workflow do
@@ -48,6 +51,10 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
         new_migration
       end
     end
+  end
+
+  def copy_settings=(val)
+    self.migration_settings[:copy_settings] = val
   end
 
   def hours_until_expire
@@ -104,13 +111,15 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     # if any changes are made between the selective export and the full export, then we'll carry those in the next selective export
     # and the ones that got the full export will get the changes twice
     # the primary export is the one we'll use to mark the content tags as exported (i.e. the first one)
-    export_to_child_courses(:selective, up_to_date_subs, true) if up_to_date_subs.any?
-    export_to_child_courses(:full, new_subs, !up_to_date_subs.any?) if new_subs.any?
+    cms = []
+    cms += export_to_child_courses(:selective, up_to_date_subs, true).to_a if up_to_date_subs.any?
+    cms += export_to_child_courses(:full, new_subs, !up_to_date_subs.any?).to_a if new_subs.any?
 
     unless self.workflow_state == 'exports_failed'
       self.workflow_state = 'imports_queued'
       self.imports_queued_at = Time.now
       self.save!
+      self.queue_imports(cms)
     end
   rescue => e
     self.fail_export_with_error!(e)
@@ -118,6 +127,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   end
 
   def export_to_child_courses(type, subscriptions, export_is_primary)
+    @export_type = type
     if type == :selective
       @deletions = self.master_template.deletions_since_last_export
       @creations = {} # will be populated during export
@@ -133,9 +143,10 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
         self.export_results[type][:created] = @creations
         self.export_results[type][:updated] = @updates
       end
-      self.queue_imports(type, export, subscriptions)
+      self.generate_imports(type, export, subscriptions)
     else
       self.fail_export_with_error!("#{type} content export #{export.id} failed")
+      return nil
     end
   end
 
@@ -177,7 +188,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   end
 
   def add_exported_asset(asset)
-    return unless last_export_at
+    return unless @export_type == :selective
     @export_count += 1
     return if @export_count > Setting.get('master_courses_history_count', '150').to_i
     set = asset.created_at >= last_export_at ? @creations : @updates
@@ -191,9 +202,8 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     end
   end
 
-  def queue_imports(type, export, subscriptions)
-    imports_expire_at = self.created_at + hours_until_expire.hours # tighten the limit until the import jobs expire
-
+  def generate_imports(type, export, subscriptions)
+    # generate all the content_migrations right now (and mark them in import_results) - queue afterwards
     cms = []
     subscriptions.each do |sub|
       cm = sub.child_course.content_migrations.build
@@ -202,7 +212,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
       cm.migration_settings[:hide_from_index] = true # we may decide we want to show this after all, but hide them for now
       cm.migration_settings[:master_course_export_id] = export.id
       cm.migration_settings[:master_migration_id] = self.id
-      cm.migration_settings[:child_subscription_id] = sub.id
+      cm.child_subscription_id = sub.id
       cm.workflow_state = 'exported'
       cm.exported_attachment = export.attachment
       cm.save!
@@ -211,8 +221,11 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
       cms << cm
     end
     self.save!
+    cms
+  end
 
-    # just queue them all at once afterwards so we don't have to queue them in a transaction
+  def queue_imports(cms)
+    imports_expire_at = self.created_at + hours_until_expire.hours # tighten the limit until the import jobs expire
     cms.each { |cm| cm.queue_migration(MigrationPluginStub, expires_at: imports_expire_at) }
     # this job is finished now but we won't mark ourselves as "completed" until all the import migrations are finished
   end
@@ -240,5 +253,18 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
       self.save!
     end
   end
+
+  set_broadcast_policy do |p|
+    p.dispatch :blueprint_sync_complete
+    p.to { [user] }
+    p.whenever { |record|
+      record.changed_state_to(:completed) && record.send_notification?
+    }
+  end
+
+  def notification_link_anchor
+    "!/blueprint/blueprint_templates/#{master_template_id}/#{id}"
+  end
+
 end
 

@@ -52,6 +52,11 @@ define [
     $('input[value=2]').parent().click()
     ok @view.currentSection == '2', 'updates its section'
 
+  test 'it sets focus on the button after changing sections', ->
+    @view.$el.find('button').click()
+    $('input[value=2]').parent().click()
+    equal document.activeElement, @view.$('button')[0]
+
   asyncTest 'it publishes changes', ->
     expect(1)
     $.subscribe 'currentSection/change', (section) ->

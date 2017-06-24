@@ -16,18 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!content_tags',
-  'jquery' /* $ */,
-  'jquery.instructure_forms' /* formSubmit, fillFormData */,
-  'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* replaceTags */,
-  'jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange */,
-  'jquery.loadingImg' /* loadingImage */,
-  'jquery.templateData' /* getTemplateData */,
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'jqueryui/accordion' /* /\.accordion\(/ */
-], function(I18n, $) {
+import I18n from 'i18n!content_tags'
+import $ from 'jquery'
+import './jquery.instructure_forms' /* formSubmit, fillFormData */
+import 'jqueryui/dialog'
+import './jquery.instructure_misc_helpers' /* replaceTags */
+import './jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange */
+import './jquery.loadingImg'
+import './jquery.templateData' /* getTemplateData */
+import './vendor/jquery.scrollTo'
+import 'jqueryui/accordion'
 
   var contentTags = {
     currentHover: null,
@@ -191,4 +189,3 @@ define([
     }
     return $match;
   }
-});

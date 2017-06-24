@@ -51,6 +51,10 @@ class GradebookSettingsController < ApplicationController
 
   def gradebook_settings_params
     params.require(:gradebook_settings).permit(
+      {
+        filter_columns_by: [:grading_period_id],
+        selected_view_options_filters: []
+      },
       :show_concluded_enrollments,
       :show_inactive_enrollments,
       :show_unpublished_assignments,

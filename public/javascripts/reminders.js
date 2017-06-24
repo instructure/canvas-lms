@@ -16,11 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jquery' /* $ */,
-  'jqueryui/draggable' /* /\.draggable/ */,
-  'jquery.instructure_misc_plugins' /* confirmDelete */
-], function($) {
+import $ from 'jquery'
+import 'jqueryui/draggable'
+import './jquery.instructure_misc_plugins' /* confirmDelete */
 
 $(document).ready(function() {
   $("#floating_reminders").draggable();
@@ -93,8 +91,4 @@ $(document).ready(function() {
       }
     });
   });
-  
-  
-});
-
 });

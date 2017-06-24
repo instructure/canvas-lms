@@ -266,11 +266,11 @@
           </div>
         </div>
       </td>
-      <td class="possible points_possible" <%= "colspan='2'".html_safe if assignment.special_class %>>
+      <td class="possible points_possible">
         <%= n(round_if_whole(assignment.points_possible)) %>
       </td>
-      <% if !assignment.special_class %>
       <td class="details">
+        <% if !assignment.special_class %>
         <a href="#"
             class="toggle_final_grade_info tooltip"
             aria-label="<%= t('This assignment does not count toward the final grade.') %>"
@@ -396,8 +396,8 @@
             </a>
           </span>
         <% end %>
-      </td>
       <% end %>
+      </td>
     </tr>
     <%# always add row (even if empty) so javascript references work %>
     <tr id="final_grade_info_<%= assignment.id %>"

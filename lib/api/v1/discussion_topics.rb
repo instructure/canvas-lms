@@ -87,6 +87,10 @@ module Api::V1::DiscussionTopics
         exclude_response_fields: excludes)
     end
 
+    if topic.context.root_account.feature_enabled?(:student_planner)
+      json[:todo_date] = topic.todo_date
+    end
+
     json
   end
 

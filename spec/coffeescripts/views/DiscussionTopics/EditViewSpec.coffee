@@ -158,6 +158,70 @@ define [
     view = @editView()
     equal view.locationAfterCancel({ return_to: 'http://bar' }), 'http://bar'
 
+  test 'shows todo checkbox', ->
+    ENV.STUDENT_PLANNER_ENABLED = true
+    view = @editView()
+    equal view.$el.find('#allow_todo_date').length, 1
+    equal view.$el.find('#todo_date_input')[0].style.display, 'none'
+
+  test 'shows todo input when todo checkbox is selected', ->
+    ENV.STUDENT_PLANNER_ENABLED = true
+    view = @editView()
+    view.$el.find('#allow_todo_date').prop('checked', true)
+    view.$el.find('#allow_todo_date').trigger('change')
+    equal view.$el.find('#todo_date_input')[0].style.display, 'block'
+
+  test 'shows todo input with date when given date', ->
+    ENV.STUDENT_PLANNER_ENABLED = true
+    view = @editView {}, {todo_date: '2017-01-03'}
+
+    equal view.$el.find('#allow_todo_date').prop('checked'), true
+    equal view.$el.find('#todo_date').val(), 'Jan 3 at 12am'
+
+  test 'does not show todo checkbox without permission', ->
+    ENV.STUDENT_PLANNER_ENABLED = false
+    view = @editView()
+    equal view.$el.find('#allow_todo_date').length, 0
+
+  test 'does not show todo date elements when grading is enabled', ->
+    ENV.STUDENT_PLANNER_ENABLED = true
+    view = @editView()
+    view.$el.find('#use_for_grading').prop('checked', true)
+    view.$el.find('#use_for_grading').trigger('change')
+    equal view.$el.find('#todo_options')[0].style.display, 'none'
+
+  test 'does save todo date if allow_todo_date is checked and discussion is not graded', ->
+    ENV.STUDENT_PLANNER_ENABLED = true
+    todo_date = new Date('2017-05-25T08:00:00-0800')
+    view = @editView()
+    view.renderGroupCategoryOptions()
+    view.$el.find('#allow_todo_date').prop('checked', true)
+    view.$el.find('#allow_todo_date').trigger('change')
+    view.$el.find('#todo_date').val(todo_date.toISOString())
+    view.$el.find('#todo_date').trigger('change')
+    formData = view.getFormData()
+    equal formData.todo_date.toString(), todo_date.toString()
+
+  test 'does not save todo date if allow_todo_date is not checked', ->
+    ENV.STUDENT_PLANNER_ENABLED = true
+    view = @editView()
+    view.$el.find('#todo_date').val('2017-01-03')
+    view.$el.find('#todo_date').trigger('change')
+    view.renderGroupCategoryOptions()
+    formData = view.getFormData()
+    equal formData.todo_date, null
+
+  test 'does not save todo date if discussion is graded', ->
+    ENV.STUDENT_PLANNER_ENABLED = true
+    view = @editView()
+    view.$el.find('#todo_date').val('2017-01-03')
+    view.$el.find('#todo_date').trigger('change')
+    view.$el.find('#use_for_grading').prop('checked', true)
+    view.$el.find('#use_for_grading').trigger('change')
+    view.renderGroupCategoryOptions()
+    formData = view.getFormData()
+    equal formData.todo_date, null
+
   QUnit.module 'EditView - ConditionalRelease',
     setup: ->
       fakeENV.setup()

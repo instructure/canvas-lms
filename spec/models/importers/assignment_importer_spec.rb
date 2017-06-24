@@ -205,4 +205,30 @@ describe "Importing assignments" do
     expect(assignment.points_possible).to eq 0
   end
 
+  it "should not clear dates if these are null in the source hash" do
+    course_model
+    assign_hash = {
+      "migration_id" => "ib4834d160d180e2e91572e8b9e3b1bc6",
+      "assignment_group_migration_id" => "i2bc4b8ea8fac88f1899e5e95d76f3004",
+      "workflow_state" => "published",
+      "title" => "date clobber or not",
+      "grading_type" => "points",
+      "submission_types" => "none",
+      "points_possible" => 10,
+      "due_at" => nil,
+      "peer_reviews_due_at" => nil,
+      "lock_at" => nil,
+      "unlock_at" => nil
+    }
+    migration = @course.content_migrations.create!
+    assignment = @course.assignments.create! :title => "test", :due_at => Time.now, :unlock_at => 1.day.ago, :lock_at => 1.day.from_now, :peer_reviews_due_at => 2.days.from_now, :migration_id => "ib4834d160d180e2e91572e8b9e3b1bc6"
+    Importers::AssignmentImporter.import_from_migration(assign_hash, @course, migration)
+    assignment.reload
+    expect(assignment.title).to eq "date clobber or not"
+    expect(assignment.due_at).not_to be_nil
+    expect(assignment.peer_reviews_due_at).not_to be_nil
+    expect(assignment.unlock_at).not_to be_nil
+    expect(assignment.lock_at).not_to be_nil
+  end
+
 end

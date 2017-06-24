@@ -17,10 +17,11 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import _ from 'underscore'
 import I18n from 'i18n!edit_timezone'
 
-  const { array } = React.PropTypes;
+  const { array } = PropTypes;
 
   class TimeZoneSelect extends React.Component {
 

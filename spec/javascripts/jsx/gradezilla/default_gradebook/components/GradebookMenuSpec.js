@@ -83,11 +83,11 @@ define([
   });
 
   test('Learning Mastery Menu Item is first in the PopoverMenu', function () {
-    equal(this.menuItems[0].textContent, 'Learning Mastery…');
+    equal(this.menuItems[0].textContent.trim(), 'Learning Mastery…');
   });
 
   test('Individual Gradebook Menu Item is second in the PopoverMenu', function () {
-    equal(this.menuItems[1].textContent, 'Individual View…');
+    equal(this.menuItems[1].textContent.trim(), 'Individual View…');
   });
 
   test('Menu Item Separator is third in the PopoverMenu', function () {
@@ -95,7 +95,7 @@ define([
   });
 
   test('Grade History Menu Item is fourth in the PopoverMenu', function () {
-    equal(this.menuItems[3].textContent, 'Grade History…');
+    equal(this.menuItems[3].textContent.trim(), 'Grade History…');
   });
 
   QUnit.module('Variant DefaultGradebook with Learning Mastery Disabled', {
@@ -117,7 +117,7 @@ define([
   });
 
   test('Individual Gradebook Menu Item is first in the PopoverMenu', function () {
-    equal(this.menuItems[0].textContent, 'Individual View…');
+    equal(this.menuItems[0].textContent.trim(), 'Individual View…');
   });
 
   test('Menu Item Separator is second in the PopoverMenu', function () {
@@ -125,7 +125,7 @@ define([
   });
 
   test('Grade History Menu Item is second in the PopoverMenu', function () {
-    equal(this.menuItems[2].textContent, 'Grade History…');
+    equal(this.menuItems[2].textContent.trim(), 'Grade History…');
   });
 
   QUnit.module('Variant DefaultGradebookLearningMastery with Learning Mastery Enabled', {
@@ -157,11 +157,11 @@ define([
   });
 
   test('DefaultGradebook Menu Item is first in the PopoverMenu', function () {
-    equal(this.menuItems[0].textContent, 'Gradebook…');
+    equal(this.menuItems[0].textContent.trim(), 'Gradebook…');
   });
 
   test('Individual Gradebook Menu Item is second in the PopoverMenu', function () {
-    equal(this.menuItems[1].textContent, 'Individual View…');
+    equal(this.menuItems[1].textContent.trim(), 'Individual View…');
   });
 
   test('Menu Item Separator is third in the PopoverMenu', function () {
@@ -169,6 +169,6 @@ define([
   });
 
   test('Grade History Menu Item is fourth in the PopoverMenu', function () {
-    equal(this.menuItems[3].textContent, 'Grade History…');
+    equal(this.menuItems[3].textContent.trim(), 'Grade History…');
   });
 });

@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import Constants from './constants'
 import I18n from 'i18n!moderated_grading'
 
@@ -24,15 +25,15 @@ const ModeratedColumnHeader = React.createClass({
   displayName: 'ModeratedColumnHeader',
 
   propTypes: {
-    markColumn: React.PropTypes.string.isRequired,
-    sortDirection: React.PropTypes.string,
-    includeModerationSetHeaders: React.PropTypes.bool.isRequired,
-    handleSortMark1: React.PropTypes.func.isRequired,
-    handleSortMark2: React.PropTypes.func.isRequired,
-    handleSortMark3: React.PropTypes.func.isRequired,
-    handleSelectAll: React.PropTypes.func.isRequired,
-    permissions: React.PropTypes.shape({
-      viewGrades: React.PropTypes.bool.isRequired
+    markColumn: PropTypes.string.isRequired,
+    sortDirection: PropTypes.string,
+    includeModerationSetHeaders: PropTypes.bool.isRequired,
+    handleSortMark1: PropTypes.func.isRequired,
+    handleSortMark2: PropTypes.func.isRequired,
+    handleSortMark3: PropTypes.func.isRequired,
+    handleSelectAll: PropTypes.func.isRequired,
+    permissions: PropTypes.shape({
+      viewGrades: PropTypes.bool.isRequired
     }).isRequired
   },
 

@@ -67,6 +67,7 @@ define [
         section = @$('[aria-checked=true] input[name=section_to_show_radio]').val() || undefined
         $.publish('currentSection/change', [section, @cid])
         @trigger('menuselect', event, ui, @currentSection)
+        @$('button').focus()
       )
 
     onSectionChange: (section, author) =>

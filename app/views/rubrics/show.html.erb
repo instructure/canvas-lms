@@ -45,7 +45,7 @@
   </style>
 <% end %>
 <% js_bundle 'legacy/rubrics_show' %>
-<h2><%= @actual_rubric.title %></h2>
+<h1><%= @actual_rubric.title %></h1>
 <div id="rubrics" class="raw_listing">
   <% [@actual_rubric].each do |rubric| %>
     <%= render :partial => "shared/rubric", :object => rubric, :locals => {:association => @account, :editable => can_do(rubric, @current_user, :update), :edit_view => true, :for_context => true} %>

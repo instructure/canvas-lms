@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import I18n from 'i18n!file_not_found'
 import preventDefault from 'compiled/fn/preventDefault'
@@ -83,7 +84,7 @@ import preventDefault from 'compiled/fn/preventDefault'
   }
 
   FileNotFound.propTypes = {
-    contextCode: React.PropTypes.string.isRequired
+    contextCode: PropTypes.string.isRequired
   };
 
 export default FileNotFound

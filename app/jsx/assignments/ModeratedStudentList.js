@@ -18,6 +18,7 @@
 
 import _ from 'underscore'
 import React from 'react'
+import PropTypes from 'prop-types'
 import ModerationActions from './actions/ModerationActions'
 import Constants from './constants'
 import I18n from 'i18n!moderated_grading'
@@ -29,9 +30,9 @@ const PG_THREE_INDEX = 2;
 
 const StudentName = React.createClass({
   propTypes: {
-    course_id: React.PropTypes.string.isRequired,
-    student_id: React.PropTypes.string.isRequired,
-    children: React.PropTypes.node
+    course_id: PropTypes.string.isRequired,
+    student_id: PropTypes.string.isRequired,
+    children: PropTypes.node
   },
 
   getDefaultProps () {
@@ -62,12 +63,12 @@ export default React.createClass({
   displayName: 'ModeratedStudentList',
 
   propTypes: {
-    studentList: React.PropTypes.object.isRequired,
-    assignment: React.PropTypes.object.isRequired,
-    handleCheckbox: React.PropTypes.func.isRequired,
-    includeModerationSetColumns: React.PropTypes.bool,
-    urls: React.PropTypes.object.isRequired,
-    onSelectProvisionalGrade: React.PropTypes.func.isRequired,
+    studentList: PropTypes.object.isRequired,
+    assignment: PropTypes.object.isRequired,
+    handleCheckbox: PropTypes.func.isRequired,
+    includeModerationSetColumns: PropTypes.bool,
+    urls: PropTypes.object.isRequired,
+    onSelectProvisionalGrade: PropTypes.func.isRequired,
   },
 
   generateSpeedgraderUrl (baseSpeedgraderUrl, student) {

@@ -23,7 +23,7 @@ require_dependency 'assignment_student_visibility'
 
 class WikiPage < ActiveRecord::Base
   attr_readonly :wiki_id
-  attr_accessor :saved_by
+  attr_accessor :saved_by, :todo_type
   validates_length_of :body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_presence_of :wiki_id
   include Canvas::SoftDeletable
@@ -31,6 +31,7 @@ class WikiPage < ActiveRecord::Base
   include CopyAuthorizedLinks
   include ContextModuleItem
   include Submittable
+  include Plannable
 
   include SearchTermHelper
 
@@ -62,8 +63,22 @@ class WikiPage < ActiveRecord::Base
     where(assignment_id: nil).joins(:course).where(courses: {id: course_ids})
   }
 
+  scope :not_ignored_by, -> (user, purpose) do
+    where("NOT EXISTS (?)", Ignore.where(asset_type: 'WikiPage', user_id: user, purpose: purpose).where("asset_id=wiki_pages.id"))
+  end
+  scope :todo_date_between, -> (starting, ending) { where(todo_date: starting...ending) }
+  scope :for_courses_and_groups, -> (course_ids, group_ids) do
+    joins("LEFT JOIN #{Course.quoted_table_name} on wiki_pages.wiki_id = courses.wiki_id
+           LEFT JOIN #{Group.quoted_table_name} on wiki_pages.wiki_id = groups.wiki_id").
+      where("courses.id IN (?) OR groups.id IN (?)", course_ids, group_ids)
+  end
+  scope :visible_to_user, -> (user_id) do
+    joins("LEFT JOIN #{AssignmentStudentVisibility.quoted_table_name} as asv on wiki_pages.assignment_id = asv.assignment_id").
+      where("wiki_pages.assignment_id IS NULL OR asv.user_id = ?", user_id)
+  end
+
   TITLE_LENGTH = 255
-  SIMPLY_VERSIONED_EXCLUDE_FIELDS = [:workflow_state, :editing_roles, :notify_of_update]
+  SIMPLY_VERSIONED_EXCLUDE_FIELDS = [:workflow_state, :editing_roles, :notify_of_update].freeze
 
   def touch_wiki_context
     self.wiki.touch_context if self.wiki && self.wiki.context

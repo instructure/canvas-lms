@@ -17,11 +17,11 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import $ from 'jquery'
 import _ from 'underscore'
 import Button from 'instructure-ui/lib/components/Button'
 import axios from 'axios'
-import ConvertCase from 'convert_case'
 import I18n from 'i18n!grading_periods'
 import GradingPeriod from 'jsx/grading/AccountGradingPeriod'
 import GradingPeriodForm from 'jsx/grading/GradingPeriodForm'
@@ -105,7 +105,7 @@ import 'jquery.instructure_misc_helpers'
     return "edit-grading-period-" + period.id;
   };
 
-  const { shape, number, string, array, bool, func } = React.PropTypes;
+  const { shape, number, string, array, bool, func } = PropTypes;
 
   let GradingPeriodSet = React.createClass({
     propTypes: {

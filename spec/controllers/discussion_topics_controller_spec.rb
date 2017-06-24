@@ -698,6 +698,92 @@ describe DiscussionTopicsController do
     end
   end
 
+  context 'student planner' do
+    before do
+      @course.root_account.enable_feature!(:student_planner)
+    end
+
+    before :each do
+      course_topic
+    end
+
+    it 'js_env STUDENT_PLANNER_ENABLED is true for teachers' do
+      user_session(@teacher)
+      get :edit, course_id: @course.id, id: @topic.id
+      expect(assigns[:js_env][:STUDENT_PLANNER_ENABLED]).to be true
+    end
+
+    it 'js_env STUDENT_PLANNER_ENABLED is false for students' do
+      user_session(@student)
+      get :edit, course_id: @course.id, id: @topic.id
+      expect(assigns[:js_env][:STUDENT_PLANNER_ENABLED]).to be false
+    end
+
+    it 'should create a topic with a todo date' do
+      user_session(@teacher)
+      todo_date = 1.day.from_now.in_time_zone('America/New_York')
+      post 'create', course_id: @course.id, todo_date: todo_date, format: 'json', title: 'Discussion 1'
+      expect(JSON.parse(response.body)['todo_date']).to eq todo_date.in_time_zone('UTC').iso8601
+    end
+
+    it 'should update a topic with a todo date' do
+      user_session(@teacher)
+      todo_date = 1.day.from_now.in_time_zone('America/New_York')
+      put 'update', course_id: @course.id, topic_id: @topic.id, todo_date: todo_date, format: 'json'
+      expect(@topic.reload.todo_date).to eq todo_date
+    end
+
+    it 'should remove a todo date from a topic' do
+      user_session(@teacher)
+      @topic.update_attributes(todo_date: 1.day.from_now.in_time_zone('America/New_York'))
+      put 'update', course_id: @course.id, topic_id: @topic.id, todo_date: nil, format: 'json'
+      expect(@topic.reload.todo_date).to be nil
+    end
+
+    it 'should not allow a student to update the to-do date' do
+      user_session(@student)
+      put 'update', course_id: @course.id, topic_id: @topic.id, todo_date: 1.day.from_now, format: 'json'
+      expect(@topic.reload.todo_date).to eq nil
+    end
+
+    it 'should not allow a todo date on a graded topic' do
+      user_session(@teacher)
+      assign = @course.assignments.create!(title: 'Graded Topic 1', submission_types: 'discussion_topic')
+      topic = assign.discussion_topic
+      put 'update', course_id: @course.id, topic_id: topic.id, todo_date: 1.day.from_now, format: 'json'
+      expect(response.code).to eq '400'
+    end
+
+    it 'should not allow changing a topic to graded and adding a todo date' do
+      user_session(@teacher)
+      put 'update', course_id: @course.id, topic_id: @topic.id, format: 'json', todo_date: 1.day.from_now,
+        assignment: {submission_types: ['discussion_topic'], name: 'Graded Topic 1'}
+      expect(response.code).to eq '400'
+    end
+
+    it 'should allow a todo date when changing a topic from graded to ungraded' do
+      user_session(@teacher)
+      todo_date = 1.day.from_now
+      assign = @course.assignments.create!(title: 'Graded Topic 1', submission_types: 'discussion_topic')
+      topic = assign.discussion_topic
+      put 'update', course_id: @course.id, topic_id: topic.id, todo_date: todo_date, format: 'json',
+        assignment: {set_assignment: false, name: 'Graded Topic 1'}
+      expect(response.code).to eq '200'
+      expect(topic.reload.assignment).to be nil
+      expect(topic.todo_date).to eq todo_date
+    end
+
+    it 'should remove an existing todo date when changing a topic from ungraded to graded' do
+      user_session(@teacher)
+      @topic.update_attributes(todo_date: 1.day.from_now)
+      put 'update', course_id: @course.id, topic_id: @topic.id, format: 'json',
+        assignment: {submission_types: ['discussion_topic'], name: 'Graded Topic 1'}
+      expect(response.code).to eq '200'
+      expect(@topic.reload.assignment).to be_truthy
+      expect(@topic.todo_date).to be nil
+    end
+  end
+
   describe "GET 'public_feed.atom'" do
     before(:once) do
       course_topic

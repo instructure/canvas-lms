@@ -16,11 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'INST' /* INST */,
-  'jquery' /* $ */,
-  'jquery.ajaxJSON' /* ajaxJSON */
-], function(INST, $) {
+import INST from './INST'
+import $ from 'jquery'
+import './jquery.ajaxJSON'
 
   $(document).ready(function(){
     var interactionSeconds = 0,
@@ -102,4 +100,3 @@ define([
       }, 1000);
     }
   });
-});

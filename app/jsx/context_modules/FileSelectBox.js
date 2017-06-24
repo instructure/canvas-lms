@@ -18,6 +18,7 @@
 
 import _ from 'underscore'
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!context_modules'
 import FileStore from './stores/FileStore'
 import FolderStore from './stores/FolderStore'
@@ -28,7 +29,7 @@ import splitAssetString from 'compiled/str/splitAssetString'
     displayName: 'FileSelectBox',
 
     propTypes: {
-      contextString: React.PropTypes.string.isRequired
+      contextString: PropTypes.string.isRequired
     },
 
     getInitialState () {

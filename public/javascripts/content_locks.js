@@ -16,14 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'INST' /* INST */,
-  'i18n!content_locks',
-  'jquery' /* $ */,
-  'str/htmlEscape',
-  'jquery.instructure_date_and_time' /* datetimeString */,
-  'jqueryui/dialog'
-], function(INST, I18n, $, htmlEscape) {
+import INST from './INST'
+import I18n from 'i18n!content_locks'
+import $ from 'jquery'
+import htmlEscape from './str/htmlEscape'
+import './jquery.instructure_date_and_time' /* datetimeString */
+import 'jqueryui/dialog'
 
   INST.lockExplanation = function(data, type) {
     // Any additions to this function should also be added to similar logic in ApplicationController.rb
@@ -133,4 +131,3 @@ define([
       }
     });
   });
-});

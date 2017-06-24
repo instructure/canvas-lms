@@ -168,7 +168,7 @@ Rails.application.config.after_initialize do
     end
 
     def in_region?(region)
-      !config[:region] || config[:region] == region
+      !config[:region] || (region.is_a?(Array) ? region.include?(config[:region]) : config[:region] == region)
     end
 
     def in_current_region?
@@ -179,11 +179,12 @@ Rails.application.config.after_initialize do
     end
 
     def self.send_in_each_region(klass, method, enqueue_args = {}, *args)
-      klass.send(method, *args)
+      run_current_region_asynchronously = enqueue_args.delete(:run_current_region_asynchronously)
+      klass.send(method, *args) unless run_current_region_asynchronously
       regions = Set.new
       regions << Shard.current.database_server.config[:region]
       all.each do |db|
-        next if regions.include?(db.config[:region]) || !db.config[:region]
+        next if (regions.include?(db.config[:region]) || !db.config[:region]) && !run_current_region_asynchronously
         next if db.shards.empty?
         regions << db.config[:region]
         db.shards.first.activate do

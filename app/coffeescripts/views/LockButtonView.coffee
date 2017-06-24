@@ -179,20 +179,20 @@ define [
         hint:        I18n.t 'Locked'
         label:       @lockedText
         buttonClass: "#{@lockedClass} #{@disabledClass}"
-        iconClass:   'icon-lock'
+        iconClass:   'icon-blueprint-lock'
 
     renderWillUnlock: () ->
       @renderState
         hint:        I18n.t 'UnLock'
         label:       @lockedText
         buttonClass: "#{@unlockedClass} #{@disabledClass}"
-        iconClass:   'icon-unlock'
+        iconClass:   'icon-blueprint'
 
     renderUnlocking: () ->
       @renderState
         hint:        I18n.t 'Unlocking...'
         buttonClass: "#{@lockedClass} #{@disabledClass}"
-        iconClass:   'icon-lock'
+        iconClass:   'icon-blueprint-lock'
 
     # when unlocked can..
     renderUnlocked: () ->
@@ -200,20 +200,20 @@ define [
         hint:        I18n.t 'Unlocked'
         label:       @unlockedText
         buttonClass: "#{@unlockedClass} #{@disabledClass}"
-        iconClass:   'icon-unlock'
+        iconClass:   'icon-blueprint'
 
     renderWillLock: () ->
       @renderState
         hint:        I18n.t 'Lock'
         label:       @unlockedText
         buttonClass: "#{@lockedClass} #{@disabledClass}"
-        iconClass:   'icon-lock'
+        iconClass:   'icon-blueprint-lock'
 
     renderLocking: () ->
       @renderState
         hint:        I18n.t 'Locking...'
         buttonClass: "#{@unlockedClass} #{@disabledClass}"
-        iconClass:   'icon-unlock'
+        iconClass:   'icon-blueprint'
 
 
 
@@ -222,7 +222,7 @@ define [
       @$el.addClass options.buttonClass
       if !@disabled
         @$el.attr 'aria-pressed', options.buttonClass is @lockedClass
-      @$icon.addClass options.iconClass
+      @$icon.attr('class', options.iconClass)
 
       @$text.html "#{htmlEscape(options.label || options.hint)}"
 

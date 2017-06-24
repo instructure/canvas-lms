@@ -18,14 +18,15 @@
 
 import I18n from 'i18n!new_nav'
 import React from 'react'
+import PropTypes from 'prop-types'
 import SVGWrapper from 'jsx/shared/SVGWrapper'
 import Spinner from 'instructure-ui/lib/components/Spinner'
 
   var AccountsTray = React.createClass({
     propTypes: {
-      accounts: React.PropTypes.array.isRequired,
-      closeTray: React.PropTypes.func.isRequired,
-      hasLoaded: React.PropTypes.bool.isRequired
+      accounts: PropTypes.array.isRequired,
+      closeTray: PropTypes.func.isRequired,
+      hasLoaded: PropTypes.bool.isRequired
     },
 
     getDefaultProps() {

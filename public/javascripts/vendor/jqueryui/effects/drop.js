@@ -10,10 +10,8 @@
  * Depends:
  *	jquery.ui.effect.js
  */
-define([
-  'jquery',
-  'jqueryui/effect'
-], function( $ ) {
+import $ from 'jquery'
+import 'jqueryui/effect'
 
 $.effects.effect.drop = function( o, done ) {
 
@@ -64,4 +62,4 @@ $.effects.effect.drop = function( o, done ) {
 	});
 };
 
-});
+

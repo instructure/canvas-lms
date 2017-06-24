@@ -1536,26 +1536,26 @@ describe Quizzes::QuizSubmission do
   describe "associated submission" do
     before(:each) { course_with_student }
 
-    it "assigns minutes_late to zero when not late" do
+    it "assigns duration_late to zero when not late" do
       Timecop.freeze do
         quiz = @course.quizzes.create(due_at: 5.minutes.from_now, quiz_type: "assignment")
         qs = Quizzes::QuizSubmission.create(
           finished_at: Time.zone.now, user: @user, quiz: quiz, workflow_state: :complete
         )
 
-        expect(qs.submission.minutes_late).to be_zero
+        expect(qs.submission.duration_late).to be_zero
       end
     end
 
-    it "assigns minutes_late with a -1 minute offset" do
+    it "assigns duration_late with a -1 minute offset" do
       Timecop.freeze do
         quiz = @course.quizzes.create(due_at: 5.minutes.ago, quiz_type: "assignment")
         qs = Quizzes::QuizSubmission.create(
           finished_at: Time.zone.now, user: @user, quiz: quiz, workflow_state: :complete
         )
 
-        expected_minutes_late = (Time.zone.now - 60.seconds - 5.minutes.ago.change(sec: 0)) / 60
-        expect(qs.submission.minutes_late).to eq(expected_minutes_late)
+        expected_duration_late = (Time.zone.now - 60.seconds - 5.minutes.ago.change(sec: 0))
+        expect(qs.submission.duration_late).to eq(expected_duration_late)
       end
     end
   end
@@ -1688,87 +1688,6 @@ describe Quizzes::QuizSubmission do
       ])
 
       expect(@quiz_submission.points_possible_at_submission_time).to eq 0.65
-    end
-  end
-
-  describe "#late?" do
-    let(:course)          { Course.create! }
-    let(:now)             { Time.zone.now }
-    let(:quiz)            { course.quizzes.create! due_at: 3.days.ago(now) }
-
-    context "for quizzes with a due date" do
-      let(:quiz_submission) { quiz.quiz_submissions.create! }
-
-      it "is not late when on turned in before the due date" do
-        quiz_submission.finished_at = 4.days.ago(now)
-        quiz_submission.save
-
-        expect(quiz_submission.late?).to eq false
-      end
-
-      it "is not late when turned in at the due date" do
-        quiz_submission.finished_at = 3.days.ago(now) + 60.seconds
-        quiz_submission.save
-
-        expect(quiz_submission.late?).to eq false
-      end
-
-      it "is late when turned in after the due date" do
-        quiz_submission.finished_at = 2.days.ago(now)
-        quiz_submission.save
-
-        expect(quiz_submission.late?).to eq true
-      end
-
-      it "is not late when unfinished" do
-        expect(quiz_submission.late?).to eq false
-      end
-    end
-
-    context "for quizzes without a due date" do
-      let(:quiz) { course.quizzes.create! }
-      let(:quiz_submission) do
-        quiz.quiz_submissions.create! do |qs|
-          qs.finished_at = 3.days.ago(now)
-        end
-      end
-
-      it "is not late when the quiz has no due date" do
-        expect(quiz_submission.late?).to eq false
-      end
-    end
-
-    context "for quizzes with overridden due dates for some students" do
-      let(:quiz_submission) do
-        quiz.quiz_submissions.create! do |qs|
-          qs.user = student
-          qs.finished_at = 1.week.ago(now)
-        end
-      end
-
-      let(:student) { User.create! }
-
-      let!(:enroll_student) do
-        course.enroll_user student, 'StudentEnrollment'
-      end
-
-      let!(:override_students_quiz) do
-        assignment_override = quiz.assignment_overrides.create! do |override|
-          override.due_at = 3.weeks.ago(now)
-          override.due_at_overridden = true
-        end
-
-        assignment_override.assignment_override_students.create! do |aos|
-          aos.quiz = quiz
-          aos.user = student
-        end
-      end
-
-      it "is late when it's overridden due date is before the submission" do
-        submission = stub("blank?" => false, "user" => student)
-        quiz_submission.stubs(:submission).returns(submission)
-        expect(quiz_submission.late?).to eq true
-      end
     end
   end
 

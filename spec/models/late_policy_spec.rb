@@ -52,6 +52,14 @@ describe LatePolicy do
 
     # Inclusion
     it { is_expected.to validate_inclusion_of(:late_submission_interval).in_array(['day', 'hour']) }
+
+    # Uniqueness
+    describe 'uniqueness' do
+      subject { course.create_late_policy }
+      let(:course) { Course.create! }
+
+      it { is_expected.to validate_uniqueness_of(:course_id) }
+    end
   end
 
   describe 'default values' do
@@ -68,33 +76,174 @@ describe LatePolicy do
 
   describe 'rounding' do
     it 'only keeps 2 digits after the decimal for late_submission_minimum_percent' do
-      policy = LatePolicy.new(late_submission_minimum_percent: 100.223)
-      expect(policy.late_submission_minimum_percent).to eql BigDecimal.new('100.22')
+      policy = LatePolicy.new(late_submission_minimum_percent: 25.223)
+      expect(policy.late_submission_minimum_percent).to eql BigDecimal.new('25.22')
     end
 
     it 'rounds late_submission_minimum_percent' do
-      policy = LatePolicy.new(late_submission_minimum_percent: 100.225)
-      expect(policy.late_submission_minimum_percent).to eql BigDecimal.new('100.23')
+      policy = LatePolicy.new(late_submission_minimum_percent: 25.225)
+      expect(policy.late_submission_minimum_percent).to eql BigDecimal.new('25.23')
     end
 
     it 'only keeps 2 digits after the decimal for missing_submission_deduction' do
-      policy = LatePolicy.new(missing_submission_deduction: 100.223)
-      expect(policy.missing_submission_deduction).to eql BigDecimal.new('100.22')
+      policy = LatePolicy.new(missing_submission_deduction: 25.223)
+      expect(policy.missing_submission_deduction).to eql BigDecimal.new('25.22')
     end
 
     it 'rounds missing_submission_deduction' do
-      policy = LatePolicy.new(missing_submission_deduction: 100.225)
-      expect(policy.missing_submission_deduction).to eql BigDecimal.new('100.23')
+      policy = LatePolicy.new(missing_submission_deduction: 25.225)
+      expect(policy.missing_submission_deduction).to eql BigDecimal.new('25.23')
     end
 
     it 'only keeps 2 digits after the decimal for late_submission_deduction' do
-      policy = LatePolicy.new(late_submission_deduction: 100.223)
-      expect(policy.late_submission_deduction).to eql BigDecimal.new('100.22')
+      policy = LatePolicy.new(late_submission_deduction: 25.223)
+      expect(policy.late_submission_deduction).to eql BigDecimal.new('25.22')
     end
 
     it 'rounds late_submission_deduction' do
-      policy = LatePolicy.new(late_submission_deduction: 100.225)
-      expect(policy.late_submission_deduction).to eql BigDecimal.new('100.23')
+      policy = LatePolicy.new(late_submission_deduction: 25.225)
+      expect(policy.late_submission_deduction).to eql BigDecimal.new('25.23')
     end
   end
+
+  describe '#points_deducted' do
+    it 'ignores disabled late submission deduction' do
+      expect(late_policy_model.points_deducted(score: 500, possible: 1000, late_for: 1.day)).to eq 0
+    end
+
+    it 'ignores ungraded assignments' do
+      policy = late_policy_model(deduct: 5.0, every: :hour)
+      expect(policy.points_deducted(score: 10, possible: nil, late_for: 1.day)).to eq 0
+    end
+
+    it 'increases by hour' do
+      policy = late_policy_model(deduct: 5.0, every: :hour)
+      expect(policy.points_deducted(score: 1000, possible: 1000, late_for: 12.hours)).to eq 600
+    end
+
+    it 'increases by day' do
+      policy = late_policy_model(deduct: 15.0, every: :day)
+      expect(policy.points_deducted(score: 1000, possible: 1000, late_for: 3.days)).to eq 450
+    end
+
+    it 'rounds partial late interval count upward' do
+      policy = late_policy_model(deduct: 10.0, every: :day)
+      expect(policy.points_deducted(score: 1000, possible: 1000, late_for: 25.hours)).to eq 200
+    end
+
+    it 'honors the minimum percent deducted' do
+      policy = late_policy_model(deduct: 10.0, every: :day, down_to: 30.0)
+      expect(policy.points_deducted(score: 800, possible: 1000, late_for: 2.days)).to eq 200
+      expect(policy.points_deducted(score: 800, possible: 1000, late_for: 7.days)).to eq 500
+      expect(policy.points_deducted(score: 200, possible: 1000, late_for: 8.days)).to eq 0
+    end
+
+    it 'can deduct fractional points' do
+      policy = late_policy_model(deduct: 1.0, every: :hour)
+      expect(policy.points_deducted(score: 10, possible: 10, late_for: 6.hours)).to eq 0.6
+    end
+  end
+
+  describe '#points_for_missing' do
+    it 'returns 0 when assignment grading_type is pass_fail' do
+      policy = late_policy_model
+      assignment = instance_double('Assignment')
+      allow(assignment).to receive(:grading_type).and_return('pass_fail')
+
+      expect(policy.points_for_missing(assignment)).to eq(0)
+    end
+
+    it 'computes expected value' do
+      policy = late_policy_model(missing_submission_deduction: 60)
+      assignment = instance_double('Assignment')
+      allow(assignment).to receive(:grading_type).and_return('foo')
+      allow(assignment).to receive(:points_possible).and_return(100)
+
+      expect(policy.points_for_missing(assignment)).to eq(40)
+    end
+  end
+
+  describe '#missing_points_deducted' do
+    it 'returns points_possible when assignment grading_type is pass_fail' do
+      policy = late_policy_model
+      assignment = instance_double('Assignment')
+      allow(assignment).to receive(:grading_type).and_return('pass_fail')
+      allow(assignment).to receive(:points_possible).and_return(100)
+
+      expect(policy.missing_points_deducted(assignment)).to eq(100)
+    end
+
+    it 'computes expected value' do
+      policy = late_policy_model(missing_submission_deduction: 60)
+      assignment = instance_double('Assignment')
+      allow(assignment).to receive(:grading_type).and_return('foo')
+      allow(assignment).to receive(:points_possible).and_return(100)
+
+      expect(policy.missing_points_deducted(assignment)).to eq(60)
+    end
+  end
+
+  describe '#update_late_submissions' do
+    before :once do
+      @course = Course.create(name: 'Late Policy Course')
+      @late_policy = LatePolicy.create(course: @course)
+    end
+
+    it 'kicks off a late policy applicator for the course if late_submission_deduction_enabled_changed changes' do
+      @late_policy.late_submission_deduction_enabled = !@late_policy.late_submission_deduction_enabled
+
+      expect(LatePolicyApplicator).to receive(:for_course).with(@course)
+
+      @late_policy.save!
+    end
+
+    it 'kicks off a late policy applicator for the course if late_submission_deduction changes' do
+      @late_policy.late_submission_deduction = 3.14
+
+      expect(LatePolicyApplicator).to receive(:for_course).with(@course)
+
+      @late_policy.save!
+    end
+
+    it 'kicks off a late policy applicator for the course if late_submission_interval changes' do
+      @late_policy.late_submission_interval = 'hour'
+
+      expect(LatePolicyApplicator).to receive(:for_course).with(@course)
+
+      @late_policy.save!
+    end
+
+    it 'kicks off a late policy applicator for the course if late_submission_minimum_percent_enabled changes' do
+      @late_policy.late_submission_minimum_percent_enabled = !@late_policy.late_submission_minimum_percent_enabled
+
+      expect(LatePolicyApplicator).to receive(:for_course).with(@course)
+
+      @late_policy.save!
+    end
+
+    it 'kicks off a late policy applicator for the course if late_submission_minimum_percent changes' do
+      @late_policy.late_submission_minimum_percent = 3.14
+
+      expect(LatePolicyApplicator).to receive(:for_course).with(@course)
+
+      @late_policy.save!
+    end
+
+    it 'does not kick off a late policy applicator if missing_submission_deduction_enabled changes' do
+      @late_policy.missing_submission_deduction_enabled = !@late_policy.missing_submission_deduction_enabled
+
+      expect(LatePolicyApplicator).not_to receive(:for_course)
+
+      @late_policy.save!
+    end
+
+    it 'does not kick off a late policy applicator if missing_submission_deduction changes' do
+      @late_policy.missing_submission_deduction = 3.14
+
+      expect(LatePolicyApplicator).not_to receive(:for_course)
+
+      @late_policy.save!
+    end
+  end
+
 end

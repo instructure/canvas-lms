@@ -19,6 +19,7 @@
 import I18n from 'i18n!external_tools'
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import ConfigurationFormManual from 'jsx/external_apps/components/ConfigurationFormManual'
 import ConfigurationFormUrl from 'jsx/external_apps/components/ConfigurationFormUrl'
 import ConfigurationFormXml from 'jsx/external_apps/components/ConfigurationFormXml'
@@ -29,10 +30,10 @@ export default React.createClass({
     displayName: 'ConfigurationForm',
 
     propTypes: {
-      configurationType: React.PropTypes.string,
-      handleSubmit: React.PropTypes.func.isRequired,
-      tool: React.PropTypes.object.isRequired,
-      showConfigurationSelector: React.PropTypes.bool
+      configurationType: PropTypes.string,
+      handleSubmit: PropTypes.func.isRequired,
+      tool: PropTypes.object.isRequired,
+      showConfigurationSelector: PropTypes.bool
     },
 
     getDefaultProps : function() {

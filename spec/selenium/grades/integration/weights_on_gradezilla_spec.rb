@@ -38,6 +38,7 @@ describe 'gradezilla' do
 
   before(:once) do
     weighted_grading_setup
+    update_course_preferences(@teacher, selected_view_options_filters: ['gradingPeriods'])
   end
 
   it_behaves_like 'a gradebook'

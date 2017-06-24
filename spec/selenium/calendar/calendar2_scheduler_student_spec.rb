@@ -215,6 +215,9 @@ describe "scheduler" do
       before :once do
         create_appointment_group(
           max_appointments_per_participant: 1,
+          # if participant_visibility is 'private', the event_details popup resizes, 
+          # causing fragile tests in Chrome
+          participant_visibility: 'protected',
           new_appointments: [
             [ 30.minutes.from_now, 1.hour.from_now ]
           ]
@@ -226,22 +229,20 @@ describe "scheduler" do
         load_month_view
 
         f('.fc-event.scheduler-event').click
-        f('.unreserve_event_link').click
-        f('#delete_event_dialog~.ui-dialog-buttonpane .btn-primary').click
-
+        move_to_click('.event-details .unreserve_event_link')
         wait_for_ajaximations
-
+        f('#delete_event_dialog~.ui-dialog-buttonpane .btn-primary').click
+        
         expect(f("#content")).not_to contain_css('.fc-event.scheduler-event')
       end
 
       it "should let me do so from the week view", priority: "1", test_id: 502483 do
         load_week_view
-
+        
         f('.fc-event.scheduler-event').click
-        f('.unreserve_event_link').click
-        f('#delete_event_dialog~.ui-dialog-buttonpane .btn-primary').click
-
+        move_to_click('.event-details .unreserve_event_link')
         wait_for_ajaximations
+        f('#delete_event_dialog~.ui-dialog-buttonpane .btn-primary').click
 
         expect(f("#content")).not_to contain_css('.fc-event.scheduler-event')
       end
@@ -250,8 +251,8 @@ describe "scheduler" do
         load_agenda_view
 
         f('.agenda-event__item-container').click
+        move_to_click('.event-details .unreserve_event_link')
         wait_for_ajaximations
-        f('.unreserve_event_link').click
         f('#delete_event_dialog~.ui-dialog-buttonpane .btn-primary').click
 
         expect(f("#content")).not_to contain_css('.agenda-event__item-container')

@@ -19,6 +19,7 @@
 import _ from 'underscore'
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import Modal from 'jsx/shared/modal'
 import ModalContent from 'jsx/shared/modal-content'
 
@@ -26,12 +27,12 @@ export default React.createClass({
     displayName: 'ExternalToolModalLauncher',
 
     propTypes: {
-      tool: React.PropTypes.object,
-      isOpen: React.PropTypes.bool.isRequired,
-      onRequestClose: React.PropTypes.func.isRequired,
-      contextType: React.PropTypes.string.isRequired,
-      contextId: React.PropTypes.number.isRequired,
-      launchType: React.PropTypes.string.isRequired,
+      tool: PropTypes.object,
+      isOpen: PropTypes.bool.isRequired,
+      onRequestClose: PropTypes.func.isRequired,
+      contextType: PropTypes.string.isRequired,
+      contextId: PropTypes.number.isRequired,
+      launchType: PropTypes.string.isRequired,
     },
 
     componentDidMount () {

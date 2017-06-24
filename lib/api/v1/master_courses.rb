@@ -23,7 +23,12 @@ module Api::V1::MasterCourses
   def master_migration_json(migration, user, session, opts={})
     hash = api_json(migration, user, session,
       :only => %w(id user_id workflow_state created_at exports_started_at imports_queued_at imports_completed_at comment))
-    hash['template_id'] = migration.master_template_id
+    if opts[:subscription]
+      hash['subscription_id'] = opts[:subscription].id
+    else
+      hash['template_id'] = migration.master_template_id
+    end
+    hash['id'] = opts[:child_migration].id if opts[:child_migration]
     hash
   end
 

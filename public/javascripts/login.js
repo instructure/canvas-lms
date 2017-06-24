@@ -16,17 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!pseudonyms.login' /* I18n.t */,
-  'jquery' /* $ */,
-  'str/htmlEscape',
-  'compiled/registration/signupDialog',
-  'jquery.fancyplaceholder' /* fancyPlaceholder */,
-  'jquery.google-analytics' /* trackPage, trackPageview */,
-  'jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */,
-  'jquery.loadingImg' /* loadingImage */,
-  'compiled/jquery.rails_flash_notifications'
-], function(I18n, $, htmlEscape, signupDialog) {
+import I18n from 'i18n!pseudonyms.login'
+import $ from 'jquery'
+import htmlEscape from './str/htmlEscape'
+import signupDialog from 'compiled/registration/signupDialog'
+import './jquery.fancyplaceholder' /* fancyPlaceholder */
+import './jquery.google-analytics' /* trackPage, trackPageview */
+import './jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */
+import './jquery.loadingImg'
+import 'compiled/jquery.rails_flash_notifications'
 
   $("#coenrollment_link").click(function(event) {
     event.preventDefault();
@@ -72,4 +70,3 @@ define([
       }
       return success;
     });
-});

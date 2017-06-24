@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!theme_editor'
 import React from 'react'
+import PropTypes from 'prop-types'
 import SVGWrapper from 'jsx/shared/SVGWrapper'
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 
@@ -25,14 +26,14 @@ export default React.createClass({
     displayName: 'ThemeCard',
 
     propTypes: {
-      name: React.PropTypes.string.isRequired,
-      isActiveBrandConfig: React.PropTypes.bool.isRequired,
-      isDeletable: React.PropTypes.bool.isRequired,
-      isBeingDeleted: React.PropTypes.bool.isRequired,
-      startDeleting: React.PropTypes.func.isRequired,
-      cancelDeleting: React.PropTypes.func.isRequired,
-      onDelete: React.PropTypes.func.isRequired,
-      getVariable: React.PropTypes.func.isRequired
+      name: PropTypes.string.isRequired,
+      isActiveBrandConfig: PropTypes.bool.isRequired,
+      isDeletable: PropTypes.bool.isRequired,
+      isBeingDeleted: PropTypes.bool.isRequired,
+      startDeleting: PropTypes.func.isRequired,
+      cancelDeleting: PropTypes.func.isRequired,
+      onDelete: PropTypes.func.isRequired,
+      getVariable: PropTypes.func.isRequired
     },
 
     render () {

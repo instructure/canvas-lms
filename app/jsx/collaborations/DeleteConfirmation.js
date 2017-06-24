@@ -18,6 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import PropTypes from 'prop-types'
 import i18n from 'i18n!react_collaborations'
   class DeleteConfirmation extends React.Component {
     componentDidMount () {
@@ -46,9 +47,9 @@ import i18n from 'i18n!react_collaborations'
   };
 
   DeleteConfirmation.propTypes = {
-    collaboration: React.PropTypes.object,
-    onCancel: React.PropTypes.func,
-    onDelete: React.PropTypes.func
+    collaboration: PropTypes.object,
+    onCancel: PropTypes.func,
+    onDelete: PropTypes.func
   }
 
 export default DeleteConfirmation

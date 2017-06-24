@@ -60,7 +60,7 @@ class GradingPeriodSetsController < ApplicationController
     grading_period_set.enrollment_terms = enrollment_terms
     # we need to recompute scores for enrollment terms that were removed since the line above
     # will not run callbacks for the removed enrollment terms
-    EnrollmentTerm.where(id: old_term_ids - enrollment_terms.map(&:id)).each(&:recompute_course_scores)
+    EnrollmentTerm.where(id: old_term_ids - enrollment_terms.map(&:id)).each(&:recompute_course_scores_later)
 
     respond_to do |format|
       if grading_period_set.update(set_params)

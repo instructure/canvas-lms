@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!new_user_tutorial'
 import Button from 'instructure-ui/lib/components/Button'
 import IconMoveLeftLine from 'instructure-icons/lib/Line/IconMoveLeftLine'
@@ -26,7 +27,7 @@ import plainStoreShape from 'jsx/shared/proptypes/plainStoreShape'
   class NewUserTutorialToggleButton extends React.Component {
 
     static propTypes = {
-      store: React.PropTypes.shape(plainStoreShape).isRequired
+      store: PropTypes.shape(plainStoreShape).isRequired
     }
 
     constructor (props) {

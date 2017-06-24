@@ -17,18 +17,21 @@
 
 require_relative '../../helpers/gradezilla_common'
 require_relative '../page_objects/gradezilla_page'
+require_relative '../setup/gradebook_setup'
 
 describe "Gradezilla - post grades to SIS" do
   include GradezillaCommon
+  include GradebookSetup
   include_context "in-process server selenium tests"
 
   before(:once) do
     gradebook_data_setup
     create_sis_assignment
+    show_sections_filter(@teacher)
   end
 
   before(:each) do
-    Account.default.set_feature_flag!('gradezilla', 'on')
+    Account.default.set_feature_flag!('new_gradebook', 'on')
     user_session(@teacher)
   end
 
@@ -161,7 +164,7 @@ describe "Gradezilla - post grades to SIS" do
       expect(Gradezilla.action_menu_item(tool_name)).to be_displayed
 
       f('button.section-select-button').click
-      fj('ul#section-to-show-menu li:nth(4)').click
+      fj('ul#section-to-show-menu li:nth(2)').click
       Gradezilla.open_action_menu
 
       expect(Gradezilla.action_menu_item(tool_name)).to be_displayed

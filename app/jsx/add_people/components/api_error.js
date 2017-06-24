@@ -18,13 +18,14 @@
 
 import I18n from 'i18n!roster'
 import React from 'react'
+import PropTypes from 'prop-types'
 import Alert from 'instructure-ui/lib/components/Alert'
 
   class ApiError extends React.Component {
     static propTypes = {
-      error: React.PropTypes.oneOfType([
-        React.PropTypes.string,
-        React.PropTypes.arrayOf(React.PropTypes.string)
+      error: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.arrayOf(PropTypes.string)
       ]).isRequired
     };
 

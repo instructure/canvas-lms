@@ -38,31 +38,6 @@ describe "enhanceable_content" do
         <li>item 2</li>
       </ul>
 
-      <div class="enhanceable_content accordion">
-        <h3><a href="#">Section 1</a></h3>
-        <div>
-          <p>
-            Section 1 Content
-          </p>
-        </div>
-        <h3><a href="#">Section 2</a></h3>
-        <div>
-          <p>
-            Section 2 Content
-          </p>
-        </div>
-        <h3><a href="#">Section 3</a></h3>
-        <div>
-          <p>
-            Section 3 Content
-          </p>
-          <ul>
-            <li>List item one</li>
-            <li>List item two</li>
-            <li>List item three</li>
-          </ul>
-        </div>
-      </div>
 
       <div class="enhanceable_content tabs">
         <ul>
@@ -103,22 +78,6 @@ describe "enhanceable_content" do
     expect(ul).to be_displayed
     expect(ul).to have_class('ui-sortable')
 
-    accordion = f(".enhanceable_content.accordion")
-    expect(accordion).to have_class('ui-accordion')
-    headers = accordion.find_elements(:css, ".ui-accordion-header")
-    expect(headers.length).to eq 3
-    divs = accordion.find_elements(:css, ".ui-accordion-content")
-    expect(divs.length).to eq 3
-    expect(headers[0]).to have_class('ui-state-active')
-    expect(divs[0]).to be_displayed
-    expect(divs[1]).not_to be_displayed
-    headers[1].click
-    wait_for_ajaximations
-    expect(headers[0]).to have_class('ui-state-default')
-    expect(headers[1]).to have_class('ui-state-active')
-    expect(divs[0]).not_to be_displayed
-    expect(divs[1]).to be_displayed
-
 
     tabs = f(".enhanceable_content.tabs")
     expect(tabs).to have_class('ui-tabs')
@@ -130,7 +89,7 @@ describe "enhanceable_content" do
     expect(headers[1]).to have_class('ui-state-default')
     expect(divs[0]).to be_displayed
     expect(divs[1]).not_to be_displayed
-    
+
     expect(f('#media_comment_0_deadbeef span.media_comment_thumbnail')).not_to be_nil
   end
 

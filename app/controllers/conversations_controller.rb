@@ -1079,7 +1079,8 @@ class ConversationsController < ApplicationController
     users, contexts = AddressBook.partition_recipients(params[:recipients])
     known = @current_user.address_book.known_users(users, context: context, conversation_id: params[:from_conversation_id])
     contexts.each{ |context| known.concat(@current_user.address_book.known_in_context(context)) }
-    @recipients = known.uniq(&:id).reject{|u| u.id == @current_user.id}
+    @recipients = known.uniq(&:id)
+    @recipients.reject!{|u| u.id == @current_user.id} unless @recipients == [@current_user]
   end
 
   def infer_tags

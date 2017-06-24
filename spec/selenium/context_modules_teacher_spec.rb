@@ -266,6 +266,24 @@ describe "context modules" do
       expect(f("#context_module_item_#{tag.id} .title").text).to eq item_edit_text
     end
 
+    it "should focus close button on open edit modal" do
+      get "/courses/#{@course.id}/modules"
+
+      module_item = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+      edit_module_item(module_item) do
+        divs = ff('.ui-dialog-titlebar.ui-widget-header.ui-corner-all.ui-helper-clearfix')
+        close_button = nil
+
+        divs.each do |div|
+          title_span = div.find_element(:css, '.ui-dialog-title')
+          if title_span.text == "Edit Item Details"
+            close_button = div.find_element(:css, '.ui-dialog-titlebar-close.ui-corner-all')
+          end
+        end
+        check_element_has_focus(close_button)
+      end
+    end
+
     it "should rename all instances of an item" do
       get "/courses/#{@course.id}/modules"
 

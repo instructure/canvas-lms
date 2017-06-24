@@ -17,11 +17,12 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
 import _ from 'underscore'
 import UsersListRow from './UsersListRow'
 
-  var { string, array, object } = React.PropTypes;
+  var { string, array, object } = PropTypes;
 
   var UsersList = React.createClass({
     propTypes: {

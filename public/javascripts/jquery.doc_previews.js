@@ -16,17 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'INST' /* INST */,
-  'i18n!instructure',
-  'jquery' /* jQuery, $ */,
-  'underscore',
-  'str/htmlEscape' /* htmlEscape, /\$\.h/ */,
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.google-analytics' /* trackEvent */,
-  'jquery.instructure_misc_helpers' /*  /\$\.uniq/, capitalize */,
-  'jquery.loadingImg' /* loadingImage */
-], function(INST, I18n, $, _, htmlEscape) {
+import INST from './INST'
+import I18n from 'i18n!instructure'
+import $ from 'jquery'
+import _ from 'underscore'
+import htmlEscape from './str/htmlEscape'
+import './jquery.ajaxJSON'
+import './jquery.google-analytics' /* trackEvent */
+import './jquery.instructure_misc_helpers' /*  /\$\.uniq/, capitalize */
+import './jquery.loadingImg'
 
   // first element in array is if scribd can handle it, second is if google can.
   var previewableMimeTypes = {
@@ -163,5 +161,3 @@ define([
       }
     });
   };
-
-});

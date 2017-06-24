@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!react_files'
 import React from 'react'
+import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import filesEnv from 'compiled/react_files/modules/filesEnv'
 import customPropTypes from 'compiled/react_files/modules/customPropTypes'
@@ -27,7 +28,7 @@ import customPropTypes from 'compiled/react_files/modules/customPropTypes'
     displayName: 'BreadcrumbCollapsedContainer',
 
     propTypes: {
-      foldersToContain: React.PropTypes.arrayOf(customPropTypes.folder).isRequired
+      foldersToContain: PropTypes.arrayOf(customPropTypes.folder).isRequired
     },
 
     getInitialState () {

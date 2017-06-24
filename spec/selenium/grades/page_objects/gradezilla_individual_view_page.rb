@@ -131,7 +131,7 @@ class GradezillaIndividualViewPage
     end
 
     def visit(course_id)
-      Account.default.enable_feature!(:gradezilla)
+      Account.default.enable_feature!(:new_gradebook)
       get "/courses/#{course_id}/gradebook/change_gradebook_version?version=individual"
     end
 

@@ -450,7 +450,7 @@ class SisImportsApiController < ApplicationController
 
   # @API Abort SIS import
   #
-  # Abort an already created but not processed or processing SIS import.
+  # Abort a SIS import that has not completed.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/accounts/<account_id>/sis_imports/<sis_import_id>/abort \
@@ -460,7 +460,7 @@ class SisImportsApiController < ApplicationController
   def abort
     if authorized_action(@account, @current_user, [:import_sis, :manage_sis])
       SisBatch.transaction do
-        @batch = @account.sis_batches.not_started.lock.find(params[:id])
+        @batch = @account.sis_batches.not_completed.lock.find(params[:id])
         @batch.abort_batch
       end
       render json: @batch.reload

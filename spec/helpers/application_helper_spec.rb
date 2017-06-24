@@ -367,15 +367,14 @@ describe ApplicationHelper do
           it "should just include domain root account's when there is no context or @current_user" do
             output = helper.include_account_js
             expect(output).to have_tag 'script'
-            expect(output).to match(/#{Regexp.quote('["https:\/\/example.com\/root\/account.js"].forEach')}/)
+            expect(output).to eq("<script src=\"https://example.com/root/account.js\" defer=\"defer\"></script>")
           end
 
           it "should load custom js even for high contrast users" do
             @current_user = user_factory
             user_factory.enable_feature!(:high_contrast)
             output = helper.include_account_js
-            expect(output).to have_tag 'script'
-            expect(output).to match(/#{Regexp.quote('["https:\/\/example.com\/root\/account.js"].forEach')}/)
+            expect(output).to eq("<script src=\"https://example.com/root/account.js\" defer=\"defer\"></script>")
           end
 
           it "should include granchild, child, and root when viewing the grandchild or any course or group in it" do
@@ -383,10 +382,11 @@ describe ApplicationHelper do
             group = course.groups.create!
             [@grandchild_account, course, group].each do |context|
               @context = context
-              output = helper.include_account_js
-            expect(output).to have_tag 'script'
-            expected = '["https:\/\/example.com\/root\/account.js","https:\/\/example.com\/child\/account.js","https:\/\/example.com\/grandchild\/account.js"].forEach'
-            expect(output).to match(/#{Regexp.quote(expected)}/)
+              expect(helper.include_account_js).to eq %{
+<script src="https://example.com/root/account.js" defer="defer"></script>
+<script src="https://example.com/child/account.js" defer="defer"></script>
+<script src="https://example.com/grandchild/account.js" defer="defer"></script>
+              }.strip
             end
           end
         end
@@ -637,8 +637,8 @@ describe ApplicationHelper do
   end
 
 
-  describe "include_js_bundles" do
-    before :each do
+  describe "include_head_js" do
+    before do
       helper.stubs(:js_bundles).returns([[:some_bundle], [:some_plugin_bundle, :some_plugin], [:another_bundle, nil]])
     end
 
@@ -651,9 +651,9 @@ describe ApplicationHelper do
       })
       base_url = helper.use_optimized_js? ? 'dist/webpack-production' : 'dist/webpack-dev'
       Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/vendor.js').returns('vendor_url')
-      Canvas::Cdn::RevManifest.stubs(:revved_url_for).with('javascripts/vendor/timezone/America/La_Paz.js').returns('La_Paz_url')
-      Canvas::Cdn::RevManifest.stubs(:revved_url_for).with('javascripts/vendor/timezone/America/Denver.js').returns('Denver_url')
-      Canvas::Cdn::RevManifest.stubs(:revved_url_for).with('javascripts/vendor/timezone/nb_NO.js').returns('nb_NO_url')
+      Canvas::Cdn::RevManifest.stubs(:revved_url_for).with('timezone/America/La_Paz.js').returns('La_Paz_url')
+      Canvas::Cdn::RevManifest.stubs(:revved_url_for).with('timezone/America/Denver.js').returns('Denver_url')
+      Canvas::Cdn::RevManifest.stubs(:revved_url_for).with('timezone/nb_NO.js').returns('nb_NO_url')
       Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/moment/locale/nb.js').returns('nb_url')
       Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/appBootstrap.js').returns('app_bootstrap_url')
       Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/common.js').returns('common_url')
@@ -661,17 +661,35 @@ describe ApplicationHelper do
       Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/some_plugin-some_plugin_bundle.js').returns('plugin_url')
       Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/another_bundle.js').returns('another_bundle_url')
 
+      expect(helper.include_head_js).to eq %{
+<script src="/vendor_url" defer="defer"></script>
+<script src="/La_Paz_url" defer="defer"></script>
+<script src="/Denver_url" defer="defer"></script>
+<script src="/nb_NO_url" defer="defer"></script>
+<script src="/nb_url" defer="defer"></script>
+<script src="/app_bootstrap_url" defer="defer"></script>
+<script src="/common_url" defer="defer"></script>
+<script src="/some_bundle_url" defer="defer"></script>
+<script src="/plugin_url" defer="defer"></script>
+<script src="/another_bundle_url" defer="defer"></script>
+      }.strip
+    end
+  end
+
+  describe "include_js_bundles" do
+    before do
+      helper.stubs(:js_bundles).returns([[:some_bundle], [:some_plugin_bundle, :some_plugin], [:another_bundle, nil]])
+    end
+    it "creates the correct javascript tags" do
+      base_url = helper.use_optimized_js? ? 'dist/webpack-production' : 'dist/webpack-dev'
+      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/some_bundle.js').returns('some_bundle_url')
+      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/some_plugin-some_plugin_bundle.js').returns('plugin_url')
+      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/another_bundle.js').returns('another_bundle_url')
+
       expect(helper.include_js_bundles).to eq %{
-<script src="/vendor_url"></script>
-<script src="/La_Paz_url"></script>
-<script src="/Denver_url"></script>
-<script src="/nb_NO_url"></script>
-<script src="/nb_url"></script>
-<script src="/app_bootstrap_url"></script>
-<script src="/common_url"></script>
-<script src="/some_bundle_url"></script>
-<script src="/plugin_url"></script>
-<script src="/another_bundle_url"></script>
+<script src="/some_bundle_url" defer="defer"></script>
+<script src="/plugin_url" defer="defer"></script>
+<script src="/another_bundle_url" defer="defer"></script>
       }.strip
     end
   end

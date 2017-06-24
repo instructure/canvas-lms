@@ -17,153 +17,135 @@
  */
 
 /*global jsonData*/
-define([
-  'jsx/speed_grader/gradingPeriod',
-  'jsx/grading/helpers/OutlierScoreHelper',
-  'jsx/grading/quizzesNextSpeedGrading',
-  'jsx/shared/helpers/numberHelper',
-  'jsx/gradebook/shared/helpers/GradeFormatHelper',
-  'jst/speed_grader/student_viewed_at',
-  'jst/speed_grader/submissions_dropdown',
-  'jst/speed_grader/speech_recognition',
-  'compiled/util/round',
-  'underscore',
-  'INST' /* INST */,
-  'i18n!gradebook',
-  'compiled/util/natcompare',
-  'jquery' /* $ */,
-  'timezone',
-  'compiled/userSettings',
-  'str/htmlEscape',
-  'rubric_assessment',
-  'speed_grader_select_menu',
-  'speed_grader_helpers',
-  'jst/_turnitinInfo',
-  'jst/_turnitinScore',
-  'jst/_vericiteInfo',
-  'jst/_vericiteScore',
-  'jqueryui/draggable' /* /\.draggable/ */,
-  'jquery.ajaxJSON' /* getJSON, ajaxJSON */,
-  'jquery.instructure_forms' /* ajaxJSONFiles */,
-  'jquery.doc_previews' /* loadDocPreview */,
-  'jquery.instructure_date_and_time' /* datetimeString */,
-  'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* replaceTags */,
-  'jquery.instructure_misc_plugins' /* confirmDelete, showIf, hasScrollbar */,
-  'jquery.keycodes' /* keycodes */,
-  'jquery.loadingImg' /* loadingImg, loadingImage */,
-  'jquery.templateData' /* fillTemplateData, getTemplateData */,
-  'media_comments' /* mediaComment */,
-  'compiled/jquery/mediaCommentThumbnail',
-  'compiled/jquery.rails_flash_notifications',
-  'vendor/jquery.ba-hashchange' /* hashchange */,
-  'vendor/jquery.elastic' /* elastic */,
-  'vendor/jquery.getScrollbarWidth' /* getScrollbarWidth */,
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'vendor/ui.selectmenu' /* /\.selectmenu/ */
-], function (MGP, OutlierScoreHelper, quizzesNextSpeedGrading, numberHelper,
-  GradeFormatHelper, studentViewedAtTemplate, submissionsDropdownTemplate,
-  speechRecognitionTemplate, round, _, INST, I18n, natcompare, $, tz, userSettings, htmlEscape,
-  rubricAssessment, SpeedgraderSelectMenu, SpeedgraderHelpers, turnitinInfoTemplate,
-  turnitinScoreTemplate, vericiteInfoTemplate, vericiteScoreTemplate) {
+import MGP from 'jsx/speed_grader/gradingPeriod'
+import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper'
+import quizzesNextSpeedGrading from 'jsx/grading/quizzesNextSpeedGrading'
+import numberHelper from 'jsx/shared/helpers/numberHelper'
+import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
+import studentViewedAtTemplate from 'jst/speed_grader/student_viewed_at'
+import submissionsDropdownTemplate from 'jst/speed_grader/submissions_dropdown'
+import speechRecognitionTemplate from 'jst/speed_grader/speech_recognition'
+import round from 'compiled/util/round'
+import _ from 'underscore'
+import INST from './INST'
+import I18n from 'i18n!gradebook'
+import natcompare from 'compiled/util/natcompare'
+import $ from 'jquery'
+import tz from 'timezone'
+import userSettings from 'compiled/userSettings'
+import htmlEscape from './str/htmlEscape'
+import rubricAssessment from './rubric_assessment'
+import SpeedgraderSelectMenu from './speed_grader_select_menu'
+import SpeedgraderHelpers from './speed_grader_helpers'
+import turnitinInfoTemplate from 'jst/_turnitinInfo'
+import turnitinScoreTemplate from 'jst/_turnitinScore'
+import vericiteInfoTemplate from 'jst/_vericiteInfo'
+import vericiteScoreTemplate from 'jst/_vericiteScore'
+import 'jqueryui/draggable'
+import './jquery.ajaxJSON' /* getJSON, ajaxJSON */
+import './jquery.instructure_forms' /* ajaxJSONFiles */
+import './jquery.doc_previews' /* loadDocPreview */
+import './jquery.instructure_date_and_time' /* datetimeString */
+import 'jqueryui/dialog'
+import './jquery.instructure_misc_helpers' /* replaceTags */
+import './jquery.instructure_misc_plugins' /* confirmDelete, showIf, hasScrollbar */
+import './jquery.keycodes'
+import './jquery.loadingImg'
+import './jquery.templateData'
+import './media_comments'
+import 'compiled/jquery/mediaCommentThumbnail'
+import 'compiled/jquery.rails_flash_notifications'
+import 'jquery.elastic'
+import 'jquery-getscrollbarwidth'
+import './vendor/jquery.scrollTo'
+import './vendor/ui.selectmenu'
+
   // PRIVATE VARIABLES AND FUNCTIONS
   // all of the $ variables here are to speed up access to dom nodes,
   // so that the jquery selector does not have to be run every time.
   // note, this assumes that this js file is being loaded at the bottom of the page
   // so that all these dom nodes already exists.
   var $window = $(window),
-      $body = $("body"),
-      $full_width_container =$("#full_width_container"),
-      $left_side = $("#left_side"),
-      $resize_overlay = $("#resize_overlay"),
-      $right_side = $("#right_side"),
-      $width_resizer = $("#width_resizer"),
-      $fixed_bottom = $("#fixed_bottom"),
-      $gradebook_header = $("#gradebook_header"),
-      assignmentUrl = $("#assignment_url").attr('href'),
-      $full_height = $(".full_height"),
-      $rightside_inner = $("#rightside_inner"),
-      $moderation_bar = $("#moderation_bar"),
-      $moderation_tabs_div = $("#moderation_tabs"),
-      $moderation_tabs = $("#moderation_tabs > ul > li"),
-      $moderation_tab_2nd = $moderation_tabs.eq(1),
-      $moderation_tab_final = $moderation_tabs.eq(2),
-      $new_mark_container = $("#new_mark_container"),
-      $new_mark_link = $("#new_mark_link"),
-      $new_mark_link_menu_item = $new_mark_link.parent(),
-      $new_mark_copy_link1 = $("#new_mark_copy_link1"),
-      $new_mark_copy_link2 = $("#new_mark_copy_link2"),
-      $new_mark_copy_link2_menu_item = $new_mark_copy_link2.parent(),
-      $new_mark_final_link = $("#new_mark_final_link"),
-      $new_mark_final_link_menu_item = $new_mark_final_link.parent(),
-      $not_gradeable_message = $("#not_gradeable_message"),
-      $comments = $("#comments"),
-      $comment_blank = $("#comment_blank").removeAttr('id').detach(),
-      $comment_attachment_blank = $("#comment_attachment_blank").removeAttr('id').detach(),
-      $comment_media_blank = $("#comment_media_blank").removeAttr('id').detach(),
-      $add_a_comment = $("#add_a_comment"),
-      $add_a_comment_submit_button = $add_a_comment.find("button:submit"),
-      $add_a_comment_textarea = $add_a_comment.find("textarea"),
-      $group_comment_wrapper = $("#group_comment_wrapper"),
-      $comment_attachment_input_blank = $("#comment_attachment_input_blank").detach(),
-      fileIndex = 1,
-      $add_attachment = $("#add_attachment"),
-      minimumWindowHeight = 500,
-      $submissions_container = $("#submissions_container"),
-      $iframe_holder = $("#iframe_holder"),
-      $avatar_image = $("#avatar_image"),
-      $x_of_x_students = $("#x_of_x_students_frd"),
-      $grded_so_far = $("#x_of_x_graded"),
-      $average_score = $("#average_score"),
-      $this_student_does_not_have_a_submission = $("#this_student_does_not_have_a_submission").hide(),
-      $this_student_has_a_submission = $('#this_student_has_a_submission').hide(),
-      $rubric_assessments_select = $("#rubric_assessments_select"),
-      $rubric_summary_container = $("#rubric_summary_container"),
-      $rubric_holder = $("#rubric_holder"),
-      $grade_container = $("#grade_container"),
-      $grade = $grade_container.find("input, select"),
-      $score = $grade_container.find(".score"),
-      $average_score_wrapper = $("#average-score-wrapper"),
-      $submission_details = $("#submission_details"),
-      $multiple_submissions = $("#multiple_submissions"),
-      $submission_late_notice = $("#submission_late_notice"),
-      $submission_not_newest_notice = $("#submission_not_newest_notice"),
-      $enrollment_inactive_notice = $("#enrollment_inactive_notice"),
-      $enrollment_concluded_notice = $("#enrollment_concluded_notice"),
-      $closed_gp_notice = $("#closed_gp_notice"),
-      $submission_files_container = $("#submission_files_container"),
-      $submission_files_list = $("#submission_files_list"),
-      $submission_attachment_viewed_at = $("#submission_attachment_viewed_at_container"),
-      $submission_file_hidden = $("#submission_file_hidden").removeAttr('id').detach(),
-      $assignment_submission_url = $("#assignment_submission_url"),
-      $assignment_submission_turnitin_report_url = $("#assignment_submission_turnitin_report_url"),
-      $assignment_submission_originality_report_url = $("#assignment_submission_originality_report_url"),
-      $assignment_submission_resubmit_to_turnitin_url = $("#assignment_submission_resubmit_to_turnitin_url"),
-      $assignment_submission_vericite_report_url = $("#assignment_submission_vericite_report_url"),
-      $assignment_submission_resubmit_to_vericite_url = $("#assignment_submission_resubmit_to_vericite_url"),
-      $rubric_full = $("#rubric_full"),
-      $rubric_full_resizer_handle = $("#rubric_full_resizer_handle"),
-      $mute_link = $('#mute_link'),
-      $no_annotation_warning = $('#no_annotation_warning'),
-      $comment_submitted = $('#comment_submitted'),
-      $comment_submitted_message = $('#comment_submitted_message'),
-      $comment_saved = $('#comment_saved'),
-      $comment_saved_message = $('#comment_saved_message'),
-      $selectmenu = null,
-      browserableCssClasses = /^(image|html|code)$/,
-      windowLastHeight = null,
-      resizeTimeOut = null,
-      iframes = {},
-      snapshotCache = {},
-      sectionToShow,
-      header,
-      studentLabel = I18n.t("student", "Student"),
-      groupLabel = I18n.t("group", "Group"),
-      gradeeLabel = studentLabel,
-      utils,
-      crocodocSessionTimer,
-      isAdmin = _.include(ENV.current_user_roles, "admin"),
-      showSubmissionOverride;
+    $full_width_container = $('#full_width_container'),
+    $left_side = $('#left_side'),
+    $resize_overlay = $('#resize_overlay'),
+    $right_side = $('#right_side'),
+    $width_resizer = $('#width_resizer'),
+    $gradebook_header = $('#gradebook_header'),
+    assignmentUrl = $('#assignment_url').attr('href'),
+    $rightside_inner = $('#rightside_inner'),
+    $moderation_bar = $('#moderation_bar'),
+    $moderation_tabs_div = $('#moderation_tabs'),
+    $moderation_tabs = $('#moderation_tabs > ul > li'),
+    $moderation_tab_2nd = $moderation_tabs.eq(1),
+    $moderation_tab_final = $moderation_tabs.eq(2),
+    $new_mark_container = $('#new_mark_container'),
+    $new_mark_link = $('#new_mark_link'),
+    $new_mark_link_menu_item = $new_mark_link.parent(),
+    $new_mark_copy_link1 = $('#new_mark_copy_link1'),
+    $new_mark_copy_link2 = $('#new_mark_copy_link2'),
+    $new_mark_copy_link2_menu_item = $new_mark_copy_link2.parent(),
+    $new_mark_final_link = $('#new_mark_final_link'),
+    $new_mark_final_link_menu_item = $new_mark_final_link.parent(),
+    $not_gradeable_message = $('#not_gradeable_message'),
+    $comments = $('#comments'),
+    $comment_blank = $('#comment_blank').removeAttr('id').detach(),
+    $comment_attachment_blank = $('#comment_attachment_blank').removeAttr('id').detach(),
+    $add_a_comment = $('#add_a_comment'),
+    $add_a_comment_submit_button = $add_a_comment.find('button:submit'),
+    $add_a_comment_textarea = $add_a_comment.find('textarea'),
+    $comment_attachment_input_blank = $('#comment_attachment_input_blank').detach(),
+    fileIndex = 1,
+    $add_attachment = $('#add_attachment'),
+    $submissions_container = $('#submissions_container'),
+    $iframe_holder = $('#iframe_holder'),
+    $avatar_image = $('#avatar_image'),
+    $x_of_x_students = $('#x_of_x_students_frd'),
+    $grded_so_far = $('#x_of_x_graded'),
+    $average_score = $('#average_score'),
+    $this_student_does_not_have_a_submission = $('#this_student_does_not_have_a_submission').hide(),
+    $this_student_has_a_submission = $('#this_student_has_a_submission').hide(),
+    $rubric_assessments_select = $('#rubric_assessments_select'),
+    $grade_container = $('#grade_container'),
+    $grade = $grade_container.find('input, select'),
+    $score = $grade_container.find('.score'),
+    $average_score_wrapper = $('#average-score-wrapper'),
+    $submission_details = $('#submission_details'),
+    $multiple_submissions = $('#multiple_submissions'),
+    $submission_late_notice = $('#submission_late_notice'),
+    $submission_not_newest_notice = $('#submission_not_newest_notice'),
+    $enrollment_inactive_notice = $('#enrollment_inactive_notice'),
+    $enrollment_concluded_notice = $('#enrollment_concluded_notice'),
+    $closed_gp_notice = $('#closed_gp_notice'),
+    $submission_files_container = $('#submission_files_container'),
+    $submission_files_list = $('#submission_files_list'),
+    $submission_attachment_viewed_at = $('#submission_attachment_viewed_at_container'),
+    $submission_file_hidden = $('#submission_file_hidden').removeAttr('id').detach(),
+    $assignment_submission_turnitin_report_url = $('#assignment_submission_turnitin_report_url'),
+    $assignment_submission_originality_report_url = $('#assignment_submission_originality_report_url'),
+    $assignment_submission_resubmit_to_turnitin_url = $('#assignment_submission_resubmit_to_turnitin_url'),
+    $assignment_submission_vericite_report_url = $('#assignment_submission_vericite_report_url'),
+    $assignment_submission_resubmit_to_vericite_url = $('#assignment_submission_resubmit_to_vericite_url'),
+    $rubric_full = $('#rubric_full'),
+    $rubric_full_resizer_handle = $('#rubric_full_resizer_handle'),
+    $no_annotation_warning = $('#no_annotation_warning'),
+    $comment_submitted = $('#comment_submitted'),
+    $comment_submitted_message = $('#comment_submitted_message'),
+    $comment_saved = $('#comment_saved'),
+    $comment_saved_message = $('#comment_saved_message'),
+    $selectmenu = null,
+    browserableCssClasses = /^(image|html|code)$/,
+    snapshotCache = {},
+    sectionToShow,
+    header,
+    studentLabel = I18n.t('student', 'Student'),
+    groupLabel = I18n.t('group', 'Group'),
+    gradeeLabel = studentLabel,
+    utils,
+    crocodocSessionTimer,
+    isAdmin = _.include(ENV.current_user_roles, 'admin'),
+    showSubmissionOverride,
+    EG;
 
   utils = {
     getParam: function(name){
@@ -791,18 +773,21 @@ define([
   }
 
   function refreshGrades (cb) {
-    var url = unescape($assignment_submission_url.attr('href')).replace("{{submission_id}}", EG.currentStudent.submission.user_id) + ".json";
-    var currentStudentIDAsOfAjaxCall = EG.currentStudent.id;
-    $.getJSON( url,
-      function(data){
-        if(currentStudentIDAsOfAjaxCall === EG.currentStudent.id) {
-          EG.currentStudent.submission = data.submission;
-          EG.currentStudent.submission_state = SpeedgraderHelpers.submissionState(EG.currentStudent, ENV.grading_role);
-          EG.showGrade();
-          cb && cb(data.submission);
+    const courseId = ENV.course_id;
+    const assignmentId = EG.currentStudent.submission.assignment_id;
+    const studentId = EG.currentStudent.submission.user_id;
+    const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${studentId}.json?include[]=submission_history`
+    const currentStudentIDAsOfAjaxCall = EG.currentStudent.id;
+    $.getJSON(url, (submission) => {
+      if (currentStudentIDAsOfAjaxCall === EG.currentStudent.id) {
+        EG.currentStudent.submission = submission;
+        EG.currentStudent.submission_state = SpeedgraderHelpers.submissionState(EG.currentStudent, ENV.grading_role);
+        EG.showGrade();
+        if (cb) {
+          cb(submission)
         }
       }
-    );
+    });
   }
 
   $.extend(INST, {
@@ -854,10 +839,12 @@ define([
   }
 
   // Public Variables and Methods
-  var EG = {
+  EG = {
     options: {},
     publicVariable: [],
     currentStudent: null,
+
+    refreshGrades,
 
     domReady: function(){
       $moderation_tabs_div.tabs({
@@ -1560,19 +1547,19 @@ define([
       };
 
       var $submission_to_view = $("#submission_to_view"),
-          submissionToViewVal = $submission_to_view.val(),
-          currentSelectedIndex = currentIndex(this, submissionToViewVal),
-          submissionHolder = this.currentStudent &&
-                             this.currentStudent.submission,
-          submissionHistory = submissionHolder && submissionHolder.submission_history,
-          isMostRecent = submissionHistory &&
-                         submissionHistory.length - 1 === currentSelectedIndex,
-          submission  = submissionHistory &&
-                        submissionHistory[currentSelectedIndex] &&
-                        submissionHistory[currentSelectedIndex].submission
-                        || {},
-          inlineableAttachments = [],
-          browserableAttachments = [];
+        submissionToViewVal = $submission_to_view.val(),
+        currentSelectedIndex = currentIndex(this, submissionToViewVal),
+        submissionHolder = this.currentStudent &&
+                           this.currentStudent.submission,
+        submissionHistory = submissionHolder && submissionHolder.submission_history,
+        isMostRecent = submissionHistory &&
+                       submissionHistory.length - 1 === currentSelectedIndex,
+        submission = (submissionHistory && submissionHistory[currentSelectedIndex] && (
+          submissionHistory[currentSelectedIndex].submission || submissionHistory[currentSelectedIndex]
+        ))
+        || {},
+        inlineableAttachments = [],
+        browserableAttachments = [];
 
       var turnitinEnabled = submission.turnitin_data && (typeof submission.turnitin_data.provider === 'undefined');
       var vericiteEnabled = submission.turnitin_data && submission.turnitin_data.provider === 'vericite';
@@ -1714,17 +1701,50 @@ define([
     },
 
     refreshSubmissionsToView: function(){
-      var innerHTML = "";
-      var s = this.currentStudent.submission;
-      var submissionHistory = s.submission_history;
+      let innerHTML
+      let s = this.currentStudent.submission;
+      let submissionHistory;
+      let noSubmittedAt;
+      let selectedIndex;
 
-      if (submissionHistory.length > 0) {
-        var noSubmittedAt = I18n.t('no_submission_time', 'no submission time');
-        var selectedIndex = parseInt($("#submission_to_view").val() ||
+      if (s && s.submission_history && s.submission_history.length > 0) {
+        submissionHistory = s.submission_history;
+        noSubmittedAt = I18n.t('no_submission_time', 'no submission time');
+        selectedIndex = parseInt($('#submission_to_view').val() ||
                                        submissionHistory.length - 1,
                                      10);
         var templateSubmissions = _(submissionHistory).map(function(o, i) {
-          var s = o.submission;
+          // The submission objects nested in the submission_history array
+          // can have two different shapes, because the `this.currentStudent.submission`
+          // can come from two different API endpoints.
+          //
+          // Shape one:
+          //
+          // ```
+          // [{
+          //   submission: {
+          //     grade: 100,
+          //     ...other submission keys
+          //   }
+          // }]
+          // ```
+          //
+          // Shape two:
+          //
+          // ```
+          // [{
+          //   grade: 100,
+          //   ...other submission keys
+          // }]
+          // ```
+          //
+          // This little dance here is to make sure we can accommodate both.
+          if (Object.prototype.hasOwnProperty.call(o, 'submission')) {
+            s = o.submission;
+          } else {
+            s = o
+          }
+
           var grade;
 
           if (s.grade && (s.grade_matches_current_submission ||
@@ -1842,7 +1862,7 @@ define([
       } else if (attachment) {
         this.renderAttachment(attachment);
       } else if (submission && submission.submission_type === 'basic_lti_launch') {
-        this.renderLtiLaunch($iframe_holder, ENV.lti_retrieve_url, submission.external_tool_url);
+        this.renderLtiLaunch($iframe_holder, ENV.lti_retrieve_url, submission.external_tool_url || submission.url);
       } else {
         this.renderSubmissionPreview();
       }
@@ -1855,6 +1875,10 @@ define([
 
     //load in the iframe preview.  if we are viewing a past version of the file pass the version to preview in the url
     renderSubmissionPreview: function() {
+      if (!this.currentStudent.submission) {
+        $this_student_does_not_have_a_submission.show();
+        return
+      }
       this.emptyIframeHolder()
       var src = htmlEscape('/courses/' + jsonData.context_id  +
         '/assignments/' + this.currentStudent.submission.assignment_id +
@@ -2590,7 +2614,7 @@ define([
     EG.jsonReady();
   }
 
-  return {
+export default {
     setup: function() {
       function registerQuizzesNext (overriddenShowSubmission) {
         showSubmissionOverride = overriddenShowSubmission;
@@ -2610,4 +2634,3 @@ define([
     },
     EG: EG
   };
-});

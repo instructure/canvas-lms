@@ -94,7 +94,7 @@ class Oauth2ProviderController < ApplicationController
     raise Canvas::Oauth::RequestError, :invalid_client_secret unless provider.is_authorized_by?(secret)
 
     if grant_type == "authorization_code"
-      raise OAuth2RequestError :authorization_code_not_supplied unless params[:code]
+      raise Canvas::Oauth::RequestError, :authorization_code_not_supplied unless params[:code]
 
       token = provider.token_for(params[:code])
       raise Canvas::Oauth::RequestError, :invalid_authorization_code  unless token.is_for_valid_code?

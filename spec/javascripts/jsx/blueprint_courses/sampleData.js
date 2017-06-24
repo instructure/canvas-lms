@@ -25,6 +25,16 @@ export default {
     { id: '1', name: 'Account One' },
     { id: '2', name: 'Account Two' },
   ],
+  childCourse: {
+    id: '1',
+    enrollment_term_id: '1',
+    name: 'Course 1',
+  },
+  masterCourse: {
+    id: '2',
+    enrollment_term_id: '1',
+    name: 'Course 2',
+  },
   courses: [
     {
       id: '1',
@@ -89,7 +99,7 @@ export default {
       ],
     },
   ],
-  unsynchedChanges: [
+  unsyncedChanges: [
     {
       asset_id: '22',
       asset_type: 'assignment',
@@ -99,7 +109,7 @@ export default {
       locked: false
     },
     {
-      asset_id: '96',
+      asset_id: '22',
       asset_type: 'attachment',
       asset_name: 'Bulldog.png',
       change_type: 'updated',

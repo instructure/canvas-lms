@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import Cropper from 'react-crop'
   //
   // The react-crop component requires a wrapper component for interacting
@@ -32,11 +33,11 @@ import Cropper from 'react-crop'
   class CanvasCropper extends React.Component {
 
     static propTypes = {
-      imgFile: React.PropTypes.object,    // eslint-disable-line react/forbid-prop-types
+      imgFile: PropTypes.object,    // eslint-disable-line react/forbid-prop-types
                                           // selected image file object
-      width: React.PropTypes.number,      // desired cropped width
-      height: React.PropTypes.number,     // desired cropped height
-      onImageLoaded: React.PropTypes.func // if you care when the image is loaded
+      width: PropTypes.number,      // desired cropped width
+      height: PropTypes.number,     // desired cropped height
+      onImageLoaded: PropTypes.func // if you care when the image is loaded
     };
     static defaultProps = {
       imgFile: null,

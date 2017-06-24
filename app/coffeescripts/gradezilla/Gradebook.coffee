@@ -48,11 +48,11 @@ define [
   'compiled/gradezilla/SubmissionCell'
   'compiled/util/NumberCompare'
   'compiled/util/natcompare'
+  'convert_case'
   'str/htmlEscape'
-  'jsx/gradezilla/shared/AssignmentDetailsDialogManager'
   'jsx/gradezilla/shared/SetDefaultGradeDialogManager'
   'jsx/gradezilla/default_gradebook/CurveGradesDialogManager'
-  'jsx/gradezilla/default_gradebook/GradebookApi'
+  'jsx/gradezilla/default_gradebook/apis/GradebookApi'
   'jsx/gradezilla/default_gradebook/slick-grid/CellEditorFactory'
   'jsx/gradezilla/default_gradebook/constants/StudentRowHeaderConstants'
   'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader'
@@ -65,6 +65,9 @@ define [
   'jsx/gradezilla/default_gradebook/components/GradebookMenu'
   'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu'
   'jsx/gradezilla/default_gradebook/components/ActionMenu'
+  'jsx/gradezilla/default_gradebook/components/GridColor'
+  'jsx/gradezilla/default_gradebook/components/StatusesModal'
+  'jsx/gradezilla/default_gradebook/components/GradebookSettingsModal'
   'jsx/gradezilla/SISGradePassback/PostGradesStore'
   'jsx/gradezilla/SISGradePassback/PostGradesApp'
   'jsx/gradezilla/SubmissionStateMap'
@@ -76,7 +79,6 @@ define [
   'compiled/gradezilla/GradebookKeyboardNav'
   'jsx/gradezilla/shared/AssignmentMuterDialogManager'
   'jsx/gradezilla/shared/helpers/assignmentHelper'
-  'jsx/gradezilla/GradebookSettingsModal'
   'instructure-ui/lib/components/Button'
   'instructure-icons/lib/Solid/IconSettingsSolid'
   'jquery.ajaxJSON'
@@ -88,7 +90,6 @@ define [
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
-  'jqueryui/mouse'
   'jqueryui/position'
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
@@ -98,14 +99,18 @@ define [
   GradingPeriodsApi, GradingPeriodSetsApi, round, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS,
   CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, GradeFormatHelper, UserSettings, Spinner, AssignmentMuter,
   AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
-  SubmissionCell, NumberCompare, natcompare, htmlEscape, AssignmentDetailsDialogManager, SetDefaultGradeDialogManager,
+  SubmissionCell, NumberCompare, natcompare, ConvertCase, htmlEscape, SetDefaultGradeDialogManager,
   CurveGradesDialogManager, GradebookApi, CellEditorFactory, StudentRowHeaderConstants, AssignmentColumnHeader,
   AssignmentGroupColumnHeader, AssignmentRowCellPropFactory, CustomColumnHeader, StudentColumnHeader, StudentRowHeader,
-  TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, PostGradesStore, PostGradesApp, SubmissionStateMap,
-  DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager, GroupTotalCellTemplate, SectionMenuView,
-  GradingPeriodMenuView, GradebookKeyboardNav, AssignmentMuterDialogManager,
-  assignmentHelper, GradebookSettingsModal, Button, IconSettingsSolid) ->
-  IS_ADMIN = _.contains(ENV.current_user_roles, 'admin')
+  TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, GridColor, StatusesModal, GradebookSettingsModal,
+  PostGradesStore, PostGradesApp,  SubmissionStateMap, DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager,
+  GroupTotalCellTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, AssignmentMuterDialogManager,
+  assignmentHelper, { default: Button }, { default: IconSettingsSolid }) ->
+
+  isAdmin = =>
+    _.contains(ENV.current_user_roles, 'admin')
+
+  IS_ADMIN = isAdmin()
 
   renderComponent = (reactClass, mountPoint, props = {}, children = null) ->
     component = React.createElement(reactClass, props, children)
@@ -122,13 +127,24 @@ define [
     sortRowsBySettingKey = settings.sort_rows_by_setting_key || 'sortable_name'
     sortRowsByDirection = settings.sort_rows_by_direction || 'ascending'
 
+    filterColumnsBy =
+      assignmentGroupId: null
+      contextModuleId: null
+      gradingPeriodId: null
+      sectionId: null
+
+    if settings.filter_columns_by?
+      Object.assign(filterColumnsBy, ConvertCase.camelize(settings.filter_columns_by))
+
     {
+      filterColumnsBy
       selectedPrimaryInfo
       selectedSecondaryInfo
       sortRowsBy:
         columnId: sortRowsByColumnId # the column controlling the sort
         settingKey: sortRowsBySettingKey # the key describing the sort criteria
         direction: sortRowsByDirection # the direction of the sort
+      selectedViewOptionsFilters: settings.selected_view_options_filters || []
       showEnrollments:
         concluded: false
         inactive: false
@@ -139,9 +155,15 @@ define [
   getInitialContentLoadStates = ->
     {
       assignmentsLoaded: false
+      contextModulesLoaded: false
       studentsLoaded: false
       submissionsLoaded: false
       teacherNotesColumnUpdating: false
+    }
+
+  getInitialCourseContent = () ->
+    {
+      contextModules: []
     }
 
   class Gradebook
@@ -164,6 +186,13 @@ define [
     constructor: (@options) ->
       @gridDisplaySettings = getInitialGridDisplaySettings(@options.settings)
       @contentLoadStates = getInitialContentLoadStates()
+      @courseContent = getInitialCourseContent()
+
+      if @options.grading_period_set
+        @gradingPeriodSet = GradingPeriodSetsApi.deserializeSet(@options.grading_period_set)
+      else
+        @gradingPeriodSet = null
+
       @students = {}
       @studentViewStudents = {}
       @rows = []
@@ -180,38 +209,31 @@ define [
       if @options.settings.show_inactive_enrollments == 'true'
         @toggleEnrollmentFilter('inactive', true)
       @initShowUnpublishedAssignments(@options.settings.show_unpublished_assignments)
-      @gradingPeriods = GradingPeriodsApi.deserializePeriods(@options.active_grading_periods)
-      if @options.grading_period_set
-        @gradingPeriodSet = GradingPeriodSetsApi.deserializeSet(@options.grading_period_set)
-      else
-        @gradingPeriodSet = null
-      @gradingPeriodToShow = @getGradingPeriodToShow()
-      @submissionStateMap = new SubmissionStateMap
-        hasGradingPeriods: @gradingPeriodSet?
-        selectedGradingPeriodID: @gradingPeriodToShow
-        isAdmin: IS_ADMIN
+      @initSubmissionStateMap()
       @gradebookColumnSizeSettings = @options.gradebook_column_size_settings
       @gradebookColumnOrderSettings = @options.gradebook_column_order_settings
       @teacherNotesNotYetLoaded = !@options.teacher_notes? || @options.teacher_notes.hidden
 
+      # emitted by AssignmentGroupWeightsDialog
       $.subscribe 'assignment_group_weights_changed', @handleAssignmentGroupWeightChange
+
       $.subscribe 'assignment_muting_toggled',        @handleAssignmentMutingChange
       $.subscribe 'submissions_updated',              @updateSubmissionsFromExternal
+
+      # emitted by SectionMenuView; also subscribed in OutcomeGradebookView
       $.subscribe 'currentSection/change',            @updateCurrentSection
+
+      # emitted by GradingPeriodMenuView
       $.subscribe 'currentGradingPeriod/change',      @updateCurrentGradingPeriod
 
-      assignmentGroupsParams = { exclude_response_fields: @fieldsToExcludeFromAssignments }
-      if @gradingPeriodSet? && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
-        $.extend(assignmentGroupsParams, {grading_period_id: @gradingPeriodToShow})
-
       submissionParams =
-        response_fields: ['id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id', 'grade_matches_current_submission', 'attachments', 'late', 'workflow_state', 'excused']
+        response_fields: ['id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id', 'grade_matches_current_submission', 'attachments', 'late', 'missing', 'workflow_state', 'excused']
         exclude_response_fields: ['preview_url']
-      submissionParams['grading_period_id'] = @gradingPeriodToShow if @gradingPeriodSet? && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
+
       dataLoader = DataLoader.loadGradebookData(
         assignmentGroupsURL: @options.assignment_groups_url
-        assignmentGroupsParams: assignmentGroupsParams
-
+        assignmentGroupsParams: { exclude_response_fields: @fieldsToExcludeFromAssignments }
+        contextModulesURL: @options.context_modules_url
         customColumnsURL: @options.custom_columns_url
 
         sectionsURL: @options.sections_url
@@ -259,11 +281,17 @@ define [
       dataLoader.gotStudents.then () =>
         @contentLoadStates.studentsLoaded = true
         @updateColumnHeaders()
+        @updateSectionFilterVisibility()
 
       dataLoader.gotAssignmentGroups.then () =>
         @contentLoadStates.assignmentsLoaded = true
         @renderViewOptionsMenu()
         @updateColumnHeaders()
+
+      dataLoader.gotContextModules.then (contextModules) =>
+        @setContextModules(contextModules)
+        @contentLoadStates.contextModulesLoaded = true
+        @renderViewOptionsMenu()
 
       dataLoader.gotSubmissions.then () =>
         @contentLoadStates.submissionsLoaded = true
@@ -305,9 +333,6 @@ define [
       for studentId in _.uniq(studentsWithHiddenAssignments)
         student = @student(studentId)
         @calculateStudentGrade(student)
-        @grid.invalidateRow(student.row)
-
-      @grid.render()
 
     hiddenStudentIdsForAssignment: (studentIds, assignment) ->
       # TODO: _.difference is ridic expensive.  may need to do something else
@@ -318,21 +343,6 @@ define [
       assignment = @assignments[hiddenSub.assignment_id]
       filteredVisibility = assignment.assignment_visibility.filter (id) -> id != hiddenSub.user_id
       assignment.assignment_visibility = filteredVisibility
-
-    gradingPeriodIsClosed: (gradingPeriod) ->
-      new Date(gradingPeriod.close_date) < new Date()
-
-    gradingPeriodIsActive: (gradingPeriodId) ->
-      activePeriodIds = _.pluck(@gradingPeriods, 'id')
-      _.contains(activePeriodIds, gradingPeriodId)
-
-    getGradingPeriodToShow: () =>
-      return null unless @gradingPeriodSet?
-      currentPeriodId = UserSettings.contextGet('gradebook_current_grading_period')
-      if currentPeriodId && (@isAllGradingPeriods(currentPeriodId) || @gradingPeriodIsActive(currentPeriodId))
-        currentPeriodId
-      else
-        @options.current_grading_period_id
 
     onShow: ->
       $(".post-grades-button-placeholder").show()
@@ -351,12 +361,15 @@ define [
       @customColumns = columns
 
     gotCustomColumnDataChunk: (column, columnData) =>
+      studentIds = []
+
       for datum in columnData
         student = @student(datum.user_id)
         if student? #ignore filtered students
           student["custom_col_#{column.id}"] = datum.content
-          @grid?.invalidateRow(student.row)
-      @grid?.render()
+          studentIds.push(student.id)
+
+      @invalidateRowsForStudentIds(_.uniq(studentIds))
 
     doSlickgridStuff: =>
       @initGrid()
@@ -415,6 +428,7 @@ define [
       e.type == "StudentEnrollment" || e.type == "StudentViewEnrollment"
 
     setupGrading: (students) =>
+      # set up a submission for each student even if we didn't receive one
       @submissionStateMap.setup(students, @assignments)
       for student in students
         for assignment_id, assignment of @assignments
@@ -426,13 +440,16 @@ define [
 
         student.initialized = true
         @calculateStudentGrade(student)
-        @grid?.invalidateRow(student.row)
 
-      @setAssignmentVisibility(_.pluck(students, 'id'))
+      studentIds = _.pluck(students, 'id')
+      @setAssignmentVisibility(studentIds)
 
-      @grid.render()
+      @invalidateRowsForStudentIds(studentIds)
 
-    rowIndex: 0
+    resetGrading: =>
+      @initSubmissionStateMap()
+      @setupGrading(@listStudents())
+
     addRow: (student) =>
       student.computed_current_score ||= 0
       student.computed_final_score ||= 0
@@ -445,8 +462,6 @@ define [
       @setStudentDisplay(student)
 
       if @rowFilter(student)
-        student.row = @rowIndex
-        @rowIndex++
         @rows.push(student)
 
       @grid?.updateRowCount(@rows.length)
@@ -550,7 +565,7 @@ define [
       assignmentHelper.compareByDueDate(firstAssignment, secondAssignment)
 
     compareAssignmentNames: (a, b) =>
-      @localeSort(a.object.name, b.object.name);
+      @localeSort(a.object.name, b.object.name)
 
     compareAssignmentPointsPossible: (a, b) ->
       a.object.points_possible - b.object.points_possible
@@ -592,6 +607,8 @@ define [
         [a, b] = [b, a] if direction == 'descending'
         wrappedFn(a, b)
 
+    ## Filtering
+
     rowFilter: (student) =>
       matchingSection = !@sectionToShow || (@sectionToShow in student.sections)
       matchingFilter = if @userFilterTerm == ""
@@ -603,6 +620,40 @@ define [
           student[prop]?.match pattern
 
       matchingSection and matchingFilter
+
+    filterAssignmentColumns: (columns) =>
+      columnsByAssignmentId = _.indexBy(columns, 'assignmentId')
+
+      assignments = _.pluck(columns, 'object')
+      filteredAssignments = @filterAssignments(assignments)
+
+      filteredAssignments.map (assignment) => columnsByAssignmentId[assignment.id]
+
+    filterAssignments: (assignments) =>
+      assignmentFilters = [
+        @filterAssignmentBySubmissionTypes,
+        @filterAssignmentByPublishedStatus,
+        @filterAssignmentByGradingPeriod
+      ]
+
+      matchesAllFilters = (assignment) =>
+        assignmentFilters.every ((filter) => filter(assignment))
+
+      assignments.filter(matchesAllFilters)
+
+    filterAssignmentBySubmissionTypes: (assignment) =>
+      submissionType = '' + assignment.submission_types
+      submissionType isnt 'not_graded' and
+        (submissionType isnt 'attendance' or @show_attendance)
+
+    filterAssignmentByPublishedStatus: (assignment) =>
+      assignment.published or @showUnpublishedAssignments
+
+    filterAssignmentByGradingPeriod: (assignment) =>
+      return true unless @isFilteringColumnsByGradingPeriod()
+      @getGradingPeriodToShow() in @listGradingPeriodsForAssignment(assignment.id)
+
+    ## Course Content Event Handlers
 
     handleAssignmentMutingChange: (assignment) =>
       @renderAssignmentColumnHeader(assignment.id)
@@ -634,12 +685,8 @@ define [
         @$grid.find("##{@uid}#{column.id}").showIf(@show_attendance)
 
       @withAllStudents (students) =>
-        @rowIndex = 0
         for id, student of @students
-          student.row = -1
           if @rowFilter(student)
-            student.row = @rowIndex
-            @rowIndex += 1
             @rows.push(student)
             @calculateStudentGrade(student) # TODO: this may not be necessary
             @setStudentDisplay(student)
@@ -663,20 +710,21 @@ define [
       student.display_name = cell.render()
 
     gotSubmissionsChunk: (student_submissions) =>
+      changedStudentIds = []
+
       for data in student_submissions
+        changedStudentIds.push(data.user_id)
         student = @student(data.user_id)
         for submission in data.submissions
           @updateSubmission(submission)
 
         student.loaded = true
 
-        if @grid
-          @calculateStudentGrade(student)
-          @grid.invalidateRow(student.row)
+        @calculateStudentGrade(student)
 
       # TODO: if gb2 survives long enough, we should consider debouncing all
       # the invalidation/rendering for smoother performance while loading
-      @grid?.render()
+      @invalidateRowsForStudentIds(_.uniq(changedStudentIds))
 
     student: (id) =>
       @students[id] || @studentViewStudents[id]
@@ -710,6 +758,8 @@ define [
     updateSubmissionsFromExternal: (submissions) =>
       columns = @grid.getColumns()
       changedColumnHeaders = {}
+      changedStudentIds = []
+
       for submission in submissions
         student = @student(submission.user_id)
         idToMatch = @getAssignmentColumnId(submission.assignment_id)
@@ -725,16 +775,12 @@ define [
         submissionState = @submissionStateMap.getSubmissionState(submission)
         student["assignment_#{submission.assignment_id}"].gradeLocked = submissionState.locked
         @calculateStudentGrade(student)
-        @grid.updateCell student.row, cell
-        @updateRowTotals student.row
+        changedStudentIds.push(student.id)
 
-      for assignmentId, cell of changedColumnHeaders
+      for assignmentId of changedColumnHeaders
         @renderAssignmentColumnHeader(assignmentId)
 
-    updateRowTotals: (rowIndex) ->
-      columns = @grid.getColumns()
-      for column, columnIndex in columns
-        @grid.updateCell rowIndex, columnIndex if column.type isnt 'assignment'
+      @updateRowCellsForStudentIds(_.uniq(changedStudentIds))
 
     cellFormatter: (row, col, submission) =>
       if !@rows[row].loaded or !@rows[row].initialized
@@ -808,11 +854,11 @@ define [
     submissionsForStudent: (student) =>
       allSubmissions = (value for key, value of student when key.match /^assignment_(?!group)/)
       return allSubmissions unless @gradingPeriodSet?
-      return allSubmissions if !@gradingPeriodToShow or @isAllGradingPeriods(@gradingPeriodToShow)
+      return allSubmissions unless @isFilteringColumnsByGradingPeriod()
 
       _.filter allSubmissions, (submission) =>
         studentPeriodInfo = @effectiveDueDates[submission.assignment_id]?[submission.user_id]
-        studentPeriodInfo and studentPeriodInfo.grading_period_id == @gradingPeriodToShow
+        studentPeriodInfo and studentPeriodInfo.grading_period_id == @getGradingPeriodToShow()
 
     calculateStudentGrade: (student) =>
       if student.loaded and student.initialized
@@ -826,31 +872,21 @@ define [
           EffectiveDueDates.scopeToUser(@effectiveDueDates, student.id) if hasGradingPeriods
         )
 
-        if @gradingPeriodToShow && !@isAllGradingPeriods(@gradingPeriodToShow)
-          grades = grades.gradingPeriods[@gradingPeriodToShow]
+        if @isFilteringColumnsByGradingPeriod()
+          grades = grades.gradingPeriods[@getGradingPeriodToShow()]
 
         finalOrCurrent = if @include_ungraded_assignments then 'final' else 'current'
 
-        for assignmentGroupId, grade of grades.assignmentGroups
-          student["assignment_group_#{assignmentGroupId}"] = grade[finalOrCurrent]
-          for submissionData in grade[finalOrCurrent].submissions
+        for assignmentGroupId, group of @assignmentGroups
+          grade = grades.assignmentGroups[assignmentGroupId]
+          grade = grade?[finalOrCurrent] || { score: 0, possible: 0, submissions: [] }
+
+          student["assignment_group_#{assignmentGroupId}"] = grade
+          for submissionData in grade.submissions
             submissionData.submission.drop = submissionData.drop
         student["total_grade"] = grades[finalOrCurrent]
 
-        @addDroppedClass(student)
-
     ## Grid Styling Methods
-
-    addDroppedClass: (student) ->
-      droppedAssignments = (name for name, assignment of student when name.match(/assignment_\d+/) and (assignment.drop? or assignment.excused))
-      drops = {}
-      drops[student.row] = {}
-      for a in droppedAssignments
-        drops[student.row][a] = 'dropped'
-
-      styleKey = "dropsForRow#{student.row}"
-      @grid.removeCellCssStyles(styleKey)
-      @grid.addCellCssStyles(styleKey, drops)
 
     highlightColumn: (event) =>
       $headers = @$grid.find('.slick-header-column')
@@ -1013,18 +1049,19 @@ define [
       _.map @sections, (section, id) =>
         { name: section.name, id: id, checked: @sectionToShow == id }
 
-    drawSectionSelectButton: () ->
-      @sectionMenu = new SectionMenuView(
-        el: $('.section-button-placeholder'),
-        sections: @sectionList(),
-        showSections: @showSections(),
-        currentSection: @sectionToShow,
-        disabled: true)
-      @sectionMenu.render()
-
-      @studentsLoaded.then =>
-        @sectionMenu.disabled = false
+    updateSectionFilterVisibility: () ->
+      if @showSections() and 'sections' in @gridDisplaySettings.selectedViewOptionsFilters
+        @sectionMenu ||= new SectionMenuView(
+          tagName: 'span'
+          sections: @sectionList()
+          currentSection: @sectionToShow
+        )
+        @sectionMenu.disabled = !@contentLoadStates.studentsLoaded
         @sectionMenu.render()
+        @sectionMenu.$el.appendTo('.assignment-gradebook-container .section-button-placeholder')
+      else if @sectionMenu
+        @sectionMenu.remove()
+        @sectionMenu = null
 
     updateCurrentSection: (section, author) =>
       @sectionToShow = section
@@ -1037,19 +1074,35 @@ define [
       @sections_enabled
 
     gradingPeriodList: ->
-      _.map @gradingPeriods, (period) =>
-        { title: period.title, id: period.id, checked: @gradingPeriodToShow == period.id }
+      _.map @gradingPeriodSet.gradingPeriods, (period) =>
+        { title: period.title, id: period.id, checked: @getGradingPeriodToShow() == period.id }
 
-    drawGradingPeriodSelectButton: () ->
-      @gradingPeriodMenu = new GradingPeriodMenuView(
-        el: $('.multiple-grading-periods-selector-placeholder'),
-        periods: @gradingPeriodList(),
-        currentGradingPeriod: @gradingPeriodToShow)
-      @gradingPeriodMenu.render()
+    updateGradingPeriodFilterVisibility: () ->
+      if @gradingPeriodSet? and 'gradingPeriods' in @gridDisplaySettings.selectedViewOptionsFilters
+        @gradingPeriodMenu ||= new GradingPeriodMenuView(
+          tagName: 'span'
+          periods: @gradingPeriodList(),
+          currentGradingPeriod: @getGradingPeriodToShow()
+        )
+        @gradingPeriodMenu.render()
+        @gradingPeriodMenu.$el.appendTo('#grading-periods-filter-container')
+      else if @gradingPeriodMenu?
+        @gradingPeriodMenu.remove()
+        @gradingPeriodMenu = null
 
-    updateCurrentGradingPeriod: (period) ->
-      UserSettings.contextSet 'gradebook_current_grading_period', period
-      window.location.reload()
+    updateCurrentGradingPeriod: (period) =>
+      if @getFilterColumnsBySetting('gradingPeriodId') != period
+        @setFilterColumnsBySetting('gradingPeriodId', period)
+        @saveSettings()
+        @resetGrading()
+        @setAssignmentWarnings()
+        @updateColumnsAndRenderViewOptionsMenu()
+
+    initSubmissionStateMap: =>
+      @submissionStateMap = new SubmissionStateMap
+        hasGradingPeriods: @gradingPeriodSet?
+        selectedGradingPeriodID: @getGradingPeriodToShow()
+        isAdmin: isAdmin()
 
     initPostGradesStore: ->
       @postGradesStore = PostGradesStore
@@ -1084,53 +1137,14 @@ define [
 
     initHeader: =>
       @renderGradebookMenus()
-      @drawSectionSelectButton() if @sections_enabled
-      @drawGradingPeriodSelectButton() if @gradingPeriodSet?
-
-      $settingsMenu = $('.gradebook_dropdown')
-
-      includeUngradedAssignmentsEl = $settingsMenu.find("#include_ungraded_assignments")
-      includeUngradedAssignmentsEl.prop('checked', @include_ungraded_assignments).change (event) =>
-        @include_ungraded_assignments = includeUngradedAssignmentsEl.is(':checked')
-        UserSettings.contextSet 'include_ungraded_assignments', @include_ungraded_assignments
-        @buildRows()
-
-      showAttendanceEl = $settingsMenu.find("#show_attendance")
-      showAttendanceEl.prop('checked', @show_attendance).change (event) =>
-        @show_attendance = showAttendanceEl.is(':checked')
-        UserSettings.contextSet 'show_attendance', @show_attendance
-        @grid.setColumns @getVisibleGradeGridColumns()
-        @buildRows()
-
-      # don't show the "show attendance" link in the dropdown if there's no attendance assignments
-      unless (_.detect @assignments, (a) -> (''+a.submission_types) == "attendance")
-        $settingsMenu.find('#show_attendance').closest('li').hide()
-
-      if @hideAggregateColumns()
-        $settingsMenu.find('#include-ungraded-list-item').hide()
+      @renderFilters()
 
       @arrangeColumnsBy(@getStoredSortOrder(), true)
 
-      $('#gradebook_settings').kyleMenu(returnFocusTo: $('#gradebook_settings'))
-      $('#download_csv').kyleMenu(returnFocusTo: $('#download_csv'))
-      $('#post_grades').kyleMenu()
+      @renderGradebookSettingsModal()
+      @renderSettingsButton()
+      @renderStatusesModal()
 
-      gradebookSettingsModalMountPoint = document.querySelector("[data-component='GrabebookSettingsModal']")
-      @gradebookSettingsModal = renderComponent(
-        GradebookSettingsModal, gradebookSettingsModalMountPoint, {
-          onClose: => @gradebookSettingsModalButton.focus()
-        }
-      )
-
-      gradebookSettingsModalButtonMountPoint = document.getElementById('gradebook-settings-modal-button-container')
-      @gradebookSettingsModalButton = renderComponent(
-        Button.default, gradebookSettingsModalButtonMountPoint, {
-          id: 'gradebook-settings-button', variant: 'icon', onClick: @gradebookSettingsModal.open
-        },
-        React.createElement(IconSettingsSolid.default, { title: I18n.t('Gradebook Settings') })
-      )
-
-      $settingsMenu.find('.student_names_toggle').click(@studentNamesToggle)
       $('#keyboard-shortcuts').click ->
         questionMarkKeyDown = $.Event('keydown', keyCode: 191)
         $(document).trigger(questionMarkKeyDown)
@@ -1202,15 +1216,27 @@ define [
       onSortByPointsDescending: =>
         @arrangeColumnsBy({ sortType: 'points', direction: 'descending' }, false)
 
+    getFilterSettingsViewOptionsMenuProps: =>
+      available: @listAvailableViewOptionsFilters()
+      onSelect: (filters) =>
+        @setSelectedViewOptionsFilters(filters)
+        @renderViewOptionsMenu()
+        @renderFilters()
+        @saveSettings()
+      selected: @listSelectedViewOptionsFilters()
+
     getViewOptionsMenuProps: ->
       teacherNotes: @getTeacherNotesViewOptionsMenuProps()
       columnSortSettings: @getColumnSortSettingsViewOptionsMenuProps()
+      filterSettings: @getFilterSettingsViewOptionsMenuProps()
       showUnpublishedAssignments: @showUnpublishedAssignments
       onSelectShowUnpublishedAssignments: @toggleUnpublishedAssignments
+      onSelectShowStatusesModal: =>
+        @statusesModal.open()
 
     renderViewOptionsMenu: =>
       mountPoint = document.querySelector("[data-component='ViewOptionsMenu']")
-      renderComponent(ViewOptionsMenu, mountPoint, @getViewOptionsMenuProps())
+      @viewOptionsMenu = renderComponent(ViewOptionsMenu, mountPoint, @getViewOptionsMenuProps())
 
     getActionMenuProps: =>
       focusReturnPoint = document.querySelector("[data-component='ActionMenu'] button")
@@ -1250,20 +1276,47 @@ define [
       props = @getActionMenuProps()
       renderComponent(ActionMenu, mountPoint, props)
 
+    renderFilters: =>
+      @updateSectionFilterVisibility()
+      @updateGradingPeriodFilterVisibility()
+
+    renderGridColor: =>
+      gridColorMountPoint = document.querySelector('[data-component="GridColor"]')
+      gridColorProps =
+        colors: @options.colors
+      renderComponent(GridColor, gridColorMountPoint, gridColorProps)
+
+    renderGradebookSettingsModal: =>
+      gradebookSettingsModalMountPoint = document.querySelector("[data-component='GradebookSettingsModal']")
+      gradebookSettingsModalProps =
+        courseId: @options.context_id
+        locale: @options.locale
+        onClose: => @gradebookSettingsModalButton.focus()
+      @gradebookSettingsModal = renderComponent(
+        GradebookSettingsModal,
+        gradebookSettingsModalMountPoint,
+        gradebookSettingsModalProps
+      )
+
+    renderSettingsButton: =>
+      buttonMountPoint = document.getElementById('gradebook-settings-modal-button-container')
+      buttonProps =
+        id: 'gradebook-settings-button',
+        variant: 'icon',
+        onClick: @gradebookSettingsModal.open
+      iconSettingsSolid = React.createElement(IconSettingsSolid, { title: I18n.t('Gradebook Settings') })
+      @gradebookSettingsModalButton = renderComponent(Button, buttonMountPoint, buttonProps, iconSettingsSolid)
+
+    renderStatusesModal: =>
+      statusesModalMountPoint = document.querySelector("[data-component='StatusesModal']")
+      statusesModalProps =
+        onClose: => @viewOptionsMenu.focus()
+      @statusesModal = renderComponent(StatusesModal, statusesModalMountPoint, statusesModalProps)
+
     checkForUploadComplete: () ->
       if UserSettings.contextGet('gradebookUploadComplete')
         $.flashMessage I18n.t('Upload successful')
         UserSettings.contextRemove('gradebookUploadComplete')
-
-    studentNamesToggle: (e) =>
-      e.preventDefault()
-      $wrapper = @$grid.find('.grid-canvas')
-      $wrapper.toggleClass('hide-students')
-
-      if $wrapper.hasClass('hide-students')
-        $(e.currentTarget).text I18n.t('show_student_names', 'Show Student Names')
-      else
-        $(e.currentTarget).text I18n.t('hide_student_names', 'Hide Student Names')
 
     weightedGroups: =>
       @options.group_weighting_scheme == "percent"
@@ -1297,22 +1350,14 @@ define [
       @buildRows()
 
     getVisibleGradeGridColumns: ->
-      columns = []
-
-      for column in @allAssignmentColumns
-        if @disabledAssignments && @disabledAssignments.indexOf(column.object.id) != -1
-          column.cssClass = "cannot_edit"
-        submissionType = '' + column.object.submission_types
-        columns.push(column) if submissionType isnt 'not_graded' and
-          (submissionType isnt 'attendance' or @show_attendance) and
-          (column.object.published or @showUnpublishedAssignments)
+      assignmentColumns = @filterAssignmentColumns(@allAssignmentColumns)
 
       if @gradebookColumnOrderSettings?.sortType
-        columns.sort @makeColumnSortFn(@getStoredSortOrder())
+        assignmentColumns.sort @makeColumnSortFn(@getStoredSortOrder())
 
-      columns = columns.concat(@aggregateColumns)
-      headers = @parentColumns.concat(@customColumnDefinitions())
-      headers.concat(columns)
+      scrollableColumns = assignmentColumns.concat(@aggregateColumns)
+      frozenColumns = @parentColumns.concat(@customColumnDefinitions())
+      frozenColumns.concat(scrollableColumns)
 
     customColumnDefinitions: =>
       @customColumns.map (c) =>
@@ -1359,7 +1404,7 @@ define [
 
       @allAssignmentColumns = for id, assignment of @assignments
         shrinkForOutOfText = assignment && assignment.grading_type == 'points' && assignment.points_possible?
-        minWidth = if shrinkForOutOfText then 70 else 90
+        minWidth = if shrinkForOutOfText then 140 else 90
 
         fieldName = @getAssignmentColumnId(id)
 
@@ -1457,22 +1502,36 @@ define [
         numberOfColumnsToFreeze: @getFrozenColumnCount()
       }, @options)
 
+      @renderGridColor()
+
       @grid = new Slick.Grid('#gradebook_grid', @rows, @getVisibleGradeGridColumns(), options)
       @grid.setSortColumn('student')
 
       # this is a faux blur event for SlickGrid.
       $('#application').on('click', @onGridBlur)
 
+      # Grid Events
+      @grid.onKeyDown.subscribe @onGridKeyDown
+
+      # Grid Header Events
       @grid.onHeaderCellRendered.subscribe @onHeaderCellRendered
       @grid.onBeforeHeaderCellDestroy.subscribe @onBeforeHeaderCellDestroy
       @grid.onColumnsReordered.subscribe @onColumnsReordered
       @grid.onColumnsResized.subscribe @onColumnsResized
 
       # Grid Body Cell Events
+      @grid.onActiveCellChanged.subscribe @onActiveCellChanged
       @grid.onBeforeEditCell.subscribe @onBeforeEditCell
       @grid.onCellChange.subscribe @onCellChange
 
       @onGridInit()
+
+    # Grid Event Handlers
+
+    onGridKeyDown: (event, obj) =>
+      column = obj.grid.getColumns()[obj.cell]
+      if column?.type == 'student' and event.which == 13
+        event.originalEvent.skipSlickGridDefaults = true
 
     # Column Header Cell Event Handlers
 
@@ -1491,7 +1550,14 @@ define [
     onBeforeHeaderCellDestroy: (event, obj) =>
       ReactDOM.unmountComponentAtNode(obj.node)
 
-    ## Column Event Handlers
+    ## Grid Body Event Handlers
+
+    onActiveCellChanged: (event, obj) =>
+      return unless obj.row? and obj.cell?
+
+      column = obj.grid.getColumns()[obj.cell]
+      if column.type == 'student'
+        $(obj.grid.getActiveCellNode()).find('.student-grades-link').focus()
 
     # The target cell will enter editing mode
     onBeforeEditCell: (event, obj) =>
@@ -1528,6 +1594,7 @@ define [
       $.ajaxJSON(url, 'POST', {column_id: id, column_size: newWidth})
 
     saveSettings: ({
+      selectedViewOptionsFilters = @listSelectedViewOptionsFilters(),
       showConcludedEnrollments = @getEnrollmentFilters().concluded,
       showInactiveEnrollments = @getEnrollmentFilters().inactive,
       showUnpublishedAssignments = @showUnpublishedAssignments,
@@ -1535,8 +1602,11 @@ define [
       studentColumnSecondaryInfo = @getSelectedSecondaryInfo(),
       sortRowsBy = @getSortRowsBySetting()
     } = {}, successFn, errorFn) =>
+      selectedViewOptionsFilters.push('') unless selectedViewOptionsFilters.length > 0
       data =
         gradebook_settings:
+          filter_columns_by: ConvertCase.underscore(@gridDisplaySettings.filterColumnsBy)
+          selected_view_options_filters: selectedViewOptionsFilters
           show_concluded_enrollments: showConcludedEnrollments
           show_inactive_enrollments: showInactiveEnrollments
           show_unpublished_assignments: showUnpublishedAssignments
@@ -1564,9 +1634,6 @@ define [
           sortFn
 
       @rows.sort respectorOfPersonsSort()
-      for student, i in @rows
-        student.row = i
-        @addDroppedClass(student)
       @grid?.invalidate()
 
     getStudentGradeForColumn: (student, field) =>
@@ -1666,10 +1733,10 @@ define [
     setAssignmentWarnings: =>
       @totalGradeWarning = null
 
-      gradebookVisibleAssignments = _.reject @assignments, (assignment) ->
-        _.contains(assignment.submission_types, 'not_graded')
+      unorderedAssignments = (assignment for assignmentId, assignment of @assignments)
+      filteredAssignments = @filterAssignments(unorderedAssignments)
 
-      if _.any(gradebookVisibleAssignments, (a) -> a.muted)
+      if _.any(filteredAssignments, 'muted')
         @totalGradeWarning =
           warningText: I18n.t "This grade differs from the student's view of the grade because some assignments are muted"
           icon: "icon-muted"
@@ -1702,7 +1769,7 @@ define [
 
         else
           # no assignments have points possible
-          pointsPossible = _.inject @assignments
+          pointsPossible = _.inject filteredAssignments
           , ((sum, a) -> sum + (a.points_possible || 0))
           , 0
 
@@ -1742,14 +1809,10 @@ define [
             break
         @grid.setNumberOfColumnsToFreeze @getFrozenColumnCount()
 
-    isAllGradingPeriods: (currentPeriodId) ->
-      currentPeriodId == "0"
-
     hideAggregateColumns: ->
       return false unless @gradingPeriodSet?
       return false if @gradingPeriodSet.displayTotalsForAllGradingPeriods
-      selectedPeriodId = @getGradingPeriodToShow()
-      @isAllGradingPeriods(selectedPeriodId)
+      not @isFilteringColumnsByGradingPeriod()
 
     fieldsToExcludeFromAssignments: ['description', 'needs_grading_count', 'in_closed_grading_period']
 
@@ -1790,13 +1853,58 @@ define [
       columnPosition = @getColumnPositionById(colId, @parentColumns)
       return columnPosition != null
 
-    ## React Grid Component Rendering Methods
+    ## SlickGrid Data Access Methods
+
+    listRows: =>
+      @rows # currently the source of truth for filtered and sorted rows
+
+    listRowIndicesForStudentIds: (studentIds) =>
+      rowIndicesByStudentId = @listRows().reduce((map, row, index) =>
+        map[row.id] = index
+        map
+      , {})
+      studentIds.map (studentId) => rowIndicesByStudentId[studentId]
+
+    ## SlickGrid Update Methods
+
+    updateRowCellsForStudentIds: (studentIds) =>
+      return unless @grid
+
+      # Update each row without entirely replacing the DOM elements.
+      # This is needed to preserve the editor for the active cell, when present.
+      rowIndices = @listRowIndicesForStudentIds(studentIds)
+      columns = @grid.getColumns()
+      for rowIndex in rowIndices
+        for column, columnIndex in columns
+          @grid.updateCell(rowIndex, columnIndex)
+
+      null # skip building an unused array return value
+
+    invalidateRowsForStudentIds: (studentIds) =>
+      return unless @grid
+
+      rowIndices = @listRowIndicesForStudentIds(studentIds)
+      for rowIndex in rowIndices
+        @grid.invalidateRow(rowIndex)
+
+      @grid.render()
+
+      null # skip building an unused array return value
+
+    ## Gradebook Bulk UI Update Methods
 
     updateFrozenColumnsAndRenderGrid: (newColumns = @getVisibleGradeGridColumns()) ->
       @grid.setNumberOfColumnsToFreeze(@getFrozenColumnCount())
       @grid.setColumns(newColumns)
       @grid.invalidate()
       @updateColumnHeaders()
+
+    updateColumnsAndRenderViewOptionsMenu: =>
+      @grid.setColumns(@getVisibleGradeGridColumns())
+      @updateColumnHeaders()
+      @renderViewOptionsMenu()
+
+    ## React Grid Component Rendering Methods
 
     updateColumnHeaders: ->
       return unless @grid
@@ -1810,11 +1918,6 @@ define [
           @renderAssignmentGroupColumnHeader(column.assignmentGroupId)
       @renderStudentColumnHeader()
       @renderTotalGradeColumnHeader()
-
-    updateColumnsAndRenderViewOptionsMenu: =>
-      @grid.setColumns(@getVisibleGradeGridColumns())
-      @updateColumnHeaders()
-      @renderViewOptionsMenu()
 
     # Student Column Header
 
@@ -2013,9 +2116,6 @@ define [
 
         studentRecord
 
-      assignmentDetailsDialogManager = new AssignmentDetailsDialogManager(
-        assignment, students, @contentLoadStates.submissionsLoaded
-      )
       downloadSubmissionsManager = new DownloadSubmissionsDialogManager(
         assignment, @options.download_assignment_submissions_url, @handleSubmissionsDownloading
       )
@@ -2052,9 +2152,6 @@ define [
         students: students
         submissionsLoaded: @contentLoadStates.submissionsLoaded
         sortBySetting: @getAssignmentColumnSortBySetting(assignmentId)
-        assignmentDetailsAction:
-          disabled: !assignmentDetailsDialogManager.isDialogEnabled()
-          onSelect: assignmentDetailsDialogManager.showDialog
         curveGradesAction: CurveGradesDialogManager.createCurveGradesAction(
           assignment, studentsThatCanSeeAssignment, curveGradesActionOptions
         )
@@ -2150,6 +2247,22 @@ define [
     setTeacherNotesColumnUpdating: (updating) =>
       @contentLoadStates.teacherNotesColumnUpdating = updating
 
+    ## Grid Display Settings Access Methods
+
+    getFilterColumnsBySetting: (filterKey) =>
+      @gridDisplaySettings.filterColumnsBy[filterKey]
+
+    setFilterColumnsBySetting: (filterKey, value) =>
+      @gridDisplaySettings.filterColumnsBy[filterKey] = value
+
+    isFilteringColumnsByGradingPeriod: =>
+      @getGradingPeriodToShow() != '0'
+
+    getGradingPeriodToShow: () =>
+      return '0' unless @gradingPeriodSet?
+      periodId = @getFilterColumnsBySetting('gradingPeriodId') || @options.current_grading_period_id
+      if periodId in _.pluck(@gradingPeriodSet.gradingPeriods, 'id') then periodId else '0'
+
     setSelectedPrimaryInfo: (primaryInfo, skipRedraw) =>
       @gridDisplaySettings.selectedPrimaryInfo = primaryInfo
       @saveSettings()
@@ -2179,6 +2292,20 @@ define [
 
     getSortRowsBySetting: =>
       @gridDisplaySettings.sortRowsBy
+
+    listAvailableViewOptionsFilters: =>
+      filters = []
+      filters.push('assignmentGroups') if Object.keys(@assignmentGroups || {}).length > 1
+      filters.push('gradingPeriods') if @gradingPeriodSet?
+      filters.push('modules') if @listContextModules().length > 0
+      filters.push('sections') if @sections_enabled
+      filters
+
+    setSelectedViewOptionsFilters: (filters) =>
+      @gridDisplaySettings.selectedViewOptionsFilters = filters
+
+    listSelectedViewOptionsFilters: =>
+      @gridDisplaySettings.selectedViewOptionsFilters
 
     toggleEnrollmentFilter: (enrollmentFilter, skipApply) =>
       @getEnrollmentFilters()[enrollmentFilter] = !@getEnrollmentFilters()[enrollmentFilter]
@@ -2212,6 +2339,21 @@ define [
 
     getAssignmentGroup: (assignmentGroupId) =>
       @assignmentGroups[assignmentGroupId]
+
+    setContextModules: (contextModules) =>
+      @courseContent.contextModules = contextModules
+
+    listContextModules: =>
+      @courseContent.contextModules
+
+    listGradingPeriodsForAssignment: (assignmentId) =>
+      effectiveDueDates = @effectiveDueDates[assignmentId] || {}
+      _.uniq((effectiveDueDate.grading_period_id for userId, effectiveDueDate of effectiveDueDates))
+
+    listStudents: =>
+      regularStudents = (student for studentId, student of @students)
+      testStudents = (student for studentId, student of @studentViewStudents)
+      [regularStudents..., testStudents...]
 
     ## Gradebook Content Api Methods
 

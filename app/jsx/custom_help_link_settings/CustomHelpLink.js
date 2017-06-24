@@ -18,6 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!custom_help_link'
 import CustomHelpLinkPropTypes from './CustomHelpLinkPropTypes'
 import CustomHelpLinkHiddenInputs from './CustomHelpLinkHiddenInputs'
@@ -26,10 +27,10 @@ import CustomHelpLinkAction from './CustomHelpLinkAction'
   const CustomHelpLink = React.createClass({
     propTypes: {
       link: CustomHelpLinkPropTypes.link.isRequired,
-      onMoveUp: React.PropTypes.func,
-      onMoveDown: React.PropTypes.func,
-      onEdit: React.PropTypes.func,
-      onRemove: React.PropTypes.func
+      onMoveUp: PropTypes.func,
+      onMoveDown: PropTypes.func,
+      onEdit: PropTypes.func,
+      onRemove: PropTypes.func
     },
     getInitialState () {
       return {

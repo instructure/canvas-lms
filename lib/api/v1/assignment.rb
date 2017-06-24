@@ -410,7 +410,7 @@ module Api::V1::Assignment
       create_api_assignment_with_overrides(prepared_create, user)
     else
       prepared_create[:assignment].save!
-      :success
+      :created
     end
   rescue ActiveRecord::RecordInvalid
     false
@@ -429,7 +429,7 @@ module Api::V1::Assignment
       update_api_assignment_with_overrides(prepared_update, user)
     else
       prepared_update[:assignment].save!
-      :success
+      :ok
     end
   rescue ActiveRecord::RecordInvalid
     false
@@ -728,7 +728,7 @@ module Api::V1::Assignment
     end
 
     assignment.do_notifications!(prepared_update[:old_assignment], prepared_update[:notify_of_update])
-    :success
+    :created
   end
 
   def update_api_assignment_with_overrides(prepared_update, user)
@@ -747,7 +747,7 @@ module Api::V1::Assignment
     end
 
     assignment.do_notifications!(prepared_update[:old_assignment], prepared_update[:notify_of_update])
-    :success
+    :ok
   end
 
   def pull_overrides_from_params(assignment_params)

@@ -18,14 +18,15 @@
 
 import I18n from 'i18n!new_nav'
 import React from 'react'
+import PropTypes from 'prop-types'
 import HelpDialog from 'jsx/help_dialog/HelpDialog'
 
   var HelpTray = React.createClass({
     propTypes: {
-      trayTitle: React.PropTypes.string,
-      closeTray: React.PropTypes.func.isRequired,
-      links: React.PropTypes.array,
-      hasLoaded: React.PropTypes.bool
+      trayTitle: PropTypes.string,
+      closeTray: PropTypes.func.isRequired,
+      links: PropTypes.array,
+      hasLoaded: PropTypes.bool
     },
 
     getDefaultProps() {

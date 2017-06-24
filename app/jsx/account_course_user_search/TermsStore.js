@@ -17,9 +17,10 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import createStore from './createStore'
 
-  var { string, shape } = React.PropTypes;
+  var { string, shape } = PropTypes;
 
   var TermsStore = createStore({
     getUrl() {

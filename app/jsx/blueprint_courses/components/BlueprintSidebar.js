@@ -17,24 +17,29 @@
  */
 
 import I18n from 'i18n!blueprint_settings'
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 
 import Tray from 'instructure-ui/lib/components/Tray'
 import Button from 'instructure-ui/lib/components/Button'
 import Typography from 'instructure-ui/lib/components/Typography'
 import Heading from 'instructure-ui/lib/components/Heading'
-import IconCopyLine from 'instructure-icons/lib/Line/IconCopyLine'
+import IconBlueprintSolid from 'instructure-icons/lib/Solid/IconBlueprintSolid'
 import IconXSolid from 'instructure-icons/lib/Solid/IconXSolid'
 
 export default class BlueprintCourseSidebar extends Component {
   static propTypes = {
     onOpen: PropTypes.func,
     children: PropTypes.node,
+    detachedChildren: PropTypes.node,
+    contentRef: PropTypes.func, // for unit testing
   }
 
   static defaultProps = {
     children: null,
+    detachedChildren: null,
     onOpen: () => {},
+    contentRef: null
   }
 
   constructor (props) {
@@ -65,9 +70,9 @@ export default class BlueprintCourseSidebar extends Component {
     return (
       <div className="bcs__wrapper">
         <div className="bcs__trigger">
-          <Button ref={(c) => { this.openBtn = c }} variant="icon" onClick={this.open}>
+          <Button ref={(c) => { this.openBtn = c }} variant="icon-inverse" onClick={this.open}>
             <Typography color="primary-inverse" size="large">
-              <IconCopyLine title={I18n.t('Open sidebar')} />
+              <IconBlueprintSolid title={I18n.t('Open sidebar')} />
             </Typography>
           </Button>
         </div>
@@ -76,21 +81,21 @@ export default class BlueprintCourseSidebar extends Component {
           isDismissable={false}
           trapFocus
           isOpen={this.state.isOpen}
-          placement="right"
+          placement="end"
           onEntering={this.handleOpen}
           onExiting={this.handleClose}
         >
-          <div className="bcs__content">
+          <div className="bcs__content" ref={this.props.contentRef}>
             <header className="bcs__header">
+              <div className="bcs__close-wrapper">
+                <Button variant="icon-inverse" onClick={this.close} ref={(c) => { this.closeBtn = c }}>
+                  <Typography color="primary-inverse" size="small">
+                    <IconXSolid title={I18n.t('Close sidebar')} />
+                  </Typography>
+                </Button>
+              </div>
               <Heading color="primary-inverse" level="h3">
-                <div className="bcs__close-wrapper">
-                  <Button variant="icon" onClick={this.close} ref={(c) => { this.closeBtn = c }}>
-                    <Typography color="primary-inverse" size="small">
-                      <IconXSolid title={I18n.t('Close sidebar')} />
-                    </Typography>
-                  </Button>
-                </div>
-                <IconCopyLine />&nbsp;{I18n.t('Blueprint')}
+                <IconBlueprintSolid /><span style={{marginLeft: '10px'}}>{I18n.t('Blueprint')}</span>
               </Heading>
             </header>
             <div className="bcs__body">
@@ -98,6 +103,7 @@ export default class BlueprintCourseSidebar extends Component {
             </div>
           </div>
         </Tray>
+        {this.props.detachedChildren}
       </div>
     )
   }

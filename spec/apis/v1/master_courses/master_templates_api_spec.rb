@@ -1,3 +1,21 @@
+#
+# Copyright (C) 2012 - 2013 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
 require_relative '../../api_spec_helper'
 
 describe MasterCourses::MasterTemplatesController, type: :request do
@@ -167,10 +185,19 @@ describe MasterCourses::MasterTemplatesController, type: :request do
     end
 
     it "should queue a master migration" do
-      json = api_call(:post, @url, @params.merge(:comment => 'seriously'))
+      json = api_call(:post, @url, @params.merge(:comment => 'seriously', :copy_settings => '1'))
       migration = @template.master_migrations.find(json['id'])
       expect(migration).to be_queued
       expect(migration.comment).to eq 'seriously'
+      expect(migration.migration_settings[:copy_settings]).to eq true
+      expect(migration.send_notification).to eq false
+    end
+
+    it "should accept the send_notification option" do
+      json = api_call(:post, @url, @params.merge(:send_notification => true))
+      migration = @template.master_migrations.find(json['id'])
+      expect(migration).to be_queued
+      expect(migration.send_notification).to eq true
     end
   end
 
@@ -182,21 +209,69 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @user, :comment => 'Hark!')
     end
 
-    it "should show a migration" do
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/blueprint_templates/default/migrations/#{@migration.id}",
-        @base_params.merge(:action => 'migrations_show', :id => @migration.to_param))
-      expect(json['workflow_state']).to eq 'queued'
-      expect(json['comment']).to eq 'Hark!'
+    describe "blueprint side" do
+      it "should show a migration" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/blueprint_templates/default/migrations/#{@migration.id}",
+          @base_params.merge(:action => 'migrations_show', :id => @migration.to_param))
+        expect(json['workflow_state']).to eq 'queued'
+        expect(json['comment']).to eq 'Hark!'
+      end
+
+      it "should show migrations" do
+        run_jobs
+        expect(@migration.reload).to be_completed
+        migration2 = MasterCourses::MasterMigration.start_new_migration!(@template, @user)
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/blueprint_templates/default/migrations", @base_params.merge(:action => 'migrations_index'))
+        pairs = json.map{|hash| [hash['id'], hash['workflow_state']]}
+        expect(pairs).to eq [[migration2.id, 'queued'], [@migration.id, 'completed']]
+      end
     end
 
-    it "should show migrations" do
-      run_jobs
-      expect(@migration.reload).to be_completed
-      migration2 = MasterCourses::MasterMigration.start_new_migration!(@template, @user)
+    describe "minion side" do
+      before :once do
+        run_jobs
+        @minion_migration = @child_course.content_migrations.last
+        teacher_in_course(:course => @child_course, :active_all => true)
+      end
 
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/blueprint_templates/default/migrations", @base_params.merge(:action => 'migrations_index'))
-      pairs = json.map{|hash| [hash['id'], hash['workflow_state']]}
-      expect(pairs).to eq [[migration2.id, 'queued'], [@migration.id, 'completed']]
+      it "should show a migration" do
+        json = api_call_as_user(@teacher, :get, "/api/v1/courses/#{@child_course.id}/blueprint_subscriptions/#{@sub.id}/migrations/#{@minion_migration.id}",
+                                @base_params.merge(:subscription_id => @sub.to_param, :course_id => @child_course.to_param, :action => 'imports_show', :id => @minion_migration.to_param))
+        expect(json['workflow_state']).to eq 'completed'
+        expect(json['subscription_id']).to eq @sub.id
+        expect(json['comment']).to eq 'Hark!'
+      end
+
+      it "should show migrations" do
+        json = api_call_as_user(@teacher, :get, "/api/v1/courses/#{@child_course.id}/blueprint_subscriptions/default/migrations",
+                                @base_params.merge(:subscription_id => 'default', :course_id => @child_course.to_param, :action => 'imports_index'))
+        expect(json.size).to eq 1
+        expect(json[0]['id']).to eq @minion_migration.id
+        expect(json[0]['subscription_id']).to eq @sub.id
+      end
+
+      it "filters by subscription and enumerates old subscriptions" do
+        me = @teacher
+        @sub.destroy
+        other_master_course = course_model
+        other_template = MasterCourses::MasterTemplate.set_as_master_course(other_master_course)
+        other_sub = other_template.add_child_course!(@child_course)
+        other_migration = MasterCourses::MasterMigration.start_new_migration!(other_template, @admin, :comment => 'Blah!')
+        run_jobs
+
+        json = api_call_as_user(me, :get, "/api/v1/courses/#{@child_course.id}/blueprint_subscriptions/default/migrations",
+                                @base_params.merge(:subscription_id => 'default', :course_id => @child_course.to_param, :action => 'imports_index'))
+        expect(json.size).to eq 1
+        expect(json[0]['subscription_id']).to eq other_sub.id
+        expect(json[0]['comment']).to eq "Blah!"
+
+        json = api_call_as_user(me, :get, "/api/v1/courses/#{@child_course.id}/blueprint_subscriptions/#{@sub.id}/migrations",
+                                @base_params.merge(:subscription_id => @sub.to_param, :course_id => @child_course.to_param, :action => 'imports_index'))
+        expect(json.size).to eq 1
+        expect(json[0]['subscription_id']).to eq @sub.id
+        expect(json[0]['comment']).to eq "Hark!"
+      end
     end
   end
 
@@ -283,6 +358,20 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       api_call(:put, @url, @params, {:content_type => 'wiki_page', :content_id => page.id, :restricted => '1'}, {}, {:expected_status => 200})
       expect(page_tag.reload.restrictions).to eq page_restricts
     end
+
+    it "should use quiz object type restrictions if the quiz assignment is locked" do
+      quiz_assmt = @course.assignments.create!(:submission_types => 'online_quiz').reload
+      quiz = quiz_assmt.quiz
+      quiz_tag = @template.content_tag_for(quiz)
+
+      assmt_restricts = {:content => true, :points => true}
+      quiz_restricts = {:content => true}
+      @template.update_attributes(:use_default_restrictions_by_type => true,
+        :default_restrictions_by_type => {'Assignment' => assmt_restricts, 'Quizzes::Quiz' => quiz_restricts})
+
+      api_call(:put, @url, @params, {:content_type => 'assignment', :content_id => quiz_assmt.id, :restricted => '1'}, {}, {:expected_status => 200})
+      expect(quiz_tag.reload.restrictions).to eq quiz_restricts
+    end
   end
 
   def run_master_migration
@@ -291,7 +380,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
     @migration.reload
   end
 
-  describe "migration_details" do
+  describe "migration_details / import_details" do
     before :once do
       setup_template
       @master = @course
@@ -339,14 +428,15 @@ describe MasterCourses::MasterTemplatesController, type: :request do
 
     it "returns change information from the minion side" do
       minion = @minions.first
+      minion_migration = minion.content_migrations.last
       minion_page = minion.wiki.wiki_pages.where(migration_id: @template.migration_id_for(@page)).first
       minion_assignment = minion.assignments.where(migration_id: @template.migration_id_for(@assignment)).first
       minion_file = minion.attachments.where(migration_id: @template.migration_id_for(@file)).first
       minion_quiz = minion.quizzes.where(migration_id: @template.migration_id_for(@quiz)).first
       json = api_call_as_user(minion.teachers.first, :get,
-                 "/api/v1/courses/#{minion.id}/blueprint_templates/default/migrations/#{@migration.id}/details",
-                 :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',
-                 :id => @migration.to_param, :course_id => minion.to_param, :action => 'migration_details')
+                 "/api/v1/courses/#{minion.id}/blueprint_subscriptions/default/migrations/#{minion_migration.id}/details",
+                 :controller => 'master_courses/master_templates', :format => 'json', :subscription_id => 'default',
+                 :id => minion_migration.to_param, :course_id => minion.to_param, :action => 'import_details')
       expect(json).to match_array([
          {"asset_id"=>minion_page.id,"asset_type"=>"wiki_page","asset_name"=>"Unicorn","change_type"=>"created",
           "html_url"=>"http://www.example.com/courses/#{minion.id}/pages/unicorn","locked"=>true,"exceptions"=>[]},
@@ -377,20 +467,12 @@ describe MasterCourses::MasterTemplatesController, type: :request do
     end
 
     it "requires manage rights on the course" do
+      minion_migration = @minions.first.content_migrations.last
       api_call_as_user(@minions.last.teachers.first, :get,
-                 "/api/v1/courses/#{@minions.first.id}/blueprint_templates/default/migrations/#{@migration.id}/details",
-                 { :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',
-                   :id => @migration.to_param, :course_id => @minions.first.to_param, :action => 'migration_details' },
+                 "/api/v1/courses/#{@minions.first.id}/blueprint_subscriptions/default/migrations/#{minion_migration.id}/details",
+                 { :controller => 'master_courses/master_templates', :format => 'json', :subscription_id => 'default',
+                   :id => minion_migration.to_param, :course_id => @minions.first.to_param, :action => 'import_details' },
                  {}, {}, { :expected_status => 401 })
-    end
-
-    it "complains if the course isn't a minion" do
-      other_course = course_factory
-      api_call_as_user(@admin, :get,
-                 "/api/v1/courses/#{other_course.id}/blueprint_templates/default/migrations/#{@migration.id}/details",
-                 { :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',
-                   :id => @migration.to_param, :course_id => other_course.to_param, :action => 'migration_details' },
-                 {}, {}, { :expected_status => 404 })
     end
   end
 
@@ -401,7 +483,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
         @master = @course
         @template.add_child_course!(course_factory(:name => 'Minion'))
         @page = @master.wiki.wiki_pages.create! :title => 'Old News'
-        @asmt = @master.assignments.create! :title => 'Boring'
+        @ann = @master.announcements.create! :title => 'Boring', :message => 'Yawn'
         @file = attachment_model(:context => @master, :display_name => 'Some File')
         @template.content_tag_for(@file).update_attribute(:restrictions, {:content => true})
         run_master_migration
@@ -409,7 +491,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
     end
 
     it 'detects creates, updates, and deletes since the last sync' do
-      @asmt.destroy
+      @ann.destroy
       @file.update_attribute(:display_name, 'Renamed')
       @new_page = @master.wiki.wiki_pages.create! :title => 'New News'
 
@@ -417,8 +499,8 @@ describe MasterCourses::MasterTemplatesController, type: :request do
         :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',
         :course_id => @master.to_param, :action => 'unsynced_changes')
       expect(json).to match_array([
-       {"asset_id"=>@asmt.id,"asset_type"=>"assignment","asset_name"=>"Boring","change_type"=>"deleted",
-        "html_url"=>"http://www.example.com/courses/#{@master.id}/assignments/#{@asmt.id}","locked"=>false},
+       {"asset_id"=>@ann.id,"asset_type"=>"announcement","asset_name"=>"Boring","change_type"=>"deleted",
+        "html_url"=>"http://www.example.com/courses/#{@master.id}/announcements/#{@ann.id}","locked"=>false},
        {"asset_id"=>@file.id,"asset_type"=>"attachment","asset_name"=>"Renamed","change_type"=>"updated",
         "html_url"=>"http://www.example.com/courses/#{@master.id}/files/#{@file.id}","locked"=>true},
        {"asset_id"=>@new_page.id,"asset_type"=>"wiki_page","asset_name"=>"New News","change_type"=>"created",

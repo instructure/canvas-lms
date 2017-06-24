@@ -16,17 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!editor',
-  'jquery',
-  'str/htmlEscape',
-  'tinymce_plugins/instructure_external_tools/TinyMCEContentItem',
-  'tinymce_plugins/instructure_external_tools/ExternalToolsHelper',
-  'jsx/shared/rce/RceCommandShim',
-  'jquery.instructure_misc_helpers',
-  'jqueryui/dialog',
-  'jquery.instructure_misc_plugins'
-], function (I18n, $, htmlEscape, TinyMCEContentItem, ExternalToolsHelper, RceCommandShim) {
+import I18n from 'i18n!editor'
+import $ from 'jquery'
+import htmlEscape from '../../str/htmlEscape'
+import TinyMCEContentItem from 'tinymce_plugins/instructure_external_tools/TinyMCEContentItem'
+import ExternalToolsHelper from 'tinymce_plugins/instructure_external_tools/ExternalToolsHelper'
+import {send} from 'jsx/shared/rce/RceCommandShim'
+import '../../jquery.instructure_misc_helpers'
+import 'jqueryui/dialog'
+import '../../jquery.instructure_misc_plugins'
 
   var TRANSLATIONS = {
     embed_from_external_tool: I18n.t('embed_from_external_tool', '"Embed content from External Tool"'),
@@ -141,7 +139,7 @@ define([
 
         for(var i = 0; i < itemLength; i++){
           codePayload = TinyMCEContentItem.fromJSON(contentItems[i]).codePayload;
-          RceCommandShim.send($("#" + editor.id), 'insert_code', codePayload)
+          send($("#" + editor.id), 'insert_code', codePayload)
         }
         $dialog.find('iframe').attr('src', 'about:blank');
         $dialog.off("dialogbeforeclose", ExternalToolsPlugin.dialogCancelHandler);
@@ -180,5 +178,4 @@ define([
 
 
 
-  return ExternalToolsPlugin
-});
+export default ExternalToolsPlugin

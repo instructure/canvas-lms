@@ -53,7 +53,7 @@
  * @desc Scroll on both axes, to different values
  * @example $('div').scrollTo( { top: 300, left:'+=200' }, { axis:'xy', offset:-20 } );
  */
-define(['jquery'], function($){
+import $ from 'jquery'
 	
 	var $scrollTo = $.scrollTo = function( target, duration, settings ){
 		$(window).scrollTo( target, duration, settings );
@@ -211,5 +211,3 @@ define(['jquery'], function($){
 	function both( val ){
 		return typeof val == 'object' ? val : { top:val, left:val };
 	};
-
-});

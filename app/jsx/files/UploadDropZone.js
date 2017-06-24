@@ -18,6 +18,7 @@
 
 import _ from 'underscore'
 import React from 'react'
+import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import I18n from 'i18n!upload_drop_zone'
@@ -28,7 +29,7 @@ import 'compiled/jquery.rails_flash_notifications'
     var UploadDropZone = React.createClass({
       displayName: 'UploadDropZone',
       propTypes: {
-        currentFolder: React.PropTypes.instanceOf(Folder)
+        currentFolder: PropTypes.instanceOf(Folder)
       },
       getInitialState: function () {
         return ({active: false});

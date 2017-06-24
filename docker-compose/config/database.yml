@@ -6,10 +6,13 @@ common: &common
   timeout: 5000
   prepared_statements: false
 
-development:
+production: &production
   <<: *common
   database: canvas
   open: true
+
+development:
+  <<: *production
 
 test:
   <<: *common

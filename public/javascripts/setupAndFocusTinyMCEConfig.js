@@ -16,12 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jquery',
-  'compiled/editor/editorAccessibility',
-  'INST'
-], function($, EditorAccessibility, INST){
-  return function (tinymce, autoFocus, enableBookmarkingOverride) {
+import $ from 'jquery'
+import EditorAccessibility from 'compiled/editor/editorAccessibility'
+import INST from './INST'
+
+export default function setupAndFocusTinyMCEConfig (tinymce, autoFocus, enableBookmarkingOverride) {
 
     if (enableBookmarkingOverride == undefined) {
       var enableBookmarking = !!INST.browser.ie;
@@ -102,4 +101,3 @@ define([
       } // function setup()
     }
   };
-});

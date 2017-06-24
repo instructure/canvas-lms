@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import tz from 'timezone'
   class DatetimeDisplay extends React.Component {
     render () {
@@ -30,11 +31,11 @@ import tz from 'timezone'
   };
 
   DatetimeDisplay.propTypes = {
-    datetime: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.instanceOf(Date)
+    datetime: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.instanceOf(Date)
     ]),
-    format: React.PropTypes.string
+    format: PropTypes.string
   };
 
   DatetimeDisplay.defaultProps = {

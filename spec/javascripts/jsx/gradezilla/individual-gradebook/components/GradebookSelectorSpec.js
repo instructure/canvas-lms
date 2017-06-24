@@ -18,10 +18,11 @@
 
 define([
   'react',
+  'prop-types',
   'react-dom',
   'enzyme',
   'jsx/gradezilla/individual-gradebook/components/GradebookSelector'
-], (React, ReactDOM, { mount }, GradebookSelector) => {
+], (React, PropTypes, ReactDOM, { mount }, GradebookSelector) => {
   QUnit.module('GradebookSelector', {
     setup () {
       this.setLocationStub = this.stub(GradebookSelector.prototype, 'setLocation');
@@ -59,8 +60,8 @@ define([
         </ic-tabs>;
 
       ICTabs.propTypes = {
-        firstOnClick: React.PropTypes.func.isRequired,
-        secondOnClick: React.PropTypes.func.isRequired,
+        firstOnClick: PropTypes.func.isRequired,
+        secondOnClick: PropTypes.func.isRequired,
       };
 
       this.firstOnClickStub = this.stub();

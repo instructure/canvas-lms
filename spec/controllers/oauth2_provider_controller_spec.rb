@@ -171,6 +171,18 @@ describe Oauth2ProviderController do
       expect(response.body).to match /invalid client/
     end
 
+    it 'renders a 400 if a code is not provided for an authorization_code grant' do
+      expected_error = Canvas::Oauth::RequestError::ERROR_MAP[:authorization_code_not_supplied]
+
+      post :token, client_id: key.id, client_secret: key.api_key, grant_type: 'authorization_code'
+
+      assert_status(400)
+
+      response_hash = JSON.parse(response.body)
+      expect(response_hash['error']).to eq expected_error[:error].to_s
+      expect(response_hash['error_description']).to eq expected_error[:error_description]
+    end
+
     it 'renders a 400 if the provided code does not match a token' do
       Canvas.stubs(:redis => redis)
       post :token, :client_id => key.id, :client_secret => key.api_key, :code => "NotALegitCode"

@@ -367,6 +367,7 @@ describe ExternalToolsController do
         @tool.save!
 
         @course.name = 'a course'
+        @course.course_code = 'CS 124'
         @course.save!
       end
 
@@ -379,6 +380,7 @@ describe ExternalToolsController do
         expect(lti_launch.params['lti_message_type']).to eq 'ContentItemSelectionRequest'
         expect(lti_launch.params['content_item_return_url']).to eq "http://test.host/courses/#{@course.id}/external_content/success/external_tool_dialog"
         expect(lti_launch.params['accept_multiple']).to eq 'false'
+        expect(lti_launch.params['context_label']).to eq @course.course_code
       end
 
       it "sets proper return data for migration_selection" do

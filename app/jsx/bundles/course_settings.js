@@ -22,11 +22,24 @@ import ReactDOM from 'react-dom'
 import NavigationView from 'compiled/views/course_settings/NavigationView'
 import FeatureFlagAdminView from 'compiled/views/feature_flags/FeatureFlagAdminView'
 import CourseImageSelector from 'jsx/course_settings/components/CourseImageSelector'
+import BlueprintLockOptions from 'jsx/blueprint_courses/components/BlueprintLockOptions'
 import configureStore from 'jsx/course_settings/store/configureStore'
 import initialState from 'jsx/course_settings/store/initialState'
 import 'jquery.cookie'
 import 'course_settings'
 import 'grading_standards'
+
+const blueprint = document.getElementById('blueprint_menu')
+if (blueprint) {
+  ReactDOM.render(
+    <BlueprintLockOptions
+      isMasterCourse={ENV.IS_MASTER_COURSE}
+      disabledMessage={ENV.DISABLED_BLUEPRINT_MESSAGE}
+      generalRestrictions={ENV.BLUEPRINT_RESTRICTIONS}
+      useRestrictionsbyType={ENV.USE_BLUEPRINT_RESTRICTIONS_BY_OBJECT_TYPE}
+      restrictionsByType={ENV.BLUEPRINT_RESTRICTIONS_BY_OBJECT_TYPE}
+    />, blueprint)
+}
 
 const navView = new NavigationView({el: $('#tab-navigation')})
 
@@ -35,16 +48,13 @@ featureFlagView.collection.fetchAll()
 
 $(() => navView.render())
 
-
-if (window.ENV.COURSE_IMAGES_ENABLED) {
+if (ENV.COURSE_IMAGES_ENABLED) {
   const courseImageStore = configureStore(initialState)
 
   ReactDOM.render(
     <CourseImageSelector
       store={courseImageStore}
       name="course[image]"
-      courseId={window.ENV.COURSE_ID}
-    />,
-    $('.CourseImageSelector__Container')[0]
-  )
+      courseId={ENV.COURSE_ID}
+    />, $('.CourseImageSelector__Container')[0])
 }

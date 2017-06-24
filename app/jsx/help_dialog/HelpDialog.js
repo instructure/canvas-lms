@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!help_dialog'
 import CreateTicketForm from './CreateTicketForm'
 import TeacherFeedbackForm from './TeacherFeedbackForm'
@@ -24,9 +25,9 @@ import HelpLinks from './HelpLinks'
 
   const HelpDialog = React.createClass({
     propTypes: {
-      links: React.PropTypes.array,
-      hasLoaded: React.PropTypes.bool,
-      onFormSubmit: React.PropTypes.func
+      links: PropTypes.array,
+      hasLoaded: PropTypes.bool,
+      onFormSubmit: PropTypes.func
     },
     getDefaultProps() {
       return {
@@ -64,9 +65,9 @@ import HelpLinks from './HelpLinks'
           );
         default:
           return (
-            <HelpLinks 
-              links={this.props.links} 
-              hasLoaded={this.props.hasLoaded} 
+            <HelpLinks
+              links={this.props.links}
+              hasLoaded={this.props.hasLoaded}
               onClick={this.handleLinkClick} />
           );
       }

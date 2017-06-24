@@ -1,4 +1,4 @@
-define(['jquery'],function($) {
+import $ from 'jquery'
 
 /*! 
  * jquery.event.drag - v 2.2
@@ -402,5 +402,3 @@ $event.fixHooks.touchcancel = {
 $special.draginit = $special.dragstart = $special.dragend = drag;
 
 })( $ );
-
-});

@@ -614,7 +614,7 @@ class ExternalToolsController < ApplicationController
       media_types,
       params["export_type"]
     )
-    params = default_lti_params.merge(
+    params = Lti::ContentItemSelectionRequest.default_lti_params(@context, @domain_root_account, @current_user).merge(
       {
         #required params
         lti_message_type: message_type,
@@ -645,88 +645,30 @@ class ExternalToolsController < ApplicationController
 
   # Do an official content-item request as specified: http://www.imsglobal.org/LTI/services/ltiCIv1p0pd/ltiCIv1p0pd.html
   def content_item_selection_request(tool, placement, opts = {})
-    extra_params = {}
-    accept_presentation_document_targets = []
-    accept_unsigned= true
-    auto_create= false
-    return_url_opts = {service: 'external_tool_dialog'}
-    launch_url = opts[:launch_url] || tool.extension_setting(placement, :url)
-    data_hash = {default_launch_url: launch_url}
-    if opts[:content_item_id]
-        data_hash.merge!(
-          {
-            content_item_id: opts[:content_item_id],
-            oauth_consumer_key: tool.consumer_key
-          }
-        )
-      return_url_opts[:id] = opts[:content_item_id]
-      return_url = polymorphic_url([@context, :external_content_update], return_url_opts)
-    else
-      return_url = polymorphic_url([@context, :external_content_success], return_url_opts)
-    end
-    extra_params[:data] = Canvas::Security.create_jwt(data_hash)
-    # choose accepted return types based on placement
-    # todo, make return types configurable at installation?
-    case placement
-    when 'migration_selection'
-      accept_media_types = 'application/vnd.ims.imsccv1p1,application/vnd.ims.imsccv1p2,application/vnd.ims.imsccv1p3,application/zip,application/xml'
-      accept_presentation_document_targets << 'download'
-      extra_params[:accept_copy_advice] = true
-      extra_params[:ext_content_file_extensions] = 'zip,imscc,mbz,xml'
-    when 'editor_button'
-      accept_media_types = 'image/*,text/html,application/vnd.ims.lti.v1.ltilink,*/*'
-      accept_presentation_document_targets += %w(embed frame iframe window)
-    when 'resource_selection', 'link_selection', 'assignment_selection'
-      accept_media_types = 'application/vnd.ims.lti.v1.ltilink'
-      accept_presentation_document_targets += %w(frame window)
-    when 'collaboration'
-      accept_media_types = 'application/vnd.ims.lti.v1.ltilink'
-      accept_presentation_document_targets << 'window'
-      accept_unsigned = false
-      auto_create = true
-      collaboration = ExternalToolCollaboration.find(opts[:content_item_id]) if opts[:content_item_id]
-    when 'homework_submission'
-      assignment = @context.assignments.active.find(params[:assignment_id])
-      accept_media_types = '*/*'
-      accept_presentation_document_targets << 'window' if assignment.submission_types.include?('online_url')
-      accept_presentation_document_targets << 'none' if assignment.submission_types.include?('online_upload')
-      extra_params[:accept_copy_advice] = !!assignment.submission_types.include?('online_upload')
-      if assignment.submission_types.strip == ('online_upload') && assignment.allowed_extensions.present?
-        extra_params[:ext_content_file_extensions] = assignment.allowed_extensions.compact.join(',')
-        accept_media_types = assignment.allowed_extensions.map { |ext| MimetypeFu::EXTENSIONS[ext] }.compact.join(',')
-      end
-    else
-      # todo: we _could_, if configured, have any other placements return to the content migration page...
-      raise "Content-Item not supported at this placement"
-    end
+    selection_request = Lti::ContentItemSelectionRequest.new(context: @context,
+                                                             domain_root_account: @domain_root_account,
+                                                             user: @current_user,
+                                                             base_url: request.base_url,
+                                                             tool: tool)
 
-    params = default_lti_params.merge({
-        #required params
-        lti_message_type: 'ContentItemSelectionRequest',
-        lti_version: 'LTI-1p0',
-        accept_media_types: accept_media_types,
-        accept_presentation_document_targets: accept_presentation_document_targets.uniq.join(','),
-        content_item_return_url: return_url,
-        #optional params
-        accept_multiple: false,
-        accept_unsigned: accept_unsigned,
-        auto_create: auto_create,
-        context_title: @context.name,
-    }).merge(extra_params).merge(variable_expander(tool:tool, collaboration: collaboration).expand_variables!(tool.set_custom_fields(placement)))
+    assignment = @context.assignments.active.find(params[:assignment_id]) if params[:assignment_id].present?
 
-    lti_launch = @tool.settings['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
-    lti_launch.resource_url = launch_url
-    lti_launch.params = Lti::Security.signed_post_params(
-      params,
-      lti_launch.resource_url,
-      tool.consumer_key,
-      tool.shared_secret,
-      @context.root_account.feature_enabled?(:disable_lti_post_only) || tool.extension_setting(:oauth_compliant)
+    opts = {
+      post_only: @tool.settings['post_only'].present?,
+      launch_url: opts[:launch_url] || tool.extension_setting(placement, :url),
+      content_item_id: opts[:content_item_id],
+      assignment: assignment
+    }
+
+    collaboration = opts[:content_item_id].present? ? ExternalToolCollaboration.find(opts[:content_item_id]) : nil
+    base_expander = variable_expander(tool: tool, collaboration: collaboration)
+    expander = Lti::PrivacyLevelExpander.new(placement, base_expander)
+
+    selection_request.generate_lti_launch(
+      placement: placement,
+      expanded_variables: expander.expanded_variables!(tool.set_custom_fields(placement)),
+      opts: opts
     )
-    lti_launch.link_text = tool.label_for(placement.to_sym, I18n.locale)
-    lti_launch.analytics_id = tool.tool_id
-
-    lti_launch
   end
   protected :content_item_selection_request
 
@@ -1144,25 +1086,6 @@ class ExternalToolsController < ApplicationController
       current_pseudonym: @current_pseudonym,
       tool: @tool }
     Lti::VariableExpander.new(@domain_root_account, @context, self, default_opts.merge(opts))
-  end
-
-  def default_lti_params
-    lti_helper = Lti::SubstitutionsHelper.new(@context, @domain_root_account, @current_user)
-
-    params = {
-      context_id: Lti::Asset.opaque_identifier_for(@context),
-      tool_consumer_instance_guid: @domain_root_account.lti_guid,
-      roles: lti_helper.current_lis_roles,
-      launch_presentation_locale: I18n.locale || I18n.default_locale.to_s,
-      launch_presentation_document_target: 'iframe',
-      ext_roles: lti_helper.all_roles,
-      # launch_presentation_width:,
-      # launch_presentation_height:,
-      # launch_presentation_return_url: return_url,
-    }
-
-    params.merge!(user_id: Lti::Asset.opaque_identifier_for(@current_user)) if @current_user
-    params
   end
 
   def placement_from_params

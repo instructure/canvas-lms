@@ -18,14 +18,15 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import PropTypes from 'prop-types'
 import CustomHelpLinkPropTypes from './CustomHelpLinkPropTypes'
 
   const CustomHelpLinkAction = React.createClass({
     propTypes: {
       link: CustomHelpLinkPropTypes.link.isRequired,
-      label: React.PropTypes.string.isRequired,
-      iconClass: React.PropTypes.string.isRequired,
-      onClick: React.PropTypes.func
+      label: PropTypes.string.isRequired,
+      iconClass: PropTypes.string.isRequired,
+      onClick: PropTypes.func
     },
     handleClick (e) {
       if (typeof this.props.onClick === 'function') {

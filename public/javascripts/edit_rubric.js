@@ -16,26 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!edit_rubric',
-  'jst/changePointsPossibleToMatchRubricDialog',
-  'jquery' /* $ */,
-  'underscore' /* _ */,
-  'str/htmlEscape',
-  'jsx/shared/helpers/numberHelper',
-  'find_outcome',
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData */,
-  'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* replaceTags */,
-  'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
-  'jquery.loadingImg' /* loadingImage */,
-  'jquery.templateData' /* fillTemplateData, getTemplateData */,
-  'compiled/jquery.rails_flash_notifications',
-  'vendor/jquery.ba-tinypubsub',
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'compiled/jquery/fixDialogButtons'
-], function(I18n, changePointsPossibleToMatchRubricDialog, $, _, htmlEscape, numberHelper) {
+import I18n from 'i18n!edit_rubric'
+import changePointsPossibleToMatchRubricDialog from 'jst/changePointsPossibleToMatchRubricDialog'
+import $ from 'jquery'
+import _ from 'underscore'
+import htmlEscape from './str/htmlEscape'
+import numberHelper from 'jsx/shared/helpers/numberHelper'
+import 'find_outcome'
+import './jquery.ajaxJSON'
+import './jquery.instructure_forms' /* formSubmit, fillFormData, getFormData */
+import 'jqueryui/dialog'
+import './jquery.instructure_misc_helpers' /* replaceTags */
+import './jquery.instructure_misc_plugins'  /* confirmDelete, showIf */
+import './jquery.loadingImg'
+import './jquery.templateData' /* fillTemplateData, getTemplateData */
+import 'compiled/jquery.rails_flash_notifications'
+import 'vendor/jquery.ba-tinypubsub'
+import './vendor/jquery.scrollTo'
+import 'compiled/jquery/fixDialogButtons'
 
   var rubricEditing = {
     htmlBody: null,
@@ -755,7 +753,10 @@ define([
         var $rubric = $(this).parents(".rubric");
         if (!$rubric.find(".criterion:not(.blank)").length) return false;
         var data = rubricEditing.rubricData($rubric);
-        if (data['rubric_association[use_for_grading]'] == '1') {
+        if (ENV.MASTER_COURSE_DATA && ENV.MASTER_COURSE_DATA.restricted_by_master_course &&
+          ENV.MASTER_COURSE_DATA.is_master_course_child_content && ENV.MASTER_COURSE_DATA.master_course_restrictions.points) {
+          skipPointsUpdate = true;
+        } else if (data['rubric_association[use_for_grading]'] == '1') {
           var assignmentPoints = numberHelper.parse($("#assignment_show .points_possible, .discussion-title .discussion-points").text());
           var rubricPoints = parseFloat(data.points_possible);
           if (assignmentPoints != null && assignmentPoints != undefined && rubricPoints != assignmentPoints && !forceSubmit) {
@@ -1024,5 +1025,4 @@ define([
     $.publish('edit_rubric/initted')
   };
 
-  return rubricEditing;
-});
+export default rubricEditing;

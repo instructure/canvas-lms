@@ -17,14 +17,15 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!help_dialog'
 import Spinner from 'instructure-ui/lib/components/Spinner'
 
   const HelpLinks = React.createClass({
     propTypes: {
-      links: React.PropTypes.array,
-      hasLoaded: React.PropTypes.bool,
-      onClick: React.PropTypes.func
+      links: PropTypes.array,
+      hasLoaded: PropTypes.bool,
+      onClick: PropTypes.func
     },
     getDefaultProps() {
       return {

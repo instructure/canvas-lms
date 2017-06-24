@@ -18,6 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import PropTypes from 'prop-types'
 import Collaboration from './Collaboration'
 import LoadMore from '../shared/load-more'
 import { dispatch } from './store/store'
@@ -51,9 +52,9 @@ import { dispatch } from './store/store'
   };
 
   CollaborationsList.propTypes = {
-    collaborationsState: React.PropTypes.object.isRequired,
-    deleteCollaboration: React.PropTypes.func.isRequired,
-    getCollaborations: React.PropTypes.func.isRequired,
+    collaborationsState: PropTypes.object.isRequired,
+    deleteCollaboration: PropTypes.func.isRequired,
+    getCollaborations: PropTypes.func.isRequired,
   };
 
 export default CollaborationsList

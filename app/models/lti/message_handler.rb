@@ -75,5 +75,19 @@ module Lti
       end
     end
 
+    def self.by_resource_codes(vendor_code:, product_code:, resource_type_code:, context:, message_type: BASIC_LTI_LAUNCH_REQUEST)
+      possible_handlers = ResourceHandler.by_resource_codes(vendor_code: vendor_code,
+                                                            product_code: product_code,
+                                                            resource_type_code: resource_type_code,
+                                                            context: context)
+      resource_handler = nil
+      search_contexts = context.account_chain.unshift(context)
+      search_contexts.each do |search_context|
+        break if resource_handler.present?
+        resource_handler = possible_handlers.find { |rh| rh.tool_proxy.context == search_context }
+      end
+      resource_handler&.find_message_by_type(message_type)
+    end
+
   end
 end

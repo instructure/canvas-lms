@@ -17,22 +17,23 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!moderated_grading'
 
   var Header = React.createClass({
     displayName: 'Header',
 
     propTypes: {
-      onPublishClick: React.PropTypes.func.isRequired,
-      onReviewClick: React.PropTypes.func.isRequired,
-      published: React.PropTypes.bool.isRequired,
-      selectedStudentCount: React.PropTypes.number.isRequired,
-      inflightAction: React.PropTypes.shape({
-        review: React.PropTypes.bool.isRequired,
-        publish: React.PropTypes.bool.isRequired
+      onPublishClick: PropTypes.func.isRequired,
+      onReviewClick: PropTypes.func.isRequired,
+      published: PropTypes.bool.isRequired,
+      selectedStudentCount: PropTypes.number.isRequired,
+      inflightAction: PropTypes.shape({
+        review: PropTypes.bool.isRequired,
+        publish: PropTypes.bool.isRequired
       }).isRequired,
-      permissions: React.PropTypes.shape({
-        editGrades: React.PropTypes.bool.isRequired
+      permissions: PropTypes.shape({
+        editGrades: PropTypes.bool.isRequired
       }).isRequired
     },
 

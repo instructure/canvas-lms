@@ -51,7 +51,7 @@ describe "master courses - child courses - discussion locking" do
 
     get "/courses/#{@copy_to.id}/discussion_topics"
 
-    expect(f('.discussion-row')).to contain_css('.icon-lock')
+    expect(f('.discussion-row')).to contain_css('.icon-blueprint-lock')
 
     f('.discussion-row .al-trigger').click
     expect(f('.discussion-row')).not_to include_text('Delete')
@@ -60,7 +60,7 @@ describe "master courses - child courses - discussion locking" do
   it "should show all the cog-menu options on the index when not locked" do
     get "/courses/#{@copy_to.id}/discussion_topics"
 
-    expect(f('.discussion-row')).to contain_css('.icon-unlock')
+    expect(f('.discussion-row')).to contain_css('.icon-blueprint')
 
     f('.discussion-row .al-trigger').click
     expect(f('.discussion-row')).to include_text('Delete')
@@ -115,7 +115,7 @@ describe "master courses - child courses - discussion locking" do
     it "should show the cog-menu options on the index when not locked" do
       get "/courses/#{@copy_to.id}/announcements"
 
-      expect(f('.discussion-topic')).to contain_css('.icon-unlock')
+      expect(f('.discussion-topic')).to contain_css('.icon-blueprint')
 
       expect(f('.discussion-topic')).to contain_css('.al-trigger')
     end

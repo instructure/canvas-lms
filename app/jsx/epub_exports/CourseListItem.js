@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import _ from 'underscore'
 import GenerateLink from 'jsx/epub_exports/GenerateLink'
 import DownloadLink from 'jsx/epub_exports/DownloadLink'
@@ -28,7 +29,7 @@ import classnames from 'classnames'
   var CourseListItem = React.createClass({
     displayName: 'CourseListItem',
     propTypes: {
-      course: React.PropTypes.object.isRequired
+      course: PropTypes.object.isRequired
     },
 
     epubExport () {

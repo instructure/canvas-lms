@@ -9,7 +9,7 @@ task :build_media_element_js do
 
   repo_path = '../mediaelement'
   public_path = 'public'
-  repo_location = "https://github.com/johndyer/mediaelement.git"
+  repo_location = "https://github.com/instructure/mediaelement.git"
 
   unless File.exists? repo_path
     puts "cloning repo"
@@ -70,7 +70,7 @@ task :build_media_element_js do
   puts "Copying CSS"
   css = File.read "#{repo_path}/src/css/mediaelementplayer.css"
   # fix urls to background images
-  css = css.gsub('url(', 'url(/images/mediaelement/')
+  css = css.gsub('url("', 'url("/images/mediaelement/')
   File.open("app/stylesheets/vendor/_mediaelementplayer.scss", 'w') {|f| f.write(rev_msg + css) }
 
   puts 'Copying Skin Files'

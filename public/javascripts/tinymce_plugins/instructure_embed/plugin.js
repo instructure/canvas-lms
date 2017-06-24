@@ -19,15 +19,13 @@
 // tinymce doesn't like its plugins being async,
 // all dependencies must export to window
 
-define([
-  'compiled/editor/stocktiny',
-  'i18n!editor',
-  'jquery',
-  'str/htmlEscape',
-  'jsx/shared/rce/RceCommandShim',
-  'jqueryui/dialog',
-  'jquery.instructure_misc_helpers'
-], function(tinymce, I18n, $, htmlEscape, RceCommandShim) {
+import tinymce from 'compiled/editor/stocktiny'
+import I18n from 'i18n!editor'
+import $ from 'jquery'
+import htmlEscape from '../../str/htmlEscape'
+import {send} from 'jsx/shared/rce/RceCommandShim'
+import 'jqueryui/dialog'
+import '../../jquery.instructure_misc_helpers'
 
   var $box, $editor, $userURL, $altText, $actions, $flickrLink;
 
@@ -79,7 +77,7 @@ define([
       var title = data.title,
           html = '<a href="' + htmlEscape(data.link_url) + '"><img src="' + htmlEscape(data.image_url) + '" title="' + htmlEscape(title) + '"alt="' + htmlEscape(title) + '" style="max-width: 500; max-height: 500"></a>';
       $box.dialog('close');
-      RceCommandShim.send($editor, 'insert_code', html);
+      send($editor, 'insert_code', html);
     });
   }
 
@@ -89,7 +87,7 @@ define([
 
     event.preventDefault();
     var html = "<img src='" + htmlEscape(text) + "' alt='" + htmlEscape(alt) + "'/>";
-    RceCommandShim.send($editor, 'insert_code', html);
+    send($editor, 'insert_code', html);
     $box.dialog('close');
   }
 
@@ -174,4 +172,3 @@ define([
   });
 
   tinymce.PluginManager.add('instructure_embed', tinymce.plugins.InstructureEmbed);
-});

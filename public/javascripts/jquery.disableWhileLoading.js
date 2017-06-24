@@ -32,13 +32,11 @@ $('#form').disableWhileLoading(promise, {
 });
 
 */
-define([
-  'i18n!instructure',
-  'compiled/util/objectCollection',
-  'jquery' /* $ */,
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'spin.js/jquery.spin' /* /\.spin/ */
-], function(I18n, objectCollection, $) {
+import I18n from 'i18n!instructure'
+import objectCollection from 'compiled/util/objectCollection'
+import $ from 'jquery'
+import './jquery.ajaxJSON'
+import 'spin.js/jquery.spin'
 
   $.fn.disableWhileLoading = function(deferred, options) {
     return this.each(function() {
@@ -109,4 +107,3 @@ define([
     opacity: 0.5,
     buttons: ['button[type="submit"], .ui-dialog-buttonpane .ui-button .ui-button-text']
   };
-});

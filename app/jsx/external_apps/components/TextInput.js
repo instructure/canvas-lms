@@ -19,6 +19,7 @@
 import I18n from 'i18n!external_tools'
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import InputMixin from 'jsx/external_apps/mixins/InputMixin'
 
 export default React.createClass({
@@ -27,13 +28,13 @@ export default React.createClass({
     mixins: [InputMixin],
 
     propTypes: {
-      defaultValue: React.PropTypes.string,
-      label:        React.PropTypes.string,
-      id:           React.PropTypes.string,
-      required:     React.PropTypes.bool,
-      hintText:     React.PropTypes.string,
-      placeholder:  React.PropTypes.string,
-      errors:       React.PropTypes.object
+      defaultValue: PropTypes.string,
+      label:        PropTypes.string,
+      id:           PropTypes.string,
+      required:     PropTypes.bool,
+      hintText:     PropTypes.string,
+      placeholder:  PropTypes.string,
+      errors:       PropTypes.object
     },
 
     render() {

@@ -19,13 +19,16 @@
 require_relative '../../helpers/gradezilla_common'
 require_relative '../page_objects/gradezilla_page'
 require_relative '../page_objects/grading_curve_page'
+require_relative '../setup/gradebook_setup'
 
 describe "Gradezilla editing grades" do
   include_context "in-process server selenium tests"
   include GradezillaCommon
+  include GradebookSetup
 
   before(:once) do
     gradebook_data_setup
+    show_sections_filter(@teacher)
   end
 
   before(:each) do
@@ -69,40 +72,6 @@ describe "Gradezilla editing grades" do
     get "/courses/#{@course.id}/quizzes/#{q.id}/history?quiz_submission_id=#{qs.id}"
     expect(f('.score_value')).to include_text points.to_s
     expect(f('#after_fudge_points_total')).to include_text points.to_s
-  end
-
-  it "treats ungraded as 0s when asked, and ignore when not", priority: "1", test_id: 164222 do
-    Gradezilla.visit(@course)
-
-    # make sure it shows like it is not treating ungraded as 0's by default
-    expect(is_checked('#include_ungraded_assignments')).to be_falsey
-    expect(final_score_for_row(0)).to eq @student_1_total_ignoring_ungraded
-    expect(final_score_for_row(1)).to eq @student_2_total_ignoring_ungraded
-
-    # set the "treat ungraded as 0's" option in the header
-
-    f('#gradebook_settings').click
-    f('label[for="include_ungraded_assignments"]').click
-
-    # now make sure that the grades show as if those ungraded assignments had a '0'
-    expect(is_checked('#include_ungraded_assignments')).to be_truthy
-    expect(final_score_for_row(0)).to eq @student_1_total_treating_ungraded_as_zeros
-    expect(final_score_for_row(1)).to eq @student_2_total_treating_ungraded_as_zeros
-
-    # reload the page and make sure it remembered the setting
-    Gradezilla.visit(@course)
-    expect(is_checked('#include_ungraded_assignments')).to be_truthy
-    expect(final_score_for_row(0)).to eq @student_1_total_treating_ungraded_as_zeros
-    expect(final_score_for_row(1)).to eq @student_2_total_treating_ungraded_as_zeros
-
-    # NOTE: gradebook1 does not handle 'remembering' the `include_ungraded_assignments` setting
-
-    # check that reverting back to unchecking 'include_ungraded_assignments' also reverts grades
-    f('#gradebook_settings').click
-    f('label[for="include_ungraded_assignments"]').click
-    expect(is_checked('#include_ungraded_assignments')).to be_falsey
-    expect(final_score_for_row(0)).to eq @student_1_total_ignoring_ungraded
-    expect(final_score_for_row(1)).to eq @student_2_total_ignoring_ungraded
   end
 
   it "validates initial grade totals are correct", priority: "1", test_id: 220311 do
@@ -174,11 +143,11 @@ describe "Gradezilla editing grades" do
   end
 
   it "displays dropped grades correctly after editing a grade", priority: "1", test_id: 220316 do
-    @course.assignment_groups.first.update_attribute :rules, 'drop_lowest:1'
+    @course.assignment_groups.first.update!(rules: 'drop_lowest:1')
     Gradezilla.visit(@course)
 
-    assignment_1_sel = '#gradebook_grid .container_1 .slick-row:nth-child(1) .l2'
-    assignment_2_sel = '#gradebook_grid .container_1 .slick-row:nth-child(1) .l3'
+    assignment_1_sel = '#gradebook_grid .container_1 .slick-row:nth-child(1) .l2 .gradebook-cell'
+    assignment_2_sel = '#gradebook_grid .container_1 .slick-row:nth-child(1) .l3 .gradebook-cell'
     a1 = f(assignment_1_sel)
     a2 = f(assignment_2_sel)
     expect(a1).to have_class 'dropped'

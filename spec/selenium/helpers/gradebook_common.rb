@@ -102,13 +102,6 @@ module GradebookCommon
     accept_alert
   end
 
-  def toggle_muting(assignment)
-    find_with_jquery(".gradebook-header-drop[data-assignment-id='#{assignment.id}']").click
-    find_with_jquery('[data-action="toggleMuting"]').click
-    find_with_jquery('.ui-dialog-buttonpane [data-action$="mute"]:visible').click
-    wait_for_ajaximations
-  end
-
   def open_assignment_options(cell_index)
     assignment_cell = ffj('#gradebook_grid .container_1 .slick-header-column')[cell_index]
     driver.action.move_to(assignment_cell).perform

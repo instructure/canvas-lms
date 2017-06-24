@@ -16,15 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'INST' /* INST */,
-  'i18n!submissions',
-  'jquery' /* $ */,
-  'str/htmlEscape',
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jqueryui/dialog',
-  'jqueryui/progressbar' /* /\.progressbar/ */
-], function(INST, I18n, $, htmlEscape) {
+import INST from './INST'
+import I18n from 'i18n!submissions'
+import $ from 'jquery'
+import htmlEscape from './str/htmlEscape'
+import './jquery.ajaxJSON'
+import 'jqueryui/dialog'
+import 'jqueryui/progressbar'
 
   INST.downloadSubmissions = function(url) {
     var cancelled = false;
@@ -80,4 +78,3 @@ define([
     }
     checkForChange();
   };
-});

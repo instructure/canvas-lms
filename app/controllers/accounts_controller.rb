@@ -1022,14 +1022,6 @@ class AccountsController < ApplicationController
   end
   protected :build_course_stats
 
-  def saml_meta_data
-    # This needs to be publicly available since external SAML
-    # servers need to be able to access it without being authenticated.
-    # It is used to disclose our SAML configuration settings.
-    settings = AccountAuthorizationConfig::SAML.saml_settings_for_account(@domain_root_account, request.host_with_port)
-    render :xml => Onelogin::Saml::MetaData.create(settings)
-  end
-
   # TODO Refactor add_account_user and remove_account_user actions into
   # AdminsController. see https://redmine.instructure.com/issues/6634
   def add_account_user

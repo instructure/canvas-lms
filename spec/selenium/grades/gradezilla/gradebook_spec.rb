@@ -64,22 +64,6 @@ describe "Gradezilla" do
     expect(dom_names).to eq @all_students.map(&:name)
   end
 
-  it "hides student avatars until they are enabled", priority: "1", test_id: 210023 do
-    Gradezilla.visit(@course)
-
-    expect(ff('.student-name')).to have_size @all_students.size
-    expect(f("body")).not_to contain_css('.avatar img')
-
-    @account = Account.default
-    @account.enable_service(:avatars)
-    @account.save!
-    expect(@account.service_enabled?(:avatars)).to be_truthy
-    Gradezilla.visit(@course)
-
-    expect(ff('.student-name')).to have_size @all_students.size
-    expect(ff('.avatar')).to have_size @all_students.size
-  end
-
   it "handles muting/unmuting correctly", priority: "1", test_id: 164227 do
     pending('TODO: Refactor this and add it back as part of CNVS-33679')
     Gradezilla.visit(@course)
@@ -112,15 +96,8 @@ describe "Gradezilla" do
     end
   end
 
-  it "validates that gradebook settings is displayed when button is clicked", priority: "1", test_id: 164217 do
-    Gradezilla.visit(@course)
-
-    f('#gradebook_settings').click
-    expect(f('.gradebook_dropdown')).to be_displayed
-  end
-
   it "View Grading History menu item redirects to grading history page", priority: "2", test_id: 164218 do
-    @course.root_account.enable_feature!(:gradezilla)
+    @course.root_account.enable_feature!(:new_gradebook)
     Gradezilla.visit(@course)
 
     f('.gradebook-menus [data-component="GradebookMenu"]').click
@@ -153,20 +130,7 @@ describe "Gradezilla" do
     expect(f('[aria-label="Gradebook Settings"]')).to be_displayed
 
     f('#gradebook-settings-cancel-button').click
-    expect(check_element_has_focus(f('#gradebook-settings-button'))).to be
-  end
-
-  it "validates assignment details", priority: "1", test_id: 210048 do
-    submissions_count = @second_assignment.submissions.count.to_s + ' submissions'
-
-    Gradezilla.visit(@course)
-
-    Gradezilla.open_assignment_options(1)
-    f('[data-menu-item-id="show-assignment-details"]').click
-    details_dialog = f('#assignment-details-dialog')
-    expect(details_dialog).to be_displayed
-    table_rows = ff('#assignment-details-dialog-stats-table tr')
-    expect(table_rows[3].find_element(:css, 'td')).to include_text submissions_count
+    expect { driver.switch_to.active_element }.to become(f('#gradebook-settings-button'))
   end
 
   it "includes student view student for grading" do
@@ -230,26 +194,6 @@ describe "Gradezilla" do
     Gradezilla.visit(@course)
 
     expect(f("body")).not_to contain_css(".total-cell .icon-muted")
-  end
-
-  it "hides and shows student names", priority: "2", test_id: 164220 do
-
-    def toggle_hiding_students
-      f('#gradebook_settings').click
-      student_toggle = f('.student_names_toggle')
-      expect(student_toggle).to be_displayed
-      student_toggle.click
-    end
-
-    Gradezilla.visit(@course)
-
-    toggle_hiding_students
-    expect(f("#content")).not_to contain_jqcss('.student-name:visible')
-    expect(fj('.student-placeholder:visible')).to be
-
-    toggle_hiding_students
-    expect(fj('.student-name:visible')).to be
-    expect(f("#content")).not_to contain_jqcss('.student-placeholder:visible')
   end
 
   context "downloading and uploading submissions" do

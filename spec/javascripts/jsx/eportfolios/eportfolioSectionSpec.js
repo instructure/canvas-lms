@@ -20,7 +20,7 @@ define([
   'jquery',
   'eportfolios/eportfolio_section',
   'helpers/fixtures'
-  ], ($, EportfolioSection, fixtures) => {
+], ($, {fetchContent}, fixtures) => {
   var $section = null
 
   QUnit.module("EportfolioSection -> fetchContent", {
@@ -44,13 +44,13 @@ define([
   });
 
   test('grabs section content for rich_text type', ()=>{
-    var content = EportfolioSection.fetchContent($section, 'rich_text', 'section1')
+    var content = fetchContent($section, 'rich_text', 'section1')
     equal(content['section1[section_type]'], 'rich_text')
     equal(content['section1[content]'].trim(), '<p>Some Editor Content</p>')
   })
 
   test("uses edit field value for html type", ()=>{
-    var content = EportfolioSection.fetchContent($section, 'html', 'section1')
+    var content = fetchContent($section, 'html', 'section1')
     equal(content['section1[section_type]'], 'html')
     equal(content['section1[content]'].trim(), 'Some HTML Content')
   })

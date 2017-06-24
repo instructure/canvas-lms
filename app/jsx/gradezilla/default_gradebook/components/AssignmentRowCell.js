@@ -17,6 +17,7 @@
  */
 
 import React from 'react';
+import PropTypes from 'prop-types'
 import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid';
 import Button from 'instructure-ui/lib/components/Button';
 import { MenuItem } from 'instructure-ui/lib/components/Menu';
@@ -24,7 +25,7 @@ import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu';
 import I18n from 'i18n!gradebook';
 import SubmissionCell from 'compiled/gradezilla/SubmissionCell';
 
-const { bool, func, shape } = React.PropTypes;
+const { bool, func, shape } = PropTypes;
 
 function renderSubmissionCell (options) {
   const assignment = options.column.object;

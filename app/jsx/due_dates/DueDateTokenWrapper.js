@@ -18,6 +18,7 @@
 
 import _ from 'underscore'
 import React from 'react'
+import PropTypes from 'prop-types'
 import ReactModal from 'react-modal'
 import OverrideStudentStore from 'jsx/due_dates/OverrideStudentStore'
 import Override from 'compiled/models/AssignmentOverride'
@@ -38,15 +39,15 @@ import DisabledTokenInput from 'jsx/due_dates/DisabledTokenInput'
   var DueDateTokenWrapper = React.createClass({
 
     propTypes: {
-      tokens: React.PropTypes.array.isRequired,
-      handleTokenAdd: React.PropTypes.func.isRequired,
-      handleTokenRemove: React.PropTypes.func.isRequired,
-      potentialOptions: React.PropTypes.array.isRequired,
-      rowKey: React.PropTypes.string.isRequired,
-      defaultSectionNamer: React.PropTypes.func.isRequired,
-      currentlySearching: React.PropTypes.bool.isRequired,
-      allStudentsFetched: React.PropTypes.bool.isRequired,
-      disabled: React.PropTypes.bool.isRequired
+      tokens: PropTypes.array.isRequired,
+      handleTokenAdd: PropTypes.func.isRequired,
+      handleTokenRemove: PropTypes.func.isRequired,
+      potentialOptions: PropTypes.array.isRequired,
+      rowKey: PropTypes.string.isRequired,
+      defaultSectionNamer: PropTypes.func.isRequired,
+      currentlySearching: PropTypes.bool.isRequired,
+      allStudentsFetched: PropTypes.bool.isRequired,
+      disabled: PropTypes.bool.isRequired
     },
 
     MINIMUM_SEARCH_LENGTH: DueDateWrapperConsts.MINIMUM_SEARCH_LENGTH,

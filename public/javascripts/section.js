@@ -16,24 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!section',
-  'jquery' /* $ */,
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_date_and_time' /* time_field, datetime_field */,
-  'jquery.instructure_forms' /* formSubmit, formErrors */,
-  'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* replaceTags */,
-  'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
-  'jquery.keycodes' /* keycodes */,
-  'jquery.loadingImg' /* loadingImage */,
-  'jquery.templateData' /* fillTemplateData */,
-  'jqueryui/autocomplete' /* /\.autocomplete/ */,
-  'compiled/PaginatedList',
-  'jst/courses/section/enrollment',
-  'compiled/presenters/sectionEnrollmentPresenter',
-  'jsx/context_cards/StudentContextCardTrigger'
-], function(I18n, $, _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, PaginatedList, enrollmentTemplate, sectionEnrollmentPresenter) {
+import I18n from 'i18n!section'
+import $ from 'jquery'
+import './jquery.ajaxJSON'
+import './jquery.instructure_date_and_time' /* time_field, datetime_field */
+import './jquery.instructure_forms' /* formSubmit, formErrors */
+import 'jqueryui/dialog'
+import './jquery.instructure_misc_helpers' /* replaceTags */
+import './jquery.instructure_misc_plugins' /* confirmDelete, showIf */
+import './jquery.keycodes'
+import './jquery.loadingImg'
+import './jquery.templateData'
+import 'jqueryui/autocomplete'
+import PaginatedList from 'compiled/PaginatedList'
+import enrollmentTemplate from 'jst/courses/section/enrollment'
+import sectionEnrollmentPresenter from 'compiled/presenters/sectionEnrollmentPresenter'
+import 'jsx/context_cards/StudentContextCardTrigger'
 
   $(document).ready(function() {
     var section_id = window.location.pathname.split('/')[4],
@@ -184,4 +182,3 @@ define([
       });
     });
   });
-});

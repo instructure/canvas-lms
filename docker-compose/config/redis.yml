@@ -1,3 +1,7 @@
+production:
+  servers:
+    - redis://redis
+
 development:
   servers:
     - redis://redis

@@ -16,111 +16,162 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define(['jquery', 'i18n!LongTextEditor', 'str/htmlEscape'], function($, I18n, htmlEscape) {
+import $ from 'jquery';
+import 'jqueryui/menu';
+import I18n from 'i18n!LongTextEditor';
+import htmlEscape from './str/htmlEscape';
+/*
+ * this is just LongTextEditor from slick.editors.js but with i18n and a
+ * stupid dontblur class to cooperate with our gradebook's onGridBlur handler
+ */
+function LongTextEditor (args) {
+  let $input;
+  let $wrapper;
+  let $saveButton;
+  let $cancelButton;
+  let defaultValue;
+  const scope = this;
 
-  /*
-   * this is just LongTextEditor from slick.editors.js but with i18n and a
-   * stupid dontblur class to cooperate with our gradebook's onGridBlur handler
-   */
-  function LongTextEditor(args) {
-    var $input, $wrapper;
-    var defaultValue;
-    var scope = this;
+  this.init = function () {
+    const $container = args.alt_container ? $(args.alt_container) : $('body');
 
-    this.init = function () {
-      var $container = $("body");
+    $wrapper = $('<div/>')
+      .addClass('dontblur')
+      .css({
+        'z-index': 10000,
+        position: 'absolute',
+        background: 'white',
+        padding: '5px',
+        border: '3px solid gray',
+        '-moz-border-radius': '10px',
+        'border-radius': '10px'
+      })
+      .appendTo($container);
+    $input = $('<textarea hidefocus rows="5"/>')
+      .attr('maxlength', htmlEscape(args.maxLength))
+      .css({
+        backround: 'white',
+        width: '250px',
+        height: '80px',
+        border: 0,
+        outline: 0
+      })
+      .appendTo($wrapper);
 
-      $wrapper = $("<DIV class=dontblur style='z-index:10000;position:absolute;background:white;padding:5px;border:3px solid gray; -moz-border-radius:10px; border-radius:10px;'/>")
-          .appendTo($container);
+    const buttonContainer = $('<div/>')
+      .css({
+        'text-align': 'right'
+      })
+      .appendTo($wrapper);
+    const saveText = I18n.t('save', 'Save');
+    const cancelText = I18n.t('cancel', 'Cancel');
+    $saveButton = $('<button/>').append(htmlEscape(saveText)).appendTo(buttonContainer);
+    $cancelButton = $('<button/>').append(htmlEscape(cancelText)).appendTo(buttonContainer);
 
-      $input = $("<TEXTAREA hidefocus maxlength="+htmlEscape(args.maxLength)+" rows=5 style='backround:white;width:250px;height:80px;border:0;outline:0'>")
-          .appendTo($wrapper);
+    $saveButton.click(this.save);
+    $cancelButton.click(this.cancel);
+    $wrapper.keydown(this.handleKeyDown);
 
-      var saveText = I18n.t("save", "Save");
-      var cancelText = I18n.t("cancel", "Cancel");
-      $("<DIV style='text-align:right'><BUTTON>"+htmlEscape(saveText)+"</BUTTON><BUTTON>"+htmlEscape(cancelText)+"</BUTTON></DIV>")
-          .appendTo($wrapper);
+    scope.position(args.position);
+    $input.focus().select();
+  };
 
-      $wrapper.find("button:first").bind("click", this.save);
-      $wrapper.find("button:last").bind("click", this.cancel);
-      $input.bind("keydown", this.handleKeyDown);
+  this.handleKeyDown = function (event) {
+    const keyCode = event.which;
+    const target = event.target;
 
-      scope.position(args.position);
-      $input.focus().select();
-    };
-
-    this.handleKeyDown = function (e) {
-      if (e.which == $.ui.keyCode.ENTER && e.ctrlKey) {
+    if (target === $input.get(0)) {
+      if (keyCode === $.ui.keyCode.ENTER && event.ctrlKey) {
+        event.preventDefault();
         scope.save();
-      } else if (e.which == $.ui.keyCode.ESCAPE) {
-        e.preventDefault();
+      } else if (keyCode === $.ui.keyCode.ESCAPE) {
+        event.preventDefault();
         scope.cancel();
-      } else if (e.which == $.ui.keyCode.TAB && e.shiftKey) {
-        e.preventDefault();
+      } else if (keyCode === $.ui.keyCode.TAB && event.shiftKey) {
+        event.preventDefault();
         args.grid.navigatePrev();
-      } else if (e.which == $.ui.keyCode.TAB) {
-        e.preventDefault();
+      } else if (keyCode === $.ui.keyCode.TAB && !event.shiftKey) {
+        // This explicit focus shifting allows JS specs to pass
+        event.preventDefault();
+        $saveButton.focus();
+      }
+    } else if (target === $saveButton.get(0)) {
+      if (keyCode === $.ui.keyCode.TAB && event.shiftKey) {
+        event.preventDefault();
+        $input.focus();
+      } else if (keyCode === $.ui.keyCode.TAB && !event.shiftKey) {
+        // This explicit focus shifting allows JS specs to pass
+        event.preventDefault();
+        $cancelButton.focus();
+      }
+    } else if (target === $cancelButton.get(0)) {
+      if (keyCode === $.ui.keyCode.TAB && event.shiftKey) {
+        event.preventDefault();
+        $saveButton.focus();
+      } else if (keyCode === $.ui.keyCode.TAB && !event.shiftKey) {
+        // This explicit focus shifting allows JS specs to pass
+        event.preventDefault();
         args.grid.navigateNext();
       }
+    }
+  };
+
+  this.save = function () {
+    args.commitChanges();
+  };
+
+  this.cancel = function () {
+    $input.val(defaultValue);
+    args.cancelChanges();
+  };
+
+  this.hide = function () {
+    $wrapper.hide();
+  };
+
+  this.show = function () {
+    $wrapper.show();
+  };
+
+  this.position = function (position) {
+    $wrapper
+        .css('top', position.top - 5)
+        .css('left', position.left - 5)
+  };
+
+  this.destroy = function () {
+    $wrapper.remove();
+  };
+
+  this.focus = function () {
+    $input.focus();
+  };
+
+  this.loadValue = function (item) {
+    $input.val(defaultValue = item[args.column.field]);
+    $input.select();
+  };
+
+  this.serializeValue = function () {
+    return $input.val();
+  };
+
+  this.applyValue = function (item, state) {
+    item[args.column.field] = state;
+  };
+
+  this.isValueChanged = function () {
+    return (!($input.val() === '' && defaultValue == null)) && ($input.val() !== defaultValue);
+  };
+
+  this.validate = function () {
+    return {
+      valid: true,
+      msg: null
     };
+  };
 
-    this.save = function () {
-      args.commitChanges();
-    };
+  this.init();
+}
 
-    this.cancel = function () {
-      $input.val(defaultValue);
-      args.cancelChanges();
-    };
-
-    this.hide = function () {
-      $wrapper.hide();
-    };
-
-    this.show = function () {
-      $wrapper.show();
-    };
-
-    this.position = function (position) {
-      $wrapper
-          .css("top", position.top - 5)
-          .css("left", position.left - 5)
-    };
-
-    this.destroy = function () {
-      $wrapper.remove();
-    };
-
-    this.focus = function () {
-      $input.focus();
-    };
-
-    this.loadValue = function (item) {
-      $input.val(defaultValue = item[args.column.field]);
-      $input.select();
-    };
-
-    this.serializeValue = function () {
-      return $input.val();
-    };
-
-    this.applyValue = function (item, state) {
-      item[args.column.field] = state;
-    };
-
-    this.isValueChanged = function () {
-      return (!($input.val() == "" && defaultValue == null)) && ($input.val() != defaultValue);
-    };
-
-    this.validate = function () {
-      return {
-        valid: true,
-        msg: null
-      };
-    };
-
-    this.init();
-  }
-
-  return LongTextEditor;
-});
+export default LongTextEditor;

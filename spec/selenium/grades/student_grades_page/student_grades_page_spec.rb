@@ -33,18 +33,28 @@ describe "gradebook - logged in as a student" do
 
   let(:student_grades_page) { StudentGradesPage.new }
 
-  it 'should display total grades as points', priority: "2", test_id: 164229 do
-    course_with_student_logged_in
-    @teacher = User.create!
-    @course.enroll_teacher(@teacher)
-    assignment = @course.assignments.build
-    assignment.publish
-    assignment.grade_student(@student, grade: 10, grader: @teacher)
-    @course.show_total_grade_as_points = true
-    @course.save!
+  describe 'total point displays' do
+    before(:each) do
+      course_with_student_logged_in
+      @teacher = User.create!
+      @course.enroll_teacher(@teacher)
+      assignment = @course.assignments.build(points_possible: 20)
+      assignment.publish
+      assignment.grade_student(@student, grade: 10, grader: @teacher)
+      assignment.assignment_group.update(group_weight: 1)
+      @course.show_total_grade_as_points = true
+      @course.save!
+    end
 
-    student_grades_page.visit_as_student(@course)
-    expect(student_grades_page.final_grade).to include_text("10")
+    it 'should display total grades as points', priority: "2", test_id: 164229 do
+      student_grades_page.visit_as_student(@course)
+      expect(student_grades_page.final_grade).to include_text("10")
+    end
+
+    it 'should display total "out of" point values' do
+      student_grades_page.visit_as_student(@course)
+      expect(student_grades_page.final_points_possible).to include_text("10.00 / 20.00")
+    end
   end
 
   context 'when testing grading periods' do
@@ -86,5 +96,3 @@ describe "gradebook - logged in as a student" do
     end
   end
 end
-
-

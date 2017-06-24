@@ -35,7 +35,8 @@ module Lti
     end
 
     def launch_definitions
-      if authorized_action(@context, @current_user, :read_as_admin)
+      permission = params['placements'] == ['global_navigation'] ? :read : :read_as_admin
+      if authorized_action(@context, @current_user, permission)
         placements = params['placements'] || []
         collection = AppLaunchCollator.bookmarked_collection(@context, placements)
         pagination_args = {max_per_page: 100}

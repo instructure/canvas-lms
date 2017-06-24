@@ -16,17 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!accounts' /* I18n.t */,
-  'jquery' /* $ */,
-  'compiled/util/addPrivacyLinkToDialog',
-  'underscore',
-  'user_sortable_name',
-  'jquery.instructure_forms' /* formSubmit */,
-  'jqueryui/dialog',
-  'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
-  'compiled/jquery.rails_flash_notifications'
-], function(I18n, $, addPrivacyLinkToDialog, _) {
+import I18n from 'i18n!accounts'
+import $ from 'jquery'
+import addPrivacyLinkToDialog from 'compiled/util/addPrivacyLinkToDialog'
+import _ from 'underscore'
+import 'user_sortable_name'
+import './jquery.instructure_forms' /* formSubmit */
+import 'jqueryui/dialog'
+import 'compiled/jquery/fixDialogButtons'
+import 'compiled/jquery.rails_flash_notifications'
 
   $(".add_user_link").click(function(event) {
     event.preventDefault();
@@ -101,5 +99,3 @@ define([
   $("#add_user_dialog .cancel_button").click(function() {
     $("#add_user_dialog").dialog('close');
   });
-});
-

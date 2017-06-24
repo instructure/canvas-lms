@@ -130,9 +130,11 @@ RSpec.describe GradingPeriodSetsController, type: :controller do
 
         it 'recomputes grades when an enrollment term is removed from the set' do
           term = root_account.enrollment_terms.create!
-          root_account.courses.create!(enrollment_term: term)
+          course = root_account.courses.create!(enrollment_term: term)
           grading_period_set.enrollment_terms << term
-          Enrollment.expects(:recompute_final_score).once
+          expect(GradeCalculator).to receive(:recompute_final_score) do |_, course_id, _|
+            course_id == course.id
+          end
           patch :update, {
             account_id: root_account.to_param,
             id: grading_period_set.to_param,

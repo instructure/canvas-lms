@@ -11,11 +11,9 @@
  *	jquery.ui.core.js
  *	jquery.ui.widget.js
  */
-define([
-	'jquery',
-	'jqueryui/core',
-	'jqueryui/widget'
-], function( $ ) {
+import $ from 'jquery'
+import 'jqueryui/core'
+import 'jqueryui/widget'
 
 // jQuery is referenced a couple times by its full name and not $ below
 var jQuery = $;
@@ -735,4 +733,4 @@ if ( $.uiBackCompat !== false ) {
 	}( jQuery, jQuery.ui.accordion.prototype ) );
 }
 
-});
+

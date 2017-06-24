@@ -937,7 +937,7 @@ describe "security" do
         expect(html.css('.section .discussions')).to be_empty
         expect(html.css('.section .files')).to be_empty
         expect(response.body).not_to match /Copy this Course/
-        expect(response.body).not_to match /Import Content into this Course/
+        expect(response.body).not_to match /Import Course Content/
         expect(response.body).not_to match /Export this Course/
 
         add_permission :read_course_content
@@ -986,7 +986,7 @@ describe "security" do
         expect(html.css('.section .discussions')).not_to be_empty
         expect(html.css('.section .files')).not_to be_empty
         expect(response.body).not_to match /Copy this Course/
-        expect(response.body).not_to match /Import Content into this Course/
+        expect(response.body).not_to match /Import Course Content/
         expect(response.body).to match /Export Course Content/
         expect(response.body).not_to match /Delete this Course/
         expect(response.body).not_to match /End this Course/
@@ -1004,7 +1004,7 @@ describe "security" do
         get "/courses/#{@course.id}/details"
         expect(response).to be_success
         expect(response.body).to match /Copy this Course/
-        expect(response.body).not_to match /Import Content into this Course/
+        expect(response.body).not_to match /Import Course Content/
         expect(response.body).to match /Export Course Content/
         expect(response.body).to_not match /Delete this Course/
 
@@ -1030,7 +1030,7 @@ describe "security" do
       it 'manage_content' do
         get "/courses/#{@course.id}/details"
         expect(response).to be_success
-        expect(response.body).not_to match /Import Content into this Course/
+        expect(response.body).not_to match /Import Course Content/
 
         get "/courses/#{@course.id}/content_migrations"
         assert_status(401)
@@ -1039,7 +1039,7 @@ describe "security" do
 
         get "/courses/#{@course.id}/details"
         expect(response).to be_success
-        expect(response.body).to match /Import Content into this Course/
+        expect(response.body).to match /Import Course Content/
 
         get "/courses/#{@course.id}/content_migrations"
         expect(response).to be_success

@@ -294,7 +294,7 @@ describe FilesController do
     it "should force download when download_frd is set" do
       user_session(@teacher)
       # this call should happen inside of FilesController#send_attachment
-      FilesController.any_instance.expects(:send_stored_file).with(@file, false, true)
+      FilesController.any_instance.expects(:send_stored_file).with(@file, false)
       get 'show', :course_id => @course.id, :id => @file.id, :download => 1, :verifier => @file.uuid, :download_frd => 1
     end
 
@@ -577,6 +577,55 @@ describe FilesController do
         get "show_relative", :file_id => "blah", :course_id => @course.id, :file_path => @file.full_display_path
         expect(response).to be_redirect
       end
+
+      it "renders inline for html files" do
+        s3_storage!
+        allow(HostUrl).to receive(:file_host).and_return('files.test')
+        request.host = 'files.test'
+        @file.update_attribute(:content_type, 'text/html')
+        s3object = double()
+        allow(s3object).to receive(:content_length).and_return(5)
+        allow(s3object).to receive(:get).and_return(s3object)
+        allow(s3object).to receive(:body).and_return(s3object)
+        allow(s3object).to receive(:read).and_return('hello')
+        @file.any_instantiation.stubs(:s3object).returns(s3object)
+        get "show_relative", file_id: @file.id, course_id: @course.id, file_path: @file.full_display_path, inline: 1, download: 1
+        expect(response).to be_success
+        expect(response.body).to eq 'hello'
+        expect(response.content_type).to eq 'text/html'
+      end
+
+      it "redirects for large html files" do
+        s3_storage!
+        allow(HostUrl).to receive(:file_host).and_return('files.test')
+        request.host = 'files.test'
+        @file.update_attribute(:content_type, 'text/html')
+        @file.update_attribute(:size, 1024 * 1024)
+        @file.any_instantiation.stubs(:inline_url).returns("https://s3/myfile")
+        get "show_relative", file_id: @file.id, course_id: @course.id, file_path: @file.full_display_path, inline: 1, download: 1
+        expect(response).to redirect_to("https://s3/myfile")
+      end
+
+      it "redirects for image files" do
+        s3_storage!
+        allow(HostUrl).to receive(:file_host).and_return('files.test')
+        request.host = 'files.test'
+        @file.update_attribute(:content_type, 'image/jpeg')
+        @file.any_instantiation.stubs(:inline_url).returns("https://s3/myfile")
+        get "show_relative", file_id: @file.id, course_id: @course.id, file_path: @file.full_display_path, inline: 1, download: 1
+        expect(response).to redirect_to("https://s3/myfile")
+      end
+
+      it "redirects for non-html files" do
+        s3_storage!
+        allow(HostUrl).to receive(:file_host).and_return('files.test')
+        request.host = 'files.test'
+        # it's a .doc file
+        @file.any_instantiation.stubs(:download_url).returns("https://s3/myfile")
+        get "show_relative", file_id: @file.id, course_id: @course.id, file_path: @file.full_display_path, inline: 1, download: 1
+        expect(response).to redirect_to("https://s3/myfile")
+      end
+
     end
 
     context "unauthenticated user" do

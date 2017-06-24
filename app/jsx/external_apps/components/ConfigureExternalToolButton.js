@@ -19,12 +19,13 @@
 import $ from 'jquery'
 import I18n from 'i18n!external_tools'
 import React from 'react'
+import PropTypes from 'prop-types'
 import Modal from 'react-modal'
 
   const modalOverrides = {
     overlay : {
       backgroundColor: 'rgba(0,0,0,0.5)'
-    },  
+    },
     content : {
       position: 'static',
       top: '0',
@@ -41,7 +42,7 @@ export default React.createClass({
     displayName: 'ConfigureExternalToolButton',
 
     propTypes: {
-      tool: React.PropTypes.object.isRequired
+      tool: PropTypes.object.isRequired
     },
 
     getInitialState() {

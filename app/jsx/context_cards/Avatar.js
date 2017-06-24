@@ -18,23 +18,24 @@
 
 import I18n from 'i18n!student_context_tray'
 import React from 'react'
+import PropTypes from 'prop-types'
 import InstUIAvatar from 'instructure-ui/lib/components/Avatar'
 import Typography from 'instructure-ui/lib/components/Typography'
 import Link from 'instructure-ui/lib/components/Link'
 
 class Avatar extends React.Component {
   static propTypes = {
-    user: React.PropTypes.shape({
-      name: React.PropTypes.string,
-      avatar_url: React.PropTypes.string,
-      short_name: React.PropTypes.string,
-      id: React.PropTypes.string
+    user: PropTypes.shape({
+      name: PropTypes.string,
+      avatar_url: PropTypes.string,
+      short_name: PropTypes.string,
+      id: PropTypes.string
     }).isRequired,
-    courseId: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.number
+    courseId: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number
     ]).isRequired,
-    canMasquerade: React.PropTypes.bool.isRequired,
+    canMasquerade: PropTypes.bool.isRequired,
   }
 
   render () {
@@ -47,8 +48,8 @@ class Avatar extends React.Component {
           <Link href={`/courses/${this.props.courseId}/users/${user.id}`} aria-label={I18n.t('Go to %{name}\'s profile', {name})}>
             <InstUIAvatar
               size="x-large"
-              userName={user.name}
-              userImgUrl={user.avatar_url}
+              name={user.name}
+              src={user.avatar_url}
             />
           </Link>
           {

@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!roster'
 import React from 'react'
+import PropTypes from 'prop-types'
 import shapes from './shapes'
 import Table from 'instructure-ui/lib/components/Table'
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
@@ -36,10 +37,10 @@ import Link from 'instructure-ui/lib/components/Link'
 
   class MissingPeopleSection extends React.Component {
     static propTypes = {
-      missing: React.PropTypes.shape(shapes.missingsShape).isRequired,
-      searchType: React.PropTypes.string.isRequired,
-      inviteUsersURL: React.PropTypes.string,
-      onChange: React.PropTypes.func.isRequired
+      missing: PropTypes.shape(shapes.missingsShape).isRequired,
+      searchType: PropTypes.string.isRequired,
+      inviteUsersURL: PropTypes.string,
+      onChange: PropTypes.func.isRequired
     };
     static defaultProps = {
       inviteUsersURL: undefined

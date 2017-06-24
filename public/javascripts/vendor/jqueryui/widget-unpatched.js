@@ -7,7 +7,7 @@
  *
  * http://docs.jquery.com/UI/Widget
  */
-define(['jquery'], function( $ ) {
+import $ from 'jquery'
 
 var uuid = 0,
 	slice = Array.prototype.slice,
@@ -471,7 +471,9 @@ $.each( { show: "fadeIn", hide: "fadeOut" }, function( method, defaultEffect ) {
 			options = { duration: options };
 		}
 		hasOptions = !$.isEmptyObject( options );
-		options.complete = callback;
+		if ( typeof options === 'object' ) {
+      options.complete = callback;
+    }
 		if ( options.delay ) {
 			element.delay( options.delay );
 		}
@@ -498,4 +500,4 @@ if ( $.uiBackCompat !== false ) {
 	};
 }
 
-});
+

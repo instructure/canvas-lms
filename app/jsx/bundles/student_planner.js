@@ -20,10 +20,17 @@ import Planner from 'canvas-planner';
 const element = document.getElementById('dashboard-planner');
 const headerElement = document.getElementById('dashboard-planner-header');
 
+const courses = window.ENV.DASHBOARD_COURSES.map(dc => ({
+  ...dc,
+  color: window.ENV.PREFERENCES.custom_colors[dc.assetString]
+}));
+
+
 const options = {
   locale: window.ENV.LOCALE,
   timeZone: window.ENV.TIMEZONE,
-  theme: (ENV.use_high_contrast) ? 'canvas-a11y' : 'canvas'
+  theme: (ENV.use_high_contrast) ? 'canvas-a11y' : 'canvas',
+  courses
 };
 
 if (element) {

@@ -17,10 +17,11 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!external_tools'
 import numberHelper from 'jsx/shared/helpers/numberHelper'
 
-  const { bool, func, number } = React.PropTypes;
+  const { bool, func, number } = PropTypes;
 
   var DataRow = React.createClass({
     propTypes: {

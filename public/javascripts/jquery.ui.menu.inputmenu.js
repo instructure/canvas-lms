@@ -24,10 +24,8 @@
  *
  * http://github.com/kborchers/jquery-ui-extensions
  */
-define([
-  'jquery',
-  'jqueryui/menu'
-], function( $ ) {
+import $ from 'jquery'
+import 'jqueryui/menu'
 
 var proto = $.ui.menu.prototype,
 	originalRefresh = proto.refresh;
@@ -198,6 +196,4 @@ $.extend( proto, {
 		if( !ui.item.children( "a" ).children().is( "input[type='checkbox'], input[type='radio']" ) ) this.collapseAll();
 		this._trigger( "select", event, ui );
 	}
-});
-
 });

@@ -28,7 +28,7 @@ module Api::V1::AccountReport
 
   def account_report_json(report, user, session)
     json = api_json(report, user, session,
-                    :only => %w(id progress parameters)
+                    :only => %w(id progress parameters current_line)
     )
     json[:status] = report.workflow_state
     json[:report] = report.report_type

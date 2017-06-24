@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-addons-test-utils'
 import { mount } from 'enzyme'
@@ -73,9 +74,9 @@ const FakeDashboard = function (props) {
 }
 
 FakeDashboard.propTypes = {
-  menuRef: React.PropTypes.func.isRequired,
-  recent_activity_dashboard: React.PropTypes.bool,
-  planner_enabled: React.PropTypes.bool
+  menuRef: PropTypes.func.isRequired,
+  recent_activity_dashboard: PropTypes.bool,
+  planner_enabled: PropTypes.bool
 }
 
 FakeDashboard.defaultProps = {

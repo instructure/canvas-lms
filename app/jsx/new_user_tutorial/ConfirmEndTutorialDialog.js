@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!new_user_tutorial'
 import Button from 'instructure-ui/lib/components/Button'
 import Heading from 'instructure-ui/lib/components/Heading'
@@ -26,8 +27,8 @@ import axios from 'axios'
   class ConfirmEndTutorialDialog extends React.Component {
 
     static propTypes = {
-      isOpen: React.PropTypes.bool,
-      handleRequestClose: React.PropTypes.func.isRequired
+      isOpen: PropTypes.bool,
+      handleRequestClose: PropTypes.func.isRequired
     }
 
     static defaultProps = {

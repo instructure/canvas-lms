@@ -17,15 +17,16 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!appointment_groups'
 import Button from 'instructure-ui/lib/components/Button'
 import Grid, { GridCol, GridRow } from 'instructure-ui/lib/components/Grid'
 
   class ContextSelector extends React.Component {
     static propTypes = {
-      appointmentGroup: React.PropTypes.object,
-      contexts: React.PropTypes.array,
-      className: React.PropTypes.string
+      appointmentGroup: PropTypes.object,
+      contexts: PropTypes.array,
+      className: PropTypes.string
     }
 
     constructor () {
@@ -198,7 +199,7 @@ import Grid, { GridCol, GridRow } from 'instructure-ui/lib/components/Grid'
       return (
         <div id={`${context.asset_string}_sections`} className={this.state.expandedContexts.has(context) ? '' : 'hiddenSection'}>
           {
-            context.sections.map(section => {
+            (context.sections || []).map(section => {
               return (
                 <div className="sectionItem" key={section.asset_string}>
                   <input

@@ -141,6 +141,9 @@
       <% elsif @last_batch.workflow_state == 'failed_with_messages' %>
         <%= t(:import_failed_with_messages_message, "No SIS records were imported. The import failed with these messages:") %>
         <%= print_messages(@last_batch) %>
+      <% elsif @last_batch.workflow_state == 'aborted' %>
+        <%= t('The previous SIS batch was aborted') %>
+        <%= print_messages(@last_batch) %>
       <% end %>
       </p>
     </div>

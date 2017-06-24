@@ -18,7 +18,6 @@
 class ChangeLtiResouceHandlerLookupIdNotNull < ActiveRecord::Migration[4.2]
   tag :postdeploy
   def change
-    DataFixup::AddLookupToResourceHandlers.run
     change_column_null :lti_resource_handlers, :lookup_id, false
   end
 end

@@ -19,6 +19,7 @@
 import _ from 'underscore'
 import I18n from 'i18n!external_tools'
 import React from 'react'
+import PropTypes from 'prop-types'
 import EditExternalToolButton from 'jsx/external_apps/components/EditExternalToolButton'
 import ManageUpdateExternalToolButton from 'jsx/external_apps/components/ManageUpdateExternalToolButton'
 import ExternalToolPlacementButton from 'jsx/external_apps/components/ExternalToolPlacementButton'
@@ -32,8 +33,8 @@ export default React.createClass({
     displayName: 'ExternalToolsTableRow',
 
     propTypes: {
-      tool: React.PropTypes.object.isRequired,
-      canAddEdit: React.PropTypes.bool.isRequired
+      tool: PropTypes.object.isRequired,
+      canAddEdit: PropTypes.bool.isRequired
     },
 
     renderButtons() {
@@ -105,13 +106,13 @@ export default React.createClass({
         if (this.props.tool.restricted_by_master_course) {
           return (
             <span className="master-course-cell">
-              <i className="icon-lock"></i>
+              <i className="icon-blueprint-lock"></i>
             </span>
           );
         } else {
           return (
             <span className="master-course-cell">
-              <i className="icon-unlock icon-Line"></i>
+              <i className="icon-blueprint"></i>
             </span>
           );
         }

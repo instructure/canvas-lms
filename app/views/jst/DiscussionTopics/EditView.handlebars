@@ -48,7 +48,6 @@
         <div id="discussion-description" class="discussion-description">
           {{convertApiUserContent message}}
         </div>
-        <input type="hidden" name="message" value="{{convertApiUserContent message forEditing=1}}"/>
       {{else}}
         <div style="float: right;">
           <a href="#" class="rte_switch_views_link">
@@ -203,6 +202,38 @@
             {{#t "sort_by_likes"}}Sort by likes{{/t}}
           </label>
         </div>
+
+        {{#if ENV.STUDENT_PLANNER_ENABLED}}
+          {{#if isTopic}}
+            <div id="todo_options" style="{{hiddenIf set_assignment}}">
+              <label class="checkbox" for="allow_todo_date">
+                {{checkbox "allow_todo_date"
+                  id="allow_todo_date"
+                  class="element_toggler"
+                  aria-controls="todo_date_input"}}
+                {{#t}}Add to student to-do{{/t}}
+              </label>
+              <div id="todo_date_input" style="{{hiddenUnless allow_todo_date}}; margin-left: 20px;">
+                <label for="todo_date">
+                  {{#t}}Date{{/t}}
+                </label>
+                <label class="screenreader-only" id="discussion_topic_todo_date_accessible_label">
+                  {{#t}}Discussion Topic will show on student to-do list for date{{/t}}
+                  {{datepickerScreenreaderPrompt}}
+                </label>
+                <input type="text"
+                       class="datetime_field input-medium"
+                       name="todo_date"
+                       id="todo_date"
+                       aria-labelledby="discussion_topic_todo_date_accessible_label"
+                       value="{{datetimeFormatted todo_date}}"
+                       data-tooltip='{"position":"top","force_position":"true"}'
+                       title="{{accessibleDateFormat}}"
+                />
+              </div>
+            </div>
+          {{/if}}
+        {{/if}}
       </div>
     </div>
     {{/ifAny}}

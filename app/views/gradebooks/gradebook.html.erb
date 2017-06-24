@@ -17,7 +17,7 @@
 %>
 
 <%
-  content_for :page_title, "Gradebook - #{@context.name}"
+  content_for :page_title, t('Gradebook - %{context_name}', context_name: @context.name)
   @body_classes << "gradebook full-width"
   @show_left_side = true
   @collapse_course_menu = true

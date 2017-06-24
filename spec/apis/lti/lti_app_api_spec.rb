@@ -41,7 +41,7 @@ module Lti
         json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
                  {controller: 'lti/lti_apps', action: 'launch_definitions', format: 'json',
                   placements: %w(resource_selection), course_id: @course.id.to_s})
-        expect(json.detect {|j| j['definition_type'] == resource_tool.class.name && j['definition_id'] == resource_tool.id}).to_not be_nil
+        expect(json.detect {|j| j['definition_type'] == resource_tool.class.name && j['definition_id'] == resource_tool.id}).not_to be_nil
         expect(json.detect {|j| j['definition_type'] == @external_tool.class.name && j['definition_id'] == @external_tool.id}).to be_nil
       end
 
@@ -51,7 +51,35 @@ module Lti
         json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
           {controller: 'lti/lti_apps', action: 'launch_definitions', format: 'json', course_id: @course.id.to_s})
         expect(json.count).to eq 1
-        expect(json.detect {|j| j['definition_type'] == @external_tool.class.name && j['definition_id'] == @external_tool.id}).to_not be_nil
+        expect(json.detect {|j| j['definition_type'] == @external_tool.class.name && j['definition_id'] == @external_tool.id}).not_to be_nil
+      end
+
+      it 'returns unauthorized for a student' do
+        course_with_student(active_all: true, user: user_with_pseudonym, account: account)
+
+        api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
+          {controller: 'lti/lti_apps', action: 'launch_definitions', format: 'json', course_id: @course.id.to_s})
+
+        expect(response.status).to eq 401
+      end
+
+      it 'returns global_navigation launches for a student' do
+        course_with_student(active_all: true, user: user_with_pseudonym, account: account)
+
+        tool = new_valid_external_tool(@course.root_account)
+        tool.global_navigation = {
+          :text => "Global Nav"
+        }
+        tool.save!
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
+          {controller: 'lti/lti_apps', action: 'launch_definitions', format: 'json', course_id: @course.id.to_s},
+          placements: ['global_navigation'])
+
+        expect(response.status).to eq 200
+        expect(json.count).to eq 1
+        expect(json.first['definition_id']).to eq tool.id
+        # expect(json.detect {|j| j.key?('name') && j.key?('domain')}).not_to be_nil
       end
 
       it 'paginates the launch definitions' do

@@ -19,23 +19,20 @@
 import I18n from 'i18n!blueprint_settings'
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
+import 'compiled/jquery.rails_flash_notifications'
+
 import Typography from 'instructure-ui/lib/components/Typography'
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
 import Table from 'instructure-ui/lib/components/Table'
 import Button from 'instructure-ui/lib/components/Button'
 import Spinner from 'instructure-ui/lib/components/Spinner'
 import RemoveIcon from 'instructure-icons/lib/Solid/IconXSolid'
-import 'compiled/jquery.rails_flash_notifications'
 
 import propTypes from '../propTypes'
+import FocusManager from '../focusManager'
 
-const { func, arrayOf, string, bool } = React.PropTypes
-
-function shortId () {
-  const prefix = String.fromCharCode(97 + Math.floor(Math.random() * 26))
-  const id = Math.random().toString(36).substring(2, 10)
-  return prefix + id
-}
+const { func, arrayOf, string, bool, instanceOf } = PropTypes
 
 export default class AssociationsTable extends React.Component {
   static propTypes = {
@@ -44,13 +41,22 @@ export default class AssociationsTable extends React.Component {
     removedAssociations: arrayOf(string).isRequired,
     onRemoveAssociations: func.isRequired,
     isLoadingAssociations: bool.isRequired,
+    focusManager: instanceOf(FocusManager).isRequired,
+  }
+
+  static defaultProps = {
+    handleFocusLoss: () => {},
   }
 
   constructor (props) {
     super(props)
     this.state = {
-      visibleExisting: this.props.existingAssociations,
+      visibleExisting: props.existingAssociations,
     }
+  }
+
+  componentDidMount () {
+    this.fixIcons()
   }
 
   componentWillReceiveProps (nextProps) {
@@ -67,21 +73,35 @@ export default class AssociationsTable extends React.Component {
     }
   }
 
+  componentDidUpdate () {
+    this.fixIcons()
+  }
+
   onRemove = (e) => {
     e.preventDefault()
 
     const form = e.currentTarget
     const courseId = form.getAttribute('data-course-id')
     const courseName = form.getAttribute('data-course-name')
-    const focusToId = form.getAttribute('data-focus-target')
+    const focusIndex = form.getAttribute('data-focus-index')
+
+    setTimeout(() => this.props.focusManager.movePrev(focusIndex), 400)
 
     $.screenReaderFlashMessage(I18n.t('Removed course association %{course}', { course: courseName }))
     this.props.onRemoveAssociations([courseId])
-
-    const focusTo = this.wrapper.querySelector(`#${focusToId}`)
-    focusTo.focus()
   }
 
+  // in IE, instui icons are in the tab order and get focus, even if hidden
+  // this fixes them up so that doesn't happen.
+  // Eventually this should get folded into instui via INSTUI-572
+  fixIcons () {
+    if (this.wrapper) {
+      Array.prototype.forEach.call(
+        this.wrapper.querySelectorAll('svg[aria-hidden]'),
+        (el) => { el.setAttribute('focusable', 'false') }
+      )
+    }
+  }
   renderColGroup () {
     return (
       <colgroup>
@@ -114,13 +134,11 @@ export default class AssociationsTable extends React.Component {
     return <Typography color="secondary" size="small">{text}</Typography>
   }
 
-  renderRows (associations, headerFocus) {
-    // generate Ids first because we need to be able to point forward
-    const focusIds = associations.map(() => shortId())
-    return associations.map((course, courseIndex) => {
-      // try next item first, if not then previous, if not then the section header
-      const focusTo = focusIds[courseIndex + 1] || focusIds[courseIndex - 1] || headerFocus
-              // {/* onClick={this.onRemove} */}
+  renderRows (associations) {
+    return associations.map((course) => {
+      const focusNode = this.props.focusManager.allocateNext()
+      const label = I18n.t('Remove course association %{name}', { name: course.name })
+
       return (
         <tr key={course.id} className="bca-associations__course-row">
           <td>{this.renderCellText(course.name)}</td>
@@ -135,16 +153,17 @@ export default class AssociationsTable extends React.Component {
               onSubmit={this.onRemove}
               data-course-id={course.id}
               data-course-name={course.name}
-              data-focus-target={focusTo}
+              data-focus-index={focusNode.index}
             >
               <Button
                 type="submit"
                 size="small"
                 variant="icon"
-                id={focusIds[courseIndex]}
+                ref={focusNode.ref}
+                aria-label={label}
               >
                 <RemoveIcon />
-                <ScreenReaderContent>{I18n.t('Remove course association %{name}', { name: course.name })}</ScreenReaderContent>
+                <ScreenReaderContent>{label}</ScreenReaderContent>
               </Button>
             </form>
           </td>
@@ -155,12 +174,11 @@ export default class AssociationsTable extends React.Component {
 
   renderExistingAssociations () {
     if (this.state.visibleExisting.length) {
-      const id = shortId()
       return [(
-        <tr id={id} key="existing-heading">
+        <tr key="existing-heading">
           <th scsope="rowgroup" colSpan={6}><Typography weight="bold" size="small">{I18n.t('Current')}</Typography></th>
         </tr>
-      )].concat(this.renderRows(this.state.visibleExisting, id))
+      )].concat(this.renderRows(this.state.visibleExisting))
     }
 
     return null
@@ -168,12 +186,11 @@ export default class AssociationsTable extends React.Component {
 
   renderAddedAssociations () {
     if (this.props.addedAssociations.length) {
-      const id = shortId()
       return [(
-        <tr id={id} key="added-heading">
+        <tr key="added-heading">
           <th scsope="rowgroup" colSpan={6}><Typography weight="bold" size="small">{I18n.t('To be Added')}</Typography></th>
         </tr>
-      )].concat(this.renderRows(this.props.addedAssociations, id))
+      )].concat(this.renderRows(this.props.addedAssociations))
     }
 
     return null
@@ -213,6 +230,7 @@ export default class AssociationsTable extends React.Component {
 
   render () {
     const { addedAssociations } = this.props
+    this.props.focusManager.reset()
     return (
       <div
         className="bca-associations-table"

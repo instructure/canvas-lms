@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import Modal from 'react-modal'
 import GettingStartedCollaborations from 'jsx/collaborations/GettingStartedCollaborations'
 import CollaborationsNavigation from 'jsx/collaborations/CollaborationsNavigation'
@@ -30,8 +31,8 @@ import { dispatch } from './store/store'
     }
 
     static propTypes = {
-      applicationState: React.PropTypes.object,
-      actions: React.PropTypes.object
+      applicationState: PropTypes.object,
+      actions: PropTypes.object
     }
 
     componentWillReceiveProps (nextProps) {

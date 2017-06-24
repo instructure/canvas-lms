@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'aws-sdk'
+require 'aws-sdk-kinesis'
 
 module Canvas::Plugins::Validators::LiveEventsValidator
   def self.validate(settings, plugin_setting)

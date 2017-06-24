@@ -16,14 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!editor',
-  'jquery',
-  'str/htmlEscape',
-  'jquery.dropdownList',
-  'jquery.instructure_misc_helpers',
-  'underscore'
-], function (I18n, $, htmlEscape) {
+import I18n from 'i18n!editor'
+import $ from 'jquery'
+import htmlEscape from '../../str/htmlEscape'
+import '../../jquery.dropdownList'
+import '../../jquery.instructure_misc_helpers'
+
   /**
    * A module for holding helper functions pulled out of the instructure_external_tools/plugin.
    *
@@ -35,7 +33,7 @@ define([
    * @exports
    */
 
-  return {
+export default {
 
     /**
      * build the TinyMCE configuration hash for each
@@ -128,4 +126,3 @@ define([
       });
     }
   };
-});

@@ -93,6 +93,15 @@ describe ContentMigration do
       expect(@copy_to.syllabus_body).to match /#{@copy_from.syllabus_body}/
     end
 
+    it "should not migrate a blank syllabus" do
+      body = "woo"
+      @copy_to.update_attribute(:syllabus_body, body)
+
+      run_course_copy
+
+      expect(@copy_to.syllabus_body).to eq body
+    end
+
     it "should not migrate syllabus when not selected" do
       course_model
       @copy_from.syllabus_body = "<p>wassup</p>"

@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import _ from 'underscore'
 import I18n from 'i18n!account_course_user_search'
 import Modal from 'jsx/shared/modal'
@@ -30,7 +31,7 @@ import IcInput from './IcInput'
 import IcSelect from './IcSelect'
 import 'compiled/jquery.rails_flash_notifications'
 
-  const { arrayOf, string } = React.PropTypes
+  const { arrayOf, string } = PropTypes
 
   const modalOverrides = {
     overlay : {

@@ -17,13 +17,11 @@
  */
 
 // xsslint jqueryObject.identifier tree
-define([
-  'jquery' /* $ */,
-  'underscore',
-  'str/htmlEscape',
-  'jqueryui/draggable' /* /\.draggable/ */,
-  'jqueryui/droppable' /* /\.droppable/ */
-], function($, _, htmlEscape) {
+import $ from 'jquery'
+import _ from 'underscore'
+import htmlEscape from './str/htmlEscape'
+import 'jqueryui/draggable'
+import 'jqueryui/droppable'
   $.fn.instTree = function(options) {
     return $(this).each(function() {
       var binded = false;
@@ -586,4 +584,3 @@ define([
       }//if ($(this).is('ul'))
     });
   };
-});

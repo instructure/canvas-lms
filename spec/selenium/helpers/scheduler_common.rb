@@ -74,19 +74,21 @@ module SchedulerCommon
     @course1.enroll_teacher(@teacher1).accept!
     @course1.enroll_student(@student2).accept!
     @course2.enroll_student(@student2).accept!
+    @course2.enroll_student(@student1).accept!
     @course3.enroll_student(@student3).accept!
     @course3.enroll_student(@student1).accept!
   end
 
   def create_appointment_groups_for_courses
+    time = Time.zone.now
     @app1 = AppointmentGroup.create!(title: "Appointment 1", contexts: [@course1],
-                                     new_appointments: [[Time.zone.now, Time.zone.now + 30.minutes],
-                                                        [Time.zone.now + 30.minutes, Time.zone.now + 1.hour]],
-                                     participants_per_appointment: 1)
+                                     participant_visibility: 'protected',
+                                     new_appointments: [[time, time+30.minutes],
+                                                        [time + 30.minutes, time + 1.hour]],
+                                     participants_per_appointment: 1, max_appointments_per_participant: 1)
     @app1.publish!
-    @app2 = AppointmentGroup.create!(appointment_params(title: "Appointment 2", contexts: [@course2]))
-    @app2.publish!
-    @app3 = AppointmentGroup.create!(appointment_params(title: "Appointment 3", contexts: [@course1, @course3]))
+    @app3 = AppointmentGroup.create!(title: "Appointment 3", contexts: [@course1, @course2],
+                                                        new_appointments: [[time+1.hour, time+1.hour + 30.minutes]])
     @app3.publish!
   end
 
@@ -110,6 +112,10 @@ module SchedulerCommon
       save.click
     end
     wait_for_ajaximations
+  end
+
+  def reserve_appointment_for(participant, user, appointment_group)
+    appointment_group.appointments.first.reserve_for(participant, user)
   end
 
   def create_appointment_group_manual(opts = {})

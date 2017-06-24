@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import customPropTypes from 'compiled/react_files/modules/customPropTypes'
 import I18n from 'i18n!react_files'
@@ -25,8 +26,8 @@ import RootFoldersFinder from 'compiled/views/RootFoldersFinder'
   var BBTreeBrowser = React.createClass({
     displayName: "BBTreeBrowser",
     propTypes: {
-      rootFoldersToShow: React.PropTypes.arrayOf(customPropTypes.folder).isRequired,
-      onSelectFolder: React.PropTypes.func.isRequired
+      rootFoldersToShow: PropTypes.arrayOf(customPropTypes.folder).isRequired,
+      onSelectFolder: PropTypes.func.isRequired
     },
     componentDidMount(){
       var rootFoldersFinder = new RootFoldersFinder({

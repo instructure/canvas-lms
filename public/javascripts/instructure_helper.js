@@ -17,12 +17,10 @@
  */
 
 //create a global object "INST" that we will have be Instructure's namespace.
-define([
-  'INST' /* INST */,
-  'i18n!instructure',
-  'jquery' /* $ */,
-  'jqueryui/dialog'
-], function(INST, I18n, $) {
+import INST from './INST'
+import I18n from 'i18n!instructure'
+import $ from 'jquery'
+import 'jqueryui/dialog'
 
   function getTld(hostname){
     hostname = (hostname || "").split(":")[0];
@@ -71,5 +69,3 @@ define([
   window.jsonFlickrApi = function(data) {
     $("#instructure_image_search").triggerHandler('search_results', data);
   };
-
-});

@@ -32,11 +32,9 @@
  *     http://www.gnu.org/licenses/lgpl.html
  * Project Website: http://mathquill.com
  */
-define([
-  'i18n!mathquill',
-  'jquery', /* jQuery, $ */
-  'str/htmlEscape'
-], function(I18n, $, htmlEscape) {
+import I18n from 'i18n!mathquill'
+import $ from 'jquery'
+import htmlEscape from './str/htmlEscape'
 
   var undefined,
     _, //temp variable of prototypes
@@ -2880,6 +2878,3 @@ define([
     $('.mathquill-textbox:not(.mathquill-rendered-math)').mathquill('textbox');
     $('.mathquill-embedded-latex').mathquill();
   });
-
-
-});

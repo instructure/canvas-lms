@@ -17,12 +17,13 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
 import _ from 'underscore'
 import NewUserModal from './NewUserModal'
 import IcInput from './IcInput'
 
-  const { string, bool, func, object } = React.PropTypes
+  const { string, bool, func, object } = PropTypes
 
   var UsersToolbar = React.createClass({
     propTypes: {
@@ -70,7 +71,7 @@ import IcInput from './IcInput'
                 <div className="users-list-toolbar-form">
                   <IcInput
                     value={this.props.search_term}
-                    placeholder={I18n.t("Search users...")}
+                    placeholder={I18n.t("Search people...")}
                     onChange={(e) => onUpdateFilters({search_term: e.target.value})}
                     error={errors.search_term}
                   />

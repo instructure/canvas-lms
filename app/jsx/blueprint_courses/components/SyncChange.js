@@ -1,14 +1,31 @@
+/*
+ * Copyright (C) 2017 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import I18n from 'i18n!blueprint_settings'
 import React, { Component } from 'react'
 import cx from 'classnames'
 
-import dig from 'jsx/shared/dig'
+import get from 'lodash/get'
 import Grid, { GridRow, GridCol } from 'instructure-ui/lib/components/Grid'
 import Typography from 'instructure-ui/lib/components/Typography'
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
 import ToggleDetails from 'instructure-ui/lib/components/ToggleDetails'
-import IconLockSolid from 'instructure-icons/lib/Solid/IconLockSolid'
-import IconUnlockSolid from 'instructure-icons/lib/Solid/IconUnlockSolid'
+import { IconLock, IconUnlock } from './BlueprintLocks'
 
 import propTypes from '../propTypes'
 
@@ -40,7 +57,7 @@ class SyncChange extends Component {
         <ul className="bcs__history-item__change-exceps__courses">
           {items.map(item => (
             <li key={item.course_id}>
-              {dig(item, 'term.name') || ''} - {item.name}{this.renderSpace()}{item.sis_course_id}{this.renderSpace()}{item.course_code}
+              {get(item, 'term.name') || ''} - {item.name}{this.renderSpace()}{item.sis_course_id}{this.renderSpace()}{item.course_code}
             </li>
           ))}
         </ul>
@@ -79,12 +96,12 @@ class SyncChange extends Component {
           {hasExceptions &&
             <ToggleDetails
               summary={<ScreenReaderContent>{I18n.t('Show exceptions')}</ScreenReaderContent>}
-              isExpanded={this.state.isExpanded}
+              expanded={this.state.isExpanded}
             >
               {this.renderExceptions()}
             </ToggleDetails>}
           <div className="bcs__history-item__lock-icon">
-            <Typography size="large" color="secondary">{locked ? <IconLockSolid /> : <IconUnlockSolid />}</Typography>
+            <Typography size="large" color="secondary">{locked ? <IconLock /> : <IconUnlock />}</Typography>
           </div>
           <div className="bcs__history-item__content-grid">
             <Grid colSpacing="none">

@@ -68,7 +68,16 @@ function cellMapForSubmission (assignment, student, hasGradingPeriods, selectedG
   }
 }
 
-class SubmissionState {
+function missingSubmission (student, assignment) {
+  const submission = { assignment_id: assignment.id, user_id: student.id, missing: false };
+  const dueDates = assignment.effectiveDueDates[student.id] || {};
+  if (dueDates.due_at != null && new Date(dueDates.due_at) < new Date()) {
+    submission.missing = true;
+  }
+  return submission;
+}
+
+class SubmissionStateMap {
   constructor ({ hasGradingPeriods, selectedGradingPeriodID, isAdmin }) {
     this.hasGradingPeriods = hasGradingPeriods;
     this.selectedGradingPeriodID = selectedGradingPeriodID;
@@ -87,8 +96,8 @@ class SubmissionState {
     });
   }
 
-  setSubmissionCellState (student, assignment, submission = { assignment_id: assignment.id, user_id: student.id }) {
-    this.submissionMap[student.id][assignment.id] = submission;
+  setSubmissionCellState (student, assignment, submission) {
+    this.submissionMap[student.id][assignment.id] = submission || missingSubmission(student, assignment);
     const params = [
       assignment,
       student,
@@ -109,4 +118,4 @@ class SubmissionState {
   }
 }
 
-export default SubmissionState;
+export default SubmissionStateMap;

@@ -18,6 +18,7 @@
 
 import { head, tail } from 'underscore'
 import React from 'react'
+import PropTypes from 'prop-types'
 import Select from 'instructure-ui/lib/components/Select'
 import Typography from 'instructure-ui/lib/components/Typography'
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
@@ -32,8 +33,8 @@ import I18n from 'i18n!gradebook'
 
   class GradebookSelector extends React.Component {
     static propTypes = {
-      courseUrl: React.PropTypes.string.isRequired,
-      learningMasteryEnabled: React.PropTypes.bool.isRequired
+      courseUrl: PropTypes.string.isRequired,
+      learningMasteryEnabled: PropTypes.bool.isRequired
     };
 
     constructor (props) {

@@ -84,6 +84,9 @@ define [
       '#discussion-edit-view' : '$discussionEditView'
       '#discussion-details-tab' : '$discussionDetailsTab'
       '#conditional-release-target' : '$conditionalReleaseTarget'
+      '#todo_options': '$todoOptions'
+      '#todo_date_input': '$todoDateInput'
+      '#allow_todo_date': '$allowTodoDate'
 
     events: _.extend(@::events,
       'click .removeAttachment' : 'removeAttachment'
@@ -93,6 +96,7 @@ define [
       'change #discussion_topic_assignment_points_possible' : 'handlePointsChange'
       'change' : 'onChange'
       'tabsbeforeactivate #discussion-edit-view' : 'onTabChange'
+      'change #allow_todo_date' : 'toggleTodoDateInput'
     )
 
     messages:
@@ -153,6 +157,7 @@ define [
         threaded: data.discussion_type is "threaded"
         inClosedGradingPeriod: @assignment.inClosedGradingPeriod()
         lockedItems: @lockedItems
+        allow_todo_date: data.todo_date?
       json.assignment = json.assignment.toView()
       json
 
@@ -270,13 +275,18 @@ define [
 
     getFormData: ->
       data = super
-      for dateField in ['last_reply_at', 'posted_at', 'delayed_post_at', 'lock_at']
+      dateFields = ['last_reply_at', 'posted_at', 'delayed_post_at', 'lock_at']
+      dateFields.push 'todo_date' if ENV.STUDENT_PLANNER_ENABLED
+      for dateField in dateFields
         data[dateField] = $.unfudgeDateForProfileTimezone(data[dateField])
       data.title ||= I18n.t 'default_discussion_title', 'No Title'
       data.discussion_type = if data.threaded is '1' then 'threaded' else 'side_comment'
       data.podcast_has_student_posts = false unless data.podcast_enabled is '1'
       data.only_graders_can_rate = false unless data.allow_rating is '1'
       data.sort_by_rating = false unless data.allow_rating is '1'
+      data.allow_todo_date = '0' if data.assignment?.set_assignment is '1'
+      data.todo_date = null unless data.allow_todo_date is '1'
+
       unless ENV?.IS_LARGE_ROSTER
         data = @groupCategorySelector.filterFormData data
 
@@ -393,10 +403,13 @@ define [
 
       if !ENV?.IS_LARGE_ROSTER && @isTopic()
         errors = @groupCategorySelector.validateBeforeSave(data, errors)
+      if data.allow_todo_date == '1' && data.todo_date == null
+        errors['todo_date'] = [{type: 'date_required_error', message: I18n.t('You must enter a date')}]
 
       if @isAnnouncement()
         unless data.message?.length > 0
-          errors['message'] = [{type: 'message_required_error', message: I18n.t("A message is required")}]
+          unless @lockedItems.content
+            errors['message'] = [{type: 'message_required_error', message: I18n.t("A message is required")}]
       if @showConditionalRelease()
         crErrors = @conditionalReleaseEditor.validateBeforeSave()
         errors['conditional_release'] = crErrors if crErrors
@@ -448,6 +461,7 @@ define [
     toggleGradingDependentOptions: ->
       @toggleAvailabilityOptions()
       @toggleConditionalReleaseTab()
+      @toggleTodoDateBox()
 
     toggleAvailabilityOptions: ->
       if @$useForGrading.is(':checked')
@@ -465,6 +479,18 @@ define [
         else
           @$discussionEditView.tabs("option", "disabled", [1])
           @$discussionEditView.tabs("option", "active", 0)
+
+    toggleTodoDateBox: ->
+      if @$useForGrading.is(':checked')
+        @$todoOptions.hide()
+      else
+        @$todoOptions.show()
+
+    toggleTodoDateInput: ->
+      if @$allowTodoDate.is(':checked')
+        @$todoDateInput.show()
+      else
+        @$todoDateInput.hide()
 
     onChange: ->
       if @showConditionalRelease() && @assignmentUpToDate

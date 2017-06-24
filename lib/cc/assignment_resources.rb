@@ -161,9 +161,9 @@ module CC
     def self.create_canvas_assignment(node, assignment, manifest = nil)
       key_generator = manifest || CCHelper
       node.title assignment.title
-      node.due_at CCHelper::ims_datetime(assignment.due_at) if assignment.due_at
-      node.lock_at CCHelper::ims_datetime(assignment.lock_at) if assignment.lock_at
-      node.unlock_at CCHelper::ims_datetime(assignment.unlock_at) if assignment.unlock_at
+      node.due_at CCHelper::ims_datetime(assignment.due_at, nil)
+      node.lock_at CCHelper::ims_datetime(assignment.lock_at, nil)
+      node.unlock_at CCHelper::ims_datetime(assignment.unlock_at, nil)
       if manifest && manifest.try(:user).present?
         node.module_locked assignment.locked_by_module_item?(manifest.user, deep_check_if_needed: true).present?
       end

@@ -17,14 +17,15 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import i18n from 'i18n!react_collaborations'
   class LoadMore extends React.Component {
 
     static propTypes = {
-      hasMore: React.PropTypes.bool.isRequired,
-      loadMore: React.PropTypes.func.isRequired,
-      isLoading: React.PropTypes.bool,
-      children: React.PropTypes.any
+      hasMore: PropTypes.bool.isRequired,
+      loadMore: PropTypes.func.isRequired,
+      isLoading: PropTypes.bool,
+      children: PropTypes.any
     }
 
     componentDidUpdate (oldProps) {
@@ -67,10 +68,10 @@ import i18n from 'i18n!react_collaborations'
   };
 
   LoadMore.propTypes = {
-    hasMore: React.PropTypes.bool.isRequired,
-    loadMore: React.PropTypes.func.isRequired,
-    isLoading: React.PropTypes.bool,
-    children: React.PropTypes.any
+    hasMore: PropTypes.bool.isRequired,
+    loadMore: PropTypes.func.isRequired,
+    isLoading: PropTypes.bool,
+    children: PropTypes.any
   };
 
 export default LoadMore

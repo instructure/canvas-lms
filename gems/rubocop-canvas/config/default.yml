@@ -36,13 +36,9 @@ Migration/ModelBehavior:
     - Shard
     - Account.default
     - Account.site_admin
-    - "*.quoted_table_name"
-    - "*.connection"
-    - "*.transaction"
-    - "*.find_ids_in_batches"
-    - "*.find_ids_in_ranges"
-    - "*.update_all"
-    - "*.delete_all"
+    - "connection.*"
+    - "find_ids_in_batches"
+    - "find_ids_in_ranges"
 
 Migration/PrimaryKey:
   Enabled: true

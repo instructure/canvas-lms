@@ -16,13 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jquery' /* $ */,
-  'jquery.instructure_misc_plugins' /* fragmentChange */,
-  'jquery.templateData' /* getTemplateData */,
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'compiled/behaviors/quiz_selectmenu'
-], function($) {
+import $ from 'jquery'
+import './jquery.instructure_misc_plugins' /* fragmentChange */
+import './jquery.templateData'
+import './vendor/jquery.scrollTo'
+import 'compiled/behaviors/quiz_selectmenu'
 
   var parentWindow = {
     exists: function(){
@@ -459,6 +457,3 @@ define([
       }
     });
   }
-
-});
-

@@ -57,18 +57,18 @@ module AttachmentHelper
     }
   end
 
-  def render_or_redirect_to_stored_file(attachment:, verifier: nil, inline: false, redirect_to_s3: false)
+  def render_or_redirect_to_stored_file(attachment:, verifier: nil, inline: false)
     set_cache_header(attachment)
     if safer_domain_available?
       redirect_to safe_domain_file_url(attachment, @safer_domain_host, verifier, !inline)
     elsif Attachment.local_storage?
       @headers = false if @files_domain
       send_file(attachment.full_filename, :type => attachment.content_type_with_encoding, :disposition => (inline ? 'inline' : 'attachment'), :filename => attachment.display_name)
-    elsif redirect_to_s3
-      redirect_to(inline ? attachment.inline_url : attachment.download_url)
-    else
+    elsif inline && attachment.mime_class == 'html' && attachment.size < Setting.get('max_inline_html_proxy_size', 128 * 1024).to_i
       send_file_headers!( :length=> attachment.s3object.content_length, :filename=>attachment.filename, :disposition => 'inline', :type => attachment.content_type_with_encoding)
-      render :status => 200, :text => attachment.s3object.get.body.read
+      render body: attachment.s3object.get.body.read
+    else
+      redirect_to(inline ? attachment.inline_url : attachment.download_url)
     end
   end
 

@@ -18,17 +18,18 @@
 
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!dashcards'
 import classnames from 'classnames'
   var DashboardCardAction = React.createClass({
     displayName: 'DashboardCardAction',
 
     propTypes: {
-      unreadCount: React.PropTypes.number,
-      iconClass: React.PropTypes.string,
-      linkClass: React.PropTypes.string,
-      path: React.PropTypes.string,
-      screenReaderLabel: React.PropTypes.string
+      unreadCount: PropTypes.number,
+      iconClass: PropTypes.string,
+      linkClass: PropTypes.string,
+      path: PropTypes.string,
+      screenReaderLabel: PropTypes.string
     },
 
     getDefaultProps: function() {

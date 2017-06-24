@@ -195,16 +195,15 @@ module ApplicationHelper
     (use_optimized_js? ? '/dist/webpack-production' : '/dist/webpack-dev').freeze
   end
 
-  # Returns a <script> tag for each registered js_bundle
-  def include_js_bundles
+  def include_head_js
     # This contains the webpack runtime, it needs to be loaded first
     paths = ["#{js_base_url}/vendor"]
 
     # We preemptive load these timezone/locale data files so they are ready
     # by the time our app-code runs and so webpack doesn't need to know how to load them
-    paths << "/javascripts/vendor/timezone/#{js_env[:TIMEZONE]}.js" if js_env[:TIMEZONE]
-    paths << "/javascripts/vendor/timezone/#{js_env[:CONTEXT_TIMEZONE]}.js" if js_env[:CONTEXT_TIMEZONE]
-    paths << "/javascripts/vendor/timezone/#{js_env[:BIGEASY_LOCALE]}.js" if js_env[:BIGEASY_LOCALE]
+    paths << "/timezone/#{js_env[:TIMEZONE]}.js" if js_env[:TIMEZONE]
+    paths << "/timezone/#{js_env[:CONTEXT_TIMEZONE]}.js" if js_env[:CONTEXT_TIMEZONE]
+    paths << "/timezone/#{js_env[:BIGEASY_LOCALE]}.js" if js_env[:BIGEASY_LOCALE]
     paths << "#{js_base_url}/moment/locale/#{js_env[:MOMENT_LOCALE]}" if js_env[:MOMENT_LOCALE] && js_env[:MOMENT_LOCALE] != 'en'
 
     paths << "#{js_base_url}/appBootstrap"
@@ -213,7 +212,21 @@ module ApplicationHelper
     js_bundles.each do |(bundle, plugin)|
       paths << "#{js_base_url}/#{plugin ? "#{plugin}-" : ''}#{bundle}"
     end
-    javascript_include_tag(*paths, type: nil)
+    # now that we've rendered out a script tag for each bundle we were told about in controllers,
+    # empty out the js_bundles array so we don't re-render them later
+    @js_bundles_included_in_head = js_bundles.dup
+    js_bundles.clear
+
+    javascript_include_tag(*paths, defer: true)
+  end
+
+  # Returns a <script> tag for each registered js_bundle
+  def include_js_bundles
+    paths = []
+    (js_bundles - (@js_bundles_included_in_head || [])).each do |(bundle, plugin)|
+      paths << "#{js_base_url}/#{plugin ? "#{plugin}-" : ''}#{bundle}"
+    end
+    javascript_include_tag(*paths, defer: true)
   end
 
   def include_css_bundles
@@ -663,21 +676,8 @@ module ApplicationHelper
     end
 
     if includes.present?
-      if options[:raw]
-        includes = ["/optimized/vendor/jquery-1.7.2.js"] + includes
-        javascript_include_tag(*includes)
-      else
-        str = <<-ENDSCRIPT
-          require(['jquery'], function fnCanvasUsesToLoadAccountJSAfterJQueryIsReady () {
-            #{includes.to_json}.forEach(function (src) {
-              var s = document.createElement('script');
-              s.src = src;
-              document.body.appendChild(s);
-            });
-          });
-        ENDSCRIPT
-        javascript_tag(str)
-      end
+      includes.unshift("/node_modules/jquery/jquery.js") if options[:raw]
+      javascript_include_tag(*includes, defer: true)
     end
   end
 

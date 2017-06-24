@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import ReactTabs from 'react-tabs'
 import permissionFilter from 'jsx/shared/helpers/permissionFilter'
 import CoursesStore from './CoursesStore'
@@ -25,7 +26,7 @@ import AccountsTreeStore from './AccountsTreeStore'
 import UsersStore from './UsersStore'
 
 const { Tab, Tabs, TabList, TabPanel } = ReactTabs
-const { string, bool, shape } = React.PropTypes
+const { string, bool, shape } = PropTypes
 
 const stores = [CoursesStore, TermsStore, AccountsTreeStore, UsersStore]
 

@@ -1190,7 +1190,7 @@ class ActiveRecord::Migration
 end
 
 class ActiveRecord::MigrationProxy
-  delegate :connection, :tags, to: :migration
+  delegate :connection, :tags, :cassandra_cluster, to: :migration
 
   def runnable?
     !migration.respond_to?(:runnable?) || migration.runnable?

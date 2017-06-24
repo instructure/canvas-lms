@@ -16,13 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!accounts.statistics',
-  'jquery', // $
-  'jquery.ajaxJSON', // ajaxJSON
-  'jqueryui/dialog', // /\.dialog/
-  'jquery.instructure_misc_helpers' // replaceTags
-], function(I18n, $) {
+import I18n from 'i18n!accounts.statistics'
+import $ from 'jquery'
+import './jquery.ajaxJSON'
+import 'jqueryui/dialog'
+import './jquery.instructure_misc_helpers' // replaceTags
 
   $(document).ready(function() {
     $(".over_time_link").live('click', function(event) {
@@ -70,4 +68,3 @@ define([
       chart.draw(data, {displayAnnotations: false});
     }
   });
-});

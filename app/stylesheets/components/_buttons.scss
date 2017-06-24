@@ -323,6 +323,14 @@ input[type="button"] {
   }
 }
 
+.Button--link--has-divider {
+  display: block;
+  text-align: left;
+  border-bottom: 1px solid $ic-border-color;
+  color: $ic-color-dark;
+  padding: $ic-sp;
+}
+
 // Icon "action" buttons
 // --------------------------------------------------
 

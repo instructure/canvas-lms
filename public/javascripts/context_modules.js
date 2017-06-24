@@ -16,42 +16,43 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'underscore',
-  'compiled/models/ModuleFile',
-  'jsx/shared/PublishCloud',
-  'react',
-  'react-dom',
-  'compiled/models/PublishableModuleItem',
-  'compiled/views/PublishIconView',
-  'INST' /* INST */,
-  'i18n!context_modules',
-  'jquery' /* $ */,
-  'context_modules_helper', /* Helper */
-  'jsx/shared/conditional_release/CyoeHelper',
-  'compiled/views/context_modules/context_modules' /* handles the publish/unpublish state */,
-  'compiled/views/modules/RelockModulesDialog',
-  'compiled/util/vddTooltip',
-  'jst/_vddTooltip',
-  'compiled/models/Publishable',
-  'compiled/views/PublishButtonView',
-  'str/htmlEscape',
-  'jsx/modules/utils/setupContentIds',
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_date_and_time' /* dateString, datetimeString, time_field, datetime_field */,
-  'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors, errorBox */,
-  'jqueryui/dialog',
-  'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
-  'jquery.instructure_misc_helpers' /* /\$\.underscore/ */,
-  'jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChange, showIf */,
-  'jquery.keycodes' /* keycodes */,
-  'jquery.loadingImg' /* loadingImage */,
-  'jquery.templateData' /* fillTemplateData, getTemplateData */,
-  'vendor/date' /* Date.parse */,
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'jqueryui/sortable' /* /\.sortable/ */,
-  'compiled/jquery.rails_flash_notifications'
-], function(_, ModuleFile, PublishCloud, React, ReactDOM, PublishableModuleItem, PublishIconView, INST, I18n, $, Helper, CyoeHelper, ContextModulesView, RelockModulesDialog, vddTooltip, vddTooltipView, Publishable, PublishButtonView, htmlEscape, setupContentIds) {
+import _ from 'underscore'
+import ModuleFile from 'compiled/models/ModuleFile'
+import PublishCloud from 'jsx/shared/PublishCloud'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import PublishableModuleItem from 'compiled/models/PublishableModuleItem'
+import PublishIconView from 'compiled/views/PublishIconView'
+import LockIconView from 'compiled/views/LockIconView'
+import MasterCourseModuleLock from 'jsx/blueprint_courses/apps/MasterCourseModuleLock'
+import INST from './INST'
+import I18n from 'i18n!context_modules'
+import $ from 'jquery'
+import Helper from './context_modules_helper'
+import CyoeHelper from 'jsx/shared/conditional_release/CyoeHelper'
+import ContextModulesView from 'compiled/views/context_modules/context_modules' /* handles the publish/unpublish state */
+import RelockModulesDialog from 'compiled/views/modules/RelockModulesDialog'
+import vddTooltip from 'compiled/util/vddTooltip'
+import vddTooltipView from 'jst/_vddTooltip'
+import Publishable from 'compiled/models/Publishable'
+import PublishButtonView from 'compiled/views/PublishButtonView'
+import htmlEscape from './str/htmlEscape'
+import setupContentIds from 'jsx/modules/utils/setupContentIds'
+import get from 'lodash/get'
+import './jquery.ajaxJSON'
+import './jquery.instructure_date_and_time' /* dateString, datetimeString, time_field, datetime_field */
+import './jquery.instructure_forms' /* formSubmit, fillFormData, formErrors, errorBox */
+import 'jqueryui/dialog'
+import 'compiled/jquery/fixDialogButtons'
+import './jquery.instructure_misc_helpers' /* /\$\.underscore/ */
+import './jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChange, showIf */
+import './jquery.keycodes'
+import './jquery.loadingImg'
+import './jquery.templateData' /* fillTemplateData, getTemplateData */
+import './vendor/date' /* Date.parse */
+import './vendor/jquery.scrollTo'
+import 'jqueryui/sortable'
+import 'compiled/jquery.rails_flash_notifications'
 
   // TODO: AMD don't export global, use as module
   /*global modules*/
@@ -233,21 +234,18 @@ define([
       loadMasterCourseData: function(tag_id) {
         if (ENV.MASTER_COURSE_SETTINGS) {
           // Grab the stuff for master courses if needed
-          $.ajaxJSON(ENV.MASTER_COURSE_SETTINGS.MASTER_COURSE_DATA_URL, 'GET', {tag_id: tag_id}, function(data) {
+          $.ajaxJSON(ENV.MASTER_COURSE_SETTINGS.MASTER_COURSE_DATA_URL, 'GET', {tag_id: tag_id}, function (data) {
             if (data.tag_restrictions) {
               $.each(data.tag_restrictions, function (id, restriction) {
-                var $item = $("#context_module_item_" + id).not('.master_course_content');
+                var $item = $('#context_module_item_' + id).not('.master_course_content');
                 $item.addClass('master_course_content');
-                var $admin_links = $item.find('.ig-admin');
-                if (restriction == 'locked') {
-                  $item.addClass('locked_by_master_course');
-                  $admin_links.prepend("<span class='master-course-cell'><i class='icon-lock'/></span>");
-                } else {
-                  $admin_links.prepend("<span class='master-course-cell'><i class='icon-unlock icon-Line'/></span>");
+                if (Object.keys(restriction).some(function (r) { return restriction[r] })) {
+                  $item.attr('data-master_course_restrictions', JSON.stringify(restriction));  // need it if user selects Edit from cog menu
                 }
-              });
+                this.initMasterCourseLockButton($item, restriction);
+              }.bind(this));
             }
-          });
+          }.bind(this));
         }
       },
 
@@ -752,8 +750,34 @@ define([
         forcePlaceholderSize: true,
         axis: 'y',
         containment: '#content'
+      },
+      initMasterCourseLockButton: function ($item, tagRestriction) {
+        // add the lock button|icon
+        var $lockCell = $item.find('.lock-icon');
+        var data = $($lockCell).data() || {};
+
+        var isMasterCourseMasterContent = !!('moduleItemId' in data && ENV.MASTER_COURSE_SETTINGS.IS_MASTER_COURSE);
+        var isMasterCourseChildContent = !!('moduleItemId' in data && ENV.MASTER_COURSE_SETTINGS.IS_CHILD_COURSE);
+        var restricted = !!('moduleItemId' in data && Object.keys(tagRestriction).some(function (r) { return tagRestriction[r] }));
+
+        var model = new MasterCourseModuleLock({
+          is_master_course_master_content: isMasterCourseMasterContent,
+          is_master_course_child_content: isMasterCourseChildContent,
+          restricted_by_master_course: restricted
+        });
+
+        var viewOptions = {
+          model: model,
+          el: $lockCell[0],
+          course_id: ENV.COURSE_ID,
+          content_type: data.moduleType,
+          content_id: data.contentId
+        };
+
+        var view = new LockIconView(viewOptions);
+        view.render();
       }
-    };
+    }
   })();
 
   var addIcon = function($icon_container, css_class, message) {
@@ -1185,14 +1209,13 @@ define([
       $("#edit_item_form").attr('action', $(this).attr('href'));
       $("#edit_item_form").fillFormData(data, {object_name: 'content_tag'});
 
-      var $title_input = $("#edit_item_form #content_tag_title")
-      $title_input.attr('disabled', $item.hasClass('locked_by_master_course'))
+      var $titleInput = $('#edit_item_form #content_tag_title');
+      var restrictions = $item.data().master_course_restrictions;
+      var isDisabled = !get(ENV, 'MASTER_COURSE_SETTINGS.IS_MASTER_COURSE') && !!get(restrictions, 'content');
+      $titleInput.attr('disabled', isDisabled);
 
       $("#edit_item_form").dialog({
         title: I18n.t('titles.edit_item', "Edit Item Details"),
-        open: function(){
-          $(this).find('input[type=text],textarea,select').first().focus();
-        },
         close: function () {
           $("#edit_item_form").hideErrors();
            $cogLink.focus();
@@ -1996,5 +2019,4 @@ define([
 
   });
 
-  return modules;
-});
+export default modules;

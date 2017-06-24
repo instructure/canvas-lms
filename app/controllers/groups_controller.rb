@@ -262,6 +262,9 @@ class GroupsController < ApplicationController
         @active_tab = "people"
         @group_user_type = "student"
         @allow_self_signup = true
+        if @context.grants_right? @current_user, session, :read_as_admin
+          js_env STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards)
+        end
       end
 
       add_crumb user_crumb, named_context_url(@context, :context_users_url)
@@ -512,9 +515,10 @@ class GroupsController < ApplicationController
   # @returns Group
   def update
     find_group
-    attrs = api_request? ? params : params.require(:group)
-    attrs = attrs.permit(:name, :description, :join_level, :is_public, :avatar_id, :storage_quota_mb, :max_membership,
+    group_params = api_request? ? params : params.require(:group)
+    attrs = group_params.permit(:name, :description, :join_level, :is_public, :avatar_id, :storage_quota_mb, :max_membership,
       :leader => strong_anything, :members => strong_anything)
+    attrs[:leader] = nil if group_params.has_key?(:leader) && !group_params[:leader]
 
     if !api_request? && params[:group][:group_category_id]
       group_category_id = params[:group].delete :group_category_id

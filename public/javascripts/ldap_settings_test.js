@@ -16,14 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!accounts' /* I18n.t */,
-  'jquery' /* $ */,
-  'str/htmlEscape',
-  'compiled/behaviors/authenticity_token',
-  'jquery.ajaxJSON' /* getJSON */,
-  'jqueryui/dialog'
-], function(I18n, $, h, authenticity_token) {
+import I18n from 'i18n!accounts'
+import $ from 'jquery'
+import h from './str/htmlEscape'
+import authenticity_token from 'compiled/behaviors/authenticity_token'
+import './jquery.ajaxJSON'
+import 'jqueryui/dialog'
 
   function testLDAP() {
     clearTestLDAP();
@@ -127,5 +125,3 @@ define([
       testLDAPLogin();
     });
   });
-});
-

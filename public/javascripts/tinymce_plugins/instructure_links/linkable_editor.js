@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define(["jquery", 'jsx/shared/rce/RceCommandShim'], function($, RceCommandShim){
+import $ from "jquery"
+import {send} from 'jsx/shared/rce/RceCommandShim'
 
   /**
    * This is not yet a complete extraction, but the idea is to continue
@@ -69,7 +70,7 @@ define(["jquery", 'jsx/shared/rce/RceCommandShim'], function($, RceCommandShim){
      * @param {Object} [dataAttrs] key value pairs for link data attributes
      */
     this.createLink = function(text, classes, dataAttrs){
-      RceCommandShim.send(this.getEditor(), "create_link",{
+      send(this.getEditor(), "create_link",{
         url: text,
         classes: classes,
         selectedContent: this.selectedContent,
@@ -78,5 +79,4 @@ define(["jquery", 'jsx/shared/rce/RceCommandShim'], function($, RceCommandShim){
     };
   };
 
-  return LinkableEditor;
-});
+export default LinkableEditor;

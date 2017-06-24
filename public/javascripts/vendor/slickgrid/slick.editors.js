@@ -1,4 +1,5 @@
-define(['jquery','vendor/slickgrid/slick.core'],function(jQuery) {
+import jQuery from 'jquery'
+import 'vendor/slickgrid/slick.core'
 
 /***
  * Contains basic SlickGrid editors.
@@ -649,5 +650,3 @@ define(['jquery','vendor/slickgrid/slick.core'],function(jQuery) {
     }
   }
 })(jQuery);
-
-});

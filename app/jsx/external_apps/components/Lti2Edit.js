@@ -19,16 +19,17 @@
 import I18n from 'i18n!external_tools'
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import htmlEscape from 'str/htmlEscape'
 
 export default React.createClass({
     displayName: 'Lti2Edit',
 
     propTypes: {
-      tool: React.PropTypes.object.isRequired,
-      handleActivateLti2: React.PropTypes.func.isRequired,
-      handleDeactivateLti2: React.PropTypes.func.isRequired,
-      handleCancel: React.PropTypes.func.isRequired
+      tool: PropTypes.object.isRequired,
+      handleActivateLti2: PropTypes.func.isRequired,
+      handleDeactivateLti2: PropTypes.func.isRequired,
+      handleCancel: PropTypes.func.isRequired
     },
 
     toggleButton() {

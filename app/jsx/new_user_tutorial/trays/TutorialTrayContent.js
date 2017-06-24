@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import Heading from 'instructure-ui/lib/components/Heading'
 import Image from 'instructure-ui/lib/components/Image'
 import SVGWrapper from 'jsx/shared/SVGWrapper'
@@ -41,14 +42,14 @@ const TutorialTrayContent = props => (
 )
 
 TutorialTrayContent.propTypes = {
-  name: React.PropTypes.string.isRequired,
-  heading: React.PropTypes.string.isRequired,
-  subheading: React.PropTypes.string.isRequired,
-  children: React.PropTypes.oneOfType([
-    React.PropTypes.arrayOf(React.PropTypes.node),
-    React.PropTypes.node
+  name: PropTypes.string.isRequired,
+  heading: PropTypes.string.isRequired,
+  subheading: PropTypes.string.isRequired,
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.node),
+    PropTypes.node
   ]),
-  image: React.PropTypes.string
+  image: PropTypes.string
 };
 TutorialTrayContent.defaultProps = {
   children: [],

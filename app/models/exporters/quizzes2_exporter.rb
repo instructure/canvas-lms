@@ -42,7 +42,8 @@ module Exporters
             external_tool_tag, @assignment.shard
           ),
           title: @quiz.title,
-          context_title: @quiz.context.name
+          context_title: @quiz.context.name,
+          course_uuid: @course.uuid
         }
       }
     end

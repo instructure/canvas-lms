@@ -48,10 +48,12 @@ class User < ActiveRecord::Base
   has_many :notification_policies, through: :communication_channels
   has_one :communication_channel, -> { where("workflow_state<>'retired'").order(:position) }
   has_many :notification_endpoints, :through => :access_tokens
+  has_many :planner_notes, :dependent => :destroy
 
   has_many :enrollments, :dependent => :destroy
 
   has_many :not_ended_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')") }, class_name: 'Enrollment', multishard: true
+  has_many :not_removed_enrollments, -> { where.not(workflow_state: ['rejected', 'deleted', 'inactive']) }, class_name: 'Enrollment', multishard: true
   has_many :observer_enrollments
   has_many :observee_enrollments, :foreign_key => :associated_user_id, :class_name => 'ObserverEnrollment'
   has_many :user_observers, dependent: :destroy, inverse_of: :user
@@ -1462,7 +1464,7 @@ class User < ActiveRecord::Base
       if opts[:contexts]
         course_ids = Array(opts[:contexts]).map(&:id) & course_ids
       end
-      opts = {limit: 15}.merge(opts.slice(:due_after, :due_before, :limit, :include_ungraded, :ungraded_quizzes))
+      opts = {limit: 15}.merge(opts.slice(:due_after, :due_before, :limit, :include_ungraded, :ungraded_quizzes, :include_ignored))
 
       course_ids_cache_key = Digest::MD5.hexdigest(course_ids.sort.join('/'))
       Rails.cache.fetch([self, "assignments_needing_#{purpose}", course_ids_cache_key, opts].cache_key, :expires_in => expires_in) do
@@ -1470,10 +1472,12 @@ class User < ActiveRecord::Base
           Shard.partition_by_shard(course_ids) do |shard_course_ids|
             if opts[:ungraded_quizzes]
               scope = Quizzes::Quiz.where(context_type: 'Course', context_id: shard_course_ids).
-                not_for_assignment.not_ignored_by(self, purpose)
+                not_for_assignment
+              scope = scope.not_ignored_by(self, purpose) unless opts[:include_ignored]
               yield(scope, opts.merge(:shard_course_ids => shard_course_ids))
             else
-              scope = Assignment.for_course(shard_course_ids).not_ignored_by(self, purpose)
+              scope = Assignment.for_course(shard_course_ids)
+              scope = scope.not_ignored_by(self, purpose) unless opts[:include_ignored]
               yield(scope, opts.merge(:shard_course_ids => shard_course_ids))
             end
           end
@@ -1527,6 +1531,19 @@ class User < ActiveRecord::Base
     end
   end
 
+  def submitted_assignments(opts={})
+    assignments_needing('submitted', :student, 120.minutes, opts) do |assignment_scope, options|
+      as = assignment_scope.active.
+              expecting_submission.
+              filter_by_visibilities_in_given_courses(id, options[:shard_course_ids]).
+              published.
+              due_between_with_overrides(options[:due_after], options[:due_before]).
+              with_submissions_for_user(id).
+              group('submissions.id')
+      select_available_assignments(as).select { |a| a.has_submitted_submissions? }
+    end
+  end
+
   def assignments_needing_moderation(opts={})
     assignments_needing('moderation', :instructor, 120.minutes, opts) do |assignment_scope, opts|
       assignment_scope.active.
@@ -1566,6 +1583,38 @@ class User < ActiveRecord::Base
           result
         end
       end
+    end
+  end
+
+  def needing_viewing(object_type, expires_in, opts={})
+    shard.activate do
+      course_ids = participated_course_ids
+      course_ids_cache_key = Digest::MD5.hexdigest(course_ids.sort.join(','))
+      cache_key = [self, "#{object_type.underscore}_needing_viewing", course_ids_cache_key, opts].cache_key
+      Rails.cache.fetch(cache_key, :expires_in => expires_in) do
+        result = Shackles.activate(:slave) do
+          Shard.partition_by_shard(course_ids) do |shard_course_ids|
+            scope = object_type.constantize.for_courses_and_groups(shard_course_ids, cached_current_group_memberships.map(&:group_id))
+            scope = scope.not_ignored_by(self, 'viewing') unless opts[:include_ignored]
+            scope = scope.available_to_planner.todo_date_between(opts[:due_after], opts[:due_before])
+            yield(scope, opts.merge(shard_course_ids: shard_course_ids))
+          end
+        end
+        result = result[0...opts[:limit]] if opts[:limit]
+        result
+      end
+    end
+  end
+
+  def discussion_topics_needing_viewing(opts={})
+    needing_viewing('DiscussionTopic', 120.minutes, opts) do |topics_context, _options|
+      topics_context.to_a
+    end
+  end
+
+  def wiki_pages_needing_viewing(opts={})
+    needing_viewing('WikiPage', 120.minutes, opts) do |wiki_pages_context, _options|
+      wiki_pages_context.visible_to_user(self).to_a
     end
   end
 
@@ -1852,6 +1901,14 @@ class User < ActiveRecord::Base
     @participating_enrollments ||= self.shard.activate do
       Rails.cache.fetch([self, 'participating_enrollments', ApplicationController.region].cache_key) do
         self.enrollments.shard(in_region_associated_shards).current.active_by_date.to_a
+      end
+    end
+  end
+
+  def participated_course_ids
+    @participated_course_ids ||= self.shard.activate do
+      Rails.cache.fetch([self, 'participated_course_ids', ApplicationController.region].cache_key) do
+        self.not_removed_enrollments.shard(in_region_associated_shards).distinct.pluck(:course_id)
       end
     end
   end

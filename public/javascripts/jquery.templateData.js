@@ -16,11 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jquery' /* $ */,
-  'str/htmlEscape',
-  'jquery.instructure_misc_helpers' /* replaceTags */
-], function($, htmlEscape) {
+import $ from 'jquery'
+import htmlEscape from './str/htmlEscape'
+import './jquery.instructure_misc_helpers' /* replaceTags */
 
   // Fills the selected object(s) with data values as specified.  Plaintext values should be specified in the
   //  data: data used to fill template.
@@ -167,5 +165,3 @@ define([
     var opts = $.extend({}, options, {textValues: [value]});
     return this.getTemplateData(opts)[value];
   };
-
-});

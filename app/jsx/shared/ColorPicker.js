@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import React from 'react'
+import PropTypes from 'prop-types'
 import ReactModal from 'react-modal'
 import I18n from 'i18n!calendar_color_picker'
 import CourseNicknameEdit from 'jsx/shared/CourseNicknameEdit'
@@ -51,16 +52,16 @@ import 'compiled/jquery.rails_flash_notifications'
     displayName: 'ColorPicker',
 
     propTypes: {
-      isOpen: React.PropTypes.bool,
-      afterUpdateColor: React.PropTypes.func,
-      afterClose: React.PropTypes.func,
-      assetString: React.PropTypes.string.isRequired,
-      hideOnScroll: React.PropTypes.bool,
-      positions: React.PropTypes.object,
-      nonModal: React.PropTypes.bool,
-      hidePrompt: React.PropTypes.bool,
-      currentColor: React.PropTypes.string,
-      nicknameInfo: React.PropTypes.object
+      isOpen: PropTypes.bool,
+      afterUpdateColor: PropTypes.func,
+      afterClose: PropTypes.func,
+      assetString: PropTypes.string.isRequired,
+      hideOnScroll: PropTypes.bool,
+      positions: PropTypes.object,
+      nonModal: PropTypes.bool,
+      hidePrompt: PropTypes.bool,
+      currentColor: PropTypes.string,
+      nicknameInfo: PropTypes.object
     },
 
     // ===============

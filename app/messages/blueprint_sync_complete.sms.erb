@@ -1,0 +1,3 @@
+<%= t :body, "Blueprint course changes synced from %{name}.", :name => asset.master_template.course.name %>
+
+<%= t :link_message, "More info at %{url}", :url => polymorphic_url(asset.master_template.course, :anchor => asset.notification_link_anchor) %>
