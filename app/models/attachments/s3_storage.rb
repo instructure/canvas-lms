@@ -97,23 +97,30 @@ class Attachments::S3Storage
   end
 
   def open(opts, &block)
-    if block_given?
-      attachment.s3object.get(&block)
-    else
-      # TODO: !need_local_file -- net/http and thus AWS::S3::S3Object don't
-      # natively support streaming the response, except when a block is given.
-      # so without Fibers, there's not a great way to return an IO-like object
-      # that streams the response. A separate thread, I guess. Bleck. Need to
-      # investigate other options.
-      if opts[:temp_folder].present? && !File.exist?(opts[:temp_folder])
-        FileUtils.mkdir_p(opts[:temp_folder])
-      end
-      tempfile = Tempfile.new(["attachment_#{attachment.id}", attachment.extension],
-                              opts[:temp_folder].presence || Dir::tmpdir)
-      tempfile.binmode
-      attachment.s3object.get(response_target: tempfile)
-      tempfile.rewind
-      tempfile
+    # TODO: !need_local_file -- net/http and thus AWS::S3::S3Object don't
+    # natively support streaming the response, except when a block is given.
+    # so without Fibers, there's not a great way to return an IO-like object
+    # that streams the response. A separate thread, I guess. Bleck. Need to
+    # investigate other options.
+    if opts[:temp_folder].present? && !File.exist?(opts[:temp_folder])
+      FileUtils.mkdir_p(opts[:temp_folder])
     end
+    tempfile = Tempfile.new(["attachment_#{attachment.id}", attachment.extension],
+                            opts[:temp_folder].presence || Dir::tmpdir)
+    tempfile.binmode
+    attachment.s3object.get(response_target: tempfile)
+    tempfile.rewind
+
+    if block_given?
+      File.open(tempfile.path, 'rb') do |file|
+        chunk = file.read(64000)
+        while chunk
+          yield chunk
+          chunk = file.read(64000)
+        end
+      end
+    end
+
+    tempfile
   end
 end
