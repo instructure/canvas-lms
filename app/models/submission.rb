@@ -1191,14 +1191,10 @@ class Submission < ActiveRecord::Base
 
         if submit_to_canvadocs
           opts = {
-            preferred_plugins: [Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC],
+            preferred_plugins: [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC],
             wants_annotation: true,
             force_crocodoc: dont_submit_to_canvadocs
           }
-
-          if context.account.feature_enabled?(:new_annotations)
-            opts[:preferred_plugins].unshift Canvadocs::RENDER_PDFJS
-          end
 
           if context.root_account.settings[:canvadocs_prefer_office_online]
             # Office 365 should take priority over pdfjs

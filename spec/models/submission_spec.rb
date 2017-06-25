@@ -2638,23 +2638,17 @@ describe Submission do
       end
 
       context "preferred_plugins" do
-        it "should not send o365 or PDFjs as preferred plugins by default" do
+        it "should not send o365  as preferred plugins by default" do
           @assignment.submit_homework(@student1,
                                       submission_type: "online_upload",
                                       attachments: [@attachment])
 
           job = Delayed::Job.where(strand: 'canvadocs').last
-          expect(job.payload_object.args[1][:preferred_plugins]).to eq [Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC]
-        end
-
-        it "should send PDFjs as a preferred plugin when the 'New Annotations' feature is enabled" do
-          Account.default.enable_feature!(:new_annotations)
-          @assignment.submit_homework(@student1,
-                                      submission_type: "online_upload",
-                                      attachments: [@attachment])
-
-          job = Delayed::Job.where(strand: 'canvadocs').last
-          expect(job.payload_object.args[1][:preferred_plugins]).to eq [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC]
+          expect(job.payload_object.args[1][:preferred_plugins]).to eq [
+            Canvadocs::RENDER_PDFJS,
+            Canvadocs::RENDER_BOX,
+            Canvadocs::RENDER_CROCODOC
+          ]
         end
 
         it "should send o365 as a preferred plugin when the 'Prefer Office 365 file viewer' account setting is enabled" do
@@ -2665,19 +2659,12 @@ describe Submission do
                                       attachments: [@attachment])
 
           job = Delayed::Job.where(strand: 'canvadocs').last
-          expect(job.payload_object.args[1][:preferred_plugins]).to eq [Canvadocs::RENDER_O365, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC]
-        end
-
-        it "should send o365 and PDFjs as preferred plugins when the 'New Annotations' feature is enabled and the 'Prefer Office 365 file viewer' account setting is enabled" do
-          @assignment.context.root_account.settings[:canvadocs_prefer_office_online] = true
-          @assignment.context.root_account.save!
-          Account.default.enable_feature!(:new_annotations)
-          @assignment.submit_homework(@student1,
-                                      submission_type: "online_upload",
-                                      attachments: [@attachment])
-
-          job = Delayed::Job.where(strand: 'canvadocs').last
-          expect(job.payload_object.args[1][:preferred_plugins]).to eq [Canvadocs::RENDER_O365, Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC]
+          expect(job.payload_object.args[1][:preferred_plugins]).to eq [
+            Canvadocs::RENDER_O365,
+            Canvadocs::RENDER_PDFJS,
+            Canvadocs::RENDER_BOX,
+            Canvadocs::RENDER_CROCODOC
+          ]
         end
       end
 
