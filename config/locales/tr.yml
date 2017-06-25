@@ -1448,8 +1448,10 @@ tr:
   add_students_to_the_course_874be8fb: "Derse Öğrenci Ekle"
   add_tas_to_the_course_2aac6e02: "Derse Öğretim Elemanı Yardımcıları Ekle"
   add_theme_32fa3d50: "Tema Ekle"
+  add_to_course_481a51c4: "Derse ekle..."
   add_trigger_bc1a0fae: "Tetikleyici Ekle"
   add_user_e73e8e50: "Kullanıcı Ekle"
+  add_users_b10c7fb1: "Kullanıcı Ekle"
   add_users_to_name_b8109bbb: "%{name}'a Kullanıcıları Ekle"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Ödevlerinizi ekleyin. Yalnızca uzun bir liste yapabilir ya da bunları gruplara ayırabilirsiniz- ve hatta her ödev grubu için ağırlıkları belirleyebilirsiniz."
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Aşağıdakilerin her biri için Zendesk yapılandırılmanızın isteğe bağlı alan ID'sini ekleyin (ID'si olamayan alanların logları tutulmayacak):"
@@ -3347,6 +3349,7 @@ tr:
       notices: 
         contact_registered: "İletişim yöntemi kaydedildi!"
   complete_all_items_e1779257: "Tüm Öğeleri Tamamla"
+  complete_fd828dea: Tamamlandı
   complete_icon_7455be93: "simgeyi tamamla"
   complete_one_item_90e5fb03: "Bir Öğeyi Tamamla"
   completed_19711ce7: Tamamlandı
