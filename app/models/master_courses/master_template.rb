@@ -244,4 +244,50 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
       self.default_restrictions
     end
   end
+
+  def self.create_associations_from_sis(root_account, associations, messages, migrating_user=nil)
+    associations.keys.each_slice(50) do |master_sis_ids|
+      templates = self.active.for_full_course.joins(:course).
+        where(:courses => {:root_account_id => root_account, :sis_source_id => master_sis_ids}).
+        select("#{self.table_name}.*, courses.sis_source_id AS sis_source_id").to_a
+      if templates.count != master_sis_ids.count
+        (master_sis_ids - templates.map(&:sis_source_id)).each do |missing_id|
+          messages << "Unknown blueprint course \"#{missing_id}\""
+        end
+      end
+
+      templates.each do |template|
+        needs_migration = false
+        associations[template.sis_source_id].each_slice(50) do |associated_sis_ids|
+          data = root_account.all_courses.where(:sis_source_id => associated_sis_ids).not_master_courses.
+            joins("LEFT OUTER JOIN #{MasterCourses::ChildSubscription.quoted_table_name} AS mcs ON mcs.child_course_id=courses.id AND mcs.workflow_state<>'deleted'").
+            pluck(:id, :sis_source_id, "mcs.master_template_id")
+
+          if data.count != associated_sis_ids
+            (associated_sis_ids - data.map{|id, sis_id, t_id| sis_id}).each do |invalid_id|
+              messages << "Cannot associate course \"#{invalid_id}\" - is a blueprint course"
+            end
+          end
+          data.each do |id, associated_sis_id, master_template_id|
+            if master_template_id
+              if master_template_id != template.id
+                messages << "Cannot associate course \"#{associated_sis_id}\" - is associated to another blueprint course"
+              end # otherwise we don't need to do anything - it's already associated
+            else
+              needs_migration = true
+              template.add_child_course!(id)
+            end
+          end
+        end
+
+        if migrating_user && needs_migration
+          begin
+            MasterCourses::MasterMigration.start_new_migration!(template, migrating_user)
+          rescue MasterCourses::MasterMigration::MigrationRunningError
+            # meh
+          end
+        end
+      end
+    end
+  end
 end

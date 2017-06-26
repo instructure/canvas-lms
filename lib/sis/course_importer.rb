@@ -23,8 +23,9 @@ module SIS
       start = Time.now
       courses_to_update_sis_batch_id = []
       course_ids_to_update_associations = [].to_set
+      blueprint_associations = {}
 
-      importer = Work.new(@batch, @root_account, @logger, courses_to_update_sis_batch_id, course_ids_to_update_associations, messages, @batch_user)
+      importer = Work.new(@batch, @root_account, @logger, courses_to_update_sis_batch_id, course_ids_to_update_associations, messages, @batch_user, blueprint_associations)
       Course.suspend_callbacks(:update_enrollments_later) do
         Course.process_as_sis(@sis_options) do
           Course.skip_updating_account_associations do
@@ -37,6 +38,9 @@ module SIS
       courses_to_update_sis_batch_id.in_groups_of(1000, false) do |batch|
         Course.where(:id => batch).update_all(:sis_batch_id => @batch.id)
       end if @batch
+
+      MasterCourses::MasterTemplate.create_associations_from_sis(@root_account, blueprint_associations, messages, @batch_user)
+
       @logger.debug("Courses took #{Time.now - start} seconds")
       return importer.success_count
     end
@@ -46,18 +50,19 @@ module SIS
     class Work
       attr_accessor :success_count
 
-      def initialize(batch, root_account, logger, a1, a2, m, batch_user)
+      def initialize(batch, root_account, logger, a1, a2, m, batch_user, blueprint_associations)
         @batch = batch
         @batch_user = batch_user
         @root_account = root_account
         @courses_to_update_sis_batch_id = a1
         @course_ids_to_update_associations = a2
+        @blueprint_associations = blueprint_associations
         @messages = m
         @logger = logger
         @success_count = 0
       end
 
-      def add_course(course_id, term_id, account_id, fallback_account_id, status, start_date, end_date, abstract_course_id, short_name, long_name, integration_id, course_format)
+      def add_course(course_id, term_id, account_id, fallback_account_id, status, start_date, end_date, abstract_course_id, short_name, long_name, integration_id, course_format, blueprint_course_id)
         state_changes = []
         @logger.debug("Processing Course #{[course_id, term_id, account_id, fallback_account_id, status, start_date, end_date, abstract_course_id, short_name, long_name].inspect}")
 
@@ -204,6 +209,11 @@ module SIS
           @course_ids_to_update_associations.add(course.id) if update_account_associations
         elsif @batch
           @courses_to_update_sis_batch_id << course.id
+        end
+
+        if blueprint_course_id && !course.deleted?
+          @blueprint_associations[blueprint_course_id] ||= []
+          @blueprint_associations[blueprint_course_id] << course_id
         end
 
         course.update_enrolled_users if update_enrollments
