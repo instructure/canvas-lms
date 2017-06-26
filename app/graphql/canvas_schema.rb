@@ -2,9 +2,7 @@ CanvasSchema = GraphQL::Schema.define do
   query(Types::QueryType)
   mutation(Types::MutationType)
 
-  # GraphQL::Batch setup:
-  lazy_resolve(Promise, :sync)
-  instrument(:query, GraphQL::Batch::Setup)
+  use GraphQL::Batch
 
   id_from_object ->(obj, type_def, _) {
     GraphQL::Schema::UniqueWithinType.encode(type_def.name, obj.id)
