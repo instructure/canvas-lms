@@ -1,4 +1,4 @@
-class GraphqlController < ApplicationController
+class GraphQLController < ApplicationController
   include Api::V1
 
   before_action :require_user, except: :execute

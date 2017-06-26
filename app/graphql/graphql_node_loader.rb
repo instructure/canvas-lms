@@ -1,4 +1,4 @@
-module GqlNodeLoader
+module GraphQLNodeLoader
   def self.load(type, id, ctx)
     check_read_permission = make_permission_check(ctx, :read)
 

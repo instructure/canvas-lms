@@ -9,7 +9,7 @@ module Types
       argument :_id, !types.ID
       argument :type, !LegacyNodeType
       resolve ->(_, args, ctx) {
-        GqlNodeLoader.load(args[:type], args[:_id], ctx)
+        GraphQLNodeLoader.load(args[:type], args[:_id], ctx)
       }
     end
 

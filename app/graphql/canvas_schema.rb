@@ -13,7 +13,7 @@ CanvasSchema = GraphQL::Schema.define do
   object_from_id ->(relay_id, ctx) {
     type, id = GraphQL::Schema::UniqueWithinType.decode(relay_id)
 
-    GqlNodeLoader.load(type, id, ctx)
+    GraphQLNodeLoader.load(type, id, ctx)
   }
 
   resolve_type ->(obj, ctx) {
