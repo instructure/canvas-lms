@@ -21,6 +21,18 @@ describe ContentMigration do
   context "course copy wiki" do
     include_examples "course copy"
 
+    it "should copy wiki page attributes" do
+      page = @copy_from.wiki.wiki_pages.create!(:title => "title", :body => "<p>butter</p>",
+                                                :editing_roles => "teachers", :todo_date => Time.zone.now)
+
+      run_course_copy
+
+      page_to = @copy_to.wiki.wiki_pages.where(migration_id: mig_id(page)).first
+
+      attrs = [:title, :body, :editing_roles, :todo_date]
+      expect(page.attributes.slice(*attrs)).to eq page_to.attributes.slice(*attrs)
+    end
+
     it "should reset user on re-import" do
       page = @copy_from.wiki.wiki_pages.create!(:title => "reset me", :body => "<p>blah</p>")
 

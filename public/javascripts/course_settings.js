@@ -143,11 +143,16 @@ import 'jqueryui/tabs'
           data: section,
           hrefValues: ['id']
         });
+        $section.find('.screenreader-only').each(function(_index, el) {
+          var $el = $(el);
+          $el.text($el.text().replace('%%name%%', section.name));
+        });
         $("#course_section_id_holder").show();
         $option.val(section.id).text(section.name).addClass('option_for_section_' + section.id);
         $("#sections .section_blank").before($section);
         $section.slideDown();
         $("#course_section_name").val();
+        $('#add_section_form button[type="submit"]').focus();
       },
       error: function(data) {
         $add_section_form
@@ -171,10 +176,12 @@ import 'jqueryui/tabs'
         var section = data.course_section;
         $section.loadingImage('remove');
         $(".option_for_section_" + section.id).text(section.name);
+        this.parent().find('.edit_section_link').focus();
       },
       error: function(data, $section) {
         $section.loadingImage('remove').find(".edit_section_link").click();
         $edit_section_form.formErrors(data);
+        this.find('#course_section_name_edit').focus();
       }
     })
     .find(":text")
@@ -204,8 +211,13 @@ import 'jqueryui/tabs'
         url: $(this).attr('href'),
         message: I18n.t('confirm.delete_section', "Are you sure you want to delete this section?"),
         success: function(data) {
+          var $prevItem = $(this).prev();
+          var $toFocus = $prevItem.length ?
+            $prevItem.find('.delete_section_link,.cant_delete_section_link') :
+            $("#sections_tab > a");
           $(this).slideUp(function() {
             $(this).remove();
+            $toFocus.focus();
           });
         }
       });

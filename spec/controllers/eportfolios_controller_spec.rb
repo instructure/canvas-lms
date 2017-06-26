@@ -330,7 +330,7 @@ describe EportfoliosController do
       Attachment.where(id: @old_zipfile).update_all(created_at: 1.day.ago)
     end
 
-    it "should hard delete old zips if there are no assiciated attachments" do
+    it "should hard delete old zips if there are no associated attachments" do
       expect(@portfolio.attachments.count).to eq 1
       expect(@old_zipfile.related_attachments.exists?).to be_falsey
 
@@ -342,7 +342,7 @@ describe EportfoliosController do
       expect(@portfolio.attachments.first.id).not_to eq @old_zipfile.id
     end
 
-    it "should soft delete old zips if there are assiciated attachments" do
+    it "should soft delete old zips if there are associated attachments" do
       expect(@portfolio.attachments.count).to eq 1
       cloned_att = @old_zipfile.clone_for(@user)
       cloned_att.workflow_state = 'to_be_zipped'

@@ -54,7 +54,7 @@
   margin-bottom: 3em;
 }
 
-.bcs__history-item__title {
+.bcs__history-item__title, .bcs__unsynced-item__title {
   border-bottom: 2px solid $ic-color-medium;
   padding-bottom: 0.5em;
   margin-bottom: 1.5em;
@@ -359,6 +359,9 @@
       margin: 0;
     }
   }
+  .bca-associations__x-col {
+    text-align: right;
+  }
 }
 
 .bcs__history-notification {
@@ -368,10 +371,11 @@
 .bcs__migration-sync__button {
   display: flex;
   justify-content: flex-end;
+}
 
-  button {
-    padding: 22px 15px;
-  }
+// extra padding only when in sidebar
+.bcs__row-sync-holder .bcs__migration-sync__button button {
+  padding: 22px 15px;
 }
 
 .bcs__row.bcs__row-sync-holder {
@@ -398,17 +402,9 @@
   }
 }
 
-/* unsynced changes are a little different than sync history */
-.bcs__history-item__content.bcs__unsynced-change__content {
-  .bcs__history-item__uncynched-changes-grid {
-    left: 25px;
-  }
-}
-
 .bcs__unsynced-changes .bcs__history-notification {
   padding-top: 1em;
 }
-
 
 .bcc__master-child-stack {
   position: relative;
@@ -463,5 +459,26 @@
     position: relative;
     top: 4px;
     margin-right: 6px
+  }
+}
+
+.bcs__unsynced-item__table {
+  table {
+    border-collapse: separate;
+    .bcs__unsynced-item {
+      td {
+        width: 17%;
+        vertical-align: middle;
+      }
+      td:first-child {
+        width: 66%;
+      }
+      td:last-child {
+        text-align: right;
+      }
+      .bcs__unsynced-item__name {
+        display: flex;
+      }
+    }
   }
 }

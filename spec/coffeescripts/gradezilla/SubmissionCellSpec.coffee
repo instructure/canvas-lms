@@ -110,10 +110,6 @@ define [
     submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 73 }, {}, {}, { isLocked: false })
     equal submissionCellResponse.indexOf("cannot_edit"), -1
 
-  test "#class.formatter, tooltip adds your text to the special classes", ->
-    submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 73 }, {}, {}, { tooltip: "dora_the_explorer" })
-    ok submissionCellResponse.indexOf("dora_the_explorer") > -1
-
   test "#class.formatter, isInactive: false doesn't add grayed-out", ->
     student = { isInactive: false }
     submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 10 }, { }, student)
@@ -160,10 +156,6 @@ define [
     submissionCellResponse = SubmissionCell.letter_grade.formatter(0, 0, { grade: "A" }, {}, {}, { isLocked: false })
     equal submissionCellResponse.indexOf("cannot_edit"), -1
 
-  test "#letter_grade.formatter, tooltip adds your text to the special classes", ->
-    submissionCellResponse = SubmissionCell.letter_grade.formatter(0, 0, { grade: "A" }, {}, {}, { tooltip: "dora_the_explorer" })
-    ok submissionCellResponse.indexOf("dora_the_explorer") > -1
-
   test "#gpa_scale.formatter, isLocked: true adds grayed-out", ->
     submissionCellResponse = SubmissionCell.gpa_scale.formatter(0, 0, { grade: 3.2 }, {}, {}, { isLocked: true })
     ok submissionCellResponse.indexOf("grayed-out") > -1
@@ -180,10 +172,6 @@ define [
     submissionCellResponse = SubmissionCell.gpa_scale.formatter(0, 0, { grade: 3.2 }, {}, {}, { isLocked: false })
     equal submissionCellResponse.indexOf("cannot_edit"), -1
 
-  test "#gpa_scale.formatter, tooltip adds your text to the special classes", ->
-    submissionCellResponse = SubmissionCell.gpa_scale.formatter(0, 0, { grade: 3.2 }, {}, {}, { tooltip: "dora_the_explorer" })
-    ok submissionCellResponse.indexOf("dora_the_explorer") > -1
-
   test "#pass_fail.formatter, isLocked: true adds grayed-out", ->
     submissionCellResponse = SubmissionCell.pass_fail.formatter(0, 0, { grade: "complete" }, {}, {}, { isLocked: true })
     ok submissionCellResponse.indexOf("grayed-out") > -1
@@ -199,10 +187,6 @@ define [
   test "#pass_fail.formatter, isLocked: false doesn't add cannot_edit", ->
     submissionCellResponse = SubmissionCell.pass_fail.formatter(0, 0, { grade: "complete" }, {}, {}, { isLocked: false })
     equal submissionCellResponse.indexOf("cannot_edit"), -1
-
-  test "#pass_fail.formatter, tooltip adds your text to the special classes", ->
-    submissionCellResponse = SubmissionCell.pass_fail.formatter(0, 0, { grade: "complete" }, {}, {}, { tooltip: "dora_the_explorer" })
-    ok submissionCellResponse.indexOf("dora_the_explorer") > -1
 
   QUnit.module "Pass/Fail SubmissionCell",
     setup: ->
@@ -354,54 +338,6 @@ define [
       "online_text_entry"
     ]
 
-  QUnit.module ".tooltips"
-
-  test "given nothing, it returns nothing", ->
-    deepEqual SubmissionCell.tooltips(), []
-
-  test "given all criteria, everything is present", ->
-    submission =
-      drop: true
-      excused: true
-      grade_matches_current_submission: false
-      missing: true
-      late: true
-      submission_type: "online_url"
-    assignment =
-      submission_types: ["not_graded"]
-      muted: true
-    deepEqual SubmissionCell.tooltips(submission, assignment), [
-      "dropped",
-      "excused",
-      "resubmitted",
-      "missing",
-      "late",
-      "ungraded"
-      "muted",
-      "online_url"
-    ]
-
-  test "given a dropped submission, it returns dropped", ->
-    deepEqual SubmissionCell.tooltips({ drop: true }), ["dropped"]
-
-  test "given an excused submission, it returns excused", ->
-    deepEqual SubmissionCell.tooltips({ excused: true }), ["excused"]
-
-  test "given a resubmitted submission, it returns resubmitted", ->
-    deepEqual SubmissionCell.tooltips({ grade_matches_current_submission: false }), ["resubmitted"]
-
-  test "given a missing submission, it returns missing", ->
-    deepEqual SubmissionCell.tooltips({ missing: true }), ["missing"]
-
-  test "given a late submission, it returns late", ->
-    deepEqual SubmissionCell.tooltips({ late: true }), ["late"]
-
-  test "given an ungraded assignment, it returns ungraded", ->
-    deepEqual SubmissionCell.tooltips({}, { submission_types: ["not_graded"] }), ["ungraded"]
-
-  test "given a muted assignment, it returns muted", ->
-    deepEqual SubmissionCell.tooltips({}, { muted: true }), ["muted"]
-
   QUnit.module "#cellWrapper",
     setup: ->
       @fixtures = document.querySelector('#fixtures')
@@ -413,6 +349,8 @@ define [
           submission_type: "online_text_entry"
       column:
         field: 'whatever'
+        object:
+          id: '42'
 
     teardown: ->
       @fixtures.innerHTML = ''
@@ -449,17 +387,6 @@ define [
   test "if is locked, styles include 'cannot_edit'", ->
     @fixtures.innerHTML = (new SubmissionCell(@params())).cellWrapper('', { isLocked: true })
     strictEqual @fixtures.querySelectorAll('div.cannot_edit').length, 1
-
-  test "if it has tooltip key, styles include that value", ->
-    @fixtures.innerHTML = (new SubmissionCell(@params())).cellWrapper('', { tooltip: 'fake-tooltip' })
-    strictEqual @fixtures.querySelectorAll('div.fake-tooltip').length, 1
-
-  test "if it has tooltip key, tooltips includes that value", ->
-    key = 'in_closed_grading_period'
-    @fixtures.innerHTML = (new SubmissionCell(@params())).cellWrapper('', { tooltip: key })
-    ok @fixtures.querySelector('.gradebook-tooltip').innerText.includes(
-      GRADEBOOK_TRANSLATIONS["submission_tooltip_#{key}"]
-    )
 
   test "if it has turnitin data, styles includes 'turnitin'", ->
     params = @params()

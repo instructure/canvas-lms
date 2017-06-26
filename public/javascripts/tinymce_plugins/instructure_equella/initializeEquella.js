@@ -16,12 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jquery',
-  'jqueryui/dialog'
-], function($) {
+import $ from 'jquery'
+import 'jqueryui/dialog'
 
-  return function(ed) {
+  export default function(ed) {
     var $box = $("#equella_dialog");
     var url = $("#equella_endpoint_url").attr('href');
     var action = $.trim($("#equella_action").text() || "") || "selectOrAdd";
@@ -98,4 +96,3 @@ define([
     $box.dialog('close').dialog('open');
     $box.find("iframe").attr('src', full_url);
   }
-})

@@ -35,9 +35,9 @@ import 'jquery.instructure_misc_helpers'
       ) && this.assignment.has_submitted_submissions;
     }
 
-    showDialog () {
+    showDialog (cb) {
       this.submissionsDownloading(this.assignment.id);
-      INST.downloadSubmissions(this.downloadUrl);
+      INST.downloadSubmissions(this.downloadUrl, cb);
     }
   }
 

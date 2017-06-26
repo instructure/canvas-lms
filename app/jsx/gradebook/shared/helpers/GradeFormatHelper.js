@@ -22,21 +22,14 @@ import round from 'compiled/util/round'
 
 const POINTS = 'points';
 const PERCENT = 'percent';
+const COMPLETION = 'completion';
 
-function shouldFormatGradingType (gradingType) {
-  return gradingType === POINTS || gradingType === PERCENT;
-}
-
-function shouldFormatGrade (grade, gradingType) {
-  if (typeof grade !== 'number') {
-    return false;
+function isCompletion (grade, gradeType) {
+  if (gradeType) {
+    return gradeType === COMPLETION;
   }
 
-  if (gradingType) {
-    return shouldFormatGradingType(gradingType);
-  }
-
-  return true;
+  return grade === 'complete' || grade === 'incomplete';
 }
 
 function isPercent (grade, gradeType) {
@@ -45,6 +38,18 @@ function isPercent (grade, gradeType) {
   }
 
   return /%/g.test(grade);
+}
+
+function shouldFormatGradingType (gradingType) {
+  return gradingType === POINTS || gradingType === PERCENT || gradingType === COMPLETION;
+}
+
+function shouldFormatGrade (grade, gradingType) {
+  if (gradingType) {
+    return shouldFormatGradingType(gradingType);
+  }
+
+  return typeof grade === 'number' || isCompletion(grade);
 }
 
 const GradeFormatHelper = {
@@ -57,7 +62,8 @@ const GradeFormatHelper = {
    * @param {object} options - An optional hash of arguments. The following optional arguments are supported:
    *  gradingType {string} - If present will be used to determine whether or not to
    *    format given grade. A value of 'points' or 'percent' will result in the grade
-   *    being formatted. Any other value will result in the grade not being formatted.
+   *    being formatted. A value of 'completion' will result in internationalization.
+   *    Any other value will result in the grade not being formatted.
    *  precision {number} - If present grade will be rounded to given precision. Default is two decimals.
    *  defaultValue - If present will be the return value when the grade is undefined, null, or empty string.
    *
@@ -74,8 +80,12 @@ const GradeFormatHelper = {
     const parsedGrade = GradeFormatHelper.parseGrade(grade, options);
 
     if (shouldFormatGrade(parsedGrade, options.gradingType)) {
-      const roundedGrade = round(parsedGrade, options.precision || 2);
-      formattedGrade = I18n.n(roundedGrade, { percentage: isPercent(grade, options.gradingType) });
+      if (isCompletion(parsedGrade, options.gradingType)) {
+        formattedGrade = parsedGrade === 'complete' ? I18n.t('complete') : I18n.t('incomplete');
+      } else {
+        const roundedGrade = round(parsedGrade, options.precision || 2);
+        formattedGrade = I18n.n(roundedGrade, { percentage: isPercent(grade, options.gradingType) });
+      }
     }
 
     return formattedGrade;

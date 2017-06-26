@@ -40,7 +40,7 @@ class DiscussionTopic < ActiveRecord::Base
                                :lock_at, :pinned, :locked, :allow_rating, :only_graders_can_rate, :sort_by_rating]
   restrict_assignment_columns
 
-  attr_accessor :user_has_posted, :saved_by, :total_root_discussion_entries, :todo_type
+  attr_accessor :user_has_posted, :saved_by, :total_root_discussion_entries
 
   module DiscussionTypes
     SIDE_COMMENT = 'side_comment'
@@ -510,11 +510,28 @@ class DiscussionTopic < ActiveRecord::Base
   scope :by_last_reply_at, -> { order("discussion_topics.last_reply_at DESC, discussion_topics.created_at DESC, discussion_topics.id DESC") }
 
   scope :by_posted_at, -> { order(<<-SQL)
-      COALESCE(discussion_topics.delayed_post_at, discussion_topics.posted_at) DESC,
+      COALESCE(discussion_topics.delayed_post_at, discussion_topics.posted_at, discussion_topics.created_at) DESC,
       discussion_topics.created_at DESC,
       discussion_topics.id DESC
     SQL
   }
+
+  scope :read_for, lambda { |user|
+    eager_load(:discussion_topic_participants).
+    where("discussion_topic_participants.id IS NOT NULL
+          AND (discussion_topic_participants.user_id = :user
+            AND discussion_topic_participants.workflow_state = 'read')",
+          user: user)
+  }
+  scope :unread_for, lambda { |user|
+    # TODO: Fix for when participants doesn't include user
+    eager_load(:discussion_topic_participants).
+    where("discussion_topic_participants.id IS NULL
+          OR (discussion_topic_participants.user_id = :user
+            AND discussion_topic_participants.workflow_state <> 'read')",
+          user: user)
+  }
+  scope :published, -> { where("discussion_topics.workflow_state = 'active'") }
 
   alias_attribute :available_from, :delayed_post_at
   alias_attribute :unlock_at, :delayed_post_at

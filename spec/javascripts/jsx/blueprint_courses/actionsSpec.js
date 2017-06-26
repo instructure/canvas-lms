@@ -618,7 +618,7 @@ test('removeAssociations dispatches REMOVE_COURSE_ASSOCIATIONS when removed asso
   actions.removeAssociations(['1'])(dispatchSpy, getState)
 
   equal(dispatchSpy.callCount, 1)
-  deepEqual(dispatchSpy.firstCall.args, [{ type: 'REMOVE_COURSE_ASSOCIATIONS', payload: ['1'] }])
+  deepEqual(dispatchSpy.firstCall.args, [{ type: 'REMOVE_COURSE_ASSOCIATIONS', payload: [{ id: '1', name: 'First Course'}] }])
 })
 
 test('removeAssociations dispatches UNDO_ADD_COURSE_ASSOCIATIONS when removed associations are new', () => {

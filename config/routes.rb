@@ -223,6 +223,7 @@ CanvasRails::Application.routes.draw do
         post :update_submission
         post :change_gradebook_column_size
         post :save_gradebook_column_order
+        get :user_ids
       end
     end
 
@@ -280,6 +281,9 @@ CanvasRails::Application.routes.draw do
       member do
         get :list_google_docs
       end
+
+      get 'lti/resource/:resource_link_id', controller: 'lti/message',
+          action: 'resource', as: :resource_link_id
     end
 
     resources :grading_standards, only: [:index, :create, :update, :destroy]
@@ -678,6 +682,7 @@ CanvasRails::Application.routes.draw do
   get 'grades_for_student' => 'users#grades_for_student'
 
   get 'login' => 'login#new'
+  get 'login/session_token' => 'login#session_token'
   delete 'logout' => 'login#destroy'
   get 'logout' => 'login#logout_confirm'
 
@@ -1036,6 +1041,7 @@ CanvasRails::Application.routes.draw do
       get 'courses/:course_id/assignments/:id', action: :show, as: 'course_assignment'
       post 'courses/:course_id/assignments', action: :create
       put 'courses/:course_id/assignments/:id', action: :update
+      post 'courses/:course_id/assignments/:assignment_id/duplicate', action: :duplicate
       delete 'courses/:course_id/assignments/:id', action: :destroy, controller: :assignments
     end
 
@@ -1220,7 +1226,7 @@ CanvasRails::Application.routes.draw do
 
       get 'users/self/todo', action: :todo_items
       get 'users/self/upcoming_events', action: :upcoming_events
-      get 'users/:user_id/missing_submissions', action: :missing_submissions
+      get 'users/:user_id/missing_submissions', action: :missing_submissions, as: 'user_missing_submissions'
 
       delete 'users/self/todo/:asset_string/:purpose', action: :ignore_item, as: 'users_todo_ignore'
       post 'accounts/:account_id/users', action: :create
@@ -1512,6 +1518,7 @@ CanvasRails::Application.routes.draw do
       get "groups/:group_id/front_page", action: :show_front_page
       put "courses/:course_id/front_page", action: :update_front_page
       put "groups/:group_id/front_page", action: :update_front_page
+      post "courses/:course_id/pages/:url/duplicate", action: :duplicate
 
       get "courses/:course_id/pages", action: :index, as: 'course_wiki_pages'
       get "groups/:group_id/pages", action: :index, as: 'group_wiki_pages'
@@ -1964,7 +1971,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :planner_notes) do
       get 'planner_notes', action: :index, as: :planner_notes
-      get 'planner_notes/:id', action: :show
+      get 'planner_notes/:id', action: :show, as: :planner_notes_show
       put 'planner_notes/:id', action: :update
       post 'planner_notes', action: :create
       delete 'planner_notes/:id', action: :destroy
@@ -2057,6 +2064,9 @@ CanvasRails::Application.routes.draw do
     scope(controller: :sis_api) do
       get 'accounts/:account_id/assignments', action: 'sis_assignments', as: :sis_account_assignments
       get 'courses/:course_id/assignments', action: 'sis_assignments', as: :sis_course_assignments
+    end
+    scope(controller: :disable_post_to_sis_api) do
+      put 'courses/:course_id/disable_post_to_sis', action: 'disable_post_to_sis', as: :disable_post_to_sis_course_assignments
     end
   end
 end

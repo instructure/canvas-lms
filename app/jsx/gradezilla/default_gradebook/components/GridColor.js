@@ -18,15 +18,14 @@
 
 import React from 'react';
 import { arrayOf, shape, string } from 'prop-types';
-import { getUserColors } from 'jsx/gradezilla/default_gradebook/stores/UserColorStore';
 import { statuses } from 'jsx/gradezilla/default_gradebook/constants/statuses';
+import { darken } from 'jsx/gradezilla/default_gradebook/constants/colors';
 
 function GridColor (props) {
-  const colorsByStatus = getUserColors(props.colors);
   const styleRules = props.statuses.map(status =>
     [
-      `.even .gradebook-cell.${status} { background-color: ${colorsByStatus.light[status]}; }`,
-      `.odd .gradebook-cell.${status} { background-color: ${colorsByStatus.dark[status]}; }`,
+      `.even .gradebook-cell.${status} { background-color: ${props.colors[status]}; }`,
+      `.odd .gradebook-cell.${status} { background-color: ${darken(props.colors[status], 5)}; }`,
       `.slick-cell.editable .gradebook-cell.${status} { background-color: white; }`
     ].join('')
   ).join('');

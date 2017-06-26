@@ -61,6 +61,7 @@ define [
 
     events:
       'click .delete_assignment': 'onDelete'
+      'click .duplicate_assignment': 'onDuplicate'
       'click .tooltip_link': preventDefault ->
       'keydown': 'handleKeys'
       'mousedown': 'stopMoveIfProtected'
@@ -190,6 +191,7 @@ define [
 
       data.canMove = @canMove()
       data.canDelete = @canDelete()
+      data.canDuplicate = @canDuplicate()
       data.is_locked =  @model.isRestrictedByMasterCourse()
       data.showAvailability = @model.multipleDueDates() or not @model.defaultDates().available()
       data.showDueDate = @model.multipleDueDates() or @model.singleSectionDueDate()
@@ -231,6 +233,16 @@ define [
       else
         data
 
+    addAssignmentToList: (response) =>
+      return unless response
+      @model.collection.view.insertAssignment(response, @model)
+      @focusOnAssignment(response)
+
+    onDuplicate: (e) =>
+      return unless @canDuplicate()
+      e.preventDefault()
+      @model.duplicate(@addAssignmentToList)
+
     onDelete: (e) =>
       e.preventDefault()
       return unless @canDelete()
@@ -256,6 +268,13 @@ define [
 
     canDelete: ->
       (@userIsAdmin or @model.canDelete()) && !@model.isRestrictedByMasterCourse()
+
+    isDuplicableAssignment: ->
+      !@model.is_quiz_assignment() && !@model.isDiscussionTopic()
+
+    canDuplicate: ->
+      # For now, forbid duplicating quizzes. We will implement that later.
+      (@userIsAdmin || @canManage()) && @isDuplicableAssignment()
 
     canMove: ->
       @userIsAdmin or (@canManage() and @model.canMove())

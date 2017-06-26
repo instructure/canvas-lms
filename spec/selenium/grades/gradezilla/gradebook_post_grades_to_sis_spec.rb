@@ -58,7 +58,7 @@ describe "Gradezilla - post grades to SIS" do
       Gradezilla.visit(@course)
       Gradezilla.open_action_menu
 
-      expect(f('body')).not_to contain_css(Gradezilla.action_menu_item_selector('post_grades_feature_tool'))
+      expect(f('body')).not_to contain_css("[data-menu-id='post_grades_feature_tool']")
     end
 
     it "should be visible when enabled on course with sis_source_id" do
@@ -69,20 +69,7 @@ describe "Gradezilla - post grades to SIS" do
       Gradezilla.visit(@course)
       Gradezilla.open_action_menu
 
-      expect(f('body')).to contain_css(Gradezilla.action_menu_item_selector('post_grades_feature_tool'))
-    end
-
-    it "containing menu should not be displayed if viewing outcome gradebook", priority: "1", test_id: 244959 do
-      Account.default.set_feature_flag!('post_grades', 'on')
-      Account.default.set_feature_flag!('outcome_gradebook', 'on')
-      @course.sis_source_id = 'xyz'
-      @course.save
-
-      Gradezilla.visit(@course)
-      Gradezilla.open_gradebook_dropdown_menu
-      Gradezilla.select_menu_item('learning-mastery')
-
-      expect(Gradezilla.action_menu).not_to be_displayed
+      expect(f('body')).to contain_css("[data-menu-id='post_grades_feature_tool']")
     end
 
     it 'does not show assignment errors when clicking the post grades button if all ' \
@@ -100,7 +87,7 @@ describe "Gradezilla - post grades to SIS" do
       end
       Gradezilla.visit(@course)
       Gradezilla.open_action_menu
-      Gradezilla.select_action_menu_item('post_grades_feature_tool')
+      Gradezilla.action_menu_item_selector('post_grades_feature_tool').click
 
       expect(f('.post-grades-dialog')).not_to contain_css('#assignment-errors')
     end
@@ -131,9 +118,9 @@ describe "Gradezilla - post grades to SIS" do
       Gradezilla.visit(@course)
       Gradezilla.open_action_menu
 
-      expect(Gradezilla.action_menu_item(tool_name)).to be_displayed
+      expect(Gradezilla.action_menu_item_selector(tool_name)).to be_displayed
 
-      Gradezilla.select_action_menu_item(tool_name)
+      Gradezilla.action_menu_item_selector(tool_name).click
 
       expect(f('iframe.post-grades-frame')).to be_displayed
     end
@@ -148,9 +135,9 @@ describe "Gradezilla - post grades to SIS" do
       Gradezilla.visit(@course)
       Gradezilla.open_action_menu
 
-      expect(Gradezilla.action_menu_item(tool_name)).to be_displayed
+      expect(Gradezilla.action_menu_item_selector(tool_name)).to be_displayed
 
-      Gradezilla.select_action_menu_item(tool_name)
+      Gradezilla.action_menu_item_selector(tool_name).click
 
       expect(f('iframe.post-grades-frame')).to be_displayed
     end
@@ -161,13 +148,12 @@ describe "Gradezilla - post grades to SIS" do
       Gradezilla.visit(@course)
       Gradezilla.open_action_menu
 
-      expect(Gradezilla.action_menu_item(tool_name)).to be_displayed
+      expect(Gradezilla.action_menu_item_selector(tool_name)).to be_displayed
 
-      f('button.section-select-button').click
-      fj('ul#section-to-show-menu li:nth(2)').click
+      switch_to_section('the other section')
       Gradezilla.open_action_menu
 
-      expect(Gradezilla.action_menu_item(tool_name)).to be_displayed
+      expect(Gradezilla.action_menu_item_selector(tool_name)).to be_displayed
     end
   end
 end

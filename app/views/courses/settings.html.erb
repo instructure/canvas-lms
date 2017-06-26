@@ -414,7 +414,7 @@
               %>
             <% end %>
           </span>
-          <a href="#" class="course_form course_form_more_options_link" style="padding-left: 20px;"><%= t('links.more_options', %{more options}) %></a>
+          <a href="#" role="button" class="course_form course_form_more_options_link" style="padding-left: 20px;"><%= t('links.more_options', %{more options}) %></a>
           <div class="course_form_more_options" style="display: none; padding-left: 20px;">
             <% if @context.self_enrollment_allowed? %>
               <%= f.check_box :self_enrollment, :class => 'self_enrollment_checkbox', :disabled => !can_manage %>
@@ -502,13 +502,13 @@
           </span>
           <span class="section_links">
             <% if can_do(section, @current_user, :update) && !section.defined_by_sis? %>
-              <a class="no-hover edit_section_link" title="<%= t('links.title.edit_section', %{Edit Section}) %>" href="<%= context_url(@context, :context_section_url, section) %>"><i class="icon-edit standalone-icon"></i><span class="screenreader-only"><%= t('images.alt.edit', %{Edit}) %></span></a>
+              <a class="no-hover edit_section_link" role="button" title="<%= t('links.title.edit_section', %{Edit Section}) %>" href="<%= context_url(@context, :context_section_url, section) %>"><i class="icon-edit standalone-icon"></i><span class="screenreader-only"><%= t('Edit Section "%{name}"', :name => section.name) %></span></a>
             <% end %>
             <% if can_do(section, @current_user, :delete) %>
               <% if section.deletable? %>
-                <a class="no-hover delete_section_link" title="<%= t('links.title.delete_section', %{Delete Section}) %>" href="<%= context_url(@context, :context_section_url, section) %>"><i class="icon-end standalone-icon"></i><span class="screenreader-only"><%= t('images.alt.delete', %{Delete}) %></span></a>
+                <a class="no-hover delete_section_link" role="button" title="<%= t('links.title.delete_section', %{Delete Section}) %>" href="<%= context_url(@context, :context_section_url, section) %>"><i class="icon-end standalone-icon"></i><span class="screenreader-only"><%= t('Delete Section "%{name}"', :name => section.name) %></span></a>
               <% else %>
-                <a class="no-hover cant_delete_section_link" href="#" title="<%= t('links.title.cant_delete', %{You can't delete sections that have users enrolled}) %>"><i class="icon-end standalone-icon"></i><span class="screenreader-only"><%= t('images.alt.delete', %{Delete}) %></span></a>
+                <a class="no-hover cant_delete_section_link" role="button" href="#" title="<%= t('links.title.cant_delete', %{You can't delete sections that have users enrolled}) %>"><i class="icon-end standalone-icon"></i><span class="screenreader-only"><%= t('Delete Section "%{name}"', :name => section.name) %></span></a>
               <% end %>
             <% end %>
           </span>
@@ -518,8 +518,8 @@
       <li class="section_blank" style="display: none;">
         <a href="<%= context_url(@context, :context_section_url, "{{ id }}") %>" class="name"></a>
         <span class="section_links">
-          <a class="no-hover edit_section_link" href="<%= context_url(@context, :context_section_url, "{{ id }}") %>" title="<%= t('links.title.edit_section', %{Edit Section}) %>"><i class="icon-edit standalone-icon"></i><span class="screenreader-only"><%= t('images.alt.edit', %{Edit}) %></span></a>
-          <a class="delete_section_link" href="<%= context_url(@context, :context_section_url, "{{ id }}") %>" title="<%= t('links.title.delete_section', %{Delete Section}) %>" class="no-hover"><i class="icon-end standalone-icon"></i><span class="screenreader-only"><%= t('images.alt.delete', %{Delete}) %></span></a>
+          <a class="no-hover edit_section_link" role="button" href="<%= context_url(@context, :context_section_url, "{{ id }}") %>" title="<%= t('links.title.edit_section', %{Edit Section}) %>"><i class="icon-edit standalone-icon"></i><span class="screenreader-only"><%= t('Edit Section "%{name}"', :name => "%%name%%") %></span></a>
+          <a class="delete_section_link" role="button" href="<%= context_url(@context, :context_section_url, "{{ id }}") %>" title="<%= t('links.title.delete_section', %{Delete Section}) %>" class="no-hover"><i class="icon-end standalone-icon"></i><span class="screenreader-only"><%= t('Delete Section "%{name}"', :name => "%%name%%") %></span></a>
         </span>
         <div class="clear"></div>
       </li>

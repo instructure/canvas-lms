@@ -34,7 +34,7 @@ describe "Gradezilla - arrange by due date" do
     Gradezilla.visit(@course)
   end
 
-  it "validates arrange columns by due date option", priority: "1", test_id: 220027 do
+  it "validates arrange columns by due date option", priority: "1", test_id: 3253270 do
     expected_text = "-"
 
     Gradezilla.open_view_menu_and_arrange_by_menu

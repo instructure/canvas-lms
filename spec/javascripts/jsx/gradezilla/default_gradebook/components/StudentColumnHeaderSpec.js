@@ -16,38 +16,62 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import { mount, ReactWrapper } from 'enzyme'
-import StudentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/StudentRowHeaderConstants'
-import StudentColumnHeader from 'jsx/gradezilla/default_gradebook/components/StudentColumnHeader'
+import React from 'react';
+import { mount } from 'enzyme';
+import studentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/studentRowHeaderConstants';
+import StudentColumnHeader from 'jsx/gradezilla/default_gradebook/components/StudentColumnHeader';
+import {
+  findMenuContent,
+  findFlyout,
+  findFlyoutMenuContent,
+  findMenuItem
+} from './helpers/columnHeaderHelpers';
+
+function mountComponent (props, mountOptions = {}) {
+  return mount(<StudentColumnHeader {...props} />, mountOptions);
+}
 
 function mountAndOpenOptions (props) {
-  const wrapper = mount(<StudentColumnHeader {...props} />);
+  const wrapper = mountComponent(props);
   wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
   return wrapper;
 }
 
-QUnit.module('StudentColumnHeader - base behavior', {
-  setup () {
-    const props = {
-      onToggleEnrollmentFilter () {},
-      selectedEnrollmentFilters: [],
-      selectedSecondaryInfo: StudentRowHeaderConstants.defaultSecondaryInfo,
-      sectionsEnabled: true,
-      selectedPrimaryInfo: StudentRowHeaderConstants.defaultPrimaryInfo,
-      onSelectPrimaryInfo () {},
-      onSelectSecondaryInfo () {},
-      sortBySetting: {
-        direction: 'ascending',
-        disabled: false,
-        isSortColumn: true,
-        onSortBySortableNameAscending () {},
-        onSortBySortableNameDescending () {},
-        settingKey: 'sortable_name'
-      }
-    };
+function defaultProps ({ props, sortBySetting } = {}) {
+  return {
+    onToggleEnrollmentFilter () {},
+    selectedEnrollmentFilters: [],
+    sectionsEnabled: true,
+    selectedSecondaryInfo: studentRowHeaderConstants.defaultSecondaryInfo,
+    onSelectSecondaryInfo () {},
+    selectedPrimaryInfo: studentRowHeaderConstants.defaultPrimaryInfo,
+    onSelectPrimaryInfo () {},
+    sortBySetting: {
+      direction: 'ascending',
+      disabled: false,
+      isSortColumn: true,
+      onSortBySortableNameAscending () {},
+      onSortBySortableNameDescending () {},
+      settingKey: 'sortable_name',
+      ...sortBySetting
+    },
+    addGradebookElement () {},
+    removeGradebookElement () {},
+    onMenuClose () {},
+    ...props
+  };
+}
 
-    this.wrapper = mount(<StudentColumnHeader {...props} />);
+QUnit.module('StudentColumnHeader', {
+  setup () {
+    this.props = defaultProps({
+      props: {
+        addGradebookElement: this.stub(),
+        removeGradebookElement: this.stub(),
+        onMenuClose: this.stub()
+      }
+    });
+    this.wrapper = mountComponent(this.props);
   },
 
   teardown () {
@@ -64,13 +88,13 @@ test('renders a title for .Gradebook__ColumnHeaderDetail', function () {
 test('renders a PopoverMenu', function () {
   const selectedElements = this.wrapper.find('PopoverMenu');
 
-  equal(selectedElements.length, 1);
+  strictEqual(selectedElements.length, 1);
 });
 
 test('renders a PopoverMenu with a trigger', function () {
   const optionsMenuTrigger = this.wrapper.find('PopoverMenu .Gradebook__ColumnHeaderAction');
 
-  equal(optionsMenuTrigger.length, 1);
+  strictEqual(optionsMenuTrigger.length, 1);
 });
 
 test('adds a class to the trigger when the PopoverMenu is opened', function () {
@@ -83,28 +107,84 @@ test('adds a class to the trigger when the PopoverMenu is opened', function () {
 test('renders a title for the More icon', function () {
   const selectedElements = this.wrapper.find('PopoverMenu IconMoreSolid');
 
-  equal(selectedElements.props().title, 'Student Name Options');
+  strictEqual(selectedElements.props().title, 'Student Name Options');
 });
 
-QUnit.module('StudentColumnHeader - secondaryInfoMenuGroup', {
+test('calls addGradebookElement prop on open', function () {
+  notOk(this.props.addGradebookElement.called);
+
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+  ok(this.props.addGradebookElement.called);
+});
+
+test('calls removeGradebookElement prop on close', function () {
+  notOk(this.props.removeGradebookElement.called);
+
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+  ok(this.props.removeGradebookElement.called);
+});
+
+test('calls onMenuClose prop on close', function () {
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+  strictEqual(this.props.onMenuClose.callCount, 1);
+});
+
+QUnit.module('StudentColumnHeader disabled prop', {
   setup () {
-    this.props = {
-      onToggleEnrollmentFilter () {},
-      selectedEnrollmentFilters: [],
-      sectionsEnabled: true,
-      selectedSecondaryInfo: StudentRowHeaderConstants.defaultSecondaryInfo,
-      onSelectSecondaryInfo: this.stub(),
-      selectedPrimaryInfo: StudentRowHeaderConstants.defaultPrimaryInfo,
-      onSelectPrimaryInfo () {},
-      sortBySetting: {
-        direction: 'ascending',
-        disabled: false,
-        isSortColumn: true,
-        onSortBySortableNameAscending () {},
-        onSortBySortableNameDescending () {},
-        settingKey: 'sortable_name'
-      }
-    };
+    this.mountAndOpenOptions = mountAndOpenOptions;
+  }
+});
+
+test('renders flyout menus disabled when prop is true', function () {
+  this.wrapper = findMenuContent.call(this, defaultProps({props: {disabled: true}}));
+  const flyoutMenus = this.wrapper.find('MenuItemFlyout');
+
+  flyoutMenus.forEach((flyoutMenu) => {
+    ok(flyoutMenu.prop('disabled'));
+  });
+});
+
+test('renders menu items disabled when prop is true', function () {
+  this.wrapper = findMenuContent.call(this, defaultProps({props: {disabled: true}}));
+  const menuItemGroups = this.wrapper.find('MenuItemGroup');
+
+  menuItemGroups.forEach((menuItemGroup) => {
+    const menuItems = menuItemGroup.find('MenuItem');
+    menuItems.forEach((menuItem) => {
+      ok(menuItem.prop('disabled'));
+    })
+  });
+});
+
+test('renders flyout menus enabled when prop is false', function () {
+  this.wrapper = findMenuContent.call(this, defaultProps({props: {disabled: false}}));
+  const flyoutMenus = this.wrapper.find('MenuItemFlyout');
+
+  flyoutMenus.forEach((flyoutMenu) => {
+    notOk(flyoutMenu.prop('disabled'));
+  });
+});
+
+test('renders menu items enabled when prop is false', function () {
+  this.wrapper = findMenuContent.call(this, defaultProps({props: {disabled: false}}));
+  const menuItemGroups = this.wrapper.find('MenuItemGroup');
+
+  menuItemGroups.forEach((menuItemGroup) => {
+    const menuItems = menuItemGroup.find('MenuItem');
+    menuItems.forEach((menuItem) => {
+      notOk(menuItem.prop('disabled'));
+    })
+  });
+});
+
+QUnit.module('StudentColumnHeader: Secondary info', {
+  setup () {
+    this.mountAndOpenOptions = mountAndOpenOptions;
   },
 
   teardown () {
@@ -112,76 +192,154 @@ QUnit.module('StudentColumnHeader - secondaryInfoMenuGroup', {
   }
 });
 
-test('renders a MenuItemGroup for secondary info options', function () {
-  this.wrapper = mountAndOpenOptions(this.props);
-  const menuItemGroup = this.wrapper.find('[data-menu-item-group-id="secondary-info"]');
-  ok(menuItemGroup);
+test('sort by menu group does not allow multiple selections', function () {
+  const flyout = findFlyoutMenuContent.call(this, defaultProps(), 'Sort by');
+  strictEqual(flyout.find('MenuItemGroup').prop('allowMultiple'), false);
 });
 
-test('renders a MenuItem for each secondary info option', function () {
-  this.wrapper = mountAndOpenOptions(this.props);
+QUnit.module('StudentColumnHeader: Secondary info > Section', {
+  setup () {
+    this.mountAndOpenOptions = mountAndOpenOptions;
+  },
 
-  StudentRowHeaderConstants.secondaryInfoKeys.forEach((key) => {
-    const menuItem = document.querySelector(`[data-menu-item-id="${key}"]`);
-
-    ok(menuItem);
-  });
+  teardown () {
+    this.wrapper.unmount();
+  }
 });
 
-test('invokes prop onSelectSecondaryInfo when MenuItem is clicked', function () {
-  this.wrapper = mount(<StudentColumnHeader {...this.props} />);
+test('includes a Section MenuItem', function () {
+  const menuItem = findMenuItem.call(this, defaultProps(), 'Secondary info', 'Section');
+  strictEqual(menuItem.length, 1);
+});
 
-  StudentRowHeaderConstants.secondaryInfoKeys.forEach((key) => {
-    this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
-    const menuItem = document.querySelector(`[data-menu-item-id="${key}"]`);
+test('calls onSelectSecondaryInfo once', function () {
+  const onSelectSecondaryInfo = this.stub();
+  const props = defaultProps({ props: { onSelectSecondaryInfo } });
+  const section = findMenuItem.call(this, props, 'Secondary info', 'Section');
+  section.simulate('click');
+  strictEqual(onSelectSecondaryInfo.callCount, 1);
+});
 
-    menuItem.click();
+test('calls onSelectSecondaryInfo with "section"', function () {
+  const onSelectSecondaryInfo = this.stub();
+  const props = defaultProps({ props: { onSelectSecondaryInfo } });
+  const section = findMenuItem.call(this, props, 'Secondary info', 'Section');
+  section.simulate('click');
 
-    equal(this.props.onSelectSecondaryInfo.lastCall.args[0], key);
-  });
+  ok(onSelectSecondaryInfo.calledWithExactly('section'));
 });
 
 test('omits section when sectionsEnabled prop is false', function () {
-  this.props.sectionsEnabled = false;
-  this.wrapper = mountAndOpenOptions(this.props);
-  const menuItem = document.querySelector('[data-menu-item-id="section"]');
-  notOk(menuItem);
+  const props = defaultProps({ props: { sectionsEnabled: false } });
+  const section = findMenuItem.call(this, props, 'Secondary info', 'Section');
+  notOk(section);
+});
+
+QUnit.module('StudentColumnHeader: Secondary info > SIS ID', {
+  setup () {
+    this.mountAndOpenOptions = mountAndOpenOptions;
+    const props = defaultProps();
+    this.SISIDMenuItem = findMenuItem.call(this, props, 'Secondary info', 'SIS ID');
+  },
+
+  teardown () {
+    this.wrapper.unmount();
+  }
+});
+
+test('includes an SIS ID MenuItem', function () {
+  strictEqual(this.SISIDMenuItem.length, 1);
+});
+
+test('calls onSelectSecondaryInfo once', function () {
+  const onSelectSecondaryInfo = this.stub();
+  const props = defaultProps({ props: { onSelectSecondaryInfo } });
+  const SISID = findMenuItem.call(this, props, 'Secondary info', 'SIS ID');
+  SISID.simulate('click');
+
+  strictEqual(onSelectSecondaryInfo.callCount, 1);
+});
+
+test('calls onSelectSecondaryInfo with "sis id"', function () {
+  const onSelectSecondaryInfo = this.stub();
+  const props = defaultProps({ props: { onSelectSecondaryInfo } });
+  const SISID = findMenuItem.call(this, props, 'Secondary info', 'SIS ID');
+  SISID.simulate('click');
+
+  ok(onSelectSecondaryInfo.calledWithExactly('sis_id'));
+});
+
+QUnit.module('StudentColumnHeader: Secondary info > Login ID', {
+  setup () {
+    this.mountAndOpenOptions = mountAndOpenOptions;
+    const props = defaultProps();
+    this.loginIDMenuItem = findMenuItem.call(this, props, 'Secondary info', 'Login ID');
+  },
+
+  teardown () {
+    this.wrapper.unmount();
+  }
+});
+
+test('includes a Login ID MenuItem', function () {
+  strictEqual(this.loginIDMenuItem.length, 1);
+});
+
+test('calls onSelectSecondaryInfo once', function () {
+  const onSelectSecondaryInfo = this.stub();
+  const props = defaultProps({ props: { onSelectSecondaryInfo } });
+  const loginID = findMenuItem.call(this, props, 'Secondary info', 'Login ID');
+  loginID.simulate('click');
+
+  strictEqual(onSelectSecondaryInfo.callCount, 1);
+});
+
+test('calls onSelectSecondaryInfo with "login id"', function () {
+  const onSelectSecondaryInfo = this.stub();
+  const props = defaultProps({ props: { onSelectSecondaryInfo } });
+  const loginID = findMenuItem.call(this, props, 'Secondary info', 'Login ID');
+  loginID.simulate('click');
+
+  ok(onSelectSecondaryInfo.calledWithExactly('login_id'));
+});
+
+QUnit.module('StudentColumnHeader: Secondary info > None', {
+  setup () {
+    this.mountAndOpenOptions = mountAndOpenOptions;
+    const props = defaultProps();
+    this.noneMenuItem = findMenuItem.call(this, props, 'Secondary info', 'None');
+  },
+
+  teardown () {
+    this.wrapper.unmount();
+  }
+});
+
+test('includes a None MenuItem', function () {
+  strictEqual(this.noneMenuItem.length, 1);
+});
+
+test('calls onSelectSecondaryInfo once', function () {
+  const onSelectSecondaryInfo = this.stub();
+  const props = defaultProps({ props: { onSelectSecondaryInfo } });
+  const none = findMenuItem.call(this, props, 'Secondary info', 'None');
+  none.simulate('click');
+
+  strictEqual(onSelectSecondaryInfo.callCount, 1);
+});
+
+test('calls onSelectSecondaryInfo with "none"', function () {
+  const onSelectSecondaryInfo = this.stub();
+  const props = defaultProps({ props: { onSelectSecondaryInfo } });
+  const none = findMenuItem.call(this, props, 'Secondary info', 'None');
+  none.simulate('click');
+
+  ok(onSelectSecondaryInfo.calledWithExactly('none'));
 });
 
 QUnit.module('StudentColumnHeader - Sort by Settings', {
   setup () {
-    this.props = {
-      onToggleEnrollmentFilter () {},
-      selectedEnrollmentFilters: [],
-      sectionsEnabled: true,
-      selectedSecondaryInfo: StudentRowHeaderConstants.defaultSecondaryInfo,
-      onSelectSecondaryInfo: this.stub(),
-      selectedPrimaryInfo: StudentRowHeaderConstants.defaultPrimaryInfo,
-      onSelectPrimaryInfo () {},
-      sortBySetting: {
-        direction: 'ascending',
-        disabled: false,
-        isSortColumn: true,
-        onSortBySortableNameAscending () {},
-        onSortBySortableNameDescending () {},
-        settingKey: 'sortable_name'
-      }
-    };
-  },
-
-  getMenuItemGroup () {
-    return new ReactWrapper(
-      [this.wrapper.node.optionsMenuContent],
-      this.wrapper.node
-    ).find('MenuItemGroup').first();
-  },
-
-  getMenuItem (index) {
-    return this.getMenuItemGroup().find('MenuItem').at(index);
-  },
-
-  getSelectedMenuItem () {
-    return this.getMenuItemGroup().findWhere(menuItem => menuItem.prop('selected'));
+    this.mountAndOpenOptions = mountAndOpenOptions;
   },
 
   teardown () {
@@ -190,252 +348,341 @@ QUnit.module('StudentColumnHeader - Sort by Settings', {
 });
 
 test('includes the "Sort by" group', function () {
-  this.wrapper = mountAndOpenOptions(this.props);
-  const optionsMenu = new ReactWrapper([this.wrapper.node.optionsMenuContent], this.wrapper.node);
-  const menuItemGroup = optionsMenu.find('MenuItemGroup').at(0);
-  equal(menuItemGroup.length, 1, '"Sort by" group exists');
-  equal(menuItemGroup.prop('label'), 'Sort by');
+  const flyout = findFlyout.call(this, defaultProps(), 'Sort by');
+  strictEqual(flyout.prop('label'), 'Sort by');
 });
 
 test('includes "A–Z" sort setting', function () {
-  this.wrapper = mountAndOpenOptions(this.props);
-  const menuItem = this.getMenuItem(0);
-  equal(menuItem.text().trim(), 'A–Z');
+  const menuItem = findMenuItem.call(this, defaultProps(), 'Sort by', 'A–Z');
+  strictEqual(menuItem.text().trim(), 'A–Z');
 });
 
 test('selects "A–Z" when sorting by sortable name ascending', function () {
-  this.wrapper = mountAndOpenOptions(this.props);
-  const menuItem = this.getSelectedMenuItem();
-  equal(menuItem.length, 1, 'only one menu item is selected');
-  equal(menuItem.text().trim(), 'A–Z', '"A–Z" is selected');
+  const menuItem = findMenuItem.call(this, defaultProps(), 'Sort by', 'A–Z');
+  strictEqual(menuItem.prop('selected'), true);
 });
 
 test('does not select "A–Z" when isSortColumn is false', function () {
-  this.props.sortBySetting.isSortColumn = false;
-  this.wrapper = mountAndOpenOptions(this.props);
-  const menuItem = this.getMenuItem(0);
-  equal(menuItem.prop('selected'), false);
+  const props = defaultProps({ sortBySetting: { isSortColumn: false } });
+  const menuItem = findMenuItem.call(this, props, 'Sort by', 'A–Z');
+  strictEqual(menuItem.prop('selected'), false);
 });
 
 test('clicking "A–Z" calls onSortBySortableNameAscending', function () {
-  this.props.sortBySetting.onSortBySortableNameAscending = this.stub();
-  this.wrapper = mountAndOpenOptions(this.props);
-  this.getMenuItem(0).simulate('click');
-  equal(this.props.sortBySetting.onSortBySortableNameAscending.callCount, 1);
+  const onSortBySortableNameAscending = this.stub();
+  const props = defaultProps({ sortBySetting: { onSortBySortableNameAscending } });
+  findMenuItem.call(this, props, 'Sort by', 'A–Z').simulate('click');
+  strictEqual(onSortBySortableNameAscending.callCount, 1);
 });
 
 test('"A–Z" is optionally disabled', function () {
-  this.props.sortBySetting.disabled = true;
-  this.wrapper = mountAndOpenOptions(this.props);
-  const menuItem = this.getMenuItem(0);
-  equal(menuItem.prop('disabled'), true);
-});
-
-test('clicking "A–Z" when disabled does not call onSortBySortableNameAscending', function () {
-  this.props.sortBySetting.disabled = true;
-  this.props.sortBySetting.onSortBySortableNameAscending = this.stub();
-  this.wrapper = mountAndOpenOptions(this.props);
-  this.getMenuItem(0).simulate('click');
-  equal(this.props.sortBySetting.onSortBySortableNameAscending.callCount, 0);
+  const props = defaultProps({ sortBySetting: { disabled: true } });
+  const menuItem = findMenuItem.call(this, props, 'Sort by', 'A–Z');
+  strictEqual(menuItem.prop('disabled'), true);
 });
 
 test('includes "Z–A" sort setting', function () {
-  this.wrapper = mountAndOpenOptions(this.props);
-  const menuItem = this.getMenuItem(1);
-  equal(menuItem.text().trim(), 'Z–A');
+  const sortBySortableNameDescending = findMenuItem.call(this, defaultProps(), 'Sort by', 'Z–A');
+  strictEqual(sortBySortableNameDescending.text().trim(), 'Z–A');
 });
 
 test('selects "Z–A" when sorting by sortable name descending', function () {
-  this.props.sortBySetting.direction = 'descending';
-  this.wrapper = mountAndOpenOptions(this.props);
-  const menuItem = this.getSelectedMenuItem();
-  equal(menuItem.length, 1, 'only one menu item is selected');
-  equal(menuItem.text().trim(), 'Z–A', '"Z–A" is selected');
+  const props = defaultProps({ sortBySetting: { direction: 'descending' } });
+  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Z–A');
+  strictEqual(menuItem.prop('selected'), true);
 });
 
 test('does not select "Z–A" when isSortColumn is false', function () {
-  this.props.sortBySetting.direction = 'descending';
-  this.props.sortBySetting.isSortColumn = false;
-  this.wrapper = mountAndOpenOptions(this.props);
-  const menuItem = this.getMenuItem(1);
-  equal(menuItem.prop('selected'), false);
+  const props = defaultProps({ sortBySetting: { direction: 'descending', isSortColumn: false } });
+  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Z–A');
+  strictEqual(menuItem.prop('selected'), false);
 });
 
 test('clicking "Z–A" calls onSortBySortableNameDescending', function () {
-  this.props.sortBySetting.onSortBySortableNameDescending = this.stub();
-  this.wrapper = mountAndOpenOptions(this.props);
-  this.getMenuItem(1).simulate('click');
-  equal(this.props.sortBySetting.onSortBySortableNameDescending.callCount, 1);
+  const onSortBySortableNameDescending = this.stub();
+  const props = defaultProps({ sortBySetting: { onSortBySortableNameDescending } });
+  findMenuItem.call(this, props, 'Sort by', 'Z–A').simulate('click');
+  strictEqual(onSortBySortableNameDescending.callCount, 1);
 });
 
 test('"Z–A" is optionally disabled', function () {
-  this.props.sortBySetting.disabled = true;
-  this.wrapper = mountAndOpenOptions(this.props);
-  const menuItem = this.getMenuItem(1);
-  equal(menuItem.prop('disabled'), true);
-});
-
-test('clicking "Z–A" when disabled does not call onSortBySortableNameDescending', function () {
-  this.props.sortBySetting.disabled = true;
-  this.props.sortBySetting.onSortBySortableNameDescending = this.stub();
-  this.wrapper = mountAndOpenOptions(this.props);
-  this.getMenuItem(1).simulate('click');
-  equal(this.props.sortBySetting.onSortBySortableNameDescending.callCount, 0);
+  const props = defaultProps({ sortBySetting: { disabled: true } });
+  const menuItem = findMenuItem.call(this, props, 'Sort by', 'Z–A');
+  strictEqual(menuItem.prop('disabled'), true);
 });
 
 test('uses prop loginHandleName for "login_id" menu item label', function () {
-  this.props.loginHandleName = 'custom login handle name';
-
-  this.wrapper = mountAndOpenOptions(this.props);
-
-  const menuItem = document.querySelector('[data-menu-item-id="login_id"]');
-
-  ok(menuItem.textContent.includes(this.props.loginHandleName));
+  const loginHandleName = 'custom login handle name';
+  const props = defaultProps({ props: { loginHandleName } });
+  const loginHandleNameMenuItem = findMenuItem.call(this, props, 'Secondary info', loginHandleName);
+  strictEqual(loginHandleNameMenuItem.text().trim(), loginHandleName);
 });
 
-test('uses default label when loginHandleName prop is falsy', function () {
-  this.props.loginHandleName = '';
-
-  this.wrapper = mountAndOpenOptions(this.props);
-
-  const menuItem = document.querySelector('[data-menu-item-id="login_id"]');
-
-  ok(menuItem.textContent.includes(StudentRowHeaderConstants.secondaryInfoLabels.login_id));
+test('uses default label when loginHandleName prop is an empty string', function () {
+  const loginHandleName = '';
+  const props = defaultProps({ props: { loginHandleName } });
+  const menuContent = findFlyoutMenuContent.call(this, props, 'Secondary info');
+  const subMenuItems = menuContent.find('MenuItem').map(menuItem => menuItem);
+  const loginIDMenuItem = subMenuItems.find(menuItem => menuItem.text().trim() === 'Login ID');
+  strictEqual(loginIDMenuItem.length, 1);
 });
 
 test('uses prop sisName for "sis_id" menu item label', function () {
-  this.props.sisName = 'custom sis name';
-
-  this.wrapper = mountAndOpenOptions(this.props);
-
-  const menuItem = document.querySelector('[data-menu-item-id="sis_id"]');
-
-  ok(menuItem.textContent.includes(this.props.sisName));
+  const sisName = 'custom login handle name';
+  const props = defaultProps({ props: { sisName } });
+  const loginHandleNameMenuItem = findMenuItem.call(this, props, 'Secondary info', sisName);
+  strictEqual(loginHandleNameMenuItem.text().trim(), sisName);
 });
 
-test('uses default label when sisName prop is falsy', function () {
-  this.props.sisName = '';
-
-  this.wrapper = mountAndOpenOptions(this.props);
-
-  const menuItem = document.querySelector('[data-menu-item-id="sis_id"]');
-
-  ok(menuItem.textContent.includes(StudentRowHeaderConstants.secondaryInfoLabels.sis_id));
+test('uses default label when sisName prop is an empty string', function () {
+  const sisName = '';
+  const props = defaultProps({ props: { sisName } });
+  const menuContent = findFlyoutMenuContent.call(this, props, 'Secondary info');
+  const subMenuItems = menuContent.find('MenuItem').map(menuItem => menuItem);
+  const SISIDMenuItem = subMenuItems.find(menuItem => menuItem.text().trim() === 'SIS ID');
+  strictEqual(SISIDMenuItem.length, 1);
 });
 
 QUnit.module('StudentColumnHeader - primaryInfoMenuGroup', {
   setup () {
-    this.props = {
-      onToggleEnrollmentFilter () {},
-      selectedEnrollmentFilters: [],
-      sectionsEnabled: true,
-      selectedSecondaryInfo: StudentRowHeaderConstants.defaultSecondaryInfo,
-      onSelectSecondaryInfo () {},
-      selectedPrimaryInfo: StudentRowHeaderConstants.defaultPrimaryInfo,
-      onSelectPrimaryInfo: this.stub(),
-      sortBySetting: {
-        direction: 'ascending',
-        disabled: false,
-        isSortColumn: true,
-        onSortBySortableNameAscending () {},
-        onSortBySortableNameDescending () {},
-        settingKey: 'sortable_name'
-      }
-    };
+    this.mountAndOpenOptions = mountAndOpenOptions;
   },
 
   teardown () {
-    this.renderOutput.unmount();
+    this.wrapper.unmount();
   }
 });
 
-test('renders a MenuItemGroup for primary info options', function () {
-  this.renderOutput = mount(<StudentColumnHeader {...this.props} />);
-  this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
-
-  const menuItemGroup = document.querySelector('[data-menu-item-group-id="primary-info"]');
-
-  ok(menuItemGroup);
+test('includes a MenuItemFlyout for primary info options', function () {
+  const displayAsFlyout = findFlyout.call(this, defaultProps(), 'Display as');
+  ok(displayAsFlyout.length, 1);
 });
 
-test('renders a MenuItem for each primary info option', function () {
-  this.renderOutput = mount(<StudentColumnHeader {...this.props} />);
-  this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
-
-  StudentRowHeaderConstants.primaryInfoKeys.forEach((key) => {
-    const menuItem = document.querySelector(`[data-menu-item-id="${key}"]`);
-    ok(menuItem, `menu item ${key} is present`);
-  });
+test('includes "First, Last Name"', function () {
+  const menuItem = findMenuItem.call(this, defaultProps(), 'Display as', 'First, Last Name');
+  strictEqual(menuItem.length, 1);
 });
 
-test('invokes prop onSelectPrimaryInfo when MenuItem is clicked', function () {
-  this.renderOutput = mount(<StudentColumnHeader {...this.props} />);
-
-  StudentRowHeaderConstants.primaryInfoKeys.forEach((key) => {
-    this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
-    const menuItem = document.querySelector(`[data-menu-item-id="${key}"]`);
-
-    menuItem.click();
-
-    equal(this.props.onSelectPrimaryInfo.lastCall.args[0], key);
-  });
+test('includes "Last, First Name"', function () {
+  const menuItem = findMenuItem.call(this, defaultProps(), 'Display as', 'Last, First Name');
+  strictEqual(menuItem.length, 1);
 });
 
-QUnit.module('StudentColumnHeader - enrollmentFilterGroup', {
+test('includes "Anonymous"', function () {
+  const menuItem = findMenuItem.call(this, defaultProps(), 'Display as', 'Anonymous');
+  strictEqual(menuItem.length, 1);
+});
+
+test('calls onSelectPrimaryInfo when "First, Last Name" MenuItem is clicked', function () {
+  const onSelectPrimaryInfo = this.stub();
+  const props = defaultProps({ props: { onSelectPrimaryInfo } });
+  findMenuItem.call(this, props, 'Display as', 'First, Last Name').simulate('click');
+  strictEqual(onSelectPrimaryInfo.callCount, 1);
+});
+
+test('calls onSelectPrimaryInfo with "first_last" when "First, Last Name" MenuItem is clicked', function () {
+  const onSelectPrimaryInfo = this.stub();
+  const props = defaultProps({ props: { onSelectPrimaryInfo } });
+  findMenuItem.call(this, props, 'Display as', 'First, Last Name').simulate('click');
+  ok(onSelectPrimaryInfo.calledWithExactly('first_last'));
+});
+
+test('calls onSelectPrimaryInfo when "Last, FirstName" MenuItem is clicked', function () {
+  const onSelectPrimaryInfo = this.stub();
+  const props = defaultProps({ props: { onSelectPrimaryInfo } });
+  findMenuItem.call(this, props, 'Display as', 'Last, First Name').simulate('click');
+  strictEqual(onSelectPrimaryInfo.callCount, 1);
+});
+
+test('calls onSelectPrimaryInfo with "last_first" when "Last, First Name" MenuItem is clicked', function () {
+  const onSelectPrimaryInfo = this.stub();
+  const props = defaultProps({ props: { onSelectPrimaryInfo } });
+  findMenuItem.call(this, props, 'Display as', 'Last, First Name').simulate('click');
+  ok(onSelectPrimaryInfo.calledWithExactly('last_first'));
+});
+
+test('calls onSelectPrimaryInfo when "Anonymous" MenuItem is clicked', function () {
+  const onSelectPrimaryInfo = this.stub();
+  const props = defaultProps({ props: { onSelectPrimaryInfo } });
+  findMenuItem.call(this, props, 'Display as', 'Anonymous').simulate('click');
+  strictEqual(onSelectPrimaryInfo.callCount, 1);
+});
+
+test('calls onSelectPrimaryInfo with "anonymous" when "Anonymous" MenuItem is clicked', function () {
+  const onSelectPrimaryInfo = this.stub();
+  const props = defaultProps({ props: { onSelectPrimaryInfo } });
+  findMenuItem.call(this, props, 'Display as', 'Anonymous').simulate('click');
+  ok(onSelectPrimaryInfo.calledWithExactly('anonymous'));
+});
+
+QUnit.module('StudentColumnHeader - Enrollment Filters Group', {
   setup () {
-    this.props = {
-      onToggleEnrollmentFilter: this.stub(),
-      selectedEnrollmentFilters: [],
-      sectionsEnabled: true,
-      selectedSecondaryInfo: StudentRowHeaderConstants.defaultSecondaryInfo,
-      onSelectSecondaryInfo () {},
-      selectedPrimaryInfo: StudentRowHeaderConstants.defaultPrimaryInfo,
-      onSelectPrimaryInfo: this.stub(),
-      sortBySetting: {
-        direction: 'ascending',
-        disabled: false,
-        isSortColumn: true,
-        onSortBySortableNameAscending () {},
-        onSortBySortableNameDescending () {},
-        settingKey: 'sortable_name'
-      }
-    };
+    this.mountAndOpenOptions = mountAndOpenOptions;
   },
 
   teardown () {
-    this.renderOutput.unmount();
+    this.wrapper.unmount();
   }
 });
 
 test('renders a MenuItemGroup for enrollment filter options', function () {
-  this.renderOutput = mount(<StudentColumnHeader {...this.props} />);
-  this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
-
-  const menuItemGroup = document.querySelector('[data-menu-item-group-id="enrollment-filter"]');
-
-  ok(menuItemGroup);
+  const menuContent = findMenuContent.call(this, defaultProps());
+  const menuItemGroups = menuContent.find('MenuItemGroup').map(group => group);
+  const menuItemGroup = menuItemGroups.find(group => group.prop('label') === 'Show');
+  strictEqual(menuItemGroup.length, 1);
 });
 
-test('renders a MenuItem for each enrollment filter option', function () {
-  this.renderOutput = mount(<StudentColumnHeader {...this.props} />);
-  this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
+test('enrollment filters group allows multiple selections', function () {
+  const menuContent = findMenuContent.call(this, defaultProps());
+  const menuItemGroups = menuContent.find('MenuItemGroup').map(group => group);
+  const menuItemGroup = menuItemGroups.find(group => group.prop('label') === 'Show');
+  strictEqual(menuItemGroup.prop('allowMultiple'), true);
+});
 
-  StudentRowHeaderConstants.enrollmentFilterKeys.forEach((key) => {
-    const menuItem = document.querySelector(`[data-menu-item-id="${key}"]`);
-    ok(menuItem);
+test('includes a MenuItem for "Inactive Enrollments"', function () {
+  const menuContent = findMenuContent.call(this, defaultProps());
+  const menuItemGroups = menuContent.find('MenuItemGroup').map(group => group);
+  const menuItemGroup = menuItemGroups.find(group => group.prop('label') === 'Show');
+  const menuItems = menuItemGroup.find('MenuItem').map(item => item);
+  const menuItem = menuItems.find(item => item.text().trim() === 'Inactive enrollments');
+  strictEqual(menuItem.length, 1);
+});
+
+test('includes a MenuItem for "Concluded Enrollments"', function () {
+  const menuContent = findMenuContent.call(this, defaultProps());
+  const menuItemGroups = menuContent.find('MenuItemGroup').map(group => group);
+  const menuItemGroup = menuItemGroups.find(group => group.prop('label') === 'Show');
+  const menuItems = menuItemGroup.find('MenuItem').map(item => item);
+  const menuItem = menuItems.find(item => item.text().trim() === 'Concluded enrollments');
+  strictEqual(menuItem.length, 1);
+});
+
+test('calls onToggleEnrollmentFilter when "Inactive enrollments" is clicked', function () {
+  const onToggleEnrollmentFilter = this.stub();
+  const props = defaultProps({ props: { onToggleEnrollmentFilter } });
+  const menuContent = findMenuContent.call(this, props);
+  const menuItemGroups = menuContent.find('MenuItemGroup').map(group => group);
+  const menuItemGroup = menuItemGroups.find(group => group.prop('label') === 'Show');
+  const menuItems = menuItemGroup.find('MenuItem').map(item => item);
+  const menuItem = menuItems.find(item => item.text().trim() === 'Inactive enrollments');
+  menuItem.simulate('click');
+  strictEqual(onToggleEnrollmentFilter.callCount, 1);
+});
+
+test('calls onToggleEnrollmentFilter with "inactive" when "Inactive enrollments" is clicked', function () {
+  const onToggleEnrollmentFilter = this.stub();
+  const props = defaultProps({ props: { onToggleEnrollmentFilter } });
+  const menuContent = findMenuContent.call(this, props);
+  const menuItemGroups = menuContent.find('MenuItemGroup').map(group => group);
+  const menuItemGroup = menuItemGroups.find(group => group.prop('label') === 'Show');
+  const menuItems = menuItemGroup.find('MenuItem').map(item => item);
+  const menuItem = menuItems.find(item => item.text().trim() === 'Inactive enrollments');
+  menuItem.simulate('click');
+  ok(onToggleEnrollmentFilter.calledWithExactly('inactive'));
+});
+
+test('calls onToggleEnrollmentFilter when "Concuded enrollments" is clicked', function () {
+  const onToggleEnrollmentFilter = this.stub();
+  const props = defaultProps({ props: { onToggleEnrollmentFilter } });
+  const menuContent = findMenuContent.call(this, props);
+  const menuItemGroups = menuContent.find('MenuItemGroup').map(group => group);
+  const menuItemGroup = menuItemGroups.find(group => group.prop('label') === 'Show');
+  const menuItems = menuItemGroup.find('MenuItem').map(item => item);
+  const menuItem = menuItems.find(item => item.text().trim() === 'Concluded enrollments');
+  menuItem.simulate('click');
+  strictEqual(onToggleEnrollmentFilter.callCount, 1);
+});
+
+test('calls onToggleEnrollmentFilter with "concluded" when "Concluded enrollments" is clicked', function () {
+  const onToggleEnrollmentFilter = this.stub();
+  const props = defaultProps({ props: { onToggleEnrollmentFilter } });
+  const menuContent = findMenuContent.call(this, props);
+  const menuItemGroups = menuContent.find('MenuItemGroup').map(group => group);
+  const menuItemGroup = menuItemGroups.find(group => group.prop('label') === 'Show');
+  const menuItems = menuItemGroup.find('MenuItem').map(item => item);
+  const menuItem = menuItems.find(item => item.text().trim() === 'Concluded enrollments');
+  menuItem.simulate('click');
+  ok(onToggleEnrollmentFilter.calledWithExactly('concluded'));
+});
+
+QUnit.module('StudentColumnHeader#handleKeyDown', function (hooks) {
+  hooks.beforeEach(function () {
+    this.wrapper = mountComponent(defaultProps(), { attachTo: document.querySelector('#fixtures') });
+    this.preventDefault = sinon.spy();
+  });
+
+  hooks.afterEach(function () {
+    this.wrapper.unmount();
+  });
+
+  this.handleKeyDown = function (which, shiftKey = false) {
+    return this.wrapper.node.handleKeyDown({ which, shiftKey, preventDefault: this.preventDefault });
+  };
+
+  QUnit.module('with focus on options menu trigger', {
+    setup () {
+      this.wrapper.node.optionsMenuTrigger.focus();
+    }
+  });
+
+  test('does not handle Tab', function () {
+    // This allows Grid Support Navigation to handle navigation.
+    const returnValue = this.handleKeyDown(9, false); // Tab
+    equal(typeof returnValue, 'undefined');
+  });
+
+  test('does not handle Shift+Tab', function () {
+    // This allows Grid Support Navigation to handle navigation.
+    const returnValue = this.handleKeyDown(9, true); // Shift+Tab
+    equal(typeof returnValue, 'undefined');
+  });
+
+  test('Enter opens the options menu', function () {
+    this.handleKeyDown(13); // Enter
+    const optionsMenu = this.wrapper.find('PopoverMenu');
+    strictEqual(optionsMenu.node.show, true);
+  });
+
+  test('returns false for Enter on options menu', function () {
+    // This prevents additional behavior in Grid Support Navigation.
+    const returnValue = this.handleKeyDown(13); // Enter
+    strictEqual(returnValue, false);
+  });
+
+  QUnit.module('without focus');
+
+  test('does not handle Tab', function () {
+    const returnValue = this.handleKeyDown(9, false); // Tab
+    equal(typeof returnValue, 'undefined');
+  });
+
+  test('does not handle Shift+Tab', function () {
+    const returnValue = this.handleKeyDown(9, true); // Shift+Tab
+    equal(typeof returnValue, 'undefined');
+  });
+
+  test('does not handle Enter', function () {
+    const returnValue = this.handleKeyDown(13); // Enter
+    equal(typeof returnValue, 'undefined');
   });
 });
 
-test('invokes prop onToggleEnrollmentFilter when MenuItem is clicked', function () {
-  this.renderOutput = mount(<StudentColumnHeader {...this.props} />);
-  const onToggle = this.props.onToggleEnrollmentFilter;
+QUnit.module('StudentColumnHeader: focus', {
+  setup () {
+    this.wrapper = mountComponent(defaultProps(), { attachTo: document.querySelector('#fixtures') });
+  },
 
-  StudentRowHeaderConstants.enrollmentFilterKeys.forEach((key) => {
-    this.renderOutput.find('.Gradebook__ColumnHeaderAction').simulate('click');
-    const menuItem = document.querySelector(`[data-menu-item-id="${key}"]`);
+  teardown () {
+    this.wrapper.unmount();
+  }
+});
 
-    menuItem.click();
+test('#focusAtStart sets focus on the options menu trigger', function () {
+  this.wrapper.node.focusAtStart();
+  equal(document.activeElement, this.wrapper.node.optionsMenuTrigger);
+});
 
-    equal(onToggle.lastCall.args[0], key, `invocation arg matches clicked menu item ${key}`);
-  });
+test('#focusAtEnd sets focus on the options menu trigger', function () {
+  this.wrapper.node.focusAtEnd();
+  equal(document.activeElement, this.wrapper.node.optionsMenuTrigger);
 });

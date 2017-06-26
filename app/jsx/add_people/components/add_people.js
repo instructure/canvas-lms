@@ -98,10 +98,16 @@ import APIError from './api_error'
     }
     componentDidMount () {
       this.manageFocus();
+      document.getElementById('application').setAttribute('aria-hidden', 'true')
     }
     componentWillReceiveProps (nextProps) {
       if (nextProps.usersEnrolled) {
         this.close();
+      }
+      if (nextProps.isOpen) {
+        document.getElementById('application').setAttribute('aria-hidden', 'true')
+      } else {
+        document.getElementById('application').removeAttribute('aria-hidden')
       }
     }
     componentDidUpdate () {

@@ -40,6 +40,10 @@ module Lti
       @expansions || {}
     end
 
+    def self.expansion_keys
+      self.expansions.keys.map { |c| c.to_s[1..-1] }
+    end
+
     CONTROLLER_GUARD = -> { !!@controller }
     COURSE_GUARD = -> { @context.is_a? Course }
     TERM_START_DATE_GUARD = -> { @context.is_a?(Course) && @context.enrollment_term &&
@@ -123,6 +127,14 @@ module Lti
     register_expansion 'Context.id', [],
                        -> { Lti::Asset.opaque_identifier_for(@context) },
                        default_name: 'context_id'
+
+    # The sourced Id of the context.
+    # @example
+    #   ```
+    #   1234
+    #   ```
+    register_expansion 'Context.sourcedId', [],
+                       -> { @context.sis_source_id }
 
     # communicates the kind of browser window/frame where the Canvas has launched a tool
     # @launch_parameter launch_presentation_document_target
@@ -877,7 +889,7 @@ module Lti
     #   https://<domain>.instructure.com/api/lti/accounts/<account_id>/tool_consumer_profile/<opaque_id>
     #   ```
     register_expansion 'ToolConsumerProfile.url', [],
-                       -> { @controller.polymorphic_url([@tool.context, :tool_consumer_profile], tool_consumer_profile_id: Lti::ToolConsumerProfile::DEFAULT_TCP_UUID)},
+                       -> { @controller.polymorphic_url([@tool.context, :tool_consumer_profile])},
                        CONTROLLER_GUARD,
                        -> { @tool && @tool.is_a?(Lti::ToolProxy) }
 

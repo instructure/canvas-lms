@@ -346,19 +346,29 @@ describe AssignmentGroupsController, type: :request do
 
   end
 
-  it "should include module_ids when requested" do
-    mods = 2.times.map { |i| @course.context_modules.create! name: "Mod#{i}" }
-    g = @course.assignment_groups.create! name: 'assignments'
-    a = @course.assignments.create! assignment_group: g, title: "blah"
-    mods.each { |m| m.add_item type: "assignment", id: a.id }
+  context 'when module_ids are requested' do
+    before :each do
+      @mods = Array.new(2) { |i| @course.context_modules.create! name: "Mod#{i}" }
+      g = @course.assignment_groups.create! name: 'assignments'
+      a = @course.assignments.create! assignment_group: g, title: 'blah'
+      @mods.each { |m| m.add_item type: 'assignment', id: a.id }
 
-    json = api_call(:get,
-          "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments&include[]=module_ids",
-          { controller: 'assignment_groups', action: 'index',
-            format: 'json', course_id: @course.id.to_s,
-            include: %w[assignments module_ids]})
-    assignment_json = json.first["assignments"].first
-    expect(assignment_json["module_ids"].sort).to eq mods.map(&:id).sort
+      json = api_call(:get,
+        "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments&include[]=module_ids",
+        { controller: 'assignment_groups', action: 'index',
+          format: 'json', course_id: @course.id.to_s,
+          include: %w[assignments module_ids]})
+
+      @assignment_json = json.first["assignments"].first
+    end
+
+    it 'includes module_ids' do
+      expect(@assignment_json['module_ids'].sort).to eq @mods.map(&:id).sort
+    end
+
+    it 'includes module_positions' do
+      expect(@assignment_json['module_positions']).to eq([1, 1])
+    end
   end
 
   it "should not include all dates" do

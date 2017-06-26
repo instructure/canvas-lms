@@ -17,13 +17,18 @@
  */
 
 import { createGradebook } from 'spec/jsx/gradezilla/default_gradebook/GradebookSpecHelper';
-import SubmissionDetailsDialog from 'compiled/SubmissionDetailsDialog';
 import AssignmentRowCellPropFactory from 'jsx/gradezilla/default_gradebook/components/AssignmentRowCellPropFactory';
 
 QUnit.module('AssignmentRowCellPropFactory#getProps', {
   setup () {
     this.assignment = { id: '2301' };
     this.gradebook = createGradebook({ context_id: '1201' });
+    this.gradebook.gridSupport = {
+      helper: {
+        commitCurrentEdit: this.stub(),
+        focus: this.stub()
+      }
+    };
     this.factory = new AssignmentRowCellPropFactory(this.assignment, this.gradebook);
     this.student = { id: '1101', isConcluded: false };
   }
@@ -31,41 +36,48 @@ QUnit.module('AssignmentRowCellPropFactory#getProps', {
 
 test('returns an object with AssignmentRowCell props', function () {
   const props = this.factory.getProps(this.student);
-  equal(typeof props.canShowSubmissionDetailsModal, 'boolean', 'includes canShowSubmissionDetailsModal');
-  equal(typeof props.onShowSubmissionDetailsModal, 'function', 'includes onShowSubmissionDetailsModal');
+  equal(typeof props.isSubmissionTrayOpen, 'boolean', 'includes isSubmissionTrayOpen');
+  equal(typeof props.onToggleSubmissionTrayOpen, 'function', 'includes onToggleSubmissionTrayOpen');
 });
 
-test('sets canShowSubmissionDetailsModal to true when student enrollment is not concluded', function () {
+test('onToggleSubmissionTrayOpen triggers a render of the submission tray', function () {
   const props = this.factory.getProps(this.student);
-  strictEqual(props.canShowSubmissionDetailsModal, true);
+  this.stub(this.gradebook, 'renderSubmissionTray');
+  props.onToggleSubmissionTrayOpen(this.student.id, this.assignment.id);
+  strictEqual(this.gradebook.renderSubmissionTray.callCount, 1)
 });
 
-test('sets canShowSubmissionDetailsModal to false when student enrollment is concluded', function () {
-  const props = this.factory.getProps({ ...this.student, isConcluded: true });
-  strictEqual(props.canShowSubmissionDetailsModal, false);
-});
-
-test('onShowSubmissionDetailsModal function opens the SubmissionDetailsDialog', function () {
+test('onToggleSubmissionTrayOpen sets the tray state', function () {
   const props = this.factory.getProps(this.student);
-  this.stub(SubmissionDetailsDialog, 'open');
-  props.onShowSubmissionDetailsModal({});
-  strictEqual(SubmissionDetailsDialog.open.callCount, 1);
+  this.stub(this.gradebook, 'renderSubmissionTray');
+  props.onToggleSubmissionTrayOpen(this.student.id, this.assignment.id);
+  deepEqual(
+    this.gradebook.getSubmissionTrayState(),
+    { open: true, studentId: this.student.id, assignmentId: this.assignment.id }
+  );
 });
 
-test('SubmissionDetailsDialog.open uses the assignment and student', function () {
+test('onToggleSubmissionTrayOpen cancels current cell edit', function () {
   const props = this.factory.getProps(this.student);
-  this.stub(SubmissionDetailsDialog, 'open');
-  props.onShowSubmissionDetailsModal({});
-  const [assignment, student] = SubmissionDetailsDialog.open.lastCall.args;
-  equal(assignment, this.assignment, 'uses the given assignment');
-  equal(student, this.student, 'uses the given student');
+  this.stub(this.gradebook, 'renderSubmissionTray');
+  props.onToggleSubmissionTrayOpen(this.student.id, this.assignment.id);
+  strictEqual(this.gradebook.gridSupport.helper.commitCurrentEdit.callCount, 1);
 });
 
-test('SubmissionDetailsDialog.open merges the gradebook options with function arguments', function () {
-  const props = this.factory.getProps(this.student);
-  this.stub(SubmissionDetailsDialog, 'open');
-  props.onShowSubmissionDetailsModal({ onClose () {} });
-  const options = SubmissionDetailsDialog.open.lastCall.args[2];
-  strictEqual(options.context_id, '1201', 'includes options from the Gradebook');
-  equal(typeof options.onClose, 'function', 'includes function arguments');
+test('isSubmissionTrayOpen is true if the tray is open for the cell', function () {
+  this.gradebook.setSubmissionTrayState(true, this.student.id, this.assignment.id);
+  const { isSubmissionTrayOpen } = this.factory.getProps(this.student);
+  strictEqual(isSubmissionTrayOpen, true);
+});
+
+test('isSubmissionTrayOpen is false if the tray is closed for the cell', function () {
+  this.gradebook.setSubmissionTrayState(false, this.student.id, this.assignment.id);
+  const { isSubmissionTrayOpen } = this.factory.getProps(this.student);
+  strictEqual(isSubmissionTrayOpen, false);
+});
+
+test('isSubmissionTrayOpen is false if the tray is open for another cell', function () {
+  this.gradebook.setSubmissionTrayState(true, this.student.id, '2302');
+  const { isSubmissionTrayOpen } = this.factory.getProps(this.student);
+  strictEqual(isSubmissionTrayOpen, false);
 });

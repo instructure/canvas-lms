@@ -523,11 +523,85 @@ describe GradebooksController do
         user_session(@teacher)
       end
 
-      it "includes colors" do
-        get :show, course_id: @course.id
+      let(:gradebook_options) { controller.js_env.fetch(:GRADEBOOK_OPTIONS) }
 
-        gradebook_options = controller.js_env.fetch(:GRADEBOOK_OPTIONS)
+      it "includes colors if New Gradebook is enabled" do
+        @course.enable_feature!(:new_gradebook)
+        get :show, course_id: @course.id
         expect(gradebook_options).to have_key :colors
+      end
+
+      it "does not include colors if New Gradebook is disabled" do
+        get :show, course_id: @course.id
+        expect(gradebook_options).not_to have_key :colors
+      end
+
+      it 'includes api_max_per_page' do
+        Setting.set('api_max_per_page', 50)
+        get :show, course_id: @course.id
+        api_max_per_page = assigns[:js_env][:GRADEBOOK_OPTIONS][:api_max_per_page]
+        expect(api_max_per_page).to eq(50)
+      end
+
+      describe "graded_late_or_missing_submissions_exist" do
+        it "is not included if New Gradebook is disabled" do
+          get :show, course_id: @course.id
+          expect(gradebook_options).not_to have_key :graded_late_or_missing_submissions_exist
+        end
+
+        context "New Gradebook is enabled" do
+          before(:once) do
+            @course.enable_feature!(:new_gradebook)
+          end
+
+          let(:assignment) do
+            @course.assignments.create!(
+              due_at: 3.days.ago,
+              points_possible: 10,
+              submission_types: "online_text_entry"
+            )
+          end
+
+          let(:graded_late_or_missing_submissions_exist) do
+            gradebook_options.fetch(:graded_late_or_missing_submissions_exist)
+          end
+
+          it "is included if New Gradebook is enabled" do
+            get :show, course_id: @course.id
+            gradebook_options = controller.js_env.fetch(:GRADEBOOK_OPTIONS)
+            expect(gradebook_options).to have_key :graded_late_or_missing_submissions_exist
+          end
+
+          it "is true if graded late submissions exist" do
+            assignment.submit_homework(@student, body: "a body")
+            assignment.grade_student(@student, grader: @teacher, grade: 8)
+            get :show, course_id: @course.id
+            expect(graded_late_or_missing_submissions_exist).to eq(true)
+          end
+
+          it "is false if late submissions exist, but they are not graded" do
+            assignment.submit_homework(@student, body: "a body")
+            get :show, course_id: @course.id
+            expect(graded_late_or_missing_submissions_exist).to eq(false)
+          end
+
+          it "is true if graded missing submissions exist" do
+            assignment.grade_student(@student, grader: @teacher, grade: 8)
+            get :show, course_id: @course.id
+            expect(graded_late_or_missing_submissions_exist).to eq(true)
+          end
+
+          it "is false if missing submissions exist, but they are not graded" do
+            assignment # create the assignment so that missing submissions exist
+            get :show, course_id: @course.id
+            expect(graded_late_or_missing_submissions_exist).to eq(false)
+          end
+
+          it "is false if there are no graded late or missing submissions" do
+            get :show, course_id: @course.id
+            expect(graded_late_or_missing_submissions_exist).to eq(false)
+          end
+        end
       end
     end
 
@@ -706,6 +780,50 @@ describe GradebooksController do
           expect(period).to have_key(:is_last)
         end
       end
+    end
+  end
+
+  describe "GET 'user_ids'" do
+    it "returns unauthorized if there is no current user" do
+      get :user_ids, course_id: @course.id, format: :json
+      assert_status(401)
+    end
+
+    it "returns unauthorized if the user is not authorized to manage grades" do
+      user_session(@student)
+      get :user_ids, course_id: @course.id, format: :json
+      assert_status(401)
+    end
+
+    it "grants authorization to teachers in active courses" do
+      user_session(@teacher)
+      get :user_ids, course_id: @course.id, format: :json
+      expect(response).to be_ok
+    end
+
+    it "grants authorization to teachers in concluded courses" do
+      @course.complete!
+      user_session(@teacher)
+      get :user_ids, course_id: @course.id, format: :json
+      expect(response).to be_ok
+    end
+
+    it "returns an array of user ids sorted according to the user's preferences" do
+      student1 = @student
+      student1.update!(name: "Jon")
+      student2 = student_in_course(active_all: true, name: "Ron").user
+      student3 = student_in_course(active_all: true, name: "Don").user
+      @teacher.preferences[:gradebook_settings] = {}
+      @teacher.preferences[:gradebook_settings][@course.id] = {
+        "sort_rows_by_column_id": "student",
+        "sort_rows_by_setting_key": "name",
+        "sort_rows_by_direction": "descending"
+      }
+
+      user_session(@teacher)
+      get :user_ids, course_id: @course.id, format: :json
+      user_ids = json_parse(response.body)["user_ids"]
+      expect(user_ids).to eq([student2.id, student1.id, student3.id])
     end
   end
 

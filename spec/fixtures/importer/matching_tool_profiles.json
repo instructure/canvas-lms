@@ -1,0 +1,65 @@
+{
+  "tool_profiles": [
+    {
+      "meta": {
+        "registration_url": "https://www.samplelaunch.com/register"
+      },
+      "resource_href": "href",
+      "tool_profile": {
+        "lti_version": "LTI-2p0",
+        "product_instance": {
+          "guid": "be42ae52-23fe-48f5-a783-40ecc7ef6d5c",
+          "product_info": {
+            "product_version": "1.0",
+            "product_family": {
+              "code": "abc",
+              "vendor": {
+                "code": "123",
+                "vendor_name": {
+                  "default_value": "acme"
+                },
+                "description": {
+                  "default_value": "example vendor"
+                }
+              }
+            },
+            "description": {
+              "default_value": "example product"
+            },
+            "product_name": {
+              "default_value": "learn abc's"
+            }
+          }
+        },
+        "base_url_choice": [
+          {
+            "default_base_url": "https://www.samplelaunch.com",
+            "selector": {
+              "applies_to": [
+                "MessageHandler"
+              ]
+            }
+          }
+        ],
+        "resource_handler": [
+          {
+            "resource_type": {
+              "code": "code"
+            },
+            "resource_name": {
+              "default_value": "resource name",
+              "key": ""
+            },
+            "message": [
+              {
+                "message_type": "message_type",
+                "path": "https://www.samplelaunch.com/blti"
+              }
+            ]
+          }
+        ],
+        "service_offered": []
+      }
+    }
+  ]
+}

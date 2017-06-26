@@ -32,8 +32,13 @@ $ic-DashboardCard-action-hover-font-color: $ic-brand-primary;
 
 // Optional parent container padding
 .ic-DashboardCard__box {
-  padding: $ic-sp 0 0;
+  padding: $ic-sp 0.125rem 0;
+}
 
+@supports (position: sticky) or (position: -webkit-sticky) {
+  .ic-DashboardCard__box {
+    padding-top: $ic-sp * 2;
+  }
 }
 
 @keyframes placeholder {

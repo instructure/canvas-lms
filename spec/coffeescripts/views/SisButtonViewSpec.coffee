@@ -204,3 +204,11 @@ define [
     @view.render()
     equal @view.$input.attr('aria-describedby'), 'sis-status-label-1'
     equal @view.$label.attr('id'), 'sis-status-label-1'
+
+  test 'properly toggles aria-pressed value based on post_to_sis', ->
+    @assignment.set('post_to_sis', true)
+    @view = new SisButtonView(model: @assignment)
+    @view.render()
+    equal @view.$label.attr('aria-pressed'), 'true'
+    @view.$el.click()
+    equal @view.$label.attr('aria-pressed'), 'false'

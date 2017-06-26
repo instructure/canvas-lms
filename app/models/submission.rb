@@ -263,6 +263,7 @@ class Submission < ActiveRecord::Base
   def self.needs_grading_conditions
     conditions = <<-SQL
       submissions.submission_type IS NOT NULL
+      AND (submissions.excused = 'f' OR submissions.excused IS NULL)
       AND (submissions.workflow_state = 'pending_review'
         OR (submissions.workflow_state IN ('submitted', 'graded')
           AND (submissions.score IS NULL OR NOT submissions.grade_matches_current_submission)
@@ -670,7 +671,7 @@ class Submission < ActiveRecord::Base
   def originality_data
     data = self.originality_reports.each_with_object({}) do |originality_report, hash|
       hash[Attachment.asset_string(originality_report.attachment_id)] = {
-        similarity_score: originality_report.originality_score.round(2),
+        similarity_score: originality_report.originality_score&.round(2),
         state: originality_report.state,
         report_url: originality_report.originality_report_url,
         status: originality_report.workflow_state
@@ -697,7 +698,7 @@ class Submission < ActiveRecord::Base
     if self.grants_right?(user, :view_turnitin_report)
       attachment = self.attachments.find_by_asset_string(asset_string)
       report = self.originality_reports.find_by(attachment: attachment)
-      url = report.originality_report_url if report
+      url = report&.report_launch_url
     end
     url
   end
@@ -1325,15 +1326,30 @@ class Submission < ActiveRecord::Base
   end
 
   # apply_late_policy is called directly by bulk update processes, or indirectly by before_save on a Submission
-  def apply_late_policy(late_policy=nil, points_possible=nil)
-    return if score.nil? || points_deducted_changed?
+  def apply_late_policy(late_policy=nil, points_possible=nil, grading_type=nil)
+    return if points_deducted_changed?
     late_policy ||= assignment.course.late_policy
     points_possible ||= assignment.points_possible
+    grading_type ||= assignment.grading_type
+    return score_missing(late_policy, points_possible, grading_type) if missing?
+    score_late_or_none(late_policy, points_possible) if score
+  end
+
+  def score_missing(late_policy, points_possible, grading_type)
+    return unless late_policy&.missing_submission_deduction_enabled
+    self.points_deducted = nil
+    self.score = late_policy.points_for_missing(points_possible, grading_type)
+  end
+  private :score_missing
+
+  def score_late_or_none(late_policy, points_possible)
     raw_score = score_changed? ? score : originally_entered_score
     deducted = late_points_deducted(raw_score, late_policy, points_possible)
+    new_score = raw_score - deducted
     self.points_deducted = deducted
-    self.score = raw_score - deducted
+    self.score = new_score
   end
+  private :score_late_or_none
 
   def originally_entered_score
     score + (points_deducted || 0)
@@ -1341,7 +1357,7 @@ class Submission < ActiveRecord::Base
   private :originally_entered_score
 
   def late_points_deducted(raw_score, late_policy, points_possible)
-    return 0 unless late_policy && points_possible && past_due?
+    return 0 unless late_policy && points_possible && late?
     late_policy.points_deducted(score: raw_score, possible: points_possible, late_for: duration_late)
   end
   private :late_points_deducted
@@ -1669,7 +1685,7 @@ class Submission < ActiveRecord::Base
   scope :having_submission, -> { where("submissions.submission_type IS NOT NULL") }
   scope :without_submission, -> { where(submission_type: nil, workflow_state: "unsubmitted") }
   scope :not_placeholder, -> {
-    where("submissions.submission_type IS NOT NULL or submissions.excused or submissions.score IS NOT NULL")
+    where("submissions.submission_type IS NOT NULL or submissions.excused or submissions.score IS NOT NULL or submissions.workflow_state = 'graded'")
   }
 
   scope :include_user, -> { preload(:user) }
@@ -1680,6 +1696,37 @@ class Submission < ActiveRecord::Base
   scope :speed_grader_includes, -> { preload(:versions, :submission_comments, :attachments, :rubric_assessment) }
   scope :for_user, lambda { |user| where(:user_id => user) }
   scope :needing_screenshot, -> { where("submissions.submission_type='online_url' AND submissions.attachment_id IS NULL AND submissions.process_attempts<3").order(:updated_at) }
+  scope :read_for, lambda { |user = nil|
+    return all unless user
+    eager_load(:content_participations, :assignment, :submission_comments).
+    where("CASE WHEN content_participations IS NULL THEN
+            (submission_comments IS NULL
+            OR (submission_comments.draft IS NOT TRUE
+              AND submission_comments.provisional_grade_id IS NULL
+              AND submission_comments.hidden = 'f'
+              AND submission_comments.author_id = :user))
+          ELSE (content_participations.user_id = :user
+            AND content_participations.workflow_state = 'read')
+           END
+          OR (assignments.workflow_state = 'deleted'
+            OR assignments.muted IS TRUE OR submissions.user_id IS NULL)",
+          user: user).distinct
+  }
+  scope :unread_for, lambda { |user = nil|
+    eager_load(:content_participations, :assignment, :submission_comments).
+    where("CASE WHEN content_participations IS NULL THEN
+            ((submission_comments.draft IS NOT TRUE
+              AND submission_comments.provisional_grade_id IS NULL
+              AND submission_comments.hidden = 'f'
+              AND submission_comments.author_id <> :user)
+            OR submissions.grade IS NOT NULL OR submissions.score IS NOT NULL)
+          ELSE (content_participations.user_id = :user
+              AND content_participations.workflow_state = 'unread')
+           END
+          AND (assignments.workflow_state <> 'deleted'
+            AND assignments.muted IS NOT TRUE AND submissions.user_id IS NOT NULL)",
+          user: user).distinct
+  }
 
   def assignment_visible_to_user?(user, opts={})
     return visible_to_user unless visible_to_user.nil?

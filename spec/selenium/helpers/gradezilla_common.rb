@@ -13,7 +13,7 @@
 # details.
 #
 # You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+# with this program. If not, see <http://www.gnu.org/licenses/>
 
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
@@ -104,13 +104,6 @@ module GradezillaCommon
     accept_alert
   end
 
-  def toggle_muting(assignment)
-    find_with_jquery(".slick-header-column[id*='assignment_#{assignment.id}'] .Gradebook__ColumnHeaderAction").click
-    find_with_jquery('[data-menu-item-id="assignment-muter"]').click
-    find_with_jquery('.ui-dialog-buttonpane [data-action$="mute"]:visible').click
-    wait_for_ajaximations
-  end
-
   def open_assignment_options(cell_index)
     assignment_cell = ffj('#gradebook_grid .container_1 .slick-header-column')[cell_index]
     driver.action.move_to(assignment_cell).perform
@@ -126,7 +119,7 @@ module GradezillaCommon
   end
 
   def edit_grade(cell, grade)
-    hover_and_click cell
+    fj(cell).click
     grade_input = fj("#{cell} .grade")
     set_value(grade_input, grade)
     grade_input.send_keys(:return)
@@ -151,12 +144,7 @@ module GradezillaCommon
   end
 
   def switch_to_section(section=nil)
-    section = section.id if section.is_a?(CourseSection)
-    section ||= ""
-    fj('.section-select-button:visible').click
-    expect(fj('.section-select-menu:visible')).to be_displayed
-    fj("label[for='section_option_#{section}']").click
-    wait_for_ajaximations
+    ::Gradezilla.select_section(section)
   end
 
   def gradebook_column_array(css_row_class)
@@ -201,9 +189,9 @@ module GradezillaCommon
     @assignment_3_points = "50"
     @attendance_points = "15"
 
-    @student_name_1 = "student 1"
-    @student_name_2 = "student 2"
-    @student_name_3 = "student 3"
+    @student_name_1 = "student1"
+    @student_name_2 = "student2"
+    @student_name_3 = "student3"
 
     @student_1_total_ignoring_ungraded = "100%"
     @student_2_total_ignoring_ungraded = "66.67%"
@@ -255,12 +243,12 @@ module GradezillaCommon
     # first assignment data
     @group = @course.assignment_groups.create!(:name => 'first assignment group', :group_weight => 100)
     @first_assignment = assignment_model({
-                                             :course => @course,
-                                             :name => 'A name that would not reasonably fit in the header cell which should have some limit set',
-                                             :due_at => nil,
-                                             :points_possible => @assignment_1_points,
-                                             :submission_types => 'online_text_entry,online_upload',
-                                             :assignment_group => @group
+                                           :course => @course,
+                                           :name => 'A name that would not reasonably fit in the header cell which should have some limit set',
+                                           :due_at => nil,
+                                           :points_possible => @assignment_1_points,
+                                           :submission_types => 'online_text_entry,online_upload',
+                                           :assignment_group => @group
                                          })
     rubric_model
     @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
@@ -278,12 +266,12 @@ module GradezillaCommon
 
     # second assignment data
     @second_assignment = assignment_model({
-                                              :course => @course,
-                                              :name => 'second assignment',
-                                              :due_at => nil,
-                                              :points_possible => @assignment_2_points,
-                                              :submission_types => 'online_text_entry',
-                                              :assignment_group => @group
+                                            :course => @course,
+                                            :name => 'second assignment',
+                                            :due_at => nil,
+                                            :points_possible => @assignment_2_points,
+                                            :submission_types => 'online_text_entry',
+                                            :assignment_group => @group
                                           })
     @second_association = @rubric.associate_with(@second_assignment, @course, :purpose => 'grading')
 
@@ -296,24 +284,24 @@ module GradezillaCommon
     # third assignment data
     due_date = Time.zone.now + 1.day
     @third_assignment = assignment_model({
-                                             :course => @course,
-                                             :name => 'assignment three',
-                                             :due_at => due_date,
-                                             :points_possible => @assignment_3_points,
-                                             :submission_types => 'online_text_entry',
-                                             :assignment_group => @group
+                                           :course => @course,
+                                           :name => 'assignment three',
+                                           :due_at => due_date,
+                                           :points_possible => @assignment_3_points,
+                                           :submission_types => 'online_text_entry',
+                                           :assignment_group => @group
                                          })
     @third_association = @rubric.associate_with(@third_assignment, @course, :purpose => 'grading')
 
     # attendance assignment
     @attendance_assignment = assignment_model({
-                                                  :course => @course,
-                                                  :name => 'attendance assignment',
-                                                  :title => 'attendance assignment',
-                                                  :due_at => nil,
-                                                  :points_possible => @attendance_points,
-                                                  :submission_types => 'attendance',
-                                                  :assignment_group => @group,
+                                                :course => @course,
+                                                :name => 'attendance assignment',
+                                                :title => 'attendance assignment',
+                                                :due_at => nil,
+                                                :points_possible => @attendance_points,
+                                                :submission_types => 'attendance',
+                                                :assignment_group => @group,
                                               })
 
     @ungraded_assignment = @course.assignments.create!(

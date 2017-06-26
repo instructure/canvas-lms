@@ -143,22 +143,19 @@ const ConversationsRouter = Backbone.Router.extend({
     this.submissionReply.show(this.detail.model, {trigger: $('#submission-reply-btn')})
   },
 
-  onReply (message) {
+  onReply (message, trigger) {
     if (this.detail.model.get('for_submission')) {
       this.onSubmissionReply()
     } else {
-      this._delegateReply(message, 'reply')
+      this._delegateReply(message, 'reply', trigger)
     }
   },
 
-  onReplyAll (message) {
-    this._delegateReply(message, 'replyAll')
+  onReplyAll (message, trigger) {
+    this._delegateReply(message, 'replyAll', trigger)
   },
 
-  _delegateReply (message, type) {
-    const btn = type === 'reply' ? 'reply-btn' : 'reply-all-btn'
-    const trigger = message ? $(`.message-item-view[data-id=${message.id}] .${btn}`) : $(`#${btn}`)
-
+  _delegateReply (message, type, trigger) {
     this.compose.show(this.detail.model, {to: type, trigger, message})
   },
 
@@ -175,18 +172,27 @@ const ConversationsRouter = Backbone.Router.extend({
     }
   },
 
-  onDelete () {
-    if (!confirm(this.messages.confirmDelete)) return
+  onDelete (focusNext, trigger) {
+    if (!confirm(this.messages.confirmDelete)) {
+      $(trigger).focus()
+      return
+    }
     const messages = this.batchUpdate('destroy')
     delete this.detail.model
     this.list.collection.remove(messages)
     this.header.updateUi(null)
     $.flashMessage(this.messages.messageDeleted)
     this.detail.render()
+
+    let $focusNext = $(focusNext)
+    if ($focusNext.length === 0) {
+      $focusNext = $('#compose-message-recipients')
+    }
+    $focusNext.focus()
   },
 
   onCompose (e) {
-    this.compose.show(null, {trigger: $('#compose-btn')})
+    this.compose.show(null, {trigger: '#compose-btn'})
   },
 
   index () {
@@ -236,8 +242,7 @@ const ConversationsRouter = Backbone.Router.extend({
     return this.batchUpdate('mark_as_read', m => m.toggleReadState(true))
   },
 
-  onForward (message) {
-    let trigger
+  onForward (message, trigger) {
     let model
     if (message) {
       model = this.detail.model.clone()
@@ -246,9 +251,7 @@ const ConversationsRouter = Backbone.Router.extend({
         m.id === message.id ||
         (_.include(m.participating_user_ids, message.author_id) && m.created_at < message.created_at)
       ))
-      trigger = $(`.message-item-view[data-id=${message.id}] .al-trigger`)
     } else {
-      trigger = $('#admin-btn')
       model = this.detail.model
     }
     this.compose.show(model, {to: 'forward', trigger})

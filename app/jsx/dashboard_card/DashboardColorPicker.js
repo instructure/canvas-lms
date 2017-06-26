@@ -31,7 +31,7 @@ import cx from 'classnames'
 
   var SPACE_NEEDED_FOR_TOOLTIP = 300;
 
-  var ColorPickerTooltip = React.createClass({
+  var DashboardColorPicker = React.createClass({
 
     propTypes: {
       elementID: PropTypes.string,
@@ -163,10 +163,11 @@ import cx from 'classnames'
                        hideOnScroll     = {false}
                        currentColor     = {this.props.backgroundColor}
                        nicknameInfo     = {this.props.nicknameInfo}
+                       parentComponent  = "DashboardColorPicker"
           />
         </div>
       )
     }
   })
 
-export default ColorPickerTooltip
+export default DashboardColorPicker

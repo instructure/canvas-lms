@@ -552,7 +552,8 @@ describe CoursesController, type: :request do
         expect(new_course.time_zone.tzinfo.name).to eql 'America/Juneau'
         course_response.merge!(
           'id' => new_course.id,
-          'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{new_course.uuid}.ics" }
+          'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{new_course.uuid}.ics" },
+          'uuid' => new_course.uuid
         )
         course_response.delete 'term_id' #not included in the response
         expect(json).to eql course_response
@@ -603,7 +604,8 @@ describe CoursesController, type: :request do
         expect(new_course.enrollment_term_id).to eql term.id
         course_response.merge!(
           'id' => new_course.id,
-          'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{new_course.uuid}.ics" }
+          'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{new_course.uuid}.ics" },
+          'uuid' => new_course.uuid
         )
         expect(json).to eql course_response
       end
@@ -2825,7 +2827,8 @@ describe CoursesController, type: :request do
         'apply_assignment_group_weights' => false,
         'enrollment_term_id' => @course.enrollment_term_id,
         'restrict_enrollments_to_course_dates' => false,
-        'time_zone' => 'America/Los_Angeles'
+        'time_zone' => 'America/Los_Angeles',
+        'uuid' => @course1.uuid
       })
     end
 

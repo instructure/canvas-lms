@@ -36,13 +36,16 @@ define [
         buttons: [{
           text: I18n.t("grade_display_warning.cancel", "Cancel"), click: @cancel},
           {text: I18n.t("grade_display_warning.continue", "Continue"), click: @save}]
+        close: =>
+          @$dialog.remove()
+          options.onClose() if typeof options.onClose == 'function'
 
     save: () =>
       if @$dialog.find('#hide_warning').prop('checked')
         @options.save({ dontWarnAgain: true })
       else
         @options.save({ dontWarnAgain: false })
-      @$dialog.remove()
+      @$dialog.dialog('close')
 
     cancel: () =>
-      @$dialog.remove()
+      @$dialog.dialog('close')

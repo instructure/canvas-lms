@@ -39,6 +39,14 @@ describe SubmissionsController do
       expect(assigns[:submission].url).to eql("http://url")
     end
 
+    it 'should only emit one live event' do
+      expect(Canvas::LiveEvents).to receive(:submission_created).once
+      expect(Canvas::LiveEvents).not_to receive(:submission_updated)
+      course_with_student_logged_in(:active_all => true)
+      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
+      post 'create', :course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_url", :url => "url"}
+    end
+
     it "should not double-send notifications to a teacher" do
       course_with_student_logged_in(:active_all => true)
       @teacher = user_with_pseudonym(username: 'teacher@example.com', active_all: 1)

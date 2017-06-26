@@ -23,7 +23,7 @@ import handleClickEvent from 'jsx/context_cards/StudentContextCardTrigger';
 QUnit.module('StudentContextCardTrigger', {
   setup () {
     $('#fixtures').append('<button class="student_context_card_trigger">Open</button>');
-    $('#fixtures').append('<div id="StudentContextTray__Container"></div>');
+    $('#fixtures').append('<div id="StudentTray__Container"></div>');
     window.ENV.STUDENT_CONTEXT_CARDS_ENABLED = true
     moxios.install();
   },

@@ -19,12 +19,29 @@
       </a>
       <ul class="al-options">
         {{#unless cannot_edit_by_master_course}}
-          <li><a href="#" class="icon-edit edit-menu-item" title="{{#t 'menu.edit'}}Edit{{/t}}">{{#t 'menu.edit'}}Edit{{/t}}</a></li>
-          <li><a href="#" class="icon-trash delete-menu-item{{#unless deletable}} disabled{{/unless}}" title="{{#t 'menu.delete'}}Delete{{/t}}" {{#unless deletable}}aria-disabled="true"{{/unless}}>{{#t 'menu.delete'}}Delete{{/t}}</a></li>
+          <li><a href="#" class="icon-edit edit-menu-item" title="{{#t}}Edit{{/t}}">{{#t}}Edit{{/t}}</a></li>
+          <li>
+            <a href="#" class="icon-trash delete-menu-item{{#unless deletable}} disabled{{/unless}}"
+               title="{{#t}}Delete {{title}}{{/t}}" {{#unless deletable}}aria-disabled="true"{{/unless}}>
+               {{#t}}Delete{{/t}}
+            </a>
+          </li>
         {{/unless}}
         {{#unless front_page}}
-          <li><a href="#" class="icon-document use-as-front-page-menu-item{{#unless published}} disabled{{/unless}}" title="{{#t 'menu.use_front_page'}}Use as Front Page{{/t}}" {{#unless published}}aria-disabled="true"{{/unless}}>{{#t 'menu.use_front_page'}}Use as Front Page{{/t}}</a></li>
+          <li>
+            <a href="#" class="icon-document use-as-front-page-menu-item{{#unless published}} disabled{{/unless}}"
+               title="{{#t}}Use as Front Page{{/t}}" {{#unless published}}aria-disabled="true"{{/unless}}>
+               {{#t}}Use as Front Page{{/t}}
+            </a>
+          </li>
         {{/unless}}
+        {{#if CAN.MANAGE}}
+          <li>
+            <a href="#" class="icon-copy-course duplicate-wiki-page" title="{{#t}}Duplicate{{/t}}">
+              {{#t}}Duplicate{{/t}}
+            </a>
+          </li>
+        {{/if}}
         {{>ExternalTools/external_tools_menu wiki_page_menu_tools}}
       </ul>
     </div>

@@ -25,28 +25,31 @@ class AssignmentCellEditor {
     this.options = options;
     this.container = options.container;
     this.handleKeyDown = this.handleKeyDown.bind(this);
+    this.renderComponent();
+    options.column.getGridSupport().events.onKeyDown.subscribe(this.handleKeyDown);
+  }
 
+  renderComponent () {
     const bindComponent = (ref) => { this.component = ref };
     const props = {
-      ...options.column.propFactory.getProps(options.item),
+      ...this.options.column.propFactory.getProps(this.options.item),
       ref: bindComponent,
-      editorOptions: options
+      editorOptions: this.options
     };
 
     const element = React.createElement(AssignmentRowCell, props, null);
     ReactDOM.render(element, this.container);
-    options.grid.onKeyDown.subscribe(this.handleKeyDown);
   }
 
   handleKeyDown (event) {
     if (this.component) {
-      this.component.handleKeyDown(event);
+      return this.component.handleKeyDown(event);
     }
   }
 
   destroy () {
     this.component = null;
-    this.options.grid.onKeyDown.unsubscribe(this.handleKeyDown);
+    this.options.column.getGridSupport().events.onKeyDown.unsubscribe(this.handleKeyDown);
     ReactDOM.unmountComponentAtNode(this.container);
   }
 
@@ -64,6 +67,7 @@ class AssignmentCellEditor {
 
   loadValue (item) {
     this.component.loadValue(item);
+    this.renderComponent();
   }
 
   applyValue (item, state) {

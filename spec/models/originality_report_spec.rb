@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../lti2_spec_helper')
 
 describe OriginalityReport do
 
@@ -123,6 +124,48 @@ describe OriginalityReport do
       report_with_score.update_attributes(workflow_state: 'error')
       report_with_score.update_attributes(originality_score: 23.2)
       expect(report_with_score.workflow_state).to eq 'error'
+    end
+  end
+
+  describe '#report_launch_url' do
+    include_context 'lti2_spec_helper'
+    let(:link_id) { SecureRandom.uuid }
+
+    let(:tool_setting) do
+      ToolSetting.new(tool_proxy: tool_proxy,
+                      context: course,
+                      resource_link_id: link_id,
+                      vendor_code: product_family.vendor_code,
+                      product_code: product_family.product_code,
+                      resource_type_code: resource_handler.resource_type_code)
+    end
+    let(:report) { subject }
+
+    it 'creates an LTI launch URL if a link_id is present' do
+      report.update_attributes(link_id: link_id)
+      expected_url = "http://localhost/courses/"\
+                     "#{submission.assignment.course.id}/assignments/"\
+                     "#{submission.assignment.id}/lti/resource/#{link_id}"
+      expect(report.report_launch_url).to eq expected_url
+    end
+
+    it 'uses the originality_report_url when the link id is present' do
+      non_lti_url = 'http://www.test.com/report'
+      report.update_attributes(originality_report_url: non_lti_url)
+      expect(report.report_launch_url).to eq non_lti_url
+    end
+  end
+
+  describe '#state' do
+    let(:report) { OriginalityReport.new(workflow_state: 'pending') }
+
+    it "returns the workflow state unless it is 'scored'" do
+      expect(report.state).to eq 'pending'
+    end
+
+    it "returns the state from similarity score if workflow state is 'scored'" do
+      report.update_attributes(originality_score: '25')
+      expect(report.state).to eq 'warning'
     end
   end
 end

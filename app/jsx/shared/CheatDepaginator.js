@@ -19,40 +19,39 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import 'jquery.ajaxJSON'
-  /**
-   * Fires callback for paginated APIs in order
-   *
-   * @param callback
-   * @param data - api data will be appended to this array (also in order)
-   */
-  const consumePagesInOrder = (callback, data) => {
-    const pendingResponses = [];
-    let wantedPage = 1;
 
-    const orderedConsumer = (response, page) => {
-      if (page === wantedPage) {
-        if (callback) callback(response);
-        if (_.isArray(response)) {
-          data.push.apply(data, response);
-        } else {
-          data.push(response);
-        }
-        wantedPage += 1;
+/**
+ * Fires callback for paginated APIs in order
+ *
+ * @param callback
+ * @param data - api data will be appended to this array (also in order)
+ */
+function consumePagesInOrder (callback, data) {
+  const pendingResponses = [];
+  let wantedPage = 1;
+
+  const orderedConsumer = (response, page) => {
+    if (page === wantedPage) {
+      if (callback) callback(response);
+      if (_.isArray(response)) {
+        data.push(...response);
       } else {
-        pendingResponses.push([response, page]);
+        data.push(response);
       }
+      wantedPage += 1;
+    } else {
+      pendingResponses.push([response, page]);
+    }
 
-      const nextPage = _.find(pendingResponses,
-                              ([pageData,pageNum]) => pageNum === wantedPage);
-      if (nextPage) {
-        const [pageData, pageNum] = nextPage;
-        orderedConsumer(pageData, pageNum);
-      }
-    };
-
-    return orderedConsumer;
+    const nextPage = _.find(pendingResponses, ([_pageData, pageNum]) => pageNum === wantedPage);
+    if (nextPage) {
+      const [pageData, pageNum] = nextPage;
+      orderedConsumer(pageData, pageNum);
+    }
   };
 
+  return orderedConsumer;
+}
 
   /**
    * Quickly depaginates a canvas API endpoint
@@ -104,5 +103,7 @@ import 'jquery.ajaxJSON'
 
     return gotAllPagesDfd;
   };
+
+cheaterDepaginate.consumePagesInOrder = consumePagesInOrder;
 
 export default cheaterDepaginate

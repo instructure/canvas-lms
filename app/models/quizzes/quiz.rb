@@ -32,7 +32,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   include Canvas::DraftStateValidations
 
   attr_readonly :context_id, :context_type
-  attr_accessor :notify_of_update, :todo_type
+  attr_accessor :notify_of_update
 
   has_many :quiz_questions, -> { order(:position) }, dependent: :destroy, class_name: 'Quizzes::QuizQuestion', inverse_of: :quiz
   has_many :quiz_submissions, :dependent => :destroy, :class_name => 'Quizzes::QuizSubmission'
@@ -1077,6 +1077,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   scope :active, -> { where("quizzes.workflow_state<>'deleted'") }
   scope :not_for_assignment, -> { where(:assignment_id => nil) }
   scope :available, -> { where("quizzes.workflow_state = 'available'") }
+  scope :for_course, lambda { |course_id| where(:context_type => 'Course', :context_id => course_id) }
 
   # NOTE: only use for courses with differentiated assignments on
   scope :visible_to_students_in_course_with_da, lambda {|student_ids, course_ids|

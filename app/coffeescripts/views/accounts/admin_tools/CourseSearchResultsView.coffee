@@ -64,6 +64,8 @@ define [
       @model.on 'searching', =>
         @model.set 'restored', false
         @disableResults()
+      @model.on 'doneRestoring', ->
+        $('#viewCourse').focus()
 
     # Restore just calls @model.restore and waits for the
     # deferred object to finish.

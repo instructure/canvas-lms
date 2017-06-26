@@ -148,8 +148,11 @@ define [
             when 'select'
               optionObj['isSelect'] = true
               break
+          return
         )
+        return
       )
+      return
 
     renderConferenceFormUserSettings: ->
       conferenceData = @toJSON()

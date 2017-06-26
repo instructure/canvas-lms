@@ -100,7 +100,7 @@ describe "scheduler" do
       get "/calendar2"
       open_select_courses_modal(@course1.name)
       f('.fc-content').click
-      f('.reserve_event_link').click
+      move_to_click('.reserve_event_link')
       refresh_page
       expected_time = calendar_time_string(@app1.new_appointments.first.start_at)
       expect(f('.fc-content .fc-title')).to include_text(@app1.title)
@@ -125,8 +125,9 @@ describe "scheduler" do
       reserve_appointment_for(@student1, @student1, @app1)
       get "/calendar2"
       open_select_courses_modal(@course1.name)
-      ff('.fc-content .fc-title')[1].click
-      f('.reserve_event_link').click
+      expect(f('.fc-content .icon-calendar-add')).to be
+      f('.fc-content .icon-calendar-add').click
+      move_to_click('.reserve_event_link')
       visible_dialog_element = fj('.ui-dialog:visible')
       title = visible_dialog_element.find_element(:css, '.ui-dialog-titlebar')
       expect(title.text).to include('Cancel existing reservation and sign up for this one?')

@@ -16,14 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  './vendor/i18n_js_extension',
-  'jquery',
-  'underscore',
-  './str/htmlEscape',
-  'compiled/str/i18nLolcalize',
-  './vendor/date' /* Date.parse, Date.UTC */
-], function(I18n, $, _, htmlEscape, i18nLolcalize) {
+import I18n from './vendor/i18n_js_extension'
+import $ from 'jquery'
+import _ from 'underscore'
+import htmlEscape from './str/htmlEscape'
+import i18nLolcalize from 'compiled/str/i18nLolcalize'
+import './vendor/date'
 
 /*
  * Overridden interpolator that localizes any interpolated numbers.
@@ -358,6 +356,4 @@ if (I18n.translations) {
   I18n.translations = {en: {}};
 }
 
-return I18n;
-
-});
+export default I18n

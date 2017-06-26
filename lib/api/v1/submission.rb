@@ -183,6 +183,12 @@ module Api::V1::Submission
       hash['discussion_entries'] = discussion_entry_api_json(entries, assignment.discussion_topic.context, user, session)
     end
 
+    if attempt.submission_type == 'basic_lti_launch'
+      hash['url'] = retrieve_course_external_tools_url(context.id,
+                                                       assignment_id: assignment.id,
+                                                       url: attempt.external_tool_url)
+    end
+
     hash
   end
 

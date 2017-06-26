@@ -20,6 +20,7 @@ import React from 'react';
 import { mount } from 'enzyme';
 import GradebookSettingsModal from 'jsx/gradezilla/default_gradebook/components/GradebookSettingsModal';
 import GradebookSettingsModalApi from 'jsx/gradezilla/default_gradebook/apis/GradebookSettingsModalApi';
+import { destroyContainer } from 'jsx/shared/FlashAlert';
 
 QUnit.module('GradebookSettingsModal', {
   setup () {
@@ -28,7 +29,13 @@ QUnit.module('GradebookSettingsModal', {
   },
 
   mountComponent (customProps = {}) {
-    const defaultProps = { courseId: '1', locale: 'en', onClose: () => {} };
+    const defaultProps = {
+      courseId: '1',
+      locale: 'en',
+      newGradebookDevelopmentEnabled: true,
+      onClose: () => {},
+      gradedLateOrMissingSubmissionsExist: true
+    };
     const props = { ...defaultProps, ...customProps };
     this.wrapper = mount(<GradebookSettingsModal {...props} />);
     return this.wrapper.get(0);
@@ -58,11 +65,7 @@ QUnit.module('GradebookSettingsModal', {
   teardown () {
     QUnit.config.testTimeout = this.qunitTimeout;
     this.wrapper.unmount();
-    const flashMessageContainer = document.getElementById('flash_message_holder');
-    if (flashMessageContainer) {
-      // need to remove this element to avoid test pollution
-      flashMessageContainer.remove();
-    }
+    destroyContainer();
   }
 });
 

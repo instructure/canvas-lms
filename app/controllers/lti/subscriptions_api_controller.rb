@@ -15,27 +15,27 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# @API Webhooks Subscriptions
-# @internal
-#
-# API for WebhooksSubscriptions
-# Webhooks from Canvas are your way to know that a change (new or updated
-# submission, or change to assignment) has taken place.
-#
-# Webhooks are available via HTTPS to an endpoint you own and specify, or via
-# an AWS SQS queue that you provision, own, and specify. We recommend SQS for
-# the most robust integration, but do support HTTPS for lower volume applications.
-#
-# We do not deduplicate or batch messages before transmission. Avoid
-# creating multiple identical subscriptions. Webhooks always identify the ID
-# of the subscription that caused them to be sent, allowing you to identify
-# problematic or high volume subscriptions.
-#
-# We cannot guarantee the transmission order of webhooks. If order is important
-# to your application, you must check the "event_time" attribute in the
-# "metadata" hash to determine sequence.
-
 module Lti
+  # @API Webhooks Subscriptions
+  # **LTI API for Webhook Subscriptions (Must use <a href="jwt_access_tokens.html">JWT access tokens</a> with this API).**
+  #
+  # The tool proxy must also have the appropriate enabled capabilities (See appendix).
+  #
+  # Webhooks from Canvas are your way to know that a change (e.g. new or updated submission,
+  # new or updated assignment, etc.) has taken place.
+  #
+  # Webhooks are available via HTTPS to an endpoint you own and specify, or via
+  # an AWS SQS queue that you provision, own, and specify. We recommend SQS for
+  # the most robust integration, but do support HTTPS for lower volume applications.
+  #
+  # We do not deduplicate or batch messages before transmission. Avoid
+  # creating multiple identical subscriptions. Webhooks always identify the ID
+  # of the subscription that caused them to be sent, allowing you to identify
+  # problematic or high volume subscriptions.
+  #
+  # We cannot guarantee the transmission order of webhooks. If order is important
+  # to your application, you must check the "event_time" attribute in the
+  # "metadata" hash to determine sequence.
   class SubscriptionsApiController < ApplicationController
     include Lti::Ims::AccessTokenHelper
 
@@ -67,6 +67,8 @@ module Lti
     end
 
     # @API Create a Webhook Subscription
+    # Creates a webook subscription for the specified event type and
+    # context.
     #
     # @argument submission[ContextId] [Required, String]
     #   The id of the context for the subscription.
@@ -83,7 +85,7 @@ module Lti
     #   Format to deliver the live events. Must be 'live-event' or 'caliper'.
     #
     # @argument subscription[TransportMetadata] [Required, Object]
-    #   An object with a single key: 'Url'. Example: '{ "Url" => "http://sqs.example"}'
+    #   An object with a single key: 'Url'. Example: { "Url": "sqs.example" }
     #
     # @argument subscription[TransportType] [Required, String]
     #   Must be either 'sqs' or 'https'.
@@ -95,7 +97,6 @@ module Lti
       response = Services::LiveEventsSubscriptionService.create_tool_proxy_subscription(tool_proxy, subscription_helper.subscription)
       forward_service_response(response)
     end
-
 
     # @API Delete a Webhook Subscription
     def destroy
@@ -110,7 +111,7 @@ module Lti
     end
 
     # @API Update a Webhook Subscription
-    # Same parameters as create
+    # This endpoint uses the same parameters as the create endpoint
     def update
       subscription = params.require(:subscription)
       subscription['Id'] = params.require(:id)
@@ -124,8 +125,17 @@ module Lti
 
 
     # @API List all Webhook Subscription for a tool proxy
+    #
+    # This endpoint returns a paginated list with a default limit of 100 items per result set.
+    # You can retrieve the next result set by setting a 'StartKey' header in your next request
+    # with the value of the 'EndKey' header in the response.
+    #
+    # Example use of a 'StartKey' header object:
+    #   { "Id":"71d6dfba-0547-477d-b41d-db8cb528c6d1","DeveloperKey":"10000000000001" }
     def index
-      service_response = Services::LiveEventsSubscriptionService.tool_proxy_subscriptions(tool_proxy)
+      headers = request.headers['StartKey'] ? { 'StartKey' => request.headers['StartKey'] } : {}
+      service_response = Services::LiveEventsSubscriptionService.tool_proxy_subscriptions(tool_proxy, headers)
+      response.headers['EndKey'] = service_response.headers['endkey'] if service_response.headers['endkey']
       forward_service_response(service_response)
     end
 
@@ -138,8 +148,11 @@ module Lti
     end
 
     def forward_service_response(service_response)
-      render json: service_response.body, status: service_response.code
+      render json: service_response, status: service_response.code
     end
 
+    # @!appendix Webhook Subscription Required Capabilities
+    #
+    #  {include:file:doc/api/subscriptions_appendix.md}
   end
 end

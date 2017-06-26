@@ -31,15 +31,19 @@ describe "course settings/blueprint" do
       user_session @admin
     end
 
-    it "enables blueprint course and set default restrictions" do
+    it "enables blueprint course and set default restrictions", priority: "1", test_id: 3166299 do
       get "/courses/#{@course.id}/settings"
       f('.bcs_check-box').find_element(:xpath, "../div").click
       wait_for_animations
       expect(f('.blueprint_setting_options')).to be_displayed
-      expect(is_checked('input[name="course[blueprint_restrictions][content]"]')).not_to be
-      expect(is_checked('input[name="course[blueprint_restrictions][points]"]')).not_to be
-      expect(is_checked('input[name="course[blueprint_restrictions][due_dates]"]')).not_to be
-      expect(is_checked('input[name="course[blueprint_restrictions][availability_dates]"]')).not_to be
+      expect(is_checked('input[name="course[blueprint_restrictions][content]"][type=checkbox]')).to be # checked by default
+      expect(is_checked('input[name="course[blueprint_restrictions][points]"][type=checkbox]')).not_to be
+      expect(is_checked('input[name="course[blueprint_restrictions][due_dates]"][type=checkbox]')).not_to be
+      expect(is_checked('input[name="course[blueprint_restrictions][availability_dates]"][type=checkbox]')).not_to be
+      expect_new_page_load { submit_form('#course_form') }
+      expect(MasterCourses::MasterTemplate.full_template_for(@course).default_restrictions).to eq(
+        { :content => true, :points => false, :due_dates => false, :availability_dates => false }
+      )
     end
 
     it "manipulates checkboxes" do
@@ -51,9 +55,10 @@ describe "course settings/blueprint" do
       expect_new_page_load { submit_form('#course_form') }
 
       expect(f('.blueprint_setting_options')).to be_displayed
-      expect(is_checked('input[name="course[blueprint_restrictions][points]"]')).not_to be
-      expect(is_checked('input[name="course[blueprint_restrictions][due_dates]"]')).not_to be
-      expect(is_checked('input[name="course[blueprint_restrictions][availability_dates]"]')).not_to be
+      expect(is_checked('input[name="course[blueprint_restrictions][content]"][type=checkbox]')).to_not be
+      expect(is_checked('input[name="course[blueprint_restrictions][points]"][type=checkbox]')).to be
+      expect(is_checked('input[name="course[blueprint_restrictions][due_dates]"][type=checkbox]')).to be
+      expect(is_checked('input[name="course[blueprint_restrictions][availability_dates]"][type=checkbox]')).to be
 
       expect(MasterCourses::MasterTemplate.full_template_for(@course).default_restrictions).to eq(
         { :content => false, :points => true, :due_dates => true, :availability_dates => true }
@@ -68,14 +73,41 @@ describe "course settings/blueprint" do
       get "/courses/#{@course.id}/settings"
 
       expect(f('.blueprint_setting_options')).to be_displayed
-      expect(is_checked('input[name="course[blueprint_restrictions][points]"]')).not_to be
-      expect(is_checked('input[name="course[blueprint_restrictions][due_dates]"]')).not_to be
-      expect(is_checked('input[name="course[blueprint_restrictions][availability_dates]"]')).not_to be
+      expect(is_checked('input[name="course[blueprint_restrictions][content]"][type=checkbox]')).to be
+      expect(is_checked('input[name="course[blueprint_restrictions][points]"][type=checkbox]')).not_to be
+      expect(is_checked('input[name="course[blueprint_restrictions][due_dates]"][type=checkbox]')).to be
+      expect(is_checked('input[name="course[blueprint_restrictions][availability_dates]"][type=checkbox]')).not_to be
 
       f('.bcs_check-box').find_element(:xpath, "../div").click
       wait_for_animations
       expect_new_page_load { submit_form('#course_form') }
+      expect(template.reload).to be_deleted
+    end
 
+    it "can set granular locks" do
+      template = MasterCourses::MasterTemplate.set_as_master_course(@course)
+
+      get "/courses/#{@course.id}/settings"
+
+      expect(f('.bcs_radio_input-group')).to be_displayed
+      ff('.bcs_radio_input-group')[1].click
+      assmt_tab = f('.bcs__object-tab[data-reactid*=assignment]')
+      assmt_tab.find_element(:css, '.bcs_tab_indicator-icon button').click
+      assmt_tab.find_element(:css, '.bcs_check_box-group[data-reactid*=content]').click
+      assmt_tab.find_element(:css, '.bcs_check_box-group[data-reactid*=points]').click
+
+      quiz_tab = f('.bcs__object-tab[data-reactid*=quiz]')
+      quiz_tab.find_element(:css, '.bcs_tab_indicator-icon button').click
+      quiz_tab.find_element(:css, '.bcs_check_box-group[data-reactid*=due_dates]').click
+
+      expect_new_page_load { submit_form('#course_form') }
+
+      template.reload
+      expect(template.use_default_restrictions_by_type).to be_truthy
+      expect(template.default_restrictions_by_type["Assignment"]).to eq({
+        :content => true, :points => true, :due_dates => false, :availability_dates => false})
+      expect(template.default_restrictions_by_type["Quizzes::Quiz"]).to eq({
+        :content => false, :points => false, :due_dates => true, :availability_dates => false})
     end
   end
 

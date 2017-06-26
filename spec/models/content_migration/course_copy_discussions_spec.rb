@@ -34,6 +34,8 @@ describe ContentMigration do
       topic = @copy_from.discussion_topics.create!(:title => "topic", :message => "<p>bloop</p>",
                                                    :pinned => true, :discussion_type => "threaded",
                                                    :require_initial_post => true)
+      todo_date = 1.day.from_now
+      topic.todo_date = todo_date
       topic.posted_at = 2.days.ago
       topic.position = 2
       topic.save!
@@ -49,6 +51,7 @@ describe ContentMigration do
       expect(new_topic.last_reply_at).to be_nil
       expect(new_topic.allow_rating).to eq false
       expect(new_topic.posted_at).to be_nil
+      expect(new_topic.todo_date.to_i).to eq todo_date.to_i
     end
 
     it "copies rating settings" do

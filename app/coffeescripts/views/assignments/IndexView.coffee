@@ -43,6 +43,7 @@ define [
     @child 'assignmentGroupsView', '[data-view=assignmentGroups]'
     @child 'createGroupView', '[data-view=createGroup]'
     @child 'assignmentSettingsView', '[data-view=assignmentSettings]'
+    @child 'assignmentSyncSettingsView', '[data-view=assignmentSyncSettings]'
     @child 'showByView', '[data-view=showBy]'
 
     events:
@@ -73,6 +74,7 @@ define [
 
       if @assignmentSettingsView
         @assignmentSettingsView.hide()
+        @assignmentSyncSettingsView.hide()
 
         @indexMenuStore = configureIndexMenuStore({
           weighted: ENV.WEIGHT_FINAL_GRADES,
@@ -91,7 +93,12 @@ define [
             contextType: contextType,
             contextId: contextId,
             setTrigger: @assignmentSettingsView.setTrigger.bind(@assignmentSettingsView)
+            setDisableTrigger: @assignmentSyncSettingsView.setTrigger.bind(@assignmentSyncSettingsView)
             registerWeightToggle: @assignmentSettingsView.on.bind(@assignmentSettingsView)
+            disableSyncToSis: @assignmentSyncSettingsView.openDisableSync.bind(@assignmentSyncSettingsView)
+            sisName: ENV.SIS_NAME
+            postToSisDefault: ENV.POST_TO_SIS_DEFAULT
+            hasAssignments: ENV.HAS_ASSIGNMENTS
           }),
           $('#settingsMountPoint')[0]
         )

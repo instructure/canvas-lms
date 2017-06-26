@@ -160,6 +160,26 @@ class WikiPagesApiController < ApplicationController
     show
   end
 
+  # @API Duplicate page
+  #
+  # Duplicate a wiki page
+  #
+  # @example_request
+  #     curl -X DELETE -H 'Authorization: Bearer <token>' \
+  #     https://<canvas>/api/v1/courses/123/pages/14/duplicate
+  #
+  # @returns the page that was created
+  def duplicate
+    return unless authorized_action(@page, @current_user, :create)
+    if @page.deleted?
+      return render json: { error: 'cannot duplicate deleted page' }, status: :bad_request
+    end
+
+    new_page = @page.duplicate
+    new_page.save!
+    render :json => wiki_page_json(new_page, @current_user, session)
+  end
+
   # @API Update/create front page
   #
   # Update the title or contents of the front page

@@ -57,6 +57,8 @@ module Api::V1::ExternalTools
   def tool_pagination_url
     if @context.is_a? Course
       api_v1_course_external_tools_url(@context)
+    elsif @context.is_a? Group
+      api_v1_group_external_tools_url(@context)
     else
       api_v1_account_external_tools_url(@context)
     end

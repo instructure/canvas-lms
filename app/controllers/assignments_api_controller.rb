@@ -585,6 +585,29 @@ class AssignmentsApiController < ApplicationController
     end
   end
 
+  def duplicate
+    assignment_id = params[:assignment_id]
+    old_assignment = @context.active_assignments.find_by({ id: assignment_id })
+
+    if !old_assignment || old_assignment.workflow_state == "deleted"
+      return render json: { error: 'assignment does not exist' }, status: 400
+    end
+
+    if old_assignment.quiz
+      return render json: { error: 'quiz duplication not implemented' }, status: 400
+    end
+
+    if old_assignment.discussion_topic
+      return render json: { error: 'discussion topic duplication not implemented' }, status: 400
+    end
+
+    return unless authorized_action(old_assignment, @current_user, :create)
+
+    new_assignment = old_assignment.duplicate
+    new_assignment.save!
+    render :json => assignment_json(new_assignment, @current_user, session)
+  end
+
   def get_assignments(user)
     if authorized_action(@context, user, :read)
       scope = Assignments::ScopedToUser.new(@context, user).scope.

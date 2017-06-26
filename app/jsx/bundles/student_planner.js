@@ -16,21 +16,43 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import Planner from 'canvas-planner';
+import $ from 'jquery';
+import 'compiled/jquery.rails_flash_notifications';
+import {sharedDashboardInstance} from '../dashboardPlannerHelper';
 
+const stickyElement = document.getElementById('dashboard_header_container');
 const element = document.getElementById('dashboard-planner');
 const headerElement = document.getElementById('dashboard-planner-header');
 
-const courses = window.ENV.DASHBOARD_COURSES.map(dc => ({
+const courses = window.ENV.STUDENT_PLANNER_COURSES.map(dc => ({
   ...dc,
   color: window.ENV.PREFERENCES.custom_colors[dc.assetString]
 }));
 
+const stickyElementRect = stickyElement.getBoundingClientRect()
+const stickyOffset = stickyElementRect.bottom - stickyElementRect.top
+
+const changeToDashboardCardView = () => {
+  sharedDashboardInstance.changeToCardView();
+}
 
 const options = {
+  flashAlertFunctions: {
+    visualErrorCallback: $.flashError,
+    visualSuccessCallback: $.flashMessage,
+    srAlertCallback: $.screenReaderFlashMessage
+  },
   locale: window.ENV.LOCALE,
   timeZone: window.ENV.TIMEZONE,
-  theme: (ENV.use_high_contrast) ? 'canvas-a11y' : 'canvas',
-  courses
+  userId: window.ENV.current_user_id,
+  ariaHideElement: document.getElementById('application'),
+  theme: '',
+  // the new activity button isn't sticky in IE yet, so make sure it slides
+  // under the header that is sticky in IE
+  stickyZIndex: 3,
+  stickyOffset,
+  courses,
+  changeToDashboardCardView
 };
 
 if (element) {

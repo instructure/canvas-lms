@@ -489,7 +489,7 @@ sections.csv
 <td>✓</td>
 <td></td>
 <td>A unique identifier used to reference sections in the enrollments data.
-This identifier must not change for the account, and must be globally unique. In the user
+This identifier must not change for the section, and must be globally unique. In the user
 interface, this is called the SIS ID.</td>
 </tr>
 <tr>

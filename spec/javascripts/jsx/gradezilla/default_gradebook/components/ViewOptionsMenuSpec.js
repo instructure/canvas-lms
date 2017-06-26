@@ -20,24 +20,28 @@ import React from 'react';
 import { mount, ReactWrapper } from 'enzyme';
 import ViewOptionsMenu from 'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu';
 
-function createExampleProps () {
+function defaultProps ({ props, filterSettings } = {}) {
   return {
     columnSortSettings: {
       criterion: 'due_date',
       direction: 'ascending',
       disabled: false,
+      modulesEnabled: true,
       onSortByDefault () {},
       onSortByDueDateAscending () {},
       onSortByDueDateDescending () {},
       onSortByNameAscending () {},
       onSortByNameDescending () {},
       onSortByPointsAscending () {},
-      onSortByPointsDescending () {}
+      onSortByPointsDescending () {},
+      onSortByModuleAscending () {},
+      onSortByModuleDescending () {}
     },
     filterSettings: {
       available: ['assignmentGroups', 'gradingPeriods', 'modules', 'sections'],
       onSelect () {},
-      selected: []
+      selected: [],
+      ...filterSettings
     },
     onSelectShowStatusesModal () {},
     onSelectShowUnpublishedAssignments () {},
@@ -46,7 +50,8 @@ function createExampleProps () {
       disabled: false,
       onSelect () {},
       selected: true
-    }
+    },
+    ...props
   };
 }
 
@@ -59,15 +64,26 @@ function mountAndOpenOptions (props) {
 function openArrangeBy (props) {
   const wrapper = mountAndOpenOptions(props);
   const menuContent = new ReactWrapper(wrapper.node.menuContent, wrapper.node);
-  const flyout = menuContent.find('MenuItemFlyout');
+  const flyouts = menuContent.find('MenuItemFlyout').map(flyout => flyout);
+  const flyout = flyouts.find(menuItem => menuItem.text().trim() === 'Arrange By')
   flyout.find('button').simulate('mouseOver');
   return wrapper;
 }
 
+function openFilters (props) {
+  const wrapper = mountAndOpenOptions(props);
+  const menuContent = new ReactWrapper(wrapper.node.menuContent, wrapper.node);
+  const flyouts = menuContent.find('MenuItemFlyout').map(flyout => flyout);
+  const flyout = flyouts.find(menuItem => menuItem.text().trim() === 'Filters')
+  flyout.find('button').simulate('mouseOver');
+  return wrapper;
+}
+
+
 QUnit.module('ViewOptionsMenu#focus');
 
 test('trigger is focused', function () {
-  const props = createExampleProps();
+  const props = defaultProps();
   const wrapper = mount(<ViewOptionsMenu {...props} />, { attachTo: document.getElementById('fixtures') });
   wrapper.instance().focus();
   equal(document.activeElement, wrapper.find('button').node);
@@ -77,7 +93,7 @@ test('trigger is focused', function () {
 
 QUnit.module('ViewOptionsMenu - notes', {
   setup () {
-    this.props = createExampleProps();
+    this.props = defaultProps();
   },
 
   getMenuItemGroup () {
@@ -134,78 +150,87 @@ test('the "Notes" option is optionally deselected', function () {
 });
 
 QUnit.module('ViewOptionsMenu - Filters', {
-  setup () {
-    this.props = createExampleProps();
-  },
-
-  findMenuItemGroup (text) {
-    const optionsMenu = new ReactWrapper(this.wrapper.node.menuContent, this.wrapper.node);
-    return optionsMenu.findWhere(component => (
-      component.name() === 'MenuItemGroup' && component.text().includes(text)
-    ));
-  },
-
-  findMenuItem (text) {
-    return this.findMenuItemGroup('Filters').findWhere(component => (
-      component.name() === 'MenuItem' && component.text().includes(text)
-    ));
-  },
-
   teardown () {
     this.wrapper.unmount();
   }
 });
 
+test('Filters menu does allows multiple selections', function () {
+  this.wrapper = openFilters(defaultProps());
+  const menuContent = new ReactWrapper(this.wrapper.node.filtersMenuContent, this.wrapper.node);
+  const group = menuContent.find('MenuItemGroup');
+  strictEqual(group.prop('allowMultiple'), true);
+});
+
 test('includes each available filter', function () {
-  this.wrapper = mountAndOpenOptions(this.props);
-  const group = this.findMenuItemGroup('Filters');
+  this.wrapper = openFilters(defaultProps());
+  const menuContent = new ReactWrapper(this.wrapper.node.filtersMenuContent, this.wrapper.node);
+  const group = menuContent.find('MenuItemGroup');
   strictEqual(group.find('MenuItem').length, 4);
 });
 
 test('displays filters by name', function () {
-  this.wrapper = mountAndOpenOptions(this.props);
-  const filters = this.findMenuItemGroup('Filters').find('MenuItem');
+  this.wrapper = openFilters(defaultProps());
+  const menuContent = new ReactWrapper(this.wrapper.node.filtersMenuContent, this.wrapper.node);
+  const filters = menuContent.find('MenuItem');
   const names = filters.map(filter => filter.text());
   deepEqual(names, ['Assignment Groups', 'Grading Periods', 'Modules', 'Sections']);
 });
 
 test('includes only available filters', function () {
-  this.props.filterSettings.available = ['gradingPeriods', 'modules'];
-  this.wrapper = mountAndOpenOptions(this.props);
-  const filters = this.findMenuItemGroup('Filters').find('MenuItem');
+  const props = defaultProps({ filterSettings: { available: ['gradingPeriods', 'modules'] } });
+  this.wrapper = openFilters(props);
+  const menuContent = new ReactWrapper(this.wrapper.node.filtersMenuContent, this.wrapper.node);
+  const filters = menuContent.find('MenuItem');
   const names = filters.map(filter => filter.text());
   deepEqual(names, ['Grading Periods', 'Modules']);
 });
 
 test('does not display filters group when no filters are available', function () {
-  this.props.filterSettings.available = [];
-  this.wrapper = mountAndOpenOptions(this.props);
-  const group = this.findMenuItemGroup('Filters');
-  strictEqual(group.length, 0);
+  const props = defaultProps({ filterSettings: { available: [] } });
+  this.wrapper = mountAndOpenOptions(props);
+  const menuContent = new ReactWrapper(this.wrapper.node.menuContent, this.wrapper.node);
+  const flyouts = menuContent.find('MenuItemFlyout').map(flyout => flyout);
+  const flyout = flyouts.find(menuItem => menuItem.text().trim() === 'Filters')
+  strictEqual(flyout, undefined);
 });
 
 test('onSelect is called when a filter is selected', function () {
-  this.props.filterSettings.onSelect = this.stub();
-  this.wrapper = mountAndOpenOptions(this.props);
-  this.findMenuItem('Grading Periods').simulate('click');
-  strictEqual(this.props.filterSettings.onSelect.callCount, 1);
+  const onSelect = this.stub();
+  const props = defaultProps({ filterSettings: { onSelect } });
+  this.wrapper = openFilters(props);
+  const menuContent = new ReactWrapper(this.wrapper.node.filtersMenuContent, this.wrapper.node);
+  const menuItems = menuContent.find('MenuItem').map(menuItem => menuItem);
+  const filter = menuItems.find(menuItem => menuItem.text().trim() === 'Grading Periods')
+  filter.simulate('click');
+  strictEqual(onSelect.callCount, 1);
 });
 
 test('onSelect is called with the selected filter', function () {
-  this.props.filterSettings.onSelect = this.stub();
-  this.wrapper = mountAndOpenOptions(this.props);
-  this.findMenuItem('Modules').simulate('click');
-  const [filters] = this.props.filterSettings.onSelect.lastCall.args;
-  deepEqual(filters, ['modules']);
+  const onSelect = this.stub();
+  const props = defaultProps({ filterSettings: { onSelect } });
+  this.wrapper = openFilters(props);
+  const menuContent = new ReactWrapper(this.wrapper.node.filtersMenuContent, this.wrapper.node);
+  const menuItems = menuContent.find('MenuItem').map(menuItem => menuItem);
+  const filter = menuItems.find(menuItem => menuItem.text().trim() === 'Modules')
+  filter.simulate('click');
+  strictEqual(onSelect.calledWithExactly(['modules']), true);
 });
 
 test('onSelect is called with list of selected filters upon any selection change', function () {
-  this.props.filterSettings.selected = ['assignmentGroups', 'sections'];
-  this.props.filterSettings.onSelect = this.stub();
-  this.wrapper = mountAndOpenOptions(this.props);
-  this.findMenuItem('Grading Periods').simulate('click');
-  const [filters] = this.props.filterSettings.onSelect.lastCall.args;
-  deepEqual(filters.sort(), ['assignmentGroups', 'gradingPeriods', 'sections']);
+  const onSelect = this.stub();
+  const props = defaultProps({
+    filterSettings: {
+      onSelect,
+      selected: ['assignmentGroups', 'sections']
+    }
+  });
+  this.wrapper = openFilters(props);
+  const menuContent = new ReactWrapper(this.wrapper.node.filtersMenuContent, this.wrapper.node);
+  const menuItems = menuContent.find('MenuItem').map(menuItem => menuItem);
+  const filter = menuItems.find(menuItem => menuItem.text().trim() === 'Grading Periods')
+  filter.simulate('click');
+  strictEqual(onSelect.calledWithExactly(['assignmentGroups', 'sections', 'gradingPeriods']), true);
 });
 
 QUnit.module('ViewOptionsMenu - unpublished assignments', {
@@ -213,7 +238,7 @@ QUnit.module('ViewOptionsMenu - unpublished assignments', {
     showUnpublishedAssignments = true,
     onSelectShowUnpublishedAssignments = () => {}
   } = {}) {
-    const props = createExampleProps();
+    const props = defaultProps();
     return mount(
       <ViewOptionsMenu
         {...props}
@@ -262,13 +287,14 @@ test('onSelectShowUnpublishedAssignment is called when selected', function () {
 });
 
 QUnit.module('ViewOptionsMenu - Column Sorting', {
-  props (criterion = 'due_date', direction = 'ascending', disabled = false) {
+  props (criterion = 'due_date', direction = 'ascending', disabled = false, modulesEnabled = true) {
     return {
-      ...createExampleProps(),
+      ...defaultProps(),
       columnSortSettings: {
         criterion,
         direction,
         disabled,
+        modulesEnabled,
         onSortByDefault: this.stub(),
         onSortByNameAscending: this.stub(),
         onSortByNameDescending: this.stub(),
@@ -276,6 +302,8 @@ QUnit.module('ViewOptionsMenu - Column Sorting', {
         onSortByDueDateDescending: this.stub(),
         onSortByPointsAscending: this.stub(),
         onSortByPointsDescending: this.stub(),
+        onSortByModuleAscending: this.stub(),
+        onSortByModuleDescending: this.stub(),
       }
     };
   },
@@ -289,7 +317,7 @@ test('Arrange By menu does not allow multiple selections', function () {
 });
 
 test('Default Order is selected when criterion is default and direction is ascending', function () {
-  const wrapper = openArrangeBy(this.props('default', 'acending'));
+  const wrapper = openArrangeBy(this.props('default', 'ascending'));
   const arrangeByMenu = new ReactWrapper(wrapper.node.arrangeByMenuContent, wrapper.node);
   const arrangeByMenuItems = arrangeByMenu.find('MenuItem').map(menuItem => menuItem);
   const selectedMenuItem = arrangeByMenuItems.find(menuItem => menuItem.props().selected);
@@ -324,7 +352,7 @@ test('Assignment Name - Z-A is selected when criterion is name and direction is 
   equal(selectedMenuItem.text().trim(), 'Assignment Name - Z-A');
 });
 
-test('Due Date - Oldest to Newest is selected when criterion is name and direction is ascending', function () {
+test('Due Date - Oldest to Newest is selected when criterion is due_date and direction is ascending', function () {
   const wrapper = openArrangeBy(this.props('due_date', 'ascending'));
   const arrangeByMenu = new ReactWrapper(wrapper.node.arrangeByMenuContent, wrapper.node);
   const arrangeByMenuItems = arrangeByMenu.find('MenuItem').map(menuItem => menuItem);
@@ -333,7 +361,7 @@ test('Due Date - Oldest to Newest is selected when criterion is name and directi
   equal(selectedMenuItem.text().trim(), 'Due Date - Oldest to Newest');
 });
 
-test('Due Date - Oldest to Newest is selected when criterion is name and direction is ascending', function () {
+test('Due Date - Oldest to Newest is selected when criterion is due_date and direction is ascending', function () {
   const wrapper = openArrangeBy(this.props('due_date', 'descending'));
   const arrangeByMenu = new ReactWrapper(wrapper.node.arrangeByMenuContent, wrapper.node);
   const arrangeByMenuItems = arrangeByMenu.find('MenuItem').map(menuItem => menuItem);
@@ -342,7 +370,7 @@ test('Due Date - Oldest to Newest is selected when criterion is name and directi
   equal(selectedMenuItem.text().trim(), 'Due Date - Newest to Oldest');
 });
 
-test('Points - Lowest to Highest is selected when criterion is name and direction is ascending', function () {
+test('Points - Lowest to Highest is selected when criterion is points and direction is ascending', function () {
   const wrapper = openArrangeBy(this.props('points', 'ascending'));
   const arrangeByMenu = new ReactWrapper(wrapper.node.arrangeByMenuContent, wrapper.node);
   const arrangeByMenuItems = arrangeByMenu.find('MenuItem').map(menuItem => menuItem);
@@ -351,13 +379,49 @@ test('Points - Lowest to Highest is selected when criterion is name and directio
   equal(selectedMenuItem.text().trim(), 'Points - Lowest to Highest');
 });
 
-test('Points - Lowest to Highest is selected when criterion is name and direction is ascending', function () {
+test('Points - Lowest to Highest is selected when criterion is points and direction is ascending', function () {
   const wrapper = openArrangeBy(this.props('points', 'descending'));
   const arrangeByMenu = new ReactWrapper(wrapper.node.arrangeByMenuContent, wrapper.node);
   const arrangeByMenuItems = arrangeByMenu.find('MenuItem').map(menuItem => menuItem);
   const selectedMenuItem = arrangeByMenuItems.find(menuItem => menuItem.props().selected);
 
   equal(selectedMenuItem.text().trim(), 'Points - Highest to Lowest');
+});
+
+test('Module - First to Last is selected when criterion is module_position and direction is ascending', function () {
+  const wrapper = openArrangeBy(this.props('module_position', 'ascending'));
+  const arrangeByMenu = new ReactWrapper(wrapper.node.arrangeByMenuContent, wrapper.node);
+  const arrangeByMenuItems = arrangeByMenu.find('MenuItem').map(menuItem => menuItem);
+  const selectedMenuItem = arrangeByMenuItems.find(menuItem => menuItem.text().trim() === 'Module - First to Last');
+
+  strictEqual(selectedMenuItem.prop('selected'), true);
+});
+
+test('Module - Last to First is selected when criterion is module_position and direction is ascending', function () {
+  const wrapper = openArrangeBy(this.props('module_position', 'descending'));
+  const arrangeByMenu = new ReactWrapper(wrapper.node.arrangeByMenuContent, wrapper.node);
+  const arrangeByMenuItems = arrangeByMenu.find('MenuItem').map(menuItem => menuItem);
+  const selectedMenuItem = arrangeByMenuItems.find(menuItem => menuItem.text().trim() === 'Module - Last to First');
+
+  strictEqual(selectedMenuItem.prop('selected'), true);
+});
+
+test('Module - First to Last is not shown when modules are not enabled', function () {
+  const wrapper = openArrangeBy(this.props('default', 'ascending', false, false));
+  const arrangeByMenu = new ReactWrapper(wrapper.node.arrangeByMenuContent, wrapper.node);
+  const arrangeByMenuItems = arrangeByMenu.find('MenuItem').map(menuItem => menuItem);
+  const selectedMenuItem = arrangeByMenuItems.find(menuItem => menuItem.text().trim() === 'Module - First to Last');
+
+  strictEqual(selectedMenuItem, undefined);
+});
+
+test('Module - Last to First is not shown when modules are not enabled', function () {
+  const wrapper = openArrangeBy(this.props('default', 'ascending', false, false));
+  const arrangeByMenu = new ReactWrapper(wrapper.node.arrangeByMenuContent, wrapper.node);
+  const arrangeByMenuItems = arrangeByMenu.find('MenuItem').map(menuItem => menuItem);
+  const selectedMenuItem = arrangeByMenuItems.find(menuItem => menuItem.text().trim() === 'Module - Last to First');
+
+  strictEqual(selectedMenuItem, undefined);
 });
 
 test('all column ordering options are disabled when the column ordering settings are disabled', function () {
@@ -368,7 +432,7 @@ test('all column ordering options are disabled when the column ordering settings
   const disabledMenuItems =
     arrangeByMenu.find('MenuItem').findWhere(menuItem => menuItem.props().disabled);
 
-  strictEqual(disabledMenuItems.length, 7);
+  strictEqual(disabledMenuItems.length, 9);
 });
 
 test('clicking on "Default Order" triggers onSortByDefault', function () {
@@ -459,7 +523,7 @@ QUnit.module('ViewOptionsMenu - Statuses');
 
 test('clicking Statuses calls onSelectShowStatusesModal', function () {
   const props = {
-    ...createExampleProps(),
+    ...defaultProps(),
     onSelectShowStatusesModal: this.stub()
   };
   const wrapper = mountAndOpenOptions(props);

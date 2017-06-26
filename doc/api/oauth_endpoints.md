@@ -6,6 +6,7 @@ OAuth2 Endpoints
 - [GET login/oauth2/auth](#get-login-oauth2-auth)
 - [POST login/oauth2/token](#post-login-oauth2-token)
 - [DELETE login/oauth2/token](#delete-login-oauth2-token)
+- [GET login/session_token](#get-login-session-token)
 
 <a name="get-login-oauth2-auth"></a>
 ## GET login/oauth2/auth
@@ -236,4 +237,43 @@ See <a href="http://tools.ietf.org/html/rfc6749#section-4.1.3">Section 4.1.3</a>
       </tr>
     </tbody>
   </table>
+</div>
+
+<a name="get-login-session-token"></a>
+## GET login/session_token
+
+
+<div class="method_details">
+
+  If your application needs to begin a normal web session in order to access
+  features not supported via API (such as quiz taking), you can use your API
+  access token in order to get a time-limited URL that can be fed to a
+  browser or web view to begin a new web session.
+
+  <h3 class="endpoint">GET /login/session_token</h3>
+
+  <h4>Parameters</h4>
+  <table>
+    <thead>
+      <tr>
+        <th>Parameter</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="mono">return_to <span class="label optional"></span></td>
+        <td>An optional URL to begin the web session at. Otherwise the user will be sent to the dashboard.</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <h4>Example responses</h4>
+
+  <pre class="example_code">
+  {
+    "session_url": "https://canvas.instructure.com/opaque_url"
+  }
+  </pre>
 </div>

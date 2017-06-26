@@ -206,6 +206,10 @@ describe ExternalToolsController, type: :request do
       it "should return course level external tools" do
         group_index_call(@group)
       end
+
+      it "should paginate" do
+        group_index_paginate_call(@group)
+      end
     end
   end
 
@@ -313,6 +317,33 @@ describe ExternalToolsController, type: :request do
 
     expect(json.size).to eq 1
     expect(HashDiff.diff(json.first, example_json(et))).to eq []
+  end
+
+  def group_index_paginate_call(group)
+    7.times { tool_with_everything(group.context) }
+
+    json = api_call(:get, "/api/v1/groups/#{group.id}/external_tools",
+                    {:controller => 'external_tools', :action => 'index', :format => 'json',
+                     :group_id => group.id.to_s, :include_parents => true, :per_page => '3'})
+
+    expect(json.length).to eq 3
+    links = response.headers['Link'].split(",")
+    expect(links.all?{ |l| l =~ /api\/v1\/groups\/#{group.id}\/external_tools/ }).to be_truthy
+    expect(links.find{ |l| l.match(/rel="next"/)}).to match(/page=2/)
+    expect(links.find{ |l| l.match(/rel="first"/)}).to match(/page=1/)
+    expect(links.find{ |l| l.match(/rel="last"/)}).to match(/page=3/)
+
+    # get the last page
+    json = api_call(:get, "/api/v1/groups/#{group.id}/external_tools",
+                    {:controller => 'external_tools', :action => 'index', :format => 'json',
+                     :group_id => group.id.to_s, :include_parents => true, :per_page => '3', :page => '3'})
+
+    expect(json.length).to eq 1
+    links = response.headers['Link'].split(",")
+    expect(links.all?{ |l| l =~ /api\/v1\/groups\/#{group.id}\/external_tools/ }).to be_truthy
+    expect(links.find{ |l| l.match(/rel="prev"/)}).to match(/page=2/)
+    expect(links.find{ |l| l.match(/rel="first"/)}).to match(/page=1/)
+    expect(links.find{ |l| l.match(/rel="last"/)}).to match(/page=3/)
   end
 
   def index_call(context, type="course")

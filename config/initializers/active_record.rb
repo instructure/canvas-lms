@@ -43,6 +43,10 @@ class ActiveRecord::Base
       # transactions due to spec fixtures are _not_in the callstack, so we only need to find 1
       !!caller.find { |s| s =~ transaction_regex && !s.include?('spec_helper.rb') }
     end
+
+    def default_scope(*)
+      raise "please don't ever use default_scope. it may seem like a great solution, but I promise, it isn't"
+    end
   end
 
   def read_or_initialize_attribute(attr_name, default_value)
@@ -997,49 +1001,45 @@ module UpdateAndDeleteWithJoins
     connection.update(sql, "#{name} Update")
   end
 
-  def delete_all(conditions = nil, *args)
+  def delete_all
     return super if joins_values.empty?
 
-    if conditions
-      where(conditions).delete_all
-    else
-      sql = "DELETE FROM #{quoted_table_name} "
+    sql = "DELETE FROM #{quoted_table_name} "
 
-      join_sql = arel.join_sources.map(&:to_sql).join(" ")
-      tables, join_conditions = deconstruct_joins(join_sql)
+    join_sql = arel.join_sources.map(&:to_sql).join(" ")
+    tables, join_conditions = deconstruct_joins(join_sql)
 
-      sql.concat('USING ')
-      sql.concat(tables.join(', '))
-      sql.concat(' ')
+    sql.concat('USING ')
+    sql.concat(tables.join(', '))
+    sql.concat(' ')
 
-      scope = self
-      join_conditions.each { |join| scope = scope.where(join) }
+    scope = self
+    join_conditions.each { |join| scope = scope.where(join) }
 
-      if CANVAS_RAILS4_2
-        binds = scope.bind_values.dup
-        sql_string = Arel::Collectors::Bind.new
-        scope.arel.constraints.each do |node|
-          connection.visitor.accept(node, sql_string)
-        end
-        sql.concat('WHERE ' + sql_string.compile(binds.map{|bvs| connection.quote(*bvs.reverse)}))
-      else
-        binds = scope.bound_attributes
-        binds = connection.prepare_binds_for_database(binds)
-        binds.map! { |value| connection.quote(value) }
-        sql_string = Arel::Collectors::Bind.new
-        scope.arel.constraints.each do |node|
-          connection.visitor.accept(node, sql_string)
-        end
-        sql.concat('WHERE ' + sql_string.substitute_binds(binds).join)
+    if CANVAS_RAILS4_2
+      binds = scope.bind_values.dup
+      sql_string = Arel::Collectors::Bind.new
+      scope.arel.constraints.each do |node|
+        connection.visitor.accept(node, sql_string)
       end
-
-      connection.exec_query(sql, "#{name} Delete all", scope.bind_values)
+      sql.concat('WHERE ' + sql_string.compile(binds.map{|bvs| connection.quote(*bvs.reverse)}))
+    else
+      binds = scope.bound_attributes
+      binds = connection.prepare_binds_for_database(binds)
+      binds.map! { |value| connection.quote(value) }
+      sql_string = Arel::Collectors::Bind.new
+      scope.arel.constraints.each do |node|
+        connection.visitor.accept(node, sql_string)
+      end
+      sql.concat('WHERE ' + sql_string.substitute_binds(binds).join)
     end
+
+    connection.exec_query(sql, "#{name} Delete all", scope.bind_values)
   end
 end
 ActiveRecord::Relation.prepend(UpdateAndDeleteWithJoins)
 
-module DeleteAllWithLimit
+module UpdateAndDeleteAllWithLimit
   def delete_all(*args)
     if limit_value || offset_value
       scope = except(:select).select("#{quoted_table_name}.#{primary_key}")
@@ -1047,8 +1047,16 @@ module DeleteAllWithLimit
     end
     super
   end
+
+  def update_all(updates, *args)
+    if limit_value || offset_value
+      scope = except(:select).select("#{quoted_table_name}.#{primary_key}")
+      return unscoped.where(primary_key => scope).update_all(updates)
+    end
+    super
+  end
 end
-ActiveRecord::Relation.prepend(DeleteAllWithLimit)
+ActiveRecord::Relation.prepend(UpdateAndDeleteAllWithLimit)
 
 ActiveRecord::Associations::CollectionProxy.class_eval do
   def respond_to?(name, include_private = false)

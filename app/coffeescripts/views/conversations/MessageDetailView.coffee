@@ -57,9 +57,9 @@ define [
           message.set('cannot_reply', context.cannot_reply) if context.cannot_reply
           childView = new MessageItemView(model: message).render()
           $template.find('.message-content').append(childView.$el)
-          @listenTo(childView, 'reply',     => @trigger('reply', message))
-          @listenTo(childView, 'reply-all', => @trigger('reply-all', message))
-          @listenTo(childView, 'forward',   => @trigger('forward', message))
+          @listenTo(childView, 'reply',     => @trigger('reply', message, ".message-item-view[data-id=#{message.id}] .reply-btn"))
+          @listenTo(childView, 'reply-all', => @trigger('reply-all', message, ".message-item-view[data-id=#{message.id}] .al-trigger"))
+          @listenTo(childView, 'forward',   => @trigger('forward', message, ".message-item-view[data-id=#{message.id}] .al-trigger"))
       else
         $template = noMessage(options)
       @$el.html($template)
@@ -91,19 +91,19 @@ define [
 
     onReply: (e) ->
       e.preventDefault()
-      @trigger('reply')
+      @trigger('reply', null, '.message-detail-actions .reply-btn')
 
     onReplyAll: (e) ->
       e.preventDefault()
-      @trigger('reply-all')
+      @trigger('reply-all', null, '.message-detail-actions .al-trigger')
 
     onForward: (e) ->
       e.preventDefault()
-      @trigger('forward')
+      @trigger('forward', null, '.message-detail-actions .al-trigger')
 
     onDelete: (e) ->
       e.preventDefault()
-      @trigger('delete')
+      @trigger('delete', '.conversations .message-actions:last .star-btn', '.message-detail-actions .al-trigger')
 
     onArchive: (e) ->
       e.preventDefault()

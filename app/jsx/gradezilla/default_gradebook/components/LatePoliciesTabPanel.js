@@ -19,6 +19,7 @@
 import React from 'react';
 import { bool, func, number, shape, string } from 'prop-types';
 import Alert from 'instructure-ui/lib/components/Alert';
+import ComingSoonContent from 'jsx/gradezilla/default_gradebook/components/ComingSoonContent';
 import Container from 'instructure-ui/lib/components/Container';
 import FormFieldGroup from 'instructure-ui/lib/components/FormFieldGroup';
 import NumberInput from 'instructure-ui/lib/components/NumberInput';
@@ -107,12 +108,14 @@ class LatePoliciesTabPanel extends React.Component {
       })
     }).isRequired,
     changeLatePolicy: func.isRequired,
-    locale: string.isRequired
+    locale: string.isRequired,
+    showContentComingSoon: bool.isRequired,
+    showAlert: bool.isRequired
   };
 
   constructor (props) {
     super(props);
-    this.state = { showAlert: true };
+    this.state = { showAlert: props.showAlert };
     this.changeMissingSubmissionDeduction = this.validateAndChangeNumber.bind(this, 'missingSubmissionDeduction');
     this.changeLateSubmissionDeduction = this.validateAndChangeNumber.bind(this, 'lateSubmissionDeduction');
     this.changeLateSubmissionMinimumPercent = this.validateAndChangeNumber.bind(this, 'lateSubmissionMinimumPercent');
@@ -202,9 +205,17 @@ class LatePoliciesTabPanel extends React.Component {
   }
 
   render () {
+    if (this.props.showContentComingSoon) {
+      return (
+        <div id="LatePoliciesTabPanel__Container-noContent">
+          <ComingSoonContent />
+        </div>
+      );
+    }
+
     if (!this.props.latePolicy.data) {
       return (
-        <div id="late-policies-tab-panel-loading">
+        <div id="LatePoliciesTabPanel__Container-noContent">
           <Spinner title={I18n.t('Loading')} size="large" margin="small" />
         </div>
       );
@@ -212,7 +223,7 @@ class LatePoliciesTabPanel extends React.Component {
 
     const { data, validationErrors } = this.props.latePolicy;
     return (
-      <div id="late-policies-tab-panel">
+      <div id="LatePoliciesTabPanel__Container">
         {this.state.showAlert &&
           <Alert
             variant="warning"

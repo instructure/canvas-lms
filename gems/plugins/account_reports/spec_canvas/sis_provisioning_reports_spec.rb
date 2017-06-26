@@ -833,6 +833,7 @@ describe "Default Account Reports" do
       it "should run the provisioning report with deleted enrollments" do
         c = Course.create(:name => 'course1')
         c.student_view_student
+        Course.where(id: @course2.id).update_all(workflow_state: 'deleted')
         parameters = {}
         parameters["enrollments"] = true
         parameters["include_deleted"] = true
@@ -847,7 +848,7 @@ describe "Default Account Reports" do
                                  'ObserverEnrollment', "false"],
                                 [@course2.id.to_s, "SIS_COURSE_ID_2", @user1.id.to_s, "user_sis_id_01",
                                  "observer", observer_role.id.to_s,
-                                 @enrollment7.course_section_id.to_s, nil, "active",
+                                 @enrollment7.course_section_id.to_s, nil, "deleted",
                                  @user3.id.to_s, "user_sis_id_03", "true", 'ObserverEnrollment', "false"],
                                 [@course1.id.to_s, "SIS_COURSE_ID_1", @user2.id.to_s, "user_sis_id_02",
                                  "ta", ta_role.id.to_s,
@@ -863,7 +864,7 @@ describe "Default Account Reports" do
                                  'StudentEnrollment', "false"],
                                 [@course2.id.to_s, "SIS_COURSE_ID_2", @user3.id.to_s, "user_sis_id_03",
                                  "student", student_role.id.to_s,
-                                 @enrollment5.course_section_id.to_s, nil, "active", nil, nil, "true",
+                                 @enrollment5.course_section_id.to_s, nil, "deleted", nil, nil, "true",
                                  'StudentEnrollment', "false"],
                                 [@course1.id.to_s, "SIS_COURSE_ID_1", @user4.id.to_s, "user_sis_id_04",
                                  "teacher", teacher_role.id.to_s, @enrollment9.course_section_id.to_s,
@@ -875,7 +876,7 @@ describe "Default Account Reports" do
                                  'TeacherEnrollment', "false"],
                                 [@course2.id.to_s, "SIS_COURSE_ID_2", @user4.id.to_s, "user_sis_id_04",
                                  "Pixel Engineer", @role.id.to_s, @enrollment11.course_section_id.to_s,
-                                 nil, "active", nil, nil, "true", 'DesignerEnrollment', "false"],
+                                 nil, "deleted", nil, nil, "true", 'DesignerEnrollment', "false"],
                                 [@course4.id.to_s, nil, @user4.id.to_s,
                                  "user_sis_id_04", "student",
                                  student_role.id.to_s,

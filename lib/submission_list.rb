@@ -203,7 +203,7 @@ class SubmissionList
 
     # A hash of the current grades of each submission, keyed by submission.id
     def current_grade_map
-      @current_grade_map ||= self.course.submissions.inject({}) do |hash, submission|
+      @current_grade_map ||= self.course.submissions.not_placeholder.inject({}) do |hash, submission|
         grader = if submission.grader_id.present?
           self.grader_map[submission.grader_id].try(:name)
         end
@@ -295,7 +295,7 @@ class SubmissionList
 
     # A list of all versions in YAML format
     def yaml_list
-      @yaml_list ||= self.course.submissions.preload(:versions).map do |s|
+      @yaml_list ||= self.course.submissions.not_placeholder.preload(:versions).map do |s|
         s.versions.map { |v| v.yaml }
       end.flatten
     end

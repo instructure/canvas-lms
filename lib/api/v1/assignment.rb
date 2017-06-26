@@ -99,7 +99,8 @@ module Api::V1::Assignment
       include_all_dates: false,
       override_dates: true,
       needs_grading_count_by_section: false,
-      exclude_response_fields: []
+      exclude_response_fields: [],
+      include_planner_override: false
     )
 
     if opts[:override_dates] && !assignment.new_record?
@@ -279,15 +280,19 @@ module Api::V1::Assignment
     end
 
     if opts[:include_module_ids]
-      thing_in_module = case assignment.submission_types
-                        when "online_quiz" then assignment.quiz
-                        when "discussion_topic" then assignment.discussion_topic
-                        else assignment
-                        end
-      hash['module_ids'] = thing_in_module.context_module_tags.map(&:context_module_id) if thing_in_module
+      modulable = case assignment.submission_types
+                  when 'online_quiz' then assignment.quiz
+                  when 'discussion_topic' then assignment.discussion_topic
+                  else assignment
+                  end
+
+      if modulable
+        hash['module_ids'] = modulable.context_module_tags.map(&:context_module_id)
+        hash['module_positions'] = modulable.context_module_tags.map(&:position)
+      end
     end
 
-    hash['published'] = ! assignment.unpublished?
+    hash['published'] = !assignment.unpublished?
     if can_manage
       hash['unpublishable'] = assignment.can_unpublish?
     end
@@ -318,6 +323,15 @@ module Api::V1::Assignment
 
     if opts[:master_course_status]
       hash.merge!(assignment.master_course_api_restriction_data(opts[:master_course_status]))
+    end
+
+    if opts[:include_planner_override]
+      override = assignment.planner_override_for(user)
+      hash['planner_override'] =  if override.present?
+                                    api_json(override, user, session)
+                                  else
+                                    nil
+                                  end
     end
 
     hash
@@ -609,11 +623,11 @@ module Api::V1::Assignment
     end
 
     post_to_sis = assignment_params.key?('post_to_sis') ? value_to_boolean(assignment_params['post_to_sis']) : nil
-    if assignment.new_record? && (post_to_sis.nil? || !Assignment.sis_grade_export_enabled?(context))
+    if !post_to_sis.nil?
+      assignment.post_to_sis = post_to_sis
+    elsif assignment.new_record? && !Assignment.sis_grade_export_enabled?(context)
       # set the default setting if it is not included.
       assignment.post_to_sis = context.account.sis_default_grade_export[:value]
-    elsif !post_to_sis.nil?
-      assignment.post_to_sis = post_to_sis
     end
 
     if assignment_params.key?('moderated_grading')

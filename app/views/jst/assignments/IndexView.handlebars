@@ -15,7 +15,7 @@
         <select class="ic-Input" id="grading_period_selector" aria-label="{{#t}}Select a Grading Period{{/t}}">
           <option value="all">{{#t}}All Grading Periods{{/t}}</option>
           {{#each ENV.active_grading_periods}}
-            <option value="{{@index}}">{{title}}</option>
+            <option id="grading_period_{{id}}" value="{{@index}}">{{title}}</option>
           {{/each}}
         </select>
       {{/if}}
@@ -77,4 +77,5 @@
 {{#if ENV.PERMISSIONS.manage_course}}
   <form data-view="createGroup" class="form-dialog"></form>
   <form data-view="assignmentSettings" class="form-dialog"></form>
+  <form data-view="assignmentSyncSettings" class="form-dialog"></form>
 {{/if}}

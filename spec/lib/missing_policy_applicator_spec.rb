@@ -104,8 +104,8 @@ describe MissingPolicyApplicator do
     end
 
     it 'does not apply deductions to assignments that went missing over 24 hours ago' do
-      late_policy_missing_enabled
       assignment_old
+      late_policy_missing_enabled
       applicator.apply_missing_deductions
 
       submission = @course.submissions.first
@@ -148,8 +148,8 @@ describe MissingPolicyApplicator do
     end
 
     it 'recomputes student scores for affected students' do
-      late_policy_missing_enabled
       create_recent_assignment
+      late_policy_missing_enabled
 
       enrollment = student.enrollments.find_by(course_id: @course.id)
       enrollment.scores.first_or_create.update(grading_period_id: nil, final_score: 100, current_score: 100)

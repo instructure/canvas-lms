@@ -133,6 +133,7 @@ module Importers
       Importers::ExternalFeedImporter.process_migration(data, migration); migration.update_import_progress(56)
       Importers::GradingStandardImporter.process_migration(data, migration); migration.update_import_progress(58)
       Importers::ContextExternalToolImporter.process_migration(data, migration); migration.update_import_progress(60)
+      Importers::ToolProfileImporter.process_migration(data, migration); migration.update_import_progress(61)
       Importers::QuizImporter.process_migration(data, migration, question_data); migration.update_import_progress(65)
       Importers::DiscussionTopicImporter.process_migration(data, migration); migration.update_import_progress(70)
       Importers::WikiPageImporter.process_migration(data, migration); migration.update_import_progress(75)
@@ -200,6 +201,7 @@ module Importers
             event.saved_by = :after_migration
             event.delayed_post_at = shift_date(event.delayed_post_at, shift_options)
             event.lock_at = shift_date(event.lock_at, shift_options)
+            event.todo_date = shift_date(event.todo_date, shift_options)
             event.save_without_broadcasting
           end
 
@@ -234,6 +236,12 @@ module Importers
           migration.imported_migration_items_by_class(ContextModule).each do |event|
             event.unlock_at = shift_date(event.unlock_at, shift_options)
             event.save
+          end
+
+          migration.imported_migration_items_by_class(WikiPage).each do |event|
+            event.reload
+            event.todo_date = shift_date(event.todo_date, shift_options)
+            event.save_without_broadcasting
           end
 
           course.set_course_dates_if_blank(shift_options)

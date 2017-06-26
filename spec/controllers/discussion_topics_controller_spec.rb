@@ -729,7 +729,7 @@ describe DiscussionTopicsController do
     it 'should update a topic with a todo date' do
       user_session(@teacher)
       todo_date = 1.day.from_now.in_time_zone('America/New_York')
-      put 'update', course_id: @course.id, topic_id: @topic.id, todo_date: todo_date, format: 'json'
+      put 'update', course_id: @course.id, topic_id: @topic.id, todo_date: todo_date.iso8601(6), format: 'json'
       expect(@topic.reload.todo_date).to eq todo_date
     end
 
@@ -766,7 +766,7 @@ describe DiscussionTopicsController do
       todo_date = 1.day.from_now
       assign = @course.assignments.create!(title: 'Graded Topic 1', submission_types: 'discussion_topic')
       topic = assign.discussion_topic
-      put 'update', course_id: @course.id, topic_id: topic.id, todo_date: todo_date, format: 'json',
+      put 'update', course_id: @course.id, topic_id: topic.id, todo_date: todo_date.iso8601(6), format: 'json',
         assignment: {set_assignment: false, name: 'Graded Topic 1'}
       expect(response.code).to eq '200'
       expect(topic.reload.assignment).to be nil

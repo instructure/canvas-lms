@@ -17,7 +17,7 @@
  */
 
 import serviceRCELoader from 'jsx/shared/rce/serviceRCELoader'
-import { send, destroy, focus } from 'jsx/shared/rce/RceCommandShim'
+import { RCELOADED_EVENT_NAME, send, destroy, focus } from 'jsx/shared/rce/RceCommandShim'
 import Sidebar from 'jsx/shared/rce/Sidebar'
 import featureFlag from 'jsx/shared/rce/featureFlag'
 import $ from 'jquery'
@@ -26,6 +26,7 @@ function loadServiceRCE (target, tinyMCEInitOptions, callback) {
   serviceRCELoader.loadOnTarget(target, tinyMCEInitOptions, (textarea, remoteEditor) => {
     const $textarea = freshNode($(textarea))
     $textarea.data('remoteEditor', remoteEditor)
+    target.trigger(RCELOADED_EVENT_NAME, remoteEditor)
     if (callback) {
       callback()
     }

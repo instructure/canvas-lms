@@ -19,8 +19,7 @@
 ////
 // if you want underscore in your code. require 'underscore' (this file)
 
-define(['vendor/lodash.underscore'], function(){
-  // grab the global '_' variable, make it not global and return it
-  /*global _*/
-  return _.noConflict();
-});
+import _ from 'vendor/lodash.underscore'
+
+// grab the global '_' variable, make it not global and return it
+export default _.noConflict();

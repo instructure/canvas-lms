@@ -317,93 +317,102 @@ class GradebooksController < ApplicationController
                    Setting.get('gradebook2.many_submissions_chunk_size', '10').to_i
                  end
     js_env STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards)
-    js_env GRADEBOOK_OPTIONS: {
-      gradezilla: @context.feature_enabled?(:new_gradebook),
-      chunk_size: chunk_size,
-      assignment_groups_url: api_v1_course_assignment_groups_url(
-        @context,
-        include: ag_includes,
-        override_assignment_dates: "false",
-        exclude_assignment_submission_types: ['wiki_page']
-      ),
-      context_modules_url: api_v1_course_context_modules_url(@context),
-      sections_url: api_v1_course_sections_url(@context),
-      course_url: api_v1_course_url(@context),
-      effective_due_dates_url: api_v1_course_effective_due_dates_url(@context),
-      enrollments_url: custom_course_enrollments_api_url(per_page: per_page),
-      enrollments_with_concluded_url:
-        custom_course_enrollments_api_url(include_concluded: true, per_page: per_page),
-      enrollments_with_inactive_url:
-        custom_course_enrollments_api_url(include_inactive: true, per_page: per_page),
-      enrollments_with_concluded_and_inactive_url:
-        custom_course_enrollments_api_url(include_concluded: true, include_inactive: true, per_page: per_page),
-      students_url: custom_course_users_api_url(per_page: per_page),
-      students_with_concluded_enrollments_url:
-        custom_course_users_api_url(include_concluded: true, per_page: per_page),
-      students_with_inactive_enrollments_url:
-        custom_course_users_api_url(include_inactive: true, per_page: per_page),
-      students_with_concluded_and_inactive_enrollments_url:
-        custom_course_users_api_url(include_concluded: true, include_inactive: true, per_page: per_page),
-      submissions_url: api_v1_course_student_submissions_url(@context, grouped: '1'),
-      outcome_links_url: api_v1_course_outcome_group_links_url(@context, outcome_style: :full),
-      outcome_rollups_url: api_v1_course_outcome_rollups_url(@context, per_page: 100),
-      change_grade_url:
-        api_v1_course_assignment_submission_url(@context, ":assignment", ":submission", include: [:visibility]),
-      context_url: named_context_url(@context, :context_url),
-      download_assignment_submissions_url:
-        named_context_url(@context, :context_assignment_submissions_url, "{{ assignment_id }}", zip: 1),
-      re_upload_submissions_url:
-        named_context_url(@context, :submissions_upload_context_gradebook_url, "{{ assignment_id }}"),
-      context_id: @context.id.to_s,
-      context_code: @context.asset_string,
-      context_sis_id: @context.sis_source_id,
-      group_weighting_scheme: @context.group_weighting_scheme,
-      grading_standard: (
-        @context.grading_standard_enabled? &&
-        (@context.grading_standard.try(:data) || GradingStandard.default_grading_standard)
-      ),
-      course_is_concluded: @context.completed?,
-      course_name: @context.name,
-      gradebook_is_editable: @gradebook_is_editable,
-      context_allows_gradebook_uploads: @context.allows_gradebook_uploads?,
-      gradebook_import_url: new_course_gradebook_upload_path(@context),
-      setting_update_url: api_v1_course_settings_url(@context),
-      show_total_grade_as_points: @context.settings[:show_total_grade_as_points],
-      publish_to_sis_enabled: @context.allows_grade_publishing_by(@current_user) && @gradebook_is_editable,
-      publish_to_sis_url: context_url(@context, :context_details_url, anchor: 'tab-grade-publishing'),
-      speed_grader_enabled: @context.allows_speed_grader?,
-      active_grading_periods: active_grading_periods_json,
-      grading_period_set: grading_period_group_json,
-      current_grading_period_id: @current_grading_period_id,
-      outcome_gradebook_enabled: @context.feature_enabled?(:outcome_gradebook),
-      custom_columns_url: api_v1_course_custom_gradebook_columns_url(@context),
-      custom_column_url: api_v1_course_custom_gradebook_column_url(@context, ":id"),
-      custom_column_data_url: api_v1_course_custom_gradebook_column_data_url(@context, ":id", per_page: per_page),
-      custom_column_datum_url: api_v1_course_custom_gradebook_column_datum_url(@context, ":id", ":user_id"),
-      reorder_custom_columns_url: api_v1_custom_gradebook_columns_reorder_url(@context),
-      teacher_notes: teacher_notes && custom_gradebook_column_json(teacher_notes, @current_user, session),
-      change_gradebook_version_url: context_url(@context, :change_gradebook_version_context_gradebook_url, version: 2),
-      export_gradebook_csv_url: course_gradebook_csv_url,
-      gradebook_csv_progress: @last_exported_gradebook_csv.try(:progress),
-      attachment_url: @last_exported_gradebook_csv.try(:attachment).try(:download_url),
-      attachment: @last_exported_gradebook_csv.try(:attachment),
-      sis_app_url: Setting.get('sis_app_url', nil),
-      sis_app_token: Setting.get('sis_app_token', nil),
-      list_students_by_sortable_name_enabled: @context.list_students_by_sortable_name?,
-      gradebook_column_size_settings: @current_user.preferences[:gradebook_column_size],
-      gradebook_column_size_settings_url: change_gradebook_column_size_course_gradebook_url,
-      gradebook_column_order_settings: @current_user.preferences[:gradebook_column_order].try(:[], @context.id),
-      gradebook_column_order_settings_url: save_gradebook_column_order_course_gradebook_url,
-      post_grades_ltis: post_grades_ltis,
-      post_grades_feature: post_grades_feature?,
-      sections: sections_json(@context.active_course_sections, @current_user, session),
-      settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
-      settings: gradebook_settings.fetch(@context.id, {}),
-      login_handle_name: @context.root_account.settings[:login_handle_name],
-      sis_name: @context.root_account.settings[:sis_name],
-      version: params.fetch(:version, nil),
-      colors: gradebook_settings.fetch(:colors, {})
+    env = {
+      GRADEBOOK_OPTIONS: {
+        api_max_per_page: per_page,
+        chunk_size: chunk_size,
+        assignment_groups_url: api_v1_course_assignment_groups_url(
+          @context,
+          include: ag_includes,
+          override_assignment_dates: "false",
+          exclude_assignment_submission_types: ['wiki_page']
+        ),
+        context_modules_url: api_v1_course_context_modules_url(@context),
+        sections_url: api_v1_course_sections_url(@context),
+        course_url: api_v1_course_url(@context),
+        effective_due_dates_url: api_v1_course_effective_due_dates_url(@context),
+        enrollments_url: custom_course_enrollments_api_url(per_page: per_page),
+        enrollments_with_concluded_url:
+          custom_course_enrollments_api_url(include_concluded: true, per_page: per_page),
+        enrollments_with_inactive_url:
+          custom_course_enrollments_api_url(include_inactive: true, per_page: per_page),
+        enrollments_with_concluded_and_inactive_url:
+          custom_course_enrollments_api_url(include_concluded: true, include_inactive: true, per_page: per_page),
+        students_url: custom_course_users_api_url(per_page: per_page),
+        students_stateless_url: custom_course_users_api_url(exclude_states: true, per_page: per_page),
+        students_with_concluded_enrollments_url:
+          custom_course_users_api_url(include_concluded: true, per_page: per_page),
+        students_with_inactive_enrollments_url:
+          custom_course_users_api_url(include_inactive: true, per_page: per_page),
+        students_with_concluded_and_inactive_enrollments_url:
+          custom_course_users_api_url(include_concluded: true, include_inactive: true, per_page: per_page),
+        submissions_url: api_v1_course_student_submissions_url(@context, grouped: '1'),
+        outcome_links_url: api_v1_course_outcome_group_links_url(@context, outcome_style: :full),
+        outcome_rollups_url: api_v1_course_outcome_rollups_url(@context, per_page: 100),
+        change_grade_url:
+          api_v1_course_assignment_submission_url(@context, ":assignment", ":submission", include: [:visibility]),
+        context_url: named_context_url(@context, :context_url),
+        download_assignment_submissions_url:
+          named_context_url(@context, :context_assignment_submissions_url, "{{ assignment_id }}", zip: 1),
+        re_upload_submissions_url:
+          named_context_url(@context, :submissions_upload_context_gradebook_url, "{{ assignment_id }}"),
+        context_id: @context.id.to_s,
+        context_code: @context.asset_string,
+        context_sis_id: @context.sis_source_id,
+        group_weighting_scheme: @context.group_weighting_scheme,
+        grading_standard: (
+          @context.grading_standard_enabled? &&
+          (@context.grading_standard.try(:data) || GradingStandard.default_grading_standard)
+        ),
+        course_is_concluded: @context.completed?,
+        course_name: @context.name,
+        gradebook_is_editable: @gradebook_is_editable,
+        context_allows_gradebook_uploads: @context.allows_gradebook_uploads?,
+        gradebook_import_url: new_course_gradebook_upload_path(@context),
+        setting_update_url: api_v1_course_settings_url(@context),
+        show_total_grade_as_points: @context.settings[:show_total_grade_as_points],
+        publish_to_sis_enabled: @context.allows_grade_publishing_by(@current_user) && @gradebook_is_editable,
+        publish_to_sis_url: context_url(@context, :context_details_url, anchor: 'tab-grade-publishing'),
+        speed_grader_enabled: @context.allows_speed_grader?,
+        active_grading_periods: active_grading_periods_json,
+        grading_period_set: grading_period_group_json,
+        current_grading_period_id: @current_grading_period_id,
+        outcome_gradebook_enabled: @context.feature_enabled?(:outcome_gradebook),
+        custom_columns_url: api_v1_course_custom_gradebook_columns_url(@context),
+        custom_column_url: api_v1_course_custom_gradebook_column_url(@context, ":id"),
+        custom_column_data_url: api_v1_course_custom_gradebook_column_data_url(@context, ":id", per_page: per_page),
+        custom_column_datum_url: api_v1_course_custom_gradebook_column_datum_url(@context, ":id", ":user_id"),
+        reorder_custom_columns_url: api_v1_custom_gradebook_columns_reorder_url(@context),
+        teacher_notes: teacher_notes && custom_gradebook_column_json(teacher_notes, @current_user, session),
+        change_gradebook_version_url: context_url(
+          @context,
+          :change_gradebook_version_context_gradebook_url,
+          version: 2
+        ),
+        export_gradebook_csv_url: course_gradebook_csv_url,
+        gradebook_csv_progress: @last_exported_gradebook_csv.try(:progress),
+        attachment_url: @last_exported_gradebook_csv.try(:attachment).try(:download_url),
+        attachment: @last_exported_gradebook_csv.try(:attachment),
+        sis_app_url: Setting.get('sis_app_url', nil),
+        sis_app_token: Setting.get('sis_app_token', nil),
+        list_students_by_sortable_name_enabled: @context.list_students_by_sortable_name?,
+        gradebook_column_size_settings: @current_user.preferences[:gradebook_column_size],
+        gradebook_column_size_settings_url: change_gradebook_column_size_course_gradebook_url,
+        gradebook_column_order_settings: @current_user.preferences[:gradebook_column_order].try(:[], @context.id),
+        gradebook_column_order_settings_url: save_gradebook_column_order_course_gradebook_url,
+        post_grades_ltis: post_grades_ltis,
+        post_grades_feature: post_grades_feature?,
+        sections: sections_json(@context.active_course_sections, @current_user, session),
+        settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
+        settings: gradebook_settings.fetch(@context.id, {}),
+        login_handle_name: @context.root_account.settings[:login_handle_name],
+        sis_name: @context.root_account.settings[:sis_name],
+        version: params.fetch(:version, nil)
+      }
     }
+
+    env = new_gradebook_env(env) if @context.feature_enabled?(:new_gradebook)
+    js_env(env)
   end
 
   def post_grades_feature?
@@ -422,7 +431,7 @@ class GradebooksController < ApplicationController
       # in large courses in a performant manner. Until that happens, we're
       # disabling it over a certain threshold.
       #
-      submissions_count = @context.submissions.count
+      submissions_count = @context.submissions.not_placeholder.count
       submissions_limit = Setting.get('gradebook_history_submission_count_threshold', '0').to_i
       if submissions_limit == 0 || submissions_count <= submissions_limit
         # TODO this whole thing could go a LOT faster if you just got ALL the versions of ALL the submissions in this course then did a ruby sort_by day then grader
@@ -678,13 +687,48 @@ class GradebooksController < ApplicationController
     end
   end
 
+  def user_ids
+    return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
+
+    gradebook_user_ids = GradebookUserIds.new(@context, @current_user)
+    render json: { user_ids: gradebook_user_ids.user_ids }
+  end
+
   def change_gradebook_version
     @current_user.preferences[:gradebook_version] = params[:version]
     @current_user.save!
     redirect_to polymorphic_url([@context, 'gradebook'])
   end
 
+  def visible_modules?
+    @visible_modules ||= @context.modules_visible_to(@current_user).any?
+  end
+  helper_method :visible_modules?
+
+  def multiple_sections?
+    @multiple_sections ||= @context.multiple_sections?
+  end
+  helper_method :multiple_sections?
+
+  def multiple_assignment_groups?
+    @multiple_assignment_groups ||= @context.assignment_groups.many?
+  end
+  helper_method :multiple_assignment_groups?
+
   private
+
+  def new_gradebook_env(env)
+    graded_late_or_missing_submissions_exist =
+      @context.submissions.graded.late.union(@context.submissions.graded.missing).exists?
+
+    options = {
+      colors: gradebook_settings.fetch(:colors, {}),
+      graded_late_or_missing_submissions_exist: graded_late_or_missing_submissions_exist,
+      gradezilla: true,
+      new_gradebook_development_enabled: @context.root_account.feature_enabled?(:new_gradebook_development)
+    }
+    env.deep_merge({ GRADEBOOK_OPTIONS: options })
+  end
 
   def set_gradebook_warnings(groups, assignments)
     @assignments_in_bad_groups = Set.new
@@ -872,10 +916,12 @@ class GradebooksController < ApplicationController
     options
   end
 
-  def custom_course_users_api_url(include_concluded: false, include_inactive: false, per_page:)
+  def custom_course_users_api_url(include_concluded: false, include_inactive: false, exclude_states: false, per_page:)
     state = %w[active invited]
     state << 'completed' if include_concluded
     state << 'inactive'  if include_inactive
+    state = [] if exclude_states
+
     api_v1_course_users_url(
       @context,
       include: %i[avatar_url group_ids enrollments],

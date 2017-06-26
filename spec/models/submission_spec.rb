@@ -529,7 +529,7 @@ describe Submission do
     before(:once) do
       @date = Time.zone.local(2017, 1, 15, 12)
       @assignment.update!(due_at: 3.hours.ago(@date), points_possible: 1000, submission_types: "online_text_entry")
-      @late_policy = late_policy_model(deduct: 10.0, every: :hour)
+      @late_policy = late_policy_model(deduct: 10.0, every: :hour, missing: 80.0)
     end
 
     let(:submission) { @assignment.submissions.find_by(user_id: @student) }
@@ -554,6 +554,16 @@ describe Submission do
       end
     end
 
+    it "does not round decimal places in the score" do
+      Timecop.freeze(2.days.ago(@date)) do
+        @assignment.submit_homework(@student, body: "a body")
+        original_score = 1.3800000000000001
+        submission.score = original_score
+        submission.apply_late_policy(@late_policy, 1000)
+        expect(submission.score).to eq original_score
+      end
+    end
+
     it "deducts only once even if called twice" do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
@@ -564,6 +574,31 @@ describe Submission do
         submission.apply_late_policy(@late_policy, 1000)
         expect(submission.score).to eq 500
         expect(submission.points_deducted).to eq 300
+      end
+    end
+
+    it "applies missing policy if submission is missing" do
+      Timecop.freeze(1.day.from_now(@date)) do
+        submission.score = nil
+        submission.apply_late_policy(@late_policy, 1000)
+        expect(submission.score).to eq 200
+      end
+    end
+
+    context "assignment on paper" do
+      before(:once) do
+        @date = Time.zone.local(2017, 1, 15, 12)
+        @assignment.update!(due_at: 3.hours.ago(@date), points_possible: 1000, submission_types: "on_paper")
+        @late_policy = late_policy_model(deduct: 10.0, every: :hour, missing: 80.0)
+      end
+
+      it "does not deduct from assignment on paper" do
+        Timecop.freeze(@date) do
+          @assignment.submit_homework(@student, body: "a body")
+          @assignment.grade_student(@student, grade: 700, grader: @teacher)
+          expect(submission.score).to eq 700
+          expect(submission.points_deducted).to eq 0
+        end
       end
     end
   end
@@ -1420,6 +1455,11 @@ describe Submission do
                                                   })
       end
 
+      it 'does not cause error if originality score is nil' do
+        originality_report.update_attributes(originality_score: nil)
+        expect{submission.originality_data}.not_to raise_error
+      end
+
       it "rounds the score to 2 decimal places" do
         originality_report.originality_score = 2.94997
         originality_report.save!
@@ -1879,20 +1919,34 @@ describe Submission do
   end
 
   describe "read/unread state" do
+
+    def check_read_state_scopes(read: false, user: @user)
+      if read
+        expect(Submission.read_for(user)).to be_include @submission
+        expect(Submission.unread_for(user)).not_to be_include @submission
+      else
+        expect(Submission.read_for(user)).not_to be_include @submission
+        expect(Submission.unread_for(user)).to be_include @submission
+      end
+    end
+
     it "should be read if a submission exists with no grade" do
       @submission = @assignment.submit_homework(@user)
       expect(@submission.read?(@user)).to be_truthy
+      check_read_state_scopes read: true
     end
 
     it "should be unread after assignment is graded" do
       @submission = @assignment.grade_student(@user, grade: 3, grader: @teacher).first
       expect(@submission.unread?(@user)).to be_truthy
+      check_read_state_scopes
     end
 
     it "should be unread after submission is graded" do
       @assignment.submit_homework(@user)
       @submission = @assignment.grade_student(@user, grade: 3, grader: @teacher).first
       expect(@submission.unread?(@user)).to be_truthy
+      check_read_state_scopes
     end
 
     it "should be unread after submission is commented on by teacher" do
@@ -1900,6 +1954,7 @@ describe Submission do
       course_with_teacher(:course => @context, :active_all => true)
       @submission = @assignment.update_submission(@student, { :commenter => @teacher, :comment => "good!" }).first
       expect(@submission.unread?(@user)).to be_truthy
+      check_read_state_scopes user: @student
     end
 
     it "should be read if other submission fields change" do
@@ -1908,6 +1963,7 @@ describe Submission do
       @submission.graded_at = Time.now
       @submission.save!
       expect(@submission.read?(@user)).to be_truthy
+      check_read_state_scopes read: true
     end
   end
 
@@ -3154,6 +3210,11 @@ describe Submission do
     it "does not include submission by non-student user" do
       @student.enrollments.take!.complete
       @course.enroll_user(@student, 'TaEnrollment').accept
+      expect(Submission.needs_grading.count).to eq(0)
+    end
+
+    it "does not include excused submissions" do
+      @assignment.grade_student(@student, excused: true, grader: @teacher)
       expect(Submission.needs_grading.count).to eq(0)
     end
   end

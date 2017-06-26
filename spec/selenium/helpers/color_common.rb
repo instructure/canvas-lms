@@ -24,6 +24,13 @@ module ColorCommon
     "(#{rgb_array[0]}, #{rgb_array[1]}, #{rgb_array[2]})"
   end
 
+  def rgba_to_hex(rgba)
+    r_g_b_a = rgba.sub('rgba(', '').sub(')', '').split(',').map(&:strip)
+
+    r_g_b = r_g_b_a[0..2]
+    r_g_b.map { |num| format("%02X", num.to_i) }.join('')
+  end
+
   def random_hex_color
     values = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f']
     color = "#" + values.sample + values.sample + values.sample + values.sample + values.sample + values.sample

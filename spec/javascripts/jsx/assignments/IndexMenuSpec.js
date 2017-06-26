@@ -24,7 +24,9 @@ define([
   'jsx/assignments/IndexMenu',
   'jsx/assignments/actions/IndexMenuActions',
   './createFakeStore',
-], (React, ReactDOM, TestUtils, Modal, IndexMenu, Actions, createFakeStore) => {
+  'jquery'
+], (React, ReactDOM, TestUtils, Modal, IndexMenu, Actions,
+    createFakeStore, $) => {
   QUnit.module('AssignmentsIndexMenu')
 
   const generateProps = (overrides, initialState = {}) => {
@@ -38,8 +40,13 @@ define([
       contextType: 'course',
       contextId: 1,
       setTrigger: () => {},
+      setDisableTrigger: () => {},
       registerWeightToggle: () => {},
-      ...overrides,
+      disableSyncToSis: () => {},
+      sisName: 'PowerSchool',
+      postToSisDefault: ENV.POST_TO_SIS_DEFAULT,
+      hasAssignments: ENV.HAS_ASSIGNMENTS,
+      ...overrides
     };
   };
 
@@ -145,6 +152,37 @@ define([
     equal(store.dispatchedActions.length, actionsCount + 2);
     equal(store.dispatchedActions[actionsCount + 1].type, Actions.SET_WEIGHTED);
     equal(store.dispatchedActions[actionsCount + 1].payload, false);
+    component.closeModal();
+    ReactDOM.unmountComponentAtNode(component.node.parentElement);
+  });
+
+  testCase('renders a dropdown menu with one option when sync to sis conditions are not met', () => {
+    const component = renderComponent(generateProps({}));
+    const options = TestUtils.scryRenderedDOMComponentsWithTag(component, 'li');
+
+    equal(options.length, 1);
+    component.closeModal();
+    ReactDOM.unmountComponentAtNode(component.node.parentElement);
+  });
+
+  testCase('renders a dropdown menu with two options when sync to sis conditions are met', () => {
+    ENV.POST_TO_SIS_DEFAULT = true
+    ENV.HAS_ASSIGNMENTS = true
+    const component = renderComponent(generateProps({}));
+    const options = TestUtils.scryRenderedDOMComponentsWithTag(component, 'li');
+
+    equal(options.length, 2);
+    component.closeModal();
+    ReactDOM.unmountComponentAtNode(component.node.parentElement);
+  });
+
+  testCase('renders a dropdown menu with one option when sync to sis conditions are not met', () => {
+    ENV.POST_TO_SIS_DEFAULT = true
+    ENV.HAS_ASSIGNMENTS = false
+    const component = renderComponent(generateProps({}));
+    const options = TestUtils.scryRenderedDOMComponentsWithTag(component, 'li');
+
+    equal(options.length, 1);
     component.closeModal();
     ReactDOM.unmountComponentAtNode(component.node.parentElement);
   });

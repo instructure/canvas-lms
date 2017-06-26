@@ -209,7 +209,7 @@ class Enrollment < ActiveRecord::Base
     }
 
     p.dispatch :enrollment_accepted
-    p.to {self.course.participating_admins - [self.user] }
+    p.to {self.course.participating_admins.restrict_to_sections([self.course_section_id]) - [self.user] }
     p.whenever { |record|
       record.course &&
       !record.observer? &&

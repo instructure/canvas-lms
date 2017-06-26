@@ -97,6 +97,10 @@ define [
     present: ->
       Object.assign {}, @attributes, contextName: @contextName, contextId: @contextId, new_record: !@get('url')
 
+    duplicate: (courseId, callback) ->
+      $.ajaxJSON "/api/v1/courses/#{courseId}/pages/#{@id}/duplicate", 'POST',
+        {}, callback
+
     # Uses the api to perform a publish on the page
     publish: ->
       attrs =

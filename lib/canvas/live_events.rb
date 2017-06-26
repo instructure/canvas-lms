@@ -295,10 +295,15 @@ module Canvas::LiveEvents
     })
   end
 
-  def self.logged_in(session)
+  def self.logged_in(session, user, pseudonym)
+    ctx = LiveEvents.get_context || {}
+    ctx[:user_id] = user.global_id
+    ctx[:user_login] = pseudonym.unique_id
+    ctx[:user_account_id] = pseudonym.account.global_id
+    ctx[:user_sis_id] = pseudonym.sis_user_id
     post_event_stringified('logged_in', {
       redirect_url: session[:return_to]
-    })
+    }, ctx)
   end
 
   def self.logged_out

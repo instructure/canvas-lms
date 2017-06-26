@@ -142,11 +142,13 @@ RSpec::Matchers.define :have_attribute do |*args|
   end
 
   failure_message do |element|
-    "expected #{element.inspect}'s #{attribute} attribute to have value of #{attribute_value}, actual #{attribute} attribute value: #{element.attribute("#{attribute.to_s}")}"
+    "expected #{element.inspect}'s #{attribute} attribute to have value of #{expected || 'not nil'}, "\
+      "actual #{attribute} attribute value: #{element.attribute(attribute.to_s)}"
   end
 
   failure_message_when_negated do |element|
-    "expected #{element.inspect}'s #{attribute} attribute to NOT have value of #{attribute_value}, actual #{attribute} attribute type: #{element.attribute("#{attribute.to_s}")}"
+    "expected #{element.inspect}'s #{attribute} attribute to NOT have value of #{expected || 'not nil'}, "\
+      "actual #{attribute} attribute type: #{element.attribute(attribute.to_s)}"
   end
 end
 

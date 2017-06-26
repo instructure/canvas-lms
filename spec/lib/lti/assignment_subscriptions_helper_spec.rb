@@ -58,7 +58,13 @@ describe Lti::AssignmentSubscriptionsHelper do
 
   describe '#create_subscription' do
     let(:subscription_helper) { Lti::AssignmentSubscriptionsHelper.new(tool_proxy, @assignment) }
-    let(:event_types) { %w(submission_created plagiarism_resubmit submission_updated).freeze }
+    let(:event_types) do
+       %w(submission_created
+          plagiarism_resubmit
+          submission_updated
+          assignment_created
+          assignment_updated).freeze
+    end
     before(:each) do
       @assignment.tool_settings_tool = message_handler
       @assignment.save!

@@ -24,6 +24,8 @@ import select from 'jsx/shared/select'
 
 import Alert from 'instructure-ui/lib/components/Alert'
 import Heading from 'instructure-ui/lib/components/Heading'
+import Table from 'instructure-ui/lib/components/Table'
+import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
 
 import UnsyncedChange from './UnsyncedChange'
 import { ConnectedMigrationOptions as MigrationOptions } from './MigrationOptions'
@@ -51,16 +53,29 @@ export default class UnsyncedChanges extends Component {
   }
 
   renderChanges () {
+    const heading = I18n.t('%{count} Unsynced Changes', {count: this.props.unsyncedChanges.length})
+
     return (
       <div className="bcs__history-item bcs__unsynced-changes">
-        <header className="bcs__history-item__title">
-          <Heading level="h3">
-            {I18n.t('%{count} Unsynced Changes', {count: this.props.unsyncedChanges.length})}
-          </Heading>
+        <header className="bcs__unsynced-item__title" aria-hidden="true" role="presentation">
+          <Heading level="h3">{heading}</Heading>
         </header>
-        {this.props.unsyncedChanges.map(change =>
-          (<UnsyncedChange key={`${change.asset_type}_${change.asset_id}`} change={change} />)
-        )}
+        <div className="bcs__unsynced-item__table">
+          <Table caption={<ScreenReaderContent>{heading}</ScreenReaderContent>}>
+            <thead className="screenreader-only">
+              <tr>
+                <th scope="col"><ScreenReaderContent>{I18n.t('Changed Item')}</ScreenReaderContent></th>
+                <th scope="col"><ScreenReaderContent>{I18n.t('Type of Change')}</ScreenReaderContent></th>
+                <th scope="col"><ScreenReaderContent>{I18n.t('Type of Item')}</ScreenReaderContent></th>
+              </tr>
+            </thead>
+            <tbody>
+              {this.props.unsyncedChanges.map(change =>
+                (<UnsyncedChange key={`${change.asset_type}_${change.asset_id}`} change={change} />)
+              )}
+            </tbody>
+          </Table>
+        </div>
         <MigrationOptions />
       </div>
     )

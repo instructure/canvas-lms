@@ -19,10 +19,22 @@
 import React from 'react';
 import { shallow, mount, ReactWrapper } from 'enzyme';
 import StatusesModal from 'jsx/gradezilla/default_gradebook/components/StatusesModal';
+import { statusColors } from 'jsx/gradezilla/default_gradebook/constants/colors';
+
+function defaultProps (props = {}) {
+  return {
+    colors: statusColors(),
+    afterUpdateStatusColors () {},
+    onClose () {},
+    ...props
+  };
+}
 
 QUnit.module('StatusesModal', {
   setup () {
-    this.wrapper = shallow(<StatusesModal onClose={() => {}} />);
+    this.wrapper = shallow(
+      <StatusesModal {...defaultProps()} />
+    );
   },
 
   teardown () {
@@ -58,61 +70,179 @@ test('modal has a "Done" button', function () {
   equal(this.wrapper.find('Button').children().text(), 'Done');
 });
 
-test('modal contains late status', function () {
-  ok(this.wrapper.find('li').children().contains('Late'));
-});
-
-test('modal contains missing status', function () {
-  ok(this.wrapper.find('li').children().contains('Missing'));
-});
-
-test('modal contains resubmitted status', function () {
-  ok(this.wrapper.find('li').children().contains('Resubmitted'));
-});
-
-test('modal contains dropped status', function () {
-  ok(this.wrapper.find('li').children().contains('Dropped'));
-});
-
-test('modal contains excused status', function () {
-  ok(this.wrapper.find('li').children().contains('Excused'));
-});
-
 test('modal opens', function () {
-  const wrapper = mount(<StatusesModal onClose={() => {}} />);
-  wrapper.get(0).open();
-  strictEqual(wrapper.find('Modal').prop('isOpen'), true);
-  wrapper.unmount();
+  this.wrapper.instance().open();
+  strictEqual(this.wrapper.find('Modal').prop('isOpen'), true);
 });
 
 test('modal closes', function () {
-  const wrapper = mount(<StatusesModal onClose={() => {}} />);
-  wrapper.get(0).open();
-  wrapper.get(0).close();
-  strictEqual(wrapper.find('Modal').prop('isOpen'), false);
-  wrapper.unmount();
-});
-
-test('clicking done closes modal', function () {
-  const wrapper = mount(<StatusesModal onClose={() => {}} />);
-  const component = wrapper.instance();
-  component.open();
-  const doneButton = new ReactWrapper(component.doneButton, component.doneButton);
-  doneButton.simulate('click');
-  strictEqual(wrapper.find('Modal').prop('isOpen'), false);
-});
-
-test('clicking the close button closes modal', function () {
-  const wrapper = mount(<StatusesModal onClose={() => {}} />);
-  const component = wrapper.instance();
-  component.open();
-  const closeButton = new ReactWrapper(component.closeButton, component.closeButton);
-  closeButton.simulate('click');
-  strictEqual(wrapper.find('Modal').prop('isOpen'), false);
+  const statusModal = this.wrapper.instance();
+  statusModal.open();
+  statusModal.close();
+  strictEqual(this.wrapper.find('Modal').prop('isOpen'), false);
 });
 
 test('on close prop is passed to Modal onExit', function () {
-  const onCloseStub = this.stub();
-  const wrapper = mount(<StatusesModal onClose={onCloseStub} />);
-  equal(wrapper.find('Modal').prop('onExited'), onCloseStub);
+  const onClose = this.stub();
+  const wrapper = shallow(<StatusesModal {...defaultProps({ onClose })} />);
+  equal(wrapper.find('Modal').prop('onExited'), onClose);
+});
+
+QUnit.module('StatusesModal#isPopoverShown', {
+  setup () {
+    this.wrapper = shallow(<StatusesModal {...defaultProps()} />);
+    this.instance = this.wrapper.instance();
+  },
+  teardown () {
+    this.wrapper.unmount();
+  }
+});
+
+test('it is true when statuses matches openPopover', function () {
+  const status = 'late';
+  this.instance.handleOnToggle(status)(true);
+  strictEqual(this.instance.isPopoverShown(status), true);
+});
+
+test('it is when statuses does not match openPopover', function () {
+  this.instance.handleOnToggle('late')(true);
+  strictEqual(this.instance.isPopoverShown('missing'), false);
+});
+
+QUnit.module('StatusesModal#updateStatusColors');
+
+test('it calls afterUpdateStatusColors', function () {
+  const afterUpdateStatusColors = this.stub();
+  const wrapper = shallow(<StatusesModal {...defaultProps({ afterUpdateStatusColors })} />);
+  const instance = wrapper.instance();
+  instance.updateStatusColors('late')('#000000');
+  strictEqual(afterUpdateStatusColors.callCount, 1);
+  wrapper.unmount();
+});
+
+test('it calls afterUpdateStatusColors with updated colors', function () {
+  const afterUpdateStatusColors = this.stub();
+  const color = '#000000';
+  const expectedColors = {
+    late: color,
+    missing: '#FFE8E5',
+    resubmitted: '#E5F7E5',
+    dropped: '#FEF0E5',
+    excused: '#FEF7E5'
+  };
+  const wrapper = shallow(<StatusesModal {...defaultProps({ afterUpdateStatusColors })} />);
+  const instance = wrapper.instance();
+  instance.updateStatusColors('late')(color);
+
+  deepEqual(afterUpdateStatusColors.firstCall.args[0], expectedColors);
+  wrapper.unmount();
+});
+
+test('it calls afterUpdateStatusColors with updated successFn', function () {
+  const successFn = this.stub();
+  function afterUpdateStatusColors (_color, fn) { fn(); }
+  const wrapper = shallow(<StatusesModal {...defaultProps({ afterUpdateStatusColors })} />);
+  const instance = wrapper.instance();
+  instance.updateStatusColors('late')('#000000', successFn);
+
+  strictEqual(successFn.calledOnce, true);
+  wrapper.unmount();
+});
+
+test('it calls afterUpdateStatusColors and sets openPopover to null', function () {
+  const successFn = this.stub();
+  function afterUpdateStatusColors (_color, fn) { fn(); }
+  const wrapper = shallow(<StatusesModal {...defaultProps({ afterUpdateStatusColors })} />);
+  const instance = wrapper.instance();
+  instance.updateStatusColors('late')('#000000', successFn);
+
+  strictEqual(instance.isPopoverShown(null), true);
+  wrapper.unmount();
+});
+
+test('it calls afterUpdateStatusColors with updated failureFn', function () {
+  const failureFn = this.stub();
+  function afterUpdateStatusColors (_color, _fn, fn) { fn(); }
+  const wrapper = shallow(<StatusesModal {...defaultProps({ afterUpdateStatusColors })} />);
+  const instance = wrapper.instance();
+  instance.updateStatusColors('late')('#000000', () => {}, failureFn);
+
+  strictEqual(failureFn.calledOnce, true);
+  wrapper.unmount();
+});
+
+QUnit.module('StatusesModal Behavior', {
+  setup () {
+    this.wrapper = shallow(<StatusesModal {...defaultProps()} />);
+    this.instance = this.wrapper.instance();
+  },
+  teardown () {
+    this.wrapper.unmount();
+  }
+});
+
+test('clicking Done closes the popover', function () {
+  const { wrapper, instance } = this;
+  instance.open();
+  wrapper.find('Button').simulate('click');
+  strictEqual(wrapper.find('Modal').prop('isOpen'), false);
+});
+
+test('renders five StatusColorListItems', function () {
+  const { wrapper, instance } = this;
+  instance.open();
+  strictEqual(wrapper.find('StatusColorListItem').length, 5);
+});
+
+QUnit.module('StatusesModal integration behavior with StatusColorListItem', {
+  setup () {
+    const afterUpdateStatusColors = (color, successFn) => successFn();
+    this.wrapper = mount(<StatusesModal {...defaultProps({ afterUpdateStatusColors })} />);
+    this.instance = this.wrapper.instance();
+  },
+  teardown () {
+    this.wrapper.unmount();
+  }
+});
+
+test('after clicking apply in the color picker, the color picker popover is closed', function () {
+  const { wrapper, instance } = this;
+  instance.open();
+  const modalContent = new ReactWrapper(wrapper.node.modalContentRef, wrapper.node);
+  modalContent.find('StatusColorListItem PopoverTrigger Button').at(0).simulate('click');
+  const colorPickerContent = new ReactWrapper(wrapper.node.colorPickerContents.late, wrapper.node);
+  const applyButton = colorPickerContent.find('button').findWhere(button => button.prop('children') === 'Apply');
+  applyButton.simulate('click');
+  strictEqual(modalContent.find('StatusColorListItem Popover').at(0).prop('show'), false);
+});
+
+test('after clicking cancel in the color picker, the color picker popover is closed', function () {
+  const { wrapper, instance } = this;
+  instance.open();
+  const modalContent = new ReactWrapper(wrapper.node.modalContentRef, wrapper.node);
+  modalContent.find('StatusColorListItem PopoverTrigger Button').at(0).simulate('click');
+  const colorPickerContent = new ReactWrapper(wrapper.node.colorPickerContents.late, wrapper.node);
+  const applyButton = colorPickerContent.find('button').findWhere(button => button.prop('children') === 'Cancel');
+  applyButton.simulate('click');
+  strictEqual(modalContent.find('StatusColorListItem Popover').at(0).prop('show'), false);
+});
+
+QUnit.module('StatusesModal integration behavior with StatusColorListItem');
+
+
+test('selecting a color and clicking Apply in the color picker passes the ' +
+  'color to afterUpdateStatusColors', function () {
+  const afterUpdateStatusColors = this.stub();
+  const wrapper = mount(<StatusesModal {...defaultProps({ afterUpdateStatusColors })} />);
+  const instance = wrapper.instance();
+  instance.open();
+  const modalContent = new ReactWrapper(wrapper.node.modalContentRef, wrapper.node);
+  modalContent.find('StatusColorListItem PopoverTrigger Button').at(0).simulate('click');
+  const colorPickerContent = new ReactWrapper(wrapper.node.colorPickerContents.late, wrapper.node);
+  const whiteSwatch = colorPickerContent.find('button').findWhere(button => button.prop('title') === 'white (#FFFFFF)');
+  whiteSwatch.simulate('click');
+  const applyButton = colorPickerContent.find('button').findWhere(button => button.prop('children') === 'Apply');
+  applyButton.simulate('click');
+  strictEqual(afterUpdateStatusColors.firstCall.args[0].late, '#FFFFFF');
+  wrapper.unmount();
 });

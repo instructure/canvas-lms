@@ -120,13 +120,12 @@ describe "calendar2" do
         expect(f('.title')).to have_value "Test Event"
         f('#duplicate_event').click
         replace_content(f("input[type=number][name='duplicate_count']"), 2)
-
         expect_new_page_load{f('button[type="submit"]').click}
         expect(CalendarEvent.count).to eq(3)
         repeat_event = CalendarEvent.where(title: "Test Event")
-        expect((repeat_event[0].start_at).to_date).to eq(Time.zone.now.to_date)
-        expect((repeat_event[1].start_at).to_date).to eq((Time.zone.now + 1.week).to_date)
-        expect((repeat_event[2].start_at).to_date).to eq((Time.zone.now + 2.weeks).to_date)
+        first_start_date = repeat_event[0].start_at.to_date
+        expect(repeat_event[1].start_at.to_date).to eq(first_start_date + 1.week)
+        expect(repeat_event[2].start_at.to_date).to eq(first_start_date + 2.weeks)
       end
 
       it "should create recurring section-specific events" do
@@ -165,12 +164,10 @@ describe "calendar2" do
 
         expect(CalendarEvent.count).to eq(6) # 2 parent events each with 2 child events
         s1_events = CalendarEvent.where(:context_code => section1.asset_string).where.not(:parent_calendar_event_id => nil).order(:start_at).to_a
-        expect(s1_events[0].start_at.to_date).to eq day1
-        expect(s1_events[1].start_at.to_date).to eq (day1 + 1.week)
+        expect(s1_events[1].start_at.to_date).to eq (s1_events[0].start_at.to_date + 1.week)
 
         s2_events = CalendarEvent.where(:context_code => section2.asset_string).where.not(:parent_calendar_event_id => nil).order(:start_at).to_a
-        expect(s2_events[0].start_at.to_date).to eq day2
-        expect(s2_events[1].start_at.to_date).to eq (day2 + 1.week)
+        expect(s2_events[1].start_at.to_date).to eq (s2_events[0].start_at.to_date + 1.week)
       end
 
       it "should query for all the sections in a course when creating an event" do

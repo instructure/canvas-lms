@@ -475,6 +475,15 @@ s2,test_1,section2,active},
     expect(batch.processing_errors.last).to eq ['', 'There were 3 more errors']
   end
 
+  it "should write warnings/errors to a file" do
+    batch = @account.sis_batches.create!
+    batch.processing_warnings = [ ['testfile.csv', 'test warning'] ] * 3
+    batch.processing_errors = [ ['testfile.csv', 'test error'] ] * 3
+    batch.save!
+    error_file = batch.errors_attachment
+    expect(CSV.parse(error_file.open).map.to_a.size).to eq 6
+  end
+
   context "csv diffing" do
     it "should skip diffing if previous diff not available" do
       SIS::CSV::DiffGenerator.any_instance.expects(:generate).never

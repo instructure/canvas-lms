@@ -22,7 +22,7 @@ import MigrationStates from 'jsx/blueprint_courses/migrationStates'
 import LoadStates from 'jsx/blueprint_courses/loadStates'
 import sampleData from './sampleData'
 
-QUnit.module('Blurpint Courses reducer')
+QUnit.module('Blueprint Courses reducer')
 
 const reduce = (action, state = {}) => reducer(state, action)
 
@@ -44,7 +44,7 @@ test('adds associations to existingAssociations on SAVE_ASSOCIATIONS_SUCCESS', (
 })
 
 test('removes associations froms existingAssociations on SAVE_ASSOCIATIONS_SUCCESS', () => {
-  const newState = reduce(actions.saveAssociationsSuccess({ removed: ['1'] }), { existingAssociations: sampleData.courses })
+  const newState = reduce(actions.saveAssociationsSuccess({ removed: [{id: '1'}] }), { existingAssociations: sampleData.courses })
   deepEqual(newState.existingAssociations, [sampleData.courses[1]])
 })
 
@@ -86,8 +86,8 @@ test('adds associations to removedAssociations on REMOVE_COURSE_ASSOCIATIONS', (
 })
 
 test('removes associations from removedAssociations on UNDO_REMOVE_COURSE_ASSOCIATIONS', () => {
-  const newState = reduce(actions.undoRemoveCourseAssociations(['1']), { removedAssociations: ['1', '2'] })
-  deepEqual(newState.removedAssociations, ['2'])
+  const newState = reduce(actions.undoRemoveCourseAssociations(['1']), { removedAssociations: [{id: '1'}, {id: '2'}] })
+  deepEqual(newState.removedAssociations, [{id: '2'}])
 })
 
 test('sets hasLoadedCourses to true on LOAD_COURSES_SUCCESS', () => {

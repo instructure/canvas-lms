@@ -45,7 +45,7 @@ module WikiAndTinyCommon
     expect(f("body")).not_to contain_jqcss("#{form}:visible")
   end
 
-  def wiki_page_tools_file_tree_setup
+  def wiki_page_tools_file_tree_setup(skip_tree=false, skip_image_list=false)
     @root_folder = Folder.root_folders(@course).first
     @sub_folder = @root_folder.sub_folders.create!(:name => 'subfolder', :context => @course)
     @sub_sub_folder = @sub_folder.sub_folders.create!(:name => 'subsubfolder', :context => @course)
@@ -60,8 +60,12 @@ module WikiAndTinyCommon
     @image2.save!
     get "/courses/#{@course.id}/pages/front-page/edit"
 
-    @tree1 = driver.find_element(:id, :tree1)
-    @image_list = f('#editor_tabs_4 .image_list')
+    if !skip_tree
+      @tree1 = driver.find_element(:id, :tree1)
+    end
+    if !skip_image_list
+      @image_list = f('#editor_tabs_4 .image_list')
+    end
   end
 
   def add_text_to_tiny(text)

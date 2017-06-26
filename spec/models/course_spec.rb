@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../lti2_course_spec_helper.rb')
 
 require 'csv'
 require 'socket'
@@ -24,6 +25,15 @@ require 'socket'
 describe Course do
   describe 'relationships' do
     it { is_expected.to have_one(:late_policy).dependent(:destroy).inverse_of(:course) }
+  end
+
+  describe 'lti2 proxies' do
+    include_context 'lti2_course_spec_helper'
+
+    it 'has many tool proxies' do
+      tool_proxy # need to do this so that the tool_proxy is instantiated
+      expect(course.tool_proxies.size).to eq 1
+    end
   end
 end
 
@@ -51,6 +61,24 @@ describe Course do
     @course.save!
     expect(DueDateCacher).not_to receive(:recompute_course)
     @course.save!
+  end
+
+  describe "#recompute_student_scores" do
+    it "should use all student ids except concluded and deleted if none are passed" do
+      @course.save!
+      course_with_student(course: @course).update!(workflow_state: :completed)
+      course_with_student(course: @course).update!(workflow_state: :inactive)
+      @user1 = @user
+      course_with_student(course: @course, active_all: true)
+      @user2 = @user
+      Enrollment.expects(:recompute_final_score).with(
+        [@user1.id, @user2.id],
+        @course.id,
+        grading_period_id: nil,
+        update_all_grading_period_scores: true
+      ).returns(nil)
+      @course.recompute_student_scores
+    end
   end
 
   it "should properly determine if group weights are active" do

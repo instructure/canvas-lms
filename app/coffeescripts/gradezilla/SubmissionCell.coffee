@@ -57,7 +57,7 @@ define [
         @val = htmlEscape(formattedGrade)
       @$input.val(@val)
       @$input[0].defaultValue = @val
-      @$input.select()
+      @$input.select() if @$input.get(0) == document.activeElement
 
     serializeValue: () ->
       @$input.val()
@@ -133,7 +133,6 @@ define [
       opts.editable = false if opts.student.isConcluded
       submission_type = opts.submission.submission_type if opts.submission?.submission_type || null
       styles = SubmissionCell.styles(opts.submission, opts.assignment)
-      tooltips = SubmissionCell.tooltips(opts.submission, opts.assignment)
 
       styles.push("grayed-out") if opts.student.isInactive || opts.student.isConcluded || opts.isLocked
       styles.push("cannot_edit") if opts.student.isConcluded || opts.isLocked
@@ -149,10 +148,7 @@ define [
         styles.push('turnitin')
         innerContents += "<span class='gradebook-cell-turnitin #{htmlEscape turnitin.state}-score' />"
 
-      tooltipText = $.map(tooltips, (t)-> GRADEBOOK_TRANSLATIONS["submission_tooltip_#{t}"]).join(', ')
-
       """
-      #{$.raw if tooltipText then '<div class="gradebook-tooltip">'+ htmlEscape(tooltipText) + '</div>' else ''}
       <div class="gradebook-cell #{htmlEscape if opts.editable then 'gradebook-cell-editable focus' else ''} #{htmlEscape opts.classes} #{htmlEscape styles.join(' ')}">
         #{$.raw innerContents}
       </div>
@@ -164,18 +160,6 @@ define [
         "aria-label='#{label}'"
       else
         ""
-
-    @tooltips: (submission = {}, assignment = {}) ->
-      classes = []
-      classes.push('dropped') if submission.drop
-      classes.push('excused') if submission.excused
-      classes.push('resubmitted') if submission.grade_matches_current_submission == false
-      classes.push('missing') if submission.missing
-      classes.push('late') if submission.late
-      classes.push('ungraded') if ''+assignment.submission_types is "not_graded"
-      classes.push('muted') if assignment.muted
-      classes.push(submission.submission_type) if submission.submission_type
-      classes
 
     @styles: (submission = {}, assignment = {}) ->
       classes = []

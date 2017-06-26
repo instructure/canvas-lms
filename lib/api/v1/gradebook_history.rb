@@ -67,6 +67,7 @@ module Api::V1
       unless opts[:submission]
         ActiveRecord::Associations::Preloader.new.preload(versions, :versionable)
         submissions = versions.map(&:versionable)
+        ActiveRecord::Associations::Preloader.new.preload(versions.map(&:model), :originality_reports)
         ActiveRecord::Associations::Preloader.new.preload(submissions, :assignment) unless opts[:assignment]
         ActiveRecord::Associations::Preloader.new.preload(submissions, :user) unless opts[:student]
         ActiveRecord::Associations::Preloader.new.preload(submissions, :grader)

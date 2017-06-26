@@ -18,27 +18,104 @@
 
 @import "pages/dashboard/dashboard_activity";
 
-.ic-Dashboard-content--align-right {
-  align-items: flex-end;
-  flex-direction: row;
-}
-.ic-Dashboard-header {
-  border-bottom: 1px solid $ic-border-light;
-  margin: 0 0 $ic-sp;
-  padding-bottom: $ic-sp;
-  > div {
-    padding-left: 0;
-    padding-right: 0;
+
+// Note: all the calculations in the following 20+ lines are done to give IE
+// a sticky header through fixed positioning. Once all browsers support position: sticky,
+// we can remove all this and use the CSS under @supports (position: sticky)
+
+$nav-collapsed-width: $ic-header-primary-width - 30;
+$nav-expanded-width: $ic-header-primary-width;
+$content-padding: $ic-sp * 4;
+$non-main-content-width-collapsed: $nav-collapsed-width + $content-padding;
+$non-main-content-width-expanded: $nav-expanded-width + $content-padding;
+
+// If the planner is showing, serve up a fixed-position header
+body.dashboard-is-planner {
+  .ic-dashboard-app {
+    padding-top: $ic-sp * 4;
   }
-  .ic-Dashboard-header_title {
+
+  .ic-Dashboard-header {
+    position: fixed;
+    top: 0;
+    z-index: 20;
+    left: $nav-collapsed-width + ($ic-sp * 2);
+    width: calc(100% - #{$non-main-content-width-collapsed});
     margin-top: 0;
-    margin-bottom: 0;
+  }
+
+  &.primary-nav-expanded {
+    .ic-Dashboard-header {
+      left: $nav-expanded-width + ($ic-sp * 2);
+      width: calc(100% - #{$non-main-content-width-expanded});
+    }
+  }
+
+  .ic-Dashboard-header__layout {
+    padding-top: $ic-sp;
   }
 }
 
-// fix awkward spacing when a notification appears above the dashboard
-.ic-notification {
-  + .ic-Dashboard-header { margin-top: $ic-sp*2; }
+@supports (position: sticky) or (position: -webkit-sticky) {
+  // If the browser supports sticky positioning:
+  // 1) Give ALL dashboard headers sticky positioning per product design
+  .ic-Dashboard-header,
+  body.dashboard-is-planner .ic-Dashboard-header {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+
+  // 2) Undo all the fixed positioning CSS rules we needed for IE
+  body.dashboard-is-planner {
+    .ic-dashboard-app {
+      padding-top: 0;
+    }
+
+    .ic-Dashboard-header {
+      left: auto;
+      width: auto;
+      margin-top: -($ic-sp / 2);
+    }
+
+    &.primary-nav-expanded {
+      .ic-Dashboard-header {
+        left: auto;
+        width: auto;
+      }
+    }
+
+    .ic-Dashboard-header__layout {
+      padding-top: 0;
+    }
+  }
+}
+
+.ic-Dashboard-header {
+  margin-top: -($ic-sp / 2);
+}
+
+.ic-Dashboard-header__layout {
+  display: flex;
+  align-items: center;
+  padding: 0 0 ($ic-sp * 0.75);
+  border-bottom: 1px solid $ic-border-light;
+  background: rgba($ic-color-light, 0.95);
 }
 
 .ic-Dashboard-Activity { padding: $ic-sp; }
+
+.ic-Dashboard-header__title {
+  margin-top: 0;
+  margin-bottom: 0;
+  flex: 1;
+  padding-right: $ic-sp;
+  box-sizing: border-box;
+}
+
+.ic-Dashboard-header__actions {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}

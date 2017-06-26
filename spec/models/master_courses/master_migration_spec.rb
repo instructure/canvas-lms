@@ -815,6 +815,21 @@ describe MasterCourses::MasterMigration do
       expect(@copy_to2.discussion_topics.first).to be_present
     end
 
+    it "sends notifications", priority: "2", test_id: 3211103 do
+      n0 = Notification.create(:name => "Blueprint Sync Complete")
+      n1 = Notification.create(:name => "Blueprint Content Added")
+      @admin = @user
+      course_with_teacher :active_all => true
+      sub = @template.add_child_course!(@course)
+      cc0 = @admin.communication_channels.create(:path => "test_#{@admin.id}@example.com", :path_type => "email")
+      cc0.confirm
+      cc1 = @user.communication_channels.create(:path => "test_#{@user.id}@example.com", :path_type => "email")
+      cc1.confirm
+      run_master_migration :comment => "ohai eh", :send_notification => true
+      expect(DelayedMessage.where(notification_id: n0, communication_channel_id: cc0).last.summary).to include "ohai eh"
+      expect(DelayedMessage.where(notification_id: n1, communication_channel_id: cc1).last.summary).to include "ohai eh"
+    end
+
     context "master courses + external migrations" do
       class TestExternalContentService
         cattr_reader :course, :imported_content

@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import StudentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/StudentRowHeaderConstants'
+import studentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/studentRowHeaderConstants'
 import StudentRowHeader from 'jsx/gradezilla/default_gradebook/components/StudentRowHeader'
 import 'compiled/handlebars_helpers'
 
@@ -37,8 +37,8 @@ function generateStudent (overrides) {
 }
 
 function generateOpts (
-  selectedPrimaryInfo = StudentRowHeaderConstants.defaultPrimaryInfo,
-  selectedSecondaryInfo = StudentRowHeaderConstants.defaultSecondaryInfo
+  selectedPrimaryInfo = studentRowHeaderConstants.defaultPrimaryInfo,
+  selectedSecondaryInfo = studentRowHeaderConstants.defaultSecondaryInfo
 ) {
   return {
     selectedPrimaryInfo,
@@ -145,7 +145,7 @@ test('renders without "inactive" or "concluded" when props on student are false'
 
 
 test('renders with student.sis_user_id when opts.selectedSecondaryInfo is "sis_id"', function () {
-  this.opts = generateOpts(StudentRowHeaderConstants.defaultPrimaryInfo, 'sis_id');
+  this.opts = generateOpts(studentRowHeaderConstants.defaultPrimaryInfo, 'sis_id');
 
   const expectedText = this.student.sis_user_id;
   const header = new StudentRowHeader(this.student, this.opts);
@@ -155,7 +155,7 @@ test('renders with student.sis_user_id when opts.selectedSecondaryInfo is "sis_i
 });
 
 test('renders with student.login_id when opts.selectedSecondaryInfo is "login_id"', function () {
-  this.opts = generateOpts(StudentRowHeaderConstants.defaultPrimaryInfo, 'login_id');
+  this.opts = generateOpts(studentRowHeaderConstants.defaultPrimaryInfo, 'login_id');
 
   const expectedText = this.student.login_id;
   const header = new StudentRowHeader(this.student, this.opts);
@@ -165,7 +165,7 @@ test('renders with student.login_id when opts.selectedSecondaryInfo is "login_id
 });
 
 test('renders with opts.sectionNames when opts.selectedSecondaryInfo is "section"', function () {
-  this.opts = generateOpts(StudentRowHeaderConstants.defaultPrimaryInfo, 'section');
+  this.opts = generateOpts(studentRowHeaderConstants.defaultPrimaryInfo, 'section');
 
   const expectedText = this.opts.sectionNames;
   const header = new StudentRowHeader(this.student, this.opts);

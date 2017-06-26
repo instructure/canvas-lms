@@ -919,8 +919,132 @@ describe AssignmentsApiController, type: :request do
     end
   end
 
-  describe "POST /courses/:course_id/assignments (#create)" do
+  describe "POST 'duplicate'" do
+    before :once do
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+    end
 
+    it "students cannot duplicate" do
+      assignment = @course.assignments.create(
+        :title => "some assignment",
+        :assignment_group => @group,
+        :due_at => Time.zone.now + 1.week
+      )
+      api_call_as_user(@student, :post,
+        "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json",
+        { :controller => "assignments_api",
+          :action => "duplicate",
+          :format => "json",
+          :course_id => @course.id.to_s,
+          :assignment_id => assignment.id.to_s },
+        {},
+        {},
+        { :expected_status => 401 })
+    end
+
+    it "should duplicate if teacher" do
+      assignment = @course.assignments.create(
+        :title => "some assignment",
+        :assignment_group => @group,
+        :due_at => Time.zone.now + 1.week
+      )
+      json = api_call_as_user(@teacher, :post,
+        "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json",
+        { :controller => "assignments_api",
+          :action => "duplicate",
+          :format => "json", :course_id => @course.id.to_s,
+          :assignment_id => assignment.id.to_s },
+        {},
+        {},
+        { :expected_status => 200 })
+      expect(json["name"]).to eq "some assignment Copy"
+    end
+
+    it "should require non-quiz" do
+      assignment = @course.assignments.create(:title => "some assignment")
+      assignment.quiz = @course.quizzes.create
+      api_call_as_user(@teacher, :post,
+        "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json",
+        { :controller => "assignments_api",
+          :action => "duplicate",
+          :format => "json",
+          :course_id => @course.id.to_s,
+          :assignment_id => assignment.id.to_s },
+          {},
+          {},
+          { :expected_status => 400 })
+    end
+
+    it "should require non-discussion topic" do
+      assignment = group_discussion_assignment.assignment
+      api_call_as_user(@teacher, :post,
+        "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json",
+        { :controller => "assignments_api",
+          :action => "duplicate",
+          :format => "json",
+          :course_id => @course.id.to_s,
+          :assignment_id => assignment.id.to_s },
+        {},
+        {},
+        { :expected_status => 400 })
+    end
+
+    it "should duplicate wiki page assignment" do
+      assignment = wiki_page_assignment_model({ :title => "Wiki Page Assignment" })
+      assignment.save!
+      json = api_call_as_user(@teacher, :post,
+        "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json",
+        { :controller => "assignments_api",
+          :action => "duplicate",
+          :format => "json",
+          :course_id => @course.id.to_s,
+          :assignment_id => assignment.id.to_s },
+        {},
+        {},
+        { :expected_status => 200 })
+      expect(json["name"]).to eq "Wiki Page Assignment Copy"
+    end
+
+    it "should require non-deleted assignment" do
+      assignment = @course.assignments.create(
+        :title => "some assignment",
+        :workflow_state => "deleted"
+      )
+      # assignment.save!
+      api_call_as_user(@teacher, :post,
+        "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json",
+        { :controller => "assignments_api",
+          :action => "duplicate",
+          :format => "json",
+          :course_id => @course.id.to_s,
+          :assignment_id => assignment.id.to_s },
+        {},
+        {},
+        { :expected_status => 400 })
+    end
+
+    it "should require existing assignment" do
+      assignment = @course.assignments.create(
+        :title => "some assignment",
+        :workflow_state => "deleted"
+      )
+      assignment.save!
+      assignment_id = Assignment.maximum(:id) + 100
+      api_call_as_user(@teacher, :post,
+        "/api/v1/courses/#{@course.id}/assignments/#{assignment_id}/duplicate.json",
+        { :controller => "assignments_api",
+          :action => "duplicate",
+          :format => "json",
+          :course_id => @course.id.to_s,
+          :assignment_id => assignment_id.to_s },
+        {},
+        {},
+        { :expected_status => 400 })
+    end
+  end
+
+  describe "POST /courses/:course_id/assignments (#create)" do
     def create_assignment_json(group, group_category)
       { 'name' => 'some assignment',
         'position' => '1',
@@ -971,6 +1095,16 @@ describe AssignmentsApiController, type: :request do
       group_category = @course.group_categories.create!(name: "foo")
       json = api_create_assignment_in_course(@course, create_assignment_json(group, group_category))
       expect(json['post_to_sis']).to eq false
+    end
+
+    it "accepts a value for post_to_sis" do
+      a = @course.account
+      a.settings[:sis_default_grade_export] = {locked: false, value: false}
+      a.save!
+      json = api_create_assignment_in_course(@course, {'post_to_sis' => true})
+
+      assignment = Assignment.find(json['id'])
+      expect(assignment.post_to_sis).to eq true
     end
 
     it "should not overwrite post_to_sis with default if missing in update params" do
@@ -1753,6 +1887,31 @@ describe AssignmentsApiController, type: :request do
           assignment = Assignment.find(json["id"])
           expect(assignment.assignment_overrides.first.due_at).to eql nil
         end
+      end
+    end
+
+    context "sis validations enabled" do
+      it 'saves with a section with a valid due_date' do
+        a = @course.account
+        a.enable_feature!(:new_sis_integrations)
+        a.settings[:sis_syncing] = {value: true}
+        a.settings[:sis_require_assignment_due_date] = {value: true}
+        a.save!
+
+        assignment_params = {
+          'post_to_sis' => true,
+          'assignment_overrides' => {
+            '0' => {
+                'course_section_id' => @course.default_section.id,
+                'due_at' => 7.days.from_now.iso8601
+            }
+          }
+        }
+
+        json = api_create_assignment_in_course(@course, assignment_params)
+
+        # expect(json["errors"]).to be_nil
+        expect(json["errors"]).to have_key('due_at')
       end
     end
   end

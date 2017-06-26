@@ -39,7 +39,64 @@ RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
       product_family: product_family,
       product_version: '1',
       workflow_state: 'active',
-      raw_data: {'enabled_capability' => ['Security.splitSecret']},
+      raw_data: {
+        'enabled_capability' => ['Security.splitSecret'],
+        'tool_profile' => {
+          'lti_version' => 'LTI-2p0',
+          'product_instance' => {
+            'guid' => 'be42ae52-23fe-48f5-a783-40ecc7ef6d5c',
+            'product_info' => {
+              'product_version' => '1.0',
+              'product_family' => {
+                'code' => 'abc',
+                'vendor' => {
+                  'code' => '123',
+                  'vendor_name' => {
+                    'default_value' => 'acme'
+                  },
+                  'description' => {
+                    'default_value' => 'example vendor'
+                  }
+                }
+              },
+              'description' => {
+                'default_value' => 'example product'
+              },
+              'product_name' => {
+                'default_value' => "learn abc's"
+              }
+            }
+          },
+          'base_url_choice' => [
+            {
+              'default_base_url' => 'https://www.samplelaunch.com',
+              'selector' => {
+                'applies_to' => [
+                  'MessageHandler'
+                ]
+              }
+            }
+          ],
+          'resource_handler' => [
+            {
+              'resource_type' => {
+                'code' => 'code'
+              },
+              'resource_name' => {
+                'default_value' => 'resource name',
+                'key' => ''
+              },
+              'message' => [
+                {
+                  'message_type' => 'message_type',
+                  'path' => 'https://www.samplelaunch.com/blti'
+                }
+              ]
+            },
+          ],
+          'service_offered' => []
+        }
+      },
       lti_version: '1'
     )
     Lti::ToolProxyBinding.where(context_id: account, context_type: account.class.to_s,
@@ -56,7 +113,7 @@ RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
   let(:message_handler) do
     Lti::MessageHandler.create!(
       message_type: 'message_type',
-      launch_path: 'https://samplelaunch/blti',
+      launch_path: 'https://www.samplelaunch.com/blti',
       resource_handler: resource_handler,
       tool_proxy: tool_proxy
     )

@@ -30,8 +30,9 @@ describe BookmarkedCollection::SimpleBookmarker do
     }
 
     @bookmarker = BookmarkedCollection::SimpleBookmarker.new(@example_class, :name, :id)
+    @date_bookmarker = BookmarkedCollection::SimpleBookmarker.new(@example_class, :date, :id)
     @bob = @example_class.create!(name: "bob")
-    @bob2 = @example_class.create!(name: "Bob")
+    @bob2 = @example_class.create!(name: "Bob", date: DateTime.now.to_s)
     @joe = @example_class.create!(name: "joe")
     @bobby = @example_class.create!(name: "bobby")
     @bill = @example_class.create!(name: "BILL!")
@@ -53,6 +54,12 @@ describe BookmarkedCollection::SimpleBookmarker do
       expect(@bookmarker.validate(["bob"])).to be_falsey
       expect(@bookmarker.validate(["bob", "1"])).to be_falsey
       expect(@bookmarker.validate(["bob", 1])).to be_truthy
+
+      # With dates
+      expect(@date_bookmarker.validate({date: DateTime.now.to_s, id: 1})).to be_falsey
+      expect(@date_bookmarker.validate(["bob"])).to be_falsey
+      expect(@date_bookmarker.validate([DateTime.now, 1])).to be_falsey
+      expect(@date_bookmarker.validate([DateTime.now.to_s, 1])).to be_truthy
     end
   end
 
@@ -64,6 +71,13 @@ describe BookmarkedCollection::SimpleBookmarker do
       )
     end
 
+    it "should order with nullable columns, having non-null values first" do
+      pager = double(current_bookmark: nil)
+      expect(@date_bookmarker.restrict_scope(@example_class, pager)).to eq(
+        [@bob2, @bob, @joe, @bobby, @bill]
+      )
+    end
+
     it "should start after the bookmark" do
       bookmark = @bookmarker.bookmark_for(@bob2)
       pager = double(current_bookmark: bookmark, include_bookmark: false)
@@ -72,7 +86,15 @@ describe BookmarkedCollection::SimpleBookmarker do
       )
     end
 
-    it "should include the bookmark iff include_bookmark" do
+    it "should start after the bookmark when nullable columns exist" do
+      bookmark = @date_bookmarker.bookmark_for(@joe)
+      pager = double(current_bookmark: bookmark, include_bookmark: false)
+      expect(@date_bookmarker.restrict_scope(@example_class, pager)).to eq(
+        [@bobby, @bill]
+      )
+    end
+
+    it "should include the bookmark if and only if include_bookmark" do
       bookmark = @bookmarker.bookmark_for(@bob2)
       pager = double(current_bookmark: bookmark, include_bookmark: true)
       expect(@bookmarker.restrict_scope(@example_class, pager)).to eq(
