@@ -779,11 +779,14 @@ describe "Files API", type: :request do
       expect(@att.file_state).to eq 'deleted'
     end
 
-    it "should delete/replace a file" do
-      account_admin_user
+    it 'should delete/replace a file' do
+      u = user_with_pseudonym(account: @account)
+      account_admin_user(account: @account)
+      @att.context = u
+      @att.save!
       Attachment.any_instance.expects(:destroy_content_and_replace).once
       @file_path_options[:replace] = true
-      api_call(:delete, @file_path, @file_path_options)
+      api_call(:delete, @file_path, @file_path_options, {}, {}, expected_status: 200)
     end
 
     it "should not be authorized to delete/replace a file" do
