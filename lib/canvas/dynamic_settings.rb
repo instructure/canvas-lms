@@ -111,7 +111,7 @@ module Canvas
       # or restart of the process.  Make sure that's the behavior you want before
       # you use this method, or specify a timeout
       def from_cache(key, expires_in: nil, use_env: true)
-        Cache.fetch(key, ttl: expires_in) do
+        Canvas::DynamicSettings::Cache.fetch(key, ttl: expires_in) do
           self.find(key, use_env: use_env)
         end
       end
@@ -121,7 +121,7 @@ module Canvas
       end
 
       def reset_cache!(hard: false)
-        Cache.reset!
+        Canvas::DynamicSettings::Cache.reset!
         @strategic_reserve = {} if hard
       end
 
