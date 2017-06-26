@@ -16,8 +16,23 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
+<% if @context.user_is_student?(@current_user) %>
+<% unless ((@context.orders) && (@context.orders.first.present? && (@context.orders.first.status == "Success") || (@context.orders.first.present? && @context.orders.first.status == "TXN_SUCCESS") ) && (@context.orders.first.user_id == @current_user.id)) %>
+  Please  purchase this course before accessing this page.
+<% else %>
+
 <% content_for :page_title, join_title(t('titles.course_modules', "Course Modules"), @context.name) %>
 
 <% css_bundle :context_modules2 %>
 <%= render :partial => "context_modules/content_next" %>
+
+<% end %>
+
+<% else %>
+<% content_for :page_title, join_title(t('titles.course_modules', "Course Modules"), @context.name) %>
+
+<% css_bundle :context_modules2 %>
+<%= render :partial => "context_modules/content_next" %>
+
+<% end %>
 

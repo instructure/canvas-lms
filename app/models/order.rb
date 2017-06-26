@@ -18,7 +18,7 @@ class Order < ActiveRecord::Base
     self[:express_token] = token
     if new_record? && !token.blank?
       details = EXPRESS.details_for(token)
-      self.express_payer_id = details.payer_id
+      self.express_player_id = details.payer_id
       self.first_name = details.params["first_name"]
       self.last_name = details.params["last_name"]
     end

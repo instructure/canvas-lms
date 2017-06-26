@@ -16,9 +16,25 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
+<% if @context.user_is_student?(@current_user) %>
+<% unless ((@context.orders) && (@context.orders.first.present? && (@context.orders.first.status == "Success") || (@context.orders.first.present? && @context.orders.first.status == "TXN_SUCCESS") ) && (@context.orders.first.user_id == @current_user.id)) %>
+  Please  purchase this course before accessing this page.
+<% else %>
 <%
   content_for :page_title, join_title(@context.name, t('titles.pages', 'Pages'))
   content_for :right_side, render(:partial => "shared/wiki_sidebar")
   css_bundle :tinymce
   js_bundle :wiki_page_index
 %>
+
+<% end %>
+
+<% else %>
+
+<%
+  content_for :page_title, join_title(@context.name, t('titles.pages', 'Pages'))
+  content_for :right_side, render(:partial => "shared/wiki_sidebar")
+  css_bundle :tinymce
+  js_bundle :wiki_page_index
+%>
+<% end %>

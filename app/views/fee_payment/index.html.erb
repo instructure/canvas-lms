@@ -27,7 +27,7 @@
 
 
 <div id="content-wrapper" class="ic-Layout-contentWrapper">
-<% unless ((@context.orders) && (@context.orders.first.present? && (@context.orders.first.status == true) || (@context.orders.first.present? && @context.orders.first.status == "TXN_SUCCESS") ) && (@context.orders.first.user_id == @current_user.id)) %>
+<% unless ((@context.orders) && (@context.orders.first.present? && (@context.orders.first.status == "Success") || (@context.orders.first.present? && @context.orders.first.status == "TXN_SUCCESS") ) && (@context.orders.first.user_id == @current_user.id)) %>
   <div id="content" class="ic-Layout-contentMain" role="main">
     <div style="margin:auto; text-align: center;">
       <%= link_to "Paypal", pay_path(@context), class: "btn btn-large btn-primary" %>&nbsp;

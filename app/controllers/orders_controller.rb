@@ -5,7 +5,7 @@ class OrdersController < ApplicationController
 
   def express
     @course = Course.find(params[:id])
-    response = EXPRESS.setup_purchase(20 * 100,
+    response = EXPRESS.setup_purchase( @course.amount * 100,
       :ip => request.remote_ip,
       :return_url => payment_course_orders_url(@course),
       :cancel_return_url => root_url,
@@ -24,7 +24,7 @@ class OrdersController < ApplicationController
     @course = Course.find(params[:course_id])
     @order = Order.create(express_token: params[:token], user_id: @current_user, course_id: @course.id)
     if @order.purchase && @order.status == "Success"
-      redirect_to '/'
+      redirect_to "http://localhost:3000/courses/#{@course.id}"
     else
       redirect_to '/'
     end
@@ -48,7 +48,7 @@ class OrdersController < ApplicationController
     @paramList["CUST_ID"] = "a-#{@course.id}"
     @paramList["INDUSTRY_TYPE_ID"] = INDUSTRY_TYPE_ID
     @paramList["CHANNEL_ID"] = CHANNEL_ID
-    @paramList["TXN_AMOUNT"] = 12
+    @paramList["TXN_AMOUNT"] =  @course.amount
     @paramList["MSISDN"] = '7799565116'
     @paramList["EMAIL"] = 'kapilkumar660@gmail.com'
     @paramList["WEBSITE"] = WEBSITE
