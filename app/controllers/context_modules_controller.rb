@@ -313,7 +313,7 @@ class ContextModulesController < ApplicationController
       is_master_course = MasterCourses::MasterTemplate.is_master_course?(@context)
 
       if is_child_course || is_master_course
-        tag_scope = @context.module_items_visible_to(@current_user)
+        tag_scope = @context.module_items_visible_to(@current_user).where(:content_type => %w{Assignment Attachment DiscussionTopic Quizzes::Quiz WikiPage})
         tag_scope = tag_scope.where(:id => params[:tag_id]) if params[:tag_id]
         tag_ids = tag_scope.pluck(:id)
         restriction_info = {}

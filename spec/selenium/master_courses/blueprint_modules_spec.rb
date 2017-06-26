@@ -124,6 +124,7 @@ describe "master courses - child courses - module item locking" do
       @assmt_mod_tag = @mod.add_item(id: @assmt.id, type: "assignment")
       @page_mod_tag  = @mod.add_item(id: @page.id, type: "wiki_page")
       @topic_mod_tag = @mod.add_item(id: @topic.id, type: "discussion_topic")
+      @header_tag = @mod.add_item(:type => 'context_module_sub_header', :title => 'header')
     end
 
     before :each do
@@ -137,6 +138,7 @@ describe "master courses - child courses - module item locking" do
       expect(f("#context_module_item_#{@page_mod_tag.id} .lock-icon")).to contain_css('.icon-blueprint-lock')
       # should still have icon even without tag
       expect(f("#context_module_item_#{@topic_mod_tag.id} .lock-icon")).to contain_css('.icon-blueprint')
+      expect(f("#context_module_item_#{@header_tag.id}")).to_not contain_css('.icon-blueprint')
     end
   end
 end
