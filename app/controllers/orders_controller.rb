@@ -43,8 +43,8 @@ class OrdersController < ApplicationController
     @paramList["INDUSTRY_TYPE_ID"] = INDUSTRY_TYPE_ID
     @paramList["CHANNEL_ID"] = CHANNEL_ID
     @paramList["TXN_AMOUNT"] =  @course.amount
-    @paramList["MSISDN"] = '7799565116'
-    @paramList["EMAIL"] = 'kapilkumar660@gmail.com'
+    @paramList["MSISDN"] = '7009417976'
+    @paramList["EMAIL"] = 'jagtar.lakhyan@gmail.com'
     @paramList["WEBSITE"] = WEBSITE
     @paramList["CALLBACK_URL"] = "#{PAYTM_URL}/courses/#{@course.id}/orders/check_paytm"
 
