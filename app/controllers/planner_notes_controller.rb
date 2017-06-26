@@ -66,6 +66,8 @@
 #
 
 class PlannerNotesController < ApplicationController
+  include Api::V1::PlannerNote
+
   before_action :require_user
 
   # @API List planner notes
@@ -99,7 +101,8 @@ class PlannerNotesController < ApplicationController
   #
   # @returns [PlannerNote]
   def index
-    render :json => PlannerNote.where(user: @current_user)
+    notes = PlannerNote.where(user: @current_user).active
+    render :json => planner_notes_json(notes, @current_user, session)
   end
 
   # @API Show a PlannerNote
@@ -108,8 +111,8 @@ class PlannerNotesController < ApplicationController
   #
   # @returns PlannerNote
   def show
-    planner_note = @current_user.planner_notes.find(params[:id])
-    render json: planner_note
+    note = @current_user.planner_notes.find(params[:id])
+    render json: planner_note_json(note, @current_user, session)
   end
 
   # @API Update a PlannerNote
@@ -119,16 +122,16 @@ class PlannerNotesController < ApplicationController
   # @returns PlannerNote
   def update
     update_params = params.permit(:title, :details, :course_id, :todo_date)
-    planner_note = @current_user.planner_notes.find(params[:id])
+    note = @current_user.planner_notes.find(params[:id])
     if (course_id = update_params.delete(:course_id))
       course = Course.find(course_id)
       return unless authorized_action(course, @current_user, :read)
       update_params[:course] = course
     end
-    if planner_note.update_attributes(update_params)
-      render json: planner_note, status: :ok
+    if note.update_attributes(update_params)
+      render json: planner_note_json(note, @current_user, session), status: :ok
     else
-      render json: planner_note.errors, status: :bad_request
+      render json: note.errors, status: :bad_request
     end
   end
 
@@ -145,11 +148,11 @@ class PlannerNotesController < ApplicationController
       return unless authorized_action(course, @current_user, :read)
       create_params[:course] = course
     end
-    planner_note = @current_user.planner_notes.new(create_params)
-    if planner_note.save
-      render json: planner_note, status: :created
+    note = @current_user.planner_notes.new(create_params)
+    if note.save
+      render json: planner_note_json(note, @current_user, session), status: :created
     else
-      render json: planner_note.errors, status: :bad_request
+      render json: note.errors, status: :bad_request
     end
   end
 
@@ -159,12 +162,12 @@ class PlannerNotesController < ApplicationController
   #
   # @returns PlannerNote
   def destroy
-    planner_note = PlannerNote.find(params[:id])
+    note = PlannerNote.find(params[:id])
 
-    if planner_note.destroy
-      render json: planner_note, status: :ok
+    if note.destroy
+      render json: planner_note_json(note, @current_user, session), status: :ok
     else
-      render json: planner_note.errors, status: :bad_request
+      render json: note.errors, status: :bad_request
     end
   end
 
