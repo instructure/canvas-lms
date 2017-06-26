@@ -199,4 +199,32 @@ module BlueprintCourseCommon
       save_button().click
       expect(f('#flash_message_holder')).to contain_css('div') # the alert saying the save completed
     end
+
+
+
+    shared_context "blueprint courses files context" do
+
+      def options_panel
+        f('.al-options')
+      end
+
+      def options_button
+        f('.al-trigger')
+      end
+
+      def files_page_header
+        f('.ef-header')
+      end
+
+      def file_object
+        f('.ef-item-row .ef-date-created-col')
+      end
+
+      def lock_icon_container
+        f('.ef-directory .ef-item-row .lock-icon')
+      end
+    end
+
+
+
 end
