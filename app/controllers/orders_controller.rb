@@ -30,12 +30,6 @@ class OrdersController < ApplicationController
     end
   end
 
-  PAYTM_MERCHANT_KEY = "5cjAqbssNYunuMjV"
-  WEBSITE = "WEB_STAGING"
-  MID = "IITIAN94490226667854"
-  INDUSTRY_TYPE_ID = "Retail"
-  CHANNEL_ID = "WEB"
-
 
   def paytm_integration
     @course = Course.find params[:course_id]
@@ -52,11 +46,11 @@ class OrdersController < ApplicationController
     @paramList["MSISDN"] = '7799565116'
     @paramList["EMAIL"] = 'kapilkumar660@gmail.com'
     @paramList["WEBSITE"] = WEBSITE
-    @paramList["CALLBACK_URL"] = "http://localhost:3000/courses/#{@course.id}/orders/check_paytm"
+    @paramList["CALLBACK_URL"] = "#{PAYTM_URL}/courses/#{@course.id}/orders/check_paytm"
 
     @checksum_hash = new_pg_checksum(@paramList, PAYTM_MERCHANT_KEY).gsub("\n",'')
     #staging Url
-    @payment_url = "https://pguat.paytm.com/oltp-web/processTransaction?order_id='a_#{@course.id}'"
+    @payment_url = "#{PAYTM_PAY_URL}?order_id='a_#{@course.id}'"
     @order= Order.new()
   end
 

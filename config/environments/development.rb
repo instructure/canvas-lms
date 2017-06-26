@@ -76,6 +76,14 @@ environment_configuration(defined?(config) && config) do |config|
     }
     ::EXPRESS = ActiveMerchant::Billing::PaypalExpressGateway.new(paypal)
   end
+  
+  PAYTM_MERCHANT_KEY = "5cjAqbssNYunuMjV"
+  WEBSITE = "WEB_STAGING"
+  MID = "IITIAN94490226667854"
+  INDUSTRY_TYPE_ID = "Retail"
+  CHANNEL_ID = "WEB"
+  PAYTM_URL = "http://localhost:3000"
+  PAYTM_PAY_URL = "https://pguat.paytm.com/oltp-web/processTransaction"
 
 
   # eval <env>-local.rb if it exists

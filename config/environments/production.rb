@@ -75,6 +75,14 @@ environment_configuration(defined?(config) && config) do |config|
   config.active_record.dump_schema_after_migration = false
 
   config.eager_load = true
+  
+  PAYTM_MERCHANT_KEY = "5cjAqbssNYunuMjV"
+  WEBSITE = "WEB_STAGING"
+  MID = "IITIAN94490226667854"
+  INDUSTRY_TYPE_ID = "Retail"
+  CHANNEL_ID = "WEB"
+  PAYTM_URL = "http://localhost:3000"
+  PAYTM_PAY_URL = "https://secure.paytm.in/oltp-web/processTransaction"
 
   # eval <env>-local.rb if it exists
   Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) }

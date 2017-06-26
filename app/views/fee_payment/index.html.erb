@@ -30,8 +30,8 @@
 <% unless ((@context.orders) && (@context.orders.first.present? && (@context.orders.first.status == "Success") || (@context.orders.first.present? && @context.orders.first.status == "TXN_SUCCESS") ) && (@context.orders.first.user_id == @current_user.id)) %>
   <div id="content" class="ic-Layout-contentMain" role="main">
     <div style="margin:auto; text-align: center;">
-      <%= link_to "Paypal", pay_path(@context), class: "btn btn-large btn-primary" %>&nbsp;
-      <%= link_to "Paytm", paytm_integration_course_orders_path(@context), class: "btn btn-large btn-primary" %><br>
+      <%= link_to image_tag("paypal-logo.png", width: 200, height: 200), pay_path(@context) %>&nbsp; |
+      <%= link_to image_tag("Paytm_logo.png", width: 200, height: 200), paytm_integration_course_orders_path(@context) %><br>
     </div>
   </div>
   <% else %>
