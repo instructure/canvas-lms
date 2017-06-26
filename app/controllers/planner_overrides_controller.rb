@@ -318,7 +318,7 @@ class PlannerOverridesController < ApplicationController
 
   def planner_note_collection
     item_collection('planner_notes',
-                    PlannerNote.where(user: @current_user, todo_date: @start_date...@end_date),
+                    PlannerNote.active.where(user: @current_user, todo_date: @start_date...@end_date),
                     PlannerNote, :todo_date, :created_at, :id)
   end
 

@@ -59,7 +59,12 @@ describe PlannerNotesController do
       end
 
       describe "GET #show" do
-        it "returns http success" do
+        it "returns http success for accessing your notes" do
+          get :show, id: @student_note.id
+          expect(response).to have_http_status(:success)
+        end
+
+        it "returns http not found for notes not yours" do
           u = user_factory(active_all: true)
           u_note = u.planner_notes.create(
             :title => "Other User's Note",
@@ -68,11 +73,6 @@ describe PlannerNotesController do
           )
           get :show, id: u_note.id
           expect(response).to have_http_status(:not_found)
-        end
-
-        it "returns http not found for notes not yours" do
-          get :show, id: @student_note.id
-          expect(response).to have_http_status(:success)
         end
       end
 
@@ -116,6 +116,11 @@ describe PlannerNotesController do
 
       describe "GET #show" do
         it "returns http success" do
+          get :show, id: @teacher_note.id
+          expect(response).to have_http_status(:success)
+        end
+
+        it "returns http not found for notes not yours" do
           u = user_factory(active_all: true)
           u_note = u.planner_notes.create(
             :title => "Other User's Note",
@@ -124,11 +129,6 @@ describe PlannerNotesController do
           )
           get :show, id: u_note.id
           expect(response).to have_http_status(:not_found)
-        end
-
-        it "returns http not found for notes not yours" do
-          get :show, id: @teacher_note.id
-          expect(response).to have_http_status(:success)
         end
       end
 
