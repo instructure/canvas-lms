@@ -892,6 +892,17 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   }
 }
 
+#deduction-box {
+  margin: 0 .25em;
+  .error {
+    color: $ic-color-danger;
+    margin-right: 1em;
+  }
+  .bold {
+    font-weight: bold;
+  }
+}
+
 #settings_form input[type=checkbox][disabled] + label {
   opacity: 0.5;
 }

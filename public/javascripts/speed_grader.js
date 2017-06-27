@@ -110,6 +110,7 @@ import './vendor/ui.selectmenu'
     $grade_container = $('#grade_container'),
     $grade = $grade_container.find('input, select'),
     $score = $grade_container.find('.score'),
+    $deduction_box = $('#deduction-box'),
     $average_score_wrapper = $('#average-score-wrapper'),
     $submission_details = $('#submission_details'),
     $multiple_submissions = $('#multiple_submissions'),
@@ -2425,14 +2426,37 @@ import './vendor/ui.selectmenu'
     },
 
     showGrade: function() {
-      var submission = EG.currentStudent.submission;
-      var grade = EG.getGradeToShow(submission, ENV.grading_role);
+      const submission = EG.currentStudent.submission;
+      const grade = EG.getGradeToShow(submission, ENV.grading_role);
 
-      $grade.val(grade);
+      $grade.val(grade.entered);
+
+      if (submission.points_deducted) {
+        $deduction_box.html(
+          I18n.t('*%{penalty}* **%{adjusted}**', {
+            penalty: I18n.t('Late Penalty: *%{pointsDeducted}*', {
+              pointsDeducted: grade.pointsDeducted,
+              wrapper: '<span class="bold">$1</span>'
+            }),
+
+            adjusted: I18n.t('Final Grade: *%{finalGrade}*', {
+              finalGrade: grade.adjusted,
+              wrapper: '<span class="bold">$1</span>'
+            }),
+
+            wrappers: [
+              '<span class="error">$1</span>',
+              '<span class="primary">$1</span>'
+            ]
+          })
+        ).show();
+      } else {
+        $deduction_box.hide().empty();
+      }
 
       $('#submit_same_score').hide();
-      if (typeof submission != "undefined" && submission.score !== null) {
-        $score.text(I18n.n(round(submission.score, round.DEFAULT)));
+      if (typeof submission !== 'undefined' && submission.entered_score !== null) {
+        $score.text(I18n.n(round(submission.entered_score, round.DEFAULT)));
         if (!submission.grade_matches_current_submission) {
           $('#submit_same_score').show();
         }
@@ -2521,18 +2545,35 @@ import './vendor/ui.selectmenu'
     },
 
     getGradeToShow: function(submission, grading_role) {
-      var grade = '';
+      const grade = { entered: '' };
 
       if (submission) {
         if (submission.excused) {
-          grade = 'EX';
-        } else if (submission.score != null && (grading_role === 'moderator' || grading_role === 'provisional_grader')) {
-          grade = GradeFormatHelper.formatGrade(round(submission.score, 2));
-        } else if (submission.grade != null) {
-          if (submission.grade !== '' && !isNaN(submission.grade)) {
-            grade = GradeFormatHelper.formatGrade(round(submission.grade, 2));
-          } else {
-            grade = GradeFormatHelper.formatGrade(submission.grade);
+          grade.entered = 'EX';
+        } else {
+          if (submission.points_deducted !== '' && !isNaN(submission.points_deducted)) {
+            grade.pointsDeducted = I18n.n(-submission.points_deducted);
+          }
+
+          let enteredScore = submission.entered_score;
+          let enteredGrade = submission.entered_grade;
+
+          if (submission.provisional_grade_id) {
+            enteredScore = submission.score;
+            enteredGrade = submission.grade;
+          }
+
+          if (enteredScore != null && (['moderator', 'provisional_grader'].includes(grading_role))) {
+            grade.entered = GradeFormatHelper.formatGrade(round(enteredScore, 2));
+            grade.adjusted = GradeFormatHelper.formatGrade(round(submission.score, 2));
+          } else if (submission.entered_grade != null) {
+            if (enteredGrade !== '' && !isNaN(enteredGrade)) {
+              grade.entered = GradeFormatHelper.formatGrade(round(enteredGrade, 2));
+              grade.adjusted = GradeFormatHelper.formatGrade(round(submission.grade, 2));
+            } else {
+              grade.entered = GradeFormatHelper.formatGrade(enteredGrade);
+              grade.adjusted = GradeFormatHelper.formatGrade(submission.grade);
+            }
           }
         }
       }

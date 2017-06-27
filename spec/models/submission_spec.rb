@@ -121,6 +121,40 @@ describe Submission do
     end
   end
 
+  describe 'entered_score' do
+    let(:submission) { @assignment.submissions.find_by!(user_id: @student) }
+
+    it 'returns nil if score is not present' do
+      expect(submission.entered_score).to be_nil
+    end
+
+    it 'returns score if no points deducted' do
+      submission.update(score: 123)
+      expect(submission.entered_score).to eql(submission.score)
+    end
+
+    it 'returns score without deduction' do
+      submission.update(score: 100, points_deducted: 23)
+      expect(submission.entered_score).to eql(123)
+    end
+  end
+
+  describe 'entered_grade' do
+    let(:submission) { @assignment.submissions.find_by!(user_id: @student) }
+
+    it 'returns grade if grading_type is pass_fail' do
+      @assignment.update(grading_type: 'pass_fail')
+      submission.update(score: 100)
+      expect(submission.entered_grade).to eql(submission.grade)
+    end
+
+    it 'returns grade without deduction' do
+      @assignment.update(grading_type: 'percent', points_possible: 100)
+      submission.update(score: 25.5, points_deducted: 60)
+      expect(submission.entered_grade).to eql('85.5%')
+    end
+  end
+
   describe 'cached_due_date' do
     before(:once) do
       @now = Time.zone.local(2013, 10, 18)

@@ -251,6 +251,19 @@ describe Assignment::SpeedGrader do
         end
       end
     end
+
+    it "includes submission entered_score and entered_grade in each submission history version" do
+      json = Assignment::SpeedGrader.new(@assignment, @teacher).json
+      json[:submissions].each do |submission|
+        user = [@student_1, @student_2].detect { |s| s.id.to_s == submission[:user_id] }
+        next unless user
+        submission[:submission_history].each_with_index do |version, idx|
+          submission_version = user.submissions.first.submission_history[idx]
+          expect(version[:submission][:entered_score]).to eq submission_version.entered_score
+          expect(version[:submission][:entered_grade]).to eq submission_version.entered_grade
+        end
+      end
+    end
   end
 
   it "includes inline view pingback url for files" do

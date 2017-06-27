@@ -580,64 +580,106 @@ define([
 
   QUnit.module('speed_grader#getGradeToShow');
 
-  test('returns an empty string if submission is null', () => {
+  test('returns an empty string for "entered" if submission is null', () => {
     let grade = SpeedGrader.EG.getGradeToShow(null, 'some_role');
-    equal(grade, '');
+    equal(grade.entered, '');
   });
 
-  test('returns an empty string if the submission is undefined', () => {
+  test('returns an empty string for "entered" if the submission is undefined', () => {
     let grade = SpeedGrader.EG.getGradeToShow(undefined, 'some_role');
-    equal(grade, '');
+    equal(grade.entered, '');
   });
 
-  test('returns an empty string if a submission has no excused or grade', () => {
+  test('returns an empty string for "entered" if a submission has no excused or grade', () => {
     let grade = SpeedGrader.EG.getGradeToShow({}, 'some_role');
-    equal(grade, '');
+    equal(grade.entered, '');
   });
 
-  test('returns excused if excused is true', () => {
+  test('returns excused for "entered" if excused is true', () => {
     let grade = SpeedGrader.EG.getGradeToShow({ excused: true }, 'some_role');
-    equal(grade, 'EX');
+    equal(grade.entered, 'EX');
   });
 
-  test('returns excused if excused is true and user is moderator', () => {
+  test('returns excused for "entered" if excused is true and user is moderator', () => {
     let grade = SpeedGrader.EG.getGradeToShow({ excused: true }, 'moderator');
-    equal(grade, 'EX');
+    equal(grade.entered, 'EX');
   });
 
-  test('returns excused if excused is true and user is provisional grader', () => {
+  test('returns excused for "entered" if excused is true and user is provisional grader', () => {
     let grade = SpeedGrader.EG.getGradeToShow({ excused: true }, 'provisional_grader');
-    equal(grade, 'EX');
+    equal(grade.entered, 'EX');
   });
 
-  test('returns grade if submission has no excused and grade is not a float', () => {
-    let grade = SpeedGrader.EG.getGradeToShow({ grade: 'some_grade' }, 'some_role');
-    equal(grade, 'some_grade');
+  test('returns negated points_deducted for "pointsDeducted"', () => {
+    const grade = SpeedGrader.EG.getGradeToShow({
+      points_deducted: 123
+    }, 'some_role');
+    equal(grade.pointsDeducted, '-123');
   });
 
-  test('returns score of submission if user is a moderator', () => {
-    let grade = SpeedGrader.EG.getGradeToShow({ grade: 15, score: 25 }, 'moderator');
-    equal(grade, '25');
+  test('returns values based on grades if submission has no excused and grade is not a float', () => {
+    const grade = SpeedGrader.EG.getGradeToShow({
+      grade: 'some_grade',
+      entered_grade: 'entered_grade'
+    }, 'some_role');
+    equal(grade.entered, 'entered_grade');
+    equal(grade.adjusted, 'some_grade');
   });
 
-  test('returns score of submission if user is a provisional grader', () => {
-    let grade = SpeedGrader.EG.getGradeToShow({ grade: 15, score: 25 }, 'provisional_grader');
-    equal(grade, '25');
+  test('returns values based on scores if user is a moderator', () => {
+    const grade = SpeedGrader.EG.getGradeToShow({
+      grade: 15,
+      score: 25,
+      entered_score: 30
+    }, 'moderator');
+    equal(grade.entered, '30');
+    equal(grade.adjusted, '25');
   });
 
-  test('returns grade of submission if user is neither a moderator or provisional grader', () => {
-    let grade = SpeedGrader.EG.getGradeToShow({ grade: 15, score: 25 }, 'some_role');
-    equal(grade, '15');
+  test('returns values based on scores if user is a provisional grader', () => {
+    const grade = SpeedGrader.EG.getGradeToShow({
+      grade: 15,
+      score: 25,
+      entered_score: 30,
+      points_deducted: 5
+    }, 'provisional_grader');
+    equal(grade.entered, '30');
+    equal(grade.adjusted, '25');
+    equal(grade.pointsDeducted, '-5');
   });
 
-  test('returns grade of submission if user is moderator but score is null', () => {
-    let grade = SpeedGrader.EG.getGradeToShow({ grade: 15 }, 'moderator');
-    equal(grade, '15');
+  test('returns values based on grades if user is neither a moderator or provisional grader', () => {
+    const grade = SpeedGrader.EG.getGradeToShow({
+      grade: 15,
+      score: 25,
+      entered_grade: 30,
+      points_deducted: 15
+    }, 'some_role');
+    equal(grade.entered, '30');
+    equal(grade.adjusted, '15');
+    equal(grade.pointsDeducted, '-15');
   });
 
-  test('returns grade of submission if user is provisional grader but score is null', () => {
-    let grade = SpeedGrader.EG.getGradeToShow({ grade: 15 }, 'provisional_grader');
-    equal(grade, '15');
+  test('returns values based on grades if user is moderator but score is null', () => {
+    const grade = SpeedGrader.EG.getGradeToShow({
+      grade: 15,
+      entered_grade: 20,
+      points_deducted: 5
+    }, 'moderator');
+    equal(grade.entered, '20');
+    equal(grade.adjusted, '15');
+    equal(grade.pointsDeducted, '-5');
+  });
+
+  test('returns values based on grades if user is provisional grader but score is null', () => {
+    const grade = SpeedGrader.EG.getGradeToShow({
+      grade: 15,
+      entered_grade: 20,
+      points_deducted: 5
+    }, 'provisional_grader');
+    equal(grade.entered, '20');
+    equal(grade.adjusted, '15');
+    equal(grade.pointsDeducted, '-5');
   });
 
   QUnit.module('speed_grader#getStudentNameAndGrade');

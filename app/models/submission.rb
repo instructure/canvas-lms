@@ -1339,7 +1339,7 @@ class Submission < ActiveRecord::Base
   private :score_missing
 
   def score_late_or_none(late_policy, points_possible)
-    raw_score = score_changed? ? score : originally_entered_score
+    raw_score = score_changed? ? score : entered_score
     deducted = late_points_deducted(raw_score, late_policy, points_possible)
     new_score = raw_score - deducted
     self.points_deducted = deducted
@@ -1347,10 +1347,14 @@ class Submission < ActiveRecord::Base
   end
   private :score_late_or_none
 
-  def originally_entered_score
-    score + (points_deducted || 0)
+  def entered_score
+    score + (points_deducted || 0) if score
   end
-  private :originally_entered_score
+
+  def entered_grade
+    return grade if grading_type == 'pass_fail'
+    assignment.score_to_grade(entered_score) if entered_score
+  end
 
   def late_points_deducted(raw_score, late_policy, points_possible)
     return 0 unless late_policy && points_possible && late?
@@ -2095,7 +2099,7 @@ class Submission < ActiveRecord::Base
 
   def self.json_serialization_full_parameters(additional_parameters={})
     includes = { :quiz_submission => {} }
-    methods = [ :submission_history, :attachments ]
+    methods = [ :submission_history, :attachments, :entered_score, :entered_grade ]
     methods << (additional_parameters.delete(:comments) || :submission_comments)
     excepts = additional_parameters.delete :except
 
