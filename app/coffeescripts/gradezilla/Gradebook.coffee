@@ -1854,34 +1854,44 @@ define [
       else
         return columnId
 
-    localeSort: (a, b) ->
+    localeSort: (a, b, { asc = true } = {}) ->
+      [b, a] = [a, b] unless asc
       natcompare.strings(a || '', b || '')
+
+    idSort: (a, b, { asc = true }) ->
+      NumberCompare(Number(a.id), Number(b.id), descending: !asc)
+
+    secondaryAndTertiarySort: (a, b, { asc = true }) =>
+      result = @localeSort(a.sortable_name, b.sortable_name, { asc })
+      result = @idSort(a, b, { asc }) if result == 0
+      result
 
     gradeSort: (a, b, field, asc) =>
       scoreForSorting = (student) =>
         grade = @getStudentGradeForColumn(student, field)
-        switch
-          when field == "total_grade"
-            if @options.show_total_grade_as_points
-              grade.score
-            else
-              @getGradeAsPercent(grade)
-          when field.match /^assignment_group/
-            @getGradeAsPercent(grade)
-          else
-            # TODO: support assignment grading types
+        if field == "total_grade"
+          if @options.show_total_grade_as_points
             grade.score
-
-      NumberCompare(scoreForSorting(a), scoreForSorting(b), descending: !asc)
+          else
+            @getGradeAsPercent(grade)
+        else if field.match /^assignment_group/
+          @getGradeAsPercent(grade)
+        else
+          # TODO: support assignment grading types
+          grade.score
+      result = NumberCompare(scoreForSorting(a), scoreForSorting(b), descending: !asc)
+      result = @secondaryAndTertiarySort(a, b, { asc }) if result == 0
+      result
 
     # when fn is true, those rows get a -1 so they go to the top of the sort
     sortRowsWithFunction: (fn, { asc = true } = {}) ->
       @sortRowsBy((a, b) =>
-        [b, a] = [a, b] unless asc
-        [rowA, rowB] = [fn(a), fn(b)]
+        rowA = fn(a)
+        rowB = fn(b)
+        [rowA, rowB] = [rowB, rowA] unless asc
         return -1 if rowA > rowB
         return 1 if rowA < rowB
-        @localeSort a.sortable_name, b.sortable_name
+        @secondaryAndTertiarySort(a, b, { asc })
       )
 
     missingSort: (columnId) =>
@@ -1892,14 +1902,18 @@ define [
 
     sortByStudentColumn: (settingKey, direction) =>
       @sortRowsBy((a, b) =>
-        [b, a] = [a, b] unless direction == 'ascending'
-        @localeSort(a[settingKey], b[settingKey])
+        asc = direction == 'ascending'
+        result = @localeSort(a[settingKey], b[settingKey], { asc })
+        result = @idSort(a, b, { asc }) if result == 0
+        result
       )
 
     sortByCustomColumn: (columnId, direction) =>
       @sortRowsBy((a, b) =>
-        [b, a] = [a, b] unless direction == 'ascending'
-        @localeSort(a[columnId], b[columnId])
+        asc = direction == 'ascending'
+        result = @localeSort(a[columnId], b[columnId], { asc } )
+        result = @secondaryAndTertiarySort(a, b, { asc }) if result == 0
+        result
       )
 
     sortByAssignmentColumn: (columnId, settingKey, direction) =>
