@@ -1250,7 +1250,7 @@ describe Course, '#assignment_groups' do
     @course.assignment_groups.create!(:name => 'C Group', position: 3)
 
     @course.reload
-    expect(AssignmentGroup).to receive(:best_unicode_collation_key).with('assignment_groups.name').and_call_original
+    expect(AssignmentGroup).to receive(:best_unicode_collation_key).with('assignment_groups.name').at_least(1).and_call_original
     groups = @course.assignment_groups
 
     expect(groups[0].name).to eq('B Group')
