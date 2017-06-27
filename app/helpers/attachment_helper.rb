@@ -74,7 +74,8 @@ module AttachmentHelper
 
   def should_proxy_attachment?(attachment)
     attachment.mime_class == 'html' && attachment.size < Setting.get('max_inline_html_proxy_size', 128 * 1024).to_i ||
-      attachment.mime_class == 'flash' && attachment.size < Setting.get('max_swf_proxy_size', 1024 * 1024).to_i
+      attachment.mime_class == 'flash' && attachment.size < Setting.get('max_swf_proxy_size', 1024 * 1024).to_i ||
+      attachment.content_type == 'text/css' && attachment.size < Setting.get('max_css_proxy_size', 64 * 1024).to_i
   end
 
   # checks if for the current root account there's a 'files' domain
