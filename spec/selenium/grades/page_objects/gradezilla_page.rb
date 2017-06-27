@@ -110,10 +110,6 @@ class Gradezilla
       f("div .slick-cell.l#{x}.r#{y}.meta-cell")
     end
 
-    def assignment_group_header_options_element(group_name)
-      fj("[title='#{group_name}'] .Gradebook__ColumnHeaderAction")
-    end
-
     def total_header_options_menu_item_element(menu_item)
       fj("[role=menuitem]:contains('#{menu_item}')")
     end
@@ -636,6 +632,10 @@ class Gradezilla
 
     def select_show_unpublished_assignments
       show_unpublished_assignments.click
+    end
+
+    def assignment_group_header_options_element(group_name)
+      fj("[title='#{group_name}'] .Gradebook__ColumnHeaderAction")
     end
 
     def click_assignment_header_menu(assignment_id)
