@@ -25,7 +25,7 @@
   @modules ||= []
 %>
 
-<% cache_if_module(context_module, editable, @is_student, @current_user, @context) do %>
+<% cache_if_module(context_module, editable, @is_student, @can_view_unpublished, @current_user, @context) do %>
 <div
   class="item-group-condensed context_module
     <%= 'editable_context_module' if editable %>
