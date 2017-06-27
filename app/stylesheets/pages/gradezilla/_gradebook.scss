@@ -849,3 +849,7 @@ $gradebook_checkbox_size: 16px;
     background-image: url("/images/svg-icons/svg_icon_expand_left.svg");
   }
 }
+
+svg.rotated {
+  transform: rotate(90deg);
+}
