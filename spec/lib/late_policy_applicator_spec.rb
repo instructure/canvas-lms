@@ -134,7 +134,7 @@ describe LatePolicyApplicator do
       @course.late_policy = @late_policy
       @course.save!
 
-      @students = Array.new(3) do
+      @students = Array.new(4) do
         user = User.create!
         @course.enroll_student(user, enrollment_state: 'active')
 
@@ -203,6 +203,15 @@ describe LatePolicyApplicator do
           score: nil
         )
 
+      @previously_late_submission = @assignment_in_open_gp.submissions.find_by(user: @students[3])
+      Submission.where(id: @previously_late_submission).
+        update_all(
+          submitted_at: @now,
+          cached_due_date: @now + 1.hour,
+          score: 10,
+          points_deducted: 10,
+          submission_type: 'online_text_entry'
+        )
       # rubocop:enable Rails/SkipsModelValidations
     end
 
@@ -223,6 +232,12 @@ describe LatePolicyApplicator do
         @late_policy_applicator = LatePolicyApplicator.new(@course)
 
         expect { @late_policy_applicator.process }.to change { @late_submission2.reload.score }.by(-10)
+      end
+
+      it 'recalculates late penalties with current due date in the open grading period' do
+        @late_policy_applicator = LatePolicyApplicator.new(@course)
+
+        expect { @late_policy_applicator.process }.to change { @previously_late_submission.reload.score }.by(+10)
       end
 
       it 'applies the missing policy to missing submissions in the open grading period' do
@@ -257,11 +272,11 @@ describe LatePolicyApplicator do
 
       it 'calls re-calculates grades in bulk after processing all submissions' do
         @late_policy_applicator = LatePolicyApplicator.new(@course)
-        student_ids = [0,2].map { |i| @students[i].id }
+        student_ids = [0,2,3].map { |i| @students[i].id }
 
         expect(@course).to receive(:recompute_student_scores).
-                             with(array_including(student_ids)).
-                             with(Array.new(2, kind_of(Integer)))
+          with(array_including(student_ids)).
+          with(Array.new(3, kind_of(Integer)))
 
         @late_policy_applicator.process
       end

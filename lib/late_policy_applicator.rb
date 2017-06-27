@@ -79,6 +79,7 @@ class LatePolicyApplicator
     @relevant_submissions[assignment.id] ||= assignment.submissions.late.
       where.not(score: nil).
       union(assignment.submissions.missing).
+      union(assignment.submissions.where("points_deducted > 0")).
       where(user_id: relevant_student_ids(assignment))
   end
 
