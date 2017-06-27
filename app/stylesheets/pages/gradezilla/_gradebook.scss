@@ -180,6 +180,15 @@ $gradebook_cell_padding_top: 8px;
   line-height: 35px;
 }
 
+.student-name,
+.secondary-info,
+.student-section,
+.student-placeholder,
+.Gradebook__ColumnHeaderDetail > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 // show and hide student names using a parent css class.
 .hide-students {
   .student-placeholder {
