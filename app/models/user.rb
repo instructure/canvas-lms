@@ -241,10 +241,9 @@ class User < ActiveRecord::Base
   end
 
   def self.order_by_sortable_name(options = {})
-    order_clause = clause = sortable_name_order_by_clause
-    order_clause = "#{clause} DESC" if options[:direction] == :descending
-    order_clause += ",users.id"
-    scope = self.order(order_clause)
+    clause = sortable_name_order_by_clause
+    sort_direction = options[:direction] == :descending ? 'DESC' : 'ASC'
+    scope = self.order("#{clause} #{sort_direction}").order("#{self.table_name}.id #{sort_direction}")
     if scope.select_values.empty?
       scope = scope.select(self.arel_table[Arel.star])
     end
