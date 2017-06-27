@@ -125,7 +125,10 @@ define [
 
   ## Gradebook Display Settings
   getInitialGridDisplaySettings = (settings, colors) ->
-    selectedPrimaryInfo = settings.student_column_display_as || studentRowHeaderConstants.defaultPrimaryInfo
+    selectedPrimaryInfo = if studentRowHeaderConstants.primaryInfoKeys.includes(settings.student_column_display_as)
+      settings.student_column_display_as
+    else
+      studentRowHeaderConstants.defaultPrimaryInfo
 
     # in case of no user preference, determine the default value after @hasSections has resolved
     selectedSecondaryInfo = settings.student_column_secondary_info

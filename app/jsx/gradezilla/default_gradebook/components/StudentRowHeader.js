@@ -23,7 +23,6 @@ function getPrimaryDisplayInfo (student, displayAs) {
   return {
     first_last: { displayName: student.name, anonymous: false},
     last_first: { displayName: student.sortable_name, anonymous: false},
-    anonymous: { displayName: '', anonymous: true}
   }[displayAs];
 }
 

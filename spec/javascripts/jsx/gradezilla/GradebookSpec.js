@@ -5776,17 +5776,6 @@ test('when primaryInfo is set as "last_first", sets display_name with student so
   ok(student.display_name.includes(student.sortable_name));
 });
 
-test('when primaryInfo is set as "anonymous", sets display_name without other values', function () {
-  const gradebook = this.createGradebook();
-  const student = this.createStudent();
-
-  gradebook.setSelectedPrimaryInfo('anonymous', true);
-  gradebook.setStudentDisplay(student);
-
-  notOk(student.display_name.includes(student.name));
-  notOk(student.display_name.includes(student.sortable_name));
-});
-
 QUnit.module('Gradebook#gotSubmissionsChunk', {
   setup () {
     this.gradebook = createGradebook();
@@ -6926,6 +6915,13 @@ test('sets selectedPrimaryInfo based on the settings passed in', function () {
 
 test('sets selectedPrimaryInfo to default if no settings passed in', function () {
   const actualSettings = createGradebook().gridDisplaySettings;
+
+  strictEqual(actualSettings.selectedPrimaryInfo, 'first_last');
+});
+
+test('sets selectedPrimaryInfo to default if unknown settings passed in', function () {
+  const loadedSettings = { student_column_display_as: 'gary_42' };
+  const actualSettings = createGradebook({ settings: loadedSettings }).gridDisplaySettings;
 
   strictEqual(actualSettings.selectedPrimaryInfo, 'first_last');
 });
