@@ -32,7 +32,10 @@ function renderTrigger (assignmentGroup, menuShown, ref) {
   return (
     <span ref={ref} className={classes}>
       <Typography weight="bold" fontStyle="normal" size="large" color="brand">
-        <IconMoreSolid title={I18n.t('%{name} Options', { name: assignmentGroup.name })} />
+        <IconMoreSolid
+          className="rotated"
+          title={I18n.t('%{name} Options', { name: assignmentGroup.name })}
+        />
       </Typography>
     </span>
   );

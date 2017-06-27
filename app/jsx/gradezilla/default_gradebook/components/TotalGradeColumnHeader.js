@@ -37,7 +37,7 @@ function renderTrigger (menuShown, ref) {
   return (
     <span ref={ref} className={classes}>
       <Typography weight="bold" fontStyle="normal" size="large" color="brand">
-        <IconMoreSolid title={I18n.t('Total Options')} />
+        <IconMoreSolid className="rotated" title={I18n.t('Total Options')} />
       </Typography>
     </span>
   );

@@ -125,7 +125,7 @@ export default class StudentColumnHeader extends ColumnHeader {
           trigger={
             <span ref={this.bindOptionsMenuTrigger} className={classes}>
               <Typography weight="bold" fontStyle="normal" size="large" color="brand">
-                <IconMoreSolid title={I18n.t('Student Name Options')} />
+                <IconMoreSolid className="rotated" title={I18n.t('Student Name Options')} />
               </Typography>
             </span>
           }
