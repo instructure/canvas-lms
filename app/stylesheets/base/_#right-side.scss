@@ -177,9 +177,11 @@
 #right-side .right-side-list .disable_item_link {
   position: absolute;
   right: 0;
-  top: $ic-sp / 2;
+  top: 0.5rem;
   z-index: 2;
   padding: 0;
+
+  @include overwrite-default-icon-size(0.75rem);
 }
 
 @mixin sidebar-logo {display: block;}
