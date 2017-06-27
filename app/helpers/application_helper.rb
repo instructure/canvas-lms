@@ -353,12 +353,18 @@ module ApplicationHelper
     @include_license_dialog = true
     css_bundle('license_help')
     js_bundle('license_help')
-    link_to(image_tag('help.png', :alt => I18n.t("Help with content licensing")), '#', :class => 'license_help_link no-hover', :title => I18n.t("Help with content licensing"))
+    icon = safe_join [
+      "<i class='icon-question' aria-hidden='true'></i>".html_safe
+    ]
+    link_to(icon, '#', :class => 'license_help_link no-hover', :title => I18n.t("Help with content licensing"))
   end
 
   def visibility_help_link
     js_bundle('visibility_help')
-    link_to(image_tag('help.png', :alt => I18n.t("Help with course visibilities")), '#', :class => 'visibility_help_link no-hover', :title => I18n.t("Help with course visibilities"))
+    icon = safe_join [
+      "<i class='icon-question' aria-hidden='true'></i>".html_safe
+    ]
+    link_to(icon, '#', :class => 'visibility_help_link no-hover', :title => I18n.t("Help with course visibilities"))
   end
 
   def equella_enabled?
