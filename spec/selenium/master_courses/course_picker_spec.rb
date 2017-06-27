@@ -73,12 +73,18 @@ describe "master courses - course picker" do
   let(:sub_account_filter) {'.bca-course-filter select:contains("Any Sub-Account")'}
 
   def wait_for_spinner
-    expect(f(filter_output)).to contain_css(loading)      # the loading spinner appears
-    expect(f(filter_output)).not_to contain_css(loading)  # and disappears
+    begin
+      f(loading) # the loading spinner appears
+    rescue Selenium::WebDriver::Error::NoSuchElementError
+      # ignore - sometimes spinner doesn't appear in Chrome
+    rescue SpecTimeLimit::Error
+      # ignore - sometimes spinner doesn't appear in Chrome
+    end
+    expect(f(filter_output)).not_to contain_css(loading) # and disappears
   end
 
   # enter search term into the filter text box and wait for the response
-  # this is complicated b the fact that the search api query doesn't happen until
+  # this is complicated by the fact that the search api query doesn't happen until
   # after the user enters at least 3 chars and stops typing for 200ms,
   # then we have to wait for the api response
   def test_filter(search_term)
@@ -113,6 +119,12 @@ describe "master courses - course picker" do
   it "should filter the course list by SIS ID", priority: "1", test_id: "3265701" do
     matches = test_filter('SIS_B')
     expect(matches.length).to eq(2)
+  end
+
+  it "course search doesn't work with nicknames", priority: "2", test_id: 3178857 do
+    @user.course_nicknames[@course.id] = 'nickname'
+    matches = test_filter('nickname')
+    expect(matches.length).to eq(0)
   end
 
   it "should filter the course list by term", priority: "1", test_id: "3075534" do

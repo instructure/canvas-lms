@@ -159,6 +159,8 @@ module BlueprintCourseCommon
     # return the <tr>s holding with the current list of available courses
     def available_courses
       ff('.bca-table__content-wrapper tbody tr.bca-table__course-row')
+    rescue
+      [] if f('.bca-table__no-results')
     end
 
     # return the <tbody> holding the current associations
