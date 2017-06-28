@@ -655,7 +655,7 @@ describe 'Submissions API', type: :request do
                       :assignment_id => a1.id.to_s, :user_id => student1.id.to_s },
                     { :include => %w(submission_comments) })
 
-    expect(json).to eq({
+    expect(json).to eql({
         "id"=>sub1.id,
         "grade"=>"A-",
         "excused" => sub1.excused,
@@ -694,8 +694,9 @@ describe 'Submissions API', type: :request do
         "late"=>false,
         "missing"=>false,
         "late_policy_status"=>nil,
-        "seconds_late"=>0.0,
-        "points_deducted"=>0.0})
+        "seconds_late"=>0,
+        "points_deducted"=>0.0
+    })
 
     # can't access other students' submissions
     @user = student2
@@ -881,7 +882,7 @@ describe 'Submissions API', type: :request do
            "late"=>false,
            "missing"=>false,
            "late_policy_status"=>nil,
-           "seconds_late"=>0.0,
+           "seconds_late"=>0,
            "points_deducted"=>nil},
           {"id"=>sub1.id,
            "grade"=>nil,
@@ -908,7 +909,7 @@ describe 'Submissions API', type: :request do
            "late"=>false,
            "missing"=>false,
            "late_policy_status"=>nil,
-           "seconds_late"=>0.0,
+           "seconds_late"=>0,
            "points_deducted"=>nil},
           {"id"=>sub1.id,
            "grade"=>"A-",
@@ -957,7 +958,7 @@ describe 'Submissions API', type: :request do
            "late"=>false,
            "missing"=>false,
            "late_policy_status"=>nil,
-           "seconds_late"=>0.0,
+           "seconds_late"=>0,
            "points_deducted"=>0.0}],
         "attempt"=>3,
         "url"=>nil,
@@ -993,7 +994,7 @@ describe 'Submissions API', type: :request do
         "late"=>false,
         "missing"=>false,
         "late_policy_status"=>nil,
-        "seconds_late"=>0.0,
+        "seconds_late"=>0,
         "points_deducted"=>0.0},
        {"id"=>sub2.id,
         "grade"=>"F",
@@ -1044,12 +1045,12 @@ describe 'Submissions API', type: :request do
                'media_entry_id' => sub2a1.media_entry_id
               },
             ],
-           "score"=>9,
+           "score"=>9.0,
            "workflow_state" => "graded",
            "late"=>false,
            "missing"=>false,
            "late_policy_status"=>nil,
-           "seconds_late"=>0.0,
+           "seconds_late"=>0,
            "points_deducted"=>0.0}],
         "attempt"=>1,
         "url"=>"http://www.instructure.com",
@@ -1079,17 +1080,17 @@ describe 'Submissions API', type: :request do
           },
          ],
         "submission_comments"=>[],
-        "score"=>9,
+        "score"=>9.0,
         "rubric_assessment"=>
          {"crit2"=>{"comments"=>"Hmm", "points"=>2},
-          "crit1"=>{"comments"=>nil, "points"=>7}},
+          "crit1"=>{"comments"=>nil, "points"=>7.0}},
         "workflow_state"=>"graded",
         "late"=>false,
         "missing"=>false,
         "late_policy_status"=>nil,
-        "seconds_late"=>0.0,
+        "seconds_late"=>0,
         "points_deducted"=>0.0}]
-    expect(json.sort_by { |h| h['user_id'] }).to eq res.sort_by { |h| h['user_id'] }
+    expect(json.sort_by { |h| h['user_id'] }).to eql res.sort_by { |h| h['user_id'] }
   end
 
   it "paginates submissions" do
@@ -2228,9 +2229,64 @@ describe 'Submissions API', type: :request do
       expect(json['late_policy_status']).to eq 'missing'
     end
 
+    it "can set seconds_late_override on a submission" do
+      seconds_late_override = 3.days
+      json = api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+        {
+          controller: 'submissions_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          user_id: @student.id.to_s
+        }, {
+          submission: {
+            late_policy_status: 'late',
+            seconds_late_override: seconds_late_override
+          }
+        }
+      )
+
+      submission = @assignment.submission_for_student(@student)
+      expect(submission.late_policy_status).to eq 'late'
+      expect(submission.seconds_late).to eql seconds_late_override.to_i
+      expect(json['late_policy_status']).to eq 'late'
+      expect(json['seconds_late']).to eql seconds_late_override.to_i
+    end
+
+    it "ignores seconds_late_override if late_policy_status is not late" do
+      seconds_late_override = 3.days
+      json = api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+        {
+          controller: 'submissions_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          user_id: @student.id.to_s
+        }, {
+          submission: {
+            late_policy_status: 'missing',
+            seconds_late_override: seconds_late_override
+          }
+        }
+      )
+
+      submission = @assignment.submission_for_student(@student)
+      expect(submission.late_policy_status).to eq 'missing'
+      expect(submission.seconds_late).to be 0
+      expect(json['late_policy_status']).to eq 'missing'
+      expect(json['seconds_late']).to be 0
+    end
+
     it "can clear late_policy_status on a submission" do
       @assignment.submissions.find_or_create_by!(user: @student).update!(
-        late_policy_status: 'missing'
+        late_policy_status: 'late',
+        seconds_late_override: 3.days
       )
       json = api_call(
         :put,
@@ -2251,7 +2307,9 @@ describe 'Submissions API', type: :request do
 
       submission = @assignment.submission_for_student(@student)
       expect(submission.late_policy_status).to be_nil
+      expect(submission.seconds_late).to be 0
       expect(json['late_policy_status']).to be_nil
+      expect(json['seconds_late']).to be 0
     end
 
     it "creates a provisional grade and comment" do

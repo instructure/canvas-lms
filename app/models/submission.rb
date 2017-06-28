@@ -94,6 +94,7 @@ class Submission < ActiveRecord::Base
   validates_length_of :published_grade, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
   validates_as_url :url
   validates :points_deducted, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  validates :seconds_late_override, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :late_policy_status, inclusion: ['none', 'missing', 'late'], allow_nil: true
   validate :ensure_grader_can_grade
 
@@ -156,7 +157,7 @@ class Submission < ActiveRecord::Base
         -- Otherwise, submission does not have a late policy applied and
         late_policy_status is null and
         -- submission is past due and
-        COALESCE(accepted_at, submitted_at, CURRENT_TIMESTAMP) >= cached_due_date +
+        COALESCE(submitted_at, CURRENT_TIMESTAMP) >= cached_due_date +
           CASE submission_type WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END and
         -- submission is not submitted and
         NULLIF(submission_type, '') is null and
@@ -181,7 +182,7 @@ class Submission < ActiveRecord::Base
       late_policy_status is distinct from 'missing' and
       (
         -- submission is not past due or
-        COALESCE(accepted_at, submitted_at, CURRENT_TIMESTAMP) < cached_due_date +
+        COALESCE(submitted_at, CURRENT_TIMESTAMP) < cached_due_date +
           CASE submission_type WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END or
         -- submission is submitted or
         NULLIF(submission_type, '') is not null or
@@ -1212,7 +1213,7 @@ class Submission < ActiveRecord::Base
       self.context_code = assignment.context_code
     end
 
-    self.accepted_at = nil unless late_policy_status == 'late'
+    self.seconds_late_override = nil unless late_policy_status == 'late'
     self.submitted_at ||= Time.now if self.has_submission?
     self.quiz_submission.reload if self.quiz_submission_id
     self.workflow_state = 'submitted' if self.unsubmitted? && self.submitted_at
@@ -1359,7 +1360,7 @@ class Submission < ActiveRecord::Base
 
   def late_policy_relevant_changes?
     return false unless grade_matches_current_submission
-    changes.slice(:score, :submitted_at, :accepted_at, :late_policy_status, :cached_due_date).any?
+    changes.slice(:score, :submitted_at, :seconds_late_override, :late_policy_status, :cached_due_date).any?
   end
   private :late_policy_relevant_changes?
 
@@ -2008,7 +2009,7 @@ class Submission < ActiveRecord::Base
   #  * score (Integer)
   #  * excused (Boolean)
   #  * late_policy_status (String)
-  #  * accepted_at (Time)
+  #  * seconds_late_override (Integer)
   #
   module Tardiness
     def past_due?
@@ -2018,8 +2019,7 @@ class Submission < ActiveRecord::Base
 
     def late?
       return late_policy_status == 'late' unless late_policy_status.nil?
-
-      accepted_at.present? && past_due?
+      submitted_at.present? && past_due?
     end
     alias late late?
 
@@ -2036,19 +2036,15 @@ class Submission < ActiveRecord::Base
     end
 
     def seconds_late
-      # the submission cannot be late if it's been marked with 'none' or 'missing'
-      return 0.0 if ['none', 'missing'].include?(late_policy_status)
-      return 0.0 if cached_due_date.nil? || time_of_submission <= cached_due_date
+      return (seconds_late_override || 0) if late_policy_status == 'late'
+      return 0 if ['none', 'missing'].include?(late_policy_status)
+      return 0 if cached_due_date.nil? || time_of_submission <= cached_due_date
 
-      (time_of_submission - cached_due_date)
-    end
-
-    def accepted_at
-      read_attribute(:accepted_at) || submitted_at
+      (time_of_submission - cached_due_date).to_i
     end
 
     def time_of_submission
-      time = accepted_at || Time.zone.now
+      time = submitted_at || Time.zone.now
       time -= 60.seconds if submission_type == 'online_quiz'
       time
     end

@@ -39,6 +39,7 @@ describe Submission do
   end
 
   it { is_expected.to validate_numericality_of(:points_deducted).is_greater_than_or_equal_to(0).allow_nil }
+  it { is_expected.to validate_numericality_of(:seconds_late_override).is_greater_than_or_equal_to(0).allow_nil }
   it { is_expected.to validate_inclusion_of(:late_policy_status).in_array(["none", "missing", "late"]).allow_nil }
 
   describe "with grading periods" do
@@ -387,27 +388,19 @@ describe Submission do
     end
   end
 
-  describe "accepted_at" do
-    before(:once) do
-      @now = Time.zone.now
-      Timecop.freeze(2.days.ago(@now)) do
-        @submission = @assignment.submit_homework(@student, body: "a body")
-        @submission.update!(late_policy_status: "late", accepted_at: 1.day.ago(@now))
-      end
+  describe "seconds_late_override" do
+    let(:submission) { @assignment.submissions.find_by!(user: @student) }
+
+    it "sets seconds_late_override to nil if the late_policy_status is set to anything other than 'late'" do
+      submission.update!(late_policy_status: "late", seconds_late_override: 60)
+      expect do
+        submission.update!(late_policy_status: "missing")
+      end.to change { submission.seconds_late_override }.from(60).to(nil)
     end
 
-    it "returns the accepted_at attribute if it is not nil" do
-      expect(@submission.accepted_at).to eq 1.day.ago(@now)
-    end
-
-    it "returns the submitted_at if the accepted_at attribute is nil" do
-      @submission.update!(late_policy_status: nil, accepted_at: nil)
-      expect(@submission.accepted_at).to eq 2.days.ago(@now)
-    end
-
-    it "sets the accepted_at attribute to nil if the late_policy_status is set to anything other than 'late'" do
-      @submission.update!(late_policy_status: "missing")
-      expect(@submission.read_attribute(:accepted_at)).to be_nil
+    it "does not set seconds_late_override if late_policy status is not 'late'" do
+      submission.update!(seconds_late_override: 60)
+      expect(submission.seconds_late_override).to be_nil
     end
   end
 
@@ -422,7 +415,7 @@ describe Submission do
     it "returns time between submitted_at and cached_due_date" do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
-        expect(submission.seconds_late).to eq 60.minutes
+        expect(submission.seconds_late).to eql 60.minutes.to_i
       end
     end
 
@@ -430,42 +423,41 @@ describe Submission do
       Timecop.freeze(@date) { @assignment.submit_homework(@student, body: "a body") }
       Timecop.freeze(30.minutes.from_now(@date)) do
         @assignment.submit_homework(@student, body: "a body")
-        expect(submission.seconds_late).to eq 90.minutes
+        expect(submission.seconds_late).to eql 90.minutes.to_i
       end
     end
 
-    it "returns time between accepted_at and cached_due_date if the submission has a" \
-    " late_policy_status of 'late' and an accepted_at" do
+    it "returns seconds_late_override if the submission has a late_policy_status of 'late'" \
+    " and a seconds_late_override" do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
-        submission.update!(late_policy_status: "late", accepted_at: 30.minutes.from_now(@date))
-        expect(submission.seconds_late).to eq 90.minutes
+        submission.update!(late_policy_status: "late", seconds_late_override: 90.minutes)
+        expect(submission.seconds_late).to eql 90.minutes.to_i
       end
     end
 
-    it "is not adjusted if the student resubmits and the submission has a late_policy_status" \
-    " of 'late' and an accepted_at" do
+    it "is not adjusted if the student resubmits and the submission has a late_policy_status of 'late'" \
+    " and a seconds_late_override" do
       Timecop.freeze(@date) { @assignment.submit_homework(@student, body: "a body") }
-      submission.update!(late_policy_status: "late", accepted_at: 30.minutes.from_now(@date))
+      submission.update!(late_policy_status: "late", seconds_late_override: 90.minutes)
       Timecop.freeze(40.minutes.from_now(@date)) do
         @assignment.submit_homework(@student, body: "a body")
-        expect(submission.seconds_late).to eq 90.minutes
+        expect(submission.seconds_late).to eql 90.minutes.to_i
       end
     end
 
-    it "returns time between submitted_at and cached_due_date if the submission has a" \
-    " late_policy_status of 'late' but no accepted_at is present" do
+    it "returns 0 if the submission has a late_policy_status of 'late' but no seconds_late_override is present" do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.update!(late_policy_status: "late")
-        expect(submission.seconds_late).to eq 60.minutes
+        expect(submission.seconds_late).to be 0
       end
     end
 
     it "is zero if it is not late" do
       Timecop.freeze(2.hours.ago(@date)) do
         @assignment.submit_homework(@student, body: "a body")
-        expect(submission.seconds_late).to be_zero
+        expect(submission.seconds_late).to be 0
       end
     end
 
@@ -473,7 +465,7 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.update!(late_policy_status: "none")
-        expect(submission.seconds_late).to be_zero
+        expect(submission.seconds_late).to be 0
       end
     end
 
@@ -481,16 +473,16 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.update!(late_policy_status: "missing")
-        expect(submission.seconds_late).to be_zero
+        expect(submission.seconds_late).to be 0
       end
     end
 
     it "is zero if it was turned in late but the teacher sets the late_policy_status to 'late'" \
-    " and sets the accepted_at to the due date" do
+    " and sets seconds_late_override to zero" do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
-        submission.update!(late_policy_status: "late", accepted_at: submission.cached_due_date)
-        expect(submission.seconds_late).to be_zero
+        submission.update!(late_policy_status: "late", seconds_late_override: 0)
+        expect(submission.seconds_late).to be 0
       end
     end
 
@@ -498,7 +490,7 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.update!(due_at: nil)
         @assignment.submit_homework(@student, body: "a body")
-        expect(submission.seconds_late).to be_zero
+        expect(submission.seconds_late).to be 0
       end
     end
 
@@ -506,21 +498,21 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.update!(submission_types: "online_quiz")
         @assignment.submit_homework(@student, submission_type: "online_quiz", body: "a body")
-        expect(submission.seconds_late).to eq 59.minutes
+        expect(submission.seconds_late).to eql 59.minutes.to_i
       end
     end
 
     it "includes seconds" do
       Timecop.freeze(30.seconds.from_now(@date)) do
         @assignment.submit_homework(@student, body: "a body")
-        expect(submission.seconds_late).to eq 60.minutes + 30.seconds
+        expect(submission.seconds_late).to eql((60.minutes + 30.seconds).to_i)
       end
     end
 
     it "uses the current time if submitted_at is nil" do
       Timecop.freeze(1.day.from_now(@date)) do
         @assignment.grade_student(@student, score: 10, grader: @teacher)
-        expect(submission.seconds_late).to eq 25.hours
+        expect(submission.seconds_late).to eql 25.hours.to_i
       end
     end
   end
@@ -652,12 +644,12 @@ describe Submission do
       end
     end
 
-    it "re-applies the late policy when accepted_at changes" do
+    it "re-applies the late policy when seconds_late_override changes" do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         @assignment.grade_student(@student, grade: 800, grader: @teacher)
       end
-      submission.update!(accepted_at: @assignment.due_at + 3.days)
+      submission.update!(seconds_late_override: 3.days, late_policy_status: "late")
       expect(submission.score).to eq 650
       expect(submission.points_deducted).to eq 150
     end
