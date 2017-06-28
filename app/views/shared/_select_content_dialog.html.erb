@@ -27,8 +27,8 @@
         <option value="attachment"><%= t :file_item, "File" %></option>
         <% end %>
         <% if !only || only.include?(:wiki_pages) %>
-        <option value="wiki_page"><%= t :content_page_item, "Content Page - Local" %></option>
-        <option value="cloned_wiki_page"><%= t :content_page_item, "Content Page - From Library" %></option>
+        <option value="wiki_page">Content Page - Local</option>
+        <option value="cloned_wiki_page">Content Page - From Library</option>
         <% end %>
         <% if !only || only.include?(:discussion_topics) %>
         <option value="discussion_topic"><%= t :discussion_item, "Discussion" %></option>
