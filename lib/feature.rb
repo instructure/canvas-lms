@@ -223,15 +223,6 @@ END
         end
       end
     },
-    'new_gradebook_development' =>
-    {
-      display_name: -> { I18n.t('New Gradebook Development') },
-      description: -> { I18n.t('For development of features for New Gradebook.') },
-      applies_to: "RootAccount",
-      state: "hidden",
-      beta: true,
-      development: true
-    },
     'k12' =>
     {
       display_name: -> { I18n.t('features.k12', 'K-12 Specific Features') },

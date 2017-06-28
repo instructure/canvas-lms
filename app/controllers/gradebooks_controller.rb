@@ -721,7 +721,7 @@ class GradebooksController < ApplicationController
       colors: gradebook_settings.fetch(:colors, {}),
       graded_late_or_missing_submissions_exist: graded_late_or_missing_submissions_exist,
       gradezilla: true,
-      new_gradebook_development_enabled: @context.root_account.feature_enabled?(:new_gradebook_development)
+      new_gradebook_development_enabled: !!ENV['GRADEBOOK_DEVELOPMENT']
     }
     env.deep_merge({ GRADEBOOK_OPTIONS: options })
   end
