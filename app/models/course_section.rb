@@ -126,8 +126,7 @@ class CourseSection < ActiveRecord::Base
   def touch_all_enrollments
     return if new_record?
     self.enrollments.touch_all
-    User.where(id: all_enrollments.select(:user_id)).
-        update_all(updated_at: Time.now.utc)
+    User.where(id: all_enrollments.select(:user_id)).touch_all
   end
 
   set_policy do
