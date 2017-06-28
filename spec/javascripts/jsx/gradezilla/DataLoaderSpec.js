@@ -37,7 +37,7 @@ QUnit.module('Gradebook Data Loader', function (hooks) {
 
   hooks.beforeEach(function () {
     this.qunitTimeout = QUnit.config.testTimeout;
-    QUnit.config.testTimeout = 100;
+    QUnit.config.testTimeout = 500;
 
     XHRS = [];
     XHR_HANDLERS = [];
