@@ -28,7 +28,7 @@ group :test do
   gem 'simplecov-rcov', '0.2.3', require: false
   gem 'mocha', github: 'maneframe/mocha', ref: 'bb8813fbb4cc589d7c58073d93983722d61b6919', require: false
     gem 'metaclass', '0.0.4', require: false
-  gem 'puma', '3.8.2'
+  gem 'puma', '3.9.1'
 
   gem 'rspec', '3.5.0'
   gem 'rspec_around_all', '0.2.0'
