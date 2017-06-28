@@ -200,7 +200,7 @@ const GradeSummary = {
     $assignment.find('.score_value').text(score.formattedValue)
 
     if ($assignment.data('muted')) {
-      $assignment.find('.grade').html('<img alt="Muted" class="muted_icon" src="/images/sound_mute.png?1318436336">')
+      $assignment.find('.grade').html('<i class="icon-muted muted_icon" aria-hidden="true"></i>')
     } else {
       $assignment.find('.grade').text(score.formattedValue)
     }
