@@ -16,9 +16,26 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../common'
+require_relative '../helpers/blueprint_common'
+
+shared_context "blueprint courses assignment context" do
+
+  def assignment_options
+    f('.assignment')
+  end
+
+  def assignment_header
+    f('#edit_assignment_header')
+  end
+
+  let(:delete_assignment){'a.delete_assignment'}
+
+end
 
 describe "master courses - child courses - assignment locking" do
   include_context "in-process server selenium tests"
+  include_context "blueprint courses files context"
+  include_context "blueprint courses assignment context"
 
   context "in the child course" do
     before :once do
@@ -28,7 +45,7 @@ describe "master courses - child courses - assignment locking" do
       @copy_from = course_factory(:active_all => true)
       @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
       @original_assmt = @copy_from.assignments.create!(
-        :title => "blah", :description => "bloo", :points_possible => 27, :due_at => due_date
+        title: "blah", description: "bloo", points_possible: 27, due_at: due_date
       )
       @tag = @template.create_content_tag_for!(@original_assmt)
 
@@ -37,7 +54,7 @@ describe "master courses - child courses - assignment locking" do
       @template.add_child_course!(@copy_to)
       # just create a copy directly instead of doing a real migration
       @assmt_copy = @copy_to.assignments.new(
-        :title => "blah", :description => "bloo", :points_possible => 27, :due_at => due_date
+        title: "blah", description: "bloo", points_possible: 27, due_at: due_date
       )
       @assmt_copy.migration_id = @tag.migration_id
       @assmt_copy.save!
@@ -52,8 +69,8 @@ describe "master courses - child courses - assignment locking" do
 
       expect(f("#assignment_#{@assmt_copy.id}")).to contain_css('.icon-blueprint')
 
-      f('.al-trigger').click
-      expect(f('.assignment')).to contain_css('a.delete_assignment')
+      options_button.click
+      expect(assignment_options).to contain_css(delete_assignment)
     end
 
     it "should not contain the delete cog-menu option on the index when locked" do
@@ -63,8 +80,8 @@ describe "master courses - child courses - assignment locking" do
 
       expect(f("#assignment_#{@assmt_copy.id}")).to contain_css('.icon-blueprint-lock')
 
-      f('.al-trigger').click
-      expect(f('.assignment')).not_to contain_css('a.delete_assignment')
+      options_button.click
+      expect(assignment_options).not_to contain_css(delete_assignment)
     end
 
     it "should show the delete cog-menu option on the index when not locked" do
@@ -72,9 +89,9 @@ describe "master courses - child courses - assignment locking" do
 
       expect(f("#assignment_#{@assmt_copy.id}")).to contain_css('.icon-blueprint')
 
-      f('.al-trigger').click
-      expect(f('.assignment')).not_to contain_css('a.delete_assignment.disabled')
-      expect(f('.assignment')).to contain_css('a.delete_assignment')
+      options_button.click
+      expect(assignment_options).not_to contain_css('a.delete_assignment.disabled')
+      expect(assignment_options).to contain_css(delete_assignment)
     end
 
     it "should not allow the delete options on the edit page when locked" do
@@ -83,15 +100,15 @@ describe "master courses - child courses - assignment locking" do
       get "/courses/#{@copy_to.id}/assignments/#{@assmt_copy.id}/edit"
 
       # when locked, the whole menu is removed
-      expect(f('#edit_assignment_header')).not_to contain_css('.al-trigger')
+      expect(assignment_header).not_to contain_css('.al-trigger')
     end
 
     it "should show the delete cog-menu options on the edit when not locked" do
       get "/courses/#{@copy_to.id}/assignments/#{@assmt_copy.id}/edit"
 
-      f('.al-trigger').click
-      expect(f('#edit_assignment_header')).not_to contain_css('a.delete_assignment_link.disabled')
-      expect(f('#edit_assignment_header')).to contain_css('a.delete_assignment_link')
+      options_button.click
+      expect(assignment_header).not_to contain_css('a.delete_assignment_link.disabled')
+      expect(assignment_header).to contain_css('a.delete_assignment_link')
     end
 
     it "should not allow editing of restricted items" do
