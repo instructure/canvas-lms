@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+@import "base/environment";
+
 .group-user {
   border: 1px solid #ccc;
   background: #fff;
@@ -46,7 +48,7 @@
   right: 3px;
   top: 1px;
   i:before {
-    color: #aaa;
+    color: $ic-icon-link-color;
     font-size: 0.8em;
   }
   .icon-mini-arrow-down{
@@ -56,8 +58,8 @@
 
 .assign-to-group {
   position: absolute;
-  top: 0px;
-  right: 1px;
+  top: 1px;
+  right: 8px;
 }
 
 .group .group-users {
@@ -93,7 +95,7 @@
     width: 23.5%;
     margin: 0 1% 3px 0;
   }
-  
+
   .group-user-name {
     margin-right: 0;
   }
@@ -110,7 +112,6 @@
   overflow: hidden;
   white-space: nowrap;
   margin-right: 10px;
-  font-size: 0.9em;
   font-weight: bold;
   color: #777;
 }
