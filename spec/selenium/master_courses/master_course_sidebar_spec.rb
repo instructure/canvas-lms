@@ -224,10 +224,11 @@ describe "master courses sidebar" do
         notification_message_text_box.send_keys("sync that!")
         sync_button.click
         run_jobs
-        open_blueprint_sidebar
       end
 
       it "removes sync button after sync", priority: "2", test_id: 3186726 do
+        refresh_page
+        open_blueprint_sidebar
         test_var = false
         begin
           sync_button
@@ -239,6 +240,8 @@ describe "master courses sidebar" do
       end
 
       it "removes notification options after sync", priority: "2", test_id: 3256295 do
+        refresh_page
+        open_blueprint_sidebar
         test_var = false
         begin
           unsynced_changes_link
