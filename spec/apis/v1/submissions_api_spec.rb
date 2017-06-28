@@ -3375,7 +3375,17 @@ describe 'Submissions API', type: :request do
 
     result_url = json.first.fetch("submission_history").first.fetch("attachments").first.
       fetch("preview_url")
-    expect(result_url).to match(/crocodoc_ids%22:\[1,2\]/)
+
+    @teacher.reload
+    @student.reload
+
+    parsed = URI.parse result_url
+    parsed_params = CGI.parse parsed.query
+    parsed_blob = JSON.parse parsed_params["blob"].first
+    expect(parsed.path).to eq "/api/v1/crocodoc_session"
+
+    expect(parsed_blob["moderated_grading_whitelist"]).to include(@student.moderated_grading_ids.as_json)
+    expect(parsed_blob["moderated_grading_whitelist"]).to include(@teacher.moderated_grading_ids.as_json)
   end
 
 

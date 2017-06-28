@@ -99,7 +99,8 @@ class CrocodocDocument < ActiveRecord::Base
       opts[:user] = user.crocodoc_user
     end
 
-    opts.merge! permissions_for_user(user, opts[:crocodoc_ids])
+    crocodoc_ids = opts[:moderated_grading_whitelist]&.map {|h| h["crocodoc_id"] }
+    opts.merge! permissions_for_user(user, crocodoc_ids)
 
     unless annotations_on
       opts[:filter] = 'none'

@@ -134,13 +134,20 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
     final_mark
   end
 
-  def crocodoc_attachment_info(user, attachment)
+  def attachment_info(user, attachment)
     annotators = [submission.user, scorer]
     annotators << source_provisional_grade.scorer if source_provisional_grade
+    url_opts = {
+      enable_annotations: true,
+      moderated_grading_whitelist: annotators.map { |u| u.moderated_grading_ids(true) }
+    }
+
     {
       :attachment_id => attachment.id,
       :crocodoc_url => attachment.crocodoc_available? &&
-                       attachment.crocodoc_url(user, annotators.map(&:crocodoc_id!))
+                       attachment.crocodoc_url(user, url_opts),
+      :canvadoc_url => attachment.canvadoc_available? &&
+                       attachment.canvadoc_url(user, url_opts)
     }
   end
 

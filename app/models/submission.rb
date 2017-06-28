@@ -1815,27 +1815,22 @@ class Submission < ActiveRecord::Base
     final ? self.provisional_grades.final.first : self.provisional_grades.not_final.find_by(scorer: scorer)
   end
 
-  def crocodoc_whitelist
+  def moderated_grading_whitelist
     if assignment.moderated_grading?
       if assignment.grades_published?
         sel = assignment.moderated_grading_selections.where(student_id: self.user).first
+        has_crocodoc = attachments.any?(&:crocodoc_available?)
         if sel && (pg = sel.provisional_grade)
           # include the student, the final grader, and the source grader (if a moderator copied a mark)
           annotators = [self.user, pg.scorer]
           annotators << pg.source_provisional_grade.scorer if pg.source_provisional_grade
-          annotators.map(&:crocodoc_id!)
-        else
-          # student not in moderation set: no filter
-          nil
+          annotators.map { |u| u.moderated_grading_ids(has_crocodoc) }
         end
       else
         # grades not yet published: students see only their own annotations
         # (speedgrader overrides this for provisional graders)
-        [self.user.crocodoc_id!]
+        [ user.moderated_grading_ids(has_crocodoc) ]
       end
-    else
-      # not a moderated assignment: no filter
-      nil
     end
   end
 

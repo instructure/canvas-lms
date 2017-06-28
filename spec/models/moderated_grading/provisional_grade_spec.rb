@@ -294,16 +294,22 @@ describe ModeratedGrading::ProvisionalGrade do
 
       test_copy_to_final_mark
 
-      expect(RubricAssessment.find_by_id(fa)).to be_nil
-      expect(SubmissionComment.find_by_id(fc)).to be_nil
+      expect(RubricAssessment.find_by(id: fa.id)).to be_nil
+      expect(SubmissionComment.find_by(id: fc.id)).to be_nil
     end
 
-    it "generates crocodoc_attachment_info with all participants" do
-      att = stub(:id => 100, :crocodoc_available? => true)
-      crocodoc_ids = [@sub.user, @moderator, @scorer].map(&:crocodoc_id!)
-      att.expects(:crocodoc_url).with(@moderator, crocodoc_ids).returns('fake_url')
+    it "generates attachment_info with all participants" do
+      att = stub(:id => 100, :crocodoc_available? => true, :canvadoc_available? => true)
+      whitelist = [@sub.user, @moderator, @scorer].map { |u| u.moderated_grading_ids(true) }
+      url_opts = {enable_annotations: true, moderated_grading_whitelist: whitelist}
+      att.expects(:crocodoc_url).with(@moderator, url_opts).returns('fake_url')
+      att.expects(:canvadoc_url).with(@moderator, url_opts).returns('fake_canvadoc_url')
       final_mark = @pg.copy_to_final_mark!(@moderator)
-      expect(final_mark.crocodoc_attachment_info(@moderator, att)).to eq({:attachment_id => 100, :crocodoc_url => 'fake_url'})
+      expect(final_mark.attachment_info(@moderator, att)).to eq({
+        attachment_id: 100,
+        crocodoc_url: 'fake_url',
+        canvadoc_url: 'fake_canvadoc_url'
+      })
     end
   end
 end

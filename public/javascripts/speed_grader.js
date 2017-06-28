@@ -1596,12 +1596,15 @@ import './vendor/ui.selectmenu'
       $vericiteInfoContainer = $("#submission_files_container .turnitin_info_container").empty();
       $.each(submission.versioned_attachments || [], function(i,a){
         var attachment = a.attachment;
-        if (attachment.crocodoc_url && EG.currentStudent.provisional_crocodoc_urls) {
-          attachment.provisional_crocodoc_url = _.find(EG.currentStudent.provisional_crocodoc_urls, function(url) {
+        if ((attachment.crocodoc_url || attachment.canvadoc_url) && EG.currentStudent.provisional_crocodoc_urls) {
+          let urlInfo = _.find(EG.currentStudent.provisional_crocodoc_urls, function(url) {
             return url.attachment_id == attachment.id;
-          }).crocodoc_url;
+          })
+          attachment.provisional_crocodoc_url = urlInfo.crocodoc_url;
+          attachment.provisional_canvadoc_url = urlInfo.canvadoc_url;
         } else {
           attachment.provisional_crocodoc_url = null;
+          attachment.provisional_canvadoc_url = null;
         }
         if (attachment.crocodoc_url ||
             attachment.canvadoc_url ||
@@ -1968,7 +1971,7 @@ import './vendor/ui.selectmenu'
         }));
       } else if (attachment.canvadoc_url) {
         $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
-          canvadoc_session_url: attachment.canvadoc_url
+          canvadoc_session_url: (attachment.provisional_canvadoc_url || attachment.canvadoc_url)
         }));
       } else if ($.isPreviewable(attachment.content_type, 'google')) {
         if (!INST.disableCrocodocPreviews) $no_annotation_warning.show();

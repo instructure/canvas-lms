@@ -2981,14 +2981,14 @@ describe Submission do
     end
   end
 
-  describe 'crocodoc_whitelist' do
+  describe 'moderated_grading_whitelist' do
     before(:once) do
       submission_spec_model
     end
 
     context "not moderated" do
       it "returns nil" do
-        expect(@submission.crocodoc_whitelist).to be_nil
+        expect(@submission.moderated_grading_whitelist).to be_nil
       end
     end
 
@@ -3003,14 +3003,14 @@ describe Submission do
       context "grades not published" do
         context "student not in moderation set" do
           it "returns the student alone" do
-            expect(@submission.crocodoc_whitelist).to eq([@student.reload.crocodoc_id!])
+            expect(@submission.moderated_grading_whitelist).to eq([@student.moderated_grading_ids])
           end
         end
 
         context "student in moderation set" do
           it "returns the student alone" do
             @assignment.moderated_grading_selections.create!(student: @student)
-            expect(@submission.crocodoc_whitelist).to eq([@student.reload.crocodoc_id!])
+            expect(@submission.moderated_grading_whitelist).to eq([@student.moderated_grading_ids])
           end
         end
       end
@@ -3024,7 +3024,7 @@ describe Submission do
 
         context "student not in moderation set" do
           it "returns nil" do
-            expect(@submission.crocodoc_whitelist).to be_nil
+            expect(@submission.moderated_grading_whitelist).to be_nil
           end
         end
 
@@ -3034,14 +3034,16 @@ describe Submission do
           end
 
           it "returns nil if no provisional grade was published" do
-            expect(@submission.crocodoc_whitelist).to be_nil
+            expect(@submission.moderated_grading_whitelist).to be_nil
           end
 
           it "returns the student's and selected provisional grader's ids" do
             @sel.provisional_grade = @pg
             @sel.save!
-            expect(@submission.crocodoc_whitelist).to match_array([@student.reload.crocodoc_id!,
-                                                                   @teacher.reload.crocodoc_id!])
+            expect(@submission.moderated_grading_whitelist).to match_array([
+              @student.moderated_grading_ids,
+              @teacher.moderated_grading_ids
+            ])
           end
 
           it "returns the student's, provisional grader's, and moderator's ids for a copied mark" do
@@ -3049,9 +3051,11 @@ describe Submission do
             final = @pg.copy_to_final_mark!(moderator)
             @sel.provisional_grade = final
             @sel.save!
-            expect(@submission.crocodoc_whitelist).to match_array([@student.reload.crocodoc_id!,
-                                                                   @teacher.reload.crocodoc_id!,
-                                                                   moderator.reload.crocodoc_id!])
+            expect(@submission.moderated_grading_whitelist).to match_array([
+              @student.moderated_grading_ids,
+              @teacher.moderated_grading_ids,
+              moderator.moderated_grading_ids
+            ])
           end
         end
       end

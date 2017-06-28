@@ -2757,7 +2757,14 @@ class User < ActiveRecord::Base
   end
 
   def crocodoc_user
-    "#{crocodoc_id!},#{short_name.gsub(",","")}"
+    "#{crocodoc_id!},#{short_name.delete(',')}"
+  end
+
+  def moderated_grading_ids(create_crocodoc_id=false)
+    {
+      crocodoc_id: create_crocodoc_id ? crocodoc_id! : crocodoc_id,
+      global_id: global_id.to_s
+    }
   end
 
   # mfa settings for a user are the most restrictive of any pseudonyms the user has

@@ -115,18 +115,21 @@ describe Attachment do
       expect(@attachment).to be_crocodocable
     end
 
-    it "should include a whitelist of crocodoc_ids in the url blob" do
+    it "should include a whitelist of moderated_grading_whitelist in the url blob" do
       crocodocable_attachment_model
-      crocodoc_ids = [user.crocodoc_id!, student.crocodoc_id!]
-      @attachment.submit_to_crocodoc
+      moderated_grading_whitelist = [user, student].map { |u| u.moderated_grading_ids(true) }
 
-      url = Rack::Utils.parse_nested_query(@attachment.crocodoc_url(user, crocodoc_ids).sub(/^.*\?{1}/, ""))
+      @attachment.submit_to_crocodoc
+      url_opts = {
+        moderated_grading_whitelist: moderated_grading_whitelist
+      }
+      url = Rack::Utils.parse_nested_query(@attachment.crocodoc_url(user, url_opts).sub(/^.*\?{1}/, ""))
       blob = extract_blob(url["hmac"], url["blob"],
                           "user_id" => user.id,
                           "type" => "crocodoc")
 
-      expect(blob["crocodoc_ids"]).to be_present
-      expect(blob["crocodoc_ids"]).to eq(crocodoc_ids & blob["crocodoc_ids"])
+      expect(blob["moderated_grading_whitelist"]).to include(user.moderated_grading_ids.as_json)
+      expect(blob["moderated_grading_whitelist"]).to include(student.moderated_grading_ids.as_json)
     end
 
     it "should submit to crocodoc" do

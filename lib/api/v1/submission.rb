@@ -163,7 +163,7 @@ module Api::V1::Submission
                                  submission_attachment: true,
                                  include: ['preview_url'],
                                  enable_annotations: true, # we want annotations on submission's attachment preview_urls
-                                 crocodoc_ids: attempt.crocodoc_whitelist)
+                                 moderated_grading_whitelist: attempt.moderated_grading_whitelist)
         attachment.skip_submission_attachment_lock_checks = false
         atjson
       end.compact unless attachments.blank?
@@ -287,10 +287,14 @@ module Api::V1::Submission
       json['submission_comments'] = submission_comments_json(provisional_grade.submission_comments, current_user)
     end
     if includes.include?('rubric_assessment')
-      json['rubric_assessments'] = provisional_grade.rubric_assessments.map{|ra| ra.as_json(:methods => [:assessor_name], :include_root => false)}
+      json['rubric_assessments'] = provisional_grade.rubric_assessments.map do |ra|
+        ra.as_json(:methods => [:assessor_name], :include_root => false)
+      end
     end
     if includes.include?('crocodoc_urls')
-      json['crocodoc_urls'] = submission.versioned_attachments.map { |a| provisional_grade.crocodoc_attachment_info(current_user, a) }
+      json['crocodoc_urls'] = submission.versioned_attachments.map do |a|
+        provisional_grade.attachment_info(current_user, a)
+      end
     end
     json
   end
