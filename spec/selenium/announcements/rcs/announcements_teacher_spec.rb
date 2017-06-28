@@ -256,7 +256,7 @@ describe "announcements" do
       f('#external_feed_header_match').send_keys('blah')
 
       expect {
-        submit_form(f('#add_external_feed_form'))
+        scroll_to_submit_button_and_click(f('#add_external_feed_form'))
         wait_for_ajaximations
       }.to change(ExternalFeed, :count).by(1)
 

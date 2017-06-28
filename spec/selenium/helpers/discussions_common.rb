@@ -45,7 +45,7 @@ module DiscussionsCommon
 
   def edit_entry(entry, text)
     wait_for_ajaximations
-    click_entry_option(entry, '.al-options:visible li:eq(1) a')
+    click_entry_option(entry, '.al-options li:nth-of-type(2) a')
     wait_for_ajaximations
     type_in_tiny 'textarea', text
     move_to_click('.edit_html_done')
@@ -112,10 +112,12 @@ module DiscussionsCommon
   def click_entry_option(discussion_entry, menu_item_selector)
     li_selector = "#entry-#{discussion_entry.id}"
     expect(fj(li_selector)).to be_displayed
-    expect(fj("#{li_selector} .al-trigger")).to be_displayed
-    fj("#{li_selector} .al-trigger").click
+    menu_button = fj("#{li_selector} .al-trigger")
+    scroll_to(menu_button)
+    menu_button.click
+    expect(menu_button).to be_displayed
     wait_for_ajaximations
-    menu_item = fj(menu_item_selector)
+    menu_item = fj("#{li_selector} #{menu_item_selector}")
     expect(menu_item).to be_displayed
     menu_item.click
   end

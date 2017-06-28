@@ -94,7 +94,7 @@ describe "discussions" do
           f('.discussion-reply-action').click
           wait_for_ajaximations
           type_in_tiny 'textarea', 'initial post text'
-          submit_form('.discussion-reply-form')
+          scroll_to_submit_button_and_click('.discussion-reply-form')
           wait_for_ajaximations
           expect(f('.topic-unsubscribe-button')).to be_displayed
         end

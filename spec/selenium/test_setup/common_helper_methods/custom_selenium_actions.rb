@@ -333,11 +333,17 @@ module CustomSeleniumActions
     submit_button_css = 'button[type="submit"]'
     button = form.is_a?(Selenium::WebDriver::Element) ? form.find_element(:css, submit_button_css) : f("#{form} #{submit_button_css}")
     scroll_to(button)
-    button.click
+    driver.action.move_to(button).click.perform
+  end
+
+  def trigger_form_submit_event(form)
+    form_element = form.is_a?(Selenium::WebDriver::Element) ? form : f(form)
+    form_element.submit
   end
 
   def submit_dialog_form(form)
-    # used to be called submit_form, but it turns out that if you're searching for a dialog that doesn't exist it's suuuuuper slow
+    # used to be called submit_form, but it turns out that if you're
+    # searching for a dialog that doesn't exist it's suuuuuper slow
     submit_button_css = 'button[type="submit"]'
     button = form.is_a?(Selenium::WebDriver::Element) ? form.find_element(:css, submit_button_css) : f("#{form} #{submit_button_css}")
     # the button may have been hidden via fixDialogButtons
