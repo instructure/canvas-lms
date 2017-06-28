@@ -58,13 +58,11 @@ test('initializes sidebar when edit link present', function () {
   ok(Sidebar.init.called, 'foo');
 });
 
-
 test('skips initializing sidebar when edit link absent', function () {
   equal(fixtures.find('.edit_syllabus_link').length, 0);
   SyllabusBehaviors.bindToEditSyllabus();
   ok(Sidebar.init.notCalled, 'bar');
 });
-
 
 test('sets syllabus_body data value on fresh node when showing edit form', function () {
   const fresh = { val: sinon.spy() };
@@ -82,4 +80,20 @@ test('sets syllabus_body data value on fresh node when showing edit form', funct
   const body = document.getElementById('course_syllabus_body');
   equal(RichContentEditor.freshNode.firstCall.args[0][0], body);
   ok(fresh.val.calledWith(text));
+});
+
+test('sets course_syllabus_body after mce destruction', function () {
+  this.stub(RichContentEditor, 'destroyRCE').callsFake( ()=> {
+     let elem = document.getElementById('course_syllabus_body');
+     elem.parentNode.removeChild(elem);
+  });
+  fixtures.create('<div id="course_syllabus"></div>');
+  fixtures.create('<a href="#" class="edit_syllabus_link">Edit Link</a>');
+  fixtures.create('<form id="edit_course_syllabus_form"></form>');
+  fixtures.create('<div id="tinymce-parent-of-course_syllabus_body"><textarea id="course_syllabus_body"></textarea></div>');
+  const $form = SyllabusBehaviors.bindToEditSyllabus();
+  $form.triggerHandler('hide_edit');
+  ok(RichContentEditor.destroyRCE.called)
+  const body = document.getElementById('course_syllabus_body');
+  ok(body !== null);
 });
