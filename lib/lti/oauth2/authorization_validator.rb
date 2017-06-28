@@ -91,7 +91,7 @@ module Lti
       def jwt_secret
         secret = tool_proxy&.shared_secret
         secret ||= developer_key&.api_key
-        secret ||= RegistrationRequestService.retrieve_registration_password(@context, unverified_jwt[:sub])
+        secret ||= (RegistrationRequestService.retrieve_registration_password(@context, unverified_jwt[:sub]) || {})[:reg_password]
         return secret if secret.present?
         raise SecretNotFound, "either the tool proxy or developer key were not found"
       end

@@ -32,7 +32,8 @@ module Lti
         message = RegistrationRequestService.create_request(
           @context,
           polymorphic_url([@context, :tool_consumer_profile]),
-          -> { polymorphic_url([@context, :registration_return]) }
+          -> { polymorphic_url([@context, :registration_return]) },
+          params[:tool_consumer_url]
         )
 
         @lti_launch.params = message.post_params

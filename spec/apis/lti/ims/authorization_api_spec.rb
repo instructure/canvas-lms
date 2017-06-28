@@ -113,8 +113,10 @@ module Lti
 
           let(:reg_password) { SecureRandom.uuid }
 
+          let(:registration_url) { 'http://example.com/register' }
+
           let(:raw_jwt) do
-            RegistrationRequestService.cache_registration(account, reg_key, reg_password)
+            RegistrationRequestService.cache_registration(account, reg_key, reg_password, registration_url)
             raw_jwt = JSON::JWT.new(
               {
                 sub: reg_key,

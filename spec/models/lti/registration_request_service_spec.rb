@@ -26,7 +26,7 @@ module Lti
       it 'creates a RegistrationRequest' do
         enable_cache do
           account = Account.new
-          reg_request = described_class.create_request(account, 'profile_url', -> {'return_url'})
+          reg_request = described_class.create_request(account, 'profile_url', -> {'return_url'}, 'http://example.com/register')
           expect(reg_request.lti_version).to eq 'LTI-2p0'
           expect(reg_request.launch_presentation_document_target).to eq 'iframe'
           expect(reg_request.tc_profile_url).to eq 'profile_url'
@@ -39,9 +39,9 @@ module Lti
           expect_any_instance_of(IMS::LTI::Models::Messages::RegistrationRequest).to receive(:generate_key_and_password).
             and_return(['key', 'password'])
           expect(Rails.cache).to receive(:write).
-            with("lti_registration_request/Account/#{account.global_id}/key", 'password', anything)
+            with("lti_registration_request/Account/#{account.global_id}/key", { reg_password:"password", registration_url: "http://example.com/register" }, anything)
 
-          described_class.create_request(account, 'profile_url', -> {'return_url'})
+          described_class.create_request(account, 'profile_url', -> {'return_url'}, 'http://example.com/register')
         end
       end
 

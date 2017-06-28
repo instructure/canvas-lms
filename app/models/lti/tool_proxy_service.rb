@@ -37,7 +37,7 @@ module Lti
 
     end
 
-    def process_tool_proxy_json(json:, context:, guid:, tool_proxy_to_update: nil, tc_half_shared_secret: nil, developer_key: nil)
+    def process_tool_proxy_json(json:, context:, guid:, tool_proxy_to_update: nil, tc_half_shared_secret: nil, developer_key: nil, registration_url: nil)
       @tc_half_secret = tc_half_shared_secret
       tp = IMS::LTI::Models::ToolProxy.new.from_json(json)
       tp.tool_proxy_guid = guid
@@ -52,7 +52,7 @@ module Lti
       tool_proxy = nil
       ToolProxy.transaction do
         product_family = create_product_family(tp, context.root_account, developer_key)
-        tool_proxy = create_tool_proxy(tp, context, product_family, tool_proxy_to_update)
+        tool_proxy = create_tool_proxy(tp, context, product_family, tool_proxy_to_update, registration_url)
         process_resources(tp, tool_proxy)
         create_proxy_binding(tool_proxy, context)
         create_tool_settings(tp, tool_proxy)
@@ -90,11 +90,12 @@ module Lti
       tp.security_contract.tp_half_shared_secret.present?
     end
 
-    def create_tool_proxy(tp, context, product_family, tool_proxy=nil)
+    def create_tool_proxy(tp, context, product_family, tool_proxy=nil, registration_url)
       # make sure the guid never changes
       raise InvalidToolProxyError if tool_proxy && tp.tool_proxy_guid != tool_proxy.guid
 
       tool_proxy ||= ToolProxy.new
+      tool_proxy.registration_url = registration_url
       tool_proxy.product_family = product_family
       tool_proxy.guid = tp.tool_proxy_guid
       tool_proxy.shared_secret = create_secret(tp)

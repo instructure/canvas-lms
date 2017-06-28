@@ -67,7 +67,10 @@ module Lti
           mock_oauth_sig.stubs(:verify).returns(true)
           OAuth::Signature.stubs(:build).returns(mock_oauth_sig)
           OAuth::Helper.stubs(:parse_header).returns({'oauth_consumer_key' => 'key'})
-          Lti::RegistrationRequestService.stubs(:retrieve_registration_password).returns('password')
+          Lti::RegistrationRequestService.stubs(:retrieve_registration_password).returns({
+            reg_password: 'password',
+            registration_url: 'http://example.com/register'
+          })
         end
 
         it 'returns a tool_proxy id object' do
@@ -161,7 +164,10 @@ module Lti
         it 'accepts valid JWT access tokens' do
           course_with_teacher_logged_in(:active_all => true)
           Lti::RegistrationRequestService.
-            stubs(:retrieve_registration_password).with(@course.account, 'reg_key').returns('password')
+            stubs(:retrieve_registration_password).with(@course.account, 'reg_key').returns({
+              reg_password: 'password',
+              registration_url: 'http://example.com/register'
+          })
           tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
           json = JSON.parse(tool_proxy_fixture)
           json[:format] = 'json'
