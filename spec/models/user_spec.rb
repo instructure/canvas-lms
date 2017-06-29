@@ -3860,4 +3860,37 @@ describe User do
       end
     end
   end
+
+  describe "#has_student_enrollment" do
+    let(:user) { User.create! }
+
+    it "returns false by default" do
+        expect(user.has_student_enrollment?).to eq false
+    end
+
+    it "returns true when user is student and a course is active" do
+        course_with_student(:user => user, :active_all => true)
+        expect(user.has_student_enrollment?).to eq true
+    end
+
+    it "returns true when user is student and no courses are active" do
+        course_with_student(:user => user, :active_all => false)
+        expect(user.has_student_enrollment?).to eq true
+    end
+
+    it "returns false when user is teacher" do
+        course_with_teacher(:user => user)
+        expect(user.has_student_enrollment?).to eq false
+    end
+
+    it "returns false when user is TA" do
+        course_with_ta(:user => user)
+        expect(user.has_student_enrollment?).to eq false
+    end
+
+    it "returns false when user is designer" do
+        course_with_designer(:user => user)
+        expect(user.has_student_enrollment?).to eq false
+    end
+  end
 end

@@ -1935,6 +1935,13 @@ class User < ActiveRecord::Base
     end
   end
 
+  def has_student_enrollment?
+    Rails.cache.fetch([self, 'has_student_enrollment', ApplicationController.region ].cache_key) do
+      self.enrollments.shard(in_region_associated_shards).where(:type => %w{StudentEnrollment StudentViewEnrollment}).
+        where.not(:workflow_state => %w{rejected inactive deleted}).exists?
+    end
+  end
+
   def participating_student_course_ids
     @participating_student_course_ids ||= self.shard.activate do
       Rails.cache.fetch([self, 'participating_student_course_ids', ApplicationController.region].cache_key) do
