@@ -46,6 +46,7 @@ describe "gradebook - concluded courses and enrollments" do
         .to({
           "show_inactive_enrollments" => "true",
           "show_concluded_enrollments" => "false",
+          "enter_grades_as" => nil
         })
     end
 
@@ -61,6 +62,7 @@ describe "gradebook - concluded courses and enrollments" do
         .to({
           "show_inactive_enrollments" => "false",
           "show_concluded_enrollments" => "true",
+          "enter_grades_as" => nil
         })
     end
 

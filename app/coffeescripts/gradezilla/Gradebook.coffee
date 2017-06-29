@@ -46,6 +46,7 @@ define [
   'compiled/util/natcompare'
   'convert_case'
   'str/htmlEscape'
+  'jsx/gradezilla/shared/EnterGradesAsSetting'
   'jsx/gradezilla/shared/SetDefaultGradeDialogManager'
   'jsx/gradezilla/default_gradebook/CurveGradesDialogManager'
   'jsx/gradezilla/default_gradebook/apis/GradebookApi'
@@ -98,7 +99,7 @@ define [
   GradingPeriodsApi, GradingPeriodSetsApi, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS,
   CourseGradeCalculator, EffectiveDueDates, GradeFormatHelper, UserSettings, Spinner, AssignmentMuter,
   GradeDisplayWarningDialog, PostGradesFrameDialog,
-  NumberCompare, natcompare, ConvertCase, htmlEscape, SetDefaultGradeDialogManager,
+  NumberCompare, natcompare, ConvertCase, htmlEscape, EnterGradesAsSetting, SetDefaultGradeDialogManager,
   CurveGradesDialogManager, GradebookApi, CellEditorFactory, CellFormatterFactory, ColumnHeaderRenderer, GridSupport,
   studentRowHeaderConstants, AssignmentRowCellPropFactory,
   GradebookMenu, ViewOptionsMenu, ActionMenu, AssignmentGroupFilter, GradingPeriodFilter, ModuleFilter, SectionFilter,
@@ -167,6 +168,7 @@ define [
 
     {
       colors
+      enterGradesAs: settings.enter_grades_as || {}
       filterColumnsBy
       filterRowsBy
       selectedPrimaryInfo
@@ -1770,6 +1772,7 @@ define [
       selectedViewOptionsFilters.push('') unless selectedViewOptionsFilters.length > 0
       data =
         gradebook_settings:
+          enter_grades_as: @gridDisplaySettings.enterGradesAs
           filter_columns_by: ConvertCase.underscore(@gridDisplaySettings.filterColumnsBy)
           selected_view_options_filters: selectedViewOptionsFilters
           show_concluded_enrollments: showConcludedEnrollments
@@ -2374,6 +2377,25 @@ define [
       for filter of filters
         selectedFilters.push filter if filters[filter]
       selectedFilters
+
+    setEnterGradesAsSetting: (assignmentId, setting) =>
+      @gridDisplaySettings.enterGradesAs[assignmentId] = setting
+
+    getEnterGradesAsSetting: (assignmentId) =>
+      gradingType = @getAssignment(assignmentId).grading_type
+      options = EnterGradesAsSetting.optionsForGradingType(gradingType)
+      return null unless options.length
+
+      setting = @gridDisplaySettings.enterGradesAs[assignmentId]
+      return setting if options.includes(setting)
+
+      EnterGradesAsSetting.defaultOptionForGradingType(gradingType)
+
+    updateEnterGradesAsSetting: (assignmentId, value) =>
+      @setEnterGradesAsSetting(assignmentId, value)
+      @saveSettings({}, =>
+        @gridSupport.columns.updateColumnHeaders([@getAssignmentColumnId(assignmentId)])
+      )
 
     ## Gradebook Content Access Methods
 

@@ -116,6 +116,7 @@ class AssignmentColumnHeader extends ColumnHeader {
   }
 
   bindAssignmentLink = (ref) => { this.assignmentLink = ref };
+  bindEnterGradesAsMenuContent = (ref) => { this.enterGradesAsMenuContent = ref };
 
   curveGrades = () => { this.invokeAndSkipFocus(this.props.curveGradesAction) };
   setDefaultGrades = () => { this.invokeAndSkipFocus(this.props.setDefaultGradeAction) };
@@ -147,6 +148,10 @@ class AssignmentColumnHeader extends ColumnHeader {
 
     return ColumnHeader.prototype.handleKeyDown.call(this, event);
   };
+
+  onEnterGradesAsSettingSelect = (_event, values) => {
+    this.props.enterGradesAsSetting.onSelect(values[0]);
+  }
 
   showMessageStudentsWhoDialog = () => {
     this.setState({ skipFocusOnClose: true });
@@ -308,6 +313,36 @@ class AssignmentColumnHeader extends ColumnHeader {
             {this.props.assignment.muted ? I18n.t('Unmute Assignment') : I18n.t('Mute Assignment')}
           </span>
         </MenuItem>
+
+        { !this.props.enterGradesAsSetting.hidden && <MenuItemSeparator /> }
+
+        {
+          !this.props.enterGradesAsSetting.hidden && (
+            <MenuItemFlyout contentRef={this.bindEnterGradesAsMenuContent} label={I18n.t('Enter Grades as')}>
+              <MenuItemGroup
+                label={<ScreenReaderContent>{I18n.t('Enter Grades as')}</ScreenReaderContent>}
+                onSelect={this.onEnterGradesAsSettingSelect}
+                selected={[this.props.enterGradesAsSetting.selected]}
+              >
+                <MenuItem value="points">
+                  { I18n.t('Points') }
+                </MenuItem>
+
+                <MenuItem value="percent">
+                  { I18n.t('Percentage') }
+                </MenuItem>
+
+                {
+                  this.props.enterGradesAsSetting.showGradingSchemeOption && (
+                    <MenuItem value="gradingScheme">
+                      { I18n.t('Grading Scheme') }
+                    </MenuItem>
+                  )
+                }
+              </MenuItemGroup>
+            </MenuItemFlyout>
+          )
+        }
 
         {
           !(

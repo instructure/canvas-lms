@@ -36,7 +36,7 @@ class GradebookSettingsController < ApplicationController
   private
 
   def gradebook_settings_params
-    params.require(:gradebook_settings).permit(
+    gradebook_settings_params = params.require(:gradebook_settings).permit(
       {
         filter_columns_by: [
           :context_module_id,
@@ -48,6 +48,7 @@ class GradebookSettingsController < ApplicationController
         ],
         selected_view_options_filters: []
       },
+      :enter_grades_as,
       :show_concluded_enrollments,
       :show_inactive_enrollments,
       :show_unpublished_assignments,
@@ -58,6 +59,8 @@ class GradebookSettingsController < ApplicationController
       :sort_rows_by_direction,
       { colors: [ :late, :missing, :resubmitted, :dropped, :excused ] }
     )
+    gradebook_settings_params[:enter_grades_as] = params[:gradebook_settings][:enter_grades_as]
+    gradebook_settings_params.permit!
   end
 
   def nilify_strings(hash)

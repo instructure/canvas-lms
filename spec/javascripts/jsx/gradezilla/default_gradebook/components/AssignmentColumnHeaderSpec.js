@@ -88,6 +88,12 @@ function defaultProps ({ props, sortBySetting, assignment, curveGradesAction } =
       hidden: false,
       onSelect () {}
     },
+    enterGradesAsSetting: {
+      hidden: false,
+      onSelect () {},
+      selected: 'points',
+      showGradingSchemeOption: true
+    },
     muteAssignmentAction: {
       disabled: false,
       onSelect () {}
@@ -218,6 +224,112 @@ test('renders a title for the More icon based on the assignment name', function 
   const optionsMenuTrigger = this.wrapper.find('PopoverMenu IconMoreSolid');
 
   equal(optionsMenuTrigger.props().title, 'Assignment #1 Options');
+});
+
+QUnit.module('AssignmentColumnHeader: "Enter Grades as" Settings', function (hooks) {
+  let props;
+  let wrapper;
+
+  function getMenuItem (text) {
+    const content = new ReactWrapper(wrapper.node.enterGradesAsMenuContent, wrapper.node);
+    return content.findWhere(component => component.name() === 'MenuItem' && component.text() === text);
+  }
+
+  function getMenuItemFlyout (text) {
+    const content = new ReactWrapper(wrapper.node.optionsMenuContent, wrapper.node);
+    return content.findWhere(component => component.name() === 'MenuItemFlyout' && component.text().trim() === text);
+  }
+
+  function mountAndOpenMenu () {
+    wrapper = mountAndOpenOptions(props);
+    getMenuItemFlyout('Enter Grades as').find('button').simulate('mouseOver');
+  }
+
+  hooks.beforeEach(function () {
+    props = defaultProps();
+  });
+
+  hooks.afterEach(function () {
+    wrapper.unmount();
+  });
+
+  test('renders when "hidden" is false', function () {
+    wrapper = mountAndOpenOptions(props);
+    strictEqual(getMenuItemFlyout('Enter Grades as').length, 1);
+  });
+
+  test('does not render when "hidden" is true', function () {
+    props.enterGradesAsSetting.hidden = true;
+    wrapper = mountAndOpenOptions(props);
+    strictEqual(getMenuItemFlyout('Enter Grades as').length, 0);
+  });
+
+  test('includes the "Points" option', function () {
+    mountAndOpenMenu();
+    strictEqual(getMenuItem('Points').length, 1);
+  });
+
+  test('includes the "Percentage" option', function () {
+    mountAndOpenMenu();
+    strictEqual(getMenuItem('Percentage').length, 1);
+  });
+
+  test('includes the "Grading Scheme" option when "showGradingSchemeOption" is true', function () {
+    props.enterGradesAsSetting.showGradingSchemeOption = true;
+    mountAndOpenMenu();
+    strictEqual(getMenuItem('Grading Scheme').length, 1);
+  });
+
+  test('excludes the "Grading Scheme" option when "showGradingSchemeOption" is false', function () {
+    props.enterGradesAsSetting.showGradingSchemeOption = false;
+    mountAndOpenMenu();
+    strictEqual(getMenuItem('Grading Scheme').length, 0);
+  });
+
+  test('optionally renders the "Points" option as selected', function () {
+    props.enterGradesAsSetting.selected = 'points';
+    mountAndOpenMenu();
+    strictEqual(getMenuItem('Points').prop('selected'), true);
+  });
+
+  test('optionally renders the "Percentage" option as selected', function () {
+    props.enterGradesAsSetting.selected = 'percent';
+    mountAndOpenMenu();
+    strictEqual(getMenuItem('Percentage').prop('selected'), true);
+  });
+
+  test('optionally renders the "Grading Scheme" option as selected', function () {
+    props.enterGradesAsSetting.showGradingSchemeOption = true;
+    props.enterGradesAsSetting.selected = 'gradingScheme';
+    mountAndOpenMenu();
+    strictEqual(getMenuItem('Grading Scheme').prop('selected'), true);
+  });
+
+  test('calls the onSelect callback with "points" when "Points" is selected', function () {
+    let selected;
+    props.enterGradesAsSetting.selected = 'percent';
+    props.enterGradesAsSetting.onSelect = (value) => { selected = value };
+    mountAndOpenMenu();
+    getMenuItem('Points').simulate('click');
+    equal(selected, 'points');
+  });
+
+  test('calls the onSelect callback with "percent" when "Percentage" is selected', function () {
+    let selected;
+    props.enterGradesAsSetting.onSelect = (value) => { selected = value };
+    mountAndOpenMenu();
+    getMenuItem('Percentage').simulate('click');
+    equal(selected, 'percent');
+  });
+
+  test('calls the onSelect callback with "gradingScheme" when "Grading Scheme" is selected', function () {
+    let selected;
+    props.enterGradesAsSetting.showGradingSchemeOption = true;
+    props.enterGradesAsSetting.onSelect = (value) => { selected = value };
+    mountAndOpenMenu();
+    getMenuItem('Grading Scheme').simulate('click');
+    equal(selected, 'gradingScheme');
+  });
 });
 
 QUnit.module('AssignmentColumnHeader: Sort by Settings', {

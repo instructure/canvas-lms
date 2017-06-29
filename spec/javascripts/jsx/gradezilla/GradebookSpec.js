@@ -4781,6 +4781,106 @@ test('reloads student data after saving settings', function () {
   strictEqual(this.gradebook.reloadStudentData.callCount, 1);
 });
 
+QUnit.module('Gradebook "Enter Grades as" Setting', function (suiteHooks) {
+  let gradebook;
+
+  suiteHooks.beforeEach(function () {
+    gradebook = createGradebook();
+    gradebook.setAssignments({
+      2301: { id: '2301', grading_type: 'points', name: 'Math Assignment', published: true },
+      2302: { id: '2302', grading_type: 'points', name: 'English Assignment', published: false }
+    });
+  });
+
+  QUnit.module('#getEnterGradesAsSetting', function () {
+    test('returns the setting when stored', function () {
+      gradebook.setEnterGradesAsSetting('2301', 'percent');
+      equal(gradebook.getEnterGradesAsSetting('2301'), 'percent');
+    });
+
+    test('defaults to "points" for a "points" assignment', function () {
+      gradebook.getAssignment('2301').grading_type = 'points';
+      equal(gradebook.getEnterGradesAsSetting('2301'), 'points');
+    });
+
+    test('defaults to "percent" for a "percent" assignment', function () {
+      gradebook.getAssignment('2301').grading_type = 'percent';
+      equal(gradebook.getEnterGradesAsSetting('2301'), 'percent');
+    });
+
+    test('defaults to "passFail" for a "pass_fail" assignment', function () {
+      gradebook.getAssignment('2301').grading_type = 'pass_fail';
+      equal(gradebook.getEnterGradesAsSetting('2301'), 'passFail');
+    });
+
+    test('defaults to "gradingScheme" for a "letter_grade" assignment', function () {
+      gradebook.getAssignment('2301').grading_type = 'letter_grade';
+      equal(gradebook.getEnterGradesAsSetting('2301'), 'gradingScheme');
+    });
+
+    test('defaults to "gradingScheme" for a "gpa_scale" assignment', function () {
+      gradebook.getAssignment('2301').grading_type = 'gpa_scale';
+      equal(gradebook.getEnterGradesAsSetting('2301'), 'gradingScheme');
+    });
+
+    test('defaults to null for a "not_graded" assignment', function () {
+      gradebook.getAssignment('2301').grading_type = 'not_graded';
+      strictEqual(gradebook.getEnterGradesAsSetting('2301'), null);
+    });
+
+    test('defaults to null for a "not_graded" assignment previously set as "points"', function () {
+      gradebook.updateEnterGradesAsSetting('2301', 'points');
+      gradebook.getAssignment('2301').grading_type = 'not_graded';
+      strictEqual(gradebook.getEnterGradesAsSetting('2301'), null);
+    });
+
+    test('defaults to null for a "not_graded" assignment previously set as "percent"', function () {
+      gradebook.updateEnterGradesAsSetting('2301', 'percent');
+      gradebook.getAssignment('2301').grading_type = 'not_graded';
+      strictEqual(gradebook.getEnterGradesAsSetting('2301'), null);
+    });
+
+    test('defaults to "points" for a "points" assignment previously set as "gradingScheme"', function () {
+      gradebook.updateEnterGradesAsSetting('2301', 'gradingScheme');
+      gradebook.getAssignment('2301').grading_type = 'points';
+      equal(gradebook.getEnterGradesAsSetting('2301'), 'points');
+    });
+
+    test('defaults to "percent" for a "percent" assignment previously set as "gradingScheme"', function () {
+      gradebook.updateEnterGradesAsSetting('2301', 'gradingScheme');
+      gradebook.getAssignment('2301').grading_type = 'percent';
+      equal(gradebook.getEnterGradesAsSetting('2301'), 'percent');
+    });
+  });
+
+  QUnit.module('#updateEnterGradesAsSetting', function (hooks) {
+    hooks.beforeEach(function () {
+      sinon.stub(gradebook, 'saveSettings');
+    });
+
+    hooks.afterEach(function () {
+      gradebook.saveSettings.restore();
+    });
+
+    test('updates the setting in Gradebook', function () {
+      gradebook.updateEnterGradesAsSetting('2301', 'percent');
+      equal(gradebook.getEnterGradesAsSetting('2301'), 'percent');
+    });
+
+    test('saves gradebooks settings', function () {
+      gradebook.updateEnterGradesAsSetting('2301', 'percent');
+      strictEqual(gradebook.saveSettings.callCount, 1);
+    });
+
+    test('saves gradebooks settings after updating the "enter grades as" setting', function () {
+      gradebook.saveSettings.callsFake(() => {
+        equal(gradebook.getEnterGradesAsSetting('2301'), 'percent');
+      });
+      gradebook.updateEnterGradesAsSetting('2301', 'percent');
+    });
+  });
+});
+
 QUnit.module('Gradebook#saveSettings', {
   setup () {
     this.server = sinon.fakeServer.create({ respondImmediately: true });
@@ -4816,6 +4916,7 @@ test('calls ajaxJSON with default gradebook_settings', function () {
       missing: '#FFE8E5',
       resubmitted: '#E5F7E5'
     },
+    enter_grades_as: {},
     filter_columns_by: {
       assignment_group_id: null,
       context_module_id: null,
@@ -4914,6 +5015,7 @@ test('calls ajaxJSON with parameters', function () {
         missing: '#FFE8E5',
         resubmitted: '#E5F7E5'
       },
+      enter_grades_as: {},
       filter_columns_by: {
         assignment_group_id: '2201',
         context_module_id: '2601',
