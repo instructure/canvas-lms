@@ -39,6 +39,7 @@ module CC::Importer::Canvas
       wiki[:title] = title
       wiki[:migration_id] = meta['identifier']
       wiki[:editing_roles] = meta['editing_roles']
+      wiki[:clone_of_id] = meta['clone_of_id']
       wiki[:notify_of_update] = meta['notify_of_update'] == 'true'
       wiki[:workflow_state] = meta['workflow_state']
       # should keep in case we import old packages
