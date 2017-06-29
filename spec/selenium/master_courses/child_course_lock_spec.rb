@@ -19,8 +19,72 @@ require_relative '../common'
 require_relative '../helpers/blueprint_common'
 require_relative '../../apis/api_spec_helper'
 
+shared_context "blueprint lock context" do
+
+  def blueprint_lock_icon_label
+    f('.bpc-lock-toggle__label')
+  end
+
+  def associated_index_lock_icon
+    f('#content-wrapper.ic-Layout-contentWrapper')
+  end
+
+  def blueprint_index_assignment_icon
+    f("#assignment_#{@assignment.id}.ig-row.ig-published")
+  end
+
+  def blueprint_index_discussions_icon
+    f('.discussion-content')
+  end
+
+  def blueprint_index_pages_icon
+    f('.master-content-lock-cell')
+  end
+
+  def blueprint_index_quizzes_icon
+    f("#summary_quiz_#{@quiz.id}.ig-row")
+  end
+
+  def blueprint_index_quizzes_search_bar
+    f('input#searchTerm')
+  end
+
+  def verify_index_locked
+    element = associated_index_lock_icon
+    expect(element).to contain_css(@locked_button_css) # if this is present, and item is showing as locked.
+  end
+
+  def verify_index_unlocked
+    element = associated_index_lock_icon
+    expect(element).not_to contain_css(@locked_button_css) # the item is now unlocked.
+  end
+
+  def verify_show_page_locked(element)
+    element = blueprint_lock_icon_label
+    expect(element).to include_text("Locked") # verify item is locked
+  end
+
+  def verify_show_page_unlocked(element)
+    element = blueprint_lock_icon_label
+    expect(element).to include_text("Blueprint") # verify the item is unlocked
+  end
+
+  def lock_index_tag
+    @tag.update(restrictions: {content: true}) # lock the item. Does not require a migration.
+  end
+
+  def unlock_index_tag
+    @tag.update(restrictions: {content: false}) # unlock the item.
+  end
+
+  def verify_unlocked(element)
+    expect(element).not_to contain_css(@unlocked_button_css) # verify that the button is unlocked
+  end
+end
+
 describe "master courses - locked items" do
   include_context "in-process server selenium tests"
+  include_context "blueprint lock context"
   include BlueprintCourseCommon
 
   before :once do
@@ -56,19 +120,51 @@ describe "master courses - locked items" do
     context "in the minion course" do
 
       it "assignments show a lock icon on the index page", priority: "2", test_id: 3137707 do
-        verify_associated_index_lock(@assignment, "assignments")
+        @tag = @template.create_content_tag_for!(@assignment)
+        lock_index_tag
+
+        get "/courses/#{@minion.id}/assignments"
+        verify_index_locked
+        unlock_index_tag
+
+        refresh_page
+        verify_index_unlocked
       end
 
       it "discussions show a lock icon on the index page", priority: "2", test_id: 3137708 do
-        verify_associated_index_lock(@discussion, "discussion_topics")
+        @tag = @template.create_content_tag_for!(@discussion)
+        lock_index_tag
+
+        get "/courses/#{@minion.id}/discussion_topics"
+        verify_index_locked
+        unlock_index_tag
+
+        refresh_page
+        verify_index_unlocked
       end
 
       it "pages show a lock icon on the index page", priority: "2", test_id: 3137709 do
-        verify_associated_index_lock(@page, "pages")
+        @tag = @template.create_content_tag_for!(@page)
+        lock_index_tag
+
+        get "/courses/#{@minion.id}/pages"
+        verify_index_locked
+        unlock_index_tag
+
+        refresh_page
+        verify_index_unlocked
       end
 
       it "quizzes show a lock icon on the index page", priority: "2", test_id: 3137710 do
-        verify_associated_index_lock(@quiz, "quizzes")
+        @tag = @template.create_content_tag_for!(@quiz)
+        lock_index_tag
+
+        get "/courses/#{@minion.id}/quizzes"
+        verify_index_locked
+        unlock_index_tag
+
+        refresh_page
+        verify_index_unlocked
       end
     end
 
@@ -76,34 +172,86 @@ describe "master courses - locked items" do
 
       it "assignments show a working lock button on the index page", priority: "2", test_id: 3137707 do
         get "/courses/#{@master.id}/assignments"
-        element = f("#assignment_#{@assignment.id}.ig-row.ig-published")
+        element = blueprint_index_assignment_icon
         escape = f('input#search_term.ic-Input')
 
-        verify_blueprint_index_lock(element, escape)
+        element.find_element(:css, @unlocked_button_css).click
+        escape.click # click away from the button due to firefox functionality
+        refresh_page # refresh the page to retrieve info from backend
+
+        element = blueprint_index_assignment_icon
+        escape = f('input#search_term.ic-Input')
+
+        verify_unlocked(element)
+        element.find_element(:css, @locked_button_css).click
+        escape.click # click away from the button due to firefox functionality
+        refresh_page
+
+        element = blueprint_index_assignment_icon
+        expect(element).not_to contain_css(@locked_button_css) # verify that the state has changed.
       end
 
       it "discussions show a working lock button on the index page", priority: "2", test_id: 3137708 do
         get "/courses/#{@master.id}/discussion_topics"
-        element = f('.discussion-content')
-        escape = f('input#searchTerm')
+        element = blueprint_index_discussions_icon
+        escape = blueprint_index_quizzes_search_bar
 
-        verify_blueprint_index_lock(element, escape)
+        element.find_element(:css, @unlocked_button_css).click
+        escape.click # click away from the button due to firefox functionality
+        refresh_page # refresh the page to retrieve info from backend
+
+        element = blueprint_index_discussions_icon
+        escape = blueprint_index_quizzes_search_bar
+
+        verify_unlocked(element)
+        element.find_element(:css, @locked_button_css).click
+        escape.click # click away from the button due to firefox functionality
+        refresh_page
+
+        element = blueprint_index_discussions_icon
+        expect(element).not_to contain_css(@locked_button_css) # verify that the state has changed.
       end
 
       it "pages show a working lock button on the index page", priority: "2", test_id: 3137709 do
         get "/courses/#{@master.id}/pages"
-        element = f('.master-content-lock-cell')
+        element = blueprint_index_pages_icon
         escape = f('.header-bar-outer-container')
 
-        verify_blueprint_index_lock(element, escape)
+        element.find_element(:css, @unlocked_button_css).click
+        escape.click # click away from the button due to firefox functionality
+        refresh_page # refresh the page to retrieve info from backend
+
+        element = blueprint_index_pages_icon
+        escape = f('.header-bar-outer-container')
+
+        verify_unlocked(element)
+        element.find_element(:css, @locked_button_css).click
+        escape.click # click away from the button due to firefox functionality
+        refresh_page
+
+        element = blueprint_index_pages_icon
+        expect(element).not_to contain_css(@locked_button_css) # verify that the state has changed.
       end
 
       it "quizzes show a working lock button on the index page", priority: "2", test_id: 3137710 do
         get "/courses/#{@master.id}/quizzes"
-        element = f("#summary_quiz_#{@quiz.id}.ig-row")
-        escape = f('input#searchTerm')
+        element = blueprint_index_quizzes_icon
+        escape = blueprint_index_quizzes_search_bar
 
-        verify_blueprint_index_lock(element, escape)
+        element.find_element(:css, @unlocked_button_css).click
+        escape.click # click away from the button due to firefox functionality
+        refresh_page # refresh the page to retrieve info from backend
+
+        element = blueprint_index_quizzes_icon
+        escape = blueprint_index_quizzes_search_bar
+
+        verify_unlocked(element)
+        element.find_element(:css, @locked_button_css).click
+        escape.click # click away from the button due to firefox functionality
+        refresh_page
+
+        element = blueprint_index_quizzes_icon
+        expect(element).not_to contain_css(@locked_button_css) # verify that the state has changed.
       end
     end
   end
@@ -119,74 +267,79 @@ describe "master courses - locked items" do
     end
 
     it "assignments show a lock icon on the show page", priority: "2", test_id: 3109490 do
-      verify_show_page_lock(@assignment, "assignments")
+      @tag = @template.create_content_tag_for!(@assignment)
+      @tag.update(restrictions: {content: true}) # lock the item. Does not require a migration.
+      get "/courses/#{@master.id}/assignments/#{@assignment.id}"
+
+      element = blueprint_lock_icon_label
+      verify_show_page_locked(element)
+      element.click
+      refresh_page
+
+      element = blueprint_lock_icon_label
+      verify_show_page_unlocked(element)
+      element.click
+      refresh_page
+
+      element = blueprint_lock_icon_label
+      verify_show_page_locked(element)
     end
 
     it "discussions show a lock icon on the show page", priority: "2", test_id: 3127582 do
-      verify_show_page_lock(@discussion, "discussion_topics")
+      @tag = @template.create_content_tag_for!(@discussion)
+      @tag.update(restrictions: {content: true}) # lock the item. Does not require a migration.
+      get "/courses/#{@master.id}/discussion_topics/#{@discussion.id}"
+
+      element = blueprint_lock_icon_label
+      verify_show_page_locked(element)
+      element.click
+      refresh_page
+
+      element = blueprint_lock_icon_label
+      verify_show_page_unlocked(element)
+      element.click
+      refresh_page
+
+      element = blueprint_lock_icon_label
+      verify_show_page_locked(element)
     end
 
     it "pages show a lock icon on the show page", priority: "2", test_id: 3127583 do
-      verify_show_page_lock(@page, "pages")
+      @tag = @template.create_content_tag_for!(@page)
+      @tag.update(restrictions: {content: true}) # lock the item. Does not require a migration.
+      get "/courses/#{@master.id}/pages/#{@page.id}"
+
+      element = blueprint_lock_icon_label
+      verify_show_page_locked(element)
+      element.click
+      refresh_page
+
+      element = blueprint_lock_icon_label
+      verify_show_page_unlocked(element)
+      element.click
+      refresh_page
+
+      element = blueprint_lock_icon_label
+      verify_show_page_locked(element)
     end
 
     it "quizzes show a lock icon on the show page", priority: "2", test_id: 3127584 do
-      verify_show_page_lock(@quiz, "quizzes")
+      @tag = @template.create_content_tag_for!(@quiz)
+      @tag.update(restrictions: {content: true}) # lock the item. Does not require a migration.
+      get "/courses/#{@master.id}/quizzes/#{@quiz.id}"
+
+      element = blueprint_lock_icon_label
+      verify_show_page_locked(element)
+      element.click
+      refresh_page
+
+      element = blueprint_lock_icon_label
+      verify_show_page_unlocked(element)
+      element.click
+      refresh_page
+
+      element = blueprint_lock_icon_label
+      verify_show_page_locked(element)
     end
-  end
-
-  private
-
-  # item is the specific item to lock, unlock.
-  # navigation_string is the string to navigate to
-  def verify_associated_index_lock(item, navigation_string)
-    @tag = @template.create_content_tag_for!(item)
-    @tag.update(restrictions: {content: true}) # lock the item. Does not require a migration.
-    get "/courses/#{@minion.id}/" + navigation_string
-    element = f('#content-wrapper.ic-Layout-contentWrapper')
-
-    expect(element).to contain_css(@locked_button_css) # if this is present, and item is showing as locked.
-    @tag.update(restrictions: {content: false}) # unlock the item.
-
-    refresh_page
-    expect(element).not_to contain_css(@locked_button_css) # the item is now unlocked.
-  end
-
-  # verifies that the lock on the show page changes properly
-  def verify_show_page_lock(item, navigation_string)
-    @tag = @template.create_content_tag_for!(item)
-    @tag.update(restrictions: {content: true}) # lock the item. Does not require a migration.
-
-    get "/courses/#{@master.id}/" + navigation_string + "/#{item.id}"
-    element = f('.bpc-lock-toggle__label')
-
-    expect(element).to include_text("Locked") # verify item is locked.
-    element.click
-
-    refresh_page
-    expect(element).to include_text("Blueprint") # verify the item is unlocked
-    element.click # lock the item
-
-    refresh_page
-    expect(element).to include_text("Locked") # verify item is locked
-  end
-
-  # This function verifies that the state of the lock has changed, and then changes the lock state.
-  def verify_unlocked(element)
-    expect(element).not_to contain_css(@unlocked_button_css) # verify that the button is unlocked
-  end
-
-  # verifies the lock functionality of the blueprint (master) course
-  def verify_blueprint_index_lock(element, escape)
-    element.find_element(:css, @unlocked_button_css).click
-    escape.click # click away from the button due to firefox functionality
-    refresh_page # refresh the page to retrieve info from backend
-
-    verify_unlocked(element)
-    element.find_element(:css, @locked_button_css).click
-    escape.click # click away from the button due to firefox functionality
-    refresh_page
-
-    expect(element).not_to contain_css(@locked_button_css) # verify that the state has changed.
   end
 end
