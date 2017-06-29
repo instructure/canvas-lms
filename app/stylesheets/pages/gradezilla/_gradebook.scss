@@ -829,6 +829,15 @@ $gradebook_checkbox_size: 16px;
   display: flex;
   justify-content: space-around;
   flex-direction: column;
+
+  input[type="text"] {
+    height: auto;
+    line-height: 1;
+    margin: 0;
+    padding: auto;
+    box-shadow: none;
+    border: none;
+  }
 }
 
 .SubmissionTray__Container {
