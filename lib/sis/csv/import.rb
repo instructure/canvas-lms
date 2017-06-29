@@ -176,8 +176,8 @@ module SIS
           @finished = true
         end
       rescue => e
-        return @batch if @batch.workflow_state == 'aborted'
         if @batch
+          return @batch if @batch.workflow_state == 'aborted'
           message = "Importing CSV for account"\
             ": #{@root_account.id} (#{@root_account.name}) "\
             "sis_batch_id: #{@batch.id}: #{e}"
