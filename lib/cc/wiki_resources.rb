@@ -33,6 +33,7 @@ module CC
           meta_fields = {:identifier => migration_id}
           meta_fields[:editing_roles] = page.editing_roles
           meta_fields[:notify_of_update] = page.notify_of_update
+          meta_fields[:clone_of_id] = page.clone_of_id
           meta_fields[:workflow_state] = page.workflow_state
           meta_fields[:front_page] = page.is_front_page?
           meta_fields[:module_locked] = page.locked_by_module_item?(@user, true).present?
