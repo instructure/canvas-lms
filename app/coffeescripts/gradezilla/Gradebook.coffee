@@ -119,6 +119,9 @@ define [
 
   IS_ADMIN = isAdmin()
 
+  htmlDecode = (input) ->
+    input && new DOMParser().parseFromString(input, "text/html").documentElement.textContent
+
   renderComponent = (reactClass, mountPoint, props = {}, children = null) ->
     component = React.createElement(reactClass, props, children)
     ReactDOM.render(component, mountPoint)
@@ -2499,7 +2502,7 @@ define [
 
     # Submission Tray
 
-    renderSubmissionTray: () =>
+    renderSubmissionTray: (student) =>
       mountPoint = document.getElementById('StudentTray__Container')
       { open, studentId, assignmentId } = @getSubmissionTrayState()
       props =
@@ -2508,11 +2511,14 @@ define [
         onRequestClose: @closeSubmissionTray
         onClose: => @gridSupport.helper.focus()
         showContentComingSoon: !@options.new_gradebook_development_enabled
+        student:
+          name: student.name,
+          avatarUrl: htmlDecode(student.avatar_url)
       renderComponent(SubmissionTray, mountPoint, props)
 
     updateRowAndRenderSubmissionTray: (studentId) =>
       @updateRowCellsForStudentIds([studentId])
-      @renderSubmissionTray()
+      @renderSubmissionTray(@student(studentId))
 
     toggleSubmissionTrayOpen: (studentId, assignmentId) =>
       @setSubmissionTrayState(!@getSubmissionTrayState().open, studentId, assignmentId)

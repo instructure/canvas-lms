@@ -843,6 +843,24 @@ $gradebook_checkbox_size: 16px;
 .SubmissionTray__Container {
   padding: 1.5rem;
   width: 18.75rem;
+  font-size: 1.2rem;
+}
+
+#SubmissionTray__Content {
+  display: flex;
+  flex-direction: column;
+}
+
+#SubmissionTray__Avatar {
+  min-height: 2rem;
+  padding: 0.7rem;
+  text-align: center;
+  font-size: 1.375rem;
+}
+
+#SubmissionTray__StudentName {
+  text-align: center;
+  padding: 0.7rem;
 }
 
 .SubmissionCell__IconExpand {

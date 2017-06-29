@@ -26,9 +26,20 @@ QUnit.module('SubmissionTray', {
       onRequestClose () {},
       onClose () {},
       showContentComingSoon: false,
-      isOpen: true
+      isOpen: true,
+      student: {
+        name: 'Jane Doe'
+      }
     };
     return mount(<SubmissionTray {...defaultProps} {...props} />);
+  },
+
+  avatarDiv () {
+    return document.querySelector('#SubmissionTray__Avatar');
+  },
+
+  studentNameDiv () {
+    return document.querySelector('#SubmissionTray__StudentName');
   },
 
   teardown () {
@@ -46,7 +57,19 @@ test('shows "Content Coming Soon" content if showContentComingSoon is true', fun
   server.restore();
 });
 
-test('does not show "Content Coming Soon" content if showContentComingSoon is false', function () {
-  this.wrapper = this.mountComponent();
-  notOk(document.querySelector('.ComingSoonContent__Container'));
+test('shows avatar if showContentComingSoon is false and avatar is not null', function () {
+  const avatarUrl = 'http://bob_is_not_a_domain/me.jpg?filter=make_me_pretty';
+  this.wrapper = this.mountComponent({ student: { name: 'Bob', avatarUrl } });
+  const avatarBackground = this.avatarDiv().firstChild.style.getPropertyValue('background-image');
+  strictEqual(avatarBackground, `url("${avatarUrl}")`);
+});
+
+test('shows no avatar if showContentComingSoon is false and avatar is null', function () {
+  this.wrapper = this.mountComponent({ student: { name: 'Joe' } });
+  notOk(this.avatarDiv());
+});
+
+test('shows name if showContentComingSoon is false', function () {
+  this.wrapper = this.mountComponent({ student: { name: 'Sara' } });
+  strictEqual(this.studentNameDiv().innerHTML, 'Sara');
 });

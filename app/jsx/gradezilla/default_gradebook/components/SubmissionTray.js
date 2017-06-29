@@ -17,12 +17,37 @@
  */
 
 import React from 'react';
-import { bool, func } from 'prop-types';
+import { bool, func, shape, string } from 'prop-types';
 import ComingSoonContent from 'jsx/gradezilla/default_gradebook/components/ComingSoonContent';
 import Tray from 'instructure-ui/lib/components/Tray';
+import Avatar from 'instructure-ui/lib/components/Avatar';
 import I18n from 'i18n!gradebook';
 
+function renderAvatar (name, avatarUrl) {
+  return (
+    <div id="SubmissionTray__Avatar">
+      <Avatar name={name} src={avatarUrl} size="auto" />
+    </div>
+  );
+}
+
+function renderTrayContent (comingSoon, name, avatarUrl) {
+  if (comingSoon) {
+    return (<ComingSoonContent />);
+  }
+  return (
+    <div id="SubmissionTray__Content">
+      {avatarUrl && renderAvatar(name, avatarUrl)}
+      <div id="SubmissionTray__StudentName">
+        {name}
+      </div>
+    </div>
+  );
+}
+
 export default function SubmissionTray (props) {
+  const comingSoon = props.showContentComingSoon;
+  const { name, avatarUrl } = props.student;
   return (
     <Tray
       label={I18n.t('Submission tray')}
@@ -35,7 +60,7 @@ export default function SubmissionTray (props) {
       onClose={props.onClose}
     >
       <div className="SubmissionTray__Container">
-        {props.showContentComingSoon && <ComingSoonContent />}
+        {renderTrayContent(comingSoon, name, avatarUrl)}
       </div>
     </Tray>
   );
@@ -45,5 +70,9 @@ SubmissionTray.propTypes = {
   onRequestClose: func.isRequired,
   onClose: func.isRequired,
   showContentComingSoon: bool.isRequired,
-  isOpen: bool.isRequired
+  isOpen: bool.isRequired,
+  student: shape({
+    name: string.isRequired,
+    avatarUrl: string
+  }).isRequired
 };

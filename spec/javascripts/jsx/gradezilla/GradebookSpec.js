@@ -7513,13 +7513,15 @@ QUnit.module('Gradebook#renderSubmissionTray', {
 });
 
 test('shows a submission tray on the page when rendering an open tray', function () {
+  const student = { name: 'Jane Doe' };
   this.gradebook.setSubmissionTrayState(true, '1', '2');
-  this.gradebook.renderSubmissionTray();
+  this.gradebook.renderSubmissionTray(student);
   ok(document.querySelector('div[aria-label="Submission tray"]'));
 });
 
 test('does not show a submission tray on the page when rendering a closed tray', function () {
-  this.gradebook.renderSubmissionTray();
+  const student = { name: 'Jane Doe' };
+  this.gradebook.renderSubmissionTray(student);
   notOk(document.querySelector('div[aria-label="Submission tray"]'));
 });
 
