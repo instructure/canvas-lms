@@ -1407,9 +1407,9 @@ caniuse-lite@^1.0.30000670:
   version "1.0.30000671"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000671.tgz#c206c2f1a1feb34de46064407c4356818389bf1e"
 
-canvas-planner@1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/canvas-planner/-/canvas-planner-1.0.2.tgz#a417945d5cb2eed9a8b6972c6747e19b1480aa87"
+canvas-planner@1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/canvas-planner/-/canvas-planner-1.0.3.tgz#89886013124a86e92078de2f88fc9e14ab54087a"
   dependencies:
     axios "^0.16.0"
     babel-plugin-inline-react-svg "^0.4.0"
@@ -6431,14 +6431,14 @@ prop-types@15.5.8:
   dependencies:
     fbjs "^0.8.9"
 
-prop-types@15.5.9, prop-types@^15.5.8:
+prop-types@15.5.9, prop-types@^15.5.6, prop-types@^15.5.8:
   version "15.5.9"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.5.9.tgz#d478eef0e761396942f70c78e772f76e8be747c9"
   dependencies:
     fbjs "^0.8.9"
     loose-envify "^1.3.1"
 
-prop-types@^15.0.0, prop-types@^15.5.10, prop-types@^15.5.6:
+prop-types@^15.0.0, prop-types@^15.5.10:
   version "15.5.10"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.5.10.tgz#2797dfc3126182e3a95e3dfbb2e893ddd7456154"
   dependencies:
@@ -6896,7 +6896,7 @@ redux-thunk@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/redux-thunk/-/redux-thunk-2.2.0.tgz#e615a16e16b47a19a515766133d1e3e99b7852e5"
 
-redux@3.5.2, redux@~3.5.2:
+redux@3.5.2, redux@^3.2.0, redux@~3.5.2:
   version "3.5.2"
   resolved "https://registry.yarnpkg.com/redux/-/redux-3.5.2.tgz#4533745e970b647ec26066a83aa30e9e26faf843"
   dependencies:
@@ -6905,7 +6905,7 @@ redux@3.5.2, redux@~3.5.2:
     loose-envify "^1.1.0"
     symbol-observable "^0.2.3"
 
-redux@^3.2.0, redux@^3.6.0:
+redux@^3.6.0:
   version "3.6.0"
   resolved "https://registry.yarnpkg.com/redux/-/redux-3.6.0.tgz#887c2b3d0b9bd86eca2be70571c27654c19e188d"
   dependencies:
