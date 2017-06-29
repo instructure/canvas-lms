@@ -3,16 +3,16 @@
 
   <div class="dropdown-menu" role="radiogroup">
     <input type="radio" name="permission-for-{{cid}}" value="0" role="radio" id="button-{{cid}}-0" {{#if enableChecked }}checked="checked"{{/if}} >
-    <label tabindex="0" for="button-{{cid}}-0"><i class="icon-check"></i></i><span class="text">{{#t "rolebutton.enable"}}Enable{{/t}}</span></label>
+    <label tabindex="0" for="button-{{cid}}-0"><i class="icon-check icon-Solid" aria-hidden="true"></i><span class="text">{{#t "rolebutton.enable"}}Enable{{/t}}</span></label>
 
     <input type="radio" name="permission-for-{{cid}}" value="0" role="radio" id="button-{{cid}}-1" {{#if enableAndLockChecked }}checked="checked"{{/if}}>
-    <label tabindex=1 for="button-{{cid}}-1"><i class="icon-check"></i><i class="icon-lock"></i><span class="text">{{#t "rolebutton.enable_and_lock"}}Enable and Lock{{/t}}</span></label>
+    <label tabindex=1 for="button-{{cid}}-1"><i class="icon-check icon-Solid" aria-hidden="true"></i><i class="icon-lock icon-Solid" aria-hidden="true"></i><span class="text">{{#t "rolebutton.enable_and_lock"}}Enable and Lock{{/t}}</span></label>
 
     <input type="radio" name="permission-for-{{cid}}" value="0" role="radio" id="button-{{cid}}-2" {{#if disableChecked }}checked="checked"{{/if}}>
-    <label tabindex=2 for="button-{{cid}}-2"><i class="icon-x"></i><span class="text">{{#t "rolebutton.disable"}}Disable{{/t}}</span></label>
+    <label tabindex=2 for="button-{{cid}}-2"><i class="icon-x icon-Solid" aria-hidden="true"></i><span class="text">{{#t "rolebutton.disable"}}Disable{{/t}}</span></label>
 
     <input type="radio" name="permission-for-{{cid}}" value="0" role="radio" id="button-{{cid}}-3" {{#if disableAndLockChecked }}checked="checked"{{/if}}>
-    <label tabindex=3 for="button-{{cid}}-3"><i class="icon-x"></i><i class="icon-lock"></i><span class="text">{{#t "rolebutton.disable_and_lock"}}Disable and Lock{{/t}}</span></label>
+    <label tabindex=3 for="button-{{cid}}-3"><i class="icon-x icon-Solid" aria-hidden="true"></i><i class="icon-lock icon-Solid" aria-hidden="true"></i><span class="text">{{#t "rolebutton.disable_and_lock"}}Disable and Lock{{/t}}</span></label>
     <li class="divider"></li>
 
     <input type="radio" name="permission-for-{{cid}}" value="0" role="radio" id="button-{{cid}}-4" {{#if systemDefaultChecked }}checked="checked"{{/if}}>
