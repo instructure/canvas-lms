@@ -183,7 +183,7 @@ define [
 
     renderWillUnlock: () ->
       @renderState
-        hint:        I18n.t 'UnLock'
+        hint:        I18n.t 'Unlock'
         label:       @lockedText
         buttonClass: "#{@unlockedClass} #{@disabledClass}"
         iconClass:   'icon-blueprint'
