@@ -209,9 +209,10 @@ describe "Gradezilla" do
 
     it 'pressing "m" closes the assignment group header menu if it is open' do
       Gradezilla.assignment_group_header_options_element(@group.name).click
-      driver.action.send_keys(:escape).perform
+      f(Gradezilla.expanded_popover_menu_selector).send_keys(:escape)
+      expect(Gradezilla.body).not_to contain_css(Gradezilla.expanded_popover_menu_selector)
       driver.action.send_keys('m').perform
-      driver.action.send_keys('m').perform
+      f(Gradezilla.expanded_popover_menu_selector).send_keys('m')
 
       expect(Gradezilla.body).not_to contain_css(Gradezilla.expanded_popover_menu_selector)
     end
