@@ -1314,7 +1314,7 @@ describe AssignmentsApiController, type: :request do
       )
 
       message_handler = Lti::MessageHandler.create(
-        message_type: 'message_type',
+        message_type: 'basic-lti-launch-request',
         launch_path: 'https://samplelaunch/blti',
         resource_handler: resource_handler
       )
@@ -1361,7 +1361,7 @@ describe AssignmentsApiController, type: :request do
       )
 
       message_handler = Lti::MessageHandler.create(
-        message_type: 'message_type',
+        message_type: 'basic-lti-launch-request',
         launch_path: 'https://samplelaunch/blti',
         resource_handler: resource_handler
       )

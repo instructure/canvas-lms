@@ -335,6 +335,21 @@ module Lti
       end
     end
 
+    describe '#resource_codes' do
+      include_context 'lti2_spec_helper'
+
+      let(:expected_hash) do
+        {
+          product_code: product_family.product_code,
+          vendor_code: product_family.vendor_code
+        }
+      end
+
+      it 'returns a hash with the product and vendor codes' do
+        expect(tool_proxy.resource_codes).to eq expected_hash
+      end
+    end
+
     describe "#matching_tool_profile?" do
       include_context 'lti2_spec_helper'
 

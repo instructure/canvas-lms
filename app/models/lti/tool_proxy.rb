@@ -113,5 +113,12 @@ module Lti
 
       true
     end
+
+    def resource_codes
+      {
+        product_code: product_family.product_code,
+        vendor_code: product_family.vendor_code
+      }
+    end
   end
 end

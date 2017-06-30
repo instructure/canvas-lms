@@ -211,6 +211,29 @@ describe Assignment do
     end
   end
 
+  describe '#tool_settings_resource_codes' do
+    let(:expected_hash) do
+      {
+        product_code: product_family.product_code,
+        vendor_code: product_family.vendor_code,
+        resource_type_code: resource_handler.resource_type_code
+      }
+    end
+
+    let(:assignment) { Assignment.create!(name: 'assignment with tool settings', context: course) }
+
+    before do
+      allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:create_subscription) { SecureRandom.uuid }
+      allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:destroy_subscription) { {} }
+    end
+
+    it 'returns a hash of three identifying lti codes' do
+      assignment.tool_settings_tool = message_handler
+      assignment.save!
+      expect(assignment.tool_settings_resource_codes).to eq expected_hash
+    end
+  end
+
   describe '#tool_settings_tool=' do
     let(:stub_response){ double(code: 200, body: {}.to_json, parsed_response: {'Id' => 'test-id'}, ok?: true) }
     let(:subscription_helper){ class_double(Lti::AssignmentSubscriptionsHelper).as_stubbed_const }
@@ -228,45 +251,10 @@ describe Assignment do
       expect(@assignment.tool_settings_tool).to eq(tool)
     end
 
-    it "should have Lti::MessageHandler through polymorphic association" do
-      setup_assignment_with_homework
-      account = @assignment.context.account
-      product_family = Lti::ProductFamily.create(
-        vendor_code: '123',
-        product_code: 'abc',
-        vendor_name: 'acme',
-        root_account: account
-      )
-      tool_proxy = Lti::ToolProxy.create!(
-        context: account,
-        guid: SecureRandom.uuid,
-        shared_secret: 'abc',
-        product_family: product_family,
-        product_version: '1',
-        workflow_state: 'disabled',
-        raw_data: {'proxy' => 'value'},
-        lti_version: '1'
-      )
-      resource_handler = Lti::ResourceHandler.create(
-        resource_type_code: 'code',
-        name: 'resource name',
-        tool_proxy: tool_proxy
-      )
-      message_handler = Lti::MessageHandler.create(
-        message_type: 'message_type',
-        launch_path: 'https://samplelaunch/blti',
-        resource_handler: resource_handler,
-        tool_proxy: tool_proxy
-      )
-
-      @assignment.tool_settings_tool = message_handler
-      @assignment.save
-      expect(@assignment.tool_settings_tool).to eq(message_handler)
-    end
-
     it 'destroys subscriptions when they exist' do
       setup_assignment_with_homework
       expect(subscription_helper_instance).to receive(:destroy_subscription)
+      course.assignments << @assignment
       @assignment.tool_settings_tool = message_handler
       @assignment.save!
       @assignment.tool_settings_tool = nil

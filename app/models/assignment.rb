@@ -70,7 +70,6 @@ class Assignment < ActiveRecord::Base
 
   has_many :assignment_configuration_tool_lookups, dependent: :delete_all
   has_many :tool_settings_context_external_tools, through: :assignment_configuration_tool_lookups, source: :tool, source_type: 'ContextExternalTool'
-  has_many :tool_settings_tool_proxies, through: :assignment_configuration_tool_lookups, source: :tool, source_type: 'Lti::MessageHandler'
 
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :inverse_of => :context, :dependent => :destroy
   validates_associated :external_tool_tag, :if => :external_tool?
@@ -1391,6 +1390,12 @@ class Assignment < ActiveRecord::Base
     submissions.compact
   end
 
+  def tool_settings_resource_codes
+    lookup = assignment_configuration_tool_lookups.first
+    return {} unless lookup.present?
+    lookup.resource_codes
+  end
+
   def tool_settings_tool
     self.tool_settings_tools.first
   end
@@ -1399,18 +1404,25 @@ class Assignment < ActiveRecord::Base
     self.tool_settings_tools = [tool] if tool_settings_tool != tool
   end
 
+  def clear_tool_settings_tools
+    assignment_configuration_tool_lookups.where(tool_type: 'Lti::MessageHandler').each(&:destroy_subscription)
+    assignment_configuration_tool_lookups.clear
+  end
+  private :clear_tool_settings_tools
+
   def tool_settings_tools=(tools)
-    lookup = AssignmentConfigurationToolLookup.find_by(tool: tool_settings_tool, assignment: self)
-    lookup&.destroy_subscription
-
-    tool_settings_context_external_tools.clear
-    tool_settings_tool_proxies.clear
-
+    clear_tool_settings_tools
     tools.each do |t|
       if t.instance_of? ContextExternalTool
         tool_settings_context_external_tools << t
       elsif t.instance_of? Lti::MessageHandler
-        tool_settings_tool_proxies << t
+        product_family = t.resource_handler.tool_proxy.product_family
+        assignment_configuration_tool_lookups.new(
+          tool_vendor_code: product_family.vendor_code,
+          tool_product_code: product_family.product_code,
+          tool_resource_type_code: t.resource_handler.resource_type_code,
+          tool_type: 'Lti::MessageHandler'
+        )
       end
     end
     tools
@@ -1418,9 +1430,14 @@ class Assignment < ActiveRecord::Base
   protected :tool_settings_tools=
 
   def tool_settings_tools
-    tool_settings_context_external_tools + tool_settings_tool_proxies
+    tool_settings_context_external_tools + tool_settings_message_handlers
   end
   protected :tool_settings_tools
+
+  def tool_settings_message_handlers
+    assignment_configuration_tool_lookups.where(tool_type: 'Lti::MessageHandler').map(&:lti_tool)
+  end
+  private :tool_settings_message_handlers
 
   def save_grade_to_submission(submission, original_student, group, opts)
     unless submission.grader_can_grade?

@@ -34,6 +34,15 @@ module Lti
 
     let(:student) { course_with_student(active_all: true, course: course); @user }
 
+    let(:aud) { host }
+
+    let(:other_tool_proxy) do
+      tp = tool_proxy.dup
+      tp.update_attributes(guid: other_tp_guid)
+      tp
+    end
+
+    let(:other_tp_guid) { SecureRandom.uuid }
 
     before do
       mock_sub_helper = instance_double("Lti::AssignmentSubscriptionsHelper",
@@ -72,6 +81,17 @@ module Lti
         tool_proxy_binding.save!
         get endpoint, {}, request_headers
         expect(response.code).to eq '401'
+      end
+
+      it "allows tool proxies with matching access" do
+        tool_proxy.raw_data['tool_profile'] = tool_profile
+        tool_proxy.raw_data['security_contract'] = security_contract
+        tool_proxy.save!
+        token = Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: other_tool_proxy.guid)
+        other_helpers = {Authorization: "Bearer #{token}"}
+        allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).and_return(true)
+        get endpoint, {}, other_helpers
+        expect(response).not_to be '401'
       end
 
     end

@@ -25,13 +25,16 @@ module Lti
 
     include_context 'lti2_api_spec_helper'
     let(:service_name) { OriginalityReportsApiController::ORIGINALITY_REPORT_SERVICE }
+    let(:aud) { host }
     before :each do
       attachment_model
-
       message_handler.update_attributes(message_type: 'basic-lti-launch-request')
       course_factory(active_all: true)
       student_in_course active_all: true
       teacher_in_course active_all: true
+
+      allow_any_instance_of(AssignmentSubscriptionsHelper).to receive(:create_subscription) { SecureRandom.uuid }
+      allow_any_instance_of(AssignmentSubscriptionsHelper).to receive(:destroy_subscription) { {} }
 
       @tool = @course.context_external_tools.create(name: "a",
                                                     domain: "google.com",
@@ -43,8 +46,6 @@ module Lti
                                                 assignment_group: @group,
                                                 points_possible: 12,
                                                 tool_settings_tool: @tool)
-
-      AssignmentConfigurationToolLookup.any_instance.stubs(:create_subscription).returns true
 
       @assignment.tool_settings_tool = message_handler
       @assignment.save!
@@ -76,6 +77,7 @@ module Lti
         }
         @report = OriginalityReport.create!(report_initial_values)
         @endpoints[:show] = "/api/lti/assignments/#{@assignment.id}/submissions/#{@submission.id}/originality_report/#{@report.id}"
+        @assignment.course.update_attributes(account: tool_proxy.context)
       end
 
       it "requires an lti access token" do
@@ -84,14 +86,27 @@ module Lti
       end
 
       it "requires the tool proxy to be associated to the assignment" do
-        @assignment.tool_settings_tool_proxies.clear
+        @assignment.tool_settings_tool = nil
         @assignment.save!
         get @endpoints[:show], {}, request_headers
         expect(response.code).to eq '401'
       end
 
-      it "returns an originality report in the response" do
+      it "allows tool proxies with matching access" do
+        @assignment.tool_settings_tool = message_handler
+        @assignment.save!
 
+        new_tool_proxy = tool_proxy.deep_clone
+        new_tool_proxy.update_attributes(guid: SecureRandom.uuid)
+
+        token = Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: new_tool_proxy.guid)
+        other_helpers = {Authorization: "Bearer #{token}"}
+        allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).and_return(true)
+        get @endpoints[:show], {}, other_helpers
+        expect(response.code).to eq '200'
+      end
+
+      it "returns an originality report in the response" do
         expected_keys = [
           'id',
           'file_id',
@@ -169,10 +184,11 @@ module Lti
         }
         @report = OriginalityReport.create!(report_initial_values)
         @endpoints[:update] = "/api/lti/assignments/#{@assignment.id}/submissions/#{@submission.id}/originality_report/#{@report.id}"
+        @assignment.course.update_attributes(account: account)
       end
 
       it "requires the tool proxy to be associated to the assignment" do
-        @assignment.tool_settings_tool_proxies.clear
+        @assignment.tool_settings_tool = nil
         @assignment.save!
         put @endpoints[:update], {originality_report: {originality_report_lti_url: "http://www.lti-test.com"}}, request_headers
         expect(response.code).to eq '401'
@@ -344,6 +360,10 @@ module Lti
     end
 
     describe "POST assignments/:assignment_id/submissions/:submission_id/originality_report (#create)" do
+      before do
+        @assignment.course.update_attributes(account: account)
+      end
+
       it "creates an originality report when provided required params" do
         score = 0.25
         post @endpoints[:create], {originality_report: {file_id: @attachment.id, originality_score: score}}, request_headers
@@ -399,7 +419,7 @@ module Lti
       end
 
       it "requires the tool proxy to be associated to the assignment" do
-        @assignment.tool_settings_tool_proxies.clear
+        @assignment.tool_settings_tool = nil
         @assignment.save!
         post @endpoints[:create], {originality_report: {file_id: @attachment.id, originality_score: 0.4}}, request_headers
         expect(response.code).to eq '401'

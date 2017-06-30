@@ -65,8 +65,10 @@ module Lti
     end
 
     def delete_subscriptions_for(tool_proxy)
+      product_family = tool_proxy.product_family
       subscription_helper = AssignmentSubscriptionsHelper.new(tool_proxy)
-      lookups = AssignmentConfigurationToolLookup.where(tool: tool_proxy.message_handlers)
+      lookups = AssignmentConfigurationToolLookup.where(tool_product_code: product_family.product_code,
+                                                        tool_vendor_code: product_family.vendor_code)
       lookups.each { |l| subscription_helper.send_later(:destroy_subscription, l.subscription_id) }
     end
 

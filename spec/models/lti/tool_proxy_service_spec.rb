@@ -308,11 +308,7 @@ module Lti
     end
 
     describe '#delete_subscriptions' do
-      let(:course) do
-        course_with_student_submissions(active_all: true)
-        @course
-      end
-      let(:assignment) { course.assignments.first }
+      let(:assignment) { course.assignments.create!(name: 'banana') }
       let(:assignment_two) do
         assignment_two = assignment.dup
         assignment_two.update_attributes(lti_context_id: SecureRandom.uuid)
