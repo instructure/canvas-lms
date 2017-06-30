@@ -57,10 +57,10 @@ describe AddressBook::Empty do
     end
   end
 
-  describe "count_in_context" do
-    it "returns zero" do
+  describe "count_in_contexts" do
+    it "returns empty hash" do
       course = course_factory(active_all: true)
-      expect(@address_book.count_in_context(course.asset_string)).to eql(0)
+      expect(@address_book.count_in_contexts([course.asset_string])).to eql({})
     end
   end
 

@@ -90,8 +90,8 @@ module AddressBook
       raise NotImplemented
     end
 
-    # counts the known users in the given context
-    def count_in_context(context)
+    # counts the known users in each of the given contexts
+    def count_in_contexts(contexts)
       raise NotImplemented
     end
 

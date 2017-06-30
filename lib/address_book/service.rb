@@ -67,8 +67,8 @@ module AddressBook
       users
     end
 
-    def count_in_context(context)
-      Services::AddressBook.count_in_context(@sender, context, @ignore_result)
+    def count_in_contexts(contexts)
+      Services::AddressBook.count_in_contexts(@sender, contexts, @ignore_result)
     end
 
     class Bookmarker
