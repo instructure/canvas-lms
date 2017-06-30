@@ -660,7 +660,7 @@ class Gradezilla
     end
 
     def click_assignment_popover_sort_by(sort_type)
-      assignment_header_menu_sort_by_element.click
+      hover(assignment_header_menu_sort_by_element)
       sort_by_item = ""
 
       if sort_type =~ /(low[\s\-]to[\s\-]high)/i
