@@ -1416,3 +1416,4 @@ module ConnectionLeaseLogging
     super
   end
 end
+ActiveRecord::ConnectionAdapters::AbstractAdapter.prepend(ConnectionLeaseLogging)
