@@ -3809,9 +3809,8 @@ describe AssignmentsApiController, type: :request do
          "late" => false,
          "missing" => false,
          "late_policy_status" => nil,
-         "accepted_at" => nil,
          "points_deducted" => nil,
-         "duration_late" => 0.0,
+         "seconds_late" => 0.0,
          "preview_url" =>
          "http://www.example.com/courses/#{@observer_course.id}/assignments/#{@assignment.id}/submissions/#{@observed_student.id}?preview=1&version=0"
        }]
@@ -3844,9 +3843,8 @@ describe AssignmentsApiController, type: :request do
          "late" => false,
          "missing" => false,
          "late_policy_status" => nil,
-         "accepted_at" => nil,
          "points_deducted" => nil,
-         "duration_late" => 0.0,
+         "seconds_late" => 0.0,
          "preview_url" =>
          "http://www.example.com/courses/#{@observer_course.id}/assignments/#{@assignment.id}/submissions/#{@observed_student.id}?preview=1&version=0"
        }]
