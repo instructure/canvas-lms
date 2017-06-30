@@ -1353,7 +1353,7 @@ class Submission < ActiveRecord::Base
 
   def late_points_deducted(raw_score, late_policy, points_possible)
     return 0 unless late_policy && points_possible && late?
-    late_policy.points_deducted(score: raw_score, possible: points_possible, late_for: duration_late)
+    late_policy.points_deducted(score: raw_score, possible: points_possible, late_for: seconds_late)
   end
   private :late_points_deducted
 
@@ -2012,7 +2012,7 @@ class Submission < ActiveRecord::Base
   #
   module Tardiness
     def past_due?
-      duration_late > 0
+      seconds_late > 0
     end
     alias past_due past_due?
 
@@ -2035,7 +2035,7 @@ class Submission < ActiveRecord::Base
       excused || (!!score && workflow_state == 'graded')
     end
 
-    def duration_late
+    def seconds_late
       # the submission cannot be late if it's been marked with 'none' or 'missing'
       return 0.0 if ['none', 'missing'].include?(late_policy_status)
       return 0.0 if cached_due_date.nil? || time_of_submission <= cached_due_date
