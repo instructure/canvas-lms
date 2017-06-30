@@ -324,19 +324,6 @@ describe AddressBook::Service do
     end
   end
 
-  describe "count_in_context" do
-    before do
-      @course = course_model
-      allow(Services::AddressBook).to receive(:count_in_context).
-        with(@sender, @course.global_asset_string, false).
-        and_return(3)
-    end
-
-    it "returns count from service" do
-      expect(@address_book.count_in_context(@course.asset_string)).to eql(3)
-    end
-  end
-
   describe "search_users" do
     def stub_search_users(args, compact_returns={})
       args << false # ignore_result
