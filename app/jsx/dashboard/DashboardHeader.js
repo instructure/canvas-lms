@@ -78,10 +78,15 @@ class DashboardHeader extends React.Component {
 }
 
 DashboardHeader.propTypes = {
-  recent_activity_dashboard: bool.isRequired,
-  hide_dashcard_color_overlays: bool.isRequired,
+  recent_activity_dashboard: bool,
+  hide_dashcard_color_overlays: bool,
   planner_enabled: bool.isRequired,
   planner_selected: bool.isRequired
+}
+
+DashboardHeader.defaultProps = {
+  recent_activity_dashboard: false,
+  hide_dashcard_color_overlays: false
 }
 
 export default DashboardHeader;
