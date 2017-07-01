@@ -30,7 +30,6 @@ define [
   'vendor/slickgrid'
   'compiled/api/gradingPeriodsApi'
   'compiled/api/gradingPeriodSetsApi'
-  'compiled/util/round'
   'compiled/views/InputFilterView'
   'i18nObj'
   'i18n!gradezilla'
@@ -80,7 +79,6 @@ define [
   'jsx/gradezilla/SubmissionStateMap'
   'jsx/gradezilla/shared/DownloadSubmissionsDialogManager'
   'jsx/gradezilla/shared/ReuploadSubmissionsDialogManager'
-  'jst/gradezilla/group_total_cell'
   'compiled/gradezilla/GradebookKeyboardNav'
   'jsx/gradezilla/shared/AssignmentMuterDialogManager'
   'jsx/gradezilla/shared/helpers/assignmentHelper'
@@ -101,7 +99,7 @@ define [
   'compiled/jquery/fixDialogButtons'
   'jsx/context_cards/StudentContextCardTrigger'
 ], ($, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
-  GradingPeriodsApi, GradingPeriodSetsApi, round, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS,
+  GradingPeriodsApi, GradingPeriodSetsApi, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS,
   CourseGradeCalculator, EffectiveDueDates, GradeFormatHelper, UserSettings, Spinner, AssignmentMuter,
   AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
   SubmissionCell, NumberCompare, natcompare, ConvertCase, htmlEscape, SetDefaultGradeDialogManager,
@@ -111,7 +109,7 @@ define [
   TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, AssignmentGroupFilter, GradingPeriodFilter, ModuleFilter, SectionFilter,
   GridColor, StatusesModal, SubmissionTray, GradebookSettingsModal, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp,
   SubmissionStateMap,
-  DownloadSubmissionsDialogManager,ReuploadSubmissionsDialogManager, GroupTotalCellTemplate, GradebookKeyboardNav,
+  DownloadSubmissionsDialogManager,ReuploadSubmissionsDialogManager, GradebookKeyboardNav,
   AssignmentMuterDialogManager, assignmentHelper, { default: Button }, { default: IconSettingsSolid }) ->
 
   isAdmin = =>
@@ -925,24 +923,6 @@ define [
     lockedAndHiddenGradeCellFormatter: (row, col) ->
       "<div class='cell-content gradebook-cell grayed-out cannot_edit'></div>"
 
-    groupTotalFormatter: (row, col, val, columnDef, student) =>
-      return '' unless val?
-
-      percentage = @calculateAndRoundGroupTotalScore val.score, val.possible
-      percentage = 0 unless isFinite(percentage)
-      possible = round(val.possible, round.DEFAULT)
-      possible = if possible then I18n.n(possible) else possible
-
-      templateOpts =
-        score: I18n.n(round(val.score, round.DEFAULT))
-        possible: possible
-        percentage: I18n.n(round(percentage, round.DEFAULT), percentage: true)
-      GroupTotalCellTemplate templateOpts
-
-    calculateAndRoundGroupTotalScore: (score, possible_points) ->
-      grade = (score / possible_points) * 100
-      round(grade, round.DEFAULT)
-
     submissionsForStudent: (student) =>
       allSubmissions = (value for key, value of student when key.match /^assignment_(?!group)/)
       return allSubmissions unless @gradingPeriodSet?
@@ -1593,7 +1573,6 @@ define [
         {
           id: columnId
           field: fieldName
-          formatter: @groupTotalFormatter
           name: group.name
           toolTip: group.name
           object: group

@@ -17,10 +17,12 @@
  */
 
 import { createGradebook } from 'spec/jsx/gradezilla/default_gradebook/GradebookSpecHelper';
+import AssignmentGroupCellFormatter from 'jsx/gradezilla/default_gradebook/slick-grid/formatters/AssignmentGroupCellFormatter';
 
-QUnit.module('Assignment Group Cell Formatter', function (hooks) {
+QUnit.module('AssignmentGroupCellFormatter', function (hooks) {
   let $fixture;
   let gradebook;
+  let formatter;
   let grade;
 
   hooks.beforeEach(function () {
@@ -28,6 +30,7 @@ QUnit.module('Assignment Group Cell Formatter', function (hooks) {
     document.body.appendChild($fixture);
 
     gradebook = createGradebook();
+    formatter = new AssignmentGroupCellFormatter(gradebook);
 
     grade = { score: 8, possible: 10 };
   });
@@ -37,24 +40,24 @@ QUnit.module('Assignment Group Cell Formatter', function (hooks) {
   });
 
   function renderCell () {
-    $fixture.innerHTML = gradebook.groupTotalFormatter(
+    $fixture.innerHTML = formatter.render(
       0, // row
       0, // cell
       grade, // value
-      { type: 'assignment_group' }, // column definition
+      null, // column definition
       null // dataContext
     );
     return $fixture;
   }
 
-  QUnit.module('with no grade');
+  QUnit.module('#render with no grade');
 
   test('renders no content', function () {
     grade = null;
     strictEqual(renderCell().innerHTML, '');
   });
 
-  QUnit.module('with a grade');
+  QUnit.module('#render with a grade');
 
   test('renders the percentage of the grade', function () {
     equal(renderCell().querySelector('.percentage').innerHTML.trim(), '80%');
