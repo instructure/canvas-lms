@@ -6664,7 +6664,7 @@ QUnit.module('Gradebook#updateCurrentGradingPeriod', {
     this.stub(this.gradebook, 'saveSettings');
     this.stub(this.gradebook, 'resetGrading');
     this.stub(this.gradebook, 'sortGridRows');
-    this.stub(this.gradebook, 'setAssignmentWarnings');
+    this.stub(this.gradebook, 'updateFilteredContentInfo');
     this.stub(this.gradebook, 'updateColumnsAndRenderViewOptionsMenu');
   }
 });
@@ -6696,7 +6696,7 @@ test('sorts grid grows after resetting grading', function () {
 });
 
 test('sets assignment warnings after resetting grading', function () {
-  this.gradebook.setAssignmentWarnings.callsFake(() => {
+  this.gradebook.updateFilteredContentInfo.callsFake(() => {
     strictEqual(this.gradebook.resetGrading.callCount, 1, 'grading was already reset');
   });
   this.gradebook.updateCurrentGradingPeriod('1401');
@@ -6704,7 +6704,7 @@ test('sets assignment warnings after resetting grading', function () {
 
 test('updates columns and menus after settings assignment warnings', function () {
   this.gradebook.updateColumnsAndRenderViewOptionsMenu.callsFake(() => {
-    strictEqual(this.gradebook.setAssignmentWarnings.callCount, 1, 'assignment warnings were already set');
+    strictEqual(this.gradebook.updateFilteredContentInfo.callCount, 1, 'assignment warnings were already set');
   });
   this.gradebook.updateCurrentGradingPeriod('1401');
 });
@@ -6713,7 +6713,7 @@ test('has no effect when the grading period has not changed', function () {
   this.gradebook.updateCurrentGradingPeriod('1402');
   strictEqual(this.gradebook.saveSettings.callCount, 0, 'saveSettings was not called');
   strictEqual(this.gradebook.resetGrading.callCount, 0, 'resetGrading was not called');
-  strictEqual(this.gradebook.setAssignmentWarnings.callCount, 0, 'setAssignmentVisibility was not called');
+  strictEqual(this.gradebook.updateFilteredContentInfo.callCount, 0, 'setAssignmentVisibility was not called');
   strictEqual(this.gradebook.updateColumnsAndRenderViewOptionsMenu.callCount, 0,
     'updateColumnsAndRenderViewOptionsMenu was not called');
 });
@@ -6729,7 +6729,7 @@ QUnit.module('Gradebook#updateCurrentModule', {
     });
     this.spy(this.gradebook, 'setFilterColumnsBySetting');
     this.stub($, 'ajaxJSON');
-    this.stub(this.gradebook, 'setAssignmentWarnings');
+    this.stub(this.gradebook, 'updateFilteredContentInfo');
     this.stub(this.gradebook, 'updateColumnsAndRenderViewOptionsMenu');
   }
 });
@@ -6758,24 +6758,24 @@ test('sets assignment warnings after updating the filter setting', function () {
   this.gradebook.updateCurrentModule('1');
 
   const settingUpdateCallId = this.gradebook.setFilterColumnsBySetting.getCall(0).callId;
-  const setAssignmentWarningsCallId = this.gradebook.setAssignmentWarnings.getCall(0).callId;
+  const updateFilteredContentInfoCallId = this.gradebook.updateFilteredContentInfo.getCall(0).callId;
 
-  ok(settingUpdateCallId < setAssignmentWarningsCallId, 'grading was reset after setting was updated');
+  ok(settingUpdateCallId < updateFilteredContentInfoCallId, 'grading was reset after setting was updated');
 });
 
 test('updates columns and menus after setting assignment warnings', function () {
   this.gradebook.updateCurrentModule('1');
 
-  const setAssignmentWarningsCallId = this.gradebook.setAssignmentWarnings.getCall(0).callId;
+  const updateFilteredContentInfoCallId = this.gradebook.updateFilteredContentInfo.getCall(0).callId;
   const updateColumnsAndMenusCallId = this.gradebook.updateColumnsAndRenderViewOptionsMenu.getCall(0).callId;
 
-  ok(setAssignmentWarningsCallId < updateColumnsAndMenusCallId, 'columns and menus were updated after setting assignment warnings');
+  ok(updateFilteredContentInfoCallId < updateColumnsAndMenusCallId, 'columns and menus were updated after setting assignment warnings');
 });
 
 test('has no effect when the module has not changed', function () {
   this.gradebook.updateCurrentModule('2');
   strictEqual($.ajaxJSON.callCount, 0, 'saveSettings was not called');
-  strictEqual(this.gradebook.setAssignmentWarnings.callCount, 0, 'setAssignmentVisibility was not called');
+  strictEqual(this.gradebook.updateFilteredContentInfo.callCount, 0, 'setAssignmentVisibility was not called');
   strictEqual(this.gradebook.updateColumnsAndRenderViewOptionsMenu.callCount, 0,
     'updateColumnsAndRenderViewOptionsMenu was not called');
 });
@@ -6791,7 +6791,7 @@ QUnit.module('Gradebook#updateCurrentAssignmentGroup', {
     });
     this.spy(this.gradebook, 'setFilterColumnsBySetting');
     this.stub($, 'ajaxJSON');
-    this.stub(this.gradebook, 'setAssignmentWarnings');
+    this.stub(this.gradebook, 'updateFilteredContentInfo');
     this.stub(this.gradebook, 'updateColumnsAndRenderViewOptionsMenu');
   }
 });
@@ -6820,24 +6820,24 @@ test('sets assignment warnings after updating the filter setting', function () {
   this.gradebook.updateCurrentAssignmentGroup('1');
 
   const settingUpdateCallId = this.gradebook.setFilterColumnsBySetting.getCall(0).callId;
-  const setAssignmentWarningsCallId = this.gradebook.setAssignmentWarnings.getCall(0).callId;
+  const updateFilteredContentInfoCallId = this.gradebook.updateFilteredContentInfo.getCall(0).callId;
 
-  ok(settingUpdateCallId < setAssignmentWarningsCallId, 'grading was reset after setting was updated');
+  ok(settingUpdateCallId < updateFilteredContentInfoCallId, 'grading was reset after setting was updated');
 });
 
 test('updates columns and menus after setting assignment warnings', function () {
   this.gradebook.updateCurrentAssignmentGroup('1');
 
-  const setAssignmentWarningsCallId = this.gradebook.setAssignmentWarnings.getCall(0).callId;
+  const updateFilteredContentInfoCallId = this.gradebook.updateFilteredContentInfo.getCall(0).callId;
   const updateColumnsAndMenusCallId = this.gradebook.updateColumnsAndRenderViewOptionsMenu.getCall(0).callId;
 
-  ok(setAssignmentWarningsCallId < updateColumnsAndMenusCallId, 'columns and menus were updated after setting assignment warnings');
+  ok(updateFilteredContentInfoCallId < updateColumnsAndMenusCallId, 'columns and menus were updated after setting assignment warnings');
 });
 
 test('has no effect when the assignment group has not changed', function () {
   this.gradebook.updateCurrentAssignmentGroup('2');
   strictEqual($.ajaxJSON.callCount, 0, 'saveSettings was not called');
-  strictEqual(this.gradebook.setAssignmentWarnings.callCount, 0, 'setAssignmentVisibility was not called');
+  strictEqual(this.gradebook.updateFilteredContentInfo.callCount, 0, 'setAssignmentVisibility was not called');
   strictEqual(this.gradebook.updateColumnsAndRenderViewOptionsMenu.callCount, 0,
     'updateColumnsAndRenderViewOptionsMenu was not called');
 });

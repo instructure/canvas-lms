@@ -37,7 +37,6 @@ define [
   'compiled/gradezilla/GradebookTranslations'
   'jsx/gradebook/CourseGradeCalculator'
   'jsx/gradebook/EffectiveDueDates'
-  'jsx/gradebook/GradingSchemeHelper'
   'jsx/gradebook/shared/helpers/GradeFormatHelper'
   'compiled/userSettings'
   'spin.js'
@@ -103,7 +102,7 @@ define [
   'jsx/context_cards/StudentContextCardTrigger'
 ], ($, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
   GradingPeriodsApi, GradingPeriodSetsApi, round, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS,
-  CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, GradeFormatHelper, UserSettings, Spinner, AssignmentMuter,
+  CourseGradeCalculator, EffectiveDueDates, GradeFormatHelper, UserSettings, Spinner, AssignmentMuter,
   AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
   SubmissionCell, NumberCompare, natcompare, ConvertCase, htmlEscape, SetDefaultGradeDialogManager,
   CurveGradesDialogManager, GradebookApi, CellEditorFactory, CellFormatterFactory, GridSupport, studentRowHeaderConstants,
@@ -126,6 +125,12 @@ define [
   renderComponent = (reactClass, mountPoint, props = {}, children = null) ->
     component = React.createElement(reactClass, props, children)
     ReactDOM.render(component, mountPoint)
+
+  getAssignmentGroupPointsPossible = (assignmentGroup) ->
+    assignmentGroup.assignments.reduce(
+      (sum, assignment) -> sum + (assignment.points_possible || 0),
+      0
+    )
 
   ## Gradebook Display Settings
   getInitialGridDisplaySettings = (settings, colors) ->
@@ -232,6 +237,10 @@ define [
       @gridDisplaySettings = getInitialGridDisplaySettings(@options.settings, @options.colors)
       @contentLoadStates = getInitialContentLoadStates()
       @headerComponentRefs = {}
+      @filteredContentInfo =
+        invalidAssignmentGroups: []
+        mutedAssignments: []
+        totalPointsPossible: 0
 
       @setAssignments({})
       @setAssignmentGroups({})
@@ -783,7 +792,7 @@ define [
 
     handleAssignmentMutingChange: (assignment) =>
       @renderAssignmentColumnHeader(assignment.id)
-      @setAssignmentWarnings()
+      @updateFilteredContentInfo()
       @buildRows()
 
     handleAssignmentGroupWeightChange: (assignment_group_options) =>
@@ -791,7 +800,7 @@ define [
       for assignment_group in assignment_group_options.assignmentGroups
         column = _.findWhere columns, id: "assignment_group_#{assignment_group.id}"
         @initAssignmentGroupColumnHeader(column)
-      @setAssignmentWarnings()
+      @updateFilteredContentInfo()
       @grid.setColumns(columns)
       # TODO: don't buildRows?
       @buildRows()
@@ -924,19 +933,10 @@ define [
       possible = round(val.possible, round.DEFAULT)
       possible = if possible then I18n.n(possible) else possible
 
-      if val.possible and @options.grading_standard and columnDef.type is 'total_grade'
-        letterGrade = GradingSchemeHelper.scoreToGrade(percentage, @options.grading_standard)
-
       templateOpts =
         score: I18n.n(round(val.score, round.DEFAULT))
         possible: possible
-        letterGrade: letterGrade
         percentage: I18n.n(round(percentage, round.DEFAULT), percentage: true)
-      if columnDef.type == 'total_grade'
-        templateOpts.warning = @totalGradeWarning
-        templateOpts.lastColumn = true
-        templateOpts.showPointsNotPercent = @displayPointTotals()
-        templateOpts.hideTooltip = @weightedGrades() and not @totalGradeWarning
       GroupTotalCellTemplate templateOpts
 
     calculateAndRoundGroupTotalScore: (score, possible_points) ->
@@ -1164,7 +1164,7 @@ define [
         @setFilterColumnsBySetting('assignmentGroupId', group)
         @saveSettings()
         @resetGrading()
-        @setAssignmentWarnings()
+        @updateFilteredContentInfo()
         @updateColumnsAndRenderViewOptionsMenu()
         @updateAssignmentGroupFilterVisibility()
 
@@ -1191,7 +1191,7 @@ define [
         @saveSettings()
         @resetGrading()
         @sortGridRows()
-        @setAssignmentWarnings()
+        @updateFilteredContentInfo()
         @updateColumnsAndRenderViewOptionsMenu()
         @updateGradingPeriodFilterVisibility()
 
@@ -1199,7 +1199,7 @@ define [
       if @getFilterColumnsBySetting('contextModuleId') != moduleId
         @setFilterColumnsBySetting('contextModuleId', moduleId)
         @saveSettings()
-        @setAssignmentWarnings()
+        @updateFilteredContentInfo()
         @updateColumnsAndRenderViewOptionsMenu()
         @updateModulesFilterVisibility()
 
@@ -1521,7 +1521,7 @@ define [
         width = Math.max($widthTester.text(text).outerWidth(), minWidth)
         Math.min width, maxWidth
 
-      @setAssignmentWarnings()
+      @updateFilteredContentInfo()
 
       studentColumnWidth = 150
       if @gradebookColumnSizeSettings
@@ -1617,7 +1617,6 @@ define [
       total_column =
         id: "total_grade"
         field: "total_grade"
-        formatter: @groupTotalFormatter
         toolTip: label
         minWidth: columnWidths.total.min
         maxWidth: columnWidths.total.max
@@ -1945,56 +1944,32 @@ define [
 
       @updateColumnHeaders()
 
-    # show warnings for bad grading setups
-    setAssignmentWarnings: =>
-      @totalGradeWarning = null
+    # Filtered Content Information Methods
 
+    updateFilteredContentInfo: =>
       unorderedAssignments = (assignment for assignmentId, assignment of @assignments)
       filteredAssignments = @filterAssignments(unorderedAssignments)
 
-      if _.any(filteredAssignments, 'muted')
-        @totalGradeWarning =
-          warningText: I18n.t "This grade differs from the student's view of the grade because some assignments are muted"
-          icon: "icon-muted"
+      @filteredContentInfo.mutedAssignments = filteredAssignments.filter((assignment) => assignment.muted)
+      @filteredContentInfo.totalPointsPossible = _.reduce @assignmentGroups,
+        (sum, assignmentGroup) -> sum + getAssignmentGroupPointsPossible(assignmentGroup),
+        0
+
+      if @weightedGroups()
+        invalidAssignmentGroups = _.filter @assignmentGroups, (ag) ->
+          getAssignmentGroupPointsPossible(ag) == 0
+        @filteredContentInfo.invalidAssignmentGroups = invalidAssignmentGroups
       else
-        if @weightedGroups()
-          # assignment group has 0 points possible
-          invalidAssignmentGroups = _.filter @assignmentGroups, (ag) ->
-            pointsPossible = _.inject ag.assignments
-            , ((sum, a) -> sum + (a.points_possible || 0))
-            , 0
-            pointsPossible == 0
+        @filteredContentInfo.invalidAssignmentGroups = []
 
-          for ag in invalidAssignmentGroups
-            for a in ag.assignments
-              a.invalid = true
+    listInvalidAssignmentGroups: =>
+      @filteredContentInfo.invalidAssignmentGroups
 
-          if invalidAssignmentGroups.length > 0
-            groupNames = (ag.name for ag in invalidAssignmentGroups)
-            text = I18n.t 'invalid_assignment_groups_warning',
-              one: "Score does not include %{groups} because it has
-                    no points possible"
-              other: "Score does not include %{groups} because they have
-                      no points possible"
-            ,
-              groups: $.toSentence(groupNames)
-              count: groupNames.length
-            @totalGradeWarning =
-              warningText: text
-              icon: "icon-warning final-warning"
+    listMutedAssignments: =>
+      @filteredContentInfo.mutedAssignments
 
-        else
-          # no assignments have points possible
-          pointsPossible = _.inject filteredAssignments
-          , ((sum, a) -> sum + (a.points_possible || 0))
-          , 0
-
-          if pointsPossible == 0
-            text = I18n.t 'no_assignments_have_points_warning'
-            , "Can't compute score until an assignment has points possible"
-            @totalGradeWarning =
-              warningText: text
-              icon: "icon-warning final-warning"
+    getTotalPointsPossible: =>
+      @filteredContentInfo.totalPointsPossible
 
     handleColumnHeaderMenuClose: =>
       @keyboardNav.handleMenuOrDialogClose()
@@ -2409,7 +2384,6 @@ define [
         assignment:
           htmlUrl: assignment.html_url
           id: assignment.id
-          invalid: assignment.invalid
           muted: assignment.muted
           name: assignment.name
           omitFromFinalGrade: assignment.omit_from_final_grade

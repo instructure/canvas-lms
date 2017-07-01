@@ -17,58 +17,56 @@
  */
 
 import { createGradebook } from 'spec/jsx/gradezilla/default_gradebook/GradebookSpecHelper';
+import TotalGradeCellFormatter from 'jsx/gradezilla/default_gradebook/slick-grid/formatters/TotalGradeCellFormatter';
 
-QUnit.module('Total Grade Cell Formatter', function (hooks) {
+QUnit.module('TotalGradeCellFormatter', function (hooks) {
   let $fixture;
   let gradebook;
+  let formatter;
   let grade;
 
   hooks.beforeEach(function () {
     $fixture = document.createElement('div');
     document.body.appendChild($fixture);
 
-    const assignments = {
-      2301: { id: '2301', points_possible: 5 },
-      2302: { id: '2302', points_possible: 5 }
-    };
-
     gradebook = createGradebook({
-      show_total_grade_as_points: true,
-      grading_standard: [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0.0]]
+      grading_standard: [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0.0]],
+      show_total_grade_as_points: true
     });
-    gradebook.setAssignments(assignments);
-    gradebook.setAssignmentGroups({
-      2401: { id: '2401', name: 'Math', assignments: [assignments[2301]] },
-      2402: { id: '2402', name: 'English', assignments: [assignments[2302]] }
-    });
+    sinon.stub(gradebook, 'getTotalPointsPossible').returns(10);
+    sinon.stub(gradebook, 'listInvalidAssignmentGroups').returns([]);
+    sinon.stub(gradebook, 'listMutedAssignments').returns([]);
+    formatter = new TotalGradeCellFormatter(gradebook);
 
     grade = { score: 8, possible: 10 };
   });
 
   hooks.afterEach(function () {
+    gradebook.getTotalPointsPossible.restore();
+    gradebook.listInvalidAssignmentGroups.restore();
+    gradebook.listMutedAssignments.restore();
     $fixture.remove();
   });
 
   function renderCell () {
-    gradebook.setAssignmentWarnings();
-    $fixture.innerHTML = gradebook.groupTotalFormatter(
+    $fixture.innerHTML = formatter.render(
       0, // row
       0, // cell
       grade, // value
-      { type: 'total_grade' }, // column definition
+      null, // column definition
       null // dataContext
     );
     return $fixture;
   }
 
-  QUnit.module('with no grade');
+  QUnit.module('#render with no grade');
 
   test('renders no content', function () {
     grade = null;
     strictEqual(renderCell().innerHTML, '');
   });
 
-  QUnit.module('with a points grade');
+  QUnit.module('#render with a points grade');
 
   test('renders the score of the grade', function () {
     equal(renderCell().querySelector('.percentage').innerText.trim(), '8');
@@ -94,7 +92,7 @@ QUnit.module('Total Grade Cell Formatter', function (hooks) {
     equal(renderCell().querySelector('.gradebook-tooltip').innerText, '-');
   });
 
-  QUnit.module('with a percent grade', {
+  QUnit.module('#render with a percent grade', {
     setup () {
       gradebook.options.show_total_grade_as_points = false;
     }
@@ -125,50 +123,44 @@ QUnit.module('Total Grade Cell Formatter', function (hooks) {
     equal(renderCell().querySelector('.gradebook-tooltip').innerText.trim(), '8.35 / 10.35');
   });
 
-  QUnit.module('with any grade');
+  QUnit.module('#render with any grade');
 
   test('renders a warning when there are muted assignments', function () {
-    gradebook.assignments[2301].muted = true;
+    gradebook.listMutedAssignments.returns([{ id: '2301' }]);
     const expectedText = /^This grade differs .* some assignments are muted$/;
     ok(renderCell().querySelector('.gradebook-tooltip').innerText.trim().match(expectedText));
   });
 
   test('renders a warning icon when there are muted assignments', function () {
-    gradebook.assignments[2301].muted = true;
+    gradebook.listMutedAssignments.returns([{ id: '2301' }]);
     strictEqual(renderCell().querySelectorAll('i.icon-muted').length, 1);
   });
 
   test('renders a warning when there is an invalid assignment group', function () {
-    gradebook.options.group_weighting_scheme = 'percent';
-    gradebook.assignmentGroups[2401].assignments = [];
+    gradebook.listInvalidAssignmentGroups.returns([{ id: '2401', name: 'Math' }]);
     const expectedText = 'Score does not include Math because it has no points possible';
     equal(renderCell().querySelector('.gradebook-tooltip').innerText.trim(), expectedText);
   });
 
   test('renders a warning icon when there is an invalid assignment group', function () {
-    gradebook.options.group_weighting_scheme = 'percent';
-    gradebook.assignmentGroups[2401].assignments = [];
+    gradebook.listInvalidAssignmentGroups.returns([{ id: '2401', name: 'Math' }]);
     strictEqual(renderCell().querySelectorAll('i.icon-warning').length, 1);
   });
 
   test('renders a warning when there are multiple invalid assignment groups', function () {
-    gradebook.options.group_weighting_scheme = 'percent';
-    gradebook.assignmentGroups[2401].assignments = [];
-    gradebook.assignmentGroups[2402].assignments = [];
+    gradebook.listInvalidAssignmentGroups.returns([{ id: '2401', name: 'Math' }, { id: '2402', name: 'English' }]);
     const expectedText = 'Score does not include Math and English because they have no points possible';
     equal(renderCell().querySelector('.gradebook-tooltip').innerText.trim(), expectedText);
   });
 
   test('renders a warning when total points possible is zero', function () {
-    gradebook.assignments[2301].points_possible = 0;
-    gradebook.assignments[2302].points_possible = null;
+    gradebook.getTotalPointsPossible.returns(0);
     const expectedText = 'Can\'t compute score until an assignment has points possible';
     equal(renderCell().querySelector('.gradebook-tooltip').innerText.trim(), expectedText);
   });
 
   test('renders a warning icon when total points possible is zero', function () {
-    gradebook.assignments[2301].points_possible = 0;
-    gradebook.assignments[2302].points_possible = null;
+    gradebook.getTotalPointsPossible.returns(0);
     strictEqual(renderCell().querySelectorAll('i.icon-warning').length, 1);
   });
 
