@@ -696,6 +696,6 @@ describe SisImportsApiController, type: :request do
                     { :controller => 'sis_imports_api', :action => 'show', :format => 'json',
                       :account_id => @account.id.to_s, :id => batch.id.to_s })
     expect(json.key?('errors_attachment')).to be_truthy
-    expect(json['errors_attachment']['id']).to eq batch.errors_attachment_id
+    expect(json['errors_attachment']['id']).to eq batch.errors_attachment.id
   end
 end

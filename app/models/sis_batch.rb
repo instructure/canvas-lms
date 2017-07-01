@@ -442,7 +442,7 @@ class SisBatch < ActiveRecord::Base
   def limit_size_of_messages
     max_messages = SisBatch.max_messages
     %w[processing_warnings processing_errors].each do |field|
-      write_warnings_and_errors_to_file
+      write_warnings_and_errors_to_file unless self.errors_attachment
       if self.send("#{field}_changed?") && (self.send(field).try(:size) || 0) > max_messages
         limit_message = case field
                         when "processing_warnings"

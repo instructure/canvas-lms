@@ -34,7 +34,7 @@ module Api::V1::SisImport
       json[:errors_attachment] = attachment_json(
         batch.errors_attachment,
         user,
-        {host: HostUrl.context_host(batch.account)},
+        {},
         # skip permission checks since the context is a sis_import it will fail permission checks
         {submission_attachment: true}
       )
