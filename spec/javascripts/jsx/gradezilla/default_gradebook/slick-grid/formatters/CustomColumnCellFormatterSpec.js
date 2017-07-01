@@ -16,16 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import SlickGrid from 'vendor/slickgrid';
+import CustomColumnCellFormatter from 'jsx/gradezilla/default_gradebook/slick-grid/formatters/CustomColumnCellFormatter';
 
-QUnit.module('Custom Column Cell Formatter', function (hooks) {
+QUnit.module('CustomColumnCellFormatter', function (hooks) {
   let $fixture;
   let columnContent;
+  let formatter;
 
   hooks.beforeEach(function () {
     $fixture = document.createElement('div');
-    $fixture.id = 'grid-fixture';
     document.body.appendChild($fixture);
+
+    formatter = new CustomColumnCellFormatter();
   });
 
   hooks.afterEach(function () {
@@ -33,8 +35,7 @@ QUnit.module('Custom Column Cell Formatter', function (hooks) {
   });
 
   function renderCell () {
-    const grid = new SlickGrid.Grid('#grid-fixture', [], [], { enableColumnReorder: false })
-    $fixture.innerHTML = grid.getOptions().defaultFormatter(
+    $fixture.innerHTML = formatter.render(
       0, // row
       0, // cell
       columnContent, // value
@@ -43,6 +44,8 @@ QUnit.module('Custom Column Cell Formatter', function (hooks) {
     );
     return $fixture;
   }
+
+  QUnit.module('#render');
 
   test('renders no content when given null content', function () {
     columnContent = null;

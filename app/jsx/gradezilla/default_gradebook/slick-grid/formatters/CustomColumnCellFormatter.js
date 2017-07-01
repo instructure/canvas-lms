@@ -16,20 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import CustomColumnCellFormatter from 'jsx/gradezilla/default_gradebook/slick-grid/formatters/CustomColumnCellFormatter';
-import StudentCellFormatter from 'jsx/gradezilla/default_gradebook/slick-grid/formatters/StudentCellFormatter';
+import htmlEscape from 'str/htmlEscape';
 
-class CellFormatterFactory {
-  constructor (gradebook) {
-    this.formatters = {
-      custom_column: new CustomColumnCellFormatter(),
-      student: new StudentCellFormatter(gradebook)
-    };
-  }
-
-  getFormatter (column) {
-    return (this.formatters[column.type] || {}).render;
+export default class CustomColumnCellFormatter {
+  render (_row, _cell, content /* value */, _columnDef, _dataContext) {
+    return (content == null) ? '' : htmlEscape(content);
   }
 }
-
-export default CellFormatterFactory;
