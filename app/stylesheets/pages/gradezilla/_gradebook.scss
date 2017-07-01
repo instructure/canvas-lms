@@ -129,6 +129,11 @@ $gradebook_cell_padding_top: 8px;
       padding-top: 2px;
       padding-bottom: 1px;
     }
+
+    color: #333333;
+    @include fontSize(12px);
+    text-align: center;
+    line-height: 35px;
   }
 }
 
@@ -173,13 +178,6 @@ $gradebook_cell_padding_top: 8px;
   @include fontSize(12px);
 }
 
-.secondary_identifier_cell, .custom_column {
-  color: #333333;
-  @include fontSize(12px);
-  text-align: center;
-  line-height: 35px;
-}
-
 .student-name,
 .secondary-info,
 .student-section,
@@ -187,16 +185,6 @@ $gradebook_cell_padding_top: 8px;
 .Gradebook__ColumnHeaderDetail > * {
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-// show and hide student names using a parent css class.
-.hide-students {
-  .student-placeholder {
-    display: block;
-  }
-  .secondary_identifier_cell {
-    text-indent: -9999em;
-  }
 }
 
 // override the default jquery ui top border
@@ -430,9 +418,10 @@ $gradebook_cell_padding_top: 8px;
   display: none;
 }
 
-.gradebook-tooltip-last {
+.container_1 .slick-cell:last-child .gradebook-tooltip {
   left: auto;
   right: 0;
+
   &:after {
     left: auto;
     right: 15px;
