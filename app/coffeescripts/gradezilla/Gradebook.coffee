@@ -54,6 +54,7 @@ define [
   'jsx/gradezilla/default_gradebook/CurveGradesDialogManager'
   'jsx/gradezilla/default_gradebook/apis/GradebookApi'
   'jsx/gradezilla/default_gradebook/slick-grid/CellEditorFactory'
+  'jsx/gradezilla/default_gradebook/slick-grid/CellFormatterFactory'
   'jsx/gradezilla/default_gradebook/slick-grid/grid-support'
   'jsx/gradezilla/default_gradebook/constants/studentRowHeaderConstants'
   'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader'
@@ -61,7 +62,6 @@ define [
   'jsx/gradezilla/default_gradebook/components/AssignmentRowCellPropFactory'
   'jsx/gradezilla/default_gradebook/components/CustomColumnHeader'
   'jsx/gradezilla/default_gradebook/components/StudentColumnHeader'
-  'jsx/gradezilla/default_gradebook/components/StudentRowHeader'
   'jsx/gradezilla/default_gradebook/components/TotalGradeColumnHeader'
   'jsx/gradezilla/default_gradebook/components/GradebookMenu'
   'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu'
@@ -106,8 +106,9 @@ define [
   CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, GradeFormatHelper, UserSettings, Spinner, AssignmentMuter,
   AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
   SubmissionCell, NumberCompare, natcompare, ConvertCase, htmlEscape, SetDefaultGradeDialogManager,
-  CurveGradesDialogManager, GradebookApi, CellEditorFactory, GridSupport, studentRowHeaderConstants, AssignmentColumnHeader,
-  AssignmentGroupColumnHeader, AssignmentRowCellPropFactory, CustomColumnHeader, StudentColumnHeader, StudentRowHeader,
+  CurveGradesDialogManager, GradebookApi, CellEditorFactory, CellFormatterFactory, GridSupport, studentRowHeaderConstants,
+  AssignmentColumnHeader,
+  AssignmentGroupColumnHeader, AssignmentRowCellPropFactory, CustomColumnHeader, StudentColumnHeader,
   TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, AssignmentGroupFilter, GradingPeriodFilter, ModuleFilter, SectionFilter,
   GridColor, StatusesModal, SubmissionTray, GradebookSettingsModal, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp,
   SubmissionStateMap,
@@ -466,12 +467,7 @@ define [
           @assignments[assignment.id] = assignment
 
     gotSections: (sections) =>
-      @sections = {}
-      for section in sections
-        htmlEscape(section)
-        @sections[section.id] = section
-
-      @sections_enabled = sections.length > 1
+      @setSections(sections.map(htmlEscape))
       @hasSections.resolve()
 
       @postGradesStore.setSections @sections
@@ -547,8 +543,6 @@ define [
         e.enrollment_state == 'inactive'
 
       student.cssClass = "student_#{student.id}"
-
-      @setStudentDisplay(student)
 
     updateStudentRow: (student) =>
       index = @rows.findIndex (row) => row.id == student.id
@@ -815,7 +809,6 @@ define [
         if @rowFilter(student)
           @rows.push(student)
           @calculateStudentGrade(student) # TODO: this may not be necessary
-          @setStudentDisplay(student) unless student.isPlaceholder
 
       return unless @grid
 
@@ -827,20 +820,6 @@ define [
       @grid.invalidateAllRows()
       @grid.updateRowCount()
       @grid.render()
-
-    setStudentDisplay: (student) =>
-      if @sections_enabled
-        mySections = (@sections[sectionId].name for sectionId in student.sections when @sections[sectionId])
-        sectionNames = $.toSentence(mySections.sort())
-
-      options =
-        selectedPrimaryInfo: @getSelectedPrimaryInfo()
-        selectedSecondaryInfo: @getSelectedSecondaryInfo()
-        sectionNames: sectionNames
-        courseId: @options.context_id
-
-      cell = new StudentRowHeader(student, options)
-      student.display_name = cell.render()
 
     gotSubmissionsChunk: (student_submissions) =>
       changedStudentIds = []
@@ -959,10 +938,6 @@ define [
         templateOpts.showPointsNotPercent = @displayPointTotals()
         templateOpts.hideTooltip = @weightedGrades() and not @totalGradeWarning
       GroupTotalCellTemplate templateOpts
-
-    htmlContentFormatter: (row, col, val, columnDef, student) ->
-      return '' unless val?
-      val
 
     calculateAndRoundGroupTotalScore: (score, possible_points) ->
       grade = (score / possible_points) * 100
@@ -1558,12 +1533,10 @@ define [
       @parentColumns = [
         id: 'student'
         type: 'student'
-        field: 'display_name'
         width: studentColumnWidth
         cssClass: 'meta-cell primary-column student'
         headerCssClass: 'primary-column student'
         resizable: true
-        formatter: @htmlContentFormatter
       ]
 
       # Assignment Column Definitions
@@ -1667,6 +1640,7 @@ define [
         autoEdit: true # whether to go into edit-mode as soon as you tab to a cell
         editable: @options.gradebook_is_editable
         editorFactory: new CellEditorFactory()
+        formatterFactory: new CellFormatterFactory(@)
         syncColumnCellResize: true
         rowHeight: 35
         headerHeight: 38
@@ -2737,6 +2711,10 @@ define [
       selectedFilters
 
     ## Gradebook Content Access Methods
+
+    setSections: (sections) =>
+      @sections = _.indexBy(sections, 'id')
+      @sections_enabled = sections.length > 1
 
     setAssignments: (assignmentMap) =>
       @assignments = assignmentMap

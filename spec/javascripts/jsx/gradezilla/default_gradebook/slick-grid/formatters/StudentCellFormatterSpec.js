@@ -17,10 +17,12 @@
  */
 
 import { createGradebook } from 'spec/jsx/gradezilla/default_gradebook/GradebookSpecHelper';
+import StudentCellFormatter from 'jsx/gradezilla/default_gradebook/slick-grid/formatters/StudentCellFormatter';
 
-QUnit.module('Student Column Cell Formatter', function (hooks) {
+QUnit.module('StudentCellFormatter', function (hooks) {
   let $fixture;
   let gradebook;
+  let formatter;
   let student;
 
   hooks.beforeEach(function () {
@@ -28,14 +30,14 @@ QUnit.module('Student Column Cell Formatter', function (hooks) {
     document.body.appendChild($fixture);
 
     gradebook = createGradebook({});
+    formatter = new StudentCellFormatter(gradebook);
 
-    gradebook.sections = {
-      2001: { id: '2001', name: 'Freshmen' },
-      2002: { id: '2002', name: 'Sophomores' },
-      2003: { id: '2003', name: 'Juniors' },
-      2004: { id: '2004', name: 'Seniors' }
-    };
-    gradebook.sections_enabled = true;
+    gradebook.setSections([
+      { id: '2001', name: 'Freshmen' },
+      { id: '2002', name: 'Sophomores' },
+      { id: '2003', name: 'Juniors' },
+      { id: '2004', name: 'Seniors' }
+    ]);
 
     student = {
       enrollments: [{ grades: { html_url: 'http://example.com/grades/1101' } }],
@@ -55,18 +57,24 @@ QUnit.module('Student Column Cell Formatter', function (hooks) {
   });
 
   function renderCell () {
-    gradebook.setStudentDisplay(student);
-    $fixture.innerHTML = gradebook.htmlContentFormatter(
+    $fixture.innerHTML = formatter.render(
       0, // row
       0, // cell
-      student.display_name, // value
+      null, // value
       null, // column definition
-      null // dataContext
+      student // dataContext
     );
     return $fixture;
   }
 
-  QUnit.module('with an active student');
+  QUnit.module('#render with a placeholder student');
+
+  test('renders no content', function () {
+    student = { isPlaceholder: true };
+    strictEqual(renderCell().innerHTML, '');
+  });
+
+  QUnit.module('#render with an active student');
 
   test('includes a link to the student grades', function () {
     const expectedUrl = 'http://example.com/grades/1101#tab-assignments';
@@ -101,19 +109,19 @@ QUnit.module('Student Column Cell Formatter', function (hooks) {
 
   test('renders section names when secondary info is "section"', function () {
     gradebook.setSelectedSecondaryInfo('section', true); // skipRedraw
-    equal(renderCell().querySelector('.student-section').innerHTML, 'Freshmen, Juniors, and Seniors');
+    equal(renderCell().querySelector('.secondary-info').innerHTML, 'Freshmen, Juniors, and Seniors');
   });
 
   test('does not escape html in the section names', function () {
     //  section names have already been escaped
     gradebook.sections[2001].name = '&lt;span&gt;Freshmen&lt;/span&gt;';
     gradebook.setSelectedSecondaryInfo('section', true); // skipRedraw
-    equal(renderCell().querySelector('.student-section').innerHTML,
+    equal(renderCell().querySelector('.secondary-info').innerHTML,
       '&lt;span&gt;Freshmen&lt;/span&gt;, Juniors, and Seniors');
   });
 
   test('does not render section names when sections should not be visible', function () {
-    gradebook.sections_enabled = false;
+    gradebook.setSections([]);
     gradebook.setSelectedSecondaryInfo('section', true); // skipRedraw
     strictEqual(renderCell().querySelector('.secondary-info'), null);
   });
@@ -133,14 +141,14 @@ QUnit.module('Student Column Cell Formatter', function (hooks) {
     strictEqual(renderCell().querySelector('.secondary-info'), null);
   });
 
-  QUnit.module('with an inactive student');
+  QUnit.module('#render with an inactive student');
 
   test('renders the "inactive" status label', function () {
     student.isInactive = true;
     equal(renderCell().querySelector('.label').innerHTML, 'inactive');
   });
 
-  QUnit.module('with an concluded student');
+  QUnit.module('#render with an concluded student');
 
   test('renders the "concluded" status label', function () {
     student.isConcluded = true;
