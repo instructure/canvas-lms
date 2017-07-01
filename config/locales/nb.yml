@@ -5376,7 +5376,7 @@ nb:
       links: 
         choose_home_page: "Velg hjemmeside"
         course_setup: "Sjekkliste for emne-etablering"
-        drop_course: "Slipp dette emnet"
+        drop_course: "Meld deg av emnet"
         join_course: "Bli med på dette emnet"
         new_announcement: "Ny kunngjøring"
         view_course_stream: "Se emnesstrøm"
@@ -5385,7 +5385,7 @@ nb:
       send_failed: "Forespørselen feilet. Forsøk igjen."
       teachers_only: "Kun forelesere kan se dette kurset før det er *publisert*"
       titles: 
-        drop_course: "Slipp dette emnet"
+        drop_course: "Meld deg av emnet"
         recent_feedback: "Nylige tilbakemeldinger"
     sidebar_weighting: 
       default_name: Gruppe
