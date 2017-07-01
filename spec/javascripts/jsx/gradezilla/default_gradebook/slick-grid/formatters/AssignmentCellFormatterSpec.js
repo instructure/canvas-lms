@@ -17,10 +17,12 @@
  */
 
 import { createGradebook } from 'spec/jsx/gradezilla/default_gradebook/GradebookSpecHelper';
+import AssignmentCellFormatter from 'jsx/gradezilla/default_gradebook/slick-grid/formatters/AssignmentCellFormatter';
 
-QUnit.module('Assignment Cell Formatter', function (hooks) {
+QUnit.module('AssignmentCellFormatter', function (hooks) {
   let $fixture;
   let gradebook;
+  let formatter;
   let student;
   let submission;
   let submissionState;
@@ -30,13 +32,12 @@ QUnit.module('Assignment Cell Formatter', function (hooks) {
     document.body.appendChild($fixture);
 
     gradebook = createGradebook();
+    formatter = new AssignmentCellFormatter(gradebook);
     gradebook.setAssignments({
       2301: { id: '2301', name: 'Algebra 1', grading_type: 'points', points_possible: 10 }
     });
 
     student = { id: '1101', loaded: true, initialized: true };
-    gradebook.rows[0] = student;
-    gradebook.students[1101] = student;
     submission = {
       assignment_id: '2301',
       grade: '8',
@@ -57,12 +58,12 @@ QUnit.module('Assignment Cell Formatter', function (hooks) {
   });
 
   function renderCell () {
-    $fixture.innerHTML = gradebook.cellFormatter(
+    $fixture.innerHTML = formatter.render(
       0, // row
       0, // cell
       submission, // value
       null, // column definition
-      null // dataContext
+      student // dataContext
     );
     return $fixture.querySelector('.gradebook-cell');
   }
@@ -72,6 +73,8 @@ QUnit.module('Assignment Cell Formatter', function (hooks) {
     submission.score = null;
     submission.excused = true;
   }
+
+  QUnit.module('#render');
 
   test('includes the "dropped" style when the submission is dropped', function () {
     submission.drop = true;
@@ -213,7 +216,7 @@ QUnit.module('Assignment Cell Formatter', function (hooks) {
     ok(renderCell().classList.contains('muted'));
   });
 
-  QUnit.module('with an ungraded submission', {
+  QUnit.module('#render with an ungraded submission', {
     setup () {
       submission.grade = null;
     }
@@ -264,7 +267,7 @@ QUnit.module('Assignment Cell Formatter', function (hooks) {
     strictEqual(renderCell().innerHTML.trim(), '-');
   });
 
-  QUnit.module('with a "points" assignment submission', {
+  QUnit.module('#render with a "points" assignment submission', {
     setup () {
       gradebook.getAssignment('2301').grading_type = 'points';
     }
@@ -297,7 +300,7 @@ QUnit.module('Assignment Cell Formatter', function (hooks) {
     strictEqual(renderCell().innerHTML.trim(), 'EX');
   });
 
-  QUnit.module('with a "percent" assignment submission', {
+  QUnit.module('#render with a "percent" assignment submission', {
     setup () {
       gradebook.getAssignment('2301').grading_type = 'percent';
     }
@@ -330,7 +333,7 @@ QUnit.module('Assignment Cell Formatter', function (hooks) {
     strictEqual(renderCell().innerHTML.trim(), 'EX');
   });
 
-  QUnit.module('with a "letter grade" assignment submission', {
+  QUnit.module('#render with a "letter grade" assignment submission', {
     setup () {
       gradebook.getAssignment('2301').grading_type = 'letter_grade';
       submission.grade = 'A';
@@ -368,7 +371,7 @@ QUnit.module('Assignment Cell Formatter', function (hooks) {
     strictEqual(renderCell().innerHTML.trim(), 'EX');
   });
 
-  QUnit.module('with a "complete/incomplete" assignment submission', {
+  QUnit.module('#render with a "complete/incomplete" assignment submission', {
     setup () {
       gradebook.getAssignment('2301').grading_type = 'pass_fail';
       submission.grade = 'Complete (i18n)';
@@ -407,7 +410,7 @@ QUnit.module('Assignment Cell Formatter', function (hooks) {
     equal(renderCell().innerHTML.trim(), 'EX');
   });
 
-  QUnit.module('with a "GPA Scale" assignment submission', {
+  QUnit.module('#render with a "GPA Scale" assignment submission', {
     setup () {
       gradebook.getAssignment('2301').grading_type = 'gpa_scale';
       submission.grade = 'A';
@@ -436,7 +439,7 @@ QUnit.module('Assignment Cell Formatter', function (hooks) {
     strictEqual(renderCell().innerHTML.trim(), 'EX');
   });
 
-  QUnit.module('with a quiz submission', {
+  QUnit.module('#render with a quiz submission', {
     setup () {
       gradebook.getAssignment('2301').grading_type = 'points';
       submission.submission_type = 'online_quiz';

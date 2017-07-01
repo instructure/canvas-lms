@@ -43,7 +43,6 @@ define [
   'compiled/gradezilla/AssignmentGroupWeightsDialog'
   'compiled/shared/GradeDisplayWarningDialog'
   'compiled/gradezilla/PostGradesFrameDialog'
-  'compiled/gradezilla/SubmissionCell'
   'compiled/util/NumberCompare'
   'compiled/util/natcompare'
   'convert_case'
@@ -102,7 +101,7 @@ define [
   GradingPeriodsApi, GradingPeriodSetsApi, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS,
   CourseGradeCalculator, EffectiveDueDates, GradeFormatHelper, UserSettings, Spinner, AssignmentMuter,
   AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
-  SubmissionCell, NumberCompare, natcompare, ConvertCase, htmlEscape, SetDefaultGradeDialogManager,
+  NumberCompare, natcompare, ConvertCase, htmlEscape, SetDefaultGradeDialogManager,
   CurveGradesDialogManager, GradebookApi, CellEditorFactory, CellFormatterFactory, GridSupport, studentRowHeaderConstants,
   AssignmentColumnHeader,
   AssignmentGroupColumnHeader, AssignmentRowCellPropFactory, CustomColumnHeader, StudentColumnHeader,
@@ -895,34 +894,6 @@ define [
 
       @updateRowCellsForStudentIds(_.uniq(changedStudentIds))
 
-    cellFormatter: (row, col, submission) =>
-      if !@rows[row].loaded or !@rows[row].initialized
-        @staticCellFormatter(row, col, '')
-      else
-        cellAttributes = @submissionStateMap.getSubmissionState(submission)
-        if cellAttributes.hideGrade
-          @lockedAndHiddenGradeCellFormatter(row, col)
-        else
-          assignment = @assignments[submission.assignment_id]
-          student = @students[submission.user_id]
-          formatterOpts =
-            isLocked: cellAttributes.locked
-
-          if !assignment?
-            @staticCellFormatter(row, col, '')
-          else if submission.workflow_state == 'pending_review'
-           (SubmissionCell[assignment.grading_type] || SubmissionCell).formatter(row, col, submission, assignment, student, formatterOpts)
-          else if assignment.grading_type == 'points' && assignment.points_possible
-            SubmissionCell.out_of.formatter(row, col, submission, assignment, student, formatterOpts)
-          else
-            (SubmissionCell[assignment.grading_type] || SubmissionCell).formatter(row, col, submission, assignment, student, formatterOpts)
-
-    staticCellFormatter: (row, col, val) ->
-      "<div class='cell-content gradebook-cell'>#{htmlEscape(val)}</div>"
-
-    lockedAndHiddenGradeCellFormatter: (row, col) ->
-      "<div class='cell-content gradebook-cell grayed-out cannot_edit'></div>"
-
     submissionsForStudent: (student) =>
       allSubmissions = (value for key, value of student when key.match /^assignment_(?!group)/)
       return allSubmissions unless @gradingPeriodSet?
@@ -1537,7 +1508,6 @@ define [
           field: fieldName
           name: assignment.name
           object: assignment
-          formatter: this.cellFormatter
           getGridSupport: => @gridSupport
           propFactory: new AssignmentRowCellPropFactory(assignment, @)
           minWidth: columnWidths.assignment.min
