@@ -1232,8 +1232,8 @@ define [
       mountPoints = document.querySelectorAll('[data-component="GradebookMenu"]')
       props =
         assignmentOrOutcome: @options.assignmentOrOutcome
-        courseUrl: ENV.GRADEBOOK_OPTIONS.context_url,
-        learningMasteryEnabled: ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled,
+        courseUrl: @options.context_url,
+        learningMasteryEnabled: @options.outcome_gradebook_enabled,
         navigate: @options.navigate
       for mountPoint in mountPoints
         props.variant = mountPoint.getAttribute('data-variant')
@@ -2287,7 +2287,7 @@ define [
       assignment = @getAssignment(assignmentId)
       assignmentKey = "assignment_#{assignmentId}"
       studentsThatCanSeeAssignment = @studentsThatCanSeeAssignment(@students, assignment)
-      contextUrl = ENV.GRADEBOOK_OPTIONS.context_url
+      contextUrl = @options.context_url
 
       students = _.map studentsThatCanSeeAssignment, (student) =>
         studentRecord =

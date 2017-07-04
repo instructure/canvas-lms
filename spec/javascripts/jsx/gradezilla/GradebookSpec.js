@@ -3171,17 +3171,12 @@ test('does not render when filter is not selected', function () {
 QUnit.module('Menus', {
   setup () {
     fakeENV.setup({
-      current_user_id: '1',
-      GRADEBOOK_OPTIONS: {
-        context_url: 'http://someUrl/',
-        outcome_gradebook_enabled: true
-      }
+      current_user_id: '1'
     });
     this.gradebook = createGradebook({
       context_allows_gradebook_uploads: true,
       export_gradebook_csv_url: 'http://someUrl',
       gradebook_import_url: 'http://someUrl',
-      gradebook_is_editable: true,
       navigate () {}
     });
     this.gradebook.postGradesLtis = [];
@@ -4179,17 +4174,11 @@ QUnit.module('Gradebook#onBeforeHeaderCellDestroy', {
   setup () {
     this.$mountPoint = document.createElement('div');
     $fixtures.appendChild(this.$mountPoint);
-    fakeENV.setup({
-      GRADEBOOK_OPTIONS: {
-        login_handle_name: ''
-      }
-    });
-    this.gradebook = createGradebook();
+    this.gradebook = createGradebook({ login_handle_name: '' });
   },
 
   teardown () {
     $fixtures.innerHTML = '';
-    fakeENV.teardown();
   }
 });
 
@@ -4205,22 +4194,16 @@ QUnit.module('Gradebook#renderStudentColumnHeader', {
   setup () {
     this.$mountPoint = document.createElement('div');
     $fixtures.appendChild(this.$mountPoint);
-    fakeENV.setup({
-      GRADEBOOK_OPTIONS: {
-        login_handle_name: 'foo'
-      }
-    });
   },
 
   teardown () {
     ReactDOM.unmountComponentAtNode(this.$mountPoint);
     $fixtures.innerHTML = '';
-    fakeENV.teardown();
   }
 });
 
 test('renders the StudentColumnHeader to the "student" column header node', function () {
-  const gradebook = createGradebook();
+  const gradebook = createGradebook({ login_handle_name: 'foo' });
   this.stub(gradebook, 'getColumnHeaderNode').withArgs('student').returns(this.$mountPoint);
   gradebook.renderStudentColumnHeader();
   ok(this.$mountPoint.innerText.includes('Student Name'), 'the "Student Name" header is rendered');
@@ -4377,9 +4360,6 @@ test('renders the CustomColumnHeader to the related custom column header node', 
 QUnit.module('Gradebook#renderAssignmentColumnHeader', {
   setup () {
     fakeENV.setup({
-      GRADEBOOK_OPTIONS: {
-        context_url: 'http://contextUrl/'
-      },
       current_user_roles: []
     });
     this.$mountPoint = document.createElement('div');
@@ -4701,9 +4681,6 @@ test('includes the sort settingKey', function () {
 QUnit.module('Gradebook#getAssignmentColumnHeaderProps', {
   setup () {
     fakeENV.setup({
-      GRADEBOOK_OPTIONS: {
-        context_url: 'http://contextUrl/'
-      },
       current_user_roles: []
     });
   },
@@ -6049,17 +6026,7 @@ test('when no submission is found, it is not late', function () {
   equal(secondRow.id, '3', 'when no submission is found, order second');
 });
 
-QUnit.module('Gradebook#getSelectedEnrollmentFilters', {
-  setup () {
-    fakeENV.setup({
-      GRADEBOOK_OPTIONS: { context_id: 10 },
-    });
-  },
-
-  teardown () {
-    fakeENV.teardown();
-  }
-});
+QUnit.module('Gradebook#getSelectedEnrollmentFilters');
 
 test('returns empty array when all settings are off', function () {
   const gradebook = createGradebook({
@@ -6932,7 +6899,6 @@ QUnit.module('Gradebook#getActionMenuProps', {
 test('generates props that conform to ActionMenu.propTypes', function () {
   $fixtures.innerHTML = '<span data-component="ActionMenu"><button /></span>';
   const gradebook = createGradebook({
-    gradebook_is_editable: true,
     context_allows_gradebook_uploads: true,
     gradebook_import_url: 'http://example.com/import',
     currentUserId: '123',
