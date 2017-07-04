@@ -146,31 +146,6 @@ test('sets the submission state map .selectedGradingPeriodID to the "grading per
   strictEqual(gradebook.submissionStateMap.selectedGradingPeriodID, gradebook.getGradingPeriodToShow());
 });
 
-QUnit.module('Gradebook#initGrid', {
-  setup () {
-    $fixtures.innerHTML = `
-      <div id="application">
-        <span data-component="GridColor"></span>
-        <div id="gradebook_grid"></div>
-        <div id="example-gradebook-cell">
-          <a class="student-grades-link" href="#">Student Name</a>
-        </div>
-      </div>
-    `;
-
-    this.gradebook = createGradebook();
-    this.stub(this.gradebook, 'renderGridColor');
-    this.stub(this.gradebook, 'getFrozenColumnCount');
-    this.stub(this.gradebook, 'getVisibleGradeGridColumns').returns([]);
-    this.stub(this.gradebook, 'onGridInit');
-    this.gradebook.initGrid();
-  }
-});
-
-test('initializes aggregateColumns with at least the total_grade column', function () {
-  ok(this.gradebook.aggregateColumns.find(col => col.type === 'total_grade'), 'contains total_grade column');
-});
-
 QUnit.module('Gradebook - when grid-required data is loaded', {
   setup () {
     $fixtures.innerHTML = `
@@ -1953,22 +1928,6 @@ test('includes attendance assignments when show_attendance is true', function ()
   const columns = this.gradebook.getVisibleGradeGridColumns();
   const objectNames = columns.map(c => c.object.name);
   ok(objectNames.includes('attendance'));
-});
-
-test('when asked to hide aggregate columns, does not append aggregate columns', function () {
-  this.stub(this.gradebook, 'hideAggregateColumns').returns(true);
-  this.gradebook.aggregateColumns = [{ type: 'total_grade' }];
-  const columns = this.gradebook.getVisibleGradeGridColumns();
-
-  notOk(columns.find(col => col.type === 'total_grade'), 'total_grade column is not returned');
-});
-
-test('when asked to show aggregate columns, appends aggregate columns', function () {
-  this.stub(this.gradebook, 'hideAggregateColumns').returns(false);
-  this.gradebook.aggregateColumns = [{ type: 'total_grade' }];
-  const columns = this.gradebook.getVisibleGradeGridColumns();
-
-  ok(columns.find(col => col.type === 'total_grade'), 'total_grade column is returned');
 });
 
 QUnit.module('Gradebook#submissionsForStudent', {
@@ -5181,46 +5140,10 @@ QUnit.module('Gradebook#freezeTotalGradeColumn', {
   }
 });
 
-test('freezes the total_grade column logically', function () {
-  strictEqual(this.gradebook.isColumnFrozen('total_grade'), false);
-
-  this.gradebook.freezeTotalGradeColumn();
-
-  strictEqual(this.gradebook.isColumnFrozen('total_grade'), true);
-});
-
-test('freezes the total_grade column "physically" by telling the grid how many columns to freeze', function () {
-  this.gradebook.freezeTotalGradeColumn();
-
-  strictEqual(this.gradebook.grid.setNumberOfColumnsToFreeze.getCall(0).args[0], 3);
-});
-
-test('puts the total_grade column to the right of the student column', function () {
-  this.gradebook.freezeTotalGradeColumn();
-
-  strictEqual(this.gradebook.getColumnPositionById('total_grade'), 2);
-});
-
 test('re-renders column headers after reordering is done', function () {
   this.gradebook.freezeTotalGradeColumn();
 
   strictEqual(this.gradebook.updateColumnHeaders.callCount, 1);
-});
-
-test('preserves the order of any existing movable columns that have been dragged elsewhere', function () {
-  const newColumnOrder = [
-    { id: 'student' },
-    { id: 'one' },
-    { id: 'aggregate_1' },
-    { id: 'total_grade' },
-    { id: 'three' },
-  ];
-  this.gradebook.grid.setColumns(newColumnOrder);
-  const expectedColumnOrder = ['student', 'total_grade', 'one', 'aggregate_1', 'three'];
-
-  this.gradebook.freezeTotalGradeColumn();
-
-  deepEqual(this.gradebook.grid.getColumns().map(item => item.id), expectedColumnOrder);
 });
 
 QUnit.module('Gradebook#listRowIndicesForStudentIds');
@@ -5498,61 +5421,10 @@ QUnit.module('Gradebook#moveTotalGradeColumnToEnd', {
   }
 });
 
-test('unfreezes the total_grade column', function () {
-  strictEqual(this.gradebook.isColumnFrozen('total_grade'), true);
-
-  this.gradebook.moveTotalGradeColumnToEnd();
-
-  strictEqual(this.gradebook.isColumnFrozen('total_grade'), false);
-  strictEqual(this.gradebook.grid.setNumberOfColumnsToFreeze.firstCall.args[0], 2);
-});
-
-test('puts the total_grade column at the end', function () {
-  strictEqual(this.gradebook.getColumnPositionById('total_grade'), 2);
-
-  this.gradebook.moveTotalGradeColumnToEnd();
-
-  strictEqual(this.gradebook.getColumnPositionById('total_grade'), 4);
-});
-
 test('re-renders column headers after reordering is done', function () {
   this.gradebook.moveTotalGradeColumnToEnd();
 
   strictEqual(this.gradebook.updateColumnHeaders.callCount, 1);
-});
-
-test('puts the total_grade column at the end if the user dragged it elsewhere but did not freeze it', function () {
-  const { parentColumns, allAssignmentColumns, aggregateColumns } = this.gradebook;
-  parentColumns.splice(2, 1);
-
-  const newColumnLayout = parentColumns.concat(Array(this.totalGradeColumn))
-    .concat(allAssignmentColumns).concat(aggregateColumns);
-
-  // The total_grade column lives either in parentColumns or aggregateColumns but when it is in
-  // aggregateColumns it can be dragged around internal to the grid without syncing back with
-  // aggregateColumns.  This simulates that.
-  aggregateColumns.push(this.totalGradeColumn);
-
-  this.gradebook.grid.setColumns(newColumnLayout);
-  this.gradebook.moveTotalGradeColumnToEnd();
-
-  strictEqual(this.gradebook.getColumnPositionById('total_grade'), 4);
-});
-
-test('preserves the order of any existing movable columns that have been dragged elsewhere', function () {
-  const newColumnOrder = [
-    { id: 'student' },
-    { id: 'one' },
-    { id: 'aggregate_1' },
-    { id: 'total_grade' },
-    { id: 'three' },
-  ];
-  this.gradebook.grid.setColumns(newColumnOrder);
-  const expectedColumnOrder = ['student', 'one', 'aggregate_1', 'three', 'total_grade'];
-
-  this.gradebook.moveTotalGradeColumnToEnd();
-
-  deepEqual(this.gradebook.grid.getColumns().map(item => item.id), expectedColumnOrder);
 });
 
 QUnit.module('Gradebook#getTotalGradeColumnPositionProps', {
