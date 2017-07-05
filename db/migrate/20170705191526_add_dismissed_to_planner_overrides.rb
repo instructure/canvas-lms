@@ -16,22 +16,22 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Api::V1::PlannerOverride
-  include Api::V1::Json
+class AddDismissedToPlannerOverrides < ActiveRecord::Migration[5.0]
+  tag :predeploy
+  disable_ddl_transaction!
 
-  PLANNABLE_TYPES = {
-    'discussion_topic' => 'DiscussionTopic',
-    'announcement' => 'DiscussionTopic',
-    'quiz' => 'Quizzes::Quiz',
-    'assignment' => 'Assignment',
-    'wiki_page' => 'WikiPage',
-    'planner_note' => 'PlannerNote'
-  }.freeze
+  def up
+    add_column :planner_overrides, :dismissed, :boolean
+    change_column_default :planner_overrides, :dismissed, false
 
-  def planner_override_json(override, user, session)
-    return unless override.present?
-    json = api_json(override, user, session)
-    json['plannable_type'] = PLANNABLE_TYPES.key(json['plannable_type'])
-    json
+    DataFixup::BackfillNulls.run(
+      PlannerOverride, [:dismissed], default_value: false
+    )
+
+    change_column_null :planner_overrides, :dismissed, false
+  end
+
+  def down
+    remove_column :planner_overrides, :dismissed
   end
 end
