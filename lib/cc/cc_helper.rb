@@ -242,7 +242,7 @@ module CCHelper
       @rewriter.set_handler('pages', &wiki_handler)
       @rewriter.set_handler('items') do |match|
         item = ContentTag.find(match.obj_id)
-        migration_id = CCHelper.create_key(item)
+        migration_id = @key_generator.create_key(item)
         new_url = "#{COURSE_TOKEN}/modules/#{match.type}/#{migration_id}"
       end
       @rewriter.set_default_handler do |match|
@@ -252,7 +252,7 @@ module CCHelper
           if obj && (@rewriter.user_can_view_content?(obj) || @for_epub_export)
             # for all other types,
             # create a migration id for the object, and use that as the new link
-            migration_id = CCHelper.create_key(obj)
+            migration_id = @key_generator.create_key(obj)
             new_url = "#{OBJECT_TOKEN}/#{match.type}/#{migration_id}"
           end
         elsif match.obj_id
@@ -297,7 +297,7 @@ module CCHelper
         next unless anchor['id']
         media_id = anchor['id'].gsub(/^media_comment_/, '')
         obj = MediaObject.by_media_id(media_id).first
-        if obj && migration_id = CCHelper.create_key(obj)
+        if obj && migration_id = @key_generator.create_key(obj)
           @used_media_objects << obj
           info = CCHelper.media_object_info(obj, nil, media_object_flavor)
           @media_object_infos[obj.id] = info

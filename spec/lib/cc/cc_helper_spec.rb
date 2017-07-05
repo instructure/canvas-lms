@@ -170,5 +170,19 @@ describe CC::CCHelper do
       urls = doc.css('a').map{ |attr| attr[:href] }
       expect(urls[0]).to eq "%24WIKI_REFERENCE%24/wiki/#{page.url}"
     end
+
+    it "uses the key_generator to translate links" do
+      HostUrl.stubs(:protocol).returns('http')
+      HostUrl.stubs(:context_host).returns('www.example.com:8080')
+      @assignment = @course.assignments.create!(:name => "Thing")
+      html = <<-HTML
+        <a href="/courses/#{@course.id}/assignments/#{@assignment.id}">Thing</a>
+      HTML
+      keygen = mock()
+      keygen.expects(:create_key).returns("silly-migration-id")
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => true, :key_generator => keygen)
+      doc = Nokogiri::HTML.parse(@exporter.html_content(html))
+      expect(doc.at_css("a").attr('href')).to eq "$CANVAS_OBJECT_REFERENCE$/assignments/silly-migration-id"
+    end
   end
 end
