@@ -62,7 +62,8 @@ class GradebooksController < ApplicationController
     if grading_periods?
       @grading_periods = active_grading_periods_json
       gp_id = @current_grading_period_id unless view_all_grading_periods?
-      effective_due_dates = EffectiveDueDates.new(@context).to_hash
+
+      effective_due_dates = EffectiveDueDates.new(@context).filter_students_to([@presenter.student]).to_hash
     end
 
     @exclude_total = exclude_total?(@context)
@@ -72,7 +73,6 @@ class GradebooksController < ApplicationController
       @presenter.assignments
       aggregate_assignments
       @presenter.submissions
-      @presenter.submission_counts
       @presenter.assignment_stats
     end
 
