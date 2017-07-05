@@ -1215,5 +1215,20 @@ describe GradeCalculator do
         expect(enrollment.reload.computed_final_score).to eql(100.0)
       end
     end
+
+    context "caches" do
+      it 'calls invalidate caches in #compute_and_save_scores' do
+        gc = GradeCalculator.new(@student.id, @course)
+        gc.expects(:invalidate_caches).once
+        gc.compute_and_save_scores
+      end
+
+      describe "#invalidate_caches" do
+        it 'calls GradeSummaryPresenter.invalidate_cache' do
+          GradeSummaryPresenter.expects(:invalidate_cache).once
+          GradeCalculator.new(@student.id, @course).compute_and_save_scores
+        end
+      end
+    end
   end
 end

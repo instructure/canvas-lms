@@ -32,7 +32,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   def hide_distribution_graphs?
-    submission_count = @summary.submission_counts[assignment.id] || 0
+    submission_count = @summary.assignment_stats[assignment.id]&.count || 0
     submission_count < 5 || assignment.context.hide_distribution_graphs?
   end
 

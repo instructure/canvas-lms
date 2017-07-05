@@ -62,7 +62,19 @@ class GradebooksController < ApplicationController
     if grading_periods?
       @grading_periods = active_grading_periods_json
       gp_id = @current_grading_period_id unless view_all_grading_periods?
-      effective_due_dates = EffectiveDueDates.new(@context).to_hash
+
+      effective_due_dates =
+        Submission.active.
+          where(user_id: @presenter.student_id, assignment_id: @context.assignments.active).
+          select(:cached_due_date, :grading_period_id, :assignment_id, :user_id).
+          each_with_object({}) do |submission, hsh|
+            hsh[submission.assignment_id] = {
+              submission.user_id => {
+                due_at: submission.cached_due_date,
+                grading_period_id: submission.grading_period_id,
+              }
+            }
+          end
     end
 
     @exclude_total = exclude_total?(@context)
@@ -72,7 +84,6 @@ class GradebooksController < ApplicationController
       @presenter.assignments
       aggregate_assignments
       @presenter.submissions
-      @presenter.submission_counts
       @presenter.assignment_stats
     end
 
