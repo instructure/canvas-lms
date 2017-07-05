@@ -1454,7 +1454,7 @@ import './vendor/ui.selectmenu'
         });
 
         var defaultInfoMessage = I18n.t('turnitin.info_message',
-                                        'This file is still being processed by turnitin. Please check back later to see the score'),
+                                        'This file is still being processed by the plagiarism detection tool associated with the assignment. Please check back later to see the score.'),
             defaultErrorMessage = I18n.t('turnitin.error_message',
                                          'There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.');
         var $turnitinInfo = $(turnitinInfoTemplate({
