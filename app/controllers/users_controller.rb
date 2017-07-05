@@ -902,9 +902,10 @@ class UsersController < ApplicationController
   # @argument user_id
   #   the student's ID
   #
-  # @argument include[] [String, "planner_overrides"]
+  # @argument include[] [String, "planner_overrides"|"course"]
   #   "planner_overrides":: Optionally include the assignment's associated planner override, if it exists, for the current user.
   #                         These will be returned under a +planner_override+ key
+  #   "course":: Optionally include the assignments' courses
   #
   # @returns [Assignment]
   def missing_submissions
@@ -925,9 +926,18 @@ class UsersController < ApplicationController
     end
     assignments = Api.paginate(submissions, self, api_v1_user_missing_submissions_url).map(&:assignment)
 
-    planner_overrides = Array(params[:include]).include?('planner_overrides')
+    includes = Array(params[:include])
+    planner_overrides = includes.include?('planner_overrides')
+    include_course = includes.include?('course')
+    ActiveRecord::Associations::Preloader.new.preload(assignments, :context) if include_course
 
-    render json: assignments.map {|as| assignment_json(as, user, session, include_planner_override: planner_overrides) }
+    json = assignments.map do |as|
+      assmt_json = assignment_json(as, user, session, include_planner_override: planner_overrides)
+      assmt_json['course'] = course_json(as.context, user, session, [], nil) if include_course
+      assmt_json
+    end
+
+    render json: json
   end
 
   def ignore_item
