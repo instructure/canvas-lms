@@ -115,11 +115,19 @@ module Lti
       [
         IMS::LTI::Models::SecurityProfile.new(
           security_profile_name: 'lti_oauth_hash_message_security',
-          digest_algorithm: 'HMAC-SHA1'
+          digest_algorithm: ['HMAC-SHA1']
         ),
         IMS::LTI::Models::SecurityProfile.new(
           security_profile_name: 'oauth2_access_token_ws_security',
-          digest_algorithm: 'HS256'
+          digest_algorithm: ['HS256']
+        ),
+        IMS::LTI::Models::SecurityProfile.new(
+          security_profile_name: 'lti_jwt_ws_security',
+          digest_algorithm: ['HS256']
+        ),
+        IMS::LTI::Models::SecurityProfile.new(
+          security_profile_name: 'lti_jwt_message_security',
+          digest_algorithm: ['HS256']
         )
       ]
     end

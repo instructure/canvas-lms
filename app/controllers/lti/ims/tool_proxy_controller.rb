@@ -40,8 +40,8 @@ module Lti
       before_action :require_context, :except => [:show]
       skip_before_action :load_user, only: [:create, :show, :re_reg]
 
-      rescue_from 'Lti::ToolProxyService::InvalidToolProxyError' do |exception|
-        render json: {error: exception.message}, status: 400
+      rescue_from Lti::Errors::InvalidToolProxyError do |exception|
+        render json: exception.as_json, status: 400
       end
 
       def show
@@ -67,7 +67,7 @@ module Lti
           rescue Lti::Oauth2::InvalidTokenError
             render_unauthorized and return
           end
-        else
+        elsif request.authorization.present?
           secret = RegistrationRequestService.retrieve_registration_password(context, oauth_consumer_key)
           render_new_tool_proxy(
             context: context,

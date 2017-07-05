@@ -22,13 +22,18 @@ module Lti
   module Ims
     class ToolSettingController < ApplicationController
       include Lti::ApiServiceHelper
+      include Lti::Ims::AccessTokenHelper
+
+      TOOL_SETTINGS_SERVICE = 'ToolProxySettings'.freeze
+      TOOL_PROXY_BINDING_SERVICE = 'ToolProxyBindingSettings'.freeze
+      LTI_LINK_SETTINGS = 'LtiLinkSettings'.freeze
 
       skip_before_action :load_user
       before_action :authenticate_api_call
 
       SERVICE_DEFINITIONS = [
         {
-          id: 'ToolProxySettings',
+          id: TOOL_SETTINGS_SERVICE,
           endpoint: 'api/lti/tool_settings/tool_proxy/{tool_proxy_id}',
           format: %w(
             application/vnd.ims.lti.v2.toolsettings+json
@@ -37,7 +42,7 @@ module Lti
           action: %w(GET PUT).freeze
         }.freeze,
         {
-          id: 'ToolProxyBindingSettings',
+          id: TOOL_PROXY_BINDING_SERVICE,
           endpoint: 'api/lti/tool_settings/bindings/{binding_id}',
           format: %w(
             application/vnd.ims.lti.v2.toolsettings+json'
@@ -46,7 +51,7 @@ module Lti
           action: %w(GET PUT).freeze
         }.freeze,
         {
-          id: 'LtiLinkSettings',
+          id: LTI_LINK_SETTINGS,
           endpoint: 'api/lti/tool_settings/links/{tool_proxy_id}',
           format: %w(
             application/vnd.ims.lti.v2.toolsettings+json
@@ -66,6 +71,10 @@ module Lti
         render_bad_request and return unless valid_update_request?(json)
         @tool_setting.update_attribute(:custom, custom_settings(tool_setting_type(@tool_setting), json))
         head :ok
+      end
+
+      def lti2_service_name
+        [TOOL_SETTINGS_SERVICE, TOOL_PROXY_BINDING_SERVICE, LTI_LINK_SETTINGS]
       end
 
       private
@@ -135,7 +144,18 @@ module Lti
       end
 
       def authenticate_api_call
-        lti_authenticate or return
+        if oauth2_request?
+          begin
+            validate_access_token!
+            @tool_proxy = tool_proxy
+          rescue Lti::Oauth2::InvalidTokenError
+            render_unauthorized and return
+          end
+        elsif request.authorization.present?
+          lti_authenticate or return
+        else
+          render_unauthorized and return
+        end
         @tool_setting = @tool_proxy.tool_settings.find(params[:tool_setting_id]) if @tool_proxy
       end
 

@@ -47,7 +47,7 @@ export default React.createClass({
         return this.props.registrationUrl
       }
       else {
-        return ENV.LTI_LAUNCH_URL + '?display=borderless&tool_consumer_url=' + this.props.registrationUrl;
+        return ENV.LTI_LAUNCH_URL + '?display=borderless&tool_consumer_url=' + encodeURIComponent(this.props.registrationUrl);
       }
     },
 

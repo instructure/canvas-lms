@@ -209,6 +209,19 @@ module Lti
             profile = security_profiles.find{|p| p.security_profile_name == 'oauth2_access_token_ws_security'}
             expect(profile.digest_algorithms).to match_array ['HS256']
           end
+
+          it 'adds the lti_jwt_ws_security' do
+            security_profiles = tcp_creator.create.security_profiles
+            profile = security_profiles.find{|p| p.security_profile_name == 'lti_jwt_ws_security'}
+            expect(profile.digest_algorithms).to match_array ['HS256']
+          end
+
+          it 'adds the lti_jwt_message_security' do
+            security_profiles = tcp_creator.create.security_profiles
+            profile = security_profiles.find{|p| p.security_profile_name == 'lti_jwt_message_security'}
+            expect(profile.digest_algorithms).to match_array ['HS256']
+          end
+
         end
 
 

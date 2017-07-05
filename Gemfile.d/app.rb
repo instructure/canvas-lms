@@ -44,7 +44,7 @@ gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   # for folio, see the folio README
   gem 'will_paginate', '3.1.5', require: false
 
-gem 'addressable', '2.5.0', require: false
+gem 'addressable', '2.5.1', require: false
 gem "after_transaction_commit", '1.1.2'
 gem "aws-sdk-s3", '1.0.0.rc3', require: false
 gem "aws-sdk-sns", '1.0.0.rc1', require: false
@@ -69,11 +69,11 @@ gem 'i18nliner', '0.0.12'
   gem 'ruby2ruby', '2.3.1', require: false
   gem 'ruby_parser', '3.8.4', require: false
 gem 'icalendar', '1.5.4', require: false
-gem 'ims-lti', '2.1.2', require: 'ims'
+gem 'ims-lti', '2.1.3', require: 'ims'
 gem 'json', '2.0.3'
 gem 'oj', '2.17.1'
 gem 'jwt', '1.2.1', require: false
-gem 'json-jwt', '1.6.5', require: false
+gem 'json-jwt', '1.7.2', require: false
 gem 'twilio-ruby', '4.2.1'
 
 gem 'mail', '2.6.4', require: false
