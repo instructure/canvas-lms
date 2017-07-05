@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
 require_relative '../spec_helper'
 
@@ -346,9 +347,10 @@ describe PlannerOverridesController do
       describe "PUT #update" do
         it "returns http success" do
           expect(@planner_override.marked_complete).to be_falsey
-          put :update, id: @planner_override.id, marked_complete: true
+          put :update, id: @planner_override.id, marked_complete: true, dismissed: true
           expect(response).to have_http_status(:success)
           expect(@planner_override.reload.marked_complete).to be_truthy
+          expect(@planner_override.dismissed).to be_truthy
         end
       end
 
