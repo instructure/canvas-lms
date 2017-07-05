@@ -28,6 +28,18 @@ describe "Student column header options" do
   before(:once) { init_course_with_students(3) }
   before(:each) { user_session(@teacher) }
 
+  context "student name sort by" do
+
+    before(:each) do
+      Gradezilla.visit(@course)
+    end
+
+    it "sorts student column in A-Z order", priority: "1", test_id: 3253316 do
+      Gradezilla.click_student_menu_sort_by('A-Z')
+      expect(Gradezilla.fetch_student_names[0]).to eq(@course.students[0].name)
+    end
+  end
+
   context "Display as" do
     before(:each) do
       Gradezilla.visit(@course)

@@ -86,10 +86,6 @@ class Gradezilla
       f("span .Gradebook__ColumnHeaderAction")
     end
 
-    def student_header_main_menu_sort_by_element
-      fj("[role=menu][aria-labelledby*=PopoverMenu] button:contains('Sort by')")
-    end
-
     def student_header_menu_main_element(menu)
       fj("[role=menu][aria-labelledby*=PopoverMenu] button:contains('#{menu}')")
     end
@@ -530,13 +526,12 @@ class Gradezilla
 
     def click_student_menu_sort_by(menu_option)
       student_column_menu.click
-      scroll_page_to_top
-      # sort by scrolls out of view and does not get selected correctly on jenkins, so..
+      hover(student_header_menu_main_element('Sort by'))
+      wait_for_ajaximations
+
       if menu_option == "A-Z"
-        ff("[role=menu][aria-labelledby*='PopoverMenu'] button")[0].click
         student_header_submenu_item_element('A–Z').click
       elsif menu_option == "Z-A"
-        ff("[role=menu][aria-labelledby*='PopoverMenu'] button")[0].click
         student_header_submenu_item_element('Z–A').click
       end
     end
