@@ -94,7 +94,8 @@ module Lti
          vnd.Canvas.root_account.uuid
          vnd.Canvas.OriginalityReport.url
          vnd.Canvas.submission.history.url
-         vnd.Canvas.submission.url)
+         vnd.Canvas.submission.url
+         Context.title)
     }
     describe '#supported_capabilities' do
       it 'returns all supported capabilities asociated with launch params' do

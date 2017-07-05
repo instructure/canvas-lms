@@ -21,7 +21,7 @@ require_dependency "lti/variable_expander"
 module Lti
   describe VariableExpander do
     let(:root_account) { Account.new(lti_guid: 'test-lti-guid') }
-    let(:account) { Account.new(root_account: root_account) }
+    let(:account) { Account.new(root_account: root_account, name:'Test Account') }
     let(:course) { Course.new(account: account, course_code: 'CS 124', sis_source_id: '1234') }
     let(:group_category) { course.group_categories.new(name: 'Category') }
     let(:group) { course.groups.new(name: 'Group', group_category: group_category) }
@@ -274,6 +274,12 @@ module Lti
     end
 
     describe "#variable expansions" do
+      it 'has a substitution for Context.title' do
+        exp_hash = {test: '$Context.title'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq variable_expander.context.name
+      end
+
       it 'has substitution for vnd.Canvas.OriginalityReport.url' do
         exp_hash = {test: '$vnd.Canvas.OriginalityReport.url'}
         variable_expander.expand_variables!(exp_hash)

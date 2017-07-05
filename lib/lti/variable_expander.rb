@@ -112,6 +112,16 @@ module Lti
       end
     end
 
+    # The title of the context
+    # @launch_parameter context_title
+    # @example
+    #   ```
+    #   Example Course
+    #   ```
+    register_expansion 'Context.title', [],
+                       -> { @context.name },
+                       default_name: 'context_title'
+
     # The Canvas id of the Originality Report associated
     # with the launch.
     # @launch_parameter com_instructure_originality_report_id

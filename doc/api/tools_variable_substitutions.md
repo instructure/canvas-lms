@@ -108,6 +108,15 @@ particular placement:
 ```
 
 # Supported Substitutions
+## Context.title
+The title of the context.
+
+**Availability**: *always*  
+**Launch Parameter**: *context_title*  
+
+```
+Example Course
+```
 ## com.instructure.OriginalityReport.id
 The Canvas id of the Originality Report associated
 with the launch.
