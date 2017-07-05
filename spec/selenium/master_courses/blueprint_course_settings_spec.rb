@@ -68,13 +68,13 @@ describe "course settings/blueprint" do
       expect(availability_dates_checkbox_state).to eq false
       expect_new_page_load { submit_form('#course_form') }
       expect(MasterCourses::MasterTemplate.full_template_for(@course).default_restrictions).to eq(
-        { :content => true, :points => false, :due_dates => false, :availability_dates => false }
+        { content: true, points: false, due_dates: false, availability_dates: false }
       )
     end
 
     it "manipulates checkboxes" do
       template = MasterCourses::MasterTemplate.set_as_master_course(@course)
-      template.default_restrictions = { :points => true, :due_dates => true, :availability_dates => true, }
+      template.default_restrictions = { points: true, due_dates: true, availability_dates: true, }
       template.save
       get "/courses/#{@course.id}/settings"
 
@@ -88,13 +88,13 @@ describe "course settings/blueprint" do
       expect(availability_dates_checkbox_state).to eq true
 
       expect(MasterCourses::MasterTemplate.full_template_for(@course).default_restrictions).to eq(
-        { :content => false, :points => true, :due_dates => true, :availability_dates => true }
+        { content: false, points: true, due_dates: true, availability_dates: true }
       )
     end
 
     it "disables blueprint course and hides restrictions" do
       template = MasterCourses::MasterTemplate.set_as_master_course(@course)
-      template.default_restrictions = { :content => true, :due_dates => true }
+      template.default_restrictions = { content: true, due_dates: true }
       template.save!
 
       get "/courses/#{@course.id}/settings"
@@ -133,9 +133,11 @@ describe "course settings/blueprint" do
       template.reload
       expect(template.use_default_restrictions_by_type).to be_truthy
       expect(template.default_restrictions_by_type["Assignment"]).to eq({
-        :content => true, :points => true, :due_dates => false, :availability_dates => false})
+        content: true, points: true, due_dates: false, availability_dates: false
+                                                                        })
       expect(template.default_restrictions_by_type["Quizzes::Quiz"]).to eq({
-        :content => false, :points => false, :due_dates => true, :availability_dates => false})
+        content: false, points: false, due_dates: true, availability_dates: false
+                                                                           })
     end
   end
 
@@ -146,13 +148,13 @@ describe "course settings/blueprint" do
 
     it "shows No instead of a checkbox for normal courses" do
       get "/courses/#{@course.id}/settings"
-      expect(f('#course_blueprint').text).to include 'No'
+      expect(f('#course_blueprint')).to include_text 'No'
     end
 
     it "shows Yes instead of a checkbox for blueprint courses" do
       MasterCourses::MasterTemplate.set_as_master_course(@course)
       get "/courses/#{@course.id}/settings"
-      expect(f('#course_blueprint').text).to include 'Yes'
+      expect(f('#course_blueprint')).to include_text 'Yes'
     end
 
   end
