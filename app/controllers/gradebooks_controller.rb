@@ -767,7 +767,7 @@ class GradebooksController < ApplicationController
     @page_title = t("Gradebook History")
     @body_classes << "full-width padless-content"
     js_bundle :react_gradebook_history
-    # css_bundle :react_gradebook_history
+    css_bundle :react_gradebook_history
     js_env({})
 
     render html: "", layout: true

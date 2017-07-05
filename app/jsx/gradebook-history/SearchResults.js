@@ -33,6 +33,7 @@ const { arrayOf, bool, number, shape, string } = PropTypes;
 class SearchResultsComponent extends Component {
   static propTypes = {
     fetchHistoryStatus: string.isRequired,
+    caption: string.isRequired,
     historyItems: arrayOf(shape({
       anonymous: string.isRequired,
       assignment: number.isRequired,
@@ -43,7 +44,6 @@ class SearchResultsComponent extends Component {
       time: string.isRequired,
       to: string.isRequired
     })).isRequired,
-    label: string.isRequired,
     requestingResults: bool.isRequired
   };
 
@@ -66,9 +66,9 @@ class SearchResultsComponent extends Component {
 
     return (
       <Table
-        label={this.props.label}
-        caption={this.props.label}
+        caption={this.props.caption}
         colHeaders={constants.colHeaders}
+        striped="rows"
       >
         <tbody>
           {this.props.historyItems.map(item => (

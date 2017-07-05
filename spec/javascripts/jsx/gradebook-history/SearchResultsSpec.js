@@ -18,7 +18,6 @@
 
 import React from 'react';
 import { mount, shallow } from 'enzyme';
-import I18n from 'i18n!gradebook-history';
 import Spinner from 'instructure-ui/lib/components/Spinner';
 import Table from 'instructure-ui/lib/components/Table';
 import Typography from 'instructure-ui/lib/components/Typography';
@@ -29,9 +28,9 @@ import Fixtures from 'spec/jsx/gradebook-history/Fixtures';
 
 const defaultProps = () => (
   {
+    caption: 'search results',
     fetchHistoryStatus: '',
     historyItems: [],
-    label: 'search results',
     loadMore () {},
     requestingResults: false
   }
@@ -57,11 +56,10 @@ test('shows a Table if there are historyItems passed', function () {
 
 test('Table is passed the label and caption props', function () {
   const historyItems = formatHistoryItems(Fixtures.payload());
-  const props = { label: 'search results label', historyItems };
+  const props = { caption: 'search results caption', historyItems };
   const wrapper = mountComponent(props);
   const table = wrapper.find(Table);
-  equal(table.props().label, props.label);
-  equal(table.props().caption, props.label);
+  equal(table.props().caption, props.caption);
 });
 
 test('Table is passed column headers in correct order', function () {

@@ -23,9 +23,11 @@ import I18n from 'i18n!gradebook_history';
 import moment from 'moment';
 import Autocomplete from 'instructure-ui/lib/components/Autocomplete';
 import Button from 'instructure-ui/lib/components/Button';
+import Container from 'instructure-ui/lib/components/Container';
 import DateInput from 'instructure-ui/lib/components/DateInput';
 import FormFieldGroup from 'instructure-ui/lib/components/FormFieldGroup';
 import Spinner from 'instructure-ui/lib/components/Spinner';
+import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
 import TextInput from 'instructure-ui/lib/components/TextInput';
 import SearchFormActions from 'jsx/gradebook-history/actions/SearchFormActions';
 import { showFlashAlert } from 'jsx/shared/FlashAlert';
@@ -202,52 +204,69 @@ class SearchFormComponent extends Component {
 
   render () {
     return (
-      <FormFieldGroup description={I18n.t('Search Form')} label={I18n.t('Search Form')} rowSpacing="small">
-        <Autocomplete
-          id="graders"
-          allowEmpty
-          emptyOption={this.state.emptyOptions.graders}
-          filter={this.filterNone}
-          label={I18n.t('Grader')}
-          loading={this.props.fetchGradersStatus === 'started'}
-          loadingOption={<Spinner size="small" title={I18n.t('Loading Graders')} />}
-          onChange={this.setSelectedGrader}
-          onInputChange={this.handleUserEntry}
-        >
-          {this.renderAsOptions(this.state.graderOptions)}
-        </Autocomplete>
-        <Autocomplete
-          id="students"
-          allowEmpty
-          emptyOption={this.state.emptyOptions.students}
-          filter={this.filterNone}
-          label={I18n.t('Student')}
-          loading={this.props.fetchStudentsStatus === 'started'}
-          loadingOption={<Spinner size="small" title={I18n.t('Loading Students')} />}
-          onChange={this.setSelectedStudent}
-          onInputChange={this.handleUserEntry}
-        >
-          {this.renderAsOptions(this.state.studentOptions)}
-        </Autocomplete>
-        <TextInput id="assignment" label={I18n.t('Assignment')} onChange={this.handleTextEntry} />
-        <DateInput
-          label={I18n.t('From')}
-          previousLabel={I18n.t('Previous Month')}
-          nextLabel={I18n.t('Next Month')}
-          onDateChange={this.setSelectedFrom}
-        />
-        <DateInput
-          label={I18n.t('To')}
-          previousLabel={I18n.t('Previous Month')}
-          nextLabel={I18n.t('Next Month')}
-          onDateChange={this.setSelectedTo}
-        />
-        <Button
-          onClick={this.handleSubmit}
-          type="submit"
-        >
-          {I18n.t('Find')}
-        </Button>
+      <FormFieldGroup
+        description={<ScreenReaderContent>{I18n.t('Search Form')}</ScreenReaderContent>}
+      >
+        <Container as="div" textAlign="center" margin="none large">
+          <div className="GradebookHistory__SearchFormInput">
+            <Autocomplete
+              id="graders"
+              allowEmpty
+              emptyOption={this.state.emptyOptions.graders}
+              filter={this.filterNone}
+              label={I18n.t('Grader')}
+              loading={this.props.fetchGradersStatus === 'started'}
+              loadingOption={<Spinner size="small" title={I18n.t('Loading Graders')} />}
+              onChange={this.setSelectedGrader}
+              onInputChange={this.handleUserEntry}
+            >
+              {this.renderAsOptions(this.state.graderOptions)}
+            </Autocomplete>
+          </div>
+          <div className="GradebookHistory__SearchFormInput">
+            <Autocomplete
+              id="students"
+              allowEmpty
+              emptyOption={this.state.emptyOptions.students}
+              filter={this.filterNone}
+              label={I18n.t('Student')}
+              loading={this.props.fetchStudentsStatus === 'started'}
+              loadingOption={<Spinner size="small" title={I18n.t('Loading Students')} />}
+              onChange={this.setSelectedStudent}
+              onInputChange={this.handleUserEntry}
+            >
+              {this.renderAsOptions(this.state.studentOptions)}
+            </Autocomplete>
+          </div>
+          <div className="GradebookHistory__SearchFormInput">
+            <TextInput id="assignment" label={I18n.t('Assignment')} onChange={this.handleTextEntry} />
+          </div>
+          <div className="GradebookHistory__SearchFormInput">
+            <DateInput
+              label={I18n.t('From')}
+              previousLabel={I18n.t('Previous Month')}
+              nextLabel={I18n.t('Next Month')}
+              onDateChange={this.setSelectedFrom}
+            />
+          </div>
+          <div className="GradebookHistory__SearchFormInput">
+            <DateInput
+              label={I18n.t('To')}
+              previousLabel={I18n.t('Previous Month')}
+              nextLabel={I18n.t('Next Month')}
+              onDateChange={this.setSelectedTo}
+            />
+          </div>
+          <div className="GradebookHistory__SearchFormInput GradebookHistory__SearchFormButton">
+            <Button
+              onClick={this.handleSubmit}
+              type="submit"
+              variant="primary"
+            >
+              {I18n.t('Find')}
+            </Button>
+          </div>
+        </Container>
       </FormFieldGroup>
     );
   }
