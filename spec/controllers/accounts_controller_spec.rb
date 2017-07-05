@@ -241,7 +241,17 @@ describe AccountsController do
 
       expect(assigns[:courses].find {|c| c.id == c1.id }.student_count).to eq c1.student_enrollments.count
       expect(assigns[:courses].find {|c| c.id == c2.id }.student_count).to eq c2.student_enrollments.count
+    end
 
+    it "should list student counts in unclaimed courses" do
+      account_with_admin_logged_in
+      c1 = @account.courses.create!(:name => "something", :workflow_state => 'created')
+      @student = User.create
+      c1.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
+
+      get 'show', :id => @account.id, :format => 'html'
+
+      expect(assigns[:courses].first.student_count).to eq 1
     end
 
     it "should not list rejected teachers" do

@@ -257,7 +257,7 @@ class Enrollment < ActiveRecord::Base
   scope :student_in_claimed_or_available, -> {
     select(:course_id).
         joins(:course).
-        where(:type => 'StudentEnrollment', :workflow_state => 'active', :courses => { :workflow_state => ['available', 'claimed'] }) }
+        where(:type => 'StudentEnrollment', :workflow_state => 'active', :courses => { :workflow_state => ['available', 'claimed', 'created'] }) }
 
   scope :all_student, -> {
     eager_load(:course).
