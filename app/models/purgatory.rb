@@ -18,4 +18,6 @@
 class Purgatory < ActiveRecord::Base
   belongs_to :attachment
   belongs_to :deleted_by_user, class_name: 'User'
+
+  scope :active, -> { where(workflow_state: 'active') }
 end
