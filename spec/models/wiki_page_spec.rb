@@ -305,6 +305,17 @@ describe WikiPage do
         front_page.initialize_wiki_page(@teacher)
         expect(front_page).to be_published
       end
+
+      it 'should not change the URL in a wiki page link' do
+        allow_any_instance_of(UserContent::HtmlRewriter).to receive(:user_can_view_content?).and_return true
+        course = course_factory()
+        some_other_course = course_factory()
+
+        file_url = "/courses/#{some_other_course.id}/files/1"
+        link_string = "<a href='#{file_url}'>link</a>"
+        page = course.wiki.wiki_pages.create!(title: 'New', body: "<p>#{link_string}</p>", user: @user)
+        expect(page.body).to include(file_url)
+      end
     end
 
     context 'on a group' do
