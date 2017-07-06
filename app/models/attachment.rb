@@ -1656,7 +1656,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def previewable_media?
-    self.content_type && self.content_type.match(/\A(video|audio)/)
+    self.content_type && (self.content_type.match(/\A(video|audio)/) || self.content_type == 'application/x-flash-video')
   end
 
   def preview_params(user, type, opts = {})
