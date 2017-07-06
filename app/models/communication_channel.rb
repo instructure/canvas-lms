@@ -92,6 +92,7 @@ class CommunicationChannel < ActiveRecord::Base
       ['63',   I18n.t('Philippines (+63)'),            false],
       ['48',   I18n.t('Poland (+48)'),                 false],
       ['974',  I18n.t('Qatar (+974)'),                 false],
+      ['7',    I18n.t('Russia (+7)'),                  false],
       ['966',  I18n.t('Saudi Arabia (+966)'),          false],
       ['65',   I18n.t('Singapore (+65)'),              false],
       ['82',   I18n.t('South Korea (+82)'),            false],
