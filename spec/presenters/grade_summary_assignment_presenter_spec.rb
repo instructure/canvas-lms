@@ -98,6 +98,47 @@ describe GradeSummaryAssignmentPresenter do
     end
   end
 
+  describe '#deduction_present?' do
+    it 'returns true when submission has positive points_deducted' do
+      @submission.stubs(:points_deducted).returns(10)
+      expect(presenter.deduction_present?).to eq(true)
+    end
+
+    it 'returns false when submission has zero points_deducted' do
+      @submission.stubs(:points_deducted).returns(0)
+      expect(presenter.deduction_present?).to eq(false)
+    end
+
+    it 'returns false when submission has nil points_deducted' do
+      @submission.stubs(:points_deducted).returns(nil)
+      expect(presenter.deduction_present?).to eq(false)
+    end
+
+    it 'returns false when submission is not present' do
+      presenter.stubs(:submission).returns(nil)
+      expect(presenter.deduction_present?).to eq(false)
+    end
+  end
+
+  describe '#entered_grade' do
+    it 'returns empty string when neither letter graded nor gpa scaled' do
+      @assignment.update(grading_type: 'points')
+      expect(presenter.entered_grade).to eq('')
+    end
+
+    it 'returns empty string when ungraded' do
+      @submission.update(grade: nil)
+      expect(presenter.entered_grade).to eq('')
+    end
+
+    it 'returns entered grade in parentheses' do
+      @assignment.update(grading_type: 'letter_grade')
+      @submission.update(grade: 'A', score: 12)
+
+      expect(presenter.entered_grade).to eq('(A)')
+    end
+  end
+
   describe "#missing?" do
     it "returns the value of the submission method" do
       expect(@submission).to receive(:missing?).and_return('foo')

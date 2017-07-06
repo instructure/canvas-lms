@@ -130,6 +130,26 @@ class GradeSummaryAssignmentPresenter
     submission.try(:excused?)
   end
 
+  def deduction_present?
+    !!(submission&.points_deducted&.> 0)
+  end
+
+  def entered_grade
+    if is_letter_graded_or_gpa_scaled? && submission.entered_grade.present?
+      "(#{submission.entered_grade})"
+    else
+      ''
+    end
+  end
+
+  def display_entered_score
+    "#{I18n.n round_if_whole(submission.entered_score)} #{entered_grade}"
+  end
+
+  def display_points_deducted
+    I18n.n round_if_whole(-submission.points_deducted)
+  end
+
   def published_grade
     if is_letter_graded_or_gpa_scaled? && !submission.published_grade.nil?
       "(#{submission.published_grade})"

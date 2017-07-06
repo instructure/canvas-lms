@@ -443,7 +443,7 @@
             <table id="score_details_<%= assignment.id %>" class="score_details_table">
               <thead>
                 <tr>
-                  <th colspan="3">
+                  <th colspan="5">
                     <%= t(:score_details, "Score Details") %>
                   </th>
                   <th>
@@ -454,7 +454,7 @@
               <tbody>
                 <tr>
                   <% if assignment_presenter.viewing_fake_student? %>
-                    <td colspan="4">
+                    <td colspan="6">
                       <%= t(:disabled_for_student_view, "Test Student scores are not included in grade statistics.") %>
                     </td>
                   <% else %>
@@ -471,7 +471,19 @@
                       <%= before_label(:low, "Low") %>
                       <%= n(round_if_whole(low)) %>
                     </td>
-                    <td>
+                    <% if assignment_presenter.deduction_present? %>
+                      <td>
+                          <%= before_label('Score') %>
+                          <%= assignment_presenter.display_entered_score %>
+                      </td>
+                      <td>
+                        <%= before_label('Late Penalty') %>
+                        <span class="error">
+                          <%= assignment_presenter.display_points_deducted %>
+                        </span>
+                      </td>
+                    <% end %>
+                    <td colspan="<%= assignment_presenter.deduction_present? ? 1 : 3 %>">
                       <% graph = assignment_presenter.graph %>
                       <div style="cursor: pointer; float: right; height: 30px; margin-left: 20px; width: 160px; position: relative; margin-right: 30px;" aria-hidden="true" title="<%= graph.title %>">
                         <div class="grade-summary-graph-component" style="height: 10px; margin: 5px 0px; border-width: 2px; border-right-width: 0;">&nbsp;</div>
