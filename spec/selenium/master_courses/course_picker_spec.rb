@@ -31,29 +31,31 @@ describe "master courses - course picker" do
     term1 = Account.default.enrollment_terms.create!(name: "fall term")
     term2 = Account.default.enrollment_terms.create!(name: "spring term")
 
+    sub_account1 = Account.default.sub_accounts.create!(name: "sub-account 1")
+
     # create some courses
     c = Course.create!(
-      :account => @account, :name => "AlphaDog", :course_code => "CCC1", :sis_source_id => "SIS_A1",
+      :account => Account.default, :name => "AlphaDog", :course_code => "CCC1", :sis_source_id => "SIS_A1",
       :enrollment_term_id => term1.id
     )
     c.offer!
     c = Course.create!(
-      :account => @account, :name => "AlphaMale", :course_code => "CCC2", :sis_source_id => "SIS_A2",
+      :account => Account.default, :name => "AlphaMale", :course_code => "CCC2", :sis_source_id => "SIS_A2",
       :enrollment_term_id => term1.id
     )
     c.offer!
     c = Course.create!(
-      :account => @account, :name => "Alphabet", :course_code => "CCC3", :sis_source_id => "SIS_A3",
+      :account => Account.default, :name => "Alphabet", :course_code => "CCC3", :sis_source_id => "SIS_A3",
       :enrollment_term_id => term1.id
     )
     c.offer!
     c = Course.create!(
-      :account => @account, :name => "BetaCarotine", :course_code => "DDD4", :sis_source_id => "SIS_B4",
+      :account => Account.default, :name => "BetaCarotine", :course_code => "DDD4", :sis_source_id => "SIS_B4",
       :enrollment_term_id => term1.id
     )
     c.offer!
     c = Course.create!(
-      :account => @account, :name => "BetaGetOuttaHere", :course_code => "DDD5", :sis_source_id => "SIS_B5",
+      :account => sub_account1, :name => "BetaGetOuttaHere", :course_code => "DDD5", :sis_source_id => "SIS_B5",
       :enrollment_term_id => term2.id
     )
     c.offer!
@@ -68,6 +70,7 @@ describe "master courses - course picker" do
   let(:filter_output) {'.bca-course-details__wrapper'}
   let(:loading) {'.bca-course-picker__loading'}
   let(:term_filter) {'.bca-course-filter select:contains("Any Term")'}
+  let(:sub_account_filter) {'.bca-course-filter select:contains("Any Sub-Account")'}
 
   def wait_for_spinner
     expect(f(filter_output)).to contain_css(loading)      # the loading spinner appears
@@ -119,5 +122,14 @@ describe "master courses - course picker" do
     click_option(term_filter, 'fall term')
     wait_for_spinner
     expect(available_courses().length).to eq(4)
+  end
+
+  it "should filter the course list by sub-account", priority: "1", test_id: "3279950" do
+    get "/courses/#{@master.id}"
+    open_associations
+    open_courses_list
+    click_option(sub_account_filter, 'sub-account 1')
+    wait_for_spinner
+    expect(available_courses().length).to eq(1)
   end
 end
