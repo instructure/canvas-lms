@@ -1239,6 +1239,7 @@ class Attachment < ActiveRecord::Base
   # object. It will replace the attachment content with a file_removed file.
   def destroy_content_and_replace(deleted_by_user = nil)
     att = self.root_attachment_id? ? self.root_attachment : self
+    return true if Purgatory.where(attachment_id: att).active.exists?
     att.send_to_purgatory(deleted_by_user)
     att.destroy_content
     att.uploaded_data = File.open Rails.root.join('public', 'file_removed', 'file_removed.pdf')
@@ -1250,7 +1251,7 @@ class Attachment < ActiveRecord::Base
   # this method does not destroy anything. It copies the content to a new s3object
   def send_to_purgatory(deleted_by_user = nil)
     make_rootless
-    if Attachment.s3_storage?
+    if Attachment.s3_storage? && self.s3object.exists?
       s3object.copy_to(bucket.object(purgatory_filename))
     else
       FileUtils.mkdir(local_purgatory_directory) unless File.exist?(local_purgatory_directory)
