@@ -457,6 +457,21 @@ describe Attachment do
       a.destroy_content
     end
 
+    it 'should allow destroy_content_and_replace when s3object is already deleted' do
+      s3_storage!
+      a = attachment_model(uploaded_data: default_uploaded_data)
+      a.s3object.delete
+      a.destroy_content_and_replace
+      expect(Purgatory.where(attachment_id: a.id).exists?).to be_truthy
+    end
+
+    it 'should not do destroy_content_and_replace twice' do
+      a = attachment_model(uploaded_data: default_uploaded_data)
+      a.destroy_content_and_replace # works
+      a.expects(:send_to_purgatory).never
+      a.destroy_content_and_replace # returns because it already happened
+    end
+
     it 'should destroy all crocodocs even from children attachments' do
       local_storage!
       configure_crocodoc
