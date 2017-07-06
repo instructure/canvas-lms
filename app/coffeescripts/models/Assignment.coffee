@@ -393,6 +393,9 @@ define [
     isQuizLTIAssignment: =>
       @get('is_quiz_lti_assignment')
 
+    submissionTypesFrozen: =>
+      _.include(@frozenAttributes(), 'submission_types')
+
     toView: =>
       fields = [
         'name', 'dueAt', 'description', 'pointsPossible', 'lockAt', 'unlockAt',
@@ -411,7 +414,7 @@ define [
         'allDates', 'hasDueDate', 'hasPointsPossible', 'singleSectionDueDate',
         'moderatedGrading', 'postToSISEnabled', 'isOnlyVisibleToOverrides',
         'omitFromFinalGrade', 'is_quiz_assignment', 'isQuizLTIAssignment',
-        'secureParams', 'inClosedGradingPeriod', 'dueDateRequired'
+        'secureParams', 'inClosedGradingPeriod', 'dueDateRequired', 'submissionTypesFrozen'
       ]
 
       hash =
