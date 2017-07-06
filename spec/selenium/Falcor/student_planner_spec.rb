@@ -148,4 +148,36 @@ describe "student planner" do
     validate_object_displayed('Page')
     validate_link_to_url(page, 'pages')
   end
+
+  it "opens the sidebar to creata a new To-Do item", priority: "1", test_id: 3263157 do
+
+    go_to_list_view
+    todo_modal_button.click
+    expect(todo_save_button).to be_displayed
+  end
+
+  it "closes the sidebar tray with the 'X' button", priority: "1", test_id: 3263163 do
+
+    go_to_list_view
+    todo_modal_button.click
+    expect(f('body')).to contain_jqcss("button:contains('Save')")
+    fj("button:contains('Close')").click
+    expect(f('body')).not_to contain_jqcss("button:contains('Save')")
+  end
+
+  it "adds text to the details field", priority: "1", test_id: 3263161 do
+    go_to_list_view
+    todo_modal_button.click
+    todo_details.send_keys("TEST")
+    expect(todo_details[:value]).to include("TEST")
+  end
+
+  it "adds text to the title field", priority: "1", test_id: 3263158 do
+    go_to_list_view
+    todo_modal_button.click
+    element = f("div[aria-label = 'Add To Do']")
+    element = f('input', element)
+    element.send_keys("TEST")
+    expect(element[:value]).to include("TEST")
+  end
 end

@@ -65,5 +65,17 @@ module PlannerPageObject
     navigate_to_course_object(object)
     validate_url(url_type, object)
   end
+
+  def todo_modal_button
+    fj("button:contains('Add To Do')")
+  end
+
+  def todo_save_button
+    fj("button:contains('Save')")
+  end
+
+  def todo_details
+    f('textarea')
+  end
 end
 
