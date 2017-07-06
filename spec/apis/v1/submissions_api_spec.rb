@@ -697,7 +697,7 @@ describe 'Submissions API', type: :request do
         "missing"=>false,
         "late_policy_status"=>nil,
         "seconds_late"=>0,
-        "points_deducted"=>0.0
+        "points_deducted"=>nil
     })
 
     # can't access other students' submissions
@@ -968,7 +968,7 @@ describe 'Submissions API', type: :request do
            "missing"=>false,
            "late_policy_status"=>nil,
            "seconds_late"=>0,
-           "points_deducted"=>0.0}],
+           "points_deducted"=>nil}],
         "attempt"=>3,
         "url"=>nil,
         "submission_type"=>"online_text_entry",
@@ -1005,7 +1005,7 @@ describe 'Submissions API', type: :request do
         "missing"=>false,
         "late_policy_status"=>nil,
         "seconds_late"=>0,
-        "points_deducted"=>0.0},
+        "points_deducted"=>nil},
        {"id"=>sub2.id,
         "grade"=>"F",
         "entered_grade"=>"F",
@@ -1064,7 +1064,7 @@ describe 'Submissions API', type: :request do
            "missing"=>false,
            "late_policy_status"=>nil,
            "seconds_late"=>0,
-           "points_deducted"=>0.0}],
+           "points_deducted"=>nil}],
         "attempt"=>1,
         "url"=>"http://www.instructure.com",
         "submission_type"=>"online_url",
@@ -1103,7 +1103,7 @@ describe 'Submissions API', type: :request do
         "missing"=>false,
         "late_policy_status"=>nil,
         "seconds_late"=>0,
-        "points_deducted"=>0.0}]
+        "points_deducted"=>nil}]
     expect(json.sort_by { |h| h['user_id'] }).to eql res.sort_by { |h| h['user_id'] }
   end
 
@@ -1850,7 +1850,8 @@ describe 'Submissions API', type: :request do
       @late_assignment = @course.assignments.create!(
         title: "assignment1",
         due_at: 47.hours.ago,
-        points_possible: 10
+        points_possible: 10,
+        submission_types: 'online_text_entry'
       )
     end
 

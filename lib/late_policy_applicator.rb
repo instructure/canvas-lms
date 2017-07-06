@@ -65,7 +65,7 @@ class LatePolicyApplicator
   private
 
   def process_submission(late_policy, assignment, submission)
-    submission.apply_late_policy(late_policy, assignment.points_possible, assignment.grading_type)
+    submission.apply_late_policy(late_policy, assignment)
     if submission.changed?
       submission.skip_grade_calc = true
       return submission.save!

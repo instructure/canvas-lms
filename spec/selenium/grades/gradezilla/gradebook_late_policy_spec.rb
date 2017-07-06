@@ -49,21 +49,24 @@ describe 'Late Policies:' do
         title: 'assignment one',
         grading_type: 'points',
         points_possible: 100,
-        due_at: 1.day.ago(now)
+        due_at: 1.day.ago(now),
+        submission_types: 'online_text_entry'
       )
 
       @a2 = @course.assignments.create!(
         title: 'assignment two',
         grading_type: 'points',
         points_possible: 100,
-        due_at: 1.day.ago(now)
+        due_at: 1.day.ago(now),
+        submission_types: 'online_text_entry'
       )
 
       @a3 = @course.assignments.create!(
         title: 'assignment three',
         grading_type: 'points',
         points_possible: 10,
-        due_at: 1.week.ago(now)
+        due_at: 1.week.ago(now),
+        submission_types: 'online_text_entry'
       )
 
       # as a student submit 2 assignments late

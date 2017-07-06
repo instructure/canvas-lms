@@ -40,6 +40,7 @@ class Assignment < ActiveRecord::Base
   ALLOWED_GRADING_TYPES = %w(
     pass_fail percent letter_grade gpa_scale points not_graded
   ).freeze
+  OFFLINE_SUBMISSION_TYPES = %i(on_paper external_tool none not_graded wiki_page).freeze
 
   attr_accessor :previous_id, :updating_user, :copying, :user_submitted
 
@@ -301,6 +302,10 @@ class Assignment < ActiveRecord::Base
   validate :frozen_atts_not_altered, :if => :frozen?, :on => :update
   validates :grading_type, inclusion: { in: ALLOWED_GRADING_TYPES },
     allow_nil: true, on: :create
+
+  scope :submittable, -> do
+    where.not(submission_types: [nil, *Assignment::OFFLINE_SUBMISSION_TYPES])
+  end
 
   acts_as_list :scope => :assignment_group
   simply_versioned :keep => 5

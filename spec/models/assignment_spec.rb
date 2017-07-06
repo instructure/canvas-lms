@@ -211,6 +211,33 @@ describe Assignment do
     end
   end
 
+  describe "scope: expects_submissions" do
+    it 'includes assignments expecting online submissions' do
+      assignment_model(submission_types: "online_text_entry,online_url,online_upload", course: @course)
+      expect(Assignment.submittable).not_to be_empty
+    end
+
+    it 'excludes submissions for assignments expecting on_paper submissions' do
+      assignment_model(submission_types: "on_paper", course: @course)
+      expect(Assignment.submittable).to be_empty
+    end
+
+    it 'excludes submissions for assignments expecting external_tool submissions' do
+      assignment_model(submission_types: "external_tool", course: @course)
+      expect(Assignment.submittable).to be_empty
+    end
+
+    it 'excludes submissions for assignments expecting wiki_page submissions' do
+      assignment_model(submission_types: "wiki_page", course: @course)
+      expect(Assignment.submittable).to be_empty
+    end
+
+    it 'excludes submissions for assignments not expecting submissions' do
+      assignment_model(submission_types: "none", course: @course)
+      expect(Assignment.submittable).to be_empty
+    end
+  end
+
   describe '#tool_settings_resource_codes' do
     let(:expected_hash) do
       {

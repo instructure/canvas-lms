@@ -565,7 +565,7 @@ describe Submission do
       expect(submission).to receive(:grading_period).and_return(grading_period)
       @assignment.submit_homework(@student, body: "a body")
       submission.score = 700
-      submission.apply_late_policy(@late_policy, 1000)
+      submission.apply_late_policy(@late_policy, @assignment)
       expect(submission.score).to eq 700
       expect(submission.points_deducted).to be nil
     end
@@ -574,7 +574,7 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.score = 700
-        submission.apply_late_policy(@late_policy, 1000)
+        submission.apply_late_policy(@late_policy, @assignment)
         expect(submission.score).to eq 400
         expect(submission.points_deducted).to eq 300
       end
@@ -584,7 +584,7 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.score = 700
-        submission.apply_late_policy(nil, 1000)
+        submission.apply_late_policy(nil, @assignment)
         expect(submission.score).to eq 700
         expect(submission.points_deducted).to eq 0
       end
@@ -595,7 +595,7 @@ describe Submission do
         @assignment.submit_homework(@student, body: "a body")
         original_score = 1.3800000000000001
         submission.score = original_score
-        submission.apply_late_policy(@late_policy, 1000)
+        submission.apply_late_policy(@late_policy, @assignment)
         expect(submission.score).to eq original_score
       end
     end
@@ -604,10 +604,10 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.score = 800
-        submission.apply_late_policy(@late_policy, 1000)
+        submission.apply_late_policy(@late_policy, @assignment)
         expect(submission.score).to eq 500
         expect(submission.points_deducted).to eq 300
-        submission.apply_late_policy(@late_policy, 1000)
+        submission.apply_late_policy(@late_policy, @assignment)
         expect(submission.score).to eq 500
         expect(submission.points_deducted).to eq 300
       end
@@ -616,7 +616,7 @@ describe Submission do
     it "applies missing policy if submission is missing" do
       Timecop.freeze(1.day.from_now(@date)) do
         submission.score = nil
-        submission.apply_late_policy(@late_policy, 1000)
+        submission.apply_late_policy(@late_policy, @assignment)
         expect(submission.score).to eq 200
       end
     end
@@ -625,15 +625,128 @@ describe Submission do
       before(:once) do
         @date = Time.zone.local(2017, 1, 15, 12)
         @assignment.update!(due_at: 3.hours.ago(@date), points_possible: 1000, submission_types: "on_paper")
-        @late_policy = late_policy_model(deduct: 10.0, every: :hour, missing: 80.0)
+        @late_policy = late_policy_factory(course: @course, deduct: 10.0, every: :hour, missing: 80.0)
       end
 
-      it "does not deduct from assignment on paper" do
+      it "does not deduct from late assignment" do
         Timecop.freeze(@date) do
           @assignment.submit_homework(@student, body: "a body")
           @assignment.grade_student(@student, grade: 700, grader: @teacher)
           expect(submission.score).to eq 700
-          expect(submission.points_deducted).to eq 0
+          expect(submission.points_deducted).to eq nil
+        end
+      end
+
+      it "does not grade missing assignment" do
+        Timecop.freeze(@date) do
+          submission.apply_late_policy
+          expect(submission.score).to eq nil
+          expect(submission.points_deducted).to eq nil
+        end
+      end
+
+      it "deducts a percentage per interval late if manually marked late" do
+        @assignment.submit_homework(@student, body: "a body")
+        submission.late_policy_status = 'late'
+        submission.seconds_late_override = 4.hours
+        submission.score = 700
+        submission.apply_late_policy(@late_policy, @assignment)
+        expect(submission.score).to be 300.0
+        expect(submission.points_deducted).to eq 400
+      end
+
+      context "when change late_policy_status from late to none" do
+        before do
+          @assignment.course.update!(late_policy: @late_policy)
+          @assignment.submit_homework(@student, body: "a body")
+
+          submission.update!(
+            score: 700,
+            late_policy_status: 'late',
+            seconds_late_override: 4.hours
+          )
+        end
+
+        it "removes late penalty from score" do
+          expect { submission.update!(late_policy_status: 'none') }
+            .to change { submission.score }.from(300).to(700)
+        end
+
+        it "sets points_deducted to 0" do
+          expect { submission.update!(late_policy_status: 'none') }
+            .to change { submission.points_deducted }.from(400).to(0)
+        end
+      end
+
+      context "when changing late_policy_status from none to nil" do
+        before do
+          @assignment.update!(due_at: 1.hour.from_now)
+          @assignment.course.update!(late_policy: @late_policy)
+          @assignment.submit_homework(@student, body: "a body")
+          submission.update!(score: 700, late_policy_status: 'late', seconds_late_override: 4.hours)
+        end
+
+        it "applies the late policy to the score" do
+          expect { submission.update!(late_policy_status: 'none') }
+            .to change { submission.score }.from(300).to(700)
+        end
+
+        it "applies the late policy to points_deducted" do
+          expect { submission.update!(late_policy_status: 'none') }
+            .to change { submission.points_deducted }.from(400).to(0)
+        end
+      end
+
+      it "applies missing policy if submission is manually marked missing" do
+        Timecop.freeze(1.day.from_now(@date)) do
+          submission.score = nil
+          submission.late_policy_status = 'missing'
+          submission.apply_late_policy(@late_policy, @assignment)
+          expect(submission.score).to eq 200
+        end
+      end
+    end
+
+    context "assignment expecting no submission" do
+      before(:once) do
+        @date = Time.zone.local(2017, 1, 15, 12)
+        @assignment.update!(due_at: 3.hours.ago(@date), points_possible: 1000, submission_types: "none")
+        @late_policy = late_policy_factory(course: @course, deduct: 10.0, every: :hour, missing: 80.0)
+      end
+
+      it "does not deduct from late assignment" do
+        Timecop.freeze(@date) do
+          @assignment.submit_homework(@student, body: "a body")
+          @assignment.grade_student(@student, grade: 700, grader: @teacher)
+          expect(submission.score).to eq 700
+          expect(submission.points_deducted).to eq nil
+        end
+      end
+
+      it "does not grade missing assignment" do
+        Timecop.freeze(@date) do
+          submission.apply_late_policy
+          expect(submission.score).to eq nil
+          expect(submission.points_deducted).to eq nil
+        end
+      end
+
+      it "deducts a percentage per interval late if manually marked late" do
+        @assignment.submit_homework(@student, body: "a body")
+        submission.late_policy_status = 'late'
+        submission.seconds_late_override = 4.hours
+        submission.score = 700
+        submission.apply_late_policy(@late_policy, @assignment)
+        expect(submission.score).to eq 300
+        expect(submission.points_deducted).to eq 400
+      end
+
+      it "applies missing policy if submission is manually marked missing" do
+        Timecop.freeze(1.day.from_now(@date)) do
+          submission.score = nil
+          submission.late_policy_status = 'missing'
+          submission.apply_late_policy(@late_policy, @assignment)
+          expect(submission.score).to eq 200
         end
       end
     end

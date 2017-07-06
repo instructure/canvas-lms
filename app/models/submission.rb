@@ -1326,14 +1326,20 @@ class Submission < ActiveRecord::Base
     true
   end
 
-  # apply_late_policy is called directly by bulk update processes, or indirectly by before_save on a Submission
-  def apply_late_policy(late_policy=nil, points_possible=nil, grading_type=nil)
+  def late_policy_status_manually_applied?
+    cleared_late = late_policy_status_was == 'late' && ['none', nil].include?(late_policy_status)
+    cleared_none = late_policy_status_was == 'none' && late_policy_status.nil?
+    late_policy_status == 'missing' || late_policy_status == 'late' || cleared_late || cleared_none
+  end
+  private :late_policy_status_manually_applied?
+
+  def apply_late_policy(late_policy=nil, incoming_assignment=nil)
     return if points_deducted_changed? || grading_period&.closed?
-    late_policy ||= assignment.course.late_policy
-    points_possible ||= assignment.points_possible
-    grading_type ||= assignment.grading_type
-    return score_missing(late_policy, points_possible, grading_type) if missing?
-    score_late_or_none(late_policy, points_possible) if score
+    incoming_assignment ||= assignment
+    return unless late_policy_status_manually_applied? || incoming_assignment.expects_submission?
+    late_policy ||= incoming_assignment.course.late_policy
+    return score_missing(late_policy, incoming_assignment.points_possible, incoming_assignment.grading_type) if missing?
+    score_late_or_none(late_policy, incoming_assignment.points_possible) if score
   end
 
   def score_missing(late_policy, points_possible, grading_type)
