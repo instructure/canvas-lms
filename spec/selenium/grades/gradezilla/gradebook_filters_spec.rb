@@ -20,6 +20,8 @@ require_relative '../../helpers/groups_common'
 require_relative '../page_objects/gradezilla_page'
 require_relative '../setup/gradebook_setup'
 
+require_relative '../page_objects/gradezilla_cells_page'
+
 describe "Filter" do
   include_context "in-process server selenium tests"
   include GradezillaCommon
@@ -105,13 +107,13 @@ describe "Filter" do
       Gradezilla.select_section("All Sections")
 
       # grade the first assignment
-      edit_grade(".slick-row.student_#{@student_1.id} .slick-cell.assignment_#{@first_assignment.id}", 0)
-      edit_grade(".slick-row.student_#{@student_2.id} .slick-cell.assignment_#{@first_assignment.id}", 1)
+      Gradezilla::Cells.edit_grade(@student_1, @first_assignment, 0)
+      Gradezilla::Cells.edit_grade(@student_2, @first_assignment, 1)
 
       Gradezilla.select_section(@other_section)
       expect(Gradezilla.section_dropdown).to include_text(@other_section.name)
 
-      expect(f(".slick-row.student_#{@student_2.id} .slick-cell.assignment_#{@first_assignment.id}")).to include_text '1'
+      expect(Gradezilla::Cells.get_grade(@student_2, @first_assignment)).to eq '1'
     end
   end
 end
