@@ -56,7 +56,7 @@ export default class StudentContextTray extends React.Component {
             fluidWidth
             aria-label={srLabel}
           >
-            {label}
+            <span className="StudentContextTray-QuickLinks__Link-text">{label}</span>
           </Button>
         </div>
       ) : null
