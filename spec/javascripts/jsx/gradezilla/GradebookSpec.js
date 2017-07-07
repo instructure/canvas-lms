@@ -7492,6 +7492,9 @@ QUnit.module('Gradebook#renderSubmissionTray', {
     this.mountPointId = 'StudentTray__Container';
     $fixtures.innerHTML = `<div id=${this.mountPointId}></div>`;
     this.gradebook = createGradebook();
+    this.gradebook.students = {
+      1101: { id: '1101', name: 'Adam Jones', assignment_2301: {} }
+    };
     this.gradebook.gridSupport = {
       helper: {
         commitCurrentEdit () {},
@@ -7513,16 +7516,22 @@ QUnit.module('Gradebook#renderSubmissionTray', {
 });
 
 test('shows a submission tray on the page when rendering an open tray', function () {
-  const student = { name: 'Jane Doe' };
-  this.gradebook.setSubmissionTrayState(true, '1', '2');
-  this.gradebook.renderSubmissionTray(student);
+  this.gradebook.setSubmissionTrayState(true, '1101', '2301');
+  this.gradebook.renderSubmissionTray(this.gradebook.student('1101'));
   ok(document.querySelector('div[aria-label="Submission tray"]'));
 });
 
 test('does not show a submission tray on the page when rendering a closed tray', function () {
-  const student = { name: 'Jane Doe' };
-  this.gradebook.renderSubmissionTray(student);
+  this.gradebook.setSubmissionTrayState(false, '1101', '2301');
+  this.gradebook.renderSubmissionTray(this.gradebook.student('1101'));
   notOk(document.querySelector('div[aria-label="Submission tray"]'));
+});
+
+test('shows a submission tray when the related submission has not loaded for the student', function () {
+  this.gradebook.setSubmissionTrayState(true, '1101', '2301');
+  this.gradebook.student('1101').assignment_2301 = undefined;
+  this.gradebook.renderSubmissionTray(this.gradebook.student('1101'));
+  ok(document.querySelector('div[aria-label="Submission tray"]'));
 });
 
 QUnit.module('Gradebook#updateRowAndRenderSubmissionTray', {

@@ -526,6 +526,10 @@ define [
       @initSubmissionStateMap()
       @setupGrading(@courseContent.students.listStudents())
 
+    getSubmission: (studentId, assignmentId) =>
+      student = @student(studentId)
+      student["assignment_#{assignmentId}"]
+
     updateStudentAttributes: (student) =>
       student.computed_current_score ||= 0
       student.computed_final_score ||= 0
@@ -2505,6 +2509,10 @@ define [
     renderSubmissionTray: (student) =>
       mountPoint = document.getElementById('StudentTray__Container')
       { open, studentId, assignmentId } = @getSubmissionTrayState()
+      # get the student's submission, or use an empty object in case the
+      # submission has not yet loaded
+      submission = @getSubmission(studentId, assignmentId) || {}
+
       props =
         key: "submission_tray_#{studentId}_#{assignmentId}"
         isOpen: open
@@ -2514,6 +2522,9 @@ define [
         student:
           name: student.name,
           avatarUrl: htmlDecode(student.avatar_url)
+        submission:
+          grade: submission.grade
+          pointsDeducted: submission.points_deducted
       renderComponent(SubmissionTray, mountPoint, props)
 
     updateRowAndRenderSubmissionTray: (studentId) =>

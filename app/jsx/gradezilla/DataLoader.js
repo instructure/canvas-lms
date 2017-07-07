@@ -24,7 +24,8 @@ const submissionsParams = {
   exclude_response_fields: ['preview_url'],
   response_fields: [
     'id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id',
-    'grade_matches_current_submission', 'attachments', 'late', 'missing', 'workflow_state', 'excused'
+    'grade_matches_current_submission', 'attachments', 'late', 'missing', 'workflow_state', 'excused',
+    'points_deducted'
   ]
 };
 
