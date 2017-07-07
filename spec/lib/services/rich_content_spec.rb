@@ -28,6 +28,10 @@ module Services
           "app-host" => "rce-app",
           "cdn-host" => "rce-cdn"
         })
+      allow(Setting).to receive(:get)
+      allow(Setting).to receive(:get)
+        .with('rich_content_service_enabled', 'false')
+        .and_return('true')
     end
 
     describe ".env_for" do
@@ -193,6 +197,36 @@ module Services
           account = account_model
           account.disable_feature!(:rich_content_service_high_risk)
           env = described_class.env_for(account)
+          expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_falsey
+        end
+      end
+
+      context "without rich_content_service_enabled setting true" do
+        before(:each) do
+          allow(Setting).to receive(:get)
+            .with('rich_content_service_enabled', 'false')
+            .and_return(false)
+        end
+
+        it "on for all risk levels if feature flag is enabled" do
+          account = account_model
+          account.enable_feature!(:rich_content_service_high_risk)
+          env = described_class.env_for(account, risk_level: :basic)
+          expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_truthy
+          env = described_class.env_for(account, risk_level: :sidebar)
+          expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_truthy
+          env = described_class.env_for(account, risk_level: :highrisk)
+          expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_truthy
+        end
+
+        it "off for all risk levels if feature flag is not enabled" do
+          account = account_model
+          account.disable_feature!(:rich_content_service_high_risk)
+          env = described_class.env_for(account, risk_level: :basic)
+          expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_falsey
+          env = described_class.env_for(account, risk_level: :sidebar)
+          expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_falsey
+          env = described_class.env_for(account, risk_level: :highrisk)
           expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_falsey
         end
       end
