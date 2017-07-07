@@ -872,20 +872,6 @@ $gradebook_checkbox_size: 16px;
   padding: 0.7rem;
 }
 
-.SubmissionCell__IconExpand {
-  height: 1.1rem;
-  width: 2rem;
-  background-repeat: no-repeat;
-
-  &.SubmissionCell__IconExpand-right {
-    background-image: url("/images/svg-icons/svg_icon_expand_right.svg");
-  }
-
-  &.SubmissionCell__IconExpand-left {
-    background-image: url("/images/svg-icons/svg_icon_expand_left.svg");
-  }
-}
-
 svg.rotated {
   transform: rotate(90deg);
 }
