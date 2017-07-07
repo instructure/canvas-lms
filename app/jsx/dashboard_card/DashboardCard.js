@@ -269,7 +269,7 @@ export default class DashboardCard extends Component {
           onClick={this.settingsClick}
           ref={(c) => { this.settingsToggle = c; }}
         >
-          <i className="icon-more icon-Line" aria-hidden="true" />
+          <i className="icon-more" aria-hidden="true" />
           <span className="screenreader-only">
             { I18n.t('Choose a color or course nickname for %{course}', { course: this.state.nicknameInfo.nickname}) }
           </span>
