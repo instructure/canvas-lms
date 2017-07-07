@@ -32,8 +32,8 @@ describe CalendarEventsApiController, type: :request do
       'id', 'location_address', 'location_name', 'parent_event_id', 'start_at',
       'title', 'type', 'updated_at', 'url', 'workflow_state'
     ]
-    expected_slot_fields = (expected_fields + ['appointment_group_id', 'appointment_group_url', 'available_slots', 'participants_per_appointment', 'reserve_url', 'participant_type', 'effective_context_code'])
-    expected_reservation_event_fields = (expected_fields + ['appointment_group_id', 'appointment_group_url', 'effective_context_code', 'participant_type'])
+    expected_slot_fields = (expected_fields + ['appointment_group_id', 'appointment_group_url', 'can_manage_appointment_group', 'available_slots', 'participants_per_appointment', 'reserve_url', 'participant_type', 'effective_context_code'])
+    expected_reservation_event_fields = (expected_fields + ['appointment_group_id', 'appointment_group_url', 'can_manage_appointment_group', 'effective_context_code', 'participant_type'])
     expected_reserved_fields = (expected_slot_fields + ['reserved', 'reserve_comments'])
     expected_reservation_fields = expected_reservation_event_fields - ['child_events']
 
@@ -368,6 +368,7 @@ describe CalendarEventsApiController, type: :request do
         expect(e1json.keys).to match_array(expected_slot_fields)
         expect(e1json['reserve_url']).to match %r{calendar_events/#{event1.id}/reservations/%7B%7B%20id%20%7D%7D}
         expect(e1json['participant_type']).to eq 'User'
+        expect(e1json['can_manage_appointment_group']).to eq true
         expect(e1json['child_events'].size).to eql 3
         e1json['child_events'].each do |e|
           expect(e.keys).to match_array((expected_reservation_fields + ['user']))
@@ -378,6 +379,7 @@ describe CalendarEventsApiController, type: :request do
         expect(e2json.keys).to match_array(expected_slot_fields)
         expect(e2json['reserve_url']).to match %r{calendar_events/#{event2.id}/reservations/%7B%7B%20id%20%7D%7D}
         expect(e2json['participant_type']).to eq 'Group'
+        expect(e1json['can_manage_appointment_group']).to eq true
         expect(e2json['child_events'].size).to eql 3
         e2json['child_events'].each do |e|
           expect(e.keys).to match_array((expected_reservation_fields + ['group'] - ['effective_context_code']))
@@ -504,6 +506,7 @@ describe CalendarEventsApiController, type: :request do
           # the group appointment won't show on the course calendar
           expect(json.size).to eql 1
           expect(json.first.keys).to match_array(expected_reservation_event_fields)
+          expect(json.first['can_manage_appointment_group']).to eq false
           expect(json.first['id']).to eql my_personal_appointment.id
 
           json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-31&context_codes[]=#{mygroup.asset_string}", {
@@ -616,6 +619,7 @@ describe CalendarEventsApiController, type: :request do
             json = api_call(:post, "/api/v1/calendar_events/#{@event1.id}/reservations", {
               :controller => 'calendar_events_api', :action => 'reserve', :format => 'json', :id => @event1.id.to_s})
             expect(json.keys).to match_array(expected_reservation_event_fields)
+            expect(json['can_manage_appointment_group']).to eq false
             expect(json['appointment_group_id']).to eql(@ag1.id)
 
             json = api_call(:post, "/api/v1/calendar_events/#{@event3.id}/reservations", {

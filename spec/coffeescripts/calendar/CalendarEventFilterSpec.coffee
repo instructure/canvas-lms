@@ -59,6 +59,7 @@ define [
         hidden: false
         appointment_group_id: "2"
         appointment_group_url: "http://example.org/api/v1/appointment_groups/2"
+        can_manage_appointment_group: can_edit
         reserve_url: "http://example.org/api/v1/calendar_events/20/reservations/%7B%7B%20id%20%7D%7D"
         child_events: []
         url: "http://example.org/api/v1/calendar_events/20"
