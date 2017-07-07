@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../spec_helper'
+require_relative '../sharding_spec_helper'
 
 describe PlannerOverridesController do
   before :once do
@@ -176,17 +176,124 @@ describe PlannerOverridesController do
         end
 
         context "date sorting" do
-          it "should return results in order by object type then date" do
+          it "should return results in order by date" do
             wiki_page_model(course: @course)
             @page.todo_date = 1.day.from_now
             @page.save!
             @assignment3 = course_assignment
             @assignment3.due_at = 1.week.ago
             @assignment3.save!
+            @assignment5 = course_assignment
+            @assignment5.due_at = 3.days.from_now
+            @assignment5.save!
+
             get :items_index
             response_json = json_parse(response.body)
+            expect(response_json.length).to eq 5
+            expect(response_json.map { |i| i["plannable_id"] }).to eq [@assignment3.id, @page.id, @assignment5.id, @assignment.id, @assignment2.id]
+
+            get :items_index, :per_page => 2
+            expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment3.id, @page.id]
+
+            next_page = Api.parse_pagination_links(response.headers['Link']).detect{|p| p[:rel] == "next"}['page']
+            get :items_index, :per_page => 2, :page => next_page
+            expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment5.id, @assignment.id]
+
+            next_page = Api.parse_pagination_links(response.headers['Link']).detect{|p| p[:rel] == "next"}['page']
+            get :items_index, :per_page => 2, :page => next_page
+            expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment2.id]
+          end
+
+          it "should behave consistently with different object types on the same datetime" do
+            time = 4.days.from_now
+            @assignment.update_attribute(:due_at, time)
+            @assignment2.update_attribute(:due_at, time)
+            page = @course.wiki.wiki_pages.create!(:title => "t1", :todo_date => time)
+            note = planner_note_model(:todo_date => time)
+            discussion = discussion_topic_model(context: @course, todo_date: time)
+
+            get :items_index
+            response_json = json_parse(response.body)
+            original_order = response_json.map { |i| [i["plannable_type"], i["plannable_id"]] }
+
+            get :items_index, :per_page => 3
+            expect(json_parse(response.body).map { |i| [i["plannable_type"], i["plannable_id"]] }).to eq original_order[0..2]
+
+            next_page = Api.parse_pagination_links(response.headers['Link']).detect{|p| p[:rel] == "next"}['page']
+            get :items_index, :per_page => 3, :page => next_page
+            expect(json_parse(response.body).map { |i| [i["plannable_type"], i["plannable_id"]] }).to eq original_order[3..4]
+          end
+
+          it "should return results in reverse order by date if requested" do
+            wiki_page_model(course: @course)
+            @page.todo_date = 1.day.from_now
+            @page.save!
+            @assignment3 = course_assignment
+            @assignment3.due_at = 1.week.ago
+            @assignment3.save!
+            get :items_index, :order => :desc
+            response_json = json_parse(response.body)
             expect(response_json.length).to eq 4
-            expect(response_json.map { |i| i["plannable_id"] }).to eq [@assignment3.id, @assignment.id, @assignment2.id, @page.id]
+            expect(response_json.map { |i| i["plannable_id"] }).to eq [@assignment2.id, @assignment.id, @page.id, @assignment3.id]
+
+            get :items_index, :order => :desc, :per_page => 2
+            expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment2.id, @assignment.id]
+
+            next_page = Api.parse_pagination_links(response.headers['Link']).detect{|p| p[:rel] == "next"}['page']
+            get :items_index, :order => :desc, :per_page => 2, :page => next_page
+            expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@page.id, @assignment3.id]
+          end
+
+          it "should not try to compare missing dates" do
+            @assignment3 = @course.assignments.create!(:submission_types => "online_text_entry")
+            # doesn't have a due_at, so it should coalesce to the created_at
+            override = @assignment3.assignment_overrides.new(:set => @course.default_section)
+            override.override_due_at(2.days.from_now)
+            override.save!
+            @assignment3.submit_homework(@student, :submission_type => "online_text_entry", :body => "text")
+            @assignment3.grade_student @student, grade: 10, grader: @teacher
+            get :items_index
+            response_json = json_parse(response.body)
+            expect(response_json.length).to eq 3
+            expect(response_json.map { |i| i["plannable_id"] }).to eq [@assignment3.id, @assignment.id, @assignment2.id]
+          end
+
+          it "should order with unread items as well" do
+            dt = @course.discussion_topics.create!(title: "Yes", message: "Please", user: @teacher, todo_date: 3.days.from_now)
+            dt.change_all_read_state("unread", @student)
+
+            @assignment3 = @course.assignments.create!(:submission_types => "online_text_entry")
+            override = @assignment3.assignment_overrides.new(:set => @course.default_section)
+            override.override_due_at(2.days.from_now)
+            override.save!
+
+            @assignment3.grade_student @student, grade: 10, grader: @teacher
+            @assignment.grade_student @student, grade: 10, grader: @teacher
+
+            get :items_index, filter: "new_activity"
+            response_json = json_parse(response.body)
+            expect(response_json.length).to eq 3
+            expect(response_json.map { |i| i["plannable_id"] }).to eq [@assignment3.id, dt.id, @assignment.id]
+          end
+        end
+
+        context "cross-sharding" do
+          specs_require_sharding
+
+          it "should ignore shards other than the current account's" do
+            @shard1.activate do
+              @another_account = Account.create!
+              @another_course = @another_account.courses.create!(:workflow_state => 'available')
+              @another_assignment = @another_course.assignments.create!(:title => "title", :due_at => 1.day.from_now)
+              @student = user_with_pseudonym(:active_all => true, :account => @another_account)
+              @another_course.enroll_student(@student, :enrollment_state => 'active')
+            end
+            @course.enroll_student(@student, :enrollment_state => 'active')
+            user_session(@student)
+
+            get :items_index
+            response_json = json_parse(response.body)
+            expect(response_json.map { |i| i["plannable_id"]}).to eq [@assignment.id, @assignment2.id]
           end
         end
 

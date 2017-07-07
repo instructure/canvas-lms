@@ -1453,18 +1453,45 @@ class User < ActiveRecord::Base
   end
 
   def assignments_needing(purpose, participation_type, expires_in, opts={})
+    original_shard = Shard.current
     shard.activate do
-      course_ids = Shackles.activate(:slave) do
-        case participation_type
-        when :student
-          participating_student_course_ids
-        when :instructor
-          participating_instructor_course_ids
+      course_ids = course_ids_for_todo_lists(participation_type, opts)
+      opts = {limit: 15}.merge(opts.slice(:due_after, :due_before, :limit, :include_ungraded, :ungraded_quizzes, :include_ignored, :include_locked, :include_concluded, :scope_only, :only_favorites))
+
+      if opts[:scope_only]
+        Shard.partition_by_shard(course_ids) do |shard_course_ids|
+          next unless Shard.current == original_shard
+          return yield(*arguments_for_assignments_needing(purpose, shard_course_ids, opts))
+        end
+        return Assignment.none # fallback
+      else
+        course_ids_cache_key = Digest::MD5.hexdigest(course_ids.sort.join('/'))
+        Rails.cache.fetch([self, "assignments_needing_#{purpose}", course_ids_cache_key, opts].cache_key, :expires_in => expires_in) do
+          result = Shackles.activate(:slave) do
+            Shard.partition_by_shard(course_ids) do |shard_course_ids|
+              yield(*arguments_for_assignments_needing(purpose, shard_course_ids, opts))
+            end
+          end
+          result = result[0...opts[:limit]] if opts[:limit]
+          result
         end
       end
+    end
+  end
 
-      if opts[:include_concluded]
-        course_ids = participated_course_ids
+  def course_ids_for_todo_lists(participation_type, opts)
+    shard.activate do
+      course_ids = Shackles.activate(:slave) do
+        if opts[:include_concluded]
+          participated_course_ids
+        else
+          case participation_type
+          when :student
+            participating_student_course_ids
+          when :instructor
+            participating_instructor_course_ids
+          end
+        end
       end
 
       if opts[:only_favorites]
@@ -1474,30 +1501,21 @@ class User < ActiveRecord::Base
       if opts[:contexts]
         course_ids = Array(opts[:contexts]).map(&:id) & course_ids
       end
-      opts = {limit: 15}.merge(opts.slice(:due_after, :due_before, :limit, :include_ungraded, :ungraded_quizzes, :include_ignored, :include_locked, :include_concluded, :scope_only, :only_favorites))
-
-      return Assignment.none if opts[:scope_only] && course_ids.blank?
-
-      course_ids_cache_key = Digest::MD5.hexdigest(course_ids.sort.join('/'))
-      Rails.cache.fetch([self, "assignments_needing_#{purpose}", course_ids_cache_key, opts].cache_key, :expires_in => expires_in) do
-        result = Shackles.activate(:slave) do
-          Shard.partition_by_shard(course_ids) do |shard_course_ids|
-            if opts[:ungraded_quizzes]
-              scope = Quizzes::Quiz.where(context_type: 'Course', context_id: shard_course_ids).
-                not_for_assignment
-              scope = scope.not_ignored_by(self, purpose) unless opts[:include_ignored]
-              yield(scope, opts.merge(:shard_course_ids => shard_course_ids))
-            else
-              scope = Assignment.for_course(shard_course_ids)
-              scope = scope.not_ignored_by(self, purpose) unless opts[:include_ignored]
-              yield(scope, opts.merge(:shard_course_ids => shard_course_ids))
-            end
-          end
-        end
-        result = result[0...opts[:limit]] if opts[:limit] && !opts[:scope_only]
-        result
-      end
+      course_ids
     end
+  end
+
+  def arguments_for_assignments_needing(purpose, shard_course_ids, opts)
+    scope = nil
+    if opts[:ungraded_quizzes]
+      scope = Quizzes::Quiz.where(context_type: 'Course', context_id: shard_course_ids).
+        not_for_assignment
+      scope = scope.not_ignored_by(self, purpose) unless opts[:include_ignored]
+    else
+      scope = Assignment.for_course(shard_course_ids)
+      scope = scope.not_ignored_by(self, purpose) unless opts[:include_ignored]
+    end
+    [scope, opts.merge(:shard_course_ids => shard_course_ids)]
   end
 
   def assignments_needing_submitting(opts={})
@@ -1512,8 +1530,11 @@ class User < ActiveRecord::Base
         need_submitting_info(id, options[:limit])
       assignments = assignments.expecting_submission unless options[:include_ungraded]
       assignments = assignments.not_locked unless options[:include_locked]
-      return assignments.for_course(options[:shard_course_ids]) if options[:scope_only]
-      select_available_assignments(assignments, options).reject { |a| a.due_at && a.due_at < Time.now && !a.expects_submission? }
+      if options[:scope_only]
+        assignments.for_course(options[:shard_course_ids])
+      else
+        select_available_assignments(assignments, options).reject { |a| a.due_at && a.due_at < Time.now && !a.expects_submission? }
+      end
     end
   end
 
@@ -1530,8 +1551,11 @@ class User < ActiveRecord::Base
                   due_between_with_overrides(due_after, due_before).
                   need_submitting_info(id, options[:limit]).
                   preload(:context)
-      return quizzes.for_course(options[:shard_course_ids]) if options[:scope_only]
-      select_available_assignments(quizzes, options)
+      if options[:scope_only]
+        quizzes.for_course(options[:shard_course_ids])
+      else
+        select_available_assignments(quizzes, options)
+      end
     end
   end
 
@@ -1542,8 +1566,11 @@ class User < ActiveRecord::Base
         expecting_submission.
         need_grading_info
       ActiveRecord::Associations::Preloader.new.preload(as, :context)
-      return as if opts[:scope_only] # This needs the below `select` somehow to work
-      as.lazy.select{|a| Assignments::NeedsGradingCountQuery.new(a, self).count != 0 }.take(opts[:limit]).to_a
+      if opts[:scope_only]
+        as # This needs the below `select` somehow to work
+      else
+        as.lazy.select{|a| Assignments::NeedsGradingCountQuery.new(a, self).count != 0 }.take(opts[:limit]).to_a
+      end
     end
   end
 
@@ -1560,8 +1587,7 @@ class User < ActiveRecord::Base
             due_between_with_overrides(due_after, due_before).
             with_non_placeholder_submissions_for_user(id).
             group('submissions.id')
-      return as if options[:scope_only]
-      select_available_assignments(as, options)
+      options[:scope_only] ? as : select_available_assignments(as, options)
     end
   end
 
@@ -1571,10 +1597,13 @@ class User < ActiveRecord::Base
         expecting_submission.
         where(:moderated_grading => true).
         where("assignments.grades_published_at IS NULL").
-        joins(:provisional_grades).distinct.preload(:context).
+        joins(:provisional_grades).preload(:context).
         need_grading_info
-      return scope if options[:scope_only] # Also need to check the rights like below
-      scope.lazy.select{|a| a.context.grants_right?(self, :moderate_grades)}.take(options[:limit]).to_a
+      if options[:scope_only]
+        scope # Also need to check the rights like below
+      else
+        scope.lazy.select{|a| a.context.grants_right?(self, :moderate_grades)}.take(options[:limit]).to_a
+      end
     end
   end
 
@@ -1609,55 +1638,48 @@ class User < ActiveRecord::Base
   end
 
   def needing_viewing(object_type, participation_type, expires_in, opts={})
+    original_shard = Shard.current
     shard.activate do
-      course_ids = Shackles.activate(:slave) do
-        case participation_type
-        when :student
-          participating_student_course_ids
-        when :instructor
-          participating_instructor_course_ids
+      course_ids = course_ids_for_todo_lists(participation_type, opts)
+
+      if opts[:scope_only]
+        Shard.partition_by_shard(course_ids) do |shard_course_ids|
+          next unless Shard.current == original_shard # only provideo scope on current shard
+          return yield(*arguments_for_needing_viewing(object_type, shard_course_ids, opts))
         end
-      end
-
-      if opts[:include_concluded]
-        course_ids = participated_course_ids
-      end
-
-      if opts[:only_favorites]
-        course_ids = course_ids & favorite_context_ids("Course")
-      end
-
-      return object_type.constantize.none if opts[:scope_only] && course_ids.blank?
-
-      course_ids_cache_key = Digest::MD5.hexdigest(course_ids.sort.join(','))
-      cache_key = [self, "#{object_type.underscore}_needing_viewing", course_ids_cache_key, opts].cache_key
-      Rails.cache.fetch(cache_key, :expires_in => expires_in) do
-        result = Shackles.activate(:slave) do
-          Shard.partition_by_shard(course_ids) do |shard_course_ids|
-            scope = object_type.constantize.for_courses_and_groups(shard_course_ids, cached_current_group_memberships.map(&:group_id))
-            scope = scope.not_ignored_by(self, 'viewing') unless opts[:include_ignored]
-            scope = scope.todo_date_between(opts[:due_after], opts[:due_before])
-            yield(scope, opts.merge(shard_course_ids: shard_course_ids))
+        return object_type.constantize.none
+      else
+        course_ids_cache_key = Digest::MD5.hexdigest(course_ids.sort.join(','))
+        cache_key = [self, "#{object_type.underscore}_needing_viewing", course_ids_cache_key, opts].cache_key
+        Rails.cache.fetch(cache_key, :expires_in => expires_in) do
+          result = Shackles.activate(:slave) do
+            Shard.partition_by_shard(course_ids) do |shard_course_ids|
+              yield(*arguments_for_needing_viewing(object_type, shard_course_ids, opts))
+            end
           end
+          result = result[0...opts[:limit]] if opts[:limit]
+          result
         end
-        result = result[0...opts[:limit]] if opts[:limit] && !opts[:scope_only]
-        result
       end
     end
   end
 
+  def arguments_for_needing_viewing(object_type, shard_course_ids, opts)
+    scope = object_type.constantize.for_courses_and_groups(shard_course_ids, cached_current_group_memberships.map(&:group_id))
+    scope = scope.not_ignored_by(self, 'viewing') unless opts[:include_ignored]
+    scope = scope.todo_date_between(opts[:due_after], opts[:due_before])
+    [scope, opts.merge(:shard_course_ids => shard_course_ids)]
+  end
+
   def discussion_topics_needing_viewing(opts={})
     needing_viewing('DiscussionTopic', :student, 120.minutes, opts) do |topics_context, options|
-      topics_context = topics_context.active.published
-      return topics_context if options[:scope_only]
-      topics_context.to_a
+      topics_context.active.published
     end
   end
 
   def wiki_pages_needing_viewing(opts={})
     needing_viewing('WikiPage', :student, 120.minutes, opts) do |wiki_pages_context, options|
-      return wiki_pages_context.available_to_planner.visible_to_user(self) if options[:scope_only]
-      wiki_pages_context.available_to_planner.visible_to_user(self).to_a
+      wiki_pages_context.available_to_planner.visible_to_user(self)
     end
   end
 
