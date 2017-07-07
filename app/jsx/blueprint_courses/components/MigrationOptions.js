@@ -23,6 +23,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import select from 'jsx/shared/select'
 import $ from 'jquery'
+import 'compiled/jquery.rails_flash_notifications'
 
 import Checkbox from 'instructure-ui/lib/components/Checkbox'
 import TextArea from 'instructure-ui/lib/components/TextArea'
@@ -34,6 +35,7 @@ import propTypes from '../propTypes'
 import MigrationStates from '../migrationStates'
 
 const MAX_NOTIFICATION_MESSAGE_LENGTH = 140
+const WARNING_MESSAGE_LENGTH = 126
 
 export default class MigrationOptions extends React.Component {
   static propTypes = {
@@ -46,6 +48,16 @@ export default class MigrationOptions extends React.Component {
     includeCustomNotificationMessage: PropTypes.func.isRequired,
     includeCourseSettings: PropTypes.func.isRequired,
     setNotificationMessage: PropTypes.func.isRequired,
+  }
+
+  componentWillReceiveProps (newProps) {
+    if (newProps.notificationMessage !== this.props.notificationMessage
+      && newProps.notificationMessage.length > WARNING_MESSAGE_LENGTH) {
+      $.screenReaderFlashMessage(I18n.t('%{count} of %{max} maximum characters', {
+        count: newProps.notificationMessage.length,
+        max: MAX_NOTIFICATION_MESSAGE_LENGTH
+      }));
+    }
   }
 
   handleSendNotificationChange = (event) => {
@@ -61,17 +73,20 @@ export default class MigrationOptions extends React.Component {
   }
 
   handleChangeMessage = (event) => {
-    const msg = event.target.value.slice(0, MAX_NOTIFICATION_MESSAGE_LENGTH);
-    if (msg.length === MAX_NOTIFICATION_MESSAGE_LENGTH) {
-      $.screenReaderFlashMessage(
-        I18n.t('You have reached the limit of %{len} characters in the notification message', {len: MAX_NOTIFICATION_MESSAGE_LENGTH})
-      )
+    if (event.target.value.length > MAX_NOTIFICATION_MESSAGE_LENGTH) {
+      setTimeout(() => {
+        $.screenReaderFlashMessage(
+          I18n.t('You have reached the limit of %{len} characters in the notification message', {len: MAX_NOTIFICATION_MESSAGE_LENGTH})
+        )
+      }, 600);
     }
+    const msg = event.target.value.slice(0, MAX_NOTIFICATION_MESSAGE_LENGTH);
     this.props.setNotificationMessage(msg)
   }
 
   render () {
     const isDisabled = MigrationStates.isLoadingState(this.props.migrationStatus)
+
     return (
       <div className="bcs__history-notification">
         <div className="bcs__history-settings">
@@ -100,13 +115,28 @@ export default class MigrationOptions extends React.Component {
               size="small"
               disabled={isDisabled}
             />
-            <Typography as="span" color="secondary" size="small">({this.props.notificationMessage.length}/140)</Typography>
+            <Typography
+              aria-label={
+                I18n.t('%{chars} written, max character length %{len}',
+                  {
+                    chars: this.props.notificationMessage.length,
+                    len: MAX_NOTIFICATION_MESSAGE_LENGTH
+                  })
+              }
+              as="span" color="secondary" size="small" role="presentation"
+            >
+              ({I18n.t('%{len}/%{maxLen}', {len: this.props.notificationMessage.length, maxLen: MAX_NOTIFICATION_MESSAGE_LENGTH})})
+            </Typography>
           </div> : null
         }
         {this.props.willSendNotification && this.props.willIncludeCustomNotificationMessage ?
           <div className="bcs__history-notification__message">
             <TextArea
-              label={<ScreenReaderContent>{I18n.t('Message text')}</ScreenReaderContent>}
+              label={
+                <ScreenReaderContent>
+                  {I18n.t('Message text')}
+                </ScreenReaderContent>
+              }
               autoGrow={false}
               resize="vertical"
               inline

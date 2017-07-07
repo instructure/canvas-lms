@@ -190,6 +190,33 @@ describe "master courses sidebar" do
       expect(notification_message_text_box).not_to have_value('A')
     end
 
+    it "updates screenreader character usage message with character count" do
+      inmsg = '1234567890123456789012345678901234567890'
+      open_blueprint_sidebar
+      # if the default ever changes in MigrationOptions, make sure our spec still works
+      driver.execute_script('ENV.MIGRATION_OPTIONS_SR_ALERT_TIMEOUT = 10')
+      send_notification_checkbox.click
+      add_message_checkbox.click
+      # we don't start adding the message until 90% full
+      notification_message_text_box.send_keys(inmsg + inmsg + inmsg + 'abcdefg')
+      n = ff('#flash_screenreader_holder span').length  # sometimes there's an empty span in there?!?
+      msg = f("#flash_screenreader_holder span:nth-of-type(#{n})").attribute("textContent")
+      msg.strip!
+      expect(msg).to eq("127 of 140 maximum characters")
+    end
+
+    it "issues screenreader alert when message is full" do
+      msg = '1234567890123456789012345678901234567890123456789012345678901234567890'
+      open_blueprint_sidebar
+      send_notification_checkbox.click
+      add_message_checkbox.click
+      n = ff('#flash_screenreader_holder span').length  # sometimes there's an empty span in there?!?
+      notification_message_text_box.send_keys(msg+msg+'12')
+      # +15 because we want to see that it has all the character messages ontop of having the ending message
+      msg = f("#flash_screenreader_holder span:nth-of-type(#{n+15})").attribute("textContent")
+      msg.strip!
+      expect(msg).to eq("You have reached the limit of 140 characters in the notification message")
+    end
 
     context "before sync" do
 
