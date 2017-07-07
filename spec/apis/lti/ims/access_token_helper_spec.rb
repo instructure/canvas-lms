@@ -91,15 +91,6 @@ module Lti
         expect(response.code).to eq '401'
       end
 
-      it 'finds the tool proxy when on a different shard' do
-        tool_proxy
-        @request.headers.merge!(request_headers)
-        Shard.create!.activate do
-          get :index, format: :json
-          expect(response.code).to eq '200'
-        end
-      end
-
       describe "#bearer_token" do
         let(:access_token_helper){ subject }
 

@@ -224,6 +224,20 @@ module Lti
         expect(response.code).to eq "401"
       end
 
+      context 'sharding' do
+        it 'retrieves attachments when tool proxy is installed on another shard' do
+          get "/api/lti/assignments/#{assignment.global_id}/submissions/#{submission.global_id}", {}, request_headers
+          json = JSON.parse(response.body)
+          url = json["attachments"].first["url"]
+
+          @shard2.activate do
+            get url, {}, request_headers
+            expect(response).to be_success
+            expect(response.content_type.to_s).to eq attachment.content_type
+          end
+        end
+      end
+
     end
 
     describe 'service' do

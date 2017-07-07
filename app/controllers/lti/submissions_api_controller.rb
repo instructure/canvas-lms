@@ -147,6 +147,7 @@ module Lti
     ].freeze
 
     skip_before_action :load_user
+    before_action :activate_tool_shard!, only: :attachment
     before_action :authorized_lti2_tool
     before_action :authorized?
 
@@ -187,6 +188,14 @@ module Lti
     end
 
     private
+
+    def activate_tool_shard!
+      tool_shard = Shard.lookup(access_token.shard_id)
+      return if tool_shard == Shard.current
+      tool_shard.activate!
+    rescue Lti::Oauth2::InvalidTokenError
+      render_unauthorized
+    end
 
     def attachment_for_submission?(attachment)
       submissions = Submission.bulk_load_versioned_attachments(submission.submission_history + [submission])
