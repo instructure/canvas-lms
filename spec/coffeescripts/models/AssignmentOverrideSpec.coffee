@@ -43,3 +43,8 @@ define [
     override.set 'course_section_id', 3
     strictEqual override.toJSON().assignment_override.id ,undefined
 
+  test "#combinedDates returns unique values for overrides with the same due date", ->
+    due_date = new Date
+    override1 = new AssignmentOverride id: 1, due_at: due_date.toISOString()
+    override2 = new AssignmentOverride id: 2, due_at: due_date.toISOString()
+    notEqual override1.combinedDates(), override2.combinedDates()
