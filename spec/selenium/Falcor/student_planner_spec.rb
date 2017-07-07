@@ -40,14 +40,50 @@ describe "student planner" do
     validate_link_to_url(announcement, 'discussion_topics')
   end
 
-  it "shows and navigates to assignments page from student planner", priority: "1", test_id: 3259300 do
-    assignment = @course.assignments.create({
-                                              name: 'Assignment 1',
-                                              due_at: Time.zone.now + 1.day
-                                            })
-    go_to_list_view
-    validate_object_displayed('Assignment')
-    validate_link_to_url(assignment, 'assignments')
+  context "assignments" do
+    before :once do
+      @assignment = @course.assignments.create({
+                                                 name: 'Assignment 1',
+                                                 due_at: Time.zone.now + 1.day,
+                                                 submission_types: 'online_text_entry'
+                                               })
+    end
+
+    it "shows and navigates to assignments page from student planner", priority: "1", test_id: 3259300 do
+      go_to_list_view
+      validate_object_displayed('Assignment')
+      validate_link_to_url(@assignment, 'assignments')
+    end
+
+    it "shows submitted tag for assignments that have submissions", priority: "1", test_id: 3263151 do
+      @assignment.submit_homework(@student1, submission_type: "online_text_entry", body: "Assignment submitted")
+      go_to_list_view
+
+      # Student planner shows submitted assignments as completed. Expand to see the assignment
+      expand_completed_item
+      validate_pill('Submitted')
+    end
+
+    it "shows graded tag for assignments that are graded", priority: "1", test_id: 3263152 do
+      @assignment.grade_student(@student1, grade: 10, submission_comment: 'Good', grader: @teacher)
+      go_to_list_view
+      validate_pill('Graded')
+    end
+
+    it "shows new feedback tag for assignments that has feedback", priority: "1", test_id: 3263154 do
+      @assignment.grade_student(@student1, grade: 10, submission_comment: 'Good', grader: @teacher)
+      go_to_list_view
+      validate_pill('New Feedback')
+    end
+
+    it "shows missing tag for assignments with missing submissions", priority: "1", test_id: 3263153 do
+      skip('WIP: scrolling fails intermittently')
+      @assignment.due_at = Time.zone.now - 2.days
+      @assignment.save!
+      go_to_list_view
+      scroll_to(f('.PlannerApp').find_element(:xpath, "//span[text()[contains(.,'Unnamed Course Assignment')]]"))
+      validate_pill('Missing')
+    end
   end
 
   it "shows and navigates to graded discussions page from student planner", priority: "1", test_id: 3259301 do
@@ -70,14 +106,40 @@ describe "student planner" do
     validate_link_to_url(discussion, 'discussion_topics')
   end
 
-  it "shows and navigates to quizzes page from student planner", priority: "1", test_id: 3259303 do
-    quiz = quiz_model(course: @course)
-    quiz.generate_quiz_data
-    quiz.due_at = Time.zone.now + 2.days
-    quiz.save!
-    go_to_list_view
-    validate_object_displayed('Quiz')
-    validate_link_to_url(quiz, 'quizzes')
+  context "Quizzes" do
+    before :once do
+      @quiz = quiz_model(course: @course)
+      @quiz.generate_quiz_data
+      @quiz.due_at = Time.zone.now + 2.days
+      @quiz.save!
+    end
+
+    it "shows and navigates to quizzes page from student planner", priority: "1", test_id: 3259303 do
+      go_to_list_view
+      validate_object_displayed('Quiz')
+      validate_link_to_url(@quiz, 'quizzes')
+    end
+
+    it "shows and navigates to graded surveys with due dates", priority: "1", test_id: 3282673 do
+      @quiz.update(quiz_type: "graded_survey")
+      go_to_list_view
+      validate_object_displayed('Quiz')
+      validate_link_to_url(@quiz, 'quizzes')
+    end
+
+    it "shows and navigates to ungraded surveys with due dates", priority: "1", test_id: 3282674 do
+      @quiz.update(quiz_type: "survey")
+      go_to_list_view
+      validate_object_displayed('Quiz')
+      validate_link_to_url(@quiz, 'quizzes')
+    end
+
+    it "shows and navigates to practice quizzes with due dates", priority: "1", test_id: 3284242 do
+      @quiz.update(quiz_type: "practice_quiz")
+      go_to_list_view
+      validate_object_displayed('Quiz')
+      validate_link_to_url(@quiz, 'quizzes')
+    end
   end
 
   it "shows and navigates to wiki pages with todo dates from student planner", priority: "1", test_id: 3259304 do

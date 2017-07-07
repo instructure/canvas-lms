@@ -30,7 +30,7 @@ module PlannerPageObject
 
   def navigate_to_course_object(object)
     expect_new_page_load do
-      f('.PlannerApp').find_element(:xpath, "//a[text()[contains(.,'#{object.title}')]]").click
+      fln(object.title.to_s).click
     end
   end
 
@@ -45,6 +45,10 @@ module PlannerPageObject
   def validate_object_displayed(object_type)  # Pass what type of object it is. Ensure object's name starts with a capital letter
     expect(f('.PlannerApp').find_element(:xpath, "//span[text()[contains(.,'Unnamed Course #{object_type}')]]")).
       to be_displayed
+  end
+
+  def expand_completed_item
+    f('.PlannerApp').find_element(:xpath, "//span[text()[contains(.,'Show 1 completed item')]]").click
   end
 
   def validate_pill(pill_type)
