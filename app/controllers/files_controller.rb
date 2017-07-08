@@ -215,7 +215,7 @@ class FilesController < ApplicationController
           redirect_to course_path(@context)
         end
       else
-        flash[:notice] = "Please  purchase this course before accessing this page."
+        flash[:notice] = "Please purchase this course before accessing this page."
         return react_files
       end
     end

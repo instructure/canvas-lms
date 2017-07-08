@@ -24,7 +24,7 @@ class OrdersController < ApplicationController
     @course = Course.find(params[:course_id])
     @order = Order.create(express_token: params[:token], user_id: @current_user, course_id: @course.id)
     if @order.purchase && @order.status == "Success"
-      redirect_to "http://localhost:3000/courses/#{@course.id}"
+      redirect_to "#{request.domain}/courses/#{@course.id}"
     else
       redirect_to '/'
     end
@@ -46,7 +46,7 @@ class OrdersController < ApplicationController
     @paramList["MSISDN"] = '7009417976'
     @paramList["EMAIL"] = 'jagtar.lakhyan@gmail.com'
     @paramList["WEBSITE"] = WEBSITE
-    @paramList["CALLBACK_URL"] = "#{PAYTM_URL}/courses/#{@course.id}/orders/check_paytm"
+    @paramList["CALLBACK_URL"] = "#{request.domain}/courses/#{@course.id}/orders/check_paytm"
 
     @checksum_hash = new_pg_checksum(@paramList, PAYTM_MERCHANT_KEY).gsub("\n",'')
     #staging Url
