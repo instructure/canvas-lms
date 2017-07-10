@@ -35,10 +35,10 @@ module AdheresToPolicy
     #   # => ['value', :in_proc]
     #
     # Returns the value of the cached object from the key.
-    def self.fetch(key)
+    def self.fetch(key, use_rails_cache: true)
       return [yield, :bypass_generated] unless key
 
-      value, how_it_got_it = self.read(key)
+      value, how_it_got_it = self.read(key, use_rails_cache: use_rails_cache)
       if value.nil?
         if block_given?
           how_it_got_it = :generated
@@ -46,7 +46,7 @@ module AdheresToPolicy
             value = yield
           end
           Thread.current[:last_cache_generate] = elapsed # so we can record it in the logs
-          self.write(key, value)
+          self.write(key, value, use_rails_cache: use_rails_cache)
         end
       end
 
@@ -65,10 +65,10 @@ module AdheresToPolicy
     #   # => 'value'
     #
     # Returns the value of the cached object from the key.
-    def self.write(key, value)
+    def self.write(key, value, use_rails_cache: true)
       return unless key
 
-      Rails.cache.write(key, value, expires_in: CACHE_EXPIRES_IN)
+      Rails.cache.write(key, value, expires_in: CACHE_EXPIRES_IN) if use_rails_cache
       @cache ||= {}
       @cache[key] = value
     end
@@ -85,15 +85,17 @@ module AdheresToPolicy
     #   # => 'value'
     #
     # Returns the value of the cached object from the key.
-    def self.read(key)
+    def self.read(key, use_rails_cache: true)
       return unless key
 
       @cache ||= {}
       if @cache.key?(key)
         [@cache[key], :in_proc]
-      else
+      elsif use_rails_cache
         result = @cache[key] = Rails.cache.read(key)
         [result, :out_of_proc]
+      else
+        [nil, :out_of_proc]
       end
     end
 

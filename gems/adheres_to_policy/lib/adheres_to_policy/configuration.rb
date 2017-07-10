@@ -1,5 +1,4 @@
-#
-# Copyright (C) 2014 - present Instructure, Inc.
+# Copyright (C) 2017 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,23 +13,14 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
-require 'active_support'
-
+#
 module AdheresToPolicy
-  require 'adheres_to_policy/cache'
-  require 'adheres_to_policy/class_methods'
-  require 'adheres_to_policy/condition'
-  require 'adheres_to_policy/configuration'
-  require 'adheres_to_policy/instance_methods'
-  require 'adheres_to_policy/policy'
+  class Configuration
+    attr_writer :blacklist
 
-  @configuration = Configuration.new
-  class << self
-    attr_reader :configuration
-
-    def configure
-      yield(configuration)
+    def blacklist
+      return [] unless @blacklist
+      @blacklist.respond_to?(:call) ? @blacklist.call : @blacklist
     end
   end
 end

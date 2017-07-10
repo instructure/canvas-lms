@@ -26,3 +26,9 @@ module ShardAwarePermissionCacheKey
   end
 end
 AdheresToPolicy::InstanceMethods.prepend(ShardAwarePermissionCacheKey)
+
+AdheresToPolicy.configure do |config|
+  config.blacklist = -> {
+    Setting.get('permissions_cache_blacklist', '').split(',').map(&:strip)
+  }
+end

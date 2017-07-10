@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014 - present Instructure, Inc.
+# Copyright (C) 2017 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,23 +14,28 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+require 'spec_helper'
 
-require 'active_support'
+describe AdheresToPolicy::Configuration do
+  let(:config) { AdheresToPolicy::Configuration.new }
 
-module AdheresToPolicy
-  require 'adheres_to_policy/cache'
-  require 'adheres_to_policy/class_methods'
-  require 'adheres_to_policy/condition'
-  require 'adheres_to_policy/configuration'
-  require 'adheres_to_policy/instance_methods'
-  require 'adheres_to_policy/policy'
+  describe '#blacklist' do
+    it 'must default to an empty array' do
+      expect(config.blacklist).to eq []
+    end
 
-  @configuration = Configuration.new
-  class << self
-    attr_reader :configuration
+    it 'must return the literal value set' do
+      config.blacklist = %w{foo bar}
+      expect(config.blacklist).to eq %w{foo bar}
+    end
 
-    def configure
-      yield(configuration)
+    it 'must evaluate the supplied block and return the result' do
+      config.blacklist = -> {
+        %w{baz qux}
+      }
+
+      expect(config.blacklist).to eq %w{baz qux}
     end
   end
 end

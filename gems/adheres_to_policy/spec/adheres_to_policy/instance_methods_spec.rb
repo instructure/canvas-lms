@@ -362,11 +362,15 @@ describe AdheresToPolicy::InstanceMethods do
     end
 
     context "caching" do
+      after do
+        AdheresToPolicy.configuration.blacklist = []
+      end
+
       it "should cache permissions" do
         user = User.new
         actor = @actor_class.new
 
-        expect(AdheresToPolicy::Cache).to receive(:fetch).twice.with(/permissions/).and_return([])
+        expect(AdheresToPolicy::Cache).to receive(:fetch).twice.with(/permissions/, an_instance_of(Hash)).and_return([])
         actor.rights_status(user)
         # cache lookups for "nobody" as well
         actor.rights_status(nil)
@@ -411,6 +415,22 @@ describe AdheresToPolicy::InstanceMethods do
         expect(actor.call_permission_cache_key_for(nil, session, :read)).to match(/\>\/default\/read$/)
 
         expect(actor.call_permission_cache_key_for(nil, nil, :read)).to match(/\>\/read$/)
+      end
+
+      it 'must not use the rails cache for permissions included in the configured blacklist' do
+        klass = Class.new {
+          extend AdheresToPolicy::ClassMethods
+          set_policy do
+            given { |_| true }
+            can :read
+          end
+        }
+        instance = klass.new
+        AdheresToPolicy.configuration.blacklist = ['.read']
+        expect(AdheresToPolicy::Cache).to receive(:fetch)
+          .with(an_instance_of(String), a_hash_including(use_rails_cache: false))
+          .and_return([])
+        instance.granted_rights(instance)
       end
     end
   end
