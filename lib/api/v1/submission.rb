@@ -162,6 +162,7 @@ module Api::V1::Submission
         atjson = attachment_json(attachment, user, {},
                                  submission_attachment: true,
                                  include: ['preview_url'],
+                                 enable_annotations: true, # we want annotations on submission's attachment preview_urls
                                  crocodoc_ids: attempt.crocodoc_whitelist)
         attachment.skip_submission_attachment_lock_checks = false
         atjson
