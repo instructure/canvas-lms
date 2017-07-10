@@ -908,6 +908,19 @@ describe FilesController do
       expect(json['upload_params']['x-amz-credential']).to start_with('stub_id')
     end
 
+    it "allows specifying a content_type" do
+      # the API does, and the files page sends it based on the browser's detection
+      s3_storage!
+      user_session(@teacher)
+      post 'create_pending', {:attachment => {
+        :context_code => @course.asset_string,
+        :filename => "something.rb",
+        :content_type => "text/magical-incantation"
+      }}
+      expect(response).to be_success
+      expect(assigns[:attachment].content_type).to eq "text/magical-incantation"
+    end
+
     it "should not allow going over quota for file uploads" do
       s3_storage!
       user_session(@student)

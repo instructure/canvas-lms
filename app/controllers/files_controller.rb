@@ -711,7 +711,7 @@ class FilesController < ApplicationController
         @folder ||= Folder.unfiled_folder(@context)
         @attachment.folder_id = @folder.id
       end
-      @attachment.content_type = Attachment.mimetype(@attachment.filename)
+      @attachment.content_type = params[:attachment][:content_type].presence || Attachment.mimetype(@attachment.filename)
       @attachment.set_publish_state_for_usage_rights
       @attachment.save!
 
