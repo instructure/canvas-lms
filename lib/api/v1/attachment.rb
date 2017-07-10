@@ -109,7 +109,7 @@ module Api::V1::Attachment
     end
     if includes.include? 'preview_url'
       hash['preview_url'] = attachment.crocodoc_url(user, options[:crocodoc_ids]) ||
-                            attachment.canvadoc_url(user)
+                            attachment.canvadoc_url(user, enable_annotations: options[:enable_annotations])
     end
     if includes.include? 'enhanced_preview_url'
       hash['preview_url'] = context_url(attachment.context, :context_file_file_preview_url, attachment, annotate: 0)
