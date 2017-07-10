@@ -3912,6 +3912,14 @@ describe 'Submissions API', type: :request do
       @student1 = student_in_course(:active_all => true).user
       @student2 = student_in_course(:active_all => true).user
       @student3 = student_in_course(:active_all => true).user
+      course_with_user('StudentViewEnrollment', :active_all => true)
+
+      section = @course.course_sections.build(:name => 'Another Section')
+      section.save
+      section.enroll_user(@student1, 'StudentEnrollment', 'active')
+      section.enroll_user(@student2, 'StudentEnrollment', 'active')
+      section.enroll_user(@student3, 'StudentEnrollment', 'active')
+
       @assignment = @course.assignments.create(points_possible: 100)
       @assignment.submit_homework @student1, :body => 'EHLO'
       @assignment.submit_homework @student2, :body => 'EHLO'
