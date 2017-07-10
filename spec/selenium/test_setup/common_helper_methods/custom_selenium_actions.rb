@@ -328,6 +328,14 @@ module CustomSeleniumActions
     button.click
   end
 
+  # can pass in either an element or a forms css
+  def scroll_to_submit_button_and_click(form)
+    submit_button_css = 'button[type="submit"]'
+    button = form.is_a?(Selenium::WebDriver::Element) ? form.find_element(:css, submit_button_css) : f("#{form} #{submit_button_css}")
+    scroll_to(button)
+    button.click
+  end
+
   def submit_dialog_form(form)
     # used to be called submit_form, but it turns out that if you're searching for a dialog that doesn't exist it's suuuuuper slow
     submit_button_css = 'button[type="submit"]'
