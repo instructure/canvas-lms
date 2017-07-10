@@ -46,23 +46,28 @@ function getByDate (timeFrame = { from: '', to: '' }) {
   return axios.get(url, params);
 }
 
-function getByGrader (graderId, timeFrame = {from: '', to: ''}) {
+function getByGrader (graderId, timeFrame = { from: '', to: '' }) {
   const url = encodeURI(`/api/v1/audit/grade_change/graders/${graderId}`);
   const params = toParams(graderId, timeFrame);
 
   return axios.get(url, params);
 }
 
-function getByStudent (studentId, timeFrame = {from: '', to: ''}) {
+function getByStudent (studentId, timeFrame = { from: '', to: '' }) {
   const url = encodeURI(`/api/v1/audit/grade_change/students/${studentId}`);
   const params = toParams(studentId, timeFrame);
 
   return axios.get(url, params);
 }
 
+function getNextPage (url) {
+  return axios.get(encodeURI(url));
+}
+
 export default {
   getByAssignment,
   getByDate,
   getByGrader,
-  getByStudent
-}
+  getByStudent,
+  getNextPage
+};

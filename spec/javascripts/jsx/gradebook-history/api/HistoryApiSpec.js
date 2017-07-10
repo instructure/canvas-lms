@@ -136,3 +136,10 @@ test('getByStudent with a timeFrame', function () {
     deepEqual(this.getStub.firstCall.args[1], params);
   });
 });
+
+test('getNextPage makes an axios get request', function () {
+  const url = encodeURI('http://example.com/grades?page=42&per_page=100000000');
+  HistoryApi.getNextPage(url);
+  strictEqual(this.getStub.callCount, 1);
+  strictEqual(this.getStub.getCall(0).args[0], url);
+});

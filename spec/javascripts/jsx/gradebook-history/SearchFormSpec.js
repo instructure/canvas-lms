@@ -50,16 +50,16 @@ const defaultProps = () => (
     fetchHistoryStatus: 'started',
     fetchGradersStatus: 'started',
     fetchStudentsStatus: 'started',
-    byAssignment: sinon.stub(),
-    byDate: sinon.stub(),
-    byGrader: sinon.stub(),
-    byStudent: sinon.stub(),
-    getNameOptions: sinon.stub(),
-    getNameOptionsNextPage: sinon.stub(),
+    byAssignment () {},
+    byDate () {},
+    byGrader () {},
+    byStudent () {},
+    getNameOptions () {},
+    getNameOptionsNextPage () {},
     graderOptions: [],
     studentOptions: []
   }
-)
+);
 
 const mountComponent = (props = {}) => (
   shallow(<SearchFormComponent {...defaultProps()} {...props} />)
@@ -305,6 +305,8 @@ QUnit.module('SearchForm Autocomplete', {
     this.props = {
       ...defaultProps(),
       fetchHistoryStatus: 'started',
+      getNameOptions: this.stub(),
+      getNameOptionsNextPage: this.stub()
     };
     this.getUsersByNameStub = this.stub(UserApi, 'getUsersByName')
       .returns(Promise.resolve({
@@ -340,9 +342,9 @@ test('getNameOptions is called with search term and input id', function () {
 });
 
 test('getNameOptionsNextPage is called if there are more users to load', function () {
-  this.wrapper.setProps({ studentOptionsNextPage: 'https://fake.url' });
+  this.wrapper.setProps({ studentOptionsNextPage: 'https://example.com' });
   strictEqual(this.props.getNameOptionsNextPage.firstCall.args[0], 'students');
-  strictEqual(this.props.getNameOptionsNextPage.firstCall.args[1], 'https://fake.url');
+  strictEqual(this.props.getNameOptionsNextPage.firstCall.args[1], 'https://example.com');
 });
 
 QUnit.module('SearchForm Autocomplete options', {

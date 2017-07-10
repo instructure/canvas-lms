@@ -42,7 +42,7 @@ function getUsersByName (userType, searchTerm) {
 }
 
 function getUsersNextPage (url) {
-  return axios.get(url);
+  return axios.get(encodeURI(url));
 }
 
 export default {

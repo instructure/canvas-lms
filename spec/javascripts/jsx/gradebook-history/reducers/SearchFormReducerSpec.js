@@ -43,7 +43,7 @@ const defaultState = () => (
       }
     },
   }
-)
+);
 
 QUnit.module('SearchFormReducer');
 
@@ -88,7 +88,7 @@ test('handles FETCH_USERS_BY_NAME_SUCCESS for given user type', function () {
   const payload = {
     userType: 'graders',
     data: Fixtures.userArray(),
-    link: '<http://fake.url/3?&page=first>; rel="current",<http://fake.url/3?&page=bookmark:asdf>; rel="next"'
+    link: '<http://example.com/3?&page=first>; rel="current",<http://example.com/3?&page=bookmark:asdf>; rel="next"'
   };
   const initialState = defaultState();
   const newState = {
@@ -151,7 +151,7 @@ test('handles FETCH_USERS_NEXT_PAGE_START for given user type', function () {
       students: {
         fetchStatus: null,
         items: Fixtures.userArray(),
-        nextPage: 'https://fake.url'
+        nextPage: 'https://example.com'
       }
     }
   };
@@ -179,7 +179,7 @@ test('handles FETCH_USERS_NEXT_PAGE_SUCCESS for given user type', function () {
   const payload = {
     userType: 'graders',
     data: Fixtures.userArray(),
-    link: '<http://fake.url/3?&page=first>; rel="current",<http://fake.url/3?&page=bookmark:asdf>; rel="next"'
+    link: '<http://example.com/3?&page=first>; rel="current",<http://example.com/3?&page=bookmark:asdf>; rel="next"'
   };
   const initialState = {
     ...defaults,
@@ -221,7 +221,7 @@ test('handles FETCH_USERS_NEXT_PAGE_FAILURE for given user type', function () {
       students: {
         fetchStatus: 'started',
         items: Fixtures.userArray(),
-        nextPage: 'https://fake.url'
+        nextPage: 'https://example.com'
       }
     }
   };

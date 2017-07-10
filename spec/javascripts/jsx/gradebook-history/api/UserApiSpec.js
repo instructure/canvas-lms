@@ -33,7 +33,7 @@ QUnit.module('UserApi', {
 
 test('getUsersByName for graders searches by teachers and TAs', function () {
   const searchTerm = 'Norval';
-  const url = encodeURI(`/api/v1/courses/${this.courseId}/users`);
+  const url = `/api/v1/courses/${this.courseId}/users`;
   const params = {
     params: {
       search_term: searchTerm,
@@ -51,7 +51,7 @@ test('getUsersByName for graders searches by teachers and TAs', function () {
 
 test('getUsersByName for students searches by students', function () {
   const searchTerm = 'Norval';
-  const url = encodeURI(`/api/v1/courses/${this.courseId}/users`);
+  const url = `/api/v1/courses/${this.courseId}/users`;
   const params = {
     params: {
       search_term: searchTerm,
@@ -68,7 +68,7 @@ test('getUsersByName for students searches by students', function () {
 });
 
 test('getUsersNextPage makes a request with given url', function () {
-  const url = 'https://fake.url/users?page=2';
+  const url = 'https://example.com/users?page=2';
   const promise = UserApi.getUsersNextPage(url);
 
   return promise.then(() => {

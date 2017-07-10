@@ -34,18 +34,18 @@ QUnit.module('SearchFormActions', function () {
   const response = {
     data: Fixtures.userArray(),
     headers: {
-      link: '<http://fake.url/3?&page=first>; rel="current",<http://fake.url/3?&page=bookmark:asdf>; rel="next"'
+      link: '<http://example.com/3?&page=first>; rel="current",<http://example.com/3?&page=bookmark:asdf>; rel="next"'
     }
   };
 
-  test('fetchUsersByNameStarted creates an action with type FETCH_USERS_BY_NAME_START', function () {
+  test('fetchUsersByNameStart creates an action with type FETCH_USERS_BY_NAME_START', function () {
     const userType = 'graders';
     const expectedValue = {
       type: FETCH_USERS_BY_NAME_START,
       payload: { userType }
     };
 
-    deepEqual(SearchFormActions.fetchUsersByNameStarted(userType), expectedValue);
+    deepEqual(SearchFormActions.fetchUsersByNameStart(userType), expectedValue);
   });
 
   test('fetchUsersByNameSuccess creates an action with type FETCH_USERS_BY_NAME_SUCCESS', function () {
@@ -109,8 +109,8 @@ QUnit.module('SearchFormActions getHistoryByAssignment', {
   }
 });
 
-test('dispatches fetchHistoryStarted', function () {
-  const fetchSpy = this.spy(HistoryActions, 'fetchHistoryStarted');
+test('dispatches fetchHistoryStart', function () {
+  const fetchSpy = this.spy(HistoryActions, 'fetchHistoryStart');
   const promise = this.dispatchSpy(SearchFormActions.getHistoryByAssignment(1));
   return promise.then(() => {
     equal(fetchSpy.callCount, 1);
@@ -127,10 +127,10 @@ test('dispatches fetchHistorySuccess on success', function () {
 
 test('dispatches fetchHistoryFailure on failure', function () {
   this.getByAssignmentStub.returns(Promise.reject(new Error('FAIL')));
-  const fetchStub = this.stub(HistoryActions, 'fetchHistoryFailure');
+  const fetchSpy = this.spy(HistoryActions, 'fetchHistoryFailure');
   const promise = this.dispatchSpy(SearchFormActions.getHistoryByAssignment(1));
-  return promise.catch(() => {
-    equal(fetchStub.callCount, 1);
+  return promise.then(() => {
+    equal(fetchSpy.callCount, 1);
   });
 });
 
@@ -149,9 +149,9 @@ QUnit.module('SearchFormActions getHistoryByDate', function (hooks) {
     this.dispatchSpy.restore();
   });
 
-  test('dispatches fetchHistoryStarted', function (assert) {
+  test('dispatches fetchHistoryStart', function (assert) {
     const done = assert.async();
-    const fetchSpy = sinon.spy(HistoryActions, 'fetchHistoryStarted');
+    const fetchSpy = sinon.spy(HistoryActions, 'fetchHistoryStart');
     const promise = this.dispatchSpy(SearchFormActions.getHistoryByDate(this.timeFrame));
 
     promise.then(() => {
@@ -176,12 +176,12 @@ QUnit.module('SearchFormActions getHistoryByDate', function (hooks) {
   test('dispatches fetchHistoryFailure on failure', function (assert) {
     this.getByDateStub.returns(Promise.reject(new Error('FAIL')));
     const done = assert.async();
-    const fetchStub = sinon.stub(HistoryActions, 'fetchHistoryFailure');
+    const fetchSpy = sinon.spy(HistoryActions, 'fetchHistoryFailure');
     const promise = this.dispatchSpy(SearchFormActions.getHistoryByDate(this.timeFrame));
 
-    promise.catch(() => {
-      strictEqual(fetchStub.callCount, 1);
-      fetchStub.restore();
+    promise.then(() => {
+      strictEqual(fetchSpy.callCount, 1);
+      fetchSpy.restore();
       done();
     });
   });
@@ -197,8 +197,8 @@ QUnit.module('SearchFormActions getHistoryByGrader', {
   }
 });
 
-test('dispatches fetchHistoryStarted', function () {
-  const fetchSpy = this.spy(HistoryActions, 'fetchHistoryStarted');
+test('dispatches fetchHistoryStart', function () {
+  const fetchSpy = this.spy(HistoryActions, 'fetchHistoryStart');
   const promise = this.dispatchSpy(SearchFormActions.getHistoryByGrader(1));
   return promise.then(() => {
     equal(fetchSpy.callCount, 1);
@@ -215,10 +215,10 @@ test('dispatches fetchHistorySuccess on success', function () {
 
 test('dispatches fetchHistoryFailure on failure', function () {
   this.getByGraderStub.returns(Promise.reject(new Error('FAIL')));
-  const fetchStub = this.stub(HistoryActions, 'fetchHistoryFailure');
+  const fetchSpy = this.spy(HistoryActions, 'fetchHistoryFailure');
   const promise = this.dispatchSpy(SearchFormActions.getHistoryByGrader(1));
-  return promise.catch(() => {
-    equal(fetchStub.callCount, 1);
+  return promise.then(() => {
+    equal(fetchSpy.callCount, 1);
   });
 });
 
@@ -232,8 +232,8 @@ QUnit.module('SearchFormActions getHistoryByStudent', {
   }
 });
 
-test('dispatches fetchHistoryStarted', function () {
-  const fetchSpy = this.spy(HistoryActions, 'fetchHistoryStarted');
+test('dispatches fetchHistoryStart', function () {
+  const fetchSpy = this.spy(HistoryActions, 'fetchHistoryStart');
   const promise = this.dispatchSpy(SearchFormActions.getHistoryByStudent(1));
   return promise.then(() => {
     equal(fetchSpy.callCount, 1);
@@ -250,10 +250,10 @@ test('dispatches fetchHistorySuccess on success', function () {
 
 test('dispatches fetchHistoryFailure on failure', function () {
   this.getByStudentStub.returns(Promise.reject(new Error('FAIL')));
-  const fetchStub = this.stub(HistoryActions, 'fetchHistoryFailure');
+  const fetchSpy = this.spy(HistoryActions, 'fetchHistoryFailure');
   const promise = this.dispatchSpy(SearchFormActions.getHistoryByStudent(1));
-  return promise.catch(() => {
-    equal(fetchStub.callCount, 1);
+  return promise.then(() => {
+    equal(fetchSpy.callCount, 1);
   });
 });
 
@@ -271,8 +271,8 @@ QUnit.module('SearchFormActions getNameOptions', {
   }
 });
 
-test('dispatches fetchUsersByNameStarted', function () {
-  const fetchSpy = this.spy(SearchFormActions, 'fetchUsersByNameStarted');
+test('dispatches fetchUsersByNameStart', function () {
+  const fetchSpy = this.spy(SearchFormActions, 'fetchUsersByNameStart');
   const promise = this.dispatchSpy(SearchFormActions.getNameOptions('graders', 'Norval'));
   return promise.then(() => {
     strictEqual(fetchSpy.callCount, 1);
@@ -289,10 +289,10 @@ test('dispatches fetchUsersByNameSuccess on success', function () {
 
 test('dispatches fetchUsersByNameFailure on failure', function () {
   this.getUsersByNameStub.returns(Promise.reject(new Error('FAIL')));
-  const fetchStub = this.stub(SearchFormActions, 'fetchUsersByNameFailure');
+  const fetchSpy = this.spy(SearchFormActions, 'fetchUsersByNameFailure');
   const promise = this.dispatchSpy(SearchFormActions.getNameOptions('graders', 'Norval'));
-  return promise.catch(() => {
-    strictEqual(fetchStub.callCount, 1);
+  return promise.then(() => {
+    strictEqual(fetchSpy.callCount, 1);
   });
 });
 
@@ -316,7 +316,7 @@ QUnit.module('SearchFormActions getNameOptionsNextPage', function (hooks) {
 
   test('dispatches fetchUsersNextPageStart', function () {
     const fetchSpy = sinon.spy(SearchFormActions, 'fetchUsersNextPageStart');
-    const promise = this.dispatchSpy(SearchFormActions.getNameOptionsNextPage('graders', 'https://fake.url'));
+    const promise = this.dispatchSpy(SearchFormActions.getNameOptionsNextPage('graders', 'https://example.com'));
     return promise.then(() => {
       strictEqual(fetchSpy.callCount, 1);
       fetchSpy.restore();
@@ -325,7 +325,7 @@ QUnit.module('SearchFormActions getNameOptionsNextPage', function (hooks) {
 
   test('dispatches fetchUsersNextPageSuccess on success', function () {
     const fetchSpy = sinon.spy(SearchFormActions, 'fetchUsersNextPageSuccess');
-    const promise = this.dispatchSpy(SearchFormActions.getNameOptionsNextPage('graders', 'https://fake.url'));
+    const promise = this.dispatchSpy(SearchFormActions.getNameOptionsNextPage('graders', 'https://example.com'));
     return promise.then(() => {
       strictEqual(fetchSpy.callCount, 1);
       fetchSpy.restore();
@@ -334,11 +334,11 @@ QUnit.module('SearchFormActions getNameOptionsNextPage', function (hooks) {
 
   test('dispatches fetchUsersNextPageFailure on failure', function () {
     this.getUsersNextPageStub.returns(Promise.reject(new Error('FAIL')));
-    const fetchStub = sinon.stub(SearchFormActions, 'fetchUsersNextPageFailure');
-    const promise = this.dispatchSpy(SearchFormActions.getNameOptionsNextPage('graders', 'https://fake.url'));
-    return promise.catch(() => {
-      strictEqual(fetchStub.callCount, 1);
-      fetchStub.restore();
+    const fetchSpy = sinon.spy(SearchFormActions, 'fetchUsersNextPageFailure');
+    const promise = this.dispatchSpy(SearchFormActions.getNameOptionsNextPage('graders', 'https://example.com'));
+    return promise.then(() => {
+      strictEqual(fetchSpy.callCount, 1);
+      fetchSpy.restore();
     });
   });
 });

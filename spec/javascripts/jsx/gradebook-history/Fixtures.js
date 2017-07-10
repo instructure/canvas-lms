@@ -71,7 +71,7 @@ function payload () {
   return {
     events: historyEventArray(),
     users: userArray(),
-    link: '<http://fake.url/3?&page=first>; rel="current",<http://fake.url/3?&page=bookmark:asdf>; rel="next"'
+    link: '<http://example.com/3?&page=first>; rel="current",<http://example.com/3?&page=bookmark:asdf>; rel="next"'
   }
 }
 
@@ -90,7 +90,7 @@ function response () {
     headers: {
       'content-type': 'application/json; charset=utf-8',
       date: 'Thu, 01 Jun 2017 00:09:21 GMT',
-      link: '<http://fake.url/3?&page=first>; rel="current",<http://fake.url/3?&page=bookmark:asdf>; rel="next"',
+      link: '<http://example.com/3?&page=first>; rel="current",<http://example.com/3?&page=bookmark:asdf>; rel="next"',
       status: '304 Not Modified'
     }
   }

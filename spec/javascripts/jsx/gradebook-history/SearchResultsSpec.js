@@ -28,10 +28,11 @@ import Fixtures from 'spec/jsx/gradebook-history/Fixtures';
 
 const defaultProps = () => (
   {
-    caption: 'search results',
-    fetchHistoryStatus: '',
-    historyItems: [],
-    loadMore () {},
+    caption: 'search results caption',
+    fetchHistoryStatus: 'success',
+    historyItems: formatHistoryItems(Fixtures.payload()),
+    getNextPage () {},
+    nextPage: 'example.com',
     requestingResults: false
   }
 );
@@ -40,33 +41,32 @@ const mountComponent = (customProps = {}) => (
   shallow(<SearchResultsComponent {...defaultProps()} {...customProps} />)
 );
 
-QUnit.module('SearchResults');
+QUnit.module('SearchResults', {
+  setup () {
+    this.wrapper = mountComponent(defaultProps());
+  },
+
+  teardown () {
+    this.wrapper.unmount();
+  }
+});
 
 test('does not show a Table/Spinner if no historyItems passed', function () {
-  const wrapper = mountComponent();
+  const wrapper = mountComponent({ historyItems: [] });
   notOk(wrapper.find(Table).exists());
 });
 
 test('shows a Table if there are historyItems passed', function () {
-  const historyItems = formatHistoryItems(Fixtures.payload());
-  const props = { historyItems };
-  const wrapper = mountComponent(props);
-  ok(wrapper.find(Table).exists());
+  ok(this.wrapper.find(Table).exists());
 });
 
 test('Table is passed the label and caption props', function () {
-  const historyItems = formatHistoryItems(Fixtures.payload());
-  const props = { caption: 'search results caption', historyItems };
-  const wrapper = mountComponent(props);
-  const table = wrapper.find(Table);
-  equal(table.props().caption, props.caption);
+  const table = this.wrapper.find(Table);
+  equal(table.props().caption, 'search results caption');
 });
 
 test('Table is passed column headers in correct order', function () {
-  const historyItems = formatHistoryItems(Fixtures.payload());
-  const props = { historyItems };
-  const wrapper = mountComponent(props);
-  const table = wrapper.find(Table);
+  const table = this.wrapper.find(Table);
   deepEqual(table.props().colHeaders, constants.colHeaders);
 });
 
@@ -75,21 +75,19 @@ test('Table displays the formatted historyItems passed it', function () {
   const events = payload.events;
   const historyItems = formatHistoryItems(payload);
   const props = { ...defaultProps(), historyItems }
-  const tableBody = mount(<SearchResultsComponent {...props} />).find('tbody');
-  equal(tableBody.find('tr').length, events.length);
+  const tableBody = mount(<SearchResultsComponent {...props} />);
+  equal(tableBody.find('tbody').find('tr').length, events.length);
+  tableBody.unmount();
 });
 
 test('does not show a Spinner if requestingResults false', function () {
-  const wrapper = mountComponent({ requestingResults: false });
-  notOk(wrapper.find(Spinner).exists());
+  notOk(this.wrapper.find(Spinner).exists());
 });
 
 test('shows a Spinner if requestingResults true', function () {
-  const props = {
-    requestingResults: true
-  };
-  const wrapper = mountComponent(props);
+  const wrapper = mountComponent({ requestingResults: true });
   ok(wrapper.find(Spinner).exists());
+  wrapper.unmount();
 });
 
 test('Table shows text if request was made but no results were found', function () {
@@ -97,5 +95,46 @@ test('Table shows text if request was made but no results were found', function 
   const wrapper = mount(<SearchResultsComponent {...props} />);
   const textBox = wrapper.find(Typography);
   ok(textBox.exists());
-  equal(textBox.text(), 'No results found');
+  equal(textBox.text(), 'No results found.');
+  wrapper.unmount();
+});
+
+test('shows text indicating that the end of results was reached', function () {
+  const historyItems = formatHistoryItems(Fixtures.payload());
+  const props = { ...defaultProps(), nextPage: '', requestingResults: false, historyItems };
+  const wrapper = mount(<SearchResultsComponent {...props} />);
+  const textBox = wrapper.find(Typography);
+  ok(textBox.exists());
+  equal(textBox.text(), 'No more results to load.');
+  wrapper.unmount();
+});
+
+test('loads next page if possible and the first results did not result in a scrollbar', function () {
+  const actualInnerHeight = window.innerHeight;
+  // fake to test that there's not a vertical scrollbar
+  window.innerHeight = document.body.clientHeight + 1;
+  const historyItems = formatHistoryItems(Fixtures.payload());
+  const props = { ...defaultProps(), nextPage: 'example.com', getNextPage: this.stub() };
+  const wrapper = mount(<SearchResultsComponent {...props} />);
+  wrapper.setProps({ historyItems });
+  ok(props.getNextPage.callCount > 0);
+  window.innerHeight = actualInnerHeight;
+  wrapper.unmount();
+});
+
+test('loads next page on scroll if possible', function () {
+  const actualInnerHeight = window.innerHeight;
+  const historyItems = formatHistoryItems(Fixtures.payload());
+  const props = {
+    ...defaultProps(),
+    historyItems,
+    nextPage: 'example.com',
+    getNextPage: this.stub()
+  };
+  const wrapper = mount(<SearchResultsComponent {...props} />);
+  window.innerHeight = document.body.clientHeight - 1;
+  document.dispatchEvent(new Event('scroll'));
+  ok(props.getNextPage.callCount > 0);
+  window.innerHeight = actualInnerHeight;
+  wrapper.unmount();
 });

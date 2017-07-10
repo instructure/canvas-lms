@@ -28,7 +28,7 @@ const FETCH_USERS_NEXT_PAGE_SUCCESS = 'FETCH_USERS_NEXT_PAGE_SUCCESS';
 const FETCH_USERS_NEXT_PAGE_FAILURE = 'FETCH_USERS_NEXT_PAGE_FAILURE';
 
 const SearchFormActions = {
-  fetchUsersByNameStarted (userType) {
+  fetchUsersByNameStart (userType) {
     return {
       type: FETCH_USERS_BY_NAME_START,
       payload: { userType }
@@ -92,14 +92,14 @@ const SearchFormActions = {
 
   getHistoryByAssignment (assignmentId, timeFrame = { from: '', to: '' }) {
     return function (dispatch) {
-      dispatch(HistoryActions.fetchHistoryStarted());
+      dispatch(HistoryActions.fetchHistoryStart());
       return dispatch(SearchFormActions.getHistoryByFunction(HistoryApi.getByAssignment, assignmentId, timeFrame));
     };
   },
 
   getHistoryByDate (timeFrame = { from: '', to: '' }) {
     return function (dispatch) {
-      dispatch(HistoryActions.fetchHistoryStarted());
+      dispatch(HistoryActions.fetchHistoryStart());
       return HistoryApi.getByDate(timeFrame)
         .then((response) => {
           dispatch(HistoryActions.fetchHistorySuccess(response.data, response.headers));
@@ -112,21 +112,21 @@ const SearchFormActions = {
 
   getHistoryByGrader (graderId, timeFrame = { from: '', to: '' }) {
     return function (dispatch) {
-      dispatch(HistoryActions.fetchHistoryStarted());
+      dispatch(HistoryActions.fetchHistoryStart());
       return dispatch(SearchFormActions.getHistoryByFunction(HistoryApi.getByGrader, graderId, timeFrame));
     };
   },
 
   getHistoryByStudent (studentId, timeFrame = { from: '', to: '' }) {
     return function (dispatch) {
-      dispatch(HistoryActions.fetchHistoryStarted());
+      dispatch(HistoryActions.fetchHistoryStart());
       return dispatch(SearchFormActions.getHistoryByFunction(HistoryApi.getByStudent, studentId, timeFrame));
     };
   },
 
   getNameOptions (userType, searchTerm) {
     return function (dispatch) {
-      dispatch(SearchFormActions.fetchUsersByNameStarted(userType));
+      dispatch(SearchFormActions.fetchUsersByNameStart(userType));
 
       return UserApi.getUsersByName(userType, searchTerm)
         .then((response) => {

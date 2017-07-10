@@ -22,16 +22,19 @@ import Fixtures from 'spec/jsx/gradebook-history/Fixtures';
 const {
   FETCH_HISTORY_START,
   FETCH_HISTORY_SUCCESS,
-  FETCH_HISTORY_FAILURE
+  FETCH_HISTORY_FAILURE,
+  FETCH_HISTORY_NEXT_PAGE_START,
+  FETCH_HISTORY_NEXT_PAGE_SUCCESS,
+  FETCH_HISTORY_NEXT_PAGE_FAILURE
 } = HistoryActions;
 
 QUnit.module('HistoryActions');
 
-test('fetchHistoryStarted creates an action with type FETCH_HISTORY_START', function () {
+test('fetchHistoryStart creates an action with type FETCH_HISTORY_START', function () {
   const expectedValue = {
     type: FETCH_HISTORY_START
   };
-  deepEqual(HistoryActions.fetchHistoryStarted(), expectedValue);
+  deepEqual(HistoryActions.fetchHistoryStart(), expectedValue);
 });
 
 test('fetchHistorySuccess creates an action with type FETCH_HISTORY_SUCCESS and payload', function () {
@@ -52,4 +55,31 @@ test('fetchHistoryFailure creates an action with type FETCH_HISTORY_FAILURE', fu
     type: FETCH_HISTORY_FAILURE
   };
   deepEqual(HistoryActions.fetchHistoryFailure(), expectedValue);
+});
+
+test('fetchHistoryNextPageStart creates an action with type FETCH_HISTORY_NEXT_PAGE_START', function () {
+  const expectedValue = {
+    type: FETCH_HISTORY_NEXT_PAGE_START
+  };
+  deepEqual(HistoryActions.fetchHistoryNextPageStart(), expectedValue);
+});
+
+test('fetchHistoryNextPageSuccess creates an action with type FETCH_HISTORY_NEXT_PAGE_SUCCESS and payload', function () {
+  const response = Fixtures.response();
+  const expectedValue = {
+    type: FETCH_HISTORY_NEXT_PAGE_SUCCESS,
+    payload: {
+      events: response.data.events,
+      users: response.data.linked.users,
+      link: response.headers.link
+    }
+  };
+  deepEqual(HistoryActions.fetchHistoryNextPageSuccess(response.data, response.headers), expectedValue);
+});
+
+test('fetchHistoryNextPageFailure creates an action with type FETCH_HISTORY_NEXT_PAGE_FAILURE', function () {
+  const expectedValue = {
+    type: FETCH_HISTORY_NEXT_PAGE_FAILURE
+  };
+  deepEqual(HistoryActions.fetchHistoryNextPageFailure(), expectedValue);
 });

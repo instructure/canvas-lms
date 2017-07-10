@@ -21,10 +21,14 @@ import 'jquery.instructure_date_and_time'
 import I18n from 'i18n!gradebook_history';
 import constants from 'jsx/gradebook-history/constants';
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
+import parseLinkHeader from 'jsx/shared/parseLinkHeader';
 import {
   FETCH_HISTORY_START,
   FETCH_HISTORY_SUCCESS,
-  FETCH_HISTORY_FAILURE
+  FETCH_HISTORY_FAILURE,
+  FETCH_HISTORY_NEXT_PAGE_START,
+  FETCH_HISTORY_NEXT_PAGE_SUCCESS,
+  FETCH_HISTORY_NEXT_PAGE_FAILURE
 } from 'jsx/gradebook-history/actions/HistoryActions';
 
 function mapUsers (users = []) {
@@ -61,6 +65,7 @@ function history (state = {}, { type, payload }) {
         ...state,
         loading: true,
         items: null,
+        nextPage: null,
         fetchHistoryStatus: 'started'
       };
     }
@@ -68,6 +73,7 @@ function history (state = {}, { type, payload }) {
       return {
         ...state,
         loading: false,
+        nextPage: parseLinkHeader(payload.link).next,
         items: formatHistoryItems(payload),
         fetchHistoryStatus: 'success'
       };
@@ -76,8 +82,35 @@ function history (state = {}, { type, payload }) {
       return {
         ...state,
         loading: false,
+        nextPage: null,
         fetchHistoryStatus: 'failure'
       };
+    }
+    case FETCH_HISTORY_NEXT_PAGE_START: {
+      return {
+        ...state,
+        loading: true,
+        nextPage: null,
+        fetchNextPageStatus: 'started',
+      };
+    }
+    case FETCH_HISTORY_NEXT_PAGE_SUCCESS: {
+      const newItems = formatHistoryItems(payload);
+      return {
+        ...state,
+        items: state.items.concat(newItems),
+        loading: false,
+        nextPage: parseLinkHeader(payload.link).next,
+        fetchNextPageStatus: 'success'
+      };
+    }
+    case FETCH_HISTORY_NEXT_PAGE_FAILURE: {
+      return {
+        ...state,
+        loading: false,
+        nextPage: null,
+        fetchNextPageStatus: 'failure'
+      }
     }
     default: {
       return state;

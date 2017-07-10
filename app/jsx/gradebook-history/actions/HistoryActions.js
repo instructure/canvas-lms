@@ -19,8 +19,11 @@
 const FETCH_HISTORY_START = 'FETCH_HISTORY_START';
 const FETCH_HISTORY_SUCCESS = 'FETCH_HISTORY_SUCCESS';
 const FETCH_HISTORY_FAILURE = 'FETCH_HISTORY_FAILURE';
+const FETCH_HISTORY_NEXT_PAGE_START = 'FETCH_HISTORY_NEXT_PAGE_START';
+const FETCH_HISTORY_NEXT_PAGE_SUCCESS = 'FETCH_HISTORY_NEXT_PAGE_SUCCESS';
+const FETCH_HISTORY_NEXT_PAGE_FAILURE = 'FETCH_HISTORY_NEXT_PAGE_FAILURE';
 
-function fetchHistoryStarted () {
+function fetchHistoryStart () {
   return {
     type: FETCH_HISTORY_START
   };
@@ -39,11 +42,36 @@ function fetchHistoryFailure () {
   };
 }
 
+function fetchHistoryNextPageStart () {
+  return {
+    type: FETCH_HISTORY_NEXT_PAGE_START
+  };
+}
+
+function fetchHistoryNextPageSuccess ({ events, linked: { users }}, { link }) {
+  return {
+    type: FETCH_HISTORY_NEXT_PAGE_SUCCESS,
+    payload: { events, users, link }
+  };
+}
+
+function fetchHistoryNextPageFailure () {
+  return {
+    type: FETCH_HISTORY_NEXT_PAGE_FAILURE
+  };
+}
+
 export default {
   FETCH_HISTORY_START,
   FETCH_HISTORY_SUCCESS,
   FETCH_HISTORY_FAILURE,
-  fetchHistoryStarted,
+  FETCH_HISTORY_NEXT_PAGE_START,
+  FETCH_HISTORY_NEXT_PAGE_SUCCESS,
+  FETCH_HISTORY_NEXT_PAGE_FAILURE,
+  fetchHistoryStart,
   fetchHistorySuccess,
-  fetchHistoryFailure
+  fetchHistoryFailure,
+  fetchHistoryNextPageStart,
+  fetchHistoryNextPageSuccess,
+  fetchHistoryNextPageFailure
 };
