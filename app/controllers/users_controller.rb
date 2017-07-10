@@ -2265,6 +2265,7 @@ class UsersController < ApplicationController
     sis_user_id = nil
     integration_id = nil
     params[:pseudonym] ||= {}
+    params[:pseudonym][:unique_id].strip! if params[:pseudonym][:unique_id].is_a?(String)
 
     if @context.grants_right?(@current_user, session, :manage_sis)
       sis_user_id = params[:pseudonym].delete(:sis_user_id)
