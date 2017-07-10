@@ -117,6 +117,16 @@ The title of the context.
 ```
 Example Course
 ```
+## com.instructure.Assignment.lti.id
+The LTI assignment id of an assignment. This value corresponds with
+the `ext_lti_assignment_id` send in various launches and webhooks.
+
+**Availability**: *always*  
+**Launch Parameter**: *com_instructure_assignment_lti_id*  
+
+```
+9ae4170c-6b64-444d-9246-0b7dedd5f560
+```
 ## com.instructure.OriginalityReport.id
 The Canvas id of the Originality Report associated
 with the launch.

@@ -95,7 +95,8 @@ module Lti
          vnd.Canvas.OriginalityReport.url
          vnd.Canvas.submission.history.url
          vnd.Canvas.submission.url
-         Context.title)
+         Context.title
+         com.instructure.Assignment.lti.id)
     }
     describe '#supported_capabilities' do
       it 'returns all supported capabilities asociated with launch params' do

@@ -274,6 +274,40 @@ module Lti
     end
 
     describe "#variable expansions" do
+      it 'has a substitution for com.instructure.Assignment.lti.id' do
+        exp_hash = {test: '$com.instructure.Assignment.lti.id'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq tool_setting.context.context.assignment.lti_context_id
+      end
+
+      it 'has a substitution for com.instructure.Assignment.lti.id when there is no tool setting' do
+        assignment.update_attributes(context: course)
+        variable_expander = VariableExpander.new(root_account,
+                                                 account,
+                                                 controller,
+                                                 current_user: user,
+                                                 tool: tool,
+                                                 assignment: assignment)
+        assignment.update_attributes(context: course)
+        exp_hash = {test: '$com.instructure.Assignment.lti.id'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq assignment.lti_context_id
+      end
+
+      it 'has a substitution for com.instructure.Assignment.lti.id when secure params are present' do
+        lti_assignment_id = SecureRandom.uuid
+        secure_params = Canvas::Security.create_jwt(lti_assignment_id: lti_assignment_id)
+        variable_expander = VariableExpander.new(root_account,
+                                                 account,
+                                                 controller,
+                                                 current_user: user,
+                                                 tool: tool,
+                                                 secure_params: secure_params)
+        exp_hash = {test: '$com.instructure.Assignment.lti.id'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq lti_assignment_id
+      end
+
       it 'has a substitution for Context.title' do
         exp_hash = {test: '$Context.title'}
         variable_expander.expand_variables!(exp_hash)
