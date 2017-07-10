@@ -904,6 +904,10 @@ define [
       @get('selectedSubmission.hidden') || false
     ).property('selectedStudent', 'selectedAssignment')
 
+    selectedSubmissionLate: (->
+      ( @get('selectedSubmission.points_deducted') || 0 ) > 0
+    ).property('selectedStudent', 'selectedAssignment')
+
     selectedOutcomeResult: ( ->
       return null unless @get('selectedStudent')? and @get('selectedOutcome')?
       student = @get 'selectedStudent'

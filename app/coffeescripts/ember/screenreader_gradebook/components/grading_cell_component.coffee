@@ -72,7 +72,7 @@ define [
         I18n.t(
           "(%{score} out of %{points})",
           points: I18n.n @assignment.points_possible
-          score: @get('score')
+          score: @get('entered_score')
         )
       else if @get('nilPointsPossible')
         I18n.t("No points possible")
@@ -93,6 +93,22 @@ define [
     score: (->
       if @submission.score? then I18n.n(@submission.score) else ' -'
     ).property('submission.score')
+
+    entered_score: (->
+      if @submission.entered_score? then I18n.n(@submission.entered_score) else ' -'
+    ).property('submission.entered_score')
+
+    late_penalty: (->
+      if @submission.points_deducted? then I18n.n(-1 * @submission.points_deducted) else ' -'
+    ).property('submission.points_deducted')
+
+    points_possible: (->
+      if @assignment.points_possible? then I18n.n(@assignment.points_possible) else ' -'
+    ).property('assignment.points_possible')
+
+    final_grade: (->
+      if @submission.grade? then GradeFormatHelper.formatGrade(@submission.grade) else ' -'
+    ).property('submission.grade')
 
     ajax: (url, options) ->
       {type, data} = options
@@ -120,7 +136,7 @@ define [
       newVal = if @submission?.excused
                  'EX'
                else
-                 @submission?.grade || '-'
+                 @submission?.entered_grade || '-'
 
       @setExcusedWithoutTriggeringSave(@submission?.excused)
       @set 'value', GradeFormatHelper.formatGrade(newVal)

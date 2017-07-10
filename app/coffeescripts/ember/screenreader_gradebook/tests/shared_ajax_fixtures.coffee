@@ -483,7 +483,7 @@ define [
           submissions: [
             { id: '1', user_id: '1', assignment_id: '1', grade: '3', score: '3' }
             { id: '2', user_id: '1', assignment_id: '2', grade: null, score: null  }
-            { id: '5', user_id: '1', assignment_id: '6', grade: 'incomplete', score: 'incomplete' }
+            { id: '5', user_id: '1', assignment_id: '6', grade: 'incomplete', score: 'incomplete', entered_grade: 'incomplete', entered_score: 'incomplete' }
           ]
         }
         {

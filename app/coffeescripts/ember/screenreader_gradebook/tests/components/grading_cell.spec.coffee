@@ -47,13 +47,18 @@ define [
           "/api/v1/assignment/:assignment/:submission"
       run =>
         @submission = Ember.Object.create
-          grade: 'A'
+          grade: 'B'
+          entered_grade: 'A'
+          score: 8
+          entered_score: 10
+          points_deducted: 2
           gradeLocked: false
           assignment_id: 1
           user_id: 1
         @assignment = Ember.Object.create
           due_at: tz.parse("2013-10-01T10:00:00Z")
           grading_type: 'points'
+          points_possible: 10
         @component.setProperties
           'submission': @submission
           assignment: @assignment
@@ -69,6 +74,18 @@ define [
     component = App.GradingCellComponent.create()
     equal(component.get('value'), '-')
     equal(@component.get('value'), 'A')
+
+  test "entered_score", ->
+    equal(@component.get('entered_score'), 10)
+
+  test "late_penalty", ->
+    equal(@component.get('late_penalty'), -2)
+
+  test "points_possible", ->
+    equal(@component.get('points_possible'), 10)
+
+  test "final_grade", ->
+    equal(@component.get('final_grade'), 'B')
 
   test "saveURL", ->
     equal(@component.get('saveURL'), "/api/v1/assignment/1/1")
@@ -94,6 +111,7 @@ define [
     equal @component.get('isInPastGradingPeriodAndNotAdmin'), false
 
   test "nilPointsPossible", ->
+    run => @assignment.set('points_possible', null)
     ok @component.get('nilPointsPossible')
     run => @assignment.set('points_possible', 10)
     equal @component.get('nilPointsPossible'), false

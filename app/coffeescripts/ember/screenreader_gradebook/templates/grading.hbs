@@ -11,8 +11,15 @@
           <div class="pad-box bottom-only">
             <label for="student_and_assignment_grade">
               {{#with selectedAssignment}}
-                <strong>{{#t 'grade_for'}}Grade for: {{name}}{{/t}}</strong>
+                <strong>{{#t}}Grade for: {{name}}{{/t}}</strong>
               {{/with}}
+              {{#if selectedSubmission.late}}
+                <span class="late-pill">
+                  <ul class="pill pill-align error" />
+                    <li class="error"><strong>{{#t}}late{{/t}}</strong></li>
+                  </ul>
+                </span>
+              {{/if}}
             </label>
           </div>
           {{
@@ -27,13 +34,6 @@
             <p class="dropped muted">
               <em>
                 {{#t 'is_dropped'}}This grade is currently dropped for this student.{{/t}}
-              </em>
-            </p>
-          {{/if}}
-          {{#if selectedSubmission.late}}
-            <p class="late muted">
-              <em>
-                {{#t 'is_late'}}This submission was late.{{/t}}
               </em>
             </p>
           {{/if}}
