@@ -278,13 +278,6 @@ class Gradezilla
       fj('button:contains("Save")')
     end
 
-    def total_score_for_row(row)
-      grade_grid = f('#gradebook_grid .container_1')
-      rows = grade_grid.find_elements(:css, '.slick-row')
-      total = f('.total-cell', rows[row])
-      total.text
-    end
-
     def select_section(section=nil)
       section = section.name if section.is_a?(CourseSection)
       section ||= ''
@@ -300,26 +293,6 @@ class Gradezilla
       grading_period_dropdown.click
       grading_period_menu_item(grading_period_name).click
       wait_for_animations
-    end
-
-    def enter_grade(grade, x_coordinate, y_coordinate)
-      cell = grading_cell(x_coordinate, y_coordinate)
-      cell.click
-      set_value(grade_input(cell), grade)
-      grade_input(cell).send_keys(:return)
-      wait_for_ajax_requests
-    end
-
-    def cell_hover(x, y)
-      hover(grading_cell(x, y))
-    end
-
-    def cell_click(x, y)
-      grading_cell(x, y).click
-    end
-
-    def cell_tooltip(x, y)
-      grading_cell(x, y).find('.gradebook-tooltip')
     end
 
     def show_notes
@@ -341,11 +314,6 @@ class Gradezilla
       driver.action.send_keys('C').perform
       driver.action.send_keys(:tab).perform
       driver.action.send_keys(:enter).perform
-    end
-
-    def cell_graded?(grade, x, y)
-      cell = f('.gradebook-cell', grading_cell(x, y))
-      cell.text == grade
     end
 
     def open_action_menu
@@ -519,10 +487,6 @@ class Gradezilla
 
     def gradebook_settings_btn_select
       gradebook_settings_button.click
-    end
-
-    def ungradable_selector
-      ".cannot_edit"
     end
 
     # -----------------------NEW-----------------------

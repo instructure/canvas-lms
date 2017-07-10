@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../page_objects/gradezilla_page'
+require_relative '../page_objects/gradezilla_cells_page'
 require_relative './weighting_setup'
 require_relative './a_gradebook_shared_example'
 
@@ -31,7 +32,7 @@ describe 'gradezilla' do
     if @grading_period_index
       Gradezilla.select_grading_period(grading_period_names[@grading_period_index])
     end
-    Gradezilla.total_score_for_row(1)
+    Gradezilla::Cells.get_total_grade(@student)
   end
 
   let(:individual_view) { false }

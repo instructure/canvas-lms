@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../page_objects/gradezilla_page'
+require_relative '../page_objects/gradezilla_cells_page'
 require_relative '../page_objects/gradezilla_late_policies_page'
 require_relative '../page_objects/gradezilla_main_settings'
 
@@ -84,16 +85,15 @@ describe 'Late Policies:' do
     after(:all) { ENV["GRADEBOOK_DEVELOPMENT"] = "false"}
 
     it 'late policy adjusts grades correctly', test_id: 3196973, priority: '1' do
-      expect(Gradezilla.cell_graded?("80", 0,0)).to be true
+      expect(Gradezilla::Cells.get_grade(@student, @a1)).to eq "80"
     end
 
     it 'missing policy adjusts grades correctly', test_id: 3196972, priority: '1' do
-      expect(Gradezilla.cell_graded?("50", 1,0)).to be true
-
+      expect(Gradezilla::Cells.get_grade(@student, @a2)).to eq "50"
     end
 
     it 'late policy with floor adjust the grades correctly', test_id: 3196974, priority: '1' do
-      expect(Gradezilla.cell_graded?("5", 2,0)).to be true
+      expect(Gradezilla::Cells.get_grade(@student, @a3)).to eq "5"
     end
   end
 

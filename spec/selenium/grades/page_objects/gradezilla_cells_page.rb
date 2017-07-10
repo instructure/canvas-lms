@@ -27,8 +27,16 @@ class Gradezilla
         ".slick-row.student_#{student.id} .slick-cell.assignment_#{assignment.id}"
       end
 
+      def ungradable_selector
+        ".cannot_edit"
+      end
+
+      def grading_cell(student, assignment)
+        f(grading_cell_selector(student, assignment))
+      end
+
       def get_grade(student, assignment)
-        f(grading_cell_selector(student, assignment)).text
+        grading_cell(student, assignment).text
       end
 
       def edit_grade(student, assignment, grade)
@@ -39,11 +47,11 @@ class Gradezilla
         set_value(grade_input, grade)
 
         grade_input.send_keys(:return)
-        wait_for_ajaximations
+        wait_for_ajax_requests
       end
 
       def open_tray(student, assignment)
-        cell = f(grading_cell_selector(student, assignment))
+        cell = grading_cell(student, assignment)
         cell.click
         fj('button:contains("Open submission tray")', cell).click
         wait_for_ajaximations
