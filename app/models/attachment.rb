@@ -1253,7 +1253,7 @@ class Attachment < ActiveRecord::Base
     make_rootless
     if Attachment.s3_storage? && self.s3object.exists?
       s3object.copy_to(bucket.object(purgatory_filename))
-    else
+    elsif Attachment.local_storage?
       FileUtils.mkdir(local_purgatory_directory) unless File.exist?(local_purgatory_directory)
       FileUtils.cp full_filename, local_purgatory_file
     end
