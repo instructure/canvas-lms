@@ -1333,19 +1333,3 @@ module ReadonlyCloning
   end
 end
 ActiveRecord::Base.prepend(ReadonlyCloning)
-
-module ConnectionLeaseLogging
-  def lease
-    if @owner
-      ::Rails.logger.error("Connection in use by thread - status: #{@owner.status}")
-      ::Rails.logger.error("variables: #{Hash[@owner.keys.map{|v| [v, @owner[v]]}]}")
-      ::Rails.logger.error("backtrace: #{@owner.backtrace}")
-    end
-    if Thread.current[:name] == 'Main thread' && $booted
-      ::Rails.logger.error("Accessing connection from the Passenger Main thread")
-      ::Rails.logger.error("backtrace: #{caller}")
-    end
-    super
-  end
-end
-ActiveRecord::ConnectionAdapters::AbstractAdapter.prepend(ConnectionLeaseLogging)
