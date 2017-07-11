@@ -192,6 +192,7 @@ module Importers
         item.body = migration.convert_html(hash[:text], :wiki_page, hash[:migration_id], :body)
 
         item.editing_roles = hash[:editing_roles] if hash[:editing_roles].present?
+        item.clone_of_id = hash[:clone_of_id] if hash[:clone_of_id].present?
         item.notify_of_update = hash[:notify_of_update] if !hash[:notify_of_update].nil?
       else
         allow_save = false
