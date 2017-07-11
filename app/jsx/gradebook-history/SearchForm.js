@@ -36,6 +36,7 @@ class SearchFormComponent extends Component {
   static propTypes = {
     fetchHistoryStatus: string.isRequired,
     byAssignment: func.isRequired,
+    byDate: func.isRequired,
     byGrader: func.isRequired,
     byStudent: func.isRequired,
     fetchGradersStatus: string.isRequired,
@@ -113,15 +114,42 @@ class SearchFormComponent extends Component {
     }
   }
 
-  get hasValidTimeFrame () {
-    const from = moment(this.state.from);
-    const to = moment(this.state.to);
-
-    return to.diff(from, 'days') >= 0 || !this.state.from || !this.state.to;
+  setSelectedFrom = (from) => {
+    this.setState({ from });
   }
 
-  get timeFrame () {
-    if (this.hasValidTimeFrame) {
+  setSelectedTo = (to) => {
+    this.setState({ to });
+  }
+
+  setSelectedGrader = (event, selected) => {
+    const grader = selected ? selected.id : '';
+    this.setState({ grader });
+  }
+
+  setSelectedStudent = (event, selected) => {
+    const student = selected ? selected.id : '';
+    this.setState({ student });
+  }
+
+  hasOneDate () {
+    return (this.state.from !== '' && !this.state.to) || (!this.state.from && this.state.to !== '');
+  }
+
+  hasNoDates () {
+    return !this.state.from && !this.state.to;
+  }
+
+  hasFromBeforeTo () {
+    return moment(this.state.to).diff(moment(this.state.from), 'days') >= 0;
+  }
+
+  hasValidTimeFrame () {
+    return this.hasFromBeforeTo() || this.hasOneDate() || this.hasNoDates();
+  }
+
+  timeFrame () {
+    if (this.hasValidTimeFrame()) {
       const from = this.state.from ? moment(this.state.from).startOf('day').format() : '';
       const to = this.state.to ? moment(this.state.to).endOf('day').format() : '';
 
@@ -159,47 +187,31 @@ class SearchFormComponent extends Component {
   }
 
   handleSubmit = () => {
-    if (!this.hasValidTimeFrame) {
+    if (!this.hasValidTimeFrame()) {
       return;
     }
 
     if (this.state.assignment !== '') {
-      this.props.byAssignment(this.state.assignment, this.timeFrame);
+      this.props.byAssignment(this.state.assignment, this.timeFrame());
     } else if (this.state.grader !== '') {
-      this.props.byGrader(this.state.grader, this.timeFrame);
+      this.props.byGrader(this.state.grader, this.timeFrame());
     } else if (this.state.student !== '') {
-      this.props.byStudent(this.state.student, this.timeFrame);
+      this.props.byStudent(this.state.student, this.timeFrame());
+    } else if (this.hasValidTimeFrame() && !this.hasNoDates()) {
+      this.props.byDate(this.timeFrame());
     }
   }
-
-  setSelectedFrom = (from) => {
-    this.setState({ from });
-  }
-
-  setSelectedTo = (to) => {
-    this.setState({ to });
-  }
-
-  setSelectedGrader = (event, selected) => {
-    const grader = selected ? selected.id : '';
-    this.setState({ grader });
-  }
-
-  setSelectedStudent = (event, selected) => {
-    const student = selected ? selected.id : '';
-    this.setState({ student });
-  }
-
-  renderAsOptions = data => (
-    data.map(item => (
-      <option key={item.id} value={item.id}>{item.name}</option>
-    ))
-  )
 
   filterNone = options => (
     // empty function here as the default filter function for Autocomplete
     // does a startsWith call, and won't match `nora` -> `Elenora` for example
     options
+  )
+
+  renderAsOptions = data => (
+    data.map(item => (
+      <option key={item.id} value={item.id}>{item.name}</option>
+    ))
   )
 
   render () {
@@ -288,6 +300,9 @@ const mapDispatchToProps = dispatch => (
   {
     byAssignment: (assignmentId, timeFrame) => {
       dispatch(SearchFormActions.getHistoryByAssignment(assignmentId, timeFrame));
+    },
+    byDate: (timeFrame) => {
+      dispatch(SearchFormActions.getHistoryByDate(timeFrame));
     },
     byGrader: (graderId, timeFrame) => {
       dispatch(SearchFormActions.getHistoryByGrader(graderId, timeFrame));

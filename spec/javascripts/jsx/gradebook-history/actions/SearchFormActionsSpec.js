@@ -134,6 +134,59 @@ test('dispatches fetchHistoryFailure on failure', function () {
   });
 });
 
+QUnit.module('SearchFormActions getHistoryByDate', function (hooks) {
+  hooks.beforeEach(function () {
+    this.response = Fixtures.response();
+    this.timeFrame = Fixtures.timeFrame();
+    this.getByDateStub = sinon.stub(HistoryApi, 'getByDate')
+      .returns(Promise.resolve(this.response));
+
+    this.dispatchSpy = sinon.spy(GradebookHistoryStore, 'dispatch');
+  });
+
+  hooks.afterEach(function () {
+    this.getByDateStub.restore();
+    this.dispatchSpy.restore();
+  });
+
+  test('dispatches fetchHistoryStarted', function (assert) {
+    const done = assert.async();
+    const fetchSpy = sinon.spy(HistoryActions, 'fetchHistoryStarted');
+    const promise = this.dispatchSpy(SearchFormActions.getHistoryByDate(this.timeFrame));
+
+    promise.then(() => {
+      strictEqual(fetchSpy.callCount, 1);
+      fetchSpy.restore();
+      done();
+    });
+  });
+
+  test('dispatches fetchHistorySuccess on success', function (assert) {
+    const done = assert.async();
+    const fetchSpy = sinon.spy(HistoryActions, 'fetchHistorySuccess');
+    const promise = this.dispatchSpy(SearchFormActions.getHistoryByDate(this.timeFrame));
+
+    promise.then(() => {
+      strictEqual(fetchSpy.callCount, 1);
+      fetchSpy.restore();
+      done();
+    });
+  });
+
+  test('dispatches fetchHistoryFailure on failure', function (assert) {
+    this.getByDateStub.returns(Promise.reject(new Error('FAIL')));
+    const done = assert.async();
+    const fetchStub = sinon.stub(HistoryActions, 'fetchHistoryFailure');
+    const promise = this.dispatchSpy(SearchFormActions.getHistoryByDate(this.timeFrame));
+
+    promise.catch(() => {
+      strictEqual(fetchStub.callCount, 1);
+      fetchStub.restore();
+      done();
+    });
+  });
+});
+
 QUnit.module('SearchFormActions getHistoryByGrader', {
   setup () {
     this.response = Fixtures.response();

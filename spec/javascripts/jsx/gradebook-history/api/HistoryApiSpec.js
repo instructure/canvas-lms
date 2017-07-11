@@ -17,6 +17,7 @@
  */
 
 import axios from 'axios';
+import constants from 'jsx/gradebook-history/constants';
 import Fixtures from 'spec/jsx/gradebook-history/Fixtures';
 import HistoryApi from 'jsx/gradebook-history/api/HistoryApi';
 
@@ -64,6 +65,23 @@ test('getByAssignment with a timeFrame', function () {
     equal(this.getStub.callCount, 1);
     equal(this.getStub.firstCall.args[0], url);
     deepEqual(this.getStub.firstCall.args[1], params);
+  });
+});
+
+test('getByDate', function (assert) {
+  const done = assert.async();
+  const timeFrame = Fixtures.timeFrame();
+  const url = encodeURI(`/api/v1/audit/grade_change/courses/${constants.courseId()}`);
+  const params = {
+    params: { start_time: timeFrame.from, end_time: timeFrame.to }
+  };
+  const promise = HistoryApi.getByDate(timeFrame);
+
+  promise.then(() => {
+    strictEqual(this.getStub.callCount, 1);
+    strictEqual(this.getStub.firstCall.args[0], url);
+    deepEqual(this.getStub.firstCall.args[1], params);
+    done();
   });
 });
 

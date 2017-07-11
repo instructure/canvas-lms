@@ -90,21 +90,34 @@ const SearchFormActions = {
     };
   },
 
-  getHistoryByAssignment (assignmentId, timeFrame = {from: '', to: ''}) {
+  getHistoryByAssignment (assignmentId, timeFrame = { from: '', to: '' }) {
     return function (dispatch) {
       dispatch(HistoryActions.fetchHistoryStarted());
       return dispatch(SearchFormActions.getHistoryByFunction(HistoryApi.getByAssignment, assignmentId, timeFrame));
     };
   },
 
-  getHistoryByGrader (graderId, timeFrame = {from: '', to: ''}) {
+  getHistoryByDate (timeFrame = { from: '', to: '' }) {
+    return function (dispatch) {
+      dispatch(HistoryActions.fetchHistoryStarted());
+      return HistoryApi.getByDate(timeFrame)
+        .then((response) => {
+          dispatch(HistoryActions.fetchHistorySuccess(response.data, response.headers));
+        })
+        .catch(() => {
+          dispatch(HistoryActions.fetchHistoryFailure());
+        });
+    };
+  },
+
+  getHistoryByGrader (graderId, timeFrame = { from: '', to: '' }) {
     return function (dispatch) {
       dispatch(HistoryActions.fetchHistoryStarted());
       return dispatch(SearchFormActions.getHistoryByFunction(HistoryApi.getByGrader, graderId, timeFrame));
     };
   },
 
-  getHistoryByStudent (studentId, timeFrame = {from: '', to: ''}) {
+  getHistoryByStudent (studentId, timeFrame = { from: '', to: '' }) {
     return function (dispatch) {
       dispatch(HistoryActions.fetchHistoryStarted());
       return dispatch(SearchFormActions.getHistoryByFunction(HistoryApi.getByStudent, studentId, timeFrame));

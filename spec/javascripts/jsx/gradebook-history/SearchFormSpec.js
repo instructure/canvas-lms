@@ -51,6 +51,7 @@ const defaultProps = () => (
     fetchGradersStatus: 'started',
     fetchStudentsStatus: 'started',
     byAssignment: sinon.stub(),
+    byDate: sinon.stub(),
     byGrader: sinon.stub(),
     byStudent: sinon.stub(),
     getNameOptions: sinon.stub(),
@@ -109,6 +110,7 @@ test('has a Button for submitting', function () {
 QUnit.module('SearchForm when button is clicked', {
   setup () {
     this.getHistoryByAssignmentStub = this.stub(SearchFormActions, 'getHistoryByAssignment');
+    this.getHistoryByDateStub = this.stub(SearchFormActions, 'getHistoryByDate');
     this.getHistoryByGraderStub = this.stub(SearchFormActions, 'getHistoryByGrader');
     this.getHistoryByStudentStub = this.stub(SearchFormActions, 'getHistoryByStudent');
     this.dispatchStub = this.stub(GradebookHistoryStore, 'dispatch');
@@ -116,6 +118,7 @@ QUnit.module('SearchForm when button is clicked', {
     const props = {
       fetchHistoryStatus: 'success',
       byAssignment: functionStubHelper(this.dispatchStub, this.getHistoryByAssignmentStub),
+      byDate: functionStubHelper(this.dispatchStub, this.getHistoryByDateStub),
       byGrader: functionStubHelper(this.dispatchStub, this.getHistoryByGraderStub),
       byStudent: functionStubHelper(this.dispatchStub, this.getHistoryByStudentStub)
     };
@@ -202,6 +205,17 @@ test('dispatches getHistoryByStudent with student id and timeFrame', function ()
     this.wrapper.find(Button).simulate('click');
     equal(this.getHistoryByStudentStub.firstCall.args[0], student);
     deepEqual(this.getHistoryByStudentStub.firstCall.args[1], stretchTimeFrame(timeFrame));
+  });
+});
+
+test('dispatches getHistoryByDate with timeFrame', function () {
+  const timeFrame = Fixtures.timeFrame();
+  this.wrapper.setState({
+    from: timeFrame.from,
+    to: timeFrame.to
+  }, () => {
+    this.wrapper.find(Button).simulate('click');
+    deepEqual(this.getHistoryByDateStub.firstCall.args[0], stretchTimeFrame(timeFrame));
   });
 });
 
