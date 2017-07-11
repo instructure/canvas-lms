@@ -276,6 +276,7 @@ module SIS
                   raise ImportError, msg
                 end
                 user.touch unless user_touched
+                user.clear_email_cache!
               end
               pseudo.sis_communication_channel_id = pseudo.communication_channel_id = cc.id
 
