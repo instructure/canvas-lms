@@ -482,6 +482,7 @@ s2,test_1,section2,active},
     batch.processing_errors = [ ['testfile.csv', 'test error'] ] * 5
     batch.save!
     error_file = batch.errors_attachment
+    expect(error_file.display_name).to eq "sis_errors_attachment_#{batch.id}.csv"
     expect(CSV.parse(error_file.open).map.to_a.size).to eq 10
   end
 
