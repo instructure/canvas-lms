@@ -370,6 +370,20 @@ describe PlannerOverridesController do
             expect(response_json.first["plannable"]["id"]).to eq @assignment2.id
           end
 
+          it "shouldn't return things from other courses" do
+            course_with_student(:active_all => true) # another course
+            other_student = @student
+            other_dt = @course.discussion_topics.create!(title: "srsly", message: "cmon", todo_date: Time.zone.now)
+            other_assignment = course_assignment
+            other_sub = other_assignment.submit_homework(@student)
+            other_sub.submission_comments.create!(comment: "hellooo", author: @teacher)
+            ContentParticipation.delete_all
+
+            get :items_index, filter: "new_activity"
+            response_json = json_parse(response.body)
+            expect(response_json).to be_empty
+          end
+
           context "date range" do
             it "should not return items before the specified start_date" do
               dt = @course.discussion_topics.create!(title: "Yes", message: "Please", user: @teacher, todo_date: 1.week.ago)

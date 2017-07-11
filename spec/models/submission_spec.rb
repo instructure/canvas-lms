@@ -1979,34 +1979,20 @@ describe Submission do
   end
 
   describe "read/unread state" do
-
-    def check_read_state_scopes(read: false, user: @user)
-      if read
-        expect(Submission.read_for(user)).to be_include @submission
-        expect(Submission.unread_for(user)).not_to be_include @submission
-      else
-        expect(Submission.read_for(user)).not_to be_include @submission
-        expect(Submission.unread_for(user)).to be_include @submission
-      end
-    end
-
     it "should be read if a submission exists with no grade" do
       @submission = @assignment.submit_homework(@user)
       expect(@submission.read?(@user)).to be_truthy
-      check_read_state_scopes read: true
     end
 
     it "should be unread after assignment is graded" do
       @submission = @assignment.grade_student(@user, grade: 3, grader: @teacher).first
       expect(@submission.unread?(@user)).to be_truthy
-      check_read_state_scopes
     end
 
     it "should be unread after submission is graded" do
       @assignment.submit_homework(@user)
       @submission = @assignment.grade_student(@user, grade: 3, grader: @teacher).first
       expect(@submission.unread?(@user)).to be_truthy
-      check_read_state_scopes
     end
 
     it "should be unread after submission is commented on by teacher" do
@@ -2014,7 +2000,6 @@ describe Submission do
       course_with_teacher(:course => @context, :active_all => true)
       @submission = @assignment.update_submission(@student, { :commenter => @teacher, :comment => "good!" }).first
       expect(@submission.unread?(@user)).to be_truthy
-      check_read_state_scopes user: @student
     end
 
     it "should be read if other submission fields change" do
@@ -2023,7 +2008,6 @@ describe Submission do
       @submission.graded_at = Time.now
       @submission.save!
       expect(@submission.read?(@user)).to be_truthy
-      check_read_state_scopes read: true
     end
   end
 
