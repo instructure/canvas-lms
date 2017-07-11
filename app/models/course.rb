@@ -2417,28 +2417,24 @@ class Course < ActiveRecord::Base
         :label => t('#tabs.announcements', "Announcements"),
         :css_class => 'announcements',
         :href => :course_announcements_path,
-        :screenreader => t("Course Announcements"),
         :icon => 'icon-announcement'
       }, {
         :id => TAB_ASSIGNMENTS,
         :label => t('#tabs.assignments', "Assignments"),
         :css_class => 'assignments',
         :href => :course_assignments_path,
-        :screenreader => t('#tabs.course_assignments', "Course Assignments"),
         :icon => 'icon-assignment'
       }, {
         :id => TAB_DISCUSSIONS,
         :label => t('#tabs.discussions', "Discussions"),
         :css_class => 'discussions',
         :href => :course_discussion_topics_path,
-        :screenreader => t("Course Discussions"),
         :icon => 'icon-discussion'
       }, {
         :id => TAB_GRADES,
         :label => t('#tabs.grades', "Grades"),
         :css_class => 'grades',
-        :href => :course_grades_path,
-        :screenreader => t('#tabs.course_grades', "Course Grades")
+        :href => :course_grades_path
       }, {
         :id => TAB_PEOPLE,
         :label => t('#tabs.people', "People"),
@@ -2454,7 +2450,6 @@ class Course < ActiveRecord::Base
         :label => t('#tabs.files', "Files"),
         :css_class => 'files',
         :href => :course_files_path,
-        :screenreader => t("Course Files"),
         :icon => 'icon-folder'
       }, {
         :id => TAB_SYLLABUS,
@@ -2495,8 +2490,7 @@ class Course < ActiveRecord::Base
         :id => TAB_SETTINGS,
         :label => t('#tabs.settings', "Settings"),
         :css_class => 'settings',
-        :href => :course_settings_path,
-        :screenreader => t('#tabs.course_settings', "Course Settings")
+        :href => :course_settings_path
       }
     ]
   end
