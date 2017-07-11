@@ -86,7 +86,7 @@ module DiscussionsCommon
       @last_entry.find_element(:css, '.discussion-reply-attachments input').send_keys(fullpath)
     end
 
-    submit_form(@last_entry.find_element(:css, ".discussion-reply-form"))
+    scroll_to_submit_button_and_click(@last_entry.find_element(:css, ".discussion-reply-form"))
     wait_for_ajaximations
     id = DiscussionEntry.last.id
     @last_entry = f "#entry-#{id}"
