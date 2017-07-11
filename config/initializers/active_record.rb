@@ -1420,6 +1420,10 @@ else
         ::Rails.logger.error("variables: #{Hash[@owner.keys.map{|v| [v, @owner[v]]}]}")
         ::Rails.logger.error("backtrace: #{@owner.backtrace}")
       end
+      if Thread.current[:name] == 'Main thread' && $booted
+        ::Rails.logger.error("Accessing connection from the Passenger Main thread")
+        ::Rails.logger.error("backtrace: #{caller}")
+      end
       super
     end
   end
