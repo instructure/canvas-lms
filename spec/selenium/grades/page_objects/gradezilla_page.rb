@@ -666,7 +666,7 @@ class Gradezilla
 
     def click_assignment_group_header_options(group_name, sort_type)
       assignment_group_header_options_element(group_name).click
-      student_header_menu_main_element('Sort by').click
+      hover(student_header_menu_main_element('Sort by'))
 
       if sort_type == 'Grade - High to Low'
         student_header_submenu_item_element('Grade - High to Low').click
