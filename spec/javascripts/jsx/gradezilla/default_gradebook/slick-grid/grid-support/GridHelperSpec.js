@@ -16,19 +16,89 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GridHelper from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support/GridHelper';
+import { Editors, Grid } from 'vendor/slickgrid';
+import GridSupport from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support';
 
-QUnit.module('GridHelper#focus', {
-  setup () {
-    const focus = this.stub();
-    this.grid = {
-      focus
-    };
-    this.gridHelper = new GridHelper(this.grid);
-  }
-});
+function createColumns () {
+  return [1, 2, 3, 4].map(id => (
+    {
+      id: `column${id}`,
+      field: `columnData${id}`,
+      name: `Column ${id}`
+    }
+  ));
+}
 
-test('focuses grid', function () {
-  this.gridHelper.focus();
-  strictEqual(this.grid.focus.callCount, 1);
+function createRows () {
+  return ['A', 'B'].map(id => (
+    {
+      id: `row${id}`,
+      cssClass: `row_${id}`,
+      columnData1: `${id}1`,
+      columnData2: `${id}2`,
+      columnData3: `${id}3`,
+      columnData4: `${id}4`
+    }
+  ));
+}
+
+function createGrid () {
+  const options = {
+    autoEdit: true, // enable editing upon cell activation
+    autoHeight: true, // adjusts grid to fit provided data
+    editable: true,
+    editorFactory: {
+      getEditor () { return Editors.Text }
+    },
+    enableCellNavigation: true,
+    enableColumnReorder: false,
+    numberOfColumnsToFreeze: 2 // for possible edge cases with multiple grid viewports
+  };
+  return new Grid('#example-grid', createRows(), createColumns(), options);
+}
+
+QUnit.module('GridHelper', function (hooks) {
+  let $gridContainer;
+  let grid;
+  let gridSupport;
+
+  hooks.beforeEach(function () {
+    $gridContainer = document.createElement('div');
+    $gridContainer.id = 'example-grid';
+    document.body.appendChild($gridContainer);
+    grid = createGrid();
+    gridSupport = new GridSupport(grid);
+    gridSupport.initialize();
+  });
+
+  hooks.afterEach(function () {
+    gridSupport.destroy();
+    grid.destroy();
+    $gridContainer.remove();
+  });
+
+  QUnit.module('#beginEdit', function (localHooks) {
+    localHooks.beforeEach(function () {
+      gridSupport.state.setActiveLocation('body', { cell: 0, row: 0 });
+      gridSupport.helper.commitCurrentEdit();
+    });
+
+    test('edits the active cell', function () {
+      gridSupport.helper.beginEdit();
+      strictEqual(grid.getEditorLock().isActive(), true);
+    });
+
+    test('does not edit the active cell when the grid is not editable', function () {
+      grid.setOptions({ editable: false });
+      gridSupport.helper.beginEdit();
+      strictEqual(grid.getEditorLock().isActive(), false);
+    });
+  });
+
+  QUnit.module('#focus');
+
+  test('sets focus on the grid', function () {
+    gridSupport.helper.focus();
+    equal(document.activeElement, gridSupport.helper.getAfterGridNode());
+  });
 });

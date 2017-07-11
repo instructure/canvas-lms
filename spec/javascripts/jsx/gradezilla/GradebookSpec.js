@@ -7314,51 +7314,46 @@ test('re-sorts the grid rows', function () {
 
 QUnit.module('Gradebook#onGridBlur', {
   setup () {
-    this.gradebook = createGradebook();
-    this.gradebook.rows = [{ id: 123 }];
-    this.gradebook.grid = {
-      getActiveCell () {
-        return { row: 0 };
-      }
-    };
-    this.stub(this.gradebook, 'updateRowAndRenderSubmissionTray');
-    this.gradebook.gridSupport = {
-      helper: {
-        commitCurrentEdit: this.stub()
-      },
-      state: {
-        blur: this.stub(),
-        getActiveNode () {
-          return $fixtures.querySelector('#cell-1');
-        }
-      }
-    };
-
     $fixtures.innerHTML = `
-      <div id="cell-1" class="slick-cell editable"></div>
-      <div id="cell-2" class="slick-cell"></div>
+      <div id="application">
+        <div id="wrapper">
+          <div id="StudentTray__Container"></div>
+          <span data-component="GridColor"></span>
+          <div id="gradebook_grid"></div>
+        </div>
+      </div>
     `;
+
+    this.gradebook = createGradebook();
+    this.gradebook.students = {
+      1101: {
+        enrollments: [{ type: 'StudentEnrollment', grades: { html_url: 'http://example.url/' } }],
+        id: '1101',
+        name: 'Adam Jones'
+      }
+    };
+    this.gradebook.rows = [{ id: '1101' }];
+    this.gradebook.initGrid();
+    this.gradebook.gridSupport.state.setActiveLocation('body', { cell: 0, row: 0 });
+    this.spy(this.gradebook.gridSupport.state, 'blur');
   },
 
   teardown () {
     $fixtures.innerHTML = '';
-    this.fixture = null;
   }
 });
 
-test('commits the current edit when clicking off the grid', function () {
+test('closes grid details tray when open', function () {
+  this.gradebook.setSubmissionTrayState(true, '1101', '2301');
   this.gradebook.onGridBlur({ target: document.body });
-  strictEqual(this.gradebook.gridSupport.helper.commitCurrentEdit.callCount, 1);
+  strictEqual(this.gradebook.gridDisplaySettings.submissionTray.open, false);
 });
 
-test('commits the current edit when clicking on another grid cell', function () {
-  this.gradebook.onGridBlur({ target: $fixtures.querySelector('#cell-2') });
-  strictEqual(this.gradebook.gridSupport.helper.commitCurrentEdit.callCount, 1);
-});
-
-test('does not commit the current edit when clicking on the active cell', function () {
-  this.gradebook.onGridBlur({ target: $fixtures.querySelector('#cell-1') });
-  strictEqual(this.gradebook.gridSupport.helper.commitCurrentEdit.callCount, 0);
+test('does not close grid details tray when not open', function () {
+  const closeSubmissionTrayStub = this.stub(this.gradebook, 'closeSubmissionTray');
+  this.gradebook.setSubmissionTrayState(false, '1101', '2301');
+  this.gradebook.onGridBlur({ target: document.body });
+  strictEqual(closeSubmissionTrayStub.callCount, 0);
 });
 
 test('blurs the grid when clicking off grid cells', function () {
@@ -7367,26 +7362,16 @@ test('blurs the grid when clicking off grid cells', function () {
 });
 
 test('does not blur the grid when clicking on the active cell', function () {
-  this.gradebook.onGridBlur({ target: $fixtures.querySelector('#cell-1') });
+  const $activeNode = this.gradebook.gridSupport.state.getActiveNode();
+  this.gradebook.onGridBlur({ target: $activeNode });
   strictEqual(this.gradebook.gridSupport.state.blur.callCount, 0);
 });
 
 test('does not blur the grid when clicking on another grid cell', function () {
-  this.gradebook.onGridBlur({ target: $fixtures.querySelector('#cell-2') });
+  const $activeNode = this.gradebook.gridSupport.state.getActiveNode();
+  this.gradebook.gridSupport.state.setActiveLocation('body', { cell: 1, row: 0 });
+  this.gradebook.onGridBlur({ target: $activeNode });
   strictEqual(this.gradebook.gridSupport.state.blur.callCount, 0);
-});
-
-test('closes grid details tray when open', function () {
-  this.gradebook.gridDisplaySettings.submissionTray.open = true;
-  this.gradebook.onGridBlur({ target: document.body });
-  strictEqual(this.gradebook.gridDisplaySettings.submissionTray.open, false);
-});
-
-test('does not close grid details tray when not open', function () {
-  const closeSubmissionTrayStub = this.stub(this.gradebook, 'closeSubmissionTray');
-  this.gradebook.gridDisplaySettings.submissionTray.open = false;
-  this.gradebook.onGridBlur({ target: document.body });
-  strictEqual(closeSubmissionTrayStub.callCount, 0);
 });
 
 QUnit.module('GridColor', {

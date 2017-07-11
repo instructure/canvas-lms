@@ -235,6 +235,8 @@ define [
       @studentViewStudents = {}
       @courseContent.students = new StudentDatastore(@students, @studentViewStudents)
 
+      @parentColumns = []
+      @customColumns = []
       @rows = []
 
       @initPostGradesStore()
@@ -1040,12 +1042,18 @@ define [
     # by clicking outside of it, save the current field.
     onGridBlur: (e) =>
       @closeSubmissionTray() if @getSubmissionTrayState().open
-      # Prevent exiting the cell editor when clicking in the cell being edited.
-      return if @gridSupport.state.getActiveNode()?.contains(e.target)
 
-      # Finish editing
-      # * This currently ignores validation, which Gradebook does not use.
-      @gridSupport.helper.commitCurrentEdit()
+      # Prevent exiting the cell editor when clicking in the cell being edited.
+      editingNode = @gridSupport.state.getEditingNode()
+      return if editingNode?.contains(e.target)
+
+      activeNode = @gridSupport.state.getActiveNode()
+      return unless activeNode
+
+      if activeNode.contains(e.target)
+        # SlickGrid does not re-engage the editor for the active cell upon single click
+        @gridSupport.helper.beginEdit()
+        return
 
       className = e.target.className
 
