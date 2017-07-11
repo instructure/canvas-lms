@@ -47,7 +47,7 @@ module Lti
       end
 
       it "associates the DeveloperKey with the product_family when creating" do
-        dev_key = DeveloperKey.create(api_key:'testapikey')
+        dev_key = DeveloperKey.create(api_key:'testapikey', vendor_code: 'acme.com')
         tool_proxy = tool_proxy_service.process_tool_proxy_json(
           json: tool_proxy_fixture,
           context: account,
@@ -76,7 +76,7 @@ module Lti
       end
 
       it "matches DeveloperKeys when looking for matching product family" do
-        dev_key = DeveloperKey.create(api_key:'testapikey')
+        dev_key = DeveloperKey.create(api_key:'testapikey', vendor_code: 'acme.com')
         pf = ProductFamily.new
         pf.vendor_code = 'acme.com'
         pf.product_code = 'assessment-tool-no-dev-key'
@@ -263,6 +263,86 @@ module Lti
         tp.security_contract.shared_secret = nil
         expect { tool_proxy_service.process_tool_proxy_json(json: tp.as_json, context: account, guid: tool_proxy_guid) }.to raise_error(Lti::Errors::InvalidToolProxyError, 'Invalid SecurityContract')do |exception|
           expect(exception.as_json).to eq({invalid_security_contract: [:shared_secret], error: "Invalid SecurityContract"})
+        end
+      end
+
+      context 'vendor developer keys' do
+        let(:valid_dev_key) { DeveloperKey.create!(vendor_code: 'acme.com') }
+        let(:mismatch_dev_key) { DeveloperKey.create!(vendor_code: 'different_vendor') }
+
+        it 'rejects tool proxies if vendor has developer key but does not use it in registration' do
+          valid_dev_key
+          tp = IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
+          expect do
+            tool_proxy_service.process_tool_proxy_json(json: tp.as_json,
+                                                       context: account,
+                                                       guid: tool_proxy_guid)
+          end.to raise_error(Lti::Errors::InvalidToolProxyError, 'Developer key mismatch')
+        end
+
+        it 'rejects tool proxies if vendor has developer key but uses a different developer key' do
+          tp = IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
+          expect do
+            valid_dev_key
+            tool_proxy_service.process_tool_proxy_json(json: tp.as_json,
+                                                       context: account,
+                                                       guid: tool_proxy_guid,
+                                                       developer_key: mismatch_dev_key)
+          end.to raise_error(Lti::Errors::InvalidToolProxyError, 'Developer key mismatch')
+        end
+
+        it 'rejects tool proxies if vendor does not match the developer key being used' do
+          valid_dev_key
+          mismatch_dev_key
+          tp = IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
+          tp.tool_profile.product_instance.product_info.product_family.vendor.code = 'different_vendor'
+          expect do
+            tool_proxy_service.process_tool_proxy_json(json: tp.as_json,
+                                                       context: account,
+                                                       guid: tool_proxy_guid,
+                                                       developer_key: valid_dev_key)
+          end.to raise_error(Lti::Errors::InvalidToolProxyError, 'Developer key mismatch')
+        end
+
+        it 'rejects tool proxies if vendor does not have a developer key but attempts to use one' do
+          valid_dev_key
+          tp = IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
+          tp.tool_profile.product_instance.product_info.product_family.vendor.code = 'different_vendor'
+          expect do
+            tool_proxy_service.process_tool_proxy_json(json: tp.as_json,
+                                                       context: account,
+                                                       guid: tool_proxy_guid,
+                                                       developer_key: valid_dev_key)
+          end.to raise_error(Lti::Errors::InvalidToolProxyError, 'Developer key mismatch')
+        end
+
+        it 'accepts tool proxies if vendor has no developer key and no developer key is provided' do
+          valid_dev_key
+          tp = IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
+          tp.tool_profile.product_instance.product_info.product_family.vendor.code = 'different_vendor'
+          expect do
+            tool_proxy_service.process_tool_proxy_json(json: tp.as_json,
+                                                       context: account,
+                                                       guid: tool_proxy_guid)
+          end.not_to raise_error
+        end
+
+        it 'accepts tool proxies if vendor has developer key and it is used in registration' do
+          valid_dev_key
+          tp = IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
+          expect do
+            tool_proxy_service.process_tool_proxy_json(json: tp.as_json,
+                                                       context: account,
+                                                       guid: tool_proxy_guid,
+                                                       developer_key: valid_dev_key)
+          end.not_to raise_error
+        end
+
+        it 'gives a descriptive error message if there is a developer key mismatch' do
+          tp = IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
+          expect { tool_proxy_service.process_tool_proxy_json(json: tp.as_json, context: account, guid: tool_proxy_guid, developer_key: mismatch_dev_key) }.to raise_error do |e|
+            expect(e.as_json).to eq({:error=>"Developer key mismatch"})
+          end
         end
       end
 
