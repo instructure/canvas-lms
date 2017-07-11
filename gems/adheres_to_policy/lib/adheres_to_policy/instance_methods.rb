@@ -222,7 +222,8 @@ module AdheresToPolicy
       return false unless sought_right
 
       sought_right_cookie = "#{self.class.name&.underscore}.#{sought_right}"
-      blacklist = AdheresToPolicy.configuration.blacklist
+      config = AdheresToPolicy.configuration
+      blacklist = config.blacklist
 
       use_rails_cache = !blacklist.include?(sought_right_cookie)
 
@@ -255,7 +256,11 @@ module AdheresToPolicy
 
                   Thread.current[:last_cache_generate] = elapsed_time # so we can record it in the logs
                   # Cache the condition_right since we already know they have access.
-                  Cache.write(permission_cache_key_for(user, session, condition_right), true)
+                  Cache.write(
+                    permission_cache_key_for(user, session, condition_right),
+                    true,
+                    use_rails_cache: config.cache_related_permissions
+                  )
                 end
               end
 

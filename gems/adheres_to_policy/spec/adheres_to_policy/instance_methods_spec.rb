@@ -363,7 +363,7 @@ describe AdheresToPolicy::InstanceMethods do
 
     context "caching" do
       after do
-        AdheresToPolicy.configuration.blacklist = []
+        AdheresToPolicy.configuration.reset!
       end
 
       it "should cache permissions" do
@@ -418,19 +418,56 @@ describe AdheresToPolicy::InstanceMethods do
       end
 
       it 'must not use the rails cache for permissions included in the configured blacklist' do
-        klass = Class.new {
+        klass = Class.new do
           extend AdheresToPolicy::ClassMethods
           set_policy do
             given { |_| true }
             can :read
           end
-        }
+        end
         instance = klass.new
         AdheresToPolicy.configuration.blacklist = ['.read']
         expect(AdheresToPolicy::Cache).to receive(:fetch)
           .with(an_instance_of(String), a_hash_including(use_rails_cache: false))
           .and_return([])
         instance.granted_rights(instance)
+      end
+
+      it 'must cache permissions calculated using the same given block by default' do
+        klass = Class.new do
+          extend AdheresToPolicy::ClassMethods
+          set_policy do
+            given { |_| true }
+            can :read, :write
+          end
+        end
+        instance = klass.new
+
+        allow(AdheresToPolicy::Cache).to receive(:write)
+          .with(/read/, true, an_instance_of(Hash))
+
+        expect(AdheresToPolicy::Cache).to receive(:write)
+          .with(/write/, true, an_instance_of(Hash))
+        instance.grants_right?('', :read)
+      end
+
+      it 'must not cache related permissions when configured not to' do
+        AdheresToPolicy.configuration.cache_related_permissions = false
+        klass = Class.new do
+          extend AdheresToPolicy::ClassMethods
+          set_policy do
+            given { |_| true }
+            can :read, :write
+          end
+        end
+        instance = klass.new
+
+        allow(AdheresToPolicy::Cache).to receive(:write)
+          .with(/read/, true, an_instance_of(Hash))
+
+        expect(AdheresToPolicy::Cache).to receive(:write)
+          .with(/write/, true, a_hash_including(use_rails_cache: false))
+        instance.grants_right?('', :read)
       end
     end
   end

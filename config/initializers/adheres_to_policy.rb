@@ -31,4 +31,8 @@ AdheresToPolicy.configure do |config|
   config.blacklist = -> {
     Setting.get('permissions_cache_blacklist', '').split(',').map(&:strip)
   }
+
+  config.cache_related_permissions = -> {
+    Canvas::Plugin.value_to_boolean(Setting.get('permissions_cache_related', 'true'))
+  }
 end

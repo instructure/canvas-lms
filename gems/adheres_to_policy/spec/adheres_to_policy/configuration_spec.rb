@@ -38,4 +38,20 @@ describe AdheresToPolicy::Configuration do
       expect(config.blacklist).to eq %w{baz qux}
     end
   end
+
+  describe '#cache_related_permissions' do
+    it 'must default to true' do
+      expect(config.cache_related_permissions).to be_truthy
+    end
+
+    it 'must return the literal value set' do
+      config.cache_related_permissions = false
+      expect(config.cache_related_permissions).to be_falsy
+    end
+
+    it 'must evaluate the supplied block and return the result' do
+      config.cache_related_permissions = -> { false }
+      expect(config.cache_related_permissions).to be_falsy
+    end
+  end
 end

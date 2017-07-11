@@ -16,11 +16,39 @@
 #
 module AdheresToPolicy
   class Configuration
-    attr_writer :blacklist
+    @defaults = {}
 
-    def blacklist
-      return [] unless @blacklist
-      @blacklist.respond_to?(:call) ? @blacklist.call : @blacklist
+    class << self
+      attr_reader :defaults
+
+      def attr_accessor_with_default(attr_name, default_value)
+        attr_writer attr_name
+        @defaults[attr_name] = default_value
+
+        define_method attr_name do
+          value = instance_variable_get("@#{attr_name}")
+          value.respond_to?(:call) ? value.call : value
+        end
+      end
+    end
+
+    attr_accessor_with_default :blacklist, []
+    attr_accessor_with_default :cache_related_permissions, true
+
+    def initialize
+      init_defaults
+    end
+
+    def reset!
+      init_defaults
+    end
+
+    private
+
+    def init_defaults
+      self.class.defaults.each do |attr_name, default_value|
+        instance_variable_set("@#{attr_name}", default_value)
+      end
     end
   end
 end
