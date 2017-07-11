@@ -88,32 +88,19 @@ describe "announcements" do
 
     it "allows rating when enabled", priority: "1", test_id: 603587 do
       announcement = @course.announcements.create!(title: 'stuff', message: 'things', allow_rating: true)
+      announcement.discussion_entries.create!(message: 'reply')
       get "/courses/#{@course.id}/discussion_topics/#{announcement.id}"
-
-      f('.discussion-reply-action').click
-      wait_for_ajaximations
-      type_in_tiny('textarea', 'stuff and things')
-      submit_form('.discussion-reply-form')
-      wait_for_ajaximations
-
       expect(f('.discussion-rate-action')).to be_displayed
 
       f('.discussion-rate-action').click
       wait_for_ajaximations
-
       expect(f('.discussion-rate-action--checked')).to be_displayed
     end
 
     it "doesn't allow rating when not enabled", priority: "1", test_id: 603588 do
       announcement = @course.announcements.create!(title: 'stuff', message: 'things', allow_rating: false)
+      announcement.discussion_entries.create!(message: 'reply')
       get "/courses/#{@course.id}/discussion_topics/#{announcement.id}"
-
-      f('.discussion-reply-action').click
-      wait_for_ajaximations
-      type_in_tiny('textarea', 'stuff and things')
-      submit_form('.discussion-reply-form')
-      wait_for_ajaximations
-
       expect(f("#content")).not_to contain_css('.discussion-rate-action')
     end
   end
