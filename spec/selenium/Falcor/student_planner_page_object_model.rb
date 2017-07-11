@@ -85,5 +85,9 @@ module PlannerPageObject
   def todo_details
     f('textarea')
   end
+
+  def todo_sidebar_modal
+    f("div[aria-label = 'Add To Do']")
+  end
 end
 

@@ -142,41 +142,84 @@ describe "student planner" do
     end
   end
 
+  context "the Create To Do sidebar" do
+
+    it "opens the sidebar to creata a new To-Do item", priority: "1", test_id: 3263157 do
+      go_to_list_view
+      todo_modal_button.click
+      expect(todo_save_button).to be_displayed
+    end
+
+    it "closes the sidebar tray with the 'X' button", priority: "1", test_id: 3263163 do
+      go_to_list_view
+      todo_modal_button.click
+      expect(todo_sidebar_modal).to contain_jqcss("button:contains('Save')")
+      fj("button:contains('Close')").click
+      expect(f('body')).not_to contain_css("div[aria-label = 'Add To Do']")
+    end
+
+    it "adds text to the details field", priority: "1", test_id: 3263161 do
+      go_to_list_view
+      todo_modal_button.click
+      todo_details.send_keys("https://imgs.xkcd.com/comics/code_quality_3.png")
+      expect(todo_details[:value]).to include("https://imgs.xkcd.com/comics/code_quality_3.png")
+    end
+
+    it "adds text to the title field", priority: "1", test_id: 3263158 do
+      go_to_list_view
+      todo_modal_button.click
+      modal = todo_sidebar_modal
+      element = f('input', modal)
+      element.send_keys("Title Text")
+      expect(element[:value]).to include("Title Text")
+    end
+
+    it "adds a new date with the date picker", priority: "1", test_id: 3263159 do
+      # sets up the date to compare against
+      current_month = Time.zone.today.month
+      test_month = Date::MONTHNAMES[(current_month + 1) % 12]
+      test_year = Time.zone.today.year
+      if current_month + 1 == 13
+        test_year += 1
+      end
+
+      # opens the date picker
+      go_to_list_view
+      todo_modal_button.click
+      modal = todo_sidebar_modal
+      element = ff('input', modal)[1]
+      element.click
+
+      # selects a date (the 17th of next month) and verifies it is showing
+      fj("button:contains('Next Month')").click
+      fj("button:contains('17')").click
+      expect(element[:value]).to eq("#{test_month} 17, #{test_year}")
+      expect(modal).not_to include_text("Invalid date")
+    end
+
+    it "saves new ToDos properly", priority: "1", test_id: 3263162 do
+      go_to_list_view
+      todo_modal_button.click
+
+      # gives the To Do a new name and saves it
+      modal = todo_sidebar_modal
+      element = f('input', modal)
+      element.send_keys("Title Text")
+      todo_save_button.click
+
+      # verifies that the new To Do is showing up
+      refresh_page
+      todo_modal_button
+      expect(f('ol')).to include_text("To Do")
+      expect(f('ol')).to include_text("Title Text")
+    end
+  end
+
   it "shows and navigates to wiki pages with todo dates from student planner", priority: "1", test_id: 3259304 do
     page = @course.wiki.wiki_pages.create!(title: 'Page1', todo_date: Time.zone.now + 2.days)
     go_to_list_view
     validate_object_displayed('Page')
     validate_link_to_url(page, 'pages')
-  end
-
-  it "opens the sidebar to creata a new To-Do item", priority: "1", test_id: 3263157 do
-    go_to_list_view
-    todo_modal_button.click
-    expect(todo_save_button).to be_displayed
-  end
-
-  it "closes the sidebar tray with the 'X' button", priority: "1", test_id: 3263163 do
-    go_to_list_view
-    todo_modal_button.click
-    expect(f('body')).to contain_jqcss("button:contains('Save')")
-    fj("button:contains('Close')").click
-    expect(f('body')).not_to contain_jqcss("button:contains('Save')")
-  end
-
-  it "adds text to the details field", priority: "1", test_id: 3263161 do
-    go_to_list_view
-    todo_modal_button.click
-    todo_details.send_keys("TEST")
-    expect(todo_details[:value]).to include("TEST")
-  end
-
-  it "adds text to the title field", priority: "1", test_id: 3263158 do
-    go_to_list_view
-    todo_modal_button.click
-    element = f("div[aria-label = 'Add To Do']")
-    element = f('input', element)
-    element.send_keys("TEST")
-    expect(element[:value]).to include("TEST")
   end
 
   it "closes the opportunities dropdown", priority: "1", test_id: 3281711 do
