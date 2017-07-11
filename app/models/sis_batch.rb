@@ -435,7 +435,7 @@ class SisBatch < ActiveRecord::Base
     self.errors_attachment = SisBatch.create_data_attachment(
       self,
       Rack::Test::UploadedFile.new(file, 'csv', true),
-      t("sis_errors_attachment_%{id}", id: self.id)
+      "sis_errors_attachment_#{id}.csv"
     )
   end
 
