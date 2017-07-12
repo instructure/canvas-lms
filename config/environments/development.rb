@@ -66,6 +66,26 @@ environment_configuration(defined?(config) && config) do |config|
 
   config.eager_load = false
 
+
+  config.after_initialize do
+    ActiveMerchant::Billing::Base.mode = :test
+    paypal = {
+      :login => "seller_1229899173_biz_api1.railscasts.com" ,
+      :password => "FXWU58S7KXFC6HBE",
+      :signature => "AGjv6SW.mTiKxtkm6L9DcSUCUgePAUDQ3L-kTdszkPG8mRfjaRZDYtSu"
+    }
+    ::EXPRESS = ActiveMerchant::Billing::PaypalExpressGateway.new(paypal)
+  end
+  
+  PAYTM_MERCHANT_KEY = "5cjAqbssNYunuMjV"
+  WEBSITE = "WEB_STAGING"
+  MID = "IITIAN94490226667854"
+  INDUSTRY_TYPE_ID = "Retail"
+  CHANNEL_ID = "WEB"
+  PAYTM_URL = "http://localhost:3000"
+  PAYTM_PAY_URL = "https://pguat.paytm.com/oltp-web/processTransaction"
+
+
   # eval <env>-local.rb if it exists
   Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) }
 end

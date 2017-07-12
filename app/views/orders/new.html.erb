@@ -1,0 +1,6 @@
+<%= form_for @order, :url => course_orders_path(@course) do |f| %>
+  <%= f.hidden_field :express_token %>
+  <%= f.hidden_field :course_id, :value => @course.id %>
+  <p> Name : <%=h @order.first_name %> <%=h @order.last_name %>
+    <%= f.submit 'Continue' %>
+  <% end %>

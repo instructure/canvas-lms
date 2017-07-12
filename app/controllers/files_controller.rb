@@ -208,7 +208,16 @@ class FilesController < ApplicationController
         end
       end
     else
-      return react_files
+      if @context.user_is_student?(@current_user)
+        if ((@context.orders) && (@context.orders.first.present? && (@context.orders.first.status == "Success") || (@context.orders.first.present? && @context.orders.first.status == "TXN_SUCCESS") ) && (@context.orders.first.user_id == @current_user.id))
+          return react_files
+        else
+          redirect_to course_path(@context)
+        end
+      else
+        flash[:notice] = "Please purchase this course before accessing this page."
+        return react_files
+      end
     end
   end
 
@@ -262,23 +271,23 @@ class FilesController < ApplicationController
       scope = Attachment.search_by_attribute(scope, :display_name, params[:search_term])
 
       order_clause = case params[:sort]
-        when 'position' # undocumented; kept for compatibility
-          "attachments.position, #{Attachment.display_name_order_by_clause('attachments')}"
-        when 'size'
-          "attachments.size"
-        when 'created_at'
-          "attachments.created_at"
-        when 'updated_at'
-          "attachments.updated_at"
-        when 'content_type'
-          "attachments.content_type"
-        when 'user'
+      when 'position' # undocumented; kept for compatibility
+        "attachments.position, #{Attachment.display_name_order_by_clause('attachments')}"
+      when 'size'
+        "attachments.size"
+      when 'created_at'
+        "attachments.created_at"
+      when 'updated_at'
+        "attachments.updated_at"
+      when 'content_type'
+        "attachments.content_type"
+      when 'user'
         scope.primary_shard.activate do
-            scope = scope.joins("LEFT OUTER JOIN #{User.quoted_table_name} ON attachments.user_id=users.id")
-          end
-          "users.sortable_name IS NULL, #{User.sortable_name_order_by_clause('users')}"
-        else
-          Attachment.display_name_order_by_clause('attachments')
+          scope = scope.joins("LEFT OUTER JOIN #{User.quoted_table_name} ON attachments.user_id=users.id")
+        end
+        "users.sortable_name IS NULL, #{User.sortable_name_order_by_clause('users')}"
+      else
+        Attachment.display_name_order_by_clause('attachments')
       end
       order_clause += ' DESC' if params[:order] == 'desc'
       scope = scope.order(order_clause)
@@ -290,12 +299,12 @@ class FilesController < ApplicationController
       url = @context ? context_files_url : api_v1_list_files_url(@folder)
       @files = Api.paginate(scope, self, url)
       render json: attachments_json(@files, @current_user, {}, {
-        can_view_hidden_files: can_view_hidden_files?(@context || @folder, @current_user, session),
-        context: @context || @folder.context,
-        include: params[:include],
-        only: params[:only],
-        omit_verifier_in_app: !value_to_boolean(params[:use_verifiers])
-      })
+          can_view_hidden_files: can_view_hidden_files?(@context || @folder, @current_user, session),
+          context: @context || @folder.context,
+          include: params[:include],
+          only: params[:only],
+          omit_verifier_in_app: !value_to_boolean(params[:use_verifiers])
+        })
     end
   end
 
@@ -349,10 +358,10 @@ class FilesController < ApplicationController
       js_bundle :react_files
       css_bundle :react_files
       js_env({
-        :FILES_CONTEXTS => files_contexts,
-        :NEW_FOLDER_TREE => @context.feature_enabled?(:use_new_tree),
-        :COURSE_ID => context.id.to_s
-      })
+          :FILES_CONTEXTS => files_contexts,
+          :NEW_FOLDER_TREE => @context.feature_enabled?(:use_new_tree),
+          :COURSE_ID => context.id.to_s
+        })
       log_asset_access([ "files", @context ], "files", "other")
 
       set_tutorial_js_env
@@ -469,7 +478,7 @@ class FilesController < ApplicationController
     verifier_checker = Attachments::Verification.new(@attachment)
     if (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :read, session)) ||
         @attachment.attachment_associations.where(:context_type => 'Submission').
-          any? { |aa| aa.context && aa.context.grants_right?(@current_user, session, :read) } ||
+        any? { |aa| aa.context && aa.context.grants_right?(@current_user, session, :read) } ||
         authorized_action(@attachment, @current_user, :read)
 
       @attachment.ensure_media_object
@@ -492,9 +501,9 @@ class FilesController < ApplicationController
         elsif authorized_action(@attachment, @current_user, :read)
           render_attachment(@attachment)
         end
-      # This action is a callback used in our system to help record when
-      # a user views an inline preview of a file instead of downloading
-      # it, since this should also count as an access.
+        # This action is a callback used in our system to help record when
+        # a user views an inline preview of a file instead of downloading
+        # it, since this should also count as an access.
       elsif params[:inline]
         @attachment.context_module_action(@current_user, :read) if @current_user
         log_asset_access(@attachment, 'files', 'files')
@@ -536,8 +545,8 @@ class FilesController < ApplicationController
           # then that means they have viewed or are about to view the file in
           # some form.
           if @current_user &&
-             (attachment.canvadocable? ||
-              (service_enabled?(:google_docs_previews) && attachment.authenticated_s3_url))
+              (attachment.canvadocable? ||
+                (service_enabled?(:google_docs_previews) && attachment.authenticated_s3_url))
             attachment.context_module_action(@current_user, :read)
           end
           if url = service_enabled?(:google_docs_previews) && attachment.authenticated_s3_url
@@ -545,14 +554,14 @@ class FilesController < ApplicationController
           end
 
           json_include = if @attachment.context.is_a?(User) || @attachment.context.is_a?(Course)
-                           { include: %w(enhanced_preview_url) }
-                         else
-                           {}
-                         end
+            { include: %w(enhanced_preview_url) }
+          else
+            {}
+          end
 
           [json[:attachment],
-           doc_preview_json(attachment, @current_user),
-           attachment_json(attachment, @current_user, {}, json_include)].reduce &:merge!
+            doc_preview_json(attachment, @current_user),
+            attachment_json(attachment, @current_user, {}, json_include)].reduce &:merge!
 
           log_asset_access(attachment, "files", "files")
         end
@@ -716,16 +725,16 @@ class FilesController < ApplicationController
       @attachment.save!
 
       res = @attachment.ajax_upload_params(@current_pseudonym,
-              named_context_url(@context, :context_files_url, :format => :text, :duplicate_handling => params[:attachment][:duplicate_handling]),
-              s3_success_url(@attachment.id, :uuid => @attachment.uuid, :duplicate_handling => params[:attachment][:duplicate_handling]),
-              :no_redirect => params[:no_redirect],
-              :upload_params => {
-                'attachment[folder_id]' => params[:attachment][:folder_id] || '',
-                'attachment[unattached_attachment_id]' => @attachment.id,
-                'check_quota_after' => @check_quota ? '1' : '0'
-              },
-              :default_content_type => params[:default_content_type],
-              :ssl => request.ssl?)
+        named_context_url(@context, :context_files_url, :format => :text, :duplicate_handling => params[:attachment][:duplicate_handling]),
+        s3_success_url(@attachment.id, :uuid => @attachment.uuid, :duplicate_handling => params[:attachment][:duplicate_handling]),
+        :no_redirect => params[:no_redirect],
+        :upload_params => {
+          'attachment[folder_id]' => params[:attachment][:folder_id] || '',
+          'attachment[unattached_attachment_id]' => @attachment.id,
+          'check_quota_after' => @check_quota ? '1' : '0'
+        },
+        :default_content_type => params[:default_content_type],
+        :ssl => request.ssl?)
       render :json => res
     end
   end
@@ -839,7 +848,7 @@ class FilesController < ApplicationController
     if authorized_action(@attachment, @current_user, :create)
       get_quota
       return if (params[:check_quota_after].nil? || params[:check_quota_after] == '1') &&
-                  quota_exceeded(@context, named_context_url(@context, :context_files_url))
+        quota_exceeded(@context, named_context_url(@context, :context_files_url))
 
       respond_to do |format|
         @attachment.folder_id ||= @folder.id

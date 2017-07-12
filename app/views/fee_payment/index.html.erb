@@ -1,0 +1,53 @@
+<%
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<%
+  @body_classes << 'hide-content-while-scripts-not-loaded'
+
+  content_for :page_title, join_title(t('#titles.fee_payment', "Fee Payments"), @context.name)
+
+  js_bundle :discussion_topics_index
+  css_bundle :discussions_list
+%>
+
+
+<div id="content-wrapper" class="ic-Layout-contentWrapper">
+<% unless ((@context.orders) && (@context.orders.first.present? && (@context.orders.first.status == "Success") || (@context.orders.first.present? && @context.orders.first.status == "TXN_SUCCESS") ) && (@context.orders.first.user_id == @current_user.id)) %>
+  <div id="content" class="ic-Layout-contentMain" role="main">
+    <div style="margin:auto; text-align: center;">
+      <%= link_to image_tag("paypal-logo.png", width: 200, height: 200), pay_path(@context) %>&nbsp; |
+      <%= link_to image_tag("Paytm_logo.png", width: 200, height: 200), paytm_integration_course_orders_path(@context) %><br>
+    </div>
+  </div>
+  <% else %>
+  <div class="ic-notification">
+  <div class="ic-notification__content">
+    <div class="ic-notification__message">
+      <div class="ic-notification__title no_recent_messages">
+      <div style="margin:auto; text-align: center;">
+        Already Paid
+        <div>
+      </div>
+      <span class="notification_message">
+      </span>
+    </div>
+  </div>
+</div>
+
+  <% end %>
+</div>

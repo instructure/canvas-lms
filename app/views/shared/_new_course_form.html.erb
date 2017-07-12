@@ -43,6 +43,17 @@
   </div>
 
   <div class="control-group">
+    <%= f.label :amount, :en => "Amount", :class => "control-label" %>
+    <div class="controls">
+      <%= f.text_field :amount,
+                       :placeholder => t('new_course_amount_placeholder', 'Amount'),
+                       :class => 'input-xlarge',
+                       :maxlength => '255' %>
+    </div>
+  </div>
+
+
+  <div class="control-group">
     <%= f.label :license,
                 :en => "Content License",
                 :class => "control-label" %>

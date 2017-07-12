@@ -16,6 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
+<% if @context.user_is_student?(@current_user) %>
+<% unless ((@context.orders) && (@context.orders.first.present? && (@context.orders.first.status == "Success") || (@context.orders.first.present? && @context.orders.first.status == "TXN_SUCCESS") ) && (@context.orders.first.user_id == @current_user.id)) %>
+Please  purchase this course before accessing this page.
+<% else %>
 <%
   @body_classes << 'hide-content-while-scripts-not-loaded'
   @body_classes << 'with_item_groups'
@@ -28,3 +32,20 @@
 %>
 <div id="hidden"></div>
 <% content_for :keyboard_navigation, true %>
+
+<% end %>
+
+<% else %>
+<%
+  @body_classes << 'hide-content-while-scripts-not-loaded'
+  @body_classes << 'with_item_groups'
+
+  content_for :page_title, join_title((t '#titles.assignments', 'Assignments'),
+    @context.name)
+
+  js_bundle :assignment_index
+  css_bundle :new_assignments
+%>
+<div id="hidden"></div>
+<% content_for :keyboard_navigation, true %>
+<% end %>
