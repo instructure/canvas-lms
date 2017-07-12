@@ -20,6 +20,37 @@ module Factories
     @account = factory_with_protected_attributes(Account, valid_account_attributes.merge(opts))
   end
 
+  def stub_rcs_config
+    unstub_rcs_config
+    Canvas::DynamicSettings.stubs(:find).with("rich-content-service", use_env: false).returns(
+      {
+        "app-host":"",
+        "cdn-host":"",
+        "sidebar-source":"fake"
+      }
+    )
+    Canvas::DynamicSettings.stubs(:find).with("canvas", use_env: false).returns(
+      {
+        "signing-secret" => "asdfasdfasdfasdfasdfasdfasdfasdf",
+        "encryption-secret" => "jkl;jkl;jkl;jkl;jkl;jkl;jkl;jkl;"
+      }
+    )
+  end
+
+  def unstub_rcs_config
+    Canvas::DynamicSettings.unstub(:find)
+  end
+
+  def account_rcs_model(opts={})
+    @account = factory_with_protected_attributes(Account, valid_account_attributes.merge(opts))
+    enable_all_rcs(@account)
+    LoadAccount.default_domain_root_account.enable_feature!(:rich_content_service_high_risk)
+  end
+
+  def enable_all_rcs(account)
+    account.enable_feature!(:rich_content_service_high_risk)
+  end
+
   def valid_account_attributes
     {
       :name => "value for name"

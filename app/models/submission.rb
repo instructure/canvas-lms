@@ -1168,11 +1168,8 @@ class Submission < ActiveRecord::Base
   def submit_attachments_to_canvadocs
     if attachment_ids_changed? && submission_type != 'discussion_topic'
       attachments.preload(:crocodoc_document, :canvadoc).each do |a|
-        # moderated grading annotations are only supported in crocodoc right now
-        dont_submit_to_canvadocs = assignment.moderated_grading?
-
         # associate previewable-document and submission for permission checks
-        if a.canvadocable? && Canvadocs.annotations_supported? && !dont_submit_to_canvadocs
+        if a.canvadocable? && Canvadocs.annotations_supported?
           submit_to_canvadocs = true
           a.create_canvadoc! unless a.canvadoc
           a.shard.activate do
@@ -1188,14 +1185,9 @@ class Submission < ActiveRecord::Base
 
         if submit_to_canvadocs
           opts = {
-            preferred_plugins: [Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC],
-            wants_annotation: true,
-            force_crocodoc: dont_submit_to_canvadocs
+            preferred_plugins: [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC],
+            wants_annotation: true
           }
-
-          if context.account.feature_enabled?(:new_annotations)
-            opts[:preferred_plugins].unshift Canvadocs::RENDER_PDFJS
-          end
 
           if context.root_account.settings[:canvadocs_prefer_office_online]
             # Office 365 should take priority over pdfjs
@@ -1342,7 +1334,7 @@ class Submission < ActiveRecord::Base
 
   def late_points_deducted(raw_score, late_policy, points_possible)
     return 0 unless late_policy && points_possible && past_due?
-    late_policy.points_deducted(score: raw_score, possible: points_possible, late_for: duration_late)
+    late_policy.points_deducted(score: raw_score, possible: points_possible, late_for: seconds_late)
   end
   private :late_points_deducted
 
@@ -1970,7 +1962,7 @@ class Submission < ActiveRecord::Base
   #
   module Tardiness
     def past_due?
-      duration_late > 0
+      seconds_late > 0
     end
     alias past_due past_due?
 
@@ -1993,7 +1985,7 @@ class Submission < ActiveRecord::Base
       excused || (!!score && workflow_state == 'graded')
     end
 
-    def duration_late
+    def seconds_late
       # the submission cannot be late if it's been marked with 'none' or 'missing'
       return 0.0 if ['none', 'missing'].include?(late_policy_status)
       return 0.0 if cached_due_date.nil? || time_of_submission <= cached_due_date

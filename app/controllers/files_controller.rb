@@ -1043,10 +1043,9 @@ class FilesController < ApplicationController
     @attachment = Attachment.find(params[:id])
     if value_to_boolean(params[:replace])
       @context = @attachment.context
-      if @context.grants_right?(@current_user, nil, :manage_files) &&
-        @domain_root_account.grants_right?(@current_user, nil, :become_user)
+      if can_replace_file?
         @attachment.destroy_content_and_replace(@current_user)
-        return format.json { render json: attachment_json(@attachment, @current_user, {}, {omit_verifier_in_app: true}) }
+        return render json: attachment_json(@attachment, @current_user, {}, {omit_verifier_in_app: true})
       else
         return render_unauthorized_action
       end
@@ -1069,6 +1068,15 @@ class FilesController < ApplicationController
       render :json => { :message => I18n.t('Cannot delete a file that has been submitted as part of an assignment') }, :status => :forbidden
     else
       render :json => { :message => I18n.t('Unauthorized to delete this file') }, :status => :unauthorized
+    end
+  end
+
+  def can_replace_file?
+    if @context.is_a?(User)
+      @context.can_masquerade?(@current_user, @domain_root_account)
+    else
+      @context.grants_right?(@current_user, nil, :manage_files) &&
+        @domain_root_account.grants_right?(@current_user, nil, :become_user)
     end
   end
 

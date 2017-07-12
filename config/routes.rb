@@ -857,6 +857,7 @@ CanvasRails::Application.routes.draw do
 
   post 'object_snippet' => 'context#object_snippet'
   get 'saml2' => 'login/saml#metadata'
+  get 'saml_meta_data' => 'login/saml#metadata'
 
   # Routes for course exports
   get 'xsd/:version.xsd' => 'content_exports#xml_schema'

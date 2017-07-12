@@ -411,7 +411,7 @@ describe Submission do
     end
   end
 
-  describe "duration_late" do
+  describe "seconds_late" do
     before(:once) do
       @date = Time.zone.local(2017, 1, 15, 12)
       @assignment.update!(due_at: 1.hour.ago(@date), submission_types: "online_text_entry")
@@ -422,7 +422,7 @@ describe Submission do
     it "returns time between submitted_at and cached_due_date" do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
-        expect(submission.duration_late).to eq 60.minutes
+        expect(submission.seconds_late).to eq 60.minutes
       end
     end
 
@@ -430,7 +430,7 @@ describe Submission do
       Timecop.freeze(@date) { @assignment.submit_homework(@student, body: "a body") }
       Timecop.freeze(30.minutes.from_now(@date)) do
         @assignment.submit_homework(@student, body: "a body")
-        expect(submission.duration_late).to eq 90.minutes
+        expect(submission.seconds_late).to eq 90.minutes
       end
     end
 
@@ -439,7 +439,7 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.update!(late_policy_status: "late", accepted_at: 30.minutes.from_now(@date))
-        expect(submission.duration_late).to eq 90.minutes
+        expect(submission.seconds_late).to eq 90.minutes
       end
     end
 
@@ -449,7 +449,7 @@ describe Submission do
       submission.update!(late_policy_status: "late", accepted_at: 30.minutes.from_now(@date))
       Timecop.freeze(40.minutes.from_now(@date)) do
         @assignment.submit_homework(@student, body: "a body")
-        expect(submission.duration_late).to eq 90.minutes
+        expect(submission.seconds_late).to eq 90.minutes
       end
     end
 
@@ -458,14 +458,14 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.update!(late_policy_status: "late")
-        expect(submission.duration_late).to eq 60.minutes
+        expect(submission.seconds_late).to eq 60.minutes
       end
     end
 
     it "is zero if it is not late" do
       Timecop.freeze(2.hours.ago(@date)) do
         @assignment.submit_homework(@student, body: "a body")
-        expect(submission.duration_late).to be_zero
+        expect(submission.seconds_late).to be_zero
       end
     end
 
@@ -473,7 +473,7 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.update!(late_policy_status: "none")
-        expect(submission.duration_late).to be_zero
+        expect(submission.seconds_late).to be_zero
       end
     end
 
@@ -481,7 +481,7 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.update!(late_policy_status: "missing")
-        expect(submission.duration_late).to be_zero
+        expect(submission.seconds_late).to be_zero
       end
     end
 
@@ -490,7 +490,7 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.update!(late_policy_status: "late", accepted_at: submission.cached_due_date)
-        expect(submission.duration_late).to be_zero
+        expect(submission.seconds_late).to be_zero
       end
     end
 
@@ -498,7 +498,7 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.update!(due_at: nil)
         @assignment.submit_homework(@student, body: "a body")
-        expect(submission.duration_late).to be_zero
+        expect(submission.seconds_late).to be_zero
       end
     end
 
@@ -506,21 +506,21 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.update!(submission_types: "online_quiz")
         @assignment.submit_homework(@student, submission_type: "online_quiz", body: "a body")
-        expect(submission.duration_late).to eq 59.minutes
+        expect(submission.seconds_late).to eq 59.minutes
       end
     end
 
     it "includes seconds" do
       Timecop.freeze(30.seconds.from_now(@date)) do
         @assignment.submit_homework(@student, body: "a body")
-        expect(submission.duration_late).to eq 60.minutes + 30.seconds
+        expect(submission.seconds_late).to eq 60.minutes + 30.seconds
       end
     end
 
     it "uses the current time if submitted_at is nil" do
       Timecop.freeze(1.day.from_now(@date)) do
         @assignment.grade_student(@student, score: 10, grader: @teacher)
-        expect(submission.duration_late).to eq 25.hours
+        expect(submission.seconds_late).to eq 25.hours
       end
     end
   end
@@ -2586,23 +2586,17 @@ describe Submission do
       end
 
       context "preferred_plugins" do
-        it "should not send o365 or PDFjs as preferred plugins by default" do
+        it "should not send o365  as preferred plugins by default" do
           @assignment.submit_homework(@student1,
                                       submission_type: "online_upload",
                                       attachments: [@attachment])
 
           job = Delayed::Job.where(strand: 'canvadocs').last
-          expect(job.payload_object.args[1][:preferred_plugins]).to eq [Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC]
-        end
-
-        it "should send PDFjs as a preferred plugin when the 'New Annotations' feature is enabled" do
-          Account.default.enable_feature!(:new_annotations)
-          @assignment.submit_homework(@student1,
-                                      submission_type: "online_upload",
-                                      attachments: [@attachment])
-
-          job = Delayed::Job.where(strand: 'canvadocs').last
-          expect(job.payload_object.args[1][:preferred_plugins]).to eq [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC]
+          expect(job.payload_object.args[1][:preferred_plugins]).to eq [
+            Canvadocs::RENDER_PDFJS,
+            Canvadocs::RENDER_BOX,
+            Canvadocs::RENDER_CROCODOC
+          ]
         end
 
         it "should send o365 as a preferred plugin when the 'Prefer Office 365 file viewer' account setting is enabled" do
@@ -2613,19 +2607,12 @@ describe Submission do
                                       attachments: [@attachment])
 
           job = Delayed::Job.where(strand: 'canvadocs').last
-          expect(job.payload_object.args[1][:preferred_plugins]).to eq [Canvadocs::RENDER_O365, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC]
-        end
-
-        it "should send o365 and PDFjs as preferred plugins when the 'New Annotations' feature is enabled and the 'Prefer Office 365 file viewer' account setting is enabled" do
-          @assignment.context.root_account.settings[:canvadocs_prefer_office_online] = true
-          @assignment.context.root_account.save!
-          Account.default.enable_feature!(:new_annotations)
-          @assignment.submit_homework(@student1,
-                                      submission_type: "online_upload",
-                                      attachments: [@attachment])
-
-          job = Delayed::Job.where(strand: 'canvadocs').last
-          expect(job.payload_object.args[1][:preferred_plugins]).to eq [Canvadocs::RENDER_O365, Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC]
+          expect(job.payload_object.args[1][:preferred_plugins]).to eq [
+            Canvadocs::RENDER_O365,
+            Canvadocs::RENDER_PDFJS,
+            Canvadocs::RENDER_BOX,
+            Canvadocs::RENDER_CROCODOC
+          ]
         end
       end
 
@@ -2656,21 +2643,6 @@ describe Submission do
                                       submission_type: "online_upload",
                                       attachments: [attachment])
       expect(job_scope.count).to eq orig_job_count
-    end
-
-    it "doesn't use canvadocs for moderated grading assignments" do
-      @assignment.update_attribute :moderated_grading, true
-      Canvas::Crocodoc.stubs(:enabled?).returns true
-      Canvadocs.stubs(:enabled?).returns true
-      Canvadocs.stubs(:annotations_supported?).returns true
-
-      attachment = crocodocable_attachment_model(context: @user)
-      @assignment.submit_homework(@user,
-                                      submission_type: "online_upload",
-                                      attachments: [attachment])
-      run_jobs
-      expect(@attachment.canvadoc).to be_nil
-      expect(@attachment.crocodoc_document).not_to be_nil
     end
   end
 

@@ -24,15 +24,29 @@ import wikiSidebar from 'wikiSidebar'
 //   .data('remoteEditor') is set:
 //     feature flag is on and succeeded, just use the remote editor call
 //
-//   .data('rich_text') is set:
+//   .data('rich_text') and .editorBox are set:
 //     feature flag is off, use the legacy editorBox/wikiSidebar interface
 //
 //   neither is set:
 //     probably feature flag is on but failed, or maybe just a poorly set up
-//     spec (or worst case, poorly set up actual usage... booo). the action
-//     will do the best it can (see send for example), but often will be a
-//     no-op
+//     spec (or worst case, poorly set up actual usage... booo). in the case
+//     of send action, we use event triggering (see RichContentEditor for the
+//     trigger) to wait until it's loaded and send the event
 //
+
+export const RCELOADED_EVENT_NAME = 'RceLoaded'
+
+function delaySend ($target, methodName, ...args) {
+  $target.one(RCELOADED_EVENT_NAME, {
+      method_name: methodName,
+      args: args
+    },
+    function (e, remoteEditor) {
+      remoteEditor.call(e.data.method_name, ...(e.data.args))
+    }
+  )
+}
+
 export function send ($target, methodName, ...args) {
   const remoteEditor = $target.data('remoteEditor')
   if (remoteEditor) {
@@ -49,7 +63,7 @@ export function send ($target, methodName, ...args) {
       args[0]['data-preview-alt'] = dataAttributes && dataAttributes['preview-alt']
     }
     return remoteEditor.call(methodName, ...args)
-  } else if ($target.data('rich_text')) {
+  } else if ($target.editorBox && $target.data('rich_text')) {
     return $target.editorBox(methodName, ...args)
   } else {
     // we're not set up, so tell the caller that `exists?` is false,
@@ -59,7 +73,8 @@ export function send ($target, methodName, ...args) {
     } else if (methodName === 'get_code') {
       return $target.val()
     } else {
-      console.warn(`called send('${methodName}') on an RCE instance that hasn't fully loaded, ignored`)
+      console.warn(`called send('${methodName}') on an RCE instance that hasn't fully loaded, delaying send`)
+      delaySend($target, methodName, ...args)
     }
   }
 }
@@ -81,8 +96,8 @@ export function destroy ($target) {
     // detach the remote editor reference after destroying it
     remoteEditor.destroy()
     $target.data('remoteEditor', null)
-  } else if ($target.data('rich_text')) {
-    $target.editorBox && $target.editorBox('destroy')
+  } else if ($target.editorBox && $target.data('rich_text')) {
+    $target.editorBox('destroy')
   } else {
     console.warn("called destroy() on an RCE instance that hasn't fully loaded, ignored")
   }

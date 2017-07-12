@@ -203,7 +203,7 @@ class Assignment
                   end
                   a.as_json(only: attachment_fields,
                             methods: [:view_inline_ping_url]).tap do |json|
-                    json[:attachment][:canvadoc_url] = a.canvadoc_url(@user)
+                    json[:attachment][:canvadoc_url] = a.canvadoc_url(@user, enable_annotations: true)
                     json[:attachment][:crocodoc_url] = a.crocodoc_url(@user, crocodoc_user_ids)
                     json[:attachment][:submitted_to_crocodoc] = a.crocodoc_document.present?
                     json[:attachment][:hijack_crocodoc_session] = a.crocodoc_document&.should_migrate_to_canvadocs?

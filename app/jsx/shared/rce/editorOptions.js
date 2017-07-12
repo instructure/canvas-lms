@@ -28,7 +28,7 @@ import skin from 'tinymce-light-skin'
     // RichContentEditor takes care of the autofocus functionality at a higher level
     var autoFocus = undefined
 
-    skin.use()
+    skin.useCanvas()
 
     return _.extend({},
       editorConfig.defaultConfig(),

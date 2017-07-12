@@ -1536,26 +1536,26 @@ describe Quizzes::QuizSubmission do
   describe "associated submission" do
     before(:each) { course_with_student }
 
-    it "assigns duration_late to zero when not late" do
+    it "assigns seconds_late to zero when not late" do
       Timecop.freeze do
         quiz = @course.quizzes.create(due_at: 5.minutes.from_now, quiz_type: "assignment")
         qs = Quizzes::QuizSubmission.create(
           finished_at: Time.zone.now, user: @user, quiz: quiz, workflow_state: :complete
         )
 
-        expect(qs.submission.duration_late).to be_zero
+        expect(qs.submission.seconds_late).to be_zero
       end
     end
 
-    it "assigns duration_late with a -1 minute offset" do
+    it "assigns seconds_late with a -1 minute offset" do
       Timecop.freeze do
         quiz = @course.quizzes.create(due_at: 5.minutes.ago, quiz_type: "assignment")
         qs = Quizzes::QuizSubmission.create(
           finished_at: Time.zone.now, user: @user, quiz: quiz, workflow_state: :complete
         )
 
-        expected_duration_late = (Time.zone.now - 60.seconds - 5.minutes.ago.change(sec: 0))
-        expect(qs.submission.duration_late).to eq(expected_duration_late)
+        expected_seconds_late = (Time.zone.now - 60.seconds - 5.minutes.ago.change(sec: 0))
+        expect(qs.submission.seconds_late).to eq(expected_seconds_late)
       end
     end
   end

@@ -1240,6 +1240,7 @@ class Attachment < ActiveRecord::Base
   # object. It will replace the attachment content with a file_removed file.
   def destroy_content_and_replace(deleted_by_user = nil)
     att = self.root_attachment_id? ? self.root_attachment : self
+    return true if Purgatory.where(attachment_id: att).active.exists?
     att.send_to_purgatory(deleted_by_user)
     att.destroy_content
     att.uploaded_data = File.open Rails.root.join('public', 'file_removed', 'file_removed.pdf')
@@ -1251,9 +1252,9 @@ class Attachment < ActiveRecord::Base
   # this method does not destroy anything. It copies the content to a new s3object
   def send_to_purgatory(deleted_by_user = nil)
     make_rootless
-    if Attachment.s3_storage?
+    if Attachment.s3_storage? && self.s3object.exists?
       s3object.copy_to(bucket.object(purgatory_filename))
-    else
+    elsif Attachment.local_storage?
       FileUtils.mkdir(local_purgatory_directory) unless File.exist?(local_purgatory_directory)
       FileUtils.cp full_filename, local_purgatory_file
     end
@@ -1397,10 +1398,9 @@ class Attachment < ActiveRecord::Base
     # ... or crocodoc (this will go away soon)
     return if Attachment.skip_3rd_party_submits?
 
-    submit_to_crocodoc_instead = opts[:force_crocodoc] ||
-                                 (opts[:wants_annotation] &&
-                                  crocodocable? &&
-                                  !Canvadocs.annotations_supported?)
+    submit_to_crocodoc_instead = opts[:wants_annotation] &&
+                                 crocodocable? &&
+                                 !Canvadocs.annotations_supported?
     if submit_to_crocodoc_instead
       # get crocodoc off the canvadocs strand
       # (maybe :wants_annotation was a dumb idea)
@@ -1642,27 +1642,31 @@ class Attachment < ActiveRecord::Base
     "/#{context_url_prefix}/files/#{self.id}/inline_view"
   end
 
-  def canvadoc_url(user)
+  def canvadoc_url(user, opts={})
     return unless canvadocable?
-    "/api/v1/canvadoc_session?#{preview_params(user, "canvadoc")}"
+    "/api/v1/canvadoc_session?#{preview_params(user, "canvadoc", opts)}"
   end
 
   def crocodoc_url(user, crocodoc_ids = nil)
+    opts = {
+      enable_annotations: true
+    }
+    opts[:crocodoc_ids] = crocodoc_ids if crocodoc_ids.present?
     return unless crocodoc_available?
-    "/api/v1/crocodoc_session?#{preview_params(user, "crocodoc", crocodoc_ids)}"
+    "/api/v1/crocodoc_session?#{preview_params(user, "crocodoc", opts)}"
   end
 
   def previewable_media?
     self.content_type && self.content_type.match(/\A(video|audio)/)
   end
 
-  def preview_params(user, type, crocodoc_ids = nil)
-    h = {
+  def preview_params(user, type, opts = {})
+    h = opts.merge({
       user_id: user.try(:global_id),
       attachment_id: id,
       type: type
-    }
-    h.merge!(crocodoc_ids: crocodoc_ids) if crocodoc_ids.present?
+    })
+
     blob = h.to_json
     hmac = Canvas::Security.hmac_sha1(blob)
     "blob=#{URI.encode blob}&hmac=#{URI.encode hmac}"

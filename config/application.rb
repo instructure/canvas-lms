@@ -227,6 +227,13 @@ module CanvasRails
         if forked
           # We're in smart spawning mode, and need to make unique connections for this fork.
           Canvas.reconnect_redis
+          # if redis failed, we would have established a connection to the
+          # database (trying to read the ignore_redis_failures setting), but
+          # we're running in the main passenger thread, and Rails will get mad
+          # at us if we try to use that connection in a different thread (the
+          # worker thread that actually processes requests). So just always
+          # close the connections again
+          ActiveRecord::Base.clear_all_connections!
         end
       end
     end
