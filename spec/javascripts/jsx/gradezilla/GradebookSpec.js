@@ -1505,10 +1505,16 @@ test('returns 1 if the name field comes later alphabetically in the first record
   strictEqual(this.gradebook.compareAssignmentNames(this.secondRecord, this.firstRecord), 1);
 });
 
-test('comparison is case-insensitive', function () {
+test('comparison is case-sensitive between alpha and Alpha', function () {
   const thirdRecord = this.getRecord('Alpha');
 
-  strictEqual(this.gradebook.compareAssignmentNames(thirdRecord, this.firstRecord), 0);
+  strictEqual(this.gradebook.compareAssignmentNames(thirdRecord, this.firstRecord), 1);
+});
+
+test('comparison does not group uppercase letters together', function () {
+  const thirdRecord = this.getRecord('Omega');
+
+  strictEqual(this.gradebook.compareAssignmentNames(thirdRecord, this.secondRecord), 1);
 });
 
 QUnit.module('Gradebook#compareAssignmentPointsPossible', {

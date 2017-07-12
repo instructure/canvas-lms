@@ -121,8 +121,12 @@ module Canvas::ICU
       @collations ||= {}
       @collations[I18n.locale] ||= begin
         collator = ICU::Collation::Collator.new(I18n.locale.to_s)
+
+        # Reference documentation (some option names differ in ruby-space)for these options is at
+        # http://userguide.icu-project.org/collation/customization#TOC-Default-Options
         collator.normalization_mode = true
         collator.numeric_collation = true
+        collator.strength = :tertiary
         collator
       end
     end

@@ -398,7 +398,10 @@ class ActiveRecord::Base
         @collkey = connection.extension_installed?(:pg_collkey)
       end
       if @collkey
-        "#{@collkey}.collkey(#{col}, '#{Canvas::ICU.locale_for_collation}', false, 0, true)"
+        # The collation level of 3 is the default, but is explicitly specified here and means that
+        # case, accents and base characters are all taken into account when creating a collation key
+        # for a string - more at https://pgxn.org/dist/pg_collkey/0.5.1/
+        "#{@collkey}.collkey(#{col}, '#{Canvas::ICU.locale_for_collation}', false, 3, true)"
       else
         "CAST(LOWER(replace(#{col}, '\\', '\\\\')) AS bytea)"
       end
