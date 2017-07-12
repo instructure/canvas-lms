@@ -18,6 +18,12 @@
 class InitNewGradeHistoryAuditLogIndexes < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
+  include Canvas::Cassandra::Migration
+
+  def self.cassandra_cluster
+    'auditors'
+  end
+
   def self.up
     DataFixup::InitNewGradeHistoryAuditLogIndexes.send_later_if_production_enqueue_args(
       :run, {
