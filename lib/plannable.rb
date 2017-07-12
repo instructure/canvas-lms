@@ -66,7 +66,10 @@ module Plannable
   end
 
   def planner_enabled?
-    root_account_for_model(self).feature_enabled?(:student_planner)
+    unless defined?(@planner_enabled)
+      @planner_enabled = root_account_for_model(self).feature_enabled?(:student_planner)
+    end
+    @planner_enabled
   end
 
   def root_account_for_model(base)

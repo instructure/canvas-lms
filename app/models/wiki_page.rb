@@ -356,7 +356,7 @@ class WikiPage < ActiveRecord::Base
 
   def context(user=nil)
     shard.activate do
-      @context ||= Course.where(wiki_id: self.wiki_id).first || Group.where(wiki_id: self.wiki_id).first
+      @context ||= association(:wiki).loaded? ? wiki.context : (Course.where(wiki_id: self.wiki_id).first || Group.where(wiki_id: self.wiki_id).first)
     end
   end
 
