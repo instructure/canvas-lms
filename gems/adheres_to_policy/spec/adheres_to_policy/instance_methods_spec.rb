@@ -469,6 +469,53 @@ describe AdheresToPolicy::InstanceMethods do
           .with(/write/, true, a_hash_including(use_rails_cache: false))
         instance.grants_right?('', :read)
       end
+
+      it 'must cache permissions calculated in the course of calculating others' do
+        klass = Class.new do
+          extend AdheresToPolicy::ClassMethods
+
+          set_policy do
+            given { |_| true }
+            can :create
+
+            given { |u| self.grants_right?(u, :create) }
+            can :update
+          end
+        end
+        instance = klass.new
+
+        allow(AdheresToPolicy::Cache).to receive(:fetch).and_yield
+        expect(AdheresToPolicy::Cache).to receive(:fetch)
+          .with(/create/, a_hash_including(use_rails_cache: true))
+        instance.grants_right?('foobar', :update)
+      end
+
+      it 'must not cache permissions calculated in the course of calculating others when configured not to' do
+        AdheresToPolicy.configuration.cache_intermediate_permissions = false
+
+        klass = Class.new do
+          extend AdheresToPolicy::ClassMethods
+
+          set_policy do
+            given { |_| true }
+            can :create
+
+            given { |u| self.grants_right?(u, :create) }
+            can :update
+          end
+        end
+        instance = klass.new
+
+        expect(AdheresToPolicy::Cache).to receive(:fetch)
+          .with(/update/, a_hash_including(use_rails_cache: true))
+          .twice
+          .and_yield
+        expect(AdheresToPolicy::Cache).to receive(:fetch)
+          .with(/create/, a_hash_including(use_rails_cache: false))
+          .twice
+        instance.grants_right?('foobar', :update)
+        instance.grants_right?('foobar', :update)
+      end
     end
   end
 end

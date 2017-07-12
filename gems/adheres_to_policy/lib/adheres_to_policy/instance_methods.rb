@@ -221,16 +221,28 @@ module AdheresToPolicy
     def check_right?(user, session, sought_right)
       return false unless sought_right
 
+      if Thread.current[:primary_permission_under_evaluation].nil?
+        Thread.current[:primary_permission_under_evaluation] = true
+      end
+
       sought_right_cookie = "#{self.class.name&.underscore}.#{sought_right}"
+
       config = AdheresToPolicy.configuration
       blacklist = config.blacklist
 
-      use_rails_cache = !blacklist.include?(sought_right_cookie)
+      use_rails_cache = !blacklist.include?(sought_right_cookie) &&
+        (Thread.current[:primary_permission_under_evaluation] || config.cache_intermediate_permissions)
+
+      was_primary_permission, Thread.current[:primary_permission_under_evaluation] =
+        Thread.current[:primary_permission_under_evaluation], false
 
       # Check the cache for the sought_right.  If it exists in the cache its
       # state (true or false) will be returned.  Otherwise we calculate the
       # state and cache it.
-      value, how_it_got_it = Cache.fetch(permission_cache_key_for(user, session, sought_right), use_rails_cache: use_rails_cache) do
+      value, how_it_got_it = Cache.fetch(
+        permission_cache_key_for(user, session, sought_right),
+        use_rails_cache: use_rails_cache
+      ) do
         CanvasStatsd::BlockTracking.track("adheres_to_policy.#{sought_right_cookie}", category: :adheres_to_policy) do
 
           conditions = self.class.policy.conditions[sought_right]
@@ -272,6 +284,8 @@ module AdheresToPolicy
       CanvasStatsd::Statsd.instance&.increment("adheres_to_policy.#{sought_right_cookie}.#{how_it_got_it}")
 
       value
+    ensure
+      Thread.current[:primary_permission_under_evaluation] = was_primary_permission
     end
 
     # Internal: Gets the cache key for the user and right.
