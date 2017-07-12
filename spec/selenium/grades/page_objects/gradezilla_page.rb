@@ -510,7 +510,7 @@ class Gradezilla
 
     def click_student_menu_display_as(menu_option)
       student_column_menu.click
-      student_header_menu_main_element("Display as").click
+      hover(student_header_menu_main_element("Display as"))
 
       if menu_option == "First,Last"
         student_header_submenu_item_element('First, Last Name').click
@@ -523,7 +523,7 @@ class Gradezilla
 
     def click_student_menu_secondary_info(menu_option)
       student_column_menu.click
-      student_header_menu_main_element("Secondary info").click
+      hover(student_header_menu_main_element("Secondary info"))
 
       if menu_option == "Section"
         student_header_submenu_item_element('Section').click
@@ -677,7 +677,7 @@ class Gradezilla
 
     def click_total_header_sort_by(sort_type)
       select_total_column_option
-      student_header_menu_main_element('Sort by').click
+      hover(student_header_menu_main_element('Sort by'))
 
       if sort_type == 'Grade - High to Low'
         student_header_submenu_item_element('Grade - High to Low').click
