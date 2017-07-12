@@ -222,12 +222,33 @@ describe "student planner" do
     validate_link_to_url(page, 'pages')
   end
 
-  it "closes the opportunities dropdown", priority: "1", test_id: 3281711 do
-    @course.assignments.create!(name: 'assignment',
-                                             due_at: Time.zone.now - 2.days)
-    go_to_list_view
-    open_opportunities_dropdown
-    close_opportunities_dropdown
-    expect(f('body')).not_to contain_jqcss("button:contains('Close opportunities popover')")
+  context "with existing assignment, open opportunities" do
+    before :once do
+      @course.assignments.create!(name: 'assignmentThatHasToBeDoneNow',
+                                  description: 'This will take a long time',
+                                  due_at: Time.zone.now - 2.days)
+    end
+
+    it "closes the opportunities dropdown", priority: "1", test_id: 3281711 do
+      go_to_list_view
+      open_opportunities_dropdown
+      close_opportunities_dropdown
+      expect(f('body')).not_to contain_jqcss("button:contains('Close opportunities popover')")
+    end
+
+    it "links opportunity to the correct assignment", priority: "1", test_id: 3281712 do
+      go_to_list_view
+      open_opportunities_dropdown
+      expect_new_page_load { fj('div:contains("assignmentThatHasToBeDoneNow")').click }
+      expect(f('.description.user_content')).to include_text("This will take a long time")
+    end
+
+    it "dismisses assignment from opportunity dropdown", priority: "1", test_id: 3281713 do
+      go_to_list_view
+      open_opportunities_dropdown
+      fj('button:contains("Dismiss assignmentThatHasToBeDoneNow")').click
+      expect(f('#opportunities_parent')).not_to contain_jqcss('div:contains("assignmentThatHasToBeDoneNow")')
+      expect(f('#opportunities_parent')).not_to contain_jqcss('button:contains("Dismiss assignmentThatHasToBeDoneNow")')
+    end
   end
 end
