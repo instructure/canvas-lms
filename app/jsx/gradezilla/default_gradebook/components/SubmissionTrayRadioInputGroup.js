@@ -17,11 +17,12 @@
  */
 
 import React from 'react';
-import { bool, number, shape, string } from 'prop-types';
+import { bool, func, number, shape, string } from 'prop-types';
 import FormFieldGroup from 'instructure-ui/lib/components/FormFieldGroup';
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
 import SubmissionTrayRadioInput from 'jsx/gradezilla/default_gradebook/components/SubmissionTrayRadioInput';
 import { statusesTitleMap } from 'jsx/gradezilla/default_gradebook/constants/statuses';
+import NumberHelper from 'jsx/shared/helpers/numberHelper';
 import I18n from 'i18n!gradebook';
 
 function checkedValue (submission) {
@@ -36,14 +37,39 @@ function checkedValue (submission) {
   return 'none';
 }
 
+function isNumeric (input) {
+  return NumberHelper.validate(input);
+}
+
 export default class SubmissionTrayRadioInputGroup extends React.Component {
-  constructor (props) {
-    super(props);
-    this.state = { checkedValue: checkedValue(props.submission) };
+  handleNumberInputBlur = ({ target: { value } }) => {
+    if (!isNumeric(value)) {
+      return;
+    }
+
+    let secondsLateOverride = NumberHelper.parse(value) * 3600;
+    if (this.props.latePolicy.lateSubmissionInterval === 'day') {
+      secondsLateOverride *= 24;
+    }
+
+    this.props.updateSubmission({
+      latePolicyStatus: 'late',
+      secondsLateOverride: Math.trunc(secondsLateOverride)
+    });
   }
 
   handleRadioInputChanged = ({ target: { value } }) => {
-    this.setState({ checkedValue: value });
+    const alreadyChecked = checkedValue(this.props.submission) === value;
+    if (alreadyChecked || this.props.submissionUpdating) {
+      return;
+    }
+
+    const data = value === 'excused' ? { excuse: true } : { latePolicyStatus: value };
+    if (value === 'late') {
+      data.secondsLateOverride = 0;
+    }
+
+    this.props.updateSubmission(data);
   }
 
   render () {
@@ -51,11 +77,12 @@ export default class SubmissionTrayRadioInputGroup extends React.Component {
     const radioOptions = ['none', 'late', 'missing', 'excused'].map(status =>
       <SubmissionTrayRadioInput
         key={status}
-        checked={this.state.checkedValue === status}
+        checked={checkedValue(this.props.submission) === status}
         color={this.props.colors[status]}
         latePolicy={this.props.latePolicy}
         locale={this.props.locale}
         onChange={this.handleRadioInputChanged}
+        onNumberInputBlur={this.handleNumberInputBlur}
         submission={this.props.submission}
         text={statusesTitleMap[status] || I18n.t('None')}
         value={status}
@@ -81,5 +108,7 @@ SubmissionTrayRadioInputGroup.propTypes = {
     late: bool.isRequired,
     missing: bool.isRequired,
     secondsLate: number.isRequired
-  }).isRequired
+  }).isRequired,
+  submissionUpdating: bool.isRequired,
+  updateSubmission: func.isRequired
 };

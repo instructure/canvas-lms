@@ -42,6 +42,7 @@ QUnit.module('SubmissionTray', function (hooks) {
       onRequestClose () {},
       onClose () {},
       showContentComingSoon: false,
+      submissionUpdating: false,
       isOpen: true,
       courseId: '1',
       speedGraderEnabled: true,
@@ -57,7 +58,8 @@ QUnit.module('SubmissionTray', function (hooks) {
         pointsDeducted: 3,
         secondsLate: 0,
         assignmentId: '30'
-      }
+      },
+      updateSubmission () {}
     };
     wrapper = mount(<SubmissionTray {...defaultProps} {...props} />);
   }

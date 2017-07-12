@@ -18,6 +18,7 @@
 
 import axios from 'axios';
 import I18n from 'i18n!gradebook';
+import { underscore } from 'convert_case';
 
 function createTeacherNotesColumn (courseId) {
   const url = `/api/v1/courses/${courseId}/custom_gradebook_columns`;
@@ -36,7 +37,13 @@ function updateTeacherNotesColumn (courseId, columnId, attr) {
   return axios.put(url, { column: attr });
 }
 
+function updateSubmission (courseId, assignmentId, userId, submission) {
+  const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${userId}`;
+  return axios.put(url, { submission: underscore(submission), include: ['visibility'] });
+}
+
 export default {
   createTeacherNotesColumn,
-  updateTeacherNotesColumn
+  updateTeacherNotesColumn,
+  updateSubmission
 };

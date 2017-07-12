@@ -2271,7 +2271,7 @@ describe 'Submissions API', type: :request do
       expect(json['late_policy_status']).to eq 'missing'
     end
 
-    it "can set seconds_late_override on a submission" do
+    it "can set seconds_late_override on a submission along with the late_policy_status of late" do
       seconds_late_override = 3.days
       json = api_call(
         :put,
@@ -2295,6 +2295,28 @@ describe 'Submissions API', type: :request do
       expect(submission.late_policy_status).to eq 'late'
       expect(submission.seconds_late).to eql seconds_late_override.to_i
       expect(json['late_policy_status']).to eq 'late'
+      expect(json['seconds_late']).to eql seconds_late_override.to_i
+    end
+
+    it "can set seconds_late_override on a submission that has a late_policy_status of 'late'" do
+      @assignment.grade_student(@student, grade: 5, grader: @teacher)
+      @assignment.submission_for_student(@student).update!(late_policy_status: 'late')
+      seconds_late_override = 3.days
+      json = api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+        {
+          controller: 'submissions_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          user_id: @student.id.to_s
+        }, {
+          submission: { seconds_late_override: seconds_late_override }
+        }
+      )
+
       expect(json['seconds_late']).to eql seconds_late_override.to_i
     end
 

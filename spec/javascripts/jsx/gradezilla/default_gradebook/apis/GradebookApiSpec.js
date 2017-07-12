@@ -128,3 +128,60 @@ test('sends the column data to the success handler', function () {
       deepEqual(data, this.customColumn);
     });
 });
+
+QUnit.module('GradebookApi.updateSubmission', function (hooks) {
+  const courseId = '1201';
+  const assignmentId = '303';
+  const userId = '201';
+  const updateSubmissionUrl = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${userId}`;
+  const submissionData = { all_submissions: [{ id: 301, late_policy_status: 'none' }] };
+  let server;
+
+  hooks.beforeEach(function () {
+    server = sinon.fakeServer.create({ respondImmediately: true });
+    const responseBody = JSON.stringify(submissionData);
+    server.respondWith('PUT', updateSubmissionUrl, [200, { 'Content-Type': 'application/json' }, responseBody]);
+  });
+
+  hooks.afterEach(function () {
+    server.restore();
+  });
+
+  function getRequest () {
+    // filter requests to eliminate spec pollution from unrelated specs
+    return _.find(server.requests, request => request.url.includes(updateSubmissionUrl));
+  }
+
+  test('sends a put request to the "update submission" url', function () {
+    return GradebookApi.updateSubmission(courseId, assignmentId, userId, { latePolicyStatus: 'none' })
+      .then(() => {
+        const request = getRequest();
+        strictEqual(request.method, 'PUT');
+        strictEqual(request.url, updateSubmissionUrl);
+      });
+  });
+
+  test('includes params for updating a submission', function () {
+    return GradebookApi.updateSubmission(courseId, assignmentId, userId, { latePolicyStatus: 'none' })
+      .then(() => {
+        const bodyData = JSON.parse(getRequest().requestBody);
+        deepEqual(bodyData.submission.late_policy_status, 'none');
+      });
+  });
+
+  test('includes params to request visibility for the submission', function () {
+    return GradebookApi.updateSubmission(courseId, assignmentId, userId, { latePolicyStatus: 'none' })
+      .then(() => {
+        const bodyData = JSON.parse(getRequest().requestBody);
+        strictEqual(bodyData.include.includes('visibility'), true);
+      });
+  });
+
+  test('sends the column data to the success handler', function () {
+    return GradebookApi.updateSubmission(courseId, assignmentId, userId, { latePolicyStatus: 'none' })
+      .then(({ data }) => {
+        deepEqual(data, submissionData);
+      });
+  });
+});
+

@@ -387,7 +387,7 @@ describe UsersController, type: :request do
       'submission_type' => nil,
       'submitted_at' => nil,
       'late_policy_status' => nil,
-      'points_deducted' => 0.0,
+      'points_deducted' => nil,
       'seconds_late' => 0,
       'url' => nil,
       'user_id' => @sub.user_id,

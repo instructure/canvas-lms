@@ -182,12 +182,14 @@ define [
       studentsLoaded: false
       submissionsLoaded: false
       teacherNotesColumnUpdating: false
+      submissionUpdating: false
     }
 
-  getInitialCourseContent = () ->
+  getInitialCourseContent = (options) ->
     {
       contextModules: []
       gradingPeriodAssignments: {}
+      latePolicy: ConvertCase.camelize(options.late_policy) if options.late_policy
     }
 
   class Gradebook
@@ -223,7 +225,7 @@ define [
     # End of constructor
 
     setInitialState: =>
-      @courseContent = getInitialCourseContent()
+      @courseContent = getInitialCourseContent(@options)
       @gridDisplaySettings = getInitialGridDisplaySettings(@options.settings, @options.colors)
       @contentLoadStates = getInitialContentLoadStates()
       @headerComponentRefs = {}
@@ -1421,6 +1423,7 @@ define [
         courseId: @options.context_id
         locale: @options.locale
         onClose: => @gradebookSettingsModalButton.focus()
+        onLatePolicyUpdate: @setLatePolicy
         newGradebookDevelopmentEnabled: @options.new_gradebook_development_enabled
         gradedLateOrMissingSubmissionsExist: @options.graded_late_or_missing_submissions_exist
       @gradebookSettingsModal = renderComponent(
@@ -2521,6 +2524,7 @@ define [
         key: "submission_tray_#{studentId}_#{assignmentId}"
         colors: @getGridColors()
         isOpen: open
+        latePolicy: @courseContent.latePolicy
         locale: @options.locale
         onRequestClose: @closeSubmissionTray
         onClose: => @gridSupport.helper.focus()
@@ -2532,7 +2536,8 @@ define [
         submission: ConvertCase.camelize(submission)
         courseId: @options.context_id
         speedGraderEnabled: @options.speed_grader_enabled
-      props.latePolicy = ConvertCase.camelize(@options.late_policy) if @options.late_policy
+        submissionUpdating: @contentLoadStates.submissionUpdating
+        updateSubmission: @updateSubmissionAndRenderSubmissionTray
       renderComponent(SubmissionTray, mountPoint, props)
 
     updateRowAndRenderSubmissionTray: (studentId) =>
@@ -2591,6 +2596,9 @@ define [
 
     setSubmissionsLoaded: (loaded) =>
       @contentLoadStates.submissionsLoaded = loaded
+
+    setSubmissionUpdating: (loaded) =>
+      @contentLoadStates.submissionUpdating = loaded
 
     setTeacherNotesColumnUpdating: (updating) =>
       @contentLoadStates.teacherNotesColumnUpdating = updating
@@ -2748,6 +2756,9 @@ define [
 
       contextModules
 
+    setLatePolicy: (latePolicy) =>
+      @courseContent.latePolicy = latePolicy
+
     getContextModule: (contextModuleId) =>
       @courseContent.modulesById?[contextModuleId] if contextModuleId?
 
@@ -2790,3 +2801,19 @@ define [
             $.flashError I18n.t('There was a problem showing the teacher notes column.')
           @setTeacherNotesColumnUpdating(false)
           @renderViewOptionsMenu()
+
+    updateSubmissionAndRenderSubmissionTray: (data) =>
+      { studentId, assignmentId } = @getSubmissionTrayState()
+      student = @student(studentId)
+      @setSubmissionUpdating(true)
+      @renderSubmissionTray(student)
+      GradebookApi.updateSubmission(@options.context_id, assignmentId, studentId, data)
+        .then((response) =>
+          @setSubmissionUpdating(false)
+          @updateSubmissionsFromExternal(response.data.all_submissions)
+          @renderSubmissionTray(student)
+        ).catch(=>
+          @setSubmissionUpdating(false)
+          $.flashError I18n.t('There was a problem updating the submission.')
+          @renderSubmissionTray(student)
+        )

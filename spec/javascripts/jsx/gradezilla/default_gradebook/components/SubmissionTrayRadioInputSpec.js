@@ -29,6 +29,7 @@ QUnit.module('SubmissionTrayRadioInput', {
       latePolicy: { lateSubmissionInterval: 'day' },
       locale: 'en',
       onChange () {},
+      onNumberInputBlur () {},
       submission: { secondsLate: 0 },
       text: 'Missing',
       value: 'missing',
@@ -62,27 +63,27 @@ QUnit.module('SubmissionTrayRadioInput', {
   }
 });
 
-test('initializes without a NumberInput when value is not "late"', function () {
+test('does not render a NumberInput when value is not "late"', function () {
   this.wrapper = this.mountComponent();
   strictEqual(this.wrapper.find(NumberInput).length, 0);
 });
 
-test('initializes with a NumberInput when value is "late" and checked is true', function () {
+test('renders with a NumberInput when value is "late" and checked is true', function () {
   this.wrapper = this.mountComponent({ value: 'late', checked: true });
   strictEqual(this.numberInput().length, 1);
 });
 
-test('initializes without a NumberInput when value is "late" and checked is false', function () {
+test('renders without a NumberInput when value is "late" and checked is false', function () {
   this.wrapper = this.mountComponent({ value: 'late' });
   strictEqual(this.numberInput().length, 0);
 });
 
-test('initializes with the radio option selected when checked is true', function () {
+test('renders with the radio option selected when checked is true', function () {
   this.wrapper = this.mountComponent({ checked: true });
   strictEqual(this.radioInput().node.checked, true);
 });
 
-test('initializes with the radio option deselected when checked is false', function () {
+test('renders with the radio option deselected when checked is false', function () {
   this.wrapper = this.mountComponent();
   strictEqual(this.radioInput().node.checked, false);
 });
