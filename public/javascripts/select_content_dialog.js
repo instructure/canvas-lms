@@ -187,7 +187,29 @@ define([
             'item[indent]': $("#content_tag_indent").val()
           }
 
-          if(item_type == 'cloned_wiki_page') {
+          if(item_type == 'cloned_assignment') {
+            item_data['item[type]'] = 'assignment';
+
+            var data = {
+              assignment: {
+                name: $option.text(),
+                clone_of_id: $option.val()
+              }
+            };
+
+            // create in api
+            var url = $("#select_context_content_dialog .module_item_option:visible:first .new .add_item_url").attr('href');
+            $.ajaxJSON(url, 'POST', data, function(data) {
+              item_data['item[id]'] = data["assignment"]["id"];
+              submit(item_data);
+            }, function(data) {
+              $("#select_context_content_dialog").loadingImage('remove');
+                $("#select_context_content_dialog").errorBox(I18n.t('errors.failed_to_create_item', 'Failed to Create new Item'));
+                console.log(JSON.stringify(data));
+            }
+            );
+
+          } else if(item_type == 'cloned_wiki_page') {
             item_data['item[type]'] = 'wiki_page';
             //'item[title]': $option.text(), // already set by loading the clone list...
 

@@ -58,6 +58,8 @@ module Importers
       description += Attachment.attachment_list_from_migration(context, hash[:attachment_ids])
       item.description = description
 
+      item.clone_of_id = hash[:clone_of_id]
+
       if hash[:freeze_on_copy]
         item.freeze_on_copy = true
         item.copied = true
