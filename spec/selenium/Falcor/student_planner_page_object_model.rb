@@ -66,6 +66,14 @@ module PlannerPageObject
     validate_url(url_type, object)
   end
 
+  def open_opportunities_dropdown
+    fj("button:contains('opportunit')").click
+  end
+
+  def close_opportunities_dropdown
+    fj("button:contains('Close opportunities popover')").click
+  end
+
   def todo_modal_button
     fj("button:contains('Add To Do')")
   end

@@ -150,14 +150,12 @@ describe "student planner" do
   end
 
   it "opens the sidebar to creata a new To-Do item", priority: "1", test_id: 3263157 do
-
     go_to_list_view
     todo_modal_button.click
     expect(todo_save_button).to be_displayed
   end
 
   it "closes the sidebar tray with the 'X' button", priority: "1", test_id: 3263163 do
-
     go_to_list_view
     todo_modal_button.click
     expect(f('body')).to contain_jqcss("button:contains('Save')")
@@ -179,5 +177,14 @@ describe "student planner" do
     element = f('input', element)
     element.send_keys("TEST")
     expect(element[:value]).to include("TEST")
+  end
+
+  it "closes the opportunities dropdown", priority: "1", test_id: 3281711 do
+    @course.assignments.create!(name: 'assignment',
+                                             due_at: Time.zone.now - 2.days)
+    go_to_list_view
+    open_opportunities_dropdown
+    close_opportunities_dropdown
+    expect(f('body')).not_to contain_jqcss("button:contains('Close opportunities popover')")
   end
 end
