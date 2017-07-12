@@ -901,4 +901,25 @@ class ContentMigration < ActiveRecord::Base
         record.master_migration && record.master_migration.send_notification?
     }
   end
+
+  def self.expire_days
+    Setting.get('content_migrations_expire_after_days', '30').to_i
+  end
+
+  def self.expire?
+    ContentMigration.expire_days > 0
+  end
+
+  def expired?
+    return false unless ContentMigration.expire?
+    created_at < ContentMigration.expire_days.days.ago
+  end
+
+  scope :expired, -> {
+    if ContentMigration.expire?
+      where('created_at < ?', ContentMigration.expire_days.days.ago)
+    else
+      none
+    end
+  }
 end

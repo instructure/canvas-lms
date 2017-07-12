@@ -122,6 +122,13 @@ describe ContentMigrationsController, type: :request do
         expect(json.first['id']).to eq @migration.id
       end
     end
+
+    it "should not return attachments for expired import" do
+      ContentMigration.where(id: @migration.id).update_all(created_at: 405.days.ago)
+
+      json = api_call(:get, @migration_url, @params)
+      expect(json[0]['attachment']).to be_nil
+    end
   end
 
   describe 'show' do
