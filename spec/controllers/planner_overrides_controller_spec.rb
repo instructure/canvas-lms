@@ -460,6 +460,17 @@ describe PlannerOverridesController do
               response_json = json_parse(response.body)
               expect(response_json.length).to eq 1
               expect(response_json.first["plannable"]["id"]).to eq @topic.id
+
+              @reply.change_read_state('read', @student)
+              @topic.change_read_state('read', @student)
+
+              get :items_index, filter: "new_activity"
+              expect(json_parse(response.body)).to be_empty
+
+              @reply2 = @entry.reply_from(:user => @teacher, :text => "ohai again...")
+
+              get :items_index, filter: "new_activity"
+              expect(json_parse(response.body).length).to eq 1
             end
           end
         end

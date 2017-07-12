@@ -524,12 +524,12 @@ class DiscussionTopic < ActiveRecord::Base
           user: user)
   }
   scope :unread_for, lambda { |user|
-    # TODO: Fix for when participants doesn't include user
-    eager_load(:discussion_topic_participants).
-    where("discussion_topic_participants.id IS NULL
-          OR (discussion_topic_participants.user_id = :user
-            AND discussion_topic_participants.workflow_state <> 'read')",
-          user: user)
+    joins(sanitize_sql(["LEFT OUTER JOIN #{DiscussionTopicParticipant.quoted_table_name} ON
+            discussion_topic_participants.discussion_topic_id=discussion_topics.id AND
+            discussion_topic_participants.user_id=?", user.id])).
+    where("discussion_topic_participants IS NULL
+          OR discussion_topic_participants.workflow_state <> 'read'
+          OR discussion_topic_participants.unread_entry_count > 0")
   }
   scope :published, -> { where("discussion_topics.workflow_state = 'active'") }
 
