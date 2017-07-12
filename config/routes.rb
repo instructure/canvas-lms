@@ -684,7 +684,7 @@ CanvasRails::Application.routes.draw do
   get 'login' => 'login#new'
   get 'login/session_token' => 'login#session_token'
   delete 'logout' => 'login#destroy'
-  get 'logout' => 'login#logout_confirm'
+  get 'logout' => 'login#logout_landing'
 
   get 'login/canvas' => 'login/canvas#new', as: :canvas_login
   post 'login/canvas' => 'login/canvas#create'

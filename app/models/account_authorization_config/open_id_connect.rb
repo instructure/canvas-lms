@@ -58,7 +58,7 @@ class AccountAuthorizationConfig::OpenIDConnect < AccountAuthorizationConfig::Oa
   end
 
   def user_logout_redirect(_controller, _current_user)
-    end_session_endpoint.presence
+    end_session_endpoint.presence || super
   end
 
   def provider_attributes(token)
