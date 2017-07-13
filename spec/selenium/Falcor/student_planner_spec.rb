@@ -33,7 +33,18 @@ describe "student planner" do
     user_session(@student1)
   end
 
-  it "shows and nvaigates to announcements page from student planner", priority: "1", test_id: 3259302 do
+  it "shows no due date assigned when no assignments are created", priority: "1", test_id: 3265570 do
+    go_to_list_view
+    validate_no_due_dates_assigned
+  end
+
+  it "navigates to the dashcard view from no due dates assigned page", priority: "1", test_id: 3281739 do
+    go_to_list_view
+    go_to_dashcard_view
+    expect(f('.ic-DashboardCard__header-title')).to include_text(@course.name)
+  end
+
+  it "shows and navigates to announcements page from student planner", priority: "1", test_id: 3259302 do
     announcement = @course.announcements.create!(title: 'Hi there!', message: 'Announcement time!')
     go_to_list_view
     validate_object_displayed('Announcement')
@@ -86,15 +97,26 @@ describe "student planner" do
     end
   end
 
-  it "shows and navigates to graded discussions page from student planner", priority: "1", test_id: 3259301 do
-    assignment = @course.assignments.create!(name: 'assignment',
-                                             due_at: Time.zone.now.advance(days:2))
-    discussion = @course.discussion_topics.create!(title: 'Discussion 1',
-                                                   message: 'Discussion with multiple due dates',
-                                                   assignment: assignment)
-    go_to_list_view
-    validate_object_displayed('Discussion')
-    validate_link_to_url(discussion, 'discussion_topics')
+  context "Graded discussion" do
+    before :once do
+      assignment = @course.assignments.create!(name: 'assignment',
+                                               due_at: Time.zone.now.advance(days:2))
+      @discussion = @course.discussion_topics.create!(title: 'Discussion 1',
+                                                     message: 'Graded discussion',
+                                                     assignment: assignment)
+    end
+
+    it "shows and navigates to graded discussions page from student planner", priority: "1", test_id: 3259301 do
+      go_to_list_view
+      validate_object_displayed('Discussion')
+      validate_link_to_url(@discussion, 'discussion_topics')
+    end
+
+    it "shows new replies tag for discussion with new replies", priority: "1", test_id: 3284231 do
+      @discussion.reply_from(user: @teacher, text: 'teacher reply')
+      go_to_list_view
+      validate_pill('New Replies')
+    end
   end
 
   it "shows and navigates to ungraded discussions with todo dates from student planner", priority:"1", test_id: 3259305 do

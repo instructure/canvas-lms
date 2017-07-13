@@ -47,6 +47,17 @@ module PlannerPageObject
       to be_displayed
   end
 
+  def validate_no_due_dates_assigned
+    expect(f('#dashboard-planner').find_element(:xpath, "//h2[text()[contains(.,'No Due Dates Assigned')]]")).
+      to be_displayed
+    expect(f('#dashboard-planner').find_element(:xpath, "//div[text()[contains(.,\"Looks like there isn't anything here\")]]")).
+      to be_displayed
+  end
+
+  def go_to_dashcard_view
+    fj("button:contains('Go to Dashboard Card View')").click
+  end
+
   def expand_completed_item
     f('.PlannerApp').find_element(:xpath, "//span[text()[contains(.,'Show 1 completed item')]]").click
   end
