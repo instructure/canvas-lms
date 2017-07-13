@@ -109,5 +109,16 @@ module PlannerPageObject
   def items_displayed
     ff('li', f('.PlannerApp'))
   end
+
+  def todo_info_holder
+    f('ol')
+  end
+
+  def create_new_todo
+    modal = todo_sidebar_modal
+    element = f('input', modal)
+    element.send_keys("Title Text")
+    todo_save_button.click
+  end
 end
 

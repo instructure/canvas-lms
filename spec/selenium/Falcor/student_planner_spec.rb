@@ -164,7 +164,10 @@ describe "student planner" do
     end
   end
 
-  context "the Create To Do sidebar" do
+  context "Create To Do Sidebar" do
+    before :each do
+      user_session(@student1)
+    end
 
     it "opens the sidebar to creata a new To-Do item", priority: "1", test_id: 3263157 do
       go_to_list_view
@@ -222,18 +225,59 @@ describe "student planner" do
     it "saves new ToDos properly", priority: "1", test_id: 3263162 do
       go_to_list_view
       todo_modal_button.click
-
-      # gives the To Do a new name and saves it
-      modal = todo_sidebar_modal
-      element = f('input', modal)
-      element.send_keys("Title Text")
-      todo_save_button.click
+      create_new_todo
+      refresh_page
 
       # verifies that the new To Do is showing up
+      todo_item = todo_info_holder
+      expect(todo_item).to include_text("To Do")
+      expect(todo_item).to include_text("Title Text")
+    end
+
+    it "edits a To Do", priority: "1", test_id: 3281714 do
+      @student1.planner_notes.create!(todo_date: 2.days.from_now, title: "Title Text")
+      go_to_list_view
+
+      # Opens the To Do edit sidebar
+      todo_item = todo_info_holder
+      expect(todo_item).to include_text("To Do")
+      expect(todo_item).to include_text("Title Text")
+      fj("a:contains('Title Text')", todo_item).click
+
+      # gives the To Do a new name and saves it
+      modal = f("div[aria-label = 'Edit Title Text']")
+      element = f('input', modal)
+      element.send_keys(8.chr * 10)
+      element.send_keys("New Text")
+      todo_save_button.click
+
+      # verifies that the edited To Do is showing up
+      todo_item = todo_info_holder
+      expect(todo_item).to include_text("To Do")
+      expect(todo_item).to include_text("New Text")
+      expect(todo_item).not_to include_text("Title Text")
+    end
+
+    it "deletes a To Do", priority: "1", test_id: 3281715 do
+      @student1.planner_notes.create!(todo_date: 2.days.from_now, title: "Title Text")
+      go_to_list_view
+
+      expect(f('body')).not_to contain_jqcss("h2:contains('No Due Dates Assigned')")
+      todo_item = todo_info_holder
+      expect(todo_item).to include_text("To Do")
+      expect(todo_item).to include_text("Title Text")
+      fj("a:contains('Title Text')", todo_item).click
+      fj("button:contains('Delete')").click
       refresh_page
-      todo_modal_button
-      expect(f('ol')).to include_text("To Do")
-      expect(f('ol')).to include_text("Title Text")
+
+      expect(fj("h2:contains('No Due Dates Assigned')")).to be_displayed
+    end
+
+    it "has courses in the course combo box", priority: "1", test_id: 3263160 do
+      go_to_list_view
+      todo_modal_button.click
+      element = fj("select:contains('Optional: Add Course')")
+      expect(fj("option:contains('Unnamed Course')", element)).to be
     end
   end
 
