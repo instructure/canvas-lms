@@ -40,7 +40,7 @@ describe "announcements" do
       ff('.discussion_entry').each { |entry| expect(entry).not_to include_text(@reply.message) }
     end
 
-    it "should show replies if user has posted", priority: "1", test_id: 150533 do
+    it "should show replies if user has posted", priority: "1", test_id: 3293301 do
       enable_all_rcs @course.account
       stub_rcs_config
       get "/courses/#{@course.id}/announcements/#{@announcement.id}"
@@ -53,7 +53,7 @@ describe "announcements" do
     end
   end
 
-  context "announcements as a student", priority: "1", test_id: 150524 do
+  context "announcements as a student" do
     before :each do
       course_with_student_logged_in
       enable_all_rcs @course.account
