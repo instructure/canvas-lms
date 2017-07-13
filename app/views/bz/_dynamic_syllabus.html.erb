@@ -125,7 +125,7 @@
     <% part_count += 1 %>
     <% progress = progressions[mod.id] %>
     <div class="bz-course-part-module-box <%= (progress.nil? || @bypass_lock) ? '' : progress.workflow_state %> " <%
-      if progress && progress.workflow_state == 'completed' %> onclick="window.location.href='/courses/<%= @course.id %>/modules/items/<%= mod.content_tags.first.id %>';"<%end%>>
+      if progress && progress.workflow_state == 'completed' %> onclick="window.location.href='/courses/<%= @course.id %>/modules/items/<%= mod.content_tags.first.id %>';" style="cursor: pointer;"<%end%>>
       <div class="bz-module-image"><img src="<%= mod.image_url %>" alt="" /></div>
       <h3><!--<%= part_count %> --><%= mod.name %></h3>
       <div><%= mod.intro_text ? mod.intro_text.html_safe : '' %></div>
