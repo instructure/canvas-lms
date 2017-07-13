@@ -35,6 +35,7 @@ module AdheresToPolicy
     attr_accessor_with_default :blacklist, []
     attr_accessor_with_default :cache_related_permissions, true
     attr_accessor_with_default :cache_intermediate_permissions, true
+    attr_accessor_with_default :cache_permissions, true
 
     def initialize
       init_defaults

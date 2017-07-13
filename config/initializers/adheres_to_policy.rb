@@ -39,4 +39,8 @@ AdheresToPolicy.configure do |config|
   config.cache_intermediate_permissions = -> {
     Canvas::Plugin.value_to_boolean(Setting.get('permissions_cache_intermediate', 'true'))
   }
+
+  config.cache_permissions = -> {
+    Canvas::Plugin.value_to_boolean(Setting.get('permissions_cache_enabled', 'true'))
+  }
 end
