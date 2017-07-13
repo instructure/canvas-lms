@@ -101,7 +101,11 @@ import $ from 'jquery'
           alt: tinyMCEContentItem.text
         }))
       } else {
-        $link.text(selectedText || tinyMCEContentItem.text);
+        let linkText = selectedText;
+        if (!linkText || linkText.trim().length === 0) {
+          linkText = tinyMCEContentItem.text;
+        }
+        $link.text(linkText);
       }
 
       return $linkContainer.html();
@@ -182,4 +186,3 @@ import $ from 'jquery'
   }
 
   export default TinyMCEContentItem;
-
