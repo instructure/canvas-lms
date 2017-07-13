@@ -226,7 +226,7 @@ class GradebooksController < ApplicationController
   def post_grades_tools
     tool_limit = @context.feature_enabled?(:post_grades) ? MAX_POST_GRADES_TOOLS - 1 : MAX_POST_GRADES_TOOLS
     tools = post_grades_ltis[0...tool_limit]
-    tools.push(type: :post_grades) if @context.feature_enabled?(:post_grades)
+    tools.push(type: :post_grades) if @context.feature_enabled?(:post_grades) && tools.size == 0
     tools
   end
 
