@@ -46,7 +46,7 @@ class Assignment < ActiveRecord::Base
 
   after_update :duplicate_across_courses
   def duplicate_across_courses
-    if self.body_changed?
+    if self.description_changed?
       Assignment.where(:clone_of_id => id).each do |assignment|
         assignment.description = description
         assignment.name = name
