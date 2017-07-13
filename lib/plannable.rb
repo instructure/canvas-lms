@@ -111,7 +111,7 @@ module Plannable
         val = col.is_a?(Array) ?
           object.attributes.values_at(*col).compact.first : # coalesce nulls
           object.attributes[col]
-        val = val.strftime("%Y-%m-%d %H:%M:%S.%6N") if val.respond_to?(:strftime)
+        val = val.utc.strftime("%Y-%m-%d %H:%M:%S.%6N") if val.respond_to?(:strftime)
         bookmark << val
       end
       bookmark
