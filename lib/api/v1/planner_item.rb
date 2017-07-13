@@ -76,9 +76,9 @@ module Api::V1::PlannerItem
   end
 
   def planner_items_json(items, user, session, opts = {})
-    notes, context_items = items.partition{|i| i.is_a?(PlannerNote)}
+    notes, context_items = items.partition{|i| i.is_a?(::PlannerNote)}
     ActiveRecord::Associations::Preloader.new.preload(notes, :user => {:pseudonym => :account}) if notes.any?
-    wiki_pages, other_context_items = context_items.partition{|i| i.is_a?(WikiPage)}
+    wiki_pages, other_context_items = context_items.partition{|i| i.is_a?(::WikiPage)}
     ActiveRecord::Associations::Preloader.new.preload(wiki_pages, :wiki => [{:course => :root_account}, {:group => :root_account}]) if wiki_pages.any?
     ActiveRecord::Associations::Preloader.new.preload(other_context_items, :context => :root_account) if other_context_items.any?
     items.map do |item|
