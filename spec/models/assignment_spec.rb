@@ -1282,10 +1282,16 @@ describe Assignment do
     end
 
     it "clears out stale submission information" do
+      @a.submissions.find_by(user: @user).update(
+        late_policy_status: 'late',
+        seconds_late_override: 120
+      )
       s = @a.submit_homework(@user, submission_type: "online_url",
                              url: "http://example.com")
       expect(s.submission_type).to eq "online_url"
       expect(s.url).to eq "http://example.com"
+      expect(s.late_policy_status).to be nil
+      expect(s.seconds_late_override).to be nil
 
       s2 = @a.submit_homework(@user, submission_type: "online_text_entry",
                               body: "blah blah blah blah blah blah blah")
@@ -1294,11 +1300,17 @@ describe Assignment do
       expect(s2.url).to be_nil
       expect(s2.workflow_state).to eq "submitted"
 
+      @a.submissions.find_by(user: @user).update(
+        late_policy_status: 'late',
+        seconds_late_override: 120
+      )
       # comments shouldn't clear out submission data
       s3 = @a.submit_homework(@user, comment: "BLAH BLAH")
       expect(s3.body).to eq "blah blah blah blah blah blah blah"
       expect(s3.submission_comments.first.comment).to eq "BLAH BLAH"
       expect(s3.submission_type).to eq "online_text_entry"
+      expect(s3.late_policy_status).to eq "late"
+      expect(s3.seconds_late_override).to eq 120
     end
   end
 

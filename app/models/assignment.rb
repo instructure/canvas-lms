@@ -1631,6 +1631,8 @@ class Assignment < ActiveRecord::Base
         # clear out attributes from prior submissions
         if opts[:submission_type].present?
           SUBMIT_HOMEWORK_ATTRS.each { |attr| homework[attr] = nil }
+          homework.late_policy_status = nil
+          homework.seconds_late_override = nil
         end
 
         student = homework.user
