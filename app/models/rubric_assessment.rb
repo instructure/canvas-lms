@@ -210,6 +210,10 @@ class RubricAssessment < ActiveRecord::Base
   scope :for_submissions, -> { where(:artifact_type => "Submission")}
   scope :for_provisional_grades, -> { where(:artifact_type => "ModeratedGrading::ProvisionalGrade")}
 
+  scope :for_course_context, lambda { |course_id|
+    joins(:rubric_association).where(rubric_associations: {context_id: course_id, context_type: "Course"})
+  }
+
   def methods_for_serialization(*methods)
     @serialization_methods = methods
   end

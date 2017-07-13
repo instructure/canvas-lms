@@ -150,9 +150,9 @@ describe "Rubrics API", type: :request do
     expect(json.length).to eq 3
     links = response.headers['Link'].split(",")
     expect(links.all?{ |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/rubrics/ }).to be_truthy
-    expect(links.find{ |l| l.match(/rel="next"/)}).to match /page=2/
-    expect(links.find{ |l| l.match(/rel="first"/)}).to match /page=1/
-    expect(links.find{ |l| l.match(/rel="last"/)}).to match /page=3/
+    expect(links.find{ |l| l.match(/rel="next"/)}).to match(/page=2/)
+    expect(links.find{ |l| l.match(/rel="first"/)}).to match(/page=1/)
+    expect(links.find{ |l| l.match(/rel="last"/)}).to match(/page=3/)
 
     # get the last page
     json = rubrics_api_call(context, {:per_page => '3', :page => '3'}, type)
@@ -160,12 +160,12 @@ describe "Rubrics API", type: :request do
     expect(json.length).to eq 2
     links = response.headers['Link'].split(",")
     expect(links.all?{ |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/rubrics/ }).to be_truthy
-    expect(links.find{ |l| l.match(/rel="prev"/)}).to match /page=2/
-    expect(links.find{ |l| l.match(/rel="first"/)}).to match /page=1/
-    expect(links.find{ |l| l.match(/rel="last"/)}).to match /page=3/
+    expect(links.find{ |l| l.match(/rel="prev"/)}).to match(/page=2/)
+    expect(links.find{ |l| l.match(/rel="first"/)}).to match(/page=1/)
+    expect(links.find{ |l| l.match(/rel="last"/)}).to match(/page=3/)
   end
 
-  describe "in a course" do
+  describe "course level rubrics" do
     describe "index action" do
       before :once do
         course_with_teacher active_all: true
@@ -389,7 +389,7 @@ describe "Rubrics API", type: :request do
     end
   end
 
-  describe "in an account" do
+  describe "account level rubrics" do
     describe "index action" do
       before :once do
         @user = account_admin_user
@@ -453,6 +453,15 @@ describe "Rubrics API", type: :request do
           response = rubric_api_call(@account, {include: "assessments"}, 'account')
           expect(response).to have_key "assessments"
           expect(response["assessments"].length).to eq 2
+        end
+
+        it "returns only rubric assessments a user has permission to read" do
+          course_with_teacher active_all: true
+          assignment = assignment_model(context: @course)
+          ra_params = rubric_association_params_for_assignment(assignment)
+          RubricAssociation.generate(@teacher, @rubric, @course, ra_params)
+          response = rubric_api_call(@course, {include: "assessments"})
+          expect(response).not_to have_key "assessments"
         end
 
         it "returns any rubric assessments used for grading when passed 'graded_assessments'" do
