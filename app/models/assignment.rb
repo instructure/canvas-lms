@@ -163,7 +163,9 @@ class Assignment < ActiveRecord::Base
     result.discussion_topic = nil
     result.peer_review_count = 0
     result.workflow_state = "unpublished"
-
+    # Default to the last position of all active assignments.  Clients can still
+    # override later.  Just helps to avoid duplicate positions.
+    result.position = Assignment.active.maximum(:position) + 1
     result.title =
       opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy"))
 
@@ -2053,6 +2055,10 @@ class Assignment < ActiveRecord::Base
 
   scope :having_submissions_for_user, lambda { |user|
     with_submissions_for_user(user).merge(Submission.having_submission)
+  }
+
+  scope :by_assignment_group_id, lambda { |group_id|
+    where('assignment_group_id = ?', group_id.to_s)
   }
 
   scope :for_context_codes, lambda { |codes| where(:context_code => codes) }

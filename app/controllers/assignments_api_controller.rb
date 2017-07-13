@@ -590,22 +590,29 @@ class AssignmentsApiController < ApplicationController
     old_assignment = @context.active_assignments.find_by({ id: assignment_id })
 
     if !old_assignment || old_assignment.workflow_state == "deleted"
-      return render json: { error: 'assignment does not exist' }, status: 400
+      return render json: { error: 'assignment does not exist' }, status: :bad_request
     end
 
     if old_assignment.quiz
-      return render json: { error: 'quiz duplication not implemented' }, status: 400
+      return render json: { error: 'quiz duplication not implemented' }, status: :bad_request
     end
 
     if old_assignment.discussion_topic
-      return render json: { error: 'discussion topic duplication not implemented' }, status: 400
+      return render json: { error: 'discussion topic duplication not implemented' }, status: :bad_request
     end
 
     return unless authorized_action(old_assignment, @current_user, :create)
 
     new_assignment = old_assignment.duplicate
+    # insert_at seems to do the right thing only on already saved entities, so
+    # save than insert into the proper position.
     new_assignment.save!
-    render :json => assignment_json(new_assignment, @current_user, session)
+    new_assignment.insert_at(old_assignment.position + 1)
+    if new_assignment
+      render :json => assignment_json(new_assignment, @current_user, session)
+    else
+      render json: { error: 'cannot save new assignment' }, status: :bad_request
+    end
   end
 
   def get_assignments(user)

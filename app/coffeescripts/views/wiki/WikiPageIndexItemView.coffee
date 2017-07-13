@@ -125,7 +125,7 @@ define [
       return unless @model.get('deletable')
 
       $curCog = $(ev.target).parents('td').children().find('.al-trigger')
-      $allCogs =  $('.collectionViewItems').children().find('.al-trigger')
+      $allCogs = $('.collectionViewItems').children().find('.al-trigger')
       curIndex = $allCogs.index($curCog)
       newIndex = curIndex - 1
       if (newIndex < 0)
@@ -148,8 +148,7 @@ define [
       handleResponse = (response) ->
         placeToAdd = collection.indexOf(model) + 1
         collection.add(response, { at: placeToAdd })
-        cogs = $('.collectionViewItems').children().find('.al-trigger')
-        cogs[placeToAdd].focus()
+        $("#wiki_page_index_item_title_#{response.page_id}").focus()
 
       @model.duplicate(ENV.COURSE_ID, handleResponse)
       return

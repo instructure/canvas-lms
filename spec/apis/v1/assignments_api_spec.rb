@@ -949,6 +949,8 @@ describe AssignmentsApiController, type: :request do
         :assignment_group => @group,
         :due_at => Time.zone.now + 1.week
       )
+      assignment.save!
+      assignment.insert_at(1)
       json = api_call_as_user(@teacher, :post,
         "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json",
         { :controller => "assignments_api",
@@ -959,6 +961,22 @@ describe AssignmentsApiController, type: :request do
         {},
         { :expected_status => 200 })
       expect(json["name"]).to eq "some assignment Copy"
+
+      expect(json["assignment_group_id"]).to eq assignment.assignment_group_id
+
+      # The new assignment should have the desired position, and nothing else
+      # in the group should have the same position.
+      new_id = json["id"]
+      new_position = json["position"]
+      expect(new_position).to eq 2
+      assignments_in_group = Assignment.active
+        .by_assignment_group_id(assignment.assignment_group_id)
+        .pluck("id", "position")
+      assignments_in_group.each do |id, position|
+       if id != new_id
+         expect(position).not_to eq(new_position)
+       end
+      end
     end
 
     it "should require non-quiz" do
