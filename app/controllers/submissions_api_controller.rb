@@ -965,14 +965,9 @@ class SubmissionsApiController < ApplicationController
 
       graded = @context.submissions.in_workflow_state('graded').where(user_id: student_ids, assignment_id: @assignment).count
       ungraded = @context.submissions.
-        ungraded.having_submission.
+        needs_grading.having_submission.
         where(user_id: student_ids, assignment_id: @assignment, excused: [nil, false]).
         count
-      pending_quizzes = @context.submissions.
-        in_workflow_state('pending_review').having_submission.
-        where(user_id: student_ids, assignment_id: @assignment, excused: [nil, false]).
-        count
-      ungraded += pending_quizzes
       not_submitted = student_ids.count - graded - ungraded
 
       render json: {graded: graded, ungraded: ungraded, not_submitted: not_submitted}

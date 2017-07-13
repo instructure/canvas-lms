@@ -3955,6 +3955,16 @@ describe 'Submissions API', type: :request do
       expect(json['not_submitted']).to eq 1
     end
 
+    it 'summarizes submission with multiple submission where latest submission needs grading' do
+      @assignment.submit_homework @student2, :body => 'EHLO2'
+      @assignment.grade_student @student2, score: 98, grader: @teacher
+      @assignment.submit_homework @student2, :body => 'EHLO3'
+      json = api_call_as_user(@teacher, :get, @path, @params)
+      expect(json['graded']).to eq 1
+      expect(json['ungraded']).to eq 1
+      expect(json['not_submitted']).to eq 1
+    end
+
     it 'is unauthorized as a student' do
       json = api_call_as_user(@student1, :get, @path, @params)
       expect(json['status']).to eq 'unauthorized'
