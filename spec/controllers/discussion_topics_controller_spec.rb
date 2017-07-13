@@ -1065,6 +1065,17 @@ describe DiscussionTopicsController do
       expect(@topic.reload).not_to be_published
     end
 
+    it "attaches a file and handles duplicates" do
+      data = fixture_file_upload("scribd_docs/txt.txt", "text/plain", true)
+      attachment_model :context => @course, :uploaded_data => data, :folder => Folder.unfiled_folder(@course)
+      put 'update', course_id: @course.id, topic_id: @topic.id, format: 'json', attachment: data
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      new_file = Attachment.find(json['attachments'][0]['id'])
+      expect(new_file.display_name).to match /txt-[0-9]+\.txt/
+      expect(json['attachments'][0]['display_name']).to eq new_file.display_name
+    end
+
     it "should delete attachments" do
       attachment = @topic.attachment = attachment_model(context: @course)
       @topic.lock_at = Time.now + 1.week

@@ -1349,15 +1349,18 @@ describe DiscussionTopicsController, type: :request do
       expect(@entry.attachment.context).to eql @user
     end
 
-    it "should include attachment info in the json response" do
+    it "handles duplicate files when attaching" do
       data = fixture_file_upload("scribd_docs/txt.txt", "text/plain", true)
+      attachment_model :context => @user, :uploaded_data => data, :folder => Folder.unfiled_folder(@user)
       json = api_call(
         :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
         {:controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s},
         {:message => @message, :attachment => data})
-      expect(json['attachment']).not_to be_nil
-      expect(json['attachment']).not_to be_empty
+      expect(json['attachment']).to be_present
+      new_file = Attachment.find(json['attachment']['id'])
+      expect(new_file.display_name).to match /txt-[0-9]+\.txt/
+      expect(json['attachment']['display_name']).to eq new_file.display_name
       expect(json['attachment']['url']).to be_include 'verifier='
     end
 
