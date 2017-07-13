@@ -1611,6 +1611,10 @@ define([
           }
         })
       );
+
+      var vaia = document.getElementById("view-assignment-with-inline-answers");
+      if(isMostRecent && vaia)
+        viewAssignmentWithInlineAnswers(vaia);
     },
 
     refreshSubmissionsToView: function(){
