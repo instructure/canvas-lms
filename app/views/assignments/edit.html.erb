@@ -12,6 +12,15 @@
   js_bundle :assignment_edit
 %>
 
+<% if @assignment.clone_of_id %>
+  <div style="text-align: center; font-weight: bold; margin-top: 4em; ">
+    This is set to clone an <a href="/courses/1/assignments/<%= @assignment.clone_of_id %>/edit">assignment in the content bank</a>.
+    <br />
+    <br />
+    The description and submission type is copied from there, but you can edit other fields.
+  </div>
+<% end %>
+
 <% if ConditionalRelease::Service.enabled_in_context?(@context) %>
 <div id="edit_assignment_header-cr" class="header-bar"></div>
 <% else %>
@@ -29,3 +38,4 @@
   <a href="<%= context_url(@context, :context_grading_standards_url) %>" style="display: none;" class="create_grading_standard_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_grading_standard_url, "{{ id }}") %>" style="display: none;" id="update_grading_standard_url">&nbsp;</a>
 </div>
+

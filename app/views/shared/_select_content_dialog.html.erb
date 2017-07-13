@@ -11,14 +11,15 @@
           var i = document.getElementById('section_restrict_div');
           if(i) {
              var a = this.options[this.selectedIndex].value;
-             if(a == 'quiz' || a == 'assignment')
+             if(a == 'quiz' || a == 'assignment' || a == 'cloned_assignment')
                 i.style.display = 'none';
              else
                 i.style.display = '';
           }
       ">
         <% if !only || only.include?(:assignments) %>
-        <option value="assignment"><%= t :assignment_item, "Assignment" %></option>
+        <option value="assignment">Assignment - Local</option>
+        <option value="cloned_assignment">Assignment - From Library</option>
         <% end %>
         <% if !only || only.include?(:quizzes) %>
         <option value="quiz"><%= t :quiz_item, "Quiz" %></option>
@@ -251,6 +252,29 @@
       </div>
       <% end %>
       <% if !only || only.include?(:assignments) %>
+      <div id="cloned_assignments_select" class="module_item_option">
+        <div style="font-size: 0.8em;">
+          <i class="icon-assignment"></i>
+          <%= t :assignment_notice, 'Select the assignment you want to associate with this *module*, or add an assignment by selecting "New Assignment".', :wrapper => '<span class="holder_type">\1</span>' %>
+        </div>
+        <div style="margin-top: 5px;">
+        <select class="module_item_select" aria-label="Select the assignment you want to associate" multiple>
+          <% Course.find(1).assignment_groups.active.include_active_assignments.each do |group| %>
+            <optgroup label="<%= group.name %>">
+            <% group.active_assignments.no_graded_quizzes_or_topics.limit(200).each do |assignment| %>
+              <option value="<%= assignment.id %>"><%= assignment.title %></option>
+            <% end %>
+            </optgroup>
+          <% end %>
+        </select>
+        </div>
+        <div class="new" style="margin-top: 5px;">
+          <%= before_label :wiki_page_namem, "Assignment Name" %>
+          <input type="text" name="assignment[title]" class="item_title" style="margin-bottom: 5px;" aria-label="<%= before_label :assignment_name, "Assignment Name" %>"/>
+          <a href="<%= context_url(@context, :context_assignments_url) %>" style="display: none;" class="add_item_url">&nbsp;</a>
+        </div>
+      </div>
+
       <div id="assignments_select" class="module_item_option">
         <div style="font-size: 0.8em;">
           <i class="icon-assignment"></i>

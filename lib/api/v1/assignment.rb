@@ -26,6 +26,7 @@ module Api::V1::Assignment
   API_ALLOWED_ASSIGNMENT_OUTPUT_FIELDS = {
     :only => %w(
       id
+      clone_of_id
       position
       description
       points_possible
@@ -50,6 +51,7 @@ module Api::V1::Assignment
   API_ASSIGNMENT_NEW_RECORD_FIELDS = {
     :only => %w(
       points_possible
+      clone_of_id
       due_at
       assignment_group_id
       post_to_sis
@@ -83,6 +85,7 @@ module Api::V1::Assignment
     hash = api_json(assignment, user, session, fields)
     hash['course_id'] = assignment.context_id
     hash['name'] = assignment.title
+    hash['clone_of_id'] = assignment.clone_of_id
     hash['submission_types'] = assignment.submission_types_array
     hash['has_submitted_submissions'] = assignment.has_submitted_submissions?
 
@@ -269,6 +272,7 @@ module Api::V1::Assignment
 
   API_ALLOWED_ASSIGNMENT_INPUT_FIELDS = %w(
     name
+    clone_of_id
     description
     position
     points_possible
