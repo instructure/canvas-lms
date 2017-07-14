@@ -71,12 +71,11 @@ describe Course do
       @user1 = @user
       course_with_student(course: @course, active_all: true)
       @user2 = @user
-      Enrollment.expects(:recompute_final_score).with(
-        [@user1.id, @user2.id],
-        @course.id,
-        grading_period_id: nil,
-        update_all_grading_period_scores: true
-      ).returns(nil)
+      Enrollment.expects(:recompute_final_score) do |student_ids, course_id, opts|
+        expect(student_ids.sort). to eq [@user1.id, @user2.id]
+        expect(course_id). to eq @course.id
+        expect(opts). to eq({grading_period_id: nil, update_all_grading_period_scores: true})
+      end.returns(nil)
       @course.recompute_student_scores
     end
   end
