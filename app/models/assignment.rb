@@ -46,11 +46,17 @@ class Assignment < ActiveRecord::Base
 
   after_update :duplicate_across_courses
   def duplicate_across_courses
-    if self.description_changed?
+    if self.description_changed? || self.name_changed?
       Assignment.where(:clone_of_id => id).each do |assignment|
         assignment.description = description
         assignment.name = name
         assignment.submission_types = submission_types
+
+        if rubric != assignment.rubric
+          assignment.rubric_association.destroy if assignment.rubric_association
+          assignment.rubric_association = rubric_association.clone if rubric_association
+        end
+
         assignment.save
       end
     end
@@ -64,6 +70,10 @@ class Assignment < ActiveRecord::Base
       self.description = master.description
       self.name = master.name
       self.submission_types = master.submission_types
+      if self.rubric != master.rubric
+        self.rubric_association.destroy if self.rubric_association
+        self.rubric_association = master.rubric_association.clone if master.rubric_association
+      end
     end
   end
 
