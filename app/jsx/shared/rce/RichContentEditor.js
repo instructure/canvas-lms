@@ -168,7 +168,7 @@ const RichContentEditor = {
    *
    * @public
    */
-  loadNewEditor ($target, tinyMCEInitOptions = {}) {
+  loadNewEditor ($target, tinyMCEInitOptions = {}, cb) {
     if ($target.length <= 0) {
       // no actual target, just short circuit out
       return
@@ -179,10 +179,14 @@ const RichContentEditor = {
     // avoid modifying the original options object provided
     tinyMCEInitOptions = $.extend({}, tinyMCEInitOptions)
 
-    let callback
-    if (tinyMCEInitOptions.focus) {
-      // call activateRCE once loaded
-      callback = this.activateRCE.bind(this, $target)
+    let callback = () => {
+      if (tinyMCEInitOptions.focus) {
+        // call activateRCE once loaded
+        this.activateRCE($target)
+      }
+      if (cb) {
+        cb()
+      }
     }
 
     if (featureFlag()) {
@@ -253,7 +257,7 @@ const RichContentEditor = {
   },
 
   freshNode,
-  ensureID,
+  ensureID
 }
 
 export default RichContentEditor
