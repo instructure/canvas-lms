@@ -173,6 +173,7 @@ module CC
           node.grading_standard_external_identifier assignment.grading_standard.id
         end
       end
+      node.clone_of_id assignment.clone_of_id
       node.workflow_state assignment.workflow_state
       if assignment.rubric
         assoc = assignment.rubric_association
@@ -192,7 +193,6 @@ module CC
           end
         end
       end
-      note.clone_of_id = assignment.clone_of_id
       node.quiz_identifierref CCHelper.create_key(assignment.quiz) if assignment.quiz
       node.allowed_extensions assignment.allowed_extensions.join(',') unless assignment.allowed_extensions.blank?
       node.has_group_category assignment.has_group_category?
