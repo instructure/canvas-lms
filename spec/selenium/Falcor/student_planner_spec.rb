@@ -272,6 +272,12 @@ describe "student planner" do
       expect(f('#opportunities_parent')).not_to contain_jqcss('div:contains("assignmentThatHasToBeDoneNow")')
       expect(f('#opportunities_parent')).not_to contain_jqcss('button:contains("Dismiss assignmentThatHasToBeDoneNow")')
     end
+
+    it "shows missing pill in the opportunities dropdown", priority: "1", test_id: 3281710 do
+      go_to_list_view
+      open_opportunities_dropdown
+      expect(f('#opportunities_parent')).to contain_jqcss('span:contains("Missing")')
+    end
   end
 
   context "History" do
