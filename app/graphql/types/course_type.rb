@@ -10,7 +10,7 @@ module Types
     field :courseCode, types.String,
       "course short name",
       property: :course_code
-    field :workflowState, !CourseWorkflowState,
+    field :state, !CourseWorkflowState,
       property: :workflow_state
 
     connection :assignmentsConnection do

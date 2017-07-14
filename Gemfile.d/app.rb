@@ -116,7 +116,7 @@ gem 'gepub', '0.7.0beta3', github: 'ccutrer/gepub', ref: '7cea2f4912f15d89bc9e9c
 gem 'imperium', '0.1.3', require: false
 gem 'academic_benchmarks', '0.0.9', require: false
 
-gem 'graphql', '~>1.5.4'
+gem 'graphql', github: 'cmatheson/graphql-ruby', ref: '75ecda782f86ee983023e62bba4910daee6649ac'
 gem 'graphql-batch', '~>0.3.1'
 
 gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbacks'
