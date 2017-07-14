@@ -291,7 +291,7 @@ class User < ActiveRecord::Base
 
   attr_accessor :require_acceptance_of_terms, :require_presence_of_name,
     :require_self_enrollment_code, :self_enrollment_code,
-    :self_enrollment_course, :validation_root_account
+    :self_enrollment_course, :validation_root_account, :sortable_name_explicitly_set
   attr_reader :self_enrollment
 
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
@@ -720,6 +720,7 @@ class User < ActiveRecord::Base
     self.sortable_name = nil if self.sortable_name == ""
     # recalculate the sortable name if the name changed, but the sortable name didn't, and the sortable_name matches the old name
     self.sortable_name = nil if !self.sortable_name_changed? &&
+        !sortable_name_explicitly_set &&
         self.name_changed? &&
         User.name_parts(self.sortable_name, likely_already_surname_first: true).compact.join(' ') == self.name_was
     unless read_attribute(:sortable_name)

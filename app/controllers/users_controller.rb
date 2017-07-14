@@ -1729,6 +1729,8 @@ class UsersController < ApplicationController
           'Invalid date or invalid datetime for birthdate')}}, :status => 400)
       end
 
+      @user.sortable_name_explicitly_set = user_params[:sortable_name].present?
+
       respond_to do |format|
         if @user.update_attributes(user_params)
           @user.avatar_state = (old_avatar_state == :locked ? old_avatar_state : 'approved') if admin_avatar_update
