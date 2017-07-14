@@ -192,7 +192,7 @@ module CC
           end
         end
       end
-      note.clone_of_id = assignment.clone_of_id
+      node.clone_of_id = assignment.clone_of_id
       node.quiz_identifierref CCHelper.create_key(assignment.quiz) if assignment.quiz
       node.allowed_extensions assignment.allowed_extensions.join(',') unless assignment.allowed_extensions.blank?
       node.has_group_category assignment.has_group_category?
