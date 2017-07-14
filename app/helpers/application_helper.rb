@@ -1132,3 +1132,4 @@ class HtmlElement
   end
 end
 
+CONTENT_BANK=1 # the course ID of our content bank, the constant is here mostly just to make the usage code look less magical
