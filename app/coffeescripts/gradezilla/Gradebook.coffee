@@ -84,6 +84,7 @@ define [
   'compiled/gradezilla/GradebookKeyboardNav'
   'jsx/gradezilla/shared/AssignmentMuterDialogManager'
   'jsx/gradezilla/shared/helpers/assignmentHelper'
+  'jsx/grading/LatePolicyApplicator'
   'instructure-ui/lib/components/Button'
   'instructure-icons/lib/Solid/IconSettingsSolid'
   'jquery.ajaxJSON'
@@ -111,7 +112,7 @@ define [
   GridColor, StatusesModal, SubmissionTray, GradebookSettingsModal, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp,
   SubmissionStateMap,
   DownloadSubmissionsDialogManager,ReuploadSubmissionsDialogManager, GroupTotalCellTemplate, GradebookKeyboardNav,
-  AssignmentMuterDialogManager, assignmentHelper, { default: Button }, { default: IconSettingsSolid }) ->
+  AssignmentMuterDialogManager, assignmentHelper, LatePolicyApplicator, { default: Button }, { default: IconSettingsSolid }) ->
 
   isAdmin = =>
     _.contains(ENV.current_user_roles, 'admin')
@@ -124,6 +125,14 @@ define [
   renderComponent = (reactClass, mountPoint, props = {}, children = null) ->
     component = React.createElement(reactClass, props, children)
     ReactDOM.render(component, mountPoint)
+
+  ASSIGNMENT_KEY_REGEX = /^assignment_(?!group)/
+  forEachSubmission = (students, fn) ->
+    Object.keys(students).forEach (studentIdx) =>
+      student = students[studentIdx]
+      Object.keys(student).forEach (key) =>
+        if key.match ASSIGNMENT_KEY_REGEX
+          fn(student[key])
 
   ## Gradebook Display Settings
   getInitialGridDisplaySettings = (settings, colors) ->
@@ -956,7 +965,7 @@ define [
       round(grade, round.DEFAULT)
 
     submissionsForStudent: (student) =>
-      allSubmissions = (value for key, value of student when key.match /^assignment_(?!group)/)
+      allSubmissions = (value for key, value of student when key.match ASSIGNMENT_KEY_REGEX)
       return allSubmissions unless @gradingPeriodSet?
       return allSubmissions unless @isFilteringColumnsByGradingPeriod()
 
@@ -1423,7 +1432,7 @@ define [
         courseId: @options.context_id
         locale: @options.locale
         onClose: => @gradebookSettingsModalButton.focus()
-        onLatePolicyUpdate: @setLatePolicy
+        onLatePolicyUpdate: @onLatePolicyUpdate
         newGradebookDevelopmentEnabled: @options.new_gradebook_development_enabled
         gradedLateOrMissingSubmissionsExist: @options.graded_late_or_missing_submissions_exist
       @gradebookSettingsModal = renderComponent(
@@ -1860,7 +1869,7 @@ define [
     getColumnTypeForColumnId: (columnId) =>
       if columnId.match /^custom_col/
         return 'custom_column'
-      else if columnId.match /^assignment_(?!group)/
+      else if columnId.match ASSIGNMENT_KEY_REGEX
         return 'assignment'
       else if columnId.match /^assignment_group/
         return 'assignment_group'
@@ -2635,6 +2644,9 @@ define [
       periodId = @getFilterColumnsBySetting('gradingPeriodId') || @options.current_grading_period_id
       if periodId in _.pluck(@gradingPeriodSet.gradingPeriods, 'id') then periodId else '0'
 
+    getGradingPeriod: (gradingPeriodId) =>
+      (@gradingPeriodSet?.gradingPeriods || []).find((gradingPeriod) => gradingPeriod.id == gradingPeriodId)
+
     setSelectedPrimaryInfo: (primaryInfo, skipRedraw) =>
       @gridDisplaySettings.selectedPrimaryInfo = primaryInfo
       @saveSettings()
@@ -2756,8 +2768,28 @@ define [
 
       contextModules
 
+    onLatePolicyUpdate: (latePolicy) =>
+      @setLatePolicy(latePolicy)
+      @applyLatePolicy()
+
     setLatePolicy: (latePolicy) =>
       @courseContent.latePolicy = latePolicy
+
+    applyLatePolicy: =>
+      latePolicy = @courseContent?.latePolicy
+      gradingStandard = @options.grading_standard || @options.default_grading_standard
+      studentsToInvalidate = {}
+
+      forEachSubmission(@students, (submission) =>
+        assignment = @assignments[submission.assignment_id]
+        return if @getGradingPeriod(submission.grading_period_id)?.isClosed
+        if LatePolicyApplicator.processSubmission(submission, assignment, gradingStandard, latePolicy)
+          studentsToInvalidate[submission.user_id] = true
+      )
+      studentIds = _.uniq(Object.keys(studentsToInvalidate))
+      studentIds.forEach (studentId) =>
+        @calculateStudentGrade(@students[studentId])
+      @invalidateRowsForStudentIds(studentIds)
 
     getContextModule: (contextModuleId) =>
       @courseContent.modulesById?[contextModuleId] if contextModuleId?
