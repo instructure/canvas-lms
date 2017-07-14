@@ -479,6 +479,11 @@ describe ConversationParticipant do
           convos = @target_user.conversations.for_masquerading_user(@admin_user)
           expect(convos.size).to eql 1
           expect(convos.sort_by(&:id)).to eql [@c1]
+
+          @cross_shard_admin =  @shard1.activate { user_factory }
+          @a1.account_users.create!(user: @cross_shard_admin)
+          convos = @target_user.conversations.for_masquerading_user(@cross_shard_admin)
+          expect(convos.size).to eql 1
         end
       end
     end

@@ -54,7 +54,7 @@ class ConversationParticipant < ActiveRecord::Base
     # we're also counting on conversations being in the join
 
     own_root_account_ids = Shard.birth.activate do
-      accts = user.associated_root_accounts.select{ |a| a.grants_right?(user, :become_user) }
+      accts = user.associated_root_accounts.shard(user.in_region_associated_shards).select{ |a| a.grants_right?(user, :become_user) }
       # we really shouldn't need the global id here, but we've got a lot of participants with
       # global id's in their root_account_ids for some reason
       accts.map(&:id) + accts.map(&:global_id)
