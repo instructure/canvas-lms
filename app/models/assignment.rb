@@ -37,10 +37,12 @@ class Assignment < ActiveRecord::Base
   include Plannable
   include DuplicatingObjects
 
-  ALLOWED_GRADING_TYPES = %w(
-    pass_fail percent letter_grade gpa_scale points not_graded
-  ).freeze
+  POINTED_GRADING_TYPES = %w(percent letter_grade gpa_scale points).freeze
+  NON_POINTED_GRADING_TYPES = %w(pass_fail not_graded).freeze
+  ALLOWED_GRADING_TYPES = (POINTED_GRADING_TYPES + NON_POINTED_GRADING_TYPES).freeze
+
   OFFLINE_SUBMISSION_TYPES = %i(on_paper external_tool none not_graded wiki_page).freeze
+  SUBMITTABLE_TYPES = %w(online_quiz discussion_topic wiki_page).freeze
 
   attr_accessor :previous_id, :updating_user, :copying, :user_submitted
 
@@ -303,10 +305,6 @@ class Assignment < ActiveRecord::Base
   validates :grading_type, inclusion: { in: ALLOWED_GRADING_TYPES },
     allow_nil: true, on: :create
 
-  scope :submittable, -> do
-    where.not(submission_types: [nil, *Assignment::OFFLINE_SUBMISSION_TYPES])
-  end
-
   acts_as_list :scope => :assignment_group
   simply_versioned :keep => 5
   sanitize_field :description, CanvasSanitize::SANITIZE
@@ -358,6 +356,7 @@ class Assignment < ActiveRecord::Base
               :schedule_do_auto_peer_review_job_if_automatic_peer_review,
               :delete_empty_abandoned_children,
               :update_cached_due_dates,
+              :apply_late_policy,
               :touch_submissions_if_muted_changed
 
   has_a_broadcast_policy
@@ -2045,7 +2044,7 @@ class Assignment < ActiveRecord::Base
 
   scope :include_submittables, -> { preload(:quiz, :discussion_topic, :wiki_page) }
 
-  SUBMITTABLE_TYPES = %w(online_quiz discussion_topic wiki_page).freeze
+  scope :submittable, -> { where.not(submission_types: [nil, *OFFLINE_SUBMISSION_TYPES]) }
   scope :no_submittables, -> { where.not(submission_types: SUBMITTABLE_TYPES) }
 
   scope :with_submissions, -> { preload(:submissions) }
@@ -2355,9 +2354,20 @@ class Assignment < ActiveRecord::Base
   end
 
   def update_cached_due_dates
-    if due_at_changed? || workflow_state_changed? || only_visible_to_overrides_changed?
-      DueDateCacher.recompute(self)
-    end
+    return unless update_cached_due_dates?
+
+    DueDateCacher.recompute(self)
+  end
+
+  def update_cached_due_dates?
+    due_at_changed? || workflow_state_changed? || only_visible_to_overrides_changed?
+  end
+
+  def apply_late_policy
+    return if update_cached_due_dates? # DueDateCacher already re-applies late policy so we shouldn't
+    return unless grading_type_changed?
+
+    LatePolicyApplicator.for_assignment(self)
   end
 
   def gradeable?

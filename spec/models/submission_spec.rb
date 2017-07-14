@@ -590,6 +590,18 @@ describe Submission do
       end
     end
 
+    it "deducts nothing if the submission is not late" do
+      Timecop.freeze(@date) do
+        @assignment.submit_homework(@student, body: "gary, what have you done?")
+        submission.score = 700
+        allow(submission).to receive(:late?).and_return(false)
+        submission.apply_late_policy(@late_policy, @assignment)
+
+        expect(submission.score).to eq 700
+        expect(submission.points_deducted).to eq 0
+      end
+    end
+
     it "does not round decimal places in the score" do
       Timecop.freeze(2.days.ago(@date)) do
         @assignment.submit_homework(@student, body: "a body")

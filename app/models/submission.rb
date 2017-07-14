@@ -1339,7 +1339,7 @@ class Submission < ActiveRecord::Base
     return unless late_policy_status_manually_applied? || incoming_assignment.expects_submission?
     late_policy ||= incoming_assignment.course.late_policy
     return score_missing(late_policy, incoming_assignment.points_possible, incoming_assignment.grading_type) if missing?
-    score_late_or_none(late_policy, incoming_assignment.points_possible) if score
+    score_late_or_none(late_policy, incoming_assignment.points_possible, incoming_assignment.grading_type) if score
   end
 
   def score_missing(late_policy, points_possible, grading_type)
@@ -1349,9 +1349,9 @@ class Submission < ActiveRecord::Base
   end
   private :score_missing
 
-  def score_late_or_none(late_policy, points_possible)
+  def score_late_or_none(late_policy, points_possible, grading_type)
     raw_score = score_changed? ? score : entered_score
-    deducted = late_points_deducted(raw_score, late_policy, points_possible)
+    deducted = late_points_deducted(raw_score, late_policy, points_possible, grading_type)
     new_score = raw_score - deducted
     self.points_deducted = deducted
     self.score = new_score
@@ -1367,9 +1367,12 @@ class Submission < ActiveRecord::Base
     assignment.score_to_grade(entered_score) if entered_score
   end
 
-  def late_points_deducted(raw_score, late_policy, points_possible)
-    return 0 unless late_policy && points_possible && late?
-    late_policy.points_deducted(score: raw_score, possible: points_possible, late_for: seconds_late)
+  def late_points_deducted(raw_score, late_policy, points_possible, grading_type)
+    return 0 unless late_policy && late?
+
+    late_policy.points_deducted(
+      score: raw_score, possible: points_possible, late_for: seconds_late, grading_type: grading_type
+    )
   end
   private :late_points_deducted
 
