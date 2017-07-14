@@ -100,5 +100,14 @@ module PlannerPageObject
   def todo_sidebar_modal
     f("div[aria-label = 'Add To Do']")
   end
+
+  def wait_for_spinner
+    fj("title:contains('Loading')", f('.PlannerApp')) # the loading spinner appears
+    expect(f('.PlannerApp')).not_to contain_css('title') # and disappears
+  end
+
+  def items_displayed
+    ff('li', f('.PlannerApp'))
+  end
 end
 
