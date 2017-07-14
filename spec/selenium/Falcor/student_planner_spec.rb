@@ -298,7 +298,7 @@ describe "student planner" do
 
     it "loads more items at the bottom of the page", priority: "1", test_id: 3263149 do
       go_to_list_view
-      current_last_item = fj("li:contains('Page10')", f('.PlannerApp'))
+      current_last_item = items_displayed.last
       current_items = items_displayed.count
       scroll_to(current_last_item)
       wait_for_spinner
