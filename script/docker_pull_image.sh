@@ -26,8 +26,16 @@
 # ```
 #
 
+# On a new installation, you will need some config files
+#cp docker-compose/config/* config/
+
 docker-compose down
 docker-compose pull web
 docker volume rm canvaslms_bundler canvaslms_canvas-docker-gems canvaslms_node_modules canvaslms_quizzes_node_modules canvaslms_selinimum_node_modules canvaslms_yarn-cache canvaslms_generated_1 canvaslms_generated_2 canvaslms_generated_3
 docker run --rm instructure/canvas-lms:master cat Gemfile.lock > Gemfile.lock
+
+# If this is the first time you've set this up, you instead need to run this:
+#docker-compose run --rm web bash -c "bundle; bundle exec rake db:create db:initial_setup"
+
+# If you are updating an existing installation, run this:
 docker-compose run --rm web bash -c "bundle; bundle exec rake db:migrate"
