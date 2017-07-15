@@ -139,7 +139,10 @@ define [
                  @submission?.entered_grade || '-'
 
       @setExcusedWithoutTriggeringSave(@submission?.excused)
-      @set 'value', GradeFormatHelper.formatGrade(newVal)
+      if @get('isPassFail')
+        @set 'value', newVal
+      else
+        @set 'value', GradeFormatHelper.formatGrade(newVal)
     ).observes('submission').on('init')
 
     onUpdateSuccess: (submission) ->

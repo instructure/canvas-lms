@@ -19,12 +19,15 @@
 define([
   'jquery',
   'submissions',
+  'helpers/fakeENV',
+  'jsx/gradebook/shared/helpers/GradeFormatHelper',
   'jquery.ajaxJSON'
-  ], ($, submissions) => {
+  ], ($, submissions, fakeENV, GradeFormatHelper) => {
 
   QUnit.module("submissions", {
     setup() {
       sinon.spy($, 'ajaxJSON');
+      fakeENV.setup();
       ENV.SUBMISSION = {
         user_id: 1,
         assignment_id: 27,
@@ -37,7 +40,7 @@ define([
         "  <div class='save_rubric_button'>"                  +
         "  </div>"                                            +
         "  <a class='update_submission_url'"                  +
-        "   href='my_url.com' title='POST'></a>"              +
+        "   href='submission_data_url.com' title='POST'></a>" +
         "  <textarea class='grading_value'>A</textarea>"      +
         "  <div class='submission_header'>"                   +
         "  </div>"                                            +
@@ -61,6 +64,7 @@ define([
     teardown() {
       $.ajaxJSON.restore();
       submissions.teardown();
+      fakeENV.teardown();
       $("#fixtures").html("");
     }
   });
@@ -68,7 +72,7 @@ define([
   test('comment_change posts to update_submission_url', ()=>{
     $(".grading_comment").val('Hello again.');
     $(document).triggerHandler('comment_change');
-    equal($.ajaxJSON.getCall(0).args[0], 'my_url.com');
+    equal($.ajaxJSON.getCall(0).args[0], 'submission_data_url.com');
     equal($.ajaxJSON.getCall(0).args[1], 'POST');
   });
 
@@ -89,7 +93,7 @@ define([
 
   test('grading_change posts to update_submission_url', ()=>{
     $(document).triggerHandler('grading_change');
-    equal($.ajaxJSON.getCall(0).args[0], 'my_url.com');
+    equal($.ajaxJSON.getCall(0).args[0], 'submission_data_url.com');
     equal($.ajaxJSON.getCall(0).args[1], 'POST');
   });
 

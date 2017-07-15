@@ -2432,7 +2432,11 @@ import './vendor/ui.selectmenu'
       const submission = EG.currentStudent.submission;
       const grade = EG.getGradeToShow(submission, ENV.grading_role);
 
-      $grade.val(grade.entered);
+      if (submission.grading_type === 'pass_fail' || ['complete', 'incomplete', 'pass', 'fail'].indexOf(submission.grade) > -1) {
+        $grade.val(submission.grade);
+      } else {
+        $grade.val(grade.entered);
+      }
 
       if (submission.points_deducted) {
         $deduction_box.html(
