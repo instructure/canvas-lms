@@ -245,7 +245,7 @@ define [
       else GRADEBOOK_TRANSLATIONS["submission_#{text}"]
 
   iconClassFromSubmission = (submission) ->
-    { pass: 'icon-check', complete: 'icon-check', fail: 'icon-x', incomplete: 'icon-x' }[submission.grade] || 'icon-undefined'
+    { pass: 'icon-check', complete: 'icon-check', fail: 'icon-x', incomplete: 'icon-x' }[submission.rawGrade] || 'icon-undefined'
 
   class SubmissionCell.pass_fail extends SubmissionCell
 
@@ -254,7 +254,7 @@ define [
       if submission.excused
         "EX"
       else
-        { pass: 'pass', complete: 'pass', fail: 'fail', incomplete: 'fail' }[submission.grade] || ''
+        { pass: 'pass', complete: 'pass', fail: 'fail', incomplete: 'fail' }[submission.rawGrade] || ''
 
     checkboxButtonTemplate = (iconClass) ->
       if _.isEmpty(iconClass)
@@ -309,12 +309,12 @@ define [
     transitionValue: (newValue) ->
       @$input
         .removeClass('gradebook-checkbox-pass gradebook-checkbox-fail')
-        .addClass('gradebook-checkbox-' + classFromSubmission(grade: newValue))
+        .addClass('gradebook-checkbox-' + classFromSubmission(rawGrade: newValue))
         .attr('aria-label', passFailMessage(newValue))
         .data('value', newValue)
       @$input.find('i')
         .removeClass()
-        .addClass(iconClassFromSubmission(grade: newValue))
+        .addClass(iconClassFromSubmission(rawGrade: newValue))
 
     loadValue: () ->
       @val = @opts.item[@opts.column.field].grade || ""

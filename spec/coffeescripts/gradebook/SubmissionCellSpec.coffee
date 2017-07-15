@@ -211,6 +211,14 @@ define [
     submissionCellResponse = SubmissionCell.pass_fail.formatter(0, 0, { grade: "complete" }, {}, {}, { tooltip: "dora_the_explorer" })
     ok submissionCellResponse.indexOf("dora_the_explorer") > -1
 
+  test "#pass_fail.formatter, uses rawGrade to determine cssClass", ->
+    submissionCellResponse = SubmissionCell.pass_fail.formatter(0, 0, { grade: "completo", rawGrade: "complete" }, {}, {}, { tooltip: "dora_the_explorer" })
+    ok submissionCellResponse.indexOf("gradebook-checkbox-pass") > -1
+
+  test "#pass_fail.formatter, uses rawGrade to determine iconClass", ->
+    submissionCellResponse = SubmissionCell.pass_fail.formatter(0, 0, { grade: "completo", rawGrade: "complete" }, {}, {}, { tooltip: "dora_the_explorer" })
+    ok submissionCellResponse.indexOf("icon-check") > -1
+
   QUnit.module "Pass/Fail SubmissionCell",
     setup: ->
       opts =

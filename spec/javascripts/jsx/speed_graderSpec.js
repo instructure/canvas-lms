@@ -371,6 +371,72 @@ define([
     equal(submitLinkScreenreaderText, 'Submit comment: test');
   });
 
+  QUnit.module('SpeedGrader#showGrade', {
+    setup () {
+      fakeENV.setup();
+      this.stub($, 'ajaxJSON');
+      this.spy($.fn, 'append');
+      this.originalWindowJSONData = window.jsonData;
+      window.jsonData = {
+        id: 27,
+        GROUP_GRADING_MODE: false,
+        points_possible: 10,
+        studentsWithSubmissions: []
+      };
+      SpeedGrader.EG.currentStudent = {
+        id: 4,
+        name: 'Guy B. Studying',
+        submission_state: 'not_graded',
+        submission: {
+          score: 7,
+          grade: 'complete',
+          entered_grade: 'A',
+          submission_comments: []
+        }
+      };
+      ENV.SUBMISSION = {
+        grading_role: 'teacher'
+      };
+      ENV.RUBRIC_ASSESSMENT = {
+        assessment_type: 'grading',
+        assessor_id: 1
+      };
+
+      const gradeContainerHtml = `
+        <div id="grade_container">
+          <a class="update_submission_grade_url" href="my_url.com" title="POST"></a>
+          <input class="grading_value" value="56" />
+          <div id="combo_box_container"></div>
+          <div id="comments">
+          </div>
+        </div>
+      `;
+
+      $('#fixtures').html(gradeContainerHtml);
+    },
+
+    teardown () {
+      $('#fixtures').empty();
+      window.jsonData = this.originalWindowJSONData;
+      fakeENV.teardown();
+    }
+  });
+
+  test('uses submission#grade for pass_fail assignments', function () {
+    this.stub(SpeedGrader.EG, 'updateStatsInHeader');
+    const $grade = this.stub($.fn, 'val');
+    SpeedGrader.EG.showGrade();
+    ok($grade.calledWith('complete'));
+  });
+
+  test('uses submission#entered_grade for other types of assignments', function () {
+    this.stub(SpeedGrader.EG, 'updateStatsInHeader');
+    const $grade = this.stub($.fn, 'val');
+    SpeedGrader.EG.currentStudent.submission.grade = 'B';
+    SpeedGrader.EG.showGrade();
+    ok($grade.calledWith('A'));
+  });
+
   QUnit.module('SpeedGrader#handleGradeSubmit', {
     setup () {
       fakeENV.setup();
