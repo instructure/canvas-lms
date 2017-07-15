@@ -19,7 +19,7 @@
 import Gradebook from 'compiled/gradezilla/Gradebook';
 
 export function createGradebook (options = {}) {
-  return new Gradebook({
+  const gradebook = new Gradebook({
     colors: {},
     context_id: '1',
     post_grades_ltis: [],
@@ -30,6 +30,12 @@ export function createGradebook (options = {}) {
     },
     ...options
   });
+  gradebook.keyboardNav = {
+    addGradebookElement () {},
+    removeGradebookElement () {}
+  };
+
+  return gradebook;
 }
 
 export default {

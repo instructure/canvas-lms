@@ -1886,7 +1886,7 @@ import 'compiled/jquery.rails_flash_notifications'
     // need the assignment data to check past due state
     modules.updateAssignmentData(function() {
       modules.updateProgressions(function() {
-        if (window.location.hash) {
+        if (window.location.hash && !window.location.hash.startsWith('#!')) {
           $.scrollTo($(window.location.hash));
         }
       });
@@ -1978,7 +1978,7 @@ import 'compiled/jquery.rails_flash_notifications'
     $(document).fragmentChange(function(event, hash) {
       if (hash == '#student_progressions') {
         $(".module_progressions_link").trigger('click');
-      } else {
+      } else if (!hash.startsWith('#!')) {
         var module = $(hash.replace(/module/, "context_module"));
         if (module.hasClass('collapsed_module')) {
           module.find(".expand_module_link").triggerHandler('click');

@@ -420,7 +420,9 @@ module AccountReports
                 cs.sis_source_id AS course_section_sis_id,
                 pseudonyms.sis_user_id AS pseudonym_sis_id,
                 ob.sis_user_id AS ob_sis_id,
-                CASE WHEN enrollments.workflow_state = 'invited' THEN 'invited'
+                CASE WHEN cs.workflow_state = 'deleted' THEN 'deleted'
+                     WHEN courses.workflow_state = 'deleted' THEN 'deleted'
+                     WHEN enrollments.workflow_state = 'invited' THEN 'invited'
                      WHEN enrollments.workflow_state = 'creation_pending' THEN 'invited'
                      WHEN enrollments.workflow_state = 'active' THEN 'active'
                      WHEN enrollments.workflow_state = 'completed' THEN 'concluded'

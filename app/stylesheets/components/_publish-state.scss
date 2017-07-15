@@ -70,11 +70,7 @@ The publish button has two states on click (publish and published) and a hover s
   }
   i:before {
     @include fontSize(18px);
-  }
-}
-.btn-publish {
-  i:before {
-    color: #bbb;
+    color: inherit;
   }
 }
 

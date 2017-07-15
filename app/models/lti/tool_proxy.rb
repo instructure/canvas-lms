@@ -27,6 +27,8 @@ module Lti
     belongs_to :context, polymorphic: [:course, :account]
     belongs_to :product_family, class_name: 'Lti::ProductFamily'
 
+    scope :active, -> { where("lti_tool_proxies.workflow_state = ?", 'active') }
+
     serialize :raw_data
     serialize :update_payload
 
@@ -36,6 +38,12 @@ module Lti
 
     def active_in_context?(context)
       self.class.find_active_proxies_for_context(context).include?(self)
+    end
+
+    def self.find_active_proxies_for_context_by_vendor_code_and_product_code(context:, vendor_code:, product_code:)
+      find_active_proxies_for_context(context)
+        .eager_load(:product_family)
+        .where('lti_product_families.vendor_code = ? AND lti_product_families.product_code = ?', vendor_code, product_code)
     end
 
     def self.find_active_proxies_for_context(context)
@@ -80,5 +88,23 @@ module Lti
       ims_tool_proxy.enabled_capabilities
     end
 
+    def matching_tool_profile?(other_profile)
+      profile = raw_data['tool_profile']
+
+      return false if profile.dig('product_instance', 'product_info', 'product_family', 'vendor', 'code') !=
+        other_profile.dig('product_instance', 'product_info', 'product_family', 'vendor', 'code')
+
+      return false if profile.dig('product_instance', 'product_info', 'product_family', 'code') !=
+        other_profile.dig('product_instance', 'product_info', 'product_family', 'code')
+
+      resource_handlers = profile['resource_handler']
+      other_resource_handlers = other_profile['resource_handler']
+
+      rh_names = resource_handlers.map { |rh| rh.dig('resource_type', 'code') }
+      other_rh_names = other_resource_handlers.map { |rh| rh.dig('resource_type', 'code') }
+      return false if rh_names.sort != other_rh_names.sort
+
+      true
+    end
   end
 end

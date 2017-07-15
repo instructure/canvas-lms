@@ -273,6 +273,51 @@ module Lti
         expect(response).to be_ok
       end
 
+      context 'resource_url' do
+        let(:custom_url) { 'http://www.samplelaunch.com/custom-resource-url' }
+        let(:link_id) { SecureRandom.uuid }
+        let(:tool_setting) do
+          ToolSetting.create!(tool_proxy: tool_proxy,
+                              context: course,
+                              resource_link_id: link_id,
+                              vendor_code: product_family.vendor_code,
+                              product_code: product_family.product_code,
+                              resource_type_code: resource_handler.resource_type_code,
+                              resource_url: custom_url)
+        end
+
+        it "uses the 'resource_url' if provided in the 'link_id'" do
+          get 'resource', account_id: account.id, resource_link_id: link_id
+          expect(assigns[:lti_launch].resource_url).to eq custom_url
+        end
+
+        it "responds with 400 if host name does not match" do
+          message_handler.update_attributes(launch_path: 'http://www.different.com')
+          get 'resource', account_id: account.id, resource_link_id: link_id
+          expect(response).to be_bad_request
+        end
+      end
+
+      context 'assignment' do
+        let(:assignment) { course.assignments.create!(name: 'test') }
+
+        before { tool_proxy.update_attributes(context: course) }
+
+        it 'finds the specified assignment' do
+          get 'resource', course_id: course.id,
+                          assignment_id: assignment.id,
+                          resource_link_id: link_id
+          expect(assigns[:_assignment]).to eq assignment
+        end
+
+        it 'renders not found if assignment does not exist' do
+          get 'resource', course_id: course.id,
+                          assignment_id: assignment.id + 1,
+                          resource_link_id: link_id
+          expect(response).to be_not_found
+        end
+      end
+
       context 'search account chain' do
         let(:root_account) { Account.create! }
 

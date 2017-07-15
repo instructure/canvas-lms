@@ -62,30 +62,25 @@ describe "outcome gradezilla" do
 
         expect(ff('.outcome-student-cell-content')).to have_size 3
 
-        choose_section = ->(name) do
-          fj('.section-select-button:visible').click
-          fj(".section-select-menu:visible a:contains('#{name}')").click
-        end
+        click_option('[data-component="SectionFilter"] select', 'All Sections')
+        selected_section_name = ff('option', f('[data-component="SectionFilter"] select')).find(&:selected?)
+        expect(selected_section_name).to include_text("All Sections")
 
-        choose_section.call "All Sections"
-        expect(fj('.section-select-button:visible')).to include_text("All Sections")
-
-        choose_section.call @other_section.name
-        expect(fj('.section-select-button:visible')).to include_text(@other_section.name)
+        click_option('[data-component="SectionFilter"] select', @other_section.name)
+        selected_section_name = ff('option', f('[data-component="SectionFilter"] select')).find(&:selected?)
+        expect(selected_section_name).to include_text(@other_section.name)
 
         expect(ff('.outcome-student-cell-content')).to have_size 1
 
         # verify that it remembers the section to show across page loads
         Gradezilla.visit(@course)
-        expect(fj('.section-select-button:visible')).to include_text @other_section.name
+        selected_section_name = ff('option', f('[data-component="SectionFilter"] select')).find(&:selected?)
+        expect(selected_section_name).to include_text(@other_section.name)
         expect(ff('.outcome-student-cell-content')).to have_size 1
 
         # now verify that you can set it back
 
-        fj('.section-select-button:visible').click
-        expect(fj('.section-select-menu:visible')).to be_displayed
-        f(".outcome-gradebook-container label[for='section_option_']").click
-        expect(fj('.section-select-button:visible')).to include_text "All Sections"
+        click_option('[data-component="SectionFilter"] select', 'All Sections')
 
         expect(ff('.outcome-student-cell-content')).to have_size 3
       end

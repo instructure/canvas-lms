@@ -150,7 +150,7 @@ import './jquery.templateData'
           .dialog('open');
         $dialog.triggerHandler('dialogresize');
         var url = $.replaceTags($("#select_content_resource_selection_url").attr('href'), 'id', tool.definition_id);
-        url = url + '?placement=' + placement_type;
+        url = url + '?placement=' + placement_type + '&secure_params=' + $('#secure_params').val();
         $dialog.find("iframe").attr('src', url);
         $(window).on('beforeunload', beforeUnloadHandler);
       } else {
@@ -351,6 +351,9 @@ import './jquery.templateData'
               submit(item_data);
             };
 
+            //Force the new assignment to set post_to_sis to false so that possible
+            //account validations do not prevent saving
+            data['assignment[post_to_sis]'] = false
             if(item_data['item[type]'] == 'attachment') {
               data['duplicate_handling'] = 'rename';
               $.ajaxJSONFiles(url, 'POST', data, $("#module_attachment_uploaded_data"), function(data) {

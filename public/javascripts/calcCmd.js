@@ -16,10 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'i18n!calculator.command',
-  'jquery' /* $ */
-], function(I18n, $) {
+import I18n from 'i18n!calculator.command'
+
+
 
   var calcCmd = {};
 
@@ -525,5 +524,4 @@ define([
     f('e', function(x) { return Math.exp(x || 1); }, I18n.t('e.description', "Returns the value for e"), "e()");
   })();
 
-  return calcCmd;
-});
+export default calcCmd;

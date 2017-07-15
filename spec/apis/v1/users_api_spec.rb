@@ -1893,8 +1893,9 @@ describe "Users API", type: :request do
         uo.user_id = @student.id
       end
       @user = @observer
+      due_date = 2.days.ago
       2.times do
-        @course.assignments.create!(due_at: 2.days.ago, workflow_state: 'published', submission_types: "online_text_entry")
+        @course.assignments.create!(due_at: due_date, workflow_state: 'published', submission_types: "online_text_entry")
       end
       @path = "/api/v1/users/#{@student.id}/missing_submissions"
       @params = {controller: "users", action: "missing_submissions", user_id: @student.id, format: "json"}
@@ -1903,6 +1904,12 @@ describe "Users API", type: :request do
     it "should return unsubmitted assignments due in the past" do
       json = api_call(:get, @path, @params)
       expect(json.length).to eql 2
+    end
+
+    it "should return course information if requested" do
+      @params['include'] = ['course']
+      json = api_call(:get, @path, @params)
+      expect(json.first['course']['name']).to eq(@course.name)
     end
 
     it "should not return submitted assignments due in the past" do
@@ -1915,6 +1922,32 @@ describe "Users API", type: :request do
       ungraded = @course.assignments.create! due_at: 2.days.from_now, workflow_state: 'published', submission_types: 'not_graded'
       json = api_call(:get, @path, @params)
       expect(json.map { |a| a['id'] }).not_to include ungraded.id
+    end
+
+    it "should show assignments past their due dates because of overrides" do
+      assignment_with_override(course: @course, due_at: 1.day.from_now, submission_types: ['online_text_entry'])
+      @override.due_at_overridden = true
+      @override.due_at = 1.day.ago
+      @override.save!
+      json = api_call(:get, @path, @params)
+      expect(json.length).to eq 3
+      expect(json.last["id"]).to eq @assignment.id
+      expect(json.last["due_at"]).to eq @override.due_at.iso8601
+    end
+
+    it "should not show assignments past their due dates if the user is not assigned" do
+      add_section('Section 1')
+      differentiated_assignment(course: @course, course_section: @course_section, due_at: 1.day.ago,
+        submission_types: ['online_text_entry'], only_visible_to_overrides: true)
+      json = api_call(:get, @path, @params)
+      expect(json.length).to eq 2
+    end
+
+    it "should not show deleted assignments" do
+      a = @course.assignments.create!(due_at: 2.days.ago, workflow_state: 'published', submission_types: "online_text_entry")
+      a.destroy
+      json = api_call(:get, @path, @params)
+      expect(json.map {|i| i["id"]}).not_to be_include a.id
     end
   end
 end

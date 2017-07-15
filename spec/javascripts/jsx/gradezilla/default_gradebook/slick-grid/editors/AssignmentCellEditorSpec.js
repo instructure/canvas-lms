@@ -28,11 +28,25 @@ QUnit.module('AssignmentCellEditor', {
       points_possible: 10
     };
     this.$fixtures = document.querySelector('#fixtures');
+    const getSubmissionTrayState = () => ({ open: false, studentId: '1101', assignmentId: '2301' });
+    this.gridSupport = {
+      events: {
+        onKeyDown: {
+          subscribe () {},
+          unsubscribe () {}
+        }
+      }
+    };
     this.options = {
       column: {
+        assignmentId: '2301',
         field: 'assignment_2301',
+        getGridSupport: () => this.gridSupport,
         object: assignment,
-        propFactory: new AssignmentRowCellPropFactory(assignment, { options: {} })
+        propFactory: new AssignmentRowCellPropFactory(
+          assignment,
+          { options: {}, getSubmissionTrayState, toggleSubmissionTrayOpen () {} }
+        )
       },
       grid: {
         onKeyDown: {
@@ -41,6 +55,7 @@ QUnit.module('AssignmentCellEditor', {
         }
       },
       item: { // student row object
+        id: '1101',
         assignment_2301: { // submission
           user_id: '1101'
         }
@@ -79,6 +94,14 @@ test('includes editor options in AssignmentRowCell props', function () {
   equal(this.editor.component.props.editorOptions, this.editor.options);
 });
 
+test('subscribes to gridSupport.events.onKeyDown', function () {
+  this.spy(this.gridSupport.events.onKeyDown, 'subscribe');
+  this.createEditor();
+  strictEqual(this.gridSupport.events.onKeyDown.subscribe.callCount, 1, 'calls grid.onKeyDown.subscribe');
+  const [handleKeyDown] = this.gridSupport.events.onKeyDown.subscribe.lastCall.args;
+  equal(handleKeyDown, this.editor.handleKeyDown, 'subscribes using the editor handleKeyDown function');
+});
+
 test('#handleKeyDown delegates to the AssignmentRowCell component', function () {
   this.createEditor();
   this.spy(this.editor.component, 'handleKeyDown');
@@ -96,18 +119,26 @@ test('#handleKeyDown passes the event when delegating handleKeyDown', function (
   equal(event, keyboardEvent);
 });
 
+test('#handleKeyDown returns the return value from the AssignmentRowCell component', function () {
+  this.createEditor();
+  this.stub(this.editor.component, 'handleKeyDown').returns(true);
+  const keyboardEvent = new KeyboardEvent('example');
+  const returnValue = this.editor.handleKeyDown(keyboardEvent);
+  strictEqual(returnValue, true);
+});
+
 test('#destroy removes the reference to the AssignmentRowCell component', function () {
   this.createEditor();
   this.editor.destroy();
   strictEqual(this.editor.component, null);
 });
 
-test('#destroy unsubscribes from grid.onKeyDown', function () {
+test('#destroy unsubscribes from gridSupport.events.onKeyDown', function () {
   this.createEditor();
-  this.spy(this.options.grid.onKeyDown, 'unsubscribe');
+  this.spy(this.gridSupport.events.onKeyDown, 'unsubscribe');
   this.editor.destroy();
-  strictEqual(this.options.grid.onKeyDown.unsubscribe.callCount, 1, 'calls grid.onKeyDown.unsubscribe');
-  const [handleKeyDown] = this.options.grid.onKeyDown.unsubscribe.lastCall.args;
+  strictEqual(this.gridSupport.events.onKeyDown.unsubscribe.callCount, 1, 'calls grid.onKeyDown.unsubscribe');
+  const [handleKeyDown] = this.gridSupport.events.onKeyDown.unsubscribe.lastCall.args;
   equal(handleKeyDown, this.editor.handleKeyDown, 'unsubscribes using the editor handleKeyDown function');
 });
 
@@ -148,6 +179,13 @@ test('#loadValue delegates to the AssignmentRowCell component', function () {
   strictEqual(this.editor.component.loadValue.callCount, 1);
   const [value] = this.editor.component.loadValue.lastCall.args;
   strictEqual(value, '9.7');
+});
+
+test('#loadValue renders the component', function () {
+  this.createEditor();
+  this.stub(this.editor, 'renderComponent');
+  this.editor.loadValue('9.7');
+  strictEqual(this.editor.renderComponent.callCount, 1);
 });
 
 test('#applyValue delegates to the AssignmentRowCell component', function () {

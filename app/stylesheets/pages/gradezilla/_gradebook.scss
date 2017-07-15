@@ -36,35 +36,115 @@ a#accessibility_warning {
   outline: 0;
 }
 
+$row-height: 35px;
 $cell_height: 33px;
-$header_height: 38px;
+$header-height: 38px;
+$header-content-height: $header-height - 2px; // subtract border
 
-// ******* overrides of the default slick.grid.css styles ********
-.slick-sort-indicator {
-  position: absolute;
-  bottom: 4px;
-  left: 0px;
+$grid-border-color: #c7cdd1;
+$active-border-color: #1790df;
+
+$gradebook_cell_padding_top: 8px;
+
+/* GridSupport Styles */
+
+.slick-row .slick-cell.active.primary-column {
+  border: 1px solid $active-border-color;
+  height: $row-height - 2px;
+}
+
+.slick-row .slick-cell.active:not(.primary-column) {
+  border: 2px solid $active-border-color;
+  height: $row-height - 4px;
+}
+
+.slick-row.active .slick-cell.primary-column {
+  background-color: $ic-bg-light-primary;
 }
 
 .container_0,
 .container_1 {
-  .slick-cell {
-    border-bottom: 1px dotted #ccc;
-    border-right: 1px dotted #ccc;
+  .slick-header.ui-state-default { // header container with full width of grid
+    background: transparent;
+    border: none;
+  }
+
+  .slick-cell { // each cell of the body
+    border-bottom: 1px solid $grid-border-color;
+    border-right: 1px solid $grid-border-color;
     padding: 0;
     overflow: visible;
+
     &.editable {
       background: transparent;
-      border: none;
     }
   }
 }
 
-#gradebook_grid .slick-cell.meta-cell {
-  padding: 0;
+.container_0 {
+  .slick-header-column:first-child {
+    border-left: 1px solid $grid-border-color;
+    padding-left: 0px;
+  }
+
+  .slick-cell:first-child {
+    border-left: 1px solid $grid-border-color;
+  }
 }
 
-// ******* END overrides of the default slick.grid.css styles ********
+.slick-cell {
+  &.active {
+    box-shadow: 0 0.1875rem 0.375rem rgba(0, 0, 0, 0.1), 0 0.1875rem 0.375rem rgba(0, 0, 0, 0.16);
+    z-index: 5;
+
+    &.assignment-group-cell .gradebook-cell {
+      padding-top: $gradebook_cell_padding_top - 1px; // subtract extra 1px top border
+    }
+
+    &.total_grade .gradebook-cell {
+      padding-top: $gradebook_cell_padding_top - 1px; // subtract extra 1px top border
+    }
+
+    &.assignment .gradebook-cell {
+      padding-top: $gradebook_cell_padding_top - 2px; // subtract 2px top border
+      height: $row-height - $gradebook_cell_padding_top - 3px;
+
+      &.gradebook-cell-out-of-formatter {
+        height: $row-height - 4px;
+        padding-top: 0;
+      }
+    }
+  }
+
+  &:not(.active) {
+    &.assignment .gradebook-cell {
+      padding-top: $gradebook_cell_padding_top - 1px; // subtract extra 1px top border
+    }
+  }
+
+  &.custom_column {
+    &:not(.active) {
+      border-top: 0;
+      height: $row-height - 4px;
+      padding-top: 2px;
+      padding-bottom: 1px;
+    }
+  }
+}
+
+.slick-row.active {
+  .slick-cell:not(.active) {
+    &.custom_column {
+      height: $row-height - 4px;
+      padding-top: 1px;
+      padding-bottom: 1px;
+    }
+  }
+}
+
+.slick-cell.meta-cell {
+  padding: 0;
+}
 
 .gradebook .ic-Layout-contentMain {
   position: relative;
@@ -82,16 +162,6 @@ $header_height: 38px;
 
 .student-grades-link {
   @if $use_high_contrast { color: darken($ic-link-color, 5%); }
-}
-
-.meta-cell .avatar {
-  width: 25px;
-  height: 25px;
-  margin-top: 3px;
-  margin-right: 4px;
-  float: left;
-  position: relative;
-  z-index: 1;
 }
 
 .student-placeholder {
@@ -112,9 +182,6 @@ $header_height: 38px;
 
 // show and hide student names using a parent css class.
 .hide-students {
-  .student-name, .avatar {
-    display: none;
-  }
   .student-placeholder {
     display: block;
   }
@@ -129,21 +196,29 @@ $header_height: 38px;
 }
 
 .slick-header-column {
-  background-color: #f3f4f8;
+  background-color: $ic-bg-light-neutral;
   background-image: none;
-  padding: 10px;
   @include fontSize(12px);
   text-align: center;
   font-weight: normal;
+
   // override jqueryUI style
   &.ui-state-default {
-    height: 30px;
+    border-top: 1px solid $grid-border-color;
+    border-right: 1px solid $grid-border-color;
+    border-bottom: 1px solid $grid-border-color;
+    border-left: none;
+    height: $header-content-height;
+    padding-bottom: 0;
+    padding-left: 1px;
+    padding-right: 0;
+    padding-top: 0;
   }
-  &.hovered-column,
-  &.slick-header-column-active,
+
+  &.hovered-column, // an element in the column is being hovered
+  &.slick-header-column-active, // the column is being dragged or resized
   &.ui-state-hover {
-    @if $use_high_contrast { @include vertical-gradient(#eef5fc, #d5e2ed); }
-    @else { @include vertical-gradient(#e0ecf9, #bdd2e3); }
+    background-color: $ic-bg-light-primary;
   }
   .slick-column-name {
     font-weight: bold;
@@ -157,12 +232,9 @@ $header_height: 38px;
   }
 
   .Gradebook__ColumnHeaderContent {
-    bottom: 0;
     display: flex;
-    left: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
+    width: 100%;
+    height: 36px;
   }
 
   .Gradebook__ColumnHeaderDetail,
@@ -229,14 +301,33 @@ $header_height: 38px;
   border: none;
 }
 
+.slick-row {
+  &.active {
+    .slick-cell:not(.active) {
+      border-bottom: 1px solid $active-border-color;
+      border-top: 1px solid $active-border-color;
+      height: $row-height - 2px; // subtract top and bottom border
+    }
+
+    .slick-cell.primary-column {
+      border-left: 1px solid $active-border-color;
+      border-right: 1px solid $active-border-color;
+      height: $row-height - 2px; // subtract top and bottom border
+    }
+  }
+}
+
+.container_1 {
+  .slick-row.active {
+    .slick-cell:not(.active):last-child {
+      border-right: 1px solid $active-border-color;
+    }
+  }
+}
+
 // my styles
 .slick-row.ui-state-active  .slick-cell {
   background-color: #dfe9f2;
-}
-
-.slick-row.ui-state-active .slick-cell.selected {
-  @include vertical-gradient(#d7eaf9, #bedff6);
-  background-color: #ccddff;
 }
 
 .slick-cell div.cell-content {
@@ -244,13 +335,8 @@ $header_height: 38px;
   vertical-align: middle;
 }
 
-.slick-cell {
-  // we're adding this further in
-  // border-right: none
-}
-
 .slick-cell.editable {
-  border-color: #2fa1ff;
+  border-color: $active-border-color;
 }
 
 .slick-cell.ungraded {
@@ -261,38 +347,22 @@ $header_height: 38px;
 @mixin first-row-tooltip() {
   top: 35px;
   &:after {
+    display: none;
+  }
+  &:before {
+    border-color: #444444 transparent;
+    border-style: solid;
+    border-width: 5px 5px 0;
+    position: absolute;
+    width: 0;
+    left: 15px;
+    content: "";
     border-top-color: transparent;
     border-left-color: transparent;
     border-right-color: transparent;
     border-bottom: 5px solid #444444;
-    bottom: 30px;
+    top: -10px;
   }
-}
-
-// We need both visibility and opacity because visibility is binary but opacity will allow fading in/out
-@keyframes fade-in-and-out {
-  0%   { opacity: 0; visibility: hidden; }
-  1%   { opacity: 0; visibility: visible; }
-  75%  { opacity: 1; visibility: visible; }
-  100% { opacity: 0; visibility: hidden; }
-}
-@-o-keyframes fade-in-and-out {
-  0%   { opacity: 0; visibility: hidden; }
-  1%   { opacity: 0; visibility: visible; }
-  75%  { opacity: 1; visibility: visible; }
-  100% { opacity: 0; visibility: hidden; }
-}
-@-moz-keyframes fade-in-and-out {
-  0%   { opacity: 0; visibility: hidden; }
-  1%   { opacity: 0; visibility: visible; }
-  75%  { opacity: 1; visibility: visible; }
-  100% { opacity: 0; visibility: hidden; }
-}
-@-webkit-keyframes fade-in-and-out {
-  0%   { opacity: 0; visibility: hidden; }
-  1%   { opacity: 0; visibility: visible; }
-  75%  { opacity: 1; visibility: visible; }
-  100% { opacity: 0; visibility: hidden; }
 }
 
 .gradebook-tooltip {
@@ -307,6 +377,7 @@ $header_height: 38px;
   font-size: 0.8em;
   left: 0;
   top: -30px;
+  line-height: 1rem;
   &:after {
     border-color: #444444 transparent;
     border-style: solid;
@@ -324,17 +395,13 @@ $header_height: 38px;
   .slick-cell.active &, .slick-cell.editable & {
     visibility: visible;
     opacity: 1;
-    -webkit-animation: fade-in-and-out 2s 1 forwards;
-    -moz-animation: fade-in-and-out 2s 1 forwards;
-    -o-animation: fade-in-and-out 2s 1 forwards;
-    animation: fade-in-and-out 2s 1 forwards;
   }
   &.first-row {
     @include first-row-tooltip();
   }
 }
 
-.slick-row:first-child {
+.slick-row.first-row {
   .gradebook-tooltip {
     @include first-row-tooltip();
   }
@@ -363,14 +430,13 @@ $header_height: 38px;
   }
 }
 
-$gradebook_cell_padding_top: 8px;
-
 .gradebook-cell {
   padding-top: $gradebook_cell_padding_top;
   height: $cell_height - $gradebook_cell_padding_top;
   position: relative;
   text-align: center;
   border: none;
+
   &.grayed-out {
     background-color: $grayLighter;
   }
@@ -401,26 +467,30 @@ $gradebook_cell_padding_top: 8px;
   &.failure-score {
     background-image: url(/images/turnitin_failure_score.png);
   }
+  &.pending-score {
+    background-image: url(/images/turnitin_submission_pending.png);
+  }
+  &.error-score {
+    background-image: url(/images/turnitin_submission_error.png);
+  }
 }
 
 .gradebook-cell-editable {
-  height: $cell_height - 1px -8px;
+  height: $cell_height - 8px;
   padding-top: 8px;
   margin: 0;
-  border: 1px solid #35a5e5;
   background-color: white;
-  box-shadow: 0 0 5px rgba(81, 203, 238, 1);
 }
 
-#gradebook_grid .slick-cell {
+.slick-cell {
   z-index: auto;
+
   &.active {
     background-color: inherit;
     z-index: 5;
-    border: 1px solid #35a5e5;
+
     &.editable {
       top: 0;
-      border: 0;
     }
   }
 }
@@ -447,13 +517,15 @@ $gradebook_cell_padding_top: 8px;
 
 .gradebook-cell-out-of-formatter {
   padding-top: 0;
-  height: $cell_height - 1px;
+  height: $cell_height;
+
   .overflow-wrapper {
     overflow: hidden;
     position: relative;
     width: 100%;
-    height: $cell_height - 1px;
+    height: $cell_height;
   }
+
   .grade-and-outof-wrapper {
     position: absolute;
     top: 50%;
@@ -508,6 +580,7 @@ $gradebook_checkbox_size: 16px;
 
 .Grid__AssignmentRowCell__Notifications {
   flex-grow: 0;
+  flex-shrink: 0;
   width: $cell_height;
 }
 
@@ -517,7 +590,15 @@ $gradebook_checkbox_size: 16px;
 
 .Grid__AssignmentRowCell__Options {
   flex-grow: 0;
+  flex-shrink: 0;
   width: $cell_height;
+}
+
+.slick-cell.active {
+  .Grid__AssignmentRowCell {
+    height: $row-height - 4px;
+    line-height: $row-height - 4px;
+  }
 }
 
 #hide_warning {
@@ -726,18 +807,45 @@ $gradebook_checkbox_size: 16px;
 
 .Gradebook__StatusModalList {
   margin: 0px;
-  width: 225px;
   list-style-type: none;
 }
 
-#late-policies-tab-panel-loading {
-  min-height: 30rem;
+.ComingSoonContent__Container {
   text-align: center;
 }
 
-#late-policies-tab-panel {
+.ComingSoonContent__Body {
+  display: inline-block;
+  margin-top: 2rem;
+}
+
+#LatePoliciesTabPanel__Container-noContent {
+  text-align: center;
+  min-height: 30rem;
+}
+
+#LatePoliciesTabPanel__Container {
   min-height: 30rem;
   display: flex;
   justify-content: space-around;
   flex-direction: column;
+}
+
+.SubmissionTray__Container {
+  padding: 1.5rem;
+  width: 18.75rem;
+}
+
+.SubmissionCell__IconExpand {
+  height: 1.1rem;
+  width: 2rem;
+  background-repeat: no-repeat;
+
+  &.SubmissionCell__IconExpand-right {
+    background-image: url("/images/svg-icons/svg_icon_expand_right.svg");
+  }
+
+  &.SubmissionCell__IconExpand-left {
+    background-image: url("/images/svg-icons/svg_icon_expand_left.svg");
+  }
 }

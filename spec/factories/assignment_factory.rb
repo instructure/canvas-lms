@@ -47,11 +47,12 @@ module Factories
   end
 
   def differentiated_assignment(opts={})
+    course_section = opts.delete(:course_section)
     @assignment = opts[:assignment] || assignment_model(opts)
     @assignment.only_visible_to_overrides = true
     @assignment.save!
     @override = @assignment.assignment_overrides.build
-    @override.set = opts[:course_section] || @course.default_section
+    @override.set = course_section || @course.default_section
     @override.save!
     @override
   end

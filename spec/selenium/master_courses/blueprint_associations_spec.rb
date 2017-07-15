@@ -16,64 +16,72 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
+
+require_relative '../common'
 require_relative '../helpers/blueprint_common'
 
-describe "master courses sidebar" do
-  include_context "in-process server selenium tests"
+describe "Blueprint association settings" do
 
-  # copied from spec/apis/v1/master_templates_api_spec.rb
-  def run_master_migration
-    @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @master_teacher)
-    run_jobs
-    @migration.reload
-  end
+  include_context "in-process server selenium tests"
+  include BlueprintCourseCommon
 
   before :once do
     Account.default.enable_feature!(:master_courses)
-    @master = course_factory(active_all: true)
-    @master_teacher = @teacher
-    @template = MasterCourses::MasterTemplate.set_as_master_course(@master)
-    @minion = @template.add_child_course!(course_factory(name: "Minion", active_all: true)).child_course
-    @minion.enroll_teacher(@master_teacher).accept!
+    account_admin_user(active_all: true)
 
-    # sets up the assignment that gets blueprinted
-    @original_assmt = @master.assignments.create! title: 'Blah', points_possible: 10, due_at: 5.days.from_now, description: 'this is the original content'
-    run_master_migration
-    @copy_assmt = @minion.assignments.last
+    @master = course_factory(active_all: true)
+    @template = MasterCourses::MasterTemplate.set_as_master_course(@master)
+
+    @minion1 = @template.add_child_course!(course_factory(course_name: "Minion", active_all: true)).child_course
+    @minion2 = @template.add_child_course!(course_factory(course_name: "Minion2", active_all: true)).child_course
+    @minion3 = course_factory(course_name: "minion3", active_all: true)
+    @minion4 = course_factory(course_name: "minion4", active_all: true)
+
+    create_sub_account
+
   end
 
-  describe "as a master course teacher" do
-    include BlueprintCourseCommon
-    before :each do
-      user_session(@master_teacher)
+  def create_sub_account(name = 'sub account', number_to_create = 1, parent_account = Account.default)
+    created_sub_accounts = []
+    number_to_create.times do |i|
+      sub_account = Account.create(:name => name + " #{i}", :parent_account => parent_account)
+      created_sub_accounts.push(sub_account)
+    end
+    created_sub_accounts.count == 1 ? created_sub_accounts[0] : created_sub_accounts
+  end
+
+  before :each do
+    user_session(@admin)
+    get "/courses/#{@master.id}"
+  end
+
+  context "in the blueprint association settings" do
+
+    it "courses show in the 'To be Added' area", priority: "2", test_id: 3077486 do
+      open_associations
+      open_courses_list
+      f('.bca-table__course-row').find_element(xpath: 'td/label/span').click
+      expect(fj("span:contains('To be Added')")).to be
+      element = f('.bca-associations-table')
+      element = element.find_element(css: "form[data-course-id=\"#{@minion3.id}\"]")
+      expect(element).to be
     end
 
-    it "locks down the associated course's assignment fields", priority: "1", test_id: 3127590 do
-      change_blueprint_settings(@master, points: true, due_dates: true, availability_dates: true)
-      get "/courses/#{@master.id}/assignments/#{@original_assmt.id}"
-      f('.bpc-lock-toggle button').click
-      expect { f('.bpc-lock-toggle__label').text }.to become('Locked')
-      run_master_migration
-      get "/courses/#{@minion.id}/assignments/#{@copy_assmt.id}/edit"
-      expect(f('#mceu_24')).not_to be nil
-      expect(f('.bpc-lock-toggle__label').text).to eq('Locked')
-      expect(f('#assignment_points_possible').attribute('readonly')).to be_truthy
-      expect(f('#due_at').attribute('readonly')).to be_truthy
-      expect(f('#unlock_at').attribute('readonly')).to be_truthy
-      expect(f('#lock_at').attribute('readonly')).to be_truthy
+    it "leaving the search bar shouldn't close the courses tab", priority: "2", test_id: 3096112 do
+      open_associations
+      open_courses_list
+      element = f('input', f('.bca-course-filter')) # .find_element(css: 'input')
+      element.send_keys("Minion")
+      f('h3', f('.bca__wrapper')).click # click away from the search bar
+      expect(f('.bca-table__wrapper')).to be_displayed
     end
 
-    it "locks down the associated course's assignment content and show banner", priority: "2", test_id: 3127585 do
-      change_blueprint_settings(@master, content: true)
-      get "/courses/#{@master.id}/assignments/#{@original_assmt.id}"
-      f('.bpc-lock-toggle button').click
-      expect { f('.bpc-lock-toggle__label').text }.to become('Locked')
-      expect(f('#blueprint-lock-banner')).to include_text('Content')
-      run_master_migration
-      get "/courses/#{@minion.id}/assignments/#{@copy_assmt.id}/edit"
-      expect(f('#edit_assignment_wrapper')).not_to contain_css('#mceu_24')
-      expect(f('.bpc-lock-toggle__label').text).to eq('Locked')
-      expect(f('#blueprint-lock-banner')).to include_text('Content')
+    it "course search dropdowns are populated", priority: "2", test_id: 3072438 do
+      open_associations
+      open_courses_list
+      select_boxes = ff('.bca-course-filter select')
+      expect(select_boxes[0]).to include_text("Default Term")
+      expect(select_boxes[1]).to include_text("sub account 0")
     end
   end
 end

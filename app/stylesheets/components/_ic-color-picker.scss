@@ -39,20 +39,28 @@
   font-weight: bold;
 }
 
-.ColorPicker__Container {
+.ColorPicker__Container.with-animation {
   animation-name: color-picker-enter;
   animation-duration: 0.2s;
   animation-fill-mode: forwards;
   animation-timing-function: ease-out;
+}
+
+.ColorPicker__Container {
   width: $ic-sp*20;
   background: $ic-color-light;
   box-sizing: border-box;
   padding: $ic-sp;
+  position: relative;
+}
+
+.ColorPicker__Container.with-border {
   box-shadow: 0 1px 8px rgba(black, 0.2);
   border-radius: $baseBorderRadius;
   border: 1px solid $ic-border-light;
-  position: relative;
+}
 
+.ColorPicker__Container.with-arrow{
   &:after, &:before {
     right: 100%; top: $ic-sp*2;
     border: solid transparent;
@@ -105,28 +113,73 @@
   transform: translate3d(0,0,0);
   display: inline-block;
   width: 34px;
-  height: 34px; line-height: 33px;
+  height: 34px;
   margin: 0 8px 8px 0;
   padding: 0;
   appearance: none;
   box-shadow: none;
+  text-align: center;
+  color: $ic-color-light;
   border-radius: $baseBorderRadius;
   border-style: solid;
   border-width: 1px;
-  text-align: center;
-  color: $ic-color-light;
-  &:hover { box-shadow: 0 1px 2px rgba(black, 0.25); }
+  border: 2px solid #73818C;
+
+  &:hover,
   &:focus {
-    box-shadow: 0 1px 2px rgba(black, 0.25), inset 0 0 0 1px $ic-color-light;
-    @if $use_high_contrast == false { outline: none; }
+    transform: scale(1.15);
   }
-  &:hover, &:focus { transform: scale(1.15); }
-  i[class*=icon-], i[class^=icon-] { top: 0; }
+
+  i[class*=icon-],
+  i[class^=icon-] {
+    &:before {
+      vertical-align: text-bottom;
+    }
+  }
 
   // Note that this declaration will have to be changed if
   // the total # colors is changed from the current 15
   &:nth-child(5n) {
     margin-right: 0;
+  }
+}
+
+.ColorPicker__ColorBlock.with-dark-check {
+  i[class*=icon-], i[class^=icon-] {
+    color: $ic-color-dark;
+  }
+}
+
+.ColorPicker__ColorBlock.with-box-shadow {
+  &:hover { box-shadow: 0 1px 2px rgba(black, 0.25); }
+  &:focus {
+    box-shadow: 0 1px 2px rgba(black, 0.25), inset 0 0 0 1px $ic-color-light;
+    @if $use_high_contrast == false { outline: none; }
+  }
+}
+
+.ColorPicker__ColorBlock.white{
+  background-color: white;
+  border-color: #E4E4E4;
+  border-width: 1px;
+  overflow: hidden;
+
+  &:before {
+    content: "";
+    position: absolute;
+    border-left: 0.0625rem solid red;
+    width: 100%;
+    height: 100%;
+    transform: translateX(15px) translateY(-16px) rotate(45deg) scale(1.42857);
+    transform-origin: 0% 0%;
+    pointer-events: none;
+  }
+
+  .icon-check {
+    position: absolute;
+    color: $ic-color-dark;
+    padding: 9px;
+    left: 0px;
   }
 }
 

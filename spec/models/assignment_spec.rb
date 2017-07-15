@@ -284,6 +284,42 @@ describe Assignment do
     end
   end
 
+  it "duplicate assignment" do
+    assignment = wiki_page_assignment_model({ :title => "Wiki Assignment" })
+    rubric = @course.rubrics.create! { |r| r.user = @teacher }
+    rubric_association_params = HashWithIndifferentAccess.new({
+       hide_score_total: "0",
+       purpose: "grading",
+       skip_updating_points_possible: false,
+       update_if_existing: true,
+       use_for_grading: "1",
+       association_object: assignment
+     })
+
+    rubric_assoc = RubricAssociation.generate(@teacher, rubric, @course, rubric_association_params)
+    assignment.rubric_association = rubric_assoc
+    assignment.attachments.push(Attachment.new)
+    assignment.submissions.push(Submission.new)
+    assignment.ignores.push(Ignore.new)
+    new_assignment = assignment.duplicate
+    expect(new_assignment.id).to be_nil
+    expect(new_assignment.new_record?).to be true
+    expect(new_assignment.attachments.length).to be(0)
+    expect(new_assignment.submissions.length).to be(0)
+    expect(new_assignment.ignores.length).to be(0)
+    expect(new_assignment.rubric_association).not_to be_nil
+    expect(new_assignment.title).to eq "Wiki Assignment Copy"
+    expect(new_assignment.wiki_page.title).to eq "Wiki Assignment Copy"
+    new_assignment.save!
+    new_assignment2 = assignment.duplicate
+    expect(new_assignment2.title).to eq "Wiki Assignment Copy 2"
+    new_assignment2.save!
+    # Go back to the first new assignment to test something just ending in
+    # "Copy"
+    new_assignment3 = new_assignment.duplicate
+    expect(new_assignment3.title).to eq "Wiki Assignment Copy 3"
+  end
+
   describe "#representatives" do
     context "individual students" do
       it "sorts by sortable_name" do

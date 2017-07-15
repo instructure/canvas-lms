@@ -67,3 +67,9 @@ def get_import_context(system=nil)
 
   context
 end
+
+class ImportHelper
+  def self.get_import_data_xml(sub_folder, file_name)
+    File.open(File.join(IMPORT_JSON_DIR, sub_folder, "#{file_name}.xml")) { |f| Nokogiri::XML(f) }
+  end
+end

@@ -121,10 +121,18 @@ define [
     # Returns nothing.
     onDelete: (e) ->
       e.preventDefault()
-      return unless confirm(@messages.confirmDelete)
+      unless confirm(@messages.confirmDelete)
+        $(".message-item-view[data-id=#{@model.id}] .al-trigger").focus()
+        return
+      prevId = $(@el).prev().data('id')
       url = "/api/v1/conversations/#{@model.get('conversation_id')}/remove_messages"
       $.ajaxJSON(url, 'POST', remove: [@model.id])
       @remove()
+      $toFocus = $(".message-item-view[data-id=#{prevId}] .al-trigger") if prevId
+      $toFocus = $(".message-detail-actions .al-trigger") unless $toFocus?.length
+      $toFocus = $(".conversations .message-actions:last .star-btn") unless $toFocus.length
+      $toFocus = $("#compose-message-recipients") unless $toFocus.length
+      $toFocus.focus()
 
     # Internal: Forward this message.
     #

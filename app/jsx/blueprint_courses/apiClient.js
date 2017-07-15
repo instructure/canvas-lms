@@ -69,7 +69,7 @@ const ApiClient = {
   saveAssociations ({ masterCourse, addedAssociations, removedAssociations }) {
     return axios.put(`/api/v1/courses/${masterCourse.id}/blueprint_templates/default/update_associations`, {
       course_ids_to_add: addedAssociations.map(c => c.id),
-      course_ids_to_remove: removedAssociations,
+      course_ids_to_remove: removedAssociations.map(c => c.id),
     })
   },
 

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<course identifier="i15448fbdf54a2fc2013e32f908227288" xmlns="http://canvas.instructure.com/xsd/cccv1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd">
+  <title>Import/Export Test</title>
+  <course_code>Import/Export</course_code>
+  <start_at>2017-06-12T22:35:22</start_at>
+  <is_public>true</is_public>
+  <allow_student_wiki_edits>false</allow_student_wiki_edits>
+  <allow_student_forum_attachments>false</allow_student_forum_attachments>
+  <lock_all_announcements>false</lock_all_announcements>
+  <allow_student_organized_groups>true</allow_student_organized_groups>
+  <default_view>feed</default_view>
+  <license>public_domain</license>
+  <lock_all_announcements>false</lock_all_announcements>
+  <grading_standard_enabled>false</grading_standard_enabled>
+  <storage_quota>524288000</storage_quota>
+  <root_account_uuid>pd3ANgn1DnNxn04Gqwi2FGBdRNiULEbEC8L1ltGc</root_account_uuid>
+</course>

@@ -72,11 +72,9 @@
 // $new-icon-size parameter
 @mixin overwrite-default-icon-size($new-icon-size) {
   i[class*=icon-], i[class^=icon-] {
-    width: auto; height: auto;
     line-height: 1;
     &:before {
       font-size: $new-icon-size;
-      top: 0;
     }
   }
 }

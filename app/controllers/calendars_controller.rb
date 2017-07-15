@@ -82,6 +82,22 @@ class CalendarsController < ApplicationController
       info
     end
     StringifyIds.recursively_stringify_ids(@contexts_json)
+
+    non_user_context = @contexts.select{ |c| c.class == Course }.first
+    post_to_sis = Assignment.sis_grade_export_enabled?(non_user_context)
+    sis_name = AssignmentUtil.post_to_sis_friendly_name(non_user_context)
+    max_name_length_required_for_account = AssignmentUtil.name_length_required_for_account?(non_user_context)
+    max_name_length = AssignmentUtil.assignment_max_name_length(non_user_context)
+    due_date_required_for_account = AssignmentUtil.due_date_required_for_account?(non_user_context)
+
+    hash = {
+      POST_TO_SIS: post_to_sis,
+      SIS_NAME: sis_name,
+      MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT: max_name_length_required_for_account,
+      MAX_NAME_LENGTH: max_name_length,
+      DUE_DATE_REQUIRED_FOR_ACCOUNT: due_date_required_for_account
+    }
+    js_env(hash)
   end
 
   def build_calendar_events

@@ -22,7 +22,15 @@ module Factories
     end
 
     unless pseudonym
-      pseudonym = stub('Pseudonym', :record => user, :user_id => user.id, :user => user, :login_count => 1)
+      pseudonym = stub(
+        'Pseudonym',
+        :record => user,
+        :user_id => user.id,
+        :user => user,
+        :login_count => 1,
+        :global_account_id => '10000000000001',
+        :sis_user_id => 'U001'
+      )
       # at least one thing cares about the id of the pseudonym... using the
       # object_id should make it unique (but obviously things will fail if
       # it tries to load it from the db.)

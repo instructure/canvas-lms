@@ -20,17 +20,17 @@ module Factories
   def planner_override_model(opts={})
     user = opts[:user] || @user || user_model
     plannable = opts[:plannable] || assignment_model
-    visibility = opts.has_key?(:visible) ? opts[:visible] : true
+    visibility = opts.key?(:marked_complete) ? opts[:marked_complete] : false
     attrs = { user_id: user.id,
               plannable_type: plannable.class.to_s,
               plannable_id: plannable.id,
-              visible: visibility }
+              marked_complete: visibility }
     @planner_override = PlannerOverride.create!(valid_planner_override_attributes.merge(attrs))
   end
 
   def valid_planner_override_attributes
     {
-      :visible => true
+      :marked_complete => false
     }
   end
 end

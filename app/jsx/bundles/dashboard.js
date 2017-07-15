@@ -22,8 +22,9 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import I18n from 'i18n!dashboard'
 import newCourseForm from 'compiled/util/newCourseForm'
+import DashboardHeader from 'jsx/dashboard/DashboardHeader'
 import showMoreTemplate from 'jst/dashboard/show_more_link'
-import DashboardOptionsMenu from 'jsx/dashboard_card/DashboardOptionsMenu'
+
 import 'jquery.disableWhileLoading'
 
 if (ENV.DASHBOARD_SIDEBAR_URL) {
@@ -35,16 +36,16 @@ if (ENV.DASHBOARD_SIDEBAR_URL) {
 }
 
 
-const dashboardOptionsMenuContainer = document.getElementById('DashboardOptionsMenu_Container')
-if (dashboardOptionsMenuContainer) {
+const dashboardHeaderContainer = document.getElementById('dashboard_header_container');
+if (dashboardHeaderContainer) {
   ReactDOM.render(
-    <DashboardOptionsMenu
+    <DashboardHeader
       recent_activity_dashboard={ENV.PREFERENCES.recent_activity_dashboard}
       hide_dashcard_color_overlays={ENV.PREFERENCES.hide_dashcard_color_overlays}
       planner_enabled={ENV.STUDENT_PLANNER_ENABLED}
       planner_selected={ENV.PREFERENCES.show_planner}
     />,
-    dashboardOptionsMenuContainer
+    dashboardHeaderContainer
   )
 }
 

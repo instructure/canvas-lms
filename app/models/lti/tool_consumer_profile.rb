@@ -20,7 +20,7 @@ module Lti
 
     belongs_to :developer_key
 
-    before_validation { self.uuid ||= SecureRandom.uuid }
+    before_validation {self.uuid ||= SecureRandom.uuid}
     after_update :clear_cache
 
     serialize :services
@@ -33,8 +33,6 @@ module Lti
       all: [WEBHOOK_GRANT_ALL_CAPABILITY].freeze,
       quiz_submitted: %w(vnd.instructure.webhooks.root_account.quiz_submitted
                          vnd.instructure.webhooks.assignment.quiz_submitted).freeze,
-      assignment_submitted: %w(vnd.instructure.webhooks.root_account.assignment_submitted
-                               vnd.instructure.webhooks.assignment.assignment_submitted).freeze,
       grade_changed: %w(vnd.instructure.webhooks.root_account.grade_changed).freeze,
       attachment_created: %w(vnd.instructure.webhooks.root_account.attachment_created
                              vnd.instructure.webhooks.assignment.attachment_created).freeze,
@@ -48,29 +46,17 @@ module Lti
 
     DEFAULT_CAPABILITIES = %w(
       basic-lti-launch-request
-      User.id
-      Canvas.api.domain
-      LtiLink.custom.url
-      ToolProxyBinding.custom.url
-      ToolProxy.custom.url
+      ToolProxyRegistrationRequest
       Canvas.placements.accountNavigation
       Canvas.placements.courseNavigation
       Canvas.placements.assignmentSelection
       Canvas.placements.linkSelection
       Canvas.placements.postGrades
-      User.username
-      Person.email.primary
-      vnd.Canvas.Person.email.sis
-      Person.name.given
-      Person.name.family
-      Person.name.full
-      CourseSection.sourcedId
-      Person.sourcedId
-      Membership.role
-      ToolConsumerProfile.url
       Security.splitSecret
-      Context.id
-    ).concat(CapabilitiesHelper::SUPPORTED_CAPABILITIES).freeze
+      Context.sourcedId
+    ).concat(
+      Lti::VariableExpander.expansion_keys
+    ).freeze
 
     RESTRICTED_CAPABILITIES = [
       'Canvas.placements.similarityDetection',

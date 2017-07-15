@@ -742,12 +742,6 @@ describe ApplicationHelper do
         expect(tutorials_enabled?).to be false
       end
     end
-
-    context "with new_users_tutorial feature flag disabled" do
-      it "returns false" do
-        expect(tutorials_enabled?).to be false
-      end
-    end
   end
 
   describe "planner_enabled?" do
@@ -760,7 +754,15 @@ describe ApplicationHelper do
         @domain_root_account.enable_feature! :student_planner
       end
 
-      it "return true" do
+      it "returns false when a user has no student enrollments" do
+        course_with_teacher(:active_all => true)
+        @current_user = @user
+        expect(planner_enabled?).to be false
+      end
+
+      it "returns true when there is at least one student enrollment" do
+        course_with_student(:active_all => true)
+        @current_user = @user
         expect(planner_enabled?).to be true
       end
     end

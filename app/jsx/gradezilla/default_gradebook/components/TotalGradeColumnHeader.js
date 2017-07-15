@@ -16,29 +16,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import PropTypes from 'prop-types'
-import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid'
-import { MenuItem, MenuItemGroup, MenuItemSeparator } from 'instructure-ui/lib/components/Menu'
-import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
-import Typography from 'instructure-ui/lib/components/Typography'
-import I18n from 'i18n!gradebook'
+import React from 'react';
+import { bool, func, shape, string } from 'prop-types';
+import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid';
+import {
+  MenuItem,
+  MenuItemFlyout,
+  MenuItemGroup,
+  MenuItemSeparator
+} from 'instructure-ui/lib/components/Menu';
+import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu';
+import Typography from 'instructure-ui/lib/components/Typography';
+import I18n from 'i18n!gradebook';
+import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
+import ColumnHeader from 'jsx/gradezilla/default_gradebook/components/ColumnHeader';
 
-const { bool, func, shape, string } = PropTypes;
-
-function renderTrigger (menuShown) {
+function renderTrigger (menuShown, ref) {
   const classes = `Gradebook__ColumnHeaderAction ${menuShown ? 'menuShown' : ''}`;
 
   return (
-    <span className={classes}>
+    <span ref={ref} className={classes}>
       <Typography weight="bold" fontStyle="normal" size="large" color="brand">
-        <IconMoreSolid title={I18n.t('Total Options')} />
+        <IconMoreSolid className="rotated" title={I18n.t('Total Options')} />
       </Typography>
     </span>
   );
 }
 
-class TotalGradeColumnHeader extends React.Component {
+class TotalGradeColumnHeader extends ColumnHeader {
   static propTypes = {
     sortBySetting: shape({
       direction: string.isRequired,
@@ -60,21 +65,29 @@ class TotalGradeColumnHeader extends React.Component {
       onMoveToFront: func.isRequired,
       onMoveToBack: func.isRequired
     }).isRequired,
+    onMenuClose: func.isRequired,
+    grabFocus: bool,
+    ...ColumnHeader.propTypes
   };
 
-  constructor (props) {
-    super(props);
+  static defaultProps = {
+    grabFocus: false,
+    ...ColumnHeader.defaultProps
+  };
 
-    this.state = {
-      menuShown: false
-    };
+  state = { menuShown: false, skipFocusOnClose: false };
 
-    this.bindOptionsMenuContent = (ref) => { this.optionsMenuContent = ref };
-    this.onToggle = this.onToggle.bind(this);
+  switchGradeDisplay = () => { this.invokeAndSkipFocus(this.props.gradeDisplay) };
+
+  invokeAndSkipFocus (action) {
+    this.setState({ skipFocusOnClose: true });
+    action.onSelect(this.focusAtEnd);
   }
 
-  onToggle (show) {
-    this.setState({ menuShown: show });
+  componentDidMount () {
+    if (this.props.grabFocus) {
+      this.focusAtEnd();
+    }
   }
 
   render () {
@@ -96,28 +109,32 @@ class TotalGradeColumnHeader extends React.Component {
         </span>
 
         <PopoverMenu
+          ref={this.bindOptionsMenu}
           contentRef={this.bindOptionsMenuContent}
           focusTriggerOnClose={false}
-          trigger={renderTrigger(menuShown)}
+          trigger={renderTrigger(menuShown, this.bindOptionsMenuTrigger)}
           onToggle={this.onToggle}
+          onClose={this.props.onMenuClose}
         >
-          <MenuItemGroup label={I18n.t('Sort by')}>
-            <MenuItem
-              selected={selectedSortSetting === 'grade' && sortBySetting.direction === 'ascending'}
-              disabled={sortBySetting.disabled}
-              onSelect={sortBySetting.onSortByGradeAscending}
-            >
-              <span>{I18n.t('Grade - Low to High')}</span>
-            </MenuItem>
+          <MenuItemFlyout contentRef={this.bindSortByMenuContent} label={I18n.t('Sort by')}>
+            <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>
+              <MenuItem
+                selected={selectedSortSetting === 'grade' && sortBySetting.direction === 'ascending'}
+                disabled={sortBySetting.disabled}
+                onSelect={sortBySetting.onSortByGradeAscending}
+              >
+                <span>{I18n.t('Grade - Low to High')}</span>
+              </MenuItem>
 
-            <MenuItem
-              selected={selectedSortSetting === 'grade' && sortBySetting.direction === 'descending'}
-              disabled={sortBySetting.disabled}
-              onSelect={sortBySetting.onSortByGradeDescending}
-            >
-              <span>{I18n.t('Grade - High to Low')}</span>
-            </MenuItem>
-          </MenuItemGroup>
+              <MenuItem
+                selected={selectedSortSetting === 'grade' && sortBySetting.direction === 'descending'}
+                disabled={sortBySetting.disabled}
+                onSelect={sortBySetting.onSortByGradeDescending}
+              >
+                <span>{I18n.t('Grade - High to Low')}</span>
+              </MenuItem>
+            </MenuItemGroup>
+          </MenuItemFlyout>
 
           {
             showSeparator &&
@@ -127,7 +144,7 @@ class TotalGradeColumnHeader extends React.Component {
             !gradeDisplay.hidden &&
             <MenuItem
               disabled={this.props.gradeDisplay.disabled}
-              onSelect={this.props.gradeDisplay.onSelect}
+              onSelect={this.switchGradeDisplay}
             >
               <span data-menu-item-id="grade-display-switcher" style={nowrapStyle}>
                 {displayAsPoints ? I18n.t('Display as Percentage') : I18n.t('Display as Points')}
@@ -158,4 +175,4 @@ class TotalGradeColumnHeader extends React.Component {
   }
 }
 
-export default TotalGradeColumnHeader
+export default TotalGradeColumnHeader;

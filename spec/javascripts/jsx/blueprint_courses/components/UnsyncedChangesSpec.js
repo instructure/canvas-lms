@@ -99,10 +99,10 @@ test('renders the migration options component', () => {
 
 test('renders the changes properly', () => {
   const tree = enzyme.mount(connect())
-  const changes = tree.find('.bcs__history-item__change')
+  const changes = tree.find('.bcs__unsynced-item')
   equal(changes.length, 3)
-  const locks = tree.find('.bcs__history-item__lock-icon IconBlueprintLockSolid')
+  const locks = tree.find('.bcs__unsynced-item IconBlueprintLockSolid')
   equal(locks.length, 1)
-  const unlocks = tree.find('.bcs__history-item__lock-icon IconBlueprintSolid')
+  const unlocks = tree.find('.bcs__unsynced-item IconBlueprintSolid')
   equal(unlocks.length, 2)
 })

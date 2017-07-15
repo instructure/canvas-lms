@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!blueprint_settings'
+import I18n from 'i18n!blueprint_course_sidebar'
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -27,6 +27,7 @@ import Button from 'instructure-ui/lib/components/Button'
 import Typography from 'instructure-ui/lib/components/Typography'
 import Spinner from 'instructure-ui/lib/components/Spinner'
 import Tooltip from 'instructure-ui/lib/components/Tooltip'
+import PresentationContent from 'instructure-ui/lib/components/PresentationContent'
 
 import propTypes from '../propTypes'
 import actions from '../actions'
@@ -90,7 +91,24 @@ export default class CourseSidebar extends Component {
     }
   }
 
-  onOpenSidebar = () => {
+  componentWillUpdate (nextProps, nextState) {
+    if (this.state.isModalOpen !== nextState.isModalOpen) {
+      if (nextState.isModalOpen) {
+        document.getElementById('application').setAttribute('aria-hidden', 'true')
+        if (this.sidebarRef) {
+          this.sidebarRef.setAttribute('aria-hidden', 'true')
+        }
+      } else {
+        document.getElementById('application').removeAttribute('aria-hidden')
+        if (this.sidebarRef) {
+          this.sidebarRef.removeAttribute('aria-hidden')
+        }
+      }
+    }
+  }
+
+  onOpenSidebar = (trayRef) => {
+    this.sidebarRef = trayRef
     if (!this.props.hasLoadedAssociations) {
       this.props.loadAssociations()
     }
@@ -99,6 +117,11 @@ export default class CourseSidebar extends Component {
     }
   }
 
+  onCloseSidebar = () => {
+    this.sidebarRef = null
+  }
+
+  sidebarRef = null
   modals = {
     associations: () => ({
       props: {
@@ -254,6 +277,7 @@ export default class CourseSidebar extends Component {
       return (
         <div className="bcs__row">
           <Button
+            aria-label={I18n.t({ one: 'There is 1 Unsynced Change', other: 'There are %{count} Unsynced Changes' }, { count: this.props.unsyncedChanges.length })}
             id="mcUnsyncedChangesBtn"
             ref={(c) => { this.unsyncedChangesBtn = c }}
             variant="link"
@@ -261,7 +285,9 @@ export default class CourseSidebar extends Component {
           >
             <Typography>{I18n.t('Unsynced Changes')}</Typography>
           </Button>
-          <Typography><span className="bcs__row-right-content">{this.props.unsyncedChanges.length}</span></Typography>
+          <PresentationContent>
+            <Typography><span className="bcs__row-right-content">{this.props.unsyncedChanges.length}</span></Typography>
+          </PresentationContent>
           <MigrationOptions />
         </div>
       )
@@ -273,12 +299,22 @@ export default class CourseSidebar extends Component {
   maybeRenderAssociations () {
     if (!this.props.canManageCourse) return null
     const isSyncing = MigrationStates.isLoadingState(this.props.migrationStatus) || this.props.isLoadingBeginMigration
+    const length = this.props.associations.length
     const button = (
       <div className="bcs__row bcs__row__associations">
-        <Button disabled={isSyncing} id="mcSidebarAsscBtn" ref={(c) => { this.asscBtn = c }} variant="link" onClick={this.handleAssociationsClick}>
+        <Button
+          aria-label={I18n.t({ one: 'There is 1 Association', other: 'There are %{count} Associations' }, { count: length })}
+          disabled={isSyncing}
+          id="mcSidebarAsscBtn"
+          ref={(c) => { this.asscBtn = c }}
+          variant="link"
+          onClick={this.handleAssociationsClick}
+        >
           <Typography>{I18n.t('Associations')}</Typography>
         </Button>
-        <Typography><span className="bcs__row-right-content">{this.props.associations.length}</span></Typography>
+        <PresentationContent>
+          <Typography><span className="bcs__row-right-content">{length}</span></Typography>
+        </PresentationContent>
       </div>
     )
 
@@ -311,18 +347,20 @@ export default class CourseSidebar extends Component {
     return (
       <BlueprintSidebar
         onOpen={this.onOpenSidebar}
+        onClose={this.onCloseSidebar}
         contentRef={this.props.contentRef}
         detachedChildren={this.renderModal()}
       >
-        {this.maybeRenderAssociations()}
-        <div className="bcs__row">
-          <Button id="mcSyncHistoryBtn" ref={(c) => { this.syncHistoryBtn = c }} variant="link" onClick={this.handleSyncHistoryClick}>
-            <Typography>{I18n.t('Sync History')}</Typography>
-          </Button>
+        <div>
+          {this.maybeRenderAssociations()}
+          <div className="bcs__row">
+            <Button id="mcSyncHistoryBtn" ref={(c) => { this.syncHistoryBtn = c }} variant="link" onClick={this.handleSyncHistoryClick}>
+              <Typography>{I18n.t('Sync History')}</Typography>
+            </Button>
+          </div>
+          {this.maybeRenderUnsyncedChanges()}
+          {this.maybeRenderSyncButton()}
         </div>
-        {this.maybeRenderUnsyncedChanges()}
-        {this.maybeRenderSyncButton()}
-        {}
       </BlueprintSidebar>
     )
   }

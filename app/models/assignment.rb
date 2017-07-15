@@ -35,12 +35,13 @@ class Assignment < ActiveRecord::Base
   include Canvas::DraftStateValidations
   include TurnitinID
   include Plannable
+  include DuplicatingObjects
 
   ALLOWED_GRADING_TYPES = %w(
     pass_fail percent letter_grade gpa_scale points not_graded
   ).freeze
 
-  attr_accessor :previous_id, :updating_user, :copying, :user_submitted, :todo_type
+  attr_accessor :previous_id, :updating_user, :copying, :user_submitted
 
   attr_reader :assignment_changed
 
@@ -124,6 +125,69 @@ class Assignment < ActiveRecord::Base
         "The value of possible points for this assignment must be zero or greater."
       )
     )
+  end
+
+  def get_potentially_conflicting_titles(title_base)
+    assignment_titles = Assignment.active.for_course(self.context_id)
+      .starting_with_title(title_base).pluck("title").to_set
+    if self.wiki_page
+      wiki_titles = self.wiki_page.get_potentially_conflicting_titles(title_base)
+    else
+      wiki_titles = [].to_set
+    end
+    assignment_titles.union(wiki_titles)
+  end
+
+  # The relevant associations that are copied are:
+  #
+  # learning_outcome_alignments, rubric_association, wiki_page
+  #
+  # In the case of wiki_page, a new wiki_page will be created.  The underlying
+  # rubric association, however, will simply point to the original rubric
+  # rather than copying the rubric.
+  #
+  # Other has_ relations are not duplicated for various reasons.
+  # These are:
+  #
+  # attachments, submissions, provisional_grades, lti stuff, discussion_topic
+  # ignores, moderated_grading_selections, teacher_enrollment
+  # TODO: Try to get more of that stuff duplicated
+  def duplicate(opts = {})
+    # Don't clone a new record
+    return self if self.new_record?
+
+    default_opts = {
+      :duplicate_wiki_page => true,
+      :copy_title => nil
+    }
+    opts_with_default = default_opts.merge(opts)
+
+    result = self.clone
+    result.migration_id = nil
+    result.submissions.clear
+    result.attachments.clear
+    result.ignores.clear
+    result.moderated_grading_selections.clear
+    result.lti_context_id = nil
+    result.discussion_topic = nil
+    result.peer_review_count = 0
+    result.workflow_state = "unpublished"
+
+    result.title =
+      opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy"))
+
+    if self.wiki_page
+      if opts_with_default[:duplicate_wiki_page]
+        result.wiki_page = self.wiki_page.duplicate({
+          :duplicate_assignment => false,
+          :copy_title => result.title
+        })
+      end
+    end
+    # Learning outcome alignments seem to get copied magically, possibly
+    # through the rubric
+    result.rubric_association = self.rubric_association.clone
+    result
   end
 
   def group_category_changes_ok?
@@ -1970,6 +2034,14 @@ class Assignment < ActiveRecord::Base
     eager_load(:submissions).where(submissions: {user_id: user})
   }
 
+  scope :starting_with_title, lambda { |title|
+    where('title ILIKE ?', "#{title}%")
+  }
+
+  scope :with_non_placeholder_submissions_for_user, lambda { |user|
+    with_submissions_for_user(user).merge(Submission.not_placeholder)
+  }
+
   scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
   scope :for_course, lambda { |course_id| where(:context_type => 'Course', :context_id => course_id) }
   scope :for_group_category, lambda { |group_category_id| where(:group_category_id => group_category_id) }
@@ -2380,7 +2452,7 @@ class Assignment < ActiveRecord::Base
     external_tool? &&
       external_tool_tag.present? &&
       external_tool_tag.content.present? &&
-      external_tool_tag.content.tool_id == 'Quizzes 2'
+      external_tool_tag.content.try(:tool_id) == 'Quizzes 2'
   end
 
   def quiz_lti!

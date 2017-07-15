@@ -23,7 +23,6 @@ define [
   'compiled/views/groups/manage/GroupUsersView'
   'compiled/views/groups/manage/GroupDetailView'
   'compiled/views/groups/manage/GroupCategoryCloneView'
-  'compiled/behaviors/firefox_number_fix'
 ], ($, _, {View}, template, GroupUsersView, GroupDetailView, GroupCategoryCloneView) ->
 
   class GroupView extends View

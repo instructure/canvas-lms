@@ -1005,7 +1005,7 @@ define([
   test('sets the .grade html to the "muted assignment" indicator when the assignment is muted', function () {
     this.$assignment.data('muted', true);
     this.onScoreRevert();
-    equal(this.$assignment.find('.grade img.muted_icon').length, 1);
+    equal(this.$assignment.find('.grade .muted_icon').length, 1);
   });
 
   test('sets the .grade text to .original_score when the assignment is not muted', function () {

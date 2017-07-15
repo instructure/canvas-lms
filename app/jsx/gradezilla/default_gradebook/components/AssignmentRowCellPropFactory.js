@@ -16,20 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import SubmissionDetailsDialog from 'compiled/SubmissionDetailsDialog';
-
 class AssignmentRowCellPropFactory {
   constructor (assignment, gradebook) {
     this.assignment = assignment;
     this.gradebook = gradebook;
   }
 
+  isTrayOpenForThisCell = (student) => {
+    const { open, studentId, assignmentId } = this.gradebook.getSubmissionTrayState();
+    return open && studentId === student.id && assignmentId === this.assignment.id;
+  }
+
   getProps (student) {
     return {
-      canShowSubmissionDetailsModal: !student.isConcluded,
-      onShowSubmissionDetailsModal: (options) => {
-        SubmissionDetailsDialog.open(this.assignment, student, { ...this.gradebook.options, ...options });
-      }
+      isSubmissionTrayOpen: this.isTrayOpenForThisCell(student),
+      onToggleSubmissionTrayOpen: this.gradebook.toggleSubmissionTrayOpen
     };
   }
 }

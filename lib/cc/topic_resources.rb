@@ -128,6 +128,7 @@ module CC
       doc.allow_rating topic.allow_rating
       doc.only_graders_can_rate topic.only_graders_can_rate
       doc.sort_by_rating topic.sort_by_rating
+      doc.todo_date topic.todo_date
       if topic.assignment && !topic.assignment.deleted?
         assignment_migration_id = create_key(topic.assignment)
         doc.assignment(:identifier=>assignment_migration_id) do |a|

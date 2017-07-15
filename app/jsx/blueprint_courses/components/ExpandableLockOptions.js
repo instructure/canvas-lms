@@ -37,7 +37,16 @@ import {formatLockObject} from '../LockItemFormat'
 import {itemTypeLabelPlurals} from '../labels'
 
 
+// ExpandableLockOptions is a single expandable tab that has a list of checkboxes as children
+// The tab has the toggle icon, the title of the tab, the lock icon that indicates whether the
+// children are checked or not, and the list of checked children
+// This is used in Blueprint Lock Options as the granular lock
+
 export default class ExpandableLockOptions extends React.Component {
+  // objectType is the Title of the tab
+  // locks are the values of the children (whether they are checked or not)
+  // isOpen determines whether the tab is expanded or not
+  // lockableAttributes are the list of items that could be locked (the list of children)
   static propTypes = {
     objectType: PropTypes.string.isRequired,
     locks: propTypes.itemLocks,
@@ -98,6 +107,28 @@ export default class ExpandableLockOptions extends React.Component {
     )
   }
 
+// The toggle icon and the title of the tab are in a subgrid because the spacing
+// If we don't do a subgrid the space between the toggle icon and the title either cuts the icon
+// or renders a large space between the icon and the title
+  renderTitle () {
+    return (
+      <Grid>
+        <GridRow>
+          <GridCol width={4}>
+            {this.renderIndicatorIcon()}
+          </GridCol>
+          <GridCol width={8}>
+            <PresentationContent>
+              <div className="bcs_tab-text" >
+                <Typography size="small" weight="normal">{itemTypeLabelPlurals[this.props.objectType]}</Typography>
+              </div>
+            </PresentationContent>
+          </GridCol>
+        </GridRow>
+      </Grid>
+    )
+  }
+
   renderLockIcon () {
     const hasLocks = Object.keys(this.state.locks)
       .reduce((isLocked, lockProp) => isLocked || this.state.locks[lockProp], false)
@@ -133,22 +164,15 @@ export default class ExpandableLockOptions extends React.Component {
         <div onClick={this.toggle}>
           <Grid>
             <GridRow>
-              <GridCol width={1}>
-                {this.renderIndicatorIcon()}
-              </GridCol>
-              <GridCol width={2}>
-                <PresentationContent>
-                  <div className="bcs_tab-text" >
-                    <Typography size="small" weight="normal">{itemTypeLabelPlurals[this.props.objectType]}</Typography>
-                  </div>
-                </PresentationContent>
+              <GridCol width={4}>
+                {this.renderTitle()}
               </GridCol>
               <GridCol width={1}>
                 <PresentationContent>
                   {this.renderLockIcon()}
                 </PresentationContent>
               </GridCol>
-              <GridCol width={8}>
+              <GridCol width={7}>
                 <PresentationContent>
                   <div className="bcs_tab-text" >
                     <Typography size="small" weight="normal" >{formatLockObject(this.state.locks)}</Typography>

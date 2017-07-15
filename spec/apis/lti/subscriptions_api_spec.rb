@@ -1,24 +1,26 @@
 require File.expand_path(File.dirname(__FILE__) + '/lti2_api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 require_dependency "lti/ims/access_token_helper"
 module Lti
   describe 'Webhook Subscription API', type: :request do
+    specs_require_sharding
     include_context 'lti2_api_spec_helper'
 
-    let(:controller){ double(lti2_service_name: 'vnd.Canvas.webhooksSubscription') }
-    let(:subscription_id){ 'ab342-c444-29392-e222' }
-    let(:test_subscription){ {'RootAccountId' => '1', 'Id' => subscription_id} }
+    let(:controller) { double(lti2_service_name: 'vnd.Canvas.webhooksSubscription') }
+    let(:subscription_id) { 'ab342-c444-29392-e222' }
+    let(:test_subscription) { {'RootAccountId' => '1', 'Id' => subscription_id} }
 
-    let(:show_endpoint){ "/api/lti/subscriptions/#{subscription_id}" }
-    let(:delete_endpoint){ "/api/lti/subscriptions/#{subscription_id}" }
-    let(:update_endpoint){ "/api/lti/subscriptions/#{subscription_id}" }
-    let(:create_endpoint){ "/api/lti/subscriptions" }
-    let(:index_endpoint){ "/api/lti/subscriptions" }
+    let(:show_endpoint) { "/api/lti/subscriptions/#{subscription_id}" }
+    let(:delete_endpoint) { "/api/lti/subscriptions/#{subscription_id}" }
+    let(:update_endpoint) { "/api/lti/subscriptions/#{subscription_id}" }
+    let(:create_endpoint) { "/api/lti/subscriptions" }
+    let(:index_endpoint) { "/api/lti/subscriptions" }
 
-    let(:ok_response){ double(code: 200, body: subscription.to_json) }
-    let(:not_found_response){ double(code: 404, body: "{}") }
-    let(:delete_response){ double(code: 200, body: "{}") }
+    let(:ok_response) { double(body: subscription.to_json, code: 200) }
+    let(:not_found_response) { double(body: "{}", code: 404) }
+    let(:delete_response) { double(body: "{}", code: 200) }
 
-    let(:subscription_service){ class_double(Services::LiveEventsSubscriptionService).as_stubbed_const }
+    let(:subscription_service) { class_double(Services::LiveEventsSubscriptionService).as_stubbed_const }
     let(:subscription) do
       {
         EventTypes:["attachment_created"],
@@ -26,7 +28,7 @@ module Lti
         ContextId: account.uuid,
         Format: "live-event",
         TransportType: "sqs",
-        TransportMetadata: { Url: "http://sqs.docker"}
+        TransportMetadata: { Url: "http://sqs.docker" }
       }
     end
 
@@ -247,9 +249,38 @@ module Lti
         tool_proxy.save!
       end
 
+      let(:pagination_key) { { Id: "71d6dfba-0547-477d-b41d-db8cb528c6d1", DeveloperKey: "10000000000001" } }
+      let(:pagination_request_headers) { { StartKey: pagination_key.to_json, Authorization: "Bearer #{access_token}" } }
+      let(:ok_pagination_response) do
+        double(
+          body: subscription.to_json,
+          code: 200,
+          headers: { EndKey: pagination_key.to_json }
+        )
+      end
+      let(:ok_unpaginated_response) do
+        double(
+          body: subscription.to_json,
+          code: 200,
+          headers: {}
+        )
+      end
+
       it 'shows subscriptions for a tool proxy' do
-        allow(subscription_service).to receive_messages(tool_proxy_subscriptions: ok_response)
+        allow(subscription_service).to receive(:tool_proxy_subscriptions) { ok_unpaginated_response }
         get index_endpoint, {}, request_headers
+        expect(response).to be_success
+      end
+
+      it 'shows subscriptions for a tool proxy from a pagination response' do
+        allow(subscription_service).to receive(:tool_proxy_subscriptions) { ok_pagination_response }
+        get index_endpoint, {}, request_headers
+        expect(response).to be_success
+      end
+
+      it 'shows subscriptions for a tool proxy with optional pagination header' do
+        allow(subscription_service).to receive(:tool_proxy_subscriptions) { ok_pagination_response }
+        get index_endpoint, {}, pagination_request_headers
         expect(response).to be_success
       end
 

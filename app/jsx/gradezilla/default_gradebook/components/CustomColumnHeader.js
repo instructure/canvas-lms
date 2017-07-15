@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -19,19 +19,22 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Typography from 'instructure-ui/lib/components/Typography'
+import ColumnHeader from 'jsx/gradezilla/default_gradebook/components/ColumnHeader'
 
 const { string } = PropTypes;
 
-function CustomColumnHeader (props) {
-  return (
-    <div className="Gradebook__ColumnHeaderContent">
-      <span className="Gradebook__ColumnHeaderDetail">
-        <Typography tag="span" size="small">
-          { props.title }
-        </Typography>
-      </span>
-    </div>
-  );
+class CustomColumnHeader extends ColumnHeader {
+  render () {
+    return (
+      <div className="Gradebook__ColumnHeaderContent">
+        <span className="Gradebook__ColumnHeaderDetail">
+          <Typography tag="span" size="small">
+            { this.props.title }
+          </Typography>
+        </span>
+      </div>
+    );
+  }
 }
 
 CustomColumnHeader.propTypes = {

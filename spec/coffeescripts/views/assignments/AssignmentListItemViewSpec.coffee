@@ -123,6 +123,7 @@ define [
     }
 
     ENV.POST_TO_SIS = options.post_to_sis
+    ENV.DUPLICATE_ENABLED = options.duplicateEnabled
 
     view = new AssignmentListItemView(model: model, userIsAdmin: options.userIsAdmin)
     view.$el.appendTo $('#fixtures')
@@ -519,6 +520,57 @@ define [
       'date.abbr_month_names.8': 'Aug'
     view = createView(@model, canManage: true)
     equal view.dateDueColumnView.$("#vdd_tooltip_#{@model.id}_due div dd").first().text().trim(), 'Aug 28'
+
+  test 'can duplicate when assignment is simple', ->
+    model = buildAssignment
+      id: 1
+      title: 'Foo'
+      is_quiz_assignment: false
+    view = createView(model, userIsAdmin: true, canManage: true, duplicateEnabled: true)
+    json = view.toJSON()
+    ok json.canDuplicate
+    equal view.$('.duplicate_assignment').length, 1
+
+  test 'cannot duplicate when user is not admin', ->
+    model = buildAssignment
+      id: 1
+      title: 'Foo'
+      is_quiz_assignment: false
+    view = createView(model, userIsAdmin: false, canManage: false, duplicateEnabled: true)
+    json = view.toJSON()
+    notOk json.canDuplicate
+    equal view.$('.duplicate_assignment').length, 0
+
+  test 'cannot duplicate when assignment is quiz', ->
+    model = buildAssignment
+      id: 1
+      title: 'Foo'
+      is_quiz_assignment: true
+    view = createView(model, userIsAdmin: true, canManage: true, duplicateEnabled: true)
+    json = view.toJSON()
+    notOk json.canDuplicate
+    equal view.$('.duplicate_assignment').length, 0
+
+  test 'cannot duplicate when assignment is discussion topic', ->
+    model = buildAssignment
+      id: 1
+      title: 'Foo'
+      submission_types: ['discussion_topic']
+
+    view = createView(model, userIsAdmin: true, canManage: true, duplicateEnabled: true)
+    json = view.toJSON()
+    notOk json.canDuplicate
+    equal view.$('.duplicate_assignment').length, 0
+
+  test 'can duplicate when assignment is wiki page', ->
+    model = buildAssignment
+      id: 1
+      title: 'Foo'
+      submission_types: ['wiki_page']
+    view = createView(model, userIsAdmin: true, canManage: true, duplicateEnabled: true)
+    json = view.toJSON()
+    ok json.canDuplicate
+    equal view.$('.duplicate_assignment').length, 1
 
   test 'can move when userIsAdmin is true', ->
     view = createView(@model, userIsAdmin: true, canManage: false)

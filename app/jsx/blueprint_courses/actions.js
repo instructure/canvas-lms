@@ -182,7 +182,7 @@ actions.removeAssociations = associations => (dispatch, getState) => {
   })
 
   if (toRm.length) {
-    dispatch(actions.removeCourseAssociations(toRm))
+    dispatch(actions.removeCourseAssociations(existing.filter(c => toRm.includes(c.id))))
   }
 
   if (toUndo.length) {

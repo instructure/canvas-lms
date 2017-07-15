@@ -23,7 +23,7 @@ require_dependency 'assignment_student_visibility'
 
 class WikiPage < ActiveRecord::Base
   attr_readonly :wiki_id
-  attr_accessor :saved_by, :todo_type
+  attr_accessor :saved_by
   validates_length_of :body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_presence_of :wiki_id
   include Canvas::SoftDeletable
@@ -32,7 +32,7 @@ class WikiPage < ActiveRecord::Base
   include ContextModuleItem
   include Submittable
   include Plannable
-
+  include DuplicatingObjects
   include SearchTermHelper
 
   include MasterCourses::Restrictor
@@ -63,15 +63,21 @@ class WikiPage < ActiveRecord::Base
     where(assignment_id: nil).joins(:course).where(courses: {id: course_ids})
   }
 
+  scope :starting_with_title, lambda { |title|
+    where('title ILIKE ?', "#{title}%")
+  }
+
   scope :not_ignored_by, -> (user, purpose) do
     where("NOT EXISTS (?)", Ignore.where(asset_type: 'WikiPage', user_id: user, purpose: purpose).where("asset_id=wiki_pages.id"))
   end
   scope :todo_date_between, -> (starting, ending) { where(todo_date: starting...ending) }
   scope :for_courses_and_groups, -> (course_ids, group_ids) do
-    joins("LEFT JOIN #{Course.quoted_table_name} on wiki_pages.wiki_id = courses.wiki_id
-           LEFT JOIN #{Group.quoted_table_name} on wiki_pages.wiki_id = groups.wiki_id").
-      where("courses.id IN (?) OR groups.id IN (?)", course_ids, group_ids)
+    wiki_ids = []
+    wiki_ids += Course.where(:id => course_ids).pluck(:wiki_id) if course_ids.any?
+    wiki_ids += Group.where(:id => group_ids).pluck(:wiki_id) if group_ids.any?
+    where(:wiki_id => wiki_ids)
   end
+
   scope :visible_to_user, -> (user_id) do
     joins("LEFT JOIN #{AssignmentStudentVisibility.quoted_table_name} as asv on wiki_pages.assignment_id = asv.assignment_id").
       where("wiki_pages.assignment_id IS NULL OR asv.user_id = ?", user_id)
@@ -366,6 +372,11 @@ class WikiPage < ActiveRecord::Base
     res.flatten.uniq
   end
 
+  def get_potentially_conflicting_titles(title_base)
+    WikiPage.not_deleted.where(wiki_id: self.wiki_id).starting_with_title(title_base)
+      .pluck("title").to_set
+  end
+
   def to_atom(opts={})
     context = opts[:context]
     Atom::Entry.new do |entry|
@@ -414,6 +425,38 @@ class WikiPage < ActiveRecord::Base
     return unless wiki_pages.any?
     front_page_url = context.wiki.get_front_page_url
     wiki_pages.each{|wp| wp.can_unpublish = !(wp.url == front_page_url)}
+  end
+
+  # opts contains a set of related entities that should be duplicated.
+  # By default, all associated entities are duplicated.
+  def duplicate(opts = {})
+    # Don't clone a new record
+    return self if self.new_record?
+    default_opts = {
+      :duplicate_assignment => true,
+      :copy_title => nil
+    }
+    opts_with_default = default_opts.merge(opts)
+    result = WikiPage.new({
+      :title => opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy")),
+      :wiki_id => self.wiki_id,
+      :body => self.body,
+      :workflow_state => "unpublished",
+      :user_id => self.user_id,
+      :protected_editing => self.protected_editing,
+      :editing_roles => self.editing_roles,
+      :view_count => 0,
+      :todo_date => self.todo_date
+    })
+    if self.assignment
+      if opts_with_default[:duplicate_assignment]
+        result.assignment = self.assignment.duplicate({
+          :duplicate_wiki_page => false,
+          :copy_title => result.title
+        })
+      end
+    end
+    result
   end
 
   def initialize_wiki_page(user)

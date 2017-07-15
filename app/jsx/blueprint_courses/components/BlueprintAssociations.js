@@ -51,7 +51,7 @@ export default class BlueprintAssociations extends React.Component {
     courses: propTypes.courseList.isRequired,
     existingAssociations: propTypes.courseList.isRequired,
     addedAssociations: propTypes.courseList.isRequired,
-    removedAssociations: arrayOf(string).isRequired,
+    removedAssociations: propTypes.courseList.isRequired,
 
     hasLoadedCourses: bool.isRequired,
     isLoadingCourses: bool.isRequired,
@@ -152,6 +152,7 @@ export default class BlueprintAssociations extends React.Component {
             addedAssociations={this.props.addedAssociations}
             removedAssociations={this.props.removedAssociations}
             onRemoveAssociations={this.props.removeAssociations}
+            onRestoreAssociations={this.props.addAssociations}
             isLoadingAssociations={this.props.isLoadingAssociations}
             handleFocusLoss={this.catchAssociationsFocus}
             focusManager={this.focusManager}

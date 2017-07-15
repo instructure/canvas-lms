@@ -220,7 +220,9 @@ define [
     # FullCalendar callbacks
     getEvents: (start, end, timezone, donecb, datacb) =>
       @gettingEvents = true
-      @dataSource.getEvents start, end, @visibleContextList.concat(@findAppointmentModeGroups()), (events) =>
+      contexts = @visibleContextList.concat(@findAppointmentModeGroups())
+
+      _donecb = (events) =>
         if @displayAppointmentEvents
           @dataSource.getEventsForAppointmentGroup @displayAppointmentEvents, (aEvents) =>
             # Make sure any events in the current appointment group get marked -
@@ -239,8 +241,11 @@ define [
             donecb([])
           else
             donecb(calendarEventFilter(@displayAppointmentEvents, events, @schedulerState))
-      , datacb && (events) =>
+
+      _datacb = datacb && (events) =>
         datacb(calendarEventFilter(@displayAppointmentEvents, events, @schedulerState))
+
+      @dataSource.getEvents(start, end, contexts, _donecb, _datacb)
 
     # Close all event details popup on the page and have them cleaned up.
     closeEventPopups: ->

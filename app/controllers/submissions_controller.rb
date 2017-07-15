@@ -264,7 +264,7 @@ class SubmissionsController < ApplicationController
     end
 
     respond_to do |format|
-      if @submission.save
+      if @submission.persisted?
         log_asset_access(@assignment, "assignments", @assignment_group, 'submit')
         format.html do
           flash[:notice] = t('assignment_submit_success', 'Assignment successfully submitted.')

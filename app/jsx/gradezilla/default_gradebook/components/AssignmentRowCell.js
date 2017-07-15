@@ -17,15 +17,11 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types'
-import IconMoreSolid from 'instructure-icons/lib/Solid/IconMoreSolid';
+import { bool, func, shape, string } from 'prop-types';
 import Button from 'instructure-ui/lib/components/Button';
-import { MenuItem } from 'instructure-ui/lib/components/Menu';
-import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu';
-import I18n from 'i18n!gradebook';
 import SubmissionCell from 'compiled/gradezilla/SubmissionCell';
-
-const { bool, func, shape } = PropTypes;
+import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
+import I18n from 'i18n!gradebook'
 
 function renderSubmissionCell (options) {
   const assignment = options.column.object;
@@ -35,60 +31,67 @@ function renderSubmissionCell (options) {
   return new (SubmissionCell[assignment.grading_type] || SubmissionCell)(options);
 }
 
-function renderTrigger (bindButton) {
-  return (
-    <Button ref={bindButton} size="small" variant="icon">
-      <IconMoreSolid title={I18n.t('Submission Options')} />
-    </Button>
-  );
-}
-
 class AssignmentRowCell extends React.Component {
   static propTypes = {
-    canShowSubmissionDetailsModal: bool.isRequired,
+    isSubmissionTrayOpen: bool.isRequired,
     editorOptions: shape({
-      column: shape({}).isRequired,
+      column: shape({
+        assignmentId: string.isRequired
+      }).isRequired,
       grid: shape({}).isRequired,
-      item: shape({}).isRequired
+      item: shape({
+        id: string.isRequired
+      }).isRequired,
     }).isRequired,
-    onShowSubmissionDetailsModal: func.isRequired
+    onToggleSubmissionTrayOpen: func.isRequired
   };
 
   constructor (props) {
     super(props);
 
-    this.bindOptionsMenuContent = (ref) => { this.optionsMenuContent = ref };
     this.bindContainerRef = (ref) => { this.container = ref };
-    this.bindOptionsButton = (ref) => { this.optionsButton = ref };
-
-    this.handleKeyDown = this.handleKeyDown.bind(this);
-    this.showSubmissionDetailsModal = this.showSubmissionDetailsModal.bind(this);
+    this.bindToggleTrayButtonRef = (ref) => { this.trayButton = ref };
   }
 
   componentDidMount () {
     this.submissionCell = renderSubmissionCell({ ...this.props.editorOptions, container: this.container });
   }
 
+  componentDidUpdate (prevProps) {
+    if (prevProps.isSubmissionTrayOpen && !this.props.isSubmissionTrayOpen) {
+      this.focusToggleTrayButton();
+    }
+  }
+
   componentWillUnmount () {
     this.submissionCell.destroy();
   }
 
-  handleKeyDown (jQueryEvent) {
+  handleKeyDown = (event) => {
     const submissionCellHasFocus = this.container.contains(document.activeElement);
-    const popoverTriggerHasFocus = this.optionsButton.focused;
+    const popoverTriggerHasFocus = this.trayButton.focused;
 
-    /* eslint-disable no-param-reassign */
-    if (jQueryEvent.keyCode === 9) { // tab
-      if (!jQueryEvent.shiftKey && submissionCellHasFocus) {
-        jQueryEvent.originalEvent.skipSlickGridDefaults = true;
-      } else if (jQueryEvent.shiftKey && popoverTriggerHasFocus) {
-        jQueryEvent.originalEvent.skipSlickGridDefaults = true;
+    if (event.which === 9) { // Tab
+      if (!event.shiftKey && submissionCellHasFocus) {
+        // browser will set focus on the tray button
+        return false; // prevent Grid behavior
+      } else if (event.shiftKey && popoverTriggerHasFocus) {
+        // browser will set focus on the submission cell
+        return false; // prevent Grid behavior
       }
     }
-    if (jQueryEvent.keyCode === 13 && popoverTriggerHasFocus) { // enter
-      jQueryEvent.originalEvent.skipSlickGridDefaults = true;
+
+    if (event.which === 13 && popoverTriggerHasFocus) { // Enter
+      // browser will activate the tray button
+      return false; // prevent Grid behavior
     }
-    /* eslint-enable no-param-reassign */
+
+    return undefined;
+  }
+
+  handleToggleTrayButtonClick = () => {
+    const options = this.props.editorOptions;
+    this.props.onToggleSubmissionTrayOpen(options.item.id, options.column.assignmentId);
   }
 
   applyValue (item, state) {
@@ -97,6 +100,12 @@ class AssignmentRowCell extends React.Component {
 
   focus () {
     this.submissionCell.focus();
+  }
+
+  focusToggleTrayButton = () => {
+    if (this.trayButton) {
+      this.trayButton.focus();
+    }
   }
 
   isValueChanged () {
@@ -111,17 +120,12 @@ class AssignmentRowCell extends React.Component {
     return this.submissionCell.serializeValue();
   }
 
-  showSubmissionDetailsModal () {
-    this.props.onShowSubmissionDetailsModal({
-      onClose: () => { this.optionsButton.focus() }
-    });
-  }
-
   validate () {
     return this.submissionCell.validate();
   }
 
   render () {
+    const arrowDirection = this.props.isSubmissionTrayOpen ? 'right' : 'left';
     return (
       <div className="Grid__AssignmentRowCell">
         <div className="Grid__AssignmentRowCell__Notifications" />
@@ -129,20 +133,15 @@ class AssignmentRowCell extends React.Component {
         <div className="Grid__AssignmentRowCell__Content" ref={this.bindContainerRef} />
 
         <div className="Grid__AssignmentRowCell__Options">
-          <PopoverMenu
-            contentRef={this.bindOptionsMenuContent}
-            focusTriggerOnClose={false}
-            trigger={renderTrigger(this.bindOptionsButton)}
+          <Button
+            ref={this.bindToggleTrayButtonRef}
+            onClick={this.handleToggleTrayButtonClick}
+            size="small"
+            variant="icon"
           >
-            {
-              this.props.canShowSubmissionDetailsModal &&
-              <MenuItem onSelect={this.showSubmissionDetailsModal}>
-                <span id="ShowSubmissionDetailsAction">
-                  { I18n.t('Submission Details…') }
-                </span>
-              </MenuItem>
-            }
-          </PopoverMenu>
+            <ScreenReaderContent>{I18n.t('Open submission tray')}</ScreenReaderContent>
+            <span className={`SubmissionCell__IconExpand SubmissionCell__IconExpand-${arrowDirection}`} />
+          </Button>
         </div>
       </div>
     );

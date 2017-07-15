@@ -37,5 +37,3 @@ class AssignmentConfigurationToolLookup < ActiveRecord::Base
     self.update_attributes(subscription_id: subscription_helper.create_subscription)
   end
 end
-
-

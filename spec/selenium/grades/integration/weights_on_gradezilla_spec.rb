@@ -24,12 +24,12 @@ describe 'gradezilla' do
   include WeightingSetup
 
   let(:total_grade) do
-    grading_period_ids = [0, @gp1.id, @gp2.id]
+    grading_period_names = ['All Grading Periods', @gp1.title, @gp2.title]
     user_session(@teacher)
     Gradezilla.visit(@course)
 
     if @grading_period_index
-      Gradezilla.select_grading_period(grading_period_ids[@grading_period_index])
+      Gradezilla.select_grading_period(grading_period_names[@grading_period_index])
     end
     Gradezilla.total_score_for_row(1)
   end

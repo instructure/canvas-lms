@@ -170,7 +170,7 @@ export default class CoursePickerTable extends React.Component {
 
   renderRows () {
     return this.props.courses.map(course =>
-      <tr key={course.id} className="bca-table__course-row">
+      <tr id={`course_${course.id}`} key={course.id} className="bca-table__course-row">
         <td>
           <Checkbox
             onChange={this.onSelectToggle}

@@ -394,9 +394,8 @@ describe "Wiki Pages" do
         f('.close-button').click
         wait_for_ajaximations
         f('.icon-edit').click
-        f('.btn-primary').click
-        wait_for_ajaximations
-        expect(f('div.user_content.clearfix.enhanced > p').text).to include 'published by teacher'
+        expect_new_page_load { f('.btn-primary').click }
+        expect(f('.show-content.user_content.clearfix.enhanced')).to include_text 'published by teacher'
       end
 
       it "keeps focus on clicked revision button" do

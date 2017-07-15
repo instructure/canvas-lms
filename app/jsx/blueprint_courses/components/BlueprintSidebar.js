@@ -30,6 +30,7 @@ import IconXSolid from 'instructure-icons/lib/Solid/IconXSolid'
 export default class BlueprintCourseSidebar extends Component {
   static propTypes = {
     onOpen: PropTypes.func,
+    onClose: PropTypes.func,
     children: PropTypes.node,
     detachedChildren: PropTypes.node,
     contentRef: PropTypes.func, // for unit testing
@@ -39,6 +40,7 @@ export default class BlueprintCourseSidebar extends Component {
     children: null,
     detachedChildren: null,
     onOpen: () => {},
+    onClose: () => {},
     contentRef: null
   }
 
@@ -47,15 +49,17 @@ export default class BlueprintCourseSidebar extends Component {
     this.state = {
       isOpen: false,
     }
+    this.trayRef = null
   }
 
   handleOpen = () => {
-    this.props.onOpen()
+    this.props.onOpen(this.trayRef)
     this.closeBtn.focus()
   }
 
   handleClose = () => {
     this.openBtn.focus()
+    this.props.onClose()
   }
 
   open = () => {
@@ -84,6 +88,7 @@ export default class BlueprintCourseSidebar extends Component {
           placement="end"
           onEntering={this.handleOpen}
           onExiting={this.handleClose}
+          contentRef={(el) => { this.trayRef = el }}
         >
           <div className="bcs__content" ref={this.props.contentRef}>
             <header className="bcs__header">

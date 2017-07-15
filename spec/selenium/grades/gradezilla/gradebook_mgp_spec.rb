@@ -44,11 +44,11 @@ describe "Gradezilla with grading periods" do
         @course.assignments.create!(due_at: 13.days.ago(now), title: "assign in ended")
         Gradezilla.visit(@course)
 
-        Gradezilla.select_grading_period(0)
+        Gradezilla.select_grading_period('All Grading Periods')
         Gradezilla.enter_grade("10", 0, 0)
         expect(Gradezilla.cell_graded?("10", 0, 0)).to be true
 
-        Gradezilla.select_grading_period(@gp_ended.id)
+        Gradezilla.select_grading_period(@gp_ended.title)
         Gradezilla.enter_grade("8", 0, 0)
         expect(Gradezilla.cell_graded?("8", 0, 0)).to be true
       end
@@ -65,7 +65,7 @@ describe "Gradezilla with grading periods" do
         assignment = @course.assignments.create!(due_at: 18.days.ago(now), title: "assign in closed")
         Gradezilla.visit(@course)
 
-        Gradezilla.select_grading_period(@gp_closed.id)
+        Gradezilla.select_grading_period(@gp_closed.title)
         Gradezilla.enter_grade("10", 0, 0)
         expect(Gradezilla.cell_graded?("10", 0, 0)).to be true
         expect(Submission.where(assignment_id: assignment.id, user_id: @student.id).first.grade).to eq "10"
@@ -78,10 +78,10 @@ describe "Gradezilla with grading periods" do
       @course.assignments.create!(due_at: 18.days.ago, title: "assign in closed")
       Gradezilla.visit(@course)
 
-      Gradezilla.select_grading_period(0)
+      Gradezilla.select_grading_period('All Grading Periods')
       expect(Gradezilla.grading_cell(0, 0)).to contain_css(Gradezilla.ungradable_selector)
 
-      Gradezilla.select_grading_period(@gp_closed.id)
+      Gradezilla.select_grading_period(@gp_closed.title)
       expect(Gradezilla.grading_cell(0, 0)).to contain_css(Gradezilla.ungradable_selector)
     end
   end

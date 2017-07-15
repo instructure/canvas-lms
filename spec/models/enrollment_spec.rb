@@ -722,6 +722,22 @@ describe Enrollment do
       e.accept!
       expect(teacher.messages).to be_exists
     end
+
+    it "should not send out notifications for enrollment acceptance to admins who are section restricted and in other sections" do
+      # even though section restrictions are still basically meaningless at this point
+      teacher = user_with_pseudonym(:active_all => true)
+      n = Notification.create!(:name => "Enrollment Accepted")
+      NotificationPolicy.create!(:notification => n, :communication_channel => @user.communication_channel, :frequency => "immediately")
+      course_with_teacher(:active_all => true, :user => teacher)
+      teacher.enrollments.first.update_attribute(:limit_privileges_to_course_section, true)
+      other_section = @course.course_sections.create!
+      e1 = @course.enroll_student(user_factory, :section => other_section)
+      e1.accept!
+      expect(teacher.messages).to_not be_exists
+      e2 = @course.enroll_student(user_factory, :section => @course.default_section)
+      e2.accept!
+      expect(teacher.messages).to be_exists
+    end
   end
 
   context "atom" do

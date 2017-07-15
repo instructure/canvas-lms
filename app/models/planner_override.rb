@@ -27,7 +27,7 @@ class PlannerOverride < ActiveRecord::Base
   validates_uniqueness_of :plannable_id, scope: [:user_id, :plannable_type]
 
   scope :active, -> { where workflow_state: 'active' }
-  scope :visible, -> { where visible: true }
+  scope :visible, -> { where(marked_complete: false) }
   scope :hidden, -> { where.not visible }
   scope :deleted, -> { where workflow_state: 'deleted' }
   scope :not_deleted, -> { where.not deleted }

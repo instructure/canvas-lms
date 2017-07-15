@@ -46,3 +46,10 @@ define [
     deepEqual dialog.gradeIsExcused('F'), false
     #this test documents that we do not consider 'excused' to return true
     deepEqual dialog.gradeIsExcused('excused'), false
+
+  test 'when given callback for #show, invokes callback upon dialog close', ->
+    callback = @stub()
+    dialog = new SetDefaultGradeDialog({ @assignment })
+    dialog.show(callback)
+    $('button.ui-dialog-titlebar-close').click();
+    equal(callback.callCount, 1)

@@ -143,6 +143,12 @@
       <td><%= before_label :locked_at, "Locked At" %></td>
       <td id="job-locked_at" class="show-field">&nbsp;</td>
     </tr>
+    <% if defined?(Marginalia) %>
+      <tr>
+        <td><%= before_label :source, "Source" %></td>
+        <td id="job-source" class="show-field">&nbsp;</td>
+      </tr>
+    <% end %>
     <tr>
       <td><%= before_label :failed_at, "Failed At" %></td>
       <td id="job-failed_at" class="show-field">&nbsp;</td>

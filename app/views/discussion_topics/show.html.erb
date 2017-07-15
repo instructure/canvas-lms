@@ -311,10 +311,12 @@
 
               &nbsp; &nbsp;
               <button id="collapseAll" class="btn disableWhileFiltering" title="<%= t('collapse_replies', 'Collapse replies') %>" aria-label="<%= t('collapse_replies', 'Collapse replies') %>">
-                <%= image_tag 'discussions/collapse_icon.png', :alt => t('collapse_replies', 'Collapse replies') %>
+                <i class="icon-expand" aria-hidden="true"> </i>
+                <span class="screenreader-only">Collapse replies</span>
               </button>
               <button id="expandAll" class="btn disableWhileFiltering" title="<%= t('expand_replies', 'Expand replies') %>" aria-label="<%= t('expand_replies', 'Expand replies') %>">
-                <%= image_tag 'discussions/expand_icon.png', :alt => t('expand_replies', 'Expand replies') %>
+                <i class="icon-collapse" aria-hidden="true"></i>
+                <span class="screenreader-only">Expand replies</span>
               </button>
             </div>
 

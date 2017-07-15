@@ -16,27 +16,42 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const colors = {
-  light: {
-    pink: '#FFE8E5',
-    orange: '#FEF0E5',
-    yellow: '#FEF7E5',
-    brown: '#F3EFEA',
-    green: '#E5F7E5',
-    lavender: '#F0E8EF',
-    blue: '#E5F3FC',
-    purple: '#F8EAF6'
-  },
-  dark: {
-    pink: '#F2DBD8',
-    orange: '#F1E3D8',
-    yellow: '#F1EAD8',
-    brown: '#E6E2DD',
-    green: '#D8EAD8',
-    lavender: '#E3DBE2',
-    blue: '#D8E6EF',
-    purple: '#EBDDE9'
-  }
+import Color from 'tinycolor2';
+
+const defaultColors = {
+  salmon: '#FFE8E5',
+  orange: '#FEF0E5',
+  yellow: '#FEF7E5',
+  brown: '#F3EFEA',
+  green: '#E5F7E5',
+  blue: '#E5F3FC',
+  steel: '#E9EDF5', // (・3・)
+  pink: '#F8EAF6',
+  lavender: '#F0E8EF',
+  white: '#FFFFFF'
 };
 
-export default colors;
+const defaultStatusColors = {
+  dropped: defaultColors.orange,
+  excused: defaultColors.yellow,
+  late: defaultColors.blue,
+  missing: defaultColors.salmon,
+  resubmitted: defaultColors.green
+};
+
+function statusColors (userColors = {}) {
+  return {
+    ...defaultStatusColors,
+    ...userColors
+  };
+}
+
+function darken (color, percent) {
+  return Color(color).darken(percent);
+}
+
+export default {
+  defaultColors,
+  statusColors,
+  darken
+};

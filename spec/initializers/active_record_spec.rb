@@ -194,6 +194,18 @@ module ActiveRecord
       end
     end
 
+    describe "update_all with limit" do
+      it "does the right thing with a join and a limit" do
+        u1 = User.create!(name: 'u1')
+        e1 = u1.eportfolios.create!(name: 'e1')
+        u2 = User.create!(name: 'u2')
+        e2 = u2.eportfolios.create!(name: 'e2')
+        Eportfolio.joins(:user).order(:id).limit(1).update_all(name: 'changed')
+        expect(e1.reload.name).to eq 'changed'
+        expect(e2.reload.name).not_to eq 'changed'
+      end
+    end
+
     describe "parse_asset_string" do
       it "parses simple asset strings" do
         expect(ActiveRecord::Base.parse_asset_string("course_123")).to eql(["Course", 123])

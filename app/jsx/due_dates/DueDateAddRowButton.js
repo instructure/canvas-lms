@@ -35,9 +35,9 @@ import I18n from 'i18n!assignments'
                 className = "Button Button--add-row"
                 onClick   = {this.props.handleAdd}
                 type      = "button" >
-          <i className="icon-plus" />
+          <i className="icon-plus" role="presentation"/>
           <span className="screenreader-only">{I18n.t("Add new set of due dates")}</span>
-          <span aria-hidden="true">{I18n.t("Add")}</span>
+          <span aria-hidden="true">&nbsp;{I18n.t("Add")}</span>
         </button>
       )
     }

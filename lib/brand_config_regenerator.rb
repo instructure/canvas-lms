@@ -83,7 +83,7 @@ class BrandConfigRegenerator
     )
     progress.user = @current_user
     progress.reset!
-    progress.process_job(new_config, job_type, {priority: Delayed::HIGH_PRIORITY}, thing.id)
+    progress.process_job(new_config, job_type, { priority: Delayed::HIGH_PRIORITY, strand: "brand_config_regenerate_#{thing.global_asset_string}" }, thing.id)
 
     @new_configs[config.md5] = new_config
     @progresses << progress

@@ -48,13 +48,15 @@
             {{#t}}Created:{{/t}} {{datetimeFormatted created_at}}
         </div>
         <div>
-            {{#t}}Last Used:{{/t}} {{#ifExists last_used_at}}{{last_used_at}}{{else}}Never{{/ifExists}}
+            {{#t}}Last Used:{{/t}} {{#ifExists last_used_at}}{{last_used_at}}{{else}}{{#t}}Never{{/t}}{{/ifExists}}
         </div>
     </td>
     <td class='notes'>
-      <div>
-        {{#t}}{{notes}}{{/t}}
-      </div>
+      {{#if notes}}
+        <div>
+            {{notes}}
+        </div>
+      {{/if}}
     </td>
     <td class='links'>
         <a href="#" class="edit_link" aria-label="{{#t}}Edit key {{name}}{{/t}}" title="{{#t "edit_key"}}Edit this key{{/t}}"><i class="icon-edit standalone-icon"></i></a>

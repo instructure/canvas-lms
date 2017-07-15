@@ -25,25 +25,30 @@ import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderConte
 import PopoverMenu from 'instructure-ui/lib/components/PopoverMenu'
 import { MenuItem, MenuItemGroup, MenuItemSeparator } from 'instructure-ui/lib/components/Menu'
 import Button from 'instructure-ui/lib/components/Button'
-import IconSettings2Solid from 'instructure-icons/lib/Solid/IconSettings2Solid'
+import IconSettings2Line from 'instructure-icons/lib/Line/IconSettings2Line'
+
+import {sharedDashboardInstance} from '../dashboardPlannerHelper'
 
 export default class DashboardOptionsMenu extends React.Component {
   static propTypes = {
     recent_activity_dashboard: PropTypes.bool,
     hide_dashcard_color_overlays: PropTypes.bool,
     planner_enabled: PropTypes.bool,
-    planner_selected: PropTypes.bool
+    planner_selected: PropTypes.bool,
+    onDashboardChange: PropTypes.func
   }
 
   static defaultProps = {
     hide_dashcard_color_overlays: false,
     planner_enabled: false,
     planner_selected: false,
-    recent_activity_dashboard: false
+    recent_activity_dashboard: false,
+    onDashboardChange: () => {}
   }
 
   constructor (props) {
     super(props)
+    sharedDashboardInstance.init(this.changeToCardView)
 
     let view;
     if (props.planner_enabled && props.planner_selected) {
@@ -58,6 +63,13 @@ export default class DashboardOptionsMenu extends React.Component {
       view,
       colorOverlays: props.hide_dashcard_color_overlays ? [] : ['colorOverlays']
     }
+  }
+
+  changeToCardView = () => {
+    this.setState({view: ['cards']}, () => {
+      this.toggleDashboardView(this.state.view)
+      this.postDashboardToggle()
+    })
   }
 
   handleViewOptionSelect = (e, newSelected) => {
@@ -107,6 +119,8 @@ export default class DashboardOptionsMenu extends React.Component {
       dashboardCards.style.display = 'block'
       rightSideContent.style.display = 'block'
     }
+
+    this.props.onDashboardChange(newView[0]);
   }
 
   toggleColorOverlays () {
@@ -149,7 +163,7 @@ export default class DashboardOptionsMenu extends React.Component {
         trigger={
           <Button variant="icon">
             <ScreenReaderContent>{I18n.t('Dashboard Options')}</ScreenReaderContent>
-            <IconSettings2Solid />
+            <IconSettings2Line />
           </Button>
         }
         contentRef={(el) => { this.menuContentRef = el; }}

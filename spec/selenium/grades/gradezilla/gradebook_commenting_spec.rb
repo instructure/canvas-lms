@@ -22,16 +22,19 @@ describe "Gradezilla" do
   include_context "in-process server selenium tests"
   include GradezillaCommon
 
-  before(:once) { gradebook_data_setup }
+  before(:once) do
+    gradebook_data_setup
+
+    @comment_text = "This is a new group comment!"
+  end
   before(:each) { user_session(@teacher) }
 
   it "should validate posting a comment to a graded assignment", priority: "1", test_id: 210046 do
-    comment_text = "This is a new comment!"
-
+    pending('to be unpended when commenting functionality is added to the new gradebook submission tray')
     Gradezilla.visit(@course)
 
     dialog = open_comment_dialog
-    set_value(dialog.find_element(:id, "add_a_comment"), comment_text)
+    set_value(dialog.find_element(:id, "add_a_comment"), @comment_text)
     f("form.submission_details_add_comment_form.clearfix > button.btn").click
     wait_for_ajax_requests
 
@@ -39,29 +42,28 @@ describe "Gradezilla" do
     refresh_page
 
     comment = open_comment_dialog.find_element(:css, '.comment')
-    expect(comment).to include_text(comment_text)
+    expect(comment).to include_text(@comment_text)
   end
 
   it "should let you post a group comment to a group assignment", priority: "1", test_id: 210047 do
+    pending('to be unpended when commenting functionality is added to the new gradebook submission tray')
     group_assignment = @course.assignments.create!({
-      :title => 'group assignment',
-      :due_at => (Time.zone.now + 1.week),
-      :points_possible => @assignment_3_points,
-      :submission_types => 'online_text_entry',
-      :assignment_group => @group,
-      :group_category => GroupCategory.create!(:name => "groups", :context => @course),
-      :grade_group_students_individually => true
-    })
+                                                     :title => 'group assignment',
+                                                     :due_at => (Time.zone.now + 1.week),
+                                                     :points_possible => @assignment_3_points,
+                                                     :submission_types => 'online_text_entry',
+                                                     :assignment_group => @group,
+                                                     :group_category => GroupCategory.create!(:name => "groups", :context => @course),
+                                                     :grade_group_students_individually => true
+                                                   })
     project_group = group_assignment.group_category.groups.create!(:name => 'g1', :context => @course)
     project_group.users << @student_1
     project_group.users << @student_2
 
-    comment_text = "This is a new group comment!"
-
     Gradezilla.visit(@course)
 
     dialog = open_comment_dialog(3)
-    set_value(dialog.find_element(:id, "add_a_comment"), comment_text)
+    set_value(dialog.find_element(:id, "add_a_comment"), @comment_text)
     dialog.find_element(:id, "group_comment").click
     f("form.submission_details_add_comment_form.clearfix > button.btn").click
 
@@ -71,6 +73,6 @@ describe "Gradezilla" do
     # make sure it's on the other student's submission
     open_comment_dialog(3, 1)
     comment = fj(".submission_details_dialog:visible .comment")
-    expect(comment).to include_text(comment_text)
+    expect(comment).to include_text(@comment_text)
   end
 end

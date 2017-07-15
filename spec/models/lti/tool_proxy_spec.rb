@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../../lti2_spec_helper.rb')
 require_dependency "lti/tool_proxy"
 
 module Lti
@@ -105,6 +106,25 @@ module Lti
         expect(subject.errors[:raw_data]).to include("can't be blank")
       end
 
+      describe "#active" do
+        let(:root_account) { Account.create }
+
+        it "returns active tool proxies" do
+          create_tool_proxy(context: root_account)
+          expect(Lti::ToolProxy.active.size).to eq(1)
+        end
+
+        it "doesn't return disabled tool proxies" do
+          create_tool_proxy(context: root_account, workflow_state: 'disabled')
+          expect(Lti::ToolProxy.active.size).to eq(0)
+        end
+
+        it "doesn't return deleted tool proxies" do
+          create_tool_proxy(context: root_account, workflow_state: 'deleted')
+          expect(Lti::ToolProxy.active.size).to eq(0)
+        end
+      end
+
       describe "#find_proxies_for_context" do
         let(:root_account) { Account.create }
         let(:sub_account_1_1) { Account.create(parent_account: root_account) }
@@ -171,6 +191,37 @@ module Lti
             tool_proxy = create_tool_proxy(context: c)
             expect(tool_proxy.active_in_context?(c)).not_to be_truthy
           end
+        end
+
+        describe "#find_active_proxies_for_context_by_vendor_code_and_product_code" do
+          it "doesn't return tool_proxies that are disabled" do
+            tool_proxy = create_tool_proxy(context: sub_account_2_1, workflow_state: 'disabled')
+            tool_proxy.bindings.create!(context: sub_account_2_1)
+            proxies = described_class.find_active_proxies_for_context_by_vendor_code_and_product_code(context: sub_account_2_1, vendor_code: '123', product_code: 'abc')
+            expect(proxies.count).to eq 0
+          end
+
+          it "doesn't return tool_proxies that don't have a matching vendor_code" do
+            tool_proxy = create_tool_proxy(context: sub_account_2_1)
+            tool_proxy.bindings.create!(context: sub_account_2_1)
+            proxies = described_class.find_active_proxies_for_context_by_vendor_code_and_product_code(context: sub_account_2_1, vendor_code: '1234', product_code: 'abc')
+            expect(proxies.count).to eq 0
+          end
+
+          it "doesn't return tool_proxies that don't have a matching product_code" do
+            tool_proxy = create_tool_proxy(context: sub_account_2_1)
+            tool_proxy.bindings.create!(context: sub_account_2_1)
+            proxies = described_class.find_active_proxies_for_context_by_vendor_code_and_product_code(context: sub_account_2_1, vendor_code: '123', product_code: 'abcd')
+            expect(proxies.count).to eq 0
+          end
+
+          it "returns tool proxies that match" do
+            tool_proxy = create_tool_proxy(context: sub_account_2_1)
+            tool_proxy.bindings.create!(context: sub_account_2_1)
+            proxies = described_class.find_active_proxies_for_context_by_vendor_code_and_product_code(context: sub_account_2_1, vendor_code: '123', product_code: 'abc')
+            expect(proxies.count).to eq 1
+          end
+
         end
 
         describe "#find_active_proxies_for_context" do
@@ -282,5 +333,123 @@ module Lti
       end
     end
 
+    describe "#matching_tool_profile?" do
+      include_context 'lti2_spec_helper'
+
+      it 'returns true when there is a match' do
+        expect(tool_proxy.matching_tool_profile?({
+          "product_instance" => {
+            "product_info" => {
+              "product_family" => {
+                "vendor" => {
+                  "code" => "123"
+                },
+                "code" => "abc"
+              },
+            }
+          },
+          "resource_handler" => [
+            {
+              "resource_type" => {
+                "code" => "code"
+              }
+            }
+          ]
+        })).to eq(true)
+      end
+
+      it "returns false when the vendor_code doesn't match" do
+        expect(tool_proxy.matching_tool_profile?({
+          "product_instance" => {
+            "product_info" => {
+              "product_family" => {
+                "vendor" => {
+                  "code" => "1234"
+                },
+                "code" => "abc"
+              },
+            }
+          },
+          "resource_handler" => [
+            {
+              "resource_type" => {
+                "code" => "code"
+              }
+            }
+          ]
+        })).to eq(false)
+      end
+
+      it "returns false when the product_code doesn't match" do
+        expect(tool_proxy.matching_tool_profile?({
+          "product_instance" => {
+            "product_info" => {
+              "product_family" => {
+                "vendor" => {
+                  "code" => "123"
+                },
+                "code" => "abcd"
+              },
+            }
+          },
+          "resource_handler" => [
+            {
+              "resource_type" => {
+                "code" => "code"
+              }
+            }
+          ]
+        })).to eq(false)
+      end
+
+      it "returns false when the resource type codes do not match" do
+        expect(tool_proxy.matching_tool_profile?({
+          "product_instance" => {
+            "product_info" => {
+              "product_family" => {
+                "vendor" => {
+                  "code" => "123"
+                },
+                "code" => "abc"
+              },
+            }
+          },
+          "resource_handler" => [
+            {
+              "resource_type" => {
+                "code" => "different_code"
+              }
+            }
+          ]
+        })).to eq(false)
+      end
+
+      it "returns false when the resource handlers differ in number" do
+        expect(tool_proxy.matching_tool_profile?({
+          "product_instance" => {
+            "product_info" => {
+              "product_family" => {
+                "vendor" => {
+                  "code" => "123"
+                },
+                "code" => "abc"
+              },
+            }
+          },
+          "resource_handler" => [
+            {
+              "resource_type" => {
+                "code" => "different_code"
+              }
+            },
+            {
+              "resource_type" => {
+                "code" => "code"
+              }
+            }
+          ]
+        })).to eq(false)
+      end
+    end
   end
 end

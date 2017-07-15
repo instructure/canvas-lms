@@ -257,6 +257,10 @@ span.agendaView--no-assignments {
 
     .fc-today {
       background: $ic-color-medium-light;
+      @if $use_high_contrast {
+        font-weight: bold;
+        text-decoration: underline;
+      }
     }
   }
 

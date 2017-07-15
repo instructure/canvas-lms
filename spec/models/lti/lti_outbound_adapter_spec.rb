@@ -33,11 +33,7 @@ describe Lti::LtiOutboundAdapter do
     end
   }
 
-  let(:user) {
-    User.new.tap do |user|
-      user.stubs(:id).returns('user_id')
-    end
-  }
+  let(:user) { User.create! }
 
   let(:context) {
     Course.new.tap do |course|
@@ -216,6 +212,19 @@ describe Lti::LtiOutboundAdapter do
       expect(payload['firstname']).to be_nil
     end
 
+    it "includes the 'ext_lti_assignment_id' if the optional assignment parameter is present" do
+      assignment.update_attributes(lti_context_id: SecureRandom.uuid)
+      adapter.prepare_tool_launch(return_url, variable_expander)
+      payload = adapter.generate_post_payload(assignment: assignment)
+      expect(payload['ext_lti_assignment_id']).to eq assignment.lti_context_id
+    end
+
+    it "does not include the 'ext_lti_assignment_id' if the optional assignment parameter is absent" do
+      adapter.prepare_tool_launch(return_url, variable_expander)
+      payload = adapter.generate_post_payload(assignment: assignment)
+      expect(payload.keys).not_to include 'ext_lti_assignment_id'
+    end
+
     it "raises a not prepared error if the tool launch has not been prepared" do
       expect { adapter.generate_post_payload }.to raise_error(RuntimeError, 'Called generate_post_payload before calling prepare_tool_launch')
     end
@@ -231,6 +240,14 @@ describe Lti::LtiOutboundAdapter do
       LtiOutbound::ToolLaunch.stubs(:new).returns(tool_launch)
     end
 
+    it "includes the 'ext_lti_assignment_id' parameter" do
+      assignment.update_attributes(lti_context_id: SecureRandom.uuid)
+      adapter.prepare_tool_launch(return_url, variable_expander)
+      tool_launch.expects(:for_assignment!).with(lti_assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
+      payload = adapter.generate_post_payload_for_assignment(assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
+      expect(payload['ext_lti_assignment_id']).to eq assignment.lti_context_id
+    end
+
     it "creates an lti_assignment" do
       adapter.prepare_tool_launch(return_url, variable_expander)
 
@@ -242,7 +259,7 @@ describe Lti::LtiOutboundAdapter do
     it "generates the correct source_id for the assignment" do
       generated_sha = 'generated_sha'
       Canvas::Security.stubs(:hmac_sha1).returns(generated_sha)
-      source_id = "tool_id-course_id-assignment_id-user_id-#{generated_sha}"
+      source_id = "tool_id-course_id-assignment_id-#{user.id}-#{generated_sha}"
       tool_launch.stubs(:for_assignment!)
       assignment_creator = mock
       assignment_creator.stubs(:convert).returns(tool_launch)

@@ -66,7 +66,7 @@ class LatePolicyApplicator
   private
 
   def process_submission(late_policy, assignment, submission)
-    submission.apply_late_policy(late_policy, assignment.points_possible)
+    submission.apply_late_policy(late_policy, assignment.points_possible, assignment.grading_type)
     if submission.changed?
       submission.skip_grade_calc = true
       return submission.save!
@@ -76,7 +76,9 @@ class LatePolicyApplicator
   end
 
   def relevant_submissions(assignment)
-    @relevant_submissions[assignment.id] ||= assignment.submissions.late.where.not(score: nil).
+    @relevant_submissions[assignment.id] ||= assignment.submissions.late.
+      where.not(score: nil).
+      union(assignment.submissions.missing).
       where(user_id: relevant_student_ids(assignment))
   end
 

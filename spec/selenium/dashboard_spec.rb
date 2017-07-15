@@ -32,8 +32,10 @@ describe "dashboard" do
 
   context "as a student" do
 
-    before (:each) do
+    before :each do
       course_with_student_logged_in(:active_all => true)
+      @course.default_view = 'feed'
+      @course.save!
     end
 
     def create_announcement
@@ -324,6 +326,8 @@ describe "dashboard" do
       PluginSetting.create!(:name => "wimba", :settings => {"domain" => "wimba.instructure.com"})
 
       course_with_teacher_logged_in
+      @course.default_view = 'feed'
+      @course.save!
 
       @conference = @course.web_conferences.build({:title => "my Conference", :conference_type => "Wimba", :duration => nil})
       @conference.user = @user
@@ -348,6 +352,8 @@ describe "dashboard" do
       announcement_model({:title => "hey all read this k", :message => "announcement"})
       @second_course = Course.create!(:name => 'second course')
       @second_course.offer!
+      @second_course.default_view = 'feed'
+      @second_course.save!
       #add teacher as a user
       u = User.create!
       u.register!

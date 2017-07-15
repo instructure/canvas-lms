@@ -17,7 +17,7 @@
  */
 
 import React from 'react';
-import { func, string } from 'prop-types';
+import { bool, func, string } from 'prop-types';
 import _ from 'underscore';
 import Button from 'instructure-ui/lib/components/Button';
 import LatePoliciesTabPanel from 'jsx/gradezilla/default_gradebook/components/LatePoliciesTabPanel';
@@ -32,7 +32,9 @@ class GradebookSettingsModal extends React.Component {
   static propTypes = {
     courseId: string.isRequired,
     locale: string.isRequired,
-    onClose: func.isRequired
+    onClose: func.isRequired,
+    gradedLateOrMissingSubmissionsExist: bool.isRequired,
+    newGradebookDevelopmentEnabled: bool.isRequired
   }
 
   constructor (props) {
@@ -139,6 +141,8 @@ class GradebookSettingsModal extends React.Component {
                 latePolicy={latePolicy}
                 changeLatePolicy={this.changeLatePolicy}
                 locale={this.props.locale}
+                showContentComingSoon={!this.props.newGradebookDevelopmentEnabled}
+                showAlert={this.props.gradedLateOrMissingSubmissionsExist}
               />
             </TabPanel>
           </TabList>

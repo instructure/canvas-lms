@@ -135,6 +135,31 @@ describe Api::V1::GradebookHistory do
     end
   end
 
+  describe '#versions_json' do
+      let(:grader) { User.create!(:name => 'grader') }
+      let(:student) { User.create! }
+      let(:assignment) { course.assignments.create!(:title => "some assignment") }
+      let(:versions) { [Version.create!(versionable: submission, model: submission)] }
+      let(:harness) {  GradebookHistoryHarness.new }
+      let(:submission) do
+        s = assignment.submit_homework(student)
+        s.update_attributes(graded_at: now, score: 90, grade: '90', grader: grader)
+        s
+      end
+      let(:course) do
+        c = Course.create!
+        c.enroll_student(student)
+        c.enroll_teacher(grader)
+        c
+      end
+
+    it "does preloads originality reports" do
+      submission.reload
+      harness.versions_json(course, versions, api_context)
+      expect(versions.first.model.association(:originality_reports).loaded?).to eq true
+    end
+  end
+
   describe '#submissions_for' do
     before :once do
       @course = Course.create!

@@ -17,11 +17,10 @@
  */
 
 import _ from 'underscore';
-import $ from 'jquery';
+import qs from 'qs';
 import DataLoader from 'jsx/gradezilla/DataLoader';
 
-QUnit.module('Gradebook Data Loader', (hooks) => {
-  let savedTrackEvent;
+QUnit.module('Gradebook Data Loader', function (hooks) {
   let fakeXhr;
   let XHRS;
   let XHR_HANDLERS;
@@ -29,14 +28,19 @@ QUnit.module('Gradebook Data Loader', (hooks) => {
 
   const ASSIGNMENT_GROUPS = [{id: 1}, {id: 4}];
   const CONTEXT_MODULES = [{id: 1}, {id: 3}];
-  const STUDENTS_PAGE_1 = [{id: 2}, {id: 5}];
-  const STUDENTS_PAGE_2 = [{id: 3}, {id: 7}];
-  const SUBMISSIONS_CHUNK_1 = [{id: 99}];
-  const SUBMISSIONS_CHUNK_2 = [{id: 100}, {id: 101}];
-  const CUSTOM_COLUMNS = [{id: 50}];
+  const STUDENT_IDS = ['1101', '1102', '1103'];
+  const STUDENTS_PAGE_1 = [{ id: '1101' }, { id: '1102' }];
+  const STUDENTS_PAGE_2 = [{ id: '1103' }];
+  const SUBMISSIONS_CHUNK_1 = [{ id: '2501' }];
+  const SUBMISSIONS_CHUNK_2 = [{ id: '2502' }, { id: '2503' }];
+  const CUSTOM_COLUMNS = [{ id: '2401' }];
 
-  hooks.beforeEach(() => {
+  hooks.beforeEach(function () {
+    this.qunitTimeout = QUnit.config.testTimeout;
+    QUnit.config.testTimeout = 100;
+
     XHRS = [];
+    XHR_HANDLERS = [];
     handlerIndex = 0;
     fakeXhr = sinon.useFakeXMLHttpRequest();
     fakeXhr.onCreate = (xhr) => {
@@ -49,23 +53,23 @@ QUnit.module('Gradebook Data Loader', (hooks) => {
         }
       });
     };
-
-       // google analytics stuff :/
-    savedTrackEvent = $.trackEvent;
-    $.trackEvent = () => {};
   });
 
-  hooks.afterEach(() => {
+  hooks.afterEach(function () {
     fakeXhr.restore();
-    XHR_HANDLERS = null;
-    $.trackEvent = savedTrackEvent;
+    XHR_HANDLERS = [];
+
+    QUnit.config.testTimeout = this.qunitTimeout;
+    this.qunitTimeout = null;
   });
 
   const callLoadGradebookData = (opts = {}) => {
     const defaults = {
+      perPage: 2,
       assignmentGroupsURL: '/ags',
       assignmentGroupsParams: {ag_params: 'ok'},
       contextModulesURL: '/context-modules',
+      courseId: '1201',
       customColumnsURL: '/customcols',
       studentsURL: '/students',
       studentsPageCb: () => {},
@@ -82,190 +86,271 @@ QUnit.module('Gradebook Data Loader', (hooks) => {
     return DataLoader.loadGradebookData({...defaults, ...opts});
   }
 
-  const respondToXhr = (url, status, headers, response) => {
+  function matchParams (request, params) {
+    const queryString = request.url.split('?')[1] || '';
+    const queryParams = qs.parse(queryString);
+    return Object.keys(params).every(key => (
+      // ensure the params match, no matter the data type
+      qs.stringify({ [key]: queryParams[key] }) === qs.stringify({ [key]: params[key] })
+    ));
+  }
+
+  function matchRequest (xhrs, url, params) {
+    return xhrs.find(request => request.url.match(url) && matchParams(request, params));
+  }
+
+  function handleRequest (url, params, status, headers, data) {
     const pendingXhrs = XHRS.filter(x => !x.status);
-    const xhr = _.find(pendingXhrs, request => request.url === url);
+    const xhr = matchRequest(pendingXhrs, url, params);
     if (xhr) {
-      xhr.respond(status, headers, JSON.stringify(response));
+      xhr.respond(status, headers, JSON.stringify(data));
       handlerIndex++;
     }
-  };
+  }
+
+  function respondWith (url, params, status, headers, data) {
+    XHR_HANDLERS.push(() => {
+      handleRequest(url, params, status, headers, data);
+    });
+  }
 
   QUnit.module('Assignment Groups');
 
-  test('resolves promise with data when all groups are loaded', (assert) => {
-    XHR_HANDLERS = [
-      () => {
-        respondToXhr('/ags?ag_params=ok',
-                       200, {Link: ''}, ASSIGNMENT_GROUPS);
-      },
-    ];
+  test('resolves promise with data when all groups are loaded', function (assert) {
+    respondWith('/ags', { ag_params: 'ok' }, 200, { Link: '' }, ASSIGNMENT_GROUPS);
 
     const dataLoader = callLoadGradebookData();
-    const resolved = assert.async();
+    const resolve = assert.async();
 
     dataLoader.gotAssignmentGroups.then((ags) => {
       ok(_.isEqual(ags, ASSIGNMENT_GROUPS));
-      resolved();
+      resolve();
     });
   });
 
   QUnit.module('Context Modules');
 
-  test('resolves promise with data when all modules are loaded', (assert) => {
-    XHR_HANDLERS = [
-      () => {
-        respondToXhr('/context-modules', 200, {Link: ''}, CONTEXT_MODULES);
-      },
-    ];
+  test('resolves promise with data when all modules are loaded', function (assert) {
+    respondWith('/context-modules', {}, 200, { Link: '' }, CONTEXT_MODULES);
 
     const dataLoader = callLoadGradebookData();
-    const resolved = assert.async();
+    const resolve = assert.async();
 
     dataLoader.gotContextModules.then((modules) => {
       deepEqual(modules, CONTEXT_MODULES);
-      resolved();
+      resolve();
     });
   });
 
   QUnit.module('Students and Submissions');
 
-  test('resolves promise with data when all students are loaded', (assert) => {
-    XHR_HANDLERS = [
-      () => {
-        respondToXhr('/students?student_params=whatever',
-                       200, {Link: ''}, STUDENTS_PAGE_1);
-      }
-    ]
+  test('requests student ids using the given course id', function () {
+    respondWith('/courses/1201/gradebook/user_ids', {}, 200, {}, { user_ids: STUDENT_IDS });
+
+    callLoadGradebookData();
+
+    const userIdsRequests = XHRS.filter(xhr => xhr.url.match('/courses/1201/gradebook/user_ids'));
+    strictEqual(userIdsRequests.length, 1, 'one request for user ids was made');
+  });
+
+  test('resolves gotStudentIds when user ids have loaded', function (assert) {
+    respondWith('/courses/1201/gradebook/user_ids', {}, 200, {}, { user_ids: STUDENT_IDS });
 
     const dataLoader = callLoadGradebookData();
-    const resolved = assert.async();
+    const resolve = assert.async();
 
-    dataLoader.gotStudents.then((students) => {
-      ok(_.isEqual(students, STUDENTS_PAGE_1));
-      resolved();
+    dataLoader.gotStudentIds.then(() => {
+      ok(true, 'gotStudentIds resolved');
+      resolve();
     });
   });
 
-  test('fires callback with each page of students', (assert) => {
-    XHR_HANDLERS = [
-      () => {
-        respondToXhr('/students?student_params=whatever',
-                       200,
-                       {Link: '</students?page=2>; rel="last"'},
-                       STUDENTS_PAGE_1)
-      },
-      () => {
-        respondToXhr('/students?page=2&student_params=whatever',
-                       200, {Link: ''}, STUDENTS_PAGE_2);
-      }
-    ];
+  test('requests students using the returned student ids', function (assert) {
+    respondWith('/courses/1201/gradebook/user_ids', {}, 200, {}, { user_ids: STUDENT_IDS });
 
-    const pageCallbacksDone = assert.async();
-    const promiseResolved = assert.async();
+    const dataLoader = callLoadGradebookData({ perPage: 50 });
+    const resolve = assert.async();
 
-    let pageCbCalled = 0;
-    const pages = [STUDENTS_PAGE_1, STUDENTS_PAGE_2];
-    const pageCb = (students) => {
-      pageCbCalled++;
-      ok(_.isEqual(students, pages.shift()));
-      if (pageCbCalled === 2) {
-        pageCallbacksDone();
-      }
-    };
-
-    const dataLoader = callLoadGradebookData({studentsPageCb: pageCb});
-    dataLoader.gotStudents.then((students) => {
-      ok(pageCbCalled === 2, 'callbacks fire before promise resolves');
-      ok(_.isEqual(students, STUDENTS_PAGE_1.concat(STUDENTS_PAGE_2)), 'promise returns all pages');
-      promiseResolved();
+    dataLoader.gotStudentIds.then(() => {
+      const studentRequest = XHRS.find(xhr => xhr.url.match('/students'));
+      const params = qs.parse(studentRequest.url.split('?')[1]);
+      deepEqual(params.user_ids, STUDENT_IDS);
+      resolve();
     });
   });
 
-  test('requests submissions as students are loading', (assert) => {
-    const studentIdParam = studentIds => studentIds.reduce(
-          (str, id) => `${str}student_ids%5B%5D=${id}&`,
-          ''
-        );
+  test('requests students using only student ids not included in the given "loadedStudentIds"', function (assert) {
+    respondWith('/courses/1201/gradebook/user_ids', {}, 200, {}, { user_ids: STUDENT_IDS });
 
-    XHR_HANDLERS = [
-      () => {
-        respondToXhr('/students?student_params=whatever',
-                       200,
-                       {Link: '</students?page=2>; rel="last"'},
-                       STUDENTS_PAGE_1)
-      },
-      () => {
-        const studentIds = studentIdParam([2, 5]);
-        respondToXhr(`/submissions?${studentIds}submission_params=blahblahblah`,
-                       200, {}, SUBMISSIONS_CHUNK_1)
-      },
-      () => {
-        respondToXhr('/students?page=2&student_params=whatever',
-                       200, {Link: ''}, STUDENTS_PAGE_2);
-      },
-      () => {
-        const studentIds = studentIdParam([3, 7]);
-        respondToXhr(`/submissions?${studentIds}submission_params=blahblahblah`,
-                       200, {}, SUBMISSIONS_CHUNK_2)
-      },
-    ];
+    const dataLoader = callLoadGradebookData({ loadedStudentIds: ['1101', '1103'], perPage: 50 });
+    const resolve = assert.async();
 
-    const studentsDone = assert.async();
-    const submissionsDone = assert.async();
-
-    let studentsCbCalled = 0;
-    let submissionsCbCalled = 0;
-
-    const submissionPages = [SUBMISSIONS_CHUNK_1, SUBMISSIONS_CHUNK_2];
-
-    const studentsCb = () => studentsCbCalled++;
-    const submissionsCb = (submissions) => {
-      submissionsCbCalled++;
-      ok(_.isEqual(submissionPages.shift(), submissions));
-      ok(studentsCbCalled === submissionsCbCalled,
-           'submissions are queued for for each page of students');
-    };
-
-    const dataLoader = callLoadGradebookData({
-      studentsPageCb: studentsCb,
-      submissionsChunkCb: submissionsCb,
+    dataLoader.gotStudentIds.then(() => {
+      const studentRequest = XHRS.find(xhr => xhr.url.match('/students'));
+      const params = qs.parse(studentRequest.url.split('?')[1]);
+      deepEqual(params.user_ids, ['1102']);
+      resolve();
     });
-    dataLoader.gotStudents.then(studentsDone);
+  });
+
+  test('resolves gotStudents when all students have loaded', function (assert) {
+    respondWith('/courses/1201/gradebook/user_ids', {}, 200, {}, { user_ids: STUDENT_IDS });
+    respondWith('/students', { user_ids: STUDENT_IDS }, 200, {}, []);
+
+    const dataLoader = callLoadGradebookData({ perPage: 50 });
+    const resolve = assert.async();
+
+    dataLoader.gotStudents.then(() => {
+      ok(true, 'gotStudents resolved');
+      resolve();
+    });
+  });
+
+  test('resolves gotStudents when multiple pages of students have loaded', function (assert) {
+    respondWith('/courses/1201/gradebook/user_ids', {}, 200, {}, { user_ids: STUDENT_IDS });
+    respondWith('/students', { user_ids: STUDENT_IDS.slice(0, 2) }, 200, {}, STUDENTS_PAGE_1);
+    respondWith('/students', { user_ids: STUDENT_IDS.slice(2, 3) }, 200, {}, STUDENTS_PAGE_2);
+
+    const dataLoader = callLoadGradebookData();
+    const resolve = assert.async();
+
+    dataLoader.gotStudents.then(() => {
+      ok(true, 'gotStudents resolved');
+      resolve();
+    });
+  });
+
+  test('calls the students page callback when each students page request resolves', function (assert) {
+    respondWith('/courses/1201/gradebook/user_ids', {}, 200, {}, { user_ids: STUDENT_IDS });
+    respondWith('/students', { user_ids: STUDENT_IDS.slice(0, 2) }, 200, {}, STUDENTS_PAGE_1);
+    respondWith('/students', { user_ids: STUDENT_IDS.slice(2, 3) }, 200, {}, STUDENTS_PAGE_2);
+
+    let callCount = 0;
+    function incrementCallCount () {
+      callCount++;
+    }
+
+    const dataLoader = callLoadGradebookData({ studentsPageCb: incrementCallCount });
+    const resolve = assert.async();
+
+    dataLoader.gotStudents.then(() => {
+      strictEqual(callCount, 2);
+      resolve();
+    });
+  });
+
+  test('includes the returned students with each students page callback', function (assert) {
+    respondWith('/courses/1201/gradebook/user_ids', {}, 200, {}, { user_ids: STUDENT_IDS });
+    respondWith('/students', { user_ids: STUDENT_IDS.slice(0, 2) }, 200, {}, STUDENTS_PAGE_1);
+    respondWith('/students', { user_ids: STUDENT_IDS.slice(2, 3) }, 200, {}, STUDENTS_PAGE_2);
+
+    const pages = [];
+    function saveStudents (students) {
+      pages.push(students);
+    }
+
+    const dataLoader = callLoadGradebookData({ studentsPageCb: saveStudents });
+    const resolve = assert.async();
+
+    dataLoader.gotStudents.then(() => {
+      strictEqual(pages.length, 2, 'two pages of students were returned');
+      deepEqual(pages[0], STUDENTS_PAGE_1);
+      deepEqual(pages[1], STUDENTS_PAGE_2);
+      resolve();
+    });
+  });
+
+  test('includes all returned students when resolving gotStudents', function (assert) {
+    respondWith('/courses/1201/gradebook/user_ids', {}, 200, {}, { user_ids: STUDENT_IDS });
+    respondWith('/students', { user_ids: STUDENT_IDS.slice(0, 2) }, 200, {}, STUDENTS_PAGE_1);
+    respondWith('/students', { user_ids: STUDENT_IDS.slice(2, 3) }, 200, {}, STUDENTS_PAGE_2);
+    respondWith('/submissions', { student_ids: STUDENT_IDS.slice(0, 2) }, 200, {}, SUBMISSIONS_CHUNK_1);
+    respondWith('/submissions', { student_ids: STUDENT_IDS.slice(2, 3) }, 200, {}, SUBMISSIONS_CHUNK_2);
+
+    const dataLoader = callLoadGradebookData();
+    const resolve = assert.async();
+
+    dataLoader.gotStudents.then((students) => {
+      strictEqual(students.length, 3, 'three students were returned in total');
+      deepEqual(students.map(student => student.id), ['1101', '1102', '1103']);
+      resolve();
+    });
+  });
+
+  test('requests submissions for each page of students', function (assert) {
+    respondWith('/courses/1201/gradebook/user_ids', {}, 200, {}, { user_ids: STUDENT_IDS });
+    respondWith('/students', { user_ids: STUDENT_IDS.slice(0, 2) }, 200, {}, STUDENTS_PAGE_1);
+    respondWith('/students', { user_ids: STUDENT_IDS.slice(2, 3) }, 200, {}, STUDENTS_PAGE_2);
+
+    const dataLoader = callLoadGradebookData();
+    const resolve = assert.async();
+
+    dataLoader.gotStudents.then(() => {
+      const submissionsRequests = XHRS.filter(xhr => xhr.url.match('/submissions'));
+      strictEqual(submissionsRequests.length, 2, 'two requests for submissions were made');
+      resolve();
+    });
+  });
+
+  test('resolves gotSubmissions when all pages of submissions have loaded', function (assert) {
+    respondWith('/courses/1201/gradebook/user_ids', {}, 200, {}, { user_ids: STUDENT_IDS });
+    respondWith('/students', { user_ids: STUDENT_IDS.slice(0, 2) }, 200, {}, STUDENTS_PAGE_1);
+    respondWith('/students', { user_ids: STUDENT_IDS.slice(2, 3) }, 200, {}, STUDENTS_PAGE_2);
+    respondWith('/submissions', { student_ids: STUDENT_IDS.slice(0, 2) }, 200, {}, SUBMISSIONS_CHUNK_1);
+    respondWith('/submissions', { student_ids: STUDENT_IDS.slice(2, 3) }, 200, {}, SUBMISSIONS_CHUNK_2);
+
+    const dataLoader = callLoadGradebookData();
+    const resolve = assert.async();
+
     dataLoader.gotSubmissions.then(() => {
-      ok(dataLoader.gotStudents.isResolved(),
-           'students finish loading first');
-      ok(submissionsCbCalled === 2);
-      submissionsDone();
+      ok(true, 'gotSubmissions resolved');
+      resolve();
+    });
+  });
+
+  test('includes the returned submissions with each students page callback', function (assert) {
+    respondWith('/courses/1201/gradebook/user_ids', {}, 200, {}, { user_ids: STUDENT_IDS });
+    respondWith('/students', { user_ids: STUDENT_IDS.slice(0, 2) }, 200, {}, STUDENTS_PAGE_1);
+    respondWith('/students', { user_ids: STUDENT_IDS.slice(2, 3) }, 200, {}, STUDENTS_PAGE_2);
+    respondWith('/submissions', { student_ids: STUDENT_IDS.slice(0, 2) }, 200, {}, SUBMISSIONS_CHUNK_1);
+    respondWith('/submissions', { student_ids: STUDENT_IDS.slice(2, 3) }, 200, {}, SUBMISSIONS_CHUNK_2);
+
+    const pages = [];
+    function saveSubmissions (submissions) {
+      pages.push(submissions);
+    }
+
+    const dataLoader = callLoadGradebookData({ submissionsChunkCb: saveSubmissions });
+    const resolve = assert.async();
+
+    dataLoader.gotSubmissions.then(() => {
+      strictEqual(pages.length, 2, 'two pages of submissions were returned');
+      deepEqual(pages[0], SUBMISSIONS_CHUNK_1);
+      deepEqual(pages[1], SUBMISSIONS_CHUNK_2);
+      resolve();
     });
   });
 
   QUnit.module('Custom Column Data');
 
-  test('resolves promise with custom columns', (assert) => {
-    XHR_HANDLERS = [
-      () => {
-        respondToXhr('/customcols', 200, {}, CUSTOM_COLUMNS);
-      },
-    ];
+  test('resolves promise with custom columns', function (assert) {
+    respondWith('/customcols', {}, 200, {}, CUSTOM_COLUMNS);
 
-    const resolved = assert.async();
+    const resolve = assert.async();
     const dataLoader = callLoadGradebookData();
+
     dataLoader.gotCustomColumns.then((cols) => {
       ok(_.isEqual(cols, CUSTOM_COLUMNS));
-      resolved();
+      resolve();
     });
   });
 
-  test("doesn't fetch custom column data until all other data is done", (assert) => {
-    XHR_HANDLERS = [
-      () => {
-        respondToXhr('/customcols', 200, {}, CUSTOM_COLUMNS);
-      },
-    ];
+  test("doesn't fetch custom column data until all other data is done", function (assert) {
+    respondWith('/customcols', {}, 200, {}, CUSTOM_COLUMNS);
 
     const done = assert.async();
     const dataLoader = callLoadGradebookData();
+
     dataLoader.gotCustomColumns.then(() => {
       ok(XHRS.filter(xhr => xhr.url.match(/data/)).length === 0,
            'custom columns for other data to finish');

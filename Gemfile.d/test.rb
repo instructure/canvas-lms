@@ -64,4 +64,5 @@ group :test do
   gem 'headless', '2.3.1', require: false
   gem 'escape_code', '0.2', require: false
   gem 'hashdiff', '0.3.2'
+  gem 'luminosity_contrast', '0.2.1'
 end

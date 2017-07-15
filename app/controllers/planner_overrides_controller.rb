@@ -51,14 +51,24 @@
 #           "example": "published",
 #           "type": "string"
 #         },
-#         "visible": {
-#           "description": "Controls whether or not the associated plannable item is displayed on the planner",
+#         "marked_complete": {
+#           "description": "Controls whether or not the associated plannable item is marked complete on the planner",
 #           "example": false,
 #           "type": "boolean"
 #         },
+#         "created_at": {
+#           "description": "The datetime of when the planner override was created",
+#           "example": "2017-05-09T10:12:00Z",
+#           "type": "datetime"
+#         },
+#         "updated_at": {
+#           "description": "The datetime of when the planner override was updated",
+#           "example": "2017-05-09T10:12:00Z",
+#           "type": "datetime"
+#         },
 #         "deleted_at": {
 #           "description": "The datetime of when the planner override was deleted, if applicable",
-#           "example": "2017-05-09T10:12:00Z",
+#           "example": "2017-05-15T12:12:00Z",
 #           "type": "datetime"
 #         }
 #       }
@@ -66,61 +76,101 @@
 #
 
 class PlannerOverridesController < ApplicationController
-  include Api::V1::PlannerItem
+  include Api::V1::PlannerOverride
 
   before_action :require_user
   before_action :set_date_range
-  before_action :set_planner_items, only: [:items_index]
+  before_action :set_params, only: [:items_index]
 
-  attr_reader :start_date, :end_date
-
+  attr_reader :start_date, :end_date, :page, :per_page,
+              :include_concluded, :only_favorites
   # @API List planner items
   #
   # Retrieve the list of objects to be shown on the planner for the current user
   # with the associated planner override to override an item's visibility if set.
   #
-  # @argument date [Date]
-  #   Only return items since the given date.
+  # @argument start_date [Date]
+  #   Only return items starting from the given date.
   #   The value should be formatted as: yyyy-mm-dd or ISO 8601 YYYY-MM-DDTHH:MM:SSZ.
   #
+  # @argument end_date [Date]
+  #   Only return items up to the given date.
+  #   The value should be formatted as: yyyy-mm-dd or ISO 8601 YYYY-MM-DDTHH:MM:SSZ.
+  #
+  # @argument filter [String, "new_activity"]
+  #   Only return items that have new or unread activity
+  #
   # @example_response
-  #   [
-  #     {
-  #       'type': 'grading',        // an assignment that needs grading
-  #       'assignment': { .. assignment object .. },
-  #       'ignore': '.. url ..',
-  #       'ignore_permanently': '.. url ..',
-  #       'visible_in_planner': true
-  #       'html_url': '.. url ..',
-  #       'needs_grading_count': 3, // number of submissions that need grading
-  #       'context_type': 'course', // course|group
-  #       'course_id': 1,
-  #       'group_id': null,
+  # [
+  #   {
+  #     "context_type": "Course",
+  #     "course_id": 1,
+  #     "visible_in_planner": true, // Whether or not it is displayed on the student planner
+  #     "planner_override": { ... planner override object ... }, // Associated PlannerOverride object if user has toggled visibility for the object on the planner
+  #     "submissions": false, // The statuses of the user's submissions for this object
+  #     "plannable_id": "123",
+  #     "plannable_type": "discussion_topic",
+  #     "plannable": { ... discussion topic object },
+  #     "html_url": "/courses/1/discussion_topics/8"
+  #   },
+  #   {
+  #     "context_type": "Course",
+  #     "course_id": 1,
+  #     "visible_in_planner": true,
+  #     "planner_override": {
+  #         "id": 3,
+  #         "plannable_type": "Assignment",
+  #         "plannable_id": 1,
+  #         "user_id": 2,
+  #         "workflow_state": "active",
+  #         "visible": true, // A user-defined setting for minimizing/hiding objects on the planner
+  #         "deleted_at": null,
+  #         "created_at": "2017-05-18T18:35:55Z",
+  #         "updated_at": "2017-05-18T18:35:55Z"
   #     },
-  #     {
-  #       'type' => 'submitting',   // an assignment that needs submitting soon
-  #       'assignment' => { .. assignment object .. },
-  #       'ignore' => '.. url ..',
-  #       'ignore_permanently' => '.. url ..',
-  #       'visible_in_planner': true
-  #       'html_url': '.. url ..',
-  #       'context_type': 'course',
-  #       'course_id': 1,
+  #     "submissions": { // The status as it pertains to the current user
+  #       "excused": false,
+  #       "graded": false,
+  #       "late": false,
+  #       "missing": true,
+  #       "needs_grading": false,
+  #       "with_feedback": false
   #     },
-  #     {
-  #       'type' => 'submitting',   // a quiz that needs submitting soon
-  #       'quiz' => { .. quiz object .. },
-  #       'ignore' => '.. url ..',
-  #       'ignore_permanently' => '.. url ..',
-  #       'visible_in_planner': true
-  #       'html_url': '.. url ..',
-  #       'context_type': 'course',
-  #       'course_id': 1,
+  #     "plannable_id": "456",
+  #     "plannable_type": "assignment",
+  #     "plannable": { ... assignment object ...  },
+  #     "html_url": "http://canvas.instructure.com/courses/1/assignments/1#submit"
+  #   },
+  #   {
+  #     "visible_in_planner": true,
+  #     "planner_override": null,
+  #     "submissions": false, // false if no associated assignment exists for the plannable item
+  #     "plannable_id": "789",
+  #     "plannable_type": "planner_note",
+  #     "plannable": {
+  #       "id": 1,
+  #       "todo_date": "2017-05-30T06:00:00Z",
+  #       "title": "hello",
+  #       "details": "world",
+  #       "user_id": 2,
+  #       "course_id": null,
+  #       "workflow_state": "active",
+  #       "created_at": "2017-05-30T16:29:04Z",
+  #       "updated_at": "2017-05-30T16:29:15Z"
   #     },
-  #   ]
+  #     "html_url": "http://canvas.instructure.com/api/v1/planner_notes.1"
+  #   }
+  # ]
   def items_index
-    pi_json = @planner_items.map { |item| planner_item_json(item, @current_user, session, item.todo_type) }
-    render json: pi_json
+    ensure_valid_params or return
+
+    items_json = Rails.cache.fetch(['planner_items', @current_user, page, params[:filter], default_opts].cache_key, raw: true, expires_in: 120.minutes) do
+      items = params[:filter] == 'new_activity' ? unread_items : planner_items
+      items = Api.paginate(items, self, api_v1_planner_items_url)
+      planner_items_json(items, @current_user, session, {start_at: start_date})
+    end
+
+    render json: items_json
   end
 
   # @API List planner overrides
@@ -129,7 +179,8 @@ class PlannerOverridesController < ApplicationController
   #
   # @returns [PlannerOverride]
   def index
-    render :json => PlannerOverride.for_user(@current_user)
+    planner_overrides = Api.paginate(PlannerOverride.for_user(@current_user).active, self, api_v1_planner_overrides_url)
+    render :json => planner_overrides.map { |po| planner_override_json(po, @current_user, session) }
   end
 
   # @API Show a planner override
@@ -138,12 +189,12 @@ class PlannerOverridesController < ApplicationController
   #
   # @returns PlannerOverride
   def show
-    planner_override = PlannerOverride.find(params[:id])
+    planner_override = PlannerOverride.find_by_id(params[:id])
 
     if planner_override.present?
-      render json: planner_override
+      render json: planner_override_json(planner_override, @current_user, session)
     else
-      not_found
+      render json: { message: "No object of type #{plannable_override.class} with that ID" }, status: :not_found
     end
   end
 
@@ -151,13 +202,16 @@ class PlannerOverridesController < ApplicationController
   #
   # Update a planner override's visibilty for the current user
   #
+  # @argument marked_complete
+  #   determines whether the planner item is marked as completed
+  #
   # @returns PlannerOverride
   def update
     planner_override = PlannerOverride.find(params[:id])
-    planner_override.visible = value_to_boolean(params[:visible])
+    planner_override.marked_complete = value_to_boolean(params[:marked_complete])
 
     if planner_override.save
-      render json: planner_override, status: :ok
+      render json: planner_override_json(planner_override, @current_user, session), status: :ok
     else
       render json: planner_override.errors, status: :bad_request
     end
@@ -167,15 +221,29 @@ class PlannerOverridesController < ApplicationController
   #
   # Create a planner override for the current user
   #
+  # @argument plannable_type [String, "announcement"|"assignment"|"discussion_topic"|"quiz"|"wiki_page"|"planner_note"]
+  #   Type of the item that you are overriding in the planner
+  #
+  # @argument plannable_id [Integer]
+  #   ID of the item that you are overriding in the planner
+  #
+  # @argument marked_complete [Boolean]
+  #   If this is true, the item will show in the planner as completed
+  #
+  #
   # @returns PlannerOverride
   def create
-    planner_override = PlannerOverride.new(plannable_type: params[:plannable_type],
-                                       plannable_id: params[:plannable_id],
-                                       visible: value_to_boolean(params[:visible]),
-                                       user: @current_user)
+    plannable_type = PLANNABLE_TYPES[params[:plannable_type]]
+    plannable = plannable_type.constantize.find_by_id(params[:plannable_id])
+    unless plannable
+      return render json: { message: "No object of type #{plannable_type} with that ID" }, status: :not_found
+    end
+    planner_override = PlannerOverride.new(plannable_type: plannable_type,
+      plannable_id: params[:plannable_id], marked_complete: value_to_boolean(params[:marked_complete]),
+      user: @current_user)
 
     if planner_override.save
-      render json: planner_override, status: :created
+      render json: planner_override_json(planner_override, @current_user, session), status: :created
     else
       render json: planner_override.errors, status: :bad_request
     end
@@ -190,7 +258,7 @@ class PlannerOverridesController < ApplicationController
     planner_override = PlannerOverride.find(params[:id])
 
     if planner_override.destroy
-      render json: planner_override, status: :ok
+      render json: planner_override_json(planner_override, @current_user, session), status: :ok
     else
       render json: planner_override.errors, status: :bad_request
     end
@@ -198,59 +266,142 @@ class PlannerOverridesController < ApplicationController
 
   private
 
-  def set_planner_items
-    set_assignments
-    set_pages
-    set_planner_notes
-    set_ungraded_discussions
-    @planner_items = Api.paginate(@discussions + @pages + @assignments + @planner_notes, self, api_v1_planner_items_url)
+  def planner_items
+    collections = [*assignment_collections,
+                    planner_note_collection,
+                    page_collection,
+                    ungraded_discussion_collection]
+    BookmarkedCollection.merge(*collections)
   end
 
-  def set_assignments
-    @grading = @current_user.assignments_needing_grading(default_opts).each { |a| a.todo_type = 'grading' }
-    @submitting = @current_user.assignments_needing_submitting(default_opts).each { |a| a.todo_type = 'submitting' }
-    @moderation = @current_user.assignments_needing_moderation(default_opts).each { |a| a.todo_type = 'moderation' }
-    @ungraded_quiz = @current_user.ungraded_quizzes_needing_submitting(default_opts).each { |a| a.todo_type = 'submitting' }
-    @submitted = @current_user.submitted_assignments(default_opts).each { |a| a.todo_type = 'submitted' }
-    @assignments = @grading + @submitted + @ungraded_quiz + @submitting + @moderation
+  def unread_items
+    collections = [unread_discussion_topic_collection,
+                   unread_submission_collection]
+
+    BookmarkedCollection.merge(*collections)
   end
 
-  def set_planner_notes
-    @planner_notes = PlannerNote.where(user: @current_user, todo_date: @start_date...@end_date).each { |pn| pn.todo_type = 'viewing' }
+  def assignment_collections
+    grading = @current_user.assignments_needing_grading(default_opts) if @domain_root_account.grants_right?(@current_user, :manage_grades)
+    submitting = @current_user.assignments_needing_submitting(default_opts)
+    moderation = @current_user.assignments_needing_moderation(default_opts)
+    ungraded_quiz = @current_user.ungraded_quizzes_needing_submitting(default_opts)
+    submitted = @current_user.submitted_assignments(default_opts)
+    scopes = {submitted: submitted, ungraded_quiz: ungraded_quiz,
+               submitting: submitting, moderation: moderation}
+    scopes[:grading] = grading if grading
+    collections = []
+    scopes.each do |scope_name, scope|
+      next unless scope
+      base_model = scope_name == :ungraded_quiz ? Quizzes::Quiz : Assignment
+      collections << item_collection(scope_name.to_s, scope, base_model, [:due_at, :created_at], :id)
+    end
+    collections
+  end
+
+  def unread_discussion_topic_collection
+    item_collection('unread_discussion_topics',
+                    @current_user.discussion_topics_needing_viewing(scope_only: true, include_ignored: true,
+                      due_before: end_date, due_after: start_date).
+                      unread_for(@current_user),
+                    DiscussionTopic, [:todo_date, :posted_at, :delayed_post_at, :last_reply_at, :created_at], :id)
+  end
+
+  def unread_submission_collection
+    course_ids = @current_user.enrollments.shard(Shard.current).where(:type => %w{StudentEnrollment StudentViewEnrollment}).current.active_by_date.distinct.pluck(:course_id)
+    item_collection('unread_assignment_submissions',
+                    Assignment.active.where(:context_type => "Course", :context_id => course_ids).
+                      where("assignments.muted IS NULL OR NOT assignments.muted").
+                      joins(:submissions => :content_participations). # we can assume content participations because they're automatically created when comments are made - see SubmissionComment#update_participation
+                      where(:submissions => {:user_id => @current_user}).
+                      where(:content_participations => {:user_id => @current_user, :workflow_state => 'unread'}).
+                      due_between_with_overrides(start_date, end_date),
+                    Assignment, [:due_at, :created_at], :id)
+  end
+
+  def planner_note_collection
+    item_collection('planner_notes',
+                    PlannerNote.active.where(user: @current_user, todo_date: @start_date...@end_date),
+                    PlannerNote, [:todo_date, :created_at], :id)
+  end
+
+  def page_collection
+    item_collection('pages', @current_user.wiki_pages_needing_viewing(default_opts),
+      WikiPage, [:todo_date, :created_at], :id)
+  end
+
+  def ungraded_discussion_collection
+    item_collection('ungraded_discussions', @current_user.discussion_topics_needing_viewing(default_opts),
+      DiscussionTopic, [:todo_date, :posted_at, :created_at], :id)
+  end
+
+  def item_collection(label, scope, base_model, *order_by)
+    descending = params[:order] == 'desc'
+    bookmarker = Plannable::Bookmarker.new(base_model, descending, *order_by)
+    [label, BookmarkedCollection.wrap(bookmarker, scope)]
   end
 
   def set_date_range
-    @end_date, @start_date = if [params[:end_date], params[:start_date]].all?(&:blank?)
-                                [2.weeks.from_now, 2.weeks.ago]
+    @start_date, @end_date = if [params[:start_date], params[:end_date]].all?(&:blank?)
+                                [2.weeks.ago.beginning_of_day,
+                                 2.weeks.from_now.beginning_of_day]
                               else
-                                [params[:end_date], params[:start_date]]
+                                [params[:start_date], params[:end_date]]
                               end
     # Since a range is needed, set values that weren't passed to a date
     # in the far past/future as to get all values before or after whichever
     # date was passed
-    @end_date ||= 10.years.from_now
-    @start_date ||= 10.years.ago
+    @start_date = formatted_date('start_date', @start_date, 10.years.ago)
+    @end_date   = formatted_date('end_date', @end_date, 10.years.from_now)
   end
 
-  def set_pages
-    @pages = @current_user.wiki_pages_needing_viewing(default_opts).each { |p| p.todo_type = 'viewing' }
+  def formatted_date(input, val, default)
+    @errors ||= {}
+    if val.present? && val.is_a?(String)
+      if val =~ Api::DATE_REGEX
+        Time.zone.parse(val).beginning_of_day
+      elsif val =~ Api::ISO8601_REGEX
+        Time.zone.parse(val)
+      else
+        @errors[input] = t('Invalid date or invalid datetime for %{attr}', attr: input)
+      end
+    else
+      default
+    end
   end
 
-  def set_ungraded_discussions
-    @discussions = @current_user.discussion_topics_needing_viewing(default_opts).each { |t| t.todo_type = 'viewing' }
+  def set_params
+    includes = Array.wrap(params[:include]) & %w{concluded only_favorites}
+    @per_page = params[:per_page] || 50
+    @page = params[:page] || 'first'
+    @include_concluded = includes.include? 'concluded'
+    @only_favorites = includes.include? 'only_favorites'
   end
 
   def require_user
     render_unauthorized_action if !@current_user || !@domain_root_account.feature_enabled?(:student_planner)
   end
 
+  def ensure_valid_params
+    if @errors.empty?
+      true
+    else
+      render json: {errors: @errors.as_json}, status: :bad_request
+      false
+    end
+  end
+
   def default_opts
     {
       include_ignored: true,
       include_ungraded: true,
+      include_concluded: include_concluded,
+      only_favorites: only_favorites,
+      include_locked: true,
       due_before: end_date,
       due_after: start_date,
-      limit: (params[:limit]&.to_i || 50)
+      scope_only: true,
+      limit: per_page.to_i + 1, # needs a + 1 because otherwise folio might think there aren't any more objects
     }
   end
 end

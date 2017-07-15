@@ -45,10 +45,14 @@ module Plannable
 
   def visible_in_planner_for?(user)
     return true unless planner_enabled?
-    self.planner_overrides.where(user_id: user,
-                                 visible: false,
-                                 workflow_state: 'active'
-                                ).blank?
+    self.planner_overrides.where(user_id: user, marked_complete: true, workflow_state: 'active').blank?
+  end
+
+  def planner_date
+    return nil unless planner_enabled?
+    date_to_use = [:todo_date, :due_at, :posted_at, :created_at].
+                  detect { |field| valid_planner_date?(field) }
+    self.send(date_to_use)
   end
 
   def planner_override_for(user)
@@ -56,6 +60,10 @@ module Plannable
     self.planner_overrides.where(user_id: user).take
   end
   private
+
+  def valid_planner_date?(field)
+    self.respond_to?(field.to_sym) && self.send(field.to_sym).present?
+  end
 
   def planner_enabled?
     root_account_for_model(self).feature_enabled?(:student_planner)
@@ -67,6 +75,155 @@ module Plannable
       base.user.account
     else
       base.context.root_account
+    end
+  end
+
+  class Bookmarker
+    class Bookmark < Array
+      attr_writer :descending
+
+      def <=>(obj)
+        val = super
+        val *= -1 if @descending
+        val
+      end
+    end
+    #   mostly copy-pasted version of SimpleBookmarker
+    #   ***
+    #   Now you can add some hackyness to your life by passing in an array for some sweet coalescing action
+    #   as well as the ability to reverse order
+    #   e.g. Plannable::Bookmarker.new(Assignment, true, [:due_at, :created_at], :id)
+
+    def initialize(model, descending, *columns)
+      @model = model
+      @descending = !!descending
+      @columns = columns.map{|c| c.is_a?(Array) ? c.map(&:to_s) : c.to_s}
+    end
+
+    def bookmark_for(object)
+      values = object.attributes.values_at *@columns
+      bookmark = Bookmark.new
+      bookmark.descending = @descending
+      @columns.each do |col|
+        val = col.is_a?(Array) ?
+          object.attributes.values_at(*col).compact.first : # coalesce nulls
+          object.attributes[col]
+        val = val.strftime("%Y-%m-%d %H:%M:%S.%6N") if val.respond_to?(:strftime)
+        bookmark << val
+      end
+      bookmark
+    end
+
+    TYPE_MAP = {
+      string: -> (val) { val.is_a?(String) },
+      integer: -> (val) { val.is_a?(Integer) },
+      datetime: -> (val) { val.is_a?(String) && !!(DateTime.parse(val) rescue false) }
+    }
+
+    def validate(bookmark)
+      bookmark.is_a?(Array) &&
+        bookmark.size == @columns.size &&
+        @columns.each.with_index.all? do |columns, i|
+          columns = [columns] unless columns.is_a?(Array)
+          columns.all? do |col|
+            type = TYPE_MAP[@model.columns_hash[col].type]
+            nullable = @model.columns_hash[col].null
+            type && (nullable && bookmark[i].nil? || type.(bookmark[i]))
+          end
+        end
+    end
+
+    def restrict_scope(scope, pager)
+      if bookmark = pager.current_bookmark
+        scope = scope.where(*comparison(bookmark))
+      end
+      scope.except(:order).order(order_by)
+    end
+
+    def order_by
+      @order_by ||= @columns.map { |col| column_order(col) }.join(', ')
+    end
+
+    def column_order(col_name)
+      if col_name.is_a?(Array)
+        order = "COALESCE(#{col_name.map{|c| "#{@model.table_name}.#{c}"}.join(", ")})"
+      else
+        order = column_comparand(col_name)
+        if @model.columns_hash[col_name].null
+          order = "#{column_comparand(col_name, '=')} IS NULL, #{order}"
+        end
+      end
+      order += " DESC" if @descending
+      order
+    end
+
+    def column_comparand(column, comparator = '>', placeholder = nil)
+      col_name = placeholder ||
+        (column.is_a?(Array) ?
+        "COALESCE(#{column.map{|c| "#{@model.table_name}.#{c}"}.join(", ")})" :
+        "#{@model.table_name}.#{column}")
+      if comparator != "=" && type_for_column(column) == :string
+        col_name = BookmarkedCollection.best_unicode_collation_key(col_name)
+      end
+      col_name
+    end
+
+    def column_comparison(column, comparator, value)
+      if value.nil? && comparator == ">"
+        # sorting by a nullable column puts nulls last, so for our sort order
+        # 'column > NULL' is universally false
+        ["0=1"]
+      elsif value.nil?
+        # likewise only NULL values in column satisfy 'column = NULL' and
+        # 'column >= NULL'
+        ["#{column_comparand(column, '=')} IS NULL"]
+      else
+        sql = "#{column_comparand(column, comparator)} #{comparator} #{column_comparand(column, comparator, '?')}"
+        if !column.is_a?(Array) && @model.columns_hash[column].null && comparator != '='
+          # our sort order wants "NULL > ?" to be universally true for non-NULL
+          # values (we already handle NULL values above). but it is false in
+          # SQL, so we need to include "column IS NULL" with > or >=
+          sql = "(#{sql} OR #{column_comparand(column, '=')} IS NULL)"
+        end
+        [sql, value]
+      end
+    end
+
+    def type_for_column(col)
+      col = col.first if col.is_a?(Array)
+      @model.columns_hash[col].type
+    end
+
+    # Generate a sql comparison like so:
+    #
+    #   a > ?
+    #   OR a = ? AND b > ?
+    #   OR a = ? AND b = ? AND c > ?
+    #
+    # Technically there's an extra check in the actual result (for index
+    # happiness), but it's logically equivalent to the example above
+    def comparison(bookmark)
+      top_clauses = []
+      args = []
+      visited = []
+      pairs = @columns.zip(bookmark)
+      comparator = @descending ? "<" : ">"
+      while pairs.present?
+        col, val = pairs.shift
+        clauses = []
+        visited.each do |c,v|
+          clause, *clause_args = column_comparison(c, "=", v)
+          clauses << clause
+          args.concat(clause_args)
+        end
+        clause, *clause_args = column_comparison(col, comparator, val)
+        clauses << clause
+        top_clauses << clauses.join(" AND ")
+        args.concat(clause_args)
+        visited << [col, val]
+      end
+      sql = "(" << top_clauses.join(" OR ") << ")"
+      return [sql, *args]
     end
   end
 end

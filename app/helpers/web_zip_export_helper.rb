@@ -22,8 +22,7 @@ module WebZipExportHelper
   end
 
   def allow_web_export_for_course_user?
-    @context.enrollments.not_inactive_by_date.where(user_id: @current_user).exists? ||
-      @context.grants_any_right?(@current_user, :read_as_admin)
+    @context.grants_any_right?(@current_user, :participate_as_student, :read_as_admin)
   end
 
   def allow_web_export_download?

@@ -29,14 +29,6 @@ module ActiveSupport::Callbacks
     # suspend_callbacks(:validate) { ... }
     #   callbacks to validate ignored
     #
-    # [ActiveSupport 2.3]
-    # suspend_callbacks(kind: :before_save) { ... }
-    #   before_save callbacks ignored
-    #
-    # suspend_callbacks(:validate, kind: :before_save) { ... }
-    #   before_save callbacks to validate ignored
-    #
-    # [ActiveSupport 3+]
     # suspend_callbacks(kind: :save) { ... }
     #   save callbacks ignored
     #
@@ -51,7 +43,7 @@ module ActiveSupport::Callbacks
     def suspend_callbacks(*callbacks)
       options = callbacks.extract_options!
       kinds = Array(options[:kind])
-      types = (ActiveSupport::VERSION::STRING < '3') ? [] : Array(options[:type])
+      types = Array(options[:type])
       delta = suspended_callbacks.update(callbacks, kinds, types)
       yield
     ensure
@@ -89,8 +81,7 @@ module ActiveSupport::Callbacks
     def suspended_callback?(callback, kind, type=nil)
       val = suspended_callbacks_defined? &&
         suspended_callbacks.include?(callback, kind, type) ||
-      suspended_callback_ancestor &&
-        suspended_callback_ancestor.suspended_callback?(callback, kind, type)
+      suspended_callback_ancestor&.suspended_callback?(callback, kind, type)
 
       val
     end
@@ -128,88 +119,82 @@ module ActiveSupport::Callbacks
         @suspended_callbacks ||= Registry.new
       end
 
-      protected
-      # as ActiveSupport::Callbacks#run_callbacks, but with the step filtering on
-      # suspended_callback? added
-      if ActiveSupport::VERSION::STRING < '4'
-        # [ActiveSupport 3]
-        def run_callbacks(kind, key=nil)
-          cbs = send("_#{kind}_callbacks")
-          if cbs.empty?
-            yield if block_given?
-          else
-            if cbs.detect{ |cb| suspended_callback?(cb.filter, kind, cb.kind) }
-              cbs = cbs.dup
-              cbs.delete_if{ |cb| suspended_callback?(cb.filter, kind, cb.kind) }
-              runner = cbs.compile(key, self)
-              # provided block (if any) is executed by yields statements in the
-              # compiled runner
-              instance_eval(runner, __FILE__)
-            else
-              super
-            end
-          end
-        end
-      elsif ActiveSupport::VERSION::STRING < '4.1'
-        # [ActiveSupport 4.0]
-        def run_callbacks(kind)
-          cbs = send("_#{kind}_callbacks")
-          if cbs.empty?
-            yield if block_given?
-          else
-            if cbs.detect{ |cb| suspended_callback?(cb.filter, kind, cb.kind) }
-              cbs = cbs.dup
-              cbs.delete_if{ |cb| suspended_callback?(cb.filter, kind, cb.kind) }
-              runner = cbs.compile
-              # provided block (if any) is executed by yields statements in the
-              # compiled runner
-              instance_eval(runner, __FILE__)
-            else
-              super
-            end
-          end
-        end
-      elsif ActiveSupport::VERSION::STRING < '4.2'
-        # [ActiveSupport 4.1]
-        def run_callbacks(kind, &block)
-          cbs = send("_#{kind}_callbacks").dup
+      def filter_callbacks(callbacks)
+        filtered = ActiveSupport::Callbacks::CallbackChain.new(callbacks.name, callbacks.config)
+        callbacks.each{ |cb| filtered.insert(-1, cb) unless suspended_callback?(cb.filter, callbacks.name, cb.kind) }
+        filtered
+      end
 
-          # emulate cbs.delete_if{ ... } since CallbackChain doesn't proxy it
-          filtered = cbs.dup
-          filtered.clear
-          cbs.each{ |cb| filtered.insert(-1, cb) unless suspended_callback?(cb.filter, kind, cb.kind) }
+      # these are copy/paste, except wrapping in a filter_callbacks
+      if ActiveSupport::VERSION::STRING < '5.1'
+        # [ActiveSupport 4.2 and 5.0]
+        def __run_callbacks__(callbacks, &block)
+          callbacks = filter_callbacks(callbacks)
 
-          if filtered.empty?
+          if callbacks.empty?
             yield if block_given?
           else
-            runner = filtered.compile
+            runner = callbacks.compile
             e = Filters::Environment.new(self, false, nil, block)
             runner.call(e).value
           end
         end
       else
-        # [ActiveSupport 4.2]
-        def __run_callbacks__(cbs, &block)
-          # emulate cbs.delete_if{ ... } since CallbackChain doesn't proxy it
-          filtered = cbs.dup
-          filtered.clear
-          cbs.each{ |cb| filtered.insert(-1, cb) unless suspended_callback?(cb.filter, cbs.name, cb.kind) }
+        # [ActiveSupport 5.1]
+        def run_callbacks(kind)
+          callbacks = filter_callbacks(__callbacks[kind.to_sym])
 
-          if filtered.empty?
+          if callbacks.empty?
             yield if block_given?
           else
-            runner = filtered.compile
-            e = Filters::Environment.new(self, false, nil, block)
-            runner.call(e).value
+            env = Filters::Environment.new(self, false, nil)
+            next_sequence = callbacks.compile
+
+            invoke_sequence = Proc.new do
+              skipped = nil
+              while true
+                current = next_sequence
+                current.invoke_before(env)
+                if current.final?
+                  env.value = !env.halted && (!block_given? || yield)
+                elsif current.skip?(env)
+                  (skipped ||= []) << current
+                  next_sequence = next_sequence.nested
+                  next
+                else
+                  next_sequence = next_sequence.nested
+                  begin
+                    target, block, method, *arguments = current.expand_call_template(env, invoke_sequence)
+                    target.send(method, *arguments, &block)
+                  ensure
+                    next_sequence = current
+                  end
+                end
+                current.invoke_after(env)
+                skipped.pop.invoke_after(env) while skipped && skipped.first
+                break env.value
+              end
+            end
+
+            # Common case: no 'around' callbacks defined
+            if next_sequence.final?
+              next_sequence.invoke_before(env)
+              env.value = !env.halted && (!block_given? || yield)
+              next_sequence.invoke_after(env)
+              env.value
+            else
+              invoke_sequence.call
+            end
           end
         end
       end
     end
 
     def self.included(base)
-      base.extend self
-      base.extend(ClassMethods)
-      base.send(:include, InstanceMethods)
+      # use extend to avoid this callback being called again
+      base.extend(self)
+      base.singleton_class.include(ClassMethods)
+      base.include(InstanceMethods)
     end
   end
 end

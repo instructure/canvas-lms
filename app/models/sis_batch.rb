@@ -24,6 +24,7 @@ class SisBatch < ActiveRecord::Base
   serialize :processing_errors, Array
   serialize :processing_warnings, Array
   belongs_to :attachment
+  belongs_to :errors_attachment, class_name: 'Attachment'
   belongs_to :generated_diff, class_name: 'Attachment'
   belongs_to :batch_mode_term, class_name: 'EnrollmentTerm'
   belongs_to :user
@@ -413,12 +414,31 @@ class SisBatch < ActiveRecord::Base
   end
 
   def self.max_messages
-    Setting.get('sis_batch_max_messages', '1000').to_i
+    Setting.get('sis_batch_max_messages', '50').to_i
+  end
+
+  def write_warnings_and_errors_to_file
+    error_count = processing_errors&.size || 0
+    warning_count = processing_warnings&.size || 0
+    return unless error_count > 0 || warning_count > 0
+    temp = Tempfile.open([self.global_id.to_s + '_processing_warnings_and_errors', '.csv'])
+    file = temp.path
+    temp.close!
+    CSV.open(file, "w") do |csv|
+      processing_warnings.each {|row| csv << row}
+      processing_errors.each {|row| csv << row}
+    end
+    self.errors_attachment = SisBatch.create_data_attachment(
+      self,
+      Rack::Test::UploadedFile.new(file, 'csv', true),
+      "sis_errors_attachment_#{id}.csv"
+    )
   end
 
   def limit_size_of_messages
     max_messages = SisBatch.max_messages
     %w[processing_warnings processing_errors].each do |field|
+      write_warnings_and_errors_to_file unless self.errors_attachment
       if self.send("#{field}_changed?") && (self.send(field).try(:size) || 0) > max_messages
         limit_message = case field
                         when "processing_warnings"

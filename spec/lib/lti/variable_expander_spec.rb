@@ -68,8 +68,17 @@ module Lti
       m.stubs(:view_context).returns(view_context_mock)
       m
     end
-
-    let(:variable_expander) { VariableExpander.new(root_account, account, controller, current_user: user, tool: tool) }
+    let(:attachment) { attachment_model }
+    let(:submission) { submission_model }
+    let(:resource_link_id) { SecureRandom.uuid }
+    let(:originality_report) do
+      OriginalityReport.create!(attachment: attachment,
+                                submission: submission,
+                                link_id: resource_link_id)
+    end
+    let(:attachment_association) { AttachmentAssociation.create!(context: submission, attachment: attachment) }
+    let(:tool_setting) { Lti::ToolSetting.create!(context: attachment_association, resource_link_id: resource_link_id) }
+    let(:variable_expander) { VariableExpander.new(root_account, account, controller, current_user: user, tool: tool, tool_setting: tool_setting) }
 
     it 'clears the lti_helper instance variable when you set the current_user' do
       expect(variable_expander.lti_helper).not_to be nil
@@ -119,6 +128,26 @@ module Lti
       expanded = variable_expander.expand_variables!({some_name: 'my variable is buried in here ${tests_expan} can you find it?'})
       expect(expanded.count).to eq 1
       expect(expanded[:some_name]).to eq "my variable is buried in here ${tests_expan} can you find it?"
+    end
+
+    describe '#self.expansion_keys' do
+      let(:expected_keys) do
+        VariableExpander.expansions.keys.map { |c| c.to_s[1..-1] }
+      end
+
+      it 'includes all expansion keys' do
+        expect(VariableExpander.expansion_keys).to eq expected_keys
+      end
+    end
+
+    describe '#self.default_name_expansions' do
+      let(:expected_keys) do
+        VariableExpander.expansions.values.select { |v| v.default_name.present? }.map(&:name)
+      end
+
+      it 'includes all expansion keys that have default names' do
+        expect(VariableExpander.default_name_expansions).to eq expected_keys
+      end
     end
 
     describe '#enabled_capability_params' do
@@ -407,6 +436,13 @@ module Lti
           exp_hash = {test: '$Canvas.course.id'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 123
+        end
+
+        it 'has substitution for $Context.sourcedId' do
+          course.stubs(:sis_source_id).returns('123')
+          exp_hash = {test: '$Context.sourcedId'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq '123'
         end
 
         it 'has substitution for $vnd.instructure.Course.uuid' do

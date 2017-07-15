@@ -75,7 +75,7 @@ define [
         $.screenReaderFlashMessage message
       else
         $.screenReaderFlashMessageExclusive I18n.t('File list updated')
-        page("#{filesEnv.baseUrl}/folder/#{folder.urlPath()}");
+        page("#{filesEnv.baseUrl}/folder/#{folder.urlPath()}")
 
 
 

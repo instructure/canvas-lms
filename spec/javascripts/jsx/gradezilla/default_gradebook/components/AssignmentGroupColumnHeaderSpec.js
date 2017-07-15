@@ -16,30 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import { mount, ReactWrapper } from 'enzyme'
-import AssignmentGroupColumnHeader from 'jsx/gradezilla/default_gradebook/components/AssignmentGroupColumnHeader'
+import React from 'react';
+import { mount } from 'enzyme';
+import AssignmentGroupColumnHeader from 'jsx/gradezilla/default_gradebook/components/AssignmentGroupColumnHeader';
+import { findMenuItem, findFlyout } from './helpers/columnHeaderHelpers';
 
-function createExampleProps () {
-  return {
-    assignmentGroup: {
-      groupWeight: 42.5,
-      name: 'Assignment Group 1'
-    },
-    sortBySetting: {
-      direction: 'ascending',
-      disabled: false,
-      isSortColumn: true,
-      onSortByGradeAscending () {},
-      onSortByGradeDescending () {},
-      settingKey: 'grade'
-    },
-    weightedGroups: true
-  };
-}
-
-function mountComponent (props) {
-  return mount(<AssignmentGroupColumnHeader {...props} />);
+function mountComponent (props, mountOptions = {}) {
+  return mount(<AssignmentGroupColumnHeader {...props} />, mountOptions);
 }
 
 function mountAndOpenOptions (props) {
@@ -48,10 +31,40 @@ function mountAndOpenOptions (props) {
   return wrapper;
 }
 
+function defaultProps ({ props, sortBySetting, assignmentGroup } = {}) {
+  return {
+    assignmentGroup: {
+      groupWeight: 42.5,
+      name: 'Assignment Group 1',
+      ...assignmentGroup
+    },
+    sortBySetting: {
+      direction: 'ascending',
+      disabled: false,
+      isSortColumn: true,
+      onSortByGradeAscending () {},
+      onSortByGradeDescending () {},
+      settingKey: 'grade',
+      ...sortBySetting
+    },
+    weightedGroups: true,
+    addGradebookElement () {},
+    removeGradebookElement () {},
+    onMenuClose () {},
+    ...props
+  };
+}
+
 QUnit.module('AssignmentGroupColumnHeader - base behavior', {
   setup () {
-    const props = createExampleProps();
-    this.wrapper = mountComponent(props);
+    this.props = defaultProps({
+      props: {
+        addGradebookElement: this.stub(),
+        removeGradebookElement: this.stub(),
+        onMenuClose: this.stub()
+      }
+    });
+    this.wrapper = mountComponent(this.props);
   },
 
   teardown () {
@@ -71,55 +84,194 @@ test('renders the assignment groupWeight percentage', function () {
 
 test('renders a PopoverMenu with a trigger', function () {
   const optionsMenuTrigger = this.wrapper.find('PopoverMenu .Gradebook__ColumnHeaderAction');
-
   equal(optionsMenuTrigger.length, 1);
 });
 
 test('adds a class to the trigger when the PopoverMenu is opened', function () {
   const optionsMenuTrigger = this.wrapper.find('PopoverMenu .Gradebook__ColumnHeaderAction');
   optionsMenuTrigger.simulate('click');
-
   ok(optionsMenuTrigger.hasClass('menuShown'));
 });
 
-QUnit.module('AssignmentGroupColumnHeader - non-standard assignment group', {
-  setup () {
-    this.props = createExampleProps();
-  },
+test('calls addGradebookElement prop on open', function () {
+  notOk(this.props.addGradebookElement.called);
+
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+  ok(this.props.addGradebookElement.called);
 });
 
+test('calls removeGradebookElement prop on close', function () {
+  notOk(this.props.removeGradebookElement.called);
+
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+  ok(this.props.removeGradebookElement.called);
+});
+
+test('calls onMenuClose prop on close', function () {
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+  this.wrapper.find('.Gradebook__ColumnHeaderAction').simulate('click');
+
+  strictEqual(this.props.onMenuClose.callCount, 1);
+});
+
+QUnit.module('AssignmentGroupColumnHeader - non-standard assignment group');
+
 test('renders 0% as the groupWeight percentage when weightedGroups is true but groupWeight is 0', function () {
-  this.props.assignmentGroup.groupWeight = 0;
-
-  const wrapper = mountComponent(this.props);
-
+  const props = defaultProps({ assignmentGroup: { groupWeight: 0 } });
+  const wrapper = mount(<AssignmentGroupColumnHeader {...props} />);
   const groupWeight = wrapper.find('.Gradebook__ColumnHeaderDetail').childAt(1);
   equal(groupWeight.text().trim(), '0.00% of grade');
 });
 
 test('does not render the groupWeight percentage when weightedGroups is false', function () {
-  this.props.weightedGroups = false;
-
-  const wrapper = mountComponent(this.props);
-
+  const props = defaultProps({ props: { weightedGroups: false } });
+  const wrapper = mount(<AssignmentGroupColumnHeader {...props} />);
   const headerDetails = wrapper.find('.Gradebook__ColumnHeaderDetail').children();
   equal(headerDetails.length, 1, 'only the assignment group name is visible');
   equal(headerDetails.text().trim(), 'Assignment Group 1');
 });
 
-QUnit.module('AssignmentColumnHeader - Sort by Settings', {
+QUnit.module('AssignmentGroupColumnHeader - Sort by Settings', {
   setup () {
-    this.props = createExampleProps();
+    this.mountAndOpenOptions = mountAndOpenOptions;
   },
+  teardown () {
+    this.wrapper.unmount();
+  }
+});
 
-  getMenuItem (index) {
-    const menuItemGroup = new ReactWrapper([this.wrapper.node.optionsMenuContent], this.wrapper.node);
-    return menuItemGroup.find('MenuItem').at(index);
-  },
+test('includes the "Sort by" group', function () {
+  const sortByFlyout = findFlyout.call(this, defaultProps(), 'Sort by');
+  strictEqual(sortByFlyout.prop('label'), 'Sort by');
+});
 
-  getSelectedMenuItem () {
-    const menuItemGroup = new ReactWrapper([this.wrapper.node.optionsMenuContent], this.wrapper.node);
-    return menuItemGroup.find('MenuItem').findWhere(menuItem => menuItem.prop('selected'));
+test('includes "Grade - Low to High" sort setting', function () {
+  const sortByGradeAscendingMenuItem = findMenuItem.call(this, defaultProps(), 'Sort by', 'Grade - Low to High');
+  strictEqual(sortByGradeAscendingMenuItem.length, 1);
+});
+
+test('selects "Grade - Low to High" when sorting by grade ascending', function () {
+  const sortByGradeAscendingMenuItem = findMenuItem.call(this, defaultProps(), 'Sort by', 'Grade - Low to High');
+  strictEqual(sortByGradeAscendingMenuItem.prop('selected'), true);
+});
+
+test('does not select "Grade - Low to High" when isSortColumn is false', function () {
+  const props = defaultProps({ sortBySetting: { isSortColumn: false } });
+  const sortByGradeAscendingMenuItem = findMenuItem.call(this, props, 'Sort by', 'Grade - Low to High');
+  strictEqual(sortByGradeAscendingMenuItem.prop('selected'), false);
+});
+
+test('clicking "Grade - Low to High" calls onSortByGradeAscending', function () {
+  const onSortByGradeAscending = this.stub();
+  const props = defaultProps({ sortBySetting: { onSortByGradeAscending } });
+  findMenuItem.call(this, props, 'Sort by', 'Grade - Low to High').simulate('click');
+  strictEqual(onSortByGradeAscending.callCount, 1);
+});
+
+test('"Grade - Low to High" is optionally disabled', function () {
+  const props = defaultProps({ sortBySetting: { disabled: true } });
+  const onSortByGradeAscendingMenuItem = findMenuItem.call(this, props, 'Sort by', 'Grade - Low to High');
+  equal(onSortByGradeAscendingMenuItem.prop('disabled'), true);
+});
+
+test('includes "Grade - High to Low" sort setting', function () {
+  const sortByGradeDescendingMenuItem = findMenuItem.call(this, defaultProps(), 'Sort by', 'Grade - High to Low');
+  strictEqual(sortByGradeDescendingMenuItem.length, 1);
+});
+
+test('selects "Grade - High to Low" when sorting by grade descending', function () {
+  const props = defaultProps({ sortBySetting: { direction: 'descending' } });
+  const sortByGradeDescendingMenuItem = findMenuItem.call(this, props, 'Sort by', 'Grade - High to Low');
+  strictEqual(sortByGradeDescendingMenuItem.prop('selected'), true);
+});
+
+test('does not select "Grade - High to Low" when isSortColumn is false', function () {
+  const props = defaultProps({ sortBySetting: { direction: 'descending', isSortColumn: false } });
+  const sortByGradeDescendingMenuItem = findMenuItem.call(this, props, 'Sort by', 'Grade - High to Low');
+  strictEqual(sortByGradeDescendingMenuItem.prop('selected'), false);
+});
+
+test('clicking "Grade - High to Low" calls onSortByGradeDescending', function () {
+  const onSortByGradeDescending = this.stub();
+  const props = defaultProps({ sortBySetting: { onSortByGradeDescending } });
+  findMenuItem.call(this, props, 'Sort by', 'Grade - High to Low').simulate('click');
+  strictEqual(onSortByGradeDescending.callCount, 1);
+});
+
+test('"Grade - High to Low" is optionally disabled', function () {
+  const props = defaultProps({ sortBySetting: { disabled: true } });
+  const onSortByGradeDescendingMenuItem = findMenuItem.call(this, props, 'Sort by', 'Grade - High to Low');
+  equal(onSortByGradeDescendingMenuItem.prop('disabled'), true);
+});
+
+QUnit.module('AssignmentGroupColumnHeader#handleKeyDown', function (hooks) {
+  hooks.beforeEach(function () {
+    this.wrapper = mountComponent(defaultProps(), { attachTo: document.querySelector('#fixtures') });
+    this.preventDefault = sinon.spy();
+  });
+
+  hooks.afterEach(function () {
+    this.wrapper.unmount();
+  });
+
+  this.handleKeyDown = function (which, shiftKey = false) {
+    return this.wrapper.node.handleKeyDown({ which, shiftKey, preventDefault: this.preventDefault });
+  };
+
+  QUnit.module('with focus on options menu trigger', {
+    setup () {
+      this.wrapper.node.optionsMenuTrigger.focus();
+    }
+  });
+
+  test('does not handle Tab', function () {
+    // This allows Grid Support Navigation to handle navigation.
+    const returnValue = this.handleKeyDown(9, false); // Tab
+    equal(typeof returnValue, 'undefined');
+  });
+
+  test('does not handle Shift+Tab', function () {
+    // This allows Grid Support Navigation to handle navigation.
+    const returnValue = this.handleKeyDown(9, true); // Shift+Tab
+    equal(typeof returnValue, 'undefined');
+  });
+
+  test('Enter opens the options menu', function () {
+    this.handleKeyDown(13); // Enter
+    const optionsMenu = this.wrapper.find('PopoverMenu');
+    strictEqual(optionsMenu.node.show, true);
+  });
+
+  test('returns false for Enter on options menu', function () {
+    // This prevents additional behavior in Grid Support Navigation.
+    const returnValue = this.handleKeyDown(13); // Enter
+    strictEqual(returnValue, false);
+  });
+
+  QUnit.module('without focus');
+
+  test('does not handle Tab', function () {
+    const returnValue = this.handleKeyDown(9, false); // Tab
+    equal(typeof returnValue, 'undefined');
+  });
+
+  test('does not handle Shift+Tab', function () {
+    const returnValue = this.handleKeyDown(9, true); // Shift+Tab
+    equal(typeof returnValue, 'undefined');
+  });
+
+  test('does not handle Enter', function () {
+    const returnValue = this.handleKeyDown(13); // Enter
+    equal(typeof returnValue, 'undefined');
+  });
+});
+
+QUnit.module('AssignmentGroupColumnHeader: focus', {
+  setup () {
+    this.wrapper = mountComponent(defaultProps(), { attachTo: document.querySelector('#fixtures') });
   },
 
   teardown () {
@@ -127,102 +279,12 @@ QUnit.module('AssignmentColumnHeader - Sort by Settings', {
   }
 });
 
-test('includes the "Sort by" group', function () {
-  this.wrapper = mountAndOpenOptions(this.props);
-  const optionsMenu = new ReactWrapper([this.wrapper.node.optionsMenuContent], this.wrapper.node);
-  const menuItemGroup = optionsMenu.find('MenuItemGroup').at(0);
-  equal(menuItemGroup.length, 1, '"Sort by" group exists');
-  equal(menuItemGroup.prop('label'), 'Sort by');
+test('#focusAtStart sets focus on the options menu trigger', function () {
+  this.wrapper.node.focusAtStart();
+  equal(document.activeElement, this.wrapper.node.optionsMenuTrigger);
 });
 
-test('includes "Grade - Low to High" sort setting', function () {
-  this.wrapper = mountAndOpenOptions(this.props);
-  const menuItem = this.getMenuItem(0);
-  equal(menuItem.text().trim(), 'Grade - Low to High');
-});
-
-test('selects "Grade - Low to High" when sorting by grade ascending', function () {
-  this.props.sortBySetting.settingKey = 'grade';
-  this.props.sortBySetting.direction = 'ascending';
-  this.wrapper = mountAndOpenOptions(this.props);
-  const menuItem = this.getSelectedMenuItem();
-  equal(menuItem.length, 1, 'only one menu item is selected');
-  equal(menuItem.text().trim(), 'Grade - Low to High', '"Grade - Low to High" is selected');
-});
-
-test('does not select "Grade - Low to High" when isSortColumn is false', function () {
-  this.props.sortBySetting.settingKey = 'grade';
-  this.props.sortBySetting.direction = 'ascending';
-  this.props.sortBySetting.isSortColumn = false;
-  this.wrapper = mountAndOpenOptions(this.props);
-  const menuItem = this.getMenuItem(0);
-  equal(menuItem.prop('selected'), false);
-});
-
-test('clicking "Grade - Low to High" calls onSortByGradeAscending', function () {
-  this.props.sortBySetting.onSortByGradeAscending = this.stub();
-  this.wrapper = mountAndOpenOptions(this.props);
-  this.getMenuItem(0).simulate('click');
-  equal(this.props.sortBySetting.onSortByGradeAscending.callCount, 1);
-});
-
-test('"Grade - Low to High" is optionally disabled', function () {
-  this.props.sortBySetting.disabled = true;
-  this.wrapper = mountAndOpenOptions(this.props);
-  const menuItem = this.getMenuItem(0);
-  equal(menuItem.prop('disabled'), true);
-});
-
-test('clicking "Grade - Low to High" when disabled does not call onSortByGradeAscending', function () {
-  this.props.sortBySetting.disabled = true;
-  this.props.sortBySetting.onSortByGradeAscending = this.stub();
-  this.wrapper = mountAndOpenOptions(this.props);
-  this.getMenuItem(0).simulate('click');
-  equal(this.props.sortBySetting.onSortByGradeAscending.callCount, 0);
-});
-
-test('includes "Grade - High to Low" sort setting', function () {
-  this.wrapper = mountAndOpenOptions(this.props);
-  const menuItem = this.getMenuItem(1);
-  equal(menuItem.text().trim(), 'Grade - High to Low');
-});
-
-test('selects "Grade - High to Low" when sorting by grade descending', function () {
-  this.props.sortBySetting.settingKey = 'grade';
-  this.props.sortBySetting.direction = 'descending';
-  this.wrapper = mountAndOpenOptions(this.props);
-  const menuItem = this.getSelectedMenuItem();
-  equal(menuItem.length, 1, 'only one menu item is selected');
-  equal(menuItem.text().trim(), 'Grade - High to Low', '"Grade - High to Low" is selected');
-});
-
-test('does not select "Grade - High to Low" when isSortColumn is false', function () {
-  this.props.sortBySetting.settingKey = 'grade';
-  this.props.sortBySetting.direction = 'descending';
-  this.props.sortBySetting.isSortColumn = false;
-  this.wrapper = mountAndOpenOptions(this.props);
-  const menuItem = this.getMenuItem(1);
-  equal(menuItem.prop('selected'), false);
-});
-
-test('clicking "Grade - High to Low" calls onSortByGradeDescending', function () {
-  this.props.sortBySetting.onSortByGradeDescending = this.stub();
-  this.wrapper = mountAndOpenOptions(this.props);
-  this.getMenuItem(1).simulate('click');
-  equal(this.props.sortBySetting.onSortByGradeDescending.callCount, 1);
-});
-
-test('"Grade - High to Low" is optionally disabled', function () {
-  this.props.sortBySetting.disabled = true;
-  this.wrapper = mountAndOpenOptions(this.props);
-  const menuItem = this.getMenuItem(1);
-  equal(menuItem.prop('disabled'), true);
-});
-
-test('clicking "Grade - High to Low" when disabled does not call onSortByGradeDescending', function () {
-  this.props.sortBySetting.disabled = true;
-  this.props.sortBySetting.onSortByGradeDescending = this.stub();
-  this.wrapper = mountAndOpenOptions(this.props);
-  this.getMenuItem(1).simulate('click');
-  equal(this.props.sortBySetting.onSortByGradeDescending.callCount, 0);
+test('#focusAtEnd sets focus on the options menu trigger', function () {
+  this.wrapper.node.focusAtEnd();
+  equal(document.activeElement, this.wrapper.node.optionsMenuTrigger);
 });

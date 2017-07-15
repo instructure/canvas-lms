@@ -259,6 +259,20 @@ module Lti
       end
     end
 
+    describe '#valid_resource_url?' do
+      include_context 'lti2_spec_helper'
+
+      it 'returns false if the domain does not match the launch path domain' do
+        invalid_url = 'http://www.banana.com/launch'
+        expect(message_handler.valid_resource_url?(invalid_url)).to eq false
+      end
+
+      it 'returns true if the domain matches the launch path domain' do
+        valid_url = "#{message_handler.launch_path}/my-launch"
+        expect(message_handler.valid_resource_url?(valid_url)).to eq true
+      end
+    end
+
 
     def create_tool_proxy(opts = {})
       default_opts = {

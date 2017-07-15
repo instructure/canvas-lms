@@ -37,8 +37,8 @@ module AddressBook
       []
     end
 
-    def count_in_context(context)
-      0
+    def count_in_contexts(contexts)
+      {}
     end
 
     module Bookmarker

@@ -89,5 +89,15 @@ module Lti
       resource_handler&.find_message_by_type(message_type)
     end
 
+    def valid_resource_url?(resource_url)
+      URI.parse(resource_url).host == URI.parse(launch_path).host
+    end
+
+    def build_resource_link_id(context:, link_fragment: nil)
+      resource_link_id = "#{context.class}_#{context.global_id},MessageHandler_#{global_id}"
+      resource_link_id += ",#{link_fragment}" if link_fragment
+      Canvas::Security.hmac_sha1(resource_link_id)
+    end
+
   end
 end

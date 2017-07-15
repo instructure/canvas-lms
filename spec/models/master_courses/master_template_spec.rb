@@ -190,6 +190,52 @@ describe MasterCourses::MasterTemplate do
       expect(topic_tag1.reload.restrictions).to be_blank
       expect(assmt_tag1.reload.restrictions).to be_blank
     end
+
+    it "should touch content when tightening default_restrictions" do
+      @template.update_attribute(:default_restrictions, {:content => true, :points => true})
+      old_time = 1.minute.ago
+      Timecop.freeze(old_time) do
+        @quiz1 = @course.quizzes.create!
+        @quiz2 = @course.quizzes.create!
+        @template.create_content_tag_for!(@quiz1, :use_default_restrictions => true)
+        @template.create_content_tag_for!(@quiz2, :use_default_restrictions => false)
+      end
+      @template.update_attribute(:default_restrictions, {:content => true})
+      # shouldn't need to update
+      expect(@quiz1.reload.updated_at.to_i).to eq old_time.to_i
+
+      @template.update_attribute(:default_restrictions, {:content => true, :due_dates => true})
+      # now should update
+      expect(@quiz1.reload.updated_at.to_i).to_not eq old_time.to_i
+      expect(@quiz2.reload.updated_at.to_i).to eq old_time.to_i # has custom restrictions
+    end
+
+    it "should touch content when tightening default_restrictions_by_type" do
+      @template.update_attributes(:use_default_restrictions_by_type => true,
+        :default_restrictions_by_type => {
+          'Assignment' => {:content => true, :points => true},
+          'DiscussionTopic' => {:content => true},
+          'Quizzes::Quiz' => {:content => true}
+        })
+
+      old_time = 1.minute.ago
+      Timecop.freeze(old_time) do
+        @assmt = @course.assignments.create!
+        @topic = @course.discussion_topics.create!
+        @quiz = @course.quizzes.create!
+        [@assmt, @topic, @quiz].each do |obj|
+          @template.create_content_tag_for!(obj, :use_default_restrictions => true)
+        end
+      end
+      @template.update_attributes(:default_restrictions_by_type => {
+        'Assignment' => {:content => true}, # lessened restrictions
+        'DiscussionTopic' => {:content => true, :points => true},
+        'Quizzes::Quiz' => {:content => true, :due_dates => true}
+      })
+      expect(@assmt.reload.updated_at.to_i).to eq old_time.to_i
+      expect(@topic.reload.updated_at.to_i).to_not eq old_time.to_i
+      expect(@quiz.reload.updated_at.to_i).to_not eq old_time.to_i
+    end
   end
 
   describe "child subscriptions" do

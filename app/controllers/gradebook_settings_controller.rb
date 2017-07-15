@@ -22,25 +22,11 @@ class GradebookSettingsController < ApplicationController
   before_action :authorize
 
   def update
-    @current_user.preferences.deep_merge!(
-      {
-        gradebook_settings: {
-          @context.id => gradebook_settings_params.to_h
-        }
-      }
-    )
+    deep_merge_gradebook_settings
 
     respond_to do |format|
       if @current_user.save
-        format.json do
-          updated_settings = {
-            gradebook_settings: {
-              @context.id => gradebook_settings[@context.id]
-            }
-          }
-
-          render json: updated_settings, status: :ok
-        end
+        format.json { render json: updated_settings, status: :ok }
       else
         format.json { render json: @current_user.errors, status: :unprocessable_entity }
       end
@@ -52,7 +38,14 @@ class GradebookSettingsController < ApplicationController
   def gradebook_settings_params
     params.require(:gradebook_settings).permit(
       {
-        filter_columns_by: [:grading_period_id],
+        filter_columns_by: [
+          :context_module_id,
+          :grading_period_id,
+          :assignment_group_id
+        ],
+        filter_rows_by: [
+          :section_id
+        ],
         selected_view_options_filters: []
       },
       :show_concluded_enrollments,
@@ -63,6 +56,7 @@ class GradebookSettingsController < ApplicationController
       :sort_rows_by_column_id,
       :sort_rows_by_setting_key,
       :sort_rows_by_direction,
+      { colors: [ :late, :missing, :resubmitted, :dropped, :excused ] }
     )
   end
 
@@ -72,5 +66,25 @@ class GradebookSettingsController < ApplicationController
 
   def gradebook_settings
     @current_user.preferences.fetch(:gradebook_settings)
+  end
+
+  def updated_settings
+    {
+      gradebook_settings: {
+        @context.id => gradebook_settings.fetch(@context.id),
+        # when new_gradebook is the only gradebook this can change to .fetch(:colors)
+        colors: gradebook_settings.fetch(:colors, {})
+      }
+    }
+  end
+
+  def deep_merge_gradebook_settings
+    @current_user.preferences.deep_merge!({
+      gradebook_settings: {
+       @context.id => gradebook_settings_params.except(:colors).to_h,
+       # when new_gradebook is the only gradebook this can change to .fetch('colors')
+       colors: gradebook_settings_params.fetch('colors', {}).to_h
+      }
+    })
   end
 end

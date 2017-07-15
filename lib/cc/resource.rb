@@ -27,6 +27,7 @@ module CC
     include WebResources
     include WebLinks
     include BasicLTILinks
+    include ToolProfiles
 
     delegate :add_error, :set_progress, :export_object?, :export_symbol?, :for_course_copy, :add_item_to_export, :add_exported_asset, :create_key, :to => :@manifest
     delegate :referenced_files, :to => :@html_exporter
@@ -76,6 +77,7 @@ module CC
         run_and_set_progress(:add_course_files, 70, I18n.t('course_exports.errors.files', "Failed to export some files"))
         run_and_set_progress(:add_media_objects, 90, I18n.t('course_exports.errors.media_files', "Failed to export some media files"), @html_exporter)
         run_and_set_progress(:create_basic_lti_links, 91, I18n.t('course_exports.errors.lti_links', "Failed to export some external tool configurations"))
+        run_and_set_progress(:create_tool_profiles, 92, I18n.t('course_exports.errors.tool_profiles', "Failed to export some tool profiles"))
       end
     end
 

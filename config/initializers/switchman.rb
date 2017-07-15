@@ -180,11 +180,14 @@ Rails.application.config.after_initialize do
 
     def self.send_in_each_region(klass, method, enqueue_args = {}, *args)
       run_current_region_asynchronously = enqueue_args.delete(:run_current_region_asynchronously)
-      klass.send(method, *args) unless run_current_region_asynchronously
       regions = Set.new
-      regions << Shard.current.database_server.config[:region]
+      unless run_current_region_asynchronously
+        klass.send(method, *args)
+        regions << Shard.current.database_server.config[:region]
+      end
+
       all.each do |db|
-        next if (regions.include?(db.config[:region]) || !db.config[:region]) && !run_current_region_asynchronously
+        next if (regions.include?(db.config[:region]) || !db.config[:region])
         next if db.shards.empty?
         regions << db.config[:region]
         db.shards.first.activate do

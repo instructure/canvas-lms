@@ -39,7 +39,7 @@ define [
 
       return unless data.items.length
 
-      stateList = ['no', 'none', 'acceptable', 'warning', 'problem', 'failure']
+      stateList = ['no', 'none', 'acceptable', 'warning', 'problem', 'failure', 'pending', 'error']
       stateMap = invert(stateList)
       states = (parseInt(stateMap[item.state or 'no']) for item in data.items)
       data.state = stateList[max(states)]

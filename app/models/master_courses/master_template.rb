@@ -61,14 +61,36 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     if self.use_default_restrictions_by_type
       if self.use_default_restrictions_by_type_changed? || self.default_restrictions_by_type_changed?
         MasterCourses::RESTRICTED_OBJECT_TYPES.each do |type|
-          self.master_content_tags.where(:use_default_restrictions => true, :content_type => type).
-            update_all(:restrictions => self.default_restrictions_by_type[type] || {})
+          new_type_restrictions = self.default_restrictions_by_type[type] || {}
+          count = self.master_content_tags.where(:use_default_restrictions => true, :content_type => type).
+            update_all(:restrictions => new_type_restrictions)
+          next unless count > 0
+
+          old_type_restrictions = self.default_restrictions_by_type_was[type] || {}
+          if new_type_restrictions.any?{|setting, locked| locked && !old_type_restrictions[setting]} # tightened restrictions
+            self.touch_all_content_for_tags(type)
+          end
         end
       end
     else
       if self.default_restrictions_changed?
-        self.master_content_tags.where(:use_default_restrictions => true).update_all(:restrictions => self.default_restrictions)
+        count = self.master_content_tags.where(:use_default_restrictions => true).
+          update_all(:restrictions => self.default_restrictions)
+        if count > 0 && self.default_restrictions.any?{|setting, locked| locked && !self.default_restrictions_was[setting]} # tightened restrictions
+          self.touch_all_content_for_tags
+        end
       end
+    end
+  end
+
+  def touch_all_content_for_tags(only_content_type=nil)
+    content_types = only_content_type ?
+      [only_content_type] :
+      self.master_content_tags.where(:use_default_restrictions => true).distinct.pluck(:content_type)
+    content_types.each do |content_type|
+      klass = content_type.constantize
+      klass.where(klass.primary_key => self.master_content_tags.where(:use_default_restrictions => true,
+        :content_type => content_type).select(:content_id)).touch_all
     end
   end
 

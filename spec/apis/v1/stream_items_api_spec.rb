@@ -431,7 +431,7 @@ describe UsersController, type: :request do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course.uuid}.ics" },
         'hide_final_grades' => false,
         'html_url' => course_url(@course, :host => HostUrl.context_host(@course)),
-        'default_view' => 'feed',
+        'default_view' => 'modules',
         'workflow_state' => 'available',
         'public_syllabus' => false,
         'public_syllabus_to_auth' => false,
@@ -440,7 +440,8 @@ describe UsersController, type: :request do
         'storage_quota_mb' => @course.storage_quota_mb,
         'apply_assignment_group_weights' => false,
         'restrict_enrollments_to_course_dates' => false,
-        'time_zone' => 'America/Denver'
+        'time_zone' => 'America/Denver',
+        'uuid' => @course.uuid
       },
 
       'user' => {
@@ -547,7 +548,7 @@ describe UsersController, type: :request do
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course.uuid}.ics" },
         'hide_final_grades' => false,
         'html_url' => course_url(@course, :host => HostUrl.context_host(@course)),
-        'default_view' => 'feed',
+        'default_view' => 'modules',
         'workflow_state' => 'available',
         'public_syllabus' => false,
         'public_syllabus_to_auth' => false,
@@ -556,7 +557,8 @@ describe UsersController, type: :request do
         'storage_quota_mb' => @course.storage_quota_mb,
         'apply_assignment_group_weights' => false,
         'restrict_enrollments_to_course_dates' => false,
-        'time_zone' => 'America/Denver'
+        'time_zone' => 'America/Denver',
+        'uuid' => @course.uuid
       },
 
       'user' => {

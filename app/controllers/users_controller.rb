@@ -499,7 +499,8 @@ class UsersController < ApplicationController
         :custom_colors => @current_user.custom_colors,
         :show_planner => show_planner?
       },
-      :STUDENT_PLANNER_ENABLED => planner_enabled?
+      :STUDENT_PLANNER_ENABLED => planner_enabled?,
+      :STUDENT_PLANNER_COURSES => planner_enabled? && map_courses_for_menu(@current_user.courses_with_primary_enrollment, :include_section_tabs => true)
     })
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
@@ -901,19 +902,42 @@ class UsersController < ApplicationController
   # @argument user_id
   #   the student's ID
   #
+  # @argument include[] [String, "planner_overrides"|"course"]
+  #   "planner_overrides":: Optionally include the assignment's associated planner override, if it exists, for the current user.
+  #                         These will be returned under a +planner_override+ key
+  #   "course":: Optionally include the assignments' courses
+  #
   # @returns [Assignment]
   def missing_submissions
     user = api_find(User, params[:user_id])
     return render_unauthorized_action unless @current_user && user.grants_right?(@current_user, :read)
 
-    assignments = []
+    submissions = []
     Shackles.activate(:slave) do
-      preloaded_submitted_assignment_ids = user.submissions.not_missing.pluck(:assignment_id)
-      assignments = user.assignments_needing_submitting due_before: Time.zone.now
-      assignments.reject {|as| preloaded_submitted_assignment_ids.include? as.id }
+      course_ids = user.participating_student_course_ids
+      Shard.partition_by_shard(course_ids) do |shard_course_ids|
+        submissions = Submission.preload(:assignment).
+                      missing.
+                      where(user_id: user.id,
+                            assignments: {context_id: shard_course_ids}).
+                      merge(Assignment.active).
+                      order(:cached_due_date)
+      end
+    end
+    assignments = Api.paginate(submissions, self, api_v1_user_missing_submissions_url).map(&:assignment)
+
+    includes = Array(params[:include])
+    planner_overrides = includes.include?('planner_overrides')
+    include_course = includes.include?('course')
+    ActiveRecord::Associations::Preloader.new.preload(assignments, :context) if include_course
+
+    json = assignments.map do |as|
+      assmt_json = assignment_json(as, user, session, include_planner_override: planner_overrides)
+      assmt_json['course'] = course_json(as.context, user, session, [], nil) if include_course
+      assmt_json
     end
 
-    render json: assignments.map {|as| assignment_json(as, user, session) }
+    render json: json
   end
 
   def ignore_item

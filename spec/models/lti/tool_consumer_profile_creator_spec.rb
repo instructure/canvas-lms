@@ -117,6 +117,11 @@ module Lti
       end
 
       describe '#capabilities' do
+        it 'includes all variable expansions from the variable expander' do
+          expected_caps = VariableExpander.expansion_keys
+          expect(tcp_creator.create.capability_offered).to include(*expected_caps)
+        end
+
         it 'add the basic_launch capability' do
           expect(tcp_creator.create.capability_offered).to include 'basic-lti-launch-request'
         end

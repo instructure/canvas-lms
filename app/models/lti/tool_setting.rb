@@ -19,9 +19,8 @@
 module Lti
   class ToolSetting < ActiveRecord::Base
     belongs_to :tool_proxy
-    belongs_to :context, polymorphic: [:course, :account]
+    belongs_to :context, polymorphic: [:course, :account, :attachment_association]
 
-    validates_presence_of :tool_proxy
     validates_presence_of :context, if: :has_resource_link_id?
 
     serialize :custom

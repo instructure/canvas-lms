@@ -174,7 +174,7 @@ $ic-font-family-fallback: "Helvetica Neue", Helvetica, Arial, sans-serif;
 
 $ic-font-weight: bold; // we can phase this var out now we're on Lato
 
-$ic-font-size: 14px;
+$ic-font-size: 16px;
 
 $ic-font-size--xlarge:   $ic-font-size + 14;
 $ic-font-size--large:    $ic-font-size + 9;
@@ -196,6 +196,7 @@ $ic-content-padding:            15px;
 $ic-header-background:          #34444f;
 $ic-header-primary-width:       84px;
 $ic-header-primary-expanded-width: $ic-sp*15;
+$ic-right-side-width: $ic-sp*24;
 
 //============================
 // List Functional Variables

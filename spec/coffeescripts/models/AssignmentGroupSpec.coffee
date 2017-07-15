@@ -58,17 +58,33 @@ define [
   test "#countRules returns false if the group has no rules", ->
     ag = new AssignmentGroup
     strictEqual ag.countRules(), 0
-    
+
   test "#hasIntegrationData returns true if integration_data is not empty", ->
     ag = new AssignmentGroup integration_data: { key: "value" }
     strictEqual ag.hasIntegrationData(), true
-    
+
   test "#hasIntegrationData returns false if integration_data is empty", ->
     ag = new AssignmentGroup integration_data: { }
     strictEqual ag.hasIntegrationData(), false
-      
+
   test "#hasIntegrationData returns false if integration_data is not set", ->
     ag = new AssignmentGroup
+    strictEqual ag.hasIntegrationData(), false
+
+  test "#hasIntegrationData returns true if sis_source_id is not empty", ->
+    ag = new AssignmentGroup sis_source_id: "1234"
+    strictEqual ag.hasIntegrationData(), true
+
+  test "#hasIntegrationData returns false if sis_source_id is empty", ->
+    ag = new AssignmentGroup sis_source_id: ""
+    strictEqual ag.hasIntegrationData(), false
+
+  test "#hasIntegrationData returns false if sis_source_id is not set", ->
+    ag = new AssignmentGroup
+    strictEqual ag.hasIntegrationData(), false
+
+  test "#hasIntegrationData returns false if sis_source_id and integration_data is empty", ->
+    ag = new AssignmentGroup sis_source_id: "", integration_data: { }
     strictEqual ag.hasIntegrationData(), false
 
   QUnit.module "AssignmentGroup#canDelete as admin",

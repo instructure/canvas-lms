@@ -213,7 +213,7 @@ import 'jqueryui/sortable'
           $preview.html($section.find(".edit_section").val());
           $section.find(".section_content").after($preview);
         } else if (section_type == "rich_text") {
-          var $richText = $section.find('.edit_section)');
+          var $richText = $section.find('.edit_section');
           var editorContent = RichContentEditor.callOnRCE($richText, "get_code");
           if (editorContent){ $preview.html($.raw(editorContent)) }
           $section.find(".section_content").after($preview);

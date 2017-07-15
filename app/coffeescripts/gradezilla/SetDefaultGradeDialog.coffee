@@ -38,7 +38,7 @@ define [
   class SetDefaultGradeDialog
     constructor: ({@assignment, @students, @context_id, @selected_section}) ->
 
-    show: =>
+    show: (onClose) =>
       templateLocals =
         assignment: @assignment
         showPointsPossible: (@assignment.points_possible || @assignment.points_possible == '0') && @assignment.grading_type != "gpa_scale"
@@ -52,6 +52,7 @@ define [
         open: => @$dialog.find(".grading_box").focus()
         close: => @$dialog.remove()
       ).fixDialogButtons()
+      @$dialog.on 'dialogclose', onClose
 
       $form = @$dialog
       $(".ui-dialog-titlebar-close").focus()
@@ -85,7 +86,7 @@ define [
               count: submissions.length)
             submittingDfd.resolve()
             $("#set_default_grade").focus()
-            @$dialog.remove()
+            @$dialog.dialog('close')
 
       getStudents = =>
         if @selected_section

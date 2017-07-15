@@ -47,7 +47,7 @@
       javascript_tag(%(
 !function(){
   var o,s,v;
-  if (!(window.Promise && Object.assign && [].find && [].includes && (o={},s=Symbol(),v={},o[s]=v,o[s]===v) && (function f(){}).bind().name==='bound f')) {
+  if (!(window.Promise && Object.assign && Object.values && [].find && [].includes && (o={},s=Symbol(),v={},o[s]=v,o[s]===v) && (function f(){}).bind().name==='bound f')) {
     s = 's', document.write('<'+s+'cr'+'ipt src="#{javascript_path(polyfill_url)}"></'+s+'c'+'ript>');
   }
 }();

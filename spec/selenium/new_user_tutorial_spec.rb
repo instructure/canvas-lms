@@ -22,7 +22,7 @@ describe "new user tutorials" do
 
   before do
     @course = course_factory(active_all: true)
-    course_with_teacher_logged_in(active_all: true)
+    course_with_teacher_logged_in(active_all: true, new_user: true)
     @course.account.enable_feature!(:new_user_tutorial)
   end
 

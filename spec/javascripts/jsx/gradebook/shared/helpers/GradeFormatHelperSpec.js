@@ -38,6 +38,18 @@ test('uses I18n#n to format numerical decimal grades', function () {
   equal(I18n.n.callCount, 1);
 });
 
+test('uses I18n#t to format completion based grades: complete', function () {
+  this.stub(I18n, 't').withArgs('complete').returns('* complete');
+  equal(GradeFormatHelper.formatGrade('complete'), '* complete');
+  equal(I18n.t.callCount, 1);
+});
+
+test('uses I18n#t to format completion based grades: incomplete', function () {
+  this.stub(I18n, 't').withArgs('incomplete').returns('* incomplete');
+  equal(GradeFormatHelper.formatGrade('incomplete'), '* incomplete');
+  equal(I18n.t.callCount, 1);
+});
+
 test('parses a stringified integer percentage grade when it is a valid number', function () {
   this.spy(numberHelper, 'parse');
   GradeFormatHelper.formatGrade('32%');

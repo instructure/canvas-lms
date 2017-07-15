@@ -1381,6 +1381,7 @@ tr:
   activity_13915493: Etkinlik
   activity_by_category_9c2033d1: "Kategoriye göre Etkinlik"
   activity_by_date_878c5b49: "Güne göre Etkinlik"
+  activity_compared_to_class_8133cb0: "Sınıfta Karşılaştırmalı Etkinlik"
   add_2nd_review_ea988088: "2. Gözden Geçiren Ekle"
   add_8523c19b: Ekle
   add_a_comment_872470ac: "Yorum Ekle"
@@ -8564,6 +8565,7 @@ tr:
   manage_module_name_dfe16816: "%{module_name} i yönet"
   manage_name_7f55f792: "%{name}'i Yönet"
   manage_profile_pictures_40c958ce: "Profil resimlerini yönet"
+  manage_rubrics_5d274f6a: "Değerlendirme Listelerini Yönet"
   manage_update_23de23a1: "Güncellemeyi Yönet"
   manage_update_for_toolname_f8e3b2fb: "%{toolName} için güncellemeyi yönet"
   manage_usage_rights_c5a8c216: "Kullanım Şartlarını Yönet"
@@ -13748,12 +13750,13 @@ tr:
     unknown_user: "Bilinmeyen Kullanıcı"
   rubric_association: 
     no_details: "Ayrıntı yok"
+  rubric_fc39da76: "Değerlendirme Listesi"
   rubrics: 
     index: 
       account_rubrics: "Hesap Değerlendirme Listeleri"
       are_you_sure_prompt: "Bu değerlendirme listesine silmek istediğinize emin misiniz? Bu değerlendirme listesiyle ilişkili herhangi bir dersten bu listeye erişilebilir fakat hiç bir yeni ders bu listeyi kullanamaz."
       buttons: 
-        add_rubric: "Değerlendirme Listesi"
+        add_rubric: "Değerlendirme Listesi Ekle"
       course_rubrics: "Ders Değerlendirme Listeleri"
       delete_rubric: "Değerlendirme Listesini Sil"
       edit_rubric: "Değerlendirme Listesini Düzenle"
@@ -14005,6 +14008,7 @@ tr:
         crosslist_this_section: "Bu Bölümün Çarpraz Listesini Oluştur"
         current_enrollments: "Varolan Kayıtlar"
         decrosslist_section: "Bu Bölümü Çarpraz Listeden Kaldır"
+  see_rubric_results_62a6447d: "Değerlendirme listesi sonuçlarına bak"
   select_content: "İçerik Seçiniz"
   select_content_checkbox: 
     select_content_error: "Bir içerik seçeneği seçmelisiniz"
@@ -16128,6 +16132,7 @@ tr:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE, WebCT 6+ Dersi"
   webct_name: "Blackboard Vista/CE (WebCT)"
+  week_s_cb1492ee: Hafta(lar)
   well_below_mastery_37664bdc: "Yeterliğin Epey Altında"
   what_are_self_sign_up_groups_af1f002a: "Kendi Kendine Üye Ol Grupları Nedir?"
   what_should_the_csv_file_look_like_985a59ac: "CSV dosyası nasıl olmalı?"
@@ -16177,6 +16182,8 @@ tr:
       delete_wiki: Sil
       labels: 
         front_page: "Ön Sayfa"
+      menu: 
+        use_front_page: "Ön Sayfa olarak kullan"
       published_indicator: Yayınlandı
       toolbar_menu: 
         settings: Ayarlar
@@ -16233,6 +16240,7 @@ tr:
       same_as_latest: "*En son * ile aynı"
     wiki_page_revisions: 
       revision_history: "Güncelleme Geçmişi"
+  wiki_6603e81b: Wiki
   wiki_page: 
     atom_author: "Wiki Sayfası"
     atom_entry_title: "Wiki Sayfası, %{course_or_group_name}: %{page_title}"
@@ -16322,6 +16330,7 @@ tr:
   you_must_specify_a_usage_right_5eb57f87: "Bir kullanım hakkı belirtmelisiniz."
   you_ve_been_invited_to_the_course_course_2aac8140: "%{course} dersine davet edildiniz."
   you_ve_been_invited_to_the_course_course_course_ro_a74d748b: "%{course} kursuna %{role_type} rolü ile davet edildiniz"
+  you_ve_been_reminded_to_assess_rubric_context_70eeb600: "%{rubric}, %{context}'i değerlendirmeniz hatırlatılıyor."
   you_will_need_to_register_an_application_on_linked_26ecb18d: |-
       [LinkedIn üzerinde bir uygulama kaydettirmeniz](%{linkedin_url}) gerek.
       OAuth 2.0 yetkili yönlendirme URL si olarak %{callback_url} eklemeli ve Uygulama Durumu nu Yayında yapmalısınız
@@ -16332,15 +16341,21 @@ tr:
   your_assignments_will_show_here_listed_by_due_date_18dc880f: "Ödevleriniz teslim tarhilerine göre burada listelenecek."
   your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: "Tarayıcınız Canvas'ın gerekli gördüğü minimum gereksinimleri karşılamıyor. Lütfen desteklenen tarayıcıların tam listesine ulaşmak için *Canvas Rehberini* ziyaret ediniz."
   your_content_has_been_exported_bbb57764: "İçeriğiniz dışarı aktarıldı."
+  your_course_db806851: Dersiniz
   your_email_address_f881e583: "E-Posta adresiniz"
   your_email_b5364bee: "E-Posta Adresiniz"
   your_message_has_been_sent_thank_you_e0284316: "Mesajınız başarıyla gönderildi. Teşekkürler!"
+  your_message_was_sent_977f6583: "Mesaj gönderildi!"
   your_name_7665e1d8: Adınız
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Profil resminiz yüklenemedi. Doys yükleme limitinizi aşmış olabilirsiniz."
   your_search_encountered_the_following_errors_fc3e5e7f: 
     one: "Aramanızda hata oluştu:"
     other: "Aramanızda hatalar oluştu:"
+  your_submission_has_not_been_graded_yet_d6963e53: "Gönderiniz henüz notlandırılmadı"
+  your_time_for_this_quiz_has_been_reduced_394652e9: "Bu sınav için zamanınız azaltıldı."
   yyyy_mm_dd_hh_mm_a01b6081: "YYYY-AA-GG ss:dd"
+  z_a_b48d8903: "Z - A"
+  z_a_be2ab67c: Z–A
   zendesk: 
     engine: 
       plugin_name: Zendesk

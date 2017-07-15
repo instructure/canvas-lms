@@ -374,6 +374,12 @@ define [
     deleteItem: =>
       $(".delete_group[data-focus-returns-to='ag_#{@model.id}_manage_link']").click()
 
+    # Inserts newAssignment into the view *after* oldAssignment if found,
+    # else at the beginning
+    insertAssignment: (newAssignment, oldAssignment) =>
+      position = @collection.indexOf(oldAssignment)
+      @collection.add(newAssignment, { at: position + 1 } )
+
     visibleAssignments: =>
       @collection.filter (assign) ->
         assign.attributes.hidden != true

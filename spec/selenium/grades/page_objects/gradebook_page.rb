@@ -49,7 +49,7 @@ module Gradebook
       f(".hide")
     end
 
-    def gp_dropdown
+    def grading_period_dropdown
       f(".grading-period-select-button")
     end
 
@@ -59,10 +59,6 @@ module Gradebook
 
     def grade_input(cell)
       f(".grade", cell)
-    end
-
-    def assignment_header(name)
-      f(assignment_header_selector(name))
     end
 
     def assignment_header_menu(id)
@@ -95,9 +91,17 @@ module Gradebook
       f('a', parent_element)
     end
 
-    # actions
     public
 
+    def assignment_header_label(name)
+      assignment_header(name).find('.assignment-name')
+    end
+
+    def assignment_header(name)
+      f(assignment_header_selector(name))
+    end
+
+    # actions
     def visit_gradebook(course, user = nil)
       if user
         user.preferences[:gradebook_version] = '2'
@@ -113,7 +117,7 @@ module Gradebook
     end
 
     def select_grading_period(grading_period_id)
-      gp_dropdown.click
+      grading_period_dropdown.click
       period = gp_menu_list.find do |item|
         f('label', item).attribute("for") == "period_option_#{grading_period_id}"
       end
@@ -125,6 +129,18 @@ module Gradebook
       cell.click
       set_value(grade_input(cell), grade)
       grade_input(cell).send_keys(:return)
+    end
+
+    def cell_hover(x, y)
+      hover(grading_cell(x, y))
+    end
+
+    def cell_click(x, y)
+      grading_cell(x, y).click
+    end
+
+    def cell_tooltip(x, y)
+      grading_cell(x, y).find('.gradebook-tooltip')
     end
 
     def cell_graded?(grade, x_coordinate, y_coordinate)

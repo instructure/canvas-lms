@@ -1,10 +1,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/../lti2_api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../../sharding_spec_helper')
 require_dependency "lti/ims/access_token_helper"
 require 'json/jwt'
 
 module Lti
   module Ims
     describe AccessTokenHelper, type: :controller do
+      specs_require_sharding
       include_context 'lti2_api_spec_helper'
 
       let(:service_name) { 'vnd.Canvas.CustomSecurity' }
@@ -87,6 +89,15 @@ module Lti
         tool_proxy.save!
         get :index, format: :json
         expect(response.code).to eq '401'
+      end
+
+      it 'finds the tool proxy when on a different shard' do
+        tool_proxy
+        @request.headers.merge!(request_headers)
+        Shard.create!.activate do
+          get :index, format: :json
+          expect(response.code).to eq '200'
+        end
       end
 
       describe "#bearer_token" do

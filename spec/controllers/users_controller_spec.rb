@@ -1471,4 +1471,30 @@ describe UsersController do
       expect(json['errored_users'].first['existing_users'].first['user_id']).to eq existing_user.id
     end
   end
+
+  describe "#user_dashboard" do
+    context "with student planner feature enabled" do
+      before(:once) do
+        @account = Account.default
+        @account.enable_feature! :student_planner
+      end
+
+      it "sets ENV.STUDENT_PLANNER_ENABLED to false when user has no student enrollments" do
+        user_factory(active_all: true)
+        user_session(@user)
+        @current_user = @user
+        get 'user_dashboard'
+        expect(assigns[:js_env][:STUDENT_PLANNER_ENABLED]).to be_falsey
+      end
+
+      it "sets ENV.STUDENT_PLANNER_ENABLED to true when user has a student enrollment" do
+        course_with_student_logged_in(active_all: true)
+        @current_user = @user
+        get 'user_dashboard'
+        expect(assigns[:js_env][:STUDENT_PLANNER_ENABLED]).to be_truthy
+      end
+
+    end
+  end
+
 end

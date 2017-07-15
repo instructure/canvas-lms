@@ -34,9 +34,9 @@ describe "Gradezilla - message students who" do
     message_text = "This is a message"
 
     Gradezilla.visit(@course)
+    Gradezilla.click_assignment_header_menu(@third_assignment.id)
+    Gradezilla.click_assignment_header_menu_element("message students")
 
-    Gradezilla.open_assignment_options(2)
-    f('[data-menu-item-id="message-students-who"]').click
     expect do
       message_form = f('#message_assignment_recipients')
       message_form.find_element(:css, '#body').send_keys(message_text)
@@ -55,11 +55,12 @@ describe "Gradezilla - message students who" do
     @third_assignment.grade_student(@student_2, grade: 42, grader: @teacher)
 
     # student 3 has neither submitted nor been graded
-
     message_text = "This is a message"
+
     Gradezilla.visit(@course)
-    Gradezilla.open_assignment_options(2)
-    f('[data-menu-item-id="message-students-who"]').click
+    Gradezilla. click_assignment_header_menu(@third_assignment.id)
+    Gradezilla.click_assignment_header_menu_element("message students")
+
     expect do
       message_form = f('#message_assignment_recipients')
       click_option('#message_assignment_recipients .message_types', "Haven't submitted yet")
@@ -72,10 +73,10 @@ describe "Gradezilla - message students who" do
 
   it "should send messages when Scored more than X points" do
     message_text = "This is a message"
-    Gradezilla.visit(@course)
 
-    Gradezilla.open_assignment_options(1)
-    f('[data-menu-item-id="message-students-who"]').click
+    Gradezilla.visit(@course)
+    Gradezilla.click_assignment_header_menu(@second_assignment.id)
+    Gradezilla.click_assignment_header_menu_element("message students")
 
     expect do
       message_form = f('#message_assignment_recipients')
@@ -96,10 +97,11 @@ describe "Gradezilla - message students who" do
     Gradezilla.visit(@course)
     # set grade for first student, 3rd assignment
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l3', 0)
-    Gradezilla.open_assignment_options(2)
+
+    Gradezilla.click_assignment_header_menu(@third_assignment.id)
+    Gradezilla.click_assignment_header_menu_element("message students")
 
     # expect dialog to show 1 more student with the "Haven't been graded" option
-    f('[data-menu-item-id="message-students-who"]').click
     visible_students = ffj('.student_list li:visible')
     expect(visible_students).to have_size 2
     expect(visible_students[0]).to include_text @student_name_1
@@ -114,9 +116,9 @@ describe "Gradezilla - message students who" do
     message_text = "This is a message"
 
     Gradezilla.visit(@course)
+    Gradezilla.click_assignment_header_menu(@third_assignment.id)
+    Gradezilla.click_assignment_header_menu_element("message students")
 
-    Gradezilla.open_assignment_options(2)
-    f('[data-menu-item-id="message-students-who"]').click
     expect do
       message_form = f('#message_assignment_recipients')
       message_form.find_element(:css, '#body').send_keys(message_text)
@@ -128,9 +130,8 @@ describe "Gradezilla - message students who" do
 
   it "allows the teacher to remove students from the message" do
     Gradezilla.visit(@course)
-
-    Gradezilla.open_assignment_options(1)
-    f('[data-menu-item-id="message-students-who"]').click
+    Gradezilla.click_assignment_header_menu(@second_assignment.id)
+    Gradezilla.click_assignment_header_menu_element("message students")
 
     message_form = f('#message_assignment_recipients')
     click_option('#message_assignment_recipients .message_types', 'Scored more than')
@@ -159,9 +160,8 @@ describe "Gradezilla - message students who" do
 
   it "disables the submit button if all students are filtered out" do
     Gradezilla.visit(@course)
-
-    Gradezilla.open_assignment_options(1)
-    f('[data-menu-item-id="message-students-who"]').click
+    Gradezilla.click_assignment_header_menu(@second_assignment.id)
+    Gradezilla.click_assignment_header_menu_element("message students")
 
     message_form = f('#message_assignment_recipients')
     message_form.find_element(:css, '#body').send_keys('hello')
@@ -176,9 +176,8 @@ describe "Gradezilla - message students who" do
 
   it "disables the submit button if all students are manually removed" do
     Gradezilla.visit(@course)
-
-    Gradezilla.open_assignment_options(1)
-    f('[data-menu-item-id="message-students-who"]').click
+    Gradezilla.click_assignment_header_menu(@second_assignment.id)
+    Gradezilla.click_assignment_header_menu_element("message students")
 
     message_form = f('#message_assignment_recipients')
     message_form.find_element(:css, '#body').send_keys('hello')
@@ -205,9 +204,8 @@ describe "Gradezilla - message students who" do
 
     message_text = "This is a message"
     Gradezilla.visit(@course)
-
-    Gradezilla.open_assignment_options(1)
-    f('[data-menu-item-id="message-students-who"]').click
+    Gradezilla.click_assignment_header_menu(@second_assignment.id)
+    Gradezilla.click_assignment_header_menu_element("message students")
 
     message_form = f('#message_assignment_recipients')
     click_option('#message_assignment_recipients .message_types', 'Scored more than')

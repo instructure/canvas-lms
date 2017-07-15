@@ -46,7 +46,7 @@
             <% date = "<span class=\"created_at time_ago_date\" data-timestamp=\"#{export.created_at.iso8601}\">#{datetime_string export.created_at}</span>".html_safe %>
             <% wrapper = link_to('\1', export.attachment ? verified_file_download_url(export.attachment) : nil) %>
             <% if export.expired? %>
-              <%= t "Course Export from %{date} (expired)", :date => date %>
+              <%= t "Course Export from %{date} (not available)", :date => date %>
             <% elsif export.export_type == ContentExport::COMMON_CARTRIDGE %>
               <%= t 'links.download', "Course Export from %{date}: *Click here to download*", :date => date, :wrapper => wrapper %>
             <% elsif export.export_type == ContentExport::QTI %>
@@ -63,7 +63,7 @@
   </div>
 
   <% if ContentExport.expire? %>
-    <p><em><%= t "Content exports expire after %{days} days.", days: ContentExport.expire_days %></em></p>
+    <p><em><%= t "Content exports cannot be downloaded after %{days} days.", days: ContentExport.expire_days %></em></p>
   <% end %>
 
   <hr />

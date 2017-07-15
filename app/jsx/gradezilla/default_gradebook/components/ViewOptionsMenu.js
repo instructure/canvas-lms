@@ -48,13 +48,16 @@ class ViewOptionsMenu extends React.Component {
       criterion: string.isRequired,
       direction: string.isRequired,
       disabled: bool.isRequired,
+      modulesEnabled: bool.isRequired,
       onSortByDefault: func.isRequired,
       onSortByNameAscending: func.isRequired,
       onSortByNameDescending: func.isRequired,
       onSortByDueDateAscending: func.isRequired,
       onSortByDueDateDescending: func.isRequired,
       onSortByPointsAscending: func.isRequired,
-      onSortByPointsDescending: func.isRequired
+      onSortByPointsDescending: func.isRequired,
+      onSortByModuleAscending: func.isRequired,
+      onSortByModuleDescending: func.isRequired
     }).isRequired,
     filterSettings: shape({
       available: arrayOf(string).isRequired,
@@ -71,15 +74,12 @@ class ViewOptionsMenu extends React.Component {
     onSelectShowUnpublishedAssignments: func.isRequired
   };
 
-  constructor (props) {
-    super(props);
-
-    this.onFilterSelect = (_event, filters) => { this.props.filterSettings.onSelect(filters) };
-    this.bindMenuContent = (menuContent) => { this.menuContent = menuContent };
-    this.bindButton = (button) => { this.button = button };
-    this.bindStatusesMenuItem = (menuItem) => { this.statusesMenuItem = menuItem };
-    this.bindArrangeByMenuContent = (menuContent) => { this.arrangeByMenuContent = menuContent };
-  }
+  onFilterSelect = (_event, filters) => { this.props.filterSettings.onSelect(filters) };
+  bindMenuContent = (menuContent) => { this.menuContent = menuContent };
+  bindButton = (button) => { this.button = button };
+  bindStatusesMenuItem = (menuItem) => { this.statusesMenuItem = menuItem };
+  bindArrangeByMenuContent = (menuContent) => { this.arrangeByMenuContent = menuContent };
+  bindFiltersMenuContent = (menuContent) => { this.filtersMenuContent = menuContent };
 
   areColumnsOrderedBy (criterion, direction) {
     const sortSettings = this.props.columnSortSettings;
@@ -162,6 +162,28 @@ class ViewOptionsMenu extends React.Component {
             >
               { I18n.t('Points - Highest to Lowest') }
             </MenuItem>
+
+            {
+              this.props.columnSortSettings.modulesEnabled &&
+              <MenuItem
+                disabled={this.props.columnSortSettings.disabled}
+                selected={this.areColumnsOrderedBy('module_position', 'ascending')}
+                onSelect={this.props.columnSortSettings.onSortByModuleAscending}
+              >
+                { I18n.t('Module - First to Last') }
+              </MenuItem>
+            }
+
+            {
+              this.props.columnSortSettings.modulesEnabled &&
+              <MenuItem
+                disabled={this.props.columnSortSettings.disabled}
+                selected={this.areColumnsOrderedBy('module_position', 'descending')}
+                onSelect={this.props.columnSortSettings.onSortByModuleDescending}
+              >
+                { I18n.t('Module - Last to First') }
+              </MenuItem>
+            }
           </MenuItemGroup>
         </MenuItemFlyout>
 
@@ -169,20 +191,25 @@ class ViewOptionsMenu extends React.Component {
 
         {
           this.props.filterSettings.available.length > 0 &&
-          <MenuItemGroup
-            allowMultiple
+          <MenuItemFlyout
+            contentRef={this.bindFiltersMenuContent}
             label={I18n.t('Filters')}
-            onSelect={this.onFilterSelect}
-            selected={this.props.filterSettings.selected}
           >
-            {
-              this.props.filterSettings.available.map(filterKey => (
-                <MenuItem key={filterKey} value={filterKey}>
-                  { filterLabels[filterKey] }
-                </MenuItem>
-              ))
-            }
-          </MenuItemGroup>
+            <MenuItemGroup
+              allowMultiple
+              label={<ScreenReaderContent>{I18n.t('Filters')}</ScreenReaderContent>}
+              onSelect={this.onFilterSelect}
+              selected={this.props.filterSettings.selected}
+            >
+              {
+                this.props.filterSettings.available.map(filterKey => (
+                  <MenuItem key={filterKey} value={filterKey}>
+                    { filterLabels[filterKey] }
+                  </MenuItem>
+                ))
+              }
+            </MenuItemGroup>
+          </MenuItemFlyout>
         }
 
         { this.props.filterSettings.available.length > 0 && <MenuItemSeparator /> }

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define(['jquery'], function ($){
+import $ from 'jquery'
   var LTI_MIME_TYPES = [ 'application/vnd.ims.lti.v1.ltilink', 'application/vnd.ims.lti.v1.launch+json'];
 
   function exportPropsToSelf(properties, keyMethod) {
@@ -181,5 +181,5 @@ define(['jquery'], function ($){
     return new TinyMCEContentItem(contentItem);
   }
 
-  return TinyMCEContentItem;
-});
+  export default TinyMCEContentItem;
+

@@ -107,10 +107,12 @@ function gulpTimezonePlugin () {
 function makeIE11Polyfill () {
   const coreJsBuilder = require('core-js-builder')
 
-  const FEATURES_TO_POLYFILL=[
+  const FEATURES_TO_POLYFILL = [
     'es6.promise',
     'es6.object.assign',
     'es6.object.is',
+    'es7.object.values',
+    'es7.object.entries',
     'es6.array',
     'es7.array.includes',
     'es6.function',

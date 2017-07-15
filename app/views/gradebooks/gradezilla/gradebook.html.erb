@@ -41,15 +41,32 @@
           <i class="icon-keyboard-shortcuts"></i>
         </button>
 
+        <% if multiple_assignment_groups? %>
+            <div class="gradebook-filter-container" id="assignment-group-filter-container"></div>
+        <% end %>
+
         <% if grading_periods? %>
           <div class="gradebook-filter-container" id="grading-periods-filter-container"></div>
         <% end %>
 
-        <div class="gradebook-filter-container section-button-placeholder"></div>
+        <% if visible_modules? %>
+          <div class="gradebook-filter-container" id="modules-filter-container"></div>
+        <% end %>
 
-        <div class="gradebook-filter-container gradebook_filter" style="display:none">
+        <% if multiple_sections? %>
+          <div class="gradebook-filter-container" id="sections-filter-container"></div>
+        <% end %>
+
+        <div class="gradebook-filter-container gradebook_filter" id="search-filter-container">
           <% placeholder = t('Search…') %>
-          <input type="text" class="search-query" placeholder="<%= placeholder %>" aria-label="<%= placeholder %>">
+          <input
+            type="text"
+            class="search-query"
+            placeholder="<%= placeholder %>"
+            aria-label="<%= placeholder %>"
+            aria-disabled="true"
+            disabled
+          >
         </div>
 
         <div class="gradebook_menu">
@@ -70,7 +87,7 @@
   <% if @context.feature_enabled?(:outcome_gradebook) %>
     <div class="outcome-gradebook-container">
       <div class="outcome-menus hidden" style="text-align: right;">
-        <div class="section-button-placeholder"></div>
+        <span data-component="SectionFilter"></span>
         <span data-component="GradebookMenu" data-variant="DefaultGradebookLearningMastery"></span>
       </div>
       <div class="outcome-gradebook hidden"></div>

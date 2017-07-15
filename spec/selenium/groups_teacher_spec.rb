@@ -490,8 +490,12 @@ describe "new groups" do
       expect(f(".group[data-id=\"#{@testgroup[1].id}\"] .group-summary")).to include_text('1 student')
 
       f(".group[data-id=\"#{@testgroup[0].id}\"] .toggle-group").click
+      # click opens the group to display details, wait for it to complete
+      expect(fj('.group-user-name:contains("Test Student 1")')).to be_displayed
+
       f(".group[data-id=\"#{@testgroup[1].id}\"] .toggle-group").click
-      wait_for_ajaximations
+      # click opens the group to display details, wait for it to complete
+      expect(fj('.group-user-name:contains("Test Student 2")')).to be_displayed
 
       drag_and_drop_element(fj(drag_item1), fj(drop_target1))
       wait_for_ajaximations
@@ -565,9 +569,11 @@ describe "new groups" do
       drop_target1 = ".group[data-id=\"#{@testgroup[0].id}\"]"
 
       f(".group[data-id=\"#{@testgroup[0].id}\"] .toggle-group").click
-      f(".group[data-id=\"#{@testgroup[1].id}\"] .toggle-group").click
-      wait_for_ajaximations
+      # click opens the group to display details, wait for it to complete
+      expect(fj('.group-user-name:contains("Test Student 2")')).to be_displayed
 
+      f(".group[data-id=\"#{@testgroup[1].id}\"] .toggle-group").click
+      # click opens the second group, wait for it to complete
       expect(f('.icon-user.group-leader')).to be_displayed
 
       drag_and_drop_element(fj(drag_item1), fj(drop_target1))

@@ -46,20 +46,20 @@ describe "Gradezilla - group weights" do
     @group1 = @course.assignment_groups.create!(:name => 'first assignment group', :group_weight => 50)
     @group2 = @course.assignment_groups.create!(:name => 'second assignment group', :group_weight => 50)
     @assignment1 = assignment_model({
-                                        :course => @course,
-                                        :name => 'first assignment',
-                                        :due_at => Date.today,
-                                        :points_possible => 50,
-                                        :submission_types => 'online_text_entry',
-                                        :assignment_group => @group1
+                                      :course => @course,
+                                      :name => 'first assignment',
+                                      :due_at => Date.today,
+                                      :points_possible => 50,
+                                      :submission_types => 'online_text_entry',
+                                      :assignment_group => @group1
                                     })
     @assignment2 = assignment_model({
-                                        :course => @course,
-                                        :name => 'second assignment',
-                                        :due_at => Date.today,
-                                        :points_possible => 10,
-                                        :submission_types => 'online_text_entry',
-                                        :assignment_group => @group2
+                                      :course => @course,
+                                      :name => 'second assignment',
+                                      :due_at => Date.today,
+                                      :points_possible => 10,
+                                      :submission_types => 'online_text_entry',
+                                      :assignment_group => @group2
                                     })
     @course.reload
   end
@@ -96,68 +96,59 @@ describe "Gradezilla - group weights" do
       @group1 = @course.assignment_groups.create!(:name => 'first assignment group', :group_weight => 50)
       @group2 = @course.assignment_groups.create!(:name => 'second assignment group', :group_weight => 50)
       @assignment1 = assignment_model({
-                                          :course => @course,
-                                          :name => 'first assignment',
-                                          :due_at => Date.today,
-                                          :points_possible => 50,
-                                          :submission_types => 'online_text_entry',
-                                          :assignment_group => @group1
+                                        :course => @course,
+                                        :name => 'first assignment',
+                                        :due_at => Date.today,
+                                        :points_possible => 50,
+                                        :submission_types => 'online_text_entry',
+                                        :assignment_group => @group1
                                       })
       @assignment2 = assignment_model({
-                                          :course => @course,
-                                          :name => 'second assignment',
-                                          :due_at => Date.today,
-                                          :points_possible => 0,
-                                          :submission_types => 'online_text_entry',
-                                          :assignment_group => @group2
+                                        :course => @course,
+                                        :name => 'second assignment',
+                                        :due_at => Date.today,
+                                        :points_possible => 0,
+                                        :submission_types => 'online_text_entry',
+                                        :assignment_group => @group2
                                       })
       @course.reload
     end
 
     it 'should display a warning icon for assignments with 0 points possible', priority: '1', test_id: 164013 do
       Gradezilla.visit(@course)
-      expect(ff('.Gradebook__ColumnHeaderDetail svg[name="IconWarningSolid"]').size).to eq(1)
+      expect(Gradezilla.select_assignment_header_warning_icon.size).to eq(1)
     end
 
     it 'should display a warning icon in the total column', priority: '1', test_id: 164013 do
       Gradezilla.visit(@course)
-      expect(ff('.gradebook-cell .icon-warning').count).to eq(1)
+      expect(Gradezilla.total_cell_warning_icon_select.size).to eq(1)
     end
 
     it 'should not display warning icons if group weights are turned off', priority: "1", test_id: 305579 do
       @course.apply_assignment_group_weights = false
       @course.save!
       Gradezilla.visit(@course)
+
       expect(f("body")).not_to contain_css('.icon-warning')
     end
 
     it 'should display mute icon if an assignment is muted in both header and total column' do
-      header_mute_icon_selector = [
-        ".container_1",
-        ".slick-header-column[id*='assignment_#{@assignment2.id}']",
-        "svg[name=IconMutedSolid]"
-      ].join(' ')
-
       Gradezilla.visit(@course)
-      toggle_muting(@assignment2)
-      expect(f("#content")).to contain_jqcss('.total-cell .icon-muted')
-      expect(f("#content")).to contain_jqcss(header_mute_icon_selector)
+      Gradezilla.toggle_assignment_muting(@assignment2.id)
+
+      expect(Gradezilla.content_selector).to contain_jqcss('.total-cell .icon-muted')
+      expect(Gradezilla.content_selector).to contain_jqcss(Gradezilla.assignment_header_mute_icon_selector(@assignment2.id))
     end
 
     it 'should not display mute icon if an assignment is unmuted in both header and total column' do
       @assignment2.muted = true
       @assignment2.save!
 
-      header_mute_icon_selector = [
-        ".container_1",
-        ".slick-header-column[id*='assignment_#{@assignment2.id}']",
-        "svg[name=IconMutedSolid]"
-      ].join(' ')
-
       Gradezilla.visit(@course)
-      toggle_muting(@assignment2)
-      expect(f("#content")).not_to contain_jqcss('.total-cell .icon-muted')
-      expect(f("#content")).not_to contain_jqcss(header_mute_icon_selector)
+      Gradezilla.toggle_assignment_muting(@assignment2.id)
+
+      expect(Gradezilla.content_selector).not_to contain_jqcss('.total-cell .icon-muted')
+      expect(Gradezilla.content_selector).not_to contain_jqcss('.svg[name=IconWarningSolid]')
     end
   end
 end
