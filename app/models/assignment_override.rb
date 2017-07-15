@@ -148,7 +148,8 @@ class AssignmentOverride < ActiveRecord::Base
     transaction do
       self.assignment_override_students.reload.destroy_all
       self.workflow_state = 'deleted'
-      self.save!
+      self.default_values
+      self.save!(validate: false)
     end
   end
 
