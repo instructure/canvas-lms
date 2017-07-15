@@ -63,10 +63,10 @@ module SIS
         @things_to_update_batch_ids = {}
       end
 
-      def process_change_sis_id(old_id: old_id, new_id: new_id, type: type)
+      def process_change_sis_id(old_id: nil, new_id: nil, type: nil)
         @logger.debug("Processing change_sis_id #{[type, old_id, new_id].inspect}")
 
-        raise ImportError, "No Type given for change_sis_id" if type.blank?
+        raise ImportError, "No type given for change_sis_id" if type.blank?
         raise ImportError, "No old_id given for change_sis_id" if old_id.blank?
         raise ImportError, "No new_id given for change_sis_id" if new_id.blank?
 
