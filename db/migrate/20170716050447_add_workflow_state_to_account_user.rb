@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2017 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,20 +14,16 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-module Api::V1::Admin
-  include Api::V1::Json
-  include Api::V1::User
+class AddWorkflowStateToAccountUser < ActiveRecord::Migration[5.0]
+  tag :predeploy
+  disable_ddl_transaction!
 
-  def admin_json(admin, current_user, session)
-    # admin is an AccountUser
-    {
-      id: admin.id,
-      role: admin.role.name,
-      role_id: admin.role_id,
-      user: user_json(admin.user, current_user, session),
-      workflow_state: admin.workflow_state
-    }
+  def change
+    add_column :account_users, :workflow_state, :string
+    change_column_default(:account_users, :workflow_state, 'active')
+    DataFixup::BackfillNulls.run(AccountUser, :workflow_state, default_value: 'active')
+    change_column_null(:account_users, :workflow_state, false)
+    add_index :account_users, :workflow_state, algorithm: :concurrently
   end
 end

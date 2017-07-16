@@ -679,7 +679,7 @@ class Course < ActiveRecord::Base
     }
 
     p.dispatch :new_course
-    p.to { self.root_account.account_users }
+    p.to { self.root_account.account_users.active }
     p.whenever { |record|
       record.root_account &&
       ((record.just_created && record.name != Course.default_name) ||
@@ -1492,7 +1492,7 @@ class Course < ActiveRecord::Base
       if account_chain_ids == [Account.site_admin.id]
         Account.site_admin.account_users_for(user)
       else
-        AccountUser.where(:account_id => account_chain_ids, :user_id => user).to_a
+        AccountUser.active.where(:account_id => account_chain_ids, :user_id => user).to_a
       end
     end
     @account_users[user.global_id] ||= []

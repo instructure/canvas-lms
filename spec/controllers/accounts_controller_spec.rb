@@ -185,7 +185,7 @@ describe AccountsController do
       account_with_admin_logged_in(account: a)
       post 'remove_account_user', params: {account_id: a.id, id: au_id}
       expect(response).to be_redirect
-      expect(AccountUser.where(id: au_id).first).to be_nil
+      expect(AccountUser.active.where(id: au_id).first).to be_nil
     end
 
     it "should verify that the membership is in the caller's account" do

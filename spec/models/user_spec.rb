@@ -266,7 +266,7 @@ describe User do
     user.reload
     expect(user.associated_account_ids.include?(account1.id)).to be_truthy
     expect(user.associated_account_ids.include?(account2.id)).to be_falsey
-    expect(user.account_users.where(:account_id => [account2, sub])).to be_empty
+    expect(user.account_users.active.where(account_id: [account2, sub])).to be_empty
   end
 
   it "should search by multiple fields" do
@@ -3267,7 +3267,7 @@ describe User do
     end
   end
 
-  describe "all_accounts" do
+  describe "adminable_accounts" do
     specs_require_sharding
 
     it "should include accounts from multiple shards" do
@@ -3278,7 +3278,7 @@ describe User do
         @account2.account_users.create!(user: @user)
       end
 
-      expect(@user.all_accounts.map(&:id).sort).to eq [Account.site_admin, @account2].map(&:id).sort
+      expect(@user.adminable_accounts.map(&:id).sort).to eq [Account.site_admin, @account2].map(&:id).sort
     end
 
     it "should exclude deleted accounts" do
@@ -3290,7 +3290,7 @@ describe User do
         @account2.destroy
       end
 
-      expect(@user.all_accounts.map(&:id).sort).to eq [Account.site_admin].map(&:id).sort
+      expect(@user.adminable_accounts.map(&:id).sort).to eq [Account.site_admin].map(&:id).sort
     end
   end
 

@@ -826,7 +826,7 @@ class Account < ActiveRecord::Base
   end
 
   def membership_for_user(user)
-    self.account_users.where(user_id: user).first if user
+    self.account_users.active.where(user_id: user).first if user
   end
 
   def available_custom_account_roles(include_inactive=false)
@@ -937,7 +937,7 @@ class Account < ActiveRecord::Base
         @account_users_cache[user.global_id] ||= begin
           all_site_admin_account_users_hash = MultiCache.fetch("all_site_admin_account_users3") do
             # this is a plain ruby hash to keep the cached portion as small as possible
-            self.account_users.inject({}) { |result, au| result[au.user_id] ||= []; result[au.user_id] << [au.id, au.role_id]; result }
+            self.account_users.active.inject({}) { |result, au| result[au.user_id] ||= []; result[au.user_id] << [au.id, au.role_id]; result }
           end
           (all_site_admin_account_users_hash[user.id] || []).map do |(id, role_id)|
             au = AccountUser.new
@@ -956,7 +956,7 @@ class Account < ActiveRecord::Base
         if account_chain_ids == [Account.site_admin.id]
           Account.site_admin.account_users_for(user)
         else
-          AccountUser.where(:account_id => account_chain_ids, :user_id => user).to_a
+          AccountUser.where(:account_id => account_chain_ids, :user_id => user).active.to_a
         end
       end
     end
@@ -964,12 +964,12 @@ class Account < ActiveRecord::Base
     @account_users_cache[user.global_id]
   end
 
-  # returns all account users for this entire account tree
+  # returns all active account users for this entire account tree
   def all_account_users_for(user)
     raise "must be a root account" unless self.root_account?
     Shard.partition_by_shard(account_chain(include_site_admin: true).uniq) do |accounts|
       next unless user.associated_shards.include?(Shard.current)
-      AccountUser.eager_load(:account).where("user_id=? AND (root_account_id IN (?) OR account_id IN (?))", user, accounts, accounts)
+      AccountUser.active.eager_load(:account).where("user_id=? AND (root_account_id IN (?) OR account_id IN (?))", user, accounts, accounts)
     end
   end
 
