@@ -302,11 +302,11 @@ describe "student planner" do
       expect(f('body')).not_to contain_jqcss("button:contains('Close opportunities popover')")
     end
 
-    it "links opportunity to the correct assignment", priority: "1", test_id: 3281712 do
-      skip('WIP: it\'s clicking the wrong div currently')
+    it "links opportunity to the correct assignment page", priority: "1", test_id: 3281712 do
       go_to_list_view
       open_opportunities_dropdown
-      expect_new_page_load { fj('div:contains("assignmentThatHasToBeDoneNow")').click }
+      parent = f('#opportunities_parent')
+      fln('assignmentThatHasToBeDoneNow', parent).click
       expect(f('.description.user_content')).to include_text("This will take a long time")
     end
 
