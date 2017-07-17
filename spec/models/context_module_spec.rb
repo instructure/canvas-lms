@@ -186,8 +186,8 @@ describe ContextModule do
     it "should not add invalid wiki pages" do
       course_module
       @course.wiki
-      @wiki = Wiki.create!(:title => "new wiki")
-      @page = @wiki.wiki_pages.create!(:title => "new page")
+      other_course = Account.default.courses.create!
+      @page = other_course.wiki.wiki_pages.create!(:title => "new page")
       @tag = @module.add_item({:id => @page.id, :type => 'wiki_page'})
       expect(@tag).to be_nil
     end
