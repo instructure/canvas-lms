@@ -299,7 +299,7 @@ describe "student planner" do
       go_to_list_view
       open_opportunities_dropdown
       close_opportunities_dropdown
-      expect(f('body')).not_to contain_jqcss("button:contains('Close opportunities popover')")
+      expect(f('body')).not_to contain_jqcss("button[title='Close opportunities popover']")
     end
 
     it "links opportunity to the correct assignment page", priority: "1", test_id: 3281712 do
