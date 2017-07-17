@@ -24,8 +24,13 @@ class DropOldCollationKeyIndexes < ActiveRecord::Migration[5.0]
   def up
     return unless connection.extension_installed?(:pg_collkey)
 
-    remove_index :users, name: :index_users_on_sortable_name_old
-    remove_index :attachments, name: :index_attachments_on_folder_id_and_file_state_and_display_name1
+    if connection.index_name_exists?(:users, :index_users_on_sortable_name_old)
+      remove_index :users, name: :index_users_on_sortable_name_old
+    end
+
+    if connection.index_name_exists?(:attachments, :index_attachments_on_folder_id_and_file_state_and_display_name1)
+      remove_index :attachments, name: :index_attachments_on_folder_id_and_file_state_and_display_name1
+    end
   end
 
   def down
