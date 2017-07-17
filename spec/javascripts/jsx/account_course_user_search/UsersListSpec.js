@@ -87,8 +87,9 @@ test('clicking the Name column header calls onUpdateFilters with username descen
   header.simulate('click')
 
   const sinonCallback = wrapper.unrendered.props.onUpdateFilters
+
   ok(sinonCallback.calledOnce)
-  ok(sinonCallback.calledWith({search_term: 'User', sort: 'username', order: 'desc'}))
+  ok(sinonCallback.calledWith({search_term: 'User', sort: 'username', order: 'desc', role_filter_id: undefined}))
 });
 
 test('clicking the Email column header calls onUpdateFilters with email ascending', () => {
@@ -98,7 +99,7 @@ test('clicking the Email column header calls onUpdateFilters with email ascendin
 
   const sinonCallback = wrapper.unrendered.props.onUpdateFilters
   ok(sinonCallback.callCount === 2)
-  ok(sinonCallback.calledWith({search_term: 'User', sort: 'email', order: 'asc'}))
+  ok(sinonCallback.calledWith({search_term: 'User', sort: 'email', order: 'asc', role_filter_id: undefined}))
 });
 
 test('clicking the SIS ID column header calls onUpdateFilters with sis_id ascending', () => {
@@ -108,7 +109,7 @@ test('clicking the SIS ID column header calls onUpdateFilters with sis_id ascend
 
   const sinonCallback = wrapper.unrendered.props.onUpdateFilters
   ok(sinonCallback.callCount === 3)
-  ok(sinonCallback.calledWith({search_term: 'User', sort: 'sis_id', order: 'asc'}))
+  ok(sinonCallback.calledWith({search_term: 'User', sort: 'sis_id', order: 'asc', role_filter_id: undefined}))
 });
 
 test('clicking the Last Login column header calls onUpdateFilters with last_login ascending', () => {
@@ -118,5 +119,5 @@ test('clicking the Last Login column header calls onUpdateFilters with last_logi
 
   const sinonCallback = wrapper.unrendered.props.onUpdateFilters
   ok(sinonCallback.callCount === 4)
-  ok(sinonCallback.calledWith({search_term: 'User', sort: 'last_login', order: 'asc'}))
+  ok(sinonCallback.calledWith({search_term: 'User', sort: 'last_login', order: 'asc', role_filter_id: undefined}))
 });
