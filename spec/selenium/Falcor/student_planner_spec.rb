@@ -303,6 +303,7 @@ describe "student planner" do
     end
 
     it "links opportunity to the correct assignment", priority: "1", test_id: 3281712 do
+      skip('WIP: it\'s clicking the wrong div currently')
       go_to_list_view
       open_opportunities_dropdown
       expect_new_page_load { fj('div:contains("assignmentThatHasToBeDoneNow")').click }
