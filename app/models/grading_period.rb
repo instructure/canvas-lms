@@ -21,6 +21,7 @@ class GradingPeriod < ActiveRecord::Base
 
   belongs_to :grading_period_group, inverse_of: :grading_periods
   has_many :scores, -> { active }
+  has_many :submissions, -> { active }
 
   validates :title, :start_date, :end_date, :close_date, :grading_period_group_id, presence: true
   validates :weight, numericality: true, allow_nil: true
