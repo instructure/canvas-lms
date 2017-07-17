@@ -19,6 +19,7 @@
 require_relative '../../helpers/gradezilla_common'
 require_relative '../setup/gradebook_setup'
 require_relative '../page_objects/gradezilla_page'
+require_relative '../page_objects/gradezilla_cells_page'
 
 describe "Gradezilla - concluded courses and enrollments" do
   include_context "in-process server selenium tests"
@@ -94,12 +95,10 @@ describe "Gradezilla - concluded courses and enrollments" do
     it "does not allow editing grades", priority: "1", test_id: 210027 do
       @course.complete!
       Gradezilla.visit(@course)
-      cell = Gradezilla.grading_cell
 
-      expect(cell).to include_text '10'
-      cell.click
-
-      expect(cell).not_to contain_css('.grade') # no input box for entry
+      expect(Gradezilla::Cells.get_grade(@student_1, @first_assignment)).to eq '10'
+      cell = Gradezilla::Cells.grading_cell(@student_1, @first_assignment)
+      expect(cell).to contain_css(Gradezilla::Cells.ungradable_selector)
     end
   end
 end
