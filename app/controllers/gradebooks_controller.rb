@@ -557,9 +557,10 @@ class GradebooksController < ApplicationController
   end
 
   def submissions_json
-    @submissions.map do |s|
-      json = s.as_json(Submission.json_serialization_full_parameters)
-      json['submission']['provisional_grade_id'] = s.provisional_grade_id if s.provisional_grade_id
+    @submissions.map do |sub|
+      json = sub.as_json(Submission.json_serialization_full_parameters)
+      json['submission']['assignment_visible'] = sub.assignment_visible_to_user?(sub.user)
+      json['submission']['provisional_grade_id'] = sub.provisional_grade_id if sub.provisional_grade_id
       json
     end
   end

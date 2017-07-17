@@ -850,6 +850,25 @@ describe GradebooksController do
   end
 
   describe "POST 'update_submission'" do
+    it "includes assignment_visibility" do
+      user_session(@teacher)
+      @assignment = @course.assignments.create!(:title => "some assignment")
+      @student = @course.enroll_user(User.create!(:name => "some user"))
+      post(
+        'update_submission',
+        format: :json,
+        course_id: @course.id,
+        submission: {
+          assignment_id: @assignment.id,
+          user_id: @student.user_id,
+          grade: 10
+        }
+      )
+
+      submissions = JSON.parse(response.body).map{ |sub| sub['submission']}
+      expect(submissions).to all include('assignment_visible' => true)
+    end
+
     it "allows adding comments for submission" do
       user_session(@teacher)
       @assignment = @course.assignments.create!(:title => "some assignment")
