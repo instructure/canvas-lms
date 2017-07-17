@@ -2038,8 +2038,8 @@ class Assignment < ActiveRecord::Base
     where('title ILIKE ?', "#{title}%")
   }
 
-  scope :with_non_placeholder_submissions_for_user, lambda { |user|
-    with_submissions_for_user(user).merge(Submission.not_placeholder)
+  scope :having_submissions_for_user, lambda { |user|
+    with_submissions_for_user(user).merge(Submission.having_submission)
   }
 
   scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
