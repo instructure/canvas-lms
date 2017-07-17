@@ -24,6 +24,8 @@ module GraphQLNodeLoader
           end
         end
       end
+    when "GradingPeriod"
+      Loaders::IDLoader.for(GradingPeriod).load(id).then(check_read_permission)
     else
       raise UnsupportedTypeError.new("don't know how to load #{type}")
     end

@@ -39,6 +39,12 @@ module Types
         end
       }
     end
+
+    connection :gradingPeriodsConnection, GradingPeriodType.connection_type do
+      resolve ->(course, _, _) {
+        GradingPeriod.for(course).order(:start_date)
+      }
+    end
   end
 
   CourseWorkflowState = GraphQL::EnumType.define do
