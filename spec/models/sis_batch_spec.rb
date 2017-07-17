@@ -594,6 +594,18 @@ test_1,test_a,course
       expect(b1.processing_warnings).to eq []
     end
 
+    it 'should set batch_ids on admins' do
+      u1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
+      a1 = @account.account_users.create!(user_id: u1.id)
+      b1 = process_csv_data([
+%{user_id,account_id,role,status
+U001,,AccountAdmin,active
+}])
+      expect(a1.reload.sis_batch_id).to eq b1.id
+      expect(b1.processing_errors).to eq []
+      expect(b1.processing_warnings).to eq []
+    end
+
     describe 'change_threshold in batch mode' do
       before :once do
         @term1 = @account.enrollment_terms.first
