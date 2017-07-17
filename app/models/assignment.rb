@@ -2437,10 +2437,11 @@ class Assignment < ActiveRecord::Base
   end
 
   def in_closed_grading_period?
-    if submissions.loaded?
+    return @in_closed_grading_period unless @in_closed_grading_period.nil?
+    @in_closed_grading_period = if submissions.loaded?
       submissions.map(&:grading_period).compact.any?(&:closed?)
     else
-      GradingPeriod.where(id: submissions.except(:preload).select(:grading_period_id)).closed.exists?
+      GradingPeriod.joins(:submissions).where(submissions: {assignment_id: self.id}).closed.exists?
     end
   end
 
