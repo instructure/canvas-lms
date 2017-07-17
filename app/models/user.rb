@@ -1584,7 +1584,7 @@ class User < ActiveRecord::Base
       as = as.filter_by_visibilities_in_given_courses(id, options[:shard_course_ids]).
             published.
             due_between_with_overrides(due_after, due_before).
-            with_non_placeholder_submissions_for_user(id).
+            having_submissions_for_user(id).
             group('submissions.id')
       options[:scope_only] ? as : select_available_assignments(as, options)
     end
