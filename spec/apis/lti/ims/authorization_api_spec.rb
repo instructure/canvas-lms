@@ -107,6 +107,20 @@ module Lti
           expect(jwt["aud"]).to match_array [request.host, file_host]
         end
 
+        context 'error reports' do
+          it 'creates an error report with error as the message' do
+            params[:assertion] = '12ad3.4fgs56'
+            post auth_endpoint, params
+            expect(ErrorReport.last.message).to eq 'Invalid JWT Format. JWT should include 3 or 5 segments.'
+          end
+
+          it 'sets the error report category' do
+            params[:assertion] = '12ad3.4fgs56'
+            post auth_endpoint, params
+            expect(ErrorReport.last.category).to eq 'JSON::JWT::InvalidFormat'
+          end
+        end
+
         context "reg_key" do
 
           let(:reg_key) { SecureRandom.uuid }
