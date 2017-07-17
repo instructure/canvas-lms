@@ -124,6 +124,28 @@ describe Attachments::GarbageCollector do
       expect(att2.reload).not_to be_deleted
     end
 
+    it "properly delineates child attachment age" do
+      export2 = course.content_exports.create!
+      att2 = attachment_model(
+        context: export2,
+        folder: nil,
+        root_attachment_id: att.id,
+        uploaded_data: stub_file_data("folder.zip", "hi", "application/zip")
+      )
+      export3 = course.content_exports.create!
+      att3 = attachment_model(
+        context: export3,
+        folder: nil,
+        uploaded_data: stub_file_data("folder2.zip", "hi2", "application/zip")
+      )
+      Attachment.where(id: [att.id, att3.id]).update_all(created_at: 2.days.ago)
+
+      gc.delete_content
+      expect(att.reload).not_to be_deleted
+      expect(att2.reload).not_to be_deleted
+      expect(att3.reload).to be_deleted
+    end
+
     it "nulls out ContentExport attachment_ids" do
       Attachment.where(id: att.id).update_all(created_at: 2.days.ago)
       gc.delete_content

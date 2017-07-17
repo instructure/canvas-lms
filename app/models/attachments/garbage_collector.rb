@@ -35,12 +35,15 @@ class Attachments::GarbageCollector
           group_by(&:root_attachment_id)
         same_type_children_fields = Attachment.where(root_attachment_id: ids_batch).
           where(context_type: context_type).
-          pluck(:id, :created_at)
-        same_type_children_ids = same_type_children_fields.map(&:first)
-        same_type_children_max_created_at = same_type_children_fields.map(&:last).compact.max
+          where.not(root_attachment_id: nil). # postgres is being weird
+          select(:id, :created_at, :root_attachment_id).
+          group_by(&:root_attachment_id)
 
         to_delete_ids = []
         Attachment.where(id: ids_batch).each do |att|
+          same_type_children_ids = same_type_children_fields[att.id]&.map(&:id) || []
+          same_type_children_max_created_at = same_type_children_fields[att.id]&.map(&:created_at)&.compact&.max
+
           if has_younger_children?(same_type_children_max_created_at)
             stats[:young_child] += 1
             next
