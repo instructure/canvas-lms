@@ -17,10 +17,11 @@
 
 class Attachments::GarbageCollector
   class ByContextType
-    attr_reader :context_type, :older_than, :dry_run, :stats
-    def initialize(context_type:, older_than:, dry_run: false)
+    attr_reader :context_type, :older_than, :restore_state, :dry_run, :stats
+    def initialize(context_type:, older_than:, restore_state: 'processed', dry_run: false)
       @context_type = context_type
       @older_than = older_than
+      @restore_state = restore_state
       @dry_run = dry_run
       @stats = Hash.new(0)
     end
@@ -28,12 +29,14 @@ class Attachments::GarbageCollector
     def delete_content
       to_delete_scope.where(root_attachment_id: nil).find_ids_in_batches(batch_size: 500) do |ids_batch|
         non_type_children = Attachment.where(root_attachment_id: ids_batch).
+          not_deleted.
           where.not(root_attachment_id: nil). # postgres is being weird
           where.not(context_type: context_type).
           order([:root_attachment_id, :id]).
           select("distinct on (attachments.root_attachment_id) attachments.*").
           group_by(&:root_attachment_id)
         same_type_children_fields = Attachment.where(root_attachment_id: ids_batch).
+          not_deleted.
           where(context_type: context_type).
           where.not(root_attachment_id: nil). # postgres is being weird
           select(:id, :created_at, :root_attachment_id).
@@ -87,7 +90,7 @@ class Attachments::GarbageCollector
             restored << att.id
           end
         end
-        updates = { workflow_state: 'zipped', file_state: 'available', deleted_at: nil, updated_at: Time.now.utc }
+        updates = { workflow_state: restore_state, file_state: 'available', deleted_at: nil, updated_at: Time.now.utc }
         Attachment.where(id: restored).update_all(updates) if restored.present?
       end
     end
@@ -127,7 +130,7 @@ class Attachments::GarbageCollector
   # file exports now go through the content export flow.
   class FolderContextType < ByContextType
     def initialize(dry_run: false)
-      super(context_type: 'Folder', older_than: nil, dry_run: dry_run)
+      super(context_type: 'Folder', older_than: nil, restore_state: 'zipped', dry_run: dry_run)
     end
   end
 
