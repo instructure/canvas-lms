@@ -18,6 +18,7 @@
 require_relative '../../helpers/gradezilla_common'
 require_relative '../../helpers/color_common'
 require_relative '../page_objects/gradezilla_page'
+require_relative '../page_objects/gradezilla_cells_page'
 
 describe "Gradezilla" do
   include_context "in-process server selenium tests"
@@ -129,16 +130,14 @@ describe "Gradezilla" do
     end
 
     it 'opens the submissions tray when a cell has focus and is not in edit mode' do
-      Gradezilla.grading_cell.click
-      driver.action.send_keys(:escape).perform
-      driver.action.send_keys('c').perform
+      Gradezilla::Cells.send_keyboard_shortcut(@student_1, @first_assignment, 'c')
 
       expect(current_active_element.text.include?('Close')).to be(true)
       expect(Gradezilla.submission_tray).to be_displayed
     end
 
     it 'does not open the submission tray when a cell has focus and is in edit mode' do
-      Gradezilla.grading_cell.click
+      Gradezilla::Cells.grading_cell(@student_1, @first_assignment).click
       driver.action.send_keys('c').perform
 
       expect(Gradezilla.body).not_to contain_css(Gradezilla.submission_tray_selector)
@@ -158,76 +157,69 @@ describe "Gradezilla" do
     end
 
     it 'opens the assignment header menu when a cell has focus and is not in edit mode' do
-      Gradezilla.grading_cell.click
-      driver.action.send_keys(:escape).perform
-      driver.action.send_keys('m').perform
+      Gradezilla::Cells.send_keyboard_shortcut(@student_1, @first_assignment, 'm')
 
       expect(Gradezilla.expanded_popover_menu).to be_displayed
     end
 
     it 'does not open the assignment header menu when a cell has focus and is in edit mode' do
-      Gradezilla.grading_cell.click
+      Gradezilla::Cells.grading_cell(@student_1, @first_assignment).click
       driver.action.send_keys('m').perform
 
       expect(Gradezilla.body).not_to contain_css(Gradezilla.expanded_popover_menu_selector)
     end
 
     it 'pressing escape closes the assignment header menu' do
-      Gradezilla.grading_cell.click
-      driver.action.send_keys(:escape).perform
-      driver.action.send_keys('m').perform
+      Gradezilla::Cells.send_keyboard_shortcut(@student_1, @first_assignment, 'm')
+      expect(Gradezilla.expanded_popover_menu).to be_displayed
+
       driver.action.send_keys(:escape).perform
 
       expect(Gradezilla.body).not_to contain_css(Gradezilla.expanded_popover_menu_selector)
     end
 
     it 'pressing "m" closes the assignment header menu if it is open' do
-      Gradezilla.grading_cell.click
-      driver.action.send_keys(:escape).perform
-      driver.action.send_keys('m').perform
+      Gradezilla::Cells.send_keyboard_shortcut(@student_1, @first_assignment, 'm')
+      expect(Gradezilla.expanded_popover_menu).to be_displayed
       driver.action.send_keys('m').perform
 
       expect(Gradezilla.body).not_to contain_css(Gradezilla.expanded_popover_menu_selector)
     end
 
     it 'opens the assignment group header menu when a cell has focus and is not in edit mode' do
-      Gradezilla.gradebook_cell(4,0).click
-      driver.action.send_keys(:escape).perform
-      driver.action.send_keys('m').perform
+      Gradezilla::Cells.send_keyboard_shortcut_to_assignment_group(@student_1, @group, 'm')
 
       expect(Gradezilla.expanded_popover_menu).to be_displayed
     end
 
     it 'pressing escape closes the assignment group header menu' do
-      Gradezilla.assignment_group_header_options_element(@group.name).click
-      driver.action.send_keys(:escape).perform
-      driver.action.send_keys('m').perform
+      Gradezilla::Cells.send_keyboard_shortcut_to_assignment_group(@student_1, @group, 'm')
+      expect(Gradezilla.expanded_popover_menu).to be_displayed
+
       driver.action.send_keys(:escape).perform
 
       expect(Gradezilla.body).not_to contain_css(Gradezilla.expanded_popover_menu_selector)
     end
 
     it 'pressing "m" closes the assignment group header menu if it is open' do
-      Gradezilla.assignment_group_header_options_element(@group.name).click
-      f(Gradezilla.expanded_popover_menu_selector).send_keys(:escape)
-      expect(Gradezilla.body).not_to contain_css(Gradezilla.expanded_popover_menu_selector)
+      Gradezilla::Cells.send_keyboard_shortcut_to_assignment_group(@student_1, @group, 'm')
+      expect(Gradezilla.expanded_popover_menu).to be_displayed
+
       driver.action.send_keys('m').perform
-      f(Gradezilla.expanded_popover_menu_selector).send_keys('m')
 
       expect(Gradezilla.body).not_to contain_css(Gradezilla.expanded_popover_menu_selector)
     end
 
     it 'opens the total header menu when a cell has focus and is not in edit mode' do
-      Gradezilla.grading_cell(4).click
-      driver.action.send_keys(:escape).perform
-      driver.action.send_keys('m').perform
+      Gradezilla::Cells.send_keyboard_shortcut_to_total(@student_1, 'm')
 
       expect(Gradezilla.expanded_popover_menu).to be_displayed
     end
 
     it 'pressing escape closes the total header menu' do
-      Gradezilla.select_total_column_option
-      driver.action.send_keys('m').perform
+      Gradezilla::Cells.send_keyboard_shortcut_to_total(@student_1, 'm')
+      expect(Gradezilla.expanded_popover_menu).to be_displayed
+
       driver.action.send_keys(:escape).perform
 
       expect(Gradezilla.body).not_to contain_css(Gradezilla.expanded_popover_menu_selector)
@@ -235,6 +227,8 @@ describe "Gradezilla" do
 
     it 'pressing "m" closes the total header menu if it is open' do
       Gradezilla.select_total_column_option
+      expect(Gradezilla.expanded_popover_menu).to be_displayed
+
       driver.action.send_keys('m').perform
 
       expect(Gradezilla.body).not_to contain_css(Gradezilla.expanded_popover_menu_selector)
