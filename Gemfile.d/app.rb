@@ -28,7 +28,6 @@ gem 'rails-observers', '0.1.4', github: 'rails/rails-observers', ref: '206cb17bc
 
 gem 'builder', '3.2.3'
 gem 'tzinfo', '1.2.2'
-gem 'oj_mimic_json', require: false
 
 gem 'encrypted_cookie_store-instructure', '1.2.5', require: 'encrypted_cookie_store'
 gem 'active_model_serializers',   '0.9.0alpha1',
@@ -71,7 +70,7 @@ gem 'i18nliner', '0.0.12'
 gem 'icalendar', '1.5.4', require: false
 gem 'ims-lti', '2.1.3', require: 'ims'
 gem 'json', '2.0.3'
-gem 'oj', '2.17.1'
+gem 'oj', '3.3.2'
 gem 'jwt', '1.2.1', require: false
 gem 'json-jwt', '1.7.2', require: false
 gem 'twilio-ruby', '4.2.1'
