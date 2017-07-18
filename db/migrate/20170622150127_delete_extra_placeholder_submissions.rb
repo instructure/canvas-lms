@@ -22,7 +22,7 @@ class DeleteExtraPlaceholderSubmissions < ActiveRecord::Migration[4.2]
     DataFixup::DeleteExtraPlaceholderSubmissions.send_later_if_production_enqueue_args(
       :run,
       priority: Delayed::LOW_PRIORITY,
-      strand: "DataFixup:DeleteExtraPlaceholderSubmissions:Migration:#{Shard.current.database_server.id}"
+      strand: "DataFixup:DeleteExtraPlaceholderSubmissions:Migration" # only run one at a time for a job server
     )
   end
 end
