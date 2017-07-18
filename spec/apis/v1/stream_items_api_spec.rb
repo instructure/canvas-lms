@@ -360,6 +360,7 @@ describe UsersController, type: :request do
     expect(json).to eql [{
       'id' => StreamItem.last.id,
       'submission_id' => @sub.id,
+      'cached_due_date' => nil,
       'title' => "assignment 1",
       'message' => nil,
       'type' => 'Submission',
@@ -479,6 +480,7 @@ describe UsersController, type: :request do
     expect(json).to eql [{
       'id' => StreamItem.last.id,
       'submission_id' => @sub.id,
+      'cached_due_date' => nil,
       'title' => "assignment 1",
       'message' => nil,
       'type' => 'Submission',

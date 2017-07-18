@@ -29,6 +29,7 @@ QUnit.module('Gradebook Data Loader', function (hooks) {
   const ASSIGNMENT_GROUPS = [{id: 1}, {id: 4}];
   const CONTEXT_MODULES = [{id: 1}, {id: 3}];
   const STUDENT_IDS = ['1101', '1102', '1103'];
+  const GRADING_PERIOD_ASSIGNMENTS = { 1401: ['2301'] };
   const STUDENTS_PAGE_1 = [{ id: '1101' }, { id: '1102' }];
   const STUDENTS_PAGE_2 = [{ id: '1103' }];
   const SUBMISSIONS_CHUNK_1 = [{ id: '2501' }];
@@ -309,6 +310,22 @@ QUnit.module('Gradebook Data Loader', function (hooks) {
     });
   });
 
+  test('includes "cached_due_date" when requesting submissions', function (assert) {
+    respondWith('/courses/1201/gradebook/user_ids', {}, 200, {}, { user_ids: STUDENT_IDS });
+    respondWith('/students', { user_ids: STUDENT_IDS.slice(0, 2) }, 200, {}, STUDENTS_PAGE_1);
+    respondWith('/students', { user_ids: STUDENT_IDS.slice(2, 3) }, 200, {}, STUDENTS_PAGE_2);
+
+    const dataLoader = callLoadGradebookData();
+    const resolve = assert.async();
+
+    dataLoader.gotStudents.then(() => {
+      const submissionsRequest = XHRS.find(xhr => xhr.url.match('/submissions'));
+      const params = qs.parse(submissionsRequest.url.split('?')[1]);
+      ok(params.response_fields.includes('cached_due_date'));
+      resolve();
+    });
+  });
+
   test('resolves gotSubmissions when all pages of submissions have loaded', function (assert) {
     respondWith('/courses/1201/gradebook/user_ids', {}, 200, {}, { user_ids: STUDENT_IDS });
     respondWith('/students', { user_ids: STUDENT_IDS.slice(0, 2) }, 200, {}, STUDENTS_PAGE_1);
@@ -346,6 +363,30 @@ QUnit.module('Gradebook Data Loader', function (hooks) {
       deepEqual(pages[1], SUBMISSIONS_CHUNK_2);
       resolve();
     });
+  });
+
+  QUnit.module('Grading Period Assignments');
+
+  test('resolves promise with data when grading period assignments are loaded', function (assert) {
+    const responseData = { grading_period_assignments: GRADING_PERIOD_ASSIGNMENTS };
+    respondWith('/courses/1201/gradebook/grading_period_assignments', {}, 200, {}, responseData);
+
+    const dataLoader = callLoadGradebookData({ getGradingPeriodAssignments: true });
+    const resolve = assert.async();
+
+    dataLoader.gotGradingPeriodAssignments.then((data) => {
+      deepEqual(data, responseData);
+      resolve();
+    });
+  });
+
+  test('optionally does not request grading period assignments', function () {
+    const responseData = { grading_period_assignments: GRADING_PERIOD_ASSIGNMENTS };
+    respondWith('/courses/1201/gradebook/grading_period_assignments', {}, 200, {}, responseData);
+
+    const dataLoader = callLoadGradebookData();
+
+    equal(typeof dataLoader.gotGradingPeriodAssignments, 'undefined');
   });
 
   QUnit.module('Custom Column Data');

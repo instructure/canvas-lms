@@ -838,6 +838,50 @@ describe GradebooksController do
     end
   end
 
+  describe "GET 'grading_period_assignments'" do
+    before(:once) do
+      @group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.account)
+      @group.enrollment_terms << @course.enrollment_term
+      @period1, @period2 = Factories::GradingPeriodHelper.new.create_presets_for_group(@group, :past, :current)
+      @assignment1_in_gp1 = @course.assignments.create!(due_at: 3.months.ago)
+      @assignment2_in_gp2 = @course.assignments.create!(due_at: 1.day.from_now)
+    end
+
+    it "returns unauthorized if there is no current user" do
+      get :grading_period_assignments, params: { course_id: @course.id }, format: :json
+      assert_status(401)
+    end
+
+    it "returns unauthorized if the user is not authorized to manage grades" do
+      user_session(@student)
+      get :grading_period_assignments, params: { course_id: @course.id }, format: :json
+      assert_status(401)
+    end
+
+    it "grants authorization to teachers in active courses" do
+      user_session(@teacher)
+      get :grading_period_assignments, params: { course_id: @course.id }, format: :json
+      expect(response).to be_ok
+    end
+
+    it "grants authorization to teachers in concluded courses" do
+      @course.complete!
+      user_session(@teacher)
+      get :grading_period_assignments, params: { course_id: @course.id }, format: :json
+      expect(response).to be_ok
+    end
+
+    it "returns an array of user ids sorted according to the user's preferences" do
+      user_session(@teacher)
+      get :grading_period_assignments, params: { course_id: @course.id }, format: :json
+      json = json_parse(response.body)["grading_period_assignments"]
+      expect(json).to eq({
+        @period1.id.to_s => [@assignment1_in_gp1.id.to_s],
+        @period2.id.to_s => [@assignment2_in_gp2.id.to_s]
+      })
+    end
+  end
+
   describe "GET 'change_gradebook_version'" do
     it 'switches to gradebook if clicked' do
       user_session(@teacher)
