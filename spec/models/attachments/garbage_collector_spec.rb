@@ -67,11 +67,11 @@ describe Attachments::GarbageCollector do
         uploaded_data: stub_file_data("folder.zip", "hi", "application/zip")
       )
       expect(att2.root_attachment_id).to eq att.id
-      expect(FileUtils).not_to receive(:rm).with(att.full_filename)
 
       gc.delete_content
       expect(att.reload).to be_deleted
       expect(att2.reload.root_attachment_id).to be_nil
+      expect(att2.reload.store.exists?).to be_truthy
 
       gc.delete_rows
       expect { att.reload }.to raise_error(ActiveRecord::RecordNotFound)

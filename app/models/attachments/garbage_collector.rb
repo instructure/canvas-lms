@@ -51,7 +51,10 @@ class Attachments::GarbageCollector
 
           if non_type_children[att.id].present?
             stats[:reparent] += 1
+            # make_childless separates this object and copies the content to
+            # a new root attachment, so we still want to delete the content here.
             att.make_childless(non_type_children[att.id].first) unless dry_run
+            att.destroy_content unless dry_run
           elsif att.filename.present?
             stats[:destroyed] += 1
             att.destroy_content unless dry_run
