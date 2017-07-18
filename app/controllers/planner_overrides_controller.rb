@@ -174,7 +174,7 @@ class PlannerOverridesController < ApplicationController
     items_json = Rails.cache.fetch(['planner_items', @current_user, page, params[:filter], default_opts].cache_key, raw: true, expires_in: 120.minutes) do
       items = params[:filter] == 'new_activity' ? unread_items : planner_items
       items = Api.paginate(items, self, api_v1_planner_items_url)
-      planner_items_json(items, @current_user, session, {start_at: start_date})
+      planner_items_json(items, @current_user, session, {start_at: start_date, due_after: start_date, due_before: end_date})
     end
 
     render json: items_json
