@@ -1,7 +1,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/lti2_api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 require_dependency "lti/ims/access_token_helper"
 module Lti
   describe 'Webhook Subscription API', type: :request do
+    specs_require_sharding
     include_context 'lti2_api_spec_helper'
 
     let(:controller) { double(lti2_service_name: 'vnd.Canvas.webhooksSubscription') }

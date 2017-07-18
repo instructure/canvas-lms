@@ -316,5 +316,15 @@ describe "announcements" do
       get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
       expect(ff('.discussion_entry .message')[1]).to include_text(student_entry)
     end
+
+    it "should create an announcement that requires an initial post", priority: "1", test_id: 3293292 do
+      get "/courses/#{@course.id}/discussion_topics/new?is_announcement=true"
+      replace_content(f('input[name=title]'), 'title')
+      type_in_tiny('textarea[name=message]', 'hi')
+      f('#require_initial_post').click
+      expect_new_page_load { submit_form('.form-actions') }
+      announcement = Announcement.where(title: 'title').first
+      expect(announcement.require_initial_post).to eq(true)
+    end
   end
 end

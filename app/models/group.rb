@@ -236,7 +236,7 @@ class Group < ActiveRecord::Base
   def submission?
     if context_type == 'Course'
       assignments = Assignment.for_group_category(group_category_id).active
-      return Submission.where(group_id: id, assignment_id: assignments).exists?
+      return Submission.active.where(group_id: id, assignment_id: assignments).exists?
     end
     false
   end
@@ -411,10 +411,6 @@ class Group < ActiveRecord::Base
     self.group_category.groups.where("id<>?", self).to_a
   end
 
-  def migrate_content_links(html, from_course)
-    Course.migrate_content_links(html, from_course, self)
-  end
-
   attr_accessor :merge_mappings
   attr_accessor :merge_results
   def merge_mapped_id(*args)
@@ -460,11 +456,7 @@ class Group < ActiveRecord::Base
   def account_id=(new_account_id)
     write_attribute(:account_id, new_account_id)
     if self.account_id_changed?
-      if CANVAS_RAILS4_2
-        self.root_account = self.account(true)&.root_account
-      else
-        self.root_account = self.reload_account&.root_account
-      end
+      self.root_account = self.reload_account&.root_account
     end
   end
 

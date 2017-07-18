@@ -1,0 +1,33 @@
+.GradebookHistory__Content {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 69.25rem;
+}
+
+.GradebookHistory__Separator {
+  flex: 100%;
+}
+
+.GradebookHistory__Heading {
+  flex: 100%;
+}
+
+.GradebookHistory__SearchForm {
+  background-color: $ic-color-medium-light;
+  border-color: $ic-border-color;
+  flex: 100%;
+
+  .GradebookHistory__SearchFormButton {
+    margin-bottom: 1.25rem;
+    text-align: left;
+  }
+}
+
+.GradebookHistory__SearchFormInput {
+  margin: 1.25rem auto 0.3125rem auto;
+  max-width: 21.875rem;
+}
+
+.GradebookHistory__Results {
+  flex: 100%;
+}

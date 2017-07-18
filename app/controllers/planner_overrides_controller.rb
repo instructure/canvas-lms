@@ -56,6 +56,11 @@
 #           "example": false,
 #           "type": "boolean"
 #         },
+#         "dismissed": {
+#           "description": "Controls whether or not the associated plannable item shows up in the opportunities list",
+#           "example": false,
+#           "type": "boolean"
+#         },
 #         "created_at": {
 #           "description": "The datetime of when the planner override was created",
 #           "example": "2017-05-09T10:12:00Z",
@@ -76,6 +81,7 @@
 #
 
 class PlannerOverridesController < ApplicationController
+  include Api::V1::PlannerItem
   include Api::V1::PlannerOverride
 
   before_action :require_user
@@ -123,7 +129,8 @@ class PlannerOverridesController < ApplicationController
   #         "plannable_id": 1,
   #         "user_id": 2,
   #         "workflow_state": "active",
-  #         "visible": true, // A user-defined setting for minimizing/hiding objects on the planner
+  #         "marked_complete": true, // A user-defined setting for marking items complete in the planner
+  #         "dismissed": false, // A user-defined setting for hiding items from the opportunities list
   #         "deleted_at": null,
   #         "created_at": "2017-05-18T18:35:55Z",
   #         "updated_at": "2017-05-18T18:35:55Z"
@@ -205,10 +212,14 @@ class PlannerOverridesController < ApplicationController
   # @argument marked_complete
   #   determines whether the planner item is marked as completed
   #
+  # @argument dismissed
+  #   determines whether the planner item shows in the opportunities list
+  #
   # @returns PlannerOverride
   def update
     planner_override = PlannerOverride.find(params[:id])
     planner_override.marked_complete = value_to_boolean(params[:marked_complete])
+    planner_override.dismissed = value_to_boolean(params[:dismissed])
 
     if planner_override.save
       render json: planner_override_json(planner_override, @current_user, session), status: :ok
@@ -230,6 +241,9 @@ class PlannerOverridesController < ApplicationController
   # @argument marked_complete [Boolean]
   #   If this is true, the item will show in the planner as completed
   #
+  # @argument dismissed [Boolean]
+  #   If this is true, the item will not show in the opportunities list
+  #
   #
   # @returns PlannerOverride
   def create
@@ -240,7 +254,7 @@ class PlannerOverridesController < ApplicationController
     end
     planner_override = PlannerOverride.new(plannable_type: plannable_type,
       plannable_id: params[:plannable_id], marked_complete: value_to_boolean(params[:marked_complete]),
-      user: @current_user)
+      user: @current_user, dismissed: value_to_boolean(params[:dismissed]))
 
     if planner_override.save
       render json: planner_override_json(planner_override, @current_user, session), status: :created
@@ -271,71 +285,73 @@ class PlannerOverridesController < ApplicationController
                     planner_note_collection,
                     page_collection,
                     ungraded_discussion_collection]
-
-    BookmarkedCollection.concat(*collections)
+    BookmarkedCollection.merge(*collections)
   end
 
   def unread_items
     collections = [unread_discussion_topic_collection,
                    unread_submission_collection]
 
-    BookmarkedCollection.concat(*collections)
+    BookmarkedCollection.merge(*collections)
   end
 
   def assignment_collections
     grading = @current_user.assignments_needing_grading(default_opts) if @domain_root_account.grants_right?(@current_user, :manage_grades)
     submitting = @current_user.assignments_needing_submitting(default_opts)
-    moderation = @current_user.assignments_needing_moderation(default_opts) if @current_user.courses.any? {|c| c.grants_right?(@current_user, :moderate_grades)}
+    moderation = @current_user.assignments_needing_moderation(default_opts)
     ungraded_quiz = @current_user.ungraded_quizzes_needing_submitting(default_opts)
     submitted = @current_user.submitted_assignments(default_opts)
     scopes = {submitted: submitted, ungraded_quiz: ungraded_quiz,
-              submitting: submitting, moderation: moderation}
+               submitting: submitting, moderation: moderation}
     scopes[:grading] = grading if grading
-    scopes = scopes.
-             each_with_object([]) do |(scope_name, scope), all_scopes|
-               next if scope.blank?
-               base_model = scope_name == :ungraded_quiz ? Quizzes::Quiz : Assignment
-               collection = item_collection(scope_name.to_s, scope, base_model, :due_at, :created_at, :id)
-               all_scopes << collection
-             end
-    scopes
+    collections = []
+    scopes.each do |scope_name, scope|
+      next unless scope
+      base_model = scope_name == :ungraded_quiz ? Quizzes::Quiz : Assignment
+      collections << item_collection(scope_name.to_s, scope, base_model, [:due_at, :created_at], :id)
+    end
+    collections
   end
 
   def unread_discussion_topic_collection
     item_collection('unread_discussion_topics',
-                    DiscussionTopic.active.todo_date_between(start_date, end_date).
-                    unread_for(@current_user),
-                    DiscussionTopic, :todo_date, :posted_at, :delayed_post_at, :last_reply_at, :created_at, :id)
+                    @current_user.discussion_topics_needing_viewing(scope_only: true, include_ignored: true,
+                      due_before: end_date, due_after: start_date).
+                      unread_for(@current_user),
+                    DiscussionTopic, [:todo_date, :posted_at, :delayed_post_at, :last_reply_at, :created_at], :id)
   end
 
   def unread_submission_collection
+    course_ids = @current_user.enrollments.shard(Shard.current).where(:type => %w{StudentEnrollment StudentViewEnrollment}).current.active_by_date.distinct.pluck(:course_id)
     item_collection('unread_assignment_submissions',
-                    Assignment.active.joins(:submissions).
-                    where(submissions: {id: Submission.unread_for(@current_user).pluck(:id)}).
-                    due_between_with_overrides(start_date, end_date),
-                    Assignment, :due_at, :created_at, :id)
+                    Assignment.active.where(:context_type => "Course", :context_id => course_ids).
+                      where("assignments.muted IS NULL OR NOT assignments.muted").
+                      joins(:submissions => :content_participations). # we can assume content participations because they're automatically created when comments are made - see SubmissionComment#update_participation
+                      where(:submissions => {:user_id => @current_user}).
+                      where(:content_participations => {:user_id => @current_user, :workflow_state => 'unread'}).
+                      due_between_with_overrides(start_date, end_date),
+                    Assignment, [:due_at, :created_at], :id)
   end
 
   def planner_note_collection
     item_collection('planner_notes',
-                    PlannerNote.where(user: @current_user, todo_date: @start_date...@end_date),
-                    PlannerNote, :todo_date, :created_at, :id)
+                    PlannerNote.active.where(user: @current_user, todo_date: @start_date...@end_date),
+                    PlannerNote, [:todo_date, :created_at], :id)
   end
 
   def page_collection
-    item_collection('pages',
-                    @current_user.wiki_pages_needing_viewing(default_opts),
-                    WikiPage, :todo_date, :created_at, :id)
+    item_collection('pages', @current_user.wiki_pages_needing_viewing(default_opts),
+      WikiPage, [:todo_date, :created_at], :id)
   end
 
   def ungraded_discussion_collection
-    item_collection('ungraded_discussions',
-                    @current_user.discussion_topics_needing_viewing(default_opts),
-                    DiscussionTopic, :todo_date, :posted_at, :delayed_post_at, :last_reply_at, :created_at, :id)
+    item_collection('ungraded_discussions', @current_user.discussion_topics_needing_viewing(default_opts),
+      DiscussionTopic, [:todo_date, :posted_at, :created_at], :id)
   end
 
   def item_collection(label, scope, base_model, *order_by)
-    bookmarker = BookmarkedCollection::SimpleBookmarker.new(base_model, *order_by)
+    descending = params[:order] == 'desc'
+    bookmarker = Plannable::Bookmarker.new(base_model, descending, *order_by)
     [label, BookmarkedCollection.wrap(bookmarker, scope)]
   end
 
@@ -399,7 +415,7 @@ class PlannerOverridesController < ApplicationController
       due_before: end_date,
       due_after: start_date,
       scope_only: true,
-      limit: per_page
+      limit: per_page.to_i + 1, # needs a + 1 because otherwise folio might think there aren't any more objects
     }
   end
 end

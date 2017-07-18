@@ -638,6 +638,7 @@ describe SubmissionsController do
 
   describe "GET zip" do
     it "should zip and download" do
+      local_storage!
       course_with_student_and_submitted_homework
 
       get 'index', :course_id => @course.id, :assignment_id => @assignment.id, :zip => '1', :format => 'json'
@@ -651,7 +652,8 @@ describe SubmissionsController do
       a.stubs('content_type').returns('test/file')
       Attachment.stubs(:instantiate).returns(a)
 
-      get 'index', { :course_id => @course.id, :assignment_id => @assignment.id, :zip => '1' }, 'HTTP_ACCEPT' => '*/*'
+      request.headers['HTTP_ACCEPT'] = '*/*'
+      get 'index', { :course_id => @course.id, :assignment_id => @assignment.id, :zip => '1' }
       expect(response).to be_success
       expect(response.content_type).to eq 'test/file'
     end

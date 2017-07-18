@@ -114,6 +114,27 @@ describe "scheduler" do
       expect(event2).to include_text "Reserved"
     end
 
+    it "does not allow me to reschedule a past appointment" do
+      ag = AppointmentGroup.create!(:contexts => [@course],
+             :title => "eh",
+             :max_appointments_per_participant => 1,
+             :new_appointments => [
+                 [2.hours.ago, 1.hour.ago],
+                 [1.hour.from_now, 2.hours.from_now],
+             ])
+      ag.publish!
+      ag.appointments.first.reserve_for(@student, @teacher)
+
+      get "/calendar2"
+      click_scheduler_link
+      click_appointment_link
+      reserve_appointment_manual(0)
+
+      thing = fj('.ui-dialog:visible')
+      expect(thing).to include_text 'Appointment limit reached'
+      expect(thing).not_to include_text 'Reschedule'
+    end
+
     it "should not let me book too many appointments", priority: "1", test_id: 502964 do
       tomorrow = (Date.today + 1).to_s
       create_appointment_group(:max_appointments_per_participant => 2,

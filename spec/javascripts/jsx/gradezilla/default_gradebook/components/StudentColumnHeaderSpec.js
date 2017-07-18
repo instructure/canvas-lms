@@ -468,11 +468,6 @@ test('includes "Last, First Name"', function () {
   strictEqual(menuItem.length, 1);
 });
 
-test('includes "Anonymous"', function () {
-  const menuItem = findMenuItem.call(this, defaultProps(), 'Display as', 'Anonymous');
-  strictEqual(menuItem.length, 1);
-});
-
 test('calls onSelectPrimaryInfo when "First, Last Name" MenuItem is clicked', function () {
   const onSelectPrimaryInfo = this.stub();
   const props = defaultProps({ props: { onSelectPrimaryInfo } });
@@ -499,20 +494,6 @@ test('calls onSelectPrimaryInfo with "last_first" when "Last, First Name" MenuIt
   const props = defaultProps({ props: { onSelectPrimaryInfo } });
   findMenuItem.call(this, props, 'Display as', 'Last, First Name').simulate('click');
   ok(onSelectPrimaryInfo.calledWithExactly('last_first'));
-});
-
-test('calls onSelectPrimaryInfo when "Anonymous" MenuItem is clicked', function () {
-  const onSelectPrimaryInfo = this.stub();
-  const props = defaultProps({ props: { onSelectPrimaryInfo } });
-  findMenuItem.call(this, props, 'Display as', 'Anonymous').simulate('click');
-  strictEqual(onSelectPrimaryInfo.callCount, 1);
-});
-
-test('calls onSelectPrimaryInfo with "anonymous" when "Anonymous" MenuItem is clicked', function () {
-  const onSelectPrimaryInfo = this.stub();
-  const props = defaultProps({ props: { onSelectPrimaryInfo } });
-  findMenuItem.call(this, props, 'Display as', 'Anonymous').simulate('click');
-  ok(onSelectPrimaryInfo.calledWithExactly('anonymous'));
 });
 
 QUnit.module('StudentColumnHeader - Enrollment Filters Group', {

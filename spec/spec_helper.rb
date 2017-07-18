@@ -118,16 +118,6 @@ Time.class_eval do
   alias_method :<=>, :compare_with_round
 end
 
-# when dropping Rails 4.2, remove this block so that we can start addressing these
-# deprecation warnings
-unless CANVAS_RAILS4_2
-  module IgnoreActionControllerKWArgsWarning
-    def non_kwarg_request_warning; end
-  end
-  Rails::Controller::Testing::Integration.prepend(IgnoreActionControllerKWArgsWarning)
-  ActionDispatch::Integration::Session.prepend(IgnoreActionControllerKWArgsWarning)
-end
-
 # we use ivars too extensively for factories; prevent them from
 # being propagated to views in view specs
 # yes, I'm overwriting the method in-place, rather than prepend,
@@ -410,7 +400,7 @@ RSpec.configure do |config|
   # this in a specific example group if you need to do something fancy/
   # crazy/slow. but you probably don't. seriously. just use once-ler
   def using_transactions_properly?
-    CANVAS_RAILS4_2 ? use_transactional_fixtures : use_transactional_tests
+    use_transactional_tests
   end
 
   config.before :suite do

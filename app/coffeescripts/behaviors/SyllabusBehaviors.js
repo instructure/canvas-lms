@@ -254,6 +254,12 @@ const bindToEditSyllabus = function () {
     $('.jump_to_today_link').focus()
   }) // a11y: Set focus so it doesn't get lost.
 
+  function recreateCourseSyllabusBody() {
+    $("#tinymce-parent-of-course_syllabus_body").append(
+      $course_syllabus_body
+    )
+  }
+
   $edit_course_syllabus_form.on('hide_edit', () => {
     $edit_course_syllabus_form.hide()
     $edit_syllabus_link.show()
@@ -261,6 +267,7 @@ const bindToEditSyllabus = function () {
     const text = $.trim($course_syllabus.html())
     $course_syllabus_details.showIf(!text)
     RichContentEditor.destroyRCE($course_syllabus_body)
+    recreateCourseSyllabusBody()
     resetToggleLinks()
     $edit_syllabus_link.focus()
   })

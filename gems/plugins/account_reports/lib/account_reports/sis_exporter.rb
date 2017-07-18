@@ -394,9 +394,12 @@ module AccountReports
     end
 
     def enrollments
+      include_other_roots = root_account.trust_exists?
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = ['course_id', 'user_id', 'role', 'role_id', 'section_id', 'status', 'associated_user_id', 'limit_section_privileges']
+        headers = ['course_id', 'user_id', 'role', 'role_id', 'section_id',
+                   'status', 'associated_user_id', 'limit_section_privileges']
+        headers << 'root_account' if include_other_roots
       else
         headers = []
         headers << I18n.t('#account_reports.report_header_canvas_course_id', 'canvas_course_id')
@@ -413,13 +416,15 @@ module AccountReports
         headers << I18n.t('created_by_sis')
         headers << I18n.t('base_role_type')
         headers << I18n.t('limit_section_privileges')
+        headers << I18n.t('root_account') if include_other_roots
       end
       enrol = root_account.enrollments.
         select("enrollments.*, courses.sis_source_id AS course_sis_id,
                 nxc.id AS nxc_id, nxc.sis_source_id AS nxc_sis_id,
                 cs.sis_source_id AS course_section_sis_id,
-                pseudonyms.sis_user_id AS pseudonym_sis_id,
-                ob.sis_user_id AS ob_sis_id,
+                pseudonyms.unique_id, pseudonyms.sis_user_id AS pseudonym_sis_id,
+                pseudonyms.workflow_state AS pseudo_state,
+                ob.sis_user_id AS ob_sis_id, ob.unique_id AS ob_unique_id,
                 CASE WHEN cs.workflow_state = 'deleted' THEN 'deleted'
                      WHEN courses.workflow_state = 'deleted' THEN 'deleted'
                      WHEN enrollments.workflow_state = 'invited' THEN 'invited'
@@ -431,31 +436,21 @@ module AccountReports
                      WHEN enrollments.workflow_state = 'rejected' THEN 'rejected' END AS enroll_state").
         joins("INNER JOIN #{CourseSection.quoted_table_name} cs ON cs.id = enrollments.course_section_id
                INNER JOIN #{Course.quoted_table_name} ON courses.id = cs.course_id
-               INNER JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id=enrollments.user_id
+               LEFT OUTER JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id=enrollments.user_id
                LEFT OUTER JOIN #{Course.quoted_table_name} nxc ON cs.nonxlist_course_id = nxc.id
                LEFT OUTER JOIN #{Pseudonym.quoted_table_name} AS ob ON ob.user_id = enrollments.associated_user_id
                  AND ob.account_id = enrollments.root_account_id").
-        where("pseudonyms.account_id=enrollments.root_account_id
-               AND enrollments.type <> 'StudentViewEnrollment'")
+        where("enrollments.type <> 'StudentViewEnrollment'")
 
       if @include_deleted
-        enrol.where!("enrollments.workflow_state<>'deleted'
-                        OR
-                        ( pseudonyms.sis_user_id IS NOT NULL
-                          AND enrollments.workflow_state NOT IN ('rejected', 'invited')
-                          AND (courses.sis_source_id IS NOT NULL
-                             OR cs.sis_source_id IS NOT NULL))")
+        enrol.where!("enrollments.workflow_state<>'deleted' OR enrollments.sis_batch_id IS NOT NULL")
       else
-        enrol.where!("enrollments.workflow_state<>'deleted'
-                        AND enrollments.workflow_state<>'completed'
-                        AND pseudonyms.workflow_state<>'deleted'")
+        enrol.where!("enrollments.workflow_state<>'deleted' AND enrollments.workflow_state<>'completed'")
       end
 
       if @sis_format
-        enrol = enrol.where("pseudonyms.sis_user_id IS NOT NULL
-                               AND enrollments.workflow_state NOT IN ('rejected', 'invited', 'creation_pending')
-                               AND (courses.sis_source_id IS NOT NULL
-                                 OR cs.sis_source_id IS NOT NULL)")
+        enrol = enrol.where("enrollments.workflow_state NOT IN ('rejected', 'invited', 'creation_pending')
+                               AND (courses.sis_source_id IS NOT NULL OR cs.sis_source_id IS NOT NULL)")
       end
 
       enrol = enrol.where.not(enrollments: {sis_batch_id: nil}) if @created_by_sis
@@ -468,28 +463,53 @@ module AccountReports
         # rather than a cursor for this iteration
         # because it often is big enough that the slave
         # kills it mid-run (http://www.postgresql.org/docs/9.0/static/hot-standby.html)
-        enrol.find_each(start: 0) do |e|
-          row = []
-          if e.nxc_id.nil?
-            row << e.course_id unless @sis_format
-            row << e.course_sis_id
-          else
-            row << e.nxc_id unless @sis_format
-            row << e.nxc_sis_id
+        enrol.find_in_batches(start: 0) do |batch|
+          if include_other_roots
+            users = batch.map {|e| User.new(id: e.user_id) if e.unique_id.nil?}.compact
+            users += batch.map {|e| User.new(id: e.associated_user_id) if e.ob_unique_id.nil? && !e.associated_user_id.nil?}.compact
+            users_by_id = users.index_by(&:id)
+            pseudonnyms = ActiveRecord::Associations::Preloader.new.preload(users, pseudonyms: :account).index_by(&:owners)
           end
-          row << e.user_id unless @sis_format
-          row << e.pseudonym_sis_id
-          row << e.sis_role
-          row << e.role_id
-          row << e.course_section_id unless @sis_format
-          row << e.course_section_sis_id
-          row << e.enroll_state
-          row << e.associated_user_id unless @sis_format
-          row << e.ob_sis_id
-          row << e.sis_batch_id? unless @sis_format
-          row << e.type unless @sis_format
-          row << e.limit_privileges_to_course_section
-          csv << row
+          batch.each do |e|
+            next if e.pseudo_state == 'deleted' && !@include_deleted
+            p = p2 = pseudo_root = nil
+            row = []
+            if e.nxc_id.nil?
+              row << e.course_id unless @sis_format
+              row << e.course_sis_id
+            else
+              row << e.nxc_id unless @sis_format
+              row << e.nxc_sis_id
+            end
+            row << e.user_id unless @sis_format
+            if e.unique_id.nil? && include_other_roots
+              u = users_by_id[e.user_id]
+              u.instance_variable_set(:@all_active_pseudonyms, pseudonnyms[[u]].preloaded_records)
+              p = SisPseudonym.for(u, root_account, {type: :trusted, require_sis: true})
+              next unless p
+              pseudo_root = p.account
+            end
+            row << (p ? p.sis_user_id : e.pseudonym_sis_id)
+            row << e.sis_role
+            row << e.role_id
+            row << e.course_section_id unless @sis_format
+            row << e.course_section_sis_id
+            row << e.enroll_state
+            row << e.associated_user_id unless @sis_format
+            if e.ob_unique_id.nil? && !e.associated_user_id.nil? && include_other_roots
+              u2 = users_by_id[e.associated_user_id]
+              u2.instance_variable_set(:@all_active_pseudonyms, pseudonnyms[[u2]].preloaded_records)
+              u2 = users_by_id[e.associated_user_id]
+              p2 = SisPseudonym.for(u2, root_account, {type: :trusted, require_sis: true})
+            end
+            row << (p2 ? p2.sis_user_id : e.ob_sis_id)
+            row << e.sis_batch_id? unless @sis_format
+            row << e.type unless @sis_format
+            row << e.limit_privileges_to_course_section
+            pseudo_root ||= root_account
+            row << HostUrl.context_host(pseudo_root) if include_other_roots
+            csv << row
+          end
         end
       end
     end

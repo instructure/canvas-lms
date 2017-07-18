@@ -57,9 +57,17 @@ module Services
       [response.user_ids, response.common_contexts]
     end
 
-    # how many users does the sender know in the context?
-    def self.count_in_context(sender, context, ignore_result=false)
-      count_recipients(sender: sender, context: context, ignore_result: ignore_result)
+    # how many users does the sender know in each of the contexts?
+    def self.count_in_contexts(sender, contexts, ignore_result=false)
+      counts = count_recipients(sender: sender, contexts: contexts, ignore_result: ignore_result)
+      # map back from normalized to argument
+      contexts.each do |ctx|
+        serialized = serialize_context(ctx)
+        if serialized != ctx
+          counts[ctx] = counts.delete(serialized)
+        end
+      end
+      counts
     end
 
     # of the users who are not in `exclude_ids` and whose name matches the
@@ -97,7 +105,7 @@ module Services
     end
 
     def self.count_recipients(params)
-      fetch("/recipients/count", query_params(params))['count'] || 0
+      fetch("/recipients/counts", query_params(params))['counts'] || {}
     end
 
     def self.jwt # public only for testing, should not be used directly
@@ -165,6 +173,10 @@ module Services
           query_params[:restricted_course_ids] = serialize_list(restricted_courses) unless restricted_courses.empty?
         end
         query_params[:in_context] = serialize_context(params[:context]) if params[:context]
+        if params[:contexts]
+          contexts = params[:contexts].map{ |ctx| serialize_context(ctx) }
+          query_params[:in_contexts] = contexts.join(',')
+        end
         query_params[:user_ids] = serialize_list(params[:user_ids]) if params[:user_ids]
         query_params[:exclude_ids] = serialize_list(params[:exclude_ids]) if params[:exclude_ids]
         query_params[:weak_checks] = 1 if params[:weak_checks]

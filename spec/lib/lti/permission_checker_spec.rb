@@ -33,6 +33,7 @@ describe Lti::PermissionChecker do
     context "assignment" do
       before :each do
         AssignmentConfigurationToolLookup.any_instance.stubs(:create_subscription).returns true
+        AssignmentConfigurationToolLookup.any_instance.stubs(:destroy_subscription).returns true
         @original_fallback = Canvas::DynamicSettings.fallback_data
         Canvas::DynamicSettings.fallback_data = {
           'canvas' => {},
@@ -52,9 +53,31 @@ describe Lti::PermissionChecker do
         a
       end
 
+      let(:other_tp) do
+        other_tp = tool_proxy.dup
+        other_tp.update_attributes(guid: SecureRandom.uuid, context: course)
+        allow(other_tp).to receive(:active_in_context?) { true }
+        allow(other_tp).to receive(:resources) { [double(message_handlers: [ message_handler ])] }
+        other_tp
+      end
+
       it "is false if the context is an assignment and the tool isn't associated" do
         assignment.tool_settings_tool = []
         expect(Lti::PermissionChecker.authorized_lti2_action?(tool: tool_proxy, context: assignment)).to eq false
+      end
+
+      it "returns true if the requesting tool has the same access as the associated tool" do
+        assignment.tool_settings_tool = message_handler
+        assignment.save!
+        expect(Lti::PermissionChecker.authorized_lti2_action?(tool: other_tp, context: assignment)).to eq true
+      end
+
+      it "returns false if the requesting tool does not have the same access as the associated tool" do
+        allow(other_tp).to receive(:resources).and_call_original
+        other_tp.raw_data['tool_profile']['product_instance']['product_info']['product_family']['code'] = 'different'
+        other_tp.update_attributes(guid: SecureRandom.uuid, context: course)
+        allow(other_tp).to receive(:active_in_context?) { true }
+        expect(Lti::PermissionChecker.authorized_lti2_action?(tool: other_tp, context: assignment)).to eq false
       end
 
       it "is true if the tool is authorized for an assignment context" do

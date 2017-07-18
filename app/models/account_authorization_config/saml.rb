@@ -334,7 +334,10 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
   def user_logout_redirect(controller, current_user)
     session = controller.session
 
-    logout_request = SAML2::LogoutRequest.initiate(idp_metadata.identity_providers.first,
+    idp = idp_metadata.identity_providers.first
+    return super if idp.single_logout_services.empty?
+
+    logout_request = SAML2::LogoutRequest.initiate(idp,
       SAML2::NameID.new(entity_id),
       SAML2::NameID.new(session[:name_id],
                         session[:name_identifier_format],

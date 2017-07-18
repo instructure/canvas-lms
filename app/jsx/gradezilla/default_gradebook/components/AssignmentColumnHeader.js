@@ -213,7 +213,7 @@ class AssignmentColumnHeader extends ColumnHeader {
     return (
       <span ref={this.bindOptionsMenuTrigger} className={classes}>
         <Typography weight="bold" fontStyle="normal" size="large" color="brand">
-          <IconMoreSolid title={optionsTitle} />
+          <IconMoreSolid className="rotated" title={optionsTitle} />
         </Typography>
       </span>
     );

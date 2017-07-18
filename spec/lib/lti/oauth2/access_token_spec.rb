@@ -33,7 +33,8 @@ module Lti
           aud: aud,
           iat: Time.zone.now.to_i,
           nbf: 30.seconds.ago,
-          jti: '34084434-0c58-405a-b8c0-4af2da9c2efd'
+          jti: '34084434-0c58-405a-b8c0-4af2da9c2efd',
+          shard_id: Shard.current.id
         }
       end
 
@@ -103,12 +104,23 @@ module Lti
           expect(Canvas::Security.decode_jwt(access_token.to_s)['reg_key']).to eq('reg_key')
         end
 
+        it "sets the 'shard_id' to the current shard" do
+          access_token = Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: sub, reg_key: 'reg_key')
+          expect(access_token.shard_id).to eq Shard.current.id
+        end
       end
 
       describe ".from_jwt" do
+        let(:token) {Canvas::Security.create_jwt(body)}
+        let(:access_token) {Lti::Oauth2::AccessToken.from_jwt(aud: aud, jwt: token)}
+
         it "raises an InvalidTokenError if not signed by the correct secret" do
           invalid_token = Canvas::Security.create_jwt(body, nil, 'invalid')
           expect{ Lti::Oauth2::AccessToken.from_jwt(aud: aud, jwt: invalid_token)}.to raise_error InvalidTokenError
+        end
+
+        it "Sets the 'shard_id'" do
+          expect(access_token.shard_id).to eq Shard.current.id
         end
       end
 

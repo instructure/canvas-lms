@@ -32,6 +32,7 @@ class Assignment
       submission_fields = [:user_id, :id, :submitted_at, :workflow_state,
                            :grade, :grade_matches_current_submission,
                            :graded_at, :turnitin_data, :submission_type, :score,
+                           :points_deducted,
                            :assignment_id, :submission_comments, :excused, :updated_at].freeze
 
       comment_fields = [:comment, :id, :author_name, :created_at, :author_id,
@@ -156,7 +157,7 @@ class Assignment
 
       res[:submissions] = submissions.map do |sub|
         json = sub.as_json(:include_root => false,
-          :methods => [:submission_history, :late, :external_tool_url],
+          :methods => [:submission_history, :late, :external_tool_url, :entered_score, :entered_grade],
           :only => submission_fields
         ).merge("from_enrollment_type" => enrollment_types_by_id[sub.user_id])
 
@@ -193,7 +194,7 @@ class Assignment
         if json['submission_history'] && (@assignment.quiz.nil? || too_many)
           json['submission_history'] = json['submission_history'].map do |version|
             version.as_json(only: submission_fields,
-                            methods: [:versioned_attachments, :late, :external_tool_url]).tap do |version_json|
+                            methods: %i[versioned_attachments late missing external_tool_url]).tap do |version_json|
               version_json['submission']['has_originality_report'] = version.versioned_originality_reports.present?
               if version_json['submission'] && version_json['submission']['versioned_attachments']
                 version_json['submission']['versioned_attachments'].map! do |a|
@@ -203,7 +204,7 @@ class Assignment
                   end
                   a.as_json(only: attachment_fields,
                             methods: [:view_inline_ping_url]).tap do |json|
-                    json[:attachment][:canvadoc_url] = a.canvadoc_url(@user)
+                    json[:attachment][:canvadoc_url] = a.canvadoc_url(@user, enable_annotations: true)
                     json[:attachment][:crocodoc_url] = a.crocodoc_url(@user, crocodoc_user_ids)
                     json[:attachment][:submitted_to_crocodoc] = a.crocodoc_document.present?
                     json[:attachment][:hijack_crocodoc_session] = a.crocodoc_document&.should_migrate_to_canvadocs?

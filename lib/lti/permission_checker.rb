@@ -29,15 +29,20 @@ module Lti
     end
     private_class_method :new
 
-
     def tool_installed_in_context?
       requested_context = @context.respond_to?(:course) ? @context.course : @context
       authorized = @tool.active_in_context?(requested_context)
       if authorized && @context.is_a?(Assignment)
-        message_handlers = @context.tool_settings_tool_proxies.preload(resource_handler: [:tool_proxy])
-        authorized &&= message_handlers.map(&:tool_proxy).include?(@tool)
+        authorized &&= matching_resource_codes?
       end
       authorized
+    end
+
+    def matching_resource_codes?
+      return false if (@tool.resource_codes.to_a - @context.tool_settings_resource_codes.to_a).present?
+      @tool.resources.map(&:message_handlers).flatten.any? do |mh|
+        mh.resource_handler.resource_type_code == @context.tool_settings_resource_codes[:resource_type_code]
+      end
     end
   end
 end

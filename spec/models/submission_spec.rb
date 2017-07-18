@@ -39,6 +39,7 @@ describe Submission do
   end
 
   it { is_expected.to validate_numericality_of(:points_deducted).is_greater_than_or_equal_to(0).allow_nil }
+  it { is_expected.to validate_numericality_of(:seconds_late_override).is_greater_than_or_equal_to(0).allow_nil }
   it { is_expected.to validate_inclusion_of(:late_policy_status).in_array(["none", "missing", "late"]).allow_nil }
 
   describe "with grading periods" do
@@ -117,6 +118,40 @@ describe Submission do
           end
         end
       end
+    end
+  end
+
+  describe 'entered_score' do
+    let(:submission) { @assignment.submissions.find_by!(user_id: @student) }
+
+    it 'returns nil if score is not present' do
+      expect(submission.entered_score).to be_nil
+    end
+
+    it 'returns score if no points deducted' do
+      submission.update(score: 123)
+      expect(submission.entered_score).to eql(submission.score)
+    end
+
+    it 'returns score without deduction' do
+      submission.update(score: 100, points_deducted: 23)
+      expect(submission.entered_score).to eql(123)
+    end
+  end
+
+  describe 'entered_grade' do
+    let(:submission) { @assignment.submissions.find_by!(user_id: @student) }
+
+    it 'returns grade if grading_type is pass_fail' do
+      @assignment.update(grading_type: 'pass_fail')
+      submission.update(score: 100)
+      expect(submission.entered_grade).to eql(submission.grade)
+    end
+
+    it 'returns grade without deduction' do
+      @assignment.update(grading_type: 'percent', points_possible: 100)
+      submission.update(score: 25.5, points_deducted: 60)
+      expect(submission.entered_grade).to eql('85.5%')
     end
   end
 
@@ -387,31 +422,23 @@ describe Submission do
     end
   end
 
-  describe "accepted_at" do
-    before(:once) do
-      @now = Time.zone.now
-      Timecop.freeze(2.days.ago(@now)) do
-        @submission = @assignment.submit_homework(@student, body: "a body")
-        @submission.update!(late_policy_status: "late", accepted_at: 1.day.ago(@now))
-      end
+  describe "seconds_late_override" do
+    let(:submission) { @assignment.submissions.find_by!(user: @student) }
+
+    it "sets seconds_late_override to nil if the late_policy_status is set to anything other than 'late'" do
+      submission.update!(late_policy_status: "late", seconds_late_override: 60)
+      expect do
+        submission.update!(late_policy_status: "missing")
+      end.to change { submission.seconds_late_override }.from(60).to(nil)
     end
 
-    it "returns the accepted_at attribute if it is not nil" do
-      expect(@submission.accepted_at).to eq 1.day.ago(@now)
-    end
-
-    it "returns the submitted_at if the accepted_at attribute is nil" do
-      @submission.update!(late_policy_status: nil, accepted_at: nil)
-      expect(@submission.accepted_at).to eq 2.days.ago(@now)
-    end
-
-    it "sets the accepted_at attribute to nil if the late_policy_status is set to anything other than 'late'" do
-      @submission.update!(late_policy_status: "missing")
-      expect(@submission.read_attribute(:accepted_at)).to be_nil
+    it "does not set seconds_late_override if late_policy status is not 'late'" do
+      submission.update!(seconds_late_override: 60)
+      expect(submission.seconds_late_override).to be_nil
     end
   end
 
-  describe "duration_late" do
+  describe "seconds_late" do
     before(:once) do
       @date = Time.zone.local(2017, 1, 15, 12)
       @assignment.update!(due_at: 1.hour.ago(@date), submission_types: "online_text_entry")
@@ -422,7 +449,7 @@ describe Submission do
     it "returns time between submitted_at and cached_due_date" do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
-        expect(submission.duration_late).to eq 60.minutes
+        expect(submission.seconds_late).to eql 60.minutes.to_i
       end
     end
 
@@ -430,42 +457,41 @@ describe Submission do
       Timecop.freeze(@date) { @assignment.submit_homework(@student, body: "a body") }
       Timecop.freeze(30.minutes.from_now(@date)) do
         @assignment.submit_homework(@student, body: "a body")
-        expect(submission.duration_late).to eq 90.minutes
+        expect(submission.seconds_late).to eql 90.minutes.to_i
       end
     end
 
-    it "returns time between accepted_at and cached_due_date if the submission has a" \
-    " late_policy_status of 'late' and an accepted_at" do
+    it "returns seconds_late_override if the submission has a late_policy_status of 'late'" \
+    " and a seconds_late_override" do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
-        submission.update!(late_policy_status: "late", accepted_at: 30.minutes.from_now(@date))
-        expect(submission.duration_late).to eq 90.minutes
+        submission.update!(late_policy_status: "late", seconds_late_override: 90.minutes)
+        expect(submission.seconds_late).to eql 90.minutes.to_i
       end
     end
 
-    it "is not adjusted if the student resubmits and the submission has a late_policy_status" \
-    " of 'late' and an accepted_at" do
+    it "is not adjusted if the student resubmits and the submission has a late_policy_status of 'late'" \
+    " and a seconds_late_override" do
       Timecop.freeze(@date) { @assignment.submit_homework(@student, body: "a body") }
-      submission.update!(late_policy_status: "late", accepted_at: 30.minutes.from_now(@date))
+      submission.update!(late_policy_status: "late", seconds_late_override: 90.minutes)
       Timecop.freeze(40.minutes.from_now(@date)) do
         @assignment.submit_homework(@student, body: "a body")
-        expect(submission.duration_late).to eq 90.minutes
+        expect(submission.seconds_late).to eql 90.minutes.to_i
       end
     end
 
-    it "returns time between submitted_at and cached_due_date if the submission has a" \
-    " late_policy_status of 'late' but no accepted_at is present" do
+    it "returns 0 if the submission has a late_policy_status of 'late' but no seconds_late_override is present" do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.update!(late_policy_status: "late")
-        expect(submission.duration_late).to eq 60.minutes
+        expect(submission.seconds_late).to be 0
       end
     end
 
     it "is zero if it is not late" do
       Timecop.freeze(2.hours.ago(@date)) do
         @assignment.submit_homework(@student, body: "a body")
-        expect(submission.duration_late).to be_zero
+        expect(submission.seconds_late).to be 0
       end
     end
 
@@ -473,7 +499,7 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.update!(late_policy_status: "none")
-        expect(submission.duration_late).to be_zero
+        expect(submission.seconds_late).to be 0
       end
     end
 
@@ -481,16 +507,16 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.update!(late_policy_status: "missing")
-        expect(submission.duration_late).to be_zero
+        expect(submission.seconds_late).to be 0
       end
     end
 
     it "is zero if it was turned in late but the teacher sets the late_policy_status to 'late'" \
-    " and sets the accepted_at to the due date" do
+    " and sets seconds_late_override to zero" do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
-        submission.update!(late_policy_status: "late", accepted_at: submission.cached_due_date)
-        expect(submission.duration_late).to be_zero
+        submission.update!(late_policy_status: "late", seconds_late_override: 0)
+        expect(submission.seconds_late).to be 0
       end
     end
 
@@ -498,7 +524,7 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.update!(due_at: nil)
         @assignment.submit_homework(@student, body: "a body")
-        expect(submission.duration_late).to be_zero
+        expect(submission.seconds_late).to be 0
       end
     end
 
@@ -506,21 +532,21 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.update!(submission_types: "online_quiz")
         @assignment.submit_homework(@student, submission_type: "online_quiz", body: "a body")
-        expect(submission.duration_late).to eq 59.minutes
+        expect(submission.seconds_late).to eql 59.minutes.to_i
       end
     end
 
     it "includes seconds" do
       Timecop.freeze(30.seconds.from_now(@date)) do
         @assignment.submit_homework(@student, body: "a body")
-        expect(submission.duration_late).to eq 60.minutes + 30.seconds
+        expect(submission.seconds_late).to eql((60.minutes + 30.seconds).to_i)
       end
     end
 
     it "uses the current time if submitted_at is nil" do
       Timecop.freeze(1.day.from_now(@date)) do
         @assignment.grade_student(@student, score: 10, grader: @teacher)
-        expect(submission.duration_late).to eq 25.hours
+        expect(submission.seconds_late).to eql 25.hours.to_i
       end
     end
   end
@@ -533,6 +559,16 @@ describe Submission do
     end
 
     let(:submission) { @assignment.submissions.find_by(user_id: @student) }
+
+    it "deducts nothing if grading period is closed" do
+      grading_period = double("grading_period", closed?: true)
+      expect(submission).to receive(:grading_period).and_return(grading_period)
+      @assignment.submit_homework(@student, body: "a body")
+      submission.score = 700
+      submission.apply_late_policy(@late_policy, 1000)
+      expect(submission.score).to eq 700
+      expect(submission.points_deducted).to be nil
+    end
 
     it "deducts a percentage per interval late" do
       Timecop.freeze(@date) do
@@ -607,7 +643,7 @@ describe Submission do
     before(:once) do
       @date = Time.zone.local(2017, 3, 25, 11)
       @assignment.update!(due_at: 4.days.ago(@date), points_possible: 1000, submission_types: "online_text_entry")
-      @late_policy = late_policy_factory(course: @course, deduct: 5.0, every: :day)
+      @late_policy = late_policy_factory(course: @course, deduct: 5.0, every: :day, missing: 80.0)
     end
 
     let(:submission) { @assignment.submissions.find_by(user_id: @student) }
@@ -615,7 +651,7 @@ describe Submission do
     it "applies the late policy when score changes" do
       Timecop.freeze(2.days.ago(@date)) do
         @assignment.submit_homework(@student, body: "a body")
-        submission.update!(score: 600)
+        @assignment.grade_student(@student, grade: 600, grader: @teacher)
         expect(submission.score).to eq 500
         expect(submission.points_deducted).to eq 100
       end
@@ -624,7 +660,7 @@ describe Submission do
     it "does not apply the late policy when what-if score changes" do
       Timecop.freeze(2.days.ago(@date)) do
         @assignment.submit_homework(@student, body: "a body")
-        submission.update!(score: 600)
+        @assignment.grade_student(@student, grade: 600, grader: @teacher)
       end
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
@@ -634,12 +670,30 @@ describe Submission do
       end
     end
 
-    it "re-applies the late policy when accepted_at changes" do
+    it "does not change a previous grade when student submits ungraded work" do
+      asg = @course.assignments.create!(points_possible: 1000, submission_types: "online_text_entry")
+      Timecop.freeze(2.days.ago(@date)) do
+        asg.update!(due_at: 4.days.ago(@date))
+        ph = asg.submissions.last
+        expect(ph.missing?).to be true
+        expect(ph.score).to eq 200
+        expect(ph.points_deducted).to be nil
+      end
+      Timecop.freeze(@date) do
+        hw = asg.submit_homework(@student, body: "a body", submission_type: "online_text_entry")
+        hw.save!
+        expect(hw.late?).to be true
+        expect(hw.score).to eq 200
+        expect(hw.points_deducted).to be nil
+      end
+    end
+
+    it "re-applies the late policy when seconds_late_override changes" do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
-        submission.update!(score: 800)
+        @assignment.grade_student(@student, grade: 800, grader: @teacher)
       end
-      submission.update!(accepted_at: @assignment.due_at + 3.days)
+      submission.update!(seconds_late_override: 3.days, late_policy_status: "late")
       expect(submission.score).to eq 650
       expect(submission.points_deducted).to eq 150
     end
@@ -1243,7 +1297,8 @@ describe Submission do
 
       @assignment.course = @course
       @assignment.stubs(:published?).returns(true)
-      @assignment.stubs(:in_closed_grading_period_for_student?).with(42).returns(false)
+      grading_period = double("grading_period", closed?: false)
+      @submission.stubs(:grading_period).returns(grading_period)
 
       @submission.grader = @grader
       @submission.user = @student
@@ -1289,7 +1344,8 @@ describe Submission do
     context 'when the grader is a teacher and the assignment is in a closed grading period' do
       before(:each) do
         @course.stubs(:account_membership_allows).with(@grader).returns(false)
-        @assignment.stubs(:in_closed_grading_period_for_student?).with(42).returns(true)
+        grading_period = double("grading_period", closed?: true)
+        @submission.stubs(:grading_period).returns(grading_period)
 
         @status = @submission.grants_right?(@grader, :grade)
       end
@@ -1306,7 +1362,8 @@ describe Submission do
     context "when grader_id is a teacher's id and the assignment is in a closed grading period" do
       before(:each) do
         @course.stubs(:account_membership_allows).with(@grader).returns(false)
-        @assignment.stubs(:in_closed_grading_period_for_student?).with(42).returns(true)
+        grading_period = double("grading_period", closed?: true)
+        @submission.stubs(:grading_period).returns(grading_period)
         @submission.grader = nil
         @submission.grader_id = 10
 
@@ -1325,7 +1382,8 @@ describe Submission do
     it 'returns true if the grader is an admin even if the assignment is in
         a closed grading period' do
       @course.stubs(:account_membership_allows).with(@grader).returns(true)
-      @assignment.stubs(:in_closed_grading_period_for_student?).with(10).returns(false)
+      grading_period = double("grading_period", closed?: false)
+      @submission.stubs(:grading_period).returns(grading_period)
 
       expect(@submission.grants_right?(@grader, :grade)).to be_truthy
     end
@@ -1342,7 +1400,8 @@ describe Submission do
       @submission.user_id = 10
 
       @assignment.stubs(:published?).returns(true)
-      @assignment.stubs(:in_closed_grading_period_for_student?).with(10).returns(false)
+      grading_period = double("grading_period", closed?: false)
+      @submission.stubs(:grading_period).returns(grading_period)
     end
 
     it 'returns true for published assignments with an autograder and when the assignment is not
@@ -1384,7 +1443,8 @@ describe Submission do
 
     context 'when the assignment is in a closed grading period for the student' do
       before(:each) do
-        @assignment.stubs(:in_closed_grading_period_for_student?).with(10).returns(true)
+        grading_period = double("grading_period", closed?: true)
+        @submission.stubs(:grading_period).returns(grading_period)
 
         @status = @submission.grants_right?(nil, :autograde)
       end
@@ -1919,34 +1979,20 @@ describe Submission do
   end
 
   describe "read/unread state" do
-
-    def check_read_state_scopes(read: false, user: @user)
-      if read
-        expect(Submission.read_for(user)).to be_include @submission
-        expect(Submission.unread_for(user)).not_to be_include @submission
-      else
-        expect(Submission.read_for(user)).not_to be_include @submission
-        expect(Submission.unread_for(user)).to be_include @submission
-      end
-    end
-
     it "should be read if a submission exists with no grade" do
       @submission = @assignment.submit_homework(@user)
       expect(@submission.read?(@user)).to be_truthy
-      check_read_state_scopes read: true
     end
 
     it "should be unread after assignment is graded" do
       @submission = @assignment.grade_student(@user, grade: 3, grader: @teacher).first
       expect(@submission.unread?(@user)).to be_truthy
-      check_read_state_scopes
     end
 
     it "should be unread after submission is graded" do
       @assignment.submit_homework(@user)
       @submission = @assignment.grade_student(@user, grade: 3, grader: @teacher).first
       expect(@submission.unread?(@user)).to be_truthy
-      check_read_state_scopes
     end
 
     it "should be unread after submission is commented on by teacher" do
@@ -1954,7 +2000,6 @@ describe Submission do
       course_with_teacher(:course => @context, :active_all => true)
       @submission = @assignment.update_submission(@student, { :commenter => @teacher, :comment => "good!" }).first
       expect(@submission.unread?(@user)).to be_truthy
-      check_read_state_scopes user: @student
     end
 
     it "should be read if other submission fields change" do
@@ -1963,7 +2008,6 @@ describe Submission do
       @submission.graded_at = Time.now
       @submission.save!
       expect(@submission.read?(@user)).to be_truthy
-      check_read_state_scopes read: true
     end
   end
 
@@ -2210,6 +2254,78 @@ describe Submission do
       @submission.update_columns(submission_type: nil)
 
       expect(Submission.missing).to be_empty
+    end
+  end
+
+  describe "scope: not_missing" do
+    before :once do
+      @now = Time.zone.now
+      submission_spec_model(cached_due_date: 1.day.ago(@now), submission_type: nil, submit_homework: true)
+      @submission.assignment.update!(submission_types: "on_paper")
+    end
+
+    it 'includes submission when late_policy_status is nil' do
+      expect(Submission.not_missing).not_to be_empty
+    end
+
+    it 'excludes submission when late_policy_status is "missing"' do
+      @submission.update(late_policy_status: 'missing')
+
+      expect(Submission.not_missing).to be_empty
+    end
+
+    it 'includes submission when late_policy_status is not nil, not missing' do
+      @submission.update(late_policy_status: 'foo')
+
+      expect(Submission.not_missing).not_to be_empty
+    end
+
+    it 'includes submission when not past due' do
+      @submission.update(submitted_at: 2.days.ago(@now))
+
+      expect(Submission.not_missing).not_to be_empty
+    end
+
+    it 'includes submission when past due and submitted' do
+      @submission.update(submitted_at: @now)
+
+      expect(Submission.not_missing).not_to be_empty
+    end
+
+    it 'includes submission when past due, not submitted, assignment does not expect a submission, is excused' do
+      @submission.assignment.update(submission_types: 'none')
+      @submission.update(excused: true)
+      @submission.update_columns(submission_type: nil)
+
+      expect(Submission.not_missing).not_to be_empty
+    end
+
+    it 'excludes submission when past due, not submitted, assignment does not expect a submission, not excused, and no score' do
+      @submission.assignment.update(submission_types: 'none')
+      @submission.update_columns(submission_type: nil)
+
+      expect(Submission.not_missing).to be_empty
+    end
+
+    it 'excludes submission when past due, not submitted, assignment does not expect a submission, not excused, has a score, workflow state is not "graded"' do
+      @submission.update(score: 1)
+      @submission.update_columns(submission_type: nil)
+
+      expect(Submission.not_missing).to be_empty
+    end
+
+    it 'excludes submission when past due, not submitted, assignment does not expect a submission, not excused, has a score, workflow state is "graded", and score is 0' do
+      @submission.update(score: 0, workflow_state: 'graded')
+      @submission.update_columns(submission_type: nil)
+
+      expect(Submission.not_missing).to be_empty
+    end
+
+    it 'includes submission when past due, not submitted, assignment does not expect a submission, not excused, has a score, workflow state is "graded", and score is greater than 0' do
+      @submission.update(score: 1, workflow_state: 'graded')
+      @submission.update_columns(submission_type: nil)
+
+      expect(Submission.not_missing).not_to be_empty
     end
   end
 
@@ -2612,11 +2728,7 @@ describe Submission do
       a2 = crocodocable_attachment_model context: @user
       s.attachments = [a1, a2]
       s.save
-      if CANVAS_RAILS4_2
-        expect(a1.crocodoc_document(true)).to eq cd
-      else
-        expect(a1.reload_crocodoc_document).to eq cd
-      end
+      expect(a1.reload_crocodoc_document).to eq cd
       expect(a2.crocodoc_document).to eq a2.crocodoc_document
     end
 
@@ -2642,23 +2754,17 @@ describe Submission do
       end
 
       context "preferred_plugins" do
-        it "should not send o365 or PDFjs as preferred plugins by default" do
+        it "should not send o365  as preferred plugins by default" do
           @assignment.submit_homework(@student1,
                                       submission_type: "online_upload",
                                       attachments: [@attachment])
 
           job = Delayed::Job.where(strand: 'canvadocs').last
-          expect(job.payload_object.args[1][:preferred_plugins]).to eq [Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC]
-        end
-
-        it "should send PDFjs as a preferred plugin when the 'New Annotations' feature is enabled" do
-          Account.default.enable_feature!(:new_annotations)
-          @assignment.submit_homework(@student1,
-                                      submission_type: "online_upload",
-                                      attachments: [@attachment])
-
-          job = Delayed::Job.where(strand: 'canvadocs').last
-          expect(job.payload_object.args[1][:preferred_plugins]).to eq [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC]
+          expect(job.payload_object.args[1][:preferred_plugins]).to eq [
+            Canvadocs::RENDER_PDFJS,
+            Canvadocs::RENDER_BOX,
+            Canvadocs::RENDER_CROCODOC
+          ]
         end
 
         it "should send o365 as a preferred plugin when the 'Prefer Office 365 file viewer' account setting is enabled" do
@@ -2669,19 +2775,12 @@ describe Submission do
                                       attachments: [@attachment])
 
           job = Delayed::Job.where(strand: 'canvadocs').last
-          expect(job.payload_object.args[1][:preferred_plugins]).to eq [Canvadocs::RENDER_O365, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC]
-        end
-
-        it "should send o365 and PDFjs as preferred plugins when the 'New Annotations' feature is enabled and the 'Prefer Office 365 file viewer' account setting is enabled" do
-          @assignment.context.root_account.settings[:canvadocs_prefer_office_online] = true
-          @assignment.context.root_account.save!
-          Account.default.enable_feature!(:new_annotations)
-          @assignment.submit_homework(@student1,
-                                      submission_type: "online_upload",
-                                      attachments: [@attachment])
-
-          job = Delayed::Job.where(strand: 'canvadocs').last
-          expect(job.payload_object.args[1][:preferred_plugins]).to eq [Canvadocs::RENDER_O365, Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC]
+          expect(job.payload_object.args[1][:preferred_plugins]).to eq [
+            Canvadocs::RENDER_O365,
+            Canvadocs::RENDER_PDFJS,
+            Canvadocs::RENDER_BOX,
+            Canvadocs::RENDER_CROCODOC
+          ]
         end
       end
 
@@ -2712,21 +2811,6 @@ describe Submission do
                                       submission_type: "online_upload",
                                       attachments: [attachment])
       expect(job_scope.count).to eq orig_job_count
-    end
-
-    it "doesn't use canvadocs for moderated grading assignments" do
-      @assignment.update_attribute :moderated_grading, true
-      Canvas::Crocodoc.stubs(:enabled?).returns true
-      Canvadocs.stubs(:enabled?).returns true
-      Canvadocs.stubs(:annotations_supported?).returns true
-
-      attachment = crocodocable_attachment_model(context: @user)
-      @assignment.submit_homework(@user,
-                                      submission_type: "online_upload",
-                                      attachments: [attachment])
-      run_jobs
-      expect(@attachment.canvadoc).to be_nil
-      expect(@attachment.crocodoc_document).not_to be_nil
     end
   end
 
@@ -3172,6 +3256,18 @@ describe Submission do
       OriginalityReport.create!(submission: submission, attachment: attachment, originality_score: 1.0, workflow_state:'pending')
       expect(submission.submission_history.first.turnitin_data[attachment.asset_string]).to be_nil
     end
+
+    it "returns self as complete history when no history record is present" do
+      student.submissions.destroy_all
+
+      create_sql = "INSERT INTO #{Submission.quoted_table_name}
+                     (assignment_id, user_id, workflow_state, created_at, updated_at, context_code, process_attempts)
+                     values
+                     (#{@assignment.id}, #{student.id}, 'unsubmitted', now(), now(), '#{@assignment.context_code}', 0)"
+
+      sub = Submission.find(Submission.connection.create(create_sql))
+      expect(sub.submission_history).to eq([sub])
+    end
   end
 
   describe ".needs_grading" do
@@ -3317,6 +3413,7 @@ describe Submission do
 
       @ongoing_unsubmitted_quiz = generate_quiz_submission(@quiz, student: User.create)
       @ongoing_unsubmitted_quiz_submission = @ongoing_unsubmitted_quiz.submission
+      @ongoing_unsubmitted_quiz_submission.save!
       Submission.where(id: @ongoing_unsubmitted_quiz_submission.id).update_all(submitted_at: nil)
 
       @timely_quiz1 = generate_quiz_submission(@quiz, student: User.create, finished_at: @now)
@@ -3347,16 +3444,19 @@ describe Submission do
 
       @ongoing_late_quiz1 = generate_quiz_submission(@quiz, student: User.create)
       @ongoing_late_quiz1_submission = @ongoing_late_quiz1.submission
+      @ongoing_late_quiz1_submission.save!
       Submission.where(id: @ongoing_late_quiz1_submission).
         update_all(submitted_at: @now, cached_due_date: @now - 61.seconds)
 
       @ongoing_late_quiz2 = generate_quiz_submission(@quiz, student: User.create)
       @ongoing_late_quiz2_submission = @ongoing_late_quiz2.submission
+      @ongoing_late_quiz2_submission.save!
       Submission.where(id: @ongoing_late_quiz2_submission).
         update_all(submitted_at: @now, cached_due_date: @now - 1.hour)
 
       @ongoing_timely_quiz_marked_late = generate_quiz_submission(@quiz, student: User.create)
       @ongoing_timely_quiz_marked_late_submission = @ongoing_timely_quiz_marked_late.submission
+      @ongoing_timely_quiz_marked_late_submission.save!
       Submission.where(id: @ongoing_timely_quiz_marked_late_submission).
         update_all(submitted_at: @now, cached_due_date: nil, late_policy_status: 'late')
 
@@ -3428,7 +3528,7 @@ describe Submission do
       expect(@late_submission_ids).to include(@timely_quiz_marked_late_submission.id)
     end
 
-    it 'excludes quizzes that have been manually marked as late but are being retaken' do
+    it 'includes quizzes that have been manually marked as late but are being retaken' do
       expect(@late_submission_ids).to include(@ongoing_timely_quiz_marked_late_submission.id)
     end
 
@@ -3459,6 +3559,169 @@ describe Submission do
 
     it 'includes homeworks that have been manually marked as late' do
       expect(@late_submission_ids).to include(@timely_hw_marked_late.id)
+    end
+  end
+
+  describe 'scope: not_late' do
+    before :once do
+      @now = Time.zone.now
+
+      ### Quizzes
+      @quiz = generate_quiz(@course)
+      @quiz_assignment = @quiz.assignment
+
+      # rubocop:disable Rails/SkipsModelValidations
+      @unsubmitted_quiz_submission = @assignment.submissions.create(user: User.create, submission_type: 'online_quiz')
+      Submission.where(id: @unsubmitted_quiz_submission.id).update_all(submitted_at: nil, cached_due_date: nil)
+
+      @ongoing_unsubmitted_quiz = generate_quiz_submission(@quiz, student: User.create)
+      @ongoing_unsubmitted_quiz_submission = @ongoing_unsubmitted_quiz.submission
+      @ongoing_unsubmitted_quiz_submission.save!
+      Submission.where(id: @ongoing_unsubmitted_quiz_submission.id).update_all(submitted_at: nil)
+
+      @timely_quiz1 = generate_quiz_submission(@quiz, student: User.create, finished_at: @now)
+      @timely_quiz1_submission = @timely_quiz1.submission
+      Submission.where(id: @timely_quiz1_submission.id).update_all(submitted_at: @now, cached_due_date: nil)
+
+      @timely_quiz2 = generate_quiz_submission(@quiz, student: User.create, finished_at: @now)
+      @timely_quiz2_submission = @timely_quiz2.submission
+      Submission.where(id: @timely_quiz2_submission.id).update_all(submitted_at: @now, cached_due_date: @now + 1.hour)
+
+      @timely_quiz3 = generate_quiz_submission(@quiz, student: User.create, finished_at: @now)
+      @timely_quiz3_submission = @timely_quiz3.submission
+      Submission.where(id: @timely_quiz3_submission.id).
+        update_all(submitted_at: @now, cached_due_date: @now - 45.seconds)
+
+      @late_quiz1 = generate_quiz_submission(@quiz, student: User.create, finished_at: @now)
+      @late_quiz1_submission = @late_quiz1.submission
+      Submission.where(id: @late_quiz1_submission).update_all(submitted_at: @now, cached_due_date: @now - 61.seconds)
+
+      @late_quiz2 = generate_quiz_submission(@quiz, student: User.create, finished_at: @now)
+      @late_quiz2_submission = @late_quiz2.submission
+      Submission.where(id: @late_quiz2_submission).update_all(submitted_at: @now, cached_due_date: @now - 1.hour)
+
+      @timely_quiz_marked_late = generate_quiz_submission(@quiz, student: User.create, finished_at: @now)
+      @timely_quiz_marked_late_submission = @timely_quiz_marked_late.submission
+      Submission.where(id: @timely_quiz_marked_late_submission).update_all(submitted_at: @now, cached_due_date: nil)
+      Submission.where(id: @timely_quiz_marked_late_submission).update_all(late_policy_status: 'late')
+
+      @ongoing_late_quiz1 = generate_quiz_submission(@quiz, student: User.create)
+      @ongoing_late_quiz1_submission = @ongoing_late_quiz1.submission
+      @ongoing_late_quiz1_submission.save!
+      Submission.where(id: @ongoing_late_quiz1_submission).
+        update_all(submitted_at: @now, cached_due_date: @now - 61.seconds)
+
+      @ongoing_late_quiz2 = generate_quiz_submission(@quiz, student: User.create)
+      @ongoing_late_quiz2_submission = @ongoing_late_quiz2.submission
+      @ongoing_late_quiz2_submission.save!
+      Submission.where(id: @ongoing_late_quiz2_submission).
+        update_all(submitted_at: @now, cached_due_date: @now - 1.hour)
+
+      @ongoing_timely_quiz_marked_late = generate_quiz_submission(@quiz, student: User.create)
+      @ongoing_timely_quiz_marked_late_submission = @ongoing_timely_quiz_marked_late.submission
+      @ongoing_timely_quiz_marked_late_submission.save!
+      Submission.where(id: @ongoing_timely_quiz_marked_late_submission).
+        update_all(submitted_at: @now, cached_due_date: nil, late_policy_status: 'late')
+
+      ### Homeworks
+      @unsubmitted_hw = @assignment.submissions.create(user: User.create, submission_type: 'online_text_entry')
+      Submission.where(id: @unsubmitted_hw.id).update_all(submitted_at: nil, cached_due_date: nil)
+
+      @timely_hw1 = @assignment.submissions.create(user: User.create, submission_type: 'online_text_entry')
+      Submission.where(id: @timely_hw1.id).update_all(submitted_at: @now, cached_due_date: nil)
+
+      @timely_hw2 = @assignment.submissions.create(user: User.create, submission_type: 'online_text_entry')
+      Submission.where(id: @timely_hw2.id).update_all(submitted_at: @now, cached_due_date: @now + 1.hour)
+
+      @late_hw1 = @assignment.submissions.create(user: User.create, submission_type: 'online_text_entry')
+      Submission.where(id: @late_hw1.id).update_all(submitted_at: @now, cached_due_date: @now - 45.seconds)
+
+      @late_hw2 = @assignment.submissions.create(user: User.create, submission_type: 'online_text_entry')
+      Submission.where(id: @late_hw2.id).update_all(submitted_at: @now, cached_due_date: @now - 61.seconds)
+
+      @late_hw3 = @assignment.submissions.create(user: User.create, submission_type: 'online_text_entry')
+      Submission.where(id: @late_hw3.id).update_all(submitted_at: @now, cached_due_date: @now - 1.hour)
+
+      @timely_hw_marked_late = @assignment.submissions.create(user: User.create, submission_type: 'online_text_entry')
+      Submission.where(id: @timely_hw_marked_late.id).update_all(submitted_at: @now, cached_due_date: nil)
+      Submission.where(id: @timely_hw_marked_late.id).update_all(late_policy_status: 'late')
+      # rubocop:enable Rails/SkipsModelValidations
+
+      @not_late_submission_ids = Submission.not_late.map(&:id)
+    end
+
+    ### Quizzes
+    it 'includes unsubmitted quizzes' do
+      expect(@not_late_submission_ids).to include(@unsubmitted_quiz_submission.id)
+    end
+
+    it 'includes ongoing quizzes that have never been submitted before' do
+      expect(@not_late_submission_ids).to include(@ongoing_unsubmitted_quiz_submission.id)
+    end
+
+    it 'includes quizzes submitted with no due date' do
+      expect(@not_late_submission_ids).to include(@timely_quiz1_submission.id)
+    end
+
+    it 'includes quizzes submitted before the due date' do
+      expect(@not_late_submission_ids).to include(@timely_quiz2_submission.id)
+    end
+
+    it 'includes quizzes submitted less than 60 seconds after the due date' do
+      expect(@not_late_submission_ids).to include(@timely_quiz3_submission.id)
+    end
+
+    it 'excludes quizzes submitted more than 60 seconds after the due date' do
+      expect(@not_late_submission_ids).not_to include(@late_quiz1_submission.id)
+    end
+
+    it 'includes quizzes that were last submitted more than 60 seconds after the due date but are being retaken' do
+      expect(@not_late_submission_ids).to include(@ongoing_late_quiz1_submission.id)
+    end
+
+    it 'excludes quizzes submitted after the due date' do
+      expect(@not_late_submission_ids).not_to include(@late_quiz2_submission.id)
+    end
+
+    it 'includes quizzes that were last submitted after the due date but are being retaken' do
+      expect(@not_late_submission_ids).to include(@ongoing_late_quiz2_submission.id)
+    end
+
+    it 'excludes quizzes that have been manually marked as late' do
+      expect(@not_late_submission_ids).not_to include(@timely_quiz_marked_late_submission.id)
+    end
+
+    it 'excludes quizzes that have been manually marked as late but are being retaken' do
+      expect(@not_late_submission_ids).not_to include(@ongoing_timely_quiz_marked_late_submission.id)
+    end
+
+    ### Homeworks
+    it 'includes unsubmitted homeworks' do
+      expect(@not_late_submission_ids).to include(@unsubmitted_hw.id)
+    end
+
+    it 'includes homeworks submitted with no due date' do
+      expect(@not_late_submission_ids).to include(@timely_hw1.id)
+    end
+
+    it 'includes homeworks submitted before the due date' do
+      expect(@not_late_submission_ids).to include(@timely_hw2.id)
+    end
+
+    it 'excludes homeworks submitted less than 60 seconds after the due date' do
+      expect(@not_late_submission_ids).not_to include(@late_hw1.id)
+    end
+
+    it 'excludes homeworks submitted more than 60 seconds after the due date' do
+      expect(@not_late_submission_ids).not_to include(@late_hw2.id)
+    end
+
+    it 'excludes homeworks submitted after the due date' do
+      expect(@not_late_submission_ids).not_to include(@late_hw3.id)
+    end
+
+    it 'excludes homeworks that have been manually marked as late' do
+      expect(@not_late_submission_ids).not_to include(@timely_hw_marked_late.id)
     end
   end
 

@@ -273,6 +273,22 @@ module Lti
       end
     end
 
+    describe '#resource_codes' do
+      include_context 'lti2_spec_helper'
+
+      let(:expected_hash) do
+        {
+          product_code: product_family.product_code,
+          vendor_code: product_family.vendor_code,
+          resource_type_code: resource_handler.resource_type_code
+        }
+      end
+
+      it 'returns three identifying lti codes' do
+        expect(message_handler.resource_codes).to eq expected_hash
+      end
+    end
+
 
     def create_tool_proxy(opts = {})
       default_opts = {

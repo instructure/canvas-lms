@@ -23,6 +23,7 @@ module Api::V1::Assignment
   include Api::V1::Locked
   include Api::V1::AssignmentOverride
   include SubmittablesGradingPeriodProtection
+  include Api::V1::PlannerOverride
 
   API_ALLOWED_ASSIGNMENT_OUTPUT_FIELDS = {
     :only => %w(
@@ -327,11 +328,7 @@ module Api::V1::Assignment
 
     if opts[:include_planner_override]
       override = assignment.planner_override_for(user)
-      hash['planner_override'] =  if override.present?
-                                    api_json(override, user, session)
-                                  else
-                                    nil
-                                  end
+      hash['planner_override'] = planner_override_json(override, user, session)
     end
 
     hash

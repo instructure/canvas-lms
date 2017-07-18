@@ -72,8 +72,7 @@ describe "conversations index page" do
     it "should archive multiple conversations", priority: "1", test_id: 201490 do
       conversations
       select_conversations
-      f('#archive-btn').click
-      wait_for_ajaximations
+      click_archive_button
       expect(f('.messages')).not_to contain_css('li')
       run_progress_job
       @conversations.each { |c| expect(c.reload).to be_archived }

@@ -20,8 +20,8 @@ import React from 'react';
 import { bool, func, shape, string } from 'prop-types';
 import Button from 'instructure-ui/lib/components/Button';
 import SubmissionCell from 'compiled/gradezilla/SubmissionCell';
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
-import I18n from 'i18n!gradebook'
+import IconExpandLeftLine from 'instructure-icons/lib/Line/IconExpandLeftLine';
+import I18n from 'i18n!gradebook';
 
 function renderSubmissionCell (options) {
   const assignment = options.column.object;
@@ -125,7 +125,6 @@ class AssignmentRowCell extends React.Component {
   }
 
   render () {
-    const arrowDirection = this.props.isSubmissionTrayOpen ? 'right' : 'left';
     return (
       <div className="Grid__AssignmentRowCell">
         <div className="Grid__AssignmentRowCell__Notifications" />
@@ -139,8 +138,7 @@ class AssignmentRowCell extends React.Component {
             size="small"
             variant="icon"
           >
-            <ScreenReaderContent>{I18n.t('Open submission tray')}</ScreenReaderContent>
-            <span className={`SubmissionCell__IconExpand SubmissionCell__IconExpand-${arrowDirection}`} />
+            <IconExpandLeftLine title={I18n.t('Open submission tray')} />
           </Button>
         </div>
       </div>

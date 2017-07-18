@@ -200,20 +200,6 @@ describe WikiPage do
     expect(p1.url).to eql('asdf-2')
   end
 
-  it "should preserve course links when in a group belonging to the course" do
-    other_course = Course.create!
-    course_with_teacher
-    group(:group_context => @course)
-    page = @group.wiki.wiki_pages.create(:title => "poni3s")
-    page.user = @teacher
-    page.update_attribute(:body, %{<a href='/courses/#{@course.id}/files#oops'>click meh</a>
-                                  <a href='/courses/#{other_course.id}/files#whoops'>click meh too</a>})
-
-    page.reload
-    expect(page.body).to include("/courses/#{@course.id}/files#oops")
-    expect(page.body).to include("/groups/#{@group.id}/files#whoops")
-  end
-
   context "unpublished" do
     before :once do
       teacher_in_course(:active_all => true)
@@ -318,6 +304,17 @@ describe WikiPage do
         front_page = @course.wiki.front_page
         front_page.initialize_wiki_page(@teacher)
         expect(front_page).to be_published
+      end
+
+      it 'should not change the URL in a wiki page link' do
+        allow_any_instance_of(UserContent::HtmlRewriter).to receive(:user_can_view_content?).and_return true
+        course = course_factory()
+        some_other_course = course_factory()
+
+        file_url = "/courses/#{some_other_course.id}/files/1"
+        link_string = "<a href='#{file_url}'>link</a>"
+        page = course.wiki.wiki_pages.create!(title: 'New', body: "<p>#{link_string}</p>", user: @user)
+        expect(page.body).to include(file_url)
       end
     end
 

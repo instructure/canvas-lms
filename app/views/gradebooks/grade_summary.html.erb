@@ -159,6 +159,7 @@
     <tr>
       <th scope="col"><%= t('headers.name', "Name") %></th>
       <th scope="col"><%= t('headers.due', "Due") %></th>
+      <th scope="col"><%= t('Status') %></th>
       <th scope="col" class="assignment_score"><%= t('headers.score', "Score") %></th>
       <th scope="col" class="possible"><%= t('headers.out_of', "Out of") %></th>
       <th scope="col"><span class="screenreader-only"><%= t('headers.details', "Details") %></span></th>
@@ -196,6 +197,13 @@
       <td class="due">
         <% if assignment_presenter.has_no_group_weight?  %>
           <%= datetime_string(assignment.due_at, :due_date) rescue "" %>
+        <% end %>
+      </td>
+      <td class="status" scope="row">
+        <% if assignment_presenter.missing? %>
+          <span class="submission-missing-pill"></span>
+        <% elsif assignment_presenter.late? %>
+          <span class="submission-late-pill"></span>
         <% end %>
       </td>
       <td class="assignment_score" title="<%= t(:click_to_change, "Click to test a different score") unless assignment_presenter.unchangeable? %>">
@@ -404,7 +412,7 @@
         class="comments <%= 'assignment_graded' if assignment_presenter.graded? %>"
         style="display: none;">
       <% if assignment.omit_from_final_grade? %>
-        <td colspan="5">
+        <td colspan="6">
           <table class="score_details_table">
             <thead>
               <tr>
@@ -430,12 +438,12 @@
     </tr>
     <tr id="grade_info_<%= assignment.id %>" class="comments grade_details <%= 'assignment_graded' if assignment_presenter.graded? %>" style="display: none;">
       <% if assignment_presenter.should_display_details? %>
-        <td colspan="5" style="padding-bottom: 20px;">
+        <td colspan="6" style="padding-bottom: 20px;">
           <% if assignment_presenter.has_grade_distribution? && can_view_distribution %>
             <table id="score_details_<%= assignment.id %>" class="score_details_table">
               <thead>
                 <tr>
-                  <th colspan="3">
+                  <th colspan="5">
                     <%= t(:score_details, "Score Details") %>
                   </th>
                   <th>
@@ -446,7 +454,7 @@
               <tbody>
                 <tr>
                   <% if assignment_presenter.viewing_fake_student? %>
-                    <td colspan="4">
+                    <td colspan="6">
                       <%= t(:disabled_for_student_view, "Test Student scores are not included in grade statistics.") %>
                     </td>
                   <% else %>
@@ -463,7 +471,19 @@
                       <%= before_label(:low, "Low") %>
                       <%= n(round_if_whole(low)) %>
                     </td>
-                    <td>
+                    <% if assignment_presenter.deduction_present? %>
+                      <td>
+                          <%= before_label('Score') %>
+                          <%= assignment_presenter.display_entered_score %>
+                      </td>
+                      <td>
+                        <%= before_label('Late Penalty') %>
+                        <span class="error">
+                          <%= assignment_presenter.display_points_deducted %>
+                        </span>
+                      </td>
+                    <% end %>
+                    <td colspan="<%= assignment_presenter.deduction_present? ? 1 : 3 %>">
                       <% graph = assignment_presenter.graph %>
                       <div style="cursor: pointer; float: right; height: 30px; margin-left: 20px; width: 160px; position: relative; margin-right: 30px;" aria-hidden="true" title="<%= graph.title %>">
                         <div class="grade-summary-graph-component" style="height: 10px; margin: 5px 0px; border-width: 2px; border-right-width: 0;">&nbsp;</div>
@@ -486,7 +506,7 @@
           <% end %>
         </tr>
     <tr id="comments_thread_<%= assignment.id %>" class="comments comments_thread <%= 'assignment_graded' if assignment_presenter.graded? %>" style="display: none;">
-      <td colspan="5">
+      <td colspan="6">
         <% if assignment_presenter.has_comments? %>
             <table class="score_details_table">
               <thead>
@@ -533,7 +553,7 @@
     </tr>
     <tr id="rubric_<%= assignment.id %>" class="rubric_assessments <%= 'assignment_graded' if submission && submission.grade %>" style="display: none;">
       <% if assignment_presenter.has_rubric_assessments? %>
-        <td colspan="5">
+        <td colspan="6">
           <% assignment_presenter.rubric_assessments.each do |assessment| %>
             <div class="assessor" style="text-align: right; margin-bottom: 5px">
               <% if assignment.anonymous_peer_reviews %>

@@ -21,7 +21,7 @@ describe Canvas::RequestForgeryProtection do
   before :each do
     # default setup is a protected non-GET non-API session-authenticated request with bogus tokens
     raw_headers = { 'X-CSRF-Token' => "bogus" }
-    raw_headers = ActionDispatch::Request.new(raw_headers) unless CANVAS_RAILS4_2
+    raw_headers = ActionDispatch::Request.new(raw_headers)
     headers = ActionDispatch::Http::Headers.new(raw_headers)
     cookies = ActionDispatch::Cookies::CookieJar.new(nil)
     request = stub("request",

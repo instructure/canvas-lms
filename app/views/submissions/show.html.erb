@@ -31,7 +31,7 @@
       :user_id => @submission.user_id,
       :assignment_id => @assignment.id,
       # don't leak grades if assignment is muted
-      :submission => @assignment.muted? ? {} : @submission.attributes
+      :submission => @assignment.muted? ? {} : @submission.attributes.merge(entered_grade: @submission.entered_grade, entered_score: @submission.entered_score)
     }
   })
   content_for :page_title, join_title(@assignment.title, submission_author_name_for(@assessment_request))
@@ -57,34 +57,54 @@
     <div class="submission-details-header__grade-summary">
       <% if @assignment.muted? %>
         <p style="width: 200px"><%= t(:student_mute_notification, "Grades are unavailable because the instructor is working on them.") %></p>
-      <% end %>
-      <% if @submission.user_can_read_grade?(@current_user, session) && !@assignment.muted? %>
-        <%= before_label('grade', 'Grade') %>
-          <% if can_do(@assignment, @current_user, :grade) %>
-            <%= render :partial => "gradebooks/grading_box", :object => @assignment, :locals => {:submission => @submission} %>
-          <% elsif @submission.user_can_read_grade?(@current_user, session) %>
-            <span class="published_grade">
-              <% if @submission.excused? %>
-                <%= t "Excused" %>
-              <% else %>
-                <%= i18n_grade(@submission.published_grade) %>
+      <% elsif @submission.user_can_read_grade?(@current_user, session) %>
+      <table class="grade-values">
+        <tbody>
+          <tr>
+            <th><%= I18n.t('Grade:') %></td>
+            <td class="bold">
+              <% if can_do(@assignment, @current_user, :grade) %>
+                <%= render :partial => "gradebooks/grading_box", :object => @assignment, :locals => {:submission => @submission} %>
+              <% elsif @submission.user_can_read_grade?(@current_user, session) %>
+                <span class="entered_grade">
+                  <% if @submission.excused? %>
+                    <%= t "Excused" %>
+                  <% else %>
+                    <%= i18n_grade(round_if_whole @submission.entered_grade) %>
+                  <% end %>
+                </span>
+                <% if !@submission.excused? &&  @assignment.grading_type == 'points' && @assignment.points_possible %>
+                  <%= t('/ %{points_possible}', points_possible: I18n.n(round_if_whole @assignment.points_possible))%>
+                <% end %>
               <% end %>
-            </span>
+            </td>
+          </tr>
+          <% if can_do(@assignment, @current_user, :grade) || @submission.user_can_read_grade?(@current_user, session)
+              points_deducted = I18n.n(-@submission.points_deducted) if @submission.points_deducted&.> 0
+              points_possible = I18n.n(round_if_whole(@assignment.points_possible))
+              grade_breakdown_style = hidden unless points_deducted && !@submission.excused?
+          %>
+            <tr class="error late-penalty-display" style="<%= grade_breakdown_style %>">
+              <th><%= I18n.t('Late penalty:') %></td>
+              <td class="late_penalty bold"><%= points_deducted %></td>
+            </tr>
+            <tr class="late-penalty-display" style="<%= grade_breakdown_style %>">
+              <th><%= I18n.t('Final grade:') %></td>
+              <td class="bold">
+                <% if can_do(@assignment, @current_user, :grade) %>
+                  <span class="published_grade"><%= i18n_grade(round_if_whole @submission.grade) %></span>
+                <% elsif @submission.user_can_read_grade?(@current_user, session) %>
+                  <span class="grade"><%= i18n_grade(round_if_whole @submission.published_grade) %></span>
+                <% end %>
+
+                <% if @assignment.grading_type == 'points' %>
+                  / <%= points_possible %>
+                <% end %>
+              </td>
+            </tr>
           <% end %>
-          <br/>
-        <% if can_do(@assignment, @current_user, :grade) %>
-          <span class="published_score" style="<%= hidden if @assignment.grading_type == 'points' %>">
-            <% if @submission.published_score? %><%= I18n.n(@submission.published_score.round(2)) %><% end %>
-          </span>
-        <% elsif @submission.user_can_read_grade?(@current_user, session) %>
-          <span class="score" style="<%= hidden if @assignment.grading_type == 'points' %>">
-            <% if @submission.score? %><%= I18n.n(@submission.score.round(2)) %><% end %>
-          </span>
-        <% end %>
-        <% if @assignment.points_possible %>
-          <%= t('out of %{points_possible}', points_possible: I18n.n(round_if_whole(@assignment.points_possible))) %>
-        <% end %>
-        <br/>
+        </tbody>
+      </table>
 
         <% if can_do(@submission, @current_user, :view_turnitin_report) %>
           <% if (turnitin_score = @submission.turnitin_data[@submission.asset_string]) &&
@@ -122,11 +142,14 @@
     </div>
     <h2 class="submission_header" style="margin-bottom: 0;"><%= @assessment_request ? t('peer_review', "Peer Review") : t('submission_details', "Submission Details") %></h2>
     <span class="SubmissionDetails__Text"><%= @assignment.title %>, <%= submission_author_name_for @assessment_request %></span>
-
     <span class="SubmissionDetails__Text <%='late' if @submission.late? %> <%= 'hidden' unless @submission.submitted_at %>">
       <%= t('submitted_at', 'submitted %{submit_date}', :submit_date => datetime_string(@submission.submitted_at)) %>
-      <%= t('late_submission', '(late)') if @submission.late? %>
     </span>
+    <% if @submission.late? %>
+      <span class="submission-late-pill"></span>
+    <% elsif @submission.missing? %>
+      <span class="submission-missing-pill"></span>
+    <% end %>
     <% if can_do(@context, @current_user, :grade) %>
       <a class="forward" href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @assignment.id) + "#" + CGI::escape({:student_id => @submission.user_id }.to_json) %>" style="float: right; padding-right: 10px;"><%= t('speedgrader', 'SpeedGrader™') %></a>
     <% end %>

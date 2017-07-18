@@ -1,10 +1,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/../lti2_api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../../sharding_spec_helper')
 require_dependency "lti/ims/access_token_helper"
 require 'json/jwt'
 
 module Lti
   module Ims
     describe AccessTokenHelper, type: :controller do
+      specs_require_sharding
       include_context 'lti2_api_spec_helper'
 
       let(:service_name) { 'vnd.Canvas.CustomSecurity' }

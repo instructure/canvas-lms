@@ -69,7 +69,6 @@ export default class StudentColumnHeader extends ColumnHeader {
 
   onShowFirstLastNames = () => { this.onSelectPrimaryInfo('first_last'); };
   onShowLastFirstNames = () => { this.onSelectPrimaryInfo('last_first'); };
-  onHideStudentNames = () => { this.onSelectPrimaryInfo('anonymous'); };
 
   onToggleInactive = () => { this.onToggleEnrollmentFilter('inactive'); };
   onToggleConcluded = () => { this.onToggleEnrollmentFilter('concluded'); };
@@ -125,7 +124,7 @@ export default class StudentColumnHeader extends ColumnHeader {
           trigger={
             <span ref={this.bindOptionsMenuTrigger} className={classes}>
               <Typography weight="bold" fontStyle="normal" size="large" color="brand">
-                <IconMoreSolid title={I18n.t('Student Name Options')} />
+                <IconMoreSolid className="rotated" title={I18n.t('Student Name Options')} />
               </Typography>
             </span>
           }
@@ -167,13 +166,6 @@ export default class StudentColumnHeader extends ColumnHeader {
                 onSelect={this.onShowLastFirstNames}
               >
                 {studentRowHeaderConstants.primaryInfoLabels.last_first}
-              </MenuItem>
-              <MenuItem
-                key="anonymous"
-                selected={this.props.selectedPrimaryInfo === 'anonymous'}
-                onSelect={this.onHideStudentNames}
-              >
-                {studentRowHeaderConstants.primaryInfoLabels.anonymous}
               </MenuItem>
             </MenuItemGroup>
           </MenuItemFlyout>

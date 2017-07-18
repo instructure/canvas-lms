@@ -302,5 +302,16 @@ describe ContentMigration do
       @copy_to.reload
       expect(@copy_to.syllabus_body).to be_include("/courses/#{@copy_to.id}/discussion_topics/#{topic2.id}")
     end
+
+    it "should not copy lock_at directly when on assignment" do
+      graded_discussion_topic
+      @assignment.update_attribute(:lock_at, 3.days.from_now)
+
+      run_course_copy
+
+      topic2 = @copy_to.discussion_topics.where(:migration_id => mig_id(@topic)).first
+      expect(topic2.assignment.lock_at.to_i).to eq @assignment.lock_at.to_i
+      expect(topic2.lock_at).to be_nil
+    end
   end
 end

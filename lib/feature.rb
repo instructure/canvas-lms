@@ -223,15 +223,6 @@ END
         end
       end
     },
-    'new_gradebook_development' =>
-    {
-      display_name: -> { I18n.t('New Gradebook Development') },
-      description: -> { I18n.t('For development of features for New Gradebook.') },
-      applies_to: "RootAccount",
-      state: "hidden",
-      beta: true,
-      development: true
-    },
     'k12' =>
     {
       display_name: -> { I18n.t('features.k12', 'K-12 Specific Features') },
@@ -432,33 +423,13 @@ END
       root_opt_in: true,
       touch_context: true
     },
-    'rich_content_service' =>
-    {
-      display_name: -> { I18n.t('Use remote version of Rich Content Editor') },
-      description: -> { I18n.t('In cases where it is available, load the RCE from a canvas rich content service') },
-      applies_to: 'RootAccount',
-      state: 'allowed',
-      beta: true,
-      development: false,
-      root_opt_in: false
-    },
-    'rich_content_service_with_sidebar' =>
-    {
-      display_name: -> { I18n.t('Use remote version of Rich Content Editor AND sidebar') },
-      description: -> { I18n.t('In cases where it is available, load the RCE and the wiki sidebar from a canvas rich content service') },
-      applies_to: 'RootAccount',
-      state: 'hidden',
-      beta: true,
-      development: false,
-      root_opt_in: false
-    },
     'rich_content_service_high_risk' =>
     {
-      display_name: -> { I18n.t('Use remote version of Rich Content Editor AND sidebar in high-risk areas like quizzes') },
-      description: -> { I18n.t('Always load the RCE and Sidebar from a canvas rich content service everywhere') },
+      display_name: -> { I18n.t('Rich Content Editor Sidebar Enhancements') },
+      description: -> { I18n.t('Use new rich content editor with enhanced sidebar everywhere') },
       applies_to: 'RootAccount',
       state: 'hidden',
-      beta: true,
+      beta: false,
       development: false,
       root_opt_in: false
     },
@@ -545,19 +516,12 @@ END
       beta: true,
       development: true,
     },
-    'modules_home_page' =>
-    {
-      display_name: -> { I18n.t('Modules Home Page') },
-      description: -> { I18n.t('Default to modules for the course home page') },
-      applies_to: "RootAccount",
-      state: "allowed",
-    },
     'new_user_tutorial' =>
     {
       display_name: -> { I18n.t('New User Tutorial')},
       description: -> { I18n.t('Provide tutorial information for new users in a flyout tray.')},
       applies_to: "RootAccount",
-      state: "on",
+      state: "allowed",
     },
     'student_planner' =>
     {

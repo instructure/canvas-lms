@@ -1906,6 +1906,12 @@ describe "Users API", type: :request do
       expect(json.length).to eql 2
     end
 
+    it "should return course information if requested" do
+      @params['include'] = ['course']
+      json = api_call(:get, @path, @params)
+      expect(json.first['course']['name']).to eq(@course.name)
+    end
+
     it "should not return submitted assignments due in the past" do
       @course.assignments.first.submit_homework @student, :submission_type => "online_text_entry"
       json = api_call(:get, @path, @params)

@@ -102,6 +102,7 @@ class SisBatch < ActiveRecord::Base
   def enable_diffing(data_set_id, opts = {})
     if data[:import_type] == "instructure_csv"
       self.diffing_data_set_identifier = data_set_id
+      self.change_threshold = opts[:change_threshold]
       if opts[:remaster]
         self.diffing_remaster = true
       end
@@ -249,6 +250,8 @@ class SisBatch < ActiveRecord::Base
       succeeded.where(diffing_data_set_identifier: self.diffing_data_set_identifier).order(:created_at).last
     previous_zip = previous_batch.try(:download_zip)
     return unless previous_zip
+
+    return if change_threshold && (1-previous_zip.size.to_f/@data_file.size.to_f).abs > (0.01 * change_threshold)
 
     diffed_data_file = SIS::CSV::DiffGenerator.new(self.account, self).generate(previous_zip.path, @data_file.path)
     return unless diffed_data_file
@@ -401,6 +404,7 @@ class SisBatch < ActiveRecord::Base
       "clear_sis_stickiness" => self.options[:clear_sis_stickiness],
       "diffing_data_set_identifier" => self.diffing_data_set_identifier,
       "diffed_against_import_id" => self.options[:diffed_against_sis_batch_id],
+      "change_threshold" => self.change_threshold,
     }
     data["processing_errors"] = self.processing_errors if self.processing_errors.present?
     data["processing_warnings"] = self.processing_warnings if self.processing_warnings.present?
@@ -431,14 +435,14 @@ class SisBatch < ActiveRecord::Base
     self.errors_attachment = SisBatch.create_data_attachment(
       self,
       Rack::Test::UploadedFile.new(file, 'csv', true),
-      t("sis_errors_attachment_%{id}", id: self.id)
+      "sis_errors_attachment_#{id}.csv"
     )
   end
 
   def limit_size_of_messages
     max_messages = SisBatch.max_messages
     %w[processing_warnings processing_errors].each do |field|
-      write_warnings_and_errors_to_file
+      write_warnings_and_errors_to_file unless self.errors_attachment
       if self.send("#{field}_changed?") && (self.send(field).try(:size) || 0) > max_messages
         limit_message = case field
                         when "processing_warnings"

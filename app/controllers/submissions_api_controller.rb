@@ -148,19 +148,14 @@
 #           "example": "missing",
 #           "type": "string"
 #         },
-#         "accepted_at": {
-#           "description": "The date that the submission was accepted at.",
-#           "example": "2012-01-01T01:00:00Z",
-#           "type": "datetime"
-#         },
 #         "points_deducted": {
 #           "description": "The amount of points automatically deducted from the score by the missing/late policy for a late or missing assignment.",
 #           "example": 12.3,
 #           "type": "number"
 #         },
-#         "duration_late": {
+#         "seconds_late": {
 #           "description": "The amount of time, in seconds, that an submission is late by.",
-#           "example": 300.2,
+#           "example": 300,
 #           "type": "number"
 #         },
 #         "workflow_state": {
@@ -380,12 +375,12 @@ class SubmissionsApiController < ApplicationController
           where("users.id" => student_ids)
 
       submissions_scope = if requested_assignment_ids.present?
-                      Submission.where(
+                      Submission.active.where(
                         :user_id => student_ids,
                         :assignment_id => assignments
                       )
                     else
-                      Submission.joins(:assignment).where(
+                      Submission.active.joins(:assignment).where(
                         :user_id => student_ids,
                         "assignments.context_type" => @context.class.name,
                         "assignments.context_id" => @context.id
@@ -594,8 +589,8 @@ class SubmissionsApiController < ApplicationController
   # @argument submission[late_policy_status] [String]
   #   Sets the late policy status to either "late", "missing", "none", or null.
   #
-  # @argument submission[accepted_at] [iso8601 Timestamp]
-  #   Sets the accepted at if late policy status is "late"
+  # @argument submission[seconds_late_override] [Integer]
+  #   Sets the seconds late if late policy status is "late"
   #
   # @argument rubric_assessment [RubricAssessment]
   #   Assign a rubric assessment to this assignment submission. The
@@ -657,8 +652,8 @@ class SubmissionsApiController < ApplicationController
         if params[:submission].key?(:late_policy_status)
           submission[:late_policy_status] = params[:submission].delete(:late_policy_status)
         end
-        if params[:submission].key?(:accepted_at)
-          submission[:accepted_at] = params[:submission].delete(:accepted_at)
+        if params[:submission].key?(:seconds_late_override)
+          submission[:seconds_late_override] = params[:submission].delete(:seconds_late_override)
         end
         submission[:provisional] = value_to_boolean(params[:submission][:provisional])
         submission[:final] = value_to_boolean(params[:submission][:final]) && @context.grants_right?(@current_user, :moderate_grades)
@@ -681,8 +676,8 @@ class SubmissionsApiController < ApplicationController
       end
       if submission.key?(:late_policy_status)
         @submission.late_policy_status = submission[:late_policy_status]
-        if @submission.late_policy_status == 'late' && submission[:accepted_at].present?
-          @submission.accepted_at = Time.zone.parse(submission[:accepted_at])
+        if @submission.late_policy_status == 'late' && submission[:seconds_late_override].present?
+          @submission.seconds_late_override = submission[:seconds_late_override]
         end
         @submission.save!
       end
@@ -963,7 +958,8 @@ class SubmissionsApiController < ApplicationController
   def submission_summary
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @assignment = @context.assignments.active.find(params[:assignment_id])
-      student_scope = @context.students_visible_to(@current_user, include: :inactive)
+      student_scope = @context.students_visible_to(@current_user)
+        .where("enrollments.type<>'StudentViewEnrollment'").uniq()
       student_scope = @assignment.students_with_visibility(student_scope)
       student_ids = student_scope.pluck(:id)
 

@@ -169,7 +169,8 @@ module Importers
 
     def resolve_media_comment_data(node, rel_path)
       if file = find_file_in_context(rel_path)
-        if media_id = ((file.media_object && file.media_object.media_id) || file.media_entry_id)
+        media_id = ((file.media_object && file.media_object.media_id) || file.media_entry_id)
+        if media_id && media_id != 'maybe'
           node['id'] = "media_comment_#{media_id}"
           return "/media_objects/#{media_id}"
         end

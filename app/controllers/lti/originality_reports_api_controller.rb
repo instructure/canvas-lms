@@ -152,22 +152,13 @@ module Lti
     # @returns OriginalityReport
     def create
       render_unauthorized_action and return unless tool_proxy_associated?
-      report_attributes = params.require(:originality_report).permit(create_attributes).to_hash.merge(
-        {submission_id: params.require(:submission_id)}
-      )
-
-      @report = OriginalityReport.new(build_link_id!(report_attributes))
-      begin
-        successful_save = @report.save
-      rescue ActiveRecord::RecordNotUnique
-        @report.errors.add(:base, I18n.t('the specified file with file_id already has an originality report'))
-      end
-
-      if successful_save
-        render json: api_json(@report, @current_user, session), status: :created
-      else
-        render json: @report.errors, status: :bad_request
-      end
+      @report = OriginalityReport.create!(create_report_params)
+      render json: api_json(@report, @current_user, session), status: :created
+    rescue ActiveRecord::RecordInvalid
+      return render json: @report.errors, status: :bad_request
+    rescue ActiveRecord::RecordNotUnique
+      return render json: {error: {message: I18n.t('the specified file with file_id already has an originality report'),
+                                   type: 'RecordNotUnique'}}, status: :bad_request
     end
 
     # @API Edit an Originality Report
@@ -205,7 +196,7 @@ module Lti
     # @returns OriginalityReport
     def update
       render_unauthorized_action and return unless tool_proxy_associated?
-      if @report.update_attributes(build_link_id!(params.require(:originality_report).permit(update_attributes)))
+      if @report.update_attributes(update_report_params)
         render json: api_json(@report, @current_user, session)
       else
         render json: @report.errors, status: :bad_request
@@ -227,20 +218,18 @@ module Lti
 
     private
 
-    def build_link_id!(report_hash)
-      resource_type_code = report_hash.dig('tool_setting', 'resource_type_code')
+    def link_id(tool_setting_params)
+      resource_type_code = tool_setting_params&.dig('resource_type_code')
       if resource_type_code.present?
         rh = tool_proxy.resources.find_by(resource_type_code: resource_type_code)
-        link_id = resource_link_id(rh, report_hash.dig('tool_setting', 'resource_url'))
-        report_hash['link_id'] = link_id
+        resource_link_id(rh, tool_setting_params['resource_url'])
       end
-      report_hash.delete 'tool_setting'
-      report_hash
     end
 
     def resource_link_id(resource_handler, lti_url = nil)
       tool_setting = resource_handler.find_or_create_tool_setting(resource_url: lti_url,
-                                                                  link_fragment: link_fragment)
+                                                                  link_fragment: link_fragment,
+                                                                  context: attachment_association)
       tool_setting.resource_link_id
     end
 
@@ -249,8 +238,7 @@ module Lti
     end
 
     def tool_proxy_associated?
-      mh = assignment.tool_settings_tool
-      mh.respond_to?(:resource_handler) && mh.resource_handler.tool_proxy.guid == access_token.sub
+      PermissionChecker.authorized_lti2_action?(tool: tool_proxy, context: assignment)
     end
 
     def plagiarism_feature_flag_enabled
@@ -279,11 +267,39 @@ module Lti
     end
 
     def submission
-      @_submission ||= Submission.find(params[:submission_id])
+      @_submission ||= Submission.active.find(params[:submission_id])
+    end
+
+    def attachment
+      @_attachment ||= Attachment.find(params.require(:originality_report)[:file_id])
+    end
+
+    def attachment_association
+      @_attachment_association ||= begin
+        file = @report&.attachment || attachment
+        file.attachment_associations.find { |a| a.context == submission }
+      end
+    end
+
+    def create_report_params
+      @_create_report_params ||= begin
+        report_attributes = params.require(:originality_report).permit(create_attributes).to_hash.merge(
+          {submission_id: params.require(:submission_id)}
+        )
+        report_attributes['link_id'] = link_id(report_attributes.delete('tool_setting'))
+        report_attributes
+      end
+    end
+
+    def update_report_params
+      @_update_report_params ||= begin
+        report_attributes = params.require(:originality_report).permit(update_attributes)
+        report_attributes['link_id'] = link_id(report_attributes.delete('tool_setting'))
+        report_attributes
+      end
     end
 
     def attachment_in_context
-      attachment = Attachment.find(params.require(:originality_report)[:file_id])
       verify_submission_attachment(attachment, submission)
     end
 

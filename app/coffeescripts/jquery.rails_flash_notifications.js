@@ -57,7 +57,7 @@ $.screenReaderFlashError = content => helper.createScreenreaderNode(content, fal
 // This is for when you want to clear the flash message content prior to
 // updating it with new content.  Makes it so the SR only reads this one
 // message.
-$.screenReaderFlashMessageExclusive = content => helper.createScreenreaderNodeExclusive(content)
+$.screenReaderFlashMessageExclusive = (content, polite = false) => helper.createScreenreaderNodeExclusive(content, polite)
 
 $.initFlashContainer = () => initFlashContainer()
 

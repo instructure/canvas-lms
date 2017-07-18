@@ -277,12 +277,14 @@ module ConversationsCommon
   # Clicks the admin archive/unarchive button
   def click_archive_button
     f('#archive-btn').click
+    driver.switch_to.alert.accept
     wait_for_ajaximations
   end
 
   # Clicks star cog menu item
   def click_archive_menu_item
     f('.archive-btn.ui-corner-all').click
+    driver.switch_to.alert.accept
     wait_for_ajaximations
   end
 

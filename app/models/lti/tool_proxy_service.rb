@@ -22,22 +22,7 @@ module Lti
 
     attr_reader :tc_half_secret
 
-    class InvalidToolProxyError < RuntimeError
-
-      def initialize(message = nil, json = {})
-        super(message)
-        @message = message
-        @json = json
-      end
-
-      def to_json
-        @json[:error] = @message if @message
-        @json.to_json
-      end
-
-    end
-
-    def process_tool_proxy_json(json:, context:, guid:, tool_proxy_to_update: nil, tc_half_shared_secret: nil, developer_key: nil)
+    def process_tool_proxy_json(json:, context:, guid:, tool_proxy_to_update: nil, tc_half_shared_secret: nil, developer_key: nil, registration_url: nil)
       @tc_half_secret = tc_half_shared_secret
       tp = IMS::LTI::Models::ToolProxy.new.from_json(json)
       tp.tool_proxy_guid = guid
@@ -45,14 +30,20 @@ module Lti
       tcp_uuid ||= developer_key&.tool_consumer_profile&.uuid
       tcp_uuid ||= Lti::ToolConsumerProfile::DEFAULT_TCP_UUID
       begin
-        validate_proxy!(tp, context, developer_key, tcp_uuid)
-      rescue Lti::ToolProxyService::InvalidToolProxyError
-        raise unless depricated_split_secret?(tp)
+        tcp = Lti::ToolConsumerProfileCreator.new(
+          context,
+          tp.tool_consumer_profile,
+          developer_key: developer_key,
+          tcp_uuid: tcp_uuid
+        ).create
+        ToolProxyValidator.new(tool_proxy: tp, tool_consumer_profile: tcp).validate!
+      rescue Lti::Errors::InvalidToolProxyError
+        raise unless deprecated_split_secret?(tp)
       end
       tool_proxy = nil
       ToolProxy.transaction do
         product_family = create_product_family(tp, context.root_account, developer_key)
-        tool_proxy = create_tool_proxy(tp, context, product_family, tool_proxy_to_update)
+        tool_proxy = create_tool_proxy(tp, context, product_family, tool_proxy_to_update, registration_url)
         process_resources(tp, tool_proxy)
         create_proxy_binding(tool_proxy, context)
         create_tool_settings(tp, tool_proxy)
@@ -74,8 +65,10 @@ module Lti
     end
 
     def delete_subscriptions_for(tool_proxy)
+      product_family = tool_proxy.product_family
       subscription_helper = AssignmentSubscriptionsHelper.new(tool_proxy)
-      lookups = AssignmentConfigurationToolLookup.where(tool: tool_proxy.message_handlers)
+      lookups = AssignmentConfigurationToolLookup.where(tool_product_code: product_family.product_code,
+                                                        tool_vendor_code: product_family.vendor_code)
       lookups.each { |l| subscription_helper.send_later(:destroy_subscription, l.subscription_id) }
     end
 
@@ -84,17 +77,18 @@ module Lti
     end
 
     private
-    def depricated_split_secret?(tp)
+    def deprecated_split_secret?(tp)
       tp.enabled_capability.present? &&
       tp.enabled_capability.include?("OAuth.splitSecret") &&
       tp.security_contract.tp_half_shared_secret.present?
     end
 
-    def create_tool_proxy(tp, context, product_family, tool_proxy=nil)
+    def create_tool_proxy(tp, context, product_family, tool_proxy=nil, registration_url)
       # make sure the guid never changes
-      raise InvalidToolProxyError if tool_proxy && tp.tool_proxy_guid != tool_proxy.guid
+      raise Lti::Errors::InvalidToolProxyError if tool_proxy && tp.tool_proxy_guid != tool_proxy.guid
 
       tool_proxy ||= ToolProxy.new
+      tool_proxy.registration_url = registration_url
       tool_proxy.product_family = product_family
       tool_proxy.guid = tp.tool_proxy_guid
       tool_proxy.shared_secret = create_secret(tp)
@@ -217,61 +211,6 @@ module Lti
 
     def create_json(obj)
       obj.is_a?(Array) ? obj.map(&:as_json) : obj.as_json
-    end
-
-    def validate_proxy!(tp, context, developer_key = nil, tcp_uuid)
-
-      profile = Lti::ToolConsumerProfileCreator.new(
-        context,
-        tp.tool_consumer_profile,
-        developer_key: developer_key,
-        tcp_uuid: tcp_uuid
-      ).create
-      tp_validator = IMS::LTI::Services::ToolProxyValidator.new(tp)
-      tp_validator.tool_consumer_profile = profile
-
-      unless tp_validator.valid?
-        json = {}
-        messages = []
-
-        if tp_validator.errors[:invalid_services]
-          messages << 'Invalid Services'
-          json.merge!({ :invalid_services => invalid_services_formatter(tp_validator) })
-        end
-
-        if tp_validator.errors[:invalid_message_handlers]
-          messages << 'Invalid Capabilities'
-          json.merge!({ :invalid_capabilities => invalid_message_handler_formatter(tp_validator) })
-        end
-
-        if tp_validator.errors[:invalid_security_contract]
-          messages << 'Invalid SecurityContract'
-          json.merge!({ :invalid_security_contract => tp_validator.errors[:invalid_security_contract].values })
-        end
-
-        last_message = messages.pop if messages.size > 1
-        message = messages.join(', ')
-        message + " and #{last_message}" if last_message
-
-        raise InvalidToolProxyError.new message, json
-      end
-    end
-
-    def invalid_message_handler_formatter(tp_validator)
-      tp_validator.errors[:invalid_message_handlers][:resource_handlers].map do |rh|
-        rh[:messages].map do |message|
-          message[:invalid_capabilities] || message[:invalid_parameters].map {|param| param[:variable] }
-        end
-      end.flatten
-    end
-
-    def invalid_services_formatter(tp_validator)
-      tp_validator.errors[:invalid_services].map do |key, value|
-        {
-          id: key,
-          actions: value
-        }
-      end
     end
   end
 end

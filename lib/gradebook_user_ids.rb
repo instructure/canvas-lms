@@ -44,53 +44,83 @@ class GradebookUserIds
   private
 
   def sort_by_student_name
-    students.joins(:enrollments).
-      order("enrollments.type = 'StudentViewEnrollment'").
+    students.
+      order("#{Enrollment.table_name}.type = 'StudentViewEnrollment'").
       order_by_sortable_name(direction: @direction.to_sym).
       pluck(:id).
       uniq
   end
 
   def sort_by_assignment_grade(assignment_id)
-    student_enrollments_scope.
-      joins("
-        LEFT JOIN #{Submission.quoted_table_name}
-          ON submissions.user_id = enrollments.user_id
-          AND submissions.assignment_id = #{assignment_id}
-      ").
-      order("enrollments.type = 'StudentViewEnrollment'", "submissions.score #{sort_direction} NULLS LAST").
-      pluck(:user_id).
+    students.
+      left_joins(:submissions).
+      where(submissions: { assignment_id: [nil, assignment_id] }).
+      order("#{Enrollment.table_name}.type = 'StudentViewEnrollment'").
+      order("#{Submission.table_name}.score #{sort_direction} NULLS LAST").
+      order_by_sortable_name(direction: @direction.to_sym).
+      pluck(:id).
       uniq
   end
 
   def sort_by_assignment_missing(assignment_id)
-    all_user_ids = student_enrollments_scope.pluck(:user_id)
-    fake_user_ids = student_enrollments_scope.where(type: "StudentViewEnrollment").pluck(:user_id)
-    real_user_ids = all_user_ids - fake_user_ids
-    user_ids_for_missing = Submission.missing.
-      where(assignment_id: assignment_id, user_id: real_user_ids).
-      pluck(:user_id)
-    user_ids_for_missing.concat(real_user_ids).concat(fake_user_ids).uniq
+    sort_user_ids(Submission.missing.where(assignment_id: assignment_id))
   end
 
   def sort_by_assignment_late(assignment_id)
-    all_user_ids = student_enrollments_scope.pluck(:user_id)
-    fake_user_ids = student_enrollments_scope.where(type: "StudentViewEnrollment").pluck(:user_id)
-    real_user_ids = all_user_ids - fake_user_ids
-    user_ids_for_late = Submission.late.where(assignment_id: assignment_id, user_id: real_user_ids).pluck(:user_id)
-    user_ids_for_late.concat(real_user_ids).concat(fake_user_ids).uniq
+    sort_user_ids(Submission.late.where(assignment_id: assignment_id))
   end
 
   def sort_by_total_grade
-    student_enrollments_scope.
-      joins("
-        LEFT JOIN #{Score.quoted_table_name}
-          ON enrollments.id = scores.enrollment_id
-          AND scores.grading_period_id #{grading_period_id ? "= #{grading_period_id}" : 'IS NULL'}
-      ").
-      order("enrollments.type = 'StudentViewEnrollment'", "scores.current_score #{sort_direction} NULLS LAST").
-      pluck(:user_id).
-      uniq
+    students.
+      left_joins(enrollments: :scores).
+      where(scores: { grading_period_id: grading_period_id }).
+      order("#{Enrollment.table_name}.type = 'StudentViewEnrollment'").
+      order("#{Score.table_name}.current_score #{sort_direction} NULLS LAST").
+      order_by_sortable_name(direction: @direction.to_sym).
+      pluck(:id).uniq
+  end
+
+  def all_user_ids
+    @all_user_ids ||= students.order_by_sortable_name(direction: @direction.to_sym).pluck(:id).uniq
+  end
+
+  def all_user_ids_index
+    @all_user_ids_index ||= index_user_ids(all_user_ids)
+  end
+
+  def fake_user_ids
+    student_enrollments_scope.where(type: "StudentViewEnrollment").pluck(:user_id).uniq
+  end
+
+  def sorted_fake_user_ids
+    @sorted_fake_user_ids ||= sort_using_index(fake_user_ids, all_user_ids_index)
+  end
+
+  def sorted_real_user_ids
+    @sorted_real_user_ids ||= sort_using_index(all_user_ids - sorted_fake_user_ids, all_user_ids_index)
+  end
+
+  def real_user_ids_from_submissions(submissions)
+    submissions.where(user_id: sorted_real_user_ids).pluck(:user_id)
+  end
+
+  def sorted_real_user_ids_from_submissions(submissions)
+    sort_using_index(real_user_ids_from_submissions(submissions), all_user_ids_index)
+  end
+
+  def sort_user_ids(submissions)
+    sorted_real_user_ids_from_submissions(submissions).concat(sorted_real_user_ids, sorted_fake_user_ids).uniq
+  end
+
+  def index_user_ids(user_ids)
+    user_ids_index = {}
+    # Traverse the array once and cache all indexes so we don't incur traversal costs at the end
+    user_ids.each_with_index { |item, idx| user_ids_index[item] = idx }
+    user_ids_index
+  end
+
+  def sort_using_index(user_ids, user_ids_index)
+    user_ids.sort_by { |item| user_ids_index[item] }
   end
 
   def student_enrollments_scope
@@ -107,7 +137,7 @@ class GradebookUserIds
   end
 
   def students
-    User.where(id: student_enrollments_scope.select(:user_id))
+    User.left_joins(:enrollments).merge(student_enrollments_scope)
   end
 
   def sort_direction

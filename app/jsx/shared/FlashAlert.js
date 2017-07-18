@@ -50,6 +50,7 @@ import Alert from 'instructure-ui/lib/components/Alert'
 import Button from 'instructure-ui/lib/components/Button'
 import Typography from 'instructure-ui/lib/components/Typography'
 import Transition from 'instructure-ui/lib/components/Transition'
+import 'compiled/jquery.rails_flash_notifications'
 
 // const liveRegionId = 'flash_screenreader_holder'  // same ids that jquery flash message uses
 const messageHolderId = 'flash_message_holder'
@@ -168,7 +169,7 @@ export default class FlashAlert extends React.Component {
           variant={this.props.variant}
           closeButtonLabel={I18n.t('Close')}
           onClose={this.closeAlert}
-          isDismissable
+          dismissable
           margin="small auto"
           timeout={timeout}
           liveRegion={this.getLiveRegion}
@@ -189,7 +190,7 @@ export default class FlashAlert extends React.Component {
 export function showFlashAlert ({ message, err, type = err ? 'error' : 'info' }) {
   function closeAlert (atNode) {
     ReactDOM.unmountComponentAtNode(atNode)
-    atNode.parentElement.removeChild(atNode)
+    atNode.remove()
   }
 
   function getAlertContainer () {

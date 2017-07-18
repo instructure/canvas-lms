@@ -101,9 +101,7 @@ class LoginController < ApplicationController
     if session[:login_aac]
       # The AAC could have been deleted since the user logged in
       aac = AccountAuthorizationConfig.where(id: session[:login_aac]).first
-      if aac && aac.respond_to?(:user_logout_redirect)
-        redirect = aac.user_logout_redirect(self, @current_user)
-      end
+      redirect = aac.try(:user_logout_redirect, self, @current_user)
     end
 
     redirect ||= login_url
@@ -114,8 +112,13 @@ class LoginController < ApplicationController
   end
 
   # GET /logout
-  def logout_confirm
-    redirect_to login_url unless @current_user
+  def logout_landing
+    # logged in; ask them to log out
+    return render :logout_confirm if @current_user
+    # not logged in at all; send them to login
+    return redirect_to login_url unless flash[:logged_out]
+    # just barely logged out. render a landing page asking them to log in again.
+    # render :logout_landing
   end
 
   # POST /login/session_token

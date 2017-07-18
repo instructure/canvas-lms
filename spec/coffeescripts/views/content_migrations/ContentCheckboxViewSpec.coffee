@@ -98,6 +98,14 @@ define [
 
     equal nameValue, 'copy[all_assignments]', 'Adds the correct name attribute from property'
 
+  QUnit.module "#getIconClass",
+    teardown: -> CheckboxHelper.teardown()
+
+  test 'returns lti icon class for tool profiles', ->
+    CheckboxHelper.renderView()
+    CheckboxHelper.checkboxView.model.set(type: 'tool_profiles')
+    equal CheckboxHelper.checkboxView.getIconClass(), 'icon-lti'
+
   QUnit.module "Sublevel Content Checkbox and Carrot Behaviors",
     setup: ->
       fakeENV.setup()

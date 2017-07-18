@@ -15,45 +15,157 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
 require_relative '../helpers/blueprint_common'
 
 describe "blueprint courses quizzes" do
   include_context "in-process server selenium tests"
+  include_context "blueprint courses files context"
   include BlueprintCourseCommon
 
-  before :once do
-    Account.default.enable_feature!(:master_courses)
-    @master = course_factory(active_all: true)
-    @master_teacher = @teacher
-    @template = MasterCourses::MasterTemplate.set_as_master_course(@master)
-    @minion = @template.add_child_course!(course_factory(name: "Minion", active_all: true)).child_course
-    @minion.enroll_teacher(@master_teacher).accept!
-
-    # sets up the quiz that gets blueprinted
-    @original_quiz = @master.quizzes.create!(title: 'Discussion time!', due_at: 5.days.from_now)
-    @original_quiz.description = 'this is the original content for the quiz'
-    run_master_course_migration(@master)
-    @copy_quiz = @minion.quizzes.last
+  def quiz_panel
+    f('.quiz')
   end
 
-  describe "as a blueprint's teacher" do
-    before :each do
-      user_session(@master_teacher)
+  context "in the blueprint course" do
+    before :once do
+      Account.default.enable_feature!(:master_courses)
+      @master = course_factory(active_all: true)
+      @master_teacher = @teacher
+      @template = MasterCourses::MasterTemplate.set_as_master_course(@master)
+      @minion = @template.add_child_course!(course_factory(name: "Minion", active_all: true)).child_course
+      @minion.enroll_teacher(@master_teacher).accept!
+
+      # sets up the quiz that gets blueprinted
+      @original_quiz = @master.quizzes.create!(title: 'Discussion time!', due_at: 5.days.from_now)
+      @original_quiz.description = 'this is the original content for the quiz'
+      run_master_course_migration(@master)
+      @copy_quiz = @minion.quizzes.last
     end
 
-    it "locks down the associated course's quizzes fields", test_id: 3127593, priority: 2 do
-      change_blueprint_settings(@master, points: true, due_dates: true, availability_dates: true)
-      get "/courses/#{@master.id}/quizzes/#{@original_quiz.id}"
-      f('.bpc-lock-toggle button').click
-      expect(f('.bpc-lock-toggle__label')).to include_text('Locked')
-      run_master_course_migration(@master)
-      get "/courses/#{@minion.id}/quizzes/#{@copy_quiz.id}/edit"
-      expect(f('#quiz_options_form')).to contain_css('.mce-tinymce.mce-container.mce-panel')
-      expect(f('.bpc-lock-toggle__label')).to include_text('Locked')
-      expect(f("#due_at")).to have_attribute('readonly', 'true')
-      expect(f("#unlock_at")).to have_attribute('readonly', 'true')
-      expect(f("#lock_at")).to have_attribute('readonly', 'true')
+    context "as a blueprint's teacher" do
+      before :each do
+        user_session(@master_teacher)
+      end
+
+      it "locks down the associated course's quizzes fields", test_id: 3127593, priority: 2 do
+        change_blueprint_settings(@master, points: true, due_dates: true, availability_dates: true)
+        get "/courses/#{@master.id}/quizzes/#{@original_quiz.id}"
+        f('.bpc-lock-toggle button').click
+        expect(f('.bpc-lock-toggle__label')).to include_text('Locked')
+        run_master_course_migration(@master)
+        get "/courses/#{@minion.id}/quizzes/#{@copy_quiz.id}/edit"
+        expect(f('#quiz_options_form')).to contain_css('.mce-tinymce.mce-container.mce-panel')
+        expect(f('.bpc-lock-toggle__label')).to include_text('Locked')
+        expect(f("#due_at")).to have_attribute('readonly', 'true')
+        expect(f("#unlock_at")).to have_attribute('readonly', 'true')
+        expect(f("#lock_at")).to have_attribute('readonly', 'true')
+      end
+    end
+  end
+
+  context "in the associated course" do
+    before :once do
+      Account.default.enable_feature!(:master_courses)
+
+      qd = { question_type: "text_only_question", id: 1, question_name: 'the hardest question ever'}.with_indifferent_access
+      due_date = format_date_for_view(Time.zone.now - 1.month)
+      @copy_from = course_factory(:active_all => true)
+      @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
+      @original_quiz = @copy_from.quizzes.create!(title: "blah", description: "bloo", due_at: due_date)
+      @original_quiz.quiz_questions.create! question_data: qd
+      @tag = @template.create_content_tag_for!(@original_quiz)
+
+      course_with_teacher(:active_all => true)
+      @copy_to = @course
+      @template.add_child_course!(@copy_to)
+      @quiz_copy = @copy_to.quizzes.new(title: "blah", description: "bloo", due_at: due_date) # just create a copy directly instead of doing a real migration
+      @quiz_copy.migration_id = @tag.migration_id
+      @quiz_copy.save!
+      @quiz_copy.quiz_questions.create! question_data: qd
+      @quiz_copy.save!
+    end
+
+    before :each do
+      user_session(@teacher)
+    end
+
+    it "should not show the cog-menu options on the index when locked" do
+      @tag.update(restrictions: {all: true})
+
+      get "/courses/#{@copy_to.id}/quizzes"
+
+      expect(f("#summary_quiz_#{@quiz_copy.id}")).to contain_css('.icon-blueprint-lock')
+
+      options_button.click
+      expect(quiz_panel).not_to contain_css('a.delete-item')
+    end
+
+    it "should show the cog-menu options on the index when not locked" do
+      get "/courses/#{@copy_to.id}/quizzes"
+
+      expect(f("#summary_quiz_#{@quiz_copy.id}")).to contain_css('.icon-blueprint')
+
+      options_button.click
+      expect(quiz_panel).to contain_css('a.delete-item')
+      expect(quiz_panel).not_to contain_css('a.delete-item.disabled')
+    end
+
+    it "should not show the edit/delete options on the show page when locked" do
+      @tag.update(restrictions: {all: true})
+
+      get "/courses/#{@copy_to.id}/quizzes/#{@quiz_copy.id}"
+
+      expect(f('#content')).to contain_css('.quiz-edit-button')
+      options_button.click
+      expect(options_panel).not_to contain_css('.delete_quiz_link')
+    end
+
+    it "should show the edit/delete cog-menu options on the show when not locked" do
+      get "/courses/#{@copy_to.id}/quizzes/#{@quiz_copy.id}"
+
+      options_button.click
+      expect(options_panel).to contain_css('.delete_quiz_link')
+    end
+
+    it "should not allow editing of restricted items" do
+      @tag.update(restrictions: {content: true, points: true, due_dates: true, availability_dates: true})
+
+      get "/courses/#{@copy_to.id}/quizzes/#{@quiz_copy.id}/edit"
+
+      expect(f('#quiz_edit_wrapper #quiz_title').tag_name).to eq "h1"
+      expect(f('#quiz_edit_wrapper #quiz_description').tag_name).to eq "div"
+      expect(f('#quiz_edit_wrapper #due_at').attribute('readonly')).to eq "true"
+    end
+
+    it "should prevent editing questions if content is locked" do
+      @tag.update(restrictions: {content: true, points: true, due_dates: true, availability_dates: true})
+
+      get "/courses/#{@copy_to.id}/quizzes/#{@quiz_copy.id}/edit"
+
+      # open the questions tab
+      hover_and_click('#quiz_tabs_tab_list li[aria-controls="questions_tab"]')
+      expect(f('#quiz_edit_wrapper #questions_tab').displayed?).to eq  true
+
+      # hover the question description and the edit/pencil link should not appear
+      hover(f('.question_text'))
+      expect(f('.question_holder')).not_to contain_css('.edit_question_link')
+    end
+
+    it "should allow editing questions if content is not locked" do
+      # this test is here mostly to validate that the previous test is valid,
+      # since it's looking "not_to contain_css('.edit_question_link')", I better
+      # have a test to prove what's not supposed to be there is there when it's supposed to be
+      @tag.update(restrictions: {content: false, points: true, due_dates: true, availability_dates: true})
+
+      get "/courses/#{@copy_to.id}/quizzes/#{@quiz_copy.id}/edit"
+
+      # open the questions tab
+      hover_and_click('#quiz_tabs_tab_list li[aria-controls="questions_tab"]')
+      expect(f('#quiz_edit_wrapper #questions_tab').displayed?).to eq  true
+
+      # hover the question description and the edit/pencil link should not appear
+      hover(f('.question_text'))
+      expect(f('.question_holder')).to contain_css('.edit_question_link')
     end
   end
 end

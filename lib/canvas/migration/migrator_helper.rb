@@ -435,6 +435,19 @@ module MigratorHelper
       end
     end
 
+    if @course[:tool_profiles]
+      @overview[:tool_profiles] = []
+      @course[:tool_profiles].each do |tool_profile|
+        title = tool_profile.dig('tool_profile', 'product_instance', 'product_info', 'product_name', 'default_value')
+        next unless title
+        profile = {
+          migration_id: tool_profile['migration_id'],
+          title: title
+        }
+        @overview[:tool_profiles] << profile
+      end
+    end
+
     if @course[:learning_outcomes]
       @overview[:learning_outcomes] = []
       @course[:learning_outcomes].each do |outcome|

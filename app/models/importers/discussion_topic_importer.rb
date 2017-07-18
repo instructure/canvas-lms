@@ -106,7 +106,11 @@ module Importers
       end
 
       item.delayed_post_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options.delayed_post_at)
-      item.lock_at         = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options[:lock_at])
+      if options[:assignment]
+        options[:assignment][:lock_at] ||= options[:lock_at]
+      else
+        item.lock_at         = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options[:lock_at])
+      end
       item.todo_date       = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options[:todo_date])
       item.last_reply_at   = nil if item.new_record?
 

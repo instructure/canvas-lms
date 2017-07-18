@@ -26,14 +26,18 @@ describe MathMan do
   let(:use_for_svg) { false }
 
   before do
-    PluginSetting.create(
-      name: 'mathman',
-      settings: {
+    @original_fallback = Canvas::DynamicSettings.fallback_data
+    Canvas::DynamicSettings.fallback_data = {
+      'math-man': {
         base_url: service_url,
         use_for_mml: use_for_mml,
         use_for_svg: use_for_svg
       }
-    )
+    }
+  end
+
+  after do
+    Canvas::DynamicSettings.fallback_data = @original_fallback
   end
 
   describe '.url_for' do

@@ -40,7 +40,8 @@ class EnsureSubmissionsForDiscussions < ActiveRecord::Migration[4.2]
       LEFT JOIN #{Submission.quoted_table_name} ON
         submissions.assignment_id=assignments.id AND
         submissions.user_id=discussion_entries.user_id AND
-        submissions.submission_type='discussion_topic'").
+        submissions.submission_type='discussion_topic' AND
+        submissions.workflow_state <> 'deleted'").
         where(discussion_topics: { workflow_state: 'active' },
               submissions: { id: nil })
 

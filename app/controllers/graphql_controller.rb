@@ -1,4 +1,4 @@
-class GraphqlController < ApplicationController
+class GraphQLController < ApplicationController
   include Api::V1
 
   before_action :require_user, except: :execute
@@ -10,6 +10,7 @@ class GraphqlController < ApplicationController
     context = {
       current_user: @current_user,
       session: session,
+      request: request,
     }
     result = CanvasSchema.execute(query, variables: variables, context: context)
     render json: result

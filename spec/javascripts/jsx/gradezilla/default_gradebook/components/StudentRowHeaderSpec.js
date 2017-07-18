@@ -97,18 +97,6 @@ test('renders with student.sortable_name when selectedPrimaryInfo is "last_first
   notOk($renderOutput.find('.student-name').text().includes(unexpectedDisplayName));
 });
 
-test('renders without student name when selectedPrimaryInfo is "anonymous"', function () {
-  this.opts = generateOpts('anonymous');
-
-  const unexpectedDisplayName = this.student.sortable_name;
-  const unexpectedDisplayName2 = this.student.name;
-  const header = new StudentRowHeader(this.student, this.opts);
-  const $renderOutput = wrappedRender(header);
-
-  notOk($renderOutput.find('.student-name').text().includes(unexpectedDisplayName));
-  notOk($renderOutput.find('.student-name').text().includes(unexpectedDisplayName2));
-});
-
 test('renders with "concluded" status when student.isConcluded is true', function () {
   this.student = generateStudent({isConcluded: true});
 

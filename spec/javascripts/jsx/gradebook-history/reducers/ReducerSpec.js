@@ -17,15 +17,13 @@
  */
 
 import history from 'jsx/gradebook-history/reducers/HistoryReducer';
-import users from 'jsx/gradebook-history/reducers//UsersReducer';
+import searchForm from 'jsx/gradebook-history/reducers/SearchFormReducer';
 import { allReducers } from 'jsx/gradebook-history/reducers/Reducer';
 
 QUnit.module('Reducer');
 
 test('should combine all the reducers available', function () {
-  const expectedReducers = {
-    history, users
-  };
+  const expectedReducers = { history, searchForm };
 
   deepEqual(allReducers(), expectedReducers);
 });

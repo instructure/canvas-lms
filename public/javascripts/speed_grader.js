@@ -20,6 +20,7 @@
 import MGP from 'jsx/speed_grader/gradingPeriod'
 import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper'
 import quizzesNextSpeedGrading from 'jsx/grading/quizzesNextSpeedGrading'
+import StatusPill from 'jsx/grading/StatusPill'
 import numberHelper from 'jsx/shared/helpers/numberHelper'
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
 import studentViewedAtTemplate from 'jst/speed_grader/student_viewed_at'
@@ -109,6 +110,7 @@ import './vendor/ui.selectmenu'
     $grade_container = $('#grade_container'),
     $grade = $grade_container.find('input, select'),
     $score = $grade_container.find('.score'),
+    $deduction_box = $('#deduction-box'),
     $average_score_wrapper = $('#average-score-wrapper'),
     $submission_details = $('#submission_details'),
     $multiple_submissions = $('#multiple_submissions'),
@@ -1453,7 +1455,7 @@ import './vendor/ui.selectmenu'
         });
 
         var defaultInfoMessage = I18n.t('turnitin.info_message',
-                                        'This file is still being processed by turnitin. Please check back later to see the score'),
+                                        'This file is still being processed by the plagiarism detection tool associated with the assignment. Please check back later to see the score.'),
             defaultErrorMessage = I18n.t('turnitin.error_message',
                                          'There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.');
         var $turnitinInfo = $(turnitinInfoTemplate({
@@ -1751,9 +1753,11 @@ import './vendor/ui.selectmenu'
                           s.show_grade_in_dropdown)) {
             grade = GradeFormatHelper.formatGrade(s.grade);
           }
+
           return {
             value: i,
             late: s.late,
+            missing: s.missing,
             selected: selectedIndex === i,
             submittedAt: $.datetimeString(s.submitted_at) || noSubmittedAt,
             grade: grade
@@ -1769,12 +1773,13 @@ import './vendor/ui.selectmenu'
         });
       }
       $multiple_submissions.html($.raw(innerHTML));
+      StatusPill.renderPills();
     },
 
     showSubmissionDetails: function(){
       //if there is a submission
       var currentSubmission = this.currentStudent.submission;
-      if (currentSubmission && currentSubmission.submitted_at) {
+      if (currentSubmission) {
         this.refreshSubmissionsToView();
         var lastIndex = currentSubmission.submission_history.length - 1;
         $("#submission_to_view option:eq(" + lastIndex + ")").attr("selected", "selected");
@@ -2421,14 +2426,37 @@ import './vendor/ui.selectmenu'
     },
 
     showGrade: function() {
-      var submission = EG.currentStudent.submission;
-      var grade = EG.getGradeToShow(submission, ENV.grading_role);
+      const submission = EG.currentStudent.submission;
+      const grade = EG.getGradeToShow(submission, ENV.grading_role);
 
-      $grade.val(grade);
+      $grade.val(grade.entered);
+
+      if (submission.points_deducted) {
+        $deduction_box.html(
+          I18n.t('*%{penalty}* **%{adjusted}**', {
+            penalty: I18n.t('Late Penalty: *%{pointsDeducted}*', {
+              pointsDeducted: grade.pointsDeducted,
+              wrapper: '<span class="bold">$1</span>'
+            }),
+
+            adjusted: I18n.t('Final Grade: *%{finalGrade}*', {
+              finalGrade: grade.adjusted,
+              wrapper: '<span class="bold">$1</span>'
+            }),
+
+            wrappers: [
+              '<span class="error">$1</span>',
+              '<span class="primary">$1</span>'
+            ]
+          })
+        ).show();
+      } else {
+        $deduction_box.hide().empty();
+      }
 
       $('#submit_same_score').hide();
-      if (typeof submission != "undefined" && submission.score !== null) {
-        $score.text(I18n.n(round(submission.score, round.DEFAULT)));
+      if (typeof submission !== 'undefined' && submission.entered_score !== null) {
+        $score.text(I18n.n(round(submission.entered_score, round.DEFAULT)));
         if (!submission.grade_matches_current_submission) {
           $('#submit_same_score').show();
         }
@@ -2517,18 +2545,35 @@ import './vendor/ui.selectmenu'
     },
 
     getGradeToShow: function(submission, grading_role) {
-      var grade = '';
+      const grade = { entered: '' };
 
       if (submission) {
         if (submission.excused) {
-          grade = 'EX';
-        } else if (submission.score != null && (grading_role === 'moderator' || grading_role === 'provisional_grader')) {
-          grade = GradeFormatHelper.formatGrade(round(submission.score, 2));
-        } else if (submission.grade != null) {
-          if (submission.grade !== '' && !isNaN(submission.grade)) {
-            grade = GradeFormatHelper.formatGrade(round(submission.grade, 2));
-          } else {
-            grade = GradeFormatHelper.formatGrade(submission.grade);
+          grade.entered = 'EX';
+        } else {
+          if (submission.points_deducted !== '' && !isNaN(submission.points_deducted)) {
+            grade.pointsDeducted = I18n.n(-submission.points_deducted);
+          }
+
+          let enteredScore = submission.entered_score;
+          let enteredGrade = submission.entered_grade;
+
+          if (submission.provisional_grade_id) {
+            enteredScore = submission.score;
+            enteredGrade = submission.grade;
+          }
+
+          if (enteredScore != null && (['moderator', 'provisional_grader'].includes(grading_role))) {
+            grade.entered = GradeFormatHelper.formatGrade(round(enteredScore, 2));
+            grade.adjusted = GradeFormatHelper.formatGrade(round(submission.score, 2));
+          } else if (submission.entered_grade != null) {
+            if (enteredGrade !== '' && !isNaN(enteredGrade)) {
+              grade.entered = GradeFormatHelper.formatGrade(round(enteredGrade, 2));
+              grade.adjusted = GradeFormatHelper.formatGrade(round(submission.grade, 2));
+            } else {
+              grade.entered = GradeFormatHelper.formatGrade(enteredGrade);
+              grade.adjusted = GradeFormatHelper.formatGrade(submission.grade);
+            }
           }
         }
       }

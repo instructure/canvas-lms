@@ -186,10 +186,6 @@ module Lti
           expect(tcp_creator.create.capability_offered).to include 'Membership.role'
         end
 
-        it 'does not add the OriginalityReport capability if developer_key is false' do
-          expect(tcp_creator.create.capability_offered).not_to include 'vnd.Canvas.OriginalityReport.url'
-        end
-
         it 'does not add the Canvas.placements.similarityDetection if developer key is false' do
           expect(tcp_creator.create.capability_offered).not_to include 'Canvas.placements.similarityDetection'
         end
@@ -213,6 +209,19 @@ module Lti
             profile = security_profiles.find{|p| p.security_profile_name == 'oauth2_access_token_ws_security'}
             expect(profile.digest_algorithms).to match_array ['HS256']
           end
+
+          it 'adds the lti_jwt_ws_security' do
+            security_profiles = tcp_creator.create.security_profiles
+            profile = security_profiles.find{|p| p.security_profile_name == 'lti_jwt_ws_security'}
+            expect(profile.digest_algorithms).to match_array ['HS256']
+          end
+
+          it 'adds the lti_jwt_message_security' do
+            security_profiles = tcp_creator.create.security_profiles
+            profile = security_profiles.find{|p| p.security_profile_name == 'lti_jwt_message_security'}
+            expect(profile.digest_algorithms).to match_array ['HS256']
+          end
+
         end
 
 

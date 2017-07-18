@@ -147,10 +147,6 @@ If the user doesn't accept the request for access, or if another error
 occurs, Canvas redirects back to your request\_uri with an `error`
 parameter, rather than a `code` parameter, in the query string.
 
-If the user doesn't accept the request for access, or if another error
-occurs, Canvas will add an `error`
-parameter, rather than a `code` parameter, to the query string.
-
 <div class="method_details">
 <h3 class="endpoint">http://www.example.com/oauth2response?error=access_denied</h3>
 </div>

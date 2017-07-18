@@ -214,10 +214,10 @@ describe LatePolicy do
       @late_policy.save!
     end
 
-    it 'does not kick off a late policy applicator if missing_submission_deduction_enabled changes' do
+    it 'kicks off a late policy applicator if missing_submission_deduction_enabled changes' do
       @late_policy.missing_submission_deduction_enabled = !@late_policy.missing_submission_deduction_enabled
 
-      expect(LatePolicyApplicator).not_to receive(:for_course)
+      expect(LatePolicyApplicator).to receive(:for_course).with(@course)
 
       @late_policy.save!
     end

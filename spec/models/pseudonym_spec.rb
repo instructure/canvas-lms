@@ -414,21 +414,13 @@ describe Pseudonym do
       it 'returns false if the sis_user_id is already taken' do
         new_pseudonym = Pseudonym.new(:account => @pseudonym.account)
         new_pseudonym.sis_user_id = sis_user_id
-        if CANVAS_RAILS4_2
-          expect(new_pseudonym.verify_unique_sis_user_id).to eq false
-        else
-          expect { new_pseudonym.verify_unique_sis_user_id }.to throw_symbol(:abort)
-        end
+        expect { new_pseudonym.verify_unique_sis_user_id }.to throw_symbol(:abort)
       end
 
       it 'also can validate if the new sis_user_id is an integer' do
         new_pseudonym = Pseudonym.new(:account => @pseudonym.account)
         new_pseudonym.sis_user_id = sis_user_id.to_i
-        if CANVAS_RAILS4_2
-          expect(new_pseudonym.verify_unique_sis_user_id).to eq false
-        else
-          expect { new_pseudonym.verify_unique_sis_user_id }.to throw_symbol(:abort)
-        end
+        expect { new_pseudonym.verify_unique_sis_user_id }.to throw_symbol(:abort)
       end
 
     end

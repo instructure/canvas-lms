@@ -34,6 +34,7 @@ class AddUngradedCountToAssignments < ActiveRecord::Migration[4.2]
             OR s.workflow_state = 'pending_review'
           )
           AND s.submission_type IS NOT NULL
+          AND s.workflow_state <> 'deleted'
       ), 0)
       SQL
   end

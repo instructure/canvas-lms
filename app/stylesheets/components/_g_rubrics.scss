@@ -66,17 +66,17 @@
     page-break-inside: avoid;
   }
   thead th {
-    background-color: #ccc;
+    background-color: $ic-color-medium-light;
   }
   td, th {
-    border: 1px solid #aaa;
+    border: 1px solid $ic-border-color;
     padding: 2px 5px;
   }
   .rubric_title {
-    background-color: #ccc;
-    border-top: 1px solid #aaa;
-    border-left: 1px solid #aaa;
-    border-right: 1px solid #aaa;
+    background-color: $ic-color-medium-light;
+    border-top: 1px solid $ic-border-color;
+    border-left: 1px solid $ic-border-color;
+    border-right: 1px solid $ic-border-color;
     padding: 5px;
     margin-right: 1px;
     font-weight: bold;

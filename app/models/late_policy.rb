@@ -48,8 +48,7 @@ class LatePolicy < ActiveRecord::Base
   end
 
   def points_for_missing(points_possible, grading_type)
-    return 0 if grading_type == 'pass_fail'
-    points_possible.to_f * (100 - missing_submission_deduction.to_f) / 100
+    points_possible.to_f - missing_points_deducted(points_possible, grading_type)
   end
 
   private
@@ -69,7 +68,8 @@ class LatePolicy < ActiveRecord::Base
         'late_submission_deduction',
         'late_submission_interval',
         'late_submission_minimum_percent_enabled',
-        'late_submission_minimum_percent'
+        'late_submission_minimum_percent',
+        'missing_submission_deduction_enabled'
       ] & changed
     ).present?
   end

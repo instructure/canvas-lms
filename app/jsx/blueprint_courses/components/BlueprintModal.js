@@ -48,6 +48,16 @@ export default class BlueprintModal extends Component {
     wide: false,
   }
 
+  componentDidMount () {
+    this.fixBodyScroll(this.props.isOpen)
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.isOpen !== this.props.isOpen) {
+      this.fixBodyScroll(nextProps.isOpen)
+    }
+  }
+
   componentDidUpdate (prevProps) {
     // if just started saving, then the save button was just clicked
     // and it is about to disappear, so focus on the done button
@@ -57,6 +67,16 @@ export default class BlueprintModal extends Component {
       setTimeout(() => {
         this.doneBtn.focus()
       }, 0)
+    }
+  }
+
+  bodyOverflow = ''
+  fixBodyScroll (isOpen) {
+    if (isOpen) {
+      this.bodyOverflow = document.body.style.overflowY
+      document.body.style.overflowY = 'hidden'
+    } else {
+      document.body.style.overflowY = this.bodyOverflow
     }
   }
 

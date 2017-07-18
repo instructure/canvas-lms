@@ -39,7 +39,7 @@ class SubmissionVersion < ActiveRecord::Base
       # TODO make context extraction more efficient in bulk case
       model = if options[:ignore_errors]
         begin
-          return nil unless Submission.where(:id => version.versionable_id).exists?
+          return nil unless Submission.active.where(id: version.versionable_id).exists?
           version.model
         rescue Psych::SyntaxError
           return nil

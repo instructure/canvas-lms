@@ -72,13 +72,15 @@ class WikiPage < ActiveRecord::Base
   end
   scope :todo_date_between, -> (starting, ending) { where(todo_date: starting...ending) }
   scope :for_courses_and_groups, -> (course_ids, group_ids) do
-    joins("LEFT JOIN #{Course.quoted_table_name} on wiki_pages.wiki_id = courses.wiki_id
-           LEFT JOIN #{Group.quoted_table_name} on wiki_pages.wiki_id = groups.wiki_id").
-      where("courses.id IN (?) OR groups.id IN (?)", course_ids, group_ids)
+    wiki_ids = []
+    wiki_ids += Course.where(:id => course_ids).pluck(:wiki_id) if course_ids.any?
+    wiki_ids += Group.where(:id => group_ids).pluck(:wiki_id) if group_ids.any?
+    where(:wiki_id => wiki_ids)
   end
+
   scope :visible_to_user, -> (user_id) do
-    joins("LEFT JOIN #{AssignmentStudentVisibility.quoted_table_name} as asv on wiki_pages.assignment_id = asv.assignment_id").
-      where("wiki_pages.assignment_id IS NULL OR asv.user_id = ?", user_id)
+    joins(sanitize_sql(["LEFT JOIN #{AssignmentStudentVisibility.quoted_table_name} as asv on wiki_pages.assignment_id = asv.assignment_id AND asv.user_id = ?", user_id])).
+      where("wiki_pages.assignment_id IS NULL OR asv IS NOT NULL")
   end
 
   TITLE_LENGTH = 255
@@ -354,7 +356,7 @@ class WikiPage < ActiveRecord::Base
 
   def context(user=nil)
     shard.activate do
-      @context ||= Course.where(wiki_id: self.wiki_id).first || Group.where(wiki_id: self.wiki_id).first
+      @context ||= association(:wiki).loaded? ? wiki.context : (Course.where(wiki_id: self.wiki_id).first || Group.where(wiki_id: self.wiki_id).first)
     end
   end
 

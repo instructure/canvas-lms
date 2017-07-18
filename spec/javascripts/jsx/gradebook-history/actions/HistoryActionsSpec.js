@@ -16,36 +16,40 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  FETCH_HISTORY_STARTED,
+import HistoryActions from 'jsx/gradebook-history/actions/HistoryActions';
+import Fixtures from 'spec/jsx/gradebook-history/Fixtures';
+
+const {
+  FETCH_HISTORY_START,
   FETCH_HISTORY_SUCCESS,
-  FETCH_HISTORY_FAILURE,
-  fetchHistoryStarted,
-  fetchHistorySuccess,
-  fetchHistoryFailure
-} from 'jsx/gradebook-history/actions/HistoryActions';
+  FETCH_HISTORY_FAILURE
+} = HistoryActions;
 
 QUnit.module('HistoryActions');
 
-test('fetchHistoryStarted creates an action with type FETCH_HISTORY_STARTED', function () {
+test('fetchHistoryStarted creates an action with type FETCH_HISTORY_START', function () {
   const expectedValue = {
-    type: FETCH_HISTORY_STARTED
+    type: FETCH_HISTORY_START
   };
-  deepEqual(fetchHistoryStarted(), expectedValue);
+  deepEqual(HistoryActions.fetchHistoryStarted(), expectedValue);
 });
 
-test('fetchHistorySuccess creates an action with type FETCH_HISTORY_SUCCESS and data', function () {
-  const data = { 1: 'some data' };
+test('fetchHistorySuccess creates an action with type FETCH_HISTORY_SUCCESS and payload', function () {
+  const response = Fixtures.response();
   const expectedValue = {
     type: FETCH_HISTORY_SUCCESS,
-    payload: data
+    payload: {
+      events: response.data.events,
+      users: response.data.linked.users,
+      link: response.headers.link
+    }
   };
-  deepEqual(fetchHistorySuccess(data), expectedValue);
+  deepEqual(HistoryActions.fetchHistorySuccess(response.data, response.headers), expectedValue);
 });
 
 test('fetchHistoryFailure creates an action with type FETCH_HISTORY_FAILURE', function () {
   const expectedValue = {
     type: FETCH_HISTORY_FAILURE
   };
-  deepEqual(fetchHistoryFailure(), expectedValue);
+  deepEqual(HistoryActions.fetchHistoryFailure(), expectedValue);
 });

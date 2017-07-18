@@ -45,7 +45,6 @@ class LatePolicyApplicator
     end
 
     @relevant_submissions = {}
-    @relevant_student_ids = {}
   end
 
   def process
@@ -76,28 +75,34 @@ class LatePolicyApplicator
   end
 
   def relevant_submissions(assignment)
-    @relevant_submissions[assignment.id] ||= assignment.submissions.late.
-      where.not(score: nil).
-      union(assignment.submissions.missing).
-      where(user_id: relevant_student_ids(assignment))
-  end
+    @relevant_submissions[assignment.id] ||= begin
+      if @course.late_policy.late_submission_deduction_enabled
+        query = late_submissions_for(assignment).union(no_longer_late_submissions_for(assignment))
+        if @course.late_policy.missing_submission_deduction_enabled
+          query = query.union(missing_submissions_for(assignment))
+        end
+      else
+        query = missing_submissions_for(assignment)
+      end
 
-  def needs_processing?
-    @course.late_policy.present? && @assignments.present?
-  end
-
-  def relevant_student_ids(assignment)
-    @relevant_student_ids[assignment.id] ||= relevant_due_dates(assignment).
-      reduce([]) do |memo, (student_id, submission)|
-      memo << student_id unless submission[:in_closed_grading_period]
+      query.left_joins(:grading_period).merge(GradingPeriod.open)
     end
   end
 
-  def relevant_due_dates(assignment)
-    effective_due_dates.find_effective_due_dates_for_assignment(assignment.id)
+  def late_submissions_for(assignment)
+    assignment.submissions.late.where.not(score: nil)
   end
 
-  def effective_due_dates
-    @effective_due_dates ||= EffectiveDueDates.new(@course, @assignments)
+  def no_longer_late_submissions_for(assignment)
+    assignment.submissions.not_late.where("submissions.points_deducted > 0")
+  end
+
+  def missing_submissions_for(assignment)
+    assignment.submissions.missing.where(score: nil, grade: nil)
+  end
+
+  def needs_processing?
+    (@course.late_policy&.missing_submission_deduction_enabled ||
+      @course.late_policy&.late_submission_deduction_enabled) && @assignments.present?
   end
 end

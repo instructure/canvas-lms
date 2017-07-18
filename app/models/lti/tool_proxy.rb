@@ -83,8 +83,15 @@ module Lti
       self.update_payload.present?
     end
 
+    def ims_tool_proxy
+      @_ims_tool_proxy ||= IMS::LTI::Models::ToolProxy.from_json(raw_data)
+    end
+
+    def security_profiles
+      ims_tool_proxy.tool_profile.security_profiles
+    end
+
     def enabled_capabilities
-      ims_tool_proxy = IMS::LTI::Models::ToolProxy.from_json(raw_data)
       ims_tool_proxy.enabled_capabilities
     end
 
@@ -105,6 +112,13 @@ module Lti
       return false if rh_names.sort != other_rh_names.sort
 
       true
+    end
+
+    def resource_codes
+      {
+        product_code: product_family.product_code,
+        vendor_code: product_family.vendor_code
+      }
     end
   end
 end

@@ -36,6 +36,7 @@ import actions from '../actions'
 
 export default class MigrationSync extends Component {
   static propTypes = {
+    id: PropTypes.string,
     migrationStatus: propTypes.migrationState.isRequired,
     hasCheckedMigration: PropTypes.bool.isRequired,
     isLoadingBeginMigration: PropTypes.bool.isRequired,
@@ -48,6 +49,7 @@ export default class MigrationSync extends Component {
   }
 
   static defaultProps = {
+    id: 'migration_sync',
     showProgress: true,
     willSendNotification: false,
     onClick: null
@@ -83,7 +85,7 @@ export default class MigrationSync extends Component {
       'bcs__sync-btn-icon__active': isSyncing,
     })
     return (
-      <div className="bcs__migration-sync">
+      <div id={this.props.id} className="bcs__migration-sync">
         { this.props.showProgress && isSyncing && (
           <div className="bcs__migration-sync__loading">
             <Typography as="p">{I18n.t('Processing')}</Typography>

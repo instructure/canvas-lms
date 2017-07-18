@@ -474,7 +474,7 @@ describe FilesController do
         attachment_model context: @student
         @assignment.submit_homework @student, attachments: [@attachment]
         # create an orphaned attachment_association
-        @assignment.submissions.delete_all
+        @assignment.all_submissions.delete_all
         get 'show', user_id: @student.id, id: @attachment.id, download_frd: 1
         expect(response).to be_success
       end
@@ -906,6 +906,19 @@ describe FilesController do
       expect(json['upload_url']).not_to be_nil
       expect(json['upload_params']).to be_present
       expect(json['upload_params']['x-amz-credential']).to start_with('stub_id')
+    end
+
+    it "allows specifying a content_type" do
+      # the API does, and the files page sends it based on the browser's detection
+      s3_storage!
+      user_session(@teacher)
+      post 'create_pending', {:attachment => {
+        :context_code => @course.asset_string,
+        :filename => "something.rb",
+        :content_type => "text/magical-incantation"
+      }}
+      expect(response).to be_success
+      expect(assigns[:attachment].content_type).to eq "text/magical-incantation"
     end
 
     it "should not allow going over quota for file uploads" do

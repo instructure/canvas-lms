@@ -86,7 +86,16 @@ module Lti
          Message.documentTarget
          Message.locale
          Context.id
-         vnd.Canvas.root_account.uuid)
+         CourseOffering.sourcedId
+         com.instructure.File.id
+         com.instructure.OriginalityReport.id
+         com.instructure.Submission.id
+         com.instructure.contextLabel
+         vnd.Canvas.root_account.uuid
+         vnd.Canvas.OriginalityReport.url
+         vnd.Canvas.submission.history.url
+         vnd.Canvas.submission.url
+         Context.title)
     }
     describe '#supported_capabilities' do
       it 'returns all supported capabilities asociated with launch params' do

@@ -34,6 +34,7 @@ class CrocodocSessionsController < ApplicationController
       crocodoc = attachment.crocodoc_document
       url = crocodoc.session_url(:user => @current_user,
                                  :annotations => annotations,
+                                 :enable_annotations => blob["enable_annotations"],
                                  :crocodoc_ids => blob["crocodoc_ids"])
 
       # For the purposes of reporting student viewership, we only

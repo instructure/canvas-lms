@@ -240,15 +240,3 @@ test('calls onToggleSubmissionTrayOpen with the student id and assignment id whe
     ['1101', '2301']
   );
 });
-
-test('shows an arrow pointing left if the tray is not open', function () {
-  this.wrapper = mountComponent(this.props);
-  strictEqual(this.wrapper.find('.SubmissionCell__IconExpand-right').length, 0);
-  strictEqual(this.wrapper.find('.SubmissionCell__IconExpand-left').length, 1);
-});
-
-test('shows an arrow pointing right if the tray is not open', function () {
-  this.wrapper = mountComponent(this.props, { isSubmissionTrayOpen: true });
-  strictEqual(this.wrapper.find('.SubmissionCell__IconExpand-left').length, 0);
-  strictEqual(this.wrapper.find('.SubmissionCell__IconExpand-right').length, 1);
-});

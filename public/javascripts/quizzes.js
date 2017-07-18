@@ -399,11 +399,14 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         $form.show();
         $form.find('.question_content').attr('id', 'question_content_' + quiz.questionContentCounter++);
         RichContentEditor.loadNewEditor($questionContent, {
-          tinyOptions: {
-            aria_label: I18n.t('label.question.instructions', 'Question instructions, rich text area')
+            tinyOptions: {
+              aria_label: I18n.t('label.question.instructions', 'Question instructions, rich text area')
+            }
+          },
+          ()=>{
+            quiz.rebindMultiChange(questionType, $questionContent[0].id, $select);
           }
-        });
-        quiz.rebindMultiChange(questionType, $questionContent[0].id, $select);
+        );
         $form.find('.text_after_answers').attr('id', 'text_after_answers_' + quiz.questionContentCounter++);
         RichContentEditor.loadNewEditor($form.find('.text_after_answers'));
         $form.hide();

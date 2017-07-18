@@ -118,6 +118,14 @@ export default class State {
     return null;
   }
 
+  getEditingNode () {
+    if (this.grid.getEditorLock().isActive()) {
+      return this.getActiveNode();
+    }
+
+    return null;
+  }
+
   getColumnHeaderNode (cell) {
     const $gridContainer = this.grid.getContainerNode();
     const $headers = $gridContainer.querySelectorAll('.slick-header-column');

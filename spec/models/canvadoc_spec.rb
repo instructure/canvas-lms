@@ -78,7 +78,7 @@ describe 'Canvadoc' do
       @doc.has_annotations = true
       canvadocs_api = @doc.send(:canvadocs_api)
       expect(canvadocs_api).to receive(:session).with(anything, hash_including(annotation_context: 'default')).and_call_original
-      @doc.session_url(user: @attachment.user)
+      @doc.session_url(user: @attachment.user, enable_annotations: true)
     end
 
     it "Creates test context for annotation session" do
@@ -91,7 +91,7 @@ describe 'Canvadoc' do
       canvadocs_api = @doc.send(:canvadocs_api)
 
       expect(canvadocs_api).to receive(:session).with(anything, hash_including(annotation_context: 'default-super-secret-testing')).and_call_original
-      @doc.session_url(user: @attachment.user)
+      @doc.session_url(user: @attachment.user, enable_annotations: true)
     end
 
     it "Session creation sends users crocodoc id" do
@@ -101,7 +101,7 @@ describe 'Canvadoc' do
       canvadocs_api = @doc.send(:canvadocs_api)
 
       expect(canvadocs_api).to receive(:session).with(anything, hash_including(user_crocodoc_id: @attachment.user.crocodoc_id)).and_call_original
-      @doc.session_url(user: @attachment.user)
+      @doc.session_url(user: @attachment.user, enable_annotations: true)
     end
   end
 

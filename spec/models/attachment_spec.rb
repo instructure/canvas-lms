@@ -457,6 +457,21 @@ describe Attachment do
       a.destroy_content
     end
 
+    it 'should allow destroy_content_and_replace when s3object is already deleted' do
+      s3_storage!
+      a = attachment_model(uploaded_data: default_uploaded_data)
+      a.s3object.delete
+      a.destroy_content_and_replace
+      expect(Purgatory.where(attachment_id: a.id).exists?).to be_truthy
+    end
+
+    it 'should not do destroy_content_and_replace twice' do
+      a = attachment_model(uploaded_data: default_uploaded_data)
+      a.destroy_content_and_replace # works
+      a.expects(:send_to_purgatory).never
+      a.destroy_content_and_replace # returns because it already happened
+    end
+
     it 'should destroy all crocodocs even from children attachments' do
       local_storage!
       configure_crocodoc
@@ -1718,15 +1733,6 @@ describe Attachment do
       course_factory
       a = attachment_model(filename: 'ENGL_100_/_ENGL_200.csv')
       expect(a.filename).to eql('ENGL_100_%2F_ENGL_200.csv')
-    end
-  end
-
-  describe "preview_params" do
-    it "includes crocodoc_ids only when a whitelist is given" do
-      course_factory :active_all => true
-      att = attachment_model
-      expect(att.send :preview_params, @teacher, 'document/msword').not_to include 'crocodoc_ids'
-      expect(att.send :preview_params, @teacher, 'document/msword', [1]).to include 'crocodoc_ids'
     end
   end
 

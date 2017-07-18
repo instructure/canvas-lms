@@ -56,7 +56,7 @@ export default class StudentContextTray extends React.Component {
             fluidWidth
             aria-label={srLabel}
           >
-            {label}
+            <span className="StudentContextTray-QuickLinks__Link-text">{label}</span>
           </Button>
         </div>
       ) : null
@@ -206,7 +206,7 @@ export default class StudentContextTray extends React.Component {
 
           <Tray
             label={I18n.t('Student Details')}
-            isDismissable={!this.state.isLoading}
+            dismissable={!this.state.isLoading}
             closeButtonLabel={I18n.t('Close')}
             closeButtonRef={this.getCloseButtonRef}
             isOpen={this.state.isOpen}

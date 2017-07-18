@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "oauth-instructure", "0.4.10"
+  spec.add_dependency "oauth"
   spec.add_dependency "nokogiri"
 
   spec.add_development_dependency "bundler", "~> 1.5"

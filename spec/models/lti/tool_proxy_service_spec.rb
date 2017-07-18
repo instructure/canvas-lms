@@ -224,7 +224,7 @@ module Lti
           tp_json['tool_profile']['resource_handler'][0]['message'][0]['enabled_capability'] = ['Canvas.placements.invalid']
           begin
             tool_proxy = tool_proxy_service.process_tool_proxy_json(json: tp_json.to_json, context: account, guid: tool_proxy_guid)
-          rescue Lti::ToolProxyService::InvalidToolProxyError => proxy_error
+          rescue Lti::Errors::InvalidToolProxyError => proxy_error
             puts proxy_error.message
           end
           expect(tool_proxy).to eq nil
@@ -236,8 +236,8 @@ module Lti
       it 'rejects tool proxies that have extra capabilities' do
         tp = IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
         tp.tool_profile.resource_handlers.first.messages.first.enabled_capability = ['extra_capability']
-        expect { tool_proxy_service.process_tool_proxy_json(json: tp.as_json, context: account, guid: tool_proxy_guid) }.to raise_error(ToolProxyService::InvalidToolProxyError, 'Invalid Capabilities') do |exception|
-          expect(JSON.parse(exception.to_json)).to eq({"invalid_capabilities"=>["extra_capability"], "error"=>"Invalid Capabilities"})
+        expect { tool_proxy_service.process_tool_proxy_json(json: tp.as_json, context: account, guid: tool_proxy_guid) }.to raise_error(Lti::Errors::InvalidToolProxyError, 'Invalid Capabilities') do |exception|
+          expect(exception.as_json).to eq({invalid_capabilities: ["extra_capability"], error: "Invalid Capabilities"})
         end
 
       end
@@ -245,24 +245,24 @@ module Lti
       it 'rejects tool proxies that have extra services' do
         tp = IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
         tp.security_contract.services.first.action = ['DELETE']
-        expect { tool_proxy_service.process_tool_proxy_json(json: tp.as_json, context: account, guid: tool_proxy_guid) }.to raise_error(ToolProxyService::InvalidToolProxyError, 'Invalid Services') do |exception|
-          expect(JSON.parse(exception.to_json)).to eq({"invalid_services"=>[{"id"=>"ToolProxy.collection", "actions"=>["DELETE"]}], "error"=>"Invalid Services"})
+        expect { tool_proxy_service.process_tool_proxy_json(json: tp.as_json, context: account, guid: tool_proxy_guid) }.to raise_error(Lti::Errors::InvalidToolProxyError, 'Invalid Services') do |exception|
+          expect(exception.as_json).to eq({invalid_services: [{id: "ToolProxy.collection", actions: ["DELETE"]}], error: "Invalid Services"})
         end
       end
 
       it 'rejects tool proxies that have extra variables' do
         tp = IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
         tp.tool_profile.resource_handlers.first.messages.first.parameter = [IMS::LTI::Models::Parameter.new(name:'extra_test', variable: 'Custom.Variable')]
-        expect { tool_proxy_service.process_tool_proxy_json(json: tp.as_json, context: account, guid: tool_proxy_guid) }.to raise_error(ToolProxyService::InvalidToolProxyError, 'Invalid Capabilities')do |exception|
-          expect(JSON.parse(exception.to_json)).to eq({"invalid_capabilities"=>["Custom.Variable"], "error"=>"Invalid Capabilities"})
+        expect { tool_proxy_service.process_tool_proxy_json(json: tp.as_json, context: account, guid: tool_proxy_guid) }.to raise_error(Lti::Errors::InvalidToolProxyError, 'Invalid Capabilities')do |exception|
+          expect(exception.as_json).to eq({invalid_capabilities: ["Custom.Variable"], error: "Invalid Capabilities"})
         end
       end
 
       it 'rejects tool proxies that are missing a shared secret' do
         tp = IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
         tp.security_contract.shared_secret = nil
-        expect { tool_proxy_service.process_tool_proxy_json(json: tp.as_json, context: account, guid: tool_proxy_guid) }.to raise_error(ToolProxyService::InvalidToolProxyError, 'Invalid SecurityContract')do |exception|
-          expect(JSON.parse(exception.to_json)).to eq({"invalid_security_contract"=>["shared_secret"], "error"=>"Invalid SecurityContract"})
+        expect { tool_proxy_service.process_tool_proxy_json(json: tp.as_json, context: account, guid: tool_proxy_guid) }.to raise_error(Lti::Errors::InvalidToolProxyError, 'Invalid SecurityContract')do |exception|
+          expect(exception.as_json).to eq({invalid_security_contract: [:shared_secret], error: "Invalid SecurityContract"})
         end
       end
 
@@ -295,24 +295,20 @@ module Lti
         tp.security_contract.shared_secret = nil
         tp.security_contract.tp_half_shared_secret = tp_half_secret
         expect { tool_proxy_service.process_tool_proxy_json(json: tp.as_json, context: account, guid: tool_proxy_guid) }
-          .to raise_error(ToolProxyService::InvalidToolProxyError, 'Invalid SecurityContract') do |exception|
-          expect(JSON.parse(exception.to_json)).to eq({
-                                                        "invalid_security_contract" => [
-                                                          "shared_secret",
-                                                          "tp_half_shared_secret"
+          .to raise_error(Lti::Errors::InvalidToolProxyError, 'Invalid SecurityContract') do |exception|
+          expect(exception.as_json).to eq({
+                                                        invalid_security_contract:  [
+                                                          :shared_secret,
+                                                          :tp_half_shared_secret
                                                         ],
-                                                        "error"=>"Invalid SecurityContract"
+                                                        error: "Invalid SecurityContract"
                                                       })
         end
       end
     end
 
     describe '#delete_subscriptions' do
-      let(:course) do
-        course_with_student_submissions(active_all: true)
-        @course
-      end
-      let(:assignment) { course.assignments.first }
+      let(:assignment) { course.assignments.create!(name: 'banana') }
       let(:assignment_two) do
         assignment_two = assignment.dup
         assignment_two.update_attributes(lti_context_id: SecureRandom.uuid)

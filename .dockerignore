@@ -5,6 +5,7 @@
 .idea
 
 build/
+!build/vendor/woff-code-latest.zip
 docker-compose/
 !docker-compose/config/*
 docker-compose.local.*.yml

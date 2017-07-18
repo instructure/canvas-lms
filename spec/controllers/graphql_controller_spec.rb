@@ -19,7 +19,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-describe GraphqlController do
+describe GraphQLController do
   before :once do
     student_in_course
   end

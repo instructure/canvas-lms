@@ -94,9 +94,11 @@ class Submission < ActiveRecord::Base
   validates_length_of :published_grade, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
   validates_as_url :url
   validates :points_deducted, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  validates :seconds_late_override, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :late_policy_status, inclusion: ['none', 'missing', 'late'], allow_nil: true
   validate :ensure_grader_can_grade
 
+  scope :active, -> { where("submissions.workflow_state <> 'deleted'") }
   scope :with_comments, -> { preload(:submission_comments) }
   scope :after, lambda { |date| where("submissions.created_at>?", date) }
   scope :before, lambda { |date| where("submissions.created_at<?", date) }
@@ -155,7 +157,7 @@ class Submission < ActiveRecord::Base
         -- Otherwise, submission does not have a late policy applied and
         late_policy_status is null and
         -- submission is past due and
-        COALESCE(accepted_at, submitted_at, CURRENT_TIMESTAMP) >= cached_due_date +
+        COALESCE(submitted_at, CURRENT_TIMESTAMP) >= cached_due_date +
           CASE submission_type WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END and
         -- submission is not submitted and
         NULLIF(submission_type, '') is null and
@@ -180,7 +182,8 @@ class Submission < ActiveRecord::Base
       late_policy_status is distinct from 'missing' and
       (
         -- submission is not past due or
-        COALESCE(accepted_at, submitted_at, CURRENT_TIMESTAMP) < cached_due_date +
+        cached_due_date is null or
+        COALESCE(submitted_at, CURRENT_TIMESTAMP) < cached_due_date +
           CASE submission_type WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END or
         -- submission is submitted or
         NULLIF(submission_type, '') is not null or
@@ -231,21 +234,25 @@ class Submission < ActiveRecord::Base
   #
   # y = A + B'CDE + BCDF
   #
-  def self.late
-    submissions_that_could_be_late = where(late_policy_status: nil).
-      where.not(submitted_at: nil).
-      where.not(cached_due_date: nil)
+  scope :late, -> do
+    left_joins(:quiz_submission).
+    where("
+      submissions.late_policy_status = 'late' OR
+      (submissions.late_policy_status IS NULL AND submissions.submitted_at >= submissions.cached_due_date +
+         CASE submissions.submission_type WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END
+         AND (submissions.quiz_submission_id IS NULL OR quiz_submissions.workflow_state = 'complete'))
+    ")
+  end
 
-    late_quizzes = submissions_that_could_be_late.
-      where(submission_type: 'online_quiz').
-      where("submissions.submitted_at - '60 seconds'::INTERVAL > submissions.cached_due_date").
-      joins(:quiz_submission).merge(Quizzes::QuizSubmission.completed)
-
-    late_non_quizzes = submissions_that_could_be_late.
-      where.not(submission_type: 'online_quiz').
-      where("submissions.submitted_at > submissions.cached_due_date")
-
-    where(late_policy_status: 'late').union(late_quizzes.union(late_non_quizzes))
+  scope :not_late, -> do
+    left_joins(:quiz_submission).
+    where("
+      submissions.late_policy_status is distinct from 'late' AND
+      (submissions.submitted_at IS NULL OR submissions.cached_due_date IS NULL OR
+        submissions.submitted_at < submissions.cached_due_date +
+          CASE submissions.submission_type WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END
+        OR quiz_submissions.workflow_state <> 'complete')
+    ")
   end
 
   workflow do
@@ -255,6 +262,7 @@ class Submission < ActiveRecord::Base
     state :unsubmitted
     state :pending_review
     state :graded
+    state :deleted
   end
 
   # see #needs_grading?
@@ -1169,11 +1177,8 @@ class Submission < ActiveRecord::Base
   def submit_attachments_to_canvadocs
     if attachment_ids_changed? && submission_type != 'discussion_topic'
       attachments.preload(:crocodoc_document, :canvadoc).each do |a|
-        # moderated grading annotations are only supported in crocodoc right now
-        dont_submit_to_canvadocs = assignment.moderated_grading?
-
         # associate previewable-document and submission for permission checks
-        if a.canvadocable? && Canvadocs.annotations_supported? && !dont_submit_to_canvadocs
+        if a.canvadocable? && Canvadocs.annotations_supported?
           submit_to_canvadocs = true
           a.create_canvadoc! unless a.canvadoc
           a.shard.activate do
@@ -1189,14 +1194,9 @@ class Submission < ActiveRecord::Base
 
         if submit_to_canvadocs
           opts = {
-            preferred_plugins: [Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC],
-            wants_annotation: true,
-            force_crocodoc: dont_submit_to_canvadocs
+            preferred_plugins: [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC],
+            wants_annotation: true
           }
-
-          if context.account.feature_enabled?(:new_annotations)
-            opts[:preferred_plugins].unshift Canvadocs::RENDER_PDFJS
-          end
 
           if context.root_account.settings[:canvadocs_prefer_office_online]
             # Office 365 should take priority over pdfjs
@@ -1218,7 +1218,7 @@ class Submission < ActiveRecord::Base
       self.context_code = assignment.context_code
     end
 
-    self.accepted_at = nil unless late_policy_status == 'late'
+    self.seconds_late_override = nil unless late_policy_status == 'late'
     self.submitted_at ||= Time.now if self.has_submission?
     self.quiz_submission.reload if self.quiz_submission_id
     self.workflow_state = 'submitted' if self.unsubmitted? && self.submitted_at
@@ -1304,6 +1304,7 @@ class Submission < ActiveRecord::Base
         end
       end
       res = self.versions.to_a[0,1].map(&:model) if res.empty?
+      res = [self] if res.empty?
       res.sort_by{ |s| s.submitted_at || CanvasSort::First }
     end
   end
@@ -1327,7 +1328,7 @@ class Submission < ActiveRecord::Base
 
   # apply_late_policy is called directly by bulk update processes, or indirectly by before_save on a Submission
   def apply_late_policy(late_policy=nil, points_possible=nil, grading_type=nil)
-    return if points_deducted_changed?
+    return if points_deducted_changed? || grading_period&.closed?
     late_policy ||= assignment.course.late_policy
     points_possible ||= assignment.points_possible
     grading_type ||= assignment.grading_type
@@ -1343,7 +1344,7 @@ class Submission < ActiveRecord::Base
   private :score_missing
 
   def score_late_or_none(late_policy, points_possible)
-    raw_score = score_changed? ? score : originally_entered_score
+    raw_score = score_changed? ? score : entered_score
     deducted = late_points_deducted(raw_score, late_policy, points_possible)
     new_score = raw_score - deducted
     self.points_deducted = deducted
@@ -1351,20 +1352,24 @@ class Submission < ActiveRecord::Base
   end
   private :score_late_or_none
 
-  def originally_entered_score
-    score + (points_deducted || 0)
+  def entered_score
+    score + (points_deducted || 0) if score
   end
-  private :originally_entered_score
+
+  def entered_grade
+    return grade if grading_type == 'pass_fail'
+    assignment.score_to_grade(entered_score) if entered_score
+  end
 
   def late_points_deducted(raw_score, late_policy, points_possible)
     return 0 unless late_policy && points_possible && late?
-    late_policy.points_deducted(score: raw_score, possible: points_possible, late_for: duration_late)
+    late_policy.points_deducted(score: raw_score, possible: points_possible, late_for: seconds_late)
   end
   private :late_points_deducted
 
   def late_policy_relevant_changes?
-    # can treat change of late_policy_status 'none' <--> 'missing' as irrelevant if needed for performance
-    changes.slice(:score, :submitted_at, :accepted_at, :late_policy_status, :cached_due_date).any?
+    return false unless grade_matches_current_submission
+    changes.slice(:score, :submitted_at, :seconds_late_override, :late_policy_status).any?
   end
   private :late_policy_relevant_changes?
 
@@ -1403,9 +1408,7 @@ class Submission < ActiveRecord::Base
 
     student_id = user_id || self.user.try(:id)
 
-    # TODO: replace this check with `grading_period&.closed?` once
-    # the populate_grading_period_for_submissions data fixup finishes
-    if assignment.in_closed_grading_period_for_student?(student_id)
+    if grading_period&.closed?
       :assignment_in_closed_grading_period
     else
       :success
@@ -1433,9 +1436,7 @@ class Submission < ActiveRecord::Base
 
     student_id = self.user_id || self.user.try(:id)
 
-    # TODO: replace this check with `grading_period&.closed?` once
-    # the populate_grading_period_for_submissions data fixup finishes
-    if assignment.in_closed_grading_period_for_student?(student_id)
+    if grading_period&.closed?
       :assignment_in_closed_grading_period
     else
       :success
@@ -1685,7 +1686,7 @@ class Submission < ActiveRecord::Base
   scope :having_submission, -> { where("submissions.submission_type IS NOT NULL") }
   scope :without_submission, -> { where(submission_type: nil, workflow_state: "unsubmitted") }
   scope :not_placeholder, -> {
-    where("submissions.submission_type IS NOT NULL or submissions.excused or submissions.score IS NOT NULL or submissions.workflow_state = 'graded'")
+    active.where("submissions.submission_type IS NOT NULL or submissions.excused or submissions.score IS NOT NULL or submissions.workflow_state = 'graded'")
   }
 
   scope :include_user, -> { preload(:user) }
@@ -1696,37 +1697,6 @@ class Submission < ActiveRecord::Base
   scope :speed_grader_includes, -> { preload(:versions, :submission_comments, :attachments, :rubric_assessment) }
   scope :for_user, lambda { |user| where(:user_id => user) }
   scope :needing_screenshot, -> { where("submissions.submission_type='online_url' AND submissions.attachment_id IS NULL AND submissions.process_attempts<3").order(:updated_at) }
-  scope :read_for, lambda { |user = nil|
-    return all unless user
-    eager_load(:content_participations, :assignment, :submission_comments).
-    where("CASE WHEN content_participations IS NULL THEN
-            (submission_comments IS NULL
-            OR (submission_comments.draft IS NOT TRUE
-              AND submission_comments.provisional_grade_id IS NULL
-              AND submission_comments.hidden = 'f'
-              AND submission_comments.author_id = :user))
-          ELSE (content_participations.user_id = :user
-            AND content_participations.workflow_state = 'read')
-           END
-          OR (assignments.workflow_state = 'deleted'
-            OR assignments.muted IS TRUE OR submissions.user_id IS NULL)",
-          user: user).distinct
-  }
-  scope :unread_for, lambda { |user = nil|
-    eager_load(:content_participations, :assignment, :submission_comments).
-    where("CASE WHEN content_participations IS NULL THEN
-            ((submission_comments.draft IS NOT TRUE
-              AND submission_comments.provisional_grade_id IS NULL
-              AND submission_comments.hidden = 'f'
-              AND submission_comments.author_id <> :user)
-            OR submissions.grade IS NOT NULL OR submissions.score IS NOT NULL)
-          ELSE (content_participations.user_id = :user
-              AND content_participations.workflow_state = 'unread')
-           END
-          AND (assignments.workflow_state <> 'deleted'
-            AND assignments.muted IS NOT TRUE AND submissions.user_id IS NOT NULL)",
-          user: user).distinct
-  }
 
   def assignment_visible_to_user?(user, opts={})
     return visible_to_user unless visible_to_user.nil?
@@ -2013,18 +1983,17 @@ class Submission < ActiveRecord::Base
   #  * score (Integer)
   #  * excused (Boolean)
   #  * late_policy_status (String)
-  #  * accepted_at (Time)
+  #  * seconds_late_override (Integer)
   #
   module Tardiness
     def past_due?
-      duration_late > 0
+      seconds_late > 0
     end
     alias past_due past_due?
 
     def late?
       return late_policy_status == 'late' unless late_policy_status.nil?
-
-      accepted_at.present? && past_due?
+      submitted_at.present? && past_due?
     end
     alias late late?
 
@@ -2040,20 +2009,16 @@ class Submission < ActiveRecord::Base
       excused || (!!score && workflow_state == 'graded')
     end
 
-    def duration_late
-      # the submission cannot be late if it's been marked with 'none' or 'missing'
-      return 0.0 if ['none', 'missing'].include?(late_policy_status)
-      return 0.0 if cached_due_date.nil? || time_of_submission <= cached_due_date
+    def seconds_late
+      return (seconds_late_override || 0) if late_policy_status == 'late'
+      return 0 if ['none', 'missing'].include?(late_policy_status)
+      return 0 if cached_due_date.nil? || time_of_submission <= cached_due_date
 
-      (time_of_submission - cached_due_date)
-    end
-
-    def accepted_at
-      read_attribute(:accepted_at) || submitted_at
+      (time_of_submission - cached_due_date).to_i
     end
 
     def time_of_submission
-      time = accepted_at || Time.zone.now
+      time = submitted_at || Time.zone.now
       time -= 60.seconds if submission_type == 'online_quiz'
       time
     end
@@ -2104,7 +2069,7 @@ class Submission < ActiveRecord::Base
 
   def self.json_serialization_full_parameters(additional_parameters={})
     includes = { :quiz_submission => {} }
-    methods = [ :submission_history, :attachments ]
+    methods = [ :submission_history, :attachments, :entered_score, :entered_grade ]
     methods << (additional_parameters.delete(:comments) || :submission_comments)
     excepts = additional_parameters.delete :except
 

@@ -21,7 +21,7 @@ require_dependency "lti/variable_expander"
 module Lti
   describe VariableExpander do
     let(:root_account) { Account.new(lti_guid: 'test-lti-guid') }
-    let(:account) { Account.new(root_account: root_account) }
+    let(:account) { Account.new(root_account: root_account, name:'Test Account') }
     let(:course) { Course.new(account: account, course_code: 'CS 124', sis_source_id: '1234') }
     let(:group_category) { course.group_categories.new(name: 'Category') }
     let(:group) { course.groups.new(name: 'Group', group_category: group_category) }
@@ -68,8 +68,17 @@ module Lti
       m.stubs(:view_context).returns(view_context_mock)
       m
     end
-
-    let(:variable_expander) { VariableExpander.new(root_account, account, controller, current_user: user, tool: tool) }
+    let(:attachment) { attachment_model }
+    let(:submission) { submission_model }
+    let(:resource_link_id) { SecureRandom.uuid }
+    let(:originality_report) do
+      OriginalityReport.create!(attachment: attachment,
+                                submission: submission,
+                                link_id: resource_link_id)
+    end
+    let(:attachment_association) { AttachmentAssociation.create!(context: submission, attachment: attachment) }
+    let(:tool_setting) { Lti::ToolSetting.create!(context: attachment_association, resource_link_id: resource_link_id) }
+    let(:variable_expander) { VariableExpander.new(root_account, account, controller, current_user: user, tool: tool, tool_setting: tool_setting) }
 
     it 'clears the lti_helper instance variable when you set the current_user' do
       expect(variable_expander.lti_helper).not_to be nil
@@ -128,6 +137,16 @@ module Lti
 
       it 'includes all expansion keys' do
         expect(VariableExpander.expansion_keys).to eq expected_keys
+      end
+    end
+
+    describe '#self.default_name_expansions' do
+      let(:expected_keys) do
+        VariableExpander.expansions.values.select { |v| v.default_name.present? }.map(&:name)
+      end
+
+      it 'includes all expansion keys that have default names' do
+        expect(VariableExpander.default_name_expansions).to eq expected_keys
       end
     end
 
@@ -255,6 +274,30 @@ module Lti
     end
 
     describe "#variable expansions" do
+      it 'has a substitution for Context.title' do
+        exp_hash = {test: '$Context.title'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq variable_expander.context.name
+      end
+
+      it 'has substitution for vnd.Canvas.OriginalityReport.url' do
+        exp_hash = {test: '$vnd.Canvas.OriginalityReport.url'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq 'api/lti/assignments/{assignment_id}/submissions/{submission_id}/originality_report'
+      end
+
+      it 'has substitution for vnd.Canvas.submission.url' do
+        exp_hash = {test: '$vnd.Canvas.submission.url'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq 'api/lti/assignments/{assignment_id}/submissions/{submission_id}'
+      end
+
+      it 'has substitution for vnd.Canvas.submission.history.url' do
+        exp_hash = {test: '$vnd.Canvas.submission.history.url'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq 'api/lti/assignments/{assignment_id}/submissions/{submission_id}/history'
+      end
+
       it 'has substitution for Message.documentTarget' do
         exp_hash = {test: '$Message.documentTarget'}
         variable_expander.expand_variables!(exp_hash)

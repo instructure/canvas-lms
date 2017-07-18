@@ -97,9 +97,22 @@ import './rubric_assessment' /*global rubricAssessment*/
     return I18n.n(round(value, round.DEFAULT));
   }
   function showGrade (submission) {
-    $('.grading_box').val(callIfSet(submission.grade, GradeFormatHelper.formatGrade));
-    $('.score').text(callIfSet(submission.score, roundAndFormat));
-    $('.published_score').text(callIfSet(submission.published_score, roundAndFormat));
+    $('.grading_box').val(callIfSet(submission.entered_grade, GradeFormatHelper.formatGrade));
+    $('.late_penalty').text(callIfSet(-submission.points_deducted, roundAndFormat));
+    $('.published_grade').text(callIfSet(submission.published_grade, GradeFormatHelper.formatGrade));
+    $('.grade').text(callIfSet(submission.grade, GradeFormatHelper.formatGrade));
+
+    if (submission.excused) {
+      $('.entered_grade').text(I18n.t('Excused'));
+    } else {
+      $('.entered_grade').text(callIfSet(submission.entered_grade, GradeFormatHelper.formatGrade));
+    }
+
+    if (!submission.excused && submission.points_deducted) {
+      $('.late-penalty-display').show();
+    } else {
+      $('.late-penalty-display').hide();
+    }
   }
   function makeRubricAccessible ($rubric) {
     $rubric.show()

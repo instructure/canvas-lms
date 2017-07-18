@@ -28,6 +28,18 @@ describe "Student column header options" do
   before(:once) { init_course_with_students(3) }
   before(:each) { user_session(@teacher) }
 
+  context "student name sort by" do
+
+    before(:each) do
+      Gradezilla.visit(@course)
+    end
+
+    it "sorts student column in A-Z order", priority: "1", test_id: 3253316 do
+      Gradezilla.click_student_menu_sort_by('A-Z')
+      expect(Gradezilla.fetch_student_names[0]).to eq(@course.students[0].name)
+    end
+  end
+
   context "Display as" do
     before(:each) do
       Gradezilla.visit(@course)
@@ -36,6 +48,21 @@ describe "Student column header options" do
     it "displays student names as First Last", priority: "1", test_id: 3253319 do
       Gradezilla.click_student_menu_display_as('First,Last')
       expect(Gradezilla.fetch_student_names[0]).to eq(@course.students[0].name)
+    end
+
+    it "displays student names as Last,First", priority: "2", test_id: 3253320 do
+      Gradezilla.click_student_menu_display_as('Last,First')
+
+      student_name = @course.students[0].last_name + ", " + @course.students[0].first_name
+      expect(Gradezilla.fetch_student_names[0]).to eq(student_name)
+    end
+
+    it "first,last display name persists", priority: "2", test_id: 3253322 do
+      Gradezilla.click_student_menu_display_as('Last,First')
+      Gradezilla.visit(@course)
+
+      student_name = @course.students[0].last_name + ", " + @course.students[0].first_name
+      expect(Gradezilla.fetch_student_names[0]).to eq(student_name)
     end
   end
 

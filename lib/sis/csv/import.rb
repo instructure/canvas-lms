@@ -34,9 +34,9 @@ module SIS
       #  * Course must be imported before Section
       #  * Course and Section must be imported before Xlist
       #  * Course, Section, and User must be imported before Enrollment
-      IMPORTERS = [:account, :term, :abstract_course, :course, :section, :xlist,
-                   :user, :user_observer, :enrollment, :group,
-                   :group_membership, :grade_publishing_results].freeze
+      IMPORTERS = [:change_sis_id, :account, :term, :abstract_course, :course,
+                   :section, :xlist, :user, :enrollment, :group,
+                   :group_membership, :grade_publishing_results, :user_observer].freeze
 
       def initialize(root_account, opts = {})
         opts = opts.with_indifferent_access
@@ -176,8 +176,8 @@ module SIS
           @finished = true
         end
       rescue => e
-        return @batch if @batch.workflow_state == 'aborted'
         if @batch
+          return @batch if @batch.workflow_state == 'aborted'
           message = "Importing CSV for account"\
             ": #{@root_account.id} (#{@root_account.name}) "\
             "sis_batch_id: #{@batch.id}: #{e}"

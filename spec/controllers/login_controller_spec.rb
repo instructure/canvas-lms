@@ -156,16 +156,23 @@ describe LoginController do
     end
   end
 
-  describe "#logout_confirm" do
+  describe "#logout_landing" do
     it "redirects to /login if not logged in" do
-      get 'logout_confirm'
+      get 'logout_landing'
+      expect(response).to redirect_to(login_url)
+    end
+
+    it "renders logout landing if just logged out" do
+      flash[:logged_out] = true
+      get 'logout_landing'
       expect(response).to redirect_to(login_url)
     end
 
     it "renders if you are logged in" do
       user_session(user_factory)
-      get 'logout_confirm'
+      get 'logout_landing'
       expect(response).to be_success
+      expect(response).to render_template(:logout_confirm)
     end
   end
 end

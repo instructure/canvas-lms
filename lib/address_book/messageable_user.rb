@@ -45,8 +45,12 @@ module AddressBook
       known_users
     end
 
-    def count_in_context(context)
-      @sender.count_messageable_users_in_context(context)
+    def count_in_contexts(contexts)
+      counts = {}
+      contexts.each do |context|
+        counts[context] = @sender.count_messageable_users_in_context(context)
+      end
+      counts
     end
 
     # search_messageable_users returns a paginatable collection. this just

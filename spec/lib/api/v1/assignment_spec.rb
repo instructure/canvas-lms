@@ -77,6 +77,12 @@ describe "Api::V1::Assignment" do
       expect(json['planner_override']['id']).to eq po.id
     end
 
+    it "returns nil for planner override when flag is passed and there is no override" do
+      json = api.assignment_json(assignment, user, session, {include_planner_override: true})
+      expect(json.key?('planner_override')).to be_present
+      expect(json['planner_override']).to be_nil
+    end
+
     context "for an assignment" do
       it "provides a submissions download URL" do
         json = api.assignment_json(assignment, user, session)

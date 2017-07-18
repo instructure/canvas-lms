@@ -117,6 +117,7 @@ module AccountReports
                              AND a.context_type = 'Course'
                            WHERE s.user_id = p.user_id
                              AND a.context_id = courses.id
+                             AND s.workflow_state <> 'deleted'
                            #{time_span_join})")
 
       no_subs = no_subs.where(e: {workflow_state: enrollment_states}) if enrollment_states

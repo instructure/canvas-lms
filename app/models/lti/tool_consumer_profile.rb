@@ -55,10 +55,8 @@ module Lti
       Security.splitSecret
       Context.sourcedId
     ).concat(
-      CapabilitiesHelper::SUPPORTED_CAPABILITIES
-    ).concat(
       Lti::VariableExpander.expansion_keys
-    ).uniq.freeze
+    ).freeze
 
     RESTRICTED_CAPABILITIES = [
       'Canvas.placements.similarityDetection',

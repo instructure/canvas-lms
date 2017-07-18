@@ -211,6 +211,29 @@ describe Assignment do
     end
   end
 
+  describe '#tool_settings_resource_codes' do
+    let(:expected_hash) do
+      {
+        product_code: product_family.product_code,
+        vendor_code: product_family.vendor_code,
+        resource_type_code: resource_handler.resource_type_code
+      }
+    end
+
+    let(:assignment) { Assignment.create!(name: 'assignment with tool settings', context: course) }
+
+    before do
+      allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:create_subscription) { SecureRandom.uuid }
+      allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:destroy_subscription) { {} }
+    end
+
+    it 'returns a hash of three identifying lti codes' do
+      assignment.tool_settings_tool = message_handler
+      assignment.save!
+      expect(assignment.tool_settings_resource_codes).to eq expected_hash
+    end
+  end
+
   describe '#tool_settings_tool=' do
     let(:stub_response){ double(code: 200, body: {}.to_json, parsed_response: {'Id' => 'test-id'}, ok?: true) }
     let(:subscription_helper){ class_double(Lti::AssignmentSubscriptionsHelper).as_stubbed_const }
@@ -228,45 +251,10 @@ describe Assignment do
       expect(@assignment.tool_settings_tool).to eq(tool)
     end
 
-    it "should have Lti::MessageHandler through polymorphic association" do
-      setup_assignment_with_homework
-      account = @assignment.context.account
-      product_family = Lti::ProductFamily.create(
-        vendor_code: '123',
-        product_code: 'abc',
-        vendor_name: 'acme',
-        root_account: account
-      )
-      tool_proxy = Lti::ToolProxy.create!(
-        context: account,
-        guid: SecureRandom.uuid,
-        shared_secret: 'abc',
-        product_family: product_family,
-        product_version: '1',
-        workflow_state: 'disabled',
-        raw_data: {'proxy' => 'value'},
-        lti_version: '1'
-      )
-      resource_handler = Lti::ResourceHandler.create(
-        resource_type_code: 'code',
-        name: 'resource name',
-        tool_proxy: tool_proxy
-      )
-      message_handler = Lti::MessageHandler.create(
-        message_type: 'message_type',
-        launch_path: 'https://samplelaunch/blti',
-        resource_handler: resource_handler,
-        tool_proxy: tool_proxy
-      )
-
-      @assignment.tool_settings_tool = message_handler
-      @assignment.save
-      expect(@assignment.tool_settings_tool).to eq(message_handler)
-    end
-
     it 'destroys subscriptions when they exist' do
       setup_assignment_with_homework
       expect(subscription_helper_instance).to receive(:destroy_subscription)
+      course.assignments << @assignment
       @assignment.tool_settings_tool = message_handler
       @assignment.save!
       @assignment.tool_settings_tool = nil
@@ -1294,10 +1282,16 @@ describe Assignment do
     end
 
     it "clears out stale submission information" do
+      @a.submissions.find_by(user: @user).update(
+        late_policy_status: 'late',
+        seconds_late_override: 120
+      )
       s = @a.submit_homework(@user, submission_type: "online_url",
                              url: "http://example.com")
       expect(s.submission_type).to eq "online_url"
       expect(s.url).to eq "http://example.com"
+      expect(s.late_policy_status).to be nil
+      expect(s.seconds_late_override).to be nil
 
       s2 = @a.submit_homework(@user, submission_type: "online_text_entry",
                               body: "blah blah blah blah blah blah blah")
@@ -1306,11 +1300,17 @@ describe Assignment do
       expect(s2.url).to be_nil
       expect(s2.workflow_state).to eq "submitted"
 
+      @a.submissions.find_by(user: @user).update(
+        late_policy_status: 'late',
+        seconds_late_override: 120
+      )
       # comments shouldn't clear out submission data
       s3 = @a.submit_homework(@user, comment: "BLAH BLAH")
       expect(s3.body).to eq "blah blah blah blah blah blah blah"
       expect(s3.submission_comments.first.comment).to eq "BLAH BLAH"
       expect(s3.submission_type).to eq "online_text_entry"
+      expect(s3.late_policy_status).to eq "late"
+      expect(s3.seconds_late_override).to eq 120
     end
   end
 
@@ -4193,54 +4193,30 @@ describe Assignment do
     end
   end
 
-  describe '#effective_due_dates' do
-    before(:each) do
-      @assignment = @course.assignments.new(id: 42)
-    end
-
-    it 'returns an instance of EffectiveDueDates' do
-      expected_result = mock()
-      EffectiveDueDates.expects(:for_course).with(@course, 42).returns(expected_result)
-
-      expect(@assignment.effective_due_dates).to eq(expected_result)
-    end
-
-    it 'memoizes the EffectiveDueDates object' do
-      expected_result = mock()
-      EffectiveDueDates.expects(:for_course).with(@course, 42).returns(expected_result).once
-
-      expect(@assignment.effective_due_dates).to eq(expected_result)
-      expect(@assignment.effective_due_dates).to eq(expected_result)
-    end
-  end
-
   describe '#in_closed_grading_period?' do
-    before(:each) do
-      @assignment = @course.assignments.new(id: 42)
-      @edd_double = mock()
-      @assignment.expects(:effective_due_dates).returns(@edd_double)
+    it 'returns true if any submissions are in a closed grading period' do
+      create_grading_periods_for(@course, grading_periods: [:old, :current])
+      assignment_model(course: @course, due_at: 3.months.ago)
+      expect(@assignment.in_closed_grading_period?).to be true
     end
 
-    it 'delegates to EffectiveDueDates#in_closed_grading_period?' do
-      @edd_status = mock()
-      @edd_double.expects(:in_closed_grading_period?).with(42).returns(@edd_status)
-
-      expect(@assignment.in_closed_grading_period?).to eq(@edd_status)
-    end
-  end
-
-  describe '#in_closed_grading_period_for_student?' do
-    before(:each) do
-      @assignment = @course.assignments.new(id: 42)
-      @edd_double = mock()
-      @assignment.expects(:effective_due_dates).returns(@edd_double)
+    it 'returns false if no submissions are in a closed grading period' do
+      create_grading_periods_for(@course, grading_periods: [:old, :current])
+      assignment_model(course: @course)
+      expect(@assignment.in_closed_grading_period?).to be false
     end
 
-    it 'delegates to EffectiveDueDates#in_closed_grading_period?' do
-      @edd_status = mock()
-      @edd_double.expects(:in_closed_grading_period?).with(42, 41).returns(@edd_status)
+    it 'returns false if there are no grading periods' do
+      assignment_model(course: @course, due_at: 3.months.ago)
+      expect(@assignment.in_closed_grading_period?).to be false
+    end
 
-      expect(@assignment.in_closed_grading_period_for_student?(41)).to eq(@edd_status)
+    it 'returns true if a single submission is in a closed grading period' do
+      create_grading_periods_for(@course, grading_periods: [:old, :current])
+      assignment_model(course: @course)
+      @u2 = student_in_course(active_all: true, user_name: 'another student').user
+      create_adhoc_override_for_assignment(@assignment, @u2, due_at: 3.months.ago)
+      expect(@assignment.in_closed_grading_period?).to be true
     end
   end
 

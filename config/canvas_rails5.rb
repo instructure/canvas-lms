@@ -15,12 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# You can disable the Rails 5.0 support by either defining a
-# CANVAS_RAILS5=0 env var, or create an empty RAILS4_2 file in the canvas config dir
-if !defined?(CANVAS_RAILS4_2)
-  if ENV['CANVAS_RAILS5']
-    CANVAS_RAILS4_2 = ENV['CANVAS_RAILS5'] == '0'
+# You can enable the Rails 5.1 support by either defining a
+# CANVAS_RAILS5_1=1 env var, or create an empty RAILS5_1 file in the canvas config dir
+if !defined?(CANVAS_RAILS5_0)
+  if ENV['CANVAS_RAILS5_1']
+    CANVAS_RAILS5_0 = ENV['CANVAS_RAILS5_1'] == '1'
   else
-    CANVAS_RAILS4_2 = File.exist?(File.expand_path("../RAILS4_2", __FILE__))
+    CANVAS_RAILS5_0 = !File.exist?(File.expand_path("../RAILS5_1", __FILE__))
   end
 end

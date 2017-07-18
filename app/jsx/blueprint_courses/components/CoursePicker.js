@@ -88,12 +88,6 @@ export default class CoursePicker extends React.Component {
     })
   }
 
-  onFilterDeactivate = () => {
-    if (this.state.isExpanded && !this.state.isManuallyExpanded) {
-      this.setState({ isExpanded: false })
-    }
-  }
-
   onSelectedChanged = (selected) => {
     this.props.onSelectedChanged(selected)
     this.setState({ isExpanded: true })
@@ -135,7 +129,6 @@ export default class CoursePicker extends React.Component {
           subAccounts={this.props.subAccounts}
           onChange={this.onFilterChange}
           onActivate={this.onFilterActivate}
-          onDeactivate={this.onFilterDeactivate}
         />
         <div className="bca-course-details__wrapper">
           <ToggleDetails

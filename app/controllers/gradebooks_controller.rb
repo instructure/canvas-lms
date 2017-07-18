@@ -62,7 +62,19 @@ class GradebooksController < ApplicationController
     if grading_periods?
       @grading_periods = active_grading_periods_json
       gp_id = @current_grading_period_id unless view_all_grading_periods?
-      effective_due_dates = EffectiveDueDates.new(@context).to_hash
+
+      effective_due_dates =
+        Submission.active.
+          where(user_id: @presenter.student_id, assignment_id: @context.assignments.active).
+          select(:cached_due_date, :grading_period_id, :assignment_id, :user_id).
+          each_with_object({}) do |submission, hsh|
+            hsh[submission.assignment_id] = {
+              submission.user_id => {
+                due_at: submission.cached_due_date,
+                grading_period_id: submission.grading_period_id,
+              }
+            }
+          end
     end
 
     @exclude_total = exclude_total?(@context)
@@ -72,7 +84,6 @@ class GradebooksController < ApplicationController
       @presenter.assignments
       aggregate_assignments
       @presenter.submissions
-      @presenter.submission_counts
       @presenter.assignment_stats
     end
 
@@ -118,11 +129,7 @@ class GradebooksController < ApplicationController
       @current_user.preferences[:course_grades_assignment_order] ||= {}
       @current_user.preferences[:course_grades_assignment_order][@context.id] = assignment_order
       @current_user.save!
-      if CANVAS_RAILS4_2
-        redirect_to :back
-      else
         redirect_back(fallback_location: course_grades_url(@context))
-      end
     end
   end
 
@@ -725,7 +732,7 @@ class GradebooksController < ApplicationController
       colors: gradebook_settings.fetch(:colors, {}),
       graded_late_or_missing_submissions_exist: graded_late_or_missing_submissions_exist,
       gradezilla: true,
-      new_gradebook_development_enabled: @context.root_account.feature_enabled?(:new_gradebook_development)
+      new_gradebook_development_enabled: !!ENV['GRADEBOOK_DEVELOPMENT']
     }
     env.deep_merge({ GRADEBOOK_OPTIONS: options })
   end
@@ -771,7 +778,7 @@ class GradebooksController < ApplicationController
     @page_title = t("Gradebook History")
     @body_classes << "full-width padless-content"
     js_bundle :react_gradebook_history
-    # css_bundle :react_gradebook_history
+    css_bundle :react_gradebook_history
     js_env({})
 
     render html: "", layout: true

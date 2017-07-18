@@ -42,7 +42,7 @@ describe AssignmentConfigurationToolLookup do
       expect(subscription_service).to receive(:destroy_tool_proxy_subscription).with(tool_proxy, 'test-id')
       assignment.tool_settings_tool = message_handler
       assignment.save!
-      lookup = AssignmentConfigurationToolLookup.where(assignment: assignment, tool: message_handler).first
+      lookup = assignment.assignment_configuration_tool_lookups.last
       lookup.destroy_subscription
     end
 
@@ -66,8 +66,57 @@ describe AssignmentConfigurationToolLookup do
     it 'creates subscription if the tool is LTI2' do
       assignment.tool_settings_tool = message_handler
       assignment.save!
-      lookup = AssignmentConfigurationToolLookup.where(assignment: assignment, tool: message_handler).first
+      lookup = assignment.assignment_configuration_tool_lookups.last
       expect(lookup.subscription_id).to eq(test_id)
+    end
+  end
+
+  describe '#lti_tool' do
+    it 'returns the tool associated by id if present (for backwards compatibility and future LTI 1)' do
+      lookup = assignment.assignment_configuration_tool_lookups.create!(
+        tool_id: message_handler.id,
+        tool_type: 'Lti::MessageHandler'
+      )
+      expect(lookup.lti_tool).to eq message_handler
+    end
+
+    it 'returns the message handler associated by lti codes' do
+      assignment.tool_settings_tool = message_handler
+      assignment.save!
+      lookup = assignment.assignment_configuration_tool_lookups.last
+      expect(lookup.lti_tool).to eq message_handler
+    end
+  end
+
+  describe '#resource_codes' do
+    let(:expected_hash) do
+      {
+        product_code: product_family.product_code,
+        vendor_code: product_family.vendor_code,
+        resource_type_code: resource_handler.resource_type_code
+      }
+    end
+
+    it 'returns the resource codes when the tool is not set but the codes are' do
+      lookup = AssignmentConfigurationToolLookup.create!(assignment: assignment, tool: message_handler)
+      expect(lookup.resource_codes).to eq expected_hash
+    end
+
+    it 'returns the resource codes when only the tool_id is set' do
+      lookup = AssignmentConfigurationToolLookup.create!(
+        assignment: assignment,
+        tool_type: 'Lti::MessageHandler',
+        tool_product_code: product_family.product_code,
+        tool_vendor_code: product_family.vendor_code,
+        tool_resource_type_code: resource_handler.resource_type_code
+      )
+      expect(lookup.resource_codes).to eq expected_hash
+    end
+
+    it 'returns an empty hash when the tool is not a message handler' do
+      tool = course.context_external_tools.create!(name: "a", url: "http://www.test.com", consumer_key: '12345', shared_secret: 'secret')
+      lookup = AssignmentConfigurationToolLookup.create(assignment: assignment, tool: tool)
+      expect(lookup.resource_codes).to eq({})
     end
   end
 end

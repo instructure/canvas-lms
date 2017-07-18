@@ -117,6 +117,27 @@ module Canvas
       end
     end
 
+    describe '.fallback_data =' do
+      before(:each) do
+        @original_fallback = DynamicSettings.fallback_data
+      end
+
+      after(:each) do
+        DynamicSettings.fallback_data = @original_fallback
+      end
+
+      it 'must convert the supplied hash to one with indifferent access' do
+        DynamicSettings.fallback_data = {}
+        expect(DynamicSettings.fallback_data).to be_a(ActiveSupport::HashWithIndifferentAccess)
+      end
+
+      it 'must clear the fallback data when passed nil' do
+        DynamicSettings.fallback_data = {}
+        DynamicSettings.fallback_data = nil
+        expect(DynamicSettings.fallback_data).to be_nil
+      end
+    end
+
     describe ".find" do
       describe "with consul config" do
         # we don't need to interact with a real consul for unit tests
@@ -250,6 +271,38 @@ module Canvas
       end
     end
 
+    describe '.for_prefix' do
+      before(:each) do
+        @original_fallback = DynamicSettings.fallback_data
+      end
+
+      after(:each) do
+        DynamicSettings.config = nil
+        DynamicSettings.fallback_data = @original_fallback
+      end
+
+      it 'must return a PrefixProxy when consul is configured' do
+        DynamicSettings.config = valid_config
+        proxy = DynamicSettings.for_prefix('foo')
+        expect(proxy).to be_a(DynamicSettings::PrefixProxy)
+      end
+
+      it 'must raise an error when neither consul or fallback data have been configured' do
+        DynamicSettings.config = nil
+        DynamicSettings.fallback_data = nil
+        expect { DynamicSettings.for_prefix('foo') }.to raise_error(
+          DynamicSettings::NoFallbackError,
+          /fallback_data is not set/
+        )
+      end
+
+      it 'must return a FallbackProxy when consul is not configured' do
+        DynamicSettings.fallback_data = {'foo' => {bar: 'baz'}}
+        proxy = DynamicSettings.for_prefix('foo')
+        expect(proxy).to be_a(DynamicSettings::FallbackProxy)
+      end
+    end
+
     describe ".from_cache" do
       before(:each){ DynamicSettings.config = valid_config } # just to be not nil
       after(:each){ DynamicSettings.reset_cache! }
@@ -319,16 +372,6 @@ module Canvas
         Timecop.travel(Time.zone.now + 6.minutes) do
           stub_consul_with("CHANGED VALUE")
           value = DynamicSettings.from_cache(parent_key, expires_in: 5.minutes)
-          expect(value["app-host"]).to eq("CHANGED VALUE")
-        end
-      end
-
-      it "accepts a timeout on a previously inifinity key" do
-        stub_consul_with("rce.insops.net")
-        value = DynamicSettings.from_cache(parent_key)
-        Timecop.travel(Time.zone.now + 11.minutes) do
-          stub_consul_with("CHANGED VALUE")
-          value = DynamicSettings.from_cache(parent_key, expires_in: 10.minutes)
           expect(value["app-host"]).to eq("CHANGED VALUE")
         end
       end

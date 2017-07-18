@@ -520,7 +520,7 @@ class UsersController < ApplicationController
       :expires_in => 3.minutes) do
       assignments = upcoming_events.select{ |e| e.is_a?(Assignment) }
       Shard.partition_by_shard(assignments) do |shard_assignments|
-        Submission.
+        Submission.active.
           select([:id, :assignment_id, :score, :grade, :workflow_state, :updated_at]).
           where(:assignment_id => shard_assignments, :user_id => user)
       end
@@ -902,9 +902,10 @@ class UsersController < ApplicationController
   # @argument user_id
   #   the student's ID
   #
-  # @argument include[] [String, "planner_overrides"]
+  # @argument include[] [String, "planner_overrides"|"course"]
   #   "planner_overrides":: Optionally include the assignment's associated planner override, if it exists, for the current user.
   #                         These will be returned under a +planner_override+ key
+  #   "course":: Optionally include the assignments' courses
   #
   # @returns [Assignment]
   def missing_submissions
@@ -915,7 +916,7 @@ class UsersController < ApplicationController
     Shackles.activate(:slave) do
       course_ids = user.participating_student_course_ids
       Shard.partition_by_shard(course_ids) do |shard_course_ids|
-        submissions = Submission.preload(:assignment).
+        submissions = Submission.active.preload(:assignment).
                       missing.
                       where(user_id: user.id,
                             assignments: {context_id: shard_course_ids}).
@@ -925,9 +926,18 @@ class UsersController < ApplicationController
     end
     assignments = Api.paginate(submissions, self, api_v1_user_missing_submissions_url).map(&:assignment)
 
-    planner_overrides = Array(params[:include]).include?('planner_overrides')
+    includes = Array(params[:include])
+    planner_overrides = includes.include?('planner_overrides')
+    include_course = includes.include?('course')
+    ActiveRecord::Associations::Preloader.new.preload(assignments, :context) if include_course
 
-    render json: assignments.map {|as| assignment_json(as, user, session, include_planner_override: planner_overrides) }
+    json = assignments.map do |as|
+      assmt_json = assignment_json(as, user, session, include_planner_override: planner_overrides)
+      assmt_json['course'] = course_json(as.context, user, session, [], nil) if include_course
+      assmt_json
+    end
+
+    render json: json
   end
 
   def ignore_item
@@ -1727,11 +1737,7 @@ class UsersController < ApplicationController
           session.delete(:require_terms)
           flash[:notice] = t('user_updated', 'User was successfully updated.')
           unless params[:redirect_to_previous].blank?
-            if CANVAS_RAILS4_2
-              return redirect_to :back
-            else
-              return redirect_back fallback_location: user_url(@user)
-            end
+            return redirect_back fallback_location: user_url(@user)
           end
           format.html { redirect_to user_url(@user) }
           format.json {
@@ -2259,6 +2265,7 @@ class UsersController < ApplicationController
     sis_user_id = nil
     integration_id = nil
     params[:pseudonym] ||= {}
+    params[:pseudonym][:unique_id].strip! if params[:pseudonym][:unique_id].is_a?(String)
 
     if @context.grants_right?(@current_user, session, :manage_sis)
       sis_user_id = params[:pseudonym].delete(:sis_user_id)

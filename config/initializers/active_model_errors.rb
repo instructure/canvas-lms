@@ -167,6 +167,6 @@ ActiveModel::BetterErrors.formatter = ActiveModel::BetterErrors::InstructureForm
 # response code.
 
 # make better errors compatible with Rails 5
-ActiveRecord::Base.include(ActiveModel::BetterErrors::AutosaveAssociation) unless CANVAS_RAILS4_2
+ActiveRecord::Base.include(ActiveModel::BetterErrors::AutosaveAssociation)
 ActiveModel::BetterErrors::Errors.include(Rails5Errors)
 ActiveModel::BetterErrors::ErrorCollection.include(Rails5ErrorCollection)

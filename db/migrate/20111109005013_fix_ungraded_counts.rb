@@ -27,6 +27,7 @@ class FixUngradedCounts < ActiveRecord::Migration[4.2]
         WHERE s.assignment_id = assignments.id
           AND e.course_id = assignments.context_id
           AND s.submission_type IS NOT NULL
+          AND s.workflow_state <> 'deleted'
           AND (s.score IS NULL
             OR NOT grade_matches_current_submission
             OR s.workflow_state IN ('submitted', 'pending_review')

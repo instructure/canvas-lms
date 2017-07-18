@@ -56,5 +56,21 @@ define([
     this.stub($, 'youTubeID').returns(47)
     instructure.enhanceUserContent()
     equal(elem.querySelector('.media_comment_thumbnail').alt, "")
-  }); 
+  });
+
+  test("enhance '.instructure_inline_media_comment' in questions", function () {
+    const mediaCommentThumbnailSpy = this.spy($.fn, 'mediaCommentThumbnail')
+    elem.innerHTML =
+      `<div class="user_content">
+       </div>
+       <div class="answers">
+         <a href="#" class="instructure_inline_media_comment instructure_video_link">
+           link
+         </a>
+       </div>`
+    instructure.enhanceUserContent()
+    equal(mediaCommentThumbnailSpy.thisValues[0].length, 1) // for .instructure_inline_media_comment
+    equal(mediaCommentThumbnailSpy.thisValues[1].length, 1) // for .instructure_video_link
+    $.fn.mediaCommentThumbnail.restore()
+  });
 })

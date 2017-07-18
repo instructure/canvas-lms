@@ -17,7 +17,7 @@
 %>
 
 <% if @quiz.description && !@quiz.description.empty? %>
-  <div class="description user_content teacher-version"><%= user_content(@quiz.description) %></div>
+  <div class="description user_content teacher-version"><%= public_user_content(@quiz.description) %></div>
 <% end %>
 
 <form class="form-horizontal bootstrap-form display-only" style="margin-top:18px;">

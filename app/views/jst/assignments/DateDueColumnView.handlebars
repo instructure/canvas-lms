@@ -33,8 +33,9 @@
 {{else}}
   {{#if singleSectionDueDate}}
     <strong>{{#t "due_date"}}Due{{/t}}</strong>
-    <span {{contextSensitiveDatetimeTitle singleSectionDueDate}}>
+    <span {{contextSensitiveDatetimeTitle singleSectionDueDate}} aria-hidden="true">
       {{datetimeFormatted singleSectionDueDate}}
     </span>
+    <span class="screenreader-only">{{contextSensitiveDatetimeTitle singleSectionDueDate justText=true}}</span>
   {{/if}}
 {{/if}}

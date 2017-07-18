@@ -94,7 +94,7 @@ module AvatarHelper
     )
   end
 
-  def avatar_url_for_user(user, blank_fallback=false)
+  def self.avatar_url_for_user(user, request, blank_fallback=false)
     default_avatar = User.avatar_fallback_url(
         blank_fallback ? '/images/blank.png' : User.default_avatar_fallback,
         request)
@@ -113,6 +113,10 @@ module AvatarHelper
     end
 
     url
+  end
+
+  def avatar_url_for_user(user, blank_fallback=false)
+    AvatarHelper.avatar_url_for_user(user, request, blank_fallback)
   end
 
   def blank_fallback

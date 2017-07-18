@@ -19,6 +19,7 @@
 module AttachmentHelper
   # returns a string of html attributes suitable for use with $.loadDocPreview
   def doc_preview_attributes(attachment, attrs={})
+    enable_annotations = attrs.delete(:enable_annotations)
     if attachment.crocodoc_available?
       begin
         attrs[:crocodoc_session_url] = attachment.crocodoc_url(@current_user, attrs[:crocodoc_ids])
@@ -26,7 +27,7 @@ module AttachmentHelper
         Canvas::Errors.capture_exception(:crocodoc, e)
       end
     elsif attachment.canvadocable?
-      attrs[:canvadoc_session_url] = attachment.canvadoc_url(@current_user)
+      attrs[:canvadoc_session_url] = attachment.canvadoc_url(@current_user, enable_annotations: enable_annotations)
     end
     attrs[:attachment_id] = attachment.id
     attrs[:mimetype] = attachment.mimetype
@@ -64,12 +65,18 @@ module AttachmentHelper
     elsif Attachment.local_storage?
       @headers = false if @files_domain
       send_file(attachment.full_filename, :type => attachment.content_type_with_encoding, :disposition => (inline ? 'inline' : 'attachment'), :filename => attachment.display_name)
-    elsif inline && attachment.mime_class == 'html' && attachment.size < Setting.get('max_inline_html_proxy_size', 128 * 1024).to_i
+    elsif inline && should_proxy_attachment?(attachment)
       send_file_headers!( :length=> attachment.s3object.content_length, :filename=>attachment.filename, :disposition => 'inline', :type => attachment.content_type_with_encoding)
       render body: attachment.s3object.get.body.read
     else
       redirect_to(inline ? attachment.inline_url : attachment.download_url)
     end
+  end
+
+  def should_proxy_attachment?(attachment)
+    attachment.mime_class == 'html' && attachment.size < Setting.get('max_inline_html_proxy_size', 128 * 1024).to_i ||
+      attachment.mime_class == 'flash' && attachment.size < Setting.get('max_swf_proxy_size', 1024 * 1024).to_i ||
+      attachment.content_type == 'text/css' && attachment.size < Setting.get('max_css_proxy_size', 64 * 1024).to_i
   end
 
   # checks if for the current root account there's a 'files' domain

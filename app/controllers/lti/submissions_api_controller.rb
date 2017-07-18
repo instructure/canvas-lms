@@ -147,6 +147,7 @@ module Lti
     ].freeze
 
     skip_before_action :load_user
+    before_action :activate_tool_shard!, only: :attachment
     before_action :authorized_lti2_tool
     before_action :authorized?
 
@@ -177,16 +178,24 @@ module Lti
     end
 
 
-    def attachment_url(attachment_id)
+    def attachment_url(attachment)
       account = @domain_root_account || Account.default
       host, shard = HostUrl.file_host_with_shard(account, request.host_with_port)
       res = "#{request.protocol}#{host}"
       shard.activate do
-        res + lti_submission_attachment_download_path(params[:assignment_id], params[:submission_id], attachment_id)
+        res + lti_submission_attachment_download_path(submission.assignment.global_id, submission.global_id, attachment.global_id)
       end
     end
 
     private
+
+    def activate_tool_shard!
+      tool_shard = Shard.lookup(access_token.shard_id)
+      return if tool_shard == Shard.current
+      tool_shard.activate!
+    rescue Lti::Oauth2::InvalidTokenError
+      render_unauthorized
+    end
 
     def attachment_for_submission?(attachment)
       submissions = Submission.bulk_load_versioned_attachments(submission.submission_history + [submission])
@@ -195,7 +204,7 @@ module Lti
     end
 
     def submission
-      @_submission ||= Submission.find(params[:submission_id])
+      @_submission ||= Submission.active.find(params[:submission_id])
     end
 
     def authorized?
@@ -216,7 +225,7 @@ module Lti
     def attachment_json(attachment)
       attachment_attributes = %w(id display_name filename content-type size created_at updated_at)
       attach = filtered_json(model: attachment, whitelist: attachment_attributes)
-      attach[:url] = attachment_url(attachment.id)
+      attach[:url] = attachment_url(attachment)
       attach
     end
 

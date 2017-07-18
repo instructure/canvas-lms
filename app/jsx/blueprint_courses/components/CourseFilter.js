@@ -32,7 +32,6 @@ export default class CourseFilter extends React.Component {
   static propTypes = {
     onChange: func,
     onActivate: func,
-    onDeactivate: func,
     terms: propTypes.termList.isRequired,
     subAccounts: propTypes.accountList.isRequired,
   }
@@ -40,7 +39,6 @@ export default class CourseFilter extends React.Component {
   static defaultProps = {
     onChange: () => {},
     onActivate: () => {},
-    onDeactivate: () => {},
   }
 
   constructor (props) {
@@ -90,8 +88,6 @@ export default class CourseFilter extends React.Component {
         if (isEmpty && !this.wrapper.contains(document.activeElement)) {
           this.setState({
             isActive: false,
-          }, () => {
-            this.props.onDeactivate()
           })
         }
       }

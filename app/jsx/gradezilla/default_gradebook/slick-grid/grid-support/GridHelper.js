@@ -44,6 +44,12 @@ class GridHelper {
     return this.grid.getContainerNode().lastChild;
   }
 
+  beginEdit () {
+    if (this.grid.getOptions().editable) {
+      this.grid.editActiveCell();
+    }
+  }
+
   commitCurrentEdit () {
     return this.grid.getEditorLock().commitCurrentEdit();
   }

@@ -60,7 +60,7 @@ describe "Blueprint association settings" do
     it "courses show in the 'To be Added' area", priority: "2", test_id: 3077486 do
       open_associations
       open_courses_list
-      f('.bca-table__course-row').find_element(xpath: 'td/label/span').click
+      f('.bca-table__course-row').find_element(xpath: 'td/label').click
       expect(fj("span:contains('To be Added')")).to be
       element = f('.bca-associations-table')
       element = element.find_element(css: "form[data-course-id=\"#{@minion3.id}\"]")
@@ -79,11 +79,9 @@ describe "Blueprint association settings" do
     it "course search dropdowns are populated", priority: "2", test_id: 3072438 do
       open_associations
       open_courses_list
-      select_boxes = ff('select')
+      select_boxes = ff('.bca-course-filter select')
       expect(select_boxes[0]).to include_text("Default Term")
       expect(select_boxes[1]).to include_text("sub account 0")
     end
-
-
   end
 end

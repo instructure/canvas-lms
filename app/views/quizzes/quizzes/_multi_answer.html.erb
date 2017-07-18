@@ -23,7 +23,7 @@
 <% answer_label = html_to_text(answer_text + ' ' + (hash_get(question, 'question_text') || '')) %>
 <div class="answer">
   <% if question_type.entry_type == "radio" || question_type.entry_type == "select" || question_type.entry_type == "checkbox" %>
-    <table>
+    <table style="width: 100%">
       <tr>
         <td class="answer_input">
           <% if user_answer %>
@@ -37,7 +37,7 @@
           <% end %>
         </td>
         <td class="answer_label">
-          <label for="question_<%= hash_get(question, :id) %>_answer_<%= hash_get(answer, :id) %>"><%= answer_text %></label>
+          <label style="width: 100%" for="question_<%= hash_get(question, :id) %>_answer_<%= hash_get(answer, :id) %>"><%= answer_text %></label>
         </td>
       </tr>
     </table>

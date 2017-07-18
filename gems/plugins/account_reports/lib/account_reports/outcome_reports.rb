@@ -100,7 +100,7 @@ module AccountReports
             LEFT JOIN #{LearningOutcomeResult.quoted_table_name} r ON (r.user_id=pseudonyms.user_id
               AND r.content_tag_id = ct.id)
             LEFT JOIN #{Submission.quoted_table_name} sub ON sub.assignment_id = a.id
-            AND sub.user_id = pseudonyms.user_id", parameters])).
+            AND sub.user_id = pseudonyms.user_id AND sub.workflow_state <> 'deleted'", parameters])).
               where("ct.tag_type = 'learning_outcome' AND ct.workflow_state <> 'deleted'
                 AND (r.id IS NULL OR (r.artifact_type IS NOT NULL AND r.artifact_type <> 'Submission'))")
 
@@ -209,7 +209,7 @@ module AccountReports
                LEFT OUTER JOIN #{Assignment.quoted_table_name} a ON a.id = ct.content_id
                  AND ct.content_type = 'Assignment'
                LEFT OUTER JOIN #{Submission.quoted_table_name} subs ON subs.assignment_id = a.id
-                 AND subs.user_id = u.id
+                 AND subs.user_id = u.id AND subs.workflow_state <> 'deleted'
                LEFT OUTER JOIN #{Quizzes::QuizSubmission.quoted_table_name} qs ON r.artifact_id = qs.id
                  AND r.artifact_type IN ('QuizSubmission', 'Quizzes::QuizSubmission')
                LEFT OUTER JOIN #{AssessmentQuestion.quoted_table_name} aq ON aq.id = qr.associated_asset_id

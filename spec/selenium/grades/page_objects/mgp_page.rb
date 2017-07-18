@@ -126,11 +126,11 @@ module GradingStandards
     end
 
     def period_delete_button
-      f('.GradingPeriodList .icon-trash')
+      f(".GradingPeriodList button[title='Delete New Period']")
     end
 
     def period_edit_button
-      f('.GradingPeriodList .icon-edit')
+      f(".GradingPeriodList button[title='Edit New Period']")
     end
 
     def visit(account_id)

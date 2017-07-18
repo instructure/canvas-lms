@@ -136,12 +136,12 @@ define [
         {
         handler: 'toggleColumnHeaderMenu'
         key: I18n.t 'keycodes.menu', 'm'
-        desc: I18n.t 'keyboard_menu_desc', 'Open the menu for the active column\'s assignment'
+        desc: I18n.t 'keyboard_menu_desc', 'Open menu for the active column'
         }
          # this one is just for display in the dialog, the menu will take care of itself
         {
         key: I18n.t 'keycodes.close_menu', 'esc'
-        desc: I18n.t 'keyboard_close_menu', 'Close the currently active assignment menu'
+        desc: I18n.t 'keyboard_close_menu', 'Close the currently active menu'
         }
 
         {

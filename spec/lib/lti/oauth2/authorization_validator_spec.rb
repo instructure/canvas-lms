@@ -108,13 +108,6 @@ module Lti
           expect { validator.jwt }.to raise_error(JSON::JWS::UnexpectedAlgorithm)
         end
 
-        it "raises Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt if the 'exp' is to far in the future" do
-          raw_jwt['exp'] = 5.minutes.from_now.to_i
-          Setting.set('lti.oauth2.authorize.max.expiration', 1.minute.to_i)
-          expect { auth_validator.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
-                                                       "the 'exp' must not be any further than #{60.seconds} seconds in the future"
-        end
-
         it "raises Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt if the 'exp' is in the past" do
           raw_jwt['exp'] = 5.minutes.ago.to_i
           expect { auth_validator.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt, "the JWT has expired"
@@ -248,12 +241,6 @@ module Lti
         it "accepts OAuth.splitSecret capability for backwards compatability" do
           tool_proxy.stubs(:raw_data).returns({'enabled_capability' => ['OAuth.splitSecret']})
           expect(auth_validator.tool_proxy).to eq tool_proxy
-        end
-
-        it "requires an associated developer_key on the product_family" do
-          product_family.stubs(:developer_key).returns nil
-          expect { auth_validator.tool_proxy }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
-                                                              "the Tool Proxy must be associated to a developer key"
         end
 
         it "requires an active developer_key" do

@@ -16,34 +16,35 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% assignment = grading_box 
+<%
+  assignment = grading_box
   submission ||= nil
 %>
 <% if assignment.grading_type == "points" %>
   <input
     type="text" size="3"
-    value="<%= I18n.n(submission.score) if submission %>"
+    value="<%= I18n.n(submission.entered_score) if submission %>"
     class="grading_value grading_box" id="student_grading_<%= assignment.id %>"
     style="<%= hidden unless submission %> text-align: center;"/>
 <% elsif assignment.grading_type == "percent" %>
   <span class="grading_box" id="student_grading_<%= assignment.id %>" style="<%= hidden unless submission %>">
     <input
       type="text" size="3" class="grading_value" style="text-align: center;"
-      value="<%= I18n.n(submission.grade.to_f, percentage: true) if submission %>"
+      value="<%= I18n.n(submission.entered_grade.to_f, percentage: true) if submission %>"
     />
     <span style="display: none;">%</span>
   </span>
 <% elsif assignment.grading_type == "letter_grade" %>
   <input
     type="text" size="3" class="grading_value grading_box score_value"
-    value="<%= I18n.n(submission.score) if submission %>"
+    value="<%= I18n.n(submission.entered_score) if submission %>"
     id="student_grading_<%= assignment.id %>"
     style="<%= hidden unless submission %> text-align: center;"
   />
 <% elsif assignment.grading_type == "gpa_scale" %>
   <input
     type="text" size="3" class="grading_value grading_box score_value gpa_scale_cell"
-    value="<%= I18n.n(submission.score) if submission %>"
+    value="<%= I18n.n(submission.entered_score) if submission %>"
     id="student_grading_<%= assignment.id %>"
     style="<%= hidden unless submission %> text-align: center;"/>
 <% elsif assignment.grading_type == "pass_fail"

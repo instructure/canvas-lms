@@ -64,10 +64,17 @@ describe Importers::ToolProfileImporter do
       let(:data) { get_import_data('', 'nonmatching_tool_profiles') }
       let(:migration) { double(context: course) }
 
-      it 'does nothing' do
+      it 'adds a warning to the migration about finding a different version' do
         tool_proxy # necessary to instantiate tool_proxy
+        allow(migration).to receive(:import_object?).with(any_args).and_return(true)
         expect(migration).to receive(:add_warning).with("We found a different version of \"learn abc's\" installed for your course. If this tool fails to work as intended, try reregistering or reinstalling it.")
         Importers::ToolProfileImporter.process_migration(data, migration)
+      end
+
+      it 'does nothing' do
+        tool_proxy # necessary to instantiate tool_proxy
+        allow(migration).to receive(:import_object?).with(any_args).and_return(false)
+        expect { Importers::ToolProfileImporter.process_migration(data, migration) }.not_to raise_error
       end
     end
 
@@ -79,6 +86,7 @@ describe Importers::ToolProfileImporter do
 
       it 'does nothing' do
         tool_proxy # necessary to instantiate tool_proxy
+        allow(migration).to receive(:import_object?).with(any_args).and_return(true)
         expect { Importers::ToolProfileImporter.process_migration(data, migration) }.not_to raise_error
       end
     end

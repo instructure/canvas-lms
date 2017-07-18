@@ -32,8 +32,8 @@ module AddressBook
       super
     end
 
-    def count_in_context(context)
-      @service_tap.count_in_context(context)
+    def count_in_contexts(contexts)
+      @service_tap.count_in_contexts(contexts)
       super
     end
 

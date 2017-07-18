@@ -100,6 +100,10 @@ module GradebookSetup
     set_filter_visibility(user, 'sections', true)
   end
 
+  def show_modules_filter(user)
+    set_filter_visibility(user, 'modules', true)
+  end
+
   def set_filter_visibility(user, filter, visible)
     filters = user.preferences.dig(:gradebook_settings, @course.id, :selected_view_options_filters) || []
     if visible && !filters.include?(filter)

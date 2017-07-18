@@ -65,27 +65,29 @@ describe UnzipAttachment do
         expect(@course.folders.where(full_name:'course files/adir')).to be_exists
       end
 
-      it "should be able to overwrite files in a folder on the database" do
+      it "should be able to overwrite files in a folder on the database (if their md5 differs)" do
         # Not overwriting FileInContext.attach, so we're actually attaching the files now.
-        # The identical @us.process guarantees that every file attached the second time 
-        # overwrites a file that was already there.
+        # The identical @us.process guarantees that every file attached the second time
+        # overwrites a file that was already there if it needs to.
+        Attachment.where(:id => first_attachment).update_all(:md5 => "somethingelse")
+
         unzipper.process
         @course.reload
 
         attachment_group_1 = @course.attachments.where(display_name: 'first_entry.txt').to_a
         expect(attachment_group_1.size).to eql(2)
-        expect(attachment_group_1.any?{|a| a.file_state == 'deleted' }).to eql(true)
+        expect(first_attachment.reload.file_state).to eq 'deleted'
         expect(attachment_group_1.any?{|a| a.file_state == 'available' }).to eql(true)
 
         attachment_group_2 = @course.attachments.where(display_name: 'second_entry.txt').to_a
-        expect(attachment_group_2.size).to eql(2)
-        expect(attachment_group_2.any?{|a| a.file_state == 'deleted' }).to eql(true)
-        expect(attachment_group_2.any?{|a| a.file_state == 'available' }).to eql(true)
+        expect(attachment_group_2.size).to eql(1)
+        expect(attachment_group_2.first.file_state).to eq 'available'
       end
 
       it "should update attachment items in modules when overwriting their files via zip upload" do
         context_module = @course.context_modules.create!(:name => "teh module")
         attachment_tag = context_module.add_item(:id => first_attachment.id, :type => 'attachment')
+        Attachment.where(:id => first_attachment).update_all(:md5 => "somethingelse")
 
         unzipper.process
         first_attachment.reload

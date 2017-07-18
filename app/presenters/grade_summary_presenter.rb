@@ -208,32 +208,33 @@ class GradeSummaryPresenter
     end
   end
 
-  def submission_counts
-    @submission_counts ||= @context.assignments.active
-      .except(:order)
-      .joins(:submissions)
-      .where("submissions.user_id in (?)", real_and_active_student_ids)
-      .group("assignments.id")
-      .count("submissions.id")
+  # Called by external classes that want to make sure we clear out
+  # cached data. Most likely this is only the GradeCalculator
+  def self.invalidate_cache(context)
+    Rails.cache.delete(cache_key(context, 'assignment_stats'))
   end
 
   def assignment_stats
+    # performance note: There is an overlap between
+    # Submission.not_placeholder and the submission where clause.
+    #
+    # note: because a score is needed for max/min/ave we are not filtering
+    # by assignment_student_visibilities, if a stat is added that doesn't
+    # require score then add a filter when the DA feature is on
     @stats ||= begin
-      chain = @context.assignments.active.except(:order)
-      # note: because a score is needed for max/min/ave we are not filtering
-      # by assignment_student_visibilities, if a stat is added that doesn't
-      # require score then add a filter when the DA feature is on
-      chain.joins(:submissions)
-        .where("submissions.user_id in (?)", real_and_active_student_ids)
-        .where("NOT submissions.excused OR submissions.excused IS NULL")
-        .group("assignments.id")
-        .select("assignments.id, max(score) max, min(score) min, avg(score) avg")
-        .index_by(&:id)
+      Rails.cache.fetch(GradeSummaryPresenter.cache_key(@context, 'assignment_stats')) do
+        @context.assignments.active.except(:order).
+          joins(:submissions).
+          joins("INNER JOIN #{Enrollment.quoted_table_name} enrollments ON submissions.user_id = enrollments.user_id").
+          merge(Enrollment.of_student_type.active_or_pending).
+          merge(Submission.not_placeholder).
+          where(enrollments: {course_id: @context}).
+          where("submissions.excused IS NOT TRUE").
+          group("assignments.id").
+          select("assignments.id, max(score) max, min(score) min, avg(score) avg, count(submissions.id) count").
+          index_by(&:id)
+      end
     end
-  end
-
-  def real_and_active_student_ids
-    @context.all_real_student_enrollments.active_or_pending.select(:user_id).distinct
   end
 
   def assignment_presenters
@@ -343,5 +344,11 @@ class GradeSummaryPresenter
     else
       module_position_comparison
     end
+  end
+
+  private_class_method
+
+  def self.cache_key(context, method)
+    ['grade_summary_presenter', context, method].cache_key
   end
 end

@@ -43,7 +43,7 @@ describe GradeSummaryAssignmentPresenter do
                                         @submission)
   }
 
-  context '#is_plagiarism_attachment?' do
+  describe '#is_plagiarism_attachment?' do
     it 'returns true if the attachment has an OriginalityReport' do
       OriginalityReport.create(originality_score: 0.8,
                                attachment: @attachment,
@@ -54,12 +54,12 @@ describe GradeSummaryAssignmentPresenter do
     end
   end
 
-  context '#originality_report' do
+  describe '#originality_report' do
     it 'returns true when an originality report exists' do
-      report = OriginalityReport.create(originality_score: 0.8,
-                                        attachment: @attachment,
-                                        submission: @submission,
-                                        workflow_state: 'pending')
+      OriginalityReport.create(originality_score: 0.8,
+                               attachment: @attachment,
+                               submission: @submission,
+                               workflow_state: 'pending')
       expect(presenter.originality_report?).to be_truthy
     end
 
@@ -68,7 +68,7 @@ describe GradeSummaryAssignmentPresenter do
     end
   end
 
-  context "#grade_distribution" do
+  describe "#grade_distribution" do
     context "when a summary's assignment_stats is empty" do
       before { summary.stubs(:assignment_stats).returns({}) }
 
@@ -82,7 +82,7 @@ describe GradeSummaryAssignmentPresenter do
     end
   end
 
-  context "#original_points" do
+  describe "#original_points" do
     it "returns an empty string when assignment is muted" do
       @assignment.muted = true
       expect(presenter.original_points).to eq ''
@@ -95,6 +95,61 @@ describe GradeSummaryAssignmentPresenter do
 
     it "returns the published score" do
       expect(presenter.original_points).to eq @submission.published_score
+    end
+  end
+
+  describe '#deduction_present?' do
+    it 'returns true when submission has positive points_deducted' do
+      @submission.stubs(:points_deducted).returns(10)
+      expect(presenter.deduction_present?).to eq(true)
+    end
+
+    it 'returns false when submission has zero points_deducted' do
+      @submission.stubs(:points_deducted).returns(0)
+      expect(presenter.deduction_present?).to eq(false)
+    end
+
+    it 'returns false when submission has nil points_deducted' do
+      @submission.stubs(:points_deducted).returns(nil)
+      expect(presenter.deduction_present?).to eq(false)
+    end
+
+    it 'returns false when submission is not present' do
+      presenter.stubs(:submission).returns(nil)
+      expect(presenter.deduction_present?).to eq(false)
+    end
+  end
+
+  describe '#entered_grade' do
+    it 'returns empty string when neither letter graded nor gpa scaled' do
+      @assignment.update(grading_type: 'points')
+      expect(presenter.entered_grade).to eq('')
+    end
+
+    it 'returns empty string when ungraded' do
+      @submission.update(grade: nil)
+      expect(presenter.entered_grade).to eq('')
+    end
+
+    it 'returns entered grade in parentheses' do
+      @assignment.update(grading_type: 'letter_grade')
+      @submission.update(grade: 'A', score: 12)
+
+      expect(presenter.entered_grade).to eq('(A)')
+    end
+  end
+
+  describe "#missing?" do
+    it "returns the value of the submission method" do
+      expect(@submission).to receive(:missing?).and_return('foo')
+      expect(presenter.missing?).to eq('foo')
+    end
+  end
+
+  describe "#late?" do
+    it "returns the value of the submission method" do
+      expect(@submission).to receive(:late?).and_return('foo')
+      expect(presenter.late?).to eq('foo')
     end
   end
 end

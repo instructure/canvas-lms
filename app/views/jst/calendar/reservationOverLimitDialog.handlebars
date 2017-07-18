@@ -14,6 +14,8 @@
   {{#if reschedulable}}
     {{#t "would_you_like_to_cancel_that_and_sign_up_for_this"}}Would you like to cancel that and sign up for this?{{/t}}
   {{else}}
-    {{#t "cancel_some_appointments_and_try_again"}}Please cancel one of your other reservations and try again.{{/t}}
+    {{#unless past_appointments}}
+      {{#t "cancel_some_appointments_and_try_again"}}Please cancel one of your other reservations and try again.{{/t}}
+    {{/unless}}
   {{/if}}
 </div>

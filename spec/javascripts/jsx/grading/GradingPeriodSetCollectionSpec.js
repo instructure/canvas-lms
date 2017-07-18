@@ -408,17 +408,13 @@ test('announces number of search results for screen readers', function () {
   const collection = renderComponent();
 
   return Promise.all([this.terms, this.sets]).then(() => {
-    sinon.spy($, 'screenReaderFlashMessageExclusive');
+    const flashStub = this.spy($, 'screenReaderFlashMessageExclusive');
     collection.changeSearchText('201');
-    collection.getVisibleSets();
     const message = '2 sets of grading periods found.';
-    ok($.screenReaderFlashMessageExclusive.calledWith(message));
+    deepEqual(flashStub.firstCall.args, [message, true]);
 
     collection.changeSearchText('');
-    collection.getVisibleSets();
-    ok($.screenReaderFlashMessageExclusive.calledWith('Showing all sets of grading periods.'));
-
-    $.screenReaderFlashMessageExclusive.restore();
+    deepEqual(flashStub.secondCall.args, ['Showing all sets of grading periods.', true]);
   });
 });
 

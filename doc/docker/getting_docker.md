@@ -2,23 +2,11 @@
 
 Docker has lots of info getting up and running [here](https://www.docker.com/products/docker). The info below should still get you going though.
 
-## OS X
-
-On OS X, you can opt for [dinghy](https://github.com/codekitchen/dinghy)
-or [Docker for Mac](https://docs.docker.com/docker-for-mac/).  They each have
-various strengths.  If you don't know which to choose, you should
-probably match your team.  We have engineers using both at Instructure
-so either one is fine.
-
-### Dinghy
+## Dinghy on macOS
 
 Make sure you have the following installed:
 
-* VMWare Fusion
-
-Preferred over VirtualBox for performance reasons. (although Virtualbox 5 is
-pretty close, about 90% of VMWare fusion in basic testing)
-
+* VirtualBox
 * Dinghy
 
 You'll want to walk through https://github.com/codekitchen/dinghy#install, but
@@ -26,7 +14,7 @@ when you run create, you may want to increase the system resources you give the
 VM, like so:
 
 ```
-$ dinghy create --memory=4096 --disk=50000 --cpus=4 --provider=vmware_fusion
+$ dinghy create --memory=4096 --disk=50000 --cpus=4 --provider=virtualbox
 ```
 
 Type `docker ps` in your terminal to make sure your Docker environment
@@ -34,23 +22,6 @@ is happy.
 
 Dinghy currently requires OS X Yosemite. Make sure you're using the most recent
 Dinghy release, or else you'll probably have a bad time.
-
-### Docker for Mac
-
-You can install Docker for Mac to get a very similar experience
-to the native Linux experience, but from your OS X machine.
-
-Download the [stable dmg](https://download.docker.com/mac/stable/Docker.dmg)
-from the [Docker for Mac website](https://docs.docker.com/docker-for-mac/).
-Or the [beta](https://download.docker.com/mac/beta/Docker.dmg) if you want to get cray.
-
-After installing docker for Mac, you will need
-[dory](https://github.com/FreedomBen/dory) for the reverse proxy
-portion that is provided by dinghy.  Install with:
-
-```
-gem install dory
-```
 
 ## Linux
 

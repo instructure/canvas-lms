@@ -28,6 +28,7 @@ module Services
         and_return({ "app-host" => @app_host, "secret" => Canvas::Security.base64_encode(@secret) })
       @sender = user_model
       @course = course_model
+      @course2 = course_model
     end
 
     def expect_request(url_matcher, options={})
@@ -67,8 +68,11 @@ module Services
     matcher :with_param do |param, value|
       match do |url|
         if value.is_a?(Array)
-          return false unless url =~ %r{[?&]#{param}=(\d+(%2C\d+)*)(?:&|$)}
-          actual = $1.split('%2C').map(&:to_i)
+          integers = value.first.is_a?(Integer)
+          char = integers ? '\d' : '\w'
+          return false unless url =~ %r{[?&]#{param}=(#{char}+(%2C#{char}+)*)(?:&|$)}
+          actual = $1.split('%2C')
+          actual = actual.map(&:to_i) if value.first.is_a?(Integer)
           return actual.sort == value.sort
         else
           url =~ %r{[?&]#{param}=#{value}(?:&|$)}
@@ -258,28 +262,28 @@ module Services
     describe "count_recipients" do
       before do
         @count = 5
-        @response = { 'count' => @count }
+        @response = { 'counts' => { @course.global_asset_string => @count } }
       end
 
-      it "makes request from /recipients/count in service" do
-        expect_request(%r{^#{@app_host}/recipients/count\?}, body: @response)
-        Services::AddressBook.count_recipients(sender: @sender)
+      it "makes request from /recipients/counts in service" do
+        expect_request(%r{^#{@app_host}/recipients/counts\?})
+        Services::AddressBook.count_recipients(sender: @sender, contexts: [@course])
       end
 
       it "normalizes sender same as recipients" do
-        expect_request(with_param(:for_sender, @sender.global_id), body: @response)
-        Services::AddressBook.count_recipients(sender: @sender)
+        expect_request(with_param(:for_sender, @sender.global_id))
+        Services::AddressBook.count_recipients(sender: @sender, contexts: [@course])
       end
 
-      it "normalizes context same as recipients" do
-        expect_request(with_param(:in_context, @course.global_asset_string), body: @response)
-        Services::AddressBook.count_recipients(context: @course)
+      it "normalizes contexts comma separated" do
+        expect_request(with_param(:in_contexts, [@course.global_asset_string, @course2.global_asset_string]))
+        Services::AddressBook.count_recipients(contexts: [@course, @course2])
       end
 
-      it "extracts count from response from service endpoint" do
+      it "extracts counts from response from service endpoint" do
         stub_response(anything, @response)
-        count = Services::AddressBook.count_recipients(sender: @sender, context: @course)
-        expect(count).to eql(@count)
+        counts = Services::AddressBook.count_recipients(sender: @sender, contexts: [@course])
+        expect(counts).to eql({ @course.global_asset_string => @count })
       end
     end
 
@@ -368,31 +372,31 @@ module Services
       end
     end
 
-    describe "count_in_context" do
+    describe "count_in_contexts" do
       before do
         @count = 5
-        @response = { 'count' => @count }
+        @response = { 'counts' => { @course.global_asset_string => @count } }
       end
 
-      it "makes a recipient/count request" do
-        expect_request(%r{/recipients/count\?})
-        Services::AddressBook.count_in_context(@sender, @course.asset_string)
+      it "makes a recipient/counts request" do
+        expect_request(%r{/recipients/counts\?})
+        Services::AddressBook.count_in_contexts(@sender, [@course.asset_string])
       end
 
       it "passes the sender to the count_recipients call" do
         expect_request(with_param(:for_sender, @sender.global_id))
-        Services::AddressBook.count_in_context(@sender, @course.asset_string)
+        Services::AddressBook.count_in_contexts(@sender, [@course.asset_string])
       end
 
-      it "passes the context to the count_recipients call" do
-        expect_request(with_param(:in_context, @course.global_asset_string))
-        Services::AddressBook.count_in_context(@sender, @course.asset_string)
+      it "passes the contexts to the count_recipients call" do
+        expect_request(with_param(:in_contexts, [@course.global_asset_string, @course2.global_asset_string]))
+        Services::AddressBook.count_in_contexts(@sender, [@course.asset_string, @course2.asset_string])
       end
 
-      it "returns the count from count_recipients call" do
+      it "returns the counts from count_recipients call mapped to arguments" do
         expect_request(anything, body: @response)
-        count = Services::AddressBook.count_in_context(@sender, 'course_1')
-        expect(count).to eql(@count)
+        counts = Services::AddressBook.count_in_contexts(@sender, [@course.asset_string])
+        expect(counts).to eql({ @course.asset_string => @count })
       end
     end
 

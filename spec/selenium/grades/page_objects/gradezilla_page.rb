@@ -40,7 +40,7 @@ class Gradezilla
     MENU_ITEM_SELECTOR = 'span[data-menu-item-id="%s"]'.freeze
 
     def gradebook_settings_cog
-      f('#gradebook_settings')
+      f('#gradebook-settings-button')
     end
 
     def notes_option
@@ -69,12 +69,8 @@ class Gradezilla
       fj("span[role=menuitemradio] span:contains(#{item})")
     end
 
-    def assignment_header_cell_element(title)
-      f(".slick-header-column[title=\"#{title}\"]")
-    end
-
     def assignment_header_cell_label_element(title)
-      assignment_header_cell_element(title).find('.assignment-name')
+      select_assignment_header_cell_element(title).find('.assignment-name')
     end
 
     def assignment_header_warning_icon_element
@@ -84,10 +80,6 @@ class Gradezilla
     # student header column elements
     def student_column_menu
       f("span .Gradebook__ColumnHeaderAction")
-    end
-
-    def student_header_main_menu_sort_by_element
-      fj("[role=menu][aria-labelledby*=PopoverMenu] button:contains('Sort by')")
     end
 
     def student_header_menu_main_element(menu)
@@ -108,10 +100,6 @@ class Gradezilla
 
     def student_column_cell_element(x,y)
       f("div .slick-cell.l#{x}.r#{y}.meta-cell")
-    end
-
-    def assignment_group_header_options_element(group_name)
-      fj("[title='#{group_name}'] .Gradebook__ColumnHeaderAction")
     end
 
     def total_header_options_menu_item_element(menu_item)
@@ -138,8 +126,8 @@ class Gradezilla
       fj(GRADEBOOK_MENU_SELECTOR + ':visible')
     end
 
-    def gp_menu_list
-      ff("#grading-period-to-show-menu li")
+    def grading_period_menu_item(grading_period_name)
+      fj("option:contains(\"#{grading_period_name}\")")
     end
 
     def grade_input(cell)
@@ -290,49 +278,21 @@ class Gradezilla
       fj('button:contains("Save")')
     end
 
-    def total_score_for_row(row)
-      grade_grid = f('#gradebook_grid .container_1')
-      rows = grade_grid.find_elements(:css, '.slick-row')
-      total = f('.total-cell', rows[row])
-      total.text
-    end
-
     def select_section(section=nil)
       section = section.name if section.is_a?(CourseSection)
       section ||= ''
       section_dropdown.click
-      section_menu_item = ff('option', section_dropdown).find { |opt| opt.text == section }
-      section_menu_item.click
+      # section_menu_item = ff('option', section_dropdown).find { |opt| opt.text == section }
+      # section_menu_item.click
+      filter_menu_item(section).click
       section_dropdown.click
       wait_for_ajaximations
     end
 
     def select_grading_period(grading_period_name)
       grading_period_dropdown.click
-      period = ff('option', grading_period_dropdown).find { |opt| opt.text == grading_period_name }
-      period.click
-      grading_period_dropdown.click
+      grading_period_menu_item(grading_period_name).click
       wait_for_animations
-    end
-
-    def enter_grade(grade, x_coordinate, y_coordinate)
-      cell = grading_cell(x_coordinate, y_coordinate)
-      cell.click
-      set_value(grade_input(cell), grade)
-      grade_input(cell).send_keys(:return)
-      wait_for_ajax_requests
-    end
-
-    def cell_hover(x, y)
-      hover(grading_cell(x, y))
-    end
-
-    def cell_click(x, y)
-      grading_cell(x, y).click
-    end
-
-    def cell_tooltip(x, y)
-      grading_cell(x, y).find('.gradebook-tooltip')
     end
 
     def show_notes
@@ -354,11 +314,6 @@ class Gradezilla
       driver.action.send_keys('C').perform
       driver.action.send_keys(:tab).perform
       driver.action.send_keys(:enter).perform
-    end
-
-    def cell_graded?(grade, x, y)
-      cell = f('.gradebook-cell', grading_cell(x, y))
-      cell.text == grade
     end
 
     def open_action_menu
@@ -493,6 +448,10 @@ class Gradezilla
       f("#content")
     end
 
+    def assignment_header_cell_selector(title)
+      ".slick-header-column[title=\"#{title}\"]"
+    end
+
     def grading_period_dropdown
       f('#grading-periods-filter-container select')
     end
@@ -503,6 +462,10 @@ class Gradezilla
 
     def module_dropdown
       f('#modules-filter-container select')
+    end
+
+    def filter_menu_item(menu_item_name)
+      fj("option:contains(\"#{menu_item_name}\")")
     end
 
     def gradebook_dropdown_item_click(menu_item_name)
@@ -517,12 +480,13 @@ class Gradezilla
       end
     end
 
-    def gradebook_settings_btn_select
-      gradebook_settings_button.click
+    def module_dropdown_item_click(menu_item_name)
+      module_dropdown.click
+      filter_menu_item(menu_item_name).click
     end
 
-    def ungradable_selector
-      ".cannot_edit"
+    def gradebook_settings_btn_select
+      gradebook_settings_button.click
     end
 
     # -----------------------NEW-----------------------
@@ -534,20 +498,19 @@ class Gradezilla
 
     def click_student_menu_sort_by(menu_option)
       student_column_menu.click
-      scroll_page_to_top
-      # sort by scrolls out of view and does not get selected correctly on jenkins, so..
+      hover(student_header_menu_main_element('Sort by'))
+      wait_for_ajaximations
+
       if menu_option == "A-Z"
-        ff("[role=menu][aria-labelledby*='PopoverMenu'] button")[0].click
         student_header_submenu_item_element('A–Z').click
       elsif menu_option == "Z-A"
-        ff("[role=menu][aria-labelledby*='PopoverMenu'] button")[0].click
         student_header_submenu_item_element('Z–A').click
       end
     end
 
     def click_student_menu_display_as(menu_option)
       student_column_menu.click
-      student_header_menu_main_element("Display as").click
+      hover(student_header_menu_main_element("Display as"))
 
       if menu_option == "First,Last"
         student_header_submenu_item_element('First, Last Name').click
@@ -560,7 +523,7 @@ class Gradezilla
 
     def click_student_menu_secondary_info(menu_option)
       student_column_menu.click
-      student_header_menu_main_element("Secondary info").click
+      hover(student_header_menu_main_element("Secondary info"))
 
       if menu_option == "Section"
         student_header_submenu_item_element('Section').click
@@ -590,6 +553,10 @@ class Gradezilla
     # css selectors
     def assignment_header_menu_selector(id)
       assignment_header_menu_element(id)
+    end
+
+    def assignment_header_cell_element(title)
+      f(".slick-header-column[title=\"#{title}\"]")
     end
 
     def assignment_header_menu_trigger_element(assignment_name)
@@ -638,6 +605,10 @@ class Gradezilla
       show_unpublished_assignments.click
     end
 
+    def assignment_group_header_options_element(group_name)
+      fj("[title='#{group_name}'] .Gradebook__ColumnHeaderAction")
+    end
+
     def click_assignment_header_menu(assignment_id)
       assignment_header_menu_element(assignment_id).click
     end
@@ -660,7 +631,7 @@ class Gradezilla
     end
 
     def click_assignment_popover_sort_by(sort_type)
-      assignment_header_menu_sort_by_element.click
+      hover(assignment_header_menu_sort_by_element)
       sort_by_item = ""
 
       if sort_type =~ /(low[\s\-]to[\s\-]high)/i
@@ -678,7 +649,7 @@ class Gradezilla
     end
 
     def select_assignment_header_cell_element(name)
-      assignment_header_cell_element(name)
+      f(assignment_header_cell_selector(name))
     end
 
     def select_assignment_header_cell_label_element(name)
@@ -695,7 +666,7 @@ class Gradezilla
 
     def click_assignment_group_header_options(group_name, sort_type)
       assignment_group_header_options_element(group_name).click
-      student_header_menu_main_element('Sort by').click
+      hover(student_header_menu_main_element('Sort by'))
 
       if sort_type == 'Grade - High to Low'
         student_header_submenu_item_element('Grade - High to Low').click
@@ -706,7 +677,7 @@ class Gradezilla
 
     def click_total_header_sort_by(sort_type)
       select_total_column_option
-      student_header_menu_main_element('Sort by').click
+      hover(student_header_menu_main_element('Sort by'))
 
       if sort_type == 'Grade - High to Low'
         student_header_submenu_item_element('Grade - High to Low').click

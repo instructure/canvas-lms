@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require_dependency 'canvas/dynamic_settings/cache'
+require_dependency 'canvas/dynamic_settings/fallback_proxy'
+require_dependency 'canvas/dynamic_settings/prefix_proxy'
 require 'imperium'
 
 module Canvas
@@ -22,12 +25,14 @@ module Canvas
 
     class Error < StandardError; end
     class ConsulError < Error; end
+    class NoFallbackError < Error; end
 
     CONSUL_READ_OPTIONS = %i{recurse stale}.freeze
     KV_NAMESPACE = "config/canvas".freeze
 
     class << self
-      attr_accessor :config, :cache, :environment, :fallback_data
+      attr_accessor :config, :environment
+      attr_reader :base_prefix_proxy, :fallback_data
 
       def config=(conf_hash)
         @config = conf_hash
@@ -47,9 +52,26 @@ module Canvas
 
           init_values(conf_hash.fetch("init_values", {}))
           init_values(conf_hash.fetch("init_values_without_env", {}), use_env: false)
+
+          @base_prefix_proxy = DynamicSettings::PrefixProxy.new(
+            [KV_NAMESPACE, @environment.presence].compact.join('/'),
+            kv_client: Imperium::KV.default_client
+          )
+        else
+          @environment = @base_prefix_proxy = nil
         end
       end
 
+      # Set the fallback data to use in leiu of Consul
+      #
+      # This isn't really meant for use in production, but as a convenience for
+      # development where most won't want to run a consul agent/server.
+      def fallback_data=(value)
+        @fallback_data = value&.with_indifferent_access
+      end
+
+      # This is deprecated, use for_prefix to get a client that will fetch your
+      # values for you and squawks like a hash so you don't have to change much.
       def find(key, use_env: true)
         if config.nil?
           return fallback_data.fetch(key) if fallback_data.present?
@@ -59,18 +81,39 @@ module Canvas
         end
       end
 
+      # Build an object used to interacting with consul for the given
+      # keyspace prefix.
+      #
+      # If using fallback data for values it is queried by the returned object
+      # instead of a Consul agent/server. The decision between using fallback
+      # data or consul is driven by whether or not consul is configured.
+      #
+      # @param prefix [String] The portion to extend the base prefix with
+      #   (base prefix: 'config/canvas/<environment>')
+      # @param default_ttl [ActiveSupport::Duration] How long to retain cached
+      #   values
+      def for_prefix(prefix, default_ttl: DynamicSettings::PrefixProxy::DEFAULT_TTL)
+        if @base_prefix_proxy
+          @base_prefix_proxy.for_prefix(prefix, default_ttl: default_ttl)
+        elsif @fallback_data.present?
+          DynamicSettings::FallbackProxy.new(@fallback_data[prefix])
+        else
+          raise NoFallbackError, 'DynamicSettings.fallback_data is not set and'\
+            ' consul is not configured, unable to supply configuration values.'
+        end
+      end
+
+      # This is deprecated, use for_prefix to get a client that will fetch your
+      # values for you and squawks like a hash so you don't have to change much.
+      #
       # settings found this way with nil expiry will be cached in the process
       # the first time they're asked for, and then can only be cleared with a SIGHUP
       # or restart of the process.  Make sure that's the behavior you want before
       # you use this method, or specify a timeout
       def from_cache(key, expires_in: nil, use_env: true)
-        reset_cache! if cache.nil?
-        cached_value = get_from_cache(key, expires_in)
-        return cached_value if cached_value.present?
-        # cache miss or timeout
-        value = self.find(key, use_env: use_env)
-        set_in_cache(key, value)
-        value
+        Canvas::DynamicSettings::Cache.fetch(key, ttl: expires_in) do
+          self.find(key, use_env: use_env)
+        end
       end
 
       def kv_client
@@ -78,23 +121,11 @@ module Canvas
       end
 
       def reset_cache!(hard: false)
-        @cache = {}
+        Canvas::DynamicSettings::Cache.reset!
         @strategic_reserve = {} if hard
       end
 
       private
-
-      def get_from_cache(key, timeout)
-        return nil unless cache.key?(key)
-        cache_entry = cache[key]
-        return cache_entry[:value] if timeout.nil?
-        threshold = (Time.zone.now - timeout).to_i
-        return cache_entry[:value] if cache_entry[:timestamp] > threshold
-      end
-
-      def set_in_cache(key, value)
-        cache[key] = {value: value, timestamp: Time.zone.now.to_i}
-      end
 
       def init_values(hash, use_env: true)
         hash.each do |parent_key, settings|

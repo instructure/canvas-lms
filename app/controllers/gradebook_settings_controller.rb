@@ -60,6 +60,20 @@ class GradebookSettingsController < ApplicationController
     )
   end
 
+  def nilify_strings(hash)
+    massaged_hash = {}
+    hash.each do |key, value|
+      massaged_hash[key] = if value == 'null'
+        nil
+      elsif value.is_a? Hash
+        nilify_strings(value)
+      else
+        value
+      end
+    end
+    massaged_hash
+  end
+
   def authorize
     authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
   end
@@ -81,7 +95,7 @@ class GradebookSettingsController < ApplicationController
   def deep_merge_gradebook_settings
     @current_user.preferences.deep_merge!({
       gradebook_settings: {
-       @context.id => gradebook_settings_params.except(:colors).to_h,
+       @context.id => nilify_strings(gradebook_settings_params.except(:colors).to_h),
        # when new_gradebook is the only gradebook this can change to .fetch('colors')
        colors: gradebook_settings_params.fetch('colors', {}).to_h
       }

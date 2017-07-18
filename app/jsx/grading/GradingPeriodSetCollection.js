@@ -219,7 +219,8 @@ import 'jquery.instructure_misc_plugins'
           }, {count: numSets}
         );
       }
-      $.screenReaderFlashMessageExclusive(msg);
+      const polite = true;
+      $.screenReaderFlashMessageExclusive(msg, polite);
     },
 
     getVisibleSets() {

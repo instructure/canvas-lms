@@ -28,6 +28,8 @@ module Lti
     end
     let(:resource_handler) { ResourceHandler.new }
 
+    subject(:tool_proxy) { ToolProxy.new}
+
     describe 'validations' do
 
       before(:each) do
@@ -333,6 +335,21 @@ module Lti
       end
     end
 
+    describe '#resource_codes' do
+      include_context 'lti2_spec_helper'
+
+      let(:expected_hash) do
+        {
+          product_code: product_family.product_code,
+          vendor_code: product_family.vendor_code
+        }
+      end
+
+      it 'returns a hash with the product and vendor codes' do
+        expect(tool_proxy.resource_codes).to eq expected_hash
+      end
+    end
+
     describe "#matching_tool_profile?" do
       include_context 'lti2_spec_helper'
 
@@ -449,6 +466,28 @@ module Lti
             }
           ]
         })).to eq(false)
+      end
+    end
+
+    describe "#ims_tool_proxy" do
+      it 'gets the ims-lti gem version of the tool proxy' do
+        tool_proxy_guid = '123'
+        tool_proxy.raw_data = {'tool_proxy_guid' => tool_proxy_guid}
+        expect(subject.ims_tool_proxy.tool_proxy_guid).to eq tool_proxy_guid
+      end
+    end
+
+
+    describe "#security_profiles" do
+      it 'gets the security profile' do
+        security_profiles = [
+          {
+            "security_profile_name" => 'lti_jwt_message_security',
+            "digest_algorithm" => 'HS256'
+          }
+        ]
+        tool_proxy.raw_data = {'tool_profile' => { 'security_profile' => security_profiles }}
+        expect(subject.security_profiles.as_json).to eq security_profiles
       end
     end
   end

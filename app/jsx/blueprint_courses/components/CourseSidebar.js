@@ -157,6 +157,7 @@ export default class CourseSidebar extends Component {
           this.unsyncedChangesBtn.focus()
         }),
         saveButton: <MigrationSync
+          id="unsynced_changes_modal_sync"
           showProgress={false}
           onClick={() => this.closeModal(() => {
             if (this.unsyncedChangesBtn) {

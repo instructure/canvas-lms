@@ -323,7 +323,7 @@ import './vendor/jquery.scrollTo'
     var next = function() {
       var item = list.shift();
       if(item) {
-        uploadFile.call($this, $.extend({
+        var attrs = $.extend({
           'name': item.name,
           'on_duplicate': 'rename',
           'attachment[folder_id]': options.folder_id,
@@ -332,7 +332,11 @@ import './vendor/jquery.scrollTo'
           'attachment[filename]': item.name,
           'attachment[context_code]': options.context_code,
           'attachment[duplicate_handling]': 'rename'
-        }, options.formDataTarget == 'uploadDataUrl' ? options.formData : {}), item);
+        }, options.formDataTarget == 'uploadDataUrl' ? options.formData : {});
+        if (item.files.length === 1) {
+          attrs['attachment[content_type]'] = item.files[0].type;
+        }
+        uploadFile.call($this, attrs, item);
       } else {
         ready.call($this);
       }

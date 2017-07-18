@@ -43,8 +43,8 @@ export default class Sticky {
   }
 
   static checkInstances () {
-    const containerTop = this.$container.scrollTop()
-    this.instances.forEach((instance) => {
+    const containerTop = Sticky.$container.scrollTop()
+    Sticky.instances.forEach((instance) => {
       if (containerTop >= instance.top) {
         if (!instance.stuck) instance.stick()
       } else {

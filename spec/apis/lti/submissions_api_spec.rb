@@ -1,10 +1,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/lti2_api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 require_dependency "lti/ims/access_token_helper"
 require_dependency "lti/submissions_api_controller"
 module Lti
   describe SubmissionsApiController, type: :request do
+    specs_require_sharding
     include_context 'lti2_api_spec_helper'
 
     let(:service_name) { SubmissionsApiController::SUBMISSION_SERVICE }
@@ -32,6 +34,15 @@ module Lti
 
     let(:student) { course_with_student(active_all: true, course: course); @user }
 
+    let(:aud) { host }
+
+    let(:other_tool_proxy) do
+      tp = tool_proxy.dup
+      tp.update_attributes(guid: other_tp_guid)
+      tp
+    end
+
+    let(:other_tp_guid) { SecureRandom.uuid }
 
     before do
       mock_sub_helper = instance_double("Lti::AssignmentSubscriptionsHelper",
@@ -72,6 +83,17 @@ module Lti
         expect(response.code).to eq '401'
       end
 
+      it "allows tool proxies with matching access" do
+        tool_proxy.raw_data['tool_profile'] = tool_profile
+        tool_proxy.raw_data['security_contract'] = security_contract
+        tool_proxy.save!
+        token = Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: other_tool_proxy.guid)
+        other_helpers = {Authorization: "Bearer #{token}"}
+        allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).and_return(true)
+        get endpoint, {}, other_helpers
+        expect(response).not_to be '401'
+      end
+
     end
 
     describe "#show" do
@@ -98,7 +120,7 @@ module Lti
                      {
                        "id" => attachment.id,
                        "size" => attachment.size,
-                       "url" => controller.attachment_url(attachment.id),
+                       "url" => controller.attachment_url(attachment),
                        "filename" => attachment.filename,
                        "display_name" => attachment.display_name,
                        "created_at" => now.iso8601,
@@ -110,7 +132,14 @@ module Lti
         end
       end
 
-
+      it 'uses global ids in the attachment download URL' do
+        get endpoint, {}, request_headers
+        expect(JSON.parse(response.body)['attachments'].first['url']).to include(
+          attachment.global_id.to_s,
+          assignment.global_id.to_s,
+          submission.global_id.to_s
+        )
+      end
     end
 
     describe "#history" do
@@ -138,7 +167,7 @@ module Lti
                      {
                        "id" => attachment.id,
                        "size" => attachment.size,
-                       "url" => controller.attachment_url(attachment.id),
+                       "url" => controller.attachment_url(attachment),
                        "filename" => attachment.filename,
                        "display_name" => attachment.display_name,
                        "created_at" => now.iso8601,
@@ -191,8 +220,22 @@ module Lti
         get "/api/lti/assignments/#{assignment.id}/submissions/#{submission.id}", {}, request_headers
         attachment1 = Attachment.create!(context: Account.create!, filename: "test.txt", content_type: "text/plain")
         endpoint = "/api/lti/assignments/#{assignment.id}/submissions/#{submission.id}/attachment/#{attachment1.id}"
-        get controller.attachment_url(attachment1.id), {}, request_headers
+        get controller.attachment_url(attachment1), {}, request_headers
         expect(response.code).to eq "401"
+      end
+
+      context 'sharding' do
+        it 'retrieves attachments when tool proxy is installed on another shard' do
+          get "/api/lti/assignments/#{assignment.global_id}/submissions/#{submission.global_id}", {}, request_headers
+          json = JSON.parse(response.body)
+          url = json["attachments"].first["url"]
+
+          @shard2.activate do
+            get url, {}, request_headers
+            expect(response).to be_success
+            expect(response.content_type.to_s).to eq attachment.content_type
+          end
+        end
       end
 
     end

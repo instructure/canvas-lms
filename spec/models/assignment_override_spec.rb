@@ -35,6 +35,15 @@ describe AssignmentOverride do
     expect(AssignmentOverrideStudent.where(:id => @override_student).first).to be_nil
   end
 
+  it 'should allow deletes to invalid objects' do
+    override = assignment_override_model(course: @course)
+    # make it invalide
+    AssignmentOverride.where(id: override).update_all(assignment_id: nil, quiz_id: nil)
+    expect(override.reload).to be_invalid
+    override.destroy
+    expect{ override.destroy }.not_to raise_error
+  end
+
   it "should default set_type to adhoc" do
     @override = AssignmentOverride.new
     @override.valid? # trigger bookkeeping
@@ -903,7 +912,7 @@ describe AssignmentOverride do
       # the critical thing is visible_students_only is called the default shard,
       # but the query executes on a different shard, but it should still be
       # well-formed (especially with qualified names)
-      AssignmentOverride.visible_students_only([1, 2]).shard(@shard1).to_a
+      expect { AssignmentOverride.visible_students_only([1, 2]).shard(@shard1).to_a }.not_to raise_error
     end
 
     it "should not duplicate adhoc overrides containing multiple students" do

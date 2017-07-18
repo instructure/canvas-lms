@@ -1,6 +1,13 @@
 {{#if singleSubmission}}
   {{#each submissions}}
     {{#t "submitted"}}<label>Submitted:</label> {{submittedAt}}{{/t}}
+    {{#if late}}
+      <span class="submission-late-pill"></span>
+    {{else}}
+      {{#if missing}}
+        <span class="submission-missing-pill"></span>
+      {{/if}}
+    {{/if}}
   {{/each}}
 {{else}}
   <label for="submission_to_view" class="ic-Label">
@@ -13,7 +20,11 @@
             {{#if selected}}selected{{/if}}>
       {{submittedAt}}
       {{#if late}}
-        {{#t "loud_late"}}LATE{{/t}}
+        {{#t}}LATE{{/t}}
+      {{else}}
+        {{#if missing}}
+          {{#t}}MISSING{{/t}}
+        {{/if}}
       {{/if}}
       {{#if grade}}
         {{#t "grade"}}(grade: {{grade}}){{/t}}
