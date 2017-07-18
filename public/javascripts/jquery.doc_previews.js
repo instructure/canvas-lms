@@ -92,6 +92,7 @@ import './jquery.loadingImg'
             src: opts.crocodoc_session_url,
             width: opts.width,
             height: opts.height,
+            allowfullscreen: "1",
             id: opts.id
         });
         iframe.appendTo($this);
