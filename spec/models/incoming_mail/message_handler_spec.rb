@@ -139,11 +139,12 @@ describe IncomingMail::MessageHandler do
         it "silently fails if the message is not from one of the original recipient's email addresses" do
           allow(Message).to receive(:where).with(id: original_message_id).and_return(double(first: original_message))
           expect_any_instance_of(Message).to receive(:deliver).never
+          expect(Account.site_admin).to receive(:feature_enabled?).with(:notification_service).and_return(false)
           expect(Rails.cache).to receive(:fetch).never
           expect(original_message.context).to receive(:reply_from).never
           message = double("incoming message with bad from",
-                         incoming_message_attributes.merge(:from => ['not_lucy@example.com'],
-                                                           :reply_to => ['also_not_lucy@example.com']))
+                           incoming_message_attributes.merge(:from => ['not_lucy@example.com'],
+                                                             :reply_to => ['also_not_lucy@example.com']))
           subject.handle(outgoing_from_address, body, html_body, message, tag)
         end
       end

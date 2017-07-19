@@ -276,7 +276,7 @@ class CommunicationChannel < ActiveRecord::Base
     m = self.messages.temp_record
     m.to = self.path
     m.body = message
-    Mailer.create_message(m).deliver rescue nil # omg! just ignore delivery failures
+    Mailer.deliver(Mailer.create_message(m))
   end
 
   def send_otp!(code, account = nil)
@@ -289,8 +289,11 @@ class CommunicationChannel < ActiveRecord::Base
         e164_path
       )
     else
-      send_later_if_production_enqueue_args(:send_otp_via_sms_gateway!,
-                                            priority: Delayed::HIGH_PRIORITY, max_attempts: 1)
+      send_later_if_production_enqueue_args(
+        :send_otp_via_sms_gateway!,
+        { priority: Delayed::HIGH_PRIORITY, max_attempts: 1 },
+        message
+      )
     end
   end
 
