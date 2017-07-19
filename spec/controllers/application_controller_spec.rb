@@ -447,6 +447,7 @@ describe ApplicationController do
           :selection_height => 400}
         tool.settings[:selection_width] = 500
         tool.settings[:selection_height] = 300
+        tool.settings[:custom_fields] = {"test_token"=>"$com.instructure.PostMessageToken"}
         tool.save!
         tool
       end
@@ -470,6 +471,16 @@ describe ApplicationController do
         allow(content_tag).to receive(:id).and_return(42)
         controller.send(:content_tag_redirect, course, content_tag, nil)
         expect(assigns[:lti_launch].params["resource_link_id"]).to eq 'e62d81a8a1587cdf9d3bbc3de0ef303d6bc70d78'
+      end
+
+      it 'sets the post message token' do
+        allow(controller).to receive(:named_context_url).and_return('wrong_url')
+        allow(controller).to receive(:render)
+        allow(controller).to receive_messages(js_env:[])
+        controller.instance_variable_set(:"@context", course)
+        allow(content_tag).to receive(:id).and_return(42)
+        controller.send(:content_tag_redirect, course, content_tag, nil)
+        expect(assigns[:lti_launch].params["custom_test_token"]).to be_present
       end
 
       it 'uses selection_width and selection_height if provided' do

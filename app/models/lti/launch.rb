@@ -26,6 +26,10 @@ module Lti
       @tool_dimensions = options[:tool_dimensions] || {selection_height: '100%', selection_width: '100%'}
     end
 
+    def post_message_token
+      @_post_message_token ||= SecureRandom.uuid
+    end
+
     def resource_url
       begin
         url = URI(@resource_url)

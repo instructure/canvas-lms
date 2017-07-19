@@ -31,8 +31,8 @@
 <% end %>
 
 <div class="tool_content_wrapper
-  <%= 'custom_height' unless @lti_launch.tool_dimensions[:selection_height] == '100%' %>">
-
+  <%= 'custom_height' unless @lti_launch.tool_dimensions[:selection_height] == '100%' %>"
+  data-tool-wrapper-id="<%= @lti_launch.post_message_token %>">
 <form action="<%= @lti_launch.resource_url %>"
       class="hide"
       method="POST" target=tool_content

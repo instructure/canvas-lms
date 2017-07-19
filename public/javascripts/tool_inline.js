@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import './jquery.google-analytics'
 import 'compiled/jquery/ModuleSequenceFooter'
+import ToolLaunchResizer from './lti/tool_launch_resizer'
 
 var $toolForm = $("#tool_form")
 
@@ -88,18 +89,10 @@ $.trackEvent(messageType, toolName, toolPath);
 var $tool_content_wrapper;
 var min_tool_height, canvas_chrome_height;
 
-function tool_content_wrapper() {
-  return $tool_content_wrapper || $('.tool_content_wrapper');
-}
-
-var resize_tool_content_wrapper = function(height) {
-  var tool_height = min_tool_height || 450;
-  tool_content_wrapper().height(tool_height > height ? tool_height : height);
-}
-
 $(function() {
   var $window = $(window);
   $tool_content_wrapper = $('.tool_content_wrapper');
+  const toolResizer = new ToolLaunchResizer(min_tool_height);
 
   if ( !$('body').hasClass('ic-full-screen-lti-tool') ) {
     canvas_chrome_height = $tool_content_wrapper.offset().top + $('#footer').outerHeight(true);
@@ -110,7 +103,7 @@ $(function() {
   if ( $tool_content_wrapper.length && !$('body').hasClass('ic-full-screen-lti-tool') ) {
     $window.resize(function () {
       if (!$tool_content_wrapper.data('height_overridden')) {
-        resize_tool_content_wrapper($window.height() - canvas_chrome_height - $('#sequence_footer').outerHeight(true));
+        toolResizer.resize_tool_content_wrapper($window.height() - canvas_chrome_height - $('#sequence_footer').outerHeight(true));
       }
     }).triggerHandler('resize');
   }
@@ -130,11 +123,12 @@ window.addEventListener('message', function(e) {
     var message = JSON.parse(e.data);
     switch (message.subject) {
       case 'lti.frameResize':
+        const toolResizer = new ToolLaunchResizer();
         var height = message.height;
         if (height <= 0) height = 1;
 
-        tool_content_wrapper().data('height_overridden', true);
-        resize_tool_content_wrapper(height);
+        const container = toolResizer.tool_content_wrapper(message.token || e.origin).data('height_overridden', true);
+        toolResizer.resize_tool_content_wrapper(height, container);
         break;
 
       case 'lti.showModuleNavigation':

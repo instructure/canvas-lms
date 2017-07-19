@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
-
+<% launch_token = SecureRandom.uuid %>
 <script>
   window.addEventListener('message', function(event) {
     var iframes = document.getElementsByTagName('iframe'),
@@ -46,8 +46,10 @@
     iframe.style.bottom = data.bottom+'px';
   }, false);
 </script>
-<iframe
-  data-launch-url="<%= full_url(context_url(@context, :context_external_tool_resource_selection_url, active_external_tool_by_id('chat').id, launch_type: 'course_navigation')) %>"
-  style="position: fixed; right: 0; bottom: 0; width: 0; height: 0; border: 1px solid #808080; z-index: 100"
-  src="<%= embedded_chat_url %>"
-  title="<%= t('Chat') %>"></iframe>
+<div data-tool-wrapper-id="<%= launch_token %>">
+  <iframe
+    data-launch-url="<%= full_url(context_url(@context, :context_external_tool_resource_selection_url, active_external_tool_by_id('chat').id, launch_type: 'course_navigation', launch_token: launch_token)) %>"
+    style="position: fixed; right: 0; bottom: 0; width: 0; height: 0; border: 1px solid #808080; z-index: 100"
+    src="<%= embedded_chat_url %>"
+    title="<%= t('Chat') %>"></iframe>
+</div>
