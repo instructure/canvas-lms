@@ -75,11 +75,10 @@ describe "student planner" do
       validate_pill('Submitted')
     end
 
-    it "shows graded tag for assignments that are graded", priority: "1", test_id: 3263152 do
-      skip('Passes locally but fails Jenkins')
+    it "shows new grades tag for assignments that are graded", priority: "1", test_id: 3263152 do
       @assignment.grade_student(@student1, grade: 10, submission_comment: 'Good', grader: @teacher)
       go_to_list_view
-      validate_pill('Graded')
+      validate_pill('New Grades')
     end
 
     it "shows new feedback tag for assignments that has feedback", priority: "1", test_id: 3263154 do
