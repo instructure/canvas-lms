@@ -194,6 +194,14 @@ describe AddressBook::Service do
         stub_common_contexts([@sender, [@recipient.global_id]])
       end
 
+      it "conversation_id can be passed blank" do
+        expect { @address_book.known_users([@recipient], conversation_id: '') }.not_to raise_error
+      end
+
+      it "conversation_id can be passed with garbage" do
+        expect { @address_book.known_users([@recipient], conversation_id: 'garbage') }.not_to raise_error
+      end
+
       it "treats unknown users in that conversation as known" do
         conversation = Conversation.initiate([@sender, @recipient], true)
         known_users = @address_book.known_users([@recipient], conversation_id: conversation.id)
