@@ -19,7 +19,7 @@ require "addressable/uri"
 
 module MathMan
   def self.url_for(latex:, target:)
-    uri = base_url.merge(path: "/#{target}")
+    uri = base_url.join(target.to_s)
     uri.query = "tex=#{latex}"
     uri.to_s
   end
@@ -45,7 +45,9 @@ module MathMan
 
     def base_url
       with_plugin_settings do |plugin_settings|
-        Addressable::URI.parse(plugin_settings[:base_url])
+        Addressable::URI.parse(plugin_settings[:base_url]).tap do |uri|
+          uri.path << '/' unless uri.path.end_with?('/')
+        end
       end
     end
 

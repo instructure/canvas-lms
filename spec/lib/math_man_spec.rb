@@ -21,7 +21,8 @@ describe MathMan do
   let(:latex) do
     '\sqrt{25}+12^{12}'
   end
-  let(:service_url) { 'http://www.mml-service.com' }
+  # we explicitly don't want a trailing slash here for the url tests
+  let(:service_url) { 'http://www.mml-service.com/beta' }
   let(:use_for_mml) { false }
   let(:use_for_svg) { false }
 
@@ -41,6 +42,12 @@ describe MathMan do
   end
 
   describe '.url_for' do
+    it 'must retain the path from base_url setting' do
+      url = MathMan.url_for(latex: latex, target: :mml)
+      parsed = Addressable::URI.parse(url)
+      expect(parsed.path).to eq ('/beta/mml')
+    end
+
     it 'should include target string in generated url' do
       expect(MathMan.url_for(latex: latex, target: :mml)).to match(/mml/)
       expect(MathMan.url_for(latex: latex, target: :svg)).to match(/svg/)
