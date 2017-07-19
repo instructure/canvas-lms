@@ -25,10 +25,6 @@ import axios from 'axios'
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
-import Checkbox from 'instructure-ui/lib/components/Checkbox'
-import Tooltip from 'instructure-ui/lib/components/Tooltip'
-import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent'
-import PresentationContent from 'instructure-ui/lib/components/PresentationContent'
 
 const defaultViewStore = createStore({
   selectedDefaultView: ENV.COURSE.default_view,
@@ -121,79 +117,7 @@ class ChooseHomePageButton extends React.Component {
   }
 }
 
-// This wraps the instui Checkbox variant=toggle
-// to submit the enclosing form when checked or unchecked.
-class PubUnpubToggle extends React.Component {  // eslint-disable-line react/no-multi-comp
-  static modes = {
-    PUBLISHED: {
-      label: I18n.t('Published'),
-      tip: I18n.t('Click to unpublish.'),
-    },
-    UNPUBLISHED: {
-      label: I18n.t('Unpublished'),
-      tip: I18n.t('Click to publish.'),
-    },
-    PUBLISHING: {
-      label: I18n.t('Publishing…'),
-      tip: I18n.t('Please wait.'),
-    },
-    UNPUBLISHING: {
-      label: I18n.t('Unpublishing…'),
-      tip: I18n.t('Please wait.'),
-    }
-  }
-  static propTypes = {
-    op: PropTypes.string.isRequired
-  }
-
-  constructor (props) {
-    super(props)
-    this.state = {
-      mode: PubUnpubToggle.modes[props.op]
-    }
-  }
-
-  onChange = (event) => {
-    // if pub/unpub is in-flight, effectively disable clicking the button
-    if (this.state.mode !== PubUnpubToggle.modes.PUBLISHING && this.state.mode !== PubUnpubToggle.modes.UNPUBLISHING) {
-      this.setState({
-        mode: this.props.op === 'PUBLISHED' ? PubUnpubToggle.modes.UNPUBLISHING : PubUnpubToggle.modes.PUBLISHING
-      })
-      const form = document.getElementById('course_status_form')
-      form.submit()
-    } else {
-      event.preventDefault()
-    }
-  }
-
-  render () {
-    const label = this.state.mode.label
-    const srlabel = this.state.mode.tip
-    const checked = this.props.op === 'PUBLISHED' || this.props.op === 'PUBLISHING'
-    const placement = 'top start'
-
-    // ideally, we'd let the tooltip provide the additional tip information, but NVDA doesn't read it unless
-    // you tab into the Checkbox to give it focus.  What I wound up doing was hiding the tooltip from the screenreader
-    // and including the tip as screenreder only content w/in the checkbox's label.
-    return (
-      <Tooltip tip={<PresentationContent>{srlabel}</PresentationContent>} on={['hover', 'focus']} variant="inverse" placement={placement}>
-        <Checkbox
-          variant="toggle"
-          checked={checked}
-          onChange={this.onChange}
-          label={<span>{label}<ScreenReaderContent>{srlabel}</ScreenReaderContent></span>}
-        />
-      </Tooltip>
-    )
-  }
-}
-
 const container = document.getElementById('choose_home_page')
 if (container) {
   ReactDOM.render(<ChooseHomePageButton store={defaultViewStore} />, container)
-}
-const pubunpubcontainer = document.getElementById('pubunpub_btn_container')
-if (pubunpubcontainer) {
-  const op = pubunpubcontainer.getAttribute('data-op')
-  ReactDOM.render(<PubUnpubToggle op={op} />, pubunpubcontainer)
 }
