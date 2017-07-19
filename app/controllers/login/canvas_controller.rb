@@ -29,6 +29,7 @@ class Login::CanvasController < ApplicationController
     @pseudonym_session = PseudonymSession.new
     @headers = false
     flash.now[:error] = params[:message] if params[:message]
+    flash.now[:notice] = t('Your password has been changed.') if params[:password_changed] == '1'
 
     maybe_render_mobile_login
   end

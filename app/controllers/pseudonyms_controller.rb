@@ -118,8 +118,12 @@ class PseudonymsController < ApplicationController
     # and finish the registration process?
     if !@cc || @cc.path_type != 'email'
       flash[:error] = t 'errors.cant_change_password', "Cannot change the password for that login, or login does not exist"
-      redirect_to root_url
+      redirect_to canvas_login_url
     else
+      if @cc.confirmation_code_expires_at.present? && @cc.confirmation_code_expires_at <= Time.now.utc
+        flash[:error] = t 'The link you used has expired. Click "Forgot Password?" to get a new reset-password link.'
+        redirect_to canvas_login_url
+      end
       @password_pseudonyms = @cc.user.pseudonyms.active.select{|p| p.account.canvas_authentication? }
       js_env :PASSWORD_POLICY => @domain_root_account.password_policy,
              :PASSWORD_POLICIES => Hash[@password_pseudonyms.map{ |p| [p.id, p.account.password_policy]}]
@@ -128,7 +132,8 @@ class PseudonymsController < ApplicationController
 
   def change_password
     @pseudonym = Pseudonym.find(params[:pseudonym][:id] || params[:pseudonym_id])
-    if @cc = @pseudonym.user.communication_channels.where(confirmation_code: params[:nonce]).first
+    if @cc = @pseudonym.user.communication_channels.where(confirmation_code: params[:nonce]).
+        where('confirmation_code_expires_at IS NULL OR confirmation_code_expires_at > ?', Time.now.utc).first
       @pseudonym.require_password = true
       @pseudonym.password = params[:pseudonym][:password]
       @pseudonym.password_confirmation = params[:pseudonym][:password_confirmation]
@@ -145,13 +150,11 @@ class PseudonymsController < ApplicationController
         reset_session
 
         @pseudonym_session = PseudonymSession.new(@pseudonym, true)
-        flash[:notice] = t 'notices.password_changed', "Password changed"
         render :json => @pseudonym, :status => :ok # -> dashboard
       else
         render :json => {:pseudonym => @pseudonym.errors.as_json[:errors]}, :status => :bad_request
       end
     else
-      flash[:notice] = t 'notices.link_invalid', "The link you used is no longer valid.  If you can't log in, click \"Don't know your password?\" to reset your password."
       render :json => {:errors => {:nonce => 'expired'}}, :status => :bad_request # -> login url
     end
   end
