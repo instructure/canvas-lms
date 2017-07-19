@@ -139,7 +139,7 @@ module CanvasRails
           begin
             connection_parameters = @connection_parameters.dup
             connection_parameters[:host] = host
-            @connection = PGconn.connect(connection_parameters)
+            @connection = PG::Connection.connect(connection_parameters)
 
             raise "Canvas requires PostgreSQL 9.3 or newer" unless postgresql_version >= 90300
 
