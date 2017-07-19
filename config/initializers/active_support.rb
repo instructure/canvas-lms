@@ -78,3 +78,7 @@ module IgnoreMonkeyPatchesInDeprecations
   end
 end
 ActiveSupport::Deprecation.prepend(IgnoreMonkeyPatchesInDeprecations)
+unless CANVAS_RAILS5_0
+  ::Rails.logger.warn("Temporarily silencing deprecations because there are a lot - especially here https://github.com/rails/rails/blob/5-1-stable/activerecord/lib/active_record/attribute_methods/dirty.rb#L250-L256")
+  ActiveSupport::Deprecation.silenced = true
+end

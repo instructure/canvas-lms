@@ -47,7 +47,6 @@ class User < ActiveRecord::Base
   has_many :communication_channels, -> { order('communication_channels.position ASC') }, dependent: :destroy
   has_many :notification_policies, through: :communication_channels
   has_one :communication_channel, -> { where("workflow_state<>'retired'").order(:position) }
-  has_many :notification_endpoints, :through => :access_tokens
   has_many :planner_notes, :dependent => :destroy
 
   has_many :enrollments, :dependent => :destroy
@@ -76,6 +75,7 @@ class User < ActiveRecord::Base
   has_many :associated_root_accounts, -> { order("user_account_associations.depth").where(accounts: { parent_account_id: nil }) }, source: :account, through: :user_account_associations
   has_many :developer_keys
   has_many :access_tokens, -> { preload(:developer_key) }
+  has_many :notification_endpoints, :through => :access_tokens
   has_many :context_external_tools, -> { order(:name) }, as: :context, inverse_of: :context, dependent: :destroy
 
   has_many :student_enrollments

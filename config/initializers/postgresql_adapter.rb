@@ -174,7 +174,8 @@ module PostgreSQLAdapterExtensions
     [index_name, index_type, index_columns, index_options, algorithm, using]
   end
 
-  def quote(value, column = nil)
+  def quote(*args)
+    value = args.first
     return value if value.is_a?(QuotedValue)
 
     super

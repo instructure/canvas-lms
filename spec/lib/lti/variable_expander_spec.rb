@@ -80,6 +80,10 @@ module Lti
     let(:tool_setting) { Lti::ToolSetting.create!(context: attachment_association, resource_link_id: resource_link_id) }
     let(:variable_expander) { VariableExpander.new(root_account, account, controller, current_user: user, tool: tool, tool_setting: tool_setting) }
 
+    before :each do
+      Account.any_instance.stubs(:all_account_users_for).returns([]) # doesn't work for unsaved records - easier to stub out than to fix in plugins
+    end
+
     it 'clears the lti_helper instance variable when you set the current_user' do
       expect(variable_expander.lti_helper).not_to be nil
       variable_expander.current_user = nil

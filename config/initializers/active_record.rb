@@ -954,7 +954,7 @@ module UpdateAndDeleteWithJoins
 
     sql = stmt.to_sql
 
-    binds = connection.prepare_binds_for_database(bound_attributes)
+    binds = bound_attributes.map(&:value_for_database)
     binds.map! { |value| connection.quote(value) }
     collector = Arel::Collectors::Bind.new
     arel.join_sources.each do |node|
@@ -975,7 +975,7 @@ module UpdateAndDeleteWithJoins
 
     # skip any binds that are used in the join
     binds = scope.bound_attributes[binds_in_join..-1]
-    binds = connection.prepare_binds_for_database(binds)
+    binds = binds.map(&:value_for_database)
     binds.map! { |value| connection.quote(value) }
     sql_string = Arel::Collectors::Bind.new
     scope.arel.constraints.each do |node|
@@ -1002,7 +1002,7 @@ module UpdateAndDeleteWithJoins
     join_conditions.each { |join| scope = scope.where(join) }
 
     binds = scope.bound_attributes
-    binds = connection.prepare_binds_for_database(binds)
+    binds = binds.map(&:value_for_database)
     binds.map! { |value| connection.quote(value) }
     sql_string = Arel::Collectors::Bind.new
     scope.arel.constraints.each do |node|
@@ -1256,10 +1256,13 @@ ActiveRecord::Associations::CollectionAssociation.class_eval do
 end
 
 module UnscopeCallbacks
-  def __run_callbacks__(*args)
-    scope = self.class.all.klass.unscoped
-    scope.scoping { super }
-  end
+  method = CANVAS_RAILS5_0 ? "__run_callbacks__" : "run_callbacks"
+  module_eval <<-RUBY, __FILE__, __LINE__ + 1
+    def #{method}(*args)
+      scope = self.class.all.klass.unscoped
+      scope.scoping { super }
+    end
+  RUBY
 end
 ActiveRecord::Base.send(:include, UnscopeCallbacks)
 
@@ -1336,3 +1339,18 @@ module ReadonlyCloning
   end
 end
 ActiveRecord::Base.prepend(ReadonlyCloning)
+
+module DupArraysInMutationTracker
+  # setting a serialized attribute to an array of hashes shouldn't change all the hashes to indifferent access
+  # when the array gets stored in the indifferent access hash inside the mutation tracker
+  # not that it really matters too much but having some consistency is nice
+  def change_to_attribute(*args)
+    change = super
+    if change
+      val = change[1]
+      change[1] = val.dup if val.is_a?(Array)
+    end
+    change
+  end
+end
+ActiveRecord::AttributeMutationTracker.prepend(DupArraysInMutationTracker) unless CANVAS_RAILS5_0

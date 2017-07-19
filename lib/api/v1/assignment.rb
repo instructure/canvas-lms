@@ -639,7 +639,7 @@ module Api::V1::Assignment
   end
 
   def turnitin_settings_hash(assignment_params)
-    turnitin_settings = assignment_params.delete("turnitin_settings").slice(*API_ALLOWED_TURNITIN_SETTINGS)
+    turnitin_settings = assignment_params.delete("turnitin_settings").permit(*API_ALLOWED_TURNITIN_SETTINGS)
     turnitin_settings['exclude_type'] = case turnitin_settings['exclude_small_matches_type']
       when nil; '0'
       when 'words'; '1'
@@ -650,7 +650,7 @@ module Api::V1::Assignment
   end
 
   def vericite_settings_hash(assignment_params)
-    vericite_settings = assignment_params.delete("vericite_settings").slice(*API_ALLOWED_VERICITE_SETTINGS)
+    vericite_settings = assignment_params.delete("vericite_settings").permit(*API_ALLOWED_VERICITE_SETTINGS)
     vericite_settings.to_hash.with_indifferent_access
   end
 

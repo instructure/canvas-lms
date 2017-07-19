@@ -98,6 +98,11 @@ module Lti
          Context.title
          com.instructure.Assignment.lti.id)
     }
+
+    before :each do
+      Account.any_instance.stubs(:all_account_users_for).returns([])
+    end
+
     describe '#supported_capabilities' do
       it 'returns all supported capabilities asociated with launch params' do
         expect(CapabilitiesHelper.supported_capabilities).to match_array(supported_capabilities)

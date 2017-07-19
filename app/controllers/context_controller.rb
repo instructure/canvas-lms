@@ -236,7 +236,7 @@ class ContextController < ApplicationController
       end
     elsif @context.is_a?(Group)
       if @context.grants_right?(@current_user, :read_as_admin)
-        @users = @context.participating_users.uniq.order_by_sortable_name
+        @users = @context.participating_users.distinct.order_by_sortable_name
       else
         @users = @context.participating_users_in_context(sort: true).distinct.order_by_sortable_name
       end
