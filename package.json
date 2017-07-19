@@ -27,7 +27,7 @@
     "babel-preset-stage-1": "^6.5.0",
     "babel-register": "^6.9.0",
     "backbone": "1.1.1",
-    "canvas-planner": "1.0.3",
+    "canvas-planner": "1.0.7",
     "canvas-rce": "2.2.1",
     "classnames": "~2.2.5",
     "coffee-loader": "^0.7.2",

@@ -1407,9 +1407,9 @@ caniuse-lite@^1.0.30000670:
   version "1.0.30000671"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000671.tgz#c206c2f1a1feb34de46064407c4356818389bf1e"
 
-canvas-planner@1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/canvas-planner/-/canvas-planner-1.0.3.tgz#89886013124a86e92078de2f88fc9e14ab54087a"
+canvas-planner@1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/canvas-planner/-/canvas-planner-1.0.7.tgz#87b2d7d66591dfb359f5df264c94212ec1c740a2"
   dependencies:
     axios "^0.16.0"
     babel-plugin-inline-react-svg "^0.4.0"
