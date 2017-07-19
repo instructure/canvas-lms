@@ -76,6 +76,12 @@ pk1,col1,pk2,col2
 CSV
   end
 
+  def only_header_row
+    CSV.new(<<CSV, headers: true)
+pk1,col1,pk2,col2
+CSV
+  end
+
   context 'validation' do
     it 'rejects csvs without headers' do
       expect { subject.generate(csv1(headers: false), csv1) }.to raise_error(CsvDiff::Failure, /headers/)
@@ -89,6 +95,12 @@ CSV
 
     it 'requires at least one pk column to be present' do
       expect { subject.generate(missing_pk, missing_pk) }.to raise_error(CsvDiff::Failure, /primary key/)
+    end
+
+    it 'handles empty files' do
+      cb = ->(row) { row['col2'] = 'deleted' }
+      output = subject.generate(csv1, only_header_row, deletes: cb)
+      expect(output.read).to eq "pk1,col1,pk2,col2\na,b,c,deleted\n1,2,3,deleted\n"
     end
   end
 
