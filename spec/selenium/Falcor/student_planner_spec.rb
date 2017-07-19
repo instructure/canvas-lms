@@ -358,4 +358,14 @@ describe "student planner" do
       expect(items_displayed.count).to be > current_items
     end
   end
+
+  it "completes and collapses item", priority: "1", test_id: 3263155 do
+    @course.assignments.create!(name: 'assignment 1',
+                                due_at: Time.zone.now + 2.days)
+    go_to_list_view
+    force_click('input[id*=Checkbox]')
+    refresh_page
+    wait_for_planner_load
+    expect(f('.PlannerApp')).to contain_jqcss('span:contains("Show 1 completed item")')
+  end
 end
