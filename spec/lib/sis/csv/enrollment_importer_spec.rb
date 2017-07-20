@@ -885,4 +885,89 @@ describe SIS::CSV::EnrollmentImporter do
     expect(student.enrollments.count).to eq 1
     expect(student.enrollments.first).to be_completed
   end
+
+  it "doesn't die if the last record is invalid" do
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,status",
+      "c1,Course,Course,active",
+    )
+    process_csv_data_cleanly(
+      "section_id,course_id,name,status",
+      "s1,c1,Section,active",
+    )
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "u1,user1,User,Uno,user@example.com,active",
+      "u2,user2,User,Uno,user@example.com,active",
+      "u3,user3,User,Uno,user@example.com,active",
+      "u4,user4,User,Uno,user@example.com,active",
+      "u5,user5,User,Uno,user@example.com,active",
+      "u6,user6,User,Uno,user@example.com,active",
+      "u7,user7,User,Uno,user@example.com,active",
+      "u8,user8,User,Uno,user@example.com,active",
+      "u9,user9,User,Uno,user@example.com,active",
+      "u0,user0,User,Uno,user@example.com,active",
+    )
+    importer = process_csv_data(
+                 "course_id,user_id,role,section_id,status",
+                 "c1,u1,student,s1,active",
+                 "c1,u2,student,s1,active",
+                 "c1,u3,student,s1,active",
+                 "c1,u4,student,s1,active",
+                 "c1,u5,student,s1,active",
+                 "c1,u6,student,s1,active",
+                 "c1,u7,student,s1,active",
+                 "c1,u8,student,s1,active",
+                 "c1,u9,student,s1,active",
+                 "c1,u0,student,s1,active",
+                 "c1,u1,student,s2,active",
+    )
+    warnings = importer.warnings.map { |r| r.last }
+    expect(warnings.first).to include("non-existent section")
+    expect(importer.errors).to be_empty
+  end
+
+  it "associates to the correct accounts" do
+    process_csv_data_cleanly(
+      "account_id,name,parent_account_id,status",
+      "a1,a1,,active",
+      "a2,a2,,active",
+    )
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,status",
+      "c1,Course,Course,a1,active",
+      "c2,Course,Course,a2,active",
+    )
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "u1,user1,User,Uno,user@example.com,active",
+      "u2,user2,User,Uno,user@example.com,active",
+      "u3,user3,User,Uno,user@example.com,active",
+      "u4,user4,User,Uno,user@example.com,active",
+      "u5,user5,User,Uno,user@example.com,active",
+      "u6,user6,User,Uno,user@example.com,active",
+      "u7,user7,User,Uno,user@example.com,active",
+      "u8,user8,User,Uno,user@example.com,active",
+      "u9,user9,User,Uno,user@example.com,active",
+      "u0,user0,User,Uno,user@example.com,active",
+      "v1,vser1,User,Uno,user@example.com,active",
+    )
+    process_csv_data_cleanly(
+      "course_id,user_id,role,status",
+      "c1,u1,student,active",
+      "c1,u2,student,active",
+      "c1,u3,student,active",
+      "c1,u4,student,active",
+      "c1,u5,student,active",
+      "c1,u6,student,active",
+      "c1,u7,student,active",
+      "c1,u8,student,active",
+      "c1,u9,student,active",
+      "c1,u0,student,active",
+      "c2,v1,student,active",
+    )
+    a2 = @account.sub_accounts.find_by(sis_source_id: 'a2')
+    u1 = @account.pseudonyms.active.find_by(sis_user_id: 'u1').user
+    expect(u1.associated_accounts).not_to be_include(a2)
+  end
 end
