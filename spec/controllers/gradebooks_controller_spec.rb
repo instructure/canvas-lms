@@ -363,14 +363,21 @@ describe GradebooksController do
         user_session(@teacher)
         get :grade_summary, { course_id: @course.id, id: @student.id }
         periods = assigns[:js_env][:grading_period_set][:grading_periods]
-        periods.each do |period|
-          expect(period).to have_key(:id)
-          expect(period).to have_key(:start_date)
-          expect(period).to have_key(:end_date)
-          expect(period).to have_key(:close_date)
-          expect(period).to have_key(:is_closed)
-          expect(period).to have_key(:is_last)
-        end
+        expect(periods).to all include(:id, :start_date, :end_date, :close_date, :is_closed, :is_last)
+      end
+
+      it 'is ordered by start_date' do
+        @grading_periods.sort_by!(&:id)
+        grading_period_ids = @grading_periods.map(&:id)
+        @grading_periods.last.update!(
+          start_date: @grading_periods.first.start_date - 1.week,
+          end_date: @grading_periods.first.start_date - 1.second
+        )
+        user_session(@teacher)
+        get :grade_summary, params: { course_id: @course.id, id: @student.id }
+        periods = assigns[:js_env][:grading_period_set][:grading_periods]
+        expected_ids = [grading_period_ids.last].concat(grading_period_ids[0..-2])
+        expect(periods.map{|period| period.fetch('id')}).to eql expected_ids
       end
     end
 
@@ -782,14 +789,7 @@ describe GradebooksController do
       it "includes necessary keys with each grading period" do
         get :show, { course_id: @course.id }
         periods = assigns[:js_env][:GRADEBOOK_OPTIONS][:grading_period_set][:grading_periods]
-        periods.each do |period|
-          expect(period).to have_key(:id)
-          expect(period).to have_key(:start_date)
-          expect(period).to have_key(:end_date)
-          expect(period).to have_key(:close_date)
-          expect(period).to have_key(:is_closed)
-          expect(period).to have_key(:is_last)
-        end
+        expect(periods).to all include(:id, :start_date, :end_date, :close_date, :is_closed, :is_last)
       end
     end
   end

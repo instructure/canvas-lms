@@ -296,7 +296,7 @@ class GradebooksController < ApplicationController
   end
 
   def active_grading_periods
-    @active_grading_periods ||= GradingPeriod.for(@context).sort_by(&:start_date)
+    @active_grading_periods ||= GradingPeriod.for(@context).order(:start_date)
   end
 
   def grading_period_group_json
