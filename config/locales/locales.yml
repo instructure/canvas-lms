@@ -38,6 +38,7 @@ fr-CA:
   locales:
     fr-CA: Français (Canada)
   fullcalendar_locale: fr
+  bigeasy_locale: fr_CA
 he:
   locales:
     he: עברית
@@ -59,7 +60,7 @@ hy:
 is:
   locales:
     is: Íslenska
-  bigeasy_locale: en_US
+  bigeasy_locale: is_IS
 ja:
   locales:
     ja: 日本語

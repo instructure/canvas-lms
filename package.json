@@ -131,7 +131,8 @@
     "webpack-cleanup-plugin": "^0.5.1",
     "webpack-manifest-plugin": "^1.0.1",
     "webpack-parallel-uglify-plugin": "^0.4.2",
-    "xsslint": "0.1.4"
+    "xsslint": "0.1.4",
+    "yaml-loader": "^0.5.0"
   },
   "repository": "instructure/canvas-lms",
   "scripts": {
