@@ -92,7 +92,11 @@ define [
     I18nStubber.pushFrame()
     tz.changeLocale(french, 'fr_FR', 'fr')
     I18nStubber.setLocale 'fr_FR'
-    I18nStubber.stub 'fr_FR', 'date.formats.full_with_weekday': '%a %-d %b %Y %-k:%M'
+    I18nStubber.stub 'fr_FR',
+      'date.formats.full_with_weekday': '%a %-d %b %Y %-k:%M'
+      'date.formats.medium': '%a %-d %b %Y %-k:%M'
+      'date.month_names': ['août']
+      'date.abbr_month_names': ['août'] 
 
     view = createView(commonEvent(), @event)
     equal view.$(".datetime_field").val(), "ven. 7 août 2015 17:00"

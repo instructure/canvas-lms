@@ -1,6 +1,7 @@
 const gulp = require('gulp')
 const gulpPlugins = require('gulp-load-plugins')()
 const merge = require('merge-stream')
+const rename = require('gulp-rename')
 
 const DIST = 'public/dist'
 
@@ -27,14 +28,23 @@ gulp.task('rev', () => {
     'rfc822.js',
     'synopsis.js',
     'zones.js',
-    '**/index.js'
+    'de_DE.js',
+    'fr_FR.js',
+    'fr_CA.js',
+    'he_IL.js',
+    'pl_PL.js',
+    '**/index.js',
   ].map(f => `!./node_modules/timezone/${f}`)
 
-  const timezonesStream = gulp.src(
-    ['./node_modules/timezone/**/*.js'].concat(timezonefilesToIgnore),
-    {base: './node_modules'}
-  ).pipe(gulpTimezonePlugin())
-
+  const timezoneFileGlobs = ['./node_modules/timezone/**/*.js'].concat(timezonefilesToIgnore)
+  const timezonesStream = gulp
+    .src(timezoneFileGlobs, {base: './node_modules'})
+    .pipe(gulpTimezonePlugin())
+  
+  const customTimezoneStream = gulp
+    .src('./public/javascripts/custom_timezone_locales/*.js')
+    .pipe(rename(path => path.dirname = '/timezone'))
+    .pipe(gulpTimezonePlugin())
 
   const fontfaceObserverStream = gulp
     .src('node_modules/fontfaceobserver/fontfaceobserver.standalone.js')
@@ -49,6 +59,7 @@ gulp.task('rev', () => {
 
     let stream = merge(
       timezonesStream,
+      customTimezoneStream,
       fontfaceObserverStream,
       gulpPlugins.file('ie11-polyfill.js', IE11PolyfillCode, { src: true }),
       gulp.src(STUFF_TO_REV, {
@@ -96,7 +107,9 @@ function gulpTimezonePlugin () {
   return through.obj((file, encoding, callback) => {
     if (file.isNull()) return callback(null, file)
     if (file.isBuffer()) {
-      const timezoneName = file.path.replace(/.*node_modules\/timezone\//, '').replace(/\.js$/, '')
+      const timezoneName = file.path
+        .replace(/.*\/timezone\//, '')
+        .replace(/\.js$/, '')
       file.contents = new Buffer(wrapTimezone(file.contents, timezoneName))
       return callback(null, file)
     }
