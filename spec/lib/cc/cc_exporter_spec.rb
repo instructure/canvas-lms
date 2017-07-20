@@ -681,7 +681,7 @@ describe "Common Cartridge exporting" do
     end
 
     context 'attachment permissions' do
-      before :once do
+      before do
         folder = Folder.root_folders(@course).first
         @visible = Attachment.create!({
           :uploaded_data => stub_png_data('visible.png'),

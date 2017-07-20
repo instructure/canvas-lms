@@ -1214,11 +1214,15 @@ describe Attachment do
       attachment_model(:uploaded_data => stub_png_data)
     end
 
+    around do |example|
+      Timecop.freeze(Time.now.utc, &example)
+    end
+
     it "should use the default size if an unknown size is passed in" do
       @attachment.thumbnail || @attachment.build_thumbnail.save!
       url = @attachment.thumbnail_url(:size => "100x100")
       expect(url).to be_present
-      expect(url).to eq @attachment.thumbnail.authenticated_s3_url
+      expect(url).to eq @attachment.thumbnail.authenticated_s3_url(expires_in: 144.hours)
     end
 
     it "should generate the thumbnail on the fly" do
@@ -1232,7 +1236,7 @@ describe Attachment do
       expect(url).to be_present
       thumb = @attachment.thumbnails.where(thumbnail: "640x>").first
       expect(thumb).to be_present
-      expect(url).to eq thumb.authenticated_s3_url
+      expect(url).to eq thumb.authenticated_s3_url(expires_in: 144.hours)
     end
 
     it "should use the existing thumbnail if present" do
@@ -1245,7 +1249,7 @@ describe Attachment do
       thumb = @attachment.thumbnails.where(thumbnail: "640x>").first
       expect(url).to be_present
       expect(thumb).to be_present
-      expect(url).to eq thumb.authenticated_s3_url
+      expect(url).to eq thumb.authenticated_s3_url(expires_in: 144.hours)
     end
   end
 
@@ -1264,7 +1268,7 @@ describe Attachment do
   end
 
   describe "thumbnail source image size limitation" do
-    before(:once) do
+    before do
       local_storage! # s3 attachment data is stubbed out, so there is no image to identify the size of
       course_factory
     end

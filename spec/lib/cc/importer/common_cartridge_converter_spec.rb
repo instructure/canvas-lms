@@ -34,9 +34,7 @@ describe "Standard Common Cartridge importing" do
     @course = course_factory
     @migration = ContentMigration.create(:context => @course)
     @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
-    enable_cache do
-      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
-    end
+    Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
   end
 
   it "should import webcontent" do
@@ -605,9 +603,7 @@ describe "LTI tool combination" do
     @migration = ContentMigration.create(:context => @course)
     @migration.migration_type = "common_cartridge_importer"
     @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
-    enable_cache do
-      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
-    end
+    Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
   end
 
   it "should combine lti tools in cc packages when possible" do
@@ -645,9 +641,7 @@ describe "other cc files" do
       :base_download_dir=>unzipped_file_path, :content_migration => @migration)
     converter.export
     @course_data = converter.course.with_indifferent_access
-    enable_cache do
-      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
-    end
+    Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
   end
 
   describe "cc assignment extensions" do

@@ -1248,7 +1248,6 @@ describe Enrollment do
 
     context 'dates for students' do
       before :once do
-        enable_cache
         Timecop.freeze(10.minutes.ago) do
           course_with_student(active_all: true)
         end
@@ -1340,7 +1339,6 @@ describe Enrollment do
 
     context 'dates for teachers' do
       before :once do
-        enable_cache
         Timecop.freeze(10.minutes.ago) do
           course_with_teacher(active_all: true)
         end

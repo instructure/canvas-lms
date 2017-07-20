@@ -842,11 +842,8 @@ describe FilesController do
         assignment.submit_homework(@student, :attachments => [@file])
       end
 
-      before :once do
+      before do
         submit_file
-      end
-
-      before :each do
         user_session(@student)
       end
 
@@ -1199,7 +1196,7 @@ describe FilesController do
         get "public_url", params: {:id => @attachment.id}
         expect(response).to be_success
         data = json_parse
-        expect(data).to eq({ "public_url" => @attachment.authenticated_s3_url })
+        expect(data).to eq({ "public_url" => @attachment.authenticated_s3_url(secure: false) })
       end
     end
 
@@ -1217,7 +1214,7 @@ describe FilesController do
         get "public_url", params: {:id => @attachment.id, :submission_id => @submission.id}
         expect(response).to be_success
         data = json_parse
-        expect(data).to eq({ "public_url" => @attachment.authenticated_s3_url })
+        expect(data).to eq({ "public_url" => @attachment.authenticated_s3_url(secure: false) })
       end
 
       it "should verify that the requested file belongs to the submission" do
@@ -1233,7 +1230,7 @@ describe FilesController do
         get "public_url", params: {:id => old_file.id, :submission_id => @submission.id}
         expect(response).to be_success
         data = json_parse
-        expect(data).to eq({ "public_url" => old_file.authenticated_s3_url })
+        expect(data).to eq({ "public_url" => old_file.authenticated_s3_url(secure: false) })
       end
     end
   end

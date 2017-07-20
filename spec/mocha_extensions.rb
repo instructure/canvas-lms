@@ -18,24 +18,26 @@
 # This chunk of monkey patching thanks to Simone Carletti,
 # see https://github.com/floehopper/mocha/pull/19 for more information
 
-module Mocha
-  class Expectation
-    def returns(*values, &block)
-      @return_values += if block_given?
-        ReturnValues.build(block)
-      else
-        ReturnValues.build(*values)
+unless ENV['NO_MOCHA']
+  module Mocha
+    class Expectation
+      def returns(*values, &block)
+        @return_values += if block_given?
+          ReturnValues.build(block)
+        else
+          ReturnValues.build(*values)
+        end
+        self
       end
-      self
     end
-  end
 
-  class SingleReturnValue
-    def evaluate
-      if @value.is_a?(Proc)
-        @value.call
-      else
-        @value
+    class SingleReturnValue
+      def evaluate
+        if @value.is_a?(Proc)
+          @value.call
+        else
+          @value
+        end
       end
     end
   end
@@ -74,8 +76,10 @@ module MochaAnyInstantiation
     end
   end
 
-  def any_instantiation
-    ActiveRecord::Base.add_any_instantiation(self)
+  unless ENV['NO_MOCHA']
+    def any_instantiation
+      ActiveRecord::Base.add_any_instantiation(self)
+    end
   end
 end
 ActiveRecord::Base.singleton_class.prepend(MochaAnyInstantiation::ClassMethods)

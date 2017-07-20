@@ -598,7 +598,7 @@ describe "Files API", type: :request do
   end
 
   describe "#show" do
-    before :once do
+    before do
       @root = Folder.root_folders(@course).first
       @att = Attachment.create!(:filename => 'test.png', :display_name => "test-frd.png", :uploaded_data => stub_png_data, :folder => @root, :context => @course)
       @file_path = "/api/v1/files/#{@att.id}"
