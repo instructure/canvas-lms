@@ -75,6 +75,7 @@ class CommunicationChannel < ActiveRecord::Base
       ['49',   I18n.t('Germany (+49)'),                false],
       ['504',  I18n.t('Honduras (+504)'),              false],
       ['852',  I18n.t('Hong Kong (+852)'),             false],
+      ['354',  I18n.t('Iceland (+354)'),               false],
       ['91',   I18n.t('India (+91)'),                  false],
       ['353',  I18n.t('Ireland (+353)'),               false],
       ['972',  I18n.t('Israel (+972)'),                false],
