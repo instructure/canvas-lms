@@ -114,7 +114,8 @@ module SIS
             enrollment_info = @enrollment_batch.shift
             @logger.debug("Processing Enrollment #{enrollment_info.to_a.inspect}")
 
-            last_section = @section
+            @last_section = @section
+            @last_course = @course
             # reset the cached course/section if they don't match this row
             if @course && enrollment_info.course_id.present? && @course.sis_source_id != enrollment_info.course_id
               @course = nil
@@ -191,7 +192,7 @@ module SIS
             @course_roles_by_account_id[@course.account_id] ||= @course.account.available_course_roles
 
             # commit pending incremental account associations
-            incrementally_update_account_associations if @section != last_section and !@incrementally_update_account_associations_user_ids.empty?
+            incrementally_update_account_associations if @section != @last_section and !@incrementally_update_account_associations_user_ids.empty?
 
             associated_user_id = nil
 
@@ -328,7 +329,7 @@ module SIS
           User.update_account_associations(@incrementally_update_account_associations_user_ids.to_a,
               :incremental => true,
               :precalculated_associations => User.calculate_account_associations_from_accounts(
-                  [@course.account_id, @section.nonxlist_course.try(:account_id)].compact.uniq,
+                  [@last_course.account_id, @last_section.nonxlist_course.try(:account_id)].compact.uniq,
                           @account_chain_cache
                       ))
         end

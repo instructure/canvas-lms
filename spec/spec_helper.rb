@@ -565,8 +565,8 @@ RSpec.configure do |config|
 
   def process_csv_data_cleanly(*lines_or_opts)
     importer = process_csv_data(*lines_or_opts)
-    raise "csv errors" if importer.errors.present?
-    raise "csv warning" if importer.warnings.present?
+    raise "csv errors: #{importer.errors.inspect}" if importer.errors.present?
+    raise "csv warning: #{importer.warnings.inspect}" if importer.warnings.present?
   end
 
   def enable_cache(new_cache=:memory_store)
