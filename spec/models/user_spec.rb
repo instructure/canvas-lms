@@ -3041,6 +3041,14 @@ describe User do
         expect(@teacher.assignments_needing_moderation.length).to eq 0 # should not count anymore once grades are published
       end
 
+      it "should not return duplicates" do
+        assmt = @course2.assignments.first
+        assmt.grade_student(@studentA, :grade => "1", :grader => @teacher, :provisional => true)
+        assmt.grade_student(@studentB, :grade => "2", :grader => @teacher, :provisional => true)
+        expect(@teacher.assignments_needing_moderation.length).to eq 1
+        expect(@teacher.assignments_needing_moderation.first).to eq assmt
+      end
+
       it "should not give a count for non-moderators" do
         assmt = @course2.assignments.first
         assmt.grade_student(@studentA, :grade => "1", :grader => @teacher, :provisional => true)
