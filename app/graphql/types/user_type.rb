@@ -32,19 +32,7 @@ module Types
     field :enrollments, types[EnrollmentType] do
       argument :courseId, !types.ID,
         "only return enrollments for this course",
-        # TODO: we're going to want to be able to re-use this
-        prepare: ->(relay_or_legacy_id, ctx) {
-          if relay_or_legacy_id =~ /\A\d+\Z/
-            relay_or_legacy_id
-          else
-            type, id = GraphQL::Schema::UniqueWithinType.decode(relay_or_legacy_id)
-            if (type != "Course" || id.nil?)
-              GraphQL::ExecutionError.new("must provide a valid courseId")
-            else
-              id
-            end
-          end
-        }
+        prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
 
       resolve ->(user, args, ctx) do
         Loaders::IDLoader.for(Course).load(args[:courseId]).then do |course|
