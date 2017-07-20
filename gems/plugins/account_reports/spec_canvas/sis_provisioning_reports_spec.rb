@@ -928,8 +928,8 @@ describe "Default Account Reports" do
             @user = user_with_managed_pseudonym(active_all: true, account: @root, name: 'Jimmy John',
                                                 username: 'other_shard@example.com', sis_user_id: 'other_shard')
           end
-          @account.stubs(:trusted_account_ids).returns([@account.id, @root.id])
-          @account.stubs(:trust_exists?).returns(true)
+          allow(@account).to receive(:trusted_account_ids).and_return([@account.id, @root.id])
+          allow(@account).to receive(:trust_exists?).and_return(true)
           @course1.enroll_user(@user)
 
           parameters = {}
@@ -1198,7 +1198,7 @@ describe "Default Account Reports" do
         @uo1 = @user2.user_observees.create_or_restore(user_id: @user1)
         uo2 = @user4.user_observees.create_or_restore(user_id: @user3)
         @user7.user_observees.create_or_restore(user_id: @user6)
-        UserObserver.where(id: [@uo1.id, uo2.id]).update_all(sis_batch_id: @sis)
+        UserObserver.where(id: [@uo1.id, uo2.id]).update_all(sis_batch_id: @sis.id)
       end
 
       it 'should run user_observer provisioning report' do

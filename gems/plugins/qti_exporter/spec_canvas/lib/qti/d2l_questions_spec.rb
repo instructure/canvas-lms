@@ -77,7 +77,7 @@ describe "Converting D2L QTI" do
   end
 
   it "should convert the assessment into a quiz" do
-    Qti::AssessmentTestConverter.any_instance.stubs(:unique_local_id).returns("random")
+    allow_any_instance_of(Qti::AssessmentTestConverter).to receive(:unique_local_id).and_return("random")
     expect(get_quiz_data(d2l_question_dir, 'assessment', @opts).last.first).to eq D2LExpected::ASSESSMENT
   end
 

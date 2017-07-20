@@ -27,10 +27,10 @@ describe AcademicBenchmark::Api do
   end
 
   def mock_api_call(code, body, url)
-    response = Object.new
-    response.stubs(:body).returns(body)
-    response.stubs(:code).returns(code.to_s)
-    AcademicBenchmark::Api.expects(:get_url).with(url).returns(response)
+    response = double()
+    allow(response).to receive(:body).and_return(body)
+    allow(response).to receive(:code).and_return(code.to_s)
+    expect(AcademicBenchmark::Api).to receive(:get_url).with(url).and_return(response)
   end
 
   it "should fail with bad AB response" do

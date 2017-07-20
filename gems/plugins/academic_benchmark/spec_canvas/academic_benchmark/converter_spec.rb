@@ -154,13 +154,13 @@ describe AcademicBenchmark::Converter do
     })
   end
   before do
-    AcademicBenchmark.stubs(:config).returns({partner_id: "instructure", partner_key: "key"})
-    standards_mock = mock("standards")
-    standards_mock.stubs(:authority_tree).returns(
+    allow(AcademicBenchmark).to receive(:config).and_return({partner_id: "instructure", partner_key: "key"})
+    standards_mock = double("standards")
+    allow(standards_mock).to receive(:authority_tree).and_return(
       AcademicBenchmarks::Standards::StandardsForest.new([standard_instance, standard_instance2, standard_instance3,
         standard_instance4, standard_instance5]).consolidate_under_root(authority_instance)
     )
-    AcademicBenchmarks::Api::Standards.stubs(:new).returns(standards_mock)
+    allow(AcademicBenchmarks::Api::Standards).to receive(:new).and_return(standards_mock)
     @user = admin_user
   end
   subject(:converter) do
@@ -170,7 +170,7 @@ describe AcademicBenchmark::Converter do
   describe '#export' do
     context 'when content_migration settings are missing' do
       before do
-        converter.stubs(:content_migration).returns(nil)
+        allow(converter).to receive(:content_migration).and_return(nil)
       end
 
       it 'raises error missing content_migration settings' do
