@@ -22,7 +22,7 @@ describe ContentExportsController do
   describe "POST 'create'" do
     it "should explicitly export everything" do
       course_with_teacher_logged_in(:active_all => true)
-      post 'create', :course_id => @course.id
+      post 'create', params: {:course_id => @course.id}
       expect(response).to be_success
 
       expect(ContentExport.last.selected_content[:everything]).to be_present
@@ -73,7 +73,7 @@ describe ContentExportsController do
       describe "index" do
         it "returns all course exports + the teacher's file exports" do
           user_session(@teacher)
-          get :index, course_id: @course.id
+          get :index, params: {course_id: @course.id}
           expect(response).to be_success
           expect(assigns(:exports).map(&:id)).to match_array [@acx.id, @tcx.id, @tzx.id]
         end
@@ -82,19 +82,19 @@ describe ContentExportsController do
       describe "show" do
         it "should find course exports" do
           user_session(@teacher)
-          get :show, course_id: @course.id, id: @acx.id
+          get :show, params: {course_id: @course.id, id: @acx.id}
           expect(response).to be_success
         end
 
         it "should find teacher's file exports" do
           user_session(@teacher)
-          get :show, course_id: @course.id, id: @tzx.id
+          get :show, params: {course_id: @course.id, id: @tzx.id}
           expect(response).to be_success
         end
 
         it "should not find other's file exports" do
           user_session(@teacher)
-          get :show, course_id: @course.id, id: @szx.id
+          get :show, params: {course_id: @course.id, id: @szx.id}
           assert_status(404)
         end
       end
@@ -121,13 +121,13 @@ describe ContentExportsController do
       describe "show" do
         it "should find one's own export" do
           user_session(@student)
-          get :show, id: @sdx.id
+          get :show, params: {id: @sdx.id}
           expect(response).to be_success
         end
 
         it "should not find another's export" do
           user_session(@student)
-          get :show, id: @tzx.id
+          get :show, params: {id: @tzx.id}
           assert_status(404)
         end
       end

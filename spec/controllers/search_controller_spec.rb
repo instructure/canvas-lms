@@ -202,7 +202,7 @@ describe SearchController do
     end
 
     it "does not cache XHR requests" do
-      xhr :get, 'all_courses'
+      get 'all_courses', xhr: true
       expect(response.headers["Pragma"]).to eq "no-cache"
     end
   end

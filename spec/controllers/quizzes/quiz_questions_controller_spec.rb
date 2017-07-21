@@ -110,9 +110,9 @@ describe Quizzes::QuizQuestionsController do
         long_data = "#{long_data}abcdefghijklmnopqrstuvwxyz#{long_data}"
       end
       user_session(@teacher)
-      xhr :post, 'create', course_id: @course.id, quiz_id: @quiz, question: {
+      post 'create', params: {course_id: @course.id, quiz_id: @quiz, question: {
         question_text: long_data
-      }
+      }}, xhr: true
       expect(response.body).to match /max length is 16384/
     end
   end
@@ -187,9 +187,9 @@ describe Quizzes::QuizQuestionsController do
         long_data = "#{long_data}abcdefghijklmnopqrstuvwxyz#{long_data}"
       end
       user_session(@teacher)
-      xhr :put, 'update', course_id: @course.id, quiz_id: @quiz, id: @question.id, question: {
+      put 'update', params: {course_id: @course.id, quiz_id: @quiz, id: @question.id, question: {
         question_text: long_data
-      }
+      }}, xhr: true
       expect(response.body).to match /max length is 16384/
     end
 
