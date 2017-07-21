@@ -380,6 +380,10 @@ class SubmissionsApiController < ApplicationController
       assignments = assignment_scope.to_a
     end
 
+    if requested_assignment_ids.present? && (requested_assignment_ids - assignments.map(&:id)).present?
+      return render json: { error: 'invalid assignment ids requested'}, status: :forbidden
+    end
+
     assignment_visibilities = {}
     assignment_visibilities = AssignmentStudentVisibility.users_with_visibility_by_assignment(course_id: @context.id, user_id: student_ids, assignment_id: assignments.map(&:id))
 
@@ -387,7 +391,6 @@ class SubmissionsApiController < ApplicationController
     unless @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
       assignments = assignments.select{ |a| (assignment_visibilities.fetch(a.id,[]) & student_ids).any?}
     end
-
 
     # preload with stuff already in memory
     assignments.each { |a| a.context = @context }
@@ -439,7 +442,7 @@ class SubmissionsApiController < ApplicationController
             hash[:submissions] << submission_json(submission, submission.assignment, @current_user, session, @context, includes, params)
           end
         end
-        if includes.include?('total_scores') && params[:grouped].present?
+        if includes.include?('total_scores')
           hash.merge!(
             :computed_final_score => enrollment.computed_final_score,
             :computed_current_score => enrollment.computed_current_score

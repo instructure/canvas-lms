@@ -1501,6 +1501,24 @@ describe 'Submissions API', type: :request do
       expect(json.map { |a| a["assignment_id"] }).to eq [@a2.id, @a1.id, @a3.id]
     end
 
+    it "errors when asking for assignments in other courses" do
+      # second course
+      course_with_teacher(:active_all => true)
+      @course.enroll_student(@student1).accept!
+      @course.enroll_student(@student2).accept!
+
+      # call the api on the new course, passing assignment ids from the old course
+      json = api_call(:get,
+            "/api/v1/courses/#{@course.id}/students/submissions.json",
+            { controller: 'submissions_api', action: 'for_students',
+              format: 'json', course_id: @course.to_param },
+            { student_ids: 'all',
+              assignment_ids: [@a1.id, @a2.id],
+              grouped: true,
+              total_scores: true })
+      expect(response).to be_forbidden
+    end
+
     context 'OriginalityReport' do
       it 'includes has_originality_report if the submission has an originality_report' do
         attachment_model
