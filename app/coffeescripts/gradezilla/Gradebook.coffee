@@ -2101,6 +2101,38 @@ define [
 
     # Submission Tray
 
+    assignmentColumns: =>
+      @gridSupport.grid.getColumns().filter (column) =>
+        column.type == 'assignment'
+
+    navigateAssignment: (direction) =>
+      location = @gridSupport.state.getActiveLocation()
+      columns = @grid.getColumns()
+      range = if direction == 'next'
+        [location.cell + 1 .. columns.length]
+      else
+        [location.cell - 1 ... 0]
+      assignment
+
+      for i in range
+        curAssignment = columns[i]
+
+        if curAssignment.id.match(/^assignment_(?!group)/)
+          this.gridSupport.state.setActiveLocation('body', { row: location.row, cell: i })
+          assignment = curAssignment
+          break
+
+      assignment
+
+    loadTrayAssignment: (direction) =>
+      studentId = @getSubmissionTrayState().studentId
+      assignment = @navigateAssignment(direction)
+
+      return unless assignment
+
+      @setSubmissionTrayState(true, studentId, assignment.assignmentId)
+      @updateRowAndRenderSubmissionTray(studentId)
+
     renderSubmissionTray: (student) =>
       mountPoint = document.getElementById('StudentTray__Container')
       { open, studentId, assignmentId } = @getSubmissionTrayState()
@@ -2108,9 +2140,21 @@ define [
       # submission has not yet loaded
       fakeSubmission = { assignment_id: assignmentId, late: false, missing: false, excused: false, seconds_late: 0 }
       submission = @getSubmission(studentId, assignmentId) || fakeSubmission
+      assignment = @getAssignment(assignmentId)
+      activeLocation = @gridSupport.state.getActiveLocation()
+      cell = activeLocation.cell
+
+      columns = @gridSupport.grid.getColumns()
+      currentColumn = columns[cell]
+
+      assignmentColumns = @assignmentColumns()
+      currentIndex = assignmentColumns.indexOf(currentColumn)
+
+      isFirstAssignment = currentIndex == 0
+      isLastAssignment = currentIndex == assignmentColumns.length - 1
 
       props =
-        key: "submission_tray_#{studentId}_#{assignmentId}"
+        key: "grade_details_tray"
         colors: @getGridColors()
         isOpen: open
         latePolicy: @courseContent.latePolicy
@@ -2122,7 +2166,12 @@ define [
           id: student.id,
           name: student.name,
           avatarUrl: htmlDecode(student.avatar_url)
+        assignment: ConvertCase.camelize(assignment)
         submission: ConvertCase.camelize(submission)
+        isFirstAssignment: isFirstAssignment
+        isLastAssignment: isLastAssignment
+        selectNextAssignment: => @loadTrayAssignment('next')
+        selectPreviousAssignment: => @loadTrayAssignment('previous')
         courseId: @options.context_id
         speedGraderEnabled: @options.speed_grader_enabled
         submissionUpdating: @contentLoadStates.submissionUpdating

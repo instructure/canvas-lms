@@ -6075,6 +6075,12 @@ QUnit.module('Gradebook#renderSubmissionTray', {
       helper: {
         commitCurrentEdit () {},
         focus () {}
+      },
+      state: {
+        getActiveLocation: () => ({ region: 'body', cell: 0, row: 0 })
+      },
+      grid: {
+        getColumns: () => []
       }
     };
   },
