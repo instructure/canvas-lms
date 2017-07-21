@@ -69,6 +69,7 @@ describe "student planner" do
     it "shows submitted tag for assignments that have submissions", priority: "1", test_id: 3263151 do
       @assignment.submit_homework(@student1, submission_type: "online_text_entry", body: "Assignment submitted")
       go_to_list_view
+      wait_for_planner_load
 
       # Student planner shows submitted assignments as completed. Expand to see the assignment
       expand_completed_item
@@ -138,6 +139,7 @@ describe "student planner" do
 
     it "shows and navigates to quizzes page from student planner", priority: "1", test_id: 3259303 do
       go_to_list_view
+      wait_for_planner_load
       validate_object_displayed('Quiz')
       validate_link_to_url(@quiz, 'quizzes')
     end
@@ -145,6 +147,7 @@ describe "student planner" do
     it "shows and navigates to graded surveys with due dates", priority: "1", test_id: 3282673 do
       @quiz.update(quiz_type: "graded_survey")
       go_to_list_view
+      wait_for_planner_load
       validate_object_displayed('Quiz')
       validate_link_to_url(@quiz, 'quizzes')
     end
@@ -152,6 +155,7 @@ describe "student planner" do
     it "shows and navigates to ungraded surveys with due dates", priority: "1", test_id: 3282674 do
       @quiz.update(quiz_type: "survey")
       go_to_list_view
+      wait_for_planner_load
       validate_object_displayed('Quiz')
       validate_link_to_url(@quiz, 'quizzes')
     end
@@ -159,6 +163,7 @@ describe "student planner" do
     it "shows and navigates to practice quizzes with due dates", priority: "1", test_id: 3284242 do
       @quiz.update(quiz_type: "practice_quiz")
       go_to_list_view
+      wait_for_planner_load
       validate_object_displayed('Quiz')
       validate_link_to_url(@quiz, 'quizzes')
     end
@@ -343,6 +348,7 @@ describe "student planner" do
 
     it "loads more items at the bottom of the page", priority: "1", test_id: 3263149 do
       go_to_list_view
+      wait_for_planner_load
       current_last_item = items_displayed.last
       current_items = items_displayed.count
       scroll_to(current_last_item)

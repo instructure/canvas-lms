@@ -128,8 +128,8 @@ describe "scheduler" do
       expect(f('.fc-content .icon-calendar-add')).to be
       scroll_into_view('.fc-content .icon-calendar-add')
       f('.fc-content .icon-calendar-add').click
-      move_to_click('.reserve_event_link')
-      visible_dialog_element = fj('.ui-dialog:visible')
+      f('.reserve_event_link').click
+      visible_dialog_element = fj(".ui-dialog:contains('You are already signed up for')")
       title = visible_dialog_element.find_element(:css, '.ui-dialog-titlebar')
       expect(title.text).to include('Cancel existing reservation and sign up for this one?')
       f('.ui-dialog-buttonset .ui-button').click

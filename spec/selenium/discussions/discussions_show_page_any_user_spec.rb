@@ -336,6 +336,7 @@ describe "discussions" do
           get url
           expect(DiscussionEntry.last.depth).to eq 2
           expect(ff('.discussion-entries .entry')).to have_size(12) # +1 because of the initial entry
+          scroll_to(fj(".entry-content:contains('teacher')")) # scroll to the button to preserve chrome functionality
           f('.showMore').click
           expect(ff('.discussion-entries .entry')).to have_size(side_comment_number + 2) # +1 because of the initial entry, +1 because of the parent entry
         end
