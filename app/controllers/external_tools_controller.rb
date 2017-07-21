@@ -611,7 +611,7 @@ class ExternalToolsController < ApplicationController
       @context,
       self,
       @current_user,
-      media_types,
+      media_types.to_unsafe_h,
       params["export_type"]
     )
     params = Lti::ContentItemSelectionRequest.default_lti_params(@context, @domain_root_account, @current_user).merge(
@@ -915,7 +915,7 @@ class ExternalToolsController < ApplicationController
   #        -F 'config_url=https://example.com/ims/lti/tool_config.xml'
   def create
     if authorized_action(@context, @current_user, :create_tool_manually)
-      external_tool_params = (params[:external_tool] || params).to_hash.with_indifferent_access
+      external_tool_params = (params[:external_tool] || params).to_unsafe_h
       @tool = @context.context_external_tools.new
       if request.content_type == 'application/x-www-form-urlencoded'
         custom_fields = Lti::AppUtil.custom_params(request.raw_post)
@@ -963,8 +963,7 @@ class ExternalToolsController < ApplicationController
         :config_settings
       ]
 
-      external_tool_params = params.to_hash.with_indifferent_access.select{|k, _| required_params.include?(k.to_sym)}
-
+      external_tool_params = params.permit(*required_params).to_unsafe_h
       external_tool_params[:config_url] = app_api.get_app_config_url(params[:app_center_id], params[:config_settings])
       external_tool_params[:config_type] = 'by_url'
 
@@ -994,7 +993,7 @@ class ExternalToolsController < ApplicationController
   def update
     @tool = @context.context_external_tools.active.find(params[:id] || params[:external_tool_id])
     if authorized_action(@tool, @current_user, :update_manually)
-      external_tool_params = (params[:external_tool] || params).to_hash.with_indifferent_access
+      external_tool_params = (params[:external_tool] || params).to_unsafe_h
       if request.content_type == 'application/x-www-form-urlencoded'
         custom_fields = Lti::AppUtil.custom_params(request.raw_post)
         external_tool_params[:custom_fields] = custom_fields if custom_fields.present?

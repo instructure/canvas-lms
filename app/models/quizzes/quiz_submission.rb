@@ -283,7 +283,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def sanitize_params(params)
-    params = params.to_hash.with_indifferent_access if params.is_a?(ActionController::Parameters) # clear the strong params
+    params = params.to_unsafe_h if params.is_a?(ActionController::Parameters) # clear the strong params
 
     # if the submission has already been graded
     if graded?

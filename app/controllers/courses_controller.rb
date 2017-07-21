@@ -2215,7 +2215,7 @@ class CoursesController < ApplicationController
     params_for_update = course_params
     params[:course][:event] = :offer if params[:offer].present?
 
-    if params[:course][:event] && params[:course].size == 1
+    if params[:course][:event] && params[:course].keys.size == 1
       if authorized_action(@course, @current_user, :change_course_state) && process_course_event
         render_update_success
       end
@@ -2374,13 +2374,13 @@ class CoursesController < ApplicationController
         end
 
         if (mc_restrictions = params[:course][:blueprint_restrictions])
-          restrictions = Hash[mc_restrictions.map{|k, v| [k.to_sym, value_to_boolean(v)]}]
+          restrictions = Hash[mc_restrictions.to_unsafe_h.map{|k, v| [k.to_sym, value_to_boolean(v)]}]
           template.default_restrictions = restrictions
         end
 
         if (mc_restrictions_by_type = params[:course][:blueprint_restrictions_by_object_type])
           parsed_restrictions_by_type = {}
-          mc_restrictions_by_type.each do |type, restrictions|
+          mc_restrictions_by_type.to_unsafe_h.each do |type, restrictions|
             class_name = type == "quiz" ? "Quizzes::Quiz" : type.camelcase
             parsed_restrictions_by_type[class_name] = Hash[restrictions.map{|k, v| [k.to_sym, value_to_boolean(v)]}]
           end

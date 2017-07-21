@@ -27,7 +27,7 @@ describe UserProfile do
       expect(tabs.map { |t| t[:id] }).not_to include UserProfile::TAB_PROFILE
 
       Account.default.update_attribute :settings, :enable_profiles => true
-      tabs = @student.profile(true).
+      tabs = @student.reload.profile.
         tabs_available(@user, :root_account => Account.default)
       expect(tabs.map { |t| t[:id] }).to include UserProfile::TAB_PROFILE
     end

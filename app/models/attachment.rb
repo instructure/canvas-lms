@@ -210,7 +210,7 @@ class Attachment < ActiveRecord::Base
     end
 
     # directly update workflow_state so we don't trigger another save cycle
-    if self.workflow_state_changed?
+    if CANVAS_RAILS5_0 ? self.workflow_state_changed? : self.will_save_change_to_workflow_state?
       self.shard.activate do
         self.class.where(:id => self).update_all(:workflow_state => self.workflow_state)
       end

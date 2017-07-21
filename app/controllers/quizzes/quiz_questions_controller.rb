@@ -280,7 +280,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
         return add_questions
       end
 
-      question_data = params[:question]
+      question_data = params[:question]&.to_unsafe_h
       question_data ||= {}
 
       if question_data[:quiz_group_id]
@@ -354,7 +354,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
   def update
     if authorized_action(@quiz, @current_user, :update)
       @question = @quiz.quiz_questions.active.find(params[:id])
-      question_data = params[:question]
+      question_data = params[:question].to_unsafe_h
       question_data[:regrade_user] = @current_user
       question_data ||= {}
 

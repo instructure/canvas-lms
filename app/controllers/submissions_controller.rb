@@ -605,7 +605,7 @@ class SubmissionsController < ApplicationController
         }
       end
       begin
-        @submissions = @assignment.update_submission(@user, params[:submission])
+        @submissions = @assignment.update_submission(@user, params[:submission].to_unsafe_h)
       rescue => e
         Canvas::Errors.capture_exception(:submissions, e)
         logger.error(e)

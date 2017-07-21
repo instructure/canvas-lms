@@ -609,6 +609,7 @@ describe ApplicationController do
     end
 
     it "should raise InvalidAuthenticityToken with invalid tokens" do
+      allow(controller).to receive(:valid_request_origin?).and_return(true)
       expect{ controller.send(:verify_authenticity_token) }.to raise_exception(ActionController::InvalidAuthenticityToken)
     end
 
@@ -619,6 +620,7 @@ describe ApplicationController do
 
     it "should still raise on session-authenticated api request with invalid tokens" do
       allow(controller.request).to receive(:path).and_return('/api/endpoint')
+      allow(controller).to receive(:valid_request_origin?).and_return(true)
       expect{ controller.send(:verify_authenticity_token) }.to raise_exception(ActionController::InvalidAuthenticityToken)
     end
 

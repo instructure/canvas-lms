@@ -2702,8 +2702,8 @@ class User < ActiveRecord::Base
     not public?
   end
 
-  def profile(force_reload = false)
-    (force_reload ? reload_profile : super) || build_profile
+  def profile
+    super || build_profile
   end
 
   def parse_otp_remember_me_cookie(cookie)

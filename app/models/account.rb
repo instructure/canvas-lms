@@ -65,8 +65,8 @@ class Account < ActiveRecord::Base
 
   has_many :account_reports
   has_many :grading_standards, -> { where("workflow_state<>'deleted'") }, as: :context, inverse_of: :context
-  has_many :assessment_questions, :through => :assessment_question_banks
   has_many :assessment_question_banks, -> { preload(:assessment_questions, :assessment_question_bank_users) }, as: :context, inverse_of: :context
+  has_many :assessment_questions, :through => :assessment_question_banks
   has_many :roles
   has_many :all_roles, :class_name => 'Role', :foreign_key => 'root_account_id'
   has_many :progresses, :as => :context, :inverse_of => :context

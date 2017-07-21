@@ -509,7 +509,7 @@ class CommunicationChannelsController < ApplicationController
   protected
   def bulk_action_args
     account = params[:account_id] == 'self' ? @domain_root_account : Account.find(params[:account_id])
-    args = params.slice(:after, :before, :pattern, :with_invalid_paths, :path_type).symbolize_keys
+    args = params.permit(:after, :before, :pattern, :with_invalid_paths, :path_type).to_unsafe_h.symbolize_keys
     args.merge!({account: account})
   end
 
