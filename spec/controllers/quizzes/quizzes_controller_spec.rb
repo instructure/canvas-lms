@@ -257,7 +257,7 @@ describe Quizzes::QuizzesController do
     include_context "grading periods within controller" do
       let(:course) { @course }
       let(:teacher) { @teacher }
-      let(:request_params) { [:edit, course_id: course, id: @quiz] }
+      let(:request_params) { [:edit, params: {course_id: course, id: @quiz}] }
     end
 
     it "should require authorization" do

@@ -619,7 +619,7 @@ describe DiscussionTopicsController do
     include_context "grading periods within controller" do
       let(:course) { @course }
       let(:teacher) { @teacher }
-      let(:request_params) { [:edit, course_id: course, id: @topic] }
+      let(:request_params) { [:edit, params: {course_id: course, id: @topic}] }
     end
 
     it "should not explode with mgp and group context" do

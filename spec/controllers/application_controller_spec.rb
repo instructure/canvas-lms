@@ -945,7 +945,7 @@ describe WikiPagesController do
       course_with_teacher_logged_in :active_all => true
       controller.instance_variable_set(:@context, @course)
 
-      get 'index', :course_id => @course.id
+      get 'index', params: {:course_id => @course.id}
 
       expect(controller.js_env).to include(:WIKI_RIGHTS)
       expect(controller.js_env[:WIKI_RIGHTS].symbolize_keys).to eq Hash[@course.wiki.check_policy(@teacher).map { |right| [right, true] }]
@@ -966,13 +966,13 @@ describe CoursesController do
 
     it "should populate js_env with course_home setting" do
       controller.instance_variable_set(:@context, @course)
-      get 'show', id: @course.id
+      get 'show', params: {id: @course.id}
       expect(controller.js_env).to include(:COURSE_HOME)
     end
 
     it "should populate js_env with setting for show_announcements flag" do
       controller.instance_variable_set(:@context, @course)
-      get 'show', id: @course.id
+      get 'show', params: {id: @course.id}
       expect(controller.js_env).to include(:SHOW_ANNOUNCEMENTS, :ANNOUNCEMENT_LIMIT)
       expect(controller.js_env[:SHOW_ANNOUNCEMENTS]).to be_truthy
       expect(controller.js_env[:ANNOUNCEMENT_LIMIT]).to eq(5)
