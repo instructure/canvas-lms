@@ -301,6 +301,7 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
   .discussion-status {
     color: $ic-color-icon-disabled;
     width: 84px;
+    white-space: nowrap;
 
     .publish-icon, .lock-icon {
       margin-right: 10px;
