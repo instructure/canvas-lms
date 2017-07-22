@@ -3630,7 +3630,7 @@ es:
       labels: 
         password: Contraseña
         subscribe_to_emails: "Quiero recibir información, noticias y ayuda de Instructure"
-        time_zone: "Huso horario"
+        time_zone: "Zona horaria"
         unique_id: "Iniciar sesión"
       page_title: "Registrar %{email}"
       titles: 
@@ -5308,7 +5308,7 @@ es:
         sis_source_id: "ID de SIS"
         start_at: Comienza
         storage_quota: "Almacenamiento de archivo"
-        time_zone: "Huso horario"
+        time_zone: "Zona horaria"
         turnitin_comments: "Comentarios en Turnitin"
       language_overrides_preferences: "Esto sobrescribirá cualquier preferencias de usuarios/sistemas. Esto solo se recomienda para cursos en otro idioma que no sea el Inglés"
       links: 
@@ -13418,7 +13418,7 @@ es:
         show_user_services: "Permitir que los miembros de los cursos y grupos en los que participo vean los servicios enlazados a mi perfil."
         skype_name: "Nombre de Skype"
         sortable_name: "Nombre clasificable"
-        time_zone: "Huso horario"
+        time_zone: "Zona horaria"
         token: Autentificador
         token_application: Aplicación
         token_created: Creado
@@ -18400,7 +18400,7 @@ es:
         profile_picture: "Imagen de perfil"
         short_name: "Mostrar nombre"
         sortable_name: "Nombre clasificable"
-        time_zone: "Huso horario"
+        time_zone: "Zona horaria"
       merge_with_another_user: "Unirse con otro usuario"
       none: Ninguno
       remove_avatar: "Eliminar el avatar"
