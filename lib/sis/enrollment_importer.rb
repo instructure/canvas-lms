@@ -114,8 +114,8 @@ module SIS
             enrollment_info = @enrollment_batch.shift
             @logger.debug("Processing Enrollment #{enrollment_info.to_a.inspect}")
 
-            @last_section = @section
-            @last_course = @course
+            @last_section = @section if @section
+            @last_course = @course if @course
             # reset the cached course/section if they don't match this row
             if @course && enrollment_info.course_id.present? && @course.sis_source_id != enrollment_info.course_id
               @course = nil
