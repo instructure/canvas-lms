@@ -39,7 +39,7 @@ describe CollaborationsController, type: :request do
     get "/courses/#{@course.id}/collaborations/"
     expect(response).to be_success
 
-    post "/courses/#{@course.id}/collaborations/", { :collaboration => { :collaboration_type => "EtherPad", :title => "My Collab" } }
+    post "/courses/#{@course.id}/collaborations/", params: { :collaboration => { :collaboration_type => "EtherPad", :title => "My Collab" } }
     expect(response).to be_redirect
 
     get "/courses/#{@course.id}/collaborations/"

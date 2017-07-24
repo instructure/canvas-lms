@@ -43,8 +43,8 @@ describe ExternalToolsController do
       user_session(@teacher)
       post(
         "/api/v1/courses/#{@course.id}/external_tools",
-        post_body,
-        { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
+        params: post_body,
+        headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
       )
       expect(response).to be_success
       expect(assigns[:tool]).not_to be_nil
@@ -54,8 +54,8 @@ describe ExternalToolsController do
       user_session(@teacher)
       post(
         "/api/v1/courses/#{@course.id}/external_tools",
-        post_body,
-        { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
+        params: post_body,
+        headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
       )
       tool = assigns[:tool]
       expect(tool.settings[:custom_fields]["Complex!@#$^*(){}[]KEY"]).to eq 'Complex!@#$^*;(){}[]½Value'
@@ -81,8 +81,8 @@ describe ExternalToolsController do
       tool = new_valid_tool(@course)
       put(
         "/api/v1/courses/#{@course.id}/external_tools/#{tool.id}",
-        post_body,
-        { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
+        params: post_body,
+        headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
       )
       assert_status(401)
     end
@@ -92,8 +92,8 @@ describe ExternalToolsController do
       tool = new_valid_tool(@course)
       put(
         "/api/v1/courses/#{@course.id}/external_tools/#{tool.id}",
-        post_body,
-        { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
+        params: post_body,
+        headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
       )
       assert_status(200)
     end
@@ -103,8 +103,8 @@ describe ExternalToolsController do
       tool = new_valid_tool(@course)
       put(
         "/api/v1/courses/#{@course.id}/external_tools/#{tool.id}",
-        post_body,
-        { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
+        params: post_body,
+        headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
       )
       expect(response).to be_success
       expect(assigns[:tool]).not_to be_nil
@@ -115,8 +115,8 @@ describe ExternalToolsController do
       tool = new_valid_tool(@course)
       put(
         "/api/v1/courses/#{@course.id}/external_tools/#{tool.id}",
-        post_body,
-        { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
+        params: post_body,
+        headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
       )
 
       expect(assigns[:tool].settings[:custom_fields]["Complex!@#$^*(){}[]KEY"]).to eq 'Complex!@#$^*;(){}[]½Value'
@@ -186,8 +186,8 @@ describe ExternalToolsController do
         user_session(@teacher)
         post(
           "/api/v1/courses/#{@course.id}/create_tool_with_verification",
-          post_body.to_json,
-          {'CONTENT_TYPE' => 'application/json'}
+          params: post_body.to_json,
+          headers: {'CONTENT_TYPE' => 'application/json'}
         )
 
         expect(response).to be_success
@@ -200,8 +200,8 @@ describe ExternalToolsController do
 
         post(
           "/api/v1/courses/#{@course.id}/create_tool_with_verification",
-          post_body.to_json,
-          {'CONTENT_TYPE' => 'application/json'}
+          params: post_body.to_json,
+          headers: {'CONTENT_TYPE' => 'application/json'}
         )
 
         expect(response).not_to be_success
@@ -213,8 +213,8 @@ describe ExternalToolsController do
 
         post(
           "/api/v1/courses/#{@course.id}/create_tool_with_verification",
-          post_body.to_json,
-          {'CONTENT_TYPE' => 'application/json'}
+          params: post_body.to_json,
+          headers: {'CONTENT_TYPE' => 'application/json'}
         )
 
         expect(response).to be_success
@@ -227,8 +227,8 @@ describe ExternalToolsController do
 
         post(
           "/api/v1/courses/#{@course.id}/create_tool_with_verification",
-          post_body.to_json,
-          {'CONTENT_TYPE' => 'application/json'}
+          params: post_body.to_json,
+          headers: {'CONTENT_TYPE' => 'application/json'}
         )
 
         expect(response).to be_success

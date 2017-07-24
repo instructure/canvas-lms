@@ -208,8 +208,8 @@ describe "site-wide" do
       course_with_teacher_logged_in
       user_with_pseudonym :username => 'blah'
       post "/courses/#{@course.id}/user_lists.json",
-           { :user_list => ['blah'], :search_type => 'unique_id', :v2 => true },
-           { 'Accept' => 'application/json+canvas-string-ids' }
+           params: { :user_list => ['blah'], :search_type => 'unique_id', :v2 => true },
+           headers: { 'Accept' => 'application/json+canvas-string-ids' }
       json = JSON.parse response.body
       expect(json['users'][0]['user_id']).to be_a String
     end

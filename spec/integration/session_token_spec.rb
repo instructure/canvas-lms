@@ -27,7 +27,7 @@ describe 'session token', type: :request do
 
   it "should work" do
     get 'https://www.example.com/login/session_token?return_to=https://www.example.com/courses',
-         access_token: access_token
+         params: {access_token: access_token}
     expect(response).to be_success
     json = JSON.parse(response.body)
     expect(json['session_url']).to match %r{^https://www.example.com/courses\?session_token=[0-9a-zA-Z_\-]+$}

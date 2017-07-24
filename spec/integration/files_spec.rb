@@ -36,7 +36,7 @@ describe FilesController do
 
     it "with safefiles" do
       HostUrl.stubs(:file_host_with_shard).returns(['files-test.host', Shard.default])
-      get "http://test.host/files/#{@submission.attachment.id}/download", :inline => '1', :verifier => @submission.attachment.uuid
+      get "http://test.host/files/#{@submission.attachment.id}/download", params: {:inline => '1', :verifier => @submission.attachment.uuid}
       expect(response).to be_redirect
       uri = URI.parse response['Location']
       qs = Rack::Utils.parse_nested_query(uri.query)
@@ -56,7 +56,7 @@ describe FilesController do
 
     it "without safefiles" do
       HostUrl.stubs(:file_host_with_shard).returns(['test.host', Shard.default])
-      get "http://test.host/files/#{@submission.attachment.id}/download", :inline => '1', :verifier => @submission.attachment.uuid
+      get "http://test.host/files/#{@submission.attachment.id}/download", params: {:inline => '1', :verifier => @submission.attachment.uuid}
       # could be success or redirect, depending on S3 config
       expect([200, 302]).to be_include(response.status)
       expect(response['Pragma']).to be_nil
@@ -108,7 +108,7 @@ describe FilesController do
 
       it "with safefiles" do
         HostUrl.stubs(:file_host_with_shard).returns(['files-test.host', Shard.default])
-        get "http://test.host/users/#{@me.id}/files/#{@att.id}/download", :wrap => '1'
+        get "http://test.host/users/#{@me.id}/files/#{@att.id}/download", params: {:wrap => '1'}
         expect(response).to be_redirect
         uri = URI.parse response['Location']
         qs = Rack::Utils.parse_nested_query(uri.query)
@@ -126,7 +126,7 @@ describe FilesController do
 
       it "without safefiles" do
         HostUrl.stubs(:file_host_with_shard).returns(['test.host', Shard.default])
-        get "http://test.host/users/#{@me.id}/files/#{@att.id}/download", :wrap => '1'
+        get "http://test.host/users/#{@me.id}/files/#{@att.id}/download", params: {:wrap => '1'}
         expect(response).to be_redirect
         location = response['Location']
         expect(URI.parse(location).path).to eq "/users/#{@me.id}/files/#{@att.id}"
@@ -152,7 +152,7 @@ describe FilesController do
     host!("test.host")
     a1 = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @course)
     HostUrl.stubs(:file_host_with_shard).returns(['files-test.host', Shard.default])
-    get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download", :inline => '1'
+    get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download", params: {:inline => '1'}
     expect(response).to be_redirect
     uri = URI.parse response['Location']
     qs = Rack::Utils.parse_nested_query(uri.query)
@@ -175,7 +175,7 @@ describe FilesController do
     host!("test.host")
     a1 = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @course)
 
-    get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download", :inline => '1'
+    get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download", params: {:inline => '1'}
     expect(response).to be_redirect
     location = response['Location']
     remove_user_session
@@ -327,7 +327,7 @@ describe FilesController do
     @submission.attachment = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png')
     @submission.save!
     HostUrl.stubs(:file_host_with_shard).returns(['files-test.host', Shard.default])
-    get "http://test.host/users/#{@submission.user.id}/files/#{@submission.attachment.id}/download", :verifier => @submission.attachment.uuid
+    get "http://test.host/users/#{@submission.user.id}/files/#{@submission.attachment.id}/download", params: {:verifier => @submission.attachment.uuid}
 
     expect(response).to be_redirect
     uri = URI.parse response['Location']
@@ -365,7 +365,7 @@ describe FilesController do
     att1 = attachment_model(:uploaded_data => stub_png_data, :context => @course)
     att2 = attachment_model(:uploaded_data => stub_png_data("file2.png"), :context => @course)
 
-    post "/courses/#{@course.id}/files/reorder", {:order => "#{att2.id}, #{att1.id}", :folder_id => @folder.id}
+    post "/courses/#{@course.id}/files/reorder", params: {:order => "#{att2.id}, #{att1.id}", :folder_id => @folder.id}
     expect(response).to be_success
 
     expect(@folder.file_attachments.by_position_then_display_name).to eq [att2, att1]
@@ -381,7 +381,7 @@ describe FilesController do
     user_session(@user)
 
     ts, sf_verifier = @user.access_verifier
-    get "/files/#{att.id}", :user_id => @user.id, :ts => ts, :sf_verifier => sf_verifier # set the file access session tokens
+    get "/files/#{att.id}", params: {:user_id => @user.id, :ts => ts, :sf_verifier => sf_verifier} # set the file access session tokens
     expect(session['file_access_user_id']).to be_present
 
     get "/courses/#{@course.id}/files/#{att.id}/file_preview"
