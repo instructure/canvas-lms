@@ -927,7 +927,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(importer.errors).to be_empty
   end
 
-  it "associates to the correct accounts" do
+  it "associates to the correct accounts and doesn't die for invalid rows" do
     process_csv_data_cleanly(
       "account_id,name,parent_account_id,status",
       "a1,a1,,active",
@@ -952,7 +952,7 @@ describe SIS::CSV::EnrollmentImporter do
       "u0,user0,User,Uno,user@example.com,active",
       "v1,vser1,User,Uno,user@example.com,active",
     )
-    process_csv_data_cleanly(
+    importer = process_csv_data(
       "course_id,user_id,role,status",
       "c1,u1,student,active",
       "c1,u2,student,active",
@@ -964,8 +964,12 @@ describe SIS::CSV::EnrollmentImporter do
       "c1,u8,student,active",
       "c1,u9,student,active",
       "c1,u0,student,active",
+      "c3,v1,student,active", # invalid course_id
       "c2,v1,student,active",
     )
+    expect(importer.errors).to eq []
+    warnings = importer.warnings.map { |r| r.last }
+    expect(warnings).to eq ["Neither course nor section existed for user enrollment (Course ID: c3, Section ID: , User ID: v1)"]
     a2 = @account.sub_accounts.find_by(sis_source_id: 'a2')
     u1 = @account.pseudonyms.active.find_by(sis_user_id: 'u1').user
     expect(u1.associated_accounts).not_to be_include(a2)
