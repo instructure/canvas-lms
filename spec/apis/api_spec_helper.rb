@@ -126,7 +126,7 @@ def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {}
       end
     end
     LoadAccount.stubs(:default_domain_root_account).returns(opts[:domain_root_account]) if opts.has_key?(:domain_root_account)
-    __send__(method, path, params.reject { |k,v| route_params.keys.include?(k.to_sym) }.merge(body_params), headers)
+    __send__(method, path, headers: headers, params: params.reject { |k,v| route_params.keys.include?(k.to_sym) }.merge(body_params))
   end
 end
 

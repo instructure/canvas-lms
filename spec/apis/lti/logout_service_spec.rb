@@ -49,8 +49,8 @@ describe LtiApiController, type: :request do
     req = consumer.create_signed_request(:post, opts['path'], nil, :scheme => 'header', :timestamp => opts['timestamp'], :nonce => opts['nonce'])
     req.body = opts['body'] if opts['body']
     post "http://www.example.com#{req.path}",
-         req.body,
-         { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => req['Authorization'] }
+         params: req.body,
+         headers: { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => req['Authorization'] }
   end
 
   it "should generate a logout service URL with token" do
