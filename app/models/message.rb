@@ -761,7 +761,7 @@ class Message < ActiveRecord::Base
   #
   # Returns json hash.
   def as_json(options = {})
-    super(:only => [:id, :created_at, :sent_at, :workflow_state, :from, :to, :reply_to, :subject, :body, :html_body])['message']
+    super(:only => [:id, :created_at, :sent_at, :workflow_state, :from, :from_name, :to, :reply_to, :subject, :body, :html_body])['message']
   end
 
   protected
