@@ -54,7 +54,7 @@ describe Login::SamlController do
 
     controller.request.env['canvas.domain_root_account'] = account1
     session[:sentinel] = true
-    post :create, :SAMLResponse => "foo"
+    post :create, params: {:SAMLResponse => "foo"}
     expect(session[:sentinel]).to be_nil
     expect(response).to redirect_to(dashboard_url(:login_success => 1))
     expect(session[:saml_unique_id]).to eq unique_id
@@ -66,7 +66,7 @@ describe Login::SamlController do
     session.clear
 
     controller.request.env['canvas.domain_root_account'] = account2
-    post :create, :SAMLResponse => "bar"
+    post :create, params: {:SAMLResponse => "bar"}
     expect(response).to redirect_to(dashboard_url(:login_success => 1))
     expect(session[:saml_unique_id]).to eq unique_id
     expect(Pseudonym.find(session['pseudonym_credentials_id'])).to eq user2.pseudonyms.first
@@ -97,7 +97,7 @@ describe Login::SamlController do
     )
 
     controller.request.env['canvas.domain_root_account'] = account1
-    post :create, :SAMLResponse => "foo"
+    post :create, params: {:SAMLResponse => "foo"}
     expect(response).to redirect_to(dashboard_url(:login_success => 1))
     expect(session[:saml_unique_id]).to eq unique_id
     expect(Pseudonym.find(session['pseudonym_credentials_id'])).to eq user1.pseudonyms.first
@@ -129,7 +129,7 @@ describe Login::SamlController do
     controller.request.env['canvas.domain_root_account'] = account
 
     # Default to Login url if set to nil or blank
-    post :create, :SAMLResponse => "foo"
+    post :create, params: {:SAMLResponse => "foo"}
     expect(response).to redirect_to(login_url)
     expect(flash[:delegated_message]).to_not be_nil
     expect(session[:saml_unique_id]).to be_nil
@@ -137,7 +137,7 @@ describe Login::SamlController do
     account.unknown_user_url = ''
     account.save!
     controller.instance_variable_set(:@aac, nil)
-    post :create, :SAMLResponse => "foo"
+    post :create, params: {:SAMLResponse => "foo"}
     expect(response).to redirect_to(login_url)
     expect(flash[:delegated_message]).to_not be_nil
     expect(session[:saml_unique_id]).to be_nil
@@ -147,7 +147,7 @@ describe Login::SamlController do
     account.unknown_user_url = unknown_user_url
     account.save!
     controller.instance_variable_set(:@aac, nil)
-    post :create, :SAMLResponse => "foo"
+    post :create, params: {:SAMLResponse => "foo"}
     expect(response).to redirect_to(unknown_user_url)
     expect(session[:saml_unique_id]).to be_nil
   end
@@ -182,7 +182,7 @@ describe Login::SamlController do
 
     expect(account.pseudonyms.active.by_unique_id(unique_id)).to_not be_exists
     # Default to Login url if set to nil or blank
-    post :create, :SAMLResponse => "foo"
+    post :create, params: {:SAMLResponse => "foo"}
     expect(response).to redirect_to(dashboard_url(login_success: 1))
     p = account.pseudonyms.active.by_unique_id(unique_id).first!
     expect(p.authentication_provider).to eq ap
@@ -213,7 +213,7 @@ describe Login::SamlController do
     )
     LoadAccount.stubs(:default_domain_root_account).returns(account)
 
-    post :create, :SAMLResponse => "foo"
+    post :create, params: {:SAMLResponse => "foo"}
     expect(response).to redirect_to(dashboard_url(login_success: 1))
     expect(@user.reload.short_name).to eq 'Cody Cutrer'
   end
@@ -247,7 +247,7 @@ describe Login::SamlController do
 
     controller.request.env['canvas.domain_root_account'] = account1
     session[:parent_registration] = { observee: { unique_id: 'foo@example.com' } }
-    post :create, :SAMLResponse => "foo"
+    post :create, params: {:SAMLResponse => "foo"}
     expect(response).to be_redirect
     expect(response.location).to match(/example.com\/logout/)
   end
@@ -282,7 +282,7 @@ describe Login::SamlController do
     it "should saml_consume login with multiple authorization configs" do
       Onelogin::Saml::Response.stubs(:new).returns(stub('response', @stub_hash))
       controller.request.env['canvas.domain_root_account'] = @account
-      post :create, :SAMLResponse => "foo", :RelayState => "/courses"
+      post :create, params: {:SAMLResponse => "foo", :RelayState => "/courses"}
       expect(response).to redirect_to(courses_url)
       expect(session[:saml_unique_id]).to eq @unique_id
     end
@@ -292,7 +292,7 @@ describe Login::SamlController do
       logout_response.issuer = SAML2::NameID.new(@aac2.idp_entity_id)
       expect(SAML2::Bindings::HTTPRedirect).to receive(:decode).and_return(logout_response)
       controller.request.env['canvas.domain_root_account'] = @account
-      get :destroy, :SAMLResponse => "foo", :RelayState => "/courses"
+      get :destroy, params: {:SAMLResponse => "foo", :RelayState => "/courses"}
 
       expect(response).to redirect_to(saml_login_url(@aac2))
     end
@@ -336,7 +336,7 @@ describe Login::SamlController do
           stub('response', @stub_hash)
         )
         controller.request.env['canvas.domain_root_account'] = @account
-        post :create, :SAMLResponse => "foo", :RelayState => "/courses"
+        post :create, params: {:SAMLResponse => "foo", :RelayState => "/courses"}
       end
 
       it "finds the SAML config by entity_id" do
@@ -396,7 +396,7 @@ describe Login::SamlController do
           stub('response', @stub_hash)
         )
         controller.request.env['canvas.domain_root_account'] = @account
-        post :create, :SAMLResponse => "foo", :RelayState => "/courses"
+        post :create, params: {:SAMLResponse => "foo", :RelayState => "/courses"}
       end
 
       describe '#destroy' do
@@ -415,7 +415,7 @@ describe Login::SamlController do
           expect(SAML2::Bindings::HTTPRedirect).to receive(:decode).and_return(logout_response)
 
           controller.request.env['canvas.domain_root_account'] = @account
-          get :destroy, :SAMLResponse => "foo"
+          get :destroy, params: {:SAMLResponse => "foo"}
           expect(response).to redirect_to(saml_login_url(@aac2))
         end
 
@@ -426,7 +426,7 @@ describe Login::SamlController do
           expect(SAML2::Bindings::HTTPRedirect).to receive(:decode).and_return(logout_request)
 
           controller.request.env['canvas.domain_root_account'] = @account
-          get :destroy, :SAMLRequest => "foo"
+          get :destroy, params: {:SAMLRequest => "foo"}
 
           expect(response).to be_redirect
           expect(response.location).to match %r{^https://example.com/idp2/slo\?SAMLResponse=}
@@ -438,7 +438,7 @@ describe Login::SamlController do
           expect(SAML2::Bindings::HTTPRedirect).to receive(:decode).and_return(logout_request)
 
           controller.request.env['canvas.domain_root_account'] = @account
-          get :destroy, :SAMLRequest => "foo"
+          get :destroy, params: {:SAMLRequest => "foo"}
 
           expect(response.status).to eq 400
         end
@@ -456,7 +456,7 @@ describe Login::SamlController do
 
       controller.expects(:logout_user_action).never
       controller.request.env['canvas.domain_root_account'] = @account
-      get :destroy, :SAMLResponse => "foo", :RelayState => "/courses"
+      get :destroy, params: {:SAMLResponse => "foo", :RelayState => "/courses"}
       expect(response.status).to eq 400
     end
 
@@ -464,7 +464,7 @@ describe Login::SamlController do
       Account.default.authentication_providers.create!(auth_type: 'saml',
                                                        idp_entity_id: 'http://adfs.ryana.local/adfs/services/trust')
       get :destroy,
-          SAMLResponse: <<SAML.delete("\n")
+          params: {SAMLResponse: <<SAML.delete("\n")
 fZLBboMwDIZfBeUOIRQojSjS1F4qdZe26mGXKSSmQ6IJi5Npe/sF0A6Vpp7iWP7j359To7gPIz+am/H
 uBDgajRAd9lvynrFCdmm1ioG1Ks6rTRpvKiXidbtismrbTIEk0RUs9kZvSZakJDogejhodEK7kEpZGa
 d5nJWXjPG05Pk6yTerNxLtAV2vhZuVH86NyCm1P0KLpA9q66XzFhJp7nQwt17TyeYUBpck2k0mpwbea
@@ -472,6 +472,7 @@ m4E9si1uANyJ/n55fXIgxculyLuNY4g+64HFfzpvxkvZktk1ZVMMdaWKwVtCkURTiZLpYo8S/NCyIJl
 Xb6e5vy+Dxr5TOt539EaZ6QZSFPPNOwifS4SiGAnGqSZaAQYQnWYLEQGI8UwJ2io+uolIA2I0NV06dD
 UyxbPTjiPj7edURBdxeDhuQOcq/kJPn3YDVgS0aamj+/S/z5L8ws=
 SAML
+      }
       expect(response).to redirect_to(login_url)
       expect(flash[:delegated_message]).not_to be_nil
     end
@@ -490,7 +491,7 @@ SAML
       saml_request = URI.decode_www_form(URI.parse(url).query).first.last
 
       controller.request.env['canvas.domain_root_account'] = account
-      get :destroy, SAMLRequest: saml_request
+      get :destroy, params: {SAMLRequest: saml_request}
 
       expect(response.status).to eq 400
       expect(ErrorReport.last.message).to eq "SAML2::UnsignedMessage"
@@ -532,7 +533,7 @@ SAML
       )
 
       controller.request.env['canvas.domain_root_account'] = @account
-      post :create, :SAMLResponse => "foo", :RelayState => "/courses"
+      post :create, params: {:SAMLResponse => "foo", :RelayState => "/courses"}
       expect(response).to redirect_to(courses_url)
       expect(session[:saml_unique_id]).to eq @unique_id
     end
@@ -558,7 +559,7 @@ SAML
       )
 
       controller.request.env['canvas.domain_root_account'] = @account
-      post :create, :SAMLResponse => "foo", :RelayState => "/courses"
+      post :create, params: {:SAMLResponse => "foo", :RelayState => "/courses"}
       expect(response).to redirect_to(courses_url)
       expect(session[:saml_unique_id]).to eq @unique_id
     end
@@ -595,7 +596,7 @@ SAML
     )
 
     controller.request.env['canvas.domain_root_account'] = account
-    post :create, :SAMLResponse => "foo", :RelayState => "/courses"
+    post :create, params: {:SAMLResponse => "foo", :RelayState => "/courses"}
     expect(response).to redirect_to(courses_url)
     expect(session[:saml_unique_id]).to eq unique_id
   end
@@ -625,7 +626,7 @@ SAML
     )
 
     controller.request.env['canvas.domain_root_account'] = account
-    post :create, :SAMLResponse => "foo", :RelayState => "/courses"
+    post :create, params: {:SAMLResponse => "foo", :RelayState => "/courses"}
     expect(response).to redirect_to(courses_url)
     expect(session[:saml_unique_id]).to eq unique_id
   end
@@ -646,7 +647,7 @@ SAML
     @pseudonym.save!
 
     controller.request.env['canvas.domain_root_account'] = @account
-    post :create, :SAMLResponse => <<-SAML
+    post :create, params: {:SAMLResponse => <<-SAML
         PHNhbWxwOlJlc3BvbnNlIHhtbG5zOnNhbWxwPSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6cHJv
         dG9jb2wiIHhtbG5zOnNhbWw9InVybjpvYXNpczpuYW1lczp0YzpTQU1MOjIuMDphc3NlcnRpb24iIElE
         PSJfMzJmMTBlOGU0NjVmY2VmNzIzNjhlMjIwZmFlYjgxZGI0YzcyZjBjNjg3IiBWZXJzaW9uPSIyLjAi
@@ -748,6 +749,7 @@ SAML
         bXBsZS5lZHU8L3NhbWw6QXR0cmlidXRlVmFsdWU+PC9zYW1sOkF0dHJpYnV0ZT48L3NhbWw6QXR0cmli
         dXRlU3RhdGVtZW50Pjwvc2FtbDpBc3NlcnRpb24+PC9zYW1scDpSZXNwb25zZT4=
     SAML
+    }
     expect(response).to redirect_to(dashboard_url(:login_success => 1))
     expect(session[:saml_unique_id]).to eq unique_id
   end

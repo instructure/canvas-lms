@@ -80,13 +80,13 @@ describe Login::CanvasController do
   end
 
   it "should re-render if incorrect password" do
-    post 'create', :pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'dvorak'}
+    post 'create', params: {:pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'dvorak'}}
     assert_status(400)
     expect(response).to render_template(:new)
   end
 
   it "should re-render if no password given" do
-    post 'create', :pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => ''}
+    post 'create', params: {:pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => ''}}
     assert_status(400)
     expect(response).to render_template(:new)
     expect(flash[:error]).to match(/no password/i)
@@ -94,7 +94,7 @@ describe Login::CanvasController do
 
   it "password auth should work" do
     session[:sentinel] = true
-    post 'create', :pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwertyuiop'}
+    post 'create', params: {:pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwertyuiop'}}
     expect(response).to be_redirect
     expect(response).to redirect_to(dashboard_url(:login_success => 1))
     expect(assigns[:pseudonym_session].record).to eq @pseudonym
@@ -104,14 +104,14 @@ describe Login::CanvasController do
 
   it "password auth should work for an explicit Canvas pseudonym" do
     @pseudonym.update_attribute(:authentication_provider, Account.default.canvas_authentication_provider)
-    post 'create', :pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwertyuiop'}
+    post 'create', params: {:pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwertyuiop'}}
     expect(response).to be_redirect
     expect(response).to redirect_to(dashboard_url(:login_success => 1))
     expect(assigns[:pseudonym_session].record).to eq @pseudonym
   end
 
   it "password auth should work with extra whitespace around unique id " do
-    post 'create', :pseudonym_session => { :unique_id => ' jtfrd@instructure.com ', :password => 'qwertyuiop'}
+    post 'create', params: {:pseudonym_session => { :unique_id => ' jtfrd@instructure.com ', :password => 'qwertyuiop'}}
     expect(response).to be_redirect
     expect(response).to redirect_to(dashboard_url(:login_success => 1))
     expect(assigns[:pseudonym_session].record).to eq @pseudonym
@@ -120,8 +120,8 @@ describe Login::CanvasController do
   it "should re-render if authenticity token is invalid and referer is not trusted" do
     controller.expects(:verify_authenticity_token).raises(ActionController::InvalidAuthenticityToken)
     session[:sentinel] = true
-    post 'create', :pseudonym_session => { :unique_id => ' jtfrd@instructure.com ', :password => 'qwertyuiop' },
-         :authenticity_token => '42'
+    post 'create', params: {:pseudonym_session => { :unique_id => ' jtfrd@instructure.com ', :password => 'qwertyuiop' },
+         :authenticity_token => '42'}
     assert_status(400)
     expect(session[:sentinel]).to eq true
     expect(response).to render_template(:new)
@@ -130,8 +130,8 @@ describe Login::CanvasController do
 
   it "should re-render if authenticity token is invalid and referer is trusted" do
     controller.expects(:verify_authenticity_token).raises(ActionController::InvalidAuthenticityToken)
-    post 'create', :pseudonym_session => { :unique_id => ' jtfrd@instructure.com ', :password => 'qwertyuiop' },
-         :authenticity_token => '42'
+    post 'create', params: {:pseudonym_session => { :unique_id => ' jtfrd@instructure.com ', :password => 'qwertyuiop' },
+         :authenticity_token => '42'}
     assert_status(400)
     expect(response).to render_template(:new)
     expect(flash[:error]).to match(/invalid authenticity token/i)
@@ -139,7 +139,7 @@ describe Login::CanvasController do
 
   it "should login if authenticity token is invalid and referer is trusted" do
     Account.any_instance.expects(:trusted_referer?).returns(true)
-    post 'create', :pseudonym_session => { :unique_id => ' jtfrd@instructure.com ', :password => 'qwertyuiop' }
+    post 'create', params: {:pseudonym_session => { :unique_id => ' jtfrd@instructure.com ', :password => 'qwertyuiop' }}
     expect(response).to be_redirect
     expect(response).to redirect_to(dashboard_url(:login_success => 1))
     expect(assigns[:pseudonym_session].record).to eq @pseudonym
@@ -155,7 +155,7 @@ describe Login::CanvasController do
           returns([{ 'uid' => ['12345'] }])
       Account.default.authentication_providers.create!(:auth_type => 'ldap', :identifier_format => 'uid')
       aac.any_instantiation.expects(:ldap_bind_result).never
-      post 'create', :pseudonym_session => { :unique_id => 'username', :password => 'password'}
+      post 'create', params: {:pseudonym_session => { :unique_id => 'username', :password => 'password'}}
       expect(response).to be_redirect
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       expect(assigns[:pseudonym_session].record).to eq @pseudonym
@@ -166,7 +166,7 @@ describe Login::CanvasController do
       aac = Account.default.authentication_providers.create!(auth_type: 'ldap')
       @pseudonym.any_instantiation.expects(:valid_arbitrary_credentials?).returns(true)
       @pseudonym.update_attribute(:authentication_provider, aac)
-      post 'create', :pseudonym_session => { :unique_id => '12345', :password => 'password'}
+      post 'create', params: {:pseudonym_session => { :unique_id => '12345', :password => 'password'}}
       expect(response).to be_redirect
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       expect(assigns[:pseudonym_session].record).to eq @pseudonym
@@ -176,7 +176,7 @@ describe Login::CanvasController do
       user_with_pseudonym(:username => 'username', :active_all => 1)
       aac = Account.default.authentication_providers.create!(:auth_type => 'ldap', :identifier_format => 'uid')
       aac.any_instantiation.expects(:ldap_bind_result).once.with('username', 'password').returns(nil)
-      post 'create', :pseudonym_session => { :unique_id => 'username', :password => 'password'}
+      post 'create', params: {:pseudonym_session => { :unique_id => 'username', :password => 'password'}}
       assert_status(400)
       expect(response).to render_template(:new)
     end
@@ -184,7 +184,7 @@ describe Login::CanvasController do
     it "doesn't query the server at all if the enabled features don't require it, and there is no matching login" do
       ap = Account.default.authentication_providers.create!(auth_type: 'ldap')
       ap.any_instantiation.expects(:ldap_bind_result).never
-      post 'create', :pseudonym_session => { :unique_id => 'username', :password => 'password'}
+      post 'create', params: {:pseudonym_session => { :unique_id => 'username', :password => 'password'}}
       assert_status(400)
       expect(response).to render_template(:new)
     end
@@ -197,7 +197,7 @@ describe Login::CanvasController do
       unique_id = 'username'
       expect(Account.default.pseudonyms.active.by_unique_id(unique_id)).to_not be_exists
 
-      post 'create', :pseudonym_session => { :unique_id => 'username', :password => 'password'}
+      post 'create', params: {:pseudonym_session => { :unique_id => 'username', :password => 'password'}}
       expect(response).to be_redirect
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
 
@@ -214,7 +214,7 @@ describe Login::CanvasController do
                           active_all: 1,
                           password: 'qwertyuiop',
                           account: account)
-      post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwertyuiop'}
+      post 'create', params: {:pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwertyuiop'}}
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       expect(flash[:notice]).to be_present
     end
@@ -229,7 +229,7 @@ describe Login::CanvasController do
                                             unique_id: 'jt@instructure.com',
                                             password: 'qwertyuiop',
                                             password_confirmation: 'qwertyuiop')
-      post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwertyuiop'}
+      post 'create', params: {:pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwertyuiop'}}
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       # it should have preferred the site admin pseudonym
       expect(assigns[:pseudonym_session].record).to eq @pseudonym
@@ -247,7 +247,7 @@ describe Login::CanvasController do
                           active_all: 1,
                           password: 'qwertyuiop',
                           account: account2)
-      post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwertyuiop'}
+      post 'create', params: {:pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwertyuiop'}}
       expect(response).not_to be_success
       expect(response).to render_template(:new)
     end
@@ -263,7 +263,7 @@ describe Login::CanvasController do
                           active_all: 1,
                           password: 'qwertyuiop',
                           account: Account.site_admin)
-      post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwertyuiop'}
+      post 'create', params: {:pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwertyuiop'}}
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       # it should have preferred the site admin pseudonym
       expect(assigns[:pseudonym_session].record).to eq @pseudonym
@@ -280,7 +280,7 @@ describe Login::CanvasController do
         @shard1.activate do
           account = Account.create!
           HostUrl.stubs(:default_domain_root_account).returns(account)
-          post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwertyuiop' }
+          post 'create', params: {:pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwertyuiop' }}
           expect(response).to redirect_to(dashboard_url(:login_success => 1))
           expect(assigns[:pseudonym_session].record).to eq @pseudonym
         end
@@ -293,7 +293,7 @@ describe Login::CanvasController do
       @cc = @user.communication_channels.create!(:path => 'jt+1@instructure.com')
       session[:confirm] = @cc.confirmation_code
       session[:expected_user_id] = @user.id
-      post 'create', :pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwertyuiop' }
+      post 'create', params: {:pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwertyuiop' }}
       expect(response).to redirect_to(registration_confirmation_url(@cc.confirmation_code,
                                                                     login_success: 1,
                                                                     enrollment: nil,
@@ -307,7 +307,7 @@ describe Login::CanvasController do
       Account.default.save!
       user_with_pseudonym(:active_all => 1, :password => 'qwertyuiop')
 
-      post :create, :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwertyuiop' }
+      post :create, params: {:pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwertyuiop' }}
       expect(response).to redirect_to dashboard_url(:login_success => 1)
     end
   end
@@ -328,19 +328,19 @@ describe Login::CanvasController do
 
     it "should skip otp verification for a valid cookie" do
       cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(Time.now.utc, nil, 'myip')
-      post 'create', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwertyuiop' }
+      post 'create', params: {:pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwertyuiop' }}
       expect(response).to redirect_to dashboard_url(:login_success => 1)
     end
 
     it "should ignore a bogus cookie" do
       cookies['canvas_otp_remember_me'] = 'bogus'
-      post 'create', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwertyuiop' }
+      post 'create', params: {:pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwertyuiop' }}
       expect(response).to redirect_to(otp_login_url)
     end
 
     it "should ignore an expired cookie" do
       cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(6.months.ago, nil, 'myip')
-      post 'create', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwertyuiop' }
+      post 'create', params: {:pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwertyuiop' }}
       expect(response).to redirect_to(otp_login_url)
     end
 
@@ -350,13 +350,13 @@ describe Login::CanvasController do
       @user.otp_secret_key = ROTP::Base32.random_base32
       @user.save!
 
-      post 'create', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwertyuiop' }
+      post 'create', params: {:pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwertyuiop' }}
       expect(response).to redirect_to(otp_login_url)
     end
 
     it "should ignore a cookie for a different IP" do
       cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(Time.now.utc, nil, 'otherip')
-      post 'create', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwertyuiop' }
+      post 'create', params: {:pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwertyuiop' }}
       expect(response).to redirect_to(otp_login_url)
     end
   end
@@ -380,7 +380,7 @@ describe Login::CanvasController do
     it 'should redirect to the confirm url if the user has no token' do
       provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, [], nil)
 
-      post :create, params, :oauth2 => provider.session_hash
+      post :create, params: params, session: {:oauth2 => provider.session_hash}
       expect(response).to redirect_to(oauth2_auth_confirm_url)
     end
 
@@ -388,7 +388,7 @@ describe Login::CanvasController do
       @user.access_tokens.create!(developer_key: key, remember_access: true, scopes: ['/auth/userinfo'], purpose: nil)
       provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, ['/auth/userinfo'], nil)
 
-      post :create, params, :oauth2 => provider.session_hash
+      post :create, params: params, session: {:oauth2 => provider.session_hash}
       expect(response).to be_redirect
       expect(response.location).to match(/https:\/\/example.com/)
     end
@@ -397,7 +397,7 @@ describe Login::CanvasController do
       @user.access_tokens.create!(developer_key: key, remember_access: true, scopes: ['/auth/userinfo'], purpose: nil)
       provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, ['/auth/userinfo'], nil)
 
-      post :create, params, :oauth2 => provider.session_hash.merge(state: "supersekrit")
+      post :create, params: params, session: {:oauth2 => provider.session_hash.merge(state: "supersekrit")}
       expect(response).to be_redirect
       expect(response.location).to match(/https:\/\/example.com/)
       expect(response.location).to match(/state=supersekrit/)
@@ -407,7 +407,7 @@ describe Login::CanvasController do
       @user.access_tokens.create!(developer_key: key, remember_access: true, scopes: ['/auth/userinfo'], purpose: nil)
       provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, [], nil)
 
-      post :create, params, :oauth2 => provider.session_hash
+      post :create, params: params, session: {:oauth2 => provider.session_hash}
       expect(response).to redirect_to(oauth2_auth_confirm_url)
     end
 
@@ -416,7 +416,7 @@ describe Login::CanvasController do
       key.save!
       provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, [], nil)
 
-      post :create, params, :oauth2 => provider.session_hash
+      post :create, params: params, session: {:oauth2 => provider.session_hash}
       expect(response).to be_redirect
       expect(response.location).to match(/https:\/\/example.com/)
     end

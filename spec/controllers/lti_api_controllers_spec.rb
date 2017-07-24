@@ -75,8 +75,8 @@ describe LtiApiController, type: :request do
 
     req.body = opts['body'] if opts['body']
     post "https://www.example.com#{req.path}",
-      req.body,
-      { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => auth }
+      params: req.body,
+      headers: { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => auth }
 
   end
 
@@ -642,8 +642,8 @@ to because the assignment has no points possible.
       consumer = OAuth::Consumer.new(opts['key'], opts['secret'], :site => "https://www.example.com", :signature_method => "HMAC-SHA1")
       req = consumer.create_signed_request(:post, opts['path'], nil, { :scheme => 'header', :timestamp => opts['timestamp'], :nonce => opts['nonce'] }, opts['body'])
       post "https://www.example.com#{req.path}",
-        req.body,
-        { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded', "HTTP_AUTHORIZATION" => req['Authorization'] }
+        params: req.body,
+        headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded', "HTTP_AUTHORIZATION" => req['Authorization'] }
     end
 
     it "should require the correct shared secret" do
