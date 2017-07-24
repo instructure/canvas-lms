@@ -48,13 +48,13 @@ describe Quizzes::QuizQuestionsController do
 
   describe "POST 'create'" do
     it "should require authorization" do
-      post 'create', :course_id => @course.id, :quiz_id => @quiz, :question => {}
+      post 'create', params: {:course_id => @course.id, :quiz_id => @quiz, :question => {}}
       assert_unauthorized
     end
 
     it "should create a quiz question" do
       user_session(@teacher)
-      post 'create', :course_id => @course.id, :quiz_id => @quiz, :question => {
+      post 'create', params: {:course_id => @course.id, :quiz_id => @quiz, :question => {
         :question_type => "multiple_choice_question",
         :answers => {
           '0' => {
@@ -66,7 +66,7 @@ describe Quizzes::QuizQuestionsController do
             :weight => 0
           }
         }
-      }
+      }}
       expect(assigns[:question]).not_to be_nil
       expect(assigns[:question].question_data).not_to be_nil
       expect(assigns[:question].question_data[:answers].length).to eql(2)
@@ -74,7 +74,7 @@ describe Quizzes::QuizQuestionsController do
     end
     it "should preserve ids, if provided, on create" do
       user_session(@teacher)
-      post 'create', :course_id => @course.id, :quiz_id => @quiz, :question => {
+      post 'create', params: {:course_id => @course.id, :quiz_id => @quiz, :question => {
         :question_type => "multiple_choice_question",
         :answers => [
           {
@@ -93,7 +93,7 @@ describe Quizzes::QuizQuestionsController do
             :weight => 0
           }
         ]
-      }
+      }}
       expect(assigns[:question]).not_to be_nil
       expect(assigns[:question].question_data).not_to be_nil
       data = assigns[:question].question_data[:answers]
@@ -121,13 +121,13 @@ describe Quizzes::QuizQuestionsController do
     before(:once) { quiz_question }
 
     it "should require authorization" do
-      put 'update', :course_id => @course.id, :quiz_id => @quiz, :id => @question.id, :question => {}
+      put 'update', params: {:course_id => @course.id, :quiz_id => @quiz, :id => @question.id, :question => {}}
       assert_unauthorized
     end
 
     it "should update a quiz question" do
       user_session(@teacher)
-      put 'update', :course_id => @course.id, :quiz_id => @quiz, :id => @question.id, :question => {
+      put 'update', params: {:course_id => @course.id, :quiz_id => @quiz, :id => @question.id, :question => {
         :question_type => "multiple_choice_question",
         :answers => {
           '0' => {
@@ -143,7 +143,7 @@ describe Quizzes::QuizQuestionsController do
             :weight => 0
           }
         }
-      }
+      }}
       expect(assigns[:question]).not_to be_nil
       expect(assigns[:question].question_data).not_to be_nil
       expect(assigns[:question].question_data[:answers].length).to eql(3)
@@ -152,7 +152,7 @@ describe Quizzes::QuizQuestionsController do
 
     it "should preserve ids, if provided, on update" do
       user_session(@teacher)
-      put 'update', :course_id => @course.id, :quiz_id => @quiz, :id => @question.id, :question => {
+      put 'update', params: {:course_id => @course.id, :quiz_id => @quiz, :id => @question.id, :question => {
         :question_type => "multiple_choice_question",
         :answers => {
           '0' => {
@@ -171,7 +171,7 @@ describe Quizzes::QuizQuestionsController do
             :weight => 0
           }
         }
-      }
+      }}
       expect(assigns[:question]).not_to be_nil
       expect(assigns[:question].question_data).not_to be_nil
       data = assigns[:question].question_data[:answers]
@@ -204,7 +204,7 @@ describe Quizzes::QuizQuestionsController do
       linked_question.save!
 
       user_session(@teacher)
-      put 'update', :course_id => @course.id, :quiz_id => @quiz, :id => linked_question.id, :question => {:correct_comments_html => ""}
+      put 'update', params: {:course_id => @course.id, :quiz_id => @quiz, :id => linked_question.id, :question => {:correct_comments_html => ""}}
       expect(response).to be_success
 
       linked_question.reload
