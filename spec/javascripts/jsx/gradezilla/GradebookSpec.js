@@ -7372,14 +7372,13 @@ QUnit.module('Gradebook#onGridBlur', {
     `;
 
     this.gradebook = createGradebook();
-    this.gradebook.students = {
-      1101: {
-        enrollments: [{ type: 'StudentEnrollment', grades: { html_url: 'http://example.url/' } }],
-        id: '1101',
-        name: 'Adam Jones'
-      }
-    };
     this.gradebook.rows = [{ id: '1101' }];
+    const students = [{
+      enrollments: [{ type: 'StudentEnrollment', grades: { html_url: 'http://example.url/' } }],
+      id: '1101',
+      name: 'Adam Jones'
+    }]
+    this.gradebook.gotChunkOfStudents(students);
     this.gradebook.initGrid();
     this.gradebook.gridSupport.state.setActiveLocation('body', { cell: 0, row: 0 });
     this.spy(this.gradebook.gridSupport.state, 'blur');
