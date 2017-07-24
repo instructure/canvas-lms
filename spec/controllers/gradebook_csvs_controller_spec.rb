@@ -34,7 +34,7 @@ describe GradebookCsvsController do
     it "returns the attachment and progress" do
       user_session @teacher
 
-      get 'show', course_id: @course.id, format: :json
+      get 'show', params: {course_id: @course.id}, format: :json
       json = json_parse(response.body)
       expect(response).to be_success
       expect(json).to have_key 'attachment_id'
@@ -44,7 +44,7 @@ describe GradebookCsvsController do
     it "creates the attachment and progress" do
       user_session @teacher
 
-      get 'show', course_id: @course.id, format: :json
+      get 'show', params: {course_id: @course.id}, format: :json
       json = json_parse(response.body)
       expect(Attachment.find json['attachment_id']).not_to be_nil
       expect(Progress.find json['progress_id']).not_to be_nil
@@ -53,7 +53,7 @@ describe GradebookCsvsController do
     it "names the CSV file after course#short_name" do
       user_session @teacher
 
-      get 'show', course_id: @course.id, format: :json
+      get 'show', params: {course_id: @course.id}, format: :json
       json = json_parse(response.body)
       attachment = Attachment.find(json['attachment_id'])
       expect(@course.short_name).to eq(File.basename(attachment.filename.split("-").last, ".csv"))

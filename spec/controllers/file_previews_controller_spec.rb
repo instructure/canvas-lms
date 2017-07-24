@@ -32,13 +32,13 @@ describe FilePreviewsController do
   it "should require authorization to view the file" do
     course_model
     attachment_model
-    get :show, course_id: @course.id, file_id: @attachment.id
+    get :show, params: {course_id: @course.id, file_id: @attachment.id}
     expect(response.status).to eq 401
   end
 
   it "should render lock information for the file" do
     attachment_model locked: true
-    get :show, course_id: @course.id, file_id: @attachment.id
+    get :show, params: {course_id: @course.id, file_id: @attachment.id}
     expect(response).to render_template 'lock_explanation'
   end
 
@@ -46,7 +46,7 @@ describe FilePreviewsController do
     attachment_model
     file_id = @attachment.id
     @attachment.destroy_permanently!
-    get :show, course_id: @course.id, file_id: file_id
+    get :show, params: {course_id: @course.id, file_id: file_id}
     expect(response.status).to eq 404
     expect(assigns['headers']).to eq false
     expect(assigns['show_left_side']).to eq false
@@ -56,7 +56,7 @@ describe FilePreviewsController do
     Attachment.any_instance.stubs(:crocodoc_url).returns('http://example.com/fake_crocodoc_url')
     Attachment.any_instance.stubs(:canvadoc_url).returns('http://example.com/fake_canvadoc_url')
     attachment_model content_type: 'application/msword'
-    get :show, course_id: @course.id, file_id: @attachment.id, annotate: 1
+    get :show, params: {course_id: @course.id, file_id: @attachment.id, annotate: 1}
     expect(response).to redirect_to @attachment.crocodoc_url
   end
 
@@ -64,7 +64,7 @@ describe FilePreviewsController do
     Attachment.any_instance.stubs(:crocodoc_url).returns('http://example.com/fake_crocodoc_url')
     Attachment.any_instance.stubs(:canvadoc_url).returns('http://example.com/fake_canvadoc_url')
     attachment_model content_type: 'application/msword'
-    get :show, course_id: @course.id, file_id: @attachment.id
+    get :show, params: {course_id: @course.id, file_id: @attachment.id}
     expect(response).to redirect_to @attachment.canvadoc_url
   end
 
@@ -72,7 +72,7 @@ describe FilePreviewsController do
     Attachment.any_instance.stubs(:crocodoc_url).returns(nil)
     Attachment.any_instance.stubs(:canvadoc_url).returns(nil)
     attachment_model content_type: 'application/msword'
-    get :show, course_id: @course.id, file_id: @attachment.id
+    get :show, params: {course_id: @course.id, file_id: @attachment.id}
     expect(response).to be_redirect
     expect(response.location).to match %r{\A//docs.google.com/viewer}
   end
@@ -81,7 +81,7 @@ describe FilePreviewsController do
     Attachment.any_instance.stubs(:crocodoc_url).returns(nil)
     Attachment.any_instance.stubs(:canvadoc_url).returns(nil)
     attachment_model content_type: 'text/html'
-    get :show, course_id: @course.id, file_id: @attachment.id
+    get :show, params: {course_id: @course.id, file_id: @attachment.id}
     expect(response).to be_redirect
     expect(response.location).to match %r{/courses/#{@course.id}/files/#{@attachment.id}/preview}
   end
@@ -92,21 +92,21 @@ describe FilePreviewsController do
     @account.disable_service(:google_docs_previews)
     @account.save!
     attachment_model content_type: 'application/msword'
-    get :show, course_id: @course.id, file_id: @attachment.id
+    get :show, params: {course_id: @course.id, file_id: @attachment.id}
     expect(response.status).to eq 200
     expect(response).to render_template 'no_preview'
   end
 
   it "should render an img element for image types" do
     attachment_model content_type: 'image/png'
-    get :show, course_id: @course.id, file_id: @attachment.id
+    get :show, params: {course_id: @course.id, file_id: @attachment.id}
     expect(response.status).to eq 200
     expect(response).to render_template 'img_preview'
   end
 
   it "should render a media tag for media types" do
     attachment_model content_type: 'video/mp4'
-    get :show, course_id: @course.id, file_id: @attachment.id
+    get :show, params: {course_id: @course.id, file_id: @attachment.id}
     expect(response.status).to eq 200
     expect(response).to render_template 'media_preview'
   end
@@ -118,14 +118,14 @@ describe FilePreviewsController do
     mod.completion_requirements = { tag.id => {:type => 'must_view'} }
     mod.save!
     expect(mod.evaluate_for(@user).workflow_state).to eq "unlocked"
-    get :show, course_id: @course.id, file_id: @attachment.id
+    get :show, params: {course_id: @course.id, file_id: @attachment.id}
     expect(mod.evaluate_for(@user).workflow_state).to eq "completed"
   end
 
   it "should log asset accesses when previewable" do
     Setting.set('enable_page_views', 'db')
     attachment_model content_type: 'image/png'
-    get :show, course_id: @course.id, file_id: @attachment.id
+    get :show, params: {course_id: @course.id, file_id: @attachment.id}
     access = AssetUserAccess.for_user(@user).first
     expect(access.asset).to eq @attachment
   end
@@ -133,7 +133,7 @@ describe FilePreviewsController do
   it "should not log asset accesses when not previewable" do
     Setting.set('enable_page_views', 'db')
     attachment_model content_type: 'unknown/unknown'
-    get :show, course_id: @course.id, file_id: @attachment.id
+    get :show, params: {course_id: @course.id, file_id: @attachment.id}
     access = AssetUserAccess.for_user(@user)
     expect(access).to be_empty
   end
@@ -141,7 +141,7 @@ describe FilePreviewsController do
   it "should work with hidden files" do
     attachment_model content_type: 'image/png'
     @attachment.update_attribute(:file_state, 'hidden')
-    get :show, course_id: @course.id, file_id: @attachment.id
+    get :show, params: {course_id: @course.id, file_id: @attachment.id}
     expect(response).to be_success
   end
 end

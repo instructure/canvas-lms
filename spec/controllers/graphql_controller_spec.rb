@@ -62,7 +62,7 @@ describe GraphQLController do
     before { Account.default.enable_feature!("graphql") }
 
     it "works" do
-      post :execute, query: "{}"
+      post :execute, params: {query: "{}"}
       expect(JSON.parse(response.body)["errors"]).not_to be_blank
     end
   end
