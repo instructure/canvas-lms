@@ -39,8 +39,8 @@ describe PlannerNotesController do
       get :index
       assert_unauthorized
 
-      post :create, :title => "thing",
-                     :todo_date => Time.zone.now + 1.day
+      post :create, params: {:title => "thing",
+                     :todo_date => Time.zone.now + 1.day}
       assert_unauthorized
     end
   end
@@ -60,7 +60,7 @@ describe PlannerNotesController do
 
       describe "GET #show" do
         it "returns http success for accessing your notes" do
-          get :show, id: @student_note.id
+          get :show, params: {id: @student_note.id}
           expect(response).to have_http_status(:success)
         end
 
@@ -71,7 +71,7 @@ describe PlannerNotesController do
             :details => "Other Details",
             :todo_date => Time.zone.now + 1.week
           )
-          get :show, id: u_note.id
+          get :show, params: {id: u_note.id}
           expect(response).to have_http_status(:not_found)
         end
       end
@@ -79,7 +79,7 @@ describe PlannerNotesController do
       describe "PUT #update" do
         it "returns http success" do
           updated_title = "updated note title"
-          put :update, id: @student_note.id, title: updated_title
+          put :update, params: {id: @student_note.id, title: updated_title}
           expect(response).to have_http_status(:success)
           expect(@student_note.reload.title).to eq updated_title
         end
@@ -87,7 +87,7 @@ describe PlannerNotesController do
 
       describe "POST #create" do
         it "returns http success" do
-          post :create, title: "A title about things", details: "Details about now", todo_date: Time.zone.now + 1.day
+          post :create, params: {title: "A title about things", details: "Details about now", todo_date: Time.zone.now + 1.day}
           expect(response).to have_http_status(:created)
           expect(PlannerNote.where(user_id: @student.id).count).to be 2
         end
@@ -95,7 +95,7 @@ describe PlannerNotesController do
 
       describe "DELETE #destroy" do
         it "returns http success" do
-          delete :destroy, id: @student_note.id
+          delete :destroy, params: {id: @student_note.id}
           expect(response).to have_http_status(:success)
           expect(@student_note.reload).to be_deleted
         end
@@ -116,7 +116,7 @@ describe PlannerNotesController do
 
       describe "GET #show" do
         it "returns http success" do
-          get :show, id: @teacher_note.id
+          get :show, params: {id: @teacher_note.id}
           expect(response).to have_http_status(:success)
         end
 
@@ -127,7 +127,7 @@ describe PlannerNotesController do
             :details => "Other Details",
             :todo_date => Time.zone.now + 1.week
           )
-          get :show, id: u_note.id
+          get :show, params: {id: u_note.id}
           expect(response).to have_http_status(:not_found)
         end
       end
@@ -135,7 +135,7 @@ describe PlannerNotesController do
       describe "PUT #update" do
         it "returns http success" do
           updated_title = "updated note title"
-          put :update, id: @teacher_note.id, title: updated_title
+          put :update, params: {id: @teacher_note.id, title: updated_title}
           expect(response).to have_http_status(:success)
           expect(@teacher_note.reload.title).to eq updated_title
         end
@@ -143,7 +143,7 @@ describe PlannerNotesController do
 
       describe "POST #create" do
         it "returns http success" do
-          post :create, title: "A title about things", details: "Details about now", todo_date: Time.zone.now + 1.day
+          post :create, params: {title: "A title about things", details: "Details about now", todo_date: Time.zone.now + 1.day}
           expect(response).to have_http_status(:created)
           expect(PlannerNote.where(user_id: @teacher.id).count).to be 2
         end
@@ -151,7 +151,7 @@ describe PlannerNotesController do
 
       describe "DELETE #destroy" do
         it "returns http success" do
-          delete :destroy, id: @teacher_note.id
+          delete :destroy, params: {id: @teacher_note.id}
           expect(response).to have_http_status(:success)
           expect(@teacher_note.reload).to be_deleted
         end

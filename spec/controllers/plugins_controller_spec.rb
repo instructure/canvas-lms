@@ -26,7 +26,7 @@ describe PluginsController do
       expect(PluginSetting.find_by(name: 'account_reports')).to be_nil
       controller.stubs(:require_setting_site_admin).returns(true)
 
-      put 'update', id: 'account_reports', account_id: Account.default.id, plugin_setting: { disabled: false }
+      put 'update', params: {id: 'account_reports', account_id: Account.default.id, plugin_setting: { disabled: false }}
       expect(response).to be_redirect
       ps = PluginSetting.find_by!(name: 'account_reports')
       expect(ps).to be_enabled
@@ -39,7 +39,7 @@ describe PluginsController do
         ps.save!
 
         controller.stubs(:require_setting_site_admin).returns(true)
-        put 'update', id: 'account_reports', account_id: Account.default.id, settings: { 'course_storage_csv' => '0' }
+        put 'update', params: {id: 'account_reports', account_id: Account.default.id, settings: { 'course_storage_csv' => '0' }}
         expect(response).to be_redirect
         ps.reload
         expect(ps.settings[:course_storage_csv]).to eq false

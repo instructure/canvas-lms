@@ -54,7 +54,7 @@ describe PageViewsController do
 
     it "should succeed" do
       page_view(@user, '/somewhere/in/app', :created_at => 2.days.ago)
-      get 'index', :user_id => @user.id, :format => 'csv'
+      get 'index', params: {:user_id => @user.id}, format: 'csv'
       expect(response).to be_success
     end
 
@@ -62,7 +62,7 @@ describe PageViewsController do
       pv2 = page_view(@user, '/somewhere/in/app', :created_at => 2.days.ago)    # 2nd day
       pv1 = page_view(@user, '/somewhere/in/app/1', :created_at => 1.day.ago)  # 1st day
       pv3 = page_view(@user, '/somewhere/in/app/2', :created_at => 3.days.ago)  # 3rd day
-      get 'index', :user_id => @user.id, :format => 'csv'
+      get 'index', params: {:user_id => @user.id}, format: 'csv'
       expect(response).to be_success
       dates = CSV.parse(response.body, :headers => true).map { |row| row['created_at'] }
       expect(dates).to eq [pv1, pv2, pv3].map(&:created_at).map(&:to_s)
@@ -111,8 +111,8 @@ describe PageViewsController do
             last_page_view_id: nil,
             limit: 25).
           returns([])
-        get 'index', user_id: @user.id, start_time: "2016-03-14T12:25:55Z",
-            end_time: "2016-03-15T00:00:00Z", per_page: 25, format: :json
+        get 'index', params: {user_id: @user.id, start_time: "2016-03-14T12:25:55Z",
+            end_time: "2016-03-15T00:00:00Z", per_page: 25}, format: :json
         expect(response).to be_success
       end
     end

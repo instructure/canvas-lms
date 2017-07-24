@@ -30,38 +30,38 @@ describe Oauth2ProviderController do
     end
 
     it 'renders 400 on a bad redirect_uri' do
-      get :auth, :client_id => key.id
+      get :auth, params: {:client_id => key.id}
       assert_status(400)
       expect(response.body).to match /redirect_uri does not match/
     end
 
     it 'redirects back with an error for invalid response_type' do
       get :auth,
-          client_id: key.id,
-          redirect_uri: 'https://example.com/oauth/callback'
+          params: {client_id: key.id,
+          redirect_uri: 'https://example.com/oauth/callback'}
       expect(response).to be_redirect
       expect(response.location).to match(%r{^https://example.com/oauth/callback\?error=unsupported_response_type})
     end
 
     it 'redirects to the login url' do
       get :auth,
-          client_id: key.id,
+          params: {client_id: key.id,
           redirect_uri: Canvas::Oauth::Provider::OAUTH2_OOB_URI,
-          response_type: 'code'
+          response_type: 'code'}
       expect(response).to redirect_to(login_url)
     end
 
     it 'passes on canvas_login if provided' do
-      get :auth, client_id: key.id,
+      get :auth, params: {client_id: key.id,
           redirect_uri: Canvas::Oauth::Provider::OAUTH2_OOB_URI,
           canvas_login: 1,
-          response_type: 'code'
+          response_type: 'code'}
       expect(response).to redirect_to(login_url(:canvas_login => 1))
     end
 
     it 'should pass pseudonym_session[unique_id] to login to populate username textbox' do
-      get :auth, :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI,
-          "unique_id"=>"test", force_login: true, response_type: 'code'
+      get :auth, params: {:client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI,
+          "unique_id"=>"test", force_login: true, response_type: 'code'}
       expect(response).to redirect_to(login_url+'?force_login=true&pseudonym_session%5Bunique_id%5D=test')
     end
 
@@ -81,18 +81,18 @@ describe Oauth2ProviderController do
 
       it 'should redirect to the confirm url if the user has no token' do
         get :auth,
-            client_id: key.id,
+            params: {client_id: key.id,
             redirect_uri: Canvas::Oauth::Provider::OAUTH2_OOB_URI,
-            response_type: 'code'
+            response_type: 'code'}
         expect(response).to redirect_to(oauth2_auth_confirm_url)
       end
 
       it 'redirects to login_url with ?force_login=1' do
         get :auth,
-            client_id: key.id,
+            params: {client_id: key.id,
             redirect_uri: Canvas::Oauth::Provider::OAUTH2_OOB_URI,
             response_type: 'code',
-            force_login: 1
+            force_login: 1}
         expect(response).to redirect_to(login_url(:force_login => 1))
       end
 
@@ -105,10 +105,10 @@ describe Oauth2ProviderController do
       it 'should redirect to the redirect uri if the user already has remember-me token' do
         @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
         get :auth,
-            client_id: key.id,
+            params: {client_id: key.id,
             redirect_uri: 'https://example.com',
             response_type: 'code',
-            scope: '/auth/userinfo'
+            scope: '/auth/userinfo'}
         expect(response).to be_redirect
         expect(response.location).to match(/https:\/\/example.com/)
       end
@@ -116,29 +116,29 @@ describe Oauth2ProviderController do
       it 'it accepts the deprecated name of scopes for scope param' do
         @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
         get :auth,
-            client_id: key.id,
+            params: {client_id: key.id,
             redirect_uri: 'https://example.com',
             response_type: 'code',
-            scope: '/auth/userinfo'
+            scope: '/auth/userinfo'}
         expect(response).to be_redirect
         expect(response.location).to match(/https:\/\/example.com/)
       end
 
       it 'should not reuse userinfo tokens for other scopes' do
         @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
-        get :auth, client_id: key.id,
+        get :auth, params: {client_id: key.id,
             redirect_uri: 'https://example.com',
-            response_type: 'code'
+            response_type: 'code'}
         expect(response).to redirect_to(oauth2_auth_confirm_url)
       end
 
       it 'should redirect to the redirect uri if the developer key is trusted' do
         key.trusted = true
         key.save!
-        get :auth, client_id: key.id,
+        get :auth, params: {client_id: key.id,
             redirect_uri: 'https://example.com',
             response_type: 'code',
-            scope: '/auth/userinfo'
+            scope: '/auth/userinfo'}
         expect(response).to be_redirect
         expect(response.location).to match(/https:\/\/example.com/)
       end
@@ -166,7 +166,7 @@ describe Oauth2ProviderController do
     end
 
     it 'renders a 401 if the secret is invalid' do
-      post :token, :client_id => key.id, :client_secret => key.api_key + "123"
+      post :token, params: {:client_id => key.id, :client_secret => key.api_key + "123"}
       assert_status(401)
       expect(response.body).to match /invalid client/
     end
@@ -174,7 +174,7 @@ describe Oauth2ProviderController do
     it 'renders a 400 if a code is not provided for an authorization_code grant' do
       expected_error = Canvas::Oauth::RequestError::ERROR_MAP[:authorization_code_not_supplied]
 
-      post :token, client_id: key.id, client_secret: key.api_key, grant_type: 'authorization_code'
+      post :token, params: {client_id: key.id, client_secret: key.api_key, grant_type: 'authorization_code'}
 
       assert_status(400)
 
@@ -185,7 +185,7 @@ describe Oauth2ProviderController do
 
     it 'renders a 400 if the provided code does not match a token' do
       Canvas.stubs(:redis => redis)
-      post :token, :client_id => key.id, :client_secret => key.api_key, :code => "NotALegitCode"
+      post :token, params: {:client_id => key.id, :client_secret => key.api_key, :code => "NotALegitCode"}
       assert_status(400)
       expect(response.body).to match /authorization_code not found/
     end
@@ -193,7 +193,7 @@ describe Oauth2ProviderController do
     it 'outputs the token json if everything checks out' do
       redis.expects(:del).with(valid_code_redis_key).at_least_once
       Canvas.stubs(:redis => redis)
-      post :token, client_id: key.id, client_secret: key.api_key, grant_type: 'authorization_code', code: valid_code
+      post :token, params: {client_id: key.id, client_secret: key.api_key, grant_type: 'authorization_code', code: valid_code}
       expect(response).to be_success
       json = JSON.parse(response.body)
       expect(json.keys.sort).to match_array(['access_token',  'refresh_token', 'user', 'expires_in', 'token_type'])
@@ -203,7 +203,7 @@ describe Oauth2ProviderController do
     it 'renders a 400 if the provided code is for the wrong key' do
       Canvas.stubs(:redis => redis)
       key2 = DeveloperKey.create!
-      post :token, client_id: key2.id.to_s, client_secret: key2.api_key, grant_type: 'authorization_code', code: valid_code
+      post :token, params: {client_id: key2.id.to_s, client_secret: key2.api_key, grant_type: 'authorization_code', code: valid_code}
       assert_status(400)
       expect(response.body).to match(/incorrect client/)
     end
@@ -211,7 +211,7 @@ describe Oauth2ProviderController do
     it 'default grant_type to authorization_code if none is supplied and code is present' do
       redis.expects(:del).with(valid_code_redis_key).at_least_once
       Canvas.stubs(:redis => redis)
-      post :token, :client_id => key.id, :client_secret => key.api_key, :code => valid_code
+      post :token, params: {:client_id => key.id, :client_secret => key.api_key, :code => valid_code}
       expect(response).to be_success
       json = JSON.parse(response.body)
       expect(json.keys.sort).to match_array ['access_token', 'refresh_token', 'user', 'expires_in', 'token_type']
@@ -220,7 +220,7 @@ describe Oauth2ProviderController do
     it 'deletes existing tokens for the same key when replace_tokens=1' do
       old_token = user.access_tokens.create! :developer_key => key
       Canvas.stubs(:redis => redis)
-      post :token, :client_id => key.id, :client_secret => key.api_key, :code => valid_code, :replace_tokens => '1'
+      post :token, params: {:client_id => key.id, :client_secret => key.api_key, :code => valid_code, :replace_tokens => '1'}
       expect(response).to be_success
       expect(AccessToken.exists?(old_token.id)).to be(false)
     end
@@ -228,14 +228,14 @@ describe Oauth2ProviderController do
     it 'does not delete existing tokens without replace_tokens' do
       old_token = user.access_tokens.create! :developer_key => key
       Canvas.stubs(:redis => redis)
-      post :token, :client_id => key.id, :client_secret => key.api_key, :code => valid_code
+      post :token, params: {:client_id => key.id, :client_secret => key.api_key, :code => valid_code}
       expect(response).to be_success
       expect(AccessToken.exists?(old_token.id)).to be(true)
     end
 
     context 'grant_type refresh_token' do
       it 'must specify grant_type' do
-        post :token, client_id: key.id, client_secret: key.api_key, refresh_token: "SAFASDFASDF"
+        post :token, params: {client_id: key.id, client_secret: key.api_key, refresh_token: "SAFASDFASDF"}
         assert_status(400)
         json = JSON.parse(response.body)
         expect(json['error']).to eq "unsupported_grant_type"
@@ -245,7 +245,7 @@ describe Oauth2ProviderController do
         old_token = user.access_tokens.create! :developer_key => key
         refresh_token = old_token.plaintext_refresh_token
 
-        post :token, client_id: key.id, client_secret: key.api_key, grant_type: "refresh_token", refresh_token: refresh_token + "ASDAS"
+        post :token, params: {client_id: key.id, client_secret: key.api_key, grant_type: "refresh_token", refresh_token: refresh_token + "ASDAS"}
         assert_status(400)
         json = JSON.parse(response.body)
         expect(json['error']).to eq "invalid_request"
@@ -257,7 +257,7 @@ describe Oauth2ProviderController do
         refresh_token = old_token.plaintext_refresh_token
         access_token = old_token.full_token
 
-        post :token, client_id: key.id, client_secret: key.api_key, grant_type: "refresh_token", refresh_token: refresh_token
+        post :token, params: {client_id: key.id, client_secret: key.api_key, grant_type: "refresh_token", refresh_token: refresh_token}
         json = JSON.parse(response.body)
         expect(json['access_token']).to_not eq access_token
       end
@@ -267,7 +267,7 @@ describe Oauth2ProviderController do
         refresh_token = old_token.plaintext_refresh_token
         key2 = DeveloperKey.create!
 
-        post :token, client_id: key2.id, client_secret: key2.api_key, grant_type: "refresh_token", refresh_token: refresh_token
+        post :token, params: {client_id: key2.id, client_secret: key2.api_key, grant_type: "refresh_token", refresh_token: refresh_token}
         assert_status(400)
         expect(response.body).to match(/incorrect client/)
       end
@@ -277,13 +277,13 @@ describe Oauth2ProviderController do
         refresh_token = old_token.plaintext_refresh_token
         access_token = old_token.full_token
 
-        post :token, client_id: key.id, client_secret: key.api_key, grant_type: "refresh_token", refresh_token: refresh_token
+        post :token, params: {client_id: key.id, client_secret: key.api_key, grant_type: "refresh_token", refresh_token: refresh_token}
         expect(response).to be_success
         json = JSON.parse(response.body)
         expect(json['access_token']).to_not eq access_token
 
         access_token = json['access_token']
-        post :token, client_id: key.id, client_secret: key.api_key, grant_type: "refresh_token", refresh_token: refresh_token
+        post :token, params: {client_id: key.id, client_secret: key.api_key, grant_type: "refresh_token", refresh_token: refresh_token}
         expect(response).to be_success
         json = JSON.parse(response.body)
         expect(json['access_token']).to_not eq access_token
@@ -292,7 +292,7 @@ describe Oauth2ProviderController do
 
     context 'unsupported grant_type' do
       it 'returns a 400' do
-        post :token, :client_id => key.id, :client_secret => key.api_key, :grant_type => "client_credentials"
+        post :token, params: {:client_id => key.id, :client_secret => key.api_key, :grant_type => "client_credentials"}
         assert_status(400)
         json = JSON.parse(response.body)
         expect(json['error']).to eq "unsupported_grant_type"
@@ -304,7 +304,7 @@ describe Oauth2ProviderController do
     let_once(:user) { User.create! }
     let_once(:key) { DeveloperKey.create! }
     let(:session_hash) { { :oauth2 => { :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI  } } }
-    let(:oauth_accept) { post :accept, {}, session_hash }
+    let(:oauth_accept) { post :accept, session: session_hash }
 
     before { user_session user }
 
@@ -323,7 +323,7 @@ describe Oauth2ProviderController do
 
     it 'remembers the users access preference with the code' do
       Canvas::Oauth::Token.expects(:generate_code_for).with(user.global_id, key.id, {:scopes => nil, :remember_access => '1', :purpose => nil}).returns('code')
-      post :accept, {:remember_access => '1'}, session_hash
+      post :accept, params: {:remember_access => '1'}, session: session_hash
     end
 
     it 'removes oauth session info after code generation' do
