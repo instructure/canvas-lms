@@ -25,7 +25,7 @@ describe UserListsController do
     account_admin_user_with_role_changes(:role => role, :role_changes => { :manage_students => true })
     user_session(@user)
 
-    post 'create', :course_id => @course.id, :user_list => '', :format => "json"
+    post 'create', params: {:course_id => @course.id, :user_list => ''}, format: "json"
     expect(response).to be_success
   end
 
@@ -34,7 +34,7 @@ describe UserListsController do
     user_session(@user)
 
     UserListV2.expects(:new).once.with('list', search_type: 'unique_id', root_account: Account.default, current_user: @user, can_read_sis: true)
-    post 'create', :course_id => @course.id, :user_list => 'list', :v2 => true, :search_type => 'unique_id', :format => "json"
+    post 'create', params: {:course_id => @course.id, :user_list => 'list', :v2 => true, :search_type => 'unique_id'}, format: "json"
     expect(response).to be_success
   end
 end

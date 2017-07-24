@@ -59,7 +59,7 @@ describe SupportHelpers::CrocodocController do
         SupportHelpers::Crocodoc::ShardFixer.expects(:new).
           with(@user.email, Time.zone.parse('2016-05-01')).returns(fixer)
         fixer.expects(:monitor_and_fix)
-        get :shard, after_time: '2016-05-01'
+        get :shard, params: {after_time: '2016-05-01'}
         expect(response.body).to eq("Enqueued Crocodoc ShardFixer ##{fixer.job_id}...")
       end
     end
@@ -70,7 +70,7 @@ describe SupportHelpers::CrocodocController do
         SupportHelpers::Crocodoc::SubmissionFixer.expects(:new).
           with(@user.email, nil, 1234, 5678).returns(fixer)
         fixer.expects(:monitor_and_fix)
-        get :submission, assignment_id: 1234, user_id: 5678
+        get :submission, params: {assignment_id: 1234, user_id: 5678}
         expect(response.body).to eq("Enqueued Crocodoc SubmissionFixer ##{fixer.job_id}...")
       end
     end
