@@ -939,6 +939,12 @@ describe SIS::CSV::EnrollmentImporter do
       "c2,Course,Course,a2,active",
     )
     process_csv_data_cleanly(
+      "section_id,course_id,name,status,start_date,end_date",
+      "s1,c1,Sec1,active,,",
+      "s2,c2,Sec2,active,,",
+      "s3,c1,Sec3,active,,",
+    )
+    process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "u1,user1,User,Uno,user@example.com,active",
       "u2,user2,User,Uno,user@example.com,active",
@@ -953,25 +959,28 @@ describe SIS::CSV::EnrollmentImporter do
       "v1,vser1,User,Uno,user@example.com,active",
     )
     importer = process_csv_data(
-      "course_id,user_id,role,status",
-      "c1,u1,student,active",
-      "c1,u2,student,active",
-      "c1,u3,student,active",
-      "c1,u4,student,active",
-      "c1,u5,student,active",
-      "c1,u6,student,active",
-      "c1,u7,student,active",
-      "c1,u8,student,active",
-      "c1,u9,student,active",
-      "c1,u0,student,active",
-      "c3,v1,student,active", # invalid course_id
-      "c2,v1,student,active",
+      "course_id,section_id,user_id,role,status",
+      "c1,s1,u1,student,active",
+      "c1,s1,u2,student,active",
+      "c1,s1,u3,student,active",
+      "c1,s1,u4,student,active",
+      "c1,s1,u5,student,active",
+      "c1,s1,u6,student,active",
+      "c1,s1,u7,student,active",
+      "c1,s1,u8,student,active",
+      "c1,s1,u9,student,active",
+      "c1,s1,u0,student,active",
+      "c3,s3,v1,student,active", # invalid course_id
+      "c2,s2,v1,student,active",
     )
     expect(importer.errors).to eq []
-    warnings = importer.warnings.map { |r| r.last }
-    expect(warnings).to eq ["Neither course nor section existed for user enrollment (Course ID: c3, Section ID: , User ID: v1)"]
+    warnings = importer.warnings.map &:last
+    expect(warnings).to eq ["An enrollment referenced a non-existent course c3"]
+    a1 = @account.sub_accounts.find_by(sis_source_id: 'a1')
     a2 = @account.sub_accounts.find_by(sis_source_id: 'a2')
     u1 = @account.pseudonyms.active.find_by(sis_user_id: 'u1').user
+    v1 = @account.pseudonyms.active.find_by(sis_user_id: 'v1').user
     expect(u1.associated_accounts).not_to be_include(a2)
+    expect(v1.associated_accounts).not_to be_include(a1)
   end
 end

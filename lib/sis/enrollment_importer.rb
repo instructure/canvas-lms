@@ -163,10 +163,12 @@ module SIS
             end
 
             if enrollment_info.section_id.present? && !@section
+              @course = nil
               @messages << "An enrollment referenced a non-existent section #{enrollment_info.section_id}"
               next
             end
             if enrollment_info.course_id.present? && !@course
+              @section = nil
               @messages << "An enrollment referenced a non-existent course #{enrollment_info.course_id}"
               next
             end
