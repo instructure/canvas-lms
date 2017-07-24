@@ -369,7 +369,7 @@ class Submission < ActiveRecord::Base
   simply_versioned :explicit => true,
     :when => lambda{ |model| model.new_version_needed? },
     :on_create => lambda{ |model,version| SubmissionVersion.index_version(version) },
-    :on_load => lambda{ |model,version| model.cached_due_date = version.versionable.cached_due_date }
+    :on_load => lambda{ |model,version| model&.cached_due_date = version.versionable&.cached_due_date }
 
   # This needs to be after simply_versioned because the grade change audit uses
   # versioning to grab the previous grade.

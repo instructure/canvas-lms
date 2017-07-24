@@ -873,6 +873,15 @@ describe Submission do
         @submission.with_versioning(:explicit => true) { @submission.save }
       }.to change(SubmissionVersion, :count)
     end
+
+    it "should not fail preload if versionable is nil" do
+      submission_spec_model
+      version = Version.find_by(versionable: @submission)
+      version.update_attribute(:versionable_id, Submission.last.id + 1)
+      expect do
+        ActiveRecord::Associations::Preloader.new.preload([version].map(&:model), :originality_reports)
+      end.not_to raise_error
+    end
   end
 
   it "should ensure the media object exists" do
