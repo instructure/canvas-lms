@@ -1149,7 +1149,7 @@ describe FilesController do
     end
 
     it "has a preflight point for options requests (mostly safari)" do
-      process :api_create_success_cors, 'OPTIONS', id: ""
+      process :api_create_success_cors, method: 'OPTIONS', params: {id: ""}
       expect(response.header['Access-Control-Allow-Headers']).to eq('Origin, X-Requested-With, Content-Type, Accept, Authorization, Accept-Encoding')
     end
 

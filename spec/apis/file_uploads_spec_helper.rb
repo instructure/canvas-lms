@@ -36,7 +36,7 @@ shared_examples_for "file uploads api" do
     # ActionDispatch Http::Headers which correctly handles the merge
     headers = headers.dup.tap { |h| h['CONTENT_TYPE'] ||= h.delete('Content-type') }
 
-    send(method, url, query, headers.merge(http_headers))
+    send(method, url, params: query, headers: headers.merge(http_headers))
   end
 
   def attachment_json(attachment, options = {})
@@ -93,7 +93,7 @@ shared_examples_for "file uploads api" do
     expect(response).to redirect_to("http://www.example.com/api/v1/files/#{attachment.id}/create_success?#{exemption_string}uuid=#{attachment.uuid}")
 
     # step 3, confirmation
-    post response['Location'], {}, { 'Authorization' => "Bearer #{access_token_for_user @user}" }
+    post response['Location'], headers: { 'Authorization' => "Bearer #{access_token_for_user @user}" }
     expect(response).to be_success
     attachment.reload
     json = json_parse(response.body)
@@ -154,7 +154,7 @@ shared_examples_for "file uploads api" do
     })
 
     # step 3, confirmation
-    post redir, {}, { 'Authorization' => "Bearer #{access_token_for_user @user}" }
+    post redir, headers: { 'Authorization' => "Bearer #{access_token_for_user @user}" }
     expect(response).to be_success
     attachment.reload
     json = json_parse(response.body)
@@ -338,7 +338,7 @@ shared_examples_for "file uploads api with folders" do
     tmpfile.rewind
     post_params = json["upload_params"].merge({"file" => tmpfile})
     send_multipart(json["upload_url"], post_params)
-    post response['Location'], {}, { 'Authorization' => "Bearer #{access_token_for_user @user}" }
+    post response['Location'], headers: { 'Authorization' => "Bearer #{access_token_for_user @user}" }
     expect(response).to be_success
     attachment = Attachment.order(:id).last
     expect(a1.reload).to be_deleted
@@ -375,7 +375,7 @@ shared_examples_for "file uploads api with folders" do
     tmpfile.rewind
     post_params = json["upload_params"].merge({"file" => tmpfile})
     send_multipart(json["upload_url"], post_params)
-    post response['Location'], {}, { 'Authorization' => "Bearer #{access_token_for_user @user}" }
+    post response['Location'], headers: { 'Authorization' => "Bearer #{access_token_for_user @user}" }
     expect(response).to be_success
     attachment = Attachment.order(:id).last
     expect(a1.reload).to be_available
@@ -414,7 +414,7 @@ shared_examples_for "file uploads api with folders" do
                                       :content_length => 1234,
                                     })
 
-    post redir, {}, { 'Authorization' => "Bearer #{access_token_for_user @user}" }
+    post redir, headers: { 'Authorization' => "Bearer #{access_token_for_user @user}" }
     expect(response).to be_success
     expect(a1.reload).to be_available
     expect(attachment.reload).to be_available

@@ -33,7 +33,7 @@ describe ContentExportsController do
     describe 'with a valid file' do
       let(:filename) { 'cccv1p0' }
       let(:full_path) { Rails.root + "lib/cc/xsd/#{filename}.xsd" }
-      before { get 'xml_schema', :version => filename }
+      before { get 'xml_schema', params: {:version => filename} }
 
       it 'sends in the entire file' do
         expect(response.header['Content-Length'].to_i).to eq File.size?(full_path)
@@ -46,7 +46,7 @@ describe ContentExportsController do
     end
 
     describe 'with a nonexistant file' do
-      before { get 'xml_schema', :version => 'notafile' }
+      before { get 'xml_schema', params: {:version => 'notafile'} }
 
       it 'returns a 404' do
         expect(response).not_to be_success

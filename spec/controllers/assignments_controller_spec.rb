@@ -772,8 +772,8 @@ describe AssignmentsController do
       controller.stubs(:google_drive_connection).returns(connection)
       Assignment.any_instance.stubs(:allow_google_docs_submission?).returns(true)
       Canvas::Errors.expects(:capture_exception)
-      params = {course_id: @course.id, id: @assignment.id, format: 'json' }
-      get 'list_google_docs', params
+      params = {course_id: @course.id, id: @assignment.id}
+      get 'list_google_docs', params: params, format: 'json'
       expect(response.code).to eq("200")
     end
   end

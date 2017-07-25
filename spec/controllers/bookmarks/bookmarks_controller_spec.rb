@@ -70,7 +70,7 @@ describe Bookmarks::BookmarksController do
       end
 
       it "should create a bookmark" do
-        expect { post 'create', params, format: 'json' }.to change { Bookmarks::Bookmark.count }.by(1)
+        expect { post 'create', params: params, format: 'json' }.to change { Bookmarks::Bookmark.count }.by(1)
       end
 
       it "should set user" do

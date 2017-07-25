@@ -2305,7 +2305,7 @@ describe CoursesController do
       @course.root_account.save!
       @course.update_attribute(:enable_offline_web_export, true)
       @course.save!
-      expect { post 'start_offline_web_export', course_id: @course.id }
+      expect { post 'start_offline_web_export', params: {course_id: @course.id} }
       .to change { @course.reload.web_zip_exports.count }.by(1)
       expect(response).to be_redirect
     end

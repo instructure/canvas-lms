@@ -365,7 +365,7 @@ describe Login::SamlController do
       def get_new(aac_id=nil)
         controller.request.env['canvas.domain_root_account'] = @account
         if aac_id
-          get 'new', id: aac_id
+          get 'new', params: {id: aac_id}
         else
           get 'new'
         end
