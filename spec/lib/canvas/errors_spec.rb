@@ -28,7 +28,7 @@ module Canvas
       described_class.instance_variable_set(:@registry, @old_registry)
     end
 
-    let(:error){ stub("Some Error") }
+    let(:error){double("Some Error") }
 
     describe '.capture_exception' do
       it 'tags with the exception type' do
@@ -57,7 +57,7 @@ module Canvas
       Canvas::Errors.register!(:test_thing) do |_exception, details|
         extra_info = details
       end
-      Canvas::Errors.capture(stub(), {detail1: 'blah'})
+      Canvas::Errors.capture(double(), {detail1: 'blah'})
       expect(extra_info).to eq({extra: {detail1: 'blah'}})
     end
 
@@ -65,7 +65,7 @@ module Canvas
       Canvas::Errors.register!(:test_thing) do
         "FOO-BAR"
       end
-      outputs = Canvas::Errors.capture(stub())
+      outputs = Canvas::Errors.capture(double())
       expect(outputs[:test_thing]).to eq('FOO-BAR')
     end
   end

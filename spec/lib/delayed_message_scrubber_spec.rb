@@ -67,11 +67,11 @@ describe DelayedMessageScrubber do
     end
 
     it 'should log predicted results if passed dry_run=true' do
-      logger   = mock
+      logger   = double
       messages = old_messages(2)
       scrubber = DelayedMessageScrubber.new(logger: logger)
 
-      logger.expects(:info).with("DelayedMessageScrubber: 2 records would be deleted (older than #{scrubber.limit})")
+      expect(logger).to receive(:info).with("DelayedMessageScrubber: 2 records would be deleted (older than #{scrubber.limit})")
       scrubber.scrub(dry_run: true)
     end
   end

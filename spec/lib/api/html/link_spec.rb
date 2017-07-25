@@ -29,7 +29,7 @@ module Api
 
         context "for user context attachment links" do
           before do
-            Attachment.stubs(:where).with(id: "1").returns(stub(first: stub(context_type: "User")))
+            allow(Attachment).to receive(:where).with(id: "1").and_return(double(first: double(context_type: "User")))
           end
 
           it 'returns the raw string for a user content link' do
@@ -44,15 +44,15 @@ module Api
         end
 
         it 'strips out verifiers for Course links and scopes them to the course' do
-          course_attachment = stub(context_type: "Course", context_id: 1)
-          Attachment.stubs(:where).with(id: "1").returns(stub(first: course_attachment))
+          course_attachment = double(context_type: "Course", context_id: 1)
+          allow(Attachment).to receive(:where).with(id: "1").and_return(double(first: course_attachment))
           raw_link = "/files/1/download?verifier=123"
           expect(Link.new(raw_link).to_corrected_s).to eq "/courses/1/files/1/download?"
         end
 
         it 'scopes to the context if url includes the host' do
-          course_attachment = stub(context_type: "Course", context_id: 1)
-          Attachment.stubs(:where).with(id: "1").returns(stub(first: course_attachment))
+          course_attachment = double(context_type: "Course", context_id: 1)
+          allow(Attachment).to receive(:where).with(id: "1").and_return(double(first: course_attachment))
           host = 'account.instructure.com'
           port = 443
           raw_link = "https://#{host}/files/1/download?verifier=123"
@@ -60,8 +60,8 @@ module Api
         end
 
         it 'strips the current host from absolute urls' do
-          course_attachment = stub(context_type: "Course", context_id: 1)
-          Attachment.stubs(:where).with(id: "1").returns(stub(first: course_attachment))
+          course_attachment = double(context_type: "Course", context_id: 1)
+          allow(Attachment).to receive(:where).with(id: "1").and_return(double(first: course_attachment))
           host = 'account.instructure.com'
           port = 443
           raw_link = "https://#{host}/courses/1/files/1/download?"
@@ -69,8 +69,8 @@ module Api
         end
 
         it 'does not scope to the context if url includes a differnt host' do
-          course_attachment = stub(context_type: "Course", context_id: 1)
-          Attachment.stubs(:where).with(id: "1").returns(stub(first: course_attachment))
+          course_attachment = double(context_type: "Course", context_id: 1)
+          allow(Attachment).to receive(:where).with(id: "1").and_return(double(first: course_attachment))
           host = 'account.instructure.com'
           port = 443
           raw_link = "https://#{host}/files/1/download"
@@ -78,8 +78,8 @@ module Api
         end
 
         it 'does not strip the current host if the ports do not match' do
-          course_attachment = stub(context_type: "Course", context_id: 1)
-          Attachment.stubs(:where).with(id: "1").returns(stub(first: course_attachment))
+          course_attachment = double(context_type: "Course", context_id: 1)
+          allow(Attachment).to receive(:where).with(id: "1").and_return(double(first: course_attachment))
           host = 'localhost'
           port = 3000
           raw_link = "https://#{host}:8080/some/other/file"

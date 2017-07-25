@@ -235,21 +235,25 @@ describe Course do
 
     it 'maps id if the assignments are already loaded' do
       args = @test_course.active_assignments.to_a
-      Assignment.any_instance.expects(:id).times(3).returns(1)
+      expect(args[0]).to receive(:id).once
+      expect(args[1]).to receive(:id).once
+      expect(args[2]).to receive(:id).once
       edd = EffectiveDueDates.for_course(@test_course, args)
       edd.to_hash
     end
 
     it 'uses sql if the assignments are still a relation' do
       args = @test_course.active_assignments
-      Assignment.any_instance.expects(:id).never
+      expect_any_instance_of(Assignment).to receive(:id).never
       edd = EffectiveDueDates.for_course(@test_course, args)
       edd.to_hash
     end
 
     it 'memoizes the result' do
       args = @test_course.active_assignments.to_a
-      Assignment.any_instance.expects(:id).times(3).returns(1)
+      expect(args[0]).to receive(:id).once
+      expect(args[1]).to receive(:id).once
+      expect(args[2]).to receive(:id).once
       edd = EffectiveDueDates.for_course(@test_course, args)
       2.times { edd.to_hash }
     end
@@ -1498,9 +1502,9 @@ describe Course do
         @assignment2.only_visible_to_overrides = false
         @assignment2.save!
 
-        @test_course.expects(:grading_periods?).returns false
+        expect(@test_course).to receive(:grading_periods?).and_return false
         edd = EffectiveDueDates.for_course(@test_course)
-        edd.expects(:to_hash).never
+        expect(edd).to receive(:to_hash).never
         expect(edd.any_in_closed_grading_period?).to eq(false)
       end
 
@@ -1529,7 +1533,7 @@ describe Course do
 
         it 'memoizes the result' do
           edd = EffectiveDueDates.for_course(@test_course)
-          edd.expects(:to_hash).once.returns({})
+          expect(edd).to receive(:to_hash).once.and_return({})
           2.times { edd.any_in_closed_grading_period? }
         end
       end
@@ -1575,15 +1579,15 @@ describe Course do
         @assignment2.only_visible_to_overrides = false
         @assignment2.save!
 
-        @test_course.expects(:grading_periods?).returns false
+        expect(@test_course).to receive(:grading_periods?).and_return false
         edd = EffectiveDueDates.for_course(@test_course)
-        edd.expects(:to_hash).never
+        expect(edd).to receive(:to_hash).never
         expect(edd.in_closed_grading_period?(@assignment2)).to eq(false)
       end
 
       it 'returns false if assignment id is nil' do
         edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-        edd.expects(:to_hash).never
+        expect(edd).to receive(:to_hash).never
         expect(edd.in_closed_grading_period?(nil)).to eq(false)
       end
 

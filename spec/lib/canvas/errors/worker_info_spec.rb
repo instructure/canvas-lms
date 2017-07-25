@@ -21,7 +21,7 @@ require_dependency "canvas/errors/worker_info"
 module Canvas
   class Errors
     describe WorkerInfo do
-      let(:worker){ stub(name: 'workername') }
+      let(:worker){ double(name: 'workername') }
       let(:info){ described_class.new(worker) }
 
       subject(:hash){ info.to_h }

@@ -49,31 +49,25 @@ describe Latex::MathMl do
 
   describe '#parse' do
     it 'delegates to Ritex::Parser' do
-      Ritex::Parser.any_instance.expects(:parse).once
+      expect_any_instance_of(Ritex::Parser).to receive(:parse).once
       math_ml.parse
     end
 
     context 'when using mathman' do
       before do
-        MathMan.expects(
-          url_for: service_url,
-          use_for_mml?: true
-        ).at_least_once
-        RequestContextGenerator.expects(
-          request_id: request_id
-        ).at_least_once
-        Canvas::Security.expects(
-          services_signing_secret: 'wooper'
-        ).at_least_once
+        expect(MathMan).to receive(:url_for).at_least(:once).and_return(service_url)
+        expect(MathMan).to receive(:use_for_mml?).at_least(:once).and_return(true)
+        expect(RequestContextGenerator).to receive(:request_id).at_least(:once).and_return(request_id)
+        expect(Canvas::Security).to receive(:services_signing_secret).at_least(:once).and_return('wooper')
       end
 
       it 'calls `CanvasHttp.get` with full url' do
-        CanvasHttp.expects(:get).
+        expect(CanvasHttp).to receive(:get).
           with(service_url, {
             'X-Request-Context-Id' => Canvas::Security.base64_encode(request_id),
             'X-Request-Context-Signature' => Canvas::Security.base64_encode(request_id_signature)
           }).
-          returns(
+          and_return(
             OpenStruct.new(
               status: '200',
               body: mml_doc
@@ -85,7 +79,7 @@ describe Latex::MathMl do
 
       context 'when response status is not 200' do
         it 'returns an empty string' do
-          CanvasHttp.expects(get: OpenStruct.new(
+          expect(CanvasHttp).to receive_messages(get: OpenStruct.new(
             status: '500',
             body: mml_doc
           ))
@@ -97,12 +91,12 @@ describe Latex::MathMl do
         let(:request_id) { 5 }
 
         it "doesn't throw an error" do
-          CanvasHttp.expects(:get).
+          expect(CanvasHttp).to receive(:get).
             with(service_url, {
               'X-Request-Context-Id' => Canvas::Security.base64_encode('5'),
               'X-Request-Context-Signature' => Canvas::Security.base64_encode(Canvas::Security.sign_hmac_sha512('5'))
             }).
-            returns(
+            and_return(
               OpenStruct.new(
                 status: '200',
                 body: mml_doc

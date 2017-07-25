@@ -22,7 +22,7 @@ module Canvas
   class Errors
     describe JobInfo do
       let(:job) do
-        stub(
+        double(
           id: 42,
           source: "controller:discussion_topics_api,action:add_entry,"\
                   "hostname:app010001063068-vpc.us-east-1.canvas.insops.net,"\
@@ -34,11 +34,11 @@ module Canvas
           run_at: Time.zone.now,
           max_attempts: 1,
           tag: "TAG",
-          current_shard: stub(id: 1),
+          current_shard: double(id: 1),
         )
       end
 
-      let(:worker){ stub(name: 'workername') }
+      let(:worker){ double(name: 'workername') }
 
       let(:info){ described_class.new(job, worker) }
 

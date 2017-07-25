@@ -92,7 +92,7 @@ module Lti::MembershipService
       context 'pagination' do
         describe '#memberships' do
           it 'returns the number of memberships specified by the per_page params' do
-            Api.stubs(:per_page).returns(1)
+            allow(Api).to receive(:per_page).and_return(1)
 
             collator = CourseGroupCollator.new(@course,  per_page: 1, page: 1)
             expect(collator.memberships.size).to eq(1)

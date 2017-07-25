@@ -20,8 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe ProgressRunner do
   before do
-    @progress = mock("progress")
-    @progress.stub_everything
+    @progress = double("progress").as_null_object
   end
 
   module ProgressMessages
@@ -35,12 +34,12 @@ describe ProgressRunner do
   end
 
   it "should perform normal processing and update progress" do
-    @progress.expects(:start!).once
-    @progress.expects(:calculate_completion!).times(3)
-    @progress.expects(:complete!).once
-    @progress.expects(:completion=).with(100.0).once
-    @progress.expects(:message=).with("foo").once
-    @progress.expects(:save).once
+    expect(@progress).to receive(:start!).once
+    expect(@progress).to receive(:calculate_completion!).exactly(3).times
+    expect(@progress).to receive(:complete!).once
+    expect(@progress).to receive(:completion=).with(100.0).once
+    expect(@progress).to receive(:message=).with("foo").once
+    expect(@progress).to receive(:save).once
 
     progress_runner = ProgressRunner.new(@progress)
 
@@ -64,9 +63,9 @@ describe ProgressRunner do
 
   it "should rescue exceptions and record messages as errors" do
     @progress.extend(ProgressMessages)
-    @progress.expects(:complete!).once
-    @progress.expects(:completion=).with(100.0)
-    @progress.expects(:save).once
+    expect(@progress).to receive(:complete!).once
+    expect(@progress).to receive(:completion=).with(100.0)
+    expect(@progress).to receive(:save).once
 
     progress_runner = ProgressRunner.new(@progress)
 
@@ -108,9 +107,9 @@ describe ProgressRunner do
 
   it "should fail progress if all records fail" do
     @progress.extend(ProgressMessages)
-    @progress.expects(:completion=).with(100.0)
-    @progress.expects(:fail!).once
-    @progress.expects(:save).once
+    expect(@progress).to receive(:completion=).with(100.0)
+    expect(@progress).to receive(:fail!).once
+    expect(@progress).to receive(:save).once
 
     progress_runner = ProgressRunner.new(@progress)
     ids = (1..4).to_a
@@ -124,7 +123,7 @@ describe ProgressRunner do
   it "updates progress frequency relative to size of input" do
     ids = (1..255).to_a
     times_update = (ids.size / (ids.size / 20).to_f).ceil
-    @progress.expects(:calculate_completion!).times(times_update)
+    expect(@progress).to receive(:calculate_completion!).exactly(times_update).times
 
     progress_runner = ProgressRunner.new(@progress)
     progress_runner.do_batch_update(ids) {}

@@ -22,7 +22,7 @@ describe Mutable do
   before do
     @klass = Class.new do
       # the signature that Mutable requires. if we care about side
-      # effects/return values from these methods for specific tests, we'll mock
+      # effects/return values from these methods for specific tests, we'll double
       # them
       def muted?; end
       def update_attribute(*args); end
@@ -36,40 +36,40 @@ describe Mutable do
 
   describe "mute!" do
     it "updates if not yet muted" do
-      @mutable.expects(:muted?).returns(false)
-      @mutable.expects(:update_attribute).once.with(:muted, true)
+      expect(@mutable).to receive(:muted?).and_return(false)
+      expect(@mutable).to receive(:update_attribute).once.with(:muted, true)
       @mutable.mute!
     end
 
     it "skips update if already muted" do
-      @mutable.expects(:muted?).returns(true)
-      @mutable.expects(:update_attribute).never
+      expect(@mutable).to receive(:muted?).and_return(true)
+      expect(@mutable).to receive(:update_attribute).never
       @mutable.mute!
     end
   end
 
   describe "unmute!" do
     it "updates if currently muted" do
-      @mutable.expects(:muted?).returns(true)
-      @mutable.expects(:update_attribute).once.with(:muted, false)
+      expect(@mutable).to receive(:muted?).and_return(true)
+      expect(@mutable).to receive(:update_attribute).once.with(:muted, false)
       @mutable.unmute!
     end
 
     it "skips update if not muted" do
-      @mutable.expects(:muted?).returns(false)
-      @mutable.expects(:update_attribute).never
+      expect(@mutable).to receive(:muted?).and_return(false)
+      expect(@mutable).to receive(:update_attribute).never
       @mutable.unmute!
     end
 
     it "broadcasts unmute event if currently muted" do
-      @mutable.expects(:muted?).returns(true)
-      @mutable.expects(:broadcast_unmute_event).once
+      expect(@mutable).to receive(:muted?).and_return(true)
+      expect(@mutable).to receive(:broadcast_unmute_event).once
       @mutable.unmute!
     end
 
     it "skips unmute event if not muted" do
-      @mutable.expects(:muted?).returns(false)
-      @mutable.expects(:broadcast_unmute_event).never
+      expect(@mutable).to receive(:muted?).and_return(false)
+      expect(@mutable).to receive(:broadcast_unmute_event).never
       @mutable.unmute!
     end
   end

@@ -43,16 +43,16 @@ describe Canvas::Security do
         end
 
         it "should encode with configured encryption key" do
-          jwt = stub
-          jwt.expects(:sign).with(Canvas::Security.encryption_key, :HS256).returns("sometoken")
-          JSON::JWT.stubs(new: jwt)
+          jwt = double
+          expect(jwt).to receive(:sign).with(Canvas::Security.encryption_key, :HS256).and_return("sometoken")
+          allow(JSON::JWT).to receive_messages(new: jwt)
           Canvas::Security.create_jwt({ a: 1 })
         end
 
         it "should encode with the supplied key" do
-          jwt = stub
-          jwt.expects(:sign).with("mykey", :HS256).returns("sometoken")
-          JSON::JWT.stubs(new: jwt)
+          jwt = double
+          expect(jwt).to receive(:sign).with("mykey", :HS256).and_return("sometoken")
+          allow(JSON::JWT).to receive_messages(new: jwt)
           Canvas::Security.create_jwt({ a: 1 }, nil, "mykey")
         end
       end

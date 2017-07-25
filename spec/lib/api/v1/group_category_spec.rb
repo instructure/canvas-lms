@@ -42,7 +42,7 @@ describe "Api::V1::GroupCategory" do
       end
 
       it 'is present with the includes' do
-        category.stubs(:groups => stub(active: stub(size: 3)), :is_member? => false)
+        allow(category).to receive_messages(:groups => double(active: double(size: 3)), :is_member? => false)
         json = CategoryHarness.new.group_category_json(category, nil, nil, {:include => ['groups_count']})
         expect(json["groups_count"]).to eq(3)
       end
@@ -55,7 +55,7 @@ describe "Api::V1::GroupCategory" do
       end
 
       it 'is present with the includes' do
-        category.stubs(current_progress: stub(:pending? => true))
+        allow(category).to receive_messages(current_progress: double(:pending? => true))
         json = CategoryHarness.new.group_category_json(category, nil, nil, {:include => ['progress_url']})
         expect(json["progress"]['url']).to match(/example.com\/api\/api_v1/)
       end
@@ -63,20 +63,20 @@ describe "Api::V1::GroupCategory" do
 
     describe 'group_category_data' do
       it 'sets protected with the category value' do
-        category.stubs(:protected? => true)
+        allow(category).to receive_messages(:protected? => true)
         json = CategoryHarness.new.group_category_json(category, nil, nil)
         expect(json["protected"]).to eq(true)
       end
 
       it 'passes through "allows_multiple_memberships"' do
-        category.stubs(:allows_multiple_memberships? => false)
+        allow(category).to receive_messages(:allows_multiple_memberships? => false)
         json = CategoryHarness.new.group_category_json(category, nil, nil)
         expect(json["allows_multiple_memberships"]).to eq(false)
       end
 
       it 'checks the user against the category to set "is_member"' do
-        user = stub
-        category.expects(:is_member?).with(user).returns(true)
+        user = double
+        expect(category).to receive(:is_member?).with(user).and_return(true)
         json = CategoryHarness.new.group_category_json(category, user, nil)
         expect(json["is_member"]).to eq(true)
       end

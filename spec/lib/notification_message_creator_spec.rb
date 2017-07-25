@@ -36,7 +36,7 @@ end
 describe NotificationMessageCreator do
   context 'create_message' do
     before(:each) do
-      Message.any_instance.stubs(:get_template).returns('template')
+      allow_any_instance_of(Message).to receive(:get_template).and_return('template')
     end
 
     it "should only send dashboard messages for users with non-validated channels" do
@@ -308,7 +308,7 @@ describe NotificationMessageCreator do
       notification_set
       expect(NotificationPolicy.count).to eq 1
       Rails.cache.delete(['recent_messages_for', @user.id].cache_key)
-      User.stubs(:max_messages_per_day).returns(1)
+      allow(User).to receive(:max_messages_per_day).and_return(1)
       User.max_messages_per_day.times do
         messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
         expect(messages.select{|m| m.to != 'dashboard'}).not_to be_empty
@@ -392,7 +392,7 @@ describe NotificationMessageCreator do
   context "localization" do
     before(:each) do
       notification_set
-      Message.any_instance.stubs(:body).returns('template')
+      allow_any_instance_of(Message).to receive(:body).and_return('template')
     end
 
     it "should translate ERB in the notification" do
@@ -452,7 +452,7 @@ describe NotificationMessageCreator do
 
     it "should create the message on the user's shard" do
       notification_set
-      Message.any_instance.stubs(:get_template).returns('template')
+      allow_any_instance_of(Message).to receive(:get_template).and_return('template')
       @shard1.activate do
         account = Account.create!
         user_with_pseudonym(:active_all => 1, :account => account)
@@ -469,7 +469,7 @@ describe NotificationMessageCreator do
         @cc.confirm!
       end
       notification_model(category: 'TestWeekly')
-      Message.any_instance.stubs(:get_template).returns('template')
+      allow_any_instance_of(Message).to receive(:get_template).and_return('template')
       expect(@cc.notification_policies).to be_empty
       expect(@cc.delayed_messages).to be_empty
       NotificationMessageCreator.new(@notification, @user, :to_list => @user).create_message
@@ -518,7 +518,7 @@ describe NotificationMessageCreator do
           :frequency => @notification.default_frequency
         )
       end
-      Message.any_instance.stubs(:get_template).returns('template')
+      allow_any_instance_of(Message).to receive(:get_template).and_return('template')
       expect(@cc.notification_policies.reload.count).to eq 1
       NotificationMessageCreator.new(@notification, @user, :to_list => @user).create_message
       expect(@cc.notification_policies.reload.count).to eq 1

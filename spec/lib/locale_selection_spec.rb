@@ -89,7 +89,7 @@ describe LocaleSelection do
 
   context "locale matching" do
     before do
-      I18n.config.stubs(:available_locales).returns([:en, :it, :es, :fr, :de, :pt, :zh])
+      allow(I18n.config).to receive(:available_locales).and_return([:en, :it, :es, :fr, :de, :pt, :zh])
       I18n.config.clear_available_locales_set
       @root_account = Account.create
       @account = Account.create(:parent_account => @root_account)
@@ -149,7 +149,7 @@ describe LocaleSelection do
     it "should ignore bogus locales" do
       @root_account.update_attribute(:default_locale, 'es')
       @account.update_attribute(:default_locale, 'fr')
-      @user.stubs(:locale).returns('bogus')
+      allow(@user).to receive(:locale).and_return('bogus')
 
       expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user)).to eql('es')
       expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @account)).to eql('fr')
@@ -192,11 +192,11 @@ describe LocaleSelection do
 
   describe "available_locales" do
     it "does not include custom locales" do
-      I18n.stubs(:available_locales).returns([:en, :ja])
-      I18n.stubs(:t).with(:locales, locale: :en).returns(en: 'English')
-      I18n.stubs(:t).with(:custom, locale: :en).returns(nil)
-      I18n.stubs(:t).with(:locales, locale: :ja).returns(ja: 'Japanese')
-      I18n.stubs(:t).with(:custom, locale: :ja).returns(true)
+      allow(I18n).to receive(:available_locales).and_return([:en, :ja])
+      allow(I18n).to receive(:t).with(:locales, locale: :en).and_return(en: 'English')
+      allow(I18n).to receive(:t).with(:custom, locale: :en).and_return(nil)
+      allow(I18n).to receive(:t).with(:locales, locale: :ja).and_return(ja: 'Japanese')
+      allow(I18n).to receive(:t).with(:custom, locale: :ja).and_return(true)
       expect(ls.available_locales).to eq('en' => 'English')
 
       PluginSetting.create!(name: 'i18n', settings: { 'ja' => true })

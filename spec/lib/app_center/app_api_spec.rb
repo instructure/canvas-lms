@@ -39,8 +39,8 @@ describe AppCenter::AppApi do
 
   describe '#fetch_app_center_response' do
     let(:response) do
-      response = mock
-      response.stubs(:body).returns(
+      response = double
+      allow(response).to receive(:body).and_return(
           {
               'meta' => {"next" => "https://www.example.com/api/v1/apps?offset=60"},
               'current_offset' => 0,
@@ -55,20 +55,20 @@ describe AppCenter::AppApi do
       endpoint = '/?myparam=value'
       per_page = 11
       page = 3
-      CanvasHttp.expects(:get).with("#{api.app_center.settings['base_url']}#{endpoint}&offset=#{page * per_page - per_page}").returns(response)
+      expect(CanvasHttp).to receive(:get).with("#{api.app_center.settings['base_url']}#{endpoint}&offset=#{page * per_page - per_page}").and_return(response)
       api.fetch_app_center_response(endpoint, 11.minutes, page, per_page)
     end
 
     it "can handle an invalid response" do
-      response.stubs(:body).returns('')
-      CanvasHttp.expects(:get).returns(response)
+      allow(response).to receive(:body).and_return('')
+      expect(CanvasHttp).to receive(:get).and_return(response)
       expect(api.fetch_app_center_response('', 12.minutes, 8, 3)).to eq({})
     end
 
     it "can handle an error response" do
       message = {"message" => "Tool not found", "type" => "error"}
-      response.stubs(:body).returns(message.to_json)
-      CanvasHttp.expects(:get).returns(response)
+      allow(response).to receive(:body).and_return(message.to_json)
+      expect(CanvasHttp).to receive(:get).and_return(response)
       expect(api.fetch_app_center_response('', 13.minutes, 6, 9)).to eq message
     end
 
@@ -77,7 +77,7 @@ describe AppCenter::AppApi do
       per_page = 1
       page = 1
       offset = page * per_page - per_page
-      CanvasHttp.expects(:get).with("#{api.app_center.settings['base_url']}#{endpoint}&offset=#{offset}").returns(response)
+      expect(CanvasHttp).to receive(:get).with("#{api.app_center.settings['base_url']}#{endpoint}&offset=#{offset}").and_return(response)
       response = api.fetch_app_center_response(endpoint, 11.minutes, page, per_page)
       results = response['objects']
       expect(results.size).to eq 1
@@ -87,12 +87,12 @@ describe AppCenter::AppApi do
 
     it "can omit next page" do
       message = {"objects" => %w(object1 object2 object3 object4), "meta" => {}}
-      response.stubs(:body).returns(message.to_json)
+      allow(response).to receive(:body).and_return(message.to_json)
       endpoint = '/?myparam=value'
       per_page = 5
       page = 1
       offset = page * per_page - per_page
-      CanvasHttp.expects(:get).with("#{api.app_center.settings['base_url']}#{endpoint}&offset=#{offset}").returns(response)
+      expect(CanvasHttp).to receive(:get).with("#{api.app_center.settings['base_url']}#{endpoint}&offset=#{offset}").and_return(response)
       response = api.fetch_app_center_response(endpoint, 11.minutes, page, per_page)
       results = response['objects']
       expect(results.size).to eq 4
@@ -102,8 +102,8 @@ describe AppCenter::AppApi do
     describe "caching" do
       it "resets the cache when getting an invalid response" do
         enable_cache do
-          response.stubs(:body).returns('')
-          CanvasHttp.expects(:get).returns(response).twice()
+          allow(response).to receive(:body).and_return('')
+          expect(CanvasHttp).to receive(:get).and_return(response).twice()
           expect(api.fetch_app_center_response('', 13.minutes, 7, 4)).to eq({})
           expect(api.fetch_app_center_response('', 13.minutes, 7, 4)).to eq({})
         end
@@ -111,7 +111,7 @@ describe AppCenter::AppApi do
 
       it "uses the configured token as part of the cache key" do
         enable_cache do
-          CanvasHttp.expects(:get).returns(response).twice()
+          expect(CanvasHttp).to receive(:get).and_return(response).twice()
 
           api.fetch_app_center_response('/endpoint/url', 13.minutes, 7, 4)
 
@@ -159,7 +159,7 @@ describe AppCenter::AppApi do
     end
 
     it 'gets the details of the specified app' do
-      api.stubs(:fetch_app_center_response).returns(app_center_response)
+      allow(api).to receive(:fetch_app_center_response).and_return(app_center_response)
       app_center_id = 'pr_youtube'
       config_settings = {}
       url = api.get_app_config_url(app_center_id, config_settings)
@@ -167,7 +167,7 @@ describe AppCenter::AppApi do
     end
 
     it 'appends config settings to an existing query string' do
-      api.stubs(:fetch_app_center_response).returns(app_center_response)
+      allow(api).to receive(:fetch_app_center_response).and_return(app_center_response)
       app_center_id = 'pr_youtube'
       config_settings = {custom_param: 'custom_value'}
       url = api.get_app_config_url(app_center_id, config_settings)
@@ -176,7 +176,7 @@ describe AppCenter::AppApi do
 
     it 'creates a query string populated with config settings' do
       app_center_response['config_xml_url'] = "https://www.edu-apps.org/lti_public_resources/config.xml"
-      api.stubs(:fetch_app_center_response).returns(app_center_response)
+      allow(api).to receive(:fetch_app_center_response).and_return(app_center_response)
       app_center_id = 'pr_youtube'
       config_settings = {custom_param: 'custom_value'}
       url = api.get_app_config_url(app_center_id, config_settings)
@@ -185,7 +185,7 @@ describe AppCenter::AppApi do
 
     it 'returns nil if app center id is invalid' do
       app_center_response = ""
-      api.stubs(:fetch_app_center_response).returns(app_center_response)
+      allow(api).to receive(:fetch_app_center_response).and_return(app_center_response)
       app_center_id = 'pr_youtube'
       config_settings = {custom_param: 'custom_value'}
       url = api.get_app_config_url(app_center_id, config_settings)
@@ -194,7 +194,7 @@ describe AppCenter::AppApi do
 
     it 'sends the app center token' do
       endpoint = "/api/v1/lti_apps/pr_youtube?access_token=#{api.app_center.settings['token']}"
-      api.stubs(:fetch_app_center_response).with(endpoint, 300, 1, 1).returns(app_center_response)
+      allow(api).to receive(:fetch_app_center_response).with(endpoint, 300, 1, 1).and_return(app_center_response)
       app_center_id = 'pr_youtube'
       config_settings = {custom_param: 'custom_value'}
       url = api.get_app_config_url(app_center_id, config_settings)
@@ -204,8 +204,8 @@ describe AppCenter::AppApi do
 
   describe '#get_apps' do
     let(:response) do
-      response = mock
-      response.stubs(:body).returns(
+      response = double
+      allow(response).to receive(:body).and_return(
           {
               'meta' => {"next" => "https://www.example.com/api/v1/apps?offset=72"},
               'current_offset' => 0,
@@ -226,14 +226,14 @@ describe AppCenter::AppApi do
     end
 
     it "gets a list of apps" do
-      CanvasHttp.stubs(:get).returns(response)
+      allow(CanvasHttp).to receive(:get).and_return(response)
       apps = api.get_apps()['lti_apps']
       expect(apps).to be_a Array
       expect(apps.size).to eq 2
     end
 
     it "returns an empty hash if the app center is disabled" do
-      CanvasHttp.stubs(:get).returns(response)
+      allow(CanvasHttp).to receive(:get).and_return(response)
       setting = PluginSetting.find_by_name(api.app_center.id)
       setting.destroy
 
@@ -246,7 +246,7 @@ describe AppCenter::AppApi do
 
     it "gets the next page" do
       enable_cache do
-        CanvasHttp.stubs(:get).returns(response)
+        allow(CanvasHttp).to receive(:get).and_return(response)
         response = api.get_apps
         expect(response['meta']['next_page']).to eq 2
       end
@@ -254,7 +254,7 @@ describe AppCenter::AppApi do
 
     it "caches apps results" do
       enable_cache do
-        CanvasHttp.expects(:get).returns(response).once
+        expect(CanvasHttp).to receive(:get).and_return(response).once
         api.get_apps()
         api.get_apps()
       end
@@ -262,7 +262,7 @@ describe AppCenter::AppApi do
 
     it "caches multiple calls" do
       enable_cache do
-        CanvasHttp.expects(:get).returns(response).times(2)
+        expect(CanvasHttp).to receive(:get).and_return(response).exactly(2).times
         api.get_apps(0)
         api.get_apps(1)
         api.get_apps(0)
@@ -334,8 +334,8 @@ describe AppCenter::AppApi do
           ]
       }
 
-      response.stubs(:body).returns({"objects" => [app]}.to_json)
-      CanvasHttp.expects(:get).returns(response)
+      allow(response).to receive(:body).and_return({"objects" => [app]}.to_json)
+      expect(CanvasHttp).to receive(:get).and_return(response)
       json = api.get_apps(0)
       tool = json['lti_apps'].first
       expect(tool['short_name']).to eq app['id']
@@ -417,8 +417,8 @@ describe AppCenter::AppApi do
               }
           ]
       }
-      response.stubs(:body).returns({"lti_apps" => [app]}.to_json)
-      CanvasHttp.expects(:get).returns(response)
+      allow(response).to receive(:body).and_return({"lti_apps" => [app]}.to_json)
+      expect(CanvasHttp).to receive(:get).and_return(response)
       json = api.get_apps(0)
       tool = json['lti_apps'].first
 

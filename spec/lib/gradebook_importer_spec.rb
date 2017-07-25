@@ -90,7 +90,7 @@ describe GradebookImporter do
         file.puts("'Student,ID,Section,Assignment 1,Final Score'\n")
         file.puts("\"Blend, Bill\",6,My Course,-,\n")
         file.close
-        a.stubs(:open).returns(file)
+        allow(a).to receive(:open).and_return(file)
         return a
       end
 
@@ -194,7 +194,7 @@ describe GradebookImporter do
       p = @u1.pseudonyms.create!(account: account2, unique_id: 'uniqueid')
       p.sis_user_id = 'SISUSERID'
       p.save!
-      Account.expects(:find_by_domain).with('account2').returns(account2)
+      expect(Account).to receive(:find_by_domain).with('account2').and_return(account2)
 
       uploaded_csv = CSV.generate do |csv|
         csv << ["Student", "ID", "SIS User ID", "SIS Login ID", "Root Account", "Section", "Assignment 1"]
@@ -783,7 +783,7 @@ def attachment_with
   file = Tempfile.new("gradebook_import.csv")
   yield file
   file.close
-  a.stubs(:open).returns(file)
+  allow(a).to receive(:open).and_return(file)
   a
 end
 

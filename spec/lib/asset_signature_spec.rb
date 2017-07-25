@@ -26,19 +26,19 @@ describe AssetSignature do
 
   describe '.generate' do
     it 'produces a combination of id and hmac to use as a url signature' do
-      asset = stub(:id=>24)
-      expect(AssetSignature.generate(asset)).to eq "24-#{example_encode(stub.class.to_s, 24)}"
+      asset = double(:id=>24)
+      expect(AssetSignature.generate(asset)).to eq "24-#{example_encode(double.class.to_s, 24)}"
     end
 
     it 'produces a different hmac for each asset id' do
-      asset = stub(:id=>0)
-      expect(AssetSignature.generate(asset)).to eq "0-#{example_encode(asset.class, 0)}"
+      asset = double(:id=>0)
+      expect(AssetSignature.generate(asset)).to eq "0-#{example_encode(double.class, 0)}"
     end
 
     it 'produces a difference hmac for each asset class' do
       asset = SomeModel.new(24)
       expect(AssetSignature.generate(asset)).to eq "24-#{example_encode('SomeModel', 24)}"
-      expect(AssetSignature.generate(asset)).not_to eq AssetSignature.generate(stub(:id=>24))
+      expect(AssetSignature.generate(asset)).not_to eq AssetSignature.generate(double(:id=>24))
     end
 
   end
@@ -46,12 +46,12 @@ describe AssetSignature do
   describe '.find_by_signature' do
 
     it 'finds the model if the hmac matches' do
-      SomeModel.expects(:where).with(id: 24).once.returns(stub(first: nil))
+      expect(SomeModel).to receive(:where).with(id: 24).once.and_return(double(first: nil))
       AssetSignature.find_by_signature(SomeModel, "24-#{example_encode('SomeModel',24)}")
     end
 
     it 'returns nil if the signature does not check out' do
-      SomeModel.expects(:where).never
+      expect(SomeModel).to receive(:where).never
       expect(AssetSignature.find_by_signature(SomeModel, '24-not-the-sig')).to be_nil
     end
   end

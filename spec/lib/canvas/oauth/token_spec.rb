@@ -27,12 +27,12 @@ module Canvas::Oauth
 
     def stub_out_cache(client_id = nil, scopes = nil)
       if client_id
-        token.stubs(:cached_code_entry =>
+        allow(token).to receive_messages(:cached_code_entry =>
                       '{"client_id": ' + client_id.to_s +
                         ', "user": ' + user.id.to_s +
                         (scopes ? ', "scopes": ' + scopes.to_json : '') + '}')
       else
-        token.stubs(:cached_code_entry => '{}')
+        allow(token).to receive_messages(:cached_code_entry => '{}')
       end
     end
 
@@ -175,7 +175,7 @@ module Canvas::Oauth
       end
 
       it 'returns the expires_in parameter' do
-        Time.stubs(:now).returns(DateTime.parse('2015-07-10T09:29:00Z').utc.to_time)
+        allow(Time).to receive(:now).and_return(DateTime.parse('2015-07-10T09:29:00Z').utc.to_time)
         access_token = token.access_token
         access_token.expires_at = DateTime.parse('2015-07-10T10:29:00Z')
         access_token.save!
@@ -196,10 +196,10 @@ module Canvas::Oauth
 
     describe '.generate_code_for' do
       let(:code) { "brand_new_code" }
-      before { SecureRandom.stubs(:hex => code) }
+      before { allow(SecureRandom).to receive_messages(:hex => code) }
 
       it 'returns the new code' do
-        Canvas.stubs(:redis => stub(:setex => true))
+        allow(Canvas).to receive_messages(:redis => double(:setex => true))
         expect(Token.generate_code_for(1, 1)).to eq code
       end
 
@@ -207,8 +207,8 @@ module Canvas::Oauth
         redis = Object.new
         code_data = {user: 1, client_id: 1, scopes: nil, purpose: nil, remember_access: nil}
         #should have 10 min (in seconds) ttl passed as second param
-        redis.expects(:setex).with('oauth2:brand_new_code', 600, code_data.to_json)
-        Canvas.stubs(:redis => redis)
+        expect(redis).to receive(:setex).with('oauth2:brand_new_code', 600, code_data.to_json)
+        allow(Canvas).to receive_messages(:redis => redis)
         Token.generate_code_for(1, 1)
       end
 
@@ -217,15 +217,15 @@ module Canvas::Oauth
         code_data = {user: 1, client_id: 1, scopes: nil, purpose: nil, remember_access: nil}
         #should have 10 sec ttl passed as second param with setting
         Setting.set('oath_token_request_timeout', '10')
-        redis.expects(:setex).with('oauth2:brand_new_code', 10, code_data.to_json)
-        Canvas.stubs(:redis => redis)
+        expect(redis).to receive(:setex).with('oauth2:brand_new_code', 10, code_data.to_json)
+        allow(Canvas).to receive_messages(:redis => redis)
         Token.generate_code_for(1, 1)
       end
     end
 
     context "token expiration" do
       it "starts expiring tokens in 1 hour" do
-        DateTime.stubs(:now).returns(DateTime.parse('2016-06-29T23:01:00Z'))
+        allow(DateTime).to receive(:now).and_return(DateTime.parse('2016-06-29T23:01:00Z'))
         expect(token.access_token.expires_at.utc).to eq(DateTime.parse('2016-06-30T00:01:00Z'))
       end
 
@@ -237,7 +237,7 @@ module Canvas::Oauth
       end
 
       it 'Tokens wont expire if the dev key has auto_expire_tokens set to false' do
-        DateTime.stubs(:now).returns(Time.zone.parse('2015-06-29T23:01:00Z'))
+        allow(DateTime).to receive(:now).and_return(Time.zone.parse('2015-06-29T23:01:00Z'))
         key = token.key
         key.auto_expire_tokens = false
         key.save!

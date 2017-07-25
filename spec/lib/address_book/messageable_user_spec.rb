@@ -393,10 +393,10 @@ describe AddressBook::MessageableUser do
     it "avoids db query with rails cache" do
       teacher = teacher_in_course(active_all: true).user
       student = student_in_course(active_all: true, name: 'Bob').user
-      Rails.cache.expects(:fetch).
-        with(regexp_matches(/address_book_preload/)).
-        returns(MessageableUser.where(id: student).to_a)
-      teacher.expects(:load_messageable_users).never
+      expect(Rails.cache).to receive(:fetch).
+        with(match(/address_book_preload/)).
+        and_return(MessageableUser.where(id: student).to_a)
+      expect(teacher).to receive(:load_messageable_users).never
       AddressBook::MessageableUser.new(teacher).preload_users([student])
     end
 

@@ -88,7 +88,7 @@ describe UserListV2 do
 
   it "doesn't find site admins if you're not a site admin" do
     user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => Account.site_admin)
-    Account.default.stubs(:trusted_account_ids).returns([Account.site_admin.id])
+    allow(Account.default).to receive(:trusted_account_ids).and_return([Account.site_admin.id])
     jt = @user
     user_with_pseudonym
     other = @user
@@ -98,7 +98,7 @@ describe UserListV2 do
     expect(ul.missing_results.first[:address]).to eq 'jt@instructure.com'
 
     # when it's the user _from_ site admin doing it, it can be found
-    Account.default.stubs(:trusted_account_ids).returns([Account.site_admin.id])
+    allow(Account.default).to receive(:trusted_account_ids).and_return([Account.site_admin.id])
     ul = UserListV2.new('jt@instructure.com', current_user: jt, search_type: 'unique_id')
     expect(ul.missing_results).to be_empty
     expect(ul.resolved_results.first[:address]).to eq 'jt@instructure.com'
@@ -106,7 +106,7 @@ describe UserListV2 do
 
   it "should find users from trusted accounts" do
     account = Account.create!(:name => "naem")
-    Account.default.stubs(:trusted_account_ids).returns([account.id])
+    allow(Account.default).to receive(:trusted_account_ids).and_return([account.id])
     user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account)
     ul = UserListV2.new('jt@instructure.com', :search_type => "unique_id")
     expect(ul.resolved_results).to eq [{:address => 'jt@instructure.com', :user_id => @user.id, :user_name => 'JT', :account_id => account.id, :account_name => account.name}]
@@ -116,7 +116,7 @@ describe UserListV2 do
     user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true)
     @user1 = @user
     account = Account.create!
-    Account.default.stubs(:trusted_account_ids).returns([account.id])
+    allow(Account.default).to receive(:trusted_account_ids).and_return([account.id])
     user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account)
     ul = UserListV2.new('jt@instructure.com', :search_type => "unique_id")
 
@@ -135,8 +135,8 @@ describe UserListV2 do
     it "should show duplicates for two results from the current account and the trusted account" do
       account1 = Account.create!
       account2 = Account.create!
-      account1.stubs(:trusted_account_ids).returns([account2.id])
-      account1.stubs(:trust_exists?).returns(true)
+      allow(account1).to receive(:trusted_account_ids).and_return([account2.id])
+      allow(account1).to receive(:trust_exists?).and_return(true)
 
       user_with_managed_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account1, :sis_user_id => "SISID")
       @user1 = @user
@@ -158,26 +158,27 @@ describe UserListV2 do
   it "should show duplicates if there is a conflict of unique_ids from not-this-account" do
     account1 = Account.create!
     account2 = Account.create!
-    Account.default.stubs(:trusted_account_ids).returns([account1.id, account2.id])
-    Pseudonym.any_instance.stubs(:works_for_account?).returns(true)
+    allow(Account.default).to receive(:trusted_account_ids).and_return([account1.id, account2.id])
 
     user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account1)
+    allow_any_instantiation_of(@pseudonym).to receive(:works_for_account?).and_return(true)
     user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account2)
+    allow_any_instantiation_of(@pseudonym).to receive(:works_for_account?).and_return(true)
     ul = UserListV2.new('jt@instructure.com', search_type: 'unique_id')
     expect(ul.resolved_results).to be_empty
     expect(ul.duplicate_results.count).to eq 1
-    dup = ul.duplicate_results.first
-    expect(dup.map{|r| r[:account_id]}).to match_array([account1.id, account2.id])
-    expect(dup.map{|r| r[:login_id]}).to match_array(['jt@instructure.com', 'jt@instructure.com'])
-    dup.each do |h|
-      expect(h).to_not has_key(:sis_user_id) # only includes if can_read_sis is true
+    dups = ul.duplicate_results.first
+    expect(dups.map{|r| r[:account_id]}).to match_array([account1.id, account2.id])
+    expect(dups.map{|r| r[:login_id]}).to match_array(['jt@instructure.com', 'jt@instructure.com'])
+    dups.each do |h|
+      expect(h).to_not have_key(:sis_user_id) # only includes if can_read_sis is true
     end
   end
 
   it "should find a user with multiple not-this-account pseudonyms" do
     account1 = Account.create!
     account2 = Account.create!
-    Account.default.stubs(:trusted_account_ids).returns([account1.id, account2.id])
+    allow(Account.default).to receive(:trusted_account_ids).and_return([account1.id, account2.id])
     user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account1)
     @user.pseudonyms.create!(:unique_id => 'jt@instructure.com', :account => account2)
     ul = UserListV2.new('jt@instructure.com', search_type: 'unique_id')
@@ -204,7 +205,7 @@ describe UserListV2 do
         @account = Account.create!(:name => "accountnaem")
         user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => @account)
       end
-      Account.default.stubs(:trusted_account_ids).returns([@account.id])
+      allow(Account.default).to receive(:trusted_account_ids).and_return([@account.id])
       ul1 = UserListV2.new('jt@instructure.com', search_type: 'sis_user_id', can_read_sis: true)
       expect(ul1.missing_results.map{|r| r[:address]}).to eq ['jt@instructure.com']
 
@@ -221,7 +222,7 @@ describe UserListV2 do
         CommunicationChannel.create!(user: @user, pseudonym: ps, path_type: 'email', path: 'jt@instructure.com')
       end
 
-      Account.default.stubs(:trusted_account_ids).returns([@account.id])
+      allow(Account.default).to receive(:trusted_account_ids).and_return([@account.id])
 
       ul = UserListV2.new('jt@instructure.com', search_type: 'cc_path')
       expect(ul.resolved_results.count).to eq 1
@@ -241,14 +242,14 @@ describe UserListV2 do
           @user2 = user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => @account2)
         end
 
-        Account.default.stubs(:trusted_account_ids).returns([Account.site_admin.id, @account1.id, @account2.id])
-        GlobalLookups.stubs(:enabled?).returns(true)
+        allow(Account.default).to receive(:trusted_account_ids).and_return([Account.site_admin.id, @account1.id, @account2.id])
+        allow(GlobalLookups).to receive(:enabled?).and_return(true)
       end
 
       it "should look on every shard if there aren't that many shards to look on" do
         Setting.set('global_lookups_shard_threshold', '3') # i.e. if we'd have to look on more than 3 shards, we should use global lookups
 
-        Pseudonym.expects(:associated_shards_for_column).never
+        expect(Pseudonym).to receive(:associated_shards_for_column).never
         ul = UserListV2.new('jt@instructure.com', search_type: 'unique_id')
         expect(ul.resolved_results).to be_empty
         expect(ul.duplicate_results.first.map{|r| r[:user_id]}).to match_array([@user1.id, @user2.id])
@@ -257,7 +258,7 @@ describe UserListV2 do
       it "should use the global lookups to restrict searched shard if there are enough shards to look on" do
         Setting.set('global_lookups_shard_threshold', '1') # i.e. if we'd have to look on more than 1 shards, we should use global lookups
 
-        Pseudonym.expects(:associated_shards_for_column).once.with(:unique_id, 'jt@instructure.com').returns([@shard1]) # don't look on shard2
+        expect(Pseudonym).to receive(:associated_shards_for_column).once.with(:unique_id, 'jt@instructure.com').and_return([@shard1]) # don't look on shard2
         ul = UserListV2.new('jt@instructure.com', search_type: 'unique_id')
         expect(ul.duplicate_results).to be_empty
         expect(ul.resolved_results.first[:user_id]).to eq @user1.id

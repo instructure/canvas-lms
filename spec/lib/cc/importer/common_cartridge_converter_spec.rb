@@ -450,10 +450,10 @@ describe "More Standard Common Cartridge importing" do
     @copy_to.course_code = "alt name"
 
     @migration = Object.new
-    @migration.stubs(:to_import).returns(nil)
-    @migration.stubs(:context).returns(@copy_to)
-    @migration.stubs(:import_object?).returns(true)
-    @migration.stubs(:add_imported_item)
+    allow(@migration).to receive(:to_import).and_return(nil)
+    allow(@migration).to receive(:context).and_return(@copy_to)
+    allow(@migration).to receive(:import_object?).and_return(true)
+    allow(@migration).to receive(:add_imported_item)
   end
 
   it "should properly handle top-level resource references" do

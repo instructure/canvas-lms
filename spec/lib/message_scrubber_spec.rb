@@ -68,11 +68,11 @@ describe MessageScrubber do
     end
 
     it 'should log predicted results if passed dry_run=true' do
-      logger   = mock
+      logger   = double
       messages = old_messages(2)
       scrubber = MessageScrubber.new(logger: logger)
 
-      logger.expects(:info).with("MessageScrubber: 2 records would be deleted (older than #{scrubber.limit})")
+      expect(logger).to receive(:info).with("MessageScrubber: 2 records would be deleted (older than #{scrubber.limit})")
       scrubber.scrub(dry_run: true)
     end
   end
@@ -111,10 +111,10 @@ describe MessageScrubber do
     end
 
     it 'should log each shard separately' do
-      logger   = mock
+      logger   = double
       scrubber = MessageScrubber.new(logger: logger)
 
-      logger.expects(:info).times(Shard.all.count)
+      expect(logger).to receive(:info).exactly(Shard.all.count).times
       scrubber.scrub_all(dry_run: true)
     end
   end

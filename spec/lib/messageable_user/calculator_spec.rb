@@ -377,7 +377,7 @@ describe "MessageableUser::Calculator" do
       specs_require_sharding
 
       it "should yield once for each of the user's associated shards" do
-        @viewing_user.stubs(:associated_shards => [@shard1, @shard2])
+        allow(@viewing_user).to receive_messages(:associated_shards => [@shard1, @shard2])
         values = @calculator.shard_cached('cache_key') { Shard.current.id }
         expect(values.keys.sort_by(&:id)).to eq [@shard1, @shard2].sort_by(&:id)
         expect(values[@shard1]).to eq @shard1.id
@@ -427,16 +427,16 @@ describe "MessageableUser::Calculator" do
         expected1 = Foo.new('a')
         expected2 = Foo.new('b')
         expected3 = Foo.new('c')
-        @calculator.stubs(:method1 => expected1)
-        @calculator.stubs(:method2 => expected2)
+        allow(@calculator).to receive_messages(:method1 => expected1)
+        allow(@calculator).to receive_messages(:method2 => expected2)
 
         calc2 = MessageableUser::Calculator.new(@viewing_user)
-        calc2.stubs(:method1 => expected1)
-        calc2.stubs(:method2 => expected2)
+        allow(calc2).to receive_messages(:method1 => expected1)
+        allow(calc2).to receive_messages(:method2 => expected2)
 
         calc3 = MessageableUser::Calculator.new(@viewing_user)
-        calc3.stubs(:method1 => expected1)
-        calc3.stubs(:method2 => expected3)
+        allow(calc3).to receive_messages(:method1 => expected1)
+        allow(calc3).to receive_messages(:method2 => expected3)
 
         enable_cache do
           @calculator.shard_cached('cache_key', :method1, :method2) { expected1 }
@@ -915,49 +915,49 @@ describe "MessageableUser::Calculator" do
     describe "messageable_users_in_context" do
       it "should recognize asset string course_X" do
         course_with_teacher(:user => @viewing_user)
-        @calculator.expects(:messageable_users_in_course_scope).
+        expect(@calculator).to receive(:messageable_users_in_course_scope).
           with(@course.id, nil, {}).once
         @calculator.messageable_users_in_context(@course.asset_string)
       end
 
       it "should recognize asset string course_X_admins" do
         course_with_teacher(:user => @viewing_user)
-        @calculator.expects(:messageable_users_in_course_scope).
+        expect(@calculator).to receive(:messageable_users_in_course_scope).
           with(@course.id, ['TeacherEnrollment', 'TaEnrollment'], {}).once
         @calculator.messageable_users_in_context(@course.asset_string + "_admins")
       end
 
       it "should recognize asset string course_X_students" do
         course_with_teacher(:user => @viewing_user)
-        @calculator.expects(:messageable_users_in_course_scope).
+        expect(@calculator).to receive(:messageable_users_in_course_scope).
           with(@course.id, ['StudentEnrollment'], {}).once
         @calculator.messageable_users_in_context(@course.asset_string + "_students")
       end
 
       it "should recognize asset string section_X" do
         course_with_teacher(:user => @viewing_user)
-        @calculator.expects(:messageable_users_in_section_scope).
+        expect(@calculator).to receive(:messageable_users_in_section_scope).
           with(@course.default_section.id, nil, {}).once
         @calculator.messageable_users_in_context("section_#{@course.default_section.id}")
       end
 
       it "should recognize asset string section_X_admins" do
         course_with_teacher(:user => @viewing_user)
-        @calculator.expects(:messageable_users_in_section_scope).
+        expect(@calculator).to receive(:messageable_users_in_section_scope).
           with(@course.default_section.id, ['TeacherEnrollment', 'TaEnrollment'], {}).once
         @calculator.messageable_users_in_context("section_#{@course.default_section.id}_admins")
       end
 
       it "should recognize asset string section_X_students" do
         course_with_teacher(:user => @viewing_user)
-        @calculator.expects(:messageable_users_in_section_scope).
+        expect(@calculator).to receive(:messageable_users_in_section_scope).
           with(@course.default_section.id, ['StudentEnrollment'], {}).once
         @calculator.messageable_users_in_context("section_#{@course.default_section.id}_students")
       end
 
       it "should recognize asset string group_X" do
         group_with_user(:user => @viewing_user)
-        @calculator.expects(:messageable_users_in_group_scope).
+        expect(@calculator).to receive(:messageable_users_in_group_scope).
           with(@group.id, {}).once
         @calculator.messageable_users_in_context(@group.asset_string)
       end

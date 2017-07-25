@@ -88,14 +88,14 @@ describe AssignmentOverrideApplicator do
       expect(@overridden_assignment.overridden_for_user.id).to eq @student1.id
       student_in_course
       @student2 = @student
-      AssignmentOverrideApplicator.expects(:overrides_for_assignment_and_user).with(@overridden_assignment, @student2).returns([])
+      expect(AssignmentOverrideApplicator).to receive(:overrides_for_assignment_and_user).with(@overridden_assignment, @student2).and_return([])
       @reoverridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@overridden_assignment, @student2)
     end
 
     it "should not attempt to apply overrides if an overridden assignment is overridden for the same user" do
       @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
       expect(@overridden_assignment.overridden_for_user.id).to eq @student.id
-      AssignmentOverrideApplicator.expects(:overrides_for_assignment_and_user).never
+      expect(AssignmentOverrideApplicator).to receive(:overrides_for_assignment_and_user).never
       @reoverridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@overridden_assignment, @student)
     end
 
@@ -168,7 +168,7 @@ describe AssignmentOverrideApplicator do
       it "should cache by assignment and user" do
         enable_cache do
           AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
-          Rails.cache.expects(:write_entry).never
+          expect(Rails.cache).to receive(:write_entry).never
           AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
         end
       end
@@ -177,7 +177,7 @@ describe AssignmentOverrideApplicator do
         enable_cache do
           overrides1 = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
           assignment = create_assignment
-          Rails.cache.expects(:write_entry)
+          expect(Rails.cache).to receive(:write_entry)
           overrides2 = AssignmentOverrideApplicator.overrides_for_assignment_and_user(assignment, @student)
         end
       end
@@ -189,7 +189,7 @@ describe AssignmentOverrideApplicator do
           expect(@assignment.versions.count).to eq 2
           enable_cache do
             AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment.versions.first.model, @student)
-            Rails.cache.expects(:write_entry)
+            expect(Rails.cache).to receive(:write_entry)
             AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment.versions.current.model, @student)
           end
         end
@@ -199,7 +199,7 @@ describe AssignmentOverrideApplicator do
         enable_cache do
           AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
           user = user_model
-          Rails.cache.expects(:write_entry)
+          expect(Rails.cache).to receive(:write_entry)
           AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, user)
         end
       end
@@ -808,7 +808,7 @@ describe AssignmentOverrideApplicator do
       @override = assignment_override_model(:assignment => @assignment)
       enable_cache do
         overrides1 = AssignmentOverrideApplicator.collapsed_overrides(@assignment, [@override])
-        Rails.cache.expects(:write_entry).never
+        expect(Rails.cache).to receive(:write_entry).never
         Timecop.freeze(5.seconds.from_now) do
           overrides2 = AssignmentOverrideApplicator.collapsed_overrides(@assignment, [@override])
         end
@@ -821,7 +821,7 @@ describe AssignmentOverrideApplicator do
       @override = assignment_override_model(:assignment => @assignment1)
       enable_cache do
         AssignmentOverrideApplicator.collapsed_overrides(@assignment1, [@override])
-        Rails.cache.expects(:write_entry)
+        expect(Rails.cache).to receive(:write_entry)
         AssignmentOverrideApplicator.collapsed_overrides(@assignment2, [@override])
       end
     end
@@ -836,7 +836,7 @@ describe AssignmentOverrideApplicator do
         enable_cache do
           expect(@assignment.versions.first.updated_at).not_to eq @assignment.versions.current.model.updated_at
           AssignmentOverrideApplicator.collapsed_overrides(@assignment.versions.first.model, [@override])
-          Rails.cache.expects(:write_entry)
+          expect(Rails.cache).to receive(:write_entry)
           AssignmentOverrideApplicator.collapsed_overrides(@assignment.versions.current.model, [@override])
         end
       end
@@ -848,7 +848,7 @@ describe AssignmentOverrideApplicator do
       @override2 = assignment_override_model(:assignment => @assignment)
       enable_cache do
         AssignmentOverrideApplicator.collapsed_overrides(@assignment, [@override1])
-        Rails.cache.expects(:write_entry)
+        expect(Rails.cache).to receive(:write_entry)
         AssignmentOverrideApplicator.collapsed_overrides(@assignment, [@override2])
       end
     end
