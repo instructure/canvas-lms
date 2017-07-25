@@ -2619,6 +2619,7 @@ describe Assignment do
         @a.due_at = Time.now + 60
         @a.save!
         expect(@a.messages_sent).to be_include('Assignment Due Date Changed')
+        expect(@a.messages_sent['Assignment Due Date Changed'].first.from_name).to eq @course.name
       end
 
       it "should NOT create a message when everything but the assignment due date has changed" do
@@ -2643,13 +2644,15 @@ describe Assignment do
       it "should notify students when their grade is changed" do
         @sub2 = @assignment.grade_student(@stu2, grade: 8, grader: @teacher).first
         expect(@sub2.messages_sent).not_to be_empty
-        expect(@sub2.messages_sent['Submission Graded']).not_to be_nil
+        expect(@sub2.messages_sent['Submission Graded']).to be_present
+        expect(@sub2.messages_sent['Submission Graded'].first.from_name).to eq @course.name
         expect(@sub2.messages_sent['Submission Grade Changed']).to be_nil
         @sub2.update_attributes(:graded_at => Time.zone.now - 60*60)
         @sub2 = @assignment.grade_student(@stu2, grade: 9, grader: @teacher).first
         expect(@sub2.messages_sent).not_to be_empty
         expect(@sub2.messages_sent['Submission Graded']).to be_nil
-        expect(@sub2.messages_sent['Submission Grade Changed']).not_to be_nil
+        expect(@sub2.messages_sent['Submission Grade Changed']).to be_present
+        expect(@sub2.messages_sent['Submission Grade Changed'].first.from_name).to eq @course.name
       end
 
       it "should notify affected students on a mass-grade change" do
@@ -2705,6 +2708,7 @@ describe Assignment do
         @a.notify_of_update = true
         @a.save
         expect(@a.messages_sent).to be_include('Assignment Changed')
+        expect(@a.messages_sent['Assignment Changed'].first.from_name).to eq @course.name
       end
 
       it "should NOT create a message when an assignment changes SHORTLY AFTER it's been created" do
@@ -2730,6 +2734,7 @@ describe Assignment do
       it "should create a message when an assignment is added to a course in process" do
         assignment_model(:course => @course)
         expect(@a.messages_sent).to be_include('Assignment Created')
+        expect(@a.messages_sent['Assignment Created'].first.from_name).to eq @course.name
       end
 
       it "should not create a message in an unpublished course" do
@@ -4649,8 +4654,19 @@ describe Assignment do
     @graded_notify = Notification.create!(:name => "Submission Graded")
     @grade_change_notify = Notification.create!(:name => "Submission Grade Changed")
     @stu1 = @student
-    @course.enroll_student(@stu2 = user_factory)
+    communication_channel(@stu1, active_cc: true)
+    @course.enroll_student(@stu2 = user_factory(active_user: true, active_cc: true))
     @assignment = @course.assignments.create(:title => "asdf", :points_possible => 10)
+
+    [@stu1, @stu2].each do |stu|
+      [@graded_notify, @grade_change_notify].each do |notification|
+        notification_policy_model(
+          notification: notification,
+          communication_channel: stu.communication_channels.first
+        )
+      end
+    end
+
     @sub1 = @assignment.grade_student(@stu1, grade: 9, grader: @teacher).first
     @assignment.reload
   end
