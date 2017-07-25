@@ -104,7 +104,7 @@ import './jquery.loadingImg'
       }
       else if (opts.canvadoc_session_url) {
         const canvadocWrapper = $('<div style="overflow: auto; resize: vertical;\
-        border: 1px solid transparent;"/>')
+        border: 1px solid transparent; height: 100%;"/>')
         canvadocWrapper.appendTo($this)
         var iframe = $('<iframe/>', {
           src: opts.canvadoc_session_url,
