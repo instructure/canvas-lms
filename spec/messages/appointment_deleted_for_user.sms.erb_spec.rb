@@ -27,8 +27,8 @@ describe 'appointment_deleted_for_user.sms' do
     appointment_participant_model(:participant => user)
 
     generate_message(:appointment_deleted_for_user, :sms, @event,
-                     :data => {:updating_user => @teacher,
-                                       :cancel_reason => "just because"})
+                     :data => {:updating_user_name => @teacher.name,
+                               :cancel_reason => "just because"})
 
     expect(@message.body).to include('some title')
   end
@@ -42,8 +42,8 @@ describe 'appointment_deleted_for_user.sms' do
     appointment_participant_model(:participant => @group, :course => @course)
 
     generate_message(:appointment_deleted_for_user, :sms, @event,
-                     :data => {:updating_user => @teacher,
-                                       :cancel_reason => "just because"})
+                     :data => {:updating_user_name => @teacher.name,
+                               :cancel_reason => "just because"})
 
     expect(@message.body).to include('some title')
   end
