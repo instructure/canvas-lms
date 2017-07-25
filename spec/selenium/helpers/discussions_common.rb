@@ -81,6 +81,7 @@ module DiscussionsCommon
 
     if attachment.present?
       filename, fullpath, data = get_file(attachment)
+      scroll_to(@last_entry.find_element(:css, '.discussion-reply-add-attachment'))
       @last_entry.find_element(:css, '.discussion-reply-add-attachment').click
       wait_for_ajaximations
       @last_entry.find_element(:css, '.discussion-reply-attachments input').send_keys(fullpath)
