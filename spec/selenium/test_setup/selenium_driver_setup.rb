@@ -272,7 +272,7 @@ module SeleniumDriverSetup
 
     def safari_driver
       puts "using safari driver"
-      selenium_remote_driver
+      selenium_url ? selenium_remote_driver : ruby_safari_driver
     end
 
     def firefox_driver
@@ -316,6 +316,11 @@ module SeleniumDriverSetup
       puts "Thread: provisioning local chrome driver"
       Chromedriver.set_version "2.29"
       Selenium::WebDriver.for :chrome, switches: %w[--disable-impl-side-painting]
+    end
+
+    def ruby_safari_driver
+      puts "Thread: provisioning local safari driver"
+      Selenium::WebDriver.for :safari
     end
 
     def selenium_remote_driver
