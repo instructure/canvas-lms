@@ -65,13 +65,15 @@ export default class FlashAlert extends React.Component {
     message: PropTypes.string.isRequired,
     error: PropTypes.instanceOf(Error),
     variant: PropTypes.oneOf(['info', 'success', 'warning', 'error']),
-    timeout: PropTypes.number
+    timeout: PropTypes.number,
+    screenReaderOnly: PropTypes.bool,
   }
 
   static defaultProps = {
     error: null,
     variant: 'info',
-    timeout
+    timeout,
+    screenReaderOnly: false
   }
 
   constructor (props) {
@@ -174,6 +176,7 @@ export default class FlashAlert extends React.Component {
           timeout={this.props.timeout}
           liveRegion={this.getLiveRegion}
           transition="fade"
+          screenReaderOnly={this.props.screenReaderOnly}
         >
           <div>
             <p style={{margin: '0 -5px'}}>
@@ -187,7 +190,7 @@ export default class FlashAlert extends React.Component {
   }
 }
 
-export function showFlashAlert ({ message, err, type = err ? 'error' : 'info' }) {
+export function showFlashAlert ({ message, err, type = err ? 'error' : 'info', srOnly=false }) {
   function closeAlert (atNode) {
     ReactDOM.unmountComponentAtNode(atNode)
     atNode.remove()
@@ -213,6 +216,7 @@ export function showFlashAlert ({ message, err, type = err ? 'error' : 'info' })
         error={err}
         variant={type}
         onClose={closeAlert.bind(null, parent)} // eslint-disable-line react/jsx-no-bind
+        screenReaderOnly={srOnly}
       />, parent
     )
   }

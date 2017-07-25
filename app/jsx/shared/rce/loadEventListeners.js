@@ -50,7 +50,7 @@ export default function loadEventListeners (callbacks = {}) {
 
   document.addEventListener('tinyRCE/initImagePicker', (e) => {
     require.ensure([], (require) => {
-      const InsertUpdateImageView = require('compiled/views/tinymce/InsertUpdateImageView')
+      const InsertUpdateImageView = require('coffeescripts/views/tinymce/InsertUpdateImageView')
       const view = new InsertUpdateImageView(e.detail.ed, e.detail.selectedNode)
       callbacks.imagePickerCB(view)
     }, 'initImagePickerAsyncChunk')

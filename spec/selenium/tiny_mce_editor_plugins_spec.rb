@@ -35,13 +35,15 @@ describe "Tiny MCE editor plugins" do
     fj('.imageSourceTabs a:contains(Canvas)').click
     wait_for_ajaximations
 
-    f('.insertUpdateImageTabpane .treeLabel').click
+    f('.insertUpdateImageTabpane .file-browser__tree button').click
+    wait_for_ajaximations
+    f('.file-browser__tree ul ul li')
+    fj("button:contains('sf 9')")
+
+    driver.execute_script("$('.file-browser__tree ul ul li').last().get(0).scrollIntoView()")
     wait_for_ajaximations
 
-    driver.execute_script("$('.treeContents .subtrees li').last().get(0).scrollIntoView()")
-    wait_for_ajaximations
-
-    expect{ff('.treeContents .subtrees li').length}.to become 11
+    expect{ff('.file-browser__tree ul ul li').length}.to become 11
     close_visible_dialog
   end
 end

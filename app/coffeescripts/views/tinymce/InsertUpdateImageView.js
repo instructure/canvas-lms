@@ -16,57 +16,27 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import I18n from 'i18n!editor'
-
 import $ from 'jquery'
 import _ from 'underscore'
-import h from 'str/htmlEscape'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import htmlEscape from 'str/htmlEscape'
+import FileBrowser from 'jsx/shared/rce/FileBrowser'
 import DialogBaseView from '../DialogBaseView'
 import template from 'jst/tinymce/InsertUpdateImageView'
-import {send} from 'jsx/shared/rce/RceCommandShim'
-import TreeBrowserView from '../TreeBrowserView'
-import RootFoldersFinder from '../RootFoldersFinder'
+import { send } from 'jsx/shared/rce/RceCommandShim'
 import FindFlickrImageView from '../FindFlickrImageView'
 
 export default class InsertUpdateImageView extends DialogBaseView {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-      eval(`${thisName} = this;`);
-    }
-    this.constrainProportions = this.constrainProportions.bind(this)
-    this.onFileLinkDblclick = this.onFileLinkDblclick.bind(this)
-    this.update = this.update.bind(this)
-    super(...args)
-  }
-
-  static initClass() {
-    this.prototype.template = template
-
-    this.prototype.events = {
-      'change [name="image[width]"]': 'constrainProportions',
-      'change [name="image[height]"]': 'constrainProportions',
-      'click .flickrImageResult, .treeFile': 'onFileLinkClick',
-      'change [name="image[src]"]': 'onImageUrlChange',
-      'tabsshow .imageSourceTabs': 'onTabsshow',
-      'dblclick .flickrImageResult, .treeFile': 'onFileLinkDblclick',
-      'change [name="image[data-decorative]"]': 'onDecorativeChange'
-    }
-
-    this.prototype.dialogOptions = {
-      width: 625,
-      title: I18n.t('titles.insert_edit_image', 'Insert / Edit Image'),
-      destroy: true
-    }
-  }
-
   toJSON() {
     return {show_quiz_warning: ENV.SHOW_QUIZ_ALT_TEXT_WARNING}
   }
 
   initialize(editor, selectedNode) {
+    this.update = this.update.bind(this)
+    this.setSelectedImage = this.setSelectedImage.bind(this)
+    this.constrainProportions = this.constrainProportions.bind(this)
+    this.onFileLinkClick = this.onFileLinkClick.bind(this)
     this.editor = editor
     this.$editor = $(`#${this.editor.id}`)
     this.prevSelection = this.editor.selection.getBookmark()
@@ -77,10 +47,7 @@ export default class InsertUpdateImageView extends DialogBaseView {
     this.dialog
       .parent()
       .find('.ui-dialog-titlebar-close')
-      .click(() => {
-        return this.restoreCaret()
-      })
-
+      .click(() => this.restoreCaret())
     if (this.$selectedNode.prop('nodeName') === 'IMG') {
       return this.setSelectedImage({
         src: this.$selectedNode.attr('src'),
@@ -93,7 +60,7 @@ export default class InsertUpdateImageView extends DialogBaseView {
   }
 
   afterRender() {
-    return this.$('.imageSourceTabs').tabs()
+    this.$('.imageSourceTabs').tabs()
   }
 
   onTabsshow(event, ui) {
@@ -102,23 +69,24 @@ export default class InsertUpdateImageView extends DialogBaseView {
       this[`${ui.panel.id}IsLoaded`] = true
       const loadingDfd = $.Deferred()
       $(ui.panel).disableWhileLoading(loadingDfd)
-      return fn(loadingDfd.resolve)
+      fn(loadingDfd.resolve)
     }
     switch (ui.panel.id) {
       case 'tabUploaded':
-        return loadTab(done => {
-          const rootFoldersFinder = new RootFoldersFinder({
-            contentTypes: 'image',
-            useVerifiers: true
-          })
-          new TreeBrowserView({rootModelsFinder: rootFoldersFinder}).render().$el.appendTo(ui.panel)
-          return done()
+        loadTab(done => {
+          ReactDOM.render(
+            <FileBrowser type="image/*" selectFile={this.setSelectedImage} />,
+            this.$el[0].querySelector('#tabUploaded'),
+            done
+          )
         })
+        break;
       case 'tabFlickr':
-        return loadTab(done => {
+        loadTab(done => {
           new FindFlickrImageView().render().$el.appendTo(ui.panel)
-          return done()
+          done()
         })
+        break;
     }
   }
 
@@ -136,9 +104,9 @@ export default class InsertUpdateImageView extends DialogBaseView {
     const val = Number($(event.target).val())
     if (this.aspectRatio && (val || val === 0)) {
       if ($(event.target).is('[name="image[height]"]')) {
-        return this.$('[name="image[width]"]').val(Math.round(val * this.aspectRatio))
+        this.$('[name="image[width]"]').val(Math.round(val * this.aspectRatio))
       } else {
-        return this.$('[name="image[height]"]').val(Math.round(val / this.aspectRatio))
+        this.$('[name="image[height]"]').val(Math.round(val / this.aspectRatio))
       }
     }
   }
@@ -167,11 +135,10 @@ export default class InsertUpdateImageView extends DialogBaseView {
       if (newAttributes['data-decorative']) {
         this.$("[name='image[alt]']").attr('disabled', true)
       }
-      const isValidImage = newAttributes.width && newAttributes.height
       this.setAspectRatio()
-      return dfd.resolve(newAttributes)
+      dfd.resolve(newAttributes)
     }
-    const onError = ({target: img}) => {
+    const onError = ({target: _img}) => {
       const newAttributes = {
         width: '',
         height: ''
@@ -220,12 +187,11 @@ export default class InsertUpdateImageView extends DialogBaseView {
       src: $a.attr('data-fullsize'),
       alt: $a.attr('title')
     })
-    return this.$("[name='image[alt]']").focus()
+    this.$("[name='image[alt]']").focus()
   }
 
-  onFileLinkDblclick(event) {
-    // click event is handled on the first click
-    return this.update()
+  onFileLinkDblclick = () => {
+    this.update()
   }
 
   onImageUrlChange(event) {
@@ -233,27 +199,28 @@ export default class InsertUpdateImageView extends DialogBaseView {
     return this.setSelectedImage({src: $(event.currentTarget).val()})
   }
 
-  onDecorativeChange(event) {
+  onDecorativeChange() {
     if (this.$("[name='image[data-decorative]']").is(':checked')) {
-      return this.$("[name='image[alt]']").attr('disabled', true)
+      this.$("[name='image[alt]']").attr('disabled', true)
     } else {
-      return this.$("[name='image[alt]']").removeAttr('disabled')
+      this.$("[name='image[alt]']").removeAttr('disabled')
     }
   }
 
   close() {
     super.close(...arguments)
-    return this.restoreCaret()
+    this.restoreCaret()
   }
 
   restoreCaret() {
-    return this.editor.selection.moveToBookmark(this.prevSelection)
+    this.editor.selection.moveToBookmark(this.prevSelection)
+    ReactDOM.unmountComponentAtNode(this.$el[0].querySelector('#tabUploaded'))
   }
 
   generateImageHtml() {
     let imgHtml = this.editor.dom.createHTML('img', this.getAttributes())
     if (this.flickr_link) {
-      imgHtml = `<a href='${h(this.flickr_link)}'>${imgHtml}</a>`
+      imgHtml = `<a href='${htmlEscape(this.flickr_link)}'>${imgHtml}</a>`
     }
     return imgHtml
   }
@@ -269,7 +236,23 @@ export default class InsertUpdateImageView extends DialogBaseView {
       send(this.$editor, 'insert_code', this.generateImageHtml())
     }
     this.editor.focus()
-    return this.close()
+    this.close()
   }
 }
-InsertUpdateImageView.initClass()
+
+InsertUpdateImageView.prototype.template = template
+InsertUpdateImageView.prototype.events = {
+  'change [name="image[width]"]': 'constrainProportions',
+  'change [name="image[height]"]': 'constrainProportions',
+  'click .flickrImageResult, .treeFile': 'onFileLinkClick',
+  'change [name="image[src]"]': 'onImageUrlChange',
+  'tabsshow .imageSourceTabs': 'onTabsshow',
+  'dblclick .flickrImageResult, .treeFile': 'onFileLinkDblclick',
+  'change [name="image[data-decorative]"]': 'onDecorativeChange'
+}
+InsertUpdateImageView.prototype.dialogOptions = {
+  id: 'rce__insert_edit_image',
+  width: 625,
+  title: I18n.t('titles.insert_edit_image', 'Insert / Edit Image'),
+  destroy: true
+}

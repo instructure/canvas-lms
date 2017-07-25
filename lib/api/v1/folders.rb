@@ -43,6 +43,7 @@ module Api::V1::Folders
       json['locked_for_user'] = can_view_hidden_files ? false : !!folder.currently_locked
       json['hidden_for_user'] = can_view_hidden_files ? false : !!folder.hidden?
       json['for_submissions'] = folder.for_submissions?
+      json['can_upload'] = folder.grants_right?(user, :manage_contents)
     end
     json
   end

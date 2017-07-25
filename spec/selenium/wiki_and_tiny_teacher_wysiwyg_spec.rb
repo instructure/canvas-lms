@@ -186,9 +186,9 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       widget = f('.ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable.ui-dialog-buttons')
       widget.find_element(:link_text, 'Canvas').click
       wait_for_ajaximations
-      widget.find_element(:link_text, 'Course files').click
+      fj("button:contains('Course files')").click
       wait_for_ajaximations
-      widget.find_element(:link_text, 'email.png').click
+      fj("button:contains('email.png')").click
       f('.btn-primary.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only').click
       wait_for_ajaximations
       f('.btn.btn-primary.submit').click
