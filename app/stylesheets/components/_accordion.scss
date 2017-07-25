@@ -126,7 +126,7 @@ Simply add the **.ui-accordion--mini** class to the parent **.accordion** elemen
         border-bottom-right-radius: 0;
         border-color: darken($ic-brand-primary, 5%);
         border-bottom: 1px solid darken($ic-brand-primary, 5%);
-        background: $ic-brand-primary;
+        background: var(--ic-brand-primary);
         &.ui-state-focus {
           border-color: darken($ic-brand-primary, 10%);
           border-bottom: 1px solid darken($ic-brand-primary, 10%);

@@ -235,7 +235,7 @@
       background: $ic-bg-light-primary;
     }
     &:hover {
-      box-shadow: inset -4px 0px 0px $ic-brand-primary;
+      box-shadow: inset -4px 0px 0px var(--ic-brand-primary);
     }
     &:hover .message-actions a, .message-actions a:focus {
       left: 0;
@@ -254,7 +254,7 @@
   }
 
   .date {
-    color: $ic-brand-primary;
+    color: var(--ic-brand-primary);
   }
 
   .summary {
@@ -330,7 +330,7 @@ h2.subject {
     width: 10px;
 
     &.read {
-      background: $ic-brand-primary;
+      background: var(--ic-brand-primary);
       border: 1px solid darken($ic-brand-primary, 10);
       @if $use_high_contrast {
         background: $ic-color-light;

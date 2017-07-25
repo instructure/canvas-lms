@@ -137,7 +137,7 @@ $highlight-blue: #00b5fe;
   }
 
   .radio-group-outline {
-    outline: $ic-brand-primary solid 2px;
+    outline: var(--ic-brand-primary) solid 2px;
   }
 }
 

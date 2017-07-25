@@ -19,7 +19,7 @@
 .progress-bar__bar-container {
   height: 10px;
   margin: $ic-sp 0;
-  border: solid $ic-brand-primary 1px;
+  border: solid var(--ic-brand-primary) 1px;
   border-radius: 20px;
   overflow: hidden;
   position: relative;
@@ -31,7 +31,7 @@
 }
 .progress-bar__bar {
   transition: width 0.1s;
-  background: $ic-brand-primary;
+  background: var(--ic-brand-primary);
   position: absolute;
   top: 0; left: 0;
   height: 100%; width: 0;

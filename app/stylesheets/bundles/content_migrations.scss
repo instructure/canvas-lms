@@ -118,7 +118,7 @@ hr {
     margin: 5px 38px 5px;
     padding: 5px;
     background-color: $ic-bg-light-primary;
-    border: solid 1px $ic-brand-primary;
+    border: solid 1px var(--ic-brand-primary);
 
     .ic-Form-control {
       margin-bottom: 0;
@@ -159,7 +159,7 @@ hr {
   li[aria-selected=true] {
     border-radius: 5px;
     > .treeitem-heading {
-      background-color: $ic-brand-primary;
+      background-color: var(--ic-brand-primary);
       label, a {
         color: white;
       }

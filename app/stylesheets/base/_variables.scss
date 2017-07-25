@@ -260,7 +260,7 @@ $ic-course-sidenav_list-item--bg-color:               $ic-color-light;
 @if $use_high_contrast {
 $ic-course-sidenav_list-item--bg-color:               $ic-color-dark;
 }
-$ic-course-sidenav_list-item--active-font-color:      $ic-brand-primary;
+$ic-course-sidenav_list-item--active-font-color:      var(--ic-brand-primary);
 @if $use_high_contrast {
 $ic-course-sidenav_list-item--active-font-color:      $ic-color-light;
 }

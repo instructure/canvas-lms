@@ -189,8 +189,8 @@
 }
 
 .ic-flash-info {
-  border-color: $ic-brand-primary;
-  .ic-flash__icon { background-color: $ic-brand-primary; }
+  border-color: var(--ic-brand-primary);
+  .ic-flash__icon { background-color: var(--ic-brand-primary); }
 }
 
 .ic-flash-success {
@@ -299,7 +299,7 @@ $ic-notification-border-thickness: 2px;
 // .ic-notification
 .ic-notification {
   display: flex;
-  border: $ic-notification-border-thickness solid $ic-brand-primary;
+  border: $ic-notification-border-thickness solid var(--ic-brand-primary);
   margin-bottom: $ic-sp;
   box-shadow: 0 1px 6px rgba(black, 0.2);
   border-radius: $baseBorderRadius;
@@ -328,7 +328,7 @@ $ic-notification-border-thickness: 2px;
 }
 
 .ic-notification__icon {
-  background: $ic-brand-primary;
+  background: var(--ic-brand-primary);
   flex: 0 0 $ic-sp*4;
   position: relative;
   display: flex;

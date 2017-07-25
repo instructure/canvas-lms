@@ -275,10 +275,10 @@ See Forms section.
     $ic-color-light, // switch bg color
     $ic-color-dark, // background color when checkbox is unchecked
     $ic-color-dark, // background color when checkbox is checked
-    $ic-brand-primary, // left unchecked
+    var(--ic-brand-primary), // left unchecked
     $ic-icon-link-color, // left checked
     $ic-icon-link-color, // right unchecked
-    $ic-brand-primary // right checked
+    var(--ic-brand-primary) // right checked
   );
 
   .ic-Super-toggle__container {
