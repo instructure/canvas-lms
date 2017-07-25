@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Messages
-  class AssetContext
+  class NameHelper
     attr_reader :asset, :notification_name
     def initialize(asset, name)
       @asset = asset

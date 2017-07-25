@@ -691,7 +691,7 @@ class Message < ActiveRecord::Base
     self.root_account_id ||= root_account.try(:id)
 
     self.from_name = infer_from_name
-    self.reply_to_name = message_context.reply_to_name
+    self.reply_to_name = name_helper.reply_to_name
 
     true
   end
@@ -882,7 +882,7 @@ class Message < ActiveRecord::Base
   private
   def infer_from_name
     if asset_context
-      return message_context.from_name if message_context.from_name.present?
+      return name_helper.from_name if name_helper.from_name.present?
       return asset_context.name if can_use_asset_name_for_from?
     end
 
@@ -897,8 +897,8 @@ class Message < ActiveRecord::Base
     !asset_context.is_a?(Account) && asset_context.name && notification.dashboard? rescue false
   end
 
-  def message_context
-    @_message_context ||= Messages::AssetContext.new(context, notification_name)
+  def name_helper
+    @name_helper ||= Messages::NameHelper.new(context, notification_name)
   end
 
   def apply_course_nickname_to_asset(asset, user)
