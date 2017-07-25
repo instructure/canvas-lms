@@ -42,8 +42,8 @@ message")
     let(:path_type) { :email }
 
     it "doesnt have trailing erb closures" do
-      @message.stubs(:attachments).returns([
-        stub("attachment",
+      allow(@message).to receive(:attachments).and_return([
+        double("attachment",
              display_name: "FileName", readable_size: "1MB", id: 42,
              context: @teacher_enrollment.course, uuid: "abcdef123456")
       ])
