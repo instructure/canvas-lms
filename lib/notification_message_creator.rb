@@ -183,7 +183,6 @@ class NotificationMessageCreator
 
   def dispatch_dashboard_messages(messages)
     messages.each do |message|
-      message.set_asset_context_code
       message.infer_defaults
       message.create_stream_items
     end
