@@ -178,7 +178,7 @@ describe QuizzesHelper do
       @answer_list = []
       @answers = []
 
-      def user_content(stuff); stuff; end # mock #user_content
+      def user_content(stuff); stuff; end # double #user_content
     end
 
     it 'should extract the answers by blank' do
@@ -249,7 +249,7 @@ describe QuizzesHelper do
 
   context "multiple_dropdowns_question" do
     before do
-      def user_content(stuff); stuff; end # mock #user_content
+      def user_content(stuff); stuff; end # double #user_content
     end
 
     it "should select the user's answer" do
@@ -294,12 +294,12 @@ describe QuizzesHelper do
   describe "#quiz_edit_text" do
 
     it "returns correct string for survey" do
-      quiz = stub(:survey? => true)
+      quiz = double(:survey? => true)
       expect(quiz_edit_text(quiz)).to eq "Edit Survey"
     end
 
     it "returns correct string for quiz" do
-      quiz = stub(:survey? => false)
+      quiz = double(:survey? => false)
       expect(quiz_edit_text(quiz)).to eq "Edit Quiz"
     end
   end
@@ -307,24 +307,24 @@ describe QuizzesHelper do
   describe "#quiz_delete_text" do
 
     it "returns correct string for survey" do
-      quiz = stub(:survey? => true)
+      quiz = double(:survey? => true)
       expect(quiz_delete_text(quiz)).to eq "Delete Survey"
     end
 
     it "returns correct string for quiz" do
-      quiz = stub(:survey? => false)
+      quiz = double(:survey? => false)
       expect(quiz_delete_text(quiz)).to eq "Delete Quiz"
     end
   end
 
   describe "#score_affected_by_regrade" do
     it "returns true if kept score differs from score before regrade" do
-      submission = stub(:score_before_regrade => 5, :kept_score => 10, :score => 5)
+      submission = double(:score_before_regrade => 5, :kept_score => 10, :score => 5)
       expect(score_affected_by_regrade?(submission)).to be_truthy
     end
 
     it "returns false if kept score equals score before regrade" do
-      submission = stub(:score_before_regrade => 5, :kept_score => 5, :score => 0)
+      submission = double(:score_before_regrade => 5, :kept_score => 5, :score => 0)
       expect(score_affected_by_regrade?(submission)).to be_falsey
     end
   end
@@ -349,14 +349,14 @@ describe QuizzesHelper do
   describe "#render_show_correct_answers" do
     context "show_correct_answers is false" do
       it 'shows No' do
-        quiz = stub({show_correct_answers: false})
+        quiz = double({show_correct_answers: false})
         expect(render_show_correct_answers(quiz)).to eq "No"
       end
     end
 
     context "show_correct_answers is true, but nothing else is set" do
       it 'shows Immediately' do
-        quiz = stub({
+        quiz = double({
           show_correct_answers: true,
           show_correct_answers_at: nil,
           hide_correct_answers_at: nil,
@@ -368,7 +368,7 @@ describe QuizzesHelper do
 
     context "show_correct_answers_last_attempt is true" do
       it 'shows After Last Attempt' do
-        quiz = stub({
+        quiz = double({
           show_correct_answers: true,
           show_correct_answers_at: nil,
           hide_correct_answers_at: nil,
@@ -381,7 +381,7 @@ describe QuizzesHelper do
     context "show_correct_answers_at is set" do
       it 'shows date of ' do
         time = 1.day.from_now
-        quiz = stub({
+        quiz = double({
           show_correct_answers: true,
           show_correct_answers_at: time,
           hide_correct_answers_at: nil
@@ -393,7 +393,7 @@ describe QuizzesHelper do
     context "hide_correct_answers_at is set" do
       it 'shows date of ' do
         time = 1.day.from_now
-        quiz = stub({
+        quiz = double({
           show_correct_answers: true,
           show_correct_answers_at: nil,
           hide_correct_answers_at: time,
@@ -407,7 +407,7 @@ describe QuizzesHelper do
         time = 1.day.from_now
         time2 = 1.week.from_now
 
-        quiz = stub({
+        quiz = double({
           show_correct_answers: true,
           show_correct_answers_at: time,
           hide_correct_answers_at: time2,
@@ -419,61 +419,61 @@ describe QuizzesHelper do
 
   describe '#render_correct_answer_protection' do
     it 'should provide a useful message when "last attempt"' do
-      quiz = stub({
+      quiz = double({
         show_correct_answers_last_attempt: true,
       })
-      quiz_submission = stub(last_attempt_completed?: false)
+      quiz_submission = double(last_attempt_completed?: false)
 
       message = render_correct_answer_protection(quiz, quiz_submission)
       expect(message).to match /last attempt/
     end
     it 'should provide a useful message when "no"' do
-      quiz = stub({
+      quiz = double({
         show_correct_answers_last_attempt: nil,
         show_correct_answers: false,
         show_correct_answers_at: nil,
         hide_correct_answers_at: nil
       })
-      quiz_submission = stub(last_attempt_completed?: false)
+      quiz_submission = double(last_attempt_completed?: false)
 
       message = render_correct_answer_protection(quiz, quiz_submission)
       expect(message).to match /are hidden/
     end
 
     it 'should provide nothing when "yes"' do
-      quiz = stub({
+      quiz = double({
         show_correct_answers_last_attempt: nil,
         show_correct_answers: true,
         show_correct_answers_at: nil,
         hide_correct_answers_at: nil
       })
-      quiz_submission = stub(last_attempt_completed?: false)
+      quiz_submission = double(last_attempt_completed?: false)
 
       message = render_correct_answer_protection(quiz, quiz_submission)
       expect(message).to eq nil
     end
 
     it 'should provide a useful message, and an availability date, when "show at" is set' do
-      quiz = stub({
+      quiz = double({
         show_correct_answers_last_attempt: nil,
         show_correct_answers: true,
         show_correct_answers_at: 1.day.from_now,
         hide_correct_answers_at: nil
       })
-      quiz_submission = stub(last_attempt_completed?: false)
+      quiz_submission = double(last_attempt_completed?: false)
 
       message = render_correct_answer_protection(quiz, quiz_submission)
       expect(message).to match /will be available/
     end
 
     it 'should provide a useful message, and a date, when "hide at" is set' do
-      quiz = stub({
+      quiz = double({
         show_correct_answers_last_attempt: nil,
         show_correct_answers: true,
         show_correct_answers_at: nil,
         hide_correct_answers_at: 1.day.from_now
       })
-      quiz_submission = stub(last_attempt_completed?: false)
+      quiz_submission = double(last_attempt_completed?: false)
 
       message = render_correct_answer_protection(quiz, quiz_submission)
       expect(message).to match /are available until/
@@ -486,7 +486,7 @@ describe QuizzesHelper do
     let(:quiz) { @quiz }
 
     before do
-      @quiz = stub(quiz_type: 'graded_survey')
+      @quiz = double(quiz_type: 'graded_survey')
       @user_answer = { correct: 'undefined', points: 5 }
     end
 
@@ -499,14 +499,14 @@ describe QuizzesHelper do
 
     it "returns empty if quiz is practice quiz or assignment" do
       ['assignment', 'practice_quiz'].each do |quiz_type|
-        @quiz.expects(:quiz_type).returns quiz_type
+        expect(@quiz).to receive(:quiz_type).and_return quiz_type
         expect(point_value_for_input(user_answer, question)).to eq ""
       end
     end
 
     it "returns points possible for the question if (un)graded survey" do
       ['survey', 'graded_survey'].each do |quiz_type|
-        @quiz.expects(:quiz_type).returns quiz_type
+        expect(@quiz).to receive(:quiz_type).and_return quiz_type
         expect(point_value_for_input(user_answer, question)).to eq(
           question[:points_possible]
         )

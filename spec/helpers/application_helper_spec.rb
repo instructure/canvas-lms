@@ -103,17 +103,17 @@ describe ApplicationHelper do
 
     describe '#context_sensitive_datetime_title' do
       it "produces a string showing the local time and the course time" do
-        context = stub(time_zone: ActiveSupport::TimeZone["America/Denver"])
+        context = double(time_zone: ActiveSupport::TimeZone["America/Denver"])
         expect(context_sensitive_datetime_title(Time.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Local: Mar 13 at  1:12am<br>Course: Mar 13 at  3:12am\""
       end
 
       it "only prints the text if just_text option passed" do
-        context = stub(time_zone: ActiveSupport::TimeZone["America/Denver"])
+        context = double(time_zone: ActiveSupport::TimeZone["America/Denver"])
         expect(context_sensitive_datetime_title(Time.now, context, just_text: true)).to eq "Local: Mar 13 at  1:12am<br>Course: Mar 13 at  3:12am"
       end
 
       it "uses the simple title if theres no timezone difference" do
-        context = stub(time_zone: ActiveSupport::TimeZone["America/Anchorage"])
+        context = double(time_zone: ActiveSupport::TimeZone["America/Anchorage"])
         expect(context_sensitive_datetime_title(Time.now, context, just_text: true)).to eq "Mar 13 at  1:12am"
         expect(context_sensitive_datetime_title(Time.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Mar 13 at  1:12am\""
       end
@@ -124,14 +124,14 @@ describe ApplicationHelper do
 
       it 'crosses date boundaries appropriately' do
         Timecop.freeze(Time.utc(2013,3,13,7,12)) do
-          context = stub(time_zone: ActiveSupport::TimeZone["America/Denver"])
+          context = double(time_zone: ActiveSupport::TimeZone["America/Denver"])
           expect(context_sensitive_datetime_title(Time.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Local: Mar 12 at 11:12pm<br>Course: Mar 13 at  1:12am\""
         end
       end
     end
 
     describe '#friendly_datetime' do
-      let(:context) { stub(time_zone: ActiveSupport::TimeZone["America/Denver"]) }
+      let(:context) { double(time_zone: ActiveSupport::TimeZone["America/Denver"]) }
 
       it 'spits out a friendly time tag' do
         tag = friendly_datetime(Time.now)
@@ -229,21 +229,21 @@ describe ApplicationHelper do
 
       context "with no custom css" do
         it "should be empty" do
-          helper.stubs(:active_brand_config).returns(nil)
+          allow(helper).to receive(:active_brand_config).and_return(nil)
           expect(helper.include_account_css).to be_nil
         end
       end
 
       context "with custom css" do
         it "should include account css" do
-          helper.stubs(:active_brand_config).returns BrandConfig.create!(css_overrides: 'https://example.com/path/to/overrides.css')
+          allow(helper).to receive(:active_brand_config).and_return BrandConfig.create!(css_overrides: 'https://example.com/path/to/overrides.css')
           output = helper.include_account_css
           expect(output).to have_tag 'link'
           expect(output).to match %r{https://example.com/path/to/overrides.css}
         end
 
         it "should include site_admin css even if there is no active brand" do
-          helper.stubs(:active_brand_config).returns nil
+          allow(helper).to receive(:active_brand_config).and_return nil
           Account.site_admin.create_brand_config!({
             css_overrides: 'https://example.com/site_admin/account.css',
             js_overrides: 'https://example.com/site_admin/account.js'
@@ -255,7 +255,7 @@ describe ApplicationHelper do
 
 
         it "should not include anything if param is set to 0" do
-          helper.stubs(:active_brand_config).returns BrandConfig.create!(css_overrides: 'https://example.com/path/to/overrides.css')
+          allow(helper).to receive(:active_brand_config).and_return BrandConfig.create!(css_overrides: 'https://example.com/path/to/overrides.css')
           params[:global_includes] = '0'
 
           output = helper.include_account_css
@@ -338,20 +338,20 @@ describe ApplicationHelper do
 
       context "with no custom js" do
         it "should be empty" do
-          helper.stubs(:active_brand_config).returns(nil)
+          allow(helper).to receive(:active_brand_config).and_return(nil)
           expect(helper.include_account_js).to be_nil
         end
       end
 
       context "with custom js" do
         it "should include account javascript" do
-          helper.stubs(:active_brand_config).returns BrandConfig.create!(js_overrides: 'https://example.com/path/to/overrides.js')
+          allow(helper).to receive(:active_brand_config).and_return BrandConfig.create!(js_overrides: 'https://example.com/path/to/overrides.js')
           output = helper.include_account_js
           expect(output).to have_tag 'script', text: %r{https:\\/\\/example.com\\/path\\/to\\/overrides.js}
         end
 
         it "should include site_admin javascript even if there is no active brand" do
-          helper.stubs(:active_brand_config).returns nil
+          allow(helper).to receive(:active_brand_config).and_return nil
           Account.site_admin.create_brand_config!({
             css_overrides: 'https://example.com/site_admin/account.css',
             js_overrides: 'https://example.com/site_admin/account.js'
@@ -529,7 +529,7 @@ describe ApplicationHelper do
       tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret", :url => "http://example.com")
       tool.editor_button = {:url => "http://example.com", :icon_url => "http://example.com", :canvas_icon_class => 'icon-commons'}
       tool.save!
-      controller.stubs(:group_external_tool_path).returns('http://dummy')
+      allow(controller).to receive(:group_external_tool_path).and_return('http://dummy')
       @context = @course
 
       expect(editor_buttons).to eq([{:name=>"bob", :id=>tool.id, :url=>"http://example.com", :icon_url=>"http://example.com", :canvas_icon_class => 'icon-commons', :width=>800, :height=>400}])
@@ -555,7 +555,7 @@ describe ApplicationHelper do
   describe "UI path checking" do
     describe "#active_path?" do
       context "when the request path is the course show page" do
-        let(:request){ stub('request', :fullpath => '/courses/2')}
+        let(:request){ double('request', :fullpath => '/courses/2')}
 
         it "returns true for paths that match" do
           expect(active_path?('/courses')).to be_truthy
@@ -571,11 +571,11 @@ describe ApplicationHelper do
       end
 
       context "when the request path is the account external tools path" do
-        let(:request){ stub('request', :fullpath => '/accounts/2/external_tools/27')}
+        let(:request){ double('request', :fullpath => '/accounts/2/external_tools/27')}
 
         before :each do
           @context = Account.default
-          controller.stubs(:controller_name).returns('external_tools')
+          allow(controller).to receive(:controller_name).and_return('external_tools')
         end
 
         it "it doesn't return true for '/accounts'" do
@@ -584,11 +584,11 @@ describe ApplicationHelper do
       end
 
       context "when the request path is the course external tools path" do
-        let(:request){ stub('request', :fullpath => '/courses/2/external_tools/27')}
+        let(:request){ double('request', :fullpath => '/courses/2/external_tools/27')}
 
         before :each do
           @context = Account.default.courses.create!
-          controller.stubs(:controller_name).returns('external_tools')
+          allow(controller).to receive(:controller_name).and_return('external_tools')
         end
 
         it "returns true for '/courses'" do
@@ -619,14 +619,14 @@ describe ApplicationHelper do
     end
 
     it "returns 'K12 Theme' by default for a k12 school" do
-      helper.stubs(:k12?).returns(true)
-      BrandConfig.stubs(:k12_config)
+      allow(helper).to receive(:k12?).and_return(true)
+      allow(BrandConfig).to receive(:k12_config)
       expect(helper.send(:active_brand_config)).to eq BrandConfig.k12_config
     end
 
     it "returns 'K12 Theme' if a k12 school has chosen 'canvas default' in Theme Editor" do
-      helper.stubs(:k12?).returns(true)
-      BrandConfig.stubs(:k12_config)
+      allow(helper).to receive(:k12?).and_return(true)
+      allow(BrandConfig).to receive(:k12_config)
 
       # this is what happens if you pick "Canvas Default" from the theme picker
       session[:brand_config_md5] = false
@@ -639,27 +639,27 @@ describe ApplicationHelper do
 
   describe "include_head_js" do
     before do
-      helper.stubs(:js_bundles).returns([[:some_bundle], [:some_plugin_bundle, :some_plugin], [:another_bundle, nil]])
+      allow(helper).to receive(:js_bundles).and_return([[:some_bundle], [:some_plugin_bundle, :some_plugin], [:another_bundle, nil]])
     end
 
     it "creates the correct javascript tags" do
-      helper.stubs(:js_env).returns({
+      allow(helper).to receive(:js_env).and_return({
         BIGEASY_LOCALE: 'nb_NO',
         MOMENT_LOCALE: 'nb',
         TIMEZONE: 'America/La_Paz',
         CONTEXT_TIMEZONE: 'America/Denver'
       })
       base_url = helper.use_optimized_js? ? 'dist/webpack-production' : 'dist/webpack-dev'
-      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/vendor.js').returns('vendor_url')
-      Canvas::Cdn::RevManifest.stubs(:revved_url_for).with('timezone/America/La_Paz.js').returns('La_Paz_url')
-      Canvas::Cdn::RevManifest.stubs(:revved_url_for).with('timezone/America/Denver.js').returns('Denver_url')
-      Canvas::Cdn::RevManifest.stubs(:revved_url_for).with('timezone/nb_NO.js').returns('nb_NO_url')
-      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/moment/locale/nb.js').returns('nb_url')
-      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/appBootstrap.js').returns('app_bootstrap_url')
-      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/common.js').returns('common_url')
-      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/some_bundle.js').returns('some_bundle_url')
-      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/some_plugin-some_plugin_bundle.js').returns('plugin_url')
-      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/another_bundle.js').returns('another_bundle_url')
+      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/vendor.js').and_return('vendor_url')
+      allow(Canvas::Cdn::RevManifest).to receive(:revved_url_for).with('timezone/America/La_Paz.js').and_return('La_Paz_url')
+      allow(Canvas::Cdn::RevManifest).to receive(:revved_url_for).with('timezone/America/Denver.js').and_return('Denver_url')
+      allow(Canvas::Cdn::RevManifest).to receive(:revved_url_for).with('timezone/nb_NO.js').and_return('nb_NO_url')
+      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/moment/locale/nb.js').and_return('nb_url')
+      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/appBootstrap.js').and_return('app_bootstrap_url')
+      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/common.js').and_return('common_url')
+      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/some_bundle.js').and_return('some_bundle_url')
+      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/some_plugin-some_plugin_bundle.js').and_return('plugin_url')
+      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/another_bundle.js').and_return('another_bundle_url')
 
       expect(helper.include_head_js).to eq %{
 <script src="/vendor_url" defer="defer"></script>
@@ -678,13 +678,13 @@ describe ApplicationHelper do
 
   describe "include_js_bundles" do
     before do
-      helper.stubs(:js_bundles).returns([[:some_bundle], [:some_plugin_bundle, :some_plugin], [:another_bundle, nil]])
+      allow(helper).to receive(:js_bundles).and_return([[:some_bundle], [:some_plugin_bundle, :some_plugin], [:another_bundle, nil]])
     end
     it "creates the correct javascript tags" do
       base_url = helper.use_optimized_js? ? 'dist/webpack-production' : 'dist/webpack-dev'
-      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/some_bundle.js').returns('some_bundle_url')
-      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/some_plugin-some_plugin_bundle.js').returns('plugin_url')
-      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/another_bundle.js').returns('another_bundle_url')
+      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/some_bundle.js').and_return('some_bundle_url')
+      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/some_plugin-some_plugin_bundle.js').and_return('plugin_url')
+      allow(Canvas::Cdn::RevManifest).to receive(:webpack_url_for).with(base_url + '/another_bundle.js').and_return('another_bundle_url')
 
       expect(helper.include_js_bundles).to eq %{
 <script src="/some_bundle_url" defer="defer"></script>

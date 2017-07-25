@@ -34,12 +34,12 @@ describe AvatarHelper do
 
     describe ".avatar_image_attrs" do
       it "accepts a user id" do
-        self.expects(:avatar_url_for_user).with(user).returns("test_url")
+        expect(self).to receive(:avatar_url_for_user).with(user).and_return("test_url")
         expect(avatar_image_attrs(user.id)).to eq ["test_url", user.short_name]
       end
 
       it "accepts a user" do
-        self.expects(:avatar_url_for_user).with(user).returns("test_url")
+        expect(self).to receive(:avatar_url_for_user).with(user).and_return("test_url")
         expect(avatar_image_attrs(user)).to eq ["test_url", user.short_name]
       end
 
@@ -48,7 +48,7 @@ describe AvatarHelper do
       end
 
       it "falls back to blank avatar when user's avatar has been reported during this session" do
-        self.expects(:session).at_least_once.returns({"reported_#{user.id}" => true})
+        expect(self).to receive(:session).at_least(:once).and_return({"reported_#{user.id}" => true})
         expect(avatar_image_attrs(user)).to eq ["/images/messages/avatar-50.png", '']
       end
 
@@ -69,7 +69,7 @@ describe AvatarHelper do
       end
 
       it "links to the context user's page when given a context_code" do
-        self.expects(:context_prefix).with('course_1').returns('/courses/1')
+        expect(self).to receive(:context_prefix).with('course_1').and_return('/courses/1')
         expect(avatar(user, context_code: "course_1")).to match("href=\"/courses/1/users/#{user.id}\"")
       end
 
