@@ -29,7 +29,7 @@ describe AdobeConnectConference do
 
   before(:each) do
     @conference = AdobeConnectConference.new
-    @conference.stubs(:config).returns(CONNECT_CONFIG)
+    allow(@conference).to receive(:config).and_return(CONNECT_CONFIG)
   end
 
   subject { AdobeConnectConference.new }
@@ -37,8 +37,8 @@ describe AdobeConnectConference do
   context 'with an admin participant' do
     before(:each) do
       @user = User.new(:name => 'Don Draper')
-      AdobeConnect::Service.stubs(:user_session).returns('CookieValue')
-      @conference.expects(:add_host).with(@user).returns(@user)
+      allow(AdobeConnect::Service).to receive(:user_session).and_return('CookieValue')
+      expect(@conference).to receive(:add_host).with(@user).and_return(@user)
     end
 
     it 'should generate an admin url using unique format if stored' do
