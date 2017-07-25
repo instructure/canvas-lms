@@ -44,8 +44,8 @@ describe AccountsController do
   end
 
   context "confirm_delete_user" do
-    before(:once) { account_with_admin }
-    before(:each) { user_session(@admin) }
+    before(:once) {account_with_admin}
+    before(:each) {user_session(@admin)}
 
     it "should confirm deletion of canvas-authenticated users" do
       user_with_pseudonym :account => @account
@@ -66,8 +66,8 @@ describe AccountsController do
   end
 
   context "remove_user" do
-    before(:once) { account_with_admin }
-    before(:each) { user_session(@admin) }
+    before(:once) {account_with_admin}
+    before(:each) {user_session(@admin)}
 
     it "should remove user from the account" do
       user_with_pseudonym :account => @account
@@ -143,8 +143,8 @@ describe AccountsController do
   end
 
   describe "add_account_user" do
-    before(:once) { account_with_admin }
-    before(:each) { user_session(@admin) }
+    before(:once) {account_with_admin}
+    before(:each) {user_session(@admin)}
 
     it "should allow adding a new account admin" do
       post 'add_account_user', params: {:account_id => @account.id, :role_id => admin_role.id, :user_list => 'testadmin@example.com'}
@@ -239,8 +239,8 @@ describe AccountsController do
 
       get 'show', params: {:id => @account.id}, :format => 'html'
 
-      expect(assigns[:courses].find {|c| c.id == c1.id }.student_count).to eq c1.student_enrollments.count
-      expect(assigns[:courses].find {|c| c.id == c2.id }.student_count).to eq c2.student_enrollments.count
+      expect(assigns[:courses].find {|c| c.id == c1.id}.student_count).to eq c1.student_enrollments.count
+      expect(assigns[:courses].find {|c| c.id == c2.id}.student_count).to eq c2.student_enrollments.count
     end
 
     it "should list student counts in unclaimed courses" do
@@ -263,7 +263,7 @@ describe AccountsController do
 
       get 'show', params: {:id => @account.id}, :format => 'html'
 
-      expect(assigns[:courses].find {|c| c.id == @course.id }.teacher_names).to eq [@teacher.name]
+      expect(assigns[:courses].find {|c| c.id == @course.id}.teacher_names).to eq [@teacher.name]
     end
 
     it "should sort courses as specified" do
@@ -280,7 +280,7 @@ describe AccountsController do
       @account.courses.create! name: 'blah C'
       @account.courses.create! name: 'blah B'
       @account.courses.create! name: 'bleh Z'
-      get 'courses', params: {:account_id => @account.id, :course => { :name => 'blah' }, :courses_sort_order => 'name_desc'}, :format => 'html'
+      get 'courses', params: {:account_id => @account.id, :course => {:name => 'blah'}, :courses_sort_order => 'name_desc'}, :format => 'html'
       expect(assigns['courses'].map(&:name)).to eq(['blah C', 'blah B', 'blah A'])
       expect(@admin.reload.preferences[:course_sort]).to eq 'name_desc'
     end
@@ -317,14 +317,14 @@ describe AccountsController do
     it "should allow admins to set the sis_source_id on sub accounts" do
       account_with_admin_logged_in
       @account = @account.sub_accounts.create!
-      post 'update', params: {:id => @account.id, :account => { :sis_source_id => 'abc' }}
+      post 'update', params: {:id => @account.id, :account => {:sis_source_id => 'abc'}}
       @account.reload
       expect(@account.sis_source_id).to eq 'abc'
     end
 
     it "should not allow setting the sis_source_id on root accounts" do
       account_with_admin_logged_in
-      post 'update', params: {:id => @account.id, :account => { :sis_source_id => 'abc' }}
+      post 'update', params: {:id => @account.id, :account => {:sis_source_id => 'abc'}}
       @account.reload
       expect(@account.sis_source_id).to be_nil
     end
@@ -332,31 +332,31 @@ describe AccountsController do
     it "should not allow admins to set the trusted_referers on sub accounts" do
       account_with_admin_logged_in
       @account = @account.sub_accounts.create!
-      post 'update', params: {:id => @account.id, :account => { :settings => {
+      post 'update', params: {:id => @account.id, :account => {:settings => {
         :trusted_referers => 'http://example.com'
-      } }}
+      }}}
       @account.reload
       expect(@account.settings[:trusted_referers]).to be_nil
     end
 
     it "should allow admins to set the trusted_referers on root accounts" do
       account_with_admin_logged_in
-      post 'update', params: {:id => @account.id, :account => { :settings => {
+      post 'update', params: {:id => @account.id, :account => {:settings => {
         :trusted_referers => 'http://example.com'
-      } }}
+      }}}
       @account.reload
       expect(@account.settings[:trusted_referers]).to eq 'http://example.com'
     end
 
     it "should not allow non-site-admins to update certain settings" do
       account_with_admin_logged_in
-      post 'update', params: {:id => @account.id, :account => { :settings => {
+      post 'update', params: {:id => @account.id, :account => {:settings => {
         :global_includes => true,
         :enable_profiles => true,
         :enable_turnitin => true,
         :admins_can_change_passwords => true,
         :admins_can_view_notifications => true,
-      } }}
+      }}}
       @account.reload
       expect(@account.global_includes?).to be_falsey
       expect(@account.enable_profiles?).to be_falsey
@@ -370,13 +370,13 @@ describe AccountsController do
       user_session(@user)
       @account = Account.create!
       Account.site_admin.account_users.create!(user: @user)
-      post 'update', params: {:id => @account.id, :account => { :settings => {
+      post 'update', params: {:id => @account.id, :account => {:settings => {
         :global_includes => true,
         :enable_profiles => true,
         :enable_turnitin => true,
         :admins_can_change_passwords => true,
         :admins_can_view_notifications => true,
-      } }}
+      }}}
       @account.reload
       expect(@account.global_includes?).to be_truthy
       expect(@account.enable_profiles?).to be_truthy
@@ -387,13 +387,13 @@ describe AccountsController do
 
     it "should allow updating services that appear in the ui for the current user" do
       AccountServices.register_service(:test1,
-                                       { name: 'test1', description: '', expose_to_ui: :setting, default: false })
+                                       {name: 'test1', description: '', expose_to_ui: :setting, default: false})
       AccountServices.register_service(:test2,
-                                       { name: 'test2', description: '', expose_to_ui: :setting, default: false, expose_to_ui_proc: proc { false } })
+                                       {name: 'test2', description: '', expose_to_ui: :setting, default: false, expose_to_ui_proc: proc {false}})
       user_session(user_factory)
       @account = Account.create!
       AccountServices.register_service(:test3,
-                                       { name: 'test3', description: '', expose_to_ui: :setting, default: false, expose_to_ui_proc: proc { |_, account| account == @account } })
+                                       {name: 'test3', description: '', expose_to_ui: :setting, default: false, expose_to_ui_proc: proc {|_, account| account == @account}})
       Account.site_admin.account_users.create!(user: @user)
       post 'update', params: {id: @account.id, account: {
         services: {
@@ -435,9 +435,9 @@ describe AccountsController do
 
         it "should allow setting default quota (mb)" do
           post 'update', params: {:id => @account.id, :account => {
-              :default_storage_quota_mb => 999,
-              :default_user_storage_quota_mb => 99,
-              :default_group_storage_quota_mb => 9999
+            :default_storage_quota_mb => 999,
+            :default_user_storage_quota_mb => 99,
+            :default_group_storage_quota_mb => 9999
           }}
           @account.reload
           expect(@account.default_storage_quota_mb).to eq 999
@@ -447,7 +447,7 @@ describe AccountsController do
 
         it "should allow setting default quota (bytes)" do
           post 'update', params: {:id => @account.id, :account => {
-              :default_storage_quota => 101.megabytes,
+            :default_storage_quota => 101.megabytes,
           }}
           @account.reload
           expect(@account.default_storage_quota).to eq 101.megabytes
@@ -472,10 +472,10 @@ describe AccountsController do
 
         it "should disallow setting default quota (mb)" do
           post 'update', params: {:id => @account.id, :account => {
-              :default_storage_quota => 999,
-              :default_user_storage_quota_mb => 99,
-              :default_group_storage_quota_mb => 9,
-              :default_time_zone => 'Alaska'
+            :default_storage_quota => 999,
+            :default_user_storage_quota_mb => 99,
+            :default_group_storage_quota_mb => 9,
+            :default_time_zone => 'Alaska'
           }}
           @account.reload
           expect(@account.default_storage_quota_mb).to eq 123
@@ -486,8 +486,8 @@ describe AccountsController do
 
         it "should disallow setting default quota (bytes)" do
           post 'update', params: {:id => @account.id, :account => {
-              :default_storage_quota => 101.megabytes,
-              :default_time_zone => 'Alaska'
+            :default_storage_quota => 101.megabytes,
+            :default_time_zone => 'Alaska'
           }}
           @account.reload
           expect(@account.default_storage_quota).to eq 123.megabytes
@@ -496,8 +496,8 @@ describe AccountsController do
 
         it "should disallow setting storage quota" do
           post 'update', params: {:id => @account.id, :account => {
-              :storage_quota => 777.megabytes,
-              :default_time_zone => 'Alaska'
+            :storage_quota => 777.megabytes,
+            :default_time_zone => 'Alaska'
           }}
           @account.reload
           expect(@account.storage_quota).to eq 555.megabytes
@@ -507,8 +507,8 @@ describe AccountsController do
     end
 
     context "turnitin" do
-      before(:once) { account_with_admin }
-      before(:each) { user_session(@admin) }
+      before(:once) {account_with_admin}
+      before(:each) {user_session(@admin)}
 
       it "should allow setting turnitin values" do
         post 'update', params: {:id => @account.id, :account => {
@@ -577,9 +577,9 @@ describe AccountsController do
 
     context "external_integration_keys" do
       before(:once) do
-        ExternalIntegrationKey.key_type :external_key0, rights: { write: true }
-        ExternalIntegrationKey.key_type :external_key1, rights: { write: false }
-        ExternalIntegrationKey.key_type :external_key2, rights: { write: true }
+        ExternalIntegrationKey.key_type :external_key0, rights: {write: true}
+        ExternalIntegrationKey.key_type :external_key1, rights: {write: false}
+        ExternalIntegrationKey.key_type :external_key2, rights: {write: true}
       end
 
       before do
@@ -608,10 +608,10 @@ describe AccountsController do
 
       it "should create a new external integration key" do
         key_value = "2142"
-        post 'update', params: {:id => @account.id, :account => { :external_integration_keys => {
+        post 'update', params: {:id => @account.id, :account => {:external_integration_keys => {
           external_key0: "42",
           external_key2: key_value
-        } }}
+        }}}
         @account.reload
         eik = @account.external_integration_keys.where(key_type: :external_key2).first
         expect(eik).to_not be_nil
@@ -620,11 +620,11 @@ describe AccountsController do
 
       it "should update an existing external integration key" do
         key_value = "2142"
-        post 'update', params: {:id => @account.id, :account => { :external_integration_keys => {
+        post 'update', params: {:id => @account.id, :account => {:external_integration_keys => {
           external_key0: key_value,
           external_key1: key_value,
           external_key2: key_value
-        } }}
+        }}}
         @account.reload
 
         # Should not be able to edit external_key1.  The user does not have the rights.
@@ -637,9 +637,9 @@ describe AccountsController do
       end
 
       it "should delete an external integration key when not provided or the value is blank" do
-        post 'update', params: {:id => @account.id, :account => { :external_integration_keys => {
+        post 'update', params: {:id => @account.id, :account => {:external_integration_keys => {
           external_key0: nil
-        } }}
+        }}}
         expect(@account.external_integration_keys.count).to eq 0
       end
     end
@@ -693,7 +693,7 @@ describe AccountsController do
       @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
       @c4 = course_factory(account: @account, course_name: "xylophone", sis_source_id: 52)
       admin_logged_in(@account)
-      get 'courses_api', :account_id => @account.id, :sort => "course_name", :order => "asc"
+      get 'courses_api', params: {account_id: @account.id, sort: "course_name", order: "asc"}
 
       expect(response).to be_success
       expect(response.body).to match(/\"name\":\"apple\".+\"name\":\"bar\".+\"name\":\"foo\".+\"name\":\"xylophone\"/)
@@ -703,7 +703,7 @@ describe AccountsController do
       @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
       @c4 = course_factory(account: @account, course_name: "xylophone", sis_source_id: 52)
       admin_logged_in(@account)
-      get 'courses_api', :account_id => @account.id, :sort => "course_name", :order => "desc"
+      get 'courses_api', params: {account_id: @account.id, sort: "course_name", order: "desc"}
 
       expect(response).to be_success
       expect(response.body).to match(/\"name\":\"xylophone\".+\"name\":\"foo\".+\"name\":\"bar\".+\"name\":\"apple\"/)
@@ -713,7 +713,7 @@ describe AccountsController do
       @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
       @c4 = course_factory(account: @account, course_name: "xylophone", sis_source_id: 52)
       admin_logged_in(@account)
-      get 'courses_api', :account_id => @account.id, :sort => "sis_course_id", :order => "asc"
+      get 'courses_api', params: {account_id: @account.id, sort: "sis_course_id", order: "asc"}
 
       expect(response).to be_success
       expect(response.body).to match(/\"sis_course_id\":\"30\".+\"sis_course_id\":\"31\".+\"sis_course_id\":\"42\".+\"sis_course_id\":\"52\"/)
@@ -723,7 +723,7 @@ describe AccountsController do
       @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
       @c4 = course_factory(account: @account, course_name: "xylophone", sis_source_id: 52)
       admin_logged_in(@account)
-      get 'courses_api', :account_id => @account.id, :sort => "sis_course_id", :order => "desc"
+      get 'courses_api', params: {account_id: @account.id, sort: "sis_course_id", order: "desc"}
 
       expect(response).to be_success
       expect(response.body).to match(/\"sis_course_id\":\"52\".+\"sis_course_id\":\"42\".+\"sis_course_id\":\"31\".+\"sis_course_id\":\"30\"/)
@@ -732,7 +732,7 @@ describe AccountsController do
     it "should be able to sort courses by teacher ascending" do
       @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
 
-      user = @c3.shard.activate { user_factory(name: 'Zach Zachary') }
+      user = @c3.shard.activate {user_factory(name: 'Zach Zachary')}
       enrollment = @c3.enroll_user(user, 'TeacherEnrollment')
       user.save!
       enrollment.course = @c3
@@ -740,7 +740,7 @@ describe AccountsController do
       enrollment.save!
       @c3.reload
 
-      user2 = @c3.shard.activate { user_factory(name: 'Example Another') }
+      user2 = @c3.shard.activate {user_factory(name: 'Example Another')}
       enrollment2 = @c3.enroll_user(user2, 'TeacherEnrollment')
       user2.save!
       enrollment2.course = @c3
@@ -751,7 +751,7 @@ describe AccountsController do
       @c4 = course_with_teacher(name: 'Teach Teacherson', course: course_factory(account: @account, course_name: "xylophone", sis_source_id: 52))
 
       admin_logged_in(@account)
-      get 'courses_api', :account_id => @account.id, :sort => "teacher", :order => "asc"
+      get 'courses_api', params: {account_id: @account.id, sort: "teacher", order: "asc"}
 
       expect(response).to be_success
       expect(response.body).to match(/\"name\":\"apple\".+\"name\":\"xylophone\".+\"name\":\"foo\".+\"name\":\"bar\"/)
@@ -760,7 +760,7 @@ describe AccountsController do
     it "should be able to sort courses by teacher descending" do
       @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
 
-      user = @c3.shard.activate { user_factory(name: 'Zach Zachary') }
+      user = @c3.shard.activate {user_factory(name: 'Zach Zachary')}
       enrollment = @c3.enroll_user(user, 'TeacherEnrollment')
       user.save!
       enrollment.course = @c3
@@ -768,7 +768,7 @@ describe AccountsController do
       enrollment.save!
       @c3.reload
 
-      user2 = @c3.shard.activate { user_factory(name: 'Example Another') }
+      user2 = @c3.shard.activate {user_factory(name: 'Example Another')}
       enrollment2 = @c3.enroll_user(user2, 'TeacherEnrollment')
       user2.save!
       enrollment2.course = @c3
@@ -779,7 +779,7 @@ describe AccountsController do
       @c4 = course_with_teacher(name: 'Teach Teacherson', course: course_factory(account: @account, course_name: "xylophone", sis_source_id: 52))
 
       admin_logged_in(@account)
-      get 'courses_api', :account_id => @account.id, :sort => "teacher", :order => "desc"
+      get 'courses_api', params: {account_id: @account.id, sort: "teacher", order: "desc"}
 
       expect(response).to be_success
       expect(response.body).to match(/\"name\":\"bar\".+\"name\":\"foo\".+\"name\":\"xylophone\".+\"name\":\"apple\"/)
@@ -806,7 +806,7 @@ describe AccountsController do
       @c3 = course_factory(account: @a3, course_name: "apple", sis_source_id: 30)
       @c4 = course_factory(account: @a4, course_name: "xylophone", sis_source_id: 52)
       admin_logged_in(@account)
-      get 'courses_api', :account_id => @account.id, :sort => "subaccount", :order => "asc"
+      get 'courses_api', params: {account_id: @account.id, sort: "subaccount", order: "asc"}
 
       expect(response).to be_success
       expect(response.body).to match(/\"sis_course_id\":\"52\".+\"sis_course_id\":\"42\".+\"sis_course_id\":\"31\".+\"sis_course_id\":\"30\"/)
@@ -833,7 +833,7 @@ describe AccountsController do
       @c3 = course_factory(account: @a3, course_name: "apple", sis_source_id: 30)
       @c4 = course_factory(account: @a4, course_name: "xylophone", sis_source_id: 52)
       admin_logged_in(@account)
-      get 'courses_api', :account_id => @account.id, :sort => "subaccount", :order => "desc"
+      get 'courses_api', params: {account_id: @account.id, sort: "subaccount", order: "desc"}
 
       expect(response).to be_success
       expect(response.body).to match(/\"sis_course_id\":\"30\".+\"sis_course_id\":\"31\".+\"sis_course_id\":\"42\".+\"sis_course_id\":\"52\"/)
@@ -842,7 +842,7 @@ describe AccountsController do
     it "should be able to sort courses by enrollments ascending" do
       @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
 
-      user = @c3.shard.activate { user_factory() }
+      user = @c3.shard.activate {user_factory()}
       enrollment = @c3.enroll_user(user, 'StudentEnrollment')
       user.save!
       enrollment.course = @c3
@@ -850,7 +850,7 @@ describe AccountsController do
       enrollment.save!
       @c3.reload
 
-      user2 = @c3.shard.activate { user_factory() }
+      user2 = @c3.shard.activate {user_factory()}
       enrollment2 = @c3.enroll_user(user2, 'StudentEnrollment')
       user2.save!
       enrollment2.course = @c3
@@ -861,7 +861,7 @@ describe AccountsController do
       @c4 = course_with_student(course: course_factory(account: @account, course_name: "xylophone", sis_source_id: 52))
 
       admin_logged_in(@account)
-      get 'courses_api', :account_id => @account.id, :sort => "enrollments", :order => "asc"
+      get 'courses_api', params: {account_id: @account.id, sort: "enrollments", order: "asc"}
 
       expect(response).to be_success
       expect(response.body).to match(/\"name\":\"foo\".+\"name\":\"bar\".+\"name\":\"xylophone\".+\"name\":\"apple\"/)
@@ -870,15 +870,15 @@ describe AccountsController do
     it "should be able to sort courses by enrollments descending" do
       @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
 
-      user = @c3.shard.activate { user_factory() }
+      user = @c3.shard.activate {user_factory()}
       enrollment = @c3.enroll_user(user, 'StudentEnrollment')
       user.save!
-      enrollment.course = @c3 
+      enrollment.course = @c3
       enrollment.workflow_state = 'active'
       enrollment.save!
       @c3.reload
 
-      user2 = @c3.shard.activate { user_factory() }
+      user2 = @c3.shard.activate {user_factory()}
       enrollment2 = @c3.enroll_user(user2, 'StudentEnrollment')
       user2.save!
       enrollment2.course = @c3
@@ -889,7 +889,7 @@ describe AccountsController do
       @c4 = course_with_student(course: course_factory(account: @account, course_name: "xylophone", sis_source_id: 52))
 
       admin_logged_in(@account)
-      get 'courses_api', :account_id => @account.id, :sort => "enrollments", :order => "desc"
+      get 'courses_api', params: {account_id: @account.id, sort: "enrollments", order: "desc"}
 
       expect(response).to be_success
       expect(response.body).to match(/\"name\":\"apple\".+\"name\":\"xylophone\".+\"name\":\"bar\".+\"name\":\"foo\"/)
