@@ -1,0 +1,34 @@
+{
+  "name": "tinymce-a11y",
+  "version": "1.0.0",
+  "description": "An accessibility checker plugin for TinyMCE.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "dev": "webpack-dev-server --open"
+  },
+  "keywords": [
+    "tinymce",
+    "accessibility",
+    "plugin",
+    "a11y"
+  ],
+  "author": "Brent Burgoyne",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-core": "^6.25.0",
+    "babel-loader": "^7.1.1",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-react": "^6.24.1",
+    "html-webpack-plugin": "^2.29.0",
+    "jest": "^20.0.4",
+    "webpack": "^3.3.0",
+    "webpack-dev-server": "^2.6.1"
+  },
+  "dependencies": {
+    "instructure-icons": "^4.2.0",
+    "instructure-ui": "^2.5.1",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1"
+  }
+}
