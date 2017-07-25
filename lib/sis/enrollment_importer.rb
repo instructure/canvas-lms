@@ -57,6 +57,7 @@ module SIS
       User.update_account_associations(i.update_account_association_user_ids.to_a, :account_chain_cache => i.account_chain_cache)
       i.users_to_touch_ids.to_a.in_groups_of(1000, false) do |batch|
         User.where(id: batch).touch_all
+        User.where(id: UserObserver.where(user_id: batch).select(:observer_id)).touch_all
       end
       @logger.debug("Enrollments with batch operations took #{Time.now - start} seconds")
       return i.success_count
