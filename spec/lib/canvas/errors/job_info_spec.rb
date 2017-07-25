@@ -33,7 +33,8 @@ module Canvas
           handler: 'Something',
           run_at: Time.zone.now,
           max_attempts: 1,
-          tag: "TAG"
+          tag: "TAG",
+          current_shard: stub(id: 1),
         )
       end
 
@@ -70,7 +71,6 @@ module Canvas
             to match(/c5ec694d-1c0d-4744-a97a-cae44c477837/)
         end
       end
-
     end
   end
 end
