@@ -73,6 +73,15 @@ describe BrandableCSS do
     end
   end
 
+  describe "all_brand_variable_values_as_css" do
+    it "defines the right default css values in the root scope" do
+      expected_css = ":root {
+        #{BrandableCSS.all_brand_variable_values(nil, true).map{ |k, v| "--#{k}: #{v};"}.join("\n")}
+      }"
+      expect(BrandableCSS.default_css).to eq expected_css
+    end
+  end
+
   describe "default_json" do
     it "includes default variables not found in brand config" do
       brand_variables = JSON.parse(BrandableCSS.default_json)
@@ -131,7 +140,7 @@ describe BrandableCSS do
       BrandableCSS.save_default_js!
     end
 
-    it 'delete the local javascript file if cdn is enabled' do
+    it 'deletes the local javascript file if cdn is enabled' do
       allow(Canvas::Cdn).to receive(:enabled?).and_return(true)
       allow(Canvas::Cdn).to receive(:config).and_return(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1', aws_access_key_id: 'id', aws_secret_access_key: 'secret', bucket: 'cdn'))
       file = StringIO.new
@@ -139,6 +148,37 @@ describe BrandableCSS do
       expect(File).to receive(:delete).with(BrandableCSS.default_brand_js_file)
       expect(BrandableCSS.s3_uploader).to receive(:upload_file)
       BrandableCSS.save_default_js!
+    end
+  end
+
+  describe "save_default_css!" do
+    it "writes the default css variables to the default css file" do
+      allow(Canvas::Cdn).to receive(:enabled?).and_return(false)
+      file = StringIO.new
+      allow(BrandableCSS).to receive(:default_brand_css_file).and_return(file)
+      BrandableCSS.save_default_css!
+      expect(file.string).to eq BrandableCSS.default_css
+    end
+
+    it 'uploads css file to s3 if cdn is enabled' do
+      allow(Canvas::Cdn).to receive(:enabled?).and_return(true)
+      allow(Canvas::Cdn).to receive(:config).and_return(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1', aws_access_key_id: 'id', aws_secret_access_key: 'secret', bucket: 'cdn'))
+
+      file = StringIO.new
+      allow(BrandableCSS).to receive(:default_brand_css_file).and_return(file)
+      allow(File).to receive(:delete)
+      expect(BrandableCSS.s3_uploader).to receive(:upload_file).with(BrandableCSS.public_default_css_path)
+      BrandableCSS.save_default_css!
+    end
+
+    it 'deletes the local css file if cdn is enabled' do
+      allow(Canvas::Cdn).to receive(:enabled?).and_return(true)
+      allow(Canvas::Cdn).to receive(:config).and_return(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1', aws_access_key_id: 'id', aws_secret_access_key: 'secret', bucket: 'cdn'))
+      file = StringIO.new
+      allow(BrandableCSS).to receive(:default_brand_css_file).and_return(file)
+      expect(File).to receive(:delete).with(BrandableCSS.default_brand_css_file)
+      expect(BrandableCSS.s3_uploader).to receive(:upload_file)
+      BrandableCSS.save_default_css!
     end
   end
 end

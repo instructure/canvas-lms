@@ -645,6 +645,12 @@ module ApplicationHelper
     "#{Canvas::Cdn.config.host}/#{path}"
   end
 
+  def active_brand_config_css_url(opts={})
+    path = active_brand_config(opts).try(:public_css_path)
+    path ||= BrandableCSS.public_default_css_path
+    "#{Canvas::Cdn.config.host}/#{path}"
+  end
+
   def brand_config_for_account(opts={})
     account = Context.get_account(@context || @course)
 
