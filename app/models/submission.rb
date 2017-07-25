@@ -2031,7 +2031,7 @@ class Submission < ActiveRecord::Base
     self.graded? && (!self.submitted_at || (self.graded_at && self.graded_at >= self.submitted_at))
   end
 
-  def context(_user=nil)
+  def context
     self.assignment.context if self.assignment
   end
 
