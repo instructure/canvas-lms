@@ -35,7 +35,6 @@ class Message < ActiveRecord::Base
 
 
   # Associations
-  belongs_to :asset_context, polymorphic: [], exhaustive: false
   belongs_to :communication_channel
   belongs_to :context, polymorphic: [], exhaustive: false
   include NotificationPreloader
@@ -259,7 +258,10 @@ class Message < ActiveRecord::Base
   def link_root_account
     @root_account ||= begin
       context = self.context
-      context = self.asset_context if context.is_a?(CommunicationChannel) && self.asset_context
+      if context.is_a?(CommunicationChannel) && @data&.root_account_id
+        root_account = Account.where(id: @data.root_account_id).first
+        context = root_account if root_account
+      end
 
       context = context.assignment if context.respond_to?(:assignment) && context.assignment
       context = context.rubric_association.context if context.respond_to?(:rubric_association) && context.rubric_association
@@ -502,8 +504,8 @@ class Message < ActiveRecord::Base
     filename = template_filename(path_type)
     message_body_template = get_template(filename)
 
-    context, asset, user, delayed_messages, asset_context, data = [self.context,
-      self.context, self.user, @delayed_messages, self.asset_context, @data]
+    context, asset, user, delayed_messages, data = [self.context,
+      self.context, self.user, @delayed_messages, @data]
 
     link_root_account.shard.activate do
       if message_body_template.present?
@@ -815,7 +817,7 @@ class Message < ActiveRecord::Base
   # Returns nothing.
   def deliver_via_twitter
     twitter_service = user.user_services.where(service: 'twitter').first
-    host = HostUrl.short_host(self.asset_context)
+    host = HostUrl.context_host(link_root_account)
     msg_id = AssetSignature.generate(self)
     Twitter::Messenger.new(self, twitter_service, host, msg_id).deliver
     complete_dispatch

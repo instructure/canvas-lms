@@ -23,7 +23,6 @@ describe Notifier do
     it 'caches messages for inspection in test' do
       group_user = user_with_communication_channel(active_all: true)
       group_membership = group_with_user(user: group_user, active_all: true)
-      group_instance = group_membership.group
       notification = Notification.create!(name: "New Context Group Membership", category: "Registration")
       to_list = [group_user]
       dispatch = :test_dispatch
@@ -35,17 +34,10 @@ describe Notifier do
         kind_of(ActiveRecord::Base),
         kind_of(Notification),
         ["user_#{group_user.id}"],
-        kind_of(ActiveRecord::Base),
         nil
       ).and_return([message])
 
-      subject.send_notification(
-          group_membership,
-          dispatch,
-          notification,
-          to_list,
-          group_instance
-      )
+      subject.send_notification(group_membership, dispatch, notification, to_list)
 
       messages = group_membership.messages_sent[dispatch]
       expect(messages.size).to eq(1)

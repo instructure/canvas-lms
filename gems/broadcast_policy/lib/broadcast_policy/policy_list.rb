@@ -55,10 +55,6 @@ module BroadcastPolicy
       self.current_notification.whenever = block
     end
 
-    def context(&block)
-      self.current_notification.context = block
-    end
-
     def data(&block)
       self.current_notification.data = block
     end

@@ -887,12 +887,11 @@ class Attachment < ActiveRecord::Base
         next if recipient_keys.empty?
 
         notification = BroadcastPolicy.notification_finder.by_name(count.to_i > 1 ? 'New Files Added' : 'New File Added')
-        asset_context = record.context
         data = { :count => count }
         DelayedNotification.send_later_if_production_enqueue_args(
             :process,
             { :priority => Delayed::LOW_PRIORITY },
-            record, notification, recipient_keys, asset_context, data)
+            record, notification, recipient_keys, data)
       end
     end
   end
