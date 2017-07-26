@@ -2339,7 +2339,7 @@ describe CoursesController, type: :request do
       it "returns a list of users" do
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                         { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' })
-        expected_users = @course1.users.uniq - [@test_student]
+        expected_users = @course1.users.to_a.uniq - [@test_student]
         expect(json.sort_by{|x| x["id"]}).to eq api_json_response(expected_users,
                                                               :only => user_api_fields).sort_by{|x| x["id"]}
       end

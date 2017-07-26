@@ -466,7 +466,7 @@ class GradebooksController < ApplicationController
                     end
       valid_user_ids = Set.new(@context.students_visible_to(@current_user, include: :inactive).pluck(:id))
       submissions.select! { |s| valid_user_ids.include? s[:user_id].to_i }
-      users = @context.admin_visible_students.uniq.find(submissions.map { |s| s[:user_id] })
+      users = @context.admin_visible_students.distinct.find(submissions.map { |s| s[:user_id] })
         .index_by(&:id)
       assignments = @context.assignments.active.find(submissions.map { |s|
         s[:assignment_id]

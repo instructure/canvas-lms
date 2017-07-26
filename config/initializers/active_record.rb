@@ -668,6 +668,10 @@ ActiveRecord::Relation.class_eval do
     super
   end
 
+  def uniq(*args)
+    raise "use #distinct instead of #uniq on relations (Rails 5.1 will delegate uniq to to_a)"
+  end
+
   def select_values_necessitate_temp_table?
     return false unless select_values.present?
     selects = select_values.flat_map{|sel| sel.to_s.split(",").map(&:strip) }
@@ -1047,6 +1051,10 @@ ActiveRecord::Associations::CollectionProxy.class_eval do
     record = klass.unscoped.merge(scope).new(*args)
     @association.set_inverse_instance(record)
     record
+  end
+
+  def uniq(*args)
+    raise "use #distinct instead of #uniq on relations (Rails 5.1 will delegate uniq to to_a)"
   end
 end
 

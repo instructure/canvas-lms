@@ -44,7 +44,7 @@ class AppointmentGroup < ActiveRecord::Base
 
   def sub_contexts
     # I wonder how rails is adding multiples of the same sub_contexts
-    appointment_group_sub_contexts.uniq.map &:sub_context
+    appointment_group_sub_contexts.map &:sub_context
   end
 
   validates_presence_of :workflow_state
