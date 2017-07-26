@@ -41,11 +41,14 @@ describe "courses" do
     context 'draft state' do
       before(:each) do
         course_with_teacher_logged_in
+        @course.default_view = 'feed'
+        @course.save
       end
 
-      def validate_action_button(validation_text)
-        action_button = f('#pubunpub_btn_container')
-        expect(action_button.text).to start_with validation_text
+      def validate_action_button(postion, validation_text)
+        action_button = ff('#course_status_actions button').send(postion)
+        expect(action_button).to have_class('disabled')
+        expect(action_button.text).to eq validation_text
       end
 
       it "should allow publishing of the course through the course status actions" do
@@ -53,10 +56,13 @@ describe "courses" do
         @course.lock_all_announcements = true
         @course.save!
         get "/courses/#{@course.id}"
-        validate_action_button('Unpublished')
-        course_status_button = f('#pubunpub_btn_container')
-        expect_new_page_load { course_status_button.click }
-        validate_action_button('Published')
+        course_status_buttons = ff('#course_status_actions button')
+        expect(course_status_buttons.first).to have_class('disabled')
+        expect(course_status_buttons.first.text).to eq 'Unpublished'
+        expect(course_status_buttons.last).not_to have_class('disabled')
+        expect(course_status_buttons.last.text).to eq 'Publish'
+        expect_new_page_load { course_status_buttons.last.click }
+        validate_action_button(:last, 'Published')
 
         @course.reload
         expect(@course.lock_all_announcements).to be_truthy
@@ -72,35 +78,47 @@ describe "courses" do
 
       it "should allow unpublishing of a course through the course status actions" do
         get "/courses/#{@course.id}"
-        course_status_button = f('#pubunpub_btn_container')
-        validate_action_button('Published')
-        expect_new_page_load { course_status_button.click }
-        validate_action_button('Unpublished')
+        course_status_buttons = ff('#course_status_actions button')
+        expect(course_status_buttons.first).not_to have_class('disabled')
+        expect(course_status_buttons.first.text).to eq 'Unpublish'
+        expect(course_status_buttons.last).to have_class('disabled')
+        expect(course_status_buttons.last.text).to eq 'Published'
+        expect_new_page_load { course_status_buttons.first.click }
+        validate_action_button(:first, 'Unpublished')
       end
 
       it "should allow publishing even if graded submissions exist" do
         course_with_student_submissions({submission_points: true, unpublished: true})
+        @course.default_view = 'feed'
+        @course.save
         get "/courses/#{@course.id}"
-        course_status_button = f('#pubunpub_btn_container')
-        validate_action_button('Unpublished')
-        expect_new_page_load { course_status_button.click }
+        course_status_buttons = ff('#course_status_actions button')
+        expect(course_status_buttons.first).to have_class('disabled')
+        expect(course_status_buttons.first.text).to eq 'Unpublished'
+        expect(course_status_buttons.last).not_to have_class('disabled')
+        expect(course_status_buttons.last.text).to eq 'Publish'
+        expect_new_page_load { course_status_buttons.last.click }
         @course.reload
         expect(@course).to be_available
       end
 
       it "should not show course status if published and graded submissions exist" do
         course_with_student_submissions({submission_points: true})
+        @course.default_view = 'feed'
+        @course.save
         get "/courses/#{@course.id}"
         expect(f("#content")).not_to contain_css('#course_status')
       end
 
       it "should allow unpublishing of the course if submissions have no score or grade" do
         course_with_student_submissions
+        @course.default_view = 'feed'
+        @course.save
         get "/courses/#{@course.id}"
-        course_status_button = f('#pubunpub_btn_container')
-        expect_new_page_load { course_status_button.click }
+        course_status_buttons = ff('#course_status_actions button')
+        expect_new_page_load { course_status_buttons.first.click }
         assert_flash_notice_message('successfully updated')
-        validate_action_button('Unpublished')
+        validate_action_button(:first, 'Unpublished')
       end
 
       it "should allow publishing/unpublishing with only change_course_state permission" do
@@ -108,11 +126,10 @@ describe "courses" do
         @course.account.role_overrides.create!(:permission => :manage_courses, :role => teacher_role, :enabled => false)
 
         get "/courses/#{@course.id}"
-        course_status_button = f('#pubunpub_btn_container')
-        expect_new_page_load { course_status_button.click }
-        validate_action_button('Unpublished')
-        expect_new_page_load { course_status_button.click }
-        validate_action_button('Published')
+        expect_new_page_load { ff('#course_status_actions button').first.click }
+        validate_action_button(:first, 'Unpublished')
+        expect_new_page_load { ff('#course_status_actions button').last.click }
+        validate_action_button(:last, 'Published')
       end
 
       it "should not allow publishing/unpublishing without change_course_state permission" do

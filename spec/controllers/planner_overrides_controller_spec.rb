@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
 require_relative '../sharding_spec_helper'
 
@@ -369,6 +370,31 @@ describe PlannerOverridesController do
             expect(response_json.first["plannable"]["id"]).to eq @assignment2.id
           end
 
+          it "should mark submitted stuff within start and end dates" do
+            @assignment4 = @course.assignments.create!(:submission_types => "online_text_entry", :due_at => 4.weeks.from_now)
+            @assignment5 = @course.assignments.create!(:submission_types => "online_text_entry", :due_at => 4.weeks.ago)
+            @assignment4.submit_homework(@student, :submission_type => "online_text_entry")
+            @assignment5.submit_homework(@student, :submission_type => "online_text_entry")
+            get :items_index, :start_date => 5.weeks.ago.to_date.to_s, :end_date => 5.weeks.from_now.to_date.to_s
+            response_json = json_parse(response.body)
+            found_assignment_4 = false
+            found_assignment_5 = false
+            response_json.each do |this_response|
+              if this_response["plannable_id"] == @assignment4.id
+                found_assignment_4 = true
+                expect(this_response["submissions"]["submitted"]).to be true
+              end
+              if this_response["plannable_id"] == @assignment5.id
+                found_assignment_5 = true
+                expect(this_response["submissions"]["submitted"]).to be true
+              end
+            end
+            # Make sure these two assignments were actually found and their
+            # associated expectations run
+            expect(found_assignment_4).to be true
+            expect(found_assignment_5).to be true
+          end
+
           it "shouldn't return things from other courses" do
             course_with_student(:active_all => true) # another course
             other_student = @student
@@ -467,9 +493,10 @@ describe PlannerOverridesController do
       describe "PUT #update" do
         it "returns http success" do
           expect(@planner_override.marked_complete).to be_falsey
-          put :update, id: @planner_override.id, marked_complete: true
+          put :update, id: @planner_override.id, marked_complete: true, dismissed: true
           expect(response).to have_http_status(:success)
           expect(@planner_override.reload.marked_complete).to be_truthy
+          expect(@planner_override.dismissed).to be_truthy
         end
       end
 

@@ -483,14 +483,6 @@ RSpec.configure do |config|
     Canvas.redis_used = false
   end
 
-  # This should be removed once all tests using the legacy rce have been removed
-  # Only use RCS in tests if high risk flag is enabled
-  config.before :each do
-    allow(Services::RichContent).to receive(:contextually_on) do |root_account|
-      root_account.feature_enabled?(:rich_content_service_high_risk)
-    end
-  end
-
   #****************************************************************
   # There used to be a lot of factory methods here!
   # In an effort to move us toward a nicer test factory solution,
@@ -583,8 +575,8 @@ RSpec.configure do |config|
 
   def process_csv_data_cleanly(*lines_or_opts)
     importer = process_csv_data(*lines_or_opts)
-    raise "csv errors" if importer.errors.present?
-    raise "csv warning" if importer.warnings.present?
+    raise "csv errors: #{importer.errors.inspect}" if importer.errors.present?
+    raise "csv warning: #{importer.warnings.inspect}" if importer.warnings.present?
   end
 
   def enable_cache(new_cache=:memory_store)

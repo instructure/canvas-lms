@@ -56,6 +56,11 @@
 #           "example": false,
 #           "type": "boolean"
 #         },
+#         "dismissed": {
+#           "description": "Controls whether or not the associated plannable item shows up in the opportunities list",
+#           "example": false,
+#           "type": "boolean"
+#         },
 #         "created_at": {
 #           "description": "The datetime of when the planner override was created",
 #           "example": "2017-05-09T10:12:00Z",
@@ -76,6 +81,7 @@
 #
 
 class PlannerOverridesController < ApplicationController
+  include Api::V1::PlannerItem
   include Api::V1::PlannerOverride
 
   before_action :require_user
@@ -123,7 +129,8 @@ class PlannerOverridesController < ApplicationController
   #         "plannable_id": 1,
   #         "user_id": 2,
   #         "workflow_state": "active",
-  #         "visible": true, // A user-defined setting for minimizing/hiding objects on the planner
+  #         "marked_complete": true, // A user-defined setting for marking items complete in the planner
+  #         "dismissed": false, // A user-defined setting for hiding items from the opportunities list
   #         "deleted_at": null,
   #         "created_at": "2017-05-18T18:35:55Z",
   #         "updated_at": "2017-05-18T18:35:55Z"
@@ -167,7 +174,7 @@ class PlannerOverridesController < ApplicationController
     items_json = Rails.cache.fetch(['planner_items', @current_user, page, params[:filter], default_opts].cache_key, raw: true, expires_in: 120.minutes) do
       items = params[:filter] == 'new_activity' ? unread_items : planner_items
       items = Api.paginate(items, self, api_v1_planner_items_url)
-      planner_items_json(items, @current_user, session, {start_at: start_date})
+      planner_items_json(items, @current_user, session, {start_at: start_date, due_after: start_date, due_before: end_date})
     end
 
     render json: items_json
@@ -205,10 +212,14 @@ class PlannerOverridesController < ApplicationController
   # @argument marked_complete
   #   determines whether the planner item is marked as completed
   #
+  # @argument dismissed
+  #   determines whether the planner item shows in the opportunities list
+  #
   # @returns PlannerOverride
   def update
     planner_override = PlannerOverride.find(params[:id])
     planner_override.marked_complete = value_to_boolean(params[:marked_complete])
+    planner_override.dismissed = value_to_boolean(params[:dismissed])
 
     if planner_override.save
       render json: planner_override_json(planner_override, @current_user, session), status: :ok
@@ -230,6 +241,9 @@ class PlannerOverridesController < ApplicationController
   # @argument marked_complete [Boolean]
   #   If this is true, the item will show in the planner as completed
   #
+  # @argument dismissed [Boolean]
+  #   If this is true, the item will not show in the opportunities list
+  #
   #
   # @returns PlannerOverride
   def create
@@ -240,7 +254,7 @@ class PlannerOverridesController < ApplicationController
     end
     planner_override = PlannerOverride.new(plannable_type: plannable_type,
       plannable_id: params[:plannable_id], marked_complete: value_to_boolean(params[:marked_complete]),
-      user: @current_user)
+      user: @current_user, dismissed: value_to_boolean(params[:dismissed]))
 
     if planner_override.save
       render json: planner_override_json(planner_override, @current_user, session), status: :created
