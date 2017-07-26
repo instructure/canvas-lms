@@ -26,7 +26,7 @@ module Types
 
     field :type, !EnrollmentTypeType
 
-    field :grades, !GradesType do
+    field :grades, GradesType do
       argument :gradingPeriodId, types.ID,
         "The grading period to return grades for. If not specified, will use the current grading period (or the course grade for courses that don't use grading periods)",
         prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("GradingPeriod")
