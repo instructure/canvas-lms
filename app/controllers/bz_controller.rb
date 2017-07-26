@@ -174,17 +174,36 @@ class BzController < ApplicationController
   def set_user_retained_data
     result = RetainedData.where(:user_id => @current_user.id, :name => params[:name])
     data = nil
+    was_new = false
     if result.empty?
       data = RetainedData.new()
       data.user_id = @current_user.id
       data.path = request.referrer
       data.name = params[:name]
+      was_new = true
     else
       data = result.first
     end
 
     data.value = params[:value]
     data.save
+
+    if was_new
+      course_id = request.referrer[/\/courses\/(\d+)\//, 1]
+      if course_id
+        course = Course.find(course_id)
+        res = course.assignments.active.where(:title => "Course Participation")
+        if !res.empty?
+          participation_assignment = res.first
+          submission = participation_assignment.find_or_create_submission(@current_user)
+          existing_grade = submission.grade.nil? ? 0 : submission.grade.to_i
+          new_grade = existing_grade + 1
+          participation_assignment.grade_student(@current_user, {:grade => (new_grade) })
+        end
+      end
+    end
+
+
     render :nothing => true
   end
 
