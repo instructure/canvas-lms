@@ -32,11 +32,11 @@ describe Quizzes::TakeQuizPresenter do
 
   def set_current_question(question)
     params[:question_id] = question[:id]
-    submission.stubs(:question).with(question[:id]).returns(question)
+    allow(submission).to receive(:question).with(question[:id]).and_return(question)
   end
 
   before do
-    submission.stubs(:questions_as_object).returns all_questions
+    allow(submission).to receive(:questions_as_object).and_return all_questions
   end
 
   describe "current_questions" do
@@ -55,7 +55,7 @@ describe Quizzes::TakeQuizPresenter do
 
     context "when one question at a time" do
       it "returns the first question" do
-        presenter.stubs(:one_question_at_a_time?).returns(true)
+        allow(presenter).to receive(:one_question_at_a_time?).and_return(true)
         expect(presenter.current_questions).to eq [question1]
       end
     end
@@ -69,7 +69,7 @@ describe Quizzes::TakeQuizPresenter do
 
   describe "neighboring_question" do
     before do
-      quiz.stubs(:one_question_at_a_time?) { true }
+      allow(quiz).to receive(:one_question_at_a_time?) { true }
     end
 
     context "when on the first question" do
@@ -114,21 +114,21 @@ describe Quizzes::TakeQuizPresenter do
   describe "previous_question_viewable?" do
 
     it "returns false if no previous_question" do
-      presenter.expects(:previous_question).returns false
+      expect(presenter).to receive(:previous_question).and_return false
       expect(presenter.previous_question_viewable?).to eq false
     end
 
     it "returns true if there is a previous question and quiz allows "+
       "user to go back" do
-      presenter.expects(:previous_question).returns true
-      presenter.expects(:cant_go_back?).returns false
+      expect(presenter).to receive(:previous_question).and_return true
+      expect(presenter).to receive(:cant_go_back?).and_return false
       expect(presenter.previous_question_viewable?).to eq true
     end
   end
 
   describe "marked?" do
     before do
-      submission.stubs(:submission_data).returns(
+      allow(submission).to receive(:submission_data).and_return(
         "question_#{question1[:id]}_marked" => true,
         "question_#{question2[:id]}_marked" => false
       )
@@ -145,7 +145,7 @@ describe Quizzes::TakeQuizPresenter do
 
   describe "answered_icon" do
     before do
-      submission.stubs(:submission_data).returns({
+      allow(submission).to receive(:submission_data).and_return({
         "question_#{question1[:id]}" => true,
         "question_#{question2[:id]}" => nil
       })
@@ -162,7 +162,7 @@ describe Quizzes::TakeQuizPresenter do
 
   describe "answered_text" do
     before do
-      submission.stubs(:submission_data).returns({
+      allow(submission).to receive(:submission_data).and_return({
         "question_#{question1[:id]}" => true,
         "question_#{question2[:id]}" => nil
       })
@@ -179,7 +179,7 @@ describe Quizzes::TakeQuizPresenter do
 
   describe "marked_text" do
     before do
-      submission.stubs(:submission_data).returns(
+      allow(submission).to receive(:submission_data).and_return(
         "question_#{question1[:id]}_marked" => true,
         "question_#{question2[:id]}_marked" => false
       )
@@ -237,14 +237,14 @@ describe Quizzes::TakeQuizPresenter do
     end
 
     it "returns true when the question is before the current question" do
-      presenter.stubs(:current_question).returns(question3)
+      allow(presenter).to receive(:current_question).and_return(question3)
       expect(presenter.question_seen?(question2)).to be_truthy
     end
   end
 
   describe "question_answered?" do
     before do
-      submission.stubs(:submission_data).returns(
+      allow(submission).to receive(:submission_data).and_return(
         "question_#{question1[:id]}" => true,
         "question_#{question2[:id]}" => nil
       )
@@ -266,7 +266,7 @@ describe Quizzes::TakeQuizPresenter do
     end
 
     it "adds 'answered' if the question was answered" do
-      submission.stubs(:submission_data).returns(
+      allow(submission).to receive(:submission_data).and_return(
         "question_#{question1[:id]}" => true,
         "question_#{question2[:id]}" => nil
       )
@@ -276,7 +276,7 @@ describe Quizzes::TakeQuizPresenter do
     end
 
     it "adds 'marked' if the question was marked" do
-      submission.stubs(:submission_data).returns(
+      allow(submission).to receive(:submission_data).and_return(
         "question_#{question1[:id]}_marked" => true,
         "question_#{question2[:id]}_marked" => false
       )
@@ -302,7 +302,7 @@ describe Quizzes::TakeQuizPresenter do
 
   describe 'building the answer set' do
     it 'should discard irrelevant entries' do
-      submission.stubs(:submission_data).returns({
+      allow(submission).to receive(:submission_data).and_return({
         'foo' => 'bar',
         "question_#{question1[:id]}_marked" => true
       })
@@ -312,7 +312,7 @@ describe Quizzes::TakeQuizPresenter do
     end
 
     it 'marks a question as answered' do
-      submission.stubs(:submission_data).returns({
+      allow(submission).to receive(:submission_data).and_return({
         "question_#{question1[:id]}" => '123',
         "question_#{question2[:id]}" => true
       })
@@ -325,7 +325,7 @@ describe Quizzes::TakeQuizPresenter do
     end
 
     it 'rejects zeroes for an answer' do
-      submission.stubs(:submission_data).returns({
+      allow(submission).to receive(:submission_data).and_return({
         "question_#{question1[:id]}" => '0'
       })
 
