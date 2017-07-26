@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
+<% blueprint_subscription ||= nil %>
 <div>
   <%= external_tools_menu_items(@course_settings_sub_navigation_tools, {link_class: "Button Button--link Button--link--has-divider Button--course-settings course-settings-sub-navigation-lti", settings_key: :course_settings_sub_navigation}) %>
   <% if can_do(@context, @current_user, :use_student_view) %>
@@ -98,6 +99,12 @@
   <% if can_do(@context, @current_user, :manage_content) %>
     <%= link_to context_url(@context, :course_link_validator_url), :class => 'Button Button--link Button--link--has-divider Button--course-settings validator_link' do %>
       <i class="icon-link"></i><%= t('Validate Links in Content') %>
+    <% end %>
+
+    <% if blueprint_subscription %>
+      <%= link_to "#!/blueprint/blueprint_subscriptions/#{blueprint_subscription.id}/#{blueprint_subscription.last_migration_id}", :onclick => 'setTimeout(function(){window.location.reload()}, 0)', :class => 'Button Button--link Button--link--has-divider Button--course-settings blueprint_information_button' do %>
+        <i class="icon-blueprint"></i><%= t('Blueprint Information') %>
+      <% end %>
     <% end %>
   <% end %>
 

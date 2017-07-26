@@ -111,10 +111,10 @@ module CoursesHelper
   def why_cant_i_enable_master_course(course)
     return nil if MasterCourses::MasterTemplate.is_master_course?(course)
 
-    if course.student_enrollments.not_fake.exists?
-      t("Cannot have a blueprint course with students")
-    elsif MasterCourses::ChildSubscription.is_child_course?(course)
+    if MasterCourses::ChildSubscription.is_child_course?(course)
       t('Course is already associated with a blueprint')
+    elsif course.student_enrollments.not_fake.exists?
+      t("Cannot have a blueprint course with students")
     else
       nil
     end

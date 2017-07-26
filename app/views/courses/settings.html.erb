@@ -32,10 +32,12 @@
   can_see_users = can_do(@context, @current_user, :read_roster, :manage_students, :manage_admin_users)
 
   is_master_course = MasterCourses::MasterTemplate.is_master_course?(@context)
+  blueprint_subscription = @context.master_course_subscriptions.active.first
+  master_course = blueprint_subscription&.master_template&.course
 %>
 
 <% content_for :right_side do %>
-  <%= render :partial => 'settings_sidebar' %>
+  <%= render :partial => 'settings_sidebar', :locals => { :blueprint_subscription => blueprint_subscription } %>
 <% end %>
 
 <h1 class="screenreader-only"><%= t 'course_settings_title', "Course Settings" %></h1>
@@ -122,10 +124,19 @@
       <tr>
         <td class="form-label nobr"><%= f.blabel :blueprint_course, :en => "Blueprint Course" %></td>
         <td class="nobr">
-          <% if can_manage_master_courses %>
-            <div id="blueprint_menu"></div>
+          <% if master_course %>
+            <% if master_course.grants_right? @current_user, session, :read %>
+              <a href="<%= course_url(master_course) %>"><%= master_course.nickname_for(@current_user) %></a>
+            <% else %>
+              <%= master_course.nickname_for(@current_user) %>
+            <% end %>
+            (courses/<%= master_course.id %>)
           <% else %>
-            <span id="course_blueprint"><%= is_master_course ? t("Yes") : t("No") %></span>
+            <% if can_manage_master_courses %>
+              <div id="blueprint_menu"></div>
+            <% else %>
+              <span id="course_blueprint"><%= is_master_course ? t("Yes") : t("No") %></span>
+            <% end %>
           <% end %>
         </td>
       </tr>
