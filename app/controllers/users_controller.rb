@@ -926,7 +926,7 @@ class UsersController < ApplicationController
                       missing.
                       where(user_id: user.id,
                             assignments: {context_id: shard_course_ids}).
-                      merge(Assignment.active).
+                      merge(Assignment.published).
                       order(:cached_due_date)
       end
     end
