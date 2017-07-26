@@ -290,7 +290,7 @@ describe DiscussionTopicsController do
     it "should hide speedgrader when for a large course" do
       user_session(@teacher)
       course_topic(user: @teacher, with_assignment: true)
-      Course.any_instance.stubs(:large_roster?).returns(true)
+      allow_any_instance_of(Course).to receive(:large_roster?).and_return(true)
       get 'show', params: {:course_id => @course.id, :id => @topic.id}
       expect(assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE]).to be_nil
     end
@@ -570,42 +570,42 @@ describe DiscussionTopicsController do
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:due_date_required_for_account?).returns(true)
+      allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
       get 'new', params: {:course_id => @course.id}
       expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(true)
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.due_date_required_for_account? == false" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:due_date_required_for_account?).returns(false)
+      allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(false)
       get 'new', params: {:course_id => @course.id}
       expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(false)
     end
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:name_length_required_for_account?).returns(true)
+      allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(true)
       get 'new', params: {:course_id => @course.id}
       expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(true)
     end
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.name_length_required_for_account? == false" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:name_length_required_for_account?).returns(false)
+      allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(false)
       get 'new', params: {:course_id => @course.id}
       expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(false)
     end
 
     it "js_env MAX_NAME_LENGTH is a 15 when AssignmentUtil.assignment_max_name_length returns 15" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:assignment_max_name_length).returns(15)
+      allow(AssignmentUtil).to receive(:assignment_max_name_length).and_return(15)
       get 'new', params: {:course_id => @course.id}
       expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
     end
 
     it "js_env SIS_NAME is Foo Bar when AssignmentUtil.post_to_sis_friendly_name is Foo Bar" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:post_to_sis_friendly_name).returns('Foo Bar')
+      allow(AssignmentUtil).to receive(:post_to_sis_friendly_name).and_return('Foo Bar')
       get 'new', params: {:course_id => @course.id}
       expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
     end
@@ -635,42 +635,42 @@ describe DiscussionTopicsController do
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:due_date_required_for_account?).returns(true)
+      allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
       get :edit, params: {course_id: @course.id, id: @topic.id}
       expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(true)
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.due_date_required_for_account? == false" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:due_date_required_for_account?).returns(false)
+      allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(false)
       get :edit, params: {course_id: @course.id, id: @topic.id}
       expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(false)
     end
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:name_length_required_for_account?).returns(true)
+      allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(true)
       get :edit, params: {course_id: @course.id, id: @topic.id}
       expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(true)
     end
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.name_length_required_for_account? == false" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:name_length_required_for_account?).returns(false)
+      allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(false)
       get :edit, params: {course_id: @course.id, id: @topic.id}
       expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(false)
     end
 
     it "js_env MAX_NAME_LENGTH is a 15 when AssignmentUtil.assignment_max_name_length returns 15" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:assignment_max_name_length).returns(15)
+      allow(AssignmentUtil).to receive(:assignment_max_name_length).and_return(15)
       get :edit, params: {course_id: @course.id, id: @topic.id}
       expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
     end
 
     it "js_env SIS_NAME is Foo Bar when AssignmentUtil.post_to_sis_friendly_name is Foo Bar" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:post_to_sis_friendly_name).returns('Foo Bar')
+      allow(AssignmentUtil).to receive(:post_to_sis_friendly_name).and_return('Foo Bar')
       get :edit, params: {:course_id => @course.id, :id => @topic.id}
       expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
     end
@@ -681,16 +681,16 @@ describe DiscussionTopicsController do
       end
 
       it 'should include environment variables if enabled' do
-        ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
-        ConditionalRelease::Service.stubs(:env_for).returns({ dummy: 'value' })
+        allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
+        allow(ConditionalRelease::Service).to receive(:env_for).and_return({ dummy: 'value' })
         get :edit, params: {course_id: @course.id, id: @topic.id}
         expect(response).to have_http_status :success
         expect(controller.js_env[:dummy]).to eq 'value'
       end
 
       it 'should not include environment variables when disabled' do
-        ConditionalRelease::Service.stubs(:enabled_in_context?).returns(false)
-        ConditionalRelease::Service.stubs(:env_for).returns({ dummy: 'value' })
+        allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(false)
+        allow(ConditionalRelease::Service).to receive(:env_for).and_return({ dummy: 'value' })
         get :edit, params: {course_id: @course.id, id: @topic.id}
         expect(response).to have_http_status :success
         expect(controller.js_env).not_to have_key :dummy
@@ -823,7 +823,7 @@ describe DiscussionTopicsController do
       Setting.set('enable_page_views', 'db')
     end
     before(:each) do
-      controller.stubs(:form_authenticity_token => 'abc', :form_authenticity_param => 'abc')
+      allow(controller).to receive_messages(:form_authenticity_token => 'abc', :form_authenticity_param => 'abc')
     end
 
     def topic_params(course, opts={})

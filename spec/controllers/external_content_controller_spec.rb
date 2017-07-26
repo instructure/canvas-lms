@@ -101,13 +101,13 @@ describe ExternalContentController do
       end
 
       before(:each) do
-        Lti::MessageAuthenticator.any_instance.stubs(:valid?).returns(true)
+        allow_any_instance_of(Lti::MessageAuthenticator).to receive(:valid?).and_return(true)
         course_with_teacher
         user_session(@teacher)
       end
 
       it 'validates the signature' do
-        Lti::MessageAuthenticator.any_instance.expects(:valid?).returns(false)
+        expect_any_instance_of(Lti::MessageAuthenticator).to receive(:valid?).and_return(false)
         post(
           :success,
           params: {

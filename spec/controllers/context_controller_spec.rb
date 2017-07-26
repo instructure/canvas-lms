@@ -220,7 +220,7 @@ describe ContextController do
   describe "POST 'object_snippet'" do
     before(:each) do
       @obj = "<object data='test'></object>"
-      HostUrl.stubs(:is_file_host?).returns(true)
+      allow(HostUrl).to receive(:is_file_host?).and_return(true)
       @data = Base64.encode64(@obj)
       @hmac = Canvas::Security.hmac_sha1(@data)
     end
@@ -239,8 +239,8 @@ describe ContextController do
 
   describe "GET '/media_objects/:id/thumbnail" do
     it "should redirect to kaltura even if the MediaObject does not exist" do
-      CanvasKaltura::ClientV3.stubs(:config).returns({})
-      CanvasKaltura::ClientV3.any_instance.expects(:thumbnail_url).returns("http://example.com/thumbnail_redirect")
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
+      expect_any_instance_of(CanvasKaltura::ClientV3).to receive(:thumbnail_url).and_return("http://example.com/thumbnail_redirect")
       get :media_object_thumbnail,
         params: {:id => '0_notexist',
         :width => 100,
@@ -341,7 +341,7 @@ describe ContextController do
   describe "POST 'undelete_item'" do
     it 'does not allow dangerous sends' do
       user_session(@teacher)
-      @course.any_instantiation.expects(:teacher_names).never
+      expect_any_instantiation_of(@course).to receive(:teacher_names).never
       post :undelete_item, params: {course_id: @course.id, asset_string: 'teacher_name_1'}
       expect(response.status).to eq 500
     end

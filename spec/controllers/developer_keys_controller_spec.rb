@@ -115,7 +115,7 @@ describe DeveloperKeysController do
 
     before :each do
       user_session(@test_domain_root_account_admin)
-      LoadAccount.stubs(:default_domain_root_account).returns(@test_domain_root_account)
+      allow(LoadAccount).to receive(:default_domain_root_account).and_return(@test_domain_root_account)
     end
 
     it 'Should be allowed to access their dev keys' do

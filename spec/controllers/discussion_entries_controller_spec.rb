@@ -338,11 +338,11 @@ describe DiscussionEntriesController do
     end
 
     it "should not error if data is missing and kaltura is unresponsive" do
-      mock_client = mock
-      mock_client.stubs(:startSession)
-      mock_client.stubs(:mediaGet).returns(nil)
-      mock_client.stubs(:flavorAssetGetByEntryId).returns(nil)
-      CanvasKaltura::ClientV3.stubs(:new).returns(mock_client)
+      mock_client = double
+      allow(mock_client).to receive(:startSession)
+      allow(mock_client).to receive(:mediaGet).and_return(nil)
+      allow(mock_client).to receive(:flavorAssetGetByEntryId).and_return(nil)
+      allow(CanvasKaltura::ClientV3).to receive(:new).and_return(mock_client)
 
       topic_with_media_reply
       @topic.update_attribute(:podcast_has_student_posts, true)

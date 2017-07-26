@@ -252,7 +252,7 @@ describe FilesController do
 
     describe "with verifiers" do
       it "should allow public access with legacy verifier" do
-        Attachment.any_instance.stubs(:canvadoc_url).returns "stubby"
+        allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return "stubby"
         get 'show', params: {:course_id => @course.id, :id => @file.id, :verifier => @file.uuid}, :format => 'json'
         expect(response).to be_success
         expect(json_parse['attachment']).to_not be_nil
@@ -294,7 +294,7 @@ describe FilesController do
     it "should force download when download_frd is set" do
       user_session(@teacher)
       # this call should happen inside of FilesController#send_attachment
-      FilesController.any_instance.expects(:send_stored_file).with(@file, false)
+      expect_any_instance_of(FilesController).to receive(:send_stored_file).with(@file, false)
       get 'show', params: {:course_id => @course.id, :id => @file.id, :download => 1, :verifier => @file.uuid, :download_frd => 1}
     end
 
@@ -410,7 +410,7 @@ describe FilesController do
 
       it "should mark files as viewed for module progressions if the file data is requested and is canvadocable" do
         file_in_a_module
-        Attachment.any_instance.stubs(:canvadocable?).returns true
+        allow_any_instance_of(Attachment).to receive(:canvadocable?).and_return true
         get 'show', params: {:course_id => @course.id, :id => @file.id}, :format => :json
         @module.reload
         expect(@module.evaluate_for(@student).state).to eql(:completed)
@@ -505,7 +505,7 @@ describe FilesController do
     describe "canvadoc_session_url" do
       before do
         user_session(@student)
-        Canvadocs.stubs(:enabled?).returns true
+        allow(Canvadocs).to receive(:enabled?).and_return true
         @file = canvadocable_attachment_model
       end
 
@@ -588,7 +588,7 @@ describe FilesController do
         allow(s3object).to receive(:get).and_return(s3object)
         allow(s3object).to receive(:body).and_return(s3object)
         allow(s3object).to receive(:read).and_return('hello')
-        @file.any_instantiation.stubs(:s3object).returns(s3object)
+        allow_any_instantiation_of(@file).to receive(:s3object).and_return(s3object)
         get "show_relative", params: {file_id: @file.id, course_id: @course.id, file_path: @file.full_display_path, inline: 1, download: 1}
         expect(response).to be_success
         expect(response.body).to eq 'hello'
@@ -601,7 +601,7 @@ describe FilesController do
         request.host = 'files.test'
         @file.update_attribute(:content_type, 'text/html')
         @file.update_attribute(:size, 1024 * 1024)
-        @file.any_instantiation.stubs(:inline_url).returns("https://s3/myfile")
+        allow_any_instantiation_of(@file).to receive(:inline_url).and_return("https://s3/myfile")
         get "show_relative", params: {file_id: @file.id, course_id: @course.id, file_path: @file.full_display_path, inline: 1, download: 1}
         expect(response).to redirect_to("https://s3/myfile")
       end
@@ -611,7 +611,7 @@ describe FilesController do
         allow(HostUrl).to receive(:file_host).and_return('files.test')
         request.host = 'files.test'
         @file.update_attribute(:content_type, 'image/jpeg')
-        @file.any_instantiation.stubs(:inline_url).returns("https://s3/myfile")
+        allow_any_instantiation_of(@file).to receive(:inline_url).and_return("https://s3/myfile")
         get "show_relative", params: {file_id: @file.id, course_id: @course.id, file_path: @file.full_display_path, inline: 1, download: 1}
         expect(response).to redirect_to("https://s3/myfile")
       end
@@ -621,7 +621,7 @@ describe FilesController do
         allow(HostUrl).to receive(:file_host).and_return('files.test')
         request.host = 'files.test'
         # it's a .doc file
-        @file.any_instantiation.stubs(:download_url).returns("https://s3/myfile")
+        allow_any_instantiation_of(@file).to receive(:download_url).and_return("https://s3/myfile")
         get "show_relative", params: {file_id: @file.id, course_id: @course.id, file_path: @file.full_display_path, inline: 1, download: 1}
         expect(response).to redirect_to("https://s3/myfile")
       end
@@ -1133,6 +1133,7 @@ describe FilesController do
     end
 
     it "should accept the upload data if the policy and attachment are acceptable" do
+      local_storage!
       params = @attachment.ajax_upload_params(@teacher.pseudonym, "", "")
       post "api_create", params: params[:upload_params].merge(:file => @content)
       expect(response).to be_redirect

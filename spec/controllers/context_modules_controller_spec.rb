@@ -411,7 +411,7 @@ describe ContextModulesController do
         tags << make_content_tag(assign, @course, mod)
       end
 
-      ContentTag.expects(:touch_context_modules).once
+      expect(ContentTag).to receive(:touch_context_modules).once
       order = tags.reverse.map(&:id)
       post 'reorder_items', params: {:course_id => @course.id, :context_module_id => mod.id, :order => order.join(",")}
       expect(mod.reload.content_tags.map(&:id)).to eq order
@@ -640,7 +640,7 @@ describe ContextModulesController do
         os = override.assignment_override_students.create!(:user => student)
       end
 
-      AssignmentOverrideApplicator.expects(:overrides_for_assignment_and_user).never
+      expect(AssignmentOverrideApplicator).to receive(:overrides_for_assignment_and_user).never
 
       get 'content_tag_assignment_data', params: {course_id: @course.id}, format: 'json' # precache
       json = JSON.parse response.body.gsub("while(1);",'')
@@ -779,7 +779,7 @@ describe ContextModulesController do
 
   describe "GET 'choose_mastery_path'" do
     before :each do
-      ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
+      allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
     end
 
     before :once do
@@ -797,7 +797,7 @@ describe ContextModulesController do
     it "should return 404 if no rule matches item assignment" do
       user_session(@student)
 
-      ConditionalRelease::Service.stubs(:rules_for).returns([])
+      allow(ConditionalRelease::Service).to receive(:rules_for).and_return([])
 
       get 'choose_mastery_path', params: {:course_id => @course.id, :id => @item.id}
       assert_response(:missing)
@@ -806,7 +806,7 @@ describe ContextModulesController do
     it "should return 404 if matching rule is unlocked but has one selected assignment set" do
       user_session(@student)
 
-      ConditionalRelease::Service.stubs(:rules_for).returns([
+      allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
         {
           trigger_assignment: @assg.id,
           locked: false,
@@ -822,7 +822,7 @@ describe ContextModulesController do
     it "should redirect to context modules page with warning if matching rule is locked" do
       user_session(@student)
 
-      ConditionalRelease::Service.stubs(:rules_for).returns([
+      allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
         {
           trigger_assignment: @assg.id,
           locked: true,
@@ -839,7 +839,7 @@ describe ContextModulesController do
       user_session(@student)
       assg1, assg2 = create_assignments(@course.id, 2).map {|id| Assignment.find(id)}
 
-      ConditionalRelease::Service.stubs(:rules_for).returns([
+      allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
         {
           trigger_assignment: @assg.id,
           locked: false,
@@ -868,7 +868,7 @@ describe ContextModulesController do
     it "should show choose page if matching rule is unlocked and has one unselected assignment set" do
       user_session(@student)
 
-      ConditionalRelease::Service.stubs(:rules_for).returns([
+      allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
         {
           trigger_assignment: @assg.id,
           locked: false,
@@ -890,7 +890,7 @@ describe ContextModulesController do
       user_session(@student)
       assg1, assg2 = create_assignments(@course.id, 2).map {|id| Assignment.find(id)}
 
-      ConditionalRelease::Service.stubs(:rules_for).returns([
+      allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
         {
           trigger_assignment: @assg.id + 1,
           locked: false,

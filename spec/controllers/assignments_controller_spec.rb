@@ -79,43 +79,43 @@ describe AssignmentsController do
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:due_date_required_for_account?).returns(true)
+      allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
       get 'index', params: {:course_id => @course.id}
       expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(true)
     end
 
     it "js_env SIS_INTEGRATION_SETTINGS_ENABLED is true when AssignmentUtil.sis_integration_settings_enabled? == true" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:sis_integration_settings_enabled?).returns(true)
+      allow(AssignmentUtil).to receive(:sis_integration_settings_enabled?).and_return(true)
       get 'index', params: {:course_id => @course.id}
       expect(assigns[:js_env][:SIS_INTEGRATION_SETTINGS_ENABLED]).to eq(true)
     end
 
     it "js_env SIS_INTEGRATION_SETTINGS_ENABLED is false when AssignmentUtil.sis_integration_settings_enabled? == false" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:sis_integration_settings_enabled?).returns(false)
+      allow(AssignmentUtil).to receive(:sis_integration_settings_enabled?).and_return(false)
       get 'index', params: {:course_id => @course.id}
       expect(assigns[:js_env][:SIS_INTEGRATION_SETTINGS_ENABLED]).to eq(false)
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.due_date_required_for_account? == false" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:due_date_required_for_account?).returns(false)
+      allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(false)
       get 'index', params: {:course_id => @course.id}
       expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(false)
     end
 
     it "js_env SIS_NAME is SIS when @context does not respond_to assignments" do
       user_session(@teacher)
-      @course.stubs(:respond_to?).returns(false)
-      controller.stubs(:set_js_assignment_data).returns({:js_env => {}})
+      allow(@course).to receive(:respond_to?).and_return(false)
+      allow(controller).to receive(:set_js_assignment_data).and_return({:js_env => {}})
       get 'index', params: {:course_id => @course.id}
       expect(assigns[:js_env][:SIS_NAME]).to eq('SIS')
     end
 
     it "js_env SIS_NAME is Foo Bar when AssignmentUtil.post_to_sis_friendly_name is Foo Bar" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:post_to_sis_friendly_name).returns('Foo Bar')
+      allow(AssignmentUtil).to receive(:post_to_sis_friendly_name).and_return('Foo Bar')
       get 'index', params: {:course_id => @course.id}
       expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
     end
@@ -141,21 +141,21 @@ describe AssignmentsController do
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:name_length_required_for_account?).returns(true)
+      allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(true)
       get 'index', params: {:course_id => @course.id}
       expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(true)
     end
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.name_length_required_for_account? == false" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:name_length_required_for_account?).returns(false)
+      allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(false)
       get 'index', params: {:course_id => @course.id}
       expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(false)
     end
 
     it "js_env MAX_NAME_LENGTH is a 15 when AssignmentUtil.assignment_max_name_length returns 15" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:assignment_max_name_length).returns(15)
+      allow(AssignmentUtil).to receive(:assignment_max_name_length).and_return(15)
       get 'index', params: {:course_id => @course.id}
       expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
     end
@@ -372,7 +372,7 @@ describe AssignmentsController do
       @assignment.save
       # This is usually a ContentExternalTool, but it only needs to
       # be true here because we aren't redirecting to it.
-      Assignment.any_instance.stubs(:external_tool_tag).returns(true)
+      allow_any_instance_of(Assignment).to receive(:external_tool_tag).and_return(true)
 
       get 'show', params: {:course_id => @course.id, :id => @assignment.id}
 
@@ -405,9 +405,9 @@ describe AssignmentsController do
       plugin_setting = PluginSetting.find_by_name(plugin.id) || PluginSetting.new(:name => plugin.id, :settings => plugin.default_settings)
       plugin_setting.posted_settings = {}
       plugin_setting.save!
-      google_drive_mock = mock('google_drive')
-      google_drive_mock.stubs(:authorized?).returns(true)
-      controller.stubs(:google_drive_connection).returns(google_drive_mock)
+      google_drive_mock = double('google_drive')
+      allow(google_drive_mock).to receive(:authorized?).and_return(true)
+      allow(controller).to receive(:google_drive_connection).and_return(google_drive_mock)
       get 'show', params: {:course_id => @course.id, :id => a.id}
 
       expect(response).to be_success
@@ -487,21 +487,21 @@ describe AssignmentsController do
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:due_date_required_for_account?).returns(true)
+      allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
       get 'new', params: {:course_id => @course.id, :id => @assignment.id}
       expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(true)
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.due_date_required_for_account? == false" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:due_date_required_for_account?).returns(false)
+      allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(false)
       get 'new', params: {:course_id => @course.id, :id => @assignment.id}
       expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(false)
     end
 
     it "js_env SIS_NAME is Foo Bar when AssignmentUtil.post_to_sis_friendly_name is Foo Bar" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:post_to_sis_friendly_name).returns('Foo Bar')
+      allow(AssignmentUtil).to receive(:post_to_sis_friendly_name).and_return('Foo Bar')
       get 'new', params: {:course_id => @course.id, :id => @assignment.id}
       expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
     end
@@ -636,21 +636,21 @@ describe AssignmentsController do
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:due_date_required_for_account?).returns(true)
+      allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
       get 'edit', params: {:course_id => @course.id, :id => @assignment.id}
       expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(true)
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.due_date_required_for_account? == false" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:due_date_required_for_account?).returns(false)
+      allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(false)
       get 'edit', params: {:course_id => @course.id, :id => @assignment.id}
       expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(false)
     end
 
     it "js_env SIS_NAME is Foo Bar when AssignmentUtil.post_to_sis_friendly_name is Foo Bar" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:post_to_sis_friendly_name).returns('Foo Bar')
+      allow(AssignmentUtil).to receive(:post_to_sis_friendly_name).and_return('Foo Bar')
       get 'edit', params: {:course_id => @course.id, :id => @assignment.id}
       expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
     end
@@ -688,7 +688,7 @@ describe AssignmentsController do
         resource_handler: resource_handler
       )
 
-      AssignmentConfigurationToolLookup.any_instance.stubs(:create_subscription).returns true
+      allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:create_subscription).and_return true
       Lti::ToolProxyBinding.create(context: @course, tool_proxy: tool_proxy)
       @assignment.tool_settings_tool = message_handler
       @assignment.save!
@@ -730,18 +730,18 @@ describe AssignmentsController do
 
     context "conditional release" do
       before do
-        ConditionalRelease::Service.stubs(:env_for).returns({ dummy: 'cr-assignment' })
+        allow(ConditionalRelease::Service).to receive(:env_for).and_return({ dummy: 'cr-assignment' })
       end
 
       it "should define env when enabled" do
-        ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
+        allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
         user_session(@teacher)
         get 'edit', params: {:course_id => @course.id, :id => @assignment.id}
         expect(assigns[:js_env][:dummy]).to eq 'cr-assignment'
       end
 
       it "should not define env when not enabled" do
-        ConditionalRelease::Service.stubs(:enabled_in_context?).returns(false)
+        allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(false)
         user_session(@teacher)
         get 'edit', params: {:course_id => @course.id, :id => @assignment.id}
         expect(assigns[:js_env][:dummy]).to be nil
@@ -767,11 +767,11 @@ describe AssignmentsController do
   describe "GET list_google_docs" do
     it "passes errors through to Canvas::Errors" do
       user_session(@teacher)
-      connection = stub()
-      connection.stubs(:list_with_extension_filter).raises(ArgumentError)
-      controller.stubs(:google_drive_connection).returns(connection)
-      Assignment.any_instance.stubs(:allow_google_docs_submission?).returns(true)
-      Canvas::Errors.expects(:capture_exception)
+      connection = double()
+      allow(connection).to receive(:list_with_extension_filter).and_raise(ArgumentError)
+      allow(controller).to receive(:google_drive_connection).and_return(connection)
+      allow_any_instance_of(Assignment).to receive(:allow_google_docs_submission?).and_return(true)
+      expect(Canvas::Errors).to receive(:capture_exception)
       params = {course_id: @course.id, id: @assignment.id}
       get 'list_google_docs', params: params, format: 'json'
       expect(response.code).to eq("200")

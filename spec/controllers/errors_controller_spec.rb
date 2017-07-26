@@ -75,13 +75,13 @@ describe ErrorsController do
     end
 
     it "should not return nil.id if report creation failed" do
-      ErrorReport.expects(:where).once.raises("failed!")
+      expect(ErrorReport).to receive(:where).once.and_raise("failed!")
       post 'create', params: {error: {id: 1}}, format: 'json'
       expect(JSON.parse(response.body)).to eq({ 'logged' => true, 'id' => nil })
     end
 
     it "should not record the user as nil.id if report creation failed" do
-      ErrorReport.expects(:where).once.raises("failed!")
+      expect(ErrorReport).to receive(:where).once.and_raise("failed!")
       post 'create', params: {error: { id: 1 }}
       expect(ErrorReport.last.user_id).to be_nil
     end
@@ -89,7 +89,7 @@ describe ErrorsController do
     it "should record the user if report creation failed" do
       user = User.create!
       user_session(user)
-      ErrorReport.expects(:where).once.raises("failed!")
+      expect(ErrorReport).to receive(:where).once.and_raise("failed!")
       post 'create', params: {error: { id: 1 }}
       expect(ErrorReport.last.user_id).to eq user.id
     end

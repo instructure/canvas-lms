@@ -21,7 +21,7 @@ require 'rotp'
 
 describe Login::CasController do
   def stubby(stub_response, use_mock = true)
-    cas_client = use_mock ? stub_everything(:cas_client) : controller.client
+    cas_client = use_mock ? double(:cas_client).as_null_object : controller.client
     cas_client.instance_variable_set(:@stub_response, stub_response)
     def cas_client.validate_service_ticket(st)
       response = CASClient::ValidationResponse.new(@stub_response)
@@ -29,7 +29,7 @@ describe Login::CasController do
       st.success = response.is_success?
       st
     end
-    AccountAuthorizationConfig::CAS.any_instance.stubs(:client).returns(cas_client) if use_mock
+    allow_any_instance_of(AccountAuthorizationConfig::CAS).to receive(:client).and_return(cas_client) if use_mock
   end
 
   it "should logout with specific cas ticket" do
@@ -135,7 +135,7 @@ describe Login::CasController do
 
     it "should redirect when a user is authorized but not found in canvas" do
       # We dont want to log them out of everything.
-      controller.expects(:logout_user_action).never
+      expect(controller).to receive(:logout_user_action).never
 
       # Default to Login url with a nil value
       session[:sentinel] = true
@@ -184,10 +184,10 @@ describe Login::CasController do
     Setting.set('cas_timelimit', 0.01)
     account_with_cas(account: Account.default)
 
-    cas_client = mock()
-    controller.stubs(:client).returns(cas_client)
+    cas_client = double()
+    allow(controller).to receive(:client).and_return(cas_client)
     start = Time.now.utc
-    cas_client.expects(:validate_service_ticket).returns { sleep 5 }
+    expect(cas_client).to receive(:validate_service_ticket) { sleep 5 }
     session[:sentinel] = true
     get 'new', params: {:ticket => 'ST-abcd'}
     expect(response).to redirect_to(login_url)
@@ -213,10 +213,10 @@ describe Login::CasController do
     stubby("yes\n#{@pseudonym.unique_id}\n")
     account_with_cas(account: Account.site_admin)
     controller.instance_variable_set(:@domain_root_account, Account.site_admin)
-    controller.client.expects(:add_service_to_login_url).returns('someurl')
+    expect(controller.client).to receive(:add_service_to_login_url).and_return('someurl')
 
     cookies['canvas_sa_delegated'] = '1'
-    # *don't* stub domain_root_account
+    # *don't* double domain_root_account
     get 'new'
     expect(response).to be_redirect
   end

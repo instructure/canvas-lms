@@ -34,8 +34,8 @@ describe CrocodocSessionsController do
   end
 
   before :each do
-    Crocodoc::API.any_instance.stubs(:upload).returns 'uuid' => '1234567890'
-    Crocodoc::API.any_instance.stubs(:session).returns 'session' => 'SESSION'
+    allow_any_instance_of(Crocodoc::API).to receive(:upload).and_return 'uuid' => '1234567890'
+    allow_any_instance_of(Crocodoc::API).to receive(:session).and_return 'session' => 'SESSION'
     user_session(@student)
   end
 
@@ -56,7 +56,7 @@ describe CrocodocSessionsController do
     end
 
     it "fails gracefulishly when crocodoc times out" do
-      Crocodoc::API.any_instance.stubs(:session).raises(Timeout::Error)
+      allow_any_instance_of(Crocodoc::API).to receive(:session).and_raise(Timeout::Error)
       get :show, params: {blob: @blob, hmac: @hmac}
       assert_status(503)
     end
@@ -112,17 +112,17 @@ describe CrocodocSessionsController do
     before do
       @attachment.submit_to_crocodoc
       Account.default.enable_feature!(:new_annotations)
-      Canvadocs.stubs(:enabled?).returns true
-      Canvadocs.stubs(:annotations_supported?).returns true
-      Canvadocs.stubs(:hijack_crocodoc_sessions?).returns false
+      allow(Canvadocs).to receive(:enabled?).and_return true
+      allow(Canvadocs).to receive(:annotations_supported?).and_return true
+      allow(Canvadocs).to receive(:hijack_crocodoc_sessions?).and_return false
 
-      Canvadocs::API.any_instance.stubs(:session).returns 'id' => 'SESSION'
+      allow_any_instance_of(Canvadocs::API).to receive(:session).and_return 'id' => 'SESSION'
       PluginSetting.create! :name => 'canvadocs',
                             :settings => { "base_url" => "https://canvadocs.instructure.docker" }
     end
 
     it "should redirect to a canvadocs session instead of crocodoc when enabled" do
-      Canvadocs.stubs(:hijack_crocodoc_sessions?).returns true
+      allow(Canvadocs).to receive(:hijack_crocodoc_sessions?).and_return true
       get :show, params: {blob: @blob, hmac: @hmac}
       expect(response.body).to include 'https://canvadocs.instructure.docker/sessions/SESSION/view'
     end

@@ -34,10 +34,10 @@ describe EquationImagesController do
     context 'when using MathMan' do
       let(:service_url) { 'http://get.mml.com' }
       before do
-        MathMan.expects(
+        allow(MathMan).to receive_messages(
           url_for: service_url,
           use_for_svg?: true
-        ).at_least_once
+        )
       end
 
       it 'redirects to service_url' do

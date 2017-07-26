@@ -107,10 +107,6 @@ describe EpubExportsController do
   end
 
   describe "POST :create.json", type: :request do
-    before :each do
-      EpubExport.any_instance.stubs(:export).returns(true)
-    end
-
     let_once(:url) do
       "/api/v1/courses/#{@course.id}/epub_exports"
     end

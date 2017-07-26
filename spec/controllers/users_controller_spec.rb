@@ -127,16 +127,16 @@ describe UsersController do
   describe "GET oauth" do
     it "sets up oauth for google_drive" do
       state = nil
-      settings_mock = mock()
-      settings_mock.stubs(:settings).returns({})
-      settings_mock.stubs(:enabled?).returns(true)
+      settings_mock = double()
+      allow(settings_mock).to receive(:settings).and_return({})
+      allow(settings_mock).to receive(:enabled?).and_return(true)
 
       user_factory(active_all: true)
       user_session(@user)
 
-      Canvas::Plugin.stubs(:find).returns(settings_mock)
-      SecureRandom.stubs(:hex).returns('abc123')
-      GoogleDrive::Client.expects(:auth_uri).with() {|_c, s| state = s and true}.returns("http://example.com/redirect")
+      allow(Canvas::Plugin).to receive(:find).and_return(settings_mock)
+      allow(SecureRandom).to receive(:hex).and_return('abc123')
+      expect(GoogleDrive::Client).to receive(:auth_uri) { |_c, s| state = s; "http://example.com/redirect" }
 
       get :oauth, params: {service: "google_drive", return_to: "http://example.com"}
 
@@ -152,13 +152,13 @@ describe UsersController do
 
   describe "GET oauth_success" do
     it "handles google_drive oauth_success for a logged_in_user" do
-      settings_mock = mock()
-      settings_mock.stubs(:settings).returns({})
-      authorization_mock = mock('authorization', :code= => nil, fetch_access_token!: nil, refresh_token:'refresh_token', access_token: 'access_token')
-      drive_mock = mock('drive_mock', about: mock(get: nil))
-      client_mock = mock("client", discovered_api:drive_mock, :execute! => mock('result', status: 200, data:{'permissionId' => 'permission_id', 'user' => {'emailAddress' => 'blah@blah.com'}}))
-      client_mock.stubs(:authorization).returns(authorization_mock)
-      GoogleDrive::Client.stubs(:create).returns(client_mock)
+      settings_mock = double()
+      allow(settings_mock).to receive(:settings).and_return({})
+      authorization_mock = double('authorization', :code= => nil, fetch_access_token!: nil, refresh_token:'refresh_token', access_token: 'access_token')
+      drive_mock = double('drive_mock', about: double(get: nil))
+      client_mock = double("client", discovered_api:drive_mock, :execute! => double('result', status: 200, data:{'permissionId' => 'permission_id', 'user' => {'emailAddress' => 'blah@blah.com'}}))
+      allow(client_mock).to receive(:authorization).and_return(authorization_mock)
+      allow(GoogleDrive::Client).to receive(:create).and_return(client_mock)
 
       session[:oauth_gdrive_nonce] = 'abc123'
       state = Canvas::Security.create_jwt({'return_to_url' => 'http://localhost.com/return', 'nonce' => 'abc123'})
@@ -175,13 +175,13 @@ describe UsersController do
     end
 
     it "handles google_drive oauth_success for a non logged in user" do
-      settings_mock = mock()
-      settings_mock.stubs(:settings).returns({})
-      authorization_mock = mock('authorization', :code= => nil, fetch_access_token!: nil, refresh_token:'refresh_token', access_token: 'access_token')
-      drive_mock = mock('drive_mock', about: mock(get: nil))
-      client_mock = mock("client", discovered_api:drive_mock, :execute! => mock('result', status: 200, data:{'permissionId' => 'permission_id'}))
-      client_mock.stubs(:authorization).returns(authorization_mock)
-      GoogleDrive::Client.stubs(:create).returns(client_mock)
+      settings_mock = double()
+      allow(settings_mock).to receive(:settings).and_return({})
+      authorization_mock = double('authorization', :code= => nil, fetch_access_token!: nil, refresh_token:'refresh_token', access_token: 'access_token')
+      drive_mock = double('drive_mock', about: double(get: nil))
+      client_mock = double("client", discovered_api:drive_mock, :execute! => double('result', status: 200, data:{'permissionId' => 'permission_id'}))
+      allow(client_mock).to receive(:authorization).and_return(authorization_mock)
+      allow(GoogleDrive::Client).to receive(:create).and_return(client_mock)
 
       session[:oauth_gdrive_nonce] = 'abc123'
       state = Canvas::Security.create_jwt({'return_to_url' => 'http://localhost.com/return', 'nonce' => 'abc123'})
@@ -194,14 +194,14 @@ describe UsersController do
     end
 
     it "rejects invalid state" do
-      settings_mock = mock()
-      settings_mock.stubs(:settings).returns({})
-      authorization_mock = mock('authorization')
-      authorization_mock.stubs(:code= => nil, fetch_access_token!: nil, refresh_token:'refresh_token', access_token: 'access_token')
-      drive_mock = mock('drive_mock', about: mock(get: nil))
-      client_mock = mock("client", discovered_api:drive_mock, :execute! => mock('result', status: 200, data:{'permissionId' => 'permission_id'}))
-      client_mock.stubs(:authorization).returns(authorization_mock)
-      GoogleDrive::Client.stubs(:create).returns(client_mock)
+      settings_mock = double()
+      allow(settings_mock).to receive(:settings).and_return({})
+      authorization_mock = double('authorization')
+      allow(authorization_mock).to receive_messages(:code= => nil, fetch_access_token!: nil, refresh_token:'refresh_token', access_token: 'access_token')
+      drive_mock = double('drive_mock', about: double(get: nil))
+      client_mock = double("client", discovered_api:drive_mock, :execute! => double('result', status: 200, data:{'permissionId' => 'permission_id'}))
+      allow(client_mock).to receive(:authorization).and_return(authorization_mock)
+      allow(GoogleDrive::Client).to receive(:create).and_return(client_mock)
 
       state = Canvas::Security.create_jwt({'return_to_url' => 'http://localhost.com/return', 'nonce' => 'abc123'})
       get :oauth_success, params: {state: state, service: "google_drive", code: "some_code"}
@@ -539,7 +539,7 @@ describe UsersController do
         end
 
         it "allows admins to force the self-registration workflow for a given user" do
-          Pseudonym.any_instance.expects(:send_confirmation!)
+          expect_any_instance_of(Pseudonym).to receive(:send_confirmation!)
           post 'create', params: {account_id: account.id,
             pseudonym: {
               unique_id: 'jacob@instructure.com', password: 'asdfasdf',
@@ -595,7 +595,7 @@ describe UsersController do
         u = User.create! { |u| u.workflow_state = 'registered' }
         u.communication_channels.create!(:path => 'jacob@instructure.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
         u.pseudonyms.create!(:unique_id => 'jon@instructure.com')
-        CommunicationChannel.any_instance.expects(:send_merge_notification!)
+        expect_any_instance_of(CommunicationChannel).to receive(:send_merge_notification!)
         post 'create', params: {:account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :send_confirmation => '0' }, :user => { :name => 'Jacob Fugal' }}, format: 'json'
         expect(response).to be_success
       end
@@ -1198,7 +1198,7 @@ describe UsersController do
     specs_require_sharding
 
     it "should associate the user with target user's shard" do
-      PageView.stubs(:page_view_method).returns(:db)
+      allow(PageView).to receive(:page_view_method).and_return(:db)
       user_with_pseudonym
       admin = @user
       Account.site_admin.account_users.create!(user: admin)
@@ -1206,7 +1206,7 @@ describe UsersController do
       @shard1.activate do
         account = Account.create!
         user2 = user_with_pseudonym(account: account)
-        LoadAccount.stubs(:default_domain_root_account).returns(account)
+        allow(LoadAccount).to receive(:default_domain_root_account).and_return(account)
         post 'masquerade', params: {user_id: user2.id}
         expect(response).to be_redirect
 
@@ -1215,14 +1215,14 @@ describe UsersController do
     end
 
     it "should not associate the user with target user's shard if masquerading failed" do
-      PageView.stubs(:page_view_method).returns(:db)
+      allow(PageView).to receive(:page_view_method).and_return(:db)
       user_with_pseudonym
       admin = @user
       user_session(admin)
       @shard1.activate do
         account = Account.create!
         user2 = user_with_pseudonym(account: account)
-        LoadAccount.stubs(:default_domain_root_account).returns(account)
+        allow(LoadAccount).to receive(:default_domain_root_account).and_return(account)
         post 'masquerade', params: {user_id: user2.id}
         expect(response).not_to be_redirect
 
@@ -1238,7 +1238,7 @@ describe UsersController do
       @shard1.activate do
         account = Account.create!
         user2 = user_with_pseudonym(account: account)
-        LoadAccount.stubs(:default_domain_root_account).returns(account)
+        allow(LoadAccount).to receive(:default_domain_root_account).and_return(account)
         post 'masquerade', params: {user_id: user2.id}
         expect(response).to be_redirect
 
@@ -1249,14 +1249,14 @@ describe UsersController do
 
   describe 'GET media_download' do
     let(:kaltura_client) do
-      kaltura_client = mock('CanvasKaltura::ClientV3').responds_like_instance_of(CanvasKaltura::ClientV3)
-      CanvasKaltura::ClientV3.stubs(:new).returns(kaltura_client)
+      kaltura_client = instance_double('CanvasKaltura::ClientV3')
+      allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kaltura_client)
       kaltura_client
     end
 
     let(:media_source_fetcher) {
-      media_source_fetcher = mock('MediaSourceFetcher').responds_like_instance_of(MediaSourceFetcher)
-      MediaSourceFetcher.expects(:new).with(kaltura_client).returns(media_source_fetcher)
+      media_source_fetcher = instance_double('MediaSourceFetcher')
+      expect(MediaSourceFetcher).to receive(:new).with(kaltura_client).and_return(media_source_fetcher)
       media_source_fetcher
     }
 
@@ -1267,17 +1267,17 @@ describe UsersController do
     end
 
     it 'should pass type and media_type params down to the media fetcher' do
-      media_source_fetcher.expects(:fetch_preferred_source_url).
+      expect(media_source_fetcher).to receive(:fetch_preferred_source_url).
         with(media_id: 'someMediaId', file_extension: 'mp4', media_type: 'video').
-        returns('http://example.com/media.mp4')
+        and_return('http://example.com/media.mp4')
 
       get 'media_download', params: {user_id: @student.id, entryId: 'someMediaId', type: 'mp4', media_type: 'video'}
     end
 
     context 'when redirect is set to 1' do
       it 'should redirect to the url' do
-        media_source_fetcher.stubs(:fetch_preferred_source_url).
-          returns('http://example.com/media.mp4')
+        allow(media_source_fetcher).to receive(:fetch_preferred_source_url).
+          and_return('http://example.com/media.mp4')
 
         get 'media_download', params: {user_id: @student.id, entryId: 'someMediaId', type: 'mp4', redirect: '1'}
 
@@ -1287,8 +1287,8 @@ describe UsersController do
 
     context 'when redirect does not equal 1' do
       it 'should render the url in json' do
-        media_source_fetcher.stubs(:fetch_preferred_source_url).
-          returns('http://example.com/media.mp4')
+        allow(media_source_fetcher).to receive(:fetch_preferred_source_url).
+          and_return('http://example.com/media.mp4')
 
         get 'media_download', params: {user_id: @student.id, entryId: 'someMediaId', type: 'mp4'}
 
@@ -1298,8 +1298,8 @@ describe UsersController do
 
     context 'when asset is not found' do
       it 'should render a 404 and error message' do
-        media_source_fetcher.stubs(:fetch_preferred_source_url).
-          returns(nil)
+        allow(media_source_fetcher).to receive(:fetch_preferred_source_url).
+          and_return(nil)
 
         get 'media_download', params: {user_id: @student.id, entryId: 'someMediaId', type: 'mp4'}
 
@@ -1315,12 +1315,12 @@ describe UsersController do
     end
 
     it "should hook on new" do
-      controller.expects(:run_login_hooks).once
+      expect(controller).to receive(:run_login_hooks).once
       get "new"
     end
 
     it "should hook on failed create" do
-      controller.expects(:run_login_hooks).once
+      expect(controller).to receive(:run_login_hooks).once
       post "create"
     end
   end
@@ -1440,7 +1440,7 @@ describe UsersController do
     end
 
     it 'works with a teacher with open_registration' do
-      Account.default.any_instantiation.stubs(:open_registration?).returns(true)
+      allow_any_instantiation_of(Account.default).to receive(:open_registration?).and_return(true)
       course_with_teacher_logged_in(:active_all => true)
 
       post 'invite_users', params: {:course_id => @course.id}
@@ -1448,7 +1448,7 @@ describe UsersController do
     end
 
     it 'invites a bunch of users' do
-      Account.default.any_instantiation.stubs(:open_registration?).returns(true)
+      allow_any_instantiation_of(Account.default).to receive(:open_registration?).and_return(true)
       course_with_teacher_logged_in(:active_all => true)
 
       user_list = [{'email' => 'example1@example.com'}, {'email' => 'example2@example.com', 'name' => 'Hurp Durp'}]
@@ -1466,7 +1466,7 @@ describe UsersController do
     it 'checks for pre-existing users' do
       existing_user = user_with_pseudonym(:active_all => true, :username => "example1@example.com")
 
-      Account.default.any_instantiation.stubs(:open_registration?).returns(true)
+      allow_any_instantiation_of(Account.default).to receive(:open_registration?).and_return(true)
       course_with_teacher_logged_in(:active_all => true)
 
       user_list = [{'email' => 'example1@example.com'}]

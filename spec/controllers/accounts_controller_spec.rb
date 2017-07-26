@@ -269,7 +269,7 @@ describe AccountsController do
     it "should sort courses as specified" do
       account_with_admin_logged_in(account: @account)
       course_with_teacher(:account => @account)
-      Account.any_instance.expects(:fast_all_courses).with(has_entry(order: "courses.created_at DESC"))
+      expect_any_instance_of(Account).to receive(:fast_all_courses).with(include(order: "courses.created_at DESC"))
       get 'show', params: {:id => @account.id, :courses_sort_order => "created_at_desc"}, :format => 'html'
       expect(@admin.reload.preferences[:course_sort]).to eq 'created_at_desc'
     end
@@ -294,7 +294,7 @@ describe AccountsController do
 
     before :each do
       user_session(@admin)
-      LoadAccount.stubs(:default_domain_root_account).returns(@account)
+      allow(LoadAccount).to receive(:default_domain_root_account).and_return(@account)
     end
 
     it "should allow self" do

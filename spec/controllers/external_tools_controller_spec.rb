@@ -30,7 +30,7 @@ describe ExternalToolsController do
 
     before :each do
       @iat = Time.zone.now
-      Time.zone.class.any_instance.stubs(:now).returns(@iat)
+      allow_any_instance_of(Time.zone.class).to receive(:now).and_return(@iat)
       @tool = new_valid_tool(@course)
       @tool.course_navigation = { message_type: 'ContentItemSelectionResponse' }
       @tool.save!
@@ -191,7 +191,7 @@ describe ExternalToolsController do
 
       it "generates launch params for a ContentItemSelectionResponse message" do
         user_session(@teacher)
-        HostUrl.stubs(:outgoing_email_address).returns('some_address')
+        allow(HostUrl).to receive(:outgoing_email_address).and_return('some_address')
 
         @course.root_account.lti_guid = 'root-account-guid'
         @course.root_account.name = 'root account'
@@ -1048,7 +1048,7 @@ describe ExternalToolsController do
 </cartridge_basiclti_link>
       XML
       obj = OpenStruct.new({:body => xml})
-      Net::HTTP.any_instance.stubs(:request).returns(obj)
+      allow_any_instance_of(Net::HTTP).to receive(:request).and_return(obj)
       post 'create', params: {:course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url", :config_url => "http://config.example.com"}}, :format => "json"
 
       expect(response).to be_success
@@ -1063,7 +1063,7 @@ describe ExternalToolsController do
     end
 
     it "should fail gracefully on invalid URL retrieval or timeouts" do
-      Net::HTTP.any_instance.stubs(:request).raises(Timeout::Error)
+      allow_any_instance_of(Net::HTTP).to receive(:request).and_raise(Timeout::Error)
       user_session(@teacher)
       xml = "bob"
       post 'create', params: {:course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url", :config_url => "http://config.example.com"}}, :format => "json"

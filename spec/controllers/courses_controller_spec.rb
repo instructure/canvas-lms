@@ -1394,13 +1394,13 @@ describe CoursesController do
     end
 
     it "should log published event on update" do
-      Auditors::Course.expects(:record_published).once
+      expect(Auditors::Course).to receive(:record_published).once
       user_session(@teacher)
       put 'update', params: {:id => @course.id, :offer => true}
     end
 
     it "should log claimed event on update" do
-      Auditors::Course.expects(:record_claimed).once
+      expect(Auditors::Course).to receive(:record_claimed).once
       user_session(@teacher)
       put 'update', params: {:id => @course.id, :course => {:event => 'claim'}}
     end
@@ -1837,7 +1837,7 @@ describe CoursesController do
     end
 
     it 'should not try and publish grades' do
-      Course.any_instance.expects(:publish_final_grades).times(0)
+      expect_any_instance_of(Course).to receive(:publish_final_grades).never
       user_session(@teacher)
       get 'sis_publish_status', params: {:course_id => @course.id}
       expect(response).to be_success
@@ -1934,7 +1934,7 @@ describe CoursesController do
       a1.grade_student(students[1].user, { :grade => "6", :grader => @teacher })
       a2.grade_student(students[1].user, { :grade => "7", :grader => @teacher })
 
-      SSLCommon.expects(:post_data).once
+      expect(SSLCommon).to receive(:post_data).once
       post "publish_to_sis", params: {:course_id => @course.id}
 
       expect(response).to be_success

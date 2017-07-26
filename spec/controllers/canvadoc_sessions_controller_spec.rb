@@ -30,8 +30,8 @@ describe CanvadocSessionsController do
   before :each do
     PluginSetting.create! :name => 'canvadocs',
                           :settings => {"base_url" => "https://example.com"}
-    Canvadocs::API.any_instance.stubs(:upload).returns "id" => 1234
-    Canvadocs::API.any_instance.stubs(:session).returns 'id' => 'SESSION'
+    allow_any_instance_of(Canvadocs::API).to receive(:upload).and_return "id" => 1234
+    allow_any_instance_of(Canvadocs::API).to receive(:session).and_return 'id' => 'SESSION'
     user_session(@teacher)
   end
 
@@ -51,7 +51,7 @@ describe CanvadocSessionsController do
 
     it "doesn't upload documents that are already uploaded" do
       @attachment1.submit_to_canvadocs
-      Attachment.any_instance.expects(:submit_to_canvadocs).never
+      expect_any_instance_of(Attachment).to receive(:submit_to_canvadocs).never
       get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
       expect(response).to redirect_to("https://example.com/sessions/SESSION/view?theme=dark")
     end
@@ -71,10 +71,10 @@ describe CanvadocSessionsController do
       Account.default.settings[:canvadocs_prefer_office_online] = true
       Account.default.save!
 
-      Attachment.stubs(:find).returns(@attachment1)
-      @attachment1.expects(:submit_to_canvadocs).with do |arg1, arg2|
-        arg1 == 1 &&
-        arg2[:preferred_plugins] == [
+      allow(Attachment).to receive(:find).and_return(@attachment1)
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+        expect(arg1).to eq 1
+        expect(arg2[:preferred_plugins]).to eq [
           Canvadocs::RENDER_O365,
           Canvadocs::RENDER_PDFJS,
           Canvadocs::RENDER_BOX,
@@ -89,10 +89,10 @@ describe CanvadocSessionsController do
       Account.default.settings[:canvadocs_prefer_office_online] = false
       Account.default.save!
 
-      Attachment.stubs(:find).returns(@attachment1)
-      @attachment1.expects(:submit_to_canvadocs).with do |arg1, arg2|
-        arg1 == 1 &&
-        arg2[:preferred_plugins] == [
+      allow(Attachment).to receive(:find).and_return(@attachment1)
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+        expect(arg1).to eq 1
+        expect(arg2[:preferred_plugins]).to eq [
           Canvadocs::RENDER_PDFJS,
           Canvadocs::RENDER_BOX,
           Canvadocs::RENDER_CROCODOC
@@ -103,10 +103,10 @@ describe CanvadocSessionsController do
     end
 
     it "should always send PDFjs as a preferred plugin" do
-      Attachment.stubs(:find).returns(@attachment1)
-      @attachment1.expects(:submit_to_canvadocs).with do |arg1, arg2|
-        arg1 == 1 &&
-        arg2[:preferred_plugins] == [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC]
+      allow(Attachment).to receive(:find).and_return(@attachment1)
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+        expect(arg1).to eq 1
+        expect(arg2[:preferred_plugins]).to eq [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC]
       end
 
       get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
@@ -134,7 +134,7 @@ describe CanvadocSessionsController do
     end
 
     it "fails gracefulishly when canvadocs times out" do
-      Canvadocs::API.any_instance.stubs(:session).raises(Timeout::Error)
+      allow_any_instance_of(Canvadocs::API).to receive(:session).and_raise(Timeout::Error)
       get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
       assert_status(503)
     end

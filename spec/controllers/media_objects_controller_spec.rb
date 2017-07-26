@@ -22,8 +22,8 @@ describe MediaObjectsController do
   describe "GET 'show'" do
     before do
       # We don't actually want to ping kaltura during these tests
-      MediaObject.stubs(:media_id_exists?).returns(true)
-      MediaObject.any_instance.stubs(:media_sources).returns([])
+      allow(MediaObject).to receive(:media_id_exists?).and_return(true)
+      allow_any_instance_of(MediaObject).to receive(:media_sources).and_return([])
     end
     
     it "should create a MediaObject if necessary on request" do

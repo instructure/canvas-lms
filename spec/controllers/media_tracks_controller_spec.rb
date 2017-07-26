@@ -30,7 +30,7 @@ describe MediaTracksController do
 
   describe "#create" do
     it "should create a track" do
-      @mo.any_instantiation.expects(:media_sources).returns(nil)
+      expect_any_instantiation_of(@mo).to receive(:media_sources).and_return(nil)
       content = "one track mind"
       post 'create', params: {:media_object_id => @mo.media_id, :kind => 'subtitles', :locale => 'en', :content => content}
       expect(response).to be_success
@@ -50,7 +50,7 @@ describe MediaTracksController do
 
   describe "#destroy" do
     it "should destroy a track" do
-      @mo.any_instantiation.expects(:media_sources).returns(nil)
+      expect_any_instantiation_of(@mo).to receive(:media_sources).and_return(nil)
       track = @mo.media_tracks.create!(kind: 'subtitles', locale: 'en', content: "subs")
       delete 'destroy', params: {:media_object_id => @mo.media_id, :media_track_id => track.id}
       expect(MediaTrack.where(:id => track.id).first).to be_nil

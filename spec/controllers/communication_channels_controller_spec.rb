@@ -547,7 +547,6 @@ describe CommunicationChannelsController do
       end
 
       it "should not show users that can't have a pseudonym created for the correct account" do
-        Pseudonym.any_instance.stubs(:works_for_account?).returns(false)
         @account1.authentication_providers.scope.delete_all
         @account1.authentication_providers.create!(:auth_type => 'cas')
         user_with_pseudonym(:active_all => 1, :account => @account1, :username => 'jt@instructure.com')
@@ -564,7 +563,6 @@ describe CommunicationChannelsController do
       end
 
       it "should create a pseudonym in the target account by copying an existing pseudonym when merging" do
-        Pseudonym.any_instance.stubs(:works_for_account?).returns(false)
         user_with_pseudonym(:active_all => 1, :username => 'jt@instructure.com')
         @old_user = @user
 
@@ -587,7 +585,6 @@ describe CommunicationChannelsController do
       end
 
       it "should include all pseudonyms if there are multiple" do
-        Pseudonym.any_instance.stubs(:works_for_account?).returns(false)
         user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :account => @account1)
         @pseudonym1 = @pseudonym
         @user1 = @user
@@ -931,7 +928,7 @@ describe CommunicationChannelsController do
         end
 
         it 'limits to CommunicationChannel::BulkActions::ResetBounceCounts.bulk_limit' do
-          CommunicationChannel::BulkActions::ResetBounceCounts.stubs(:bulk_limit).returns(5)
+          allow(CommunicationChannel::BulkActions::ResetBounceCounts).to receive(:bulk_limit).and_return(5)
           now = Time.zone.now
 
           user_with_pseudonym
@@ -1044,7 +1041,7 @@ describe CommunicationChannelsController do
         end
 
         it 'respects the BULK_LIMIT' do
-          CommunicationChannel::BulkActions::ResetBounceCounts.stubs(:bulk_limit).returns(5)
+          allow(CommunicationChannel::BulkActions::ResetBounceCounts).to receive(:bulk_limit).and_return(5)
           now = Time.zone.now
 
           user_with_pseudonym

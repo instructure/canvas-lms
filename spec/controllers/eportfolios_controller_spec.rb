@@ -62,11 +62,7 @@ describe EportfoliosController do
       }
 
       before do
-        Canvas::DynamicSettings.stubs(:find).with("canvas", use_env: false).returns(fake_secrets)
-      end
-
-      after do
-        Canvas::DynamicSettings.unstub(:find)
+        allow(Canvas::DynamicSettings).to receive(:find).with("canvas", use_env: false).and_return(fake_secrets)
       end
 
       it "assigns variables" do
@@ -78,7 +74,7 @@ describe EportfoliosController do
 
       it "exposes the feature state for rich content service to js_env" do
         @user.account.root_account.enable_feature!(:rich_content_service_high_risk)
-        Canvas::DynamicSettings.stubs(:find).with("rich-content-service", use_env: false).returns({
+        allow(Canvas::DynamicSettings).to receive(:find).with("rich-content-service", use_env: false).and_return({
           'app-host' => 'rce.docker',
           'cdn-host' => 'rce.docker'
         })

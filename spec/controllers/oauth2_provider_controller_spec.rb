@@ -74,9 +74,9 @@ describe Oauth2ProviderController do
       before :each do
         user_session(@user)
 
-        redis = stub('Redis')
-        redis.stubs(:setex)
-        Canvas.stubs(:redis => redis)
+        redis = double('Redis')
+        allow(redis).to receive(:setex)
+        allow(Canvas).to receive_messages(:redis => redis)
       end
 
       it 'should redirect to the confirm url if the user has no token' do
@@ -152,10 +152,10 @@ describe Oauth2ProviderController do
     let(:valid_code) {"thecode"}
     let(:valid_code_redis_key) {"#{Canvas::Oauth::Token::REDIS_PREFIX}#{valid_code}"}
     let(:redis) do
-      redis = stub('Redis')
-      redis.stubs(:get)
-      redis.stubs(:get).with(valid_code_redis_key).returns(%Q{{"client_id": #{key.id}, "user": #{user.id}}})
-      redis.stubs(:del).with(valid_code_redis_key).returns(%Q{{"client_id": #{key.id}, "user": #{user.id}}})
+      redis = double('Redis')
+      allow(redis).to receive(:get)
+      allow(redis).to receive(:get).with(valid_code_redis_key).and_return(%Q{{"client_id": #{key.id}, "user": #{user.id}}})
+      allow(redis).to receive(:del).with(valid_code_redis_key).and_return(%Q{{"client_id": #{key.id}, "user": #{user.id}}})
       redis
     end
 
@@ -184,15 +184,15 @@ describe Oauth2ProviderController do
     end
 
     it 'renders a 400 if the provided code does not match a token' do
-      Canvas.stubs(:redis => redis)
+      allow(Canvas).to receive_messages(:redis => redis)
       post :token, params: {:client_id => key.id, :client_secret => key.api_key, :code => "NotALegitCode"}
       assert_status(400)
       expect(response.body).to match /authorization_code not found/
     end
 
     it 'outputs the token json if everything checks out' do
-      redis.expects(:del).with(valid_code_redis_key).at_least_once
-      Canvas.stubs(:redis => redis)
+      expect(redis).to receive(:del).with(valid_code_redis_key).at_least(:once)
+      allow(Canvas).to receive_messages(:redis => redis)
       post :token, params: {client_id: key.id, client_secret: key.api_key, grant_type: 'authorization_code', code: valid_code}
       expect(response).to be_success
       json = JSON.parse(response.body)
@@ -201,7 +201,7 @@ describe Oauth2ProviderController do
     end
 
     it 'renders a 400 if the provided code is for the wrong key' do
-      Canvas.stubs(:redis => redis)
+      allow(Canvas).to receive_messages(:redis => redis)
       key2 = DeveloperKey.create!
       post :token, params: {client_id: key2.id.to_s, client_secret: key2.api_key, grant_type: 'authorization_code', code: valid_code}
       assert_status(400)
@@ -209,8 +209,8 @@ describe Oauth2ProviderController do
     end
 
     it 'default grant_type to authorization_code if none is supplied and code is present' do
-      redis.expects(:del).with(valid_code_redis_key).at_least_once
-      Canvas.stubs(:redis => redis)
+      expect(redis).to receive(:del).with(valid_code_redis_key).at_least(:once)
+      allow(Canvas).to receive_messages(:redis => redis)
       post :token, params: {:client_id => key.id, :client_secret => key.api_key, :code => valid_code}
       expect(response).to be_success
       json = JSON.parse(response.body)
@@ -219,7 +219,7 @@ describe Oauth2ProviderController do
 
     it 'deletes existing tokens for the same key when replace_tokens=1' do
       old_token = user.access_tokens.create! :developer_key => key
-      Canvas.stubs(:redis => redis)
+      allow(Canvas).to receive_messages(:redis => redis)
       post :token, params: {:client_id => key.id, :client_secret => key.api_key, :code => valid_code, :replace_tokens => '1'}
       expect(response).to be_success
       expect(AccessToken.exists?(old_token.id)).to be(false)
@@ -227,7 +227,7 @@ describe Oauth2ProviderController do
 
     it 'does not delete existing tokens without replace_tokens' do
       old_token = user.access_tokens.create! :developer_key => key
-      Canvas.stubs(:redis => redis)
+      allow(Canvas).to receive_messages(:redis => redis)
       post :token, params: {:client_id => key.id, :client_secret => key.api_key, :code => valid_code}
       expect(response).to be_success
       expect(AccessToken.exists?(old_token.id)).to be(true)
@@ -309,7 +309,7 @@ describe Oauth2ProviderController do
     before { user_session user }
 
     it 'uses the global id of the user for generating the code' do
-      Canvas::Oauth::Token.expects(:generate_code_for).with(user.global_id, key.id, {:scopes => nil, :remember_access => nil, :purpose => nil}).returns('code')
+      expect(Canvas::Oauth::Token).to receive(:generate_code_for).with(user.global_id, key.id, {:scopes => nil, :remember_access => nil, :purpose => nil}).and_return('code')
       oauth_accept
       expect(response).to redirect_to(oauth2_auth_url(:code => 'code'))
     end
@@ -317,24 +317,24 @@ describe Oauth2ProviderController do
     it 'saves the requested scopes with the code' do
       scopes = 'userinfo'
       session_hash[:oauth2][:scopes] = scopes
-      Canvas::Oauth::Token.expects(:generate_code_for).with(user.global_id, key.id, {:scopes => scopes, :remember_access => nil, :purpose => nil}).returns('code')
+      expect(Canvas::Oauth::Token).to receive(:generate_code_for).with(user.global_id, key.id, {:scopes => scopes, :remember_access => nil, :purpose => nil}).and_return('code')
       oauth_accept
     end
 
     it 'remembers the users access preference with the code' do
-      Canvas::Oauth::Token.expects(:generate_code_for).with(user.global_id, key.id, {:scopes => nil, :remember_access => '1', :purpose => nil}).returns('code')
+      expect(Canvas::Oauth::Token).to receive(:generate_code_for).with(user.global_id, key.id, {:scopes => nil, :remember_access => '1', :purpose => nil}).and_return('code')
       post :accept, params: {:remember_access => '1'}, session: session_hash
     end
 
     it 'removes oauth session info after code generation' do
-      Canvas::Oauth::Token.stubs(:generate_code_for => 'code')
+      allow(Canvas::Oauth::Token).to receive_messages(:generate_code_for => 'code')
       oauth_accept
       expect(controller.session[:oauth2]).to be_nil
     end
 
     it 'forwards the oauth state if it was provided' do
       session_hash[:oauth2][:state] = '1234567890'
-      Canvas::Oauth::Token.stubs(:generate_code_for => 'code')
+      allow(Canvas::Oauth::Token).to receive_messages(:generate_code_for => 'code')
       oauth_accept
       expect(response).to redirect_to(oauth2_auth_url(:code => 'code', :state => '1234567890'))
     end

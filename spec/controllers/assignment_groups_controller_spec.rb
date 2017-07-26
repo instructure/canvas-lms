@@ -235,7 +235,7 @@ describe AssignmentGroupsController do
 
         it 'does not check visibilities on individual assignemnts' do
           # ensures that check is not an N+1 from the gradebook
-          Assignment.any_instance.expects(:students_with_visibility).never
+          expect_any_instance_of(Assignment).to receive(:students_with_visibility).never
           get 'index', params: {:course_id => @course.id, :include => ['assignments','assignment_visibility']}, :format => :json
           expect(response).to be_success
         end
@@ -275,8 +275,8 @@ describe AssignmentGroupsController do
 
       it 'only makes the call to get effective due dates once when assignments are included' do
         @course.assignments.create!
-        stub = EffectiveDueDates.for_course(@course)
-        EffectiveDueDates.expects(:for_course).once.returns(stub)
+        double = EffectiveDueDates.for_course(@course)
+        expect(EffectiveDueDates).to receive(:for_course).once.and_return(double)
         api_call_as_user(@teacher, :get,
           "/api/v1/courses/#{@course.id}/assignment_groups", {
           controller: 'assignment_groups',
@@ -693,7 +693,7 @@ describe AssignmentGroupsController do
     end
 
     it 'does not allow users to delete assignment groups with frozen assignments' do
-      PluginSetting.stubs(:settings_for_plugin).returns(title: 'yes')
+      allow(PluginSetting).to receive(:settings_for_plugin).and_return(title: 'yes')
       user_session(@teacher)
       group = @course.assignment_groups.create!(name: 'group 1')
       assignment = @course.assignments.create!(

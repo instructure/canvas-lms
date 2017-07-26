@@ -176,7 +176,7 @@ module Lti
 
       describe '#as_json' do
         it 'provides the right next_page url when no page/per_page/role params are given' do
-          Api.stubs(:per_page).returns(1)
+          allow(Api).to receive(:per_page).and_return(1)
           get 'course_index', params: {course_id: @course.id}
           hash = json_parse.with_indifferent_access
 
@@ -188,7 +188,7 @@ module Lti
         end
 
         it 'provides the right next_page url when page/per_page/role params are given' do
-          Api.stubs(:per_page).returns(1)
+          allow(Api).to receive(:per_page).and_return(1)
           get 'course_index', params: {course_id: @course.id, page: 2, per_page: 1, role: 'Instructor'}
           hash = json_parse.with_indifferent_access
 
@@ -200,7 +200,7 @@ module Lti
         end
 
         it 'returns nil for the next page url when the last page in the collection was requested' do
-          Api.stubs(:per_page).returns(1)
+          allow(Api).to receive(:per_page).and_return(1)
           get 'course_index', params: {course_id: @course.id, page: 3, per_page: 1, role: 'Instructor'}
           hash = json_parse.with_indifferent_access
 
@@ -371,7 +371,7 @@ module Lti
 
       describe '#as_json' do
         it 'provides the right next_page url when no page/per_page/role params are given' do
-          Api.stubs(:per_page).returns(1)
+          allow(Api).to receive(:per_page).and_return(1)
           get 'group_index', params: {group_id: @group.id}
           hash = json_parse.with_indifferent_access
 
@@ -383,7 +383,7 @@ module Lti
         end
 
         it 'provides the right next_page url when page/per_page/role params are given' do
-          Api.stubs(:per_page).returns(1)
+          allow(Api).to receive(:per_page).and_return(1)
           get 'group_index', params: {group_id: @group.id, page: 2, per_page: 1, role: 'Instructor'}
           hash = json_parse.with_indifferent_access
 
@@ -395,7 +395,7 @@ module Lti
         end
 
         it 'returns nil for the next page url when the last page in the collection was requested' do
-          Api.stubs(:per_page).returns(1)
+          allow(Api).to receive(:per_page).and_return(1)
           get 'group_index', params: {group_id: @group.id, page: 3, per_page: 1, role: 'Instructor'}
           hash = json_parse.with_indifferent_access
 

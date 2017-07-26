@@ -95,7 +95,7 @@ describe LtiApiController, type: :request do
 
   it "adds xml to an error report if the xml is invalid according to spec" do
     body = %{<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"></imsx_POXEnvelopeRequest>}
-    Canvas::Errors.expects(:capture).with { |_, opts| opts[:extra][:xml].present? }.returns({})
+    expect(Canvas::Errors).to receive(:capture) { |_, opts| expect(opts[:extra][:xml]).to be_present; {} }
     make_call('body' => body)
   end
 

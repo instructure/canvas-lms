@@ -93,14 +93,14 @@ describe Quizzes::QuizSubmissionsController do
       expect(events.size).to be_equal(1)
     end
   end
-  
+
   describe "PUT 'update'" do
     before(:once) { quiz_with_submission }
     it "should require authentication" do
       put 'update', params: {:course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id}
       assert_unauthorized
     end
-    
+
     it "should allow updating scores if the teacher is logged in" do
       user_session(@teacher)
       put 'update', params: {:course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id, "question_score_128" => "2"}
@@ -108,7 +108,7 @@ describe Quizzes::QuizSubmissionsController do
       expect(assigns[:submission]).not_to be_nil
       expect(assigns[:submission].submission_data[0][:points]).to eq 2
     end
-    
+
     it "should not allow updating if the course is concluded" do
       @teacher_enrollment.conclude
       put 'update', params: {:course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id}
@@ -195,10 +195,8 @@ describe Quizzes::QuizSubmissionsController do
       it "queues a job to get all attachments for all submissions of a quiz" do
         user_session(@teacher)
         quiz = course_quiz !!:active
-        ContentZipper.expects(:send_later_enqueue_args).with {|first_arg,second_arg|
-          expect(first_arg).to eq :process_attachment
-          expect(second_arg).to eq({priority: Delayed::LOW_PRIORITY, max_attempts: 1})
-        }
+        expect(ContentZipper).to receive(:send_later_enqueue_args).with(:process_attachment,
+          {priority: Delayed::LOW_PRIORITY, max_attempts: 1}, anything)
         get 'index', params: {quiz_id: quiz.id, zip: '1', course_id: @course}
       end
     end

@@ -241,7 +241,7 @@ describe PseudonymsController do
         Account.default.pseudonyms.create!(unique_id: 'user', user: user2)
         account2 = Account.create!
 
-        LoadAccount.stubs(:default_domain_root_account).returns(account2)
+        allow(LoadAccount).to receive(:default_domain_root_account).and_return(account2)
         post 'create', params: {user_id: user2.id, pseudonym: { unique_id: 'user' }}
         assert_unauthorized
       end
@@ -251,7 +251,7 @@ describe PseudonymsController do
         Account.default.pseudonyms.create!(unique_id: 'user', user: user2)
         Account.site_admin.account_users.create!(user: user2)
 
-        LoadAccount.stubs(:default_domain_root_account).returns(Account.site_admin)
+        allow(LoadAccount).to receive(:default_domain_root_account).and_return(Account.site_admin)
         post 'create', params: {user_id: user2.id, pseudonym: { unique_id: 'user' }}
         assert_unauthorized
       end
@@ -271,7 +271,7 @@ describe PseudonymsController do
       end
 
       before :each do
-        LoadAccount.stubs(:default_domain_root_account).returns(@account)
+        allow(LoadAccount).to receive(:default_domain_root_account).and_return(@account)
         user_session(@user, @pseudonym)
       end
 

@@ -29,8 +29,8 @@ describe ConferencesController do
   end
 
   before :each do
-    WimbaConference.any_instance.stubs(:send_request).returns('')
-    WimbaConference.any_instance.stubs(:get_auth_token).returns('abc123')
+    allow_any_instance_of(WimbaConference).to receive(:send_request).and_return('')
+    allow_any_instance_of(WimbaConference).to receive(:get_auth_token).and_return('abc123')
   end
 
   describe "GET 'index'" do
@@ -178,7 +178,7 @@ describe ConferencesController do
       @conference = @course.web_conferences.create!(:conference_type => 'Wimba', :user => @teacher)
       @conference.update_attribute :start_at, 1.month.ago
       @conference.users << @student
-      WimbaConference.any_instance.stubs(:conference_status).returns(:closed)
+      allow_any_instance_of(WimbaConference).to receive(:conference_status).and_return(:closed)
       post 'join', params: {:course_id => @course.id, :conference_id => @conference.id}
       expect(response).to be_redirect
       expect(response['Location']).to match /wimba\.test/
@@ -196,7 +196,7 @@ describe ConferencesController do
       end
 
       it "should not let students join an inactive conference" do
-        WimbaConference.any_instance.expects(:active?).returns(false)
+        expect_any_instance_of(WimbaConference).to receive(:active?).and_return(false)
         post 'join', params: {:course_id => @course.id, :conference_id => @conference.id}
         expect(response).to be_redirect
         expect(response['Location']).not_to match /wimba\.test/
@@ -206,7 +206,7 @@ describe ConferencesController do
       describe 'when the conference is active' do
         before do
           Setting.set('enable_page_views', 'db')
-          WimbaConference.any_instance.expects(:active?).returns(true)
+          expect_any_instance_of(WimbaConference).to receive(:active?).and_return(true)
           post 'join', params: {:course_id => @course.id, :conference_id => @conference.id}
         end
 

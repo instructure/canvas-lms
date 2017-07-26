@@ -22,7 +22,7 @@ describe Login::Oauth2Controller do
   let(:aac) { Account.default.authentication_providers.create!(auth_type: 'facebook') }
   before do
     aac
-    Canvas::Plugin.find(:facebook).stubs(:settings).returns({})
+    allow(Canvas::Plugin.find(:facebook)).to receive(:settings).and_return({})
 
     # replace on just this instance. this allows the tests to look directly at
     # response.location independent of any implementation plugins may add for
@@ -42,7 +42,7 @@ describe Login::Oauth2Controller do
 
     it "wraps redirect in delegated_auth_redirect_uri" do
       # needs the `returns` or it returns nil and causes a 500
-      @controller.expects(:delegated_auth_redirect_uri).once.returns('/')
+      expect(@controller).to receive(:delegated_auth_redirect_uri).once.and_return('/')
       get :new, params: {auth_type: 'facebook'}
       expect(response).to be_redirect
     end
@@ -64,7 +64,7 @@ describe Login::Oauth2Controller do
       state = CGI.parse(URI.parse(response.location).query)['state'].first
       expect(state).to_not be_nil
 
-      aac.any_instantiation.expects(:get_token).never
+      expect_any_instantiation_of(aac).to receive(:get_token).never
       Timecop.travel(15.minutes) do
         get :create, params: {state: state}
         expect(response).to redirect_to(login_url)
@@ -82,9 +82,9 @@ describe Login::Oauth2Controller do
 
     it "works" do
       session[:oauth2_nonce] = 'bob'
-      aac.any_instantiation.expects(:get_token).returns('token')
-      aac.any_instantiation.expects(:unique_id).with('token').returns('user')
-      aac.any_instantiation.expects(:provider_attributes).with('token').returns({})
+      expect_any_instantiation_of(aac).to receive(:get_token).and_return('token')
+      expect_any_instantiation_of(aac).to receive(:unique_id).with('token').and_return('user')
+      expect_any_instantiation_of(aac).to receive(:provider_attributes).with('token').and_return({})
       user_with_pseudonym(username: 'user', active_all: 1)
       @pseudonym.authentication_provider = aac
       @pseudonym.save!
@@ -98,9 +98,9 @@ describe Login::Oauth2Controller do
     end
 
     it "redirects to login if no user found" do
-      aac.any_instantiation.expects(:get_token).returns('token')
-      aac.any_instantiation.expects(:unique_id).with('token').returns('user')
-      aac.any_instantiation.expects(:provider_attributes).with('token').returns({})
+      expect_any_instantiation_of(aac).to receive(:get_token).and_return('token')
+      expect_any_instantiation_of(aac).to receive(:unique_id).with('token').and_return('user')
+      expect_any_instantiation_of(aac).to receive(:provider_attributes).with('token').and_return({})
 
       session[:oauth2_nonce] = 'bob'
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: 'bob')
@@ -111,9 +111,9 @@ describe Login::Oauth2Controller do
     end
 
     it "redirects to login if no user information returned" do
-      aac.any_instantiation.expects(:get_token).returns('token')
-      aac.any_instantiation.expects(:unique_id).with('token').returns(nil)
-      aac.any_instantiation.expects(:provider_attributes).with('token').returns({})
+      expect_any_instantiation_of(aac).to receive(:get_token).and_return('token')
+      expect_any_instantiation_of(aac).to receive(:unique_id).with('token').and_return(nil)
+      expect_any_instantiation_of(aac).to receive(:provider_attributes).with('token').and_return({})
 
       session[:oauth2_nonce] = 'bob'
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: 'bob')
@@ -132,9 +132,9 @@ describe Login::Oauth2Controller do
 
     it "provisions automatically when enabled" do
       aac.update_attribute(:jit_provisioning, true)
-      aac.any_instantiation.expects(:get_token).returns('token')
-      aac.any_instantiation.expects(:unique_id).with('token').returns('user')
-      aac.any_instantiation.expects(:provider_attributes).with('token').returns({})
+      expect_any_instantiation_of(aac).to receive(:get_token).and_return('token')
+      expect_any_instantiation_of(aac).to receive(:unique_id).with('token').and_return('user')
+      expect_any_instantiation_of(aac).to receive(:provider_attributes).with('token').and_return({})
 
       session[:oauth2_nonce] = 'bob'
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: 'bob')

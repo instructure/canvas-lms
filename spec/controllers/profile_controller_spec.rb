@@ -50,7 +50,7 @@ describe ProfileController do
     describe "other user's profile" do
       before :each do
         # to allow viewing other user's profile
-        @controller.stubs(:api_request?).returns(true)
+        allow(@controller).to receive(:api_request?).and_return(true)
       end
 
       it "should include common contexts in @user_data" do

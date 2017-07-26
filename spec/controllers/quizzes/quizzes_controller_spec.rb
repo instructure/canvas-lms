@@ -112,28 +112,28 @@ describe Quizzes::QuizzesController do
       user_session(@student)
       course_quiz(active = true)
 
-      Quizzes::OutstandingQuizSubmissionManager.expects(:grade_by_course)
+      expect(Quizzes::OutstandingQuizSubmissionManager).to receive(:grade_by_course)
 
       get 'index', params: {:course_id => @course.id}
     end
 
     it "js_env SIS_INTEGRATION_SETTINGS_ENABLED is true when AssignmentUtil.sis_integration_settings_enabled? == true" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:sis_integration_settings_enabled?).returns(true)
+      allow(AssignmentUtil).to receive(:sis_integration_settings_enabled?).and_return(true)
       get 'index', params: {:course_id => @course.id}
       expect(assigns[:js_env][:SIS_INTEGRATION_SETTINGS_ENABLED]).to eq(true)
     end
 
     it "js_env SIS_INTEGRATION_SETTINGS_ENABLED is false when AssignmentUtil.sis_integration_settings_enabled? == false" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:sis_integration_settings_enabled?).returns(false)
+      allow(AssignmentUtil).to receive(:sis_integration_settings_enabled?).and_return(false)
       get 'index', params: {:course_id => @course.id}
       expect(assigns[:js_env][:SIS_INTEGRATION_SETTINGS_ENABLED]).to eq(false)
     end
 
     it "js_env SIS_NAME is Foo Bar when AssignmentUtil.post_to_sis_friendly_name is Foo Bar" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:post_to_sis_friendly_name).returns('Foo Bar')
+      allow(AssignmentUtil).to receive(:post_to_sis_friendly_name).and_return('Foo Bar')
       get 'index', params: {:course_id => @course.id}
       expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
     end
@@ -159,28 +159,28 @@ describe Quizzes::QuizzesController do
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:due_date_required_for_account?).returns(true)
+      allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
       get 'index', params: {:course_id => @course.id}
       expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(true)
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.due_date_required_for_account? == false" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:due_date_required_for_account?).returns(false)
+      allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(false)
       get 'index', params: {:course_id => @course.id}
       expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(false)
     end
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:name_length_required_for_account?).returns(true)
+      allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(true)
       get 'index', params: {:course_id => @course.id}
       expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(true)
     end
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.name_length_required_for_account? == false" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:name_length_required_for_account?).returns(false)
+      allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(false)
       get 'index', params: {:course_id => @course.id}
       expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(false)
     end
@@ -194,14 +194,14 @@ describe Quizzes::QuizzesController do
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:due_date_required_for_account?).returns(true)
+      allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
       get 'new', params: {:course_id => @course.id}
       expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(true)
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.due_date_required_for_account? == false" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:due_date_required_for_account?).returns(false)
+      allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(false)
       get 'new', params: {:course_id => @course.id}
       expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(false)
     end
@@ -231,21 +231,21 @@ describe Quizzes::QuizzesController do
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:name_length_required_for_account?).returns(true)
+      allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(true)
       get 'new', params: {:course_id => @course.id}
       expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(true)
     end
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.name_length_required_for_account? == false" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:name_length_required_for_account?).returns(false)
+      allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(false)
       get 'new', params: {:course_id => @course.id}
       expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(false)
     end
 
     it "js_env MAX_NAME_LENGTH is a 15 when AssignmentUtil.assignment_max_name_length returns 15" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:assignment_max_name_length).returns(15)
+      allow(AssignmentUtil).to receive(:assignment_max_name_length).and_return(15)
       get 'new', params: {:course_id => @course.id}
       expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
     end
@@ -280,53 +280,53 @@ describe Quizzes::QuizzesController do
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:due_date_required_for_account?).returns(true)
+      allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
       get 'edit', params: {:course_id => @course.id, :id => @quiz.id}
       expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(true)
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.due_date_required_for_account? == false" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:due_date_required_for_account?).returns(false)
+      allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(false)
       get 'edit', params: {:course_id => @course.id, :id => @quiz.id}
       expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(false)
     end
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:name_length_required_for_account?).returns(true)
+      allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(true)
       get 'edit', params: {:course_id => @course.id, :id => @quiz.id}
       expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(true)
     end
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.name_length_required_for_account? == false" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:name_length_required_for_account?).returns(false)
+      allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(false)
       get 'edit', params: {:course_id => @course.id, :id => @quiz.id}
       expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(false)
     end
 
     it "js_env MAX_NAME_LENGTH is a 15 when AssignmentUtil.assignment_max_name_length returns 15" do
       user_session(@teacher)
-      AssignmentUtil.stubs(:assignment_max_name_length).returns(15)
+      allow(AssignmentUtil).to receive(:assignment_max_name_length).and_return(15)
       get 'edit', params: {:course_id => @course.id, :id => @quiz.id}
       expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
     end
 
     context "conditional release" do
       before do
-        ConditionalRelease::Service.stubs(:env_for).returns({ dummy: 'charliemccarthy' })
+        allow(ConditionalRelease::Service).to receive(:env_for).and_return({ dummy: 'charliemccarthy' })
       end
 
       it "should define env when enabled" do
-        ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
+        allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
         user_session(@teacher)
         get 'edit', params: {:course_id => @course.id, :id => @quiz.id}
         expect(assigns[:js_env][:dummy]).to eq 'charliemccarthy'
       end
 
       it "should not define env when not enabled" do
-        ConditionalRelease::Service.stubs(:enabled_in_context?).returns(false)
+        allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(false)
         user_session(@teacher)
         get 'edit', params: {:course_id => @course.id, :id => @quiz.id}
         expect(assigns[:js_env][:dummy]).to be nil
@@ -931,7 +931,7 @@ describe Quizzes::QuizzesController do
 
       context "a valid question" do
         it "renders take_quiz" do
-          Quizzes::QuizzesController.any_instance.stubs(:valid_question?).returns(true)
+          allow_any_instance_of(Quizzes::QuizzesController).to receive(:valid_question?).and_return(true)
           get 'show', params: {:course_id => @course, :quiz_id => @quiz.id, :question_id => '1', :take => '1'}
           expect(response).to render_template('take_quiz')
         end
@@ -939,7 +939,7 @@ describe Quizzes::QuizzesController do
 
       context "a question not in this quiz" do
         it "redirects to the main quiz page" do
-          Quizzes::QuizzesController.any_instance.stubs(:valid_question?).returns(false)
+          allow_any_instance_of(Quizzes::QuizzesController).to receive(:valid_question?).and_return(false)
           get 'show', params: {:course_id => @course, :quiz_id => @quiz.id, :question_id => '1', :take => '1'}
           expect(response).to redirect_to course_quiz_url(@course, @quiz)
         end
@@ -947,18 +947,18 @@ describe Quizzes::QuizzesController do
     end
 
     describe "valid_question?" do
-      let(:submission) { mock }
+      let(:submission) { double }
 
       context "when the passed in question ID is in the submission" do
         it "returns true" do
-          submission.stubs(:has_question?).with(1).returns(true)
+          allow(submission).to receive(:has_question?).with(1).and_return(true)
           expect(controller.send(:valid_question?, submission, 1)).to be_truthy
         end
       end
 
       context "when the question ID isn't part of the submission" do
         it "returns false" do
-          submission.stubs(:has_question?).with(1).returns(false)
+          allow(submission).to receive(:has_question?).with(1).and_return(false)
           expect(controller.send(:valid_question?, submission, 1)).to be_falsey
         end
       end
@@ -1097,7 +1097,7 @@ describe Quizzes::QuizzesController do
       section = @course.course_sections.create!
       course_due_date = 3.days.from_now.iso8601
       section_due_date = 5.days.from_now.iso8601
-      Quizzes::Quiz.any_instance.expects(:relock_modules!).once
+      expect_any_instance_of(Quizzes::Quiz).to receive(:relock_modules!).once
 
       post 'create', params: {:course_id => @course.id,
         :quiz => {
@@ -2094,13 +2094,13 @@ describe Quizzes::QuizzesController do
     # When possible I recommend extracting this into a PORO or Quizzes::Quiz.
 
     before do
-      subject.stubs(:authorized_action).returns(true)
+      allow(subject).to receive(:authorized_action).and_return(true)
       course_with_teacher
       course_quiz(active=true)
       @quiz.save!
       subject.instance_variable_set(:@quiz, @quiz)
-      @quiz.stubs(:require_lockdown_browser?).returns(false)
-      @quiz.stubs(:ip_filter).returns(false)
+      allow(@quiz).to receive(:require_lockdown_browser?).and_return(false)
+      allow(@quiz).to receive(:ip_filter).and_return(false)
       subject.instance_variable_set(:@course, @course)
       subject.instance_variable_set(:@current_user, @student)
     end
@@ -2113,35 +2113,35 @@ describe Quizzes::QuizzesController do
     end
 
     it "returns false when unauthorized" do
-      subject.stubs(:authorized_action).returns(false)
+      allow(subject).to receive(:authorized_action).and_return(false)
       expect(return_value).to eq false
     end
 
     it "returns false when a lockdown browser is required and the lockdown browser is false" do
-      @quiz.stubs(:require_lockdown_browser?).returns(true)
+      allow(@quiz).to receive(:require_lockdown_browser?).and_return(true)
 
-      subject.stubs(:named_context_url).returns("some string")
-      subject.stubs(:check_lockdown_browser).returns(false)
+      allow(subject).to receive(:named_context_url).and_return("some string")
+      allow(subject).to receive(:check_lockdown_browser).and_return(false)
 
       expect(return_value).to eq false
     end
 
     context "when access code is required but does not match" do
       before do
-        @quiz.stubs(:access_code).returns("trust me. *winks*")
-        subject.stubs(:params).returns({
+        allow(@quiz).to receive(:access_code).and_return("trust me. *winks*")
+        allow(subject).to receive(:params).and_return({
           :access_code => "Don't trust me. *tips hat*",
           :take => 1
         })
       end
 
       it "renders access_code template" do
-        subject.expects(:render).with(:access_code)
+        expect(subject).to receive(:render).with(:access_code)
         subject.send(:can_take_quiz?)
       end
 
       it "returns false" do
-        subject.stubs(:render)
+        allow(subject).to receive(:render)
 
         expect(return_value).to eq false
       end
@@ -2149,18 +2149,18 @@ describe Quizzes::QuizzesController do
 
     context "when the ip address is invalid" do
       before do
-        @quiz.stubs(:ip_filter).returns(true)
-        @quiz.stubs(:valid_ip?).returns(false)
-        subject.stubs(:params).returns({:take => 1})
+        allow(@quiz).to receive(:ip_filter).and_return(true)
+        allow(@quiz).to receive(:valid_ip?).and_return(false)
+        allow(subject).to receive(:params).and_return({:take => 1})
       end
 
       it "renders invalid_ip" do
-        subject.expects(:render).with(:invalid_ip)
+        expect(subject).to receive(:render).with(:invalid_ip)
         subject.send(:can_take_quiz?)
       end
 
       it "returns false" do
-        subject.stubs(:render)
+        allow(subject).to receive(:render)
         expect(return_value).to eq false
       end
     end

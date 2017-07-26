@@ -61,7 +61,7 @@ describe Login::OtpController do
 
         @user.otp_secret_key = ROTP::Base32.random_base32
         cc = @user.otp_communication_channel = @user.communication_channels.sms.create!(:path => 'bob')
-        cc.any_instantiation.expects(:send_otp!)
+        expect_any_instantiation_of(cc).to receive(:send_otp!)
         @user.save!
 
         get :new
@@ -124,7 +124,7 @@ describe Login::OtpController do
         session[:pending_otp_communication_channel_id] = @cc.id
         code = ROTP::TOTP.new(@secret_key).now
         # make sure we get 5 minutes of drift
-        ROTP::TOTP.any_instance.expects(:verify_with_drift).with(code.to_s, 300).once.returns(true)
+        expect_any_instance_of(ROTP::TOTP).to receive(:verify_with_drift).with(code.to_s, 300).once.and_return(true)
         post :create, params: {:otp_login => { :verification_code => code.to_s }}
         expect(response).to redirect_to settings_profile_url
         expect(@user.reload.otp_secret_key).to eq @secret_key
@@ -159,7 +159,7 @@ describe Login::OtpController do
       before do
         @user.otp_secret_key = ROTP::Base32.random_base32
         @user.save!
-        CommunicationChannel.any_instance.expects(:send_otp!).never
+        expect_any_instance_of(CommunicationChannel).to receive(:send_otp!).never
         user_session(@user, @pseudonym)
         session[:pending_otp] = true
       end
@@ -188,7 +188,7 @@ describe Login::OtpController do
 
       it "should add the current ip to existing ips" do
         cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(Time.now.utc, nil, 'ip1')
-        ActionDispatch::Request.any_instance.stubs(:remote_ip).returns('ip2')
+        allow_any_instance_of(ActionDispatch::Request).to receive(:ip).and_return('ip2')
         post :create, params: {otp_login: { verification_code: ROTP::TOTP.new(@user.otp_secret_key).now, remember_me: '1' }}
         expect(response).to redirect_to dashboard_url(:login_success => 1)
         expect(cookies['canvas_otp_remember_me']).not_to be_nil
@@ -202,7 +202,7 @@ describe Login::OtpController do
       end
 
       it "should allow 30 seconds of drift by default" do
-        ROTP::TOTP.any_instance.expects(:verify_with_drift).with('123456', 30).once.returns(false)
+        expect_any_instance_of(ROTP::TOTP).to receive(:verify_with_drift).with('123456', 30).once.and_return(false)
         post :create, params: {:otp_login => { :verification_code => '123456' }}
         expect(response).to redirect_to(otp_login_url)
       end
@@ -211,7 +211,7 @@ describe Login::OtpController do
         @user.otp_communication_channel = @user.communication_channels.sms.create!(:path => 'bob')
         @user.save!
 
-        ROTP::TOTP.any_instance.expects(:verify_with_drift).with('123456', 300).once.returns(false)
+        expect_any_instance_of(ROTP::TOTP).to receive(:verify_with_drift).with('123456', 300).once.and_return(false)
         post :create, params: {:otp_login => { :verification_code => '123456' }}
         expect(response).to redirect_to(otp_login_url)
       end
@@ -220,7 +220,7 @@ describe Login::OtpController do
         skip "needs redis" unless Canvas.redis_enabled?
 
         Canvas.redis.set("otp_used:#{@user.global_id}:123456", '1')
-        ROTP::TOTP.any_instance.expects(:verify_with_drift).never
+        expect_any_instance_of(ROTP::TOTP).to receive(:verify_with_drift).never
         post :create, params: {:otp_login => { :verification_code => '123456' }}
         expect(response).to redirect_to(otp_login_url)
       end

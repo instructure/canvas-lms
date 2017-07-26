@@ -49,7 +49,7 @@ describe LoginController do
 
       flash_hash = ActionDispatch::Flash::FlashHash.new
       flash_hash[:delegated_message] = 'hi'
-      controller.stubs(:flash).returns(flash_hash)
+      allow(controller).to receive(:flash).and_return(flash_hash)
       get 'new'
       expect(response).to redirect_to('https://google.com/?message=hi')
     end

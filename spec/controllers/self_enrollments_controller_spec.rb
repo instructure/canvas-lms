@@ -73,7 +73,7 @@ describe SelfEnrollmentsController do
 
     it "should change login_label_name when set on domain_root_account" do
       custom_label = "batman is the best"
-      Account.any_instance.stubs(:login_handle_name).returns(custom_label)
+      allow_any_instance_of(Account).to receive(:login_handle_name).and_return(custom_label)
 
       get 'new', params: {:self_enrollment_code => @course.self_enrollment_code}
       expect(assigns(:login_label_name)).to eq(custom_label)

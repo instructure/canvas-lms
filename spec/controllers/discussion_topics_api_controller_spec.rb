@@ -27,7 +27,7 @@ describe DiscussionTopicsApiController do
 
     before :each do
       user_session(@student)
-      controller.stubs(:form_authenticity_token => 'abc', :form_authenticity_param => 'abc')
+      allow(controller).to receive_messages(:form_authenticity_token => 'abc', :form_authenticity_param => 'abc')
       post 'add_entry', params: {:topic_id => @topic.id, :course_id => @course.id, :user_id => @user.id, :message => 'message', :read_state => 'read'}, :format => 'json'
     end
 
@@ -61,7 +61,7 @@ describe DiscussionTopicsApiController do
       @course.save!
       @topic = @course.discussion_topics.create!(:title => 'discussion')
       user_session(@student)
-      controller.stubs(:form_authenticity_token => 'abc', :form_authenticity_param => 'abc')
+      allow(controller).to receive_messages(:form_authenticity_token => 'abc', :form_authenticity_param => 'abc')
     end
 
     it "fails if attachment a file over student quota (not course)" do

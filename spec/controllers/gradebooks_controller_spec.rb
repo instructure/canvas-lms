@@ -635,7 +635,7 @@ describe GradebooksController do
 
       shared_examples_for "working download" do
         it "does not recompute enrollment grades" do
-          Enrollment.expects(:recompute_final_score).never
+          expect(Enrollment).to receive(:recompute_final_score).never
           get 'show', params: {:course_id => @course.id, :init => 1, :assignments => 1}, :format => 'csv'
         end
         it "should get all the expected datas even with multibytes characters", :focus => true do
@@ -1141,7 +1141,7 @@ describe GradebooksController do
       user_session(@teacher)
       assignment = @course.assignments.create!(:title => 'some assignment')
 
-      Course.any_instance.stubs(:large_roster?).returns(true)
+      allow_any_instance_of(Course).to receive(:large_roster?).and_return(true)
 
       get 'speed_grader', params: {:course_id => @course.id, :assignment_id => assignment.id}
       expect(response).to be_redirect

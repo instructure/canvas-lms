@@ -71,7 +71,7 @@ module Lti
         end
 
         it "includes the authorization URL when feature flag enabled" do
-          Account.any_instance.stubs(:feature_enabled?).returns(true)
+          allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(true)
           course_with_teacher_logged_in(active_all: true)
           get 'registration', params: {course_id: @course.id, tool_consumer_url: 'http://tool.consumer.url'}
           lti_launch = assigns[:lti_launch]
@@ -395,7 +395,7 @@ module Lti
         it 'redirects to login page if there is no session' do
           tool_proxy.raw_data['enabled_capability'] += enabled_capability
           tool_proxy.save!
-          PseudonymSession.stubs(:find).returns(nil)
+          allow(PseudonymSession).to receive(:find).and_return(nil)
           get 'basic_lti_launch_request', params: {account_id: account.id, message_handler_id: message_handler.id}
           expect(response).to redirect_to(login_url)
         end

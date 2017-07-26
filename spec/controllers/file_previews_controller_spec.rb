@@ -53,24 +53,24 @@ describe FilePreviewsController do
   end
 
   it "should redirect to crododoc_url if available and params[:annotate] is given" do
-    Attachment.any_instance.stubs(:crocodoc_url).returns('http://example.com/fake_crocodoc_url')
-    Attachment.any_instance.stubs(:canvadoc_url).returns('http://example.com/fake_canvadoc_url')
+    allow_any_instance_of(Attachment).to receive(:crocodoc_url).and_return('http://example.com/fake_crocodoc_url')
+    allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return('http://example.com/fake_canvadoc_url')
     attachment_model content_type: 'application/msword'
     get :show, params: {course_id: @course.id, file_id: @attachment.id, annotate: 1}
     expect(response).to redirect_to @attachment.crocodoc_url
   end
 
   it "should redirect to canvadocs_url if available" do
-    Attachment.any_instance.stubs(:crocodoc_url).returns('http://example.com/fake_crocodoc_url')
-    Attachment.any_instance.stubs(:canvadoc_url).returns('http://example.com/fake_canvadoc_url')
+    allow_any_instance_of(Attachment).to receive(:crocodoc_url).and_return('http://example.com/fake_crocodoc_url')
+    allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return('http://example.com/fake_canvadoc_url')
     attachment_model content_type: 'application/msword'
     get :show, params: {course_id: @course.id, file_id: @attachment.id}
     expect(response).to redirect_to @attachment.canvadoc_url
   end
 
   it "should redirect to a google doc preview if available" do
-    Attachment.any_instance.stubs(:crocodoc_url).returns(nil)
-    Attachment.any_instance.stubs(:canvadoc_url).returns(nil)
+    allow_any_instance_of(Attachment).to receive(:crocodoc_url).and_return(nil)
+    allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return(nil)
     attachment_model content_type: 'application/msword'
     get :show, params: {course_id: @course.id, file_id: @attachment.id}
     expect(response).to be_redirect
@@ -78,8 +78,8 @@ describe FilePreviewsController do
   end
 
   it "should redirect to file if it's html" do
-    Attachment.any_instance.stubs(:crocodoc_url).returns(nil)
-    Attachment.any_instance.stubs(:canvadoc_url).returns(nil)
+    allow_any_instance_of(Attachment).to receive(:crocodoc_url).and_return(nil)
+    allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return(nil)
     attachment_model content_type: 'text/html'
     get :show, params: {course_id: @course.id, file_id: @attachment.id}
     expect(response).to be_redirect
@@ -87,8 +87,8 @@ describe FilePreviewsController do
   end
 
   it "should render a download link if no previews are available" do
-    Attachment.any_instance.stubs(:crocodoc_url).returns(nil)
-    Attachment.any_instance.stubs(:canvadoc_url).returns(nil)
+    allow_any_instance_of(Attachment).to receive(:crocodoc_url).and_return(nil)
+    allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return(nil)
     @account.disable_service(:google_docs_previews)
     @account.save!
     attachment_model content_type: 'application/msword'

@@ -26,7 +26,7 @@ describe TermsController do
     user_session(@user)
 
     term = a.default_enrollment_term
-    term.any_instantiation.expects(:touch_all_courses).once
+    expect_any_instantiation_of(term).to receive(:touch_all_courses).once
 
     put 'update', params: {:account_id => a.id, :id => term.id, :enrollment_term => {:start_at => 1.day.ago, :end_at => 1.day.from_now,
         :overrides => {

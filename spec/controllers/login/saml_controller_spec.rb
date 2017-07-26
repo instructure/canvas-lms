@@ -36,8 +36,8 @@ describe Login::SamlController do
     @pseudonym.account = account2
     @pseudonym.save!
 
-    Onelogin::Saml::Response.stubs(:new).returns(
-      stub('response',
+    allow(Onelogin::Saml::Response).to receive(:new).and_return(
+      double('response',
            is_valid?: true,
            success_status?: true,
            name_id: unique_id,
@@ -80,8 +80,8 @@ describe Login::SamlController do
     @pseudonym.account = account1
     @pseudonym.save!
 
-    Onelogin::Saml::Response.stubs(:new).returns(
-        stub('response',
+    allow(Onelogin::Saml::Response).to receive(:new).and_return(
+        double('response',
              is_valid?: true,
              success_status?: true,
              name_id: unique_id,
@@ -108,8 +108,8 @@ describe Login::SamlController do
 
     account = account_with_saml
 
-    Onelogin::Saml::Response.stubs(:new).returns(
-      stub('response',
+    allow(Onelogin::Saml::Response).to receive(:new).and_return(
+      double('response',
            is_valid?: true,
            success_status?: true,
            name_id: unique_id,
@@ -125,7 +125,7 @@ describe Login::SamlController do
     )
 
     # We dont want to log them out of everything.
-    controller.expects(:logout_user_action).never
+    expect(controller).to receive(:logout_user_action).never
     controller.request.env['canvas.domain_root_account'] = account
 
     # Default to Login url if set to nil or blank
@@ -161,8 +161,8 @@ describe Login::SamlController do
     ap.federated_attributes = { 'display_name' => 'eduPersonNickname' }
     ap.save!
 
-    Onelogin::Saml::Response.stubs(:new).returns(
-      stub('response',
+    allow(Onelogin::Saml::Response).to receive(:new).and_return(
+      double('response',
            is_valid?: true,
            success_status?: true,
            name_id: unique_id,
@@ -177,7 +177,7 @@ describe Login::SamlController do
           ))
 
     # We dont want to log them out of everything.
-    controller.expects(:logout_user_action).never
+    expect(controller).to receive(:logout_user_action).never
     controller.request.env['canvas.domain_root_account'] = account
 
     expect(account.pseudonyms.active.by_unique_id(unique_id)).to_not be_exists
@@ -197,8 +197,8 @@ describe Login::SamlController do
     ap.federated_attributes = { 'display_name' => 'eduPersonNickname' }
     ap.save!
 
-    Onelogin::Saml::Response.stubs(:new).returns(
-      stub('response',
+    allow(Onelogin::Saml::Response).to receive(:new).and_return(
+      double('response',
            is_valid?: true,
            success_status?: true,
            name_id: @pseudonym.unique_id,
@@ -211,7 +211,7 @@ describe Login::SamlController do
            saml_attributes: { 'eduPersonNickname' => 'Cody Cutrer' },
            used_key: nil)
     )
-    LoadAccount.stubs(:default_domain_root_account).returns(account)
+    allow(LoadAccount).to receive(:default_domain_root_account).and_return(account)
 
     post :create, params: {:SAMLResponse => "foo"}
     expect(response).to redirect_to(dashboard_url(login_success: 1))
@@ -229,8 +229,8 @@ describe Login::SamlController do
     @pseudonym.account = account1
     @pseudonym.save!
 
-    Onelogin::Saml::Response.stubs(:new).returns(
-        stub('response',
+    allow(Onelogin::Saml::Response).to receive(:new).and_return(
+        double('response',
              is_valid?: true,
              success_status?: true,
              name_id: unique_id,
@@ -280,7 +280,7 @@ describe Login::SamlController do
     end
 
     it "should saml_consume login with multiple authorization configs" do
-      Onelogin::Saml::Response.stubs(:new).returns(stub('response', @stub_hash))
+      allow(Onelogin::Saml::Response).to receive(:new).and_return(double('response', @stub_hash))
       controller.request.env['canvas.domain_root_account'] = @account
       post :create, params: {:SAMLResponse => "foo", :RelayState => "/courses"}
       expect(response).to redirect_to(courses_url)
@@ -332,16 +332,16 @@ describe Login::SamlController do
 
     context "#create" do
       def post_create
-        Onelogin::Saml::Response.stubs(:new).returns(
-          stub('response', @stub_hash)
+        allow(Onelogin::Saml::Response).to receive(:new).and_return(
+          double('response', @stub_hash)
         )
         controller.request.env['canvas.domain_root_account'] = @account
         post :create, params: {:SAMLResponse => "foo", :RelayState => "/courses"}
       end
 
       it "finds the SAML config by entity_id" do
-        @aac1.any_instantiation.expects(:saml_settings).never
-        @aac2.any_instantiation.expects(:saml_settings)
+        expect_any_instantiation_of(@aac1).to receive(:saml_settings).never
+        expect_any_instantiation_of(@aac2).to receive(:saml_settings)
 
         post_create
 
@@ -392,8 +392,8 @@ describe Login::SamlController do
 
     context "logging out" do
       before do
-        Onelogin::Saml::Response.stubs(:new).returns(
-          stub('response', @stub_hash)
+        allow(Onelogin::Saml::Response).to receive(:new).and_return(
+          double('response', @stub_hash)
         )
         controller.request.env['canvas.domain_root_account'] = @account
         post :create, params: {:SAMLResponse => "foo", :RelayState => "/courses"}
@@ -401,14 +401,14 @@ describe Login::SamlController do
 
       describe '#destroy' do
         it "should return bad request if a SAMLResponse or SAMLRequest parameter is not provided" do
-          controller.expects(:logout_user_action).never
+          expect(controller).to receive(:logout_user_action).never
           get :destroy
           expect(response.status).to eq 400
         end
 
         it "should find the correct AAC" do
-          expect(@aac1.any_instantiation).to receive(:debugging?).never
-          expect(@aac2.any_instantiation).to receive(:debugging?).at_least(1)
+          expect_any_instantiation_of(@aac1).to receive(:debugging?).never
+          expect_any_instantiation_of(@aac2).to receive(:debugging?).at_least(1)
 
           logout_response = SAML2::LogoutResponse.new
           logout_response.issuer = SAML2::NameID.new(@aac2.idp_entity_id)
@@ -420,7 +420,7 @@ describe Login::SamlController do
         end
 
         it "should redirect a response to idp on logout with a SAMLRequest parameter" do
-          controller.expects(:logout_current_user)
+          expect(controller).to receive(:logout_current_user)
           logout_request = SAML2::LogoutRequest.new
           logout_request.issuer = SAML2::NameID.new(@aac2.idp_entity_id)
           expect(SAML2::Bindings::HTTPRedirect).to receive(:decode).and_return(logout_request)
@@ -454,7 +454,7 @@ describe Login::SamlController do
       logout_response.issuer = SAML2::NameID.new('entity')
       expect(SAML2::Bindings::HTTPRedirect).to receive(:decode).and_return(logout_response)
 
-      controller.expects(:logout_user_action).never
+      expect(controller).to receive(:logout_user_action).never
       controller.request.env['canvas.domain_root_account'] = @account
       get :destroy, params: {:SAMLResponse => "foo", :RelayState => "/courses"}
       expect(response.status).to eq 400
@@ -514,8 +514,8 @@ SAML
       @aac.login_attribute = 'eduPersonPrincipalName_stripped'
       @aac.save
 
-      Onelogin::Saml::Response.stubs(:new).returns(
-        stub('response',
+      allow(Onelogin::Saml::Response).to receive(:new).and_return(
+        double('response',
              is_valid?: true,
              success_status?: true,
              name_id: nil,
@@ -542,8 +542,8 @@ SAML
       @aac.login_attribute = nil
       @aac.save
 
-      Onelogin::Saml::Response.stubs(:new).returns(
-        stub('response',
+      allow(Onelogin::Saml::Response).to receive(:new).and_return(
+        double('response',
              is_valid?: true,
              success_status?: true,
              name_id: @unique_id,
@@ -577,8 +577,8 @@ SAML
     @pseudonym.account = account
     @pseudonym.save!
 
-    Onelogin::Saml::Response.stubs(:new).returns(
-      stub('response',
+    allow(Onelogin::Saml::Response).to receive(:new).and_return(
+      double('response',
            is_valid?: true,
            success_status?: true,
            name_id: nil,
@@ -609,8 +609,8 @@ SAML
     @pseudonym.account = account
     @pseudonym.save!
 
-    Onelogin::Saml::Response.stubs(:new).returns(
-      stub('response',
+    allow(Onelogin::Saml::Response).to receive(:new).and_return(
+      double('response',
            is_valid?: true,
            success_status?: true,
            name_id: unique_id,

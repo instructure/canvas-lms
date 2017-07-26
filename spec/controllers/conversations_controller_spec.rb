@@ -511,7 +511,7 @@ describe ConversationsController do
       @conversation.last_message_at = expected_lma
       @conversation.save!
 
-      ConversationParticipant.any_instance.stubs(:should_process_immediately?).returns(false)
+      allow_any_instance_of(ConversationParticipant).to receive(:should_process_immediately?).and_return(false)
 
       post 'add_message', params: { conversation_id: @conversation.conversation_id, body: "hello world" }
       expect(response).to be_success
@@ -671,7 +671,7 @@ describe ConversationsController do
       conversation
       attachment = @user.conversation_attachments_folder.attachments.create!(:filename => "somefile.doc", :context => @user, :uploaded_data => StringIO.new('test'))
       @conversation.add_message('test attachment', :attachment_ids => [attachment.id])
-      HostUrl.stubs(:context_host).returns("test.host")
+      allow(HostUrl).to receive(:context_host).and_return("test.host")
       get 'public_feed', params: {:feed_code => @student.feed_code}, :format => 'atom'
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed).not_to be_nil

@@ -309,7 +309,7 @@ describe SubmissionsController do
     context "google doc" do
       before(:each) do
         course_with_student_logged_in(active_all: true)
-        @student.stubs(:gmail).returns('student@does-not-match.com')
+        allow(@student).to receive(:gmail).and_return('student@does-not-match.com')
         @assignment = @course.assignments.create!(title: 'some assignment', submission_types: 'online_upload')
         account = Account.default
         flag    = FeatureFlag.new
@@ -319,17 +319,17 @@ describe SubmissionsController do
         flag.feature = 'google_docs_domain_restriction'
         flag.state = 'on'
         flag.save!
-        mock_user_service = mock()
-        @user.stubs(:user_services).returns(mock_user_service)
-        mock_user_service.expects(:where).with(service: "google_drive").
-          returns(stub(first: mock(token: "token", secret: "secret")))
+        mock_user_service = double()
+        allow(@user).to receive(:user_services).and_return(mock_user_service)
+        expect(mock_user_service).to receive(:where).with(service: "google_drive").
+          and_return(double(first: double(token: "token", secret: "secret")))
       end
 
       it "should not save if domain restriction prevents it" do
-        google_docs = mock
-        GoogleDrive::Connection.expects(:new).returns(google_docs)
+        google_docs = double
+        expect(GoogleDrive::Connection).to receive(:new).and_return(google_docs)
 
-        google_docs.expects(:download).returns([Net::HTTPOK.new(200, {}, ''), 'title', 'pdf'])
+        expect(google_docs).to receive(:download).and_return([Net::HTTPOK.new(200, {}, ''), 'title', 'pdf'])
         post(:create, params: {course_id: @course.id, assignment_id: @assignment.id,
              submission: { submission_type: 'google_doc' },
              google_doc: { document_id: '12345' }})
@@ -648,9 +648,9 @@ describe SubmissionsController do
       expect(a.user).to eq @teacher
       expect(a.workflow_state).to eq 'to_be_zipped'
       a.update_attribute('workflow_state', 'zipped')
-      a.stubs('full_filename').returns(File.expand_path(__FILE__)) # just need a valid file
-      a.stubs('content_type').returns('test/file')
-      Attachment.stubs(:instantiate).returns(a)
+      allow(a).to receive('full_filename').and_return(File.expand_path(__FILE__)) # just need a valid file
+      allow(a).to receive('content_type').and_return('test/file')
+      allow(Attachment).to receive(:instantiate).and_return(a)
 
       request.headers['HTTP_ACCEPT'] = '*/*'
       get 'index', params: { :course_id => @course.id, :assignment_id => @assignment.id, :zip => '1' }
