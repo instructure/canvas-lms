@@ -136,7 +136,7 @@ describe "accounts/settings.html.erb" do
       context "should not show settings to site admin user" do
         context "new_sis_integrations => true" do
           before do
-            @account.stubs(:feature_enabled?).with(:new_sis_integrations).returns(true)
+            allow(@account).to receive(:feature_enabled?).with(:new_sis_integrations).and_return(true)
           end
 
           it { expect(response).not_to have_tag("#sis_integration_settings") }
@@ -148,7 +148,7 @@ describe "accounts/settings.html.erb" do
 
       context "new_sis_integrations => false" do
         before do
-          @account.stubs(:feature_enabled?).with(:new_sis_integrations).returns(false)
+          allow(@account).to receive(:feature_enabled?).with(:new_sis_integrations).and_return(false)
         end
 
         it { expect(response).not_to have_tag("#sis_integration_settings") }
@@ -168,20 +168,20 @@ describe "accounts/settings.html.erb" do
         assign(:root_account, @account)
         assign(:current_user, current_user)
 
-        @account.stubs(:feature_enabled?).with(:post_grades).returns(true)
-        @account.stubs(:feature_enabled?).with(:google_docs_domain_restriction).returns(true)
+        allow(@account).to receive(:feature_enabled?).with(:post_grades).and_return(true)
+        allow(@account).to receive(:feature_enabled?).with(:google_docs_domain_restriction).and_return(true)
       end
 
       context "new_sis_integrations => false" do
         before do
-          @account.stubs(:feature_enabled?).with(:new_sis_integrations).returns(false)
-          @account.stubs(:grants_right?).with(current_user, :manage_account_memberships).returns(true)
-          @account.stubs(:feature_enabled?).with(:plagiarism_detection_platform).returns(true)
+          allow(@account).to receive(:feature_enabled?).with(:new_sis_integrations).and_return(false)
+          allow(@account).to receive(:grants_right?).with(current_user, :manage_account_memberships).and_return(true)
+          allow(@account).to receive(:feature_enabled?).with(:plagiarism_detection_platform).and_return(true)
         end
 
         context "show old version of settings to regular admin user" do
           before do
-            @account.stubs(:grants_right?).with(current_user, :manage_site_settings).returns(true)
+            allow(@account).to receive(:grants_right?).with(current_user, :manage_site_settings).and_return(true)
             do_render(current_user)
           end
 
@@ -203,8 +203,8 @@ describe "accounts/settings.html.erb" do
         let(:assignment_name_length) { "#account_settings_sis_assignment_name_length_value" }
 
         before do
-          @account.stubs(:feature_enabled?).with(:new_sis_integrations).returns(true)
-          @account.stubs(:feature_enabled?).with(:plagiarism_detection_platform).returns(true)
+          allow(@account).to receive(:feature_enabled?).with(:new_sis_integrations).and_return(true)
+          allow(@account).to receive(:feature_enabled?).with(:plagiarism_detection_platform).and_return(true)
         end
 
         context "should show settings to regular admin user" do
@@ -226,13 +226,13 @@ describe "accounts/settings.html.erb" do
 
         context "SIS syncing enabled" do
           before do
-            Assignment.stubs(:sis_grade_export_enabled?).returns(true)
+            allow(Assignment).to receive(:sis_grade_export_enabled?).and_return(true)
           end
 
           context "for root account" do
             before do
-              @account.stubs(:sis_syncing).returns({value: true, locked: true})
-              @account.stubs(:feature_enabled?).with(:plagiarism_detection_platform).returns(true)
+              allow(@account).to receive(:sis_syncing).and_return({value: true, locked: true})
+              allow(@account).to receive(:feature_enabled?).with(:plagiarism_detection_platform).and_return(true)
               do_render(current_user)
             end
 
@@ -250,7 +250,7 @@ describe "accounts/settings.html.erb" do
             context "locked" do
               before do
                 @account.enable_feature!(:post_grades)
-                @account.stubs(:sis_syncing).returns({value: true, locked: true, inherited: true })
+                allow(@account).to receive(:sis_syncing).and_return({value: true, locked: true, inherited: true })
                 do_render(current_user, @account)
               end
 
@@ -265,8 +265,8 @@ describe "accounts/settings.html.erb" do
 
             context "not locked" do
               before do
-                @account.stubs(:sis_syncing).returns({value: true, locked: false, inherited: true })
-                @account.stubs(:feature_enabled?).with(:plagiarism_detection_platform).returns(true)
+                allow(@account).to receive(:sis_syncing).and_return({value: true, locked: false, inherited: true })
+                allow(@account).to receive(:feature_enabled?).with(:plagiarism_detection_platform).and_return(true)
                 do_render(current_user)
               end
 

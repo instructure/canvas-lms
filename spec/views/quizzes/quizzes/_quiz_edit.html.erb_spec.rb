@@ -33,13 +33,13 @@ describe "/quizzes/quizzes/_quiz_edit" do
   end
 
   it 'should include conditional content if configured' do
-    ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
+    allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
     render :partial => "quizzes/quizzes/quiz_edit"
     expect(response.body).to match /conditional_release/
   end
 
   it 'should not include conditional content if not configured' do
-    ConditionalRelease::Service.stubs(:enabled_in_context?).returns(false)
+    allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(false)
     render :partial => "quizzes/quizzes/quiz_edit"
     expect(response.body).not_to match /conditional_release/
   end

@@ -33,7 +33,7 @@ describe "courses/_settings_sidebar.html.erb" do
 
   describe "End this course button" do
     it "should not display if the course or term end date has passed" do
-      @course.stubs(:soft_concluded?).returns(true)
+      allow(@course).to receive(:soft_concluded?).and_return(true)
       view_context(@course, @user)
       assign(:current_user, @user)
       render
@@ -41,7 +41,7 @@ describe "courses/_settings_sidebar.html.erb" do
     end
 
     it "should display if the course and its term haven't ended" do
-      @course.stubs(:soft_concluded?).returns(false)
+      allow(@course).to receive(:soft_concluded?).and_return(false)
       view_context(@course, @user)
       assign(:current_user, @user)
       render
