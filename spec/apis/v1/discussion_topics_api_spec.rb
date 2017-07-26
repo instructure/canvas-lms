@@ -2354,7 +2354,7 @@ describe DiscussionTopicsController, type: :request do
       end
 
       it "should include mobile overrides in the html if not in-app" do
-        DiscussionTopicsApiController.any_instance.stubs(:in_app?).returns(false)
+        allow_any_instance_of(DiscussionTopicsApiController).to receive(:in_app?).and_return(false)
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/view",
           {:controller => "discussion_topics_api", :action => "view", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s}, {:include_new_entries => '1'})
 
@@ -2364,7 +2364,7 @@ describe DiscussionTopicsController, type: :request do
       end
 
       it "should not include mobile overrides in the html if in-app" do
-        DiscussionTopicsApiController.any_instance.stubs(:in_app?).returns(true)
+        allow_any_instance_of(DiscussionTopicsApiController).to receive(:in_app?).and_return(true)
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/view",
           {:controller => "discussion_topics_api", :action => "view", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s}, {:include_new_entries => '1'})

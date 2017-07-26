@@ -25,7 +25,7 @@ describe 'Submissions API', type: :request do
   let(:params) { {} }
 
   before :each do
-    HostUrl.stubs(:file_host_with_shard).returns(["www.example.com", Shard.default])
+    allow(HostUrl).to receive(:file_host_with_shard).and_return(["www.example.com", Shard.default])
   end
 
   def submit_homework(assignment, student, opts = {:body => "test!"})
@@ -744,6 +744,8 @@ describe 'Submissions API', type: :request do
   end
 
   it "allows retrieving attachments without a session" do
+    local_storage!
+
     student1 = user_factory(active_all: true)
     course_with_teacher(:active_all => true)
     @course.enroll_student(student1).accept!
@@ -768,9 +770,9 @@ describe 'Submissions API', type: :request do
     @course.enroll_student(student1).accept!
     a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
     media_object(:media_id => "54321", :context => student1, :user => student1)
-    mock_kaltura = mock('CanvasKaltura::ClientV3')
-    CanvasKaltura::ClientV3.stubs(:new).returns(mock_kaltura)
-    mock_kaltura.expects(:media_sources).returns([{:height => "240", :bitrate => "382", :isOriginal => "0", :width => "336", :content_type => "video/mp4",
+    mock_kaltura = double('CanvasKaltura::ClientV3')
+    allow(CanvasKaltura::ClientV3).to receive(:new).and_return(mock_kaltura)
+    expect(mock_kaltura).to receive(:media_sources).and_return([{:height => "240", :bitrate => "382", :isOriginal => "0", :width => "336", :content_type => "video/mp4",
                                                    :containerFormat => "isom", :url => "https://kaltura.example.com/some/url", :size =>"204", :fileExt=>"mp4"}])
 
     submit_homework(a1, student1, submission_type: 'online_text_entry', media_comment_id: 54321, media_comment_type: "video")
@@ -1994,7 +1996,7 @@ describe 'Submissions API', type: :request do
       end
 
       it "errors if too many students requested" do
-        Api.stubs(:max_per_page).returns(0)
+        allow(Api).to receive(:max_per_page).and_return(0)
         @user = @student1
         api_call(:get,
                  "/api/v1/courses/#{@course.id}/students/submissions.json",
@@ -3338,7 +3340,7 @@ describe 'Submissions API', type: :request do
   end
 
   it "includes preview urls for attachments" do
-    Canvadocs.stubs(:config).returns({a: 1})
+    allow(Canvadocs).to receive(:config).and_return({a: 1})
 
     course_with_teacher_logged_in active_all: true
     student_in_course active_all: true
@@ -3358,7 +3360,7 @@ describe 'Submissions API', type: :request do
   end
 
   it "includes crocodoc whitelist ids in the preview url for attachments" do
-    Canvas::Crocodoc.stubs(:config).returns({a: 1})
+    allow(Canvas::Crocodoc).to receive(:config).and_return({a: 1})
 
     course_with_teacher_logged_in active_all: true
     student_in_course active_all: true

@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper'
 describe "CourseAudit API", type: :request do
   context "not configured" do
     before do
-      Canvas::Cassandra::DatabaseBuilder.stubs(:configured?).with('auditors').returns(false)
+      allow(Canvas::Cassandra::DatabaseBuilder).to receive(:configured?).with('auditors').and_return(false)
       course_factory
     end
 
@@ -37,7 +37,7 @@ describe "CourseAudit API", type: :request do
 
     before do
       @request_id = SecureRandom.uuid
-      RequestContextGenerator.stubs( :request_id => @request_id )
+      allow(RequestContextGenerator).to receive_messages( :request_id => @request_id )
 
       @domain_root_account = Account.default
       @viewing_user = user_with_pseudonym(account: @domain_root_account)
@@ -157,7 +157,7 @@ describe "CourseAudit API", type: :request do
 
       it "should not allow other account models" do
         new_root_account = Account.create!(name: 'New Account')
-        LoadAccount.stubs(:default_domain_root_account).returns(new_root_account)
+        allow(LoadAccount).to receive(:default_domain_root_account).and_return(new_root_account)
         @viewing_user = user_with_pseudonym(account: new_root_account)
 
         fetch_for_context(@course, expected_status: 404)

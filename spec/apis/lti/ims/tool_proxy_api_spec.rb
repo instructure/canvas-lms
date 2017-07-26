@@ -56,8 +56,8 @@ module Lti
       describe "Get #show" do
 
         before(:each) do
-          OAuth::Signature.stubs(:build).returns(mock(verify: true))
-          OAuth::Helper.stubs(:parse_header).returns({'oauth_consumer_key' => 'key'})
+          allow(OAuth::Signature).to receive(:build).and_return(double(verify: true))
+          allow(OAuth::Helper).to receive(:parse_header).and_return({'oauth_consumer_key' => 'key'})
         end
 
         it 'the tool proxy raw data' do
@@ -75,11 +75,11 @@ module Lti
       describe "POST #create" do
 
         before(:each) do
-          mock_oauth_sig = mock('oauth_signature')
-          mock_oauth_sig.stubs(:verify).returns(true)
-          OAuth::Signature.stubs(:build).returns(mock_oauth_sig)
-          OAuth::Helper.stubs(:parse_header).returns({'oauth_consumer_key' => 'key'})
-          Lti::RegistrationRequestService.stubs(:retrieve_registration_password).returns({
+          mock_oauth_sig = double('oauth_signature')
+          allow(mock_oauth_sig).to receive(:verify).and_return(true)
+          allow(OAuth::Signature).to receive(:build).and_return(mock_oauth_sig)
+          allow(OAuth::Helper).to receive(:parse_header).and_return({'oauth_consumer_key' => 'key'})
+          allow(Lti::RegistrationRequestService).to receive(:retrieve_registration_password).and_return({
             reg_password: 'password',
             registration_url: 'http://example.com/register'
           })
@@ -134,7 +134,7 @@ module Lti
           let(:account) {Account.create!}
           let(:dev_key) do
             dev_key = DeveloperKey.create(api_key: 'test-api-key')
-            DeveloperKey.stubs(:find_cached).returns(dev_key)
+            allow(DeveloperKey).to receive(:find_cached).and_return(dev_key)
             dev_key
           end
           let!(:tcp) do
@@ -176,8 +176,8 @@ module Lti
 
         it 'accepts valid JWT access tokens' do
           course_with_teacher_logged_in(:active_all => true)
-          Lti::RegistrationRequestService.
-            stubs(:retrieve_registration_password).with(@course.account, 'reg_key').returns({
+          allow(Lti::RegistrationRequestService).to receive(:retrieve_registration_password).
+            with(@course.account, 'reg_key').and_return({
               reg_password: 'password',
               registration_url: 'http://example.com/register'
           })
@@ -204,9 +204,9 @@ module Lti
       describe "POST #reregistration" do
 
         before(:each) do
-          mock_siq = mock('signature')
-          mock_siq.stubs(:verify).returns(true)
-          OAuth::Signature.stubs(:build).returns(mock_siq)
+          mock_siq = double('signature')
+          allow(mock_siq).to receive(:verify).and_return(true)
+          allow(OAuth::Signature).to receive(:build).and_return(mock_siq)
 
         end
 
@@ -218,9 +218,9 @@ module Lti
         end
 
         it 'checks for valid oauth signatures' do
-          mock_siq = mock('signature')
-          mock_siq.stubs(:verify).returns(false)
-          OAuth::Signature.stubs(:build).returns(mock_siq)
+          mock_siq = double('signature')
+          allow(mock_siq).to receive(:verify).and_return(false)
+          allow(OAuth::Signature).to receive(:build).and_return(mock_siq)
           course_with_teacher_logged_in(:active_all => true)
           headers = {'VND-IMS-CONFIRM-URL' => 'Routing based on arbitrary headers, Barf!'}.merge(oauth1_header)
           response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", params: 'sad times', headers: headers
@@ -228,9 +228,9 @@ module Lti
         end
 
         it 'updates the tool proxy update payload' do
-          mock_siq = mock('signature')
-          mock_siq.stubs(:verify).returns(true)
-          OAuth::Signature.stubs(:build).returns(mock_siq)
+          mock_siq = double('signature')
+          allow(mock_siq).to receive(:verify).and_return(true)
+          allow(OAuth::Signature).to receive(:build).and_return(mock_siq)
           course_with_teacher_logged_in(:active_all => true)
 
           fixture_file = File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json')
@@ -253,9 +253,9 @@ module Lti
         end
 
         it 'Errors on invalid payload' do
-          mock_siq = mock('signature')
-          mock_siq.stubs(:verify).returns(true)
-          OAuth::Signature.stubs(:build).returns(mock_siq)
+          mock_siq = double('signature')
+          allow(mock_siq).to receive(:verify).and_return(true)
+          allow(OAuth::Signature).to receive(:build).and_return(mock_siq)
           course_with_teacher_logged_in(:active_all => true)
           headers = {'VND-IMS-CONFIRM-URL' => 'Routing based on arbitrary headers, Barf!'}.merge(oauth1_header)
           response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", params: 'sad times', headers: headers

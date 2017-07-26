@@ -72,7 +72,7 @@ module Lti
         let(:account) { Account.create! }
         let(:dev_key) do
           dev_key = DeveloperKey.create(api_key: 'test-api-key')
-          DeveloperKey.stubs(:find_cached).returns(dev_key)
+          allow(DeveloperKey).to receive(:find_cached).and_return(dev_key)
           dev_key
         end
         let!(:tcp) do

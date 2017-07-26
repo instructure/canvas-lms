@@ -41,9 +41,9 @@ module Lti
       let(:message_handler) { MessageHandler.create(message_type: 'basic-lti-launch-request', launch_path: 'https://samplelaunch/blti', resource_handler: resource_handler) }
 
       before do
-        ToolSettingController.any_instance.stubs(oauth_authenticated_request?: true)
-        ToolSettingController.any_instance.stubs(authenticate_body_hash: true)
-        ToolSettingController.any_instance.stubs(oauth_consumer_key: tool_proxy.guid)
+        allow_any_instance_of(ToolSettingController).to receive_messages(oauth_authenticated_request?: true)
+        allow_any_instance_of(ToolSettingController).to receive_messages(authenticate_body_hash: true)
+        allow_any_instance_of(ToolSettingController).to receive_messages(oauth_consumer_key: tool_proxy.guid)
         @link_setting = ToolSetting.create(tool_proxy: tool_proxy, context: account, resource_link_id: 'abc', custom: {link: :setting, a: 1, b: 2, c: 3})
         @binding_setting = ToolSetting.create(tool_proxy: tool_proxy, context: account, custom: {binding: :setting, a: 1, b: 2, d: 4})
         @proxy_setting = ToolSetting.create(tool_proxy: tool_proxy, custom: {proxy: :setting, a: 1, c: 3, d: 4})

@@ -272,6 +272,8 @@ module MockSerialization
 end
 Mocha::Mock.prepend(MockSerialization) unless ENV['NO_MOCHA']
 
+RSpec::Matchers.define_negated_matcher :not_eq, :eq
+
 RSpec::Matchers.define :encompass do |expected|
   match do |actual|
     if expected.is_a?(Array) && actual.is_a?(Array)

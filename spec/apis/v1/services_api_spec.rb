@@ -24,8 +24,8 @@ describe "Services API", type: :request do
   end
 
   before :each do
-    @kal = mock('CanvasKaltura::ClientV3')
-    CanvasKaltura::ClientV3.stubs(:config).returns({
+    @kal = double('CanvasKaltura::ClientV3')
+    allow(CanvasKaltura::ClientV3).to receive(:config).and_return({
       'domain' => 'kaltura.fake.local',
       'resource_domain' => 'cdn.kaltura.fake.local',
       'rtmp_domain' => 'rtmp-kaltura.fake.local',
@@ -51,7 +51,7 @@ describe "Services API", type: :request do
   end
   
   it "should degrade gracefully if kaltura is disabled or not configured" do
-    CanvasKaltura::ClientV3.stubs(:config).returns(nil)
+    allow(CanvasKaltura::ClientV3).to receive(:config).and_return(nil)
     json = api_call(:get, "/api/v1/services/kaltura",
               :controller => "services_api", :action => "show_kaltura_config", :format => "json")
     expect(json).to eq({
@@ -61,9 +61,9 @@ describe "Services API", type: :request do
 
   it "should return a new kaltura session" do
     stub_kaltura
-    kal = mock('CanvasKaltura::ClientV3')
-    kal.expects(:startSession).returns "new_session_id_here"
-    CanvasKaltura::ClientV3.stubs(:new).returns(kal)
+    kal = double('CanvasKaltura::ClientV3')
+    expect(kal).to receive(:startSession).and_return "new_session_id_here"
+    allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kal)
     json = api_call(:post, "/api/v1/services/kaltura_session",
                     :controller => "services_api", :action => "start_kaltura_session", :format => "json")
     expect(json.delete_if { |k,v| %w(serverTime).include?(k) }).to eq({

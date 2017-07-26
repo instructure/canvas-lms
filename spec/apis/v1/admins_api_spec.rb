@@ -92,8 +92,8 @@ describe "Admins API", type: :request do
     end
 
     it "should not send a notification email if passed a 0 'send_confirmation' value" do
-      AccountUser.any_instance.expects(:account_user_notification!).never
-      AccountUser.any_instance.expects(:account_user_registration!).never
+      expect_any_instance_of(AccountUser).to receive(:account_user_notification!).never
+      expect_any_instance_of(AccountUser).to receive(:account_user_registration!).never
 
       api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
                {:controller => 'admins', :action => 'create', :format => 'json',
@@ -104,8 +104,8 @@ describe "Admins API", type: :request do
     end
 
     it "should not send a notification email if passed a false 'send_confirmation' value" do
-      AccountUser.any_instance.expects(:account_user_notification!).never
-      AccountUser.any_instance.expects(:account_user_registration!).never
+      expect_any_instance_of(AccountUser).to receive(:account_user_notification!).never
+      expect_any_instance_of(AccountUser).to receive(:account_user_registration!).never
 
       json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
                       {:controller => 'admins', :action => 'create', :format => 'json',
@@ -116,7 +116,7 @@ describe "Admins API", type: :request do
     end
 
     it "should send a notification email if 'send_confirmation' isn't set" do
-      AccountUser.any_instance.expects(:account_user_registration!).once
+      expect_any_instance_of(AccountUser).to receive(:account_user_registration!).once
 
       json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
                       {:controller => 'admins', :action => 'create', :format => 'json',

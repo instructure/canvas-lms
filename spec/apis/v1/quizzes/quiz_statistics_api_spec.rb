@@ -63,7 +63,7 @@ describe Quizzes::QuizStatisticsController, type: :request do
       expect(json['quiz_statistics'][0]).not_to have_key('quiz_id')
     end
     it "should return :no_content for large quizzes" do
-      Quizzes::QuizStatistics.stubs(:large_quiz?).returns true
+      allow(Quizzes::QuizStatistics).to receive(:large_quiz?).and_return true
 
       expect(api_index(raw:true)).to be_equal(204)
     end

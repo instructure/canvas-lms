@@ -540,7 +540,7 @@ describe "Pages API", type: :request do
       end
 
       it 'should process body with process_incoming_html_content' do
-        WikiPagesApiController.any_instance.stubs(:process_incoming_html_content).returns('processed content')
+        allow_any_instance_of(WikiPagesApiController).to receive(:process_incoming_html_content).and_return('processed content')
 
         json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
                  { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
@@ -856,7 +856,7 @@ describe "Pages API", type: :request do
       end
 
       it 'should process body with process_incoming_html_content' do
-        WikiPagesApiController.any_instance.stubs(:process_incoming_html_content).returns('processed content')
+        allow_any_instance_of(WikiPagesApiController).to receive(:process_incoming_html_content).and_return('processed content')
 
         api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
                  { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,

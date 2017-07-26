@@ -58,7 +58,7 @@ module Lti
         create: "/api/lti/assignments/#{@assignment.id}/submissions/#{@submission.id}/originality_report"
       }
 
-      Account.any_instance.stubs(:feature_enabled?).with(:plagiarism_detection_platform).returns(true)
+      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:plagiarism_detection_platform).and_return(true)
     end
 
     describe 'service definition' do
@@ -148,7 +148,7 @@ module Lti
       end
 
       it "requires the plagiarism feature flag" do
-        Account.any_instance.stubs(:feature_enabled?).with(:plagiarism_detection_platform).returns(false)
+        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:plagiarism_detection_platform).and_return(false)
         post @endpoints[:show]
         expect(response).not_to be_success
       end
@@ -262,7 +262,7 @@ module Lti
       end
 
       it "requires the plagiarism feature flag" do
-        Account.any_instance.stubs(:feature_enabled?).with(:plagiarism_detection_platform).returns(false)
+        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:plagiarism_detection_platform).and_return(false)
 
         put @endpoints[:udpate], params: {originality_report: {originality_report_lti_url: "http://www.lti-test.com"}}, headers: request_headers
         expect(response).not_to be_success
@@ -436,7 +436,7 @@ module Lti
       end
 
       it "requires the plagiarism feature flag" do
-        Account.any_instance.stubs(:feature_enabled?).with(:plagiarism_detection_platform).returns(false)
+        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:plagiarism_detection_platform).and_return(false)
 
         post @endpoints[:create], params: {originality_report: {file_id: @attachment.id, originality_score: 0.4}}, headers: request_headers
         expect(response).not_to be_success

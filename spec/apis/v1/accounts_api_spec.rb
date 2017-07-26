@@ -33,10 +33,6 @@ describe "Accounts API", type: :request do
     @a4 = account_model(:name => 'implicit-access', :parent_account => @a1, :root_account => @a1)
   end
 
-  before :each do
-    Pseudonym.any_instance.stubs(:works_for_account?).returns(true)
-  end
-
   describe 'index' do
     it "should return the account list" do
       json = api_call(:get, "/api/v1/accounts.json",

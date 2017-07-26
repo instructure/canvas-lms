@@ -56,7 +56,7 @@ describe "API Authentication", type: :request do
 
       before :each do
         # Trust the referer
-        Account.any_instance.stubs(:trusted_referer?).returns(true)
+        allow_any_instance_of(Account).to receive(:trusted_referer?).and_return(true)
         post '/login', params: {'pseudonym_session[unique_id]' => 'test1@example.com', 'pseudonym_session[password]' => 'test1234'}
       end
 
@@ -184,7 +184,7 @@ describe "API Authentication", type: :request do
         flow do
           follow_redirect!
           expect(response).to redirect_to(canvas_login_url)
-          Account.any_instance.stubs(:trusted_referer?).returns(true)
+          allow_any_instance_of(Account).to receive(:trusted_referer?).and_return(true)
           post canvas_login_url, params: {:pseudonym_session => { :unique_id => 'test1@example.com', :password => 'test1234' }}
         end
       end
@@ -193,15 +193,15 @@ describe "API Authentication", type: :request do
         skip("requires SAML extension") unless AccountAuthorizationConfig::SAML.enabled?
         account_with_saml(account: Account.default)
         flow do
-          Onelogin::Saml::Response.any_instance.stubs(:settings=)
-          Onelogin::Saml::Response.any_instance.stubs(:logger=)
-          Onelogin::Saml::Response.any_instance.stubs(:is_valid?).returns(true)
-          Onelogin::Saml::Response.any_instance.stubs(:success_status?).returns(true)
-          Onelogin::Saml::Response.any_instance.stubs(:name_id).returns('test1@example.com')
-          Onelogin::Saml::Response.any_instance.stubs(:name_qualifier).returns(nil)
-          Onelogin::Saml::Response.any_instance.stubs(:session_index).returns(nil)
-          Onelogin::Saml::Response.any_instance.stubs(:issuer).returns("saml_entity")
-          Onelogin::Saml::Response.any_instance.stubs(:trusted_roots).returns([])
+          allow_any_instance_of(Onelogin::Saml::Response).to receive(:settings=)
+          allow_any_instance_of(Onelogin::Saml::Response).to receive(:logger=)
+          allow_any_instance_of(Onelogin::Saml::Response).to receive(:is_valid?).and_return(true)
+          allow_any_instance_of(Onelogin::Saml::Response).to receive(:success_status?).and_return(true)
+          allow_any_instance_of(Onelogin::Saml::Response).to receive(:name_id).and_return('test1@example.com')
+          allow_any_instance_of(Onelogin::Saml::Response).to receive(:name_qualifier).and_return(nil)
+          allow_any_instance_of(Onelogin::Saml::Response).to receive(:session_index).and_return(nil)
+          allow_any_instance_of(Onelogin::Saml::Response).to receive(:issuer).and_return("saml_entity")
+          allow_any_instance_of(Onelogin::Saml::Response).to receive(:trusted_roots).and_return([])
 
           post '/login/saml', params: {:SAMLResponse => "foo"}
         end
@@ -221,7 +221,7 @@ describe "API Authentication", type: :request do
             st.success = response.is_success?
             return st
           end
-          CASClient::Client.stubs(:new).returns(cas)
+          allow(CASClient::Client).to receive(:new).and_return(cas)
 
           follow_redirect!
           expect(response).to redirect_to("/login/cas")
@@ -281,7 +281,7 @@ describe "API Authentication", type: :request do
 
         user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test1234')
         course_with_teacher(:user => @user)
-        Account.any_instance.stubs(:trusted_referer?).returns(true)
+        allow_any_instance_of(Account).to receive(:trusted_referer?).and_return(true)
         post "/login", params: {:pseudonym_session => { :unique_id => 'test1@example.com', :password => 'test1234' }}
 
         # step 2
@@ -308,8 +308,8 @@ describe "API Authentication", type: :request do
 
           @shard1.activate do
             account = Account.create!
-            LoadAccount.stubs(:default_domain_root_account).returns(account)
-            account.stubs(:trusted_account_ids).returns([Account.default.id])
+            allow(LoadAccount).to receive(:default_domain_root_account).and_return(account)
+            allow(account).to receive(:trusted_account_ids).and_return([Account.default.id])
 
             # step 1
             get "/login/oauth2/auth", params: {:response_type => 'code', :client_id => @key.id, :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob'}
@@ -319,7 +319,7 @@ describe "API Authentication", type: :request do
             expect(response).to be_redirect
             follow_redirect!
             expect(response).to be_success
-            Account.any_instance.stubs(:trusted_referer?).returns(true)
+            allow_any_instance_of(Account).to receive(:trusted_referer?).and_return(true)
             post "/login", params: {:pseudonym_session => { :unique_id => 'test1@example.com', :password => 'test1234' }}
 
             # step 3
@@ -386,7 +386,7 @@ describe "API Authentication", type: :request do
               expect(response).to be_redirect
               follow_redirect!
               expect(response).to be_success
-              Account.any_instance.stubs(:trusted_referer?).returns(true)
+              allow_any_instance_of(Account).to receive(:trusted_referer?).and_return(true)
               post "/login", params: {:pseudonym_session => {:unique_id => 'test1@example.com', :password => 'test1234'}}
 
               expect(response).to be_redirect
@@ -611,7 +611,7 @@ describe "API Authentication", type: :request do
     end
 
     it "recovers gracefully if consul is missing encryption data" do
-      Imperium::KV.stubs(:get).returns(Imperium::Testing.kv_not_found_response(options: %i{recurse}))
+      allow(Imperium::KV).to receive(:get).and_return(Imperium::Testing.kv_not_found_response(options: %i{recurse}))
       check_used { get "/api/v1/courses", headers: { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" } }
       assert_status(200)
     end
@@ -695,7 +695,7 @@ describe "API Authentication", type: :request do
             developer_key = DeveloperKey.create!(account: @account, redirect_uri: "http://www.example.com/my_uri")
             @token = @user.access_tokens.create!(:developer_key => developer_key)
 
-            LoadAccount.stubs(:default_domain_root_account).returns(@account)
+            allow(LoadAccount).to receive(:default_domain_root_account).and_return(@account)
             check_used {  get "/api/v1/courses", headers: { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" } }
             expect(JSON.parse(response.body).size).to eq 1
           end
@@ -710,7 +710,7 @@ describe "API Authentication", type: :request do
             developer_key = DeveloperKey.create!(account: @account, redirect_uri: "http://www.example.com/my_uri")
             @token = @user.access_tokens.create!(:developer_key => developer_key)
 
-            LoadAccount.stubs(:default_domain_root_account).returns(@account)
+            allow(LoadAccount).to receive(:default_domain_root_account).and_return(@account)
             check_used {  get "/api/v1/courses", headers: { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" } }
             expect(JSON.parse(response.body).size).to eq 1
           end
@@ -725,7 +725,7 @@ describe "API Authentication", type: :request do
             developer_key = DeveloperKey.create!(account: @not_sub_account, redirect_uri: "http://www.example.com/my_uri")
             @token = @user.access_tokens.create!(:developer_key => developer_key)
 
-            LoadAccount.stubs(:default_domain_root_account).returns(@account)
+            allow(LoadAccount).to receive(:default_domain_root_account).and_return(@account)
             get "/api/v1/courses", headers: { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" }
             assert_status(401)
           end
@@ -744,7 +744,7 @@ describe "API Authentication", type: :request do
           @token = @user.access_tokens.create!(:developer_key => DeveloperKey.default)
           expect(@token.developer_key.shard).to be_default
         end
-        LoadAccount.stubs(:default_domain_root_account).returns(@account)
+        allow(LoadAccount).to receive(:default_domain_root_account).and_return(@account)
 
         check_used { get "/api/v1/courses", headers: { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" } }
         expect(JSON.parse(response.body).size).to eq 1
@@ -765,7 +765,7 @@ describe "API Authentication", type: :request do
 
         end
 
-        LoadAccount.stubs(:default_domain_root_account).returns(@account)
+        allow(LoadAccount).to receive(:default_domain_root_account).and_return(@account)
         get "/api/v1/courses", headers: { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" }
         assert_status(401)
       end
@@ -945,7 +945,7 @@ describe "API Authentication", type: :request do
 
     it "should prepend the CSRF protection for API endpoints, when session auth is used" do
       user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test1234')
-      Account.any_instance.stubs(:trusted_referer?).returns(true)
+      allow_any_instance_of(Account).to receive(:trusted_referer?).and_return(true)
       post "/login", params: {"pseudonym_session[unique_id]" => "test1@example.com",
         "pseudonym_session[password]" => "test1234"}
       assert_response 302

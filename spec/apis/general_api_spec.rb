@@ -24,8 +24,8 @@ describe "API", type: :request do
       obj = Object.new
       obj.extend Api::V1::Json
       course_with_teacher
-      session = mock()
-      @course.expects(:as_json).with({ :include_root => false, :permissions => { :user => @user, :session => session, :include_permissions => false }, :only => [ :name, :sis_source_id ] })
+      session = double()
+      expect(@course).to receive(:as_json).with({ :include_root => false, :permissions => { :user => @user, :session => session, :include_permissions => false }, :only => [ :name, :sis_source_id ] })
       obj.api_json(@course, @user, session, :only => [:name, :sis_source_id])
     end
 
@@ -40,7 +40,7 @@ describe "API", type: :request do
 
       obj.extend Api::V1::Json
       course_with_teacher
-      session = mock()
+      session = double()
 
       json_hash = obj.api_json(@course, @user, session, :only => [:name]) do |json, object|
         json.mapped_value = obj.serialized[:nested_key]

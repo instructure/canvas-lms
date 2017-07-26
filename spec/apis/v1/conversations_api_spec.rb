@@ -368,13 +368,22 @@ describe ConversationsController, type: :request do
     context "sent scope" do
       it "should sort by last authored date" do
         expected_times = 5.times.to_a.reverse.map{ |h| Time.parse((Time.now.utc - h.hours).to_s) }
-        ConversationMessage.any_instance.expects(:current_time_from_proper_timezone).times(5).returns(*expected_times)
-        @c1 = conversation(@bob)
-        @c2 = conversation(@bob, @billy)
-        @c3 = conversation(@jane)
+        Timecop.travel(expected_times[0]) do
+          @c1 = conversation(@bob)
+        end
+        Timecop.travel(expected_times[1]) do
+          @c2 = conversation(@bob, @billy)
+        end
+        Timecop.travel(expected_times[2]) do
+          @c3 = conversation(@jane)
+        end
 
-        @m1 = @c1.conversation.add_message(@bob, 'ohai')
-        @m2 = @c2.conversation.add_message(@bob, 'ohai')
+        Timecop.travel(expected_times[3]) do
+          @m1 = @c1.conversation.add_message(@bob, 'ohai')
+        end
+        Timecop.travel(expected_times[4]) do
+          @m2 = @c2.conversation.add_message(@bob, 'ohai')
+        end
 
         json = api_call(:get, "/api/v1/conversations.json?scope=sent",
                 { :controller => 'conversations', :action => 'index', :format => 'json', :scope => 'sent' })
@@ -1947,21 +1956,17 @@ describe ConversationsController, type: :request do
         end
 
         it "should fail progress if exception is raised in job" do
-          begin
-            Progress.any_instance.stubs(:complete!).raises "crazy exception"
+          allow_any_instance_of(Progress).to receive(:complete!).and_raise "crazy exception"
 
-            c1 = conversation(@me, @jane, :workflow_state => 'unread')
-            conversation_ids = [c1.conversation.id]
-            json = api_call(:put, "/api/v1/conversations",
-              { :controller => 'conversations', :action => 'batch_update', :format => 'json' },
-              { :event => 'mark_as_read', :conversation_ids => conversation_ids })
-            run_jobs
-            progress = Progress.find(json['id'])
-            expect(progress).to be_failed
-            expect(progress.message).to include 'crazy exception'
-          ensure
-            Progress.any_instance.unstub(:complete!)
-          end
+          c1 = conversation(@me, @jane, :workflow_state => 'unread')
+          conversation_ids = [c1.conversation.id]
+          json = api_call(:put, "/api/v1/conversations",
+            { :controller => 'conversations', :action => 'batch_update', :format => 'json' },
+            { :event => 'mark_as_read', :conversation_ids => conversation_ids })
+          run_jobs
+          progress = Progress.find(json['id'])
+          expect(progress).to be_failed
+          expect(progress.message).to include 'crazy exception'
         end
       end
     end
