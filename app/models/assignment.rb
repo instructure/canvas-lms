@@ -2051,8 +2051,8 @@ class Assignment < ActiveRecord::Base
     where('title ILIKE ?', "#{title}%")
   }
 
-  scope :with_non_placeholder_submissions_for_user, lambda { |user|
-    with_submissions_for_user(user).merge(Submission.not_placeholder)
+  scope :having_submissions_for_user, lambda { |user|
+    with_submissions_for_user(user).merge(Submission.having_submission)
   }
 
   scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
@@ -2437,10 +2437,11 @@ class Assignment < ActiveRecord::Base
   end
 
   def in_closed_grading_period?
-    if submissions.loaded?
+    return @in_closed_grading_period unless @in_closed_grading_period.nil?
+    @in_closed_grading_period = if submissions.loaded?
       submissions.map(&:grading_period).compact.any?(&:closed?)
     else
-      GradingPeriod.where(id: submissions.except(:preload).select(:grading_period_id)).closed.exists?
+      GradingPeriod.joins(:submissions).where(submissions: {assignment_id: self.id}).closed.exists?
     end
   end
 

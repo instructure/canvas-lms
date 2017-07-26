@@ -516,6 +516,27 @@ describe AdheresToPolicy::InstanceMethods do
         instance.grants_right?('foobar', :update)
         instance.grants_right?('foobar', :update)
       end
+
+      it 'must not cache anything when configured not to' do
+        AdheresToPolicy.configuration.cache_permissions = false
+
+        klass = Class.new do
+          extend AdheresToPolicy::ClassMethods
+
+          set_policy do
+            given { |_| true }
+            can :create, :update
+          end
+        end
+        instance = klass.new
+
+        expect(AdheresToPolicy::Cache).to receive(:fetch)
+          .with(/create/, a_hash_including(use_rails_cache: false))
+          .and_yield
+        expect(AdheresToPolicy::Cache).to receive(:write)
+          .with(/update/, true, a_hash_including(use_rails_cache: false))
+        instance.grants_right?('foobar', :create)
+      end
     end
   end
 end

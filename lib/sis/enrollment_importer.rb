@@ -57,6 +57,7 @@ module SIS
       User.update_account_associations(i.update_account_association_user_ids.to_a, :account_chain_cache => i.account_chain_cache)
       i.users_to_touch_ids.to_a.in_groups_of(1000, false) do |batch|
         User.where(id: batch).touch_all
+        User.where(id: UserObserver.where(user_id: batch).select(:observer_id)).touch_all
       end
       @logger.debug("Enrollments with batch operations took #{Time.now - start} seconds")
       return i.success_count
@@ -114,7 +115,8 @@ module SIS
             enrollment_info = @enrollment_batch.shift
             @logger.debug("Processing Enrollment #{enrollment_info.to_a.inspect}")
 
-            last_section = @section
+            @last_section = @section if @section
+            @last_course = @course if @course
             # reset the cached course/section if they don't match this row
             if @course && enrollment_info.course_id.present? && @course.sis_source_id != enrollment_info.course_id
               @course = nil
@@ -162,10 +164,12 @@ module SIS
             end
 
             if enrollment_info.section_id.present? && !@section
+              @course = nil
               @messages << "An enrollment referenced a non-existent section #{enrollment_info.section_id}"
               next
             end
             if enrollment_info.course_id.present? && !@course
+              @section = nil
               @messages << "An enrollment referenced a non-existent course #{enrollment_info.course_id}"
               next
             end
@@ -191,7 +195,7 @@ module SIS
             @course_roles_by_account_id[@course.account_id] ||= @course.account.available_course_roles
 
             # commit pending incremental account associations
-            incrementally_update_account_associations if @section != last_section and !@incrementally_update_account_associations_user_ids.empty?
+            incrementally_update_account_associations if @section != @last_section and !@incrementally_update_account_associations_user_ids.empty?
 
             associated_user_id = nil
 
@@ -328,7 +332,7 @@ module SIS
           User.update_account_associations(@incrementally_update_account_associations_user_ids.to_a,
               :incremental => true,
               :precalculated_associations => User.calculate_account_associations_from_accounts(
-                  [@course.account_id, @section.nonxlist_course.try(:account_id)].compact.uniq,
+                  [@last_course.account_id, @last_section.nonxlist_course.try(:account_id)].compact.uniq,
                           @account_chain_cache
                       ))
         end

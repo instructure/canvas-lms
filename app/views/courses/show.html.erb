@@ -40,10 +40,20 @@
         <div id='course_status_actions' class="ui-buttonset">
           <%= form_for @context, html: {id: "course_status_form"} do |f| %>
             <% if @context.created? || @context.claimed? %>
-              <div id="pubunpub_btn_container" data-op="UNPUBLISHED"></div>
+              <button type="button" class='ui-button btn-unpublish disabled' disabled>
+                <i class="icon-unpublish"></i><%= t('#buttons.unpublished', %{Unpublished}) %>
+              </button>
+              <button type='submit' class="ui-button btn-publish">
+                <i class="icon-publish"></i><%= t('#buttons.publish', %{Publish}) %>
+              </button>
               <input type='hidden' name='course[event]' value='offer' />
             <% else %>
-              <div id="pubunpub_btn_container" data-op="PUBLISHED"></div>
+              <button type='submit' class="ui-button">
+                <i class="icon-unpublish"></i><%= t('#buttons.unpublish', %{Unpublish}) %>
+              </button>
+              <button type="button" class="ui-button disabled btn-published" disabled>
+                <i class="icon-publish"></i><%= t('#buttons.published', %{Published}) %>
+              </button>
               <input type='hidden' name='course[event]' value='claim' />
             <% end %>
           <% end %>

@@ -82,7 +82,7 @@ module PlannerPageObject
   end
 
   def close_opportunities_dropdown
-    fj("button:contains('Close opportunities popover')").click
+    fj("button[title='Close opportunities popover']").click
   end
 
   def todo_modal_button
@@ -121,4 +121,3 @@ module PlannerPageObject
     todo_save_button.click
   end
 end
-
