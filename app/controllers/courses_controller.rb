@@ -2883,7 +2883,7 @@ class CoursesController < ApplicationController
     Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
     enrollments_by_course = enrollments.group_by(&:course_id).values
     enrollments_by_course.sort_by! do |course_enrollments|
-      Canvas::ICU.collation_key(course_enrollments.first.course.nickname_for(user))
+      Canvas::ICU.collation_key(course_enrollments.first.course.nickname_for(@current_user))
     end
     enrollments_by_course = Api.paginate(enrollments_by_course, self, paginate_url) if api_request?
     courses = enrollments_by_course.map(&:first).map(&:course)
@@ -2902,7 +2902,7 @@ class CoursesController < ApplicationController
 
     enrollments_by_course.each do |course_enrollments|
       course = course_enrollments.first.course
-      hash << course_json(course, user, session, includes, course_enrollments)
+      hash << course_json(course, @current_user, session, includes, course_enrollments, user)
     end
     hash
   end
