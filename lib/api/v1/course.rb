@@ -79,7 +79,7 @@ module Api::V1::Course
   #     "uuid" => "WvAHhY5FINzq5IyRIJybGeiXyFkG3SqHUPb7jZY5"
   #   }
   #
-  def course_json(course, user, session, includes, enrollments)
+  def course_json(course, user, session, includes, enrollments, subject_user = user)
     if includes.include?('access_restricted_by_date') && enrollments && enrollments.all?(&:inactive?)
       return {'id' => course.id, 'access_restricted_by_date' => true}
     end
@@ -87,7 +87,7 @@ module Api::V1::Course
     Api::V1::CourseJson.to_hash(course, user, includes, enrollments) do |builder, allowed_attributes, methods, permissions_to_include|
       hash = api_json(course, user, session, { :only => allowed_attributes, :methods => methods }, permissions_to_include)
       hash['term'] = enrollment_term_json(course.enrollment_term, user, session, enrollments, []) if includes.include?('term')
-      hash['course_progress'] = CourseProgress.new(course, user).to_json if includes.include?('course_progress')
+      hash['course_progress'] = CourseProgress.new(course, subject_user).to_json if includes.include?('course_progress')
       hash['apply_assignment_group_weights'] = course.apply_group_weights?
       hash['sections'] = section_enrollments_json(enrollments) if includes.include?('sections')
       hash['total_students'] = course.student_count || course.students.count if includes.include?('total_students')
