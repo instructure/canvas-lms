@@ -182,7 +182,11 @@ module CanvasCassandra
     end
 
     def tables
-      if @db.use_cql3?
+      if @db.connection.describe_version >= '20.1.0'
+        @db.execute("SELECT table_name FROM system_schema.tables WHERE keyspace_name=?", @db.keyspace).map do |row|
+          row['table_name']
+        end
+      elsif @db.use_cql3?
         @db.execute("SELECT columnfamily_name FROM system.schema_columnfamilies WHERE keyspace_name=?", @db.keyspace).map do |row|
           row['columnfamily_name']
         end
