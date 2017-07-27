@@ -4448,8 +4448,8 @@ QUnit.module('Gradebook#getAssignmentColumnHeaderProps', {
   createGradebook (options = {}) {
     const gradebook = createGradebook(options);
     gradebook.setAssignments({
-      201: { name: 'Math Assignment', published: true },
-      202: { name: 'English Assignment', published: false }
+      201: { id: '201', name: 'Math Assignment', published: true, only_visible_to_overrides: false },
+      202: { id: '201', name: 'English Assignment', published: false, only_visible_to_overrides: false }
     });
     return gradebook;
   },
@@ -5463,6 +5463,57 @@ QUnit.module('Gradebook#gotSubmissionsChunk', function (hooks) {
     this.gradebook.gotSubmissionsChunk(studentSubmissions);
     const [students] = this.gradebook.setupGrading.lastCall.args;
     deepEqual(students.map(student => student.id), ['1101', '1102']);
+  });
+});
+
+QUnit.module('Gradebook Assignment Student Visibility', function (hooks) {
+  let gradebook;
+  let allStudents;
+  let assignments;
+  let studentMap;
+
+  hooks.beforeEach(function () {
+    gradebook = createGradebook();
+
+    allStudents = [{
+      id: '1101',
+      name: 'Adam Jones',
+      enrollments: [{ type: 'StudentEnrollment', grades: { html_url: 'http://example.url/' } }]
+    }, {
+      id: '1102',
+      name: 'Betty Ford',
+      enrollments: [{ type: 'StudentEnrollment', grades: { html_url: 'http://example.url/' } }]
+    }];
+    studentMap = _.indexBy(allStudents, 'id');
+
+    assignments = [{
+      id: '2301',
+      assignment_visibility: null,
+      only_visible_to_overrides: false
+    }, {
+      id: '2302',
+      assignment_visibility: ['1102'],
+      only_visible_to_overrides: true
+    }];
+
+    gradebook.gotAllAssignmentGroups([
+      { id: '2201', position: 1, name: 'Assignments', assignments: assignments.slice(0, 1) },
+      { id: '2202', position: 2, name: 'Homework', assignments: assignments.slice(1, 2) }
+    ]);
+  });
+
+  QUnit.module('#studentsThatCanSeeAssignment', function () {
+    test('returns all students when the assignment is visible to everyone', function () {
+      gradebook.gotChunkOfStudents(allStudents);
+      const students = gradebook.studentsThatCanSeeAssignment(studentMap, assignments[0]);
+      deepEqual(Object.keys(students).sort(), ['1101', '1102']);
+    });
+
+    test('returns only students with visibility when the assignment is not visible to everyone', function () {
+      gradebook.gotChunkOfStudents(allStudents);
+      const students = gradebook.studentsThatCanSeeAssignment(studentMap, assignments[1]);
+      deepEqual(Object.keys(students), ['1102']);
+    });
   });
 });
 
