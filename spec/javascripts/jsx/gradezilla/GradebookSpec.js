@@ -4070,13 +4070,6 @@ test('does not skip SlickGrid default behavior when pressing "enter" off the gri
 
 QUnit.module('Gradebook#onHeaderCellRendered');
 
-test('renders the student column header for the "student" column type', function () {
-  const gradebook = createGradebook();
-  this.stub(gradebook, 'renderStudentColumnHeader');
-  gradebook.onHeaderCellRendered(null, { column: { type: 'student' } });
-  equal(gradebook.renderStudentColumnHeader.callCount, 1);
-});
-
 test('renders the total grade column header for the "total_grade" column type', function () {
   const gradebook = createGradebook();
   this.stub(gradebook, 'renderTotalGradeColumnHeader');
@@ -4147,134 +4140,6 @@ test('unmounts any component on the cell being destroyed', function () {
   this.gradebook.onBeforeHeaderCellDestroy(null, { node: this.$mountPoint });
   const componentExistedAtNode = ReactDOM.unmountComponentAtNode(this.$mountPoint);
   equal(componentExistedAtNode, false, 'the component was already unmounted');
-});
-
-QUnit.module('Gradebook#renderStudentColumnHeader', {
-  setup () {
-    this.$mountPoint = document.createElement('div');
-    $fixtures.appendChild(this.$mountPoint);
-  },
-
-  teardown () {
-    ReactDOM.unmountComponentAtNode(this.$mountPoint);
-    $fixtures.innerHTML = '';
-  }
-});
-
-test('renders the StudentColumnHeader to the "student" column header node', function () {
-  const gradebook = createGradebook({ login_handle_name: 'foo' });
-  this.stub(gradebook, 'getColumnHeaderNode').withArgs('student').returns(this.$mountPoint);
-  gradebook.renderStudentColumnHeader();
-  ok(this.$mountPoint.innerText.includes('Student Name'), 'the "Student Name" header is rendered');
-});
-
-QUnit.module('Gradebook#getStudentColumnHeaderProps');
-
-test('includes properties from gradebook', function () {
-  const gradebook = createGradebook({
-    login_handle_name: 'foo',
-    sis_name: 'bar'
-  });
-  gradebook.setStudentsLoaded(false);
-  const props = gradebook.getStudentColumnHeaderProps();
-  ok(props.selectedSecondaryInfo, 'selectedSecondaryInfo is present');
-  ok(props.selectedPrimaryInfo, 'selectedPrimaryInfo is present');
-  equal(typeof props.sectionsEnabled, 'boolean');
-  equal(typeof props.onSelectSecondaryInfo, 'function');
-  equal(typeof props.onSelectPrimaryInfo, 'function');
-  equal(props.loginHandleName, 'foo');
-  equal(props.sisName, 'bar');
-  equal(props.disabled, true);
-});
-
-test('includes a ref callback to store the component reference', function () {
-  const gradebook = createGradebook();
-  const props = gradebook.getStudentColumnHeaderProps();
-  const mockComponent = { column: 'student' };
-  props.ref(mockComponent);
-  equal(gradebook.getHeaderComponentRef('student'), mockComponent);
-});
-
-test('includes props for the "Sort by" settings', function () {
-  const props = createGradebook().getStudentColumnHeaderProps();
-  ok(props.sortBySetting, 'sort by setting is present');
-  equal(typeof props.sortBySetting.disabled, 'boolean', 'props include "disabled"');
-  equal(typeof props.sortBySetting.onSortBySortableNameAscending, 'function', 'props include "onSortBySortableNameAscending"');
-  equal(typeof props.sortBySetting.onSortBySortableNameDescending, 'function', 'props include "onSortBySortableNameDescending"');
-});
-
-test('includes close handler for popover menu', function () {
-  const props = createGradebook().getStudentColumnHeaderProps();
-  equal(typeof props.onMenuClose, 'function', 'props include "onMenuClose"');
-});
-
-QUnit.module('Gradebook#getStudentColumnSortBySetting', {
-  setup () {
-    this.gradebook = createGradebook();
-    this.gradebook.setStudentsLoaded(true);
-  }
-});
-
-test('includes the sort direction', function () {
-  this.gradebook.setSortRowsBySetting('student', 'sortable_name', 'ascending');
-  const props = this.gradebook.getStudentColumnSortBySetting();
-  equal(props.direction, 'ascending');
-});
-
-test('is not disabled when students are loaded', function () {
-  const props = this.gradebook.getStudentColumnSortBySetting();
-  equal(props.disabled, false);
-});
-
-test('is disabled when students are not loaded', function () {
-  this.gradebook.setStudentsLoaded(false);
-  const props = this.gradebook.getStudentColumnSortBySetting();
-  equal(props.disabled, true);
-});
-
-test('sets isSortColumn to true when sorting by the student column', function () {
-  this.gradebook.setSortRowsBySetting('student', 'sortable_name', 'ascending');
-  const props = this.gradebook.getStudentColumnSortBySetting();
-  equal(props.isSortColumn, true);
-});
-
-test('sets isSortColumn to false when not sorting by the student column', function () {
-  const columnId = this.gradebook.getAssignmentColumnId('202');
-  this.gradebook.setSortRowsBySetting(columnId, 'grade', 'ascending');
-  const props = this.gradebook.getStudentColumnSortBySetting();
-  equal(props.isSortColumn, false);
-});
-
-test('sets the onSortBySortableNameAscending function', function () {
-  this.stub(this.gradebook, 'setSortRowsBySetting');
-  const props = this.gradebook.getStudentColumnSortBySetting();
-
-  props.onSortBySortableNameAscending();
-  equal(this.gradebook.setSortRowsBySetting.callCount, 1);
-
-  const [columnId, settingKey, direction] = this.gradebook.setSortRowsBySetting.getCall(0).args;
-  equal(columnId, 'student', 'parameter 1 is the sort columnId');
-  equal(settingKey, 'sortable_name', 'parameter 2 is the sort settingKey');
-  equal(direction, 'ascending', 'parameter 3 is the sort direction');
-});
-
-test('sets the onSortBySortableNameDescending function', function () {
-  this.stub(this.gradebook, 'setSortRowsBySetting');
-  const props = this.gradebook.getStudentColumnSortBySetting();
-
-  props.onSortBySortableNameDescending();
-  equal(this.gradebook.setSortRowsBySetting.callCount, 1);
-
-  const [columnId, settingKey, direction] = this.gradebook.setSortRowsBySetting.getCall(0).args;
-  equal(columnId, 'student', 'parameter 1 is the sort columnId');
-  equal(settingKey, 'sortable_name', 'parameter 2 is the sort settingKey');
-  equal(direction, 'descending', 'parameter 3 is the sort direction');
-});
-
-test('includes the sort settingKey', function () {
-  this.gradebook.setSortRowsBySetting('student', 'sortable_name', 'ascending');
-  const props = this.gradebook.getStudentColumnSortBySetting();
-  equal(props.settingKey, 'sortable_name');
 });
 
 QUnit.module('Gradebook#getCustomColumnHeaderProps');
@@ -4446,12 +4311,16 @@ QUnit.module('Gradebook#updateColumnHeaders', {
       { type: 'total_grade' }
     ];
     this.gradebook = createGradebook();
+    this.gradebook.gridSupport = {
+      columns: {
+        updateColumnHeaders: this.stub()
+      }
+    };
     this.gradebook.grid = {
       getColumns () {
         return columns;
       }
     };
-    this.stub(this.gradebook, 'renderStudentColumnHeader');
     this.stub(this.gradebook, 'renderTotalGradeColumnHeader');
     this.stub(this.gradebook, 'renderCustomColumnHeader');
     this.stub(this.gradebook, 'renderAssignmentColumnHeader');
@@ -4459,9 +4328,9 @@ QUnit.module('Gradebook#updateColumnHeaders', {
   }
 });
 
-test('renders the student column header', function () {
+test('uses Grid Support to update the column headers', function () {
   this.gradebook.updateColumnHeaders();
-  equal(this.gradebook.renderStudentColumnHeader.callCount, 1);
+  strictEqual(this.gradebook.gridSupport.columns.updateColumnHeaders.callCount, 1);
 });
 
 test('renders the total grade column header', function () {
@@ -4505,7 +4374,6 @@ test('uses the column "assignmentGroupId" when rendering an assignment group col
 test('does not render column headers when the grid has not been created', function () {
   this.gradebook.grid = undefined;
   this.gradebook.updateColumnHeaders();
-  equal(this.gradebook.renderStudentColumnHeader.callCount, 0);
   equal(this.gradebook.renderTotalGradeColumnHeader.callCount, 0);
   equal(this.gradebook.renderCustomColumnHeader.callCount, 0);
   equal(this.gradebook.renderAssignmentColumnHeader.callCount, 0);
@@ -5947,8 +5815,13 @@ test('returns array including multiple values when settings are on', function ()
 QUnit.module('Gradebook#toggleEnrollmentFilter', {
   setup () {
     this.gradebook = createGradebook();
-    this.stub(this.gradebook, 'renderStudentColumnHeader');
+    this.gradebook.gridSupport = {
+      columns: {
+        updateColumnHeaders: this.stub()
+      }
+    };
     this.stub(this.gradebook, 'reloadStudentData');
+    this.stub(this.gradebook, 'saveSettings').callsFake((_data, callback) => { callback() });
   }
 });
 
@@ -5962,19 +5835,22 @@ test('changes the value of @getSelectedEnrollmentFilters', function () {
 });
 
 test('saves settings', function () {
-  this.stub(this.gradebook, 'saveSettings');
   this.gradebook.toggleEnrollmentFilter('inactive');
   strictEqual(this.gradebook.saveSettings.callCount, 1);
 });
 
-test('renders the student column header after saving settings', function () {
-  this.stub(this.gradebook, 'saveSettings').callsFake((_data, callback) => { callback() });
+test('updates the student column header', function () {
   this.gradebook.toggleEnrollmentFilter('inactive');
-  strictEqual(this.gradebook.renderStudentColumnHeader.callCount, 1);
+  strictEqual(this.gradebook.gridSupport.columns.updateColumnHeaders.callCount, 1);
+});
+
+test('includes the "student" column id when updating column headers', function () {
+  this.gradebook.toggleEnrollmentFilter('inactive');
+  const [columnIds] = this.gradebook.gridSupport.columns.updateColumnHeaders.lastCall.args;
+  deepEqual(columnIds, ['student']);
 });
 
 test('reloads student data after saving settings', function () {
-  this.stub(this.gradebook, 'saveSettings').callsFake((_data, callback) => { callback() });
   this.gradebook.toggleEnrollmentFilter('inactive');
   strictEqual(this.gradebook.reloadStudentData.callCount, 1);
 });
@@ -6956,9 +6832,13 @@ test('returns the current_grading_period_id when set and the "filter columns by"
 QUnit.module('Gradebook#setSelectedPrimaryInfo', {
   setup () {
     this.gradebook = createGradebook();
+    this.gradebook.gridSupport = {
+      columns: {
+        updateColumnHeaders: this.stub()
+      }
+    };
     this.stub(this.gradebook, 'saveSettings');
     this.stub(this.gradebook, 'buildRows');
-    this.stub(this.gradebook, 'renderStudentColumnHeader');
   }
 });
 
@@ -6980,18 +6860,28 @@ test('re-renders the grid unless asked not to do it', function () {
   strictEqual(this.gradebook.buildRows.callCount, 1);
 });
 
-test('re-renders the header of the student name column unless asked not to do it', function () {
+test('updates the student column header', function () {
   this.gradebook.setSelectedPrimaryInfo('last_first', false);
 
-  strictEqual(this.gradebook.renderStudentColumnHeader.callCount, 1);
+  strictEqual(this.gradebook.gridSupport.columns.updateColumnHeaders.callCount, 1);
+});
+
+test('includes the "student" column id when updating column headers', function () {
+  this.gradebook.setSelectedPrimaryInfo('last_first', false);
+  const [columnIds] = this.gradebook.gridSupport.columns.updateColumnHeaders.lastCall.args;
+  deepEqual(columnIds, ['student']);
 });
 
 QUnit.module('Gradebook#setSelectedSecondaryInfo', {
   setup () {
     this.gradebook = createGradebook();
+    this.gradebook.gridSupport = {
+      columns: {
+        updateColumnHeaders: this.stub()
+      }
+    };
     this.stub(this.gradebook, 'saveSettings');
     this.stub(this.gradebook, 'buildRows');
-    this.stub(this.gradebook, 'renderStudentColumnHeader');
   }
 });
 
@@ -7013,10 +6903,16 @@ test('re-renders the grid unless asked not to do it', function () {
   strictEqual(this.gradebook.buildRows.callCount, 1);
 });
 
-test('re-renders the header of the student name column unless asked not to do it', function () {
+test('updates the student column header', function () {
   this.gradebook.setSelectedSecondaryInfo('last_first', false);
 
-  strictEqual(this.gradebook.renderStudentColumnHeader.callCount, 1);
+  strictEqual(this.gradebook.gridSupport.columns.updateColumnHeaders.callCount, 1);
+});
+
+test('includes the "student" column id when updating column headers', function () {
+  this.gradebook.setSelectedSecondaryInfo('last_first', false);
+  const [columnIds] = this.gradebook.gridSupport.columns.updateColumnHeaders.lastCall.args;
+  deepEqual(columnIds, ['student']);
 });
 
 QUnit.module('Gradebook#setSortRowsBySetting', {

@@ -52,13 +52,13 @@ define [
   'jsx/gradezilla/default_gradebook/apis/GradebookApi'
   'jsx/gradezilla/default_gradebook/slick-grid/CellEditorFactory'
   'jsx/gradezilla/default_gradebook/slick-grid/CellFormatterFactory'
+  'jsx/gradezilla/default_gradebook/slick-grid/ColumnHeaderRenderer'
   'jsx/gradezilla/default_gradebook/slick-grid/grid-support'
   'jsx/gradezilla/default_gradebook/constants/studentRowHeaderConstants'
   'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader'
   'jsx/gradezilla/default_gradebook/components/AssignmentGroupColumnHeader'
   'jsx/gradezilla/default_gradebook/components/AssignmentRowCellPropFactory'
   'jsx/gradezilla/default_gradebook/components/CustomColumnHeader'
-  'jsx/gradezilla/default_gradebook/components/StudentColumnHeader'
   'jsx/gradezilla/default_gradebook/components/TotalGradeColumnHeader'
   'jsx/gradezilla/default_gradebook/components/GradebookMenu'
   'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu'
@@ -102,9 +102,9 @@ define [
   CourseGradeCalculator, EffectiveDueDates, GradeFormatHelper, UserSettings, Spinner, AssignmentMuter,
   AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
   NumberCompare, natcompare, ConvertCase, htmlEscape, SetDefaultGradeDialogManager,
-  CurveGradesDialogManager, GradebookApi, CellEditorFactory, CellFormatterFactory, GridSupport, studentRowHeaderConstants,
-  AssignmentColumnHeader,
-  AssignmentGroupColumnHeader, AssignmentRowCellPropFactory, CustomColumnHeader, StudentColumnHeader,
+  CurveGradesDialogManager, GradebookApi, CellEditorFactory, CellFormatterFactory, ColumnHeaderRenderer, GridSupport,
+  studentRowHeaderConstants, AssignmentColumnHeader,
+  AssignmentGroupColumnHeader, AssignmentRowCellPropFactory, CustomColumnHeader,
   TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, AssignmentGroupFilter, GradingPeriodFilter, ModuleFilter, SectionFilter,
   GridColor, StatusesModal, SubmissionTray, GradebookSettingsModal, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp,
   SubmissionStateMap,
@@ -558,7 +558,8 @@ define [
 
     gotAllStudents: =>
       @setStudentsLoaded(true)
-      @renderedGrid.then @renderStudentColumnHeader
+      @renderedGrid.then =>
+        @gridSupport.columns.updateColumnHeaders(['student'])
 
     studentsThatCanSeeAssignment: (potential_students, assignment) ->
       if assignment.only_visible_to_overrides
@@ -1045,13 +1046,6 @@ define [
             @minimizeColumn($columnHeader) unless columnDef.minimized
           else if columnDef.minimized
             @unminimizeColumn($columnHeader)
-
-      @keyboardNav = new GradebookKeyboardNav({
-        gridSupport: @gridSupport,
-        getColumnTypeForColumnId: @getColumnTypeForColumnId,
-        toggleDefaultSort: @toggleDefaultSort,
-        openSubmissionTray: @openSubmissionTray
-      })
 
       @keyboardNav.init()
       keyBindings = @keyboardNav.keyBindings
@@ -1618,6 +1612,7 @@ define [
 
       gridSupportOptions = {
         activeBorderColor: '#1790DF' # $active-border-color
+        columnHeaderRenderer: new ColumnHeaderRenderer(@)
         rows: @rows
       }
 
@@ -1628,6 +1623,14 @@ define [
 
       # Improved SlickGrid Management
       @gridSupport = new GridSupport(@grid, gridSupportOptions)
+
+      @keyboardNav = new GradebookKeyboardNav({
+        gridSupport: @gridSupport,
+        getColumnTypeForColumnId: @getColumnTypeForColumnId,
+        toggleDefaultSort: @toggleDefaultSort,
+        openSubmissionTray: @openSubmissionTray
+      })
+
       @gridSupport.initialize()
 
       @gridSupport.events.onActiveLocationChanged.subscribe (event, location) =>
@@ -1676,9 +1679,7 @@ define [
     # Column Header Cell Event Handlers
 
     onHeaderCellRendered: (event, obj) =>
-      if obj.column.type == 'student'
-        @renderStudentColumnHeader()
-      else if obj.column.type == 'total_grade'
+      if obj.column.type == 'total_grade'
         @renderTotalGradeColumnHeader()
       else if obj.column.type == 'custom_column'
         @renderCustomColumnHeader(obj.column.customColumnId)
@@ -2074,7 +2075,7 @@ define [
         else if column.type == 'total_grade'
           @renderTotalGradeColumnHeader()
 
-      @renderStudentColumnHeader()
+      @gridSupport.columns.updateColumnHeaders()
 
     # Column Header Helpers
     handleHeaderKeyDown: (e, columnId) =>
@@ -2082,48 +2083,6 @@ define [
         region: 'header'
         cell: @grid.getColumnIndex(columnId)
         columnId: columnId
-
-    # Student Column Header
-
-    getStudentColumnSortBySetting: =>
-      columnId = 'student'
-      sortRowsBySetting = @getSortRowsBySetting()
-
-      {
-        direction: sortRowsBySetting.direction
-        disabled: !@contentLoadStates.studentsLoaded
-        isSortColumn: sortRowsBySetting.columnId == columnId
-        onSortBySortableNameAscending: () =>
-          @setSortRowsBySetting(columnId, 'sortable_name', 'ascending')
-        onSortBySortableNameDescending: () =>
-          @setSortRowsBySetting(columnId, 'sortable_name', 'descending')
-        settingKey: sortRowsBySetting.settingKey
-      }
-
-    getStudentColumnHeaderProps: ->
-      ref: (ref) =>
-        @setHeaderComponentRef('student', ref)
-      selectedPrimaryInfo: @getSelectedPrimaryInfo()
-      onSelectPrimaryInfo: @setSelectedPrimaryInfo
-      loginHandleName: @options.login_handle_name
-      sisName: @options.sis_name
-      selectedSecondaryInfo: @getSelectedSecondaryInfo()
-      onSelectSecondaryInfo: @setSelectedSecondaryInfo
-      sectionsEnabled: @sections_enabled
-      sortBySetting: @getStudentColumnSortBySetting()
-      selectedEnrollmentFilters: @getSelectedEnrollmentFilters()
-      onToggleEnrollmentFilter: @toggleEnrollmentFilter
-      disabled: !@contentLoadStates.studentsLoaded
-      addGradebookElement: @keyboardNav.addGradebookElement
-      removeGradebookElement: @keyboardNav.removeGradebookElement
-      onMenuClose: @handleColumnHeaderMenuClose
-      onHeaderKeyDown: (e) =>
-        @handleHeaderKeyDown(e, 'student')
-
-    renderStudentColumnHeader: =>
-      mountPoint = @getColumnHeaderNode('student')
-      props = @getStudentColumnHeaderProps()
-      renderComponent(StudentColumnHeader, mountPoint, props)
 
     # Total Grade Column Header
 
@@ -2541,7 +2500,7 @@ define [
       @saveSettings()
       unless skipRedraw
         @buildRows()
-        @renderStudentColumnHeader()
+        @gridSupport.columns.updateColumnHeaders(['student'])
 
     toggleDefaultSort: (columnId) =>
       sortSettings = @getSortRowsBySetting()
@@ -2568,7 +2527,7 @@ define [
       @saveSettings()
       unless skipRedraw
         @buildRows()
-        @renderStudentColumnHeader()
+        @gridSupport.columns.updateColumnHeaders(['student'])
 
     getSelectedSecondaryInfo: () =>
       @gridDisplaySettings.selectedSecondaryInfo
@@ -2619,7 +2578,7 @@ define [
       showInactive = @getEnrollmentFilters().inactive
       showConcluded = @getEnrollmentFilters().concluded
       @saveSettings({ showInactive, showConcluded }, =>
-        @renderStudentColumnHeader()
+        @gridSupport.columns.updateColumnHeaders(['student'])
         @reloadStudentData()
       )
 
