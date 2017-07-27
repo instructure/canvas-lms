@@ -13,6 +13,7 @@ const Grid = require('instructure-ui/lib/components/Grid').default
 const GridRow = require('instructure-ui/lib/components/Grid/GridRow').default
 const GridCol = require('instructure-ui/lib/components/Grid/GridCol').default
 const Spinner = require('instructure-ui/lib/components/Spinner').default
+const ColorField = require('./color-field')
 
 const Typography = require('instructure-ui/lib/components/Typography').default
 const IconCompleteSolid = require('instructure-icons/lib/Solid/IconCompleteSolid').default
@@ -47,7 +48,8 @@ class Checker extends React.Component {
     this.setState({
       open: true,
       checking: true,
-      errors: []
+      errors: [],
+      errorIndex: 0,
     }, () => this._check())
   }
 
@@ -84,6 +86,7 @@ class Checker extends React.Component {
   }
 
   setErrorIndex (errorIndex) {
+    this.onLeaveError()
     this.setState({ errorIndex }, this.selectCurrent)
   }
 
@@ -136,13 +139,13 @@ class Checker extends React.Component {
 
   formStateValid (formState) {
     formState = formState || this.state.formState
-    const node = this.errorNode()
+    const node = this.tempNode()
     const rule = this.errorRule()
     if (!node || !rule) {
       return false
     }
-    const clone = rule.update(node.cloneNode(true), formState)
-    return rule.test(clone)
+    rule.update(node, formState)
+    return rule.test(node)
   }
 
   fixIssue (ev) {
@@ -150,11 +153,39 @@ class Checker extends React.Component {
     const rule = this.errorRule()
     const node = this.errorNode()
     if (rule && node) {
+      this.removeTempNode()
       rule.update(node, this.state.formState)
       if (rule.test(node)) {
         this.removeError()
       }
     }
+  }
+
+  tempNode () {
+    if (!this._tempNode) {
+      const node = this.errorNode()
+      if (node) {
+        this._tempNode = node.cloneNode(true)
+        const parent = node.parentNode
+        parent.insertBefore(this._tempNode, node)
+        parent.removeChild(node)
+      }
+    }
+    return this._tempNode
+  }
+
+  removeTempNode () {
+    const node = this.errorNode()
+    if (this._tempNode && node) {
+      const parent = this._tempNode.parentNode
+      parent.insertBefore(node, this._tempNode)
+      parent.removeChild(this._tempNode)
+      this._tempNode = null
+    }
+  }
+
+  onLeaveError () {
+    this.removeTempNode()
   }
 
   removeError () {
@@ -164,10 +195,12 @@ class Checker extends React.Component {
     if (errorIndex >= errors.length) {
       errorIndex = 0
     }
+    this.onLeaveError()
     this.setState({ errors, errorIndex }, this.selectCurrent)
   }
 
   handleClose () {
+    this.onLeaveError()
     this.setState({ open: false })
   }
 
@@ -201,24 +234,7 @@ class Checker extends React.Component {
             <Alert variant="warning">{this.errorMessage()}</Alert>
             <form onSubmit={this.fixIssue}>
               { rule.form.map((f) => <Container as="div" margin="medium 0 0">
-                { f.options
-                  ? <Select
-                      label={f.label}
-                      name={f.dataKey}
-                      value={this.state.formState[f.dataKey]}
-                      onChange={this.updateFormState}
-                     >
-                      { f.options.map((o) =>
-                        <option value={o[0]}>{o[1]}</option>
-                      )}
-                    </Select>
-                  : <TextInput
-                      label={f.label}
-                      name={f.dataKey}
-                      value={this.state.formState[f.dataKey]}
-                      onChange={this.updateFormState}
-                     />
-                }
+                {this.renderField(f)}
               </Container>) }
               <Container as="div" margin="medium 0 0">
                 <Grid vAlign="middle" hAlign="space-between" colSpacing="none">
@@ -265,6 +281,35 @@ class Checker extends React.Component {
         }
       </Container>
     </Tray>
+  }
+
+  renderField (f) {
+    if (f.options) {
+      return <Select
+        label={f.label}
+        name={f.dataKey}
+        value={this.state.formState[f.dataKey]}
+        onChange={this.updateFormState}
+        >
+        { f.options.map((o) =>
+          <option value={o[0]}>{o[1]}</option>
+        )}
+      </Select>
+    } else if (f.color) {
+      return <ColorField
+        label={f.label}
+        name={f.dataKey}
+        value={this.state.formState[f.dataKey]}
+        onChange={this.updateFormState}
+      />
+    } else {
+      return <TextInput
+        label={f.label}
+        name={f.dataKey}
+        value={this.state.formState[f.dataKey]}
+        onChange={this.updateFormState}
+      />
+    }
   }
 }
 
