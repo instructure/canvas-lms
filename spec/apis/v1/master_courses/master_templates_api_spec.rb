@@ -427,6 +427,8 @@ describe MasterCourses::MasterTemplatesController, type: :request do
     end
 
     it "returns change information from the minion side" do
+      skip 'Requires QtiMigrationTool' unless Qti.qti_enabled?
+
       minion = @minions.first
       minion_migration = minion.content_migrations.last
       minion_page = minion.wiki.wiki_pages.where(migration_id: @template.migration_id_for(@page)).first

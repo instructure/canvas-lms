@@ -433,6 +433,8 @@ describe ContentMigration do
   end
 
   it "should correclty handle media comment resolution in quizzes" do
+    skip 'Requires QtiMigrationTool' unless Qti.qti_enabled?
+
     course_with_teacher
     cm = ContentMigration.new(:context => @course, :user => @user)
     cm.migration_type = 'canvas_cartridge_importer'
