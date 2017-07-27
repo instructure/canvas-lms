@@ -1864,6 +1864,8 @@ CanvasRails::Application.routes.draw do
     scope(controller: :grading_standards_api) do
       get 'courses/:course_id/grading_standards', action: :context_index
       get 'accounts/:account_id/grading_standards', action: :context_index
+      get 'courses/:course_id/grading_standards/:grading_standard_id', action: :context_show
+      get 'accounts/:account_id/grading_standards/:grading_standard_id', action: :context_show
       post 'accounts/:account_id/grading_standards', action: :create
       post 'courses/:course_id/grading_standards', action: :create
     end
