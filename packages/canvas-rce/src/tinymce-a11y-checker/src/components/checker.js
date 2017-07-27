@@ -54,12 +54,13 @@ class Checker extends React.Component {
   }
 
   _check () {
+    const node = this.props.node()
     const errors = []
-    if (this.props.node) {
-      dom.walk(this.props.node, (node) => {
+    if (node) {
+      dom.walk(node, (child) => {
         for (let rule of rules) {
-          if (!rule.test(node)) {
-            errors.push({ node, rule })
+          if (!rule.test(child)) {
+            errors.push({ node: child, rule })
           }
         }
       }, () => {
@@ -94,7 +95,7 @@ class Checker extends React.Component {
     const errorNode = this.errorNode()
     if (errorNode) {
       this.getFormState()
-      dom.select(document, errorNode)
+      dom.select(this.props.doc(), errorNode)
       errorNode.scrollIntoView(false)
     } else {
       this.firstError()
@@ -277,7 +278,7 @@ class Checker extends React.Component {
           </Alert>
         }
         { this.state.checking && 
-          <Spinner margin="medium auto" />
+          <Spinner margin="medium auto" title="Checking for accessibility issues" />
         }
       </Container>
     </Tray>

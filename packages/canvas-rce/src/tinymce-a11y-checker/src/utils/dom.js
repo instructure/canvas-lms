@@ -39,7 +39,7 @@ function select (doc, elem) {
     range.selectNode(elem)
   }
   sel.addRange(range)
-  elem.scrollIntoView(false)
+  elem.scrollIntoView()
 }
 
 function prepend (parent, child) {
