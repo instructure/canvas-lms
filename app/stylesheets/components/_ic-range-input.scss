@@ -18,9 +18,8 @@
 
 .RangeInput {
   $range-input-handle-color: $ic-brand-primary;
-  $range-input-handle-color-hover: darken($ic-brand-primary, 10%);
+  $range-input-handle-color-hover: var(--ic-brand-primary-darkened-10);
 
-  $range-input-handle-border-color-focused: darken($ic-brand-primary, 50%);
   $range-input-handle-size: 20px;
   $range-input-handle-shadow: 0 3px 6px rgba(black, 0.3);
 

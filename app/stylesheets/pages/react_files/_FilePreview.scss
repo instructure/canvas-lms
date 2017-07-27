@@ -142,7 +142,7 @@ $preview-html-background: whitesmoke;
 
   &:hover, &:focus {
     background: rgba(white, 0.1);
-    border-bottom-color: lighten($ic-brand-primary, 15%);
+    border-bottom-color: var(--ic-brand-primary-lightened-15);
   }
 
   &.ef-file-preview-button--active {
@@ -201,7 +201,7 @@ a.ef-file-preview-button, button.ef-file-preview-button div {
   padding: 20px 10px 24px;
   text-align: center;
   &:hover, &:focus {
-    border-color: lighten($ic-brand-primary, 15%);
+    border-color: var(--ic-brand-primary-lightened-15);
     background: transparent;
   }
   i {

@@ -331,7 +331,7 @@ h2.subject {
 
     &.read {
       background: var(--ic-brand-primary);
-      border: 1px solid darken($ic-brand-primary, 10);
+      border: 1px solid var(--ic-brand-primary-darkened-10);
       @if $use_high_contrast {
         background: $ic-color-light;
         border: 1px solid $ic-color-dark;
