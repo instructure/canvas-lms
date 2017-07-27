@@ -100,9 +100,11 @@ describe "scheduler" do
       get "/calendar2"
       open_select_courses_modal(@course1.name)
       f('.fc-content').click
+      wait_for_ajaximations
       move_to_click('.reserve_event_link')
       refresh_page
       expected_time = calendar_time_string(@app1.new_appointments.first.start_at)
+      wait_for_ajaximations
       expect(f('.fc-content .fc-title')).to include_text(@app1.title)
       expect(f('.fc-time')).to include_text expected_time
     end
@@ -128,6 +130,7 @@ describe "scheduler" do
       expect(f('.fc-content .icon-calendar-add')).to be
       scroll_into_view('.fc-content .icon-calendar-add')
       f('.fc-content .icon-calendar-add').click
+      wait_for_ajaximations
       f('.reserve_event_link').click
       visible_dialog_element = fj(".ui-dialog:contains('You are already signed up for')")
       title = visible_dialog_element.find_element(:css, '.ui-dialog-titlebar')

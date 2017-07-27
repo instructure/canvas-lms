@@ -84,6 +84,7 @@ describe "scheduler" do
       f('#FindAppointmentButton').click
       f('.ReactModalPortal button[type="submit"]').click
       f('.fc-event.scheduler-event').click
+      wait_for_ajaximations
       f('.reserve_event_link').click
       wait_for_ajaximations
       move_to_click('#FindAppointmentButton')
@@ -101,6 +102,7 @@ describe "scheduler" do
       f('#FindAppointmentButton').click
       f('.ReactModalPortal button[type="submit"]').click
       f('.fc-event.scheduler-event').click
+      wait_for_ajaximations
       f('.reserve_event_link').click
       wait_for_ajax_requests
       move_to_click('#FindAppointmentButton')
@@ -253,7 +255,7 @@ describe "scheduler" do
       before :once do
         create_appointment_group(
           max_appointments_per_participant: 1,
-          # if participant_visibility is 'private', the event_details popup resizes, 
+          # if participant_visibility is 'private', the event_details popup resizes,
           # causing fragile tests in Chrome
           participant_visibility: 'protected',
           new_appointments: [
@@ -270,13 +272,13 @@ describe "scheduler" do
         move_to_click('.event-details .unreserve_event_link')
         wait_for_ajaximations
         f('#delete_event_dialog~.ui-dialog-buttonpane .btn-primary').click
-        
+
         expect(f("#content")).not_to contain_css('.fc-event.scheduler-event')
       end
 
       it "should let me do so from the week view", priority: "1", test_id: 502483 do
         load_week_view
-        
+
         f('.fc-event.scheduler-event').click
         move_to_click('.event-details .unreserve_event_link')
         wait_for_ajaximations
