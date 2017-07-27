@@ -21,9 +21,9 @@ require_dependency "messages/name_helper"
 module Messages
 
   describe NameHelper do
-    let(:author){ stub("Author", short_name: "Author Name") }
-    let(:user){ stub("User", short_name: "User Name") }
-    let(:asset){ stub("Asset", user: user, author: author) }
+    let(:author){ double("Author", short_name: "Author Name") }
+    let(:user){ double("User", short_name: "User Name") }
+    let(:asset){ double("Asset", user: user, author: author) }
 
     def asset_for(notification_name, a = asset)
       NameHelper.new(a, notification_name)
@@ -57,7 +57,7 @@ module Messages
       end
 
       it 'returns Anonymous User' do
-        asset2 = stub("Asset", user: user, author: author, recipient: user, can_read_author?: false)
+        asset2 = double("Asset", user: user, author: author, recipient: user, can_read_author?: false)
         expect(asset_for("Submission Comment", asset2).from_name).to eq "Anonymous User"
       end
     end

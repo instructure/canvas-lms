@@ -79,34 +79,34 @@ describe Score do
 
   describe '#current_grade' do
     it 'delegates the grade conversion to the course' do
-      score.course.expects(:score_to_grade).once.with(score.current_score)
+      expect(score.course).to receive(:score_to_grade).once.with(score.current_score)
       score.current_grade
     end
 
     it 'returns nil if grading schemes are not used in the course' do
-      score.course.expects(:grading_standard_enabled?).returns(false)
+      expect(score.course).to receive(:grading_standard_enabled?).and_return(false)
       expect(score.current_grade).to be_nil
     end
 
     it 'returns the grade according to the course grading scheme' do
-      score.course.expects(:grading_standard_enabled?).returns(true)
+      expect(score.course).to receive(:grading_standard_enabled?).and_return(true)
       expect(score.current_grade).to eq 'B-'
     end
   end
 
   describe '#final_grade' do
     it 'delegates the grade conversion to the course' do
-      score.course.expects(:score_to_grade).once.with(score.final_score)
+      expect(score.course).to receive(:score_to_grade).once.with(score.final_score)
       score.final_grade
     end
 
     it 'returns nil if grading schemes are not used in the course' do
-      score.course.expects(:grading_standard_enabled?).returns(false)
+      expect(score.course).to receive(:grading_standard_enabled?).and_return(false)
       expect(score.final_grade).to be_nil
     end
 
     it 'returns the grade according to the course grading scheme' do
-      score.course.expects(:grading_standard_enabled?).returns(true)
+      expect(score.course).to receive(:grading_standard_enabled?).and_return(true)
       expect(score.final_grade).to eq 'C'
     end
   end

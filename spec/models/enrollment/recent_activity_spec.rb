@@ -22,15 +22,15 @@ require_dependency "enrollment/recent_activity"
 class Enrollment
   describe RecentActivity do
     describe "initialization" do
-      let(:context) { stub('enrollment context') }
-      let(:enrollment) { stub(context: context) }
+      let(:context) { double('enrollment context') }
+      let(:enrollment) { double(context: context) }
 
       it "defaults to the enrollments context" do
         expect(RecentActivity.new(enrollment).context).to eq(context)
       end
 
       it "can be passed a context" do
-        override = stub("other context")
+        override = double("other context")
         expect(RecentActivity.new(enrollment, override).context).to eq(override)
       end
     end
@@ -83,25 +83,25 @@ class Enrollment
 
       describe "#record_for_access" do
         it "records activity for a positive response" do
-          response = stub(response_code: 200)
+          response = double(response_code: 200)
           recent_activity.record_for_access(response)
           expect(@enrollment.last_activity_at).not_to be_nil
         end
 
         it "skips recording for 4xx or 5xx errors" do
-          recent_activity.record_for_access(stub(response_code: 401))
+          recent_activity.record_for_access(double(response_code: 401))
           expect(@enrollment.last_activity_at).to be_nil
-          recent_activity.record_for_access(stub(response_code: 500))
+          recent_activity.record_for_access(double(response_code: 500))
           expect(@enrollment.last_activity_at).to be_nil
-          recent_activity.record_for_access(stub(response_code: 567))
+          recent_activity.record_for_access(double(response_code: 567))
           expect(@enrollment.last_activity_at).to be_nil
-          recent_activity.record_for_access(stub(response_code: 234))
+          recent_activity.record_for_access(double(response_code: 234))
           expect(@enrollment.last_activity_at).not_to be_nil
         end
 
         it "skips recording for non-course contexts" do
           local_activity = Enrollment::RecentActivity.new(@enrollment, Account.new)
-          local_activity.record_for_access(stub(response_code: 200))
+          local_activity.record_for_access(double(response_code: 200))
           expect(@enrollment.last_activity_at).to be_nil
         end
       end

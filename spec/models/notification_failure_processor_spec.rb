@@ -26,14 +26,17 @@ describe NotificationFailureProcessor do
   end
 
   def mock_failure_summary(obj)
-    failure_summary = mock
-    failure_summary.stubs(:body).returns(obj.to_json)
+    failure_summary = double
+    allow(failure_summary).to receive(:body).and_return(obj.to_json)
     failure_summary
   end
 
   def mock_queue(bare_failure_summaries)
-    queue = mock
-    queue.expects(:poll).multiple_yields(*bare_failure_summaries.map { |s| mock_failure_summary(s) })
+    queue = double
+    expectation = expect(queue).to receive(:poll)
+    bare_failure_summaries.each do |s|
+      expectation = expectation.and_yield(mock_failure_summary(s))
+    end
     queue
   end
 
@@ -58,7 +61,7 @@ describe NotificationFailureProcessor do
         }
       ])
       nfp = NotificationFailureProcessor.new(access_key: 'key', secret_access_key: 'secret')
-      nfp.stubs(:notification_failure_queue).returns(failure_queue)
+      allow(nfp).to receive(:notification_failure_queue).and_return(failure_queue)
       nfp.process
 
       messages.each do |msg|
@@ -74,12 +77,17 @@ describe NotificationFailureProcessor do
 
       @at = AccessToken.create!(:user => @user, :developer_key => DeveloperKey.default)
 
-      sns_client = mock()
-      NotificationEndpoint.any_instance.expects(:sns_client).at_least_once.returns(sns_client)
-      sns_client.expects(:get_endpoint_attributes).at_least_once.returns(stub(attributes: {'Enabled' => 'true', 'CustomUserData' => @at.global_id.to_s}))
-      sns_client.expects(:create_platform_endpoint).twice.returns({endpoint_arn: bad_arn}, {endpoint_arn: good_arn})
-      bad_ne = @at.notification_endpoints.create!(token: 'token1') # order matters
-      good_ne = @at.notification_endpoints.create!(token: 'token2')
+      sns_client = double()
+      expect(sns_client).to receive(:get_endpoint_attributes).at_least(:once).and_return(double(attributes: {'Enabled' => 'true', 'CustomUserData' => @at.global_id.to_s}))
+      expect(sns_client).to receive(:create_platform_endpoint).twice.and_return({endpoint_arn: bad_arn}, {endpoint_arn: good_arn})
+      bad_ne = @at.notification_endpoints.new(token: 'token1') # order matters
+      good_ne = @at.notification_endpoints.new(token: 'token2')
+      allow(bad_ne).to receive(:sns_client).and_return(sns_client)
+      allow(good_ne).to receive(:sns_client).and_return(sns_client)
+      bad_ne.save!
+      good_ne.save!
+      allow_any_instantiation_of(bad_ne).to receive(:sns_client).and_return(sns_client)
+      allow_any_instantiation_of(good_ne).to receive(:sns_client).and_return(sns_client)
 
       @message = generate_message(:account_user_notification, :push, @au, user: @user)
       @message.save! # generate a message id
@@ -92,9 +100,9 @@ describe NotificationFailureProcessor do
         },
       ])
       nfp = NotificationFailureProcessor.new(access_key: 'key', secret_access_key: 'secret')
-      nfp.stubs(:notification_failure_queue).returns(failure_queue)
+      allow(nfp).to receive(:notification_failure_queue).and_return(failure_queue)
 
-      sns_client.expects(:delete_endpoint).with(endpoint_arn: bad_arn)
+      expect(sns_client).to receive(:delete_endpoint).with(endpoint_arn: bad_arn)
       nfp.process
       expect(NotificationEndpoint.where(arn: good_arn)).not_to be_empty
       expect(NotificationEndpoint.where(arn: bad_arn)).to be_empty
@@ -111,7 +119,7 @@ describe NotificationFailureProcessor do
         },
       ])
       nfp = NotificationFailureProcessor.new(access_key: 'key', secret_access_key: 'secret')
-      nfp.stubs(:notification_failure_queue).returns(failure_queue)
+      allow(nfp).to receive(:notification_failure_queue).and_return(failure_queue)
 
       expect{ Message.find(nonexistent_id) }.to raise_error(ActiveRecord::RecordNotFound)
       expect{ nfp.process }.not_to raise_error
@@ -131,7 +139,7 @@ describe NotificationFailureProcessor do
           }
         ])
         nfp = NotificationFailureProcessor.new(access_key: 'key', secret_access_key: 'secret')
-        nfp.stubs(:notification_failure_queue).returns(failure_queue)
+        allow(nfp).to receive(:notification_failure_queue).and_return(failure_queue)
         @shard1.activate do
           nfp.process
         end

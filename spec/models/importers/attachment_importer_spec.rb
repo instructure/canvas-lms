@@ -29,7 +29,7 @@ module Importers
       let(:migration_id) { '123' }
       let(:attachment_id) { 456 }
       let(:attachment) do
-        stub(:context= => true,
+        double(:context= => true,
              :migration_id= => true,
              :migration_id => migration_id,
              :save_without_broadcasting! => true,
@@ -38,8 +38,8 @@ module Importers
       end
 
       before :each do
-        course.stubs(:id).returns(course_id)
-        migration.stubs(:import_object?).with('attachments', migration_id).returns(true)
+        allow(course).to receive(:id).and_return(course_id)
+        allow(migration).to receive(:import_object?).with('attachments', migration_id).and_return(true)
       end
 
       it 'imports an attachment' do
@@ -52,14 +52,14 @@ module Importers
             }
         }
 
-        ::Attachment.expects(:where).with(context_type: "Course", context_id: course, id: attachment_id).returns(stub(first: attachment))
-        migration.expects(:import_object?).with('attachments', migration_id).returns(true)
-        attachment.expects(:context=).with(course)
-        attachment.expects(:migration_id=).with(migration_id)
-        attachment.expects(:locked=).never
-        attachment.expects(:file_state=).never
-        attachment.expects(:display_name=).never
-        attachment.expects(:save_without_broadcasting!)
+        expect(::Attachment).to receive(:where).with(context_type: "Course", context_id: course, id: attachment_id).and_return(double(first: attachment))
+        expect(migration).to receive(:import_object?).with('attachments', migration_id).and_return(true)
+        expect(attachment).to receive(:context=).with(course)
+        expect(attachment).to receive(:migration_id=).with(migration_id)
+        expect(attachment).to receive(:locked=).never
+        expect(attachment).to receive(:file_state=).never
+        expect(attachment).to receive(:display_name=).never
+        expect(attachment).to receive(:save_without_broadcasting!)
 
         Importers::AttachmentImporter.process_migration(data, migration)
 
@@ -79,9 +79,9 @@ module Importers
             }
         }
 
-        ::Attachment.expects(:where).with(context_type: "Course", context_id: course, id: attachment_id).returns(stub(first: attachment))
-        migration.expects(:import_object?).with('attachments', migration_id).returns(true)
-        attachment.expects(:save_without_broadcasting!)
+        expect(::Attachment).to receive(:where).with(context_type: "Course", context_id: course, id: attachment_id).and_return(double(first: attachment))
+        expect(migration).to receive(:import_object?).with('attachments', migration_id).and_return(true)
+        expect(attachment).to receive(:save_without_broadcasting!)
 
         Importers::AttachmentImporter.process_migration(data, migration)
       end
@@ -96,10 +96,10 @@ module Importers
             }
         }
 
-        ::Attachment.expects(:where).with(context_type: "Course", context_id: course, id: attachment_id).returns(stub(first: nil))
-        ::Attachment.expects(:where).with(context_type: "Course", context_id: course, migration_id: migration_id).returns(stub(first: attachment))
-        migration.expects(:import_object?).with('attachments', migration_id).returns(true)
-        attachment.expects(:save_without_broadcasting!)
+        expect(::Attachment).to receive(:where).with(context_type: "Course", context_id: course, id: attachment_id).and_return(double(first: nil))
+        expect(::Attachment).to receive(:where).with(context_type: "Course", context_id: course, migration_id: migration_id).and_return(double(first: attachment))
+        expect(migration).to receive(:import_object?).with('attachments', migration_id).and_return(true)
+        expect(attachment).to receive(:save_without_broadcasting!)
 
         Importers::AttachmentImporter.process_migration(data, migration)
       end
@@ -115,11 +115,11 @@ module Importers
             }
         }
 
-        ::Attachment.expects(:where).with(context_type: "Course", context_id: course, id: attachment_id).returns(stub(first: nil))
-        ::Attachment.expects(:where).with(context_type: "Course", context_id: course, migration_id: migration_id).returns(stub(first: nil))
-        ::Attachment.expects(:find_from_path).with("path/to/file", course).returns(attachment)
-        migration.expects(:import_object?).with('attachments', migration_id).returns(true)
-        attachment.expects(:save_without_broadcasting!)
+        expect(::Attachment).to receive(:where).with(context_type: "Course", context_id: course, id: attachment_id).and_return(double(first: nil))
+        expect(::Attachment).to receive(:where).with(context_type: "Course", context_id: course, migration_id: migration_id).and_return(double(first: nil))
+        expect(::Attachment).to receive(:find_from_path).with("path/to/file", course).and_return(attachment)
+        expect(migration).to receive(:import_object?).with('attachments', migration_id).and_return(true)
+        expect(attachment).to receive(:save_without_broadcasting!)
 
         Importers::AttachmentImporter.process_migration(data, migration)
       end
@@ -134,11 +134,11 @@ module Importers
             }
         }
 
-        ::Attachment.expects(:where).with(context_type: "Course", context_id: course, id: attachment_id).returns(stub(first: attachment))
-        migration.stubs(:import_object?).with('attachments', migration_id).returns(false)
-        migration.stubs(:import_object?).with('files', migration_id).returns(true)
+        expect(::Attachment).to receive(:where).with(context_type: "Course", context_id: course, id: attachment_id).and_return(double(first: attachment))
+        allow(migration).to receive(:import_object?).with('attachments', migration_id).and_return(false)
+        allow(migration).to receive(:import_object?).with('files', migration_id).and_return(true)
 
-        attachment.expects(:save_without_broadcasting!)
+        expect(attachment).to receive(:save_without_broadcasting!)
 
         Importers::AttachmentImporter.process_migration(data, migration)
       end
@@ -154,7 +154,7 @@ module Importers
             }
         }
 
-        ::Attachment.expects(:where).never
+        expect(::Attachment).to receive(:where).never
 
         Importers::AttachmentImporter.process_migration(data, migration)
       end
@@ -171,7 +171,7 @@ module Importers
             }
         }
 
-        ::Attachment.expects(:where).never
+        expect(::Attachment).to receive(:where).never
 
         Importers::AttachmentImporter.process_migration(data, migration)
       end
@@ -189,10 +189,10 @@ module Importers
             }
         }
 
-        ::Attachment.expects(:where).with(context_type: "Course", context_id: course, id: attachment_id).returns(stub(first: attachment))
-        attachment.expects(:locked=).with(true)
-        attachment.expects(:file_state=).with('hidden')
-        attachment.expects(:display_name=).with('display name')
+        expect(::Attachment).to receive(:where).with(context_type: "Course", context_id: course, id: attachment_id).and_return(double(first: attachment))
+        expect(attachment).to receive(:locked=).with(true)
+        expect(attachment).to receive(:file_state=).with('hidden')
+        expect(attachment).to receive(:display_name=).with('display name')
 
         Importers::AttachmentImporter.process_migration(data, migration)
       end
@@ -205,13 +205,13 @@ module Importers
             ]
         }
 
-        active_folders_association = stub()
-        course.expects(:active_folders).returns(active_folders_association).twice
-        folder = stub()
-        active_folders_association.stubs(:where).with(full_name: "course files/path1/foo").returns(stub(first: folder))
-        active_folders_association.stubs(:where).with(full_name: "course files/path2/bar").returns(stub(first: nil))
-        folder.expects(:locked=).with(true)
-        folder.expects(:save)
+        active_folders_association = double()
+        expect(course).to receive(:active_folders).and_return(active_folders_association).twice
+        folder = double()
+        allow(active_folders_association).to receive(:where).with(full_name: "course files/path1/foo").and_return(double(first: folder))
+        allow(active_folders_association).to receive(:where).with(full_name: "course files/path2/bar").and_return(double(first: nil))
+        expect(folder).to receive(:locked=).with(true)
+        expect(folder).to receive(:save)
 
         Importers::AttachmentImporter.process_migration(data, migration)
       end
@@ -224,13 +224,13 @@ module Importers
             ]
         }
 
-        active_folders_association = stub()
-        course.expects(:active_folders).returns(active_folders_association).twice
-        folder = stub()
-        active_folders_association.stubs(:where).with(full_name: "course files/path1/foo").returns(stub(first: folder))
-        active_folders_association.stubs(:where).with(full_name: "course files/path2/bar").returns(stub(first: nil))
-        folder.expects(:workflow_state=).with("hidden")
-        folder.expects(:save)
+        active_folders_association = double()
+        expect(course).to receive(:active_folders).and_return(active_folders_association).twice
+        folder = double()
+        allow(active_folders_association).to receive(:where).with(full_name: "course files/path1/foo").and_return(double(first: folder))
+        allow(active_folders_association).to receive(:where).with(full_name: "course files/path2/bar").and_return(double(first: nil))
+        expect(folder).to receive(:workflow_state=).with("hidden")
+        expect(folder).to receive(:save)
 
         Importers::AttachmentImporter.process_migration(data, migration)
       end
@@ -248,8 +248,8 @@ module Importers
           }
 
           error = RuntimeError.new
-          ::Attachment.expects(:where).raises(error)
-          migration.expects(:add_import_warning).with(I18n.t('#migration.file_type', "File"), "foo", error)
+          expect(::Attachment).to receive(:where).and_raise(error)
+          expect(migration).to receive(:add_import_warning).with(I18n.t('#migration.file_type', "File"), "foo", error)
 
           Importers::AttachmentImporter.process_migration(data, migration)
         end
@@ -266,8 +266,8 @@ module Importers
           }
 
           error = RuntimeError.new
-          ::Attachment.expects(:where).raises(error)
-          migration.expects(:add_import_warning).with(I18n.t('#migration.file_type', "File"), "bar", error)
+          expect(::Attachment).to receive(:where).and_raise(error)
+          expect(migration).to receive(:add_import_warning).with(I18n.t('#migration.file_type', "File"), "bar", error)
 
           Importers::AttachmentImporter.process_migration(data, migration)
         end

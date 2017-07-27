@@ -218,7 +218,7 @@ describe ConversationParticipant do
 
     it "should let site admins see everything" do
       Account.site_admin.account_users.create!(user: @admin_user)
-      Account.site_admin.stubs(:grants_right?).with(@admin_user, :become_user).returns(false)
+      allow(Account.site_admin).to receive(:grants_right?).with(@admin_user, :become_user).and_return(false)
       convos = @target_user.conversations.for_masquerading_user(@admin_user)
       expect(convos.size).to eql 4
       expect(convos).to eq @target_user.conversations.to_a

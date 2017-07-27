@@ -24,7 +24,7 @@ describe FeatureFlag do
   let_once(:t_course) { course_factory account: t_sub_account, active_all: true }
 
   before do
-    Feature.stubs(:definitions).returns({
+    allow(Feature).to receive(:definitions).and_return({
       'root_account_feature' => Feature.new(feature: 'root_account_feature', applies_to: 'RootAccount'),
       'account_feature' => Feature.new(feature: 'account_feature', applies_to: 'Account'),
       'course_feature' => Feature.new(feature: 'course_feature', applies_to: 'Course'),

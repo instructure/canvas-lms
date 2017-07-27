@@ -73,10 +73,10 @@ describe GroupMembership do
 
     it "should have a validation error on new record" do
       membership = GroupMembership.new
-      membership.stubs(:user).returns(mock(:name => 'test user'))
-      membership.stubs(:group).returns(mock(:name => 'test group'))
-      membership.stubs(:restricted_self_signup?).returns(true)
-      membership.stubs(:has_common_section_with_me?).returns(false)
+      allow(membership).to receive(:user).and_return(double(:name => 'test user'))
+      allow(membership).to receive(:group).and_return(double(:name => 'test group'))
+      allow(membership).to receive(:restricted_self_signup?).and_return(true)
+      allow(membership).to receive(:has_common_section_with_me?).and_return(false)
       expect(membership.save).not_to be_truthy
       expect(membership.errors.size).to eq 1
       expect(membership.errors[:user_id].to_s).to match(/test user does not share a section/)
@@ -326,30 +326,26 @@ describe GroupMembership do
     end
 
     it "triggers a batch when membership is created" do
-      DueDateCacher.expects(:recompute).never
-      DueDateCacher.expects(:recompute_course).with { |course_id, assignment_ids|
-        course_id == @course.id && assignment_ids.sort == [@assignments[0].id, @assignments[1].id].sort
-      }.once
+      expect(DueDateCacher).to receive(:recompute).never
+      expect(DueDateCacher).to receive(:recompute_course).with(@course.id, match_array(@assignments[0..1].map(&:id)))
       @group.group_memberships.create(:user => user_factory)
     end
 
     it "triggers a batch when membership is deleted" do
-      DueDateCacher.expects(:recompute).never
-      DueDateCacher.expects(:recompute_course).with { |course_id, assignment_ids|
-        course_id == @course.id && assignment_ids.sort == [@assignments[0].id, @assignments[1].id].sort
-      }.once
+      expect(DueDateCacher).to receive(:recompute).never
+      expect(DueDateCacher).to receive(:recompute_course).with(@course.id, match_array(@assignments[0..1].map(&:id)))
       @membership.destroy
     end
 
     it "does not trigger when nothing changed" do
-      DueDateCacher.expects(:recompute).never
-      DueDateCacher.expects(:recompute_course).never
+      expect(DueDateCacher).to receive(:recompute).never
+      expect(DueDateCacher).to receive(:recompute_course).never
       @membership.save
     end
 
     it "does not trigger when it's an account group" do
-      DueDateCacher.expects(:recompute).never
-      DueDateCacher.expects(:recompute_course).never
+      expect(DueDateCacher).to receive(:recompute).never
+      expect(DueDateCacher).to receive(:recompute_course).never
       @group = Account.default.groups.create!(:name => 'Group!')
       @group.group_memberships.create!(:user => user_factory)
     end

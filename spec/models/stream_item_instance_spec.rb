@@ -28,8 +28,8 @@ describe StreamItemInstance do
   describe ".update_all_with_invalidation" do
      it "invalidates stream item cache keys and runs update_all (the original)" do
        # expect
-       StreamItemCache.expects(:invalidate_context_stream_item_key).twice
-       StreamItemInstance.expects(:original_update_all).with('updates')
+       expect(StreamItemCache).to receive(:invalidate_context_stream_item_key).twice
+       expect(StreamItemInstance).to receive(:original_update_all).with('updates')
        # when
        StreamItemInstance.update_all_with_invalidation(['code_1', 'code_2'],
                                                        'updates')

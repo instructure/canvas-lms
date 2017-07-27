@@ -21,14 +21,14 @@ require_dependency "lti/navigation_cache"
 
 module Lti
   describe NavigationCache do
-    let(:account) { mock }
+    let(:account) { double }
     subject { NavigationCache.new(account) }
 
     describe "#cache_key" do
       it 'creates a new cache key' do
         enable_cache do
           uuid = SecureRandom.uuid
-          SecureRandom.expects(:uuid).once.returns(uuid)
+          expect(SecureRandom).to receive(:uuid).once.and_return(uuid)
           expect(subject.cache_key).to eq uuid
         end
       end
@@ -36,7 +36,7 @@ module Lti
       it 'returns the cached result on subsequent calls' do
         enable_cache do
           uuid = SecureRandom.uuid
-          SecureRandom.expects(:uuid).once.returns(uuid)
+          expect(SecureRandom).to receive(:uuid).once.and_return(uuid)
           expect(subject.cache_key).to eq uuid
           expect(subject.cache_key).to eq uuid
         end
@@ -48,7 +48,7 @@ module Lti
       it 'invalidates the cache' do
         enable_cache do
           uuid = SecureRandom.uuid
-          SecureRandom.expects(:uuid).twice.returns(uuid)
+          expect(SecureRandom).to receive(:uuid).twice.and_return(uuid)
           subject.cache_key
           subject.invalidate_cache_key
           subject.cache_key

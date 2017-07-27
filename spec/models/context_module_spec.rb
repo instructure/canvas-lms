@@ -383,8 +383,8 @@ describe ContextModule do
       @user = User.create!(:name => "some name")
       @course.enroll_student(@user).accept!
 
-      Canvas::Plugin.find!('grade_export').stubs(:enabled?).returns(true)
-      @course.expects(:publish_final_grades).with(@user, @user.id).once
+      allow(Canvas::Plugin.find!('grade_export')).to receive(:enabled?).and_return(true)
+      expect(@course).to receive(:publish_final_grades).with(@user, @user.id).once
 
       @module.evaluate_for(@user)
     end
@@ -1138,7 +1138,7 @@ describe ContextModule do
         expect(@module.content_tags_visible_to(@student_2).map(&:content).include?(@assignment)).to be_falsey
       end
       it "should not reload the tags if already loaded" do
-        ContentTag.expects(:visible_to_students_in_course_with_da).never
+        expect(ContentTag).to receive(:visible_to_students_in_course_with_da).never
         ActiveRecord::Associations::Preloader.new.preload(@module, content_tags: :content)
         @module.content_tags_visible_to(@student_1)
       end

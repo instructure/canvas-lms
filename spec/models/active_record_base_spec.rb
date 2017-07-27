@@ -149,7 +149,7 @@ describe ActiveRecord::Base do
     it "should not use a cursor when start is passed" do
       skip "needs PostgreSQL" unless Account.connection.adapter_name == 'PostgreSQL'
       Account.transaction do
-        Account.expects(:find_in_batches_with_cursor).never
+        expect(Account).to receive(:find_in_batches_with_cursor).never
         Account.where(:id => Account.default).find_each(start: 0) do
         end
       end
@@ -326,13 +326,19 @@ describe ActiveRecord::Base do
       User.cache do
         User.first
 
-        User.connection.expects(:select).never
+        count = 0
+        allow(User.connection).to receive(:select).and_wrap_original do |original, args|
+          count += 1
+          original.call(args)
+        end
         User.first
-        User.connection.unstub(:select)
+        expect(count).to eq 0
 
         User.create!
-        User.connection.expects(:select).once.returns(ActiveRecord::Result.new([], []))
+
+        count = 0
         User.first
+        expect(count).to eq 1
       end
     end
 
@@ -340,15 +346,21 @@ describe ActiveRecord::Base do
       u = User.create
       User.cache do
         User.first
-        User.connection.expects(:select).never
+
+        count = 0
+        allow(User.connection).to receive(:select).and_wrap_original do |original, args|
+          count += 1
+          original.call(args)
+        end
         User.first
-        User.connection.unstub(:select)
+        expect(count).to eq 0
 
         u2 = User.new
         u2.id = u.id
         expect{ u2.save! }.to raise_error(ActiveRecord::RecordNotUnique)
-        User.connection.expects(:select).once.returns(ActiveRecord::Result.new([], []))
+        count = 0
         User.first
+        expect(count).to eq 1
       end
     end
   end
@@ -564,7 +576,7 @@ describe ActiveRecord::Base do
       relation = Assignment.all
       user1 = User.create!
       account1 = Account.create!
-      relation.expects(:where).with("(context_id=? AND context_type=?) OR (context_id=? AND context_type=?)", user1, 'User', account1, 'Account')
+      expect(relation).to receive(:where).with("(context_id=? AND context_type=?) OR (context_id=? AND context_type=?)", user1, 'User', account1, 'Account')
       relation.polymorphic_where(context: [user1, account1])
     end
 
@@ -572,7 +584,7 @@ describe ActiveRecord::Base do
       relation = Assignment.all
       user1 = User.create!
       account1 = Account.create!
-      relation.expects(:where).with("(context_id=? AND context_type=?) OR (context_id=? AND context_type=?) OR (context_id IS NULL AND context_type IS NULL)", user1, 'User', account1, 'Account')
+      expect(relation).to receive(:where).with("(context_id=? AND context_type=?) OR (context_id=? AND context_type=?) OR (context_id IS NULL AND context_type IS NULL)", user1, 'User', account1, 'Account')
       relation.polymorphic_where(context: [nil, user1, account1])
     end
   end

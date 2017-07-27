@@ -25,7 +25,7 @@ describe Auditors::GradeChange do
   let(:request_id) { 42 }
 
   before do
-    RequestContextGenerator.stubs( :request_id => request_id )
+    allow(RequestContextGenerator).to receive_messages( :request_id => request_id )
 
     shard_class = Class.new {
       define_method(:activate) { |&b| b.call }

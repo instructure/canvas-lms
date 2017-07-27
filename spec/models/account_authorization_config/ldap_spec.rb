@@ -59,41 +59,41 @@ describe AccountAuthorizationConfig::LDAP do
       aac = AccountAuthorizationConfig::LDAP.new
       aac.auth_type = 'ldap'
       aac.ldap_filter = 'bob'
-      aac.expects(:ldap_connection).never
+      expect(aac).to receive(:ldap_connection).never
       aac.ldap_bind_result('test', '')
     end
 
     context "statsd" do
       before do
-        @ldap = mock()
-        @ldap.stubs(:base)
-        @aac.expects(:ldap_connection).returns(@ldap)
-        @aac.expects(:ldap_filter).returns(nil)
+        @ldap = double()
+        allow(@ldap).to receive(:base)
+        expect(@aac).to receive(:ldap_connection).and_return(@ldap)
+        expect(@aac).to receive(:ldap_filter).and_return(nil)
       end
 
       it "should send to statsd on success" do
-        @ldap.stubs(:bind_as).returns(true)
-        CanvasStatsd::Statsd.expects(:increment).with("#{@aac.send(:statsd_prefix)}.ldap_success")
+        allow(@ldap).to receive(:bind_as).and_return(true)
+        expect(CanvasStatsd::Statsd).to receive(:increment).with("#{@aac.send(:statsd_prefix)}.ldap_success")
         @aac.ldap_bind_result('user', 'pass')
       end
 
       it "should send to statsd on failure" do
-        @ldap.stubs(:bind_as).returns(false)
-        CanvasStatsd::Statsd.expects(:increment).with("#{@aac.send(:statsd_prefix)}.ldap_failure")
+        allow(@ldap).to receive(:bind_as).and_return(false)
+        expect(CanvasStatsd::Statsd).to receive(:increment).with("#{@aac.send(:statsd_prefix)}.ldap_failure")
         @aac.ldap_bind_result('user', 'pass')
       end
 
       it "should send to statsd on timeout" do
-        @ldap.stubs(:bind_as).raises(Timeout::Error)
-        CanvasStatsd::Statsd.expects(:increment).with("#{@aac.send(:statsd_prefix)}.ldap_timeout")
-        CanvasStatsd::Statsd.stubs(:increment).with(Not(equals("#{@aac.send(:statsd_prefix)}.ldap_timeout")))
+        allow(@ldap).to receive(:bind_as).and_raise(Timeout::Error)
+        expect(CanvasStatsd::Statsd).to receive(:increment).with("#{@aac.send(:statsd_prefix)}.ldap_timeout")
+        allow(CanvasStatsd::Statsd).to receive(:increment).with(not_eq("#{@aac.send(:statsd_prefix)}.ldap_timeout"))
         @aac.ldap_bind_result('user', 'pass')
       end
 
       it "should send to statsd on exception" do
-        @ldap.stubs(:bind_as).raises(StandardError)
-        CanvasStatsd::Statsd.expects(:increment).with("#{@aac.send(:statsd_prefix)}.ldap_error")
-        CanvasStatsd::Statsd.stubs(:increment).with(Not(equals("#{@aac.send(:statsd_prefix)}.ldap_error")))
+        allow(@ldap).to receive(:bind_as).and_raise(StandardError)
+        expect(CanvasStatsd::Statsd).to receive(:increment).with("#{@aac.send(:statsd_prefix)}.ldap_error")
+        allow(CanvasStatsd::Statsd).to receive(:increment).with(not_eq("#{@aac.send(:statsd_prefix)}.ldap_error"))
         @aac.ldap_bind_result('user', 'pass')
       end
     end

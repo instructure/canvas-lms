@@ -261,7 +261,7 @@ module Alerts
         end
 
         before :each do
-          @pseudonym = mock('Pseudonym')
+          @pseudonym = double('Pseudonym')
           allow(@pseudonym).to receive(:destroyed?).and_return(false)
           allow(Pseudonym).to receive(:find_by_user_id).and_return(@pseudonym)
         end

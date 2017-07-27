@@ -87,8 +87,8 @@ describe SisBatch do
       @a1 = @account
       @a2 = account_model
       b5 = create_csv_data(['abc'])
-      b2.any_instantiation.expects(:process_without_send_later).never
-      b5.any_instantiation.expects(:process_without_send_later).never
+      expect_any_instantiation_of(b2).to receive(:process_without_send_later).never
+      expect_any_instantiation_of(b5).to receive(:process_without_send_later).never
       SisBatch.process_all_for_account(@a1)
       [b1, b2, b4].each { |batch| expect([:imported, :imported_with_messages]).to be_include(batch.reload.state) }
     end
@@ -488,7 +488,7 @@ s2,test_1,section2,active},
 
   context "csv diffing" do
     it "should skip diffing if previous diff not available" do
-      SIS::CSV::DiffGenerator.any_instance.expects(:generate).never
+      expect_any_instance_of(SIS::CSV::DiffGenerator).to receive(:generate).never
       batch = process_csv_data([
 %{course_id,short_name,long_name,account_id,term_id,status
 test_1,TC 101,Test Course 101,,term1,active

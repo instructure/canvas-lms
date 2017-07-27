@@ -30,6 +30,10 @@ describe Attachments::GarbageCollector do
     end
     let_once(:gc) { Attachments::GarbageCollector::FolderContextType.new }
 
+    before do
+      local_storage!
+    end
+
     it "destroys content and deletes objects" do
       expect(FileUtils).to receive(:rm).with(att.full_filename)
 

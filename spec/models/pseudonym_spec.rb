@@ -79,14 +79,14 @@ describe Pseudonym do
 
   it "should share a root_account_id with its account" do
     pseudonym = Pseudonym.new
-    pseudonym.stubs(:account).returns(stub(root_account_id: 1, id: 2))
+    allow(pseudonym).to receive(:account).and_return(double(root_account_id: 1, id: 2))
 
     expect(pseudonym.root_account_id).to eq 1
   end
 
   it "should use its account_id as a root_account_id if its account has no root" do
     pseudonym = Pseudonym.new
-    pseudonym.stubs(:account).returns(stub(root_account_id: nil, id: 1))
+    allow(pseudonym).to receive(:account).and_return(double(root_account_id: nil, id: 1))
 
     expect(pseudonym.root_account_id).to eq 1
   end
@@ -185,15 +185,18 @@ describe Pseudonym do
     end
 
     it "should gracefully handle unreachable LDAP servers" do
-      Net::LDAP.any_instance.expects(:bind_as).raises(Net::LDAP::LdapError, "no connection to server")
+      expect_any_instance_of(Net::LDAP).to receive(:bind_as).and_raise(Net::LDAP::LdapError, "no connection to server")
       expect{ @pseudonym.ldap_bind_result('blech') }.not_to raise_error
       expect(ErrorReport.last.message).to eql("no connection to server")
-      Net::LDAP.any_instance.expects(:bind_as).returns(true)
+    end
+
+    it "passes a success result through" do
+      expect_any_instance_of(Net::LDAP).to receive(:bind_as).and_return(true)
       expect(@pseudonym.ldap_bind_result('yay!')).to be_truthy
     end
 
     it "should set last_timeout_failure on LDAP servers that timeout" do
-      Net::LDAP.any_instance.expects(:bind_as).once.raises(Timeout::Error, "timed out")
+      expect_any_instance_of(Net::LDAP).to receive(:bind_as).once.and_raise(Timeout::Error, "timed out")
       expect(@pseudonym.ldap_bind_result('test')).to be_falsey
       expect(ErrorReport.last.message).to match(/timed out/)
       expect(@aac.reload.last_timeout_failure).to be > 1.minute.ago
@@ -208,10 +211,10 @@ describe Pseudonym do
 
   it "should not attempt validating a blank password" do
     pseudonym_model
-    @pseudonym.expects(:sis_ssha).never
+    expect(@pseudonym).to receive(:sis_ssha).never
     @pseudonym.valid_ssha?('')
 
-    @pseudonym.expects(:ldap_bind_result).never
+    expect(@pseudonym).to receive(:ldap_bind_result).never
     @pseudonym.valid_ldap_credentials?('')
   end
 
@@ -326,10 +329,10 @@ describe Pseudonym do
       Account.default.authentication_providers.create!(:auth_type => 'ldap')
       @pseudonym.reload
 
-      @pseudonym.stubs(:valid_ldap_credentials?).returns(false)
+      allow(@pseudonym).to receive(:valid_ldap_credentials?).and_return(false)
       expect(@pseudonym.valid_arbitrary_credentials?('qwertyuiop')).to be_falsey
 
-      @pseudonym.stubs(:valid_ldap_credentials?).returns(true)
+      allow(@pseudonym).to receive(:valid_ldap_credentials?).and_return(true)
       expect(@pseudonym.valid_arbitrary_credentials?('anything')).to be_truthy
     end
   end
@@ -340,16 +343,16 @@ describe Pseudonym do
       let_once(:account2) { @shard1.activate { Account.create! } }
 
       it "should only query the pertinent shard" do
-        Pseudonym.expects(:associated_shards).with('abc').returns([@shard1])
-        Pseudonym.expects(:active).once.returns(Pseudonym.none)
-        GlobalLookups.stubs(:enabled?).returns(true)
+        expect(Pseudonym).to receive(:associated_shards).with('abc').and_return([@shard1])
+        expect(Pseudonym).to receive(:active).once.and_return(Pseudonym.none)
+        allow(GlobalLookups).to receive(:enabled?).and_return(true)
         Pseudonym.authenticate({ unique_id: 'abc', password: 'def' }, [Account.default.id, account2])
       end
 
       it "should query all pertinent shards" do
-        Pseudonym.expects(:associated_shards).with('abc').returns([Shard.default, @shard1])
-        Pseudonym.expects(:active).twice.returns(Pseudonym.none)
-        GlobalLookups.stubs(:enabled?).returns(true)
+        expect(Pseudonym).to receive(:associated_shards).with('abc').and_return([Shard.default, @shard1])
+        expect(Pseudonym).to receive(:active).twice.and_return(Pseudonym.none)
+        allow(GlobalLookups).to receive(:enabled?).and_return(true)
         Pseudonym.authenticate({ unique_id: 'abc', password: 'def' }, [Account.default.id, account2])
       end
     end
@@ -361,36 +364,38 @@ describe Pseudonym do
 
     before(:once) do
       user_with_pseudonym
+    end
 
-      Canvas.redis.stubs(:redis_enabled?).returns(true)
-      Canvas.redis.stubs(:ttl).returns(1.day)
+    before do
+      allow(Canvas.redis).to receive(:redis_enabled?).and_return(true)
+      allow(Canvas.redis).to receive(:ttl).and_return(1.day)
     end
 
     it 'should claim a cas ticket' do
-      Canvas.redis.expects(:expire).with(redis_key, 1.day).returns(false).once
-      Canvas.redis.expects(:set).with(redis_key, @pseudonym.global_id, { ex: 1.day, nx: true, raw: true }).once
+      expect(Canvas.redis).to receive(:expire).with(redis_key, 1.day).and_return(false).once
+      expect(Canvas.redis).to receive(:set).with(redis_key, @pseudonym.global_id, { ex: 1.day, nx: true }).once
       @pseudonym.claim_cas_ticket(cas_ticket)
     end
 
     it 'should refresh a cas ticket' do
-      Canvas.redis.expects(:expire).with(redis_key, 1.day).returns(true).once
-      Canvas.redis.expects(:setex).never
+      expect(Canvas.redis).to receive(:expire).with(redis_key, 1.day).and_return(true).once
+      expect(Canvas.redis).to receive(:setex).never
       @pseudonym.claim_cas_ticket(cas_ticket)
     end
 
     it 'should check cas ticket expiration' do
-      Canvas.redis.expects(:get).with(redis_key, raw: true).returns(@pseudonym.global_id.to_s)
+      expect(Canvas.redis).to receive(:get).with(redis_key).and_return(@pseudonym.global_id.to_s)
       expect(@pseudonym.cas_ticket_expired?(cas_ticket)).to be_falsey
 
-      Canvas.redis.expects(:get).with(redis_key, raw: true).returns(Pseudonym::CAS_TICKET_EXPIRED)
+      expect(Canvas.redis).to receive(:get).with(redis_key).and_return(Pseudonym::CAS_TICKET_EXPIRED)
       expect(@pseudonym.cas_ticket_expired?(cas_ticket)).to be_truthy
     end
 
     it 'should expire a cas ticket' do
-      Canvas.redis.expects(:getset).once.returns(@pseudonym.global_id.to_s)
+      expect(Canvas.redis).to receive(:getset).once.and_return(@pseudonym.global_id.to_s)
       expect(Pseudonym.expire_cas_ticket(cas_ticket)).to be_truthy
 
-      Canvas.redis.expects(:getset).once.returns(Pseudonym::CAS_TICKET_EXPIRED)
+      expect(Canvas.redis).to receive(:getset).once.and_return(Pseudonym::CAS_TICKET_EXPIRED)
       expect(Pseudonym.expire_cas_ticket(cas_ticket)).to be_falsey
     end
   end

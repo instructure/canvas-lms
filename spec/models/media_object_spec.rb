@@ -78,19 +78,19 @@ describe MediaObject do
   describe ".ensure_media_object" do
     it "should not create if the media object exists already" do
       MediaObject.create!(:context => user_factory, :media_id => "test")
-      MediaObject.expects(:create!).never
+      expect(MediaObject).to receive(:create!).never
       MediaObject.ensure_media_object("test", {})
     end
 
     it "should not create if the media id doesn't exist in kaltura" do
-      MediaObject.expects(:media_id_exists?).with("test").returns(false)
-      MediaObject.expects(:create!).never
+      expect(MediaObject).to receive(:media_id_exists?).with("test").and_return(false)
+      expect(MediaObject).to receive(:create!).never
       MediaObject.ensure_media_object("test", {})
       run_jobs
     end
 
     it "should create the media object" do
-      MediaObject.expects(:media_id_exists?).with("test").returns(true)
+      expect(MediaObject).to receive(:media_id_exists?).with("test").and_return(true)
       MediaObject.ensure_media_object("test", { :context => user_factory })
       run_jobs
       obj = MediaObject.by_media_id("test").first
@@ -119,8 +119,8 @@ describe MediaObject do
     it "retries later when the transcode isn't available" do
       Timecop.freeze do
         mo = MediaObject.create!(:context => user_factory, :media_id => "test")
-        mo.expects(:retrieve_details)
-        mo.expects(:send_at).with(5.minutes.from_now, :retrieve_details_ensure_codecs, 2)
+        expect(mo).to receive(:retrieve_details)
+        expect(mo).to receive(:send_at).with(5.minutes.from_now, :retrieve_details_ensure_codecs, 2)
         mo.retrieve_details_ensure_codecs(1)
       end
     end
@@ -128,8 +128,8 @@ describe MediaObject do
     it "verifies existence of the transcoded details" do
       mo = MediaObject.create!(:context => user_factory, :media_id => "test")
       mo.data = { extensions: { mp4: { id: "t-yyy" } } }
-      mo.expects(:retrieve_details)
-      mo.expects(:send_at).never
+      expect(mo).to receive(:retrieve_details)
+      expect(mo).to receive(:send_at).never
       mo.retrieve_details_ensure_codecs(1)
     end
   end
@@ -185,13 +185,13 @@ describe MediaObject do
 
   describe ".add_media_files" do
     it "delegates to the KalturaMediaFileHandler to make a bulk upload to kaltura" do
-      kaltura_media_file_handler = mock('KalturaMediaFileHandler')
-      KalturaMediaFileHandler.expects(:new).returns(kaltura_media_file_handler)
+      kaltura_media_file_handler = double('KalturaMediaFileHandler')
+      expect(KalturaMediaFileHandler).to receive(:new).and_return(kaltura_media_file_handler)
 
       attachments = [ Attachment.new ]
       wait_for_completion = true
 
-      kaltura_media_file_handler.expects(:add_media_files).with(attachments, wait_for_completion).returns(:retval)
+      expect(kaltura_media_file_handler).to receive(:add_media_files).with(attachments, wait_for_completion).and_return(:retval)
 
       expect(MediaObject.add_media_files(attachments, wait_for_completion)).to eq :retval
     end

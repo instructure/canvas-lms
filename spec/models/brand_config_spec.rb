@@ -125,16 +125,16 @@ describe BrandConfig do
       @json_file = StringIO.new
       @js_file = StringIO.new
       @scss_file = StringIO.new
-      @subaccount_bc.stubs(:json_file).returns(@json_file)
-      @subaccount_bc.stubs(:js_file).returns(@js_file)
-      @subaccount_bc.stubs(:scss_file).returns(@scss_file)
+      allow(@subaccount_bc).to receive(:json_file).and_return(@json_file)
+      allow(@subaccount_bc).to receive(:js_file).and_return(@js_file)
+      allow(@subaccount_bc).to receive(:scss_file).and_return(@scss_file)
     end
 
     describe "with cdn disabled" do
       before do
-        Canvas::Cdn.expects(:enabled?).at_least_once.returns(false)
-        @subaccount_bc.expects(:s3_uploader).never
-        File.expects(:delete).never
+        expect(Canvas::Cdn).to receive(:enabled?).at_least(:once).and_return(false)
+        expect(@subaccount_bc).to receive(:s3_uploader).never
+        expect(File).to receive(:delete).never
       end
 
       it "writes the json representation to the json file" do
@@ -155,11 +155,11 @@ describe BrandConfig do
 
     describe "with cdn enabled" do
       before :each do
-        Canvas::Cdn.expects(:enabled?).at_least_once.returns(true)
-        s3 = stub(bucket: nil)
-        Aws::S3::Resource.stubs(:new).returns(s3)
-        @upload_expectation = @subaccount_bc.s3_uploader.expects(:upload_file).twice
-        @delete_expectation = File.expects(:delete).twice
+        expect(Canvas::Cdn).to receive(:enabled?).at_least(:once).and_return(true)
+        s3 = double(bucket: nil)
+        allow(Aws::S3::Resource).to receive(:new).and_return(s3)
+        @upload_expectation = expect(@subaccount_bc.s3_uploader).to receive(:upload_file).twice
+        expect(File).to receive(:delete).twice
       end
 
       it "writes the json representation to the json file" do
@@ -173,15 +173,10 @@ describe BrandConfig do
       end
 
       it 'uploads json & js file to s3' do
-        @upload_expectation.with(any_of(
-          @subaccount_bc.public_json_path,
+        @upload_expectation.with(eq(
+          @subaccount_bc.public_json_path).or eq(
           @subaccount_bc.public_js_path
         ))
-        @subaccount_bc.save_all_files!
-      end
-
-      it 'deletes local json & js file when its done' do
-        @delete_expectation.with(@subaccount_bc.js_file).then.with(@subaccount_bc.json_file)
         @subaccount_bc.save_all_files!
       end
     end

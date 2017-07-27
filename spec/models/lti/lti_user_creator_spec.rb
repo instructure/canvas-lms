@@ -22,7 +22,7 @@ describe Lti::LtiUserCreator do
   describe '#convert' do
     let(:tool) do
       ContextExternalTool.new.tap do |tool|
-        tool.stubs(:opaque_identifier_for).returns('this is opaque')
+        allow(tool).to receive(:opaque_identifier_for).and_return('this is opaque')
       end
     end
 
@@ -41,7 +41,7 @@ describe Lti::LtiUserCreator do
       pseudonym.sis_user_id = 'sis id!'
       pseudonym.save!
 
-      Time.zone.tzinfo.stubs(:name).returns('my/zone')
+      allow(Time.zone.tzinfo).to receive(:name).and_return('my/zone')
 
       user_factory = Lti::LtiUserCreator.new(canvas_user, root_account, tool, sub_account)
       lti_user = user_factory.convert
@@ -199,7 +199,7 @@ describe Lti::LtiUserCreator do
         end
 
         it "does not return any course enrollments when the context is an account" do
-          canvas_account.stubs(:id).returns(canvas_course.id)
+          allow(canvas_account).to receive(:id).and_return(canvas_course.id)
           student_in_course(user: canvas_user, course: canvas_course, active_enrollment: true)
           expect(account_user_creator.convert.current_roles).to eq ["urn:lti:sysrole:ims/lis/None"]
         end
@@ -239,7 +239,7 @@ describe Lti::LtiUserCreator do
         end
 
         it "does not return any course enrollments when the context is an account" do
-          canvas_account.stubs(:id).returns(canvas_course.id)
+          allow(canvas_account).to receive(:id).and_return(canvas_course.id)
           student_in_course(user: canvas_user, course: canvas_course, active_enrollment: true).conclude
           expect(account_user_creator.convert.concluded_roles.size).to eq 0
         end

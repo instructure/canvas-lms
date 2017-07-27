@@ -176,14 +176,14 @@ describe AccountAuthorizationConfig do
       it "allows valid provider attributes" do
         aac = Account.default.authentication_providers.new(auth_type: 'saml',
             federated_attributes: { 'integration_id' => 'internal_id'})
-        AccountAuthorizationConfig::SAML.stubs(:recognized_federated_attributes).returns(['internal_id'])
+        allow(AccountAuthorizationConfig::SAML).to receive(:recognized_federated_attributes).and_return(['internal_id'])
         expect(aac).to be_valid
       end
 
       it "doesn't allow invalid provider attributes" do
         aac = Account.default.authentication_providers.new(auth_type: 'saml',
             federated_attributes: { 'integration_id' => 'garbage'})
-        AccountAuthorizationConfig::SAML.stubs(:recognized_federated_attributes).returns(['internal_id'])
+        allow(AccountAuthorizationConfig::SAML).to receive(:recognized_federated_attributes).and_return(['internal_id'])
         expect(aac).not_to be_valid
       end
 

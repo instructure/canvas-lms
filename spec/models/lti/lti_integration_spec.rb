@@ -64,12 +64,12 @@ describe "LTI integration tests" do
   }
 
   let(:controller) do
-    request_mock = mock('request')
-    request_mock.stubs(:host).returns('/my/url')
-    request_mock.stubs(:scheme).returns('https')
-    m = mock('controller')
-    m.stubs(:request).returns(request_mock)
-    m.stubs(:logged_in_user).returns(@user || user)
+    request_mock = double('request')
+    allow(request_mock).to receive(:host).and_return('/my/url')
+    allow(request_mock).to receive(:scheme).and_return('https')
+    m = double('controller')
+    allow(m).to receive(:request).and_return(request_mock)
+    allow(m).to receive(:logged_in_user).and_return(@user || user)
     m
   end
 
@@ -409,7 +409,7 @@ describe "LTI integration tests" do
     end
 
     it "should include assignment outcome service params for student" do
-      Canvas::Security.stubs(:hmac_sha1).returns('some_sha')
+      allow(Canvas::Security).to receive(:hmac_sha1).and_return('some_sha')
       hash = tool_setup
 
       payload = [@tool.id, @course.id, @assignment.id, @user.id].join('-')

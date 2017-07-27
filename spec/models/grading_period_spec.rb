@@ -564,24 +564,24 @@ describe GradingPeriod do
 
   describe ".current_period_for" do
     let(:account) { Account.new }
-    let(:not_current_grading_period) { mock }
-    let(:current_grading_period) { mock }
+    let(:not_current_grading_period) { double }
+    let(:current_grading_period) { double }
 
     it "returns the current grading period given a context" do
-      GradingPeriod.expects(:for).with(account).returns([not_current_grading_period, current_grading_period])
-      not_current_grading_period.expects(:current?).returns(false)
-      current_grading_period.expects(:current?).returns(true)
+      expect(GradingPeriod).to receive(:for).with(account).and_return([not_current_grading_period, current_grading_period])
+      expect(not_current_grading_period).to receive(:current?).and_return(false)
+      expect(current_grading_period).to receive(:current?).and_return(true)
       expect(GradingPeriod.current_period_for(account)).to eq(current_grading_period)
     end
 
     it "returns nil if grading periods exist for the given context, but none are current" do
-      GradingPeriod.expects(:for).with(account).returns([not_current_grading_period])
-      not_current_grading_period.expects(:current?).returns(false)
+      expect(GradingPeriod).to receive(:for).with(account).and_return([not_current_grading_period])
+      expect(not_current_grading_period).to receive(:current?).and_return(false)
       expect(GradingPeriod.current_period_for(account)).to be_nil
     end
 
     it "returns nil if no grading periods exist for the given context" do
-      GradingPeriod.expects(:for).with(account).returns([])
+      expect(GradingPeriod).to receive(:for).with(account).and_return([])
       expect(GradingPeriod.current_period_for(account)).to be_nil
     end
   end

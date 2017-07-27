@@ -36,11 +36,11 @@ describe ContentParticipationCount do
     it "should count current unread objects correctly" do
       ["Submission"].each do |type|
         cpc = ContentParticipationCount.create_or_update(:context => @course, :user => @teacher, :content_type => type)
-        cpc.expects(:refresh_unread_count).never
+        expect(cpc).to receive(:refresh_unread_count).never
         expect(cpc.unread_count).to eq 0
 
         cpc = ContentParticipationCount.create_or_update(:context => @course, :user => @student, :content_type => type)
-        cpc.expects(:refresh_unread_count).never
+        expect(cpc).to receive(:refresh_unread_count).never
         expect(cpc.unread_count).to eq 1
       end
     end
@@ -49,7 +49,7 @@ describe ContentParticipationCount do
       cpc = ContentParticipationCount.create_or_update(:context => @course, :user => @student, :content_type => "Submission")
       ContentParticipationCount.create_or_update(:context => @course, :user => @student, :content_type => "Submission", :offset => -1)
       cpc.reload
-      cpc.expects(:refresh_unread_count).never
+      expect(cpc).to receive(:refresh_unread_count).never
       expect(cpc.unread_count).to eq 0
     end
 
@@ -96,7 +96,7 @@ describe ContentParticipationCount do
     it "should not refresh if just created" do
       ["Submission"].each do |type|
         cpc = ContentParticipationCount.create_or_update(:context => @course, :user => @teacher, :content_type => type)
-        cpc.expects(:refresh_unread_count).never
+        expect(cpc).to receive(:refresh_unread_count).never
         expect(cpc.unread_count).to eq 0
       end
     end
@@ -104,11 +104,15 @@ describe ContentParticipationCount do
     it "should refresh if data could be stale" do
       ["Submission"].each do |type|
         cpc = ContentParticipationCount.create_or_update(:context => @course, :user => @teacher, :content_type => type)
-        cpc.expects(:refresh_unread_count).never
+        allowed = false
+        expect(cpc).to receive(:refresh_unread_count).and_wrap_original do |original|
+          raise "not allowed" unless allowed
+          original.call
+        end
         expect(cpc.unread_count).to eq 0
         ContentParticipationCount.where(:id => cpc).update_all(:updated_at => Time.now.utc - 1.day)
         cpc.reload
-        cpc.expects(:refresh_unread_count)
+        allowed = true
         expect(cpc.unread_count).to eq 0
       end
     end

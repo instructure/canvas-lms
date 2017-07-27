@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 describe KalturaMediaFileHandler do
   describe '#add_media_files' do
     let(:kaltura_config) { {} }
-    let(:kaltura_client) { mock('CanvasKaltura::ClientV3') }
+    let(:kaltura_client) { double('CanvasKaltura::ClientV3') }
     let(:files_sent_to_kaltura) { [] }
     let(:uploading_user) { user_factory }
     let(:attachment_context) { uploading_user }
@@ -30,13 +30,13 @@ describe KalturaMediaFileHandler do
     let(:bulk_upload_add_response) {{ id: "someBulkUploadId", ready: false }}
 
     before do
-      CanvasKaltura::ClientV3.stubs(:config).returns(kaltura_config)
-      CanvasKaltura::ClientV3.stubs(:new).returns(kaltura_client)
-      kaltura_client.stubs(:startSession)
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return(kaltura_config)
+      allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kaltura_client)
+      allow(kaltura_client).to receive(:startSession)
     end
 
     it "returns without action when all attachments have media objects already" do
-      kaltura_client.expects(:bulkUploadAdd).never
+      expect(kaltura_client).to receive(:bulkUploadAdd).never
       attachment.media_object = media_object()
       res = KalturaMediaFileHandler.new.add_media_files(attachment, wait_for_completion)
       expect(res).to be_nil
@@ -44,9 +44,10 @@ describe KalturaMediaFileHandler do
 
     context "with successful upload" do
       before do
-        kaltura_client.stubs(:bulkUploadAdd).with do |files|
+        allow(kaltura_client).to receive(:bulkUploadAdd) do |files|
           files_sent_to_kaltura.concat(files)
-        end.returns(bulk_upload_add_response)
+          bulk_upload_add_response
+        end
       end
 
       it "should work for user context" do
@@ -54,7 +55,7 @@ describe KalturaMediaFileHandler do
       end
 
       it "queues a job to check on the bulk upload later" do
-        MediaObject.expects(:send_later_enqueue_args).with do |method, config, *args|
+        expect(MediaObject).to receive(:send_later_enqueue_args) do |method, _config, *args|
           expect(method).to eq :refresh_media_files
           expect(args).to eq ['someBulkUploadId', [attachment.id], attachment.root_account_id]
         end
@@ -70,12 +71,11 @@ describe KalturaMediaFileHandler do
           unfinished_bulk_upload_get = { ready: false }
           successful_bulk_upload_get = { ready: true, entries: [:some_details] }
 
-          media_file_handler.expects(:sleep).with(60).twice
-          kaltura_client.expects(:bulkUploadGet).with("someBulkUploadId").twice
-            .returns(unfinished_bulk_upload_get).then
-            .returns(successful_bulk_upload_get)
+          expect(media_file_handler).to receive(:sleep).with(60).twice
+          expect(kaltura_client).to receive(:bulkUploadGet).with("someBulkUploadId").twice
+            .and_return(unfinished_bulk_upload_get, successful_bulk_upload_get)
 
-          MediaObject.expects(:build_media_objects).with(successful_bulk_upload_get, attachment.root_account_id)
+          expect(MediaObject).to receive(:build_media_objects).with(successful_bulk_upload_get, attachment.root_account_id)
 
           media_file_handler.add_media_files(attachment, wait_for_completion)
         end
@@ -85,7 +85,7 @@ describe KalturaMediaFileHandler do
 
           Setting.set('media_bulk_upload_timeout', 0)
 
-          MediaObject.expects(:send_later_enqueue_args).with do |method, config, *args|
+          expect(MediaObject).to receive(:send_later_enqueue_args) do |method, _config, *args|
             expect(method).to eq :refresh_media_files
             expect(args).to eq ['someBulkUploadId', [attachment.id], attachment.root_account_id]
           end

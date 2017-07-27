@@ -33,7 +33,7 @@ describe Auditors::Authentication do
       shard_class.new
     }
 
-    RequestContextGenerator.stubs( :request_id => request_id )
+    allow(RequestContextGenerator).to receive_messages( :request_id => request_id )
     @account = Account.default
     user_with_pseudonym(active_all: true)
     @event = Auditors::Authentication.record(@pseudonym, 'login')
@@ -60,9 +60,9 @@ describe Auditors::Authentication do
     end
 
     it "doesn't record an error when not configured" do
-      Auditors::Authentication::Stream.stubs(:database).returns(nil)
-      Canvas::Cassandra::DatabaseBuilder.expects(:configured?).with(:auditors).once.returns(false)
-      Canvas::EventStreamLogger.expects(:error).never
+      allow(Auditors::Authentication::Stream).to receive(:database).and_return(nil)
+      expect(Canvas::Cassandra::DatabaseBuilder).to receive(:configured?).with(:auditors).once.and_return(false)
+      expect(Canvas::EventStreamLogger).to receive(:error).never
       Auditors::Authentication.record(@pseudonym, 'login')
     end
   end

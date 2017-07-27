@@ -27,7 +27,7 @@ describe WimbaConference do
 
   before(:all) do
     WimbaConference.class_eval do
-      # set up a simple mock that mimics basic API functionality
+      # set up a simple double that mimics basic API functionality
       def send_request(action, opts={})
         @mocked_users ||= {:added => [], :admins => [], :joined => []}
         extra = ''
@@ -64,9 +64,9 @@ describe WimbaConference do
   end
 
   before :each do
-    WebConference.stubs(:plugins).returns([web_conference_plugin_mock("wimba", {:domain => "wimba.test"})])
+    allow(WebConference).to receive(:plugins).and_return([web_conference_plugin_mock("wimba", {:domain => "wimba.test"})])
     email = "email@email.com"
-    @user.stubs(:email).returns(email)
+    allow(@user).to receive(:email).and_return(email)
   end
 
   it "should correctly retrieve a config hash" do

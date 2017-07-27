@@ -47,7 +47,7 @@ describe CourseProgress do
 
   it "should return nil for non student users" do
     user = user_model
-    @course.stubs(:module_based?).returns(true)
+    allow(@course).to receive(:module_based?).and_return(true)
     progress = CourseProgress.new(@course, user).to_json
     expect(progress).to eq progress_error
   end
@@ -117,7 +117,7 @@ describe CourseProgress do
 
       [@module, @module2, @module3].each do |m|
         m.evaluate_for(@user)
-        m.any_instantiation.expects(:evaluate_for).never # shouldn't re-evaluate
+        expect_any_instantiation_of(m).to receive(:evaluate_for).never # shouldn't re-evaluate
       end
 
       progress = CourseProgress.new(@course, @user, read_only: true).to_json

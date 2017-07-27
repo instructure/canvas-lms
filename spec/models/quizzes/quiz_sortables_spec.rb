@@ -28,8 +28,8 @@ describe Quizzes::QuizSortables do
     end
 
     it "should assign the group and quiz" do
-      quiz  = stub
-      group = stub(:quiz => quiz)
+      quiz  = double
+      group = double(:quiz => quiz)
 
       sortables = Quizzes::QuizSortables.new(:group => group, :order => [])
 
@@ -44,9 +44,9 @@ describe Quizzes::QuizSortables do
 
       question  = Quizzes::QuizQuestion.new
       question.id = 123
-      questions = stub(:active => [question])
+      questions = double(:active => [question])
 
-      quiz = stub(:quiz_groups => groups, :quiz_questions => questions)
+      quiz = double(:quiz_groups => groups, :quiz_questions => questions)
 
       order = [{"type" => "group",    "id" => "234"},
                {"type" => "question", "id" => "123"}]
@@ -57,9 +57,9 @@ describe Quizzes::QuizSortables do
 
     it "should ignore items that dont have valid ids" do
       groups = [Quizzes::QuizGroup.new]
-      questions = stub(:active => [Quizzes::QuizQuestion.new])
+      questions = double(:active => [Quizzes::QuizQuestion.new])
 
-      quiz = stub(:quiz_groups => groups, :quiz_questions => questions)
+      quiz = double(:quiz_groups => groups, :quiz_questions => questions)
 
       order = [{"type" => "group",    "id" => "234"},
                {"type" => "question", "id" => "123"}]
@@ -78,21 +78,21 @@ describe Quizzes::QuizSortables do
         @question2  = Quizzes::QuizQuestion.new
         @question2.id = 234
 
-        @quiz = stub(:quiz_groups    => [],
-                     :quiz_questions => stub(:active => [@question1, @question2]),
+        @quiz = double(:quiz_groups    => [],
+                     :quiz_questions => double(:active => [@question1, @question2]),
                      :mark_edited!    => true)
         @group = Group.new
-        @group.stubs(:quiz => @quiz, :id => 999)
+        allow(@group).to receive_messages(:quiz => @quiz, :id => 999)
 
         @order = [{"type" => "question", "id" => "234"},
                   {"type" => "question", "id" => "123"}]
         @sortables = Quizzes::QuizSortables.new(:group => @group, :order => @order)
-        @sortables.expects(:update_object_positions!)
+        expect(@sortables).to receive(:update_object_positions!)
       end
 
       it "should update quiz_group_ids of group questions" do
-        @question1.expects(:quiz_group_id=).with(@group.id)
-        @question2.expects(:quiz_group_id=).with(@group.id)
+        expect(@question1).to receive(:quiz_group_id=).with(@group.id)
+        expect(@question2).to receive(:quiz_group_id=).with(@group.id)
         @sortables.reorder!
       end
     end
@@ -105,30 +105,30 @@ describe Quizzes::QuizSortables do
         @question  = Quizzes::QuizQuestion.new
         @question.id = 123
 
-        @quiz = stub(:quiz_groups    => [@group],
-                     :quiz_questions => stub(:active => [@question]),
+        @quiz = double(:quiz_groups    => [@group],
+                     :quiz_questions => double(:active => [@question]),
                      :mark_edited!    => true)
 
         @order = [{"type" => "group",    "id" => "234"},
                   {"type" => "question", "id" => "123"}]
         @sortables = Quizzes::QuizSortables.new(:quiz => @quiz, :order => @order)
-        @sortables.expects(:update_object_positions!)
+        expect(@sortables).to receive(:update_object_positions!)
       end
 
       it "should update positions attribute of questions" do
-        @group.expects(:position=).with(1)
-        @question.expects(:position=).with(2)
+        expect(@group).to receive(:position=).with(1)
+        expect(@question).to receive(:position=).with(2)
 
         @sortables.reorder!
       end
 
       it "should update quiz_group_ids of quiz questions" do
-        @question.expects(:quiz_group_id=).with(nil)
+        expect(@question).to receive(:quiz_group_id=).with(nil)
         @sortables.reorder!
       end
 
       it "should mark quiz as edited" do
-        @quiz.expects(:mark_edited!)
+        expect(@quiz).to receive(:mark_edited!)
         @sortables.reorder!
       end
     end

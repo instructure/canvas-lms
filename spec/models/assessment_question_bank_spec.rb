@@ -79,9 +79,10 @@ describe AssessmentQuestionBank do
     end
 
     it "processes questions in :id sorted order" do
-      AssessmentQuestion.expects(:find_or_create_quiz_questions).with do |aqs, _, _, _|
-        aqs == aqs.sort_by(&:id)
-      end.returns([])
+      expect(AssessmentQuestion).to receive(:find_or_create_quiz_questions) do |aqs, _, _, _|
+        expect(aqs).to eq aqs.sort_by(&:id)
+        []
+      end
       @bank.select_for_submission(@quiz.id, nil, 10)
     end
   end

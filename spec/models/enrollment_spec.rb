@@ -31,7 +31,7 @@ describe Enrollment do
 
   it "should have an interesting state machine" do
     enrollment_model
-    @user.stubs(:dashboard_messages).returns(Message.none)
+    allow(@user).to receive(:dashboard_messages).and_return(Message.none)
     expect(@enrollment.state).to eql(:invited)
     @enrollment.accept
     expect(@enrollment.state).to eql(:active)
@@ -650,7 +650,7 @@ describe Enrollment do
 
       Timecop.freeze(2.days.from_now) do
         expect(e).to be_invited
-        e.any_instantiation.expects(:re_send_confirmation!).once
+        expect_any_instantiation_of(e).to receive(:re_send_confirmation!).once
         run_jobs
       end
     end
@@ -781,7 +781,7 @@ describe Enrollment do
   context "recompute_final_score_if_stale" do
     before(:once) { course_with_student }
     it "should only call recompute_final_score once within the cache window" do
-      Enrollment.expects(:recompute_final_score).once
+      expect(Enrollment).to receive(:recompute_final_score).once
       enable_cache do
         Enrollment.recompute_final_score_if_stale @course
         Enrollment.recompute_final_score_if_stale @course
@@ -789,7 +789,7 @@ describe Enrollment do
     end
 
     it "should yield iff it calls recompute_final_score" do
-      Enrollment.expects(:recompute_final_score).once
+      expect(Enrollment).to receive(:recompute_final_score).once
       count = 1
       enable_cache do
         Enrollment.recompute_final_score_if_stale(@course, @user){ count += 1 }
@@ -827,8 +827,8 @@ describe Enrollment do
       expect(@user.student_enrollments.reload.count).to eq 2
       course_with_student(:user => @user)
       @c2 = @course
-      Enrollment.expects(:recompute_final_score).with(@user.id, @c1.id, {})
-      Enrollment.expects(:recompute_final_score).with(@user.id, @c2.id, {})
+      expect(Enrollment).to receive(:recompute_final_score).with(@user.id, @c1.id, {})
+      expect(Enrollment).to receive(:recompute_final_score).with(@user.id, @c2.id, {})
       Enrollment.recompute_final_scores(@user.id)
     end
   end
@@ -1071,7 +1071,7 @@ describe Enrollment do
         end
 
         it "recomputes scores for the student" do
-          Enrollment.expects(:recompute_final_score).with(@enrollment.user_id, @enrollment.course_id, {})
+          expect(Enrollment).to receive(:recompute_final_score).with(@enrollment.user_id, @enrollment.course_id, {})
           @enrollment.workflow_state = 'invited'
           @enrollment.save!
           @enrollment.accept
@@ -1104,7 +1104,7 @@ describe Enrollment do
         end
 
         it "does not attempt to recompute scores since the user is not a student" do
-          Enrollment.expects(:recompute_final_score).never
+          expect(Enrollment).to receive(:recompute_final_score).never
           @enrollment.workflow_state = 'invited'
           @enrollment.save!
           @enrollment.accept
@@ -1986,7 +1986,7 @@ describe Enrollment do
         end
 
         before :each do
-          Enrollment.stubs(:cross_shard_invitations?).returns(true)
+          allow(Enrollment).to receive(:cross_shard_invitations?).and_return(true)
           skip "working CommunicationChannel.associated_shards" unless CommunicationChannel.associated_shards('jt@instructure.com').length == 2
         end
 
@@ -2005,7 +2005,7 @@ describe Enrollment do
             @shard2.activate do
               expect(Enrollment.cached_temporary_invitations('jt@instructure.com').sort_by(&:global_id)).to eq [@enrollment1, @enrollment2].sort_by(&:global_id)
             end
-            Shard.expects(:with_each_shard).never
+            expect(Shard).to receive(:with_each_shard).never
             @shard1.activate do
               expect(Enrollment.cached_temporary_invitations('jt@instructure.com').sort_by(&:global_id)).to eq [@enrollment1, @enrollment2].sort_by(&:global_id)
             end
@@ -2085,17 +2085,17 @@ describe Enrollment do
     end
 
     it "should utilize to enrollment_dates if it has a value" do
-      @enrollment.stubs(:enrollment_dates).returns([[@enrollment_date_start_at, nil]])
+      allow(@enrollment).to receive(:enrollment_dates).and_return([[@enrollment_date_start_at, nil]])
       expect(@enrollment.effective_start_at).to eq @enrollment_date_start_at
     end
 
     it "should use earliest value from enrollment_dates if it has multiple" do
-      @enrollment.stubs(:enrollment_dates).returns([[@enrollment.start_at, nil], [@enrollment_date_start_at, nil]])
+      allow(@enrollment).to receive(:enrollment_dates).and_return([[@enrollment.start_at, nil], [@enrollment_date_start_at, nil]])
       expect(@enrollment.effective_start_at).to eq @enrollment_date_start_at
     end
 
     it "should follow chain of fallbacks in correct order if no enrollment_dates" do
-      @enrollment.stubs(:enrollment_dates).returns([[nil, Time.now]])
+      allow(@enrollment).to receive(:enrollment_dates).and_return([[nil, Time.now]])
 
       # start peeling away things from most preferred to least preferred to
       # test fallback chain
@@ -2142,17 +2142,17 @@ describe Enrollment do
     end
 
     it "should utilize to enrollment_dates if it has a value" do
-      @enrollment.stubs(:enrollment_dates).returns([[nil, @enrollment_date_end_at]])
+      allow(@enrollment).to receive(:enrollment_dates).and_return([[nil, @enrollment_date_end_at]])
       expect(@enrollment.effective_end_at).to eq @enrollment_date_end_at
     end
 
     it "should use earliest value from enrollment_dates if it has multiple" do
-      @enrollment.stubs(:enrollment_dates).returns([[nil, @enrollment.end_at], [nil, @enrollment_date_end_at]])
+      allow(@enrollment).to receive(:enrollment_dates).and_return([[nil, @enrollment.end_at], [nil, @enrollment_date_end_at]])
       expect(@enrollment.effective_end_at).to eq @enrollment_date_end_at
     end
 
     it "should follow chain of fallbacks in correct order if no enrollment_dates" do
-      @enrollment.stubs(:enrollment_dates).returns([[nil, nil]])
+      allow(@enrollment).to receive(:enrollment_dates).and_return([[nil, nil]])
 
       # start peeling away things from most preferred to least preferred to
       # test fallback chain
@@ -2264,7 +2264,7 @@ describe Enrollment do
       it "allows enrolling a user that is observed from another shard" do
         se = @shard1.activate do
           account = Account.create!
-          User.any_instance.expects(:can_be_enrolled_in_course?).returns(true)
+          expect_any_instance_of(User).to receive(:can_be_enrolled_in_course?).and_return(true)
           course_with_student(account: account, active_all: true, user: @student)
         end
         pe = @parent.observer_enrollments.shard(@shard1).first
@@ -2282,33 +2282,33 @@ describe Enrollment do
 
     describe 'on a student enrollment' do
       let(:enrollment) { StudentEnrollment.new }
-      let(:user) { stub(:id => 42) }
-      let(:session) { stub }
+      let(:user) { double(:id => 42) }
+      let(:session) { double }
 
       it 'is true for a user who has been granted :manage_students' do
         context = Object.new
-        context.stubs(:grants_right?).with(user, session, :manage_students).returns(true)
-        context.stubs(:grants_right?).with(user, session, :manage_admin_users).returns(false)
+        allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
+        allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
         expect(enrollment.can_be_deleted_by(user, context, session)).to be_truthy
       end
 
       it 'is false for a user without :manage_students' do
-        context = stub(:grants_right? => false)
+        context = double(:grants_right? => false)
         expect(enrollment.can_be_deleted_by(user, context, session)).to be_falsey
       end
 
       it 'is false for someone with :manage_admin_users but without :manage_students' do
         context = Object.new
-        context.stubs(:grants_right?).with(user, session, :manage_students).returns(false)
-        context.stubs(:grants_right?).with(user, session, :manage_admin_users).returns(true)
+        allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
+        allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(true)
         expect(enrollment.can_be_deleted_by(user, context, session)).to be_falsey
       end
 
       it 'is false if a user is trying to remove their own enrollment' do
         context = Object.new
-        context.stubs(:grants_right?).with(user, session, :manage_students).returns(true)
-        context.stubs(:grants_right?).with(user, session, :manage_admin_users).returns(false)
-        context.stubs(:account => context)
+        allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
+        allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
+        allow(context).to receive_messages(:account => context)
         enrollment.user_id = user.id
         expect(enrollment.can_be_deleted_by(user, context, session)).to be_falsey
       end
@@ -2316,27 +2316,27 @@ describe Enrollment do
 
     describe 'on an observer enrollment' do
       let(:enrollment) { ObserverEnrollment.new }
-      let(:user) { stub(:id => 42) }
-      let(:session) { stub }
+      let(:user) { double(:id => 42) }
+      let(:session) { double }
 
       it 'is true with :manage_students' do
         context = Object.new
-        context.stubs(:grants_right?).with(user, session, :manage_students).returns(true)
-        context.stubs(:grants_right?).with(user, session, :manage_admin_users).returns(false)
+        allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
+        allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
         expect(enrollment.can_be_deleted_by(user, context, session)).to be_truthy
       end
 
       it 'is true with :manage_admin_users' do
         context = Object.new
-        context.stubs(:grants_right?).with(user, session, :manage_students).returns(false)
-        context.stubs(:grants_right?).with(user, session, :manage_admin_users).returns(true)
+        allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
+        allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(true)
         expect(enrollment.can_be_deleted_by(user, context, session)).to be_truthy
       end
 
       it 'is false otherwise' do
         context = Object.new
-        context.stubs(:grants_right?).with(user, session, :manage_students).returns(false)
-        context.stubs(:grants_right?).with(user, session, :manage_admin_users).returns(false)
+        allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
+        allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
         expect(enrollment.can_be_deleted_by(user, context, session)).to be_falsey
       end
     end
@@ -2352,41 +2352,41 @@ describe Enrollment do
     end
 
     it "triggers a batch when enrollment is created" do
-      DueDateCacher.expects(:recompute).never
-      DueDateCacher.expects(:recompute_course).with(@course)
+      expect(DueDateCacher).to receive(:recompute).never
+      expect(DueDateCacher).to receive(:recompute_course).with(@course)
       @course.enroll_student(user_factory)
     end
 
     it "does not trigger a batch when enrollment is not student" do
-      DueDateCacher.expects(:recompute).never
-      DueDateCacher.expects(:recompute_course).never
+      expect(DueDateCacher).to receive(:recompute).never
+      expect(DueDateCacher).to receive(:recompute_course).never
       @course.enroll_teacher(user_factory)
     end
 
     it "triggers a batch when enrollment is deleted" do
-      DueDateCacher.expects(:recompute).never
-      DueDateCacher.expects(:recompute_course).with(@course)
+      expect(DueDateCacher).to receive(:recompute).never
+      expect(DueDateCacher).to receive(:recompute_course).with(@course)
       @enrollment.destroy
     end
 
     it "does not trigger when nothing changed" do
-      DueDateCacher.expects(:recompute).never
-      DueDateCacher.expects(:recompute_course).never
+      expect(DueDateCacher).to receive(:recompute).never
+      expect(DueDateCacher).to receive(:recompute_course).never
       @enrollment.save
     end
   end
 
   describe "#student_with_conditions?" do
     it "returns false if the enrollment is neither a student enrollment nor a fake student enrollment" do
-      @enrollment.stubs(:student?).returns(false)
-      @enrollment.stubs(:fake_student?).returns(false)
+      allow(@enrollment).to receive(:student?).and_return(false)
+      allow(@enrollment).to receive(:fake_student?).and_return(false)
       expect(@enrollment.student_with_conditions?(include_future: true, include_fake_student: true)).to eq(false)
     end
 
     context "the enrollment is a student enrollment" do
       before(:each) do
-        @enrollment.stubs(:student?).returns(true)
-        @enrollment.stubs(:fake_student?).returns(false)
+        allow(@enrollment).to receive(:student?).and_return(true)
+        allow(@enrollment).to receive(:fake_student?).and_return(false)
       end
 
       it "returns true if include_future is true" do
@@ -2394,20 +2394,20 @@ describe Enrollment do
       end
 
       it "returns true if include_future is false and the enrollment is active" do
-        @enrollment.stubs(:participating?).returns(true)
+        allow(@enrollment).to receive(:participating?).and_return(true)
         expect(@enrollment.student_with_conditions?(include_future: false, include_fake_student: false)).to eq(true)
       end
 
       it "returns false if include_future is false and the enrollment is inactive" do
-        @enrollment.stubs(:participating?).returns(false)
+        allow(@enrollment).to receive(:participating?).and_return(false)
         expect(@enrollment.student_with_conditions?(include_future: false, include_fake_student: false)).to eq(false)
       end
     end
 
     context "the enrollment is a fake student enrollment" do
       before(:each) do
-        @enrollment.stubs(:student?).returns(false)
-        @enrollment.stubs(:fake_student?).returns(true)
+        allow(@enrollment).to receive(:student?).and_return(false)
+        allow(@enrollment).to receive(:fake_student?).and_return(true)
       end
 
       it "returns false if include_fake_student is false" do
@@ -2420,12 +2420,12 @@ describe Enrollment do
         end
 
         it "returns true if include_future is false and the enrollment is active" do
-          @enrollment.stubs(:participating?).returns(true)
+          allow(@enrollment).to receive(:participating?).and_return(true)
           expect(@enrollment.student_with_conditions?(include_future: false, include_fake_student: true)).to eq(true)
         end
 
         it "returns false if include_future is false and the enrollment is inactive" do
-          @enrollment.stubs(:participating?).returns(false)
+          allow(@enrollment).to receive(:participating?).and_return(false)
           expect(@enrollment.student_with_conditions?(include_future: false, include_fake_student: true)).to eq(false)
         end
       end
@@ -2438,12 +2438,12 @@ describe Enrollment do
     end
 
     it 'includes users for whom the enrollment has not yet started' do
-      Enrollment.any_instance.stubs(:effective_start_at).returns(1.month.from_now)
+      allow_any_instance_of(Enrollment).to receive(:effective_start_at).and_return(1.month.from_now)
       expect(Enrollment.not_yet_started(@course)).to include(@enrollment)
     end
 
     it 'excludes users for whom the enrollment has started' do
-      @enrollment.stubs(:effective_start_at).returns(1.month.ago)
+      allow(@enrollment).to receive(:effective_start_at).and_return(1.month.ago)
       expect(Enrollment.not_yet_started(@course)).not_to include(@enrollment)
     end
   end

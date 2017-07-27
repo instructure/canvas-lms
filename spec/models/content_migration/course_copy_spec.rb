@@ -624,7 +624,7 @@ describe ContentMigration do
         :uploaded_data => StringIO.new('file'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       topic = @copy_from.discussion_topics.create!(:title => "some topic", :message => "<img src='/courses/#{@copy_from.id}/files/#{att.id}/preview'>")
 
-      Importers::WikiPageImporter.stubs(:process_migration).raises(ArgumentError)
+      allow(Importers::WikiPageImporter).to receive(:process_migration).and_raise(ArgumentError)
 
       expect{
         run_course_copy
