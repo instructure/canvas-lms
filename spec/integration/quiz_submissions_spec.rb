@@ -95,7 +95,7 @@ describe Quizzes::QuizSubmissionsController do
   end
 
   def submit_quiz
-    Canvas::LiveEvents.expects(:quiz_submitted).with(@qs)
+    expect(Canvas::LiveEvents).to receive(:quiz_submitted).with(@qs)
 
     post "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/",
          params: {:question_1 => 'password', :attempt => 1, :validation_token => @qs.validation_token}

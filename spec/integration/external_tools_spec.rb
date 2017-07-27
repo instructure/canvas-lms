@@ -52,7 +52,7 @@ describe "External Tools" do
     it "should include outcome service params when viewing as student" do
       student_in_course(:course => @course, :active_all => true)
       user_session(@user)
-      Canvas::Security.stubs(:hmac_sha1).returns('some_sha')
+      allow(Canvas::Security).to receive(:hmac_sha1).and_return('some_sha')
       payload = [@tool.id, @course.id, @assignment.id, @user.id].join('-')
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"

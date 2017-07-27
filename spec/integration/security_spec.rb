@@ -391,7 +391,7 @@ describe "security" do
 
       it "should apply limitations correctly for cross-account logins" do
         account = Account.create!
-        Account.any_instance.stubs(:trusted_account_ids).returns([account.id])
+        allow_any_instantiation_of(Account.default).to receive(:trusted_account_ids).and_return([account.id])
         @pseudonym.account = account
         @pseudonym.save!
         bad_login("5.5.5.5")
@@ -576,14 +576,14 @@ describe "security" do
   end
 
   it "should not allow logins to safefiles domains" do
-    HostUrl.stubs(:is_file_host?).returns(true)
-    HostUrl.stubs(:default_host).returns('test.host')
+    allow(HostUrl).to receive(:is_file_host?).and_return(true)
+    allow(HostUrl).to receive(:default_host).and_return('test.host')
     get "http://files-test.host/login"
     expect(response).to be_redirect
     uri = URI.parse response['Location']
     expect(uri.host).to eq 'test.host'
 
-    HostUrl.stubs(:is_file_host?).returns(false)
+    allow(HostUrl).to receive(:is_file_host?).and_return(false)
     get "http://test.host/login"
     expect(response).to redirect_to('http://test.host/login/canvas')
   end

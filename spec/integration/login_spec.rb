@@ -48,7 +48,7 @@ describe 'login' do
         st.success = response.is_success?
         st
       end
-      Login::CasController.any_instance.stubs(:client).returns(@cas_client)
+      allow_any_instance_of(Login::CasController).to receive(:client).and_return(@cas_client)
     end
 
     let(:cas_redirect_url) { Regexp.new(Regexp.escape(@cas_client.add_service_to_login_url(''))) }

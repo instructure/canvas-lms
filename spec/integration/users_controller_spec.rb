@@ -316,14 +316,14 @@ describe UsersController do
 
   context "media_download url" do
     let(:kaltura_client) do
-      kaltura_client = mock('CanvasKaltura::ClientV3').responds_like_instance_of(CanvasKaltura::ClientV3)
-      CanvasKaltura::ClientV3.stubs(:new).returns(kaltura_client)
+      kaltura_client = instance_double('CanvasKaltura::ClientV3')
+      allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kaltura_client)
       kaltura_client
     end
 
     let(:media_source_fetcher) {
-      media_source_fetcher = mock('MediaSourceFetcher').responds_like_instance_of(MediaSourceFetcher)
-      MediaSourceFetcher.expects(:new).with(kaltura_client).returns(media_source_fetcher)
+      media_source_fetcher = instance_double('MediaSourceFetcher')
+      expect(MediaSourceFetcher).to receive(:new).with(kaltura_client).and_return(media_source_fetcher)
       media_source_fetcher
     }
 
@@ -334,9 +334,9 @@ describe UsersController do
     end
 
     it 'should pass the type down to the media fetcher even with a malformed url' do
-      media_source_fetcher.expects(:fetch_preferred_source_url).
+      expect(media_source_fetcher).to receive(:fetch_preferred_source_url).
           with(media_id: 'someMediaId', file_extension: 'mp4', media_type: nil).
-          returns('http://example.com/media.mp4')
+          and_return('http://example.com/media.mp4')
 
       # this url actually passes "mp4" into params[:format] instead of params[:type] now
       # but we're going to handle it anyway because we're so nice

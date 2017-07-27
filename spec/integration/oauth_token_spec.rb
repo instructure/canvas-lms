@@ -25,23 +25,23 @@ describe integration do
   end
 
   def oauth_start(integration)
-    UsersController.any_instance.expects(:feature_and_service_enabled?).with(integration.underscore).returns(true)
+    expect_any_instance_of(UsersController).to receive(:feature_and_service_enabled?).with(integration.underscore).and_return(true)
     if integration == "LinkedIn"
-      LinkedIn::Connection.expects(:config).at_least_once.returns({})
+      expect(LinkedIn::Connection).to receive(:config).at_least(:once).and_return({})
     elsif integration == "Twitter"
-      Twitter::Connection.expects(:config).at_least_once.returns({})
+      expect(Twitter::Connection).to receive(:config).at_least(:once).and_return({})
     else
-      integration.constantize.expects(:config).at_least_once.returns({})
+      expect(integration.constantize).to receive(:config).at_least(:once).and_return({})
     end
 
     # mock up the response from the 3rd party service, so we don't actually contact it
-    OAuth::Consumer.any_instance.expects(:token_request).returns({:oauth_token => "test_token", :oauth_token_secret => "test_secret", :authorize_url => "http://oauth.example.com/start"})
-    OAuth::RequestToken.any_instance.expects(:authorize_url).returns("http://oauth.example.com/start")
+    expect_any_instance_of(OAuth::Consumer).to receive(:token_request).and_return({:oauth_token => "test_token", :oauth_token_secret => "test_secret", :authorize_url => "http://oauth.example.com/start"})
+    expect_any_instance_of(OAuth::RequestToken).to receive(:authorize_url).and_return("http://oauth.example.com/start")
     get "/oauth?service=#{integration.underscore}"
   end
 
   it "should error if the service isn't enabled" do
-    UsersController.any_instance.expects(:feature_and_service_enabled?).with(integration.underscore).returns(false)
+    expect_any_instance_of(UsersController).to receive(:feature_and_service_enabled?).with(integration.underscore).and_return(false)
     get "/oauth?service=#{integration.underscore}"
     expect(response).to redirect_to(user_profile_url(@user))
     expect(flash[:error]).to be_present
@@ -94,15 +94,15 @@ describe integration do
       oauth_start(integration)
 
       if integration == "LinkedIn"
-        LinkedIn::Connection.expects(:from_request_token).returns(stub("LinkedInConnection",
-          access_token: stub("AccessToken", token: 'test_token', secret: 'test_secret'),
+        expect(LinkedIn::Connection).to receive(:from_request_token).and_return(double("LinkedInConnection",
+          access_token: double("AccessToken", token: 'test_token', secret: 'test_secret'),
           service_user_id: "test_user_id",
           service_user_name: "test_user_name",
           service_user_url: "test_user_url"
         ))
       elsif integration == "Twitter"
-        Twitter::Connection.expects(:from_request_token).returns(stub("TwitterConnection",
-          access_token: stub("AccessToken", token: 'test_token', secret: 'test_secret'),
+        expect(Twitter::Connection).to receive(:from_request_token).and_return(double("TwitterConnection",
+          access_token: double("AccessToken", token: 'test_token', secret: 'test_secret'),
           service_user_id: "test_user_id",
           service_user_name: "test_user_name"
         ))
@@ -126,11 +126,11 @@ describe integration do
       # pretend that somehow we think we got a valid auth token, but we actually didn't
       if integration == "LinkedIn"
         # mock up the response from the 3rd party service, so we don't actually contact it
-        LinkedIn::Connection.expects(:from_request_token).
-          raises(RuntimeError, "Third-party service totally like, failed")
+        expect(LinkedIn::Connection).to receive(:from_request_token).
+          and_raise(RuntimeError, "Third-party service totally like, failed")
       elsif integration == "Twitter"
-        Twitter::Connection.expects(:from_request_token).
-          raises(RuntimeError, "Third-party service totally like, failed")
+        expect(Twitter::Connection).to receive(:from_request_token).
+          and_raise(RuntimeError, "Third-party service totally like, failed")
       end
 
       get "/oauth_success?oauth_token=test_token&oauth_verifier=test_verifier&service=#{integration.underscore}"

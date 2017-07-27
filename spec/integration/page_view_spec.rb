@@ -49,8 +49,9 @@ describe "page views" do
     Setting.set('create_get_api_page_views', 'false')
     course_with_teacher(active_all: 1, user: user_with_pseudonym)
     @topic = @course.discussion_topics.create!
-    PageView.any_instance.expects(:store).never
-    get "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries", params: {access_token: @user.access_tokens.create!.full_token}
+    expect do
+      get "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries", params: {access_token: @user.access_tokens.create!.full_token}
+    end.not_to change(PageView, :count)
   end
 
   it "records the developer key when an access token was used" do

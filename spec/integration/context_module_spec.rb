@@ -273,10 +273,10 @@ describe ContextModule do
 
   describe "cache_visibilities_for_students" do
     it "should load visibilities for each model" do
-      AssignmentStudentVisibility.expects(:visible_assignment_ids_in_course_by_user).returns({}).once
-      DiscussionTopic.expects(:visible_ids_by_user).returns({}).once
-      WikiPage.expects(:visible_ids_by_user).returns({}).once
-      Quizzes::QuizStudentVisibility.expects(:visible_quiz_ids_in_course_by_user).returns({}).once
+      expect(AssignmentStudentVisibility).to receive(:visible_assignment_ids_in_course_by_user).and_return({}).once
+      expect(DiscussionTopic).to receive(:visible_ids_by_user).and_return({}).once
+      expect(WikiPage).to receive(:visible_ids_by_user).and_return({}).once
+      expect(Quizzes::QuizStudentVisibility).to receive(:visible_quiz_ids_in_course_by_user).and_return({}).once
       course_module
       @module.assignment_visibilities_for_users([2])
       @module.discussion_visibilities_for_users([2])

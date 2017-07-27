@@ -170,12 +170,12 @@ describe ExternalToolsController do
         }
       end
 
-      let(:app_api) { mock() }
+      let(:app_api) { double() }
 
       before do
-        AppCenter::AppApi.stubs(:new).returns(app_api)
-        app_api.stubs(:fetch_app_center_response).returns(app_center_response)
-        app_api.stubs(:get_app_config_url).returns(app_center_response['config_xml_url'])
+        allow(AppCenter::AppApi).to receive(:new).and_return(app_api)
+        allow(app_api).to receive(:fetch_app_center_response).and_return(app_center_response)
+        allow(app_api).to receive(:get_app_config_url).and_return(app_center_response['config_xml_url'])
 
         configxml = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'config.youtube.xml'))
         stub_request(:get, app_center_response['config_xml_url']).to_return(body: configxml)
@@ -195,7 +195,7 @@ describe ExternalToolsController do
       end
 
       it 'gives error if app_center_id is not provided' do
-        app_api.stubs(:get_app_config_url).returns('')
+        allow(app_api).to receive(:get_app_config_url).and_return('')
         user_session(@teacher)
 
         post(
@@ -205,7 +205,7 @@ describe ExternalToolsController do
         )
 
         expect(response).not_to be_success
-        app_api.stubs(:get_app_config_url).returns(app_center_response['config_xml_url'])
+        allow(app_api).to receive(:get_app_config_url).and_return(app_center_response['config_xml_url'])
       end
 
       it 'ignores non-required params' do
