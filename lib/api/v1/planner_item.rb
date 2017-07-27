@@ -39,7 +39,8 @@ module Api::V1::PlannerItem
       :plannable_id => item.id,
       :plannable_date => item.planner_date,
       :visible_in_planner => item.visible_in_planner_for?(user),
-      :planner_override => planner_override_json(item.planner_override_for(user), user, session)
+      :planner_override => planner_override_json(item.planner_override_for(user), user, session),
+      :new_activity => new_activity(item, user, opts)
     }).merge(submission_statuses_for(user, item, opts)).tap do |hash|
       if item.is_a?(PlannerNote)
         hash[:plannable_type] = 'planner_note'
@@ -103,10 +104,15 @@ module Api::V1::PlannerItem
     submission_status
   end
 
-  def planner_override_json(override, user, session)
-    return unless override.present?
-    json = api_json(override, user, session)
-    json['plannable_type'] = PLANNABLE_TYPES.key(json['plannable_type'])
-    json
+  def new_activity(item, user, opts = {})
+    if item.is_a?(Assignment) || item.try(:assignment)
+      assign = item.try(:assignment) || item
+      return true if user.submission_statuses(opts).dig(:new_activity).include?(assign.id)
+    end
+    if item.is_a?(DiscussionTopic) || item.try(:discussion_topic)
+      topic = item.try(:discussion_topic) || item
+      return true if topic && topic.unread_count(user) > 0
+    end
+    false
   end
 end

@@ -100,6 +100,10 @@ class Submission < ActiveRecord::Base
 
   scope :active, -> { where("submissions.workflow_state <> 'deleted'") }
   scope :with_comments, -> { preload(:submission_comments) }
+  scope :unread_for, -> (user_id) do
+    joins(:content_participations).
+    where(user_id: user_id, content_participations: {workflow_state: 'unread', user_id: user_id})
+  end
   scope :after, lambda { |date| where("submissions.created_at>?", date) }
   scope :before, lambda { |date| where("submissions.created_at<?", date) }
   scope :submitted_before, lambda { |date| where("submitted_at<?", date) }
