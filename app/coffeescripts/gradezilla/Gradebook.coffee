@@ -58,7 +58,6 @@ define [
   'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader'
   'jsx/gradezilla/default_gradebook/components/AssignmentGroupColumnHeader'
   'jsx/gradezilla/default_gradebook/components/AssignmentRowCellPropFactory'
-  'jsx/gradezilla/default_gradebook/components/CustomColumnHeader'
   'jsx/gradezilla/default_gradebook/components/TotalGradeColumnHeader'
   'jsx/gradezilla/default_gradebook/components/GradebookMenu'
   'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu'
@@ -104,7 +103,7 @@ define [
   NumberCompare, natcompare, ConvertCase, htmlEscape, SetDefaultGradeDialogManager,
   CurveGradesDialogManager, GradebookApi, CellEditorFactory, CellFormatterFactory, ColumnHeaderRenderer, GridSupport,
   studentRowHeaderConstants, AssignmentColumnHeader,
-  AssignmentGroupColumnHeader, AssignmentRowCellPropFactory, CustomColumnHeader,
+  AssignmentGroupColumnHeader, AssignmentRowCellPropFactory,
   TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, AssignmentGroupFilter, GradingPeriodFilter, ModuleFilter, SectionFilter,
   GridColor, StatusesModal, SubmissionTray, GradebookSettingsModal, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp,
   SubmissionStateMap,
@@ -1681,8 +1680,6 @@ define [
     onHeaderCellRendered: (event, obj) =>
       if obj.column.type == 'total_grade'
         @renderTotalGradeColumnHeader()
-      else if obj.column.type == 'custom_column'
-        @renderCustomColumnHeader(obj.column.customColumnId)
       else if obj.column.type == 'assignment'
         @renderAssignmentColumnHeader(obj.column.assignmentId)
       else if obj.column.type == 'assignment_group'
@@ -2066,8 +2063,6 @@ define [
       return unless @grid
 
       for column in @grid.getColumns()
-        if column.type == 'custom_column'
-          @renderCustomColumnHeader(column.customColumnId)
         if column.type == 'assignment'
           @renderAssignmentColumnHeader(column.assignmentId)
         else if column.type == 'assignment_group'
@@ -2198,22 +2193,6 @@ define [
       mountPoint = @getColumnHeaderNode('total_grade')
       props = @getTotalGradeColumnHeaderProps()
       renderComponent(TotalGradeColumnHeader, mountPoint, props)
-
-    # Custom Column Header
-
-    getCustomColumnHeaderProps: (customColumnId) =>
-      customColumn = _.find(@customColumns, id: customColumnId)
-      {
-        ref: (ref) =>
-          @setHeaderComponentRef(@getCustomColumnId(customColumnId), ref)
-        title: customColumn.title
-      }
-
-    renderCustomColumnHeader: (customColumnId) =>
-      columnId = @getCustomColumnId(customColumnId)
-      mountPoint = @getColumnHeaderNode(columnId)
-      props = @getCustomColumnHeaderProps(customColumnId)
-      renderComponent(CustomColumnHeader, mountPoint, props)
 
     # Assignment Column Header
 
@@ -2609,6 +2588,9 @@ define [
 
     getAssignmentGroup: (assignmentGroupId) =>
       @assignmentGroups[assignmentGroupId]
+
+    getCustomColumn: (customColumnId) =>
+      @customColumns.find((column) -> column.id == customColumnId)
 
     setContextModules: (contextModules) =>
       @courseContent.contextModules = contextModules

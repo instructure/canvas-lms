@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import CustomColumnHeaderRenderer
+from 'jsx/gradezilla/default_gradebook/slick-grid/column-headers/CustomColumnHeaderRenderer';
 import StudentColumnHeaderRenderer
 from 'jsx/gradezilla/default_gradebook/slick-grid/column-headers/StudentColumnHeaderRenderer';
 
@@ -23,6 +25,7 @@ export default class ColumnHeaderRenderer {
   constructor (gradebook) {
     this.gradebook = gradebook;
     this.factories = {
+      custom_column: new CustomColumnHeaderRenderer(gradebook),
       student: new StudentColumnHeaderRenderer(gradebook)
     };
   }

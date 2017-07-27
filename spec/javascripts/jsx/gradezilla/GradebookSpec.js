@@ -4077,21 +4077,6 @@ test('renders the total grade column header for the "total_grade" column type', 
   equal(gradebook.renderTotalGradeColumnHeader.callCount, 1);
 });
 
-test('renders the custom column header for the "custom_column" column type', function () {
-  const gradebook = createGradebook();
-  this.stub(gradebook, 'renderCustomColumnHeader');
-  gradebook.onHeaderCellRendered(null, { column: { type: 'custom_column', customColumnId: '2401' } });
-  equal(gradebook.renderCustomColumnHeader.callCount, 1);
-});
-
-test('uses the column "customColumnId" when rendering a custom column header', function () {
-  const gradebook = createGradebook();
-  this.stub(gradebook, 'renderCustomColumnHeader');
-  gradebook.onHeaderCellRendered(null, { column: { type: 'custom_column', customColumnId: '2401' } });
-  const [customColumnId] = gradebook.renderCustomColumnHeader.getCall(0).args;
-  equal(customColumnId, '2401');
-});
-
 test('renders the assignment column header for the "assignment" column type', function () {
   const gradebook = createGradebook();
   this.stub(gradebook, 'renderAssignmentColumnHeader');
@@ -4140,45 +4125,6 @@ test('unmounts any component on the cell being destroyed', function () {
   this.gradebook.onBeforeHeaderCellDestroy(null, { node: this.$mountPoint });
   const componentExistedAtNode = ReactDOM.unmountComponentAtNode(this.$mountPoint);
   equal(componentExistedAtNode, false, 'the component was already unmounted');
-});
-
-QUnit.module('Gradebook#getCustomColumnHeaderProps');
-
-test('includes the custom column title', function () {
-  const gradebook = createGradebook();
-  gradebook.customColumns = [{ id: '2401', title: 'Notes' }, { id: '2402', title: 'Other Notes' }];
-  const props = gradebook.getCustomColumnHeaderProps('2401');
-  equal(props.title, 'Notes');
-});
-
-test('includes a ref callback to store the component reference', function () {
-  const gradebook = createGradebook();
-  gradebook.customColumns = [{ id: '2401', title: 'Notes' }, { id: '2402', title: 'Other Notes' }];
-  const props = gradebook.getCustomColumnHeaderProps('2401');
-  const mockComponent = { column: 'customColumn' };
-  props.ref(mockComponent);
-  const columnId = gradebook.getCustomColumnId('2401');
-  equal(gradebook.getHeaderComponentRef(columnId), mockComponent);
-});
-
-QUnit.module('Gradebook#renderCustomColumnHeader', {
-  setup () {
-    this.$mountPoint = document.createElement('div');
-    $fixtures.appendChild(this.$mountPoint);
-  },
-
-  teardown () {
-    ReactDOM.unmountComponentAtNode(this.$mountPoint);
-    $fixtures.innerHTML = '';
-  }
-});
-
-test('renders the CustomColumnHeader to the related custom column header node', function () {
-  const gradebook = createGradebook();
-  gradebook.customColumns = [{ id: '2401', title: 'Notes' }, { id: '2402', title: 'Other Notes' }];
-  this.stub(gradebook, 'getColumnHeaderNode').withArgs('custom_col_2401').returns(this.$mountPoint);
-  gradebook.renderCustomColumnHeader('2401');
-  ok(this.$mountPoint.innerText.includes('Notes'), 'the "Notes" header is rendered');
 });
 
 QUnit.module('Gradebook#renderAssignmentColumnHeader', {
@@ -4322,7 +4268,6 @@ QUnit.module('Gradebook#updateColumnHeaders', {
       }
     };
     this.stub(this.gradebook, 'renderTotalGradeColumnHeader');
-    this.stub(this.gradebook, 'renderCustomColumnHeader');
     this.stub(this.gradebook, 'renderAssignmentColumnHeader');
     this.stub(this.gradebook, 'renderAssignmentGroupColumnHeader');
   }
@@ -4336,17 +4281,6 @@ test('uses Grid Support to update the column headers', function () {
 test('renders the total grade column header', function () {
   this.gradebook.updateColumnHeaders();
   equal(this.gradebook.renderTotalGradeColumnHeader.callCount, 1);
-});
-
-test('renders a custom column header for each "custom_column" column type', function () {
-  this.gradebook.updateColumnHeaders();
-  equal(this.gradebook.renderCustomColumnHeader.callCount, 1);
-});
-
-test('uses the column "customColumnId" when rendering a custom column header', function () {
-  this.gradebook.updateColumnHeaders();
-  const [customColumnId] = this.gradebook.renderCustomColumnHeader.getCall(0).args;
-  equal(customColumnId, '2401');
 });
 
 test('renders the assignment column header for each "assignment" column type', function () {
@@ -4375,7 +4309,6 @@ test('does not render column headers when the grid has not been created', functi
   this.gradebook.grid = undefined;
   this.gradebook.updateColumnHeaders();
   equal(this.gradebook.renderTotalGradeColumnHeader.callCount, 0);
-  equal(this.gradebook.renderCustomColumnHeader.callCount, 0);
   equal(this.gradebook.renderAssignmentColumnHeader.callCount, 0);
   equal(this.gradebook.renderAssignmentGroupColumnHeader.callCount, 0);
 });
