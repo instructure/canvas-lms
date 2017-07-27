@@ -22,9 +22,9 @@ module.exports = {
   }],
 
   update: (elem, data) => {
-    let caption = document.querySelector('caption')
+    let caption = elem.querySelector('caption')
     if (!caption) {
-      caption = document.createElement('caption')
+      caption = elem.ownerDocument.createElement('caption')
       dom.prepend(elem, caption)
     }
     caption.textContent = data.caption
