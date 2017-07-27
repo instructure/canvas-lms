@@ -29,7 +29,7 @@ app/stylesheets/brandable_css_brands
 /db/*sql
 /exports/
 Gemfile.lock
-Gemfile.lock.5
+Gemfile.lock.51
 /log/
 mkmf.log
 /node_modules
