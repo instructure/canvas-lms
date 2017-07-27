@@ -48,10 +48,6 @@ describe "master courses - child courses - assignment locking" do
     user_session(@teacher)
   end
 
-  after :each do
-    unstub_rcs_config
-  end
-
   it "should show the delete cog-menu options on the edit when not locked" do
     get "/courses/#{@copy_to.id}/assignments/#{@assmt_copy.id}/edit"
 

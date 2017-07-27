@@ -30,10 +30,6 @@ describe 'new ui' do
       stub_rcs_config
     end
 
-    after(:each) do
-      unstub_rcs_config
-    end
-
     it 'should not break tiny mce css', priority: "2", test_id: 244891 do
       skip_if_chrome('Chrome does not get these values properly')
       get "/courses/#{@course.id}/discussion_topics/new?is_announcement=true"

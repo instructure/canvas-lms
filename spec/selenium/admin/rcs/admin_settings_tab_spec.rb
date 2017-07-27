@@ -29,10 +29,6 @@ describe "admin settings tab" do
     user_session(@admin)
   end
 
-  after :each do
-    unstub_rcs_config
-  end
-
   def get_default_services
     default_services = []
     service_hash = Account.default.allowed_services_hash

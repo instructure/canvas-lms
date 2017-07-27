@@ -45,10 +45,6 @@ describe 'editing a quiz' do
       stub_rcs_config
     end
 
-    after(:each) do
-      unstub_rcs_config
-    end
-
     context 'when the quiz is published' do
       it 'indicates the quiz is published', priority: "1", test_id: 351924 do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"

@@ -32,10 +32,6 @@ describe "root account basic settings" do
     stub_rcs_config
   end
 
-  after(:each) do
-    unstub_rcs_config
-  end
-
   it "should change the default user quota", priority: "1", test_id: 250002 do
     course_with_admin_logged_in
     group_model(context: @course)

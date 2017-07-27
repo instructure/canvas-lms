@@ -32,10 +32,6 @@ describe "sub account basic settings" do
     stub_rcs_config
   end
 
-  after(:each) do
-    unstub_rcs_config
-  end
-
   it "should disable inherited settings if locked by a parent account", priority: "1", test_id: 250007 do
     parent = Account.default
     parent.settings[:restrict_student_future_view] = {locked: true, value: true}

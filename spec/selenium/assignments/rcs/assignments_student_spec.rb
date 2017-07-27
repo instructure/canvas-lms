@@ -32,10 +32,6 @@ describe "assignments" do
       stub_rcs_config
     end
 
-    after(:each) do
-      unstub_rcs_config
-    end
-
     before do
       @due_date = Time.now.utc + 2.days
       @assignment = @course.assignments.create!(:title => 'default assignment', :name => 'default assignment', :due_at => @due_date)

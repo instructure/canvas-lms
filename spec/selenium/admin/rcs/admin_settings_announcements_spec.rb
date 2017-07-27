@@ -82,10 +82,6 @@ describe "settings tabs" do
       driver.manage.window.maximize
     end
 
-    after do
-      unstub_rcs_config
-    end
-
     it "should add and delete an announcement" do
       get "/accounts/#{Account.default.id}/settings"
       add_announcement

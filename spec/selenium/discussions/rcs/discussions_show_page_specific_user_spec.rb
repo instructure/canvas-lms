@@ -52,10 +52,6 @@ describe "discussions" do
     stub_rcs_config
   end
 
-  after(:each) do
-    unstub_rcs_config
-  end
-
   context "on the show page" do
     let(:url) { "/courses/#{course.id}/discussion_topics/#{topic.id}/" }
 

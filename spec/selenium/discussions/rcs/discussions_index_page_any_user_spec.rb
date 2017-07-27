@@ -40,10 +40,6 @@ describe "discussions" do
         stub_rcs_config
       end
 
-      after(:each) do
-        unstub_rcs_config
-      end
-
       let(:topic) { somebody_topic }
 
       it "should start a new topic", priority: "1", test_id: 140669 do

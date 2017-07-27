@@ -28,10 +28,6 @@ describe 'quizzes question with html answers' do
     stub_rcs_config
   end
 
-  after(:each) do
-    unstub_rcs_config
-  end
-
   def edit_first_html_answer(question_type=nil)
     edit_first_question
     click_option('.question_form:visible .question_type', question_type) if question_type

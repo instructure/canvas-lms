@@ -21,7 +21,6 @@ module Factories
   end
 
   def stub_rcs_config
-    unstub_rcs_config
     Canvas::DynamicSettings.stubs(:find).with("rich-content-service", use_env: false).returns(
       {
         "app-host":"",
@@ -35,10 +34,6 @@ module Factories
         "encryption-secret" => "jkl;jkl;jkl;jkl;jkl;jkl;jkl;jkl;"
       }
     )
-  end
-
-  def unstub_rcs_config
-    Canvas::DynamicSettings.unstub(:find)
   end
 
   def account_rcs_model(opts={})

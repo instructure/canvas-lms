@@ -34,10 +34,6 @@ describe "announcements" do
       stub_rcs_config
     end
 
-    after :each do
-      unstub_rcs_config
-    end
-
     describe "shared bulk topics specs" do
       let(:url) { "/courses/#{@course.id}/announcements/" }
       let(:what_to_create) { Announcement }

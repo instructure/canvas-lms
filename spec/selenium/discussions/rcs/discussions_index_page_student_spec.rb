@@ -59,10 +59,6 @@ describe "discussions" do
         stub_rcs_config
       end
 
-      after(:each) do
-        unstub_rcs_config
-      end
-
       it "should allow a student to create a discussion", priority: "1", test_id: 270941 do
         get url
         expect_new_page_load { f('#new-discussion-btn').click }

@@ -36,10 +36,6 @@ describe "assignment groups" do
       stub_rcs_config
     end
 
-    after(:each) do
-      unstub_rcs_config
-    end
-
     it "should create an assignment with default dates", priority:"1", test_id: 216344 do
       visit_new_assignment_page
       fill_assignment_title 'vdd assignment'

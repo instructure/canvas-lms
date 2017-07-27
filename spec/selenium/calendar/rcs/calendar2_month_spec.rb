@@ -37,10 +37,6 @@ describe "calendar2" do
       stub_rcs_config
     end
 
-    after(:each) do
-      unstub_rcs_config
-    end
-
     describe "main month calendar" do
 
       it "more options link on assignments should go to assignment edit page" do
