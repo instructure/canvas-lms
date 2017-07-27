@@ -75,7 +75,7 @@ module Canvas
     alias_method :user, :scope
     alias_method :current_user, :user
 
-    def_delegators :@controller, :stringify_json_ids?, :polymorphic_url,
+    def_delegators :@controller, :polymorphic_url,
       :accepts_jsonapi?, :session, :context
 
     # See ActiveModel::Serializer's documentation for options.
@@ -100,6 +100,10 @@ module Canvas
       unless controller
         raise ArgumentError.new("You must pass a controller to APISerializer!")
       end
+    end
+
+    def stringify_json_ids?
+      @controller.send(:stringify_json_ids?)
     end
 
     # Overriding to allow for "links" hash.

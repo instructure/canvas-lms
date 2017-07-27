@@ -420,7 +420,6 @@ describe AssignmentOverridesController, type: :request do
 
       context "title" do
         before :once do
-          @override = assignment_override_model
           names = ["Adam Aardvark", "Ben Banana", "Chipmunk Charlie", "Donald Duck", "Erik Erikson", "Freddy Frog"]
           @students = names.map do |name|
             student_in_course(course: @course, :user => user_with_pseudonym(name: name)).user

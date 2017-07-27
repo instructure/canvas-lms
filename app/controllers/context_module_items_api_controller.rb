@@ -757,7 +757,7 @@ class ContextModuleItemsApiController < ApplicationController
     if params[:module_item][:completion_requirement].blank?
       reqs[@tag.id] = {}
     elsif ["must_view", "must_submit", "must_contribute", "min_score"].include?(params[:module_item][:completion_requirement][:type])
-      reqs[@tag.id] = params[:module_item][:completion_requirement].with_indifferent_access
+      reqs[@tag.id] = params[:module_item][:completion_requirement].to_unsafe_h
     else
       @tag.errors.add(:completion_requirement, t(:invalid_requirement_type, "Invalid completion requirement type"))
       return false

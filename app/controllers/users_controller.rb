@@ -1609,7 +1609,7 @@ class UsersController < ApplicationController
       end
     end
 
-    user.dashboard_positions = user.dashboard_positions.merge(params[:dashboard_positions])
+    user.dashboard_positions = user.dashboard_positions.merge(params[:dashboard_positions].to_unsafe_h)
 
     respond_to do |format|
       format.json do

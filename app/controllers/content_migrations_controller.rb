@@ -472,7 +472,7 @@ class ContentMigrationsController < ApplicationController
         params[:do_not_run] = true
       end
     elsif params[:copy]
-      copy_options = ContentMigration.process_copy_params(params[:copy].to_hash.with_indifferent_access)
+      copy_options = ContentMigration.process_copy_params(params[:copy]&.to_unsafe_h)
       @content_migration.migration_settings[:migration_ids_to_import] ||= {}
       @content_migration.migration_settings[:migration_ids_to_import][:copy] = copy_options
       @content_migration.copy_options = copy_options

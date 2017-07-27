@@ -370,7 +370,7 @@ class AccountsController < ApplicationController
                 AND #{Enrollment.quoted_table_name}.course_id
                 = #{Course.quoted_table_name}.id)
                 #{params[:order] == 'desc' ? 'DESC, id DESC' : 'ASC, id ASC'}"
-            elsif params[:sort] == 'subaccount' 
+            elsif params[:sort] == 'subaccount'
                 "(SELECT #{Account.quoted_table_name}.name FROM #{Account.quoted_table_name}
                 WHERE #{Account.quoted_table_name}.id
                 = #{Course.quoted_table_name}.account_id), id"
@@ -472,7 +472,7 @@ class AccountsController < ApplicationController
   # Delegated to by the update action (when the request is an api_request?)
   def update_api
     if authorized_action(@account, @current_user, [:manage_account_settings, :manage_storage_quotas])
-      account_params = params[:account].present? ? strong_account_params : {}
+      account_params = params[:account].present? ? strong_account_params.to_unsafe_h : {}
       includes = Array(params[:includes]) || []
       unauthorized = false
 
@@ -501,7 +501,7 @@ class AccountsController < ApplicationController
       end
 
       # account settings (:manage_account_settings)
-      account_settings = account_params.select {|k, v| [:name, :default_time_zone, :settings].include?(k.to_sym)}.with_indifferent_access
+      account_settings = account_params.slice(:name, :default_time_zone, :settings)
       unless account_settings.empty?
         if @account.grants_right?(@current_user, session, :manage_account_settings)
           if account_settings[:settings]
@@ -529,8 +529,8 @@ class AccountsController < ApplicationController
       end
 
       # quotas (:manage_account_quotas)
-      quota_settings = account_params.select {|k, v| [:default_storage_quota_mb, :default_user_storage_quota_mb,
-                                                      :default_group_storage_quota_mb].include?(k.to_sym)}.with_indifferent_access
+      quota_settings = account_params.slice(:default_storage_quota_mb, :default_user_storage_quota_mb,
+                                                      :default_group_storage_quota_mb)
       unless quota_settings.empty?
         if @account.grants_right?(@current_user, session, :manage_storage_quotas)
           [:default_storage_quota_mb, :default_user_storage_quota_mb, :default_group_storage_quota_mb].each do |quota_type|

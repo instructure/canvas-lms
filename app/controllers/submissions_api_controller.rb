@@ -705,7 +705,7 @@ class SubmissionsApiController < ApplicationController
           author: @current_user,
           hidden: @assignment.muted? && admin_in_context
         }.merge(
-          comment.slice(:media_comment_id, :media_comment_type, :group_comment)
+          comment.permit(:media_comment_id, :media_comment_type, :group_comment).to_unsafe_h
         ).with_indifferent_access
         comment[:provisional] = value_to_boolean(submission[:provisional])
         if (file_ids = params[:comment][:file_ids])
@@ -886,7 +886,7 @@ class SubmissionsApiController < ApplicationController
   #
   # @returns Progress
   def bulk_update
-    grade_data = params[:grade_data].to_hash.with_indifferent_access
+    grade_data = params[:grade_data].to_unsafe_h
     unless grade_data.is_a?(Hash) && grade_data.present?
       return render :json => "'grade_data' parameter required", :status => :bad_request
     end
