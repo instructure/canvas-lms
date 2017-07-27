@@ -26,7 +26,7 @@ module.exports = {
     return elem
   },
 
-  message: 'Text smaller that 14pt should have a minimum contrast ratio of 4.5:1.',
+  message: 'Text smaller than 18pt (14pt if bold) should have a minimum contrast ratio of 4.5:1.',
 
   why: `Paragraph about why color contrast is important.`,
 
