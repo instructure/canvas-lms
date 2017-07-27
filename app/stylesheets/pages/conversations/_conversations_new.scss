@@ -329,19 +329,31 @@ h2.subject {
     margin: 3px;
     width: 10px;
 
-    &.read {
-      background: var(--ic-brand-primary);
-      border: 1px solid var(--ic-brand-primary-darkened-10);
-      @if $use_high_contrast {
-        background: $ic-color-light;
-        border: 1px solid $ic-color-dark;
-      }
-      left: -9999px;
+    &::before {
+      content: "";
+      position: absolute;
+      top: -0.25rem;
+      left: -0.25rem;
+      right: -0.25rem;
+      bottom: -0.25rem;
+      border: 1px solid var(--ic-brand-primary);
+      border-radius: 50%;
+      opacity: 0;
+      transform: scale(0.01);
+      transition: all 0.2s;
     }
 
     &:focus {
-      border: 1px solid $ic-color-dark;
-      box-shadow: none;
+      outline: none;
+      &::before {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    &.read {
+      background: var(--ic-brand-primary);
+      left: -9999px;
     }
   }
 
