@@ -28,9 +28,9 @@ group :test do
   gem 'simplecov-rcov', '0.2.3', require: false
   gem 'puma', '3.9.1'
 
-  gem 'rspec', '3.5.0'
+  gem 'rspec', '3.6.0'
   gem 'rspec_around_all', '0.2.0'
-  gem 'rspec-rails', '3.5.2'
+  gem 'rspec-rails', '3.6.0'
   gem 'rspec-collection_matchers', '1.1.3'
   gem 'shoulda-matchers', '3.1.1'
 
