@@ -2,7 +2,6 @@ require 'active_model_serializers'
 require 'action_controller'
 require 'active_support'
 require 'active_record'
-require 'mocha/api' unless ENV['NO_MOCHA']
 require_dependency 'canvas/lock_explanation'
 require_dependency 'api'
 require_dependency 'text_helper'

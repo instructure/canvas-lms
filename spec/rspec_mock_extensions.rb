@@ -19,6 +19,35 @@
 # this AR instance is instantiated, through find or whatever
 # the record must be saved before calling any_instantiation, so that it has an id
 module RspecMockAnyInstantiation
+  module ClassMethods
+    def reset_any_instantiation!
+      @@any_instantiation = {}
+    end
+
+    def add_any_instantiation(ar_obj)
+      raise(ArgumentError, "need to save first") if ar_obj.new_record?
+      @@any_instantiation[ [ar_obj.class.base_class, ar_obj.id] ] = ar_obj
+      # calling any_instantiation is likely to be because you're stubbing it,
+      # and to later be cached inadvertently from code that *thinks* it
+      # has a non-stubbed object. So let it dump, but not load (i.e.
+      # the MemoryStore and NilStore dumps that are just for testing,
+      # but just discard the result of dump)
+      def ar_obj.marshal_dump
+        nil
+      end
+      # no marshal_load; will raise an exception on load
+      ar_obj
+    end
+
+    def instantiate(*args)
+      if obj = @@any_instantiation[[base_class, args.first['id'].to_i]]
+        obj
+      else
+        super
+      end
+    end
+  end
+
   def allow_any_instantiation_of(ar_object)
     ActiveRecord::Base.add_any_instantiation(ar_object)
     allow(ar_object)
@@ -29,8 +58,6 @@ module RspecMockAnyInstantiation
     expect(ar_object)
   end
 end
-
+ActiveRecord::Base.singleton_class.prepend(RspecMockAnyInstantiation::ClassMethods)
 RSpec::Mocks::ExampleMethods.include(RspecMockAnyInstantiation)
-unless ENV['NO_MOCHA']
-  RSpec::Core::ExampleGroup.include(RspecMockAnyInstantiation)
-end
+ActiveRecord::Base.reset_any_instantiation!

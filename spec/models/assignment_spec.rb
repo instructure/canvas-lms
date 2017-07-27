@@ -2841,7 +2841,6 @@ describe Assignment do
           allow(Time).to receive(:now).and_return(fake_submission_time)
           subA = @assignment.submit_homework @studentA, :submission_type => "online_text_entry", :body => "ooga"
           subB = @assignment.submit_homework @studentB, :submission_type => "online_text_entry", :body => "booga"
-          Time.unstub(:now)
 
           expect(subA.messages_sent["Assignment Submitted Late"]).not_to be_nil
           expect(subB.messages_sent["Assignment Submitted Late"]).to be_nil
@@ -2867,7 +2866,6 @@ describe Assignment do
           allow(Time).to receive(:now).and_return(fake_submission_time)
           subA = @assignment.submit_homework @studentA, :submission_type => "online_text_entry", :body => "eenie"
           subB = @assignment.submit_homework @studentB, :submission_type => "online_text_entry", :body => "meenie"
-          Time.unstub(:now)
 
           expect(subA.messages_sent["Group Assignment Submitted Late"]).not_to be_nil
           expect(subB.messages_sent["Group Assignment Submitted Late"]).to be_nil

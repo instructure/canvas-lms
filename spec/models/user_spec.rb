@@ -766,12 +766,12 @@ describe User do
     end
 
     it 'is true when all account_users for current user are subsets of target user' do
-      account = double(:root_account? => true, :all_account_users_for => [stub(:is_subset_of? => true)])
+      account = double(:root_account? => true, :all_account_users_for => [double(:is_subset_of? => true)])
       expect(user.has_subset_of_account_permissions?(other_user, account)).to be_truthy
     end
 
     it 'is false when any account_user for current user is not a subset of target user' do
-      account = double(:root_account? => true, :all_account_users_for => [stub(:is_subset_of? => false)])
+      account = double(:root_account? => true, :all_account_users_for => [double(:is_subset_of? => false)])
       expect(user.has_subset_of_account_permissions?(other_user, account)).to be_falsey
     end
   end
@@ -1718,7 +1718,7 @@ describe User do
   describe "select_upcoming_assignments" do
     it "filters based on assignment date for asignments the user cannot delete" do
       time = Time.now + 1.day
-      assignments = [stub, double, stub]
+      assignments = [double, double, double]
       user = User.new
       assignments.each do |assignment|
         allow(assignment).to receive_messages(:due_at => time)

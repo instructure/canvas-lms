@@ -175,13 +175,6 @@ module GreatExpectations
         recorder.instance_variable_get(:@expectation_set)
       end
 
-      # mocha expectations
-      unless ENV['NO_MOCHA']
-        return if ::Mocha::Mockery.instance.send(:expectations).any? do |expectation|
-          expectation.instance_variable_get(:@cardinality).needs_verifying?
-        end
-      end
-
       generate_error config[:MISSING], "This spec has no expectations. Add one!", current_example.location
     end
 

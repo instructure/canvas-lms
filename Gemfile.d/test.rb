@@ -26,8 +26,6 @@ group :test do
   gem 'simplecov', '0.14.1', require: false, github: 'jenseng/simplecov', ref: '78c1171e98b7227f6bdd8f76f4c14666fd7fc5ea'
     gem 'docile', '1.1.5', require: false
   gem 'simplecov-rcov', '0.2.3', require: false
-  gem 'mocha', github: 'maneframe/mocha', ref: 'bb8813fbb4cc589d7c58073d93983722d61b6919', require: false
-    gem 'metaclass', '0.0.4', require: false
   gem 'puma', '3.9.1'
 
   gem 'rspec', '3.5.0'

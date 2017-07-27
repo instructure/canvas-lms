@@ -1543,8 +1543,8 @@ describe Course, "gradebook_to_csv" do
     @user2.pseudonym.save!
     @course.reload
     allow(@course.root_account).to receive(:trust_exists?).and_return(true)
-    allow(@course.root_account.any_instantiation).to receive(:trusted_account_ids).and_return([account2.id])
-    allow(@user2.pseudonyms.first.any_instantiation).to receive(:works_for_account?).and_return(true)
+    allow_any_instantiation_of(@course.root_account).to receive(:trusted_account_ids).and_return([account2.id])
+    allow_any_instantiation_of(@user2.pseudonyms.first).to receive(:works_for_account?).and_return(true)
     expect(HostUrl).to receive(:context_host).with(@course.root_account).and_return('school1')
     expect(HostUrl).to receive(:context_host).with(account2).and_return('school2')
 

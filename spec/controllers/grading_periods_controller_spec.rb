@@ -430,7 +430,7 @@ describe GradingPeriodsController do
           expect(response).to be_ok
           json = JSON.parse(response.body)
           expect(json['grading_periods']).to be_empty
-          expect(json).not_to includes('errors')
+          expect(json).not_to include('errors')
         end
 
         it "responds with json upon failure" do

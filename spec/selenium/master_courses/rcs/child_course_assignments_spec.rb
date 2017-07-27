@@ -22,8 +22,6 @@ describe "master courses - child courses - assignment locking" do
 
   before :once do
     Account.default.enable_feature!(:master_courses)
-    enable_all_rcs Account.default
-    stub_rcs_config
 
     due_date = format_date_for_view(Time.zone.now - 1.month)
     @copy_from = course_factory(:active_all => true)
@@ -45,6 +43,8 @@ describe "master courses - child courses - assignment locking" do
   end
 
   before :each do
+    enable_all_rcs Account.default
+    stub_rcs_config
     user_session(@teacher)
   end
 

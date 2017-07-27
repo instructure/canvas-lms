@@ -202,25 +202,10 @@ end
 RSpec::Rails::ViewExampleGroup::ExampleMethods.prepend(RenderWithHelpers)
 
 require 'action_controller_test_process'
-unless ENV['NO_MOCHA']
-  require File.expand_path(File.dirname(__FILE__) + '/mocha_rspec_adapter')
-end
-require File.expand_path(File.dirname(__FILE__) + '/mocha_extensions')
 require_relative 'rspec_mock_extensions'
 require File.expand_path(File.dirname(__FILE__) + '/ams_spec_helper')
 
 require 'i18n_tasks'
-
-unless ENV['NO_MOCHA']
-  # if mocha was initialized before rails (say by another spec), CollectionProxy would have
-  # undef_method'd them; we need to restore them
-  Mocha::ObjectMethods.instance_methods.each do |m|
-    ActiveRecord::Associations::CollectionProxy.class_eval <<-RUBY
-      def #{m}; end
-      remove_method #{m.inspect}
-    RUBY
-  end
-end
 
 factories = "#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb"
 legit_global_methods = Object.private_methods
@@ -247,30 +232,6 @@ if defined?(Spec::DSL::Main)
     remove_method :context if respond_to? :context
   end
 end
-
-# Be sure to actually test serializing things to non-existent caches,
-# but give Mocks a pass, since they won't exist in dev/prod
-module MockSerialization
-  def marshal_dump
-    nil
-  end
-
-  def marshal_load(data)
-    raise "Mocks aren't really serializeable!"
-  end
-
-  def to_yaml(opts = {})
-    YAML.quick_emit(self.object_id, opts) do |out|
-      out.scalar(nil, 'null')
-    end
-  end
-
-  def respond_to?(symbol, include_private = false)
-    return true if [:marshal_dump, :marshal_load].include?(symbol)
-    super
-  end
-end
-Mocha::Mock.prepend(MockSerialization) unless ENV['NO_MOCHA']
 
 RSpec::Matchers.define_negated_matcher :not_eq, :eq
 
@@ -373,7 +334,6 @@ RSpec.configure do |config|
     PluginSetting.current_account = nil
     AdheresToPolicy::Cache.clear
     Setting.reset_cache!
-    ConfigFile.unstub unless ENV['NO_MOCHA']
     HostUrl.reset_cache!
     Notification.reset_cache!
     ActiveRecord::Base.reset_any_instantiation!

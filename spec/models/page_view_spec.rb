@@ -281,7 +281,6 @@ describe PageView do
     let(:attributes) { {:real_user => user, :user => user } }
 
     before { allow(RequestContextGenerator).to receive_messages( :request_id => 'xyz' ) }
-    after { RequestContextGenerator.unstub :request_id }
 
     subject { PageView.generate(request, attributes) }
 
