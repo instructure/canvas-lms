@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 group :redis do
-  gem 'redis-rails', '5.0.1'
-  gem 'redis-store', '1.2.0'
+  gem 'redis-rails', '5.0.2'
+  gem 'redis-store', '1.3.0'
 
   gem 'redis', '3.3.1'
   gem 'redis-scripting', '1.0.1'
