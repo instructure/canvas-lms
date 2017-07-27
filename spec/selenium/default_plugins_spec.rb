@@ -29,7 +29,7 @@ describe "default plugins" do
     settings = Canvas::Plugin.find(:twitter).try(:settings)
     expect(settings).to be_nil
 
-    Twitter::Connection.stubs(:config_check).returns("Bad check")
+    allow(Twitter::Connection).to receive(:config_check).and_return("Bad check")
     get "/plugins/twitter"
 
     multiple_accounts_select
@@ -42,7 +42,7 @@ describe "default plugins" do
     assert_flash_error_message "There was an error"
 
     f("#settings_consumer_secret").send_keys("asdf")
-    Twitter::Connection.stubs(:config_check).returns(nil)
+    allow(Twitter::Connection).to receive(:config_check).and_return(nil)
 
     submit_form('#new_plugin_setting')
     wait_for_ajax_requests
@@ -85,7 +85,7 @@ describe "default plugins" do
     settings = Canvas::Plugin.find(:linked_in).try(:settings)
     expect(settings).to be_nil
 
-    LinkedIn::Connection.stubs(:config_check).returns("Bad check")
+    allow(LinkedIn::Connection).to receive(:config_check).and_return("Bad check")
     get "/plugins/linked_in"
 
     multiple_accounts_select
@@ -98,7 +98,7 @@ describe "default plugins" do
     assert_flash_error_message "There was an error"
 
     f("#settings_client_secret").send_keys("asdf")
-    LinkedIn::Connection.stubs(:config_check).returns(nil)
+    allow(LinkedIn::Connection).to receive(:config_check).and_return(nil)
     submit_form('#new_plugin_setting')
     wait_for_ajax_requests
 

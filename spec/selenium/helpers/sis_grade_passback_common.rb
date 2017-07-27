@@ -143,7 +143,7 @@ module SisGradePassbackCommon
           "#{@teacher.id},T1,#{getsection('S1').id},S1,#{getpseudonym('S4').user.id},S4,#{getenroll('S4', 'S1').id},active,0,F\n" \
           "#{@teacher.id},T1,#{getsection('S3').id},S3,#{@stud5.id},,#{Enrollment.where(user_id: @stud5.user.id, course_section_id: getsection('S3').first.id).id},active,85,B\n" \
           "#{@teacher.id},T1,#{@sec4.id},,#{@stud6.id},,#{Enrollment.where(user_id: @stud6.user.id, course_section_id: @sec4.id).first.id},active,90,A-\n"
-    SSLCommon.expects(:post_data).with("http://localhost/endpoint", csv, "text/csv", {})
+    expect(SSLCommon).to receive(:post_data).with("http://localhost/endpoint", csv, "text/csv", {})
     f("#publish_grades_link").click
     wait_for_ajaximations
     expect(f("#publish_grades_messages").text).to eq(wait_for_success ? "Publishing - 6" : "Published - 6")

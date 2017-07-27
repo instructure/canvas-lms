@@ -69,12 +69,12 @@ describe "profile communication settings" do
     expect(fj('tr.grouping:first th.comm-channel:last')).to include_text('8011235555@vtext.com')
   end
 
-  let(:sns_response) { stub(data: {endpointarn: 'endpointarn'}) }
-  let(:sns_client) { stub(create_platform_endpoint: sns_response) }
+  let(:sns_response) { double(data: {endpointarn: 'endpointarn'}) }
+  let(:sns_client) { double(create_platform_endpoint: sns_response) }
   let(:sns_developer_key_sns_field) { sns_client }
 
   let(:sns_developer_key) do
-    DeveloperKey.stubs(:sns).returns(sns_developer_key_sns_field)
+    allow(DeveloperKey).to receive(:sns).and_return(sns_developer_key_sns_field)
     dk = DeveloperKey.default
     dk.sns_arn = 'apparn'
     dk.save!

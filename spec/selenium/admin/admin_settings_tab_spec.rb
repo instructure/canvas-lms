@@ -485,13 +485,13 @@ describe "admin settings tab" do
     end
 
     it "should not display external integration keys if no key types exist" do
-      ExternalIntegrationKey.stubs(:key_types).returns([])
+      allow(ExternalIntegrationKey).to receive(:key_types).and_return([])
       get "/accounts/#{Account.default.id}/settings"
       expect(f("#account_settings")).not_to contain_css("#external_integration_keys")
     end
 
     it "should not display external integration keys if no rights are granted" do
-      ExternalIntegrationKey.any_instance.stubs(:grants_right_for?).returns(false)
+      allow_any_instance_of(ExternalIntegrationKey).to receive(:grants_right_for?).and_return(false)
       get "/accounts/#{Account.default.id}/settings"
       expect(f("#account_settings")).not_to contain_css("#external_integration_keys")
     end
