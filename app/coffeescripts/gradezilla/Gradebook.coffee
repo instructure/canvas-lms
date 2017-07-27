@@ -190,6 +190,7 @@ define [
     {
       contextModules: []
       gradingPeriodAssignments: {}
+      assignmentStudentVisibility: {}
     }
 
   class Gradebook
@@ -473,6 +474,7 @@ define [
       @postGradesStore.setSections @sections
 
     gotChunkOfStudents: (students) =>
+      @courseContent.assignmentStudentVisibility = {}
       for student in students
         student.enrollments = _.filter student.enrollments, @isStudentEnrollment
         isStudentView = student.enrollments[0].type == "StudentViewEnrollment"
@@ -555,11 +557,14 @@ define [
       @renderedGrid.then =>
         @gridSupport.columns.updateColumnHeaders(['student'])
 
-    studentsThatCanSeeAssignment: (potential_students, assignment) ->
-      if assignment.only_visible_to_overrides
-        _.pick potential_students, assignment.assignment_visibility...
-      else
-        potential_students
+    studentsThatCanSeeAssignment: (assignmentId) ->
+      @courseContent.assignmentStudentVisibility[assignmentId] ||= (
+        assignment = @getAssignment(assignmentId)
+        if assignment.only_visible_to_overrides
+          _.pick @students, assignment.assignment_visibility...
+        else
+          @students
+      )
 
     isInvalidSort: =>
       sortSettings = @gradebookColumnOrderSettings
@@ -2209,7 +2214,7 @@ define [
     getAssignmentColumnHeaderProps: (assignmentId) =>
       assignment = @getAssignment(assignmentId)
       assignmentKey = "assignment_#{assignmentId}"
-      studentsThatCanSeeAssignment = @studentsThatCanSeeAssignment(@students, assignment)
+      studentsThatCanSeeAssignment = @studentsThatCanSeeAssignment(assignment.id)
       contextUrl = @options.context_url
 
       students = _.map studentsThatCanSeeAssignment, (student) =>

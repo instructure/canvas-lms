@@ -5470,7 +5470,6 @@ QUnit.module('Gradebook Assignment Student Visibility', function (hooks) {
   let gradebook;
   let allStudents;
   let assignments;
-  let studentMap;
 
   hooks.beforeEach(function () {
     gradebook = createGradebook();
@@ -5484,7 +5483,6 @@ QUnit.module('Gradebook Assignment Student Visibility', function (hooks) {
       name: 'Betty Ford',
       enrollments: [{ type: 'StudentEnrollment', grades: { html_url: 'http://example.url/' } }]
     }];
-    studentMap = _.indexBy(allStudents, 'id');
 
     assignments = [{
       id: '2301',
@@ -5505,13 +5503,28 @@ QUnit.module('Gradebook Assignment Student Visibility', function (hooks) {
   QUnit.module('#studentsThatCanSeeAssignment', function () {
     test('returns all students when the assignment is visible to everyone', function () {
       gradebook.gotChunkOfStudents(allStudents);
-      const students = gradebook.studentsThatCanSeeAssignment(studentMap, assignments[0]);
+      const students = gradebook.studentsThatCanSeeAssignment('2301');
       deepEqual(Object.keys(students).sort(), ['1101', '1102']);
     });
 
     test('returns only students with visibility when the assignment is not visible to everyone', function () {
       gradebook.gotChunkOfStudents(allStudents);
-      const students = gradebook.studentsThatCanSeeAssignment(studentMap, assignments[1]);
+      const students = gradebook.studentsThatCanSeeAssignment('2302');
+      deepEqual(Object.keys(students), ['1102']);
+    });
+
+    test('returns an empty collection when related students are not loaded', function () {
+      gradebook.gotChunkOfStudents(allStudents.slice(0, 1));
+      const students = gradebook.studentsThatCanSeeAssignment('2302');
+      deepEqual(Object.keys(students), []);
+    });
+
+    test('returns an up-to-date collection when student data has changed', function () {
+      // this ensures cached visibility data is invalidated when student data changes
+      gradebook.gotChunkOfStudents(allStudents.slice(0, 1));
+      let students = gradebook.studentsThatCanSeeAssignment('2302'); // first cache
+      gradebook.gotChunkOfStudents(allStudents.slice(1, 2));
+      students = gradebook.studentsThatCanSeeAssignment('2302'); // re-cache
       deepEqual(Object.keys(students), ['1102']);
     });
   });
