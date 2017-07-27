@@ -56,7 +56,7 @@ class AnnouncementsController < ApplicationController
 
   def public_feed
     return unless get_feed_context
-    announcements = @context.announcements.active.order('posted_at DESC').limit(15).
+    announcements = @context.announcements.published.order('posted_at DESC').limit(15).
       select{|a| a.visible_for?(@current_user) }
 
     respond_to do |format|
