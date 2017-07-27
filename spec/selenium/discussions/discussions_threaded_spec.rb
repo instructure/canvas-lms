@@ -72,7 +72,6 @@ describe "threaded discussions" do
   end
 
   it "should allow edits to entries with replies", priority: "2", test_id: 222520 do
-    skip_if_chrome('Type in tiny fails in chrome')
     edit_text = 'edit message'
     entry       = @topic.discussion_entries.create!(user: @student,
                                                     message: 'new threaded reply from student')
@@ -118,7 +117,6 @@ describe "threaded discussions" do
   end
 
   it "should edit a reply", priority: "1", test_id: 150514 do
-    skip_if_chrome('Type in tiny fails in chrome')
     edit_text = 'edit message'
     entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
@@ -139,7 +137,6 @@ describe "threaded discussions" do
   end
 
   it "should show a reply time that is different from the creation time", priority: "2", test_id: 113813 do
-    skip_if_chrome('Type in tiny fails in chrome')
     @enrollment.workflow_state = 'active'
     @enrollment.save!
 
@@ -185,7 +182,6 @@ describe "threaded discussions" do
   end
 
   it "should support repeated editing", priority: "2", test_id: 222523 do
-    skip_if_chrome('Type in tiny fails in chrome')
     entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     edit_entry(entry, 'New text 1')
@@ -197,7 +193,6 @@ describe "threaded discussions" do
   end
 
   it "should re-render replies after editing", priority: "2", test_id: 222524 do
-    skip_if_chrome('Type in tiny fails in chrome')
     edit_text = 'edit message'
     entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
 
