@@ -174,17 +174,77 @@ class BzController < ApplicationController
   def set_user_retained_data
     result = RetainedData.where(:user_id => @current_user.id, :name => params[:name])
     data = nil
+    was_new = false
     if result.empty?
       data = RetainedData.new()
       data.user_id = @current_user.id
       data.path = request.referrer
       data.name = params[:name]
+      was_new = true
     else
       data = result.first
     end
 
     data.value = params[:value]
     data.save
+
+    # now that the user's work is safely saved, we will go back and do addon work
+    # like micrograding
+
+    if was_new
+      course_id = request.referrer[/\/courses\/(\d+)\//, 1]
+      if course_id
+
+        course = Course.find(course_id)
+
+        # counting the total number of magic fields is a really slow operation since it needs to
+        # scan the whole course. Thus, it is aggressively cached. Major changes to a course in
+        # the middle of a term can thus throw off scores (since the existing points don't adapt to
+        # the step) and changes (since the cache won't instantly update - it will update in a week,
+        # so probably next monday).
+        #
+        # However, given that we can just round up the points at the end of the semester and most the
+        # steps will be fractional points, and most the content will be written ahead of time, this
+        # shouldn't be a real problem.
+        magic_field_count = Rails.cache.fetch("magic_field_count_for_course_#{course_id}", :expires_in => 1.week) do
+          count = 0
+          course.assignments.active.each do |assignment|
+            assignment_html = assignment.description
+            doc = Nokogiri::HTML(assignment_html)
+            doc.css('[data-bz-retained]').each do |o|
+              count += 1
+            end
+          end
+          course.wiki_pages.active.each do |wiki_page|
+            page_html = wiki_page.body
+            doc = Nokogiri::HTML(page_html)
+            doc.css('[data-bz-retained]').each do |o|
+              count += 1
+            end
+          end
+
+          count == 0 ? 1 : count
+        end
+
+        res = course.assignments.active.where(:title => "Course Participation")
+        if !res.empty?
+          participation_assignment = res.first
+
+          step = participation_assignment.points_possible.to_f / magic_field_count
+
+          submission = participation_assignment.find_or_create_submission(@current_user)
+
+          # actually a race condition but we should be ok since users will only really
+          # be editing one field at a time anyway and I don't think the Canvas models
+          # have a way to do this with a proper atomic update or a lock.
+          existing_grade = submission.grade.nil? ? 0 : submission.grade.to_f
+          new_grade = existing_grade + step
+          participation_assignment.grade_student(@current_user, {:grade => (new_grade) })
+        end
+      end
+    end
+
+
     render :nothing => true
   end
 
