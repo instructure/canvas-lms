@@ -22,7 +22,7 @@ class Demo extends React.Component {
     return <div>
       <button onClick={this.handleCheck}>Check Accessability</button>
       <div ref={r => this._body = r}>
-        <h1 style={{backgroundColor: 'rgba(0, 0, 0, 0.1)'}}>Test Document</h1>
+        <h1 style={{backgroundColor: 'rgba(0, 0, 0, 0.8)'}}>Test Document</h1>
         <img src="http://lorempixel.com/output/animals-q-c-640-480-6.jpg" alt=""/>
         <table>
           <tr>
