@@ -337,7 +337,12 @@
 }
 
 // Updated replacement mixin for buttonBackground ^^
-@mixin canvas-button($button-color, $text-color) {
+@mixin canvas-button(
+  $button-color, 
+  $text-color, 
+  $button-color-darkened-5:darken($button-color, 5), 
+  $button-color-darkened-15:darken($button-color, 15)
+) {
   background: $button-color;
   color: $text-color;
   border: 1px solid;
@@ -349,7 +354,7 @@
       color: $ic-color-light;
     }
     @else  {
-      background: darken($button-color, 5%);
+      background: $button-color-darkened-5;
       color: $text-color;
     }
 
@@ -360,41 +365,21 @@
         color: $ic-color-light;
       }
       @else {
-        background: darken($button-color, 6%);
+        background: $button-color-darkened-5;
         color: $text-color;
-        border-color: darken($button-color, 15%);
+        border-color: $button-color-darkened-15;
       }
     }
   }
 
-  @if lightness($button-color) > lightness($text-color) {
-    border-color: $ic-border-color;
+  border-color: $button-color-darkened-15;
 
-    &.active, &.Button--active, &:active { box-shadow: none; }
-    &.active, &.Button--active {
-      background: darken($button-color, 55%);
-      border-color: darken($button-color, 65%);
-      color: $ic-color-light;
-    }
-    &:focus { @include button-focus-light; }
-    // handle jquery UI ui-button states
-    &.ui-state-focus.ui-state-active {
-      &:focus { @include button-focus-dark; }
-    }
-    &:active { background: darken($button-color, 8%); }
-  }
-
-  @else {
-    border-color: darken($button-color, 15%);
-
-    &:focus { @include button-focus-dark; }
-    &.active, &.Button--active, &:active {
-      background: darken($button-color, 8%);
-      box-shadow: none;
-    }
+  &:focus { @include button-focus-dark; }
+  &.active, &.Button--active, &:active {
+    background: $button-color-darkened-5;
+    box-shadow: none;
   }
 }
-
 
 // Grid System
 // -----------

@@ -279,14 +279,6 @@ $ic-dim-helper-text:            darken($ic-color-neutral, 45);
 $ic-dim-helper-text:            darken($ic-color-neutral, 55);
 }
 
-// special handling for button--primary coloring
-$button--primary-text: $ic-brand-button--primary-text;
-$button--primary-bgd: $ic-brand-button--primary-bgd;
-@if $use_high_contrast {
-  $button--primary-bgd: $ic-brand-primary;
-  $button--primary-text: $ic-color-light;
-}
-
 //==========================================================
 // Legacy Vendor Variables (please do not touch these files)
 //==========================================================

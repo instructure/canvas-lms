@@ -135,8 +135,27 @@ module BrandableCSS
       handle_urls(default, config, css_urls)
     end
 
+    def computed_variables(active_brand_config=nil)
+      [
+        ['ic-brand-primary', 'darken', 5],
+        ['ic-brand-primary', 'darken', 10],
+        ['ic-brand-primary', 'darken', 15],
+        ['ic-brand-primary', 'lighten', 5],
+        ['ic-brand-primary', 'lighten', 10],
+        ['ic-brand-primary', 'lighten', 15],
+        ['ic-brand-button--primary-bgd', 'darken', 5],
+        ['ic-brand-button--primary-bgd', 'darken', 15],
+        ['ic-brand-button--secondary-bgd', 'darken', 5],
+        ['ic-brand-button--secondary-bgd', 'darken', 15],
+      ].each_with_object({}) do |(variable_name, darken_or_lighten, percent), memo|
+        color = brand_variable_value(variable_name, active_brand_config, variables_map_with_image_urls)
+        computed_color = CanvasColor::Color.new(color).send(darken_or_lighten, percent/100.0)
+        memo["#{variable_name}-#{darken_or_lighten}ed-#{percent}"] = computed_color.to_s
+      end
+    end
+
     def all_brand_variable_values(active_brand_config=nil, css_urls=false)
-      variables_map.each_with_object({}) do |(key, _), memo|
+      variables_map.each_with_object(computed_variables(active_brand_config)) do |(key, _), memo|
         memo[key] = brand_variable_value(key, active_brand_config, variables_map_with_image_urls, css_urls)
       end
     end
