@@ -2526,9 +2526,12 @@ define [
         onClose: => @gridSupport.helper.focus()
         showContentComingSoon: !@options.new_gradebook_development_enabled
         student:
+          id: student.id,
           name: student.name,
           avatarUrl: htmlDecode(student.avatar_url)
         submission: ConvertCase.camelize(submission)
+        courseId: @options.context_id
+        speedGraderEnabled: @options.speed_grader_enabled
       props.latePolicy = ConvertCase.camelize(@options.late_policy) if @options.late_policy
       renderComponent(SubmissionTray, mountPoint, props)
 

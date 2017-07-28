@@ -43,14 +43,20 @@ QUnit.module('SubmissionTray', function (hooks) {
       onClose () {},
       showContentComingSoon: false,
       isOpen: true,
-      student: { name: 'Jane Doe' },
+      courseId: '1',
+      speedGraderEnabled: true,
+      student: {
+        id: '27',
+        name: 'Jane Doe'
+      },
       submission: {
         grade: '100%',
         excused: false,
         late: false,
         missing: false,
         pointsDeducted: 3,
-        secondsLate: 0
+        secondsLate: 0,
+        assignmentId: '30'
       }
     };
     wrapper = mount(<SubmissionTray {...defaultProps} {...props} />);
@@ -82,20 +88,33 @@ QUnit.module('SubmissionTray', function (hooks) {
     server.restore();
   });
 
+  test('shows SpeedGrader link if enabled', function () {
+    const speedGraderUrl = '/courses/1/gradebook/speed_grader?assignment_id=30#%7B%22student_id%22%3A27%7D';
+    mountComponent();
+    const speedGraderLink = document.querySelector('.SubmissionTray__Container a[href*="speed_grader"]').getAttribute('href');
+    strictEqual(speedGraderLink, speedGraderUrl);
+  });
+
+  test('does not show SpeedGrader link if disabled', function () {
+    mountComponent({speedGraderEnabled: false});
+    const speedGraderLink = document.querySelector('.SubmissionTray__Container a[href*="speed_grader"]');
+    notOk(speedGraderLink);
+  });
+
   test('shows avatar if showContentComingSoon is false and avatar is not null', function () {
     const avatarUrl = 'http://bob_is_not_a_domain/me.jpg?filter=make_me_pretty';
-    mountComponent({ student: { name: 'Bob', avatarUrl } });
+    mountComponent({ student: { id: '27', name: 'Bob', avatarUrl } });
     const avatarBackground = avatarDiv().firstChild.style.getPropertyValue('background-image');
     strictEqual(avatarBackground, `url("${avatarUrl}")`);
   });
 
   test('shows no avatar if showContentComingSoon is false and avatar is null', function () {
-    mountComponent({ student: { name: 'Joe' } });
+    mountComponent({ student: { id: '27', name: 'Joe' } });
     notOk(avatarDiv());
   });
 
   test('shows name if showContentComingSoon is false', function () {
-    mountComponent({ student: { name: 'Sara' } });
+    mountComponent({ student: { id: '27', name: 'Sara' } });
     strictEqual(studentNameDiv().innerHTML, 'Sara');
   });
 
@@ -112,12 +131,12 @@ QUnit.module('SubmissionTray', function (hooks) {
   });
 
   test('does not show the late policy grade when zero points have been deducted', function () {
-    mountComponent({ submission: { excused: false, late: true, missing: false, pointsDeducted: 0, secondsLate: 0 } });
+    mountComponent({ submission: { excused: false, late: true, missing: false, pointsDeducted: 0, secondsLate: 0, assignmentId: '30' } });
     strictEqual(wrapContent().find('LatePolicyGrade').length, 0);
   });
 
   test('does not show the late policy grade when points deducted is null', function () {
-    mountComponent({ submission: { excused: false, late: true, missing: false, pointsDeducted: null, secondsLate: 0 } });
+    mountComponent({ submission: { excused: false, late: true, missing: false, pointsDeducted: null, secondsLate: 0, assignmentId: '30' } });
     strictEqual(wrapContent().find('LatePolicyGrade').length, 0);
   });
 
