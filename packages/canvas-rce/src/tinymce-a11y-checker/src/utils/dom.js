@@ -24,10 +24,11 @@ function walk (node, fn, done) {
   processBatch()
 }
 
-function select (doc, elem) {
+function select (elem) {
   if (elem == null) {
     return
   }
+  const doc = elem.ownerDocument
   const sel = doc.getSelection()
   const range = doc.createRange()
   if (sel.rangeCount > 0) {

@@ -54,7 +54,7 @@ class Checker extends React.Component {
   }
 
   _check () {
-    const node = this.props.node()
+    const node = this.props.getBody()
     const errors = []
     if (node) {
       dom.walk(node, (child) => {
@@ -95,8 +95,7 @@ class Checker extends React.Component {
     const errorNode = this.errorNode()
     if (errorNode) {
       this.getFormState()
-      dom.select(this.props.doc(), errorNode)
-      errorNode.scrollIntoView(false)
+      dom.select(errorNode)
     } else {
       this.firstError()
     }
