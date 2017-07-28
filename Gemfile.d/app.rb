@@ -71,7 +71,7 @@ gem 'icalendar', '1.5.4', require: false
 gem 'ims-lti', '2.1.3', require: 'ims'
 gem 'json', '2.1.0'
 gem 'oj', '3.3.2'
-gem 'jwt', '1.2.1', require: false
+gem 'jwt', '1.5.6', require: false
 gem 'json-jwt', '1.7.2', require: false
 gem 'twilio-ruby', '4.2.1'
 
