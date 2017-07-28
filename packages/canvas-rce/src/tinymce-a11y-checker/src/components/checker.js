@@ -44,6 +44,10 @@ class Checker extends React.Component {
     this.handleClose = this.handleClose.bind(this)
   }
 
+  componentWillUnmount () {
+    clearTimeout(this._closeTimout)
+  }
+
   check () {
     this.setState({
       open: true,
@@ -65,6 +69,9 @@ class Checker extends React.Component {
         }
       }, () => {
         this.setState({ errors, checking: false }, this.firstError)
+        if (errors.length === 0) {
+          this._closeTimout = setTimeout(this.handleClose, 3000)
+        }
       })
     }
   }
@@ -196,7 +203,11 @@ class Checker extends React.Component {
       errorIndex = 0
     }
     this.onLeaveError()
-    this.setState({ errors, errorIndex }, this.selectCurrent)
+    if (errors.length === 0) {
+      this.check()
+    } else {
+      this.setState({ errors, errorIndex }, this.selectCurrent)
+    }
   }
 
   handleClose () {
