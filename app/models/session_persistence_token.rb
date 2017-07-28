@@ -68,6 +68,10 @@ class SessionPersistenceToken < ActiveRecord::Base
     return token
   end
 
+  def self.delete_expired(since)
+    where('updated_at < ?', since.seconds.ago).delete_all
+  end
+
   def valid_token?(persistence_token, uncrypted_token)
     # if the pseudonym is marked deleted, the token can still be marked as
     # valid, but the actual login step will fail as expected.
