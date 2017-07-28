@@ -1,3 +1,4 @@
+const formatMessage = require('../format-message')
 const dom = require('../utils/dom')
 
 const _forEach = Array.prototype.forEach
@@ -16,14 +17,14 @@ module.exports = {
     }
   },
 
-  form: [{
-    label: 'Set table header',
+  form: () => [{
+    label: formatMessage('Set table header'),
     dataKey: 'header',
     options: [
-      ['none', 'No Headers'],
-      ['row', 'Header Row'],
-      ['col', 'Header Column'],
-      ['both', 'Header Row and Column']
+      ['none', formatMessage('No Headers')],
+      ['row', formatMessage('Header Row')],
+      ['col', formatMessage('Header Column')],
+      ['both', formatMessage('Header Row and Column')]
     ]
   }],
 
@@ -56,9 +57,9 @@ module.exports = {
     }
   },
 
-  message: 'Tables should have at least one header',
+  message: () => formatMessage('Tables should have at least one header'),
 
-  why: `Paragraph about why table headers are important.`,
+  why: () => formatMessage(`Paragraph about why table headers are important.`),
 
   link: 'https://www.w3.org/TR/WCAG20-TECHS/G95.html'
 }
