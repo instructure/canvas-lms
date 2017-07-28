@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "dev": "webpack-dev-server --open"
+    "dev": "webpack-dev-server --open",
+    "extract": "format-message extract \"src*/**/*.js\" > locales/en.json"
   },
   "keywords": [
     "tinymce",
@@ -22,11 +23,13 @@
     "babel-preset-env": "^1.6.0",
     "babel-preset-react": "^6.24.1",
     "canvas-rce": "^2.2.1",
+    "format-message-cli": "^5.2.0",
     "jest": "^20.0.4",
     "webpack": "^3.3.0",
     "webpack-dev-server": "^2.6.1"
   },
   "dependencies": {
+    "format-message": "^5.2.0",
     "instructure-icons": "^4.2.0",
     "instructure-ui": "^2.5.1",
     "react": "^15.6.1",

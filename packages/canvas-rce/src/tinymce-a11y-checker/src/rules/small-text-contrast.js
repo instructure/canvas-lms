@@ -1,3 +1,4 @@
+const formatMessage = require('../format-message')
 const contrast = require('wcag-element-contrast')
 
 module.exports = {
@@ -15,8 +16,8 @@ module.exports = {
     }
   },
 
-  form: [{
-    label: 'Change text color',
+  form: () => [{
+    label: formatMessage('Change text color'),
     dataKey: 'color',
     color: true
   }],
@@ -26,9 +27,9 @@ module.exports = {
     return elem
   },
 
-  message: 'Text smaller than 18pt (14pt if bold) should have a minimum contrast ratio of 4.5:1.',
+  message: () => formatMessage('Text smaller than 18pt (14pt if bold) should have a minimum contrast ratio of 4.5:1.'),
 
-  why: `Paragraph about why color contrast is important.`,
+  why: () => formatMessage(`Paragraph about why color contrast is important.`),
 
   link: 'https://www.w3.org/TR/UNDERSTANDING-WCAG20/visual-audio-contrast-contrast.html'
 }

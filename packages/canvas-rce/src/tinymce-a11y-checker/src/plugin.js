@@ -1,6 +1,7 @@
 const React = require('react')
 const ReactDOM = require('react-dom')
 const Checker = require('./components/checker')
+const formatMessage = require('./format-message')
 
 tinymce.create('tinymce.plugins.AccessibilityChecker', {
   init : function(ed) {
@@ -11,7 +12,7 @@ tinymce.create('tinymce.plugins.AccessibilityChecker', {
     ed.addCommand('openAccessibilityChecker', checker.check.bind(checker))
 
     ed.addButton('check_a11y', {
-      title: 'Check Accessibility',
+      title: formatMessage('Check Accessibility'),
       cmd: 'openAccessibilityChecker',
       icon: 'a11y'
     })

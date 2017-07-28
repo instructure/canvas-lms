@@ -1,3 +1,5 @@
+const formatMessage = require('../format-message')
+
 module.exports = {
   test: (elem) => {
     if (elem.tagName !== 'IMG') {
@@ -14,8 +16,8 @@ module.exports = {
     }
   },
 
-  form: [{
-    label: 'Add alt text for the image',
+  form: () => [{
+    label: formatMessage('Add alt text for the image'),
     dataKey: 'alt'
   }],
 
@@ -24,9 +26,9 @@ module.exports = {
     return elem
   },
 
-  message: 'Images should have an alt attribute describing its content.',
+  message: () => formatMessage('Images should have an alt attribute describing its content.'),
 
-  why: `Paragraph about why alt text for images is important.`,
+  why: () => formatMessage(`Paragraph about why alt text for images is important.`),
 
   link: 'https://www.w3.org/TR/WCAG20-TECHS/G95.html'
 }

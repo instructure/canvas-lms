@@ -1,3 +1,4 @@
+const formatMessage = require('../format-message')
 const dom = require('../utils/dom')
 
 module.exports = {
@@ -16,8 +17,8 @@ module.exports = {
     }
   },
 
-  form: [{
-    label: 'Add a caption',
+  form: () => [{
+    label: formatMessage('Add a caption'),
     dataKey: 'caption'
   }],
 
@@ -31,9 +32,9 @@ module.exports = {
     return elem
   },
 
-  message: 'Tables should have a caption describing the contents of the table',
+  message: () => formatMessage('Tables should have a caption describing the contents of the table'),
 
-  why: `Paragraph about why table captions are important.`,
+  why: () => formatMessage(`Paragraph about why table captions are important.`),
 
   link: 'https://www.w3.org/TR/WCAG20-TECHS/G95.html'
 }

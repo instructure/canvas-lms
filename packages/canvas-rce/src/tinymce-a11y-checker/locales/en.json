@@ -1,0 +1,110 @@
+{
+  "accessibility_checker_b3af1f6c": {
+    "message": "Accessibility Checker"
+  },
+  "add_a_caption_2a915239": {
+    "message": "Add a caption"
+  },
+  "add_alt_text_for_the_image_48cd88aa": {
+    "message": "Add alt text for the image"
+  },
+  "apply_fix_7b90ba48": {
+    "message": "Apply Fix"
+  },
+  "change_text_color_1aecb912": {
+    "message": "Change text color"
+  },
+  "check_accessibility_3c78211c": {
+    "message": "Check Accessibility"
+  },
+  "checking_for_accessibility_issues_fac18c6d": {
+    "message": "Checking for accessibility issues"
+  },
+  "close_accessibility_checker_29d1c51e": {
+    "message": "Close Accessibility Checker"
+  },
+  "column_e1ae5c64": {
+    "message": "Column"
+  },
+  "column_group_ddc70c6c": {
+    "message": "Column Group"
+  },
+  "header_column_f5d836fd": {
+    "message": "Header Column"
+  },
+  "header_row_and_column_c40dc402": {
+    "message": "Header Row and Column"
+  },
+  "header_row_cb73f789": {
+    "message": "Header Row"
+  },
+  "images_should_have_an_alt_attribute_describing_its_a86ed190": {
+    "message": "Images should have an alt attribute describing its content."
+  },
+  "issue_num_of_total_f5856670": {
+    "message": "Issue { num } of { total }"
+  },
+  "learn_more_a79a7918": {
+    "message": "Learn more"
+  },
+  "next_40e12421": {
+    "message": "Next"
+  },
+  "no_accessibility_issues_were_detected_f8d3c875": {
+    "message": "No accessibility issues were detected."
+  },
+  "no_headers_547ae5e3": {
+    "message": "No Headers"
+  },
+  "none_3b5e34d2": {
+    "message": "None"
+  },
+  "paragraph_about_why_alt_text_for_images_is_importa_1093bc8d": {
+    "message": "Paragraph about why alt text for images is important."
+  },
+  "paragraph_about_why_color_contrast_is_important_7053f9c9": {
+    "message": "Paragraph about why color contrast is important."
+  },
+  "paragraph_about_why_table_captions_are_important_20607615": {
+    "message": "Paragraph about why table captions are important."
+  },
+  "paragraph_about_why_table_header_scope_is_importan_b6361131": {
+    "message": "Paragraph about why table header scope is important."
+  },
+  "paragraph_about_why_table_headers_are_important_cd99c445": {
+    "message": "Paragraph about why table headers are important."
+  },
+  "prev_f82cbc48": {
+    "message": "Prev"
+  },
+  "row_fc0944a7": {
+    "message": "Row"
+  },
+  "row_group_565e7a2c": {
+    "message": "Row Group"
+  },
+  "set_header_scope_8c548f40": {
+    "message": "Set header scope"
+  },
+  "set_table_header_cfab13a0": {
+    "message": "Set table header"
+  },
+  "tables_headers_should_have_scope_specified_5bf21f10": {
+    "message": "Tables headers should have scope specified"
+  },
+  "tables_should_have_a_caption_describing_the_conten_bea25b4e": {
+    "message": "Tables should have a caption describing the contents of the table"
+  },
+  "tables_should_have_at_least_one_header_e8aeadd1": {
+    "message": "Tables should have at least one header"
+  },
+  "text_18pt_14pt_if_bold_or_larger_should_have_a_min_ccb18c3c": {
+    "message": "Text 18pt (14pt if bold) or larger should have a minimum contrast ratio of 3:1."
+  },
+  "text_smaller_than_18pt_14pt_if_bold_should_have_a__b08f92f4": {
+    "message": "Text smaller than 18pt (14pt if bold) should have a minimum contrast ratio of 4.5:1."
+  },
+  "why_523b3d8c": {
+    "message": "Why"
+  }
+}

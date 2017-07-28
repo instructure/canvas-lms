@@ -21,6 +21,7 @@ const IconQuestionSolid = require('instructure-icons/lib/Solid/IconQuestionSolid
 
 const dom = require('../utils/dom')
 const rules = require('../rules')
+const formatMessage = require('../format-message')
 
 class Checker extends React.Component {
   constructor () {
@@ -124,7 +125,7 @@ class Checker extends React.Component {
 
   errorMessage () {
     const rule = this.errorRule()
-    return rule && rule.message
+    return rule && rule.message()
   }
 
   getFormState () {
@@ -218,12 +219,12 @@ class Checker extends React.Component {
   render () {
     const rule = this.errorRule()
     return <Tray
-      label="Accessibility Checker"
+      label={formatMessage('Accessibility Checker')}
       isDismissable
       isOpen={this.state.open}
       onRequestClose={this.handleClose}
       placement="end"
-      closeButtonLabel="Close Accessibility Checker"
+      closeButtonLabel={formatMessage('Close Accessibility Checker')}
     >
       <Container
         as="div"
@@ -234,21 +235,24 @@ class Checker extends React.Component {
           <IconCompleteSolid style={{
             verticalAlign: 'middle',
             paddingBottom: '0.1em'
-          }} />{' '}
-          Accessibility Checker
+          }} />
+          {' ' + formatMessage('Accessibility Checker')}
         </Heading>
         { this.state.errors.length > 0 &&
           <Container as="div">
             <Typography size="small">
-              Issue {this.state.errorIndex + 1} of {this.state.errors.length}
+              {formatMessage('Issue { num } of { total }', {
+                num: this.state.errorIndex + 1,
+                total: this.state.errors.length
+              })}
             </Typography>
             <form onSubmit={this.fixIssue}>
               <Container as="div" margin="x-small 0 medium">
                 <Grid vAlign="middle" hAlign="space-between" colSpacing="none">
                   <GridRow>
                     <GridCol>
-                      <Button onClick={this.prevError}>Prev</Button>{' '}
-                      <Button onClick={this.nextError} variant="primary">Next</Button>
+                      <Button onClick={this.prevError}>{formatMessage('Prev')}</Button>{' '}
+                      <Button onClick={this.nextError} variant="primary">{formatMessage('Next')}</Button>
                     </GridCol>
                     <GridCol width="auto">
                       <Button
@@ -256,14 +260,14 @@ class Checker extends React.Component {
                         variant="success"
                         disabled={!this.state.formStateValid}
                       >
-                        Apply Fix
+                        {formatMessage('Apply Fix')}
                       </Button>
                     </GridCol>
                   </GridRow>
                 </Grid>
               </Container>
               <Alert variant="warning">{this.errorMessage()}</Alert>
-              { rule.form.map((f) => <Container as="div" key={f.dataKey} margin="medium 0 0">
+              { rule.form().map((f) => <Container as="div" key={f.dataKey} margin="medium 0 0">
                 {this.renderField(f)}
               </Container>) }
             </form>
@@ -272,23 +276,26 @@ class Checker extends React.Component {
                 <IconQuestionSolid style={{
                   verticalAlign: 'middle',
                   paddingBottom: '0.1em'
-                }} />{' '}
-                Why
+                }} />
+                {' ' + formatMessage('Why')}
               </Heading>
               <Typography size="small">
-                {rule.why + ' '}
-                <Link href={rule.link} target="_blank">Learn more</Link>
+                {rule.why() + ' '}
+                <Link href={rule.link} target="_blank">{formatMessage('Learn more')}</Link>
               </Typography>
             </Container>
           </Container>
         }
         { this.state.errors.length === 0 && !this.state.checking &&
           <Alert variant="success">
-            No accessibility issues were detected.
+            {formatMessage('No accessibility issues were detected.')}
           </Alert>
         }
         { this.state.checking && 
-          <Spinner margin="medium auto" title="Checking for accessibility issues" />
+          <Spinner
+            margin="medium auto"
+            title={formatMessage('Checking for accessibility issues')}
+          />
         }
       </Container>
     </Tray>

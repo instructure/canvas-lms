@@ -1,4 +1,7 @@
+const formatMessage = require('../format-message')
+
 const VALID_SCOPES = ['row', 'col', 'rowgroup', 'colgroup']
+
 module.exports = {
   test: (elem) => {
     if (elem.tagName !== 'TH') {
@@ -13,15 +16,15 @@ module.exports = {
     }
   },
 
-  form: [{
-    label: 'Set header scope',
+  form: () => [{
+    label: formatMessage('Set header scope'),
     dataKey: 'scope',
     options: [
-      ['none', 'None'],
-      ['row', 'Row'],
-      ['col', 'Column'],
-      ['rowgroup', 'Row Group'],
-      ['colgroup', 'Column Group'],
+      ['none', formatMessage('None')],
+      ['row', formatMessage('Row')],
+      ['col', formatMessage('Column')],
+      ['rowgroup', formatMessage('Row Group')],
+      ['colgroup', formatMessage('Column Group')],
     ]
   }],
 
@@ -33,9 +36,9 @@ module.exports = {
     elem.setAttribute('scope', data.scope)
   },
 
-  message: 'Tables headers should have scope specified',
+  message: () => formatMessage('Tables headers should have scope specified'),
 
-  why: `Paragraph about why table header scope is important.`,
+  why: () => formatMessage(`Paragraph about why table header scope is important.`),
 
   link: 'https://www.w3.org/TR/WCAG20-TECHS/G95.html'
 }
