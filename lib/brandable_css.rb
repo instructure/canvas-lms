@@ -147,6 +147,10 @@ module BrandableCSS
         ['ic-brand-button--primary-bgd', 'darken', 15],
         ['ic-brand-button--secondary-bgd', 'darken', 5],
         ['ic-brand-button--secondary-bgd', 'darken', 15],
+        ['ic-brand-font-color-dark', 'lighten', 15],
+        ['ic-brand-font-color-dark', 'lighten', 30],
+        ['ic-link-color', 'darken', 10],
+        ['ic-link-color', 'lighten', 10],
       ].each_with_object({}) do |(variable_name, darken_or_lighten, percent), memo|
         color = brand_variable_value(variable_name, active_brand_config, variables_map_with_image_urls)
         computed_color = CanvasColor::Color.new(color).send(darken_or_lighten, percent/100.0)

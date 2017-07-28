@@ -163,7 +163,7 @@ $cell_height: 33px;
       right: 14px;
     };
     // If high contrast, default to regular dark text
-    @if $use_high_contrast == false { color: lighten($ic-font-color-dark, 15%); }
+    @if not $use_high_contrast { color: var(--ic-brand-font-color-dark-lightened-15); }
   }
   .gradebook-header-drop {
     //put it above the "out of"
