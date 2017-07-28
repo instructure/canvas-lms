@@ -2214,8 +2214,7 @@ define [
     getAssignmentColumnHeaderProps: (assignmentId) =>
       assignment = @getAssignment(assignmentId)
       assignmentKey = "assignment_#{assignmentId}"
-      studentsThatCanSeeAssignment = @studentsThatCanSeeAssignment(assignment.id)
-      contextUrl = @options.context_url
+      studentsThatCanSeeAssignment = @studentsThatCanSeeAssignment(assignmentId)
 
       students = _.map studentsThatCanSeeAssignment, (student) =>
         studentRecord =
@@ -2235,26 +2234,6 @@ define [
 
         studentRecord
 
-      downloadSubmissionsManager = new DownloadSubmissionsDialogManager(
-        assignment, @options.download_assignment_submissions_url, @handleSubmissionsDownloading
-      )
-      reuploadSubmissionsManager = new ReuploadSubmissionsDialogManager(
-        assignment, @options.re_upload_submissions_url
-      )
-      curveGradesActionOptions =
-        isAdmin: IS_ADMIN
-        contextUrl: contextUrl
-        submissionsLoaded: @contentLoadStates.submissionsLoaded
-      setDefaultGradeDialogManager = new SetDefaultGradeDialogManager(
-        assignment, studentsThatCanSeeAssignment, @options.context_id,
-        @getFilterRowsBySetting('sectionId'), isAdmin(), @contentLoadStates.submissionsLoaded
-      )
-      assignmentMuterDialogManager = new AssignmentMuterDialogManager(
-        assignment,
-        "#{@options.context_url}/assignments/#{assignmentId}/mute",
-        @contentLoadStates.submissionsLoaded
-      )
-
       {
         ref: (ref) =>
           @setHeaderComponentRef(@getAssignmentColumnId(assignmentId), ref)
@@ -2272,23 +2251,13 @@ define [
         students: students
         submissionsLoaded: @contentLoadStates.submissionsLoaded
         sortBySetting: @getAssignmentColumnSortBySetting(assignmentId)
-        curveGradesAction: CurveGradesDialogManager.createCurveGradesAction(
-          assignment, studentsThatCanSeeAssignment, curveGradesActionOptions
-        )
-        setDefaultGradeAction:
-          disabled: !setDefaultGradeDialogManager.isDialogEnabled()
-          onSelect: setDefaultGradeDialogManager.showDialog
+        curveGradesAction: @getCurveGradesAction(assignmentId)
+        setDefaultGradeAction: @getSetDefaultGradeAction(assignmentId)
         students: students
         submissionsLoaded: @contentLoadStates.submissionsLoaded
-        downloadSubmissionsAction:
-          hidden: !downloadSubmissionsManager.isDialogEnabled()
-          onSelect: downloadSubmissionsManager.showDialog
-        reuploadSubmissionsAction:
-          hidden: !reuploadSubmissionsManager.isDialogEnabled()
-          onSelect: reuploadSubmissionsManager.showDialog
-        muteAssignmentAction:
-          disabled: !assignmentMuterDialogManager.isDialogEnabled()
-          onSelect: assignmentMuterDialogManager.showDialog
+        downloadSubmissionsAction: @getDownloadSubmissionsAction(assignmentId)
+        reuploadSubmissionsAction: @getReuploadSubmissionsAction(assignmentId)
+        muteAssignmentAction: @getMuteAssignmentAction(assignmentId)
         addGradebookElement: @keyboardNav.addGradebookElement
         removeGradebookElement: @keyboardNav.removeGradebookElement
         onMenuClose: @handleColumnHeaderMenuClose
@@ -2600,6 +2569,74 @@ define [
 
     listContextModules: =>
       @courseContent.contextModules
+
+    ## Assignment UI Action Methods
+
+    getDownloadSubmissionsAction: (assignmentId) =>
+      assignment = @getAssignment(assignmentId)
+      manager = new DownloadSubmissionsDialogManager(
+        assignment,
+        @options.download_assignment_submissions_url,
+        @handleSubmissionsDownloading
+      )
+
+      {
+        hidden: !manager.isDialogEnabled()
+        onSelect: manager.showDialog
+      }
+
+    getReuploadSubmissionsAction: (assignmentId) =>
+      assignment = @getAssignment(assignmentId)
+      manager = new ReuploadSubmissionsDialogManager(
+        assignment,
+        @options.re_upload_submissions_url
+      )
+
+      {
+        hidden: !manager.isDialogEnabled()
+        onSelect: manager.showDialog
+      }
+
+    getSetDefaultGradeAction: (assignmentId) =>
+      assignment = @getAssignment(assignmentId)
+      manager = new SetDefaultGradeDialogManager(
+        assignment,
+        @studentsThatCanSeeAssignment(assignmentId),
+        @options.context_id,
+        @getFilterRowsBySetting('sectionId'),
+        isAdmin(),
+        @contentLoadStates.submissionsLoaded
+      )
+
+      {
+        disabled: !manager.isDialogEnabled()
+        onSelect: manager.showDialog
+      }
+
+    getCurveGradesAction: (assignmentId) =>
+      assignment = @getAssignment(assignmentId)
+      CurveGradesDialogManager.createCurveGradesAction(
+        assignment,
+        @studentsThatCanSeeAssignment(assignmentId),
+        {
+          isAdmin: isAdmin()
+          contextUrl: @options.context_url
+          submissionsLoaded: @contentLoadStates.submissionsLoaded
+        }
+      )
+
+    getMuteAssignmentAction: (assignmentId) =>
+      assignment = @getAssignment(assignmentId)
+      manager = new AssignmentMuterDialogManager(
+        assignment,
+        "#{@options.context_url}/assignments/#{assignmentId}/mute",
+        @contentLoadStates.submissionsLoaded
+      )
+
+      {
+        disabled: !manager.isDialogEnabled()
+        onSelect: manager.showDialog
+      }
 
     ## Gradebook Content Api Methods
 

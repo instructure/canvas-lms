@@ -7280,3 +7280,87 @@ test('returns the state of the submission tray', function () {
   expected = { open: true, studentId: '1', assignmentId: '2' };
   deepEqual(this.gradebook.getSubmissionTrayState(), expected);
 });
+
+QUnit.module('Gradebook Assignment Actions', function (suiteHooks) {
+  let gradebook;
+  let assignments;
+
+  suiteHooks.beforeEach(function () {
+    gradebook = createGradebook({
+      download_assignment_submissions_url: 'http://example.com/submissions'
+    });
+
+    assignments = [{
+      id: '2301',
+      submission_types: ['online_text_entry']
+    }, {
+      id: '2302',
+      submission_types: ['online_text_entry']
+    }];
+
+    gradebook.gotAllAssignmentGroups([
+      { id: '2201', position: 1, name: 'Assignments', assignments: assignments.slice(0, 1) },
+      { id: '2202', position: 2, name: 'Homework', assignments: assignments.slice(1, 2) }
+    ]);
+  });
+
+  QUnit.module('#getDownloadSubmissionsAction', function () {
+    test('includes the "hidden" property', function () {
+      const action = gradebook.getDownloadSubmissionsAction('2301');
+      equal(typeof action.hidden, 'boolean');
+    });
+
+    test('includes the "onSelect" callback', function () {
+      const action = gradebook.getDownloadSubmissionsAction('2301');
+      equal(typeof action.onSelect, 'function');
+    });
+  });
+
+  QUnit.module('#getReuploadSubmissionsAction', function () {
+    test('includes the "hidden" property', function () {
+      const action = gradebook.getReuploadSubmissionsAction('2301');
+      equal(typeof action.hidden, 'boolean');
+    });
+
+    test('includes the "onSelect" callback', function () {
+      const action = gradebook.getReuploadSubmissionsAction('2301');
+      equal(typeof action.onSelect, 'function');
+    });
+  });
+
+  QUnit.module('#getSetDefaultGradeAction', function () {
+    test('includes the "disabled" property', function () {
+      const action = gradebook.getSetDefaultGradeAction('2301');
+      equal(typeof action.disabled, 'boolean');
+    });
+
+    test('includes the "onSelect" callback', function () {
+      const action = gradebook.getSetDefaultGradeAction('2301');
+      equal(typeof action.onSelect, 'function');
+    });
+  });
+
+  QUnit.module('#getCurveGradesAction', function () {
+    test('includes the "isDisabled" property', function () {
+      const action = gradebook.getCurveGradesAction('2301');
+      equal(typeof action.isDisabled, 'boolean');
+    });
+
+    test('includes the "onSelect" callback', function () {
+      const action = gradebook.getCurveGradesAction('2301');
+      equal(typeof action.onSelect, 'function');
+    });
+  });
+
+  QUnit.module('#getMuteAssignmentAction', function () {
+    test('includes the "disabled" property', function () {
+      const action = gradebook.getMuteAssignmentAction('2301');
+      equal(typeof action.disabled, 'boolean');
+    });
+
+    test('includes the "onSelect" callback', function () {
+      const action = gradebook.getMuteAssignmentAction('2301');
+      equal(typeof action.onSelect, 'function');
+    });
+  });
+});
