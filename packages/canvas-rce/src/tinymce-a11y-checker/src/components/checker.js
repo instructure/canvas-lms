@@ -231,12 +231,8 @@ class Checker extends React.Component {
             <Typography size="small">
               Issue {this.state.errorIndex + 1} of {this.state.errors.length}
             </Typography>
-            <Alert variant="warning">{this.errorMessage()}</Alert>
             <form onSubmit={this.fixIssue}>
-              { rule.form.map((f) => <Container as="div" margin="medium 0 0">
-                {this.renderField(f)}
-              </Container>) }
-              <Container as="div" margin="medium 0 0">
+              <Container as="div" margin="x-small 0 medium">
                 <Grid vAlign="middle" hAlign="space-between" colSpacing="none">
                   <GridRow>
                     <GridCol>
@@ -255,8 +251,12 @@ class Checker extends React.Component {
                   </GridRow>
                 </Grid>
               </Container>
+              <Alert variant="warning">{this.errorMessage()}</Alert>
+              { rule.form.map((f) => <Container as="div" margin="medium 0 0">
+                {this.renderField(f)}
+              </Container>) }
             </form>
-            <Container as="div" margin="x-large 0 0">
+            <Container as="div" margin="large 0 0">
               <Heading level="h4" as="h3" padding="0 0 x-small">
                 <IconQuestionSolid style={{
                   verticalAlign: 'middle',
