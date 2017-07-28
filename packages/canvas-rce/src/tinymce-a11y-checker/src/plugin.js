@@ -6,19 +6,15 @@ tinymce.create('tinymce.plugins.AccessibilityChecker', {
   init : function(ed) {
     const container = document.createElement('div')
     document.body.appendChild(container)
-    const props = {
-      node: ed.getBody.bind(ed),
-      doc: ed.getDoc.bind(ed)
-    }
-    const checker = ReactDOM.render(<Checker {...props} />, container) 
+    const checker = ReactDOM.render(<Checker getBody={ed.getBody.bind(ed)} />, container) 
 
-    ed.addCommand('openAccessibilityChecker', checker.check.bind(checker));
+    ed.addCommand('openAccessibilityChecker', checker.check.bind(checker))
 
     ed.addButton('check_a11y', {
       title: 'Check Accessibility',
       cmd: 'openAccessibilityChecker',
       icon: 'a11y'
-    });
+    })
   },
 
   getInfo : function() {
@@ -28,10 +24,10 @@ tinymce.create('tinymce.plugins.AccessibilityChecker', {
       authorurl : 'https://github.com/instructure',
       infourl : 'https://github.com/instructure/tinymce-a11y',
       version : '1.0' 
-    };
+    }
   }
-});
+})
 
 // Register plugin
-tinymce.PluginManager.add('a11y_checker', tinymce.plugins.AccessibilityChecker);
+tinymce.PluginManager.add('a11y_checker', tinymce.plugins.AccessibilityChecker)
 
