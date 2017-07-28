@@ -54,7 +54,6 @@ define [
   'jsx/gradezilla/default_gradebook/slick-grid/ColumnHeaderRenderer'
   'jsx/gradezilla/default_gradebook/slick-grid/grid-support'
   'jsx/gradezilla/default_gradebook/constants/studentRowHeaderConstants'
-  'jsx/gradezilla/default_gradebook/components/AssignmentGroupColumnHeader'
   'jsx/gradezilla/default_gradebook/components/AssignmentRowCellPropFactory'
   'jsx/gradezilla/default_gradebook/components/TotalGradeColumnHeader'
   'jsx/gradezilla/default_gradebook/components/GradebookMenu'
@@ -101,8 +100,7 @@ define [
   GradeDisplayWarningDialog, PostGradesFrameDialog,
   NumberCompare, natcompare, ConvertCase, htmlEscape, SetDefaultGradeDialogManager,
   CurveGradesDialogManager, GradebookApi, CellEditorFactory, CellFormatterFactory, ColumnHeaderRenderer, GridSupport,
-  studentRowHeaderConstants,
-  AssignmentGroupColumnHeader, AssignmentRowCellPropFactory,
+  studentRowHeaderConstants, AssignmentRowCellPropFactory,
   TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, AssignmentGroupFilter, GradingPeriodFilter, ModuleFilter, SectionFilter,
   GridColor, StatusesModal, SubmissionTray, GradebookSettingsModal, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp,
   SubmissionStateMap,
@@ -1681,8 +1679,6 @@ define [
     onHeaderCellRendered: (event, obj) =>
       if obj.column.type == 'total_grade'
         @renderTotalGradeColumnHeader()
-      else if obj.column.type == 'assignment_group'
-        @renderAssignmentGroupColumnHeader(obj.column.assignmentGroupId)
 
     onBeforeHeaderCellDestroy: (event, obj) =>
       ReactDOM.unmountComponentAtNode(obj.node)
@@ -2062,9 +2058,7 @@ define [
       return unless @grid
 
       for column in @grid.getColumns()
-        if column.type == 'assignment_group'
-          @renderAssignmentGroupColumnHeader(column.assignmentGroupId)
-        else if column.type == 'total_grade'
+        if column.type == 'total_grade'
           @renderTotalGradeColumnHeader()
 
       @gridSupport.columns.updateColumnHeaders()
@@ -2190,50 +2184,6 @@ define [
       mountPoint = @getColumnHeaderNode('total_grade')
       props = @getTotalGradeColumnHeaderProps()
       renderComponent(TotalGradeColumnHeader, mountPoint, props)
-
-    # Assignment Group Column Header
-
-    getAssignmentGroupColumnSortBySetting: (assignmentGroupId) =>
-      columnId = @getAssignmentGroupColumnId(assignmentGroupId)
-      gradeSortDataLoaded =
-        @contentLoadStates.assignmentsLoaded and
-        @contentLoadStates.studentsLoaded and
-        @contentLoadStates.submissionsLoaded
-      sortRowsBySetting = @getSortRowsBySetting()
-
-      {
-        direction: sortRowsBySetting.direction
-        disabled: !gradeSortDataLoaded
-        isSortColumn: sortRowsBySetting.columnId == columnId
-        onSortByGradeAscending: () =>
-          @setSortRowsBySetting(columnId, 'grade', 'ascending')
-        onSortByGradeDescending: () =>
-          @setSortRowsBySetting(columnId, 'grade', 'descending')
-        settingKey: sortRowsBySetting.settingKey
-      }
-
-    getAssignmentGroupColumnHeaderProps: (assignmentGroupId) =>
-      assignmentGroup = @getAssignmentGroup(assignmentGroupId)
-      {
-        ref: (ref) =>
-          @setHeaderComponentRef(@getAssignmentGroupColumnId(assignmentGroupId), ref)
-        assignmentGroup:
-          name: assignmentGroup.name
-          groupWeight: assignmentGroup.group_weight
-        sortBySetting: @getAssignmentGroupColumnSortBySetting(assignmentGroupId)
-        weightedGroups: @weightedGroups()
-        addGradebookElement: @keyboardNav.addGradebookElement
-        removeGradebookElement: @keyboardNav.removeGradebookElement
-        onMenuClose: @handleColumnHeaderMenuClose
-        onHeaderKeyDown: (e) =>
-          @handleHeaderKeyDown(e, @getAssignmentGroupColumnId(assignmentGroupId))
-      }
-
-    renderAssignmentGroupColumnHeader: (assignmentGroupId) =>
-      columnId = @getAssignmentGroupColumnId(assignmentGroupId)
-      mountPoint = @getColumnHeaderNode(columnId)
-      props = @getAssignmentGroupColumnHeaderProps(assignmentGroupId)
-      renderComponent(AssignmentGroupColumnHeader, mountPoint, props)
 
     # Submission Tray
 

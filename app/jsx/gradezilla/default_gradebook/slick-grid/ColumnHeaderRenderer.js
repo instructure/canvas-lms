@@ -18,6 +18,8 @@
 
 import AssignmentColumnHeaderRenderer
 from 'jsx/gradezilla/default_gradebook/slick-grid/column-headers/AssignmentColumnHeaderRenderer';
+import AssignmentGroupColumnHeaderRenderer
+from 'jsx/gradezilla/default_gradebook/slick-grid/column-headers/AssignmentGroupColumnHeaderRenderer';
 import CustomColumnHeaderRenderer
 from 'jsx/gradezilla/default_gradebook/slick-grid/column-headers/CustomColumnHeaderRenderer';
 import StudentColumnHeaderRenderer
@@ -28,6 +30,7 @@ export default class ColumnHeaderRenderer {
     this.gradebook = gradebook;
     this.factories = {
       assignment: new AssignmentColumnHeaderRenderer(gradebook),
+      assignment_group: new AssignmentGroupColumnHeaderRenderer(gradebook),
       custom_column: new CustomColumnHeaderRenderer(gradebook),
       student: new StudentColumnHeaderRenderer(gradebook)
     };
