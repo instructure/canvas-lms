@@ -55,7 +55,6 @@ define [
   'jsx/gradezilla/default_gradebook/slick-grid/grid-support'
   'jsx/gradezilla/default_gradebook/constants/studentRowHeaderConstants'
   'jsx/gradezilla/default_gradebook/components/AssignmentRowCellPropFactory'
-  'jsx/gradezilla/default_gradebook/components/TotalGradeColumnHeader'
   'jsx/gradezilla/default_gradebook/components/GradebookMenu'
   'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu'
   'jsx/gradezilla/default_gradebook/components/ActionMenu'
@@ -101,7 +100,7 @@ define [
   NumberCompare, natcompare, ConvertCase, htmlEscape, SetDefaultGradeDialogManager,
   CurveGradesDialogManager, GradebookApi, CellEditorFactory, CellFormatterFactory, ColumnHeaderRenderer, GridSupport,
   studentRowHeaderConstants, AssignmentRowCellPropFactory,
-  TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, AssignmentGroupFilter, GradingPeriodFilter, ModuleFilter, SectionFilter,
+  GradebookMenu, ViewOptionsMenu, ActionMenu, AssignmentGroupFilter, GradingPeriodFilter, ModuleFilter, SectionFilter,
   GridColor, StatusesModal, SubmissionTray, GradebookSettingsModal, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp,
   SubmissionStateMap,
   DownloadSubmissionsDialogManager,ReuploadSubmissionsDialogManager, GradebookKeyboardNav,
@@ -1400,7 +1399,7 @@ define [
       @options.show_total_grade_as_points = not @options.show_total_grade_as_points
       $.ajaxJSON @options.setting_update_url, "PUT", show_total_grade_as_points: @displayPointTotals()
       @grid.invalidate()
-      @renderTotalGradeColumnHeader()
+      @gridSupport.columns.updateColumnHeaders(['total_grade'])
 
     togglePointsOrPercentTotals: (cb) =>
       if UserSettings.contextGet('warned_about_totals_display')
@@ -1599,8 +1598,6 @@ define [
       @grid.onKeyDown.subscribe @onGridKeyDown
 
       # Grid Header Events
-      @grid.onHeaderCellRendered.subscribe @onHeaderCellRendered
-      @grid.onBeforeHeaderCellDestroy.subscribe @onBeforeHeaderCellDestroy
       @grid.onColumnsReordered.subscribe @onColumnsReordered
       @grid.onColumnsResized.subscribe @onColumnsResized
 
@@ -1673,15 +1670,6 @@ define [
 
       if column.type == 'student' and event.which == 13 # activate link
         event.originalEvent.skipSlickGridDefaults = true
-
-    # Column Header Cell Event Handlers
-
-    onHeaderCellRendered: (event, obj) =>
-      if obj.column.type == 'total_grade'
-        @renderTotalGradeColumnHeader()
-
-    onBeforeHeaderCellDestroy: (event, obj) =>
-      ReactDOM.unmountComponentAtNode(obj.node)
 
     ## Grid Body Event Handlers
 
@@ -2055,13 +2043,7 @@ define [
     ## React Grid Component Rendering Methods
 
     updateColumnHeaders: ->
-      return unless @grid
-
-      for column in @grid.getColumns()
-        if column.type == 'total_grade'
-          @renderTotalGradeColumnHeader()
-
-      @gridSupport.columns.updateColumnHeaders()
+      @gridSupport?.columns.updateColumnHeaders()
 
     # Column Header Helpers
     handleHeaderKeyDown: (e, columnId) =>
@@ -2118,72 +2100,12 @@ define [
 
       @updateFrozenColumnsAndRenderGrid(allColumns)
 
-    getTotalGradeColumnSortBySetting: (assignmentId) =>
-      columnId = 'total_grade'
-      gradeSortDataLoaded =
-        @contentLoadStates.assignmentsLoaded and
-        @contentLoadStates.studentsLoaded and
-        @contentLoadStates.submissionsLoaded
-      sortRowsBySetting = @getSortRowsBySetting()
-
-      {
-        direction: sortRowsBySetting.direction
-        disabled: !gradeSortDataLoaded
-        isSortColumn: sortRowsBySetting.columnId == columnId
-        onSortByGradeAscending: () =>
-          @setSortRowsBySetting(columnId, 'grade', 'ascending')
-        onSortByGradeDescending: () =>
-          @setSortRowsBySetting(columnId, 'grade', 'descending')
-        settingKey: sortRowsBySetting.settingKey
-      }
-
-    getTotalGradeColumnGradeDisplayProps: =>
-      currentDisplay: if @options.show_total_grade_as_points then 'points' else 'percentage'
-      onSelect: @togglePointsOrPercentTotals
-      disabled: !@contentLoadStates.submissionsLoaded
-      hidden: @weightedGroups()
-
-    getTotalGradeColumnPositionProps: =>
-      totalColumnPosition = @getColumnPositionById('total_grade')
-      totalIsFrozen = @isColumnFrozen('total_grade')
-      backPosition = @grid.getColumns().length - 1
-
-      isInFront: totalIsFrozen
-      isInBack: totalColumnPosition == backPosition
-      onMoveToFront: =>
-        setTimeout(=>
-          @freezeTotalGradeColumn()
-        , 10)
-      onMoveToBack: =>
-        setTimeout(=>
-          @moveTotalGradeColumnToEnd()
-        , 10)
-
     totalColumnShouldFocus: ->
       if @totalColumnPositionChanged
         @totalColumnPositionChanged = false
         true
       else
         false
-
-    getTotalGradeColumnHeaderProps: ->
-      ref: (ref) =>
-        @setHeaderComponentRef('total_grade', ref)
-      sortBySetting: @getTotalGradeColumnSortBySetting()
-      gradeDisplay: @getTotalGradeColumnGradeDisplayProps()
-      position: @getTotalGradeColumnPositionProps()
-      addGradebookElement: @keyboardNav.addGradebookElement
-      removeGradebookElement: @keyboardNav.removeGradebookElement
-      onMenuClose: @handleColumnHeaderMenuClose
-      grabFocus: @totalColumnShouldFocus()
-      onHeaderKeyDown: (e) =>
-        @handleHeaderKeyDown(e, 'total_grade')
-
-    renderTotalGradeColumnHeader: =>
-      return if @hideAggregateColumns()
-      mountPoint = @getColumnHeaderNode('total_grade')
-      props = @getTotalGradeColumnHeaderProps()
-      renderComponent(TotalGradeColumnHeader, mountPoint, props)
 
     # Submission Tray
 

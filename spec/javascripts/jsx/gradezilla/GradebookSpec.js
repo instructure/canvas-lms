@@ -2104,7 +2104,11 @@ QUnit.module('Gradebook#switchTotalDisplay', {
     this.gradebook.grid = {
       invalidate: this.stub()
     }
-    this.stub(this.gradebook, 'renderTotalGradeColumnHeader');
+    this.gradebook.gridSupport = {
+      columns: {
+        updateColumnHeaders: this.stub()
+      }
+    }
 
     // Stub this here so the AJAX calls in Dataloader don't get stubbed too
     this.stub($, 'ajaxJSON');
@@ -2148,10 +2152,15 @@ test('invalidates the grid so it re-renders it', function () {
   equal(this.gradebook.grid.invalidate.callCount, 1);
 });
 
-test('re-renders the total grade column header', function () {
+test('updates the total grade column header', function () {
   this.gradebook.switchTotalDisplay({ dontWarnAgain: false });
+  strictEqual(this.gradebook.gridSupport.columns.updateColumnHeaders.callCount, 1);
+});
 
-  equal(this.gradebook.renderTotalGradeColumnHeader.callCount, 1);
+test('includes the "student" column id when updating column headers', function () {
+  this.gradebook.switchTotalDisplay({ dontWarnAgain: false });
+  const [columnIds] = this.gradebook.gridSupport.columns.updateColumnHeaders.lastCall.args;
+  deepEqual(columnIds, ['total_grade']);
 });
 
 QUnit.module('Gradebook#togglePointsOrPercentTotals', {
@@ -4084,65 +4093,6 @@ test('does not skip SlickGrid default behavior when pressing "enter" off the gri
   notOk('skipSlickGridDefaults' in event.originalEvent, 'skipSlickGridDefaults is not applied');
 });
 
-QUnit.module('Gradebook#onHeaderCellRendered');
-
-test('renders the total grade column header for the "total_grade" column type', function () {
-  const gradebook = createGradebook();
-  this.stub(gradebook, 'renderTotalGradeColumnHeader');
-  gradebook.onHeaderCellRendered(null, { column: { type: 'total_grade' } });
-  equal(gradebook.renderTotalGradeColumnHeader.callCount, 1);
-});
-
-QUnit.module('Gradebook#onBeforeHeaderCellDestroy', {
-  setup () {
-    this.$mountPoint = document.createElement('div');
-    $fixtures.appendChild(this.$mountPoint);
-    this.gradebook = createGradebook({ login_handle_name: '' });
-  },
-
-  teardown () {
-    $fixtures.innerHTML = '';
-  }
-});
-
-test('unmounts any component on the cell being destroyed', function () {
-  const component = React.createElement('span', {}, 'Example Component');
-  ReactDOM.render(component, this.$mountPoint, null);
-  this.gradebook.onBeforeHeaderCellDestroy(null, { node: this.$mountPoint });
-  const componentExistedAtNode = ReactDOM.unmountComponentAtNode(this.$mountPoint);
-  equal(componentExistedAtNode, false, 'the component was already unmounted');
-});
-
-QUnit.module('Gradebook#renderTotalGradeColumnHeader', {
-  setup () {
-    this.$mountPoint = document.createElement('div');
-    $fixtures.appendChild(this.$mountPoint);
-
-    this.gradebook = createGradebook();
-    this.gradebook.grid = {
-      getColumns () { return [] }
-    }
-    this.stub(this.gradebook, 'getColumnHeaderNode').withArgs('total_grade').returns(this.$mountPoint);
-  },
-
-  teardown () {
-    ReactDOM.unmountComponentAtNode(this.$mountPoint);
-    $fixtures.innerHTML = '';
-  }
-});
-
-test('renders the TotalGradeColumnHeader to the "total_grade" column header node', function () {
-  this.stub(this.gradebook, 'hideAggregateColumns').returns(false);
-  this.gradebook.renderTotalGradeColumnHeader();
-  ok(this.$mountPoint.innerText.includes('Total'), 'the "Total" header is rendered');
-});
-
-test('does not render when aggregate columns are hidden', function () {
-  this.stub(this.gradebook, 'hideAggregateColumns').returns(true);
-  this.gradebook.renderTotalGradeColumnHeader();
-  equal(this.$mountPoint.children.length, 0, 'the mount point contains no elements');
-});
-
 QUnit.module('Gradebook#getCustomColumnId');
 
 test('returns a unique key for the custom column', function () {
@@ -4183,154 +4133,12 @@ QUnit.module('Gradebook#updateColumnHeaders', {
         return columns;
       }
     };
-    this.stub(this.gradebook, 'renderTotalGradeColumnHeader');
   }
 });
 
 test('uses Grid Support to update the column headers', function () {
   this.gradebook.updateColumnHeaders();
   strictEqual(this.gradebook.gridSupport.columns.updateColumnHeaders.callCount, 1);
-});
-
-test('renders the total grade column header', function () {
-  this.gradebook.updateColumnHeaders();
-  equal(this.gradebook.renderTotalGradeColumnHeader.callCount, 1);
-});
-
-test('does not render column headers when the grid has not been created', function () {
-  this.gradebook.grid = undefined;
-  this.gradebook.updateColumnHeaders();
-  equal(this.gradebook.renderTotalGradeColumnHeader.callCount, 0);
-});
-
-QUnit.module('Gradebook#getTotalGradeColumnSortBySetting', {
-  setup () {
-    this.gradebook = createGradebook();
-    this.gradebook.setAssignmentsLoaded(true);
-    this.gradebook.setStudentsLoaded(true);
-    this.gradebook.setSubmissionsLoaded(true);
-  }
-});
-
-test('includes the sort direction', function () {
-  this.gradebook.setSortRowsBySetting('total_grade', 'grade', 'ascending');
-  const props = this.gradebook.getTotalGradeColumnSortBySetting();
-  equal(props.direction, 'ascending');
-});
-
-test('is not disabled when assignments, students, and submissions are loaded', function () {
-  const props = this.gradebook.getTotalGradeColumnSortBySetting();
-  equal(props.disabled, false);
-});
-
-test('is disabled when assignments are not loaded', function () {
-  this.gradebook.setAssignmentsLoaded(false);
-  const props = this.gradebook.getTotalGradeColumnSortBySetting();
-  equal(props.disabled, true);
-});
-
-test('is disabled when students are not loaded', function () {
-  this.gradebook.setStudentsLoaded(false);
-  const props = this.gradebook.getTotalGradeColumnSortBySetting();
-  equal(props.disabled, true);
-});
-
-test('is disabled when submissions are not loaded', function () {
-  this.gradebook.setSubmissionsLoaded(false);
-  const props = this.gradebook.getTotalGradeColumnSortBySetting();
-  equal(props.disabled, true);
-});
-
-test('sets isSortColumn to true when sorting by the total grade', function () {
-  this.gradebook.setSortRowsBySetting('total_grade', 'grade', 'ascending');
-  const props = this.gradebook.getTotalGradeColumnSortBySetting();
-  equal(props.isSortColumn, true);
-});
-
-test('sets isSortColumn to false when not sorting by the total grade', function () {
-  this.gradebook.setSortRowsBySetting('student', 'grade', 'ascending');
-  const props = this.gradebook.getTotalGradeColumnSortBySetting();
-  equal(props.isSortColumn, false);
-});
-
-test('sets the onSortByGradeAscending function', function () {
-  this.stub(this.gradebook, 'setSortRowsBySetting');
-  const props = this.gradebook.getTotalGradeColumnSortBySetting();
-
-  props.onSortByGradeAscending();
-  equal(this.gradebook.setSortRowsBySetting.callCount, 1);
-
-  const [columnId, settingKey, direction] = this.gradebook.setSortRowsBySetting.getCall(0).args;
-  equal(columnId, 'total_grade', 'parameter 1 is the sort columnId');
-  equal(settingKey, 'grade', 'parameter 2 is the sort settingKey');
-  equal(direction, 'ascending', 'parameter 3 is the sort direction');
-});
-
-test('sets the onSortByGradeDescending function', function () {
-  this.stub(this.gradebook, 'setSortRowsBySetting');
-  const props = this.gradebook.getTotalGradeColumnSortBySetting();
-
-  props.onSortByGradeDescending();
-  equal(this.gradebook.setSortRowsBySetting.callCount, 1);
-
-  const [columnId, settingKey, direction] = this.gradebook.setSortRowsBySetting.getCall(0).args;
-  equal(columnId, 'total_grade', 'parameter 1 is the sort columnId');
-  equal(settingKey, 'grade', 'parameter 2 is the sort settingKey');
-  equal(direction, 'descending', 'parameter 3 is the sort direction');
-});
-
-test('includes the sort settingKey', function () {
-  this.gradebook.setSortRowsBySetting('total_grade', 'grade', 'ascending');
-  const props = this.gradebook.getTotalGradeColumnSortBySetting();
-  equal(props.settingKey, 'grade');
-});
-
-QUnit.module('Gradebook#getTotalGradeColumnGradeDisplayProps', {
-  setup () {
-    this.gradebook = createGradebook();
-    this.gradebook.togglePointsOrPercentTotals = () => {}
-  }
-});
-
-test('currentDisplay is set to percentage when show_total_grade_as_points is undefined or false', function () {
-  equal(this.gradebook.options.show_total_grade_as_points, undefined);
-  equal(this.gradebook.getTotalGradeColumnGradeDisplayProps().currentDisplay, 'percentage');
-
-  this.gradebook.options.show_total_grade_as_points = false;
-
-  equal(this.gradebook.getTotalGradeColumnGradeDisplayProps().currentDisplay, 'percentage');
-});
-
-test('currentDisplay is set to percentage when show_total_grade_as_points is true', function () {
-  this.gradebook.options.show_total_grade_as_points = true;
-
-  equal(this.gradebook.getTotalGradeColumnGradeDisplayProps().currentDisplay, 'points');
-});
-
-test('onSelect is set to the togglePointsOrPercentTotals function', function () {
-  equal(this.gradebook.getTotalGradeColumnGradeDisplayProps().onSelect, this.gradebook.togglePointsOrPercentTotals);
-});
-
-test('disabled is true when submissions have not loaded yet', function () {
-  this.gradebook.setSubmissionsLoaded(false);
-
-  ok(this.gradebook.getTotalGradeColumnGradeDisplayProps().disabled);
-});
-
-test('disabled is true when submissions have not loaded yet', function () {
-  this.gradebook.setSubmissionsLoaded(true);
-
-  notOk(this.gradebook.getTotalGradeColumnGradeDisplayProps().disabled);
-});
-
-test('hidden is false when weightedGroups returns false', function () {
-  notOk(this.gradebook.getTotalGradeColumnGradeDisplayProps().hidden);
-});
-
-test('hidden is true when weightedGroups returns true', function () {
-  this.gradebook.options.group_weighting_scheme = 'percent';
-
-  ok(this.gradebook.getTotalGradeColumnGradeDisplayProps().hidden);
 });
 
 QUnit.module('Gradebook#getColumnPositionById', {
@@ -4766,149 +4574,6 @@ test('re-renders column headers after reordering is done', function () {
   this.gradebook.moveTotalGradeColumnToEnd();
 
   strictEqual(this.gradebook.updateColumnHeaders.callCount, 1);
-});
-
-QUnit.module('Gradebook#getTotalGradeColumnPositionProps', {
-  setup () {
-    const parentColumns = [
-      { id: 'student' },
-    ];
-    const assignmentColumns = [
-      { id: 'assignment_1' }
-    ];
-    const aggregateColumns = [
-      { id: 'assignment_group_1' }
-    ];
-
-    this.totalColumn = { id: 'total_grade' };
-
-    this.gradebook = createGradebook();
-    this.gradebook.parentColumns = parentColumns;
-    this.gradebook.assignmentColumns = assignmentColumns;
-    this.gradebook.aggregateColumns = aggregateColumns;
-    this.gradebook.grid = {
-      getColumns () {
-        return parentColumns.concat(assignmentColumns).concat(aggregateColumns);
-      }
-    }
-  }
-});
-
-test('isInFront is true if the total_grade column is frozen', function () {
-  this.gradebook.parentColumns.push(this.totalColumn);
-
-  strictEqual(this.gradebook.getTotalGradeColumnPositionProps().isInFront, true);
-});
-
-test('isInFront is false if the total_grade column is not frozen', function () {
-  strictEqual(this.gradebook.getTotalGradeColumnPositionProps().isInFront, false);
-});
-
-test('isInFront is false if the total_grade column is not frozen even if it is in first place', function () {
-  const { totalColumn, gradebook: { parentColumns, assignmentColumns, aggregateColumns } } = this;
-  this.stub(this.gradebook.grid, 'getColumns').returns(
-    [totalColumn, ...parentColumns, ...assignmentColumns, ...aggregateColumns]
-  )
-
-  strictEqual(this.gradebook.getTotalGradeColumnPositionProps().isInFront, false);
-});
-
-test('isInBack is true if the total_grade column is the last column', function () {
-  this.gradebook.aggregateColumns.push(this.totalColumn);
-
-  strictEqual(this.gradebook.getTotalGradeColumnPositionProps().isInBack, true);
-});
-
-test('isInBack is false if the total_grade column is not the last column', function () {
-  this.gradebook.aggregateColumns.unshift(this.totalColumn);
-
-  strictEqual(this.gradebook.getTotalGradeColumnPositionProps().isInBack, false);
-});
-
-test('onMoveToFront calls freezeTotalGradeColumn', function () {
-  this.clock = sinon.useFakeTimers()
-  this.stub(this.gradebook, 'freezeTotalGradeColumn');
-
-  this.gradebook.getTotalGradeColumnPositionProps().onMoveToFront();
-
-  strictEqual(this.gradebook.freezeTotalGradeColumn.callCount, 0, 'does not call it right away');
-
-  this.clock.tick(10);
-  strictEqual(this.gradebook.freezeTotalGradeColumn.callCount, 1, 'but after a 10ms timeout');
-
-  this.clock.restore();
-});
-
-test('onMoveToBack calls @moveTotalGradeColumnToEnd', function () {
-  this.clock = sinon.useFakeTimers()
-  this.stub(this.gradebook, 'moveTotalGradeColumnToEnd');
-
-  this.gradebook.getTotalGradeColumnPositionProps().onMoveToBack();
-
-  strictEqual(this.gradebook.moveTotalGradeColumnToEnd.callCount, 0, 'does not call it right away');
-
-  this.clock.tick(10);
-  strictEqual(this.gradebook.moveTotalGradeColumnToEnd.callCount, 1, 'but after a 10ms timeout');
-
-  this.clock.restore();
-});
-
-QUnit.module('Gradebook#getTotalGradeColumnHeaderProps', {
-  createGradebook (options = {}) {
-    const gradebook = createGradebook({
-      group_weighting_scheme: 'percent',
-      ...options
-    });
-    gradebook.setAssignmentGroups({
-      301: { name: 'Assignments', group_weight: 40 },
-      302: { name: 'Homework', group_weight: 60 }
-    });
-    gradebook.grid = {
-      getColumns: () => []
-    }
-
-    return gradebook;
-  }
-});
-
-test('includes a ref callback to store the component reference', function () {
-  const gradebook = this.createGradebook();
-  const props = gradebook.getTotalGradeColumnHeaderProps();
-  const mockComponent = { column: 'total_grade' };
-  props.ref(mockComponent);
-  equal(gradebook.getHeaderComponentRef('total_grade'), mockComponent);
-});
-
-test('includes props for the "Sort by" setting', function () {
-  const props = this.createGradebook().getTotalGradeColumnHeaderProps();
-  ok(props.sortBySetting, 'Sort by setting is present');
-  equal(typeof props.sortBySetting.disabled, 'boolean', 'props include "disabled"');
-  equal(typeof props.sortBySetting.onSortByGradeAscending, 'function', 'props include "onSortByGradeAscending"');
-});
-
-test('includes props for the "Grade Display" settings', function () {
-  const props = this.createGradebook().getTotalGradeColumnHeaderProps();
-  ok(props.gradeDisplay, 'Grade Display setting is present');
-  equal(typeof props.gradeDisplay.disabled, 'boolean', 'props include "disabled"');
-  equal(typeof props.gradeDisplay.hidden, 'boolean', 'props include "hidden"');
-  equal(typeof props.gradeDisplay.currentDisplay, 'string', 'props include "currentDisplay"');
-  equal(typeof props.gradeDisplay.onSelect, 'function', 'props include "onSelect"');
-});
-
-test('includes props for the "Position" settings', function () {
-  const props = this.createGradebook().getTotalGradeColumnHeaderProps();
-  ok(props.position, 'Position setting is present');
-  strictEqual(typeof props.position.isInFront, 'boolean', 'props include "isInFront"');
-  strictEqual(typeof props.position.isInBack, 'boolean', 'props include "isInBack"');
-  strictEqual(typeof props.position.onMoveToFront, 'function', 'props include "onMoveToFront"');
-  strictEqual(typeof props.position.onMoveToBack, 'function', 'props include "onMoveToBack"');
-});
-
-test('includes prop for focusing the column header', function () {
-  const gradebook = this.createGradebook();
-  this.stub(gradebook, 'totalColumnShouldFocus').returns(true);
-  const props = gradebook.getTotalGradeColumnHeaderProps();
-  equal(typeof props.grabFocus, 'boolean');
 });
 
 QUnit.module('Gradebook#gotSubmissionsChunk', function (hooks) {
