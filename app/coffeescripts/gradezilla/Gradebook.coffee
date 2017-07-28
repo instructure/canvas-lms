@@ -54,7 +54,6 @@ define [
   'jsx/gradezilla/default_gradebook/slick-grid/ColumnHeaderRenderer'
   'jsx/gradezilla/default_gradebook/slick-grid/grid-support'
   'jsx/gradezilla/default_gradebook/constants/studentRowHeaderConstants'
-  'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader'
   'jsx/gradezilla/default_gradebook/components/AssignmentGroupColumnHeader'
   'jsx/gradezilla/default_gradebook/components/AssignmentRowCellPropFactory'
   'jsx/gradezilla/default_gradebook/components/TotalGradeColumnHeader'
@@ -101,7 +100,7 @@ define [
   GradeDisplayWarningDialog, PostGradesFrameDialog,
   NumberCompare, natcompare, ConvertCase, htmlEscape, SetDefaultGradeDialogManager,
   CurveGradesDialogManager, GradebookApi, CellEditorFactory, CellFormatterFactory, ColumnHeaderRenderer, GridSupport,
-  studentRowHeaderConstants, AssignmentColumnHeader,
+  studentRowHeaderConstants,
   AssignmentGroupColumnHeader, AssignmentRowCellPropFactory,
   TotalGradeColumnHeader, GradebookMenu, ViewOptionsMenu, ActionMenu, AssignmentGroupFilter, GradingPeriodFilter, ModuleFilter, SectionFilter,
   GridColor, StatusesModal, SubmissionTray, GradebookSettingsModal, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp,
@@ -788,13 +787,13 @@ define [
     ## Course Content Event Handlers
 
     handleAssignmentMutingChange: (assignment) =>
-      @renderAssignmentColumnHeader(assignment.id)
+      @gridSupport.columns.updateColumnHeaders([@getAssignmentColumnId(assignment.id)])
       @updateFilteredContentInfo()
       @buildRows()
 
     handleSubmissionsDownloading: (assignmentId) =>
       @getAssignment(assignmentId).hasDownloadedSubmissions = true
-      @renderAssignmentColumnHeader(assignmentId)
+      @gridSupport.columns.updateColumnHeaders([@getAssignmentColumnId(assignmentId)])
 
     # filter, sort, and build the dataset for slickgrid to read from, then
     # force a full redraw
@@ -879,8 +878,8 @@ define [
         @calculateStudentGrade(student)
         changedStudentIds.push(student.id)
 
-      for assignmentId of changedColumnHeaders
-        @renderAssignmentColumnHeader(assignmentId)
+      changedColumnIds = Object.keys(changedColumnHeaders).map(@getAssignmentColumnId)
+      @gridSupport.columns.updateColumnHeaders(changedColumnIds)
 
       @updateRowCellsForStudentIds(_.uniq(changedStudentIds))
 
@@ -1670,8 +1669,6 @@ define [
     onHeaderCellRendered: (event, obj) =>
       if obj.column.type == 'total_grade'
         @renderTotalGradeColumnHeader()
-      else if obj.column.type == 'assignment'
-        @renderAssignmentColumnHeader(obj.column.assignmentId)
       else if obj.column.type == 'assignment_group'
         @renderAssignmentGroupColumnHeader(obj.column.assignmentGroupId)
 
@@ -2053,9 +2050,7 @@ define [
       return unless @grid
 
       for column in @grid.getColumns()
-        if column.type == 'assignment'
-          @renderAssignmentColumnHeader(column.assignmentId)
-        else if column.type == 'assignment_group'
+        if column.type == 'assignment_group'
           @renderAssignmentGroupColumnHeader(column.assignmentGroupId)
         else if column.type == 'total_grade'
           @renderTotalGradeColumnHeader()
@@ -2183,94 +2178,6 @@ define [
       mountPoint = @getColumnHeaderNode('total_grade')
       props = @getTotalGradeColumnHeaderProps()
       renderComponent(TotalGradeColumnHeader, mountPoint, props)
-
-    # Assignment Column Header
-
-    getAssignmentColumnSortBySetting: (assignmentId) =>
-      columnId = @getAssignmentColumnId(assignmentId)
-      gradeSortDataLoaded =
-        @contentLoadStates.assignmentsLoaded and
-        @contentLoadStates.studentsLoaded and
-        @contentLoadStates.submissionsLoaded
-      sortRowsBySetting = @getSortRowsBySetting()
-
-      {
-        direction: sortRowsBySetting.direction
-        disabled: !gradeSortDataLoaded
-        isSortColumn: sortRowsBySetting.columnId == columnId
-        onSortByGradeAscending: () =>
-          @setSortRowsBySetting(columnId, 'grade', 'ascending')
-        onSortByGradeDescending: () =>
-          @setSortRowsBySetting(columnId, 'grade', 'descending')
-        onSortByLate: () =>
-          @setSortRowsBySetting(columnId, 'late', 'ascending')
-        onSortByMissing: () =>
-          @setSortRowsBySetting(columnId, 'missing', 'ascending')
-        onSortByUnposted: () =>
-          @setSortRowsBySetting(columnId, 'unposted', 'ascending')
-        settingKey: sortRowsBySetting.settingKey
-      }
-
-    getAssignmentColumnHeaderProps: (assignmentId) =>
-      assignment = @getAssignment(assignmentId)
-      assignmentKey = "assignment_#{assignmentId}"
-      studentsThatCanSeeAssignment = @studentsThatCanSeeAssignment(assignmentId)
-
-      students = _.map studentsThatCanSeeAssignment, (student) =>
-        studentRecord =
-          id: student.id
-          name: student.name
-          isInactive: student.isInactive
-
-        submission = student[assignmentKey]
-        if submission
-          studentRecord.submission =
-            score: submission.score
-            submittedAt: submission.submitted_at
-        else
-          studentRecord.submission =
-            score: undefined
-            submittedAt: undefined
-
-        studentRecord
-
-      {
-        ref: (ref) =>
-          @setHeaderComponentRef(@getAssignmentColumnId(assignmentId), ref)
-        assignment:
-          htmlUrl: assignment.html_url
-          id: assignment.id
-          muted: assignment.muted
-          name: assignment.name
-          omitFromFinalGrade: assignment.omit_from_final_grade
-          pointsPossible: assignment.points_possible
-          published: assignment.published
-          submissionTypes: assignment.submission_types
-          courseId: assignment.course_id
-          inClosedGradingPeriod: assignment.inClosedGradingPeriod
-        students: students
-        submissionsLoaded: @contentLoadStates.submissionsLoaded
-        sortBySetting: @getAssignmentColumnSortBySetting(assignmentId)
-        curveGradesAction: @getCurveGradesAction(assignmentId)
-        setDefaultGradeAction: @getSetDefaultGradeAction(assignmentId)
-        students: students
-        submissionsLoaded: @contentLoadStates.submissionsLoaded
-        downloadSubmissionsAction: @getDownloadSubmissionsAction(assignmentId)
-        reuploadSubmissionsAction: @getReuploadSubmissionsAction(assignmentId)
-        muteAssignmentAction: @getMuteAssignmentAction(assignmentId)
-        addGradebookElement: @keyboardNav.addGradebookElement
-        removeGradebookElement: @keyboardNav.removeGradebookElement
-        onMenuClose: @handleColumnHeaderMenuClose
-        showUnpostedMenuItem: @options.new_gradebook_development_enabled
-        onHeaderKeyDown: (e) =>
-          @handleHeaderKeyDown(e, @getAssignmentColumnId(assignmentId))
-      }
-
-    renderAssignmentColumnHeader: (assignmentId) =>
-      columnId = @getAssignmentColumnId(assignmentId)
-      mountPoint = @getColumnHeaderNode(columnId)
-      props = @getAssignmentColumnHeaderProps(assignmentId)
-      renderComponent(AssignmentColumnHeader, mountPoint, props)
 
     # Assignment Group Column Header
 
