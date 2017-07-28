@@ -51,4 +51,16 @@ function prepend (parent, child) {
   }
 }
 
-module.exports = { walk, select, prepend }
+function changeTag (elem, tagName) {
+  const newElem = elem.ownerDocument.createElement(tagName)
+  while (elem.firstChild) {
+    newElem.appendChild(elem.firstChild)
+  }
+  for (let i = elem.attributes.length - 1; i >= 0; --i) {
+    newElem.attributes.setNamedItem(elem.attributes[i].cloneNode())
+  }
+  elem.parentNode.replaceChild(newElem, elem)
+  return newElem
+}
+
+module.exports = { walk, select, prepend, changeTag }
