@@ -263,7 +263,7 @@ class Checker extends React.Component {
                 </Grid>
               </Container>
               <Alert variant="warning">{this.errorMessage()}</Alert>
-              { rule.form.map((f) => <Container as="div" margin="medium 0 0">
+              { rule.form.map((f) => <Container as="div" key={f.dataKey} margin="medium 0 0">
                 {this.renderField(f)}
               </Container>) }
             </form>
