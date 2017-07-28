@@ -147,7 +147,7 @@
     "webpack": "gulp rev & webpack --progress --color --watch",
     "webpack-development": "gulp rev & webpack --progress --color",
     "webpack-stats": "webpack --profile --json",
-    "webpack-production": "NODE_ENV=production gulp rev & webpack --progress --color --config webpack.production.config.js",
+    "webpack-production": "NODE_ENV=production gulp rev & webpack --color --config webpack.production.config.js",
     "jspec": "./spec/jspec.sh",
     "jspec-watch": "./spec/jspec.sh --watch"
   }
