@@ -2016,7 +2016,7 @@ class CoursesController < ApplicationController
       if (adjust_dates = params[:adjust_dates]) && Canvas::Plugin.value_to_boolean(adjust_dates[:enabled])
         params[:date_shift_options][adjust_dates[:operation]] = '1'
       end
-      @content_migration.set_date_shift_options(params[:date_shift_options].to_hash.with_indifferent_access)
+      @content_migration.set_date_shift_options(params[:date_shift_options].to_unsafe_h)
 
       if Canvas::Plugin.value_to_boolean(params[:selective_import])
         @content_migration.migration_settings[:import_immediately] = false

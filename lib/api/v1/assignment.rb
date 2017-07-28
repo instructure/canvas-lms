@@ -646,12 +646,12 @@ module Api::V1::Assignment
       when 'percent'; '2'
     end
     turnitin_settings['exclude_value'] = turnitin_settings['exclude_small_matches_value']
-    turnitin_settings.to_hash.with_indifferent_access
+    turnitin_settings.to_unsafe_h
   end
 
   def vericite_settings_hash(assignment_params)
     vericite_settings = assignment_params.delete("vericite_settings").permit(*API_ALLOWED_VERICITE_SETTINGS)
-    vericite_settings.to_hash.with_indifferent_access
+    vericite_settings.to_unsafe_h
   end
 
   def submissions_hash(include_params, assignments, submissions_for_user=nil)

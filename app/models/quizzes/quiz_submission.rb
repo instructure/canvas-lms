@@ -371,7 +371,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     if self.finished_at && self.end_at && self.finished_at > self.end_at
       drift = self.finished_at - self.end_at
 
-      if drift <= GRACEFUL_FINISHED_AT_DRIFT_PERIOD
+      if drift <= GRACEFUL_FINISHED_AT_DRIFT_PERIOD.to_i
         self.finished_at = self.end_at
       end
     end
@@ -517,7 +517,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def less_than_allotted_time?
-    self.started_at && self.end_at && self.quiz && self.quiz.time_limit && (self.end_at - self.started_at) < self.quiz.time_limit.minutes
+    self.started_at && self.end_at && self.quiz && self.quiz.time_limit && (self.end_at - self.started_at) < self.quiz.time_limit.minutes.to_i
   end
 
   def completed?

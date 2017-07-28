@@ -17,11 +17,11 @@
 %>
 
 <% content_for :page_title do %><%= join_title t(:page_title, "Plugin Settings"), @plugin.name %><% end %>
-<% 
+<%
   js_bundle :plugins
   add_crumb(t('#crumbs.plugins', "Plugins"), plugins_path)
   add_crumb(@plugin.name)
-%>  
+%>
 
 <h2><%= join_title t(:page_title, "Plugin Settings"), @plugin.name %></h2>
 
@@ -33,7 +33,7 @@
       <%= f.check_box :disabled, :class => "disabled_checkbox" %>
       <%= f.label :disabled, :en => "Disable this Plugin" %>
     </div>
-    <% partial = render :partial => @plugin.settings_partial, :locals => {:settings => (@plugin_setting.settings || {}).merge(params[:settings] || {})} %>
+    <% partial = render :partial => @plugin.settings_partial, :locals => {:settings => (@plugin_setting.settings || {}).merge(params[:settings]&.to_unsafe_h || {})} %>
     <%= f.error_messages if !@error_messages_handled %>
     <div class="box tabular plugin_settings">
         <%= partial %>

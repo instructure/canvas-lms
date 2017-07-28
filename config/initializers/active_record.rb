@@ -1328,7 +1328,8 @@ module SkipTouchCallbacks
   end
 
   module BelongsTo
-    def touch_record(o, foreign_key, name, *args)
+    def touch_record(o, *args)
+      name = CANVAS_RAILS5_0 ? args[1] : args[2]
       return if o.class.touch_callbacks_skipped?(name)
       super
     end

@@ -232,7 +232,7 @@ describe PageView do
         expect(@page_view.store).to be_truthy
         bucket = PageView.user_count_bucket_for_time(store_time)
         expect(Canvas.redis.smembers(bucket)).to eq [@user.global_id.to_s]
-        expect(Canvas.redis.ttl(bucket)).to be > 23.hours
+        expect(Canvas.redis.ttl(bucket)).to be > 23.hours.to_i
 
         store_time_2 = Time.zone.parse('2012-01-13T15:47:52Z')
         @user1 = @user

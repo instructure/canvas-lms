@@ -1007,12 +1007,12 @@ describe Submission do
       @entry1 = @topic.discussion_entries.create(:message => "first entry", :user => @user)
       @topic.assignment_id = @assignment.id
       @topic.save!
-      @submission = @assignment.submissions.where(:user_id => @entry1.user_id).first
-      new_time = Time.now + 30.minutes
-      allow(Time).to receive(:now).and_return(new_time)
-      @entry2 = @topic.discussion_entries.create(:message => "second entry", :user => @user)
+      @submission = @assignment.submissions.where(:user_id => @user.id).first
+      Timecop.freeze(30.minutes.from_now) do
+        @entry2 = @topic.discussion_entries.create(:message => "second entry", :user => @user)
+      end
       @submission.reload
-      expect((@submission.submitted_at.to_i - @submission.created_at.to_i).abs).to be < 1.minute
+      expect((@submission.submitted_at.to_i - @submission.created_at.to_i).abs).to be < 1.minute.to_i
     end
 
     it "should not create multiple versions on submission for discussion topics" do

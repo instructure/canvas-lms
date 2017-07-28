@@ -689,7 +689,7 @@ class GradebooksController < ApplicationController
         @current_user.preferences[:gradebook_column_order] = {}
       end
 
-      @current_user.preferences[:gradebook_column_order][@context.id] = params[:column_order].to_hash.with_indifferent_access
+      @current_user.preferences[:gradebook_column_order][@context.id] = params[:column_order].to_unsafe_h
       @current_user.save!
       render json: nil
     end
