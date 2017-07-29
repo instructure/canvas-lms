@@ -18,7 +18,7 @@
 group :development do
   gem 'colorize', '0.8.1', require: false
   gem 'letter_opener', '1.4.1'
-  gem 'spring', '2.0.0'
+  gem 'spring', '2.0.2'
   gem 'spring-commands-rspec', '1.0.4'
 
   # Option to DISABLE_RUBY_DEBUGGING is helpful IDE-based debugging.

@@ -260,7 +260,7 @@ $ic-course-sidenav_list-item--bg-color:               $ic-color-light;
 @if $use_high_contrast {
 $ic-course-sidenav_list-item--bg-color:               $ic-color-dark;
 }
-$ic-course-sidenav_list-item--active-font-color:      $ic-brand-primary;
+$ic-course-sidenav_list-item--active-font-color:      var(--ic-brand-primary);
 @if $use_high_contrast {
 $ic-course-sidenav_list-item--active-font-color:      $ic-color-light;
 }
@@ -277,14 +277,6 @@ $ic-color-icon-disabled:        darken($ic-color-neutral, 60);
 $ic-dim-helper-text:            darken($ic-color-neutral, 45);
 @if $use_high_contrast {
 $ic-dim-helper-text:            darken($ic-color-neutral, 55);
-}
-
-// special handling for button--primary coloring
-$button--primary-text: $ic-brand-button--primary-text;
-$button--primary-bgd: $ic-brand-button--primary-bgd;
-@if $use_high_contrast {
-  $button--primary-bgd: $ic-brand-primary;
-  $button--primary-text: $ic-color-light;
 }
 
 //==========================================================

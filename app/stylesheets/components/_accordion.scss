@@ -24,33 +24,33 @@
 <div class="accordion" id="styleguide_demo_accordion1">
 
   <h3><a href="#">Section 1</a></h3>
-  <div> 
+  <div>
     <div class="styleguide-section__accordion-demo-element">
       Content for Section 1
     </div>
   </div>
-  
+
   <h3><a href="#">Section 2</a></h3>
   <div>
     <div class="styleguide-section__accordion-demo-element">
       Content for Section 2
     </div>
   </div>
-  
+
   <h3><a href="#">Section 3</a></h3>
-  <div> 
+  <div>
     <div class="styleguide-section__accordion-demo-element">
       Content for Section 3
     </div>
   </div>
-  
+
 </div>
 <br/>
 ```
 
 
 ```js
-$("div#styleguide_demo_accordion1").accordion({header: "h3"}) 
+$("div#styleguide_demo_accordion1").accordion({header: "h3"})
 ```
 
 ## Mini accordion
@@ -68,16 +68,16 @@ Simply add the **.ui-accordion--mini** class to the parent **.accordion** elemen
       Content for Section 1
     </div>
   </div>
-  
+
   <h3><a href="#">Section 2</a></h3>
   <div>
     <div class="styleguide-section__accordion-demo-element">
       Content for Section 2
     </div>
   </div>
-  
+
   <h3><a href="#">Section 3</a></h3>
-  <div> 
+  <div>
     <div class="styleguide-section__accordion-demo-element">
       Content for Section 3
     </div>
@@ -90,7 +90,7 @@ Simply add the **.ui-accordion--mini** class to the parent **.accordion** elemen
 */
 
 // Custom Canvas branding for the accordion widget -- overwriting the defaults
-// in the jQuery UI accordion styles 
+// in the jQuery UI accordion styles
 
 .ui-accordion {
 
@@ -102,7 +102,7 @@ Simply add the **.ui-accordion--mini** class to the parent **.accordion** elemen
     border-color: $ic-border-color;
     &.ui-accordion-content-active {
       border-bottom-left-radius: $ic-border-radius;
-      border-bottom-right-radius: $ic-border-radius;  
+      border-bottom-right-radius: $ic-border-radius;
     }
   }
 
@@ -124,12 +124,12 @@ Simply add the **.ui-accordion--mini** class to the parent **.accordion** elemen
       &.ui-state-active {
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
-        border-color: darken($ic-brand-primary, 5%);
-        border-bottom: 1px solid darken($ic-brand-primary, 5%);
-        background: $ic-brand-primary;
+        border-color: var(--ic-brand-primary-darkened-5);
+        border-bottom: 1px solid var(--ic-brand-primary-darkened-5);
+        background: var(--ic-brand-primary);
         &.ui-state-focus {
-          border-color: darken($ic-brand-primary, 10%);
-          border-bottom: 1px solid darken($ic-brand-primary, 10%);
+          border-color: var(--ic-brand-primary-darkened-10);
+          border-bottom: 1px solid var(--ic-brand-primary-darkened-10);
           a { @include button-focus-dark; }
         }
       }
@@ -166,6 +166,6 @@ Simply add the **.ui-accordion--mini** class to the parent **.accordion** elemen
         border-bottom-left-radius: $ic-border-radius/2;
         border-bottom-right-radius: $ic-border-radius/2;
       }
-    } 
+    }
   }
 }

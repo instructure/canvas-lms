@@ -209,7 +209,7 @@ ul[class*=ac-] {
 // to a new conversation
 i[class*=icon-].icon-messageRecipient--cancel {
   &:before {
-    background: $ic-brand-primary;
+    background: var(--ic-brand-primary);
     border-radius: 10px;
     padding: 2px;
     @include fontSize(9px);
@@ -277,14 +277,14 @@ i[class*=icon-].icon-messageRecipient--cancel {
 
   &.selected, &:hover {
     background: $ic-bg-light-primary;
-    color: $ic-brand-primary;
+    color: var(--ic-brand-primary);
   }
 }
 
 .ac-result-list {
   .context, .everyone {
     border-bottom: 1px solid $ic-border-light;
-    color: $ic-brand-primary;
+    color: var(--ic-brand-primary);
   }
 
   .back {

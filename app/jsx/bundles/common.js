@@ -115,3 +115,10 @@ if (
     initializeNewUserTutorials()
   }, 'NewUserTutorialsAsyncChunk')
 }
+
+const supportsCSSVars = window.CSS && window.CSS.supports && window.CSS.supports('(--foo: red)')
+if (!supportsCSSVars) {
+  require.ensure([], (require) => {
+    window.canvasCssVariablesPolyfill = require('jsx/canvasCssVariablesPolyfill')
+  }, 'canvasCssVariablesPolyfill')
+}

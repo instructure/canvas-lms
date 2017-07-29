@@ -249,7 +249,7 @@ $discussion-dark-text: $ic-color-dark;
   border-radius: 5px;
   width: 10px;
   height: 10px;
-  background: $ic-brand-primary;
+  background: var(--ic-brand-primary);
 }
 
 .read .discussion-read-state {
@@ -512,7 +512,7 @@ $discussion-dark-text: $ic-color-dark;
 }
 
 .highlight .entry-content {
-  outline: 3px solid $ic-brand-primary;
+  outline: 3px solid var(--ic-brand-primary);
 }
 
 .highlight .entry .entry-content {

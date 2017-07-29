@@ -48,6 +48,7 @@ module WebMock::API
 end
 
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
+require_relative 'sharding_spec_helper'
 
 # nuke the db (say, if `rake db:migrate RAILS_ENV=test` created records),
 # and then ensure people aren't creating records outside the rspec
@@ -398,6 +399,10 @@ RSpec.configure do |config|
     Timecop.safe_mode = true
   end
 
+  config.before do
+    allow(AttachmentFu::Backends::S3Backend).to receive(:load_s3_config) { StubS3::AWS_CONFIG.dup }
+  end
+
   # this runs on post-merge builds to capture dependencies of each spec;
   # we then use that data to run just the bare minimum subset of selenium
   # specs on the patchset builds
@@ -661,21 +666,20 @@ RSpec.configure do |config|
   end
 
   module StubS3
+    AWS_CONFIG = {
+      access_key_id: 'stub_id',
+      secret_access_key: 'stub_key',
+      region: 'us-east-1',
+      stub_responses: true,
+      bucket_name: 'no-bucket'
+    }.freeze
+
     def self.stubbed?
       false
     end
 
     def load(file, *args)
-      if StubS3.stubbed? && file == 'amazon_s3'
-        return {
-          access_key_id: 'stub_id',
-          secret_access_key: 'stub_key',
-          region: 'us-east-1',
-          stub_responses: true,
-          bucket_name: 'no-bucket'
-        }
-      end
-
+      return AWS_CONFIG.dup if StubS3.stubbed? && file == 'amazon_s3'
       super
     end
   end

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014 - present Instructure, Inc.
+# Copyright (C) 2017 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,21 +14,9 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
-class AddMoreGistIndexesForUserSearch < ActiveRecord::Migration[4.2]
-  disable_ddl_transaction!
-  tag :predeploy
-
-  def self.up
-    if is_postgres? && (schema = connection.extension_installed?(:pg_trgm))
-      add_index :pseudonyms, "lower(unique_id) #{schema}.gist_trgm_ops", name: "index_trgm_pseudonyms_unique_id", using: :gist, algorithm: :concurrently
-    end
-  end
-
-  def self.down
-    if is_postgres?
-      execute("DROP INDEX IF EXISTS #{connection.quote_table_name('index_trgm_pseudonyms_unique_id')}")
-    end
-  end
-
+#
+class SisBatchErrorFile < ActiveRecord::Base
+  belongs_to :sis_batch
+  belongs_to :attachment
 end
+

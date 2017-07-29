@@ -433,6 +433,8 @@ describe ContentMigration do
     end
 
     it "should not break link resolution in quiz_data" do
+      skip 'Requires QtiMigrationTool' unless Qti.qti_enabled?
+
       topic = @copy_from.discussion_topics.create!(:title => "some topic", :message => "<p>some text</p>")
 
       html = "<a href='/courses/#{@copy_from.id}/discussion_topics/#{topic.id}'>link</a>"

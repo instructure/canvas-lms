@@ -46,7 +46,6 @@ $revision-sidebar-selected-color: #ffffff;
 $revision-sidebar-hover-color: lighten($ic-color-neutral, 10);
 $revision-sidebar-dimmed-color: $ic-dim-helper-text;
 $revision-button-color: $ic-color-dark;
-$revision-button-hover-color: $ic-brand-primary;
 
 .pages .sticky-toolbar .sticky {
   position: fixed;
@@ -437,7 +436,7 @@ $revision-button-hover-color: $ic-brand-primary;
       text-align: center;
       color: dimgrey;
       &:hover {
-        color: $revision-button-hover-color;
+        color: var(--ic-brand-primary);
       }
       i.icon-x {
         position: absolute;
@@ -509,7 +508,7 @@ $revision-button-hover-color: $ic-brand-primary;
     a:hover {
       text-decoration: none;
       cursor: pointer;
-      color: $revision-button-hover-color;
+      color: var(--revision-button-hover-color);
       border-radius: 3px;
     }
     .prev-button {

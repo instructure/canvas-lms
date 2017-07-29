@@ -63,7 +63,7 @@ $context_module_bg_color: #f2f3f4;
   }
 
   .icon-info {
-    color: $ic-brand-primary;
+    color: var(--ic-brand-primary);
   }
 
   .icon-check {

@@ -41,7 +41,7 @@
   }
   .unread-count {
     display: block;
-    background: $ic-brand-primary;
+    background: var(--ic-brand-primary);
     border-radius: 15px;
     width: 10px;
     height: 10px;
@@ -58,7 +58,7 @@
     width: 10px;
     height: 10px;
     margin-left: -15px;
-    background-color: $ic-brand-primary;
+    background-color: var(--ic-brand-primary);
     border-radius: 5px;
   }
 }

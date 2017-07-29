@@ -125,6 +125,8 @@ describe ContentMigration do
     end
 
     it "should not re-unpublish module items on re-copy" do
+      skip 'Requires QtiMigrationTool' unless Qti.qti_enabled?
+
       mod = @copy_from.context_modules.create!(:name => "some module")
       tags = []
 

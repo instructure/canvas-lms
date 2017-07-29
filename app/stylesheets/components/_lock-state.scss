@@ -24,7 +24,7 @@
   cursor: pointer;
   &:focus { @include ic-focus-variant; }
   &.lock-icon-unlocked { color: $ic-color-icon-disabled; }
-  &.lock-icon-locked { color: $ic-brand-primary; }
+  &.lock-icon-locked { color: var(--ic-brand-primary); }
   &.disabled { cursor: default; }
 }
 .lock-text {

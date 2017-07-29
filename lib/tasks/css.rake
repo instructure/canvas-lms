@@ -12,6 +12,7 @@ namespace :css do
     time = Benchmark.realtime { BrandableCSS.compile_all! }
     BrandableCSS.save_default_json!
     BrandableCSS.save_default_js!
+    BrandableCSS.save_default_css!
     puts "--> Finished: 'compile css (including custom brands)' in #{time}"
   end
 end

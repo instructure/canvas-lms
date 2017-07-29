@@ -24,9 +24,6 @@
 }
 
 // List View
-
-$ic-brand-course-nav-link--active: $ic-brand-primary;
-
 .list-view {
   overflow: auto;
   & > header,
@@ -95,13 +92,13 @@ $ic-brand-course-nav-link--active: $ic-brand-primary;
   }
 
   a.active {
-    background-color: $ic-brand-course-nav-link--active;
+    background-color: var(--ic-brand-primary);
     font-weight: bold;
     color: $ic-color-light;
-    &:hover, &:focus { background-color: $ic-brand-primary; }
+    &:hover, &:focus { background-color: var(--ic-brand-primary); }
     .nav-badge {
       background: $ic-color-light;
-      color: $ic-brand-primary;
+      color: var(--ic-brand-primary);
     }
   }
 }

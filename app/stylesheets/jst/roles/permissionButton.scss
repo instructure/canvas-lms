@@ -82,7 +82,7 @@
     label:hover, label:focus, input:checked+label {
       text-decoration: none;
       color: white;
-      background-color: $ic-brand-primary;
+      background-color: var(--ic-brand-primary);
     }
   }
 }

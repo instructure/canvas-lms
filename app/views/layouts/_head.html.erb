@@ -31,6 +31,7 @@
   <%= favicon_link_tag(favicon) %>
   <%= favicon_link_tag(brand_variable('ic-brand-apple-touch-icon'), rel: 'apple-touch-icon', type: nil) %>
   <%= yield :auto_discovery %>
+  <%= stylesheet_link_tag(active_brand_config_css_url, media: "all") %>
   <%= yield :head %>
   <%=
     # polyfill browsers that don't have a baseline of features we use like Promise or Object.assign

@@ -146,9 +146,9 @@
     }  
   }
   &.ui-state-default.ui-state-active {
-    background: $ic-brand-primary;
+    background: var(--ic-brand-primary);
     color: $ic-color-light;
-    border-color: darken($ic-brand-primary, 10%);
+    border-color: var(--ic-brand-primary-darkened-10);
     text-shadow: none;
   }
 }

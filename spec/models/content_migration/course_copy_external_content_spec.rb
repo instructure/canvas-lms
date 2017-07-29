@@ -55,6 +55,8 @@ describe ContentMigration do
     end
 
     it "should translate ids for copied course content" do
+      skip 'Requires QtiMigrationTool' unless Qti.qti_enabled?
+
       assmt = @copy_from.assignments.create!
       topic = @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
       ann = @copy_from.announcements.create!(:message => "goodbye")
