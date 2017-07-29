@@ -153,7 +153,7 @@ nl:
     account_required: "Moet via LDAP geverifieerd zijn"
     index: 
       delete_auth_confirmation: "Weet je het zeker? Gebruikers kunnen zich mogelijk niet aanmelden als dit wordt verwijderd"
-      delete_auth_link: "Alle Verificatie Verwijderen"
+      delete_auth_link: "Verificatie verwijderen"
       ip_address_list_description: "Als je een verificatieservice gebruikt die nodig is om de Canvas-servers rechtstreeks verbinding te laten maken met jouw servers, zoals LDAP, dan moet je ervoor zorgen dat jouw servers verbindingen vanuit deze IP-adressen kunnen accepteren:"
       no_auth_type_description: "Dit account integreert momenteel niet met een identiteitsprovider."
       page_title: Verificatie-instellingen
@@ -736,6 +736,11 @@ nl:
             start: 
               parameters: 
                 header: "Beginnen bij:"
+    embry_riddle_activity_report_csv_parameters: 
+      account_reports: 
+        embry_riddle: 
+          outcome: 
+            text: "Cursus SIS-patroon/patronen (door komma's gescheiden lijst):"
     engagement_report_csv_parameters: 
       account_reports: 
         bryan_engagement: 
@@ -1736,6 +1741,9 @@ nl:
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "App Center zal in het tabblad \"Apps\" verschijnen op de pagina met instellingen voor óf een cursus óf account. De URL hieronder moet naar het eindpunt van een geldig App Center wijzen (bijvoorbeeld %{url} -- zorg ervoor dat je de slash aan het einde weglaat"
   app_placements_6d877225: "Plaatsingen toevoegen"
   app_reregistration_87cc8817: "App Herregistratie"
+  app_was_installed_by_admin_and_is_locked_3bee4d39: "%{app} is geïnstalleerd door de beheerder en is vergrendeld"
+  app_was_installed_by_the_master_course_and_is_lock_dbeb24a6: "%{app} is geïnstalleerd door de hoofdcursus en is vergrendeld"
+  app_was_installed_by_the_master_course_e55ba1d7: "%{app} is geïnstalleerd door de hoofdcursus"
   appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "Bevestigt een nummer aan het eind van elke gebeurtenis titel (bijv. Gebeurtenis 1, Gebeurtenis 2, enz.)"
   appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "Bevestigt een nummer aan het eind van elke gebeurtenis titel (bijv. Gebeurtenis 1, Gebeurtenis 2, enz.) \"voor=\"append_iterator"
   application: 
@@ -1809,6 +1817,9 @@ nl:
   archive_3f794d7e: Archiveren
   archive_selected_d64506ca: "Archief geselecteerd"
   are_you_sure_26795d3c: "Weet je het zeker?"
+  are_you_sure_you_want_to_archive_your_copies_of_th_7d219afe: 
+    one: "Weet je zeker dat je je kopie van dit gesprek wilt archiveren?"
+    other: "Weet je zeker dat je je kopieën van deze gesprekken wilt archiveren?"
   are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496: "Weet je zeker dat je wilt annuleren? Je wijzigingen worden niet opgeslagen."
   are_you_sure_you_want_to_cancel_your_appointment_w_dbbd27eb: "Weet je zeker dat je de afspraak met %{name} wilt annuleren?"
   are_you_sure_you_want_to_copy_to_the_final_mark_th_28a7e7b3: "Weet je zeker dat je het eindcijfer wilt kopiëren? Dit zal het bestaande cijfer overschrijven."
@@ -1823,6 +1834,9 @@ nl:
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: "Weet je zeker dat je deze set beoordelingsperiodes wilt verwijderen?"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Weet je zeker dat je deze beoordelingsperiode wilt verwijderen?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Weet je zeker dat je dit beoordelingsschema wilt verwijderen?"
+  are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
+    one: "Weet je zeker dat je je kopie van dit gesprek wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt."
+    other: "Weet je zeker dat je je kopie van deze gesprekken wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt."
   are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: "Weet je zeker dat je de reservering voor deze gebeurtenis wilt verwijderen?"
   are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: "Weet je zeker dat je Synchroniseren naar %{sisName} voor alle opdrachten wilt uitschakelen?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Weet je zeker dat je dit wilt doen? Het kan niet ongedaan gemaakt worden en zal bestaande cijfers in de cijferlijst overschrijven."
@@ -1835,6 +1849,9 @@ nl:
   are_you_sure_you_want_to_resync_these_grades_to_th_e509cb9e: "Weet je zeker dat je deze cijfers opnieuw  in het informatiesysteem voor cursisten wilt synchroniseren?"
   are_you_sure_you_want_to_submit_this_comment_fbe76ba6: "Weet je zeker dat je deze opmerking wilt verwijderen?"
   are_you_sure_you_want_to_sync_these_grades_to_the__ca3c28a4: "Weet je zeker dat je deze cijfers in het informatiesysteem voor cursisten wilt synchroniseren? Je moet dat pas doen zodra al je cijfers definitief zijn."
+  are_you_sure_you_want_to_unarchive_these_conversat_ec7d7e8d: 
+    one: "Weet je zeker dat je het archiveren van dit gesprek ongedaan wilt maken?"
+    other: "Weet je zeker dat je het archiveren van deze gesprekken ongedaan wilt maken?"
   argentina_3257a200: Argentinië
   argentina_54_375d6af4: "Argentinië (+54)"
   arrange_by_34a545de: "Ordenen op"
@@ -3386,6 +3403,7 @@ nl:
   click_here_it_s_free_eeccb9cb: "Hier klikken, het is gratis!"
   click_here_on_the_calendar_link_c9965631: "Hier klikken op de *kalender* koppeling"
   click_here_to_download_size_of_file_74443988: "Hier klikken om te downloaden %{size_of_file}"
+  click_here_to_log_in_again_4a6055de: "Klik hier om je opnieuw aan te melden"
   click_here_to_see_the_file_79e2b366: "Hier klikken om het bestand te zien."
   click_here_to_view_ec8cb2fd: "Hier klikken om te bekijken"
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Klik op een snapshot om terug te keren naar je proefversie zoals deze was op het moment dat de snapshot werd gemaakt. Opmerking: Je verliest al het werk dat je hebt uitgevoerd sinds de snapshot is gemaakt. Dit kan niet ongedaan worden gemaakt!"
@@ -5987,6 +6005,7 @@ nl:
     edit_key: "Deze toets bewerken"
     identifier: "ID: %{id}"
     redirect_uri: "URI: %{redirect_uri}"
+  developer_key_921ddbae: "Sleutel voor ontwikkelaar"
   developer_key_form: 
     cancel: Annuleren
     icon_url: "Pictogram-URL:"
@@ -7424,6 +7443,10 @@ nl:
   filter_replies_by_unread_342e8e90: "Antwoorden ongelezen filteren"
   filter_replies_by_unread_caf870ea: "Antwoorden op ongelezen gefilterd"
   filters_92f2776f: Filters
+  final_grade_4d7f6545: Eindcijfer
+  final_grade_6938dca8: "Eindcijfer:"
+  final_grade_finalgrade_138d9e07: "Eindcijfer: %{finalGrade}"
+  final_grade_finalgrade_408580bb: "Eindcijfer: *%{finalGrade}*"
   final_grade_info_2aa35d25: "Eindcijfer Info"
   final_grade_score_fe69a301: "Eindcijfer: %{score}"
   final_letter_grade_80dccec1: "Eindbeoordeling in lettervorm"
@@ -7547,13 +7570,16 @@ nl:
   gpa_scale_a6d1cdea: "Gemiddeld eindcijfer"
   grade_10d1e5a1: "%{grade}"
   grade_9c6f076d: Cijfer
+  grade_a91e433e: "Cijfer:"
   grade_assignment_7c1abc11: "Cijfer %{assignment}"
+  grade_changes_cb5a57a8: Cijferwijzigingen
   grade_display_warning_dialog: 
     grade_display_warning: 
       checkbox: "Deze cursus niet nog een keer tonen."
       warning: Waarschuwing
   grade_distribution_e52c9256: Beoordelingsdistributie
   grade_export_title: Cijferexport
+  grade_for_name_b9df168a: "Cijfer voor: %{name}"
   grade_high_to_low_1cea0381: "Cijfer - Van hoog naar laag"
   grade_history_9c51ad49: Cijfergeschiedenis…
   grade_history_ccc09fde: Cijfergeschiedenis
@@ -7708,7 +7734,7 @@ nl:
       switch_to_points: "Overschakelen naar punten"
     turnitin: 
       error_message: "Er is een fout opgetreden bij het verzenden van het bestand naar de service voor vergelijkbaarheidsdetectie. Probeer het bestand opnieuw te verzenden voordat je contact opneemt met de ondersteuning."
-      info_message: "Het bestand wordt nog steeds verwerkt door Turnitin. Controleer later om de score te zien"
+      info_message: "Dit bestand wordt nog verwerkt door de tool voor plagiaatcontrole die aan de opdracht is gekoppeld. Kom later terug om de score te bekijken."
       resubmitting: "Opnieuw inleveren..."
       tooltip: 
         error: "Vergelijkbaarheidsscore - Zie gegevens over inleveringsfout"
@@ -8202,9 +8228,9 @@ nl:
       one: "Score bevat geen %{groups} omdat er geen (maximaal aantal) punten zijn ingesteld"
       other: "Scores bevatten geen %{groups} omdat er geen (maximaal aantal ) punten zijn ingesteld"
     keyboard_assignment_desc: "Naar de pagina met details over de huidige opdracht gaan"
-    keyboard_close_menu: "Het huidige actieve menu voor de opdracht sluiten"
+    keyboard_close_menu: "Het huidige actieve menu sluiten"
     keyboard_comment_desc: "Opmerking over de actieve inzending"
-    keyboard_menu_desc: "Open het menu voor de actieve opdracht van de kolom"
+    keyboard_menu_desc: "Het menu voor de actieve kolom openen"
     keyboard_sort_desc: "Raster sorteren op de huidige actieve kolom"
     keyboard_tooltip_desc: "Het type inzending voor actieve inzending tonen"
     keycodes: 
@@ -9234,6 +9260,12 @@ nl:
   last_used_f9457313: "Laatst gebruikt:"
   last_user_access_title: "Laatste gebruikerstoegang"
   late_2be42b88: Laat
+  late_8bd684b6: "te laat"
+  late_bd436902: "TE LAAT"
+  late_penalty_817fff4e: "Sanctie indien te laat:"
+  late_penalty_9c312b22: "Sanctie indien te laat"
+  late_penalty_pointsdeducted_7033a095: "Sanctie indien te laat: %{pointsDeducted}"
+  late_penalty_pointsdeducted_dac023ff: "Sanctie indien te laat: *%{pointsDeducted}*"
   late_percent_b91d01b3: "Laat: %{percent}"
   late_policies_42bac80: "Laatste beleidslijnen"
   late_policies_fd5dced6: Laatbeleid
@@ -9341,6 +9373,7 @@ nl:
         quizzes: Toetsen
         rubrics: Rubrieken
         syllabus_body: "Hoofdbestanddeel van syllabus"
+        tool_profiles: Toolprofielen
         wikis: Wikipagina's
     cc: 
       standard: 
@@ -9451,9 +9484,11 @@ nl:
     other: "Laden van cursussen voltooid: %{count} cursussen gevonden"
   loading_courses_started_6e6d742c: "Laden van cursussen is gestart"
   loading_data_ecd89ba: "Gegevens laden.."
+  loading_graders_f6a76142: "Revisoren laden"
   loading_mastery_paths_c558a766: "Bezig met het laden van Meesterschap Paths..."
   loading_more_results_def6df65: "Bezig met laden van meer resultaten"
   loading_results_spinner_73ef739c: "Resultatenoverzicht laden"
+  loading_students_30b71301: "Cursisten laden"
   loading_sync_history_9f342cbf: "Synchronisatiegeschiedenis laden"
   loading_unsynced_changes_b5d7b202: "Bezig met laden van niet-gesynchroniseerde wijzigingen"
   loading_unsynched_changes_688434f2: "Niet-gesynchroniseerde wijzigingen laden"
@@ -9483,6 +9518,7 @@ nl:
   log_on_url_fc166e4c: "Aanmelden op URL"
   log_out_379ba28a: Afmelden
   log_out_url_2605c2c1: "Afmelden op URL"
+  logged_out_724b3717: Afgemeld
   logged_out_user: "Afgemelde gebruiker %{user_counter}"
   login: 
     canvas: 
@@ -9540,6 +9576,8 @@ nl:
         log_out: "Weet je zeker dat je uit Canvas wilt afmelden?"
       log_out: Afmelden
       page_title: Afmelden
+    logout_landing: 
+      page_title: Afgemeld
     otp: 
       errors: 
         invalid_otp: "Ongeldige verificatiecode, probeer het opnieuw"
@@ -11528,6 +11566,9 @@ nl:
         subject: "Webconferentie Opname Gereed: %{name}"
       twitter: 
         tweet: "Canvas waarschuwing - Opname klaar: %{title}, %{name}"
+  messages_deleted_8f781481: 
+    one: "Bericht verwijderd!"
+    other: "Berichten verwijderd!"
   mexico_52_60d635c7: "Mexico (+52)"
   mexico_b2d7a271: Mexico
   mgp_grade_export_d29b471f: "MGP Cijferexport"
@@ -11554,6 +11595,7 @@ nl:
     webct: 
       course_not_found: "De Blackboard-cursus is niet te vinden."
     wiki_page_type: Wikipagina
+  migration_in_progress_6f0ed4f9: "Bezig met migreren"
   migration_issues: 
     errors: 
       valid_workflow_state: "Moet een geldige werkstroomstatus sturen"
@@ -11565,6 +11607,8 @@ nl:
   minutes_4aee5a41: Minuten
   minutes_per_slot_5b7169e5: "Minuten per tijdsperiode"
   missing_1a256b3b: Ontbrekend
+  missing_d59852a7: ontbreekt
+  missing_eaddacbd: ONTBREEKT
   missing_percent_94534638: "Ontbrekend: %{percent}"
   missing_policies_4f195e0b: "Ontbrekend beleid"
   missing_required_values_missing_values_f3be2ff8: "Ontbrekende vereiste waarden: %{missing_values}"
@@ -11981,6 +12025,7 @@ nl:
   no_grade_assigned_90e531f5: "Geen cijfer toegewezen."
   no_grade_for_assignment_97c9bc75: "Geen cijfer voor %{assignment}"
   no_graded_submissions_e40c957a: "Geen beoordeelde inzendingen"
+  no_graders_with_that_name_found_d8204d90: "Geen revisoren met die naam gevonden"
   no_grading_periods_configured_for_this_term_ca22393e: "geen beoordelingsperiodes voor deze termijn geconfigureerd"
   no_grading_periods_set_up_a20a8819: "Geen beoordelingsperioden ingesteld"
   no_grading_schemes_to_display_8b0e92e7: "Geen beoordelingsschema's om weer te geven"
@@ -12000,6 +12045,7 @@ nl:
   no_students_dd8de9f0: "Geen cursisten"
   no_students_have_taken_the_quiz_yet_e667644b: "De toets is nog door geen enkele cursist gemaakt"
   no_students_have_taken_the_survey_yet_d378cd35: "De enquête is nog door geen enkele cursist gemaakt"
+  no_students_with_that_name_found_f6004da2: "Geen cursisten met die naam gevonden"
   no_submission_for_assignment_a9cb6fe2: "Geen inlevering voor %{assignment}"
   no_tls_618add1a: "Geen TLS"
   no_unassigned_terms_deb7b76b: "Geen toegewezen periodes"
@@ -12699,6 +12745,7 @@ nl:
     errors: 
       delete_reminder_failed: "Verwijderen mislukt"
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "Peerbeoordelingen kunnen niet ingeschakeld worden voor opdrachten onder toezicht"
+  penalty_adjusted_707df573: "*%{penalty}* **%{adjusted}**"
   pending_3e506a5b: "In behandeling"
   pending_message_2d9a8796: "In behandeling: %{message}"
   people_b4ebb13c: Personen
@@ -13201,6 +13248,7 @@ nl:
   points_out_of_total_24f61148: "*%{points}* van **%{total}**"
   points_points_b6b422e2: "Punten: %{points}"
   points_possible_1c0b3445: "Punten mogelijk"
+  points_possible_44cb4190: "/ %{points_possible}"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Mogelijke punten moeten voor het gekozen type beoordeling 0 of meer zijn"
   points_possible_points_fda3b111: "%{points_possible} Punten"
   points_pts_e5596bf7: "%{points} punten"
@@ -13758,7 +13806,7 @@ nl:
       labels: 
         title: "Naam van toetsbank"
       page_title: Toetsbanken
-      see_bookmarked_banks: "Mijn bladwijzer toetsbanken zien"
+      see_bookmarked_banks: "Toetsbanken met bladwijzer weergeven"
       user_question_banks: "Gebruiker van toetsbanken"
     question_bank: 
       bookmark_bank: "Plaats een bladwijzer bij deze toetsbank"
@@ -15286,6 +15334,7 @@ nl:
   reviewer_b993ce28: Revisor
   reviewers_successfully_added_bd4b629a: "Revisoren succesvol toegevoegd!"
   rich_content_editor_2708ef21: "Rich Content Editor "
+  rich_content_editor_sidebar_enhancements_8bd945d3: "Uitbreidingen van zijbalk Rich Content Editor"
   right_sidebar_logo_5483dc0a: "Rechter zijbalk logo"
   role: 
     duplicate_role: "Een functie/rol met deze naam bestaat al"
@@ -15421,6 +15470,7 @@ nl:
     course_files: Cursusbestanden
     group_files: Groepsbestanden
     my_files: "Mijn bestanden"
+  root_account_3fb3aacf: root_account
   root_accounts_cc035dcf: Hoofdaccounts
   roster: 
     delete_confirm: "Weet je zeker dat je deze gebruiker wilt verwijderen?"
@@ -15490,6 +15540,7 @@ nl:
         are_you_sure_delete: "Weet je zeker dat je deze rubric wilt verwijderen? Alle cursussen die momenteel aan deze rubric gekoppeld zijn kunnen de rubric nog steeds gebruiken, maar het is niet meer mogelijk om deze voor nieuwe cursussen te gebruiken."
         are_you_sure_remove: "Weet je zeker dat je deze rubric uit de lijst wilt verwijderen?"
       remove_rubric: "Deze rubriek uit mijn lijst verwijderen"
+  russia_7_87bc99d5: "Rusland (+7)"
   salesforce_account_id_eb5c78ad: "ID van account in Salesforce "
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce heeft een andere aanmeldingshost voor sandbox accounts dan voor de productie van accounts, dus als je een Salesforce Sandbox-account gebruikt,en je dit veld niet aanvinkt, zal het niet geverifieerd worden (dit werkt ook omgekeerd, als je een productie account hebt en je het vakje WEL aanvinkt, zal het niet geverifieerd worden)"
   salesforce_ticketing_webtocase_connector_80f75716: "Salesforce Ticketing WebToCase Connector"
@@ -17475,6 +17526,7 @@ nl:
   there_was_an_error_uploading_the_image_932fc4ce: "Er was een fout bij het uploaden van de afbeelding"
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "Er is een fout opgetreden bij je zoekopdracht, probeer een andere zoekopdracht"
   there_was_an_unexpected_problem_with_the_sync_be079a67: "Er is een onbekende fout opgetreden tijdens het synchroniseren"
+  there_was_an_unknown_error_registering_the_tool_b9a29954: "Er is een onbekende fout opgetreden bij het registreren van de tool"
   there_were_errors_with_the_form_errors_ab5b559a: "Er zijn fouten opgetreden met het formulier: %{errors}"
   there_were_several_possible_matches_with_the_impor_ad58bcd0: "Er zijn verschillende mogelijke overeenkomsten met de import. Los deze hieronder op."
   these_backup_codes_can_be_used_if_your_multi_facto_ca30a3df: "Deze back-upcodes kunnen worden gebruikt als uw apparaat voor Multi-Factor-verificatie niet beschikbaar is. Druk ze af en bewaar ze op een veilige plek, zoals uw portefeuille."
@@ -17887,6 +17939,7 @@ nl:
     originality_report_visible_immediately: Onmiddellijk
   turnitin_similarity_score_more_information_e2571be8: "Turnitin vergelijkbaarheidsscore -- meer informatie"
   twitter_fcef6b54: Twitter
+  type_a_few_letters_to_start_searching_3334657b: "Typ enkele letters om te beginnen met zoeken"
   type_c8106334: Type
   type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: "'%{type}' is geen geldige afbeeldingsoort (probeer jpg, png of gif)"
   type_of_change_1cb24a0e: "Type wijziging"
@@ -18035,6 +18088,7 @@ nl:
   use_mathman_to_convert_latex_to_svg_3f61c9b: "MathMan gebruiken om LaTeX om te zetten naar SVG?"
   use_new_folder_tree_in_files_bc0ea09f: "Nieuwe mappenstructuur in Bestanden gebruiken"
   use_new_folder_tree_in_files_eb5a451b: "Nieuwe mappenstructuur in Bestanden gebruiken"
+  use_new_rich_content_editor_with_enhanced_sidebar__8e0bfedd: "Gebruik overal de nieuwe Rich Content Editor met uitgebreide zijbalk"
   use_remote_service_for_notifications_9fe667c6: "Gebruik service op afstand voor meldingen"
   use_remote_version_of_rich_content_editor_52f7fc4b: "Gebruik versie op afstand van Rich Content Editor"
   use_remote_version_of_rich_content_editor_and_side_a058a664: "Gebruik versie op afstand van Rich Content Editor EN zijbalk"
@@ -18793,6 +18847,7 @@ nl:
   you_are_currently_masquerading_as_user_name_f4a00ade: "Je doet je momenteel voor als %{user_name}"
   you_are_here_54075d8c: "Je bent hier:"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "Je bent aangemeld bij %{institution1} met jouw referenties van %{institution2}"
+  you_are_logged_out_of_canvas_8b5fc59a: "Je bent afgemeld bij Canvas."
   you_are_not_authorized_to_disable_the_sync_to_name_d283c3e0: "Je bent niet bevoegd om de optie Synchroniseren naar %{name} uit te schakelen."
   you_are_not_authorized_to_disable_the_sync_to_sisn_54aebeb0: "Je bent niet bevoegd om de optie Synchroniseren naar %{sisName} uit te schakelen."
   you_are_not_enrolled_in_any_courses_a5c63286: "Je bent voor geen enkele cursus ingeschreven."
