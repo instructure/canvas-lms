@@ -252,6 +252,8 @@ define [
 
       @parentColumns = []
       @customColumns = []
+      @allAssignmentColumns = []
+      @aggregateColumns = []
       @rows = []
 
       @initPostGradesStore()
@@ -633,7 +635,8 @@ define [
         sortType: 'custom'
         customOrder: []
       columns = @grid.getColumns()
-      scrollable_columns = columns.slice(@getFrozenColumnCount())
+      numberOfColumnsToFreeze = @grid.getOptions().numberOfColumnsToFreeze
+      scrollable_columns = columns.slice(numberOfColumnsToFreeze)
       newSortOrder.customOrder = _.pluck(scrollable_columns, 'id')
       @setStoredSortOrder(newSortOrder)
 
@@ -641,7 +644,8 @@ define [
       @setStoredSortOrder(newSortOrder) unless isFirstArrangement
 
       columns = @grid.getColumns()
-      frozen = columns.splice(0, @getFrozenColumnCount())
+      numberOfColumnsToFreeze = @grid.getOptions().numberOfColumnsToFreeze
+      frozen = columns.splice(0, numberOfColumnsToFreeze)
       columns.sort @makeColumnSortFn(newSortOrder)
       columns.splice(0, 0, frozen...)
       @grid.setColumns(columns)
@@ -1583,7 +1587,7 @@ define [
         syncColumnCellResize: true
         rowHeight: 35
         headerHeight: 38
-        numberOfColumnsToFreeze: @getFrozenColumnCount()
+        numberOfColumnsToFreeze: @customColumns.length + 1
       }, @options)
 
       @grid = new Slick.Grid('#gradebook_grid', @rows, @getVisibleGradeGridColumns(), options)
@@ -1905,7 +1909,7 @@ define [
       @keyboardNav.handleMenuOrDialogClose()
 
     toggleNotesColumn: (callback) =>
-      columnsToReplace = @getFrozenColumnCount()
+      columnsToReplace = @grid.getOptions().numberOfColumnsToFreeze
       callback()
       cols = @grid.getColumns()
       cols.splice 0, columnsToReplace,
@@ -1920,10 +1924,7 @@ define [
 
       @toggleNotesColumn =>
         @customColumns.splice 0, 0, @options.teacher_notes
-        @grid.setNumberOfColumnsToFreeze @getFrozenColumnCount()
-
-    getFrozenColumnCount: ->
-      @parentColumns.length + @customColumns.length
+        @grid.setNumberOfColumnsToFreeze @parentColumns.length + @customColumns.length
 
     hideNotesColumn: =>
       @toggleNotesColumn =>
@@ -1931,7 +1932,7 @@ define [
           if c.teacher_notes
             @customColumns.splice i, 1
             break
-        @grid.setNumberOfColumnsToFreeze @getFrozenColumnCount()
+        @grid.setNumberOfColumnsToFreeze @parentColumns.length + @customColumns.length
 
     hideAggregateColumns: ->
       return false unless @gradingPeriodSet?
@@ -1961,22 +1962,6 @@ define [
 
     getAssignmentGroupColumnId: (assignmentGroupId) =>
       "assignment_group_#{assignmentGroupId}"
-
-    getColumnHeaderNode: (columnId) =>
-      @gridSupport.helper.getColumnHeaderNode(columnId)
-
-    getColumnPositionById: (colId, columnGroup = @grid.getColumns()) ->
-      position = null
-
-      columnGroup.forEach (col, idx) ->
-        if col.id == colId
-          position = idx
-
-      position
-
-    isColumnFrozen: (colId) =>
-      columnPosition = @getColumnPositionById(colId, @parentColumns)
-      return columnPosition != null
 
     ## SlickGrid Data Access Methods
 
@@ -2018,8 +2003,8 @@ define [
 
     ## Gradebook Bulk UI Update Methods
 
-    updateFrozenColumnsAndRenderGrid: (newColumns = @getVisibleGradeGridColumns()) ->
-      @grid.setNumberOfColumnsToFreeze(@getFrozenColumnCount())
+    updateFrozenColumnsAndRenderGrid: (newColumns) ->
+      @grid.setNumberOfColumnsToFreeze(@parentColumns.length + @customColumns.length)
       @grid.setColumns(newColumns)
       @grid.invalidate()
       @updateColumnHeaders()
@@ -2058,20 +2043,23 @@ define [
       @totalColumnPositionChanged = true
       allColumns = @grid.getColumns()
 
+      isStudentColumn = (column) -> column.id == 'student'
+      isTotalGradeColumn = (column) -> column.id == 'total_grade'
+
       # Remove total_grade column from aggregate section
-      totalColumnPosition = @getColumnPositionById('total_grade', @aggregateColumns)
+      totalColumnPosition = @aggregateColumns.findIndex(isTotalGradeColumn)
       totalColumn = @aggregateColumns.splice(totalColumnPosition, 1)
 
       # Remove total_grade column from the current order of displayed columns in the grid
-      totalColumnPositionOverall = @getColumnPositionById('total_grade', allColumns)
+      totalColumnPositionOverall = allColumns.findIndex(isTotalGradeColumn)
       allColumns.splice(totalColumnPositionOverall, 1)
 
       # Add total_grade column next to the position of the student column in the current column order
-      studentColumnPositionOverall = @getColumnPositionById('student', allColumns)
+      studentColumnPositionOverall = allColumns.findIndex(isStudentColumn)
       allColumns = allColumns.splice(0, studentColumnPositionOverall + 1).concat(totalColumn).concat(allColumns)
 
       # Add total_grade column next to the position of the student column in the frozen section
-      studentColumnPosition = @getColumnPositionById('student', @parentColumns)
+      studentColumnPosition = @parentColumns.findIndex(isStudentColumn)
       @parentColumns = @parentColumns.splice(0, studentColumnPosition + 1).concat(totalColumn).concat(@parentColumns)
 
       @updateFrozenColumnsAndRenderGrid(allColumns)
@@ -2080,16 +2068,18 @@ define [
       @totalColumnPositionChanged = true
       allColumns = @grid.getColumns()
 
+      isTotalGradeColumn = (column) -> column.id == 'total_grade'
+
       # Remove total_grade column from aggregate or frozen section as needed
-      if @isColumnFrozen('total_grade')
-        totalColumnPosition = @getColumnPositionById('total_grade', @parentColumns)
+      if @gridSupport.columns.getColumns().frozen.some(isTotalGradeColumn)
+        totalColumnPosition = @parentColumns.findIndex(isTotalGradeColumn)
         totalColumn = @parentColumns.splice(totalColumnPosition, 1)
       else
-        totalColumnPosition = @getColumnPositionById('total_grade', @aggregateColumns)
+        totalColumnPosition = @aggregateColumns.findIndex(isTotalGradeColumn)
         totalColumn = @aggregateColumns.splice(totalColumnPosition, 1)
 
       # Remove total_grade column from the current order of displayed columns in the grid
-      totalColumnPositionOverall = @getColumnPositionById('total_grade', allColumns)
+      totalColumnPositionOverall = allColumns.findIndex(isTotalGradeColumn)
       allColumns.splice(totalColumnPositionOverall, 1)
 
       # Add total_grade column next to the position of the student column in the current column order

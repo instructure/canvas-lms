@@ -1662,9 +1662,17 @@ test('stores the custom column order (ignoring frozen columns)', function () {
   ];
   const gradeBook = createGradebook();
   this.stub(gradeBook, 'setStoredSortOrder');
-  gradeBook.grid = { getColumns: this.stub().returns(columns) };
-  gradeBook.parentColumns = [{ id: 'student' }];
-  gradeBook.customColumns = [];
+  gradeBook.grid = {
+    getColumns () {
+      return columns;
+    },
+
+    getOptions () {
+      return {
+        numberOfColumnsToFreeze: 1
+      }
+    }
+  };
 
   const expectedSortOrder = {
     sortType: 'custom',
@@ -1879,9 +1887,6 @@ QUnit.module('Gradebook#getVisibleGradeGridColumns', {
     ];
     this.gradebook = createGradebook();
     this.gradebook.allAssignmentColumns = allAssignmentColumns;
-    this.gradebook.parentColumns = [];
-    this.gradebook.customColumns = [];
-    this.gradebook.aggregateColumns = [];
   }
 });
 
@@ -3891,7 +3896,6 @@ QUnit.module('Gradebook Grid Events', function (hooks) {
 
     this.gradebook = createGradebook();
     sinon.stub(this.gradebook, 'getVisibleGradeGridColumns').returns([]);
-    sinon.stub(this.gradebook, 'getFrozenColumnCount').returns(0);
     sinon.stub(this.gradebook, 'onGridInit');
 
     this.gradebook.createGrid();
@@ -4141,98 +4145,6 @@ test('uses Grid Support to update the column headers', function () {
   strictEqual(this.gradebook.gridSupport.columns.updateColumnHeaders.callCount, 1);
 });
 
-QUnit.module('Gradebook#getColumnPositionById', {
-  setupGradebook (columns) {
-    const gradebook = createGradebook();
-    gradebook.grid = {
-      getColumns () {
-        return columns;
-      }
-    };
-
-    return gradebook;
-  },
-
-  setup () {
-    const columns = [
-      { id: 'one' },
-      { id: 'two' },
-      { id: 'three' }
-    ];
-
-    this.gradebook = this.setupGradebook(columns);
-
-    this.alternateColumnList = [
-      { id: 'two' },
-      { id: 'three' },
-      { id: 'one' },
-    ]
-  }
-});
-
-test('returns the position of the column in the specified array', function () {
-  strictEqual(this.gradebook.getColumnPositionById('two', this.alternateColumnList), 0);
-  strictEqual(this.gradebook.getColumnPositionById('three', this.alternateColumnList), 1);
-  strictEqual(this.gradebook.getColumnPositionById('one', this.alternateColumnList), 2);
-});
-
-test("returns the position of the column from the grid's columns when not specified an array", function () {
-  strictEqual(this.gradebook.getColumnPositionById('two'), 1);
-  strictEqual(this.gradebook.getColumnPositionById('three'), 2);
-  strictEqual(this.gradebook.getColumnPositionById('one'), 0);
-});
-
-test('returns null when no column matches the column id passed in', function () {
-  strictEqual(this.gradebook.getColumnPositionById('four'), null);
-});
-
-QUnit.module('Gradebook#isColumnFrozen', {
-  setupGradebook (columns) {
-    const gradebook = createGradebook();
-    gradebook.grid = {
-      columns: [],
-
-      getColumns () {
-        return this.columns;
-      },
-
-      setColumns (incomingColumns) {
-        this.columns = incomingColumns;
-      }
-    };
-    gradebook.grid.setColumns(columns);
-    this.stub(gradebook, 'getFrozenColumnCount').returns(1);
-
-    return gradebook;
-  },
-
-  setup () {
-    const columns = [
-      { id: 'one' },
-      { id: 'two' },
-      { id: 'three' },
-      { id: 'total_grade' },
-      { id: 'five'}
-    ];
-
-    this.gradebook = this.setupGradebook(columns);
-    this.gradebook.parentColumns = [
-      { id: 'one' },
-      { id: 'total_grade' }
-    ]
-  }
-});
-
-test('returns true when the column is frozen', function () {
-  strictEqual(this.gradebook.isColumnFrozen('one'), true);
-  strictEqual(this.gradebook.isColumnFrozen('total_grade'), true);
-});
-
-test('returns false when the column is not frozen', function () {
-  strictEqual(this.gradebook.isColumnFrozen('two'), false);
-  strictEqual(this.gradebook.isColumnFrozen('three'), false);
-});
-
 QUnit.module('Gradebook#freezeTotalGradeColumn', {
   setupGradebook () {
     const gradebook = createGradebook();
@@ -4252,34 +4164,7 @@ QUnit.module('Gradebook#freezeTotalGradeColumn', {
       invalidate () {}
     };
 
-    this.stub(gradebook.grid, 'setNumberOfColumnsToFreeze');
     this.stub(gradebook, 'updateColumnHeaders');
-
-    const columns = [
-      { id: 'one' },
-      { id: 'student' },
-      { id: 'three'},
-      { id: 'aggregate_1' },
-      { id: 'total_grade' },
-    ];
-    gradebook.grid.setColumns(columns);
-    gradebook.allAssignmentColumns = [
-      {
-        id: 'three',
-        object: {
-          submission_types: []
-        }
-      }
-    ]
-    gradebook.parentColumns = [
-      { id: 'one' },
-      { id: 'student' },
-    ];
-    gradebook.aggregateColumns = [
-      { id: 'aggregate_1' },
-      { id: 'total_grade' }
-    ];
-    gradebook.customColumns = [];
 
     return gradebook;
   },
@@ -4418,36 +4303,8 @@ QUnit.module('Gradebook#updateFrozenColumnsAndRenderGrid', {
       invalidate () {},
     };
 
-    this.stub(gradebook.grid, 'setNumberOfColumnsToFreeze');
     this.stub(gradebook.grid, 'invalidate');
     this.stub(gradebook, 'updateColumnHeaders');
-
-    this.totalGradeColumn = { id: 'total_grade' };
-
-    gradebook.grid.setColumns([
-      { id: 'one' },
-      { id: 'student' },
-      this.totalGradeColumn,
-      { id: 'three'},
-      { id: 'aggregate_1' },
-    ]);
-    gradebook.allAssignmentColumns = [
-      {
-        id: 'three',
-        object: {
-          submission_types: []
-        }
-      }
-    ]
-    gradebook.parentColumns = [
-      { id: 'one' },
-      { id: 'student' },
-      this.totalGradeColumn,
-    ];
-    gradebook.aggregateColumns = [
-      { id: 'aggregate_1' },
-    ];
-    gradebook.customColumns = [];
 
     return gradebook;
   },
@@ -4487,35 +4344,19 @@ QUnit.module('Gradebook#moveTotalGradeColumnToEnd', {
 
       invalidate () {}
     };
+    gradebook.gridSupport = {
+      columns: {
+        getColumns () {
+          return {
+            frozen: [],
+            scrollable: []
+          }
+        }
+      }
+    };
 
     this.stub(gradebook.grid, 'setNumberOfColumnsToFreeze');
     this.stub(gradebook, 'updateColumnHeaders');
-    this.totalGradeColumn = { id: 'total_grade' };
-
-    gradebook.grid.setColumns([
-      { id: 'one' },
-      { id: 'student' },
-      this.totalGradeColumn,
-      { id: 'three'},
-      { id: 'aggregate_1' },
-    ]);
-    gradebook.allAssignmentColumns = [
-      {
-        id: 'three',
-        object: {
-          submission_types: []
-        }
-      }
-    ]
-    gradebook.parentColumns = [
-      { id: 'one' },
-      { id: 'student' },
-      this.totalGradeColumn,
-    ];
-    gradebook.aggregateColumns = [
-      { id: 'aggregate_1' },
-    ];
-    gradebook.customColumns = [];
 
     return gradebook;
   },
@@ -4710,15 +4551,6 @@ test('sorts the grid rows after updating the setting', function () {
     equal(sortRowsBySetting.direction, 'descending', 'sortRowsBySetting.direction was set beforehand');
   });
   gradebook.setSortRowsBySetting('assignment_201', 'grade', 'descending');
-});
-
-QUnit.module('Gradebook#getFrozenColumnCount');
-
-test('returns number of columns in frozen section', function () {
-  const gradebook = createGradebook();
-  gradebook.parentColumns = [{ id: 'student' }, { id: 'secondary_identifier' }];
-  gradebook.customColumns = [{ id: 'custom_col_1' }];
-  equal(gradebook.getFrozenColumnCount(), 3);
 });
 
 QUnit.module('Gradebook#sortRowsWithFunction', {
@@ -5470,11 +5302,14 @@ test('sets the raw grade on submission', function () {
 QUnit.module('Gradebook#arrangeColumnsBy', {
   setup () {
     this.gradebook = createGradebook();
-    this.gradebook.parentColumns = [];
-    this.gradebook.customColumns = [];
     this.gradebook.makeColumnSortFn = () => () => 1;
     this.gradebook.grid = {
       getColumns () { return []; },
+      getOptions () {
+        return {
+          numberOfColumnsToFreeze: 0
+        };
+      },
       setColumns () {}
     }
   }
@@ -5493,7 +5328,6 @@ test('renders the view options menu', function () {
 QUnit.module('Gradebook#onColumnsReordered', {
   setup () {
     this.gradebook = createGradebook();
-    this.gradebook.customColumns = [];
     this.gradebook.grid = {
       getColumns () { return []; },
       setColumns () {}
@@ -6181,7 +6015,6 @@ QUnit.module('GridColor', {
 test('is rendered on init', function () {
   const gradebook = createGradebook();
   const renderGridColorStub = this.stub(gradebook, 'renderGridColor');
-  this.stub(gradebook, 'getFrozenColumnCount');
   this.stub(gradebook, 'getVisibleGradeGridColumns').returns([]);
   this.stub(gradebook, 'onGridInit');
   gradebook.initGrid();
