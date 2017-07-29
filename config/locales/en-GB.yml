@@ -153,7 +153,7 @@ en-GB:
     account_required: "must be LDAP-authenticated"
     index: 
       delete_auth_confirmation: "Are you sure? Users may not be able to log in if this is removed."
-      delete_auth_link: "Remove All Authentication"
+      delete_auth_link: "Remove Authentication"
       ip_address_list_description: "If you are using an authentication service that requires the Canvas servers to contact your servers directly, such as LDAP, you'll need to make sure that your servers can accept connections from these IP addresses:"
       no_auth_type_description: "This account does not currently integrate with an identity provider."
       page_title: "Authentication settings"
@@ -738,6 +738,11 @@ en-GB:
             start: 
               parameters: 
                 header: "Start at:"
+    embry_riddle_activity_report_csv_parameters: 
+      account_reports: 
+        embry_riddle: 
+          outcome: 
+            text: "Course SIS Pattern(s) (Comma separated list):"
     engagement_report_csv_parameters: 
       account_reports: 
         bryan_engagement: 
@@ -1741,6 +1746,9 @@ en-GB:
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "App Centre will appear in the \"Apps\" tab on the settings page of either a course or account. The URL provided below should point to a valid App Centre endpoint (for example, %{url} - be sure to omit the trailing slash"
   app_placements_6d877225: "App placements"
   app_reregistration_87cc8817: "App re-registration"
+  app_was_installed_by_admin_and_is_locked_3bee4d39: "%{app} was installed by Admin and is locked"
+  app_was_installed_by_the_master_course_and_is_lock_dbeb24a6: "%{app} was installed by the master course and is locked"
+  app_was_installed_by_the_master_course_e55ba1d7: "%{app} was installed by the master course"
   appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "Appends a number to the end of each event title (e.g. Event 1, Event 2, etc.)"
   appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "Appends a number to the end of each event title (e.g. Event 1, Event 2, etc.)\" for=\"append_iterator"
   application: 
@@ -1814,6 +1822,9 @@ en-GB:
   archive_3f794d7e: Archive
   archive_selected_d64506ca: "Archive selected"
   are_you_sure_26795d3c: "Are you sure?"
+  are_you_sure_you_want_to_archive_your_copies_of_th_7d219afe: 
+    one: "Are you sure you want to archive your copy of this conversation?"
+    other: "Are you sure you want to archive your copies of these conversations?"
   are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496: "Are you sure you want to cancel? Changes you made may not be saved."
   are_you_sure_you_want_to_cancel_your_appointment_w_dbbd27eb: "Are you sure you want to cancel your appointment with %{name}?"
   are_you_sure_you_want_to_copy_to_the_final_mark_th_28a7e7b3: "Are you sure you want to copy to the final mark? This will overwrite the existing mark."
@@ -1828,6 +1839,9 @@ en-GB:
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: "Are you sure you want to delete this grading period set?"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Are you sure you want to delete this grading period?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Are you sure you want to delete this grading scheme?"
+  are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
+    one: "Are you sure you want to delete your copy of this conversation? This action cannot be undone."
+    other: "Are you sure you want to delete your copy of these conversations? This action cannot be undone."
   are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: "Are you sure you want to delete your reservation to this event?"
   are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: "Are you sure you want to disable Sync to %{sisName} for all assignments?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Are you sure you want to do this? It cannot be undone and will override existing grades in the gradebook."
@@ -1839,6 +1853,9 @@ en-GB:
   are_you_sure_you_want_to_resync_these_grades_to_th_e509cb9e: "Are you sure you want to resync these grades to the student information system?"
   are_you_sure_you_want_to_submit_this_comment_fbe76ba6: "Are you certain you want to submit this comment?"
   are_you_sure_you_want_to_sync_these_grades_to_the__ca3c28a4: "Are you sure you want to sync these grades to the student information system? You should only do this if all your grades have been finalised."
+  are_you_sure_you_want_to_unarchive_these_conversat_ec7d7e8d: 
+    one: "Are you sure you want to unarchive this conversation?"
+    other: "Are you sure you want to unarchive these conversations?"
   argentina_3257a200: Argentina
   argentina_54_375d6af4: "Argentina (+54)"
   arrange_by_34a545de: "Arrange by"
@@ -3400,6 +3417,7 @@ en-GB:
   click_here_it_s_free_eeccb9cb: "Click Here, It's Free!"
   click_here_on_the_calendar_link_c9965631: "Click here on the *Calendar* link"
   click_here_to_download_size_of_file_74443988: "Click here to download %{size_of_file}"
+  click_here_to_log_in_again_4a6055de: "Click here to log in again"
   click_here_to_see_the_file_79e2b366: "Click here to see the file."
   click_here_to_view_ec8cb2fd: "Click here to view"
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Click on a snapshot to revert back to your trial as it was when the snapshot was taken. Note: You will lose any work you have done since the snapshot was taken and it cannot be undone!"
@@ -6024,6 +6042,7 @@ en-GB:
     edit_key: "Edit this key"
     identifier: "ID: %{id}"
     redirect_uri: "URI: %{redirect_uri}"
+  developer_key_921ddbae: "Developer Key"
   developer_key_form: 
     cancel: Cancel
     icon_url: "Icon URL:"
@@ -7457,6 +7476,10 @@ en-GB:
   filter_replies_by_unread_342e8e90: "Filtre replies by unread"
   filter_replies_by_unread_caf870ea: "filter replies by unread"
   filters_92f2776f: Filters
+  final_grade_4d7f6545: "Final Grade"
+  final_grade_6938dca8: "Final grade:"
+  final_grade_finalgrade_138d9e07: "Final grade: %{finalGrade}"
+  final_grade_finalgrade_408580bb: "Final grade: *%{finalGrade}*"
   final_grade_info_2aa35d25: "Final grade info"
   final_grade_score_fe69a301: "Final grade: %{score}"
   final_letter_grade_80dccec1: "Final Letter Grade"
@@ -7584,13 +7607,16 @@ en-GB:
   gpa_scale_a6d1cdea: "GPA scale"
   grade_10d1e5a1: "%{grade}"
   grade_9c6f076d: Grade
+  grade_a91e433e: "Grade:"
   grade_assignment_7c1abc11: "Grade %{assignment}"
+  grade_changes_cb5a57a8: "Grade Changes"
   grade_display_warning_dialog: 
     grade_display_warning: 
       checkbox: "Don't show for this course again."
       warning: Warning
   grade_distribution_e52c9256: "Grade distribution"
   grade_export_title: "Grade export"
+  grade_for_name_b9df168a: "Grade for: %{name}"
   grade_high_to_low_1cea0381: "Grade - high to low"
   grade_history_9c51ad49: "Grade history…"
   grade_history_ccc09fde: "Grade History"
@@ -7745,7 +7771,7 @@ en-GB:
       switch_to_points: "Switch to points"
     turnitin: 
       error_message: "There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support."
-      info_message: "This file is still being processed by turnitin. Please check back later to see the score"
+      info_message: "This file is still being processed by the plagiarism detection tool associated with the assignment. Please check back later to see the score."
       resubmitting: Resubmitting...
       tooltip: 
         error: "Similarity Score - See submission error details"
@@ -8239,9 +8265,9 @@ en-GB:
       one: "Score does not include %{groups} because it has no points possible"
       other: "Score does not include %{groups} because they have no points possible"
     keyboard_assignment_desc: "Go to the current assignment's detail page"
-    keyboard_close_menu: "Close the active assignment menu"
+    keyboard_close_menu: "Close the currently active menu"
     keyboard_comment_desc: "Comment on the active submission"
-    keyboard_menu_desc: "Open the menu for the active column's assignment"
+    keyboard_menu_desc: "Open menu for the active column"
     keyboard_sort_desc: "Sort the grid on the current active column"
     keyboard_tooltip_desc: "Show the submission type of the active submission"
     keycodes: 
@@ -9282,6 +9308,12 @@ en-GB:
   last_used_f9457313: "Last Used:"
   last_user_access_title: "Last User Access"
   late_2be42b88: Late
+  late_8bd684b6: late
+  late_bd436902: LATE
+  late_penalty_817fff4e: "Late penalty:"
+  late_penalty_9c312b22: "Late Penalty"
+  late_penalty_pointsdeducted_7033a095: "Late Penalty: %{pointsDeducted}"
+  late_penalty_pointsdeducted_dac023ff: "Late Penalty: *%{pointsDeducted}*"
   late_percent_b91d01b3: "Late: %{percent}"
   late_policies_42bac80: "Late Policies"
   late_policies_fd5dced6: "Late policies"
@@ -9389,6 +9421,7 @@ en-GB:
         quizzes: Quizzes
         rubrics: Rubrics
         syllabus_body: "Syllabus body"
+        tool_profiles: "Tool Profiles"
         wikis: "Wiki pages"
     cc: 
       standard: 
@@ -9499,9 +9532,11 @@ en-GB:
     other: "Loading courses complete: %{count} courses found"
   loading_courses_started_6e6d742c: "Loading courses started"
   loading_data_ecd89ba: "Loading Data…"
+  loading_graders_f6a76142: "Loading Graders"
   loading_mastery_paths_c558a766: "Loading mastery paths..."
   loading_more_results_def6df65: "Loading more results..."
   loading_results_spinner_73ef739c: "Loading Results Spinner"
+  loading_students_30b71301: "Loading Students"
   loading_sync_history_9f342cbf: "Loading Sync History"
   loading_unsynced_changes_b5d7b202: "Loading Unsynced Changes"
   loading_unsynched_changes_688434f2: "Loading Unsynched Changes"
@@ -9531,6 +9566,7 @@ en-GB:
   log_on_url_fc166e4c: "Log on URL"
   log_out_379ba28a: "Log out"
   log_out_url_2605c2c1: "Log out URL"
+  logged_out_724b3717: "Logged Out"
   logged_out_user: "Logged out user %{user_counter}"
   login: 
     canvas: 
@@ -9588,6 +9624,8 @@ en-GB:
         log_out: "Are you sure you want to log out of Canvas?"
       log_out: "Log out"
       page_title: "Log out"
+    logout_landing: 
+      page_title: "Logged Out"
     otp: 
       errors: 
         invalid_otp: "Invalid verification code, please try again"
@@ -11562,6 +11600,9 @@ en-GB:
         subject: "Web conference recording ready: %{name}"
       twitter: 
         tweet: "Canvas Alert - Recording ready: %{title}, %{name}"
+  messages_deleted_8f781481: 
+    one: "Message Deleted!"
+    other: "Messages Deleted!"
   mexico_52_60d635c7: "Mexico (+52)"
   mexico_b2d7a271: Mexico
   mgp_grade_export_d29b471f: "MGP grade export"
@@ -11588,6 +11629,7 @@ en-GB:
     webct: 
       course_not_found: "The Blackboard course wasn't found."
     wiki_page_type: "Wiki page"
+  migration_in_progress_6f0ed4f9: "Migration in progress"
   migration_issues: 
     errors: 
       valid_workflow_state: "Must send a valid workflow state"
@@ -11599,6 +11641,8 @@ en-GB:
   minutes_4aee5a41: Minutes
   minutes_per_slot_5b7169e5: "Minutes per slot"
   missing_1a256b3b: Missing
+  missing_d59852a7: missing
+  missing_eaddacbd: MISSING
   missing_percent_94534638: "Missing: %{percent}"
   missing_policies_4f195e0b: "Missing policies"
   missing_required_values_missing_values_f3be2ff8: "Missing required values: %{missing_values}"
@@ -12020,6 +12064,7 @@ en-GB:
   no_grade_assigned_90e531f5: "No grade assigned."
   no_grade_for_assignment_97c9bc75: "No grade for %{assignment}"
   no_graded_submissions_e40c957a: "No graded submissions"
+  no_graders_with_that_name_found_d8204d90: "No graders with that name found"
   no_grading_periods_configured_for_this_term_ca22393e: "no grading periods configured for this term"
   no_grading_periods_set_up_a20a8819: "No grading periods set up"
   no_grading_schemes_to_display_8b0e92e7: "No grading schemes to display"
@@ -12039,6 +12084,7 @@ en-GB:
   no_students_dd8de9f0: "No Students"
   no_students_have_taken_the_quiz_yet_e667644b: "No students have taken the quiz yet"
   no_students_have_taken_the_survey_yet_d378cd35: "No students have taken the survey yet"
+  no_students_with_that_name_found_f6004da2: "No students with that name found"
   no_submission_for_assignment_a9cb6fe2: "No submission for %{assignment}"
   no_tls_618add1a: "No TLS"
   no_unassigned_terms_deb7b76b: "No unassigned terms"
@@ -12744,6 +12790,7 @@ en-GB:
     errors: 
       delete_reminder_failed: "Delete failed"
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "Peer reviews cannot be enabled for moderated assignments"
+  penalty_adjusted_707df573: "*%{penalty}* **%{adjusted}**"
   pending_3e506a5b: Pending
   pending_message_2d9a8796: "Pending: %{message}"
   people_b4ebb13c: People
@@ -13244,6 +13291,7 @@ en-GB:
   points_out_of_total_24f61148: "*%{points}* out of **%{total}**"
   points_points_b6b422e2: "Points: %{points}"
   points_possible_1c0b3445: "Points possible"
+  points_possible_44cb4190: "/ %{points_possible}"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Points possible must be 0 or more for selected grading type"
   points_possible_points_fda3b111: "%{points_possible} Points"
   points_pts_e5596bf7: "%{points} pts"
@@ -13807,7 +13855,7 @@ en-GB:
       labels: 
         title: "Bank name"
       page_title: "Question banks"
-      see_bookmarked_banks: "See my bookmarked banks"
+      see_bookmarked_banks: "View Bookmarked Banks"
       user_question_banks: "User question banks"
     question_bank: 
       bookmark_bank: "Bookmark this question bank"
@@ -15335,6 +15383,7 @@ en-GB:
   reviewer_b993ce28: Reviewer
   reviewers_successfully_added_bd4b629a: "Reviewers successfully added"
   rich_content_editor_2708ef21: "Rich Content Editor"
+  rich_content_editor_sidebar_enhancements_8bd945d3: "Rich Content Editor Sidebar Enhancements"
   right_sidebar_logo_5483dc0a: "Right sidebar logo"
   role: 
     duplicate_role: "A role with this name already exists"
@@ -15470,6 +15519,7 @@ en-GB:
     course_files: "Course files"
     group_files: "Group files"
     my_files: "My files"
+  root_account_3fb3aacf: root_account
   root_accounts_cc035dcf: "Root accounts"
   roster: 
     delete_confirm: "Are you sure you want to remove this user?"
@@ -15539,6 +15589,7 @@ en-GB:
         are_you_sure_delete: "Are you sure you want to delete this rubric? Any course currently associated with this rubric will still have access to it, but, no new courses will be able to use it."
         are_you_sure_remove: "Are you sure you want to remove this rubric from your list?"
       remove_rubric: "Remove this rubric from my list"
+  russia_7_87bc99d5: "Russia (+7)"
   salesforce_account_id_eb5c78ad: "Salesforce account Id"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce has a different login host for sandbox accounts than for production accounts. If you are using a Salesforce sandbox account and you do not check this box, it will not be able to authenticate. (This works in reverse too: if you have a production account and you DO check this box it will not authenticate.)"
   salesforce_ticketing_webtocase_connector_80f75716: "Salesforce Ticketing WebToCase Connector"
@@ -17533,6 +17584,7 @@ en-GB:
   there_was_an_error_uploading_the_image_932fc4ce: "There was an error uploading image"
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "There was an error with your query; please try a different search"
   there_was_an_unexpected_problem_with_the_sync_be079a67: "There was an unexpected problem with the sync"
+  there_was_an_unknown_error_registering_the_tool_b9a29954: "There was an unknown error registering the tool"
   there_were_errors_with_the_form_errors_ab5b559a: "There were errors with the form: %{errors}"
   there_were_several_possible_matches_with_the_impor_ad58bcd0: "There were several possible matches with the import. Please resolve them below."
   these_backup_codes_can_be_used_if_your_multi_facto_ca30a3df: "These backup codes can be used if your multi-factor authentication device is unavailable. Please print them out and keep them in a safe location, like your wallet."
@@ -17946,6 +17998,7 @@ en-GB:
     originality_report_visible_immediately: Immediately
   turnitin_similarity_score_more_information_e2571be8: "Turnitin similarity score -- more information"
   twitter_fcef6b54: Twitter
+  type_a_few_letters_to_start_searching_3334657b: "Type a few letters to start searching"
   type_c8106334: Type
   type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: "'%{type}' is not a valid image type (try jpg, png, or gif)"
   type_of_change_1cb24a0e: "Type of Change"
@@ -18100,6 +18153,7 @@ en-GB:
   use_mathman_to_convert_latex_to_svg_3f61c9b: "Use MathMan to convert LaTeX to SVG?"
   use_new_folder_tree_in_files_bc0ea09f: "Use new folder tree in files"
   use_new_folder_tree_in_files_eb5a451b: "Use new folder tree in Files"
+  use_new_rich_content_editor_with_enhanced_sidebar__8e0bfedd: "Use new rich content editor with enhanced sidebar everywhere"
   use_remote_service_for_notifications_9fe667c6: "Use remote service for notifications"
   use_remote_version_of_rich_content_editor_52f7fc4b: "Use remote version of Rich Content Editor"
   use_remote_version_of_rich_content_editor_and_side_a058a664: "Use remote version of Rich Content Editor AND sidebar"
@@ -18860,6 +18914,7 @@ en-GB:
   you_are_currently_masquerading_as_user_name_f4a00ade: "You are currently masquerading as %{user_name}"
   you_are_here_54075d8c: "You are here:"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "You are logged in at %{institution1} using your credentials from %{institution2}"
+  you_are_logged_out_of_canvas_8b5fc59a: "You are logged out of Canvas."
   you_are_not_authorized_to_disable_the_sync_to_name_d283c3e0: "You are not authorised to disable the Sync to %{name} option."
   you_are_not_authorized_to_disable_the_sync_to_sisn_54aebeb0: "You are not authorised to disable the Sync to %{sisName} option."
   you_are_not_enrolled_in_any_courses_a5c63286: "You are not enrolled in any courses."
