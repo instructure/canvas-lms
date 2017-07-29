@@ -153,7 +153,7 @@ da:
     account_required: "skal være LDAP-godkendt"
     index: 
       delete_auth_confirmation: "Er du sikker? Brugere vil muligvis ikke være i stand til at logge på, hvis denne slettes."
-      delete_auth_link: "Slet alle godkendelser"
+      delete_auth_link: "Fjern godkendelse"
       ip_address_list_description: "Hvis du bruger en godkendelsestjeneste, som kræver, at Canvas-serverne kontakter dine servere direkte, såsom LDAP, skal du sikre, at dine servere kan acceptere tilkoblinger fra disse IP-adresser:"
       no_auth_type_description: "Denne konto integrerer ikke med en identitetsudbyder på nuværende tidspunkt."
       page_title: Autentifikationsindstillinger
@@ -736,6 +736,11 @@ da:
             start: 
               parameters: 
                 header: "Start:"
+    embry_riddle_activity_report_csv_parameters: 
+      account_reports: 
+        embry_riddle: 
+          outcome: 
+            text: "Fagets SIS-mønstre (kommasepareret liste):"
     engagement_report_csv_parameters: 
       account_reports: 
         bryan_engagement: 
@@ -1732,6 +1737,9 @@ da:
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "App Center vises i fanen \"Apps\" på indstillingssiden til et fag eller konto. Den viste URL nedenfor skal pege på et gyldigt slutpunkt for App Center (for eksempel, %{url} -- husk at udelade den efterstillede streg"
   app_placements_6d877225: App-placeringer
   app_reregistration_87cc8817: "Genregistrering af app"
+  app_was_installed_by_admin_and_is_locked_3bee4d39: "%{app} blev installeret af admin og er låst"
+  app_was_installed_by_the_master_course_and_is_lock_dbeb24a6: "%{app} blev installeret af masterfaget og er låst"
+  app_was_installed_by_the_master_course_e55ba1d7: "%{app} blev installeret af masterfaget"
   appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "Føjer et tal til afslutningen af hver begivenhedsoverstitel (f.eks. Begivenhed 1, Begivenhed 2 osv.)"
   appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "Føjer et tal til afslutningen af hver begivenhedsoverskrift (f.eks. Begivenhed 1, Begivenhed 2 osv.)\" for=\"append_iterator"
   application: 
@@ -1805,6 +1813,9 @@ da:
   archive_3f794d7e: Arkiv
   archive_selected_d64506ca: "Valgt arkiv"
   are_you_sure_26795d3c: "Er du sikker?"
+  are_you_sure_you_want_to_archive_your_copies_of_th_7d219afe: 
+    one: "Er du sikker på, du vil arkivere din kopi af denne samtale?"
+    other: "Er du sikker på, du vil arkivere dine kopier af disse samtaler?"
   are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496: "Er du sikker på, du vil annullere? Ændringer, du har foretaget, bliver muligvis ikke gemt."
   are_you_sure_you_want_to_cancel_your_appointment_w_dbbd27eb: "Er du sikker på, du vil annullere din aftale med %{name}?"
   are_you_sure_you_want_to_copy_to_the_final_mark_th_28a7e7b3: "Er du sikker på, at du vil kopiere til den endelige karakter. Dette overskriver den eksisterende karakter."
@@ -1819,6 +1830,9 @@ da:
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: "Er du sikker på, at du ønsker at slette dette karakter periodesæt?"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Er du sikker på, at du vil slette denne karakterperiode?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Er du sikker på, at du vil slette denne karakterordning?"
+  are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
+    one: "Er du sikker på, du vil slette din kopi af denne samtale? Denne handling kan ikke fortrydes."
+    other: "Er du sikker på, du vil slette din kopi af disse samtaler? Denne handling kan ikke fortrydes."
   are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: "Er du sikker på, at du vil slette din reservation til denne begivenhed?"
   are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: "Er du sikker på, at du vil deaktivere Synkroniser til %{sisName} for alle opgaver?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Er du sikker på, at du vil gøre dette. Det kan ikke fortrydes og vil tilsidesætte eksisterende karakterer i karakterbogen."
@@ -1831,6 +1845,9 @@ da:
   are_you_sure_you_want_to_resync_these_grades_to_th_e509cb9e: "Er du sikker på, at du vil gensynkronisere disse karakterer i de studerendes informationssystem?"
   are_you_sure_you_want_to_submit_this_comment_fbe76ba6: "Er du sikker på, at du ønsker at indsende denne kommentar?"
   are_you_sure_you_want_to_sync_these_grades_to_the__ca3c28a4: "Er du sikker på, at du vil synkronisere disse karakterer i de studerendes informationssystem? Du bør kun gøre dette, hvis alle dine karakterer er færdigbehandlede."
+  are_you_sure_you_want_to_unarchive_these_conversat_ec7d7e8d: 
+    one: "Er du sikker på, du vil fjerne denne samtale fra arkivet?"
+    other: "Er du sikker på, du vil fjerne disse samtaler fra arkivet?"
   argentina_3257a200: Argentina
   argentina_54_375d6af4: "Argentina (+54)"
   arrange_by_34a545de: "Organiser efter"
@@ -3390,6 +3407,7 @@ da:
   click_here_it_s_free_eeccb9cb: "Klik her, det er gratis!"
   click_here_on_the_calendar_link_c9965631: "Klik her på *Kalender* link"
   click_here_to_download_size_of_file_74443988: "Klik her for at downloade %{size_of_file}"
+  click_here_to_log_in_again_4a6055de: "Klik her for at logge på igen"
   click_here_to_see_the_file_79e2b366: "Klik her for at se filen."
   click_here_to_view_ec8cb2fd: "klik her for at vise"
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Klik på et øjebliksbillede for at vende tilbage til din prøve, som den var, da øjebliksbilledet blev taget. Bemærk: Du vil miste det arbejde, du har udført, siden øjebliksbilledet blev taget, og det kan ikke fortrydes!"
@@ -6002,6 +6020,7 @@ da:
     edit_key: "Rediger denne nø"
     identifier: "Id: %{id}"
     redirect_uri: "URI: %{redirect_uri}"
+  developer_key_921ddbae: Udviklernøgle
   developer_key_form: 
     cancel: Annuller
     icon_url: "Ikon-URL:"
@@ -7437,6 +7456,10 @@ da:
   filter_replies_by_unread_342e8e90: "Filtrer svar efter ulæst"
   filter_replies_by_unread_caf870ea: "filtrer svar efter ulæst"
   filters_92f2776f: Filtre
+  final_grade_4d7f6545: "Endelig karakter"
+  final_grade_6938dca8: "Endelig karakter:"
+  final_grade_finalgrade_138d9e07: "Endelig karakter: %{finalGrade}"
+  final_grade_finalgrade_408580bb: "Endelig karakter: *%{finalGrade}*"
   final_grade_info_2aa35d25: "Endelig karakterinformation"
   final_grade_score_fe69a301: "Endelig karakter: %{score}"
   final_letter_grade_80dccec1: "Endelig bogstavkarakter"
@@ -7564,13 +7587,16 @@ da:
   gpa_scale_a6d1cdea: GPA-scala
   grade_10d1e5a1: "%{grade}"
   grade_9c6f076d: Karakter
+  grade_a91e433e: "Karakter:"
   grade_assignment_7c1abc11: "Karakter %{assignment}"
+  grade_changes_cb5a57a8: Karakterændringer
   grade_display_warning_dialog: 
     grade_display_warning: 
       checkbox: "Vis ikke for dette fag igen."
       warning: Advarsel
   grade_distribution_e52c9256: Karakterfordeling
   grade_export_title: Karaktereksport
+  grade_for_name_b9df168a: "Karakter for: %{name}"
   grade_high_to_low_1cea0381: "Karakter - høj til lav"
   grade_history_9c51ad49: "Karakteroversigt ..."
   grade_history_ccc09fde: Karakteroversigt
@@ -7725,7 +7751,7 @@ da:
       switch_to_points: "Skift til point"
     turnitin: 
       error_message: "Der opstod en fejl ved indsendelse til lighedsafsløringstjenesten. Prøv at genindsende filen, inden du kontakter support."
-      info_message: "Filen behandles stadig af Turnitin. Vend tilbage lidt senere for at se resultatet"
+      info_message: "Denne fil behandles stadigvæk af værktøjet til detektering af plagiat, som er tilknyttet opgaven. Du kan prøve igen senere for at se resultatet."
       resubmitting: "Sender igen ..."
       tooltip: 
         error: "Lighedsresultat - Se detaljerne for fejl ved indsendelse"
@@ -8219,9 +8245,9 @@ da:
       one: "Resultatet inkluderer ikke %{groups}, fordi det ikke har mulige point"
       other: "Resultatet inkluderer ikke %{groups}, fordi de ikke har mulige point"
     keyboard_assignment_desc: "Gå til den aktuelle opgaves detaljeside"
-    keyboard_close_menu: "Luk den aktive opgavemenu"
+    keyboard_close_menu: "Luk den aktuelt aktive menu"
     keyboard_comment_desc: "Kommenter på den aktive aflevering"
-    keyboard_menu_desc: "Åbn menuen for den aktive kolonnes opgave"
+    keyboard_menu_desc: "Åbn menuen for den aktive kolonne"
     keyboard_sort_desc: "Sorter gitteret på den aktuelt aktive kolonne"
     keyboard_tooltip_desc: "Vis afleveringstype for den aktive aflevering"
     keycodes: 
@@ -9261,6 +9287,12 @@ da:
   last_used_f9457313: "Sidst brugt:"
   last_user_access_title: "Sidste brugeradgang"
   late_2be42b88: Sen
+  late_8bd684b6: sen
+  late_bd436902: SEN
+  late_penalty_817fff4e: "Straf for sen aflevering:"
+  late_penalty_9c312b22: "Straf for sen aflevering"
+  late_penalty_pointsdeducted_7033a095: "Straf for sen aflevering: %{pointsDeducted}"
+  late_penalty_pointsdeducted_dac023ff: "Straf for sen aflevering: *%{pointsDeducted}*"
   late_percent_b91d01b3: "Sen: %{percent}"
   late_policies_42bac80: Sentpolitikker
   late_policies_fd5dced6: Sentpolitikker
@@ -9367,6 +9399,7 @@ da:
         quizzes: Quizzer
         rubrics: Rubrikker
         syllabus_body: "Pensum brødtekst"
+        tool_profiles: Værktøjsprofiler
         wikis: Wikisider
     cc: 
       standard: 
@@ -9477,9 +9510,11 @@ da:
     other: "Indlæsning af fag afsluttet: %{count} fag fundet"
   loading_courses_started_6e6d742c: "Indlæsning af fag påbegyndt"
   loading_data_ecd89ba: "Indlæsning af data ..."
+  loading_graders_f6a76142: "Eksaminatorer indlæses"
   loading_mastery_paths_c558a766: "Indlæser beherskelses-stier"
   loading_more_results_def6df65: "Indlæser flere resultater ..."
   loading_results_spinner_73ef739c: "Indlæser resultater-snurretop"
+  loading_students_30b71301: "Studerende indlæses"
   loading_sync_history_9f342cbf: "Indlæser synkroniseringshistorik"
   loading_unsynced_changes_b5d7b202: "Indlæser usynkroniserede ændringer"
   loading_unsynched_changes_688434f2: "Indlæser usynkroniserede ændringer"
@@ -9509,6 +9544,7 @@ da:
   log_on_url_fc166e4c: "Login url"
   log_out_379ba28a: "Log ud"
   log_out_url_2605c2c1: "Log ud url"
+  logged_out_724b3717: "Logget af"
   logged_out_user: "Bruger %{user_counter} logget ud"
   login: 
     canvas: 
@@ -9566,6 +9602,8 @@ da:
         log_out: "Er du sikker på, at du vil logge ud af Canvas?"
       log_out: "Log ud"
       page_title: "Log ud"
+    logout_landing: 
+      page_title: "Logget af"
     otp: 
       errors: 
         invalid_otp: "Ugyldig godkendelseskode, prøv igen"
@@ -11534,6 +11572,9 @@ da:
         subject: "Optagelse af webkonference er klar %{name}"
       twitter: 
         tweet: "Canvas-bemærkning - Optagelse er klar: %{title}, %{name}"
+  messages_deleted_8f781481: 
+    one: "Meddelelse slettet!"
+    other: "Meddelelser slettet!"
   mexico_52_60d635c7: "Mexico (+52)"
   mexico_b2d7a271: Mexico
   mgp_grade_export_d29b471f: "MGP karakter-eksport"
@@ -11560,6 +11601,7 @@ da:
     webct: 
       course_not_found: "Blackboard-faget blev ikke fundet."
     wiki_page_type: Wikiside
+  migration_in_progress_6f0ed4f9: "Overflytning i gang"
   migration_issues: 
     errors: 
       valid_workflow_state: "Skal sende gyldig status for workflow"
@@ -11571,6 +11613,8 @@ da:
   minutes_4aee5a41: Minutter
   minutes_per_slot_5b7169e5: "Minutter pr. tidsvindue"
   missing_1a256b3b: Mangler
+  missing_d59852a7: mangler
+  missing_eaddacbd: MANGLER
   missing_percent_94534638: "Mangler: %{percent}"
   missing_policies_4f195e0b: "Manglende politikker"
   missing_required_values_missing_values_f3be2ff8: "Mangler påkrævede værdier: %{missing_values}"
@@ -11990,6 +12034,7 @@ da:
   no_grade_assigned_90e531f5: "Der er ikke tildelt karakter."
   no_grade_for_assignment_97c9bc75: "Ingen karakter for %{assignment}"
   no_graded_submissions_e40c957a: "Ingen bedømte afleveringer"
+  no_graders_with_that_name_found_d8204d90: "Ingen eksaminatorer med dette navn blev fundet"
   no_grading_periods_configured_for_this_term_ca22393e: "ingen karakterperioder konfigureret for dette semester"
   no_grading_periods_set_up_a20a8819: "Ingen karakterperioder oprettet"
   no_grading_schemes_to_display_8b0e92e7: "Der kan ikke vises karakterordninger"
@@ -12009,6 +12054,7 @@ da:
   no_students_dd8de9f0: "Ingen studerende"
   no_students_have_taken_the_quiz_yet_e667644b: "Ingen studerende har taget quizzen endnu"
   no_students_have_taken_the_survey_yet_d378cd35: "Ingen studerende har gennemført spørgeundersøgelsen endnu"
+  no_students_with_that_name_found_f6004da2: "Ingen studerende med dette navn blev fundet"
   no_submission_for_assignment_a9cb6fe2: "Ingen indsendelse for %{assignment}"
   no_tls_618add1a: "Ingen TLS"
   no_unassigned_terms_deb7b76b: "Ingen utildelte betingelser"
@@ -12712,6 +12758,7 @@ da:
     errors: 
       delete_reminder_failed: "Sletning mislykkedes"
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "Peer reviews kan ikke aktiveres til modererede opgaver"
+  penalty_adjusted_707df573: "*%{penalty}* **%{adjusted}**"
   pending_3e506a5b: Afventer
   pending_message_2d9a8796: "Verserende: %{message}"
   people_b4ebb13c: Users
@@ -13214,6 +13261,7 @@ da:
   points_out_of_total_24f61148: "*%{points}* ud af **%{total}**"
   points_points_b6b422e2: "Point: %{points}"
   points_possible_1c0b3445: "Mulige point"
+  points_possible_44cb4190: "/ %{points_possible}"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Mulige point skal være 0 eller mere for valgt bedømmelsestype"
   points_possible_points_fda3b111: "%{points_possible} Points"
   points_pts_e5596bf7: "%{points} point"
@@ -13770,7 +13818,7 @@ da:
       labels: 
         title: Banknavn
       page_title: Spørgsmålsbanker
-      see_bookmarked_banks: "Se Mine banker i bogmærker"
+      see_bookmarked_banks: "Se bogmærkede banker"
       user_question_banks: "Brugerens spørgsmålsbanker"
     question_bank: 
       bookmark_bank: "Gem denne spørgsmålsbank i bogmærker"
@@ -15296,6 +15344,7 @@ da:
   reviewer_b993ce28: Bedømmer
   reviewers_successfully_added_bd4b629a: "Bedømmere blev tilføjet"
   rich_content_editor_2708ef21: "Rich Content Editor"
+  rich_content_editor_sidebar_enhancements_8bd945d3: "Forbedringer til Rich Content Editor-sidepanel"
   right_sidebar_logo_5483dc0a: "Højre sidepanel logo"
   role: 
     duplicate_role: "En rolle med dette navn eksisterer allerede"
@@ -15431,6 +15480,7 @@ da:
     course_files: "Fagets filer"
     group_files: Gruppefiler
     my_files: "Mine filer"
+  root_account_3fb3aacf: root_account
   root_accounts_cc035dcf: Rodkonti
   roster: 
     delete_confirm: "Er du sikker på, at du vil slette denne bruger?"
@@ -15500,6 +15550,7 @@ da:
         are_you_sure_delete: "Er du sikker op, at du ønsker at slette denne Rubric? Ethvert kursus, der for øjeblikket er tilknyttet med denne Rubric, vil stadig have adgang til den, men ingen nye kurser vil være i stand til at benytte den."
         are_you_sure_remove: "Er du sikker på, at du ønsker at fjerne denne Rubric fra din liste?"
       remove_rubric: "Fjern denne rubrik fra min liste"
+  russia_7_87bc99d5: "Rusland (+7)"
   salesforce_account_id_eb5c78ad: "Salesforce konto-id"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce bruger en anden login-host til sandbox-konti end den, der bruges til produktionskonti. Hvis du bruger en Salesforce sandbox-konto og ikke sætter flueben i dette felt, så er den ikke i stand til at godkende (og dette gælder også i modsat tilfælde, hvis du har en produktionskonto og IKKE sætter flueben i dette felt)"
   salesforce_ticketing_webtocase_connector_80f75716: "Salesforce Ticketing WebToCase Connector"
@@ -17488,6 +17539,7 @@ da:
   there_was_an_error_uploading_the_image_932fc4ce: "Der var en fejl under upload of billedet"
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "Der opstod en fejl med din forespørgsel. Prøv en anden søgning"
   there_was_an_unexpected_problem_with_the_sync_be079a67: "Der opstod et uventet problem med synkroniseringen"
+  there_was_an_unknown_error_registering_the_tool_b9a29954: "Der opstod en ukendt fejl ved registrering af værktøjet"
   there_were_errors_with_the_form_errors_ab5b559a: "Der opstod fejl med formularen: %{errors}"
   there_were_several_possible_matches_with_the_impor_ad58bcd0: "Der var flere mulige match med importen. Løs dem nedenfor."
   these_backup_codes_can_be_used_if_your_multi_facto_ca30a3df: "Disse sikkerhedskoder kan bruges, hvis din multi-faktor-autentificering ikke er tilgængelig. Udskriv dem og behold dem på et sikkert sted, fx i din pung."
@@ -17902,6 +17954,7 @@ da:
     originality_report_visible_immediately: Straks
   turnitin_similarity_score_more_information_e2571be8: "Turnitin similarity score -- yderligere oplysninger"
   twitter_fcef6b54: Twitter
+  type_a_few_letters_to_start_searching_3334657b: "Indtast et par bogstaver for at starte søgning"
   type_c8106334: Type
   type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: "'%{type}' er ikke en gyldig billedfiltype (prøv jpg, png  eller gif)"
   type_of_change_1cb24a0e: Ændringstype
@@ -18056,6 +18109,7 @@ da:
   use_mathman_to_convert_latex_to_svg_3f61c9b: "Benyt MathMan til at konvertere LaTeX til SVG?"
   use_new_folder_tree_in_files_bc0ea09f: "Brug træet Ny mappe i filer"
   use_new_folder_tree_in_files_eb5a451b: "Benyt nye mappetræ i filer"
+  use_new_rich_content_editor_with_enhanced_sidebar__8e0bfedd: "Brug ny Rich Content Editor med forbedret sidepanel overalt"
   use_remote_service_for_notifications_9fe667c6: "Brug fjernservice for meddelelser"
   use_remote_version_of_rich_content_editor_52f7fc4b: "Brug fjernversion af Rich Content Editor"
   use_remote_version_of_rich_content_editor_and_side_a058a664: "Brug fjernversion af Rich Content Editor OG sidepanel"
@@ -18822,6 +18876,7 @@ da:
   you_are_currently_masquerading_as_user_name_f4a00ade: "Du maskerer dig aktuelt som %{user_name}"
   you_are_here_54075d8c: "Du er her:"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "Du er logget ind på %{institution1} med dine brugeroplysninger fra %{institution2}"
+  you_are_logged_out_of_canvas_8b5fc59a: "Du er logget af Canvas."
   you_are_not_authorized_to_disable_the_sync_to_name_d283c3e0: "Du er ikke autoriseret til at deaktivere muligheden Synkroniser til %{name}."
   you_are_not_authorized_to_disable_the_sync_to_sisn_54aebeb0: "Du er ikke autoriseret til at deaktivere muligheden Synkroniser til %{sisName}."
   you_are_not_enrolled_in_any_courses_a5c63286: "Du er ikke tilmeldt fag."
