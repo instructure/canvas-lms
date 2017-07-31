@@ -24,6 +24,26 @@ describe "CanvasHttp" do
 
   include WebMock::API
 
+  describe ".post" do
+    it "allows you to send a body" do
+      url = "www.example.com/a"
+      body = "abc"
+      stub_request(:post, url).with(body: "abc").
+        to_return(status: 200)
+      expect(CanvasHttp.post(url, body: body).code).to eq "200"
+    end
+
+    it "allows you to set a content_type" do
+      url = "www.example.com/a"
+      body = "abc"
+      content_type = "plain/text"
+      stub_request(:post, url).with(body: "abc", :headers => {'Content-Type'=>content_type}).
+        to_return(status: 200)
+      expect(CanvasHttp.post(url, body: body, content_type: content_type).code).to eq "200"
+    end
+
+  end
+
   describe ".get" do
     it "should return response objects" do
       stub_request(:get, "http://www.example.com/a/b").

@@ -52,7 +52,7 @@ module Lti
                                        developer_key: developer_key)
         process_resources(tp, tool_proxy)
         create_proxy_binding(tool_proxy, context)
-        create_tool_settings(tp, tool_proxy)
+        create_or_update_tool_settings(tp, tool_proxy)
       end
 
       tool_proxy.reload
@@ -221,8 +221,13 @@ module Lti
       end
     end
 
-    def create_tool_settings(tp, tool_proxy)
-      ToolSetting.create!(tool_proxy:tool_proxy, custom: tp.custom) if tp.custom.present?
+    def create_or_update_tool_settings(tp, tool_proxy)
+      if tp.custom.present?
+        tool_setting = ToolSetting.where(tool_proxy:tool_proxy).first_or_create!
+        custom = tool_setting.custom || {}
+        tool_setting.update(custom: custom.merge(tp.custom) )
+      end
+
     end
 
     def create_json(obj)

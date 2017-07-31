@@ -239,14 +239,13 @@ module Lti
           fixture_file = File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json')
           tool_proxy_fixture = JSON.parse(File.read(fixture_file))
 
-          tcp_url = polymorphic_url([@course.account, :tool_consumer_profile],
-                                    tool_consumer_profile_id: Lti::ToolConsumerProfile::DEFAULT_TCP_UUID)
+          tcp_url = polymorphic_url([@course.account, :tool_consumer_profile])
           tool_proxy_fixture["tool_consumer_profile"] = tcp_url
 
           headers = {'VND-IMS-CONFIRM-URL' => 'Routing based on arbitrary headers, Barf!'}.merge(oauth1_header)
           response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", params: tool_proxy_fixture.to_json, headers: headers
 
-          expect(response).to eq 200
+          expect(response).to eq 201
 
           tool_proxy.reload
           expect(tool_proxy.update_payload).to eq({

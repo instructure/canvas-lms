@@ -8,7 +8,7 @@ module Lti::Errors
     end
 
     def as_json
-      @json[:error] = @message if @message
+      @json['error'] = @message if @message
       @json
     end
 

@@ -301,7 +301,7 @@ module Lti
       end
       let(:reregistration_message_handler) do
         MessageHandler.create!(
-          message_type: IMS::LTI::Models::Messages::ToolProxyReregistrationRequest::MESSAGE_TYPE,
+          message_type: IMS::LTI::Models::Messages::ToolProxyUpdateRequest::MESSAGE_TYPE,
           launch_path: 'https://samplelaunch/rereg',
           resource_handler: default_resource_handler
         )

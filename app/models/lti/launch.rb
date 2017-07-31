@@ -19,7 +19,7 @@ module Lti
   class Launch
 
     attr_writer :analytics_id, :analytics_message_type
-    attr_accessor :link_text, :resource_url, :params, :launch_type, :tool_dimensions
+    attr_accessor :link_text, :resource_url, :params, :launch_type, :tool_dimensions, :base_string
 
     def initialize(options = {})
       @post_only = options[:post_only]

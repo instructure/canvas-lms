@@ -22,25 +22,32 @@ module Lti
       include Lti::ApiServiceHelper
       include Lti::Ims::AccessTokenHelper
 
+      TOOL_PROXY_COLLECTION = 'ToolProxy.collection'.freeze
+      TOOL_PROXY_ITEM = 'ToolProxy.item'.freeze
+
       SERVICE_DEFINITIONS = [
         {
-          id: 'ToolProxy.collection',
+          id: TOOL_PROXY_COLLECTION,
           endpoint: ->(context) { "api/lti/#{context.class.name.downcase}s/#{context.id}/tool_proxy" },
           format: ['application/vnd.ims.lti.v2.toolproxy+json'].freeze,
           action: ['POST'].freeze
         }.freeze,
         {
-          id: 'ToolProxy.item',
+          id: TOOL_PROXY_ITEM,
           endpoint: 'api/lti/tool_proxy/{tool_proxy_guid}',
           format: ['application/vnd.ims.lti.v2.toolproxy+json'].freeze,
           action: ['GET'].freeze
         }.freeze
       ].freeze
 
+      def lti2_service_name
+        [TOOL_PROXY_COLLECTION, TOOL_PROXY_ITEM]
+      end
+
       before_action :require_context, :except => [:show]
       skip_before_action :load_user, only: [:create, :show, :re_reg]
 
-      rescue_from Lti::Errors::InvalidToolProxyError do |exception|
+      rescue_from Lti::Errors::InvalidToolProxyError, IMS::LTI::Errors::InvalidToolConsumerProfile do |exception|
         render json: exception.as_json, status: 400
       end
 
@@ -79,14 +86,23 @@ module Lti
       end
 
       def re_reg
-        tp = ToolProxy.where(guid: oauth_consumer_key).first
-
-        unless oauth_authenticated_request?(tp.shared_secret)
-          return render(json: {error: 'unauthorized'}, status: :unauthorized)
+        tp = nil
+        if oauth2_request?
+          begin
+            validate_access_token!
+            tp = ToolProxy.find_by guid: access_token.sub
+          rescue Lti::Oauth2::InvalidTokenError
+            render_unauthorized and return
+          end
+        elsif request.authorization.present?
+          tp = ToolProxy.find_by guid: oauth_consumer_key
+          render_unauthorized and return unless oauth_authenticated_request?(tp.shared_secret)
+        else
+          render_unauthorized and return
         end
 
         unless tp_validator.valid?
-          raise Lti::ToolProxyService::InvalidToolProxyError.new "Invalid Tool Proxy", tp_validator.errors.to_json
+          raise Lti::Errors::InvalidToolProxyError.new "Invalid Tool Proxy", tp_validator.errors.as_json
         end
 
         json = {
@@ -110,7 +126,7 @@ module Lti
         end
 
         tp.save
-        render json: json
+        render json: json, status: :created, content_type: 'application/vnd.ims.lti.v2.toolproxy.id+json'
       rescue JSON::ParserError
         render json: {error: 'Invalid request'}, status: 400
       end
@@ -143,16 +159,18 @@ module Lti
         )
       end
 
-      def tp_validator
-        @tp_validator ||= begin
-          tcp_url = polymorphic_url([@context, :tool_consumer_profile],
-                                    tool_consumer_profile_id: Lti::ToolConsumerProfile::DEFAULT_TCP_UUID)
-          profile = Lti::ToolConsumerProfileCreator.new(@context, tcp_url).create
-
-          tp_validator = IMS::LTI::Services::ToolProxyValidator.new(IMS::LTI::Models::ToolProxy.from_json(payload))
-          tp_validator.tool_consumer_profile = profile
-          tp_validator
-        end
+      def tp_validator(tcp_uuid:nil)
+        tcp_path = [@context, :tool_consumer_profile]
+        tcp_url = tcp_uuid ? polymorphic_url(tcp_path, tool_consumer_profile_id: tcp_uuid) : polymorphic_url(tcp_path)
+        profile = Lti::ToolConsumerProfileCreator.new(
+          @context,
+          tcp_url,
+          tcp_uuid: tcp_uuid,
+          developer_key: developer_key
+        ).create
+        tp_validator = IMS::LTI::Services::ToolProxyValidator.new(IMS::LTI::Models::ToolProxy.from_json(payload))
+        tp_validator.tool_consumer_profile = profile
+        tp_validator
       end
     end
   end
