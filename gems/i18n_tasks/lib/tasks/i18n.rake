@@ -430,7 +430,7 @@ HEADER
       end
 
       puts "Downloading tmp/#{lang}.yml"
-      json = `curl --user #{userpass} #{translation_url}/#{transifex_lang}/`
+      json = `curl -L --user #{userpass} #{translation_url}/#{transifex_lang}/`
       parsed = YAML.load(JSON.parse(json)['content'])
       File.open("tmp/#{lang}.yml", "w") do |file|
         file.write({ lang => parsed[transifex_lang] }.to_yaml)
