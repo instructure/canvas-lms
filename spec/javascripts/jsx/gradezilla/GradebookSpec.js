@@ -4457,51 +4457,6 @@ QUnit.module('Gradebook#updateFrozenColumnsAndRenderGrid', {
   }
 });
 
-test('updates the frozen column count', function () {
-  this.gradebook.updateFrozenColumnsAndRenderGrid();
-
-  strictEqual(this.gradebook.grid.setNumberOfColumnsToFreeze.callCount, 1);
-});
-
-test('updates the frozen column count to the number of parentColumns', function () {
-  this.gradebook.updateFrozenColumnsAndRenderGrid();
-
-  strictEqual(this.gradebook.grid.setNumberOfColumnsToFreeze.firstCall.args[0], 3);
-});
-
-test('sets the columns of the grid', function () {
-  const setColumnsSpy = this.spy(this.gradebook.grid, 'setColumns');
-
-  this.gradebook.updateFrozenColumnsAndRenderGrid();
-
-  strictEqual(setColumnsSpy.callCount, 1);
-});
-
-test('sets the columns of the grid to the provided columns', function () {
-  const setColumnsSpy = this.spy(this.gradebook.grid, 'setColumns');
-  const newColumns = [
-    { id: 'one' },
-    { id: 'two' },
-    { id: 'three' },
-    { id: 'four' },
-    { id: 'five' },
-  ];
-
-  this.gradebook.updateFrozenColumnsAndRenderGrid(newColumns);
-
-  deepEqual(setColumnsSpy.firstCall.args[0], newColumns);
-});
-
-test('sets the columns of the grid to the return value of getVisibleGradeGridColumns if no args given', function () {
-  const setColumnsSpy = this.spy(this.gradebook.grid, 'setColumns');
-  const { parentColumns, allAssignmentColumns, aggregateColumns } = this.gradebook;
-  const expectedColumns = [...parentColumns, ...allAssignmentColumns, ...aggregateColumns];
-
-  this.gradebook.updateFrozenColumnsAndRenderGrid();
-
-  deepEqual(setColumnsSpy.firstCall.args[0], expectedColumns);
-});
-
 test('invalidates the grid, forcing a re-render', function () {
   this.gradebook.updateFrozenColumnsAndRenderGrid();
 
