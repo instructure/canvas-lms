@@ -144,7 +144,7 @@ import './vendor/ui.selectmenu'
     groupLabel = I18n.t('group', 'Group'),
     gradeeLabel = studentLabel,
     utils,
-    crocodocSessionTimer,
+    sessionTimer,
     isAdmin = _.include(ENV.current_user_roles, 'admin'),
     showSubmissionOverride,
     EG;
@@ -1532,7 +1532,7 @@ import './vendor/ui.selectmenu'
       }
     },
     handleSubmissionSelectionChange: function(){
-      clearInterval(crocodocSessionTimer);
+      clearInterval(sessionTimer);
 
       function currentIndex (context, submissionToViewVal) {
         var result;
@@ -1860,7 +1860,7 @@ import './vendor/ui.selectmenu'
     },
 
     loadSubmissionPreview: function(attachment, submission) {
-      clearInterval(crocodocSessionTimer);
+      clearInterval(sessionTimer);
       $submissions_container.children().hide();
       $(".speedgrader_alert").hide();
       if (!this.currentStudent.submission || !this.currentStudent.submission.submission_type || this.currentStudent.submission.workflow_state == 'unsubmitted') {
@@ -1926,6 +1926,30 @@ import './vendor/ui.selectmenu'
       ).show();
     },
 
+    generateWarningTimings (numHours) {
+      const sessionLimit = numHours * 60 * 60 * 1000;
+      return [
+        sessionLimit - (10 * 60 * 1000),
+        sessionLimit - (5 * 60 * 1000),
+        sessionLimit - (2 * 60 * 1000),
+        sessionLimit - (1 * 60 * 1000)
+      ];
+    },
+
+    displayExpirationWarnings (aggressiveWarnings, numHours, message) {
+      const start = new Date();
+      const sessionLimit = numHours * 60 * 60 * 1000;
+      sessionTimer = window.setInterval(() => {
+        const elapsed = new Date() - start;
+        if (elapsed > sessionLimit) {
+          window.location.reload();
+        } else if (elapsed > aggressiveWarnings[0]) {
+          $.flashWarning(message);
+          aggressiveWarnings.shift();
+        }
+      }, 1000);
+    },
+
     renderAttachment: function(attachment) {
       // show the crocodoc doc if there is one
       // then show the google attachment if there is one
@@ -1944,32 +1968,29 @@ import './vendor/ui.selectmenu'
       if (!attachment.hijack_crocodoc_session && attachment.submitted_to_crocodoc && !attachment.crocodoc_url) {
         $("#crocodoc_pending").show();
       }
+      const canvadocMessage = I18n.t('canvadoc_expiring',
+        'Your Canvas DocViewer session is expiring soon.  Please ' +
+        'reload the window to avoid losing any work.');
 
       if (attachment.crocodoc_url) {
         if (!attachment.hijack_crocodoc_session) {
-          var crocodocStart = new Date()
-          ,   sessionLimit = 60 * 60 * 1000
-          ,   aggressiveWarnings = [50 * 60 * 1000,
-                                    55 * 60 * 1000,
-                                    58 * 60 * 1000,
-                                    59 * 60 * 1000];
-            crocodocSessionTimer = window.setInterval(function() {
-              var elapsed = new Date() - crocodocStart;
-              if (elapsed > sessionLimit) {
-                window.location.reload();
-              } else if (elapsed > aggressiveWarnings[0]) {
-                alert(I18n.t("crocodoc_expiring",
-                             "Your Crocodoc session is expiring soon.  Please reload " +
-                             "the window to avoid losing any work."));
-                aggressiveWarnings.shift();
-              }
-            }, 1000);
+          const crocodocMessage = I18n.t('crocodoc_expiring',
+            'Your Crocodoc session is expiring soon.  Please reload ' +
+            'the window to avoid losing any work.');
+          const aggressiveWarnings = this.generateWarningTimings(1)
+          this.displayExpirationWarnings(aggressiveWarnings, 1, crocodocMessage);
+        } else {
+          const aggressiveWarnings = this.generateWarningTimings(10)
+          this.displayExpirationWarnings(aggressiveWarnings, 10, canvadocMessage);
         }
 
         $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
           crocodoc_session_url: (attachment.provisional_crocodoc_url || attachment.crocodoc_url)
         }));
       } else if (attachment.canvadoc_url) {
+        const aggressiveWarnings = this.generateWarningTimings(10)
+        this.displayExpirationWarnings(aggressiveWarnings, 10, canvadocMessage);
+
         $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
           canvadoc_session_url: (attachment.provisional_canvadoc_url || attachment.canvadoc_url)
         }));
