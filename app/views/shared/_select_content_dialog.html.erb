@@ -162,8 +162,8 @@
         <div style="margin-top: 5px;">
         <select class="module_item_select" aria-label="<%= t 'wiki_page_select_label_cloned', 'Select the content bank page you want to associate.' %>" multiple>
           <%# cache on the context.wiki instead of just the context because even though it will require a db query, we will get a much better cache hit rate %>
-          <% cache([Course.find(CONTENT_BANK).wiki, 'non_deleted_bank_wiki_pages']) do  %>
-            <% Course.find(CONTENT_BANK).wiki.wiki_pages.not_deleted.select([:id, :title]).each do |page| %>
+          <% cache([Course.find(CONTENT_BANK).wiki, 'published_bank_wiki_pages']) do  %>
+            <% Course.find(CONTENT_BANK).wiki.wiki_pages.published.select([:id, :title]).each do |page| %>
               <% if page && !page.new_record? %>
                 <option value="<%= page.id %>"><%= page.title %></option>
               <% end %>
@@ -262,6 +262,7 @@
           <% Course.find(CONTENT_BANK).assignment_groups.active.include_active_assignments.each do |group| %>
             <optgroup label="<%= group.name %>">
             <% group.active_assignments.no_graded_quizzes_or_topics.limit(200).each do |assignment| %>
+              <% next if assignment.workflow_state != 'published' %>
               <option value="<%= assignment.id %>"><%= assignment.title %></option>
             <% end %>
             </optgroup>
