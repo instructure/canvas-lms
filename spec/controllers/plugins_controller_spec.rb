@@ -34,12 +34,14 @@ describe PluginsController do
 
     context "account_reports" do
       it 'can disable reports' do
-        ps = PluginSetting.new(name: 'account_reports', account_id: Account.default.id)
+        ps = PluginSetting.new(name: 'account_reports')
         ps.settings = { course_storage_csv: true }.with_indifferent_access
         ps.save!
 
         allow(controller).to receive(:require_setting_site_admin).and_return(true)
-        put 'update', params: {id: 'account_reports', account_id: Account.default.id, settings: { 'course_storage_csv' => '0' }}
+        # The 'all' parameter is necessary for this test to pass when the
+        # multiple root acoounts plugin is installed
+        put 'update', params: {id: 'account_reports', settings: { 'course_storage_csv' => '0' }, all: 1}
         expect(response).to be_redirect
         ps.reload
         expect(ps.settings[:course_storage_csv]).to eq false
