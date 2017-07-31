@@ -136,7 +136,7 @@ class GradeChangeAuditApiController < AuditorApiController
   # @returns [GradeChangeEvent]
   #
   def for_assignment
-    return render_unauthorized_action unless authorize
+    return render_unauthorized_action unless admin_authorized?
 
     @assignment = Assignment.active.find(params[:assignment_id])
     unless @assignment.context.root_account == @domain_root_account
@@ -160,11 +160,17 @@ class GradeChangeAuditApiController < AuditorApiController
   # @returns [GradeChangeEvent]
   #
   def for_course
-    return render_unauthorized_action unless authorize
+    begin
+      course = Course.find(params[:course_id])
+    rescue ActiveRecord::RecordNotFound => not_found
+      return render_unauthorized_action unless admin_authorized?
+      raise not_found
+    end
 
-    @course = @domain_root_account.all_courses.find(params[:course_id])
-    events = Auditors::GradeChange.for_course(@course, query_options)
-    render_events(events, polymorphic_url([:api_v1, :audit_grade_change, @course]))
+    return render_unauthorized_action unless course_authorized?(course)
+
+    events = Auditors::GradeChange.for_course(course, query_options)
+    render_events(events, polymorphic_url([:api_v1, :audit_grade_change, course]))
   end
 
   # @API Query by student.
@@ -180,7 +186,7 @@ class GradeChangeAuditApiController < AuditorApiController
   # @returns [GradeChangeEvent]
   #
   def for_student
-    return render_unauthorized_action unless authorize
+    return render_unauthorized_action unless admin_authorized?
 
     @student = User.active.find(params[:student_id])
     unless @domain_root_account.associated_user?(@student)
@@ -204,7 +210,7 @@ class GradeChangeAuditApiController < AuditorApiController
   # @returns [GradeChangeEvent]
   #
   def for_grader
-    return render_unauthorized_action unless authorize
+    return render_unauthorized_action unless admin_authorized?
 
     @grader = User.active.find(params[:grader_id])
     unless @domain_root_account.associated_user?(@grader)
@@ -216,9 +222,14 @@ class GradeChangeAuditApiController < AuditorApiController
   end
 
   def for_course_and_other_parameters
-    return render_unauthorized_action unless authorize
+    begin
+      course = Course.find(params[:course_id])
+    rescue ActiveRecord::RecordNotFound => not_found
+      return render_unauthorized_action unless admin_authorized?
+      raise not_found
+    end
 
-    course = @domain_root_account.all_courses.find(params[:course_id])
+    return render_unauthorized_action unless course_authorized?(course)
 
     args = { course: course }
     args[:assignment] = course.assignments.find(params[:assignment_id]) if params[:assignment_id]
@@ -247,8 +258,12 @@ class GradeChangeAuditApiController < AuditorApiController
 
   private
 
-  def authorize
+  def admin_authorized?
     @domain_root_account.grants_right?(@current_user, session, :view_grade_changes)
+  end
+
+  def course_authorized?(course)
+    course.grants_right?(@current_user, session, :manage_grades)
   end
 
   def render_events(events, route)

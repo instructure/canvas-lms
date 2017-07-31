@@ -60,7 +60,7 @@ def api_call(method, path, params, body_params = {}, headers = {}, opts = {})
   end
 
   case params[:format]
-  when 'json'
+  when 'json', :json
     raise "got non-json" unless response.header[content_type_key] == 'application/json; charset=utf-8'
 
     body = response.body
