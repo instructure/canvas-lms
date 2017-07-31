@@ -25,6 +25,8 @@ class Assignment
       @user = user
       @avatars = avatars
       @grading_role = grading_role
+      account_context = @course.try(:account) || @course.try(:root_account)
+      @should_migrate_to_canvadocs = account_context.present? && account_context.migrate_to_canvadocs?
     end
 
     def json
@@ -115,7 +117,7 @@ class Assignment
       end
       res[:context][:quiz] = @assignment.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
 
-      includes = [:versions, :quiz_submission, :user, :attachment_associations, :assignment, :originality_reports]
+      includes = [{ versions: :versionable }, :quiz_submission, :user, :attachment_associations, :assignment, :originality_reports]
       key = @grading_role == :grader ? :submission_comments : :all_submission_comments
       includes << {key => {submission: {assignment: { context: :root_account }}}}
       submissions = @assignment.submissions.where(:user_id => students).preload(*includes)
@@ -202,6 +204,8 @@ class Assignment
 
         if json['submission_history'] && (@assignment.quiz.nil? || too_many)
           json['submission_history'] = json['submission_history'].map do |version|
+            # to avoid a call to the DB in Submission#missing?
+            version.assignment = sub.assignment
             version.as_json(only: submission_fields,
                             methods: %i[versioned_attachments late missing external_tool_url]).tap do |version_json|
               version_json['submission']['has_originality_report'] = version.versioned_originality_reports.present?
@@ -216,7 +220,7 @@ class Assignment
                     json[:attachment][:canvadoc_url] = a.canvadoc_url(@user, url_opts)
                     json[:attachment][:crocodoc_url] = a.crocodoc_url(@user, url_opts)
                     json[:attachment][:submitted_to_crocodoc] = a.crocodoc_document.present?
-                    json[:attachment][:hijack_crocodoc_session] = a.crocodoc_document&.should_migrate_to_canvadocs?
+                    json[:attachment][:hijack_crocodoc_session] = a.crocodoc_document.present? && @should_migrate_to_canvadocs
                   end
                 end
               end
