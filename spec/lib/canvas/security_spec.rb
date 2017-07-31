@@ -199,4 +199,16 @@ describe Canvas::Security do
       end
     end
   end
+
+  describe '.config' do
+    before { described_class.instance_variable_set(:@config, nil) }
+    after  { described_class.instance_variable_set(:@config, nil) }
+
+    it 'loads config as erb from config/security.yml' do
+      config = "test:\n  encryption_key: <%= ENV['ENCRYPTION_KEY'] %>"
+      expect(File).to receive(:read).with(Rails.root + 'config/security.yml').and_return(config)
+      expect(ENV).to receive(:[]).with('ENCRYPTION_KEY').and_return('secret')
+      expect(Canvas::Security.config).to eq('encryption_key' => 'secret')
+    end
+  end
 end
