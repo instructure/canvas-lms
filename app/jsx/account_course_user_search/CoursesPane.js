@@ -49,6 +49,7 @@ class CoursesPane extends React.Component {
       with_students: false,
       sort: 'sis_course_id',
       order: 'asc',
+      search_by: 'course',
     }
 
     this.state = {
@@ -144,14 +145,14 @@ class CoursesPane extends React.Component {
           courses={courses.data}
           roles={this.props.roles}
           addUserUrls={this.props.addUserUrls}
-          sort={this.state.filters.sort}
-          order={this.state.filters.order}
+          sort={filters.sort}
+          order={filters.order}
         />
 
         {renderSearchMessage(courses, this.fetchMoreCourses, I18n.t('No courses found'))}
       </div>
     )
   }
-  }
+}
 
 export default CoursesPane
