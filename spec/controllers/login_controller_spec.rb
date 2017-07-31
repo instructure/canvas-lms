@@ -149,10 +149,18 @@ describe LoginController do
 
     it "follows CAS logout redirect to CAS server" do
       account_with_cas(account: Account.default)
-      session[:login_aac] = Account.default.authentication_providers.first
+      session[:login_aac] = Account.default.authentication_providers.first.id
       delete 'destroy'
       expect(response.status).to eq 302
       expect(response.location).to match(%r{localhost/cas/})
+    end
+
+    it "returns you to Canvas login if you logged in via Canvas, but something else is the primary provider" do
+      account_with_saml(account: Account.default, saml_log_out_url: 'https://www.google.com/')
+      session[:login_aac] = Account.default.canvas_authentication_provider.id
+      delete 'destroy'
+      expect(response.status).to eq 302
+      expect(response.location).to match(%r{/login/canvas$})
     end
   end
 
