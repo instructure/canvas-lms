@@ -1646,4 +1646,8 @@ class Account < ActiveRecord::Base
     return work.call if Rails.env.test?
     self.class.connection.after_transaction_commit(&work)
   end
+
+  def migrate_to_canvadocs?
+    Canvadocs.hijack_crocodoc_sessions? && feature_enabled?(:new_annotations)
+  end
 end
