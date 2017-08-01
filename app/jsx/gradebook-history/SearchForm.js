@@ -46,10 +46,7 @@ class SearchFormComponent extends Component {
     assignments: recordShape.isRequired,
     graders: recordShape.isRequired,
     students: recordShape.isRequired,
-    byAssignment: func.isRequired,
-    byDate: func.isRequired,
-    byGrader: func.isRequired,
-    byStudent: func.isRequired,
+    getGradeHistory: func.isRequired,
     clearSearchOptions: func.isRequired,
     getSearchOptions: func.isRequired,
     getSearchOptionsNextPage: func.isRequired,
@@ -69,6 +66,10 @@ class SearchFormComponent extends Component {
       students: I18n.t('Type a few letters to start searching')
     }
   };
+
+  componentDidMount () {
+    this.props.getGradeHistory(this.state.selected);
+  }
 
   componentWillReceiveProps ({
     fetchHistoryStatus,
@@ -116,19 +117,21 @@ class SearchFormComponent extends Component {
   }
 
   setSelectedFrom = (from) => {
+    const startOfFrom = from ? moment(from).startOf('day').format() : '';
     this.setState(prevState => ({
       selected: {
         ...prevState.selected,
-        from
+        from: startOfFrom
       }
     }));
   }
 
   setSelectedTo = (to) => {
+    const endOfTo = to ? moment(to).endOf('day').format() : '';
     this.setState(prevState => ({
       selected: {
         ...prevState.selected,
-        to
+        to: endOfTo
       }
     }));
   }
@@ -173,22 +176,11 @@ class SearchFormComponent extends Component {
   }
 
   hasFromBeforeTo () {
-    return moment(this.state.selected.to).diff(moment(this.state.selected.from), 'days') >= 0;
+    return moment(this.state.selected.to).diff(moment(this.state.selected.from), 'seconds') >= 0;
   }
 
   hasValidTimeFrame () {
     return this.hasFromBeforeTo() || this.hasOneDate() || this.hasNoDates();
-  }
-
-  timeFrame () {
-    if (this.hasValidTimeFrame()) {
-      const from = this.state.selected.from ? moment(this.state.selected.from).startOf('day').format() : '';
-      const to = this.state.selected.to ? moment(this.state.selected.to).endOf('day').format() : '';
-
-      return { from, to };
-    }
-
-    return { from: '', to: '' };
   }
 
   promptUserEntry = () => {
@@ -223,17 +215,7 @@ class SearchFormComponent extends Component {
       return;
     }
 
-    const { assignment, grader, student } = this.state.selected;
-
-    if (assignment) {
-      this.props.byAssignment(assignment, this.timeFrame());
-    } else if (grader) {
-      this.props.byGrader(grader, this.timeFrame());
-    } else if (student) {
-      this.props.byStudent(student, this.timeFrame());
-    } else if (this.hasValidTimeFrame() && !this.hasNoDates()) {
-      this.props.byDate(this.timeFrame());
-    }
+    this.props.getGradeHistory(this.state.selected);
   }
 
   filterNone = options => (
@@ -356,17 +338,8 @@ const mapStateToProps = state => (
 
 const mapDispatchToProps = dispatch => (
   {
-    byAssignment: (assignmentId, timeFrame) => {
-      dispatch(SearchFormActions.getHistoryByAssignment(assignmentId, timeFrame));
-    },
-    byDate: (timeFrame) => {
-      dispatch(SearchFormActions.getHistoryByDate(timeFrame));
-    },
-    byGrader: (graderId, timeFrame) => {
-      dispatch(SearchFormActions.getHistoryByGrader(graderId, timeFrame));
-    },
-    byStudent: (studentId, timeFrame) => {
-      dispatch(SearchFormActions.getHistoryByStudent(studentId, timeFrame));
+    getGradeHistory: (input) => {
+      dispatch(SearchFormActions.getGradeHistory(input));
     },
     getSearchOptions: (recordType, searchTerm) => {
       dispatch(SearchFormActions.getSearchOptions(recordType, searchTerm));

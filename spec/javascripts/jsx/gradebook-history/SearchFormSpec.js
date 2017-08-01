@@ -18,11 +18,7 @@
 
 import React from 'react';
 import { mount, shallow } from 'enzyme';
-import moment from 'moment';
-import environment from 'jsx/gradebook-history/environment';
-import GradebookHistoryStore from 'jsx/gradebook-history/store/GradebookHistoryStore';
 import { SearchFormComponent } from 'jsx/gradebook-history/SearchForm';
-import SearchFormActions from 'jsx/gradebook-history/actions/SearchFormActions';
 import Autocomplete from 'instructure-ui/lib/components/Autocomplete';
 import Button from 'instructure-ui/lib/components/Button';
 import DateInput from 'instructure-ui/lib/components/DateInput';
@@ -30,26 +26,10 @@ import FormFieldGroup from 'instructure-ui/lib/components/FormFieldGroup';
 import { destroyContainer } from 'jsx/shared/FlashAlert';
 import Fixtures from 'spec/jsx/gradebook-history/Fixtures';
 
-const functionStubHelper = (dispatchStub, functionToDispatch) => (
-  (id, timeFrame) => {
-    dispatchStub(functionToDispatch(id, timeFrame))
-  }
-);
-
-const stretchTimeFrame = timeFrame => (
-  {
-    from: moment(timeFrame.from).startOf('day').format(),
-    to: moment(timeFrame.to).endOf('day').format()
-  }
-);
-
 const defaultProps = () => (
   {
     fetchHistoryStatus: 'started',
-    byAssignment () {},
-    byDate () {},
-    byGrader () {},
-    byStudent () {},
+    getGradeHistory () {},
     clearSearchOptions () {},
     getSearchOptions () {},
     getSearchOptionsNextPage () {},
@@ -117,23 +97,17 @@ test('has a Button for submitting', function () {
   ok(this.wrapper.find(Button).exists());
 });
 
+test('calls getGradeHistory prop on mount', function () {
+  const props = { getGradeHistory: this.stub() };
+  const wrapper = mount(<SearchFormComponent {...defaultProps()} {...props} />);
+  strictEqual(props.getGradeHistory.callCount, 1);
+  wrapper.unmount();
+});
+
 QUnit.module('SearchForm when button is clicked', {
   setup () {
-    this.getHistoryByAssignmentStub = this.stub(SearchFormActions, 'getHistoryByAssignment');
-    this.getHistoryByDateStub = this.stub(SearchFormActions, 'getHistoryByDate');
-    this.getHistoryByGraderStub = this.stub(SearchFormActions, 'getHistoryByGrader');
-    this.getHistoryByStudentStub = this.stub(SearchFormActions, 'getHistoryByStudent');
-    this.dispatchStub = this.stub(GradebookHistoryStore, 'dispatch');
-
-    const props = {
-      fetchHistoryStatus: 'success',
-      byAssignment: functionStubHelper(this.dispatchStub, this.getHistoryByAssignmentStub),
-      byDate: functionStubHelper(this.dispatchStub, this.getHistoryByDateStub),
-      byGrader: functionStubHelper(this.dispatchStub, this.getHistoryByGraderStub),
-      byStudent: functionStubHelper(this.dispatchStub, this.getHistoryByStudentStub)
-    };
-
-    this.wrapper = mountComponent(props);
+    this.props = { getGradeHistory: this.stub() };
+    this.wrapper = mountComponent(this.props);
   },
 
   teardown () {
@@ -141,166 +115,20 @@ QUnit.module('SearchForm when button is clicked', {
   }
 });
 
-test('does nothing when all fields are blank', function () {
-  const emptyState = {
-    selected: {
-      assignment: '',
-      grader: '',
-      student: '',
-      from: '',
-      to: ''
-    }
+test('dispatches with the state of input', function () {
+  const selected = {
+    assignment: '1',
+    grader: '2',
+    student: '3',
+    from: '2017-05-20T00:00:00-05:00',
+    to: '2017-05-21T00:00:00-05:00'
   };
-  this.wrapper.setState({ emptyState }, () => {
-    this.wrapper.find(Button).simulate('click');
-    equal(this.dispatchStub.callCount, 0);
-  });
-});
 
-test('dispatches when assignment not empty', function () {
-  this.wrapper.setState({ selected: { assignment: '1' } }, () => {
-    this.wrapper.find(Button).simulate('click');
-    equal(this.dispatchStub.callCount, 1);
-  });
-});
-
-test('dispatches when grader not empty', function () {
-  this.wrapper.setState({ selected: { grader: '1' } }, () => {
-    this.wrapper.find(Button).simulate('click');
-    equal(this.dispatchStub.callCount, 1);
-  });
-});
-
-test('dispatches when student not empty', function () {
-  this.wrapper.setState({ selected: { student: '1' } }, () => {
-    this.wrapper.find(Button).simulate('click');
-    equal(this.dispatchStub.callCount, 1);
-  });
-});
-
-test('dispatches getHistoryByAssignment with assignment id and timeFrame', function () {
-  const assignment = '1010';
-  const timeFrame = Fixtures.timeFrame();
   this.wrapper.setState({
-    selected: {
-      assignment,
-      from: timeFrame.from,
-      to: timeFrame.to
-    }
+    selected
   }, () => {
     this.wrapper.find(Button).simulate('click');
-    equal(this.getHistoryByAssignmentStub.firstCall.args[0], assignment);
-    deepEqual(this.getHistoryByAssignmentStub.firstCall.args[1], stretchTimeFrame(timeFrame));
-  });
-});
-
-test('dispatches getHistoryByGrader with grader id and timeFrame', function () {
-  const grader = '1011';
-  const timeFrame = Fixtures.timeFrame();
-  this.wrapper.setState({
-    selected: {
-      grader,
-      from: timeFrame.from,
-      to: timeFrame.to
-    }
-  }, () => {
-    this.wrapper.find(Button).simulate('click');
-    equal(this.getHistoryByGraderStub.firstCall.args[0], grader);
-    deepEqual(this.getHistoryByGraderStub.firstCall.args[1], stretchTimeFrame(timeFrame));
-  });
-});
-
-test('dispatches getHistoryByStudent with student id and timeFrame', function () {
-  const student = '1100';
-  const timeFrame = Fixtures.timeFrame();
-  this.wrapper.setState({
-    selected: {
-      student,
-      from: timeFrame.from,
-      to: timeFrame.to
-    }
-  }, () => {
-    this.wrapper.find(Button).simulate('click');
-    equal(this.getHistoryByStudentStub.firstCall.args[0], student);
-    deepEqual(this.getHistoryByStudentStub.firstCall.args[1], stretchTimeFrame(timeFrame));
-  });
-});
-
-test('dispatches getHistoryByDate with timeFrame', function () {
-  const timeFrame = Fixtures.timeFrame();
-  this.wrapper.setState({
-    selected: {
-      from: timeFrame.from,
-      to: timeFrame.to
-    }
-  }, () => {
-    this.wrapper.find(Button).simulate('click');
-    deepEqual(this.getHistoryByDateStub.firstCall.args[0], stretchTimeFrame(timeFrame));
-  });
-});
-
-test('does not dispatch when to date is earlier than from date', function () {
-  const assignment = '1101';
-  const earlyDate = '2017-01-01T00:00:00-00:00';
-  const futureDate = '2017-01-02T00:00:00-00:00';
-  this.wrapper.setState({
-    selected: {
-      assignment,
-      from: futureDate,
-      to: earlyDate
-    }
-  }, () => {
-    this.wrapper.find(Button).simulate('click');
-    equal(this.dispatchStub.callCount, 0);
-    equal(this.getHistoryByAssignmentStub.callCount, 0);
-  });
-});
-
-test('dispatches with empty strings if no dates selected', function () {
-  const assignment = '1110';
-  this.wrapper.setState({ selected: { assignment } }, () => {
-    const timeFrame = {
-      from: '',
-      to: ''
-    };
-    this.wrapper.find(Button).simulate('click');
-    deepEqual(this.getHistoryByAssignmentStub.firstCall.args[1], timeFrame);
-  });
-});
-
-test('dispatches with empty string and from date if only from date available', function () {
-  const assignment = '1101';
-  const earlyDate = '2017-01-01T00:00:00-00:00';
-  this.wrapper.setState({
-    selected: {
-      assignment,
-      from: earlyDate,
-    }
-  }, () => {
-    const timeFrame = {
-      from: moment(earlyDate).startOf('day').format(),
-      to: ''
-    };
-    this.wrapper.find(Button).simulate('click');
-    deepEqual(this.getHistoryByAssignmentStub.firstCall.args[1], timeFrame);
-  });
-});
-
-test('dispatches with empty string and to date if only to date available', function () {
-  const assignment = '1101';
-  const futureDate = '2017-01-02T00:00:00-00:00';
-  this.wrapper.setState({
-    selected: {
-      assignment,
-      to: futureDate,
-    }
-  }, () => {
-    const timeFrame = {
-      from: '',
-      to: moment(futureDate).endOf('day').format()
-    };
-    this.wrapper.find(Button).simulate('click');
-    deepEqual(this.getHistoryByAssignmentStub.firstCall.args[1], timeFrame);
+    deepEqual(this.props.getGradeHistory.firstCall.args[0], selected);
   });
 });
 
@@ -326,8 +154,6 @@ test('turning from started to failure displays an AjaxFlashAlert', function () {
 
 QUnit.module('SearchForm Autocomplete', {
   setup () {
-    this.courseId = '341';
-    this.stub(environment, 'courseId').returns(this.courseId);
     this.props = {
       ...defaultProps(),
       fetchHistoryStatus: 'started',

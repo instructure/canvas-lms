@@ -110,10 +110,10 @@ QUnit.module('SearchFormActions', function () {
   });
 });
 
-QUnit.module('SearchFormActions getHistoryByAssignment', {
+QUnit.module('SearchFormActions getGradeHistory', {
   setup () {
     this.response = Fixtures.historyResponse();
-    this.getByAssignmentStub = this.stub(HistoryApi, 'getByAssignment')
+    this.getGradeHistoryStub = this.stub(HistoryApi, 'getGradeHistory')
       .returns(Promise.resolve(this.response));
 
     this.dispatchSpy = this.spy(GradebookHistoryStore, 'dispatch');
@@ -122,161 +122,40 @@ QUnit.module('SearchFormActions getHistoryByAssignment', {
 
 test('dispatches fetchHistoryStart', function () {
   const fetchSpy = this.spy(HistoryActions, 'fetchHistoryStart');
-  const promise = this.dispatchSpy(SearchFormActions.getHistoryByAssignment(1));
+  const promise = this.dispatchSpy(SearchFormActions.getGradeHistory({}));
   return promise.then(() => {
-    equal(fetchSpy.callCount, 1);
+    strictEqual(fetchSpy.callCount, 1);
   });
 });
 
 test('dispatches fetchHistorySuccess on success', function () {
   const fetchSpy = this.spy(HistoryActions, 'fetchHistorySuccess');
-  const promise = this.dispatchSpy(SearchFormActions.getHistoryByAssignment(1));
+  const promise = this.dispatchSpy(SearchFormActions.getGradeHistory({}));
   return promise.then(() => {
-    equal(fetchSpy.callCount, 1);
+    strictEqual(fetchSpy.callCount, 1);
+    deepEqual(fetchSpy.firstCall.args[0], this.response.data);
+    deepEqual(fetchSpy.firstCall.args[1], this.response.headers);
   });
 });
 
 test('dispatches fetchHistoryFailure on failure', function () {
-  this.getByAssignmentStub.returns(Promise.reject(new Error('FAIL')));
+  this.getGradeHistoryStub.returns(Promise.reject(new Error('FAIL')));
   const fetchSpy = this.spy(HistoryActions, 'fetchHistoryFailure');
-  const promise = this.dispatchSpy(SearchFormActions.getHistoryByAssignment(1));
+  const promise = this.dispatchSpy(SearchFormActions.getGradeHistory({}));
   return promise.then(() => {
-    equal(fetchSpy.callCount, 1);
-  });
-});
-
-QUnit.module('SearchFormActions getHistoryByDate', function (hooks) {
-  hooks.beforeEach(function () {
-    this.response = Fixtures.historyResponse();
-    this.timeFrame = Fixtures.timeFrame();
-    this.getByDateStub = sinon.stub(HistoryApi, 'getByDate')
-      .returns(Promise.resolve(this.response));
-
-    this.dispatchSpy = sinon.spy(GradebookHistoryStore, 'dispatch');
-  });
-
-  hooks.afterEach(function () {
-    this.getByDateStub.restore();
-    this.dispatchSpy.restore();
-  });
-
-  test('dispatches fetchHistoryStart', function (assert) {
-    const done = assert.async();
-    const fetchSpy = sinon.spy(HistoryActions, 'fetchHistoryStart');
-    const promise = this.dispatchSpy(SearchFormActions.getHistoryByDate(this.timeFrame));
-
-    promise.then(() => {
-      strictEqual(fetchSpy.callCount, 1);
-      fetchSpy.restore();
-      done();
-    });
-  });
-
-  test('dispatches fetchHistorySuccess on success', function (assert) {
-    const done = assert.async();
-    const fetchSpy = sinon.spy(HistoryActions, 'fetchHistorySuccess');
-    const promise = this.dispatchSpy(SearchFormActions.getHistoryByDate(this.timeFrame));
-
-    promise.then(() => {
-      strictEqual(fetchSpy.callCount, 1);
-      fetchSpy.restore();
-      done();
-    });
-  });
-
-  test('dispatches fetchHistoryFailure on failure', function (assert) {
-    this.getByDateStub.returns(Promise.reject(new Error('FAIL')));
-    const done = assert.async();
-    const fetchSpy = sinon.spy(HistoryActions, 'fetchHistoryFailure');
-    const promise = this.dispatchSpy(SearchFormActions.getHistoryByDate(this.timeFrame));
-
-    promise.then(() => {
-      strictEqual(fetchSpy.callCount, 1);
-      fetchSpy.restore();
-      done();
-    });
-  });
-});
-
-QUnit.module('SearchFormActions getHistoryByGrader', {
-  setup () {
-    this.response = Fixtures.historyResponse();
-    this.getByGraderStub = this.stub(HistoryApi, 'getByGrader')
-      .returns(Promise.resolve(this.response));
-
-    this.dispatchSpy = this.spy(GradebookHistoryStore, 'dispatch');
-  }
-});
-
-test('dispatches fetchHistoryStart', function () {
-  const fetchSpy = this.spy(HistoryActions, 'fetchHistoryStart');
-  const promise = this.dispatchSpy(SearchFormActions.getHistoryByGrader(1));
-  return promise.then(() => {
-    equal(fetchSpy.callCount, 1);
-  });
-});
-
-test('dispatches fetchHistorySuccess on success', function () {
-  const fetchSpy = this.spy(HistoryActions, 'fetchHistorySuccess');
-  const promise = this.dispatchSpy(SearchFormActions.getHistoryByGrader(1));
-  return promise.then(() => {
-    equal(fetchSpy.callCount, 1);
-  });
-});
-
-test('dispatches fetchHistoryFailure on failure', function () {
-  this.getByGraderStub.returns(Promise.reject(new Error('FAIL')));
-  const fetchSpy = this.spy(HistoryActions, 'fetchHistoryFailure');
-  const promise = this.dispatchSpy(SearchFormActions.getHistoryByGrader(1));
-  return promise.then(() => {
-    equal(fetchSpy.callCount, 1);
-  });
-});
-
-QUnit.module('SearchFormActions getHistoryByStudent', {
-  setup () {
-    this.response = Fixtures.historyResponse();
-    this.getByStudentStub = this.stub(HistoryApi, 'getByStudent')
-      .returns(Promise.resolve(this.response));
-
-    this.dispatchSpy = this.spy(GradebookHistoryStore, 'dispatch');
-  }
-});
-
-test('dispatches fetchHistoryStart', function () {
-  const fetchSpy = this.spy(HistoryActions, 'fetchHistoryStart');
-  const promise = this.dispatchSpy(SearchFormActions.getHistoryByStudent(1));
-  return promise.then(() => {
-    equal(fetchSpy.callCount, 1);
-  });
-});
-
-test('dispatches fetchHistorySuccess on success', function () {
-  const fetchSpy = this.spy(HistoryActions, 'fetchHistorySuccess');
-  const promise = this.dispatchSpy(SearchFormActions.getHistoryByStudent(1));
-  return promise.then(() => {
-    equal(fetchSpy.callCount, 1);
-  });
-});
-
-test('dispatches fetchHistoryFailure on failure', function () {
-  this.getByStudentStub.returns(Promise.reject(new Error('FAIL')));
-  const fetchSpy = this.spy(HistoryActions, 'fetchHistoryFailure');
-  const promise = this.dispatchSpy(SearchFormActions.getHistoryByStudent(1));
-  return promise.then(() => {
-    equal(fetchSpy.callCount, 1);
+    strictEqual(fetchSpy.callCount, 1);
   });
 });
 
 QUnit.module('SearchFormActions getSearchOptions', {
   setup () {
-    const userResponse = {
+    this.userResponse = {
       data: Fixtures.userArray(),
       headers: { link: 'http://example.com/link-to-next-page' }
     };
 
     this.getUsersByNameStub = this.stub(UserApi, 'getUsersByName')
-      .returns(Promise.resolve(userResponse));
+      .returns(Promise.resolve(this.userResponse));
 
     this.dispatchSpy = this.spy(GradebookHistoryStore, 'dispatch');
   }
@@ -295,6 +174,8 @@ test('dispatches fetchRecordsSuccess on success', function () {
   const promise = this.dispatchSpy(SearchFormActions.getSearchOptions('graders', 'Norval'));
   return promise.then(() => {
     strictEqual(fetchSpy.callCount, 1);
+    deepEqual(fetchSpy.firstCall.args[0], this.userResponse);
+    strictEqual(fetchSpy.firstCall.args[1], 'graders');
   });
 });
 
@@ -309,13 +190,12 @@ test('dispatches fetchRecordsFailure on failure', function () {
 
 QUnit.module('SearchFormActions getSearchOptionsNextPage', function (hooks) {
   hooks.beforeEach(function () {
-    const userResponse = {
+    this.userResponse = {
       data: Fixtures.userArray(),
       headers: { link: 'http://example.com/link-to-next-page' }
     };
-
     this.getUsersNextPageStub = sinon.stub(UserApi, 'getUsersNextPage')
-      .returns(Promise.resolve(userResponse));
+      .returns(Promise.resolve(this.userResponse));
 
     this.dispatchSpy = sinon.spy(GradebookHistoryStore, 'dispatch');
   });
@@ -339,6 +219,8 @@ QUnit.module('SearchFormActions getSearchOptionsNextPage', function (hooks) {
     const promise = this.dispatchSpy(SearchFormActions.getSearchOptionsNextPage('graders', 'https://example.com'));
     return promise.then(() => {
       strictEqual(fetchSpy.callCount, 1);
+      deepEqual(fetchSpy.firstCall.args[0], this.userResponse);
+      strictEqual(fetchSpy.firstCall.args[1], 'graders');
       fetchSpy.restore();
     });
   });
