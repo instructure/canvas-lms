@@ -1438,9 +1438,9 @@ da:
   add_icon_567dbcaa: "tilføj ikon"
   add_link_5c01c1e8: "Tilføj link"
   add_link_fc336ed6: "Tilføj link"
-  add_moderator_review_copy_1st_a484c813: "Tilføj moderatorevaluering (kopier 1.)"
-  add_moderator_review_copy_2nd_e80d458f: "Tilføj moderatorevaluering (kopier 2.)"
-  add_moderator_review_new_3c183cea: "Tilføj moderatorevaluering (Ny)"
+  add_moderator_review_copy_1st_a484c813: "Tilføj censorbedømmelse (kopier først)"
+  add_moderator_review_copy_2nd_e80d458f: "Tilføj censorbedømmelse (kopier anden)"
+  add_moderator_review_new_3c183cea: "Tilføj censorbedømmelse (Ny)"
   add_module_item: 
     add_assignment_to: "Tilføj en opgave til %{module}"
     add_file_to: "Tilføj filer til %{module}"
@@ -1665,7 +1665,7 @@ da:
   announcement: 
     no_title: "Ingen overskrift"
   announcement_creation_failed_f7d227f5: "Oprettelse af besked mislykkedes"
-  announcement_ends_at_4ccc2a7e: "Besked udkøber d."
+  announcement_ends_at_4ccc2a7e: "Besked udløber den"
   announcement_fb4cb645: Besked
   announcement_not_found_d6d124c3: "Besked ikke fundet"
   announcement_starts_at_2e987a38: "Besked starter den"
@@ -7500,7 +7500,7 @@ da:
       invalid_root_folder_name: "Rodmappens navn kan ikke ændres"
     folder_created: "Mappe \"%{name}\" oprettet"
   folder_705fd2d7: mappe
-  folder_browsing_tree_1f00a3ae: Mappe-træ
+  folder_browsing_tree_1f00a3ae: Mappestruktur
   folder_icon_29017021: Mappe-ikon
   folders: 
     event_updated: "Begivenhed blev opdateret."
@@ -8610,13 +8610,13 @@ da:
         saving: "Gemmer ..."
         where_to_move: "Hvor vil du gerne flytte *%{userName}*?"
       group_categories: 
-        account_group_explanation: "Studiegrupper på konto-niveau er en god måde at gruppere studerende uden at de behøver være tilmeldt samme fag. Hver studiegruppe råder over sin egen kalender, diskussionsforum og samarbejdsværktøjer, så de selv kan organisere deres samarbejde på en mere effektiv måde."
+        account_group_explanation: "Studiegrupper på kontoniveau er en god måde at gruppere studerende uden at de behøver være tilmeldt samme fag. Hver studiegruppe råder over sin egen kalender, diskussionsforum og samarbejdsværktøjer, så de selv kan organisere deres samarbejde på en mere effektiv måde."
         add_group_set: "Tilføj gruppesæt"
         course_group_explanation: "Studiegrupper er en god måde at gruppere studerende for ting såsom gruppeprojekter eller opgaver. Hver studiegruppe råder over sin egen kalender, diskussionsforum og samarbejdsværktøjer, så de selv kan organisere deres samarbejde på en mere effektiv måde."
         group_assignment_instructions: "Du kan vælge vilkårlige studerende til grupper af en specifik størrelse, eller manuelt oprette og organisere grupperne. Når dine grupper er oprettet, kan du indstille opgaver til at være opgaver med \"Gruppeaflevering\", hvilket betyder, at hver gruppe har én aflevering, som gælder for alle medlemmerne i den pågældende gruppe."
         group_set: Gruppesæt
         headings: 
-          account_groups: "Studiegrupper på konto-niveau"
+          account_groups: "Studiegrupper på kontoniveau"
           course_groups: Studiegrupper
           groups: Grupper
         tabs: 
@@ -9052,7 +9052,7 @@ da:
   information_7f11072: information
   information_816d9fa5: information
   information_icon_8a514faa: Informationsikon
-  inner_box_background_6f9092f: "Invendigt felt baggrund"
+  inner_box_background_6f9092f: "Baggrund for invendigt felt"
   inner_box_border_d0524b03: "Kant til indre felt"
   input_and_distribute_grades_for_students_display_g_95b9b6ee: |-
       Indtast og distribuer karakterer for studerende. Vis karakterer som
@@ -12539,7 +12539,7 @@ da:
   outcome_results_title: Læringsmålsresultater
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Resultat: %{title} har en status for %{statusTooltip}"
   outcomes: 
-    account_standards: Konto-standarder
+    account_standards: Kontostandarder
     account_standards_description: "Til venstre kan du se de standarder, som din institution har oprettet for dig til brug i dine fag."
     blank_error: "Kan ikke være tom"
     browser: 
@@ -13077,7 +13077,7 @@ da:
         player_ui_conf: "Player UI konf ID"
         resource_domain: Ressourcedomæne
         rtmp_domain: RTMP-domæne
-        secret_key: "Administrator hemmelighed"
+        secret_key: Administratorhemmelighed
         subpartner_id: "Sub Partner ID"
         upload_ui_conf: "Uploader UI konf ID"
         user_secret_key: "Bruger hemmelighed"
@@ -13892,8 +13892,8 @@ da:
       page_blurred: "Stoppede med at vise side til Canvas-quizzen ..."
       page_focused: Genoptaget.
       question_answered: 
-        one: "Besvaret spørgsmål:"
-        other: "Svaret følgende spørgsmål:"
+        one: "Besvarede spørgsmål:"
+        other: "Besvarede følgende spørgsmål:"
       question_flagged: "Afmærket spørgsmål:"
       question_unflagged: "Ikke afmærket spørgsmål:"
       question_viewed: 
@@ -14809,7 +14809,7 @@ da:
           update_scores: "Opdater resultater"
         labels: 
           final_score: "Endeligt resultat"
-          fudge_points: "Fudge Point"
+          fudge_points: "Rediger points"
           fudge_points_changed_points_quiz: "Siden %{user} tog denne quiz, er antallet af mulige point blevet ændret med %{difference}. Du kan justere for denne ændring og tilføje positive eller negative point manuelt ved brug af dette felt."
           fudge_points_changed_points_survey: "Siden %{user} deltog i denne spørgeundersøgelse, er antallet af mulige point blevet ændret med %{difference}. Du kan justere for denne ændring og tilføje positive eller negative point manuelt ved brug af dette felt."
           fudge_points_generic_explanation: "Du kan justere resultatet manuelt ved at føje positive eller negative point til dette felt."
@@ -15144,7 +15144,7 @@ da:
     files_heading: Filer
     files_toolbar: Filværktøjslinje
     folder: Mappe
-    folder_browsing_tree: Mappe-træ
+    folder_browsing_tree: Mappestruktur
     folder_name: Mappenavn
     loading_more_results: "Loader flere resultater..."
     modified_by: "Modificeret af"
@@ -16436,7 +16436,7 @@ da:
       delete_criterion_row: "Slet kriteriumsrække"
       description: 
         custom_comments_area: "Dette område bruges af bedømmeren til at efterlade kommentarer i forbindelse med dette vurderingskriterium."
-      full_marks: Topkarakter
+      full_marks: "Fulde point"
       icons: 
         add_new_rating_after: "Tilføj en ny bedømmelseskategori efter aktuel bedømmelse"
         additional_comments: "Yderligere kommentarer"
@@ -16493,7 +16493,7 @@ da:
     rubric_summary_criterion: 
       defaults: 
         description: "Beskrivelse af vurderingskriterium"
-      full_marks: Topkarakter
+      full_marks: "Fulde point"
       labels: 
         long_description: "Lang beskrivelse"
       links: 
@@ -16620,7 +16620,7 @@ da:
       drop_files: "Slip filer her for at uploade"
       drop_images: "Slip billeder her for at uploade"
       file_size_limit: "grænse %{size} pr. fil"
-      files_remaining: "*0* tilbage at overføre"
+      files_remaining: "*0* tilbage at uploade"
       files_tab: "Klik på en vilkårlig fil for at indsætte et download-link til den pågældende fil."
       group_links: "Link til andet indhold i gruppen."
       headings: 
