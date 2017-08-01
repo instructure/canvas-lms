@@ -161,12 +161,9 @@
         </div>
         <div style="margin-top: 5px;">
         <select class="module_item_select" aria-label="<%= t 'wiki_page_select_label_cloned', 'Select the content bank page you want to associate.' %>" multiple>
-          <%# cache on the context.wiki instead of just the context because even though it will require a db query, we will get a much better cache hit rate %>
-          <% cache([Course.find(CONTENT_BANK).wiki, 'published_bank_wiki_pages']) do  %>
-            <% Course.find(CONTENT_BANK).wiki.wiki_pages.published.select([:id, :title]).each do |page| %>
-              <% if page && !page.new_record? %>
-                <option value="<%= page.id %>"><%= page.title %></option>
-              <% end %>
+          <% Course.find(CONTENT_BANK).wiki.wiki_pages.published.select([:id, :title]).each do |page| %>
+            <% if page && !page.new_record? %>
+              <option value="<%= page.id %>"><%= page.title %></option>
             <% end %>
           <% end %>
         </select>
