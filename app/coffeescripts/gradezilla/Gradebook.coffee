@@ -262,9 +262,16 @@ define [
       @courseContent.students = new StudentDatastore(@students, @studentViewStudents)
 
       @parentColumns = []
-      @customColumns = {}
       @allAssignmentColumns = []
       @aggregateColumns = []
+
+      @gradebookGrid = {
+        columns: {
+          definitions: {}
+          frozen: []
+          scrollable: []
+        }
+      }
       @rows = []
 
       @initPostGradesStore()
@@ -460,7 +467,7 @@ define [
       @gradebookContent.customColumns = columns
       columns.forEach (column) =>
         customColumn = @buildCustomColumn(column)
-        @customColumns[customColumn.id] = customColumn
+        @gradebookGrid.columns.definitions[customColumn.id] = customColumn
 
     gotCustomColumnDataChunk: (column, columnData) =>
       studentIds = []
@@ -1443,7 +1450,7 @@ define [
       @userFilter.el.disabled = disabled
       @userFilter.el.setAttribute('aria-disabled', disabled)
 
-    getVisibleGradeGridColumns: ->
+    setVisibleGridColumns: ->
       assignmentColumns = @filterAssignmentColumns(@allAssignmentColumns)
 
       if @gradebookColumnOrderSettings?.sortType
@@ -1454,9 +1461,15 @@ define [
       else
         assignmentColumns.concat(@aggregateColumns)
 
-      customColumns = @listVisibleCustomColumns().map((column) => @customColumns[@getCustomColumnId(column.id)])
+      customColumns = @listVisibleCustomColumns().map((column) => @gradebookGrid.columns.definitions[@getCustomColumnId(column.id)])
       frozenColumns = @parentColumns.concat(customColumns)
-      frozenColumns.concat(scrollableColumns)
+
+      @gradebookGrid.columns.frozen = frozenColumns.map((column) -> column.id)
+      @gradebookGrid.columns.scrollable = scrollableColumns.map((column) -> column.id)
+
+    getVisibleGradeGridColumns: ->
+      [@gradebookGrid.columns.frozen..., @gradebookGrid.columns.scrollable...].map (columnId) =>
+        @gradebookGrid.columns.definitions[columnId]
 
     ## Grid Column Definitions
 
@@ -1586,15 +1599,23 @@ define [
     initGrid: =>
       @updateFilteredContentInfo()
 
-      @parentColumns.push(@buildStudentColumn())
+      studentColumn = @buildStudentColumn()
+      @parentColumns.push(studentColumn)
+      @gradebookGrid.columns.definitions[studentColumn.id] = studentColumn
 
       for id, assignment of @assignments
-        @allAssignmentColumns.push(@buildAssignmentColumn(assignment))
+        assignmentColumn = @buildAssignmentColumn(assignment)
+        @allAssignmentColumns.push(assignmentColumn)
+        @gradebookGrid.columns.definitions[assignmentColumn.id] = assignmentColumn
 
-      @aggregateColumns = for id, assignmentGroup of @assignmentGroups
-        @buildAssignmentGroupColumn(assignmentGroup)
+      for id, assignmentGroup of @assignmentGroups
+        assignmentGroupColumn = @buildAssignmentGroupColumn(assignmentGroup)
+        @aggregateColumns.push(assignmentGroupColumn)
+        @gradebookGrid.columns.definitions[assignmentGroupColumn.id] = assignmentGroupColumn
 
-      @aggregateColumns.push(@buildTotalGradeColumn())
+      totalGradeColumn = @buildTotalGradeColumn()
+      @aggregateColumns.push(totalGradeColumn)
+      @gradebookGrid.columns.definitions[totalGradeColumn.id] = totalGradeColumn
 
       @renderGridColor()
       @createGrid()
@@ -1613,6 +1634,7 @@ define [
         numberOfColumnsToFreeze: @listVisibleCustomColumns().length + 1
       }, @options)
 
+      @setVisibleGridColumns()
       @grid = new Slick.Grid('#gradebook_grid', @rows, @getVisibleGradeGridColumns(), options)
       @grid.setSortColumn('student')
 
@@ -1935,7 +1957,7 @@ define [
       columnsToReplace = @grid.getOptions().numberOfColumnsToFreeze
       callback()
       cols = @grid.getColumns()
-      customColumns = @listVisibleCustomColumns().map((column) => @customColumns[@getCustomColumnId(column.id)])
+      customColumns = @listVisibleCustomColumns().map((column) => @gradebookGrid.columns.definitions[@getCustomColumnId(column.id)])
       cols.splice 0, columnsToReplace,
         @parentColumns..., customColumns...
       @grid.setColumns(cols)
@@ -2031,6 +2053,7 @@ define [
       @updateColumnHeaders()
 
     updateColumnsAndRenderViewOptionsMenu: =>
+      @setVisibleGridColumns()
       @grid.setColumns(@getVisibleGradeGridColumns())
       @updateColumnHeaders()
       @renderViewOptionsMenu()
@@ -2486,7 +2509,7 @@ define [
         .then (response) =>
           @gradebookContent.customColumns.push(response.data)
           teacherNotesColumn = @buildCustomColumn(response.data)
-          @customColumns[teacherNotesColumn.id] = teacherNotesColumn
+          @gradebookGrid.columns.definitions[teacherNotesColumn.id] = teacherNotesColumn
           @showNotesColumn()
           @setTeacherNotesColumnUpdating(false)
           @renderViewOptionsMenu()
