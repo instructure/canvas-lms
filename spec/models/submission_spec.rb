@@ -998,7 +998,7 @@ describe Submission do
   end
 
   context "Discussion Topic" do
-    it "should use correct date for its submitted_at value" do
+    it "submitted_at does not change when a second discussion entry is created" do
       course_with_student(:active_all => true)
       @topic = @course.discussion_topics.create(:title => "some topic")
       @assignment = @course.assignments.create(:title => "some discussion assignment")
@@ -1007,12 +1007,12 @@ describe Submission do
       @entry1 = @topic.discussion_entries.create(:message => "first entry", :user => @user)
       @topic.assignment_id = @assignment.id
       @topic.save!
-      @submission = @assignment.submissions.where(:user_id => @user.id).first
+
       Timecop.freeze(30.minutes.from_now) do
-        @entry2 = @topic.discussion_entries.create(:message => "second entry", :user => @user)
+        expect do
+          @topic.discussion_entries.create(:message => "second entry", :user => @user)
+        end.not_to(change { @assignment.submissions.find_by(user: @user).submitted_at })
       end
-      @submission.reload
-      expect((@submission.submitted_at.to_i - @submission.created_at.to_i).abs).to be < 1.minute.to_i
     end
 
     it "should not create multiple versions on submission for discussion topics" do
