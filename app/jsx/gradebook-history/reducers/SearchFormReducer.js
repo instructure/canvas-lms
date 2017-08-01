@@ -18,16 +18,22 @@
 
 import parseLinkHeader from 'jsx/shared/parseLinkHeader';
 import {
-  FETCH_USERS_BY_NAME_START,
-  FETCH_USERS_BY_NAME_SUCCESS,
-  FETCH_USERS_BY_NAME_FAILURE,
-  FETCH_USERS_NEXT_PAGE_START,
-  FETCH_USERS_NEXT_PAGE_SUCCESS,
-  FETCH_USERS_NEXT_PAGE_FAILURE
+  CLEAR_RECORDS,
+  FETCH_RECORDS_START,
+  FETCH_RECORDS_SUCCESS,
+  FETCH_RECORDS_FAILURE,
+  FETCH_RECORDS_NEXT_PAGE_START,
+  FETCH_RECORDS_NEXT_PAGE_SUCCESS,
+  FETCH_RECORDS_NEXT_PAGE_FAILURE
 } from 'jsx/gradebook-history/actions/SearchFormActions';
 
 const initialState = {
-  options: {
+  records: {
+    assignments: {
+      fetchStatus: null,
+      items: [],
+      nextPage: null
+    },
     graders: {
       fetchStatus: null,
       items: [],
@@ -43,13 +49,13 @@ const initialState = {
 
 function searchForm (state = initialState, { type, payload }) {
   switch (type) {
-    case FETCH_USERS_BY_NAME_START: {
+    case FETCH_RECORDS_START: {
       return {
         ...state,
-        options: {
-          ...state.options,
-          [payload.userType]: {
-            ...state.options[payload.userType],
+        records: {
+          ...state.records,
+          [payload.recordType]: {
+            ...state.records[payload.recordType],
             fetchStatus: 'started',
             items: [],
             nextPage: null
@@ -57,13 +63,13 @@ function searchForm (state = initialState, { type, payload }) {
         }
       };
     }
-    case FETCH_USERS_BY_NAME_SUCCESS: {
+    case FETCH_RECORDS_SUCCESS: {
       return {
         ...state,
-        options: {
-          ...state.options,
-          [payload.userType]: {
-            ...state.options[payload.userType],
+        records: {
+          ...state.records,
+          [payload.recordType]: {
+            ...state.records[payload.recordType],
             fetchStatus: 'success',
             items: payload.data,
             nextPage: parseLinkHeader(payload.link).next
@@ -71,13 +77,13 @@ function searchForm (state = initialState, { type, payload }) {
         }
       };
     }
-    case FETCH_USERS_BY_NAME_FAILURE: {
+    case FETCH_RECORDS_FAILURE: {
       return {
         ...state,
-        options: {
-          ...state.options,
-          [payload.userType]: {
-            ...state.options[payload.userType],
+        records: {
+          ...state.records,
+          [payload.recordType]: {
+            ...state.records[payload.recordType],
             fetchStatus: 'failure',
             items: [],
             nextPage: null
@@ -85,45 +91,59 @@ function searchForm (state = initialState, { type, payload }) {
         }
       };
     }
-    case FETCH_USERS_NEXT_PAGE_START: {
+    case FETCH_RECORDS_NEXT_PAGE_START: {
       return {
         ...state,
-        options: {
-          ...state.options,
-          [payload.userType]: {
-            ...state.options[payload.userType],
+        records: {
+          ...state.records,
+          [payload.recordType]: {
+            ...state.records[payload.recordType],
             fetchStatus: 'started',
             nextPage: null,
           }
         }
       };
     }
-    case FETCH_USERS_NEXT_PAGE_SUCCESS: {
+    case FETCH_RECORDS_NEXT_PAGE_SUCCESS: {
       return {
         ...state,
-        options: {
-          ...state.options,
-          [payload.userType]: {
-            ...state.options[payload.userType],
+        records: {
+          ...state.records,
+          [payload.recordType]: {
+            ...state.records[payload.recordType],
             fetchStatus: 'success',
-            items: state.options[payload.userType].items.concat(payload.data),
+            items: state.records[payload.recordType].items.concat(payload.data),
             nextPage: parseLinkHeader(payload.link).next
           }
         }
       };
     }
-    case FETCH_USERS_NEXT_PAGE_FAILURE: {
+    case FETCH_RECORDS_NEXT_PAGE_FAILURE: {
       return {
         ...state,
-        options: {
-          ...state.options,
-          [payload.userType]: {
-            ...state.options[payload.userType],
+        records: {
+          ...state.records,
+          [payload.recordType]: {
+            ...state.records[payload.recordType],
             fetchStatus: 'failure',
             nextPage: null
           }
         }
       };
+    }
+    case CLEAR_RECORDS: {
+      return {
+        ...state,
+        records: {
+          ...state.records,
+          [payload.recordType]: {
+            ...state.records[payload.recordType],
+            fetchStatus: null,
+            items: [],
+            nextPage: null
+          }
+        }
+      }
     }
     default: {
       return state;

@@ -17,7 +17,6 @@
  */
 
 import axios from 'axios';
-import constants from 'jsx/gradebook-history/constants';
 import Fixtures from 'spec/jsx/gradebook-history/Fixtures';
 import HistoryApi from 'jsx/gradebook-history/api/HistoryApi';
 
@@ -37,7 +36,7 @@ QUnit.module('HistoryApi', {
     this.getStub = this.stub(axios, 'get')
       .returns(Promise.resolve({
         status: 200,
-        response: Fixtures.response()
+        response: Fixtures.historyResponse()
       }));
   }
 });
@@ -70,12 +69,13 @@ test('getByAssignment with a timeFrame', function () {
 
 test('getByDate', function (assert) {
   const done = assert.async();
+  const courseId = 123;
   const timeFrame = Fixtures.timeFrame();
-  const url = encodeURI(`/api/v1/audit/grade_change/courses/${constants.courseId()}`);
+  const url = encodeURI(`/api/v1/audit/grade_change/courses/${courseId}`);
   const params = {
     params: { start_time: timeFrame.from, end_time: timeFrame.to }
   };
-  const promise = HistoryApi.getByDate(timeFrame);
+  const promise = HistoryApi.getByDate(courseId, timeFrame);
 
   promise.then(() => {
     strictEqual(this.getStub.callCount, 1);

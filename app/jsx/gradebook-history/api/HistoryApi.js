@@ -17,7 +17,6 @@
  */
 
 import axios from 'axios';
-import constants from 'jsx/gradebook-history/constants';
 
 function toParams (id, timeFrame) {
   return {
@@ -37,8 +36,8 @@ function getByAssignment (assignmentId, timeFrame = { from: '', to: '' }) {
   return axios.get(url, params);
 }
 
-function getByDate (timeFrame = { from: '', to: '' }) {
-  const url = encodeURI(`/api/v1/audit/grade_change/courses/${constants.courseId()}`);
+function getByDate (courseId, timeFrame = { from: '', to: '' }) {
+  const url = encodeURI(`/api/v1/audit/grade_change/courses/${courseId}`);
   const params = {
     params: { start_time: timeFrame.from, end_time: timeFrame.to }
   };

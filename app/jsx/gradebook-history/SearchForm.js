@@ -28,120 +28,152 @@ import DateInput from 'instructure-ui/lib/components/DateInput';
 import FormFieldGroup from 'instructure-ui/lib/components/FormFieldGroup';
 import Spinner from 'instructure-ui/lib/components/Spinner';
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
-import TextInput from 'instructure-ui/lib/components/TextInput';
 import SearchFormActions from 'jsx/gradebook-history/actions/SearchFormActions';
 import { showFlashAlert } from 'jsx/shared/FlashAlert';
+
+const recordShape = shape({
+  fetchStatus: string.isRequired,
+  items: arrayOf(shape({
+    id: string.isRequired,
+    name: string.isRequired
+  })),
+  nextPage: string.isRequired
+});
 
 class SearchFormComponent extends Component {
   static propTypes = {
     fetchHistoryStatus: string.isRequired,
+    assignments: recordShape.isRequired,
+    graders: recordShape.isRequired,
+    students: recordShape.isRequired,
     byAssignment: func.isRequired,
     byDate: func.isRequired,
     byGrader: func.isRequired,
     byStudent: func.isRequired,
-    fetchGradersStatus: string.isRequired,
-    fetchStudentsStatus: string.isRequired,
-    getNameOptions: func.isRequired,
-    getNameOptionsNextPage: func.isRequired,
-    graderOptions: arrayOf(shape({
-      name: string.isRequired
-    })).isRequired,
-    studentOptions: arrayOf(shape({
-      name: string.isRequired
-    })).isRequired
+    clearSearchOptions: func.isRequired,
+    getSearchOptions: func.isRequired,
+    getSearchOptionsNextPage: func.isRequired,
   };
 
-  constructor (props) {
-    super(props);
-
-    this.state = {
+  state = {
+    selected: {
+      assignment: '',
       grader: '',
       student: '',
-      assignment: '',
       from: '',
-      to: '',
-      graderOptions: props.graderOptions,
-      studentOptions: props.studentOptions,
-      emptyOptions: {
-        graders: I18n.t('Type a few letters to start searching'),
-        students: I18n.t('Type a few letters to start searching')
-      }
+      to: ''
+    },
+    messages: {
+      assignments: I18n.t('Type a few letters to start searching'),
+      graders: I18n.t('Type a few letters to start searching'),
+      students: I18n.t('Type a few letters to start searching')
     }
-  }
+  };
 
   componentWillReceiveProps ({
-    fetchGradersStatus,
     fetchHistoryStatus,
-    fetchStudentsStatus,
-    graderOptions,
-    studentOptions,
-    graderOptionsNextPage,
-    studentOptionsNextPage
+    assignments,
+    graders,
+    students
   }) {
     if (this.props.fetchHistoryStatus === 'started' && fetchHistoryStatus === 'failure') {
       showFlashAlert({ message: I18n.t('Error loading grade history. Try again?') });
     }
 
-    if (fetchGradersStatus === 'success' && graderOptions.length === 0) {
+    if (assignments.fetchStatus === 'success' && assignments.items.length === 0) {
       this.setState(prevState => ({
-        emptyOptions: {
-          ...prevState.emptyOptions,
+        messages: {
+          ...prevState.messages,
+          assignments: I18n.t('No assignments with that name found')
+        }
+      }));
+    }
+    if (graders.fetchStatus === 'success' && !graders.items.length) {
+      this.setState(prevState => ({
+        messages: {
+          ...prevState.messages,
           graders: I18n.t('No graders with that name found')
         }
       }));
     }
-
-    if (fetchStudentsStatus === 'success' && studentOptions.length === 0) {
+    if (students.fetchStatus === 'success' && !students.items.length) {
       this.setState(prevState => ({
-        emptyOptions: {
-          ...prevState.emptyOptions,
+        messages: {
+          ...prevState.messages,
           students: I18n.t('No students with that name found')
         }
       }));
     }
-
-    this.setState({
-      graderOptions,
-      studentOptions
-    });
-
-    if (studentOptionsNextPage) {
-      this.props.getNameOptionsNextPage('students', studentOptionsNextPage);
+    if (assignments.nextPage) {
+      this.props.getSearchOptionsNextPage('assignments', assignments.nextPage);
     }
-
-    if (graderOptionsNextPage) {
-      this.props.getNameOptionsNextPage('graders', graderOptionsNextPage);
+    if (graders.nextPage) {
+      this.props.getSearchOptionsNextPage('graders', graders.nextPage);
+    }
+    if (students.nextPage) {
+      this.props.getSearchOptionsNextPage('students', students.nextPage);
     }
   }
 
   setSelectedFrom = (from) => {
-    this.setState({ from });
+    this.setState(prevState => ({
+      selected: {
+        ...prevState.selected,
+        from
+      }
+    }));
   }
 
   setSelectedTo = (to) => {
-    this.setState({ to });
+    this.setState(prevState => ({
+      selected: {
+        ...prevState.selected,
+        to
+      }
+    }));
+  }
+
+  setSelectedAssignment = (event, selected) => {
+    this.props.clearSearchOptions('assignments');
+    this.setState(prevState => ({
+      selected: {
+        ...prevState.selected,
+        assignment: selected ? selected.id : ''
+      }
+    }));
   }
 
   setSelectedGrader = (event, selected) => {
-    const grader = selected ? selected.id : '';
-    this.setState({ grader });
+    this.props.clearSearchOptions('graders');
+    this.setState(prevState => ({
+      selected: {
+        ...prevState.selected,
+        grader: selected ? selected.id : ''
+      }
+    }));
   }
 
   setSelectedStudent = (event, selected) => {
-    const student = selected ? selected.id : '';
-    this.setState({ student });
+    this.props.clearSearchOptions('students');
+    this.setState(prevState => ({
+      selected: {
+        ...prevState.selected,
+        student: selected ? selected.id : ''
+      }
+    }));
   }
 
   hasOneDate () {
-    return (this.state.from !== '' && !this.state.to) || (!this.state.from && this.state.to !== '');
+    const { from, to } = this.state.selected;
+    return (from !== '' && !to) || (!from && to !== '');
   }
 
   hasNoDates () {
-    return !this.state.from && !this.state.to;
+    return !this.state.selected.from && !this.state.selected.to;
   }
 
   hasFromBeforeTo () {
-    return moment(this.state.to).diff(moment(this.state.from), 'days') >= 0;
+    return moment(this.state.selected.to).diff(moment(this.state.selected.from), 'days') >= 0;
   }
 
   hasValidTimeFrame () {
@@ -150,8 +182,8 @@ class SearchFormComponent extends Component {
 
   timeFrame () {
     if (this.hasValidTimeFrame()) {
-      const from = this.state.from ? moment(this.state.from).startOf('day').format() : '';
-      const to = this.state.to ? moment(this.state.to).endOf('day').format() : '';
+      const from = this.state.selected.from ? moment(this.state.selected.from).startOf('day').format() : '';
+      const to = this.state.selected.to ? moment(this.state.selected.to).endOf('day').format() : '';
 
       return { from, to };
     }
@@ -159,31 +191,31 @@ class SearchFormComponent extends Component {
     return { from: '', to: '' };
   }
 
-  handleUserEntry = (event) => {
+  promptUserEntry = () => {
+    const emptyMessage = I18n.t('Type a few letters to start searching');
+    this.setState({
+      messages: {
+        assignments: emptyMessage,
+        graders: emptyMessage,
+        students: emptyMessage
+      }
+    });
+  }
+
+  handleSearchEntry = (event) => {
     const target = event.target.id;
     const searchTerm = event.target.value;
 
-    if (searchTerm.length === 0) {
-      this.setState({
-        graderOptions: [],
-        studentOptions: []
-      });
-      return;
-    }
     if (searchTerm.length <= 2) {
-      this.setState(prevState => ({
-        emptyOptions: {
-          ...prevState.emptyOptions,
-          [target]: I18n.t('Type a few letters to start searching')
-        }
-      }));
+      if (this.props[target].items.length > 0) {
+        this.props.clearSearchOptions(target);
+        this.promptUserEntry();
+      }
+
       return;
     }
-    this.props.getNameOptions(target, searchTerm);
-  }
 
-  handleTextEntry = (event) => {
-    this.setState({ [event.target.id]: event.target.value });
+    this.props.getSearchOptions(target, searchTerm);
   }
 
   handleSubmit = () => {
@@ -191,12 +223,14 @@ class SearchFormComponent extends Component {
       return;
     }
 
-    if (this.state.assignment !== '') {
-      this.props.byAssignment(this.state.assignment, this.timeFrame());
-    } else if (this.state.grader !== '') {
-      this.props.byGrader(this.state.grader, this.timeFrame());
-    } else if (this.state.student !== '') {
-      this.props.byStudent(this.state.student, this.timeFrame());
+    const { assignment, grader, student } = this.state.selected;
+
+    if (assignment) {
+      this.props.byAssignment(assignment, this.timeFrame());
+    } else if (grader) {
+      this.props.byGrader(grader, this.timeFrame());
+    } else if (student) {
+      this.props.byStudent(student, this.timeFrame());
     } else if (this.hasValidTimeFrame() && !this.hasNoDates()) {
       this.props.byDate(this.timeFrame());
     }
@@ -224,34 +258,49 @@ class SearchFormComponent extends Component {
             <Autocomplete
               id="graders"
               allowEmpty
-              emptyOption={this.state.emptyOptions.graders}
+              emptyOption={this.state.messages.graders}
               filter={this.filterNone}
               label={I18n.t('Grader')}
-              loading={this.props.fetchGradersStatus === 'started'}
+              loading={this.props.graders.fetchStatus === 'started'}
               loadingOption={<Spinner size="small" title={I18n.t('Loading Graders')} />}
+              onBlur={this.promptUserEntry}
               onChange={this.setSelectedGrader}
-              onInputChange={this.handleUserEntry}
+              onInputChange={this.handleSearchEntry}
             >
-              {this.renderAsOptions(this.state.graderOptions)}
+              {this.renderAsOptions(this.props.graders.items)}
             </Autocomplete>
           </div>
           <div className="GradebookHistory__SearchFormInput">
             <Autocomplete
               id="students"
               allowEmpty
-              emptyOption={this.state.emptyOptions.students}
+              emptyOption={this.state.messages.students}
               filter={this.filterNone}
               label={I18n.t('Student')}
-              loading={this.props.fetchStudentsStatus === 'started'}
+              loading={this.props.students.fetchStatus === 'started'}
               loadingOption={<Spinner size="small" title={I18n.t('Loading Students')} />}
+              onBlur={this.promptUserEntry}
               onChange={this.setSelectedStudent}
-              onInputChange={this.handleUserEntry}
+              onInputChange={this.handleSearchEntry}
             >
-              {this.renderAsOptions(this.state.studentOptions)}
+              {this.renderAsOptions(this.props.students.items)}
             </Autocomplete>
           </div>
           <div className="GradebookHistory__SearchFormInput">
-            <TextInput id="assignment" label={I18n.t('Assignment')} onChange={this.handleTextEntry} />
+            <Autocomplete
+              id="assignments"
+              allowEmpty
+              emptyOption={this.state.messages.assignments}
+              filter={this.filterNone}
+              label={I18n.t('Assignment')}
+              loading={this.props.assignments.fetchStatus === 'started'}
+              loadingOption={<Spinner size="small" title={I18n.t('Loading Assignments')} />}
+              onBlur={this.promptUserEntry}
+              onChange={this.setSelectedAssignment}
+              onInputChange={this.handleSearchEntry}
+            >
+              {this.renderAsOptions(this.props.assignments.items)}
+            </Autocomplete>
           </div>
           <div className="GradebookHistory__SearchFormInput">
             <DateInput
@@ -287,12 +336,21 @@ class SearchFormComponent extends Component {
 const mapStateToProps = state => (
   {
     fetchHistoryStatus: state.history.fetchHistoryStatus || '',
-    fetchGradersStatus: state.searchForm.options.graders.fetchStatus || '',
-    fetchStudentsStatus: state.searchForm.options.students.fetchStatus || '',
-    graderOptions: state.searchForm.options.graders.items || [],
-    studentOptions: state.searchForm.options.students.items || [],
-    graderOptionsNextPage: state.searchForm.options.graders.nextPage || '',
-    studentOptionsNextPage: state.searchForm.options.students.nextPage || ''
+    assignments: {
+      fetchStatus: state.searchForm.records.assignments.fetchStatus || '',
+      items: state.searchForm.records.assignments.items || [],
+      nextPage: state.searchForm.records.assignments.nextPage || ''
+    },
+    graders: {
+      fetchStatus: state.searchForm.records.graders.fetchStatus || '',
+      items: state.searchForm.records.graders.items || [],
+      nextPage: state.searchForm.records.graders.nextPage || ''
+    },
+    students: {
+      fetchStatus: state.searchForm.records.students.fetchStatus || '',
+      items: state.searchForm.records.students.items || [],
+      nextPage: state.searchForm.records.students.nextPage || ''
+    }
   }
 );
 
@@ -310,11 +368,14 @@ const mapDispatchToProps = dispatch => (
     byStudent: (studentId, timeFrame) => {
       dispatch(SearchFormActions.getHistoryByStudent(studentId, timeFrame));
     },
-    getNameOptions: (userType, searchTerm) => {
-      dispatch(SearchFormActions.getNameOptions(userType, searchTerm));
+    getSearchOptions: (recordType, searchTerm) => {
+      dispatch(SearchFormActions.getSearchOptions(recordType, searchTerm));
     },
-    getNameOptionsNextPage: (userType, url) => {
-      dispatch(SearchFormActions.getNameOptionsNextPage(userType, url));
+    getSearchOptionsNextPage: (recordType, url) => {
+      dispatch(SearchFormActions.getSearchOptionsNextPage(recordType, url));
+    },
+    clearSearchOptions: (recordType) => {
+      dispatch(SearchFormActions.clearSearchOptions(recordType));
     }
   }
 );

@@ -16,35 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import axios from 'axios';
+import splitAssetString from 'coffeescripts/str/splitAssetString';
 
-const userMetaTypes = {
-  graders: ['teacher', 'ta'],
-  students: ['student', 'student_view']
-};
-
-function getUsersByName (courseId, userType, searchTerm) {
-  if (searchTerm.length < 3) {
-    // the endpoint doesn't allow searching by 2 letters or less
-    return Promise.resolve({ response: {data: []} });
-  }
-
-  const params = {
-    params: {
-      search_term: searchTerm,
-      enrollment_type: userMetaTypes[userType]
-    }
-  }
-  const url = encodeURI(`/api/v1/courses/${courseId}/users`);
-
-  return axios.get(url, params);
+function courseId () {
+  return ENV.context_asset_string ? splitAssetString(ENV.context_asset_string)[1] : '';
 }
 
-function getUsersNextPage (url) {
-  return axios.get(encodeURI(url));
+function timezone () {
+  return ENV.TIMEZONE;
 }
 
 export default {
-  getUsersByName,
-  getUsersNextPage
+  courseId,
+  timezone
 }

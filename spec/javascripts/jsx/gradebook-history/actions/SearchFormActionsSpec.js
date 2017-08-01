@@ -21,12 +21,13 @@ import GradebookHistoryStore from 'jsx/gradebook-history/store/GradebookHistoryS
 import HistoryActions from 'jsx/gradebook-history/actions/HistoryActions';
 import HistoryApi from 'jsx/gradebook-history/api/HistoryApi';
 import SearchFormActions, {
-  FETCH_USERS_BY_NAME_START,
-  FETCH_USERS_BY_NAME_SUCCESS,
-  FETCH_USERS_BY_NAME_FAILURE,
-  FETCH_USERS_NEXT_PAGE_START,
-  FETCH_USERS_NEXT_PAGE_SUCCESS,
-  FETCH_USERS_NEXT_PAGE_FAILURE
+  CLEAR_RECORDS,
+  FETCH_RECORDS_START,
+  FETCH_RECORDS_SUCCESS,
+  FETCH_RECORDS_FAILURE,
+  FETCH_RECORDS_NEXT_PAGE_START,
+  FETCH_RECORDS_NEXT_PAGE_SUCCESS,
+  FETCH_RECORDS_NEXT_PAGE_FAILURE
 } from 'jsx/gradebook-history/actions/SearchFormActions';
 import UserApi from 'jsx/gradebook-history/api/UserApi';
 
@@ -38,70 +39,80 @@ QUnit.module('SearchFormActions', function () {
     }
   };
 
-  test('fetchUsersByNameStart creates an action with type FETCH_USERS_BY_NAME_START', function () {
-    const userType = 'graders';
+  test('fetchRecordsStart creates an action with type FETCH_RECORDS_START', function () {
+    const recordType = 'graders';
     const expectedValue = {
-      type: FETCH_USERS_BY_NAME_START,
-      payload: { userType }
+      type: FETCH_RECORDS_START,
+      payload: { recordType }
     };
 
-    deepEqual(SearchFormActions.fetchUsersByNameStart(userType), expectedValue);
+    deepEqual(SearchFormActions.fetchRecordsStart(recordType), expectedValue);
   });
 
-  test('fetchUsersByNameSuccess creates an action with type FETCH_USERS_BY_NAME_SUCCESS', function () {
-    const userType = 'graders';
+  test('fetchRecordsFailure creates an action with type FETCH_RECORDS_SUCCESS', function () {
+    const recordType = 'graders';
     const expectedValue = {
-      type: FETCH_USERS_BY_NAME_SUCCESS,
-      payload: { userType, data: response.data, link: response.headers.link }
+      type: FETCH_RECORDS_SUCCESS,
+      payload: { recordType, data: response.data, link: response.headers.link }
     };
 
-    deepEqual(SearchFormActions.fetchUsersByNameSuccess(response, userType), expectedValue);
+    deepEqual(SearchFormActions.fetchRecordsSuccess(response, recordType), expectedValue);
   });
 
-  test('fetchUsersByNameFailure creates an action with type FETCH_USERS_BY_NAME_FAILURE', function () {
-    const userType = 'graders';
+  test('fetchRecordsFailure creates an action with type FETCH_RECORDS_FAILURE', function () {
+    const recordType = 'graders';
     const expectedValue = {
-      type: FETCH_USERS_BY_NAME_FAILURE,
-      payload: { userType }
+      type: FETCH_RECORDS_FAILURE,
+      payload: { recordType }
     };
 
-    deepEqual(SearchFormActions.fetchUsersByNameFailure(userType), expectedValue);
+    deepEqual(SearchFormActions.fetchRecordsFailure(recordType), expectedValue);
   });
 
-  test('fetchUsersNextPageStart creates an action with type FETCH_USERS_NEXT_PAGE_START', function () {
-    const userType = 'graders';
+  test('fetchRecordsNextPageStart creates an action with type FETCH_RECORDS_NEXT_PAGE_START', function () {
+    const recordType = 'graders';
     const expectedValue = {
-      type: FETCH_USERS_NEXT_PAGE_START,
-      payload: { userType }
+      type: FETCH_RECORDS_NEXT_PAGE_START,
+      payload: { recordType }
     };
 
-    deepEqual(SearchFormActions.fetchUsersNextPageStart(userType), expectedValue);
+    deepEqual(SearchFormActions.fetchRecordsNextPageStart(recordType), expectedValue);
   });
 
-  test('fetchUsersNextPageSuccess creates an action with type FETCH_USERS_NEXT_PAGE_SUCCESS', function () {
-    const userType = 'graders';
+  test('fetchRecordsNextPageSuccess creates an action with type FETCH_RECORDS_NEXT_PAGE_SUCCESS', function () {
+    const recordType = 'graders';
     const expectedValue = {
-      type: FETCH_USERS_NEXT_PAGE_SUCCESS,
-      payload: { userType, data: response.data, link: response.headers.link }
+      type: FETCH_RECORDS_NEXT_PAGE_SUCCESS,
+      payload: { recordType, data: response.data, link: response.headers.link }
     };
 
-    deepEqual(SearchFormActions.fetchUsersNextPageSuccess(response, userType), expectedValue);
+    deepEqual(SearchFormActions.fetchRecordsNextPageSuccess(response, recordType), expectedValue);
   });
 
-  test('fetchUsersNextPageFailure creates an action with type FETCH_USERS_NEXT_PAGE_FAILURE', function () {
-    const userType = 'graders';
+  test('fetchRecordsNextPageFailure creates an action with type FETCH_RECORDS_NEXT_PAGE_FAILURE', function () {
+    const recordType = 'graders';
     const expectedValue = {
-      type: FETCH_USERS_NEXT_PAGE_FAILURE,
-      payload: { userType }
+      type: FETCH_RECORDS_NEXT_PAGE_FAILURE,
+      payload: { recordType }
     };
 
-    deepEqual(SearchFormActions.fetchUsersNextPageFailure(userType), expectedValue);
+    deepEqual(SearchFormActions.fetchRecordsNextPageFailure(recordType), expectedValue);
+  });
+
+  test('clearSearchOptions creates an action with type CLEAR_RECORDS', function () {
+    const recordType = 'assignments';
+    const expectedValue = {
+      type: CLEAR_RECORDS,
+      payload: { recordType }
+    };
+
+    deepEqual(SearchFormActions.clearSearchOptions(recordType), expectedValue);
   });
 });
 
 QUnit.module('SearchFormActions getHistoryByAssignment', {
   setup () {
-    this.response = Fixtures.response();
+    this.response = Fixtures.historyResponse();
     this.getByAssignmentStub = this.stub(HistoryApi, 'getByAssignment')
       .returns(Promise.resolve(this.response));
 
@@ -136,7 +147,7 @@ test('dispatches fetchHistoryFailure on failure', function () {
 
 QUnit.module('SearchFormActions getHistoryByDate', function (hooks) {
   hooks.beforeEach(function () {
-    this.response = Fixtures.response();
+    this.response = Fixtures.historyResponse();
     this.timeFrame = Fixtures.timeFrame();
     this.getByDateStub = sinon.stub(HistoryApi, 'getByDate')
       .returns(Promise.resolve(this.response));
@@ -189,7 +200,7 @@ QUnit.module('SearchFormActions getHistoryByDate', function (hooks) {
 
 QUnit.module('SearchFormActions getHistoryByGrader', {
   setup () {
-    this.response = Fixtures.response();
+    this.response = Fixtures.historyResponse();
     this.getByGraderStub = this.stub(HistoryApi, 'getByGrader')
       .returns(Promise.resolve(this.response));
 
@@ -224,7 +235,7 @@ test('dispatches fetchHistoryFailure on failure', function () {
 
 QUnit.module('SearchFormActions getHistoryByStudent', {
   setup () {
-    this.response = Fixtures.response();
+    this.response = Fixtures.historyResponse();
     this.getByStudentStub = this.stub(HistoryApi, 'getByStudent')
       .returns(Promise.resolve(this.response));
 
@@ -257,13 +268,13 @@ test('dispatches fetchHistoryFailure on failure', function () {
   });
 });
 
-QUnit.module('SearchFormActions getNameOptions', {
+QUnit.module('SearchFormActions getSearchOptions', {
   setup () {
     const userResponse = {
-      response: {
-        data: Fixtures.userArray()
-      }
-    }
+      data: Fixtures.userArray(),
+      headers: { link: 'http://example.com/link-to-next-page' }
+    };
+
     this.getUsersByNameStub = this.stub(UserApi, 'getUsersByName')
       .returns(Promise.resolve(userResponse));
 
@@ -271,38 +282,38 @@ QUnit.module('SearchFormActions getNameOptions', {
   }
 });
 
-test('dispatches fetchUsersByNameStart', function () {
-  const fetchSpy = this.spy(SearchFormActions, 'fetchUsersByNameStart');
-  const promise = this.dispatchSpy(SearchFormActions.getNameOptions('graders', 'Norval'));
+test('dispatches fetchRecordsStart', function () {
+  const fetchSpy = this.spy(SearchFormActions, 'fetchRecordsStart');
+  const promise = this.dispatchSpy(SearchFormActions.getSearchOptions('assignments', '50 Page Essay'));
   return promise.then(() => {
     strictEqual(fetchSpy.callCount, 1);
   });
 });
 
-test('dispatches fetchUsersByNameSuccess on success', function () {
-  const fetchSpy = this.spy(SearchFormActions, 'fetchUsersByNameSuccess');
-  const promise = this.dispatchSpy(SearchFormActions.getNameOptions('graders', 'Norval'));
+test('dispatches fetchRecordsSuccess on success', function () {
+  const fetchSpy = this.spy(SearchFormActions, 'fetchRecordsSuccess');
+  const promise = this.dispatchSpy(SearchFormActions.getSearchOptions('graders', 'Norval'));
   return promise.then(() => {
     strictEqual(fetchSpy.callCount, 1);
   });
 });
 
-test('dispatches fetchUsersByNameFailure on failure', function () {
+test('dispatches fetchRecordsFailure on failure', function () {
   this.getUsersByNameStub.returns(Promise.reject(new Error('FAIL')));
-  const fetchSpy = this.spy(SearchFormActions, 'fetchUsersByNameFailure');
-  const promise = this.dispatchSpy(SearchFormActions.getNameOptions('graders', 'Norval'));
+  const fetchSpy = this.spy(SearchFormActions, 'fetchRecordsFailure');
+  const promise = this.dispatchSpy(SearchFormActions.getSearchOptions('students', 'Norval'));
   return promise.then(() => {
     strictEqual(fetchSpy.callCount, 1);
   });
 });
 
-QUnit.module('SearchFormActions getNameOptionsNextPage', function (hooks) {
+QUnit.module('SearchFormActions getSearchOptionsNextPage', function (hooks) {
   hooks.beforeEach(function () {
     const userResponse = {
-      response: {
-        data: Fixtures.userArray()
-      }
-    }
+      data: Fixtures.userArray(),
+      headers: { link: 'http://example.com/link-to-next-page' }
+    };
+
     this.getUsersNextPageStub = sinon.stub(UserApi, 'getUsersNextPage')
       .returns(Promise.resolve(userResponse));
 
@@ -314,28 +325,28 @@ QUnit.module('SearchFormActions getNameOptionsNextPage', function (hooks) {
     this.dispatchSpy.restore();
   });
 
-  test('dispatches fetchUsersNextPageStart', function () {
-    const fetchSpy = sinon.spy(SearchFormActions, 'fetchUsersNextPageStart');
-    const promise = this.dispatchSpy(SearchFormActions.getNameOptionsNextPage('graders', 'https://example.com'));
+  test('dispatches fetchRecordsNextPageStart', function () {
+    const fetchSpy = sinon.spy(SearchFormActions, 'fetchRecordsNextPageStart');
+    const promise = this.dispatchSpy(SearchFormActions.getSearchOptionsNextPage('graders', 'https://example.com'));
     return promise.then(() => {
       strictEqual(fetchSpy.callCount, 1);
       fetchSpy.restore();
     });
   });
 
-  test('dispatches fetchUsersNextPageSuccess on success', function () {
-    const fetchSpy = sinon.spy(SearchFormActions, 'fetchUsersNextPageSuccess');
-    const promise = this.dispatchSpy(SearchFormActions.getNameOptionsNextPage('graders', 'https://example.com'));
+  test('dispatches fetchRecordsNextPageSuccess on success', function () {
+    const fetchSpy = sinon.spy(SearchFormActions, 'fetchRecordsNextPageSuccess');
+    const promise = this.dispatchSpy(SearchFormActions.getSearchOptionsNextPage('graders', 'https://example.com'));
     return promise.then(() => {
       strictEqual(fetchSpy.callCount, 1);
       fetchSpy.restore();
     });
   });
 
-  test('dispatches fetchUsersNextPageFailure on failure', function () {
+  test('dispatches fetchRecordsNextPageFailure on failure', function () {
     this.getUsersNextPageStub.returns(Promise.reject(new Error('FAIL')));
-    const fetchSpy = sinon.spy(SearchFormActions, 'fetchUsersNextPageFailure');
-    const promise = this.dispatchSpy(SearchFormActions.getNameOptionsNextPage('graders', 'https://example.com'));
+    const fetchSpy = sinon.spy(SearchFormActions, 'fetchRecordsNextPageFailure');
+    const promise = this.dispatchSpy(SearchFormActions.getSearchOptionsNextPage('graders', 'https://example.com'));
     return promise.then(() => {
       strictEqual(fetchSpy.callCount, 1);
       fetchSpy.restore();
