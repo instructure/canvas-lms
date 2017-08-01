@@ -42,7 +42,6 @@ define [
   'compiled/userSettings'
   'spin.js'
   'compiled/AssignmentMuter'
-  'compiled/gradezilla/AssignmentGroupWeightsDialog'
   'compiled/shared/GradeDisplayWarningDialog'
   'compiled/gradezilla/PostGradesFrameDialog'
   'compiled/gradezilla/SubmissionCell'
@@ -104,7 +103,7 @@ define [
 ], ($, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
   GradingPeriodsApi, GradingPeriodSetsApi, round, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS,
   CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, GradeFormatHelper, UserSettings, Spinner, AssignmentMuter,
-  AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
+  GradeDisplayWarningDialog, PostGradesFrameDialog,
   SubmissionCell, NumberCompare, natcompare, ConvertCase, htmlEscape, SetDefaultGradeDialogManager,
   CurveGradesDialogManager, GradebookApi, CellEditorFactory, GridSupport, studentRowHeaderConstants, AssignmentColumnHeader,
   AssignmentGroupColumnHeader, AssignmentRowCellPropFactory, CustomColumnHeader, StudentColumnHeader, StudentRowHeader,
@@ -209,9 +208,6 @@ define [
     gridReady: $.Deferred()
 
     constructor: (@options) ->
-      # emitted by AssignmentGroupWeightsDialog
-      $.subscribe 'assignment_group_weights_changed', @handleAssignmentGroupWeightChange
-
       $.subscribe 'assignment_muting_toggled',        @handleAssignmentMutingChange
       $.subscribe 'submissions_updated',              @updateSubmissionsFromExternal
 
@@ -456,7 +452,6 @@ define [
     gotAllAssignmentGroups: (assignmentGroups) =>
       # purposely passing the @options and assignmentGroups by reference so it can update
       # an assigmentGroup's .group_weight and @options.group_weighting_scheme
-      new AssignmentGroupWeightsDialog context: @options, assignmentGroups: assignmentGroups
       for group in assignmentGroups
         @assignmentGroups[group.id] = group
         for assignment in group.assignments
@@ -790,16 +785,6 @@ define [
     handleAssignmentMutingChange: (assignment) =>
       @renderAssignmentColumnHeader(assignment.id)
       @setAssignmentWarnings()
-      @buildRows()
-
-    handleAssignmentGroupWeightChange: (assignment_group_options) =>
-      columns = @grid.getColumns()
-      for assignment_group in assignment_group_options.assignmentGroups
-        column = _.findWhere columns, id: "assignment_group_#{assignment_group.id}"
-        @initAssignmentGroupColumnHeader(column)
-      @setAssignmentWarnings()
-      @grid.setColumns(columns)
-      # TODO: don't buildRows?
       @buildRows()
 
     handleSubmissionsDownloading: (assignmentId) =>
