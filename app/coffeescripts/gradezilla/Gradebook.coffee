@@ -76,6 +76,7 @@ define [
   'compiled/gradezilla/GradebookKeyboardNav'
   'jsx/gradezilla/shared/AssignmentMuterDialogManager'
   'jsx/gradezilla/shared/helpers/assignmentHelper'
+  'jsx/gradezilla/shared/helpers/TextMeasure'
   'jsx/grading/LatePolicyApplicator'
   'instructure-ui/lib/components/Button'
   'instructure-icons/lib/Solid/IconSettingsSolid'
@@ -104,7 +105,7 @@ define [
   GridColor, StatusesModal, SubmissionTray, GradebookSettingsModal, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp,
   SubmissionStateMap,
   DownloadSubmissionsDialogManager,ReuploadSubmissionsDialogManager, GradebookKeyboardNav,
-  AssignmentMuterDialogManager, assignmentHelper, LatePolicyApplicator, { default: Button }, { default: IconSettingsSolid }) ->
+  AssignmentMuterDialogManager, assignmentHelper, TextMeasure, LatePolicyApplicator, { default: Button }, { default: IconSettingsSolid }) ->
 
   isAdmin = =>
     _.contains(ENV.current_user_roles, 'admin')
@@ -113,6 +114,10 @@ define [
 
   htmlDecode = (input) ->
     input && new DOMParser().parseFromString(input, "text/html").documentElement.textContent
+
+  testWidth = (text, minWidth, maxWidth) ->
+    width = Math.max(TextMeasure.getWidth(text), minWidth)
+    Math.min width, maxWidth
 
   renderComponent = (reactClass, mountPoint, props = {}, children = null) ->
     component = React.createElement(reactClass, props, children)
@@ -1441,125 +1446,123 @@ define [
       else
         assignmentColumns.concat(@aggregateColumns)
 
-      frozenColumns = @parentColumns.concat(@customColumnDefinitions())
+      frozenColumns = @parentColumns.concat(@gradebookContent.customColumns.map(@buildCustomColumn))
       frozenColumns.concat(scrollableColumns)
 
-    customColumnDefinitions: =>
-      @gradebookContent.customColumns.map (c) =>
-        columnId = @getCustomColumnId(c.id)
+    ## Grid Column Definitions
 
-        id: columnId
-        type: 'custom_column'
-        name: htmlEscape c.title
-        field: "custom_col_#{c.id}"
-        width: 100
-        cssClass: "meta-cell custom_column #{columnId}"
-        headerCssClass: columnId
-        resizable: true
-        editor: LongTextEditor
-        customColumnId: c.id
-        autoEdit: false
-        maxLength: 255
+    # Student Column
 
-    initGrid: =>
-      #this is used to figure out how wide to make each column
-      $widthTester = $('<span style="padding:10px" />').appendTo('#content')
-      testWidth = (text, minWidth, maxWidth) ->
-        width = Math.max($widthTester.text(text).outerWidth(), minWidth)
-        Math.min width, maxWidth
-
-      @updateFilteredContentInfo()
-
+    buildStudentColumn: ->
       studentColumnWidth = 150
       if @gradebookColumnSizeSettings
         if @gradebookColumnSizeSettings['student']
           studentColumnWidth = parseInt(@gradebookColumnSizeSettings['student'])
 
-      # Student Column Definition
-
-      @parentColumns = [
+      {
         id: 'student'
         type: 'student'
         width: studentColumnWidth
         cssClass: 'meta-cell primary-column student'
         headerCssClass: 'primary-column student'
         resizable: true
-      ]
+      }
 
-      # Assignment Column Definitions
+    # Custom Column
 
-      @allAssignmentColumns = for id, assignment of @assignments
-        shrinkForOutOfText = assignment && assignment.grading_type == 'points' && assignment.points_possible?
-        minWidth = if shrinkForOutOfText then 140 else 90
+    buildCustomColumn: (customColumn) =>
+      columnId = @getCustomColumnId(customColumn.id)
 
-        columnId = @getAssignmentColumnId(id)
-        fieldName = "assignment_#{id}"
+      id: columnId
+      type: 'custom_column'
+      name: htmlEscape customColumn.title
+      field: "custom_col_#{customColumn.id}"
+      width: 100
+      cssClass: "meta-cell custom_column #{columnId}"
+      headerCssClass: "custom_column #{columnId}"
+      resizable: true
+      editor: LongTextEditor
+      customColumnId: customColumn.id
+      autoEdit: false
+      maxLength: 255
 
+    # Assignment Column
+
+    buildAssignmentColumn: (assignment) ->
+      shrinkForOutOfText = assignment && assignment.grading_type == 'points' && assignment.points_possible?
+      minWidth = if shrinkForOutOfText then 140 else 90
+
+      columnId = @getAssignmentColumnId(assignment.id)
+      fieldName = "assignment_#{assignment.id}"
+
+      if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings[fieldName]
+        assignmentWidth = parseInt(@gradebookColumnSizeSettings[fieldName])
+      else
         assignmentWidth = testWidth(assignment.name, minWidth, columnWidths.assignment.default_max)
-        if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings[fieldName]
-          assignmentWidth = parseInt(@gradebookColumnSizeSettings[fieldName])
 
-        columnDef =
-          id: columnId
-          field: fieldName
-          name: assignment.name
-          object: assignment
-          getGridSupport: => @gridSupport
-          propFactory: new AssignmentRowCellPropFactory(assignment, @)
-          minWidth: columnWidths.assignment.min
-          maxWidth: columnWidths.assignment.max
-          width: assignmentWidth
-          cssClass: "assignment #{columnId}"
-          headerCssClass: columnId
-          toolTip: assignment.name
-          type: 'assignment'
-          assignmentId: assignment.id
+      columnDef =
+        id: columnId
+        field: fieldName
+        name: assignment.name
+        object: assignment
+        getGridSupport: => @gridSupport
+        propFactory: new AssignmentRowCellPropFactory(assignment, @)
+        minWidth: columnWidths.assignment.min
+        maxWidth: columnWidths.assignment.max
+        width: assignmentWidth
+        cssClass: "assignment #{columnId}"
+        headerCssClass: "assignment #{columnId}"
+        toolTip: assignment.name
+        type: 'assignment'
+        assignmentId: assignment.id
 
-        if fieldName in @assignmentsToHide
-          columnDef.width = 10
-          do (fieldName) =>
-            $(document)
-              .bind('gridready', =>
-                @minimizeColumn(@$grid.find("##{@uid}#{fieldName}"))
-              )
-              .unbind('gridready.render')
-              .bind('gridready.render', => @grid.invalidate() )
-        columnDef
+      if fieldName in @assignmentsToHide
+        columnDef.width = 10
+        do (fieldName) =>
+          $(document)
+            .bind('gridready', =>
+              @minimizeColumn(@$grid.find("##{@uid}#{fieldName}"))
+            )
+            .unbind('gridready.render')
+            .bind('gridready.render', => @grid.invalidate() )
 
-      # Assignment Group Column Definitions
+      columnDef
 
-      @aggregateColumns = for id, group of @assignmentGroups
-        columnId = @getAssignmentGroupColumnId(id)
-        fieldName = "assignment_group_#{id}"
+    buildAssignmentGroupColumn: (assignmentGroup) ->
+      columnId = @getAssignmentGroupColumnId(assignmentGroup.id)
+      fieldName = "assignment_group_#{assignmentGroup.id}"
 
-        aggregateWidth = testWidth(group.name, columnWidths.assignmentGroup.min, columnWidths.assignmentGroup.default_max)
-        if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings[fieldName]
-          aggregateWidth = parseInt(@gradebookColumnSizeSettings[fieldName])
+      if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings[fieldName]
+        width = parseInt(@gradebookColumnSizeSettings[fieldName])
+      else
+        width = testWidth(
+          assignmentGroup.name, columnWidths.assignmentGroup.min, columnWidths.assignmentGroup.default_max
+        )
 
-        {
-          id: columnId
-          field: fieldName
-          name: group.name
-          toolTip: group.name
-          object: group
-          minWidth: columnWidths.assignmentGroup.min
-          maxWidth: columnWidths.assignmentGroup.max
-          width: aggregateWidth
-          cssClass: "meta-cell assignment-group-cell #{columnId}"
-          headerCssClass: columnId
-          type: 'assignment_group'
-          assignmentGroupId: group.id
-        }
+      {
+        id: columnId
+        field: fieldName
+        name: assignmentGroup.name
+        toolTip: assignmentGroup.name
+        object: assignmentGroup
+        minWidth: columnWidths.assignmentGroup.min
+        maxWidth: columnWidths.assignmentGroup.max
+        width: width
+        cssClass: "meta-cell assignment-group-cell #{columnId}"
+        headerCssClass: "assignment_group #{columnId}"
+        type: 'assignment_group'
+        assignmentGroupId: assignmentGroup.id
+      }
 
+    buildTotalGradeColumn: ->
       label = I18n.t "Total"
 
-      totalWidth = testWidth(label, columnWidths.total.min, columnWidths.total.max)
       if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings['total_grade']
         totalWidth = parseInt(@gradebookColumnSizeSettings['total_grade'])
+      else
+        totalWidth = testWidth(label, columnWidths.total.min, columnWidths.total.max)
 
-      # Total Grade Column Definition
-
-      total_column =
+      {
         id: "total_grade"
         field: "total_grade"
         toolTip: label
@@ -1569,10 +1572,20 @@ define [
         cssClass: 'total-cell total_grade'
         headerCssClass: 'total_grade'
         type: 'total_grade'
+      }
 
-      @aggregateColumns.push total_column
+    initGrid: =>
+      @updateFilteredContentInfo()
 
-      $widthTester.remove()
+      @parentColumns.push(@buildStudentColumn())
+
+      for id, assignment of @assignments
+        @allAssignmentColumns.push(@buildAssignmentColumn(assignment))
+
+      @aggregateColumns = for id, assignmentGroup of @assignmentGroups
+        @buildAssignmentGroupColumn(assignmentGroup)
+
+      @aggregateColumns.push(@buildTotalGradeColumn())
 
       @renderGridColor()
       @createGrid()
@@ -1914,7 +1927,7 @@ define [
       callback()
       cols = @grid.getColumns()
       cols.splice 0, columnsToReplace,
-        @parentColumns..., @customColumnDefinitions()...
+        @parentColumns..., @gradebookContent.customColumns.map(@buildCustomColumn)...
       @grid.setColumns(cols)
       @grid.invalidate()
 
