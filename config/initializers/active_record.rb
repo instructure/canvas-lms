@@ -1014,7 +1014,7 @@ module UpdateAndDeleteWithJoins
     end
     sql.concat('WHERE ' + sql_string.substitute_binds(binds).join)
 
-    connection.exec_query(sql, "#{name} Delete all", scope.bind_values)
+    connection.delete(sql, "SQL", scope.bind_values)
   end
 end
 ActiveRecord::Relation.prepend(UpdateAndDeleteWithJoins)

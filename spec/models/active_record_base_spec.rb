@@ -501,14 +501,14 @@ describe ActiveRecord::Base do
     end
 
     it "should do an update all with a join" do
-      Pseudonym.joins(:user).active.where(:users => {:name => 'a'}).update_all(:unique_id => 'pa3')
+      expect(Pseudonym.joins(:user).active.where(:users => {:name => 'a'}).update_all(:unique_id => 'pa3')).to eq 1
       expect(@p1.reload.unique_id).to eq 'pa3'
       expect(@p1_2.reload.unique_id).to eq 'pa2'
       expect(@p2.reload.unique_id).to eq 'pb'
     end
 
     it "should do a delete all with a join" do
-      Pseudonym.joins(:user).active.where(:users => {:name => 'a'}).delete_all
+      expect(Pseudonym.joins(:user).active.where(:users => {:name => 'a'}).delete_all).to eq 1
       expect { @p1.reload }.to raise_error(ActiveRecord::RecordNotFound)
       expect(@u1.reload).not_to be_deleted
       expect(@p1_2.reload.unique_id).to eq 'pa2'
