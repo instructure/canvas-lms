@@ -338,9 +338,10 @@
 
 // Updated replacement mixin for buttonBackground ^^
 @mixin canvas-button(
-  $button-color, 
-  $text-color, 
-  $button-color-darkened-5:darken($button-color, 5), 
+  $button-color,
+  $text-color,
+  $button-background-is-lighter-than-text:false,
+  $button-color-darkened-5:darken($button-color, 5),
   $button-color-darkened-15:darken($button-color, 15)
 ) {
   background: $button-color;
@@ -372,12 +373,32 @@
     }
   }
 
-  border-color: $button-color-darkened-15;
 
-  &:focus { @include button-focus-dark; }
-  &.active, &.Button--active, &:active {
-    background: $button-color-darkened-5;
-    box-shadow: none;
+  @if $button-background-is-lighter-than-text {
+    border-color: $ic-border-color;
+
+    &.active, &.Button--active, &:active { box-shadow: none; }
+    &.active, &.Button--active {
+      background: darken($button-color, 55%);
+      border-color: darken($button-color, 65%);
+      color: $ic-color-light;
+    }
+    &:focus { @include button-focus-light; }
+    // handle jquery UI ui-button states
+    &.ui-state-focus.ui-state-active {
+      &:focus { @include button-focus-dark; }
+    }
+    &:active { background: darken($button-color, 8%); }
+  }
+
+  @else {
+    border-color: $button-color-darkened-15;
+
+    &:focus { @include button-focus-dark; }
+    &.active, &.Button--active, &:active {
+      background: $button-color-darkened-5;
+      box-shadow: none;
+    }
   }
 }
 
