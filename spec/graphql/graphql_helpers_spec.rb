@@ -46,4 +46,26 @@ describe GraphQLHelpers do
       ).to be_a(GraphQL::ExecutionError)
     end
   end
+
+  context "relay_or_legacy_ids_prepare_func" do
+    let :user1234 { "VXNlci0xMjM0" }
+    let :user5678 { "VXNlci01Njc4" }
+    let :ctx { nil }
+
+    it "works for valid ids" do
+      expect(
+        GraphQLHelpers.relay_or_legacy_ids_prepare_func("User").call(
+          [user1234, user5678], nil
+        )
+      ).to eq ["1234", "5678"]
+    end
+
+    it "returns an error for bad ids" do
+      expect(
+        GraphQLHelpers.relay_or_legacy_ids_prepare_func("Course").call(
+          [user1234, user5678], nil
+        )
+      ).to be_a(GraphQL::ExecutionError)
+    end
+  end
 end
