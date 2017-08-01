@@ -150,9 +150,9 @@ module SIS
 
               d = enrollment_ids.count
               d += @root_account.all_group_memberships.active.where(user_id: user).update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
-              d += user.account_users.shard(@root_account).where(account_id: @root_account.all_accounts).delete_all
-              d += user.account_users.shard(@root_account).where(account_id: @root_account).delete_all
-              if 0 < d
+              d += user.account_users.shard(@root_account).where(account_id: @root_account.all_accounts).update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
+              d += user.account_users.shard(@root_account).where(account_id: @root_account).update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
+              if d > 0
                 should_update_account_associations = true
               end
             end
