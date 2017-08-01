@@ -600,7 +600,7 @@ class GradebooksController < ApplicationController
       return redirect_to polymorphic_url([@context, @assignment])
     end
 
-    if canvadoc_annotations_enabled_in_firefox? ||
+    if !canvadoc_annotations_enabled_in_firefox? &&
         submisions_attachment_crocodocable_in_firefox?(@assignment.submissions)
         flash[:notice] = t("Warning: Crocodoc has limitations when used in Firefox. Comments will not always be saved.")
     end
