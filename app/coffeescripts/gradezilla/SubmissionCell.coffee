@@ -52,7 +52,7 @@ define [
         "EX"
       else
         submission = @opts.item[@opts.column.field]
-        grade = submission.grade || ""
+        grade = submission.entered_grade || submission.grade || ""
         formattedGrade = GradeFormatHelper.formatGrade(grade, { gradingType: submission.gradingType })
         @val = htmlEscape(formattedGrade)
       @$input.val(@val)
@@ -317,7 +317,8 @@ define [
         .addClass(iconClassFromSubmission(rawGrade: newValue))
 
     loadValue: () ->
-      @val = @opts.item[@opts.column.field].grade || ""
+      submission = @opts.item[@opts.column.field]
+      @val = submission.entered_grade || submission.grade || ""
 
     serializeValue: () ->
       @$input.data('value')

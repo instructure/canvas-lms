@@ -673,6 +673,22 @@ describe Assignment do
       end
     end
 
+    context 'with a submission that has an existing grade' do
+      it 'applies the late penalty' do
+        Timecop.freeze do
+          @assignment.update(points_possible: 100, due_at: 1.5.days.ago, submission_types: %w[online_text_entry])
+          late_policy_factory(course: @course, deduct: 15.0, every: :day, missing: 80.0)
+          @assignment.submit_homework(@user, submission_type: 'online_text_entry', body: 'foo')
+          @assignment.grade_student(@user, grade: "100", grader: @teacher)
+          @assignment.reload
+
+          expect(@assignment.submission_for_student(@user).grade).to eql('70')
+          @assignment.grade_student(@user, grade: '70', grader: @teacher)
+          expect(@assignment.submission_for_student(@user).grade).to eql('40')
+        end
+      end
+    end
+
     context 'with a valid student' do
       before :once do
         @result = @assignment.grade_student(@user, grade: "10", grader: @teacher)

@@ -1464,7 +1464,10 @@ class Assignment < ActiveRecord::Base
       did_grade = true if score.present? || submission.excused?
     end
 
-    submission.grade_matches_current_submission = true if did_grade
+    if did_grade
+      submission.grade_matches_current_submission = true
+      submission.instance_variable_set(:@regraded, true)
+    end
 
     if (submission.score_changed? ||
         submission.grade_matches_current_submission) &&

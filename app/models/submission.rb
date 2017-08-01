@@ -1305,7 +1305,7 @@ class Submission < ActiveRecord::Base
   private :score_missing
 
   def score_late_or_none(late_policy, points_possible, grading_type)
-    raw_score = score_changed? ? score : entered_score
+    raw_score = score_changed? || @regraded ? score : entered_score
     deducted = late_points_deducted(raw_score, late_policy, points_possible, grading_type)
     new_score = raw_score && raw_score - deducted
     self.points_deducted = late? ? deducted : nil
@@ -1332,6 +1332,7 @@ class Submission < ActiveRecord::Base
   private :late_points_deducted
 
   def late_policy_relevant_changes?
+    return true if @regraded
     return false if grade_matches_current_submission == false # nil is treated as true
     changes.slice(:score, :submitted_at, :seconds_late_override, :late_policy_status).any?
   end

@@ -904,6 +904,16 @@ describe Submission do
       end
     end
 
+    it "applies the late policy when entered grade is equal to previous penalized grade" do
+      Timecop.freeze(2.days.ago(@date)) do
+        @assignment.submit_homework(@student, body: "a body")
+        @assignment.grade_student(@student, grade: 600, grader: @teacher)
+
+        @assignment.grade_student(@student, grade: 500, grader: @teacher)
+        expect(submission.score).to eq 400
+      end
+    end
+
     it "does not apply the late policy when what-if score changes" do
       Timecop.freeze(2.days.ago(@date)) do
         @assignment.submit_homework(@student, body: "a body")
