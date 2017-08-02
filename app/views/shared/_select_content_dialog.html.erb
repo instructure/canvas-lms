@@ -19,7 +19,9 @@
       ">
         <% if !only || only.include?(:assignments) %>
         <option value="assignment">Assignment - Local</option>
+        <% if @context.id != CONTENT_BANK %>
         <option value="cloned_assignment">Assignment - From Library</option>
+        <% end %>
         <% end %>
         <% if !only || only.include?(:quizzes) %>
         <option value="quiz"><%= t :quiz_item, "Quiz" %></option>
@@ -29,7 +31,9 @@
         <% end %>
         <% if !only || only.include?(:wiki_pages) %>
         <option value="wiki_page">Content Page - Local</option>
+        <% if @context.id != CONTENT_BANK %>
         <option value="cloned_wiki_page">Content Page - From Library</option>
+        <% end %>
         <% end %>
         <% if !only || only.include?(:discussion_topics) %>
         <option value="discussion_topic"><%= t :discussion_item, "Discussion" %></option>
