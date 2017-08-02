@@ -958,4 +958,51 @@ define([
     ok(natcompare.strings.calledWith(studentA.sortable_name, studentB.sortable_name));
     equal(order, 1);
   });
+
+  QUnit.module('SpeedGrader - gateway timeout', {
+    setup () {
+      this.server = sinon.fakeServer.create({ respondImmediately: true });
+      this.server.respondWith(
+        'GET',
+        `${window.location.pathname}.json${window.location.search}`,
+        [504, { 'Content-Type': 'application/json' }, '']
+      );
+      $('#fixtures').html('<div id="speed_grader_timeout_alert"></div>');
+    },
+    teardown () {
+      $('#fixtures').empty();
+      this.server.restore();
+    }
+  });
+
+  test('shows an error when the gateway times out', function () {
+    this.stub(SpeedGrader.EG, 'domReady');
+    ENV.assignment_title = 'Assignment Title';
+    SpeedGrader.setup();
+    const message = 'Something went wrong. Please try refreshing the page. If the problem persists, there may be too many records on "Assignment Title" to load SpeedGrader.';
+    strictEqual($('#speed_grader_timeout_alert').text(), message);
+  });
+
+  QUnit.module('SpeedGrader - no gateway timeout', {
+    setup () {
+      this.server = sinon.fakeServer.create({ respondImmediately: true });
+      this.server.respondWith(
+        'GET',
+        `${window.location.pathname}.json${window.location.search}`,
+        [200, { 'Content-Type': 'application/json' }, '{ hello: "world"}']
+      );
+      $('#fixtures').html('<div id="speed_grader_timeout_alert"></div>');
+    },
+    teardown () {
+      $('#fixtures').empty();
+      this.server.restore();
+    }
+  });
+
+  test('does not show an error when the gateway times out', function () {
+    this.stub(SpeedGrader.EG, 'domReady');
+    ENV.assignment_title = 'Assignment Title';
+    SpeedGrader.setup();
+    strictEqual($('#speed_grader_timeout_alert').text(), '');
+  });
 });

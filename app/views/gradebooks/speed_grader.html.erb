@@ -31,6 +31,7 @@
   @can_edit_anything = !@context.completed?
 %>
 <% content_for :page_title, t(:page_title, "%{assignment_name}, SpeedGrader, %{course_name}", :assignment_name => @assignment.title, :course_name => @context.name) %>
+<div id="speed_grader_timeout_alert"></div>
 <h4 id="speed_grader_loading">
   <%= t(:loading, "loading...") %>
 </h4>

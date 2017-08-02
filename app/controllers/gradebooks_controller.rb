@@ -630,6 +630,7 @@ class GradebooksController < ApplicationController
           ),
           :course_id => @context.id,
           :assignment_id => @assignment.id,
+          :assignment_title => @assignment.title
         }
         if [:moderator, :provisional_grader].include?(grading_role)
           env[:provisional_status_url] = api_v1_course_assignment_provisional_status_path(@context.id, @assignment.id)
