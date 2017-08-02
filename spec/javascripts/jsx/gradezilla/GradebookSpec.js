@@ -5228,7 +5228,12 @@ QUnit.module('Gradebook#onColumnsReordered', {
     this.gradebook = createGradebook();
     this.gradebook.grid = {
       getColumns () { return []; },
-      setColumns () {}
+      setColumns () {},
+      getOptions () {
+        return {
+          numberOfColumnsToFreeze: 1
+        }
+      }
     }
 
     this.stub(this.gradebook, 'renderViewOptionsMenu');

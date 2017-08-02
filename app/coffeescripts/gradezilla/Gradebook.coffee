@@ -261,7 +261,6 @@ define [
       @studentViewStudents = {}
       @courseContent.students = new StudentDatastore(@students, @studentViewStudents)
 
-      @parentColumns = []
       @allAssignmentColumns = []
       @aggregateColumns = []
 
@@ -636,6 +635,10 @@ define [
       columns = @grid.getColumns()
       currentIds = _(@gradebookContent.customColumns).map (c) -> c.id
       reorderedIds = (m[1] for c in columns when m = c.id.match /^custom_col_(\d+)/)
+
+      frozenColumnCount = @grid.getOptions().numberOfColumnsToFreeze
+      @gradebookGrid.columns.frozen = columns.slice(0, frozenColumnCount).map((column) -> column.id)
+      @gradebookGrid.columns.scrollable = columns.slice(frozenColumnCount).map((column) -> column.id)
 
       if !_.isEqual(reorderedIds, currentIds)
         @reorderCustomColumns(reorderedIds)
@@ -1463,10 +1466,10 @@ define [
       else
         assignmentColumns.concat(@aggregateColumns)
 
-      customColumns = @listVisibleCustomColumns().map((column) => @gradebookGrid.columns.definitions[@getCustomColumnId(column.id)])
-      frozenColumns = @parentColumns.concat(customColumns)
+      parentColumnIds = @gradebookGrid.columns.frozen.filter((columnId) -> !/^custom_col_/.test(columnId))
+      customColumnIds = @listVisibleCustomColumns().map((column) => @getCustomColumnId(column.id))
 
-      @gradebookGrid.columns.frozen = frozenColumns.map((column) -> column.id)
+      @gradebookGrid.columns.frozen = [parentColumnIds..., customColumnIds...]
       @gradebookGrid.columns.scrollable = scrollableColumns.map((column) -> column.id)
 
     getVisibleGradeGridColumns: ->
@@ -1607,8 +1610,8 @@ define [
       @updateFilteredContentInfo()
 
       studentColumn = @buildStudentColumn()
-      @parentColumns.push(studentColumn)
       @gradebookGrid.columns.definitions[studentColumn.id] = studentColumn
+      @gradebookGrid.columns.frozen.push(studentColumn.id)
 
       for id, assignment of @assignments
         assignmentColumn = @buildAssignmentColumn(assignment)
@@ -1961,7 +1964,7 @@ define [
       @keyboardNav.handleMenuOrDialogClose()
 
     toggleNotesColumn: =>
-      parentColumnIds = @parentColumns.map((column) -> column.id)
+      parentColumnIds = @gradebookGrid.columns.frozen.filter((columnId) -> !/^custom_col_/.test(columnId))
       customColumnIds = @listVisibleCustomColumns().map((column) => @getCustomColumnId(column.id))
 
       @gradebookGrid.columns.frozen = [parentColumnIds..., customColumnIds...]
@@ -2082,61 +2085,20 @@ define [
 
     freezeTotalGradeColumn: =>
       @totalColumnPositionChanged = true
-      allColumns = @grid.getColumns()
 
-      isStudentColumn = (column) -> column.id == 'student'
-      isTotalGradeColumn = (column) -> column.id == 'total_grade'
-
-      # Remove total_grade column from aggregate section
-      totalColumnPosition = @aggregateColumns.findIndex(isTotalGradeColumn)
-      totalColumn = @aggregateColumns.splice(totalColumnPosition, 1)
-
-      # Remove total_grade column from the current order of displayed columns in the grid
-      totalColumnPositionOverall = allColumns.findIndex(isTotalGradeColumn)
-      allColumns.splice(totalColumnPositionOverall, 1)
-
-      # Add total_grade column next to the position of the student column in the current column order
-      studentColumnPositionOverall = allColumns.findIndex(isStudentColumn)
-      allColumns = allColumns.splice(0, studentColumnPositionOverall + 1).concat(totalColumn).concat(allColumns)
-
-      # Add total_grade column next to the position of the student column in the frozen section
-      studentColumnPosition = @parentColumns.findIndex(isStudentColumn)
-      @parentColumns = @parentColumns.splice(0, studentColumnPosition + 1).concat(totalColumn).concat(@parentColumns)
-
-      frozenColumnCount = @parentColumns.length + @listVisibleCustomColumns().length
-      @gradebookGrid.columns.frozen = allColumns.slice(0, frozenColumnCount).map((column) -> column.id)
-      @gradebookGrid.columns.scrollable = allColumns.slice(frozenColumnCount).map((column) -> column.id)
+      studentColumnPosition = @gradebookGrid.columns.frozen.indexOf('student')
+      @gradebookGrid.columns.frozen.splice(studentColumnPosition + 1, 0, 'total_grade')
+      @gradebookGrid.columns.scrollable = @gradebookGrid.columns.scrollable.filter((columnId) -> columnId != 'total_grade')
 
       @updateGrid()
       @updateColumnHeaders()
 
     moveTotalGradeColumnToEnd: =>
       @totalColumnPositionChanged = true
-      allColumns = @grid.getColumns()
 
-      isTotalGradeColumn = (column) -> column.id == 'total_grade'
-
-      # Remove total_grade column from aggregate or frozen section as needed
-      if @gridSupport.columns.getColumns().frozen.some(isTotalGradeColumn)
-        totalColumnPosition = @parentColumns.findIndex(isTotalGradeColumn)
-        totalColumn = @parentColumns.splice(totalColumnPosition, 1)
-      else
-        totalColumnPosition = @aggregateColumns.findIndex(isTotalGradeColumn)
-        totalColumn = @aggregateColumns.splice(totalColumnPosition, 1)
-
-      # Remove total_grade column from the current order of displayed columns in the grid
-      totalColumnPositionOverall = allColumns.findIndex(isTotalGradeColumn)
-      allColumns.splice(totalColumnPositionOverall, 1)
-
-      # Add total_grade column next to the position of the student column in the current column order
-      allColumns = allColumns.concat(totalColumn)
-
-      # Add total_grade column to the end of the aggregate section
-      @aggregateColumns = @aggregateColumns.concat(totalColumn)
-
-      frozenColumnCount = @parentColumns.length + @listVisibleCustomColumns().length
-      @gradebookGrid.columns.frozen = allColumns.slice(0, frozenColumnCount).map((column) -> column.id)
-      @gradebookGrid.columns.scrollable = allColumns.slice(frozenColumnCount).map((column) -> column.id)
+      @gradebookGrid.columns.frozen = @gradebookGrid.columns.frozen.filter((columnId) -> columnId != 'total_grade')
+      @gradebookGrid.columns.scrollable = @gradebookGrid.columns.scrollable.filter((columnId) -> columnId != 'total_grade')
+      @gradebookGrid.columns.scrollable.push('total_grade')
 
       @updateGrid()
       @updateColumnHeaders()
