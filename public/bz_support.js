@@ -409,3 +409,4 @@ function BZ_GoToMasterPage(master_page_id) {
     };
     req.send('');
 }
+

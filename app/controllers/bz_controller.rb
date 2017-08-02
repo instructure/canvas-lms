@@ -146,15 +146,17 @@ class BzController < ApplicationController
     if module_sequence.nil?
       # view the entire course
       items = []
-      Course.find(@course_id.to_i).context_modules.not_deleted.each do |ms|
+      Course.find(@course_id.to_i).context_modules.active.each do |ms|
         items += ms.content_tags_visible_to(@current_user)
       end
     else
       # view just one module inside a course
-      items = Course.find(@course_id.to_i).context_modules.not_deleted[module_sequence.to_i].content_tags_visible_to(@current_user)
+      items = Course.find(@course_id.to_i).context_modules.active[module_sequence.to_i].content_tags_visible_to(@current_user)
     end
     @pages = []
     items.each do |item|
+      next if !item.published?
+      # what about assignments?
       if item.content_type == "WikiPage"
         wp = WikiPage.find(item.content_id)
         @pages << wp
@@ -208,14 +210,14 @@ class BzController < ApplicationController
         # shouldn't be a real problem.
         magic_field_count = Rails.cache.fetch("magic_field_count_for_course_#{course_id}", :expires_in => 1.week) do
           count = 0
-          course.assignments.active.each do |assignment|
+          course.assignments.published.each do |assignment|
             assignment_html = assignment.description
             doc = Nokogiri::HTML(assignment_html)
             doc.css('[data-bz-retained]').each do |o|
               count += 1
             end
           end
-          course.wiki_pages.active.each do |wiki_page|
+          course.wiki_pages.published.each do |wiki_page|
             page_html = wiki_page.body
             doc = Nokogiri::HTML(page_html)
             doc.css('[data-bz-retained]').each do |o|
