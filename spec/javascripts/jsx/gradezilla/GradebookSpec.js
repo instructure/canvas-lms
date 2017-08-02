@@ -5207,7 +5207,9 @@ QUnit.module('Gradebook#arrangeColumnsBy', {
           numberOfColumnsToFreeze: 0
         };
       },
-      setColumns () {}
+      invalidate () {},
+      setColumns () {},
+      setNumberOfColumnsToFreeze () {}
     }
   }
 });
@@ -5215,7 +5217,6 @@ QUnit.module('Gradebook#arrangeColumnsBy', {
 test('renders the view options menu', function () {
   this.stub(this.gradebook, 'renderViewOptionsMenu');
   this.stub(this.gradebook, 'updateColumnHeaders');
-  this.stub(this.gradebook.grid, 'setColumns');
 
   this.gradebook.arrangeColumnsBy({ sortBy: 'due_date', direction: 'ascending' }, false);
 

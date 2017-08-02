@@ -665,12 +665,14 @@ define [
       @setStoredSortOrder(newSortOrder) unless isFirstArrangement
 
       columns = @grid.getColumns()
-      numberOfColumnsToFreeze = @grid.getOptions().numberOfColumnsToFreeze
-      frozen = columns.splice(0, numberOfColumnsToFreeze)
-      columns.sort @makeColumnSortFn(newSortOrder)
-      columns.splice(0, 0, frozen...)
-      @grid.setColumns(columns)
+      frozen = columns.splice(0, @gradebookGrid.columns.frozen.length)
+      @gradebookGrid.columns.frozen = frozen.map((column) -> column.id)
 
+      columns = @gradebookGrid.columns.scrollable.map((columnId) => @gradebookGrid.columns.definitions[columnId])
+      columns.sort @makeColumnSortFn(newSortOrder)
+      @gradebookGrid.columns.scrollable = columns.map((column) -> column.id)
+
+      @updateGrid()
       @renderViewOptionsMenu()
       @updateColumnHeaders()
 
@@ -1471,6 +1473,11 @@ define [
       [@gradebookGrid.columns.frozen..., @gradebookGrid.columns.scrollable...].map (columnId) =>
         @gradebookGrid.columns.definitions[columnId]
 
+    updateGrid: ->
+      @grid.setNumberOfColumnsToFreeze(@gradebookGrid.columns.frozen.length)
+      @grid.setColumns(@getVisibleGradeGridColumns())
+      @grid.invalidate()
+
     ## Grid Column Definitions
 
     # Student Column
@@ -1953,29 +1960,25 @@ define [
     handleColumnHeaderMenuClose: =>
       @keyboardNav.handleMenuOrDialogClose()
 
-    toggleNotesColumn: (callback) =>
-      columnsToReplace = @grid.getOptions().numberOfColumnsToFreeze
-      callback()
-      cols = @grid.getColumns()
-      customColumns = @listVisibleCustomColumns().map((column) => @gradebookGrid.columns.definitions[@getCustomColumnId(column.id)])
-      cols.splice 0, columnsToReplace,
-        @parentColumns..., customColumns...
-      @grid.setColumns(cols)
-      @grid.invalidate()
+    toggleNotesColumn: =>
+      parentColumnIds = @parentColumns.map((column) -> column.id)
+      customColumnIds = @listVisibleCustomColumns().map((column) => @getCustomColumnId(column.id))
+
+      @gradebookGrid.columns.frozen = [parentColumnIds..., customColumnIds...]
+
+      @updateGrid()
 
     showNotesColumn: =>
       if @teacherNotesNotYetLoaded
         @teacherNotesNotYetLoaded = false
         DataLoader.getDataForColumn(@getTeacherNotesColumn(), @options.custom_column_data_url, {}, @gotCustomColumnDataChunk)
 
-      @toggleNotesColumn =>
-        @getTeacherNotesColumn()?.hidden = false
-        @grid.setNumberOfColumnsToFreeze @parentColumns.length + @listVisibleCustomColumns().length
+      @getTeacherNotesColumn()?.hidden = false
+      @toggleNotesColumn()
 
     hideNotesColumn: =>
-      @toggleNotesColumn =>
-        @getTeacherNotesColumn()?.hidden = true
-        @grid.setNumberOfColumnsToFreeze @parentColumns.length + @listVisibleCustomColumns().length
+      @getTeacherNotesColumn()?.hidden = true
+      @toggleNotesColumn()
 
     hideAggregateColumns: ->
       return false unless @gradingPeriodSet?
@@ -2046,12 +2049,6 @@ define [
 
     ## Gradebook Bulk UI Update Methods
 
-    updateFrozenColumnsAndRenderGrid: (newColumns) ->
-      @grid.setNumberOfColumnsToFreeze(@parentColumns.length + @listVisibleCustomColumns().length)
-      @grid.setColumns(newColumns)
-      @grid.invalidate()
-      @updateColumnHeaders()
-
     updateColumnsAndRenderViewOptionsMenu: =>
       @setVisibleGridColumns()
       @grid.setColumns(@getVisibleGradeGridColumns())
@@ -2106,7 +2103,12 @@ define [
       studentColumnPosition = @parentColumns.findIndex(isStudentColumn)
       @parentColumns = @parentColumns.splice(0, studentColumnPosition + 1).concat(totalColumn).concat(@parentColumns)
 
-      @updateFrozenColumnsAndRenderGrid(allColumns)
+      frozenColumnCount = @parentColumns.length + @listVisibleCustomColumns().length
+      @gradebookGrid.columns.frozen = allColumns.slice(0, frozenColumnCount).map((column) -> column.id)
+      @gradebookGrid.columns.scrollable = allColumns.slice(frozenColumnCount).map((column) -> column.id)
+
+      @updateGrid()
+      @updateColumnHeaders()
 
     moveTotalGradeColumnToEnd: =>
       @totalColumnPositionChanged = true
@@ -2132,7 +2134,12 @@ define [
       # Add total_grade column to the end of the aggregate section
       @aggregateColumns = @aggregateColumns.concat(totalColumn)
 
-      @updateFrozenColumnsAndRenderGrid(allColumns)
+      frozenColumnCount = @parentColumns.length + @listVisibleCustomColumns().length
+      @gradebookGrid.columns.frozen = allColumns.slice(0, frozenColumnCount).map((column) -> column.id)
+      @gradebookGrid.columns.scrollable = allColumns.slice(frozenColumnCount).map((column) -> column.id)
+
+      @updateGrid()
+      @updateColumnHeaders()
 
     totalColumnShouldFocus: ->
       if @totalColumnPositionChanged
