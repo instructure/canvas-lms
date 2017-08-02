@@ -5838,6 +5838,7 @@ is:
   editor_button_6647db9c: Ritilshnappur
   either_the_url_or_domain_should_be_set_c29cf8c1: "Annað hvort vefslóð eða lén þarf að vera skilgreint."
   either_you_re_a_new_user_or_the_terms_of_use_have__14f0d0d0: "Annað hvort ertu nýr notandi eða *notendaskilmálar* hafa breyst síðan þú samþykktir þá. Vinsamlegast samþykktu *notendaskilmála* og **persónuverndarstefnu** áður en þú heldur áfram."
+  element_option_missing_error_an_element_to_attach__be433478: "`Villa` við vöntun á þætti: Þáttur til að tengja TreeBrowserView þarf skilgreiningu þegar stillt er á 'rétt' fyrir BBTreeBrowserView."
   email: 
     default_from_name: "Instructure Canvas"
   email_22a7d52d: Netfang
@@ -6122,6 +6123,17 @@ is:
       links: 
         create: "Stofna ePortfolio"
       page_title: "Mín ePortfolios"
+      what: 
+        details1: |-
+            Í ePortfolios geturðu sýnt og rætt mikilvæg skil og reynslu þína af náminu. Þú getur notað ePortfolio til að:
+            * Sýna fleirum en kennara þínum ritgerðir sem þú ert stolt/stoltur af.
+            * Ræða um hugsun og vinnu sem fór í verkefnið.
+            * Fá yfirlit yfir námsreynslu þína í heild.
+            * Deila vinnu þinni með vinum, framtíðarvinnuveitendum o.s.frv.
+            
+            ePortfolios geta verið opin fyrir öllum, fyrir þér eða fyrir afmörkuðum hópi og þú getur alltaf breytt stillingunum.
+            
+            Viltu byrja? Smelltu á hnappinn.
     wizard_box: 
       finish: 
         body: "Viltu byrja? Þú getur alltaf farið aftur í  þessa hjálp með því að smella á tengilinn \"%{help_link_text}\" sem þú sérð þarna."
@@ -11330,6 +11342,7 @@ is:
       error_loading_token_details: "Villa við að sækja upplýsingar um tákn"
       feature_options: "Valkostir þáttar"
       full_token_warning: "**Afrita þetta tákn núna**. Þegar þú yfirgefur síðuna geturðu ekki endurheimt táknið að fullu og verður að endurskapa það til að fá nýtt gildi."
+      generate_access_token_description: "Aðgangstákn heimila forritum þriðju aðila aðgang að Canvas fyrir þína hönd. Þessi tákn eru yfirleitt stofnuð sjálfkrafa jafnóðum en ef [þú ert að þróa nýtt eða takmarkað verkefni](%{documentation_url})  geturðu búið til táknið hérna."
       google_drive_description: "Þegar þú heimilar okkur að sjá Google Drive hjá þér, geturðu skilað verkefnunum þínum beint úr Google Drive og stofnað og deilt skjölum með meðlimum í bekkjunum þínum."
       headers: 
         application_abbrev: Smáforrit
@@ -11807,6 +11820,7 @@ is:
       discrimination_index: Aðgreiningarvísir
       discrimination_index_dialog_title: "Myndrit aðgreiningarvísis"
       discrimination_index_dialog_trigger: "Læra meira um aðgreiningarvísi."
+    discrimination_index_help: "* Þetta fall mælir hversu vel ein spurning getur sýnt muninn (eða aðgreint) milli nemenda sem gengur vel á prófi og hinum sem gengur ekki vel. * ** Það skiptir nemendum í þrjá hópa á grundvelli einkunna þeirra á öllu prófinu og sýnir þessa hópa eftir þeim sem svöruðu spurningunni rétt. ** *** ****Nánari upplýsingar hérna.**** ***"
     download_submissions: "Hlaða niður öllum skrám"
     duration_in_hours: 
       one: "1 klukkustund"
