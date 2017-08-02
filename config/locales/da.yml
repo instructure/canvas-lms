@@ -1940,13 +1940,13 @@ da:
   assignment_group_1a781505: Opgavegruppe
   assignment_group_filter_c03f8a1d: "Opgave gruppefilter"
   assignment_group_was_saved_successfully_5caa27d3: "Opgavegruppe blev gemt"
-  assignment_group_weights_and_drop_rules_can_t_be_e_7b5f305d: "Reglerne for vægtning af opgavegrupper og drop-regler kan ikke redigeres, fordi der er opgaver i en af ​​grupperne, hvis forfaldsdato er nået."
-  assignment_group_weights_can_t_be_edited_because_t_b6b591ae: "Vægtning af opgavegrupper kan ikke redigeres, fordi der er opgaver i en af ​​grupperne, hvis forfaldsdato er nået."
+  assignment_group_weights_and_drop_rules_can_t_be_e_7b5f305d: "Reglerne for vægtning af opgavegruppe og drop-regler kan ikke redigeres, fordi der er opgaver i en af ​​grupperne, hvis forfaldsdato er nået."
+  assignment_group_weights_can_t_be_edited_because_t_b6b591ae: "Vægtning af opgavegruppe kan ikke redigeres, fordi der er opgaver i en af ​​grupperne, hvis forfaldsdato er nået."
   assignment_group_weights_dialog: 
     buttons: 
       save: Gem
     titles: 
-      assignment_group_weights: "Administrér styring af vægtning af opgavegrupper"
+      assignment_group_weights: "Administrér styring af vægtning af opgavegruppe"
       total: "I alt"
     weight_final: "Vægt endelig karakter ud fra grupper"
   assignment_groups: 
@@ -1960,7 +1960,7 @@ da:
     errors: 
       frozen_assignments_error: "Du kan ikke slette en gruppe med en låst opgave."
   assignment_groups_bc9cc3c9: Opgavegrupper
-  assignment_groups_weight_2f1a5a7c: "Vægtning af opgavegrupper"
+  assignment_groups_weight_2f1a5a7c: "Vægtning af opgavegruppe"
   assignment_menu_91fe3716: Opgavemenu
   assignment_muted_4cb590a4: "Opgave er uden besked til de studerende"
   assignment_muted_8d74bfa0: "Opgave uden besked til de studerende"
@@ -2652,7 +2652,7 @@ da:
   available_until_date_2c0ccec3: "Tilgængelig indtil den:"
   available_until_date_cd125c62: "Tilgængelig indtil dato"
   available_until_f3b9c4ed: "Tilgængelig indtil"
-  available_until_field_for_styleguide_85d5d65a: "Feltet Tilgængelig til til stilmanual"
+  available_until_field_for_styleguide_85d5d65a: "Feltet \"Tilgængelig indtil\" i styleguide"
   available_until_format_like_yyyy_mm_dd_hh_mm_622378d6: "Tilgængelig indtil - Format som ÅÅÅÅ-MM-DD tt:mm"
   available_until_lock_at_ab022445: "Tilgængelig til %{lock_at}"
   availableslots_available_87b8b69d: "%{availableSlots} tilgængelige"
@@ -12841,7 +12841,7 @@ da:
         token: Adgangs-token
     assignment_freezer: 
       description: "Lås opgaveegenskaber på kopi"
-      name: "Låsning af opgaveegenskaber"
+      name: Opgavelåsning
     assignment_freezer_settings: 
       description: |-
           Dette plugin giver administratorer mulighed for at kontrollere en egenskab på opgaver,
@@ -13241,7 +13241,7 @@ da:
         api_url: "Api URL"
         become_user_id_uri: "Bliv bruger URL"
         http_env: "HTTP ENV"
-        message_backtrace: Tilbagesporing
+        message_backtrace: Backtrace
         message_type: Beskedtype
         password: Adgangskode
         request_context_id: "Anmod om kontekst-id"
