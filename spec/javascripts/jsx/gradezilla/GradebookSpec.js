@@ -4088,7 +4088,7 @@ QUnit.module('Gradebook#freezeTotalGradeColumn', {
 
       setNumberOfColumnsToFreeze () {},
 
-      invalidate () {}
+      invalidate: sinon.stub()
     };
 
     this.stub(gradebook, 'updateColumnHeaders');
@@ -4105,6 +4105,12 @@ test('re-renders column headers after reordering is done', function () {
   this.gradebook.freezeTotalGradeColumn();
 
   strictEqual(this.gradebook.updateColumnHeaders.callCount, 1);
+});
+
+test('invalidates the grid, forcing a re-render', function () {
+  this.gradebook.freezeTotalGradeColumn();
+
+  strictEqual(this.gradebook.grid.invalidate.callCount, 1);
 });
 
 QUnit.module('Gradebook#listRowIndicesForStudentIds');
@@ -4212,47 +4218,6 @@ test('has no effect when the grid has not been initialized', function () {
   ok(true, 'no error was thrown');
 });
 
-QUnit.module('Gradebook#updateFrozenColumnsAndRenderGrid', {
-  setupGradebook () {
-    const gradebook = createGradebook();
-    gradebook.grid = {
-      columns: [],
-
-      getColumns () {
-        return this.columns;
-      },
-
-      setColumns (incomingColumns) {
-        this.columns = incomingColumns;
-      },
-
-      setNumberOfColumnsToFreeze () {},
-      invalidate () {},
-    };
-
-    this.stub(gradebook.grid, 'invalidate');
-    this.stub(gradebook, 'updateColumnHeaders');
-
-    return gradebook;
-  },
-
-  setup () {
-    this.gradebook = this.setupGradebook();
-  }
-});
-
-test('invalidates the grid, forcing a re-render', function () {
-  this.gradebook.updateFrozenColumnsAndRenderGrid();
-
-  strictEqual(this.gradebook.grid.invalidate.callCount, 1);
-});
-
-test('re-renders column headers', function () {
-  this.gradebook.updateFrozenColumnsAndRenderGrid();
-
-  strictEqual(this.gradebook.updateColumnHeaders.callCount, 1);
-});
-
 QUnit.module('Gradebook#moveTotalGradeColumnToEnd', {
   setupGradebook () {
     const gradebook = createGradebook();
@@ -4269,7 +4234,7 @@ QUnit.module('Gradebook#moveTotalGradeColumnToEnd', {
 
       setNumberOfColumnsToFreeze () {},
 
-      invalidate () {}
+      invalidate: sinon.stub()
     };
     gradebook.gridSupport = {
       columns: {
@@ -4282,7 +4247,6 @@ QUnit.module('Gradebook#moveTotalGradeColumnToEnd', {
       }
     };
 
-    this.stub(gradebook.grid, 'setNumberOfColumnsToFreeze');
     this.stub(gradebook, 'updateColumnHeaders');
 
     return gradebook;
@@ -4297,6 +4261,12 @@ test('re-renders column headers after reordering is done', function () {
   this.gradebook.moveTotalGradeColumnToEnd();
 
   strictEqual(this.gradebook.updateColumnHeaders.callCount, 1);
+});
+
+test('invalidates the grid, forcing a re-render', function () {
+  this.gradebook.moveTotalGradeColumnToEnd();
+
+  strictEqual(this.gradebook.grid.invalidate.callCount, 1);
 });
 
 QUnit.module('Gradebook#gotSubmissionsChunk', function (hooks) {
