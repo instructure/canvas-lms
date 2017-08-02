@@ -241,7 +241,7 @@ class BzController < ApplicationController
           # have a way to do this with a proper atomic update or a lock.
           existing_grade = submission.grade.nil? ? 0 : submission.grade.to_f
           new_grade = existing_grade + step
-          participation_assignment.grade_student(@current_user, {:grade => (new_grade) })
+          participation_assignment.grade_student(@current_user, {:grade => (new_grade), :suppress_notification => true })
         end
       end
     end

@@ -1187,6 +1187,10 @@ class Assignment < ActiveRecord::Base
     did_grade = false
     submission.attributes = opts.slice(:excused, :submission_type, :url, :body)
 
+    if opts[:suppress_notification]
+      submission.suppress_notification
+    end
+
     unless opts[:provisional]
       submission.grader = grader
       submission.grade = grade

@@ -785,6 +785,10 @@ class Submission < ActiveRecord::Base
     self.updated_at <=> other.updated_at
   end
 
+  def suppress_notification
+    @suppress_notification = true
+  end
+
   # Submission:
   #   Online submission submitted AFTER the due date (notify the teacher) - "Grade Changes"
   #   Submission graded (or published) - "Grade Changes"
@@ -801,35 +805,35 @@ class Submission < ActiveRecord::Base
     p.dispatch :assignment_submitted
     p.to { assignment.context.instructors_in_charge_of(user_id) }
     p.whenever { |submission|
-      BroadcastPolicies::SubmissionPolicy.new(submission).
+      !@suppress_notification && BroadcastPolicies::SubmissionPolicy.new(submission).
         should_dispatch_assignment_submitted?
     }
 
     p.dispatch :assignment_resubmitted
     p.to { assignment.context.instructors_in_charge_of(user_id) }
     p.whenever { |submission|
-      BroadcastPolicies::SubmissionPolicy.new(submission).
+      !@suppress_notification && BroadcastPolicies::SubmissionPolicy.new(submission).
         should_dispatch_assignment_resubmitted?
     }
 
     p.dispatch :group_assignment_submitted_late
     p.to { assignment.context.instructors_in_charge_of(user_id) }
     p.whenever { |submission|
-      BroadcastPolicies::SubmissionPolicy.new(submission).
+      !@suppress_notification && BroadcastPolicies::SubmissionPolicy.new(submission).
         should_dispatch_group_assignment_submitted_late?
     }
 
     p.dispatch :submission_graded
     p.to { [student] + User.observing_students_in_course(student, assignment.context) }
     p.whenever { |submission|
-      BroadcastPolicies::SubmissionPolicy.new(submission).
+      !@suppress_notification && BroadcastPolicies::SubmissionPolicy.new(submission).
         should_dispatch_submission_graded?
     }
 
     p.dispatch :submission_grade_changed
     p.to { [student] + User.observing_students_in_course(student, assignment.context) }
     p.whenever { |submission|
-      BroadcastPolicies::SubmissionPolicy.new(submission).
+      !@suppress_notification && BroadcastPolicies::SubmissionPolicy.new(submission).
         should_dispatch_submission_grade_changed?
     }
 
