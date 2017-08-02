@@ -27,7 +27,7 @@
     <%= form_tag context_url(@context, :context_url), {:method => :delete} do %>
       <input type="hidden" name="event" value="delete"/>
       <div class="form-actions">
-        <a href="<%= context_url(@context, :context_url) %>" class="btn"><%= t('#buttons.cancel', %{Cancel}) %></a>
+        <a href="<%= course_settings_url(@context) %>" class="btn"><%= t('#buttons.cancel', %{Cancel}) %></a>
         <button class="btn btn-danger" type="submit"><%= t('buttons.delete_course', %{Delete Course}) %></button>
       </div>
     <% end %>
@@ -39,7 +39,7 @@
     <%= form_tag context_url(@context, :context_url), {:method => :delete} do %>
       <input type="hidden" name="event" value="conclude"/>
       <div class="form-actions">
-        <a href="<%= context_url(@context, :context_url) %>" class="btn"><%= t('#buttons.cancel', %{Cancel}) %></a>
+        <a href="<%= course_settings_url(@context) %>" class="btn"><%= t('#buttons.cancel', %{Cancel}) %></a>
         <button class="btn btn-primary" type="submit"><%= t('buttons.conclude_course', %{Conclude Course}) %></button>
       </div>
     <% end %>
