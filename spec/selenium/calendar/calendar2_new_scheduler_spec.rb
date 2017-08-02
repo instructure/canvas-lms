@@ -137,7 +137,9 @@ describe "scheduler" do
       title = visible_dialog_element.find_element(:css, '.ui-dialog-titlebar')
       expect(title.text).to include('Cancel existing reservation and sign up for this one?')
       f('.ui-dialog-buttonset .ui-button').click
+      scroll_to(f('span[class="navigation_title_text"]'))
       ff('.fc-content .fc-title')[1].click
+      wait_for_ajaximations
       expect(f('.event-details')).to contain_css('.reserve_event_link')
     end
   end
