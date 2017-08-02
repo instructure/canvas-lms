@@ -27,6 +27,10 @@ module ApplicationHelper
     BeyondZConfiguration.url(path)
   end
 
+  def fixup_bz_scripts(html)
+    html.gsub(/<script>(.*?)<\/script>/m, "<script>try { runAtEnd(function() { \n\n\\1\n\n }); } catch(e) { console.log(e); }</script>")
+  end
+
   def context_user_name(context, user)
     return nil unless user
     return user.short_name if !context && user.respond_to?(:short_name)
