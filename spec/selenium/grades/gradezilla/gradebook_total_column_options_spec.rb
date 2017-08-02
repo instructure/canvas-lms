@@ -39,7 +39,7 @@ describe "Gradezilla - total column menu options" do
       ff(".slick-row .slick-cell:nth-child(5)").each do |total|
         raise Error "Total text is missing." unless total.text
         total.text.strip!
-        expect(total.text).to match(/\A#{expected_points.shift}$/) unless total.text.length < 1
+        expect(total.text).to include("#{expected_points.shift}") unless total.text.length < 1
       end
     end
 

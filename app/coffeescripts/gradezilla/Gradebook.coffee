@@ -222,7 +222,7 @@ define [
         max: 400
       total:
         min: 95
-        max: 110
+        max: 400
 
     hasSections: $.Deferred()
     gridReady: $.Deferred()
