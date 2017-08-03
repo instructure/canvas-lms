@@ -5842,7 +5842,10 @@ QUnit.module('Gradebook#onGridBlur', {
     const students = [{
       enrollments: [{ type: 'StudentEnrollment', grades: { html_url: 'http://example.url/' } }],
       id: '1101',
-      name: 'Adam Jones'
+      name: 'Adam Jones',
+      assignment_2301: {
+        assignment_id: '2301', late: false, missing: false, excused: false, seconds_late: 0
+      }
     }]
     this.gradebook.gotChunkOfStudents(students);
     this.gradebook.initGrid();
@@ -6012,7 +6015,14 @@ QUnit.module('Gradebook#renderSubmissionTray', {
     $fixtures.innerHTML = `<div id=${this.mountPointId}></div>`;
     this.gradebook = createGradebook();
     this.gradebook.students = {
-      1101: { id: '1101', name: 'Adam Jones', assignment_2301: { late: false, missing: false, excused: false, seconds_late: 0 } }
+      1101: {
+        id: '1101',
+        name: 'Adam Jones',
+        wtf: true,
+        assignment_2301: {
+          assignment_id: '2301', late: false, missing: false, excused: false, seconds_late: 0
+        }
+      }
     };
     this.gradebook.gridSupport = {
       helper: {
@@ -6020,14 +6030,9 @@ QUnit.module('Gradebook#renderSubmissionTray', {
         focus () {}
       }
     };
-    this.server = sinon.fakeServer.create({ respondImmediately: true });
-    this.server.respondWith('GET', /^\/images\/.*\.svg$/, [
-      200, { 'Content-Type': 'img/svg+xml' }, '{}'
-    ]);
   },
 
   teardown () {
-    this.server.restore();
     const node = document.getElementById(this.mountPointId);
     ReactDOM.unmountComponentAtNode(node);
     $fixtures.innerHTML = '';

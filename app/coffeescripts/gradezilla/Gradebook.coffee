@@ -2104,7 +2104,7 @@ define [
       { open, studentId, assignmentId } = @getSubmissionTrayState()
       # get the student's submission, or use a fake submission object in case the
       # submission has not yet loaded
-      fakeSubmission = { late: false, missing: false, excused: false, seconds_late: 0 }
+      fakeSubmission = { assignment_id: assignmentId, late: false, missing: false, excused: false, seconds_late: 0 }
       submission = @getSubmission(studentId, assignmentId) || fakeSubmission
 
       props =
