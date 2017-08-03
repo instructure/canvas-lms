@@ -4348,14 +4348,14 @@ QUnit.module('Gradebook#gotSubmissionsChunk', function (hooks) {
     deepEqual(Object.keys(this.gradebook.getAssignment('202').effectiveDueDates), ['1101']);
   });
 
-  test('updates inClosedGradingPeriod on related assignments', function () {
+  QUnit.only('updates inClosedGradingPeriod on related assignments', function () {
     this.gradebook.setAssignments({
       201: { id: '201', name: 'Math Assignment', published: true },
       202: { id: '202', name: 'English Assignment', published: false }
     });
     this.gradebook.gotSubmissionsChunk(studentSubmissions);
-    deepEqual(Object.keys(this.gradebook.getAssignment('201').effectiveDueDates), ['1101', '1102']);
-    deepEqual(Object.keys(this.gradebook.getAssignment('202').effectiveDueDates), ['1101']);
+    strictEqual(this.gradebook.getAssignment('201').inClosedGradingPeriod, false);
+    strictEqual(this.gradebook.getAssignment('202').inClosedGradingPeriod, false);
   });
 
   test('sets up grading for the related students', function () {
