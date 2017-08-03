@@ -20,6 +20,15 @@ tinymce.create('tinymce.plugins.BZRetainedFields', {
       div.appendChild(label);
 
       label = document.createElement("label");
+      label.innerHTML = "<span>Optional? </span> ";
+      var optional = document.createElement("input");
+      optional.type = "checkbox";
+      if(editing) {
+        label.appendChild(optional);
+        div.appendChild(label);
+      }
+
+      label = document.createElement("label");
       label.innerHTML = "<span>Type:</span> ";
 
       var type = document.createElement("select");
@@ -67,7 +76,7 @@ tinymce.create('tinymce.plugins.BZRetainedFields', {
             if(name.value.length == 0)
               alert("You cannot use a magic field without a name. Please enter one.");
             else {
-              callback(name.value, type.options[type.selectedIndex].value, values.value.split("\n"));
+              callback(name.value, type.options[type.selectedIndex].value, values.value.split("\n"), optional.checked);
               dialog.parentNode.removeChild(dialog);
             }
       };
@@ -78,12 +87,12 @@ tinymce.create('tinymce.plugins.BZRetainedFields', {
     }
 
     ed.addCommand('bzRetainedField', function() {
-      showFieldDialog("Add Magic Field Editor", function(name, type, values) {
+      showFieldDialog("Add Magic Field Editor", function(name, type, values, optional) {
         name = name.replace(/</g, '&lt;');
         name = name.replace(/"/g, '&quot;');
 
         if(type == "checkbox")
-          ed.selection.setContent('<input type="checkbox" data-bz-retained="'+name+'" />');
+          ed.selection.setContent('<input type="checkbox" '+(optional.checked ? 'class="bz-optional-magic-field"':'')+' data-bz-retained="'+name+'" />');
         else if(type == "radio") {
           for(var i = 0; i < values.length; i++) {
             var v = values[i].
@@ -91,12 +100,12 @@ tinymce.create('tinymce.plugins.BZRetainedFields', {
               replace("<", "&lt;").
               replace(">", "&gt;").
               replace("\"", "&quot;");
-            ed.selection.setContent('<input type="radio" value="'+v+'" data-bz-retained="'+name+'" /> ' + v + '<br>');
+            ed.selection.setContent('<input type="radio" value="'+v+'" '+(optional.checked ? 'class="bz-optional-magic-field"':'')+' data-bz-retained="'+name+'" /> ' + v + '<br>');
           }
         } else if(type == "input")
-          ed.selection.setContent('<input type="text" data-bz-retained="'+name+'" />');
+          ed.selection.setContent('<input type="text" '+(optional.checked ? 'class="bz-optional-magic-field"':'')+' data-bz-retained="'+name+'" />');
         else if(type == "textarea")
-          ed.selection.setContent('<textarea data-bz-retained="'+name+'">&#8291;</textarea>');
+          ed.selection.setContent('<textarea '+(optional.checked ? 'class="bz-optional-magic-field"':'')+' data-bz-retained="'+name+'">&#8291;</textarea>');
       }, true);
     });
     ed.addCommand('bzRetainedFieldView', function() {

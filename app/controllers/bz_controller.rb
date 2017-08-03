@@ -177,6 +177,9 @@ class BzController < ApplicationController
     result = RetainedData.where(:user_id => @current_user.id, :name => params[:name])
     data = nil
     was_new = false
+    # if a student hacks this to set optional = true... they just lose out on their own points
+    # so i don't mind it being passed to us from the client.
+    was_optional = params[:optional]
     if result.empty?
       data = RetainedData.new()
       data.user_id = @current_user.id
@@ -193,7 +196,7 @@ class BzController < ApplicationController
     # now that the user's work is safely saved, we will go back and do addon work
     # like micrograding
 
-    if was_new
+    if was_new && !was_optional
       course_id = request.referrer[/\/courses\/(\d+)\//, 1]
       if course_id
 
@@ -213,14 +216,14 @@ class BzController < ApplicationController
           course.assignments.published.each do |assignment|
             assignment_html = assignment.description
             doc = Nokogiri::HTML(assignment_html)
-            doc.css('[data-bz-retained]').each do |o|
+            doc.css('[data-bz-retained]:not(bz-optional-magic-field)').each do |o|
               count += 1
             end
           end
           course.wiki_pages.published.each do |wiki_page|
             page_html = wiki_page.body
             doc = Nokogiri::HTML(page_html)
-            doc.css('[data-bz-retained]').each do |o|
+            doc.css('[data-bz-retained]:not(bz-optional-magic-field)').each do |o|
               count += 1
             end
           end
