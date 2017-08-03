@@ -1421,17 +1421,17 @@ canvas-planner@1.0.7:
     format-message "^5.1.2"
     format-message-parse "^5.1.2"
     format-message-print "^5.1.2"
-    instructure-icons "^3.0.1"
-    instructure-ui "^2.3.0"
+    instructure-icons "^4.1.0"
+    instructure-ui "2.3.0"
     keycode "^2.1.9"
     moment "~2.10.6"
     moment-timezone "^0.5.13"
     parse-link-header "^1.0.1"
-    prop-types "^15.5.8"
+    prop-types "^15.5.9"
     react-moment-proptypes "^1.4.0"
     react-redux "^5.0.3"
     react-waypoint "^7.0.3"
-    redux "^3.6.0"
+    redux "^3.5.2"
     redux-actions "^2.0.1"
     redux-logger "^3.0.1"
     redux-promise "^0.5.3"
@@ -4112,7 +4112,7 @@ install@~0.1.7:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/install/-/install-0.1.8.tgz#9980ef93e30dfb534778d163bc86ddd472ad5fe8"
 
-instructure-icons@4.2.0:
+instructure-icons@4.2.0, instructure-icons@^4.1.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/instructure-icons/-/instructure-icons-4.2.0.tgz#7faa6ba3f6c84a9154f81f64a6d4e5ce544df105"
   dependencies:
@@ -4120,14 +4120,25 @@ instructure-icons@4.2.0:
     shortid "^2.2.8"
     svg-to-jsx "^0.0.20"
 
-instructure-icons@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/instructure-icons/-/instructure-icons-3.0.1.tgz#1a8eb651ca4af619846a5c8d5f23e70cbba9badf"
+instructure-ui@2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/instructure-ui/-/instructure-ui-2.3.0.tgz#bb08d3cb1b8d77b374b649f95ff652cba8a7e9d5"
   dependencies:
+    classnames "2.2.5"
+    decimal.js "7.2.1"
+    deep-equal "1.0.1"
+    glamor "2.20.24"
+    invariant "2.2.2"
+    keycode "2.1.8"
+    moment-timezone "0.5.13"
+    numeral "2.0.6"
+    object.omit "2.0.1"
+    object.pick "1.2.0"
     prop-types "15.5.8"
     shortid "2.2.8"
+    tinycolor2 "1.4.1"
 
-instructure-ui@2.5.0, instructure-ui@^2.3.0:
+instructure-ui@2.5.0:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/instructure-ui/-/instructure-ui-2.5.0.tgz#ba92a3975721334c7edc171b997461ac2940dab8"
   dependencies:
@@ -6402,14 +6413,7 @@ prop-types@15.5.8:
   dependencies:
     fbjs "^0.8.9"
 
-prop-types@15.5.9, prop-types@^15.5.6, prop-types@^15.5.8:
-  version "15.5.9"
-  resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.5.9.tgz#d478eef0e761396942f70c78e772f76e8be747c9"
-  dependencies:
-    fbjs "^0.8.9"
-    loose-envify "^1.3.1"
-
-prop-types@^15.0.0, prop-types@^15.5.10:
+prop-types@^15.0.0, prop-types@^15.5.10, prop-types@^15.5.6, prop-types@^15.5.8, prop-types@^15.5.9:
   version "15.5.10"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.5.10.tgz#2797dfc3126182e3a95e3dfbb2e893ddd7456154"
   dependencies:
@@ -6850,16 +6854,7 @@ redux-thunk@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/redux-thunk/-/redux-thunk-2.2.0.tgz#e615a16e16b47a19a515766133d1e3e99b7852e5"
 
-redux@3.5.2, redux@^3.2.0, redux@~3.5.2:
-  version "3.5.2"
-  resolved "https://registry.yarnpkg.com/redux/-/redux-3.5.2.tgz#4533745e970b647ec26066a83aa30e9e26faf843"
-  dependencies:
-    lodash "^4.2.1"
-    lodash-es "^4.2.1"
-    loose-envify "^1.1.0"
-    symbol-observable "^0.2.3"
-
-redux@^3.6.0:
+redux@^3.2.0, redux@^3.5.2:
   version "3.6.0"
   resolved "https://registry.yarnpkg.com/redux/-/redux-3.6.0.tgz#887c2b3d0b9bd86eca2be70571c27654c19e188d"
   dependencies:
@@ -6867,6 +6862,15 @@ redux@^3.6.0:
     lodash-es "^4.2.1"
     loose-envify "^1.1.0"
     symbol-observable "^1.0.2"
+
+redux@~3.5.2:
+  version "3.5.2"
+  resolved "https://registry.yarnpkg.com/redux/-/redux-3.5.2.tgz#4533745e970b647ec26066a83aa30e9e26faf843"
+  dependencies:
+    lodash "^4.2.1"
+    lodash-es "^4.2.1"
+    loose-envify "^1.1.0"
+    symbol-observable "^0.2.3"
 
 regenerate@^1.2.1:
   version "1.3.2"
@@ -8427,7 +8431,7 @@ yargs@^1.2.6:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/yargs/-/yargs-1.3.3.tgz#054de8b61f22eefdb7207059eaef9d6b83fb931a"
 
-yargs@^3.21.0:
+yargs@^3.21.0, yargs@^3.5.4, yargs@^3.8.0:
   version "3.32.0"
   resolved "https://registry.yarnpkg.com/yargs/-/yargs-3.32.0.tgz#03088e9ebf9e756b69751611d2a5ef591482c995"
   dependencies:
@@ -8438,15 +8442,6 @@ yargs@^3.21.0:
     string-width "^1.0.1"
     window-size "^0.1.4"
     y18n "^3.2.0"
-
-yargs@^3.5.4, yargs@^3.8.0, yargs@~3.10.0:
-  version "3.10.0"
-  resolved "https://registry.yarnpkg.com/yargs/-/yargs-3.10.0.tgz#f7ee7bd857dd7c1d2d38c0e74efbd681d1431fd1"
-  dependencies:
-    camelcase "^1.0.2"
-    cliui "^2.1.0"
-    decamelize "^1.0.0"
-    window-size "0.1.0"
 
 yargs@^6.0.0, yargs@^6.6.0:
   version "6.6.0"
@@ -8483,6 +8478,15 @@ yargs@^7.0.0:
     which-module "^1.0.0"
     y18n "^3.2.1"
     yargs-parser "^5.0.0"
+
+yargs@~3.10.0:
+  version "3.10.0"
+  resolved "https://registry.yarnpkg.com/yargs/-/yargs-3.10.0.tgz#f7ee7bd857dd7c1d2d38c0e74efbd681d1431fd1"
+  dependencies:
+    camelcase "^1.0.2"
+    cliui "^2.1.0"
+    decamelize "^1.0.0"
+    window-size "0.1.0"
 
 yauzl@2.4.1:
   version "2.4.1"

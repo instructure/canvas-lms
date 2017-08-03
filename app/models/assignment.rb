@@ -49,7 +49,8 @@ class Assignment < ActiveRecord::Base
   restrict_columns :content, [:title, :description]
   restrict_assignment_columns
 
-  has_many :submissions, :dependent => :destroy
+  has_many :submissions, -> { active.preload(:grading_period) }
+  has_many :all_submissions, class_name: 'Submission', dependent: :destroy
   has_many :provisional_grades, :through => :submissions
   has_many :attachments, :as => :context, :inverse_of => :context, :dependent => :destroy
   has_many :assignment_student_visibilities
@@ -69,7 +70,6 @@ class Assignment < ActiveRecord::Base
 
   has_many :assignment_configuration_tool_lookups, dependent: :delete_all
   has_many :tool_settings_context_external_tools, through: :assignment_configuration_tool_lookups, source: :tool, source_type: 'ContextExternalTool'
-  has_many :tool_settings_tool_proxies, through: :assignment_configuration_tool_lookups, source: :tool, source_type: 'Lti::MessageHandler'
 
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :inverse_of => :context, :dependent => :destroy
   validates_associated :external_tool_tag, :if => :external_tool?
@@ -81,15 +81,6 @@ class Assignment < ActiveRecord::Base
   validate :moderation_setting_ok?
   validate :assignment_name_length_ok?
   validates :lti_context_id, presence: true, uniqueness: true
-
-  after_save :clear_effective_due_dates_memo
-
-  def clear_effective_due_dates_memo
-    return if @effective_due_dates.nil?
-    if due_at_changed? || active_assignment_overrides.any?(&:due_at_changed?)
-      @effective_due_dates = nil
-    end
-  end
 
   accepts_nested_attributes_for :external_tool_tag, :update_only => true, :reject_if => proc { |attrs|
     # only accept the url, content_tyupe, content_id, and new_tab params, the other accessible
@@ -164,7 +155,7 @@ class Assignment < ActiveRecord::Base
 
     result = self.clone
     result.migration_id = nil
-    result.submissions.clear
+    result.all_submissions.clear
     result.attachments.clear
     result.ignores.clear
     result.moderated_grading_selections.clear
@@ -1284,7 +1275,7 @@ class Assignment < ActiveRecord::Base
       submissions_to_save.concat(submissions.select  { !submissions.score || (options[:overwrite_existing_grades] && submissions.score != score) })
     end
 
-    Submission.where(:id => submissions_to_save).update_all({
+    Submission.active.where(id: submissions_to_save).update_all({
       :score => score,
       :grade => grade,
       :published_score => score,
@@ -1340,7 +1331,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def submission_for_student(user)
-    self.submissions.where(user_id: user.id).first_or_initialize
+    self.all_submissions.where(user_id: user.id).first_or_initialize
   end
 
   class GradeError < StandardError
@@ -1390,6 +1381,12 @@ class Assignment < ActiveRecord::Base
     submissions.compact
   end
 
+  def tool_settings_resource_codes
+    lookup = assignment_configuration_tool_lookups.first
+    return {} unless lookup.present?
+    lookup.resource_codes
+  end
+
   def tool_settings_tool
     self.tool_settings_tools.first
   end
@@ -1398,18 +1395,25 @@ class Assignment < ActiveRecord::Base
     self.tool_settings_tools = [tool] if tool_settings_tool != tool
   end
 
+  def clear_tool_settings_tools
+    assignment_configuration_tool_lookups.where(tool_type: 'Lti::MessageHandler').each(&:destroy_subscription)
+    assignment_configuration_tool_lookups.clear
+  end
+  private :clear_tool_settings_tools
+
   def tool_settings_tools=(tools)
-    lookup = AssignmentConfigurationToolLookup.find_by(tool: tool_settings_tool, assignment: self)
-    lookup&.destroy_subscription
-
-    tool_settings_context_external_tools.clear
-    tool_settings_tool_proxies.clear
-
+    clear_tool_settings_tools
     tools.each do |t|
       if t.instance_of? ContextExternalTool
         tool_settings_context_external_tools << t
       elsif t.instance_of? Lti::MessageHandler
-        tool_settings_tool_proxies << t
+        product_family = t.resource_handler.tool_proxy.product_family
+        assignment_configuration_tool_lookups.new(
+          tool_vendor_code: product_family.vendor_code,
+          tool_product_code: product_family.product_code,
+          tool_resource_type_code: t.resource_handler.resource_type_code,
+          tool_type: 'Lti::MessageHandler'
+        )
       end
     end
     tools
@@ -1417,9 +1421,14 @@ class Assignment < ActiveRecord::Base
   protected :tool_settings_tools=
 
   def tool_settings_tools
-    tool_settings_context_external_tools + tool_settings_tool_proxies
+    tool_settings_context_external_tools + tool_settings_message_handlers
   end
   protected :tool_settings_tools
+
+  def tool_settings_message_handlers
+    assignment_configuration_tool_lookups.where(tool_type: 'Lti::MessageHandler').map(&:lti_tool)
+  end
+  private :tool_settings_message_handlers
 
   def save_grade_to_submission(submission, original_student, group, opts)
     unless submission.grader_can_grade?
@@ -1476,7 +1485,7 @@ class Assignment < ActiveRecord::Base
 
   def find_or_create_submission(user)
     Assignment.unique_constraint_retry do
-      s = submissions.where(user_id: user).first
+      s = all_submissions.where(user_id: user).first
       if !s
         s = submissions.build
         user.is_a?(User) ? s.user = user : s.user_id = user
@@ -1487,7 +1496,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def find_or_create_submissions(students)
-    submissions = self.submissions.where(user_id: students).order(:user_id).to_a
+    submissions = self.all_submissions.where(user_id: students).order(:user_id).to_a
     submissions_hash = submissions.index_by(&:user_id)
     # we touch the user in an after_save; the FK causes a read lock
     # to be taken on the user during submission INSERT, so to avoid
@@ -1519,7 +1528,7 @@ class Assignment < ActiveRecord::Base
             submissions << submission
           end
         rescue ActiveRecord::RecordNotUnique
-          submission = self.submissions.where(user_id: student).first
+          submission = self.all_submissions.where(user_id: student).first
           raise unless submission
           submissions << submission
           submission.assignment = self
@@ -1622,6 +1631,8 @@ class Assignment < ActiveRecord::Base
         # clear out attributes from prior submissions
         if opts[:submission_type].present?
           SUBMIT_HOMEWORK_ATTRS.each { |attr| homework[attr] = nil }
+          homework.late_policy_status = nil
+          homework.seconds_late_override = nil
         end
 
         student = homework.user
@@ -1692,7 +1703,7 @@ class Assignment < ActiveRecord::Base
 
   def student_needs_provisional_grade?(student, preloaded_counts=nil)
     pg_count = if preloaded_counts
-      preloaded_counts[CANVAS_RAILS4_2 ? student.id.to_s : student.id] || 0
+      preloaded_counts[student.id] || 0
     else
       self.provisional_grades.not_final.where(:submissions => {:user_id => student}).count
     end
@@ -2016,12 +2027,14 @@ class Assignment < ActiveRecord::Base
   scope :include_submitted_count, -> { select(
     "assignments.*, (SELECT COUNT(*) FROM #{Submission.quoted_table_name}
     WHERE assignments.id = submissions.assignment_id
-    AND submissions.submission_type IS NOT NULL) AS submitted_count") }
+    AND submissions.submission_type IS NOT NULL
+    AND submissions.workflow_state <> 'deleted') AS submitted_count") }
 
   scope :include_graded_count, -> { select(
     "assignments.*, (SELECT COUNT(*) FROM #{Submission.quoted_table_name}
     WHERE assignments.id = submissions.assignment_id
-    AND submissions.grade IS NOT NULL) AS graded_count") }
+    AND submissions.grade IS NOT NULL
+    AND submissions.workflow_state <> 'deleted') AS graded_count") }
 
   scope :include_submittables, -> { preload(:quiz, :discussion_topic, :wiki_page) }
 
@@ -2118,6 +2131,7 @@ class Assignment < ActiveRecord::Base
     chain = api_needed_fields.
       where("(SELECT COUNT(id) FROM #{Submission.quoted_table_name}
             WHERE assignment_id = assignments.id
+            AND submissions.workflow_state <> 'deleted'
             AND (submission_type IS NOT NULL OR excused = ?)
             AND user_id = ?) = 0", true, user_id).
       limit(limit).
@@ -2133,7 +2147,7 @@ class Assignment < ActiveRecord::Base
   scope :need_grading_info, lambda {
     chain = api_needed_fields.
       where("EXISTS (?)",
-        Submission.where("assignment_id=assignments.id").
+        Submission.active.where("assignment_id=assignments.id").
           where(Submission.needs_grading_conditions)).
       order("assignments.due_at")
 
@@ -2256,7 +2270,7 @@ class Assignment < ActiveRecord::Base
 
     if user_id
       user = User.where(id: user_id).first
-      submission = Submission.where(user_id: user_id, assignment_id: self).first
+      submission = Submission.active.where(user_id: user_id, assignment_id: self).first
     end
     attachment = Attachment.where(id: attachment_id).first if attachment_id
 
@@ -2330,7 +2344,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def update_cached_due_dates
-    if due_at_changed? || workflow_state_changed?
+    if due_at_changed? || workflow_state_changed? || only_visible_to_overrides_changed?
       DueDateCacher.recompute(self)
     end
   end
@@ -2377,7 +2391,8 @@ class Assignment < ActiveRecord::Base
     all.primary_shard.activate do
       joins("LEFT OUTER JOIN #{Submission.quoted_table_name} s ON
              s.assignment_id = assignments.id AND
-             s.submission_type IS NOT NULL")
+             s.submission_type IS NOT NULL AND
+             s.workflow_state <> 'deleted'")
       .group("assignments.id")
       .select("assignments.*, count(s.assignment_id) AS student_submission_count")
     end
@@ -2401,7 +2416,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.assignment_ids_with_submissions(assignment_ids)
-    Submission.having_submission.where(:assignment_id => assignment_ids).distinct.pluck(:assignment_id)
+    Submission.active.having_submission.where(:assignment_id => assignment_ids).distinct.pluck(:assignment_id)
   end
 
   # override so validations are called
@@ -2421,16 +2436,13 @@ class Assignment < ActiveRecord::Base
     s.excused?
   end
 
-  def effective_due_dates
-    @effective_due_dates ||= EffectiveDueDates.for_course(context, id)
-  end
-
   def in_closed_grading_period?
-    effective_due_dates.in_closed_grading_period?(id)
-  end
-
-  def in_closed_grading_period_for_student?(student)
-    effective_due_dates.in_closed_grading_period?(id, student)
+    return @in_closed_grading_period unless @in_closed_grading_period.nil?
+    @in_closed_grading_period = if submissions.loaded?
+      submissions.map(&:grading_period).compact.any?(&:closed?)
+    else
+      GradingPeriod.joins(:submissions).where(submissions: {assignment_id: self.id}).closed.exists?
+    end
   end
 
   # simply versioned models are always marked new_record, but for our purposes

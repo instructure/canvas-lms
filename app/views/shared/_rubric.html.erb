@@ -150,7 +150,7 @@
   <tr class="summary" style="<%= hidden if rubric_association && rubric_association.hide_score_total %>">
     <td colspan="4">
       <div style="float: right;" class="total_points_holder">
-        <span style="padding-right: 10px;"><%= before_label :total_points, "Total Points" %>
+        <span><%= before_label :total_points, "Total Points" %>
           <% ot(:out_of, "%{points} *out of %{total}*", :points => capture { %>
             <span class="rubric_total">
               <%=

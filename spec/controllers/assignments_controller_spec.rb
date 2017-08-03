@@ -683,7 +683,7 @@ describe AssignmentsController do
       )
 
       message_handler = Lti::MessageHandler.create(
-        message_type: 'message_type',
+        message_type: 'basic-lti-launch-request',
         launch_path: 'https://samplelaunch/blti',
         resource_handler: resource_handler
       )
@@ -691,6 +691,7 @@ describe AssignmentsController do
       AssignmentConfigurationToolLookup.any_instance.stubs(:create_subscription).returns true
       Lti::ToolProxyBinding.create(context: @course, tool_proxy: tool_proxy)
       @assignment.tool_settings_tool = message_handler
+      @assignment.save!
 
       get 'edit', :course_id => @course.id, :id => @assignment.id
       expect(assigns[:js_env][:SELECTED_CONFIG_TOOL_ID]).to eq message_handler.id

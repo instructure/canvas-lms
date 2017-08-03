@@ -294,7 +294,7 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def cache_child_event_ranges!
-    events = CANVAS_RAILS4_2 ? child_events(true) : child_events.reload
+    events = child_events.reload
 
     if events.present?
       CalendarEvent.where(:id => self).
@@ -455,7 +455,9 @@ class CalendarEvent < ActiveRecord::Base
       participant.lock! # in case two people try to make a reservation for the same participant
 
       if options[:cancel_existing]
+        now = Time.now.utc
         context.reservations_for(participant).lock.each do |reservation|
+          raise ReservationError, "cannot cancel past reservation" if reservation.end_at < Time.now.utc
           reservation.updating_user = user
           reservation.destroy
         end

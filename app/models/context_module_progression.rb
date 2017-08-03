@@ -192,13 +192,13 @@ class ContextModuleProgression < ActiveRecord::Base
     subs = []
     if tag.content_type_quiz?
       subs = Quizzes::QuizSubmission.where(quiz_id: tag.content_id, user_id: user).to_a +
-        Submission.where(assignment_id: tag.content.assignment_id, user_id: user).to_a
+        Submission.active.where(assignment_id: tag.content.assignment_id, user_id: user).to_a
     elsif tag.content_type_discussion?
       if tag.content
-        subs = Submission.where(assignment_id: tag.content.assignment_id, user_id: user).to_a
+        subs = Submission.active.where(assignment_id: tag.content.assignment_id, user_id: user).to_a
       end
     else
-      subs = Submission.where(assignment_id: tag.content_id, user_id: user).to_a
+      subs = Submission.active.where(assignment_id: tag.content_id, user_id: user).to_a
     end
     subs
   end

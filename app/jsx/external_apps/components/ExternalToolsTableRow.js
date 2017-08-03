@@ -96,23 +96,33 @@ export default React.createClass({
       if (!this.props.tool.installed_locally) {
         return (
           <span className="text-muted">
-            <i className="icon-lock"
-               ref="lockIcon"
-               data-tooltip="top"
-               title={I18n.t('Installed by Admin')}></i>
+            <i
+              className="icon-lock"
+              ref="lockIcon"
+              data-tooltip="top"
+              title={I18n.t('%{app} was installed by Admin and is locked', {app: this.props.tool.name})}
+            />
           </span>
         );
       } else if (this.props.tool.is_master_course_child_content) {
         if (this.props.tool.restricted_by_master_course) {
           return (
             <span className="master-course-cell">
-              <i className="icon-blueprint-lock"></i>
+              <i
+                className="icon-blueprint-lock"
+                data-tooltip="top"
+                title={I18n.t('%{app} was installed by the master course and is locked', {app: this.props.tool.name})}
+              />
             </span>
           );
         } else {
           return (
             <span className="master-course-cell">
-              <i className="icon-blueprint"></i>
+              <i
+                className="icon-blueprint"
+                data-tooltip="top"
+                title={I18n.t('%{app} was installed by the master course', {app: this.props.tool.name})}
+              />
             </span>
           );
         }

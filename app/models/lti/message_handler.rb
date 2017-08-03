@@ -99,5 +99,11 @@ module Lti
       Canvas::Security.hmac_sha1(resource_link_id)
     end
 
+    def resource_codes
+      resource_handler.tool_proxy.resource_codes.merge(
+        { resource_type_code: resource_handler.resource_type_code }
+      )
+    end
+
   end
 end

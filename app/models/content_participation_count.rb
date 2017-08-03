@@ -74,12 +74,12 @@ class ContentParticipationCount < ActiveRecord::Base
           assignments.workflow_state NOT IN ('deleted', 'unpublished') AND
           (assignments.muted IS NULL OR NOT assignments.muted)
         SQL
-        subs_with_grades = Submission.graded.
+        subs_with_grades = Submission.active.graded.
             joins(:assignment).
             where(submission_conditions).
             where("submissions.score IS NOT NULL").
             pluck(:id)
-        subs_with_comments = Submission.
+        subs_with_comments = Submission.active.
             joins(:assignment, :submission_comments).
             where(submission_conditions).
             where(<<-SQL, user).pluck(:id)

@@ -189,40 +189,79 @@ describe Assignment::SpeedGrader do
     end
   end
 
-  it "returns submission lateness" do
-    # Set up
-    section_1 = @course.course_sections.create!(:name => 'Section one')
-    section_2 = @course.course_sections.create!(:name => 'Section two')
+  context "with submissions" do
+    let!(:now) { Time.zone.now }
 
-    assignment = @course.assignments.create!(:title => 'Overridden assignment', :due_at => Time.now - 5.days)
+    before do
+      section_1 = @course.course_sections.create!(name: 'Section one')
+      section_2 = @course.course_sections.create!(name: 'Section two')
 
-    student_1 = user_with_pseudonym(:active_all => true, :username => 'student1@example.com')
-    student_2 = user_with_pseudonym(:active_all => true, :username => 'student2@example.com')
+      @assignment = @course.assignments.create!(title: 'Overridden assignment', due_at: 5.days.ago(now))
 
-    @course.enroll_student(student_1, :section => section_1).accept!
-    @course.enroll_student(student_2, :section => section_2).accept!
+      @student_1 = user_with_pseudonym(active_all: true, username: 'student1@example.com')
+      @student_2 = user_with_pseudonym(active_all: true, username: 'student2@example.com')
 
-    o1 = assignment.assignment_overrides.build
-    o1.due_at = Time.now - 2.days
-    o1.due_at_overridden = true
-    o1.set = section_1
-    o1.save!
+      @course.enroll_student(@student_1, :section => section_1).accept!
+      @course.enroll_student(@student_2, :section => section_2).accept!
 
-    o2 = assignment.assignment_overrides.build
-    o2.due_at = Time.now + 2.days
-    o2.due_at_overridden = true
-    o2.set = section_2
-    o2.save!
+      o1 = @assignment.assignment_overrides.build
+      o1.due_at = 2.days.ago(now)
+      o1.due_at_overridden = true
+      o1.set = section_1
+      o1.save!
 
-    submission_1 = assignment.submit_homework(student_1, :submission_type => 'online_text_entry', :body => 'blah')
-    submission_2 = assignment.submit_homework(student_2, :submission_type => 'online_text_entry', :body => 'blah')
+      o2 = @assignment.assignment_overrides.build
+      o2.due_at = 2.days.from_now(now)
+      o2.due_at_overridden = true
+      o2.set = section_2
+      o2.save!
 
-    # Test
-    json = Assignment::SpeedGrader.new(assignment, @teacher).json
-    json[:submissions].each do |submission|
-      user = [student_1, student_2].detect { |s| s.id.to_s == submission[:user_id] }
-      if(submission[:workflow_state] == "submitted")
-        expect(submission[:late]).to eq user.submissions.first.late?
+      @assignment.submit_homework(@student_1, submission_type: 'online_text_entry', body: 'blah')
+      @assignment.submit_homework(@student_2, submission_type: 'online_text_entry', body: 'blah')
+    end
+
+    it "returns submission lateness" do
+      json = Assignment::SpeedGrader.new(@assignment, @teacher).json
+      json[:submissions].each do |submission|
+        user = [@student_1, @student_2].detect { |s| s.id.to_s == submission[:user_id] }
+        if submission[:workflow_state] == "submitted"
+          expect(submission[:late]).to eq user.submissions.first.late?
+        end
+      end
+    end
+
+    it "includes submission missing status in each submission history version" do
+      json = Assignment::SpeedGrader.new(@assignment, @teacher).json
+      json[:submissions].each do |submission|
+        user = [@student_1, @student_2].detect { |s| s.id.to_s == submission[:user_id] }
+        next unless user
+        submission[:submission_history].each_with_index do |version, idx|
+          expect(version[:submission][:missing]).to eq user.submissions.first.submission_history[idx].missing?
+        end
+      end
+    end
+
+    it "includes submission late status in each submission history version" do
+      json = Assignment::SpeedGrader.new(@assignment, @teacher).json
+      json[:submissions].each do |submission|
+        user = [@student_1, @student_2].detect { |s| s.id.to_s == submission[:user_id] }
+        next unless user
+        submission[:submission_history].each_with_index do |version, idx|
+          expect(version[:submission][:late]).to eq user.submissions.first.submission_history[idx].late?
+        end
+      end
+    end
+
+    it "includes submission entered_score and entered_grade in each submission history version" do
+      json = Assignment::SpeedGrader.new(@assignment, @teacher).json
+      json[:submissions].each do |submission|
+        user = [@student_1, @student_2].detect { |s| s.id.to_s == submission[:user_id] }
+        next unless user
+        submission[:submission_history].each_with_index do |version, idx|
+          submission_version = user.submissions.first.submission_history[idx]
+          expect(version[:submission][:entered_score]).to eq submission_version.entered_score
+          expect(version[:submission][:entered_grade]).to eq submission_version.entered_grade
+        end
       end
     end
   end

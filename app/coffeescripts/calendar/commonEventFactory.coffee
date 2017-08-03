@@ -87,20 +87,22 @@ define [
     obj.can_delete = false
     obj.can_change_context = false
 
-    # If the user can create an event in a context, they can also edit/delete
-    # any events in that context.
-    if contextInfo.can_create_calendar_events
-      obj.can_edit = true
-      obj.can_delete = true
-    # If the event has a state "locked" - in which case, it can't be
-    # edited (but it could be deleted)
-    if obj.object.workflow_state == 'locked'
-      obj.can_edit = false
-
-    # Only the description can be edited on scheduler events,
-    # but that can always be changed whether locked or not
-    if obj.object.appointment_group_id && contextInfo.can_create_calendar_events
-      obj.can_edit = true
+    if obj.object.appointment_group_id
+      # for events linked to appointment groups, use appointment group permissions
+      # because e.g. students can create group calendar events but cannot edit group AGs
+      if obj.object.can_manage_appointment_group
+        obj.can_edit = true
+        obj.can_delete = true
+    else
+      # If the user can create an event in a context, they can also edit/delete
+      # any events in that context.
+      if contextInfo.can_create_calendar_events
+        obj.can_edit = true
+        obj.can_delete = true
+      # If the event has a state "locked" - in which case, it can't be
+      # edited (but it could be deleted)
+      if obj.object.workflow_state == 'locked'
+        obj.can_edit = false
 
     # frozen assignments can't be deleted
     if obj.assignment?.frozen

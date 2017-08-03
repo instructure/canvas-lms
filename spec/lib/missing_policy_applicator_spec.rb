@@ -106,9 +106,11 @@ describe MissingPolicyApplicator do
     it 'does not apply deductions to assignments that went missing over 24 hours ago' do
       assignment_old
       late_policy_missing_enabled
-      applicator.apply_missing_deductions
-
       submission = @course.submissions.first
+      submission.update_columns(score: nil, grade: nil)
+
+      applicator.apply_missing_deductions
+      submission.reload
 
       expect(submission.score).to be nil
       expect(submission.grade).to be nil
@@ -152,7 +154,8 @@ describe MissingPolicyApplicator do
       late_policy_missing_enabled
 
       enrollment = student.enrollments.find_by(course_id: @course.id)
-      enrollment.scores.first_or_create.update(grading_period_id: nil, final_score: 100, current_score: 100)
+      enrollment.scores.first_or_create.update_columns(grading_period_id: nil, final_score: 100, current_score: 100)
+      @course.submissions.first.update_columns(score: nil, grade: nil)
 
       expect { applicator.apply_missing_deductions }.to change(enrollment, :computed_final_score)
     end

@@ -84,7 +84,7 @@ module GradezillaCommon
 
     @students = []
     (1..num).each do |i|
-      student = User.create!(:name => "Student_#{i}")
+      student = User.create!(:name => "Student_#{i} lastname#{i}")
       student.register!
 
       e1 = @course.enroll_student(student)
@@ -189,9 +189,9 @@ module GradezillaCommon
     @assignment_3_points = "50"
     @attendance_points = "15"
 
-    @student_name_1 = "student1"
-    @student_name_2 = "student2"
-    @student_name_3 = "student3"
+    @student_name_1 = "student1 last1"
+    @student_name_2 = "student2 last2"
+    @student_name_3 = "student3 last3"
 
     @student_1_total_ignoring_ungraded = "100%"
     @student_2_total_ignoring_ungraded = "66.67%"

@@ -520,7 +520,7 @@ class UsersController < ApplicationController
       :expires_in => 3.minutes) do
       assignments = upcoming_events.select{ |e| e.is_a?(Assignment) }
       Shard.partition_by_shard(assignments) do |shard_assignments|
-        Submission.
+        Submission.active.
           select([:id, :assignment_id, :score, :grade, :workflow_state, :updated_at]).
           where(:assignment_id => shard_assignments, :user_id => user)
       end
@@ -916,11 +916,11 @@ class UsersController < ApplicationController
     Shackles.activate(:slave) do
       course_ids = user.participating_student_course_ids
       Shard.partition_by_shard(course_ids) do |shard_course_ids|
-        submissions = Submission.preload(:assignment).
+        submissions = Submission.active.preload(:assignment).
                       missing.
                       where(user_id: user.id,
                             assignments: {context_id: shard_course_ids}).
-                      merge(Assignment.active).
+                      merge(Assignment.published).
                       order(:cached_due_date)
       end
     end
@@ -1737,11 +1737,7 @@ class UsersController < ApplicationController
           session.delete(:require_terms)
           flash[:notice] = t('user_updated', 'User was successfully updated.')
           unless params[:redirect_to_previous].blank?
-            if CANVAS_RAILS4_2
-              return redirect_to :back
-            else
-              return redirect_back fallback_location: user_url(@user)
-            end
+            return redirect_back fallback_location: user_url(@user)
           end
           format.html { redirect_to user_url(@user) }
           format.json {
@@ -2269,6 +2265,7 @@ class UsersController < ApplicationController
     sis_user_id = nil
     integration_id = nil
     params[:pseudonym] ||= {}
+    params[:pseudonym][:unique_id].strip! if params[:pseudonym][:unique_id].is_a?(String)
 
     if @context.grants_right?(@current_user, session, :manage_sis)
       sis_user_id = params[:pseudonym].delete(:sis_user_id)

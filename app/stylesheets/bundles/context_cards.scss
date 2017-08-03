@@ -102,6 +102,13 @@
   &:last-of-type {
     padding-right: 0;
   }
+  .StudentContextTray-QuickLinks__Link-text {
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    line-height: 1rem;
+    margin-top:.25rem;
+  }
 }
 
 .StudentContextTray-Progress__Bar {

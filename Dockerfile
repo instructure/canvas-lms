@@ -41,8 +41,8 @@ RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="
   && find $GEM_HOME ! -user docker | xargs chown docker:docker
 
 # We will need sfnt2woff in order to build fonts
-RUN curl -O https://people-mozilla.org/~jkew/woff/woff-code-latest.zip \
-  && unzip woff-code-latest.zip -d woff \
+COPY build/vendor/woff-code-latest.zip ./
+RUN unzip woff-code-latest.zip -d woff \
   && cd woff \
   && make \
   && cp sfnt2woff /usr/local/bin \

@@ -178,8 +178,7 @@ class CourseSection < ActiveRecord::Base
     return true unless scope.exists?
 
     self.errors.add(:sis_source_id, t('sis_id_taken', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_source_id))
-    throw :abort unless CANVAS_RAILS4_2
-    false
+    throw :abort
   end
 
   alias_method :parent_event_context, :course

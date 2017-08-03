@@ -22,7 +22,11 @@ define [
 
   QUnit.module "TinyMCEContentItem LTI Link",
     setup: ->
+      textarea = $("<textarea id='a42' data-rich_text='true'></textarea>")
+      $("#fixtures").append(textarea)
+      tinymce.init({selector: "#fixtures textarea#a42"})
     teardown: ->
+      $("#fixtures").empty()
 
   test "Handles LTI link with presentation target of 'embed' and thumbnail is set", ->
     contentItem = TinyMCEContentItem.fromJSON(contentItems.lti_thumb_embed)
@@ -68,6 +72,9 @@ define [
     equal(contentItem.codePayload, '<iframe src="/courses/1/external_tools/retrieve?display=borderless&amp;url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like sexy for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" style="width: 800px; height: 600px;"></iframe>')
 
   test "Handles LTI link with presentation target of 'window' and thumbnail is *NOT* set", ->
+    iframe = $('.mce-tinymce').find('iframe')[0]
+    tinymce_element = $(iframe).find('body').append("<p>&nbsp;</p>")
+    tinymce_element.click
     contentItem = TinyMCEContentItem.fromJSON(contentItems.lti_window)
     equal(contentItem.text, "Arch Linux plain window")
     equal(contentItem.url, "/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti")

@@ -16,6 +16,15 @@
 {{/if}}
 {{outOfText}}
 
+{{#if submission.late}}
+  <span class="submission_late_penalty">
+    {{#t}}Late Penalty{{/t}} <strong>{{late_penalty}}</strong>
+  </span>
+  <span class="submission_final_grade">
+    {{#t}}Final Grade{{/t}} <strong>{{final_grade}}</strong>
+  </span>
+{{/if}}
+
 {{#unless isPassFail}}
 <div class="checkbox">
   <label class="checkbox">

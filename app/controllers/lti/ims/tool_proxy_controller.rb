@@ -40,8 +40,8 @@ module Lti
       before_action :require_context, :except => [:show]
       skip_before_action :load_user, only: [:create, :show, :re_reg]
 
-      rescue_from 'Lti::ToolProxyService::InvalidToolProxyError' do |exception|
-        render json: {error: exception.message}, status: 400
+      rescue_from Lti::Errors::InvalidToolProxyError do |exception|
+        render json: exception.as_json, status: 400
       end
 
       def show
@@ -58,14 +58,22 @@ module Lti
           begin
             validate_access_token!
             reg_key = access_token.reg_key
-            reg_secret = RegistrationRequestService.retrieve_registration_password(context, reg_key) if reg_key
-            render_new_tool_proxy(context, reg_key, developer_key) and return if reg_secret.present?
+            reg_info = RegistrationRequestService.retrieve_registration_password(context, reg_key) if reg_key
+            render_new_tool_proxy(
+              context: context,
+              tool_proxy_guid: reg_key,
+              dev_key: developer_key,
+              registration_url: reg_info[:registration_url]) and return if reg_info.present?
           rescue Lti::Oauth2::InvalidTokenError
             render_unauthorized and return
           end
-        else
+        elsif request.authorization.present?
           secret = RegistrationRequestService.retrieve_registration_password(context, oauth_consumer_key)
-          render_new_tool_proxy(context, oauth_consumer_key) and return if secret.present? && oauth_authenticated_request?(secret)
+          render_new_tool_proxy(
+            context: context,
+            tool_proxy_guid: oauth_consumer_key,
+            registration_url: secret[:registration_url]
+          ) and return if secret.present? && oauth_authenticated_request?(secret[:reg_password])
         end
         render_unauthorized
       end
@@ -109,13 +117,14 @@ module Lti
 
       private
 
-      def render_new_tool_proxy(context, tool_proxy_guid, dev_key = nil)
+      def render_new_tool_proxy(context:, tool_proxy_guid:, dev_key: nil, registration_url: nil)
         tp_service = ToolProxyService.new
         tool_proxy = tp_service.process_tool_proxy_json(
           json: request.body.read,
           context: context,
           guid: tool_proxy_guid,
-          developer_key: dev_key
+          developer_key: dev_key,
+          registration_url: registration_url
         )
         json = {
           "@context" => "http://purl.imsglobal.org/ctx/lti/v2/ToolProxyId",

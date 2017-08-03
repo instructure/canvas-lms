@@ -60,7 +60,7 @@ class EffectiveDueDates
         attributes[:grading_period_id] = row["grading_period_id"] && row["grading_period_id"].to_i
       end
       if include?(included, :in_closed_grading_period)
-        attributes[:in_closed_grading_period] = (CANVAS_RAILS4_2 ? (row["closed"] == "t") : row["closed"])
+        attributes[:in_closed_grading_period] = row["closed"]
       end
       if include?(included, :override_id)
         attributes[:override_id] = row["override_id"] && row["override_id"].to_i
@@ -278,8 +278,7 @@ class EffectiveDueDates
               2 AS priority
             FROM
               models a
-            INNER JOIN #{Course.quoted_table_name} c ON a.context_id = c.id AND a.context_type = 'Course'
-            INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_id = c.id
+            INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_id = a.context_id
             WHERE
               e.workflow_state NOT IN ('rejected', 'deleted') AND
               e.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND
@@ -302,8 +301,12 @@ class EffectiveDueDates
             FROM
               models a
             INNER JOIN #{Submission.quoted_table_name} s ON s.assignment_id = a.id
-            WHERE s.workflow_state = 'graded'
-            #{filter_students_sql('s')}
+            INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_id = a.context_id AND e.user_id = s.user_id
+            WHERE
+              (s.grade IS NOT NULL OR s.excused) AND
+              e.workflow_state NOT IN ('rejected', 'deleted') AND
+              e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
+              #{filter_students_sql('s')}
           ),
 
           -- join all these students together into a single table
@@ -339,7 +342,7 @@ class EffectiveDueDates
                 gpg.account_id
               FROM
                 models a
-              INNER JOIN #{Course.quoted_table_name} c ON c.id = a.context_id AND a.context_type = 'Course'
+              INNER JOIN #{Course.quoted_table_name} c ON c.id = a.context_id
               INNER JOIN #{EnrollmentTerm.quoted_table_name} term ON c.enrollment_term_id = term.id
               LEFT OUTER JOIN #{GradingPeriodGroup.quoted_table_name} gpg ON
                   gpg.course_id = c.id OR gpg.id = term.grading_period_group_id

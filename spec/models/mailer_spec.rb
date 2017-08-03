@@ -20,7 +20,6 @@ require 'spec_helper'
 describe Mailer do
 
   describe 'create_message' do
-
     it 'passes through to address' do
       message = message_model(to: "someemail@example.com")
       mail = Mailer.create_message(message)
@@ -50,6 +49,25 @@ describe Mailer do
       mail = Mailer.create_message(message)
       expect(mail.header['Reply-To']).to be_nil
       expect(mail.header['From'].to_s).to eq "Handy Randy <#{HostUrl.outgoing_email_address}>"
+    end
+  end
+
+  describe 'deliver_now' do
+    it 'calls deliver_now if notification_service is not configured' do
+      message = message_model(to: "someemail@example.com")
+      mail = Mailer.create_message(message)
+      expect(mail).to receive(:deliver_now)
+      expect(Services::NotificationService).not_to receive(:process)
+      Mailer.deliver(mail)
+    end
+
+    it 'calls the notification service if configured' do
+      Account.site_admin.enable_feature!(:notification_service)
+      message = message_model(to: "someemail@example.com")
+      mail = Mailer.create_message(message)
+      expect(mail).not_to receive(:deliver_now)
+      expect(Services::NotificationService).to receive(:process)
+      Mailer.deliver(mail)
     end
   end
 end

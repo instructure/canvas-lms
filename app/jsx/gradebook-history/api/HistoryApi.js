@@ -17,6 +17,7 @@
  */
 
 import axios from 'axios';
+import constants from 'jsx/gradebook-history/constants';
 
 function toParams (id, timeFrame) {
   return {
@@ -24,14 +25,23 @@ function toParams (id, timeFrame) {
       id,
       start_time: timeFrame.from,
       end_time: timeFrame.to,
-      per_page: 20
+      per_page: 10
     }
   };
 }
 
-function getByAssignment (assignmentId, timeFrame = {from: '', to: ''}) {
+function getByAssignment (assignmentId, timeFrame = { from: '', to: '' }) {
   const url = encodeURI(`/api/v1/audit/grade_change/assignments/${assignmentId}`);
   const params = toParams(assignmentId, timeFrame);
+
+  return axios.get(url, params);
+}
+
+function getByDate (timeFrame = { from: '', to: '' }) {
+  const url = encodeURI(`/api/v1/audit/grade_change/courses/${constants.courseId()}`);
+  const params = {
+    params: { start_time: timeFrame.from, end_time: timeFrame.to }
+  };
 
   return axios.get(url, params);
 }
@@ -50,4 +60,9 @@ function getByStudent (studentId, timeFrame = {from: '', to: ''}) {
   return axios.get(url, params);
 }
 
-export default { getByAssignment, getByGrader, getByStudent };
+export default {
+  getByAssignment,
+  getByDate,
+  getByGrader,
+  getByStudent
+}

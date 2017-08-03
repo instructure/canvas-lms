@@ -98,11 +98,6 @@ describe ContextModulesController do
     end
   end
 
-  def use_route(options)
-    options[:use_route] = :course_context_module_first_redirect if CANVAS_RAILS4_2
-    options
-  end
-
   describe "GET 'module_redirect'" do
     it "should skip leading and trailing sub-headers" do
       course_with_student_logged_in(:active_all => true)
@@ -117,23 +112,20 @@ describe ContextModulesController do
       header2 = @module.add_item :type => 'context_module_sub_header'
 
 
-      # CANVAS_RAILS4_2 remove this silence when we drop Rails 4.2
-      ActiveSupport::Deprecation.silence do
-        get 'module_redirect', use_route(:course_id => @course.id, :context_module_id => @module.id, :first => 1)
-        expect(response).to redirect_to course_assignment_url(@course.id, assignment1.id, :module_item_id => assignmentTag1.id)
+      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :first => 1
+      expect(response).to redirect_to course_assignment_url(@course.id, assignment1.id, :module_item_id => assignmentTag1.id)
 
-        get 'module_redirect', use_route(:course_id => @course.id, :context_module_id => @module.id, :last => 1)
-        expect(response).to redirect_to course_assignment_url(@course.id, assignment2.id, :module_item_id => assignmentTag2.id)
+      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :last => 1
+      expect(response).to redirect_to course_assignment_url(@course.id, assignment2.id, :module_item_id => assignmentTag2.id)
 
-        assignmentTag1.destroy
-        assignmentTag2.destroy
+      assignmentTag1.destroy
+      assignmentTag2.destroy
 
-        get 'module_redirect', use_route(:course_id => @course.id, :context_module_id => @module.id, :first => 1)
-        expect(response).to redirect_to course_context_modules_url(@course.id, :anchor => "module_#{@module.id}")
+      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :first => 1
+      expect(response).to redirect_to course_context_modules_url(@course.id, :anchor => "module_#{@module.id}")
 
-        get 'module_redirect', use_route(:course_id => @course.id, :context_module_id => @module.id, :last => 1)
-        expect(response).to redirect_to course_context_modules_url(@course.id, :anchor => "module_#{@module.id}")
-      end
+      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :last => 1
+      expect(response).to redirect_to course_context_modules_url(@course.id, :anchor => "module_#{@module.id}")
     end
   end
 

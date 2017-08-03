@@ -37,7 +37,8 @@ QUnit.module('Gradebook Data Loader', function (hooks) {
 
   hooks.beforeEach(function () {
     this.qunitTimeout = QUnit.config.testTimeout;
-    QUnit.config.testTimeout = 100;
+    // because the assignment groups request takes a while, limit the timeout to at least 500ms
+    QUnit.config.testTimeout = 500;
 
     XHRS = [];
     XHR_HANDLERS = [];
@@ -288,6 +289,22 @@ QUnit.module('Gradebook Data Loader', function (hooks) {
     dataLoader.gotStudents.then(() => {
       const submissionsRequests = XHRS.filter(xhr => xhr.url.match('/submissions'));
       strictEqual(submissionsRequests.length, 2, 'two requests for submissions were made');
+      resolve();
+    });
+  });
+
+  test('includes "points_deducted" when requesting submissions', function (assert) {
+    respondWith('/courses/1201/gradebook/user_ids', {}, 200, {}, { user_ids: STUDENT_IDS });
+    respondWith('/students', { user_ids: STUDENT_IDS.slice(0, 2) }, 200, {}, STUDENTS_PAGE_1);
+    respondWith('/students', { user_ids: STUDENT_IDS.slice(2, 3) }, 200, {}, STUDENTS_PAGE_2);
+
+    const dataLoader = callLoadGradebookData();
+    const resolve = assert.async();
+
+    dataLoader.gotStudents.then(() => {
+      const submissionsRequest = XHRS.find(xhr => xhr.url.match('/submissions'));
+      const params = qs.parse(submissionsRequest.url.split('?')[1]);
+      ok(params.response_fields.includes('points_deducted'));
       resolve();
     });
   });

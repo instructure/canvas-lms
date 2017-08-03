@@ -56,6 +56,10 @@ hy:
   fullcalendar_locale: en
   moment_locale: hy-am
   crowdsourced: true
+is:
+  locales:
+    is: Íslenska
+  bigeasy_locale: en_US
 ja:
   locales:
     ja: 日本語

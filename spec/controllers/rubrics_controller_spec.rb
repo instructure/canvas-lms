@@ -50,7 +50,7 @@ describe RubricsController do
 
     it "should assign variables" do
       course_with_teacher_logged_in(:active_all => true)
-      request.content_type = 'application/json' unless CANVAS_RAILS4_2
+      request.content_type = 'application/json'
       post 'create', :course_id => @course.id, :rubric => {}
       expect(assigns[:rubric]).not_to be_nil
       expect(assigns[:rubric]).not_to be_new_record
@@ -61,7 +61,7 @@ describe RubricsController do
     it "should create an association if specified" do
       course_with_teacher_logged_in(:active_all => true)
       association = @course.assignments.create!(assignment_valid_attributes)
-      request.content_type = 'application/json' unless CANVAS_RAILS4_2
+      request.content_type = 'application/json'
       post 'create', :course_id => @course.id, :rubric => {}, :rubric_association => {:association_type => association.class.to_s, :association_id => association.id}
       expect(assigns[:rubric]).not_to be_nil
       expect(assigns[:rubric]).not_to be_new_record

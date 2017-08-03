@@ -20,6 +20,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe Course do
   before(:once) do
     @test_course = Course.create!
+    course_with_teacher(course: @test_course, active_all: true)
+    @teacher = @user
   end
 
   describe 'for_course' do
@@ -651,10 +653,7 @@ describe Course do
       end
 
       it 'includes not-assigned students with existing graded submissions' do
-        @assignment1.submissions.find_by!(user: @student1).update!(
-          submission_type: 'online_text_entry',
-          workflow_state: 'graded'
-        )
+        @assignment1.grade_student(@student1, grade: 5, grader: @teacher)
 
         edd = EffectiveDueDates.for_course(@test_course, @assignment1)
         result = edd.to_hash
@@ -675,10 +674,10 @@ describe Course do
       it 'uses assigned date instead of submission date even if submission was late' do
         override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
         override.assignment_override_students.create!(user: @student1)
+        @assignment1.grade_student(@student1, grade: 5, grader: @teacher)
         @assignment1.submissions.find_by!(user: @student1).update!(
           submitted_at: 1.week.from_now(@now),
-          submission_type: 'online_text_entry',
-          workflow_state: 'graded'
+          submission_type: 'online_text_entry'
         )
 
         edd = EffectiveDueDates.for_course(@test_course, @assignment1)
@@ -737,10 +736,10 @@ describe Course do
       it 'prioritizes the override due date even if it is earlier than the Everyone Else date and the student has a graded submission that does not qualify' do
         override = @assignment2.assignment_overrides.create!(due_at: 3.days.ago(@now), due_at_overridden: true)
         override.assignment_override_students.create!(user: @student1)
+        @assignment2.grade_student(@student1, grade: 5, grader: @teacher)
         @assignment2.submissions.find_by!(user: @student1).update!(
           submitted_at: 1.week.from_now(@now),
-          submission_type: 'online_text_entry',
-          workflow_state: 'graded'
+          submission_type: 'online_text_entry'
         )
         @assignment2.due_at = 4.days.from_now(@now)
         @assignment2.save!
@@ -778,10 +777,10 @@ describe Course do
       it 'prioritizes the Everyone Else due date if it exists over the submission NULL date' do
         @assignment2.due_at = 4.days.from_now(@now)
         @assignment2.save!
+        @assignment2.grade_student(@student1, grade: 5, grader: @teacher)
         @assignment2.submissions.find_by!(user: @student1).update!(
           submitted_at: 1.week.from_now(@now),
-          submission_type: 'online_text_entry',
-          workflow_state: 'graded'
+          submission_type: 'online_text_entry'
         )
 
         edd = EffectiveDueDates.for_course(@test_course, @assignment2)
@@ -815,7 +814,7 @@ describe Course do
       end
 
       it 'ignores not-assigned students with ungraded submissions' do
-        @assignment1.submissions.find_by!(user: @student1).update!(
+        @assignment1.all_submissions.find_by!(user: @student1).update!(
           submission_type: 'online_text_entry',
           workflow_state: 'submitted'
         )
@@ -1449,10 +1448,10 @@ describe Course do
               end_date: 15.days.ago(@now),
               close_date: 10.days.ago(@now)
             })
+            @assignment1.grade_student(@student1, grade: 5, grader: @teacher)
             @assignment1.submissions.find_by!(user: @student1).update!(
               submitted_at: 1.week.from_now(@now),
-              submission_type: 'online_text_entry',
-              workflow_state: 'graded'
+              submission_type: 'online_text_entry'
             )
 
             edd = EffectiveDueDates.for_course(@test_course, @assignment1)

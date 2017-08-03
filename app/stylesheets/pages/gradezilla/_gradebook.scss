@@ -180,6 +180,15 @@ $gradebook_cell_padding_top: 8px;
   line-height: 35px;
 }
 
+.student-name,
+.secondary-info,
+.student-section,
+.student-placeholder,
+.Gradebook__ColumnHeaderDetail > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 // show and hide student names using a parent css class.
 .hide-students {
   .student-placeholder {
@@ -829,23 +838,36 @@ $gradebook_checkbox_size: 16px;
   display: flex;
   justify-content: space-around;
   flex-direction: column;
+
+  input[type="text"] {
+    height: auto;
+    line-height: 1;
+    margin: 0;
+    padding: auto;
+    box-shadow: none;
+    border: none;
+  }
 }
 
 .SubmissionTray__Container {
   padding: 1.5rem;
   width: 18.75rem;
+  font-size: 1.2rem;
 }
 
-.SubmissionCell__IconExpand {
-  height: 1.1rem;
-  width: 2rem;
-  background-repeat: no-repeat;
+#SubmissionTray__Content {
+  display: flex;
+  flex-direction: column;
+}
 
-  &.SubmissionCell__IconExpand-right {
-    background-image: url("/images/svg-icons/svg_icon_expand_right.svg");
-  }
+#SubmissionTray__Avatar {
+  min-height: 2rem;
+  padding: 0.7rem;
+  text-align: center;
+  font-size: 1.375rem;
+}
 
-  &.SubmissionCell__IconExpand-left {
-    background-image: url("/images/svg-icons/svg_icon_expand_left.svg");
-  }
+#SubmissionTray__StudentName {
+  text-align: center;
+  padding: 0.7rem;
 }

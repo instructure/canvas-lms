@@ -129,7 +129,7 @@ module Api::V1::StreamItem
             scope = scope.joins("INNER JOIN #{Submission.quoted_table_name} ON submissions.id=asset_id")
             # just because there are comments doesn't mean the user can see them.
             # we still need to filter after the pagination :(
-            scope = scope.where("submissions.submission_comments_count>0")
+            scope = scope.where("submissions.workflow_state <> 'deleted' AND submissions.submission_comments_count>0")
             scope = scope.where("submissions.user_id=?", opts[:submission_user_id]) if opts.has_key?(:submission_user_id)
           end
         end
@@ -153,7 +153,7 @@ module Api::V1::StreamItem
         si_scope = si_scope.joins("INNER JOIN #{Submission.quoted_table_name} ON submissions.id=asset_id")
         # just because there are comments doesn't mean the user can see them.
         # we still need to filter after the pagination :(
-        si_scope = si_scope.where("submissions.submission_comments_count>0")
+        si_scope = si_scope.where("submissions.workflow_state <> 'deleted' AND submissions.submission_comments_count>0")
         si_scope = si_scope.where("submissions.user_id=?", opts[:submission_user_id]) if opts.has_key?(:submission_user_id)
         filtered_ids += si_scope.pluck(:id).map{|id| Shard.relative_id_for(id, Shard.current, @current_user.shard)}
       end

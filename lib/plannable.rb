@@ -66,7 +66,10 @@ module Plannable
   end
 
   def planner_enabled?
-    root_account_for_model(self).feature_enabled?(:student_planner)
+    unless defined?(@planner_enabled)
+      @planner_enabled = root_account_for_model(self).feature_enabled?(:student_planner)
+    end
+    @planner_enabled
   end
 
   def root_account_for_model(base)
@@ -108,7 +111,7 @@ module Plannable
         val = col.is_a?(Array) ?
           object.attributes.values_at(*col).compact.first : # coalesce nulls
           object.attributes[col]
-        val = val.strftime("%Y-%m-%d %H:%M:%S.%6N") if val.respond_to?(:strftime)
+        val = val.utc.strftime("%Y-%m-%d %H:%M:%S.%6N") if val.respond_to?(:strftime)
         bookmark << val
       end
       bookmark

@@ -31,10 +31,17 @@ class GradebookHistoryApp extends React.Component {
   render () {
     return (
       <Provider store={GradebookHistoryStore}>
-        <div>
-          <Heading level="h2" as="h1">{I18n.t('Grade History')}</Heading>
-          <SearchForm />
-          <SearchResults label={I18n.t('Search Results')} />
+        <div className="GradebookHistory__Content">
+          <div className="GradebookHistory__Heading">
+            <Heading level="h2" as="h1" margin="none none large">{I18n.t('Gradebook History')}</Heading>
+          </div>
+          <div className="GradebookHistory__SearchForm">
+            <SearchForm />
+          </div>
+          <hr className="GradebookHistory__Separator" />
+          <div className="GradebookHistory__Results">
+            <SearchResults caption={I18n.t('Grade Changes')} />
+          </div>
         </div>
       </Provider>
     );

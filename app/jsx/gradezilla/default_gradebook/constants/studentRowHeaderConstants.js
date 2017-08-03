@@ -21,10 +21,9 @@ import I18n from 'i18n!gradebook';
 const primaryInfoLabels = {
   first_last: I18n.t('First, Last Name'),
   last_first: I18n.t('Last, First Name'),
-  anonymous: I18n.t('Anonymous')
 };
 
-const primaryInfoKeys = ['first_last', 'last_first', 'anonymous'];
+const primaryInfoKeys = ['first_last', 'last_first'];
 const defaultPrimaryInfo = 'first_last';
 
 const secondaryInfoLabels = {

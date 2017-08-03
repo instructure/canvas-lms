@@ -22,6 +22,7 @@ export function createGradebook (options = {}) {
   const gradebook = new Gradebook({
     colors: {},
     context_id: '1',
+    new_gradebook_development_enabled: true,
     post_grades_ltis: [],
     sections: [],
     settings: {

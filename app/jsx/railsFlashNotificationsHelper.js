@@ -19,10 +19,16 @@
 import I18n from 'i18n!shared.flash_notices'
 import $ from 'jquery'
 import _ from 'underscore'
-import preventDefault from 'compiled/fn/preventDefault'
 import htmlEscape from 'str/htmlEscape'
 import 'jqueryui/effects/drop'
 import 'jquery.cookie'
+
+function updateAriaLive ({ polite } = { polite: false }) {
+  if (this.screenreaderHolderReady()) {
+    const value = polite ? 'polite' : 'assertive';
+    $(this.screenreader_holder).attr('aria-live', value);
+  }
+}
 
   class RailsFlashNotificationsHelper {
     constructor() {
@@ -114,8 +120,9 @@ import 'jquery.cookie'
       return this.screenreader_holder != null;
     }
 
-    createScreenreaderNode(content, closable = true) {
+    createScreenreaderNode (content, closable = true) {
       if (this.screenreaderHolderReady()) {
+        updateAriaLive.call(this, { polite: false });
         const node = $(this.generateScreenreaderNodeHTML(content, closable));
         node.appendTo($(this.screenreader_holder));
 
@@ -154,11 +161,11 @@ import 'jquery.cookie'
       }
     }
 
-    createScreenreaderNodeExclusive(content) {
+    createScreenreaderNodeExclusive (content, polite = false) {
       if (this.screenreaderHolderReady()) {
+        updateAriaLive.call(this, { polite });
         this.screenreader_holder.innerHTML = '';
-
-        let node = $(this.generateScreenreaderNodeHTML(content, false));
+        const node = $(this.generateScreenreaderNodeHTML(content, false));
         node.appendTo($(this.screenreader_holder));
       }
     }

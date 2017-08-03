@@ -108,6 +108,15 @@ particular placement:
 ```
 
 # Supported Substitutions
+## Context.title
+The title of the context.
+
+**Availability**: *always*  
+**Launch Parameter**: *context_title*  
+
+```
+Example Course
+```
 ## com.instructure.OriginalityReport.id
 The Canvas id of the Originality Report associated
 with the launch.
@@ -155,6 +164,15 @@ an opaque identifier that uniquely identifies the context of the tool launch.
 
 ```
 cdca1fe2c392a208bd8a657f8865ddb9ca359534
+```
+## Context.sourcedId
+The sourced Id of the context.
+
+**Availability**: *always*  
+
+
+```
+1234
 ```
 ## Message.documentTarget
 communicates the kind of browser window/frame where the Canvas has launched a tool.
@@ -866,6 +884,33 @@ Only available for LTI 2.0.
 ```
 https://<domain>.instructure.com/api/lti/courses/<course_id>/tool_consumer_profile/<opaque_id>
 https://<domain>.instructure.com/api/lti/accounts/<account_id>/tool_consumer_profile/<opaque_id>
+```
+## vnd.Canvas.OriginalityReport.url
+The originality report LTI2 service endpoint.
+
+**Availability**: *always*  
+**Launch Parameter**: *vnd_canvas_originality_report_url*  
+
+```
+api/lti/assignments/{assignment_id}/submissions/{submission_id}/originality_report
+```
+## vnd.Canvas.submission.url
+The submission LTI2 service endpoint.
+
+**Availability**: *always*  
+**Launch Parameter**: *vnd_canvas_submission_url*  
+
+```
+api/lti/assignments/{assignment_id}/submissions/{submission_id}
+```
+## vnd.Canvas.submission.history.url
+The submission history LTI2 service endpoint.
+
+**Availability**: *always*  
+**Launch Parameter**: *vnd_canvas_submission_history_url*  
+
+```
+api/lti/assignments/{assignment_id}/submissions/{submission_id}/history
 ```
 ## Canvas.file.media.id
 

@@ -99,7 +99,7 @@ define [
 
     onReplyAll:    (e) -> @trigger('reply-all', null, '#reply-all-btn')
 
-    onArchive:     (e) -> @trigger('archive')
+    onArchive:     (e) -> @trigger('archive', '#compose-btn', '#archive-btn')
 
     onDelete:      (e) -> @trigger('delete', '#compose-btn', '#delete-btn')
 

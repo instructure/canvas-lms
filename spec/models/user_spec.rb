@@ -1702,12 +1702,14 @@ describe User do
 
         it "should be able to filter section events after fetching" do
           # trigger the after db filtering
+          allow(Setting).to receive(:get).with(anything, anything).and_return('')
           allow(Setting).to receive(:get).with('filter_events_by_section_code_threshold', anything).and_return(0)
           @course.enroll_student(@student, :section => @sections[1], :enrollment_state => 'active', :allow_multiple_enrollments => true)
           expect(@student.upcoming_events(:limit => 2)).to eq [@events[1]]
         end
 
         it "should use the old behavior as a fallback" do
+          allow(Setting).to receive(:get).with(anything, anything).and_return('')
           allow(Setting).to receive(:get).with('filter_events_by_section_code_threshold', anything).and_return(0)
           # the optimized call will retrieve the first two events, and then filter them out
           # since it didn't retrieve enough events it will use the old code as a fallback
@@ -2576,40 +2578,93 @@ describe User do
       ids = []
       ids << User.create!(:name => "John Johnson")
       ids << User.create!(:name => "John John")
+      ids << User.create!(:name => "john john")
     end
 
-    it "should sort lexicographically" do
-      expect(User.order_by_sortable_name.where(id: ids).map(&:sortable_name)).to eq ["John, John", "Johnson, John"]
-    end
-
-    it "should sort support direction toggle" do
-      expect(User.order_by_sortable_name(:direction => :descending).where(id: ids).map(&:sortable_name)).to eq ["Johnson, John", "John, John"]
-    end
-
-    it "should sort support direction toggle with a prior select" do
-      expect(User.select([:id, :sortable_name]).order_by_sortable_name(:direction => :descending).where(id: ids).map(&:sortable_name)).to eq ["Johnson, John", "John, John"]
-    end
-
-    it "should sort by the current locale with pg_collkey if possible" do
-      skip "requires postgres" unless User.connection.adapter_name == 'PostgreSQL'
-      skip "requires pg_collkey on the server" if User.connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='collkey'").to_i == 0
-      begin
-        Bundler.require 'icu'
-      rescue LoadError
-        skip "requires icu locally"
+    let_once :has_pg_collkey do
+      status = if User.connection.extension_installed?(:pg_collkey)
+        begin
+          Bundler.require 'icu'
+          true
+        rescue LoadError
+          skip 'requires icu locally SD-2747'
+          false
+        end
       end
-      I18n.locale = :es
-      expect(User.sortable_name_order_by_clause).to match(/'es'/)
-      expect(User.sortable_name_order_by_clause).not_to match(/'root'/)
-      # english has no specific sorting rules, so use root
-      I18n.locale = :en
-      expect(User.sortable_name_order_by_clause).not_to match(/'es'/)
-      expect(User.sortable_name_order_by_clause).to match(/'root'/)
+
+      status || false
+    end
+
+    context 'when pg_collkey is installed' do
+      before do
+        skip 'requires pg_collkey installed SD-2747' unless has_pg_collkey
+      end
+
+      it "should sort lexicographically" do
+        ascending_sortable_names = User.order_by_sortable_name.where(id: ids).map(&:sortable_name)
+        expect(ascending_sortable_names).to eq(["john, john", "John, John", "Johnson, John"])
+      end
+
+      it "should sort support direction toggle" do
+        descending_sortable_names = User.order_by_sortable_name(:direction => :descending).
+          where(id: ids).map(&:sortable_name)
+        expect(descending_sortable_names).to eq(["Johnson, John", "John, John", "john, john"])
+      end
+
+      it "should sort support direction toggle with a prior select" do
+        descending_sortable_names = User.select([:id, :sortable_name]).order_by_sortable_name(:direction => :descending).
+          where(id: ids).map(&:sortable_name)
+        expect(descending_sortable_names).to eq ["Johnson, John", "John, John", "john, john"]
+      end
+
+      it "should sort by the current locale with pg_collkey if possible" do
+        I18n.locale = :es
+        expect(User.sortable_name_order_by_clause).to match(/'es'/)
+        expect(User.sortable_name_order_by_clause).not_to match(/'root'/)
+        # english has no specific sorting rules, so use root
+        I18n.locale = :en
+        expect(User.sortable_name_order_by_clause).not_to match(/'es'/)
+        expect(User.sortable_name_order_by_clause).to match(/'root'/)
+      end
+    end
+
+    context 'when pg_collkey is not installed' do
+      before do
+        skip 'requires pg_collkey to not be installed SD-2747' if has_pg_collkey
+      end
+
+      it "should sort lexicographically" do
+        ascending_sortable_names = User.order_by_sortable_name.where(id: ids).map(&:sortable_name)
+        expect(ascending_sortable_names).to eq(["John, John", "john, john", "Johnson, John"])
+      end
+
+      it "should sort support direction toggle" do
+        descending_sortable_names = User.order_by_sortable_name(:direction => :descending).
+          where(id: ids).map(&:sortable_name)
+        expect(descending_sortable_names).to eq(["Johnson, John", "john, john", "John, John"])
+      end
+
+      it "should sort support direction toggle with a prior select" do
+        descending_sortable_names = User.select([:id, :sortable_name]).order_by_sortable_name(:direction => :descending).
+          where(id: ids).map(&:sortable_name)
+        expect(descending_sortable_names).to eq ["Johnson, John", "john, john", "John, John"]
+      end
     end
 
     it "breaks ties with user id" do
       ids = 5.times.map { User.create!(:name => "Abcde").id }.sort
       expect(User.order_by_sortable_name.where(id: ids).map(&:id)).to eq(ids)
+    end
+
+    it "breaks ties in the direction of the order" do
+      users = [
+        User.create!(:name => "Gary"),
+        User.create!(:name => "Gary")
+      ]
+      ids = users.map(&:id)
+
+      descending_user_ids = User.where(id: ids).order_by_sortable_name(direction: :descending).map(&:id)
+      expect(descending_user_ids).to eq(ids.reverse)
     end
   end
 
@@ -3858,6 +3913,39 @@ describe User do
       otps.each do |otp|
         expect { otp.reload }.to raise_error(ActiveRecord::RecordNotFound)
       end
+    end
+  end
+
+  describe "#has_student_enrollment" do
+    let(:user) { User.create! }
+
+    it "returns false by default" do
+        expect(user.has_student_enrollment?).to eq false
+    end
+
+    it "returns true when user is student and a course is active" do
+        course_with_student(:user => user, :active_all => true)
+        expect(user.has_student_enrollment?).to eq true
+    end
+
+    it "returns true when user is student and no courses are active" do
+        course_with_student(:user => user, :active_all => false)
+        expect(user.has_student_enrollment?).to eq true
+    end
+
+    it "returns false when user is teacher" do
+        course_with_teacher(:user => user)
+        expect(user.has_student_enrollment?).to eq false
+    end
+
+    it "returns false when user is TA" do
+        course_with_ta(:user => user)
+        expect(user.has_student_enrollment?).to eq false
+    end
+
+    it "returns false when user is designer" do
+        course_with_designer(:user => user)
+        expect(user.has_student_enrollment?).to eq false
     end
   end
 end

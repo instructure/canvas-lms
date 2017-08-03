@@ -131,13 +131,14 @@ describe "speed grader submissions" do
       expect(f('#this_student_does_not_have_a_submission')).to be_displayed
     end
 
+    let(:unenrolled_user) { create_users(1, return_type: :record)[0] }
+
+    let(:student_3) { @course.enroll_student(unenrolled_user, enrollment_state: :active) }
+
     it "should handle versions correctly", priority: "2", test_id: 283500 do
       submission1 = student_submission(:username => "student1@example.com", :body => 'first student, first version')
       submission2 = student_submission(:username => "student2@example.com", :body => 'second student')
-      submission3 = student_submission(:username => "student3@example.com", :body => 'third student')
-
-      # This is "no submissions" guy
-      submission3.delete
+      student_3
 
       submission1.submitted_at = 10.minutes.from_now
       submission1.body = 'first student, second version'

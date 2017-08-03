@@ -18,6 +18,14 @@
 
 @import "base/environment";
 
+.submission_details {
+  .bold { font-weight: bold; }
+  .error { color: $ic-color-danger; }
+  td { padding-left: 1em; }
+  th { font-weight: normal; }
+  td, th { text-align: right; }
+}
+
 .submission-details-header {
   margin-bottom: $ic-sp;
 }

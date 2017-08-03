@@ -489,8 +489,6 @@ SAML
       url = SAML2::Bindings::HTTPRedirect.encode(logout_request)
       saml_request = URI.decode_www_form(URI.parse(url).query).first.last
 
-      # rails 4.2 is dumb and somehow caches this between specs
-      allow(controller.request).to receive(:url).and_return(url) if CANVAS_RAILS4_2
       controller.request.env['canvas.domain_root_account'] = account
       get :destroy, SAMLRequest: saml_request
 

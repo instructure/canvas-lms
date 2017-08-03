@@ -335,13 +335,20 @@ class SisImportsApiController < ApplicationController
   # @argument diffing_data_set_identifier [String]
   #   If set on a CSV import, Canvas will attempt to optimize the SIS import by
   #   comparing this set of CSVs to the previous set that has the same data set
-  #   identifier, and only appliying the difference between the two. See the
+  #   identifier, and only applying the difference between the two. See the
   #   SIS CSV Format documentation for more details.
   #
   # @argument diffing_remaster_data_set [Boolean]
   #   If true, and diffing_data_set_identifier is sent, this SIS import will be
   #   part of the data set, but diffing will not be performed. See the SIS CSV
   #   Format documentation for details.
+  #
+  # @argument change_threshold [Integer]
+  #   If set, diffing will not be performed if the files are greater than the
+  #   threshold as a percent. If set to 5 and the file is more than 5% smaller
+  #   or more than 5% larger than the file that is being compared to, diffing
+  #   will not be performed. If the files are less than 5%, diffing will be
+  #   performed. See the SIS CSV Format documentation for more details.
   #
   # @returns SisImport
   def create
@@ -411,6 +418,7 @@ class SisImportsApiController < ApplicationController
           batch.batch_mode_term = batch_mode_term
         elsif params[:diffing_data_set_identifier].present?
           batch.enable_diffing(params[:diffing_data_set_identifier],
+                               change_threshold: params[:change_threshold],
                                remaster: value_to_boolean(params[:diffing_remaster_data_set]))
         end
 

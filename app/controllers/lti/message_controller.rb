@@ -32,7 +32,8 @@ module Lti
         message = RegistrationRequestService.create_request(
           @context,
           polymorphic_url([@context, :tool_consumer_profile]),
-          -> { polymorphic_url([@context, :registration_return]) }
+          -> { polymorphic_url([@context, :registration_return]) },
+          params[:tool_consumer_url]
         )
 
         @lti_launch.params = message.post_params
@@ -106,6 +107,15 @@ module Lti
 
     private
 
+    def launch_params(tool_proxy:, message:, private_key:)
+      if tool_proxy.security_profiles.find { |sp| sp.security_profile_name == 'lti_jwt_message_security'}
+        domain = HostUrl.context_host(@context, request.host)
+        {jwt: message.to_jwt(private_key: private_key, originating_domain: domain, algorithm: :HS256)}
+      else
+        message.signed_post_params(private_key)
+      end
+    end
+
     def assignment
       if params[:assignment_id].present?
         @_assignment ||= @context.try(:active_assignments)&.find(params[:assignment_id])
@@ -135,7 +145,7 @@ module Lti
       tool_proxy = resource_handler.tool_proxy
       # TODO: create scope for query
       if tool_proxy.workflow_state == 'active'
-        launch_params = {
+        launch_attrs = {
           launch_url: launch_url(resource_url, message_handler),
           oauth_consumer_key: tool_proxy.guid,
           lti_version: IMS::LTI::Models::LTIModel::LTI_VERSION_2P0,
@@ -144,18 +154,18 @@ module Lti
         }
 
         lti_assignment_id = Lti::Security.decoded_lti_assignment_id(params[:secure_params])
-        launch_params[:ext_lti_assignment_id] = lti_assignment_id
+        launch_attrs[:ext_lti_assignment_id] = lti_assignment_id
 
         @lti_launch = Launch.new
         tag = find_tag
-        custom_param_opts = prep_tool_settings(message_handler.parameters, tool_proxy, launch_params[:resource_link_id])
+        custom_param_opts = prep_tool_settings(message_handler.parameters, tool_proxy, launch_attrs[:resource_link_id])
         custom_param_opts[:content_tag] = tag if tag
         tool_setting = ToolSetting.find_by(resource_link_id: resource_link_id)
         variable_expander = create_variable_expander(custom_param_opts.merge(tool: tool_proxy,
                                                                              tool_setting: tool_setting))
-        launch_params.merge! enabled_parameters(tool_proxy, message_handler, variable_expander)
+        launch_attrs.merge! enabled_parameters(tool_proxy, message_handler, variable_expander)
 
-        message = IMS::LTI::Models::Messages::BasicLTILaunchRequest.new(launch_params)
+        message = IMS::LTI::Models::Messages::BasicLTILaunchRequest.new(launch_attrs)
         message.user_id = Lti::Asset.opaque_identifier_for(@current_user)
         @active_tab = message_handler.asset_string
         @lti_launch.resource_url = message.launch_url
@@ -166,7 +176,7 @@ module Lti
 
         message.add_custom_params(custom_params(message_handler.parameters, variable_expander))
         message.add_custom_params(ToolSetting.custom_settings(tool_proxy.id, @context, message.resource_link_id))
-        @lti_launch.params = message.signed_post_params(tool_proxy.shared_secret)
+        @lti_launch.params = launch_params(tool_proxy: tool_proxy, message: message, private_key: tool_proxy.shared_secret)
 
         render Lti::AppUtil.display_template(display_override: params[:display]) and return
       end

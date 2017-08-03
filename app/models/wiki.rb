@@ -108,7 +108,7 @@ class Wiki < ActiveRecord::Base
 
   def context
     shard.activate do
-      @context ||= self.id && (Course.where(wiki_id: self).first || Group.where(wiki_id: self).first)
+      @context ||= self.id && (self.course || self.group)
     end
   end
 

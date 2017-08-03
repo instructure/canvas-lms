@@ -5,6 +5,7 @@
         "registration_url": "https://www.samplelaunch.com/register"
       },
       "resource_href": "href",
+      "migration_id": "m_id",
       "tool_profile": {
         "lti_version": "LTI-2p0",
         "product_instance": {

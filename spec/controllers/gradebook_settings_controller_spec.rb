@@ -40,7 +40,7 @@ RSpec.describe GradebookSettingsController, type: :controller do
             "assignment_group_id" => "888"
           },
           "filter_rows_by" => {
-            "section_id" => "2001"
+            "section_id" => "null"
           },
           "selected_view_options_filters" => ["assignmentGroups"],
           "show_inactive_enrollments" => "true", # values must be strings
@@ -60,6 +60,11 @@ RSpec.describe GradebookSettingsController, type: :controller do
           }
         }
       end
+
+      let(:show_settings_massaged) do
+        show_settings.merge('filter_rows_by' => { 'section_id' => nil })
+      end
+
       let(:valid_params) do
         {
           "course_id" => @course.id,
@@ -72,31 +77,37 @@ RSpec.describe GradebookSettingsController, type: :controller do
         expect(response).to be_ok
 
         expected_settings = {
-          @course.id => show_settings.except("colors"),
-          colors: show_settings.fetch("colors")
+          @course.id => show_settings_massaged.except("colors"),
+          colors: show_settings_massaged.fetch("colors")
         }
         expect(teacher.preferences[:gradebook_settings]).to eq expected_settings
         expect(json_response["gradebook_settings"]).to eql expected_settings.as_json
       end
 
+      it "transforms 'null' string values to nil" do
+        put :update, valid_params
+
+        expect(teacher.preferences[:gradebook_settings][@course.id]['filter_rows_by']['section_id']).to be_nil
+      end
+
       it "allows saving gradebook settings for multiple courses" do
         previous_course = Course.create!(name: 'Previous Course')
         teacher.preferences[:gradebook_settings] = {
-          previous_course.id => show_settings.except("colors"),
-          colors: show_settings.fetch("colors")
+          previous_course.id => show_settings_massaged.except("colors"),
+          colors: show_settings_massaged.fetch("colors")
         }
         teacher.save!
 
         put :update, valid_params
 
         expected_user_settings = {
-          @course.id => show_settings.except("colors"),
-          previous_course.id => show_settings.except("colors"),
-          colors: show_settings.fetch("colors")
+          @course.id => show_settings_massaged.except("colors"),
+          previous_course.id => show_settings_massaged.except("colors"),
+          colors: show_settings_massaged.fetch("colors")
         }
         expected_response = {
-          @course.id => show_settings.except("colors"),
-          colors: show_settings.fetch("colors")
+          @course.id => show_settings_massaged.except("colors"),
+          colors: show_settings_massaged.fetch("colors")
         }
 
         expect(teacher.reload.preferences[:gradebook_settings]).to eq(expected_user_settings)
@@ -112,8 +123,8 @@ RSpec.describe GradebookSettingsController, type: :controller do
         expect(response).to be_ok
 
         expected_settings = {
-          @course.id => show_settings.except("colors"),
-          colors: show_settings.fetch("colors")
+          @course.id => show_settings_massaged.except("colors"),
+          colors: show_settings_massaged.fetch("colors")
         }
         expect(teacher.preferences[:gradebook_settings]).to eq expected_settings
         expect(json_response["gradebook_settings"]).to eql expected_settings.as_json
@@ -127,8 +138,8 @@ RSpec.describe GradebookSettingsController, type: :controller do
         expect(response).to be_ok
 
         expected_settings = {
-          @course.id => show_settings.except("colors"),
-          colors: show_settings.fetch("colors")
+          @course.id => show_settings_massaged.except("colors"),
+          colors: show_settings_massaged.fetch("colors")
         }
         expect(teacher.preferences[:gradebook_settings]).to eq expected_settings
         expect(json_response["gradebook_settings"]).to eql expected_settings.as_json

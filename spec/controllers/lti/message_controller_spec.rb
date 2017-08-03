@@ -22,25 +22,7 @@ require_dependency "lti/message_controller"
 
 module Lti
   describe MessageController do
-
-    def wrap_params(params)
-      CANVAS_RAILS4_2 ? params : { params: params }
-    end
-
-    let(:account) { Account.create }
-    let(:product_family) do
-      ProductFamily.create(vendor_code: '123', product_code: 'abc', vendor_name: 'acme', root_account: account)
-    end
-    let(:resource_handler) do
-      ResourceHandler.create(resource_type_code: 'code', name: 'resource name', tool_proxy: tool_proxy)
-    end
-    let(:message_handler) do
-      MessageHandler.create(
-        message_type: 'basic-lti-launch-request',
-        launch_path: 'https://samplelaunch/blti',
-        resource_handler: resource_handler
-      )
-    end
+    include_context 'lti2_spec_helper'
     let(:enabled_capability) {
       %w(ToolConsumerInstance.guid
          Message.documentTarget
@@ -48,18 +30,7 @@ module Lti
          Membership.role
          Context.id)
     }
-    let(:tool_proxy) do
-      ToolProxy.create(
-        shared_secret: 'shared_secret',
-        guid: 'guid',
-        product_version: '1.0beta',
-        lti_version: 'LTI-2p0',
-        product_family: product_family,
-        context: account,
-        workflow_state: 'active',
-        raw_data: {enabled_capability: enabled_capability}
-      )
-    end
+
     let(:default_resource_handler) do
       ResourceHandler.create!(
         resource_type_code: 'instructure.com:default',
@@ -94,7 +65,7 @@ module Lti
         end
 
         it "doesn't allow student to register an app" do
-          course_with_student_logged_in(active_all:true)
+          course_with_student_logged_in(active_all: true)
           get 'registration', course_id: @course.id, tool_consumer_url: 'http://tool.consumer.url'
           expect(response.code).to eq '401'
         end
@@ -139,9 +110,7 @@ module Lti
     end
 
     describe 'GET #registration_return' do
-      include_context 'lti2_spec_helper'
-
-      before { user_session(account_admin_user) }
+      before {user_session(account_admin_user)}
 
       it 'does not 500 if tool registration fails' do
         get 'registration_return', course_id: course.id, status: 'failure'
@@ -192,7 +161,7 @@ module Lti
           get 'reregistration', course_id: course.id, tool_proxy_id: tool_proxy.id
           lti_launch = assigns[:lti_launch]
           params = lti_launch.params.with_indifferent_access
-          expect(params[:oauth_consumer_key]).to eq 'guid'
+          expect(params[:oauth_consumer_key]).to eq tool_proxy.guid
         end
 
         it 'sends the correct tc_profile_url' do
@@ -217,16 +186,16 @@ module Lti
         end
 
 
-         it 'returns an error if there is not a reregistration handler'do
-           course_with_teacher_logged_in(:active_alll => true)
-           course = @course
-           default_resource_handler.message_handlers.first.destroy
-           get 'reregistration', course_id: course.id, tool_proxy_id: tool_proxy.id
-           expect(response.code).to eq "404"
-         end
+        it 'returns an error if there is not a reregistration handler' do
+          course_with_teacher_logged_in(:active_alll => true)
+          course = @course
+          default_resource_handler.message_handlers.first.destroy
+          get 'reregistration', course_id: course.id, tool_proxy_id: tool_proxy.id
+          expect(response.code).to eq "404"
+        end
 
         it "doesn't allow a student to reregister an app" do
-          course_with_student_logged_in(active_all:true)
+          course_with_student_logged_in(active_all: true)
           get 'reregistration', course_id: course_factory.id, tool_proxy_id: tool_proxy.id
           expect(response.code).to eq '404'
         end
@@ -237,7 +206,7 @@ module Lti
     describe "GET #resource_link_id" do
       include_context 'lti2_spec_helper'
 
-      let(:link_id) { SecureRandom.uuid }
+      let(:link_id) {SecureRandom.uuid}
 
       let(:tool_setting) do
         ToolSetting.new(tool_proxy: tool_proxy,
@@ -274,8 +243,8 @@ module Lti
       end
 
       context 'resource_url' do
-        let(:custom_url) { 'http://www.samplelaunch.com/custom-resource-url' }
-        let(:link_id) { SecureRandom.uuid }
+        let(:custom_url) {'http://www.samplelaunch.com/custom-resource-url'}
+        let(:link_id) {SecureRandom.uuid}
         let(:tool_setting) do
           ToolSetting.create!(tool_proxy: tool_proxy,
                               context: course,
@@ -299,29 +268,29 @@ module Lti
       end
 
       context 'assignment' do
-        let(:assignment) { course.assignments.create!(name: 'test') }
+        let(:assignment) {course.assignments.create!(name: 'test')}
 
-        before { tool_proxy.update_attributes(context: course) }
+        before {tool_proxy.update_attributes(context: course)}
 
         it 'finds the specified assignment' do
           get 'resource', course_id: course.id,
-                          assignment_id: assignment.id,
-                          resource_link_id: link_id
+              assignment_id: assignment.id,
+              resource_link_id: link_id
           expect(assigns[:_assignment]).to eq assignment
         end
 
         it 'renders not found if assignment does not exist' do
           get 'resource', course_id: course.id,
-                          assignment_id: assignment.id + 1,
-                          resource_link_id: link_id
+              assignment_id: assignment.id + 1,
+              resource_link_id: link_id
           expect(response).to be_not_found
         end
       end
 
       context 'search account chain' do
-        let(:root_account) { Account.create! }
+        let(:root_account) {Account.create!}
 
-        before { account.update_attributes(root_account: root_account) }
+        before {account.update_attributes(root_account: root_account)}
 
         it "succeeds if the tool is installed in the current account's root account" do
           tool_proxy.update_attributes(context: root_account)
@@ -350,20 +319,50 @@ module Lti
         user_session(@student)
       end
 
-      context 'account' do
-        before do
-          ToolProxyBinding.create(context: account, tool_proxy: tool_proxy)
+      context 'jwt' do
+        let(:tool_profile) do
+          {
+            'security_profile' => { 'security_profile_name' => 'lti_jwt_message_security' }
+          }
         end
 
+        before(:each) do
+          tool_proxy.raw_data['tool_profile'] = tool_profile
+          tool_proxy.save!
+        end
+
+        it 'does a jwt launch' do
+          get 'basic_lti_launch_request', params: {account_id: account.id, message_handler_id: message_handler.id,
+                                                      params: { tool_launch_context: 'my_custom_context' }}
+          params = assigns[:lti_launch].params
+          expect(params.keys).to eq [:jwt]
+        end
+
+        it 'signs the jwt with the shared secret' do
+          get 'basic_lti_launch_request', params: {account_id: account.id,
+                                                      message_handler_id: message_handler.id,
+                                                      params: { tool_launch_context: 'my_custom_context' }}
+          params = assigns[:lti_launch].params
+          launch_url = assigns[:lti_launch].resource_url
+          authenticator = IMS::LTI::Services::MessageAuthenticator.new(launch_url, params, tool_proxy.shared_secret)
+          expect(authenticator.valid_signature?).to eq true
+        end
+
+      end
+
+      context 'account' do
+
         it 'returns the signed params' do
-          get 'basic_lti_launch_request', wrap_params(account_id: account.id, message_handler_id: message_handler.id,
-              params: {tool_launch_context: 'my_custom_context'})
+          tool_proxy.raw_data['enabled_capability'] += enabled_capability
+          tool_proxy.save!
+          get 'basic_lti_launch_request', params: {account_id: account.id, message_handler_id: message_handler.id,
+                                                      params: { tool_launch_context: 'my_custom_context' }}
           expect(response.code).to eq "200"
 
           lti_launch = assigns[:lti_launch]
-          expect(lti_launch.resource_url).to eq 'https://samplelaunch/blti'
+          expect(lti_launch.resource_url).to eq 'https://www.samplelaunch.com/blti'
           params = lti_launch.params.with_indifferent_access
-          expect(params[:oauth_consumer_key]).to eq 'guid'
+          expect(params[:oauth_consumer_key]).to eq tool_proxy.guid
           expect(params[:context_id]).not_to be_empty
           expect(params[:resource_link_id]).not_to be_empty
           expect(params[:tool_consumer_instance_guid]).not_to be_empty
@@ -377,8 +376,8 @@ module Lti
           tag.context_module = ContextModule.create!(context: course)
           tag.save!
           tag.delete
-          get 'basic_lti_launch_request', wrap_params(course_id: course.id, message_handler_id: message_handler.id,
-              module_item_id: tag.id, params: {tool_launch_context: 'my_custom_context' })
+          get 'basic_lti_launch_request', params: {course_id: course.id, message_handler_id: message_handler.id,
+                                                      module_item_id: tag.id, params: { tool_launch_context: 'my_custom_context' }}
           expect(response.code).to eq "200"
         end
 
@@ -394,6 +393,8 @@ module Lti
         end
 
         it 'redirects to login page if there is no session' do
+          tool_proxy.raw_data['enabled_capability'] += enabled_capability
+          tool_proxy.save!
           PseudonymSession.stubs(:find).returns(nil)
           get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id
           expect(response).to redirect_to(login_url)
@@ -401,7 +402,7 @@ module Lti
 
         it 'does custom variable expansion for tool settings' do
           parameters = %w( LtiLink.custom.url ToolProxyBinding.custom.url ToolProxy.custom.url ).map do |key|
-            IMS::LTI::Models::Parameter.new(name: key.underscore, variable: key )
+            IMS::LTI::Models::Parameter.new(name: key.underscore, variable: key)
           end
           message_handler.parameters = parameters.as_json
           message_handler.save
@@ -416,15 +417,17 @@ module Lti
         end
 
         it 'returns the roles' do
-          get 'basic_lti_launch_request', wrap_params(account_id: account.id, message_handler_id: message_handler.id,
-              params: {tool_launch_context: 'my_custom_context'})
+          tool_proxy.raw_data['enabled_capability'] += enabled_capability
+          tool_proxy.save!
+          get 'basic_lti_launch_request', params: {account_id: account.id, message_handler_id: message_handler.id,
+                                                      params: { tool_launch_context: 'my_custom_context' }}
           params = assigns[:lti_launch].params.with_indifferent_access
           expect(params['roles']).to eq "http://purl.imsglobal.org/vocab/lis/v2/system/person#User"
         end
 
         it 'adds module item substitutions' do
           parameters = %w( Canvas.module.id Canvas.moduleItem.id ).map do |key|
-            IMS::LTI::Models::Parameter.new(name: key.underscore, variable: key )
+            IMS::LTI::Models::Parameter.new(name: key.underscore, variable: key)
           end
           message_handler.parameters = parameters.as_json
           message_handler.save
@@ -433,8 +436,8 @@ module Lti
           tag.context_module = ContextModule.create!(context: @course)
           tag.save!
 
-          get 'basic_lti_launch_request', wrap_params(course_id: @course.id, message_handler_id: message_handler.id,
-              module_item_id: tag.id, params: {tool_launch_context: 'my_custom_context' })
+          get 'basic_lti_launch_request', params: {course_id: @course.id, message_handler_id: message_handler.id,
+                                                      module_item_id: tag.id, params: { tool_launch_context: 'my_custom_context' }}
           expect(response.code).to eq "200"
 
           params = assigns[:lti_launch].params.with_indifferent_access
@@ -446,51 +449,53 @@ module Lti
           tag = message_handler.context_module_tags.create!(context: @course, tag_type: 'context_module', new_tab: true)
           tag.context_module = ContextModule.create!(context: @course)
           tag.save!
-          get 'basic_lti_launch_request', wrap_params(course_id: @course.id, message_handler_id: message_handler.id,
-              module_item_id: tag.id, params: {tool_launch_context: 'my_custom_context' })
+          get 'basic_lti_launch_request', params: {course_id: @course.id, message_handler_id: message_handler.id,
+                                                      module_item_id: tag.id, params: { tool_launch_context: 'my_custom_context' }}
           expect(response.code).to eq "200"
           expect(assigns[:lti_launch].launch_type).to eq 'window'
         end
 
         it 'returns the locale' do
-          get 'basic_lti_launch_request', wrap_params(account_id: account.id, message_handler_id: message_handler.id,
-              params: {tool_launch_context: 'my_custom_context'})
+          tool_proxy.raw_data['enabled_capability'] += enabled_capability
+          tool_proxy.save!
+          get 'basic_lti_launch_request', params: {account_id: account.id, message_handler_id: message_handler.id,
+                                                      params: { tool_launch_context: 'my_custom_context' }}
           params = assigns[:lti_launch].params.with_indifferent_access
           expect(params['launch_presentation_locale']).to eq :en
         end
 
         it 'returns tool settings in the launch' do
           ToolSetting.create(tool_proxy: tool_proxy, context_id: nil, context_type: nil, resource_link_id: nil,
-                             custom:{'default' => 42})
-          get 'basic_lti_launch_request', wrap_params(account_id: account.id, message_handler_id: message_handler.id,
-              params: {tool_launch_context: 'my_custom_context'})
+                             custom: { 'default' => 42 })
+          get 'basic_lti_launch_request', params: {account_id: account.id, message_handler_id: message_handler.id,
+                                                      params: { tool_launch_context: 'my_custom_context' }}
           params = assigns[:lti_launch].params.with_indifferent_access
           expect(params['custom_default']).to eq 42
         end
 
         it 'does not do variable substitutions for tool settings' do
           ToolSetting.create(tool_proxy: tool_proxy, context_id: nil, context_type: nil, resource_link_id: nil,
-                             custom:{'default' => 'Canvas.api.baseUrl'})
-          get 'basic_lti_launch_request', wrap_params(account_id: account.id, message_handler_id: message_handler.id,
-              params: {tool_launch_context: 'my_custom_context'})
+                             custom: { 'default' => 'Canvas.api.baseUrl' })
+          get 'basic_lti_launch_request', params: {account_id: account.id, message_handler_id: message_handler.id,
+                                                      params: { tool_launch_context: 'my_custom_context' }}
           params = assigns[:lti_launch].params.with_indifferent_access
           expect(params['custom_default']).to eq 'Canvas.api.baseUrl'
         end
 
         it 'adds params from secure_params' do
           lti_assignment_id = SecureRandom.uuid
-          jwt = Canvas::Security.create_jwt({lti_assignment_id: lti_assignment_id})
+          jwt = Canvas::Security.create_jwt({ lti_assignment_id: lti_assignment_id })
           get 'basic_lti_launch_request', account_id: account.id,
-            message_handler_id: message_handler.id, secure_params: jwt
+              message_handler_id: message_handler.id, secure_params: jwt
           params = assigns[:lti_launch].params.with_indifferent_access
           expect(params['ext_lti_assignment_id']).to eq lti_assignment_id
         end
 
         it 'does only adds non-required params if they are present in enabled_capability' do
-          allow_any_instance_of(IMS::LTI::Models::ToolProxy).to receive(:enabled_capability) { {} }
+          allow_any_instance_of(IMS::LTI::Models::ToolProxy).to receive(:enabled_capability) {{}}
 
-          get 'basic_lti_launch_request', wrap_params(account_id: account.id, message_handler_id: message_handler.id,
-              params: {tool_launch_context: 'my_custom_context'})
+          get 'basic_lti_launch_request', params: {account_id: account.id, message_handler_id: message_handler.id,
+                                                      params: { tool_launch_context: 'my_custom_context' }}
           expect(response.code).to eq "200"
 
           lti_launch = assigns[:lti_launch]
@@ -505,8 +510,8 @@ module Lti
       describe "resource link" do
         it 'creates resource_links without a resource_link_fragment' do
           Timecop.freeze do
-            get 'basic_lti_launch_request', wrap_params(account_id: account.id, message_handler_id: message_handler.id,
-                params: {tool_launch_context: 'my_custom_context'})
+            get 'basic_lti_launch_request', params: {account_id: account.id, message_handler_id: message_handler.id,
+                                                        params: { tool_launch_context: 'my_custom_context' }}
             expect(response.code).to eq "200"
 
             lti_launch = assigns[:lti_launch]
@@ -537,8 +542,8 @@ module Lti
           message_handler.parameters = [{ "name" => "tool_settings", "variable" => "ToolProxy.custom.url" }]
           message_handler.save!
           expect(ToolSetting.where(tool_proxy_id: tool_proxy.id, context_id: nil, resource_link_id: nil).size).to eq 0
-          get 'basic_lti_launch_request', wrap_params(account_id: account.id, message_handler_id: message_handler.id,
-              params: {tool_launch_context: 'my_custom_context'})
+          get 'basic_lti_launch_request', params: {account_id: account.id, message_handler_id: message_handler.id,
+                                                      params: { tool_launch_context: 'my_custom_context' }}
           expect(ToolSetting.where(tool_proxy_id: tool_proxy.id, context_id: nil, resource_link_id: nil).size).to eq 1
         end
       end

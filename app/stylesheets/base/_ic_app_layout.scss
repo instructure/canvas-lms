@@ -34,22 +34,6 @@
 
 $ic-left-side-width: $ic-sp*15;
 
-::-webkit-scrollbar {
-  -webkit-appearance: none;
-  width: $ic-sp*0.75; height: $ic-sp*0.75;
-}
-
-::-webkit-scrollbar-track {
-  -webkit-appearance: none;
-  background: $ic-color-light;
-}
-::-webkit-scrollbar-thumb {
-  -webkit-appearance: none;
-  box-shadow: inset 0 0 0 2px $ic-color-light;
-  @if $use_high_contrast { background: $ic-color-dark; }
-  @else { background: $ic-border-dark; }
-}
-
 body:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
   box-sizing: border-box;
   flex: 1;
@@ -276,7 +260,6 @@ body:not(.course-menu-expanded) {
 }
 
 .ic-app-course-nav-toggle {
-  transform: translateY(1px);
   margin-right: $ic-sp;
   padding: 0;
   width: $ic-sp*3; height: ($ic-sp*3) - ($ic-sp/2);

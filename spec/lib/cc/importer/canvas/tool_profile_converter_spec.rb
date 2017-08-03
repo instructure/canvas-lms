@@ -125,6 +125,7 @@ describe CC::Importer::Canvas::ToolProfileConverter do
         "meta" => {
           "registration_url" => "https://register.me/register"
         },
+        "migration_id" => "i964fd8107ac2c2e75e9a142971693976",
         "resource_href" => "i964fd8107ac2c2e75e9a142971693976.json"
       })
     end

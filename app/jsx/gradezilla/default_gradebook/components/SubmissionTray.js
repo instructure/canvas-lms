@@ -17,16 +17,48 @@
  */
 
 import React from 'react';
-import { bool, func } from 'prop-types';
+import { bool, func, number, shape, string } from 'prop-types';
 import ComingSoonContent from 'jsx/gradezilla/default_gradebook/components/ComingSoonContent';
+import LatePolicyGrade from 'jsx/gradezilla/default_gradebook/components/LatePolicyGrade';
 import Tray from 'instructure-ui/lib/components/Tray';
+import Avatar from 'instructure-ui/lib/components/Avatar';
 import I18n from 'i18n!gradebook';
 
+function renderAvatar (name, avatarUrl) {
+  return (
+    <div id="SubmissionTray__Avatar">
+      <Avatar name={name} src={avatarUrl} size="auto" />
+    </div>
+  );
+}
+
+function renderTrayContent (showContentComingSoon, student, submission) {
+  if (showContentComingSoon) {
+    return (<ComingSoonContent />);
+  }
+
+  const { name, avatarUrl } = student;
+
+  return (
+    <div id="SubmissionTray__Content">
+      {avatarUrl && renderAvatar(name, avatarUrl)}
+      <div id="SubmissionTray__StudentName">
+        {name}
+      </div>
+
+      {!!submission.pointsDeducted && <LatePolicyGrade submission={submission} />}
+    </div>
+  );
+}
+
 export default function SubmissionTray (props) {
+  const { showContentComingSoon, student, submission } = props;
+
   return (
     <Tray
+      contentRef={props.contentRef}
       label={I18n.t('Submission tray')}
-      isDismissable
+      dismissable
       closeButtonLabel={I18n.t('Close submission tray')}
       isOpen={props.isOpen}
       trapFocus
@@ -35,15 +67,28 @@ export default function SubmissionTray (props) {
       onClose={props.onClose}
     >
       <div className="SubmissionTray__Container">
-        {props.showContentComingSoon && <ComingSoonContent />}
+        {renderTrayContent(showContentComingSoon, student, submission)}
       </div>
     </Tray>
   );
 }
 
+SubmissionTray.defaultProps = {
+  contentRef: undefined
+}
+
 SubmissionTray.propTypes = {
-  onRequestClose: func.isRequired,
+  contentRef: func,
+  isOpen: bool.isRequired,
   onClose: func.isRequired,
+  onRequestClose: func.isRequired,
   showContentComingSoon: bool.isRequired,
-  isOpen: bool.isRequired
+  student: shape({
+    name: string.isRequired,
+    avatarUrl: string
+  }).isRequired,
+  submission: shape({
+    grade: string,
+    pointsDeducted: number
+  }).isRequired
 };

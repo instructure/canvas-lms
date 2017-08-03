@@ -17,36 +17,95 @@
  */
 
 import React from 'react';
-import { mount } from 'enzyme';
+import { mount, ReactWrapper } from 'enzyme';
 import SubmissionTray from 'jsx/gradezilla/default_gradebook/components/SubmissionTray';
 
-QUnit.module('SubmissionTray', {
-  mountComponent (props) {
+QUnit.module('SubmissionTray', function (hooks) {
+  let content;
+  let wrapper;
+
+  hooks.afterEach(function () {
+    wrapper.unmount();
+  });
+
+  function mountComponent (props) {
     const defaultProps = {
+      contentRef (ref) {
+        content = ref;
+      },
       onRequestClose () {},
       onClose () {},
       showContentComingSoon: false,
-      isOpen: true
+      isOpen: true,
+      student: {
+        name: 'Jane Doe'
+      },
+      submission: {
+        grade: '100%',
+        pointsDeducted: 3
+      }
     };
-    return mount(<SubmissionTray {...defaultProps} {...props} />);
-  },
-
-  teardown () {
-    this.wrapper.unmount();
+    wrapper = mount(<SubmissionTray {...defaultProps} {...props} />);
   }
-});
 
-test('shows "Content Coming Soon" content if showContentComingSoon is true', function () {
-  const server = sinon.fakeServer.create({ respondImmediately: true });
-  server.respondWith('GET', /^\/images\/.*\.svg$/, [
-    200, { 'Content-Type': 'img/svg+xml' }, '{}'
-  ]);
-  this.wrapper = this.mountComponent({ showContentComingSoon: true });
-  ok(document.querySelector('.ComingSoonContent__Container'));
-  server.restore();
-});
+  function avatarDiv () {
+    return document.querySelector('#SubmissionTray__Avatar');
+  }
 
-test('does not show "Content Coming Soon" content if showContentComingSoon is false', function () {
-  this.wrapper = this.mountComponent();
-  notOk(document.querySelector('.ComingSoonContent__Container'));
+  function studentNameDiv () {
+    return document.querySelector('#SubmissionTray__StudentName');
+  }
+
+  function wrapContent () {
+    return new ReactWrapper(content, wrapper.node);
+  }
+
+  test('shows "Content Coming Soon" content if showContentComingSoon is true', function () {
+    const server = sinon.fakeServer.create({ respondImmediately: true });
+    server.respondWith('GET', /^\/images\/.*\.svg$/, [
+      200, { 'Content-Type': 'img/svg+xml' }, '{}'
+    ]);
+    mountComponent({ showContentComingSoon: true });
+    ok(document.querySelector('.ComingSoonContent__Container'));
+    server.restore();
+  });
+
+  test('shows avatar if showContentComingSoon is false and avatar is not null', function () {
+    const avatarUrl = 'http://bob_is_not_a_domain/me.jpg?filter=make_me_pretty';
+    mountComponent({ student: { name: 'Bob', avatarUrl } });
+    const avatarBackground = avatarDiv().firstChild.style.getPropertyValue('background-image');
+    strictEqual(avatarBackground, `url("${avatarUrl}")`);
+  });
+
+  test('shows no avatar if showContentComingSoon is false and avatar is null', function () {
+    mountComponent({ student: { name: 'Joe' } });
+    notOk(avatarDiv());
+  });
+
+  test('shows name if showContentComingSoon is false', function () {
+    mountComponent({ student: { name: 'Sara' } });
+    strictEqual(studentNameDiv().innerHTML, 'Sara');
+  });
+
+  test('shows the late policy grade when points have been deducted', function () {
+    mountComponent();
+    strictEqual(wrapContent().find('LatePolicyGrade').length, 1);
+  });
+
+  test('uses the submission to show the late policy grade', function () {
+    mountComponent();
+    const latePolicyGrade = wrapContent().find('LatePolicyGrade').at(0);
+    equal(latePolicyGrade.prop('submission').grade, '100%');
+    strictEqual(latePolicyGrade.prop('submission').pointsDeducted, 3);
+  });
+
+  test('does not show the late policy grade when zero points have been deducted', function () {
+    mountComponent({ submission: { pointsDeducted: 0 } });
+    strictEqual(wrapContent().find('LatePolicyGrade').length, 0);
+  });
+
+  test('does not show the late policy grade when points deducted is null', function () {
+    mountComponent({ submission: { pointsDeducted: null } });
+    strictEqual(wrapContent().find('LatePolicyGrade').length, 0);
+  });
 });

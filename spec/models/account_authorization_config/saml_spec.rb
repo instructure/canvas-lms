@@ -127,24 +127,45 @@ describe AccountAuthorizationConfig::SAML do
       expect(saml.metadata_uri).to eq AccountAuthorizationConfig::SAML::InCommon::URN
     end
   end
-end
 
-describe '.resolve_saml_key_path' do
-  it "returns nil for nil" do
-    expect(AccountAuthorizationConfig::SAML.resolve_saml_key_path(nil)).to be_nil
-  end
+  describe '.resolve_saml_key_path' do
+    it "returns nil for nil" do
+      expect(AccountAuthorizationConfig::SAML.resolve_saml_key_path(nil)).to be_nil
+    end
 
-  it "returns nil for nonexistent paths" do
-    expect(AccountAuthorizationConfig::SAML.resolve_saml_key_path('/tmp/does_not_exist')).to be_nil
-  end
+    it "returns nil for nonexistent paths" do
+      expect(AccountAuthorizationConfig::SAML.resolve_saml_key_path('/tmp/does_not_exist')).to be_nil
+    end
 
-  it "returns abolute paths unmodified when the file exists" do
-    Tempfile.open('samlkey') do |samlkey|
-      expect(AccountAuthorizationConfig::SAML.resolve_saml_key_path(samlkey.path)).to eq samlkey.path
+    it "returns abolute paths unmodified when the file exists" do
+      Tempfile.open('samlkey') do |samlkey|
+        expect(AccountAuthorizationConfig::SAML.resolve_saml_key_path(samlkey.path)).to eq samlkey.path
+      end
+    end
+
+    it "interprets relative paths from the config dir" do
+      expect(AccountAuthorizationConfig::SAML.resolve_saml_key_path('initializers')).to eq Rails.root.join('config', 'initializers').to_s
     end
   end
 
-  it "interprets relative paths from the config dir" do
-    expect(AccountAuthorizationConfig::SAML.resolve_saml_key_path('initializers')).to eq Rails.root.join('config', 'initializers').to_s
+  describe '#user_logout_redirect' do
+    it "sends you to the logout landing page if the IdP doesn't support SLO" do
+      controller = double()
+      allow(controller).to receive(:session).and_return({})
+      expect(controller).to receive(:logout_url).and_return("bananas")
+
+      aac = @account.authentication_providers.create!(auth_type: 'saml')
+      @account.authentication_providers.first.destroy
+      expect(aac.user_logout_redirect(controller, nil)).to eq "bananas"
+    end
+
+    it "sends you to the login page if the IdP doesn't support SLO, but Canvas auth is default" do
+      controller = double()
+      allow(controller).to receive(:session).and_return({})
+      expect(controller).to receive(:login_url).and_return("bananas")
+
+      aac = @account.authentication_providers.create!(auth_type: 'saml')
+      expect(aac.user_logout_redirect(controller, nil)).to eq "bananas"
+    end
   end
 end

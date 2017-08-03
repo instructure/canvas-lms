@@ -119,13 +119,19 @@ define [
 
   IS_ADMIN = isAdmin()
 
+  htmlDecode = (input) ->
+    input && new DOMParser().parseFromString(input, "text/html").documentElement.textContent
+
   renderComponent = (reactClass, mountPoint, props = {}, children = null) ->
     component = React.createElement(reactClass, props, children)
     ReactDOM.render(component, mountPoint)
 
   ## Gradebook Display Settings
   getInitialGridDisplaySettings = (settings, colors) ->
-    selectedPrimaryInfo = settings.student_column_display_as || studentRowHeaderConstants.defaultPrimaryInfo
+    selectedPrimaryInfo = if studentRowHeaderConstants.primaryInfoKeys.includes(settings.student_column_display_as)
+      settings.student_column_display_as
+    else
+      studentRowHeaderConstants.defaultPrimaryInfo
 
     # in case of no user preference, determine the default value after @hasSections has resolved
     selectedSecondaryInfo = settings.student_column_secondary_info
@@ -229,6 +235,8 @@ define [
       @studentViewStudents = {}
       @courseContent.students = new StudentDatastore(@students, @studentViewStudents)
 
+      @parentColumns = []
+      @customColumns = []
       @rows = []
 
       @initPostGradesStore()
@@ -325,6 +333,7 @@ define [
         @setContextModules(contextModules)
         @contentLoadStates.contextModulesLoaded = true
         @renderViewOptionsMenu()
+        @renderFilters()
 
       dataLoader.gotSubmissions.then () =>
         @setSubmissionsLoaded(true)
@@ -518,6 +527,10 @@ define [
     resetGrading: =>
       @initSubmissionStateMap()
       @setupGrading(@courseContent.students.listStudents())
+
+    getSubmission: (studentId, assignmentId) =>
+      student = @student(studentId)
+      student["assignment_#{assignmentId}"]
 
     updateStudentAttributes: (student) =>
       student.computed_current_score ||= 0
@@ -1029,12 +1042,18 @@ define [
     # by clicking outside of it, save the current field.
     onGridBlur: (e) =>
       @closeSubmissionTray() if @getSubmissionTrayState().open
-      # Prevent exiting the cell editor when clicking in the cell being edited.
-      return if @gridSupport.state.getActiveNode()?.contains(e.target)
 
-      # Finish editing
-      # * This currently ignores validation, which Gradebook does not use.
-      @gridSupport.helper.commitCurrentEdit()
+      # Prevent exiting the cell editor when clicking in the cell being edited.
+      editingNode = @gridSupport.state.getEditingNode()
+      return if editingNode?.contains(e.target)
+
+      activeNode = @gridSupport.state.getActiveNode()
+      return unless activeNode
+
+      if activeNode.contains(e.target)
+        # SlickGrid does not re-engage the editor for the active cell upon single click
+        @gridSupport.helper.beginEdit()
+        return
 
       className = e.target.className
 
@@ -1850,34 +1869,44 @@ define [
       else
         return columnId
 
-    localeSort: (a, b) ->
+    localeSort: (a, b, { asc = true } = {}) ->
+      [b, a] = [a, b] unless asc
       natcompare.strings(a || '', b || '')
+
+    idSort: (a, b, { asc = true }) ->
+      NumberCompare(Number(a.id), Number(b.id), descending: !asc)
+
+    secondaryAndTertiarySort: (a, b, { asc = true }) =>
+      result = @localeSort(a.sortable_name, b.sortable_name, { asc })
+      result = @idSort(a, b, { asc }) if result == 0
+      result
 
     gradeSort: (a, b, field, asc) =>
       scoreForSorting = (student) =>
         grade = @getStudentGradeForColumn(student, field)
-        switch
-          when field == "total_grade"
-            if @options.show_total_grade_as_points
-              grade.score
-            else
-              @getGradeAsPercent(grade)
-          when field.match /^assignment_group/
-            @getGradeAsPercent(grade)
-          else
-            # TODO: support assignment grading types
+        if field == "total_grade"
+          if @options.show_total_grade_as_points
             grade.score
-
-      NumberCompare(scoreForSorting(a), scoreForSorting(b), descending: !asc)
+          else
+            @getGradeAsPercent(grade)
+        else if field.match /^assignment_group/
+          @getGradeAsPercent(grade)
+        else
+          # TODO: support assignment grading types
+          grade.score
+      result = NumberCompare(scoreForSorting(a), scoreForSorting(b), descending: !asc)
+      result = @secondaryAndTertiarySort(a, b, { asc }) if result == 0
+      result
 
     # when fn is true, those rows get a -1 so they go to the top of the sort
     sortRowsWithFunction: (fn, { asc = true } = {}) ->
       @sortRowsBy((a, b) =>
-        [b, a] = [a, b] unless asc
-        [rowA, rowB] = [fn(a), fn(b)]
+        rowA = fn(a)
+        rowB = fn(b)
+        [rowA, rowB] = [rowB, rowA] unless asc
         return -1 if rowA > rowB
         return 1 if rowA < rowB
-        @localeSort a.sortable_name, b.sortable_name
+        @secondaryAndTertiarySort(a, b, { asc })
       )
 
     missingSort: (columnId) =>
@@ -1888,14 +1917,18 @@ define [
 
     sortByStudentColumn: (settingKey, direction) =>
       @sortRowsBy((a, b) =>
-        [b, a] = [a, b] unless direction == 'ascending'
-        @localeSort(a[settingKey], b[settingKey])
+        asc = direction == 'ascending'
+        result = @localeSort(a[settingKey], b[settingKey], { asc })
+        result = @idSort(a, b, { asc }) if result == 0
+        result
       )
 
     sortByCustomColumn: (columnId, direction) =>
       @sortRowsBy((a, b) =>
-        [b, a] = [a, b] unless direction == 'ascending'
-        @localeSort(a[columnId], b[columnId])
+        asc = direction == 'ascending'
+        result = @localeSort(a[columnId], b[columnId], { asc } )
+        result = @secondaryAndTertiarySort(a, b, { asc }) if result == 0
+        result
       )
 
     sortByAssignmentColumn: (columnId, settingKey, direction) =>
@@ -2481,20 +2514,30 @@ define [
 
     # Submission Tray
 
-    renderSubmissionTray: () =>
+    renderSubmissionTray: (student) =>
       mountPoint = document.getElementById('StudentTray__Container')
       { open, studentId, assignmentId } = @getSubmissionTrayState()
+      # get the student's submission, or use an empty object in case the
+      # submission has not yet loaded
+      submission = @getSubmission(studentId, assignmentId) || {}
+
       props =
         key: "submission_tray_#{studentId}_#{assignmentId}"
         isOpen: open
         onRequestClose: @closeSubmissionTray
         onClose: => @gridSupport.helper.focus()
         showContentComingSoon: !@options.new_gradebook_development_enabled
+        student:
+          name: student.name,
+          avatarUrl: htmlDecode(student.avatar_url)
+        submission:
+          grade: submission.grade
+          pointsDeducted: submission.points_deducted
       renderComponent(SubmissionTray, mountPoint, props)
 
     updateRowAndRenderSubmissionTray: (studentId) =>
       @updateRowCellsForStudentIds([studentId])
-      @renderSubmissionTray()
+      @renderSubmissionTray(@student(studentId))
 
     toggleSubmissionTrayOpen: (studentId, assignmentId) =>
       @setSubmissionTrayState(!@getSubmissionTrayState().open, studentId, assignmentId)

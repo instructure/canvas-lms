@@ -53,7 +53,7 @@ describe 'Excuse an Assignment' do
     it 'Submission details displays scores as excused', priority: "1", test_id: 246617 do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
       wait_for_ajaximations
-      expect(f('#content span.published_grade').text).to eq 'Excused'
+      expect(f('#content span.entered_grade').text).to eq 'Excused'
     end
   end
 

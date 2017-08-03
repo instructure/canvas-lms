@@ -19,20 +19,57 @@ class AssignmentConfigurationToolLookup < ActiveRecord::Base
   belongs_to :tool, polymorphic: true
   belongs_to :assignment
   after_create :create_subscription
-
   # Do not add before_destroy or after_destroy, these records are "delete_all"ed
 
+  def lti_tool
+    @_lti_tool ||= begin
+      if tool_id.present?
+        tool
+      elsif tool_type == 'Lti::MessageHandler'
+        Lti::MessageHandler.by_resource_codes(
+          vendor_code: tool_vendor_code,
+          product_code: tool_product_code,
+          resource_type_code: tool_resource_type_code,
+          context: assignment.course
+        )
+      end
+    end
+  end
+
   def destroy_subscription
-    return unless tool.instance_of? Lti::MessageHandler
-    tool_proxy = tool.resource_handler.tool_proxy
+    return unless lti_tool.instance_of? Lti::MessageHandler
+    tool_proxy = lti_tool.resource_handler.tool_proxy
     Lti::AssignmentSubscriptionsHelper.new(tool_proxy).destroy_subscription(subscription_id)
+  end
+
+  def resource_codes
+    if tool_type == 'Lti::MessageHandler' && tool_id.blank?
+      return {
+        product_code: tool_product_code,
+        vendor_code: tool_vendor_code,
+        resource_type_code: tool_resource_type_code
+      }
+    elsif tool_type == 'Lti::MessageHandler' && tool_id.present?
+      return lti_tool.resource_codes
+    end
+    {}
+  end
+
+  def self.by_message_handler(message_handler, assignment)
+    product_family = message_handler.resource_handler.tool_proxy.product_family
+    AssignmentConfigurationToolLookup.where(
+      assignment: assignment,
+      tool_product_code: product_family.product_code,
+      tool_vendor_code: product_family.vendor_code,
+      tool_resource_type_code: message_handler.resource_handler.resource_type_code
+    )
   end
 
   private
 
   def create_subscription
-    return unless tool.instance_of? Lti::MessageHandler
-    tool_proxy = tool.resource_handler.tool_proxy
+    return unless lti_tool.instance_of? Lti::MessageHandler
+    tool_proxy = lti_tool.resource_handler.tool_proxy
     subscription_helper = Lti::AssignmentSubscriptionsHelper.new(tool_proxy, assignment)
     self.update_attributes(subscription_id: subscription_helper.create_subscription)
   end

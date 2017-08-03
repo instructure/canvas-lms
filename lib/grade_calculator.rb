@@ -84,6 +84,7 @@ class GradeCalculator
     calculate_grading_period_scores if @update_all_grading_period_scores
     compute_scores
     save_scores
+    invalidate_caches
     calculate_course_score if @update_course_score
   end
 
@@ -596,5 +597,10 @@ class GradeCalculator
       score: wrapped_submission[:score],
       total: wrapped_submission[:total],
     }
+  end
+
+  # If you need to invalidate caches with associated classes, put those calls here.
+  def invalidate_caches
+    GradeSummaryPresenter.invalidate_cache(@course)
   end
 end

@@ -224,6 +224,20 @@ describe PlannerOverridesController do
             expect(json_parse(response.body).map { |i| [i["plannable_type"], i["plannable_id"]] }).to eq original_order[3..4]
           end
 
+          it "should use the right bookmarker in different time zones" do
+            Account.default.default_time_zone = "America/Denver"
+            time = 2.days.from_now
+            @assignment.update_attribute(:due_at, time)
+            @assignment2.update_attribute(:due_at, time)
+
+            get :items_index, :per_page => 1
+            expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment.id]
+
+            next_page = Api.parse_pagination_links(response.headers['Link']).detect{|p| p[:rel] == "next"}['page']
+            get :items_index, :per_page => 1, :page => next_page
+            expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment2.id]
+          end
+
           it "should return results in reverse order by date if requested" do
             wiki_page_model(course: @course)
             @page.todo_date = 1.day.from_now

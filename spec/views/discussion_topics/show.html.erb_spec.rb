@@ -41,6 +41,7 @@ describe "/discussion_topics/show" do
     group_model
     view_context(@group, @user)
     @topic = @assignment.discussion_topic
+    @topic.message = nil # the assigns for @context don't seem to carry over to the controller helper method
     @topic.user = @user
     @topic.save!
     @entry = @topic.discussion_entries.create!(:message => "some message")

@@ -126,6 +126,7 @@ describe "scheduler" do
       get "/calendar2"
       open_select_courses_modal(@course1.name)
       expect(f('.fc-content .icon-calendar-add')).to be
+      scroll_into_view('.fc-content .icon-calendar-add')
       f('.fc-content .icon-calendar-add').click
       move_to_click('.reserve_event_link')
       visible_dialog_element = fj('.ui-dialog:visible')

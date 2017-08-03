@@ -262,6 +262,74 @@ describe GradingPeriod do
     end
   end
 
+  describe "scope: closed" do
+    around { |example| Timecop.freeze(now, &example) }
+
+    it "includes grading period if the current date is past the close date" do
+      period = grading_period_group.grading_periods.create(
+        title: "Closed Period",
+        start_date: 10.days.ago(now),
+        end_date: 5.days.ago(now),
+        close_date: 3.days.ago(now)
+      )
+      expect(GradingPeriod.closed).to include period
+    end
+
+    it "excludes grading period if the current date is before the close date" do
+      period = grading_period_group.grading_periods.create(
+        title: "A Period",
+        start_date: 10.days.ago(now),
+        end_date: 5.days.ago(now),
+        close_date: 2.days.from_now(now)
+      )
+      expect(GradingPeriod.closed).not_to include period
+    end
+
+    it "excludes grading period if the current date matches the close date" do
+      period = grading_period_group.grading_periods.create(
+        title: "A Period",
+        start_date: 10.days.ago(now),
+        end_date: 5.days.ago(now),
+        close_date: now
+      )
+      expect(GradingPeriod.closed).not_to include period
+    end
+  end
+
+  describe "scope: open" do
+    around { |example| Timecop.freeze(now, &example) }
+
+    it "excludes grading period if the current date is past the close date" do
+      period = grading_period_group.grading_periods.create(
+        title: "Closed Period",
+        start_date: 10.days.ago(now),
+        end_date: 5.days.ago(now),
+        close_date: 3.days.ago(now)
+      )
+      expect(GradingPeriod.open).not_to include period
+    end
+
+    it "includes grading period if the current date is before the close date" do
+      period = grading_period_group.grading_periods.create(
+        title: "A Period",
+        start_date: 10.days.ago(now),
+        end_date: 5.days.ago(now),
+        close_date: 2.days.from_now(now)
+      )
+      expect(GradingPeriod.open).to include period
+    end
+
+    it "includes grading period if the current date matches the close date" do
+      period = grading_period_group.grading_periods.create(
+        title: "A Period",
+        start_date: 10.days.ago(now),
+        end_date: 5.days.ago(now),
+        close_date: now
+      )
+      expect(GradingPeriod.open).to include period
+    end
+  end
+
   describe "#closed?" do
     around { |example| Timecop.freeze(now, &example) }
 

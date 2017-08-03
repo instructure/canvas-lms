@@ -169,15 +169,6 @@ describe SectionTabHelper do
         )
 
         expect(tag.a_attributes.keys).to include(:href, :class)
-        expect(tag.a_attributes.keys).to_not include(:'aria-label')
-      end
-
-      it 'should include key aria-label if tab has screenreader text' do
-        tag = SectionTabHelperSpec::SectionTabTag.new(
-          tab_assignments, course
-        )
-
-        expect(tag.a_attributes.keys).to include(:'aria-label')
       end
 
       it 'includes a target if tab has the target attribute' do

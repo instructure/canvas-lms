@@ -16,25 +16,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const FETCH_HISTORY_STARTED = 'FETCH_HISTORY_STARTED';
-export const FETCH_HISTORY_SUCCESS = 'FETCH_HISTORY_SUCCESS';
-export const FETCH_HISTORY_FAILURE = 'FETCH_HISTORY_FAILURE';
+const FETCH_HISTORY_START = 'FETCH_HISTORY_START';
+const FETCH_HISTORY_SUCCESS = 'FETCH_HISTORY_SUCCESS';
+const FETCH_HISTORY_FAILURE = 'FETCH_HISTORY_FAILURE';
 
-export function fetchHistoryStarted () {
+function fetchHistoryStarted () {
   return {
-    type: FETCH_HISTORY_STARTED
+    type: FETCH_HISTORY_START
   };
 }
 
-export function fetchHistorySuccess (data) {
+function fetchHistorySuccess ({ events, linked: { users }}, { link }) {
   return {
     type: FETCH_HISTORY_SUCCESS,
-    payload: data
+    payload: { events, users, link }
   };
 }
 
-export function fetchHistoryFailure () {
+function fetchHistoryFailure () {
   return {
     type: FETCH_HISTORY_FAILURE
   };
 }
+
+export default {
+  FETCH_HISTORY_START,
+  FETCH_HISTORY_SUCCESS,
+  FETCH_HISTORY_FAILURE,
+  fetchHistoryStarted,
+  fetchHistorySuccess,
+  fetchHistoryFailure
+};

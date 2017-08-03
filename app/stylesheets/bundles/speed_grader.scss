@@ -464,6 +464,10 @@ $icon-size: 1.4rem;
     font-size: 1.2em;
     display: none;
   }
+  .submission-late-pill,
+  .submission-missing-pill {
+    font-size: 1rem;
+  }
 }
 
 .right_side_content {
@@ -889,6 +893,17 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   margin-bottom: 0;
   &.pass_fail_grading_type {
     width: 105px;
+  }
+}
+
+#deduction-box {
+  margin: 0 .25em;
+  .error {
+    color: $ic-color-danger;
+    margin-right: 1em;
+  }
+  .bold {
+    font-weight: bold;
   }
 }
 

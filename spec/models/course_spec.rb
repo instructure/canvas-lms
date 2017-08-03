@@ -1055,18 +1055,6 @@ describe Course do
     end
   end
 
-  context "migrate_content_links" do
-    it "should ignore types not in the supported_types arg" do
-      c1 = course_model
-      c2 = course_model
-      orig = <<-HTML
-      We aren't translating <a href="/courses/#{c1.id}/assignments/5">links to assignments</a>
-      HTML
-      html = Course.migrate_content_links(orig, c1, c2, ['files'])
-      expect(html).to eq orig
-    end
-  end
-
   it "should be marshal-able" do
     c = Course.new(:name => 'c1')
     expect { Marshal.dump(c) }.not_to raise_error
@@ -1250,7 +1238,7 @@ describe Course, '#assignment_groups' do
     @course.assignment_groups.create!(:name => 'C Group', position: 3)
 
     @course.reload
-    expect(AssignmentGroup).to receive(:best_unicode_collation_key).with('assignment_groups.name').and_call_original
+    expect(AssignmentGroup).to receive(:best_unicode_collation_key).with('assignment_groups.name').at_least(1).and_call_original
     groups = @course.assignment_groups
 
     expect(groups[0].name).to eq('B Group')

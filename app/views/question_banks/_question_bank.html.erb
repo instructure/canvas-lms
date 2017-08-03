@@ -28,14 +28,14 @@
       <% not_yet_bookmarked = question_bank && !question_bank.bookmarked_for?(@current_user) %>
       <% bookmark_bank_text = t('Bookmark %{bank}', :bank => title) %>
       <% unbookmark_bank_text = t('Unbookmark %{bank}', :bank => title) %>
-      <a href="<%= context_url(context, :context_question_bank_bookmark_url, question_bank ? question_bank.id : "{{ id }}") %>" class="bookmark_bank_link no-hover" title="<%= bookmark_bank_text %>" style="<%= hidden unless not_yet_bookmarked %>"><span class="screenreader-only"><%= bookmark_bank_text %></span><i class="icon-bookmark" aria-hidden="true"></i></a>
-      <a href="<%= context_url(context, :context_question_bank_bookmark_url, question_bank ? question_bank.id : "{{ id }}", :unbookmark => 1) %>" class="bookmark_bank_link no-hover" title="<%= unbookmark_bank_text %>" style="<%= hidden if not_yet_bookmarked %>"><span class="screenreader-only"><%= unbookmark_bank_text %></span><i class="icon-remove-bookmark" aria-hidden="true"></i></a>
+      <a href="<%= context_url(context, :context_question_bank_bookmark_url, question_bank ? question_bank.id : "{{ id }}") %>" class="Button Button--icon-action bookmark_bank_link" title="<%= bookmark_bank_text %>" style="<%= hidden unless not_yet_bookmarked %>"><span class="screenreader-only"><%= bookmark_bank_text %></span><i class="icon-bookmark" aria-hidden="true"></i></a>
+      <a href="<%= context_url(context, :context_question_bank_bookmark_url, question_bank ? question_bank.id : "{{ id }}", :unbookmark => 1) %>" class="Button Button--icon-action bookmark_bank_link" title="<%= unbookmark_bank_text %>" style="<%= hidden if not_yet_bookmarked %>"><span class="screenreader-only"><%= unbookmark_bank_text %></span><i class="icon-remove-bookmark" aria-hidden="true"></i></a>
       <% if context == @context && @context.grants_right?(@current_user, session, :manage_assignments) %>
         <% edit_bank_text = t('Edit %{bank}', :bank => title) %>
         <% delete_bank_text = t('Delete %{bank}', :bank => title) %>
         <span style="<%= hidden if question_bank && !can_do(question_bank, @current_user, :update) %>">
-          <a href="<%= context_url(context, :context_question_bank_url, question_bank ? question_bank.id : "{{ id }}") %>" class="edit_bank_link" title="<%= edit_bank_text %>"><span class="screenreader-only"><%= edit_bank_text %></span><i class="icon-edit standalone-icon" aria-hidden="true"></i></a>
-          <a href="<%= context_url(context, :context_question_bank_url, question_bank ? question_bank.id : "{{ id }}") %>" class="delete_bank_link" title="<%= delete_bank_text %>"><span class="screenreader-only"><%= delete_bank_text %></span><i class="icon-end standalone-icon" aria-hidden="true"></i></a>
+          <a href="<%= context_url(context, :context_question_bank_url, question_bank ? question_bank.id : "{{ id }}") %>" class="Button Button--icon-action edit_bank_link" title="<%= edit_bank_text %>"><span class="screenreader-only"><%= edit_bank_text %></span><i class="icon-edit" aria-hidden="true"></i></a>
+          <a href="<%= context_url(context, :context_question_bank_url, question_bank ? question_bank.id : "{{ id }}") %>" class="Button Button--icon-action delete_bank_link" title="<%= delete_bank_text %>"><span class="screenreader-only"><%= delete_bank_text %></span><i class="icon-end" aria-hidden="true"></i></a>
         </span>
       <% end %>
     </div>

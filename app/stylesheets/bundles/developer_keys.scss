@@ -19,14 +19,8 @@
 @import "base/environment";
 
 #keys {
-  border-collapse: collapse;
-  width: 100%;
   tr:hover {
     td {
-      background-color: #eee;
-      &.links i {
-        opacity: 1;
-      }
       .api_key {
         visibility: visible;
       }
@@ -34,24 +28,10 @@
   }
   tr.inactive {
     td {
-      background-color: #fee;
+      background-color: $ic-bg-light-danger;
     }
-  }
-  tr.inactive:hover {
-    td {
-      background-color: #fcc;
-    }
-  }
-  td, th {
-    padding: 3px 5px;
-  }
-  th {
-    border-bottom: 1px dotted #888;
-    font-weight: bold;
   }
   td {
-    border-bottom: 1px dotted #ccc;
-    vertical-align: middle;
     span.name {
       font-weight: bold;
       @include fontSize(14px);
@@ -63,18 +43,15 @@
         overflow-x: auto
       }
     }
-    &.links i {
-      opacity: 0.4;
-    }
     .api_key {
       visibility: hidden;
     }
     .icon {
-      width: 36px;
-      height: 36px;
-      border: 1px solid #ccc;
+      width: $ic-sp * 3;
+      height: $ic-sp * 3;
+      border: 1px solid $ic-border-color;
       padding: 2px;
-      margin-right: 5px;
+      margin-right: $ic-sp / 2;
       vertical-align: middle;
       float: left;
     }

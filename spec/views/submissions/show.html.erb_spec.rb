@@ -33,9 +33,59 @@ describe "/submissions/show" do
     expect(response).not_to be_nil
   end
 
+  context 'when assignment has deducted points' do
+    it 'shows the deduction and "grade" as final grade when current_user is teacher' do
+      view_context(@course, @teacher)
+      a = @course.assignments.create!(title: "some assignment", points_possible: 10, grading_type: 'points')
+      assign(:assignment, a)
+      @submission = a.submit_homework(@user)
+      @submission.update(grade: 7, points_deducted: 2)
+      assign(:submission, @submission)
+      render "submissions/show"
+      html = Nokogiri::HTML.fragment(response.body)
+
+      expect(html.css('.late_penalty').text).to include('-2')
+      expect(html.css('.published_grade').text).to include('7')
+    end
+
+    it 'shows the deduction and "published_grade" as final grade when current_user is submission user' do
+      view_context(@course, @user)
+      a = @course.assignments.create!(title: "some assignment", points_possible: 10, grading_type: 'points')
+      assign(:assignment, a)
+      @submission = a.submit_homework(@user)
+      @submission.update(grade: '7', points_deducted: 2, published_grade: '6')
+      assign(:submission, @submission)
+      render "submissions/show"
+      html = Nokogiri::HTML.fragment(response.body)
+
+      expect(html.css('.late_penalty').text).to include('-2')
+      expect(html.css('.grade').text).to include('6')
+    end
+
+    context 'and is excused' do
+      it 'hides the deduction' do
+        view_context(@course, @teacher)
+        a = @course.assignments.create!(title: "some assignment", points_possible: 10, grading_type: 'points')
+        assign(:assignment, a)
+        @submission = a.submit_homework(@user)
+        @submission.update(grade: 7, points_deducted: 2, excused: true)
+        assign(:submission, @submission)
+        render "submissions/show"
+        html = Nokogiri::HTML.fragment(response.body)
+
+        deduction_elements = html.css('.late-penalty-display')
+
+        expect(deduction_elements).not_to be_empty
+        deduction_elements.each do |deduction_element|
+          expect(deduction_element.attr('style')).to include('display: none;')
+        end
+      end
+    end
+  end
+
   context 'when assignment has a rubric' do
     before :once do
-      assignment_model
+      assignment_model(course: @course)
       rubric_association_model association_object: @assignment, purpose: 'grading'
       @submission = @assignment.submit_homework(@user)
     end
@@ -119,4 +169,3 @@ describe "/submissions/show" do
     end
   end
 end
-

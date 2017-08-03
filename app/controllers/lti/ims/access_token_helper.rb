@@ -17,9 +17,7 @@
 
 module Lti::Ims::AccessTokenHelper
   def authorized_lti2_tool
-    Shard.lookup(access_token.shard_id).activate do
-      validate_access_token!
-    end
+    validate_access_token!
     true
   rescue Lti::Oauth2::InvalidTokenError
     render_unauthorized_action
@@ -53,15 +51,16 @@ module Lti::Ims::AccessTokenHelper
 
   def validate_services!(tool_proxy)
     ims_tp = IMS::LTI::Models::ToolProxy.from_json(tool_proxy.raw_data)
+    service_names = [*lti2_service_name]
     service = ims_tp.security_contract.tool_services.find(
       -> {
         raise Lti::Oauth2::InvalidTokenError,
-              "The ToolProxy security contract doesn't include #{lti2_service_name}"
+              "The ToolProxy security contract doesn't include #{service_names.join(', or ')}"
       }) do |s|
-      s.service.split(':').last.split('#').last == lti2_service_name
+      service_names.include? s.service.split(':').last.split('#').last
     end
     unless service.actions.map(&:downcase).include? request.method.downcase
-      msg = "#{lti2_service_name}.#{request.method} not included in ToolProxy security Contract"
+      msg = "#{s.service.split(':').last.split('#').last}.#{request.method} not included in ToolProxy security Contract"
       raise Lti::Oauth2::InvalidTokenError, msg
     end
 

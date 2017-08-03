@@ -34,6 +34,15 @@ module Lti
 
     let(:student) { course_with_student(active_all: true, course: course); @user }
 
+    let(:aud) { host }
+
+    let(:other_tool_proxy) do
+      tp = tool_proxy.dup
+      tp.update_attributes(guid: other_tp_guid)
+      tp
+    end
+
+    let(:other_tp_guid) { SecureRandom.uuid }
 
     before do
       mock_sub_helper = instance_double("Lti::AssignmentSubscriptionsHelper",
@@ -72,6 +81,17 @@ module Lti
         tool_proxy_binding.save!
         get endpoint, {}, request_headers
         expect(response.code).to eq '401'
+      end
+
+      it "allows tool proxies with matching access" do
+        tool_proxy.raw_data['tool_profile'] = tool_profile
+        tool_proxy.raw_data['security_contract'] = security_contract
+        tool_proxy.save!
+        token = Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: other_tool_proxy.guid)
+        other_helpers = {Authorization: "Bearer #{token}"}
+        allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).and_return(true)
+        get endpoint, {}, other_helpers
+        expect(response).not_to be '401'
       end
 
     end
@@ -202,6 +222,20 @@ module Lti
         endpoint = "/api/lti/assignments/#{assignment.id}/submissions/#{submission.id}/attachment/#{attachment1.id}"
         get controller.attachment_url(attachment1), {}, request_headers
         expect(response.code).to eq "401"
+      end
+
+      context 'sharding' do
+        it 'retrieves attachments when tool proxy is installed on another shard' do
+          get "/api/lti/assignments/#{assignment.global_id}/submissions/#{submission.global_id}", {}, request_headers
+          json = JSON.parse(response.body)
+          url = json["attachments"].first["url"]
+
+          @shard2.activate do
+            get url, {}, request_headers
+            expect(response).to be_success
+            expect(response.content_type.to_s).to eq attachment.content_type
+          end
+        end
       end
 
     end

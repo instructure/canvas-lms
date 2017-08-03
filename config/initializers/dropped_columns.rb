@@ -135,7 +135,7 @@ ActiveRecord::Base::DROPPED_COLUMNS = {
     'sis_batches' => %w(batch_id errored_attempts).freeze,
     'stream_items' => %w(context_code item_asset_string).freeze,
     'stream_item_instances' => %w(context_code).freeze,
-    'submissions' => %w(changed_since_publish late).freeze,
+    'submissions' => %w(changed_since_publish late accepted_at).freeze,
     'submission_comments' => %w{recipient_id}.freeze,
     'users' => %w(type
                   creation_unique_id

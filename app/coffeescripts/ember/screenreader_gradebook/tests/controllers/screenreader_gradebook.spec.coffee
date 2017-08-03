@@ -142,6 +142,14 @@ define [
     ok (!@srgb.get('selectedSection'))
     deepEqual @srgb.get('students'), @srgb.get('studentsInSelectedSection')
 
+  test 'selectedSubmissionLate is true for a late submission', ->
+    @srgb.set('selectedSubmission', {points_deducted: 1})
+    ok (@srgb.get('selectedSubmissionLate'))
+
+  test 'selectedSubmissionLate is false for an on time submission', ->
+    @srgb.set('selectedSubmission', {points_deducted: 0})
+    ok (!@srgb.get('selectedSubmissionLate'))
+
   test 'selecting a section filters students properly', ->
     Ember.run =>
       @srgb.set('selectedSection', @srgb.get('sections.lastObject'))

@@ -25,6 +25,7 @@ class SisBatch < ActiveRecord::Base
   serialize :processing_warnings, Array
   belongs_to :attachment
   belongs_to :errors_attachment, class_name: 'Attachment'
+  has_many :sis_batch_error_files
   belongs_to :generated_diff, class_name: 'Attachment'
   belongs_to :batch_mode_term, class_name: 'EnrollmentTerm'
   belongs_to :user
@@ -102,6 +103,7 @@ class SisBatch < ActiveRecord::Base
   def enable_diffing(data_set_id, opts = {})
     if data[:import_type] == "instructure_csv"
       self.diffing_data_set_identifier = data_set_id
+      self.change_threshold = opts[:change_threshold]
       if opts[:remaster]
         self.diffing_remaster = true
       end
@@ -250,6 +252,8 @@ class SisBatch < ActiveRecord::Base
     previous_zip = previous_batch.try(:download_zip)
     return unless previous_zip
 
+    return if change_threshold && (1-previous_zip.size.to_f/@data_file.size.to_f).abs > (0.01 * change_threshold)
+
     diffed_data_file = SIS::CSV::DiffGenerator.new(self.account, self).generate(previous_zip.path, @data_file.path)
     return unless diffed_data_file
 
@@ -276,9 +280,17 @@ class SisBatch < ActiveRecord::Base
   end
 
   def finish(import_finished)
-    @data_file.close if @data_file
+    @data_file&.close
     @data_file = nil
     return self if workflow_state == 'aborted'
+    compile_all_errors
+    finalize_workflow_state(import_finished)
+    self.progress = 100
+    self.ended_at = Time.now.utc
+    self.save!
+  end
+
+  def finalize_workflow_state(import_finished)
     if import_finished
       remove_previous_imports if self.batch_mode?
       self.workflow_state = :imported
@@ -401,32 +413,43 @@ class SisBatch < ActiveRecord::Base
       "clear_sis_stickiness" => self.options[:clear_sis_stickiness],
       "diffing_data_set_identifier" => self.diffing_data_set_identifier,
       "diffed_against_import_id" => self.options[:diffed_against_sis_batch_id],
+      "change_threshold" => self.change_threshold,
     }
     data["processing_errors"] = self.processing_errors if self.processing_errors.present?
     data["processing_warnings"] = self.processing_warnings if self.processing_warnings.present?
     data
   end
 
-  private
-
-  def messages?
-    (self.processing_errors && self.processing_errors.length > 0) || (self.processing_warnings && self.processing_warnings.length > 0)
-  end
-
   def self.max_messages
     Setting.get('sis_batch_max_messages', '50').to_i
   end
 
-  def write_warnings_and_errors_to_file
-    error_count = processing_errors&.size || 0
-    warning_count = processing_warnings&.size || 0
-    return unless error_count > 0 || warning_count > 0
-    temp = Tempfile.open([self.global_id.to_s + '_processing_warnings_and_errors', '.csv'])
-    file = temp.path
-    temp.close!
+  private
+
+  def messages?
+    self.errors_attachment_id?
+  end
+
+  def compile_all_errors
+    write_warnings_and_errors_to_file
+    all_errors = Set.new
+    return unless self.sis_batch_error_files.exists?
+    self.sis_batch_error_files.each do |errors|
+      CSV.foreach(errors.attachment.open) do |row|
+        next if row.first.start_with?('There were ')
+        all_errors << row
+      end
+    end
+    write_all_errors(all_errors)
+    cleanup_error_files
+  end
+
+  def write_all_errors(errors)
+    file = temp_error_file_path
     CSV.open(file, "w") do |csv|
-      processing_warnings.each {|row| csv << row}
-      processing_errors.each {|row| csv << row}
+      errors.to_a.each do |row|
+        csv << row
+      end
     end
     self.errors_attachment = SisBatch.create_data_attachment(
       self,
@@ -435,19 +458,55 @@ class SisBatch < ActiveRecord::Base
     )
   end
 
+  def cleanup_error_files
+    atts = Attachment.where(id: self.sis_batch_error_files.select(:attachment_id)).to_a
+    atts.each do |a|
+      a.make_childless
+      a.destroy_content unless a.root_attachment_id?
+    end
+    self.sis_batch_error_files.scope.delete_all
+    Attachment.where(id: atts).delete_all
+  end
+
+  def write_warnings_and_errors_to_file
+    error_count = processing_errors&.size || 0
+    warning_count = processing_warnings&.size || 0
+    return unless error_count > 0 || warning_count > 0
+    file = temp_error_file_path
+    CSV.open(file, "w") do |csv|
+      processing_warnings.each {|row| csv << row}
+      processing_errors.each {|row| csv << row}
+    end
+    self.sis_batch_error_files.create(
+      attachment: SisBatch.create_data_attachment(
+        self,
+        Rack::Test::UploadedFile.new(file, 'csv', true),
+        "errors_and_warnings.csv"
+      )
+    )
+  end
+
+  def temp_error_file_path
+    temp = Tempfile.open([self.global_id.to_s + '_processing_warnings_and_errors' + Time.zone.now.to_s, '.csv'])
+    file = temp.path
+    temp.close!
+    file
+  end
+
   def limit_size_of_messages
     max_messages = SisBatch.max_messages
     %w[processing_warnings processing_errors].each do |field|
-      write_warnings_and_errors_to_file unless self.errors_attachment
-      if self.send("#{field}_changed?") && (self.send(field).try(:size) || 0) > max_messages
-        limit_message = case field
-                        when "processing_warnings"
-                          t 'errors.too_many_warnings', "There were %{count} more warnings", count: (processing_warnings.size - max_messages + 1)
-                        when "processing_errors"
-                          t 'errors.too_many_errors', "There were %{count} more errors", count: (processing_errors.size - max_messages + 1)
-                        end
-        self.send("#{field}=", self.send(field)[0, max_messages-1] + [['', limit_message]])
-      end
+      write_warnings_and_errors_to_file unless messages?
+      next unless self.send("#{field}_changed?") && (self.send(field).try(:size) || 0) > max_messages
+      limit_message = case field
+                      when "processing_warnings"
+                        t 'errors.too_many_warnings', "There were %{count} more warnings",
+                          count: (processing_warnings.size - max_messages + 1)
+                      when "processing_errors"
+                        t 'errors.too_many_errors', "There were %{count} more errors",
+                          count: (processing_errors.size - max_messages + 1)
+                      end
+      self.send("#{field}=", self.send(field)[0, max_messages-1] + [['', limit_message]])
     end
     true
   end

@@ -24,111 +24,79 @@ import 'jquery.instructure_date_and_time'
 import I18n from 'i18n!gradebook_history';
 import Spinner from 'instructure-ui/lib/components/Spinner';
 import Table from 'instructure-ui/lib/components/Table';
-import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
-
-const colHeaders = [
-  I18n.t('Date'),
-  I18n.t('Time'),
-  I18n.t('From'),
-  I18n.t('To'),
-  I18n.t('Grader'),
-  I18n.t('Student'),
-  I18n.t('Assignment'),
-  I18n.t('Anonymous')
-];
+import Typography from 'instructure-ui/lib/components/Typography';
+import constants from 'jsx/gradebook-history/constants';
+import SearchResultsRow from 'jsx/gradebook-history/SearchResultsRow';
 
 const { arrayOf, bool, number, shape, string } = PropTypes;
 
-export class SearchResultsComponent extends Component {
+class SearchResultsComponent extends Component {
   static propTypes = {
+    fetchHistoryStatus: string.isRequired,
+    caption: string.isRequired,
     historyItems: arrayOf(shape({
-      created_at: string,
-      grade_before: string,
-      grade_after: string,
-      links: shape({
-        grader: number,
-        student: number,
-        assignment: number,
-        graded_anonymously: bool
-      })
+      anonymous: string.isRequired,
+      assignment: number.isRequired,
+      date: string.isRequired,
+      from: string.isRequired,
+      grader: string.isRequired,
+      student: string.isRequired,
+      time: string.isRequired,
+      to: string.isRequired
     })).isRequired,
-    label: string.isRequired,
-    requestingResults: bool.isRequired,
-    users: shape({
-      id: number,
-      name: string
-    }).isRequired
+    requestingResults: bool.isRequired
   };
 
-  constructor (props) {
-    super(props);
-
-    this.state = {
-      formattedHistoryItems: this.formatHistoryItems(props.historyItems)
-    };
+  hasHistory () {
+    return this.props.historyItems.length > 0;
   }
 
-  componentWillReceiveProps (nextProps) {
-    const formattedHistoryItems = this.formatHistoryItems(nextProps.historyItems);
-    this.setState({ formattedHistoryItems });
+  noResultsFound () {
+    return this.props.fetchHistoryStatus === 'success' && !this.hasHistory();
   }
 
-  getNameFromId (id) {
-    const user = this.props.users[id];
-
-    return user || I18n.t('Not available');
-  }
-
-  formatHistoryItems = (historyItems) => {
-    if (!historyItems) {
-      return [];
+  showResults = () => {
+    if (this.noResultsFound()) {
+      return (<Typography fontStyle="italic">{I18n.t('No results found')}</Typography>);
     }
 
-    return historyItems.map((item) => {
-      const dateChanged = new Date(item.created_at);
-      return {
-        Date: $.dateString(dateChanged, { format: 'medium', timezone: ENV.TIMEZONE }),
-        Time: $.timeString(dateChanged, { format: 'medium', timezone: ENV.TIMEZONE }),
-        From: GradeFormatHelper.formatGrade(item.grade_before, {defaultValue: '-'}),
-        To: GradeFormatHelper.formatGrade(item.grade_after, {defaultValue: '-'}),
-        Grader: this.getNameFromId(item.links.grader),
-        Student: this.getNameFromId(item.links.student),
-        Assignment: item.links.assignment,
-        Anonymous: item.graded_anonymously ? I18n.t('yes') : I18n.t('no')
-      };
-    });
-  }
-
-  results = () => {
-    if (this.state.formattedHistoryItems.length === 0) {
+    if (!this.hasHistory()) {
       return null;
     }
 
     return (
       <Table
-        label={this.props.label}
-        caption={this.props.label}
-        colHeaders={colHeaders}
-        tableData={this.state.formattedHistoryItems}
-      />
+        caption={this.props.caption}
+        colHeaders={constants.colHeaders}
+        striped="rows"
+      >
+        <tbody>
+          {this.props.historyItems.map(item => (
+            <SearchResultsRow
+              key={`history-items-${item.id}`}
+              item={item}
+            />
+          ))}
+        </tbody>
+      </Table>
     );
   }
 
-  spinnerAnimation = () => {
+  showSpinner = () => {
     if (!this.props.requestingResults) {
       return null;
     }
 
     return (
-      <Spinner title={I18n.t('Loading Results Spinner')} />
+      <Spinner title="Loading Results Spinner" />
     );
   }
 
   render () {
     return (
       <div>
-        {this.results()}
-        {this.spinnerAnimation()}
+        {this.showResults()}
+        {this.showSpinner()}
       </div>
     );
   }
@@ -136,10 +104,12 @@ export class SearchResultsComponent extends Component {
 
 const mapStateToProps = state => (
   {
+    fetchHistoryStatus: state.history.fetchHistoryStatus || '',
     historyItems: state.history.items || [],
     requestingResults: state.history.loading || false,
-    users: state.users.users || {}
   }
 );
 
 export default connect(mapStateToProps)(SearchResultsComponent);
+
+export { SearchResultsComponent };

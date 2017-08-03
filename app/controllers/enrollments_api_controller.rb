@@ -337,7 +337,7 @@ class EnrollmentsApiController < ApplicationController
     enrollments = enrollments.joins(:user).select("enrollments.*").
       order("enrollments.type, #{User.sortable_name_order_by_clause("users")}, enrollments.id")
 
-    has_courses = (CANVAS_RAILS4_2 ? enrollments.where_values : enrollments.where_clause.instance_variable_get(:@predicates)).
+    has_courses = enrollments.where_clause.instance_variable_get(:@predicates).
       any? { |cond| cond.is_a?(String) && cond =~ /courses\./ }
     enrollments = enrollments.joins(:course) if has_courses
     enrollments = enrollments.shard(@shard_scope) if @shard_scope

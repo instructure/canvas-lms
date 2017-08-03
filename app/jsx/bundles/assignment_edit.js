@@ -48,7 +48,8 @@ const assignmentGroupSelector = new AssignmentGroupSelector({
   assignmentGroups: (typeof ENV !== 'undefined' && ENV !== null ? ENV.ASSIGNMENT_GROUPS : undefined) || []
 })
 const gradingTypeSelector = new GradingTypeSelector({
-  parentModel: assignment
+  parentModel: assignment,
+  preventNotGraded: assignment.submissionTypesFrozen()
 })
 const groupCategorySelector = new GroupCategorySelector({
   parentModel: assignment,

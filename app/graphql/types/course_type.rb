@@ -19,6 +19,26 @@ module Types
         Assignments::ScopedToUser.new(course, ctx[:current_user]).scope
       }
     end
+
+    connection :sectionsConnection do
+      type SectionType.connection_type
+      resolve -> (course, _, ctx) {
+        course.active_course_sections.
+          order(CourseSection.best_unicode_collation_key('name'))
+      }
+    end
+
+    connection :usersConnection do
+      type UserType.connection_type
+      resolve ->(course, _, ctx) {
+        if course.grants_any_right?(ctx[:current_user], ctx[:session],
+            :read_roster, :view_all_grades, :manage_grades)
+          UserSearch.scope_for(course, ctx[:current_user], {})
+        else
+          nil
+        end
+      }
+    end
   end
 
   CourseWorkflowState = GraphQL::EnumType.define do

@@ -357,7 +357,7 @@ describe UsersController, type: :request do
     assign_json['created_at'] = @assignment.created_at.as_json
     assign_json['updated_at'] = @assignment.updated_at.as_json
     assign_json['title'] = @assignment.title
-    expect(json).to eq [{
+    expect(json).to eql [{
       'id' => StreamItem.last.id,
       'submission_id' => @sub.id,
       'title' => "assignment 1",
@@ -367,10 +367,12 @@ describe UsersController, type: :request do
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
       'grade' => '12',
+      'entered_grade' => '12',
       'excused' => false,
       'grader_id' => @teacher.id,
       'graded_at' => @sub.graded_at.as_json,
-      'score' => 12,
+      'score' => 12.0,
+      'entered_score' => 12.0,
       'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}",
       'workflow_state' => 'graded',
       'late' => false,
@@ -385,7 +387,7 @@ describe UsersController, type: :request do
       'submitted_at' => nil,
       'late_policy_status' => nil,
       'points_deducted' => 0.0,
-      'seconds_late' => 0.0,
+      'seconds_late' => 0,
       'url' => nil,
       'user_id' => @sub.user_id,
 
@@ -474,7 +476,7 @@ describe UsersController, type: :request do
     assign_json['created_at'] = @assignment.created_at.as_json
     assign_json['updated_at'] = @assignment.updated_at.as_json
     assign_json['title'] = @assignment.title
-    expect(json).to eq [{
+    expect(json).to eql [{
       'id' => StreamItem.last.id,
       'submission_id' => @sub.id,
       'title' => "assignment 1",
@@ -484,10 +486,12 @@ describe UsersController, type: :request do
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
       'grade' => nil,
+      'entered_grade' => nil,
       'excused' => nil,
       'grader_id' => @teacher.id,
       'graded_at' => nil,
       'score' => nil,
+      'entered_score' => nil,
       'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}",
       'workflow_state' => 'unsubmitted',
       'late' => false,
@@ -502,7 +506,7 @@ describe UsersController, type: :request do
       'submitted_at' => nil,
       'late_policy_status' => nil,
       'points_deducted' => nil,
-      'seconds_late' => 0.0,
+      'seconds_late' => 0,
       'url' => nil,
       'user_id' => @sub.user_id,
 

@@ -425,7 +425,7 @@ describe GradingPeriodsController do
         end
 
         it "responds with json upon success" do
-          request.content_type = 'application/json' unless CANVAS_RAILS4_2
+          request.content_type = 'application/json'
           patch :batch_update, { course_id: course.id, grading_periods: [] }
           expect(response).to be_ok
           json = JSON.parse(response.body)

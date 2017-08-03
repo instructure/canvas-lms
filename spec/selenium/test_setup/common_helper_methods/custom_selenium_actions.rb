@@ -328,6 +328,14 @@ module CustomSeleniumActions
     button.click
   end
 
+  # can pass in either an element or a forms css
+  def scroll_to_submit_button_and_click(form)
+    submit_button_css = 'button[type="submit"]'
+    button = form.is_a?(Selenium::WebDriver::Element) ? form.find_element(:css, submit_button_css) : f("#{form} #{submit_button_css}")
+    scroll_to(button)
+    button.click
+  end
+
   def submit_dialog_form(form)
     # used to be called submit_form, but it turns out that if you're searching for a dialog that doesn't exist it's suuuuuper slow
     submit_button_css = 'button[type="submit"]'
@@ -421,8 +429,16 @@ module CustomSeleniumActions
     driver.execute_script('window.scrollTo(0, ' + element_location + ');')
   end
 
+  def flash_message_selector
+    '#flash_message_holder li'
+  end
+
   def dismiss_flash_messages
-    ff("#flash_message_holder li").each(&:click)
+    ff(flash_message_selector).each(&:click)
+  end
+
+  def dismiss_flash_messages_if_present
+    find_all_with_jquery(flash_message_selector).each(&:click)
   end
 
   def scroll_into_view(selector)

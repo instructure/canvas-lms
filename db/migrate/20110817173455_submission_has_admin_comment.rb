@@ -24,6 +24,7 @@ class SubmissionHasAdminComment < ActiveRecord::Migration[4.2]
       UPDATE #{Submission.quoted_table_name} SET has_admin_comment=EXISTS(
         SELECT 1 FROM #{SubmissionComment.quoted_table_name} AS sc, #{Assignment.quoted_table_name} AS a, #{Course.quoted_table_name} AS c, #{Enrollment.quoted_table_name} AS e
         WHERE sc.submission_id=submissions.id AND a.id = submissions.assignment_id
+          AND submissions.workflow_state <> 'deleted'
           AND c.id = a.context_id AND a.context_type = 'Course' AND e.course_id = c.id
           AND e.user_id = sc.author_id AND e.workflow_state = 'active'
           AND e.type IN ('TeacherEnrollment', 'TaEnrollment'))

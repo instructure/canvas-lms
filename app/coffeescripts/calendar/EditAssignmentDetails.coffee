@@ -48,7 +48,7 @@ define [
 
     events: _.extend {}, @::events,
       'click .save_assignment': 'submitAssignment'
-      'click .more_options': 'moreOptions'
+      'click .more_options_link': 'moreOptions'
       'change .context_id': 'contextChange'
 
     template: editAssignmentTemplate
@@ -100,7 +100,7 @@ define [
       pieces = $(jsEvent.target).attr('href').split("#")
       data = @$el.getFormData( object_name: 'assignment' )
       params = {}
-      if data.title then params['title'] = data.title
+      params['title'] = data.name if data.name
       if data.due_at and @$el.find(".datetime_field").data('unfudged-date')
           params['due_at'] = @$el.find(".datetime_field").data('unfudged-date').toISOString()
 

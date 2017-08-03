@@ -912,7 +912,7 @@ describe AssignmentOverride do
       # the critical thing is visible_students_only is called the default shard,
       # but the query executes on a different shard, but it should still be
       # well-formed (especially with qualified names)
-      AssignmentOverride.visible_students_only([1, 2]).shard(@shard1).to_a
+      expect { AssignmentOverride.visible_students_only([1, 2]).shard(@shard1).to_a }.not_to raise_error
     end
 
     it "should not duplicate adhoc overrides containing multiple students" do

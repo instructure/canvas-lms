@@ -72,7 +72,9 @@ define [
       $.publish "CommonEvent/eventSaveFailed", @event
       for error in data when error.message is 'participant has met per-participant limit'
         errorHandled = true
-        error.reschedulable = error.reservations.length == 1
+        error.past_appointments = _.all error.reservations, (res) ->
+          fcUtil.wrap(res.end_at) < fcUtil.now()
+        error.reschedulable = error.reservations.length == 1 && !error.past_appointments
         $dialog = $(reservationOverLimitDialog(error)).dialog
           resizable: false
           width: 450

@@ -16,22 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+ @import "base/environment";
+
 .table td.permissionButtonView {
   position: relative;
 
     .default_permission {
-      opacity: .5;
+      opacity: 0.5;
     }
 
     .icon-x {
-      color: #9B0000;
-    }
-    
-    .icon-check {
-      color: green;
+      color: $ic-color-danger;
     }
 
-    .btn-group{
+    .icon-check {
+      color: $ic-color-success;
+    }
+
+    .btn-group {
       margin: 0 auto;
       width: 40px;
       position: relative;
@@ -53,7 +55,6 @@
 
   .dropdown-menu {
     text-align: left;
-    /*left: 30%;*/
 
     input[type=radio] {
       /* Display none breaks ie so we position it off the page */
@@ -81,9 +82,7 @@
     label:hover, label:focus, input:checked+label {
       text-decoration: none;
       color: white;
-      background-color: #0081C2;
-      background-image: linear-gradient(to bottom, #08C, #0077B3);
-      background-repeat: repeat-x;
+      background-color: $ic-brand-primary;
     }
   }
 }

@@ -70,6 +70,7 @@ describe SisImportsApiController, type: :request do
           "clear_sis_stickiness" => opts[:clear_sis_stickiness] ? true : nil,
           "diffing_data_set_identifier" => nil,
           "diffed_against_import_id" => nil,
+          "change_threshold" => nil,
     })
     batch.process_without_send_later
     return batch
@@ -107,6 +108,7 @@ describe SisImportsApiController, type: :request do
           "clear_sis_stickiness" => nil,
           "diffing_data_set_identifier" => nil,
           "diffed_against_import_id" => nil,
+          "change_threshold" => nil,
     })
 
     expect(SisBatch.count).to eq @batch_count + 1
@@ -130,7 +132,8 @@ describe SisImportsApiController, type: :request do
     expect(json).to eq({
           "data" => { "import_type" => "instructure_csv",
                       "supplied_batches" => ["user"],
-                      "counts" => { "abstract_courses" => 0,
+                      "counts" => { "change_sis_ids"=>0,
+                                    "abstract_courses" => 0,
                                     "courses" => 0,
                                     "sections" => 0,
                                     "accounts" => 0,
@@ -152,6 +155,7 @@ describe SisImportsApiController, type: :request do
           "clear_sis_stickiness" => nil,
           "diffing_data_set_identifier" => nil,
           "diffed_against_import_id" => nil,
+          "change_threshold" => nil,
     })
   end
 
@@ -252,9 +256,12 @@ describe SisImportsApiController, type: :request do
       { import_type: 'instructure_csv',
         attachment: fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
         diffing_data_set_identifier: 'my-users-data',
+        change_threshold: 7,
       })
     batch = SisBatch.find(json["id"])
     expect(batch.batch_mode).to be_falsey
+    expect(batch.change_threshold).to eq 7
+    expect(json['change_threshold']).to eq 7
     expect(batch.diffing_data_set_identifier).to eq 'my-users-data'
   end
 
@@ -579,7 +586,8 @@ describe SisImportsApiController, type: :request do
     expect(json).to eq({"sis_imports"=>[{
                       "data" => { "import_type" => "instructure_csv",
                                   "supplied_batches" => ["account"],
-                                  "counts" => { "abstract_courses" => 0,
+                                  "counts" => { "change_sis_ids"=>0,
+                                                "abstract_courses" => 0,
                                                 "courses" => 0,
                                                 "sections" => 0,
                                                 "accounts" => 1,
@@ -601,6 +609,7 @@ describe SisImportsApiController, type: :request do
           "clear_sis_stickiness" => nil,
           "diffing_data_set_identifier" => nil,
           "diffed_against_import_id" => nil,
+          "change_threshold" => nil,
       }]
     })
 
@@ -681,13 +690,19 @@ describe SisImportsApiController, type: :request do
 
   it "should include the errors_attachment when there are errors" do
     batch = @account.sis_batches.create
+    warnings = []
+    errors = []
+    5.times do |i|
+      warnings << ['testfile.csv', "test warning#{i}"]
+      errors << ['testfile.csv', "test error#{i}"]
+    end
+    batch.processing_warnings = warnings
+    batch.processing_errors = errors
+    batch.finish(false)
 
-    batch.processing_warnings = [ ['testfile.csv', 'test warning'] ] * 3
-    batch.processing_errors = [ ['testfile.csv', 'test error'] ] * 3
-    batch.save!
     json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}.json",
-                    { :controller => 'sis_imports_api', :action => 'show', :format => 'json',
-                      :account_id => @account.id.to_s, :id => batch.id.to_s })
+                    { controller: 'sis_imports_api', action: 'show', format: 'json',
+                      account_id: @account.id.to_s, id: batch.id.to_s })
     expect(json.key?('errors_attachment')).to be_truthy
     expect(json['errors_attachment']['id']).to eq batch.errors_attachment.id
   end

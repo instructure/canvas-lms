@@ -4,6 +4,15 @@ module Types
 
     field :node, GraphQL::Relay::Node.field
 
+    field :legacyNode, GraphQL::Relay::Node.interface do
+      description "Fetches an object given its type and legacy ID"
+      argument :_id, !types.ID
+      argument :type, !LegacyNodeType
+      resolve ->(_, args, ctx) {
+        GraphQLNodeLoader.load(args[:type], args[:_id], ctx)
+      }
+    end
+
     field :allCourses, types[CourseType] do
       description "All courses viewable by the current user"
       resolve ->(_, _, ctx) {

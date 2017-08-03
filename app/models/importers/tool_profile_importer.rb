@@ -26,6 +26,8 @@ module Importers
         tool_profiles.each do |tool_profile|
           begin
             values = tease_out_required_values!(tool_profile)
+            next unless migration.import_object?('tool_profiles', tool_profile['migration_id'])
+
             tool_proxies = Lti::ToolProxy.find_active_proxies_for_context_by_vendor_code_and_product_code(
               context: migration.context,
               vendor_code: values[:vendor_code],

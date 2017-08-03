@@ -297,6 +297,39 @@ QUnit.module('GridSupport State', function (hooks) {
     strictEqual(this.gridSupport.state.getActiveNode(), null);
   });
 
+  QUnit.module('#getEditingNode');
+
+  test('returns null for an active header cell', function () {
+    this.gridSupport.state.setActiveLocation('header', { cell: 1 });
+    strictEqual(this.gridSupport.state.getEditingNode(), null);
+  });
+
+  test('returns the element for an active body cell editor', function () {
+    this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 1 });
+    equal(this.gridSupport.state.getEditingNode(), this.grid.getActiveCellNode());
+  });
+
+  test('returns null for an active body cell without an editor', function () {
+    this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 1 });
+    this.gridSupport.helper.commitCurrentEdit();
+    strictEqual(this.gridSupport.state.getEditingNode(), null);
+  });
+
+  test('returns null when "before grid" is the active location', function () {
+    this.gridSupport.state.setActiveLocation('beforeGrid');
+    strictEqual(this.gridSupport.state.getEditingNode(), null);
+  });
+
+  test('returns null when "after grid" is the active location', function () {
+    this.gridSupport.state.setActiveLocation('afterGrid');
+    strictEqual(this.gridSupport.state.getEditingNode(), null);
+  });
+
+  test('returns null when "unknown" is the active location', function () {
+    this.gridSupport.state.setActiveLocation('unknown');
+    strictEqual(this.gridSupport.state.getEditingNode(), null);
+  });
+
   QUnit.module('#getActiveColumnHeaderNode');
 
   test('returns the element for an active header cell', function () {

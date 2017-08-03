@@ -25,12 +25,14 @@ define([
   'instructure-ui/lib/components/Button',
   'instructure-ui/lib/components/Portal',
   'instructure-ui/lib/components/Alert',
-  'instructure-ui/lib/components/Modal'
+  'instructure-ui/lib/components/Modal',
+  'instructure-ui/lib/components/Transition'
 ], (React, ReactDOM, TestUtils, axios, MessageStudents,
     { default: Button },
     { default: Portal },
     { default: Alert },
     { default: Modal, ModalHeader, ModalBody, ModalFooter },
+    { default: Transition }
    ) => {
 
   let $domNode, subject
@@ -203,6 +205,7 @@ define([
 
     QUnit.module('handleAlertClose()', (hooks) => {
       let closeButton
+      let clocks
 
       hooks.beforeEach(() => {
         subject = renderComponent({
@@ -212,11 +215,20 @@ define([
           subject: 'provide a subject'
         }})
         closeButton = document.querySelector('div.MessageStudents__Alert button')
+        clocks = sinon.useFakeTimers()
+      })
+
+      hooks.afterEach(() => {
+        clocks.restore()
       })
 
       test('sets state.hideAlert to true', () => {
         notOk(subject.state.hideAlert, 'precondition')
         TestUtils.Simulate.click(closeButton)
+        // can remove these ticks once this ticket is resolved
+        // https://instructure.atlassian.net/browse/INSTUI-607
+        clocks.tick(Transition.duration)
+        clocks.tick(Transition.duration)
         ok(subject.state.hideAlert)
       })
     })

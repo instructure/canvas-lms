@@ -362,11 +362,15 @@ describe AdheresToPolicy::InstanceMethods do
     end
 
     context "caching" do
+      after do
+        AdheresToPolicy.configuration.reset!
+      end
+
       it "should cache permissions" do
         user = User.new
         actor = @actor_class.new
 
-        expect(AdheresToPolicy::Cache).to receive(:fetch).twice.with(/permissions/).and_return([])
+        expect(AdheresToPolicy::Cache).to receive(:fetch).twice.with(/permissions/, an_instance_of(Hash)).and_return([])
         actor.rights_status(user)
         # cache lookups for "nobody" as well
         actor.rights_status(nil)
@@ -411,6 +415,127 @@ describe AdheresToPolicy::InstanceMethods do
         expect(actor.call_permission_cache_key_for(nil, session, :read)).to match(/\>\/default\/read$/)
 
         expect(actor.call_permission_cache_key_for(nil, nil, :read)).to match(/\>\/read$/)
+      end
+
+      it 'must not use the rails cache for permissions included in the configured blacklist' do
+        klass = Class.new do
+          extend AdheresToPolicy::ClassMethods
+          set_policy do
+            given { |_| true }
+            can :read
+          end
+        end
+        instance = klass.new
+        AdheresToPolicy.configuration.blacklist = ['.read']
+        expect(AdheresToPolicy::Cache).to receive(:fetch)
+          .with(an_instance_of(String), a_hash_including(use_rails_cache: false))
+          .and_return([])
+        instance.granted_rights(instance)
+      end
+
+      it 'must cache permissions calculated using the same given block by default' do
+        klass = Class.new do
+          extend AdheresToPolicy::ClassMethods
+          set_policy do
+            given { |_| true }
+            can :read, :write
+          end
+        end
+        instance = klass.new
+
+        allow(AdheresToPolicy::Cache).to receive(:write)
+          .with(/read/, true, an_instance_of(Hash))
+
+        expect(AdheresToPolicy::Cache).to receive(:write)
+          .with(/write/, true, an_instance_of(Hash))
+        instance.grants_right?('', :read)
+      end
+
+      it 'must not cache related permissions when configured not to' do
+        AdheresToPolicy.configuration.cache_related_permissions = false
+        klass = Class.new do
+          extend AdheresToPolicy::ClassMethods
+          set_policy do
+            given { |_| true }
+            can :read, :write
+          end
+        end
+        instance = klass.new
+
+        allow(AdheresToPolicy::Cache).to receive(:write)
+          .with(/read/, true, an_instance_of(Hash))
+
+        expect(AdheresToPolicy::Cache).to receive(:write)
+          .with(/write/, true, a_hash_including(use_rails_cache: false))
+        instance.grants_right?('', :read)
+      end
+
+      it 'must cache permissions calculated in the course of calculating others' do
+        klass = Class.new do
+          extend AdheresToPolicy::ClassMethods
+
+          set_policy do
+            given { |_| true }
+            can :create
+
+            given { |u| self.grants_right?(u, :create) }
+            can :update
+          end
+        end
+        instance = klass.new
+
+        allow(AdheresToPolicy::Cache).to receive(:fetch).and_yield
+        expect(AdheresToPolicy::Cache).to receive(:fetch)
+          .with(/create/, a_hash_including(use_rails_cache: true))
+        instance.grants_right?('foobar', :update)
+      end
+
+      it 'must not cache permissions calculated in the course of calculating others when configured not to' do
+        AdheresToPolicy.configuration.cache_intermediate_permissions = false
+
+        klass = Class.new do
+          extend AdheresToPolicy::ClassMethods
+
+          set_policy do
+            given { |_| true }
+            can :create
+
+            given { |u| self.grants_right?(u, :create) }
+            can :update
+          end
+        end
+        instance = klass.new
+
+        expect(AdheresToPolicy::Cache).to receive(:fetch)
+          .with(/update/, a_hash_including(use_rails_cache: true))
+          .twice
+          .and_yield
+        expect(AdheresToPolicy::Cache).to receive(:fetch)
+          .with(/create/, a_hash_including(use_rails_cache: false))
+          .twice
+        instance.grants_right?('foobar', :update)
+        instance.grants_right?('foobar', :update)
+      end
+
+      it 'must not cache anything when configured not to' do
+        AdheresToPolicy.configuration.cache_permissions = false
+
+        klass = Class.new do
+          extend AdheresToPolicy::ClassMethods
+
+          set_policy do
+            given { |_| true }
+            can :create, :update
+          end
+        end
+        instance = klass.new
+
+        expect(AdheresToPolicy::Cache).to receive(:fetch)
+          .with(/create/, a_hash_including(use_rails_cache: false))
+          .and_yield
+        expect(AdheresToPolicy::Cache).to receive(:write)
+          .with(/update/, true, a_hash_including(use_rails_cache: false))
+        instance.grants_right?('foobar', :create)
       end
     end
   end

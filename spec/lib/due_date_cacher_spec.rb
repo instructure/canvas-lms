@@ -100,7 +100,7 @@ describe DueDateCacher do
       it "should create submissions for enrollments that are not overridden" do
         Submission.destroy_all
         expect { @cacher.recompute }.to change {
-          Submission.where(assignment_id: @assignment.id).count
+          Submission.active.where(assignment_id: @assignment.id).count
         }.from(0).to(1)
       end
 
@@ -111,14 +111,27 @@ describe DueDateCacher do
         Submission.destroy_all
 
         expect { @cacher.recompute }.to change {
-          Submission.where(assignment_id: @assignment.id).count
+          Submission.active.where(assignment_id: @assignment.id).count
+        }.from(0).to(1)
+      end
+
+      it "should not create submissions for enrollments that are not assigned" do
+        @assignment1 = @assignment
+        @assignment2 = assignment_model(course: @course)
+        @assignment2.only_visible_to_overrides = true
+        @assignment2.save!
+
+        Submission.destroy_all
+
+        expect { DueDateCacher.recompute_course(@course) }.to change {
+          Submission.active.count
         }.from(0).to(1)
       end
     end
 
     it "should not create another submission for enrollments that have a submission" do
       expect { @cacher.recompute }.not_to change {
-        Submission.where(assignment_id: @assignment.id).count
+        Submission.active.where(assignment_id: @assignment.id).count
       }
     end
 
@@ -128,8 +141,29 @@ describe DueDateCacher do
       @override.save!
 
       expect { @cacher.recompute }.not_to change {
-        Submission.where(assignment_id: @assignment.id).count
+        Submission.active.where(assignment_id: @assignment.id).count
       }
+    end
+
+    it "should delete submissions for enrollments that are no longer assigned" do
+      @assignment.only_visible_to_overrides = true
+
+      expect { @assignment.save! }.to change {
+        Submission.active.count
+      }.from(1).to(0)
+    end
+
+    it "should restore submissions for enrollments that are assigned again" do
+      @assignment.submit_homework(@student, submission_type: :online_url, url: 'http://instructure.com')
+      @assignment.only_visible_to_overrides = true
+      @assignment.save!
+      expect(Submission.first.workflow_state).to eq 'deleted'
+
+      @assignment.only_visible_to_overrides = false
+      expect { @assignment.save! }.to change {
+        Submission.active.count
+      }.from(0).to(1)
+      expect(Submission.first.workflow_state).to eq 'submitted'
     end
 
     context "no overrides" do

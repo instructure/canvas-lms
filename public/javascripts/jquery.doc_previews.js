@@ -103,15 +103,17 @@ import './jquery.loadingImg'
         });
       }
       else if (opts.canvadoc_session_url) {
+        const canvadocWrapper = $('<div style="overflow: auto; resize: vertical;\
+        border: 1px solid transparent; height: 100%;"/>')
+        canvadocWrapper.appendTo($this)
         var iframe = $('<iframe/>', {
-            src: opts.canvadoc_session_url,
-            width: opts.width,
-            height: opts.height,
-            allowfullscreen: "1",
-            css: {border: 0},
-            id: opts.id
+          src: opts.canvadoc_session_url,
+          width: opts.width,
+          allowfullscreen: '1',
+          css: {border: 0, overflow: 'auto', height: '99%', 'min-height': '400px'},
+          id: opts.id
         });
-        iframe.appendTo($this);
+        iframe.appendTo(canvadocWrapper)
         iframe.load(function() {
           tellAppIViewedThisInline('canvadocs');
           if ($.isFunction(opts.ready))

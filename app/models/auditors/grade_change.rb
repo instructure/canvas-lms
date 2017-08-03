@@ -56,7 +56,7 @@ class Auditors::GradeChange
     end
 
     def submission
-      @submission ||= Submission.find(submission_id)
+      @submission ||= Submission.active.find(submission_id)
     end
 
     def previous_submission
@@ -177,6 +177,59 @@ class Auditors::GradeChange
       entry_proc lambda{ |record| [record.root_account, record.student] }
       key_proc lambda{ |root_account, student| [root_account.global_id, student.global_id] }
     end
+
+    add_index :course_assignment do
+      table :grade_changes_by_course_assignment
+      entry_proc lambda { |record| [record.course, record.assignment] }
+      key_proc lambda { |course, assignment| [course.global_id, assignment.global_id] }
+    end
+
+    add_index :course_assignment_grader do
+      table :grade_changes_by_course_assignment_grader
+      entry_proc lambda { |record|
+        [record.course, record.assignment, record.grader] if record.grader && !record.submission.autograded?
+      }
+      key_proc lambda { |course, assignment, grader| [course.global_id, assignment.global_id, grader.global_id] }
+    end
+
+    add_index :course_assignment_grader_student do
+      table :grade_change_by_course_assignment_grader_student
+      entry_proc lambda { |record|
+        if record.grader && !record.submission.autograded?
+          [record.course, record.assignment, record.grader, record.student]
+        end
+      }
+      key_proc lambda { |course, assignment, grader, student|
+        [course.global_id, assignment.global_id, grader.global_id, student.global_id]
+      }
+    end
+
+    add_index :course_assignment_student do
+      table :grade_changes_by_course_assignment_student
+      entry_proc lambda { |record| [record.course, record.assignment, record.student] }
+      key_proc lambda { |course, assignment, student| [course.global_id, assignment.global_id, student.global_id] }
+    end
+
+    add_index :course_grader do
+      table :grade_changes_by_course_grader
+      entry_proc lambda { |record| [record.course, record.grader] if record.grader && !record.submission.autograded? }
+      key_proc lambda { |course, grader| [course.global_id, grader.global_id] }
+    end
+
+    add_index :course_grader_student do
+      table :grade_changes_by_course_grader_student
+      entry_proc lambda { |record|
+        [record.course, record.grader, record.student] if record.grader && !record.submission.autograded?
+      }
+      key_proc lambda { |course, grader, student| [course.global_id, grader.global_id, student.global_id] }
+    end
+
+    add_index :course_student do
+      table :grade_changes_by_course_student
+      entry_proc lambda { |record| [record.course, record.student] }
+      key_proc lambda { |course, student| [course.global_id, student.global_id] }
+    end
+
   end
 
   def self.record(submission, event_type=nil)
@@ -209,6 +262,44 @@ class Auditors::GradeChange
   def self.for_assignment(assignment, options={})
     assignment.shard.activate do
       Auditors::GradeChange::Stream.for_assignment(assignment, options)
+    end
+  end
+
+  # These are the groupings this method expects to receive:
+  # course assignment
+  # course assignment grader
+  # course assignment grader student
+  # course assignment student
+  # course grader
+  # course grader student
+  # course student
+  def self.for_course_and_other_arguments(course, arguments, options={})
+    course.shard.activate do
+      if arguments[:assignment] && arguments[:grader] && arguments[:student]
+        Auditors::GradeChange::Stream.for_course_assignment_grader_student(course,
+          arguments[:assignment], arguments[:grader], arguments[:student], options)
+
+      elsif arguments[:assignment] && arguments[:grader]
+        Auditors::GradeChange::Stream.for_course_assignment_grader(course, arguments[:assignment],
+          arguments[:grader], options)
+
+      elsif arguments[:assignment] && arguments[:student]
+        Auditors::GradeChange::Stream.for_course_assignment_student(course, arguments[:assignment],
+          arguments[:student], options)
+
+      elsif arguments[:assignment]
+        Auditors::GradeChange::Stream.for_course_assignment(course, arguments[:assignment], options)
+
+      elsif arguments[:grader] && arguments[:student]
+        Auditors::GradeChange::Stream.for_course_grader_student(course, arguments[:grader], arguments[:student],
+          options)
+
+      elsif arguments[:grader]
+        Auditors::GradeChange::Stream.for_course_grader(course, arguments[:grader], options)
+
+      elsif arguments[:student]
+        Auditors::GradeChange::Stream.for_course_student(course, arguments[:student], options)
+      end
     end
   end
 end

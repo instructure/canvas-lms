@@ -39,8 +39,8 @@ import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderConte
     renderNotice () {
       return (
         this.props.nameList.length > 0
-          ? <Alert variant="success" isDismissable={false}>{I18n.t('The following users are ready to be added to the course.')}</Alert>
-          : <Alert variant="info" isDismissable={false}>{I18n.t('No users were selected to add to the course')}</Alert>
+          ? <Alert variant="success" dismissable={false}>{I18n.t('The following users are ready to be added to the course.')}</Alert>
+          : <Alert variant="info" dismissable={false}>{I18n.t('No users were selected to add to the course')}</Alert>
       );
     }
     renderUserTable () {

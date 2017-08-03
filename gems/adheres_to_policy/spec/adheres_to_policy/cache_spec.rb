@@ -32,7 +32,7 @@ describe AdheresToPolicy::Cache do
     end
 
     it "writes the key and value if it was not read" do
-      expect(AdheresToPolicy::Cache).to receive(:write).with(:key, 'value')
+      expect(AdheresToPolicy::Cache).to receive(:write).with(:key, 'value', an_instance_of(Hash))
       value = AdheresToPolicy::Cache.fetch(:key){ 'value' }
       expect(value).to eq ['value', :generated]
     end
@@ -49,6 +49,15 @@ describe AdheresToPolicy::Cache do
       AdheresToPolicy::Cache.fetch(:key){ 'new_value' }
       expect(Thread.current[:last_cache_generate]).to_not be_nil
     end
+
+    it 'must forward the value pased for use_rails_cache to .read and .write' do
+      expect(AdheresToPolicy::Cache).to receive(:read)
+        .with(an_instance_of(String), a_hash_including(use_rails_cache: false))
+      expect(AdheresToPolicy::Cache).to receive(:write)
+        .with(an_instance_of(String), an_instance_of(String), a_hash_including(use_rails_cache: false))
+
+      AdheresToPolicy::Cache.fetch('foobar', use_rails_cache: false){ 'new_value' }
+    end
   end
 
   context "#write" do
@@ -56,6 +65,11 @@ describe AdheresToPolicy::Cache do
       expect(Rails.cache).to receive(:write).with(:key, 'value', anything).and_return('value')
       AdheresToPolicy::Cache.write(:key, 'value')
       expect(cached).to eq({ :key => 'value' })
+    end
+
+    it 'must not write to the Rails cache when use_rails_cache is passed as false' do
+      expect(Rails.cache).to_not receive(:write)
+      AdheresToPolicy::Cache.write('foo', 'bar', use_rails_cache: false)
     end
   end
 
@@ -71,6 +85,11 @@ describe AdheresToPolicy::Cache do
     it "returns nil if the key does not exist" do
       expect(Rails.cache).to receive(:read).with(:key2)
       expect(AdheresToPolicy::Cache.read(:key2)).to eq [nil, :out_of_proc]
+    end
+
+    it 'must not attempt to read from the rails cache when use_rails_cache is passed as false' do
+      expect(Rails.cache).to_not receive(:read)
+      expect(AdheresToPolicy::Cache.read(:key2, use_rails_cache: false)).to eq [nil, :out_of_proc]
     end
   end
 

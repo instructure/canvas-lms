@@ -77,7 +77,7 @@ export default React.createClass({
     handleLti2ToolInstalled(toolData) {
       if (toolData.status === 'failure') {
         this.setState({ modalIsOpen: false }, () => {
-          $.flashMessage(toolData.message);
+          $.flashError(toolData.message || I18n.t('There was an unknown error registering the tool'));
         });
       } else {
         this.setState({ tool: toolData });

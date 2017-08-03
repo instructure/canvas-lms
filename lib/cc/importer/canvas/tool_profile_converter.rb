@@ -28,6 +28,7 @@ module CC::Importer::Canvas
         file_path = File.join @unzipped_file_path, file['href']
         json = JSON.parse(File.read(file_path))
         json['resource_href'] = file['href']
+        json['migration_id'] = res['identifier']
         tool_profiles << json
       end
 

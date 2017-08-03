@@ -81,7 +81,8 @@ class User < ActiveRecord::Base
   has_many :student_enrollments
   has_many :ta_enrollments
   has_many :teacher_enrollments, -> { where(enrollments: { type: 'TeacherEnrollment' })}, class_name: 'TeacherEnrollment'
-  has_many :submissions, -> { preload(:assignment, :submission_comments).order('submissions.updated_at DESC') }, dependent: :destroy
+  has_many :all_submissions, -> { preload(:assignment, :submission_comments).order('submissions.updated_at DESC') }, class_name: 'Submission', dependent: :destroy
+  has_many :submissions, -> { active.preload(:assignment, :submission_comments, :grading_period).order('submissions.updated_at DESC') }
   has_many :pseudonyms, -> { order(:position) }, dependent: :destroy
   has_many :active_pseudonyms, -> { where("pseudonyms.workflow_state<>'deleted'") }, class_name: 'Pseudonym'
   has_many :pseudonym_accounts, :source => :account, :through => :pseudonyms
@@ -240,10 +241,9 @@ class User < ActiveRecord::Base
   end
 
   def self.order_by_sortable_name(options = {})
-    order_clause = clause = sortable_name_order_by_clause
-    order_clause = "#{clause} DESC" if options[:direction] == :descending
-    order_clause += ",users.id"
-    scope = self.order(order_clause)
+    clause = sortable_name_order_by_clause
+    sort_direction = options[:direction] == :descending ? 'DESC' : 'ASC'
+    scope = self.order("#{clause} #{sort_direction}").order("#{self.table_name}.id #{sort_direction}")
     if scope.select_values.empty?
       scope = scope.select(self.arel_table[Arel.star])
     end
@@ -1355,7 +1355,7 @@ class User < ActiveRecord::Base
 
   def assignments_recently_graded(opts={})
     opts = { :start_at => 1.week.ago, :limit => 10 }.merge(opts)
-    Submission.recently_graded_assignments(id, opts[:start_at], opts[:limit])
+    Submission.active.recently_graded_assignments(id, opts[:start_at], opts[:limit])
   end
 
   def preferences
@@ -1688,11 +1688,11 @@ class User < ActiveRecord::Base
 
         {
           submitted: Set.new(submitted_assignments(opts).map(&:id)),
-          excused: Set.new(Submission.with_assignment.where(excused: true, user_id: self).pluck(:assignment_id)),
-          graded: Set.new(Submission.with_assignment.where(user_id: self).where("submissions.excused = true OR (submissions.score IS NOT NULL AND submissions.workflow_state = 'graded')").pluck(:assignment_id)),
-          late: Set.new(Submission.with_assignment.where(user_id: self).late.pluck(:assignment_id)),
-          missing: Set.new(Submission.with_assignment.missing.where(user_id: self).pluck(:assignment_id)),
-          needs_grading: Set.new(Submission.with_assignment.needs_grading.where(user_id: self).pluck(:assignment_id)),
+          excused: Set.new(Submission.active.with_assignment.where(excused: true, user_id: self).pluck(:assignment_id)),
+          graded: Set.new(Submission.active.with_assignment.where(user_id: self).where("submissions.excused = true OR (submissions.score IS NOT NULL AND submissions.workflow_state = 'graded')").pluck(:assignment_id)),
+          late: Set.new(Submission.active.with_assignment.late.where(user_id: self).pluck(:assignment_id)),
+          missing: Set.new(Submission.active.with_assignment.missing.where(user_id: self).pluck(:assignment_id)),
+          needs_grading: Set.new(Submission.active.with_assignment.needs_grading.where(user_id: self).pluck(:assignment_id)),
           has_feedback: Set.new(self.recent_feedback(start_at: opts[:due_after]).map(&:assignment_id))
         }.with_indifferent_access
     end
@@ -1731,10 +1731,6 @@ class User < ActiveRecord::Base
       :otp_secret_key_salt,
       :collkey
     ]
-  end
-
-  def migrate_content_links(html, from_course)
-    Course.migrate_content_links(html, from_course, self)
   end
 
   attr_accessor :merge_mappings
@@ -1960,6 +1956,13 @@ class User < ActiveRecord::Base
     end
   end
 
+  def has_student_enrollment?
+    Rails.cache.fetch([self, 'has_student_enrollment', ApplicationController.region ].cache_key) do
+      self.enrollments.shard(in_region_associated_shards).where(:type => %w{StudentEnrollment StudentViewEnrollment}).
+        where.not(:workflow_state => %w{rejected inactive deleted}).exists?
+    end
+  end
+
   def participating_student_course_ids
     @participating_student_course_ids ||= self.shard.activate do
       Rails.cache.fetch([self, 'participating_student_course_ids', ApplicationController.region].cache_key) do
@@ -2009,7 +2012,7 @@ class User < ActiveRecord::Base
             order('submissions.created_at DESC').
             limit(opts[:limit]).to_a
 
-          subs_with_comment_scope = Submission.where(:user_id => self).for_context_codes(context_codes).
+          subs_with_comment_scope = Submission.active.where(user_id: self).for_context_codes(context_codes).
             joins(:submission_comments, :assignment).
             where(assignments: {muted: false, workflow_state: 'published'}).
             where.not(:submission_comments => {:author_id => self, :draft => true}).
@@ -2699,11 +2702,7 @@ class User < ActiveRecord::Base
   end
 
   def profile(force_reload = false)
-    if CANVAS_RAILS4_2
-      super(force_reload) || build_profile
-    else
-      (force_reload ? reload_profile : super) || build_profile
-    end
+    (force_reload ? reload_profile : super) || build_profile
   end
 
   def parse_otp_remember_me_cookie(cookie)

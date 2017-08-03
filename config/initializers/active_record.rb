@@ -18,8 +18,7 @@
 require 'active_support/callbacks/suspension'
 
 class ActiveRecord::Base
-  # CANVAS_RAILS4_2 - set this back to :usec once we're on Rails 5 for good
-  self.cache_timestamp_format = :bogus
+  self.cache_timestamp_format = :usec
 
   public :write_attribute
 
@@ -399,7 +398,10 @@ class ActiveRecord::Base
         @collkey = connection.extension_installed?(:pg_collkey)
       end
       if @collkey
-        "#{@collkey}.collkey(#{col}, '#{Canvas::ICU.locale_for_collation}', false, 0, true)"
+        # The collation level of 3 is the default, but is explicitly specified here and means that
+        # case, accents and base characters are all taken into account when creating a collation key
+        # for a string - more at https://pgxn.org/dist/pg_collkey/0.5.1/
+        "#{@collkey}.collkey(#{col}, '#{Canvas::ICU.locale_for_collation}', false, 3, true)"
       else
         "CAST(LOWER(replace(#{col}, '\\', '\\\\')) AS bytea)"
       end
@@ -943,31 +945,23 @@ module UpdateAndDeleteWithJoins
   def update_all(updates, *args)
     return super if joins_values.empty?
 
-    stmt = CANVAS_RAILS4_2 ? Arel::UpdateManager.new(arel.engine) : Arel::UpdateManager.new
+    stmt = Arel::UpdateManager.new
 
     stmt.set Arel.sql(@klass.send(:sanitize_sql_for_assignment, updates))
-    from = (CANVAS_RAILS4_2 ? from_value&.first : from_clause.value)
+    from = from_clause.value
     stmt.table(from ? Arel::Nodes::SqlLiteral.new(from) : table)
     stmt.key = table[primary_key]
 
     sql = stmt.to_sql
 
-    if CANVAS_RAILS4_2
-      collector = Arel::Collectors::Bind.new
-      arel.join_sources.each do |node|
-        connection.visitor.accept(node, collector)
-      end
-      join_sql = collector.compile(arel.bind_values.map{|bvs| connection.quote(*bvs.reverse)})
-    else
-      binds = connection.prepare_binds_for_database(bound_attributes)
-      binds.map! { |value| connection.quote(value) }
-      collector = Arel::Collectors::Bind.new
-      arel.join_sources.each do |node|
-        connection.visitor.accept(node, collector)
-      end
-      binds_in_join = collector.value.count { |x| x.is_a?(Arel::Nodes::BindParam) }
-      join_sql = collector.substitute_binds(binds).join
+    binds = connection.prepare_binds_for_database(bound_attributes)
+    binds.map! { |value| connection.quote(value) }
+    collector = Arel::Collectors::Bind.new
+    arel.join_sources.each do |node|
+      connection.visitor.accept(node, collector)
     end
+    binds_in_join = collector.value.count { |x| x.is_a?(Arel::Nodes::BindParam) }
+    join_sql = collector.substitute_binds(binds).join
     tables, join_conditions = deconstruct_joins(join_sql)
 
     unless tables.empty?
@@ -979,24 +973,15 @@ module UpdateAndDeleteWithJoins
     scope = self
     join_conditions.each { |join| scope = scope.where(join) }
 
-    if CANVAS_RAILS4_2
-      binds = scope.bind_values.dup
-      sql_string = Arel::Collectors::Bind.new
-      scope.arel.constraints.each do |node|
-        connection.visitor.accept(node, sql_string)
-      end
-      sql.concat('WHERE ' + sql_string.compile(binds.map{|bvs| connection.quote(*bvs.reverse)}))
-    else
-      # skip any binds that are used in the join
-      binds = scope.bound_attributes[binds_in_join..-1]
-      binds = connection.prepare_binds_for_database(binds)
-      binds.map! { |value| connection.quote(value) }
-      sql_string = Arel::Collectors::Bind.new
-      scope.arel.constraints.each do |node|
-        connection.visitor.accept(node, sql_string)
-      end
-      sql.concat('WHERE ' + sql_string.substitute_binds(binds).join)
+    # skip any binds that are used in the join
+    binds = scope.bound_attributes[binds_in_join..-1]
+    binds = connection.prepare_binds_for_database(binds)
+    binds.map! { |value| connection.quote(value) }
+    sql_string = Arel::Collectors::Bind.new
+    scope.arel.constraints.each do |node|
+      connection.visitor.accept(node, sql_string)
     end
+    sql.concat('WHERE ' + sql_string.substitute_binds(binds).join)
 
     connection.update(sql, "#{name} Update")
   end
@@ -1016,23 +1001,14 @@ module UpdateAndDeleteWithJoins
     scope = self
     join_conditions.each { |join| scope = scope.where(join) }
 
-    if CANVAS_RAILS4_2
-      binds = scope.bind_values.dup
-      sql_string = Arel::Collectors::Bind.new
-      scope.arel.constraints.each do |node|
-        connection.visitor.accept(node, sql_string)
-      end
-      sql.concat('WHERE ' + sql_string.compile(binds.map{|bvs| connection.quote(*bvs.reverse)}))
-    else
-      binds = scope.bound_attributes
-      binds = connection.prepare_binds_for_database(binds)
-      binds.map! { |value| connection.quote(value) }
-      sql_string = Arel::Collectors::Bind.new
-      scope.arel.constraints.each do |node|
-        connection.visitor.accept(node, sql_string)
-      end
-      sql.concat('WHERE ' + sql_string.substitute_binds(binds).join)
+    binds = scope.bound_attributes
+    binds = connection.prepare_binds_for_database(binds)
+    binds.map! { |value| connection.quote(value) }
+    sql_string = Arel::Collectors::Bind.new
+    scope.arel.constraints.each do |node|
+      connection.visitor.accept(node, sql_string)
     end
+    sql.concat('WHERE ' + sql_string.substitute_binds(binds).join)
 
     connection.exec_query(sql, "#{name} Delete all", scope.bind_values)
   end
@@ -1138,16 +1114,6 @@ class ActiveRecord::Migration
   # at least one of these tags is required
   DEPLOY_TAGS = [:predeploy, :postdeploy]
 
-  if CANVAS_RAILS4_2
-    class V4_2 < self
-      class << self
-        def method_missing(name, *args, &block) # :nodoc:
-          (delegate || superclass.delegate || superclass.superclass.delegate).send(name, *args, &block)
-        end
-      end
-    end
-  end
-
   class << self
     def tag(*tags)
       raise "invalid tags #{tags.inspect}" unless tags - VALID_TAGS == []
@@ -1164,23 +1130,6 @@ class ActiveRecord::Migration
 
     def has_postgres_proc?(procname)
       connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='#{procname}'").to_i != 0
-    end
-
-    if CANVAS_RAILS4_2
-      def [](version)
-        raise ArgumentError unless version == 4.2
-        V4_2
-      end
-
-      def inherited(klass)
-        super
-        return if klass.name == 'V4_2' || klass.superclass != ActiveRecord::Migration
-        raise \
-            "Directly inheriting from ActiveRecord::Migration is deprecated. " \
-            "Please specify the Rails release the migration was written for:\n" \
-            "\n" \
-            "  class #{klass.name} < ActiveRecord::Migration[4.2]"
-      end
     end
   end
 
@@ -1307,16 +1256,9 @@ ActiveRecord::Associations::CollectionAssociation.class_eval do
 end
 
 module UnscopeCallbacks
-  if CANVAS_RAILS4_2
-    def __run_callbacks__(*args)
-      scope = self.class.base_class.unscoped
-      scope.scoping { super }
-    end
-  else
-    def __run_callbacks__(*args)
-      scope = self.class.all.klass.unscoped
-      scope.scoping { super }
-    end
+  def __run_callbacks__(*args)
+    scope = self.class.all.klass.unscoped
+    scope.scoping { super }
   end
 end
 ActiveRecord::Base.send(:include, UnscopeCallbacks)
@@ -1394,38 +1336,3 @@ module ReadonlyCloning
   end
 end
 ActiveRecord::Base.prepend(ReadonlyCloning)
-
-if CANVAS_RAILS4_2
-  # https://github.com/rails/rails/commit/696f1766148453160e1f6f21e4d7d7aac1356c7d
-  # the fix was backported into rails 5-0-stable
-  module DecimalCastRescueRuby24
-    def cast_value(value)
-      if value.is_a?(::String)
-        begin
-          super(value)
-        rescue ArgumentError
-          BigDecimal(0)
-        end
-      else
-        super(value)
-      end
-    end
-  end
-  ActiveRecord::Type::Decimal.prepend DecimalCastRescueRuby24
-else
-  module ConnectionLeaseLogging
-    def lease
-      if @owner
-        ::Rails.logger.error("Connection in use by thread - status: #{@owner.status}")
-        ::Rails.logger.error("variables: #{Hash[@owner.keys.map{|v| [v, @owner[v]]}]}")
-        ::Rails.logger.error("backtrace: #{@owner.backtrace}")
-      end
-      if Thread.current[:name] == 'Main thread' && $booted
-        ::Rails.logger.error("Accessing connection from the Passenger Main thread")
-        ::Rails.logger.error("backtrace: #{caller}")
-      end
-      super
-    end
-  end
-  ActiveRecord::ConnectionAdapters::AbstractAdapter.prepend(ConnectionLeaseLogging)
-end

@@ -74,4 +74,5 @@ define [
     combinedDates: =>
       # using this as a key to sort overrides
       # into rows in the due date picker
-      "#{@get("due_at") + @get("unlock_at") + @get("lock_at")}"
+      override_id = if @get("id") is undefined then null else @get("id")
+      "#{@get("due_at") + @get("unlock_at") + @get("lock_at") + override_id}"

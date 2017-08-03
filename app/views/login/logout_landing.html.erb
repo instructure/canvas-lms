@@ -1,0 +1,46 @@
+<%
+  # Copyright (C) 2014 - present Instructure, Inc.
+  #
+  # This file is part of Canvas.
+  #
+  # Canvas is free software: you can redistribute it and/or modify it under
+  # the terms of the GNU Affero General Public License as published by the Free
+  # Software Foundation, version 3 of the License.
+  #
+  # Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+  # WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+  # A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+  # details.
+  #
+  # You should have received a copy of the GNU Affero General Public License along
+  # with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<%
+  css_bundle :login
+  @headers = false
+  content_for :page_title, t(:page_title, "Logged Out")
+  @body_classes << "full-width ic-Login-Body" if @body_classes
+%>
+<div class="ic-Login">
+  <div class="ic-Login__container">
+    <div class="ic-Login__content">
+      <div class="ic-Login__innerContent">
+        <div class="ic-Login__header">
+          <%= render :partial => 'login/shared/header_logo' %>
+        </div>
+        <div class="ic-Login__body">
+          <h1 class="ic-Login__title">
+            <%= t 'Logged Out' %>
+          </h1>
+          <p class="ic-Login__text">
+            <%= t 'You are logged out of Canvas.' %>
+          </p>
+          <div class="ic-Login__actions">
+            <%= link_to(t("Click here to log in again"), login_url, :class => "ic-Login__link") %>
+          </div>
+        </div> <!-- end ic-Login__body -->
+      </div> <!-- end ic-Login__innerContent -->
+    </div> <!-- end ic-Login__content -->
+  </div> <!-- end ic-Login__content -->
+</div> <!-- end ic-Login__container -->

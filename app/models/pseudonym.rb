@@ -216,8 +216,7 @@ class Pseudonym < ActiveRecord::Base
     if (!self.account || self.account.email_pseudonyms) && !self.deleted?
       unless self.unique_id.present? && self.unique_id.match(/\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i)
         self.errors.add(:unique_id, "not_email")
-        throw :abort unless CANVAS_RAILS4_2
-        return false
+        throw :abort
       end
     end
     unless self.deleted?
@@ -227,8 +226,7 @@ class Pseudonym < ActiveRecord::Base
         if existing_pseudo && existing_pseudo.id != self.id
           self.errors.add(:unique_id, :taken,
             message: t("ID already in use for this account and authentication provider"))
-          throw :abort unless CANVAS_RAILS4_2
-          return false
+          throw :abort
         end
       end
     end
@@ -242,8 +240,7 @@ class Pseudonym < ActiveRecord::Base
     self.errors.add(:sis_user_id, :taken,
       message: t('#errors.sis_id_in_use', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_user_id)
     )
-    throw :abort unless CANVAS_RAILS4_2
-    false
+    throw :abort
   end
 
   workflow do

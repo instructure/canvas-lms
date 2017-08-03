@@ -42,8 +42,13 @@ class FileInContext
       end
     end
 
-    def attach(context, filename, display_name=nil, folder=nil, explicit_filename=nil, allow_rename = false)
+    def attach(context, filename, display_name=nil, folder=nil, explicit_filename=nil, allow_rename = false, md5=nil)
       display_name ||= File.split(filename).last
+      if md5 && folder && !allow_rename
+        existing_att = context.attachments.where(:display_name => display_name, :folder => folder, :md5 => md5).not_deleted.first
+        return existing_att if existing_att
+      end
+
       uploaded_data = Rack::Test::UploadedFile.new(filename, Attachment.mimetype(explicit_filename || filename))
 
       @attachment = context.attachments.new(:uploaded_data => uploaded_data, :display_name => display_name, :folder => folder)

@@ -475,15 +475,19 @@ s2,test_1,section2,active},
     expect(batch.processing_errors.last).to eq ['', 'There were 3 more errors']
   end
 
-  it "should write all warnings/errors to a file" do
+  it "should write all warnings/errors to a file and cleanup temp files" do
     Setting.set('sis_batch_max_messages', '3')
     batch = @account.sis_batches.create!
-    batch.processing_warnings = [ ['testfile.csv', 'test warning'] ] * 5
-    batch.processing_errors = [ ['testfile.csv', 'test error'] ] * 5
-    batch.save!
-    error_file = batch.errors_attachment
+    5.times do |i|
+      batch.add_warnings([['testfile.csv', "test warning#{i}"]])
+      batch.add_warnings([['testfile.csv', "test error#{i}"]])
+    end
+    batch.finish(false)
+    error_file = batch.errors_attachment.reload
     expect(error_file.display_name).to eq "sis_errors_attachment_#{batch.id}.csv"
     expect(CSV.parse(error_file.open).map.to_a.size).to eq 10
+    expect(Attachment.where(context: batch).count).to eq 1
+    expect(Attachment.where(context: batch, id: batch.errors_attachment_id).count).to eq 1
   end
 
   context "csv diffing" do
@@ -550,6 +554,44 @@ test_4,TC 104,Test Course 104,,term1,active
 %{course_id,short_name,long_name,account_id,term_id,status
 test_4,TC 104,Test Course 104,,term1,active
 })
+    end
+
+    it 'should not diff outside of diff threshold' do
+      b1 = process_csv_data([
+%{course_id,short_name,long_name,account_id,term_id,status
+test_1,TC 101,Test Course 101,,term1,active
+test_4,TC 104,Test Course 104,,term1,active
+}], diffing_data_set_identifier: 'default', change_threshold: 1)
+
+      # small change, less than 1% difference
+      b2 = process_csv_data([
+%{course_id,short_name,long_name,account_id,term_id,status
+test_1,TC 101,Test Course 101,,term1,active
+test_4,TC 104,Test Course 104b,,term1,active
+}], diffing_data_set_identifier: 'default', change_threshold: 1)
+
+      # whoops left out the whole file, don't delete everything.
+      b3 = process_csv_data([
+%{course_id,short_name,long_name,account_id,term_id,status
+}], diffing_data_set_identifier: 'default', change_threshold: 1)
+
+      expect(b2.data[:diffed_against_sis_batch_id]).to eq b1.id
+      expect(b2.generated_diff_id).not_to be_nil
+      expect(b3.data[:diffed_against_sis_batch_id]).to be_nil
+      expect(b3.generated_diff_id).to be_nil
+    end
+
+    it 'should set batch_ids on change_sis_id' do
+      course1 = @account.courses.build
+      course1.sis_source_id = 'test_1'
+      course1.save!
+      b1 = process_csv_data([
+%{old_id,new_id,type
+test_1,test_a,course
+}])
+      expect(course1.reload.sis_batch_id).to eq b1.id
+      expect(b1.processing_errors).to eq []
+      expect(b1.processing_warnings).to eq []
     end
   end
 end

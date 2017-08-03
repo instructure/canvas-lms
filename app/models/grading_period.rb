@@ -21,6 +21,7 @@ class GradingPeriod < ActiveRecord::Base
 
   belongs_to :grading_period_group, inverse_of: :grading_periods
   has_many :scores, -> { active }
+  has_many :submissions, -> { active }
 
   validates :title, :start_date, :end_date, :close_date, :grading_period_group_id, presence: true
   validates :weight, numericality: true, allow_nil: true
@@ -42,6 +43,9 @@ class GradingPeriod < ActiveRecord::Base
       now
     )
   end
+
+  scope :closed, -> { where("grading_periods.close_date < ?", Time.zone.now) }
+  scope :open, -> { where("grading_periods.close_date IS NULL OR grading_periods.close_date >= ?", Time.zone.now) }
 
   scope :grading_periods_by, ->(context_with_ids) do
     joins(:grading_period_group).where(grading_period_groups: context_with_ids).readonly(false)

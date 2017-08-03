@@ -31,7 +31,7 @@ class MissingPolicyApplicator
 
   def recently_missing_submissions
     now = Time.zone.now
-    Submission
+    Submission.active
       .joins(assignment: {course: :late_policy})
       .eager_load(:grading_period, assignment: { course: :late_policy })
       .missing
@@ -46,7 +46,7 @@ class MissingPolicyApplicator
 
     # We are using update_all here for performance reasons
     # rubocop:disable SkipsModelValidations
-    Submission.where(id: submissions).update_all(
+    Submission.active.where(id: submissions).update_all(
       score: score,
       grade: grade,
       published_score: score,

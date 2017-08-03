@@ -289,6 +289,10 @@ input[type="button"] {
   cursor: pointer;
   color: $ic-link-color;
 
+  @if $use_high_contrast {
+    text-decoration: underline;
+  }
+
   body.Underline-All-Links__enabled & {
     text-decoration: underline;
   }
@@ -297,6 +301,10 @@ input[type="button"] {
     color: $ic-link-color-hover;
     text-decoration: underline;
     background: transparent;
+
+    @if $use_high_contrast {
+      text-decoration: none;
+    }
 
     body.Underline-All-Links__enabled & {
       text-decoration: none;

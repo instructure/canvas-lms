@@ -75,8 +75,8 @@ describe "Gradezilla view menu" do
       gradebook_student_names = Gradezilla.fetch_student_names
 
       expect(gradebook_student_names[0]).to eq(@course.students[0].name)
-      expect(gradebook_student_names[1]).to eq(@course.students[1].name)
-      expect(gradebook_student_names[2]).to eq(@course.students[2].name)
+      expect(gradebook_student_names[1]).to eq(@course.students[2].name)
+      expect(gradebook_student_names[2]).to eq(@course.students[1].name)
     end
   end
 end

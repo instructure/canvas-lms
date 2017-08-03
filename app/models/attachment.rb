@@ -60,7 +60,7 @@ class Attachment < ActiveRecord::Base
   belongs_to :user
   has_one :account_report
   has_one :media_object
-  has_many :submissions
+  has_many :submissions, -> { active }
   has_many :attachment_associations
   belongs_to :root_attachment, :class_name => 'Attachment'
   belongs_to :replacement_attachment, :class_name => 'Attachment'
@@ -323,8 +323,7 @@ class Attachment < ActiveRecord::Base
   def assert_attachment
     if !self.to_be_zipped? && !self.zipping? && !self.errored? && !self.deleted? && (!filename || !content_type || !downloadable?)
       self.errors.add(:base, t('errors.not_found', "File data could not be found"))
-      throw :abort unless CANVAS_RAILS4_2
-      return false
+      throw :abort
     end
   end
 
@@ -1657,7 +1656,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def previewable_media?
-    self.content_type && self.content_type.match(/\A(video|audio)/)
+    self.content_type && (self.content_type.match(/\A(video|audio)/) || self.content_type == 'application/x-flash-video')
   end
 
   def preview_params(user, type, opts = {})

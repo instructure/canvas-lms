@@ -575,31 +575,31 @@ describe GradebooksController do
           it "is true if graded late submissions exist" do
             assignment.submit_homework(@student, body: "a body")
             assignment.grade_student(@student, grader: @teacher, grade: 8)
-            get :show, course_id: @course.id
-            expect(graded_late_or_missing_submissions_exist).to eq(true)
+            get :show, params: {course_id: @course.id}
+            expect(graded_late_or_missing_submissions_exist).to be true
           end
 
           it "is false if late submissions exist, but they are not graded" do
             assignment.submit_homework(@student, body: "a body")
-            get :show, course_id: @course.id
-            expect(graded_late_or_missing_submissions_exist).to eq(false)
+            get :show, params: {course_id: @course.id}
+            expect(graded_late_or_missing_submissions_exist).to be false
           end
 
           it "is true if graded missing submissions exist" do
             assignment.grade_student(@student, grader: @teacher, grade: 8)
-            get :show, course_id: @course.id
-            expect(graded_late_or_missing_submissions_exist).to eq(true)
+            get :show, params: {course_id: @course.id}
+            expect(graded_late_or_missing_submissions_exist).to be true
           end
 
           it "is false if missing submissions exist, but they are not graded" do
             assignment # create the assignment so that missing submissions exist
-            get :show, course_id: @course.id
-            expect(graded_late_or_missing_submissions_exist).to eq(false)
+            get :show, params: {course_id: @course.id}
+            expect(graded_late_or_missing_submissions_exist).to be false
           end
 
           it "is false if there are no graded late or missing submissions" do
-            get :show, course_id: @course.id
-            expect(graded_late_or_missing_submissions_exist).to eq(false)
+            get :show, params: {course_id: @course.id}
+            expect(graded_late_or_missing_submissions_exist).to be false
           end
         end
       end

@@ -79,19 +79,22 @@ class CustomGradebookColumnDataApiController < ApplicationController
     raise ActiveRecord::RecordNotFound unless user
 
     column = @context.custom_gradebook_columns.active.find(params[:id])
-    datum   = column.custom_gradebook_column_data.where(user_id: user).first
-    datum ||= column.custom_gradebook_column_data.build.tap { |d|
-      d.user_id = user.id
-    }
+    datum = column.custom_gradebook_column_data.find_or_initialize_by(user_id: user.id)
     if authorized_action? datum, @current_user, :update
-      datum.attributes = params.require(:column_data).permit(:content)
-      if datum.content.blank?
-        datum.destroy
-        render :json => custom_gradebook_column_datum_json(datum, @current_user, session)
-      elsif datum.save
-        render :json => custom_gradebook_column_datum_json(datum, @current_user, session)
-      else
-        render :json => datum.errors
+      CustomGradebookColumnDatum.unique_constraint_retry do |retry_count|
+        if retry_count > 0
+          # query for the datum again if this is a retry
+          datum = column.custom_gradebook_column_data.find_or_initialize_by(user_id: user.id)
+        end
+        datum.attributes = params.require(:column_data).permit(:content)
+        if datum.content.blank?
+          datum.destroy
+          render json: custom_gradebook_column_datum_json(datum, @current_user, session)
+        elsif datum.save
+          render json: custom_gradebook_column_datum_json(datum, @current_user, session)
+        else
+          render json: datum.errors
+        end
       end
     end
   end

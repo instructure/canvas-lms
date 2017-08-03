@@ -26,3 +26,21 @@ module ShardAwarePermissionCacheKey
   end
 end
 AdheresToPolicy::InstanceMethods.prepend(ShardAwarePermissionCacheKey)
+
+AdheresToPolicy.configure do |config|
+  config.blacklist = -> {
+    Setting.get('permissions_cache_blacklist', '').split(',').map(&:strip)
+  }
+
+  config.cache_related_permissions = -> {
+    Canvas::Plugin.value_to_boolean(Setting.get('permissions_cache_related', 'true'))
+  }
+
+  config.cache_intermediate_permissions = -> {
+    Canvas::Plugin.value_to_boolean(Setting.get('permissions_cache_intermediate', 'true'))
+  }
+
+  config.cache_permissions = -> {
+    Canvas::Plugin.value_to_boolean(Setting.get('permissions_cache_enabled', 'true'))
+  }
+end

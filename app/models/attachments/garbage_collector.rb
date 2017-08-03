@@ -16,43 +16,59 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Attachments::GarbageCollector
-  class FolderExports
-    def self.delete_content
-      max_id = 0
-      root_scope.find_ids_in_batches(batch_size: 500) do |ids_batch|
-        non_folder_children = Attachment.where(root_attachment_id: ids_batch).
+  class ByContextType
+    attr_reader :context_type, :older_than, :dry_run, :stats
+    def initialize(context_type:, older_than:, dry_run: false)
+      @context_type = context_type
+      @older_than = older_than
+      @dry_run = dry_run
+      @stats = Hash.new(0)
+    end
+
+    def delete_content
+      to_delete_scope.where(root_attachment_id: nil).find_ids_in_batches(batch_size: 500) do |ids_batch|
+        non_type_children = Attachment.where(root_attachment_id: ids_batch).
           where.not(root_attachment_id: nil). # postgres is being weird
-          where.not(context_type: 'Folder').
+          where.not(context_type: context_type).
           order([:root_attachment_id, :id]).
           select("distinct on (attachments.root_attachment_id) attachments.*").
           group_by(&:root_attachment_id)
-        folder_children_ids = Attachment.where(root_attachment_id: ids_batch).
-          where(context_type: 'Folder').
-          pluck(:id)
+        same_type_children_fields = Attachment.where(root_attachment_id: ids_batch).
+          where(context_type: context_type).
+          pluck(:id, :created_at)
+        same_type_children_ids = same_type_children_fields.map(&:first)
+        same_type_children_max_created_at = same_type_children_fields.map(&:last).compact.max
 
+        to_delete_ids = []
         Attachment.where(id: ids_batch).each do |att|
-          if non_folder_children[att.id].present?
-            att.make_childless(non_folder_children[att.id].first)
-          elsif att.filename.present?
-            att.destroy_content
+          if has_younger_children?(same_type_children_max_created_at)
+            stats[:young_child] += 1
+            next
           end
 
-          max_id = [max_id, att.id, folder_children_ids].flatten.max
-        end
-      end
+          if non_type_children[att.id].present?
+            stats[:reparent] += 1
+            att.make_childless(non_type_children[att.id].first) unless dry_run
+          elsif att.filename.present?
+            stats[:destroyed] += 1
+            att.destroy_content unless dry_run
+          end
 
-      update_scope = Attachment.where(context_type: 'Folder').
-        where("id <= ?", max_id).
-        where.not(workflow_state: 'deleted', file_state: 'deleted')
-      updates = { workflow_state: 'deleted', file_state: 'deleted', deleted_at: Time.now.utc }
-      while update_scope.limit(1000).update_all(updates) > 0; end
+          to_delete_ids.concat([att.id, same_type_children_ids].flatten)
+        end
+
+        stats[:marked_deleted] += to_delete_ids.count
+        updates = { workflow_state: 'deleted', file_state: 'deleted', deleted_at: Time.now.utc }
+        Attachment.where(id: to_delete_ids).update_all(updates) unless dry_run
+      end
     end
 
     # Just in case this goes south: assumes versioning is enabled on the
     # bucket and old versions still exist (haven't been cleaned up by lifecycle
     # policies)
-    def self.undelete_content
+    def undelete_content
       raise "Only works with S3" unless Attachment.s3_storage?
+      raise "Cannot delete rows in dry_run mode" if dry_run
       deleted_scope.where(root_attachment_id: nil).find_ids_in_batches do |ids_batch|
         restored = []
         Attachment.where(id: ids_batch).each do |att|
@@ -71,17 +87,69 @@ class Attachments::GarbageCollector
     end
 
     # Once you're confident and don't want to revert, clean up the DB rows
-    def self.delete_rows
+    def delete_rows
+      raise "Cannot delete rows in dry_run mode" if dry_run
       while deleted_scope.where.not(:root_attachment_id => nil).limit(1000).delete_all > 0; end
       while deleted_scope.limit(1000).delete_all > 0; end
     end
 
-    def self.root_scope
-      Attachment.where(context_type: 'Folder', root_attachment_id: nil).where.not(file_state: 'deleted')
+    private
+
+    def to_delete_scope
+      scope = Attachment.where(context_type: context_type).
+        where.not(file_state: 'deleted')
+      scope = scope.where("created_at < ?", older_than) if older_than
+      scope
     end
 
-    def self.deleted_scope
-      Attachment.where(context_type: 'Folder', workflow_state: 'deleted', file_state: 'deleted')
+    def deleted_scope
+      Attachment.where(
+        context_type: context_type,
+        workflow_state: 'deleted',
+        file_state: 'deleted'
+      )
+    end
+
+    def has_younger_children?(children_max_created_at)
+      return false unless older_than
+      return false unless children_max_created_at
+      children_max_created_at >= older_than
+    end
+  end
+
+  # context_type: 'Folder' is no longer generated by the code.
+  # file exports now go through the content export flow.
+  class FolderContextType < ByContextType
+    def initialize(dry_run: false)
+      super(context_type: 'Folder', older_than: nil, dry_run: dry_run)
+    end
+  end
+
+  # See the ContentExport model for a list of valid export types. Some, like
+  # course copy, could be purged quickly, as they aren't user accessible.
+  # Others, like QTI or Zip, can be downloaded by the user for a period of
+  # time.  For now, we treat them all the same and just purge older than
+  # a given date.
+  #
+  # NOTE: content_export.attachment are always either
+  # - context_type='ContentExport', or
+  # - context_type='User' (in the case of user data exports)
+  # which is why we use the join conditions below
+  class ContentExportContextType < ByContextType
+    def initialize(older_than:, dry_run: false)
+      super(context_type: 'ContentExport', older_than: older_than, dry_run: dry_run)
+    end
+
+    def delete_rows
+      raise "Cannot delete rows in dry_run mode" if dry_run
+      null_scope = ContentExport.joins(<<-SQL).
+INNER JOIN #{Attachment.quoted_table_name}
+ON attachments.context_type = 'ContentExport'
+AND content_exports.attachment_id = attachments.id
+SQL
+        where(attachments: { workflow_state: 'deleted', file_state: 'deleted' })
+      while null_scope.limit(1000).update_all(attachment_id: nil) > 0; end
+      super
     end
   end
 end

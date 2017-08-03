@@ -561,6 +561,15 @@ describe UsersController do
           assert_status(400)
           expect(response).not_to be_success
         end
+
+        it "strips whitespace from the unique_id" do
+          post 'create', :format => 'json', :account_id => account.id, :pseudonym => { :unique_id => 'spaceman@example.com ' }, :user => { :name => 'Spaceman' }
+          expect(response).to be_success
+          json = JSON.parse(response.body)
+          p = Pseudonym.find(json["pseudonym"]["pseudonym"]["id"])
+          expect(p.unique_id).to eq 'spaceman@example.com'
+          expect(p.user.email).to eq 'spaceman@example.com'
+        end
       end
 
       it "should not allow an admin to set the sis id when creating a user if they don't have privileges to manage sis" do

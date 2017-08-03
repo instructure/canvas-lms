@@ -81,6 +81,7 @@ define [
       @model.on("change:starred change:workflow_state", _.debounce(@updateLabels, 90), this) if @model
 
     updateLabels: ->
+      return unless @model
       @$starToggle.text(if @model.starred() then @messages['unstar'] else @messages['star'])
       @$archiveToggle.text(if @model.get('workflow_state') == 'archived' then @messages['unarchive'] else @messages['archive'])
 
@@ -107,4 +108,4 @@ define [
 
     onArchive: (e) ->
       e.preventDefault()
-      @trigger('archive')
+      @trigger('archive', '.conversations .message-actions:last .star-btn', '.message-detail-actions .al-trigger')

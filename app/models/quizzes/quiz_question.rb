@@ -180,27 +180,6 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
     true
   end
 
-  def self.migrate_question_hash(hash, params)
-    if params[:old_context] && params[:new_context]
-      migrator = lambda { |value| Course.migrate_content_links(value, params[:old_context], params[:new_context]) }
-    elsif params[:context] && params[:user]
-      migrator = lambda { |value| Course.copy_authorized_content(value, params[:context], params[:user]) }
-    else
-      return hash
-    end
-
-    [:question_text, :correct_comments, :incorrect_comments, :neutral_comments, :text_after_answers].each do |key|
-      hash[key] = migrator.call(hash[key]) if hash[key]
-    end
-    hash[:answers].each do |answer|
-      [:html, :comments_html].each do |key|
-        answer[key] = migrator.call(answer[key]) if answer[key].present?
-      end
-    end if hash[:answers]
-
-    hash
-  end
-
   def clone_for(quiz, dup=nil, options={})
     dup ||= Quizzes::QuizQuestion.new
     self.attributes.delete_if { |k, v| [:id, :quiz_id, :quiz_group_id, :question_data].include?(k.to_sym) }.each do |key, val|
@@ -208,9 +187,9 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
     end
     data = self.question_data || HashWithIndifferentAccess.new
     data.delete(:id)
-    if options[:old_context] && options[:new_context]
-      data = Quizzes::QuizQuestion.migrate_question_hash(data, options)
-    end
+    # if options[:old_context] && options[:new_context]
+    #   data = Quizzes::QuizQuestion.migrate_question_hash(data, options)
+    # end
     dup.write_attribute(:question_data, data)
     dup.quiz_id = quiz.id
     dup

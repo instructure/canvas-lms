@@ -117,6 +117,7 @@ class Course < ActiveRecord::Base
   has_many :course_account_associations
   has_many :non_unique_associated_accounts, -> { order('course_account_associations.depth') }, source: :account, through: :course_account_associations
   has_many :users, -> { distinct }, through: :enrollments, source: :user
+  has_many :all_users, -> { distinct }, through: :all_enrollments, source: :user
   has_many :current_users, -> { distinct }, through: :current_enrollments, source: :user
   has_many :all_current_users, -> { distinct }, through: :all_current_enrollments, source: :user
   has_many :group_categories, -> {where(deleted_at: nil) }, as: :context, inverse_of: :context
@@ -126,7 +127,7 @@ class Course < ActiveRecord::Base
   has_many :assignment_groups, -> { order('assignment_groups.position', AssignmentGroup.best_unicode_collation_key('assignment_groups.name')) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :assignments, -> { order('assignments.created_at') }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :calendar_events, -> { where("calendar_events.workflow_state<>'cancelled'") }, as: :context, inverse_of: :context, dependent: :destroy
-  has_many :submissions, -> { order('submissions.updated_at DESC') }, through: :assignments, dependent: :destroy
+  has_many :submissions, -> { active.order('submissions.updated_at DESC') }, through: :assignments, dependent: :destroy
   has_many :submission_comments, -> { published }, as: :context, inverse_of: :context
   has_many :discussion_topics, -> { where("discussion_topics.workflow_state<>'deleted'").preload(:user).order('discussion_topics.position DESC, discussion_topics.created_at DESC') }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :active_discussion_topics, -> { where("discussion_topics.workflow_state<>'deleted'").preload(:user) }, as: :context, inverse_of: :context, class_name: 'DiscussionTopic'
@@ -357,8 +358,7 @@ class Course < ActiveRecord::Base
       end
     end
 
-    throw :abort if !is_unique && !CANVAS_RAILS4_2
-    is_unique
+    throw :abort unless is_unique
   end
 
   def validate_course_dates
@@ -1967,30 +1967,6 @@ class Course < ActiveRecord::Base
     User.file_structure_for(self, user)
   end
 
-  def self.copy_authorized_content(html, to_context, user)
-    return html unless to_context
-    pairs = []
-    content_types_to_copy = ['files']
-    matches = html.scan(/\/(courses|groups|users)\/(\d+)\/(\w+)/) do |match|
-      pairs << [match[0].singularize, match[1].to_i] if content_types_to_copy.include?(match[2])
-    end
-    pairs = pairs.select{|p| p[0] != to_context.class.to_s || p[1] != to_context.id }
-    pairs.uniq.each do |context_type, id|
-      context = Context.find_by_asset_string("#{context_type}_#{id}") rescue nil
-      if context
-        next if context.respond_to?(:context) && to_context == context.context
-        next if to_context.respond_to?(:context) && context == to_context.context
-
-        if context.grants_right?(user, :manage_content)
-          html = self.migrate_content_links(html, context, to_context, content_types_to_copy)
-        else
-          html = self.migrate_content_links(html, context, to_context, content_types_to_copy, user)
-        end
-      end
-    end
-    html
-  end
-
   def turnitin_settings
     # check if somewhere up the account chain turnitin is enabled and
     # has valid settings
@@ -2033,53 +2009,6 @@ class Course < ActiveRecord::Base
     if vericite_enabled?
       Canvas::Plugin.find(:vericite).settings[:comments]
     end
-  end
-
-  def self.migrate_content_links(html, from_context, to_context, supported_types=nil, user_to_check_for_permission=nil)
-    return html unless html.present? && to_context
-
-    from_name = from_context.class.name.tableize
-    to_name = to_context.class.name.tableize
-
-    @merge_mappings ||= {}
-    rewriter = UserContent::HtmlRewriter.new(from_context, user_to_check_for_permission)
-    limit_migrations_to_listed_types = !!supported_types
-    rewriter.allowed_types = %w(assignments calendar_events discussion_topics collaborations files conferences quizzes groups modules)
-
-    rewriter.set_default_handler do |match|
-      new_url = match.url
-      next(new_url) if supported_types && !supported_types.include?(match.type)
-      if match.obj_id
-        new_id = @merge_mappings["#{match.obj_class.name.underscore}_#{match.obj_id}"]
-        next(new_url) unless rewriter.user_can_view_content? { match.obj_class.where(id: match.obj_id).first }
-        if !limit_migrations_to_listed_types || new_id
-          new_url = new_url.gsub("#{match.type}/#{match.obj_id}", new_id ? "#{match.type}/#{new_id}" : "#{match.type}")
-        end
-      end
-      new_url.gsub("/#{from_name}/#{from_context.id}", "/#{to_name}/#{to_context.id}")
-    end
-
-    rewriter.set_unknown_handler do |match|
-      match.url.gsub("/#{from_name}/#{from_context.id}", "/#{to_name}/#{to_context.id}")
-    end
-
-    html = rewriter.translate_content(html)
-
-    if !limit_migrations_to_listed_types
-      # for things like calendar urls, swap out the old context id with the new one
-      regex = Regexp.new("include_contexts=[^\\s&]*#{from_context.asset_string}")
-      html = html.gsub(regex) do |match|
-        match.gsub("#{from_context.asset_string}", "#{to_context.asset_string}")
-      end
-      # swap out the old host with the new host
-      html = html.gsub(HostUrl.context_host(from_context), HostUrl.context_host(to_context))
-    end
-
-    html
-  end
-
-  def migrate_content_links(html, from_course)
-    Course.migrate_content_links(html, from_course, self)
   end
 
   attr_accessor :merge_results
@@ -2489,28 +2418,24 @@ class Course < ActiveRecord::Base
         :label => t('#tabs.announcements', "Announcements"),
         :css_class => 'announcements',
         :href => :course_announcements_path,
-        :screenreader => t("Course Announcements"),
         :icon => 'icon-announcement'
       }, {
         :id => TAB_ASSIGNMENTS,
         :label => t('#tabs.assignments', "Assignments"),
         :css_class => 'assignments',
         :href => :course_assignments_path,
-        :screenreader => t('#tabs.course_assignments', "Course Assignments"),
         :icon => 'icon-assignment'
       }, {
         :id => TAB_DISCUSSIONS,
         :label => t('#tabs.discussions', "Discussions"),
         :css_class => 'discussions',
         :href => :course_discussion_topics_path,
-        :screenreader => t("Course Discussions"),
         :icon => 'icon-discussion'
       }, {
         :id => TAB_GRADES,
         :label => t('#tabs.grades', "Grades"),
         :css_class => 'grades',
-        :href => :course_grades_path,
-        :screenreader => t('#tabs.course_grades', "Course Grades")
+        :href => :course_grades_path
       }, {
         :id => TAB_PEOPLE,
         :label => t('#tabs.people', "People"),
@@ -2526,7 +2451,6 @@ class Course < ActiveRecord::Base
         :label => t('#tabs.files', "Files"),
         :css_class => 'files',
         :href => :course_files_path,
-        :screenreader => t("Course Files"),
         :icon => 'icon-folder'
       }, {
         :id => TAB_SYLLABUS,
@@ -2567,8 +2491,7 @@ class Course < ActiveRecord::Base
         :id => TAB_SETTINGS,
         :label => t('#tabs.settings', "Settings"),
         :css_class => 'settings',
-        :href => :course_settings_path,
-        :screenreader => t('#tabs.course_settings', "Course Settings")
+        :href => :course_settings_path
       }
     ]
   end

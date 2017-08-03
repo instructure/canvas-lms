@@ -28,9 +28,6 @@ class SubmissionCommentInteraction
         submissions: { user_id: student_or_ids }
       }).
       maximum(:created_at)
-    if CANVAS_RAILS4_2
-      result = result.map { |(key, value)| [key.map(&:to_i), value] }.to_h
-    end
     result
   end
 end

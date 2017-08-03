@@ -74,6 +74,7 @@ describe "Gradezilla" do
     it "after arrange columns is clicked", priority: "2", test_id: 720462 do
       Gradezilla.open_view_menu_and_arrange_by_menu
       Gradezilla.select_gradebook_menu_option('Due Date - Oldest to Newest')
+
       expect(check_element_has_focus(Gradezilla.view_options_menu_selector)).to be true
     end
   end
@@ -85,6 +86,7 @@ describe "Gradezilla" do
     it 'returns focus to the view options menu after clicking the "Notes" option' do
       Gradezilla.select_view_dropdown
       Gradezilla.select_notes_option
+
       expect(check_element_has_focus(Gradezilla.view_options_menu_selector)).to be true
     end
   end
@@ -130,6 +132,7 @@ describe "Gradezilla" do
       Gradezilla.grading_cell.click
       driver.action.send_keys(:escape).perform
       driver.action.send_keys('c').perform
+
       expect(current_active_element.text.include?('Close')).to be(true)
       expect(Gradezilla.submission_tray).to be_displayed
     end
@@ -137,12 +140,14 @@ describe "Gradezilla" do
     it 'does not open the submission tray when a cell has focus and is in edit mode' do
       Gradezilla.grading_cell.click
       driver.action.send_keys('c').perform
+
       expect(Gradezilla.body).not_to contain_css(Gradezilla.submission_tray_selector)
     end
 
     it 'does not open the submission tray when grid does not have focus' do
       Gradezilla.body.click
       driver.action.send_keys('c').perform
+
       expect(Gradezilla.body).not_to contain_css(Gradezilla.submission_tray_selector)
     end
   end
@@ -156,12 +161,14 @@ describe "Gradezilla" do
       Gradezilla.grading_cell.click
       driver.action.send_keys(:escape).perform
       driver.action.send_keys('m').perform
+
       expect(Gradezilla.expanded_popover_menu).to be_displayed
     end
 
     it 'does not open the assignment header menu when a cell has focus and is in edit mode' do
       Gradezilla.grading_cell.click
       driver.action.send_keys('m').perform
+
       expect(Gradezilla.body).not_to contain_css(Gradezilla.expanded_popover_menu_selector)
     end
 
@@ -170,6 +177,7 @@ describe "Gradezilla" do
       driver.action.send_keys(:escape).perform
       driver.action.send_keys('m').perform
       driver.action.send_keys(:escape).perform
+
       expect(Gradezilla.body).not_to contain_css(Gradezilla.expanded_popover_menu_selector)
     end
 
@@ -178,29 +186,34 @@ describe "Gradezilla" do
       driver.action.send_keys(:escape).perform
       driver.action.send_keys('m').perform
       driver.action.send_keys('m').perform
+
       expect(Gradezilla.body).not_to contain_css(Gradezilla.expanded_popover_menu_selector)
     end
 
     it 'opens the assignment group header menu when a cell has focus and is not in edit mode' do
-      Gradezilla.grading_cell(3).click
+      Gradezilla.gradebook_cell(4,0).click
       driver.action.send_keys(:escape).perform
       driver.action.send_keys('m').perform
+
       expect(Gradezilla.expanded_popover_menu).to be_displayed
     end
 
     it 'pressing escape closes the assignment group header menu' do
-      Gradezilla.grading_cell(3).click
+      Gradezilla.assignment_group_header_options_element(@group.name).click
       driver.action.send_keys(:escape).perform
       driver.action.send_keys('m').perform
       driver.action.send_keys(:escape).perform
+
       expect(Gradezilla.body).not_to contain_css(Gradezilla.expanded_popover_menu_selector)
     end
 
     it 'pressing "m" closes the assignment group header menu if it is open' do
-      Gradezilla.grading_cell(3).click
-      driver.action.send_keys(:escape).perform
+      Gradezilla.assignment_group_header_options_element(@group.name).click
+      f(Gradezilla.expanded_popover_menu_selector).send_keys(:escape)
+      expect(Gradezilla.body).not_to contain_css(Gradezilla.expanded_popover_menu_selector)
       driver.action.send_keys('m').perform
-      driver.action.send_keys('m').perform
+      f(Gradezilla.expanded_popover_menu_selector).send_keys('m')
+
       expect(Gradezilla.body).not_to contain_css(Gradezilla.expanded_popover_menu_selector)
     end
 
@@ -208,26 +221,29 @@ describe "Gradezilla" do
       Gradezilla.grading_cell(4).click
       driver.action.send_keys(:escape).perform
       driver.action.send_keys('m').perform
+
       expect(Gradezilla.expanded_popover_menu).to be_displayed
     end
 
     it 'pressing escape closes the total header menu' do
-      Gradezilla.grading_cell(4).click
+      Gradezilla.select_total_column_option
       driver.action.send_keys('m').perform
       driver.action.send_keys(:escape).perform
+
       expect(Gradezilla.body).not_to contain_css(Gradezilla.expanded_popover_menu_selector)
     end
 
     it 'pressing "m" closes the total header menu if it is open' do
-      Gradezilla.grading_cell(4).click
+      Gradezilla.select_total_column_option
       driver.action.send_keys('m').perform
-      driver.action.send_keys('m').perform
+
       expect(Gradezilla.body).not_to contain_css(Gradezilla.expanded_popover_menu_selector)
     end
 
     it 'does not open a menu when grid does not have focus' do
       Gradezilla.body.click
       driver.action.send_keys('m').perform
+
       expect(Gradezilla.body).not_to contain_css(Gradezilla.expanded_popover_menu_selector)
     end
   end
@@ -240,7 +256,8 @@ describe "Gradezilla" do
     # Default sort is by student name ascending, so first press of "s" will
     # toggle to descending sort
     it 'toggles sort order on student column by name' do
-      Gradezilla.student_cell.click
+      cell = Gradezilla.student_cell
+      driver.action.move_to(cell, 0, cell.size.height / 2 - 2).click.perform
 
       expect(Gradezilla.student_grades_link(Gradezilla.student_cell(0)).text).to eq(students[0].name)
       expect(Gradezilla.student_grades_link(Gradezilla.student_cell(1)).text).to eq(students[1].name)

@@ -17,83 +17,28 @@
  */
 
 import React from 'react';
-import { shallow } from 'enzyme';
-import I18n from 'i18n!gradebook-history';
+import { mount, shallow } from 'enzyme';
 import Spinner from 'instructure-ui/lib/components/Spinner';
 import Table from 'instructure-ui/lib/components/Table';
+import Typography from 'instructure-ui/lib/components/Typography';
+import constants from 'jsx/gradebook-history/constants';
 import { SearchResultsComponent } from 'jsx/gradebook-history/SearchResults';
-import $ from 'jquery';
-import 'jquery.instructure_date_and_time';
+import { formatHistoryItems } from 'jsx/gradebook-history/reducers/HistoryReducer';
+import Fixtures from 'spec/jsx/gradebook-history/Fixtures';
 
-const mockHistoryItem = {
-  created_at: '2017-05-19T18:54:01Z',
-  grade_before: '0',
-  grade_after: '21',
-  links: {
-    grader: 2,
-    student: 8,
-    assignment: 3,
-    graded_anonymously: false
-  }
-};
-
-const anotherMockHistoryItem = {
-  created_at: '2017-05-20T18:54:01Z',
-  grade_before: '21',
-  grade_after: '0',
-  links: {
-    grader: 2,
-    student: 10,
-    assignment: 3,
-    graded_anonymously: true
-  }
-};
-
-const mockUsers = {
-  1: 'admin@instructure.com',
-  2: 'teacher@instructure.com',
-  8: 'classpres@instructure.com',
-  10: 'classclown@instructure.com'
-};
-
-const formatHistoryItems = (historyItems, users = {}) => {
-  if (historyItems == null) {
-    return [];
-  }
-
-  const length = historyItems.length;
-  const formattedHistoryItems = []
-
-  for (let i = 0; i < length; i += 1) {
-    const newHistoryItem = {};
-
-    const dateChanged = new Date(historyItems[i].created_at);
-
-    newHistoryItem.Date = $.dateString(dateChanged, { format: 'medium', timezone: ENV.TIMEZONE });
-    newHistoryItem.Time = $.timeString(dateChanged, { format: 'medium', timezone: ENV.TIMEZONE });
-    newHistoryItem.From = I18n.n(historyItems[i].grade_before) || '-';
-    newHistoryItem.To = I18n.n(historyItems[i].grade_after) || '-';
-    newHistoryItem.Grader = users[historyItems[i].links.grader] || 'Not available';
-    newHistoryItem.Student = users[historyItems[i].links.student] || 'Not available';
-    newHistoryItem.Assignment = historyItems[i].links.assignment;
-    newHistoryItem.Anonymous = historyItems[i].graded_anonymously ? I18n.t('yes') : I18n.t('no');
-
-    formattedHistoryItems.push(newHistoryItem);
-  }
-
-  return formattedHistoryItems;
-};
-
-const mountComponent = (customProps = {}) => {
-  const props = {
+const defaultProps = () => (
+  {
+    caption: 'search results',
+    fetchHistoryStatus: '',
     historyItems: [],
-    label: 'search results',
-    requestingResults: false,
-    users: {},
-    errorMessage: ''
-  };
-  return shallow(<SearchResultsComponent {...props} {...customProps} />);
-};
+    loadMore () {},
+    requestingResults: false
+  }
+);
+
+const mountComponent = (customProps = {}) => (
+  shallow(<SearchResultsComponent {...defaultProps()} {...customProps} />)
+);
 
 QUnit.module('SearchResults');
 
@@ -103,41 +48,35 @@ test('does not show a Table/Spinner if no historyItems passed', function () {
 });
 
 test('shows a Table if there are historyItems passed', function () {
-  const props = { historyItems: [mockHistoryItem] };
+  const historyItems = formatHistoryItems(Fixtures.payload());
+  const props = { historyItems };
   const wrapper = mountComponent(props);
   ok(wrapper.find(Table).exists());
 });
 
 test('Table is passed the label and caption props', function () {
-  const props = {
-    label: 'search results label',
-    historyItems: [mockHistoryItem]
-  };
+  const historyItems = formatHistoryItems(Fixtures.payload());
+  const props = { caption: 'search results caption', historyItems };
   const wrapper = mountComponent(props);
   const table = wrapper.find(Table);
-  equal(table.props().label, props.label);
-  equal(table.props().caption, props.label);
+  equal(table.props().caption, props.caption);
 });
 
 test('Table is passed column headers in correct order', function () {
-  const props = { historyItems: [mockHistoryItem] };
-  const colHeaders = ['Date', 'Time', 'From', 'To', 'Grader', 'Student', 'Assignment', 'Anonymous'];
+  const historyItems = formatHistoryItems(Fixtures.payload());
+  const props = { historyItems };
   const wrapper = mountComponent(props);
   const table = wrapper.find(Table);
-  deepEqual(table.props().colHeaders, colHeaders);
+  deepEqual(table.props().colHeaders, constants.colHeaders);
 });
 
-test('Table displays the formatted historyItems passed', function () {
-  const props = {
-    historyItems: [mockHistoryItem, anotherMockHistoryItem],
-    users: mockUsers
-  };
-  const wrapper = mountComponent(props);
-  const table = wrapper.find(Table);
-
-  const expectedValue = formatHistoryItems(props.historyItems, props.users);
-
-  deepEqual(table.props().tableData, expectedValue);
+test('Table displays the formatted historyItems passed it', function () {
+  const payload = Fixtures.payload();
+  const events = payload.events;
+  const historyItems = formatHistoryItems(payload);
+  const props = { ...defaultProps(), historyItems }
+  const tableBody = mount(<SearchResultsComponent {...props} />).find('tbody');
+  equal(tableBody.find('tr').length, events.length);
 });
 
 test('does not show a Spinner if requestingResults false', function () {
@@ -151,4 +90,12 @@ test('shows a Spinner if requestingResults true', function () {
   };
   const wrapper = mountComponent(props);
   ok(wrapper.find(Spinner).exists());
+});
+
+test('Table shows text if request was made but no results were found', function () {
+  const props = { ...defaultProps(), fetchHistoryStatus: 'success', historyItems: [] };
+  const wrapper = mount(<SearchResultsComponent {...props} />);
+  const textBox = wrapper.find(Typography);
+  ok(textBox.exists());
+  equal(textBox.text(), 'No results found');
 });

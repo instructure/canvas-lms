@@ -34,11 +34,7 @@ describe Quizzes::QuizStatistics do
   def csv(opts = {}, quiz = @quiz)
     stats = quiz.statistics_csv('student_analysis', opts)
     run_jobs
-    if CANVAS_RAILS4_2
-      stats.csv_attachment(true).open.read
-    else
-      stats.reload_csv_attachment.open.read
-    end
+    stats.reload_csv_attachment.open.read
   end
 
   it "should use the last completed submission, even if the current submission is in progress" do

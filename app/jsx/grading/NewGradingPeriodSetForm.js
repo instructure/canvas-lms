@@ -18,14 +18,12 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import _ from 'underscore'
-import $ from 'jquery'
 import Button from 'instructure-ui/lib/components/Button'
 import Checkbox from 'instructure-ui/lib/components/Checkbox'
 import I18n from 'i18n!grading_periods'
 import setsApi from 'compiled/api/gradingPeriodSetsApi'
 import EnrollmentTermInput from 'jsx/grading/EnrollmentTermInput'
-import 'compiled/jquery.rails_flash_notifications'
+import { showFlashAlert } from 'jsx/shared/FlashAlert';
 
   let NewGradingPeriodSetForm = React.createClass({
     propTypes: {
@@ -62,7 +60,7 @@ import 'compiled/jquery.rails_flash_notifications'
       if(this.state.title.trim() !== '') {
         return true;
       } else {
-        $.flashError(I18n.t("A name for this set is required"));
+        showFlashAlert({ type: 'error', message: I18n.t('A name for this set is required') });
         return false;
       }
     },
@@ -91,12 +89,12 @@ import 'compiled/jquery.rails_flash_notifications'
     },
 
     submitSucceeded(set) {
-      $.flashMessage(I18n.t("Successfully created a set"));
+      showFlashAlert({ type: 'success', message: I18n.t('Successfully created a set') });
       this.props.addGradingPeriodSet(set, this.state.selectedEnrollmentTermIDs);
     },
 
     submitFailed() {
-      $.flashError(I18n.t("There was a problem submitting your set"));
+      showFlashAlert({ type: 'error', message: I18n.t('There was a problem submitting your set') });
       this.setState({ buttonsDisabled: false });
     },
 

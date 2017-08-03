@@ -23,8 +23,8 @@ export default {
     const locale_map = {zh_Hant: 'zh-Hant'}
     locale = locale_map[locale] || locale
     return x.localeCompare(y, locale, {
-      sensitivity: 'accent',
-      ignorePunctuation: true,
+      sensitivity: 'variant',
+      ignorePunctuation: false,
       numeric: true,
     })
   },

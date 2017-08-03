@@ -45,10 +45,8 @@ module CanvasRails
     config.action_dispatch.rescue_responses['AuthenticationMethods::LoggedOutError'] = 401
     config.action_dispatch.default_headers['X-UA-Compatible'] = "IE=Edge,chrome=1"
     config.action_dispatch.default_headers.delete('X-Frame-Options')
-    unless CANVAS_RAILS4_2
-      config.action_controller.forgery_protection_origin_check = true
-      ActiveSupport.to_time_preserves_timezone = true
-    end
+    config.action_controller.forgery_protection_origin_check = true
+    ActiveSupport.to_time_preserves_timezone = true
 
     config.app_generators do |c|
       c.test_framework :rspec
@@ -101,8 +99,6 @@ module CanvasRails
     # Activate observers that should always be running
     config.active_record.observers = [:cacher, :stream_item_cache, :live_events_observer, :conditional_release_observer ]
 
-    config.active_record.raise_in_transactional_callbacks = true if CANVAS_RAILS4_2
-
     config.active_support.encode_big_decimal_as_string = false
 
     config.paths['lib'].eager_load!
@@ -116,11 +112,10 @@ module CanvasRails
     # we don't know what middleware to make SessionsTimeout follow until after
     # we've loaded config/initializers/session_store.rb
     initializer("extend_middleware_stack", after: "load_config_initializers") do |app|
-      request_throttle_position = CANVAS_RAILS4_2 ? ActionDispatch::ParamsParser : Rack::Head
       app.config.middleware.insert_before(config.session_store, LoadAccount)
       app.config.middleware.swap(ActionDispatch::RequestId, RequestContextGenerator)
       app.config.middleware.insert_after(config.session_store, RequestContextSession)
-      app.config.middleware.insert_before(request_throttle_position, RequestThrottle)
+      app.config.middleware.insert_before(Rack::Head, RequestThrottle)
       app.config.middleware.insert_before(Rack::MethodOverride, PreventNonMultipartParse)
     end
 
@@ -147,10 +142,6 @@ module CanvasRails
             @connection = PGconn.connect(connection_parameters)
 
             raise "Canvas requires PostgreSQL 9.3 or newer" unless postgresql_version >= 90300
-
-            if CANVAS_RAILS4_2
-              ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::OID::Money.precision = (postgresql_version >= 80300) ? 19 : 10
-            end
 
             configure_connection
 
@@ -261,13 +252,9 @@ module CanvasRails
 
     class ExceptionsApp
       def call(env)
-        if CANVAS_RAILS4_2
-          ApplicationController.action('rescue_action_dispatch_exception').call(env)
-        else
-          req = ActionDispatch::Request.new(env)
-          res = ApplicationController.make_response!(req)
-          ApplicationController.dispatch('rescue_action_dispatch_exception', req, res)
-        end
+        req = ActionDispatch::Request.new(env)
+        res = ApplicationController.make_response!(req)
+        ApplicationController.dispatch('rescue_action_dispatch_exception', req, res)
       end
     end
 

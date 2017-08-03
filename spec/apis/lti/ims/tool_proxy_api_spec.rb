@@ -41,6 +41,18 @@ module Lti
         )
       end
 
+      let(:oauth1_header) do
+        {
+          'HTTP_AUTHORIZATION' => "OAuth
+                oauth_consumer_key=\"#{tool_proxy.guid}\",
+                oauth_signature_method=\"HMAC-SHA1\",
+                oauth_signature=\"not_a_sig\",
+                oauth_timestamp=\"137131200\",
+                oauth_nonce=\"4572616e48616d6d65724c61686176\",
+                oauth_version=\"1.0\" ".gsub(/\s+/, ' ')
+        }
+      end
+
       describe "Get #show" do
 
         before(:each) do
@@ -67,7 +79,10 @@ module Lti
           mock_oauth_sig.stubs(:verify).returns(true)
           OAuth::Signature.stubs(:build).returns(mock_oauth_sig)
           OAuth::Helper.stubs(:parse_header).returns({'oauth_consumer_key' => 'key'})
-          Lti::RegistrationRequestService.stubs(:retrieve_registration_password).returns('password')
+          Lti::RegistrationRequestService.stubs(:retrieve_registration_password).returns({
+            reg_password: 'password',
+            registration_url: 'http://example.com/register'
+          })
         end
 
         it 'returns a tool_proxy id object' do
@@ -76,7 +91,7 @@ module Lti
           json = JSON.parse(tool_proxy_fixture)
           json[:format] = 'json'
           json[:account_id] = @course.account.id
-          headers = {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+          headers = {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}.merge(oauth1_header)
           response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", tool_proxy_fixture, headers
           expect(response).to eq 201
           expect(JSON.parse(body).keys).to match_array ["@context", "@type", "@id", "tool_proxy_guid"]
@@ -85,7 +100,8 @@ module Lti
         it 'has the correct content-type' do
           course_with_teacher_logged_in(:active_all => true)
           tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
-          headers = {'CONTENT_TYPE' => 'application/vnd.ims.lti.v2.toolproxy+json', 'ACCEPT' => 'application/vnd.ims.lti.v2.toolproxy.id+json'}
+          headers = {'CONTENT_TYPE' => 'application/vnd.ims.lti.v2.toolproxy+json',
+                     'ACCEPT' => 'application/vnd.ims.lti.v2.toolproxy.id+json'}.merge(oauth1_header)
           post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", tool_proxy_fixture, headers
           expect(response.headers['Content-Type']).to include 'application/vnd.ims.lti.v2.toolproxy.id+json'
         end
@@ -95,10 +111,10 @@ module Lti
           tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
           tp = IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
           tp.tool_profile.resource_handlers.first.messages.first.enabled_capability = ['extra_capability']
-          headers = {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+          headers = {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}.merge(oauth1_header)
           response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", tp.to_json, headers
           expect(response).to eq 400
-          expect(JSON.parse(body)).to eq({"error" => "Invalid Capabilities"})
+          expect(JSON.parse(body)).to eq({"invalid_capabilities"=>["extra_capability"], "error"=>"Invalid Capabilities"})
         end
 
         it 'accepts split secret' do
@@ -108,7 +124,7 @@ module Lti
           tool_proxy_fixture[:enabled_capability] = ['OAuth.splitSecret']
           tool_proxy_fixture["security_contract"].delete("shared_secret")
           tool_proxy_fixture["security_contract"]["tp_half_shared_secret"] = SecureRandom.hex(128)
-          headers = {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+          headers = {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}.merge(oauth1_header)
           response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", tool_proxy_fixture.to_json, headers
           expect(response).to eq 201
           expect(JSON.parse(body).keys).to match_array ["@context", "@type", "@id", "tool_proxy_guid", "tc_half_shared_secret"]
@@ -161,7 +177,10 @@ module Lti
         it 'accepts valid JWT access tokens' do
           course_with_teacher_logged_in(:active_all => true)
           Lti::RegistrationRequestService.
-            stubs(:retrieve_registration_password).with(@course.account, 'reg_key').returns('password')
+            stubs(:retrieve_registration_password).with(@course.account, 'reg_key').returns({
+              reg_password: 'password',
+              registration_url: 'http://example.com/register'
+          })
           tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
           json = JSON.parse(tool_proxy_fixture)
           json[:format] = 'json'
@@ -191,21 +210,9 @@ module Lti
 
         end
 
-        let(:auth_header) do
-          {
-              'HTTP_AUTHORIZATION' => "OAuth
-                oauth_consumer_key=\"#{tool_proxy.guid}\",
-                oauth_signature_method=\"HMAC-SHA1\",
-                oauth_signature=\"not_a_sig\",
-                oauth_timestamp=\"137131200\",
-                oauth_nonce=\"4572616e48616d6d65724c61686176\",
-                oauth_version=\"1.0\" ".gsub(/\s+/, ' ')
-          }
-        end
-
         it "routes to the reregistration action based on header" do
           course_with_teacher_logged_in(:active_all => true)
-          headers = {'VND-IMS-CONFIRM-URL' => 'Routing based on arbitrary headers, Barf!'}.merge(auth_header)
+          headers = {'VND-IMS-CONFIRM-URL' => 'Routing based on arbitrary headers, Barf!'}.merge(oauth1_header)
           post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", 'sad times', headers
           expect(controller.params[:action]).to eq 're_reg'
         end
@@ -215,7 +222,7 @@ module Lti
           mock_siq.stubs(:verify).returns(false)
           OAuth::Signature.stubs(:build).returns(mock_siq)
           course_with_teacher_logged_in(:active_all => true)
-          headers = {'VND-IMS-CONFIRM-URL' => 'Routing based on arbitrary headers, Barf!'}.merge(auth_header)
+          headers = {'VND-IMS-CONFIRM-URL' => 'Routing based on arbitrary headers, Barf!'}.merge(oauth1_header)
           response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", 'sad times', headers
           expect(response).to eq 401
         end
@@ -233,7 +240,7 @@ module Lti
                                     tool_consumer_profile_id: Lti::ToolConsumerProfile::DEFAULT_TCP_UUID)
           tool_proxy_fixture["tool_consumer_profile"] = tcp_url
 
-          headers = {'VND-IMS-CONFIRM-URL' => 'Routing based on arbitrary headers, Barf!'}.merge(auth_header)
+          headers = {'VND-IMS-CONFIRM-URL' => 'Routing based on arbitrary headers, Barf!'}.merge(oauth1_header)
           response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", tool_proxy_fixture.to_json, headers
 
           expect(response).to eq 200
@@ -250,7 +257,7 @@ module Lti
           mock_siq.stubs(:verify).returns(true)
           OAuth::Signature.stubs(:build).returns(mock_siq)
           course_with_teacher_logged_in(:active_all => true)
-          headers = {'VND-IMS-CONFIRM-URL' => 'Routing based on arbitrary headers, Barf!'}.merge(auth_header)
+          headers = {'VND-IMS-CONFIRM-URL' => 'Routing based on arbitrary headers, Barf!'}.merge(oauth1_header)
           response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", 'sad times', headers
           expect(response).to eq 400
 

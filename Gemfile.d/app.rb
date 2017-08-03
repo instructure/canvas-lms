@@ -15,22 +15,19 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-if CANVAS_RAILS4_2
-  gem 'rails', '4.2.8'
-  gem 'rack', '1.6.5'
-  gem 'activesupport-json_encoder', '1.1.0'
-  gem 'oauth2', '1.0.0', require: false
+if CANVAS_RAILS5_0
+  gem 'rails', '5.0.4'
 else
-  gem 'rails', '5.0.2'
-  gem 'rack', '2.0.1'
-  gem 'oauth2', '1.2.0', require: false
+  gem 'rails', '5.1.2'
 end
+
+gem 'rack', '2.0.1'
+gem 'oauth2', '1.2.0', require: false
 
 gem 'rails-observers', '0.1.4', github: 'rails/rails-observers', ref: '206cb17bc14f4f5ac6f83da4204013a69549b9dc'
 
 gem 'builder', '3.2.3'
 gem 'tzinfo', '1.2.2'
-gem 'oj_mimic_json', require: false
 
 gem 'encrypted_cookie_store-instructure', '1.2.5', require: 'encrypted_cookie_store'
 gem 'active_model_serializers',   '0.9.0alpha1',
@@ -46,7 +43,7 @@ gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   # for folio, see the folio README
   gem 'will_paginate', '3.1.5', require: false
 
-gem 'addressable', '2.5.0', require: false
+gem 'addressable', '2.5.1', require: false
 gem "after_transaction_commit", '1.1.2'
 gem "aws-sdk-s3", '1.0.0.rc3', require: false
 gem "aws-sdk-sns", '1.0.0.rc1', require: false
@@ -71,11 +68,11 @@ gem 'i18nliner', '0.0.12'
   gem 'ruby2ruby', '2.3.1', require: false
   gem 'ruby_parser', '3.8.4', require: false
 gem 'icalendar', '1.5.4', require: false
-gem 'ims-lti', '2.1.2', require: 'ims'
+gem 'ims-lti', '2.1.3', require: 'ims'
 gem 'json', '2.0.3'
-gem 'oj', '2.17.1'
+gem 'oj', '3.3.2'
 gem 'jwt', '1.2.1', require: false
-gem 'json-jwt', '1.6.5', require: false
+gem 'json-jwt', '1.7.2', require: false
 gem 'twilio-ruby', '4.2.1'
 
 gem 'mail', '2.6.4', require: false
@@ -85,8 +82,7 @@ gem 'mini_magick', '4.2.7'
 gem 'multi_json', '1.12.1'
 gem 'netaddr', '1.5.1', require: false
 gem 'nokogiri', '1.7.1', require: false
-# oauth gem, with rails3 fixes rolled in
-gem 'oauth-instructure', '0.4.10', require: false
+gem 'oauth', '0.5.3', require: false
 gem 'parallel', '1.10.0', require: false
   gem 'ruby-progressbar', '1.8.1', require: false #used to show progress of S3Uploader
 gem 'retriable', '1.4.1'

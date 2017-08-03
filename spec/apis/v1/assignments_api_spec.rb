@@ -1314,7 +1314,7 @@ describe AssignmentsApiController, type: :request do
       )
 
       message_handler = Lti::MessageHandler.create(
-        message_type: 'message_type',
+        message_type: 'basic-lti-launch-request',
         launch_path: 'https://samplelaunch/blti',
         resource_handler: resource_handler
       )
@@ -1361,7 +1361,7 @@ describe AssignmentsApiController, type: :request do
       )
 
       message_handler = Lti::MessageHandler.create(
-        message_type: 'message_type',
+        message_type: 'basic-lti-launch-request',
         launch_path: 'https://samplelaunch/blti',
         resource_handler: resource_handler
       )
@@ -3782,7 +3782,7 @@ describe AssignmentsApiController, type: :request do
       @assignment, @submission = create_submitted_assignment_with_user(@observed_student)
     end
 
-    it "should include submissions for observed users when requested with all assignments" do
+    it "includes submissions for observed users when requested with all assignments" do
       json = api_call_as_user(@observer, :get,
                               "/api/v1/courses/#{@observer_course.id}/assignments?include[]=observed_users&include[]=submission",
                               { :controller => 'assignments_api',
@@ -3790,17 +3790,19 @@ describe AssignmentsApiController, type: :request do
                                 :course_id => @observer_course.id,
                                 :include => [ "observed_users", "submission" ]})
 
-      expect(json.first['submission']).to eq [{
+      expect(json.first['submission']).to eql [{
          "assignment_id" => @assignment.id,
          "attempt" => nil,
          "body" => nil,
          "excused" => nil,
          "grade" => "99",
+         "entered_grade" => "99",
          "grade_matches_current_submission" => true,
          "graded_at" => nil,
          "grader_id" => @teacher.id,
          "id" => @submission.id,
-         "score" => 99,
+         "score" => 99.0,
+         "entered_score" => 99.0,
          "submission_type" => nil,
          "submitted_at" => nil,
          "url" => nil,
@@ -3810,13 +3812,13 @@ describe AssignmentsApiController, type: :request do
          "missing" => false,
          "late_policy_status" => nil,
          "points_deducted" => nil,
-         "seconds_late" => 0.0,
+         "seconds_late" => 0,
          "preview_url" =>
          "http://www.example.com/courses/#{@observer_course.id}/assignments/#{@assignment.id}/submissions/#{@observed_student.id}?preview=1&version=0"
        }]
     end
 
-    it "should insoclude submissions for observed users when requested with a single assignment" do
+    it "includes submissions for observed users when requested with a single assignment" do
       json = api_call_as_user(@observer, :get,
                               "/api/v1/courses/#{@observer_course.id}/assignments/#{@assignment.id}?include[]=observed_users&include[]=submission",
                               { :controller => 'assignments_api',
@@ -3824,17 +3826,19 @@ describe AssignmentsApiController, type: :request do
                                 :id => @assignment.id,
                                 :course_id => @observer_course.id,
                                 :include => [ "observed_users", "submission" ]})
-      expect(json['submission']).to eq [{
+      expect(json['submission']).to eql [{
          "assignment_id" => @assignment.id,
          "attempt" => nil,
          "body" => nil,
          "excused" => nil,
          "grade" => "99",
+         "entered_grade" => "99",
          "grade_matches_current_submission" => true,
          "graded_at" => nil,
          "grader_id" => @teacher.id,
          "id" => @submission.id,
-         "score" => 99,
+         "score" => 99.0,
+         "entered_score" => 99.0,
          "submission_type" => nil,
          "submitted_at" => nil,
          "url" => nil,
@@ -3844,7 +3848,7 @@ describe AssignmentsApiController, type: :request do
          "missing" => false,
          "late_policy_status" => nil,
          "points_deducted" => nil,
-         "seconds_late" => 0.0,
+         "seconds_late" => 0,
          "preview_url" =>
          "http://www.example.com/courses/#{@observer_course.id}/assignments/#{@assignment.id}/submissions/#{@observed_student.id}?preview=1&version=0"
        }]

@@ -8,9 +8,3 @@ gem 'canvas_statsd', '1.0.0'
 gem 'json_token', path: '../json_token'
 gem 'paginated_collection', path: '../paginated_collection'
 gem 'simplecov', '0.14.1', :require => false
-
-require File.expand_path("../../../config/canvas_rails5", __FILE__)
-
-if CANVAS_RAILS4_2
-  gem 'rails', '~> 4.2'
-end

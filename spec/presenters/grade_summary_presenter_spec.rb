@@ -156,11 +156,8 @@ describe GradeSummaryPresenter do
       expect(assignment_stats.min.to_f).to eq 2
       expect(assignment_stats.avg.to_f).to eq 6
     end
-  end
 
-
-  describe '#submission count' do
-    it 'filters out test students and inactive enrollments' do
+    it 'returns a count of submissions ignoring test students and inactive enrollments' do
       @course = Course.create!
       teacher_in_course
       s1, s2, s3, removed_student = n_students_in_course(4, {:course => @course})
@@ -181,7 +178,7 @@ describe GradeSummaryPresenter do
       end
 
       p = GradeSummaryPresenter.new(@course, @teacher, nil)
-      expect(p.submission_counts.values[0]).to eq 3
+      expect(p.assignment_stats.values.first.count).to eq 3
     end
   end
 

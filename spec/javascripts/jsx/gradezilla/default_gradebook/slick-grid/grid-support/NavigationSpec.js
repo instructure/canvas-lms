@@ -20,8 +20,6 @@ import 'jquery.keycodes'; // used by some SlickGrid editors
 import { Grid, Editors } from 'vendor/slickgrid';
 import GridSupport from 'jsx/gradezilla/default_gradebook/slick-grid/grid-support';
 
-const $fixtures = document.getElementById('fixtures');
-
 const keyMap = {
   Tab: { which: 9, shiftKey: false },
   ShiftTab: { which: 9, shiftKey: true },
@@ -78,7 +76,13 @@ function simulateKeyDown ($element, keyCode, shiftKey = false) {
 }
 
 QUnit.module('GridSupport Navigation', function (hooks) {
+  let $fixtures;
+  let $activeElement;
+
   hooks.beforeEach(function () {
+    // avoid spec pollution by listeners on #fixtures
+    $fixtures = document.createElement('div');
+    document.body.appendChild($fixtures);
     const $gridContainer = document.createElement('div');
     $gridContainer.id = 'example-grid';
     $fixtures.appendChild($gridContainer);
@@ -89,7 +93,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
     document.body.addEventListener('keydown', this.onKeyDown, false);
   });
 
-  this.simulateKeyDown = function (key, $element = document.activeElement) {
+  this.simulateKeyDown = function (key, $element = $activeElement) {
     const { which, shiftKey } = keyMap[key];
     this.triggeredEvent = simulateKeyDown($element, which, shiftKey);
   };
@@ -105,12 +109,13 @@ QUnit.module('GridSupport Navigation', function (hooks) {
     document.body.removeEventListener('keydown', this.onKeyDown, false);
     this.gridSupport.destroy();
     this.grid.destroy();
-    $fixtures.innerHTML = '';
+    $fixtures.remove();
   });
 
   QUnit.module('Tab into the header', {
     setup () {
       this.gridSupport.state.setActiveLocation('beforeGrid');
+      $activeElement = this.gridSupport.helper.getBeforeGridNode();
     }
   });
 
@@ -162,6 +167,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('other keys on the beforeGrid region', {
     setup () {
       this.gridSupport.state.setActiveLocation('beforeGrid');
+      $activeElement = this.gridSupport.helper.getBeforeGridNode();
     }
   });
 
@@ -191,6 +197,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('Tab between two header cells', {
     setup () {
       this.gridSupport.state.setActiveLocation('header', { cell: 0 });
+      $activeElement = this.gridSupport.helper.getBeforeGridNode();
     }
   });
 
@@ -249,6 +256,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('Tab from frozen header cell to scrollable header cell', {
     setup () {
       this.gridSupport.state.setActiveLocation('header', { cell: 1 });
+      $activeElement = this.gridSupport.helper.getBeforeGridNode();
     }
   });
 
@@ -300,6 +308,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('Tab from last header cell to first body cell', {
     setup () {
       this.gridSupport.state.setActiveLocation('header', { cell: 3 });
+      $activeElement = this.gridSupport.helper.getBeforeGridNode();
     }
   });
 
@@ -363,6 +372,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('Tab between two body cells', {
     setup () {
       this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 0 });
+      $activeElement = this.gridSupport.state.getActiveNode();
     }
   });
 
@@ -398,6 +408,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('Tab from frozen body cell to scrollable body cell', {
     setup () {
       this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 1 });
+      $activeElement = this.gridSupport.state.getActiveNode();
     }
   });
 
@@ -433,6 +444,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('Tab from last row cell to first cell of next row', {
     setup () {
       this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 3 });
+      $activeElement = this.gridSupport.state.getActiveNode();
     }
   });
 
@@ -468,6 +480,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('Tab into the afterGrid region', {
     setup () {
       this.gridSupport.state.setActiveLocation('body', { row: 1, cell: 3 });
+      $activeElement = this.gridSupport.state.getActiveNode();
     }
   });
 
@@ -497,6 +510,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('Tab out of the afterGrid region', {
     setup () {
       this.gridSupport.state.setActiveLocation('afterGrid');
+      $activeElement = this.gridSupport.helper.getAfterGridNode();
     }
   });
 
@@ -549,6 +563,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('other keys on the afterGrid region', {
     setup () {
       this.gridSupport.state.setActiveLocation('afterGrid');
+      $activeElement = this.gridSupport.helper.getAfterGridNode();
     }
   });
 
@@ -578,6 +593,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('Shift+Tab back out of the beforeGrid region', {
     setup () {
       this.gridSupport.state.setActiveLocation('beforeGrid');
+      $activeElement = this.gridSupport.helper.getBeforeGridNode();
     }
   });
 
@@ -599,6 +615,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('Shift+Tab back out of the header', {
     setup () {
       this.gridSupport.state.setActiveLocation('header', { cell: 0 });
+      $activeElement = this.gridSupport.helper.getBeforeGridNode();
     }
   });
 
@@ -651,6 +668,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('Shift+Tab between two header cells', {
     setup () {
       this.gridSupport.state.setActiveLocation('header', { cell: 1 });
+      $activeElement = this.gridSupport.helper.getBeforeGridNode();
     }
   });
 
@@ -702,6 +720,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('Shift+Tab from scrollable header cell to frozen header cell', {
     setup () {
       this.gridSupport.state.setActiveLocation('header', { cell: 2 });
+      $activeElement = this.gridSupport.helper.getBeforeGridNode();
     }
   });
 
@@ -753,6 +772,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('Shift+Tab from first body cell to last header cell', {
     setup () {
       this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 0 });
+      $activeElement = this.gridSupport.state.getActiveNode();
     }
   });
 
@@ -805,6 +825,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('Shift+Tab between two body cells', {
     setup () {
       this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 1 });
+      $activeElement = this.gridSupport.state.getActiveNode();
     }
   });
 
@@ -840,6 +861,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('Shift+Tab from scrollable body cell to frozen body cell', {
     setup () {
       this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 2 });
+      $activeElement = this.gridSupport.state.getActiveNode();
     }
   });
 
@@ -875,6 +897,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('Shift+Tab from first row cell to last cell of previous row', {
     setup () {
       this.gridSupport.state.setActiveLocation('body', { row: 1, cell: 0 });
+      $activeElement = this.gridSupport.state.getActiveNode();
     }
   });
 
@@ -910,6 +933,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('Shift+Tab back into the body', {
     setup () {
       this.gridSupport.state.setActiveLocation('afterGrid');
+      $activeElement = this.gridSupport.helper.getAfterGridNode();
     }
   });
 
@@ -973,6 +997,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('RightArrow between two header cells', {
     setup () {
       this.gridSupport.state.setActiveLocation('header', { cell: 0 });
+      $activeElement = this.gridSupport.helper.getBeforeGridNode();
     }
   });
 
@@ -1024,6 +1049,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('RightArrow from frozen header cell to scrollable header cell', {
     setup () {
       this.gridSupport.state.setActiveLocation('header', { cell: 1 });
+      $activeElement = this.gridSupport.helper.getBeforeGridNode();
     }
   });
 
@@ -1075,6 +1101,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('RightArrow on the last header cell', {
     setup () {
       this.gridSupport.state.setActiveLocation('header', { cell: 3 });
+      $activeElement = this.gridSupport.helper.getBeforeGridNode();
     }
   });
 
@@ -1111,6 +1138,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('RightArrow between two body cells', {
     setup () {
       this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 0 });
+      $activeElement = this.gridSupport.state.getActiveNode();
     }
   });
 
@@ -1135,6 +1163,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('RightArrow on the last cell of a row', {
     setup () {
       this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 3 });
+      $activeElement = this.gridSupport.state.getActiveNode();
     }
   });
 
@@ -1164,6 +1193,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('LeftArrow between two header cells', {
     setup () {
       this.gridSupport.state.setActiveLocation('header', { cell: 1 });
+      $activeElement = this.gridSupport.helper.getBeforeGridNode();
     }
   });
 
@@ -1215,6 +1245,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('LeftArrow from scrollable header cell to frozen header cell', {
     setup () {
       this.gridSupport.state.setActiveLocation('header', { cell: 2 });
+      $activeElement = this.gridSupport.helper.getBeforeGridNode();
     }
   });
 
@@ -1266,6 +1297,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('LeftArrow on the first header cell', {
     setup () {
       this.gridSupport.state.setActiveLocation('header', { cell: 0 });
+      $activeElement = this.gridSupport.helper.getBeforeGridNode();
     }
   });
 
@@ -1302,6 +1334,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('LeftArrow between two body cells', {
     setup () {
       this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 1 });
+      $activeElement = this.gridSupport.state.getActiveNode();
     }
   });
 
@@ -1326,6 +1359,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('LeftArrow on the first cell of a row', {
     setup () {
       this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 0 });
+      $activeElement = this.gridSupport.state.getActiveNode();
     }
   });
 
@@ -1358,6 +1392,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('LeftArrow on the first cell of the last row', {
     setup () {
       this.gridSupport.state.setActiveLocation('body', { row: 1, cell: 0 });
+      $activeElement = this.gridSupport.state.getActiveNode();
     }
   });
 
@@ -1387,6 +1422,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('UpArrow on a header cell', {
     setup () {
       this.gridSupport.state.setActiveLocation('header', { cell: 0 });
+      $activeElement = this.gridSupport.helper.getBeforeGridNode();
     }
   });
 
@@ -1423,6 +1459,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('UpArrow on a cell in the first row', {
     setup () {
       this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 0 });
+      $activeElement = this.gridSupport.state.getActiveNode();
     }
   });
 
@@ -1475,6 +1512,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('UpArrow on a cell in a row other than the first', {
     setup () {
       this.gridSupport.state.setActiveLocation('body', { row: 1, cell: 0 });
+      $activeElement = this.gridSupport.state.getActiveNode();
     }
   });
 
@@ -1499,6 +1537,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('DownArrow on a header cell', {
     setup () {
       this.gridSupport.state.setActiveLocation('header', { cell: 0 });
+      $activeElement = this.gridSupport.helper.getBeforeGridNode();
     }
   });
 
@@ -1551,6 +1590,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('DownArrow on a body cell', {
     setup () {
       this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 0 });
+      $activeElement = this.gridSupport.state.getActiveNode();
     }
   });
 
@@ -1575,6 +1615,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
   QUnit.module('DownArrow on a cell in the last row', {
     setup () {
       this.gridSupport.state.setActiveLocation('body', { row: 1, cell: 0 });
+      $activeElement = this.gridSupport.state.getActiveNode();
     }
   });
 
@@ -1603,6 +1644,7 @@ QUnit.module('GridSupport Navigation', function (hooks) {
         this.handledEvent = event;
         this.handledLocation = location;
       });
+      $activeElement = this.gridSupport.helper.getBeforeGridNode();
     }
   });
 
@@ -1650,19 +1692,19 @@ QUnit.module('GridSupport Navigation', function (hooks) {
 
   test('includes the columnId in the active location when handling a body cell event', function () {
     this.gridSupport.state.setActiveLocation('body', { row: 0, cell: 1 });
-    this.simulateKeyDown('Tab');
+    this.simulateKeyDown('Tab', this.gridSupport.state.getActiveNode());
     equal(this.handledLocation.columnId, 'column2');
   });
 
   test('excludes a columnId from the active location when handling a "before grid" event', function () {
     this.gridSupport.state.setActiveLocation('beforeGrid');
-    this.simulateKeyDown('Tab');
+    this.simulateKeyDown('Tab', this.gridSupport.helper.getBeforeGridNode());
     equal(typeof this.handledLocation.columnId, 'undefined');
   });
 
   test('excludes a columnId from the active location when handling an "after grid" event', function () {
     this.gridSupport.state.setActiveLocation('afterGrid');
-    this.simulateKeyDown('Tab');
+    this.simulateKeyDown('Tab', this.gridSupport.helper.getAfterGridNode());
     equal(typeof this.handledLocation.columnId, 'undefined');
   });
 

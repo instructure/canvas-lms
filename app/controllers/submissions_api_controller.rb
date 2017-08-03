@@ -155,7 +155,7 @@
 #         },
 #         "seconds_late": {
 #           "description": "The amount of time, in seconds, that an submission is late by.",
-#           "example": 300.2,
+#           "example": 300,
 #           "type": "number"
 #         },
 #         "workflow_state": {
@@ -375,12 +375,12 @@ class SubmissionsApiController < ApplicationController
           where("users.id" => student_ids)
 
       submissions_scope = if requested_assignment_ids.present?
-                      Submission.where(
+                      Submission.active.where(
                         :user_id => student_ids,
                         :assignment_id => assignments
                       )
                     else
-                      Submission.joins(:assignment).where(
+                      Submission.active.joins(:assignment).where(
                         :user_id => student_ids,
                         "assignments.context_type" => @context.class.name,
                         "assignments.context_id" => @context.id
@@ -589,6 +589,9 @@ class SubmissionsApiController < ApplicationController
   # @argument submission[late_policy_status] [String]
   #   Sets the late policy status to either "late", "missing", "none", or null.
   #
+  # @argument submission[seconds_late_override] [Integer]
+  #   Sets the seconds late if late policy status is "late"
+  #
   # @argument rubric_assessment [RubricAssessment]
   #   Assign a rubric assessment to this assignment submission. The
   #   sub-parameters here depend on the rubric for the assignment. The general
@@ -649,6 +652,9 @@ class SubmissionsApiController < ApplicationController
         if params[:submission].key?(:late_policy_status)
           submission[:late_policy_status] = params[:submission].delete(:late_policy_status)
         end
+        if params[:submission].key?(:seconds_late_override)
+          submission[:seconds_late_override] = params[:submission].delete(:seconds_late_override)
+        end
         submission[:provisional] = value_to_boolean(params[:submission][:provisional])
         submission[:final] = value_to_boolean(params[:submission][:final]) && @context.grants_right?(@current_user, :moderate_grades)
         if params[:submission][:submission_type] == 'basic_lti_launch' && (!@submission.has_submission? || @submission.submission_type == 'basic_lti_launch')
@@ -670,6 +676,9 @@ class SubmissionsApiController < ApplicationController
       end
       if submission.key?(:late_policy_status)
         @submission.late_policy_status = submission[:late_policy_status]
+        if @submission.late_policy_status == 'late' && submission[:seconds_late_override].present?
+          @submission.seconds_late_override = submission[:seconds_late_override]
+        end
         @submission.save!
       end
 
@@ -956,14 +965,9 @@ class SubmissionsApiController < ApplicationController
 
       graded = @context.submissions.in_workflow_state('graded').where(user_id: student_ids, assignment_id: @assignment).count
       ungraded = @context.submissions.
-        ungraded.having_submission.
+        needs_grading.having_submission.
         where(user_id: student_ids, assignment_id: @assignment, excused: [nil, false]).
         count
-      pending_quizzes = @context.submissions.
-        in_workflow_state('pending_review').having_submission.
-        where(user_id: student_ids, assignment_id: @assignment, excused: [nil, false]).
-        count
-      ungraded += pending_quizzes
       not_submitted = student_ids.count - graded - ungraded
 
       render json: {graded: graded, ungraded: ungraded, not_submitted: not_submitted}

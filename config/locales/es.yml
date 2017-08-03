@@ -153,7 +153,7 @@ es:
     account_required: "debe ser autenticado por LDAP"
     index: 
       delete_auth_confirmation: "¿Está seguro? Los usuarios pueden no ser capaces de ingresar si esto se elimina."
-      delete_auth_link: "Eliminar toda autentificación"
+      delete_auth_link: "Eliminar autentificación"
       ip_address_list_description: "Si está usando un servicio de autentificación que requiere que los servidores de Canvas contacten a sus servidores directamente, como LDAP, necesitará asegurarse que sus servidores pueden aceptar conexiones de estas direcciones IP:"
       no_auth_type_description: "Esta cuenta actualmente no se integra con un proveedor de identidad."
       page_title: "Configuraciones de autentificación"
@@ -736,6 +736,11 @@ es:
             start: 
               parameters: 
                 header: "Comienza en:"
+    embry_riddle_activity_report_csv_parameters: 
+      account_reports: 
+        embry_riddle: 
+          outcome: 
+            text: "Patrón(es) SIS del curso (lista separada por comas):"
     engagement_report_csv_parameters: 
       account_reports: 
         bryan_engagement: 
@@ -1739,6 +1744,9 @@ es:
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "App Center aparecerá en la pestaña \"Apps\" en la página de configuración de un curso o una cuenta. La URL que aparece más abajo deberá dirigir a un punto del App Center válido (por ejemplo, %{url}, asegúrese de omitir la barra final."
   app_placements_6d877225: "Colocaciones de la aplicación"
   app_reregistration_87cc8817: "Aplicación del proceso de registro"
+  app_was_installed_by_admin_and_is_locked_3bee4d39: "%{app} fue instalada por el administrador y está bloqueada"
+  app_was_installed_by_the_master_course_and_is_lock_dbeb24a6: "%{app} fue instalada por el curso principal y está bloqueada"
+  app_was_installed_by_the_master_course_e55ba1d7: "%{app} fue instalada por el curso principal"
   appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "Agrega un número al final de cada título del evento (por ejemplo, Evento 1, Evento 2, etc.)"
   appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "Agrega un número al final de cada título del evento (por ejemplo, Evento 1, Evento 2, etc.)\" para=\"append_iterator"
   application: 
@@ -1812,6 +1820,9 @@ es:
   archive_3f794d7e: Archivo
   archive_selected_d64506ca: "Archivo seleccionado"
   are_you_sure_26795d3c: "¿Está seguro?"
+  are_you_sure_you_want_to_archive_your_copies_of_th_7d219afe: 
+    one: "¿Está seguro de que desea archivar su copia de esta conversación?"
+    other: "¿Está seguro de que desea archivar sus copias de estas conversaciones?"
   are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496: "¿Está seguro que desea cancelar la operación? No se guardarán los cambios que realizó."
   are_you_sure_you_want_to_cancel_your_appointment_w_dbbd27eb: "¿Está seguro que desea cancelar su cita con %{name}?"
   are_you_sure_you_want_to_copy_to_the_final_mark_th_28a7e7b3: "¿Está seguro que desea pegarlo a la marca final? Esto sobrescribirá la marca existente."
@@ -1826,6 +1837,9 @@ es:
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: "¿Está seguro que desea eliminar este conjunto de período de calificaciones?"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "¿Está seguro que desea eliminar este período de calificaciones?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "¿Está seguro que desea eliminar este esquema de calificaciones?"
+  are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
+    one: "¿Está seguro de que desea eliminar su copia de esta conversación? Esta acción no se puede deshacer."
+    other: "¿Está seguro de que desea eliminar su copia de estas conversaciones? Esta acción no se puede deshacer."
   are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: "¿Está seguro que desea eliminar su reserva para este evento?"
   are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: "¿Está seguro de que desea desactivar la sincronización con %{sisName} para todas las tareas?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "¿Está seguro que desea hacer esto? No puede ser deshecho y anulará las calificaciones existentes en el libro de calificaciones."
@@ -1838,6 +1852,9 @@ es:
   are_you_sure_you_want_to_resync_these_grades_to_th_e509cb9e: "¿Está seguro de que desea volver a sincronizar estas calificaciones en el sistema de información de alumnos?"
   are_you_sure_you_want_to_submit_this_comment_fbe76ba6: "¿Está seguro que desea presentar este comentario?"
   are_you_sure_you_want_to_sync_these_grades_to_the__ca3c28a4: "¿Está seguro de que desea sincronizar estas calificaciones en el sistema de información de alumnos? Solo debe hacerlo si todas sus calificaciones son definitivas."
+  are_you_sure_you_want_to_unarchive_these_conversat_ec7d7e8d: 
+    one: "¿Está seguro de que desea desarchivar esta conversación?"
+    other: "¿Está seguro de que desea desarchivar estas conversaciones?"
   argentina_3257a200: Argentina
   argentina_54_375d6af4: "Argentina (+54)"
   arrange_by_34a545de: "Organizado por"
@@ -3397,6 +3414,7 @@ es:
   click_here_it_s_free_eeccb9cb: "Haga clic aquí, ¡es gratis!"
   click_here_on_the_calendar_link_c9965631: "Haga clic aquí en el enlace del *Calendario*"
   click_here_to_download_size_of_file_74443988: "Haga clic aquí para descargar %{size_of_file}"
+  click_here_to_log_in_again_4a6055de: "Haga clic aquí para volver a iniciar sesión"
   click_here_to_see_the_file_79e2b366: "Haga clic aquí para ver el archivo."
   click_here_to_view_ec8cb2fd: "haga clic aquí para ver"
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Hacer clic en la instantánea para volver su versión de prueba al momento en que se tomó la instantánea. Nota: se perderá todo el trabajo que haya realizado desde que se tomó la instantánea y no podrá deshacerse."
@@ -3630,7 +3648,7 @@ es:
       labels: 
         password: Contraseña
         subscribe_to_emails: "Quiero recibir información, noticias y ayuda de Instructure"
-        time_zone: "Huso horario"
+        time_zone: "Zona horaria"
         unique_id: "Iniciar sesión"
       page_title: "Registrar %{email}"
       titles: 
@@ -5308,7 +5326,7 @@ es:
         sis_source_id: "ID de SIS"
         start_at: Comienza
         storage_quota: "Almacenamiento de archivo"
-        time_zone: "Huso horario"
+        time_zone: "Zona horaria"
         turnitin_comments: "Comentarios en Turnitin"
       language_overrides_preferences: "Esto sobrescribirá cualquier preferencias de usuarios/sistemas. Esto solo se recomienda para cursos en otro idioma que no sea el Inglés"
       links: 
@@ -6012,6 +6030,7 @@ es:
     edit_key: "Editar esta clave"
     identifier: "ID: %{id}"
     redirect_uri: "URI: %{redirect_uri}"
+  developer_key_921ddbae: "Clave del desarrollador"
   developer_key_form: 
     cancel: Cancelar
     icon_url: "URL del icono:"
@@ -7439,6 +7458,10 @@ es:
   filter_replies_by_unread_342e8e90: "Filtrar respuestas por no leídas"
   filter_replies_by_unread_caf870ea: "filtrar respuestas por no leídas"
   filters_92f2776f: Filtros
+  final_grade_4d7f6545: "Calificación final"
+  final_grade_6938dca8: "Calificación final:"
+  final_grade_finalgrade_138d9e07: "Calificación final: %{finalGrade}"
+  final_grade_finalgrade_408580bb: "Calificación final: *%{finalGrade}*"
   final_grade_info_2aa35d25: "Información de la calificación final"
   final_grade_score_fe69a301: "Calificación final: %{score}"
   final_letter_grade_80dccec1: "Calificación final con letras"
@@ -7562,13 +7585,16 @@ es:
   gpa_scale_a6d1cdea: "Escala GPA"
   grade_10d1e5a1: "%{grade}"
   grade_9c6f076d: Calificación
+  grade_a91e433e: "Calificación:"
   grade_assignment_7c1abc11: "Calificar %{assignment}"
+  grade_changes_cb5a57a8: "Cambios en la calificación"
   grade_display_warning_dialog: 
     grade_display_warning: 
       checkbox: "No mostrar de nuevo para este curso"
       warning: Aviso
   grade_distribution_e52c9256: "Distribución de las calificaciones"
   grade_export_title: "Exportación de calificaciones"
+  grade_for_name_b9df168a: "Calificación para: %{name}"
   grade_high_to_low_1cea0381: "Calificación: de más alta a más baja"
   grade_history_9c51ad49: "Historial de calificaciones..."
   grade_history_ccc09fde: "Historial de calificaciones"
@@ -7722,7 +7748,7 @@ es:
       switch_to_points: "Cambiar a puntos"
     turnitin: 
       error_message: "Ocurrió un error al presentar a turnitin. Intente presentar de nuevo el archivo antes de contactar al servicio de asistencia técnica"
-      info_message: "Este archivo todavía está siendo procesado por turnitin. Vuelva más tarde para comprobar la calificación."
+      info_message: "La herramienta de detección de plagio asociada con la tarea está aún procesando el archivo. Vuelva a intentarlo más tarde para poder ver la calificación."
       resubmitting: "ePresentando nuevamente..."
       tooltip: 
         error: "Calificación de similitud: consultar los detalles del error de presentación"
@@ -8216,9 +8242,9 @@ es:
       one: "El puntaje no incluye a %{groups} porque no tiene puntos posibles"
       other: "El puntaje no incluye a %{groups} porque no tienen puntos posibles"
     keyboard_assignment_desc: "Ir a la página de detalles de tareas actual"
-    keyboard_close_menu: "Cerrar el menú de tareas activo actualmente"
+    keyboard_close_menu: "Cerrar el menú activo actualmente"
     keyboard_comment_desc: "Comentar la presentación activa"
-    keyboard_menu_desc: "Abrir el menú para la tarea de la columna activa"
+    keyboard_menu_desc: "Abrir el menú para la columna activa"
     keyboard_sort_desc: "Ordenar la cuadrícula en la columna activa actual"
     keyboard_tooltip_desc: "Mostrar el tipo de presentación dela presentación activa"
     keycodes: 
@@ -9252,6 +9278,12 @@ es:
   last_used_f9457313: "Usado por última vez:"
   last_user_access_title: "Acceso del último usuario"
   late_2be42b88: Atrasado
+  late_8bd684b6: tarde
+  late_bd436902: TARDE
+  late_penalty_817fff4e: "Sanción por presentación tardía:"
+  late_penalty_9c312b22: "Sanción por presentación tardía"
+  late_penalty_pointsdeducted_7033a095: "Sanción por presentación tardía: %{pointsDeducted}"
+  late_penalty_pointsdeducted_dac023ff: "Sanción por presentación tardía: *%{pointsDeducted}*"
   late_percent_b91d01b3: "Atrasado: %{percent}"
   late_policies_42bac80: "Últimas políticas"
   late_policies_fd5dced6: "Políticas por retraso"
@@ -9355,6 +9387,7 @@ es:
         quizzes: Evaluaciones
         rubrics: Rúbricas
         syllabus_body: "Parte principal del programa de estudios"
+        tool_profiles: "Perfiles de la herramienta"
         wikis: "Páginas wiki"
     cc: 
       standard: 
@@ -9465,9 +9498,11 @@ es:
     other: "Carga de cursos completada: %{count} cursos se encontraron"
   loading_courses_started_6e6d742c: "Carga de cursos iniciada"
   loading_data_ecd89ba: "Cargando datos..."
+  loading_graders_f6a76142: "Cargando calificadores"
   loading_mastery_paths_c558a766: "Cargando los caminos del dominio..."
   loading_more_results_def6df65: "Cargando más resultados..."
   loading_results_spinner_73ef739c: "Cargando la ruleta de resultados"
+  loading_students_30b71301: "Cargando alumnos"
   loading_sync_history_9f342cbf: "Cargando historial de sincronización"
   loading_unsynced_changes_b5d7b202: "Cargando cambios no sincronizados"
   loading_unsynched_changes_688434f2: "Cargando cambios no sincronizados"
@@ -9497,6 +9532,7 @@ es:
   log_on_url_fc166e4c: "URL de ingreso"
   log_out_379ba28a: "Cerrar sesión"
   log_out_url_2605c2c1: "URL de salida"
+  logged_out_724b3717: "Sesión cerrada"
   logged_out_user: "Usuario desconectado %{user_counter}"
   login: 
     canvas: 
@@ -9554,6 +9590,8 @@ es:
         log_out: "¿Está seguro que desea salir de Canvas?"
       log_out: "Cerrar sesión"
       page_title: "Cerrar sesión"
+    logout_landing: 
+      page_title: "Sesión cerrada"
     otp: 
       errors: 
         invalid_otp: "Código de verificación inválido. Por favor, inténtelo de nuevo"
@@ -11518,6 +11556,9 @@ es:
         subject: "Grabación de la conferencia en línea lista: %{name} "
       twitter: 
         tweet: "Alerta de Canvas-Grabación lista: %{title}, %{name}"
+  messages_deleted_8f781481: 
+    one: "¡Mensaje eliminado!"
+    other: "¡Mensajes eliminados!"
   mexico_52_60d635c7: "México (+52)"
   mexico_b2d7a271: México
   mgp_grade_export_d29b471f: "Exportación de calificaciones MGP"
@@ -11544,6 +11585,7 @@ es:
     webct: 
       course_not_found: "No se ha encontrado el curso de Blackboard."
     wiki_page_type: "Página wiki"
+  migration_in_progress_6f0ed4f9: "Migración en progreso"
   migration_issues: 
     errors: 
       valid_workflow_state: "Debe enviar un estado de flujo de trabajo válido"
@@ -11555,6 +11597,8 @@ es:
   minutes_4aee5a41: Minutos
   minutes_per_slot_5b7169e5: "Minutos por intervalo"
   missing_1a256b3b: Faltante
+  missing_d59852a7: faltante
+  missing_eaddacbd: FALTANTE
   missing_percent_94534638: "Falta: %{percent}"
   missing_policies_4f195e0b: "Políticas faltantes"
   missing_required_values_missing_values_f3be2ff8: "Faltan valores requeridos: %{missing_values}"
@@ -11978,6 +12022,7 @@ es:
   no_grade_assigned_90e531f5: "No se ha asignado una calificación."
   no_grade_for_assignment_97c9bc75: "No hay calificación para %{assignment}"
   no_graded_submissions_e40c957a: "No hay presentaciones calificadas"
+  no_graders_with_that_name_found_d8204d90: "No se encontraron calificadores con ese nombre"
   no_grading_periods_configured_for_this_term_ca22393e: "no hay períodos de calificación configurados para este término"
   no_grading_periods_set_up_a20a8819: "No hay períodos de calificación configurados"
   no_grading_schemes_to_display_8b0e92e7: "No hay ningún esquema de calificaciones que mostrar"
@@ -11997,6 +12042,7 @@ es:
   no_students_dd8de9f0: "No hay alumnos"
   no_students_have_taken_the_quiz_yet_e667644b: "Ningún alumno ha realizado el cuestionario aún"
   no_students_have_taken_the_survey_yet_d378cd35: "Ningún alumno ha realizado la encuesta aún"
+  no_students_with_that_name_found_f6004da2: "No se encontraron alumnos con ese nombre"
   no_submission_for_assignment_a9cb6fe2: "No hay entrega de %{assignment}"
   no_tls_618add1a: "Sin TLS"
   no_unassigned_terms_deb7b76b: "No hay términos no asignados"
@@ -12702,6 +12748,7 @@ es:
     errors: 
       delete_reminder_failed: "La eliminación ha fallado"
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "Las revisiones por pares no pueden ser habilitadas para tareas moderadas"
+  penalty_adjusted_707df573: "*%{penalty}* **%{adjusted}**"
   pending_3e506a5b: Pendiente
   pending_message_2d9a8796: "Pendiente: %{message}"
   people_b4ebb13c: Personas
@@ -13202,6 +13249,7 @@ es:
   points_out_of_total_24f61148: "*%{points}* de **%{total}**"
   points_points_b6b422e2: "Puntos: %{points}"
   points_possible_1c0b3445: "Puntos posibles"
+  points_possible_44cb4190: "/ %{points_possible}"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "La cantidad de puntos posible debe ser 0 o más para el tipo de clasificación seleccionada"
   points_possible_points_fda3b111: "%{points_possible} Puntos"
   points_pts_e5596bf7: "%{points} ptos."
@@ -13418,7 +13466,7 @@ es:
         show_user_services: "Permitir que los miembros de los cursos y grupos en los que participo vean los servicios enlazados a mi perfil."
         skype_name: "Nombre de Skype"
         sortable_name: "Nombre clasificable"
-        time_zone: "Huso horario"
+        time_zone: "Zona horaria"
         token: Autentificador
         token_application: Aplicación
         token_created: Creado
@@ -13756,7 +13804,7 @@ es:
       labels: 
         title: "Nombre del banco"
       page_title: "Banco de preguntas"
-      see_bookmarked_banks: "Ver mis bancos de preguntas guardadas"
+      see_bookmarked_banks: "Ver bancos favoritos"
       user_question_banks: "Bancos de preguntas del usuario"
     question_bank: 
       bookmark_bank: "Marca como favorito este Grupo de Preguntas"
@@ -15284,6 +15332,7 @@ es:
   reviewer_b993ce28: Evaluador
   reviewers_successfully_added_bd4b629a: "Evaluador agregado exitosamente"
   rich_content_editor_2708ef21: "Editor de contenido enriquecido"
+  rich_content_editor_sidebar_enhancements_8bd945d3: "Mejoras en la barra lateral del editor de contenido enriquecido"
   right_sidebar_logo_5483dc0a: "Logotipo de la barra lateral derecha"
   role: 
     duplicate_role: "Ya existe una función con este nombre"
@@ -15419,6 +15468,7 @@ es:
     course_files: "Archivos del curso"
     group_files: "Archivos del grupo"
     my_files: "Mis archivos"
+  root_account_3fb3aacf: root_account
   root_accounts_cc035dcf: "Cuentas de nivel superior"
   roster: 
     delete_confirm: "¿Está seguro que quiere eliminar este usuario?"
@@ -15488,6 +15538,7 @@ es:
         are_you_sure_delete: "¿Seguro que quiere borrar esta rúbrica? Cualquier sitio usando esta rúbrica todavía tendrá acceso a ella, pero nadie más podrá usarla."
         are_you_sure_remove: "¿Seguro que quiere remover esta rúbrica de su lista?"
       remove_rubric: "Eliminar esta rúbrica de mi lista"
+  russia_7_87bc99d5: "Rusia (+7)"
   salesforce_account_id_eb5c78ad: "ID de la cuenta de Salesforce"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce tiene un host de acceso diferente para las cuentas de sandbox del de las cuentas de producción, por lo que si usted está utilizando un sandbox de Salesforce y no marca esta casilla no podrá autenticar (y esto funciona a la inversa también, si usted tiene una cuenta de producción y usted MARCA esta casilla no autenticará)"
   salesforce_ticketing_webtocase_connector_80f75716: "Conector de WebToCase de emisión de boletos de Salesforce"
@@ -17473,6 +17524,7 @@ es:
   there_was_an_error_uploading_the_image_932fc4ce: "Hubo un error al subir la imagen"
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "Ha ocurrido un error al enviar su búsqueda; por favor intente una búsqueda diferente"
   there_was_an_unexpected_problem_with_the_sync_be079a67: "Se produjo un problema inesperado con la sincronización"
+  there_was_an_unknown_error_registering_the_tool_b9a29954: "Se produjo un error desconocido al registrar la herramienta"
   there_were_errors_with_the_form_errors_ab5b559a: "Se han producido errores en el formulario: %{errors}"
   there_were_several_possible_matches_with_the_impor_ad58bcd0: "Hubo varias coincidencias posibles con la importación. Por favor, resuélvalas a continuación."
   these_backup_codes_can_be_used_if_your_multi_facto_ca30a3df: "Estos códigos de respaldo pueden usarse si el dispositivo de autentificación de múltiples factores no está disponible. Imprímalos y consérvelos en un lugar seguro, como su monedero."
@@ -17886,6 +17938,7 @@ es:
     originality_report_visible_immediately: Inmediatamente
   turnitin_similarity_score_more_information_e2571be8: "Calificación de similitud Turnitin: más información"
   twitter_fcef6b54: Twitter
+  type_a_few_letters_to_start_searching_3334657b: "Ingrese algunas letras para comenzar la búsqueda"
   type_c8106334: Tipo
   type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: "'%{type}' no es un tipo de imagen válida (intente con jpg, png, o gif)"
   type_of_change_1cb24a0e: "Tipo de cambio"
@@ -18043,6 +18096,7 @@ es:
   use_mathman_to_convert_latex_to_svg_3f61c9b: "¿Usar MathMan to convert LaTeX a SVG?"
   use_new_folder_tree_in_files_bc0ea09f: "Use el árbol de carpeta nuevo en archivos"
   use_new_folder_tree_in_files_eb5a451b: "Use el árbol de carpeta nuevo en Archivos"
+  use_new_rich_content_editor_with_enhanced_sidebar__8e0bfedd: "Utilice el nuevo editor de contenido enriquecido con barra lateral mejorada en todas partes"
   use_remote_service_for_notifications_9fe667c6: "Usar servicio remoto para las notificaciones"
   use_remote_version_of_rich_content_editor_52f7fc4b: "Usar la versión remota del editor de contenido enriquecido"
   use_remote_version_of_rich_content_editor_and_side_a058a664: "Usar la versión remota del editor de contenido enriquecido Y la barra lateral"
@@ -18400,7 +18454,7 @@ es:
         profile_picture: "Imagen de perfil"
         short_name: "Mostrar nombre"
         sortable_name: "Nombre clasificable"
-        time_zone: "Huso horario"
+        time_zone: "Zona horaria"
       merge_with_another_user: "Unirse con otro usuario"
       none: Ninguno
       remove_avatar: "Eliminar el avatar"
@@ -18805,6 +18859,7 @@ es:
   you_are_currently_masquerading_as_user_name_f4a00ade: "Actualmente está haciéndose pasar por %{user_name}"
   you_are_here_54075d8c: "Usted está aquí:"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "Ha iniciado sesión en %{institution1} usando sus credenciales de %{institution2}"
+  you_are_logged_out_of_canvas_8b5fc59a: "Se ha cerrado su sesión en Canvas."
   you_are_not_authorized_to_disable_the_sync_to_name_d283c3e0: "No tiene autorización para desactivar la opción Sincronizar con %{name}."
   you_are_not_authorized_to_disable_the_sync_to_sisn_54aebeb0: "No tiene autorización para desactivar la opción Sincronizar con %{sisName}."
   you_are_not_enrolled_in_any_courses_a5c63286: "No está inscrito en ningún curso."

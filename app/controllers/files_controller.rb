@@ -394,7 +394,7 @@ class FilesController < ApplicationController
     # if the attachment is part of a submisison, its 'context' will be the student that submmited the assignment.  so if  @current_user is a
     # teacher authorized_action(@attachment, @current_user, :download) will be false, we need to actually check if they have perms to see the
     # submission.
-    @submission = Submission.find(params[:submission_id]) if params[:submission_id]
+    @submission = Submission.active.find(params[:submission_id]) if params[:submission_id]
     # verify that the requested attachment belongs to the submission
     return render_unauthorized_action if @submission && !@submission.includes_attachment?(@attachment)
     if @submission ? authorized_action(@submission, @current_user, :read) : authorized_action(@attachment, @current_user, :download)
@@ -711,7 +711,7 @@ class FilesController < ApplicationController
         @folder ||= Folder.unfiled_folder(@context)
         @attachment.folder_id = @folder.id
       end
-      @attachment.content_type = Attachment.mimetype(@attachment.filename)
+      @attachment.content_type = params[:attachment][:content_type].presence || Attachment.mimetype(@attachment.filename)
       @attachment.set_publish_state_for_usage_rights
       @attachment.save!
 
@@ -1029,16 +1029,19 @@ class FilesController < ApplicationController
   # @API Delete file
   # Remove the specified file
   #
+  # @argument replace [boolean]
+  #   This action is irreversible.
+  #   If replace is set to true the file contents will be replaced with a
+  #   generic "file has been removed" file. This also destroys any previews
+  #   that have been generated for the file.
+  #   Must have manage files and become other users permissions
+  #
+  # @example_request
+  #
   #   curl -X DELETE 'https://<canvas>/api/v1/files/<file_id>' \
   #        -H 'Authorization: Bearer <token>'
   #
-  #  @argument replace [boolean]
-  #    This action is irreversible.
-  #    If replace is set to true the file contents will be replaced with a
-  #    generic "file has been removed" file. This also destroys any previews
-  #    that have been generated for the file.
-  #    Must have manage files and become other users permissions
-  #
+  # @returns File
   def destroy
     @attachment = Attachment.find(params[:id])
     if value_to_boolean(params[:replace])

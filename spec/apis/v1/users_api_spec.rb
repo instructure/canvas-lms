@@ -1949,5 +1949,11 @@ describe "Users API", type: :request do
       json = api_call(:get, @path, @params)
       expect(json.map {|i| i["id"]}).not_to be_include a.id
     end
+
+    it "should not show unpublished assignments" do
+      a = @course.assignments.create!(due_at: 2.days.ago, workflow_state: 'unpublished', submission_types: "online_text_entry")
+      json = api_call(:get, @path, @params)
+      expect(json.map {|i| i["id"]}).not_to be_include a.id
+    end
   end
 end

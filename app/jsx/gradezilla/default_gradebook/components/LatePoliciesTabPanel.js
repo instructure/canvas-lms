@@ -228,8 +228,9 @@ class LatePoliciesTabPanel extends React.Component {
           <Alert
             variant="warning"
             closeButtonLabel={I18n.t('Close')}
-            isDismissable margin="small"
+            dismissable
             onClose={this.closeAlert}
+            margin="small"
           >
             {I18n.t('Changing your policy now will affect previously graded submissions.')}
           </Alert>

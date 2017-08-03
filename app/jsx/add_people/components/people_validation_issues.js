@@ -93,7 +93,7 @@ import Alert from 'instructure-ui/lib/components/Alert'
       }
       return (
         <div className="peopleValidationissues__duplicates">
-          <Alert variant="warning" isDismissable={false}>
+          <Alert variant="warning" dismissable={false}>
             {I18n.t('There were several possible matches with the import. Please resolve them below.')}
           </Alert>
           {duplicateAddresses.map((address) => {
@@ -124,7 +124,7 @@ import Alert from 'instructure-ui/lib/components/Alert'
 
       return (
         <div className="peoplevalidationissues__missing">
-          <Alert variant="warning" isDismissable={false}>{alertText}</Alert>
+          <Alert variant="warning" dismissable={false}>{alertText}</Alert>
           <MissingPeopleSection
             inviteUsersURL={this.props.inviteUsersURL}
             missing={this.props.missing}

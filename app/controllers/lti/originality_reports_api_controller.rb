@@ -238,8 +238,7 @@ module Lti
     end
 
     def tool_proxy_associated?
-      mh = assignment.tool_settings_tool
-      mh.respond_to?(:resource_handler) && mh.resource_handler.tool_proxy.guid == access_token.sub
+      PermissionChecker.authorized_lti2_action?(tool: tool_proxy, context: assignment)
     end
 
     def plagiarism_feature_flag_enabled
@@ -268,7 +267,7 @@ module Lti
     end
 
     def submission
-      @_submission ||= Submission.find(params[:submission_id])
+      @_submission ||= Submission.active.find(params[:submission_id])
     end
 
     def attachment

@@ -42,7 +42,6 @@
   }
   .question_bank .header .links {
     float: right;
-    opacity: 0.5;
   }
   .question_bank:hover .header .links {
     opacity: 1.0;
@@ -59,7 +58,7 @@
     <a href="#" class="add_bank_link btn button-sidebar-wide"><i class="icon-add"></i> <%= t 'add_bank', 'Add Question Bank' %></a>
   <% end %>
   <% if @current_user && @context != @current_user %>
-    <a href="<%= context_url(@current_user, :context_question_banks_url) %>" class="btn button-sidebar-wide see_bookmarked_banks"><i class="icon-bookmark" role="presentation"></i> <%= t 'see_bookmarked_banks', 'See My Bookmarked Banks' %></a>
+    <a href="<%= context_url(@current_user, :context_question_banks_url) %>" class="btn button-sidebar-wide see_bookmarked_banks"><i class="icon-bookmark" role="presentation"></i> <%= t 'see_bookmarked_banks', 'View Bookmarked Banks' %></a>
   <% end %>
 <% end %>
 

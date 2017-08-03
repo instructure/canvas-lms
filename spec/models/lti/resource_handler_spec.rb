@@ -65,20 +65,20 @@ module Lti
       before { resource_handler.update_attributes(tool_proxy: tool_proxy) }
 
       it 'returns resource handlers with specified product family and context' do
-        resource_handlers = ResourceHandler.by_product_family(product_family, tool_proxy.context)
+        resource_handlers = ResourceHandler.by_product_family([product_family], tool_proxy.context)
         expect(resource_handlers).to include resource_handler
       end
 
       it 'does not return resource handlers with different product family' do
         pf = product_family.dup
         pf.update_attributes(product_code: SecureRandom.uuid)
-        resource_handlers = ResourceHandler.by_product_family(pf, tool_proxy.context)
+        resource_handlers = ResourceHandler.by_product_family([pf], tool_proxy.context)
         expect(resource_handlers).not_to include resource_handler
       end
 
       it 'does not return resource handlers with different context' do
         a = Account.create!
-        resource_handlers = ResourceHandler.by_product_family(product_family, a)
+        resource_handlers = ResourceHandler.by_product_family([product_family], a)
         expect(resource_handlers).not_to include resource_handler
       end
     end
@@ -93,6 +93,26 @@ module Lti
       end
 
       it 'finds resource handlers specified in link id JWT' do
+        resource_handlers = ResourceHandler.by_resource_codes(vendor_code: jwt_body[:vendor_code],
+                                                              product_code: jwt_body[:product_code],
+                                                              resource_type_code: jwt_body[:resource_type_code],
+                                                              context: tool_proxy.context)
+        expect(resource_handlers).to match_array([resource_handler])
+      end
+
+      it 'considers all matching product families, not just the first' do
+        k = DeveloperKey.new
+        pf = Lti::ProductFamily.create!(
+          product_code: product_family.product_code,
+          vendor_code: product_family.vendor_code,
+          vendor_name: 'test',
+          root_account: account,
+          developer_key: k
+        )
+
+        tool_proxy.product_family = pf
+        tool_proxy.save!
+
         resource_handlers = ResourceHandler.by_resource_codes(vendor_code: jwt_body[:vendor_code],
                                                               product_code: jwt_body[:product_code],
                                                               resource_type_code: jwt_body[:resource_type_code],

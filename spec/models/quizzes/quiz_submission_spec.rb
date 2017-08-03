@@ -1543,7 +1543,7 @@ describe Quizzes::QuizSubmission do
           finished_at: Time.zone.now, user: @user, quiz: quiz, workflow_state: :complete
         )
 
-        expect(qs.submission.seconds_late).to be_zero
+        expect(qs.submission.seconds_late).to be 0
       end
     end
 
@@ -1554,8 +1554,8 @@ describe Quizzes::QuizSubmission do
           finished_at: Time.zone.now, user: @user, quiz: quiz, workflow_state: :complete
         )
 
-        expected_seconds_late = (Time.zone.now - 60.seconds - 5.minutes.ago.change(sec: 0))
-        expect(qs.submission.seconds_late).to eq(expected_seconds_late)
+        expected_seconds_late = (Time.zone.now - 60.seconds - 5.minutes.ago.change(sec: 0)).to_i
+        expect(qs.submission.seconds_late).to eql(expected_seconds_late)
       end
     end
   end

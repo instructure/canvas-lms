@@ -95,13 +95,13 @@ import Toolbar from 'jsx/files/Toolbar'
         </header>
         <div className='ic-app-nav-toggle-and-crumbs ic-app-nav-toggle-and-crumbs--files no-print'>
           <button
-            className='Button Button--link Button--small ic-app-course-nav-toggle'
+            className='Button Button--link ic-app-course-nav-toggle'
             type='button'
             id='courseMenuToggle'
             title={I18n.t("Show and hide courses menu")}
             aria-hidden={true}
           >
-            <i className='icon-hamburger' />
+            <i className='icon-hamburger' aria-hidden='true' />
           </button>
           <div className='ic-app-crumbs'>
             <Breadcrumbs

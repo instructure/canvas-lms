@@ -33,17 +33,20 @@ module Lti
       message_handlers.by_message_types(message_type).first
     end
 
-    def self.by_product_family(product_family, context)
-      tool_proxies = ToolProxy.find_active_proxies_for_context(context)
-      tool_proxies = tool_proxies.where(product_family: product_family)
+    def self.by_product_family(product_families, context)
+      initial_tool_proxies = ToolProxy.find_active_proxies_for_context(context)
+      tool_proxies = []
+      product_families.each do |pf|
+        tool_proxies += initial_tool_proxies.where(product_family: pf)
+      end
       tool_proxies.map { |tp| tp.resources.to_a.flatten }.flatten
     end
 
 
     def self.by_resource_codes(vendor_code:, product_code:, resource_type_code:, context:)
-      product_family = ProductFamily.find_by(vendor_code: vendor_code,
+      product_families = ProductFamily.where(vendor_code: vendor_code,
                                              product_code: product_code)
-      possible_handlers = ResourceHandler.by_product_family(product_family, context)
+      possible_handlers = ResourceHandler.by_product_family(product_families, context)
       possible_handlers.select { |rh| rh.resource_type_code == resource_type_code}
     end
 

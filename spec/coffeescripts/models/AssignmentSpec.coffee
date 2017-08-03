@@ -807,3 +807,13 @@ define [
     assignment = new Assignment name: 'foo', frozen_attributes: []
     @stub assignment, "isQuizLTIAssignment", -> true
     equal assignment.canFreeze(), false
+
+  QUnit.module "Assignment#submissionTypesFrozen"
+
+  test "returns false if submission types are not in frozenAttributes", ->
+    assignment = new Assignment frozen_attributes: ['foo']
+    equal assignment.submissionTypesFrozen(), false
+
+  test "returns true if submission_types are in frozenAttributes", ->
+    assignment = new Assignment frozen_attributes: ['submission_types']
+    equal assignment.submissionTypesFrozen(), true
