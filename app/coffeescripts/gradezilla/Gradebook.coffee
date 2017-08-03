@@ -262,7 +262,6 @@ define [
       @courseContent.students = new StudentDatastore(@students, @studentViewStudents)
 
       @allAssignmentColumns = []
-      @aggregateColumns = []
 
       @gradebookGrid = {
         columns: {
@@ -1458,10 +1457,11 @@ define [
     setVisibleGridColumns: ->
       assignmentColumns = @filterAssignmentColumns(@allAssignmentColumns)
 
-      scrollableColumns = if @hideAggregateColumns()
-        assignmentColumns
-      else
-        assignmentColumns.concat(@aggregateColumns)
+      scrollableColumns = assignmentColumns
+      unless @hideAggregateColumns()
+        for assignmentGroupId of @assignmentGroups
+          scrollableColumns.push(@gradebookGrid.columns.definitions[@getAssignmentGroupColumnId(assignmentGroupId)])
+        scrollableColumns.push(@gradebookGrid.columns.definitions['total_grade'])
 
       if @gradebookColumnOrderSettings?.sortType
         scrollableColumns.sort @makeColumnSortFn(@getStoredSortOrder())
@@ -1620,11 +1620,9 @@ define [
 
       for id, assignmentGroup of @assignmentGroups
         assignmentGroupColumn = @buildAssignmentGroupColumn(assignmentGroup)
-        @aggregateColumns.push(assignmentGroupColumn)
         @gradebookGrid.columns.definitions[assignmentGroupColumn.id] = assignmentGroupColumn
 
       totalGradeColumn = @buildTotalGradeColumn()
-      @aggregateColumns.push(totalGradeColumn)
       @gradebookGrid.columns.definitions[totalGradeColumn.id] = totalGradeColumn
 
       @renderGridColor()

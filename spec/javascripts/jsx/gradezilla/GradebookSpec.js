@@ -3822,6 +3822,7 @@ QUnit.module('Gradebook Grid Events', function (hooks) {
     };
 
     this.gradebook = createGradebook();
+    sinon.stub(this.gradebook, 'setVisibleGridColumns');
     sinon.stub(this.gradebook, 'getVisibleGradeGridColumns').returns([]);
     sinon.stub(this.gradebook, 'onGridInit');
 
@@ -4945,48 +4946,48 @@ test('excludes "sort rows by" settings when sorting by total grade', function ()
   notOk('sort_rows_by_direction' in requestData.gradebook_settings, 'request excludes "sort_rows_by_direction"');
 });
 
-QUnit.module('Gradebook#updateColumnsAndRenderViewOptionsMenu');
+QUnit.module('Gradebook#updateColumnsAndRenderViewOptionsMenu', function (hooks) {
+  let gradebook;
 
-test('calls setColumns with getVisibleGradeGridColumns as arguments', function () {
-  const gradebook = createGradebook();
-  const setColumnsStub = this.stub();
-  gradebook.rows = [
-    { id: '3', sortable_name: 'Z Lastington', someProperty: false },
-    { id: '4', sortable_name: 'A Firstington', someProperty: true }
-  ];
-  gradebook.grid = { // stubs for slickgrid
-    setColumns: setColumnsStub,
-    getColumns: () => gradebook.rows
-  };
-  this.stub(gradebook, 'getVisibleGradeGridColumns').returns(gradebook.rows);
-  this.stub(gradebook, 'updateColumnHeaders');
-  this.stub(gradebook, 'renderViewOptionsMenu');
-  gradebook.updateColumnsAndRenderViewOptionsMenu();
+  hooks.beforeEach(function () {
+    gradebook = createGradebook();
 
-  strictEqual(setColumnsStub.callCount, 1);
-  strictEqual(setColumnsStub.firstCall.args[0], gradebook.rows);
-});
+    let gridColumns;
+    gradebook.grid = {
+      getColumns () {
+        return gridColumns;
+      },
 
-test('calls updateColumnHeaders', function () {
-  const gradebook = createGradebook();
-  gradebook.grid = { setColumns: () => {} };
-  this.stub(gradebook, 'getVisibleGradeGridColumns');
-  this.stub(gradebook, 'renderViewOptionsMenu');
-  const updateColumnHeadersStub = this.stub(gradebook, 'updateColumnHeaders');
-  gradebook.updateColumnsAndRenderViewOptionsMenu();
+      setColumns (columns) {
+        gridColumns = columns;
+      }
+    };
 
-  strictEqual(updateColumnHeadersStub.callCount, 1);
-});
+    sinon.stub(gradebook, 'setVisibleGridColumns');
+    sinon.stub(gradebook, 'getVisibleGradeGridColumns').returns([{ id: 'student' }, { id: 'total_grade' }]);
+    sinon.stub(gradebook, 'updateColumnHeaders');
+    sinon.stub(gradebook, 'renderViewOptionsMenu');
+  });
 
-test('calls renderViewOptionsMenu', function () {
-  const gradebook = createGradebook();
-  gradebook.grid = { setColumns: () => {} };
-  this.stub(gradebook, 'getVisibleGradeGridColumns');
-  this.stub(gradebook, 'updateColumnHeaders');
-  const renderViewOptionsMenuStub = this.stub(gradebook, 'renderViewOptionsMenu');
-  gradebook.updateColumnsAndRenderViewOptionsMenu();
+  test('sets the visible grid columns', function () {
+    gradebook.updateColumnsAndRenderViewOptionsMenu();
+    strictEqual(gradebook.setVisibleGridColumns.callCount, 1);
+  });
 
-  strictEqual(renderViewOptionsMenuStub.callCount, 1);
+  test('sets the columns on the grid', function () {
+    gradebook.updateColumnsAndRenderViewOptionsMenu();
+    deepEqual(gradebook.grid.getColumns().map(column => column.id), ['student', 'total_grade']);
+  });
+
+  test('calls updateColumnHeaders', function () {
+    gradebook.updateColumnsAndRenderViewOptionsMenu();
+    strictEqual(gradebook.updateColumnHeaders.callCount, 1);
+  });
+
+  test('calls renderViewOptionsMenu', function () {
+    gradebook.updateColumnsAndRenderViewOptionsMenu();
+    strictEqual(gradebook.renderViewOptionsMenu.callCount, 1);
+  });
 });
 
 QUnit.module('Gradebook React Header Component References', {
