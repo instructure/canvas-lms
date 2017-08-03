@@ -2562,7 +2562,7 @@ QUnit.module('Gradebook#setTeacherNotesHidden - showing teacher notes', {
     };
     this.stub(GradebookApi, 'updateTeacherNotesColumn').returns(this.promise);
     this.gradebook = createGradebook({ context_id: '1201', teacher_notes: { id: '2401', hidden: true } });
-    this.gradebook.customColumns = [{ id: '2401' }, { id: '2402' }];
+    this.gradebook.gradebookContent.customColumns = [{ id: '2401' }, { id: '2402' }];
     this.stub(this.gradebook, 'showNotesColumn');
     this.stub(this.gradebook, 'reorderCustomColumns');
     this.stub(this.gradebook, 'renderViewOptionsMenu');

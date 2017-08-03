@@ -234,6 +234,8 @@ define [
 
     setInitialState: =>
       @courseContent = getInitialCourseContent(@options)
+      @gradebookContent =
+        customColumns: []
       @gridDisplaySettings = getInitialGridDisplaySettings(@options.settings, @options.colors)
       @contentLoadStates = getInitialContentLoadStates()
       @headerComponentRefs = {}
@@ -251,7 +253,6 @@ define [
       @courseContent.students = new StudentDatastore(@students, @studentViewStudents)
 
       @parentColumns = []
-      @customColumns = []
       @allAssignmentColumns = []
       @aggregateColumns = []
       @rows = []
@@ -446,7 +447,7 @@ define [
       $('#gradebook-grid-wrapper').hide()
 
     gotCustomColumns: (columns) =>
-      @customColumns = columns
+      @gradebookContent.customColumns = columns
 
     gotCustomColumnDataChunk: (column, columnData) =>
       studentIds = []
@@ -613,14 +614,14 @@ define [
       # (this works because frozen columns and non-frozen columns are can't be
       # swapped)
       columns = @grid.getColumns()
-      currentIds = _(@customColumns).map (c) -> c.id
+      currentIds = _(@gradebookContent.customColumns).map (c) -> c.id
       reorderedIds = (m[1] for c in columns when m = c.id.match /^custom_col_(\d+)/)
 
       if !_.isEqual(reorderedIds, currentIds)
         @reorderCustomColumns(reorderedIds)
         .then =>
-          colsById = _(@customColumns).indexBy (c) -> c.id
-          @customColumns = _(reorderedIds).map (id) -> colsById[id]
+          colsById = _(@gradebookContent.customColumns).indexBy (c) -> c.id
+          @gradebookContent.customColumns = _(reorderedIds).map (id) -> colsById[id]
       else
         @storeCustomColumnOrder()
 
@@ -1444,7 +1445,7 @@ define [
       frozenColumns.concat(scrollableColumns)
 
     customColumnDefinitions: =>
-      @customColumns.map (c) =>
+      @gradebookContent.customColumns.map (c) =>
         columnId = @getCustomColumnId(c.id)
 
         id: columnId
@@ -1587,7 +1588,7 @@ define [
         syncColumnCellResize: true
         rowHeight: 35
         headerHeight: 38
-        numberOfColumnsToFreeze: @customColumns.length + 1
+        numberOfColumnsToFreeze: @gradebookContent.customColumns.length + 1
       }, @options)
 
       @grid = new Slick.Grid('#gradebook_grid', @rows, @getVisibleGradeGridColumns(), options)
@@ -1923,16 +1924,16 @@ define [
         DataLoader.getDataForColumn(@options.teacher_notes, @options.custom_column_data_url, {}, @gotCustomColumnDataChunk)
 
       @toggleNotesColumn =>
-        @customColumns.splice 0, 0, @options.teacher_notes
-        @grid.setNumberOfColumnsToFreeze @parentColumns.length + @customColumns.length
+        @gradebookContent.customColumns.splice 0, 0, @options.teacher_notes
+        @grid.setNumberOfColumnsToFreeze @parentColumns.length + @gradebookContent.customColumns.length
 
     hideNotesColumn: =>
       @toggleNotesColumn =>
-        for c, i in @customColumns
+        for c, i in @gradebookContent.customColumns
           if c.teacher_notes
-            @customColumns.splice i, 1
+            @gradebookContent.customColumns.splice i, 1
             break
-        @grid.setNumberOfColumnsToFreeze @parentColumns.length + @customColumns.length
+        @grid.setNumberOfColumnsToFreeze @parentColumns.length + @gradebookContent.customColumns.length
 
     hideAggregateColumns: ->
       return false unless @gradingPeriodSet?
@@ -2004,7 +2005,7 @@ define [
     ## Gradebook Bulk UI Update Methods
 
     updateFrozenColumnsAndRenderGrid: (newColumns) ->
-      @grid.setNumberOfColumnsToFreeze(@parentColumns.length + @customColumns.length)
+      @grid.setNumberOfColumnsToFreeze(@parentColumns.length + @gradebookContent.customColumns.length)
       @grid.setColumns(newColumns)
       @grid.invalidate()
       @updateColumnHeaders()
@@ -2341,7 +2342,7 @@ define [
       @assignmentGroups[assignmentGroupId]
 
     getCustomColumn: (customColumnId) =>
-      @customColumns.find((column) -> column.id == customColumnId)
+      @gradebookContent.customColumns.find((column) -> column.id == customColumnId)
 
     setContextModules: (contextModules) =>
       @courseContent.contextModules = contextModules
@@ -2476,7 +2477,7 @@ define [
             @hideNotesColumn()
           else
             @showNotesColumn()
-            @reorderCustomColumns(@customColumns.map (c) -> c.id)
+            @reorderCustomColumns(@gradebookContent.customColumns.map (c) -> c.id)
           @setTeacherNotesColumnUpdating(false)
           @renderViewOptionsMenu()
         .catch (error) =>

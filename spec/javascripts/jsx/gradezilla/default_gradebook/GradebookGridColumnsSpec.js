@@ -192,7 +192,7 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
         'assignment_group_2201', 'assignment_group_2202', 'total_grade'
       ]);
       reorderApiResponse.resolve();
-      deepEqual(gradebook.customColumns.map(column => column.id), ['2402', '2401']);
+      deepEqual(gradebook.gradebookContent.customColumns.map(column => column.id), ['2402', '2401']);
     });
 
     test('stores "custom" column order when assignment columns were reordered', function () {
