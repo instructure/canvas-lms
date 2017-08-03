@@ -816,6 +816,36 @@ describe MasterCourses::MasterMigration do
       expect(@copy_to2.discussion_topics.first).to be_present
     end
 
+    it "should link assignment rubrics on update" do
+      Timecop.freeze(10.minutes.ago) do
+        @copy_to = course_factory
+        @template.add_child_course!(@copy_to)
+        @assmt = @copy_from.assignments.create!
+      end
+      Timecop.freeze(8.minutes.ago) do
+        run_master_migration # copy the assignment
+      end
+
+      assignment_to = @copy_to.assignments.where(:migration_id => mig_id(@assmt)).first
+      expect(assignment_to).to be_present
+
+      @course = @copy_from
+      outcome_with_rubric
+      @ra = @rubric.associate_with(@assmt, @copy_from, purpose: 'grading')
+
+      run_master_migration # copy the rubric
+
+      rubric_to = @copy_to.rubrics.where(:migration_id => mig_id(@rubric)).first
+      expect(rubric_to).to be_present
+      expect(assignment_to.reload.rubric).to eq rubric_to
+
+      Timecop.freeze(5.minutes.from_now) do
+        @ra.destroy # unlink the rubric
+        run_master_migration
+      end
+      expect(assignment_to.reload.rubric).to eq nil
+    end
+
     it "sends notifications", priority: "2", test_id: 3211103 do
       n0 = Notification.create(:name => "Blueprint Sync Complete")
       n1 = Notification.create(:name => "Blueprint Content Added")
