@@ -21,8 +21,9 @@ require 'saml2'
 class AccountAuthorizationConfig::SAML::MetadataRefresher
   class << self
     def refresh_providers(shard_scope: Shard.current, providers: nil)
+      federations = AccountAuthorizationConfig::SAML::Federation.descendants.map { |federation| federation::URN }
       providers ||= AccountAuthorizationConfig::SAML.active.
-          where.not(metadata_uri: [nil, AccountAuthorizationConfig::SAML::InCommon::URN]).
+          where.not(metadata_uri: [nil] + federations).
           shard(shard_scope)
 
       providers.each do |provider|

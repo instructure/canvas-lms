@@ -18,18 +18,18 @@
 
 require 'saml2'
 
-class AccountAuthorizationConfig::SAML::InCommon < AccountAuthorizationConfig::SAML::Federation
-  URN = 'urn:mace:incommon'.freeze
+class AccountAuthorizationConfig::SAML::UKFederation < AccountAuthorizationConfig::SAML::Federation
+  URN = 'http://ukfederation.org.uk'.freeze
 
   class << self
     def endpoint
-      Setting.get('incommon_metadata_url', 'http://md.incommon.org/InCommon/InCommon-metadata.xml')
+      Setting.get('ukfederation_metadata_url', 'http://metadata.ukfederation.org.uk/ukfederation-metadata.xml')
     end
 
     protected
 
     def cert
-      Rails.root.join("config/saml/inc-md-cert.pem").read
+      Rails.root.join("config/saml/ukfederation.pem").read
     end
   end
 end
