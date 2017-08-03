@@ -261,8 +261,6 @@ define [
       @studentViewStudents = {}
       @courseContent.students = new StudentDatastore(@students, @studentViewStudents)
 
-      @allAssignmentColumns = []
-
       @gradebookGrid = {
         columns: {
           definitions: {}
@@ -773,14 +771,6 @@ define [
       pattern = new RegExp(@userFilterTerm, 'i')
       _.any propertiesToMatch, (prop) ->
         student[prop]?.match pattern
-
-    filterAssignmentColumns: (columns) =>
-      columnsByAssignmentId = _.indexBy(columns, 'assignmentId')
-
-      assignments = _.pluck(columns, 'object')
-      filteredAssignments = @filterAssignments(assignments)
-
-      filteredAssignments.map (assignment) => columnsByAssignmentId[assignment.id]
 
     filterAssignments: (assignments) =>
       assignmentFilters = [
@@ -1455,9 +1445,10 @@ define [
       @userFilter.el.setAttribute('aria-disabled', disabled)
 
     setVisibleGridColumns: ->
-      assignmentColumns = @filterAssignmentColumns(@allAssignmentColumns)
+      assignments = @filterAssignments(Object.values(@assignments))
+      scrollableColumns = assignments.map (assignment) =>
+        @gradebookGrid.columns.definitions[@getAssignmentColumnId(assignment.id)]
 
-      scrollableColumns = assignmentColumns
       unless @hideAggregateColumns()
         for assignmentGroupId of @assignmentGroups
           scrollableColumns.push(@gradebookGrid.columns.definitions[@getAssignmentGroupColumnId(assignmentGroupId)])
@@ -1615,7 +1606,6 @@ define [
 
       for id, assignment of @assignments
         assignmentColumn = @buildAssignmentColumn(assignment)
-        @allAssignmentColumns.push(assignmentColumn)
         @gradebookGrid.columns.definitions[assignmentColumn.id] = assignmentColumn
 
       for id, assignmentGroup of @assignmentGroups
@@ -1639,7 +1629,7 @@ define [
         syncColumnCellResize: true
         rowHeight: 35
         headerHeight: 38
-        numberOfColumnsToFreeze: @listVisibleCustomColumns().length + 1
+        numberOfColumnsToFreeze: @gradebookGrid.columns.frozen.length
       }, @options)
 
       @setVisibleGridColumns()
