@@ -49,8 +49,8 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
 
   function addCustomColumns (columns) {
     dataLoader.gotCustomColumns.resolve(columns || [
-      { id: '2401', teacher_notes: true, title: 'Notes' },
-      { id: '2402', teacher_notes: false, title: 'Other Notes' }
+      { id: '2401', teacher_notes: true, hidden: false, title: 'Notes' },
+      { id: '2402', teacher_notes: false, hidden: false, title: 'Other Notes' }
     ]);
   }
 
@@ -457,8 +457,10 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
       gradebook = createGradebook({ teacher_notes: { id: '2401', title: 'Notes', teacher_notes: true, hidden: true } });
       gradebook.initialize();
       addStudentIds();
-      // by default, hidden columns are not returned from the api
-      addCustomColumns([{ id: '2402', teacher_notes: false, title: 'Other Notes', hidden: false }]);
+      addCustomColumns([
+        { id: '2401', teacher_notes: true, hidden: true, title: 'Notes' },
+        { id: '2402', teacher_notes: false, hidden: false, title: 'Other Notes' }
+      ]);
       addAssignmentGroups();
       addGradingPeriodAssignments();
       gridSpecHelper = new SlickGridSpecHelper(gradebook.grid);

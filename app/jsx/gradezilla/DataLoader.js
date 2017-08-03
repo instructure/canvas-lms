@@ -49,7 +49,7 @@ function getContextModules (url) {
 }
 
   const getCustomColumns = (url) => {
-    return $.ajaxJSON(url, "GET", {});
+    return $.ajaxJSON(url, 'GET', { include_hidden: true });
   };
   const getSections = (url) => {
     return $.ajaxJSON(url, "GET", {});

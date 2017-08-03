@@ -147,6 +147,17 @@ test('sets the submission state map .selectedGradingPeriodID to the "grading per
   strictEqual(gradebook.submissionStateMap.selectedGradingPeriodID, gradebook.getGradingPeriodToShow());
 });
 
+test('adds teacher notes to custom columns when provided', function () {
+  const teacherNotes = { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false };
+  const gradebook = createGradebook({ teacher_notes: teacherNotes });
+  deepEqual(gradebook.gradebookContent.customColumns, [teacherNotes]);
+});
+
+test('custom columns remain empty when teacher notes are not provided', function () {
+  const gradebook = createGradebook();
+  deepEqual(gradebook.gradebookContent.customColumns, []);
+});
+
 QUnit.module('Gradebook - when grid-required data is loaded', {
   setup () {
     $fixtures.innerHTML = `
@@ -2178,8 +2189,9 @@ test('onSelect calls createTeacherNotes if there are no teacher notes', function
   equal(gradebook.createTeacherNotes.callCount, 1);
 });
 
-test('onSelect calls setTeacherNotesHidden with false if teacher notes are hidden', function () {
-  const gradebook = createGradebook({ teacher_notes: { hidden: true } });
+test('onSelect calls setTeacherNotesHidden with false if teacher notes are visible', function () {
+  const teacherNotes = { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: true };
+  const gradebook = createGradebook({ teacher_notes: teacherNotes });
   this.stub(gradebook, 'setTeacherNotesHidden');
   const props = gradebook.getTeacherNotesViewOptionsMenuProps();
   props.onSelect();
@@ -2187,8 +2199,9 @@ test('onSelect calls setTeacherNotesHidden with false if teacher notes are hidde
   equal(gradebook.setTeacherNotesHidden.getCall(0).args[0], false)
 });
 
-test('onSelect calls setTeacherNotesHidden with true if teacher notes are visible', function () {
-  const gradebook = createGradebook({ teacher_notes: { hidden: false } });
+test('onSelect calls setTeacherNotesHidden with true if teacher notes are hidden', function () {
+  const teacherNotes = { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false };
+  const gradebook = createGradebook({ teacher_notes: teacherNotes });
   this.stub(gradebook, 'setTeacherNotesHidden');
   const props = gradebook.getTeacherNotesViewOptionsMenuProps();
   props.onSelect();
@@ -2203,13 +2216,15 @@ test('selected is false if there are no teacher notes', function () {
 });
 
 test('selected is false if teacher notes are hidden', function () {
-  const gradebook = createGradebook({ teacher_notes: { hidden: true } });
+  const teacherNotes = { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: true };
+  const gradebook = createGradebook({ teacher_notes: teacherNotes });
   const props = gradebook.getTeacherNotesViewOptionsMenuProps();
   equal(props.selected, false);
 });
 
 test('selected is true if teacher notes are visible', function () {
-  const gradebook = createGradebook({ teacher_notes: { hidden: false } });
+  const teacherNotes = { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false };
+  const gradebook = createGradebook({ teacher_notes: teacherNotes });
   const props = gradebook.getTeacherNotesViewOptionsMenuProps();
   equal(props.selected, true);
 });
@@ -2506,14 +2521,20 @@ test('updates teacher notes with response data after request resolves', function
   const column = { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false };
   this.gradebook.createTeacherNotes();
   this.promise.thenFn({ data: column });
-  equal(this.gradebook.options.teacher_notes, column);
+  equal(this.gradebook.getTeacherNotesColumn(), column);
+});
+
+test('updates custom columns with response data after request resolves', function () {
+  const column = { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false };
+  this.gradebook.createTeacherNotes();
+  this.promise.thenFn({ data: column });
+  deepEqual(this.gradebook.gradebookContent.customColumns, [column]);
 });
 
 test('shows the notes column after request resolves', function () {
   this.gradebook.createTeacherNotes();
-  equal(this.gradebook.showNotesColumn.callCount, 0);
   this.promise.thenFn({ data: { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false } });
-  equal(this.gradebook.showNotesColumn.callCount, 1);
+  equal(this.gradebook.getTeacherNotesColumn().hidden, false);
 });
 
 test('sets teacherNotesUpdating to false after request resolves', function () {
@@ -2561,9 +2582,25 @@ QUnit.module('Gradebook#setTeacherNotesHidden - showing teacher notes', {
       }
     };
     this.stub(GradebookApi, 'updateTeacherNotesColumn').returns(this.promise);
-    this.gradebook = createGradebook({ context_id: '1201', teacher_notes: { id: '2401', hidden: true } });
-    this.gradebook.gradebookContent.customColumns = [{ id: '2401' }, { id: '2402' }];
-    this.stub(this.gradebook, 'showNotesColumn');
+    this.gradebook = createGradebook({ context_id: '1201' });
+    this.gradebook.gradebookContent.customColumns = [
+      { id: '2401', teacher_notes: true, hidden: true, title: 'Notes' },
+      { id: '2402', teacher_notes: false, hidden: false, title: 'Other Notes' }
+    ];
+    this.gradebook.grid = {
+      getColumns () {
+        return [];
+      },
+      getOptions () {
+        return {
+          numberOfColumnsToFreeze: 0
+        };
+      },
+      invalidate () {},
+      setColumns () {},
+      setNumberOfColumnsToFreeze () {}
+    };
+    this.stub(DataLoader, 'getDataForColumn');
     this.stub(this.gradebook, 'reorderCustomColumns');
     this.stub(this.gradebook, 'renderViewOptionsMenu');
   }
@@ -2590,18 +2627,11 @@ test('calls GradebookApi.updateTeacherNotesColumn', function () {
   equal(attr.hidden, false, 'attr.hidden is true');
 });
 
-test('updates teacher notes as not hidden after request resolves', function () {
-  this.gradebook.setTeacherNotesHidden(false);
-  equal(this.gradebook.options.teacher_notes.hidden, true);
-  this.promise.thenFn({ data: { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false } });
-  equal(this.gradebook.options.teacher_notes.hidden, false);
-});
-
 test('shows the notes column after request resolves', function () {
   this.gradebook.setTeacherNotesHidden(false);
-  equal(this.gradebook.showNotesColumn.callCount, 0);
+  equal(this.gradebook.getTeacherNotesColumn().hidden, true);
   this.promise.thenFn({ data: { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false } });
-  equal(this.gradebook.showNotesColumn.callCount, 1);
+  equal(this.gradebook.getTeacherNotesColumn().hidden, false);
 });
 
 test('reorders custom columns after request resolves', function () {
@@ -2663,8 +2693,23 @@ QUnit.module('Gradebook#setTeacherNotesHidden - hiding teacher notes', {
       }
     };
     this.stub(GradebookApi, 'updateTeacherNotesColumn').returns(this.promise);
-    this.gradebook = createGradebook({ context_id: '1201', teacher_notes: { id: '2401', hidden: false } });
-    this.stub(this.gradebook, 'hideNotesColumn');
+    this.gradebook = createGradebook({
+      context_id: '1201',
+      teacher_notes: { id: '2401', teacher_notes: true, hidden: false }
+    });
+    this.gradebook.grid = {
+      getColumns () {
+        return [];
+      },
+      getOptions () {
+        return {
+          numberOfColumnsToFreeze: 0
+        };
+      },
+      invalidate () {},
+      setColumns () {},
+      setNumberOfColumnsToFreeze () {}
+    };
     this.stub(this.gradebook, 'renderViewOptionsMenu');
   }
 });
@@ -2690,18 +2735,11 @@ test('calls GradebookApi.updateTeacherNotesColumn', function () {
   equal(attr.hidden, true, 'attr.hidden is true');
 });
 
-test('updates teacher notes as hidden after request resolves', function () {
-  this.gradebook.setTeacherNotesHidden(true);
-  equal(this.gradebook.options.teacher_notes.hidden, false);
-  this.promise.thenFn({ data: { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: true } });
-  equal(this.gradebook.options.teacher_notes.hidden, true);
-});
-
 test('hides the notes column after request resolves', function () {
   this.gradebook.setTeacherNotesHidden(true);
-  equal(this.gradebook.hideNotesColumn.callCount, 0);
+  equal(this.gradebook.getTeacherNotesColumn().hidden, false);
   this.promise.thenFn({ data: { id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: true } });
-  equal(this.gradebook.hideNotesColumn.callCount, 1);
+  equal(this.gradebook.getTeacherNotesColumn().hidden, true);
 });
 
 test('sets teacherNotesUpdating to false after request resolves', function () {

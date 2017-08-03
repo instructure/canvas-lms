@@ -205,6 +205,11 @@ define [
       latePolicy: ConvertCase.camelize(options.late_policy) if options.late_policy
     }
 
+  getInitialGradebookContent = (options) ->
+    {
+      customColumns: if options.teacher_notes then [options.teacher_notes] else []
+    }
+
   class Gradebook
     columnWidths =
       assignment:
@@ -239,8 +244,7 @@ define [
 
     setInitialState: =>
       @courseContent = getInitialCourseContent(@options)
-      @gradebookContent =
-        customColumns: []
+      @gradebookContent = getInitialGradebookContent(@options)
       @gridDisplaySettings = getInitialGridDisplaySettings(@options.settings, @options.colors)
       @contentLoadStates = getInitialContentLoadStates()
       @headerComponentRefs = {}
@@ -284,7 +288,7 @@ define [
       @initSubmissionStateMap()
       @gradebookColumnSizeSettings = @options.gradebook_column_size_settings
       @gradebookColumnOrderSettings = @options.gradebook_column_order_settings
-      @teacherNotesNotYetLoaded = !@options.teacher_notes? || @options.teacher_notes.hidden
+      @teacherNotesNotYetLoaded = !@getTeacherNotesColumn()? || @getTeacherNotesColumn().hidden
 
       @gotSections(@options.sections)
       @hasSections.then () =>
@@ -1240,7 +1244,7 @@ define [
         renderComponent(GradebookMenu, mountPoint, props)
 
     getTeacherNotesViewOptionsMenuProps: ->
-      teacherNotes = @options.teacher_notes
+      teacherNotes = @getTeacherNotesColumn()
       showingNotes = teacherNotes? and not teacherNotes.hidden
       if showingNotes
         onSelect = => @setTeacherNotesHidden(true)
@@ -1446,7 +1450,7 @@ define [
       else
         assignmentColumns.concat(@aggregateColumns)
 
-      frozenColumns = @parentColumns.concat(@gradebookContent.customColumns.map(@buildCustomColumn))
+      frozenColumns = @parentColumns.concat(@listVisibleCustomColumns().map(@buildCustomColumn))
       frozenColumns.concat(scrollableColumns)
 
     ## Grid Column Definitions
@@ -1601,7 +1605,7 @@ define [
         syncColumnCellResize: true
         rowHeight: 35
         headerHeight: 38
-        numberOfColumnsToFreeze: @gradebookContent.customColumns.length + 1
+        numberOfColumnsToFreeze: @listVisibleCustomColumns().length + 1
       }, @options)
 
       @grid = new Slick.Grid('#gradebook_grid', @rows, @getVisibleGradeGridColumns(), options)
@@ -1927,26 +1931,23 @@ define [
       callback()
       cols = @grid.getColumns()
       cols.splice 0, columnsToReplace,
-        @parentColumns..., @gradebookContent.customColumns.map(@buildCustomColumn)...
+        @parentColumns..., @listVisibleCustomColumns().map(@buildCustomColumn)...
       @grid.setColumns(cols)
       @grid.invalidate()
 
     showNotesColumn: =>
       if @teacherNotesNotYetLoaded
         @teacherNotesNotYetLoaded = false
-        DataLoader.getDataForColumn(@options.teacher_notes, @options.custom_column_data_url, {}, @gotCustomColumnDataChunk)
+        DataLoader.getDataForColumn(@getTeacherNotesColumn(), @options.custom_column_data_url, {}, @gotCustomColumnDataChunk)
 
       @toggleNotesColumn =>
-        @gradebookContent.customColumns.splice 0, 0, @options.teacher_notes
-        @grid.setNumberOfColumnsToFreeze @parentColumns.length + @gradebookContent.customColumns.length
+        @getTeacherNotesColumn()?.hidden = false
+        @grid.setNumberOfColumnsToFreeze @parentColumns.length + @listVisibleCustomColumns().length
 
     hideNotesColumn: =>
       @toggleNotesColumn =>
-        for c, i in @gradebookContent.customColumns
-          if c.teacher_notes
-            @gradebookContent.customColumns.splice i, 1
-            break
-        @grid.setNumberOfColumnsToFreeze @parentColumns.length + @gradebookContent.customColumns.length
+        @getTeacherNotesColumn()?.hidden = true
+        @grid.setNumberOfColumnsToFreeze @parentColumns.length + @listVisibleCustomColumns().length
 
     hideAggregateColumns: ->
       return false unless @gradingPeriodSet?
@@ -2018,7 +2019,7 @@ define [
     ## Gradebook Bulk UI Update Methods
 
     updateFrozenColumnsAndRenderGrid: (newColumns) ->
-      @grid.setNumberOfColumnsToFreeze(@parentColumns.length + @gradebookContent.customColumns.length)
+      @grid.setNumberOfColumnsToFreeze(@parentColumns.length + @listVisibleCustomColumns().length)
       @grid.setColumns(newColumns)
       @grid.invalidate()
       @updateColumnHeaders()
@@ -2357,6 +2358,12 @@ define [
     getCustomColumn: (customColumnId) =>
       @gradebookContent.customColumns.find((column) -> column.id == customColumnId)
 
+    getTeacherNotesColumn: =>
+      @gradebookContent.customColumns.find((column) -> column.teacher_notes)
+
+    listVisibleCustomColumns: ->
+      @gradebookContent.customColumns.filter((column) -> !column.hidden)
+
     setContextModules: (contextModules) =>
       @courseContent.contextModules = contextModules
       @courseContent.modulesById = {}
@@ -2471,7 +2478,7 @@ define [
       @renderViewOptionsMenu()
       GradebookApi.createTeacherNotesColumn(@options.context_id)
         .then (response) =>
-          @options.teacher_notes = response.data
+          @gradebookContent.customColumns.push(response.data)
           @showNotesColumn()
           @setTeacherNotesColumnUpdating(false)
           @renderViewOptionsMenu()
@@ -2483,9 +2490,9 @@ define [
     setTeacherNotesHidden: (hidden) =>
       @setTeacherNotesColumnUpdating(true)
       @renderViewOptionsMenu()
-      GradebookApi.updateTeacherNotesColumn(@options.context_id, @options.teacher_notes.id, { hidden })
+      teacherNotes = @getTeacherNotesColumn()
+      GradebookApi.updateTeacherNotesColumn(@options.context_id, teacherNotes.id, { hidden })
         .then =>
-          @options.teacher_notes.hidden = hidden
           if hidden
             @hideNotesColumn()
           else
