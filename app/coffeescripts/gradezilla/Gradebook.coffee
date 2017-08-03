@@ -1458,13 +1458,13 @@ define [
     setVisibleGridColumns: ->
       assignmentColumns = @filterAssignmentColumns(@allAssignmentColumns)
 
-      if @gradebookColumnOrderSettings?.sortType
-        assignmentColumns.sort @makeColumnSortFn(@getStoredSortOrder())
-
       scrollableColumns = if @hideAggregateColumns()
         assignmentColumns
       else
         assignmentColumns.concat(@aggregateColumns)
+
+      if @gradebookColumnOrderSettings?.sortType
+        scrollableColumns.sort @makeColumnSortFn(@getStoredSortOrder())
 
       parentColumnIds = @gradebookGrid.columns.frozen.filter((columnId) -> !/^custom_col_/.test(columnId))
       customColumnIds = @listVisibleCustomColumns().map((column) => @getCustomColumnId(column.id))

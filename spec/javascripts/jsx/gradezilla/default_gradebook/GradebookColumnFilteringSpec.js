@@ -255,6 +255,35 @@ QUnit.module('Gradebook Grid Column Filtering', function (suiteHooks) {
       ];
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns);
     });
+
+    test('sorts all scrollable columns after showing unpublished assignment columns', function () {
+      const customOrder = [
+        'student', 'custom_col_2401', 'custom_col_2402', 'total_grade', 'assignment_group_2201', 'assignment_2301',
+        'assignment_2303', 'assignment_group_2202', 'assignment_2302', 'assignment_2304'
+      ];
+      setShowUnpublishedAssignments(true);
+      addDataAndInitialize();
+      gridSpecHelper.updateColumnOrder(customOrder);
+      gradebook.toggleUnpublishedAssignments(); // hide unpublished
+      gradebook.toggleUnpublishedAssignments(); // show unpublished
+      deepEqual(gridSpecHelper.listColumnIds(), customOrder);
+    });
+
+    test('sorts all scrollable columns after hiding unpublished assignment columns', function () {
+      const customOrder = [
+        'student', 'custom_col_2401', 'custom_col_2402', 'total_grade', 'assignment_group_2201', 'assignment_2301',
+        'assignment_2303', 'assignment_group_2202', 'assignment_2302', 'assignment_2304'
+      ];
+      setShowUnpublishedAssignments(true);
+      addDataAndInitialize();
+      gridSpecHelper.updateColumnOrder(customOrder);
+      gradebook.toggleUnpublishedAssignments();
+      const expectedColumns = [
+        'student', 'custom_col_2401', 'custom_col_2402', 'total_grade', 'assignment_group_2201', 'assignment_2301',
+        'assignment_group_2202', 'assignment_2302'
+      ];
+      deepEqual(gridSpecHelper.listColumnIds(), expectedColumns);
+    });
   });
 
   QUnit.module('with attendance assignments', function (hooks) {
@@ -341,6 +370,33 @@ QUnit.module('Gradebook Grid Column Filtering', function (suiteHooks) {
       ];
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns);
     });
+
+    test('sorts all scrollable columns after selecting an assignment group', function () {
+      const customOrder = [
+        'student', 'custom_col_2401', 'custom_col_2402', 'total_grade', 'assignment_group_2201', 'assignment_2301',
+        'assignment_2303', 'assignment_group_2202', 'assignment_2302', 'assignment_2304'
+      ];
+      addDataAndInitialize();
+      gridSpecHelper.updateColumnOrder(customOrder);
+      gradebook.updateCurrentAssignmentGroup('2202');
+      const expectedColumns = [
+        'student', 'custom_col_2401', 'custom_col_2402', 'total_grade', 'assignment_group_2201',
+        'assignment_group_2202', 'assignment_2302', 'assignment_2304'
+      ];
+      deepEqual(gridSpecHelper.listColumnIds(), expectedColumns);
+    });
+
+    test('sorts all scrollable columns after deselecting an assignment group', function () {
+      const customOrder = [
+        'student', 'custom_col_2401', 'custom_col_2402', 'total_grade', 'assignment_group_2201', 'assignment_2301',
+        'assignment_2303', 'assignment_group_2202', 'assignment_2302', 'assignment_2304'
+      ];
+      addDataAndInitialize();
+      gridSpecHelper.updateColumnOrder(customOrder);
+      gradebook.updateCurrentAssignmentGroup('2202');
+      gradebook.updateCurrentAssignmentGroup('0');
+      deepEqual(gridSpecHelper.listColumnIds(), customOrder);
+    });
   });
 
   QUnit.module('with grading periods', function (hooks) {
@@ -411,6 +467,33 @@ QUnit.module('Gradebook Grid Column Filtering', function (suiteHooks) {
       ];
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns);
     });
+
+    test('sorts all scrollable columns after selecting a grading period', function () {
+      const customOrder = [
+        'student', 'custom_col_2401', 'custom_col_2402', 'total_grade', 'assignment_group_2201', 'assignment_2301',
+        'assignment_2303', 'assignment_group_2202', 'assignment_2302', 'assignment_2304'
+      ];
+      addDataAndInitialize();
+      gridSpecHelper.updateColumnOrder(customOrder);
+      gradebook.updateCurrentGradingPeriod('1402');
+      const expectedColumns = [
+        'student', 'custom_col_2401', 'custom_col_2402', 'total_grade', 'assignment_group_2201',
+        'assignment_2303', 'assignment_group_2202', 'assignment_2302'
+      ];
+      deepEqual(gridSpecHelper.listColumnIds(), expectedColumns);
+    });
+
+    test('sorts all scrollable columns after deselecting a grading period', function () {
+      const customOrder = [
+        'student', 'custom_col_2401', 'custom_col_2402', 'total_grade', 'assignment_group_2201', 'assignment_2301',
+        'assignment_2303', 'assignment_group_2202', 'assignment_2302', 'assignment_2304'
+      ];
+      addDataAndInitialize();
+      gridSpecHelper.updateColumnOrder(customOrder);
+      gradebook.updateCurrentGradingPeriod('1402');
+      gradebook.updateCurrentGradingPeriod('0');
+      deepEqual(gridSpecHelper.listColumnIds(), customOrder);
+    });
   });
 
   QUnit.module('with multiple context modules', function (hooks) {
@@ -454,6 +537,33 @@ QUnit.module('Gradebook Grid Column Filtering', function (suiteHooks) {
         'assignment_2302', 'assignment_group_2201', 'assignment_group_2202', 'total_grade'
       ];
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns);
+    });
+
+    test('sorts all scrollable columns after selecting a context module', function () {
+      const customOrder = [
+        'student', 'custom_col_2401', 'custom_col_2402', 'total_grade', 'assignment_group_2201', 'assignment_2301',
+        'assignment_2303', 'assignment_group_2202', 'assignment_2302', 'assignment_2304'
+      ];
+      addDataAndInitialize();
+      gridSpecHelper.updateColumnOrder(customOrder);
+      gradebook.updateCurrentModule('2601');
+      const expectedColumns = [
+        'student', 'custom_col_2401', 'custom_col_2402', 'total_grade', 'assignment_group_2201', 'assignment_2301',
+        'assignment_2303', 'assignment_group_2202'
+      ];
+      deepEqual(gridSpecHelper.listColumnIds(), expectedColumns);
+    });
+
+    test('sorts all scrollable columns after deselecting a context module', function () {
+      const customOrder = [
+        'student', 'custom_col_2401', 'custom_col_2402', 'total_grade', 'assignment_group_2201', 'assignment_2301',
+        'assignment_2303', 'assignment_group_2202', 'assignment_2302', 'assignment_2304'
+      ];
+      addDataAndInitialize();
+      gridSpecHelper.updateColumnOrder(customOrder);
+      gradebook.updateCurrentModule('2602');
+      gradebook.updateCurrentModule('0');
+      deepEqual(gridSpecHelper.listColumnIds(), customOrder);
     });
   });
 });
