@@ -159,7 +159,7 @@ function copyAssignmentDescriptionIntoAssignmentSubmission() {
 function validateMagicFields() {
   var list = document.querySelectorAll("#assignment_show .description input[type=text][data-bz-retained], #assignment_show .description input[type=url][data-bz-retained], #assignment_show .description textarea[data-bz-retained]");
   for(var a = 0; a < list.length; a++) {
-    if(list[a].value == "") {
+    if(list[a].value == "" && list[a].className != "bz-optional-magic-field") {
       alert('You have incomplete fields in this project. Go back and complete them before submitting.');
       list[a].focus();
       return false;
@@ -231,10 +231,12 @@ function bzActivateInstantSurvey(magic_field_name) {
 
 	// react to survey click - save and encourage hitting the next button.
 
-	var save = function(value) {
+	var save = function(value, optional) {
 		var http = new XMLHttpRequest();
 		http.open("POST", "/bz/user_retained_data", true);
 		var data = "name=" + encodeURIComponent(magic_field_name) + "&value=" + encodeURIComponent(value) + "&from=" + encodeURIComponent(location.href);
+                if(!optional)
+                  data += "&optional=1";
 		http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
 		// encourage next clicking again once they are saved
@@ -252,7 +254,7 @@ function bzActivateInstantSurvey(magic_field_name) {
 	var inputs = i.querySelectorAll("input");
 	for(var a = 0; a < inputs.length; a++) {
 		inputs[a].onchange = function() {
-			save(this.value);
+			save(this.value, this.className == "bz-optional-magic-field");
 		};
 	}
 }
