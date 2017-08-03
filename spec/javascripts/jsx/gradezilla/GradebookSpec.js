@@ -198,7 +198,7 @@ test('renders the StatusesModal', function () {
   const renderStatusesModalStub = this.stub(gradebook, 'renderStatusesModal');
   gradebook.gridReady.reject();
   gradebook.initialize();
-  loaderPromises.gotCustomColumns.resolve();
+  loaderPromises.gotCustomColumns.resolve([]);
   loaderPromises.gotAssignmentGroups.resolve([]);
   loaderPromises.gotStudentIds.resolve({ user_ids: [] });
 

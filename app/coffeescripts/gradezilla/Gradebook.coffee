@@ -262,6 +262,7 @@ define [
       @courseContent.students = new StudentDatastore(@students, @studentViewStudents)
 
       @parentColumns = []
+      @customColumns = {}
       @allAssignmentColumns = []
       @aggregateColumns = []
       @rows = []
@@ -457,6 +458,9 @@ define [
 
     gotCustomColumns: (columns) =>
       @gradebookContent.customColumns = columns
+      columns.forEach (column) =>
+        customColumn = @buildCustomColumn(column)
+        @customColumns[customColumn.id] = customColumn
 
     gotCustomColumnDataChunk: (column, columnData) =>
       studentIds = []
@@ -1450,7 +1454,8 @@ define [
       else
         assignmentColumns.concat(@aggregateColumns)
 
-      frozenColumns = @parentColumns.concat(@listVisibleCustomColumns().map(@buildCustomColumn))
+      customColumns = @listVisibleCustomColumns().map((column) => @customColumns[@getCustomColumnId(column.id)])
+      frozenColumns = @parentColumns.concat(customColumns)
       frozenColumns.concat(scrollableColumns)
 
     ## Grid Column Definitions
@@ -1930,8 +1935,9 @@ define [
       columnsToReplace = @grid.getOptions().numberOfColumnsToFreeze
       callback()
       cols = @grid.getColumns()
+      customColumns = @listVisibleCustomColumns().map((column) => @customColumns[@getCustomColumnId(column.id)])
       cols.splice 0, columnsToReplace,
-        @parentColumns..., @listVisibleCustomColumns().map(@buildCustomColumn)...
+        @parentColumns..., customColumns...
       @grid.setColumns(cols)
       @grid.invalidate()
 
@@ -2479,6 +2485,8 @@ define [
       GradebookApi.createTeacherNotesColumn(@options.context_id)
         .then (response) =>
           @gradebookContent.customColumns.push(response.data)
+          teacherNotesColumn = @buildCustomColumn(response.data)
+          @customColumns[teacherNotesColumn.id] = teacherNotesColumn
           @showNotesColumn()
           @setTeacherNotesColumnUpdating(false)
           @renderViewOptionsMenu()
