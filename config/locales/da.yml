@@ -358,7 +358,7 @@ da:
     report_header_term__id: term_id
     report_header_term_id: semester-id
     report_header_term_sis: semester-SIS
-    report_header_token_dev_key_id: "udv. nøgle-id"
+    report_header_token_dev_key_id: "udviklers nøgle-id"
     report_header_token_dev_key_name: "udv nøglenavn"
     report_header_token_hint: "token tip"
     report_header_token_last_used: "sidst brugt"
@@ -950,8 +950,8 @@ da:
       email_notification_from_description: "Denne indstilling giver administratoren mulighed for at mærke eller etikettere teksten 'Fra' på alle meddelelser, som sendes fra Canvas til denne konto."
       email_notification_from_settings: "Indstillinger til e-mail meddelelse \"Fra\""
       enabled_web_serices_title: "Aktiverede webtjenester"
-      equall_endpoint_help: "Dette er URL'en til din equella-service. Den ser sandsynligvis således ud \"%{sample_url}\"."
-      equella_settings_title: Equella-indstillinger
+      equall_endpoint_help: "Dette er URL'en til din EQUELLA-service. Den ser sandsynligvis således ud \"%{sample_url}\"."
+      equella_settings_title: EQUELLA-indstillinger
       feature_options: Funktionsvalg
       features_title: Funktioner
       global_announcements_description: "Med globale meddelelser kan du sende beskeder til oversigten for alle brugere på din konto. De vil forekomme på hver brugers oversigt for den angivne periode eller indtil brugeren klikker \"luk\"(×) link for at ignorere alarmen. **Disse meddelelser bør benyttes med omtanke.**"
@@ -995,9 +995,9 @@ da:
         enable_turnitin: Turnitin
         enable_user_notes: Fakultetsjournal
         end_at: Slutter
-        equella: Equella
-        equella_endpoint: "Equella slutpunkt"
-        equella_teaser: "Equella kommentarer"
+        equella: EQUELLA
+        equella_endpoint: EQUELLA-slutpunkt
+        equella_teaser: "EQUELLA kommentarer"
         global_brand_includes: "Upload global CSS/JavaScript inkluderet i Tema Editor"
         global_includes: "Tilpasset CSS/JavaScript tilsidesætter"
         global_javascript: "Global JavaScript URL"
@@ -1887,7 +1887,7 @@ da:
       upload_as_zip: "Upload fil som en .zip"
     feed_entry_title: "Opgave: %{assignment}"
     feed_entry_title_with_course: "Opgave, %{course}: %{assignment}"
-    gpa_scale_explainer: "Hvad er GPA scalaklassificering?"
+    gpa_scale_explainer: Karakterskala-omregningstabel
     group_assignment_must_have_group_set: "Vælg et studiegruppe til denne opgave"
     labels: 
       due: Forfalder
@@ -1908,7 +1908,7 @@ da:
       external_tool: "et eksternt værktøj"
       on_paper: "på papir"
     titles: 
-      gpa_scale_explainer: "Hvad er GPA scalaklassificering?"
+      gpa_scale_explainer: Karakterskala-omregningstabel
       grading_scheme_info: "Vis/rediger karakterordning"
     vericite_submission_types_validation: "VeriCite understøtter kun filindsendelser og tekstindtastning"
   assignment_976578a8: Opgave
@@ -2209,7 +2209,7 @@ da:
       gpa_scale_percentage_explainer: "Du kan ikke indtaste point direkte, men du kan indtaste procentdele. Hvis for eksempel en opgave består af i alt 50 point, vil indtastning af \"40\" ikke fungere, men \"80%\" vil."
       gpa_scale_recommendation: "Med mindre din skole bruger en 4.0 skala (eller 5.0/6.0), anbefaler Canvas at vise karaktererne som bogstaver."
       gpa_scale_scores_explainer: "De eneste tilladte resultater er prædefineret i karakterordningen."
-      gpa_scale_title: "Hvad er GPA-scalaklassificering?"
+      gpa_scale_title: Karakterskala-omregningstabel
       grading_type_options: 
         gpa_scale: GPA-scala
         letter_grade: Bogstavkarakterer
@@ -4869,7 +4869,7 @@ da:
       large_roster: "Stor liste"
       license: Licens
       locale: Landestandard
-      lock_all_announcements: "Lås alle opslag"
+      lock_all_announcements: "Lås alle beskeder"
       name: Navn
       old_account_id: "Gammel konto id"
       open_enrollment: "Åben tilmelding"
@@ -4964,7 +4964,7 @@ da:
       move_course: "Flyt fag"
       reset_course_content_dialog_help: "Gendan fagets indhold"
       section_enrollments: Sektionstilmeldinger
-  course_settings_sub_navigation_b95deae: "Fag indstilling sub-navigation"
+  course_settings_sub_navigation_b95deae: "Kursusindstillinger subnavigation"
   course_setup_wizard_is_showing_a7c087c1: "Fagets installationsguide vises."
   course_sis_7ae8f649: Fag-SIS
   course_sis_df8b379: Fag-Sis
@@ -7282,8 +7282,8 @@ da:
   failed_to_save_please_try_again_later_bb7070fb: "Kunne ikke gemmes, prøv igen senere"
   failed_to_submit_draft_comment_1de83451: "Mislykkedes at indsende kladde-kommentar"
   fair_38e62237: Fair
-  fair_score_554e2558: "Fair resultat"
-  fair_use_bee47d77: "Fair brug"
+  fair_score_554e2558: "Fair Score"
+  fair_use_bee47d77: "Fair Use"
   fall_grading_period_current_score_d48c7f78: "Nuværende resultat for efterårets karakterperiode"
   fall_grading_period_final_score_56d96a8f: "Endeligt resultat for efterårets karakterperiode"
   fall_grading_period_id_74ef68e: "Efterårets karakterperiode id"
@@ -7331,8 +7331,8 @@ da:
     quiz_log_auditing: "Revision af quizlog"
     student_groups: "Ny studerendes gruppeside"
     student_outcome_gradebook: "Studerendes beherskelses karakterbog"
-  federated_attributes_5cbe6441: "Organisatoriske attributter"
-  federated_attributes_are_information_sent_from_you_2116fb61: "Organisatoriske attributter er information sendt fra din godkender, som kan bruges til automatisk at opdatere tilhørende information for brugere i Canvas, hver gang de logger ind."
+  federated_attributes_5cbe6441: "Samlede attributter"
+  federated_attributes_are_information_sent_from_you_2116fb61: "Samlede attributter er information sendt fra din godkender, som kan bruges til automatisk at opdatere tilhørende information for brugere i Canvas, hver gang de logger ind."
   feed_url_is_required_253fda4e: "Feed URL er nødvendig"
   field_name_31fff38e: Feltnavn
   file_a_ticket_for_a_personal_response_from_our_sup_1e1ffaff: "Indsend besked for et personligt svar fra vores supportteam"
@@ -7905,7 +7905,7 @@ da:
         no_changes: "Der blev ikke registreret ændringer i din uploadede karakterbog."
         past_grading_periods_prevent_editing: "Følgende opgaver kan ikke redigeres, fordi de ikke befinder sig i en aktuel bedømmelsesperiode:"
       ignore_assignment_option: "Vrøvl, ignorer det"
-      ignore_student_option: "Ikke i min klasse, ignorer denne række."
+      ignore_student_option: "Ikke på mit hold, ignorer denne række."
       labels: 
         points_possible: "Mulige points"
       links: 
@@ -9127,7 +9127,7 @@ da:
     titles: 
       bookmark_search: "Bogmærkesøgning: %{service_name}"
       cant_create_recordings: "Kan ikke oprette optagelser?"
-      equella_content_preview: "Equella forhåndsvisning af indhold"
+      equella_content_preview: "EQUELLA forhåndsvisning af indhold"
       external_link: "Links til en ekstern webside."
       image_search: "Billedsøgning: %{service_name}"
       keyboard_shortcuts: Tastaturgenveje
@@ -9791,7 +9791,7 @@ da:
   media_recordings_749aef6d: Medieoptagelser
   median_ed291842: Gennemsnit
   median_score_4657e907: "Gennemsnit: %{score}"
-  meets_mastery_754e1c06: "Opfylder mål"
+  meets_mastery_754e1c06: "Opfylder læringsmål"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} medlemmer ud af maksimum %{max_membership}"
   members_af25c21d: Medlemmer
   membership_by_invitation_only_9bc27199: "Medlemskab udelukkede efter invitation"
@@ -12797,7 +12797,7 @@ da:
   plagiarism_detection_platform_6ce67e66: "Afsløringsplatform for plagiat"
   plagiarism_review_tool_error_513f47ff: "Fejl i bedømmelsesværktøjet for plagiater"
   plagiarism_review_tool_is_missing_submission_event_75273069: "Plagiat-bedømmelsesværktøjet mangler tjeneste for afleveringsbegivenhed"
-  plagiarism_review_tool_submission_event_service_is_b023b4c7: "Plagiat-bedømmelsesværktøjets tjeneste for afleveringsbegivenhed mangler afslutningpunkt"
+  plagiarism_review_tool_submission_event_service_is_b023b4c7: "Plagiat-bedømmelsesværktøjets tjeneste for afleveringsbegivenhed mangler slutpunkt"
   plain_text_e3ab33aa: "Almindelig tekst"
   planner_7fd46783: Planlægger
   please_add_a_due_date_1d433d2: "Tilføj venligst en forfaldsdato"
@@ -13646,7 +13646,7 @@ da:
       privacy_notice: 
         ok: Ok
         privacy_notice: "Bemærk: Nogle meddelelser indeholder muligvis fortrolige oplysninger. Hvis du vælger at modtage meddelelser til en anden e-mail end den, som din institution forsynede dig med, bliver der muligvis sendt følsomme oplysninger om Canvas-fag og -grupper uden for institutionens system."
-        privacy_notice_title: Fortrolighed
+        privacy_notice_title: Fortrolighedserklæring
     take_picture_view: 
       retry: "Prøv igen"
       take_picture: "Tag billede"
@@ -13797,7 +13797,7 @@ da:
       more_questions: "flere spørgsmål"
     load_questions: "Indlæser spørgsmål ..."
     loading_banks: "Indlæser banker ..."
-    loading_more_fail: "hentning af flere spørgsmål mislykkedes, prøv igen"
+    loading_more_fail: "indlæsning af flere spørgsmål mislykkedes, prøv igen"
     move_questions: "Flyt spørgsmål"
     multiple_questions: "Flere spørgsmål"
     question_bank: Spørgsmålsbank
@@ -14483,7 +14483,7 @@ da:
           multiple_choice: "Flere valg"
           multiple_dropdowns: "Flere dropdown-menuer"
           numerical: "Numerisk svar"
-          short_answer: "Udfyld det blanke"
+          short_answer: "Udfyld de tomme felter"
           text_only: "Tekst (intet spørgsmål)"
           true_false: Sandt/Falsk
         show_possible_answers: "Vis mulige svar på %{question}"
@@ -17610,7 +17610,7 @@ da:
   this_package_includes_curriculum_standards_which_a_1a137060: "Denne pakke indeholder curriculum-standarder, der ikke er kompatible med Canvas, og de blev ikke inkluderet i importen."
   this_package_includes_epub3_file_s_which_are_not_c_bbafef30: "Denne pakke indeholder EPub3-fil(er), der ikke er kompatible med Canvas, og de blev ikke inkluderet i importen."
   this_package_includes_iwb_file_s_which_are_not_com_6e3c37d2: "Denne pakke indeholder IWB-fil(er), der ikke er kompatible med Canvas, og de blev ikke inkluderet i importen."
-  this_package_includes_the_question_type_pattern_ma_ce3dadc6: "Denne pakke indeholder spørgsmålstypen, Mønster-match, der ikke er kompatibel med Canvas. Vi har konverteret spørgsmålstypen til Udfyld det blanke"
+  this_package_includes_the_question_type_pattern_ma_ce3dadc6: "Denne pakke indeholder spørgsmålstypen, Mønster-match, der ikke er kompatibel med Canvas. Vi har konverteret spørgsmålstypen til Udfyld de tomme felter"
   this_page_cannot_be_modified_because_grades_have_a_48646991: "Denne side kan ikke modificeres, fordi karaktererne allerede er blevet lagt ud."
   this_panel_lists_the_users_ready_to_be_added_to_th_79efad22: "Dette panel viser de brugere, der er klar til at blive tilføjet til dette fag."
   this_question_group_is_set_to_pick_more_questions__2e3552c4: "Denne spørgsmålsgruppe er konfigureret til at vælge flere spørgsmål end tilgængelige."
@@ -18110,7 +18110,7 @@ da:
   use_new_folder_tree_in_files_bc0ea09f: "Brug træet Ny mappe i filer"
   use_new_folder_tree_in_files_eb5a451b: "Benyt nye mappetræ i filer"
   use_new_rich_content_editor_with_enhanced_sidebar__8e0bfedd: "Brug ny Rich Content Editor med forbedret sidepanel overalt"
-  use_remote_service_for_notifications_9fe667c6: "Brug fjernservice for meddelelser"
+  use_remote_service_for_notifications_9fe667c6: "Brug fjerntjeneste for meddelelser"
   use_remote_version_of_rich_content_editor_52f7fc4b: "Brug fjernversion af Rich Content Editor"
   use_remote_version_of_rich_content_editor_and_side_a058a664: "Brug fjernversion af Rich Content Editor OG sidepanel"
   use_remote_version_of_rich_content_editor_and_side_ebaaa986: "Brug fjernversion af Rich Content Editor OG sidepanel i områder med høj risiko som f.eks. quizzer"
