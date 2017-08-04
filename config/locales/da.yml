@@ -196,7 +196,7 @@ da:
       description: |-
           Du skal [registrere et program på LinkedIn](%{linkedin_url}).
           Du skal tilføje %{callback_url} som et OAuth 2.0 autoriseret omdirigerings-URL og indstille programstatus til Live
-          Efter du opretter dit program, skal du notere dig kunde-id og kunde hemmelighed og indtaste dem her.
+          Efter du opretter dit program, skal du notere dig kunde-id og kundehemmelighed og indtaste dem her.
     login_required: "skal formidles"
     no_changing_auth_types: "Kan ikke ændre autorisationskonfig. Slet og opret ny konfig."
     password_required: "skal formidles"
@@ -213,7 +213,7 @@ da:
       auth_response_from_idp: "AuthnResponse fra IdP"
       labels: 
         canvas_login_fail_message: "Canvas-login fejlmeddelelse"
-        fingerprint_from_idp: "IdP-certifikat fingeraftryk"
+        fingerprint_from_idp: "IdP certifikat-fingeraftryk"
         idp_in_response_to: "IdP inResponseTo"
         idp_login_destination: "IdP LoginResponse destination"
         idp_logout_destination: "Idp LogoutResponse destination"
@@ -2716,7 +2716,7 @@ da:
   blueprint_courses_create_edit_associate_delete_bf41988e: "Blueprint-fag (opret / rediger / associer / slet)"
   blueprint_settings_233e909a: Blueprint-indstillinger
   body_9f663faf: Brødtekst
-  body_shadow_d36e8c2e: Skygge
+  body_shadow_d36e8c2e: Skyggetekst
   bolivia_567898d8: Bolivia
   bolivia_591_9b8a7a5c: "Bolivia (+591)"
   bookmark_bank_46d729be: "Bogmærke %{bank}"
@@ -3354,7 +3354,7 @@ da:
     public_domain: "Offentligt domæne"
   cell_number_is_invalid_bd6faee0: "Mobilnummer er ugyldigt!"
   cell_number_is_required_2edcee60: "Mobilnummer er påkrævet"
-  certificate_fingerprint_b376df90: "Certifikat fingeraftryk"
+  certificate_fingerprint_b376df90: Certifikat-fingeraftryk
   change_applied_89d1aa5a: "Ændring anvendt"
   change_beginning_date_to_39dbd06e: "Ændr begyndelsesdato til"
   change_dcaa253a: Skift
@@ -6582,7 +6582,7 @@ da:
     button: 
       insert_equation: "Indsæt udligning"
     cancel: Annuller
-    cannot_render_equation: "Denne udligning kan ikke gengives i Grundlæggende visning."
+    cannot_render_equation: "Denne udligning kan ikke gengives i Basisvisning."
     click_to_embed: "Klik for at integrere billedet"
     done: 
       title: "Klik for at afslutte redigering af RTF-område"
@@ -6613,7 +6613,7 @@ da:
     switch_editor_html: HTML-editor
     switch_editor_rich_text: "Rich Content Editor"
     switch_editor_visual: "Rich Content Editor"
-    switch_to_mathjax: "Skift visning til Grundlæggende"
+    switch_to_mathjax: "Skift visning til Basis"
     switch_to_mathquill: "Skift visning til Avanceret"
     tabs: 
       arrows: Pile
@@ -7283,7 +7283,7 @@ da:
   failed_to_submit_draft_comment_1de83451: "Mislykkedes at indsende kladde-kommentar"
   fair_38e62237: Fair
   fair_score_554e2558: "Fair Score"
-  fair_use_bee47d77: "Fair Use"
+  fair_use_bee47d77: "Fair brug"
   fall_grading_period_current_score_d48c7f78: "Nuværende resultat for efterårets karakterperiode"
   fall_grading_period_final_score_56d96a8f: "Endeligt resultat for efterårets karakterperiode"
   fall_grading_period_id_74ef68e: "Efterårets karakterperiode id"
@@ -9791,7 +9791,7 @@ da:
   media_recordings_749aef6d: Medieoptagelser
   median_ed291842: Gennemsnit
   median_score_4657e907: "Gennemsnit: %{score}"
-  meets_mastery_754e1c06: "Opfylder læringsmål"
+  meets_mastery_754e1c06: "Opfylder mål"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} medlemmer ud af maksimum %{max_membership}"
   members_af25c21d: Medlemmer
   membership_by_invitation_only_9bc27199: "Medlemskab udelukkede efter invitation"
@@ -12560,14 +12560,14 @@ da:
       meets_expectations: "Opfylder forventningerne"
     criterion: 
       close_rating: Ok
-      criterion_rating_points: "Point til kriterium-bedømmelse"
+      criterion_rating_points: "Point til kriteriebedømmelse"
       delete_criterion: Slet
-      edit_criterion_rating_title: "Rediger \"%{description} kriterium-bedømmelse"
-      insert_criterion_rating: "Indfør kriterium-bedømmelse"
+      edit_criterion_rating_title: "Rediger \"%{description} kriteriebedømmelse"
+      insert_criterion_rating: "Indfør kriteriebedømmelse"
       insert_rating: Indsæt
       points: Point
       pts: point
-      rating_description: "Beskrivelse af kriterium-bedømmelse"
+      rating_description: "Beskrivelse af kriteriebedømmelse"
     dont_import: "Denne gruppe kan ikke importeres."
     failed_outcome_creation: "Oprettelse af resultat mislykkedes"
     failed_outcome_update: "Opdatering af resultat mislykkedes"
@@ -12609,9 +12609,9 @@ da:
     outcome_criterion: "Kriterium for læringsudbytte"
     outcome_form: 
       calculation_method: Beregningsmetode
-      criterion: Kriterium-bedømmelse
+      criterion: Kriteriebedømmelse
       criterion_dialog: "Læringsudbytte kan inkluderes i opgave-rubrikker som en enkel måde at vurdere beherskelse af læringsudbytte tilpasset til specifikke opgaver. Når du definerer et læringsudbytte, skal du også definere kriterier for læringsudbyttet, der kan anvendes, når der oprettes opgave-rubrikker. Definer så mange rubrikkolonner, som du har brug for, og specificer afgrænsningen mellem dem, som bliver brugt til at definere beherskelsen af dette læringsudbytte."
-      criterion_info_link: "Klik for at læse om kriterium-bedømmelser"
+      criterion_info_link: "Klik for at læse om kriteriebedømmelser"
       description: "Beskriv dette resultat"
       display_name: "Venligt navn (valgfrit)"
       mastery: "Beherskelse ved"
@@ -12885,7 +12885,7 @@ da:
     clever_settings: 
       labels: 
         client_id: Kunde-id
-        client_secret: Kunde-hemmelighed
+        client_secret: Kundehemmelighed
     crocodoc: 
       description: "Aktivér Crocodoc som en mulighed for forhåndsvisning af dokumenter"
       name: Crocodoc
@@ -12965,7 +12965,7 @@ da:
     github_settings: 
       labels: 
         client_id: Kunde-id
-        client_secret: Kunde-hemmelighed
+        client_secret: Kundehemmelighed
         domain: Domæne
     google_docs: 
       description: "Google Docs dokument deling"
@@ -12985,8 +12985,8 @@ da:
       labels: 
         auth_uri: "Auth URI"
         client_id: Kunde-id
-        client_secret: Kunde-hemmelighed
-        client_secret_json: "Client secrets json"
+        client_secret: Kundehemmelighed
+        client_secret_json: "Kundehemmelighed json"
         redirect_uri: Omdirigerings-URI
         token_uri: "Token URI"
     grade_export: 
@@ -13088,7 +13088,7 @@ da:
       domain_name: Domæne
       labels: 
         client_id: Kunde-id
-        client_secret: Kunde-hemmelighed
+        client_secret: Kundehemmelighed
     live_events: 
       description: "Tjeneste til begivenheder i realtid."
       name: "Live begivenheder"
@@ -14483,7 +14483,7 @@ da:
           multiple_choice: "Flere valg"
           multiple_dropdowns: "Flere dropdown-menuer"
           numerical: "Numerisk svar"
-          short_answer: "Udfyld de tomme felter"
+          short_answer: "Udfyld det blanke"
           text_only: "Tekst (intet spørgsmål)"
           true_false: Sandt/Falsk
         show_possible_answers: "Vis mulige svar på %{question}"
@@ -15356,7 +15356,7 @@ da:
       read_sis: "Læs SIS-data"
     permissions: 
       app_profiling: Ansøgningsprofilering
-      become_user: "Masker som andre brugere"
+      become_user: "Gå ind som anden bruger"
       change_course_state: "Skift fagets tilstand"
       comment_on_others_submissions: "Vis alle studerendes afleveringer og kommentér dem"
       create_accounts: "Opret nye rodkonti"
@@ -16201,7 +16201,7 @@ da:
       buttons: 
         add_outcome: "Tilføj resultat"
       labels: 
-        criterion_ratings: Kriterium-bedømmelse
+        criterion_ratings: Kriteriebedømmelse
         master_level: "indstil beherskelse for ethvert resultat på eller over"
         use_for_scoring: "Brug dette kriterium til bedømmelsen"
       points: "%{points} point"
@@ -17610,7 +17610,7 @@ da:
   this_package_includes_curriculum_standards_which_a_1a137060: "Denne pakke indeholder curriculum-standarder, der ikke er kompatible med Canvas, og de blev ikke inkluderet i importen."
   this_package_includes_epub3_file_s_which_are_not_c_bbafef30: "Denne pakke indeholder EPub3-fil(er), der ikke er kompatible med Canvas, og de blev ikke inkluderet i importen."
   this_package_includes_iwb_file_s_which_are_not_com_6e3c37d2: "Denne pakke indeholder IWB-fil(er), der ikke er kompatible med Canvas, og de blev ikke inkluderet i importen."
-  this_package_includes_the_question_type_pattern_ma_ce3dadc6: "Denne pakke indeholder spørgsmålstypen, Mønster-match, der ikke er kompatibel med Canvas. Vi har konverteret spørgsmålstypen til Udfyld de tomme felter"
+  this_package_includes_the_question_type_pattern_ma_ce3dadc6: "Denne pakke indeholder spørgsmålstypen, Mønster-match, der ikke er kompatibel med Canvas. Vi har konverteret spørgsmålstypen til Udfyld det blanke"
   this_page_cannot_be_modified_because_grades_have_a_48646991: "Denne side kan ikke modificeres, fordi karaktererne allerede er blevet lagt ud."
   this_panel_lists_the_users_ready_to_be_added_to_th_79efad22: "Dette panel viser de brugere, der er klar til at blive tilføjet til dette fag."
   this_question_group_is_set_to_pick_more_questions__2e3552c4: "Denne spørgsmålsgruppe er konfigureret til at vælge flere spørgsmål end tilgængelige."
@@ -17880,7 +17880,7 @@ da:
   to_change_sis_account_id_the_user_must_have_manage_4b8a37a8: "For at skifte sis_account_id skal brugeren have manage_sis tilladelse."
   to_configure_an_openid_connect_provider_you_need_t_5c937249: |-
       Du har brug for autorisations- og token-url'er, samt at opnå kunde-id og
-      kunde hemmelighed for at konfigurere en OpenID Connect-udbyder.
+      kundehemmelighed for at konfigurere en OpenID Connect-udbyder.
       
       Hvis udbyderen kan konfigurere gyldige callback eller omdirigerings-URI'er,
       bruger du %{callback_url}.
@@ -18989,7 +18989,7 @@ da:
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       Du skal oprette et webprogram i [Google Developer Console](%{google_url}).
       Du skal tilføje %{callback_url} som omdirigerings-URI.
-      Efter oprettelse af din app, skal du notere dig kunde-id og kunde themmelighed og indtaste dem her.
+      Efter oprettelse af din app, skal du notere dig kunde-id og kundehemmelighed og indtaste dem her.
   you_will_need_to_register_a_new_app_with_microsoft_53e97ced: |-
       Du skal registrere en [ny app med Microsoft](%{ms_app_url}).
       Du skal konfigurere %{callback_url} som omdirigerings-URI.
@@ -19010,7 +19010,7 @@ da:
   you_will_need_to_register_an_application_on_linked_26ecb18d: |-
       Du skal [registrere et program på LinkedIn](%{linkedin_url}).
       Du skal tilføje %{callback_url} som et OAuth 2.0 autoriseret omdirigerings-URL og indstille programstatus til Live
-      Efter du opretter dit program, skal du notere dig kunde-id og kunde hemmelighed og indtaste dem her.
+      Efter du opretter dit program, skal du notere dig kunde-id og kundehemmelighed og indtaste dem her.
   you_will_need_to_register_an_application_on_twitte_5ff04bee: |-
       Du skal [registrere en applikation på Twitter](%{twitter_url}).
       Du skal konfigurere %{callback_url} som Callback URL.
