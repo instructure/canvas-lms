@@ -69,7 +69,6 @@ describe "student planner" do
     it "shows submitted tag for assignments that have submissions", priority: "1", test_id: 3263151 do
       @assignment.submit_homework(@student1, submission_type: "online_text_entry", body: "Assignment submitted")
       go_to_list_view
-      wait_for_planner_load
 
       # Student planner shows submitted assignments as completed. Expand to see the assignment
       expand_completed_item
@@ -95,6 +94,15 @@ describe "student planner" do
       go_to_list_view
       scroll_to(f('.PlannerApp').find_element(:xpath, "//span[text()[contains(.,'Unnamed Course Assignment')]]"))
       validate_pill('Missing')
+    end
+
+    it "can follow course link to course", priority: "1", test_id: 3306198 do
+      go_to_list_view
+      element = fln(@course[:name].upcase, f('.PlannerApp'))
+      expect_new_page_load do
+        element.click
+      end
+      expect(driver).not_to contain_css('.StudentPlanner__Container')
     end
   end
 
@@ -139,7 +147,6 @@ describe "student planner" do
 
     it "shows and navigates to quizzes page from student planner", priority: "1", test_id: 3259303 do
       go_to_list_view
-      wait_for_planner_load
       validate_object_displayed('Quiz')
       validate_link_to_url(@quiz, 'quizzes')
     end
@@ -147,7 +154,6 @@ describe "student planner" do
     it "shows and navigates to graded surveys with due dates", priority: "1", test_id: 3282673 do
       @quiz.update(quiz_type: "graded_survey")
       go_to_list_view
-      wait_for_planner_load
       validate_object_displayed('Quiz')
       validate_link_to_url(@quiz, 'quizzes')
     end
@@ -155,7 +161,6 @@ describe "student planner" do
     it "shows and navigates to ungraded surveys with due dates", priority: "1", test_id: 3282674 do
       @quiz.update(quiz_type: "survey")
       go_to_list_view
-      wait_for_planner_load
       validate_object_displayed('Quiz')
       validate_link_to_url(@quiz, 'quizzes')
     end
@@ -163,7 +168,6 @@ describe "student planner" do
     it "shows and navigates to practice quizzes with due dates", priority: "1", test_id: 3284242 do
       @quiz.update(quiz_type: "practice_quiz")
       go_to_list_view
-      wait_for_planner_load
       validate_object_displayed('Quiz')
       validate_link_to_url(@quiz, 'quizzes')
     end
@@ -242,7 +246,6 @@ describe "student planner" do
     it "edits a To Do", priority: "1", test_id: 3281714 do
       @student1.planner_notes.create!(todo_date: 2.days.from_now, title: "Title Text")
       go_to_list_view
-
       # Opens the To Do edit sidebar
       todo_item = todo_info_holder
       expect(todo_item).to include_text("To Do")
@@ -266,7 +269,6 @@ describe "student planner" do
     it "deletes a To Do", priority: "1", test_id: 3281715 do
       @student1.planner_notes.create!(todo_date: 2.days.from_now, title: "Title Text")
       go_to_list_view
-
       expect(f('body')).not_to contain_jqcss("h2:contains('No Due Dates Assigned')")
       todo_item = todo_info_holder
       expect(todo_item).to include_text("To Do")
@@ -349,7 +351,6 @@ describe "student planner" do
 
     it "loads more items at the bottom of the page", priority: "1", test_id: 3263149 do
       go_to_list_view
-      wait_for_planner_load
       current_last_item = items_displayed.last
       current_items = items_displayed.count
       scroll_to(current_last_item)
