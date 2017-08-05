@@ -1455,21 +1455,21 @@ canvas-planner@1.0.7:
     reselect "^3.0.1"
     velocity-animate "^1.5.0"
 
-canvas-rce@2.2.1:
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/canvas-rce/-/canvas-rce-2.2.1.tgz#c5ce097a4d7684b71c6e6d708cc2cb4bb1dff123"
+canvas-rce@2.2.2:
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/canvas-rce/-/canvas-rce-2.2.2.tgz#4998d87c8d4fee9bd1430dd63f3a2f718fa4d886"
   dependencies:
     aphrodite "^1.1.0"
     bloody-offset "0.0.0"
     escape-html "1.0.3"
-    format-message "5.1.0"
+    format-message "^5.1.0"
     format-message-generate-id "^5.1.0"
     isomorphic-fetch "2.2.1"
     load-css "0.1.0"
     react-redux "~4.4.5"
-    react-tinymce "0.5.1"
+    react-tinymce "0.6.0"
     react-transition-group "1.1.3"
-    redux "~3.5.2"
+    redux "^3.5.2"
     redux-batch-middleware "0.2.0"
     redux-thunk "~2.1.0"
     scroll-into-view "https://github.com/bkirkby/scroll-into-view.git#588b0ced98eeecf84e6fb2074aa076e80b7cffab"
@@ -1584,7 +1584,7 @@ clap@^1.0.9:
   dependencies:
     chalk "^1.1.3"
 
-classnames@2.2.5, classnames@^2.2.0, classnames@^2.2.1, classnames@^2.2.5, classnames@~2.2.5:
+classnames@2.2.5, classnames@^2.2.0, classnames@^2.2.1, classnames@^2.2.5:
   version "2.2.5"
   resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.5.tgz#fb3801d453467649ef3603c7d61a02bd129bde6d"
 
@@ -2831,6 +2831,10 @@ esprima@~3.1.0:
   version "3.1.3"
   resolved "https://registry.yarnpkg.com/esprima/-/esprima-3.1.3.tgz#fdca51cee6133895e3c88d535ce49dbff62a4633"
 
+esprima@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/esprima/-/esprima-4.0.0.tgz#4499eddcd1110e0b218bacf2fa7f7f59f55ca804"
+
 esquery@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/esquery/-/esquery-1.0.0.tgz#cfba8b57d7fba93f17298a8a006a04cda13d80fa"
@@ -3205,14 +3209,14 @@ format-message-generate-id@^5.1.0:
     format-message-parse "^5.1.2"
     format-message-print "^5.1.2"
 
-format-message-interpret@^5.1.0, format-message-interpret@^5.1.2:
+format-message-interpret@^5.1.2:
   version "5.1.2"
   resolved "https://registry.yarnpkg.com/format-message-interpret/-/format-message-interpret-5.1.2.tgz#183471d6b8cf048d18d76606fa96a1f2b40e7938"
   dependencies:
     format-message-formats "^5.1.0"
     lookup-closest-locale "^5.1.0"
 
-format-message-parse@^5.1.0, format-message-parse@^5.1.2:
+format-message-parse@^5.1.2:
   version "5.1.2"
   resolved "https://registry.yarnpkg.com/format-message-parse/-/format-message-parse-5.1.2.tgz#bc5cf9f7ffd6b221927c4018b21bee551b99234d"
 
@@ -3220,17 +3224,7 @@ format-message-print@^5.1.2:
   version "5.1.2"
   resolved "https://registry.yarnpkg.com/format-message-print/-/format-message-print-5.1.2.tgz#eb8621ff53764b9b5aaae2f077582a8d9a3e2527"
 
-format-message@5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/format-message/-/format-message-5.1.0.tgz#04e274c947ff2a8aae261cd8642bda0d6859ad66"
-  dependencies:
-    format-message-formats "^5.1.0"
-    format-message-interpret "^5.1.0"
-    format-message-parse "^5.1.0"
-    lookup-closest-locale "^5.1.0"
-    object-assign "^4.0.1"
-
-format-message@^5.1.2:
+format-message@^5.1.0, format-message@^5.1.2:
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/format-message/-/format-message-5.2.0.tgz#9329710082d992d048fd53f72d1e35249697e90f"
   dependencies:
@@ -4547,6 +4541,13 @@ js-yaml@3.x, js-yaml@^3.4.3, js-yaml@^3.5.1, js-yaml@^3.8.2:
     argparse "^1.0.7"
     esprima "^4.0.0"
 
+js-yaml@^3.5.2:
+  version "3.9.0"
+  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.9.0.tgz#4ffbbf25c2ac963b8299dc74da7e3740de1c18ce"
+  dependencies:
+    argparse "^1.0.7"
+    esprima "^4.0.0"
+
 js-yaml@~3.7.0:
   version "3.7.0"
   resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.7.0.tgz#5c967ddd837a9bfdca5f2de84253abe8a1c03b80"
@@ -5174,11 +5175,11 @@ lodash.values@~2.4.1:
   dependencies:
     lodash.keys "~2.4.1"
 
-"lodash@>=3.5 <5", lodash@^4.0.0, lodash@^4.0.1, lodash@^4.1.0, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.16.4, lodash@^4.17.2, lodash@^4.17.4, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.3.0, lodash@^4.5.0, lodash@~4.17.4:
+"lodash@>=3.5 <5", lodash@>=4.0.0, lodash@^4.0.0, lodash@^4.0.1, lodash@^4.1.0, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.16.4, lodash@^4.17.2, lodash@^4.17.4, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.3.0, lodash@^4.5.0, lodash@~4.17.4:
   version "4.17.4"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
 
-lodash@^3.5.0, lodash@^3.8.0, lodash@^3.9.3:
+lodash@^3.5.0, lodash@^3.8.0:
   version "3.10.1"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-3.10.1.tgz#5bf45e8e49ba4189e17d482789dfd15bd140b7b6"
 
@@ -6500,12 +6501,6 @@ promise@^7.0.3, promise@^7.1.1:
   dependencies:
     asap "~2.0.3"
 
-prop-types@15.5.8:
-  version "15.5.8"
-  resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.5.8.tgz#6b7b2e141083be38c8595aa51fc55775c7199394"
-  dependencies:
-    fbjs "^0.8.9"
-
 prop-types@^15.0.0, prop-types@^15.5.10, prop-types@^15.5.4, prop-types@^15.5.6, prop-types@^15.5.8, prop-types@^15.5.9:
   version "15.5.10"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.5.10.tgz#2797dfc3126182e3a95e3dfbb2e893ddd7456154"
@@ -6734,11 +6729,11 @@ react-tabs@0.8.2:
     classnames "^2.2.0"
     js-stylesheet "^0.0.1"
 
-react-tinymce@0.5.1:
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/react-tinymce/-/react-tinymce-0.5.1.tgz#8f56b7f81cefed06f4aca6b66c903e2db165c2c4"
+react-tinymce@0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/react-tinymce/-/react-tinymce-0.6.0.tgz#729cd1edd00c4214b7d253f02283a7d2b52813aa"
   dependencies:
-    lodash "^3.9.3"
+    lodash ">=4.0.0"
 
 react-tokeninput@2.4.0:
   version "2.4.0"
@@ -6987,15 +6982,6 @@ redux@^3.2.0, redux@^3.5.2:
     lodash-es "^4.2.1"
     loose-envify "^1.1.0"
     symbol-observable "^1.0.3"
-
-redux@~3.5.2:
-  version "3.5.2"
-  resolved "https://registry.yarnpkg.com/redux/-/redux-3.5.2.tgz#4533745e970b647ec26066a83aa30e9e26faf843"
-  dependencies:
-    lodash "^4.2.1"
-    lodash-es "^4.2.1"
-    loose-envify "^1.1.0"
-    symbol-observable "^0.2.3"
 
 regenerate@^1.2.1:
   version "1.3.2"
@@ -7841,10 +7827,6 @@ swfobject@^2.2.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/swfobject/-/swfobject-2.2.1.tgz#e55451d5dde59657335c86b01732c61a923293e2"
 
-symbol-observable@^0.2.3:
-  version "0.2.4"
-  resolved "https://registry.yarnpkg.com/symbol-observable/-/symbol-observable-0.2.4.tgz#95a83db26186d6af7e7a18dbd9760a2f86d08f40"
-
 symbol-observable@^1.0.3:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/symbol-observable/-/symbol-observable-1.0.4.tgz#29bf615d4aa7121bdd898b22d4b3f9bc4e2aa03d"
@@ -8591,6 +8573,12 @@ yallist@^2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/yallist/-/yallist-2.1.2.tgz#1c11f9218f076089a47dd512f93c6699a6a81d52"
 
+yaml-loader@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/yaml-loader/-/yaml-loader-0.5.0.tgz#86b1982d84a8e429e6647d93de9a0169e1c15827"
+  dependencies:
+    js-yaml "^3.5.2"
+
 yargs-parser@^4.2.0:
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/yargs-parser/-/yargs-parser-4.2.1.tgz#29cceac0dc4f03c6c87b4a9f217dd18c9f74871c"
@@ -8632,24 +8620,6 @@ yargs@^6.0.0:
     which-module "^1.0.0"
     y18n "^3.2.1"
     yargs-parser "^4.2.0"
-
-yargs@^7.0.0:
-  version "7.1.0"
-  resolved "https://registry.yarnpkg.com/yargs/-/yargs-7.1.0.tgz#6ba318eb16961727f5d284f8ea003e8d6154d0c8"
-  dependencies:
-    camelcase "^3.0.0"
-    cliui "^3.2.0"
-    decamelize "^1.1.1"
-    get-caller-file "^1.0.1"
-    os-locale "^1.4.0"
-    read-pkg-up "^1.0.1"
-    require-directory "^2.1.1"
-    require-main-filename "^1.0.1"
-    set-blocking "^2.0.0"
-    string-width "^1.0.2"
-    which-module "^1.0.0"
-    y18n "^3.2.1"
-    yargs-parser "^5.0.0"
 
 yargs@~3.10.0:
   version "3.10.0"

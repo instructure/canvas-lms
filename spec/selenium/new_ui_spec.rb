@@ -140,7 +140,7 @@ describe 'new ui' do
     it 'should not break equation editor css', priority: "2", test_id: 273600 do
       get "/courses/#{@course.id}/assignments/new"
       wait_for_tiny(f('#assignment_description'))
-      f('div#mceu_19.mce-widget.mce-btn').click
+      f('div#mceu_20.mce-widget.mce-btn').click
       wait_for_ajaximations
       expect(f('.mathquill-toolbar-panes, .mathquill-tab-bar')).to be_displayed
     end

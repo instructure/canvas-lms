@@ -124,52 +124,23 @@ class Submission < ActiveRecord::Base
     where(assignment_id: course.assignments.except(:order))
   }
 
-  # truth table for `missing` and `not_missing` scopes
-  # +--------------------+-----------+--------------+---------------------+---------+---------+-----------+---------+
-  # | late_policy_status | past_due? | submitted_at | assignment          | excused | graded? | score > 0 | MISSING |
-  # |                    |           | .present?    | .expects_submission?|         |         |           |         |
-  # +--------------------+-----------+--------------+---------------------+---------+---------+-----------+---------+
-  # | missing            | any       | any          | any                 | any     | any     | any       | TRUE    |
-  # +--------------------+-----------+--------------+---------------------+---------+---------+-----------+---------+
-  # | not null           | any       | any          | any                 | any     | any     | any       | FALSE   |
-  # | not missing        |           |              |                     |         |         |           |         |
-  # +--------------------+-----------+--------------+---------------------+---------+---------+-----------+---------+
-  # | NULL               | FALSE     | any          | any                 | any     | any     | any       | FALSE   |
-  # +--------------------+-----------+--------------+---------------------+---------+---------+-----------+---------+
-  # | NULL               | TRUE      | TRUE         | any                 | any     | any     | any       | FALSE   |
-  # +--------------------+-----------+--------------+---------------------+---------+---------+-----------+---------+
-  # | NULL               | TRUE      | FALSE        | TRUE                | any     | any     | any       | TRUE    |
-  # +--------------------+-----------+--------------+---------------------+---------+---------+-----------+---------+
-  # | NULL               | TRUE      | FALSE        | FALSE               | TRUE    | any     | any       | FALSE   |
-  # +--------------------+-----------+--------------+---------------------+---------+---------+-----------+---------+
-  # | NULL               | TRUE      | FALSE        | FALSE               | FALSE   | FALSE   | any       | TRUE    |
-  # +--------------------+-----------+--------------+---------------------+---------+---------+-----------+---------+
-  # | NULL               | TRUE      | FALSE        | FALSE               | FALSE   | TRUE    | TRUE      | FALSE   |
-  # +--------------------+-----------+--------------+---------------------+---------+---------+-----------+---------+
-  # | NULL               | TRUE      | FALSE        | FALSE               | FALSE   | TRUE    | FALSE     | TRUE    |
-  # +--------------------+-----------+--------------+---------------------+---------+---------+-----------+---------+
   scope :missing, -> do
     joins(:assignment).
     where("
-      -- teacher said it's missing, 'nuff said.
-      late_policy_status = 'missing' OR
-      (
-        -- Otherwise, submission does not have a late policy applied and
-        late_policy_status is null and
-        -- submission is past due and
-        COALESCE(submitted_at, CURRENT_TIMESTAMP) >= cached_due_date +
-          CASE submission_type WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END and
-        -- submission is not submitted and
-        NULLIF(submission_type, '') is null and
+      -- if excused is false or null, and...
+      excused IS NOT TRUE AND (
+        -- teacher said it's missing, 'nuff said.
+        late_policy_status = 'missing' OR
         (
-          -- we expect a digital submission or
-          COALESCE(NULLIF(assignments.submission_types, ''), 'none') similar to '%(online\_%|discussion\_topic)%' or
-          (
-            -- submission is not excused and
-            excused is not true and
-            -- submission is not graded
-            (submissions.workflow_state is distinct from 'graded' or NULLIF(score, 0) IS NULL)
-          )
+          -- Otherwise, submission does not have a late policy applied and
+          late_policy_status is null and
+          -- submission is past due and
+          COALESCE(submitted_at, CURRENT_TIMESTAMP) >= cached_due_date +
+            CASE submission_type WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END and
+          -- submission is not submitted and
+          NULLIF(submission_type, '') is null and
+          -- we expect a digital submission
+          COALESCE(NULLIF(assignments.submission_types, ''), 'none') not similar to '%(none|not\_graded|on\_paper|wiki\_page|external\_tool)%'
         )
       )
     ")
@@ -178,80 +149,49 @@ class Submission < ActiveRecord::Base
   scope :not_missing, -> do
     joins(:assignment).
     where("
-      -- teacher hasn't said it's missing and
-      late_policy_status is distinct from 'missing' and
-      (
-        -- submission is not past due or
-        cached_due_date is null or
-        COALESCE(submitted_at, CURRENT_TIMESTAMP) < cached_due_date +
-          CASE submission_type WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END or
-        -- submission is submitted or
-        NULLIF(submission_type, '') is not null or
+      -- excused submissions cannot be missing
+      excused IS TRUE OR (
+        -- teacher hasn't said it's missing and
+        late_policy_status is distinct from 'missing' and
         (
-          -- we expect an offline submission and
+          -- late policy status was overridden but the value is not 'missing', or
+          late_policy_status IS NOT NULL OR
+          -- submission is not past due or
+          cached_due_date is null or
+          COALESCE(submitted_at, CURRENT_TIMESTAMP) < cached_due_date +
+            CASE submission_type WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END or
+          -- submission is submitted or
+          NULLIF(submission_type, '') is not null or
+          -- we expect an offline submission
           COALESCE(NULLIF(assignments.submission_types, ''), 'none') similar to
-            '%(none|not\_graded|on\_paper|wiki\_page|external\_tool)%' and
-          (
-            -- submission is excused or
-            excused is true or
-            -- submission is graded
-            (submissions.workflow_state = 'graded' and NULLIF(score, 0) IS NOT NULL)
-          )
+            '%(none|not\_graded|on\_paper|wiki\_page|external\_tool)%'
         )
       )
     ")
   end
 
-  #
-  # Karnaugh Map for this scope
-  #
-  # A: late_policy_status: 'late'
-  # B: submission_type: 'online_quiz'
-  # C: not(cached_due_date: nil)
-  # D: not(submitted_at: nil)
-  # E: submitted_at > cached_due_date
-  # F: submitted_at - 60.seconds > cached_due_date
-  #
-  # +--------+--------+--------+--------+--------+--------+--------+--------+--------+
-  # |        | D'E'F' | D'E'F  | D'EF   | D'EF'  | DE'F'  | DE'F   | DEF    | DEF'   |
-  # +--------+--------+--------+--------+--------+--------+--------+--------+--------+
-  # | A'B'C' |   0    |   0    |   0    |   0    |   0    |   0    |   0    |   0    |
-  # +--------+--------+--------+--------+--------+--------+--------+--------+--------+
-  # | A'B'C  |   0    |   0    |   0    |   0    |   0    |   0    |   1    |   1    |
-  # +--------+--------+--------+--------+--------+--------+--------+--------+--------+
-  # | A'BC   |   0    |   0    |   0    |   0    |   0    |   1    |   1    |   0    |
-  # +--------+--------+--------+--------+--------+--------+--------+--------+--------+
-  # | A'BC'  |   0    |   0    |   0    |   0    |   0    |   0    |   0    |   0    |
-  # +--------+--------+--------+--------+--------+--------+--------+--------+--------+
-  # | AB'C'  |   1    |   1    |   1    |   1    |   1    |   1    |   1    |   1    |
-  # +--------+--------+--------+--------+--------+--------+--------+--------+--------+
-  # | AB'C   |   1    |   1    |   1    |   1    |   1    |   1    |   1    |   1    |
-  # +--------+--------+--------+--------+--------+--------+--------+--------+--------+
-  # | ABC    |   1    |   1    |   1    |   1    |   1    |   1    |   1    |   1    |
-  # +--------+--------+--------+--------+--------+--------+--------+--------+--------+
-  # | ABC'   |   1    |   1    |   1    |   1    |   1    |   1    |   1    |   1    |
-  # +--------+--------+--------+--------+--------+--------+--------+--------+--------+
-  #
-  # y = A + B'CDE + BCDF
-  #
   scope :late, -> do
     left_joins(:quiz_submission).
     where("
-      submissions.late_policy_status = 'late' OR
-      (submissions.late_policy_status IS NULL AND submissions.submitted_at >= submissions.cached_due_date +
-         CASE submissions.submission_type WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END
-         AND (submissions.quiz_submission_id IS NULL OR quiz_submissions.workflow_state = 'complete'))
+      submissions.excused IS NOT TRUE AND (
+        submissions.late_policy_status = 'late' OR
+        (submissions.late_policy_status IS NULL AND submissions.submitted_at >= submissions.cached_due_date +
+           CASE submissions.submission_type WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END
+           AND (submissions.quiz_submission_id IS NULL OR quiz_submissions.workflow_state = 'complete'))
+      )
     ")
   end
 
   scope :not_late, -> do
     left_joins(:quiz_submission).
     where("
-      submissions.late_policy_status is distinct from 'late' AND
-      (submissions.submitted_at IS NULL OR submissions.cached_due_date IS NULL OR
-        submissions.submitted_at < submissions.cached_due_date +
-          CASE submissions.submission_type WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END
-        OR quiz_submissions.workflow_state <> 'complete')
+      submissions.excused IS TRUE OR (
+        submissions.late_policy_status is distinct from 'late' AND
+        (submissions.submitted_at IS NULL OR submissions.cached_due_date IS NULL OR
+          submissions.submitted_at < submissions.cached_due_date +
+            CASE submissions.submission_type WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END
+          OR quiz_submissions.workflow_state <> 'complete')
+      )
     ")
   end
 
@@ -1339,7 +1279,7 @@ class Submission < ActiveRecord::Base
     return unless late_policy_status_manually_applied? || incoming_assignment.expects_submission?
     late_policy ||= incoming_assignment.course.late_policy
     return score_missing(late_policy, incoming_assignment.points_possible, incoming_assignment.grading_type) if missing?
-    score_late_or_none(late_policy, incoming_assignment.points_possible) if score
+    score_late_or_none(late_policy, incoming_assignment.points_possible, incoming_assignment.grading_type) if score
   end
 
   def score_missing(late_policy, points_possible, grading_type)
@@ -1349,9 +1289,9 @@ class Submission < ActiveRecord::Base
   end
   private :score_missing
 
-  def score_late_or_none(late_policy, points_possible)
+  def score_late_or_none(late_policy, points_possible, grading_type)
     raw_score = score_changed? ? score : entered_score
-    deducted = late_points_deducted(raw_score, late_policy, points_possible)
+    deducted = late_points_deducted(raw_score, late_policy, points_possible, grading_type)
     new_score = raw_score - deducted
     self.points_deducted = deducted
     self.score = new_score
@@ -1367,9 +1307,12 @@ class Submission < ActiveRecord::Base
     assignment.score_to_grade(entered_score) if entered_score
   end
 
-  def late_points_deducted(raw_score, late_policy, points_possible)
-    return 0 unless late_policy && points_possible && late?
-    late_policy.points_deducted(score: raw_score, possible: points_possible, late_for: seconds_late)
+  def late_points_deducted(raw_score, late_policy, points_possible, grading_type)
+    return 0 unless late_policy && late?
+
+    late_policy.points_deducted(
+      score: raw_score, possible: points_possible, late_for: seconds_late, grading_type: grading_type
+    )
   end
   private :late_points_deducted
 
@@ -1993,16 +1936,29 @@ class Submission < ActiveRecord::Base
     alias past_due past_due?
 
     def late?
+      return false if excused?
       return late_policy_status == 'late' unless late_policy_status.nil?
       submitted_at.present? && past_due?
     end
     alias late late?
 
     def missing?
-      return late_policy_status == 'missing' unless late_policy_status.nil?
+      return false if excused?
+      # It's missing if the teacher said it was missing
+      return late_policy_status == 'missing' if late_policy_status.present?
 
-      return false if !past_due? || submitted_at.present?
-      assignment.expects_submission? || !(self.excused || (self.graded? && self.score > 0))
+      # Teacher didn't say it was missing
+      # It's not missing if it has already been submitted
+      return false if submitted_at.present?
+
+      # It hasn't been submitted yet
+      # It's not missing if it's not past due
+      return false unless past_due?
+
+      # It isn't excused
+      # It is missing if the assignment expects a submission
+      # It is not missing if the assignment does not expect a submission
+      assignment.expects_submission?
     end
     alias missing missing?
 

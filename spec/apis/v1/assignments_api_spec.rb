@@ -125,6 +125,34 @@ describe AssignmentsApiController, type: :request do
       expect(json.first['max_name_length']).to eq(20)
     end
 
+    it 'returns all assignments using paging' do
+      group1 = @course.assignment_groups.create!(:name => 'group1')
+      41.times do
+        @course.assignments.create!(:title => 'assignment1',
+          :assignment_group => group1).
+          update_attribute(:position, 0)
+      end
+      assignment_ids = []
+      page = 1
+      loop do
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/assignments.json?per_page=10&page=#{page}",
+                        {
+                            :controller => 'assignments_api',
+                            :action => 'index',
+                            :format => 'json',
+                            :course_id => @course.id.to_s,
+                            :per_page => '10',
+                            :page => page.to_s
+                        })
+        assignment_ids.concat(json.map { |a| a['id'] })
+        break if json.empty?
+        page +=1
+      end
+      expect(assignment_ids.count).to eq(41)
+      expect(assignment_ids.uniq.count).to eq(41)
+    end
+
     it "sorts the returned list of assignments" do
       # the API returns the assignments sorted by
       # [assignment_groups.position, assignments.position]

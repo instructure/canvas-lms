@@ -40,7 +40,6 @@ define [
   'compiled/userSettings'
   'spin.js'
   'compiled/AssignmentMuter'
-  'compiled/gradezilla/AssignmentGroupWeightsDialog'
   'compiled/shared/GradeDisplayWarningDialog'
   'compiled/gradezilla/PostGradesFrameDialog'
   'compiled/util/NumberCompare'
@@ -99,7 +98,7 @@ define [
 ], ($, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
   GradingPeriodsApi, GradingPeriodSetsApi, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS,
   CourseGradeCalculator, EffectiveDueDates, GradeFormatHelper, UserSettings, Spinner, AssignmentMuter,
-  AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
+  GradeDisplayWarningDialog, PostGradesFrameDialog,
   NumberCompare, natcompare, ConvertCase, htmlEscape, SetDefaultGradeDialogManager,
   CurveGradesDialogManager, GradebookApi, CellEditorFactory, CellFormatterFactory, ColumnHeaderRenderer, GridSupport,
   studentRowHeaderConstants, AssignmentColumnHeader,
@@ -211,9 +210,6 @@ define [
     gridReady: $.Deferred()
 
     constructor: (@options) ->
-      # emitted by AssignmentGroupWeightsDialog
-      $.subscribe 'assignment_group_weights_changed', @handleAssignmentGroupWeightChange
-
       $.subscribe 'assignment_muting_toggled',        @handleAssignmentMutingChange
       $.subscribe 'submissions_updated',              @updateSubmissionsFromExternal
 
@@ -462,7 +458,6 @@ define [
     gotAllAssignmentGroups: (assignmentGroups) =>
       # purposely passing the @options and assignmentGroups by reference so it can update
       # an assigmentGroup's .group_weight and @options.group_weighting_scheme
-      new AssignmentGroupWeightsDialog context: @options, assignmentGroups: assignmentGroups
       for group in assignmentGroups
         @assignmentGroups[group.id] = group
         for assignment in group.assignments
@@ -790,16 +785,6 @@ define [
     handleAssignmentMutingChange: (assignment) =>
       @renderAssignmentColumnHeader(assignment.id)
       @updateFilteredContentInfo()
-      @buildRows()
-
-    handleAssignmentGroupWeightChange: (assignment_group_options) =>
-      columns = @grid.getColumns()
-      for assignment_group in assignment_group_options.assignmentGroups
-        column = _.findWhere columns, id: "assignment_group_#{assignment_group.id}"
-        @initAssignmentGroupColumnHeader(column)
-      @updateFilteredContentInfo()
-      @grid.setColumns(columns)
-      # TODO: don't buildRows?
       @buildRows()
 
     handleSubmissionsDownloading: (assignmentId) =>
@@ -2376,9 +2361,12 @@ define [
         onClose: => @gridSupport.helper.focus()
         showContentComingSoon: !@options.new_gradebook_development_enabled
         student:
+          id: student.id,
           name: student.name,
           avatarUrl: htmlDecode(student.avatar_url)
         submission: ConvertCase.camelize(submission)
+        courseId: @options.context_id
+        speedGraderEnabled: @options.speed_grader_enabled
       props.latePolicy = ConvertCase.camelize(@options.late_policy) if @options.late_policy
       renderComponent(SubmissionTray, mountPoint, props)
 

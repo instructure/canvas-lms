@@ -35,7 +35,7 @@ module AccountReports
 
       #if both dates are specified use them or change the start date if range is over 2 week
       if start_at && end_at
-        if end_at - start_at > 2.weeks
+        if end_at - start_at > 2.weeks.to_i
           @start = end_at - 2.weeks
           @account_report.parameters["start_at"] = @start
         end

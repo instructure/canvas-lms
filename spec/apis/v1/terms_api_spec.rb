@@ -69,7 +69,7 @@ describe TermsApiController, type: :request do
       end
 
       it "should not blow up for invalid state parameters" do
-        json = get_terms(workflow_state: {all: nil})
+        json = get_terms(workflow_state: ['blall'])
         names = json.map { |t| t['name'] }
         expect(names).to include(@term1.name)
         expect(names).not_to include(@term2.name)

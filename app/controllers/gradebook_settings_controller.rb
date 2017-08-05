@@ -97,7 +97,7 @@ class GradebookSettingsController < ApplicationController
       gradebook_settings: {
        @context.id => nilify_strings(gradebook_settings_params.except(:colors).to_h),
        # when new_gradebook is the only gradebook this can change to .fetch('colors')
-       colors: gradebook_settings_params.fetch('colors', {}).to_h
+       colors: gradebook_settings_params.fetch('colors', {}).to_unsafe_h
       }
     })
   end

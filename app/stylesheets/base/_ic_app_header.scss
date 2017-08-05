@@ -30,9 +30,8 @@
 // ic-brand-global-nav-ic-icon-svg-fill--active
 // ic-brand-global-nav-logo-bgd
 
-$ic-global-nav-menu-item__badge-border: darken($ic-brand-global-nav-bgd, 5%);
-$ic-global-nav-link-hover: darken($ic-brand-global-nav-bgd, 5%);
-$ic-global-nav-link-active:  darken($ic-brand-global-nav-bgd, 8%);
+$ic-global-nav-link-hover: rgba(black, 0.2);
+$ic-global-nav-link-active:  rgba(black, 0.4);
 $ic-masquerade-color: $ic-color-action;
 $ic-subnav-panel-bgd: $ic-color-light;
 $ic-subnav-tray-bgd: black;
@@ -64,7 +63,6 @@ $ic-tooltip-arrow-size: 0.375rem;
   bottom: 0;
   z-index: 1;
   width: 100%;
-  background-color: rgba($ic-brand-global-nav-bgd, 0.8);
 }
 
 .ic-app-header__menu-list {
@@ -148,9 +146,6 @@ $ic-tooltip-arrow-size: 0.375rem;
     .ic-avatar {
       border-color: var(--ic-brand-global-nav-avatar-border);
       &.ic-avatar--fake-student { border-color: $ic-masquerade-color; }
-    }
-    .menu-item__badge {
-      @include primary-nav-badge-border($ic-global-nav-menu-item__badge-border);
     }
     .menu-item__text {
       transform: translate3d($ic-tooltip-arrow-size, 0, 0);
@@ -357,7 +352,7 @@ body.primary-nav-expanded {
     .menu-item__text {
 
       @if $use_high_contrast {
-        color: var(--ic-link-color);
+        color: $ic-link-color;
       }
       @else {
         color: var(--ic-brand-global-nav-menu-item__text-color--active);

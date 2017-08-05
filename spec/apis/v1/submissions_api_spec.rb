@@ -95,6 +95,24 @@ describe 'Submissions API', type: :request do
       expect(json.size).to eq 1
     end
 
+    it 'returns submissions based on workflow_state' do
+      json = api_call(:get,
+        "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
+        { :controller => 'submissions_api', :action => 'for_students',
+          :format => 'json', :section_id => 'sis_section_id:my-section-sis-id' },
+          :workflow_state => 'submitted',
+          :student_ids => [@student1.id])
+      expect(json.size).to eq 1
+
+      json = api_call(:get,
+        "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
+        { :controller => 'submissions_api', :action => 'for_students',
+          :format => 'json', :section_id => 'sis_section_id:my-section-sis-id' },
+          :workflow_state => 'unsubmitted',
+          :student_ids => [@student1.id])
+      expect(json.size).to eq 0
+    end
+
     it "includes user" do
       json = api_call(:get,
         "/api/v1/sections/#{@section.id}/assignments/#{@a1.id}/submissions.json",

@@ -17,16 +17,17 @@
  */
 
 import Fixtures from 'spec/jsx/gradebook-history/Fixtures';
-import parseLinkHeader from 'jsx/shared/parseLinkHeader';
 import {
   FETCH_HISTORY_START,
   FETCH_HISTORY_SUCCESS,
   FETCH_HISTORY_FAILURE,
   FETCH_HISTORY_NEXT_PAGE_START,
   FETCH_HISTORY_NEXT_PAGE_SUCCESS,
-  FETCH_HISTORY_NEXT_PAGE_FAILURE
+  FETCH_HISTORY_NEXT_PAGE_FAILURE,
+  formatHistoryItems
 } from 'jsx/gradebook-history/actions/HistoryActions';
-import reducer, { formatHistoryItems } from 'jsx/gradebook-history/reducers/HistoryReducer';
+import parseLinkHeader from 'jsx/shared/parseLinkHeader';
+import reducer from 'jsx/gradebook-history/reducers/HistoryReducer';
 
 QUnit.module('HistoryReducer');
 
@@ -37,6 +38,13 @@ const defaultState = () => (
     fetchHistoryStatus: 'success'
   }
 )
+
+const defaultPayload = () => (
+  {
+    items: formatHistoryItems(Fixtures.historyResponse().data),
+    link: parseLinkHeader(Fixtures.historyResponse().headers.link)
+  }
+);
 
 test('returns the current state by default', function () {
   const initialState = defaultState();
@@ -58,7 +66,7 @@ test('should handle FETCH_HISTORY_START', function () {
 });
 
 test('handles FETCH_HISTORY_SUCCESS', function () {
-  const payload = Fixtures.payload();
+  const payload = defaultPayload();
   const initialState = {
     ...defaultState(),
     fetchHistoryStatus: 'started'
@@ -66,8 +74,8 @@ test('handles FETCH_HISTORY_SUCCESS', function () {
   const newState = {
     ...initialState,
     loading: false,
-    nextPage: parseLinkHeader(payload.link).next,
-    items: formatHistoryItems(payload),
+    nextPage: payload.link,
+    items: payload.items,
     fetchHistoryStatus: 'success'
   };
   deepEqual(reducer(initialState, { type: FETCH_HISTORY_SUCCESS, payload }), newState);
@@ -99,17 +107,17 @@ test('handles FETCH_HISTORY_NEXT_PAGE_START', function () {
 });
 
 test('handles FETCH_HISTORY_NEXT_PAGE_SUCCESS', function () {
-  const payload = Fixtures.payload();
+  const payload = defaultPayload();
   const initialState = {
     ...defaultState(),
-    items: formatHistoryItems(Fixtures.payload())
+    items: formatHistoryItems(Fixtures.historyResponse().data)
   };
   const newState = {
     ...initialState,
     fetchNextPageStatus: 'success',
-    items: initialState.items.concat(formatHistoryItems(payload)),
+    items: initialState.items.concat(payload.items),
     loading: false,
-    nextPage: parseLinkHeader(payload.link).next
+    nextPage: payload.link
   };
   deepEqual(reducer(initialState, { type: FETCH_HISTORY_NEXT_PAGE_SUCCESS, payload }), newState);
 });

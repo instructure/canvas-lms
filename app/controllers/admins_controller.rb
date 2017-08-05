@@ -37,7 +37,7 @@
 #           "description": "The user the role is assigned to. See the Users API for details.",
 #           "$ref": "User"
 #         },
-#         "status": {
+#         "workflow_state": {
 #           "description": "The status of the account role/user assignment.",
 #           "type": "string",
 #           "example": "deleted"
@@ -75,10 +75,11 @@ class AdminsController < ApplicationController
 
     require_role
     admin = @context.account_users.where(user_id: user.id, role_id: @role.id).first_or_initialize
+    admin.workflow_state = 'active'
 
     return unless authorized_action(admin, @current_user, :create)
 
-    if admin.new_record?
+    if admin.new_record? || admin.workflow_state_changed?
       if admin.save
         # if they don't provide it, or they explicitly want it
         if params[:send_confirmation].nil? ||
@@ -130,7 +131,7 @@ class AdminsController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :manage_account_memberships)
       user_ids = api_find_all(User, Array(params[:user_id])).pluck(:id) if params[:user_id]
-      scope = @context.account_users
+      scope = @context.account_users.active
       scope = scope.where(user_id: user_ids) if user_ids
       route = polymorphic_url([:api_v1, @context, :admins])
       admins = Api.paginate(scope.order(:id), self, route)

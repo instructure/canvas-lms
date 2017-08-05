@@ -20,7 +20,19 @@ class MasterCourses::ChildContentTag < ActiveRecord::Base
 
   belongs_to :child_subscription, :class_name => "MasterCourses::ChildSubscription"
 
-  belongs_to :content, :polymorphic => true
+  belongs_to :content, polymorphic: [:assessment_question_bank,
+                                     :assignment,
+                                     :assignment_group,
+                                     :attachment,
+                                     :calendar_event,
+                                     :context_external_tool,
+                                     :context_module,
+                                     :discussion_topic,
+                                     :learning_outcome,
+                                     :rubric,
+                                     :wiki_page,
+                                     quiz: 'Quizzes::Quiz'
+  ]
   validates_with MasterCourses::TagValidator
 
   serialize :downstream_changes, Array # an array of changed columns

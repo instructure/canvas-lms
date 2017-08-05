@@ -231,11 +231,13 @@ class AccountAuthorizationConfig < ActiveRecord::Base
           account.get_account_role_by_name(role_name)
         end.compact
         roles_to_add = roles - existing_account_users.map(&:role)
-        account_users_to_delete = existing_account_users.select { |au| !roles.include?(au.role) }
+        account_users_to_delete = existing_account_users.select { |au| au.active? && !roles.include?(au.role) }
+        account_users_to_activate = existing_account_users.select { |au| au.deleted? && roles.include?(au.role) } 
         roles_to_add.each do |role|
           account.account_users.create!(user: user, role: role)
         end
         account_users_to_delete.each(&:destroy)
+        account_users_to_activate.each(&:reactivate)
       when 'sis_user_id', 'integration_id'
         pseudonym[attribute] = value
       when 'display_name'

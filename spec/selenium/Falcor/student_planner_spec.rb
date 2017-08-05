@@ -297,6 +297,7 @@ describe "student planner" do
     before :once do
       @course.assignments.create!(name: 'assignmentThatHasToBeDoneNow',
                                   description: 'This will take a long time',
+                                  submission_types: 'online_text_entry',
                                   due_at: Time.zone.now - 2.days)
     end
 

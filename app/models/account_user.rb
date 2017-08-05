@@ -36,10 +36,27 @@ class AccountUser < ActiveRecord::Base
 
   alias_method :context, :account
 
+  scope :active, -> { where.not(workflow_state: 'deleted') }
 
+  include Workflow
+  workflow do
+    state :active
+
+    state :deleted do
+      event :reactivate, transitions_to: :active
+    end
+  end
+
+  alias_method :destroy_permanently!, :destroy
+  def destroy
+    return if self.new_record?
+    self.workflow_state = 'deleted'
+    self.save!
+  end
 
   def update_account_associations_if_changed
-    if (self.account_id_changed? || self.user_id_changed?)
+    being_deleted = self.workflow_state == 'deleted' && self.workflow_state_was != 'deleted'
+    if (self.account_id_changed? || self.user_id_changed?) || being_deleted
       if self.new_record?
         return if %w{creation_pending deleted}.include?(self.user.workflow_state)
         account_chain = self.account.account_chain
@@ -157,7 +174,7 @@ class AccountUser < ActiveRecord::Base
   def self.account_ids_for_user(user)
     @account_ids_for ||= {}
     @account_ids_for[user.id] ||= Rails.cache.fetch(['account_ids_for_user', user].cache_key) do
-      AccountUser.for_user(user).map(&:account_id)
+      AccountUser.active.for_user(user).map(&:account_id)
     end
   end
 

@@ -357,6 +357,7 @@ module Api
   end
 
   def self.wrap_pagination_args!(pagination_args, controller)
+    pagination_args = pagination_args.to_unsafe_h if pagination_args.is_a?(ActionController::Parameters)
     pagination_args.reverse_merge!(
       page: controller.params[:page],
       per_page: per_page_for(controller,

@@ -21,16 +21,15 @@ import { mount, shallow } from 'enzyme';
 import Spinner from 'instructure-ui/lib/components/Spinner';
 import Table from 'instructure-ui/lib/components/Table';
 import Typography from 'instructure-ui/lib/components/Typography';
-import constants from 'jsx/gradebook-history/constants';
 import { SearchResultsComponent } from 'jsx/gradebook-history/SearchResults';
-import { formatHistoryItems } from 'jsx/gradebook-history/reducers/HistoryReducer';
+import { formatHistoryItems } from 'jsx/gradebook-history/actions/HistoryActions';
 import Fixtures from 'spec/jsx/gradebook-history/Fixtures';
 
 const defaultProps = () => (
   {
     caption: 'search results caption',
     fetchHistoryStatus: 'success',
-    historyItems: formatHistoryItems(Fixtures.payload()),
+    historyItems: formatHistoryItems(Fixtures.historyResponse().data),
     getNextPage () {},
     nextPage: 'example.com',
     requestingResults: false
@@ -65,18 +64,33 @@ test('Table is passed the label and caption props', function () {
   equal(table.props().caption, 'search results caption');
 });
 
-test('Table is passed column headers in correct order', function () {
-  const table = this.wrapper.find(Table);
-  deepEqual(table.props().colHeaders, constants.colHeaders);
+test('Table has column headers in correct order', function () {
+  const expectedHeaders = [
+    'Date',
+    'Time',
+    'From',
+    'To',
+    'Grader',
+    'Student',
+    'Assignment',
+    'Anonymous'
+  ];
+  const wrapper = mount(<SearchResultsComponent {...defaultProps()} />);
+  const headerNodes = wrapper.find('thead').find('tr').find('th').nodes;
+  const headers = [];
+
+  for (let i = 0; i < headerNodes.length; i += 1) {
+    headers.push(headerNodes[i].innerHTML);
+  }
+
+  deepEqual(headers, expectedHeaders);
 });
 
 test('Table displays the formatted historyItems passed it', function () {
-  const payload = Fixtures.payload();
-  const events = payload.events;
-  const historyItems = formatHistoryItems(payload);
-  const props = { ...defaultProps(), historyItems }
+  const items = formatHistoryItems(Fixtures.historyResponse().data);
+  const props = { ...defaultProps(), items }
   const tableBody = mount(<SearchResultsComponent {...props} />);
-  equal(tableBody.find('tbody').find('tr').length, events.length);
+  equal(tableBody.find('tbody').find('tr').length, items.length);
   tableBody.unmount();
 });
 
@@ -100,7 +114,7 @@ test('Table shows text if request was made but no results were found', function 
 });
 
 test('shows text indicating that the end of results was reached', function () {
-  const historyItems = formatHistoryItems(Fixtures.payload());
+  const historyItems = formatHistoryItems(Fixtures.historyResponse().data);
   const props = { ...defaultProps(), nextPage: '', requestingResults: false, historyItems };
   const wrapper = mount(<SearchResultsComponent {...props} />);
   const textBox = wrapper.find(Typography);
@@ -113,7 +127,7 @@ test('loads next page if possible and the first results did not result in a scro
   const actualInnerHeight = window.innerHeight;
   // fake to test that there's not a vertical scrollbar
   window.innerHeight = document.body.clientHeight + 1;
-  const historyItems = formatHistoryItems(Fixtures.payload());
+  const historyItems = formatHistoryItems(Fixtures.historyResponse().data);
   const props = { ...defaultProps(), nextPage: 'example.com', getNextPage: this.stub() };
   const wrapper = mount(<SearchResultsComponent {...props} />);
   wrapper.setProps({ historyItems });
@@ -124,7 +138,7 @@ test('loads next page if possible and the first results did not result in a scro
 
 test('loads next page on scroll if possible', function () {
   const actualInnerHeight = window.innerHeight;
-  const historyItems = formatHistoryItems(Fixtures.payload());
+  const historyItems = formatHistoryItems(Fixtures.historyResponse().data);
   const props = {
     ...defaultProps(),
     historyItems,

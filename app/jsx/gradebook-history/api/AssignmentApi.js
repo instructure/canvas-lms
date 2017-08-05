@@ -16,30 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!gradebook_history';
-import splitAssetString from 'coffeescripts/str/splitAssetString';
+import axios from 'axios';
 
-const colHeaders = [
-  I18n.t('Date'),
-  I18n.t('Time'),
-  I18n.t('From'),
-  I18n.t('To'),
-  I18n.t('Grader'),
-  I18n.t('Student'),
-  I18n.t('Assignment'),
-  I18n.t('Anonymous')
-];
+function getAssignmentsByName (courseId, searchTerm) {
+  if (searchTerm.length < 3) {
+    // the endpoint doesn't allow searching by 2 letters or less
+    return Promise.resolve({ response: { data: [] } });
+  }
 
-function courseId () {
-  return ENV.context_asset_string ? splitAssetString(ENV.context_asset_string)[1] : '';
+  const params = {
+    params: {
+      search_term: searchTerm
+    }
+  };
+
+  const url = encodeURI(`/api/v1/courses/${courseId}/assignments`);
+
+  return axios.get(url, params);
 }
 
-function timezone () {
-  return ENV.TIMEZONE;
+function getAssignmentsNextPage (url) {
+  return axios.get(url);
 }
 
 export default {
-  colHeaders,
-  courseId,
-  timezone
-}
+  getAssignmentsByName,
+  getAssignmentsNextPage
+};

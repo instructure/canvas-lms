@@ -220,7 +220,7 @@ class CommunicationChannelsController < ApplicationController
       @root_account ||= @user.pseudonyms.first.try(:account) if @user.pre_registered?
       @root_account ||= @user.enrollments.first.try(:root_account) if @user.creation_pending?
       unless @root_account
-        account = @user.all_accounts.first
+        account = @user.adminable_accounts.first
         @root_account = account.try(:root_account)
       end
       @root_account ||= @domain_root_account

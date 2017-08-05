@@ -267,6 +267,9 @@ class SubmissionsApiController < ApplicationController
   #   The id of the grading period in which submissions are being requested
   #   (Requires grading periods to exist on the account)
   #
+  # @argument workflow_state [String, "submitted"|"unsubmitted"|"graded"|"pending_review"]
+  #   The current status of the submission
+  #
   # @argument order [String, "id"|"graded_at"]
   #   The order submissions will be returned in.  Defaults to "id".  Doesn't
   #   affect results for "grouped" mode.
@@ -371,23 +374,26 @@ class SubmissionsApiController < ApplicationController
 
     if params[:grouped].present?
       scope = (@section || @context).all_student_enrollments.
-          eager_load(:user => :pseudonyms).
-          where("users.id" => student_ids)
+        eager_load(:user => :pseudonyms).
+        where("users.id" => student_ids)
 
       submissions_scope = if requested_assignment_ids.present?
-                      Submission.active.where(
-                        :user_id => student_ids,
-                        :assignment_id => assignments
-                      )
-                    else
-                      Submission.active.joins(:assignment).where(
-                        :user_id => student_ids,
-                        "assignments.context_type" => @context.class.name,
-                        "assignments.context_id" => @context.id
-                      ).where(
-                        "assignments.workflow_state != 'deleted'"
-                      )
-                    end
+                            Submission.active.where(
+                              :user_id => student_ids,
+                              :assignment_id => assignments
+                            )
+                          else
+                            Submission.active.joins(:assignment).where(
+                              :user_id => student_ids,
+                              "assignments.context_type" => @context.class.name,
+                              "assignments.context_id" => @context.id
+                            ).where(
+                              "assignments.workflow_state != 'deleted'"
+                            )
+                          end
+      if params[:workflow_state].present?
+        submissions_scope = submissions_scope.where(:workflow_state => params[:workflow_state])
+      end
       submissions = submissions_scope.preload(:originality_reports).to_a
       bulk_load_attachments_and_previews(submissions)
       submissions_for_user = submissions.group_by(&:user_id)
@@ -439,6 +445,7 @@ class SubmissionsApiController < ApplicationController
       order = "#{order_by} #{order_direction}"
       submissions = @context.submissions.except(:order).where(user_id: student_ids).order(order)
       submissions = submissions.where(:assignment_id => assignments) unless assignments.empty?
+      submissions = submissions.where(:workflow_state => params[:workflow_state]) if params[:workflow_state].present?
       submissions = submissions.preload(:user, :originality_reports)
 
       submissions = Api.paginate(submissions, self, polymorphic_url([:api_v1, @section || @context, :student_submissions]))

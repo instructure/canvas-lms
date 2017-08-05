@@ -18,16 +18,26 @@
 
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { arrayOf, bool, func, number, shape, string } from 'prop-types';
+import { arrayOf, bool, func, shape, string } from 'prop-types';
 import $ from 'jquery';
 import 'jquery.instructure_date_and_time'
 import I18n from 'i18n!gradebook_history';
 import Spinner from 'instructure-ui/lib/components/Spinner';
 import Table from 'instructure-ui/lib/components/Table';
 import Typography from 'instructure-ui/lib/components/Typography';
-import constants from 'jsx/gradebook-history/constants';
 import { getHistoryNextPage } from 'jsx/gradebook-history/actions/SearchResultsActions';
 import SearchResultsRow from 'jsx/gradebook-history/SearchResultsRow';
+
+const colHeaders = [
+  I18n.t('Date'),
+  I18n.t('Time'),
+  I18n.t('From'),
+  I18n.t('To'),
+  I18n.t('Grader'),
+  I18n.t('Student'),
+  I18n.t('Assignment'),
+  I18n.t('Anonymous')
+];
 
 const nearPageBottom = () => (
   document.body.clientHeight - (window.innerHeight + window.scrollY) < 100
@@ -40,7 +50,7 @@ class SearchResultsComponent extends Component {
     caption: string.isRequired,
     historyItems: arrayOf(shape({
       anonymous: string.isRequired,
-      assignment: number.isRequired,
+      assignment: string.isRequired,
       date: string.isRequired,
       from: string.isRequired,
       grader: string.isRequired,
@@ -108,9 +118,15 @@ class SearchResultsComponent extends Component {
       <div>
         <Table
           caption={this.props.caption}
-          colHeaders={constants.colHeaders}
           striped="rows"
         >
+          <thead>
+            <tr>
+              {colHeaders.map(header => (
+                <th scope="col" key={`${header}-column`}>{ header }</th>
+              ))}
+            </tr>
+          </thead>
           <tbody>
             {this.props.historyItems.map(item => (
               <SearchResultsRow

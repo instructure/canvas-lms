@@ -28,7 +28,8 @@
   js_env({
     :SUBMIT_ASSIGNMENT => {
       :ALLOWED_EXTENSIONS => (@assignment.allowed_extensions || []),
-      :ID => @assignment.id
+      :ID => @assignment.id,
+      :GROUP_ID_FOR_USER => @assignment.group_category.try(:group_for, @current_user).try(:id)
     }
   })
 %>

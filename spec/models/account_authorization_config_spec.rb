@@ -300,7 +300,15 @@ describe AccountAuthorizationConfig do
         @user.account_users.create!(account: @pseudonym.account)
         aac.apply_federated_attributes(@pseudonym, 'admin_roles' => '')
         @user.reload
-        expect(@user.account_users).not_to be_exists
+        expect(@user.account_users.active).not_to be_exists
+      end
+
+      it "reactivates previously deleted roles" do
+        au = @user.account_users.create!(account: @pseudonym.account)
+        au.destroy
+        aac.apply_federated_attributes(@pseudonym, 'admin_roles' => 'AccountAdmin')
+        @user.reload
+        expect(au.reload).to be_active
       end
     end
 

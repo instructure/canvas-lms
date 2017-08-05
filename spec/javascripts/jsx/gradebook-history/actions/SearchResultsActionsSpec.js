@@ -24,7 +24,7 @@ import SearchResultsActions from 'jsx/gradebook-history/actions/SearchResultsAct
 
 QUnit.module('SearchResultsActionsSpec getHistoryNextPage', {
   setup () {
-    this.response = Fixtures.response();
+    this.response = Fixtures.historyResponse();
     this.getNextPageStub = this.stub(HistoryApi, 'getNextPage')
       .returns(Promise.resolve(this.response));
 

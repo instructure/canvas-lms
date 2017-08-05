@@ -50,6 +50,7 @@ describe AccountUser do
         RoleOverride.clear_cached_contexts
         @account.instance_variable_set(:@account_users_cache, {})
         expect(@account.grants_right?(@user, :read)).to be_falsey
+        expect(au.reload.workflow_state).to eq 'deleted'
       end
     end
   end

@@ -182,19 +182,15 @@ body.ic-Login-Body { // apply the background to the body element so that you don
     border: 1px solid var(--ic-brand-Login-Content-password-text-color);
     overflow: visible;
 
-    &:hover {
-      background: rgba($ic-brand-Login-Content-password-text-color, 0.1);
-    }
-
     &::before {
       content: "";
       position: absolute;
-      top: -0.2857rem;
-      left: -0.2857rem;
-      right: -0.2857rem;
-      bottom: -0.2857rem;
+      top: -0.375rem;
+      left: -0.375rem;
+      right: -0.375rem;
+      bottom: -0.375rem;
       border: 1px solid var(--ic-brand-Login-Content-password-text-color);
-      border-radius: 0.2857rem;
+      border-radius: 0.375rem;
       opacity: 0;
     }
 
@@ -203,6 +199,21 @@ body.ic-Login-Body { // apply the background to the body element so that you don
       &::before {
         opacity: 1;
       }
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 0.175rem;
+    }
+
+    &:hover::after {
+      background: var(--ic-brand-Login-Content-password-text-color);
+      opacity: 0.1;
     }
   }
 }

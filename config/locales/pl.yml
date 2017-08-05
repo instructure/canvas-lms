@@ -157,7 +157,7 @@ pl:
     account_required: "konieczność uwierzytelnienia za pomocą protokołu LDAP"
     index: 
       delete_auth_confirmation: "Na pewno? Usunięcie tego elementu może uniemożliwić logowanie użytkownikom."
-      delete_auth_link: "Usuń wszystkie uwierzytelnienia"
+      delete_auth_link: "Usuń uwierzytelnienie"
       ip_address_list_description: "W przypadku korzystania z usługi uwierzytelniania wymagającej bezpośredniego połączenia serwerów Canvas z serwerem użytkownika (np. protokołu LDAP) należy upewnić się, że serwery przyjmują połączenia z następujących adresów IP:"
       no_auth_type_description: "Konto nie jest obecnie zintegrowane z żadnym dostawcą tożsamości."
       page_title: "Ustawienia uwierzytelniania"
@@ -748,6 +748,11 @@ pl:
             start: 
               parameters: 
                 header: "Data rozpoczęcia:"
+    embry_riddle_activity_report_csv_parameters: 
+      account_reports: 
+        embry_riddle: 
+          outcome: 
+            text: "Wzorzec SIS kursów (lista pozycji oddzielonych przecinkami):"
     engagement_report_csv_parameters: 
       account_reports: 
         bryan_engagement: 
@@ -1758,6 +1763,9 @@ pl:
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "Centrum aplikacji zostanie wyświetlone w zakładce „Aplikacje” znajdującej się na stronie ustawień kursu lub konta. Adres URL podany poniżej powinien wskazywać ważny punkt końcowy Centrum aplikacji (na przykład %{url} — należy pominąć ukośnik kończący"
   app_placements_6d877225: "Miejsca docelowe aplikacji"
   app_reregistration_87cc8817: "Ponowna rejestracja aplikacji"
+  app_was_installed_by_admin_and_is_locked_3bee4d39: "%{app} został zainstalowany przed administratora i jest zablokowany"
+  app_was_installed_by_the_master_course_and_is_lock_dbeb24a6: "%{app} został zainstalowany przed kurs główny i jest zablokowany"
+  app_was_installed_by_the_master_course_e55ba1d7: "%{app} został zainstalowany przed kurs główny"
   appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "Dołącza numer do końca każdego tytułu zdarzeń (np. Zdarzenie 1, Zdarzenie 2, itp.)"
   appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "Dołącza numer do końcówki każdego tytułu zdarzeń (np. Zdarzenie 1, Zdarzenie 2 itp.)\" for=\"append_iterator"
   application: 
@@ -1831,6 +1839,11 @@ pl:
   archive_3f794d7e: Archiwum
   archive_selected_d64506ca: "Wybrane Archiwum"
   are_you_sure_26795d3c: "Czy jesteś pewien?"
+  are_you_sure_you_want_to_archive_your_copies_of_th_7d219afe: 
+    few: "Czy na pewno chcesz zarchiwizować kopie tych rozmów?"
+    many: "Czy na pewno chcesz zarchiwizować kopie tych rozmów?"
+    one: "Czy na pewno chcesz zarchiwizować kopię tej rozmowy?"
+    other: "Czy na pewno chcesz zarchiwizować kopie tych rozmów?"
   are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496: "Czy na pewno chcesz anulować? Zmiany mogą nie zostać zapisane."
   are_you_sure_you_want_to_cancel_your_appointment_w_dbbd27eb: "Czy na pewno chcesz anulować spotkanie z %{name}?"
   are_you_sure_you_want_to_copy_to_the_final_mark_th_28a7e7b3: "Czy jestes pewien, że chcesz skopiować ocenę ostateczną? To zastąpi istniejącą ocenę."
@@ -1847,6 +1860,11 @@ pl:
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: "Czy na pewno chcesz usunąć ten zbiór okresów oceniania?"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Czy na pewno chcesz usunąć ten okres oceniania?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Czy na pewno chcesz usunąć ten schemat oceniania?"
+  are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
+    few: "Czy na pewno chcesz usunąć kopię tych rozmów? Ta czynność jest nieodwracalna."
+    many: "Czy na pewno chcesz usunąć kopię tych rozmów? Ta czynność jest nieodwracalna."
+    one: "Czy na pewno chcesz usunąć kopię tej rozmowy? Ta czynność jest nieodwracalna."
+    other: "Czy na pewno chcesz usunąć kopię tych rozmów? Ta czynność jest nieodwracalna."
   are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: "Czy na pewno chcesz usunąć swoją rezerwację dla tego wydarzenia?"
   are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: "Czy na pewno chcesz wyłączyć synchronizację z %{sisName} dla wszystkich zadań?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Czy jesteś pewien, że chcesz wykonać tę czynność? Po wykonaniu, nie może ona być cofnięta i zastąpi istniejące oceny w Dzienniku ocen."
@@ -1859,6 +1877,11 @@ pl:
   are_you_sure_you_want_to_resync_these_grades_to_th_e509cb9e: "Czy na pewno chcesz ponownie zsynchronizować te oceny w systemie informacji o uczestnikach?"
   are_you_sure_you_want_to_submit_this_comment_fbe76ba6: "Czy na pewno chcesz wysłać ten komentarz?"
   are_you_sure_you_want_to_sync_these_grades_to_the__ca3c28a4: "Czy na pewno chcesz zsynchronizować te oceny w systemie informacji o uczestnikach? Jest to zalecane tylko wtedy, gdy wszystkie oceny zostały sfinalizowane."
+  are_you_sure_you_want_to_unarchive_these_conversat_ec7d7e8d: 
+    few: "Czy na pewno chcesz cofnąć archiwizację tych rozmów?"
+    many: "Czy na pewno chcesz cofnąć archiwizację tych rozmów?"
+    one: "Czy na pewno chcesz cofnąć archiwizację tej rozmowy?"
+    other: "Czy na pewno chcesz cofnąć archiwizację tych rozmów?"
   argentina_3257a200: Argentyna
   argentina_54_375d6af4: "Argentyna (+54)"
   arrange_by_34a545de: "Uporządkowane według"
@@ -3436,6 +3459,7 @@ pl:
   click_here_it_s_free_eeccb9cb: "Kliknij tutaj, to jest darmowe!"
   click_here_on_the_calendar_link_c9965631: "Kliknij łącze *Kalendarz*"
   click_here_to_download_size_of_file_74443988: "Kliknij tutaj, aby pobrać. %{size_of_file}"
+  click_here_to_log_in_again_4a6055de: "Kliknij tutaj, aby zalogować się ponownie"
   click_here_to_see_the_file_79e2b366: "Kliknij tutaj, aby zobaczyć plik."
   click_here_to_view_ec8cb2fd: "Kliknij tutaj, aby wyświetlić"
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Kliknij migawkę, aby powrócić do wersji próbnej zgodnej ze stanem, gdy wykonywano migawkę. Uwaga: Utracisz wszelkie efekty pracy od chwili wykonania migawki; tej operacji nie można cofnąć!"
@@ -6148,6 +6172,7 @@ pl:
     edit_key: "Edytuj ten klucz"
     identifier: "ID: %{id}"
     redirect_uri: "URI: %{redirect_uri}"
+  developer_key_921ddbae: "Klucz dewelopera"
   developer_key_form: 
     cancel: Anuluj
     icon_url: "URL ikony:"
@@ -7609,6 +7634,10 @@ pl:
   filter_replies_by_unread_342e8e90: "Filtruj odpowiedzi według nieprzeczytanych"
   filter_replies_by_unread_caf870ea: "filtruj odpowiedzi według nieprzeczytanych"
   filters_92f2776f: Filtry
+  final_grade_4d7f6545: "Ocena końcowa"
+  final_grade_6938dca8: "Ocena końcowa:"
+  final_grade_finalgrade_138d9e07: "Ocena końcowa: %{finalGrade}"
+  final_grade_finalgrade_408580bb: "Ocena końcowa: *%{finalGrade}*"
   final_grade_info_2aa35d25: "Informacje o ocenie końcowej"
   final_grade_score_fe69a301: "Ocena końcowa: %{score}"
   final_letter_grade_80dccec1: "Ocena końcowa"
@@ -7740,13 +7769,16 @@ pl:
   gpa_scale_a6d1cdea: "Skala GPA"
   grade_10d1e5a1: "%{grade}"
   grade_9c6f076d: Ocena
+  grade_a91e433e: "Ocena:"
   grade_assignment_7c1abc11: "Oceń zadanie %{assignment}"
+  grade_changes_cb5a57a8: "Zmiany oceny"
   grade_display_warning_dialog: 
     grade_display_warning: 
       checkbox: "Nie pokazuj ponownie dla tego kursu."
       warning: Ostrzeżenie
   grade_distribution_e52c9256: "Dystrybucja ocen"
   grade_export_title: "Eksport ocen"
+  grade_for_name_b9df168a: "Ocena za: %{name}"
   grade_high_to_low_1cea0381: "Ocena – Od wysokiej do niskiej"
   grade_history_9c51ad49: "Historia ocen..."
   grade_history_ccc09fde: "Historia ocen"
@@ -7905,7 +7937,7 @@ pl:
       switch_to_points: "Przełącz na punkty"
     turnitin: 
       error_message: "Wystąpił błąd podczas przesyłania danych do usługi wykrywania podobieństw. Spróbuj przesłać plik ponownie, zanim skontaktujesz się z działem pomocy technicznej."
-      info_message: "Plik jest wciąż przetwarzany przez program Turnitin. Sprawdź wynik póżniej"
+      info_message: "Ten plik jest nadal przetwarzany przez narzędzie do wykrywania plagiatów powiązane z tym testem. Powróć później, aby sprawdzić ocenę."
       resubmitting: "Ponowne przesyłanie..."
       tooltip: 
         error: "Stopień podobieństwa – patrz szczegóły błędu przy wysyłaniu"
@@ -8416,9 +8448,9 @@ pl:
       one: "Wynik nie obejmuje %{groups}, ponieważ nie określono potencjalnych punktów do zdobycia"
       other: "Wynik nie obejmuje %{groups}, ponieważ nie określono potencjalnych punktów do zdobycia"
     keyboard_assignment_desc: "Przejdź do bieżącej strony informacji szczegółowych o zadaniu"
-    keyboard_close_menu: "Zamknij aktywne menu zadania"
+    keyboard_close_menu: "Zamknij obecnie aktywne menu"
     keyboard_comment_desc: "Skomentuj aktywne przesłane zadanie"
-    keyboard_menu_desc: "Otwórz menu dla zadań zawartych w kolumnie aktywnej"
+    keyboard_menu_desc: "Otwórz menu dla aktywnego kolumny"
     keyboard_sort_desc: "Sortuj siatkę w bieżącej, aktywnej kolumnie"
     keyboard_tooltip_desc: "Pokaż typ przesyłanego, aktywnego zadania"
     keycodes: 
@@ -9464,6 +9496,12 @@ pl:
   last_used_f9457313: "Ostatnio używane:"
   last_user_access_title: "Ostatni dostęp użytkownika"
   late_2be42b88: Opóźnione
+  late_8bd684b6: "po czasie"
+  late_bd436902: "PO CZASIE"
+  late_penalty_817fff4e: "Kara za spóźnienie:"
+  late_penalty_9c312b22: "Kara za spóźnienie"
+  late_penalty_pointsdeducted_7033a095: "Kara za spóźnienie: %{pointsDeducted}"
+  late_penalty_pointsdeducted_dac023ff: "Kara za spóźnienie: *%{pointsDeducted}*"
   late_percent_b91d01b3: "Po czasie: %{percent}"
   late_policies_42bac80: "Ostatnie zasady"
   late_policies_fd5dced6: "Zasady dot. opóźnień"
@@ -9571,6 +9609,7 @@ pl:
         quizzes: Testy
         rubrics: "Kryteria ocen"
         syllabus_body: "Treść programu nauczania"
+        tool_profiles: "Profile narzędzia"
         wikis: "Strony typu Wiki"
     cc: 
       standard: 
@@ -9685,9 +9724,11 @@ pl:
     other: "Ukończono wczytywanie kursów: %{count} odnaleziono kursy"
   loading_courses_started_6e6d742c: "Rozpoczęto wczytywanie kursów"
   loading_data_ecd89ba: "Wczytywanie danych..."
+  loading_graders_f6a76142: "Wczytywanie oceniających"
   loading_mastery_paths_c558a766: "Trwa ładowanie ścieżek biegłości..."
   loading_more_results_def6df65: "Trwa ładowanie kolejnych wyników..."
   loading_results_spinner_73ef739c: "Wczytywanie narzędzia wyników"
+  loading_students_30b71301: "Wczytywanie uczestników"
   loading_sync_history_9f342cbf: "Wczytywanie historii synchronizacji"
   loading_unsynced_changes_b5d7b202: "Wczytywanie niezsynchronizowanych zmian"
   loading_unsynched_changes_688434f2: "Wczytywanie niezsynchronizowanych zmian"
@@ -9717,6 +9758,7 @@ pl:
   log_on_url_fc166e4c: "Adres URL logowania"
   log_out_379ba28a: Wyloguj
   log_out_url_2605c2c1: "Adres URL wylogowania"
+  logged_out_724b3717: Wylogowano
   logged_out_user: "Użytkownik wylogowany %{user_counter}"
   login: 
     canvas: 
@@ -9774,6 +9816,8 @@ pl:
         log_out: "Czy na pewno chcesz się wylogować z systemu Canvas?"
       log_out: Wyloguj
       page_title: Wyloguj
+    logout_landing: 
+      page_title: Wylogowano
     otp: 
       errors: 
         invalid_otp: "Nieprawidłowy kod weryfikacji, spróbuj ponownie."
@@ -11772,6 +11816,11 @@ pl:
         subject: "Zapis konferencji internetowej gotowy: %{name}"
       twitter: 
         tweet: "Alarm Canvas - Zapis gotowy: %{title}, %{name}"
+  messages_deleted_8f781481: 
+    few: "Wiadomości usunięte!"
+    many: "Wiadomości usunięte!"
+    one: "Wiadomość usunięta!"
+    other: "Wiadomości usunięte!"
   mexico_52_60d635c7: "Meksyk  (+52)"
   mexico_b2d7a271: Meksyk
   mgp_grade_export_d29b471f: "Eksport ocen MPG"
@@ -11798,6 +11847,7 @@ pl:
     webct: 
       course_not_found: "Nie odnaleziono kursu Blackboard."
     wiki_page_type: "Strona Wiki"
+  migration_in_progress_6f0ed4f9: "Migracja w toku..."
   migration_issues: 
     errors: 
       valid_workflow_state: "Należy przesłać prawidłowy stan pracy"
@@ -11809,6 +11859,8 @@ pl:
   minutes_4aee5a41: Minuty
   minutes_per_slot_5b7169e5: "Minuty na spotkanie"
   missing_1a256b3b: Brak
+  missing_d59852a7: brak
+  missing_eaddacbd: BRAK
   missing_percent_94534638: "Brakuje: %{percent}"
   missing_policies_4f195e0b: "Brakujące zasady"
   missing_required_values_missing_values_f3be2ff8: "Brakujące wymagane wartości: %{missing_values}"
@@ -12231,6 +12283,7 @@ pl:
   no_grade_assigned_90e531f5: "Nie przydzielono oceny."
   no_grade_for_assignment_97c9bc75: "Brak oceny dla %{assignment}"
   no_graded_submissions_e40c957a: "Brak ocenionych zadań"
+  no_graders_with_that_name_found_d8204d90: "Brak oceniających z taką nazwą"
   no_grading_periods_configured_for_this_term_ca22393e: "brak okresów oceniania skonfigurowanych dla danego semestru"
   no_grading_periods_set_up_a20a8819: "Nie ustawiono okresów oceniania"
   no_grading_schemes_to_display_8b0e92e7: "Brak schematów oceniania do wyświetlenia"
@@ -12250,6 +12303,7 @@ pl:
   no_students_dd8de9f0: "Brak uczestników"
   no_students_have_taken_the_quiz_yet_e667644b: "Żaden z uczestników nie napisał jeszcze tego testu"
   no_students_have_taken_the_survey_yet_d378cd35: "Żaden z uczestników nie wypełnił jeszcze tej ankiety"
+  no_students_with_that_name_found_f6004da2: "Brak uczestników z taką nazwą"
   no_submission_for_assignment_a9cb6fe2: "Brak przesłanych materiałów dla %{assignment}"
   no_tls_618add1a: "Brak TLS"
   no_unassigned_terms_deb7b76b: "Brak nieprzypisanych terminów"
@@ -12967,6 +13021,7 @@ pl:
     errors: 
       delete_reminder_failed: "Usunięcie nie powiodło się"
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "Wzajemne oceny nie mogą być włączone dla zadań moderowanych"
+  penalty_adjusted_707df573: "*%{penalty}* **%{adjusted}**"
   pending_3e506a5b: Oczekujące
   pending_message_2d9a8796: "Oczekujące: %{message}"
   people_b4ebb13c: Osoby
@@ -13460,6 +13515,7 @@ pl:
   points_out_of_total_24f61148: "*%{points}* z **%{total}**"
   points_points_b6b422e2: "Punkty: %{points}"
   points_possible_1c0b3445: "Maksymalna możliwa liczba punktów"
+  points_possible_44cb4190: "/ %{points_possible}"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Maksymalna możliwa liczba punktów musi wynosić 0 lub więcej dla wybranego typu oceniania"
   points_possible_points_fda3b111: "%{points_possible} Punkty"
   points_pts_e5596bf7: "%{points} pkt"
@@ -14031,7 +14087,7 @@ pl:
       labels: 
         title: "Nazwa banku"
       page_title: "Banki pytań"
-      see_bookmarked_banks: "Wyświetl banki dodane do moich zakładek"
+      see_bookmarked_banks: "Wyświetl banki dodane do zakładek"
       user_question_banks: "Banki pytań użytkownika"
     question_bank: 
       bookmark_bank: "Dodaj zakładkę do tego banku pytań"
@@ -15647,6 +15703,7 @@ pl:
   reviewer_b993ce28: Recenzent
   reviewers_successfully_added_bd4b629a: "Recenzenci pomyślnie dodani"
   rich_content_editor_2708ef21: "Edytor wzbogaconej zawartości"
+  rich_content_editor_sidebar_enhancements_8bd945d3: "Ulepszenia paska bocznego edytora zawartości"
   right_sidebar_logo_5483dc0a: "Logo prawego paska bocznego"
   role: 
     duplicate_role: "Rola o tej nazwie już istnieje"
@@ -15782,6 +15839,7 @@ pl:
     course_files: "Pliki kursu"
     group_files: "Pliki grupy"
     my_files: "Moje pliki"
+  root_account_3fb3aacf: root_account
   root_accounts_cc035dcf: "Konta źródłowe"
   roster: 
     delete_confirm: "Czy na pewno chcesz usunąć tego użytkownika?"
@@ -15855,6 +15913,7 @@ pl:
         are_you_sure_delete: "Czy na pewno chcesz usunąć te kryteria ocen?  Lokalizacje obecnie uzyskujące dostęp do kryteriów ocen nie stracą go, jednak nikt inny nie będzie mógł ich użyć."
         are_you_sure_remove: "Czy na pewno chcesz usunąć te kryteria ocen ze swojej listy?"
       remove_rubric: "Usuń te kryteria ocen z mojej listy"
+  russia_7_87bc99d5: "Rosja (+7)"
   salesforce_account_id_eb5c78ad: "Identyfikator konta Salesforce"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce posiada inny host logowania dla kont sandbox niż w przypadku kont produkcji, więc jeśli używasz konta Salesforce sandbox i nie zaznaczysz tego pola, nie będzie w stanie uwierzytelnić (działa to również w drugą stronę - jeśli posiadasz konto produkcyjne i zaznaczysz to pole - nie będzie mógł uwierzytelnić)"
   salesforce_ticketing_webtocase_connector_80f75716: "Łącznik biletów WebToCase Salesforce"
@@ -17878,6 +17937,7 @@ pl:
   there_was_an_error_uploading_the_image_932fc4ce: "Wystąpił błąd podczas ładowania obrazu"
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "Twoje pytanie jest niepoprawne; spróbuj wpisać inne pytanie w wyszukiwarkę  "
   there_was_an_unexpected_problem_with_the_sync_be079a67: "Wystąpił nieoczekiwany błąd synchronizacji"
+  there_was_an_unknown_error_registering_the_tool_b9a29954: "Wystąpił nieznany błąd podczas rejestrowania narzędzia"
   there_were_errors_with_the_form_errors_ab5b559a: "Wystąpiły błędy w formularzu: %{errors}"
   there_were_several_possible_matches_with_the_impor_ad58bcd0: "Istnieje kilka potencjalnych dopasowań do importu. Rozwiąż je poniżej."
   these_backup_codes_can_be_used_if_your_multi_facto_ca30a3df: "Kodów zapasowych można używać na wypadek niedostępności urządzenia do uwierzytelnienia wieloskładnikowego. Wydrukuj je i przechowuj w bezpiecznym miejscu, np. w portfelu."
@@ -18294,6 +18354,7 @@ pl:
     originality_report_visible_immediately: Natychmiast
   turnitin_similarity_score_more_information_e2571be8: "Porównawczy wynik punktowy Turnitin — więcej informacji"
   twitter_fcef6b54: Twitter
+  type_a_few_letters_to_start_searching_3334657b: "Wpisz kilka liter, aby rozpocząć wyszukiwanie"
   type_c8106334: Typ
   type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: "Rodzaj '%{type}' nie jest prawidłowym rodzajem pliku (spróbuj jpg, png lub gif)"
   type_of_change_1cb24a0e: "Typ zmiany"
@@ -18450,6 +18511,7 @@ pl:
   use_mathman_to_convert_latex_to_svg_3f61c9b: "Zastosować MathMan aby zamienić LaTeX w SVG?"
   use_new_folder_tree_in_files_bc0ea09f: "Użyj nowego drzewa plików w Plikach"
   use_new_folder_tree_in_files_eb5a451b: "Użyj nowego drzewa plików w Plikach"
+  use_new_rich_content_editor_with_enhanced_sidebar__8e0bfedd: "Użyj nowego edytora zawartości z ulepszonymi paskiem bocznym"
   use_remote_service_for_notifications_9fe667c6: "Użyj usługi zdalnej do obsługi powiadomień"
   use_remote_version_of_rich_content_editor_52f7fc4b: "Użyj usługi zdalnej dla Edytora wzbogaconej zawartości"
   use_remote_version_of_rich_content_editor_and_side_a058a664: "Użyj usługi zdalnej dla Edytora wzbogaconej zawartości I paska bocznego"
@@ -19231,6 +19293,7 @@ pl:
   you_are_currently_masquerading_as_user_name_f4a00ade: "Obecnie podszywasz się pod %{user_name}"
   you_are_here_54075d8c: "Jesteś tutaj:"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "Użytkownik jest zalogowany w %{institution1} przy użyciu informacji uwierzytelniających od %{institution2}"
+  you_are_logged_out_of_canvas_8b5fc59a: "Wylogowano z Canvas."
   you_are_not_authorized_to_disable_the_sync_to_name_d283c3e0: "Nie masz uprawnień potrzebnych do wyłączenia funkcji synchronizacji z %{name}."
   you_are_not_authorized_to_disable_the_sync_to_sisn_54aebeb0: "Nie masz uprawnień potrzebnych do wyłączenia funkcji synchronizacji z %{sisName}."
   you_are_not_enrolled_in_any_courses_a5c63286: "Nie jesteś zapisany na żadne kursy."

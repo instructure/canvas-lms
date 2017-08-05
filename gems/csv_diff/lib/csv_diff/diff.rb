@@ -36,8 +36,8 @@ module CsvDiff
       setup_output(current_csv.headers)
 
       @db.transaction do
-        insert("previous", row_previous, previous_csv, current_csv.headers)
-        insert("current", row_current, current_csv, nil)
+        insert("previous", row_previous, previous_csv, current_csv.headers) if row_previous
+        insert("current", row_current, current_csv, nil) if row_current
       end
 
       find_updates

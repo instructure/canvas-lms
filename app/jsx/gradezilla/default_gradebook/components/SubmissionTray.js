@@ -21,8 +21,11 @@ import { bool, func, number, shape, string } from 'prop-types';
 import ComingSoonContent from 'jsx/gradezilla/default_gradebook/components/ComingSoonContent';
 import LatePolicyGrade from 'jsx/gradezilla/default_gradebook/components/LatePolicyGrade';
 import SubmissionTrayRadioInputGroup from 'jsx/gradezilla/default_gradebook/components/SubmissionTrayRadioInputGroup';
-import Tray from 'instructure-ui/lib/components/Tray';
 import Avatar from 'instructure-ui/lib/components/Avatar';
+import Button from 'instructure-ui/lib/components/Button';
+import Container from 'instructure-ui/lib/components/Container';
+import Tray from 'instructure-ui/lib/components/Tray';
+import IconSpeedGraderLine from 'instructure-icons/lib/Line/IconSpeedGraderLine';
 import I18n from 'i18n!gradebook';
 
 function renderAvatar (name, avatarUrl) {
@@ -33,8 +36,29 @@ function renderAvatar (name, avatarUrl) {
   );
 }
 
+function renderSpeedGraderLink (speedGraderUrl) {
+  return (
+    <Container as="div" textAlign="center">
+      <Button href={speedGraderUrl} variant="link">
+        <IconSpeedGraderLine />
+        {I18n.t('SpeedGrader')}
+      </Button>
+    </Container>
+  );
+}
+
+function renderComingSoon (speedGraderEnabled, speedGraderUrl) {
+  return (
+    <div>
+      { speedGraderEnabled && renderSpeedGraderLink(speedGraderUrl) }
+      <ComingSoonContent />
+    </div>
+  );
+}
+
 export default function SubmissionTray (props) {
   const { name, avatarUrl } = props.student;
+  const speedGraderUrl = `/courses/${props.courseId}/gradebook/speed_grader?assignment_id=${props.submission.assignmentId}#%7B%22student_id%22%3A${props.student.id}%7D`;
   return (
     <Tray
       contentRef={props.contentRef}
@@ -50,7 +74,7 @@ export default function SubmissionTray (props) {
       <div className="SubmissionTray__Container">
         {
           props.showContentComingSoon ?
-            <ComingSoonContent /> :
+            renderComingSoon(props.speedGraderEnabled, speedGraderUrl) :
             <div>
               <div id="SubmissionTray__Content">
                 {avatarUrl && renderAvatar(name, avatarUrl)}
@@ -58,6 +82,8 @@ export default function SubmissionTray (props) {
                 <div id="SubmissionTray__StudentName">
                   {name}
                 </div>
+
+                { props.speedGraderEnabled && renderSpeedGraderLink(speedGraderUrl) }
 
                 {!!props.submission.pointsDeducted && <LatePolicyGrade submission={props.submission} />}
 
@@ -94,6 +120,7 @@ SubmissionTray.propTypes = {
   onRequestClose: func.isRequired,
   showContentComingSoon: bool.isRequired,
   student: shape({
+    id: string.isRequired,
     name: string.isRequired,
     avatarUrl: string
   }).isRequired,
@@ -103,8 +130,11 @@ SubmissionTray.propTypes = {
     late: bool.isRequired,
     missing: bool.isRequired,
     pointsDeducted: number,
-    secondsLate: number.isRequired
+    secondsLate: number.isRequired,
+    assignmentId: string.isRequired
   }),
+  courseId: string.isRequired,
+  speedGraderEnabled: bool.isRequired,
   locale: string.isRequired,
   latePolicy: shape({
     lateSubmissionInterval: string

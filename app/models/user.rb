@@ -118,7 +118,6 @@ class User < ActiveRecord::Base
   has_many :web_conference_participants
   has_many :web_conferences, :through => :web_conference_participants
   has_many :account_users
-  has_many :accounts, :through => :account_users
   has_many :media_objects, :as => :context, :inverse_of => :context
   has_many :user_generated_media_objects, :class_name => 'MediaObject'
   has_many :user_notes
@@ -501,9 +500,7 @@ class User < ActiveRecord::Base
         data[:courses] += Course.select([:id, :account_id]).where(:id => course_ids.to_a).to_a unless course_ids.empty?
 
         data[:pseudonyms] += Pseudonym.active.select([:user_id, :account_id]).distinct.where(:user_id => shard_user_ids).to_a
-        AccountUser.unscoped do
-          data[:account_users] += AccountUser.select([:user_id, :account_id]).distinct.where(:user_id => shard_user_ids).to_a
-        end
+        data[:account_users] += AccountUser.active.select([:user_id, :account_id]).distinct.where(:user_id => shard_user_ids).to_a
       end
       # now make it easy to get the data by user id
       data[:enrollments] = data[:enrollments].group_by(&:user_id)
@@ -888,7 +885,7 @@ class User < ActiveRecord::Base
         user_observer_scope = self.user_observers.shard(self)
         user_observee_scope = self.user_observees.shard(self)
         pseudonym_scope = self.pseudonyms.active.shard(self)
-        account_users = self.account_users.shard(self)
+        account_users = self.account_users.active.shard(self)
         has_other_root_accounts = false
       else
         # make sure to do things on the root account's shard. but note,
@@ -1053,7 +1050,7 @@ class User < ActiveRecord::Base
     can :read_grades
 
     given do |user|
-      self.check_accounts_right?(user, :manage_user_logins) && self.all_accounts.select(&:root_account?).all? {|a| has_subset_of_account_permissions?(user, a) }
+      self.check_accounts_right?(user, :manage_user_logins) && self.adminable_accounts.select(&:root_account?).all? {|a| has_subset_of_account_permissions?(user, a) }
     end
     can :manage_user_details and can :rename and can :read_profile
 
@@ -1597,7 +1594,8 @@ class User < ActiveRecord::Base
         expecting_submission.
         where(:moderated_grading => true).
         where("assignments.grades_published_at IS NULL").
-        joins(:provisional_grades).preload(:context).
+        where(:id => ModeratedGrading::ProvisionalGrade.joins(:submission).where("submissions.assignment_id=assignments.id").distinct.select(:assignment_id)).
+        preload(:context).
         need_grading_info
       if options[:scope_only]
         scope # Also need to check the rights like below
@@ -2579,8 +2577,8 @@ class User < ActiveRecord::Base
     @menu_data = {
       :group_memberships => coalesced_group_memberships,
       :group_memberships_count => cached_group_memberships.length,
-      :accounts => self.all_accounts,
-      :accounts_count => self.all_accounts.length,
+      :accounts => self.adminable_accounts,
+      :accounts_count => self.adminable_accounts.length,
     }
   end
 
@@ -2872,16 +2870,18 @@ class User < ActiveRecord::Base
     associated_shards.select { |shard| shard.in_current_region? || shard.default? }
   end
 
-  def all_accounts
-    @all_accounts ||= shard.activate do
-      Rails.cache.fetch(['all_accounts', self, ApplicationController.region].cache_key) do
-        self.accounts.active.shard(in_region_associated_shards).to_a
+  def adminable_accounts
+    @adminable_accounts ||= shard.activate do
+      Rails.cache.fetch(['adminable_accounts', self, ApplicationController.region].cache_key) do
+        Account.shard(self).active.joins(:account_users).
+          where(account_users: {user_id: self.id}).
+          where.not(account_users: {workflow_state: 'deleted'})
       end
     end
   end
 
   def all_paginatable_accounts
-    ShardedBookmarkedCollection.build(Account::Bookmarker, self.accounts.active)
+    ShardedBookmarkedCollection.build(Account::Bookmarker, self.adminable_accounts)
   end
 
   def all_pseudonyms

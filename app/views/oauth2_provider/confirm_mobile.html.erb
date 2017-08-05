@@ -19,14 +19,15 @@
 <%
   content_for :page_title, t(:page_title, "App Login")
 %>
+
 <div class="face">
   <p>
     <%= mt 'details.allow_application', " Allow %{app_name} to access your account.", :app_name => @provider.app_name %>
   </p>
   <%= form_tag oauth2_auth_accept_path do %>
     <div class="button_box">
-      <button type="submit" class="btn btn-large btn-primary"><%= t 'authorize', 'Authorize' %></button>
-      <%= link_to(t(:cancel, "Cancel"), oauth2_auth_deny_path, :class => "btn btn-large") %>
+      <button type="submit" class="Button Button--primary Button--block"><%= t 'authorize', 'Authorize' %></button>
+      <%= link_to(t(:cancel, "Cancel"), oauth2_auth_deny_path, :class => "Button Button--block") %>
     </div>
     <% if true#unless @provider.scopes.blank? %>
       <div class="control-group">

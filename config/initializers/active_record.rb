@@ -491,6 +491,10 @@ class ActiveRecord::Base
   #   belongs_to :context, polymorphic: [:course, :account]
   def self.belongs_to(name, scope = nil, options={})
     options = scope if scope.is_a?(Hash)
+    if options[:polymorphic] == true
+      raise "Please pass an array of valid types for polymorphic associations. Use exhaustive: false if you really don't want to validate them"
+    end
+
     polymorphic_prefix = options.delete(:polymorphic_prefix)
     exhaustive = options.delete(:exhaustive)
 
@@ -1014,7 +1018,7 @@ module UpdateAndDeleteWithJoins
     end
     sql.concat('WHERE ' + sql_string.substitute_binds(binds).join)
 
-    connection.exec_query(sql, "#{name} Delete all", scope.bind_values)
+    connection.delete(sql, "SQL", scope.bind_values)
   end
 end
 ActiveRecord::Relation.prepend(UpdateAndDeleteWithJoins)
@@ -1328,7 +1332,8 @@ module SkipTouchCallbacks
   end
 
   module BelongsTo
-    def touch_record(o, foreign_key, name, *args)
+    def touch_record(o, *args)
+      name = CANVAS_RAILS5_0 ? args[1] : args[2]
       return if o.class.touch_callbacks_skipped?(name)
       super
     end

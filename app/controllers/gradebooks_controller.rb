@@ -600,7 +600,7 @@ class GradebooksController < ApplicationController
       return redirect_to polymorphic_url([@context, @assignment])
     end
 
-    if canvadoc_annotations_enabled_in_firefox? ||
+    if !canvadoc_annotations_enabled_in_firefox? &&
         submisions_attachment_crocodocable_in_firefox?(@assignment.submissions)
         flash[:notice] = t("Warning: Crocodoc has limitations when used in Firefox. Comments will not always be saved.")
     end
@@ -630,6 +630,7 @@ class GradebooksController < ApplicationController
           ),
           :course_id => @context.id,
           :assignment_id => @assignment.id,
+          :assignment_title => @assignment.title
         }
         if [:moderator, :provisional_grader].include?(grading_role)
           env[:provisional_status_url] = api_v1_course_assignment_provisional_status_path(@context.id, @assignment.id)
@@ -689,7 +690,7 @@ class GradebooksController < ApplicationController
         @current_user.preferences[:gradebook_column_order] = {}
       end
 
-      @current_user.preferences[:gradebook_column_order][@context.id] = params[:column_order].to_hash.with_indifferent_access
+      @current_user.preferences[:gradebook_column_order][@context.id] = params[:column_order].to_unsafe_h
       @current_user.save!
       render json: nil
     end

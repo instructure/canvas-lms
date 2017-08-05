@@ -135,3 +135,19 @@ define [
     @user.assignment_1.gradeLocked = false
     new SubmissionDetailsDialog(@assignment, @user, @options).open()
     equal $('#student_grading_1').prop('disabled'), false
+
+  test "does not hide download links when grading_type is pass_fail and grade is present", ->
+    @assignment.grading_type = 'pass_fail'
+    @user.assignment_1.submission_history = [
+      submission_type: 'online_upload'
+      attachments: [
+        url: 'http://example.com/download'
+        filename: 'foo.txt'
+        display_name: 'Dummy Download'
+        mimeClass: 'test-fake'
+      ]
+    ]
+    @user.assignment_1.grade = 'complete'
+    new SubmissionDetailsDialog(@assignment, @user, @options).open()
+
+    ok $('.submisison-attachment').is(':visible'), 'submission download link is visible'

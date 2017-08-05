@@ -128,7 +128,7 @@ class AccountsController < ApplicationController
   def index
     respond_to do |format|
       format.html do
-        @accounts = @current_user ? @current_user.all_accounts : []
+        @accounts = @current_user ? @current_user.adminable_accounts : []
       end
       format.json do
         if @current_user
@@ -636,7 +636,7 @@ class AccountsController < ApplicationController
 
         custom_help_links = params[:account].delete :custom_help_links
         if custom_help_links
-          sorted_help_links = custom_help_links.select{|_k, h| h['state'] != 'deleted' && h['state'] != 'new'}.sort_by{|_k, h| _k.to_i}
+          sorted_help_links = custom_help_links.to_unsafe_h.select{|_k, h| h['state'] != 'deleted' && h['state'] != 'new'}.sort_by{|_k, h| _k.to_i}
           @account.settings[:custom_help_links] = sorted_help_links.map do |index_with_hash|
             hash = index_with_hash[1].to_hash.with_indifferent_access
             hash.delete('state')
@@ -754,7 +754,7 @@ class AccountsController < ApplicationController
         end
       end
       load_course_right_side
-      @account_users = @account.account_users
+      @account_users = @account.account_users.active
       ActiveRecord::Associations::Preloader.new.preload(@account_users, user: :communication_channels)
       order_hash = {}
       @account.available_account_roles.each_with_index do |role, idx|
@@ -1078,12 +1078,13 @@ class AccountsController < ApplicationController
     admins = users.map do |user|
       admin = @context.account_users.where(user_id: user.id, role_id: role.id).first_or_initialize
       admin.user = user
+      admin.workflow_state = 'active'
       return unless authorized_action(admin, @current_user, :create)
       admin
     end
 
     account_users = admins.map do |admin|
-      if admin.new_record?
+      if admin.new_record? || admin.workflow_state_changed?
         admin.save!
         if admin.user.registered?
           admin.account_user_notification!

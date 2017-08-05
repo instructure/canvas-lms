@@ -108,39 +108,49 @@ describe LatePolicy do
 
   describe '#points_deducted' do
     it 'ignores disabled late submission deduction' do
-      expect(late_policy_model.points_deducted(score: 500, possible: 1000, late_for: 1.day)).to eq 0
+      expect(late_policy_model.points_deducted(score: 500, possible: 1000, late_for: 1.day, grading_type: 'points')).to eq 0
     end
 
     it 'ignores ungraded assignments' do
       policy = late_policy_model(deduct: 5.0, every: :hour)
-      expect(policy.points_deducted(score: 10, possible: nil, late_for: 1.day)).to eq 0
+      expect(policy.points_deducted(score: 10, possible: nil, late_for: 1.day, grading_type: 'points')).to eq 0
+    end
+
+    it 'ignores pass_fail assignments' do
+      policy = late_policy_model(deduct: 5.0, every: :hour)
+      expect(policy.points_deducted(score: 10, possible: nil, late_for: 1.day, grading_type: 'pass_fail')).to eq 0
+    end
+
+    it 'ignores assignments that are not meant to be graded' do
+      policy = late_policy_model(deduct: 5.0, every: :hour)
+      expect(policy.points_deducted(score: 10, possible: nil, late_for: 1.day, grading_type: 'not_graded')).to eq 0
     end
 
     it 'increases by hour' do
       policy = late_policy_model(deduct: 5.0, every: :hour)
-      expect(policy.points_deducted(score: 1000, possible: 1000, late_for: 12.hours)).to eq 600
+      expect(policy.points_deducted(score: 1000, possible: 1000, late_for: 12.hours, grading_type: 'points')).to eq 600
     end
 
     it 'increases by day' do
       policy = late_policy_model(deduct: 15.0, every: :day)
-      expect(policy.points_deducted(score: 1000, possible: 1000, late_for: 3.days)).to eq 450
+      expect(policy.points_deducted(score: 1000, possible: 1000, late_for: 3.days, grading_type: 'points')).to eq 450
     end
 
     it 'rounds partial late interval count upward' do
       policy = late_policy_model(deduct: 10.0, every: :day)
-      expect(policy.points_deducted(score: 1000, possible: 1000, late_for: 25.hours)).to eq 200
+      expect(policy.points_deducted(score: 1000, possible: 1000, late_for: 25.hours, grading_type: 'points')).to eq 200
     end
 
     it 'honors the minimum percent deducted' do
       policy = late_policy_model(deduct: 10.0, every: :day, down_to: 30.0)
-      expect(policy.points_deducted(score: 800, possible: 1000, late_for: 2.days)).to eq 200
-      expect(policy.points_deducted(score: 800, possible: 1000, late_for: 7.days)).to eq 500
-      expect(policy.points_deducted(score: 200, possible: 1000, late_for: 8.days)).to eq 0
+      expect(policy.points_deducted(score: 800, possible: 1000, late_for: 2.days, grading_type: 'points')).to eq 200
+      expect(policy.points_deducted(score: 800, possible: 1000, late_for: 7.days, grading_type: 'points')).to eq 500
+      expect(policy.points_deducted(score: 200, possible: 1000, late_for: 8.days, grading_type: 'points')).to eq 0
     end
 
     it 'can deduct fractional points' do
       policy = late_policy_model(deduct: 1.0, every: :hour)
-      expect(policy.points_deducted(score: 10, possible: 10, late_for: 6.hours)).to eq 0.6
+      expect(policy.points_deducted(score: 10, possible: 10, late_for: 6.hours, grading_type: 'points')).to eq 0.6
     end
   end
 

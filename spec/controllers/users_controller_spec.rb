@@ -309,7 +309,7 @@ describe UsersController do
         accepted_terms = json["user"]["user"]["preferences"]["accepted_terms"]
         expect(response).to be_success
         expect(accepted_terms).to be_present
-        expect(Time.parse(accepted_terms)).to be_within(1.minute).of(Time.now.utc)
+        expect(Time.parse(accepted_terms)).to be_within(1.minute.to_i).of(Time.now.utc)
       end
 
       it "should create a registered user if the skip_registration flag is passed in" do

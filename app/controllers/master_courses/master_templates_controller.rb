@@ -339,7 +339,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
       return render :json => {:message => "No associated courses to migrate to"}, :status => :bad_request
     end
 
-    options = params.permit(:comment, :send_notification)
+    options = params.permit(:comment, :send_notification).to_unsafe_h
     options[:copy_settings] = value_to_boolean(params[:copy_settings]) if params.has_key?(:copy_settings)
 
     migration = MasterCourses::MasterMigration.start_new_migration!(@template, @current_user, options)

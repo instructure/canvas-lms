@@ -153,7 +153,7 @@ zh-Hant:
     account_required: "必須為 LDAP 驗證"
     index: 
       delete_auth_confirmation: 是否確定？如果刪除，則使用者可能無法登入。
-      delete_auth_link: 清除所有驗證資訊
+      delete_auth_link: 清除驗證資訊
       ip_address_list_description: "如果您正在使用需要 Canvas 伺服器直接連接您伺服器的驗證服務，如 LDAP，則需要確保您的伺服器可以接受來自這些IP位址的連接："
       no_auth_type_description: 此帳戶目前無法與身份識別提供方整合。
       page_title: 驗證設置
@@ -736,6 +736,11 @@ zh-Hant:
             start: 
               parameters: 
                 header: 開始時間：
+    embry_riddle_activity_report_csv_parameters: 
+      account_reports: 
+        embry_riddle: 
+          outcome: 
+            text: "課程 SIS 模式（逗號分隔列表）："
     engagement_report_csv_parameters: 
       account_reports: 
         bryan_engagement: 
@@ -1733,6 +1738,9 @@ zh-Hant:
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "應用程式中心將出現在課程或帳戶設置頁面上的『應用程式』標籤中。下方提供的 URL 應指向一個有效的應用程式中心端點（例如，%{url}——請確保刪除尾斜杠）"
   app_placements_6d877225: 應用程式配置
   app_reregistration_87cc8817: 應用程式再註冊
+  app_was_installed_by_admin_and_is_locked_3bee4d39: "%{app} 由管理員安裝及已被鎖定"
+  app_was_installed_by_the_master_course_and_is_lock_dbeb24a6: "%{app} 由主課程安裝及已被鎖定"
+  app_was_installed_by_the_master_course_e55ba1d7: "%{app} 由主課程安裝"
   appends_a_number_to_the_end_of_each_event_title_e__bca98abd: 在每個事件標題後附加數字（如：事件1、事件2等等）
   appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "在每個事件標題後附加數字 (如：事件1、事件2等等)『for=』append_iterator"
   application: 
@@ -1806,6 +1814,9 @@ zh-Hant:
   archive_3f794d7e: 存檔
   archive_selected_d64506ca: 已選存檔
   are_you_sure_26795d3c: 您是否確定？
+  are_you_sure_you_want_to_archive_your_copies_of_th_7d219afe: 
+    one: 是否確定要儲存此交談副本？
+    other: 是否確定要儲存此交談副本？
   are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496: 是否確定要取消？您所做的變更或未能貯存。
   are_you_sure_you_want_to_cancel_your_appointment_w_dbbd27eb: "您是否確定要取消與 %{name} 的預約？"
   are_you_sure_you_want_to_copy_to_the_final_mark_th_28a7e7b3: 您確定希望複製到最終分數嗎？新分數會改寫現有的分數。
@@ -1820,6 +1831,9 @@ zh-Hant:
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: 您是否確定要刪除這個評分時段組？
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: 是否確定要刪除此評分時段？
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: 是否確定要刪除此評分方案？
+  are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
+    one: 是否確定要刪除此交談副本？此操作無法撤消。
+    other: 是否確定要刪除此交談副本？此操作無法撤消。
   are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: 您是否確定要刪除此事件的預約？
   are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: "是否確定要停用所有作業的同步 %{sisName} 功能？"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: 您是否確定要這樣做？其將無法撤銷，並且將會覆蓋成績單中的分數。
@@ -1832,6 +1846,9 @@ zh-Hant:
   are_you_sure_you_want_to_resync_these_grades_to_th_e509cb9e: 是否確定要重新同步這些成績至學生資訊系統？
   are_you_sure_you_want_to_submit_this_comment_fbe76ba6: 您是否確定要提交此評論？
   are_you_sure_you_want_to_sync_these_grades_to_the__ca3c28a4: 是否確定要同步這些成績至學生資訊系統？您只可在最終確定所有成績後才能這樣做。
+  are_you_sure_you_want_to_unarchive_these_conversat_ec7d7e8d: 
+    one: 您是否確定要撤消儲存此對話內容？
+    other: 您是否確定要撤消儲存此對話內容？
   argentina_3257a200: 阿根廷
   argentina_54_375d6af4: "阿根廷 (+54)"
   arrange_by_34a545de: 排列規則為
@@ -3388,6 +3405,7 @@ zh-Hant:
   click_here_it_s_free_eeccb9cb: 按一下此處，完全免費！
   click_here_on_the_calendar_link_c9965631: "在此處點擊 *月曆* 連結"
   click_here_to_download_size_of_file_74443988: "按下此處下載%{size_of_file}"
+  click_here_to_log_in_again_4a6055de: 按此處重新登入
   click_here_to_see_the_file_79e2b366: 按一下此處以檢視文檔。
   click_here_to_view_ec8cb2fd: 按一下此處以檢視
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: 當快照拍攝好時，點擊快照可恢復為您的試用版本。注：您將失去自拍攝快照以來所做的任何工作，而且無法撤銷！
@@ -6008,6 +6026,7 @@ zh-Hant:
     edit_key: 編輯此鍵
     identifier: "ID：%{id}"
     redirect_uri: "URI：%{redirect_uri}"
+  developer_key_921ddbae: 開發人員密鑰
   developer_key_form: 
     cancel: 取消
     icon_url: "圖標 URL："
@@ -7435,6 +7454,10 @@ zh-Hant:
   filter_replies_by_unread_342e8e90: 透過『未讀取』篩選器對回復進行篩選
   filter_replies_by_unread_caf870ea: 通過『未讀取』篩選器對回復進行篩選
   filters_92f2776f: 篩選器
+  final_grade_4d7f6545: 最終評分
+  final_grade_6938dca8: "最終評分： "
+  final_grade_finalgrade_138d9e07: "最終評分：%{finalGrade}"
+  final_grade_finalgrade_408580bb: "最終評分：*%{finalGrade}*"
   final_grade_info_2aa35d25: 最終成績資訊
   final_grade_score_fe69a301: "最終成績： %{score}"
   final_letter_grade_80dccec1: 最終等級
@@ -7558,13 +7581,16 @@ zh-Hant:
   gpa_scale_a6d1cdea: "GPA 量表系統"
   grade_10d1e5a1: "%{grade}"
   grade_9c6f076d: 成績
+  grade_a91e433e: 成績：
   grade_assignment_7c1abc11: "成績 %{assignment}"
+  grade_changes_cb5a57a8: 成績更改
   grade_display_warning_dialog: 
     grade_display_warning: 
       checkbox: 不再為此課程顯示。
       warning: 警告
   grade_distribution_e52c9256: 成績分佈
   grade_export_title: 成績導出
+  grade_for_name_b9df168a: "評分：%{name}"
   grade_high_to_low_1cea0381: "評分 - 高至低"
   grade_history_9c51ad49: 評分歷史...
   grade_history_ccc09fde: 評分歷史
@@ -7718,7 +7744,7 @@ zh-Hant:
       switch_to_points: 切換至分數值
     turnitin: 
       error_message: 相似性檢測服務提交一個錯誤。請嘗試重新提交檔案後再聯絡技術支援。
-      info_message: "此文檔仍將由 turnitin 處理。請稍後再返回以檢視成績"
+      info_message: 該檔案仍受與任務關聯的抄襲探測工具處理中。請稍後返回查看分數。
       resubmitting: 正在重新提交...
       tooltip: 
         error: "相似分數 - 參閱提交項目錯誤的詳細訊息"
@@ -8212,9 +8238,9 @@ zh-Hant:
       one: "分數不包括 %{groups}，因為其沒有可能的分數"
       other: "分數不包括 %{groups} 因為他們沒有可能的分數"
     keyboard_assignment_desc: 移至當前任務的詳細資料頁面
-    keyboard_close_menu: 關閉當前活躍的任務功能表
+    keyboard_close_menu: 關閉當前活躍的功能表
     keyboard_comment_desc: 關於活躍的提交件評論
-    keyboard_menu_desc: 打開此活躍列任務的功能表
+    keyboard_menu_desc: 打開此活躍列的功能表
     keyboard_sort_desc: 整理當前活躍列的格線
     keyboard_tooltip_desc: 顯示活躍提交件的提交類型
     keycodes: 
@@ -9239,6 +9265,12 @@ zh-Hant:
   last_used_f9457313: 上次使用：
   last_user_access_title: 上次使用者訪問
   late_2be42b88: 逾期
+  late_8bd684b6: 逾期
+  late_bd436902: 逾期
+  late_penalty_817fff4e: 逾期懲罰：
+  late_penalty_9c312b22: 逾期懲罰
+  late_penalty_pointsdeducted_7033a095: "逾期懲罰：%{pointsDeducted}"
+  late_penalty_pointsdeducted_dac023ff: "逾期懲罰：*%{pointsDeducted}*"
   late_percent_b91d01b3: "逾期：%{percent}"
   late_policies_42bac80: 遲到政策：
   late_policies_fd5dced6: 遲交政策
@@ -9340,6 +9372,7 @@ zh-Hant:
         quizzes: 測驗
         rubrics: 評估量表
         syllabus_body: 教學大綱主體
+        tool_profiles: 工具基本資料
         wikis: "Wiki 頁面"
     cc: 
       standard: 
@@ -9450,9 +9483,11 @@ zh-Hant:
     other: "載入課程完成：%{count} 找到課程"
   loading_courses_started_6e6d742c: 開始載入課程
   loading_data_ecd89ba: 載入資料中..
+  loading_graders_f6a76142: 正在載入評分人
   loading_mastery_paths_c558a766: 正在載入精通路徑...
   loading_more_results_def6df65: 正在載入更多結果...
   loading_results_spinner_73ef739c: 正在載入結果微調項目
+  loading_students_30b71301: 正在載入學生
   loading_sync_history_9f342cbf: 載入同步歷史
   loading_unsynced_changes_b5d7b202: 正在載入未同步變更
   loading_unsynched_changes_688434f2: 載入未同步的變更
@@ -9482,6 +9517,7 @@ zh-Hant:
   log_on_url_fc166e4c: "登入 URL"
   log_out_379ba28a: 登出
   log_out_url_2605c2c1: "登出 URL"
+  logged_out_724b3717: 已登出
   logged_out_user: "已登出的使用者 %{user_counter}"
   login: 
     canvas: 
@@ -9539,6 +9575,8 @@ zh-Hant:
         log_out: "您確定要登出 Canvas？"
       log_out: 登出
       page_title: 登出
+    logout_landing: 
+      page_title: 已登出
     otp: 
       errors: 
         invalid_otp: 無效的驗證碼，請再試一次
@@ -11481,6 +11519,9 @@ zh-Hant:
         subject: "網路會議記錄就緒：%{name}"
       twitter: 
         tweet: "Canvas提示-記錄就緒：%{title}, %{name}"
+  messages_deleted_8f781481: 
+    one: 訊息已刪除！
+    other: 訊息已刪除！
   mexico_52_60d635c7: "墨西哥 (+52)"
   mexico_b2d7a271: 墨西哥
   mgp_grade_export_d29b471f: "MGP 成績導出"
@@ -11507,6 +11548,7 @@ zh-Hant:
     webct: 
       course_not_found: "找不到 Blackboard 課程。"
     wiki_page_type: "Wiki 頁面"
+  migration_in_progress_6f0ed4f9: 遷移進行中
   migration_issues: 
     errors: 
       valid_workflow_state: 必須發送一個有效的工作流程狀態
@@ -11518,6 +11560,8 @@ zh-Hant:
   minutes_4aee5a41: 分鐘
   minutes_per_slot_5b7169e5: 每個時段的分鐘數
   missing_1a256b3b: 缺失
+  missing_d59852a7: 缺失
+  missing_eaddacbd: 缺失
   missing_percent_94534638: "缺失：%{percent}"
   missing_policies_4f195e0b: 欠交規則
   missing_required_values_missing_values_f3be2ff8: "欠乏必填數值：%{missing_values}"
@@ -11934,6 +11978,7 @@ zh-Hant:
   no_grade_assigned_90e531f5: 無指派的成績。
   no_grade_for_assignment_97c9bc75: "沒有成績%{assignment}"
   no_graded_submissions_e40c957a: 沒有已評分的提交項目
+  no_graders_with_that_name_found_d8204d90: 找不到評分人姓名
   no_grading_periods_configured_for_this_term_ca22393e: 沒有為本學期配置的評分時段
   no_grading_periods_set_up_a20a8819: 未設定評分週期
   no_grading_schemes_to_display_8b0e92e7: 沒有可顯示的評分方案
@@ -11953,6 +11998,7 @@ zh-Hant:
   no_students_dd8de9f0: 無學生
   no_students_have_taken_the_quiz_yet_e667644b: 還沒有學生參加該測驗
   no_students_have_taken_the_survey_yet_d378cd35: 還沒有學生參加該調查
+  no_students_with_that_name_found_f6004da2: 找不到學生姓名
   no_submission_for_assignment_a9cb6fe2: "沒有提交%{assignment}"
   no_tls_618add1a: "沒有 TLS"
   no_unassigned_terms_deb7b76b: 沒有未指派的學期
@@ -12659,6 +12705,7 @@ zh-Hant:
     errors: 
       delete_reminder_failed: 刪除失敗
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: 無法在調整後的任務中應用學生互評
+  penalty_adjusted_707df573: "*%{penalty}* **%{adjusted}**"
   pending_3e506a5b: 擱置
   pending_message_2d9a8796: "擱置：%{message}"
   people_b4ebb13c: 人員
@@ -13146,6 +13193,7 @@ zh-Hant:
   points_out_of_total_24f61148: "*%{points}* 總分**%{total}**"
   points_points_b6b422e2: "分数：%{points}"
   points_possible_1c0b3445: 可能分數
+  points_possible_44cb4190: "/%{points_possible}"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "對於已選評分類型而言，可能的分數必須為 0 或更多"
   points_possible_points_fda3b111: "%{points_possible} 分數"
   points_pts_e5596bf7: "%{points} 分"
@@ -13706,7 +13754,7 @@ zh-Hant:
       labels: 
         title: 題庫名稱
       page_title: 題庫
-      see_bookmarked_banks: 檢視我已加為書籤的題庫
+      see_bookmarked_banks: 檢視書籤庫
       user_question_banks: 使用者題庫
     question_bank: 
       bookmark_bank: 將此題庫加為書籤
@@ -15230,6 +15278,7 @@ zh-Hant:
   reviewer_b993ce28: 檢閲人
   reviewers_successfully_added_bd4b629a: 成功添加檢閲人
   rich_content_editor_2708ef21: 富內容編輯器
+  rich_content_editor_sidebar_enhancements_8bd945d3: 強化多種格式的內容編輯器的側邊欄功能
   right_sidebar_logo_5483dc0a: 右側邊欄標誌
   role: 
     duplicate_role: 已存在帶有該名稱的角色
@@ -15365,6 +15414,7 @@ zh-Hant:
     course_files: 課程文檔
     group_files: 群組文檔
     my_files: 我的文檔
+  root_account_3fb3aacf: root_account
   root_accounts_cc035dcf: 根帳戶
   roster: 
     delete_confirm: 是否確定要移除此使用者？
@@ -15434,6 +15484,7 @@ zh-Hant:
         are_you_sure_delete: 是否確定要刪除此評估準則？目前，任何與此評估準則相關的課程仍然可以存取它，但新課程無法使用它。
         are_you_sure_remove: 是否確定要從您的清單中移除此評估準則？
       remove_rubric: 從我的清單中刪除此評分量表
+  russia_7_87bc99d5: "俄羅斯 (+7)"
   salesforce_account_id_eb5c78ad: "銷售人員帳戶 ID"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: 除了產品帳戶之外，銷售人員有一個用於安全帳戶登入的不同主機。因此，如果您使用的是銷售人員的安全帳戶，並且而您沒有勾選此複選框，那麼您將無法進行身份驗證（同理，如果您有一個產品帳戶，並且您勾選了此複選框，也無法進行驗證）。
   salesforce_ticketing_webtocase_connector_80f75716: "銷售人員票務 WebToCase 連接器"
@@ -17413,6 +17464,7 @@ zh-Hant:
   there_was_an_error_uploading_the_image_932fc4ce: 上載影像時出現錯誤
   there_was_an_error_with_your_query_please_try_a_di_761dff12: 搜索時出現錯誤，請嘗試不同的搜索項
   there_was_an_unexpected_problem_with_the_sync_be079a67: 同步時發生了不能預計的問題
+  there_was_an_unknown_error_registering_the_tool_b9a29954: 註冊工具時出現未知錯誤
   there_were_errors_with_the_form_errors_ab5b559a: "該表單含有多個錯誤：%{errors}"
   there_were_several_possible_matches_with_the_impor_ad58bcd0: 匯入中有幾個可能的吻合。請於下方解決。
   these_backup_codes_can_be_used_if_your_multi_facto_ca30a3df: 如果您的多因素驗證設備不可用，可使用這些備份代碼。請列印並保存於安全位置，如您的銀包內。
@@ -17825,6 +17877,7 @@ zh-Hant:
     originality_report_visible_immediately: 立即
   turnitin_similarity_score_more_information_e2571be8: "Turnitin 相似性分數 – 更多資訊"
   twitter_fcef6b54: Twitter
+  type_a_few_letters_to_start_searching_3334657b: 輸入字母開始搜索
   type_c8106334: 類型
   type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: "『%{type}』不是有效的影像文檔格式（請嘗試 jpg、png 或 gif）"
   type_of_change_1cb24a0e: 變更類型
@@ -17979,6 +18032,7 @@ zh-Hant:
   use_mathman_to_convert_latex_to_svg_3f61c9b: "使用 MathMan 將 LaTeX 轉換成 SVG?"
   use_new_folder_tree_in_files_bc0ea09f: 在文檔中應用新的文件夾樹
   use_new_folder_tree_in_files_eb5a451b: 在文檔中應用新的文件夾樹
+  use_new_rich_content_editor_with_enhanced_sidebar__8e0bfedd: 使用新的多種格式的內容編輯器，嘗試強化的側邊欄功能
   use_remote_service_for_notifications_9fe667c6: 採用遙控通知服務
   use_remote_version_of_rich_content_editor_52f7fc4b: 採用多種格式的內容編輯器遙控版本
   use_remote_version_of_rich_content_editor_and_side_a058a664: 採用多種格式的內容編輯器和邊欄遙控版本
@@ -18739,6 +18793,7 @@ zh-Hant:
   you_are_currently_masquerading_as_user_name_f4a00ade: "您目前正在偽裝成 %{user_name}"
   you_are_here_54075d8c: 你在此：
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "您使用您來自 %{institution2} 的認證登入了 %{institution1} "
+  you_are_logged_out_of_canvas_8b5fc59a: "您已登出 Canvas。"
   you_are_not_authorized_to_disable_the_sync_to_name_d283c3e0: "您未經准許停用同至步 %{name} 選項。"
   you_are_not_authorized_to_disable_the_sync_to_sisn_54aebeb0: "您未經准許停用同至步 %{sisName} 選項。"
   you_are_not_enrolled_in_any_courses_a5c63286: 您未註冊任何課程

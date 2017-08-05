@@ -68,7 +68,7 @@ define [
 
     submissionFailure: (message) =>
       @loaderPromise.resolve()
-      @$.find(".submit_button").text I18n.t("file_retrieval_error", "Retrieving File Failed")
+      @$el.find(".submit_button").text I18n.t("file_retrieval_error", "Retrieving File Failed")
       $.flashError I18n.t("invalid_file_retrieval", "There was a problem retrieving the file sent from this tool.")
 
     uploadSuccess: (data) =>
@@ -77,7 +77,7 @@ define [
 
     uploadFailure: (data) =>
       @loaderPromise.resolve()
-      @$.find(".submit_button").text I18n.t("file_retrieval_error", "Retrieving File Failed")
+      @$el.find(".submit_button").text I18n.t("file_retrieval_error", "Retrieving File Failed")
       return
 
     uploadFileFromUrl: (tool, modelData) ->
@@ -90,7 +90,11 @@ define [
         name: @assignmentSubmission.get('text')
         content_type: ''
 
-      fileUploadUrl = "/api/v1/courses/" + ENV.COURSE_ID + "/assignments/" + ENV.SUBMIT_ASSIGNMENT.ID + "/submissions/" + ENV.current_user_id + "/files"
+      if ENV.SUBMIT_ASSIGNMENT.GROUP_ID_FOR_USER?
+        fileUploadUrl = "/api/v1/groups/" + ENV.SUBMIT_ASSIGNMENT.GROUP_ID_FOR_USER + "/files"
+      else
+        fileUploadUrl = "/api/v1/courses/" + ENV.COURSE_ID + "/assignments/" + ENV.SUBMIT_ASSIGNMENT.ID + "/submissions/" + ENV.current_user_id + "/files"
+
       $.ajaxJSON fileUploadUrl, "POST", fileParams, @uploadSuccess, @uploadFailure
 
       @$el.disableWhileLoading @loaderPromise,

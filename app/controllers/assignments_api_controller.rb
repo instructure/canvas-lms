@@ -618,9 +618,9 @@ class AssignmentsApiController < ApplicationController
   def get_assignments(user)
     if authorized_action(@context, user, :read)
       scope = Assignments::ScopedToUser.new(@context, user).scope.
-          eager_load(:assignment_group).
-          preload(:rubric_association, :rubric).
-          reorder("assignment_groups.position, assignments.position")
+        eager_load(:assignment_group).
+        preload(:rubric_association, :rubric).
+        reorder("assignment_groups.position, assignments.position, assignments.id")
       scope = Assignment.search_by_attribute(scope, :title, params[:search_term])
       include_params = Array(params[:include])
 

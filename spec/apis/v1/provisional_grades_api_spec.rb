@@ -246,7 +246,7 @@ describe 'Provisional Grades API', type: :request do
           expect(@submission.score).to eq 100
 
           @assignment.reload
-          expect(@assignment.grades_published_at).to be_within(1.minute).of(Time.now.utc)
+          expect(@assignment.grades_published_at).to be_within(1.minute.to_i).of(Time.now.utc)
 
           @student.reload
           expect(@student.messages.map(&:notification_name)).to be_include 'Submission Graded'

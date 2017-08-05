@@ -152,7 +152,7 @@ export default class EditorConfig {
    *   representing the buttons to appear on the n-th line of the toolbar
    */
   balanceButtons (instructure_buttons) {
-    const instBtnGroup = `table,instructure_links,unlink${instructure_buttons}`
+    const instBtnGroup = `table,media,instructure_links,unlink${instructure_buttons}`
     let buttons1 = ''
     let buttons2 = ''
     let buttons3 = ''

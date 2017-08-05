@@ -479,6 +479,16 @@ YYYY-MM-DDTHH:MM:SSZ</td>
 <td></td>
 <td>on_campus, online, blended</td>
 </tr>
+<tr>
+<td>blueprint_course_id</td>
+<td>text</td>
+<td></td>
+<td></td>
+<td>The SIS id of a pre-existing Blueprint course. When provided, 
+the current course will be set up to receive updates from the blueprint course.
+Requires Blueprint Courses feature.
+</td>
+</tr>
 </table>
 
 <p>If the start_date is set, it will override the term start date. If the end_date is set, it will

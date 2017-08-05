@@ -30,6 +30,7 @@ $menu-item-keyboard-shortcut-color: $ic-font-color-dark;
   @include canvas-button(
     var(--ic-brand-button--primary-bgd),
     var(--ic-brand-button--primary-text),
+    false,
     var(--ic-brand-button--primary-bgd-darkened-5),
     var(--ic-brand-button--primary-bgd-darkened-15)
   );

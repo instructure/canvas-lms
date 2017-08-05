@@ -590,6 +590,18 @@ describe Submission do
       end
     end
 
+    it "deducts nothing if the submission is not late" do
+      Timecop.freeze(@date) do
+        @assignment.submit_homework(@student, body: "gary, what have you done?")
+        submission.score = 700
+        allow(submission).to receive(:late?).and_return(false)
+        submission.apply_late_policy(@late_policy, @assignment)
+
+        expect(submission.score).to eq 700
+        expect(submission.points_deducted).to eq 0
+      end
+    end
+
     it "does not round decimal places in the score" do
       Timecop.freeze(2.days.ago(@date)) do
         @assignment.submit_homework(@student, body: "a body")
@@ -986,7 +998,7 @@ describe Submission do
   end
 
   context "Discussion Topic" do
-    it "should use correct date for its submitted_at value" do
+    it "submitted_at does not change when a second discussion entry is created" do
       course_with_student(:active_all => true)
       @topic = @course.discussion_topics.create(:title => "some topic")
       @assignment = @course.assignments.create(:title => "some discussion assignment")
@@ -995,12 +1007,12 @@ describe Submission do
       @entry1 = @topic.discussion_entries.create(:message => "first entry", :user => @user)
       @topic.assignment_id = @assignment.id
       @topic.save!
-      @submission = @assignment.submissions.where(:user_id => @entry1.user_id).first
-      new_time = Time.now + 30.minutes
-      allow(Time).to receive(:now).and_return(new_time)
-      @entry2 = @topic.discussion_entries.create(:message => "second entry", :user => @user)
-      @submission.reload
-      expect((@submission.submitted_at.to_i - @submission.created_at.to_i).abs).to be < 1.minute
+
+      Timecop.freeze(30.minutes.from_now) do
+        expect do
+          @topic.discussion_entries.create(:message => "second entry", :user => @user)
+        end.not_to(change { @assignment.submissions.find_by(user: @user).submitted_at })
+      end
     end
 
     it "should not create multiple versions on submission for discussion topics" do
@@ -2342,37 +2354,23 @@ describe Submission do
       expect(Submission.missing).to be_empty
     end
 
-    it 'excludes submission when past due, not submitted, assignment does not expect a submission, is excused' do
-      @submission.assignment.update(submission_types: 'none')
+    it 'excludes submission when past due, not submitted, and excused' do
+      @submission.assignment.update(submission_types: 'online_text_entry')
       @submission.update(excused: true)
+      @submission.update_columns(submission_type: nil, submitted_at: nil)
+
+      expect(Submission.missing).to be_empty
+    end
+
+    it 'excludes submission when past due, not submitted, assignment does not expect a submission, not excused, and no score' do
+      @submission.assignment.update(submission_types: 'none')
       @submission.update_columns(submission_type: nil)
 
       expect(Submission.missing).to be_empty
     end
 
-    it 'includes submission when past due, not submitted, assignment does not expect a submission, not excused, and no score' do
-      @submission.assignment.update(submission_types: 'none')
-      @submission.update_columns(submission_type: nil)
-
-      expect(Submission.missing).not_to be_empty
-    end
-
-    it 'includes submission when past due, not submitted, assignment does not expect a submission, not excused, has a score, workflow state is not "graded"' do
+    it 'excludes submission when assignment does not expect a submission and late_policy_status is not "missing"' do
       @submission.update(score: 1)
-      @submission.update_columns(submission_type: nil)
-
-      expect(Submission.missing).not_to be_empty
-    end
-
-    it 'includes submission when past due, not submitted, assignment does not expect a submission, not excused, has a score, workflow state is "graded", and score is 0' do
-      @submission.update(score: 0, workflow_state: 'graded')
-      @submission.update_columns(submission_type: nil)
-
-      expect(Submission.missing).not_to be_empty
-    end
-
-    it 'excludes submission when past due, not submitted, assignment does not expect a submission, not excused, has a score, workflow state is "graded", and score is greater than 0' do
-      @submission.update(score: 1, workflow_state: 'graded')
       @submission.update_columns(submission_type: nil)
 
       expect(Submission.missing).to be_empty
@@ -2422,43 +2420,66 @@ describe Submission do
       expect(Submission.not_missing).not_to be_empty
     end
 
-    it 'excludes submission when past due, not submitted, assignment does not expect a submission, not excused, and no score' do
+    it 'includes submission when past due, not submitted, assignment does not expect a submission, not excused, and no score' do
       @submission.assignment.update(submission_types: 'none')
-      @submission.update_columns(submission_type: nil)
-
-      expect(Submission.not_missing).to be_empty
-    end
-
-    it 'excludes submission when past due, not submitted, assignment does not expect a submission, not excused, has a score, workflow state is not "graded"' do
-      @submission.update(score: 1)
-      @submission.update_columns(submission_type: nil)
-
-      expect(Submission.not_missing).to be_empty
-    end
-
-    it 'excludes submission when past due, not submitted, assignment does not expect a submission, not excused, has a score, workflow state is "graded", and score is 0' do
-      @submission.update(score: 0, workflow_state: 'graded')
-      @submission.update_columns(submission_type: nil)
-
-      expect(Submission.not_missing).to be_empty
-    end
-
-    it 'includes submission when past due, not submitted, assignment does not expect a submission, not excused, has a score, workflow state is "graded", and score is greater than 0' do
-      @submission.update(score: 1, workflow_state: 'graded')
       @submission.update_columns(submission_type: nil)
 
       expect(Submission.not_missing).not_to be_empty
     end
   end
 
+  describe "#late?" do
+    before(:once) do
+      course = Course.create!
+      student = User.create!
+      course.enroll_student(student, enrollment_state: "active")
+      now = Time.zone.now
+      assignment = course.assignments.create!(submission_types: "online_text_entry", due_at: 10.days.ago(now))
+      @submission = assignment.submit_homework(student, body: "Submitting late :(")
+    end
+
+    it "returns true if the submission is past due" do
+      expect(@submission).to be_late
+    end
+
+    it "returns false if the submission is excused" do
+      @submission.excused = true
+      expect(@submission).not_to be_late
+    end
+
+    it "returns false if the submission is past due but has its late_policy_status set to something other than 'late'" do
+      @submission.late_policy_status = "missing"
+      expect(@submission).not_to be_late
+    end
+  end
+
   describe "#missing" do
+    SUBMISSIONS_THAT_CANT_BE_MISSING = %w/none on_paper external_tool/
+    SUBMISSION_TYPES = %w/none on_paper online_quiz discussion_topic external_tool online_upload online_text_entry online_url media_recording/
+
     before :once do
       @now = Time.zone.now
       submission_spec_model(cached_due_date: 1.day.ago(@now), submission_type: nil, submit_homework: true)
-      @submission.assignment.update!(submission_types: "on_paper")
+      @submission.assignment.update!(submission_types: 'on_paper')
+      @another_assignment = assignment_model(course: @course, due_at: 1.day.ago)
+      @another_submission = @another_assignment.submissions.last
     end
 
-    it 'returns false when late_policy_status is nil' do
+    SUBMISSION_TYPES.each do |sub_type|
+      should_not_be_missing = SUBMISSIONS_THAT_CANT_BE_MISSING.include?(sub_type)
+      expected_status = should_not_be_missing ? 'false' : 'true'
+      it "returns #{expected_status} when late_policy_status is nil and submission_type is #{sub_type}" do
+        @another_assignment.update(submission_types: sub_type)
+
+        if should_not_be_missing
+          expect(@another_submission.reload).not_to be_missing
+        else
+          expect(@another_submission.reload).to be_missing
+        end
+      end
+    end
+
+    it 'returns false when late_policy_status is nil standalone' do
       expect(@submission).not_to be_missing
     end
 
@@ -2468,8 +2489,14 @@ describe Submission do
       expect(@submission).to be_missing
     end
 
+    it 'returns false when the submission is excused and late_policy_status is "missing"' do
+      @submission.excused = true
+      @submission.late_policy_status = "missing"
+      expect(@submission).not_to be_missing
+    end
+
     it 'returns false when late_policy_status is not nil, not missing' do
-      @submission.update(late_policy_status: 'foo')
+      @submission.update(late_policy_status: 'late')
 
       expect(@submission).not_to be_missing
     end
@@ -2494,25 +2521,25 @@ describe Submission do
       expect(@submission).not_to be_missing
     end
 
-    it 'returns true when past due, not submitted, assignment does not expect a submission, not excused, and no score' do
+    it 'returns false when past due, not submitted, assignment does not expect a submission, not excused, and no score' do
       @submission.assignment.update(submission_types: 'none')
       @submission.update_columns(submission_type: nil)
 
-      expect(@submission).to be_missing
+      expect(@submission).not_to be_missing
     end
 
-    it 'returns true when past due, not submitted, assignment does not expect a submission, not excused, has a score, workflow state is not "graded"' do
+    it 'returns false when past due, not submitted, assignment does not expect a submission, not excused, has a score, workflow state is not "graded"' do
       @submission.update(score: 1)
       @submission.update_columns(submission_type: nil)
 
-      expect(@submission).to be_missing
+      expect(@submission).not_to be_missing
     end
 
-    it 'returns true when past due, not submitted, assignment does not expect a submission, not excused, has a score, workflow state is "graded", and score is 0' do
+    it 'returns false when past due, not submitted, assignment does not expect a submission, not excused, has a score, workflow state is "graded", and score is 0' do
       @submission.update(score: 0, workflow_state: 'graded')
       @submission.update_columns(submission_type: nil)
 
-      expect(@submission).to be_missing
+      expect(@submission).not_to be_missing
     end
 
     it 'returns false when past due, not submitted, assignment does not expect a submission, not excused, has a score, workflow state is "graded", and score is greater than 0' do
@@ -3605,6 +3632,9 @@ describe Submission do
       @late_hw3 = @assignment.submissions.create(user: User.create, submission_type: 'online_text_entry')
       Submission.where(id: @late_hw3.id).update_all(submitted_at: @now, cached_due_date: @now - 1.hour)
 
+      @late_hw_excused = @assignment.submissions.create(user: User.create, submission_type: 'online_text_entry')
+      Submission.where(id: @late_hw_excused.id).update_all(submitted_at: @now, cached_due_date: @now - 1.hour, excused: true)
+
       @timely_hw_marked_late = @assignment.submissions.create(user: User.create, submission_type: 'online_text_entry')
       Submission.where(id: @timely_hw_marked_late.id).update_all(submitted_at: @now, cached_due_date: nil)
       Submission.where(id: @timely_hw_marked_late.id).update_all(late_policy_status: 'late')
@@ -3681,6 +3711,10 @@ describe Submission do
 
     it 'includes homeworks submitted after the due date' do
       expect(@late_submission_ids).to include(@late_hw3.id)
+    end
+
+    it 'excludes excused homework submitted after the due date' do
+      expect(@late_submission_ids).not_to include(@late_hw_excused.id)
     end
 
     it 'includes homeworks that have been manually marked as late' do
@@ -3768,6 +3802,9 @@ describe Submission do
       @late_hw3 = @assignment.submissions.create(user: User.create, submission_type: 'online_text_entry')
       Submission.where(id: @late_hw3.id).update_all(submitted_at: @now, cached_due_date: @now - 1.hour)
 
+      @late_hw_excused = @assignment.submissions.create(user: User.create, submission_type: 'online_text_entry')
+      Submission.where(id: @late_hw_excused.id).update_all(submitted_at: @now, cached_due_date: @now - 1.hour, excused: true)
+
       @timely_hw_marked_late = @assignment.submissions.create(user: User.create, submission_type: 'online_text_entry')
       Submission.where(id: @timely_hw_marked_late.id).update_all(submitted_at: @now, cached_due_date: nil)
       Submission.where(id: @timely_hw_marked_late.id).update_all(late_policy_status: 'late')
@@ -3844,6 +3881,10 @@ describe Submission do
 
     it 'excludes homeworks submitted after the due date' do
       expect(@not_late_submission_ids).not_to include(@late_hw3.id)
+    end
+
+    it 'includes excused homework submitted after the due date' do
+      expect(@not_late_submission_ids).to include(@late_hw_excused.id)
     end
 
     it 'excludes homeworks that have been manually marked as late' do

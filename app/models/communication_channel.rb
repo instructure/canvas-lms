@@ -75,6 +75,7 @@ class CommunicationChannel < ActiveRecord::Base
       ['49',   I18n.t('Germany (+49)'),                false],
       ['504',  I18n.t('Honduras (+504)'),              false],
       ['852',  I18n.t('Hong Kong (+852)'),             false],
+      ['354',  I18n.t('Iceland (+354)'),               false],
       ['91',   I18n.t('India (+91)'),                  false],
       ['353',  I18n.t('Ireland (+353)'),               false],
       ['972',  I18n.t('Israel (+972)'),                false],
@@ -275,7 +276,7 @@ class CommunicationChannel < ActiveRecord::Base
     m = self.messages.temp_record
     m.to = self.path
     m.body = message
-    Mailer.create_message(m).deliver rescue nil # omg! just ignore delivery failures
+    Mailer.deliver(Mailer.create_message(m))
   end
 
   def send_otp!(code, account = nil)
@@ -288,8 +289,11 @@ class CommunicationChannel < ActiveRecord::Base
         e164_path
       )
     else
-      send_later_if_production_enqueue_args(:send_otp_via_sms_gateway!,
-                                            priority: Delayed::HIGH_PRIORITY, max_attempts: 1)
+      send_later_if_production_enqueue_args(
+        :send_otp_via_sms_gateway!,
+        { priority: Delayed::HIGH_PRIORITY, max_attempts: 1 },
+        message
+      )
     end
   end
 

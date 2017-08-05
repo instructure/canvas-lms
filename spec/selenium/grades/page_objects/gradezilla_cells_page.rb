@@ -50,6 +50,13 @@ class Gradezilla
         wait_for_ajax_requests
       end
 
+      def send_keyboard_shortcut(student, assignment, key)
+        grading_cell(student, assignment).click
+        driver.action.send_keys(:escape).perform
+        driver.action.send_keys(key).perform
+        wait_for_animations
+      end
+
       def open_tray(student, assignment)
         cell = grading_cell(student, assignment)
         cell.click
@@ -62,8 +69,15 @@ class Gradezilla
         ".slick-row.student_#{student.id} .slick-cell.assignment_group_#{assignment_group.id}"
       end
 
-      def get_assignment_group_grade(student, assignment)
-        f(assignment_group_selector(student, assignment)).text
+      def get_assignment_group_grade(student, assignment_group)
+        f(assignment_group_selector(student, assignment_group)).text
+      end
+
+      def send_keyboard_shortcut_to_assignment_group(student, assignment_group, key)
+        f(assignment_group_selector(student, assignment_group)).click
+        driver.action.send_keys(:escape).perform
+        driver.action.send_keys(key).perform
+        wait_for_animations
       end
 
       # ---------- Total Grade Cells ---------------
@@ -73,6 +87,13 @@ class Gradezilla
 
       def get_total_grade(student)
         f(total_grade_selector(student)).text
+      end
+
+      def send_keyboard_shortcut_to_total(student, key)
+        f(total_grade_selector(student)).click
+        driver.action.send_keys(:escape).perform
+        driver.action.send_keys(key).perform
+        wait_for_animations
       end
     end
   end

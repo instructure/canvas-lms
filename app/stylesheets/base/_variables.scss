@@ -79,7 +79,20 @@ $fire:                      #FC5E13; // orange
 // Default Functional Swatches
 //====================================
 
-@if $use_high_contrast {    $ic-brand-primary: #0770A3; }
+$variables-have-been-defined: false !default;
+@if $use_high_contrast {
+  $ic-brand-primary: #0770A3;
+  @if not $variables-have-been-defined { // makes sure this is only output once
+    $variables-have-been-defined: true;
+    :root {
+      --ic-brand-primary: $ic-brand-primary;
+      --ic-brand-primary-darkened-5: darken($ic-brand-primary, 5);
+      --ic-brand-primary-darkened-10: darken($ic-brand-primary, 10);
+      --ic-brand-primary-lightened-15: lighten($ic-brand-primary, 15);
+    }
+  }
+}
+
 $ic-color-success:          $shamrock;
 $ic-color-action:           $barney;
 $ic-color-danger:           $crimson;

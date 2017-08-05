@@ -153,7 +153,7 @@ zh-Hans:
     account_required: "必须经过 LDAP 身份验证"
     index: 
       delete_auth_confirmation: 是否确定?如果删除，用户可能无法登录。
-      delete_auth_link: 移除所有身份验证
+      delete_auth_link: 删除身份验证
       ip_address_list_description: "如果使用的身份验证服务要求 Canvas 服务器与您的服务器直接连接，例如 LDAP，则需确保您的服务器可以接受来自以下 IP 地址的连接:"
       no_auth_type_description: 此帐户目前未与身份提供商集成。
       page_title: 身份验证设置
@@ -736,6 +736,11 @@ zh-Hans:
             start: 
               parameters: 
                 header: 开始时间：
+    embry_riddle_activity_report_csv_parameters: 
+      account_reports: 
+        embry_riddle: 
+          outcome: 
+            text: "课程 SIS 模式（用逗号分隔的列表）："
     engagement_report_csv_parameters: 
       account_reports: 
         bryan_engagement: 
@@ -1739,6 +1744,9 @@ zh-Hans:
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "App Center 将出现在课程或帐户的设置页上的“应用程序”选项卡中。下面提供的 URL 应指向有效的 App Center 终端（例如，%{url} -- 确保略去末尾斜杠）"
   app_placements_6d877225: 应用程序安置
   app_reregistration_87cc8817: 应用程序登记
+  app_was_installed_by_admin_and_is_locked_3bee4d39: "%{app} 由管理员安装并已锁定"
+  app_was_installed_by_the_master_course_and_is_lock_dbeb24a6: "%{app} 由主课程安装并已锁定"
+  app_was_installed_by_the_master_course_e55ba1d7: "%{app} 由主课程安装"
   appends_a_number_to_the_end_of_each_event_title_e__bca98abd: 在每个事件标题末尾附加一个数字（例如事件1，事件2等等）。
   appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "在每个事件标题末尾附加一个数字（例如事件1，事件2等等） “for=”append_iterator。"
   application: 
@@ -1812,6 +1820,9 @@ zh-Hans:
   archive_3f794d7e: 存档
   archive_selected_d64506ca: 已选择归档
   are_you_sure_26795d3c: 是否确定？
+  are_you_sure_you_want_to_archive_your_copies_of_th_7d219afe: 
+    one: 是否确定要将这些对话的副本归档？
+    other: 是否确定要将这些对话的副本归档？
   are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496: 确定要取消吗？您做出的变更可能无法保存。
   are_you_sure_you_want_to_cancel_your_appointment_w_dbbd27eb: "是否确定要取消您和 %{name} 的预约?"
   are_you_sure_you_want_to_copy_to_the_final_mark_th_28a7e7b3: 您确定要复制最终标志吗？这将覆盖现有的标记。
@@ -1826,6 +1837,9 @@ zh-Hans:
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: 您确定要删除这个评分周期集吗？
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: 是否确定要删除此评分周期？
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: 是否确定要删除此评分方案?
+  are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
+    one: 是否确定要将删除这些对话的副本？此操作无法撤消。
+    other: 是否确定要将删除这些对话的副本？此操作无法撤消。
   are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: 是否确定要删除您对此事件的预订?
   are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: "是否确定要对所有作业禁用“同步到 %{sisName}”？"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: 您确定要这么做吗？不能撤消它，否则将覆盖成绩册内现有的成绩。
@@ -1838,6 +1852,9 @@ zh-Hans:
   are_you_sure_you_want_to_resync_these_grades_to_th_e509cb9e: 您确定要将这些评分重新同步到学生信息系统吗？
   are_you_sure_you_want_to_submit_this_comment_fbe76ba6: 您确定要提交此评论吗？
   are_you_sure_you_want_to_sync_these_grades_to_the__ca3c28a4: 您确定要将这些评分同步到学生信息系统吗？仅当给出您的所有最后评分后，您才应这样做。
+  are_you_sure_you_want_to_unarchive_these_conversat_ec7d7e8d: 
+    one: 是否确定要将这些对话取消归档？
+    other: 是否确定要将这些对话取消归档？
   argentina_3257a200: 阿根廷
   argentina_54_375d6af4: 阿根廷(+54)
   arrange_by_34a545de: 排列方式
@@ -3386,6 +3403,7 @@ zh-Hans:
   click_here_it_s_free_eeccb9cb: 点击这里，它是免费的！
   click_here_on_the_calendar_link_c9965631: "单击此处的 *日历* 链接"
   click_here_to_download_size_of_file_74443988: "单击此处下载%{size_of_file}"
+  click_here_to_log_in_again_4a6055de: 单击此处可再次登录
   click_here_to_see_the_file_79e2b366: 点击此处查看文件。
   click_here_to_view_ec8cb2fd: 单击此处查看
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: 单击快照以退回到捕捉快照时的测试。注意：已经捕捉快照且无法取消，因此您将丢失您已经完成的任何工作！
@@ -5985,6 +6003,7 @@ zh-Hans:
     edit_key: 编辑此密钥
     identifier: "ID: %{id}"
     redirect_uri: "URI: %{redirect_uri}"
+  developer_key_921ddbae: 开发人员密钥
   developer_key_form: 
     cancel: 取消
     icon_url: "图标 URL:"
@@ -7420,6 +7439,10 @@ zh-Hans:
   filter_replies_by_unread_342e8e90: 通过未读过滤回复
   filter_replies_by_unread_caf870ea: 按未读过滤回复
   filters_92f2776f: 筛选器
+  final_grade_4d7f6545: 最终评分
+  final_grade_6938dca8: 最终评分：
+  final_grade_finalgrade_138d9e07: "最终评分：%{finalGrade}"
+  final_grade_finalgrade_408580bb: "最终评分：*%{finalGrade}*"
   final_grade_info_2aa35d25: 最终成绩信息
   final_grade_score_fe69a301: "最终成绩: %{score}"
   final_letter_grade_80dccec1: 最终字母分数
@@ -7547,13 +7570,16 @@ zh-Hans:
   gpa_scale_a6d1cdea: 平均分制
   grade_10d1e5a1: "%{grade}"
   grade_9c6f076d: 评分
+  grade_a91e433e: 评分：
   grade_assignment_7c1abc11: "评改%{assignment}"
+  grade_changes_cb5a57a8: 评分更改
   grade_display_warning_dialog: 
     grade_display_warning: 
       checkbox: 不要再显示此课程。
       warning: 警告
   grade_distribution_e52c9256: 评分分布
   grade_export_title: 评分导出
+  grade_for_name_b9df168a: "评分：%{name}"
   grade_high_to_low_1cea0381: "评分 - 从高到低"
   grade_history_9c51ad49: 评分历史记录……
   grade_history_ccc09fde: 评分历史记录
@@ -7708,7 +7734,7 @@ zh-Hans:
       switch_to_points: 切换到得分
     turnitin: 
       error_message: 提交相似度检测服务时出现错误。联系支持人员前，请尝试重新提交文件。
-      info_message: "Turnitin 正在处理文件，请晚些时候再来查看得分。"
+      info_message: 与此作业关联的抄袭检测工具仍然在处理该文件。请稍后再回来检查分数。
       resubmitting: 正在重新提交...
       tooltip: 
         error: "相似性分数 - 查看提交错误详细信息"
@@ -8202,9 +8228,9 @@ zh-Hans:
       one: "分数不包括 %{groups}，因为他们没有可能的得分"
       other: "分数不包括 %{groups}，因为他们没有可能的得分"
     keyboard_assignment_desc: 转到当前作业的详细信息页面
-    keyboard_close_menu: 关闭当前活动的作业菜单
+    keyboard_close_menu: 管理当前的活动菜单
     keyboard_comment_desc: 对当前提交文件的评论
-    keyboard_menu_desc: 打开活跃栏中的作业菜单
+    keyboard_menu_desc: 打开活动栏的菜单
     keyboard_sort_desc: 对当前活动栏上的网格排序
     keyboard_tooltip_desc: 显示当前提交文件的提交类型
     keycodes: 
@@ -9230,6 +9256,12 @@ zh-Hans:
   last_used_f9457313: 上次使用日期：
   last_user_access_title: 上次用户访问
   late_2be42b88: 迟到
+  late_8bd684b6: 迟交
+  late_bd436902: 迟交
+  late_penalty_817fff4e: 迟交罚分：
+  late_penalty_9c312b22: 迟交罚分
+  late_penalty_pointsdeducted_7033a095: "迟交罚分：%{pointsDeducted}"
+  late_penalty_pointsdeducted_dac023ff: "迟交罚分：*%{pointsDeducted}*"
   late_percent_b91d01b3: "延迟：%{percent}"
   late_policies_42bac80: 最新政策
   late_policies_fd5dced6: 最新策略
@@ -9335,6 +9367,7 @@ zh-Hans:
         quizzes: 测验
         rubrics: 评分标准说明
         syllabus_body: 大纲主体
+        tool_profiles: 工具模板
         wikis: 维基页面
     cc: 
       standard: 
@@ -9445,9 +9478,11 @@ zh-Hans:
     other: "加载课程完成%{count} 找到课程"
   loading_courses_started_6e6d742c: 加载课程已开始
   loading_data_ecd89ba: 正在加载数据……
+  loading_graders_f6a76142: 正在加载评分人
   loading_mastery_paths_c558a766: 加载通达的路径......
   loading_more_results_def6df65: 正在载入更多的结果...
   loading_results_spinner_73ef739c: 加载结果微调框
+  loading_students_30b71301: 正在加载学生
   loading_sync_history_9f342cbf: 正在加载同步历史记录
   loading_unsynced_changes_b5d7b202: 正在加载未同步的更改
   loading_unsynched_changes_688434f2: 正在加载未同步的更改
@@ -9477,6 +9512,7 @@ zh-Hans:
   log_on_url_fc166e4c: 登录到URL
   log_out_379ba28a: 退出
   log_out_url_2605c2c1: 退出URL
+  logged_out_724b3717: 已登出
   logged_out_user: "退出的用户 %{user_counter}"
   login: 
     canvas: 
@@ -9534,6 +9570,8 @@ zh-Hans:
         log_out: "是否确定要退出 Canvas？"
       log_out: 退出
       page_title: 退出
+    logout_landing: 
+      page_title: 已登出
     otp: 
       errors: 
         invalid_otp: 验证码无效，请重试
@@ -11500,6 +11538,9 @@ zh-Hans:
         subject: "网站会议的录制准备好：%{name}"
       twitter: 
         tweet: "Canvas通知－录制准备：%{title}, %{name}"
+  messages_deleted_8f781481: 
+    one: 消息已删除！
+    other: 消息已删除！
   mexico_52_60d635c7: 墨西哥(+52)
   mexico_b2d7a271: 墨西哥
   mgp_grade_export_d29b471f: "MGP 评分导出"
@@ -11526,6 +11567,7 @@ zh-Hans:
     webct: 
       course_not_found: "找不到 Blackboard 课程。"
     wiki_page_type: 维基页面
+  migration_in_progress_6f0ed4f9: 迁移中
   migration_issues: 
     errors: 
       valid_workflow_state: 必须发送有效的工作流状态
@@ -11537,6 +11579,8 @@ zh-Hans:
   minutes_4aee5a41: 分钟
   minutes_per_slot_5b7169e5: 每个时段的分钟
   missing_1a256b3b: 失踪
+  missing_d59852a7: 缺失
+  missing_eaddacbd: 缺失
   missing_percent_94534638: "缺少：%{percent}"
   missing_policies_4f195e0b: 缺少策略
   missing_required_values_missing_values_f3be2ff8: "缺少必填值：%{missing_values}"
@@ -11953,6 +11997,7 @@ zh-Hans:
   no_grade_assigned_90e531f5: 没有最终成绩被指定
   no_grade_for_assignment_97c9bc75: "无评分%{assignment}"
   no_graded_submissions_e40c957a: 没有已评分的提交项
+  no_graders_with_that_name_found_d8204d90: 找不到该姓名的评分人
   no_grading_periods_configured_for_this_term_ca22393e: 没有成绩周期为该学期配置
   no_grading_periods_set_up_a20a8819: 未设置评分周期
   no_grading_schemes_to_display_8b0e92e7: 没有可显示的评分方案
@@ -11972,6 +12017,7 @@ zh-Hans:
   no_students_dd8de9f0: 没有学生
   no_students_have_taken_the_quiz_yet_e667644b: 学生尚未参加测验
   no_students_have_taken_the_survey_yet_d378cd35: 学生尚未参加调查
+  no_students_with_that_name_found_f6004da2: 找不到该姓名的学生
   no_submission_for_assignment_a9cb6fe2: "无提交项%{assignment}"
   no_tls_618add1a: 没有TLS
   no_unassigned_terms_deb7b76b: 未指定的学期
@@ -12671,6 +12717,7 @@ zh-Hans:
     errors: 
       delete_reminder_failed: 删除失败
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: 同侪评审无法启用于缓和的作业。
+  penalty_adjusted_707df573: "*%{penalty}* **%{adjusted}**"
   pending_3e506a5b: 审核中
   pending_message_2d9a8796: "审核中：%{message}"
   people_b4ebb13c: 人员、人们
@@ -13167,6 +13214,7 @@ zh-Hans:
   points_out_of_total_24f61148: "*%{points}* 共**%{total}**"
   points_points_b6b422e2: "分值： %{points}"
   points_possible_1c0b3445: 满分值
+  points_possible_44cb4190: "/%{points_possible}"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "对于所选评分类型，满分值必须大于等于 0"
   points_possible_points_fda3b111: "%{points_possible} 分"
   points_pts_e5596bf7: "%{points} 得分"
@@ -13731,7 +13779,7 @@ zh-Hans:
       labels: 
         title: 库名称
       page_title: 题库
-      see_bookmarked_banks: 查看我添加到书签的库
+      see_bookmarked_banks: 查看已添加书签的题库
       user_question_banks: 用户题库
     question_bank: 
       bookmark_bank: 将此题库添加到书签
@@ -15270,6 +15318,7 @@ zh-Hans:
   reviewer_b993ce28: 审阅者
   reviewers_successfully_added_bd4b629a: 成功添加审阅者
   rich_content_editor_2708ef21: 富内容编辑器
+  rich_content_editor_sidebar_enhancements_8bd945d3: 富内容编辑器侧栏增强
   right_sidebar_logo_5483dc0a: 右侧栏的标志
   role: 
     duplicate_role: 具有此名称的角色已经存在
@@ -15405,6 +15454,7 @@ zh-Hans:
     course_files: 课程文件
     group_files: 组文件
     my_files: 我的文件
+  root_account_3fb3aacf: root_account
   root_accounts_cc035dcf: 根帐户
   roster: 
     delete_confirm: 是否确定要删除此用户？
@@ -15474,6 +15524,7 @@ zh-Hans:
         are_you_sure_delete: "是否确定要删除此评分标准说明? 当前使用评分标准的任何位置将仍可访问，但其他人将无法使用该评分标准。"
         are_you_sure_remove: 是否确定要从您的列表中删除此评分标准?
       remove_rubric: 从我的列表中删除此评分标准
+  russia_7_87bc99d5: "俄罗斯 (+7)"
   salesforce_account_id_eb5c78ad: "Salesforce 帐户 ID"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: 销售团队有一个与它的产品帐户不同的登录主机砂盒的帐户，因此，如果您使用的是销售团队的砂盒帐户，而您又没有勾选此复选框，那将无法进行身份验证（相反，这也同样起作用，如果您有一个产品帐户，以及勾选了不会验证的复选框）。
   salesforce_ticketing_webtocase_connector_80f75716: 销售团队的票务WebToCase连接器
@@ -17468,6 +17519,7 @@ zh-Hans:
   there_was_an_error_uploading_the_image_932fc4ce: 上传图像出现错误
   there_was_an_error_with_your_query_please_try_a_di_761dff12: 您的查询有错误；请尝试不同的搜索
   there_was_an_unexpected_problem_with_the_sync_be079a67: 同步时出现意外问题
+  there_was_an_unknown_error_registering_the_tool_b9a29954: 登记此工具时发生未知错误
   there_were_errors_with_the_form_errors_ab5b559a: "表格出错：%{errors}"
   there_were_several_possible_matches_with_the_impor_ad58bcd0: 有多个结果可能与导入匹配。请在下方解答。
   these_backup_codes_can_be_used_if_your_multi_facto_ca30a3df: 如果您的多重身份验证设备不可用，可使用这些备份代码。请将它们打印出来，并保存在安全的位置，例如您的钱包。
@@ -17881,6 +17933,7 @@ zh-Hans:
     originality_report_visible_immediately: 马上、立即
   turnitin_similarity_score_more_information_e2571be8: "抄袭监测系统相似度分数 – 更多信息"
   twitter_fcef6b54: Twitter
+  type_a_few_letters_to_start_searching_3334657b: 键入一些字母以开始搜索
   type_c8106334: 类型
   type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: |-
       '%{type}' 不是一个有效的图像类型 (尝试 jpg, png, or gif)
@@ -18031,6 +18084,7 @@ zh-Hans:
   use_mathman_to_convert_latex_to_svg_3f61c9b: "使用 MathMan 转换 LaTeX 成 SVG 吗?"
   use_new_folder_tree_in_files_bc0ea09f: 使用新的文件中树状文件
   use_new_folder_tree_in_files_eb5a451b: 在文件中使用新的文件夹系统
+  use_new_rich_content_editor_with_enhanced_sidebar__8e0bfedd: 在任何地方使用新的带有增强侧栏的富内容编辑器
   use_remote_service_for_notifications_9fe667c6: 使用远程通知服务
   use_remote_version_of_rich_content_editor_52f7fc4b: 使用富内容编辑器的远程版本
   use_remote_version_of_rich_content_editor_and_side_a058a664: 使用富内容编辑器和侧栏的远程版本
@@ -18789,6 +18843,7 @@ zh-Hans:
   you_are_currently_masquerading_as_user_name_f4a00ade: "您正在伪装成 %{user_name}"
   you_are_here_54075d8c: 您在此处：
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "您使用来自 %{institution2} 的凭据登录到 %{institution1}"
+  you_are_logged_out_of_canvas_8b5fc59a: "您已登出 Canvas。"
   you_are_not_authorized_to_disable_the_sync_to_name_d283c3e0: "您没有获得禁用“同步到 %{name}”选项的授权。"
   you_are_not_authorized_to_disable_the_sync_to_sisn_54aebeb0: "您没有获得禁用“同步到 %{sisName}”选项的授权。"
   you_are_not_enrolled_in_any_courses_a5c63286: 您没有登记任何课程。

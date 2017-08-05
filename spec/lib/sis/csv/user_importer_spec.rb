@@ -1164,7 +1164,7 @@ describe SIS::CSV::UserImporter do
       "badmin,badmin,Bad,Admin,badmin@example.com,deleted"
     )
     @badmin.reload
-    expect(@badmin.account_users).to be_empty
+    expect(@badmin.account_users.active).to be_empty
   end
 
   it 'removes subaccount memberships when a user is deleted' do
@@ -1176,7 +1176,7 @@ describe SIS::CSV::UserImporter do
       "badmin,badmin,Bad,Admin,badmin@example.com,deleted"
     )
     @badmin.reload
-    expect(@badmin.account_users).to be_empty
+    expect(@badmin.account_users.active).to be_empty
   end
 
   context 'account associations' do

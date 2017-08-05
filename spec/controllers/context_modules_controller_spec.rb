@@ -44,6 +44,20 @@ describe ContextModulesController do
       expect(response).to be_success
     end
 
+    it "should touch modules if necessary" do
+      time = 2.days.ago
+      Timecop.freeze(time) do
+        @mod1 = @course.context_modules.create!(:unlock_at => 1.day.from_now)
+        @mod2 = @course.context_modules.create!(:unlock_at => 1.day.ago)
+        expect(@mod1.updated_at.to_i).to eq time.to_i
+      end
+      user_session(@student)
+      get 'index', params: {:course_id => @course.id}
+      expect(response).to be_success
+      expect(@mod1.reload.updated_at.to_i).to_not eq time.to_i # should be touched in case view for old unlock time was cached
+      expect(@mod2.reload.updated_at.to_i).to eq time.to_i # should not be touched since the unlock_at was already in the past the last time it was updated
+    end
+
     context "unpublished modules" do
       before :once do
         @m1 = @course.context_modules.create(:name => "unpublished oi")

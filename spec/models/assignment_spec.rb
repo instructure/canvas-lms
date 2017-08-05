@@ -96,6 +96,50 @@ describe Assignment do
     expect(@assignment.errors[:grading_type]).not_to be_nil
   end
 
+  describe 'callbacks' do
+    describe 'apply_late_policy' do
+      it 'invokes the LatePolicyApplicator for this assignment if grading type changes but due dates do not' do
+        assignment = @course.assignments.new(assignment_valid_attributes)
+
+        allow(assignment).to receive(:update_cached_due_dates?).and_return(false)
+        allow(assignment).to receive(:grading_type_changed?).and_return(true)
+        expect(LatePolicyApplicator).to receive(:for_assignment).with(assignment)
+
+        assignment.save!
+      end
+
+      it 'invokes the LatePolicyApplicator only once if grading type changes and due dates also change' do
+        assignment = @course.assignments.new(assignment_valid_attributes)
+
+        allow(assignment).to receive(:update_cached_due_dates?).and_return(true)
+        allow(assignment).to receive(:grading_type_changed?).and_return(true)
+        expect(LatePolicyApplicator).to receive(:for_assignment).with(assignment).once
+
+        assignment.save!
+      end
+
+      it 'does not invoke the LatePolicyApplicator if neither grading type nor due dates change' do
+        assignment = @course.assignments.new(assignment_valid_attributes)
+
+        allow(assignment).to receive(:update_cached_due_dates?).and_return(false)
+        allow(assignment).to receive(:grading_type_changed?).and_return(false)
+        expect(LatePolicyApplicator).not_to receive(:for_assignment).with(assignment)
+
+        assignment.save!
+      end
+
+      it 'invokes the LatePolicyApplicator only once if grading type does not change but due dates change' do
+        assignment = @course.assignments.new(assignment_valid_attributes)
+
+        allow(assignment).to receive(:update_cached_due_dates?).and_return(true)
+        allow(assignment).to receive(:grading_type_changed?).and_return(false)
+        expect(LatePolicyApplicator).to receive(:for_assignment).with(assignment).once
+
+        assignment.save!
+      end
+    end
+  end
+
   describe "default values for boolean attributes" do
     before(:once) do
       @assignment = @course.assignments.create!
