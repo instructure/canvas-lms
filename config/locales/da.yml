@@ -115,7 +115,7 @@ da:
     tab_authentication: Autentifikation
     tab_brand_configs: Temaer
     tab_courses: Fag
-    tab_developer_keys: Udvikler-nøgler
+    tab_developer_keys: "Udvikler nøgler"
     tab_faculty_journal: Fakultetsjournal
     tab_grading_standards: Karakter
     tab_jobs: Jobs
@@ -312,7 +312,7 @@ da:
     report_header_email: e-mail
     report_header_end__date: end_date
     report_header_end_date: slutdato
-    report_header_enrollment_state: tilmeldings-status
+    report_header_enrollment_state: tilmeldingsstatus
     report_header_expiration: udløb
     report_header_final_score: "endeligt resultat"
     report_header_first_name: first_name
@@ -371,8 +371,8 @@ da:
     sis_exporter: 
       reports: "Rapporter: %{files}"
     student: 
-      enrollment_state: "Inkluder tilmeldings-status: sand;"
-      enrollment_states: "Tilmeldings-statusser: %{states};"
+      enrollment_state: "Inkluder tilmeldingsstatus: sand;"
+      enrollment_states: "Tilmeldingsstatusser: %{states};"
   account_roles_d13f8f75: Kontoroller
   account_settings: 
     account: Konto
@@ -1568,15 +1568,15 @@ da:
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Giv en moderator tilladelse til at evaluere flere uafhængige karakterer for de valgte afleveringer"
   allow_bulk_grade_export_to_sis_e11a6e66: "Tillad bulkeksport af karakterer til SIS"
   allow_course_content_to_be_downloaded_and_viewed_o_48a0d252: "Tillad, at fagindhold kan hentes og ses offline"
-  allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Tillad fag-billeder at blive tildelt til et fag og blive benyttet i forside-kortene."
+  allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Tillad fag-billeder at blive tildelt til et fag og blive benyttet i panel-kortene."
   allow_course_images_to_be_assigned_to_a_course_and_adb906f4: "Gør det muligt at føje kursusbilleder til et kursus, og til brug på dashcards."
-  allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "Tillad, at forside-kort omorganiseres for hver bruger."
+  allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "Tillad, at panel-kort omorganiseres for hver bruger."
   allow_in_mastery_paths_5332c786: "Tillad i læringsstier"
   allow_intra_group_peer_reviews_53f1e455: "Tillad interne peer review"
   allow_lor_tools: "Giv brugerne mulighed for at se og bruge eksterne værktøjer, der er konfigureret til LOR."
   allow_multiple_attempts_e67a0a37: "Tillad flere forsøg"
   allow_opt_out_of_inbox: "Giv brugerne mulighed for at framelde sig diskussionens indbakke. Dette medfører, at alle diskussionsbeskeder og meddelelser sendes som ASAP-meddelelser til brugerens primære e-mail. Skjul badge for ulæste beskeder på samtalens indbakke, og skjul samtalens meddelelsespræferencer."
-  allow_reorder_dashboard_cards_78215947: "Tillad omorganisering af forside-kort"
+  allow_reorder_dashboard_cards_78215947: "Tillad omorganisering af panel-kort"
   allow_students_to_download_course_content_and_view_810e66ec: "Tillad, at studerende henter fagets indhold og viser det offline"
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Giv de studerende mulighed for at se, hvem har meldt sig til tidsvinduer."
   allow_students_to_see_who_was_signed_up_for_time_s_160ba252: "Lad de studerende se, hvem der er tilmeldt tidsvinduer"
@@ -1675,7 +1675,7 @@ da:
   announcement_update_failed_6a6ec9fe: "Opdatering af besked mislykkedes"
   announcements: 
     announcements_crumb: Beskeder
-    error_draft_state: "Dette emne kan ikke indstilles til udkast, fordi det er en besked."
+    error_draft_state: "Dette emne kan ikke indstilles til udkastform, fordi det er en besked."
     external_feed: 
       alts: 
         deleted_feed: "Slet dette feed"
@@ -3212,7 +3212,7 @@ da:
     ics_description_group: "Kalenderbegivenheder for gruppen, %{group_name}"
     ics_description_user: "Kalenderbegivenheder for brugeren, %{user_name}"
     ics_title: "%{course_or_group_name} kalender (Canvas)"
-    invalid_date_or_time: "Ugyldig dato eller ugyldig datetime for %{attr}"
+    invalid_date_or_time: "Ugyldig dato eller ugyldig dato og klokkeslæt for %{attr}"
   calendars: 
     event: 
       due: forfalder
@@ -4084,7 +4084,7 @@ da:
         conclude_student: "Er du sikker på, at du vil afslutte den studerendes tilmelding?"
         delete_enrollment: "Er du sikker på, at du vil slette den studerendes tilmelding?"
       enrolled_as: "Tilmeldt som %{enrollment_type}"
-      enrollment_change_failed: "Ændring af tilmeldingsprivilegiet mislykkedes, prøv igen."
+      enrollment_change_failed: "Ændring af tilmelding med fortrinsret mislykkedes, prøv igen."
       enrollment_linked_to: "linket til *%{linked_user}*"
       headings: 
         recent_messages: "Seneste beskeder"
@@ -5565,7 +5565,7 @@ da:
     conferences: Konferencer
     confirmation: Bekræftelse
     copy_course: "Kopiér fag"
-    developer_keys: Udvikler-nøgler
+    developer_keys: "Udvikler nøgler"
     discussions: Diskussioner
     eportfolio_welcome: "Velkommen til din ePortfolio"
     error_reports: Fejlrapporter
@@ -5722,11 +5722,11 @@ da:
     show_more_link: 
       show_less: "Vis mindre"
       show_more: "Vis mere"
-  dashboard_7f1dbf71: Forside
-  dashboard_options_b240ed5a: Forsideindstillinger
-  dashboard_view_d7d85969: Forsidevisning
+  dashboard_7f1dbf71: Panel
+  dashboard_options_b240ed5a: "Panel indstillinger"
+  dashboard_view_d7d85969: "Panel visning"
   data_exports: dataeksporter
-  data_set_identifier_data_set_id_c228b5df: "Datasæt identifikator: %{data_set_id}"
+  data_set_identifier_data_set_id_c228b5df: "Datasæt-identifikator: %{data_set_id}"
   date: 
     abbr_day_names: 
       - søn
@@ -6020,7 +6020,7 @@ da:
     edit_key: "Rediger denne nø"
     identifier: "Id: %{id}"
     redirect_uri: "URI: %{redirect_uri}"
-  developer_key_921ddbae: Udviklernøgle
+  developer_key_921ddbae: "Udvikler nøgle"
   developer_key_form: 
     cancel: Annuller
     icon_url: "Ikon-URL:"
@@ -6036,18 +6036,18 @@ da:
       saving: "Gemmer nøgle ..."
       saving_failed: "Lagring af nøgle mislykkedes"
     index: 
-      add_developer_key: "Tilføj udvikler-nøgle"
+      add_developer_key: "Tilføj udvikler nøgle"
       details: "Nærmere oplysninger"
-      developer_keys: Udvikler-nøgler
+      developer_keys: "Udvikler nøgler"
       key_settings: Nøgleindstillinger
       name: Navn
       notes: Noter
       show_all: "Vis alle %{count} nøgler"
       stats: Statistik
-      title: Udvikler-nøgler
+      title: "Udvikler nøgler"
       user: Bruger
     messages: 
-      confirm_delete: "Er du sikker på, at du vil slette denne udvikler-nøgle?"
+      confirm_delete: "Er du sikker på, at du vil slette denne udvikler nøgle?"
     no_user: "Ingen bruger"
     unnamed_tool: "Værktøj uden navn"
   dialog_form_wrapper: 
@@ -6180,8 +6180,8 @@ da:
       show_more_entries: 
         one: "Vis 1 indtastning mere"
         other: "Vis %{count} flere indtastninger"
-    error_draft_state_unauthorized: "Du har ikke tilladelse til at indstille dette emne til udkast."
-    error_draft_state_with_posts: "Dette emne kan ikke indstilles til udkast, fordi det indeholder indlæg."
+    error_draft_state_unauthorized: "Du har ikke tilladelse til at indstille dette emne til udkastform."
+    error_draft_state_with_posts: "Dette emne kan ikke indstilles til udkastform, fordi det indeholder indlæg."
     error_group_announcement: "Du kan ikke bruge grupperet diskussion på en besked."
     error_group_change: "Du kan ikke ændre gruppering på en diskussion med svar."
     error_todo_date_assignment: "Dato kan ikke tilføjes, hvis diskussionsemnet bedømmes"
@@ -6452,7 +6452,7 @@ da:
   due_assignment_due_date_time_607f2e1d: "forfalder: %{assignment_due_date_time}"
   due_at: "kan ikke være tom, når Post til Sis er markeret"
   due_at_5d7d2fa: "Forfalden d."
-  due_at_5e18eeac: "Forfalder d.:"
+  due_at_5e18eeac: "Afleveres d.:"
   due_at_time_fa41cf6c: "Forfalder kl.: %{time}"
   due_by_c263dc10: forfalder
   due_date_5d0a953c: "Deadline:"
@@ -6488,7 +6488,7 @@ da:
   due_multiple_due_dates_d1b141b: "Forfalder: flere afleveringsdatoer"
   due_no_due_date_2b226d2c: "Forfalder: ingen afleveringsdato "
   due_no_due_date_3c1d1651: "forfalder: ingen afleveringsdato"
-  due_on_date_5ffb2182: "Forfalder d."
+  due_on_date_5ffb2182: "Afleveres d."
   due_time_9acd6b69: "Forfalder %{time}"
   duplicate_31cec192: Dupliker
   duplicate_assignment_name_3ca7d753: "Duplikeret opgave %{name}"
@@ -6719,8 +6719,8 @@ da:
     teacher: Lærer
     teacher_assistant: Undervisningsassistent
   enrollment_role_f5d985a7: Tilmeldingsrolle
-  enrollment_state_7a9c55e2: tilmeldings-status
-  enrollment_state_ac62019b: Tilmeldings-status
+  enrollment_state_7a9c55e2: tilmeldingsstatus
+  enrollment_state_ac62019b: Tilmeldingsstatus
   enrollment_term: 
     errors: 
       delete_default_term: "Kan ikke slette standardsemester"
@@ -9146,7 +9146,7 @@ da:
   invalid_aws_configuration_e8a6ae0f: "Ugyldig AWS-konfiguration"
   invalid_csv_file_grades_could_not_be_updated_4d5c120c: "Ugyldig CSV-fil. Karakterer kunne ikke opdateres."
   invalid_csv_file_grades_could_not_be_updated_6ebdeca4: "Ugyldig csv-fil, karakterer kunne ikke opdateres."
-  invalid_date_or_invalid_datetime_for_attr_6661103f: "Ugyldig dato eller ugyldig datetime for %{attr}"
+  invalid_date_or_invalid_datetime_for_attr_6661103f: "Ugyldig dato eller ugyldig dato og klokkeslæt for %{attr}"
   invalid_points_possible: "Værdien af mulige point til denne opgave skal være nul eller større."
   invalid_recipient_name_56b22b86: "Ugyldigt modtagernavn."
   invalid_restrictions_316cd740: "Ugyldige restriktioner"
@@ -9482,7 +9482,7 @@ da:
   linked_with_wiki_page_title_b17c3521: "linket med Wiki Page '%{title}'"
   linkedin_5726caca: LinkedIn
   links: 
-    dashboard: "Min forside"
+    dashboard: "Min panel"
     errors: 
       4xx_feedback: "Klik her for at fortælle os, hvad du leder efter."
       feedback: "Klik her for at fortælle os, hvad der skete"
@@ -11913,7 +11913,7 @@ da:
   mute_unmute_assignment_62608e44: "Med / uden besked til de studerende om denne opgave"
   muted_283cfa0f: (afbrudt)
   muting_assignment_a9aeb5c7: "Sender ikke beskeder til studerende om opgave ..."
-  my_dashboard_b724020: "Min forside"
+  my_dashboard_b724020: "Min panel"
   my_themes_b72217b8: "Mine temaer"
   n_554bc493: "n"
   n_a_d6f6c42f: N/A
@@ -13766,7 +13766,7 @@ da:
   qti_display: QTI
   qti_file_description: "QTI .zip-fil"
   qti_img_matching_question: "Importeret matchende spørgsmål indeholder billeder på begge sider, hvilket ikke understøttes"
-  qti_img_matching_question_distractors: "Importeret matchende spørgsmål indeholder billeder inden i valgmulighederne og kunne ikke rettes, fordi det også indeholder distraktører"
+  qti_img_matching_question_distractors: "Importeret matchende spørgsmål indeholder billeder inden i valgmulighederne og kunne ikke rettes, fordi det også indeholder distraktorer"
   qti_name: QTI-konverter
   question_9121487: Spørgsmål
   question_answered: Besvaret
@@ -15373,7 +15373,7 @@ da:
       manage_content: "Styring af alt andet fagindhold"
       manage_courses: "Styring af (tilføj / rediger / slet) fag"
       manage_demos: "Styring af demoer"
-      manage_developer_keys: "Styring af udvikler-nøgler"
+      manage_developer_keys: "Styring af udvikler nøgler"
       manage_feature_flags: "Aktivér eller deaktivér funktioner på kontoniveau"
       manage_files: "Styring af (tilføj / rediger / slet) fagfiler"
       manage_frozen_assignment: "Styring af (tilføj / slet) låste opgaver"
@@ -18323,7 +18323,7 @@ da:
         find_user: "Find en bruger"
         merge_users: "Foren brugerkonti"
         really_merge: "Vil du virkelig forene brugerkonti?"
-    birthdate_invalid: "Ugyldig dato eller ugyldig dato og tidspunkt for fødselsdato"
+    birthdate_invalid: "Ugyldig dato eller ugyldig dato og klokkeslæt for fødselsdato"
     cant_self_merge: "Du kan ikke forene en konto med sig selv."
     cc_prefs: 
       buttons: 
@@ -18378,7 +18378,7 @@ da:
         other: "gennemsnit for %{count} studerende"
       course: Fag
       current_teacher_courses: "Fag jeg underviser"
-      linked_student_accounts: "Linkede studiekonti"
+      linked_student_accounts: "Studerendes forbundne konti"
       links: 
         teacher_activity: "Rapport over studerendes interaktioner"
       no_grade: "ingen karakter"
@@ -18542,7 +18542,7 @@ da:
     user_dashboard: 
       dashboard: Forside
       user_atom_feed: "Bruger Atom Feed (Alle fag)"
-      user_dashboard: "Brugerens forside"
+      user_dashboard: "Brugerens panel"
     user_is_deleted: "%{user_name} er blevet slettet"
     user_merge_fail: "Brugerforening mislykkedes. Sørg for, at du har passende tilladelse og prøv igen."
     user_merge_success: "Brugerne blev forenet ! %{first_user} og %{second_user} er nu en og samme."
