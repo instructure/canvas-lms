@@ -18,11 +18,11 @@
 module CC::Importer::Canvas
   module RubricsConverter
     include CC::Importer
-    
+
     def convert_rubrics(doc)
       rubrics = []
       return rubrics unless doc
-      
+
       doc.css('rubric').each do |r_node|
         rubric = {}
         rubric[:migration_id] = r_node['identifier']
@@ -47,6 +47,7 @@ module CC::Importer::Canvas
           crit[:ignore_for_scoring] = get_bool_val(c_node, 'ignore_for_scoring')
           crit[:learning_outcome_migration_id] = get_node_val(c_node, 'learning_outcome_identifierref')
           crit[:title] = get_node_val(c_node, 'description')
+          crit[:criterion_use_range] = get_bool_val(c_node, 'criterion_use_range')
           crit[:ratings] = []
           c_node.css('rating').each do |rat_node|
             rating = {}
@@ -56,15 +57,15 @@ module CC::Importer::Canvas
             rating[:points] = get_float_val(rat_node, 'points')
             crit[:ratings] << rating
           end
-          
+
           rubric[:data] << crit
         end
-        
+
         rubrics << rubric
       end
-      
+
       rubrics
     end
-    
+
   end
 end
