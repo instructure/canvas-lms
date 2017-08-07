@@ -1003,7 +1003,7 @@ class ApplicationController < ActionController::Base
           end
           if pseudonym && pseudonym != @current_pseudonym
             return_to = session.delete(:return_to)
-            reset_session
+            reset_session_saving_keys(:oauth2)
             PseudonymSession.create!(pseudonym)
             session[:used_remember_me_token] = true if token.used_remember_me_token
           end
@@ -1013,6 +1013,11 @@ class ApplicationController < ActionController::Base
           end
         end
         return redirect_to return_to if return_to
+        if (oauth = session[:oauth2])
+          provider = Canvas::Oauth::Provider.new(oauth[:client_id], oauth[:redirect_uri], oauth[:scopes], oauth[:purpose])
+          return redirect_to Canvas::Oauth::Provider.confirmation_redirect(self, provider, pseudonym.user)
+        end
+
         # do one final redirect to get the token out of the URL
         redirect_to remove_query_params(request.original_url, 'session_token')
       end
