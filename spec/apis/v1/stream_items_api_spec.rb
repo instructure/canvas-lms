@@ -58,7 +58,7 @@ describe UsersController, type: :request do
     announcement_model
     conversation(User.create, @user)
     Notification.create(:name => 'Assignment Due Date Changed', :category => "TestImmediately")
-    Assignment.any_instance.stubs(:created_at).returns(4.hours.ago)
+    allow_any_instance_of(Assignment).to receive(:created_at).and_return(4.hours.ago)
     assignment_model(:course => @course)
     @assignment.update_attribute(:due_at, 1.week.from_now)
     json = api_call(:get, "/api/v1/users/self/activity_stream/summary.json",
@@ -86,7 +86,7 @@ describe UsersController, type: :request do
         announcement_model
         conversation(User.create, @user)
         Notification.create(:name => 'Assignment Due Date Changed', :category => "TestImmediately")
-        Assignment.any_instance.stubs(:created_at).returns(4.hours.ago)
+        allow_any_instance_of(Assignment).to receive(:created_at).and_return(4.hours.ago)
         assignment_model(:course => @course)
         @assignment.update_attribute(:due_at, 1.week.from_now)
         @assignment.update_attribute(:due_at, 2.weeks.from_now)
@@ -138,7 +138,7 @@ describe UsersController, type: :request do
     # TODO: can remove this spec as well as the code in lib/api/v1/stream_item once the datafixup has been run
     @context = @course
     Notification.create(:name => 'Assignment Due Date Changed', :category => "TestImmediately")
-    Assignment.any_instance.stubs(:created_at).returns(4.hours.ago)
+    allow_any_instance_of(Assignment).to receive(:created_at).and_return(4.hours.ago)
     assignment_model(:course => @course)
     @assignment.update_attribute(:due_at, 1.week.from_now)
     @assignment.update_attribute(:due_at, 2.weeks.from_now)
@@ -360,6 +360,7 @@ describe UsersController, type: :request do
     expect(json).to eql [{
       'id' => StreamItem.last.id,
       'submission_id' => @sub.id,
+      'cached_due_date' => nil,
       'title' => "assignment 1",
       'message' => nil,
       'type' => 'Submission',
@@ -479,6 +480,7 @@ describe UsersController, type: :request do
     expect(json).to eql [{
       'id' => StreamItem.last.id,
       'submission_id' => @sub.id,
+      'cached_due_date' => nil,
       'title' => "assignment 1",
       'message' => nil,
       'type' => 'Submission',
@@ -622,7 +624,7 @@ describe UsersController, type: :request do
   end
 
   it "should format WebConference" do
-    WebConference.stubs(:plugins).returns(
+    allow(WebConference).to receive(:plugins).and_return(
         [OpenObject.new(:id => "big_blue_button", :settings => {:domain => "bbb.instructure.com", :secret_dec => "secret"}, :valid_settings? => true, :enabled? => true),]
     )
     @conference = BigBlueButtonConference.create!(:title => 'myconf', :user => @user, :description => 'mydesc', :conference_type => 'big_blue_button', :context => @course)

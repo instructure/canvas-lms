@@ -16,40 +16,76 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import HistoryActions from 'jsx/gradebook-history/actions/HistoryActions';
 import Fixtures from 'spec/jsx/gradebook-history/Fixtures';
+import parseLinkHeader from 'jsx/shared/parseLinkHeader';
 
-const {
+import {
   FETCH_HISTORY_START,
   FETCH_HISTORY_SUCCESS,
-  FETCH_HISTORY_FAILURE
-} = HistoryActions;
+  FETCH_HISTORY_FAILURE,
+  FETCH_HISTORY_NEXT_PAGE_START,
+  FETCH_HISTORY_NEXT_PAGE_SUCCESS,
+  FETCH_HISTORY_NEXT_PAGE_FAILURE,
+  fetchHistoryStart,
+  fetchHistorySuccess,
+  fetchHistoryFailure,
+  fetchHistoryNextPageStart,
+  fetchHistoryNextPageSuccess,
+  fetchHistoryNextPageFailure,
+  formatHistoryItems
+} from 'jsx/gradebook-history/actions/HistoryActions';
 
 QUnit.module('HistoryActions');
 
-test('fetchHistoryStarted creates an action with type FETCH_HISTORY_START', function () {
+test('fetchHistoryStart creates an action with type FETCH_HISTORY_START', function () {
   const expectedValue = {
     type: FETCH_HISTORY_START
   };
-  deepEqual(HistoryActions.fetchHistoryStarted(), expectedValue);
+  deepEqual(fetchHistoryStart(), expectedValue);
 });
 
 test('fetchHistorySuccess creates an action with type FETCH_HISTORY_SUCCESS and payload', function () {
-  const response = Fixtures.response();
+  const response = Fixtures.historyResponse();
+  const { events, linked: { assignments, users } } = response.data;
   const expectedValue = {
     type: FETCH_HISTORY_SUCCESS,
     payload: {
-      events: response.data.events,
-      users: response.data.linked.users,
-      link: response.headers.link
+      items: formatHistoryItems({ events, users, assignments }),
+      link: parseLinkHeader(response.headers.link).next
     }
   };
-  deepEqual(HistoryActions.fetchHistorySuccess(response.data, response.headers), expectedValue);
+  deepEqual(fetchHistorySuccess(response.data, response.headers), expectedValue);
 });
 
 test('fetchHistoryFailure creates an action with type FETCH_HISTORY_FAILURE', function () {
   const expectedValue = {
     type: FETCH_HISTORY_FAILURE
   };
-  deepEqual(HistoryActions.fetchHistoryFailure(), expectedValue);
+  deepEqual(fetchHistoryFailure(), expectedValue);
+});
+
+test('fetchHistoryNextPageStart creates an action with type FETCH_HISTORY_NEXT_PAGE_START', function () {
+  const expectedValue = {
+    type: FETCH_HISTORY_NEXT_PAGE_START
+  };
+  deepEqual(fetchHistoryNextPageStart(), expectedValue);
+});
+
+test('fetchHistoryNextPageSuccess creates an action with type FETCH_HISTORY_NEXT_PAGE_SUCCESS and payload', function () {
+  const response = Fixtures.historyResponse();
+  const expectedValue = {
+    type: FETCH_HISTORY_NEXT_PAGE_SUCCESS,
+    payload: {
+      items: formatHistoryItems(response.data),
+      link: parseLinkHeader(response.headers.link).next
+    }
+  };
+  deepEqual(fetchHistoryNextPageSuccess(response.data, response.headers), expectedValue);
+});
+
+test('fetchHistoryNextPageFailure creates an action with type FETCH_HISTORY_NEXT_PAGE_FAILURE', function () {
+  const expectedValue = {
+    type: FETCH_HISTORY_NEXT_PAGE_FAILURE
+  };
+  deepEqual(fetchHistoryNextPageFailure(), expectedValue);
 });

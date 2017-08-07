@@ -35,10 +35,6 @@ describe "add content box" do
     wait_for_ajaximations
   end
 
-  after(:each) do
-    unstub_rcs_config
-  end
-
   it "should add rich text content" do
     # skip 'failing RCS selenium test. when CNVS-37278 is fixed/worked on, this skip should be removed.'
     f(".add_rich_content_link").click

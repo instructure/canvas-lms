@@ -68,7 +68,7 @@ describe LiveAssessments::ResultsController, type: :request do
       end
 
       it 'generates submissions' do
-        LiveAssessments::Assessment.any_instance.expects(:generate_submissions_for).with([student, another_student])
+        expect_any_instance_of(LiveAssessments::Assessment).to receive(:generate_submissions_for).with([student, another_student])
         create_results(result_hashes)
       end
 

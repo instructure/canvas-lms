@@ -62,14 +62,14 @@ module Lti
       it "returns a 401 if the tool doesn't have a similarity detection placement" do
         tool_proxy.raw_data['enabled_capability'] = []
         tool_proxy.save!
-        get endpoint, {}, request_headers
+        get endpoint, headers: request_headers
         expect(response.code).to eq '401'
       end
 
       it "returns a 401 if the tool is not associated with the assignment" do
         assignment.tool_settings_tool = []
         assignment.save!
-        get endpoint, {}, request_headers
+        get endpoint, headers: request_headers
         expect(response.code).to eq '401'
       end
 
@@ -79,7 +79,7 @@ module Lti
         tool_proxy.save!
         tool_proxy_binding.context_id = a.id
         tool_proxy_binding.save!
-        get endpoint, {}, request_headers
+        get endpoint, headers: request_headers
         expect(response.code).to eq '401'
       end
 
@@ -90,7 +90,7 @@ module Lti
         token = Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: other_tool_proxy.guid)
         other_helpers = {Authorization: "Bearer #{token}"}
         allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).and_return(true)
-        get endpoint, {}, other_helpers
+        get endpoint, headers: other_helpers
         expect(response).not_to be '401'
       end
 
@@ -103,7 +103,7 @@ module Lti
       it "returns a submission json object" do
         now = Time.now.utc
         Timecop.freeze(now) do
-          get endpoint, {}, request_headers
+          get endpoint, headers: request_headers
           expect(JSON.parse(response.body)).to(
             eq({
                  "id" => submission.id,
@@ -133,7 +133,7 @@ module Lti
       end
 
       it 'uses global ids in the attachment download URL' do
-        get endpoint, {}, request_headers
+        get endpoint, headers: request_headers
         expect(JSON.parse(response.body)['attachments'].first['url']).to include(
           attachment.global_id.to_s,
           assignment.global_id.to_s,
@@ -149,7 +149,7 @@ module Lti
       it "returns the submission history as an array of JSON objects" do
         now = Time.now.utc
         Timecop.freeze(now) do
-          get endpoint, {}, request_headers
+          get endpoint, headers: request_headers
           expect(JSON.parse(response.body)).to(
             match_array(
               [{
@@ -197,7 +197,7 @@ module Lti
           assignment.submit_homework student, attachments: [attachments[2]]
         end
 
-        get endpoint, {}, request_headers
+        get endpoint, headers: request_headers
         json = JSON.parse(response.body)
         expect(json[0]["attachments"].first["id"]).to_not equal json[1]["attachments"].first["id"]
       end
@@ -209,29 +209,29 @@ module Lti
       include_examples 'authorization'
 
       it "allows a user to download a file" do
-        get "/api/lti/assignments/#{assignment.id}/submissions/#{submission.id}", {}, request_headers
+        get "/api/lti/assignments/#{assignment.id}/submissions/#{submission.id}", headers: request_headers
         json = JSON.parse(response.body)
         url = json["attachments"].first["url"]
-        get url, {}, request_headers
+        get url, headers: request_headers
         expect(response.content_type.to_s).to eq attachment.content_type
       end
 
       it "returns a 401 if the attachment isn't associated to the assignment" do
-        get "/api/lti/assignments/#{assignment.id}/submissions/#{submission.id}", {}, request_headers
+        get "/api/lti/assignments/#{assignment.id}/submissions/#{submission.id}", headers: request_headers
         attachment1 = Attachment.create!(context: Account.create!, filename: "test.txt", content_type: "text/plain")
         endpoint = "/api/lti/assignments/#{assignment.id}/submissions/#{submission.id}/attachment/#{attachment1.id}"
-        get controller.attachment_url(attachment1), {}, request_headers
+        get controller.attachment_url(attachment1), headers: request_headers
         expect(response.code).to eq "401"
       end
 
       context 'sharding' do
         it 'retrieves attachments when tool proxy is installed on another shard' do
-          get "/api/lti/assignments/#{assignment.global_id}/submissions/#{submission.global_id}", {}, request_headers
+          get "/api/lti/assignments/#{assignment.global_id}/submissions/#{submission.global_id}", headers: request_headers
           json = JSON.parse(response.body)
           url = json["attachments"].first["url"]
 
           @shard2.activate do
-            get url, {}, request_headers
+            get url, headers: request_headers
             expect(response).to be_success
             expect(response.content_type.to_s).to eq attachment.content_type
           end

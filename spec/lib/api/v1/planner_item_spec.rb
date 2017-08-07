@@ -52,7 +52,7 @@ describe Api::V1::PlannerItem do
 
   describe '.planner_item_json' do
     let(:api) { PlannerItemHarness.new }
-    let(:session) { stub }
+    let(:session) { double }
 
     it 'should return with a plannable_date for the respective item' do
       asg_due_at = 1.week.ago

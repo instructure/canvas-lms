@@ -29,7 +29,7 @@ describe AttachmentHelper do
 
   it "should return a valid crocodoc session url" do
     @current_user = @student
-    @att.stubs(:crocodoc_available?).returns(true)
+    allow(@att).to receive(:crocodoc_available?).and_return(true)
     attrs = doc_preview_attributes(@att)
     expect(attrs).to match /crocodoc_session/
     expect(attrs).to match /#{@current_user.id}/
@@ -38,7 +38,7 @@ describe AttachmentHelper do
 
   it "should return a valid canvadoc session url" do
     @current_user = @student
-    @att.stubs(:canvadocable?).returns(true)
+    allow(@att).to receive(:canvadocable?).and_return(true)
     attrs = doc_preview_attributes(@att)
     expect(attrs).to match /canvadoc_session/
     expect(attrs).to match /#{@current_user.id}/

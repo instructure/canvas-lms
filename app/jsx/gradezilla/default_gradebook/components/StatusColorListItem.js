@@ -34,6 +34,13 @@ const colorPickerColors = Object.keys(defaultColors).reduce((obj, key) => {
   return obj;
 }, []);
 
+function formatColor (color) {
+  if (color[0] !== '#') {
+    return `#${color}`;
+  }
+  return color;
+}
+
 class StatusColorListItem extends React.Component {
   static propTypes = {
     status: string.isRequired,
@@ -52,7 +59,8 @@ class StatusColorListItem extends React.Component {
     this.state = { color: props.color };
   }
 
-  setColor = (color, successFn, errorFn) => {
+  setColor = (unformattedColor, successFn, errorFn) => {
+    const color = formatColor(unformattedColor);
     this.setState({ color }, () => {
       this.props.afterSetColor(color, successFn, errorFn);
     });

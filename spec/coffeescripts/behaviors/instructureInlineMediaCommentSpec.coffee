@@ -45,9 +45,9 @@ define [
     ok(link.is("a"))
     equal(link.attr('href'), "#")
 
-  test "buildHolder contains a tabindex for better tab navigation", ->
+  test "buildHolder does not contain a tabindex for better tab navigation", ->
     holder = inlineMediaComment.buildCommentHolder()
-    ok(holder.html().match(/tabindex="0"/))
+    ok(holder.html().match(/tabindex="-1"/))
 
   test "getMediaCommentId pulls straight from data element", ->
     $link = $("<a data-media_comment_id='42'></a>")

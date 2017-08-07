@@ -47,7 +47,8 @@ module SIS
             end
 
             begin
-              importer.add_course(row['course_id'], row['term_id'], row['account_id'], row['fallback_account_id'], row['status'], start_date, end_date, row['abstract_course_id'], row['short_name'], row['long_name'], row['integration_id'], row['course_format'])
+              importer.add_course(row['course_id'], row['term_id'], row['account_id'], row['fallback_account_id'], row['status'], start_date, end_date,
+                row['abstract_course_id'], row['short_name'], row['long_name'], row['integration_id'], row['course_format'], row['blueprint_course_id'])
             rescue ImportError => e
               messages << "#{e}"
             end

@@ -259,7 +259,7 @@ class LatePoliciesTabPanel extends React.Component {
                 </Container>
               </PresentationContent>
 
-              <div style={{display: 'flex', alignItems: 'center'}}>
+              <div className="NumberInput__Container">
                 <NumberInput
                   id="missing-submission-grade"
                   locale={this.props.locale}

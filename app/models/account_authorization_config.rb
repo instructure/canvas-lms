@@ -176,6 +176,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   end
 
   CANVAS_ALLOWED_FEDERATED_ATTRIBUTES = %w{
+    admin_roles
     display_name
     email
     given_name
@@ -222,6 +223,21 @@ class AccountAuthorizationConfig < ActiveRecord::Base
 
     canvas_attributes.each do |(attribute, value)|
       case attribute
+      when 'admin_roles'
+        role_names = value.is_a?(String) ? value.split(',').map(&:strip) : value
+        account = pseudonym.account
+        existing_account_users = account.account_users.merge(user.account_users).preload(:role).to_a
+        roles = role_names.map do |role_name|
+          account.get_account_role_by_name(role_name)
+        end.compact
+        roles_to_add = roles - existing_account_users.map(&:role)
+        account_users_to_delete = existing_account_users.select { |au| au.active? && !roles.include?(au.role) }
+        account_users_to_activate = existing_account_users.select { |au| au.deleted? && roles.include?(au.role) } 
+        roles_to_add.each do |role|
+          account.account_users.create!(user: user, role: role)
+        end
+        account_users_to_delete.each(&:destroy)
+        account_users_to_activate.each(&:reactivate)
       when 'sis_user_id', 'integration_id'
         pseudonym[attribute] = value
       when 'display_name'

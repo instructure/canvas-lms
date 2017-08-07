@@ -421,7 +421,7 @@ describe ContentTag do
     @module = @course.context_modules.create!
     @tag = @module.add_item(type: 'Assignment', id: @assignment.id)
     @tag.workflow_state = 'active'
-    @tag.content.expects(:publish!).once
+    expect(@tag.content).to receive(:publish!).once
     @tag.save!
     @tag.update_asset_workflow_state!
   end
@@ -431,7 +431,7 @@ describe ContentTag do
     @module = @course.context_modules.create!
     @tag = @module.add_item(type: 'Quiz', id: @quiz.id)
     @tag.workflow_state = 'unpublished'
-    @tag.content.expects(:unpublish!).once
+    expect(@tag.content).to receive(:unpublish!).once
     @tag.save!
     @tag.update_asset_workflow_state!
   end

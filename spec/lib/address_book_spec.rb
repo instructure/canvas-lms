@@ -20,20 +20,20 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe AddressBook do
   describe "for" do
     it "returns an instance of AddressBook::MessageableUser for 'messageable_user' strategy" do
-      plugin = stub(settings: {strategy: 'messageable_user'})
-      Canvas::Plugin.stubs(:find).returns(plugin)
+      plugin = double(settings: {strategy: 'messageable_user'})
+      allow(Canvas::Plugin).to receive(:find).and_return(plugin)
       expect(AddressBook.for(user_model)).to be_a(AddressBook::MessageableUser)
     end
 
     it "returns an instance of AddressBook::Empty for 'empty' strategy" do
-      plugin = stub(settings: {strategy: 'empty'})
-      Canvas::Plugin.stubs(:find).returns(plugin)
+      plugin = double(settings: {strategy: 'empty'})
+      allow(Canvas::Plugin).to receive(:find).and_return(plugin)
       expect(AddressBook.for(user_model)).to be_a(AddressBook::Empty)
     end
 
     it "defaults to an instance of AddressBook::MessageableUser for invalid strategy" do
-      plugin = stub(settings: {strategy: 'invalid'})
-      Canvas::Plugin.stubs(:find).returns(plugin)
+      plugin = double(settings: {strategy: 'invalid'})
+      allow(Canvas::Plugin).to receive(:find).and_return(plugin)
       expect(AddressBook.for(user_model)).to be_a(AddressBook::MessageableUser)
     end
 

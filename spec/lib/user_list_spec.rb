@@ -314,7 +314,7 @@ describe UserList do
 
     it "doesn't find site admins if you're not a site admin" do
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => Account.site_admin)
-      Account.default.stubs(:trusted_account_ids).returns([Account.site_admin.id])
+      allow(Account.default).to receive(:trusted_account_ids).and_return([Account.site_admin.id])
       jt = @user
       user_with_pseudonym
       other = @user
@@ -324,7 +324,7 @@ describe UserList do
       expect(ul.errors).to eq [{:address => 'jt@instructure.com', :type => :email, :details => :not_found}]
 
       # when it's the user _from_ site admin doing it, it can be found
-      Account.default.stubs(:trusted_account_ids).returns([Account.site_admin.id])
+      allow(Account.default).to receive(:trusted_account_ids).and_return([Account.site_admin.id])
       ul = UserList.new 'jt@instructure.com', current_user: jt
       expect(ul.addresses).to eq [{:address => 'jt@instructure.com', :type => :pseudonym, :user_id => jt.id, :name => 'JT', :shard => Shard.default}]
       expect(ul.errors).to eq []
@@ -332,7 +332,7 @@ describe UserList do
 
     it "should find users from trusted accounts" do
       account = Account.create!
-      Account.default.stubs(:trusted_account_ids).returns([account.id])
+      allow(Account.default).to receive(:trusted_account_ids).and_return([account.id])
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account)
       ul = UserList.new 'jt@instructure.com'
       expect(ul.addresses).to eq [{:address => 'jt@instructure.com', :type => :pseudonym, :user_id => @user.id, :name => 'JT', :shard => Shard.default}]
@@ -343,7 +343,7 @@ describe UserList do
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true)
       @user1 = @user
       account = Account.create!
-      Account.default.stubs(:trusted_account_ids).returns([account.id])
+      allow(Account.default).to receive(:trusted_account_ids).and_return([account.id])
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account)
       ul = UserList.new 'jt@instructure.com'
       expect(ul.addresses).to eq [{:address => 'jt@instructure.com', :type => :pseudonym, :user_id => @user1.id, :name => 'JT', :shard => Shard.default}]
@@ -352,7 +352,7 @@ describe UserList do
 
     it "should prefer a user from the current account instead of a trusted account (reverse order)" do
       account = Account.create!
-      Account.default.stubs(:trusted_account_ids).returns([account.id])
+      allow(Account.default).to receive(:trusted_account_ids).and_return([account.id])
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account)
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true)
       ul = UserList.new 'jt@instructure.com'
@@ -364,7 +364,7 @@ describe UserList do
       it "should prefer a user from the current account instead of a trusted account" do
         account1 = Account.create!
         account2 = Account.create!
-        account1.stubs(:trusted_account_ids).returns([account2.id])
+        allow(account1).to receive(:trusted_account_ids).and_return([account2.id])
         user_with_managed_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account1, :sis_user_id => "SISID")
         @user1 = @user
         user_with_managed_pseudonym(:name => 'JT', :username => 'jt2@instructure.com', :active_all => true, :account => account2, :sis_user_id => "SISID")
@@ -376,7 +376,7 @@ describe UserList do
       it "should prefer a user from the current account instead of a trusted account (reverse order)" do
         account1 = Account.create!
         account2 = Account.create!
-        account2.stubs(:trusted_account_ids).returns([account1.id])
+        allow(account2).to receive(:trusted_account_ids).and_return([account1.id])
         user_with_managed_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account1, :sis_user_id => "SISID")
         user_with_managed_pseudonym(:name => 'JT', :username => 'jt2@instructure.com', :active_all => true, :account => account2, :sis_user_id => "SISID")
         ul = UserList.new 'SISID', :root_account => account2
@@ -388,7 +388,7 @@ describe UserList do
     it "should not find a user if there is a conflict of unique_ids from not-this-account" do
       account1 = Account.create!
       account2 = Account.create!
-      Account.default.stubs(:trusted_account_ids).returns([account1.id, account2.id])
+      allow(Account.default).to receive(:trusted_account_ids).and_return([account1.id, account2.id])
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account1)
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account2)
       ul = UserList.new 'jt@instructure.com'
@@ -399,7 +399,7 @@ describe UserList do
     it "should find a user with multiple not-this-account pseudonyms" do
       account1 = Account.create!
       account2 = Account.create!
-      Account.default.stubs(:trusted_account_ids).returns([account1.id, account2.id])
+      allow(Account.default).to receive(:trusted_account_ids).and_return([account1.id, account2.id])
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account1)
       @user.pseudonyms.create!(:unique_id => 'jt@instructure.com', :account => account2)
       ul = UserList.new 'jt@instructure.com'
@@ -549,7 +549,7 @@ describe UserList do
         @account = Account.create!
         user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => @account)
       end
-      Account.default.stubs(:trusted_account_ids).returns([@account.id])
+      allow(Account.default).to receive(:trusted_account_ids).and_return([@account.id])
       ul = UserList.new 'jt@instructure.com'
       expect(ul.addresses).to eq [{:address => 'jt@instructure.com', :type => :pseudonym, :user_id => @user.local_id, :name => 'JT', :shard => @shard1}]
       expect(ul.errors).to eq []

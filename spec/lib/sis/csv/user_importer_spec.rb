@@ -571,22 +571,37 @@ describe SIS::CSV::UserImporter do
 
   it "should allow a user to update emails specifically" do
     enable_cache do
-      now = Time.now
-      Time.stubs(:now).returns(now - 2)
-      process_csv_data_cleanly(
-        "user_id,login_id,first_name,last_name,email,status",
-        "user_1,user1,User,Uno,user1@example.com,active"
-      )
+      Timecop.travel(1.minute.ago) do
+        process_csv_data_cleanly(
+          "user_id,login_id,first_name,last_name,email,status",
+          "user_1,user1,User,Uno,user1@example.com,active"
+        )
+        expect(Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.email).to eq "user1@example.com"
+      end
 
-      expect(Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.email).to eq "user1@example.com"
-
-      Time.stubs(:now).returns(now)
       process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
         "user_1,user1,User,Uno,user2@example.com,active"
       )
-
       expect(Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.email).to eq "user2@example.com"
+    end
+  end
+
+  it "clears the email cache when email is changed and full_name is supplied" do
+    enable_cache do
+      Timecop.travel(1.minute.ago) do
+        process_csv_data_cleanly(
+          "user_id,login_id,full_name,email,status",
+          "sharky,sharky,Sharkwig von Sharkface,sharky@example.com,active"
+        )
+        expect(Pseudonym.where(account_id: @account, sis_user_id: "sharky").first.user.email).to eq "sharky@example.com"
+      end
+
+      process_csv_data_cleanly(
+        "user_id,login_id,full_name,email,status",
+        "sharky,sharky,Sharkwig von Sharkface,sharkface@example.com,active"
+      )
+      expect(Pseudonym.where(account_id: @account, sis_user_id: "sharky").first.user.email).to eq "sharkface@example.com"
     end
   end
 
@@ -1149,7 +1164,7 @@ describe SIS::CSV::UserImporter do
       "badmin,badmin,Bad,Admin,badmin@example.com,deleted"
     )
     @badmin.reload
-    expect(@badmin.account_users).to be_empty
+    expect(@badmin.account_users.active).to be_empty
   end
 
   it 'removes subaccount memberships when a user is deleted' do
@@ -1161,7 +1176,7 @@ describe SIS::CSV::UserImporter do
       "badmin,badmin,Bad,Admin,badmin@example.com,deleted"
     )
     @badmin.reload
-    expect(@badmin.account_users).to be_empty
+    expect(@badmin.account_users.active).to be_empty
   end
 
   context 'account associations' do

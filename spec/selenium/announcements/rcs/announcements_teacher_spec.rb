@@ -34,10 +34,6 @@ describe "announcements" do
       stub_rcs_config
     end
 
-    after :each do
-      unstub_rcs_config
-    end
-
     describe "shared bulk topics specs" do
       let(:url) { "/courses/#{@course.id}/announcements/" }
       let(:what_to_create) { Announcement }
@@ -256,7 +252,7 @@ describe "announcements" do
       f('#external_feed_header_match').send_keys('blah')
 
       expect {
-        submit_form(f('#add_external_feed_form'))
+        scroll_to_submit_button_and_click(f('#add_external_feed_form'))
         wait_for_ajaximations
       }.to change(ExternalFeed, :count).by(1)
 
@@ -287,7 +283,7 @@ describe "announcements" do
       f('.discussion-reply-action').click
       entry_text = 'new entry text'
       type_in_tiny('textarea', entry_text)
-      move_to_click('button[type=submit]')
+      scroll_to_submit_button_and_click('#discussion_topic .discussion-reply-form')
       wait_for_ajax_requests
       expect(DiscussionEntry.last.message).to include(entry_text)
     end

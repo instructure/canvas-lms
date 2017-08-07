@@ -21,9 +21,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 describe LiveEvents do
 
   it 'should trigger a live event on login' do
-    Canvas::LiveEvents.expects(:logged_in).once
+    expect(Canvas::LiveEvents).to receive(:logged_in).once
     user_with_pseudonym(:username => 'jtfrd@instructure.com', :active_user => true, :password => 'qwertyuiop')
-    post '/login', :pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwertyuiop'}
+    post '/login', params: {:pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwertyuiop'}}
     expect(response).to be_redirect
   end
 
@@ -42,25 +42,25 @@ describe LiveEvents do
       end
 
       it 'should trigger a live event on page creation' do
-        Canvas::LiveEvents.expects(:wiki_page_created).once
+        expect(Canvas::LiveEvents).to receive(:wiki_page_created).once
         create_page :title => 'a-page', :body => 'body'
       end
 
       it 'should trigger a live event on page update' do
-        Canvas::LiveEvents.expects(:wiki_page_updated).twice
+        expect(Canvas::LiveEvents).to receive(:wiki_page_updated).twice
         page = create_page :title => 'a-page', :body => 'body'
 
         # Updating the page body should trigger a live event
-        put "/api/v1/courses/#{@course.id}/pages/#{page.url}", :wiki_page => {body: 'UPDATED'}
+        put "/api/v1/courses/#{@course.id}/pages/#{page.url}", params: {:wiki_page => {body: 'UPDATED'}}
         expect(response.code).to eq '200'
 
         # Updating the page title should trigger a live event
-        put "/api/v1/courses/#{@course.id}/pages/#{page.url}", :wiki_page => {title: 'UPDATED'}
+        put "/api/v1/courses/#{@course.id}/pages/#{page.url}", params: {:wiki_page => {title: 'UPDATED'}}
         expect(response.code).to eq '200'
       end
 
       it 'should trigger a live event on page delete' do
-        Canvas::LiveEvents.expects(:wiki_page_deleted).once
+        expect(Canvas::LiveEvents).to receive(:wiki_page_deleted).once
         page = create_page :title => 'a-page', :body => 'body'
 
         # Updating the page body should trigger a live event
@@ -77,19 +77,19 @@ describe LiveEvents do
       end
 
       it 'should trigger a live event on files being added to the course' do
-        Canvas::LiveEvents.expects(:attachment_created).once
+        expect(Canvas::LiveEvents).to receive(:attachment_created).once
         course_file
       end
 
       it 'should trigger a live event on file updates' do
-        Canvas::LiveEvents.expects(:attachment_updated).once
+        expect(Canvas::LiveEvents).to receive(:attachment_updated).once
         file = course_file
-        put "/api/v1/files/#{file.id}", :name => 'UPDATED'
+        put "/api/v1/files/#{file.id}", params: {:name => 'UPDATED'}
         expect(response.code).to eq '200'
       end
 
       it 'should trigger a live event on file deletes' do
-        Canvas::LiveEvents.expects(:attachment_deleted).once
+        expect(Canvas::LiveEvents).to receive(:attachment_deleted).once
         file = course_file
         delete "/api/v1/files/#{file.id}"
         expect(response.code).to eq '200'

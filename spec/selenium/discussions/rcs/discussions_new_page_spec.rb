@@ -47,10 +47,6 @@ describe "discussions" do
       stub_rcs_config
     end
 
-    after(:each) do
-      unstub_rcs_config
-    end
-
     context "as a teacher" do
       before(:each) do
         user_session(teacher)

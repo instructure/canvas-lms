@@ -117,14 +117,14 @@ describe Quizzes::QuizStatistics do
     stats.reload
     expect(stats.csv_attachment).to be_present
 
-    stats.expects(:build_csv_attachment).never
+    expect(stats).to receive(:build_csv_attachment).never
     expect(stats.generate_csv).to eq attachment
   end
 
   it 'could possibly tell whether CSV generation has gone bananas' do
     stats = @quiz.current_statistics_for 'student_analysis'
 
-    Quizzes::QuizStatistics::StudentAnalysis.any_instance.stubs(:to_csv) {
+    allow_any_instance_of(Quizzes::QuizStatistics::StudentAnalysis).to receive(:to_csv) {
       throw 'totally bananas'
     }
 
@@ -137,34 +137,34 @@ describe Quizzes::QuizStatistics do
 
   describe 'self#large_quiz?' do
     let :active_quiz_questions do
-      Object.new.tap { |o| o.stubs(size: 50) }
+      double(size: 50)
     end
 
     let :quiz_submissions do
-      Object.new.tap { |o| o.stubs(size: 15) }
+      double(size: 15)
     end
 
     let :quiz do
       Quizzes::Quiz.new.tap do |quiz|
-        quiz.stubs(:active_quiz_questions).returns(active_quiz_questions)
-        quiz.stubs(:quiz_submissions).returns(quiz_submissions)
+        allow(quiz).to receive(:active_quiz_questions).and_return(active_quiz_questions)
+        allow(quiz).to receive(:quiz_submissions).and_return(quiz_submissions)
       end
     end
 
     context 'quiz_statistics_max_questions' do
       it 'should be true when there are too many questions' do
-        Setting.expects(:get).with('quiz_statistics_max_questions',
-          Quizzes::QuizStatistics::DefaultMaxQuestions).returns 25
+        expect(Setting).to receive(:get).with('quiz_statistics_max_questions',
+          Quizzes::QuizStatistics::DefaultMaxQuestions).and_return 25
 
         expect(Quizzes::QuizStatistics.large_quiz?(quiz)).to be_truthy
       end
 
       it 'should be false otherwise' do
-        Setting.expects(:get).with('quiz_statistics_max_questions',
-          Quizzes::QuizStatistics::DefaultMaxQuestions).returns 100
+        expect(Setting).to receive(:get).with('quiz_statistics_max_questions',
+          Quizzes::QuizStatistics::DefaultMaxQuestions).and_return 100
 
-        Setting.expects(:get).with('quiz_statistics_max_submissions',
-          Quizzes::QuizStatistics::DefaultMaxSubmissions).returns 25
+        expect(Setting).to receive(:get).with('quiz_statistics_max_submissions',
+          Quizzes::QuizStatistics::DefaultMaxSubmissions).and_return 25
 
         expect(Quizzes::QuizStatistics.large_quiz?(quiz)).to be_falsey
       end
@@ -172,19 +172,19 @@ describe Quizzes::QuizStatistics do
 
     context 'quiz_statistics_max_submissions' do
       it 'should be true when there are too many submissions' do
-        Setting.expects(:get).with('quiz_statistics_max_questions',
-          Quizzes::QuizStatistics::DefaultMaxQuestions).returns 100
-        Setting.expects(:get).with('quiz_statistics_max_submissions',
-          Quizzes::QuizStatistics::DefaultMaxSubmissions).returns 5
+        expect(Setting).to receive(:get).with('quiz_statistics_max_questions',
+          Quizzes::QuizStatistics::DefaultMaxQuestions).and_return 100
+        expect(Setting).to receive(:get).with('quiz_statistics_max_submissions',
+          Quizzes::QuizStatistics::DefaultMaxSubmissions).and_return 5
 
         expect(Quizzes::QuizStatistics.large_quiz?(quiz)).to be_truthy
       end
 
       it 'should be false otherwise' do
-        Setting.expects(:get).with('quiz_statistics_max_questions',
-          Quizzes::QuizStatistics::DefaultMaxQuestions).returns 100
-        Setting.expects(:get).with('quiz_statistics_max_submissions',
-          Quizzes::QuizStatistics::DefaultMaxSubmissions).returns 25
+        expect(Setting).to receive(:get).with('quiz_statistics_max_questions',
+          Quizzes::QuizStatistics::DefaultMaxQuestions).and_return 100
+        expect(Setting).to receive(:get).with('quiz_statistics_max_submissions',
+          Quizzes::QuizStatistics::DefaultMaxSubmissions).and_return 25
 
         expect(Quizzes::QuizStatistics.large_quiz?(quiz)).to be_falsey
       end

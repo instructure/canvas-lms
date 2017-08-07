@@ -38,6 +38,16 @@ This option will only affect data that has been involved in a previous SIS job
 ID was manually added. Manually created courses with no SIS ID, for example,
 won't be deleted even if they don't appear in the new SIS import.
 
+During a term batch mode may be used often and if a partial file is sent, many
+objects can become deleted. Using `change_threshold=5` will only delete objects
+if the number of objects to delete is less than 5% of the objects for the term.
+For example: If change_threshold set to 5 and the term has 100 courses, and
+batch_mode would delete more than 5 of the courses the batch will abort
+before the courses are deleted.
+The change_threshold can be set to any integer between 1 and 100.
+
+change_threshold also impacts diffing mode.
+
 Diffing Mode
 ------------
 
@@ -103,6 +113,8 @@ the files being compared are greater than 10% different. The threshold can be
 set to help prevent removing objects unintentionally. When set and the file is
 over 10% different it will be the same as if `diffing_remaster_data_set=true`.
 The change_threshold can be set to any integer between 1 and 100.
+
+change_threshold also impacts batch mode.
 
 Stickiness
 ----------
@@ -466,6 +478,16 @@ YYYY-MM-DDTHH:MM:SSZ</td>
 <td></td>
 <td></td>
 <td>on_campus, online, blended</td>
+</tr>
+<tr>
+<td>blueprint_course_id</td>
+<td>text</td>
+<td></td>
+<td></td>
+<td>The SIS id of a pre-existing Blueprint course. When provided, 
+the current course will be set up to receive updates from the blueprint course.
+Requires Blueprint Courses feature.
+</td>
 </tr>
 </table>
 

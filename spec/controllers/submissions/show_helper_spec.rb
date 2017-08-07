@@ -39,7 +39,7 @@ describe 'Submissions::ShowHelper' do
 
       context 'with format html' do
         before do
-          get :show, context_id: @course.id, assignment_id: @assignment.id
+          get :show, params: {context_id: @course.id, assignment_id: @assignment.id}
         end
 
         it 'redirects to assignment url' do
@@ -53,7 +53,7 @@ describe 'Submissions::ShowHelper' do
 
       context 'with format json' do
         before do
-          get :show, context_id: @course.id, assignment_id: @assignment.id, format: :json
+          get :show, params: {context_id: @course.id, assignment_id: @assignment.id}, format: :json
         end
 
         it 'render json with errors key' do

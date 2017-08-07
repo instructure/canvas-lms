@@ -77,13 +77,13 @@ module GreatExpectations
       super
     end
 
-    def to(*)
-      GreatExpectations.expectation_checked(self)
+    def to(matcher = nil, _message = nil)
+      GreatExpectations.expectation_checked(self, matcher)
       super
     end
 
-    def not_to(*)
-      GreatExpectations.expectation_checked(self)
+    def not_to(matcher = nil, _message = nil)
+      GreatExpectations.expectation_checked(self, matcher)
       super
     end
     alias to_not not_to
@@ -110,13 +110,21 @@ module GreatExpectations
     end
 
     def expectation_created(expectation)
-      assert_not_early!
+      early_expectations << expectation unless current_example
       unchecked_expectations << expectation
     end
 
-    def expectation_checked(expectation = nil)
-      unchecked_expectations.delete(expectation) if expectation
-      self.expectation_count += 1
+    def expectation_checked(expectation = nil, matcher = nil)
+      if expectation
+        unchecked_expectations.delete(expectation)
+        early_expectations.delete(expectation) if matcher.is_a?(RSpec::Mocks::Matchers::Receive)
+      end
+      assert_not_early! unless early_expectations.empty?
+      self.expectation_count += 1 if expectation_count
+    end
+
+    def early_expectations
+      @early_expectations ||= Set.new
     end
 
     def unchecked_expectations
@@ -165,11 +173,6 @@ module GreatExpectations
       end
       return if ::RSpec::Mocks.space.any_instance_recorders.any? do |_, recorder|
         recorder.instance_variable_get(:@expectation_set)
-      end
-
-      # mocha expectations
-      return if ::Mocha::Mockery.instance.send(:expectations).any? do |expectation|
-        expectation.instance_variable_get(:@cardinality).needs_verifying?
       end
 
       generate_error config[:MISSING], "This spec has no expectations. Add one!", current_example.location

@@ -27,15 +27,13 @@ describe SIS::UserImporter do
       # this is the fun bit where we get to stub User.new to insert a sleep into
       # the transaction loop.
 
-      # so it stays fast and skips the db
-      User.any_instance.expects(:save).times(3).returns(true)
-
       # yes, enough time has passed for the transaction
-      Time.any_instance.stubs(:>).returns(true)
+      allow_any_instance_of(Time).to receive(:>).and_return(true)
 
       # two outer transactions (one per batch of 2)
       # three inner transactions (one per user)
-      User.expects(:transaction).times(5).yields
+      # three implicit transaction (one per user save)
+      expect(User).to receive(:transaction).exactly(8).times.and_yield
 
       user1 = SIS::Models::User.new(user_id: 'U001', login_id: 'user1', status: 'active',
                                     full_name: 'User One', email: 'user1@example.com')
@@ -43,6 +41,7 @@ describe SIS::UserImporter do
                                     full_name: 'User Two', email: 'user2@example.com')
       user3 = SIS::Models::User.new(user_id: 'U003', login_id: 'user3', status: 'active',
                                     full_name: 'User Three', email: 'user3@example.com')
+
       SIS::UserImporter.new(@account, {}).process(2, messages) do |importer|
         importer.add_user(user1)
         importer.add_user(user2)

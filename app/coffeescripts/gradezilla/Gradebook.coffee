@@ -42,7 +42,6 @@ define [
   'compiled/userSettings'
   'spin.js'
   'compiled/AssignmentMuter'
-  'compiled/gradezilla/AssignmentGroupWeightsDialog'
   'compiled/shared/GradeDisplayWarningDialog'
   'compiled/gradezilla/PostGradesFrameDialog'
   'compiled/gradezilla/SubmissionCell'
@@ -104,7 +103,7 @@ define [
 ], ($, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
   GradingPeriodsApi, GradingPeriodSetsApi, round, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS,
   CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, GradeFormatHelper, UserSettings, Spinner, AssignmentMuter,
-  AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
+  GradeDisplayWarningDialog, PostGradesFrameDialog,
   SubmissionCell, NumberCompare, natcompare, ConvertCase, htmlEscape, SetDefaultGradeDialogManager,
   CurveGradesDialogManager, GradebookApi, CellEditorFactory, GridSupport, studentRowHeaderConstants, AssignmentColumnHeader,
   AssignmentGroupColumnHeader, AssignmentRowCellPropFactory, CustomColumnHeader, StudentColumnHeader, StudentRowHeader,
@@ -188,6 +187,7 @@ define [
   getInitialCourseContent = () ->
     {
       contextModules: []
+      gradingPeriodAssignments: {}
     }
 
   class Gradebook
@@ -208,9 +208,6 @@ define [
     gridReady: $.Deferred()
 
     constructor: (@options) ->
-      # emitted by AssignmentGroupWeightsDialog
-      $.subscribe 'assignment_group_weights_changed', @handleAssignmentGroupWeightChange
-
       $.subscribe 'assignment_muting_toggled',        @handleAssignmentMutingChange
       $.subscribe 'submissions_updated',              @updateSubmissionsFromExternal
 
@@ -230,6 +227,10 @@ define [
       @gridDisplaySettings = getInitialGridDisplaySettings(@options.settings, @options.colors)
       @contentLoadStates = getInitialContentLoadStates()
       @headerComponentRefs = {}
+
+      @setAssignments({})
+      @setAssignmentGroups({})
+      @effectiveDueDates = {}
 
       @students = {}
       @studentViewStudents = {}
@@ -284,6 +285,7 @@ define [
           include: @fieldsToIncludeWithAssignments
         contextModulesURL: @options.context_modules_url
         customColumnsURL: @options.custom_columns_url
+        getGradingPeriodAssignments: @gradingPeriodSet?
 
         sectionsURL: @options.sections_url
 
@@ -304,11 +306,10 @@ define [
         @courseContent.students.setStudentIds(response.user_ids)
         @buildRows()
 
-      $.when(
-        dataLoader.gotAssignmentGroups,
-        dataLoader.gotEffectiveDueDates
-      ).then(@gotAllAssignmentGroupsAndEffectiveDueDates)
+      dataLoader.gotGradingPeriodAssignments?.then (response) =>
+        @courseContent.gradingPeriodAssignments = response.grading_period_assignments
 
+      dataLoader.gotAssignmentGroups.then @gotAllAssignmentGroups
       dataLoader.gotCustomColumns.then @gotCustomColumns
       dataLoader.gotStudents.then @gotAllStudents
 
@@ -316,7 +317,7 @@ define [
         dataLoader.gotStudentIds,
         dataLoader.gotCustomColumns,
         dataLoader.gotAssignmentGroups,
-        dataLoader.gotEffectiveDueDates
+        dataLoader.gotGradingPeriodAssignments
       ).then(@doSlickgridStuff)
 
       dataLoader.gotStudents.then () =>
@@ -448,23 +449,15 @@ define [
       @gridReady.resolve()
       @loadOverridesForSIS()
 
-    gotAllAssignmentGroupsAndEffectiveDueDates: (assignmentGroups, dueDatesResponse) =>
-      @effectiveDueDates = dueDatesResponse[0]
-      @gotAllAssignmentGroups(assignmentGroups)
-
     gotAllAssignmentGroups: (assignmentGroups) =>
-      @assignmentGroups = {}
-      @assignments      = {}
       # purposely passing the @options and assignmentGroups by reference so it can update
       # an assigmentGroup's .group_weight and @options.group_weighting_scheme
-      new AssignmentGroupWeightsDialog context: @options, assignmentGroups: assignmentGroups
       for group in assignmentGroups
         @assignmentGroups[group.id] = group
         for assignment in group.assignments
           assignment.assignment_group = group
           assignment.due_at = tz.parse(assignment.due_at)
-          assignment.effectiveDueDates = @effectiveDueDates[assignment.id] || {}
-          assignment.inClosedGradingPeriod = _.any(assignment.effectiveDueDates, (date) => date.in_closed_grading_period)
+          @updateAssignmentEffectiveDueDates(assignment)
           @assignments[assignment.id] = assignment
 
     gotSections: (sections) =>
@@ -531,6 +524,13 @@ define [
     getSubmission: (studentId, assignmentId) =>
       student = @student(studentId)
       student["assignment_#{assignmentId}"]
+
+    updateEffectiveDueDatesFromSubmissions: (submissions) =>
+      EffectiveDueDates.updateWithSubmissions(@effectiveDueDates, submissions, @gradingPeriodSet?.gradingPeriods)
+
+    updateAssignmentEffectiveDueDates: (assignment) ->
+      assignment.effectiveDueDates = @effectiveDueDates[assignment.id] || {}
+      assignment.inClosedGradingPeriod = _.any(assignment.effectiveDueDates, (date) => date.in_closed_grading_period)
 
     updateStudentAttributes: (student) =>
       student.computed_current_score ||= 0
@@ -769,7 +769,7 @@ define [
 
     filterAssignmentByGradingPeriod: (assignment) =>
       return true unless @isFilteringColumnsByGradingPeriod()
-      @getGradingPeriodToShow() in @listGradingPeriodsForAssignment(assignment.id)
+      assignment.id in (@courseContent.gradingPeriodAssignments[@getGradingPeriodToShow()] or [])
 
     filterAssignmentByModule: (assignment) =>
       contextModuleFilterSetting = @getFilterColumnsBySetting('contextModuleId')
@@ -785,16 +785,6 @@ define [
     handleAssignmentMutingChange: (assignment) =>
       @renderAssignmentColumnHeader(assignment.id)
       @setAssignmentWarnings()
-      @buildRows()
-
-    handleAssignmentGroupWeightChange: (assignment_group_options) =>
-      columns = @grid.getColumns()
-      for assignment_group in assignment_group_options.assignmentGroups
-        column = _.findWhere columns, id: "assignment_group_#{assignment_group.id}"
-        @initAssignmentGroupColumnHeader(column)
-      @setAssignmentWarnings()
-      @grid.setColumns(columns)
-      # TODO: don't buildRows?
       @buildRows()
 
     handleSubmissionsDownloading: (assignmentId) =>
@@ -839,21 +829,24 @@ define [
 
     gotSubmissionsChunk: (student_submissions) =>
       changedStudentIds = []
+      submissions = []
 
       for data in student_submissions
         changedStudentIds.push(data.user_id)
         student = @student(data.user_id)
         for submission in data.submissions
+          submissions.push(submission)
           @updateSubmission(submission)
 
         student.loaded = true
 
-        @calculateStudentGrade(student)
+      @updateEffectiveDueDatesFromSubmissions(submissions)
+      _.each @assignments, (assignment) =>
+        @updateAssignmentEffectiveDueDates(assignment)
 
-      # TODO: if gb2 survives long enough, we should consider debouncing all
-      # the invalidation/rendering for smoother performance while loading
-      @invalidateRowsForStudentIds(_.uniq(changedStudentIds))
-      @grid?.render()
+      changedStudentIds = _.uniq(changedStudentIds)
+      students = changedStudentIds.map(@student)
+      @setupGrading(students)
 
     student: (id) =>
       @students[id] || @studentViewStudents[id]
@@ -861,6 +854,8 @@ define [
     updateSubmission: (submission) =>
       student = @student(submission.user_id)
       submission.submitted_at = tz.parse(submission.submitted_at)
+      submission.excused = !!submission.excused
+      submission.rawGrade = submission.grade # save the unformatted version of the grade too
       submission.grade = GradeFormatHelper.formatGrade(submission.grade, {
         gradingType: submission.gradingType, delocalize: false
       })
@@ -2433,7 +2428,7 @@ define [
           published: assignment.published
           submissionTypes: assignment.submission_types
           courseId: assignment.course_id
-          inClosedGradingPeriod: assignment.in_closed_grading_period
+          inClosedGradingPeriod: assignment.inClosedGradingPeriod
         students: students
         submissionsLoaded: @contentLoadStates.submissionsLoaded
         sortBySetting: @getAssignmentColumnSortBySetting(assignmentId)
@@ -2517,22 +2512,27 @@ define [
     renderSubmissionTray: (student) =>
       mountPoint = document.getElementById('StudentTray__Container')
       { open, studentId, assignmentId } = @getSubmissionTrayState()
-      # get the student's submission, or use an empty object in case the
+      # get the student's submission, or use a fake submission object in case the
       # submission has not yet loaded
-      submission = @getSubmission(studentId, assignmentId) || {}
+      fakeSubmission = { late: false, missing: false, excused: false, seconds_late: 0 }
+      submission = @getSubmission(studentId, assignmentId) || fakeSubmission
 
       props =
         key: "submission_tray_#{studentId}_#{assignmentId}"
+        colors: @getGridColors()
         isOpen: open
+        locale: @options.locale
         onRequestClose: @closeSubmissionTray
         onClose: => @gridSupport.helper.focus()
         showContentComingSoon: !@options.new_gradebook_development_enabled
         student:
+          id: student.id,
           name: student.name,
           avatarUrl: htmlDecode(student.avatar_url)
-        submission:
-          grade: submission.grade
-          pointsDeducted: submission.points_deducted
+        submission: ConvertCase.camelize(submission)
+        courseId: @options.context_id
+        speedGraderEnabled: @options.speed_grader_enabled
+      props.latePolicy = ConvertCase.camelize(@options.late_policy) if @options.late_policy
       renderComponent(SubmissionTray, mountPoint, props)
 
     updateRowAndRenderSubmissionTray: (studentId) =>
@@ -2753,10 +2753,6 @@ define [
 
     listContextModules: =>
       @courseContent.contextModules
-
-    listGradingPeriodsForAssignment: (assignmentId) =>
-      effectiveDueDates = @effectiveDueDates[assignmentId] || {}
-      _.uniq((effectiveDueDate.grading_period_id for userId, effectiveDueDate of effectiveDueDates))
 
     ## Gradebook Content Api Methods
 

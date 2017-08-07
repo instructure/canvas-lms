@@ -54,7 +54,7 @@ describe PageViewsController do
 
     it "should succeed" do
       page_view(@user, '/somewhere/in/app', :created_at => 2.days.ago)
-      get 'index', :user_id => @user.id, :format => 'csv'
+      get 'index', params: {:user_id => @user.id}, format: 'csv'
       expect(response).to be_success
     end
 
@@ -62,7 +62,7 @@ describe PageViewsController do
       pv2 = page_view(@user, '/somewhere/in/app', :created_at => 2.days.ago)    # 2nd day
       pv1 = page_view(@user, '/somewhere/in/app/1', :created_at => 1.day.ago)  # 1st day
       pv3 = page_view(@user, '/somewhere/in/app/2', :created_at => 3.days.ago)  # 3rd day
-      get 'index', :user_id => @user.id, :format => 'csv'
+      get 'index', params: {:user_id => @user.id}, format: 'csv'
       expect(response).to be_success
       dates = CSV.parse(response.body, :headers => true).map { |row| row['created_at'] }
       expect(dates).to eq [pv1, pv2, pv3].map(&:created_at).map(&:to_s)
@@ -82,11 +82,11 @@ describe PageViewsController do
 
     context "POST 'update'" do
       it "catches a cassandra error" do
-        PageView.stubs(:find_for_update).raises(CassandraCQL::Error::InvalidRequestException)
+        allow(PageView).to receive(:find_for_update).and_raise(CassandraCQL::Error::InvalidRequestException)
         pv = page_view(@student, '/somewhere/in/app/1', :created_at => 1.day.ago)
 
         user_session(@student)
-        xhr :put, 'update', id: pv.token, interaction_seconds: '5', page_view_token: pv.token
+        put 'update', params: {id: pv.token, interaction_seconds: '5', page_view_token: pv.token}, xhr: true
         expect(response.status).to eq 200
       end
     end
@@ -94,7 +94,7 @@ describe PageViewsController do
 
   context "pv4" do
     before do
-      PageView.stubs(:pv4?).returns(true)
+      allow(PageView).to receive(:pv4?).and_return(true)
       ConfigFile.stub('pv4', {})
     end
 
@@ -103,16 +103,16 @@ describe PageViewsController do
         account_admin_user
         user_session(@user)
 
-        PageView::Pv4Client.any_instance.expects(:fetch).
+        expect_any_instance_of(PageView::Pv4Client).to receive(:fetch).
           with(
             @user.global_id,
             start_time: Time.zone.parse("2016-03-14T12:25:55Z"),
             end_time: Time.zone.parse("2016-03-15T00:00:00Z"),
             last_page_view_id: nil,
             limit: 25).
-          returns([])
-        get 'index', user_id: @user.id, start_time: "2016-03-14T12:25:55Z",
-            end_time: "2016-03-15T00:00:00Z", per_page: 25, format: :json
+          and_return([])
+        get 'index', params: {user_id: @user.id, start_time: "2016-03-14T12:25:55Z",
+            end_time: "2016-03-15T00:00:00Z", per_page: 25}, format: :json
         expect(response).to be_success
       end
     end

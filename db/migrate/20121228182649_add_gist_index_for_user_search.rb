@@ -30,10 +30,9 @@ class AddGistIndexForUserSearch < ActiveRecord::Migration[4.2]
       end
 
       if (schema = connection.extension_installed?(:pg_trgm))
-        concurrently = " CONCURRENTLY" if connection.open_transactions == 0
-        execute("create index#{concurrently} index_trgm_users_name on #{User.quoted_table_name} USING gist(lower(name) #{schema}.gist_trgm_ops);")
-        execute("create index#{concurrently} index_trgm_pseudonyms_sis_user_id on #{Pseudonym.quoted_table_name} USING gist(lower(sis_user_id) #{schema}.gist_trgm_ops);")
-        execute("create index#{concurrently} index_trgm_communication_channels_path on #{CommunicationChannel.quoted_table_name} USING gist(lower(path) #{schema}.gist_trgm_ops);")
+        add_index :users, "lower(name) #{schema}.gist_trgm_ops", name: "index_trgm_users_name", using: :gist, algorithm: :concurrently
+        add_index :pseudonyms, "lower(sis_user_id) #{schema}.gist_trgm_ops", name: "index_trgm_pseudonyms_sis_user_id", using: :gist, algorithm: :concurrently
+        add_index :communication_channels, "lower(path) #{schema}.gist_trgm_ops", name: "index_trgm_communication_channels_path", using: :gist, algorithm: :concurrently
       end
     end
   end

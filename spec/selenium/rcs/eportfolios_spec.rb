@@ -28,10 +28,6 @@ describe "eportfolios" do
     stub_rcs_config
   end
 
-  after(:each) do
-    unstub_rcs_config
-  end
-
   context "eportfolio created with user" do
     before(:each) do
       eportfolio_model({:user => @user, :name => "student content"})

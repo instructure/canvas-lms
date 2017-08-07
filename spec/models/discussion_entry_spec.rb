@@ -38,7 +38,7 @@ describe DiscussionEntry do
 
     it "should not subscribe the author on create outside of the #subscribe_author method" do
       discussion_topic_participant = topic.discussion_topic_participants.create!(user: @teacher, subscribed: false)
-      DiscussionEntry.any_instance.stubs(subscribe_author: true)
+      allow_any_instance_of(DiscussionEntry).to receive_messages(subscribe_author: true)
       entry
       expect(discussion_topic_participant.reload.subscribed).to be_falsey
     end
@@ -286,7 +286,7 @@ describe DiscussionEntry do
 
     describe "#destroy" do
       it "should call decrement_unread_counts_for_this_entry" do
-        @entry_4.expects(:decrement_unread_counts_for_this_entry)
+        expect(@entry_4).to receive(:decrement_unread_counts_for_this_entry)
         @entry_4.destroy
       end
     end
@@ -409,7 +409,7 @@ describe DiscussionEntry do
     end
 
     it "should use unique_constaint_retry when updating read state" do
-      DiscussionEntry.expects(:unique_constraint_retry).once
+      expect(DiscussionEntry).to receive(:unique_constraint_retry).once
       @entry.change_read_state("read", @student)
     end
   end

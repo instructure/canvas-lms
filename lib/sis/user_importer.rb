@@ -101,7 +101,7 @@ module SIS
                 next
               end
               if pseudo_by_login && (pseudo != pseudo_by_login && status_is_active ||
-                !ActiveRecord::Base.connection.select_value("SELECT 1 FROM #{Pseudonym.quoted_table_name} WHERE #{Pseudonym.to_lower_column(Pseudonym.sanitize(pseudo.unique_id))}=#{Pseudonym.to_lower_column(Pseudonym.sanitize(user_row.login_id))} LIMIT 1"))
+                !ActiveRecord::Base.connection.select_value("SELECT 1 FROM #{Pseudonym.quoted_table_name} WHERE #{Pseudonym.to_lower_column(Pseudonym.connection.quote(pseudo.unique_id))}=#{Pseudonym.to_lower_column(Pseudonym.connection.quote(user_row.login_id))} LIMIT 1"))
                 id_message = pseudo_by_login.sis_user_id ? 'SIS ID' : 'Canvas ID'
                 user_id = pseudo_by_login.sis_user_id || pseudo_by_login.user_id
                 @messages << I18n.t("An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s user_id requested login information, skipping", user_id: "#{id_message} #{user_id.to_s}", other_user_id: user_row.user_id)
@@ -150,9 +150,9 @@ module SIS
 
               d = enrollment_ids.count
               d += @root_account.all_group_memberships.active.where(user_id: user).update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
-              d += user.account_users.shard(@root_account).where(account_id: @root_account.all_accounts).delete_all
-              d += user.account_users.shard(@root_account).where(account_id: @root_account).delete_all
-              if 0 < d
+              d += user.account_users.shard(@root_account).where(account_id: @root_account.all_accounts).update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
+              d += user.account_users.shard(@root_account).where(account_id: @root_account).update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
+              if d > 0
                 should_update_account_associations = true
               end
             end
@@ -276,6 +276,7 @@ module SIS
                   raise ImportError, msg
                 end
                 user.touch unless user_touched
+                user.clear_email_cache!
               end
               pseudo.sis_communication_channel_id = pseudo.communication_channel_id = cc.id
 

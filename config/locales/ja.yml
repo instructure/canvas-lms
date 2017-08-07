@@ -153,7 +153,7 @@ ja:
     account_required: "LDAP で認証される必要があります"
     index: 
       delete_auth_confirmation: よろしいですか?これを削除すると、ユーザはログインできない場合があります。
-      delete_auth_link: すべての承認を削除
+      delete_auth_link: 認証を削除する
       ip_address_list_description: "Canvas サーバを必要とする認証サービス (LDAP など) を使用して、ご利用のサーバと直接通信している場合は、これらの IP アドレスからの接続をサーバが確実に受け入れることができるようにする必要があります。"
       no_auth_type_description: "このアカウントは現在、ID プロバイダーと統合されていません。"
       page_title: 認証設定
@@ -736,6 +736,11 @@ ja:
             start: 
               parameters: 
                 header: "開始日:"
+    embry_riddle_activity_report_csv_parameters: 
+      account_reports: 
+        embry_riddle: 
+          outcome: 
+            text: "コース SIS パターン（コンマ区切りリスト）："
     engagement_report_csv_parameters: 
       account_reports: 
         bryan_engagement: 
@@ -1737,6 +1742,9 @@ ja:
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "コースまたはアカウントの設定ページの「アプリ」タブにアプリ センターが表示されます。下の URL はアプリ センターのエンドポイントを指している必要があります。 (例: %{url} -- 末尾のスラッシュは省略します"
   app_placements_6d877225: アプリプレースメント
   app_reregistration_87cc8817: アプリ登録
+  app_was_installed_by_admin_and_is_locked_3bee4d39: "%{app} 管理者によってインストールされ、ロックされています"
+  app_was_installed_by_the_master_course_and_is_lock_dbeb24a6: "%{app} マスターコースによってインストールされ、ロックされています"
+  app_was_installed_by_the_master_course_e55ba1d7: "%{app} マスターコースによってインストールされています"
   appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "各イベントのタイトルの末尾に番号を追加 (例：イベント1、イベント2、等)　"
   appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "各イベントのタイトルの末尾に番号を追加 (例：イベント1、イベント2、等)\" for=\"append_iterator　"
   application: 
@@ -1810,6 +1818,9 @@ ja:
   archive_3f794d7e: アーカイブ
   archive_selected_d64506ca: 選択されたアーカイブ
   are_you_sure_26795d3c: よろしいですか？
+  are_you_sure_you_want_to_archive_your_copies_of_th_7d219afe: 
+    one: これら会話のコピーを本当にアーカイブしますか？
+    other: これら会話のコピーを本当にアーカイブしますか？
   are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496: ほんとうにキャンセルしますか?行われた変更は保存されません。
   are_you_sure_you_want_to_cancel_your_appointment_w_dbbd27eb: "%{name} の予約をキャンセルしてもよろしいですか？ "
   are_you_sure_you_want_to_copy_to_the_final_mark_th_28a7e7b3: 本当に最終マークにコピーしてもよろしいですか？このことにより、既存のマークを上書きすることになります。
@@ -1824,6 +1835,9 @@ ja:
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: この採点期間セットを削除しますか？
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: この採点期間を削除してもよろしいですか?
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: この採点スキームを削除してもよろしいですか?
+  are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
+    one: これら会話のコピーを本当に削除しますか？この操作は元に戻すことはできません。
+    other: これら会話のコピーを本当に削除しますか？この操作は元に戻すことはできません。
   are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: このイベントの予約を削除してもよろしいですか?
   are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: "すべての課題で %{sisName} へのSyncをほんとうに無効にしますか?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: 本当にこれを実行してもよろしいですか？元に戻すことが不可能となり、評定表内に存在する成績を上書きします。
@@ -1835,6 +1849,9 @@ ja:
   are_you_sure_you_want_to_resync_these_grades_to_th_e509cb9e: これらの成績を受講生情報システムに再同期してもよろしいですか？
   are_you_sure_you_want_to_submit_this_comment_fbe76ba6: このコメントを提出してもよろしいですか？
   are_you_sure_you_want_to_sync_these_grades_to_the__ca3c28a4: これらの成績を受講生情報システムに同期してもよろしいですか？これは、すべての成績が確定した場合にのみ行ってください。
+  are_you_sure_you_want_to_unarchive_these_conversat_ec7d7e8d: 
+    one: これら会話のコピーを本当にアンアーカイブしますか？
+    other: これら会話のコピーを本当にアンアーカイブしますか？
   argentina_3257a200: アルゼンチン
   argentina_54_375d6af4: "アルゼンチン (+54)"
   arrange_by_34a545de: 以下によって手配
@@ -3391,6 +3408,7 @@ ja:
   click_here_it_s_free_eeccb9cb: こちらをクリックしてください。無料です！
   click_here_on_the_calendar_link_c9965631: "*カレンダー* リンクのここをクリック"
   click_here_to_download_size_of_file_74443988: "ここをクリックしてダウンロード%{size_of_file}"
+  click_here_to_log_in_again_4a6055de: ここをクリックして再度ログイン
   click_here_to_see_the_file_79e2b366: ここをクリックして、ファイルを表示。
   click_here_to_view_ec8cb2fd: ここをクリックして表示
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "スナップショットがクリックされたときの状態に戻すには、スナップショットをクリックします。注意:スナップショット撮影時点からの作業がすべて失われます。元に戻すことはできません！"
@@ -5993,6 +6011,7 @@ ja:
     edit_key: この鍵を編集する
     identifier: "ID: %{id}"
     redirect_uri: "URI: %{redirect_uri}"
+  developer_key_921ddbae: 開発者キー
   developer_key_form: 
     cancel: キャンセル
     icon_url: "アイコンの URL:"
@@ -7430,6 +7449,10 @@ ja:
   filter_replies_by_unread_342e8e90: 未読の返信のみを表示
   filter_replies_by_unread_caf870ea: 未読の返信のみを表示
   filters_92f2776f: フィルター
+  final_grade_4d7f6545: 最終的な成績
+  final_grade_6938dca8: 最終的な成績：
+  final_grade_finalgrade_138d9e07: "最終的な成績：%{finalGrade}"
+  final_grade_finalgrade_408580bb: "最終的な成績：*%{finalGrade}*"
   final_grade_info_2aa35d25: 最終成績についての情報
   final_grade_score_fe69a301: "最終的な成績: %{score}"
   final_letter_grade_80dccec1: 最終的なABC...評価
@@ -7557,13 +7580,16 @@ ja:
   gpa_scale_a6d1cdea: "GPA スケール"
   grade_10d1e5a1: "%{grade}"
   grade_9c6f076d: 成績
+  grade_a91e433e: 成績：
   grade_assignment_7c1abc11: "%{assignment} を採点"
+  grade_changes_cb5a57a8: 成績変更
   grade_display_warning_dialog: 
     grade_display_warning: 
       checkbox: このコースでは再度表示しません。
       warning: 警告
   grade_distribution_e52c9256: 成績の分布
   grade_export_title: 成績のエクスポート
+  grade_for_name_b9df168a: "成績：%{name}"
   grade_high_to_low_1cea0381: "グレード - 高〜低"
   grade_history_9c51ad49: 採点履歴...
   grade_history_ccc09fde: 採点履歴
@@ -7717,7 +7743,7 @@ ja:
       switch_to_points: 点数に切り替え
     turnitin: 
       error_message: 類似検出サービスに送信中にエラーが発生しました。サポートに連絡する前に、ファイルを再提出するよう試みてください
-      info_message: "このファイルはまだ turnitin による処理中です。しばらくしてからスコアを確認してください"
+      info_message: このファイルは、課題に関連付けられている盗作検出ツールで処理されています。後ほどまた確認してスコアを見てください。
       resubmitting: 再提出しています...
       tooltip: 
         error: "類似スコア - 提出エラーの詳細を参照"
@@ -8211,9 +8237,9 @@ ja:
       one: "可能なポイントがないため、%{groups}はスコアには含まれません"
       other: "可能なポイントがないため、%{groups}はスコアには含まれません"
     keyboard_assignment_desc: 現在の課題の詳細ページに移動
-    keyboard_close_menu: 現在アクティブな課題のメニューを閉じる
+    keyboard_close_menu: 現在アクティブなメニューを閉じる
     keyboard_comment_desc: アクティブな提出物にコメント
-    keyboard_menu_desc: アクティブコラムの課題のメニューを開く
+    keyboard_menu_desc: アクティブな列のメニューを開く
     keyboard_sort_desc: 現在アクティブな列でグリッドを並べ替え
     keyboard_tooltip_desc: アクティブな提出物の提出物タイプの表示
     keycodes: 
@@ -9245,6 +9271,12 @@ ja:
   last_used_f9457313: 最後に使用された：
   last_user_access_title: "最終ユーザ アクセス"
   late_2be42b88: 遅れる
+  late_8bd684b6: 遅延
+  late_bd436902: 遅延
+  late_penalty_817fff4e: 遅延ペナルティ：
+  late_penalty_9c312b22: 遅延ペナルティ：
+  late_penalty_pointsdeducted_7033a095: "遅延ペナルティ：%{pointsDeducted}"
+  late_penalty_pointsdeducted_dac023ff: "遅延ペナルティ：*%{pointsDeducted}*"
   late_percent_b91d01b3: "遅延: %{percent}"
   late_policies_42bac80: 遅延ポリシー
   late_policies_fd5dced6: 遅延ポリシー
@@ -9348,6 +9380,7 @@ ja:
         quizzes: クイズ
         rubrics: 注釈
         syllabus_body: 要綱本文
+        tool_profiles: ツールプロファイル
         wikis: "Wiki ページ"
     cc: 
       standard: 
@@ -9458,9 +9491,11 @@ ja:
     other: "コース読み込み完了%{count} コースが見つかりました"
   loading_courses_started_6e6d742c: コース読み込み開始
   loading_data_ecd89ba: データをロード中..
+  loading_graders_f6a76142: 採点者の読み込み
   loading_mastery_paths_c558a766: 熟達の過程の読み込み中...
   loading_more_results_def6df65: より多くの結果を読み込んでいます...
   loading_results_spinner_73ef739c: 結果をスピナーに読み込む
+  loading_students_30b71301: 受講生を読み込む
   loading_sync_history_9f342cbf: 同期履歴の読み込み
   loading_unsynced_changes_b5d7b202: 同期されていない変更を読み込み中
   loading_unsynched_changes_688434f2: 同期されていない変更の読み込み
@@ -9490,6 +9525,7 @@ ja:
   log_on_url_fc166e4c: "ログオンの URL"
   log_out_379ba28a: ログアウト
   log_out_url_2605c2c1: "ログアウトの URL"
+  logged_out_724b3717: ログアウト
   logged_out_user: "ログアウトしたユーザ %{user_counter}"
   login: 
     canvas: 
@@ -9546,6 +9582,8 @@ ja:
       details: 
         log_out: "Canvas からログアウトしてもよろしいですか?"
       log_out: ログアウト
+      page_title: ログアウト
+    logout_landing: 
       page_title: ログアウト
     otp: 
       errors: 
@@ -11517,6 +11555,9 @@ ja:
         subject: "ウェブ会議の録音準備ができました: %{name}"
       twitter: 
         tweet: "Canvas アラート - 録音の準備ができました: %{title}, %{name}"
+  messages_deleted_8f781481: 
+    one: メッセージが削除されました！
+    other: メッセージが削除されました！
   mexico_52_60d635c7: "メキシコ (+52)"
   mexico_b2d7a271: メキシコ
   mgp_grade_export_d29b471f: "MGP 成績のエクスポート"
@@ -11543,6 +11584,7 @@ ja:
     webct: 
       course_not_found: "Blackboard コースが見つかりませんでした。"
     wiki_page_type: "Wiki ページ"
+  migration_in_progress_6f0ed4f9: 移行中
   migration_issues: 
     errors: 
       valid_workflow_state: 有効なワークフロー状態を送信する必要があります
@@ -11554,6 +11596,8 @@ ja:
   minutes_4aee5a41: 分
   minutes_per_slot_5b7169e5: スロットあたりの分
   missing_1a256b3b: 欠落
+  missing_d59852a7: 欠如
+  missing_eaddacbd: 欠如
   missing_percent_94534638: "欠落: %{percent}"
   missing_policies_4f195e0b: 不在のポリシー
   missing_required_values_missing_values_f3be2ff8: "必須の値が不足しています：%{missing_values}"
@@ -11970,6 +12014,7 @@ ja:
   no_grade_assigned_90e531f5: 採点が割り当てられていません。
   no_grade_for_assignment_97c9bc75: "成績がありません%{assignment}"
   no_graded_submissions_e40c957a: 採点済みの提出物なし
+  no_graders_with_that_name_found_d8204d90: その名前の採点者は見つかりませんでした
   no_grading_periods_configured_for_this_term_ca22393e: この期間に設定された採点期間はありません
   no_grading_periods_set_up_a20a8819: 採点期間が設定されていません
   no_grading_schemes_to_display_8b0e92e7: 表示する採点スキームがありません
@@ -11989,6 +12034,7 @@ ja:
   no_students_dd8de9f0: 受講生なし
   no_students_have_taken_the_quiz_yet_e667644b: "受講生がまだ 1 人もこのクイズに回答していません"
   no_students_have_taken_the_survey_yet_d378cd35: "受講生がまだ 1 人もこのサーベイに回答していません"
+  no_students_with_that_name_found_f6004da2: その名前の受講生は見つかりませんでした
   no_submission_for_assignment_a9cb6fe2: "～の提出なし%{assignment}"
   no_tls_618add1a: "TLS なし"
   no_unassigned_terms_deb7b76b: 割り当てられていない期間はありません
@@ -12690,6 +12736,7 @@ ja:
     errors: 
       delete_reminder_failed: 削除に失敗しました
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: 相互評価は、管理された課題に対して有効化することはできません
+  penalty_adjusted_707df573: "*%{penalty}* **%{adjusted}**"
   pending_3e506a5b: 未定
   pending_message_2d9a8796: "未定：%{message}"
   people_b4ebb13c: メンバー
@@ -13185,6 +13232,7 @@ ja:
   points_out_of_total_24f61148: "*%{points}* 中**%{total}**"
   points_points_b6b422e2: "ポイント: %{points}点"
   points_possible_1c0b3445: 配点
+  points_possible_44cb4190: "/%{points_possible}"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "選択された採点タイプでは、配点は 0 以上である必要があります"
   points_possible_points_fda3b111: "%{points_possible} ポイント"
   points_pts_e5596bf7: "%{points} 点"
@@ -13748,7 +13796,7 @@ ja:
       labels: 
         title: バンク名
       page_title: 問題バンク
-      see_bookmarked_banks: "マイ ブックマークに登録したバンクを見る"
+      see_bookmarked_banks: ブックマークされたバンクの表示
       user_question_banks: ユーザの問題バンク
     question_bank: 
       bookmark_bank: この問題バンクにブックマークを付ける
@@ -15279,6 +15327,7 @@ ja:
   reviewer_b993ce28: 評価者
   reviewers_successfully_added_bd4b629a: レビューは正常に追加されました!
   rich_content_editor_2708ef21: "リッチ コンテンツ エディタ"
+  rich_content_editor_sidebar_enhancements_8bd945d3: リッチコンテンツエディタのサイドバーの機能拡張
   right_sidebar_logo_5483dc0a: 右のサイドバーロゴ
   role: 
     duplicate_role: 同じ名前の役割が既に存在しています
@@ -15414,6 +15463,7 @@ ja:
     course_files: "コース ファイル"
     group_files: "グループ ファイル"
     my_files: "マイ ファイル"
+  root_account_3fb3aacf: root_account
   root_accounts_cc035dcf: "ルート アカウント"
   roster: 
     delete_confirm: このユーザを削除してもよろしいですか?
@@ -15483,6 +15533,7 @@ ja:
         are_you_sure_delete: この注釈を削除してもよろしいですか?注釈を削除しても、現在この注釈を使用している場所からは注釈にアクセスできますが、ほかの人はこの注釈を使用できなくなります。
         are_you_sure_remove: この注釈をリストから削除してもよろしいですか?
       remove_rubric: "この注釈をマイ リストから削除"
+  russia_7_87bc99d5: ロシア（+7）
   salesforce_account_id_eb5c78ad: "Salesforce アカウント ID"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: セールスフォースには、制作アカウントより、サンドボックスアカウント用の異なるログインホストがあるので、セールスフォースアカウントを使用していて、このボックスをチェックしない場合は、認証されません。(そして、これは逆の場合でも起こります。制作アカウントを所持していて、このボックスをチェックする場合は、認証されません。)
   salesforce_ticketing_webtocase_connector_80f75716: "セールスフォース・チケット WebToCase コネクタ"
@@ -17476,6 +17527,7 @@ ja:
   there_was_an_error_uploading_the_image_932fc4ce: 画像のアップロード中にエラーが発生しました
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "あなたのクエリーにエラーが発生しました; 違う検索でやり直してください"
   there_was_an_unexpected_problem_with_the_sync_be079a67: 同期に予期しない問題が発生しました
+  there_was_an_unknown_error_registering_the_tool_b9a29954: ツール登録中に不明なエラーが発生しました
   there_were_errors_with_the_form_errors_ab5b559a: "フォームにエラーがあります: %{errors}"
   there_were_several_possible_matches_with_the_impor_ad58bcd0: エクスポートにはいくつかの可能なマッチがあります。以下で解決してください。
   these_backup_codes_can_be_used_if_your_multi_facto_ca30a3df: これらのバックアップコードは、マルチファクター認証デバイスが使用できない場合に使用できます。それらを印刷して、ウォレットのような安全な場所に保管してください。
@@ -17889,6 +17941,7 @@ ja:
     originality_report_visible_immediately: ただちに
   turnitin_similarity_score_more_information_e2571be8: "Turnitin の類似性スコア -- 詳細情報"
   twitter_fcef6b54: Twitter
+  type_a_few_letters_to_start_searching_3334657b: いくつか文字を入力して検索を開始する
   type_c8106334: タイプ
   type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: "'%{type}'は有効な画像形式ではありません(jpg、 png、またはgifをお試しください)"
   type_of_change_1cb24a0e: 変更の種類
@@ -18042,6 +18095,7 @@ ja:
   use_mathman_to_convert_latex_to_svg_3f61c9b: "MathMan を使用して、LaTeX から SVG に変換しますか？"
   use_new_folder_tree_in_files_bc0ea09f: ファイル中の新しいフォルダツリーを使う
   use_new_folder_tree_in_files_eb5a451b: ファイル中の新しいフォルダツリーを使う
+  use_new_rich_content_editor_with_enhanced_sidebar__8e0bfedd: 拡張されたサイドバーで新しいリッチコンテンツエディタをどこでも使用する
   use_remote_service_for_notifications_9fe667c6: 通知にリモートサービスを使用する
   use_remote_version_of_rich_content_editor_52f7fc4b: "リモートバージョンのリッチ コンテンツ エディタを使用する"
   use_remote_version_of_rich_content_editor_and_side_a058a664: "リモートバージョンのリッチ コンテンツ エディタとサイドバーを使用する"
@@ -18805,6 +18859,7 @@ ja:
   you_are_currently_masquerading_as_user_name_f4a00ade: "現在、%{user_name} としてマスカレードしています"
   you_are_here_54075d8c: "あなたの現在地:"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "%{institution2} からの資格情報を使用して %{institution1} にログインしています"
+  you_are_logged_out_of_canvas_8b5fc59a: Canvasからログアウトしています。
   you_are_not_authorized_to_disable_the_sync_to_name_d283c3e0: "あなたは %{name} へ同期化するオプションを無効にする権限がありません。"
   you_are_not_authorized_to_disable_the_sync_to_sisn_54aebeb0: "あなたは %{sisName} へ同期化するオプションを無効にする権限がありません。"
   you_are_not_enrolled_in_any_courses_a5c63286: どのコースにも登録していません。

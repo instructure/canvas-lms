@@ -37,10 +37,6 @@ describe "assignments" do
       @course.require_assignment_group
     end
 
-    after(:each) do
-      unstub_rcs_config
-    end
-
     context "save and publish button" do
 
       def create_assignment(publish = true, params = {name: "Test Assignment"})
@@ -287,10 +283,6 @@ describe "assignments" do
       stub_rcs_config
     end
 
-    after do
-      unstub_rcs_config
-    end
-
     it "should default to post grades if account setting is enabled", priority: "2", test_id: 498879 do
       @account.settings[:sis_default_grade_export] = {:locked => false, :value => true}
       @account.save!
@@ -317,10 +309,6 @@ describe "assignments" do
 
       # type something in here so you can check to make sure it was not added
       fj('div.controls > input:visible').send_keys(@new_group)
-    end
-
-    after do
-      unstub_rcs_config
     end
 
     it "should add a new assignment group", priority: "1", test_id:525190 do

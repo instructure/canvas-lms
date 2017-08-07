@@ -97,7 +97,11 @@ import './rubric_assessment' /*global rubricAssessment*/
     return I18n.n(round(value, round.DEFAULT));
   }
   function showGrade (submission) {
-    $('.grading_box').val(callIfSet(submission.entered_grade, GradeFormatHelper.formatGrade));
+    if (['pass', 'fail', 'complete', 'incomplete'].indexOf(submission.entered_grade) > -1) {
+      $('.grading_box').val(submission.entered_grade);
+    } else {
+      $('.grading_box').val(callIfSet(submission.entered_grade, GradeFormatHelper.formatGrade));
+    }
     $('.late_penalty').text(callIfSet(-submission.points_deducted, roundAndFormat));
     $('.published_grade').text(callIfSet(submission.published_grade, GradeFormatHelper.formatGrade));
     $('.grade').text(callIfSet(submission.grade, GradeFormatHelper.formatGrade));

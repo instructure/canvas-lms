@@ -75,7 +75,7 @@ describe 'Theme Editor' do
   it 'should close after preview (no changes saved)', priority: "1", test_id: 239984 do
     # since npm modules arent installed in worker nodes this needs to get installed to not fail on
     # those nodes
-    BrandConfig.any_instance.stubs(:compile_css!).returns(true)
+    allow_any_instance_of(BrandConfig).to receive(:compile_css!).and_return(true)
     open_theme_editor(Account.default.id)
 
     # verifies theme editor is open

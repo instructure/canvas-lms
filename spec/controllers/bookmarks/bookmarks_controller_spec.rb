@@ -42,13 +42,13 @@ describe Bookmarks::BookmarksController do
 
     describe "GET 'show'" do
       it "should succeed" do
-        get 'show', id: bookmark.id, format: 'json'
+        get 'show', params: {id: bookmark.id}, format: 'json'
         expect(response).to be_success
       end
 
       it "includes data" do
         bookmark.update_attributes(data: {foo: "bar"})
-        get 'show', id: bookmark.id, format: 'json'
+        get 'show', params: {id: bookmark.id}, format: 'json'
         json = json_parse
         expect(json["data"]["foo"]).to eq("bar")
       end
@@ -56,59 +56,59 @@ describe Bookmarks::BookmarksController do
       it "restricts to own bookmarks" do
         u2 = user_factory
         bookmark2 = Bookmarks::Bookmark.create(user_id: u2.id, name: 'bio 101', url: '/courses/1')
-        get 'show', id: bookmark2.id, format: 'json'
+        get 'show', params: {id: bookmark2.id}, format: 'json'
         expect(response).to_not be_success
       end
     end
 
     describe "POST 'create'" do
-      let(:params) { { name: 'chem 101', url: '/courses/2', format: 'json' } }
+      let(:params) { { name: 'chem 101', url: '/courses/2'} }
 
       it "should succeed" do
-        post 'create', params
+        post 'create', params: params, format: 'json'
         expect(response).to be_success
       end
 
       it "should create a bookmark" do
-        expect { post 'create', params }.to change { Bookmarks::Bookmark.count }.by(1)
+        expect { post 'create', params: params, format: 'json' }.to change { Bookmarks::Bookmark.count }.by(1)
       end
 
       it "should set user" do
-        post 'create', params
+        post 'create', params: params, format: 'json'
         expect(Bookmarks::Bookmark.order(:id).last.user_id).to eq(u.id)
       end
 
       it "should set data" do
-        post 'create', params.merge(data: {foo: "bar"})
+        post 'create', params: params.merge(data: {foo: "bar"}), format: 'json'
         expect(Bookmarks::Bookmark.order(:id).last.data["foo"]).to eq("bar")
       end
 
       it "should append by default" do
-        post 'create', params
+        post 'create', params: params, format: 'json'
         expect(Bookmarks::Bookmark.order(:id).last).to be_last
       end
 
       it "should set position" do
-        post 'create', params.merge(position: 1)
+        post 'create', params: params.merge(position: 1), format: 'json'
         expect(Bookmarks::Bookmark.order(:id).last).to_not be_last
       end
 
       it "should handle position strings" do
-        post 'create', params.merge(position: "1")
+        post 'create', params: params.merge(position: "1"), format: 'json'
         expect(Bookmarks::Bookmark.order(:id).last).to_not be_last
       end
     end
 
     describe "PUT 'update'" do
       it "should succeed" do
-        put 'update', id: bookmark.id, format: 'json'
+        put 'update', params: {id: bookmark.id}, format: 'json'
         expect(response).to be_success
       end
     end
 
     describe "DELETE 'delete'" do
       it "should succeed" do
-        delete 'destroy', id: bookmark.id, format: 'json'
+        delete 'destroy', params: {id: bookmark.id}, format: 'json'
         expect(response).to be_success
       end
     end

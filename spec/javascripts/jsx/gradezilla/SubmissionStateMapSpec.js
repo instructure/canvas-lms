@@ -81,3 +81,36 @@ test('the submission object is not missing, if the assignment is not late ' +
   const submission = map.getSubmission(student.id, assignment.id);
   strictEqual(submission.missing, false);
 });
+
+test('the submission object has seconds_late set to zero', function () {
+  const assignment = {
+    id: '1',
+    published: true,
+    effectiveDueDates: { 1: { due_at: new Date() } }
+  };
+  const map = createAndSetupMap(assignment);
+  const submission = map.getSubmission(student.id, assignment.id);
+  strictEqual(submission.seconds_late, 0);
+});
+
+test('the submission object has late set to false', function () {
+  const assignment = {
+    id: '1',
+    published: true,
+    effectiveDueDates: { 1: { due_at: new Date() } }
+  };
+  const map = createAndSetupMap(assignment);
+  const submission = map.getSubmission(student.id, assignment.id);
+  strictEqual(submission.late, false);
+});
+
+test('the submission object has excused set to false', function () {
+  const assignment = {
+    id: '1',
+    published: true,
+    effectiveDueDates: { 1: { due_at: new Date() } }
+  };
+  const map = createAndSetupMap(assignment);
+  const submission = map.getSubmission(student.id, assignment.id);
+  strictEqual(submission.excused, false);
+});

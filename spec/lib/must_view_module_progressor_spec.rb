@@ -93,7 +93,7 @@ describe "MustViewModuleProgressor" do
     # needed to get updated info as progress is made
     it "calls evaluate_for on modules" do
       @course.context_modules.create!(name: 'some module')
-      ContextModule.any_instance.expects(:evaluate_for)
+      expect_any_instance_of(ContextModule).to receive(:evaluate_for)
       progressor = MustViewModuleProgressor.new(@student, @course)
       progressor.make_progress
     end
@@ -306,7 +306,7 @@ describe "MustViewModuleProgressor" do
     end
 
     it "triggers completion events" do
-      ContextModuleProgression.any_instance.expects(:trigger_completion_events)
+      expect_any_instance_of(ContextModuleProgression).to receive(:trigger_completion_events)
       module_with_item(:page)
       progressor = MustViewModuleProgressor.new(@student, @course)
       progressor.make_progress

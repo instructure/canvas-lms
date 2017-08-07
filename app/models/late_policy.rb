@@ -31,8 +31,9 @@ class LatePolicy < ActiveRecord::Base
 
   after_save :update_late_submissions, if: :late_policy_attributes_changed?
 
-  def points_deducted(score: nil, possible: 0.0, late_for: 0.0)
+  def points_deducted(score: nil, possible: 0.0, late_for: 0.0, grading_type: nil)
     return 0.0 unless late_submission_deduction_enabled && score && possible&.positive? && late_for&.positive?
+    return 0.0 unless Assignment::POINTED_GRADING_TYPES.include?(grading_type)
 
     intervals_late = (late_for / interval_seconds).ceil
     minimum_percent = late_submission_minimum_percent_enabled ? late_submission_minimum_percent : 0.0

@@ -45,9 +45,9 @@ describe PlannerOverridesController do
       get :index
       assert_unauthorized
 
-      post :create, :plannable_type => "assignment",
+      post :create, params: {:plannable_type => "assignment",
                      :plannable_id => @assignment.id,
-                     :marked_complete => false
+                     :marked_complete => false}
       assert_unauthorized
     end
   end
@@ -139,7 +139,7 @@ describe PlannerOverridesController do
           end
 
           it "should include objects from concluded courses if specified" do
-            get :items_index, include: %w{concluded}
+            get :items_index, params: {include: %w{concluded}}
             response_json = json_parse(response.body)
             expect(response_json.map { |i| i["plannable"]["id"] }).to be_include(@a2.id)
           end
@@ -169,7 +169,7 @@ describe PlannerOverridesController do
           end
 
           it "should only return data from favorite courses if specified" do
-            get :items_index, include: %w{only_favorites}
+            get :items_index, params: {include: %w{only_favorites}}
             response_json = json_parse(response.body)
             expect(response_json.map { |i| i["plannable"]["id"] }).not_to be_include(@a2.id)
           end
@@ -192,15 +192,15 @@ describe PlannerOverridesController do
             expect(response_json.length).to eq 5
             expect(response_json.map { |i| i["plannable_id"] }).to eq [@assignment3.id, @page.id, @assignment5.id, @assignment.id, @assignment2.id]
 
-            get :items_index, :per_page => 2
+            get :items_index, params: {:per_page => 2}
             expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment3.id, @page.id]
 
             next_page = Api.parse_pagination_links(response.headers['Link']).detect{|p| p[:rel] == "next"}['page']
-            get :items_index, :per_page => 2, :page => next_page
+            get :items_index, params: {:per_page => 2, :page => next_page}
             expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment5.id, @assignment.id]
 
             next_page = Api.parse_pagination_links(response.headers['Link']).detect{|p| p[:rel] == "next"}['page']
-            get :items_index, :per_page => 2, :page => next_page
+            get :items_index, params: {:per_page => 2, :page => next_page}
             expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment2.id]
           end
 
@@ -216,11 +216,11 @@ describe PlannerOverridesController do
             response_json = json_parse(response.body)
             original_order = response_json.map { |i| [i["plannable_type"], i["plannable_id"]] }
 
-            get :items_index, :per_page => 3
+            get :items_index, params: {:per_page => 3}
             expect(json_parse(response.body).map { |i| [i["plannable_type"], i["plannable_id"]] }).to eq original_order[0..2]
 
             next_page = Api.parse_pagination_links(response.headers['Link']).detect{|p| p[:rel] == "next"}['page']
-            get :items_index, :per_page => 3, :page => next_page
+            get :items_index, params: {:per_page => 3, :page => next_page}
             expect(json_parse(response.body).map { |i| [i["plannable_type"], i["plannable_id"]] }).to eq original_order[3..4]
           end
 
@@ -230,11 +230,11 @@ describe PlannerOverridesController do
             @assignment.update_attribute(:due_at, time)
             @assignment2.update_attribute(:due_at, time)
 
-            get :items_index, :per_page => 1
+            get :items_index, params: {:per_page => 1}
             expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment.id]
 
             next_page = Api.parse_pagination_links(response.headers['Link']).detect{|p| p[:rel] == "next"}['page']
-            get :items_index, :per_page => 1, :page => next_page
+            get :items_index, params: {:per_page => 1, :page => next_page}
             expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment2.id]
           end
 
@@ -245,16 +245,16 @@ describe PlannerOverridesController do
             @assignment3 = course_assignment
             @assignment3.due_at = 1.week.ago
             @assignment3.save!
-            get :items_index, :order => :desc
+            get :items_index, params: {:order => :desc}
             response_json = json_parse(response.body)
             expect(response_json.length).to eq 4
             expect(response_json.map { |i| i["plannable_id"] }).to eq [@assignment2.id, @assignment.id, @page.id, @assignment3.id]
 
-            get :items_index, :order => :desc, :per_page => 2
+            get :items_index, params: {:order => :desc, :per_page => 2}
             expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment2.id, @assignment.id]
 
             next_page = Api.parse_pagination_links(response.headers['Link']).detect{|p| p[:rel] == "next"}['page']
-            get :items_index, :order => :desc, :per_page => 2, :page => next_page
+            get :items_index, params: {:order => :desc, :per_page => 2, :page => next_page}
             expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@page.id, @assignment3.id]
           end
 
@@ -284,7 +284,7 @@ describe PlannerOverridesController do
             @assignment3.grade_student @student, grade: 10, grader: @teacher
             @assignment.grade_student @student, grade: 10, grader: @teacher
 
-            get :items_index, filter: "new_activity"
+            get :items_index, params: {filter: "new_activity"}
             response_json = json_parse(response.body)
             expect(response_json.length).to eq 3
             expect(response_json.map { |i| i["plannable_id"] }).to eq [@assignment3.id, dt.id, @assignment.id]
@@ -318,7 +318,7 @@ describe PlannerOverridesController do
             opts = { per_page: PER_PAGE }
             opts.merge(page: bookmark) if bookmark.present?
 
-            page =  get :items_index, opts
+            page =  get :items_index, params: opts
             links = Api.parse_pagination_links(page.headers['Link'])
             response_json = json_parse(page.body)
             expect(response_json.length).to eq PER_PAGE
@@ -341,7 +341,7 @@ describe PlannerOverridesController do
           end
 
           it "should adhere to per_page" do
-            get :items_index, per_page: 2
+            get :items_index, params: {per_page: 2}
             response_json = json_parse(response.body)
             expect(response_json.length).to eq 2
             expect(response_json.map { |i| i["plannable_id"] }).to eq [@assignments[0].id, @assignments[1].id]
@@ -361,7 +361,7 @@ describe PlannerOverridesController do
           it "should return newly created & unseen items" do
             dt = @course.discussion_topics.create!(title: "Yes", message: "Please", user: @teacher, todo_date: Time.zone.now)
             dt.change_all_read_state("unread", @student)
-            get :items_index, filter: "new_activity"
+            get :items_index, params: {filter: "new_activity"}
             response_json = json_parse(response.body)
             expect(response_json.length).to eq 1
             expect(response_json.map { |i| i["plannable"]["id"].to_s }).to be_include(dt.id.to_s)
@@ -369,7 +369,7 @@ describe PlannerOverridesController do
 
           it "should return newly graded items" do
             @assignment.grade_student @student, grade: 10, grader: @teacher
-            get :items_index, filter: "new_activity"
+            get :items_index, params: {filter: "new_activity"}
             response_json = json_parse(response.body)
             expect(response_json.length).to eq 1
             expect(response_json.first["plannable"]["id"]).to eq @assignment.id
@@ -378,7 +378,7 @@ describe PlannerOverridesController do
           it "should return items with new submission comments" do
             @sub = @assignment2.submit_homework(@student)
             @sub.submission_comments.create!(comment: "hello", author: @teacher)
-            get :items_index, filter: "new_activity"
+            get :items_index, params: {filter: "new_activity"}
             response_json = json_parse(response.body)
             expect(response_json.length).to eq 1
             expect(response_json.first["plannable"]["id"]).to eq @assignment2.id
@@ -389,7 +389,7 @@ describe PlannerOverridesController do
             @assignment5 = @course.assignments.create!(:submission_types => "online_text_entry", :due_at => 4.weeks.ago)
             @assignment4.submit_homework(@student, :submission_type => "online_text_entry")
             @assignment5.submit_homework(@student, :submission_type => "online_text_entry")
-            get :items_index, :start_date => 5.weeks.ago.to_date.to_s, :end_date => 5.weeks.from_now.to_date.to_s
+            get :items_index, params: {:start_date => 5.weeks.ago.to_date.to_s, :end_date => 5.weeks.from_now.to_date.to_s}
             response_json = json_parse(response.body)
             found_assignment_4 = false
             found_assignment_5 = false
@@ -418,7 +418,7 @@ describe PlannerOverridesController do
             other_sub.submission_comments.create!(comment: "hellooo", author: @teacher)
             ContentParticipation.delete_all
 
-            get :items_index, filter: "new_activity"
+            get :items_index, params: {filter: "new_activity"}
             response_json = json_parse(response.body)
             expect(response_json).to be_empty
           end
@@ -427,7 +427,7 @@ describe PlannerOverridesController do
             it "should not return items before the specified start_date" do
               dt = @course.discussion_topics.create!(title: "Yes", message: "Please", user: @teacher, todo_date: 1.week.ago)
               dt.change_all_read_state("unread", @student)
-              get :items_index, filter: "new_activity", start_date: 1.week.from_now.to_date.to_s
+              get :items_index, params: {filter: "new_activity", start_date: 1.week.from_now.to_date.to_s}
               response_json = json_parse(response.body)
               expect(response_json.length).to eq 0
             end
@@ -435,7 +435,7 @@ describe PlannerOverridesController do
             it "should not return items after the specified end_date" do
               dt = @course.discussion_topics.create!(title: "Yes", message: "Please", user: @teacher, todo_date: 1.week.from_now)
               dt.change_all_read_state("unread", @student)
-              get :items_index, filter: "new_activity", end_date: 1.week.ago.to_date.to_s
+              get :items_index, params: {filter: "new_activity", end_date: 1.week.ago.to_date.to_s}
               response_json = json_parse(response.body)
               expect(response_json.length).to eq 0
             end
@@ -443,9 +443,9 @@ describe PlannerOverridesController do
             it "should return items within the start_date and end_date" do
               dt = @course.discussion_topics.create!(title: "Yes", message: "Please", user: @student, todo_date: Time.zone.now)
               dt.change_all_read_state("unread", @student)
-              get :items_index, filter: "new_activity",
+              get :items_index, params: {filter: "new_activity",
                                 start_date: 1.week.ago.to_date.to_s,
-                                end_date: 1.week.from_now.to_date.to_s
+                                end_date: 1.week.from_now.to_date.to_s}
               response_json = json_parse(response.body)
               expect(response_json.length).to eq 1
               expect(response_json.map { |i| i["plannable_id"] }).to be_include dt.id
@@ -460,7 +460,7 @@ describe PlannerOverridesController do
             end
 
             it "should return new discussion topics" do
-              get :items_index, filter: "new_activity"
+              get :items_index, params: {filter: "new_activity"}
               response_json = json_parse(response.body)
               expect(response_json.length).to eq 1
               expect(response_json.first["plannable"]["id"]).to eq @topic.id
@@ -468,7 +468,7 @@ describe PlannerOverridesController do
 
             it "should not return read discussion topics" do
               @topic.change_read_state("read", @student)
-              get :items_index, filter: "new_activity"
+              get :items_index, params: {filter: "new_activity"}
               response_json = json_parse(response.body)
               expect(response_json.length).to eq 0
             end
@@ -481,10 +481,21 @@ describe PlannerOverridesController do
               expect(@topic.unread?(@student)).to eq true
               expect(@topic.unread_count(@student)).to eq 1
 
-              get :items_index, filter: "new_activity"
+              get :items_index, params: {filter: "new_activity"}
               response_json = json_parse(response.body)
               expect(response_json.length).to eq 1
               expect(response_json.first["plannable"]["id"]).to eq @topic.id
+
+              @reply.change_read_state('read', @student)
+              @topic.change_read_state('read', @student)
+
+              get :items_index, params: {filter: "new_activity"}
+              expect(json_parse(response.body)).to be_empty
+
+              @reply2 = @entry.reply_from(:user => @teacher, :text => "ohai again...")
+
+              get :items_index, params: {filter: "new_activity"}
+              expect(json_parse(response.body).length).to eq 1
             end
           end
         end
@@ -499,7 +510,7 @@ describe PlannerOverridesController do
 
       describe "GET #show" do
         it "returns http success" do
-          get :show, id: @planner_override.id
+          get :show, params: {id: @planner_override.id}
           expect(response).to have_http_status(:success)
         end
       end
@@ -507,7 +518,7 @@ describe PlannerOverridesController do
       describe "PUT #update" do
         it "returns http success" do
           expect(@planner_override.marked_complete).to be_falsey
-          put :update, id: @planner_override.id, marked_complete: true, dismissed: true
+          put :update, params: {id: @planner_override.id, marked_complete: true, dismissed: true}
           expect(response).to have_http_status(:success)
           expect(@planner_override.reload.marked_complete).to be_truthy
           expect(@planner_override.dismissed).to be_truthy
@@ -516,14 +527,14 @@ describe PlannerOverridesController do
 
       describe "POST #create" do
         it "returns http success" do
-          post :create, plannable_type: "assignment", plannable_id: @assignment2.id, marked_complete: true
+          post :create, params: {plannable_type: "assignment", plannable_id: @assignment2.id, marked_complete: true}
           expect(response).to have_http_status(:created)
           expect(PlannerOverride.where(user_id: @student.id).count).to be 2
         end
 
         it "should save announcement overrides with a plannable_type of discussion_topic" do
           announcement_model(context: @course)
-          post :create, plannable_type: 'announcement', plannable_id: @a.id, user_id: @student.id, marked_complete: true
+          post :create, params: {plannable_type: 'announcement', plannable_id: @a.id, user_id: @student.id, marked_complete: true}
           json = json_parse(response.body)
           expect(json["plannable_type"]).to eq 'discussion_topic'
         end
@@ -531,7 +542,7 @@ describe PlannerOverridesController do
 
       describe "DELETE #destroy" do
         it "returns http success" do
-          delete :destroy, id: @planner_override.id
+          delete :destroy, params: {id: @planner_override.id}
           expect(response).to have_http_status(:success)
           expect(@planner_override.reload).to be_deleted
         end

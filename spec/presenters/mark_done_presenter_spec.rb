@@ -32,8 +32,8 @@ describe MarkDonePresenter do
   end
 
   def create_presenter(tag)
-    ctrl = stub('Controller', session: true)
-    context = stub('Context', "grants_any_right?" => true)
+    ctrl = double('Controller', session: true)
+    context = double('Context', "grants_any_right?" => true)
     MarkDonePresenter.new(ctrl, context, tag.id, @user, nil)
   end
 

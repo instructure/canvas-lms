@@ -47,13 +47,13 @@ describe SubmissionList do
     @assignment3 = @course.assignments.create!(:title => 'three', :points_possible => 10)
 
     Time.zone = 'Alaska'
-    Time.stubs(:now).returns(Time.utc(2011, 12, 31, 23, 0))   # 12/31 14:00 local time
+    allow(Time).to receive(:now).and_return(Time.utc(2011, 12, 31, 23, 0)).ordered   # 12/31 14:00 local time
     @assignment1.grade_student(@student, {:grade => 10, :grader => @teacher})
-    Time.stubs(:now).returns(Time.utc(2012, 1, 1, 1, 0))      # 12/31 16:00 local time
+    allow(Time).to receive(:now).and_return(Time.utc(2012, 1, 1, 1, 0)).ordered      # 12/31 16:00 local time
     @assignment2.grade_student(@student, {:grade => 10, :grader => @teacher})
-    Time.stubs(:now).returns(Time.utc(2012, 1, 1, 10, 0))     #  1/01 01:00 local time
+    allow(Time).to receive(:now).and_return(Time.utc(2012, 1, 1, 10, 0)).ordered     #  1/01 01:00 local time
     @assignment3.grade_student(@student, {:grade => 10, :grader => @teacher})
-    Time.unstub(:now)
+    allow(Time).to receive(:now).and_call_original.ordered
 
     @days = SubmissionList.new(@course).days
     expect(@days.size).to eq 2
@@ -190,12 +190,12 @@ describe SubmissionList do
 
       @points = 15.0
 
-      @question = stub(:id => 1, :question_data => {:id => 1,
+      @question = double(:id => 1, :question_data => {:id => 1,
           :regrade_option => 'full_credit',
           :points_possible => @points},
           :quiz_group => nil )
 
-      @question_regrade = stub(:quiz_question  => @question,
+      @question_regrade = double(:quiz_question  => @question,
         :regrade_option => "full_credit" )
 
       @answer = { :question_id => 1, :points => @points, :text => ""}

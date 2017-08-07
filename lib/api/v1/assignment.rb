@@ -639,19 +639,19 @@ module Api::V1::Assignment
   end
 
   def turnitin_settings_hash(assignment_params)
-    turnitin_settings = assignment_params.delete("turnitin_settings").slice(*API_ALLOWED_TURNITIN_SETTINGS)
+    turnitin_settings = assignment_params.delete("turnitin_settings").permit(*API_ALLOWED_TURNITIN_SETTINGS)
     turnitin_settings['exclude_type'] = case turnitin_settings['exclude_small_matches_type']
       when nil; '0'
       when 'words'; '1'
       when 'percent'; '2'
     end
     turnitin_settings['exclude_value'] = turnitin_settings['exclude_small_matches_value']
-    turnitin_settings.to_hash.with_indifferent_access
+    turnitin_settings.to_unsafe_h
   end
 
   def vericite_settings_hash(assignment_params)
-    vericite_settings = assignment_params.delete("vericite_settings").slice(*API_ALLOWED_VERICITE_SETTINGS)
-    vericite_settings.to_hash.with_indifferent_access
+    vericite_settings = assignment_params.delete("vericite_settings").permit(*API_ALLOWED_VERICITE_SETTINGS)
+    vericite_settings.to_unsafe_h
   end
 
   def submissions_hash(include_params, assignments, submissions_for_user=nil)
@@ -734,6 +734,7 @@ module Api::V1::Assignment
     return :forbidden unless grading_periods_allow_assignment_overrides_batch_create?(assignment, overrides)
 
     assignment.transaction do
+      assignment.validate_overrides_for_sis(overrides)
       assignment.save_without_broadcasting!
       batch_update_assignment_overrides(assignment, overrides, user)
     end
@@ -753,6 +754,7 @@ module Api::V1::Assignment
     return :forbidden unless grading_periods_allow_assignment_overrides_batch_update?(assignment, prepared_batch)
 
     assignment.transaction do
+      assignment.validate_overrides_for_sis(prepared_batch)
       assignment.save_without_broadcasting!
       perform_batch_update_assignment_overrides(assignment, prepared_batch)
     end

@@ -32,7 +32,7 @@ describe MasterCourses::ChildSubscription do
     it "should cache the result" do
       enable_cache do
         expect(check).to be_falsey
-        MasterCourses::ChildSubscription.expects(:where).never
+        expect(MasterCourses::ChildSubscription).to receive(:where).never
         expect(check).to be_falsey
         expect(MasterCourses::ChildSubscription.is_child_course?(@course.id)).to be_falsey # should work with ids too
       end

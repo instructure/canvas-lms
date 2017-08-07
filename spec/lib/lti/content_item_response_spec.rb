@@ -25,9 +25,9 @@ describe Lti::ContentItemResponse do
   let_once(:assign1) { context.assignments.create!(name: "A1") }
   let_once(:assign2) { context.assignments.create!(name: "A2") }
   let(:controller) do
-    controller_mock = mock('controller')
-    controller_mock.stubs(:api_v1_course_content_exports_url).returns('api_export_url')
-    controller_mock.stubs(:file_download_url).returns('file_download_url')
+    controller_mock = double('controller')
+    allow(controller_mock).to receive(:api_v1_course_content_exports_url).and_return('api_export_url')
+    allow(controller_mock).to receive(:file_download_url).and_return('file_download_url')
     controller_mock
   end
 

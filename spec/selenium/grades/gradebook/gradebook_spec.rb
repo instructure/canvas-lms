@@ -300,7 +300,7 @@ describe "gradebook" do
   end
 
   it "should not display a speedgrader link for large courses", priority: "2", test_id: 210099 do
-    Course.any_instance.stubs(:large_roster?).returns(true)
+    allow_any_instance_of(Course).to receive(:large_roster?).and_return(true)
 
     @gradebook_page.visit_gradebook(@course)
 

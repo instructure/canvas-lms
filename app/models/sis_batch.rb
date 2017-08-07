@@ -25,6 +25,7 @@ class SisBatch < ActiveRecord::Base
   serialize :processing_warnings, Array
   belongs_to :attachment
   belongs_to :errors_attachment, class_name: 'Attachment'
+  has_many :sis_batch_error_files
   belongs_to :generated_diff, class_name: 'Attachment'
   belongs_to :batch_mode_term, class_name: 'EnrollmentTerm'
   belongs_to :user
@@ -279,26 +280,38 @@ class SisBatch < ActiveRecord::Base
   end
 
   def finish(import_finished)
-    @data_file.close if @data_file
+    @data_file&.close
     @data_file = nil
     return self if workflow_state == 'aborted'
+    compile_all_errors
+    finalize_workflow_state(import_finished)
+    self.progress = 100
+    self.ended_at = Time.now.utc
+    self.save!
+  end
+
+  def finalize_workflow_state(import_finished)
     if import_finished
       remove_previous_imports if self.batch_mode?
+      return if workflow_state == 'aborted'
       self.workflow_state = :imported
       self.workflow_state = :imported_with_messages if messages?
     else
       self.workflow_state = :failed
       self.workflow_state = :failed_with_messages if messages?
     end
-    self.progress = 100
-    self.ended_at = Time.now.utc
-    self.save
+  end
+
+  def term_course_scope
+    if data[:supplied_batches].include?(:course)
+      scope = account.all_courses.active.where.not(sis_batch_id: nil, sis_source_id: nil)
+      scope.where(enrollment_term_id: self.batch_mode_term)
+    end
   end
 
   def non_batch_courses_scope
     if data[:supplied_batches].include?(:course)
-      scope = account.all_courses.active.where.not(sis_batch_id: nil, sis_source_id: nil).where.not(sis_batch_id: self)
-      scope.where(enrollment_term_id: self.batch_mode_term)
+      term_course_scope.where.not(sis_batch_id: self)
     end
   end
 
@@ -319,11 +332,17 @@ class SisBatch < ActiveRecord::Base
     current_row
   end
 
-  def non_batch_sections_scope
+  def term_sections_scope
     if data[:supplied_batches].include?(:section)
       scope = self.account.course_sections.active.where(courses: {enrollment_term_id: self.batch_mode_term})
-      scope = scope.where.not(sis_batch_id: nil, sis_source_id: nil).where.not(sis_batch_id: self)
+      scope = scope.where.not(sis_batch_id: nil, sis_source_id: nil)
       scope.joins("INNER JOIN #{Course.quoted_table_name} ON courses.id=COALESCE(nonxlist_course_id, course_id)").readonly(false)
+    end
+  end
+
+  def non_batch_sections_scope
+    if data[:supplied_batches].include?(:section)
+      term_sections_scope.where.not(sis_batch_id: self)
     end
   end
 
@@ -341,11 +360,17 @@ class SisBatch < ActiveRecord::Base
     current_row
   end
 
-  def non_batch_enrollments_scope
+  def term_enrollments_scope
     if data[:supplied_batches].include?(:enrollment)
       scope = self.account.enrollments.active.joins(:course).readonly(false)
       scope = scope.where.not(sis_batch_id: nil).where.not(sis_batch_id: self)
       scope.where(courses: {enrollment_term_id: self.batch_mode_term})
+    end
+  end
+
+  def non_batch_enrollments_scope
+    if data[:supplied_batches].include?(:enrollment)
+      term_enrollments_scope.where.not(sis_batch_id: self)
     end
   end
 
@@ -373,17 +398,47 @@ class SisBatch < ActiveRecord::Base
     sections = non_batch_sections_scope
     enrollments = non_batch_enrollments_scope
 
-    count += courses.count if courses
-    count += sections.count if sections
-    count += enrollments.count if enrollments
-
     begin
+      count = detect_changes(count, courses, enrollments, sections)
       row = remove_non_batch_courses(courses, count) if courses
       row = remove_non_batch_sections(sections, count, row) if sections
       remove_non_batch_enrollments(enrollments, count, row) if enrollments
     rescue SisBatch::Aborted
-      return self
+      return self.reload
     end
+  end
+
+  def detect_changes(count, courses, enrollments, sections)
+    all_count = 0
+
+    if courses
+      count += courses.count
+      all_count += term_course_scope.count
+    end
+
+    if sections
+      count += sections.count
+      all_count += term_sections_scope.count
+    end
+
+    if enrollments
+      count += enrollments.count
+      all_count += term_enrollments_scope.count
+    end
+
+    if change_threshold && count.to_f/all_count*100 > change_threshold
+      change_detected(count)
+    end
+    count
+  end
+
+  def change_detected(count)
+    abort_batch
+    processing_errors ||= []
+    processing_errors << [t("%{count} items would be deleted and exceeds the set threshold of %{change_threshold}%",
+                            count: count, change_threshold: change_threshold)]
+    SisBatch.where(id: self).update_all(processing_errors: processing_errors)
+    raise SisBatch::Aborted
   end
 
   def as_json(options={})
@@ -411,26 +466,36 @@ class SisBatch < ActiveRecord::Base
     data
   end
 
-  private
-
-  def messages?
-    (self.processing_errors && self.processing_errors.length > 0) || (self.processing_warnings && self.processing_warnings.length > 0)
-  end
-
   def self.max_messages
     Setting.get('sis_batch_max_messages', '50').to_i
   end
 
-  def write_warnings_and_errors_to_file
-    error_count = processing_errors&.size || 0
-    warning_count = processing_warnings&.size || 0
-    return unless error_count > 0 || warning_count > 0
-    temp = Tempfile.open([self.global_id.to_s + '_processing_warnings_and_errors', '.csv'])
-    file = temp.path
-    temp.close!
+  private
+
+  def messages?
+    self.errors_attachment_id?
+  end
+
+  def compile_all_errors
+    write_warnings_and_errors_to_file
+    all_errors = Set.new
+    return unless self.sis_batch_error_files.exists?
+    self.sis_batch_error_files.each do |errors|
+      CSV.foreach(errors.attachment.open) do |row|
+        next if row.first.start_with?('There were ')
+        all_errors << row
+      end
+    end
+    write_all_errors(all_errors)
+    cleanup_error_files
+  end
+
+  def write_all_errors(errors)
+    file = temp_error_file_path
     CSV.open(file, "w") do |csv|
-      processing_warnings.each {|row| csv << row}
-      processing_errors.each {|row| csv << row}
+      errors.to_a.each do |row|
+        csv << row
+      end
     end
     self.errors_attachment = SisBatch.create_data_attachment(
       self,
@@ -439,19 +504,55 @@ class SisBatch < ActiveRecord::Base
     )
   end
 
+  def cleanup_error_files
+    atts = Attachment.where(id: self.sis_batch_error_files.select(:attachment_id)).to_a
+    atts.each do |a|
+      a.make_childless
+      a.destroy_content unless a.root_attachment_id?
+    end
+    self.sis_batch_error_files.scope.delete_all
+    Attachment.where(id: atts).delete_all
+  end
+
+  def write_warnings_and_errors_to_file
+    error_count = processing_errors&.size || 0
+    warning_count = processing_warnings&.size || 0
+    return unless error_count > 0 || warning_count > 0
+    file = temp_error_file_path
+    CSV.open(file, "w") do |csv|
+      processing_warnings.each {|row| csv << row}
+      processing_errors.each {|row| csv << row}
+    end
+    self.sis_batch_error_files.create(
+      attachment: SisBatch.create_data_attachment(
+        self,
+        Rack::Test::UploadedFile.new(file, 'csv', true),
+        "errors_and_warnings.csv"
+      )
+    )
+  end
+
+  def temp_error_file_path
+    temp = Tempfile.open([self.global_id.to_s + '_processing_warnings_and_errors' + Time.zone.now.to_s, '.csv'])
+    file = temp.path
+    temp.close!
+    file
+  end
+
   def limit_size_of_messages
     max_messages = SisBatch.max_messages
     %w[processing_warnings processing_errors].each do |field|
-      write_warnings_and_errors_to_file unless self.errors_attachment
-      if self.send("#{field}_changed?") && (self.send(field).try(:size) || 0) > max_messages
-        limit_message = case field
-                        when "processing_warnings"
-                          t 'errors.too_many_warnings', "There were %{count} more warnings", count: (processing_warnings.size - max_messages + 1)
-                        when "processing_errors"
-                          t 'errors.too_many_errors', "There were %{count} more errors", count: (processing_errors.size - max_messages + 1)
-                        end
-        self.send("#{field}=", self.send(field)[0, max_messages-1] + [['', limit_message]])
-      end
+      write_warnings_and_errors_to_file unless messages?
+      next unless self.send("#{field}_changed?") && (self.send(field).try(:size) || 0) > max_messages
+      limit_message = case field
+                      when "processing_warnings"
+                        t 'errors.too_many_warnings', "There were %{count} more warnings",
+                          count: (processing_warnings.size - max_messages + 1)
+                      when "processing_errors"
+                        t 'errors.too_many_errors', "There were %{count} more errors",
+                          count: (processing_errors.size - max_messages + 1)
+                      end
+      self.send("#{field}=", self.send(field)[0, max_messages-1] + [['', limit_message]])
     end
     true
   end

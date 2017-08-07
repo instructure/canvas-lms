@@ -20,10 +20,10 @@ require 'spec_helper'
 
 describe GoogleDocsCollaboration do
   def stub_service
-    google_drive_connection = stub(retrieve_access_token: "asdf123", acl_add: nil, acl_remove: nil)
-    GoogleDrive::Connection.stubs(:new).returns(google_drive_connection)
-    file = stub(data: stub(id: 1, to_json: "{id: 1}", alternateLink: "http://google.com"))
-    google_drive_connection.stubs(:create_doc).with("title").returns(file)
+    google_drive_connection = double(retrieve_access_token: "asdf123", acl_add: nil, acl_remove: nil)
+    allow(GoogleDrive::Connection).to receive(:new).and_return(google_drive_connection)
+    file = double(data: double(id: 1, to_json: "{id: 1}", alternateLink: "http://google.com"))
+    allow(google_drive_connection).to receive(:create_doc).with("title").and_return(file)
   end
 
   describe "#initialize_document" do
@@ -33,7 +33,7 @@ describe GoogleDocsCollaboration do
       google_docs_collaboration.title = "title"
       google_docs_collaboration.user = user
       stub_service
-      Rails.cache.expects(:fetch).returns(["token", "secret"])
+      expect(Rails.cache).to receive(:fetch).and_return(["token", "secret"])
       google_docs_collaboration.initialize_document
     end
   end
@@ -52,7 +52,9 @@ describe GoogleDocsCollaboration do
                                      service_user_id: 'teh_student@gmail.com', token: 'bleh', secret: 'blah'
       @other_user.user_services.create! service: 'google_drive', service_domain: 'drive.google.com',
                                         service_user_id: 'distractor@gmail.com', token: 'bleh', secret: 'bleh'
+    end
 
+    before do
       stub_service
       @collaboration = GoogleDocsCollaboration.new(:title => 'title', :user => @teacher)
       @collaboration.context = @course

@@ -17,6 +17,9 @@
  */
 
 /*global jsonData*/
+import React from 'react'
+import ReactDOM from 'react-dom'
+import Alert from 'instructure-ui/lib/components/Alert'
 import MGP from 'jsx/speed_grader/gradingPeriod'
 import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper'
 import quizzesNextSpeedGrading from 'jsx/grading/quizzesNextSpeedGrading'
@@ -144,7 +147,7 @@ import './vendor/ui.selectmenu'
     groupLabel = I18n.t('group', 'Group'),
     gradeeLabel = studentLabel,
     utils,
-    crocodocSessionTimer,
+    sessionTimer,
     isAdmin = _.include(ENV.current_user_roles, 'admin'),
     showSubmissionOverride,
     EG;
@@ -1532,7 +1535,7 @@ import './vendor/ui.selectmenu'
       }
     },
     handleSubmissionSelectionChange: function(){
-      clearInterval(crocodocSessionTimer);
+      clearInterval(sessionTimer);
 
       function currentIndex (context, submissionToViewVal) {
         var result;
@@ -1596,12 +1599,15 @@ import './vendor/ui.selectmenu'
       $vericiteInfoContainer = $("#submission_files_container .turnitin_info_container").empty();
       $.each(submission.versioned_attachments || [], function(i,a){
         var attachment = a.attachment;
-        if (attachment.crocodoc_url && EG.currentStudent.provisional_crocodoc_urls) {
-          attachment.provisional_crocodoc_url = _.find(EG.currentStudent.provisional_crocodoc_urls, function(url) {
+        if ((attachment.crocodoc_url || attachment.canvadoc_url) && EG.currentStudent.provisional_crocodoc_urls) {
+          let urlInfo = _.find(EG.currentStudent.provisional_crocodoc_urls, function(url) {
             return url.attachment_id == attachment.id;
-          }).crocodoc_url;
+          })
+          attachment.provisional_crocodoc_url = urlInfo.crocodoc_url;
+          attachment.provisional_canvadoc_url = urlInfo.canvadoc_url;
         } else {
           attachment.provisional_crocodoc_url = null;
+          attachment.provisional_canvadoc_url = null;
         }
         if (attachment.crocodoc_url ||
             attachment.canvadoc_url ||
@@ -1857,7 +1863,7 @@ import './vendor/ui.selectmenu'
     },
 
     loadSubmissionPreview: function(attachment, submission) {
-      clearInterval(crocodocSessionTimer);
+      clearInterval(sessionTimer);
       $submissions_container.children().hide();
       $(".speedgrader_alert").hide();
       if (!this.currentStudent.submission || !this.currentStudent.submission.submission_type || this.currentStudent.submission.workflow_state == 'unsubmitted') {
@@ -1923,6 +1929,30 @@ import './vendor/ui.selectmenu'
       ).show();
     },
 
+    generateWarningTimings (numHours) {
+      const sessionLimit = numHours * 60 * 60 * 1000;
+      return [
+        sessionLimit - (10 * 60 * 1000),
+        sessionLimit - (5 * 60 * 1000),
+        sessionLimit - (2 * 60 * 1000),
+        sessionLimit - (1 * 60 * 1000)
+      ];
+    },
+
+    displayExpirationWarnings (aggressiveWarnings, numHours, message) {
+      const start = new Date();
+      const sessionLimit = numHours * 60 * 60 * 1000;
+      sessionTimer = window.setInterval(() => {
+        const elapsed = new Date() - start;
+        if (elapsed > sessionLimit) {
+          window.location.reload();
+        } else if (elapsed > aggressiveWarnings[0]) {
+          $.flashWarning(message);
+          aggressiveWarnings.shift();
+        }
+      }, 1000);
+    },
+
     renderAttachment: function(attachment) {
       // show the crocodoc doc if there is one
       // then show the google attachment if there is one
@@ -1941,34 +1971,31 @@ import './vendor/ui.selectmenu'
       if (!attachment.hijack_crocodoc_session && attachment.submitted_to_crocodoc && !attachment.crocodoc_url) {
         $("#crocodoc_pending").show();
       }
+      const canvadocMessage = I18n.t('canvadoc_expiring',
+        'Your Canvas DocViewer session is expiring soon.  Please ' +
+        'reload the window to avoid losing any work.');
 
       if (attachment.crocodoc_url) {
         if (!attachment.hijack_crocodoc_session) {
-          var crocodocStart = new Date()
-          ,   sessionLimit = 60 * 60 * 1000
-          ,   aggressiveWarnings = [50 * 60 * 1000,
-                                    55 * 60 * 1000,
-                                    58 * 60 * 1000,
-                                    59 * 60 * 1000];
-            crocodocSessionTimer = window.setInterval(function() {
-              var elapsed = new Date() - crocodocStart;
-              if (elapsed > sessionLimit) {
-                window.location.reload();
-              } else if (elapsed > aggressiveWarnings[0]) {
-                alert(I18n.t("crocodoc_expiring",
-                             "Your Crocodoc session is expiring soon.  Please reload " +
-                             "the window to avoid losing any work."));
-                aggressiveWarnings.shift();
-              }
-            }, 1000);
+          const crocodocMessage = I18n.t('crocodoc_expiring',
+            'Your Crocodoc session is expiring soon.  Please reload ' +
+            'the window to avoid losing any work.');
+          const aggressiveWarnings = this.generateWarningTimings(1)
+          this.displayExpirationWarnings(aggressiveWarnings, 1, crocodocMessage);
+        } else {
+          const aggressiveWarnings = this.generateWarningTimings(10)
+          this.displayExpirationWarnings(aggressiveWarnings, 10, canvadocMessage);
         }
 
         $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
           crocodoc_session_url: (attachment.provisional_crocodoc_url || attachment.crocodoc_url)
         }));
       } else if (attachment.canvadoc_url) {
+        const aggressiveWarnings = this.generateWarningTimings(10)
+        this.displayExpirationWarnings(aggressiveWarnings, 10, canvadocMessage);
+
         $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
-          canvadoc_session_url: attachment.canvadoc_url
+          canvadoc_session_url: (attachment.provisional_canvadoc_url || attachment.canvadoc_url)
         }));
       } else if ($.isPreviewable(attachment.content_type, 'google')) {
         if (!INST.disableCrocodocPreviews) $no_annotation_warning.show();
@@ -2429,7 +2456,11 @@ import './vendor/ui.selectmenu'
       const submission = EG.currentStudent.submission;
       const grade = EG.getGradeToShow(submission, ENV.grading_role);
 
-      $grade.val(grade.entered);
+      if (submission.grading_type === 'pass_fail' || ['complete', 'incomplete', 'pass', 'fail'].indexOf(submission.grade) > -1) {
+        $grade.val(submission.grade);
+      } else {
+        $grade.val(grade.entered);
+      }
 
       if (submission.points_deducted) {
         $deduction_box.html(
@@ -2659,7 +2690,24 @@ import './vendor/ui.selectmenu'
     EG.jsonReady();
   }
 
-export default {
+  function speedGraderJSONErrorFn (data, _xhr, _textStatus, _errorThrown) {
+    if (data.status === 504) {
+      const alertProps = {
+        variant: 'error',
+        dismissible: false
+      };
+      const alertMessage = I18n.t(
+        'Something went wrong. Please try refreshing the page. If the problem persists, there may be too many records on "%{assignmentTitle}" to load SpeedGrader.',
+        { assignmentTitle: ENV.assignment_title }
+      );
+      ReactDOM.render(
+        React.createElement(Alert, alertProps, alertMessage),
+        document.getElementById('speed_grader_timeout_alert')
+      );
+    }
+  }
+
+  export default {
     setup: function() {
       function registerQuizzesNext (overriddenShowSubmission) {
         showSubmissionOverride = overriddenShowSubmission;
@@ -2668,7 +2716,8 @@ export default {
 
       // fire off the request to get the jsonData
       window.jsonData = {};
-      var speedGraderJsonDfd = $.getJSON(window.location.pathname+ '.json' + window.location.search);
+      const speedGraderJSONUrl = `${window.location.pathname}.json${window.location.search}`;
+      const speedGraderJsonDfd = $.ajaxJSON(speedGraderJSONUrl, 'GET', null, null, speedGraderJSONErrorFn);
 
       $.when(getAssignmentOverrides(), getGradingPeriods(), speedGraderJsonDfd).then(gotData);
 

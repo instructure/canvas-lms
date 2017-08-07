@@ -246,7 +246,7 @@ describe "Gradezilla" do
 
   it "hides the speedgrader link for large courses", priority: "2", test_id: 210099 do
     pending('TODO: Refactor this and add it back as part of CNVS-32440')
-    @course.stubs(:large_roster?).returns(true)
+    allow(@course).to receive(:large_roster?).and_return(true)
 
     Gradezilla.visit(@course)
 

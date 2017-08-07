@@ -41,7 +41,7 @@ describe Api::V1::CourseEvent do
     skip("needs auditors cassandra keyspace configured") unless Auditors::Course::Stream.available?
 
     @request_id = SecureRandom.uuid
-    RequestContextGenerator.stubs( :request_id => @request_id )
+    allow(RequestContextGenerator).to receive_messages( :request_id => @request_id )
 
     @domain_root_account = Account.default
 
@@ -54,7 +54,7 @@ describe Api::V1::CourseEvent do
       })
     }
 
-    PageView.stubs(
+    allow(PageView).to receive_messages(
       :find_by_id => @page_view,
       :find_all_by_id => [ @page_view ]
     )

@@ -159,6 +159,11 @@ import 'compiled/behaviors/quiz_selectmenu'
               // TODO: support this redirect in LDB, by getting out of high security mode.
               if (ec.status === 401 || resp['status'] == 'unauthorized') {
                 showDeauthorizedDialog();
+                // since we popped up our own "not logged in" modal, skip the default error handler
+                // see jquery.ajaxJSON.js defaultAjaxError
+                if ($.inArray(ec, $.ajaxJSON.ignoredXHRs) === -1) {
+                  $.ajaxJSON.ignoredXHRs.push(ec)
+                }
               }
               else {
                 // Connectivity lost?

@@ -28,7 +28,7 @@ const inlineMediaComment = {
     </a>`
   ),
 
-  buildCommentHolder: ($link) => $('<div><div tabindex="0" style="margin-bottom: 15px;"></div></div>'),
+  buildCommentHolder: ($link) => $('<div><div class="innerholder" tabindex="-1" style="margin-bottom: 15px;"></div></div>'),
 
   getMediaCommentId ($link) {
     let idAttr
@@ -43,6 +43,10 @@ const inlineMediaComment = {
     $holder.remove()
     $.trackEvent('hide_embedded_content', 'hide_media')
   },
+}
+
+const initialFocusInnerhold = (e) => {
+  $(e.target).find('div.mejs-audio').focus()
 }
 
 $(document).on('click', 'a.instructure_inline_media_comment', preventDefault(function () {
@@ -73,6 +77,8 @@ $(document).on('click', 'a.instructure_inline_media_comment', preventDefault(fun
   }))
 
   $.trackEvent('show_embedded_content', 'show_media')
+  $holder.find('.innerholder').css('outline', 'none')
+  $holder.find('.innerholder').on('focus', initialFocusInnerhold)
 }))
 
 export default inlineMediaComment

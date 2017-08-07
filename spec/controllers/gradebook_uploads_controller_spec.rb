@@ -41,7 +41,7 @@ describe GradebookUploadsController do
 
   def upload_gradebook_import(course, file)
     data = Rack::Test::UploadedFile.new(file.path, 'text/csv', true)
-    post 'create', course_id: course.id, gradebook_upload: {uploaded_data: data}
+    post 'create', params: {course_id: course.id, gradebook_upload: {uploaded_data: data}}
   end
 
   def check_create_response(include_sis_id=false)
@@ -77,7 +77,7 @@ describe GradebookUploadsController do
 
   describe "POST 'create'" do
     it "should require authorization" do
-      post 'create', :course_id => @course.id
+      post 'create', params: {:course_id => @course.id}
       assert_unauthorized
     end
 
@@ -114,7 +114,7 @@ describe GradebookUploadsController do
 
   describe "GET 'data'" do
     it "requires authorization" do
-      get 'data', course_id: @course.id
+      get 'data', params: {course_id: @course.id}
       assert_unauthorized
     end
 
@@ -125,7 +125,7 @@ describe GradebookUploadsController do
       @gb_upload = GradebookUpload.new course: @course, user: @teacher, progress: progress, gradebook: {foo: 'bar'}
       @gb_upload.save
 
-      get 'data', course_id: @course.id
+      get 'data', params: {course_id: @course.id}
       expect(response).to be_success
       expect(response.body).to eq("while(1);{\"foo\":\"bar\"}")
     end
@@ -135,7 +135,7 @@ describe GradebookUploadsController do
       progress = Progress.create!(tag: "test", context: @teacher)
       @gb_upload = GradebookUpload.new course: @course, user: @teacher, progress: progress, gradebook: {foo: 'bar'}
       @gb_upload.save
-      get 'data', course_id: @course.id
+      get 'data', params: {course_id: @course.id}
       expect { GradebookUpload.find(@gb_upload.id) }.to raise_error(ActiveRecord::RecordNotFound)
       expect(response).to be_success
     end

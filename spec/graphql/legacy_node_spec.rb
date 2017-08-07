@@ -140,4 +140,35 @@ describe "legacyNode" do
       expect(run_query(@query, @student)["data"]["user"]).to be_nil
     end
   end
+
+  context "enrollments" do
+    before(:once) do
+      @enrollment = @student.enrollments.first
+
+      @query = <<-GQL
+      query {
+        enrollment: legacyNode(type: Enrollment, _id: "#{@enrollment.id}") {
+          ... on Enrollment {
+            _id
+          }
+        }
+      }
+      GQL
+    end
+
+    it "works" do
+      expect(
+        run_query(@query, @student)["data"]["enrollment"]["_id"]
+      ).to eq @enrollment.id.to_s
+    end
+
+    it "requires read_roster permission on the course" do
+      original_student = @student
+      student_in_course(course: course_factory)
+      @other_class_student = @student
+      expect(
+        run_query(@query, @other_class_student)["data"]["enrollment"]
+      ).to be_nil
+    end
+  end
 end

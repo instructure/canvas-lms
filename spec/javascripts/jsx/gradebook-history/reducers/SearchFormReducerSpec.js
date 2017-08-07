@@ -20,17 +20,23 @@ import Fixtures from 'spec/jsx/gradebook-history/Fixtures';
 import parseLinkHeader from 'jsx/shared/parseLinkHeader';
 import reducer from 'jsx/gradebook-history/reducers/SearchFormReducer';
 import {
-  FETCH_USERS_BY_NAME_START,
-  FETCH_USERS_BY_NAME_SUCCESS,
-  FETCH_USERS_BY_NAME_FAILURE,
-  FETCH_USERS_NEXT_PAGE_START,
-  FETCH_USERS_NEXT_PAGE_SUCCESS,
-  FETCH_USERS_NEXT_PAGE_FAILURE
+  CLEAR_RECORDS,
+  FETCH_RECORDS_START,
+  FETCH_RECORDS_SUCCESS,
+  FETCH_RECORDS_FAILURE,
+  FETCH_RECORDS_NEXT_PAGE_START,
+  FETCH_RECORDS_NEXT_PAGE_SUCCESS,
+  FETCH_RECORDS_NEXT_PAGE_FAILURE
 } from 'jsx/gradebook-history/actions/SearchFormActions';
 
 const defaultState = () => (
   {
-    options: {
+    records: {
+      assignments: {
+        fetchStatus: null,
+        items: [],
+        nextPage: null
+      },
       graders: {
         fetchStatus: null,
         items: [],
@@ -43,7 +49,7 @@ const defaultState = () => (
       }
     },
   }
-)
+);
 
 QUnit.module('SearchFormReducer');
 
@@ -52,49 +58,49 @@ test('returns the current state by default', function () {
   deepEqual(reducer(currState, {}), currState);
 });
 
-test('handles FETCH_USERS_BY_NAME_START for given user type', function () {
+test('handles FETCH_RECORDS_START for given record type', function () {
   const defaults = defaultState();
   const initialState = {
     ...defaults,
-    options: {
-      ...defaults.options,
-      graders: {
-        ...defaults.options.graders,
+    records: {
+      ...defaults.records,
+      assignments: {
+        ...defaults.records.assignments,
         fetchStatus: null
       }
     }
   };
   const newState = {
     ...initialState,
-    options: {
-      ...initialState.options,
-      graders: {
-        ...initialState.options.graders,
+    records: {
+      ...initialState.records,
+      assignments: {
+        ...initialState.records.assignments,
         fetchStatus: 'started'
       }
     }
   };
   const action = {
-    type: FETCH_USERS_BY_NAME_START,
+    type: FETCH_RECORDS_START,
     payload: {
-      userType: 'graders'
+      recordType: 'assignments'
     }
   };
 
   deepEqual(reducer(initialState, action), newState);
 });
 
-test('handles FETCH_USERS_BY_NAME_SUCCESS for given user type', function () {
+test('handles FETCH_RECORDS_SUCCESS on success for given record type', function () {
   const payload = {
-    userType: 'graders',
+    recordType: 'graders',
     data: Fixtures.userArray(),
-    link: '<http://fake.url/3?&page=first>; rel="current",<http://fake.url/3?&page=bookmark:asdf>; rel="next"'
+    link: '<http://example.com/3?&page=first>; rel="current",<http://example.com/3?&page=bookmark:asdf>; rel="next"'
   };
   const initialState = defaultState();
   const newState = {
     ...initialState,
-    options: {
-      ...initialState.options,
+    records: {
+      ...initialState.records,
       graders: {
         fetchStatus: 'success',
         items: payload.data,
@@ -103,19 +109,19 @@ test('handles FETCH_USERS_BY_NAME_SUCCESS for given user type', function () {
     }
   };
   const action = {
-    type: FETCH_USERS_BY_NAME_SUCCESS,
+    type: FETCH_RECORDS_SUCCESS,
     payload
   };
 
   deepEqual(reducer(initialState, action), newState);
 });
 
-test('handles FETCH_USERS_BY_NAME_FAILURE for given user type', function () {
+test('handles FETCH_RECORDS_FAILURE on failure for given record type', function () {
   const defaults = defaultState();
   const initialState = {
     ...defaults,
-    options: {
-      ...defaults.options,
+    records: {
+      ...defaults.records,
       students: {
         fetchStatus: 'started',
         items: Fixtures.userArray(),
@@ -125,8 +131,8 @@ test('handles FETCH_USERS_BY_NAME_FAILURE for given user type', function () {
   };
   const newState = {
     ...initialState,
-    options: {
-      ...initialState.options,
+    records: {
+      ...initialState.records,
       students: {
         fetchStatus: 'failure',
         items: [],
@@ -135,56 +141,56 @@ test('handles FETCH_USERS_BY_NAME_FAILURE for given user type', function () {
     }
   };
   const action = {
-    type: FETCH_USERS_BY_NAME_FAILURE,
-    payload: { userType: 'students' }
+    type: FETCH_RECORDS_FAILURE,
+    payload: { recordType: 'students' }
   };
 
   deepEqual(reducer(initialState, action), newState);
 });
 
-test('handles FETCH_USERS_NEXT_PAGE_START for given user type', function () {
+test('handles FETCH_RECORDS_NEXT_PAGE_START on start for given record type', function () {
   const defaults = defaultState();
   const initialState = {
     ...defaults,
-    options: {
-      ...defaults.options,
+    records: {
+      ...defaults.records,
       students: {
         fetchStatus: null,
         items: Fixtures.userArray(),
-        nextPage: 'https://fake.url'
+        nextPage: 'https://example.com'
       }
     }
   };
   const newState = {
     ...initialState,
-    options: {
-      ...initialState.options,
+    records: {
+      ...initialState.records,
       students: {
-        ...initialState.options.students,
+        ...initialState.records.students,
         fetchStatus: 'started',
         nextPage: null
       }
     }
   };
   const action = {
-    type: FETCH_USERS_NEXT_PAGE_START,
-    payload: { userType: 'students' }
+    type: FETCH_RECORDS_NEXT_PAGE_START,
+    payload: { recordType: 'students' }
   };
 
   deepEqual(reducer(initialState, action), newState);
 });
 
-test('handles FETCH_USERS_NEXT_PAGE_SUCCESS for given user type', function () {
+test('handles FETCH_RECORDS_NEXT_PAGE_SUCCESS for given record type', function () {
   const defaults = defaultState();
   const payload = {
-    userType: 'graders',
+    recordType: 'graders',
     data: Fixtures.userArray(),
-    link: '<http://fake.url/3?&page=first>; rel="current",<http://fake.url/3?&page=bookmark:asdf>; rel="next"'
+    link: '<http://example.com/3?&page=first>; rel="current",<http://example.com/3?&page=bookmark:asdf>; rel="next"'
   };
   const initialState = {
     ...defaults,
-    options: {
-      ...defaults.options,
+    records: {
+      ...defaults.records,
       graders: {
         fetchStatus: 'started',
         items: Fixtures.userArray(),
@@ -194,51 +200,83 @@ test('handles FETCH_USERS_NEXT_PAGE_SUCCESS for given user type', function () {
   };
   const newState = {
     ...initialState,
-    options: {
-      ...initialState.options,
+    records: {
+      ...initialState.records,
       graders: {
-        ...initialState.options.graders,
+        ...initialState.records.graders,
         fetchStatus: 'success',
-        items: initialState.options.graders.items.concat(payload.data),
+        items: initialState.records.graders.items.concat(payload.data),
         nextPage: parseLinkHeader(payload.link).next
       }
     }
   };
   const action = {
-    type: FETCH_USERS_NEXT_PAGE_SUCCESS,
+    type: FETCH_RECORDS_NEXT_PAGE_SUCCESS,
     payload
   };
 
   deepEqual(reducer(initialState, action), newState);
 });
 
-test('handles FETCH_USERS_NEXT_PAGE_FAILURE for given user type', function () {
+test('handles FETCH_RECORDS_NEXT_PAGE_FAILURE for given record type', function () {
   const defaults = defaultState();
   const initialState = {
     ...defaults,
-    options: {
-      ...defaults.options,
+    records: {
+      ...defaults.records,
       students: {
         fetchStatus: 'started',
         items: Fixtures.userArray(),
-        nextPage: 'https://fake.url'
+        nextPage: 'https://example.com'
       }
     }
   };
   const newState = {
     ...initialState,
-    options: {
-      ...initialState.options,
+    records: {
+      ...initialState.records,
       students: {
-        ...initialState.options.students,
+        ...initialState.records.students,
         fetchStatus: 'failure',
         nextPage: null
       }
     }
   };
   const action = {
-    type: FETCH_USERS_NEXT_PAGE_FAILURE,
-    payload: { userType: 'students' }
+    type: FETCH_RECORDS_NEXT_PAGE_FAILURE,
+    payload: { recordType: 'students' }
+  };
+
+  deepEqual(reducer(initialState, action), newState);
+});
+
+test('handles CLEAR_RECORDS for given record type', function () {
+  const defaults = defaultState();
+  const initialState = {
+    ...defaults,
+    records: {
+      ...defaults.records,
+      students: {
+        fetchStatus: 'success',
+        items: Fixtures.userArray(),
+        nextPage: 'https://example.com'
+      }
+    }
+  };
+  const newState = {
+    ...initialState,
+    records: {
+      ...initialState.records,
+      students: {
+        fetchStatus: null,
+        items: [],
+        nextPage: null
+      }
+    }
+  };
+  const action = {
+    type: CLEAR_RECORDS,
+    payload: { recordType: 'students' }
   };
 
   deepEqual(reducer(initialState, action), newState);

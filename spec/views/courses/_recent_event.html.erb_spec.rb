@@ -107,7 +107,7 @@ describe "/courses/_recent_event" do
       Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
 
       @submission = @quiz_submission.submission
-      Submission.any_instance.stubs(:grade).returns('1234567890')
+      allow_any_instance_of(Submission).to receive(:grade).and_return('1234567890')
     end
 
     it "should show the grade for a non-muted assignment" do

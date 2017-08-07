@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 describe Lti::LtiAssignmentCreator do
   it "converts an assignment into an lti_assignment" do
     assignment = Assignment.new()
-    assignment.stubs(:id).returns(123)
+    allow(assignment).to receive(:id).and_return(123)
     assignment.title = 'name'
     assignment.points_possible = 10
     assignment.allowed_extensions = 'csv,txt'

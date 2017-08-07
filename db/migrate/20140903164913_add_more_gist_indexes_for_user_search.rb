@@ -21,8 +21,7 @@ class AddMoreGistIndexesForUserSearch < ActiveRecord::Migration[4.2]
 
   def self.up
     if is_postgres? && (schema = connection.extension_installed?(:pg_trgm))
-      concurrently = " CONCURRENTLY" if connection.open_transactions == 0
-      execute("create index#{concurrently} index_trgm_pseudonyms_unique_id ON #{Pseudonym.quoted_table_name} USING gist(lower(unique_id) #{schema}.gist_trgm_ops);")
+      add_index :pseudonyms, "lower(unique_id) #{schema}.gist_trgm_ops", name: "index_trgm_pseudonyms_unique_id", using: :gist, algorithm: :concurrently
     end
   end
 

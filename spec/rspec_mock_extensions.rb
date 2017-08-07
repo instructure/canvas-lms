@@ -15,36 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# This chunk of monkey patching thanks to Simone Carletti,
-# see https://github.com/floehopper/mocha/pull/19 for more information
-
-module Mocha
-  class Expectation
-    def returns(*values, &block)
-      @return_values += if block_given?
-        ReturnValues.build(block)
-      else
-        ReturnValues.build(*values)
-      end
-      self
-    end
-  end
-
-  class SingleReturnValue
-    def evaluate
-      if @value.is_a?(Proc)
-        @value.call
-      else
-        @value
-      end
-    end
-  end
-end
-
 # allows setting up mocks/stubs that will be automatically applied any time
 # this AR instance is instantiated, through find or whatever
 # the record must be saved before calling any_instantiation, so that it has an id
-module MochaAnyInstantiation
+module RspecMockAnyInstantiation
   module ClassMethods
     def reset_any_instantiation!
       @@any_instantiation = {}
@@ -74,10 +48,16 @@ module MochaAnyInstantiation
     end
   end
 
-  def any_instantiation
-    ActiveRecord::Base.add_any_instantiation(self)
+  def allow_any_instantiation_of(ar_object)
+    ActiveRecord::Base.add_any_instantiation(ar_object)
+    allow(ar_object)
+  end
+
+  def expect_any_instantiation_of(ar_object)
+    ActiveRecord::Base.add_any_instantiation(ar_object)
+    expect(ar_object)
   end
 end
-ActiveRecord::Base.singleton_class.prepend(MochaAnyInstantiation::ClassMethods)
-ActiveRecord::Base.include(MochaAnyInstantiation)
+ActiveRecord::Base.singleton_class.prepend(RspecMockAnyInstantiation::ClassMethods)
+RSpec::Mocks::ExampleMethods.include(RspecMockAnyInstantiation)
 ActiveRecord::Base.reset_any_instantiation!

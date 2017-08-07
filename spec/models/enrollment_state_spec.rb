@@ -82,7 +82,7 @@ describe EnrollmentState do
       @course.save!
       term_enroll = student_in_course(:course => @course)
 
-      EnrollmentState.expects(:update_enrollment).at_least_once.with {|e| e != other_enroll}
+      expect(EnrollmentState).to receive(:update_enrollment).at_least(:once).with(not_eq(other_enroll))
 
       term.reload
       end_at = 2.days.ago
@@ -109,7 +109,7 @@ describe EnrollmentState do
       other_enroll = teacher_in_course(:course => @course)
       term_enroll = student_in_course(:course => @course)
 
-      EnrollmentState.expects(:update_enrollment).at_least_once.with {|e| e == term_enroll}
+      expect(EnrollmentState).to receive(:update_enrollment).at_least(:once).with(term_enroll)
 
       override = term.enrollment_dates_overrides.new(:enrollment_type => "StudentEnrollment", :enrollment_term => term)
       start_at = 2.days.from_now
@@ -135,7 +135,7 @@ describe EnrollmentState do
       enroll = student_in_course(:course => @course)
       enroll_state = enroll.enrollment_state
 
-      EnrollmentState.expects(:update_enrollment).at_least_once.with {|e| e.course == @course}
+      expect(EnrollmentState).to receive(:update_enrollment).at_least(:once) { |e| expect(e.course).to eq @course }
 
       @course.start_at = 4.days.ago
       ended_at = 3.days.ago
@@ -155,7 +155,7 @@ describe EnrollmentState do
       enroll = student_in_course(:course => @course)
       enroll_state = enroll.enrollment_state
 
-      EnrollmentState.expects(:update_enrollment).at_least_once.with {|e| e.course == @course}
+      expect(EnrollmentState).to receive(:update_enrollment).at_least(:once) { |e| expect(e.course).to eq @course }
 
       @course.start_at = 4.days.ago
       ended_at = 3.days.ago
@@ -184,7 +184,7 @@ describe EnrollmentState do
       enroll = student_in_course(:course => @course, :section => section)
       enroll_state = enroll.enrollment_state
 
-      EnrollmentState.expects(:update_enrollment).at_least_once.with {|e| e.course_section == section}
+      expect(EnrollmentState).to receive(:update_enrollment).at_least(:once) { |e| expect(e.course_section).to eq section }
 
       section.restrict_enrollments_to_section_dates = true
       section.save!
@@ -226,7 +226,7 @@ describe EnrollmentState do
       expect(future_state.state_valid_until).to eq start_at
       expect(future_state.restricted_access?).to be_falsey
 
-      EnrollmentState.expects(:update_enrollment).at_least_once.with {|e| e != other_enroll}
+      expect(EnrollmentState).to receive(:update_enrollment).at_least(:once).with(not_eq(other_enroll))
 
       restrict_view(Account.default, :restrict_student_future_view)
 
@@ -258,7 +258,7 @@ describe EnrollmentState do
       past_state = past_enroll.enrollment_state
       expect(past_state.state).to eq 'completed'
 
-      EnrollmentState.expects(:update_enrollment).at_least_once.with {|e| e != other_enroll}
+      expect(EnrollmentState).to receive(:update_enrollment).at_least(:once).with(not_eq(other_enroll))
 
       restrict_view(Account.default, :restrict_student_past_view)
 
@@ -284,7 +284,7 @@ describe EnrollmentState do
 
       expect(enroll_state.state).to eq 'pending_invited'
 
-      EnrollmentState.expects(:update_enrollment).at_least_once.with {|e| e.course == @course}
+      expect(EnrollmentState).to receive(:update_enrollment).at_least(:once)  { |e| expect(e.course).to eq @course }
       @course.restrict_student_future_view = true
       @course.save!
 
@@ -308,7 +308,7 @@ describe EnrollmentState do
 
       expect(enroll_state.state).to eq 'pending_invited'
 
-      EnrollmentState.expects(:update_enrollment).at_least_once.with {|e| e.course == @course}
+      expect(EnrollmentState).to receive(:update_enrollment).at_least(:once)  { |e| expect(e.course).to eq @course }
       @course.start_at = 2.days.from_now
       @course.restrict_student_future_view = true
       @course.save!

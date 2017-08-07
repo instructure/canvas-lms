@@ -35,7 +35,7 @@ describe ProfileController do
     it "should chain to settings when it's the same user" do
       user_session(@user)
 
-      get 'show', :user_id => @user.id
+      get 'show', params: {:user_id => @user.id}
       expect(response).to render_template('profile')
     end
 
@@ -43,14 +43,14 @@ describe ProfileController do
       user_session(@user)
       session[:used_remember_me_token] = true
 
-      get 'show', :user_id => @user.id
+      get 'show', params: {:user_id => @user.id}
       expect(response).to redirect_to(login_url)
     end
 
     describe "other user's profile" do
       before :each do
         # to allow viewing other user's profile
-        @controller.stubs(:api_request?).returns(true)
+        allow(@controller).to receive(:api_request?).and_return(true)
       end
 
       it "should include common contexts in @user_data" do
@@ -62,7 +62,7 @@ describe ProfileController do
         group.add_user(@user, 'accepted')
         student_in_course(user: @user, active_all: true)
 
-        get 'show', user_id: @user.id
+        get 'show', params: {user_id: @user.id}
         expect(assigns(:user_data)[:common_contexts].size).to eql(2)
         expect(assigns(:user_data)[:common_contexts][0]['id']).to eql(@course.id)
         expect(assigns(:user_data)[:common_contexts][0]['roles']).to eql(['Student'])
@@ -78,7 +78,7 @@ describe ProfileController do
       expect(@cc.position).to eq 1
       @cc2 = @user.communication_channels.create!(:path => 'email2@example.com')
       expect(@cc2.position).to eq 2
-      put 'update', :user_id => @user.id, :default_email_id => @cc2.id, :format => 'json'
+      put 'update', params: {:user_id => @user.id, :default_email_id => @cc2.id}, format: 'json'
       expect(response).to be_success
       expect(@cc2.reload.position).to eq 1
       expect(@cc.reload.position).to eq 2
@@ -89,7 +89,7 @@ describe ProfileController do
         @user.email # prime cache
         user_session(@user, @pseudonym)
         @cc2 = @user.communication_channels.create!(:path => 'email2@example.com')
-        put 'update', :user_id => @user.id, :default_email_id => @cc2.id, :format => 'json'
+        put 'update', params: {:user_id => @user.id, :default_email_id => @cc2.id}, format: 'json'
         expect(response).to be_success
         expect(@user.email).to eq @cc2.path
       end
@@ -103,7 +103,7 @@ describe ProfileController do
       expect(@cc.position).to eq 1
       @cc2 = @user.communication_channels.create!(:path => 'email2@example.com')
       expect(@cc2.position).to eq 2
-      put 'update', :user_id => @user.id, :default_email_id => @cc2.id, :format => 'json'
+      put 'update', params: {:user_id => @user.id, :default_email_id => @cc2.id}, format: 'json'
       expect(response).to be_success
       expect(@cc2.reload.position).to eq 1
       expect(@cc.reload.position).to eq 2
@@ -114,7 +114,7 @@ describe ProfileController do
       @fake_student = @course.student_view_student
       session[:become_user_id] = @fake_student.id
 
-      put 'update', :user_id => @fake_student.id
+      put 'update', params: {:user_id => @fake_student.id}
       assert_unauthorized
     end
   end
@@ -147,9 +147,9 @@ describe ProfileController do
 
     it "should let you change your short_name and profile information" do
       put 'update_profile',
-          :user => {:short_name => 'Monsturd', :name => 'Jenkins'},
-          :user_profile => {:bio => '...', :title => '!!!'},
-          :format => 'json'
+          params: {:user => {:short_name => 'Monsturd', :name => 'Jenkins'},
+          :user_profile => {:bio => '...', :title => '!!!'}},
+          format: 'json'
       expect(response).to be_success
 
       @user.reload
@@ -167,9 +167,9 @@ describe ProfileController do
       old_name = @user.short_name
       old_title = @user.profile.title
       put 'update_profile',
-          :user => {:short_name => 'Monsturd', :name => 'Jenkins'},
-          :user_profile => {:bio => '...', :title => '!!!'},
-          :format => 'json'
+          params: {:user => {:short_name => 'Monsturd', :name => 'Jenkins'},
+          :user_profile => {:bio => '...', :title => '!!!'}},
+          format: 'json'
       expect(response).to be_success
 
       @user.reload
@@ -184,9 +184,9 @@ describe ProfileController do
       @user.user_services.create! :service => 'twitter', :service_user_name => 'user', :service_user_id => 'user', :visible => false
 
       put 'update_profile',
-        :user_profile => {:bio => '...'},
-        :user_services => {:twitter => "1", :skype => "false"},
-        :format => 'json'
+        params: {:user_profile => {:bio => '...'},
+        :user_services => {:twitter => "1", :skype => "false"}},
+        format: 'json'
       expect(response).to be_success
 
       @user.reload
@@ -196,10 +196,10 @@ describe ProfileController do
 
     it "should let you set your profile links" do
       put 'update_profile',
-        :user_profile => {:bio => '...'},
+        params: {:user_profile => {:bio => '...'},
         :link_urls => ['example.com', 'foo.com', ''],
-        :link_titles => ['Example.com', 'Foo', ''],
-        :format => 'json'
+        :link_titles => ['Example.com', 'Foo', '']},
+        format: 'json'
       expect(response).to be_success
 
       @user.reload

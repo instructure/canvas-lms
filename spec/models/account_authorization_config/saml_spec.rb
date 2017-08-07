@@ -88,7 +88,7 @@ describe AccountAuthorizationConfig::SAML do
   end
 
   it "should set the entity_id with the current domain" do
-    HostUrl.stubs(:default_host).returns('bob.cody.instructure.com')
+    allow(HostUrl).to receive(:default_host).and_return('bob.cody.instructure.com')
     @aac = @account.authentication_providers.create!(:auth_type => "saml")
     expect(@aac.entity_id).to eq "http://bob.cody.instructure.com/saml2"
     @account.reload

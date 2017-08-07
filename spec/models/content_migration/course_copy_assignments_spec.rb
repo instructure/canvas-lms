@@ -188,8 +188,8 @@ describe ContentMigration do
 
       @assignment.save!
 
-      @copy_to.any_instantiation.expects(:turnitin_enabled?).at_least(1).returns(true)
-      @copy_to.any_instantiation.expects(:vericite_enabled?).at_least(1).returns(true)
+      expect_any_instantiation_of(@copy_to).to receive(:turnitin_enabled?).at_least(1).and_return(true)
+      expect_any_instantiation_of(@copy_to).to receive(:vericite_enabled?).at_least(1).and_return(true)
 
       attrs = [:turnitin_enabled, :vericite_enabled, :turnitin_settings, :peer_reviews,
           :automatic_peer_reviews, :anonymous_peer_reviews,
@@ -215,8 +215,8 @@ describe ContentMigration do
       @assignment.vericite_enabled = true
       @assignment.save!
 
-      @copy_to.any_instantiation.expects(:turnitin_enabled?).at_least(1).returns(false)
-      @copy_to.any_instantiation.expects(:vericite_enabled?).at_least(1).returns(false)
+      expect_any_instantiation_of(@copy_to).to receive(:turnitin_enabled?).at_least(1).and_return(false)
+      expect_any_instantiation_of(@copy_to).to receive(:vericite_enabled?).at_least(1).and_return(false)
 
       run_course_copy
 

@@ -176,14 +176,14 @@ describe AccountAuthorizationConfig do
       it "allows valid provider attributes" do
         aac = Account.default.authentication_providers.new(auth_type: 'saml',
             federated_attributes: { 'integration_id' => 'internal_id'})
-        AccountAuthorizationConfig::SAML.stubs(:recognized_federated_attributes).returns(['internal_id'])
+        allow(AccountAuthorizationConfig::SAML).to receive(:recognized_federated_attributes).and_return(['internal_id'])
         expect(aac).to be_valid
       end
 
       it "doesn't allow invalid provider attributes" do
         aac = Account.default.authentication_providers.new(auth_type: 'saml',
             federated_attributes: { 'integration_id' => 'garbage'})
-        AccountAuthorizationConfig::SAML.stubs(:recognized_federated_attributes).returns(['internal_id'])
+        allow(AccountAuthorizationConfig::SAML).to receive(:recognized_federated_attributes).and_return(['internal_id'])
         expect(aac).not_to be_valid
       end
 
@@ -199,6 +199,7 @@ describe AccountAuthorizationConfig do
     let(:aac) do
       Account.default.authentication_providers.new(auth_type: 'saml',
         federated_attributes: {
+          'admin_roles' => 'admin_roles',
           'display_name' => 'display_name',
           'email' => 'email',
           'given_name' => 'given_name',
@@ -270,6 +271,45 @@ describe AccountAuthorizationConfig do
       expect(@pseudonym.sis_user_id).not_to eq '28'
       expect(@user.sortable_name).to eq 'Cutrer, Cody'
       expect(@user.time_zone.tzinfo.name).to eq 'America/New_York'
+    end
+
+    context 'admin_roles' do
+      it 'ignores non-existent roles' do
+        aac.apply_federated_attributes(@pseudonym, 'admin_roles' => 'garbage')
+        @user.reload
+        expect(@user.account_users).not_to be_exists
+      end
+
+      it 'provisions an admin' do
+        aac.apply_federated_attributes(@pseudonym, 'admin_roles' => 'AccountAdmin')
+        @user.reload
+        aus = @user.account_users.to_a
+        expect(aus.length).to eq 1
+        expect(aus.first.account).to eq @pseudonym.account
+        expect(aus.first.role.name).to eq 'AccountAdmin'
+      end
+
+      it "doesn't provision an existing admin" do
+        @user.account_users.create!(account: @pseudonym.account)
+        aac.apply_federated_attributes(@pseudonym, 'admin_roles' => 'AccountAdmin')
+        @user.reload
+        expect(@user.account_users.count).to eq 1
+      end
+
+      it "removes no-longer-extant roles" do
+        @user.account_users.create!(account: @pseudonym.account)
+        aac.apply_federated_attributes(@pseudonym, 'admin_roles' => '')
+        @user.reload
+        expect(@user.account_users.active).not_to be_exists
+      end
+
+      it "reactivates previously deleted roles" do
+        au = @user.account_users.create!(account: @pseudonym.account)
+        au.destroy
+        aac.apply_federated_attributes(@pseudonym, 'admin_roles' => 'AccountAdmin')
+        @user.reload
+        expect(au.reload).to be_active
+      end
     end
 
     context 'locale' do

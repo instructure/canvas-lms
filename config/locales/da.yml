@@ -115,7 +115,7 @@ da:
     tab_authentication: Autentifikation
     tab_brand_configs: Temaer
     tab_courses: Fag
-    tab_developer_keys: Udvikler-nøgler
+    tab_developer_keys: "Udvikler nøgler"
     tab_faculty_journal: Fakultetsjournal
     tab_grading_standards: Karakter
     tab_jobs: Jobs
@@ -153,7 +153,7 @@ da:
     account_required: "skal være LDAP-godkendt"
     index: 
       delete_auth_confirmation: "Er du sikker? Brugere vil muligvis ikke være i stand til at logge på, hvis denne slettes."
-      delete_auth_link: "Slet alle godkendelser"
+      delete_auth_link: "Fjern godkendelse"
       ip_address_list_description: "Hvis du bruger en godkendelsestjeneste, som kræver, at Canvas-serverne kontakter dine servere direkte, såsom LDAP, skal du sikre, at dine servere kan acceptere tilkoblinger fra disse IP-adresser:"
       no_auth_type_description: "Denne konto integrerer ikke med en identitetsudbyder på nuværende tidspunkt."
       page_title: Autentifikationsindstillinger
@@ -196,7 +196,7 @@ da:
       description: |-
           Du skal [registrere et program på LinkedIn](%{linkedin_url}).
           Du skal tilføje %{callback_url} som et OAuth 2.0 autoriseret omdirigerings-URL og indstille programstatus til Live
-          Efter du opretter dit program, skal du notere dig kunde-id og kunde hemmelighed og indtaste dem her.
+          Efter du opretter dit program, skal du notere dig kunde-id og kundehemmelighed og indtaste dem her.
     login_required: "skal formidles"
     no_changing_auth_types: "Kan ikke ændre autorisationskonfig. Slet og opret ny konfig."
     password_required: "skal formidles"
@@ -213,7 +213,7 @@ da:
       auth_response_from_idp: "AuthnResponse fra IdP"
       labels: 
         canvas_login_fail_message: "Canvas-login fejlmeddelelse"
-        fingerprint_from_idp: "IdP-certifikat fingeraftryk"
+        fingerprint_from_idp: "IdP certifikat-fingeraftryk"
         idp_in_response_to: "IdP inResponseTo"
         idp_login_destination: "IdP LoginResponse destination"
         idp_logout_destination: "Idp LogoutResponse destination"
@@ -312,7 +312,7 @@ da:
     report_header_email: e-mail
     report_header_end__date: end_date
     report_header_end_date: slutdato
-    report_header_enrollment_state: tilmeldings-status
+    report_header_enrollment_state: tilmeldingsstatus
     report_header_expiration: udløb
     report_header_final_score: "endeligt resultat"
     report_header_first_name: first_name
@@ -358,7 +358,7 @@ da:
     report_header_term__id: term_id
     report_header_term_id: semester-id
     report_header_term_sis: semester-SIS
-    report_header_token_dev_key_id: "udv. nøgle-id"
+    report_header_token_dev_key_id: "udviklers nøgle-id"
     report_header_token_dev_key_name: "udv nøglenavn"
     report_header_token_hint: "token tip"
     report_header_token_last_used: "sidst brugt"
@@ -371,8 +371,8 @@ da:
     sis_exporter: 
       reports: "Rapporter: %{files}"
     student: 
-      enrollment_state: "Inkluder tilmeldings-status: sand;"
-      enrollment_states: "Tilmeldings-statusser: %{states};"
+      enrollment_state: "Inkluder tilmeldingsstatus: sand;"
+      enrollment_states: "Tilmeldingsstatusser: %{states};"
   account_roles_d13f8f75: Kontoroller
   account_settings: 
     account: Konto
@@ -736,6 +736,11 @@ da:
             start: 
               parameters: 
                 header: "Start:"
+    embry_riddle_activity_report_csv_parameters: 
+      account_reports: 
+        embry_riddle: 
+          outcome: 
+            text: "Fagets SIS-mønstre (kommasepareret liste):"
     engagement_report_csv_parameters: 
       account_reports: 
         bryan_engagement: 
@@ -945,8 +950,8 @@ da:
       email_notification_from_description: "Denne indstilling giver administratoren mulighed for at mærke eller etikettere teksten 'Fra' på alle meddelelser, som sendes fra Canvas til denne konto."
       email_notification_from_settings: "Indstillinger til e-mail meddelelse \"Fra\""
       enabled_web_serices_title: "Aktiverede webtjenester"
-      equall_endpoint_help: "Dette er URL'en til din equella-service. Den ser sandsynligvis således ud \"%{sample_url}\"."
-      equella_settings_title: Equella-indstillinger
+      equall_endpoint_help: "Dette er URL'en til din EQUELLA-service. Den ser sandsynligvis således ud \"%{sample_url}\"."
+      equella_settings_title: EQUELLA-indstillinger
       feature_options: Funktionsvalg
       features_title: Funktioner
       global_announcements_description: "Med globale meddelelser kan du sende beskeder til oversigten for alle brugere på din konto. De vil forekomme på hver brugers oversigt for den angivne periode eller indtil brugeren klikker \"luk\"(×) link for at ignorere alarmen. **Disse meddelelser bør benyttes med omtanke.**"
@@ -990,9 +995,9 @@ da:
         enable_turnitin: Turnitin
         enable_user_notes: Fakultetsjournal
         end_at: Slutter
-        equella: Equella
-        equella_endpoint: "Equella slutpunkt"
-        equella_teaser: "Equella kommentarer"
+        equella: EQUELLA
+        equella_endpoint: EQUELLA-slutpunkt
+        equella_teaser: "EQUELLA kommentarer"
         global_brand_includes: "Upload global CSS/JavaScript inkluderet i Tema Editor"
         global_includes: "Tilpasset CSS/JavaScript tilsidesætter"
         global_javascript: "Global JavaScript URL"
@@ -1433,9 +1438,9 @@ da:
   add_icon_567dbcaa: "tilføj ikon"
   add_link_5c01c1e8: "Tilføj link"
   add_link_fc336ed6: "Tilføj link"
-  add_moderator_review_copy_1st_a484c813: "Tilføj moderatorevaluering (kopier 1.)"
-  add_moderator_review_copy_2nd_e80d458f: "Tilføj moderatorevaluering (kopier 2.)"
-  add_moderator_review_new_3c183cea: "Tilføj moderatorevaluering (Ny)"
+  add_moderator_review_copy_1st_a484c813: "Tilføj censorbedømmelse (kopier først)"
+  add_moderator_review_copy_2nd_e80d458f: "Tilføj censorbedømmelse (kopier anden)"
+  add_moderator_review_new_3c183cea: "Tilføj censorbedømmelse (Ny)"
   add_module_item: 
     add_assignment_to: "Tilføj en opgave til %{module}"
     add_file_to: "Tilføj filer til %{module}"
@@ -1563,15 +1568,15 @@ da:
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Giv en moderator tilladelse til at evaluere flere uafhængige karakterer for de valgte afleveringer"
   allow_bulk_grade_export_to_sis_e11a6e66: "Tillad bulkeksport af karakterer til SIS"
   allow_course_content_to_be_downloaded_and_viewed_o_48a0d252: "Tillad, at fagindhold kan hentes og ses offline"
-  allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Tillad fag-billeder at blive tildelt til et fag og blive benyttet i forside-kortene."
+  allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Tillad fag-billeder at blive tildelt til et fag og blive benyttet i panel-kortene."
   allow_course_images_to_be_assigned_to_a_course_and_adb906f4: "Gør det muligt at føje kursusbilleder til et kursus, og til brug på dashcards."
-  allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "Tillad, at forside-kort omorganiseres for hver bruger."
+  allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "Tillad, at panel-kort omorganiseres for hver bruger."
   allow_in_mastery_paths_5332c786: "Tillad i læringsstier"
   allow_intra_group_peer_reviews_53f1e455: "Tillad interne peer review"
   allow_lor_tools: "Giv brugerne mulighed for at se og bruge eksterne værktøjer, der er konfigureret til LOR."
   allow_multiple_attempts_e67a0a37: "Tillad flere forsøg"
   allow_opt_out_of_inbox: "Giv brugerne mulighed for at framelde sig diskussionens indbakke. Dette medfører, at alle diskussionsbeskeder og meddelelser sendes som ASAP-meddelelser til brugerens primære e-mail. Skjul badge for ulæste beskeder på samtalens indbakke, og skjul samtalens meddelelsespræferencer."
-  allow_reorder_dashboard_cards_78215947: "Tillad omorganisering af forside-kort"
+  allow_reorder_dashboard_cards_78215947: "Tillad omorganisering af panel-kort"
   allow_students_to_download_course_content_and_view_810e66ec: "Tillad, at studerende henter fagets indhold og viser det offline"
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Giv de studerende mulighed for at se, hvem har meldt sig til tidsvinduer."
   allow_students_to_see_who_was_signed_up_for_time_s_160ba252: "Lad de studerende se, hvem der er tilmeldt tidsvinduer"
@@ -1660,7 +1665,7 @@ da:
   announcement: 
     no_title: "Ingen overskrift"
   announcement_creation_failed_f7d227f5: "Oprettelse af besked mislykkedes"
-  announcement_ends_at_4ccc2a7e: "Besked udkøber d."
+  announcement_ends_at_4ccc2a7e: "Besked udløber den"
   announcement_fb4cb645: Besked
   announcement_not_found_d6d124c3: "Besked ikke fundet"
   announcement_starts_at_2e987a38: "Besked starter den"
@@ -1670,7 +1675,7 @@ da:
   announcement_update_failed_6a6ec9fe: "Opdatering af besked mislykkedes"
   announcements: 
     announcements_crumb: Beskeder
-    error_draft_state: "Dette emne kan ikke indstilles til udkast, fordi det er en besked."
+    error_draft_state: "Dette emne kan ikke indstilles til udkastform, fordi det er en besked."
     external_feed: 
       alts: 
         deleted_feed: "Slet dette feed"
@@ -1732,6 +1737,9 @@ da:
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "App Center vises i fanen \"Apps\" på indstillingssiden til et fag eller konto. Den viste URL nedenfor skal pege på et gyldigt slutpunkt for App Center (for eksempel, %{url} -- husk at udelade den efterstillede streg"
   app_placements_6d877225: App-placeringer
   app_reregistration_87cc8817: "Genregistrering af app"
+  app_was_installed_by_admin_and_is_locked_3bee4d39: "%{app} blev installeret af admin og er låst"
+  app_was_installed_by_the_master_course_and_is_lock_dbeb24a6: "%{app} blev installeret af masterfaget og er låst"
+  app_was_installed_by_the_master_course_e55ba1d7: "%{app} blev installeret af masterfaget"
   appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "Føjer et tal til afslutningen af hver begivenhedsoverstitel (f.eks. Begivenhed 1, Begivenhed 2 osv.)"
   appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "Føjer et tal til afslutningen af hver begivenhedsoverskrift (f.eks. Begivenhed 1, Begivenhed 2 osv.)\" for=\"append_iterator"
   application: 
@@ -1805,6 +1813,9 @@ da:
   archive_3f794d7e: Arkiv
   archive_selected_d64506ca: "Valgt arkiv"
   are_you_sure_26795d3c: "Er du sikker?"
+  are_you_sure_you_want_to_archive_your_copies_of_th_7d219afe: 
+    one: "Er du sikker på, du vil arkivere din kopi af denne samtale?"
+    other: "Er du sikker på, du vil arkivere dine kopier af disse samtaler?"
   are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496: "Er du sikker på, du vil annullere? Ændringer, du har foretaget, bliver muligvis ikke gemt."
   are_you_sure_you_want_to_cancel_your_appointment_w_dbbd27eb: "Er du sikker på, du vil annullere din aftale med %{name}?"
   are_you_sure_you_want_to_copy_to_the_final_mark_th_28a7e7b3: "Er du sikker på, at du vil kopiere til den endelige karakter. Dette overskriver den eksisterende karakter."
@@ -1819,6 +1830,9 @@ da:
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: "Er du sikker på, at du ønsker at slette dette karakter periodesæt?"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Er du sikker på, at du vil slette denne karakterperiode?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Er du sikker på, at du vil slette denne karakterordning?"
+  are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
+    one: "Er du sikker på, du vil slette din kopi af denne samtale? Denne handling kan ikke fortrydes."
+    other: "Er du sikker på, du vil slette din kopi af disse samtaler? Denne handling kan ikke fortrydes."
   are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: "Er du sikker på, at du vil slette din reservation til denne begivenhed?"
   are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: "Er du sikker på, at du vil deaktivere Synkroniser til %{sisName} for alle opgaver?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Er du sikker på, at du vil gøre dette. Det kan ikke fortrydes og vil tilsidesætte eksisterende karakterer i karakterbogen."
@@ -1831,6 +1845,9 @@ da:
   are_you_sure_you_want_to_resync_these_grades_to_th_e509cb9e: "Er du sikker på, at du vil gensynkronisere disse karakterer i de studerendes informationssystem?"
   are_you_sure_you_want_to_submit_this_comment_fbe76ba6: "Er du sikker på, at du ønsker at indsende denne kommentar?"
   are_you_sure_you_want_to_sync_these_grades_to_the__ca3c28a4: "Er du sikker på, at du vil synkronisere disse karakterer i de studerendes informationssystem? Du bør kun gøre dette, hvis alle dine karakterer er færdigbehandlede."
+  are_you_sure_you_want_to_unarchive_these_conversat_ec7d7e8d: 
+    one: "Er du sikker på, du vil fjerne denne samtale fra arkivet?"
+    other: "Er du sikker på, du vil fjerne disse samtaler fra arkivet?"
   argentina_3257a200: Argentina
   argentina_54_375d6af4: "Argentina (+54)"
   arrange_by_34a545de: "Organiser efter"
@@ -1870,7 +1887,7 @@ da:
       upload_as_zip: "Upload fil som en .zip"
     feed_entry_title: "Opgave: %{assignment}"
     feed_entry_title_with_course: "Opgave, %{course}: %{assignment}"
-    gpa_scale_explainer: "Hvad er GPA scalaklassificering?"
+    gpa_scale_explainer: Karakterskala-omregningstabel
     group_assignment_must_have_group_set: "Vælg et studiegruppe til denne opgave"
     labels: 
       due: Forfalder
@@ -1891,7 +1908,7 @@ da:
       external_tool: "et eksternt værktøj"
       on_paper: "på papir"
     titles: 
-      gpa_scale_explainer: "Hvad er GPA scalaklassificering?"
+      gpa_scale_explainer: Karakterskala-omregningstabel
       grading_scheme_info: "Vis/rediger karakterordning"
     vericite_submission_types_validation: "VeriCite understøtter kun filindsendelser og tekstindtastning"
   assignment_976578a8: Opgave
@@ -1923,13 +1940,13 @@ da:
   assignment_group_1a781505: Opgavegruppe
   assignment_group_filter_c03f8a1d: "Opgave gruppefilter"
   assignment_group_was_saved_successfully_5caa27d3: "Opgavegruppe blev gemt"
-  assignment_group_weights_and_drop_rules_can_t_be_e_7b5f305d: "Reglerne for vægtning af opgavegrupper og drop-regler kan ikke redigeres, fordi der er opgaver i en af ​​grupperne, hvis forfaldsdato er nået."
-  assignment_group_weights_can_t_be_edited_because_t_b6b591ae: "Vægtning af opgavegrupper kan ikke redigeres, fordi der er opgaver i en af ​​grupperne, hvis forfaldsdato er nået."
+  assignment_group_weights_and_drop_rules_can_t_be_e_7b5f305d: "Reglerne for vægtning af opgavegruppe og drop-regler kan ikke redigeres, fordi der er opgaver i en af ​​grupperne, hvis forfaldsdato er nået."
+  assignment_group_weights_can_t_be_edited_because_t_b6b591ae: "Vægtning af opgavegruppe kan ikke redigeres, fordi der er opgaver i en af ​​grupperne, hvis forfaldsdato er nået."
   assignment_group_weights_dialog: 
     buttons: 
       save: Gem
     titles: 
-      assignment_group_weights: "Administrér styring af vægtning af opgavegrupper"
+      assignment_group_weights: "Administrér styring af vægtning af opgavegruppe"
       total: "I alt"
     weight_final: "Vægt endelig karakter ud fra grupper"
   assignment_groups: 
@@ -1943,7 +1960,7 @@ da:
     errors: 
       frozen_assignments_error: "Du kan ikke slette en gruppe med en låst opgave."
   assignment_groups_bc9cc3c9: Opgavegrupper
-  assignment_groups_weight_2f1a5a7c: "Vægtning af opgavegrupper"
+  assignment_groups_weight_2f1a5a7c: "Vægtning af opgavegruppe"
   assignment_menu_91fe3716: Opgavemenu
   assignment_muted_4cb590a4: "Opgave er uden besked til de studerende"
   assignment_muted_8d74bfa0: "Opgave uden besked til de studerende"
@@ -2192,7 +2209,7 @@ da:
       gpa_scale_percentage_explainer: "Du kan ikke indtaste point direkte, men du kan indtaste procentdele. Hvis for eksempel en opgave består af i alt 50 point, vil indtastning af \"40\" ikke fungere, men \"80%\" vil."
       gpa_scale_recommendation: "Med mindre din skole bruger en 4.0 skala (eller 5.0/6.0), anbefaler Canvas at vise karaktererne som bogstaver."
       gpa_scale_scores_explainer: "De eneste tilladte resultater er prædefineret i karakterordningen."
-      gpa_scale_title: "Hvad er GPA-scalaklassificering?"
+      gpa_scale_title: Karakterskala-omregningstabel
       grading_type_options: 
         gpa_scale: GPA-scala
         letter_grade: Bogstavkarakterer
@@ -2635,7 +2652,7 @@ da:
   available_until_date_2c0ccec3: "Tilgængelig indtil den:"
   available_until_date_cd125c62: "Tilgængelig indtil dato"
   available_until_f3b9c4ed: "Tilgængelig indtil"
-  available_until_field_for_styleguide_85d5d65a: "Feltet Tilgængelig til til stilmanual"
+  available_until_field_for_styleguide_85d5d65a: "Feltet \"Tilgængelig indtil\" i styleguide"
   available_until_format_like_yyyy_mm_dd_hh_mm_622378d6: "Tilgængelig indtil - Format som ÅÅÅÅ-MM-DD tt:mm"
   available_until_lock_at_ab022445: "Tilgængelig til %{lock_at}"
   availableslots_available_87b8b69d: "%{availableSlots} tilgængelige"
@@ -2699,7 +2716,7 @@ da:
   blueprint_courses_create_edit_associate_delete_bf41988e: "Blueprint-fag (opret / rediger / associer / slet)"
   blueprint_settings_233e909a: Blueprint-indstillinger
   body_9f663faf: Brødtekst
-  body_shadow_d36e8c2e: Skygge
+  body_shadow_d36e8c2e: Skyggetekst
   bolivia_567898d8: Bolivia
   bolivia_591_9b8a7a5c: "Bolivia (+591)"
   bookmark_bank_46d729be: "Bogmærke %{bank}"
@@ -3195,7 +3212,7 @@ da:
     ics_description_group: "Kalenderbegivenheder for gruppen, %{group_name}"
     ics_description_user: "Kalenderbegivenheder for brugeren, %{user_name}"
     ics_title: "%{course_or_group_name} kalender (Canvas)"
-    invalid_date_or_time: "Ugyldig dato eller ugyldig datetime for %{attr}"
+    invalid_date_or_time: "Ugyldig dato eller ugyldig dato og klokkeslæt for %{attr}"
   calendars: 
     event: 
       due: forfalder
@@ -3337,7 +3354,7 @@ da:
     public_domain: "Offentligt domæne"
   cell_number_is_invalid_bd6faee0: "Mobilnummer er ugyldigt!"
   cell_number_is_required_2edcee60: "Mobilnummer er påkrævet"
-  certificate_fingerprint_b376df90: "Certifikat fingeraftryk"
+  certificate_fingerprint_b376df90: Certifikat-fingeraftryk
   change_applied_89d1aa5a: "Ændring anvendt"
   change_beginning_date_to_39dbd06e: "Ændr begyndelsesdato til"
   change_dcaa253a: Skift
@@ -3390,6 +3407,7 @@ da:
   click_here_it_s_free_eeccb9cb: "Klik her, det er gratis!"
   click_here_on_the_calendar_link_c9965631: "Klik her på *Kalender* link"
   click_here_to_download_size_of_file_74443988: "Klik her for at downloade %{size_of_file}"
+  click_here_to_log_in_again_4a6055de: "Klik her for at logge på igen"
   click_here_to_see_the_file_79e2b366: "Klik her for at se filen."
   click_here_to_view_ec8cb2fd: "klik her for at vise"
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Klik på et øjebliksbillede for at vende tilbage til din prøve, som den var, da øjebliksbilledet blev taget. Bemærk: Du vil miste det arbejde, du har udført, siden øjebliksbilledet blev taget, og det kan ikke fortrydes!"
@@ -4066,7 +4084,7 @@ da:
         conclude_student: "Er du sikker på, at du vil afslutte den studerendes tilmelding?"
         delete_enrollment: "Er du sikker på, at du vil slette den studerendes tilmelding?"
       enrolled_as: "Tilmeldt som %{enrollment_type}"
-      enrollment_change_failed: "Ændring af tilmeldingsprivilegiet mislykkedes, prøv igen."
+      enrollment_change_failed: "Ændring af tilmelding med fortrinsret mislykkedes, prøv igen."
       enrollment_linked_to: "linket til *%{linked_user}*"
       headings: 
         recent_messages: "Seneste beskeder"
@@ -4851,7 +4869,7 @@ da:
       large_roster: "Stor liste"
       license: Licens
       locale: Landestandard
-      lock_all_announcements: "Lås alle opslag"
+      lock_all_announcements: "Lås alle beskeder"
       name: Navn
       old_account_id: "Gammel konto id"
       open_enrollment: "Åben tilmelding"
@@ -4946,7 +4964,7 @@ da:
       move_course: "Flyt fag"
       reset_course_content_dialog_help: "Gendan fagets indhold"
       section_enrollments: Sektionstilmeldinger
-  course_settings_sub_navigation_b95deae: "Fag indstilling sub-navigation"
+  course_settings_sub_navigation_b95deae: "Kursusindstillinger subnavigation"
   course_setup_wizard_is_showing_a7c087c1: "Fagets installationsguide vises."
   course_sis_7ae8f649: Fag-SIS
   course_sis_df8b379: Fag-Sis
@@ -5547,7 +5565,7 @@ da:
     conferences: Konferencer
     confirmation: Bekræftelse
     copy_course: "Kopiér fag"
-    developer_keys: Udvikler-nøgler
+    developer_keys: "Udvikler nøgler"
     discussions: Diskussioner
     eportfolio_welcome: "Velkommen til din ePortfolio"
     error_reports: Fejlrapporter
@@ -5704,11 +5722,11 @@ da:
     show_more_link: 
       show_less: "Vis mindre"
       show_more: "Vis mere"
-  dashboard_7f1dbf71: Forside
-  dashboard_options_b240ed5a: Forsideindstillinger
-  dashboard_view_d7d85969: Forsidevisning
+  dashboard_7f1dbf71: Panel
+  dashboard_options_b240ed5a: "Panel indstillinger"
+  dashboard_view_d7d85969: "Panel visning"
   data_exports: dataeksporter
-  data_set_identifier_data_set_id_c228b5df: "Datasæt identifikator: %{data_set_id}"
+  data_set_identifier_data_set_id_c228b5df: "Datasæt-identifikator: %{data_set_id}"
   date: 
     abbr_day_names: 
       - søn
@@ -6002,6 +6020,7 @@ da:
     edit_key: "Rediger denne nø"
     identifier: "Id: %{id}"
     redirect_uri: "URI: %{redirect_uri}"
+  developer_key_921ddbae: "Udvikler nøgle"
   developer_key_form: 
     cancel: Annuller
     icon_url: "Ikon-URL:"
@@ -6017,18 +6036,18 @@ da:
       saving: "Gemmer nøgle ..."
       saving_failed: "Lagring af nøgle mislykkedes"
     index: 
-      add_developer_key: "Tilføj udvikler-nøgle"
+      add_developer_key: "Tilføj udvikler nøgle"
       details: "Nærmere oplysninger"
-      developer_keys: Udvikler-nøgler
+      developer_keys: "Udvikler nøgler"
       key_settings: Nøgleindstillinger
       name: Navn
       notes: Noter
       show_all: "Vis alle %{count} nøgler"
       stats: Statistik
-      title: Udvikler-nøgler
+      title: "Udvikler nøgler"
       user: Bruger
     messages: 
-      confirm_delete: "Er du sikker på, at du vil slette denne udvikler-nøgle?"
+      confirm_delete: "Er du sikker på, at du vil slette denne udvikler nøgle?"
     no_user: "Ingen bruger"
     unnamed_tool: "Værktøj uden navn"
   dialog_form_wrapper: 
@@ -6161,8 +6180,8 @@ da:
       show_more_entries: 
         one: "Vis 1 indtastning mere"
         other: "Vis %{count} flere indtastninger"
-    error_draft_state_unauthorized: "Du har ikke tilladelse til at indstille dette emne til udkast."
-    error_draft_state_with_posts: "Dette emne kan ikke indstilles til udkast, fordi det indeholder indlæg."
+    error_draft_state_unauthorized: "Du har ikke tilladelse til at indstille dette emne til udkastform."
+    error_draft_state_with_posts: "Dette emne kan ikke indstilles til udkastform, fordi det indeholder indlæg."
     error_group_announcement: "Du kan ikke bruge grupperet diskussion på en besked."
     error_group_change: "Du kan ikke ændre gruppering på en diskussion med svar."
     error_todo_date_assignment: "Dato kan ikke tilføjes, hvis diskussionsemnet bedømmes"
@@ -6433,7 +6452,7 @@ da:
   due_assignment_due_date_time_607f2e1d: "forfalder: %{assignment_due_date_time}"
   due_at: "kan ikke være tom, når Post til Sis er markeret"
   due_at_5d7d2fa: "Forfalden d."
-  due_at_5e18eeac: "Forfalder d.:"
+  due_at_5e18eeac: "Afleveres d.:"
   due_at_time_fa41cf6c: "Forfalder kl.: %{time}"
   due_by_c263dc10: forfalder
   due_date_5d0a953c: "Deadline:"
@@ -6469,7 +6488,7 @@ da:
   due_multiple_due_dates_d1b141b: "Forfalder: flere afleveringsdatoer"
   due_no_due_date_2b226d2c: "Forfalder: ingen afleveringsdato "
   due_no_due_date_3c1d1651: "forfalder: ingen afleveringsdato"
-  due_on_date_5ffb2182: "Forfalder d."
+  due_on_date_5ffb2182: "Afleveres d."
   due_time_9acd6b69: "Forfalder %{time}"
   duplicate_31cec192: Dupliker
   duplicate_assignment_name_3ca7d753: "Duplikeret opgave %{name}"
@@ -6563,7 +6582,7 @@ da:
     button: 
       insert_equation: "Indsæt udligning"
     cancel: Annuller
-    cannot_render_equation: "Denne udligning kan ikke gengives i Grundlæggende visning."
+    cannot_render_equation: "Denne udligning kan ikke gengives i Basisvisning."
     click_to_embed: "Klik for at integrere billedet"
     done: 
       title: "Klik for at afslutte redigering af RTF-område"
@@ -6594,7 +6613,7 @@ da:
     switch_editor_html: HTML-editor
     switch_editor_rich_text: "Rich Content Editor"
     switch_editor_visual: "Rich Content Editor"
-    switch_to_mathjax: "Skift visning til Grundlæggende"
+    switch_to_mathjax: "Skift visning til Basis"
     switch_to_mathquill: "Skift visning til Avanceret"
     tabs: 
       arrows: Pile
@@ -6700,8 +6719,8 @@ da:
     teacher: Lærer
     teacher_assistant: Undervisningsassistent
   enrollment_role_f5d985a7: Tilmeldingsrolle
-  enrollment_state_7a9c55e2: tilmeldings-status
-  enrollment_state_ac62019b: Tilmeldings-status
+  enrollment_state_7a9c55e2: tilmeldingsstatus
+  enrollment_state_ac62019b: Tilmeldingsstatus
   enrollment_term: 
     errors: 
       delete_default_term: "Kan ikke slette standardsemester"
@@ -7263,7 +7282,7 @@ da:
   failed_to_save_please_try_again_later_bb7070fb: "Kunne ikke gemmes, prøv igen senere"
   failed_to_submit_draft_comment_1de83451: "Mislykkedes at indsende kladde-kommentar"
   fair_38e62237: Fair
-  fair_score_554e2558: "Fair resultat"
+  fair_score_554e2558: "Fair Score"
   fair_use_bee47d77: "Fair brug"
   fall_grading_period_current_score_d48c7f78: "Nuværende resultat for efterårets karakterperiode"
   fall_grading_period_final_score_56d96a8f: "Endeligt resultat for efterårets karakterperiode"
@@ -7312,8 +7331,8 @@ da:
     quiz_log_auditing: "Revision af quizlog"
     student_groups: "Ny studerendes gruppeside"
     student_outcome_gradebook: "Studerendes beherskelses karakterbog"
-  federated_attributes_5cbe6441: "Organisatoriske attributter"
-  federated_attributes_are_information_sent_from_you_2116fb61: "Organisatoriske attributter er information sendt fra din godkender, som kan bruges til automatisk at opdatere tilhørende information for brugere i Canvas, hver gang de logger ind."
+  federated_attributes_5cbe6441: "Samlede attributter"
+  federated_attributes_are_information_sent_from_you_2116fb61: "Samlede attributter er information sendt fra din godkender, som kan bruges til automatisk at opdatere tilhørende information for brugere i Canvas, hver gang de logger ind."
   feed_url_is_required_253fda4e: "Feed URL er nødvendig"
   field_name_31fff38e: Feltnavn
   file_a_ticket_for_a_personal_response_from_our_sup_1e1ffaff: "Indsend besked for et personligt svar fra vores supportteam"
@@ -7437,6 +7456,10 @@ da:
   filter_replies_by_unread_342e8e90: "Filtrer svar efter ulæst"
   filter_replies_by_unread_caf870ea: "filtrer svar efter ulæst"
   filters_92f2776f: Filtre
+  final_grade_4d7f6545: "Endelig karakter"
+  final_grade_6938dca8: "Endelig karakter:"
+  final_grade_finalgrade_138d9e07: "Endelig karakter: %{finalGrade}"
+  final_grade_finalgrade_408580bb: "Endelig karakter: *%{finalGrade}*"
   final_grade_info_2aa35d25: "Endelig karakterinformation"
   final_grade_score_fe69a301: "Endelig karakter: %{score}"
   final_letter_grade_80dccec1: "Endelig bogstavkarakter"
@@ -7477,7 +7500,7 @@ da:
       invalid_root_folder_name: "Rodmappens navn kan ikke ændres"
     folder_created: "Mappe \"%{name}\" oprettet"
   folder_705fd2d7: mappe
-  folder_browsing_tree_1f00a3ae: Mappe-træ
+  folder_browsing_tree_1f00a3ae: Mappestruktur
   folder_icon_29017021: Mappe-ikon
   folders: 
     event_updated: "Begivenhed blev opdateret."
@@ -7564,13 +7587,16 @@ da:
   gpa_scale_a6d1cdea: GPA-scala
   grade_10d1e5a1: "%{grade}"
   grade_9c6f076d: Karakter
+  grade_a91e433e: "Karakter:"
   grade_assignment_7c1abc11: "Karakter %{assignment}"
+  grade_changes_cb5a57a8: Karakterændringer
   grade_display_warning_dialog: 
     grade_display_warning: 
       checkbox: "Vis ikke for dette fag igen."
       warning: Advarsel
   grade_distribution_e52c9256: Karakterfordeling
   grade_export_title: Karaktereksport
+  grade_for_name_b9df168a: "Karakter for: %{name}"
   grade_high_to_low_1cea0381: "Karakter - høj til lav"
   grade_history_9c51ad49: "Karakteroversigt ..."
   grade_history_ccc09fde: Karakteroversigt
@@ -7725,7 +7751,7 @@ da:
       switch_to_points: "Skift til point"
     turnitin: 
       error_message: "Der opstod en fejl ved indsendelse til lighedsafsløringstjenesten. Prøv at genindsende filen, inden du kontakter support."
-      info_message: "Filen behandles stadig af Turnitin. Vend tilbage lidt senere for at se resultatet"
+      info_message: "Denne fil behandles stadigvæk af værktøjet til detektering af plagiat, som er tilknyttet opgaven. Du kan prøve igen senere for at se resultatet."
       resubmitting: "Sender igen ..."
       tooltip: 
         error: "Lighedsresultat - Se detaljerne for fejl ved indsendelse"
@@ -7879,7 +7905,7 @@ da:
         no_changes: "Der blev ikke registreret ændringer i din uploadede karakterbog."
         past_grading_periods_prevent_editing: "Følgende opgaver kan ikke redigeres, fordi de ikke befinder sig i en aktuel bedømmelsesperiode:"
       ignore_assignment_option: "Vrøvl, ignorer det"
-      ignore_student_option: "Ikke i min klasse, ignorer denne række."
+      ignore_student_option: "Ikke på mit hold, ignorer denne række."
       labels: 
         points_possible: "Mulige points"
       links: 
@@ -8219,9 +8245,9 @@ da:
       one: "Resultatet inkluderer ikke %{groups}, fordi det ikke har mulige point"
       other: "Resultatet inkluderer ikke %{groups}, fordi de ikke har mulige point"
     keyboard_assignment_desc: "Gå til den aktuelle opgaves detaljeside"
-    keyboard_close_menu: "Luk den aktive opgavemenu"
+    keyboard_close_menu: "Luk den aktuelt aktive menu"
     keyboard_comment_desc: "Kommenter på den aktive aflevering"
-    keyboard_menu_desc: "Åbn menuen for den aktive kolonnes opgave"
+    keyboard_menu_desc: "Åbn menuen for den aktive kolonne"
     keyboard_sort_desc: "Sorter gitteret på den aktuelt aktive kolonne"
     keyboard_tooltip_desc: "Vis afleveringstype for den aktive aflevering"
     keycodes: 
@@ -8584,13 +8610,13 @@ da:
         saving: "Gemmer ..."
         where_to_move: "Hvor vil du gerne flytte *%{userName}*?"
       group_categories: 
-        account_group_explanation: "Studiegrupper på konto-niveau er en god måde at gruppere studerende uden at de behøver være tilmeldt samme fag. Hver studiegruppe råder over sin egen kalender, diskussionsforum og samarbejdsværktøjer, så de selv kan organisere deres samarbejde på en mere effektiv måde."
+        account_group_explanation: "Studiegrupper på kontoniveau er en god måde at gruppere studerende uden at de behøver være tilmeldt samme fag. Hver studiegruppe råder over sin egen kalender, diskussionsforum og samarbejdsværktøjer, så de selv kan organisere deres samarbejde på en mere effektiv måde."
         add_group_set: "Tilføj gruppesæt"
         course_group_explanation: "Studiegrupper er en god måde at gruppere studerende for ting såsom gruppeprojekter eller opgaver. Hver studiegruppe råder over sin egen kalender, diskussionsforum og samarbejdsværktøjer, så de selv kan organisere deres samarbejde på en mere effektiv måde."
         group_assignment_instructions: "Du kan vælge vilkårlige studerende til grupper af en specifik størrelse, eller manuelt oprette og organisere grupperne. Når dine grupper er oprettet, kan du indstille opgaver til at være opgaver med \"Gruppeaflevering\", hvilket betyder, at hver gruppe har én aflevering, som gælder for alle medlemmerne i den pågældende gruppe."
         group_set: Gruppesæt
         headings: 
-          account_groups: "Studiegrupper på konto-niveau"
+          account_groups: "Studiegrupper på kontoniveau"
           course_groups: Studiegrupper
           groups: Grupper
         tabs: 
@@ -9026,7 +9052,7 @@ da:
   information_7f11072: information
   information_816d9fa5: information
   information_icon_8a514faa: Informationsikon
-  inner_box_background_6f9092f: "Invendigt felt baggrund"
+  inner_box_background_6f9092f: "Baggrund for invendigt felt"
   inner_box_border_d0524b03: "Kant til indre felt"
   input_and_distribute_grades_for_students_display_g_95b9b6ee: |-
       Indtast og distribuer karakterer for studerende. Vis karakterer som
@@ -9101,7 +9127,7 @@ da:
     titles: 
       bookmark_search: "Bogmærkesøgning: %{service_name}"
       cant_create_recordings: "Kan ikke oprette optagelser?"
-      equella_content_preview: "Equella forhåndsvisning af indhold"
+      equella_content_preview: "EQUELLA forhåndsvisning af indhold"
       external_link: "Links til en ekstern webside."
       image_search: "Billedsøgning: %{service_name}"
       keyboard_shortcuts: Tastaturgenveje
@@ -9120,7 +9146,7 @@ da:
   invalid_aws_configuration_e8a6ae0f: "Ugyldig AWS-konfiguration"
   invalid_csv_file_grades_could_not_be_updated_4d5c120c: "Ugyldig CSV-fil. Karakterer kunne ikke opdateres."
   invalid_csv_file_grades_could_not_be_updated_6ebdeca4: "Ugyldig csv-fil, karakterer kunne ikke opdateres."
-  invalid_date_or_invalid_datetime_for_attr_6661103f: "Ugyldig dato eller ugyldig datetime for %{attr}"
+  invalid_date_or_invalid_datetime_for_attr_6661103f: "Ugyldig dato eller ugyldig dato og klokkeslæt for %{attr}"
   invalid_points_possible: "Værdien af mulige point til denne opgave skal være nul eller større."
   invalid_recipient_name_56b22b86: "Ugyldigt modtagernavn."
   invalid_restrictions_316cd740: "Ugyldige restriktioner"
@@ -9261,6 +9287,12 @@ da:
   last_used_f9457313: "Sidst brugt:"
   last_user_access_title: "Sidste brugeradgang"
   late_2be42b88: Sen
+  late_8bd684b6: sen
+  late_bd436902: SEN
+  late_penalty_817fff4e: "Straf for sen aflevering:"
+  late_penalty_9c312b22: "Straf for sen aflevering"
+  late_penalty_pointsdeducted_7033a095: "Straf for sen aflevering: %{pointsDeducted}"
+  late_penalty_pointsdeducted_dac023ff: "Straf for sen aflevering: *%{pointsDeducted}*"
   late_percent_b91d01b3: "Sen: %{percent}"
   late_policies_42bac80: Sentpolitikker
   late_policies_fd5dced6: Sentpolitikker
@@ -9367,6 +9399,7 @@ da:
         quizzes: Quizzer
         rubrics: Rubrikker
         syllabus_body: "Pensum brødtekst"
+        tool_profiles: Værktøjsprofiler
         wikis: Wikisider
     cc: 
       standard: 
@@ -9449,7 +9482,7 @@ da:
   linked_with_wiki_page_title_b17c3521: "linket med Wiki Page '%{title}'"
   linkedin_5726caca: LinkedIn
   links: 
-    dashboard: "Min forside"
+    dashboard: "Min panel"
     errors: 
       4xx_feedback: "Klik her for at fortælle os, hvad du leder efter."
       feedback: "Klik her for at fortælle os, hvad der skete"
@@ -9477,9 +9510,11 @@ da:
     other: "Indlæsning af fag afsluttet: %{count} fag fundet"
   loading_courses_started_6e6d742c: "Indlæsning af fag påbegyndt"
   loading_data_ecd89ba: "Indlæsning af data ..."
+  loading_graders_f6a76142: "Eksaminatorer indlæses"
   loading_mastery_paths_c558a766: "Indlæser beherskelses-stier"
   loading_more_results_def6df65: "Indlæser flere resultater ..."
   loading_results_spinner_73ef739c: "Indlæser resultater-snurretop"
+  loading_students_30b71301: "Studerende indlæses"
   loading_sync_history_9f342cbf: "Indlæser synkroniseringshistorik"
   loading_unsynced_changes_b5d7b202: "Indlæser usynkroniserede ændringer"
   loading_unsynched_changes_688434f2: "Indlæser usynkroniserede ændringer"
@@ -9509,6 +9544,7 @@ da:
   log_on_url_fc166e4c: "Login url"
   log_out_379ba28a: "Log ud"
   log_out_url_2605c2c1: "Log ud url"
+  logged_out_724b3717: "Logget af"
   logged_out_user: "Bruger %{user_counter} logget ud"
   login: 
     canvas: 
@@ -9566,6 +9602,8 @@ da:
         log_out: "Er du sikker på, at du vil logge ud af Canvas?"
       log_out: "Log ud"
       page_title: "Log ud"
+    logout_landing: 
+      page_title: "Logget af"
     otp: 
       errors: 
         invalid_otp: "Ugyldig godkendelseskode, prøv igen"
@@ -11534,6 +11572,9 @@ da:
         subject: "Optagelse af webkonference er klar %{name}"
       twitter: 
         tweet: "Canvas-bemærkning - Optagelse er klar: %{title}, %{name}"
+  messages_deleted_8f781481: 
+    one: "Meddelelse slettet!"
+    other: "Meddelelser slettet!"
   mexico_52_60d635c7: "Mexico (+52)"
   mexico_b2d7a271: Mexico
   mgp_grade_export_d29b471f: "MGP karakter-eksport"
@@ -11560,6 +11601,7 @@ da:
     webct: 
       course_not_found: "Blackboard-faget blev ikke fundet."
     wiki_page_type: Wikiside
+  migration_in_progress_6f0ed4f9: "Overflytning i gang"
   migration_issues: 
     errors: 
       valid_workflow_state: "Skal sende gyldig status for workflow"
@@ -11571,6 +11613,8 @@ da:
   minutes_4aee5a41: Minutter
   minutes_per_slot_5b7169e5: "Minutter pr. tidsvindue"
   missing_1a256b3b: Mangler
+  missing_d59852a7: mangler
+  missing_eaddacbd: MANGLER
   missing_percent_94534638: "Mangler: %{percent}"
   missing_policies_4f195e0b: "Manglende politikker"
   missing_required_values_missing_values_f3be2ff8: "Mangler påkrævede værdier: %{missing_values}"
@@ -11869,7 +11913,7 @@ da:
   mute_unmute_assignment_62608e44: "Med / uden besked til de studerende om denne opgave"
   muted_283cfa0f: (afbrudt)
   muting_assignment_a9aeb5c7: "Sender ikke beskeder til studerende om opgave ..."
-  my_dashboard_b724020: "Min forside"
+  my_dashboard_b724020: "Min panel"
   my_themes_b72217b8: "Mine temaer"
   n_554bc493: "n"
   n_a_d6f6c42f: N/A
@@ -11990,6 +12034,7 @@ da:
   no_grade_assigned_90e531f5: "Der er ikke tildelt karakter."
   no_grade_for_assignment_97c9bc75: "Ingen karakter for %{assignment}"
   no_graded_submissions_e40c957a: "Ingen bedømte afleveringer"
+  no_graders_with_that_name_found_d8204d90: "Ingen eksaminatorer med dette navn blev fundet"
   no_grading_periods_configured_for_this_term_ca22393e: "ingen karakterperioder konfigureret for dette semester"
   no_grading_periods_set_up_a20a8819: "Ingen karakterperioder oprettet"
   no_grading_schemes_to_display_8b0e92e7: "Der kan ikke vises karakterordninger"
@@ -12009,6 +12054,7 @@ da:
   no_students_dd8de9f0: "Ingen studerende"
   no_students_have_taken_the_quiz_yet_e667644b: "Ingen studerende har taget quizzen endnu"
   no_students_have_taken_the_survey_yet_d378cd35: "Ingen studerende har gennemført spørgeundersøgelsen endnu"
+  no_students_with_that_name_found_f6004da2: "Ingen studerende med dette navn blev fundet"
   no_submission_for_assignment_a9cb6fe2: "Ingen indsendelse for %{assignment}"
   no_tls_618add1a: "Ingen TLS"
   no_unassigned_terms_deb7b76b: "Ingen utildelte betingelser"
@@ -12493,7 +12539,7 @@ da:
   outcome_results_title: Læringsmålsresultater
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Resultat: %{title} har en status for %{statusTooltip}"
   outcomes: 
-    account_standards: Konto-standarder
+    account_standards: Kontostandarder
     account_standards_description: "Til venstre kan du se de standarder, som din institution har oprettet for dig til brug i dine fag."
     blank_error: "Kan ikke være tom"
     browser: 
@@ -12514,14 +12560,14 @@ da:
       meets_expectations: "Opfylder forventningerne"
     criterion: 
       close_rating: Ok
-      criterion_rating_points: "Point til kriterium-bedømmelse"
+      criterion_rating_points: "Point til kriteriebedømmelse"
       delete_criterion: Slet
-      edit_criterion_rating_title: "Rediger \"%{description} kriterium-bedømmelse"
-      insert_criterion_rating: "Indfør kriterium-bedømmelse"
+      edit_criterion_rating_title: "Rediger \"%{description} kriteriebedømmelse"
+      insert_criterion_rating: "Indfør kriteriebedømmelse"
       insert_rating: Indsæt
       points: Point
       pts: point
-      rating_description: "Beskrivelse af kriterium-bedømmelse"
+      rating_description: "Beskrivelse af kriteriebedømmelse"
     dont_import: "Denne gruppe kan ikke importeres."
     failed_outcome_creation: "Oprettelse af resultat mislykkedes"
     failed_outcome_update: "Opdatering af resultat mislykkedes"
@@ -12563,9 +12609,9 @@ da:
     outcome_criterion: "Kriterium for læringsudbytte"
     outcome_form: 
       calculation_method: Beregningsmetode
-      criterion: Kriterium-bedømmelse
+      criterion: Kriteriebedømmelse
       criterion_dialog: "Læringsudbytte kan inkluderes i opgave-rubrikker som en enkel måde at vurdere beherskelse af læringsudbytte tilpasset til specifikke opgaver. Når du definerer et læringsudbytte, skal du også definere kriterier for læringsudbyttet, der kan anvendes, når der oprettes opgave-rubrikker. Definer så mange rubrikkolonner, som du har brug for, og specificer afgrænsningen mellem dem, som bliver brugt til at definere beherskelsen af dette læringsudbytte."
-      criterion_info_link: "Klik for at læse om kriterium-bedømmelser"
+      criterion_info_link: "Klik for at læse om kriteriebedømmelser"
       description: "Beskriv dette resultat"
       display_name: "Venligt navn (valgfrit)"
       mastery: "Beherskelse ved"
@@ -12712,6 +12758,7 @@ da:
     errors: 
       delete_reminder_failed: "Sletning mislykkedes"
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "Peer reviews kan ikke aktiveres til modererede opgaver"
+  penalty_adjusted_707df573: "*%{penalty}* **%{adjusted}**"
   pending_3e506a5b: Afventer
   pending_message_2d9a8796: "Verserende: %{message}"
   people_b4ebb13c: Users
@@ -12750,7 +12797,7 @@ da:
   plagiarism_detection_platform_6ce67e66: "Afsløringsplatform for plagiat"
   plagiarism_review_tool_error_513f47ff: "Fejl i bedømmelsesværktøjet for plagiater"
   plagiarism_review_tool_is_missing_submission_event_75273069: "Plagiat-bedømmelsesværktøjet mangler tjeneste for afleveringsbegivenhed"
-  plagiarism_review_tool_submission_event_service_is_b023b4c7: "Plagiat-bedømmelsesværktøjets tjeneste for afleveringsbegivenhed mangler afslutningpunkt"
+  plagiarism_review_tool_submission_event_service_is_b023b4c7: "Plagiat-bedømmelsesværktøjets tjeneste for afleveringsbegivenhed mangler slutpunkt"
   plain_text_e3ab33aa: "Almindelig tekst"
   planner_7fd46783: Planlægger
   please_add_a_due_date_1d433d2: "Tilføj venligst en forfaldsdato"
@@ -12794,7 +12841,7 @@ da:
         token: Adgangs-token
     assignment_freezer: 
       description: "Lås opgaveegenskaber på kopi"
-      name: "Låsning af opgaveegenskaber"
+      name: Opgavelåsning
     assignment_freezer_settings: 
       description: |-
           Dette plugin giver administratorer mulighed for at kontrollere en egenskab på opgaver,
@@ -12838,7 +12885,7 @@ da:
     clever_settings: 
       labels: 
         client_id: Kunde-id
-        client_secret: Kunde-hemmelighed
+        client_secret: Kundehemmelighed
     crocodoc: 
       description: "Aktivér Crocodoc som en mulighed for forhåndsvisning af dokumenter"
       name: Crocodoc
@@ -12918,7 +12965,7 @@ da:
     github_settings: 
       labels: 
         client_id: Kunde-id
-        client_secret: Kunde-hemmelighed
+        client_secret: Kundehemmelighed
         domain: Domæne
     google_docs: 
       description: "Google Docs dokument deling"
@@ -12938,8 +12985,8 @@ da:
       labels: 
         auth_uri: "Auth URI"
         client_id: Kunde-id
-        client_secret: Kunde-hemmelighed
-        client_secret_json: "Client secrets json"
+        client_secret: Kundehemmelighed
+        client_secret_json: "Kundehemmelighed json"
         redirect_uri: Omdirigerings-URI
         token_uri: "Token URI"
     grade_export: 
@@ -13030,7 +13077,7 @@ da:
         player_ui_conf: "Player UI konf ID"
         resource_domain: Ressourcedomæne
         rtmp_domain: RTMP-domæne
-        secret_key: "Administrator hemmelighed"
+        secret_key: Administratorhemmelighed
         subpartner_id: "Sub Partner ID"
         upload_ui_conf: "Uploader UI konf ID"
         user_secret_key: "Bruger hemmelighed"
@@ -13041,7 +13088,7 @@ da:
       domain_name: Domæne
       labels: 
         client_id: Kunde-id
-        client_secret: Kunde-hemmelighed
+        client_secret: Kundehemmelighed
     live_events: 
       description: "Tjeneste til begivenheder i realtid."
       name: "Live begivenheder"
@@ -13194,7 +13241,7 @@ da:
         api_url: "Api URL"
         become_user_id_uri: "Bliv bruger URL"
         http_env: "HTTP ENV"
-        message_backtrace: Tilbagesporing
+        message_backtrace: Backtrace
         message_type: Beskedtype
         password: Adgangskode
         request_context_id: "Anmod om kontekst-id"
@@ -13214,6 +13261,7 @@ da:
   points_out_of_total_24f61148: "*%{points}* ud af **%{total}**"
   points_points_b6b422e2: "Point: %{points}"
   points_possible_1c0b3445: "Mulige point"
+  points_possible_44cb4190: "/ %{points_possible}"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Mulige point skal være 0 eller mere for valgt bedømmelsestype"
   points_possible_points_fda3b111: "%{points_possible} Points"
   points_pts_e5596bf7: "%{points} point"
@@ -13598,7 +13646,7 @@ da:
       privacy_notice: 
         ok: Ok
         privacy_notice: "Bemærk: Nogle meddelelser indeholder muligvis fortrolige oplysninger. Hvis du vælger at modtage meddelelser til en anden e-mail end den, som din institution forsynede dig med, bliver der muligvis sendt følsomme oplysninger om Canvas-fag og -grupper uden for institutionens system."
-        privacy_notice_title: Fortrolighed
+        privacy_notice_title: Fortrolighedserklæring
     take_picture_view: 
       retry: "Prøv igen"
       take_picture: "Tag billede"
@@ -13718,7 +13766,7 @@ da:
   qti_display: QTI
   qti_file_description: "QTI .zip-fil"
   qti_img_matching_question: "Importeret matchende spørgsmål indeholder billeder på begge sider, hvilket ikke understøttes"
-  qti_img_matching_question_distractors: "Importeret matchende spørgsmål indeholder billeder inden i valgmulighederne og kunne ikke rettes, fordi det også indeholder distraktører"
+  qti_img_matching_question_distractors: "Importeret matchende spørgsmål indeholder billeder inden i valgmulighederne og kunne ikke rettes, fordi det også indeholder distraktorer"
   qti_name: QTI-konverter
   question_9121487: Spørgsmål
   question_answered: Besvaret
@@ -13749,7 +13797,7 @@ da:
       more_questions: "flere spørgsmål"
     load_questions: "Indlæser spørgsmål ..."
     loading_banks: "Indlæser banker ..."
-    loading_more_fail: "hentning af flere spørgsmål mislykkedes, prøv igen"
+    loading_more_fail: "indlæsning af flere spørgsmål mislykkedes, prøv igen"
     move_questions: "Flyt spørgsmål"
     multiple_questions: "Flere spørgsmål"
     question_bank: Spørgsmålsbank
@@ -13770,7 +13818,7 @@ da:
       labels: 
         title: Banknavn
       page_title: Spørgsmålsbanker
-      see_bookmarked_banks: "Se Mine banker i bogmærker"
+      see_bookmarked_banks: "Se bogmærkede banker"
       user_question_banks: "Brugerens spørgsmålsbanker"
     question_bank: 
       bookmark_bank: "Gem denne spørgsmålsbank i bogmærker"
@@ -13844,8 +13892,8 @@ da:
       page_blurred: "Stoppede med at vise side til Canvas-quizzen ..."
       page_focused: Genoptaget.
       question_answered: 
-        one: "Besvaret spørgsmål:"
-        other: "Svaret følgende spørgsmål:"
+        one: "Besvarede spørgsmål:"
+        other: "Besvarede følgende spørgsmål:"
       question_flagged: "Afmærket spørgsmål:"
       question_unflagged: "Ikke afmærket spørgsmål:"
       question_viewed: 
@@ -14761,7 +14809,7 @@ da:
           update_scores: "Opdater resultater"
         labels: 
           final_score: "Endeligt resultat"
-          fudge_points: "Fudge Point"
+          fudge_points: "Rediger points"
           fudge_points_changed_points_quiz: "Siden %{user} tog denne quiz, er antallet af mulige point blevet ændret med %{difference}. Du kan justere for denne ændring og tilføje positive eller negative point manuelt ved brug af dette felt."
           fudge_points_changed_points_survey: "Siden %{user} deltog i denne spørgeundersøgelse, er antallet af mulige point blevet ændret med %{difference}. Du kan justere for denne ændring og tilføje positive eller negative point manuelt ved brug af dette felt."
           fudge_points_generic_explanation: "Du kan justere resultatet manuelt ved at føje positive eller negative point til dette felt."
@@ -15096,7 +15144,7 @@ da:
     files_heading: Filer
     files_toolbar: Filværktøjslinje
     folder: Mappe
-    folder_browsing_tree: Mappe-træ
+    folder_browsing_tree: Mappestruktur
     folder_name: Mappenavn
     loading_more_results: "Loader flere resultater..."
     modified_by: "Modificeret af"
@@ -15296,6 +15344,7 @@ da:
   reviewer_b993ce28: Bedømmer
   reviewers_successfully_added_bd4b629a: "Bedømmere blev tilføjet"
   rich_content_editor_2708ef21: "Rich Content Editor"
+  rich_content_editor_sidebar_enhancements_8bd945d3: "Forbedringer til Rich Content Editor-sidepanel"
   right_sidebar_logo_5483dc0a: "Højre sidepanel logo"
   role: 
     duplicate_role: "En rolle med dette navn eksisterer allerede"
@@ -15307,7 +15356,7 @@ da:
       read_sis: "Læs SIS-data"
     permissions: 
       app_profiling: Ansøgningsprofilering
-      become_user: "Masker som andre brugere"
+      become_user: "Gå ind som anden bruger"
       change_course_state: "Skift fagets tilstand"
       comment_on_others_submissions: "Vis alle studerendes afleveringer og kommentér dem"
       create_accounts: "Opret nye rodkonti"
@@ -15324,7 +15373,7 @@ da:
       manage_content: "Styring af alt andet fagindhold"
       manage_courses: "Styring af (tilføj / rediger / slet) fag"
       manage_demos: "Styring af demoer"
-      manage_developer_keys: "Styring af udvikler-nøgler"
+      manage_developer_keys: "Styring af udvikler nøgler"
       manage_feature_flags: "Aktivér eller deaktivér funktioner på kontoniveau"
       manage_files: "Styring af (tilføj / rediger / slet) fagfiler"
       manage_frozen_assignment: "Styring af (tilføj / slet) låste opgaver"
@@ -15431,6 +15480,7 @@ da:
     course_files: "Fagets filer"
     group_files: Gruppefiler
     my_files: "Mine filer"
+  root_account_3fb3aacf: root_account
   root_accounts_cc035dcf: Rodkonti
   roster: 
     delete_confirm: "Er du sikker på, at du vil slette denne bruger?"
@@ -15500,6 +15550,7 @@ da:
         are_you_sure_delete: "Er du sikker op, at du ønsker at slette denne Rubric? Ethvert kursus, der for øjeblikket er tilknyttet med denne Rubric, vil stadig have adgang til den, men ingen nye kurser vil være i stand til at benytte den."
         are_you_sure_remove: "Er du sikker på, at du ønsker at fjerne denne Rubric fra din liste?"
       remove_rubric: "Fjern denne rubrik fra min liste"
+  russia_7_87bc99d5: "Rusland (+7)"
   salesforce_account_id_eb5c78ad: "Salesforce konto-id"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce bruger en anden login-host til sandbox-konti end den, der bruges til produktionskonti. Hvis du bruger en Salesforce sandbox-konto og ikke sætter flueben i dette felt, så er den ikke i stand til at godkende (og dette gælder også i modsat tilfælde, hvis du har en produktionskonto og IKKE sætter flueben i dette felt)"
   salesforce_ticketing_webtocase_connector_80f75716: "Salesforce Ticketing WebToCase Connector"
@@ -16150,7 +16201,7 @@ da:
       buttons: 
         add_outcome: "Tilføj resultat"
       labels: 
-        criterion_ratings: Kriterium-bedømmelse
+        criterion_ratings: Kriteriebedømmelse
         master_level: "indstil beherskelse for ethvert resultat på eller over"
         use_for_scoring: "Brug dette kriterium til bedømmelsen"
       points: "%{points} point"
@@ -16385,7 +16436,7 @@ da:
       delete_criterion_row: "Slet kriteriumsrække"
       description: 
         custom_comments_area: "Dette område bruges af bedømmeren til at efterlade kommentarer i forbindelse med dette vurderingskriterium."
-      full_marks: Topkarakter
+      full_marks: "Fulde point"
       icons: 
         add_new_rating_after: "Tilføj en ny bedømmelseskategori efter aktuel bedømmelse"
         additional_comments: "Yderligere kommentarer"
@@ -16442,7 +16493,7 @@ da:
     rubric_summary_criterion: 
       defaults: 
         description: "Beskrivelse af vurderingskriterium"
-      full_marks: Topkarakter
+      full_marks: "Fulde point"
       labels: 
         long_description: "Lang beskrivelse"
       links: 
@@ -16569,7 +16620,7 @@ da:
       drop_files: "Slip filer her for at uploade"
       drop_images: "Slip billeder her for at uploade"
       file_size_limit: "grænse %{size} pr. fil"
-      files_remaining: "*0* tilbage at overføre"
+      files_remaining: "*0* tilbage at uploade"
       files_tab: "Klik på en vilkårlig fil for at indsætte et download-link til den pågældende fil."
       group_links: "Link til andet indhold i gruppen."
       headings: 
@@ -17488,6 +17539,7 @@ da:
   there_was_an_error_uploading_the_image_932fc4ce: "Der var en fejl under upload of billedet"
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "Der opstod en fejl med din forespørgsel. Prøv en anden søgning"
   there_was_an_unexpected_problem_with_the_sync_be079a67: "Der opstod et uventet problem med synkroniseringen"
+  there_was_an_unknown_error_registering_the_tool_b9a29954: "Der opstod en ukendt fejl ved registrering af værktøjet"
   there_were_errors_with_the_form_errors_ab5b559a: "Der opstod fejl med formularen: %{errors}"
   there_were_several_possible_matches_with_the_impor_ad58bcd0: "Der var flere mulige match med importen. Løs dem nedenfor."
   these_backup_codes_can_be_used_if_your_multi_facto_ca30a3df: "Disse sikkerhedskoder kan bruges, hvis din multi-faktor-autentificering ikke er tilgængelig. Udskriv dem og behold dem på et sikkert sted, fx i din pung."
@@ -17828,7 +17880,7 @@ da:
   to_change_sis_account_id_the_user_must_have_manage_4b8a37a8: "For at skifte sis_account_id skal brugeren have manage_sis tilladelse."
   to_configure_an_openid_connect_provider_you_need_t_5c937249: |-
       Du har brug for autorisations- og token-url'er, samt at opnå kunde-id og
-      kunde hemmelighed for at konfigurere en OpenID Connect-udbyder.
+      kundehemmelighed for at konfigurere en OpenID Connect-udbyder.
       
       Hvis udbyderen kan konfigurere gyldige callback eller omdirigerings-URI'er,
       bruger du %{callback_url}.
@@ -17902,6 +17954,7 @@ da:
     originality_report_visible_immediately: Straks
   turnitin_similarity_score_more_information_e2571be8: "Turnitin similarity score -- yderligere oplysninger"
   twitter_fcef6b54: Twitter
+  type_a_few_letters_to_start_searching_3334657b: "Indtast et par bogstaver for at starte søgning"
   type_c8106334: Type
   type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: "'%{type}' er ikke en gyldig billedfiltype (prøv jpg, png  eller gif)"
   type_of_change_1cb24a0e: Ændringstype
@@ -18056,7 +18109,8 @@ da:
   use_mathman_to_convert_latex_to_svg_3f61c9b: "Benyt MathMan til at konvertere LaTeX til SVG?"
   use_new_folder_tree_in_files_bc0ea09f: "Brug træet Ny mappe i filer"
   use_new_folder_tree_in_files_eb5a451b: "Benyt nye mappetræ i filer"
-  use_remote_service_for_notifications_9fe667c6: "Brug fjernservice for meddelelser"
+  use_new_rich_content_editor_with_enhanced_sidebar__8e0bfedd: "Brug ny Rich Content Editor med forbedret sidepanel overalt"
+  use_remote_service_for_notifications_9fe667c6: "Brug fjerntjeneste for meddelelser"
   use_remote_version_of_rich_content_editor_52f7fc4b: "Brug fjernversion af Rich Content Editor"
   use_remote_version_of_rich_content_editor_and_side_a058a664: "Brug fjernversion af Rich Content Editor OG sidepanel"
   use_remote_version_of_rich_content_editor_and_side_ebaaa986: "Brug fjernversion af Rich Content Editor OG sidepanel i områder med høj risiko som f.eks. quizzer"
@@ -18269,7 +18323,7 @@ da:
         find_user: "Find en bruger"
         merge_users: "Foren brugerkonti"
         really_merge: "Vil du virkelig forene brugerkonti?"
-    birthdate_invalid: "Ugyldig dato eller ugyldig dato og tidspunkt for fødselsdato"
+    birthdate_invalid: "Ugyldig dato eller ugyldig dato og klokkeslæt for fødselsdato"
     cant_self_merge: "Du kan ikke forene en konto med sig selv."
     cc_prefs: 
       buttons: 
@@ -18324,7 +18378,7 @@ da:
         other: "gennemsnit for %{count} studerende"
       course: Fag
       current_teacher_courses: "Fag jeg underviser"
-      linked_student_accounts: "Linkede studiekonti"
+      linked_student_accounts: "Studerendes forbundne konti"
       links: 
         teacher_activity: "Rapport over studerendes interaktioner"
       no_grade: "ingen karakter"
@@ -18488,7 +18542,7 @@ da:
     user_dashboard: 
       dashboard: Forside
       user_atom_feed: "Bruger Atom Feed (Alle fag)"
-      user_dashboard: "Brugerens forside"
+      user_dashboard: "Brugerens panel"
     user_is_deleted: "%{user_name} er blevet slettet"
     user_merge_fail: "Brugerforening mislykkedes. Sørg for, at du har passende tilladelse og prøv igen."
     user_merge_success: "Brugerne blev forenet ! %{first_user} og %{second_user} er nu en og samme."
@@ -18822,6 +18876,7 @@ da:
   you_are_currently_masquerading_as_user_name_f4a00ade: "Du maskerer dig aktuelt som %{user_name}"
   you_are_here_54075d8c: "Du er her:"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "Du er logget ind på %{institution1} med dine brugeroplysninger fra %{institution2}"
+  you_are_logged_out_of_canvas_8b5fc59a: "Du er logget af Canvas."
   you_are_not_authorized_to_disable_the_sync_to_name_d283c3e0: "Du er ikke autoriseret til at deaktivere muligheden Synkroniser til %{name}."
   you_are_not_authorized_to_disable_the_sync_to_sisn_54aebeb0: "Du er ikke autoriseret til at deaktivere muligheden Synkroniser til %{sisName}."
   you_are_not_enrolled_in_any_courses_a5c63286: "Du er ikke tilmeldt fag."
@@ -18934,7 +18989,7 @@ da:
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       Du skal oprette et webprogram i [Google Developer Console](%{google_url}).
       Du skal tilføje %{callback_url} som omdirigerings-URI.
-      Efter oprettelse af din app, skal du notere dig kunde-id og kunde themmelighed og indtaste dem her.
+      Efter oprettelse af din app, skal du notere dig kunde-id og kundehemmelighed og indtaste dem her.
   you_will_need_to_register_a_new_app_with_microsoft_53e97ced: |-
       Du skal registrere en [ny app med Microsoft](%{ms_app_url}).
       Du skal konfigurere %{callback_url} som omdirigerings-URI.
@@ -18955,7 +19010,7 @@ da:
   you_will_need_to_register_an_application_on_linked_26ecb18d: |-
       Du skal [registrere et program på LinkedIn](%{linkedin_url}).
       Du skal tilføje %{callback_url} som et OAuth 2.0 autoriseret omdirigerings-URL og indstille programstatus til Live
-      Efter du opretter dit program, skal du notere dig kunde-id og kunde hemmelighed og indtaste dem her.
+      Efter du opretter dit program, skal du notere dig kunde-id og kundehemmelighed og indtaste dem her.
   you_will_need_to_register_an_application_on_twitte_5ff04bee: |-
       Du skal [registrere en applikation på Twitter](%{twitter_url}).
       Du skal konfigurere %{callback_url} som Callback URL.

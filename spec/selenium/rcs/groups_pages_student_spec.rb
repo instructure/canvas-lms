@@ -55,10 +55,6 @@ describe "groups" do
       stub_rcs_config
     end
 
-    after :each do
-      unstub_rcs_config
-    end
-
     #-------------------------------------------------------------------------------------------------------------------
     describe "announcements page" do
       it "should not allow group members to edit someone else's announcement", priority: "1", test_id: 327111 do

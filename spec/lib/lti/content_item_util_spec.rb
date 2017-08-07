@@ -83,13 +83,13 @@ describe Lti::ContentItemUtil do
     subject { described_class.new(content_item) }
 
     it "will not call back for success if no confirmUrl is present" do
-      CanvasHttp.expects(:post).times(0)
+      expect(CanvasHttp).to receive(:post).never
       subject.success_callback
       run_jobs
     end
 
     it "will not call back for failure if no confirmUrl is present" do
-      CanvasHttp.expects(:delete).times(0)
+      expect(CanvasHttp).to receive(:delete).never
       subject.failure_callback
       run_jobs
     end

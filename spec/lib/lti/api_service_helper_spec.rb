@@ -39,12 +39,12 @@ module Lti
   describe ApiServiceHelper do
     subject { TestClass.new(request) }
     let(:request) do
-      m = mock('request')
-      m.stubs(authorization:"")
+      m = double('request')
+      allow(m).to receive_messages(authorization:"")
       body = StringIO.new
       body.write('abc123')
       body.rewind
-      m.stubs(body: body)
+      allow(m).to receive_messages(body: body)
       m
     end
     let(:course){Course.create}
@@ -59,13 +59,13 @@ module Lti
           lti_version: 'LTIv2p0', workflow_state: 'active', raw_data: '{}',
           product_family: product_family, context: course
       )
-      OAuth::Helper.stubs(parse_header: {})
+      allow(OAuth::Helper).to receive_messages(parse_header: {})
     end
 
     describe "#lti_authenticate" do
       before(:each) do
-        subject.stubs(oauth_consumer_key: 'key')
-        subject.stubs(oauth_authenticated_request?: true)
+        allow(subject).to receive_messages(oauth_consumer_key: 'key')
+        allow(subject).to receive_messages(oauth_authenticated_request?: true)
       end
 
       it "finds the tool_proxy" do
@@ -74,20 +74,20 @@ module Lti
       end
 
       it "renders unauthorized unless tool proxy exists" do
-        subject.expects(:render_unauthorized_api)
-        subject.stubs(oauth_consumer_key: 'wrong-key')
+        expect(subject).to receive(:render_unauthorized_api)
+        allow(subject).to receive_messages(oauth_consumer_key: 'wrong-key')
         expect(subject.lti_authenticate).to be_falsey
       end
 
       it "renders unauthorized unless signature validates" do
-        subject.expects(:render_unauthorized_api)
-        subject.stubs(oauth_authenticated_request?: false)
+        expect(subject).to receive(:render_unauthorized_api)
+        allow(subject).to receive_messages(oauth_authenticated_request?: false)
         expect(subject.lti_authenticate).to be_falsey
       end
 
       it "rejects an invalid body_hash" do
-        OAuth::Helper.stubs(parse_header: {'oauth_body_hash' => 'abc'})
-        subject.expects(:render_unauthorized_api)
+        allow(OAuth::Helper).to receive_messages(parse_header: {'oauth_body_hash' => 'abc'})
+        expect(subject).to receive(:render_unauthorized_api)
         expect(subject.lti_authenticate).to be_falsey
       end
 

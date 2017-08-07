@@ -93,7 +93,7 @@ describe "Importers::QuizImporter" do
     quiz_hash = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
     data = {'assessments' => {'assessments' => [quiz_hash]}}
     migration = context.content_migrations.create!
-    migration.stubs(:canvas_import?).returns(true)
+    allow(migration).to receive(:canvas_import?).and_return(true)
     Importers::CourseContentImporter.import_content(context, data, @migration, migration)
 
     expect(Assignment.count).to eq 0
@@ -110,7 +110,7 @@ describe "Importers::QuizImporter" do
     quiz_hash = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
     data = {'assessments' => {'assessments' => [quiz_hash]}}
     migration = context.content_migrations.create!
-    migration.stubs(:canvas_import?).returns(false)
+    allow(migration).to receive(:canvas_import?).and_return(false)
     Importers::CourseContentImporter.import_content(context, data, @migration, migration)
 
     expect(Assignment.count).to eq 1

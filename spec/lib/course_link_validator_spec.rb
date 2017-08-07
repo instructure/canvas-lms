@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe CourseLinkValidator do
 
   it "should validate all the links" do
-    CourseLinkValidator.any_instance.stubs(:reachable_url?).returns(false).once # don't actually ping the links for the specs
+    allow_any_instance_of(CourseLinkValidator).to receive(:reachable_url?).and_return(false) # don't actually ping the links for the specs
 
     course_factory
     attachment_model
@@ -81,7 +81,7 @@ describe CourseLinkValidator do
   end
 
   it "should not run on assessment questions in deleted banks" do
-    CourseLinkValidator.any_instance.stubs(:reachable_url?).returns(false) # don't actually ping the links for the specs
+    allow_any_instance_of(CourseLinkValidator).to receive(:reachable_url?).and_return(false) # don't actually ping the links for the specs
     html = %{<a href='http://www.notarealsitebutitdoesntmattercauseimstubbingitanwyay.com'>linky</a>}
 
     course_factory
@@ -105,7 +105,7 @@ describe CourseLinkValidator do
   end
 
   it "should not care if it can reach it" do
-    CourseLinkValidator.any_instance.stubs(:reachable_url?).returns(true)
+    allow_any_instance_of(CourseLinkValidator).to receive(:reachable_url?).and_return(true)
 
     course_factory
     topic = @course.discussion_topics.create!(:message => %{<a href="http://www.www.www">pretend this is real</a>}, :title => "title")

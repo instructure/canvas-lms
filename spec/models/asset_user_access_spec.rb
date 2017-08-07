@@ -228,7 +228,7 @@ describe AssetUserAccess do
     let(:context) { User.new }
     subject { access }
 
-    before { access.stubs :save }
+    before { allow(access).to receive :save }
 
     describe 'attribute values directly from hash' do
       def it_sets_if_nil( attribute, hash_key = nil)
@@ -295,7 +295,7 @@ describe AssetUserAccess do
     it 'should not complain if there is no current score' do
       subject.view_score = nil
       subject.participate_score = 4
-      subject.stubs(:asset_group_code).returns('quizzes')
+      allow(subject).to receive(:asset_group_code).and_return('quizzes')
 
       expect(subject.corrected_view_score).to eq -4
     end

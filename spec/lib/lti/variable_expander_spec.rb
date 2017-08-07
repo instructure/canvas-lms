@@ -34,38 +34,38 @@ module Lti
         url: 'http://www.example.com'
       )
     end
-    let(:substitution_helper) { stub_everything }
+    let(:substitution_helper) { double.as_null_object }
     let(:right_now) { DateTime.now }
     let(:tool) do
-      m = mock('tool')
-      m.stubs(:id).returns(1)
-      m.stubs(:context).returns(root_account)
-      m.stubs(:extension_setting).with(nil, :prefer_sis_email).returns(nil)
-      m.stubs(:extension_setting).with(:tool_configuration, :prefer_sis_email).returns(nil)
-      m.stubs(:include_email?).returns(true)
-      m.stubs(:include_name?).returns(true)
-      m.stubs(:public?).returns(true)
-      shard_mock = mock('shard')
-      shard_mock.stubs(:settings).returns({encription_key: 'abc'})
-      m.stubs(:shard).returns(shard_mock)
-      m.stubs(:opaque_identifier_for).returns("6cd2e0d65bd5aef3b5ee56a64bdcd595e447bc8f")
+      m = double('tool')
+      allow(m).to receive(:id).and_return(1)
+      allow(m).to receive(:context).and_return(root_account)
+      allow(m).to receive(:extension_setting).with(nil, :prefer_sis_email).and_return(nil)
+      allow(m).to receive(:extension_setting).with(:tool_configuration, :prefer_sis_email).and_return(nil)
+      allow(m).to receive(:include_email?).and_return(true)
+      allow(m).to receive(:include_name?).and_return(true)
+      allow(m).to receive(:public?).and_return(true)
+      shard_mock = double('shard')
+      allow(shard_mock).to receive(:settings).and_return({encription_key: 'abc'})
+      allow(m).to receive(:shard).and_return(shard_mock)
+      allow(m).to receive(:opaque_identifier_for).and_return("6cd2e0d65bd5aef3b5ee56a64bdcd595e447bc8f")
       m
     end
     let(:controller) do
-      request_mock = mock('request')
-      request_mock.stubs(:url).returns('https://localhost')
-      request_mock.stubs(:host).returns('/my/url')
-      request_mock.stubs(:scheme).returns('https')
-      m = mock('controller')
-      m.stubs(:css_url_for).with(:common).returns('/path/to/common.scss')
-      m.stubs(:request).returns(request_mock)
-      m.stubs(:logged_in_user).returns(user)
-      m.stubs(:named_context_url).returns('url')
-      m.stubs(:polymorphic_url).returns('url')
-      view_context_mock = mock('view_context')
-      view_context_mock.stubs(:stylesheet_path)
-        .returns(URI.parse(request_mock.url).merge(m.css_url_for(:common)).to_s)
-      m.stubs(:view_context).returns(view_context_mock)
+      request_mock = double('request')
+      allow(request_mock).to receive(:url).and_return('https://localhost')
+      allow(request_mock).to receive(:host).and_return('/my/url')
+      allow(request_mock).to receive(:scheme).and_return('https')
+      m = double('controller')
+      allow(m).to receive(:css_url_for).with(:common).and_return('/path/to/common.scss')
+      allow(m).to receive(:request).and_return(request_mock)
+      allow(m).to receive(:logged_in_user).and_return(user)
+      allow(m).to receive(:named_context_url).and_return('url')
+      allow(m).to receive(:polymorphic_url).and_return('url')
+      view_context_mock = double('view_context')
+      allow(view_context_mock).to receive(:stylesheet_path)
+        .and_return(URI.parse(request_mock.url).merge(m.css_url_for(:common)).to_s)
+      allow(m).to receive(:view_context).and_return(view_context_mock)
       m
     end
     let(:attachment) { attachment_model }
@@ -104,7 +104,7 @@ module Lti
     end
 
     it 'expands substring variables' do
-      account.stubs(:id).returns(42)
+      allow(account).to receive(:id).and_return(42)
       VariableExpander.register_expansion('test_expan', ['a'], -> { @context.id })
       expanded = variable_expander.expand_variables!({some_name: 'my variable is buried in here ${test_expan} can you find it?'})
       expect(expanded.count).to eq 1
@@ -112,7 +112,7 @@ module Lti
     end
 
     it 'handles multiple substring variables' do
-      account.stubs(:id).returns(42)
+      allow(account).to receive(:id).and_return(42)
       VariableExpander.register_expansion('test_expan', ['a'], -> { @context.id })
       VariableExpander.register_expansion('variable1', ['a'], -> { 1 })
       VariableExpander.register_expansion('other_variable', ['a'], -> { 2 })
@@ -123,7 +123,7 @@ module Lti
     end
 
     it 'does not expand a substring variable if it is not valid' do
-      account.stubs(:id).returns(42)
+      allow(account).to receive(:id).and_return(42)
       VariableExpander.register_expansion('test_expan', ['a'], -> { @context.id })
       expanded = variable_expander.expand_variables!({some_name: 'my variable is buried in here ${tests_expan} can you find it?'})
       expect(expanded.count).to eq 1
@@ -265,7 +265,7 @@ module Lti
       end
 
       it 'expands substring variables' do
-        account.stubs(:id).returns(42)
+        allow(account).to receive(:id).and_return(42)
         VariableExpander.register_expansion('test_expan', ['a'], -> { @context.id })
         expanded = variable_expander.expand_variables!({'some_name' => 'my variable is buried in here ${test_expan} can you find it?'})
         expect(expanded.count).to eq 1
@@ -274,6 +274,40 @@ module Lti
     end
 
     describe "#variable expansions" do
+      it 'has a substitution for com.instructure.Assignment.lti.id' do
+        exp_hash = {test: '$com.instructure.Assignment.lti.id'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq tool_setting.context.context.assignment.lti_context_id
+      end
+
+      it 'has a substitution for com.instructure.Assignment.lti.id when there is no tool setting' do
+        assignment.update_attributes(context: course)
+        variable_expander = VariableExpander.new(root_account,
+                                                 account,
+                                                 controller,
+                                                 current_user: user,
+                                                 tool: tool,
+                                                 assignment: assignment)
+        assignment.update_attributes(context: course)
+        exp_hash = {test: '$com.instructure.Assignment.lti.id'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq assignment.lti_context_id
+      end
+
+      it 'has a substitution for com.instructure.Assignment.lti.id when secure params are present' do
+        lti_assignment_id = SecureRandom.uuid
+        secure_params = Canvas::Security.create_jwt(lti_assignment_id: lti_assignment_id)
+        variable_expander = VariableExpander.new(root_account,
+                                                 account,
+                                                 controller,
+                                                 current_user: user,
+                                                 tool: tool,
+                                                 secure_params: secure_params)
+        exp_hash = {test: '$com.instructure.Assignment.lti.id'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq lti_assignment_id
+      end
+
       it 'has a substitution for Context.title' do
         exp_hash = {test: '$Context.title'}
         variable_expander.expand_variables!(exp_hash)
@@ -312,7 +346,7 @@ module Lti
 
       it 'has substitution for $Canvas.api.domain' do
         exp_hash = {test: '$Canvas.api.domain'}
-        HostUrl.stubs(:context_host).returns('localhost')
+        allow(HostUrl).to receive(:context_host).and_return('localhost')
         variable_expander.expand_variables!(exp_hash)
         expect(exp_hash[:test]).to eq 'localhost'
       end
@@ -341,7 +375,7 @@ module Lti
 
       it 'has substitution for $Canvas.api.baseUrl' do
         exp_hash = {test: '$Canvas.api.baseUrl'}
-        HostUrl.stubs(:context_host).returns('localhost')
+        allow(HostUrl).to receive(:context_host).and_return('localhost')
         variable_expander.expand_variables!(exp_hash)
         expect(exp_hash[:test]).to eq 'https://localhost'
       end
@@ -355,7 +389,7 @@ module Lti
       end
 
       it 'has substitution for $Canvas.account.id' do
-        account.stubs(:id).returns(12345)
+        allow(account).to receive(:id).and_return(12345)
         exp_hash = {test: '$Canvas.account.id'}
         variable_expander.expand_variables!(exp_hash)
         expect(exp_hash[:test]).to eq 12345
@@ -376,7 +410,7 @@ module Lti
       end
 
       it 'has substitution for $Canvas.rootAccount.id' do
-        root_account.stubs(:id).returns(54321)
+        allow(root_account).to receive(:id).and_return(54321)
         exp_hash = {test: '$Canvas.rootAccount.id'}
         variable_expander.expand_variables!(exp_hash)
         expect(exp_hash[:test]).to eq 54321
@@ -390,7 +424,7 @@ module Lti
       end
 
       it 'has substitution for $Canvas.root_account.id' do
-        root_account.stubs(:id).returns(54321)
+        allow(root_account).to receive(:id).and_return(54321)
         exp_hash = {test: '$Canvas.root_account.id'}
         variable_expander.expand_variables!(exp_hash)
         expect(exp_hash[:test]).to eq 54321
@@ -411,7 +445,7 @@ module Lti
       end
 
       it 'has substitution for $Canvas.root_account.global_id' do
-        root_account.stubs(:global_id).returns(10054321)
+        allow(root_account).to receive(:global_id).and_return(10054321)
         exp_hash = {test: '$Canvas.root_account.global_id'}
         variable_expander.expand_variables!(exp_hash)
         expect(exp_hash[:test]).to eq 10054321
@@ -428,8 +462,8 @@ module Lti
 
         it 'has substitution for $ToolProxyBinding.memberships.url when context is a group' do
           exp_hash = { test: '$ToolProxyBinding.memberships.url' }
-          group.stubs(:id).returns('1')
-          controller.stubs(:polymorphic_url).returns("/api/lti/groups/#{group.id}/membership_service")
+          allow(group).to receive(:id).and_return('1')
+          allow(controller).to receive(:polymorphic_url).and_return("/api/lti/groups/#{group.id}/membership_service")
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq "/api/lti/groups/1/membership_service"
         end
@@ -449,35 +483,35 @@ module Lti
 
         it 'has substitution for $ToolProxyBinding.memberships.url when context is a course' do
           exp_hash = { test: '$ToolProxyBinding.memberships.url' }
-          course.stubs(:id).returns('1')
-          controller.stubs(:polymorphic_url).returns("/api/lti/courses/#{course.id}/membership_service")
+          allow(course).to receive(:id).and_return('1')
+          allow(controller).to receive(:polymorphic_url).and_return("/api/lti/courses/#{course.id}/membership_service")
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq "/api/lti/courses/1/membership_service"
         end
 
         it 'has substitution for $Canvas.course.id' do
-          course.stubs(:id).returns(123)
+          allow(course).to receive(:id).and_return(123)
           exp_hash = {test: '$Canvas.course.id'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 123
         end
 
         it 'has substitution for $Context.sourcedId' do
-          course.stubs(:sis_source_id).returns('123')
+          allow(course).to receive(:sis_source_id).and_return('123')
           exp_hash = {test: '$Context.sourcedId'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq '123'
         end
 
         it 'has substitution for $vnd.instructure.Course.uuid' do
-          course.stubs(:uuid).returns('Ioe3sJPt0KZp9Pw6xAvcHuLCl0z4TvPKP0iIOLbo')
+          allow(course).to receive(:uuid).and_return('Ioe3sJPt0KZp9Pw6xAvcHuLCl0z4TvPKP0iIOLbo')
           exp_hash = {test: '$vnd.instructure.Course.uuid'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 'Ioe3sJPt0KZp9Pw6xAvcHuLCl0z4TvPKP0iIOLbo'
         end
 
         it 'has substitution for $Canvas.course.name' do
-          course.stubs(:name).returns('Course 101')
+          allow(course).to receive(:name).and_return('Course 101')
           exp_hash = {test: '$Canvas.course.name'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 'Course 101'
@@ -505,40 +539,40 @@ module Lti
         end
 
         it 'has substitution for $Canvas.enrollment.enrollmentState' do
-          Lti::SubstitutionsHelper.stubs(:new).returns(substitution_helper)
-          substitution_helper.stubs(:enrollment_state).returns('active')
+          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+          allow(substitution_helper).to receive(:enrollment_state).and_return('active')
           exp_hash = {test: '$Canvas.enrollment.enrollmentState'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 'active'
         end
 
         it 'has substitution for $Canvas.membership.roles' do
-          Lti::SubstitutionsHelper.stubs(:new).returns(substitution_helper)
-          substitution_helper.stubs(:current_canvas_roles).returns('teacher,student')
+          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+          allow(substitution_helper).to receive(:current_canvas_roles).and_return('teacher,student')
           exp_hash = {test: '$Canvas.membership.roles'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 'teacher,student'
         end
 
         it 'has substitution for $Canvas.membership.concludedRoles' do
-          Lti::SubstitutionsHelper.stubs(:new).returns(substitution_helper)
-          substitution_helper.stubs(:concluded_lis_roles).returns('learner')
+          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+          allow(substitution_helper).to receive(:concluded_lis_roles).and_return('learner')
           exp_hash = {test: '$Canvas.membership.concludedRoles'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 'learner'
         end
 
         it 'has substitution for $Canvas.course.previousContextIds' do
-          Lti::SubstitutionsHelper.stubs(:new).returns(substitution_helper)
-          substitution_helper.stubs(:previous_lti_context_ids).returns('abc,xyz')
+          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+          allow(substitution_helper).to receive(:previous_lti_context_ids).and_return('abc,xyz')
           exp_hash = {test: '$Canvas.course.previousContextIds'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 'abc,xyz'
         end
 
         it 'has substitution for $Canvas.course.previousCourseIds' do
-          Lti::SubstitutionsHelper.stubs(:new).returns(substitution_helper)
-          substitution_helper.stubs(:previous_course_ids).returns('1,2')
+          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+          allow(substitution_helper).to receive(:previous_course_ids).and_return('1,2')
           exp_hash = {test: '$Canvas.course.previousCourseIds'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq '1,2'
@@ -555,24 +589,24 @@ module Lti
         let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool: tool) }
 
         it 'has substitution for $Canvas.xapi.url' do
-          Lti::XapiService.stubs(:create_token).returns('abcd')
-          controller.stubs(:lti_xapi_url).returns('/xapi/abcd')
+          allow(Lti::XapiService).to receive(:create_token).and_return('abcd')
+          allow(controller).to receive(:lti_xapi_url).and_return('/xapi/abcd')
           exp_hash = {test: '$Canvas.xapi.url'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq '/xapi/abcd'
         end
 
         it 'has substitution for $Canvas.course.sectionIds' do
-          Lti::SubstitutionsHelper.stubs(:new).returns(substitution_helper)
-          substitution_helper.stubs(:section_ids).returns('5,6')
+          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+          allow(substitution_helper).to receive(:section_ids).and_return('5,6')
           exp_hash = {test: '$Canvas.course.sectionIds'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq '5,6'
         end
 
         it 'has substitution for $Canvas.course.sectionSisSourceIds' do
-          Lti::SubstitutionsHelper.stubs(:new).returns(substitution_helper)
-          substitution_helper.stubs(:section_sis_ids).returns('5a,6b')
+          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+          allow(substitution_helper).to receive(:section_sis_ids).and_return('5a,6b')
           exp_hash = {test: '$Canvas.course.sectionSisSourceIds'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq '5a,6b'
@@ -610,8 +644,8 @@ module Lti
         it 'has substitution for $Canvas.externalTool.url' do
           course.save!
           tool = course.context_external_tools.create!(:domain => 'example.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'anonymous', :name => 'tool')
-          controller.expects(:named_context_url).with(course, :api_v1_context_external_tools_update_url,
-                                                      tool.id, include_host:true).returns("url")
+          expect(controller).to receive(:named_context_url).with(course, :api_v1_context_external_tools_update_url,
+                                                      tool.id, include_host:true).and_return("url")
           expander = VariableExpander.new(root_account, course, controller, current_user: user, tool: tool)
           exp_hash = {test: '$Canvas.externalTool.url'}
           expander.expand_variables!(exp_hash)
@@ -657,8 +691,8 @@ module Lti
         let(:variable_expander) { VariableExpander.new(root_account, course, controller, collaboration: collaboration) }
 
         it 'has substitution for $Canvas.api.collaborationMembers.url' do
-          collaboration.stubs(:id).returns(1)
-          controller.stubs(:api_v1_collaboration_members_url).returns('https://www.example.com/api/v1/collaborations/1/members')
+          allow(collaboration).to receive(:id).and_return(1)
+          allow(controller).to receive(:api_v1_collaboration_members_url).and_return('https://www.example.com/api/v1/collaborations/1/members')
           exp_hash = {test: '$Canvas.api.collaborationMembers.url'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 'https://www.example.com/api/v1/collaborations/1/members'
@@ -669,7 +703,7 @@ module Lti
         let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, assignment: assignment) }
 
         it 'has substitution for $Canvas.assignment.id' do
-          assignment.stubs(:id).returns(2015)
+          allow(assignment).to receive(:id).and_return(2015)
           exp_hash = {test: '$Canvas.assignment.id'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 2015
@@ -684,21 +718,21 @@ module Lti
 
         describe "$Canvas.assignment.pointsPossible" do
           it 'has substitution for $Canvas.assignment.pointsPossible' do
-            assignment.stubs(:points_possible).returns(10.0)
+            allow(assignment).to receive(:points_possible).and_return(10.0)
             exp_hash = {test: '$Canvas.assignment.pointsPossible'}
             variable_expander.expand_variables!(exp_hash)
             expect(exp_hash[:test]).to eq 10
           end
 
           it 'does not round if not whole' do
-            assignment.stubs(:points_possible).returns(9.5)
+            allow(assignment).to receive(:points_possible).and_return(9.5)
             exp_hash = {test: '$Canvas.assignment.pointsPossible'}
             variable_expander.expand_variables!(exp_hash)
             expect(exp_hash[:test].to_s).to eq "9.5"
           end
 
           it 'rounds if whole' do
-            assignment.stubs(:points_possible).returns(9.0)
+            allow(assignment).to receive(:points_possible).and_return(9.0)
             exp_hash = {test: '$Canvas.assignment.pointsPossible'}
             variable_expander.expand_variables!(exp_hash)
             expect(exp_hash[:test].to_s).to eq "9"
@@ -706,28 +740,28 @@ module Lti
         end
 
         it 'has substitution for $Canvas.assignment.unlockAt' do
-          assignment.stubs(:unlock_at).returns(right_now.to_s)
+          allow(assignment).to receive(:unlock_at).and_return(right_now.to_s)
           exp_hash = {test: '$Canvas.assignment.unlockAt'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq right_now.to_s
         end
 
         it 'has substitution for $Canvas.assignment.lockAt' do
-          assignment.stubs(:lock_at).returns(right_now.to_s)
+          allow(assignment).to receive(:lock_at).and_return(right_now.to_s)
           exp_hash = {test: '$Canvas.assignment.lockAt'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq right_now.to_s
         end
 
         it 'has substitution for $Canvas.assignment.dueAt' do
-          assignment.stubs(:due_at).returns(right_now.to_s)
+          allow(assignment).to receive(:due_at).and_return(right_now.to_s)
           exp_hash = {test: '$Canvas.assignment.dueAt'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq right_now.to_s
         end
 
         it 'has substitution for $Canvas.assignment.published' do
-          assignment.stubs(:workflow_state).returns('published')
+          allow(assignment).to receive(:workflow_state).and_return('published')
           exp_hash = {test: '$Canvas.assignment.published'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq true
@@ -735,42 +769,42 @@ module Lti
 
         context 'iso8601' do
           it 'has substitution for $Canvas.assignment.unlockAt.iso8601' do
-            assignment.stubs(:unlock_at).returns(right_now)
+            allow(assignment).to receive(:unlock_at).and_return(right_now)
             exp_hash = {test: '$Canvas.assignment.unlockAt.iso8601'}
             variable_expander.expand_variables!(exp_hash)
             expect(exp_hash[:test]).to eq right_now.utc.iso8601.to_s
           end
 
           it 'has substitution for $Canvas.assignment.lockAt.iso8601' do
-            assignment.stubs(:lock_at).returns(right_now)
+            allow(assignment).to receive(:lock_at).and_return(right_now)
             exp_hash = {test: '$Canvas.assignment.lockAt.iso8601'}
             variable_expander.expand_variables!(exp_hash)
             expect(exp_hash[:test]).to eq right_now.utc.iso8601.to_s
           end
 
           it 'has substitution for $Canvas.assignment.dueAt.iso8601' do
-            assignment.stubs(:due_at).returns(right_now)
+            allow(assignment).to receive(:due_at).and_return(right_now)
             exp_hash = {test: '$Canvas.assignment.dueAt.iso8601'}
             variable_expander.expand_variables!(exp_hash)
             expect(exp_hash[:test]).to eq right_now.utc.iso8601.to_s
           end
 
           it 'handles a nil unlock_at' do
-            assignment.stubs(:unlock_at).returns(nil)
+            allow(assignment).to receive(:unlock_at).and_return(nil)
             exp_hash = {test: '$Canvas.assignment.unlockAt.iso8601'}
             variable_expander.expand_variables!(exp_hash)
             expect(exp_hash[:test]).to eq "$Canvas.assignment.unlockAt.iso8601"
           end
 
           it 'handles a nil lock_at' do
-            assignment.stubs(:lock_at).returns(nil)
+            allow(assignment).to receive(:lock_at).and_return(nil)
             exp_hash = {test: '$Canvas.assignment.lockAt.iso8601'}
             variable_expander.expand_variables!(exp_hash)
             expect(exp_hash[:test]).to eq "$Canvas.assignment.lockAt.iso8601"
           end
 
           it 'handles a nil due_at' do
-            assignment.stubs(:lock_at).returns(nil)
+            allow(assignment).to receive(:lock_at).and_return(nil)
             exp_hash = {test: '$Canvas.assignment.dueAt.iso8601'}
             variable_expander.expand_variables!(exp_hash)
             expect(exp_hash[:test]).to eq "$Canvas.assignment.dueAt.iso8601"
@@ -814,8 +848,8 @@ module Lti
         end
 
         it 'has substitution for $Person.email.primary' do
-          substitution_helper.stubs(:email).returns('someone@somewhere')
-          SubstitutionsHelper.stubs(:new).returns(substitution_helper)
+          allow(substitution_helper).to receive(:email).and_return('someone@somewhere')
+          allow(SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
           exp_hash = {test: '$Person.email.primary'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 'someone@somewhere'
@@ -852,58 +886,58 @@ module Lti
         end
 
         it 'has substitution for $User.image' do
-          user.stubs(:avatar_url).returns('/my/pic')
+          allow(user).to receive(:avatar_url).and_return('/my/pic')
           exp_hash = {test: '$User.image'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq '/my/pic'
         end
 
         it 'has substitution for $Canvas.user.id' do
-          user.stubs(:id).returns(456)
+          allow(user).to receive(:id).and_return(456)
           exp_hash = {test: '$Canvas.user.id'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 456
         end
 
         it 'has substitution for $vnd.instructure.User.uuid' do
-          user.stubs(:uuid).returns('N2ST123dQ9zyhurykTkBfXFa3Vn1RVyaw9Os6vu3')
+          allow(user).to receive(:uuid).and_return('N2ST123dQ9zyhurykTkBfXFa3Vn1RVyaw9Os6vu3')
           exp_hash = {test: '$vnd.instructure.User.uuid'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 'N2ST123dQ9zyhurykTkBfXFa3Vn1RVyaw9Os6vu3'
         end
 
         it 'has substitution for $Canvas.user.isRootAccountAdmin' do
-          user.stubs(:roles).returns(["root_admin"])
+          allow(user).to receive(:roles).and_return(["root_admin"])
           exp_hash = {test: '$Canvas.user.isRootAccountAdmin'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq true
         end
 
         it 'has substitution for $Canvas.xuser.allRoles' do
-          Lti::SubstitutionsHelper.stubs(:new).returns(substitution_helper)
-          substitution_helper.stubs(:all_roles).returns('Admin,User')
+          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+          allow(substitution_helper).to receive(:all_roles).and_return('Admin,User')
           exp_hash = {test: '$Canvas.xuser.allRoles'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 'Admin,User'
         end
 
         it 'has substitution for $Canvas.user.globalId' do
-          user.stubs(:global_id).returns(456)
+          allow(user).to receive(:global_id).and_return(456)
           exp_hash = {test: '$Canvas.user.globalId'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 456
         end
 
         it 'has substitution for $Membership.role' do
-          substitution_helper.stubs(:all_roles).with('lis2').returns('Admin,User')
-          Lti::SubstitutionsHelper.stubs(:new).returns(substitution_helper)
+          allow(substitution_helper).to receive(:all_roles).with('lis2').and_return('Admin,User')
+          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
           exp_hash = {test: '$Membership.role'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 'Admin,User'
         end
 
         it 'has substitution for $User.id' do
-          user.stubs(:id).returns(456)
+          allow(user).to receive(:id).and_return(456)
           exp_hash = {test: '$User.id'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 456
@@ -911,14 +945,14 @@ module Lti
 
         context '$Canvas.user.prefersHighContrast' do
           it 'substitutes as true' do
-            user.stubs(:prefers_high_contrast?).returns(true)
+            allow(user).to receive(:prefers_high_contrast?).and_return(true)
             exp_hash = {test: '$Canvas.user.prefersHighContrast'}
             variable_expander.expand_variables!(exp_hash)
             expect(exp_hash[:test]).to eq 'true'
           end
 
           it 'substitutes as false' do
-            user.stubs(:prefers_high_contrast?).returns(false)
+            allow(user).to receive(:prefers_high_contrast?).and_return(false)
             exp_hash = {test: '$Canvas.user.prefersHighContrast'}
             variable_expander.expand_variables!(exp_hash)
             expect(exp_hash[:test]).to eq 'false'
@@ -1052,8 +1086,8 @@ module Lti
 
         it 'has substitution for $Canvas.masqueradingUser.id' do
           masquerading_user = User.new
-          masquerading_user.stubs(:id).returns(7878)
-          user.stubs(:id).returns(42)
+          allow(masquerading_user).to receive(:id).and_return(7878)
+          allow(user).to receive(:id).and_return(42)
           variable_expander.instance_variable_set("@current_user", masquerading_user)
           exp_hash = {test: '$Canvas.masqueradingUser.id'}
           variable_expander.expand_variables!(exp_hash)
@@ -1070,7 +1104,7 @@ module Lti
 
         it 'has substitution for $Canvas.masqueradingUser.userId' do
           masquerading_user = User.new
-          masquerading_user.stubs(:id).returns(7878)
+          allow(masquerading_user).to receive(:id).and_return(7878)
           variable_expander.instance_variable_set("@current_user", masquerading_user)
           exp_hash = {test: '$Canvas.masqueradingUser.userId'}
           variable_expander.expand_variables!(exp_hash)
@@ -1078,8 +1112,8 @@ module Lti
         end
 
         it 'has substitution for Canvas.module.id' do
-          content_tag = mock('content_tag')
-          content_tag.stubs(:context_module_id).returns('foo')
+          content_tag = double('content_tag')
+          allow(content_tag).to receive(:context_module_id).and_return('foo')
           variable_expander.instance_variable_set('@content_tag', content_tag)
           exp_hash = {test: '$Canvas.module.id'}
           variable_expander.expand_variables!(exp_hash)
@@ -1087,8 +1121,8 @@ module Lti
         end
 
         it 'has substitution for Canvas.moduleItem.id' do
-          content_tag = mock('content_tag')
-          content_tag.stubs(:id).returns(7878)
+          content_tag = double('content_tag')
+          allow(content_tag).to receive(:id).and_return(7878)
           variable_expander.instance_variable_set('@content_tag', content_tag)
           exp_hash = {test: '$Canvas.moduleItem.id'}
           variable_expander.expand_variables!(exp_hash)

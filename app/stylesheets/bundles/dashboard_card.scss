@@ -28,7 +28,6 @@ $ic-DashboardCard-action-width: floor($ic-DashboardCard-width / 4);
 $ic-DashboardCard-icon-size: 24px;
 $ic-DashboardCard-icon-padding: floor(($ic-DashboardCard-action-width - $ic-DashboardCard-icon-size) / 2);
 $ic-DashboardCard-icon-color: $ic-icon-link-color;
-$ic-DashboardCard-action-hover-font-color: $ic-brand-primary;
 
 // Optional parent container padding
 .ic-DashboardCard__box {
@@ -160,7 +159,7 @@ $ic-DashboardCard-action-hover-font-color: $ic-brand-primary;
 }
 
 .ic-DashboardCard__action-badge {
-  @include ic-badge-maker(18px, $ic-brand-primary, $ic-color-light);
+  @include ic-badge-maker(18px, var(--ic-brand-primary), $ic-color-light);
   box-shadow: 0 0 0 1px $ic-color-light;
   transition: all 0.2s;
   position: absolute;
@@ -197,7 +196,7 @@ $ic-DashboardCard-action-hover-font-color: $ic-brand-primary;
       @if $use_high_contrast { outline: 1px solid $ic-link-color; }
       @else { outline: none; }
     }
-    &:hover { color: $ic-DashboardCard-action-hover-font-color; }
+    &:hover { color: var(--ic-brand-primary); }
   }
 }
 

@@ -21,7 +21,7 @@ app/stylesheets/brandable_css_brands
 /config/*.yml
 /config/environments/*-local.rb
 /config/locales/generated/
-/config/RAILS5
+/config/RAILS5_1
 /coverage/
 /coverage-js/
 /db/schema.rb
@@ -29,7 +29,7 @@ app/stylesheets/brandable_css_brands
 /db/*sql
 /exports/
 Gemfile.lock
-Gemfile.lock.5
+Gemfile.lock.51
 /log/
 mkmf.log
 /node_modules

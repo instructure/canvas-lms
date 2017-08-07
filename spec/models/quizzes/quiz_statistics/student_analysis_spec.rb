@@ -316,12 +316,12 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
 
     it 'should include primary domain if trust exists' do
       account2 = Account.create!
-      HostUrl.stubs(:context_host).returns('school')
-      HostUrl.expects(:context_host).with(account2).returns('school1')
+      allow(HostUrl).to receive(:context_host).and_return('school')
+      expect(HostUrl).to receive(:context_host).with(account2).and_return('school1')
       @student.pseudonyms.scope.delete_all
       account2.pseudonyms.create!(user: @student, unique_id: 'user') { |p| p.sis_user_id = 'sisid' }
-      @quiz.context.root_account.any_instantiation.stubs(:trust_exists?).returns(true)
-      @quiz.context.root_account.any_instantiation.stubs(:trusted_account_ids).returns([account2.id])
+      allow_any_instantiation_of(@quiz.context.root_account).to receive(:trust_exists?).and_return(true)
+      allow_any_instantiation_of(@quiz.context.root_account).to receive(:trusted_account_ids).and_return([account2.id])
 
       qs = @quiz.generate_submission(@student)
       Quizzes::SubmissionGrader.new(qs).grade_submission
@@ -523,10 +523,9 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       question_data = { question_type: 'essay_question' }
       responses = []
 
-      CanvasQuizStatistics.
-        expects(:analyze).
+      expect(CanvasQuizStatistics).to receive(:analyze).
           with(question_data, responses).
-          returns({ some_metric: 5 })
+          and_return({ some_metric: 5 })
 
       output = subject.send(:stats_for_question, question_data, responses, false)
       expect(output).to eq({
@@ -541,7 +540,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
         answers: []
       }
 
-      CanvasQuizStatistics.expects(:analyze).never
+      expect(CanvasQuizStatistics).to receive(:analyze).never
 
       subject.send(:stats_for_question, question_data, [])
     end

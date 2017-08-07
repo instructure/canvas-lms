@@ -138,6 +138,9 @@ Rails/TimeZone:
 # accessors are often defined in terms of read_attribute
 Rails/ReadWriteAttribute:
   Enabled: false
+# we never bothered creating an ApplicationRecord
+Rails/ApplicationRecord:
+  Enabled: false
 
 # Lint changes
 Lint/AmbiguousRegexpLiteral:

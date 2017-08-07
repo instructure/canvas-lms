@@ -108,7 +108,9 @@ class EnrollmentState < ActiveRecord::Base
       # this will at least prevent cached unauthorization
       self.user_needs_touch = true
       unless self.skip_touch_user
-        self.enrollment.user.touch
+        self.class.connection.after_transaction_commit do
+          self.enrollment.user.touch
+        end
       end
     end
   end

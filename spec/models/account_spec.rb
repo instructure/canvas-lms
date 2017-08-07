@@ -153,7 +153,7 @@ describe Account do
 
       it "should order list by specified parameter" do
         order = "courses.created_at ASC"
-        @account.expects(:fast_course_base).with(order: order)
+        expect(@account).to receive(:fast_course_base).with(order: order)
         @account.fast_all_courses(order: order)
       end
     end
@@ -441,10 +441,10 @@ describe Account do
   end
 
   it "should set up access policy correctly" do
-    # stub out any "if" permission conditions
+    # double out any "if" permission conditions
     RoleOverride.permissions.each do |k, v|
       next unless v[:if]
-      Account.any_instance.stubs(v[:if]).returns(true)
+      allow_any_instance_of(Account).to receive(v[:if]).and_return(true)
     end
     site_admin = Account.site_admin
 
@@ -860,7 +860,7 @@ describe Account do
         :hidden => false,
         :args => [1, 2]
       }
-      Lti::MessageHandler.stubs(:lti_apps_tabs).returns([mock_tab])
+      allow(Lti::MessageHandler).to receive(:lti_apps_tabs).and_return([mock_tab])
       expect(@account.tabs_available(nil)).to include(mock_tab)
     end
 
@@ -1199,13 +1199,13 @@ describe Account do
     end
 
     it "doesn't have permission, it returns false" do
-      account.stubs(:grants_right?).returns(false)
+      allow(account).to receive(:grants_right?).and_return(false)
       account_admin_user(:account => account)
       expect(account.can_see_admin_tools_tab?(@admin)).to be_falsey
     end
 
     it "does have permission, it returns true" do
-      account.stubs(:grants_right?).returns(true)
+      allow(account).to receive(:grants_right?).and_return(true)
       account_admin_user(:account => account)
       expect(account.can_see_admin_tools_tab?(@admin)).to be_truthy
     end
@@ -1347,7 +1347,7 @@ describe Account do
     it "should only clear the quota cache if something changes" do
       account = account_model
 
-      Account.expects(:invalidate_inherited_caches).once
+      expect(Account).to receive(:invalidate_inherited_caches).once
 
       account.default_storage_quota = 10.megabytes
       account.save! # clear here
@@ -1559,7 +1559,7 @@ describe Account do
       specs_require_sharding
 
       it "should work cross-shard" do
-        ActiveRecord::Base.connection.stubs(:use_qualified_names?).returns(true)
+        allow(ActiveRecord::Base.connection).to receive(:use_qualified_names?).and_return(true)
         @shard1.activate do
           @account = Account.create!
           @user = user_factory(:name => "silly name")
@@ -1567,6 +1567,29 @@ describe Account do
         end
         expect(@account.users_name_like("silly").first).to eq @user
       end
+    end
+  end
+
+  describe "#migrate_to_canvadocs?" do
+    before(:once) do
+      @account = Account.create!
+    end
+
+    it "is true if hijack_crocodoc_sessions is true and new annotations are enabled" do
+      allow(Canvadocs).to receive(:hijack_crocodoc_sessions?).and_return(true)
+      @account.enable_feature!(:new_annotations)
+      expect(@account).to be_migrate_to_canvadocs
+    end
+
+    it "is false if new annotations are enabled but hijack_crocodoc_sessions is false" do
+      allow(Canvadocs).to receive(:hijack_crocodoc_sessions?).and_return(false)
+      @account.enable_feature!(:new_annotations)
+      expect(@account).not_to be_migrate_to_canvadocs
+    end
+
+    it "is false if hijack_crocodoc_sessions is true but new annotations are disabled" do
+      allow(Canvadocs).to receive(:hijack_crocodoc_sessions?).and_return(true)
+      expect(@account).not_to be_migrate_to_canvadocs
     end
   end
 

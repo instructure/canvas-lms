@@ -43,16 +43,16 @@ describe Canvas::Security do
         end
 
         it "should encode with configured encryption key" do
-          jwt = stub
-          jwt.expects(:sign).with(Canvas::Security.encryption_key, :HS256).returns("sometoken")
-          JSON::JWT.stubs(new: jwt)
+          jwt = double
+          expect(jwt).to receive(:sign).with(Canvas::Security.encryption_key, :HS256).and_return("sometoken")
+          allow(JSON::JWT).to receive_messages(new: jwt)
           Canvas::Security.create_jwt({ a: 1 })
         end
 
         it "should encode with the supplied key" do
-          jwt = stub
-          jwt.expects(:sign).with("mykey", :HS256).returns("sometoken")
-          JSON::JWT.stubs(new: jwt)
+          jwt = double
+          expect(jwt).to receive(:sign).with("mykey", :HS256).and_return("sometoken")
+          allow(JSON::JWT).to receive_messages(new: jwt)
           Canvas::Security.create_jwt({ a: 1 }, nil, "mykey")
         end
       end
@@ -197,6 +197,18 @@ describe Canvas::Security do
         expect(Canvas::Security.time_until_login_allowed(@p, '5.5.5.6')).to eq 0
         expect(Canvas::Security.time_until_login_allowed(@p, '5.5.5.5')).to be <= 5
       end
+    end
+  end
+
+  describe '.config' do
+    before { described_class.instance_variable_set(:@config, nil) }
+    after  { described_class.instance_variable_set(:@config, nil) }
+
+    it 'loads config as erb from config/security.yml' do
+      config = "test:\n  encryption_key: <%= ENV['ENCRYPTION_KEY'] %>"
+      expect(File).to receive(:read).with(Rails.root + 'config/security.yml').and_return(config)
+      expect(ENV).to receive(:[]).with('ENCRYPTION_KEY').and_return('secret')
+      expect(Canvas::Security.config).to eq('encryption_key' => 'secret')
     end
   end
 end

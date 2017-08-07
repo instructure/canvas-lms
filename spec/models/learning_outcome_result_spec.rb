@@ -131,10 +131,10 @@ describe LearningOutcomeResult do
 
     it "returns accurate results" do
       points_possible = 5.5
-      learning_outcome_result.learning_outcome.stubs({
+      allow(learning_outcome_result.learning_outcome).to receive_messages({
         points_possible: points_possible, mastery_points: 3.5
       })
-      learning_outcome_result.alignment.stubs(mastery_score: 0.6)
+      allow(learning_outcome_result.alignment).to receive_messages(mastery_score: 0.6)
       learning_outcome_result.update_attribute(:score, 6)
       learning_outcome_result.update_attribute(:possible, 10)
       learning_outcome_result.calculate_percent!
@@ -143,10 +143,10 @@ describe LearningOutcomeResult do
     end
 
     it "properly scales score to parent outcome's mastery level" do
-      learning_outcome_result.learning_outcome.stubs({
+      allow(learning_outcome_result.learning_outcome).to receive_messages({
         points_possible: 5.0, mastery_points: 3.0
       })
-      learning_outcome_result.alignment.stubs(mastery_score: 0.7)
+      allow(learning_outcome_result.alignment).to receive_messages(mastery_score: 0.7)
       learning_outcome_result.update_attribute(:score, 6)
       learning_outcome_result.update_attribute(:possible, 10)
       learning_outcome_result.calculate_percent!
@@ -155,10 +155,10 @@ describe LearningOutcomeResult do
     end
 
     it "does not fail if parent outcome has integers instead of floats" do
-      learning_outcome_result.learning_outcome.stubs({
+      allow(learning_outcome_result.learning_outcome).to receive_messages({
         points_possible: 5, mastery_points: 3
       })
-      learning_outcome_result.alignment.stubs(mastery_score: 0.7)
+      allow(learning_outcome_result.alignment).to receive_messages(mastery_score: 0.7)
       learning_outcome_result.update_attribute(:score, 6)
       learning_outcome_result.update_attribute(:possible, 10)
       learning_outcome_result.calculate_percent!

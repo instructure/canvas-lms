@@ -44,7 +44,7 @@ describe GraphQLController do
     end
 
     it "doesn't work in production" do
-      Rails.env.stubs(:production?).returns(true)
+      allow(Rails.env).to receive(:production?).and_return(true)
       user_session(@student)
       get :graphiql
       expect(response.status).to eq 401
@@ -62,7 +62,7 @@ describe GraphQLController do
     before { Account.default.enable_feature!("graphql") }
 
     it "works" do
-      post :execute, query: "{}"
+      post :execute, params: {query: "{}"}
       expect(JSON.parse(response.body)["errors"]).not_to be_blank
     end
   end

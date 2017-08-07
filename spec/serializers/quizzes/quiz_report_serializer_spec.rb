@@ -70,13 +70,13 @@ describe Quizzes::QuizReportSerializer do
   end
 
   let(:user) { User.new }
-  let(:session) { stub }
+  let(:session) { double }
   let(:host_name) { 'example.com' }
 
   let :controller do
     ActiveModel::FakeController.new({}).tap do |controller|
-      controller.stubs(:session).returns session
-      controller.stubs(:context).returns context
+      allow(controller).to receive(:session).and_return session
+      allow(controller).to receive(:context).and_return context
     end
   end
 
@@ -115,7 +115,7 @@ describe Quizzes::QuizReportSerializer do
 
   context 'JSON-API' do
     before do
-      controller.expects(:accepts_jsonapi?).at_least_once.returns true
+      expect(controller).to receive(:accepts_jsonapi?).at_least(:once).and_return true
     end
 
     it 'serializes id' do
@@ -134,7 +134,7 @@ describe Quizzes::QuizReportSerializer do
 
   context 'legacy JSON' do
     before do
-      controller.expects(:accepts_jsonapi?).at_least_once.returns false
+      expect(controller).to receive(:accepts_jsonapi?).at_least(:once).and_return false
     end
 
     it 'serializes id' do

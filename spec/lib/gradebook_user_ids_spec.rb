@@ -696,20 +696,20 @@ describe GradebookUserIds do
 
       context "ascending" do
         it "sorts by the current grading period totals if no selected grading period is in user preferences" do
-          @course.stubs(:grading_periods?).returns(true)
+          allow(@course).to receive(:grading_periods?).and_return(true)
           expected_user_ids = [@student1.id, @student3.id, @student4.id, @student2.id, @fake_student.id]
           expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
         end
 
         it "sorts by the current grading period totals if a grading period ID of 'null' is in user preferences" do
-          @course.stubs(:grading_periods?).returns(true)
+          allow(@course).to receive(:grading_periods?).and_return(true)
           @teacher.preferences[:gradebook_settings][@course.id][:filter_columns_by][:grading_period_id] = "null"
           expected_user_ids = [@student1.id, @student3.id, @student4.id, @student2.id, @fake_student.id]
           expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
         end
 
         it "sorts by the selected grading period totals if a selected grading period is in user preferences" do
-          @course.stubs(:grading_periods?).returns(true)
+          allow(@course).to receive(:grading_periods?).and_return(true)
           @teacher.preferences[:gradebook_settings][@course.id][:filter_columns_by][:grading_period_id] =
             @future_period.id.to_s
           expected_user_ids = [@student2.id, @student1.id, @student4.id, @student3.id, @fake_student.id]
@@ -722,7 +722,7 @@ describe GradebookUserIds do
           end
 
           it "sorts by 'All Grading Periods' if a grading period ID of '0' is in user preferences" do
-            @course.stubs(:grading_periods?).returns(true)
+            allow(@course).to receive(:grading_periods?).and_return(true)
             @teacher.preferences[:gradebook_settings][@course.id][:filter_columns_by][:grading_period_id] = "0"
             expected_user_ids = [@student1.id, @student2.id, @student4.id, @student3.id, @fake_student.id]
             expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
@@ -735,7 +735,7 @@ describe GradebookUserIds do
           end
 
           it "sorts by 'All Grading Periods' if a grading period ID of '0' is in user preferences" do
-            @course.stubs(:grading_periods?).returns(true)
+            allow(@course).to receive(:grading_periods?).and_return(true)
             @teacher.preferences[:gradebook_settings][@course.id][:filter_columns_by][:grading_period_id] = "0"
             expected_user_ids = [@student1.id, @student2.id, @student3.id, @student4.id, @fake_student.id]
             expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
@@ -749,20 +749,20 @@ describe GradebookUserIds do
         end
 
         it "sorts by the current grading period totals if no selected grading period is in user preferences" do
-          @course.stubs(:grading_periods?).returns(true)
+          allow(@course).to receive(:grading_periods?).and_return(true)
           expected_user_ids = [@student2.id, @student4.id, @student3.id, @student1.id, @fake_student.id]
           expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
         end
 
         it "sorts by the current grading period totals if a grading period ID of 'null' is in user preferences" do
-          @course.stubs(:grading_periods?).returns(true)
+          allow(@course).to receive(:grading_periods?).and_return(true)
           @teacher.preferences[:gradebook_settings][@course.id][:filter_columns_by][:grading_period_id] = "null"
           expected_user_ids = [@student2.id, @student4.id, @student3.id, @student1.id, @fake_student.id]
           expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
         end
 
         it "sorts by the selected grading period totals if a selected grading period is in user preferences" do
-          @course.stubs(:grading_periods?).returns(true)
+          allow(@course).to receive(:grading_periods?).and_return(true)
           @teacher.preferences[:gradebook_settings][@course.id][:filter_columns_by][:grading_period_id] =
             @future_period.id.to_s
           expected_user_ids = [@student3.id, @student4.id, @student1.id, @student2.id, @fake_student.id]
@@ -775,7 +775,7 @@ describe GradebookUserIds do
           end
 
           it "sorts by 'All Grading Periods' if a grading period ID of '0' is in user preferences" do
-            @course.stubs(:grading_periods?).returns(true)
+            allow(@course).to receive(:grading_periods?).and_return(true)
             @teacher.preferences[:gradebook_settings][@course.id][:filter_columns_by][:grading_period_id] = "0"
             expected_user_ids = [@student3.id, @student4.id, @student2.id, @student1.id, @fake_student.id]
             expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
@@ -788,7 +788,7 @@ describe GradebookUserIds do
           end
 
           it "sorts by 'All Grading Periods' if a grading period ID of '0' is in user preferences" do
-            @course.stubs(:grading_periods?).returns(true)
+            allow(@course).to receive(:grading_periods?).and_return(true)
             @teacher.preferences[:gradebook_settings][@course.id][:filter_columns_by][:grading_period_id] = "0"
             expected_user_ids = [@student4.id, @student3.id, @student2.id, @student1.id, @fake_student.id]
             expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)

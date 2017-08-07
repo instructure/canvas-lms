@@ -181,7 +181,7 @@ class Group < ActiveRecord::Base
   end
 
   def participants(opts={})
-    users = participating_users.uniq.all
+    users = participating_users.distinct.all
     if opts[:include_observers] && self.context.is_a?(Course)
       (users + User.observing_students_in_course(users, self.context)).flatten.uniq
     else

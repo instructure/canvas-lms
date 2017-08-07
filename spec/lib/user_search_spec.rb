@@ -23,7 +23,7 @@ describe UserSearch do
   describe '.for_user_in_context' do
     let(:search_names) { ['Rose Tyler', 'Martha Jones', 'Rosemary Giver', 'Martha Stewart', 'Tyler Pickett', 'Jon Stewart', 'Stewart Little', 'Ĭńşŧřůćƭǜȑȩ Person'] }
     let(:course) { Course.create!(workflow_state: "available") }
-    let(:users) { UserSearch.for_user_in_context('Stewart', course, user).to_a }
+    let(:users) { UserSearch.for_user_in_context('Stewart', course, user, nil, sort: "username", order: "asc").to_a }
     let(:names) { users.map(&:name) }
     let(:user) { User.last }
     let(:student) { User.where(name: search_names.last).first }
@@ -83,10 +83,17 @@ describe UserSearch do
           expect(results.map(&:name)).to include('Tyler Teacher')
         end
 
+        it "sorts by name" do
+          expect(names.size).to eq 3
+          expect(names[0]).to eq "Stewart Little"
+          expect(names[1]).to eq "Jon Stewart"
+          expect(names[2]).to eq "Martha Stewart"
+        end
+
         describe 'filtering by role' do
           subject { names }
           describe 'to a single role' do
-            let(:users) { UserSearch.for_user_in_context('Tyler', course, user, nil, :enrollment_type => 'student' ).to_a }
+            let(:users) { UserSearch.for_user_in_context('Tyler', course, user, nil, :enrollment_type => 'student').to_a }
 
             it { is_expected.to include('Rose Tyler') }
             it { is_expected.to include('Tyler Pickett') }
@@ -280,6 +287,43 @@ describe UserSearch do
 
 
   describe '.scope_for' do
+
+    let(:search_names) do
+      ['Rose Tyler',
+       'Martha Jones',
+       'Rosemary Giver',
+       'Martha Stewart',
+       'Tyler Pickett',
+       'Jon Stewart',
+       'Stewart Little',
+       'Ĭńşŧřůćƭǜȑȩ Person']
+    end
+
+    let(:course) { Course.create!(workflow_state: "available") }
+    let(:users) { UserSearch.scope_for(course, user, sort: "username", order: "desc").to_a }
+    let(:names) { users.map(&:name) }
+    let(:user) { User.last }
+    let(:student) { User.where(name: search_names.last).first }
+
+    before do
+      search_names.each do |name|
+        student = User.create!(:name => name)
+        StudentEnrollment.create!(:user => student, :course => course, :workflow_state => 'active')
+      end
+    end
+
+    it 'sorts by name desc' do
+      expect(names.size).to eq 8
+      expect(names[0]).to eq "Rose Tyler"
+      expect(names[1]).to eq "Martha Stewart"
+      expect(names[2]).to eq "Jon Stewart"
+      expect(names[3]).to eq "Tyler Pickett"
+      expect(names[4]).to eq "Ĭńşŧřůćƭǜȑȩ Person"
+      expect(names[5]).to eq "Stewart Little"
+      expect(names[6]).to eq "Martha Jones"
+      expect(names[7]).to eq "Rosemary Giver"
+    end
+
     it 'raises an error if there is a bad enrollment type' do
       course = Course.create!
       student = User.create!

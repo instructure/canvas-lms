@@ -344,11 +344,18 @@ class SisImportsApiController < ApplicationController
   #   Format documentation for details.
   #
   # @argument change_threshold [Integer]
-  #   If set, diffing will not be performed if the files are greater than the
-  #   threshold as a percent. If set to 5 and the file is more than 5% smaller
-  #   or more than 5% larger than the file that is being compared to, diffing
-  #   will not be performed. If the files are less than 5%, diffing will be
-  #   performed. See the SIS CSV Format documentation for more details.
+  #   If set with batch_mode, the batch cleanup process will not run if the
+  #   number of items deleted is higher than the percentage set. If set to 10
+  #   and a term has 200 enrollments, and batch would delete more than 20 of
+  #   the enrollments the batch will abort before the enrollments are deleted.
+  #   If set with diffing, diffing  will not be performed if the files are
+  #   greater than the threshold as a percent. If set to 5 and the file is more
+  #   than 5% smaller or more than 5% larger than the file that is being
+  #   compared to, diffing will not be performed. If the files are less than 5%,
+  #   diffing will be performed. See the SIS CSV Format documentation for more
+  #   details.
+  #   If set with batch_mode and diffing, the same threshold is used for both
+  #   steps of the import.
   #
   # @returns SisImport
   def create

@@ -19,7 +19,7 @@
 # CANVAS_RAILS5_1=1 env var, or create an empty RAILS5_1 file in the canvas config dir
 if !defined?(CANVAS_RAILS5_0)
   if ENV['CANVAS_RAILS5_1']
-    CANVAS_RAILS5_0 = ENV['CANVAS_RAILS5_1'] == '1'
+    CANVAS_RAILS5_0 = ENV['CANVAS_RAILS5_1'] != '1'
   else
     CANVAS_RAILS5_0 = !File.exist?(File.expand_path("../RAILS5_1", __FILE__))
   end

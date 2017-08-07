@@ -51,10 +51,6 @@ describe "discussions" do
         stub_rcs_config
       end
 
-      after(:each) do
-        unstub_rcs_config
-      end
-
       context "graded" do
         let(:topic) { assignment_topic }
 

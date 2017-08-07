@@ -47,7 +47,6 @@ class User < ActiveRecord::Base
   has_many :communication_channels, -> { order('communication_channels.position ASC') }, dependent: :destroy
   has_many :notification_policies, through: :communication_channels
   has_one :communication_channel, -> { where("workflow_state<>'retired'").order(:position) }
-  has_many :notification_endpoints, :through => :access_tokens
   has_many :planner_notes, :dependent => :destroy
 
   has_many :enrollments, :dependent => :destroy
@@ -76,6 +75,7 @@ class User < ActiveRecord::Base
   has_many :associated_root_accounts, -> { order("user_account_associations.depth").where(accounts: { parent_account_id: nil }) }, source: :account, through: :user_account_associations
   has_many :developer_keys
   has_many :access_tokens, -> { preload(:developer_key) }
+  has_many :notification_endpoints, :through => :access_tokens
   has_many :context_external_tools, -> { order(:name) }, as: :context, inverse_of: :context, dependent: :destroy
 
   has_many :student_enrollments
@@ -118,7 +118,6 @@ class User < ActiveRecord::Base
   has_many :web_conference_participants
   has_many :web_conferences, :through => :web_conference_participants
   has_many :account_users
-  has_many :accounts, :through => :account_users
   has_many :media_objects, :as => :context, :inverse_of => :context
   has_many :user_generated_media_objects, :class_name => 'MediaObject'
   has_many :user_notes
@@ -291,7 +290,7 @@ class User < ActiveRecord::Base
 
   attr_accessor :require_acceptance_of_terms, :require_presence_of_name,
     :require_self_enrollment_code, :self_enrollment_code,
-    :self_enrollment_course, :validation_root_account
+    :self_enrollment_course, :validation_root_account, :sortable_name_explicitly_set
   attr_reader :self_enrollment
 
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
@@ -501,9 +500,7 @@ class User < ActiveRecord::Base
         data[:courses] += Course.select([:id, :account_id]).where(:id => course_ids.to_a).to_a unless course_ids.empty?
 
         data[:pseudonyms] += Pseudonym.active.select([:user_id, :account_id]).distinct.where(:user_id => shard_user_ids).to_a
-        AccountUser.unscoped do
-          data[:account_users] += AccountUser.select([:user_id, :account_id]).distinct.where(:user_id => shard_user_ids).to_a
-        end
+        data[:account_users] += AccountUser.active.select([:user_id, :account_id]).distinct.where(:user_id => shard_user_ids).to_a
       end
       # now make it easy to get the data by user id
       data[:enrollments] = data[:enrollments].group_by(&:user_id)
@@ -720,6 +717,7 @@ class User < ActiveRecord::Base
     self.sortable_name = nil if self.sortable_name == ""
     # recalculate the sortable name if the name changed, but the sortable name didn't, and the sortable_name matches the old name
     self.sortable_name = nil if !self.sortable_name_changed? &&
+        !sortable_name_explicitly_set &&
         self.name_changed? &&
         User.name_parts(self.sortable_name, likely_already_surname_first: true).compact.join(' ') == self.name_was
     unless read_attribute(:sortable_name)
@@ -887,7 +885,7 @@ class User < ActiveRecord::Base
         user_observer_scope = self.user_observers.shard(self)
         user_observee_scope = self.user_observees.shard(self)
         pseudonym_scope = self.pseudonyms.active.shard(self)
-        account_users = self.account_users.shard(self)
+        account_users = self.account_users.active.shard(self)
         has_other_root_accounts = false
       else
         # make sure to do things on the root account's shard. but note,
@@ -1052,7 +1050,7 @@ class User < ActiveRecord::Base
     can :read_grades
 
     given do |user|
-      self.check_accounts_right?(user, :manage_user_logins) && self.all_accounts.select(&:root_account?).all? {|a| has_subset_of_account_permissions?(user, a) }
+      self.check_accounts_right?(user, :manage_user_logins) && self.adminable_accounts.select(&:root_account?).all? {|a| has_subset_of_account_permissions?(user, a) }
     end
     can :manage_user_details and can :rename and can :read_profile
 
@@ -1596,7 +1594,8 @@ class User < ActiveRecord::Base
         expecting_submission.
         where(:moderated_grading => true).
         where("assignments.grades_published_at IS NULL").
-        joins(:provisional_grades).preload(:context).
+        where(:id => ModeratedGrading::ProvisionalGrade.joins(:submission).where("submissions.assignment_id=assignments.id").distinct.select(:assignment_id)).
+        preload(:context).
         need_grading_info
       if options[:scope_only]
         scope # Also need to check the rights like below
@@ -2578,8 +2577,8 @@ class User < ActiveRecord::Base
     @menu_data = {
       :group_memberships => coalesced_group_memberships,
       :group_memberships_count => cached_group_memberships.length,
-      :accounts => self.all_accounts,
-      :accounts_count => self.all_accounts.length,
+      :accounts => self.adminable_accounts,
+      :accounts_count => self.adminable_accounts.length,
     }
   end
 
@@ -2701,8 +2700,8 @@ class User < ActiveRecord::Base
     not public?
   end
 
-  def profile(force_reload = false)
-    (force_reload ? reload_profile : super) || build_profile
+  def profile
+    super || build_profile
   end
 
   def parse_otp_remember_me_cookie(cookie)
@@ -2756,7 +2755,14 @@ class User < ActiveRecord::Base
   end
 
   def crocodoc_user
-    "#{crocodoc_id!},#{short_name.gsub(",","")}"
+    "#{crocodoc_id!},#{short_name.delete(',')}"
+  end
+
+  def moderated_grading_ids(create_crocodoc_id=false)
+    {
+      crocodoc_id: create_crocodoc_id ? crocodoc_id! : crocodoc_id,
+      global_id: global_id.to_s
+    }
   end
 
   # mfa settings for a user are the most restrictive of any pseudonyms the user has
@@ -2864,16 +2870,18 @@ class User < ActiveRecord::Base
     associated_shards.select { |shard| shard.in_current_region? || shard.default? }
   end
 
-  def all_accounts
-    @all_accounts ||= shard.activate do
-      Rails.cache.fetch(['all_accounts', self, ApplicationController.region].cache_key) do
-        self.accounts.active.shard(in_region_associated_shards).to_a
+  def adminable_accounts
+    @adminable_accounts ||= shard.activate do
+      Rails.cache.fetch(['adminable_accounts', self, ApplicationController.region].cache_key) do
+        Account.shard(self).active.joins(:account_users).
+          where(account_users: {user_id: self.id}).
+          where.not(account_users: {workflow_state: 'deleted'})
       end
     end
   end
 
   def all_paginatable_accounts
-    ShardedBookmarkedCollection.build(Account::Bookmarker, self.accounts.active)
+    ShardedBookmarkedCollection.build(Account::Bookmarker, self.adminable_accounts)
   end
 
   def all_pseudonyms

@@ -261,30 +261,30 @@ describe LearningOutcomeGroup do
     end
 
     it "should read vendor_guid_2" do
-      AcademicBenchmark.stubs(:use_new_guid_columns?).returns(false)
+      allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(false)
       expect(@group.vendor_guid).to be_nil
       @group.vendor_guid = "GUID-XXXX"
       @group.save!
       expect(@group.vendor_guid).to eql "GUID-XXXX"
-      AcademicBenchmark.stubs(:use_new_guid_columns?).returns(true)
+      allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(true)
       expect(@group.vendor_guid).to eql "GUID-XXXX"
       @group.write_attribute('vendor_guid_2', "GUID-YYYY")
       expect(@group.vendor_guid).to eql "GUID-YYYY"
-      AcademicBenchmark.stubs(:use_new_guid_columns?).returns(false)
+      allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(false)
       expect(@group.vendor_guid).to eql "GUID-XXXX"
     end
 
     it "should read migration_id_2" do
-      AcademicBenchmark.stubs(:use_new_guid_columns?).returns(false)
+      allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(false)
       expect(@group.migration_id).to be_nil
       @group.migration_id = "GUID-XXXX"
       @group.save!
       expect(@group.migration_id).to eql "GUID-XXXX"
-      AcademicBenchmark.stubs(:use_new_guid_columns?).returns(true)
+      allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(true)
       expect(@group.migration_id).to eql "GUID-XXXX"
       @group.write_attribute('migration_id_2', "GUID-YYYY")
       expect(@group.migration_id).to eql "GUID-YYYY"
-      AcademicBenchmark.stubs(:use_new_guid_columns?).returns(false)
+      allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(false)
       expect(@group.migration_id).to eql "GUID-XXXX"
     end
   end

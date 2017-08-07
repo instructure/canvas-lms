@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class AssignmentConfigurationToolLookup < ActiveRecord::Base
-  belongs_to :tool, polymorphic: true
+  belongs_to :tool, polymorphic: [:context_external_tool, message_handler: 'Lti::MessageHandler']
   belongs_to :assignment
   after_create :create_subscription
   # Do not add before_destroy or after_destroy, these records are "delete_all"ed

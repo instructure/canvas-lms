@@ -20,7 +20,9 @@ class GraphQLTypeTester
 
       define_singleton_method name do |ctx={}|
         args = ctx.delete(:args) || {}
-        field.resolve(@obj, args, @context.merge(ctx))
+        GraphQL::Batch.batch {
+          field.resolve(@obj, args, @context.merge(ctx))
+        }
       end
     }
   end

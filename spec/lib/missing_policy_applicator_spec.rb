@@ -44,19 +44,36 @@ describe MissingPolicyApplicator do
         missing_submission_deduction: 75
       )
     end
+    let :valid_assignment_attributes do
+      assignment_valid_attributes.merge(submission_types: 'online_text_entry')
+    end
     let :create_recent_assignment do
       @course.assignments.create!(
-        assignment_valid_attributes.merge(grading_type: 'letter_grade', due_at: 1.hour.ago(now))
+        valid_assignment_attributes.merge(grading_type: 'letter_grade', due_at: 1.hour.ago(now))
+      )
+    end
+    let :create_recent_paper_assignment do
+      @course.assignments.create!(
+        valid_assignment_attributes.merge(
+          grading_type: 'letter_grade', due_at: 1.hour.ago(now), submission_types: 'on_paper'
+        )
+      )
+    end
+    let :create_recent_no_submission_assignment do
+      @course.assignments.create!(
+        valid_assignment_attributes.merge(
+          grading_type: 'letter_grade', due_at: 1.hour.ago(now), submission_types: 'none'
+        )
       )
     end
     let :assignment_old do
       @course.assignments.create!(
-        assignment_valid_attributes.merge(grading_type: 'letter_grade', due_at: 25.hours.ago(now))
+        valid_assignment_attributes.merge(grading_type: 'letter_grade', due_at: 25.hours.ago(now))
       )
     end
     let :create_pass_fail_assignment do
       @course.assignments.create!(
-        assignment_valid_attributes.merge(grading_type: 'pass_fail', due_at: 1.hour.ago(now))
+        valid_assignment_attributes.merge(grading_type: 'pass_fail', due_at: 1.hour.ago(now))
       )
     end
     let(:grading_period_group) do
@@ -141,6 +158,28 @@ describe MissingPolicyApplicator do
       grading_period_closed
       late_policy_missing_enabled
       create_recent_assignment
+      applicator.apply_missing_deductions
+
+      submission = @course.submissions.first
+
+      expect(submission.score).to be nil
+      expect(submission.grade).to be nil
+    end
+
+    it 'does not apply deductions to assignments expecting on paper submissions' do
+      late_policy_missing_enabled
+      create_recent_paper_assignment
+      applicator.apply_missing_deductions
+
+      submission = @course.submissions.first
+
+      expect(submission.score).to be nil
+      expect(submission.grade).to be nil
+    end
+
+    it 'does not apply deductions to assignments expecting no submission' do
+      late_policy_missing_enabled
+      create_recent_no_submission_assignment
       applicator.apply_missing_deductions
 
       submission = @course.submissions.first

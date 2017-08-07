@@ -31,10 +31,6 @@ describe 'drag and drop reordering' do
     create_question_group
   end
 
-  after(:each) do
-    unstub_rcs_config
-  end
-
   it 'should reorder quiz questions', priority: "1", test_id: 206021 do
     click_questions_tab
     old_data = get_question_data

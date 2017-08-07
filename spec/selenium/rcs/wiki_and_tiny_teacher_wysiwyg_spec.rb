@@ -31,10 +31,6 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       stub_rcs_config
     end
 
-    after(:each) do
-      unstub_rcs_config
-    end
-
     def wysiwyg_state_setup(text = "1\n2\n3", val: false, html: false)
       get "/courses/#{@course.id}/pages/front-page/edit"
       wait_for_tiny(f("form.edit-form .edit-content"))

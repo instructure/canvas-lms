@@ -32,7 +32,7 @@ describe SearchController do
       group = @course.groups.create(:name => 'this_is_a_test_group')
       group.users = [@user, other]
 
-      get 'recipients', :search => 'this_is_a_test_'
+      get 'recipients', params: {:search => 'this_is_a_test_'}
       expect(response).to be_success
       expect(response.body).to include(@course.name)
       expect(response.body).to include(group.name)
@@ -48,7 +48,7 @@ describe SearchController do
       group = @course.groups.create(:name => 'group')
       group.users << other
 
-      get 'recipients', :context => @course.asset_string, :per_page => '1', :type => 'user'
+      get 'recipients', params: {:context => @course.asset_string, :per_page => '1', :type => 'user'}
       expect(response).to be_success
       expect(response.body).to include('billy')
       expect(response.body).not_to include('bob')
@@ -61,7 +61,7 @@ describe SearchController do
       other.update_attribute(:workflow_state, 'creation_pending')
       @course.enroll_student(other).tap{ |e| e.workflow_state = 'invited'; e.save! }
 
-      get 'recipients', {
+      get 'recipients', params: {
         :search => 'b', :type => 'user', :skip_visibility_checks => true,
         :synthetic_contexts => true, :context => "course_#{@course.id}_students"
       }
@@ -78,7 +78,7 @@ describe SearchController do
       @course2.update_attribute(:name, "course2")
       term = @course2.root_account.enrollment_terms.create! :name => "Fall", :end_at => 1.day.ago
       @course2.update_attributes! :enrollment_term => term
-      get 'recipients', {search: 'course', :messageable_only => true}
+      get 'recipients', params: {search: 'course', :messageable_only => true}
       expect(response.body).to include('course1')
       expect(response.body).not_to include('course2')
     end
@@ -86,7 +86,7 @@ describe SearchController do
     it "should return an empty list when searching in a non-messageable context" do
       course_with_student_logged_in(:active_all => true)
       @enrollment.update_attributes(workflow_state: 'deleted')
-      get 'recipients', {search: 'foo', :context => @course.asset_string}
+      get 'recipients', params: {search: 'foo', :context => @course.asset_string}
       expect(response.body).to match /\[\]\z/
     end
 
@@ -94,7 +94,7 @@ describe SearchController do
       course_with_student_logged_in
       group = @course.groups.create(:name => 'this_is_a_test_group')
       group.users = [@user]
-      get 'recipients', {:search => '', :type => 'context'}
+      get 'recipients', params: {:search => '', :type => 'context'}
       expect(response).to be_success
       # This is questionable legacy behavior.
       expect(response.body).to include(group.name)
@@ -106,7 +106,7 @@ describe SearchController do
         course_factory(active_all: true).course_sections.create(:name => "other section")
         expect(response).to be_success
 
-        get 'recipients', {
+        get 'recipients', params: {
           :type => 'section', :skip_visibility_checks => true,
           :synthetic_contexts => true, :context => "course_#{@course.id}_sections"
         }
@@ -118,7 +118,7 @@ describe SearchController do
         user_session(@user)
         course_factory(active_all: true).course_sections.create(:name => "other section")
 
-        get 'recipients', {
+        get 'recipients', params: {
           :type => 'section', :skip_visibility_checks => true,
           :synthetic_contexts => true, :context => "course_#{@course.id}_sections"
         }
@@ -132,7 +132,7 @@ describe SearchController do
         course_factory(active_all: true).course_sections.create(:name => "other section")
         course_with_student(:active_all => true)
 
-        get 'recipients', {
+        get 'recipients', params: {
           :type => 'user', :skip_visibility_checks => true,
           :synthetic_contexts => true, :context => "course_#{@course.id}_all"
         }
@@ -155,12 +155,12 @@ describe SearchController do
       end
 
       it "should exclude non-messageable contexts" do
-        get 'recipients', {
+        get 'recipients', params: {
           :context => "course_#{@course.id}",
           :synthetic_contexts => true
         }
         expect(response.body).to include('"name":"Course Sections"')
-        get 'recipients', {
+        get 'recipients', params: {
           :context => "course_#{@course.id}_sections",
           :synthetic_contexts => true
         }
@@ -169,7 +169,7 @@ describe SearchController do
       end
 
       it "should exclude non-messageable users" do
-        get 'recipients', {
+        get 'recipients', params: {
           :context => "course_#{@course.id}_students"
         }
         expect(response.body).to include('Student1')
@@ -192,17 +192,17 @@ describe SearchController do
 
     it "searches" do
       @c1.update_attribute(:indexed, true)
-      get 'all_courses', search: 'foo'
+      get 'all_courses', params: {search: 'foo'}
       expect(assigns[:courses].map(&:id)).to eq [@c1.id]
     end
 
     it "doesn't explode with non-string searches" do
-      get 'all_courses', search: {'foo' => 'bar'}
+      get 'all_courses', params: {search: {'foo' => 'bar'}}
       expect(assigns[:courses].map(&:id)).to eq []
     end
 
     it "does not cache XHR requests" do
-      xhr :get, 'all_courses'
+      get 'all_courses', xhr: true
       expect(response.headers["Pragma"]).to eq "no-cache"
     end
   end

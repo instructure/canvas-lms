@@ -66,6 +66,7 @@ module Lti
     LTI1_GUARD = -> { @tool.is_a?(ContextExternalTool) }
     MASQUERADING_GUARD = -> { !!@controller && @controller.logged_in_user != @current_user }
     ATTACHMENT_ASSOCIATION_GUARD = -> { @tool_setting&.context&.is_a?(AttachmentAssociation) }
+    LTI_ASSIGN_ID = -> { @assignment.present? || @tool_setting&.context&.is_a?(AttachmentAssociation) || @secure_params.present? }
 
     def initialize(root_account, context, controller, opts = {})
       @root_account = root_account
@@ -121,6 +122,26 @@ module Lti
     register_expansion 'Context.title', [],
                        -> { @context.name },
                        default_name: 'context_title'
+
+    # The LTI assignment id of an assignment. This value corresponds with
+    # the `ext_lti_assignment_id` send in various launches and webhooks.
+    # @launch_parameter com_instructure_assignment_lti_id
+    # @example
+    #   ```
+    #   9ae4170c-6b64-444d-9246-0b7dedd5f560
+    #   ```
+    register_expansion 'com.instructure.Assignment.lti.id', [],
+                       -> do
+                        if @assignment
+                          @assignment.lti_context_id
+                        elsif @tool_setting&.context&.is_a?(AttachmentAssociation)
+                          @tool_setting.context.context.assignment.lti_context_id
+                        elsif @secure_params.present?
+                          Lti::Security.decoded_lti_assignment_id(@secure_params)
+                        end
+                       end,
+                       LTI_ASSIGN_ID,
+                       default_name: 'com_instructure_assignment_lti_id'
 
     # The Canvas id of the Originality Report associated
     # with the launch.

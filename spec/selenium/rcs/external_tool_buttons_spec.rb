@@ -26,10 +26,6 @@ describe "external tool buttons" do
     stub_rcs_config
   end
 
-  after (:each) do
-    unstub_rcs_config
-  end
-
   def editor_traversal
     "$('textarea[name=message]').parent().find('iframe').contents().find('body')"
   end

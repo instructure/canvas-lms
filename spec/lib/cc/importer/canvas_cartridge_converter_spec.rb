@@ -605,7 +605,7 @@ describe "Canvas Cartridge importing" do
     att.save!
 
     media_id = "m_mystiry"
-    Attachment.any_instance.stubs(:media_object).returns(stub(:media_id => media_id))
+    allow_any_instance_of(Attachment).to receive(:media_object).and_return(double(:media_id => media_id))
 
     path = CGI.escape(att.full_path)
     body_with_links = %{<p>Watup? <strong>eh?</strong>
@@ -714,7 +714,7 @@ describe "Canvas Cartridge importing" do
   end
 
   it "should import assignments" do
-     PluginSetting.stubs(:settings_for_plugin).returns({"lock_at" => "yes",
+     allow(PluginSetting).to receive(:settings_for_plugin).and_return({"lock_at" => "yes",
                   "assignment_group" => "yes",
                   "title" => "yes",
                   "assignment_group_id" => "yes",
@@ -759,8 +759,8 @@ describe "Canvas Cartridge importing" do
     hash = @converter.parse_canvas_assignment_data(meta_doc, html_doc)
     hash = hash.with_indifferent_access
     #import
-    @copy_to.expects(:turnitin_enabled?).at_least(1).returns(true)
-    @copy_to.expects(:vericite_enabled?).at_least(1).returns(true)
+    expect(@copy_to).to receive(:turnitin_enabled?).at_least(1).and_return(true)
+    expect(@copy_to).to receive(:vericite_enabled?).at_least(1).and_return(true)
     Importers::AssignmentImporter.import_from_migration(hash, @copy_to, @migration)
 
     asmnt_2 = @copy_to.assignments.where(migration_id: migration_id).first
@@ -1125,7 +1125,7 @@ XML
     }.with_indifferent_access
 
     migration = ContentMigration.create(context: @copy_to)
-    migration.stubs(:canvas_import?).returns(true)
+    allow(migration).to receive(:canvas_import?).and_return(true)
     migration.migration_settings[:migration_ids_to_import] = {copy: {'everything' => 1}}
     Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
 
@@ -1431,9 +1431,7 @@ describe "cc assignment extensions" do
     @migration = ContentMigration.create(:context => @course)
     @migration.migration_type = "canvas_cartridge_importer"
     @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
-    enable_cache do
-      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
-    end
+    Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
   end
 
   it "should parse canvas data from cc extension" do
@@ -1476,9 +1474,7 @@ describe "matching question reordering" do
     @migration = ContentMigration.create(:context => @course)
     @migration.migration_type = "common_cartridge_importer"
     @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
-    enable_cache do
-      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
-    end
+    Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
   end
 
   it "should reorder matching question answers with images if possible (and warn otherwise)" do

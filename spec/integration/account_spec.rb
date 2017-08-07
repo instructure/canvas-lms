@@ -35,7 +35,7 @@ describe AccountsController do
     end
 
     it "should use the correct entity_id" do
-      HostUrl.stubs(:default_host).returns('bob.cody.instructure.com')
+      allow(HostUrl).to receive(:default_host).and_return('bob.cody.instructure.com')
       @aac = @account.authentication_providers.create!(:auth_type => "saml")
 
       get "/saml2"

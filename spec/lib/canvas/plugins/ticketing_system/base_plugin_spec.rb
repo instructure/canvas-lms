@@ -43,16 +43,16 @@ module Canvas::Plugins::TicketingSystem
   describe BasePlugin do
     describe "#register!" do
       it "interacts with the ticketing system to get this plugin registered" do
-        ticketing = stub()
+        ticketing = double()
         plugin = FakePlugin.new(ticketing)
-        ticketing.expects(:register_plugin).with("fake_plugin", plugin.settings)
+        expect(ticketing).to receive(:register_plugin).with("fake_plugin", plugin.settings)
         plugin.register!
       end
 
       it "builds a callback that submits the report and the plugin conf to the export_error action" do
         tix = FakeTicketing.new
-        tix.stubs(:get_settings).with("fake_plugin").returns({fake: "settings"})
-        tix.stubs(is_selected?: true)
+        allow(tix).to receive(:get_settings).with("fake_plugin").and_return({fake: "settings"})
+        allow(tix).to receive_messages(is_selected?: true)
         plugin = FakePlugin.new(tix)
         plugin.register!
         tix.callback.call(ErrorReport.new)
@@ -63,24 +63,24 @@ module Canvas::Plugins::TicketingSystem
     end
 
     describe "#enabled?" do
-      let(:ticketing){ stub() }
+      let(:ticketing){ double() }
       let(:plugin){ FakePlugin.new(ticketing) }
 
       it "is true if the plugin is selected and the config has values" do
-        ticketing.stubs(:is_selected?).with("fake_plugin").returns(true)
-        ticketing.stubs(:get_settings).with("fake_plugin").returns({some: 'value'})
+        allow(ticketing).to receive(:is_selected?).with("fake_plugin").and_return(true)
+        allow(ticketing).to receive(:get_settings).with("fake_plugin").and_return({some: 'value'})
         expect(plugin.enabled?).to be(true)
       end
 
       it "is false if the plugin is not selected" do
-        ticketing.stubs(:is_selected?).with("fake_plugin").returns(false)
-        ticketing.stubs(:get_settings).with("fake_plugin").returns({some: 'value'})
+        allow(ticketing).to receive(:is_selected?).with("fake_plugin").and_return(false)
+        allow(ticketing).to receive(:get_settings).with("fake_plugin").and_return({some: 'value'})
         expect(plugin.enabled?).to be(false)
       end
 
       it "is false if the config is empty" do
-        ticketing.stubs(:is_selected?).with("fake_plugin").returns(true)
-        ticketing.stubs(:get_settings).with("fake_plugin").returns({})
+        allow(ticketing).to receive(:is_selected?).with("fake_plugin").and_return(true)
+        allow(ticketing).to receive(:get_settings).with("fake_plugin").and_return({})
         expect(plugin.enabled?).to be(false)
       end
     end

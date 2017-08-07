@@ -554,3 +554,8 @@ define [
     @stub(GradeFormatHelper, 'formatGrade').returns('123.45%')
     @gradebook.updateSubmission(@submission)
     equal(@submission.grade, '123.45%')
+
+  test 'sets the raw grade on submission', ->
+    @stub(GradeFormatHelper, 'formatGrade').returns('123.45%')
+    @gradebook.updateSubmission(@submission)
+    equal(@submission.rawGrade, '123.45')

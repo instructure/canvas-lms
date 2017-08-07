@@ -193,11 +193,9 @@ test('renders the StatusesModal', function () {
     gotStudentIds: $.Deferred(),
     gotStudents: $.Deferred(),
     gotSubmissions: $.Deferred(),
-    gotCustomColumnData: $.Deferred(),
-    gotEffectiveDueDates: $.Deferred()
+    gotCustomColumnData: $.Deferred()
   };
   this.stub(DataLoader, 'loadGradebookData').returns(loaderPromises);
-  this.stub(Gradebook.prototype, 'gotAllAssignmentGroupsAndEffectiveDueDates');
   this.stub(Gradebook.prototype, 'renderActionMenu');
   const gradebook = createGradebook();
   [
@@ -214,8 +212,7 @@ test('renders the StatusesModal', function () {
   gradebook.gridReady.reject();
   gradebook.initialize();
   loaderPromises.gotCustomColumns.resolve();
-  loaderPromises.gotAssignmentGroups.resolve();
-  loaderPromises.gotEffectiveDueDates.resolve();
+  loaderPromises.gotAssignmentGroups.resolve([]);
   loaderPromises.gotStudentIds.resolve({ user_ids: [] });
 
   ok(renderStatusesModalStub.calledOnce);
@@ -321,8 +318,7 @@ QUnit.module('Gradebook#initialize', {
       gotStudentIds: $.Deferred(),
       gotStudents: $.Deferred(),
       gotSubmissions: $.Deferred(),
-      gotCustomColumnData: $.Deferred(),
-      gotEffectiveDueDates: $.Deferred()
+      gotCustomColumnData: $.Deferred()
     };
     this.stub(DataLoader, 'loadGradebookData').returns(this.loaderPromises);
     $fixtures.innerHTML = `
@@ -3814,19 +3810,9 @@ QUnit.module('Gradebook#filterAssignments', {
       { id: '1', name: 'Assignments', position: 1 },
       { id: '2', name: 'Homework', position: 2 }
     ]);
-    this.gradebook.effectiveDueDates = {
-      2301: {
-        1101: { grading_period_id: '1401' }
-      },
-      2302: {
-        1101: { grading_period_id: '1402' }
-      },
-      2303: {
-        1101: { grading_period_id: '1401' }
-      },
-      2304: {
-        1101: { grading_period_id: '1402' }
-      }
+    this.gradebook.courseContent.gradingPeriodAssignments = {
+      1401: ['2301', '2303'],
+      1402: ['2302', '2304']
     };
     this.gradebook.gradingPeriodSet = { id: '1501', gradingPeriods: [{ id: '1401' }, { id: '1402' }] };
     this.gradebook.showUnpublishedAssignments = true;
@@ -5883,50 +5869,99 @@ test('when primaryInfo is set as "last_first", sets display_name with student so
   ok(student.display_name.includes(student.sortable_name));
 });
 
-QUnit.module('Gradebook#gotSubmissionsChunk', {
-  setup () {
+QUnit.module('Gradebook#gotSubmissionsChunk', function (hooks) {
+  let studentSubmissions;
+
+  hooks.beforeEach(function () {
+    $fixtures.innerHTML = `
+      <div id="application">
+        <div id="wrapper">
+          <div id="StudentTray__Container"></div>
+          <span data-component="GridColor"></span>
+          <div id="gradebook_grid"></div>
+        </div>
+      </div>
+    `;
+
     this.gradebook = createGradebook();
-    this.gradebook.grid = { render: this.stub() };
-    this.gradebook.courseContent.students.addUserStudents([
-      { id: '1101', assignment_201: {}, assignment_202: {} },
-      { id: '1102', assignment_201: {} }
-    ]);
-    this.stub(this.gradebook, 'updateSubmission');
-    this.stub(this.gradebook, 'invalidateRowsForStudentIds');
-  }
-});
+    this.gradebook.initGrid();
 
-test('invalidates rows for related students', function () {
-  const studentSubmissions = [
-    {
-      submissions: [
-        { assignment_id: '201', user_id: '1101', score: 10, assignment_visible: true },
-        { assignment_id: '202', user_id: '1101', score: 9, assignment_visible: true }
-      ],
+    const students = [{
+      id: '1101',
+      name: 'Adam Jones',
+      enrollments: [{ type: 'StudentEnrollment', grades: { html_url: 'http://example.url/' } }]
+    }, {
+      id: '1102',
+      name: 'Betty Ford',
+      enrollments: [{ type: 'StudentEnrollment', grades: { html_url: 'http://example.url/' } }]
+    }];
+    this.gradebook.gotChunkOfStudents(students);
+    sinon.stub(this.gradebook, 'updateSubmission');
+    sinon.spy(this.gradebook, 'setupGrading');
+
+    studentSubmissions = [{
+      submissions: [{
+        assignment_id: '201',
+        assignment_visible: true,
+        cached_due_date: '2015-02-01T12:00:00Z',
+        score: 10,
+        user_id: '1101'
+      }, {
+        assignment_id: '202',
+        assignment_visible: true,
+        cached_due_date: '2015-02-02T12:00:00Z',
+        score: 9,
+        user_id: '1101'
+      }],
       user_id: '1101'
-    },
-    {
-      submissions: [
-        { assignment_id: '201', user_id: '1102', score: 8, assignment_visible: true }
-      ],
+    }, {
+      submissions: [{
+        assignment_id: '201',
+        assignment_visible: true,
+        cached_due_date: '2015-02-03T12:00:00Z',
+        score: 8,
+        user_id: '1102'
+      }],
       user_id: '1102'
-    }
-  ];
-  this.gradebook.gotSubmissionsChunk(studentSubmissions);
-  const [studentIds] = this.gradebook.invalidateRowsForStudentIds.lastCall.args;
-  deepEqual(studentIds, ['1101', '1102']);
-});
+    }];
+  });
 
-test('renders the grid', function () {
-  this.gradebook.gotSubmissionsChunk([]);
-  strictEqual(this.gradebook.grid.render.callCount, 1);
-});
+  hooks.afterEach(function () {
+    $fixtures.innerHTML = '';
+  });
 
-test('does not attempt to render the grid when not defined', function () {
-  const render = this.gradebook.grid.render;
-  this.gradebook.grid = null;
-  this.gradebook.gotSubmissionsChunk([]);
-  strictEqual(render.callCount, 0);
+  test('updates effectiveDueDates with the submissions', function () {
+    this.gradebook.gotSubmissionsChunk(studentSubmissions);
+    deepEqual(Object.keys(this.gradebook.effectiveDueDates), ['201', '202']);
+    deepEqual(Object.keys(this.gradebook.effectiveDueDates[201]), ['1101', '1102']);
+    deepEqual(Object.keys(this.gradebook.effectiveDueDates[202]), ['1101']);
+  });
+
+  test('updates effectiveDueDates on related assignments', function () {
+    this.gradebook.setAssignments({
+      201: { id: '201', name: 'Math Assignment', published: true },
+      202: { id: '202', name: 'English Assignment', published: false }
+    });
+    this.gradebook.gotSubmissionsChunk(studentSubmissions);
+    deepEqual(Object.keys(this.gradebook.getAssignment('201').effectiveDueDates), ['1101', '1102']);
+    deepEqual(Object.keys(this.gradebook.getAssignment('202').effectiveDueDates), ['1101']);
+  });
+
+  test('updates inClosedGradingPeriod on related assignments', function () {
+    this.gradebook.setAssignments({
+      201: { id: '201', name: 'Math Assignment', published: true },
+      202: { id: '202', name: 'English Assignment', published: false }
+    });
+    this.gradebook.gotSubmissionsChunk(studentSubmissions);
+    deepEqual(Object.keys(this.gradebook.getAssignment('201').effectiveDueDates), ['1101', '1102']);
+    deepEqual(Object.keys(this.gradebook.getAssignment('202').effectiveDueDates), ['1101']);
+  });
+
+  test('sets up grading for the related students', function () {
+    this.gradebook.gotSubmissionsChunk(studentSubmissions);
+    const [students] = this.gradebook.setupGrading.lastCall.args;
+    deepEqual(students.map(student => student.id), ['1101', '1102']);
+  });
 });
 
 QUnit.module('Gradebook#setSortRowsBySetting');
@@ -6700,6 +6735,12 @@ test('sets the formatted grade on submission', function () {
   this.stub(GradeFormatHelper, 'formatGrade').returns('123.45%');
   this.gradebook.updateSubmission(this.submission);
   equal(this.submission.grade, '123.45%');
+});
+
+test('sets the raw grade on submission', function () {
+  this.stub(GradeFormatHelper, 'formatGrade').returns('123.45%');
+  this.gradebook.updateSubmission(this.submission);
+  equal(this.submission.rawGrade, '123.45');
 });
 
 QUnit.module('Gradebook#arrangeColumnsBy', {
@@ -7484,7 +7525,7 @@ QUnit.module('Gradebook#renderSubmissionTray', {
     $fixtures.innerHTML = `<div id=${this.mountPointId}></div>`;
     this.gradebook = createGradebook();
     this.gradebook.students = {
-      1101: { id: '1101', name: 'Adam Jones', assignment_2301: {} }
+      1101: { id: '1101', name: 'Adam Jones', assignment_2301: { late: false, missing: false, excused: false, seconds_late: 0 } }
     };
     this.gradebook.gridSupport = {
       helper: {

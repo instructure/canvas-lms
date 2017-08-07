@@ -24,7 +24,7 @@ describe SubmissionCommentsController do
     it "should delete the comment" do
       course_with_teacher_logged_in(:active_all => true)
       submission_comment_model(:author => @user)
-      delete 'destroy', :id => @submission_comment.id, :format => "json"
+      delete 'destroy', params: {:id => @submission_comment.id}, format: "json"
       expect(response).to be_success
     end
 
@@ -50,7 +50,7 @@ describe SubmissionCommentsController do
     end
 
     it 'allows updating the status field' do
-      expect { patch 'update', @test_params }.to change { SubmissionComment.draft.count }.by(-1)
+      expect { patch 'update', params: @test_params }.to change { SubmissionComment.draft.count }.by(-1)
     end
   end
 end

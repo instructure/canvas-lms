@@ -251,9 +251,21 @@ describe "Pages API", type: :request do
                      { :controller => 'wiki_pages_api', :action => 'update',
                        :format => 'json', :course_id => @course.to_param,
                        :url => page.url },
-                     { :wiki_page => { :student_planner_checkbox => "0" }})
+                     { :wiki_page => { :student_planner_checkbox => false }})
             page.reload
             expect(page.todo_date).to eq nil
+          end
+
+          it 'should unset page todo_date only if explicitly asked for' do
+            now = Time.zone.now
+            page = @course.wiki.wiki_pages.create!(:title => "hrup", :todo_date => now)
+            api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{page.url}",
+                     { :controller => 'wiki_pages_api', :action => 'update',
+                       :format => 'json', :course_id => @course.to_param,
+                       :url => page.url },
+                     { :wiki_page => {} })
+            page.reload
+            expect(page.todo_date).to eq now
           end
         end
       end
@@ -528,7 +540,7 @@ describe "Pages API", type: :request do
       end
 
       it 'should process body with process_incoming_html_content' do
-        WikiPagesApiController.any_instance.stubs(:process_incoming_html_content).returns('processed content')
+        allow_any_instance_of(WikiPagesApiController).to receive(:process_incoming_html_content).and_return('processed content')
 
         json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
                  { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
@@ -844,7 +856,7 @@ describe "Pages API", type: :request do
       end
 
       it 'should process body with process_incoming_html_content' do
-        WikiPagesApiController.any_instance.stubs(:process_incoming_html_content).returns('processed content')
+        allow_any_instance_of(WikiPagesApiController).to receive(:process_incoming_html_content).and_return('processed content')
 
         api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
                  { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
@@ -1661,4 +1673,3 @@ describe "Pages API", type: :request do
     end
   end
 end
-

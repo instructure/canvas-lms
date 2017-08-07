@@ -148,7 +148,7 @@ listen to the "click" and "keyclick" events and add `tabindex="0"` and `role="bu
 
 .btn,       // <-- deprecated- do not use
 .Button {
-  @include canvas-button($ic-color-medium-light, $ic-color-dark);
+  @include canvas-button($ic-color-medium-light, $ic-color-dark, true);
   border-radius: $baseBorderRadius;
   transition: background-color 0.2s ease-in-out;
   display: inline-block;
@@ -240,11 +240,20 @@ input[type="button"] {
 // The colors for these come from app/stylesheets/brandable_variables.json
 // Or the values the account sets in the Theme Editor
 
-
 // Primary appears as blue
 .btn-primary, // <-- deprecated- do not use
 .Button--primary {
-  @include canvas-button($button--primary-bgd, $button--primary-text);
+  @if $use_high_contrast {
+    @include canvas-button($ic-brand-primary, $ic-color-light);
+  } @else {
+    @include canvas-button(
+      var(--ic-brand-button--primary-bgd),
+      var(--ic-brand-button--primary-text),
+      false,
+      var(--ic-brand-button--primary-bgd-darkened-5),
+      var(--ic-brand-button--primary-bgd-darkened-15)
+    );
+  }
 }
 // Warning appears as orange
 .btn-warning, // <-- deprecated- do not use
@@ -264,7 +273,17 @@ input[type="button"] {
 // Info appears as a neutral blue
 .btn-info, // <-- deprecated- do not use
 .Button--secondary {
-  @include canvas-button($ic-brand-button--secondary-bgd, $ic-brand-button--secondary-text);
+  @if $use_high_contrast {
+    @include canvas-button($ic-brand-button--secondary-bgd, $ic-brand-button--secondary-text);
+  } @else {
+    @include canvas-button(
+      var(--ic-brand-button--secondary-bgd),
+      var(--ic-brand-button--secondary-text),
+      false,
+      var(--ic-brand-button--secondary-bgd-darkened-5),
+      var(--ic-brand-button--secondary-bgd-darkened-15)
+    );
+  }
 }
 
 // Inverse appears as dark gray <-- deprecated- do not use

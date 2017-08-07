@@ -44,7 +44,7 @@ describe PageView::CsvReport do
       pv1 = page_view_model
 
       report = PageView::CsvReport.new(@user)
-      report.stubs(:page_views).returns(PaginationStub.new([pv1]))
+      allow(report).to receive(:page_views).and_return(PaginationStub.new([pv1]))
 
       expect(report.records.map(&:id).sort).to eq [pv1.id, pv1.id].sort
     end
@@ -55,7 +55,7 @@ describe PageView::CsvReport do
       pv2 = page_view_model
 
       report = PageView::CsvReport.new(@user)
-      report.stubs(:page_views).returns(PaginationStub.new([pv1, pv2]))
+      allow(report).to receive(:page_views).and_return(PaginationStub.new([pv1, pv2]))
 
       expect(report.records.map(&:id).sort).to eq [pv1.id, pv2.id, pv1.id].sort
     end

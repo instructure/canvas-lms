@@ -132,12 +132,12 @@ describe OutcomeResultsController do
                         :title => "Child outcome group", :context => @course)
       outcome_group.save!
       outcome_group.add_outcome(@outcome)
-      get 'rollups', {:context_id => @course.id,
+      get 'rollups', params: {:context_id => @course.id,
                       :course_id => @course.id,
                       :context_type => "Course",
-                      :format => "json",
                       :user_ids => [@student.id],
-                      :outcome_ids => [@outcome.id]}
+                      :outcome_ids => [@outcome.id]},
+                      format: "json"
       expect(response).to be_success
     end
   end

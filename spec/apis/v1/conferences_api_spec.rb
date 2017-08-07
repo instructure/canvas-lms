@@ -96,7 +96,7 @@ describe "Conferences API", type: :request do
 
   describe "POST 'recording_ready'" do
     before do
-      WebConference.stubs(:plugins).returns([
+      allow(WebConference).to receive(:plugins).and_return([
         web_conference_plugin_mock("big_blue_button", {
           :domain => "bbb.instructure.com",
           :secret_dec => "secret",

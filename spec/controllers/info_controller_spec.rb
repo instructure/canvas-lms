@@ -29,7 +29,7 @@ describe InfoController do
 
     it "should respond_to json" do
       request.accept = "application/json"
-      Canvas.stubs(:revision).returns("Test Proc")
+      allow(Canvas).to receive(:revision).and_return("Test Proc")
       get "health_check"
       expect(response).to be_success
       json = JSON.parse(response.body)
@@ -58,7 +58,7 @@ describe InfoController do
 
     it "should filter the links based on the current user's role" do
       account = Account.create!
-      Account::HelpLinks.stubs(:default_links).returns([
+      allow(Account::HelpLinks).to receive(:default_links).and_return([
         {
           :available_to => ['student'],
           :text => 'Ask Your Instructor a Question',
@@ -81,7 +81,7 @@ describe InfoController do
           :is_default => 'true'
         }
       ])
-      LoadAccount.stubs(:default_domain_root_account).returns(account)
+      allow(LoadAccount).to receive(:default_domain_root_account).and_return(account)
       admin = account_admin_user active_all: true
       user_session(admin)
 

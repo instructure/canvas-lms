@@ -133,7 +133,7 @@ Tools configured as described in section 1 of this document will be made availab
 
 Selecting a tool in the "Plagiarism Review" selector initiates a standard LTI launch to the launch URL provided in the resource handler during the registration phase (see 1.2). This launch is intended to allow configuration of the plagiarism review tool during the assignment creation process.
 
-In addition to standard LTI parameters and variables requested by the TP for this launch, Canvas will send a parameter named `ext_lti_assignment_id`. This parameter's value uniquely identifies the assignment and may be used by the TP to show the correct configuration options.
+~~In addition to standard LTI parameters and variables requested by the TP for this launch, Canvas will send a parameter named `ext_lti_assignment_id`.~~ This behavior will soon be deprecated. Instead please add the `com.instructure.Assignment.lti.id` capability to the same message that uses the `Canvas.placements.similarityDetection` capability. This parameter's value uniquely identifies the assignment and may be used by the TP to show the correct configuration options.
 
 #### 2.2 Webhook Background
 

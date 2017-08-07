@@ -459,7 +459,7 @@ class ContentMigrationsController < ApplicationController
 
   def update_migration
     @content_migration.update_migration_settings(params[:settings]) if params[:settings]
-    date_shift_params = params[:date_shift_options] ? params[:date_shift_options].to_hash.with_indifferent_access : {}
+    date_shift_params = params[:date_shift_options] ? params[:date_shift_options].to_unsafe_h : {}
     @content_migration.set_date_shift_options(date_shift_params)
 
     params[:selective_import] = false if @plugin.settings && @plugin.settings[:no_selective_import]
@@ -472,7 +472,7 @@ class ContentMigrationsController < ApplicationController
         params[:do_not_run] = true
       end
     elsif params[:copy]
-      copy_options = ContentMigration.process_copy_params(params[:copy].to_hash.with_indifferent_access)
+      copy_options = ContentMigration.process_copy_params(params[:copy]&.to_unsafe_h)
       @content_migration.migration_settings[:migration_ids_to_import] ||= {}
       @content_migration.migration_settings[:migration_ids_to_import][:copy] = copy_options
       @content_migration.copy_options = copy_options

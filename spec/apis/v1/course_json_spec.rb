@@ -6,8 +6,8 @@ module Api
 
     describe CourseJson do
       let(:includes) { [] }
-      let(:course) { stub(:course) }
-      let(:user) { stub(:user) }
+      let(:course) { double(:course) }
+      let(:user) { double(:user) }
       let(:course_json) { CourseJson.new( course, nil, includes, [] ) }
 
       describe '#include_description' do
@@ -32,7 +32,7 @@ module Api
       describe '#include_total_scores?' do
         let(:predicate) { course_json.include_total_scores? }
         let(:course_settings) { Hash.new }
-        let(:course) { stub( course_settings ) }
+        let(:course) { double( course_settings ) }
 
         describe 'when total scores key is set' do
           before { includes << :total_scores }
@@ -133,7 +133,7 @@ module Api
       end
 
       describe '#description' do
-        let(:course) { stub(:public_description => 'an eloquent anecdote' ) }
+        let(:course) { double(:public_description => 'an eloquent anecdote' ) }
 
         it 'returns the description when its configured for inclusion' do
           includes << :public_description
@@ -148,7 +148,7 @@ module Api
       end
 
       describe '#initialization' do
-        let(:enrollments) { stub(:enrollments) }
+        let(:enrollments) { double(:enrollments) }
         let(:hash) { {:a => '1', :b => '2'} }
         let(:includes) { ['these', 'three', 'keys' ] }
 
@@ -185,7 +185,7 @@ module Api
       end
 
       describe '#set_sis_course_id' do
-        let(:sis_course) { stub(:grants_any_right? => @has_right, :sis_source_id => @sis_id ) }
+        let(:sis_course) { double(:grants_any_right? => @has_right, :sis_source_id => @sis_id ) }
         let(:hash) { Hash.new }
 
         before do
@@ -224,7 +224,7 @@ module Api
       end
 
       describe '#permissions' do
-        let(:course) { stub(:public_description => 'an eloquent anecdote' ) }
+        let(:course) { double(:public_description => 'an eloquent anecdote' ) }
 
         it 'returns the permissions when its configured for inclusion' do
           includes << :permissions

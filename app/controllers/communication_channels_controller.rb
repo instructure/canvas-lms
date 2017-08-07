@@ -220,7 +220,7 @@ class CommunicationChannelsController < ApplicationController
       @root_account ||= @user.pseudonyms.first.try(:account) if @user.pre_registered?
       @root_account ||= @user.enrollments.first.try(:root_account) if @user.creation_pending?
       unless @root_account
-        account = @user.all_accounts.first
+        account = @user.adminable_accounts.first
         @root_account = account.try(:root_account)
       end
       @root_account ||= @domain_root_account
@@ -509,7 +509,7 @@ class CommunicationChannelsController < ApplicationController
   protected
   def bulk_action_args
     account = params[:account_id] == 'self' ? @domain_root_account : Account.find(params[:account_id])
-    args = params.slice(:after, :before, :pattern, :with_invalid_paths, :path_type).symbolize_keys
+    args = params.permit(:after, :before, :pattern, :with_invalid_paths, :path_type).to_unsafe_h.symbolize_keys
     args.merge!({account: account})
   end
 

@@ -176,7 +176,7 @@ describe "grades" do
       skip_if_chrome('issue with blur')
       get "/courses/#{@course.id}/grades"
 
-      Assignment.any_instance.expects(:find_or_create_submission).twice.returns(@submission)
+      expect_any_instantiation_of(@first_assignment).to receive(:find_or_create_submission).and_return(@submission)
 
       #check initial total
       expect(f('#submission_final-grade .assignment_score .grade').text).to eq '33.33%'

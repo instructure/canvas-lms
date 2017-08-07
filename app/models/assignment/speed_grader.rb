@@ -25,6 +25,8 @@ class Assignment
       @user = user
       @avatars = avatars
       @grading_role = grading_role
+      account_context = @course.try(:account) || @course.try(:root_account)
+      @should_migrate_to_canvadocs = account_context.present? && account_context.migrate_to_canvadocs?
     end
 
     def json
@@ -62,6 +64,8 @@ class Assignment
       students = @assignment.representatives(@user, includes: gradebook_includes) do |rep, others|
         others.each { |s| res[:context][:rep_for_student][s.id] = rep.id }
       end
+      # Ensure that any test students are sorted last
+      students = students.partition { |r| r.preferences[:fake_student] != true }.flatten
 
       enrollments = @course.apply_enrollment_visibility(gradebook_enrollment_scope, @user, nil,
                                                         include: gradebook_includes)
@@ -113,7 +117,7 @@ class Assignment
       end
       res[:context][:quiz] = @assignment.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
 
-      includes = [:versions, :quiz_submission, :user, :attachment_associations, :assignment, :originality_reports]
+      includes = [{ versions: :versionable }, :quiz_submission, :user, :attachment_associations, :assignment, :originality_reports]
       key = @grading_role == :grader ? :submission_comments : :all_submission_comments
       includes << {key => {submission: {assignment: { context: :root_account }}}}
       submissions = @assignment.submissions.where(:user_id => students).preload(*includes)
@@ -182,17 +186,26 @@ class Assignment
         json['attachments'] = attachments_for_submission[sub].map do |att|
           att.as_json(:only => [:mime_class, :comment_id, :id, :submitter_id ])
         end
+        has_crocodoc = attachments_for_submission[sub].any?(&:crocodoc_available?)
 
         sub_attachments = []
+        moderated_grading_whitelist = if is_provisional
+                                        [ sub.user, @user ].map do |u|
+                                          u.moderated_grading_ids(has_crocodoc)
+                                        end
+                                      else
+                                        sub.moderated_grading_whitelist
+                                      end
 
-        crocodoc_user_ids = if is_provisional
-          [sub.user.crocodoc_id!, @user.crocodoc_id!]
-        else
-          sub.crocodoc_whitelist
-        end
+        url_opts = {
+          enable_annotations: true,
+          moderated_grading_whitelist: moderated_grading_whitelist
+        }
 
         if json['submission_history'] && (@assignment.quiz.nil? || too_many)
           json['submission_history'] = json['submission_history'].map do |version|
+            # to avoid a call to the DB in Submission#missing?
+            version.assignment = sub.assignment
             version.as_json(only: submission_fields,
                             methods: %i[versioned_attachments late missing external_tool_url]).tap do |version_json|
               version_json['submission']['has_originality_report'] = version.versioned_originality_reports.present?
@@ -204,10 +217,10 @@ class Assignment
                   end
                   a.as_json(only: attachment_fields,
                             methods: [:view_inline_ping_url]).tap do |json|
-                    json[:attachment][:canvadoc_url] = a.canvadoc_url(@user, enable_annotations: true)
-                    json[:attachment][:crocodoc_url] = a.crocodoc_url(@user, crocodoc_user_ids)
+                    json[:attachment][:canvadoc_url] = a.canvadoc_url(@user, url_opts)
+                    json[:attachment][:crocodoc_url] = a.crocodoc_url(@user, url_opts)
                     json[:attachment][:submitted_to_crocodoc] = a.crocodoc_document.present?
-                    json[:attachment][:hijack_crocodoc_session] = a.crocodoc_document&.should_migrate_to_canvadocs?
+                    json[:attachment][:hijack_crocodoc_session] = a.crocodoc_document.present? && @should_migrate_to_canvadocs
                   end
                 end
               end
@@ -241,8 +254,9 @@ class Assignment
                     as_json(:methods => [:assessor_name], :include_root => false)
 
                 json[:selected] = !!(selection && selection.selected_provisional_grade_id == pg.id)
+                # this should really be provisional_doc_view_urls :: https://instructure.atlassian.net/browse/CNVS-38202
                 json[:crocodoc_urls] =
-                  sub_attachments.map { |a| pg.crocodoc_attachment_info(@user, a) }
+                  sub_attachments.map { |a| pg.attachment_info(@user, a) }
                 json[:readonly] = !pg.final && (pg.scorer_id != @user.id)
                 json[:submission_comments] =
                   pg.submission_comments.as_json(include_root: false,

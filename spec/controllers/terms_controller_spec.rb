@@ -26,14 +26,14 @@ describe TermsController do
     user_session(@user)
 
     term = a.default_enrollment_term
-    term.any_instantiation.expects(:touch_all_courses).once
+    expect_any_instantiation_of(term).to receive(:touch_all_courses).once
 
-    put 'update', :account_id => a.id, :id => term.id, :enrollment_term => {:start_at => 1.day.ago, :end_at => 1.day.from_now,
+    put 'update', params: {:account_id => a.id, :id => term.id, :enrollment_term => {:start_at => 1.day.ago, :end_at => 1.day.from_now,
         :overrides => {
           :student_enrollment => { :start_at => 1.day.ago, :end_at => 1.day.from_now},
           :teacher_enrollment => { :start_at => 1.day.ago, :end_at => 1.day.from_now},
           :ta_enrollment => { :start_at => 1.day.ago, :end_at => 1.day.from_now},
-      }}
+      }}}
   end
 
   it "should not be able to delete a default term" do
@@ -41,7 +41,7 @@ describe TermsController do
     account_admin_user(:account => @account)
     user_session(@user)
 
-    delete 'destroy', :account_id => @account.id, :id => @account.default_enrollment_term.id
+    delete 'destroy', params: {:account_id => @account.id, :id => @account.default_enrollment_term.id}
 
     expect(response).to_not be_success
     error = json_parse(response.body)["errors"]["workflow_state"].first["message"]
@@ -58,7 +58,7 @@ describe TermsController do
     @course.enrollment_term = @term
     @course.save!
 
-    delete 'destroy', :account_id => @account.id, :id => @term.id
+    delete 'destroy', params: {:account_id => @account.id, :id => @term.id}
 
     expect(response).to_not be_success
     error = json_parse(response.body)["errors"]["workflow_state"].first["message"]
@@ -66,7 +66,7 @@ describe TermsController do
 
     @course.destroy
 
-    delete 'destroy', :account_id => @account.id, :id => @term.id
+    delete 'destroy', params: {:account_id => @account.id, :id => @term.id}
 
     expect(response).to be_success
 

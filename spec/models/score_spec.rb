@@ -79,35 +79,60 @@ describe Score do
 
   describe '#current_grade' do
     it 'delegates the grade conversion to the course' do
-      score.course.expects(:score_to_grade).once.with(score.current_score)
+      expect(score.course).to receive(:score_to_grade).once.with(score.current_score)
       score.current_grade
     end
 
     it 'returns nil if grading schemes are not used in the course' do
-      score.course.expects(:grading_standard_enabled?).returns(false)
+      expect(score.course).to receive(:grading_standard_enabled?).and_return(false)
       expect(score.current_grade).to be_nil
     end
 
     it 'returns the grade according to the course grading scheme' do
-      score.course.expects(:grading_standard_enabled?).returns(true)
+      expect(score.course).to receive(:grading_standard_enabled?).and_return(true)
       expect(score.current_grade).to eq 'B-'
     end
   end
 
   describe '#final_grade' do
     it 'delegates the grade conversion to the course' do
-      score.course.expects(:score_to_grade).once.with(score.final_score)
+      expect(score.course).to receive(:score_to_grade).once.with(score.final_score)
       score.final_grade
     end
 
     it 'returns nil if grading schemes are not used in the course' do
-      score.course.expects(:grading_standard_enabled?).returns(false)
+      expect(score.course).to receive(:grading_standard_enabled?).and_return(false)
       expect(score.final_grade).to be_nil
     end
 
     it 'returns the grade according to the course grading scheme' do
-      score.course.expects(:grading_standard_enabled?).returns(true)
+      expect(score.course).to receive(:grading_standard_enabled?).and_return(true)
       expect(score.final_grade).to eq 'C'
+    end
+  end
+
+  context "permissions" do
+    it "allows the proper people" do
+      expect(score.grants_right? @enrollment.user, :read).to eq true
+
+      teacher_in_course(active_all: true)
+      expect(score.grants_right? @teacher, :read).to eq true
+    end
+
+    it "doesn't work for nobody" do
+      expect(score.grants_right? nil, :read).to eq false
+    end
+
+    it "doesn't allow random classmates to read" do
+      score
+      student_in_course(active_all: true)
+      expect(score.grants_right? @student, :read).to eq false
+    end
+
+    it "doesn't work for yourself if the course is configured badly" do
+      @enrollment.course.hide_final_grade = true
+      @enrollment.course.save!
+      expect(score.grants_right? @enrollment.user, :read).to eq false
     end
   end
 end

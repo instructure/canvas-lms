@@ -89,6 +89,10 @@ module PlannerPageObject
     fj("button:contains('Add To Do')")
   end
 
+  def wait_for_planner_load
+    todo_modal_button
+  end
+
   def todo_save_button
     fj("button:contains('Save')")
   end

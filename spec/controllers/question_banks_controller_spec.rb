@@ -35,7 +35,7 @@ describe QuestionBanksController do
     it "only includes active question banks" do
       @bank3 = @course.account.assessment_question_banks.create!
       @bank3.destroy
-      res = get 'index', controller: :question_banks, inherited: '1',course_id: @course.id, format: 'json'
+      res = get 'index', params: {controller: :question_banks, inherited: '1', course_id: @course.id}, format: 'json'
       expect(response).to be_success
       json = json_parse(response.body)
       expect(json.size).to eq 2
@@ -51,7 +51,7 @@ describe QuestionBanksController do
     before(:each) { user_session(@teacher) }
 
     it "should copy questions" do
-      post 'move_questions', :course_id => @course.id, :question_bank_id => @bank1.id, :assessment_question_bank_id => @bank2.id, :questions => { @question1.id => 1, @question2.id => 1 }
+      post 'move_questions', params: {:course_id => @course.id, :question_bank_id => @bank1.id, :assessment_question_bank_id => @bank2.id, :questions => { @question1.id => 1, @question2.id => 1 }}
       expect(response).to be_success
 
       @bank1.reload
@@ -60,7 +60,7 @@ describe QuestionBanksController do
     end
 
     it "should move questions" do
-      post 'move_questions', :course_id => @course.id, :question_bank_id => @bank1.id, :assessment_question_bank_id => @bank2.id, :move => '1', :questions => { @question1.id => 1, @question2.id => 1 }
+      post 'move_questions', params: {:course_id => @course.id, :question_bank_id => @bank1.id, :assessment_question_bank_id => @bank2.id, :move => '1', :questions => { @question1.id => 1, @question2.id => 1 }}
       expect(response).to be_success
 
       @bank1.reload
@@ -80,8 +80,8 @@ describe QuestionBanksController do
     end
 
     it "bookmarks" do
-      post 'bookmark', :course_id => @course.id,
-                       :question_bank_id => @bank.id
+      post 'bookmark', params: {:course_id => @course.id,
+                       :question_bank_id => @bank.id}
       expect(response).to be_success
       expect(@teacher.reload.assessment_question_banks).to include @bank
     end
@@ -93,9 +93,9 @@ describe QuestionBanksController do
       # should work even if the bank's context is destroyed
       @course.destroy
 
-      post 'bookmark', :course_id => @course.id,
+      post 'bookmark', params: {:course_id => @course.id,
                        :question_bank_id => @bank.id,
-                       :unbookmark => 1
+                       :unbookmark => 1}
       expect(response).to be_success
       expect(@teacher.reload.assessment_question_banks).not_to include @bank
     end
@@ -112,7 +112,7 @@ describe QuestionBanksController do
     end
 
     subject do
-      get :show, course_id: @course.id, id: @bank.id
+      get :show, params: {course_id: @course.id, id: @bank.id}
     end
 
     it 'renders show template' do

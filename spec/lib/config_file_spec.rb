@@ -20,6 +20,8 @@ require_relative '../spec_helper.rb'
 
 describe ConfigFile do
   describe ".cache_object" do
+    before { ConfigFile.unstub }
+
     it "caches objects" do
       expect(File).to receive(:exist?).and_return(true)
       expect(File).to receive(:read).and_return('test: {}')

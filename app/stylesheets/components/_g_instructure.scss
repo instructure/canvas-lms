@@ -549,7 +549,6 @@ ul.group_list {
 
 $wizard-icon-size: 120px;
 $wizard-bg-color: $ic-color-dark;
-$wizard-highlight-color: $ic-brand-primary;
 
 @keyframes icon-slide-down {
   from {
@@ -810,7 +809,7 @@ $wizard-highlight-color: $ic-brand-primary;
           &.selected {
             background: rgba($ic-color-light, 0.1);
             a.header {
-              border-left-color: $ic-brand-primary;
+              border-left-color: var(--ic-brand-primary);
             }
           }
           &.completed {

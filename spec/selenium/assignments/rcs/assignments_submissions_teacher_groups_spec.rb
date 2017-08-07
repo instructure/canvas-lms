@@ -28,10 +28,6 @@ describe 'submissions' do
     stub_rcs_config
   end
 
-  after do
-    unstub_rcs_config
-  end
-
   context "Assignment" do
     it "Create an assignment as a teacher", priority: "1", test_id: 56751 do
       group_test_setup(3,3,1)

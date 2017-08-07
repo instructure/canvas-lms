@@ -25,6 +25,7 @@ namespace :brand_configs do
     Rake::Task['brand_configs:clean'].invoke
     BrandableCSS.save_default_json!
     BrandableCSS.save_default_js!
+    BrandableCSS.save_default_css!
     Rake::Task['brand_configs:write'].invoke
 
     # This'll pick up on all those written brand_configs and compile their css.

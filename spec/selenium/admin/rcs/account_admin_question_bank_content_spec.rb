@@ -31,10 +31,6 @@ describe "account admin question bank" do
     wait_for_ajaximations
   end
 
-  after(:each) do
-    unstub_rcs_config
-  end
-
   def create_question_bank(title = "question bank 1")
     Account.default.assessment_question_banks.create!(:title => title)
   end

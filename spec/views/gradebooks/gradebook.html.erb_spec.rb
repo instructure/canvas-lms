@@ -34,8 +34,8 @@ describe "/gradebooks/gradebook" do
     if course_allows && permissions_allow
       assign(:post_grades_tools, [{type: :post_grades}])
     end
-    @course.expects(:allows_grade_publishing_by).with(@user).returns(course_allows)
-    @course.expects(:grants_any_right?).returns(permissions_allow) if course_allows
+    expect(@course).to receive(:allows_grade_publishing_by).with(@user).and_return(course_allows)
+    expect(@course).to receive(:grants_any_right?).and_return(permissions_allow) if course_allows
     render "/gradebooks/gradebook"
     expect(response).not_to be_nil
     if course_allows && permissions_allow

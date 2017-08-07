@@ -141,6 +141,9 @@
 #     {
 #       "description": "A mapping of Canvas attribute names to attribute names that a provider may send, in order to update the value of these attributes when a user logs in. The values can be a FederatedAttributeConfig, or a raw string corresponding to the \"attribute\" property of a FederatedAttributeConfig. In responses, full FederatedAttributeConfig objects are returned if JIT provisioning is enabled, otherwise just the attribute names are returned.",
 #       "properties": {
+#         "admin_roles": {
+#           "description": "A comma separated list of role names to grant to the user. Note that these only apply at the root account level, and not sub-accounts. If the attribute is not marked for provisioning only, the user will also be removed from any other roles they currently hold that are not still specified by the IdP."
+#         },
 #         "display_name": {
 #           "description": "The full display name of the user"
 #         },
@@ -915,7 +918,7 @@ class AccountAuthorizationConfigsController < ApplicationController
     klass = AccountAuthorizationConfig.find_sti_class(auth_type)
     federated_attributes = data[:federated_attributes]
     federated_attributes = {} if federated_attributes == ""
-    federated_attributes = federated_attributes&.to_hash
+    federated_attributes = federated_attributes.to_unsafe_h if federated_attributes.is_a?(ActionController::Parameters)
     data = data.permit(klass.recognized_params)
     data[:federated_attributes] = federated_attributes if federated_attributes
     data[:auth_type] = auth_type

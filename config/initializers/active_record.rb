@@ -491,6 +491,10 @@ class ActiveRecord::Base
   #   belongs_to :context, polymorphic: [:course, :account]
   def self.belongs_to(name, scope = nil, options={})
     options = scope if scope.is_a?(Hash)
+    if options[:polymorphic] == true
+      raise "Please pass an array of valid types for polymorphic associations. Use exhaustive: false if you really don't want to validate them"
+    end
+
     polymorphic_prefix = options.delete(:polymorphic_prefix)
     exhaustive = options.delete(:exhaustive)
 
@@ -666,6 +670,10 @@ ActiveRecord::Relation.class_eval do
   def where!(*args)
     raise "where!.not doesn't work in Rails 4.2" if args.empty?
     super
+  end
+
+  def uniq(*args)
+    raise "use #distinct instead of #uniq on relations (Rails 5.1 will delegate uniq to to_a)"
   end
 
   def select_values_necessitate_temp_table?
@@ -954,7 +962,7 @@ module UpdateAndDeleteWithJoins
 
     sql = stmt.to_sql
 
-    binds = connection.prepare_binds_for_database(bound_attributes)
+    binds = bound_attributes.map(&:value_for_database)
     binds.map! { |value| connection.quote(value) }
     collector = Arel::Collectors::Bind.new
     arel.join_sources.each do |node|
@@ -975,7 +983,7 @@ module UpdateAndDeleteWithJoins
 
     # skip any binds that are used in the join
     binds = scope.bound_attributes[binds_in_join..-1]
-    binds = connection.prepare_binds_for_database(binds)
+    binds = binds.map(&:value_for_database)
     binds.map! { |value| connection.quote(value) }
     sql_string = Arel::Collectors::Bind.new
     scope.arel.constraints.each do |node|
@@ -1002,7 +1010,7 @@ module UpdateAndDeleteWithJoins
     join_conditions.each { |join| scope = scope.where(join) }
 
     binds = scope.bound_attributes
-    binds = connection.prepare_binds_for_database(binds)
+    binds = binds.map(&:value_for_database)
     binds.map! { |value| connection.quote(value) }
     sql_string = Arel::Collectors::Bind.new
     scope.arel.constraints.each do |node|
@@ -1010,7 +1018,7 @@ module UpdateAndDeleteWithJoins
     end
     sql.concat('WHERE ' + sql_string.substitute_binds(binds).join)
 
-    connection.exec_query(sql, "#{name} Delete all", scope.bind_values)
+    connection.delete(sql, "SQL", scope.bind_values)
   end
 end
 ActiveRecord::Relation.prepend(UpdateAndDeleteWithJoins)
@@ -1047,6 +1055,10 @@ ActiveRecord::Associations::CollectionProxy.class_eval do
     record = klass.unscoped.merge(scope).new(*args)
     @association.set_inverse_instance(record)
     record
+  end
+
+  def uniq(*args)
+    raise "use #distinct instead of #uniq on relations (Rails 5.1 will delegate uniq to to_a)"
   end
 end
 
@@ -1256,10 +1268,13 @@ ActiveRecord::Associations::CollectionAssociation.class_eval do
 end
 
 module UnscopeCallbacks
-  def __run_callbacks__(*args)
-    scope = self.class.all.klass.unscoped
-    scope.scoping { super }
-  end
+  method = CANVAS_RAILS5_0 ? "__run_callbacks__" : "run_callbacks"
+  module_eval <<-RUBY, __FILE__, __LINE__ + 1
+    def #{method}(*args)
+      scope = self.class.all.klass.unscoped
+      scope.scoping { super }
+    end
+  RUBY
 end
 ActiveRecord::Base.send(:include, UnscopeCallbacks)
 
@@ -1317,7 +1332,8 @@ module SkipTouchCallbacks
   end
 
   module BelongsTo
-    def touch_record(o, foreign_key, name, *args)
+    def touch_record(o, *args)
+      name = CANVAS_RAILS5_0 ? args[1] : args[2]
       return if o.class.touch_callbacks_skipped?(name)
       super
     end
@@ -1336,3 +1352,18 @@ module ReadonlyCloning
   end
 end
 ActiveRecord::Base.prepend(ReadonlyCloning)
+
+module DupArraysInMutationTracker
+  # setting a serialized attribute to an array of hashes shouldn't change all the hashes to indifferent access
+  # when the array gets stored in the indifferent access hash inside the mutation tracker
+  # not that it really matters too much but having some consistency is nice
+  def change_to_attribute(*args)
+    change = super
+    if change
+      val = change[1]
+      change[1] = val.dup if val.is_a?(Array)
+    end
+    change
+  end
+end
+ActiveRecord::AttributeMutationTracker.prepend(DupArraysInMutationTracker) unless CANVAS_RAILS5_0

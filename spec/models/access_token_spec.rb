@@ -241,7 +241,7 @@ describe AccessToken do
     end
 
     it "should regenerate the token" do
-      DateTime.stubs(:now).returns(Time.zone.parse('2015-06-29T23:01:00+00:00'))
+      allow(DateTime).to receive(:now).and_return(Time.zone.parse('2015-06-29T23:01:00+00:00'))
 
       @at.update_attribute(:expires_at, 2.hours.ago)
       @at.regenerate_access_token

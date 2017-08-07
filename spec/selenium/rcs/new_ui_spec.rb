@@ -30,10 +30,6 @@ describe 'new ui' do
       stub_rcs_config
     end
 
-    after(:each) do
-      unstub_rcs_config
-    end
-
     it 'should not break tiny mce css', priority: "2", test_id: 244891 do
       skip_if_chrome('Chrome does not get these values properly')
       get "/courses/#{@course.id}/discussion_topics/new?is_announcement=true"
@@ -52,7 +48,7 @@ describe 'new ui' do
     it 'should not break equation editor css', priority: "2", test_id: 273600 do
       get "/courses/#{@course.id}/assignments/new"
       wait_for_tiny(f('#assignment_description'))
-      f('div#mceu_19.mce-widget.mce-btn').click
+      f('div#mceu_20.mce-widget.mce-btn').click
       wait_for_ajaximations
       expect(f('.mathquill-toolbar-panes, .mathquill-tab-bar')).to be_displayed
     end

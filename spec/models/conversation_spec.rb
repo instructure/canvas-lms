@@ -476,23 +476,27 @@ describe Conversation do
     end
 
     it "should set last_authored_at and visible_last_authored_at on deleted conversations even if update_for_sender=false" do
-      expected_times = [Time.now.utc - 1.hours, Time.now.utc].map{ |t| Time.parse(t.to_s) }
-      ConversationMessage.any_instance.expects(:current_time_from_proper_timezone).twice.returns(*expected_times)
+      expected_times = [Time.now.utc - 1.hours, Time.now.utc].map { |t| Time.at(t.to_i).utc }
 
-      rconvo = Conversation.initiate([sender, recipient], true)
-      message = rconvo.add_message(sender, 'test')
-      convo = sender.conversations.first
-      expect(convo.last_authored_at).to eql expected_times.first
-      expect(convo.visible_last_authored_at).to eql expected_times.first
+      convo = nil
+      Timecop.freeze(expected_times.first) do
+        rconvo = Conversation.initiate([sender, recipient], true)
+        message = rconvo.add_message(sender, 'test')
+        convo = sender.conversations.first
+        expect(convo.last_authored_at).to eql expected_times.first
+        expect(convo.visible_last_authored_at).to eql expected_times.first
 
-      convo.remove_messages(message)
-      expect(convo.last_authored_at).to eql expected_times.first
-      expect(convo.visible_last_authored_at).to be_nil
+        convo.remove_messages(message)
+        expect(convo.last_authored_at).to eql expected_times.first
+        expect(convo.visible_last_authored_at).to be_nil
+      end
 
-      convo.add_message('bulk message', :update_for_sender => false)
-      convo.reload
-      expect(convo.last_authored_at).to eql expected_times.last
-      expect(convo.visible_last_authored_at).to eql expected_times.last
+      Timecop.freeze(expected_times.last) do
+        convo.add_message('bulk message', :update_for_sender => false)
+        convo.reload
+        expect(convo.last_authored_at).to eql expected_times.last
+        expect(convo.visible_last_authored_at).to eql expected_times.last
+      end
     end
 
     it "should deliver the message to unsubscribed participants but not alert them" do

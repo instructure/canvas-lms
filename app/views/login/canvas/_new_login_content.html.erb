@@ -44,7 +44,7 @@
         </div>
 
         <div class="ic-Login__body">
-          <%= form_for :pseudonym_session, :url => url_for({ action: :create }.merge(params.slice(:id))), :html => {:id => "login_form"} do |f| %>
+          <%= form_for :pseudonym_session, :url => url_for({ action: :create }.merge(params.slice(:id).to_unsafe_h)), :html => {:id => "login_form"} do |f| %>
             <h2 class="ui-helper-hidden-accessible">
               <%= t('log_in', 'Log In') %>
             </h2>

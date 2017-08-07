@@ -144,8 +144,8 @@ shared_context "in-process server selenium tests" do
   before do
     raise "all specs need to use transactional fixtures" unless use_transactional_tests
 
-    HostUrl.stubs(:default_host).returns(app_host_and_port)
-    HostUrl.stubs(:file_host).returns(app_host_and_port)
+    allow(HostUrl).to receive(:default_host).and_return(app_host_and_port)
+    allow(HostUrl).to receive(:file_host).and_return(app_host_and_port)
   end
 
   # synchronize db connection methods for a modicum of thread safety
@@ -170,9 +170,10 @@ shared_context "in-process server selenium tests" do
     @db_connection = ActiveRecord::Base.connection
     @dj_connection = Delayed::Backend::ActiveRecord::Job.connection
 
-    ActiveRecord::ConnectionAdapters::ConnectionPool.any_instance.stubs(:connection).returns(@db_connection)
-    Delayed::Backend::ActiveRecord::Job.stubs(:connection).returns(@dj_connection)
-    Delayed::Backend::ActiveRecord::Job::Failed.stubs(:connection).returns(@dj_connection)
+    allow(ActiveRecord::Base).to receive(:connection).and_return(@db_connection)
+    allow_any_instance_of(Switchman::ConnectionPoolProxy).to receive(:connection).and_return(@db_connection)
+    allow(Delayed::Backend::ActiveRecord::Job).to receive(:connection).and_return(@dj_connection)
+    allow(Delayed::Backend::ActiveRecord::Job::Failed).to receive(:connection).and_return(@dj_connection)
   end
 
   after(:each) do |example|
@@ -186,6 +187,11 @@ shared_context "in-process server selenium tests" do
       # we want to ignore selenium errors when attempting to wait here
     ensure
       SeleniumDriverSetup.disallow_requests!
+    end
+
+    if SeleniumDriverSetup.reset_driver_between_specs?
+      driver.quit
+      SeleniumDriverSetup.reset!
     end
   end
 end

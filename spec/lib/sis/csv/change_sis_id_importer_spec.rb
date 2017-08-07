@@ -73,7 +73,7 @@ describe SIS::CSV::ChangeSisIdImporter do
     expect(warnings).to eq ["An old_id, 'invalid', referenced a non-existent term and was not changed to 'valid'",
                             "No old_id given for change_sis_id",
                             "No new_id given for change_sis_id",
-                            "No Type given for change_sis_id",
+                            "No type given for change_sis_id",
                             "A new_id, 'c001', referenced an existing course and the course with sis_source_id 'c002' was not updated",
                             "Invalid type 'invalid' for change_sis_id"]
   end

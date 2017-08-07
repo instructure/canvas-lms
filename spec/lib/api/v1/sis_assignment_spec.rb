@@ -37,11 +37,11 @@ describe Api::V1::SisAssignment do
     end
 
     let(:assignment_overrides) do
-      assignment_override_1.stubs(:set_type).returns("CourseSection")
-      assignment_override_1.stubs(:set_id).returns(1)
+      allow(assignment_override_1).to receive(:set_type).and_return("CourseSection")
+      allow(assignment_override_1).to receive(:set_id).and_return(1)
 
-      assignment_override_2.stubs(:set_type).returns("CourseSection")
-      assignment_override_2.stubs(:set_id).returns(2)
+      allow(assignment_override_2).to receive(:set_type).and_return("CourseSection")
+      allow(assignment_override_2).to receive(:set_id).and_return(2)
 
       [
         assignment_override_1,
@@ -63,24 +63,24 @@ describe Api::V1::SisAssignment do
     end
 
     before do
-      assignment_1.stubs(:locked_for?).returns(false)
+      allow(assignment_1).to receive(:locked_for?).and_return(false)
 
-      assignment_overrides.stubs(:loaded?).returns(true)
-      assignment_overrides.stubs(:unlock_at).returns(15.days.ago)
-      assignment_overrides.stubs(:lock_at).returns(2.days.from_now)
+      allow(assignment_overrides).to receive(:loaded?).and_return(true)
+      allow(assignment_overrides).to receive(:unlock_at).and_return(15.days.ago)
+      allow(assignment_overrides).to receive(:lock_at).and_return(2.days.from_now)
 
-      course_section_1.stubs(:id).returns(1)
-      course_section_2.stubs(:id).returns(2)
-      course_section_3.stubs(:id).returns(3)
+      allow(course_section_1).to receive(:id).and_return(1)
+      allow(course_section_2).to receive(:id).and_return(2)
+      allow(course_section_3).to receive(:id).and_return(3)
 
       course_sections.each do |course_section|
-        course_section.stubs(:nonxlist_course).returns(course_1)
-        course_section.stubs(:crosslisted?).returns(false)
+        allow(course_section).to receive(:nonxlist_course).and_return(course_1)
+        allow(course_section).to receive(:crosslisted?).and_return(false)
       end
 
-      course_sections.stubs(:loaded?).returns(true)
-      course_sections.stubs(:active_course_sections).returns(course_sections)
-      course_sections.stubs(:association).returns(OpenStruct.new(:loaded? => true))
+      allow(course_sections).to receive(:loaded?).and_return(true)
+      allow(course_sections).to receive(:active_course_sections).and_return(course_sections)
+      allow(course_sections).to receive(:association).and_return(OpenStruct.new(:loaded? => true))
     end
 
     it "creates assignment groups that have name and integration_data with proper data" do
@@ -90,7 +90,7 @@ describe Api::V1::SisAssignment do
       assignment_group = AssignmentGroup.new(name: ag_name,
                                              sis_source_id: sis_source_id,
                                              integration_data: integration_data, group_weight: 8.7)
-      assignment_1.stubs(:assignment_group).returns(assignment_group)
+      allow(assignment_1).to receive(:assignment_group).and_return(assignment_group)
       result = subject.sis_assignments_json([assignment_1])
       expect(result[0]["assignment_group"]["name"]).to eq(ag_name)
       expect(result[0]["assignment_group"]["sis_source_id"]).to eq(sis_source_id)
@@ -104,7 +104,7 @@ describe Api::V1::SisAssignment do
       assignment_group = AssignmentGroup.new(name: ag_name,
                                              sis_source_id: sis_source_id,
                                              integration_data: nil, group_weight: 8.7)
-      assignment_1.stubs(:assignment_group).returns(assignment_group)
+      allow(assignment_1).to receive(:assignment_group).and_return(assignment_group)
       result = subject.sis_assignments_json([assignment_1])
       expect(result[0]["assignment_group"]["name"]).to eq(ag_name)
       expect(result[0]["assignment_group"]["sis_source_id"]).to eq(sis_source_id)

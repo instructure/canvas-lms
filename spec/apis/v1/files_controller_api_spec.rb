@@ -108,7 +108,7 @@ describe "Files API", type: :request do
     it "should set the attachment to available (s3 storage)" do
       s3_storage!
 
-      Aws::S3::Object.any_instance.expects(:data).returns({
+      expect_any_instance_of(Aws::S3::Object).to receive(:data).and_return({
                                           :content_type => 'text/plain',
                                           :content_length => 1234,
                                       })
@@ -141,6 +141,7 @@ describe "Files API", type: :request do
     end
 
     it "includes usage rights if overwriting a file that has them already" do
+      local_storage!
       usage_rights = @course.usage_rights.create! use_justification: 'creative_commons', legal_copyright: '(C) 2014 XYZ Corp', license: 'cc_by_nd'
       @attachment.usage_rights = usage_rights
       @attachment.save!
@@ -162,10 +163,10 @@ describe "Files API", type: :request do
 
     it "should render the response as text/html when in app" do
       s3_storage!
-      FilesController.any_instance.stubs(:in_app?).returns(true)
-      FilesController.any_instance.stubs(:verified_request?).returns(true)
+      allow_any_instance_of(FilesController).to receive(:in_app?).and_return(true)
+      allow_any_instance_of(FilesController).to receive(:verified_request?).and_return(true)
 
-      Aws::S3::Object.any_instance.expects(:data).returns({
+      expect_any_instance_of(Aws::S3::Object).to receive(:data).and_return({
                                           :content_type => 'text/plain',
                                           :content_length => 1234,
                                       })
@@ -193,13 +194,13 @@ describe "Files API", type: :request do
 
     context "upload success context callback" do
       before do
-        Course.any_instance.stubs(:file_upload_success_callback)
-        Course.any_instance.expects(:file_upload_success_callback).with(@attachment)
+        allow_any_instance_of(Course).to receive(:file_upload_success_callback)
+        expect_any_instance_of(Course).to receive(:file_upload_success_callback).with(@attachment)
       end
 
       it "should call back for s3" do
         s3_storage!
-         Aws::S3::Object.any_instance.expects(:data).returns({
+         expect_any_instance_of(Aws::S3::Object).to receive(:data).and_return({
                                           :content_type => 'text/plain',
                                           :content_length => 1234,
                                       })
@@ -598,7 +599,7 @@ describe "Files API", type: :request do
   end
 
   describe "#show" do
-    before :once do
+    before do
       @root = Folder.root_folders(@course).first
       @att = Attachment.create!(:filename => 'test.png', :display_name => "test-frd.png", :uploaded_data => stub_png_data, :folder => @root, :context => @course)
       @file_path = "/api/v1/files/#{@att.id}"
@@ -784,7 +785,7 @@ describe "Files API", type: :request do
       account_admin_user(account: @account)
       @att.context = u
       @att.save!
-      Attachment.any_instance.expects(:destroy_content_and_replace).once
+      expect_any_instance_of(Attachment).to receive(:destroy_content_and_replace).once
       @file_path_options[:replace] = true
       api_call(:delete, @file_path, @file_path_options, {}, {}, expected_status: 200)
     end
@@ -828,8 +829,8 @@ describe "Files API", type: :request do
     end
 
     it "should omit verifier in-app" do
-      FilesController.any_instance.stubs(:in_app?).returns(true)
-      FilesController.any_instance.stubs(:verified_request?).returns(true)
+      allow_any_instance_of(FilesController).to receive(:in_app?).and_return(true)
+      allow_any_instance_of(FilesController).to receive(:verified_request?).and_return(true)
 
       new_params = {:locked => 'true'}
       json = api_call(:put, @file_path, @file_path_options, new_params)

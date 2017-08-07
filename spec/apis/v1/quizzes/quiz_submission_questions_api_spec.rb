@@ -170,7 +170,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       end
 
       it 'should list all items' do
-        Quizzes::QuizSubmission.any_instance.stubs(:quiz_questions).returns([@qq1,@qq2])
+        allow_any_instance_of(Quizzes::QuizSubmission).to receive(:quiz_questions).and_return([@qq1,@qq2])
         json = api_index
         expect(json['quiz_submission_questions'].size).to eq 2
       end
@@ -650,14 +650,14 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
         @quiz.require_lockdown_browser = true
         @quiz.save
 
-        Quizzes::Quiz.stubs(:lockdown_browser_plugin_enabled?).returns true
+        allow(Quizzes::Quiz).to receive(:lockdown_browser_plugin_enabled?).and_return true
 
         fake_plugin = Object.new
-        fake_plugin.stubs(:authorized?).returns false
-        fake_plugin.stubs(:base).returns fake_plugin
+        allow(fake_plugin).to receive(:authorized?).and_return false
+        allow(fake_plugin).to receive(:base).and_return fake_plugin
 
-        subject.stubs(:ldb_plugin).returns fake_plugin
-        Canvas::LockdownBrowser.stubs(:plugin).returns fake_plugin
+        allow(subject).to receive(:ldb_plugin).and_return fake_plugin
+        allow(Canvas::LockdownBrowser).to receive(:plugin).and_return fake_plugin
 
         api_answer({
           quiz_questions: [{

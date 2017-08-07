@@ -659,7 +659,7 @@ class ApplicationController < ActionController::Base
         @context = api_find(Account, params[:account_id])
         params[:context_id] = @context.id
         params[:context_type] = "Account"
-        @context_enrollment = @context.account_users.where(user_id: @current_user.id).first if @context && @current_user
+        @context_enrollment = @context.account_users.active.where(user_id: @current_user.id).first if @context && @current_user
         @context_membership = @context_enrollment
         @account = @context
       elsif params[:group_id]

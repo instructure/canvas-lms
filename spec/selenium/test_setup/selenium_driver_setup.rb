@@ -42,8 +42,8 @@ module SeleniumDriverSetup
     # nothing should wait by default
     implicit_wait: 0,
     # except finding elements
-    finder: 5,
-    script: 5
+    finder: CONFIG[:finder_timeout_seconds] || 5,
+    script: CONFIG[:script_timeout_seconds] || 5
   }.freeze
 
   # If you have some really slow UI, you can temporarily override
@@ -89,6 +89,11 @@ module SeleniumDriverSetup
     def reset!
       dump_browser_log if browser_log
       @driver = nil
+    end
+
+    def reset_driver_between_specs?
+      SeleniumDriverSetup::CONFIG[:remote_url].present? &&
+        SeleniumDriverSetup::CONFIG[:remote_url].downcase.include?("saucelabs")
     end
 
     def run
@@ -272,7 +277,7 @@ module SeleniumDriverSetup
 
     def safari_driver
       puts "using safari driver"
-      selenium_remote_driver
+      selenium_url ? selenium_remote_driver : ruby_safari_driver
     end
 
     def firefox_driver
@@ -316,6 +321,11 @@ module SeleniumDriverSetup
       puts "Thread: provisioning local chrome driver"
       Chromedriver.set_version "2.29"
       Selenium::WebDriver.for :chrome, switches: %w[--disable-impl-side-painting]
+    end
+
+    def ruby_safari_driver
+      puts "Thread: provisioning local safari driver"
+      Selenium::WebDriver.for :safari
     end
 
     def selenium_remote_driver

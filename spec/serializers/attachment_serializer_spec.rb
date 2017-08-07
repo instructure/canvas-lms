@@ -48,8 +48,8 @@ describe AttachmentSerializer do
     }
 
     ActiveModel::FakeController.new(options).tap do |controller|
-      controller.stubs(:session).returns Object.new
-      controller.stubs(:context).returns context
+      allow(controller).to receive(:session).and_return Object.new
+      allow(controller).to receive(:context).and_return context
     end
   end
 

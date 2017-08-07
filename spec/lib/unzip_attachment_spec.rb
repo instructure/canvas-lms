@@ -144,12 +144,12 @@ describe UnzipAttachment do
       end
 
       it 'errors when the file quotas push the context over its quota' do
-        Attachment.stubs(:get_quota).returns({:quota => 5000, :quota_used => 0})
+        allow(Attachment).to receive(:get_quota).and_return({:quota => 5000, :quota_used => 0})
         expect{ unzipper.process }.to raise_error(Attachment::OverQuotaError, "Zip file would exceed quota limit")
       end
 
       it 'should be able to rescue the file quota error' do
-        Attachment.stubs(:get_quota).returns({:quota => 5000, :quota_used => 0})
+        allow(Attachment).to receive(:get_quota).and_return({:quota => 5000, :quota_used => 0})
         unzipper.process rescue nil
       end
     end
@@ -165,7 +165,7 @@ describe UnzipAttachment do
       let(:filename) { fixture_filename('zipbomb.zip') }
 
       it 'double-checks the extracted file sizes in case the central directory lies' do
-        Attachment.stubs(:get_quota).returns({:quota => 5000, :quota_used => 0})
+        allow(Attachment).to receive(:get_quota).and_return({:quota => 5000, :quota_used => 0})
         expect{ unzipper.process }.to raise_error(Attachment::OverQuotaError)
         # a and b should have been attached
         # but we should have bailed once c ate the remaining quota
@@ -173,13 +173,13 @@ describe UnzipAttachment do
       end
 
       it "doesn't interfere when the quota is 0 (unlimited)" do
-        Attachment.stubs(:get_quota).returns({:quota => 0, :quota_used => 0})
+        allow(Attachment).to receive(:get_quota).and_return({:quota => 0, :quota_used => 0})
         expect{ unzipper.process }.not_to raise_error
         expect(@course.attachments.count).to eql 4
       end
 
       it "lets incorrect central directory size slide if the quota isn't exceeded" do
-        Attachment.stubs(:get_quota).returns({:quota => 15000, :quota_used => 0})
+        allow(Attachment).to receive(:get_quota).and_return({:quota => 15000, :quota_used => 0})
         expect{ unzipper.process }.not_to raise_error
         expect(@course.attachments.count).to eql 4
       end

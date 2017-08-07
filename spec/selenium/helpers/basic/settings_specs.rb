@@ -59,7 +59,7 @@ shared_examples_for "settings basic tests" do |account_type|
       f("#enrollment_#{admin_id} .remove_account_user_link").click
       driver.switch_to.alert.accept
       wait_for_ajax_requests
-      expect(AccountUser.where(id: admin_id)).not_to be_exists
+      expect(AccountUser.active.where(id: admin_id)).not_to be_exists
     end
   end
 

@@ -17,14 +17,13 @@
  */
 
 import axios from 'axios';
-import constants from 'jsx/gradebook-history/constants';
 
 const userMetaTypes = {
   graders: ['teacher', 'ta'],
   students: ['student', 'student_view']
 };
 
-function getUsersByName (userType, searchTerm) {
+function getUsersByName (courseId, userType, searchTerm) {
   if (searchTerm.length < 3) {
     // the endpoint doesn't allow searching by 2 letters or less
     return Promise.resolve({ response: {data: []} });
@@ -36,13 +35,13 @@ function getUsersByName (userType, searchTerm) {
       enrollment_type: userMetaTypes[userType]
     }
   }
-  const url = encodeURI(`/api/v1/courses/${constants.courseId()}/users`);
+  const url = encodeURI(`/api/v1/courses/${courseId}/users`);
 
   return axios.get(url, params);
 }
 
 function getUsersNextPage (url) {
-  return axios.get(url);
+  return axios.get(encodeURI(url));
 }
 
 export default {

@@ -38,8 +38,8 @@ describe ProgressSerializer do
     }
 
     ActiveModel::FakeController.new(options).tap do |controller|
-      controller.stubs(:session).returns Object.new
-      controller.stubs(:context).returns Object.new
+      allow(controller).to receive(:session).and_return Object.new
+      allow(controller).to receive(:context).and_return Object.new
     end
   end
 

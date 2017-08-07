@@ -155,7 +155,7 @@ describe Quizzes::QuizReportsController, type: :request do
 
       it "should work when a job had failed previously" do
         stats, original_job = *begin
-          Quizzes::QuizStatistics::StudentAnalysis.any_instance.stubs(:to_csv) {
+          allow_any_instance_of(Quizzes::QuizStatistics::StudentAnalysis).to receive(:to_csv) {
             throw 'simulated failure'
           }
 

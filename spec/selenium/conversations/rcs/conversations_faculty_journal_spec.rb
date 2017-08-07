@@ -46,10 +46,6 @@ describe "conversations new" do
       stub_rcs_config
     end
 
-    after(:each) do
-      unstub_rcs_config
-    end
-
     it "should allow a site admin to enable faculty journal", priority: "2", test_id: 75005 do
       get account_settings_url
       f('#account_enable_user_notes').click

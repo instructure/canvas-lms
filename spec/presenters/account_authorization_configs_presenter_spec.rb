@@ -20,21 +20,21 @@
 describe AccountAuthorizationConfigsPresenter do
   describe "initialization" do
     it "wraps an account" do
-      account = stub()
+      account = double()
       presenter = described_class.new(account)
       expect(presenter.account).to eq(account)
     end
   end
 
   def stubbed_account(providers=[])
-    stub(authentication_providers: stub(active: providers))
+    double(authentication_providers: double(active: providers))
   end
 
   describe "#configs" do
 
     it "pulls configs from account" do
-      config2 = stub
-      account = stubbed_account([stub, config2])
+      config2 = double
+      account = stubbed_account([double, config2])
       presenter = described_class.new(account)
       expect(presenter.configs[1]).to eq(config2)
     end
@@ -48,24 +48,24 @@ describe AccountAuthorizationConfigsPresenter do
     end
 
     it "only pulls from the db connection one time" do
-      account = stub()
-      account.expects(:authentication_providers).times(1).returns(stub(active: []))
+      account = double()
+      expect(account).to receive(:authentication_providers).exactly(1).times.and_return(double(active: []))
       presenter = described_class.new(account)
       5.times{ presenter.configs }
     end
   end
 
   describe "SAML view helpers" do
-    let(:presenter){ described_class.new(stub) }
+    let(:presenter){ described_class.new(double) }
 
     describe "#saml_identifiers" do
       it "is empty when saml disabled" do
-        AccountAuthorizationConfig::SAML.stubs(:enabled?).returns(false)
+        allow(AccountAuthorizationConfig::SAML).to receive(:enabled?).and_return(false)
         expect(presenter.saml_identifiers).to be_empty
       end
 
       it "is the list from Onelogin::Saml::NameIdentifiers" do
-        AccountAuthorizationConfig::SAML.stubs(:enabled?).returns(true)
+        allow(AccountAuthorizationConfig::SAML).to receive(:enabled?).and_return(true)
         expected = Onelogin::Saml::NameIdentifiers::ALL_IDENTIFIERS
         expect(presenter.saml_identifiers).to eq(expected)
       end
@@ -73,14 +73,14 @@ describe AccountAuthorizationConfigsPresenter do
 
     describe "#saml_authn_contexts" do
       it "is empty when saml disabled" do
-        AccountAuthorizationConfig::SAML.stubs(:enabled?).returns(false)
+        allow(AccountAuthorizationConfig::SAML).to receive(:enabled?).and_return(false)
         expect(presenter.saml_authn_contexts).to be_empty
       end
 
       context "when saml enabled" do
 
         before do
-          AccountAuthorizationConfig::SAML.stubs(:enabled?).returns(true)
+          allow(AccountAuthorizationConfig::SAML).to receive(:enabled?).and_return(true)
         end
 
         it "has each value from Onelogin" do
@@ -105,13 +105,13 @@ describe AccountAuthorizationConfigsPresenter do
 
   describe "#auth?" do
     it "is true for one aac" do
-      account = stubbed_account([stub])
+      account = stubbed_account([double])
       presenter = described_class.new(account)
       expect(presenter.auth?).to be(true)
     end
 
     it "is true for many aacs" do
-      account = stubbed_account([stub, stub])
+      account = stubbed_account([double, double])
       presenter = described_class.new(account)
       expect(presenter.auth?).to be(true)
     end
@@ -137,7 +137,7 @@ describe AccountAuthorizationConfigsPresenter do
     end
 
     it "is false for aacs which are not ldap" do
-      account = stubbed_account( [ stub(auth_type: 'saml'), stub(auth_type: 'cas') ] )
+      account = stubbed_account( [ double(auth_type: 'saml'), double(auth_type: 'cas') ] )
       presenter = described_class.new(account)
       expect(presenter.ldap_config?).to be(false)
     end
@@ -145,7 +145,7 @@ describe AccountAuthorizationConfigsPresenter do
 
   describe "#sso_options" do
     it "always has cas and ldap" do
-      AccountAuthorizationConfig::SAML.stubs(:enabled?).returns(false)
+      allow(AccountAuthorizationConfig::SAML).to receive(:enabled?).and_return(false)
       presenter = described_class.new(stubbed_account)
       options = presenter.sso_options
       expect(options).to include({name: 'CAS', value: 'cas'})
@@ -153,7 +153,7 @@ describe AccountAuthorizationConfigsPresenter do
     end
 
     it "includes saml if saml enabled" do
-      AccountAuthorizationConfig::SAML.stubs(:enabled?).returns(true)
+      allow(AccountAuthorizationConfig::SAML).to receive(:enabled?).and_return(true)
       presenter = described_class.new(stubbed_account)
       expect(presenter.sso_options).to include({name: 'SAML', value: 'saml'})
     end
@@ -161,21 +161,21 @@ describe AccountAuthorizationConfigsPresenter do
 
   describe "ip_configuration" do
     def stub_setting(val)
-      Setting.stubs(:get)
+      allow(Setting).to receive(:get)
         .with('account_authorization_config_ip_addresses', nil)
-        .returns(val)
+        .and_return(val)
     end
 
     describe "#ips_configured?" do
       it "is true if there is anything in the ip addresses setting" do
         stub_setting('127.0.0.1')
-        presenter = described_class.new(stub)
+        presenter = described_class.new(double)
         expect(presenter.ips_configured?).to be(true)
       end
 
       it "is false without ip addresses" do
         stub_setting(nil)
-        presenter = described_class.new(stub)
+        presenter = described_class.new(double)
         expect(presenter.ips_configured?).to be(false)
       end
     end
@@ -183,20 +183,20 @@ describe AccountAuthorizationConfigsPresenter do
     describe "#ip_list" do
       it "just returns the one for one ip address" do
         stub_setting("127.0.0.1")
-        presenter = described_class.new(stub)
+        presenter = described_class.new(double)
         expect(presenter.ip_list).to eq("127.0.0.1")
       end
 
       it "combines many ips into a newline delimited block" do
         stub_setting("127.0.0.1,2.2.2.2, 4.4.4.4,  6.6.6.6")
-        presenter = described_class.new(stub)
+        presenter = described_class.new(double)
         list_output = "127.0.0.1\n2.2.2.2\n4.4.4.4\n6.6.6.6"
         expect(presenter.ip_list).to eq(list_output)
       end
 
       it "is an empty string for no ips" do
         stub_setting(nil)
-        presenter = described_class.new(stub)
+        presenter = described_class.new(double)
         expect(presenter.ip_list).to eq("")
       end
     end
@@ -204,7 +204,7 @@ describe AccountAuthorizationConfigsPresenter do
 
   describe "#login_placeholder" do
     it "wraps AAC.default_delegated_login_handle_name" do
-      expect(described_class.new(stub).login_placeholder).to eq(
+      expect(described_class.new(double).login_placeholder).to eq(
         AccountAuthorizationConfig.default_delegated_login_handle_name
       )
     end
@@ -229,7 +229,7 @@ describe AccountAuthorizationConfigsPresenter do
     it "selects out all ldap configs" do
       config = AccountAuthorizationConfig::LDAP.new
       config2 = AccountAuthorizationConfig::LDAP.new
-      account = stubbed_account([stub, config, stub, config2])
+      account = stubbed_account([double, config, double, config2])
       presenter = described_class.new(account)
       expect(presenter.ldap_configs).to eq([config, config2])
     end
@@ -239,8 +239,8 @@ describe AccountAuthorizationConfigsPresenter do
     it "selects out all saml configs" do
       config = AccountAuthorizationConfig::SAML.new
       config2 = AccountAuthorizationConfig::SAML.new
-      pre_configs = [stub, config, stub, config2]
-      pre_configs.stubs(:all).returns(AccountAuthorizationConfig)
+      pre_configs = [double, config, double, config2]
+      allow(pre_configs).to receive(:all).and_return(AccountAuthorizationConfig)
       account = stubbed_account(pre_configs)
       configs = described_class.new(account).saml_configs
       expect(configs[0]).to eq(config)
@@ -255,11 +255,11 @@ describe AccountAuthorizationConfigsPresenter do
     let(:account){ stubbed_account(configs) }
 
     before do
-      configs.stubs(:all).returns(AccountAuthorizationConfig)
+      allow(configs).to receive(:all).and_return(AccountAuthorizationConfig)
     end
 
     it "generates a list from the saml config size" do
-      config.stubs(:new_record?).returns(false)
+      allow(config).to receive(:new_record?).and_return(false)
       options = described_class.new(account).position_options(config)
       expect(options).to eq([[1,1],[2,2],[3,3],[4,4]])
     end
@@ -303,7 +303,7 @@ describe AccountAuthorizationConfigsPresenter do
 
   describe "#new_auth_types" do
     it "excludes singletons that have a config" do
-      AccountAuthorizationConfig::Facebook.stubs(:enabled?).returns(true)
+      allow(AccountAuthorizationConfig::Facebook).to receive(:enabled?).and_return(true)
       Account.default.authentication_providers.create!(auth_type: 'facebook')
       presenter = described_class.new(Account.default)
       expect(presenter.new_auth_types).to_not be_include(AccountAuthorizationConfig::Facebook)

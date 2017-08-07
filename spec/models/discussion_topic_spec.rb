@@ -1557,12 +1557,12 @@ describe DiscussionTopic do
     end
 
     it "should use unique_constaint_retry when updating read state" do
-      DiscussionTopic.expects(:unique_constraint_retry).once
+      expect(DiscussionTopic).to receive(:unique_constraint_retry).once
       @topic.change_read_state("read", @student)
     end
 
     it "should use unique_constaint_retry when updating all read state" do
-      DiscussionTopic.expects(:unique_constraint_retry).once
+      expect(DiscussionTopic).to receive(:unique_constraint_retry).once
       @topic.change_all_read_state("unread", @student)
     end
 
@@ -1784,7 +1784,7 @@ describe DiscussionTopic do
       group_discussion_assignment
       @topic.destroy
 
-      @topic.reload.assignment.expects(:restore).with(:discussion_topic).once
+      expect(@topic.reload.assignment).to receive(:restore).with(:discussion_topic).once
       @topic.restore
       expect(@topic.reload).to be_unpublished
       @topic.child_topics.each { |ct| expect(ct.reload).to be_unpublished }

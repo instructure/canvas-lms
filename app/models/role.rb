@@ -40,6 +40,10 @@ class Role < ActiveRecord::Base
       end
       super
     end
+
+    def role=(role)
+      super(role&.role_for_shard(self.shard))
+    end
   end
 
   belongs_to :account
@@ -55,11 +59,11 @@ class Role < ActiveRecord::Base
   validates_exclusion_of :name, :in => KNOWN_TYPES, :unless => :built_in?, :message => 'is reserved'
   validate :ensure_non_built_in_name
 
-  def id
-    if self.built_in? && self.shard != Shard.current && role = Role.get_built_in_role(self.name, Shard.current)
-      role.read_attribute(:id)
+  def role_for_shard(target_shard=Shard.current)
+    if self.built_in? && self.shard != target_shard && target_shard_role = Role.get_built_in_role(self.name, target_shard)
+      target_shard_role
     else
-      super
+      self
     end
   end
 

@@ -269,7 +269,7 @@ describe Quizzes::QuizQuestionBuilder do
       before { subject.options[:shuffle_answers] = true }
 
       context "on a non-shuffleable question type" do
-        before { subject.stubs(:shuffleable_question_type?).returns(false) }
+        before { allow(subject).to receive(:shuffleable_question_type?).and_return(false) }
 
         it "doesn't shuffle" do
           expect(subject.shuffle_answers(question)).to eq answers
@@ -277,14 +277,14 @@ describe Quizzes::QuizQuestionBuilder do
       end
 
       context "on a shuffleable question type" do
-        before { subject.stubs(:shuffleable_question_type?).returns(true) }
+        before { allow(subject).to receive(:shuffleable_question_type?).and_return(true) }
 
         it "returns the same answers, not necessarily in the same order" do
           expect(subject.shuffle_answers(question).sort).to eq answers.sort
         end
 
         it "shuffles" do
-          answers.expects(:sort_by)
+          expect(answers).to receive(:sort_by)
           subject.shuffle_answers(question)
         end
       end
@@ -303,13 +303,13 @@ describe Quizzes::QuizQuestionBuilder do
 
     it "shuffles matches for a matching question" do
       subject.options[:shuffle_answers] = true
-      matches.expects(:sort_by)
+      expect(matches).to receive(:sort_by)
       subject.shuffle_matches(question)
     end
 
     it "still shuffles even if shuffle_answers option is off" do
       subject.options[:shuffle_answers] = false
-      matches.expects(:sort_by)
+      expect(matches).to receive(:sort_by)
       subject.shuffle_matches(question)
     end
   end

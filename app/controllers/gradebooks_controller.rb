@@ -226,7 +226,7 @@ class GradebooksController < ApplicationController
   def post_grades_tools
     tool_limit = @context.feature_enabled?(:post_grades) ? MAX_POST_GRADES_TOOLS - 1 : MAX_POST_GRADES_TOOLS
     tools = post_grades_ltis[0...tool_limit]
-    tools.push(type: :post_grades) if @context.feature_enabled?(:post_grades)
+    tools.push(type: :post_grades) if @context.feature_enabled?(:post_grades) && tools.size == 0
     tools
   end
 
@@ -296,7 +296,7 @@ class GradebooksController < ApplicationController
   end
 
   def active_grading_periods
-    @active_grading_periods ||= GradingPeriod.for(@context).sort_by(&:start_date)
+    @active_grading_periods ||= GradingPeriod.for(@context).order(:start_date)
   end
 
   def grading_period_group_json
@@ -466,7 +466,7 @@ class GradebooksController < ApplicationController
                     end
       valid_user_ids = Set.new(@context.students_visible_to(@current_user, include: :inactive).pluck(:id))
       submissions.select! { |s| valid_user_ids.include? s[:user_id].to_i }
-      users = @context.admin_visible_students.uniq.find(submissions.map { |s| s[:user_id] })
+      users = @context.admin_visible_students.distinct.find(submissions.map { |s| s[:user_id] })
         .index_by(&:id)
       assignments = @context.assignments.active.find(submissions.map { |s|
         s[:assignment_id]
@@ -480,7 +480,7 @@ class GradebooksController < ApplicationController
 
         submission = submission.permit(:grade, :score, :excuse, :excused,
           :graded_anonymously, :provisional, :final,
-          :comment, :media_comment_id)
+          :comment, :media_comment_id).to_unsafe_h
 
         submission[:grader] = @current_user
         submission.delete(:provisional) unless @assignment.moderated_grading?
@@ -557,9 +557,10 @@ class GradebooksController < ApplicationController
   end
 
   def submissions_json
-    @submissions.map do |s|
-      json = s.as_json(Submission.json_serialization_full_parameters)
-      json['submission']['provisional_grade_id'] = s.provisional_grade_id if s.provisional_grade_id
+    @submissions.map do |sub|
+      json = sub.as_json(Submission.json_serialization_full_parameters)
+      json['submission']['assignment_visible'] = sub.assignment_visible_to_user?(sub.user)
+      json['submission']['provisional_grade_id'] = sub.provisional_grade_id if sub.provisional_grade_id
       json
     end
   end
@@ -599,7 +600,7 @@ class GradebooksController < ApplicationController
       return redirect_to polymorphic_url([@context, @assignment])
     end
 
-    if canvadoc_annotations_enabled_in_firefox? ||
+    if !canvadoc_annotations_enabled_in_firefox? &&
         submisions_attachment_crocodocable_in_firefox?(@assignment.submissions)
         flash[:notice] = t("Warning: Crocodoc has limitations when used in Firefox. Comments will not always be saved.")
     end
@@ -629,6 +630,7 @@ class GradebooksController < ApplicationController
           ),
           :course_id => @context.id,
           :assignment_id => @assignment.id,
+          :assignment_title => @assignment.title
         }
         if [:moderator, :provisional_grader].include?(grading_role)
           env[:provisional_status_url] = api_v1_course_assignment_provisional_status_path(@context.id, @assignment.id)
@@ -688,7 +690,7 @@ class GradebooksController < ApplicationController
         @current_user.preferences[:gradebook_column_order] = {}
       end
 
-      @current_user.preferences[:gradebook_column_order][@context.id] = params[:column_order].to_hash.with_indifferent_access
+      @current_user.preferences[:gradebook_column_order][@context.id] = params[:column_order].to_unsafe_h
       @current_user.save!
       render json: nil
     end
@@ -699,6 +701,13 @@ class GradebooksController < ApplicationController
 
     gradebook_user_ids = GradebookUserIds.new(@context, @current_user)
     render json: { user_ids: gradebook_user_ids.user_ids }
+  end
+
+  def grading_period_assignments
+    return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
+
+    grading_period_assignments = GradebookGradingPeriodAssignments.new(@context)
+    render json: { grading_period_assignments: grading_period_assignments.to_h }
   end
 
   def change_gradebook_version
@@ -732,7 +741,8 @@ class GradebooksController < ApplicationController
       colors: gradebook_settings.fetch(:colors, {}),
       graded_late_or_missing_submissions_exist: graded_late_or_missing_submissions_exist,
       gradezilla: true,
-      new_gradebook_development_enabled: !!ENV['GRADEBOOK_DEVELOPMENT']
+      new_gradebook_development_enabled: !!ENV['GRADEBOOK_DEVELOPMENT'],
+      late_policy: @context.late_policy.as_json(include_root: false)
     }
     env.deep_merge({ GRADEBOOK_OPTIONS: options })
   end

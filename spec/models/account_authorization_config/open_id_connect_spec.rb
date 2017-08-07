@@ -33,7 +33,7 @@ describe AccountAuthorizationConfig::OpenIDConnect do
       connect = described_class.new
       payload = { sub: "some-login-attribute" }
       id_token = Canvas::Security.create_jwt(payload, nil, :unsigned)
-      uid = connect.unique_id(stub(params: {'id_token' => id_token}, options: {}))
+      uid = connect.unique_id(double(params: {'id_token' => id_token}, options: {}))
       expect(uid).to eq("some-login-attribute")
     end
 
@@ -43,8 +43,8 @@ describe AccountAuthorizationConfig::OpenIDConnect do
       connect.login_attribute = 'not_in_id_token'
       payload = { sub: "1" }
       id_token = Canvas::Security.create_jwt(payload, nil, :unsigned)
-      token = stub(options: {}, params: {'id_token' => id_token})
-      token.expects(:get).with('moar').returns(stub(parsed: { 'not_in_id_token' => 'myid', 'sub' => '1' }))
+      token = double(options: {}, params: {'id_token' => id_token})
+      expect(token).to receive(:get).with('moar').and_return(double(parsed: { 'not_in_id_token' => 'myid', 'sub' => '1' }))
       expect(connect.unique_id(token)).to eq 'myid'
     end
 
@@ -54,8 +54,8 @@ describe AccountAuthorizationConfig::OpenIDConnect do
       connect.login_attribute = 'not_in_id_token'
       payload = { sub: "1" }
       id_token = Canvas::Security.create_jwt(payload, nil, :unsigned)
-      token = stub(options: {}, params: {'id_token' => id_token})
-      token.expects(:get).with('moar').returns(stub(parsed: { 'not_in_id_token' => 'myid', 'sub' => '2' }))
+      token = double(options: {}, params: {'id_token' => id_token})
+      expect(token).to receive(:get).with('moar').and_return(double(parsed: { 'not_in_id_token' => 'myid', 'sub' => '2' }))
       expect(connect.unique_id(token)).to be_nil
     end
   end

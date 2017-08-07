@@ -42,10 +42,6 @@ describe "assignments" do
     stub_rcs_config
   end
 
-  after(:each) do
-    unstub_rcs_config
-  end
-
   %w(points percent pass_fail letter_grade gpa_scale).each do |grading_option|
     it "should create assignment with #{grading_option} grading option", priority: "2", test_id: 209976 do
       assignment_title = 'grading options assignment'

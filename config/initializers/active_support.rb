@@ -78,3 +78,15 @@ module IgnoreMonkeyPatchesInDeprecations
   end
 end
 ActiveSupport::Deprecation.prepend(IgnoreMonkeyPatchesInDeprecations)
+unless CANVAS_RAILS5_0
+  ::Rails.logger.warn("Temporarily silencing deprecations because there are a lot - especially here https://github.com/rails/rails/blob/5-1-stable/activerecord/lib/active_record/attribute_methods/dirty.rb#L250-L256")
+  ActiveSupport::Deprecation.silenced = true
+end
+
+module RaiseErrorOnDurationCoercion
+  def coerce(other)
+    ::Rails.logger.error("Implicit numeric calculations on a duration are getting changed in Rails 5.1 - e.g. `240 / 2.minutes` will return `120` instead of `2` - so please make the duration explicit with to_i")
+    raise # i'd raise the message but it gets swallowed up in a TypeError
+  end
+end
+ActiveSupport::Duration.prepend(RaiseErrorOnDurationCoercion)

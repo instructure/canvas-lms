@@ -13,6 +13,19 @@ module GraphQLNodeLoader
       Loaders::IDLoader.for(User).load(id).then(
         make_permission_check(ctx, :manage, :manage_user_details)
       )
+    when "Enrollment"
+      Loaders::IDLoader.for(Enrollment).load(id).then do |enrollment|
+        Loaders::IDLoader.for(Course).load(enrollment.course_id).then do |course|
+          if enrollment.user_id == ctx[:current_user].id ||
+              course.grants_right?(ctx[:current_user], ctx[:session], :read_roster)
+            enrollment
+          else
+            nil
+          end
+        end
+      end
+    when "GradingPeriod"
+      Loaders::IDLoader.for(GradingPeriod).load(id).then(check_read_permission)
     else
       raise UnsupportedTypeError.new("don't know how to load #{type}")
     end

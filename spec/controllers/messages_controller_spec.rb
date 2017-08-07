@@ -25,7 +25,7 @@ describe MessagesController do
       before(:each){ user_session(@user) }
 
       it "should be able to access the page" do
-        post 'create', :user_id => @user.to_param
+        post 'create', params: {:user_id => @user.to_param}
         expect(response.code).to eq '200'
       end
 
@@ -33,12 +33,12 @@ describe MessagesController do
         secure_id, message_id = ['secure_id', 42]
         expect_any_instance_of(IncomingMailProcessor::IncomingMessageProcessor).to receive(:process_single).
           with(anything, "#{secure_id}-#{message_id}")
-        post 'create', :secure_id  => secure_id,
+        post 'create', params: {:secure_id  => secure_id,
                        :message_id => message_id,
                        :subject    => 'subject',
                        :message    => 'message',
                        :from       => 'test@example.com',
-                       :user_id    => @user.to_param
+                       :user_id    => @user.to_param}
       end
     end
 
@@ -49,7 +49,7 @@ describe MessagesController do
       end
 
       it "should receive a redirect" do
-        post 'create', :user_id => @user.to_param
+        post 'create', params: {:user_id => @user.to_param}
         expect(response.code).to eq '302'
       end
     end

@@ -309,15 +309,20 @@ module CustomSeleniumActions
 
   MODIFIER_KEY = RUBY_PLATFORM =~ /darwin/ ? :command : :control
   def replace_content(el, value, options = {})
-    keys = [[MODIFIER_KEY, "a"], :backspace, value]
-    keys << :tab if options[:tab_out]
-
     # We are treating the chrome browser different because currently Selenium cannot send :command key to the chrome.
     # This is a known issue and hasn't been solved yet. https://bugs.chromium.org/p/chromedriver/issues/detail?id=30
-    if driver.browser == :chrome
+    case driver.browser
+    when :firefox
+      keys = [[MODIFIER_KEY, "a"], :backspace]
+    when :chrome
       driver.execute_script("arguments[0].select()", el)
-      keys.delete_at(0)
+      keys = [:backspace]
+    when :safari
+      el.clear()
+      keys = []
     end
+    keys << value
+    keys << :tab if options[:tab_out]
     el.send_keys(*keys)
   end
 
@@ -333,11 +338,17 @@ module CustomSeleniumActions
     submit_button_css = 'button[type="submit"]'
     button = form.is_a?(Selenium::WebDriver::Element) ? form.find_element(:css, submit_button_css) : f("#{form} #{submit_button_css}")
     scroll_to(button)
-    button.click
+    driver.action.move_to(button).click.perform
+  end
+
+  def trigger_form_submit_event(form)
+    form_element = form.is_a?(Selenium::WebDriver::Element) ? form : f(form)
+    form_element.submit
   end
 
   def submit_dialog_form(form)
-    # used to be called submit_form, but it turns out that if you're searching for a dialog that doesn't exist it's suuuuuper slow
+    # used to be called submit_form, but it turns out that if you're
+    # searching for a dialog that doesn't exist it's suuuuuper slow
     submit_button_css = 'button[type="submit"]'
     button = form.is_a?(Selenium::WebDriver::Element) ? form.find_element(:css, submit_button_css) : f("#{form} #{submit_button_css}")
     # the button may have been hidden via fixDialogButtons

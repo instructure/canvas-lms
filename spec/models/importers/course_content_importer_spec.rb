@@ -25,6 +25,8 @@ describe Course do
     end
 
     it "should import a whole json file" do
+      local_storage!
+
       # TODO: pull this out into smaller tests... right now I'm using
       # the whole example JSON from Bracken because the formatting is
       # somewhat in flux
@@ -34,7 +36,7 @@ describe Course do
         'file_path' => File.join(IMPORT_JSON_DIR, 'import_from_migration_small.zip')
       }
       migration = ContentMigration.create!(:context => @course)
-      migration.stubs(:canvas_import?).returns(true)
+      allow(migration).to receive(:canvas_import?).and_return(true)
 
       params = {:copy => {
         :topics => {'1864019689002' => true, '1865116155002' => true},
@@ -61,7 +63,7 @@ describe Course do
       migration.migration_ids_to_import = params
 
       # tool profile tests
-      Importers::ToolProfileImporter.expects(:process_migration)
+      expect(Importers::ToolProfileImporter).to receive(:process_migration)
 
       Importers::CourseContentImporter.import_content(@course, data, params, migration)
       @course.reload
@@ -300,14 +302,14 @@ describe Course do
     end
 
     it "should wait for media objects on canvas cartridge import" do
-      migration = mock(:canvas_import? => true)
-      MediaObject.expects(:add_media_files).with([@attachment], true)
+      migration = double(:canvas_import? => true)
+      expect(MediaObject).to receive(:add_media_files).with([@attachment], true)
       Importers::CourseContentImporter.import_media_objects([@attachment], migration)
     end
 
     it "should not wait for media objects on other import" do
-      migration = mock(:canvas_import? => false)
-      MediaObject.expects(:add_media_files).with([@attachment], false)
+      migration = double(:canvas_import? => false)
+      expect(MediaObject).to receive(:add_media_files).with([@attachment], false)
       Importers::CourseContentImporter.import_media_objects([@attachment], migration)
     end
   end
@@ -358,7 +360,7 @@ describe Course do
       migration.user = @user
       migration.save!
 
-      Auditors::Course.expects(:record_copied).once.with(migration.source_course, @course, migration.user, source: migration.initiated_source)
+      expect(Auditors::Course).to receive(:record_copied).once.with(migration.source_course, @course, migration.user, source: migration.initiated_source)
 
       Importers::CourseContentImporter.import_content(@course, data, params, migration)
     end

@@ -104,9 +104,9 @@ describe DelayedMessage do
     account = Account.create!(:name => 'new acct')
     user = user_with_pseudonym(:account => account)
     expect(user.pseudonym.account).to eq account
-    SisPseudonym.expects(:for).with(user, Account.default, type: :implicit, require_sis: false).returns(user.pseudonym)
-    HostUrl.expects(:context_host).with(account).at_least(1).returns("dm.dummy.test.host")
-    HostUrl.stubs(:default_host).returns("test.host")
+    expect(SisPseudonym).to receive(:for).with(user, Account.default, type: :implicit, require_sis: false).and_return(user.pseudonym)
+    expect(HostUrl).to receive(:context_host).with(account).at_least(1).and_return("dm.dummy.test.host")
+    allow(HostUrl).to receive(:default_host).and_return("test.host")
     user.communication_channel.confirm!
     dm = DelayedMessage.create!(:summary => "This is a notification", :context => Account.default, :communication_channel => user.communication_channel, :notification => notification_model)
     DelayedMessage.summarize([dm])
@@ -128,7 +128,7 @@ describe DelayedMessage do
     Canvas::MessageHelper.create_notification(:name => 'Summaries', :category => 'Summaries')
     account = Account.create!(default_locale: 'es')
     delayed_message_model(root_account_id: account.id).save!
-    I18n.expects(:with_locale).with('es').once
+    expect(I18n).to receive(:with_locale).with('es').once
     DelayedMessage.summarize([@delayed_message])
   end
 
@@ -136,7 +136,7 @@ describe DelayedMessage do
     Canvas::MessageHelper.create_notification(:name => 'Summaries', :category => 'Summaries')
     @user = User.create!(locale: 'es')
     delayed_message_model.save!
-    I18n.expects(:with_locale).with('es').once
+    expect(I18n).to receive(:with_locale).with('es').once
     DelayedMessage.summarize([@delayed_message])
   end
 
@@ -150,8 +150,8 @@ describe DelayedMessage do
         account = Account.create!(:name => 'new acct')
         user = user_with_pseudonym(:account => account)
         expect(user.pseudonym.account).to eq account
-        HostUrl.expects(:context_host).with(user.pseudonym.account).at_least(1).returns("dm.dummy.test.host")
-        HostUrl.stubs(:default_host).returns("test.host")
+        expect(HostUrl).to receive(:context_host).with(user.pseudonym.account).at_least(1).and_return("dm.dummy.test.host")
+        allow(HostUrl).to receive(:default_host).and_return("test.host")
         @cc = user.communication_channel
         @cc.confirm!
         @dm = DelayedMessage.create!(:summary => "This is a notification", :context => account, :communication_channel => @cc, :notification => notification_model)
@@ -322,7 +322,7 @@ describe DelayedMessage do
           @dm.send(:set_send_at)
           window = (@dm.send_at - saturday).to_i / (60 * DelayedMessage::MINUTES_PER_WEEKLY_ACCOUNT_BUCKET)
           windows << window
-          actual_diffs << @dm.send_at - saturday - (DelayedMessage::MINUTES_PER_WEEKLY_ACCOUNT_BUCKET * window).minutes
+          actual_diffs << @dm.send_at - saturday - (DelayedMessage::MINUTES_PER_WEEKLY_ACCOUNT_BUCKET * window).minutes.to_i
           expected_diffs << i.minutes
         end
 

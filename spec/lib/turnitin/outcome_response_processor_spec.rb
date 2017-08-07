@@ -27,16 +27,16 @@ module Turnitin
       let(:filename) {'my_sample_file'}
 
       before(:each) do
-        original_submission_response = mock('original_submission_mock')
-        original_submission_response.stubs(:headers).returns(
+        original_submission_response = double('original_submission_mock')
+        allow(original_submission_response).to receive(:headers).and_return(
             {'content-disposition' => "attachment; filename=#{filename}", 'content-type' => 'plain/text'}
         )
-        original_submission_response.stubs(:body).returns('1234')
-        TurnitinApi::OutcomesResponseTransformer.any_instance.expects(:original_submission).yields(original_submission_response)
+        allow(original_submission_response).to receive(:body).and_return('1234')
+        expect_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:original_submission).and_yield(original_submission_response)
 
-        response_response = mock('response_mock')
-        response_response.stubs(:body).returns(tii_response)
-        TurnitinApi::OutcomesResponseTransformer.any_instance.stubs(:response).returns(response_response)
+        response_response = double('response_mock')
+        allow(response_response).to receive(:body).and_return(tii_response)
+        allow_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:response).and_return(response_response)
       end
 
       it 'creates an attachment' do
@@ -70,8 +70,8 @@ module Turnitin
     describe "#process with request errors" do
       context 'when it is not the last attempt' do
         it 'does not create an error attachment' do
-          subject.class.any_instance.stubs(:attempt_number).returns(subject.class.max_attempts-1)
-          TurnitinApi::OutcomesResponseTransformer.any_instance.expects(:original_submission).raises(Faraday::TimeoutError, 'Net::ReadTimeout')
+          allow_any_instance_of(subject.class).to receive(:attempt_number).and_return(subject.class.max_attempts-1)
+          expect_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:original_submission).and_raise(Faraday::TimeoutError, 'Net::ReadTimeout')
           expect { subject.process_without_send_later }.to raise_error(Faraday::TimeoutError)
           expect(lti_assignment.attachments.count).to eq 0
         end
@@ -79,8 +79,8 @@ module Turnitin
 
       context 'when it is the last attempt' do
         it 'creates an attachment for "Faraday::TimeoutError"' do
-          subject.class.stubs(:max_attempts).returns(1)
-          TurnitinApi::OutcomesResponseTransformer.any_instance.expects(:original_submission).raises(Faraday::TimeoutError, 'Net::ReadTimeout')
+          allow(subject.class).to receive(:max_attempts).and_return(1)
+          expect_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:original_submission).and_raise(Faraday::TimeoutError, 'Net::ReadTimeout')
           expect { subject.process_without_send_later }.to raise_error(Faraday::TimeoutError)
           attachment = lti_assignment.attachments.first
           expect(lti_assignment.attachments.count).to eq 1
@@ -88,8 +88,8 @@ module Turnitin
         end
 
         it 'creates an attachment for "Errno::ETIMEDOUT"' do
-          subject.class.stubs(:max_attempts).returns(1)
-          TurnitinApi::OutcomesResponseTransformer.any_instance.expects(:original_submission).raises(Errno::ETIMEDOUT, 'Connection timed out - connect(2) for "api.turnitin.com" port 443')
+          allow(subject.class).to receive(:max_attempts).and_return(1)
+          expect_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:original_submission).and_raise(Errno::ETIMEDOUT, 'Connection timed out - connect(2) for "api.turnitin.com" port 443')
           expect { subject.process_without_send_later }.to raise_error(Errno::ETIMEDOUT)
           attachment = lti_assignment.attachments.first
           expect(lti_assignment.attachments.count).to eq 1
@@ -97,8 +97,8 @@ module Turnitin
         end
 
         it 'creates an attachment for "Faraday::ConnectionFailed"' do
-          subject.class.stubs(:max_attempts).returns(1)
-          TurnitinApi::OutcomesResponseTransformer.any_instance.expects(:original_submission).raises(Faraday::ConnectionFailed, 'Connection reset by peer')
+          allow(subject.class).to receive(:max_attempts).and_return(1)
+          expect_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:original_submission).and_raise(Faraday::ConnectionFailed, 'Connection reset by peer')
           expect { subject.process_without_send_later }.to raise_error(Faraday::ConnectionFailed)
           attachment = lti_assignment.attachments.first
           expect(lti_assignment.attachments.count).to eq 1
@@ -109,10 +109,10 @@ module Turnitin
 
     describe "#update_originality_data" do
       it 'raises an error if max attempts are not exceeded' do
-        subject.class.any_instance.stubs(:attempt_number).returns(subject.class.max_attempts-1)
-        mock_turnitin_client = mock('turnitin_client')
-        mock_turnitin_client.stubs(:scored?).returns(false)
-        subject.stubs(:turnitin_client).returns(mock_turnitin_client)
+        allow_any_instance_of(subject.class).to receive(:attempt_number).and_return(subject.class.max_attempts-1)
+        mock_turnitin_client = double('turnitin_client')
+        allow(mock_turnitin_client).to receive(:scored?).and_return(false)
+        allow(subject).to receive(:turnitin_client).and_return(mock_turnitin_client)
         submission = lti_assignment.submit_homework(lti_student, attachments:[attachment], submission_type: 'online_upload')
         expect do
           subject.update_originality_data(submission, attachment.asset_string)
@@ -120,10 +120,10 @@ module Turnitin
       end
 
       it 'sets an error message if max attempts are exceeded' do
-        subject.class.any_instance.stubs(:attempt_number).returns(subject.class.max_attempts)
-        mock_turnitin_client = mock('turnitin_client')
-        mock_turnitin_client.stubs(:scored?).returns(false)
-        subject.stubs(:turnitin_client).returns(mock_turnitin_client)
+        allow_any_instance_of(subject.class).to receive(:attempt_number).and_return(subject.class.max_attempts)
+        mock_turnitin_client = double('turnitin_client')
+        allow(mock_turnitin_client).to receive(:scored?).and_return(false)
+        allow(subject).to receive(:turnitin_client).and_return(mock_turnitin_client)
         submission = lti_assignment.submit_homework(lti_student, attachments:[attachment], submission_type: 'online_upload')
         subject.update_originality_data(submission, attachment.asset_string)
         expect(submission.turnitin_data[attachment.asset_string][:status]).to eq 'error'

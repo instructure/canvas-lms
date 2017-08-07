@@ -277,7 +277,7 @@ class GradeCalculator
     return if @grading_period && @grading_period.deleted?
 
     @course.touch
-    updated_at = Score.sanitize(Time.now.utc)
+    updated_at = Score.connection.quote(Time.now.utc)
 
     Score.transaction do
       @course.shard.activate do

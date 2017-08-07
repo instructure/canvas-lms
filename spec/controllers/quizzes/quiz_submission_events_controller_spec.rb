@@ -25,7 +25,7 @@ describe Quizzes::QuizSubmissionEventsController do
 
   describe 'GET /log (#index)' do
     def subject
-      get 'index', {
+      get 'index', params: {
         course_id: @course.id,
         quiz_id: @quiz.id,
         quiz_submission_id: @quiz_submission.id

@@ -79,7 +79,20 @@ $fire:                      #FC5E13; // orange
 // Default Functional Swatches
 //====================================
 
-@if $use_high_contrast {    $ic-brand-primary: #0770A3; }
+$variables-have-been-defined: false !default;
+@if $use_high_contrast {
+  $ic-brand-primary: #0770A3;
+  @if not $variables-have-been-defined { // makes sure this is only output once
+    $variables-have-been-defined: true;
+    :root {
+      --ic-brand-primary: $ic-brand-primary;
+      --ic-brand-primary-darkened-5: darken($ic-brand-primary, 5);
+      --ic-brand-primary-darkened-10: darken($ic-brand-primary, 10);
+      --ic-brand-primary-lightened-15: lighten($ic-brand-primary, 15);
+    }
+  }
+}
+
 $ic-color-success:          $shamrock;
 $ic-color-action:           $barney;
 $ic-color-danger:           $crimson;
@@ -260,7 +273,7 @@ $ic-course-sidenav_list-item--bg-color:               $ic-color-light;
 @if $use_high_contrast {
 $ic-course-sidenav_list-item--bg-color:               $ic-color-dark;
 }
-$ic-course-sidenav_list-item--active-font-color:      $ic-brand-primary;
+$ic-course-sidenav_list-item--active-font-color:      var(--ic-brand-primary);
 @if $use_high_contrast {
 $ic-course-sidenav_list-item--active-font-color:      $ic-color-light;
 }
@@ -277,14 +290,6 @@ $ic-color-icon-disabled:        darken($ic-color-neutral, 60);
 $ic-dim-helper-text:            darken($ic-color-neutral, 45);
 @if $use_high_contrast {
 $ic-dim-helper-text:            darken($ic-color-neutral, 55);
-}
-
-// special handling for button--primary coloring
-$button--primary-text: $ic-brand-button--primary-text;
-$button--primary-bgd: $ic-brand-button--primary-bgd;
-@if $use_high_contrast {
-  $button--primary-bgd: $ic-brand-primary;
-  $button--primary-text: $ic-color-light;
 }
 
 //==========================================================

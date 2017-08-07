@@ -258,10 +258,8 @@ describe "discussions" do
       it "should not show keyboard shortcut modal during html editing", priority: "2", test_id: 846539 do
         get url
         f('.discussion-reply-action').click
-        wait_for_ajaximations
         fln('HTML Editor').click
-        wait_for_ajaximations
-        f('.reply-textarea').send_keys("< , > , ?, /")
+        fj('.reply-textarea:visible').send_keys("< , > , ?, /")
         expect(f('.ui-dialog')).not_to be_displayed
       end
 
@@ -338,6 +336,7 @@ describe "discussions" do
           get url
           expect(DiscussionEntry.last.depth).to eq 2
           expect(ff('.discussion-entries .entry')).to have_size(12) # +1 because of the initial entry
+          scroll_to(fj(".entry-content:contains('teacher')")) # scroll to the button to preserve chrome functionality
           f('.showMore').click
           expect(ff('.discussion-entries .entry')).to have_size(side_comment_number + 2) # +1 because of the initial entry, +1 because of the parent entry
         end

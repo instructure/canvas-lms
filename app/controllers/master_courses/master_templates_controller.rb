@@ -339,7 +339,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
       return render :json => {:message => "No associated courses to migrate to"}, :status => :bad_request
     end
 
-    options = params.permit(:comment, :send_notification)
+    options = params.permit(:comment, :send_notification).to_unsafe_h
     options[:copy_settings] = value_to_boolean(params[:copy_settings]) if params.has_key?(:copy_settings)
 
     migration = MasterCourses::MasterMigration.start_new_migration!(@template, @current_user, options)
@@ -398,7 +398,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     end
     mc_tag = @template.content_tag_for(item)
     if value_to_boolean(params[:restricted])
-      custom_restrictions = params[:restrictions] && Hash[params[:restrictions].map{|k, v| [k.to_sym, value_to_boolean(v)]}]
+      custom_restrictions = params[:restrictions] && Hash[params[:restrictions].to_unsafe_h.map{|k, v| [k.to_sym, value_to_boolean(v)]}]
       mc_tag.restrictions = custom_restrictions || @template.default_restrictions_for(item)
       mc_tag.use_default_restrictions = !custom_restrictions
     else

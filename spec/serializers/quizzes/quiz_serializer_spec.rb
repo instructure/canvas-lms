@@ -44,12 +44,12 @@ describe Quizzes::QuizSerializer do
     @quiz.id = 1
     @quiz.context = @context
     @user = User.new
-    @quiz.stubs(:locked_for?).returns false
-    @quiz.stubs(:check_right?).returns true
-    @session = stub(:[] => nil)
-    controller.stubs(:session).returns session
-    controller.stubs(:context).returns context
-    @quiz.stubs(:grants_right?).at_least_once.returns true
+    allow(@quiz).to receive(:locked_for?).and_return false
+    allow(@quiz).to receive(:check_right?).and_return true
+    @session = double(:[] => nil)
+    allow(controller).to receive(:session).and_return session
+    allow(controller).to receive(:context).and_return context
+    allow(@quiz).to receive(:grants_right?).at_least(:once).and_return true
     @serializer = quiz_serializer
     @json = @serializer.as_json[:quiz]
   end
@@ -99,71 +99,71 @@ describe Quizzes::QuizSerializer do
     assignment = Assignment.new
     assignment.id = 1
     assignment.context_id = @context.id
-    @quiz.stubs(:assignment).returns assignment
+    allow(@quiz).to receive(:assignment).and_return assignment
 
     # nil when quiz is unpublished
-    @quiz.stubs(:published?).returns false
+    allow(@quiz).to receive(:published?).and_return false
     expect(@serializer.as_json[:quiz][:speed_grader_url]).to be_nil
 
     # nil when context doesn't allow speedgrader
-    @quiz.stubs(:published?).returns true
-    @context.expects(:allows_speed_grader?).returns false
+    allow(@quiz).to receive(:published?).and_return true
+    expect(@context).to receive(:allows_speed_grader?).and_return false
     expect(@serializer.as_json[:quiz][:speed_grader_url]).to be_nil
 
-    @context.expects(:allows_speed_grader?).returns true
+    expect(@context).to receive(:allows_speed_grader?).and_return true
     json = @serializer.as_json[:quiz]
     expect(json[:speed_grader_url]).to eq(
       controller.send(:speed_grader_course_gradebook_url, @quiz.context, assignment_id: @quiz.assignment.id)
     )
 
     # Students shouldn't be able to see speed_grader_url
-    @quiz.stubs(:grants_right?).returns false
+    allow(@quiz).to receive(:grants_right?).and_return false
     expect(@serializer.as_json[:quiz]).not_to have_key :speed_grader_url
   end
 
   it "doesn't include the section count unless the user can grade" do
-    quiz.expects(:grants_right?).with(@user, @session, :grade).
-      at_least_once.returns true
+    result = true
+    allow(quiz).to receive(:grants_right?).with(@user, @session, :grade) { result }
     expect(serializer.as_json[:quiz]).to have_key :section_count
 
-    quiz.expects(:grants_right?).with(@user, @session, :grade).
-      at_least_once.returns false
+    result = false
     expect(serializer.as_json[:quiz]).not_to have_key :section_count
   end
 
   it "uses available_question_count for question_count" do
-    quiz.stubs(:available_question_count).returns 5
+    allow(quiz).to receive(:available_question_count).and_return 5
     expect(serializer.as_json[:quiz][:question_count]).to eq 5
   end
 
   it "sends the message_students_url when user can grade" do
-    quiz.expects(:grants_right?).at_least_once.returns true
+    result = true
+    allow(quiz).to receive(:grants_right?) { result }
     expect(serializer.as_json[:quiz][:message_students_url]).to eq(
       controller.send(:api_v1_course_quiz_submission_users_message_url, quiz, quiz.context)
     )
 
-    quiz.expects(:grants_right?).at_least_once.returns false
+    result = false
     expect(serializer.as_json[:quiz]).not_to have_key :message_students_url
   end
 
   describe "access code" do
     it "is included if the user can grade" do
-      quiz.expects(:grants_right?).with(@user, @session, :grade).
-        at_least_once.returns true
+      expect(quiz).to receive(:grants_right?).with(@user, @session, :grade).
+        at_least(:once).and_return true
       expect(serializer.as_json[:quiz]).to have_key :access_code
     end
 
     it "is included if the user can manage" do
-      quiz.expects(:grants_right?).with(@user, @session, :manage).
-        at_least_once.returns true
+      expect(quiz).to receive(:grants_right?).with(@user, @session, :manage).
+        at_least(:once).and_return true
       expect(serializer.as_json[:quiz]).to have_key :access_code
     end
 
     it "is not included if the user can't grade or manage" do
-      quiz.expects(:grants_right?).with(@user, @session, :grade).
-        at_least_once.returns false
-      quiz.expects(:grants_right?).with(@user, @session, :manage).
-        at_least_once.returns false
+      expect(quiz).to receive(:grants_right?).with(@user, @session, :grade).
+        at_least(:once).and_return false
+      expect(quiz).to receive(:grants_right?).with(@user, @session, :manage).
+        at_least(:once).and_return false
       expect(serializer.as_json[:quiz]).not_to have_key :access_code
     end
   end
@@ -171,13 +171,13 @@ describe Quizzes::QuizSerializer do
   describe "id" do
 
     it "stringifys when stringify_json_ids? is true" do
-      controller.expects(:accepts_jsonapi?).at_least_once.returns false
-      controller.expects(:stringify_json_ids?).at_least_once.returns true
+      expect(controller).to receive(:accepts_jsonapi?).at_least(:once).and_return false
+      expect(controller).to receive(:stringify_json_ids?).at_least(:once).and_return true
       expect(serializer.as_json[:quiz][:id]).to eq quiz.id.to_s
     end
 
     it "when stringify_json_ids? is false" do
-      controller.expects(:accepts_jsonapi?).at_least_once.returns false
+      expect(controller).to receive(:accepts_jsonapi?).at_least(:once).and_return false
       expect(serializer.as_json[:quiz][:id]).to eq quiz.id
       expect(serializer.as_json[:quiz][:id].is_a?(Integer)).to be_truthy
     end
@@ -186,17 +186,17 @@ describe Quizzes::QuizSerializer do
 
   describe "lock_info" do
     it "includes lock_info when appropriate" do
-      quiz.expects(:locked_for?).
+      expect(quiz).to receive(:locked_for?).
         with(@user, check_policies: true, context: @context).
-        returns({due_at: true})
+        and_return({due_at: true})
       json = quiz_serializer.as_json[:quiz]
       expect(json).to have_key :lock_info
       expect(json).to have_key :lock_explanation
       expect(json[:locked_for_user]).to eq true
 
-      quiz.expects(:locked_for?).
+      expect(quiz).to receive(:locked_for?).
         with(@user, check_policies: true, context: @context).
-        returns false
+        and_return false
       json = quiz_serializer.as_json[:quiz]
       expect(json).not_to have_key :lock_info
       expect(json).not_to have_key :lock_explanation
@@ -204,7 +204,7 @@ describe Quizzes::QuizSerializer do
     end
 
     it "doesn't if skip_lock_tests is on" do
-      quiz.expects(:locked_for?).never
+      expect(quiz).to receive(:locked_for?).never
       json = quiz_serializer({
         serializer_options: {
           skip_lock_tests: true
@@ -219,12 +219,14 @@ describe Quizzes::QuizSerializer do
   describe "unpublishable" do
 
     it "is not present unless the user can manage the quiz's assignments" do
-      quiz.expects(:grants_right?).with(@user, session, :manage).returns true
+      manage_result = true
+      allow(quiz).to receive(:grants_right?).with(any_args).and_call_original
+      allow(quiz).to receive(:grants_right?).with(@user, session, :manage) { manage_result }
       expect(serializer.filter(serializer.class._attributes)).to include :unpublishable
 
-      quiz.unstub(:grants_right?)
-      quiz.expects(:grants_right?).with(@user, session, :grade).at_least_once.returns false
-      quiz.expects(:grants_right?).with(@user, session, :manage).at_least_once.returns false
+      manage_result = false
+      expect(quiz).to receive(:grants_right?).with(@user, session, :grade).at_least(:once).and_return false
+      quiz.grants_right?(@user, session, :manage)
       expect(serializer.filter(serializer.class._attributes)).not_to include :unpublishable
     end
   end
@@ -258,10 +260,10 @@ describe Quizzes::QuizSerializer do
       @quiz_submission.workflow_state = "complete"
       @quiz.allowed_attempts = 2
       # false when attempts left attempts is 0
-      @quiz_submission.expects(:attempts_left).at_least_once.returns 0
+      expect(@quiz_submission).to receive(:attempts_left).at_least(:once).and_return 0
       expect(@serializer.as_json[:quiz][:takeable]).to eq false
       # true when than attempts left greater than 0
-      @quiz_submission.expects(:attempts_left).at_least_once.returns 1
+      expect(@quiz_submission).to receive(:attempts_left).at_least(:once).and_return 1
       expect(@serializer.as_json[:quiz][:takeable]).to eq true
     end
   end
@@ -286,7 +288,7 @@ describe Quizzes::QuizSerializer do
         before { skip }
 
         it "serialize the assignment group's url when present" do
-          @quiz.stubs(:context).returns course = Account.default.courses.new
+          allow(@quiz).to receive(:context).and_return course = Account.default.courses.new
           course.id = 1
           @quiz.assignment_group = assignment_group = AssignmentGroup.new
           assignment_group.id = 1
@@ -304,7 +306,7 @@ describe Quizzes::QuizSerializer do
       context "controller doesn't accept jsonapi" do
 
         it "serialized the assignment_group as assignment_group_id" do
-          controller.expects(:accepts_jsonapi?).at_least_once.returns false
+          expect(controller).to receive(:accepts_jsonapi?).at_least(:once).and_return false
           expect(serializer.as_json[:quiz]['assignment_group_id']).to be_nil
 
           group = quiz.assignment_group = AssignmentGroup.new
@@ -364,15 +366,15 @@ describe Quizzes::QuizSerializer do
 
     describe 'quiz_reports' do
       it 'sends the url' do
-        quiz.stubs(context: Account.default.courses.new.tap { |c| c.id = 3 })
+        allow(quiz).to receive_messages(context: Account.default.courses.new.tap { |c| c.id = 3 })
         expect(serializer.as_json[:quiz]['links']['quiz_reports']).to eq(
           controller.send(:api_v1_course_quiz_reports_url, 3, quiz.id)
         )
       end
 
       it 'sends the url as quiz_reports_url' do
-        controller.expects(:accepts_jsonapi?).at_least_once.returns false
-        quiz.stubs(context: Account.default.courses.new.tap { |c| c.id = 3 })
+        expect(controller).to receive(:accepts_jsonapi?).at_least(:once).and_return false
+        allow(quiz).to receive_messages(context: Account.default.courses.new.tap { |c| c.id = 3 })
         expect(serializer.as_json[:quiz][:quiz_reports_url]).to eq(
           controller.send(:api_v1_course_quiz_reports_url, 3, quiz.id)
         )
@@ -381,15 +383,15 @@ describe Quizzes::QuizSerializer do
 
     describe "quiz_statistics" do
       it "sends the url" do
-        quiz.stubs(context: Account.default.courses.new.tap { |c| c.id = 3 })
+        allow(quiz).to receive_messages(context: Account.default.courses.new.tap { |c| c.id = 3 })
         expect(serializer.as_json[:quiz]['links']['quiz_statistics']).to eq(
           controller.send(:api_v1_course_quiz_statistics_url, 3, quiz.id)
         )
       end
 
       it "sends the url in non-JSONAPI too" do
-        controller.expects(:accepts_jsonapi?).at_least_once.returns false
-        quiz.stubs(context: Account.default.courses.new.tap { |c| c.id = 3 })
+        expect(controller).to receive(:accepts_jsonapi?).at_least(:once).and_return false
+        allow(quiz).to receive_messages(context: Account.default.courses.new.tap { |c| c.id = 3 })
         expect(serializer.as_json[:quiz][:quiz_statistics_url]).to eq(
           controller.send(:api_v1_course_quiz_statistics_url, 3, quiz.id)
         )
@@ -449,37 +451,37 @@ describe Quizzes::QuizSerializer do
       expect(serializer.as_json[:quiz][:quiz_submission_html_url]).to eq(
         controller.send(:course_quiz_submission_html_url, context.id, quiz.id)
       )
-      controller.expects(:accepts_jsonapi?).at_least_once.returns false
+      expect(controller).to receive(:accepts_jsonapi?).at_least(:once).and_return false
       expect(serializer.as_json[:quiz]).not_to have_key :quiz_submission_html_url
     end
   end
 
   describe "quiz_submissions_zip_url" do
     it "includes a url to download all files" do
-      controller.expects(:accepts_jsonapi?).at_least_once.returns true
-      serializer.expects(:user_may_grade?).at_least_once.returns true
-      serializer.expects(:has_file_uploads?).at_least_once.returns true
+      expect(controller).to receive(:accepts_jsonapi?).at_least(:once).and_return true
+      expect(serializer).to receive(:user_may_grade?).at_least(:once).and_return true
+      expect(serializer).to receive(:has_file_uploads?).at_least(:once).and_return true
       expect(serializer.as_json[:quiz][:quiz_submissions_zip_url]).to eq(
         'http://example.com/courses/1/quizzes/1/submissions?zip=1'
       )
     end
 
     it "doesn't if it's not a JSON-API request" do
-      controller.expects(:accepts_jsonapi?).at_least_once.returns false
-      serializer.expects(:user_may_grade?).at_least_once.returns true
+      expect(controller).to receive(:accepts_jsonapi?).at_least(:once).and_return false
+      expect(serializer).to receive(:user_may_grade?).at_least(:once).and_return true
       expect(serializer.as_json[:quiz]).not_to have_key :quiz_submissions_zip_url
     end
 
     it "doesn't if the user may not grade" do
-      controller.expects(:accepts_jsonapi?).at_least_once.returns true
-      serializer.expects(:user_may_grade?).at_least_once.returns false
+      expect(controller).to receive(:accepts_jsonapi?).at_least(:once).and_return true
+      expect(serializer).to receive(:user_may_grade?).at_least(:once).and_return false
       expect(serializer.as_json[:quiz]).not_to have_key :quiz_submissions_zip_url
     end
 
     it "doesn't if the quiz has no file upload questions" do
-      controller.expects(:accepts_jsonapi?).at_least_once.returns true
-      serializer.expects(:user_may_grade?).at_least_once.returns true
-      serializer.expects(:has_file_uploads?).at_least_once.returns false
+      expect(controller).to receive(:accepts_jsonapi?).at_least(:once).and_return true
+      expect(serializer).to receive(:user_may_grade?).at_least(:once).and_return true
+      expect(serializer).to receive(:has_file_uploads?).at_least(:once).and_return false
       expect(serializer.as_json[:quiz]).not_to have_key :quiz_submissions_zip_url
     end
   end
@@ -512,7 +514,7 @@ describe Quizzes::QuizSerializer do
       unlock_at: 3.minutes.from_now
     }
 
-    serializer.stubs(:due_dates).returns [student_overrides]
+    allow(serializer).to receive(:due_dates).and_return [student_overrides]
 
     output = serializer.as_json[:quiz]
     expect(output).not_to have_key :all_dates
@@ -525,10 +527,10 @@ describe Quizzes::QuizSerializer do
   it 'displays quiz dates for students if not overridden' do
     student_overrides = []
 
-    quiz.expects(:due_at).at_least_once.returns 5.minutes.from_now
-    quiz.expects(:lock_at).at_least_once.returns nil
-    quiz.expects(:unlock_at).at_least_once.returns 3.minutes.from_now
-    serializer.stubs(:due_dates).returns student_overrides
+    expect(quiz).to receive(:due_at).at_least(:once).and_return 5.minutes.from_now
+    expect(quiz).to receive(:lock_at).at_least(:once).and_return nil
+    expect(quiz).to receive(:unlock_at).at_least(:once).and_return 3.minutes.from_now
+    allow(serializer).to receive(:due_dates).and_return student_overrides
 
     output = serializer.as_json[:quiz]
 
@@ -552,9 +554,9 @@ describe Quizzes::QuizSerializer do
       title: 'Some Section'
     }]
 
-    quiz.expects(:due_at).at_least_once
-    serializer.stubs(:all_dates).returns teacher_overrides
-    serializer.stubs(:include_all_dates?).returns true
+    expect(quiz).to receive(:due_at).at_least(:once)
+    allow(serializer).to receive(:all_dates).and_return teacher_overrides
+    allow(serializer).to receive(:include_all_dates?).and_return true
 
     output = serializer.as_json[:quiz]
     expect(output).to have_key :all_dates

@@ -126,7 +126,7 @@ const { object, string, func, shape, bool } = PropTypes
             {sis_user_id}
           </div>
 
-          <div className="col-xs-3" role='gridcell'>
+          <div className="col-xs-2" role='gridcell'>
             {$.datetimeString(last_login)}
           </div>
 

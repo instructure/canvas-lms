@@ -287,13 +287,13 @@ describe Role do
 
   describe "cross-shard built-in role translation" do
     specs_require_sharding
-    it "should return the id of the built in role on the current shard" do
+    it "should use the built-in role on the correct shard when setting for associations" do
       built_in_role = Role.get_built_in_role("AccountAdmin")
       @shard1.activate do
-        expect(built_in_role.id).to eq Role.get_built_in_role("AccountAdmin", @shard1).id
         account = Account.create
         # should not get foreign key error
-        account.role_overrides.create!(role: built_in_role, enabled: false, permission: :manage_admin_users)
+        ro = account.role_overrides.create!(role: built_in_role, enabled: false, permission: :manage_admin_users)
+        expect(ro.role).to eq Role.get_built_in_role("AccountAdmin", @shard1)
       end
     end
   end

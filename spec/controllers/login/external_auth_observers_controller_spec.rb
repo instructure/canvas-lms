@@ -30,15 +30,15 @@ describe Login::ExternalAuthObserversController do
     end
 
     it "redirects to login path" do
-      controller.stubs(:valid_user_unique_id?).returns(true)
-      controller.stubs(:valid_observee_unique_id?).returns(true)
-      subject = post :redirect_login, params
+      allow(controller).to receive(:valid_user_unique_id?).and_return(true)
+      allow(controller).to receive(:valid_observee_unique_id?).and_return(true)
+      subject = post :redirect_login, params: params
       expect(subject).to be_success
     end
 
     it "returns an error if unique_id is not valid" do
-      controller.stubs(:valid_user_unique_id?).returns(false)
-      post :redirect_login, params
+      allow(controller).to receive(:valid_user_unique_id?).and_return(false)
+      post :redirect_login, params: params
       expect(response.status).to eq 422
     end
   end

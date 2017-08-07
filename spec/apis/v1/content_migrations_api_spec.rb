@@ -287,8 +287,8 @@ describe ContentMigrationsController, type: :request do
 
       @post_params.delete :pre_attachment
       p = Canvas::Plugin.new("hi")
-      p.stubs(:default_settings).returns({'worker' => 'CCWorker', 'valid_contexts' => ['Course']}.with_indifferent_access)
-      Canvas::Plugin.stubs(:find).returns(p)
+      allow(p).to receive(:default_settings).and_return({'worker' => 'CCWorker', 'valid_contexts' => ['Course']}.with_indifferent_access)
+      allow(Canvas::Plugin).to receive(:find).and_return(p)
       json = api_call(:post, @migration_url, @params, @post_params)
       expect(json["workflow_state"]).to eq 'running'
       migration = ContentMigration.find json['id']
@@ -299,8 +299,8 @@ describe ContentMigrationsController, type: :request do
     it "should not queue a migration if do_not_run flag is set" do
       @post_params.delete :pre_attachment
       p = Canvas::Plugin.new("hi")
-      p.stubs(:default_settings).returns({'worker' => 'CCWorker', 'valid_contexts' => ['Course']}.with_indifferent_access)
-      Canvas::Plugin.stubs(:find).returns(p)
+      allow(p).to receive(:default_settings).and_return({'worker' => 'CCWorker', 'valid_contexts' => ['Course']}.with_indifferent_access)
+      allow(Canvas::Plugin).to receive(:find).and_return(p)
       json = api_call(:post, @migration_url, @params, @post_params.merge(:do_not_run => true))
       expect(json["workflow_state"]).to eq 'pre_processing'
       migration = ContentMigration.find json['id']
@@ -573,7 +573,7 @@ describe ContentMigrationsController, type: :request do
   describe 'migration_systems' do
     it "should return the migrators" do
       p = Canvas::Plugin.find('common_cartridge_importer')
-      Canvas::Plugin.stubs(:all_for_tag).returns([p])
+      allow(Canvas::Plugin).to receive(:all_for_tag).and_return([p])
       json = api_call(:get, "/api/v1/courses/#{@course.id}/content_migrations/migrators",
                       {:controller=>"content_migrations", :action=>"available_migrators", :format=>"json", :course_id=>@course.id.to_param})
       expect(json).to eq [{
@@ -585,7 +585,7 @@ describe ContentMigrationsController, type: :request do
     end
 
     it "should filter by context type" do
-      Canvas::Plugin.stubs(:all_for_tag).returns([Canvas::Plugin.find('common_cartridge_importer'),
+      allow(Canvas::Plugin).to receive(:all_for_tag).and_return([Canvas::Plugin.find('common_cartridge_importer'),
                                                   Canvas::Plugin.find('zip_file_importer')])
       json = api_call(:get, "/api/v1/users/#{@user.id}/content_migrations/migrators",
                       {:controller=>"content_migrations", :action=>"available_migrators", :format=>"json", :user_id=>@user.to_param})

@@ -22,9 +22,9 @@ describe AccountAuthorizationConfig::Google do
   it 'rejects non-matching hd' do
     ap = AccountAuthorizationConfig::Google.new
     ap.hosted_domain = 'instructure.com'
-    Canvas::Security.expects(:decode_jwt).returns({'hd' => 'school.edu', 'sub' => '123'})
-    userinfo = stub('userinfo', parsed: {})
-    token = stub('token', params: {}, options: {}, get: userinfo)
+    expect(Canvas::Security).to receive(:decode_jwt).and_return({'hd' => 'school.edu', 'sub' => '123'})
+    userinfo = double('userinfo', parsed: {})
+    token = double('token', params: {}, options: {}, get: userinfo)
 
     expect { ap.unique_id(token) }.to raise_error('Non-matching hosted domain: "school.edu"')
   end
@@ -32,16 +32,16 @@ describe AccountAuthorizationConfig::Google do
   it 'rejects missing hd' do
     ap = AccountAuthorizationConfig::Google.new
     ap.hosted_domain = 'instructure.com'
-    Canvas::Security.expects(:decode_jwt).returns({'sub' => '123'})
-    token = stub('token', params: {}, options: {})
+    expect(Canvas::Security).to receive(:decode_jwt).and_return({'sub' => '123'})
+    token = double('token', params: {}, options: {})
 
     expect { ap.unique_id(token) }.to raise_error('Non-matching hosted domain: nil')
   end
 
   it "accepts when hosted domain isn't required" do
     ap = AccountAuthorizationConfig::Google.new
-    Canvas::Security.expects(:decode_jwt).once.returns({'sub' => '123'})
-    token = stub('token', params: {}, options: {})
+    expect(Canvas::Security).to receive(:decode_jwt).once.and_return({'sub' => '123'})
+    token = double('token', params: {}, options: {})
 
     expect(ap.unique_id(token)).to eq '123'
   end

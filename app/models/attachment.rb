@@ -210,7 +210,7 @@ class Attachment < ActiveRecord::Base
     end
 
     # directly update workflow_state so we don't trigger another save cycle
-    if self.workflow_state_changed?
+    if CANVAS_RAILS5_0 ? self.workflow_state_changed? : self.will_save_change_to_workflow_state?
       self.shard.activate do
         self.class.where(:id => self).update_all(:workflow_state => self.workflow_state)
       end
@@ -1643,16 +1643,13 @@ class Attachment < ActiveRecord::Base
 
   def canvadoc_url(user, opts={})
     return unless canvadocable?
-    "/api/v1/canvadoc_session?#{preview_params(user, "canvadoc", opts)}"
+    "/api/v1/canvadoc_session?#{preview_params(user, 'canvadoc', opts)}"
   end
 
-  def crocodoc_url(user, crocodoc_ids = nil)
-    opts = {
-      enable_annotations: true
-    }
-    opts[:crocodoc_ids] = crocodoc_ids if crocodoc_ids.present?
+  def crocodoc_url(user, opts={})
+    opts[:enable_annotations] = true
     return unless crocodoc_available?
-    "/api/v1/crocodoc_session?#{preview_params(user, "crocodoc", opts)}"
+    "/api/v1/crocodoc_session?#{preview_params(user, 'crocodoc', opts)}"
   end
 
   def previewable_media?
@@ -1665,7 +1662,6 @@ class Attachment < ActiveRecord::Base
       attachment_id: id,
       type: type
     })
-
     blob = h.to_json
     hmac = Canvas::Security.hmac_sha1(blob)
     "blob=#{URI.encode blob}&hmac=#{URI.encode hmac}"

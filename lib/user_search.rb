@@ -20,7 +20,8 @@ module UserSearch
   def self.for_user_in_context(search_term, context, searcher, session=nil, options = {})
     search_term = search_term.to_s
     return User.none if search_term.strip.empty?
-    base_scope = scope_for(context, searcher, options.slice(:enrollment_type, :enrollment_role, :enrollment_role_id, :exclude_groups, :enrollment_state, :include_inactive_enrollments))
+    base_scope = scope_for(context, searcher, options.slice(:enrollment_type, :enrollment_role, 
+      :enrollment_role_id, :exclude_groups, :enrollment_state, :include_inactive_enrollments, :sort, :order))
     if search_term.to_s =~ Api::ID_REGEX
       db_id = Shard.relative_id_for(search_term, Shard.current, Shard.current)
       scope = base_scope.where(id: db_id)
@@ -76,9 +77,53 @@ module UserSearch
               context.users_visible_to(searcher, include_prior_enrollments,
                 enrollment_state: enrollment_states, include_inactive: include_inactive_enrollments).distinct
             else
-              context.users_visible_to(searcher).uniq
+              context.users_visible_to(searcher).distinct
             end
-    users = users.order_by_sortable_name
+
+    users = if options[:sort] == "last_login"
+              if options[:order] == 'desc'
+                users.order("MAX(current_login_at) desc, id desc")
+              else
+                users.order("MAX(current_login_at), id")
+              end
+            elsif options[:sort] == "username"
+              if options[:order] == 'desc'
+                users.order_by_sortable_name(direction: :descending)
+              else
+                users.order_by_sortable_name
+              end
+            elsif options[:sort] == "email"
+              if options[:order] == 'desc'
+                users.order("(SELECT unique_id FROM #{Pseudonym.quoted_table_name}
+                                WHERE #{Pseudonym.quoted_table_name}.user_id = #{User.quoted_table_name}.id
+                                AND unique_id ~* \'\\A([^@\\s]+)@((?:[-a-z0-9]+\\.)+[a-z]{2,})\\Z\'
+                                LIMIT 1)
+                                DESC, id DESC")
+              else
+                users.order("(SELECT unique_id FROM #{Pseudonym.quoted_table_name}
+                                WHERE #{Pseudonym.quoted_table_name}.user_id = #{User.quoted_table_name}.id
+                                AND unique_id ~* \'\\A([^@\\s]+)@((?:[-a-z0-9]+\\.)+[a-z]{2,})\\Z\'
+                                LIMIT 1)")
+              end
+            elsif options[:sort] == "sis_id"
+              if options[:order] == 'desc'
+                users.order("(SELECT sis_user_id FROM #{Pseudonym.quoted_table_name}
+                                WHERE #{Pseudonym.quoted_table_name}.user_id = #{User.quoted_table_name}.id
+                                LIMIT 1) DESC, id DESC")
+              else
+                users.order("(SELECT sis_user_id FROM #{Pseudonym.quoted_table_name}
+                                WHERE #{Pseudonym.quoted_table_name}.user_id = #{User.quoted_table_name}.id
+                                LIMIT 1)")
+              end
+            else
+              users.order_by_sortable_name
+            end
+
+    if options[:role_filter_id] && options[:role_filter_id] != ""
+      users = users.where("#{options[:role_filter_id]} IN
+                            (SELECT role_id FROM #{Enrollment.quoted_table_name}
+                              WHERE #{Enrollment.quoted_table_name}.user_id = #{User.quoted_table_name}.id)")
+    end
 
     if enrollment_role_ids || enrollment_roles
       if enrollment_role_ids
