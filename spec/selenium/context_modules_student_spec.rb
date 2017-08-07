@@ -296,7 +296,7 @@ describe "context modules" do
         @assignment3 = @course.assignments.create!(:title => 'last item in module')
         @quiz = @course.quizzes.create!(:title => 'quiz assignment')
         @quiz.publish!
-        @wiki = @course.wiki.wiki_pages.create!(:title => "wiki", :body => 'hi')
+        @wiki = @course.wiki_pages.create!(:title => "wiki", :body => 'hi')
         @discussion = @course.discussion_topics.create!(:title => 'discussion')
 
         #add items to module
@@ -414,7 +414,7 @@ describe "context modules" do
     context 'mark as done' do
       def setup
         @mark_done_module = create_context_module('Mark Done Module')
-        page = @course.wiki.wiki_pages.create!(:title => "The page", :body => 'hi')
+        page = @course.wiki_pages.create!(:title => "The page", :body => 'hi')
         @tag = @mark_done_module.add_item({:id => page.id, :type => 'wiki_page'})
         @mark_done_module.completion_requirements = {@tag.id => {:type => 'must_mark_done'}}
         @mark_done_module.save!
@@ -446,7 +446,7 @@ describe "context modules" do
 
       it "should still show the mark done button when navigating directly" do
         mod = create_context_module('Mark Done Module')
-        page = @course.wiki.wiki_pages.create!(:title => "page", :body => 'hi')
+        page = @course.wiki_pages.create!(:title => "page", :body => 'hi')
         assmt = @course.assignments.create!(:title => "assmt")
 
         tag1 = mod.add_item({:id => page.id, :type => 'wiki_page'})
@@ -749,7 +749,7 @@ describe "context modules" do
     end
 
     it "should not lock a page module item on first load" do
-      page = @course.wiki.wiki_pages.create!(title: "some page", body: "some body")
+      page = @course.wiki_pages.create!(title: "some page", body: "some body")
       page.set_as_front_page!
 
       tag = @module.add_item({id: page.id, type: 'wiki_page'})

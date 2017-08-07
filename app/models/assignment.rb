@@ -691,7 +691,7 @@ class Assignment < ActiveRecord::Base
       self.discussion_topic = topic
     elsif self.context.feature_enabled?(:conditional_release) &&
       self.submission_types == "wiki_page" && @saved_by != :wiki_page
-      page = self.wiki_page || self.context.wiki.wiki_pages.build(:user => @updating_user)
+      page = self.wiki_page || self.context.wiki_pages.build(:user => @updating_user)
       save_submittable(page)
       self.wiki_page = page
     end

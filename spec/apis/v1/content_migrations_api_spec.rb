@@ -608,7 +608,7 @@ describe ContentMigrationsController, type: :request do
       @dt1 = @course.discussion_topics.create!(:message => "hi", :title => "discussion title")
       @cm = @course.context_modules.create!(:name => "some module")
       @att = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
-      @wiki = @course.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
+      @wiki = @course.wiki_pages.create!(:title => "wiki", :body => "ohai")
       @migration.migration_type = 'course_copy_importer'
       @migration.migration_settings[:source_course_id] = @course.id
       @migration.save!

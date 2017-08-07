@@ -27,13 +27,13 @@ describe "master courses - child courses - wiki page locking" do
 
     @copy_from = course_factory(:active_all => true)
     @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
-    @original_page = @copy_from.wiki.wiki_pages.create!(:title => "blah", :body => "bloo")
+    @original_page = @copy_from.wiki_pages.create!(:title => "blah", :body => "bloo")
     @tag = @template.create_content_tag_for!(@original_page)
 
     course_with_teacher(:active_all => true)
     @copy_to = @course
     @template.add_child_course!(@copy_to)
-    @page_copy = @copy_to.wiki.wiki_pages.new(:title => "bloo", :body => "bloo") # just create a copy directly instead of doing a real migraiton
+    @page_copy = @copy_to.wiki_pages.new(:title => "bloo", :body => "bloo") # just create a copy directly instead of doing a real migraiton
     @page_copy.migration_id = @tag.migration_id
     @page_copy.save!
   end

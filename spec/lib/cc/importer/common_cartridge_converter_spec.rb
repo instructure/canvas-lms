@@ -293,7 +293,7 @@ describe "Standard Common Cartridge importing" do
       expect(@course.context_external_tools.first.migration_id).to eq "I_00011_R"
       expect(@course.context_modules.count).to eq 1
       expect(@course.context_modules.first.migration_id).to eq 'I_00000'
-      expect(@course.wiki.wiki_pages.count).to eq 0
+      expect(@course.wiki_pages.count).to eq 0
       expect(@course.discussion_topics.count).to eq 1
       expect(@course.discussion_topics.first.migration_id).to eq 'I_00006_R'
     end

@@ -33,7 +33,7 @@ describe "course copy" do
     @course.syllabus_body = "<p>haha</p>"
     @course.tab_configuration = [{"id" => 0}, {"id" => 14}, {"id" => 8}, {"id" => 5}, {"id" => 6}, {"id" => 2}, {"id" => 3, "hidden" => true}]
     @course.default_view = 'modules'
-    @course.wiki.wiki_pages.create!(:title => "hi", :body => "Whatever")
+    @course.wiki_pages.create!(:title => "hi", :body => "Whatever")
     @course.save!
 
     get "/courses/#{@course.id}/copy"
@@ -45,7 +45,7 @@ describe "course copy" do
     expect(@new_course.syllabus_body).to eq @course.syllabus_body
     expect(@new_course.tab_configuration).to eq @course.tab_configuration
     expect(@new_course.default_view).to eq @course.default_view
-    expect(@new_course.wiki.wiki_pages.count).to eq 1
+    expect(@new_course.wiki_pages.count).to eq 1
   end
 
   # TODO reimplement per CNVS-29604, but make sure we're testing at the right level

@@ -287,7 +287,7 @@ describe "student planner" do
   end
 
   it "shows and navigates to wiki pages with todo dates from student planner", priority: "1", test_id: 3259304 do
-    page = @course.wiki.wiki_pages.create!(title: 'Page1', todo_date: Time.zone.now + 2.days)
+    page = @course.wiki_pages.create!(title: 'Page1', todo_date: Time.zone.now + 2.days)
     go_to_list_view
     validate_object_displayed('Page')
     validate_link_to_url(page, 'pages')
@@ -338,7 +338,7 @@ describe "student planner" do
       quiz.due_at = Time.zone.now + 2.days
       quiz.save!
       Array.new(12){|n|n}.each do |i|
-        @course.wiki.wiki_pages.create!(title: "Page#{i}", todo_date: Time.zone.now + (i-4).days)
+        @course.wiki_pages.create!(title: "Page#{i}", todo_date: Time.zone.now + (i-4).days)
         @course.assignments.create!(name: "assignment#{i}",
                                               due_at: Time.zone.now.advance(days:(i-4)))
         @course.discussion_topics.create!(user: @teacher, title: "topic#{i}",

@@ -608,7 +608,7 @@ describe UserMerge do
 
     it "should update other appropriate versions" do
       course_factory(active_all: true)
-      wiki_page = @course.wiki.wiki_pages.create(:title => "Hi", :user_id => user2.id)
+      wiki_page = @course.wiki_pages.create(:title => "Hi", :user_id => user2.id)
       ra = rubric_assessment_model(:context => @course, :user => user2)
 
       expect(wiki_page.versions).to be_present

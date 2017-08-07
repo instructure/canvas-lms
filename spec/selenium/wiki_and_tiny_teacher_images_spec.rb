@@ -28,7 +28,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
 
     before(:each) do
       course_with_teacher_logged_in
-      @blank_page = @course.wiki.wiki_pages.create! :title => 'blank'
+      @blank_page = @course.wiki_pages.create! :title => 'blank'
     end
 
     after(:each) do

@@ -56,10 +56,10 @@ describe MasterCourses::ChildSubscription do
       child_course = course_factory
       sub = @template.add_child_course!(@course)
 
-      original_page = master_course.wiki.wiki_pages.create!(:title => "blah")
+      original_page = master_course.wiki_pages.create!(:title => "blah")
       mc_tag = @template.create_content_tag_for!(original_page)
 
-      page_copy = child_course.wiki.wiki_pages.create!(:title => "blah", :migration_id => mc_tag.migration_id)
+      page_copy = child_course.wiki_pages.create!(:title => "blah", :migration_id => mc_tag.migration_id)
       child_tag = sub.create_content_tag_for!(page_copy)
 
       sub.destroy!

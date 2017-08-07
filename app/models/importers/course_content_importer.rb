@@ -152,7 +152,7 @@ module Importers
       if course.wiki.has_no_front_page
         if migration.for_course_copy? && (source = migration.source_course || Course.where(id: migration.migration_settings[:source_course_id]).first)
           mig_id = CC::CCHelper.create_key(source.wiki.front_page)
-          if new_front_page = course.wiki.wiki_pages.where(migration_id: mig_id).first
+          if new_front_page = course.wiki_pages.where(migration_id: mig_id).first
             course.wiki.set_front_page_url!(new_front_page.url)
           end
         end

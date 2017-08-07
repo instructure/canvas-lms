@@ -584,8 +584,6 @@ class ContentMigration < ActiveRecord::Base
       next unless MasterCourses::ALLOWED_CONTENT_TYPES.include?(klass)
       mig_ids = deletions[klass]
       item_scope = case klass
-      when 'WikiPage'
-        self.context.wiki.wiki_pages.not_deleted.where(migration_id: mig_ids)
       when 'Attachment'
         self.context.attachments.not_deleted.where(migration_id: mig_ids)
       else

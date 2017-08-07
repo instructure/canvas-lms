@@ -195,12 +195,12 @@ describe MasterCourses::MasterMigration do
       expect(cm1.migration_settings[:imported_assets]["DiscussionTopic"]).to eq topic_to.id.to_s
       expect(cm1.migration_settings[:imported_assets]["Attachment"]).to eq att_to.id.to_s
 
-      page = @copy_from.wiki.wiki_pages.create!(:title => "another title")
+      page = @copy_from.wiki_pages.create!(:title => "another title")
 
       run_master_migration
       expect(@migration.export_results.keys).to eq [:selective]
 
-      page_to = @copy_to.wiki.wiki_pages.where(:migration_id => mig_id(page)).first
+      page_to = @copy_to.wiki_pages.where(:migration_id => mig_id(page)).first
       expect(page_to).to be_present
 
       cm2 = ContentMigration.find(@migration.import_results.keys.first)
@@ -216,8 +216,8 @@ describe MasterCourses::MasterMigration do
       assmt = @copy_from.assignments.create!
       topic = @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
       ann = @copy_from.announcements.create!(:message => "goodbye")
-      page = @copy_from.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
-      page2 = @copy_from.wiki.wiki_pages.create!(:title => "wiki", :body => "bluh")
+      page = @copy_from.wiki_pages.create!(:title => "wiki", :body => "ohai")
+      page2 = @copy_from.wiki_pages.create!(:title => "wiki", :body => "bluh")
       quiz = @copy_from.quizzes.create!
       quiz2 = @copy_from.quizzes.create!
       bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
@@ -232,8 +232,8 @@ describe MasterCourses::MasterMigration do
       assmt_to = @copy_to.assignments.where(:migration_id => mig_id(assmt)).first
       topic_to = @copy_to.discussion_topics.where(:migration_id => mig_id(topic)).first
       ann_to = @copy_to.announcements.where(:migration_id => mig_id(ann)).first
-      page_to = @copy_to.wiki.wiki_pages.where(:migration_id => mig_id(page)).first
-      page2_to = @copy_to.wiki.wiki_pages.where(:migration_id => mig_id(page2)).first
+      page_to = @copy_to.wiki_pages.where(:migration_id => mig_id(page)).first
+      page2_to = @copy_to.wiki_pages.where(:migration_id => mig_id(page2)).first
       quiz_to = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
       quiz2_to = @copy_to.quizzes.where(:migration_id => mig_id(quiz2)).first
       bank_to = @copy_to.assessment_question_banks.where(:migration_id => mig_id(bank)).first
@@ -298,7 +298,7 @@ describe MasterCourses::MasterMigration do
 
       Timecop.freeze(10.minutes.from_now) do
         assmt.update_attribute(:title, 'new title eh')
-        page = @copy_from.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
+        page = @copy_from.wiki_pages.create!(:title => "wiki", :body => "ohai")
         file = @copy_from.attachments.create!(:filename => 'blah', :uploaded_data => default_uploaded_data)
       end
 
@@ -318,7 +318,7 @@ describe MasterCourses::MasterMigration do
       run_master_migration
 
       Timecop.travel(10.minutes.from_now) do
-        3.times { |x| @copy_from.wiki.wiki_pages.create! :title => "Page #{x}" }
+        3.times { |x| @copy_from.wiki_pages.create! :title => "Page #{x}" }
         mm = run_master_migration
         expect(mm.export_results[:selective][:created]['WikiPage'].length).to eq 2
       end
@@ -337,7 +337,7 @@ describe MasterCourses::MasterMigration do
       new_title = "new title"
       topic_to1.update_attribute(:title, new_title)
 
-      page = @copy_from.wiki.wiki_pages.create!(:title => "another title")
+      page = @copy_from.wiki_pages.create!(:title => "another title")
 
       @copy_to2 = course_factory
       @template.add_child_course!(@copy_to2) # new child course - needs full update
@@ -345,11 +345,11 @@ describe MasterCourses::MasterMigration do
       run_master_migration
       expect(@migration.export_results.keys).to match_array([:selective, :full]) # should create both
 
-      expect(@copy_to1.wiki.wiki_pages.where(:migration_id => mig_id(page)).first).to be_present # should bring the wiki page in the selective
+      expect(@copy_to1.wiki_pages.where(:migration_id => mig_id(page)).first).to be_present # should bring the wiki page in the selective
       expect(topic_to1.reload.title).to eq new_title # should not have have overwritten the new change in the child course
 
       expect(@copy_to2.discussion_topics.where(:migration_id => mig_id(topic)).first).to be_present # should bring both in the full
-      expect(@copy_to2.wiki.wiki_pages.where(:migration_id => mig_id(page)).first).to be_present
+      expect(@copy_to2.wiki_pages.where(:migration_id => mig_id(page)).first).to be_present
     end
 
     it "should skip master course restriction validations on import" do
@@ -359,7 +359,7 @@ describe MasterCourses::MasterMigration do
       assmt = @copy_from.assignments.create!
       topic = @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
       ann = @copy_from.announcements.create!(:message => "goodbye")
-      page = @copy_from.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
+      page = @copy_from.wiki_pages.create!(:title => "wiki", :body => "ohai")
       quiz = @copy_from.quizzes.create!
       qq = quiz.quiz_questions.create!(:question_data => {'question_name' => 'test question', 'question_type' => 'essay_question'})
       bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
@@ -379,7 +379,7 @@ describe MasterCourses::MasterMigration do
       copied_assmt = @copy_to.assignments.where(:migration_id => mig_id(assmt)).first
       copied_topic = @copy_to.discussion_topics.where(:migration_id => mig_id(topic)).first
       copied_ann = @copy_to.announcements.where(:migration_id => mig_id(ann)).first
-      copied_page = @copy_to.wiki.wiki_pages.where(:migration_id => mig_id(page)).first
+      copied_page = @copy_to.wiki_pages.where(:migration_id => mig_id(page)).first
       copied_quiz = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
       copied_qq = copied_quiz.quiz_questions.where(:migration_id => mig_id(qq)).first
       copied_bank = @copy_to.assessment_question_banks.where(:migration_id => mig_id(bank)).first
@@ -434,13 +434,13 @@ describe MasterCourses::MasterMigration do
 
       # TODO: add more content here as we add the Restrictor module to more models
       old_title = "some title"
-      page = @copy_from.wiki.wiki_pages.create!(:title => old_title, :body => "ohai")
+      page = @copy_from.wiki_pages.create!(:title => old_title, :body => "ohai")
       assignment = @copy_from.assignments.create!(:title => old_title, :description => "kthnx")
 
       run_master_migration
 
       # WikiPage
-      copied_page = @copy_to.wiki.wiki_pages.where(:migration_id => mig_id(page)).first
+      copied_page = @copy_to.wiki_pages.where(:migration_id => mig_id(page)).first
       child_tag = sub.child_content_tags.polymorphic_where(:content => copied_page).first
       expect(child_tag).to be_present # should create a tag
       new_child_text = "<p>some other text here</p>"
@@ -884,7 +884,7 @@ describe MasterCourses::MasterMigration do
         cm = @copy_from.context_modules.create!(:name => "some module")
         item = cm.add_item(:id => assmt.id, :type => 'assignment')
         att = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
-        page = @copy_from.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
+        page = @copy_from.wiki_pages.create!(:title => "wiki", :body => "ohai")
         quiz = @copy_from.quizzes.create!
 
         allow(TestExternalContentService).to receive(:applies_to_course?).and_return(true)
@@ -911,7 +911,7 @@ describe MasterCourses::MasterMigration do
         copied_cm = @copy_to.context_modules.where(:migration_id => mig_id(cm)).first
         copied_item = @copy_to.context_module_tags.where(:migration_id => mig_id(item)).first
         copied_att = @copy_to.attachments.where(:migration_id => mig_id(att)).first
-        copied_page = @copy_to.wiki.wiki_pages.where(:migration_id => mig_id(page)).first
+        copied_page = @copy_to.wiki_pages.where(:migration_id => mig_id(page)).first
         copied_quiz = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
 
         expect(TestExternalContentService.course).to eq @copy_to

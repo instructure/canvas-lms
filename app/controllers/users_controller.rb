@@ -1904,7 +1904,7 @@ class UsersController < ApplicationController
       @entries.concat context.assignments.active.where("updated_at>?", cutoff)
       @entries.concat context.calendar_events.active.where("updated_at>?", cutoff)
       @entries.concat context.discussion_topics.active.where("updated_at>?", cutoff)
-      @entries.concat context.wiki.wiki_pages.not_deleted.where("updated_at>?", cutoff)
+      @entries.concat context.wiki_pages.not_deleted.where("updated_at>?", cutoff)
     end
     @entries.each do |entry|
       feed.entries << entry.to_atom(:include_context => true, :context => @context)

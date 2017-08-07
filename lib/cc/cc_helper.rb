@@ -228,9 +228,9 @@ module CCHelper
         # WikiPagesController allows loosely-matching URLs; fix them before exporting
         if match.obj_id.present?
           url_or_title = match.obj_id
-          page = @course.wiki.wiki_pages.deleted_last.where(url: url_or_title).first ||
-                 @course.wiki.wiki_pages.deleted_last.where(url: url_or_title.to_url).first ||
-                 @course.wiki.wiki_pages.where(id: url_or_title.to_i).first
+          page = @course.wiki_pages.deleted_last.where(url: url_or_title).first ||
+                 @course.wiki_pages.deleted_last.where(url: url_or_title.to_url).first ||
+                 @course.wiki_pages.where(id: url_or_title.to_i).first
         end
         if page
           "#{WIKI_TOKEN}/#{match.type}/#{page.url}"
