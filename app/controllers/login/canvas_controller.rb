@@ -77,7 +77,7 @@ class Login::CanvasController < ApplicationController
                     end
         next unless unique_id
 
-        pseudonym = @domain_root_account.pseudonyms.active.by_unique_id(unique_id).first
+        pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_id, aac)
         pseudonym ||= aac.provision_user(unique_id) if aac.jit_provisioning?
         next unless pseudonym
 
