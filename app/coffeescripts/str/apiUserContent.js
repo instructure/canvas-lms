@@ -37,6 +37,7 @@ const apiUserContent = {
         id='media_comment_${htmlEscape($(node).data('media_comment_id'))}'
         data-media_comment_type='${htmlEscape($(node).data('media_comment_type'))}'
         class='instructure_inline_media_comment ${htmlEscape(node.nodeName.toLowerCase())}_comment'
+        data-alt='${htmlEscape($(node).attr("data-alt"))}'
       />`
     )
     $link.html($(node).html())

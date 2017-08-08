@@ -147,7 +147,7 @@ const mediaCommentActions = {
     $('#media_recorder_container').removeAttr('id')
     this.attr('id', 'media_recorder_container')
     pubsub.unsubscribe('media_comment_created')
-    pubsub.subscribe('media_comment_created', data => callback(data.id, data.mediaType))
+    pubsub.subscribe('media_comment_created', data => callback(data.id, data.mediaType, data.title))
 
     const initOpts = {modal: false, defaultTitle}
     if ($.isFunction(onClose)) initOpts.close = onClose.bind(this)
