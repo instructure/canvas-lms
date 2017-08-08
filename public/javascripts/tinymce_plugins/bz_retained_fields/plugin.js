@@ -92,7 +92,7 @@ tinymce.create('tinymce.plugins.BZRetainedFields', {
         name = name.replace(/"/g, '&quot;');
 
         if(type == "checkbox")
-          ed.selection.setContent('<input type="checkbox" '+(optional.checked ? 'class="bz-optional-magic-field"':'')+' data-bz-retained="'+name+'" />');
+          ed.selection.setContent('<input type="checkbox" '+(optional ? 'class="bz-optional-magic-field"':'')+' data-bz-retained="'+name+'" />');
         else if(type == "radio") {
           for(var i = 0; i < values.length; i++) {
             var v = values[i].
@@ -100,12 +100,12 @@ tinymce.create('tinymce.plugins.BZRetainedFields', {
               replace("<", "&lt;").
               replace(">", "&gt;").
               replace("\"", "&quot;");
-            ed.selection.setContent('<input type="radio" value="'+v+'" '+(optional.checked ? 'class="bz-optional-magic-field"':'')+' data-bz-retained="'+name+'" /> ' + v + '<br>');
+            ed.selection.setContent('<input type="radio" value="'+v+'" '+(optional ? 'class="bz-optional-magic-field"':'')+' data-bz-retained="'+name+'" /> ' + v + '<br>');
           }
         } else if(type == "input")
-          ed.selection.setContent('<input type="text" '+(optional.checked ? 'class="bz-optional-magic-field"':'')+' data-bz-retained="'+name+'" />');
+          ed.selection.setContent('<input type="text" '+(optional ? 'class="bz-optional-magic-field"':'')+' data-bz-retained="'+name+'" />');
         else if(type == "textarea")
-          ed.selection.setContent('<textarea '+(optional.checked ? 'class="bz-optional-magic-field"':'')+' data-bz-retained="'+name+'">&#8291;</textarea>');
+          ed.selection.setContent('<textarea '+(optional ? 'class="bz-optional-magic-field"':'')+' data-bz-retained="'+name+'">&#8291;</textarea>');
       }, true);
     });
     ed.addCommand('bzRetainedFieldView', function() {
