@@ -3969,6 +3969,11 @@ describe 'Submissions API', type: :request do
           submission_json = api_call_as_user(teacher, :get, path, params)
           expect(submission_json.first['url']).to eq expected_url
         end
+
+        it 'includes the external tool URL' do
+          submission_json = api_call_as_user(teacher, :get, path, params)
+          expect(submission_json.first['external_tool_url']).to eq external_tool_url
+        end
       end
     end
   end

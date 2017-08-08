@@ -185,6 +185,7 @@ module Api::V1::Submission
     end
 
     if attempt.submission_type == 'basic_lti_launch'
+      hash['external_tool_url'] = attempt.external_tool_url
       hash['url'] = retrieve_course_external_tools_url(context.id,
                                                        assignment_id: assignment.id,
                                                        url: attempt.external_tool_url)
