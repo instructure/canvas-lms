@@ -159,7 +159,7 @@ function copyAssignmentDescriptionIntoAssignmentSubmission() {
 function validateMagicFields() {
   var list = document.querySelectorAll("#assignment_show .description input[type=text][data-bz-retained], #assignment_show .description input[type=url][data-bz-retained], #assignment_show .description textarea[data-bz-retained]");
   for(var a = 0; a < list.length; a++) {
-    if(list[a].value == "" && list[a].classList.contains("bz-optional-magic-field")) {
+    if(list[a].value == "" && !list[a].classList.contains("bz-optional-magic-field")) {
       alert('You have incomplete fields in this project. Go back and complete them before submitting.');
       list[a].focus();
       return false;
