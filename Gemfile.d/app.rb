@@ -18,7 +18,7 @@
 if CANVAS_RAILS5_0
   gem 'rails', '5.0.4'
 else
-  gem 'rails', '5.1.2'
+  gem 'rails', '5.1.3'
 end
 
 gem 'rack', '2.0.3'
