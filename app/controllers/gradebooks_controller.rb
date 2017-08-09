@@ -786,10 +786,13 @@ class GradebooksController < ApplicationController
   end
 
   def new_history
+    # remove Grades crumb added by default in this controller
+    crumbs.delete_if { |crumb| crumb[0] == "Grades" }
+    add_crumb(t("Gradebook History"),
+              context_url(@context, controller: :gradebooks, action: :history))
     @page_title = t("Gradebook History")
     @body_classes << "full-width padless-content"
     js_bundle :react_gradebook_history
-    css_bundle :react_gradebook_history
     js_env({})
 
     render html: "", layout: true
