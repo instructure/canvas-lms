@@ -80,6 +80,16 @@ module Types
         submissions
       }
     end
+
+    field :permissions, CoursePermissionsType do
+      description "returns permission information for the current user in this course"
+      resolve ->(course, _, ctx) {
+        Loaders::CoursePermissionsLoader.for(
+          course,
+          current_user: ctx[:current_user], session: ctx[:session]
+        )
+      }
+    end
   end
 
   SubmissionOrderInputType = GraphQL::InputObjectType.define do
