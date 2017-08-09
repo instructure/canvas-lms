@@ -29,7 +29,7 @@ class CourseProgress
   end
 
   def modules
-    @_modules ||= course.modules_visible_to(user)
+    @_modules ||= course.modules_visible_to(user).preload(:content_tags)
   end
 
   def current_module
