@@ -228,6 +228,12 @@ module BrandableCSS
       move_default_css_to_s3_if_enabled!
     end
 
+    def save_default_files!
+      save_default_json!
+      save_default_js!
+      save_default_css!
+    end
+
     def move_default_json_to_s3_if_enabled!
       return unless defined?(Canvas) && Canvas::Cdn.enabled?
       s3_uploader.upload_file(public_default_json_path)
