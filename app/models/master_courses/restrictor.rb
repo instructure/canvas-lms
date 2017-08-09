@@ -125,7 +125,7 @@ module MasterCourses::Restrictor
   def create_child_content_tag
     # i thought about making this a bulk insert at the end of the migration but the race conditions seemed scary
     if @importing_migration && is_child_content?
-      @importing_migration.master_course_subscription.create_content_tag_for!(self)
+      @importing_migration.master_course_subscription.content_tag_for(self)
     end
   end
 
