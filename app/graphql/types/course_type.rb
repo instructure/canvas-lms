@@ -49,7 +49,7 @@ module Types
     connection :submissionsConnection, SubmissionType.connection_type do
       description "all the submissions for assignments in this course"
 
-      argument :studentIds, !types[types.ID], "Only return submissions for the given students.",
+      argument :studentIds, !types[!types.ID], "Only return submissions for the given students.",
         prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User")
       argument :orderBy, types[SubmissionOrderInputType]
 
