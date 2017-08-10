@@ -30,12 +30,21 @@ describe InfoController do
     it "should respond_to json" do
       request.accept = "application/json"
       allow(Canvas).to receive(:revision).and_return("Test Proc")
+      allow(Canvas::Cdn::RevManifest).to receive(:gulp_manifest).and_return({test_key: "mock_revved_url"})
       get "health_check"
       expect(response).to be_success
       json = JSON.parse(response.body)
       expect(json).to have_key('installation_uuid')
       json.delete('installation_uuid')
-      expect(json).to eq({ "status" => "canvas ok", "revision" => "Test Proc" })
+      expect(json).to eq({
+        "status" => "canvas ok",
+        "revision" => "Test Proc",
+        "asset_urls" => {
+          "common_css" => "/dist/brandable_css/new_styles_normal_contrast/bundles/common-#{BrandableCSS.cache_for('bundles/common', 'new_styles_normal_contrast')[:combinedChecksum]}.css",
+          "common_js" => ActionController::Base.helpers.javascript_url("#{ENV['USE_OPTIMIZED_JS'] == 'true' ? '/dist/webpack-production' : '/dist/webpack-dev'}/common"),
+          "revved_url" => "mock_revved_url"
+        }
+      })
     end
   end
 

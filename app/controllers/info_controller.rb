@@ -54,10 +54,18 @@ class InfoController < ApplicationController
     end
     Tempfile.open("heartbeat", ENV['TMPDIR'] || Dir.tmpdir) { |f| f.write("heartbeat"); f.flush }
 
+    # javascript/css build process didn't die, right?
+    asset_urls = {
+      common_css: css_url_for("common"), # ensures brandable_css_bundles_with_deps exists
+      common_js: ActionController::Base.helpers.javascript_url("#{js_base_url}/common"), # ensures webpack worked
+      revved_url: Canvas::Cdn::RevManifest.gulp_manifest.values.first # makes sure `gulp rev` has ran
+    }
+
     respond_to do |format|
       format.html { render plain: 'canvas ok' }
       format.json { render json:
                                { status: 'canvas ok',
+                                 asset_urls: asset_urls,
                                  revision: Canvas.revision,
                                  installation_uuid: Canvas.installation_uuid } }
     end
