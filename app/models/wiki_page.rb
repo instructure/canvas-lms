@@ -89,12 +89,7 @@ class WikiPage < ActiveRecord::Base
   SIMPLY_VERSIONED_EXCLUDE_FIELDS = [:workflow_state, :editing_roles, :notify_of_update].freeze
 
   def ensure_wiki_and_context
-    if self.context
-      self.wiki_id ||= self.context.wiki.id
-    elsif self.wiki
-      self.context_type ||= self.wiki.context.class.base_class.name
-      self.context_id ||= self.wiki.context.id
-    end
+    self.wiki_id ||= (self.context.wiki_id || self.context.wiki.id)
   end
 
   def touch_context
@@ -113,12 +108,11 @@ class WikiPage < ActiveRecord::Base
     self.title ||= to_cased_title.call(self.url || "page")
     # TODO i18n (see wiki.rb)
 
-    scope = self.context ? self.context.wiki_pages : self.wiki.wiki_pages
     if self.title == "Front Page" && self.new_record?
-      baddies = scope.not_deleted.where(title: "Front Page").select{|p| p.url != "front-page" }
+      baddies = self.context.wiki_pages.not_deleted.where(title: "Front Page").select{|p| p.url != "front-page" }
       baddies.each{|p| p.title = to_cased_title.call(p.url); p.save_without_broadcasting! }
     end
-    if existing = scope.not_deleted.where(title: self.title).first
+    if existing = self.context.wiki_pages.not_deleted.where(title: self.title).first
       return if existing == self
       real_title = self.title.gsub(/-(\d*)\z/, '') # remove any "-#" at the end
       n = $1 ? $1.to_i + 1 : 2
@@ -126,7 +120,7 @@ class WikiPage < ActiveRecord::Base
         mod = "-#{n}"
         new_title = real_title[0...(TITLE_LENGTH - mod.length)] + mod
         n = n.succ
-      end while scope.not_deleted.where(title: new_title).exists?
+      end while self.context.wiki_pages.not_deleted.where(title: new_title).exists?
 
       self.title = new_title
     end
@@ -147,8 +141,7 @@ class WikiPage < ActiveRecord::Base
       conditions << id
     end
 
-    scope = self.context ? self.context.wiki_pages : self.wiki.wiki_pages
-    urls = scope.where(*conditions).not_deleted.pluck(:url)
+    urls = self.context.wiki_pages.where(*conditions).not_deleted.pluck(:url)
     # This is the part in stringex that messed us up, since it will never allow
     # a url of "front-page" once "front-page-1" or "front-page-2" is created
     # We modify it to allow "front-page" and start the indexing at "front-page-2"
@@ -433,6 +426,8 @@ class WikiPage < ActiveRecord::Base
     result = WikiPage.new({
       :title => opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy")),
       :wiki_id => self.wiki_id,
+      :context_id => self.context_id,
+      :context_type => self.context_type,
       :body => self.body,
       :workflow_state => "unpublished",
       :user_id => self.user_id,

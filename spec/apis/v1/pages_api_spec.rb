@@ -58,13 +58,13 @@ describe "Pages API", type: :request do
     @front_page.workflow_state = 'active'
     @front_page.save!
     @front_page.set_as_front_page!
-    @hidden_page = @wiki.wiki_pages.create!(:title => "Hidden Page", :body => "Body of hidden page")
+    @hidden_page = @course.wiki_pages.create!(:title => "Hidden Page", :body => "Body of hidden page")
     @hidden_page.unpublish!
   end
 
   context 'versions' do
     before :once do
-      @page = @wiki.wiki_pages.create!(:title => 'Test Page', :body => 'Test content')
+      @page = @course.wiki_pages.create!(:title => 'Test Page', :body => 'Test content')
     end
 
     example 'creates initial version of the page' do
@@ -142,7 +142,7 @@ describe "Pages API", type: :request do
       end
 
       it "should paginate" do
-        2.times { |i| @wiki.wiki_pages.create!(:title => "New Page #{i}") }
+        2.times { |i| @course.wiki_pages.create!(:title => "New Page #{i}") }
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?per_page=2",
                         :controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>@course.to_param, :per_page => "2")
         expect(json.size).to eq 2
@@ -158,7 +158,7 @@ describe "Pages API", type: :request do
 
       it "should search for pages by title" do
         new_pages = []
-        3.times { |i| new_pages << @wiki.wiki_pages.create!(:title => "New Page #{i}") }
+        3.times { |i| new_pages << @course.wiki_pages.create!(:title => "New Page #{i}") }
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?search_term=new",
                         :controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>@course.to_param, :search_term => "new")
@@ -189,7 +189,7 @@ describe "Pages API", type: :request do
 
       describe "sorting" do
         it "should sort by title (case-insensitive)" do
-          @wiki.wiki_pages.create! :title => 'gIntermediate Page'
+          @course.wiki_pages.create! :title => 'gIntermediate Page'
           json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?sort=title",
                           :controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>@course.to_param,
                           :sort=>'title')
@@ -734,7 +734,7 @@ describe "Pages API", type: :request do
         wiki.set_front_page_url!(@front_page.url)
 
         # create and update another page
-        other_page = @wiki.wiki_pages.create!(:title => "Other Page", :body => "Body of other page")
+        other_page = @course.wiki_pages.create!(:title => "Other Page", :body => "Body of other page")
         other_page.workflow_state = 'active'
         other_page.save!
 
@@ -1001,9 +1001,9 @@ describe "Pages API", type: :request do
 
     context "unpublished pages" do
       before :once do
-        @deleted_page = @wiki.wiki_pages.create! :title => "Deleted page"
+        @deleted_page = @course.wiki_pages.create! :title => "Deleted page"
         @deleted_page.destroy
-        @unpublished_page = @wiki.wiki_pages.create(:title => "Draft Page", :body => "Don't text and drive.")
+        @unpublished_page = @course.wiki_pages.create(:title => "Draft Page", :body => "Don't text and drive.")
         @unpublished_page.workflow_state = :unpublished
         @unpublished_page.save!
       end
@@ -1073,7 +1073,7 @@ describe "Pages API", type: :request do
     end
 
     it "should paginate, excluding hidden" do
-      2.times { |i| @wiki.wiki_pages.create!(:title => "New Page #{i}") }
+      2.times { |i| @course.wiki_pages.create!(:title => "New Page #{i}") }
       json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?per_page=2",
                       :controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>"#{@course.id}", :per_page => "2")
       expect(json.size).to eq 2
@@ -1250,7 +1250,7 @@ describe "Pages API", type: :request do
 
     context "unpublished pages" do
       before :once do
-        @unpublished_page = @wiki.wiki_pages.create(:title => "Draft Page", :body => "Don't text and drive.")
+        @unpublished_page = @course.wiki_pages.create(:title => "Draft Page", :body => "Don't text and drive.")
         @unpublished_page.workflow_state = :unpublished
         @unpublished_page.save!
       end
