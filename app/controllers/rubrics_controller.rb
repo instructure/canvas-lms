@@ -34,7 +34,14 @@ class RubricsController < ApplicationController
 
   def show
     permission = @context.is_a?(User) ? :manage : :read
-    return unless authorized_action(@context, @current_user, permission)
+    # It will bypass the permission check for reading the content
+    # bank on direct links because cloned courses will reference the
+    # shared rubrics and we want to make sure users can always see the
+    # embedded content via our ajax scripts too. Reading a rubric is harmless
+    # if they poke around to other links anyway.
+    unless @context.id == 1 && permission == :read
+      return unless authorized_action(@context, @current_user, permission)
+    end
     if (id = params[:id]) =~ Api::ID_REGEX
       js_env :ROOT_OUTCOME_GROUP => get_root_outcome
       @rubric_association = @context.rubric_associations.bookmarked.where(rubric_id: params[:id]).first
