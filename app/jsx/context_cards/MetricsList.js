@@ -27,7 +27,7 @@ import InstUIMetricsList, { MetricsListItem } from 'instructure-ui/lib/component
     }
 
     static defaultProps = {
-      analytics: {},
+      analytics: null,
       user: {}
     }
 
@@ -50,7 +50,7 @@ import InstUIMetricsList, { MetricsListItem } from 'instructure-ui/lib/component
     }
 
     get missingCount () {
-      if (typeof this.props.analytics.tardiness_breakdown === 'undefined') {
+      if (!this.props.analytics.tardiness_breakdown) {
         return null
       }
 
@@ -58,7 +58,7 @@ import InstUIMetricsList, { MetricsListItem } from 'instructure-ui/lib/component
     }
 
     get lateCount () {
-      if (typeof this.props.analytics.tardiness_breakdown === 'undefined') {
+      if (!this.props.analytics.tardiness_breakdown) {
         return null
       }
 
@@ -68,7 +68,7 @@ import InstUIMetricsList, { MetricsListItem } from 'instructure-ui/lib/component
     render () {
       if (
         typeof this.props.user.enrollments !== 'undefined' &&
-        Object.keys(this.props.analytics).length > 0
+        this.props.analytics
       ) {
         return (
           <section

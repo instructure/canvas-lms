@@ -52,7 +52,7 @@ define([
       const user = {
         name: userName,
         avatar_url: avatarUrl,
-        id: '17'
+        _id: '17'
       }
       subject = TestUtils.renderIntoDocument(
         <Avatar user={user} courseId="1" canMasquerade />

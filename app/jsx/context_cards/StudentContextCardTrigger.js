@@ -19,8 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import StudentContextTray from 'jsx/context_cards/StudentContextTray'
-import StudentCardStore from 'jsx/context_cards/StudentCardStore'
+import StudentContextTray from 'jsx/context_cards/RestStudentContextTray'
 
   const handleClickEvent = (event) => {
     const studentId = $(event.target).attr('data-student_id');
@@ -28,8 +27,6 @@ import StudentCardStore from 'jsx/context_cards/StudentCardStore'
     if (ENV.STUDENT_CONTEXT_CARDS_ENABLED && studentId && courseId) {
       event.preventDefault();
       const container = document.getElementById('StudentTray__Container')
-      const store = new StudentCardStore(studentId, courseId)
-      store.load()
 
       const returnFocusToHandler = () => {
         const focusableItems = [$(event.target)];
@@ -47,7 +44,6 @@ import StudentCardStore from 'jsx/context_cards/StudentCardStore'
         <StudentContextTray
           key={`student_context_card_${courseId}_${studentId}`}
           courseId={courseId}
-          store={store}
           studentId={studentId}
           returnFocusTo={returnFocusToHandler}
           onClose={() => {
