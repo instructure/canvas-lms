@@ -75,12 +75,12 @@ class DiscussionEntry < ActiveRecord::Base
 
   on_create_send_to_streams do
     if self.root_entry_id.nil?
-      # If the topic has beeng going for more than two weeks, only show
+      # If the topic has been going for more than two weeks, only show
       # people who have been participating in the topic
       if self.created_at > self.discussion_topic.created_at + 2.weeks
         DiscussionEntry.active.
-            where('discussion_topic_id=? AND created_at > ?', self.discussion_topic_id, 2.weeks.ago).
-            uniq.pluck(:user_id)
+          where('discussion_topic_id=? AND created_at > ?', self.discussion_topic_id, 2.weeks.ago).
+          distinct.pluck(:user_id)
       else
         self.discussion_topic.active_participants
       end
