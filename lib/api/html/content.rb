@@ -68,7 +68,15 @@ module Api
       end
 
       # a hash of allowed html attributes that represent urls, like { 'a' => ['href'], 'img' => ['src'] }
-      UrlAttributes = CanvasSanitize::SANITIZE[:protocols].inject({}) { |h,(k,v)| h[k] = v.keys; h }
+      # we used to use CanvasSanitize::SANITIZE[:protocols] but using that full
+      # list is SLOW, and we don't care about most of them.
+      URL_ATTRIBUTES = {
+        'a' => ['href'].freeze,
+        'img' => ['src'].freeze,
+        'object' => ['data'].freeze, # needed?
+        'embed' => ['src'].freeze, # needed?
+        'iframe' => ['src'].freeze # needed?
+      }.freeze
 
       # rewrite HTML being sent out to an API request to make sure
       # it has all necessary media elements and full URLs for later usage
@@ -88,7 +96,7 @@ module Api
           apply_mathml(node)
         end
 
-        UrlAttributes.each do |tag, attributes|
+        URL_ATTRIBUTES.each do |tag, attributes|
           parsed_html.css(tag).each do |element|
             url_helper.rewrite_api_urls(element, attributes)
           end

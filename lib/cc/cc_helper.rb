@@ -283,8 +283,6 @@ module CCHelper
       %{<html>\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=utf-8">\n<title>#{title}</title>\n#{meta_html}</head>\n<body>\n#{content}\n</body>\n</html>}
     end
 
-    UrlAttributes = CanvasSanitize::SANITIZE[:protocols].inject({}) { |h,(k,v)| h[k] = v.keys; h }
-
     def html_content(html)
       html = @rewriter.translate_content(html)
       return html if html.blank? || @for_course_copy
@@ -309,7 +307,7 @@ module CCHelper
       # (those in the course are already "$CANVAS_COURSE_REFERENCE$/...", but links
       #  outside the course need a domain to be meaningful in the export)
       # see also Api#api_user_content, which does a similar thing
-      UrlAttributes.each do |tag, attributes|
+      Api::Html::Content::URL_ATTRIBUTES.each do |tag, attributes|
         doc.css(tag).each do |element|
           attributes.each do |attribute|
             url_str = element[attribute]
