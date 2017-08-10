@@ -154,7 +154,7 @@ class EnrollmentTerm < ActiveRecord::Base
     Enrollment.active.joins(:course).
       where(root_account_id: root_account, courses: {enrollment_term_id: terms}).
       group(:enrollment_term_id).
-      uniq.
+      distinct.
       count(:user_id)
   end
 
