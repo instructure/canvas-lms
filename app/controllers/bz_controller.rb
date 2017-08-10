@@ -142,6 +142,7 @@ class BzController < ApplicationController
   def full_module_view
     @course_id = params[:course_id]
     module_sequence = params[:module_sequence]
+    @module_sequence = module_sequence
     items = nil
     if module_sequence.nil?
       # view the entire course

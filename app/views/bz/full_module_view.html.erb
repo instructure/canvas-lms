@@ -1,4 +1,16 @@
 <script>
+  <%
+    data = 0
+    if @current_user
+      result = RetainedData.where(:user_id => @current_user.id, :name => "module_position_#{@course_id}_#{@module_sequence}")
+      unless result.empty?
+        data = result.first.value.to_i
+      end
+    end
+  %>
+
+  window.openBzBoxPosition = <%= data %>;
+  window.position_magic_field_name = "module_position_<%= @course_id %>_<%= @module_sequence %>";
   var runningAtEnd = [];
   function runAtEnd(func) {
     runningAtEnd.push(func);
