@@ -24,6 +24,8 @@ define([
   'instructure-ui/lib/components/Progress'
 ], (React, ReactDOM, TestUtils, SubmissionProgressBars, { default: InstUIProgress }) => {
 
+  const user = { _id: 1 };
+
   QUnit.module('StudentContextTray/Progress', (hooks) => {
     let grade, score, spy, subject, submission, tag
 
@@ -210,7 +212,8 @@ define([
                 id: 1,
                 grade: 'complete',
                 score: 25,
-                assignment: {points_possible: 25}
+                assignment: {points_possible: 25},
+                user
               }]}
             />
           )
@@ -226,7 +229,8 @@ define([
               id: 1,
               grade: 'incomplete',
               score: 0,
-              assignment: {points_possible: 25}
+              assignment: {points_possible: 25},
+              user
             }]} />
           )
           tag = TestUtils.findRenderedDOMComponentWithTag(subject, 'i')
@@ -241,16 +245,19 @@ define([
           id: 1,
           grade: 'incomplete',
           score: 0,
+          user,
           assignment: {points_possible: 25}
         }, {
           id: 2,
           grade: 'complete',
           score: 25,
+          user,
           assignment: {points_possible: 25}
         }, {
           id: 3,
           grade: 'A+',
           score: 25,
+          user,
           assignment: {points_possible: 25}
         }]
         subject = TestUtils.renderIntoDocument(

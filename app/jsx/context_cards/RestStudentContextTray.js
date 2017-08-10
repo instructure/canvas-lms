@@ -47,7 +47,12 @@ export default class RestStudentContextTray extends React.Component {
       course: {
         _id: course.id,
         submissionsConnection: {
-          edges: submissions.map(submission => ({ submission }))
+          edges: submissions.map(submission => ({
+            submission: {
+              user: { _id: submission.user_id },
+              ...submission
+            }
+          }))
         },
         permissions: permissions,
         ...course

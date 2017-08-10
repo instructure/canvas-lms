@@ -48,7 +48,7 @@ class Avatar extends React.Component {
           <Link href={`/courses/${this.props.courseId}/users/${user._id}`} aria-label={I18n.t('Go to %{name}\'s profile', {name})}>
             <InstUIAvatar
               size="x-large"
-              name={user.name}
+              name={name}
               src={user.avatar_url}
             />
           </Link>
