@@ -55,7 +55,6 @@ export default class StudentContextTray extends React.Component {
     static propTypes = {
       courseId: PropTypes.string.isRequired,
       studentId: PropTypes.string.isRequired,
-      onClose: PropTypes.func.isRequired,
       returnFocusTo: PropTypes.func.isRequired,
       data: dataShape.isRequired,
     }
@@ -89,13 +88,8 @@ export default class StudentContextTray extends React.Component {
      */
 
     componentWillReceiveProps (nextProps) {
-      if (nextProps.store !== this.props.store) {
-        this.props.store.onChange = null
-        nextProps.store.onChange = this.onChange
-        if (!this.state.isOpen) {
-          newState.isOpen = true
-        }
-        this.setState(newState)
+      if (!this.state.isOpen) {
+        this.setState({isOpen: true})
       }
     }
 
@@ -196,7 +190,6 @@ export default class StudentContextTray extends React.Component {
             onDismiss={this.handleRequestClose}
             placement='end'
             zIndex='1000'
-            onClose={this.props.onClose}
           >
             <aside
               className={user && user.avatar_url

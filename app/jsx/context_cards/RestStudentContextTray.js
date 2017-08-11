@@ -14,12 +14,17 @@ export default class RestStudentContextTray extends React.Component {
     this.state = {
       loading: true
     };
-    const store = new StudentCardStore(
+    this.store = new StudentCardStore(
       this.props.studentId,
       this.props.courseId
     );
-    store.load();
-    store.onChange = () => this.setState(this.mungeState(store.getState()));
+    this.store.load();
+    this.store.onChange = () =>
+      this.setState(this.mungeState(this.store.getState()));
+  }
+
+  componentWillUnmount() {
+    this.store.onChange = null;
   }
 
   mungeState(state) {

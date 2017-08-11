@@ -46,9 +46,6 @@ import StudentContextTray from 'jsx/context_cards/RestStudentContextTray'
           courseId={courseId}
           studentId={studentId}
           returnFocusTo={returnFocusToHandler}
-          onClose={() => {
-            ReactDOM.unmountComponentAtNode(container)
-          }}
         />, container
       )
     }
