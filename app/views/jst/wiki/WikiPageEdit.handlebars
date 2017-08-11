@@ -17,6 +17,9 @@
     {{#if CAN.EDIT_TITLE}}
       <label for="title" class="screenreader-only">{{#t "title_label"}}Page Title{{/t}}</label>
       <input id="title" name="title" type="text" class="span4 title" value="{{title}}" maxlength="255" autofocus>
+      {{#if IS_CONTENT_BANK}}
+      <p>Please note: title changes will NOT automatically update linked pages since that would break links. If you want to change them, you'll have to do each independently.</p>
+      {{/if}}
     {{else}}
       <h2>{{title}}</h2>
     {{/if}}

@@ -74,6 +74,7 @@ define [
         EDIT_ROLES: !!@WIKI_RIGHTS.manage
       json.SHOW =
         COURSE_ROLES: json.contextName == "courses"
+      json.IS_CONTENT_BANK = json.contextId == "1"
 
       json.assignment = json.assignment?.toView()
 
