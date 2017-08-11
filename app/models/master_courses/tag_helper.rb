@@ -46,6 +46,7 @@ module MasterCourses::TagHelper
     if content.is_a?(Assignment) && submittable = content.submittable_object
       content = submittable # use one child tag
     end
+    return unless content && content.persisted?
 
     if @content_tag_index
       tag = (@content_tag_index[content.class.base_class.name] || {})[content.id]

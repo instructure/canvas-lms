@@ -41,7 +41,7 @@ describe SIS::CSV::UserObserverImporter do
     expect(importer.errors).to eq []
     warnings = importer.warnings.map(&:last)
     expect(warnings).to eq ["An observer referenced a non-existent user no_observer",
-                            "Can't observe yourself",
+                            "Can't observe yourself user U001",
                             "A student referenced a non-existent user no_student",
                             "No observer_id given for a user observer",
                             "No user_id given for a user observer",

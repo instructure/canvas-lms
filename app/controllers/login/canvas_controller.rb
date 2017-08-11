@@ -84,6 +84,7 @@ class Login::CanvasController < ApplicationController
         pseudonym.instance_variable_set(:@ldap_result, res.first)
         @pseudonym_session = PseudonymSession.new(pseudonym, params[:pseudonym_session][:remember_me] == "1")
         @pseudonym_session.save
+        session[:login_aac] = aac.id
       end
     end
 
@@ -113,6 +114,9 @@ class Login::CanvasController < ApplicationController
     if found
       # Call for some cleanups that should be run when a user logs in
       user = pseudonym.login_assertions_for_user
+      session[:login_aac] ||= pseudonym.authentication_provider ||
+        @domain_root_account.canvas_authentication_provider ||
+        @domain_root_account.authentication_providers.active.where(auth_type: 'ldap').first
       successful_login(user, pseudonym)
     else
       unsuccessful_login t("Invalid username or password")

@@ -50,4 +50,8 @@ class AccountAuthorizationConfig::Canvas < AccountAuthorizationConfig
   def self_registration
     jit_provisioning? ? auth_filter : 'none'
   end
+
+  def user_logout_redirect(controller, _current_user)
+    controller.login_canvas_url unless controller.instance_variable_get(:@domain_root_account).auth_discovery_url
+  end
 end

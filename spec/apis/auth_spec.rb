@@ -300,6 +300,14 @@ describe "API Authentication", type: :request do
         expect(response).to be_client_error
       end
 
+      it "works when the user logs in via a session_token" do
+        flow do
+          follow_redirect!
+          expect(response).to redirect_to(canvas_login_url)
+          get root_url, params: { session_token: SessionToken.new(@pseudonym.id) }
+        end
+      end
+
       context "sharding" do
         specs_require_sharding
 
