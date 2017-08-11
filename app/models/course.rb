@@ -473,7 +473,7 @@ class Course < ActiveRecord::Base
   end
 
   def readable_license
-    license_data[:readable_license]
+    license_data[:readable_license].call
   end
 
   def unpublishable?
