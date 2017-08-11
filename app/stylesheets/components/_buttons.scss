@@ -274,7 +274,7 @@ input[type="button"] {
 .btn-info, // <-- deprecated- do not use
 .Button--secondary {
   @if $use_high_contrast {
-    @include canvas-button($ic-brand-button--secondary-bgd, $ic-brand-button--secondary-text);
+    @include canvas-button($ic-color-dark, $ic-color-light);
   } @else {
     @include canvas-button(
       var(--ic-brand-button--secondary-bgd),
