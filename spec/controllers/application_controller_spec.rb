@@ -963,7 +963,7 @@ describe CoursesController do
       @course.show_announcements_on_home_page = true
       @course.home_page_announcement_limit = 5
       @course.save!
-      @course.wiki.wiki_pages.create!(:title => 'blah').set_as_front_page!
+      @course.wiki_pages.create!(:title => 'blah').set_as_front_page!
     end
 
     it "should populate js_env with course_home setting" do
@@ -990,13 +990,13 @@ describe CoursesController do
 
       @master_course = course_factory
       @template = MasterCourses::MasterTemplate.set_as_master_course(@course)
-      @master_page = @course.wiki.wiki_pages.create!(:title => "blah", :body => "bloo")
+      @master_page = @course.wiki_pages.create!(:title => "blah", :body => "bloo")
       @tag = @template.content_tag_for(@master_page)
 
       @child_course = course_factory
       @template.add_child_course!(@child_course)
 
-      @child_page = @child_course.wiki.wiki_pages.create!(:title => "bloo", :body => "bloo", :migration_id => @tag.migration_id)
+      @child_page = @child_course.wiki_pages.create!(:title => "bloo", :body => "bloo", :migration_id => @tag.migration_id)
     end
 
     it "should populate master-side data (unrestricted)" do

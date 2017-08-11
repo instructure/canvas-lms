@@ -224,7 +224,7 @@ module Canvas::Migration::Helpers
             when 'attachments'
               course_attachments_data(content_list, source)
             when 'wiki_pages'
-              source.wiki.wiki_pages.not_deleted.select("id, title, assignment_id").each do |item|
+              source.wiki_pages.not_deleted.select("id, title, assignment_id").each do |item|
                 content_list << course_item_hash(type, item)
               end
             when 'discussion_topics'
@@ -271,9 +271,7 @@ module Canvas::Migration::Helpers
             next if type == 'groups'
 
             count = 0
-            if type == 'wiki_pages'
-              count = source.wiki.wiki_pages.not_deleted.count
-            elsif type == 'discussion_topics'
+            if type == 'discussion_topics'
               count = source.discussion_topics.active.only_discussion_topics.count
             elsif type == 'learning_outcomes'
               count = source.linked_learning_outcomes.count

@@ -369,7 +369,7 @@ class CalendarEvent < ActiveRecord::Base
       just_created &&
       context == appointment_group.participant_for(@updating_user)
     }
-    data { {:updating_user => @updating_user} }
+    data { {:updating_user_name => @updating_user.name} }
 
     dispatch :appointment_canceled_by_user
     to { appointment_group.instructors +
@@ -382,7 +382,7 @@ class CalendarEvent < ActiveRecord::Base
       context == appointment_group.participant_for(@updating_user)
     }
     data { {
-      :updating_user => @updating_user,
+      :updating_user_name => @updating_user.name,
       :cancel_reason => @cancel_reason
     } }
 
@@ -392,7 +392,7 @@ class CalendarEvent < ActiveRecord::Base
       appointment_group && parent_event &&
       just_created
     }
-    data { {:updating_user => @updating_user} }
+    data { {:updating_user_name => @updating_user.name} }
 
     dispatch :appointment_deleted_for_user
     to { participants(include_observers: true) - [@updating_user] }
@@ -402,7 +402,7 @@ class CalendarEvent < ActiveRecord::Base
       workflow_state_changed?
     }
     data { {
-      :updating_user => @updating_user,
+      :updating_user_name => @updating_user.name,
       :cancel_reason => @cancel_reason
     } }
   end

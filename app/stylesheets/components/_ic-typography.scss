@@ -179,7 +179,13 @@ h3, .h3 {
 
 a {
   color: $ic-link-color;
-  &:focus, &:hover { color: darken($ic-link-color, 10%); }
+  &:focus, &:hover {
+    @if $use_high_contrast {
+      color: darken($ic-link-color, 10%);
+    } @else {
+      color: var(--ic-link-color-darkened-10);
+     }
+  }
 
   @if $use_high_contrast {
     text-decoration: underline;

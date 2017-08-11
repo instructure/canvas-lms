@@ -32,7 +32,7 @@ a#accessibility_warning {
   border-radius: 0.25rem;
 
   // from app/stylesheets/vendor/bootstrap/_forms.scss .uneditable-input:focus
-  border: 1px solid lighten($ic-link-color, 10%);
+  border: 1px solid $ic-link-color-lightened-10;
   outline: 0;
 }
 

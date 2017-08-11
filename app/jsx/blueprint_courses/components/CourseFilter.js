@@ -51,13 +51,19 @@ export default class CourseFilter extends React.Component {
     }
   }
 
+  componentDidUpdate (prevProps, prevState) {
+    if (prevState.search !== this.state.search ||
+        prevState.term !== this.state.term ||
+        prevState.subAccount !== this.state.subAccount) {
+      this.props.onChange(this.state)
+    }
+  }
+
   onChange = () => {
     this.setState({
       search: this.getSearchText(),
       term: this.termInput.value,
       subAccount: this.subAccountInput.value,
-    }, () => {
-      this.props.onChange(this.state)
     })
   }
 

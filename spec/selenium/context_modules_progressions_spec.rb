@@ -290,7 +290,7 @@ describe "context modules" do
     end
 
     it "should show student progress once wiki page-view requirement is met", priority: "1", test_id: 126700 do
-      @wiki_page = @course.wiki.wiki_pages.create!(title: 'Wiki Page')
+      @wiki_page = @course.wiki_pages.create!(title: 'Wiki Page')
       tag = @module1.add_item(id: @wiki_page.id, type: 'wiki_page')
       add_requirement({tag.id => {type: 'must_view'}})
       wait_for_ajaximations
@@ -299,7 +299,7 @@ describe "context modules" do
     end
 
     it "should show student progress once wiki page-contribute requirement is met", priority: "1", test_id: 126699 do
-      @wiki_page = @course.wiki.wiki_pages.create(title: "Wiki_page", editing_roles: "public", notify_of_update: true)
+      @wiki_page = @course.wiki_pages.create(title: "Wiki_page", editing_roles: "public", notify_of_update: true)
       tag = @module1.add_item(id: @wiki_page.id, type: 'wiki_page')
       add_requirement({tag.id => {type: 'must_contribute'}})
       get "/courses/#{@course.id}/pages/#{@wiki_page.title}/edit"

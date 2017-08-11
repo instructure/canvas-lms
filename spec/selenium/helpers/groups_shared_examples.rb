@@ -131,17 +131,17 @@ shared_examples 'pages_page' do |context|
   include SharedExamplesCommon
 
   it "should load pages index and display all pages", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273610, teacher: 324927) do
-    @testgroup.first.wiki.wiki_pages.create!(title: "Page 1", user: @teacher)
-    @testgroup.first.wiki.wiki_pages.create!(title: "Page 2", user: @teacher)
+    @testgroup.first.wiki_pages.create!(title: "Page 1", user: @teacher)
+    @testgroup.first.wiki_pages.create!(title: "Page 2", user: @teacher)
     get pages_page
     expect(ff('.collectionViewItems .clickable').size).to eq 2
   end
 
   it "should only list in-group pages in the content right pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273620, teacher: 324928) do
     # create group and course announcements
-    group_page = @testgroup.first.wiki.wiki_pages.create!(user: @teacher,
+    group_page = @testgroup.first.wiki_pages.create!(user: @teacher,
                                                           title: 'Group Page')
-    course_page = @course.wiki.wiki_pages.create!(user: @teacher,
+    course_page = @course.wiki_pages.create!(user: @teacher,
                                                   title: 'Course Page')
 
     get pages_page

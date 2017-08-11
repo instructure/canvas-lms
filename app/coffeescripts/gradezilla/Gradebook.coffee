@@ -78,6 +78,7 @@ define [
   'compiled/gradezilla/GradebookKeyboardNav'
   'jsx/gradezilla/shared/AssignmentMuterDialogManager'
   'jsx/gradezilla/shared/helpers/assignmentHelper'
+  'jsx/grading/LatePolicyApplicator'
   'instructure-ui/lib/components/Button'
   'instructure-icons/lib/Solid/IconSettingsSolid'
   'jquery.ajaxJSON'
@@ -106,7 +107,7 @@ define [
   GridColor, StatusesModal, SubmissionTray, GradebookSettingsModal, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp,
   SubmissionStateMap,
   DownloadSubmissionsDialogManager,ReuploadSubmissionsDialogManager, GradebookKeyboardNav,
-  AssignmentMuterDialogManager, assignmentHelper, { default: Button }, { default: IconSettingsSolid }) ->
+  AssignmentMuterDialogManager, assignmentHelper, LatePolicyApplicator, { default: Button }, { default: IconSettingsSolid }) ->
 
   isAdmin = =>
     _.contains(ENV.current_user_roles, 'admin')
@@ -125,6 +126,14 @@ define [
       (sum, assignment) -> sum + (assignment.points_possible || 0),
       0
     )
+
+  ASSIGNMENT_KEY_REGEX = /^assignment_(?!group)/
+  forEachSubmission = (students, fn) ->
+    Object.keys(students).forEach (studentIdx) =>
+      student = students[studentIdx]
+      Object.keys(student).forEach (key) =>
+        if key.match ASSIGNMENT_KEY_REGEX
+          fn(student[key])
 
   ## Gradebook Display Settings
   getInitialGridDisplaySettings = (settings, colors) ->
@@ -183,13 +192,15 @@ define [
       studentsLoaded: false
       submissionsLoaded: false
       teacherNotesColumnUpdating: false
+      submissionUpdating: false
     }
 
-  getInitialCourseContent = () ->
+  getInitialCourseContent = (options) ->
     {
       contextModules: []
       gradingPeriodAssignments: {}
       assignmentStudentVisibility: {}
+      latePolicy: ConvertCase.camelize(options.late_policy) if options.late_policy
     }
 
   class Gradebook
@@ -225,7 +236,7 @@ define [
     # End of constructor
 
     setInitialState: =>
-      @courseContent = getInitialCourseContent()
+      @courseContent = getInitialCourseContent(@options)
       @gridDisplaySettings = getInitialGridDisplaySettings(@options.settings, @options.colors)
       @contentLoadStates = getInitialContentLoadStates()
       @headerComponentRefs = {}
@@ -884,7 +895,7 @@ define [
       @updateRowCellsForStudentIds(_.uniq(changedStudentIds))
 
     submissionsForStudent: (student) =>
-      allSubmissions = (value for key, value of student when key.match /^assignment_(?!group)/)
+      allSubmissions = (value for key, value of student when key.match ASSIGNMENT_KEY_REGEX)
       return allSubmissions unless @gradingPeriodSet?
       return allSubmissions unless @isFilteringColumnsByGradingPeriod()
 
@@ -1344,6 +1355,7 @@ define [
         courseId: @options.context_id
         locale: @options.locale
         onClose: => @gradebookSettingsModalButton.focus()
+        onLatePolicyUpdate: @onLatePolicyUpdate
         newGradebookDevelopmentEnabled: @options.new_gradebook_development_enabled
         gradedLateOrMissingSubmissionsExist: @options.graded_late_or_missing_submissions_exist
       @gradebookSettingsModal = renderComponent(
@@ -1779,7 +1791,7 @@ define [
     getColumnTypeForColumnId: (columnId) =>
       if columnId.match /^custom_col/
         return 'custom_column'
-      else if columnId.match /^assignment_(?!group)/
+      else if columnId.match ASSIGNMENT_KEY_REGEX
         return 'assignment'
       else if columnId.match /^assignment_group/
         return 'assignment_group'
@@ -2237,6 +2249,7 @@ define [
         key: "submission_tray_#{studentId}_#{assignmentId}"
         colors: @getGridColors()
         isOpen: open
+        latePolicy: @courseContent.latePolicy
         locale: @options.locale
         onRequestClose: @closeSubmissionTray
         onClose: => @gridSupport.helper.focus()
@@ -2248,7 +2261,8 @@ define [
         submission: ConvertCase.camelize(submission)
         courseId: @options.context_id
         speedGraderEnabled: @options.speed_grader_enabled
-      props.latePolicy = ConvertCase.camelize(@options.late_policy) if @options.late_policy
+        submissionUpdating: @contentLoadStates.submissionUpdating
+        updateSubmission: @updateSubmissionAndRenderSubmissionTray
       renderComponent(SubmissionTray, mountPoint, props)
 
     updateRowAndRenderSubmissionTray: (studentId) =>
@@ -2308,6 +2322,9 @@ define [
     setSubmissionsLoaded: (loaded) =>
       @contentLoadStates.submissionsLoaded = loaded
 
+    setSubmissionUpdating: (loaded) =>
+      @contentLoadStates.submissionUpdating = loaded
+
     setTeacherNotesColumnUpdating: (updating) =>
       @contentLoadStates.teacherNotesColumnUpdating = updating
 
@@ -2342,6 +2359,9 @@ define [
       return '0' unless @gradingPeriodSet?
       periodId = @getFilterColumnsBySetting('gradingPeriodId') || @options.current_grading_period_id
       if periodId in _.pluck(@gradingPeriodSet.gradingPeriods, 'id') then periodId else '0'
+
+    getGradingPeriod: (gradingPeriodId) =>
+      (@gradingPeriodSet?.gradingPeriods || []).find((gradingPeriod) => gradingPeriod.id == gradingPeriodId)
 
     setSelectedPrimaryInfo: (primaryInfo, skipRedraw) =>
       @gridDisplaySettings.selectedPrimaryInfo = primaryInfo
@@ -2471,6 +2491,29 @@ define [
 
       contextModules
 
+    onLatePolicyUpdate: (latePolicy) =>
+      @setLatePolicy(latePolicy)
+      @applyLatePolicy()
+
+    setLatePolicy: (latePolicy) =>
+      @courseContent.latePolicy = latePolicy
+
+    applyLatePolicy: =>
+      latePolicy = @courseContent?.latePolicy
+      gradingStandard = @options.grading_standard || @options.default_grading_standard
+      studentsToInvalidate = {}
+
+      forEachSubmission(@students, (submission) =>
+        assignment = @assignments[submission.assignment_id]
+        return if @getGradingPeriod(submission.grading_period_id)?.isClosed
+        if LatePolicyApplicator.processSubmission(submission, assignment, gradingStandard, latePolicy)
+          studentsToInvalidate[submission.user_id] = true
+      )
+      studentIds = _.uniq(Object.keys(studentsToInvalidate))
+      studentIds.forEach (studentId) =>
+        @calculateStudentGrade(@students[studentId])
+      @invalidateRowsForStudentIds(studentIds)
+
     getContextModule: (contextModuleId) =>
       @courseContent.modulesById?[contextModuleId] if contextModuleId?
 
@@ -2581,3 +2624,19 @@ define [
             $.flashError I18n.t('There was a problem showing the teacher notes column.')
           @setTeacherNotesColumnUpdating(false)
           @renderViewOptionsMenu()
+
+    updateSubmissionAndRenderSubmissionTray: (data) =>
+      { studentId, assignmentId } = @getSubmissionTrayState()
+      student = @student(studentId)
+      @setSubmissionUpdating(true)
+      @renderSubmissionTray(student)
+      GradebookApi.updateSubmission(@options.context_id, assignmentId, studentId, data)
+        .then((response) =>
+          @setSubmissionUpdating(false)
+          @updateSubmissionsFromExternal(response.data.all_submissions)
+          @renderSubmissionTray(student)
+        ).catch(=>
+          @setSubmissionUpdating(false)
+          $.flashError I18n.t('There was a problem updating the submission.')
+          @renderSubmissionTray(student)
+        )

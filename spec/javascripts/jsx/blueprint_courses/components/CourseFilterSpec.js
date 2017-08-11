@@ -81,3 +81,31 @@ test('onActivate fires when filters are focussed', () => {
   input.simulate('focus')
   ok(props.onActivate.calledOnce)
 })
+
+test('onChange not fired when < 3 chars are entered in search text input', (assert) => {
+  const done = assert.async()
+  const props = defaultProps()
+  props.onChange = sinon.spy()
+  const tree = enzyme.mount(<CourseFilter {...props} />)
+  const input = tree.find('input[type="search"]')
+  input.node.value = 'aa'
+  input.simulate('change')
+  setTimeout(() => {
+    equal(props.onChange.callCount, 0)
+    done()
+  }, 0)
+})
+
+test('onChange fired when 3 chars are entered in search text input', (assert) => {
+  const done = assert.async()
+  const props = defaultProps()
+  props.onChange = sinon.spy()
+  const tree = enzyme.mount(<CourseFilter {...props} />)
+  const input = tree.find('input[type="search"]')
+  input.node.value = 'aaa'
+  input.simulate('change')
+  setTimeout(() => {
+    ok(props.onChange.calledOnce)
+    done()
+  }, 0)
+})

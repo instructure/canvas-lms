@@ -897,7 +897,18 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 }
 
 #deduction-box {
+  display: flex;
   margin: 0 .25em;
+
+  &.hidden {
+    display: none;
+  }
+  .deduction-box-labels {
+    margin-right: .5em;
+  }
+  .deduction-box-values {
+    flex: 1
+  }
   .error {
     color: $ic-color-danger;
     margin-right: 1em;

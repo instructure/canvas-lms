@@ -89,9 +89,9 @@ describe Course do
 
       # wiki pages tests
       migration_ids = ["1865116206002", "1865116207002"].sort
-      added_migration_ids = @course.wiki.wiki_pages.map(&:migration_id).uniq.sort
+      added_migration_ids = @course.wiki_pages.map(&:migration_id).uniq.sort
       expect(added_migration_ids).to eq(migration_ids)
-      expect(@course.wiki.wiki_pages.length).to eq(migration_ids.length)
+      expect(@course.wiki_pages.length).to eq(migration_ids.length)
       # front page
       page = @course.wiki.front_page
       expect(page).not_to be_nil

@@ -169,10 +169,12 @@ Rails.configuration.after_initialize do
                                   :refresh_providers)
     end
 
-    Delayed::Periodic.cron 'AccountAuthorizationConfig::SAML::InCommon.refresh_providers', '45 0 * * *' do
-      DatabaseServer.send_in_each_region(AccountAuthorizationConfig::SAML::InCommon,
-                                  :refresh_providers,
-                                  singleton: 'AccountAuthorizationConfig::SAML::InCommon.refresh_providers')
+    AccountAuthorizationConfig::SAML::Federation.descendants.each do |federation|
+      Delayed::Periodic.cron "AccountAuthorizationConfig::SAML::#{federation.class_name}.refresh_providers", '45 0 * * *' do
+        DatabaseServer.send_in_each_region(federation,
+                                    :refresh_providers,
+                                    singleton: "AccountAuthorizationConfig::SAML::#{federation.class_name}.refresh_providers")
+      end
     end
   end
 

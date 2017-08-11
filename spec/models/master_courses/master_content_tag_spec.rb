@@ -27,7 +27,7 @@ describe MasterCourses::MasterContentTag do
     it "should match the generated migration_ids from CCHelper" do
       ann = @course.announcements.create!(:message => "blah")
       topic = @course.discussion_topics.create!
-      page = @course.wiki.wiki_pages.create!(:title => "blah")
+      page = @course.wiki_pages.create!(:title => "blah")
 
       [ann, topic, page].each do |content|
         expect(@template.create_content_tag_for!(content).migration_id).to eq @template.migration_id_for(content)

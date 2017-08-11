@@ -26,6 +26,7 @@ import round from 'compiled/util/round';
 import fakeENV from 'helpers/fakeENV';
 import { createCourseGradesWithGradingPeriods as createGrades } from 'spec/jsx/gradebook/GradeCalculatorSpecHelper';
 import { createGradebook } from 'spec/jsx/gradezilla/default_gradebook/GradebookSpecHelper';
+import LatePolicyApplicator from 'jsx/grading/LatePolicyApplicator';
 import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator';
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
 import DataLoader from 'jsx/gradezilla/DataLoader';
@@ -324,6 +325,11 @@ test('sets the submissions as not loaded', function () {
   strictEqual(gradebook.contentLoadStates.submissionsLoaded, false);
 });
 
+test('sets submissionUpdating to false', function () {
+  const gradebook = this.createInitializedGradebook();
+  strictEqual(gradebook.contentLoadStates.submissionUpdating, false);
+});
+
 test('calls DataLoader.loadGradebookData', function () {
   this.createInitializedGradebook();
   strictEqual(DataLoader.loadGradebookData.callCount, 1);
@@ -358,6 +364,16 @@ test('stores student ids when loaded', function () {
   const studentIds = ['1101', '1102', '1103'];
   this.loaderPromises.gotStudentIds.resolve({ user_ids: studentIds });
   equal(gradebook.courseContent.students.listStudentIds(), studentIds);
+});
+
+test('stores the late policy with camelized keys, if one exists', function () {
+  const gradebook = this.createInitializedGradebook({ late_policy: { late_submission_interval: 'hour' } });
+  deepEqual(gradebook.courseContent.latePolicy, { lateSubmissionInterval: 'hour' });
+});
+
+test('stores the late policy as undefined if the late_policy option is null', function () {
+  const gradebook = this.createInitializedGradebook({ late_policy: null });
+  strictEqual(gradebook.courseContent.latePolicy, undefined);
 });
 
 test('builds rows when student ids are loaded', function () {
@@ -7107,4 +7123,150 @@ QUnit.module('Gradebook Assignment Actions', function (suiteHooks) {
       equal(typeof action.onSelect, 'function');
     });
   });
+});
+
+QUnit.module('Gradebook#setLatePolicy', {
+  setup () {
+    this.gradebook = createGradebook();
+  }
+});
+
+test('sets the late policy state', function () {
+  const latePolicy = { lateSubmissionInterval: 'day' };
+  this.gradebook.setLatePolicy(latePolicy);
+  deepEqual(this.gradebook.courseContent.latePolicy, latePolicy);
+});
+
+QUnit.module('Gradebook#applyLatePolicy', {
+  setup () {
+    this.gradingStandard = [['A', 0]];
+    this.gradebook = createGradebook({ grading_standard: this.gradingStandard });
+    this.gradebook.gradingPeriodSet = { gradingPeriods: [{ id: 100, isClosed: true }, { id: 101, isClosed: false }] };
+    this.latePolicyApplicator = this.stub(LatePolicyApplicator, 'processSubmission');
+
+    this.submission1 = {
+      user_id: 10,
+      assignment_id: 'assignment_1',
+      grading_period_id: null
+    };
+
+    this.submission2 = {
+      user_id: 10,
+      assignment_id: 'assignment_2',
+      grading_period_id: 100
+    };
+
+    this.submission3 = {
+      user_id: 11,
+      assignment_id: 'assignment_2',
+      grading_period_id: 101
+    };
+
+    this.gradebook.assignments = { assignment_1: 'assignment1value', assignment_2: 'assignment2value' };
+    this.gradebook.students = {
+      10: {
+        assignment_1: this.submission1,
+        assignment_2: this.submission2
+      },
+      11: {
+        assignment_2: this.submission3
+      }
+    }
+    this.gradebook.courseContent.latePolicy = 'latepolicy';
+  }
+});
+
+test('does not affect submissions in closed grading periods', function () {
+  this.gradebook.applyLatePolicy();
+  notOk(this.latePolicyApplicator.calledWith(this.submission2, 'assignment2value', this.gradingStandard, 'latepolicy'));
+});
+
+test('affects submissions that are not in a grading period', function () {
+  this.gradebook.applyLatePolicy();
+  ok(this.latePolicyApplicator.calledWith(this.submission1, 'assignment1value', this.gradingStandard, 'latepolicy'));
+});
+
+test('affects submissions that are in not-closed grading periods', function () {
+  this.gradebook.applyLatePolicy();
+  ok(this.latePolicyApplicator.calledWith(this.submission3, 'assignment2value', this.gradingStandard, 'latepolicy'));
+});
+
+QUnit.module('Gradebook#setSubmissionUpdating', {
+  setup () {
+    this.gradebook = createGradebook();
+  }
+});
+
+test('sets the submission updating state', function () {
+  this.gradebook.setSubmissionUpdating(true);
+  strictEqual(this.gradebook.contentLoadStates.submissionUpdating, true);
+});
+
+QUnit.module('Gradebook#updateSubmissionAndRenderSubmissionTray', {
+  setup () {
+    this.gradebook = createGradebook();
+    this.promise = {
+      then (thenFn) {
+        this.thenFn = thenFn;
+        return this;
+      },
+
+      catch (catchFn) {
+        this.catchFn = catchFn;
+        return this;
+      }
+    };
+
+    this.stub(GradebookApi, 'updateSubmission').returns(this.promise);
+  }
+});
+
+test('sets the submission as updating before sending the request', function () {
+  this.stub(this.gradebook, 'renderSubmissionTray');
+  this.gradebook.updateSubmissionAndRenderSubmissionTray({ submission: { late_policy_status: 'none' } });
+  strictEqual(this.gradebook.contentLoadStates.submissionUpdating, true);
+});
+
+test('renders the tray before sending the request', function () {
+  this.stub(this.gradebook, 'renderSubmissionTray');
+  this.gradebook.updateSubmissionAndRenderSubmissionTray({ submission: { late_policy_status: 'none' } });
+  strictEqual(this.gradebook.renderSubmissionTray.callCount, 1);
+});
+
+test('on success the submission is not in an updating state', function () {
+  this.stub(this.gradebook, 'renderSubmissionTray');
+  this.stub(this.gradebook, 'updateSubmissionsFromExternal');
+  this.gradebook.updateSubmissionAndRenderSubmissionTray({ submission: { late_policy_status: 'none' } });
+  this.promise.thenFn({ data: { all_submissions: [{ id: '293', late_policy_status: 'none' }] } });
+  strictEqual(this.gradebook.contentLoadStates.submissionUpdating, false);
+});
+
+test('on success the tray has been rendered a second time', function () {
+  this.stub(this.gradebook, 'renderSubmissionTray');
+  this.stub(this.gradebook, 'updateSubmissionsFromExternal');
+  this.gradebook.updateSubmissionAndRenderSubmissionTray({ submission: { late_policy_status: 'none' } });
+  this.promise.thenFn({ data: { all_submissions: [{ id: '293', late_policy_status: 'none' }] } });
+  strictEqual(this.gradebook.renderSubmissionTray.callCount, 2);
+});
+
+test('on failure the submission is not in an updating state', function () {
+  this.stub(this.gradebook, 'renderSubmissionTray');
+  this.gradebook.updateSubmissionAndRenderSubmissionTray({ submission: { late_policy_status: 'none' } });
+  this.promise.catchFn(new Error('A failure'));
+  strictEqual(this.gradebook.contentLoadStates.submissionUpdating, false);
+});
+
+test('on failure the submission has been rendered a second time', function () {
+  this.stub(this.gradebook, 'renderSubmissionTray');
+  this.gradebook.updateSubmissionAndRenderSubmissionTray({ submission: { late_policy_status: 'none' } });
+  this.promise.catchFn(new Error('A failure'));
+  strictEqual(this.gradebook.renderSubmissionTray.callCount, 2);
+});
+
+test('on failure a flash error is triggered', function () {
+  this.stub(this.gradebook, 'renderSubmissionTray');
+  this.stub($, 'flashError');
+  this.gradebook.updateSubmissionAndRenderSubmissionTray({ submission: { late_policy_status: 'none' } });
+  this.promise.catchFn(new Error('A failure'));
+  strictEqual($.flashError.callCount, 1);
 });

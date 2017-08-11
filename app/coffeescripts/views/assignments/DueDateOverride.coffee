@@ -28,6 +28,7 @@ define [
   'jsx/due_dates/StudentGroupStore'
   'compiled/api/gradingPeriodsApi'
   'timezone'
+  'jquery.instructure_forms.js' # errorBox
 ], (
   $,
   Backbone,
@@ -40,7 +41,8 @@ define [
   DueDates,
   StudentGroupStore,
   GradingPeriodsAPI,
-  tz) ->
+  tz
+) ->
 
   class DueDateOverrideView extends Backbone.View
 
@@ -118,7 +120,7 @@ define [
       validRowKeys = _.pluck(data.assignment_overrides, "rowKey")
       blankOverrideMsg = I18n.t('blank_override', 'You must have a student or section selected')
       for row in $('.Container__DueDateRow-item')
-        rowKey = "#{$(row).data('row-key')}"
+        rowKey = "#{$(row).attr('data-row-key')}"
         continue if _.contains(validRowKeys, rowKey)
         identifier = 'tokenInputFor' + rowKey
         $inputWrapper = $('[data-row-identifier="'+identifier+'"]')[0]
@@ -143,7 +145,7 @@ define [
       invalidGroupOverrideRowKeys = _.pluck(invalidGroupOverrides, "rowKey")
       invalidGroupOverrideMessage = I18n.t('invalid_group_override', "You cannot assign to a group outside of the assignment's group set")
       for row in $('.Container__DueDateRow-item')
-        rowKey = "#{$(row).data('row-key')}"
+        rowKey = "#{$(row).attr('data-row-key')}"
         continue unless _.contains(invalidGroupOverrideRowKeys, rowKey)
         identifier = 'tokenInputFor' + rowKey
         $nameInput = $('[data-row-identifier="'+identifier+'"]').find("input")

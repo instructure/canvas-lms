@@ -373,8 +373,8 @@ class ContextModule < ActiveRecord::Base
     validated_reqs
   end
 
-  def completion_requirements_visible_to(user)
-    valid_ids = content_tags_visible_to(user).map(&:id)
+  def completion_requirements_visible_to(user, opts={})
+    valid_ids = content_tags_visible_to(user, opts).map(&:id)
     completion_requirements.select { |cr| valid_ids.include? cr[:id]  }
   end
 
@@ -464,7 +464,7 @@ class ContextModule < ActiveRecord::Base
     position = opts[:position] || (self.content_tags.not_deleted.maximum(:position) || 0) + 1
     position = [position, params[:position].to_i].max if params[:position]
     if params[:type] == "wiki_page" || params[:type] == "page"
-      item = opts[:wiki_page] || self.context.wiki.wiki_pages.where(id: params[:id]).first
+      item = opts[:wiki_page] || self.context.wiki_pages.where(id: params[:id]).first
     elsif params[:type] == "attachment" || params[:type] == "file"
       item = opts[:attachment] || self.context.attachments.not_deleted.find_by_id(params[:id])
     elsif params[:type] == "assignment"

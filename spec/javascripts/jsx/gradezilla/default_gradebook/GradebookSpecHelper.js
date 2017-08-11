@@ -37,6 +37,7 @@ export function createGradebook (options = {}) {
       show_concluded_enrollments: 'false',
       show_inactive_enrollments: 'false'
     },
+    closed_grading_period_ids: [],
     ...options
   });
   gradebook.keyboardNav = {

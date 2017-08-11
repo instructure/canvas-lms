@@ -371,6 +371,7 @@ class GradebooksController < ApplicationController
           @context.grading_standard_enabled? &&
           (@context.grading_standard.try(:data) || GradingStandard.default_grading_standard)
         ),
+        default_grading_standard: GradingStandard.default_grading_standard,
         course_is_concluded: @context.completed?,
         course_name: @context.name,
         gradebook_is_editable: @gradebook_is_editable,

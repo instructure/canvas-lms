@@ -383,8 +383,6 @@ class MasterCourses::MasterTemplatesController < ApplicationController
 
     scope =
       case content_type
-      when 'wiki_page'
-        @course.wiki.wiki_pages.not_deleted
       when 'external_tool'
         @course.context_external_tools.active
       when 'attachment'
@@ -430,8 +428,6 @@ class MasterCourses::MasterTemplatesController < ApplicationController
       item_scope = case klass
       when 'Attachment'
         @course.attachments
-      when 'WikiPage'
-        @course.wiki.wiki_pages
       when 'Assignment'
         @course.assignments.include_submittables
       when 'DiscussionTopic'

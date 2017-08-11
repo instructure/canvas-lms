@@ -21,11 +21,11 @@ describe MasterCourses::Restrictor do
   before :once do
     @copy_from = course_factory
     @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
-    @original_page = @copy_from.wiki.wiki_pages.create!(:title => "blah", :body => "bloo")
+    @original_page = @copy_from.wiki_pages.create!(:title => "blah", :body => "bloo")
     @tag = @template.create_content_tag_for!(@original_page)
 
     @copy_to = course_factory
-    @page_copy = @copy_to.wiki.wiki_pages.new(:title => "blah", :body => "bloo") # just create a copy directly instead of doing a real migraiton
+    @page_copy = @copy_to.wiki_pages.new(:title => "blah", :body => "bloo") # just create a copy directly instead of doing a real migraiton
     @page_copy.migration_id = @tag.migration_id
     @page_copy.save!
     @page_copy.child_content_restrictions = nil
@@ -111,10 +111,10 @@ describe MasterCourses::Restrictor do
 
   describe "preload_child_restrictions" do
     it "should bulk preload restrictions in a single query" do
-      page2 = @copy_from.wiki.wiki_pages.create!(:title => "blah2")
+      page2 = @copy_from.wiki_pages.create!(:title => "blah2")
       tag2 = @template.create_content_tag_for!(page2, {:restrictions => {:content => true}})
 
-      page2_copy = @copy_to.wiki.wiki_pages.new(:title => "blah2") # just create a copy directly instead of doing a real migraiton
+      page2_copy = @copy_to.wiki_pages.new(:title => "blah2") # just create a copy directly instead of doing a real migraiton
       page2_copy.migration_id = tag2.migration_id
       page2_copy.save!
 
@@ -128,7 +128,7 @@ describe MasterCourses::Restrictor do
 
   describe "preload_default_template_restrictions" do
     it "should bulk preload master-side restrictions in a single query" do
-      page2 = @copy_from.wiki.wiki_pages.create!(:title => "blah2")
+      page2 = @copy_from.wiki_pages.create!(:title => "blah2")
       tag2 = @template.create_content_tag_for!(page2, {:restrictions => {:content => true}})
 
       # should also work for associated assignments (since they share a master content tag)

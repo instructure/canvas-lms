@@ -315,10 +315,10 @@ describe "context modules" do
 
     it "should not create a duplicate page if you publish after renaming" do
       mod = @course.context_modules.create! name: 'TestModule'
-      page = @course.wiki.wiki_pages.create title: 'A Page'
+      page = @course.wiki_pages.create title: 'A Page'
       page.workflow_state = 'unpublished'
       page.save!
-      page_count = @course.wiki.wiki_pages.count
+      page_count = @course.wiki_pages.count
       tag = mod.add_item({:id => page.id, :type => 'wiki_page'})
 
       get "/courses/#{@course.id}/modules"
@@ -332,7 +332,7 @@ describe "context modules" do
       item.find_element(:css, '.publish-icon').click
       wait_for_ajax_requests
 
-      expect(@course.wiki.wiki_pages.count).to eq page_count
+      expect(@course.wiki_pages.count).to eq page_count
       expect(page.reload).to be_published
     end
 

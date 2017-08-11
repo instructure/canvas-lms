@@ -4,7 +4,8 @@ const karmaConfig = {
   frameworks: ['qunit'],
 
   proxies: {
-    '/dist/brandable_css/': '/base/public/dist/brandable_css/'
+    '/dist/brandable_css/': '/base/public/dist/brandable_css/',
+    '/images/': '/base/public/images/'
   },
 
   exclude: [],

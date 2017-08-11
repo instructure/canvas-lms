@@ -27,7 +27,7 @@ class Quizzes::QuizStatistics::ItemAnalysis::Summary
     @items = {}
     attempts_query = quiz.quiz_submissions.for_students(quiz)
     if param_options[:section_ids].present?
-      user_ids = Enrollment.active.where(course_section_id: param_options[:section_ids], course_id: quiz.context).uniq.pluck(:user_id)
+      user_ids = Enrollment.active.where(course_section_id: param_options[:section_ids], course_id: quiz.context).distinct.pluck(:user_id)
       attempts_query = attempts_query.where(user_id: user_ids)
     end
     @attempts = attempts_query.map { |qs| qs.submitted_attempts.first }.compact

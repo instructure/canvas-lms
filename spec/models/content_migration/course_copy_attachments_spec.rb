@@ -88,7 +88,7 @@ describe ContentMigration do
       asmnt_des = %{<a href="/courses/%s/files/%s/preview">First file</a>}
       wiki_body = %{<img src="/courses/%s/files/%s/preview">}
       asmnt = @copy_from.assignments.create!(:points_possible => 40, :grading_type => 'points', :description=>(asmnt_des % [@copy_from.id, att.id]), :title => "assignment")
-      wiki = @copy_from.wiki.wiki_pages.create!(:title => "wiki", :body => (wiki_body % [@copy_from.id, att2.id]))
+      wiki = @copy_from.wiki_pages.create!(:title => "wiki", :body => (wiki_body % [@copy_from.id, att2.id]))
 
       # don't mark the attachments
       @cm.copy_options = {
@@ -105,7 +105,7 @@ describe ContentMigration do
       expect(att2_2).not_to be_nil
 
       expect(@copy_to.assignments.first.description).to eq asmnt_des % [@copy_to.id, att_2.id]
-      expect(@copy_to.wiki.wiki_pages.first.body).to eq wiki_body % [@copy_to.id, att2_2.id]
+      expect(@copy_to.wiki_pages.first.body).to eq wiki_body % [@copy_to.id, att2_2.id]
     end
 
     it "should preserve links to re-uploaded attachments" do
@@ -114,7 +114,7 @@ describe ContentMigration do
       new_att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       expect(@copy_from.attachments.find(att.id)).to eq new_att
 
-      page = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => "<a href='/courses/#{@copy_from.id}/files/#{att.id}/download?wrap=1'>link</a>")
+      page = @copy_from.wiki_pages.create!(:title => "some page", :body => "<a href='/courses/#{@copy_from.id}/files/#{att.id}/download?wrap=1'>link</a>")
 
       @cm.copy_options = { :wiki_pages => {mig_id(page) => "1"}}
       @cm.save!
@@ -122,7 +122,7 @@ describe ContentMigration do
       run_course_copy
 
       att2 = @copy_to.attachments.where(filename: 'first.png').first
-      page2 = @copy_to.wiki.wiki_pages.where(migration_id: mig_id(page)).first
+      page2 = @copy_to.wiki_pages.where(migration_id: mig_id(page)).first
       expect(page2.body).to include("<a href=\"/courses/#{@copy_to.id}/files/#{att2.id}/download?wrap=1\">link</a>")
     end
 

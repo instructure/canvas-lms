@@ -74,6 +74,13 @@ define [
     equal @cell.$input.val(), escapedDangerousHTML
     equal @cell.$input[0].defaultValue, escapedDangerousHTML
 
+  test "#loadValue uses entered_grade when available", ->
+    @opts.item.whatever.grade = '100'
+    @opts.item.whatever.entered_grade = '110'
+    @cell.loadValue()
+    equal @cell.$input.val(), '110'
+    equal @cell.$input[0].defaultValue, '110'
+
   test "#class.formatter rounds numbers if they are numbers", ->
     @stub(SubmissionCell.prototype, 'cellWrapper').withArgs('0.67').returns('ok')
     formattedResponse = SubmissionCell.formatter(0, 0, { grade: 0.666 }, {}, {})

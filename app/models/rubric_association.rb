@@ -45,6 +45,9 @@ class RubricAssociation < ActiveRecord::Base
   after_destroy :update_alignments
   after_save :assert_uniqueness
   after_save :update_alignments
+
+  before_create :touch_association
+  before_destroy :touch_association
   serialize :summary_data
 
   ValidAssociationModels = {
@@ -106,6 +109,14 @@ class RubricAssociation < ActiveRecord::Base
     end
     LearningOutcome.update_alignments(assignment, context, outcome_ids)
     true
+  end
+
+  def touch_association
+    if self.association_type == "Assignment"
+      self.class.connection.after_transaction_commit do
+        self.association_object.touch
+      end
+    end
   end
 
   def update_old_rubric

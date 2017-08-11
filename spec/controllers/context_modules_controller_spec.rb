@@ -398,10 +398,10 @@ describe ContextModulesController do
 
     it "should reorder unpublished items" do
       course_with_teacher_logged_in(active_all: true)
-      pageA = @course.wiki.wiki_pages.create title: "pageA"
+      pageA = @course.wiki_pages.create title: "pageA"
       pageA.workflow_state = 'unpublished'
       pageA.save
-      pageB = @course.wiki.wiki_pages.create! title: "pageB"
+      pageB = @course.wiki_pages.create! title: "pageB"
       m1 = @course.context_modules.create!
       tagB = m1.add_item({type: "wiki_page", id: pageB.id}, nil, position: 1)
       expect(tagB).to be_published
@@ -576,7 +576,7 @@ describe ContextModulesController do
       student_in_course(:active_all => true)
       @module = @course.context_modules.create!(:name => "first module")
       @module.publish
-      @wiki = @course.wiki.wiki_pages.create!(:title => "wiki", :body => 'hi')
+      @wiki = @course.wiki_pages.create!(:title => "wiki", :body => 'hi')
 
       @tag = @module.add_item(:id => @wiki.id, :type => 'wiki_page')
       @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
@@ -964,7 +964,7 @@ describe ContextModulesController do
     end
 
     it "should 404 if module item is not a graded type" do
-      page = @course.wiki.wiki_pages.create title: "test"
+      page = @course.wiki_pages.create title: "test"
       item = @mod.add_item type: 'page', id: page.id
 
       get 'item_redirect_mastery_paths', params: {:course_id => @course.id, :id => item.id}

@@ -123,7 +123,7 @@ describe MasterCourses::MasterTemplate do
       expect(@template.content_tag_for(@assignment).id).to eq old_tag_id
 
       # should still create a tag even if it's not found in the index
-      @page = @course.wiki.wiki_pages.create!(:title => "title")
+      @page = @course.wiki_pages.create!(:title => "title")
       page_tag = @template.content_tag_for(@page)
       expect(page_tag.reload.content).to eq @page
     end

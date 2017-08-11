@@ -176,7 +176,7 @@ describe ContextModule do
 
     it "should add a wiki page" do
       course_module
-      @page = @course.wiki.wiki_pages.create!(:title => "some page")
+      @page = @course.wiki_pages.create!(:title => "some page")
       @tag = @module.add_item({:id => @page.id, :type => 'wiki_page'}) #@page)
 
       expect(@tag.content).to eql(@page)
@@ -187,7 +187,7 @@ describe ContextModule do
       course_module
       @course.wiki
       other_course = Account.default.courses.create!
-      @page = other_course.wiki.wiki_pages.create!(:title => "new page")
+      @page = other_course.wiki_pages.create!(:title => "new page")
       @tag = @module.add_item({:id => @page.id, :type => 'wiki_page'})
       expect(@tag).to be_nil
     end
@@ -301,7 +301,7 @@ describe ContextModule do
     it "should not generate progressions for non-active modules" do
       student_in_course :active_all => true
       tehmod = @course.context_modules.create! :name => "teh module"
-      page = @course.wiki.wiki_pages.create! :title => "view this page"
+      page = @course.wiki_pages.create! :title => "view this page"
       tag = tehmod.add_item(:id => page.id, :type => 'wiki_page')
       tehmod.completion_requirements = { tag.id => {:type => 'must_view'} }
       tehmod.workflow_state = 'active'
@@ -323,7 +323,7 @@ describe ContextModule do
     it 'should not remove completed contribution requirements when viewed' do
       student_in_course(active_all: true)
       mod = @course.context_modules.create!(name: 'Module')
-      page = @course.wiki.wiki_pages.create!(title: 'Edit This Page')
+      page = @course.wiki_pages.create!(title: 'Edit This Page')
       tag = mod.add_item(id: page.id, type: 'wiki_page')
       mod.completion_requirements = [{ id: tag.id, type: 'must_contribute' }]
       mod.workflow_state = 'active'

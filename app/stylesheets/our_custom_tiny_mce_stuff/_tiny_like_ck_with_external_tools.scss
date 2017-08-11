@@ -27,13 +27,17 @@ $menu-item-keyboard-shortcut-color: $ic-font-color-dark;
 }
 
 .mce-container .mce-primary {
-  @include canvas-button(
-    var(--ic-brand-button--primary-bgd),
-    var(--ic-brand-button--primary-text),
-    false,
-    var(--ic-brand-button--primary-bgd-darkened-5),
-    var(--ic-brand-button--primary-bgd-darkened-15)
-  );
+  @if $use_high_contrast {
+    @include canvas-button($ic-brand-primary, $ic-color-light);
+  } @else {
+    @include canvas-button(
+      var(--ic-brand-button--primary-bgd),
+      var(--ic-brand-button--primary-text),
+      false,
+      var(--ic-brand-button--primary-bgd-darkened-5),
+      var(--ic-brand-button--primary-bgd-darkened-15)
+    );
+  }
 }
 
 .mce-container.mce-tinymce .mce-menu-item,

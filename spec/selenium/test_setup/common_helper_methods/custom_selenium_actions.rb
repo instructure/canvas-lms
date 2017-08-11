@@ -255,6 +255,31 @@ module CustomSeleniumActions
     end
   end
 
+  # This function is to be used as a last resort ONLY
+  # Make sure that you have tried:
+  # 1.) finding and clicking the element with f, fj, and fln statements.
+  # 2.) attempts to wait
+  # 3.) attempt to click blocking items by finding them instead
+  # 4.) attempts to find and click blocking items with xpath
+  #
+  # This function is to be used if:
+  # 1.) the above are still fragile
+  # 2.) clicking an item works intermittently
+  # 3.) an item is not covered (as this should cause a failure)
+  # 4.) an item is UNIQUE ON THE PAGE.
+  #
+  # If this function is used:
+  # 1.) make sure your jquery selector always finds ONLY THE ELEMENT YOU WANT
+  #   1a.) attempting to click a non-unique element may remain fragile.
+  #
+  # 2.) This function will click items that are not visible or covered.
+  #
+  # 3.) This function will likely have trouble clicking links. Use fln instead.
+  def force_click(element_jquery_finder)
+    fj(element_jquery_finder) 
+    driver.execute_script(%{$(#{element_jquery_finder.to_s.to_json}).click()})
+  end
+
   def hover(element)
     element.with_stale_element_protection do
       driver.action.move_to(element).perform

@@ -353,7 +353,7 @@ class ContextModuleItemsApiController < ApplicationController
       item_params[:id] = params[:module_item][:content_id]
       if ['Page', 'WikiPage'].include?(item_params[:type])
         if page_url = params[:module_item][:page_url]
-          if wiki_page = @context.wiki.wiki_pages.not_deleted.where(url: page_url).first
+          if wiki_page = @context.wiki_pages.not_deleted.where(url: page_url).first
             item_params[:id] = wiki_page.id
           else
             return render :json => {:message => "invalid page_url parameter"}, :status => :bad_request
@@ -630,7 +630,7 @@ class ContextModuleItemsApiController < ApplicationController
       else
         # map wiki page url to id
         if asset_type == 'WikiPage'
-          page = @context.wiki.wiki_pages.not_deleted.where(url: asset_id).first
+          page = @context.wiki_pages.not_deleted.where(url: asset_id).first
           asset_id = page.id if page
         else
           asset_id = asset_id.to_i

@@ -96,7 +96,7 @@ describe Lti::ContentItemResponse do
       end
       it 'sets the media_type to "page"' do
         context_module = context.context_modules.create!(name: 'a module')
-        page = context.wiki.wiki_pages.create!(title: 'a page')
+        page = context.wiki_pages.create!(title: 'a page')
         tag = context_module.add_item(:id => page.id, :type => 'page')
         content_item_response = subject({module_items: [tag.id]})
         expect(content_item_response.media_type).to eq 'page'
@@ -155,7 +155,7 @@ describe Lti::ContentItemResponse do
     end
 
     it 'gets the title for a page' do
-      page = context.wiki.wiki_pages.create!(title: 'a page')
+      page = context.wiki_pages.create!(title: 'a page')
       content_item_response = subject({pages: [page.id]})
       expect(content_item_response.title).to eq 'a page'
     end

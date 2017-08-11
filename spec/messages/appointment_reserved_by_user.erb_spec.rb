@@ -31,7 +31,7 @@ describe 'appointment_reserved_by_user.twitter' do
   let(:notification_name) { :appointment_reserved_by_user }
   let(:message_data) {
     {
-      data: { updating_user: @user },
+      data: { updating_user_name: @user.name },
       user: @user
     }
   }

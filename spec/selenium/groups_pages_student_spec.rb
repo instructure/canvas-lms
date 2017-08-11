@@ -256,7 +256,7 @@ describe "groups" do
       end
 
       it "should allow all group members to access a page", priority: "1", test_id: 273612 do
-        @page = @testgroup.first.wiki.wiki_pages.create!(title: "Page", user: @teacher)
+        @page = @testgroup.first.wiki_pages.create!(title: "Page", user: @teacher)
         # Verifying with a few different group members should be enough to ensure all group members can see it
         verify_member_sees_group_page
 

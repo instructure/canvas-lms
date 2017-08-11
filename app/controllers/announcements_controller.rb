@@ -34,16 +34,13 @@ class AnnouncementsController < ApplicationController
         add_crumb(t(:announcements_crumb, "Announcements"))
         can_create = @context.announcements.temp_record.grants_right?(@current_user, session, :create)
         js_env :permissions => {
-          :create => can_create,
+          create: can_create,
           manage_content: @context.grants_right?(@current_user, session, :manage_content),
-          :moderate => can_create
+          moderate: can_create
         }
-        js_env :is_showing_announcements => true
-        js_env :atom_feed_url => feeds_announcements_format_path((@context_enrollment || @context).feed_code, :atom)
-
-        if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :read) && !@js_env[:COURSE_ID].present?
-          js_env :COURSE_ID => @context.id.to_s
-        end
+        js_env is_showing_announcements: true
+        js_env atom_feed_url: feeds_announcements_format_path((@context_enrollment || @context).feed_code, :atom)
+        js_env(COURSE_ID: @context.id.to_s) if @context.is_a?(Course)
 
         set_tutorial_js_env
       end

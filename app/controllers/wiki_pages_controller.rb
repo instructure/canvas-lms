@@ -90,7 +90,7 @@ class WikiPagesController < ApplicationController
         encoded_name = @page_name && CGI.escape(@page_name).gsub("+", " ")
         redirect_to polymorphic_url([@context, :wiki_page], id: encoded_name || @page, titleize: params[:titleize], action: :edit)
       else
-        wiki_page = @wiki.wiki_pages.deleted_last.where(url: @page.url).first
+        wiki_page = @context.wiki_pages.deleted_last.where(url: @page.url).first
         if wiki_page && wiki_page.deleted?
           flash[:warning] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
         else
