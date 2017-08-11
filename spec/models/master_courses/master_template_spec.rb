@@ -301,5 +301,15 @@ describe MasterCourses::MasterTemplate do
       expect(t3.instance_variable_defined?(:@last_export_completed_at)).to be_truthy
       expect(t3.instance_variable_get(:@last_export_completed_at)).to be_nil
     end
+
+    it "should not count deleted courses" do
+      t = MasterCourses::MasterTemplate.set_as_master_course(@course)
+      t.add_child_course!(Course.create!)
+      t.add_child_course!(Course.create!(:workflow_state => 'deleted'))
+
+      MasterCourses::MasterTemplate.preload_index_data([t])
+
+      expect(t.child_course_count).to eq 1
+    end
   end
 end
