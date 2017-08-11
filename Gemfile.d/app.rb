@@ -113,7 +113,7 @@ gem 'canvas_statsd', '2.0.4'
   gem 'aroi', '0.0.5', require: false
 gem 'gepub', '0.7.0beta4'
 gem 'imperium', '0.1.3', require: false
-gem 'academic_benchmarks', '0.0.9', require: false
+gem 'academic_benchmarks', '0.0.10', require: false
 
 gem 'graphql', '1.6.6'
 gem 'graphql-batch', '~>0.3.1'
