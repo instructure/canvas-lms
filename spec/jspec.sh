@@ -10,8 +10,8 @@ export JSPEC_WD=$(pwd)
 # error messages if there is a spec that fails.
 if [ "$1" == "--watch" ]; then
   export JSPEC_PATH=$2
-  npm run test-watch --silent || true
+  yarn run test-watch --silent || true
 else
   export JSPEC_PATH=$1
-  npm run test || true
+  yarn run test || true
 fi
