@@ -58,3 +58,10 @@ define [
     $link = $("<a><span class='media_comment_id'>24</span></a>")
     id = inlineMediaComment.getMediaCommentId($link)
     equal("24", id)
+
+  test 'video in td has minimum size of 300', ->
+    $.trackEvent = (()-> null)
+    @fixtures.innerHTML = "<table><tbody><tr><td><a data-media_comment_id=42 class='instructure_inline_media_comment' href='42' tabindex=0></a></td></tr></tbody></table>"
+    $link = $(@fixtures).find('a')
+    $link.click()
+    equal('300px', $link.closest('td').css('width'))
