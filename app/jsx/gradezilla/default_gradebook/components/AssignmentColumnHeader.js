@@ -43,7 +43,6 @@ class AssignmentColumnHeader extends ColumnHeader {
       courseId: string.isRequired,
       htmlUrl: string.isRequired,
       id: string.isRequired,
-      invalid: bool,
       muted: bool.isRequired,
       name: string.isRequired,
       omitFromFinalGrade: bool.isRequired,
@@ -180,7 +179,7 @@ class AssignmentColumnHeader extends ColumnHeader {
     } else if (assignment.omitFromFinalGrade) {
       assignmentTitle = I18n.t('This assignment does not count toward the final grade');
       assignmentIcon = AssignmentColumnHeader.renderWarningIcon(assignmentTitle);
-    } else if (assignment.invalid) {
+    } else if (assignment.pointsPossible == null || assignment.pointsPossible === 0) {
       assignmentTitle = I18n.t('This assignment has no points possible and cannot be included in grade calculation');
       assignmentIcon = AssignmentColumnHeader.renderWarningIcon(assignmentTitle);
     }
