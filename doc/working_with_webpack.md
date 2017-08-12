@@ -37,7 +37,7 @@ If you look at package.json, you can see there are 2 scripts for building
 your assets with webpack (webpack and webpack-production). If you want to include
 the translations (eg when you run webpack-production), make sure you've
 run "rake i18nliner:generate_js" first so translations are in place,
-webpack depends on those already existing. You can use these scripts with "npm run":
+webpack depends on those already existing. You can use these scripts with "yarn run":
 
 `yarn run webpack`
 
