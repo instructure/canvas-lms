@@ -254,7 +254,11 @@ QUnit.module('SearchForm Autocomplete options', {
     this.assignments = Fixtures.assignmentArray();
     this.graders = Fixtures.userArray();
     this.students = Fixtures.userArray();
-    this.wrapper = mount(<SearchFormComponent {...this.props} />);
+    this.wrapper = mount(<SearchFormComponent {...this.props} />, {attachTo: document.getElementById('fixtures')});
+  },
+
+  teardown () {
+    this.wrapper.unmount();
   }
 });
 

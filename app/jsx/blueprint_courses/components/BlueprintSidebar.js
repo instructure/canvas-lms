@@ -49,11 +49,10 @@ export default class BlueprintCourseSidebar extends Component {
     this.state = {
       isOpen: false,
     }
-    this.trayRef = null
   }
 
   handleOpen = () => {
-    this.props.onOpen(this.trayRef)
+    this.props.onOpen()
     this.closeBtn.focus()
   }
 
@@ -74,7 +73,7 @@ export default class BlueprintCourseSidebar extends Component {
     return (
       <div className="bcs__wrapper">
         <div className="bcs__trigger">
-          <Button ref={(c) => { this.openBtn = c }} variant="icon-inverse" onClick={this.open}>
+          <Button buttonRef={(c) => { this.openBtn = c }} variant="icon-inverse" onClick={this.open}>
             <Typography color="primary-inverse" size="large">
               <IconBlueprintSolid title={I18n.t('Open sidebar')} />
             </Typography>
@@ -82,18 +81,18 @@ export default class BlueprintCourseSidebar extends Component {
         </div>
         <Tray
           label={I18n.t('Blueprint Settings')}
-          dismissable={false}
-          trapFocus
-          isOpen={this.state.isOpen}
+          shouldContainFocus
+          open={this.state.isOpen}
           placement="end"
-          onEntering={this.handleOpen}
+          onEntered={this.handleOpen}
           onExiting={this.handleClose}
-          contentRef={(el) => { this.trayRef = el }}
+          applicationElement={() => document.getElementById('application')}
+          contentRef={this.props.contentRef}
         >
-          <div className="bcs__content" ref={this.props.contentRef}>
+          <div className="bcs__content">
             <header className="bcs__header">
               <div className="bcs__close-wrapper">
-                <Button variant="icon-inverse" onClick={this.close} ref={(c) => { this.closeBtn = c }}>
+                <Button variant="icon-inverse" onClick={this.close} buttonRef={(c) => { this.closeBtn = c }}>
                   <Typography color="primary-inverse" size="small">
                     <IconXSolid title={I18n.t('Close sidebar')} />
                   </Typography>
@@ -110,6 +109,6 @@ export default class BlueprintCourseSidebar extends Component {
         </Tray>
         {this.props.detachedChildren}
       </div>
-    )
+    );
   }
 }

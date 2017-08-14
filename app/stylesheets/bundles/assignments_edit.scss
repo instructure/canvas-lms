@@ -145,14 +145,15 @@ div.form-column-right, div.overrides-column-right {
   margin: 15px 20px 0;
 }
 
+#discussion-edit-view {
+  @include readonly-input;
+}
 
 /* support for master class locked input fields */
 #edit_assignment_form, #discussion-edit-view {
    h1.title {
      clear: both;
    }
-
-   @include readonly-input;
 
    .to .ic-Form-control.readonly,
    .from .ic-Form-control.readonly {  // locked availability dates

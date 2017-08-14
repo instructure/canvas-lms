@@ -26,6 +26,9 @@ define([
   'jsx/context_cards/StudentContextTray',
   'jsx/context_cards/StudentCardStore'
 ], ($, React, ReactDOM, TestUtils, Avatar, Tray, StudentContextTray, StudentCardStore) => {
+  let fixtureElement
+  let applicationElement
+
   QUnit.module('StudentContextTray', (hooks) => {
     let store, subject
     const courseId = '1'
@@ -42,6 +45,11 @@ define([
           returnFocusTo={() => {}}
         />
       )
+      fixtureElement = document.createElement('div')
+      document.getElementById('fixtures').appendChild(fixtureElement)
+      applicationElement = document.createElement('div')
+      applicationElement.id = 'application'
+      document.getElementById('fixtures').appendChild(applicationElement)
     })
     hooks.afterEach(() => {
       if (subject) {
@@ -77,6 +85,7 @@ define([
     })
 
     test('tray should set focus to the close button when mounting', () => {
+      const clock = sinon.useFakeTimers()
       store.state.loading = false
       // eslint-disable-next-line react/no-render-return-value
       const component = TestUtils.renderIntoDocument(
@@ -86,11 +95,15 @@ define([
           studentId={studentId}
           returnFocusTo={() => {}}
         />,
-        document.getElementById('fixtures')
+        fixtureElement
       )
 
       component.onChange()
-      ok(component.closeButtonRef.focused)
+      clock.tick(1) // perform the setState timeout callback
+      equal(document.activeElement, component.closeButtonRef)
+      const componentNode = ReactDOM.findDOMNode(component)
+      ReactDOM.unmountComponentAtNode(componentNode.parentNode)
+      clock.restore()
     })
 
     test('tray should set focus back to the result of the returnFocusTo prop', () => {
@@ -103,7 +116,7 @@ define([
           studentId={studentId}
           returnFocusTo={() => [$('#someButton')]}
         />,
-        document.getElementById('fixtures')
+        fixtureElement
       )
 
       const fakeEvent = {
@@ -111,6 +124,8 @@ define([
       }
       component.handleRequestClose(fakeEvent)
       ok(document.activeElement === document.getElementById('someButton'))
+      const componentNode = ReactDOM.findDOMNode(component)
+      ReactDOM.unmountComponentAtNode(componentNode.parentNode)
     })
 
     QUnit.module('analytics button', () => {

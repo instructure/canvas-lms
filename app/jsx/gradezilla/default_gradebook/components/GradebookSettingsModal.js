@@ -125,11 +125,12 @@ class GradebookSettingsModal extends React.Component {
     return (
       <Modal
         size="large"
-        isOpen={isOpen}
+        open={isOpen}
         label={title}
         closeButtonLabel={I18n.t('Close')}
-        onAfterOpen={this.fetchLatePolicy}
-        onRequestClose={this.close}
+        applicationElement={() => document.getElementById('application')}
+        onOpen={this.fetchLatePolicy}
+        onDismiss={this.close}
         onExited={this.props.onClose}
       >
         <ModalHeader>

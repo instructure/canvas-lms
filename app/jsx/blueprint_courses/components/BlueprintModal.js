@@ -86,9 +86,10 @@ export default class BlueprintModal extends Component {
 
     return (
       <Modal
-        isOpen={this.props.isOpen}
-        onRequestClose={this.props.onCancel}
+        open={this.props.isOpen}
+        onDismiss={this.props.onCancel}
         onClose={this.handleModalClose}
+        applicationElement={() => document.getElementById('application')}
         transition="fade"
         size="fullscreen"
         label={this.props.title}
@@ -114,6 +115,6 @@ export default class BlueprintModal extends Component {
           )}
         </ModalFooter>
       </Modal>
-    )
+    );
   }
 }

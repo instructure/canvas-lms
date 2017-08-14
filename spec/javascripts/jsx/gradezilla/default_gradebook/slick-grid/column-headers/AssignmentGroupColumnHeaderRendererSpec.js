@@ -17,7 +17,7 @@
  */
 
 import ReactDOM from 'react-dom';
-import { createGradebook } from 'spec/jsx/gradezilla/default_gradebook/GradebookSpecHelper';
+import { createGradebook, setFixtureHtml } from 'spec/jsx/gradezilla/default_gradebook/GradebookSpecHelper';
 import AssignmentGroupColumnHeaderRenderer
 from 'jsx/gradezilla/default_gradebook/slick-grid/column-headers/AssignmentGroupColumnHeaderRenderer';
 
@@ -35,6 +35,8 @@ QUnit.module('AssignmentGroupColumnHeaderRenderer', function (suiteHooks) {
 
   suiteHooks.beforeEach(function () {
     $container = document.createElement('div');
+    document.body.appendChild($container);
+    setFixtureHtml($container);
 
     gradebook = createGradebook();
 
@@ -60,6 +62,10 @@ QUnit.module('AssignmentGroupColumnHeaderRenderer', function (suiteHooks) {
     gradebook.gotAllAssignmentGroups([assignmentGroup]);
     column = { id: gradebook.getAssignmentGroupColumnId('2201'), assignmentGroupId: '2201' };
     renderer = new AssignmentGroupColumnHeaderRenderer(gradebook);
+  });
+
+  suiteHooks.afterEach(function() {
+    $container.remove();
   });
 
   QUnit.module('#render', function () {

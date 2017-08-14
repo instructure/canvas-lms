@@ -137,6 +137,6 @@ export default React.createClass({
             </ModalButtons>
           </Modal>
         </div>
-      )
+      );
     }
   })

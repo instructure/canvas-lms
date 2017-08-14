@@ -3104,6 +3104,7 @@ QUnit.module('Menus', {
     this.gradebook.postGradesLtis = [];
     this.gradebook.postGradesStore = {};
     $fixtures.innerHTML = `
+      <div id="application"></div>
       <span data-component="ViewOptionsMenu"></span>
       <span data-component="ActionMenu"></span>
       <span data-component="GradebookMenu" data-variant="DefaultGradebook"></span>
@@ -3137,13 +3138,16 @@ test('GradebookMenu is rendered on renderGradebookMenu', function () {
 });
 
 test('StatusesModal is mounted on renderStatusesModal', function () {
+  const clock = sinon.useFakeTimers();
   const statusModal = this.gradebook.renderStatusesModal();
   statusModal.open();
+  clock.tick(500); // wait for Modal to transition open
   const header = document.querySelector('h3');
   equal(header.innerText, 'Statuses');
 
   const statusesModalMountPoint = document.querySelector("[data-component='StatusesModal']");
   ReactDOM.unmountComponentAtNode(statusesModalMountPoint);
+  clock.restore();
 });
 
 QUnit.module('setupGrading', {
@@ -6059,13 +6063,12 @@ test('includes the column ids for related assignments when updating column heade
 QUnit.module('Gradebook#renderSubmissionTray', {
   setup () {
     this.mountPointId = 'StudentTray__Container';
-    $fixtures.innerHTML = `<div id=${this.mountPointId}></div>`;
+    $fixtures.innerHTML = `<div id="${this.mountPointId}"></div><div id="application"></div>`;
     this.gradebook = createGradebook();
     this.gradebook.students = {
       1101: {
         id: '1101',
         name: 'Adam Jones',
-        wtf: true,
         assignment_2301: {
           assignment_id: '2301', late: false, missing: false, excused: false, seconds_late: 0
         }
@@ -6093,22 +6096,31 @@ QUnit.module('Gradebook#renderSubmissionTray', {
 });
 
 test('shows a submission tray on the page when rendering an open tray', function () {
+  const clock = sinon.useFakeTimers();
   this.gradebook.setSubmissionTrayState(true, '1101', '2301');
   this.gradebook.renderSubmissionTray(this.gradebook.student('1101'));
-  ok(document.querySelector('div[aria-label="Submission tray"]'));
+  clock.tick(500); // wait for Tray to transition open
+  ok(document.querySelector('[aria-label="Submission tray"]'));
+  clock.restore();
 });
 
 test('does not show a submission tray on the page when rendering a closed tray', function () {
+  const clock = sinon.useFakeTimers();
   this.gradebook.setSubmissionTrayState(false, '1101', '2301');
   this.gradebook.renderSubmissionTray(this.gradebook.student('1101'));
-  notOk(document.querySelector('div[aria-label="Submission tray"]'));
+  clock.tick(500); // wait for Tray transition to ensure it has not opened
+  notOk(document.querySelector('[aria-label="Submission tray"]'));
+  clock.restore();
 });
 
 test('shows a submission tray when the related submission has not loaded for the student', function () {
+  const clock = sinon.useFakeTimers();
   this.gradebook.setSubmissionTrayState(true, '1101', '2301');
   this.gradebook.student('1101').assignment_2301 = undefined;
   this.gradebook.renderSubmissionTray(this.gradebook.student('1101'));
-  ok(document.querySelector('div[aria-label="Submission tray"]'));
+  clock.tick(500); // wait for Tray to transition open
+  ok(document.querySelector('[aria-label="Submission tray"]'));
+  clock.restore();
 });
 
 QUnit.module('Gradebook#updateRowAndRenderSubmissionTray', {

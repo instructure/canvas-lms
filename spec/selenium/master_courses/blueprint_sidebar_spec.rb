@@ -29,7 +29,7 @@ shared_context "blueprint sidebar context" do
   end
 
   def blueprint_open_sidebar_button
-    f('.blueprint__root .bcs__wrapper .bcs__trigger')
+    f('.blueprint__root .bcs__wrapper .bcs__trigger button')
   end
 
   def sync_modal_send_notification_checkbox
@@ -136,7 +136,7 @@ describe "master courses sidebar" do
       get "/courses/#{@master.id}"
       blueprint_open_sidebar_button.click
       f('button#mcSyncHistoryBtn').click
-      expect(f('div[aria-label="Sync History"]')).to be_displayed
+      expect(f('span[aria-label="Sync History"]')).to be_displayed
       expect(f('#application')).to have_attribute('aria-hidden', 'true')
     end
 
@@ -146,7 +146,7 @@ describe "master courses sidebar" do
       wait_for_ajaximations
       f('button#mcUnsyncedChangesBtn').click
       wait_for_ajaximations
-      expect(f('div[aria-label="Unsynced Changes"]')).to be_displayed
+      expect(f('span[aria-label="Unsynced Changes"]')).to be_displayed
       expect(f('#application')).to have_attribute('aria-hidden', 'true')
     end
 
@@ -177,7 +177,7 @@ describe "master courses sidebar" do
       get "/courses/#{@master.id}"
       blueprint_open_sidebar_button.click
       f('button#mcSidebarAsscBtn').click
-      expect(f('div[aria-label="Associations"]')).to be_displayed
+      expect(f('span[aria-label="Associations"]')).to be_displayed
     end
 
     it "limits notification message to 140 characters", priority: "2", test_id: 3186725 do

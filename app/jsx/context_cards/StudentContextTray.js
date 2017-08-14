@@ -206,11 +206,11 @@ export default class StudentContextTray extends React.Component {
 
           <Tray
             label={I18n.t('Student Details')}
-            dismissable={!this.state.isLoading}
-            closeButtonLabel={I18n.t('Close')}
+            closeButtonLabel={!this.state.isLoading ? I18n.t('Close') : null}
             closeButtonRef={this.getCloseButtonRef}
-            isOpen={this.state.isOpen}
-            onRequestClose={this.handleRequestClose}
+            applicationElement={() => document.getElementById('application')}
+            open={this.state.isOpen}
+            onDismiss={this.handleRequestClose}
             placement='end'
             zIndex='1000'
             onClose={this.props.onClose}
@@ -307,6 +307,6 @@ export default class StudentContextTray extends React.Component {
             </aside>
           </Tray>
         </div>
-      )
+      );
     }
   }

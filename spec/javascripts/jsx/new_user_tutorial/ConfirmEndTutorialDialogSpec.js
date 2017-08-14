@@ -42,24 +42,6 @@ define([
     handleRequestClose () {}
   });
 
-  test('sets appElment to application div', () => {
-    const wrapper = shallow(<ConfirmEndTutorialDialog {...getDefaultProps()} />);
-    equal(wrapper.instance().appElement, $appElement[0]);
-  });
-
-  test('handleModalReady sets aria-hidden on appElement', () => {
-    const wrapper = shallow(<ConfirmEndTutorialDialog {...getDefaultProps()} />);
-    wrapper.instance().handleModalReady();
-    equal($appElement.attr('aria-hidden'), 'true');
-  });
-
-  test('handleModalClose removes aria-hidden from appElement', () => {
-    const wrapper = shallow(<ConfirmEndTutorialDialog {...getDefaultProps()} />);
-    $appElement.attr('aria-hidden', 'true')
-    wrapper.instance().handleModalClose()
-    ok(!$appElement.attr('aria-hidden'));
-  });
-
   test('handleOkayButtonClick calls the proper api endpoint and data', () => {
     const spy = sinon.spy(axios, 'put');
     const wrapper = shallow(<ConfirmEndTutorialDialog {...getDefaultProps()} />);
