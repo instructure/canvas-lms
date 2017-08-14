@@ -227,6 +227,16 @@ module.exports = {
 
   plugins: [
 
+    // return a non-zero exit code if there are any warnings so we don't continue compiling assets if webpack fails
+    function () {
+      this.plugin('done', ({compilation}) => {
+        if (compilation.warnings && compilation.warnings.length) {
+          console.error(compilation.warnings)
+          throw new Error('webpack build had warnings. Failing.')
+        }
+      })
+    },
+
     // A lot of our files expect a global `I18n` variable, this will provide it if it is used
     new webpack.ProvidePlugin({I18n: 'vendor/i18n'}),
 
@@ -238,7 +248,7 @@ module.exports = {
     }),
 
     new WebpackCleanupPlugin({
-      exclude: ["selinimum-manifest.json"]
+      exclude: ['selinimum-manifest.json']
     }),
 
     // handles our custom i18n stuff
