@@ -155,7 +155,7 @@
     background-color: $btnBackgroundHighlight;
   }
   .btn-primary.dropdown-toggle {
-    background-color: $btnPrimaryBackgroundHighlight;
+    background-color: var(--ic-link-color);
   }
   .btn-warning.dropdown-toggle {
     background-color: $btnWarningBackgroundHighlight;
