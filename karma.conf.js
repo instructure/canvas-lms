@@ -11,16 +11,9 @@ const karmaConfig = {
   exclude: [],
 
   // 'dots', 'progress', 'junit', 'growl', 'coverage', 'spec'
-  reporters: ['progress', 'coverage'],
+  reporters: ['progress'],
   // enable the verbose reporter if you want to have more information of where/how specs fail
   // reporters: ['verbose'],
-
-
-  coverageReporter: {
-    type: 'html',
-    dir: 'coverage-js/',
-    subdir: '.'
-  },
 
   port: 9876,
 
@@ -74,6 +67,25 @@ const karmaConfig = {
   },
 
   webpack: require('./webpack.test.config'),
+}
+
+// For faster local debugging in karma, only add istanbul cruft you've explicity set the "COVERAGE" environment variable
+if (process.env.COVERAGE) {
+  karmaConfig.reporters.push('coverage-istanbul')
+  karmaConfig.coverageIstanbulReporter = {
+    reports: ['html'],
+    dir: 'coverage-js/',
+    fixWebpackSourcePaths: true
+  }
+  karmaConfig.webpack.module.rules.unshift({
+    test: /\.(js|coffee)$/,
+    use: {
+      loader: 'istanbul-instrumenter-loader',
+      options: { esModules: true }
+    },
+    enforce: 'post',
+    exclude: /(node_modules|spec|public\/javascripts\/(bower|client_apps|translations|vendor|custom_moment_locales|custom_timezone_locales))/,
+  })
 }
 
 module.exports = function (config) {
