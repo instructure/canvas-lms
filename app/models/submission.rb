@@ -2161,6 +2161,14 @@ class Submission < ActiveRecord::Base
     !read?(current_user)
   end
 
+  def mark_read(current_user)
+    change_read_state("read", current_user)
+  end
+
+  def mark_unread(current_user)
+    change_read_state("unread", current_user)
+  end
+
   def change_read_state(new_state, current_user)
     return nil unless current_user
     return true if new_state == self.read_state(current_user)

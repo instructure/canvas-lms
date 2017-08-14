@@ -2275,6 +2275,18 @@ describe Submission do
       @submission.save!
       expect(@submission.read?(@user)).to be_truthy
     end
+
+    it "mark read/unread" do
+      @submission = @assignment.submit_homework(@user)
+      @submission.workflow_state = 'graded'
+      @submission.graded_at = Time.now
+      @submission.save!
+      expect(@submission.read?(@user)).to be_truthy
+      @submission.mark_unread(@user)
+      expect(@submission.read?(@user)).to be_falsey
+      @submission.mark_read(@user)
+      expect(@submission.read?(@user)).to be_truthy
+    end
   end
 
   describe "mute" do
