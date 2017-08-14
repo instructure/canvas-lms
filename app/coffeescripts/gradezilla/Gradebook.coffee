@@ -329,7 +329,6 @@ define [
         submissionsChunkSize: @options.chunk_size
         customColumnDataURL: @options.custom_column_data_url
         customColumnDataPageCb: @gotCustomColumnDataChunk
-        effectiveDueDatesURL: @options.effective_due_dates_url
       )
 
       dataLoader.gotStudentIds.then (response) =>
