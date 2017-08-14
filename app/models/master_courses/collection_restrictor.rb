@@ -48,6 +48,14 @@ module MasterCourses::CollectionRestrictor
     end
   end
 
+  def check_restrictions_on_creation?
+    if self.is_a?(Quizzes::QuizQuestion)
+      !self.generated?
+    else
+      true
+    end
+  end
+
   def owner_for_restrictions
     self.send(self.class.base_class.collection_owner_association)
   end
