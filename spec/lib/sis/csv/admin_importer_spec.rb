@@ -81,4 +81,21 @@ describe SIS::CSV::AdminImporter do
     expect(@sub_account.account_users.where(user_id: u1).take.workflow_state).to eq 'deleted'
     expect(@account.account_users.where(user_id: u1).count).to eq 1
   end
+
+  it 'should add admins from other root_account' do
+    account2 = Account.create!
+    user_with_managed_pseudonym(account: account2, sis_user_id: 'U001')
+
+    before_count = @account.account_users.active.count
+
+    work = SIS::AdminImporter::Work.new(nil, @account, Rails.logger, [])
+    expect(work).to receive(:root_account_from_id).with('account2').once.and_return(account2)
+    expect(SIS::AdminImporter::Work).to receive(:new).with(any_args).and_return(work)
+
+    process_csv_data_cleanly(
+      'user_id,account_id,role,status,root_account',
+      'U001,,AccountAdmin,active,account2'
+    )
+    expect(@account.account_users.active.count).to eq before_count + 1
+  end
 end
