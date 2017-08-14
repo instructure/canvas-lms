@@ -286,29 +286,6 @@ class EffectiveDueDates
               #{filter_students_sql('e')}
           ),
 
-          -- fetch all students who have graded submissions
-          -- because if the student received a grade, they
-          -- shouldn't lose visibility to the assignment
-          override_submissions_students AS (
-            SELECT
-              s.user_id AS student_id,
-              s.assignment_id,
-              NULL::integer AS override_id,
-              NULL::timestamp AS due_at,
-              'Submission'::varchar AS override_type,
-              FALSE AS due_at_overridden,
-              3 AS priority
-            FROM
-              models a
-            INNER JOIN #{Submission.quoted_table_name} s ON s.assignment_id = a.id
-            INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_id = a.context_id AND e.user_id = s.user_id
-            WHERE
-              (s.grade IS NOT NULL OR s.excused) AND
-              e.workflow_state NOT IN ('rejected', 'deleted') AND
-              e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-              #{filter_students_sql('s')}
-          ),
-
           -- join all these students together into a single table
           override_all_students AS (
             SELECT * FROM override_adhoc_students
@@ -318,8 +295,6 @@ class EffectiveDueDates
             SELECT * FROM override_sections_students
             UNION ALL
             SELECT * FROM override_everyonelse_students
-            UNION ALL
-            SELECT * FROM override_submissions_students
           ),
 
           -- and pick the latest override date as the effective due date

@@ -928,7 +928,7 @@ define [
           @submissionsForStudent(student),
           @assignmentGroups,
           @options.group_weighting_scheme,
-          @gradingPeriodSet if hasGradingPeriods,
+          (@gradingPeriodSet if hasGradingPeriods),
           EffectiveDueDates.scopeToUser(@effectiveDueDates, student.id) if hasGradingPeriods
         )
 

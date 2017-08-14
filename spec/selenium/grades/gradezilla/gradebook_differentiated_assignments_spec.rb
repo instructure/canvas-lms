@@ -53,12 +53,11 @@ describe "Gradezilla" do
       expect(cell.find_element(:css, '.gradebook-cell')).not_to have_class('grayed-out')
     end
 
-    it "should gray out cells after removing a score which removes visibility" do
+    it "should gray out cells after removing an override which removes visibility" do
       selector = '#gradebook_grid .container_1 .slick-row:nth-child(1) .l4'
       @da_assignment.grade_student(@student_1, grade: 42, grader: @teacher)
       @override.destroy
       Gradezilla.visit(@course)
-      edit_grade(selector, '')
       cell = f(selector)
       expect(cell.find_element(:css, '.gradebook-cell')).to have_class('grayed-out')
     end

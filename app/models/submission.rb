@@ -46,6 +46,10 @@ class Submission < ActiveRecord::Base
     assignment_in_closed_grading_period: {
       status: false,
       message: I18n.t('This assignment is in a closed grading period for this student')
+    }.freeze,
+    not_applicable: {
+      status: false,
+      message: I18n.t('This assignment is not applicable to this student')
     }.freeze
   }.freeze
 
@@ -1368,10 +1372,9 @@ class Submission < ActiveRecord::Base
   private :can_autograde?
 
   def can_autograde_symbolic_status
+    return :not_applicable if deleted?
     return :unpublished unless assignment.published?
     return :not_autograded if grader_id >= 0
-
-    student_id = user_id || self.user.try(:id)
 
     if grading_period&.closed?
       :assignment_in_closed_grading_period
@@ -1395,11 +1398,10 @@ class Submission < ActiveRecord::Base
   def can_grade_symbolic_status(user = nil)
     user ||= grader
 
+    return :not_applicable if deleted?
     return :unpublished unless assignment.published?
     return :cant_manage_grades unless context.grants_right?(user, nil, :manage_grades)
     return :account_admin if context.account_membership_allows(user)
-
-    student_id = self.user_id || self.user.try(:id)
 
     if grading_period&.closed?
       :assignment_in_closed_grading_period

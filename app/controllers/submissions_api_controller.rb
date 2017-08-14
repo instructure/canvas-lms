@@ -642,13 +642,12 @@ class SubmissionsApiController < ApplicationController
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @user = get_user_considering_section(params[:user_id])
 
-    authorized = false
-    @submission = @assignment.submissions.find_or_create_by!(user: @user)
+    @submission = @assignment.all_submissions.find_or_create_by!(user: @user)
 
-    if params[:submission] || params[:rubric_assessment]
-      authorized = authorized_action(@submission, @current_user, :grade)
+    authorized = if params[:submission] || params[:rubric_assessment]
+      authorized_action(@submission, @current_user, :grade)
     else
-      authorized = authorized_action(@submission, @current_user, :comment)
+      authorized_action(@submission, @current_user, :comment)
     end
 
     if authorized

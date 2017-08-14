@@ -1690,18 +1690,6 @@ describe 'Submissions API', type: :request do
 
           expect(json.size).to eq 0
         end
-
-        it "returns the graded submisson even if the student is not in the overriden section" do
-          @assignment.grade_student(@student, grade: 5, grader: @teacher)
-          Score.where(enrollment_id: @student.enrollments).delete_all
-          @student.enrollments.each(&:destroy_permanently!)
-          student_in_section(@section2, user: @student)
-
-          json = call_to_for_students(as_student: false)
-
-          expect(json.size).to eq 1
-          json.each { |submission| expect(submission['user_id']).to eq @student.id }
-        end
       end
     end
   end
@@ -2206,6 +2194,33 @@ describe 'Submissions API', type: :request do
       expect(Submission.count).to eq 1
       expect(json['grade']).to eq 'B'
       expect(json['score']).to eq 12.9
+    end
+
+    it "doesn't allow grading a deleted submission" do
+      submission = @assignment.submissions.find_by(user: @student)
+      submission.destroy
+
+      api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+        {
+          controller: 'submissions_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          user_id: @student.id.to_s
+        }, {
+          submission: {
+            posted_grade: 'B'
+          },
+        }, {
+          expected_status: :unauthorized
+        }
+      )
+
+      expect(submission.score).to be_nil
+      expect(submission.grade).to be_nil
     end
 
     it "can excuse assignments" do
