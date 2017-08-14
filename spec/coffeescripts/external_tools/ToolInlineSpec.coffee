@@ -101,3 +101,10 @@ define [
     launchResizer.resize_tool_content_wrapper(300, $('.tool_content_wrapper'))
     launchResizer.resize_tool_content_wrapper(500, $('#second-wrapper'))
     equal($('.tool_content_wrapper').height(), 300)
+
+  test "defaults the resize height to 450px", ->
+    document.querySelector('#second-wrapper').className = '';
+    launchResizer = new ToolLaunchResizer()
+    launchResizer.resize_tool_content_wrapper()
+    equal($('.tool_content_wrapper').height(), 450)
+    document.querySelector('#second-wrapper').className = 'tool_content_wrapper';
