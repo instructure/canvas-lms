@@ -79,12 +79,13 @@ class SearchController < ApplicationController
   # @example_response
   #   [
   #     {"id": "group_1", "name": "the group", "type": "context", "user_count": 3},
-  #     {"id": 2, "name": "greg", "common_courses": {}, "common_groups": {"1": ["Member"]}}
+  #     {"id": 2, "name": "greg", "full_name": "greg jones", "common_courses": {}, "common_groups": {"1": ["Member"]}}
   #   ]
   #
   # @response_field id The unique identifier for the user/context. For
   #   groups/courses, the id is prefixed by "group_"/"course_" respectively.
-  # @response_field name The name of the user/context
+  # @response_field name The name of the context or short name of the user
+  # @response_field full_name Only set for users. The full name of the user
   # @response_field avatar_url Avatar image url for the user/context
   # @response_field type ["context"|"course"|"section"|"group"|"user"|null]
   #   Type of recipients to return, defaults to null (all). "context"
