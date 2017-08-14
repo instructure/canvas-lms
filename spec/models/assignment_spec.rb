@@ -3949,7 +3949,7 @@ describe Assignment do
         create_section_override_for_assignment(assignment, course_section: section_2)
       end
 
-      it "is valid when AssignmentUtil.due_date_required? is true and " do
+      it "is valid when AssignmentUtil.due_date_required? is true" do
         allow(AssignmentUtil).to receive(:due_date_required?).and_return(true)
         expect(assignment.valid?).to eq(true)
       end

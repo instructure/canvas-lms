@@ -2550,13 +2550,19 @@ class Assignment < ActiveRecord::Base
 
   def assignment_overrides_due_date_ok?(overrides={})
     if AssignmentUtil.due_date_required?(self)
-      overrides = self.assignment_overrides.empty? ? overrides : self.assignment_overrides
+      overrides = gather_override_data(overrides)
       if overrides.select{|o| o['due_at'].nil?}.length > 0
         errors.add(:due_at, I18n.t("cannot be blank for any assignees when Post to Sis is checked"))
         return false
       end
-      return true
     end
+    true
+  end
+
+  def gather_override_data(overrides)
+    return self.assignment_overrides unless self.assignment_overrides.empty?
+    return overrides.values.reject(&:empty?).flatten if overrides.is_a?(Hash)
+    overrides
   end
 
   def active_assignment_overrides?

@@ -1976,10 +1976,69 @@ describe AssignmentsApiController, type: :request do
         expect(json["errors"]&.keys).to eq ['due_at']
       end
 
+      it 'saves with an empty section override' do
+        assignment_params = {
+          'due_at' => 7.days.from_now.iso8601,
+          'post_to_sis' => true,
+          'assignment_overrides' => {}
+        }
+
+        json = api_create_assignment_in_course(@course, assignment_params)
+
+        expect(json["errors"]).to be_nil
+      end
+
       it 'does not save without a due date' do
         json = api_create_assignment_in_course(@course, 'post_to_sis' => true)
 
         expect(json["errors"]&.keys).to eq ['due_at']
+      end
+
+      it 'saves with an assignment with a valid due_date' do
+        assignment_params = {
+          'post_to_sis' => true,
+          'due_at' => 7.days.from_now.iso8601
+        }
+
+        json = api_create_assignment_in_course(@course, assignment_params)
+
+        expect(json["errors"]).to be_nil
+      end
+
+      it 'saves with an assignment with a valid title' do
+        account = @course.account
+        account.settings[:sis_assignment_name_length] = {value: true}
+        account.settings[:sis_assignment_name_length_input] = {value: 10}
+        account.save!
+
+        assignment_params = {
+          'name' => 'Gil Faizon',
+          'post_to_sis' => true,
+          'due_at' => 7.days.from_now.iso8601
+        }
+
+        json = api_create_assignment_in_course(@course, assignment_params)
+
+        expect(json["errors"]).to be_nil
+      end
+
+      it 'does not save with an assignment with an invalid title length' do
+        account = @course.account
+        account.settings[:sis_assignment_name_length] = {value: true}
+        account.settings[:sis_assignment_name_length_input] = {value: 10}
+        account.save!
+
+        assignment_params = {
+          'name' => 'Too Much Tuna',
+          'post_to_sis' => true,
+          'due_at' => 7.days.from_now.iso8601
+        }
+
+        json = api_create_assignment_in_course(@course, assignment_params)
+
+        expect(json["errors"]).to_not be_nil
+        expect(json["errors"]&.keys).to eq ['title']
+        expect(json["errors"]["title"].first["message"]).to eq("The title cannot be longer than 10 characters")
       end
     end
   end
