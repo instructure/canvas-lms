@@ -29,16 +29,17 @@ import Container from 'instructure-ui/lib/components/Container';
 import Spinner from 'instructure-ui/lib/components/Spinner';
 import ButtonLink from 'instructure-ui/lib/components/Link';
 
-import { loadItems, completeItem } from './actions';
+import { loadInitialItems, completeItem } from './actions';
 import ToDoItem from './ToDoItem';
 
 export class ToDoSidebar extends Component {
   static propTypes = {
-    loadItems: func.isRequired,
+    loadInitialItems: func.isRequired,
     completeItem: func.isRequired,
     items: arrayOf(object).isRequired,
     loading: bool,
     courses: arrayOf(object).isRequired,
+    timeZone: string.isRequired
   };
 
   static defaultProps = {
@@ -52,7 +53,7 @@ export class ToDoSidebar extends Component {
   }
 
   componentDidMount () {
-    this.props.loadItems();
+    this.props.loadInitialItems(moment.tz(this.props.timeZone).startOf('day'));
   }
 
   showMoreTodos = () => {
@@ -76,9 +77,11 @@ export class ToDoSidebar extends Component {
       );
     }
 
-    const completedFilter = item => (
-      item.planner_override == null || !item.planner_override.marked_complete
-    );
+    const completedFilter = (item) => {
+      if (!item) return false
+      return item.planner_override == null || !item.planner_override.marked_complete
+    };
+
     const filteredTodos = this.props.items.filter(completedFilter)
     const visibleTodos = this.state.showTodos ? filteredTodos : filteredTodos.slice(0, 5);
 
@@ -114,6 +117,6 @@ const mapStateToProps = state => ({
   items: state.items,
   loading: state.loading
 });
-const mapDispatchToProps = { loadItems, completeItem };
+const mapDispatchToProps = { loadInitialItems, completeItem };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ToDoSidebar);

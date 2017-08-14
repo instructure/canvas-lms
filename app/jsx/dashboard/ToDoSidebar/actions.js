@@ -18,6 +18,7 @@
 
 import { createActions } from 'redux-actions';
 import axios from 'axios';
+import parseLinkHeader from 'parse-link-header';
 
 export const {
   itemsLoading,
@@ -25,29 +26,61 @@ export const {
   itemsLoadingFailed,
   itemSaving,
   itemSaved,
-  itemSavingFailed
+  itemSavingFailed,
+  allItemsLoaded
 } = createActions(
   'ITEMS_LOADING',
   'ITEMS_LOADED',
   'ITEMS_LOADING_FAILED',
   'ITEM_SAVING',
   'ITEM_SAVED',
-  'ITEM_SAVING_FAILED'
+  'ITEM_SAVING_FAILED',
+  'ALL_ITEMS_LOADED'
 );
 
-export const loadItems = () => (
+export const loadNextItems = () => (
+  (dispatch, getState) => {
+    if (!getState().loaded && getState().nextUrl) {
+      dispatch(itemsLoading());
+      axios.get(getState().nextUrl, { params: {
+        order: 'asc'
+      }}).then((response) => {
+        if (parseLinkHeader(response.headers.link).next) {
+          dispatch(itemsLoaded({ items: response.data, nextUrl: parseLinkHeader(response.headers.link).next.url }));
+          dispatch(loadNextItems());
+        } else {
+          dispatch(allItemsLoaded())
+          dispatch(itemsLoaded({ items: response.data, nextUrl: null }));
+        }
+      }).catch(response => dispatch(itemsLoadingFailed(response)));
+    }
+  }
+);
+
+export const loadInitialItems = currentMoment => (
   (dispatch) => {
     dispatch(itemsLoading());
+    const firstMomentDate = currentMoment.clone().subtract(2, 'weeks');
+    const lastMomentDate = currentMoment.clone().add(2, 'weeks');
     axios.get('/api/v1/planner/items', { params: {
+      start_date: firstMomentDate.format(),
+      end_date: lastMomentDate.format(),
       order: 'asc'
-    }}).then(response => dispatch(itemsLoaded(response.data)))
-       .catch(response => dispatch(itemsLoadingFailed(response)));
+    }}).then((response) => {
+      if (parseLinkHeader(response.headers.link).next) {
+        dispatch(itemsLoaded({ items: response.data, nextUrl: parseLinkHeader(response.headers.link).next.url }));
+        dispatch(loadNextItems());
+      } else {
+        dispatch(itemsLoaded({ items: response.data, nextUrl: null }));
+      }
+    }).catch(response => dispatch(itemsLoadingFailed(response)));
   }
 );
 
 export const completeItem = (itemType, itemId) => (
   (dispatch, getState) => {
     dispatch(itemSaving());
+
     const itemToUpdate = getState().items.find(item => (
       item.plannable_id === itemId &&
       item.plannable_type === itemType

@@ -18,6 +18,7 @@
 
 import * as Actions from 'jsx/dashboard/ToDoSidebar/actions';
 import moxios from 'moxios';
+import moment from 'moment-timezone';
 
 QUnit.module('loadItems', {
   setup () {
@@ -29,7 +30,7 @@ QUnit.module('loadItems', {
 });
 
 test('dispatches ITEMS_LOADING action initially', () => {
-  const thunk = Actions.loadItems();
+  const thunk = Actions.loadInitialItems(moment().startOf('day'));
   const fakeDispatch = sinon.spy();
   thunk(fakeDispatch);
   const expected = {
@@ -40,18 +41,21 @@ test('dispatches ITEMS_LOADING action initially', () => {
 
 test('dispatches ITEMS_LOADED with the proper payload on success', (assert) => {
   const done = assert.async();
-  const thunk = Actions.loadItems();
+  const thunk = Actions.loadInitialItems(moment().startOf('day'));
   const fakeDispatch = sinon.spy();
   thunk(fakeDispatch);
   moxios.wait(() => {
     const request = moxios.requests.mostRecent();
     request.respondWith({
       status: 200,
+      headers: {
+        link: '</>; rel="current"'
+      },
       response: [{ id: 1 }, { id: 2 }]
     }).then(() => {
       const expected = {
         type: 'ITEMS_LOADED',
-        payload: [{ id: 1 }, { id: 2 }]
+        payload: { items: [{ id: 1 }, { id: 2 }], nextUrl: null }
       };
       deepEqual(fakeDispatch.secondCall.args[0], expected);
       done();
@@ -59,9 +63,34 @@ test('dispatches ITEMS_LOADED with the proper payload on success', (assert) => {
   });
 });
 
+test('dispatches ITEMS_LOADED with the proper url on success', (assert) => {
+  const done = assert.async();
+  const thunk = Actions.loadInitialItems(moment().startOf('day'));
+  const fakeDispatch = sinon.spy();
+  thunk(fakeDispatch);
+  moxios.wait(() => {
+    const request = moxios.requests.mostRecent();
+    request.respondWith({
+      status: 200,
+      headers: {
+        link: '</>; rel="next"'
+      },
+      response: [{ id: 1 }, { id: 2 }]
+    }).then(() => {
+      const expected = {
+        type: 'ITEMS_LOADED',
+        payload: { items: [{ id: 1 }, { id: 2 }], nextUrl: '/' }
+      };
+      deepEqual(fakeDispatch.secondCall.args[0], expected);
+      done();
+    })
+  });
+});
+
+
 test('dispatches ITEMS_LOADING_FAILED on failure', (assert) => {
   const done = assert.async();
-  const thunk = Actions.loadItems();
+  const thunk = Actions.loadInitialItems(moment().startOf('day'));
   const fakeDispatch = sinon.spy();
   thunk(fakeDispatch);
   moxios.wait(() => {

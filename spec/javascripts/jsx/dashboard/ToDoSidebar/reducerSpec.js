@@ -23,17 +23,41 @@ QUnit.module('ToDoSidebar reducer');
 const getInitialState = overrides => ({
   items: [],
   loading: false,
+  loaded: false,
+  nextUrl: null,
   ...overrides
 });
 
 test('adds items to the state on ITEMS_LOADED', () => {
   const actual = reducer(getInitialState(), {
     type: 'ITEMS_LOADED',
-    payload: [{ id: 1 }, { id: 2 }]
+    payload: {
+      items: [{ id: 1 }, { id: 2 }],
+      nextUrl: null
+    }
   });
   const expected = {
     items: [{ id: 1 }, { id: 2 }],
-    loading: false
+    loading: false,
+    loaded: false,
+    nextUrl: null
+  }
+  deepEqual(actual, expected);
+});
+
+test('sets nextUrl to the correct state on ITEMS_LOADED', () => {
+  const actual = reducer(getInitialState(), {
+    type: 'ITEMS_LOADED',
+    payload: {
+      items: [{ id: 1 }, { id: 2 }],
+      nextUrl: '/'
+    }
+  });
+  const expected = {
+    items: [{ id: 1 }, { id: 2 }],
+    loading: false,
+    loaded: false,
+    nextUrl: '/'
   }
   deepEqual(actual, expected);
 });
@@ -44,11 +68,16 @@ test('sets loading to false on ITEMS_LOADED', () => {
   });
   const actual = reducer(initialState, {
     type: 'ITEMS_LOADED',
-    payload: []
+    payload: {
+      items: [],
+      nextUrl: null
+    }
   });
   const expected = {
     items: [],
-    loading: false
+    loading: false,
+    loaded: false,
+    nextUrl: null
   };
   deepEqual(actual, expected);
 });
@@ -63,7 +92,25 @@ test('sets loading to true on ITEMS_LOADING', () => {
   });
   const expected = {
     items: [],
-    loading: true
+    loading: true,
+    loaded: false,
+    nextUrl: null
+  };
+  deepEqual(actual, expected);
+});
+
+test('sets loaded to true on ALL_ITEMS_LOADED', () => {
+  const initialState = getInitialState({
+    loaded: false
+  });
+  const actual = reducer(initialState, {
+    type: 'ALL_ITEMS_LOADED'
+  });
+  const expected = {
+    items: [],
+    loading: false,
+    loaded: true,
+    nextUrl: null
   };
   deepEqual(actual, expected);
 });
@@ -78,7 +125,9 @@ test('sets loading to false on ITEMS_LOADING_FAILED', () => {
   });
   const expected = {
     items: [],
-    loading: false
+    loading: false,
+    loaded: false,
+    nextUrl: null
   };
   deepEqual(actual, expected);
 });
@@ -116,7 +165,9 @@ test('updates planner_override property of a given item on ITEM_SAVED', () => {
         marked_complete: true
       }
     }],
-    loading: false
+    loading: false,
+    loaded: false,
+    nextUrl: null
   };
 
   deepEqual(actual, expected);

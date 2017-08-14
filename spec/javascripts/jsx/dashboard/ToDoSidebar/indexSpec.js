@@ -25,7 +25,7 @@ import ButtonLink from 'instructure-ui/lib/components/Link';
 QUnit.module('ToDoSidebar Index');
 
 const defaultProps = {
-  loadItems: () => {},
+  loadInitialItems: () => {},
   completeItem: () => {},
   items: [],
   courses: []
@@ -38,7 +38,7 @@ test('displays a spinner when the loading prop is true', () => {
 
 test('calls loadItems prop on mount', () => {
   const fakeLoadItems = sinon.spy();
-  mount(<ToDoSidebar {...defaultProps} loadItems={fakeLoadItems} />);
+  mount(<ToDoSidebar {...defaultProps} loadInitialItems={fakeLoadItems} />);
   ok(fakeLoadItems.called);
 });
 
