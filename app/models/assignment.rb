@@ -662,9 +662,11 @@ class Assignment < ActiveRecord::Base
   attr_accessor :updated_submissions # for testing
   def update_submissions
     @updated_submissions ||= []
-    self.submissions.find_each do |submission|
-      @updated_submissions << submission
-      submission.save!
+    Submission.suspend_callbacks(:update_assignment) do
+      self.submissions.find_each do |submission|
+        @updated_submissions << submission
+        submission.save!
+      end
     end
   end
 
