@@ -945,6 +945,49 @@ describe ContextExternalTool do
 
   end
 
+  context "#global_navigation_tools" do
+    let(:account) { Account.create! name: 'root_account'}
+    let(:external_tool) do
+      ContextExternalTool.new(
+        name: 'test_name',
+        consumer_key: 'test_key',
+        shared_secret: 'bob',
+        domain: 'example.com',
+        workflow_state: 'public',
+        global_navigation: {url: 'http://www.example.com', text: 'Example URL'}
+      )
+    end
+
+    it 'should include tools for the specified account' do
+      external_tool.update_attributes!(context: account)
+      expect(ContextExternalTool.global_navigation_tools([account], '')).to match_array [external_tool]
+    end
+
+    it 'should include tools for all accounts in the account chain' do
+      sub_account = Account.create!(parent_account: account, name: 'sub_account')
+      tool_two = external_tool.dup
+      tool_two.update_attributes!(context: sub_account)
+      external_tool.update_attributes!(context: account)
+      expect(ContextExternalTool.global_navigation_tools([sub_account], '').map(&:id)).to eq [tool_two.id, external_tool.id]
+    end
+
+    it 'should not include tools intalled in sub-accounts' do
+      sub_account = Account.create!(parent_account: account, name: 'sub_account')
+      tool_two = external_tool.dup
+      tool_two.update_attributes!(context: sub_account)
+      external_tool.update_attributes!(context: account)
+      expect(ContextExternalTool.global_navigation_tools([account], '')).to match_array [external_tool]
+    end
+
+    it "should only return tools with the 'global_navigation' setting" do
+      external_tool.update_attributes!(
+        context: account,
+        global_navigation: nil
+      )
+      expect(ContextExternalTool.global_navigation_tools([account], '')).to be_empty
+    end
+  end
+
   describe "global navigation" do
     before(:once) do
       @account = account_model
