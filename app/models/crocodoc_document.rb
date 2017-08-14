@@ -61,9 +61,8 @@ class CrocodocDocument < ActiveRecord::Base
   end
 
   def should_migrate_to_canvadocs?
-    account_context = attachment.context.try(:account)
-    account_context ||= attachment.context.try(:root_account)
-    Canvadocs.hijack_crocodoc_sessions? && account_context&.feature_enabled?(:new_annotations)
+    account_context = attachment.context.try(:account) || attachment.context.try(:root_account)
+    account_context.present? && account_context.migrate_to_canvadocs?
   end
 
   def canvadocs_can_annotate?(user)

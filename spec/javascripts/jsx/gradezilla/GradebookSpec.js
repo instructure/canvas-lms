@@ -6702,6 +6702,12 @@ test('sets the formatted grade on submission', function () {
   equal(this.submission.grade, '123.45%');
 });
 
+test('sets the raw grade on submission', function () {
+  this.stub(GradeFormatHelper, 'formatGrade').returns('123.45%');
+  this.gradebook.updateSubmission(this.submission);
+  equal(this.submission.rawGrade, '123.45');
+});
+
 QUnit.module('Gradebook#arrangeColumnsBy', {
   setup () {
     this.gradebook = createGradebook();

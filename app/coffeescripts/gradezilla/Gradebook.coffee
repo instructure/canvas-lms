@@ -861,6 +861,8 @@ define [
     updateSubmission: (submission) =>
       student = @student(submission.user_id)
       submission.submitted_at = tz.parse(submission.submitted_at)
+      submission.excused = !!submission.excused
+      submission.rawGrade = submission.grade # save the unformatted version of the grade too
       submission.grade = GradeFormatHelper.formatGrade(submission.grade, {
         gradingType: submission.gradingType, delocalize: false
       })

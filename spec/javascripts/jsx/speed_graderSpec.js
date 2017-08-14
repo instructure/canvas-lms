@@ -371,6 +371,72 @@ define([
     equal(submitLinkScreenreaderText, 'Submit comment: test');
   });
 
+  QUnit.module('SpeedGrader#showGrade', {
+    setup () {
+      fakeENV.setup();
+      this.stub($, 'ajaxJSON');
+      this.spy($.fn, 'append');
+      this.originalWindowJSONData = window.jsonData;
+      window.jsonData = {
+        id: 27,
+        GROUP_GRADING_MODE: false,
+        points_possible: 10,
+        studentsWithSubmissions: []
+      };
+      SpeedGrader.EG.currentStudent = {
+        id: 4,
+        name: 'Guy B. Studying',
+        submission_state: 'not_graded',
+        submission: {
+          score: 7,
+          grade: 'complete',
+          entered_grade: 'A',
+          submission_comments: []
+        }
+      };
+      ENV.SUBMISSION = {
+        grading_role: 'teacher'
+      };
+      ENV.RUBRIC_ASSESSMENT = {
+        assessment_type: 'grading',
+        assessor_id: 1
+      };
+
+      const gradeContainerHtml = `
+        <div id="grade_container">
+          <a class="update_submission_grade_url" href="my_url.com" title="POST"></a>
+          <input class="grading_value" value="56" />
+          <div id="combo_box_container"></div>
+          <div id="comments">
+          </div>
+        </div>
+      `;
+
+      $('#fixtures').html(gradeContainerHtml);
+    },
+
+    teardown () {
+      $('#fixtures').empty();
+      window.jsonData = this.originalWindowJSONData;
+      fakeENV.teardown();
+    }
+  });
+
+  test('uses submission#grade for pass_fail assignments', function () {
+    this.stub(SpeedGrader.EG, 'updateStatsInHeader');
+    const $grade = this.stub($.fn, 'val');
+    SpeedGrader.EG.showGrade();
+    ok($grade.calledWith('complete'));
+  });
+
+  test('uses submission#entered_grade for other types of assignments', function () {
+    this.stub(SpeedGrader.EG, 'updateStatsInHeader');
+    const $grade = this.stub($.fn, 'val');
+    SpeedGrader.EG.currentStudent.submission.grade = 'B';
+    SpeedGrader.EG.showGrade();
+    ok($grade.calledWith('A'));
+  });
+
   QUnit.module('SpeedGrader#handleGradeSubmit', {
     setup () {
       fakeENV.setup();
@@ -891,5 +957,52 @@ define([
     equal(natcompare.strings.callCount, 2);
     ok(natcompare.strings.calledWith(studentA.sortable_name, studentB.sortable_name));
     equal(order, 1);
+  });
+
+  QUnit.module('SpeedGrader - gateway timeout', {
+    setup () {
+      this.server = sinon.fakeServer.create({ respondImmediately: true });
+      this.server.respondWith(
+        'GET',
+        `${window.location.pathname}.json${window.location.search}`,
+        [504, { 'Content-Type': 'application/json' }, '']
+      );
+      $('#fixtures').html('<div id="speed_grader_timeout_alert"></div>');
+    },
+    teardown () {
+      $('#fixtures').empty();
+      this.server.restore();
+    }
+  });
+
+  test('shows an error when the gateway times out', function () {
+    this.stub(SpeedGrader.EG, 'domReady');
+    ENV.assignment_title = 'Assignment Title';
+    SpeedGrader.setup();
+    const message = 'Something went wrong. Please try refreshing the page. If the problem persists, there may be too many records on "Assignment Title" to load SpeedGrader.';
+    strictEqual($('#speed_grader_timeout_alert').text(), message);
+  });
+
+  QUnit.module('SpeedGrader - no gateway timeout', {
+    setup () {
+      this.server = sinon.fakeServer.create({ respondImmediately: true });
+      this.server.respondWith(
+        'GET',
+        `${window.location.pathname}.json${window.location.search}`,
+        [200, { 'Content-Type': 'application/json' }, '{ hello: "world"}']
+      );
+      $('#fixtures').html('<div id="speed_grader_timeout_alert"></div>');
+    },
+    teardown () {
+      $('#fixtures').empty();
+      this.server.restore();
+    }
+  });
+
+  test('does not show an error when the gateway times out', function () {
+    this.stub(SpeedGrader.EG, 'domReady');
+    ENV.assignment_title = 'Assignment Title';
+    SpeedGrader.setup();
+    strictEqual($('#speed_grader_timeout_alert').text(), '');
   });
 });

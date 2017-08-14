@@ -293,6 +293,11 @@ define [
   test "openAgain adds datetime picker", ->
     @stub(DialogFormView.prototype, "openAgain")
     @spy $.fn, "datetime_field"
+    I18nStubber.setLocale 'fr_FR'
+    I18nStubber.stub 'fr_FR',
+      'date.formats.medium': '%a %-d %b %Y %-k:%M'
+      'date.month_names': ['août']
+      'date.abbr_month_names': ['août']
 
     view = createView(@assignment2)
     view.openAgain()

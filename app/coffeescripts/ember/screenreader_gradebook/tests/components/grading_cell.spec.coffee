@@ -21,7 +21,8 @@ define [
   'timezone'
   '../start_app'
   '../shared_ajax_fixtures'
-], ($, Ember, tz, startApp, fixtures) ->
+  'jsx/gradebook/shared/helpers/GradeFormatHelper'
+], ($, Ember, tz, startApp, fixtures, GradeFormatHelper) ->
 
   {run} = Ember
 
@@ -119,6 +120,24 @@ define [
   test "isGpaScale", ->
     setType 'gpa_scale'
     ok @component.get('isGpaScale')
+
+  test "isPassFail", ->
+    setType 'pass_fail'
+    ok @component.get('isPassFail')
+
+  test "does not translate pass_fail grades", ->
+    setType 'pass_fail'
+    @stub(GradeFormatHelper, 'formatGrade').returns 'completo'
+    run => @submission.set('entered_grade', 'complete')
+    @component.submissionDidChange()
+    equal(@component.get('value'), 'complete')
+
+  test "formats percent grades", ->
+    setType 'percent'
+    @stub(GradeFormatHelper, 'formatGrade').returns '32,4%'
+    run => @submission.set('entered_grade', '32.4')
+    @component.submissionDidChange()
+    equal(@component.get('value'), '32,4%')
 
   asyncTest "focusOut", ->
     stub = @stub @component, 'boundUpdateSuccess'

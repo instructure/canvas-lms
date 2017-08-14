@@ -17,6 +17,9 @@
  */
 
 /*global jsonData*/
+import React from 'react'
+import ReactDOM from 'react-dom'
+import Alert from 'instructure-ui/lib/components/Alert'
 import MGP from 'jsx/speed_grader/gradingPeriod'
 import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper'
 import quizzesNextSpeedGrading from 'jsx/grading/quizzesNextSpeedGrading'
@@ -2429,7 +2432,11 @@ import './vendor/ui.selectmenu'
       const submission = EG.currentStudent.submission;
       const grade = EG.getGradeToShow(submission, ENV.grading_role);
 
-      $grade.val(grade.entered);
+      if (submission.grading_type === 'pass_fail' || ['complete', 'incomplete', 'pass', 'fail'].indexOf(submission.grade) > -1) {
+        $grade.val(submission.grade);
+      } else {
+        $grade.val(grade.entered);
+      }
 
       if (submission.points_deducted) {
         $deduction_box.html(
@@ -2659,7 +2666,24 @@ import './vendor/ui.selectmenu'
     EG.jsonReady();
   }
 
-export default {
+  function speedGraderJSONErrorFn (data, _xhr, _textStatus, _errorThrown) {
+    if (data.status === 504) {
+      const alertProps = {
+        variant: 'error',
+        dismissible: false
+      };
+      const alertMessage = I18n.t(
+        'Something went wrong. Please try refreshing the page. If the problem persists, there may be too many records on "%{assignmentTitle}" to load SpeedGrader.',
+        { assignmentTitle: ENV.assignment_title }
+      );
+      ReactDOM.render(
+        React.createElement(Alert, alertProps, alertMessage),
+        document.getElementById('speed_grader_timeout_alert')
+      );
+    }
+  }
+
+  export default {
     setup: function() {
       function registerQuizzesNext (overriddenShowSubmission) {
         showSubmissionOverride = overriddenShowSubmission;
@@ -2668,7 +2692,8 @@ export default {
 
       // fire off the request to get the jsonData
       window.jsonData = {};
-      var speedGraderJsonDfd = $.getJSON(window.location.pathname+ '.json' + window.location.search);
+      const speedGraderJSONUrl = `${window.location.pathname}.json${window.location.search}`;
+      const speedGraderJsonDfd = $.ajaxJSON(speedGraderJSONUrl, 'GET', null, null, speedGraderJSONErrorFn);
 
       $.when(getAssignmentOverrides(), getGradingPeriods(), speedGraderJsonDfd).then(gotData);
 

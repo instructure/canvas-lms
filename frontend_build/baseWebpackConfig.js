@@ -32,19 +32,11 @@ const WebpackHooks = require('./webpackHooks')
 const webpackPublicPath = require('./webpackPublicPath')
 const WebpackCleanupPlugin = require('webpack-cleanup-plugin')
 const HappyPack = require('happypack')
+const momentLocaleBundles = require('./momentBundles')
 require('babel-polyfill')
 
 const root = path.resolve(__dirname, '..')
 const USE_BABEL_CACHE = process.env.NODE_ENV !== 'production' && process.env.DISABLE_HAPPYPACK === '1'
-
-const momentLocaleBundles = glob.sync('moment/locale/**/*.js', {cwd: 'node_modules'}).reduce((memo, filename) =>
-  Object.assign(memo, {[filename.replace(/.js$/, '')]: filename})
-, {})
-
-// Put any custom moment locales here:
-momentLocaleBundles['moment/locale/mi-nz'] = 'custom_moment_locales/mi_nz.js'
-momentLocaleBundles['moment/locale/ht-ht'] = 'custom_moment_locales/ht_ht.js'
-
 
 const happypackPlugins = []
 const getHappyThreadPool = (() => {

@@ -75,7 +75,7 @@ export default class DatetimeField {
     this.$field.wrap('<div class="input-append" />')
     const $wrapper = this.$field.parent('.input-append')
     if (!this.isReadonly()) {
-      const datepickerOptions = $.extend({}, this.datepickerDefaults, {
+      const datepickerOptions = $.extend({}, this.datepickerDefaults(), {
         timePicker: this.allowTime,
         beforeShow: () => this.$field.trigger('detachTooltip'),
         onClose: () => this.$field.trigger('reattachTooltip')
@@ -303,27 +303,30 @@ export default class DatetimeField {
   isReadonly () {
     return !!this.$field.attr('readonly')
   }
+
+  datepickerDefaults () {
+    return {
+      constrainInput: false,
+      dateFormat: datePickerFormat(I18n.lookup('date.formats.medium')),
+      showOn: 'button',
+      buttonText: '<i class="icon-calendar-month"></i>',
+      buttonImageOnly: false,
+      disableButton: false,
+
+      // localization values understood by $.datepicker
+      prevText: I18n.t('prevText', 'Prev'), // title text for previous month icon
+      nextText: I18n.t('nextText', 'Next'), // title text for next month icon
+      monthNames: I18n.lookup('date.month_names').slice(1), // names of months
+      monthNamesShort: I18n.lookup('date.abbr_month_names').slice(1), // abbreviated names of months
+      dayNames: I18n.lookup('date.day_names'), // title text for column headings
+      dayNamesShort: I18n.lookup('date.abbr_day_names'), // title text for column headings
+      dayNamesMin: I18n.lookup('date.datepicker.column_headings'), // column headings for days (Sunday = 0)
+      firstDay: I18n.t('first_day_index', '0'), // first day of the week (Sun = 0)
+      showMonthAfterYear: I18n.t('#date.formats.medium_month').slice(0, 2) === '%Y' // "month year" or "year month"
+    }
+  }
 }
 
-DatetimeField.prototype.datepickerDefaults = {
-  constrainInput: false,
-  dateFormat: datePickerFormat(I18n.t('#date.formats.medium')),
-  showOn: 'button',
-  buttonText: '<i class="icon-calendar-month"></i>',
-  buttonImageOnly: false,
-  disableButton: false,
-
-  // localization values understood by $.datepicker
-  prevText: I18n.t('prevText', 'Prev'), // title text for previous month icon
-  nextText: I18n.t('nextText', 'Next'), // title text for next month icon
-  monthNames: I18n.lookup('date.month_names').slice(1), // names of months
-  monthNamesShort: I18n.lookup('date.abbr_month_names').slice(1), // abbreviated names of months
-  dayNames: I18n.lookup('date.day_names'), // title text for column headings
-  dayNamesShort: I18n.lookup('date.abbr_day_names'), // title text for column headings
-  dayNamesMin: I18n.lookup('date.datepicker.column_headings'), // column headings for days (Sunday = 0)
-  firstDay: I18n.t('first_day_index', '0'), // first day of the week (Sun = 0)
-  showMonthAfterYear: I18n.t('#date.formats.medium_month').slice(0, 2) === '%Y' // "month year" or "year month"
-}
 
 DatetimeField.prototype.parseError = I18n.t('errors.not_a_date', "That's not a date!")
 DatetimeField.prototype.courseLabel = `${I18n.t('#helpers.course', 'Course')}: `
