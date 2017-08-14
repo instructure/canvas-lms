@@ -111,7 +111,8 @@ module Api::V1::Conversation
   def conversation_user_json(user, current_user, session, options = {})
     result = {
       :id => user.id,
-      :name => user.short_name
+      :name => user.short_name,
+      :full_name => user.name
     }
     if options[:include_participant_contexts]
       result[:common_courses] = current_user.address_book.common_courses(user)
