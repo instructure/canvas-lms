@@ -151,9 +151,6 @@
   }
 
   // Keep the hover's background when dropdown is open
-  .btn.dropdown-toggle {
-    background-color: $btnBackgroundHighlight;
-  }
   .btn-primary.dropdown-toggle {
     background-color: var(--ic-link-color);
   }

@@ -90,7 +90,7 @@
 .dropdown-submenu:hover > a {
   text-decoration: none;
   color: $dropdownLinkColorHover;
-  @include gradient-vertical($dropdownLinkBackgroundHover, darken($dropdownLinkBackgroundHover, 5%));
+  background: var(--ic-brand-primary);
 }
 
 // Active state
@@ -100,7 +100,7 @@
   color: $dropdownLinkColorActive;
   text-decoration: none;
   outline: 0;
-  @include gradient-vertical($dropdownLinkBackgroundActive, darken($dropdownLinkBackgroundActive, 5%));
+  background: var(--ic-brand-primary-darkened-5);
 }
 
 // Disabled state
