@@ -214,17 +214,27 @@ class BzController < ApplicationController
         # shouldn't be a real problem.
         magic_field_count = Rails.cache.fetch("magic_field_count_for_course_#{course_id}", :expires_in => 1.week) do
           count = 0
+          names = {}
+          selector = 'input[data-bz-retained]:not(.bz-optional-magic-field),textarea[data-bz-retained]:not(.bz-optional-magic-field)'
           course.assignments.published.each do |assignment|
             assignment_html = assignment.description
             doc = Nokogiri::HTML(assignment_html)
-            doc.css('[data-bz-retained]:not(bz-optional-magic-field)').each do |o|
+            doc.css(selector).each do |o|
+              n = o.attr('data-bz-retained')
+              next if names[n] # since we only count new saves, repeated names should not be added
+              next if o.attr['type'] == 'checkbox' # checkboxes are optional by nature
+              names[n] = true
               count += 1
             end
           end
           course.wiki_pages.published.each do |wiki_page|
             page_html = wiki_page.body
             doc = Nokogiri::HTML(page_html)
-            doc.css('[data-bz-retained]:not(bz-optional-magic-field)').each do |o|
+            doc.css(selector).each do |o|
+              n = o.attr('data-bz-retained')
+              next if names[n]
+              next if o.attr['type'] == 'checkbox'
+              names[n] = true
               count += 1
             end
           end
@@ -244,7 +254,7 @@ class BzController < ApplicationController
           # be editing one field at a time anyway and I don't think the Canvas models
           # have a way to do this with a proper atomic update or a lock.
           existing_grade = submission.grade.nil? ? 0 : submission.grade.to_f
-          new_grade = existing_grade + step
+          new_grade = existing_grade + step * 1.1 # the multiplier is to force it to round up a little to hide floating point inaccuracies. don't want users worrying about a 9.9 that was introduced just cuz of roundoff error, so better to err on the side of being slightly too large
           participation_assignment.grade_student(@current_user, {:grade => (new_grade), :suppress_notification => true })
         end
       end

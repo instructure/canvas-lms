@@ -49,6 +49,8 @@ module CC::Importer::Canvas
           item[:linked_resource_id] = get_node_val(item_node, 'identifierref')
           item[:linked_resource_global_id] = get_node_val(item_node, 'global_identifierref')
 
+          item[:part_id] = get_node_val(item_node, 'part_id')
+
           mod[:items] << item
         end
 
