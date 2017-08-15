@@ -401,6 +401,9 @@ class Assignment < ActiveRecord::Base
   end
 
   def touch_assignment_group
+    if assignment_group_id_changed? && assignment_group_id_was.present?
+      AssignmentGroup.where(id: assignment_group_id_was).update_all(updated_at: Time.zone.now.utc)
+    end
     AssignmentGroup.where(:id => self.assignment_group_id).update_all(:updated_at => Time.zone.now.utc) if self.assignment_group_id
     true
   end
@@ -650,24 +653,19 @@ class Assignment < ActiveRecord::Base
   end
 
   def update_submissions_later
-    if assignment_group_id_changed? && assignment_group_id_was.present?
-      AssignmentGroup.where(id: assignment_group_id_was).update_all(updated_at: Time.zone.now.utc)
-    end
-    self.assignment_group.touch if self.assignment_group
-    if points_possible_changed?
-      send_later_if_production(:update_submissions)
-    end
+    send_later_if_production(:update_submissions) if points_possible_changed?
   end
 
   attr_accessor :updated_submissions # for testing
   def update_submissions
     @updated_submissions ||= []
-    Submission.suspend_callbacks(:update_assignment) do
+    Submission.suspend_callbacks(:update_assignment, :touch_graders) do
       self.submissions.find_each do |submission|
         @updated_submissions << submission
         submission.save!
       end
     end
+    context.touch_admins if context.respond_to?(:touch_admins)
   end
 
   def update_submittable

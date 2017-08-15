@@ -25,15 +25,9 @@ module Importers
     def self.process_migration(data, migration)
       assignments = data['assignments'] ? data['assignments']: []
       to_import = migration.to_import 'assignments'
-      assignments.each do |assign|
-        if migration.import_object?("assignments", assign['migration_id'])
-          begin
-            import_from_migration(assign, migration.context, migration)
-          rescue
-            migration.add_import_warning(t('#migration.assignment_type', "Assignment"), assign[:title], $!)
-          end
-        end
-      end
+
+      create_assignments(assignments, migration)
+
       migration_ids = assignments.map{|m| m['assignment_id'] }.compact
       conn = Assignment.connection
       cases = []
@@ -42,6 +36,34 @@ module Importers
       unless cases.empty?
         conn.execute("UPDATE #{Assignment.quoted_table_name} SET position=CASE #{cases.join(' ')} ELSE NULL END WHERE context_id=#{migration.context.id} AND context_type=#{conn.quote(migration.context.class.to_s)} AND migration_id IN (#{migration_ids.map{|id| conn.quote(id)}.join(',')})")
       end
+    end
+
+    def self.create_assignments(assignments, migration)
+      assignment_records = []
+      context = migration.context
+
+      Assignment.suspend_callbacks(:update_submissions_later) do
+        assignments.each do |assign|
+          if migration.import_object?("assignments", assign['migration_id'])
+            begin
+              assignment_records << import_from_migration(assign, context, migration)
+            rescue
+              migration.add_import_warning(t('#migration.assignment_type', "Assignment"), assign[:title], $!)
+            end
+          end
+        end
+      end
+
+      assignment_records.compact!
+
+      assignment_ids = assignment_records.map(&:id)
+      Submission.suspend_callbacks(:update_assignment, :touch_graders) do
+        Submission.where(assignment_id: assignment_ids).find_each do |sub|
+          sub.save!
+        end
+      end
+
+      context.touch_admins if context.respond_to?(:touch_admins)
     end
 
     def self.import_from_migration(hash, context, migration, item=nil, quiz=nil)
