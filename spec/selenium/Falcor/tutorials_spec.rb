@@ -163,6 +163,15 @@ describe "Tutorials" do
       expect(element).to include_text("navigation, feature options and external app integrations")
     end
 
+    it "the tutorial tray appears on the course import page", priority: "1", test_id: 3165153 do
+      get "/courses/#{@course.id}/content_migrations"
+      element = f('.NewUserTutorialTray')
+      expect(element).to include_text("Import")
+      expect(element).to include_text("Bring your content into your course")
+      expect(element).to include_text("Bring existing content from")
+      expect(element).to include_text("into your Canvas course")
+    end
+
     it "the 'End Tutorial' button ends the tutorial", priority: "1", test_id: 3189025 do
       get "/courses/#{@course.id}"
       fj("button:contains('End Tutorial')").click
@@ -188,6 +197,25 @@ describe "Tutorials" do
       fj("span button:contains('Cancel')").click
       expect(f('.NewUserTutorialTray')).to be_displayed
       expect(driver).not_to contain_css("End Course Set-up Tutorial")
+    end
+  end
+
+  context "as an admin" do
+    before :once do
+      course_with_teacher
+      account_admin_user
+    end
+
+    before :each do
+      user_session(@admin)
+    end
+
+    it "the tutorial feature flag can be enabled", priority: "1", test_id: 3165145 do
+      get "/accounts/#{@course.account_id}/settings"
+      f("li[aria-labelledby='tab-features-link']").click
+      flag_container = f("div[class*=new_user_tutorial]")
+      f('label', flag_container).click
+      expect((f'input', flag_container)[:checked]).to eq "true"
     end
   end
 end
