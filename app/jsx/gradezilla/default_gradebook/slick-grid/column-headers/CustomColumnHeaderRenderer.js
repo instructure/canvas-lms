@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import I18n from 'i18n!gradebook';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import CustomColumnHeader from 'jsx/gradezilla/default_gradebook/components/CustomColumnHeader';
@@ -25,7 +26,7 @@ function getProps (column, gradebook, options) {
 
   return {
     ref: options.ref,
-    title: customColumn.title
+    title: customColumn.teacher_notes ? I18n.t('Notes') : customColumn.title
   };
 }
 

@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import I18n from 'i18n!gradebook';
 import ReactDOM from 'react-dom';
 import { createGradebook } from 'spec/jsx/gradezilla/default_gradebook/GradebookSpecHelper';
 import CustomColumnHeaderRenderer
@@ -53,6 +54,13 @@ QUnit.module('CustomColumnHeaderRenderer', function (suiteHooks) {
     test('calls the "ref" option with the component reference', function () {
       render();
       equal(component.constructor.name, 'CustomColumnHeader');
+    });
+
+    test('uses translated label for teacher notes', function () {
+      sinon.stub(I18n, 't').withArgs('Notes').returns('Translated Notes');
+      render();
+      equal(component.props.title, 'Translated Notes');
+      I18n.t.restore();
     });
 
     test('uses the custom column for the related "customColumnId" on the column definition', function () {

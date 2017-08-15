@@ -2,7 +2,11 @@
   <div class="custom-column-cell padding-top">
     <label {{bind-attr for=id}}>
       <h4>
-        {{column.title}}
+        {{#if column.teacher_notes}}
+          {{#t}}Notes{{/t}}
+        {{else}}
+          {{column.title}}
+        {{/if}}
       </h4>
     </label>
     {{

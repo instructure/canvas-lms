@@ -1317,7 +1317,7 @@ define [
     customColumnDefinitions: ->
       @customColumns.map (c) ->
         id: "custom_col_#{c.id}"
-        name: htmlEscape c.title
+        name: if c.teacher_notes then I18n.t('Notes') else htmlEscape c.title
         field: "custom_col_#{c.id}"
         width: 100
         cssClass: "meta-cell custom_column"
