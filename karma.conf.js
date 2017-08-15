@@ -30,12 +30,21 @@ const karmaConfig = {
 
   // - Chrome
   // - ChromeCanary
+  // - ChromeHeadless
   // - Firefox
   // - Opera (has to be installed with `npm install karma-opera-launcher`)
   // - Safari (only Mac; has to be installed with `npm install karma-safari-launcher`)
   // - PhantomJS
   // - IE (only Windows; has to be installed with `npm install karma-ie-launcher`)
   browsers: ['Chrome'],
+
+  // Run headless chrome with `karma start --browsers ChromeHeadlessNoSandbox`
+  customLaunchers: {
+    ChromeHeadlessNoSandbox: {
+      base: 'ChromeHeadless',
+      flags: ['--no-sandbox'] // needed for running tests in local docker
+    }
+  },
 
   // If browser does not capture in given timeout [ms], kill it
   captureTimeout: 60000,

@@ -35,6 +35,11 @@ services:
       <<: *BASE-ENV
       VIRTUAL_HOST: .canvas.docker
 
+  karma:
+    <<: *BASE
+    build:
+      context: .
+      dockerfile: docker-compose/karma/Dockerfile
 
   postgres:
     volumes:
