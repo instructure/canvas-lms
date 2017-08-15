@@ -198,6 +198,22 @@ describe "Tutorials" do
       expect(f('.NewUserTutorialTray')).to be_displayed
       expect(driver).not_to contain_css("End Course Set-up Tutorial")
     end
+
+    it "the New User Tutorial description toggle button toggles the description", priority: "1", test_id: 3189023 do
+      get "/profile/settings"
+      feature_container = f("div[class*=new_user_tutorial]")
+      description_container = f("div[id*=new_user_tutorial]")
+      expect(description_container).not_to be_displayed
+      description_toggle_button = f("span[class=element_toggler]", feature_container)
+      description_toggle_button.click
+
+      expect(description_container).to be_displayed
+      expect(description_container).to include_text("Course set-up tutorial provides tips on how to")
+      expect(description_container).to include_text("setting up a new course for the first time in a long time")
+
+      description_toggle_button.click
+      expect(description_container).not_to be_displayed
+    end
   end
 
   context "as an admin" do
