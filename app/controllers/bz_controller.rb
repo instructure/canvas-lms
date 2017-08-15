@@ -214,17 +214,23 @@ class BzController < ApplicationController
         # shouldn't be a real problem.
         magic_field_count = Rails.cache.fetch("magic_field_count_for_course_#{course_id}", :expires_in => 1.week) do
           count = 0
+          names = {}
+          selector = 'input[data-bz-retained]:not(.bz-optional-magic-field),textarea[data-bz-retained]:not(.bz-optional-magic-field)'
           course.assignments.published.each do |assignment|
             assignment_html = assignment.description
             doc = Nokogiri::HTML(assignment_html)
-            doc.css('[data-bz-retained]:not(bz-optional-magic-field)').each do |o|
+            doc.css(selector).each do |o|
+              n = o.attr('data-bz-retained')
+              next if names[n]
               count += 1
             end
           end
           course.wiki_pages.published.each do |wiki_page|
             page_html = wiki_page.body
             doc = Nokogiri::HTML(page_html)
-            doc.css('[data-bz-retained]:not(bz-optional-magic-field)').each do |o|
+            doc.css(selector).each do |o|
+              n = o.attr('data-bz-retained')
+              next if names[n]
               count += 1
             end
           end

@@ -95,6 +95,7 @@ module CC
                   item_node.position ct.position
                   item_node.new_tab ct.new_tab
                   item_node.indent ct.indent
+                  item_node.part_id ct.part_id
                 end
               end
             end
