@@ -329,6 +329,8 @@ define [
         submissionsChunkSize: @options.chunk_size
         customColumnDataURL: @options.custom_column_data_url
         customColumnDataPageCb: @gotCustomColumnDataChunk
+        customColumnDataParams:
+          include_hidden: true
       )
 
       dataLoader.gotStudentIds.then (response) =>

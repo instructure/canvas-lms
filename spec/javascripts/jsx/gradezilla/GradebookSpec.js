@@ -370,6 +370,12 @@ test('loads context modules', function () {
   equal(options.contextModulesURL, '/context-modules');
 });
 
+test('requests data for hidden custom columns', function () {
+  this.createInitializedGradebook({ custom_column_data_url: '/custom-column-data' });
+  const [options] = DataLoader.loadGradebookData.lastCall.args;
+  strictEqual(options.customColumnDataParams.include_hidden, true);
+});
+
 test('stores student ids when loaded', function () {
   const gradebook = this.createInitializedGradebook();
   const studentIds = ['1101', '1102', '1103'];
