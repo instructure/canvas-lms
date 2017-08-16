@@ -140,6 +140,18 @@ Canvas::Plugin.register('kaltura', nil, {
   :settings_partial => 'plugins/kaltura_settings',
   :validator => 'KalturaValidator'
 })
+Canvas::Plugin.register('mathman', nil, {
+  :name => lambda{ t :name, 'MathMan' },
+  :description => lambda{ t :description, 'A simple microservice that converts LaTeX formulae to MathML and SVG'},
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/mathman_settings',
+  :settings => {
+    use_for_svg: false,
+    use_for_mml: false
+  }
+})
 Canvas::Plugin.register('wimba', :web_conferencing, {
   :name => lambda{ t :name, "Wimba" },
   :description => lambda{ t :description, "Wimba web conferencing support" },
