@@ -43,6 +43,7 @@ module CC::Importer::Canvas
       @course[:grading_standards] = convert_grading_standards(settings_doc(GRADING_STANDARDS))
       @course[:learning_outcomes] = convert_learning_outcomes(settings_doc(LEARNING_OUTCOMES))
       @course[:modules] = convert_modules(settings_doc(MODULE_META))
+      @course[:dynamic_syllabus_parts] = convert_dynamic_syllabus_parts(settings_doc(MODULE_META))
       @course[:rubrics] = convert_rubrics(settings_doc(RUBRICS))
       @course[:calendar_events] = convert_events(settings_doc(EVENTS))
     end
