@@ -40,10 +40,10 @@ class BzController < ApplicationController
         if o.name == "TEXTAREA"
           n = doc.create_element 'div'
           n.content = value
-        elsif o.name == "INPUT" && o.attr['type'] == 'checkbox'
+        elsif o.name == "INPUT" && o.attr('type') == 'checkbox'
           n = doc.create_element 'span'
           n.inner_html = value == 'yes' ? '[X]' : '[ ]'
-        elsif o.name == "INPUT" && o.attr['type'] == 'radio'
+        elsif o.name == "INPUT" && o.attr('type') == 'radio'
           n = doc.create_element 'span'
           n.inner_html = value == 'yes' ? '[O]' : '[ ]'
         elsif value =~ /\A#{URI::regexp(['http', 'https'])}\z/
@@ -222,7 +222,7 @@ class BzController < ApplicationController
             doc.css(selector).each do |o|
               n = o.attr('data-bz-retained')
               next if names[n] # since we only count new saves, repeated names should not be added
-              next if o.attr['type'] == 'checkbox' # checkboxes are optional by nature
+              next if o.attr('type') == 'checkbox' # checkboxes are optional by nature
               names[n] = true
               count += 1
             end
@@ -233,7 +233,7 @@ class BzController < ApplicationController
             doc.css(selector).each do |o|
               n = o.attr('data-bz-retained')
               next if names[n]
-              next if o.attr['type'] == 'checkbox'
+              next if o.attr('type') == 'checkbox'
               names[n] = true
               count += 1
             end
