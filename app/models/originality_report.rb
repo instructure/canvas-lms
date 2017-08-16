@@ -21,6 +21,10 @@ class OriginalityReport < ActiveRecord::Base
   belongs_to :submission
   belongs_to :attachment
   belongs_to :originality_report_attachment, class_name: "Attachment"
+
+  has_one :lti_link, class_name: Lti::Link, as: :linkable, inverse_of: :linkable, dependent: :destroy
+  accepts_nested_attributes_for :lti_link, allow_destroy: true
+
   validates :attachment, :submission, presence: true
   validates :workflow_state, inclusion: { in: ['scored', 'error', 'pending'] }
   validates :originality_score, inclusion: { in: 0..100, message: 'score must be between 0 and 100' }, allow_nil: true
@@ -42,19 +46,18 @@ class OriginalityReport < ActiveRecord::Base
     super(options).tap do |h|
       h[:file_id] = h.delete :attachment_id
       h[:originality_report_file_id] = h.delete :originality_report_attachment_id
-      if h[:link_id].present?
-        tool_setting = Lti::ToolSetting.find_by(resource_link_id: h.delete(:link_id))
-        h[:tool_setting] = { resource_url: tool_setting.resource_url,
-                             resource_type_code:tool_setting.resource_type_code }
+      if lti_link.present?
+        h[:tool_setting] = { resource_url: lti_link.resource_url,
+                             resource_type_code:lti_link.resource_type_code }
       end
     end
   end
 
   def report_launch_url
-    if link_id.present?
+    if lti_link.present?
       course_assignment_resource_link_id_url(course_id: assignment.context_id,
                                              assignment_id: assignment.id,
-                                             resource_link_id: link_id,
+                                             resource_link_id: lti_link.resource_link_id,
                                              host: HostUrl.context_host(assignment.context),
                                              display: 'borderless')
     else

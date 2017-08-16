@@ -78,9 +78,7 @@ module Lti
                                 submission: submission,
                                 link_id: resource_link_id)
     end
-    let(:attachment_association) { AttachmentAssociation.create!(context: submission, attachment: attachment) }
-    let(:tool_setting) { Lti::ToolSetting.create!(context: attachment_association, resource_link_id: resource_link_id) }
-    let(:variable_expander) { VariableExpander.new(root_account, account, controller, current_user: user, tool: tool, tool_setting: tool_setting) }
+    let(:variable_expander) { VariableExpander.new(root_account, account, controller, current_user: user, tool: tool, originality_report: originality_report) }
 
     it 'clears the lti_helper instance variable when you set the current_user' do
       expect(variable_expander.lti_helper).not_to be nil
@@ -279,7 +277,7 @@ module Lti
       it 'has a substitution for com.instructure.Assignment.lti.id' do
         exp_hash = {test: '$com.instructure.Assignment.lti.id'}
         variable_expander.expand_variables!(exp_hash)
-        expect(exp_hash[:test]).to eq tool_setting.context.context.assignment.lti_context_id
+        expect(exp_hash[:test]).to eq originality_report.submission.assignment.lti_context_id
       end
 
       it 'has a substitution for com.instructure.Assignment.lti.id when there is no tool setting' do
@@ -346,6 +344,24 @@ module Lti
         exp_hash = {test: '$vnd.Canvas.OriginalityReport.url'}
         variable_expander.expand_variables!(exp_hash)
         expect(exp_hash[:test]).to eq 'api/lti/assignments/{assignment_id}/submissions/{submission_id}/originality_report'
+      end
+
+      it 'has substitution for com.instructure.OriginalityReport.id' do
+        exp_hash = {test: '$com.instructure.OriginalityReport.id'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq originality_report.id
+      end
+
+      it 'has substitution for com.instructure.Submission.id' do
+        exp_hash = {test: '$com.instructure.Submission.id'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq originality_report.submission.id
+      end
+
+      it 'has substitution for com.instructure.File.id' do
+        exp_hash = {test: '$com.instructure.File.id'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq originality_report.attachment.id
       end
 
       it 'has substitution for vnd.Canvas.submission.url' do

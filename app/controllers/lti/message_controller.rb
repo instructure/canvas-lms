@@ -81,9 +81,9 @@ module Lti
     private :reregistration_message
 
     def resource
-      tool_setting = ToolSetting.find_by(resource_link_id: params[:resource_link_id])
-      return not_found if tool_setting.blank?
-      basic_launch_by_tool_setting(tool_setting)
+      lti_link = Link.find_by(resource_link_id: params[:resource_link_id])
+      return not_found if lti_link.blank?
+      basic_launch_by_lti_link(lti_link)
     end
 
     def basic_lti_launch_request
@@ -133,26 +133,26 @@ module Lti
       message_handler.launch_path
     end
 
-    def basic_launch_by_tool_setting(tool_setting)
-      message_handler = tool_setting.message_handler(@context)
+    def basic_launch_by_lti_link(lti_link)
+      message_handler = lti_link.message_handler(@context)
       if message_handler.present?
-        return lti2_basic_launch(message_handler, tool_setting.resource_url, tool_setting.resource_link_id)
+        return lti2_basic_launch(message_handler, lti_link)
       end
       not_found
     rescue InvalidDomain => e
       return render json: {errors: {invalid_launch_url: {message: e.message}}}, status: 400
     end
 
-    def lti2_basic_launch(message_handler, resource_url = nil, resource_link_id = nil)
+    def lti2_basic_launch(message_handler, lti_link = nil)
       resource_handler = message_handler.resource_handler
       tool_proxy = resource_handler.tool_proxy
       # TODO: create scope for query
       if tool_proxy.workflow_state == 'active'
         launch_attrs = {
-          launch_url: launch_url(resource_url, message_handler),
+          launch_url: launch_url(lti_link&.resource_url, message_handler),
           oauth_consumer_key: tool_proxy.guid,
           lti_version: IMS::LTI::Models::LTIModel::LTI_VERSION_2P0,
-          resource_link_id: resource_link_id || message_handler.build_resource_link_id(context: @context,
+          resource_link_id: lti_link&.resource_link_id || message_handler.build_resource_link_id(context: @context,
                                                                                        link_fragment: params[:resource_link_fragment]),
         }
 
@@ -164,9 +164,8 @@ module Lti
         custom_param_opts = prep_tool_settings(message_handler.parameters, tool_proxy, launch_attrs[:resource_link_id])
         custom_param_opts[:content_tag] = tag if tag
         custom_param_opts[:secure_params] = params[:secure_params] if params[:secure_params].present?
-        tool_setting = ToolSetting.find_by(resource_link_id: resource_link_id)
         variable_expander = create_variable_expander(custom_param_opts.merge(tool: tool_proxy,
-                                                                             tool_setting: tool_setting,
+                                                                             originality_report: lti_link&.originality_report,
                                                                              launch: @lti_launch))
         launch_attrs.merge! enabled_parameters(tool_proxy, message_handler, variable_expander)
 
