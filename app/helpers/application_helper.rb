@@ -841,6 +841,7 @@ module ApplicationHelper
     end
 
     if includes.present?
+      includes[0] = bz_css_choice(includes[0])
       stylesheet_link_tag(*(includes + [{media: 'all' }]))
     end
   end
@@ -854,9 +855,23 @@ module ApplicationHelper
       css_includes
     end
     if includes.length > 0
-      includes[0] # just give the url
+      bz_css_choice(includes[0]) # just give the url
     else
       '' # return empty string if there's nothing so the type is consistent to the view
+    end
+  end
+
+  # for new courses, we use newui. for old ones, we use bz_custom
+  # the configuration value should always be to bz_custom, but at different
+  # locations for prod vs staging, etc.
+  def bz_css_choice(orig)
+    # this list of course IDs are our 2015 and 2016 ones.
+    # I don't mind hardcoding since we will always use the new
+    # style going forward, and thus this list will never change.
+    if @context && [11, 17, 23, 24, 21, 22, 7].include?(@context.id)
+      orig.sub("bz_custom.css", "bz_newui.css")
+    else
+      orig.sub("bz_custom.css", "bz_oldui.css")
     end
   end
 
