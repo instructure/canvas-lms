@@ -470,7 +470,7 @@ module AccountReports
             users = batch.map {|e| User.new(id: e.user_id) if e.unique_id.nil?}.compact
             users += batch.map {|e| User.new(id: e.associated_user_id) if e.ob_unique_id.nil? && !e.associated_user_id.nil?}.compact
             users_by_id = users.index_by(&:id)
-            pseudonyms = ActiveRecord::Associations::Preloader.new.preload(users, pseudonyms: :account).index_by(&:owners)
+            pseudonyms = load_cross_shard_logins(users)
           end
           batch.each do |e|
             next if e.pseudo_state == 'deleted' && !@include_deleted
@@ -486,8 +486,7 @@ module AccountReports
             row << e.user_id unless @sis_format
             if e.unique_id.nil? && include_other_roots
               u = users_by_id[e.user_id]
-              u.instance_variable_set(:@all_active_pseudonyms, pseudonyms[[u]].preloaded_records)
-              p = SisPseudonym.for(u, root_account, {type: :trusted, require_sis: true})
+              p = loaded_pseudonym(pseudonyms, u)
               next unless p
               pseudo_root = p.account
             end
@@ -500,9 +499,7 @@ module AccountReports
             row << e.associated_user_id unless @sis_format
             if e.ob_unique_id.nil? && !e.associated_user_id.nil? && include_other_roots
               u2 = users_by_id[e.associated_user_id]
-              u2.instance_variable_set(:@all_active_pseudonyms, pseudonyms[[u2]].preloaded_records)
-              u2 = users_by_id[e.associated_user_id]
-              p2 = SisPseudonym.for(u2, root_account, {type: :trusted, require_sis: true})
+              p2 = loaded_pseudonym(pseudonyms, u2)
             end
             row << (p2 ? p2.sis_user_id : e.ob_sis_id)
             row << e.sis_batch_id? unless @sis_format
@@ -514,6 +511,26 @@ module AccountReports
           end
         end
       end
+    end
+
+    def loaded_pseudonym(pseudonyms, u)
+      user_pseudonyms = pseudonyms[u.id] || []
+      u.association(:pseudonyms).target = []
+      u.instance_variable_set(:@all_active_pseudonyms, user_pseudonyms)
+      SisPseudonym.for(u, root_account, {type: :trusted, require_sis: false})
+    end
+
+    def load_cross_shard_logins(users)
+      shards = root_account.trusted_account_ids.map {|id| Shard.shard_for(id)}
+      shards << root_account.shard
+      User.preload_shard_associations(users)
+      shards = shards & users.map(&:associated_shards).flatten
+      pseudonyms = Pseudonym.shard(shards.uniq).where(user_id: users).active
+      pseudonyms.each do |p|
+        p.account = root_account if p.account_id == root_account.id
+      end
+      ActiveRecord::Associations::Preloader.new.preload(pseudonyms, account: :role_links)
+      pseudonyms.group_by(&:user_id)
     end
 
     def groups

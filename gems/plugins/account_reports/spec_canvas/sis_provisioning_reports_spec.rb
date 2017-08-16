@@ -927,21 +927,24 @@ describe "Default Account Reports" do
         it "should run with cross shard pseudonyms" do
           @shard1.activate do
             @root = Account.create
-            @user = user_with_managed_pseudonym(active_all: true, account: @root, name: 'Jimmy John',
+            @user1 = user_with_managed_pseudonym(active_all: true, account: @root, name: 'Jimmy John',
                                                 username: 'other_shard@example.com', sis_user_id: 'other_shard')
+            @user2 = user_with_managed_pseudonym(active_all: true, account: @root, name: 'James John',
+                                                 username: 'other_shar2d@example.com', sis_user_id: 'other_shard2')
           end
           allow(@account).to receive(:trusted_account_ids).and_return([@account.id, @root.id])
           allow(@account).to receive(:trust_exists?).and_return(true)
-          @course1.enroll_user(@user)
+          @course1.enroll_user(@user1)
+          @course1.enroll_user(@user2)
 
           parameters = {}
           parameters["enrollments"] = true
           parsed = read_report("provisioning_csv", {params: parameters, order: [3, 1, 8]})
-          expect(parsed.length).to eq 10
+          expect(parsed.length).to eq 11
 
-          expect(parsed[0]).to eq [@course1.id.to_s, "SIS_COURSE_ID_1", @user.id.to_s,
+          expect(parsed[0]).to eq [@course1.id.to_s, "SIS_COURSE_ID_1", @user1.id.to_s,
                                    'other_shard', "student", student_role.id.to_s,
-                                   @course1.enrollments.where(user_id: @user).take.course_section_id.to_s,
+                                   @course1.enrollments.where(user_id: @user1).take.course_section_id.to_s,
                                    nil, "invited", nil, nil, "false", 'StudentEnrollment',
                                    "false", HostUrl.context_host(@root)]
         end
