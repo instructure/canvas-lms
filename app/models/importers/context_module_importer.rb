@@ -52,6 +52,8 @@ module Importers
 
     def self.process_migration(data, migration)
 
+      @course_parts = {}
+
       parts = data['dynamic_syllabus_parts'] ? data['dynamic_syllabus_parts'] : []
       parts.each do|part|
         self.process_course_part(part, migration)
@@ -66,12 +68,13 @@ module Importers
     end
 
     def self.process_course_part(part, migration)
-      if migration.import_object?("course_parts", mod['migration_id'])
+      if migration.import_object?("course_parts", part['migration_id'])
         begin
-          self.import_course_part_from_migration(mod, migration.context, migration)
+          self.import_course_part_from_migration(part, migration.context, migration)
         rescue
           migration.add_import_warning("Dynamic Syllabus Part", part[:title], $!)
         end
+      end
     end
 
 
@@ -88,6 +91,8 @@ module Importers
       item.task_box_title = hash[:task_box_title]
 
       item.save
+
+      @course_parts[hash[:migration_id]] = item
 
       item
     end
@@ -136,7 +141,10 @@ module Importers
         item.workflow_state = 'active'
       end
 
-      item.part_id = hash[:part_id]
+      if hash[:part_id]
+        part = @course_parts[hash[:part_id]]
+        item.part_id = part.id
+      end
       item.image_url = hash[:image_url]
       item.intro_text = hash[:intro_text]
 
