@@ -101,7 +101,7 @@ ic-tab {
     background-color: $grayLighter;
   }
   &[selected] {
-    background-color: $linkColor;
+    background-color: var(--ic-link-color);
     color: $white;
   }
 }

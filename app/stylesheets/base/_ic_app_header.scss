@@ -352,7 +352,7 @@ body.primary-nav-expanded {
     .menu-item__text {
 
       @if $use_high_contrast {
-        color: $ic-link-color;
+        color: var(--ic-link-color);
       }
       @else {
         color: var(--ic-brand-global-nav-menu-item__text-color--active);
@@ -485,7 +485,7 @@ body.primary-nav-expanded {
     display: inline-block;
     &:focus {
       @include ic-focus-base;
-      @include ic-focus-variant($color: $ic-link-color, $offset: 2px);
+      @include ic-focus-variant($color: var(--ic-link-color), $offset: 2px);
     }
     i[class*=icon-],
     i[class^=icon-] { margin-right: $ic-sp/3; }

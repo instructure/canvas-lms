@@ -124,7 +124,7 @@ input[type="color"],
 
   // Focus state
   &:focus {
-    border-color: $ic-link-color-lightened-10;
+    border-color: var(--ic-link-color-lightened-10);
     outline: 0;
   }
 }

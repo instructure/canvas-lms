@@ -178,20 +178,16 @@ h3, .h3 {
 ///////==============
 
 a {
-  color: $ic-link-color;
+  color: var(--ic-link-color);
   &:focus, &:hover {
-    @if $use_high_contrast {
-      color: darken($ic-link-color, 10%);
-    } @else {
-      color: var(--ic-link-color-darkened-10);
-     }
+    color: var(--ic-link-color-darkened-10);
   }
 
   @if $use_high_contrast {
     text-decoration: underline;
     &:focus, &:hover { text-decoration: none; }
     @include ic-focus-base;
-    &:focus { @include ic-focus-variant($color: $ic-link-color, $offset: -1px); }
+    &:focus { @include ic-focus-variant($color: var(--ic-link-color), $offset: -1px); }
   }
 
   @else {
@@ -208,7 +204,7 @@ a {
     text-decoration: underline;
     &:focus, &:hover { text-decoration: none; }
     @include ic-focus-base;
-    &:focus { @include ic-focus-variant($color: $ic-link-color, $offset: -1px); }
+    &:focus { @include ic-focus-variant($color: var(--ic-link-color), $offset: -1px); }
   }
 }
 

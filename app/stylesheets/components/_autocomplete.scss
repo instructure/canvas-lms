@@ -97,7 +97,7 @@ ul[class*=ac-] {
   width: 100%;
 
   &.focused {
-    border-color: $ic-link-color-lightened-10;
+    border-color: var(--ic-link-color);
   }
 
   &.disabled {

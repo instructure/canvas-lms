@@ -61,8 +61,8 @@
   &:focus,
   &:hover {
     outline: none;
-    color: $ic-link-color;
-    border-color: $ic-link-color;
+    color: var(--ic-link-color);
+    border-color: var(--ic-link-color);
     text-decoration: none;
   }
 }
@@ -74,5 +74,5 @@
 .ic-EmptyStateButton__Text {
   @include fontSize($ic-font-size--medium);
   display: block;
-  color: $ic-link-color;
+  color: var(--ic-link-color);
 }

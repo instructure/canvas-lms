@@ -924,7 +924,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 
 #settings_form .icon-info {
   vertical-align: -4px;
-  color: $linkColor;
+  color: var(--ic-link-color);
 }
 
 .gradebook-icon-link:hover {

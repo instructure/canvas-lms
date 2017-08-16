@@ -66,11 +66,10 @@ $menu-item-keyboard-shortcut-color: $ic-font-color-dark;
 }
 
 .mce-container.mce-tinymce .mce-btn.mce-active:focus:after {
-  border-bottom-color: $ic-link-color;
+  border-bottom-color: var(--ic-link-color);
 }
 
 .mce-container.mce-tinymce :focus,
 .mce-container.mce-tinyrce :focus{
-  outline: 2px solid $ic-link-color;
+  outline: 2px solid var(--ic-link-color);
 }
-

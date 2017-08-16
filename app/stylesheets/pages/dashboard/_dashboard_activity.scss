@@ -160,7 +160,7 @@ $ignore-col-width: 50px;
 }
 
 .fake-link {
-  color: $ic-link-color;
+  color: var(--ic-link-color);
   &:hover {
     text-decoration: underline;
   }

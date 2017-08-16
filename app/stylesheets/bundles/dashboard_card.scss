@@ -193,7 +193,7 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
 
   .no-touch & {
     &:focus {
-      @if $use_high_contrast { outline: 1px solid $ic-link-color; }
+      @if $use_high_contrast { outline: 1px solid var(--ic-link-color); }
       @else { outline: none; }
     }
     &:hover { color: var(--ic-brand-primary); }

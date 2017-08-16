@@ -32,7 +32,7 @@ a#accessibility_warning {
   border-radius: 0.25rem;
 
   // from app/stylesheets/vendor/bootstrap/_forms.scss .uneditable-input:focus
-  border: 1px solid $ic-link-color-lightened-10;
+  border: 1px solid var(--ic-link-color-lightened-10);
   outline: 0;
 }
 
@@ -166,7 +166,7 @@ $gradebook_cell_padding_top: 8px;
 }
 
 .student-grades-link {
-  @if $use_high_contrast { color: darken($ic-link-color, 5%); }
+  @if $use_high_contrast { color: var(--ic-link-color-darkened-10); }
 }
 
 .student-placeholder {

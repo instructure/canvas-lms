@@ -280,7 +280,7 @@
 // If the prompt is not a clickable link, set $is-link to false when including the mixin
 @mixin accessibility-prompt($is-link: true) {
   padding: 4px 8px;
-  background: $ic-link-color;
+  background: var(--ic-link-color);
   background-clip: border-box;
   text-align: center;
   color: $ic-color-light;
@@ -301,14 +301,14 @@
   outline-style: solid;
 }
 
-@mixin ic-focus-variant($color: $ic-link-color, $offset: -1px) {
+@mixin ic-focus-variant($color: var(--ic-link-color), $offset: -1px) {
   outline-offset: $offset;
   outline-color: $color;
 }
 
 @mixin button-focus-light {
-  @if $use_high_contrast { box-shadow: inset 0 0 0 2px $ic-link-color; }
-  @else { box-shadow: inset 0 0 0 1px $ic-link-color; }
+  @if $use_high_contrast { box-shadow: inset 0 0 0 2px var(--ic-link-color); }
+  @else { box-shadow: inset 0 0 0 1px var(--ic-link-color); }
 }
 
 @mixin button-focus-dark {
