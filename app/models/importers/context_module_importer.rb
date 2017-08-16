@@ -55,7 +55,7 @@ module Importers
       @course_parts = {}
 
       parts = data['dynamic_syllabus_parts'] ? data['dynamic_syllabus_parts'] : []
-      parts.each do|part|
+      parts.each do |part|
         self.process_course_part(part, migration)
       end
 

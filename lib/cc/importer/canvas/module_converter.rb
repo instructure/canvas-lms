@@ -54,6 +54,10 @@ module CC::Importer::Canvas
         mod[:require_sequential_progress] = get_bool_val(r_node, 'require_sequential_progress')
         mod[:requirement_count] = get_int_val(r_node, 'requirement_count')
 
+        mod[:part_id] = get_node_val(r_node, 'part_id')
+        mod[:image_url] = get_node_val(r_node, 'image_url')
+        mod[:intro_text] = get_node_val(r_node, 'intro_text')
+
         mod[:items] = []
         r_node.css('item').each do |item_node|
           item = {}
@@ -67,10 +71,6 @@ module CC::Importer::Canvas
           item[:linked_resource_type] = get_node_val(item_node, 'content_type')
           item[:linked_resource_id] = get_node_val(item_node, 'identifierref')
           item[:linked_resource_global_id] = get_node_val(item_node, 'global_identifierref')
-
-          item[:part_id] = get_node_val(item_node, 'part_id')
-          item[:image_url] = get_node_val(item_node, 'image_url')
-          item[:intro_text] = get_node_val(item_node, 'intro_text')
 
           mod[:items] << item
         end
