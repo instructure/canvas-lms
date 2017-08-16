@@ -51,6 +51,12 @@ module Importers
     end
 
     def self.process_migration(data, migration)
+
+      parts = data['dynamic_syllabus_parts'] ? data['dynamic_syllabus_parts'] : []
+      parts.each do|part|
+        self.process_course_part(part, migration)
+      end
+
       modules = data['modules'] ? data['modules'] : []
       modules.each do |mod|
         self.process_module(mod, migration)
@@ -58,6 +64,34 @@ module Importers
       migration.context.context_modules.first.try(:fix_position_conflicts)
       migration.context.touch
     end
+
+    def self.process_course_part(part, migration)
+      if migration.import_object?("course_parts", mod['migration_id'])
+        begin
+          self.import_course_part_from_migration(mod, migration.context, migration)
+        rescue
+          migration.add_import_warning("Dynamic Syllabus Part", part[:title], $!)
+        end
+    end
+
+
+    def self.import_course_part_from_migration(hash, context, migration, item=nil)
+      hash = hash.with_indifferent_access
+      item = CoursePart.new(:course_id => context.id)
+      item.migration_id = hash[:migration_id]
+      migration.add_imported_item(item)
+
+      item.title = hash[:title]
+      item.position = hash[:position]
+      item.intro = hash[:intro]
+      item.task_box_intro = hash[:task_box_intro]
+      item.task_box_title = hash[:task_box_title]
+
+      item.save
+
+      item
+    end
+
 
     def self.process_module(mod, migration)
       if migration.import_object?("context_modules", mod['migration_id']) || migration.import_object?("modules", mod['migration_id'])
@@ -101,6 +135,10 @@ module Importers
       else
         item.workflow_state = 'active'
       end
+
+      item.part_id = hash[:part_id]
+      item.image_url = hash[:image_url]
+      item.intro_text = hash[:intro_text]
 
       item.position = hash[:position] || hash[:order]
       item.context = context
