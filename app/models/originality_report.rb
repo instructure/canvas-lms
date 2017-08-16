@@ -54,7 +54,8 @@ class OriginalityReport < ActiveRecord::Base
       course_assignment_resource_link_id_url(course_id: assignment.context_id,
                                              assignment_id: assignment.id,
                                              resource_link_id: link_id,
-                                             host: HostUrl.context_host(assignment.context))
+                                             host: HostUrl.context_host(assignment.context),
+                                             display: 'borderless')
     else
       originality_report_url
     end
