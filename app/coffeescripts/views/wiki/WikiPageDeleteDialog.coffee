@@ -15,7 +15,11 @@ define [
   class WikiPageDeleteDialog extends DialogFormView
     setViewProperties: false
     wrapperTemplate: -> '<div class="outlet"></div>'
-    template: -> ((@model.get('context_id') == '1') ? 'warning' : I18n.t('delete_confirmation', 'Are you sure you wish to delete this wiki page?'))
+    template: ->
+      if (ENV["COURSE_ID"] == 1) 
+        'Warning: deleting this page or assignment will also delete it from any course that uses it from the Content Library'
+      else
+        I18n.t('delete_confirmation', 'Are you sure you wish to delete this wiki page?')
 
     @optionProperty 'wiki_pages_path'
     @optionProperty 'focusOnCancel'
