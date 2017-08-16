@@ -4354,7 +4354,7 @@ QUnit.module('Gradebook#gotSubmissionsChunk', function (hooks) {
     deepEqual(Object.keys(this.gradebook.getAssignment('202').effectiveDueDates), ['1101']);
   });
 
-  QUnit.only('updates inClosedGradingPeriod on related assignments', function () {
+  test('updates inClosedGradingPeriod on related assignments', function () {
     this.gradebook.setAssignments({
       201: { id: '201', name: 'Math Assignment', published: true },
       202: { id: '202', name: 'English Assignment', published: false }
