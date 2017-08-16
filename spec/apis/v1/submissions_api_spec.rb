@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2016 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -3909,16 +3909,16 @@ describe 'Submissions API', type: :request do
 
   describe '#index' do
     context 'grouped_submissions' do
-      let(:test_course) { course_factory() }
+      let(:course) { course_factory }
       let(:teacher)   { user_factory(active_all: true) }
       let(:student1)  { user_factory(active_all: true) }
       let(:student2)  { user_factory(active_all: true) }
       let(:group) do
-        group_category = test_course.group_categories.create(name: 'Engineering')
-        test_course.groups.create(name: 'Group1', group_category: group_category)
+        group_category = course.group_categories.create(name: 'Engineering')
+        course.groups.create(name: 'Group1', group_category: group_category)
       end
       let(:assignment) do
-        test_course.assignments.create!(
+        course.assignments.create!(
           title: 'group assignment',
           grading_type: 'points',
           points_possible: 10,
@@ -3928,9 +3928,9 @@ describe 'Submissions API', type: :request do
       end
 
       let!(:enroll_teacher_and_students) do
-        test_course.enroll_teacher(teacher).accept!
-        test_course.enroll_student(student1, enrollment_state: 'active')
-        test_course.enroll_student(student2, enrollment_state: 'active')
+        course.enroll_teacher(teacher).accept!
+        course.enroll_student(student1, enrollment_state: 'active')
+        course.enroll_student(student2, enrollment_state: 'active')
       end
       let!(:add_students_to_group) do
         group.add_user(student1)
@@ -3938,11 +3938,11 @@ describe 'Submissions API', type: :request do
       end
       let!(:submit_homework) { assignment.submit_homework(student1, submission_type: 'online_text_entry') }
 
-      let(:path) { "/api/v1/courses/#{test_course.id}/assignments/#{assignment.id}/submissions" }
+      let(:path) { "/api/v1/courses/#{course.id}/assignments/#{assignment.id}/submissions" }
       let(:params) do
         {
           controller: 'submissions_api', action: 'index',
-          format: 'json', course_id: test_course.id.to_s,
+          format: 'json', course_id: course.id.to_s,
           assignment_id: assignment.id.to_s
         }
       end
@@ -3969,7 +3969,7 @@ describe 'Submissions API', type: :request do
       context "submission of type basic_lti_launch" do
         let(:external_tool_url) { 'http://www.test.com/basic-launch' }
         let(:assignment) do
-          test_course.assignments.create!(
+          course.assignments.create!(
             title: 'group assignment',
             grading_type: 'points',
             points_possible: 10,
@@ -3988,6 +3988,50 @@ describe 'Submissions API', type: :request do
         it 'includes the external tool URL' do
           submission_json = api_call_as_user(teacher, :get, path, params)
           expect(submission_json.first['external_tool_url']).to eq external_tool_url
+        end
+      end
+
+      describe 'mobile_student_label' do
+        let(:field) { 'mobile_student_label' }
+
+        it "does not include label" do
+          json = api_call_as_user(teacher, :get, path, params)
+          json.each do |entry| # can't use `.not_to all`
+            expect(entry).not_to include field
+          end
+        end
+
+        it "includes label when label is passed to the include param" do
+          json = api_call_as_user(teacher, :get, path, params.merge(include: field))
+          expect(json).to all include field
+        end
+
+        it "defaults to unsubmitted for newly created assignment" do
+          assignment = course.assignments.create!(
+            title: 'new_assignment',
+            grading_type: 'points',
+            points_possible: 10,
+            submission_types: 'online_text_entry'
+          )
+          path = "/api/v1/courses/#{course.id}/assignments/#{assignment.id}/submissions"
+          json = api_call_as_user(teacher, :get, path, params.merge(assignment_id: assignment.id, include: field))
+          expect(json).to all include("#{field}" => 'unsubmitted')
+        end
+      end
+
+      describe 'mobile_teacher_state' do
+        let(:field) { 'mobile_teacher_state' }
+
+        it "does not include action" do
+          json = api_call_as_user(teacher, :get, path, params)
+          json.each do |entry| # can't use `.not_to all`
+            expect(entry).not_to include field
+          end
+        end
+
+        it "includes action when action is passed to the include param" do
+          json = api_call_as_user(teacher, :get, path, params.merge(include: field))
+          expect(json).to all include field
         end
       end
     end

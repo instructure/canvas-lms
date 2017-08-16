@@ -90,10 +90,11 @@ module Api::V1::QuizSubmission
     end
 
     if includes.include?('submission')
+      ActiveRecord::Associations::Preloader.new.preload(quiz_submissions, :submission)
       with_submissions = quiz_submissions.select { |qs| !!qs.submission }
 
       hash[:submissions] = with_submissions.map do |qs|
-        submission_json(qs.submission, quiz.assignment, user, session, context)
+        submission_json(qs.submission, quiz.assignment, user, session, context, params)
       end
     end
 

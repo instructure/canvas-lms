@@ -212,6 +212,7 @@ class Submission < ActiveRecord::Base
     state :graded
     state :deleted
   end
+  alias needs_review? pending_review?
 
   # see #needs_grading?
   # When changing these conditions, update index_submissions_needs_grading to
@@ -240,6 +241,10 @@ class Submission < ActiveRecord::Base
       (send("score#{suffix}").nil? || !send("grade_matches_current_submission#{suffix}"))
      )
     )
+  end
+
+  def resubmitted?
+    needs_grading? && grade_matches_current_submission == false
   end
 
   def needs_grading_changed?
@@ -1955,27 +1960,17 @@ class Submission < ActiveRecord::Base
 
     def late?
       return false if excused?
-      return late_policy_status == 'late' unless late_policy_status.nil?
+      return late_policy_status == 'late' if late_policy_status.present?
       submitted_at.present? && past_due?
     end
     alias late late?
 
     def missing?
       return false if excused?
-      # It's missing if the teacher said it was missing
       return late_policy_status == 'missing' if late_policy_status.present?
-
-      # Teacher didn't say it was missing
-      # It's not missing if it has already been submitted
       return false if submitted_at.present?
-
-      # It hasn't been submitted yet
-      # It's not missing if it's not past due
       return false unless past_due?
 
-      # It isn't excused
-      # It is missing if the assignment expects a submission
-      # It is not missing if the assignment does not expect a submission
       assignment.expects_submission?
     end
     alias missing missing?

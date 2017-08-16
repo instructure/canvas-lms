@@ -306,9 +306,10 @@ module Api::V1::Assignment
 
     if submission = opts[:submission]
       if submission.is_a?(Array)
-        hash['submission'] = submission.map { |s| submission_json(s, assignment, user, session) }
+        ActiveRecord::Associations::Preloader.new.preload(submission, :quiz_submission) if assignment.quiz?
+        hash['submission'] = submission.map { |s| submission_json(s, assignment, user, session, params) }
       else
-        hash['submission'] = submission_json(submission, assignment, user, session)
+        hash['submission'] = submission_json(submission, assignment, user, session, params)
       end
     end
 

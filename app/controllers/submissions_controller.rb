@@ -273,8 +273,11 @@ class SubmissionsController < ApplicationController
         end
         format.json do
           if api_request?
-            render :json => submission_json(@submission, @assignment, @current_user, session, @context, %{submission_comments attachments}),
-              :status => :created, :location => api_v1_course_assignment_submission_url(@context, @assignment, @current_user)
+            includes = %|submission_comments attachments|
+            json = submission_json(@submission, @assignment, @current_user, session, @context, includes, params)
+            render json: json,
+              status: :created,
+              location: api_v1_course_assignment_submission_url(@context, @assignment, @current_user)
           else
             render :json => @submission.as_json(:include => :submission_comments), :status => :created,
               :location => course_gradebook_url(@submission.assignment.context)

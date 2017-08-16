@@ -720,7 +720,9 @@ describe AssignmentsApiController, type: :request do
              )
       assign = json.first
       expect(assign['submission']).to eq(
-        json_parse(controller.submission_json(submission,assignment,@user,session).to_json)
+        json_parse(
+          controller.submission_json(submission, assignment, @user, session, { include: ['submission'] }).to_json
+        )
       )
     end
 
@@ -3514,7 +3516,9 @@ describe AssignmentsApiController, type: :request do
           :id => assignment.id.to_s},
           {:include => ['submission']})
         expect(json['submission']).to eq(
-          json_parse(controller.submission_json(submission,assignment,@user,session).to_json)
+          json_parse(
+            controller.submission_json(submission, assignment, @user, session, { include: ['submission'] }).to_json
+          )
         )
       end
 
