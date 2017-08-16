@@ -39,7 +39,11 @@ class WikiPage < ActiveRecord::Base
 
   after_update :duplicate_across_courses
   def duplicate_across_courses
-    if self.body_changed?
+    if self.deleted?
+      WikiPage.where(:clone_of_id => id).each do |page|
+        page.destroy
+      end
+    elsif self.body_changed?
       WikiPage.where(:clone_of_id => id).each do |page|
         page.body = body
         # Syncing titles changes the page URL which has a
