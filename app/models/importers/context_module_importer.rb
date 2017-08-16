@@ -143,7 +143,7 @@ module Importers
 
       if hash[:part_id]
         part = @course_parts[hash[:part_id]]
-        item.part_id = part.id
+        item.part_id = part.id if part
       end
       item.image_url = hash[:image_url]
       item.intro_text = hash[:intro_text]
