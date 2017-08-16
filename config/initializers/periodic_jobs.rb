@@ -74,7 +74,7 @@ Rails.configuration.after_initialize do
   end
 
   Delayed::Periodic.cron 'CrocodocDocument.update_process_states', '*/10 * * * *' do
-    if Canvas::Crocodoc.config
+    if Canvas::Crocodoc.config && !Canvas::Plugin.value_to_boolean(Canvas::Crocodoc.config['disable_polling'])
       with_each_shard_by_database(CrocodocDocument, :update_process_states)
     end
   end
