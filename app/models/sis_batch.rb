@@ -390,7 +390,8 @@ class SisBatch < ActiveRecord::Base
   def remove_previous_imports
     # we shouldn't be able to get here without a term, but if we do, skip
     return unless self.batch_mode_term
-    return unless data[:supplied_batches]
+    supplied_batches = data[:supplied_batches].dup.keep_if { |i| [:course, :section, :enrollment].include? i }
+    return unless supplied_batches.present?
     SisBatch.where(id: self).update_all(workflow_state: 'cleanup_batch')
 
     count = 0

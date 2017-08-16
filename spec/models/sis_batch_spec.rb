@@ -361,6 +361,19 @@ s2,test_1,section2,active},
       expect(@c1.reload).to be_available
     end
 
+    it "shouldn't do batch mode when there is not batch data types" do
+      @term = @account.enrollment_terms.first
+      @term.update_attribute(:sis_source_id, 'term_1')
+      @previous_batch = @account.sis_batches.create!
+
+      batch = create_csv_data([%{user_id,login_id,status
+                                 user_1,user_1,active}])
+      batch.update_attributes(batch_mode: true, batch_mode_term: @term)
+      expect(batch).to receive(:remove_previous_imports).once
+      expect(batch).to receive(:non_batch_courses_scope).never
+      batch.process_without_send_later
+    end
+
     it "should only do batch mode removals for supplied data types" do
       @term = @account.enrollment_terms.first
       @term.update_attribute(:sis_source_id, 'term_1')
