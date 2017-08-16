@@ -109,7 +109,7 @@ end
 if CANVAS_RAILS5_0
   module RaiseOnDeprecateHashMethods
     def raise_deprecation_error(method)
-      raise "The method '#{method})' is going away for `params` in Rails 5.1 because ActionController::Parameters will no longer inherit from Hash - Use #to_unsafe_h if needed"
+      raise "The method '#{method}' is going away for `params` in Rails 5.1 because ActionController::Parameters will no longer inherit from Hash - Use #to_unsafe_h if needed"
     end
 
     def method_missing(method_sym, *args, &block)

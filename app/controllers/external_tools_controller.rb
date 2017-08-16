@@ -588,8 +588,12 @@ class ExternalToolsController < ApplicationController
     opts = default_opts.merge(opts)
 
     assignment = @context.assignments.active.find(params[:assignment_id]) if params[:assignment_id]
+    adapter = Lti::LtiOutboundAdapter.new(tool, @current_user, @context).prepare_tool_launch(
+      @return_url,
+      variable_expander(assignment: assignment, tool: tool, launch: lti_launch),
+      opts
+    )
 
-    adapter = Lti::LtiOutboundAdapter.new(tool, @current_user, @context).prepare_tool_launch(@return_url, variable_expander(assignment: assignment, tool: tool), opts)
     lti_launch.params = if selection_type == 'homework_submission' && assignment
                           adapter.generate_post_payload_for_homework_submission(assignment)
                         else
@@ -963,8 +967,9 @@ class ExternalToolsController < ApplicationController
         :config_settings
       ]
 
-      external_tool_params = params.permit(*required_params).to_unsafe_h
-      external_tool_params[:config_url] = app_api.get_app_config_url(params[:app_center_id], params[:config_settings])
+      # we're ok with an "unsafe" hash because we're filtering via required_params
+      external_tool_params = params.to_unsafe_h.select{|k, _| required_params.include?(k.to_sym)}
+      external_tool_params[:config_url] = app_api.get_app_config_url(external_tool_params[:app_center_id], external_tool_params[:config_settings])
       external_tool_params[:config_type] = 'by_url'
 
       @tool = @context.context_external_tools.new
