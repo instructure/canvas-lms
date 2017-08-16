@@ -3572,8 +3572,8 @@ da:
     titles: 
       delete: "Slette samarbejde?"
   collaborations_5c56c15f: Samarbejde
-  collaborations_are_web_based_tools_to_work_collabo_6e9f7b3f: "Samarbejde er web-baserede værktøjer for at arbejde kollektivt på ogaver som f.eks. at tage notater eller gruppere dokumenter."
-  collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "Samarbejder er web-baserede værktøjer for at arbejde kollektivt på ogaver som f.eks. at tage notater eller gruppere dokumenter. Start ved at tilføje en samarbejds-app."
+  collaborations_are_web_based_tools_to_work_collabo_6e9f7b3f: "Samarbejde er web-baserede værktøjer for at arbejde kollektivt på opgaver som f.eks. at tage notater eller gruppere dokumenter."
+  collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "Samarbejder er web-baserede værktøjer for at arbejde kollektivt på opgaver som f.eks. at tage notater eller gruppere dokumenter. Start ved at tilføje en samarbejds-app."
   collaborations_tutorial_tray_9219d9d: "Selvstudiumområde for samarbejder"
   collapse_group_c2af7cad: "Skjul gruppe"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Skjul listen over gruppemedlemmer for %{groupName}"
