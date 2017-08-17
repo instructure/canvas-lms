@@ -231,6 +231,10 @@ See <a href="http://tools.ietf.org/html/rfc6749#section-4.1.3">Section 4.1.3</a>
     </thead>
     <tbody>
       <tr>
+        <td class="mono">access_token<span class="label required"></span></td>
+        <td>The OAuth2 access token.</td>
+      </tr>
+      <tr>
         <td class="mono">expire_sessions <span class="label optional"></span></td>
         <td>Set this to '1' if you want to end all of the user's
   Canvas web sessions.  Without this argument, the endpoint will leave web sessions intact.</td>
