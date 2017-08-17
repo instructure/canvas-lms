@@ -631,7 +631,7 @@ define [
       # (this works because frozen columns and non-frozen columns are can't be
       # swapped)
       columns = @grid.getColumns()
-      currentIds = _(@gradebookContent.customColumns).map (c) -> c.id
+      currentIds = (m[1] for columnId in @gradebookGrid.columns.frozen when m = columnId.match /^custom_col_(\d+)/)
       reorderedIds = (m[1] for c in columns when m = c.id.match /^custom_col_(\d+)/)
 
       frozenColumnCount = @grid.getOptions().numberOfColumnsToFreeze
