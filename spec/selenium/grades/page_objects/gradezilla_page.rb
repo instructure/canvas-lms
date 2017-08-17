@@ -142,10 +142,6 @@ class Gradezilla
       f('span[data-menu-id="previous-export"]')
     end
 
-    def popover_menu_items
-      ff('[role=menu][aria-labelledby*=PopoverMenu] [role=menuitemradio]')
-    end
-
     def slick_custom_col_cell
       ff(".slick-cell.custom_column")
     end
@@ -372,8 +368,7 @@ class Gradezilla
 
     def open_view_menu_and_arrange_by_menu
       view_menu = open_gradebook_menu('View')
-      trigger = ff('button', view_menu).find { |element| element.text == "Arrange By" }
-      trigger.click
+      hover(view_menu_item("Arrange By"))
       view_menu
     end
 
@@ -426,14 +421,17 @@ class Gradezilla
       gradebook_settings_cog.click
     end
 
-    def popover_menu_item(name)
-      popover_menu_items.find do |menu_item|
-        menu_item.text == name
-      end
+    def view_arrange_by_submenu_item(name)
+      fj("[role=menuitemradio]:contains(#{name})")
     end
 
-    def popover_menu_items_select
-      popover_menu_items
+    def view_menu_item(name)
+      fj("[role=menu] li:contains(#{name})")
+    end
+
+    def popover_menu_item_checked?(menu_item_name)
+      menu_item = view_arrange_by_submenu_item(menu_item_name)
+      menu_item.attribute('aria-checked')
     end
 
     def total_cell_mute_icon_select
