@@ -167,3 +167,18 @@ test('loads next page on scroll if possible', function () {
   window.innerHeight = actualInnerHeight;
   wrapper.unmount();
 });
+
+test('loads next page if available on window resize that causes window to not have a scrollbar', function () {
+  const historyItems = formatHistoryItems(Fixtures.historyResponse().data);
+  const props = {
+    ...defaultProps(),
+    historyItems,
+    nextPage: 'example.com',
+    getNextPage: this.stub()
+  };
+  const wrapper = mount(<SearchResultsComponent {...props} />);
+  window.innerHeight = document.body.clientHeight;
+  window.dispatchEvent(new Event('resize'));
+  strictEqual(props.getNextPage.callCount, 1);
+  wrapper.unmount();
+});
