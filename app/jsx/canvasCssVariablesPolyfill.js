@@ -18,6 +18,13 @@
 
 import {get} from 'jquery'
 
+import brandableVariables from '../stylesheets/brandable_variables.json'
+
+const images = brandableVariables
+  .reduce((acc, cur) => acc.concat(cur.variables), []) // flatten
+  .filter(e => e.type === 'image')
+  .map(e => e.variable_name)
+
 const variablesMap = window.CANVAS_ACTIVE_BRAND_VARIABLES || {}
 
 // makes a regex that will match any occurrence of any of the brandable css variables in a stylesheet
@@ -30,9 +37,13 @@ export default function processSheet (element) {
     const replacedCss = cssText.replace(variablesRegex, (match, name) => {
       // if this variable exists in CANVAS_ACTIVE_BRAND_VARIABLES, replace it with it's value.
       // otherwise, leave it unchanged
-      const replacement = variablesMap[name]
+      let replacement = variablesMap[name]
       if (replacement) {
         replacedAtLeastOneVar = true
+
+        // the json contains raw urls for images, wrap them in css `url(...)` syntax.
+        if (images.includes(name)) replacement = `url('${replacement}')`
+
         return replacement
       } else {
         return match
