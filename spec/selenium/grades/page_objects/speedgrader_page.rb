@@ -181,5 +181,8 @@ class Speedgrader
       click_option(submission_to_view_dropdown, option_index, :value)
     end
 
+    def submit_settings_form
+      fj('.ui-dialog-buttonset .ui-button:visible:last').click
+    end
   end
 end

@@ -216,7 +216,7 @@ function mergeStudentsAndSubmission() {
   // if the cookie to sort it by submitted_at is set we need to sort by submitted_at.
   var hideStudentNames = utils.shouldHideStudentNames();
 
-  if(hideStudentNames) {
+  if(hideStudentNames && userSettings.get('eg_sort_by') === 'alphabetically') {
     window.jsonData.studentsWithSubmissions.sort(EG.compareStudentsBy(function (student) {
       return student &&
         student.submission &&
