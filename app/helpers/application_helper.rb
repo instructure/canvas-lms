@@ -869,9 +869,9 @@ module ApplicationHelper
     # I don't mind hardcoding since we will always use the new
     # style going forward, and thus this list will never change.
     if @context && [11, 17, 23, 24, 21, 22, 7].include?(@context.id)
-      orig.sub("bz_custom.css", "bz_newui.css")
-    else
       orig.sub("bz_custom.css", "bz_oldui.css")
+    else
+      orig.sub("bz_custom.css", "bz_newui.css")
     end
   end
 
