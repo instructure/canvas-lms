@@ -19,7 +19,7 @@
 require_relative '../spec_helper'
 
 describe GradingPeriod do
-  subject(:grading_period) { grading_period_group.grading_periods.build(params) }
+  subject(:grading_period) { grading_period_group.grading_periods.create!(params) }
 
   let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
   let(:account) { Account.create! }
@@ -890,7 +890,7 @@ describe GradingPeriod do
     end
 
     it 'creates scores for the grading period upon its creation' do
-      expect{ grading_period.save! }.to change{ Score.count }.from(1).to(2)
+      expect{ grading_period.save! }.to change{ Score.count }.by(1)
     end
 
     it 'updates grading period scores when the grading period end date is changed' do

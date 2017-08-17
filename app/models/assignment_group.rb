@@ -26,14 +26,21 @@ class AssignmentGroup < ActiveRecord::Base
   has_a_broadcast_policy
   serialize :integration_data, Hash
 
+  has_many :scores, -> { active }
   has_many :assignments, -> { order('position, due_at, title') }, dependent: :destroy
-  has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'").order('assignments.position, assignments.due_at, assignments.title') }, class_name: 'Assignment'
-  has_many :published_assignments,  -> { where(workflow_state: 'published').order('assignments.position, assignments.due_at, assignments.title') }, class_name: 'Assignment'
 
-  validates_presence_of :context_id, :context_type, :workflow_state
-  validates_length_of :rules, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :default_assignment_name, :maximum => maximum_string_length, :allow_nil => true
-  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
+  has_many :active_assignments, -> {
+    where("assignments.workflow_state<>'deleted'").order('assignments.position, assignments.due_at, assignments.title')
+  }, class_name: 'Assignment'
+
+  has_many :published_assignments, -> {
+    where(workflow_state: 'published').order('assignments.position, assignments.due_at, assignments.title')
+  }, class_name: 'Assignment'
+
+  validates :context_id, :context_type, :workflow_state, presence: true
+  validates :rules, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
+  validates :default_assignment_name, length: { maximum: maximum_string_length }, allow_nil: true
+  validates :name, length: { maximum: maximum_string_length }, allow_nil: true
 
   before_save :set_context_code
   before_save :generate_default_values
