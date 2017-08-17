@@ -32,6 +32,54 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
   let dataLoader;
   let server;
 
+  let assignmentGroups;
+  let assignments;
+  let customColumns;
+
+  function createAssignments () {
+    assignments = {
+      homework: [{
+        id: '2301',
+        assignment_group_id: '2201',
+        course_id: '1201',
+        html_url: '/assignments/2301',
+        muted: false,
+        name: 'Math Assignment',
+        omit_from_final_grade: false,
+        position: 1,
+        published: true,
+        submission_types: ['online_text_entry']
+      }],
+
+      quizzes: [{
+        id: '2302',
+        assignment_group_id: '2202',
+        course_id: '1201',
+        html_url: '/assignments/2302',
+        muted: false,
+        name: 'English Assignment',
+        omit_from_final_grade: false,
+        position: 1,
+        published: true,
+        submission_types: ['online_text_entry']
+      }]
+    };
+  }
+
+  function createAssignmentGroups () {
+    assignmentGroups = [
+      { id: '2201', position: 1, name: 'Homework', assignments: assignments.homework },
+      { id: '2202', position: 2, name: 'Quizzes', assignments: assignments.quizzes }
+    ];
+  }
+
+  function createCustomColumns () {
+    customColumns = [
+      { id: '2401', teacher_notes: true, hidden: false, title: 'Notes' },
+      { id: '2402', teacher_notes: false, hidden: false, title: 'Other Notes' }
+    ];
+  }
+
   function addStudentIds () {
     dataLoader.gotStudentIds.resolve({
       user_ids: ['1101']
@@ -47,45 +95,12 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
     });
   }
 
-  function addCustomColumns (columns) {
-    dataLoader.gotCustomColumns.resolve(columns || [
-      { id: '2401', teacher_notes: true, hidden: false, title: 'Notes' },
-      { id: '2402', teacher_notes: false, hidden: false, title: 'Other Notes' }
-    ]);
-  }
-
-  function createExampleAssignments () {
-    return [{
-      id: '2301',
-      assignment_group_id: '2201',
-      course_id: '1201',
-      html_url: '/assignments/2301',
-      muted: false,
-      name: 'Math Assignment',
-      omit_from_final_grade: false,
-      position: 1,
-      published: true,
-      submission_types: ['online_text_entry']
-    }, {
-      id: '2302',
-      assignment_group_id: '2202',
-      course_id: '1201',
-      html_url: '/assignments/2302',
-      muted: false,
-      name: 'English Assignment',
-      omit_from_final_grade: false,
-      position: 1,
-      published: true,
-      submission_types: ['online_text_entry']
-    }];
+  function addCustomColumns () {
+    dataLoader.gotCustomColumns.resolve(customColumns);
   }
 
   function addAssignmentGroups () {
-    const assignments = createExampleAssignments();
-    dataLoader.gotAssignmentGroups.resolve([
-      { id: '2201', position: 1, name: 'Assignments', assignments: assignments.slice(0, 1) },
-      { id: '2202', position: 2, name: 'Homework', assignments: assignments.slice(1, 2) }
-    ]);
+    dataLoader.gotAssignmentGroups.resolve(assignmentGroups);
   }
 
   function addGridData () {
@@ -123,6 +138,10 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
     };
     sinon.stub(DataLoader, 'loadGradebookData').returns(dataLoader);
     sinon.stub(DataLoader, 'getDataForColumn');
+
+    createAssignments();
+    createAssignmentGroups();
+    createCustomColumns();
   });
 
   suiteHooks.afterEach(function () {
@@ -454,21 +473,14 @@ QUnit.module('Gradebook Grid Columns', function (suiteHooks) {
 
   QUnit.module('when teacher notes are hidden', function (hooks) {
     hooks.beforeEach(function () {
-      gradebook = createGradebook({ teacher_notes: { id: '2401', title: 'Notes', teacher_notes: true, hidden: true } });
-      gradebook.initialize();
-      addStudentIds();
-      addCustomColumns([
-        { id: '2401', teacher_notes: true, hidden: true, title: 'Notes' },
-        { id: '2402', teacher_notes: false, hidden: false, title: 'Other Notes' }
-      ]);
-      addAssignmentGroups();
-      addGradingPeriodAssignments();
+      customColumns[0].hidden = true;
+      createGradebookAndAddData({ teacher_notes: { id: '2401', title: 'Notes', teacher_notes: true, hidden: true } });
       gridSpecHelper = new SlickGridSpecHelper(gradebook.grid);
     });
 
     test('does not include the column in the grid', function () {
-      const customColumns = gridSpecHelper.listColumns().filter(column => column.id.match(/^custom_col_/));
-      deepEqual(customColumns.map(column => column.id), ['custom_col_2402']);
+      const columns = gridSpecHelper.listColumns().filter(column => column.id.match(/^custom_col_/));
+      deepEqual(columns.map(column => column.id), ['custom_col_2402']);
     });
 
     test('adds the column to the frozen columns when showing', function () {
