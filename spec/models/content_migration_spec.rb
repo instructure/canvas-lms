@@ -548,6 +548,24 @@ describe ContentMigration do
     run_jobs # even though the requeue is set to happen in the future, it should get run right away after the first one completes
   end
 
+  it "should try to handle zip files with a nested root directory" do
+    cm = @cm
+    cm.migration_type = 'common_cartridge_importer'
+    cm.migration_settings['import_immediately'] = true
+    cm.save!
+
+    package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/cc_nested.zip")
+    attachment = Attachment.new(:context => cm, :filename => 'file.zip')
+    attachment.uploaded_data = File.open(package_path, 'rb')
+    attachment.save!
+
+    cm.update_attribute(:attachment, attachment)
+    cm.queue_migration
+    run_jobs
+
+    expect(cm.reload.migration_issues).to be_empty
+  end
+
   describe "#expired?" do
     it "marks as expired after X days" do
       ContentMigration.where(id: @cm.id).update_all(created_at: 405.days.ago)
