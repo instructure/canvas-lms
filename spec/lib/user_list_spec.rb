@@ -28,8 +28,8 @@ describe UserList do
   end
 
   it "should complain about invalid input" do
-    ul = UserList.new '%instructure'
-    expect(ul.errors).to eq [{:address => '%instructure', :details => :unparseable}]
+    ul = UserList.new "i\x01nstructure"
+    expect(ul.errors).to eq [{:address => "i\x01nstructure", :details => :unparseable}]
   end
 
   it "should not fail with unicode names" do
