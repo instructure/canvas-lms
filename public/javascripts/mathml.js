@@ -18,27 +18,25 @@
 
 import $ from 'jquery'
 
-function loadMathJax (config_file, cb = null) {
+export function loadMathJax (config_file, cb = null) {
   if (!isMathJaxLoaded()) {
     $.getScript(`//cdnjs.cloudflare.com/ajax/libs/mathjax/2.1/MathJax.js?config=${config_file}`, cb);
   }
 }
 
-function isMathMLOnPage () {
+export function isMathMLOnPage () {
   return $('math').length > 0
 }
 
-function isMathJaxLoaded () {
+export function isMathJaxLoaded () {
   return !(typeof MathJax === 'undefined')
 }
 
 /*
  * elem: string with elementId or en elem object
  */
-function reloadElement(elem) {
+export function reloadElement(elem) {
   if (MathJax) {
     MathJax.Hub.Queue(['Typeset', MathJax.Hub, elem])
   }
 }
-
-export { loadMathJax, isMathMLOnPage, isMathJaxLoaded, reloadElement }
