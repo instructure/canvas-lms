@@ -203,4 +203,8 @@ module SchedulerCommon
   def agenda_item
     f('.agenda-event__item .agenda-event__item-container')
   end
+
+  def scheduler_event
+    f('.fc-event.scheduler-event')
+  end
 end
