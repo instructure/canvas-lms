@@ -75,9 +75,6 @@
     </label>
     <a class="btn cancel" tabindex="0" role="button">{{#t "buttons.cancel"}}Cancel{{/t}}</a>
     {{#if CAN.PUBLISH_NOW}}
-      {{#if page_id}}
-      <button type="button" class="btn clone" onclick="BZ_SetupMasterPageClone({{page_id}});">Replace With</button>
-      {{/if}}
       <button class="btn btn-default save_and_publish">{{#t "buttons.save_and_publish"}}Save & Publish{{/t}}</button>
     {{/if}}
     <button class="btn btn-primary submit">{{#t "buttons.save"}}Save{{/t}}</button>
