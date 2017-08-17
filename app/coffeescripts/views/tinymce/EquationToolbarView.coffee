@@ -61,7 +61,7 @@ define [
         
       $('#mathjax-view .mathquill-tab-bar li:first-child').addClass('mathquill-tab-selected')
 
-      mathml.loadMathJax($, 'TeX-AMS_HTML.js', @addMathJaxEvents)
+      mathml.loadMathJax('TeX-AMS_HTML.js', @addMathJaxEvents)
 
     addMathJaxEvents: =>
       renderPreview = ->
