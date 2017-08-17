@@ -360,6 +360,7 @@ describe Assignment do
     assignment.attachments.push(Attachment.new)
     assignment.submissions.push(Submission.new)
     assignment.ignores.push(Ignore.new)
+    assignment.turnitin_asset_string
     new_assignment = assignment.duplicate
     expect(new_assignment.id).to be_nil
     expect(new_assignment.new_record?).to be true

@@ -163,6 +163,7 @@ class Assignment < ActiveRecord::Base
     result.ignores.clear
     result.moderated_grading_selections.clear
     result.lti_context_id = nil
+    result.turnitin_id = nil
     result.discussion_topic = nil
     result.peer_review_count = 0
     result.workflow_state = "unpublished"
