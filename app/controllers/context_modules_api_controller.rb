@@ -371,17 +371,9 @@ class ContextModulesApiController < ApplicationController
       end
 
       if includes.include?('items')
-        user_ids = [(@student || @current_user).id]
-
         if @context.user_has_been_observer?(@student || @current_user)
           opts[:observed_student_ids] = ObserverEnrollment.observed_student_ids(self.context, (@student || @current_user) )
-          user_ids.concat(opts[:observed_student_ids])
         end
-
-        opts[:assignment_visibilities] = AssignmentStudentVisibility.visible_assignment_ids_for_user(user_ids, @context.id)
-        opts[:discussion_visibilities] = DiscussionTopic.visible_to_students_in_course_with_da(user_ids, @context.id).pluck(:id)
-        opts[:page_visibilities] = WikiPage.visible_to_students_in_course_with_da(user_ids, @context.id).pluck(:id)
-        opts[:quiz_visibilities] = Quizzes::Quiz.visible_to_students_in_course_with_da(user_ids,@context.id).pluck(:quiz_id)
       end
 
       render :json => modules_and_progressions.map { |mod, prog| module_json(mod, @student || @current_user, session, prog, includes, opts) }.compact

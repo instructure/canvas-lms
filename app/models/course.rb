@@ -27,6 +27,7 @@ class Course < ActiveRecord::Base
   include TimeZoneHelper
   include ContentLicenses
   include TurnitinID
+  include Courses::ItemVisibilityHelper
 
   attr_accessor :teacher_names, :master_course
   attr_writer :student_count, :primary_enrollment_type, :primary_enrollment_role_id, :primary_enrollment_rank, :primary_enrollment_state, :primary_enrollment_date, :invitation, :updating_master_template_id
@@ -3081,6 +3082,11 @@ class Course < ActiveRecord::Base
     context_external_tools.active.find_by(query) ||
       account.context_external_tools.active.find_by(query) ||
         root_account.context_external_tools.active.find_by(query)
+  end
+
+  def find_or_create_progressions_for_user(user)
+    @progressions ||= {}
+    @progressions[user.id] ||= ContextModuleProgressions::Finder.find_or_create_for_context_and_user(self, user)
   end
 
   private
