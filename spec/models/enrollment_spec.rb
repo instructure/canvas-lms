@@ -740,6 +740,16 @@ describe Enrollment do
     end
   end
 
+  it 'should not touch observer when set to skip' do
+    course_model
+    student = user_with_pseudonym
+    observer = user_with_pseudonym
+    old_time = observer.updated_at
+    observer.observed_users << student
+    @course.enrollments.create(user: student, skip_touch_user: true, type: 'StudentEnrollment')
+    expect(observer.reload.updated_at).to eq old_time
+  end
+
   context "atom" do
     it "should use the course and user name to derive a title" do
       expect(@enrollment.to_atom.title).to eql("#{@enrollment.user.name} in #{@enrollment.course.name}")
