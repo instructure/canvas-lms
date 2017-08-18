@@ -124,6 +124,21 @@ describe "Modules API", type: :request do
         expect(json.map { |mod| mod['items'].size }).to eq [5, 2, 0]
       end
 
+      it "should only fetch visibility information once" do
+        student_in_course(:course => @course)
+        @user = @student
+
+        assmt2 = @course.assignments.create!(:name => "another assmt", :workflow_state => "published")
+        @module2.add_item(:id => assmt2.id, :type => 'assignment')
+
+        expect(AssignmentStudentVisibility).to receive(:visible_assignment_ids_in_course_by_user).once.and_call_original
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items",
+          :controller => "context_modules_api", :action => "index", :format => "json",
+          :course_id => "#{@course.id}", :include => %w(items))
+        expect(json.map { |mod| mod['items'].size }).to eq [4, 3]
+      end
+
       context 'index including content details' do
         let(:json) do
           api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items&include[]=content_details",

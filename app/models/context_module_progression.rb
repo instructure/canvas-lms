@@ -332,7 +332,7 @@ class ContextModuleProgression < ActiveRecord::Base
   def self.prerequisites_satisfied?(user, context_module)
     related_progressions = nil
     (context_module.active_prerequisites || []).all? do |pre|
-      related_progressions ||= ContextModuleProgressions::Finder.find_or_create_for_module_and_user(context_module, user).index_by(&:context_module_id)
+      related_progressions ||= context_module.context.find_or_create_progressions_for_user(user).index_by(&:context_module_id)
       if pre[:type] == 'context_module' && progression = related_progressions[pre[:id]]
         progression.evaluate!(context_module)
         progression.completed?
@@ -427,7 +427,7 @@ class ContextModuleProgression < ActiveRecord::Base
   end
 
   def trigger_reevaluation_of_dependent_progressions(dependent_module_to_skip=nil)
-    progressions = ContextModuleProgressions::Finder.find_or_create_for_module_and_user(context_module, user)
+    progressions = context_module.context.find_or_create_progressions_for_user(user)
 
     # only recalculate progressions related to this module as a prerequisite
     progressions = progressions.select do |progression|
