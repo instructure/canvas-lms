@@ -865,10 +865,10 @@ module ApplicationHelper
   # the configuration value should always be to bz_custom, but at different
   # locations for prod vs staging, etc.
   def bz_css_choice(orig)
-    # this list of course IDs are our 2015 and 2016 ones.
+    # this list of course IDs are our 2015, 2016, and Spring 2017 ones.  New UI was rolled out Fall 2017
     # I don't mind hardcoding since we will always use the new
     # style going forward, and thus this list will never change.
-    if @context && [11, 17, 23, 24, 21, 22, 7].include?(@context.id)
+    if @context && [25, 26, 11, 17, 23, 24, 21, 22, 7].include?(@context.id)
       orig.sub("bz_custom.css", "bz_oldui.css")
     else
       orig.sub("bz_custom.css", "bz_newui.css")
