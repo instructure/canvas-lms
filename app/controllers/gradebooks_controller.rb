@@ -735,14 +735,16 @@ class GradebooksController < ApplicationController
   private
 
   def new_gradebook_env(env)
+    development_mode_enabled = !!ENV['GRADEBOOK_DEVELOPMENT']
     graded_late_or_missing_submissions_exist =
-      @context.submissions.graded.late.union(@context.submissions.graded.missing).exists?
+      development_mode_enabled &&
+      (@context.submissions.graded.late.exists? || @context.submissions.graded.missing.exists?)
 
     options = {
       colors: gradebook_settings.fetch(:colors, {}),
       graded_late_or_missing_submissions_exist: graded_late_or_missing_submissions_exist,
       gradezilla: true,
-      new_gradebook_development_enabled: !!ENV['GRADEBOOK_DEVELOPMENT'],
+      new_gradebook_development_enabled: development_mode_enabled,
       late_policy: @context.late_policy.as_json(include_root: false)
     }
     env.deep_merge({ GRADEBOOK_OPTIONS: options })
