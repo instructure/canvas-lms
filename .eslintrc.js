@@ -4,7 +4,11 @@ module.exports = {
     amd: true,
     browser: true
   },
-  extends: "airbnb",
+  extends: [
+    "airbnb",
+    "prettier",
+    "prettier/react",
+  ],
   parserOptions: {
     ecmaVersion: 7,
     ecmaFeatures: {
@@ -38,7 +42,6 @@ module.exports = {
     "object-curly-spacing": [0],
     "padded-blocks": [0], // so we can have space between the define([... and the callback
     "semi": [0],
-    "space-before-function-paren": [2, "always"],
     "import/no-extraneous-dependencies": [0], // allows 'i18n!webzip_exports' and 'compiled/foo/bar'
     "import/named": [2],
     "import/no-unresolved": [0],
