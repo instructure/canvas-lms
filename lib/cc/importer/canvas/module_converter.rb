@@ -19,6 +19,25 @@ module CC::Importer::Canvas
   module ModuleConverter
     include CC::Importer
 
+    def convert_dynamic_syllabus_parts(doc)
+      parts = []
+      return parts unless doc
+
+      doc.css('dynamic_syllabus_part').each do |r_node|
+        part = {}
+        part[:migration_id] = r_node['identifier']
+        part[:title] = get_node_val(r_node, 'title')
+        part[:position] = get_int_val(r_node, 'position')
+        part[:intro] = get_node_val(r_node, 'intro')
+        part[:task_box_title] = get_node_val(r_node, 'task_box_title')
+        part[:task_box_intro] = get_node_val(r_node, 'task_box_intro')
+
+        parts << part
+      end
+
+      parts
+    end
+
     def convert_modules(doc)
       modules = []
       return modules unless doc
@@ -34,6 +53,10 @@ module CC::Importer::Canvas
         mod[:unlock_at] = get_time_val(r_node, 'unlock_at')
         mod[:require_sequential_progress] = get_bool_val(r_node, 'require_sequential_progress')
         mod[:requirement_count] = get_int_val(r_node, 'requirement_count')
+
+        mod[:part_id] = get_node_val(r_node, 'part_id')
+        mod[:image_url] = get_node_val(r_node, 'image_url')
+        mod[:intro_text] = get_node_val(r_node, 'intro_text')
 
         mod[:items] = []
         r_node.css('item').each do |item_node|

@@ -1,10 +1,86 @@
-<div id="page-mapper-container">
+<script>
+  <%
+    data = 0
+    if @current_user
+      result = RetainedData.where(:user_id => @current_user.id, :name => "module_position_#{@course_id}_#{@module_sequence}")
+      unless result.empty?
+        data = result.first.value.to_i
+      end
+    end
+  %>
+
+  window.openBzBoxPosition = <%= data %>;
+  window.position_magic_field_name = "module_position_<%= @course_id %>_<%= @module_sequence %>";
+  var runningAtEnd = [];
+  function runAtEnd(func) {
+    runningAtEnd.push(func);
+  }
+</script>
+
+<div id="page-mapper-container" class="show-content">
   <% @pages.each do |page| %>
-    <div class="page-mapper-page">
+    <div class="page-mapper-page" id="portion-<%= page.id %>">
       <h1 class="page-mapper-title page-title"><%= link_to page.title, "/courses/#{@course_id}/pages/#{page.id}" %></h1>
-      <div class="page-mapper-content">
-        <%= page.body.html_safe if page.body %>
+      <div class="page-mapper-content user_content">
+        <%= fixup_bz_scripts(page.body).html_safe if page.body %>
       </div>
     </div>
   <% end %>
 </div>
+
+<script>
+
+  for(var i = 0; i < runningAtEnd.length; i++) {
+    try {
+      runningAtEnd[i]();
+    } catch(e) {
+      console.log(e);
+    }
+  }
+
+(function() {
+  var last_known_scroll_position = 0;
+  var ticking = false;
+
+  var sections = document.querySelectorAll(".page-mapper-page");
+  if(sections.length == 0)
+    return;
+
+  var activeSection = -1;
+
+  function getWindowOffset(ele) {
+    var a = 0;
+    var e = ele;
+    while(e) {
+      a += e.offsetTop;
+      e = e.offsetParent;
+    }
+    return a;
+  }
+
+  function doSomething(scroll_pos) {
+    var start = activeSection + 1;
+    if(start >= sections.length)
+      return;
+    for(var a = sections.length - 1; a >= start; a--) {
+      if(getWindowOffset(sections[a]) < scroll_pos) {
+        activeSection = a;
+        window.location.hash = sections[a].id;
+        //alert('changed');
+        break;
+      }
+    }
+  }
+
+  window.addEventListener('scroll', function(e) {
+    last_known_scroll_position = window.scrollY;
+    if (!ticking) {
+      window.requestAnimationFrame(function() {
+        doSomething(last_known_scroll_position);
+        ticking = false;
+      });
+    }
+    ticking = true;
+  });
+})();
+</script>

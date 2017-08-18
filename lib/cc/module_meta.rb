@@ -36,6 +36,21 @@ module CC
               "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
               "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
       ) do |mods_node|
+
+        part_id_map = {}
+
+        CoursePart.where(:course_id => @course.id).order(:position, :id).each do |part|
+          part_migration_id = CCHelper.create_key(part)
+          part_id_map[part.id] = part_migration_id
+          mods_node.dynamic_syllabus_part(:identifier=>part_migration_id) do |m_node|
+            m_node.title part.title
+            m_node.position part.position
+            m_node.intro part.intro
+            m_node.task_box_title part.task_box_title
+            m_node.task_box_intro part.task_box_intro
+          end
+        end
+
         @course.context_modules.not_deleted.each do |cm|
 
           unless export_object?(cm)
@@ -60,6 +75,9 @@ module CC
             m_node.require_sequential_progress cm.require_sequential_progress.to_s unless cm.require_sequential_progress.nil?
             m_node.requirement_count cm.requirement_count if cm.requirement_count
             m_node.locked cm.locked_for?(@user).present?
+            m_node.part_id part_id_map[cm.part_id]
+            m_node.image_url cm.image_url
+            m_node.intro_text cm.intro_text
 
             if cm.prerequisites && !cm.prerequisites.empty?
               m_node.prerequisites do |pre_reqs|

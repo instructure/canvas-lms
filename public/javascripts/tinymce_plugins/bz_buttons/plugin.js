@@ -95,6 +95,27 @@ tinymce.create('tinymce.plugins.BZButtons', {
       cmd: 'bzTooltip'
     });
 
+    function showMoreDialog() {
+    	var label;
+	showDialog(
+		"Add Show More Button",
+		function(div) {
+		  label = addField(div, "Button label:", "input");
+		},
+		function() {
+        	  ed.selection.setContent('<input class="bz-toggle-all-next" type="button" value="'+htmlEncode(label.value)+'" />');
+		}
+	);
+    }
+
+    ed.addCommand('bzShowmore', showMoreDialog);
+    ed.addButton('bz_show_more', {
+      title: 'Add Show More Button',
+      image: url + '/btn-showmore.png',
+      cmd: 'bzShowmore'
+    });
+
+
 
     function quickQuizDialog() {
     	var titleInput;

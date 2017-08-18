@@ -27,6 +27,10 @@ module ApplicationHelper
     BeyondZConfiguration.url(path)
   end
 
+  def fixup_bz_scripts(html)
+    html.gsub(/<script>(.*?)<\/script>/m, "<script>try { runAtEnd(function() { \n\n\\1\n\n }); } catch(e) { console.log(e); }</script>")
+  end
+
   def context_user_name(context, user)
     return nil unless user
     return user.short_name if !context && user.respond_to?(:short_name)
@@ -837,6 +841,7 @@ module ApplicationHelper
     end
 
     if includes.present?
+      includes[0] = bz_css_choice(includes[0])
       stylesheet_link_tag(*(includes + [{media: 'all' }]))
     end
   end
@@ -850,9 +855,23 @@ module ApplicationHelper
       css_includes
     end
     if includes.length > 0
-      includes[0] # just give the url
+      bz_css_choice(includes[0]) # just give the url
     else
       '' # return empty string if there's nothing so the type is consistent to the view
+    end
+  end
+
+  # for new courses, we use newui. for old ones, we use bz_custom
+  # the configuration value should always be to bz_custom, but at different
+  # locations for prod vs staging, etc.
+  def bz_css_choice(orig)
+    # this list of course IDs are our 2015, 2016, and Spring 2017 ones.  New UI was rolled out Fall 2017
+    # I don't mind hardcoding since we will always use the new
+    # style going forward, and thus this list will never change.
+    if @context && [25, 26, 11, 17, 23, 24, 21, 22, 7].include?(@context.id)
+      orig.sub("bz_custom.css", "bz_oldui.css")
+    else
+      orig.sub("bz_custom.css", "bz_newui.css")
     end
   end
 
@@ -1132,3 +1151,4 @@ class HtmlElement
   end
 end
 
+CONTENT_BANK=1 # the course ID of our content bank, the constant is here mostly just to make the usage code look less magical

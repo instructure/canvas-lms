@@ -11,6 +11,7 @@
 <html class="scripts-not-loaded" lang=<%= @locale %>>
 <head>
   <meta charset="utf-8">
+  <script src="/javascripts/vendor/jquery-1.7.2.js"></script>
   <title><%= (yield :page_title).presence || @page_title || t('default_page_title', "Canvas LMS") %></title>
   <!--[if lte IE 9]> <meta http-equiv=refresh content="0; URL=/ie-9-is-not-supported.html" /> <![endif]-->
   <%= favicon_link_tag(favicon) %>
@@ -56,7 +57,8 @@
       }
       document.addEventListener('click', _earlyClick);
   </script>
-  <script src="/bz_support.js?030617"></script>
+  <script src="/bz_support.js?080117"></script>
+  <link rel="stylesheet" type="text/css" href="/bz_support.css?062017" />
   <%= render 'shared/google_analytics' %>
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700,300,600,400' rel='stylesheet' type='text/css'>
   <link href="/font/TradeGothicNo.20-CondBold.css" rel="stylesheet" type="text/css" />

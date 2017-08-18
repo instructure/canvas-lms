@@ -231,7 +231,8 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       @$peerReviewsBox = $("#{PEER_REVIEWS_BOX}")
       @$groupCategoryBox = $("#{GROUP_CATEGORY_BOX}")
 
-      @_attachEditorToDescription()
+      if BZAssignmentEditPostProcess()
+        @_attachEditorToDescription()
       @addTinyMCEKeyboardShortcuts()
       @handleModeratedGradingChange()
       if ENV?.HAS_GRADED_SUBMISSIONS

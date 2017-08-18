@@ -22,7 +22,7 @@ require 'atom'
 require_dependency 'assignment_student_visibility'
 
 class WikiPage < ActiveRecord::Base
-  attr_accessible :title, :body, :url, :user_id, :user, :editing_roles, :notify_of_update
+  attr_accessible :title, :body, :url, :user_id, :user, :editing_roles, :notify_of_update, :clone_of_id
   attr_readonly :wiki_id
   attr_accessor :saved_by
   validates_length_of :body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
@@ -36,6 +36,37 @@ class WikiPage < ActiveRecord::Base
   include SearchTermHelper
 
   after_update :post_to_pandapub_when_revised
+
+  after_update :duplicate_across_courses
+  def duplicate_across_courses
+    if self.deleted?
+      WikiPage.where(:clone_of_id => id).each do |page|
+        ContentTag.where(:content_id => page.id, :content_type => 'WikiPage').destroy_all
+        page.workflow_state = 'deleted'
+        page.save!
+      end
+    elsif self.body_changed?
+      WikiPage.where(:clone_of_id => id).each do |page|
+        page.body = body
+        # Syncing titles changes the page URL which has a
+        # major risk of breaking links in the courses. I
+        # am thus going to leave that manual - adr
+        # page.title = title
+        page.save
+      end
+    end
+  end
+
+  before_update :clone_from_master_bank
+  before_create :clone_from_master_bank
+  def clone_from_master_bank
+    if self.clone_of_id_changed? && !self.clone_of_id.nil?
+      master = WikiPage.find(self.clone_of_id)
+      self.body = master.body
+      # see above
+      # self.title = master.title
+    end
+  end
 
   belongs_to :wiki, :touch => true
   belongs_to :course, foreign_key: 'wiki_id', primary_key: 'wiki_id'

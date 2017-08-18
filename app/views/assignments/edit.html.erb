@@ -12,6 +12,41 @@
   js_bundle :assignment_edit
 %>
 
+<script>
+  function BZAssignmentEditPostProcess() {
+    <% if @assignment.clone_of_id %>
+      var a = document.getElementById("assignment_submission_type");
+      a.setAttribute("disabled", "disabled");
+      a = document.getElementById("assignment_description");
+      a.setAttribute("disabled", "disabled");
+      return false; // skip description editor initialization
+    <% end %>
+
+    return true; // continue normally
+  }
+</script>
+
+<% if @assignment.clone_of_id %>
+  <div style="text-align: center; font-weight: bold; margin-top: 4em; ">
+    This assignment is <a href="/courses/<%=CONTENT_BANK%>/assignments/<%= @assignment.clone_of_id %>/edit">linked from the content library</a>.
+    <br />
+    <br />
+    The description and submission type is copied from there, but you can edit other fields.
+
+
+    <div>
+    <button type="button" onclick="
+      var http = new XMLHttpRequest();
+      http.open('PUT', '/api/v1/courses/<%=@context.id%>/assignments/<%=@assignment.id%>', true);
+      var data = 'assignment[clone_of_id]=&authenticity_token=' + encodeURIComponent(BZ_AuthToken);
+      http.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      http.onload = function() { location.reload(); };
+      http.send(data);
+    ">Detach and edit independently</button>
+    </div>
+  </div>
+<% end %>
+
 <% if ConditionalRelease::Service.enabled_in_context?(@context) %>
 <div id="edit_assignment_header-cr" class="header-bar"></div>
 <% else %>
@@ -29,3 +64,4 @@
   <a href="<%= context_url(@context, :context_grading_standards_url) %>" style="display: none;" class="create_grading_standard_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_grading_standard_url, "{{ id }}") %>" style="display: none;" id="update_grading_standard_url">&nbsp;</a>
 </div>
+

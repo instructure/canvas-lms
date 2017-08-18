@@ -173,6 +173,7 @@ module CC
           node.grading_standard_external_identifier assignment.grading_standard.id
         end
       end
+      node.clone_of_id assignment.clone_of_id
       node.workflow_state assignment.workflow_state
       if assignment.rubric
         assoc = assignment.rubric_association

@@ -40,10 +40,10 @@ class BzController < ApplicationController
         if o.name == "TEXTAREA"
           n = doc.create_element 'div'
           n.content = value
-        elsif o.name == "INPUT" && o.attr['type'] == 'checkbox'
+        elsif o.name == "INPUT" && o.attr('type') == 'checkbox'
           n = doc.create_element 'span'
           n.inner_html = value == 'yes' ? '[X]' : '[ ]'
-        elsif o.name == "INPUT" && o.attr['type'] == 'radio'
+        elsif o.name == "INPUT" && o.attr('type') == 'radio'
           n = doc.create_element 'span'
           n.inner_html = value == 'yes' ? '[O]' : '[ ]'
         elsif value =~ /\A#{URI::regexp(['http', 'https'])}\z/
@@ -142,19 +142,22 @@ class BzController < ApplicationController
   def full_module_view
     @course_id = params[:course_id]
     module_sequence = params[:module_sequence]
+    @module_sequence = module_sequence
     items = nil
     if module_sequence.nil?
       # view the entire course
       items = []
-      Course.find(@course_id.to_i).context_modules.not_deleted.each do |ms|
+      Course.find(@course_id.to_i).context_modules.active.each do |ms|
         items += ms.content_tags_visible_to(@current_user)
       end
     else
       # view just one module inside a course
-      items = Course.find(@course_id.to_i).context_modules.not_deleted[module_sequence.to_i].content_tags_visible_to(@current_user)
+      items = Course.find(@course_id.to_i).context_modules.active[module_sequence.to_i].content_tags_visible_to(@current_user)
     end
     @pages = []
     items.each do |item|
+      next if !item.published?
+      # what about assignments?
       if item.content_type == "WikiPage"
         wp = WikiPage.find(item.content_id)
         @pages << wp
@@ -174,17 +177,90 @@ class BzController < ApplicationController
   def set_user_retained_data
     result = RetainedData.where(:user_id => @current_user.id, :name => params[:name])
     data = nil
+    was_new = false
+    # if a student hacks this to set optional = true... they just lose out on their own points
+    # so i don't mind it being passed to us from the client.
+    was_optional = params[:optional]
     if result.empty?
       data = RetainedData.new()
       data.user_id = @current_user.id
       data.path = request.referrer
       data.name = params[:name]
+      was_new = true
     else
       data = result.first
     end
 
     data.value = params[:value]
     data.save
+
+    # now that the user's work is safely saved, we will go back and do addon work
+    # like micrograding
+
+    if was_new && !was_optional
+      course_id = request.referrer[/\/courses\/(\d+)\//, 1]
+      if course_id
+
+        course = Course.find(course_id)
+
+        # counting the total number of magic fields is a really slow operation since it needs to
+        # scan the whole course. Thus, it is aggressively cached. Major changes to a course in
+        # the middle of a term can thus throw off scores (since the existing points don't adapt to
+        # the step) and changes (since the cache won't instantly update - it will update in a week,
+        # so probably next monday).
+        #
+        # However, given that we can just round up the points at the end of the semester and most the
+        # steps will be fractional points, and most the content will be written ahead of time, this
+        # shouldn't be a real problem.
+        magic_field_count = Rails.cache.fetch("magic_field_count_for_course_#{course_id}", :expires_in => 1.week) do
+          count = 0
+          names = {}
+          selector = 'input[data-bz-retained]:not(.bz-optional-magic-field),textarea[data-bz-retained]:not(.bz-optional-magic-field)'
+          course.assignments.published.each do |assignment|
+            assignment_html = assignment.description
+            doc = Nokogiri::HTML(assignment_html)
+            doc.css(selector).each do |o|
+              n = o.attr('data-bz-retained')
+              next if names[n] # since we only count new saves, repeated names should not be added
+              next if o.attr('type') == 'checkbox' # checkboxes are optional by nature
+              names[n] = true
+              count += 1
+            end
+          end
+          course.wiki_pages.published.each do |wiki_page|
+            page_html = wiki_page.body
+            doc = Nokogiri::HTML(page_html)
+            doc.css(selector).each do |o|
+              n = o.attr('data-bz-retained')
+              next if names[n]
+              next if o.attr('type') == 'checkbox'
+              names[n] = true
+              count += 1
+            end
+          end
+
+          count == 0 ? 1 : count
+        end
+
+        res = course.assignments.active.where(:title => "Course Participation")
+        if !res.empty?
+          participation_assignment = res.first
+
+          step = participation_assignment.points_possible.to_f / magic_field_count
+
+          submission = participation_assignment.find_or_create_submission(@current_user)
+
+          # actually a race condition but we should be ok since users will only really
+          # be editing one field at a time anyway and I don't think the Canvas models
+          # have a way to do this with a proper atomic update or a lock.
+          existing_grade = submission.grade.nil? ? 0 : submission.grade.to_f
+          new_grade = existing_grade + step * 1.1 # the multiplier is to force it to round up a little to hide floating point inaccuracies. don't want users worrying about a 9.9 that was introduced just cuz of roundoff error, so better to err on the side of being slightly too large
+          participation_assignment.grade_student(@current_user, {:grade => (new_grade), :suppress_notification => true })
+        end
+      end
+    end
+
+
     render :nothing => true
   end
 

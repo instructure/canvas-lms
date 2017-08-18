@@ -1,8 +1,25 @@
+{{#if clone_of_id}}
+<div class="edit-content">
+  <div>
+    <p>This is set to track changes to <abbr title="{{clone_of_id}}">a page</abbr> from the Braven content bank.</p>
+
+    <p>You can edit the other page and have changes appear here (as well as any other course with the cloned page), or you can detach this page and edit it independently.</p>
+
+    <p>If you detach it, it will no longer track changes from the Braven content bank.</p>
+
+    <button onclick="BZ_GoToMasterPage({{clone_of_id}});" type="button">Go to the master page</button>
+    <button onclick="BZ_DetachFromMasterPage({{page_id}});" type="button">Detach and edit independently</button>
+  </div>
+</div>
+{{else}}
 <div class="edit-content">
   <div class="edit-header">
     {{#if CAN.EDIT_TITLE}}
       <label for="title" class="screenreader-only">{{#t "title_label"}}Page Title{{/t}}</label>
       <input id="title" name="title" type="text" class="span4 title" value="{{title}}" maxlength="255" autofocus>
+      {{#if IS_CONTENT_BANK}}
+      <p>Please note: title changes will NOT automatically update linked pages since that would break links. If you want to change them, you'll have to do each independently.</p>
+      {{/if}}
     {{else}}
       <h2>{{title}}</h2>
     {{/if}}
@@ -65,3 +82,4 @@
 </div>
 
 <a href="/bz/retained_data_stats?name=instant-survey-{{page_id}}">See Instant Survey results</a>
+{{/if}}

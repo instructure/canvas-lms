@@ -91,6 +91,7 @@ define([], function(){
 	{title: 'Resource Box', wrapper: true, block: 'div', classes: 'bz-resource-box'},
 	{title: 'Quick Practice Box', wrapper: true, block: 'div', classes: 'bz-practice-box'},
 	{title: 'Pull out Box', wrapper: true, block: 'div', classes: 'bz-pull-out-box'},
+	{title: 'Content Box', wrapper: true, block: 'div', classes: 'bz-box'},
 
 	{title: 'To Do List', block: 'ul', classes: 'bz-to-do-item'},
 	{title: 'Pros List', block: 'ul', classes: 'bz-pros'},
@@ -196,7 +197,7 @@ define([], function(){
     var instructure_buttons = this.buildInstructureButtons();
     var stuff = this.balanceButtons(instructure_buttons);
     stuff[0] += (",bz_retained_field,bz_retained_field_view,bz_name,bz_iframe");
-    stuff[1] += (",bz_survey,bz_tooltip,bz_quickquiz,bz_checklist");
+    stuff[1] += (",bz_survey,bz_tooltip,bz_quickquiz,bz_checklist,bz_show_more");
     return stuff;
   };
 

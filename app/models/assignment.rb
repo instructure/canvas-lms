@@ -42,7 +42,42 @@ class Assignment < ActiveRecord::Base
     :notify_of_update, :time_zone_edited, :turnitin_enabled,
     :turnitin_settings, :context, :position, :allowed_extensions,
     :external_tool_tag_attributes, :freeze_on_copy,
-    :only_visible_to_overrides, :post_to_sis, :integration_id, :integration_data, :moderated_grading
+    :only_visible_to_overrides, :post_to_sis, :integration_id, :integration_data, :moderated_grading, :clone_of_id
+
+  after_update :duplicate_across_courses
+  def duplicate_across_courses
+    if self.description_changed?
+      Assignment.where(:clone_of_id => id).each do |assignment|
+        assignment.description = description
+        assignment.name = name
+        assignment.submission_types = submission_types
+
+        if rubric != assignment.rubric
+          assignment.rubric_association.destroy if assignment.rubric_association
+          assignment.rubric_association = rubric_association.clone if rubric_association
+        end
+
+        assignment.save
+      end
+    end
+  end
+
+  before_update :clone_from_master_bank
+  before_create :clone_from_master_bank
+  def clone_from_master_bank
+    if self.clone_of_id_changed? && !self.clone_of_id.nil?
+      master = Assignment.find(self.clone_of_id)
+      self.description = master.description
+      self.name = master.name
+      self.submission_types = master.submission_types
+      if self.rubric != master.rubric
+        self.rubric_association.destroy if self.rubric_association
+        self.rubric_association = master.rubric_association.clone if master.rubric_association
+      end
+    end
+  end
+
+
 
   ALLOWED_GRADING_TYPES = %w(
     pass_fail percent letter_grade gpa_scale points not_graded
@@ -1151,6 +1186,10 @@ class Assignment < ActiveRecord::Base
 
     did_grade = false
     submission.attributes = opts.slice(:excused, :submission_type, :url, :body)
+
+    if opts[:suppress_notification]
+      submission.suppress_notification
+    end
 
     unless opts[:provisional]
       submission.grader = grader

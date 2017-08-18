@@ -435,10 +435,17 @@ class FilesController < ApplicationController
   # @returns File
   def api_show
     get_context
-    @attachment = @context ? @context.attachments.find(params[:id]) : Attachment.find(params[:id])
+    begin
+      @attachment = @context ? @context.attachments.find(params[:id]) : Attachment.find(params[:id])
+    rescue
+      @attachment = Attachment.find(params[:id])
+    end
     raise ActiveRecord::RecordNotFound if @attachment.deleted?
     params[:include] = Array(params[:include])
-    if authorized_action(@attachment,@current_user,:read)
+    # This context_id == 1 thing appears thrice more in addition to this line
+    # in all three cases, it is to bypass the course enrollment check for images
+    # from the content library
+    if @attachment.context_id == 1 || authorized_action(@attachment,@current_user,:read)
       render :json => attachment_json(@attachment, @current_user, {}, { include: params[:include], omit_verifier_in_app: !value_to_boolean(params[:use_verifiers]) })
     end
   end
@@ -454,7 +461,11 @@ class FilesController < ApplicationController
     # this implicit context magic happens in ApplicationController#get_context
     if @context && !@context.is_a?(User)
       # note that Attachment#find has special logic to find overwriting files; see FindInContextAssociation
-      @attachment = @context.attachments.find(params[:id])
+      begin
+        @attachment = @context.attachments.find(params[:id])
+      rescue
+        @attachment = Attachment.find(params[:id])
+      end
     else
       @attachment = Attachment.find(params[:id])
       @skip_crumb = true unless @context
@@ -483,13 +494,14 @@ class FilesController < ApplicationController
     if (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :read, session)) ||
         @attachment.attachment_associations.where(:context_type => 'Submission').
           any? { |aa| aa.context && aa.context.grants_right?(@current_user, session, :read) } ||
+        @attachment.context_id == 1 ||
         authorized_action(@attachment, @current_user, :read)
 
       @attachment.ensure_media_object
 
       if params[:download]
         if (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, session)) ||
-            (@attachment.grants_right?(@current_user, session, :download))
+            (@attachment.grants_right?(@current_user, session, :download)) || @attachment.context_id == 1
           disable_page_views if params[:preview]
           begin
             send_attachment(@attachment)
@@ -502,7 +514,7 @@ class FilesController < ApplicationController
               formats: [:html]
           end
           return
-        elsif authorized_action(@attachment, @current_user, :read)
+        elsif @attachment.context_id == 1 || authorized_action(@attachment, @current_user, :read)
           render_attachment(@attachment)
         end
       # This action is a callback used in our system to help record when

@@ -186,7 +186,54 @@ define([
             'item[title]': $option.text(),
             'item[indent]': $("#content_tag_indent").val()
           }
-          if(item_data['item[id]'] == 'new') {
+
+          if(item_type == 'cloned_assignment') {
+            item_data['item[type]'] = 'assignment';
+
+            var data = {
+              assignment: {
+                name: $option.text(),
+                clone_of_id: $option.val()
+              }
+            };
+
+            // create in api
+            var url = $("#select_context_content_dialog .module_item_option:visible:first .new .add_item_url").attr('href');
+            $.ajaxJSON(url, 'POST', data, function(data) {
+              item_data['item[id]'] = data["assignment"]["id"];
+              submit(item_data);
+            }, function(data) {
+              $("#select_context_content_dialog").loadingImage('remove');
+                $("#select_context_content_dialog").errorBox(I18n.t('errors.failed_to_create_item', 'Failed to Create new Item'));
+                console.log(JSON.stringify(data));
+            }
+            );
+
+          } else if(item_type == 'cloned_wiki_page') {
+            item_data['item[type]'] = 'wiki_page';
+            //'item[title]': $option.text(), // already set by loading the clone list...
+
+            // but id needs to change as we create the new page in this course.
+
+            var data = {
+              wiki_page: {
+                title: $option.text(),
+                clone_of_id: $option.val()
+              }
+            };
+
+            // create in api
+            var url = $("#select_context_content_dialog .module_item_option:visible:first .new .add_item_url").attr('href');
+            $.ajaxJSON(url, 'POST', data, function(data) {
+              item_data['item[id]'] = data["page_id"];
+              submit(item_data);
+            }, function(data) {
+              $("#select_context_content_dialog").loadingImage('remove');
+                $("#select_context_content_dialog").errorBox(I18n.t('errors.failed_to_create_item', 'Failed to Create new Item'));
+                console.log(JSON.stringify(data));
+            }
+            );
+          } else if(item_data['item[id]'] == 'new') {
             $("#select_context_content_dialog").loadingImage();
             var url = $("#select_context_content_dialog .module_item_option:visible:first .new .add_item_url").attr('href');
             var data = $("#select_context_content_dialog .module_item_option:visible:first").getFormData();
@@ -194,14 +241,14 @@ define([
               var obj;
 
               // discussion_topics will come from real api v1 and so wont be nested behind a `discussion_topic` or 'wiki_page' root object
-              if (item_data['item[type]'] === 'discussion_topic' || item_data['item[type]'] === 'wiki_page') {
+              if (item_data['item[type]'] === 'discussion_topic' || item_data['item[type]'] === 'wiki_page' || item_data['item[type]'] === 'cloned_wiki_page') {
                 obj = data;
               } else {
                 obj = data[item_data['item[type]']]; // e.g. data['wiki_page'] for wiki pages
               }
 
               $("#select_context_content_dialog").loadingImage('remove');
-              if (item_data['item[type]'] === 'wiki_page') {
+              if (item_data['item[type]'] === 'wiki_page' || item_data['item[type]'] === 'cloned_wiki_page') {
                 item_data['item[id]'] = obj.page_id;
               } else {
                 item_data['item[id]'] = obj.id;
