@@ -632,7 +632,7 @@ class AccountsController < ApplicationController
           @account.settings[:custom_help_links] = sorted_help_links.map do |index_with_hash|
             hash = index_with_hash[1].to_hash.with_indifferent_access
             hash.delete('state')
-            hash.assert_valid_keys ["text", "subtext", "url", "available_to", "type"]
+            hash.assert_valid_keys ["text", "subtext", "url", "available_to", "type", "id"]
             hash
           end
           @account.settings[:new_custom_help_links] = true
@@ -765,7 +765,7 @@ class AccountsController < ApplicationController
 
       js_env({
         CUSTOM_HELP_LINKS: @domain_root_account && @domain_root_account.help_links || [],
-        DEFAULT_HELP_LINKS: Account::HelpLinks.default_links,
+        DEFAULT_HELP_LINKS: Account::HelpLinks.instantiate_links(Account::HelpLinks.default_links),
         APP_CENTER: { enabled: Canvas::Plugin.find(:app_center).enabled? },
         LTI_LAUNCH_URL: account_tool_proxy_registration_path(@account),
         CONTEXT_BASE_URL: "/accounts/#{@context.id}",

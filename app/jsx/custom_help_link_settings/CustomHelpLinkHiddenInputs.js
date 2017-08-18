@@ -31,11 +31,13 @@ import CustomHelpLinkPropTypes from './CustomHelpLinkPropTypes'
         available_to,
         type,
         index,
-        state
+        state,
+        id
       } = this.props.link
       const namePrefix = `account[custom_help_links][${index}]`
       return (
         <span>
+          <input type="hidden" name={`${namePrefix}[id]`} value={id} />
           <input type="hidden" name={`${namePrefix}[text]`} value={text} />
           <input type="hidden" name={`${namePrefix}[subtext]`} value={subtext} />
           <input type="hidden" name={`${namePrefix}[url]`} value={url} />
