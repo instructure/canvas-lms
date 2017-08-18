@@ -149,18 +149,23 @@ module Context
     result
   end
 
-  def self.find_by_asset_string(string)
-    opts = string.split("_", -1)
-    id = opts.pop
-    klass_name = opts.join('_').classify.to_sym
+  def self.find_polymorphic(context_type, context_id)
+    klass_name = context_type.classify.to_sym
     if CONTEXT_TYPES.include?(klass_name)
       type = Object.const_get(klass_name, false)
-      type.find(id)
+      type.find(context_id)
     else
       nil
     end
   rescue => e
     nil
+  end
+
+  def self.find_by_asset_string(string)
+    opts = string.split("_", -1)
+    id = opts.pop
+    type = opts.join('_')
+    Context.find_polymorphic(type, id)
   end
 
   def self.asset_type_for_string(string)

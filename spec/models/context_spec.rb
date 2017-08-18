@@ -19,6 +19,21 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Context do
+  context "find_polymorphic" do
+    it "should find a valid context" do
+      course = Course.create!
+      expect(Context.find_polymorphic("course", course.id)).to eql(course)
+    end
+
+    it "should not find a context with invalid type" do
+      expect(Context.find_polymorphic("WRONG", 0)).to eql(nil)
+    end
+
+    it "should not find a context with invalid id" do
+      expect(Context.find_polymorphic("course", 0)).to eql(nil)
+    end
+  end
+
   context "find_by_asset_string" do
     it "should find a valid course" do
       course = Course.create!
