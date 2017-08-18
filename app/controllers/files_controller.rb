@@ -435,7 +435,11 @@ class FilesController < ApplicationController
   # @returns File
   def api_show
     get_context
-    @attachment = @context ? @context.attachments.find(params[:id]) : Attachment.find(params[:id])
+    begin
+      @attachment = @context ? @context.attachments.find(params[:id]) : Attachment.find(params[:id])
+    rescue
+      @attachment = Attachment.find(params[:id])
+    end
     raise ActiveRecord::RecordNotFound if @attachment.deleted?
     params[:include] = Array(params[:include])
     if authorized_action(@attachment,@current_user,:read)
@@ -454,7 +458,11 @@ class FilesController < ApplicationController
     # this implicit context magic happens in ApplicationController#get_context
     if @context && !@context.is_a?(User)
       # note that Attachment#find has special logic to find overwriting files; see FindInContextAssociation
-      @attachment = @context.attachments.find(params[:id])
+      begin
+        @attachment = @context.attachments.find(params[:id])
+      rescue
+        @attachment = Attachment.find(params[:id])
+      end
     else
       @attachment = Attachment.find(params[:id])
       @skip_crumb = true unless @context
