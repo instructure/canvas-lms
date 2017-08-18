@@ -52,6 +52,8 @@ module Types
           end
       }
     end
+
+    field :lastActivityAt, TimeType, property: :last_activity_at
   end
 
   EnrollmentWorkflowState = GraphQL::EnumType.define do
