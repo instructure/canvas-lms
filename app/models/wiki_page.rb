@@ -41,6 +41,7 @@ class WikiPage < ActiveRecord::Base
   def duplicate_across_courses
     if self.deleted?
       WikiPage.where(:clone_of_id => id).each do |page|
+        ContentTag.where(:content_id => page.id, :content_type => 'WikiPage').destroy_all
         page.workflow_state = 'deleted'
         page.save!
       end
