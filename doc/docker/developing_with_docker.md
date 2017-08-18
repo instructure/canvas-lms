@@ -139,10 +139,11 @@ $ docker-compose run --rm web bundle exec rspec spec
 
 ## Running javascript tests
 
-To run tests in headless Chrome:
+To run tests in headless Chrome, add the `docker-compose/js-tests.override.yml`
+to the `COMPOSE_FILE` environment variable in your .env, and run:
 
 ```
-$ docker-compose run --rm karma yarn run test-headless
+$ docker-compose run --rm js-tests
 ```
 
 ### Selenium

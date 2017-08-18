@@ -139,6 +139,7 @@
     "test": "karma start --single-run",
     "test-headless": "karma start --single-run --browsers ChromeHeadlessNoSandbox",
     "test-watch": "karma start",
+    "test-watch-headless": "karma start --browsers ChromeHeadlessNoSandbox",
     "preinstall": "script/gem_npm install",
     "preupdate": "script/gem_npm update",
     "build": "yarn run build:css && yarn run build:js",
