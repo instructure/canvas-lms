@@ -442,7 +442,7 @@ class FilesController < ApplicationController
     end
     raise ActiveRecord::RecordNotFound if @attachment.deleted?
     params[:include] = Array(params[:include])
-    # This context_id == 1 thing appears twice more in addition to this line
+    # This context_id == 1 thing appears thrice more in addition to this line
     # in all three cases, it is to bypass the course enrollment check for images
     # from the content library
     if @attachment.context_id == 1 || authorized_action(@attachment,@current_user,:read)
@@ -501,7 +501,7 @@ class FilesController < ApplicationController
 
       if params[:download]
         if (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, session)) ||
-            (@attachment.grants_right?(@current_user, session, :download))
+            (@attachment.grants_right?(@current_user, session, :download)) || @attachment.context_id == 1
           disable_page_views if params[:preview]
           begin
             send_attachment(@attachment)
