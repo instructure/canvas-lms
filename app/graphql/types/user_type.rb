@@ -44,7 +44,21 @@ module Types
         end
       end
     end
+
+    field :summaryAnalytics, StudentSummaryAnalyticsType do
+      argument :courseId, !types.ID,
+        "returns summary analytics for this course",
+        prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+
+      resolve ->(user, args, ctx) do
+        Loaders::CourseStudentAnalyticsLoader.for(
+          args[:courseId],
+          current_user: ctx[:current_user], session: ctx[:session]
+        ).load(user)
+      end
+    end
   end
+
 end
 
 class UserCourseEnrollmentLoader < Loaders::ForeignKeyLoader
