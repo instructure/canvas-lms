@@ -303,6 +303,7 @@ zh-Hans:
     report_header_canvas_xlist_course_id: canvas_xlist_course_id
     report_header_course: 课程
     report_header_course__id: course_id
+    report_header_course_format: course_format
     report_header_course_id: "课程 id"
     report_header_course_name: 课程名称
     report_header_course_sis: "课程 sis"
@@ -712,6 +713,12 @@ zh-Hans:
     default_account_quotas_not_updated: 未更新默认帐户配额
     default_account_quotas_updated: 默认帐户配额已更新
     devry: 
+      attendance_extract: 
+        parameters: 
+          custom_reports: 
+            start: 
+              parameters: 
+                header: 活动日期：
       dcr2: 
         parameters: 
           custom_reports: 
@@ -728,6 +735,24 @@ zh-Hans:
               parameters: 
                 header: 开始时间：
       dcr7: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: 结束时间：
+            start: 
+              parameters: 
+                header: 开始时间：
+      no_submissions: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: 结束时间：
+            start: 
+              parameters: 
+                header: 开始时间：
+      submissions_detail: 
         parameters: 
           custom_reports: 
             end: 
@@ -2142,6 +2167,8 @@ zh-Hans:
         remove_these_dates: 删除这些日期
     edit: 
       edit_assignment: 编辑作业
+      links: 
+        add_rubric: 评测
     edit_header_view: 
       buttons: 
         not_published: 未发布
@@ -2850,8 +2877,8 @@ zh-Hans:
     show_all_artifacts: 显示所有教具
     submit: 提交
     unmasquerade: 停止仿冒
-    unpublish: 取消发布
-    unpublished: 已取消发布
+    unpublish: 未发布
+    unpublished: 未发布
     update: 更新
     view_account_roster: 查看帐户清单
     view_course_roster: 查看课程清单
@@ -3415,12 +3442,30 @@ zh-Hans:
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: 如果学生选择此答案，点击此处，输入评论
   click_to_load_a020891b: (点击加载)
   click_to_modify_89fa26aa: 点击修改
+  click_to_order_by_email_ascending_98b1a697: 点击以按电子邮件升序排序
+  click_to_order_by_last_login_ascending_502b6ad2: 点击以按上次登录升序排序
+  click_to_order_by_sis_id_ascending_692d35a7: "点击以按 SIS ID 升序排序"
   click_to_publish_ad27be9d: 单击以发布。
   click_to_report_profile_picture_370f9625: 点击报告资料图片
   click_to_select_bd3b3a0d: 单击以选择
   click_to_select_user_name_41746803: "单击以选择用户%{name}"
   click_to_set_this_answer_as_correct_1326e3fd: 点击此处，设置此答案为正确
   click_to_skip_address_8f874b32: "单击以跳过%{address}"
+  click_to_sort_by_email_ascending_cb789ec4: 点击以按电子邮件升序排序
+  click_to_sort_by_email_descending_72801b54: 点击以按电子邮件降序排序
+  click_to_sort_by_enrollments_ascending_f535b994: 点击以按登记人数升序排序
+  click_to_sort_by_enrollments_descending_3e5c80ee: 点击以按登记人数降序排序
+  click_to_sort_by_last_login_ascending_eafcbee4: 点击以按上次登录升序排序
+  click_to_sort_by_last_login_descending_61fdadc: 点击以按上次登录降序排序
+  click_to_sort_by_name_ascending_739c011e: 点击以按姓名升序排序
+  click_to_sort_by_name_descending_b6262093: 点击以按姓名降序排序
+  click_to_sort_by_sis_id_ascending_832c870: "点击以按 SIS ID 升序排序"
+  click_to_sort_by_sis_id_descending_2d611236: "点击以按 SIS ID 降序排序"
+  click_to_sort_by_subaccount_ascending_11252bc4: 点击以按子帐户升序排序
+  click_to_sort_by_subaccount_descending_3d8a2381: 点击以按子帐户降序排序
+  click_to_sort_by_teacher_ascending_cda7a18c: 点击以按教师升序排序
+  click_to_sort_by_teacher_descending_45ef0d1e: 点击以按教师降序排序
+  click_to_sort_c81ff8c8: 点击以排序。
   click_to_test_a_different_score_2e0bb6f0: 单击以测试不同分数
   click_to_test_dropdown_b950974d: 点击此处，测试下拉菜单
   click_to_unpublish_5b19e761: 单击以取消发布。
@@ -3440,6 +3485,8 @@ zh-Hans:
   closes_5c6b4367: 关闭：
   code_is_case_sensitive_d8175cad: 代码对大小写敏感。
   cog_icon_69bdffd5: 齿轮图标
+  col_is_sorted_ascending_cc5152cc: "%{col} 按升序排序"
+  col_is_sorted_descending_1cef74aa: "%{col} 按降序排序。"
   collaboration: 
     default_title: 未命名的协作
   collaboration_71c024f4: 协作
@@ -4612,6 +4659,7 @@ zh-Hans:
   count_items_selected_91814713: 
     one: "%{count} 项已选定"
     other: "%{count} 项已选定"
+  count_items_would_be_deleted_and_exceeds_the_set_t_a4a21dbe: "%{count} 项目将被删除并超出设定的阈值%{change_threshold}%"
   count_max_students_2db76773: "%{count} / %{max} 学生"
   count_max_users_bdebb537: "%{count} / %{max} 用户"
   count_messages_4f8ff204: 
@@ -5842,6 +5890,7 @@ zh-Hans:
       year: 年
   day_9d999bec: 日
   day_s_7cc1231f: 天数
+  days_late_a3a721b0: 延迟天数
   deactivate_this_key_3e79a2b5: 停用此键
   deactivate_user_86c09036: 取消用户
   decaying_average_8bf6a0dd: 平均衰减
@@ -7532,6 +7581,7 @@ zh-Hans:
   generating_preview_ae83830: 正生成预览...
   germany_49_fc5b8179: 德国(+49)
   germany_b02d91c9: 德国
+  get_started_b9507525: 开始
   get_the_following_from_your_salesforce_connected_a_881fc9a3: 从您的销售团队连接如下的应用程序
   get_your_users_error_reports_posted_to_salesforce__76f57839: 获取用户发布到销售团队的云服务的错误报告。
   get_your_users_error_reports_posted_to_salesforce_dfb1a6c2: 获取用户发布到销售团队的错误报告。
@@ -7613,6 +7663,7 @@ zh-Hans:
       submit_comment: 提交评论
       submitting: 正在提交...
     cancel_button: 取消
+    canvadoc_expiring: "您的 Canvas DocViewer 会话即将过期。请重新加载窗口以免丢失任何工作。"
     click_to_change: 单击以测试不同分数
     column_header: 
       assignment_options: 作业选项
@@ -8865,6 +8916,8 @@ zh-Hans:
   host_8be927e0: 主持
   host_is_unreachable_or_not_pointing_to_catalog_fb3fc082: 主持不可达或无法指向目录
   hour_34d02553: 小时
+  hour_s_b6e8d238: 小时
+  hours_late_989e9081: 延迟小时数
   hover_over_me_496521b9: 将鼠标悬停在我之上。
   how_is_this_affecting_you_b3b6a639: 这对您有什么影响？
   how_many_minutes_ecca5ee7: 多少分钟？
@@ -8880,6 +8933,7 @@ zh-Hans:
   i_need_some_help_but_it_is_not_urgent_d967ea0a: 我需要一些帮助，但并不迫切
   ic_actions: 
     manage: 管理
+  iceland_354_1a03c558: "冰岛 (+354)"
   icon_215a1dc6: 图标
   icons: 
     discussion_submission: 讨论提交项
@@ -9466,6 +9520,7 @@ zh-Hans:
   loading_25990131: 正在加载...
   loading_725811ca: 正在加载
   loading_announcements_b927a86c: 正在加载公告
+  loading_assignments_352ec769: 正在加载作业
   loading_associations_9da66c4e: 正在加载关联
   loading_associations_complete_b93a9c6e: 加载关联完成
   loading_associations_started_1f65d8d: 加载关联已开始
@@ -9480,7 +9535,9 @@ zh-Hans:
   loading_data_ecd89ba: 正在加载数据……
   loading_graders_f6a76142: 正在加载评分人
   loading_mastery_paths_c558a766: 加载通达的路径......
+  loading_more_grade_history_results_b235de5: 正在加载多个评分历史记录结果。
   loading_more_results_def6df65: 正在载入更多的结果...
+  loading_results_769c8819: 正在加载结果
   loading_results_spinner_73ef739c: 加载结果微调框
   loading_students_30b71301: 正在加载学生
   loading_sync_history_9f342cbf: 正在加载同步历史记录
@@ -11785,6 +11842,7 @@ zh-Hans:
   more_courses_5ebbe998: 更多课程
   more_info_at_course_name_56dc8c10: "更多的信息在 %{course_name}"
   more_information_3dfb76b5: 更多信息
+  more_results_were_added_at_the_bottom_of_the_page_dc323877: 多个结果已加载到页面底部。
   more_than_999_submissions_need_grading_bc087dd0: 超过999的提交需要评分
   more_than_9_submissions_need_grading_30157d49: 有超过9个需要评改的提交
   more_than_a19b440: "%{more_than}+"
@@ -11979,6 +12037,7 @@ zh-Hans:
   nickname_7df95b09: 昵称：
   no_74e9b590: 否
   no_assignment_name_adbb215b: 无作业名称
+  no_assignments_with_that_name_found_1d7be1: 该姓名下没有找到作业
   no_associated_terms_13bacefc: 没有相关的条款
   no_attributes_locked_611c5cc: 未锁定任何属性
   no_broken_links_found_38d951e3: 没有找到断开的链接
@@ -12006,6 +12065,7 @@ zh-Hans:
   no_ltis_configured_f4b9bc6b: 没有LTIs的配置
   no_matching_users_found_83889c10: 没有发现匹配的用户。
   no_migration_file: 内容迁移需要文件
+  no_more_results_to_load_6774fb1c: 没有更多结果可以加载。
   no_outcome_file_or_authority_given_c90f9c5f: 未提供结果文件或授权
   no_password_was_given_472222e5: 未提供密码
   no_placements_enabled_f705f28: 没有启用的安置
@@ -12013,6 +12073,7 @@ zh-Hans:
   no_points_possible_72db3a55: 没有可能的得分
   no_results_f36777ee: 无结果
   no_results_found_58717065: 未找到结果
+  no_results_found_e4b686bd: 没有找出结果。
   no_score_yet_c94e919b: 尚无分数
   no_students_dd8de9f0: 没有学生
   no_students_have_taken_the_quiz_yet_e667644b: 学生尚未参加测验
@@ -16484,6 +16545,9 @@ zh-Hans:
       titles: 
         full_comments: 单击以查看完整评论
         linked_to_learning_outcome: 此标准已链接至学习结果
+    rubrics_component: 
+      links: 
+        assign_rubric: 指定评分标准
     select_content_dialog: 
       add_to_module: "添加 %{item} 到*单元*"
       assignment_item: 作业
@@ -16843,6 +16907,7 @@ zh-Hans:
   something_is_broken_but_i_can_work_around_it_for_n_7fcedb9d: 发生错误，但我现在就可以解决它。
   something_went_wrong_inactivating_the_user_please__ea7d0001: "停用用户出错。 请稍后再试。"
   something_went_wrong_please_try_again_6d337b6c: 出事了，请重试。
+  something_went_wrong_please_try_refreshing_the_pag_4e14a67: "出了些问题。请尝试刷新页面。如果问题仍然存在，可能是因为“%{assignmentTitle}”上要加载 SpeedGrader 的记录太多。"
   something_went_wrong_re_activating_the_user_please_82c3e7a: "重新激活用户出错。 请稍后再试。"
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "更新用户的角色出错。 请稍后再试。"
   something_went_wrong_when_trying_to_sync_grades_to_592c4c35: 尝试将评分同步到学生信息系统时出现了一些问题。请稍后再试。
@@ -16853,9 +16918,11 @@ zh-Hans:
   sortable_name_73f707cf: 可排序的名称
   sorted_ascending_1f9b52c6: 升序排列。
   sorted_ascending_2318ec99: 升序排列
+  sorted_ascending_3138603c: 已按升序排序。
   sorted_ascending_b6d61547: 按升序排序
   sorted_descending_1e30f0d5: 按降序排序
   sorted_descending_7fcec1ff: 降序排列
+  sorted_descending_84ec84c8: 已按降序排序。
   sorted_descending_d9aa3cf8: 降序排列。
   source_code_2395ca74: 源代码
   south_korea_16d43049: 韩国
@@ -17026,6 +17093,7 @@ zh-Hans:
   students_will_automatically_receive_full_credit_on_cc61df39: 一旦学生参加调查，他们将自动获得到满分
   students_with_no_submissions_title: 无提交项的学生
   studentsperrangecount_out_of_totalstudentsenrolled_90cbfaf1: "%{studentsPerRangeCount} 超出 %{totalStudentsEnrolled} 的学生"
+  sub_account_daeadd0: 子帐户
   sub_accounts: 
     alerts: 
       subaccount_has_courses: 您无法删除其中有课程的子帐户
@@ -17095,6 +17163,7 @@ zh-Hans:
     view_rubric_assessment_in_the_speedgrader: 在SpeedGrader中查看评分标准测验
   submission_in_another_grading_period_e754b329: 在另一个评分周期提交
   submission_options_5184a65b: 提交选项
+  submission_status_3079e730: 提交状态
   submission_tray_429ac3df: 提交托盘
   submissions: 
     assignment_submit_success: 作业已成功提交。
