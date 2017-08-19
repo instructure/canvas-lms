@@ -303,6 +303,7 @@ nb:
     report_header_canvas_xlist_course_id: canvas_xlist_course_id
     report_header_course: emne
     report_header_course__id: course_id
+    report_header_course_format: course_format
     report_header_course_id: "emne id"
     report_header_course_name: emnenavn
     report_header_course_sis: "emne sis"
@@ -712,6 +713,12 @@ nb:
     default_account_quotas_not_updated: "Standard kontokvoter ble ikke oppdatert"
     default_account_quotas_updated: "Kontokvotene ble oppdatert"
     devry: 
+      attendance_extract: 
+        parameters: 
+          custom_reports: 
+            start: 
+              parameters: 
+                header: "Aktivitetsdato:"
       dcr2: 
         parameters: 
           custom_reports: 
@@ -728,6 +735,24 @@ nb:
               parameters: 
                 header: "Start:"
       dcr7: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Slutt:"
+            start: 
+              parameters: 
+                header: "Start:"
+      no_submissions: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Slutt:"
+            start: 
+              parameters: 
+                header: "Start:"
+      submissions_detail: 
         parameters: 
           custom_reports: 
             end: 
@@ -2142,6 +2167,8 @@ nb:
         remove_these_dates: "Fjern disse datoene"
     edit: 
       edit_assignment: "Rediger oppgave"
+      links: 
+        add_rubric: Rubrikk
     edit_header_view: 
       buttons: 
         not_published: "Ikke publisert"
@@ -3417,12 +3444,30 @@ nb:
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "Klikk for å legge inn kommentarer, dersom studenten velger dette svaret"
   click_to_load_a020891b: "(klikk for å laste)"
   click_to_modify_89fa26aa: "Klikk for å modifisere"
+  click_to_order_by_email_ascending_98b1a697: "Klikk for å bestille stigende etter e-post"
+  click_to_order_by_last_login_ascending_502b6ad2: "Klikk for å bestille avtagende etter siste innlogging"
+  click_to_order_by_sis_id_ascending_692d35a7: "Klikk for å bestille stigende etter SIS-ID"
   click_to_publish_ad27be9d: "Trykk her for å publisere"
   click_to_report_profile_picture_370f9625: "Klikk for å rapportere profilbilde"
   click_to_select_bd3b3a0d: "klikk for å velge"
   click_to_select_user_name_41746803: "Klikk for å velge bruker %{name}"
   click_to_set_this_answer_as_correct_1326e3fd: "Klikk for å sette dette svaret som riktig"
   click_to_skip_address_8f874b32: "Klikk for å hoppe over %{address}"
+  click_to_sort_by_email_ascending_cb789ec4: "Klikk for å sortere stigende etter e-post"
+  click_to_sort_by_email_descending_72801b54: "Klikk for å sortere avtagende etter e-post"
+  click_to_sort_by_enrollments_ascending_f535b994: "Klikk for å sortere stigende etter oppmeldinger"
+  click_to_sort_by_enrollments_descending_3e5c80ee: "Klikk for å sortere avtagende etter oppmeldinger"
+  click_to_sort_by_last_login_ascending_eafcbee4: "Klikk for å sortere stigende etter siste innlogging"
+  click_to_sort_by_last_login_descending_61fdadc: "Klikk for å sortere avtagende etter siste innlogging"
+  click_to_sort_by_name_ascending_739c011e: "Klikk for å sortere stigende etter navn"
+  click_to_sort_by_name_descending_b6262093: "Klikk for å sortere avtagende etter navn"
+  click_to_sort_by_sis_id_ascending_832c870: "Klikk for å sortere stigende etter SIS-ID"
+  click_to_sort_by_sis_id_descending_2d611236: "Klikk for å sortere avtagende etter SIS-ID"
+  click_to_sort_by_subaccount_ascending_11252bc4: "Klikk for å sortere stigende etter delkonto"
+  click_to_sort_by_subaccount_descending_3d8a2381: "Klikk for å sortere avtagende etter delkonto"
+  click_to_sort_by_teacher_ascending_cda7a18c: "Klikk for å sortere stigende etter lærer"
+  click_to_sort_by_teacher_descending_45ef0d1e: "Klikk for å sortere avtagende etter lærer"
+  click_to_sort_c81ff8c8: "Klikk for å sortere."
   click_to_test_a_different_score_2e0bb6f0: "Klikk for å teste et annet resultat"
   click_to_test_dropdown_b950974d: "Klikk for å teste nedtrekksmeny"
   click_to_unpublish_5b19e761: "Trykk for å oppheve publiseringen"
@@ -3442,6 +3487,8 @@ nb:
   closes_5c6b4367: "Lukker:"
   code_is_case_sensitive_d8175cad: "Koden benytter små og store bokstaver"
   cog_icon_69bdffd5: Tannhjuls-ikon
+  col_is_sorted_ascending_cc5152cc: "%{col} er sortert stigende"
+  col_is_sorted_descending_1cef74aa: "%{col} er sortert avtagende."
   collaboration: 
     default_title: "Samarbeid uten navn"
   collaboration_71c024f4: Samarbeid
@@ -4618,6 +4665,7 @@ nb:
   count_items_selected_91814713: 
     one: "%{count} elementet valgt"
     other: "%{count} elementer valgt"
+  count_items_would_be_deleted_and_exceeds_the_set_t_a4a21dbe: "%{count} elementer vil bli slettet og overskrider den definerte terskelen %{change_threshold}%"
   count_max_students_2db76773: "%{count} / %{max} studenter"
   count_max_users_bdebb537: "%{count} / %{max} brukere"
   count_messages_4f8ff204: 
@@ -5850,6 +5898,7 @@ nb:
       year: År
   day_9d999bec: Dag
   day_s_7cc1231f: Dag(er)
+  days_late_a3a721b0: "Dager for sent"
   deactivate_this_key_3e79a2b5: "Deaktiver denne nøkkelen"
   deactivate_user_86c09036: "Deaktiver bruker"
   decaying_average_8bf6a0dd: "Forfalne Gjennomsnitt"
@@ -7537,6 +7586,7 @@ nb:
   generating_preview_ae83830: "Laster forhåndsvisning…"
   germany_49_fc5b8179: "Tyskland (+49)"
   germany_b02d91c9: Tyskland
+  get_started_b9507525: "Kom i gang"
   get_the_following_from_your_salesforce_connected_a_881fc9a3: "Få følgende fra din Salesforce tilkoblede applikasjon"
   get_your_users_error_reports_posted_to_salesforce__76f57839: "Få dine brukeres avviksrapporter publisert til Salesforce Service Cloud"
   get_your_users_error_reports_posted_to_salesforce_dfb1a6c2: "Få dine brukeres avviksrapporter publisert til Salesforce"
@@ -7618,6 +7668,7 @@ nb:
       submit_comment: "Send inn kommentar"
       submitting: "Sender inn..."
     cancel_button: Avbryt
+    canvadoc_expiring: "Din Canvas DocViewer økt utløper snart.  Vennligst last inn vinduet på nytt for å unngå og miste arbeid."
     click_to_change: "Klikk for å teste et annet resultat"
     column_header: 
       assignment_options: Oppgavevalg
@@ -8877,6 +8928,8 @@ nb:
   host_8be927e0: Vert
   host_is_unreachable_or_not_pointing_to_catalog_fb3fc082: "Verten er utilgjengelig eller peker ikke til katalog"
   hour_34d02553: Time
+  hour_s_b6e8d238: Time(r)
+  hours_late_989e9081: "Timer for sent"
   hover_over_me_496521b9: "Hold markøren over meg"
   how_is_this_affecting_you_b3b6a639: "Hvordan påvirker dette deg?"
   how_many_minutes_ecca5ee7: "Hvor mange minutter?"
@@ -8892,6 +8945,7 @@ nb:
   i_need_some_help_but_it_is_not_urgent_d967ea0a: "Jeg trenger litt hjelp, men det haster ikke"
   ic_actions: 
     manage: administrer
+  iceland_354_1a03c558: "Island (+354)"
   icon_215a1dc6: Ikon
   icons: 
     discussion_submission: Diskusjonsinnlevering
@@ -9482,6 +9536,7 @@ nb:
   loading_25990131: Laster...
   loading_725811ca: "laster inn"
   loading_announcements_b927a86c: "Laster kunngjøringer"
+  loading_assignments_352ec769: "Laster oppgaver"
   loading_associations_9da66c4e: "Laster inn assosiasjoner"
   loading_associations_complete_b93a9c6e: "Innlasting av assosiasjoner fullført"
   loading_associations_started_1f65d8d: "Innlasting av assosiasjoner påbegynt"
@@ -9496,7 +9551,9 @@ nb:
   loading_data_ecd89ba: "Laster data..."
   loading_graders_f6a76142: "Laster inn karaktersettere"
   loading_mastery_paths_c558a766: "Laster mestringsstier ..."
+  loading_more_grade_history_results_b235de5: "Laster flere resultater over karakterhistorie."
   loading_more_results_def6df65: "Laster inn flere resultater…"
+  loading_results_769c8819: "Laster resultater"
   loading_results_spinner_73ef739c: "Laster resultatspinner"
   loading_students_30b71301: "Laster inn studenter"
   loading_sync_history_9f342cbf: "Laster synkroniseringsloggen"
@@ -11799,6 +11856,7 @@ nb:
   more_courses_5ebbe998: "Flere emner"
   more_info_at_course_name_56dc8c10: "Mer info på %{course_name}"
   more_information_3dfb76b5: "Mer informasjon"
+  more_results_were_added_at_the_bottom_of_the_page_dc323877: "Flere resultater ble lagt til på bunnen av siden."
   more_than_999_submissions_need_grading_bc087dd0: "Mer enn 999 innleveringer trenger karaktersetting"
   more_than_9_submissions_need_grading_30157d49: "Mer enn 9 innleveringer krever vurdering"
   more_than_a19b440: "%{more_than}+"
@@ -11990,6 +12048,7 @@ nb:
   nickname_7df95b09: "Kallenavn:"
   no_74e9b590: nei
   no_assignment_name_adbb215b: "Ingen oppgavenavn"
+  no_assignments_with_that_name_found_1d7be1: "Ingen oppdrag med det navnet funnet"
   no_associated_terms_13bacefc: "Ingen assosierte semestre"
   no_attributes_locked_611c5cc: "ingen låste attributter"
   no_broken_links_found_38d951e3: "Ingen lenkebrudd funnet"
@@ -12017,6 +12076,7 @@ nb:
   no_ltis_configured_f4b9bc6b: "Ingen LTI'er konfigurert"
   no_matching_users_found_83889c10: "Ingen matchende brukere funnet."
   no_migration_file: "En fil er påkrevet for innholdsflytting."
+  no_more_results_to_load_6774fb1c: "Ingen flere resultater å laste."
   no_outcome_file_or_authority_given_c90f9c5f: "Ingen resultatfil eller autoritet gitt"
   no_password_was_given_472222e5: "Intet passord oppgitt"
   no_placements_enabled_f705f28: "Ingen plasseringer aktivert"
@@ -12024,6 +12084,7 @@ nb:
   no_points_possible_72db3a55: "Ingen mulige poeng"
   no_results_f36777ee: "Ingen resultater"
   no_results_found_58717065: "Ingen resultater funnet"
+  no_results_found_e4b686bd: "Ingen resultater funnet."
   no_score_yet_c94e919b: "Ingen resultat ennå"
   no_students_dd8de9f0: "Ingen studenter"
   no_students_have_taken_the_quiz_yet_e667644b: "Ingen studenter har tatt testen"
@@ -16475,6 +16536,9 @@ nb:
       titles: 
         full_comments: "Klikk for å se alle kommentarer"
         linked_to_learning_outcome: "Dette kriteriet er koblet til et læringsresultat"
+    rubrics_component: 
+      links: 
+        assign_rubric: "Tildel vurderingsveiledning"
     select_content_dialog: 
       add_to_module: "Legg til %{item} til *modul*"
       assignment_item: Oppgave
@@ -16834,6 +16898,7 @@ nb:
   something_is_broken_but_i_can_work_around_it_for_n_7fcedb9d: "Noe er ødelagt, men jeg kan omgå det inntil videre"
   something_went_wrong_inactivating_the_user_please__ea7d0001: "Noe gikk galt med å inaktivere brukeren. Vennligst forsøk igjen senere."
   something_went_wrong_please_try_again_6d337b6c: "Noe gikk galt, prøv igjen"
+  something_went_wrong_please_try_refreshing_the_pag_4e14a67: "Noe gikk galt. Vennligst prøv å oppdatere siden. Hvis problemet vedvarer kan det være for mange poster \"%{assignmentTitle}\" å laste SpeedGrader."
   something_went_wrong_re_activating_the_user_please_82c3e7a: "Noe gikk galt med å re-aktivere brukeren. Vennligst forsøk igjen senere."
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "Noe gikk galt under oppdateringen av brukerrollen. Vennligst forsøk igjen senere."
   something_went_wrong_when_trying_to_sync_grades_to_592c4c35: "Noe gikk galt ved et forsøk på å synkronisere karakterer til studentinformasjonssystemet. Vennligst prøv igjen senere."
@@ -16844,9 +16909,11 @@ nb:
   sortable_name_73f707cf: "Navn for sortering"
   sorted_ascending_1f9b52c6: "Sortere stigende"
   sorted_ascending_2318ec99: "Sortert Stigende"
+  sorted_ascending_3138603c: "sortert stigende."
   sorted_ascending_b6d61547: "sortert stigende"
   sorted_descending_1e30f0d5: "sortert synkende"
   sorted_descending_7fcec1ff: "Sortert Stigende"
+  sorted_descending_84ec84c8: "sortert avtagende."
   sorted_descending_d9aa3cf8: "Sortere synkende"
   source_code_2395ca74: "kilde kode"
   south_korea_16d43049: Sør-Korea
@@ -17012,6 +17079,7 @@ nb:
   students_will_automatically_receive_full_credit_on_cc61df39: "studentene vil automatisk få full skår så fort de har tatt undersøkelsen"
   students_with_no_submissions_title: "Studenter uten innleveringer"
   studentsperrangecount_out_of_totalstudentsenrolled_90cbfaf1: "%{studentsPerRangeCount} ut av %{totalStudentsEnrolled} studenter"
+  sub_account_daeadd0: Under-konto
   sub_accounts: 
     alerts: 
       subaccount_has_courses: "Du kan ikke slette en underkonto som har emner"
@@ -17081,6 +17149,7 @@ nb:
     view_rubric_assessment_in_the_speedgrader: "Vis vurdering av vurderingsveiledning i SpeedGrader"
   submission_in_another_grading_period_e754b329: "Innlevering i en annen vurderingsperiode"
   submission_options_5184a65b: Innleveringsalternativer
+  submission_status_3079e730: Innleveringsstatus
   submission_tray_429ac3df: Innleveringsskuff
   submissions: 
     assignment_submit_success: "Oppgaven ble levert."
