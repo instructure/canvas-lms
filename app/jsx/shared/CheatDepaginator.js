@@ -66,10 +66,13 @@ function consumePagesInOrder (callback, data) {
  * @param pageCallback - called for each page of data
  * @returns a jQuery Deferred that will be resolved when all pages have been fetched
  */
-function cheaterDepaginate (url, params, pageCallback) {
+function cheaterDepaginate (url, params, pageCallback, pagesEnqueuedCallback = () => {}) {
   const gotAllPagesDfd = $.Deferred();
   const data = [];
-  const errHandler = function () { gotAllPagesDfd.reject() };
+  const errHandler = () => {
+    pagesEnqueuedCallback([])
+    gotAllPagesDfd.reject()
+  }
   const orderedPageCallback = consumePagesInOrder(pageCallback, data);
 
   $.ajaxJSON(url, 'GET', params, (firstPageResponse, xhr) => {
@@ -78,12 +81,14 @@ function cheaterDepaginate (url, params, pageCallback) {
     const paginationLinks = xhr.getResponseHeader('Link');
     const lastLink = paginationLinks.match(/<[^>]+>; *rel="last"/);
     if (lastLink === null) {
+      pagesEnqueuedCallback([]);
       gotAllPagesDfd.resolve(data);
       return;
     }
 
     const lastPage = parseInt(lastLink[0].match(/page=(\d+)/)[1], 10);
     if (lastPage === 1) {
+      pagesEnqueuedCallback([]);
       gotAllPagesDfd.resolve(data);
       return;
     }
@@ -95,13 +100,12 @@ function cheaterDepaginate (url, params, pageCallback) {
     for (let page = 2; page <= lastPage; page++) {
       dfds.push(fetchPage(page));
     }
+    pagesEnqueuedCallback(dfds);
 
     $.when(...dfds).then(() => gotAllPagesDfd.resolve(data), errHandler);
   }, errHandler);
 
   return gotAllPagesDfd;
 }
-
-cheaterDepaginate.consumePagesInOrder = consumePagesInOrder;
 
 export default cheaterDepaginate;

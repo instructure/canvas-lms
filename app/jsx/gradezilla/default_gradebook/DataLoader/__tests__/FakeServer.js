@@ -37,7 +37,7 @@ function matchParams(request, params) {
 }
 
 function requestMatchesResponse(request, response) {
-  return request.url.match(response.url) && matchParams(request, response.params)
+  return request.url.match(response.response.url) && matchParams(request, response.response.params)
 }
 
 function getResponseForRequest(request, pendingResponses) {
@@ -57,10 +57,13 @@ function urlMatcher(url) {
   return request => pathFromRequest(request).match(urlRegExp)
 }
 
-function processRequest(request, pendingResponses) {
+async function processRequest(request, pendingResponses) {
   const response = getResponseForRequest(request, pendingResponses)
   if (response) {
-    request.respond(response.status, response.headers, JSON.stringify(response.body))
+    const {body, headers, status} = response.response
+    await response.beforeRespond(request)
+    request.respond(status, headers, JSON.stringify(body))
+    await response.afterRespond(request)
   }
 }
 
@@ -78,7 +81,29 @@ class RequestStub {
     this.queryParams = queryParams
   }
 
+  afterRespond(afterFn) {
+    this.afterRespondFn = afterFn
+    return this
+  }
+
+  beforeRespond(beforeFn) {
+    this.beforeRespondFn = beforeFn
+    return this
+  }
+
   respond(responseData) {
+    const beforeRespond = async request => {
+      if (this.beforeRespondFn) {
+        await this.beforeRespondFn(request)
+      }
+    }
+
+    const afterRespond = async request => {
+      if (this.afterRespondFn) {
+        await this.afterRespondFn(request)
+      }
+    }
+
     const {queryParams, url} = this
     if (responseData instanceof Array) {
       responseData.forEach((responseDatum, index) => {
@@ -92,11 +117,21 @@ class RequestStub {
         if (index > 0) {
           params.page = index + 1
         }
-        this.server.pendingResponses.push({url, params, headers, ...responseDatum})
+        this.server.pendingResponses.push({
+          afterRespond,
+          beforeRespond,
+          response: {url, params, headers, ...responseDatum}
+        })
       })
     } else {
-      this.server.pendingResponses.push({url, params: queryParams, headers: {}, ...responseData})
+      this.server.pendingResponses.push({
+        afterRespond,
+        beforeRespond,
+        response: {url, params: queryParams, headers: {}, ...responseData}
+      })
     }
+
+    return this
   }
 }
 
@@ -137,7 +172,9 @@ export default class FakeServer {
 
   unsetResponses(...urlsToUnset) {
     urlsToUnset.forEach(url => {
-      this.pendingResponses = this.pendingResponses.filter(response => response.url !== url)
+      this.pendingResponses = this.pendingResponses.filter(
+        response => response.response.url !== url
+      )
     })
   }
 }
