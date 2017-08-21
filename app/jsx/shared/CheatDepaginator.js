@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import _ from 'underscore'
-import 'jquery.ajaxJSON'
+import $ from 'jquery';
+import _ from 'underscore';
+import 'jquery.ajaxJSON';
 
-/**
+/*
  * Fires callback for paginated APIs in order
  *
  * @param callback
@@ -53,57 +53,55 @@ function consumePagesInOrder (callback, data) {
   return orderedConsumer;
 }
 
-  /**
-   * Quickly depaginates a canvas API endpoint
-   *
-   * Returns pages in sequential order.
-   *
-   * Note: this can only be used for endpoints that have sequential page
-   * numbers
-   *
-   * @param url - canvas api endpoint
-   * @param params - params to be passed along with each request
-   * @param pageCallback - called for each page of data
-   * @returns a jQuery Deferred that will be resolved when all pages have been fetched
-   */
-  const cheaterDepaginate = (url, params, pageCallback) => {
-    const gotAllPagesDfd = $.Deferred();
-    const data = [];
-    const errHandler = function() {gotAllPagesDfd.reject()};
-    pageCallback = consumePagesInOrder(pageCallback, data);
+/*
+ * Quickly depaginates a canvas API endpoint
+ *
+ * Returns pages in sequential order.
+ *
+ * Note: this can only be used for endpoints that have sequential page
+ * numbers
+ *
+ * @param url - canvas api endpoint
+ * @param params - params to be passed along with each request
+ * @param pageCallback - called for each page of data
+ * @returns a jQuery Deferred that will be resolved when all pages have been fetched
+ */
+function cheaterDepaginate (url, params, pageCallback) {
+  const gotAllPagesDfd = $.Deferred();
+  const data = [];
+  const errHandler = function () { gotAllPagesDfd.reject() };
+  const orderedPageCallback = consumePagesInOrder(pageCallback, data);
 
-    $.ajaxJSON(url, "GET", params, (firstPageResponse, xhr) => {
-      pageCallback(firstPageResponse, 1);
+  $.ajaxJSON(url, 'GET', params, (firstPageResponse, xhr) => {
+    orderedPageCallback(firstPageResponse, 1);
 
-      const paginationLinks = xhr.getResponseHeader('Link');
-      const lastLink = paginationLinks.match(/<[^>]+>; *rel="last"/);
-      if (lastLink === null) {
-        gotAllPagesDfd.resolve(data);
-        return;
-      }
+    const paginationLinks = xhr.getResponseHeader('Link');
+    const lastLink = paginationLinks.match(/<[^>]+>; *rel="last"/);
+    if (lastLink === null) {
+      gotAllPagesDfd.resolve(data);
+      return;
+    }
 
-      const lastPage = parseInt(lastLink[0].match(/page=(\d+)/)[1], 10);
-      if (lastPage === 1) {
-        gotAllPagesDfd.resolve(data);
-        return;
-      }
+    const lastPage = parseInt(lastLink[0].match(/page=(\d+)/)[1], 10);
+    if (lastPage === 1) {
+      gotAllPagesDfd.resolve(data);
+      return;
+    }
 
-      const fetchPage = (page) => {
-        return $.ajaxJSON(url, "GET", {page: page, ...params},
-                          response => pageCallback(response, page));
-      };
+    const fetchPage = page => $.ajaxJSON(url, 'GET', {page, ...params},
+      response => orderedPageCallback(response, page));
 
-      const dfds = [];
-      for (let page = 2; page <= lastPage; page++) {
-        dfds.push(fetchPage(page));
-      }
+    const dfds = [];
+    for (let page = 2; page <= lastPage; page++) {
+      dfds.push(fetchPage(page));
+    }
 
-      $.when(...dfds).then(() => gotAllPagesDfd.resolve(data), errHandler);
-    }, errHandler);
+    $.when(...dfds).then(() => gotAllPagesDfd.resolve(data), errHandler);
+  }, errHandler);
 
-    return gotAllPagesDfd;
-  };
+  return gotAllPagesDfd;
+}
 
 cheaterDepaginate.consumePagesInOrder = consumePagesInOrder;
 
-export default cheaterDepaginate
+export default cheaterDepaginate;
