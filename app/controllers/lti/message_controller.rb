@@ -111,6 +111,7 @@ module Lti
     def launch_params(tool_proxy:, message:, private_key:)
       if tool_proxy.security_profiles.find { |sp| sp.security_profile_name == 'lti_jwt_message_security'}
         message.roles = message.roles.split(',') if message.roles
+        message.launch_url = Addressable::URI.escape(message.launch_url)
         {jwt: message.to_jwt(private_key: private_key, originating_domain: request.host, algorithm: :HS256)}
       else
         message.oauth_callback = 'about:blank'

@@ -359,6 +359,17 @@ module Lti
           expect(message.post_params["roles"]).to eq ["http://purl.imsglobal.org/vocab/lis/v2/system/person#User"]
         end
 
+        it 'url encodes the aud' do
+          message_handler.launch_path = "http://example.com/test?query with space=true"
+          message_handler.save!
+          get 'basic_lti_launch_request', params: {account_id: account.id,
+                                                   message_handler_id: message_handler.id,
+                                                   params: { tool_launch_context: 'my_custom_context' }}
+          params = assigns[:lti_launch].params.stringify_keys!
+          aud = JSON::JWT.decode(params["jwt"], :skip_verification)["aud"]
+          expect(aud).to eq "http://example.com/test?query%20with%20space=true"
+        end
+
       end
 
       context 'account' do
