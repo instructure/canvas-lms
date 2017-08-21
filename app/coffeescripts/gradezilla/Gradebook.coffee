@@ -387,6 +387,11 @@ define [
         submissionsURL: @options.submissions_url
         submissionsChunkCb: @gotSubmissionsChunk
         submissionsChunkSize: @options.chunk_size
+        customColumnIds: @gradebookContent.customColumns.map((column) -> column.id)
+        customColumnDataURL: @options.custom_column_data_url
+        customColumnDataPageCb: @gotCustomColumnDataChunk
+        customColumnDataParams:
+          include_hidden: true
       )
 
       dataLoader.gotStudentIds.then (response) =>
@@ -466,13 +471,13 @@ define [
         customColumn = @buildCustomColumn(column)
         @gradebookGrid.columns.definitions[customColumn.id] = customColumn
 
-    gotCustomColumnDataChunk: (column, columnData) =>
+    gotCustomColumnDataChunk: (customColumnId, columnData) =>
       studentIds = []
 
       for datum in columnData
         student = @student(datum.user_id)
         if student? #ignore filtered students
-          student["custom_col_#{column.id}"] = datum.content
+          student["custom_col_#{customColumnId}"] = datum.content
           studentIds.push(student.id)
 
       @invalidateRowsForStudentIds(_.uniq(studentIds))

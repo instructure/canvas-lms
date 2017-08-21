@@ -218,14 +218,14 @@ QUnit.module('Gradebook#gotCustomColumnDataChunk', {
 
 test('updates students with custom column data', function () {
   const data = [{ user_id: '1101', content: 'example' }, { user_id: '1102', content: 'sample' }];
-  this.gradebook.gotCustomColumnDataChunk({ id: '2401' }, data);
+  this.gradebook.gotCustomColumnDataChunk('2401', data);
   equal(this.gradebook.students[1101].custom_col_2401, 'example');
   equal(this.gradebook.students[1102].custom_col_2401, 'sample');
 });
 
 test('invalidates rows for related students', function () {
   const data = [{ user_id: '1101', content: 'example' }, { user_id: '1102', content: 'sample' }];
-  this.gradebook.gotCustomColumnDataChunk({ id: '2401' }, data);
+  this.gradebook.gotCustomColumnDataChunk('2401', data);
   strictEqual(this.gradebook.invalidateRowsForStudentIds.callCount, 1);
   const [studentIds] = this.gradebook.invalidateRowsForStudentIds.lastCall.args;
   deepEqual(studentIds, ['1101', '1102'], 'both students had custom column data');
@@ -233,7 +233,7 @@ test('invalidates rows for related students', function () {
 
 test('ignores students without custom column data', function () {
   const data = [{ user_id: '1102', content: 'sample' }];
-  this.gradebook.gotCustomColumnDataChunk({ id: '2401' }, data);
+  this.gradebook.gotCustomColumnDataChunk('2401', data);
   const [studentIds] = this.gradebook.invalidateRowsForStudentIds.lastCall.args;
   deepEqual(studentIds, ['1102'], 'only the student 1102 had custom column data');
 });
@@ -244,7 +244,7 @@ test('invalidates rows after updating students', function () {
     equal(this.gradebook.students[1101].custom_col_2401, 'example');
     equal(this.gradebook.students[1102].custom_col_2401, 'sample');
   });
-  this.gradebook.gotCustomColumnDataChunk({ id: '2401' }, data);
+  this.gradebook.gotCustomColumnDataChunk('2401', data);
 });
 
 QUnit.module('Gradebook - initial .gridDisplaySettings');
@@ -625,6 +625,35 @@ test('includes the submissions chunk size when calling DataLoader.loadGradebookD
   gradebook.reloadStudentData();
   const [options] = DataLoader.loadGradebookData.lastCall.args;
   equal(options.submissionsChunkSize, 10);
+});
+
+test('includes the stored custom columns when calling DataLoader.loadGradebookData', function () {
+  const gradebook = createGradebook({ chunk_size: 10 });
+  gradebook.gotCustomColumns([{ id: '2401' }, { id: '2402' }]);
+  gradebook.reloadStudentData();
+  const [options] = DataLoader.loadGradebookData.lastCall.args;
+  deepEqual(options.customColumnIds, ['2401', '2402']);
+});
+
+test('includes the custom column data url when calling DataLoader.loadGradebookData', function () {
+  const gradebook = createGradebook({ custom_column_data_url: '/custom-column-data' });
+  gradebook.reloadStudentData();
+  const [options] = DataLoader.loadGradebookData.lastCall.args;
+  equal(options.customColumnDataURL, '/custom-column-data');
+});
+
+test('includes the custom column data page callback when calling DataLoader.loadGradebookData', function () {
+  const gradebook = createGradebook();
+  gradebook.reloadStudentData();
+  const [options] = DataLoader.loadGradebookData.lastCall.args;
+  strictEqual(options.customColumnDataPageCb, gradebook.gotCustomColumnDataChunk);
+});
+
+test('requests data for hidden custom columns', function () {
+  const gradebook = createGradebook({ custom_column_data_url: '/custom-column-data' });
+  gradebook.reloadStudentData();
+  const [options] = DataLoader.loadGradebookData.lastCall.args;
+  strictEqual(options.customColumnDataParams.include_hidden, true);
 });
 
 test('stores student ids when loaded', function () {

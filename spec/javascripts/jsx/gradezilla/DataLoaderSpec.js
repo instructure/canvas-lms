@@ -457,4 +457,21 @@ QUnit.module('Gradebook Data Loader', function (hooks) {
       });
     });
   });
+
+  test('requests custom column data for the given column ids', function (assert) {
+    const done = assert.async();
+    const dataLoader = callLoadGradebookData({ customColumnIds: ['2401', '2402'] });
+
+    dataLoader.gotSubmissions.resolve();
+
+    setTimeout(() => {
+      const urls = XHRS.filter(xhr => xhr.url.match(/data/)).map(xhr => xhr.url);
+      const expectedUrls = [
+        '/customcols/2401/data?custom_column_data_params=...',
+        '/customcols/2402/data?custom_column_data_params=...'
+      ];
+      deepEqual(urls, expectedUrls);
+      done();
+    });
+  });
 });
