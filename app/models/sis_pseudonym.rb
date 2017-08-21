@@ -73,7 +73,11 @@ class SisPseudonym
 
   def find_in_home_account
     if use_loaded_collection?(root_account.shard)
-      pick_user_pseudonym(user.pseudonyms,[root_account.id])
+      if user.pseudonyms.loaded?
+        pick_user_pseudonym(user.pseudonyms,[root_account.id])
+      else
+        pick_user_pseudonym(user.all_active_pseudonyms,[root_account.id])
+      end
     else
       root_account.shard.activate do
         pick_pseudonym([root_account.id])
@@ -82,7 +86,7 @@ class SisPseudonym
   end
 
   def use_loaded_collection?(shard)
-    user.pseudonyms.loaded? && user.shard == shard
+    user.pseudonyms.loaded? && user.shard == shard || user.all_active_pseudonyms_loaded?
   end
 
   def root_account

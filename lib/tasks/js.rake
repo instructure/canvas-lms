@@ -13,14 +13,14 @@ namespace :js do
         puts "Building client app '#{app_name}'"
 
         if File.exists?('./package.json')
-          output = `yarn install || npm install` rescue `npm cache clean && npm install`
+          output = `yarn install`
           unless $?.exitstatus == 0
             puts "INSTALL FAILURE:\n#{output}"
             raise "Package installation failure for client app #{app_name}"
           end
         end
 
-        puts "\tRunning 'npm run build'..."
+        puts "\tRunning 'yarn run build'..."
         output = `./script/build`
         unless $?.exitstatus == 0
           puts "BUILD FAILURE:\n#{output}"
@@ -38,18 +38,18 @@ namespace :js do
   task :webpack do
     if ENV['RAILS_ENV'] == 'production' || ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
       puts "--> Building PRODUCTION webpack bundles"
-      system "npm run webpack-production"
+      system "yarn run webpack-production"
     else
       puts "--> Building DEVELOPMENT webpack bundles"
-      system "npm run webpack-development"
+      system "yarn run webpack-development"
     end
     raise "Error running js:webpack: \nABORTING" if $?.exitstatus != 0
   end
 
   desc "Ensure up-to-date node environment"
-  task :npm_install do
+  task :yarn_install do
     puts "node is: #{`node -v`.strip} (#{`which node`.strip})"
-    output = `yarn install || npm install`
+    output = `yarn install --frozen-lockfile`
     unless $?.success?
       puts output
       raise 'error running yarn install'
