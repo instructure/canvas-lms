@@ -291,29 +291,29 @@ export default class DashboardCard extends Component {
             {
               this.props.imagesEnabled && this.props.image ?
                 I18n.t('Course image for %{course}', {course: this.state.nicknameInfo.nickname})
-              :
-                I18n.t('Course card color region for %{course}', {course: this.state.nicknameInfo.nickname})
+                : I18n.t('Course card color region for %{course}', {course: this.state.nicknameInfo.nickname})
             }
           </span>
           {this.renderHeaderHero()}
           <a href={this.props.href} className="ic-DashboardCard__link">
-            <div
-              className="ic-DashboardCard__header_content"
-              style={{height: (this.props.term ? '75px' : '65px')}}
-            >
+            <div className="ic-DashboardCard__header_content">
               <h2 className="ic-DashboardCard__header-title ellipsis" title={this.props.originalName}>
                 <span style={{color: this.props.backgroundColor}}>
                   {this.state.nicknameInfo.nickname}
                 </span>
               </h2>
-              <p className="ic-DashboardCard__header-subtitle ellipsis" title={this.props.courseCode}>{this.props.courseCode}</p>
-              {
-                this.props.term ? (
-                  <p className="ic-DashboardCard__header-term ellipsis" title={this.props.term}>
-                    {this.props.term}
-                  </p>
-                ) : null
-              }
+              <div
+                className="ic-DashboardCard__header-subtitle ellipsis"
+                title={this.props.courseCode}
+              >
+                {this.props.courseCode}
+              </div>
+              <div
+                className="ic-DashboardCard__header-term ellipsis"
+                title={this.props.term}
+              >
+                {(this.props.term) ? this.props.term : null}
+              </div>
             </div>
           </a>
           {this.props.reorderingEnabled && (
