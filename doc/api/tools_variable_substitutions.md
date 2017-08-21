@@ -117,6 +117,16 @@ The title of the context.
 ```
 Example Course
 ```
+## com.instructure.PostMessageToken
+A token that can be used for frontend communication between an LTI tool
+and Canvas via the Window.postMessage API.
+
+**Availability**: **  
+**Launch Parameter**: *com_instructure_post_message_token*  
+
+```
+9ae4170c-6b64-444d-9246-0b7dedd5f560
+```
 ## com.instructure.Assignment.lti.id
 The LTI assignment id of an assignment. This value corresponds with
 the `ext_lti_assignment_id` send in various launches and webhooks.
