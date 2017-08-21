@@ -58,7 +58,7 @@ function getContextModules (url) {
 }
 
 function getCustomColumns (url) {
-  return $.ajaxJSON(url, 'GET', { include_hidden: true });
+  return cheaterDepaginate(url, { include_hidden: true });
 }
 
 function gotSubmissionsChunk (data) {
