@@ -18,13 +18,17 @@
 
 import React from 'react';
 import { bool, shape, string } from 'prop-types';
+import $ from 'jquery';
+import 'jquery.instructure_date_and_time'
+import environment from 'jsx/gradebook-history/environment';
+import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
 import I18n from 'i18n!gradebook_history';
 import IconOffLine from 'instructure-icons/lib/Line/IconOffLine';
 import ScreenReaderContent from 'instructure-ui/lib/components/ScreenReaderContent';
 import Tooltip from 'instructure-ui/lib/components/Tooltip';
 
-const anonymouslyGraded = anonymous => (
-  anonymous ? (
+function anonymouslyGraded (anonymous) {
+  return anonymous ? (
     <div>
       <Tooltip tip={I18n.t('Anonymously graded')}>
         <IconOffLine />
@@ -33,33 +37,44 @@ const anonymouslyGraded = anonymous => (
     </div>
   ) : (
     <ScreenReaderContent>{I18n.t('Not anonymously graded')}</ScreenReaderContent>
-  )
-);
+  );
+}
 
-const SearchResultsRow = (props) => {
+function displayGrade (grade, possible, displayAsPoints) {
+  if (displayAsPoints) {
+    return `${GradeFormatHelper.formatGrade(grade, { defaultValue: '-' })}/${GradeFormatHelper.formatGrade(possible)}`;
+  }
+
+  return GradeFormatHelper.formatGrade(grade, { defaultValue: '-' });
+}
+
+function SearchResultsRow (props) {
   const item = props.item;
   return (
     <tr>
-      <td>{item.date}</td>
+      <td>{$.datetimeString(new Date(item.date), { format: 'medium', timezone: environment.timezone() })}</td>
       <td>{anonymouslyGraded(item.anonymous)}</td>
-      <td>{item.student}</td>
-      <td>{item.grader}</td>
-      <td>{item.assignment}</td>
-      <td>{item.before}</td>
-      <td>{item.after}</td>
+      <td>{item.student || I18n.t('Not available')}</td>
+      <td>{item.grader || I18n.t('Not available')}</td>
+      <td>{item.assignment || I18n.t('Not available')}</td>
+      <td>{displayGrade(item.gradeBefore, item.pointsPossibleBefore, item.displayAsPoints)}</td>
+      <td>{displayGrade(item.gradeAfter, item.pointsPossibleAfter, item.displayAsPoints)}</td>
     </tr>
   );
-};
+}
 
 SearchResultsRow.propTypes = {
   item: shape({
-    after: string.isRequired,
     anonymous: bool.isRequired,
     assignment: string.isRequired,
-    before: string.isRequired,
     date: string.isRequired,
+    displayAsPoints: bool.isRequired,
     grader: string.isRequired,
-    student: string.isRequired,
+    gradeAfter: string.isRequired,
+    gradeBefore: string.isRequired,
+    pointsPossibleAfter: string.isRequired,
+    pointsPossibleBefore: string.isRequired,
+    student: string.isRequired
   }).isRequired
 };
 

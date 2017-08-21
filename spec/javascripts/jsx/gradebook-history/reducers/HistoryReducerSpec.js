@@ -23,8 +23,7 @@ import {
   FETCH_HISTORY_FAILURE,
   FETCH_HISTORY_NEXT_PAGE_START,
   FETCH_HISTORY_NEXT_PAGE_SUCCESS,
-  FETCH_HISTORY_NEXT_PAGE_FAILURE,
-  formatHistoryItems
+  FETCH_HISTORY_NEXT_PAGE_FAILURE
 } from 'jsx/gradebook-history/actions/HistoryActions';
 import parseLinkHeader from 'jsx/shared/parseLinkHeader';
 import reducer from 'jsx/gradebook-history/reducers/HistoryReducer';
@@ -41,7 +40,17 @@ const defaultState = () => (
 
 const defaultPayload = () => (
   {
-    items: formatHistoryItems(Fixtures.historyResponse().data),
+    items: [
+      {
+        assignment: 'Rustic Rubber Car',
+        grader: 'Ms. Casey',
+        gradeAfter: '25',
+        gradeBefore: '20',
+        pointsPossibleBefore: '20',
+        pointsPossibleAfter: '25',
+        student: 'Norman Osborne'
+      }
+    ],
     link: parseLinkHeader(Fixtures.historyResponse().headers.link)
   }
 );
@@ -110,7 +119,17 @@ test('handles FETCH_HISTORY_NEXT_PAGE_SUCCESS', function () {
   const payload = defaultPayload();
   const initialState = {
     ...defaultState(),
-    items: formatHistoryItems(Fixtures.historyResponse().data)
+    items: [
+      {
+        assignment: 'Rustic Rubber Car',
+        grader: 'Ms. Casey',
+        gradeAfter: '15',
+        gradeBefore: '25',
+        pointsPossibleBefore: '20',
+        pointsPossibleAfter: '25',
+        student: 'Norman Osborne'
+      }
+    ]
   };
   const newState = {
     ...initialState,
