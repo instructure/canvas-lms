@@ -1466,11 +1466,11 @@ EG = {
       var $turnitinInfo = $(turnitinInfoTemplate({
         assetString: assetString,
         message: (turnitinAsset.status == 'error' ? (turnitinAsset.public_error_message || defaultErrorMessage) : defaultInfoMessage),
-        showResubmit: turnitinAsset.status == 'error' && isMostRecent
+        showResubmit: isMostRecent
       }));
       $turnitinInfoContainer.append($turnitinInfo);
 
-      if (turnitinAsset.status == 'error' && isMostRecent) {
+      if (isMostRecent) {
         var resubmitUrl = $.replaceTags($assignment_submission_resubmit_to_turnitin_url.attr('href'), { user_id: submission.user_id });
         $turnitinInfo.find('.turnitin_resubmit_button').click(function(event) {
           event.preventDefault();

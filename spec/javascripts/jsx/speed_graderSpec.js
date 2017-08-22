@@ -161,6 +161,99 @@ define([
     ok(true, 'should not throw an exception')
   })
 
+  QUnit.module('SpeedGrader#populateTurnitin', {
+    setup () {
+      const fixtures = document.getElementById('fixtures')
+      fixtures.innerHTML = "<div id='turnitin_score_container'></div><div id='turnitin_info_container'></div>"
+
+      fakeENV.setup();
+      this.stub($, 'ajaxJSON');
+      this.spy($.fn, 'append');
+      this.originalWindowJSONData = window.jsonData;
+      window.jsonData = {
+        id: 27,
+        GROUP_GRADING_MODE: false,
+        points_possible: 10
+      };
+      SpeedGrader.EG.currentStudent = {
+        id: 4,
+        name: 'Guy B. Studying',
+        submission_state: 'not_graded',
+        submission: {
+          score: 7,
+          grade: 70,
+          turnitin_data: {
+            attachment_103: {
+              similarity_score: 0.8,
+              state: 'acceptable',
+              report_url: 'http://www.thebrickfan.com',
+              status: 'pending'
+            }
+          },
+          submission_history: [
+            {
+              submission_type: 'basic_lti_launch',
+              external_tool_url: 'foo'
+            },
+            {
+              submission_type: 'basic_lti_launch',
+              external_tool_url: 'bar'
+            }
+          ]
+        }
+      };
+    },
+
+    teardown () {
+      document.getElementById('fixtures').innerHTML = ""
+      fakeENV.teardown();
+    }
+  })
+
+  test('Shows the resubmit to plagiarism when status is pending', () => {
+    const scoreContainer = $('#turnitin_score_container')
+    const infoContainer = $('#turnitin_info_container')
+    SpeedGrader.EG.populateTurnitin(
+      SpeedGrader.EG.currentStudent.submission,
+      'attachment_103',
+      SpeedGrader.EG.currentStudent.submission.turnitin_data.attachment_103,
+      scoreContainer,
+      infoContainer,
+      true
+    )
+    equal(document.querySelector('.turnitin_resubmit_button').innerHTML, 'Resubmit')
+  })
+
+  test('Shows the resubmit to plagiarism when status is error', () => {
+    SpeedGrader.EG.currentStudent.submission.turnitin_data.attachment_103.status = 'error'
+    const scoreContainer = $('#turnitin_score_container')
+    const infoContainer = $('#turnitin_info_container')
+    SpeedGrader.EG.populateTurnitin(
+      SpeedGrader.EG.currentStudent.submission,
+      'attachment_103',
+      SpeedGrader.EG.currentStudent.submission.turnitin_data.attachment_103,
+      scoreContainer,
+      infoContainer,
+      true
+    )
+    equal(document.querySelector('.turnitin_resubmit_button').innerHTML, 'Resubmit')
+  })
+
+  test('Does not show the resubmit to plagiarism when status is scored', () => {
+    SpeedGrader.EG.currentStudent.submission.turnitin_data.attachment_103.status = 'scored'
+    const scoreContainer = $('#turnitin_score_container')
+    const infoContainer = $('#turnitin_info_container')
+    SpeedGrader.EG.populateTurnitin(
+      SpeedGrader.EG.currentStudent.submission,
+      'attachment_103',
+      SpeedGrader.EG.currentStudent.submission.turnitin_data.attachment_103,
+      scoreContainer,
+      infoContainer,
+      true
+    )
+    ok(!document.querySelector('.turnitin_resubmit_button'))
+  })
+
   QUnit.module('SpeedGrader#refreshGrades', {
     setup () {
       fakeENV.setup();
