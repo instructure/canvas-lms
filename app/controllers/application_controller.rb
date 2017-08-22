@@ -740,7 +740,11 @@ class ApplicationController < ActionController::Base
       # we already know the user can read these courses and groups, so skip
       # the grants_right? check to avoid querying for the various memberships
       # again.
-      enrollment_scope = Enrollment.for_user(@context).current.active_by_date
+      enrollment_scope = Enrollment
+        .shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current)
+        .for_user(@context)
+        .current
+        .active_by_date
       include_groups = !!opts[:include_groups]
       group_ids = nil
 
@@ -751,15 +755,21 @@ class ApplicationController < ActionController::Base
         # view them.
         course_ids = only_contexts.select { |c| c.first == "Course" }.map(&:last)
         unless course_ids.empty?
-          courses = Course.where(:id => course_ids).where(:id => enrollment_scope.select(:course_id)).to_a
+          courses = Course
+            .shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current)
+            .joins(enrollments: :enrollment_state)
+            .merge(enrollment_scope)
+            .where(id: course_ids)
         end
         if include_groups
           group_ids = only_contexts.select { |c| c.first == "Group" }.map(&:last)
-          include_groups = false if group_ids.empty?
+          include_groups = !group_ids.empty?
         end
       else
-        courses = Course.shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current).
-          where(:id => enrollment_scope.select(:course_id)).to_a
+        courses = Course
+          .shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current)
+          .joins(enrollments: :enrollment_state)
+          .merge(enrollment_scope)
       end
 
       groups = []

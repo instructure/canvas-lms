@@ -149,6 +149,11 @@ module Context
     result
   end
 
+  def self.context_code_for(record)
+    raise ArgumentError unless record.respond_to?(:context_type) && record.respond_to?(:context_id)
+    "#{record.context_type.underscore}_#{record.context_id}"
+  end
+
   def self.find_polymorphic(context_type, context_id)
     klass_name = context_type.classify.to_sym
     if CONTEXT_TYPES.include?(klass_name)
