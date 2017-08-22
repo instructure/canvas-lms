@@ -285,6 +285,42 @@ describe MasterCourses::MasterMigration do
       end
     end
 
+    it "should sync deleted quiz questions (unless changed downstream)" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      quiz = @copy_from.quizzes.create!
+      qq1 = quiz.quiz_questions.create!(:question_data => {'question_name' => 'test question', 'question_type' => 'essay_question'})
+      qq2 = quiz.quiz_questions.create!(:question_data => {'question_name' => 'test question 2', 'question_type' => 'essay_question'})
+      qgroup = quiz.quiz_groups.create!(:name => "group", :pick_count => 1)
+      qq3 = qgroup.quiz_questions.create!(:quiz => quiz, :question_data => {'question_name' => 'test group question', 'question_type' => 'essay_question'})
+      run_master_migration
+
+      quiz_to = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
+      qq1_to = quiz_to.quiz_questions.where(:migration_id => mig_id(qq1)).first
+      qq2_to = quiz_to.quiz_questions.where(:migration_id => mig_id(qq2)).first
+      qq3_to = quiz_to.quiz_questions.where(:migration_id => mig_id(qq3)).first
+
+      new_text = "new text"
+      qq1_to.update_attribute(:question_data, qq1_to.question_data.merge('question_text' => new_text))
+      Timecop.freeze(2.minutes.from_now) do
+        qq2.destroy
+      end
+      run_master_migration
+
+      expect(qq1_to.reload.question_data['question_text']).to eq new_text
+      expect(qq2_to.reload).to_not be_deleted # should not have overwritten because downstream changes
+
+      Timecop.freeze(4.minutes.from_now) do
+        @template.content_tag_for(quiz).update_attribute(:restrictions, {:content => true})
+      end
+      run_master_migration
+
+      expect(qq1_to.reload.question_data['question_text']).to_not eq new_text # should overwrite now because locked
+      expect(qq2_to.reload).to be_deleted
+      expect(qq3_to.reload).to_not be_deleted
+    end
+
     it "tracks creations and updates in selective migrations" do
       @copy_to = course_factory
       @template.add_child_course!(@copy_to)
