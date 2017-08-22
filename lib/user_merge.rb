@@ -63,8 +63,8 @@ class UserMerge
         Rails.cache.delete([cc.path, 'invited_enrollments2'].cache_key)
       end
       [
-        [:quiz_id, :'quizzes/quiz_submissions'],
-        [:assignment_id, :submissions]
+        [:assignment_id, :submissions],
+        [:quiz_id, :'quizzes/quiz_submissions']
       ].each do |unique_id, table|
         begin
           # Submissions are a special case since there's a unique index
@@ -98,6 +98,12 @@ class UserMerge
           model.transaction do
             update_versions(from_user, target_user, scope, table, :user_id)
             scope.update_all(user_id: target_user.id)
+          end
+          # remaining quiz_submission for the from_user need to be unlinked from
+          # the submissions that were moved to the target_user so that when they
+          # can be cleaned up later
+          if model.name == "Quizzes::QuizSubmission"
+            model.where(user_id: from_user).joins(:submission).where(submissions: {user_id: target_user}).update_all(submission_id: nil)
           end
         rescue => e
           Rails.logger.error "migrating #{table} column user_id failed: #{e}"
