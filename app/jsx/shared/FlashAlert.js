@@ -229,3 +229,7 @@ export function destroyContainer () {
 export function showFlashError (message = I18n.t('An error occurred making a network request')) {
   return err => showFlashAlert({ message, err, type: 'error' })
 }
+
+export function showFlashSuccess (message) {
+  return err => showFlashAlert({ message, err, type: 'success' })
+}

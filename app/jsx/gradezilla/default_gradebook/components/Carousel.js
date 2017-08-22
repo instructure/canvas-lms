@@ -47,6 +47,7 @@ export default class Carousel extends Component {
   render () {
     const leftArrow = (
       <Button
+        disabled={this.props.disabled}
         ref={(button) => { this.leftArrow = button }}
         variant="icon"
         onClick={this.handleLeftArrowClick}
@@ -58,6 +59,7 @@ export default class Carousel extends Component {
 
     const rightArrow = (
       <Button
+        disabled={this.props.disabled}
         ref={(button) => { this.rightArrow = button }}
         variant="icon"
         onClick={this.handleRightArrowClick}
@@ -92,6 +94,7 @@ Carousel.defaultProps = {
 Carousel.propTypes = {
   id: string,
   children: node.isRequired,
+  disabled: bool.isRequired,
   displayLeftArrow: bool.isRequired,
   displayRightArrow: bool.isRequired,
   onLeftArrowClick: func.isRequired,

@@ -60,10 +60,7 @@ test('onToggleSubmissionTrayOpen sets the tray state', function () {
   const props = this.factory.getProps(this.student);
   this.stub(this.gradebook, 'renderSubmissionTray');
   props.onToggleSubmissionTrayOpen(this.student.id, this.assignment.id);
-  deepEqual(
-    this.gradebook.getSubmissionTrayState(),
-    { open: true, studentId: this.student.id, assignmentId: this.assignment.id }
-  );
+  strictEqual(this.gradebook.getSubmissionTrayState().open, true);
 });
 
 test('onToggleSubmissionTrayOpen cancels current cell edit', function () {

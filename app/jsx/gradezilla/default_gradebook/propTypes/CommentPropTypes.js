@@ -15,15 +15,19 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-.carousel {
-  display: flex;
-  align-items: center;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid $tiara;
-  text-align: center;
 
-  .left-arrow-button-container,
-  .right-arrow-button-container {
-    width: 2rem;
-  }
-}
+import {
+  instanceOf,
+  string
+} from 'prop-types';
+
+const SubmissionTrayCommentPropTypes = {
+  id: string.isRequired,
+  author: string.isRequired,
+  authorAvatarUrl: string.isRequired,
+  authorUrl: string.isRequired,
+  createdAt: instanceOf(Date).isRequired,
+  comment: string.isRequired
+};
+
+export default SubmissionTrayCommentPropTypes;

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { destroyContainer, showFlashAlert } from 'jsx/shared/FlashAlert';
+import { destroyContainer, showFlashAlert, showFlashError, showFlashSuccess } from 'jsx/shared/FlashAlert';
 
 QUnit.module('FlashAlert', function (hooks) {
   let clock;
@@ -53,5 +53,23 @@ QUnit.module('FlashAlert', function (hooks) {
     destroyContainer();
     clock.tick(10510);
     ok('no error was thrown');
+  });
+
+  QUnit.module('.showFlashError');
+
+  test('renders an alert with a default message', function () {
+    showFlashError()();
+    clock.tick(600);
+    const expectedText = 'An error occurred making a network request';
+    ok(document.querySelector('#flashalert_message_holder').innerText.includes(expectedText));
+  });
+
+  QUnit.module('.showFlashSuccess');
+
+  test('renders an alert with a given message', function () {
+    const expectedText = 'hello world';
+    showFlashSuccess(expectedText)();
+    clock.tick(600);
+    ok(document.querySelector('#flashalert_message_holder').innerText.includes(expectedText));
   });
 });

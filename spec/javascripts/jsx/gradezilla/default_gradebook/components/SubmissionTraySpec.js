@@ -72,12 +72,19 @@ QUnit.module('SubmissionTray', function (hooks) {
       updateSubmission () {},
       assignment: {
         name: 'Book Report',
-        htmlUrl: 'http://example.com/theassignment'
+        htmlUrl: 'http://htmlUrl/'
       },
       isFirstAssignment: true,
       isLastAssignment: true,
-      selectNextAssignment: () => {},
-      selectPreviousAssignment: () => {}
+      selectNextAssignment () {},
+      selectPreviousAssignment () {},
+      updateSubmissionComments () {},
+      submissionCommentsLoaded: true,
+      createSubmissionComment () {},
+      deleteSubmissionComment () {},
+      processing: false,
+      setProcessing () {},
+      submissionComments: []
     };
     wrapper = mount(<SubmissionTray {...defaultProps} {...props} />);
     clock.tick(50); // wait for Tray to transition open
@@ -167,8 +174,13 @@ QUnit.module('SubmissionTray', function (hooks) {
   });
 
   test('does not show a radio input group if showContentComingSoon is true', function () {
+    const server = sinon.fakeServer.create({ respondImmediately: true });
+    server.respondWith('GET', /^\/images\/.*\.svg$/, [
+      200, { 'Content-Type': 'img/svg+xml' }, '{}'
+    ]);
     mountComponent({ showContentComingSoon: true });
     notOk(radioInputGroupDiv());
+    server.restore();
   });
 
   test('shows assignment carousel', function () {
