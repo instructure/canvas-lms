@@ -306,7 +306,8 @@ define [
             parseInt(ENV.COURSE_ID),
             @$secureParams.val(),
             parseInt(ENV.SELECTED_CONFIG_TOOL_ID),
-            ENV.SELECTED_CONFIG_TOOL_TYPE)
+            ENV.SELECTED_CONFIG_TOOL_TYPE,
+            ENV.REPORT_VISIBILITY_SETTING)
 
       @_attachEditorToDescription()
       @addTinyMCEKeyboardShortcuts()

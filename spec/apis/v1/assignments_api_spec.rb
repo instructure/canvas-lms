@@ -1331,6 +1331,20 @@ describe AssignmentsApiController, type: :request do
       expect(a.tool_settings_tool).to eq(tool)
     end
 
+    it "does set the visibility settings" do
+      tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
+      response = api_create_assignment_in_course(@course, {
+        'description' => 'description',
+        'similarityDetectionTool' => tool.id,
+        'configuration_tool_type' => 'ContextExternalTool',
+        'submission_type' => 'online',
+        'submission_types' => ['online_upload'],
+        'report_visibility' => 'after_grading'
+      })
+      a = Assignment.find response['id']
+      expect(a.turnitin_settings[:originality_report_visibility]).to eq('after_grading')
+    end
+
     it "sets the configuration LTI 2 tool in account context" do
       allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:create_subscription).and_return true
       account = @course.account

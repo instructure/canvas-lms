@@ -781,6 +781,11 @@ module Api::V1::Assignment
     if plagiarism_capable?(assignment_params)
       tool = assignment_configuration_tool(assignment_params)
       assignment.tool_settings_tool = tool
+      if assignment_params[:report_visibility].present?
+        settings = assignment.turnitin_settings
+        settings[:originality_report_visibility] = assignment_params[:report_visibility]
+        assignment.turnitin_settings = settings
+      end
     end
   end
 

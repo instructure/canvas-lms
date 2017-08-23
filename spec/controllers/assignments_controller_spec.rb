@@ -634,6 +634,12 @@ describe AssignmentsController do
       expect(assigns[:js_env][:SELECTED_CONFIG_TOOL_TYPE]).to eq tool.class.to_s
     end
 
+    it "bootstrap the assignment originality report visibility settings to js_env" do
+      user_session(@teacher)
+      get 'edit', params: {:course_id => @course.id, :id => @assignment.id}
+      expect(assigns[:js_env][:REPORT_VISIBILITY_SETTING]).to eq('immediate')
+    end
+
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
