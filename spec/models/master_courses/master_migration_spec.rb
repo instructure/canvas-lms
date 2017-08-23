@@ -310,6 +310,39 @@ describe MasterCourses::MasterMigration do
       end
     end
 
+    it "doesn't restore deleted associated content unless relocked" do
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+
+      page1 = @copy_from.wiki_pages.create!(:title => "whee")
+      page2 = @copy_from.wiki_pages.create!(:title => "whoo")
+      run_master_migration
+
+      page1_to = @copy_to.wiki_pages.where(:migration_id => mig_id(page1)).first
+      page1_to.destroy # "manually" delete it
+      page2_to = @copy_to.wiki_pages.where(:migration_id => mig_id(page2)).first
+
+      Timecop.freeze(3.minutes.from_now) do
+        page1.update_attribute(:title, 'new title eh')
+        page2.destroy
+      end
+      run_master_migration
+
+      expect(page1_to.reload).to be_deleted # shouldn't have restored it
+      expect(page2_to.reload).to be_deleted # should still sync the original deletion
+
+      Timecop.freeze(5.minutes.from_now) do
+        page1.update_attribute(:title, 'another new title srsly')
+        @template.content_tag_for(page1).update_attribute(:restrictions, {:content => true}) # lock it down
+
+        page2.update_attribute(:workflow_state, "active") # restore the original
+      end
+      run_master_migration
+
+      expect(page1_to.reload).to be_active # should be restored because it's locked now
+      expect(page2_to.reload).to be_active # should be restored because it hadn't been deleted manually
+    end
+
     it "limits the number of items to track" do
       Setting.set('master_courses_history_count', '2')
 

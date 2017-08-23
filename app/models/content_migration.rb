@@ -597,6 +597,7 @@ class ContentMigration < ActiveRecord::Base
           add_skipped_item(child_tag)
         else
           Rails.logger.debug("syncing deletion of #{content.asset_string} from master course")
+          content.skip_downstream_changes!
           content.destroy
         end
       end
