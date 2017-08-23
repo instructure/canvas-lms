@@ -175,12 +175,14 @@ class BzController < ApplicationController
   end
 
   def set_user_retained_data
+    Rails.logger.debug("### set_user_retained_data - all params = #{params.inspect}")
     result = RetainedData.where(:user_id => @current_user.id, :name => params[:name])
     data = nil
     was_new = false
     # if a student hacks this to set optional = true... they just lose out on their own points
     # so i don't mind it being passed to us from the client.
     was_optional = params[:optional]
+    field_type = params[:type]
     if result.empty?
       data = RetainedData.new()
       data.user_id = @current_user.id
@@ -197,7 +199,7 @@ class BzController < ApplicationController
     # now that the user's work is safely saved, we will go back and do addon work
     # like micrograding
 
-    if was_new && !was_optional
+    if was_new && !was_optional && field_type != 'checkbox' # Checkboxes are optional by nature
       course_id = request.referrer[/\/courses\/(\d+)\//, 1]
       if course_id
 
@@ -217,6 +219,7 @@ class BzController < ApplicationController
           names = {}
           selector = 'input[data-bz-retained]:not(.bz-optional-magic-field),textarea[data-bz-retained]:not(.bz-optional-magic-field)'
           course.assignments.published.each do |assignment|
+            Rails.logger.debug("### set_user_retained_data - processing assignment ID = #{assignment.id}, count = #{count}")
             assignment_html = assignment.description
             doc = Nokogiri::HTML(assignment_html)
             doc.css(selector).each do |o|
@@ -225,9 +228,11 @@ class BzController < ApplicationController
               next if o.attr('type') == 'checkbox' # checkboxes are optional by nature
               names[n] = true
               count += 1
+              Rails.logger.debug("### set_user_retained_data - incrementing magic fields count for: #{n}, count = #{count}")
             end
           end
           course.wiki_pages.published.each do |wiki_page|
+            Rails.logger.debug("### set_user_retained_data - processing wiki_page ID = #{wiki_page.id}, count = #{count}")
             page_html = wiki_page.body
             doc = Nokogiri::HTML(page_html)
             doc.css(selector).each do |o|
@@ -236,11 +241,13 @@ class BzController < ApplicationController
               next if o.attr('type') == 'checkbox'
               names[n] = true
               count += 1
+              Rails.logger.debug("### set_user_retained_data - incrementing magic fields count for: #{n}, count = #{count}")
             end
           end
 
           count == 0 ? 1 : count
         end
+        Rails.logger.debug("### set_user_retained_data - magic_field_count = #{magic_field_count}")
 
         res = course.assignments.active.where(:title => "Course Participation")
         if !res.empty?
@@ -254,7 +261,13 @@ class BzController < ApplicationController
           # be editing one field at a time anyway and I don't think the Canvas models
           # have a way to do this with a proper atomic update or a lock.
           existing_grade = submission.grade.nil? ? 0 : submission.grade.to_f
-          new_grade = existing_grade + step * 1.1 # the multiplier is to force it to round up a little to hide floating point inaccuracies. don't want users worrying about a 9.9 that was introduced just cuz of roundoff error, so better to err on the side of being slightly too large
+          new_grade = existing_grade + step 
+          if (new_grade > (participation_assignment.points_possible.to_f - 0.4))
+            Rails.logger.debug("### set_user_retained_data - awarding full points since they are close enough #{new_grade}")
+            new_grade = participation_assignment.points_possible.to_f # Once they are pretty close to full participation points, always set their grade to full points
+                                                                      # to account for floating point inaccuracies.
+          end
+          Rails.logger.debug("### set_user_retained_data - setting new_grade = #{new_grade} = existing_grade + step = #{existing_grade} + #{step}")
           participation_assignment.grade_student(@current_user, {:grade => (new_grade), :suppress_notification => true })
         end
       end

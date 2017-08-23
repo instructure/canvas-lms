@@ -70,7 +70,9 @@ function bzRetainedInfoSetup() {
             return; // we only want to actually save the one that is checked
         if(ta.getAttribute("type") == "checkbox")
           value = ta.checked ? "yes" : "";
-        var data = "name=" + encodeURIComponent(name) + "&value=" + encodeURIComponent(value);
+        var data = "name=" + encodeURIComponent(name) + "&value=" + encodeURIComponent(value) + "&type=" + ta.getAttribute("type");
+        if (ta.classList.contains("bz-optional-magic-field"))
+          data += "&optional=true";
         http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         http.send(data);
 
