@@ -175,12 +175,14 @@ class BzController < ApplicationController
   end
 
   def set_user_retained_data
+    Rails.logger.debug("### set_user_retained_data - all params = #{params.inspect}")
     result = RetainedData.where(:user_id => @current_user.id, :name => params[:name])
     data = nil
     was_new = false
     # if a student hacks this to set optional = true... they just lose out on their own points
     # so i don't mind it being passed to us from the client.
     was_optional = params[:optional]
+    field_type = params[:type]
     if result.empty?
       data = RetainedData.new()
       data.user_id = @current_user.id
@@ -197,14 +199,18 @@ class BzController < ApplicationController
     # now that the user's work is safely saved, we will go back and do addon work
     # like micrograding
 
-    if was_new && !was_optional
+    if was_new && !was_optional && field_type != 'checkbox' # Checkboxes are optional by nature
       course_id = request.referrer[/\/courses\/(\d+)\//, 1]
-      if course_id
+      module_item_id = request.referrer[/module_item_id=(\d+)/, 1]
+      Rails.logger.debug("### set_user_retained_data - course_id = #{course_id}, module_item_id = #{module_item_id}")
+      if course_id && module_item_id
 
         course = Course.find(course_id)
+        tag = ContentTag.find(module_item_id)
+        context_module = tag.context_module
 
         # counting the total number of magic fields is a really slow operation since it needs to
-        # scan the whole course. Thus, it is aggressively cached. Major changes to a course in
+        # scan the whole module. Thus, it is aggressively cached. Major changes to a course in
         # the middle of a term can thus throw off scores (since the existing points don't adapt to
         # the step) and changes (since the cache won't instantly update - it will update in a week,
         # so probably next monday).
@@ -212,37 +218,53 @@ class BzController < ApplicationController
         # However, given that we can just round up the points at the end of the semester and most the
         # steps will be fractional points, and most the content will be written ahead of time, this
         # shouldn't be a real problem.
-        magic_field_count = Rails.cache.fetch("magic_field_count_for_course_#{course_id}", :expires_in => 1.week) do
+        magic_field_count = Rails.cache.fetch("magic_field_count_for_course_#{course_id}_#{context_module.id}", :expires_in => 1.week) do
           count = 0
           names = {}
           selector = 'input[data-bz-retained]:not(.bz-optional-magic-field),textarea[data-bz-retained]:not(.bz-optional-magic-field)'
-          course.assignments.published.each do |assignment|
-            assignment_html = assignment.description
-            doc = Nokogiri::HTML(assignment_html)
-            doc.css(selector).each do |o|
-              n = o.attr('data-bz-retained')
-              next if names[n] # since we only count new saves, repeated names should not be added
-              next if o.attr('type') == 'checkbox' # checkboxes are optional by nature
-              names[n] = true
-              count += 1
-            end
-          end
-          course.wiki_pages.published.each do |wiki_page|
-            page_html = wiki_page.body
-            doc = Nokogiri::HTML(page_html)
-            doc.css(selector).each do |o|
-              n = o.attr('data-bz-retained')
-              next if names[n]
-              next if o.attr('type') == 'checkbox'
-              names[n] = true
-              count += 1
-            end
-          end
+          # NOTE: Now that we have separate Course Participation assignments to track engagement on a per module basis, 
+          # we don't track engagement of the actual assignments. By submitting it, you've engaged!
+          #
+          #  course.assignments.published.each do |assignment|
+          #    Rails.logger.debug("### set_user_retained_data - processing assignment ID = #{assignment.id}, count = #{count}")
+          #    assignment_html = assignment.description
+          #    doc = Nokogiri::HTML(assignment_html)
+          #    doc.css(selector).each do |o|
+          #      n = o.attr('data-bz-retained')
+          #      next if names[n] # since we only count new saves, repeated names should not be added
+          #      next if o.attr('type') == 'checkbox' # checkboxes are optional by nature
+          #      names[n] = true
+          #      count += 1
+          #      Rails.logger.debug("### set_user_retained_data - incrementing magic fields count for: #{n}, count = #{count}")
+          #    end
+          #  end
 
+          # Loop over the Wiki Pages in this module
+          items_in_module = context_module.content_tags_visible_to(@current_user)
+          items_in_module.each do |item|
+            next if !item.published?
+            if item.content_type == "WikiPage"
+              wiki_page = WikiPage.find(item.content_id)
+              page_html = wiki_page.body
+              doc = Nokogiri::HTML(page_html)
+              doc.css(selector).each do |o|
+                n = o.attr('data-bz-retained')
+                next if names[n]
+                next if o.attr('type') == 'checkbox'
+                names[n] = true
+                count += 1
+                Rails.logger.debug("### set_user_retained_data - incrementing magic fields count for: #{n}, count = #{count}")
+              end
+            end
+          end
           count == 0 ? 1 : count
         end
+        Rails.logger.debug("### set_user_retained_data - magic_field_count = #{magic_field_count}")
 
-        res = course.assignments.active.where(:title => "Course Participation")
+        # This is hacky, but we tie modules to participation tracking assignments using the name.
+        # E.g. #Course Participation - Onboarding" would track the Onboarding Module.
+        # Note: this is case sensitve based on the module name in the database, not the CSS styled upper case names.
+        res = course.assignments.active.where(:title => "Course Participation - #{context_module.name}")
         if !res.empty?
           participation_assignment = res.first
 
@@ -254,7 +276,13 @@ class BzController < ApplicationController
           # be editing one field at a time anyway and I don't think the Canvas models
           # have a way to do this with a proper atomic update or a lock.
           existing_grade = submission.grade.nil? ? 0 : submission.grade.to_f
-          new_grade = existing_grade + step * 1.1 # the multiplier is to force it to round up a little to hide floating point inaccuracies. don't want users worrying about a 9.9 that was introduced just cuz of roundoff error, so better to err on the side of being slightly too large
+          new_grade = existing_grade + step 
+          if (new_grade > (participation_assignment.points_possible.to_f - 0.4))
+            Rails.logger.debug("### set_user_retained_data - awarding full points since they are close enough #{new_grade}")
+            new_grade = participation_assignment.points_possible.to_f # Once they are pretty close to full participation points, always set their grade to full points
+                                                                      # to account for floating point inaccuracies.
+          end
+          Rails.logger.debug("### set_user_retained_data - setting new_grade = #{new_grade} = existing_grade + step = #{existing_grade} + #{step}")
           participation_assignment.grade_student(@current_user, {:grade => (new_grade), :suppress_notification => true })
         end
       end
