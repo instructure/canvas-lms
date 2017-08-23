@@ -201,12 +201,16 @@ class BzController < ApplicationController
 
     if was_new && !was_optional && field_type != 'checkbox' # Checkboxes are optional by nature
       course_id = request.referrer[/\/courses\/(\d+)\//, 1]
-      if course_id
+      module_item_id = request.referrer[/module_item_id=(\d+)/, 1]
+      Rails.logger.debug("### set_user_retained_data - course_id = #{course_id}, module_item_id = #{module_item_id}")
+      if course_id && module_item_id
 
         course = Course.find(course_id)
+        tag = ContentTag.find(module_item_id)
+        context_module = tag.context_module
 
         # counting the total number of magic fields is a really slow operation since it needs to
-        # scan the whole course. Thus, it is aggressively cached. Major changes to a course in
+        # scan the whole module. Thus, it is aggressively cached. Major changes to a course in
         # the middle of a term can thus throw off scores (since the existing points don't adapt to
         # the step) and changes (since the cache won't instantly update - it will update in a week,
         # so probably next monday).
@@ -214,42 +218,53 @@ class BzController < ApplicationController
         # However, given that we can just round up the points at the end of the semester and most the
         # steps will be fractional points, and most the content will be written ahead of time, this
         # shouldn't be a real problem.
-        magic_field_count = Rails.cache.fetch("magic_field_count_for_course_#{course_id}", :expires_in => 1.week) do
+        magic_field_count = Rails.cache.fetch("magic_field_count_for_course_#{course_id}_#{context_module.id}", :expires_in => 1.week) do
           count = 0
           names = {}
           selector = 'input[data-bz-retained]:not(.bz-optional-magic-field),textarea[data-bz-retained]:not(.bz-optional-magic-field)'
-          course.assignments.published.each do |assignment|
-            Rails.logger.debug("### set_user_retained_data - processing assignment ID = #{assignment.id}, count = #{count}")
-            assignment_html = assignment.description
-            doc = Nokogiri::HTML(assignment_html)
-            doc.css(selector).each do |o|
-              n = o.attr('data-bz-retained')
-              next if names[n] # since we only count new saves, repeated names should not be added
-              next if o.attr('type') == 'checkbox' # checkboxes are optional by nature
-              names[n] = true
-              count += 1
-              Rails.logger.debug("### set_user_retained_data - incrementing magic fields count for: #{n}, count = #{count}")
-            end
-          end
-          course.wiki_pages.published.each do |wiki_page|
-            Rails.logger.debug("### set_user_retained_data - processing wiki_page ID = #{wiki_page.id}, count = #{count}")
-            page_html = wiki_page.body
-            doc = Nokogiri::HTML(page_html)
-            doc.css(selector).each do |o|
-              n = o.attr('data-bz-retained')
-              next if names[n]
-              next if o.attr('type') == 'checkbox'
-              names[n] = true
-              count += 1
-              Rails.logger.debug("### set_user_retained_data - incrementing magic fields count for: #{n}, count = #{count}")
-            end
-          end
+          # NOTE: Now that we have separate Course Participation assignments to track engagement on a per module basis, 
+          # we don't track engagement of the actual assignments. By submitting it, you've engaged!
+          #
+          #  course.assignments.published.each do |assignment|
+          #    Rails.logger.debug("### set_user_retained_data - processing assignment ID = #{assignment.id}, count = #{count}")
+          #    assignment_html = assignment.description
+          #    doc = Nokogiri::HTML(assignment_html)
+          #    doc.css(selector).each do |o|
+          #      n = o.attr('data-bz-retained')
+          #      next if names[n] # since we only count new saves, repeated names should not be added
+          #      next if o.attr('type') == 'checkbox' # checkboxes are optional by nature
+          #      names[n] = true
+          #      count += 1
+          #      Rails.logger.debug("### set_user_retained_data - incrementing magic fields count for: #{n}, count = #{count}")
+          #    end
+          #  end
 
+          # Loop over the Wiki Pages in this module
+          items_in_module = context_module.content_tags_visible_to(@current_user)
+          items_in_module.each do |item|
+            next if !item.published?
+            if item.content_type == "WikiPage"
+              wiki_page = WikiPage.find(item.content_id)
+              page_html = wiki_page.body
+              doc = Nokogiri::HTML(page_html)
+              doc.css(selector).each do |o|
+                n = o.attr('data-bz-retained')
+                next if names[n]
+                next if o.attr('type') == 'checkbox'
+                names[n] = true
+                count += 1
+                Rails.logger.debug("### set_user_retained_data - incrementing magic fields count for: #{n}, count = #{count}")
+              end
+            end
+          end
           count == 0 ? 1 : count
         end
         Rails.logger.debug("### set_user_retained_data - magic_field_count = #{magic_field_count}")
 
-        res = course.assignments.active.where(:title => "Course Participation")
+        # This is hacky, but we tie modules to participation tracking assignments using the name.
+        # E.g. #Course Participation - Onboarding" would track the Onboarding Module.
+        # Note: this is case sensitve based on the module name in the database, not the CSS styled upper case names.
+        res = course.assignments.active.where(:title => "Course Participation - #{context_module.name}")
         if !res.empty?
           participation_assignment = res.first
 
