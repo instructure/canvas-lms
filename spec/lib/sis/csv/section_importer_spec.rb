@@ -48,6 +48,35 @@ describe SIS::CSV::SectionImporter do
                       "Section S005 references course C001 which doesn't exist"]
   end
 
+  it 'should not die when a course is deleted' do
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "C001,TC 101,Test Course 101,,,active",
+      "C002,TC 102,Test Course 102,,,active"
+    )
+    process_csv_data_cleanly(
+      "section_id,course_id,name,start_date,end_date,status",
+      "1B,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
+    )
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "U001,user1,User,Uno,user@example.com,active"
+    )
+    process_csv_data_cleanly(
+      "course_id,user_id,role,section_id,status",
+      "C001,U001,student,1B,active")
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "C002,TC 101,Test Course 101,,,deleted"
+    )
+    importer = process_csv_data(
+      "section_id,course_id,name,start_date,end_date,status",
+      "1B,C002,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
+    )
+    expect(importer.warnings).to eq []
+    expect(importer.errors).to eq []
+  end
+
   it 'should ignore unsupported column account_id' do
     process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",

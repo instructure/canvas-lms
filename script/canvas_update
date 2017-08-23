@@ -91,10 +91,10 @@ function rake_db_migrate_dev_and_test {
     ( echo "  failed to migrate db (test) (see $LOG)"; kill -INT $$ )
 }
 
-function npm_install {
-  echo_console_and_log "  Installing npm packages ..."
-  (yarn install || npm install) >>"$LOG" 2>&1 || \
-    ( echo "  failed to install npm packages (see $LOG)"; kill -INT $$ )
+function yarn_install {
+  echo_console_and_log "  Installing node packages ..."
+  yarn install >>"$LOG" 2>&1 || \
+    ( echo "  failed to install node packages (see $LOG)"; kill -INT $$ )
 }
 
 function compile_assets {
@@ -117,7 +117,7 @@ function update_canvas {
   rebase_canvas
   bundle_install_with_check
   rake_db_migrate_dev_and_test
-  npm_install
+  yarn_install
 
   # skip if QUICK_MODE
   if ! $1; then

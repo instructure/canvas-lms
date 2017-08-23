@@ -53,7 +53,8 @@ class GradeCalculator
   def self.recompute_final_score(user_ids, course_id, compute_score_opts = {})
     user_ids = Array(user_ids).uniq.map(&:to_i)
     return if user_ids.empty?
-    course = Course.active.find(course_id)
+    course = Course.active.where(id: course_id).take
+    return unless course
     grading_period = GradingPeriod.for(course).find_by(
       id: compute_score_opts.delete(:grading_period_id)
     )

@@ -7,7 +7,7 @@ git clean client_apps public spec/javascripts node_modules coverage-js gems/*/no
 rm -rfv gems/plugins/*/node_modules
 
 echo "yarn installing..."
-(yarn install || npm install)
+yarn install
 
 echo "everything's clean, now compiling assets..."
 bundle exec rake canvas:compile_assets

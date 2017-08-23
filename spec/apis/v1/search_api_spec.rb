@@ -10,7 +10,7 @@ describe SearchController, type: :request do
     @other_section = @course.course_sections.create(:name => "the other section")
     @me = @user
 
-    @bob = student_in_course(:name => "bob")
+    @bob = student_in_course(name: "robert", short_name: "bob")
     @billy = student_in_course(:name => "billy")
     @jane = student_in_course(:name => "jane")
     @joe = student_in_course(:name => "joe")
@@ -41,10 +41,10 @@ describe SearchController, type: :request do
         {"id" => "section_#{@other_section.id}", "name" => "the other section", "type" => "context", "user_count" => 1, "context_name" => "the course", "permissions" => {}},
         {"id" => "section_#{@course.default_section.id}", "name" => "the section", "type" => "context", "user_count" => 5, "context_name" => "the course", "permissions" => {}},
         {"id" => "group_#{@group.id}", "name" => "the group", "type" => "context", "user_count" => 3, "context_name" => "the course", "permissions" => {}},
-        {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
-        {"id" => @joe.id, "name" => "joe", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
-        {"id" => @me.id, "name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
-        {"id" => @tommy.id, "name" => "tommy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+        {"id" => @joe.id, "name" => "joe", "full_name" => "joe", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
+        {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
+        {"id" => @bob.id, "name" => "bob", "full_name" => "robert", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
+        {"id" => @tommy.id, "name" => "tommy", "full_name" => "tommy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
       ]
     end
 
@@ -53,12 +53,12 @@ describe SearchController, type: :request do
               { :controller => 'search', :action => 'recipients', :format => 'json', :context => "course_#{@course.id}" })
       json.each { |c| c.delete("avatar_url") }
       expect(json).to eql [
-        {"id" => @billy.id, "name" => "billy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-        {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-        {"id" => @jane.id, "name" => "jane", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-        {"id" => @joe.id, "name" => "joe", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-        {"id" => @me.id, "name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {}},
-        {"id" => @tommy.id, "name" => "tommy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+        {"id" => @billy.id, "name" => "billy", "full_name" => "billy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+        {"id" => @jane.id, "name" => "jane", "full_name" => "jane", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+        {"id" => @joe.id, "name" => "joe", "full_name" => "joe", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+        {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {}},
+        {"id" => @bob.id, "name" => "bob", "full_name" => "robert", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+        {"id" => @tommy.id, "name" => "tommy", "full_name" => "tommy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
       ]
     end
 
@@ -67,9 +67,9 @@ describe SearchController, type: :request do
               { :controller => 'search', :action => 'recipients', :format => 'json', :context => "group_#{@group.id}" })
       json.each { |c| c.delete("avatar_url") }
       expect(json).to eql [
-        {"id" => @bob.id, "name" => "bob", "common_courses" => {}, "common_groups" => {@group.id.to_s => ["Member"]}},
-        {"id" => @joe.id, "name" => "joe", "common_courses" => {}, "common_groups" => {@group.id.to_s => ["Member"]}},
-        {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {@group.id.to_s => ["Member"]}}
+        {"id" => @joe.id, "name" => "joe", "full_name" => "joe", "common_courses" => {}, "common_groups" => {@group.id.to_s => ["Member"]}},
+        {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name, "common_courses" => {}, "common_groups" => {@group.id.to_s => ["Member"]}},
+        {"id" => @bob.id, "name" => "bob", "full_name" => "robert", "common_courses" => {}, "common_groups" => {@group.id.to_s => ["Member"]}}
       ]
     end
 
@@ -78,11 +78,11 @@ describe SearchController, type: :request do
               { :controller => 'search', :action => 'recipients', :format => 'json', :context => "section_#{@course.default_section.id}" })
       json.each { |c| c.delete("avatar_url") }
       expect(json).to eql [
-        {"id" => @billy.id, "name" => "billy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-        {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-        {"id" => @jane.id, "name" => "jane", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-        {"id" => @joe.id, "name" => "joe", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-        {"id" => @me.id, "name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {}}
+        {"id" => @billy.id, "name" => "billy", "full_name" => "billy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+        {"id" => @jane.id, "name" => "jane", "full_name" => "jane", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+        {"id" => @joe.id, "name" => "joe", "full_name" => "joe", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+        {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {}},
+        {"id" => @bob.id, "name" => "bob", "full_name" => "robert", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
       ]
     end
 
@@ -91,7 +91,7 @@ describe SearchController, type: :request do
               { :controller => 'search', :action => 'recipients', :format => 'json', :user_id => @bob.id.to_s })
       json.each { |c| c.delete("avatar_url") }
       expect(json).to eql [
-        {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
+        {"id" => @bob.id, "name" => "bob", "full_name" => "robert", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
       ]
     end
 
@@ -103,7 +103,7 @@ describe SearchController, type: :request do
                       { :controller => 'search', :action => 'recipients', :format => 'json', :user_id=>"sis_user_id:abc123" })
       json.each { |c| c.delete("avatar_url") }
       expect(json).to eql [
-        {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
+        {"id" => @bob.id, "name" => "bob", "full_name" => "robert", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
       ]
     end
 
@@ -112,7 +112,7 @@ describe SearchController, type: :request do
               { :controller => 'search', :action => 'recipients', :format => 'json', :user_id => @bob.id.to_s, :search => "asdf" })
       json.each { |c| c.delete("avatar_url") }
       expect(json).to eql [
-        {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
+        {"id" => @bob.id, "name" => "bob", "full_name" => "robert", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
       ]
     end
 
@@ -131,7 +131,7 @@ describe SearchController, type: :request do
               { :controller => 'search', :action => 'recipients', :format => 'json', :user_id => other.id.to_s, :from_conversation_id => c.id.to_s })
       json.each { |c| c.delete("avatar_url") }
       expect(json).to eql [
-        {"id" => other.id, "name" => "other personage", "common_courses" => {}, "common_groups" => {}},
+        {"id" => other.id, "name" => "other personage", "full_name" => "other personage", "common_courses" => {}, "common_groups" => {}},
       ]
     end
 
@@ -157,14 +157,14 @@ describe SearchController, type: :request do
                         { :controller => 'search', :action => 'recipients', :format => 'json', :context => "course_#{@course.id}" })
         json.each { |c| c.delete("avatar_url") }
         expect(json).to eql [
-                            {"id" => @billy.id, "name" => "billy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-                            {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-                            {"id" => @jane.id, "name" => "jane", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-                            {"id" => @joe.id, "name" => "joe", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-                            {"id" => @bobs_mom.id, "name" => "bob's mom", "common_courses" => {@course.id.to_s => ["ObserverEnrollment"]}, "common_groups" => {}},
-                            {"id" => @me.id, "name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {}},
-                            {"id" => @lonely.id, "name" => "lonely observer", "common_courses" => {@course.id.to_s => ["ObserverEnrollment"]}, "common_groups" => {}},
-                            {"id" => @tommy.id, "name" => "tommy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+                            {"id" => @billy.id, "name" => "billy", "full_name" => "billy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+                            {"id" => @jane.id, "name" => "jane", "full_name" => "jane", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+                            {"id" => @joe.id, "name" => "joe", "full_name" => "joe", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+                            {"id" => @bobs_mom.id, "name" => "bob's mom", "full_name" => "bob's mom", "common_courses" => {@course.id.to_s => ["ObserverEnrollment"]}, "common_groups" => {}},
+                            {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {}},
+                            {"id" => @lonely.id, "name" => "lonely observer", "full_name" => "lonely observer", "common_courses" => {@course.id.to_s => ["ObserverEnrollment"]}, "common_groups" => {}},
+                            {"id" => @bob.id, "name" => "bob", "full_name" => "robert", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+                            {"id" => @tommy.id, "name" => "tommy", "full_name" => "tommy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
                         ]
       end
 
@@ -173,17 +173,17 @@ describe SearchController, type: :request do
                         { :controller => 'search', :action => 'recipients', :format => 'json', :context => "course_#{@course.id}" })
         json.each { |c| c.delete("avatar_url") }
         expect(json).to eql [
-                            {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-                            {"id" => @bobs_mom.id, "name" => "bob's mom", "common_courses" => {@course.id.to_s => ["ObserverEnrollment"]}, "common_groups" => {}},
-                            {"id" => @me.id, "name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {}}
+                            {"id" => @bobs_mom.id, "name" => "bob's mom", "full_name" => "bob's mom", "common_courses" => {@course.id.to_s => ["ObserverEnrollment"]}, "common_groups" => {}},
+                            {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {}},
+                            {"id" => @bob.id, "name" => "bob", "full_name" => "robert", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
                         ]
 
         json = api_call_as_user(@lonely, :get, "/api/v1/search/recipients.json?context=course_#{@course.id}",
                         { :controller => 'search', :action => 'recipients', :format => 'json', :context => "course_#{@course.id}" })
         json.each { |c| c.delete("avatar_url") }
         expect(json).to eql [
-                            {"id" => @me.id, "name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {}},
-                            {"id" => @lonely.id, "name" => "lonely observer", "common_courses" => {@course.id.to_s => ["ObserverEnrollment"]}, "common_groups" => {}}
+                            {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {}},
+                            {"id" => @lonely.id, "name" => "lonely observer", "full_name" => "lonely observer", "common_courses" => {@course.id.to_s => ["ObserverEnrollment"]}, "common_groups" => {}}
                         ]
       end
 
@@ -192,28 +192,28 @@ describe SearchController, type: :request do
                                 { :controller => 'search', :action => 'recipients', :format => 'json', :context => "course_#{@course.id}" })
         json.each { |c| c.delete("avatar_url") }
         expect(json).to eql [
-                            {"id" => @billy.id, "name" => "billy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-                            {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-                            {"id" => @jane.id, "name" => "jane", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-                            {"id" => @joe.id, "name" => "joe", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-                            {"id" => @bobs_mom.id, "name" => "bob's mom", "common_courses" => {@course.id.to_s => ["ObserverEnrollment"]}, "common_groups" => {}},
+                            {"id" => @billy.id, "name" => "billy", "full_name" => "billy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+                            {"id" => @jane.id, "name" => "jane", "full_name" => "jane", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+                            {"id" => @joe.id, "name" => "joe", "full_name" => "joe", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+                            {"id" => @bobs_mom.id, "name" => "bob's mom", "full_name" => "bob's mom", "common_courses" => {@course.id.to_s => ["ObserverEnrollment"]}, "common_groups" => {}},
                             # must not include lonely observer here
-                            {"id" => @me.id, "name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {}},
-                            {"id" => @tommy.id, "name" => "tommy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+                            {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {}},
+                            {"id" => @bob.id, "name" => "bob", "full_name" => "robert", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+                            {"id" => @tommy.id, "name" => "tommy", "full_name" => "tommy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
                         ]
 
         json = api_call_as_user(@billy, :get, "/api/v1/search/recipients.json?context=course_#{@course.id}",
                                 { :controller => 'search', :action => 'recipients', :format => 'json', :context => "course_#{@course.id}" })
         json.each { |c| c.delete("avatar_url") }
         expect(json).to eql [
-                            {"id" => @billy.id, "name" => "billy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-                            {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+                            {"id" => @billy.id, "name" => "billy", "full_name" => "billy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
                             # must not include bob's mom here
-                            {"id" => @jane.id, "name" => "jane", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
-                            {"id" => @joe.id, "name" => "joe", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+                            {"id" => @jane.id, "name" => "jane", "full_name" => "jane", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+                            {"id" => @joe.id, "name" => "joe", "full_name" => "joe", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
                             # must not include lonely observer here
-                            {"id" => @me.id, "name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {}},
-                            {"id" => @tommy.id, "name" => "tommy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+                            {"id" => @me.id, "name" => @me.short_name, "full_name" => @me.name, "common_courses" => {@course.id.to_s => ["TeacherEnrollment"]}, "common_groups" => {}},
+                            {"id" => @bob.id, "name" => "bob", "full_name" => "robert", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+                            {"id" => @tommy.id, "name" => "tommy", "full_name" => "tommy", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
                         ]
       end
     end

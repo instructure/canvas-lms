@@ -52,7 +52,7 @@ namespace :canvas do
 
     if npm_install
       log_time('Making sure node_modules are up to date') {
-        Rake::Task['js:npm_install'].invoke
+        Rake::Task['js:yarn_install'].invoke
       }
     end
 

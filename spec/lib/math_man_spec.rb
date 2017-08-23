@@ -31,10 +31,15 @@ describe MathMan do
     Canvas::DynamicSettings.fallback_data = {
       'math-man': {
         base_url: service_url,
-        use_for_mml: use_for_mml,
-        use_for_svg: use_for_svg
       }
     }
+    PluginSetting.create!(
+      name: 'mathman',
+      settings: {
+        use_for_mml: use_for_mml,
+        use_for_svg: use_for_svg
+      }.with_indifferent_access
+    )
   end
 
   after do
@@ -55,7 +60,12 @@ describe MathMan do
   end
 
   describe '.use_for_mml?' do
-    it 'returns false when not appropriately configured' do
+    it 'returns false when set to false' do
+      expect(MathMan.use_for_mml?).to be_falsey
+    end
+
+    it 'returns false when PluginSetting is missing' do
+      PluginSetting.where(name: 'mathman').first.destroy
       expect(MathMan.use_for_mml?).to be_falsey
     end
 
@@ -69,7 +79,12 @@ describe MathMan do
   end
 
   describe '.use_for_svg?' do
-    it 'returns false when not appropriately configured' do
+    it 'returns false when set to false' do
+      expect(MathMan.use_for_svg?).to be_falsey
+    end
+
+    it 'returns false when PluginSetting is missing' do
+      PluginSetting.where(name: 'mathman').first.destroy
       expect(MathMan.use_for_svg?).to be_falsey
     end
 

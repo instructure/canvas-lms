@@ -429,6 +429,7 @@ define [
     toJSON: ->
       data = super
       data = @_filterFrozenAttributes(data)
+      delete data.description if (ENV.MASTER_COURSE_DATA?.is_master_course_child_content && ENV.MASTER_COURSE_DATA?.master_course_restrictions?.content)
       if @alreadyScoped then data else { assignment: data }
 
     inGradingPeriod: (gradingPeriod) ->

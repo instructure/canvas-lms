@@ -134,9 +134,10 @@ describe ExternalToolsController do
           shared_secret: 'N/A',
           config_url: 'https://www.edu-apps.org/lti_public_resources/config.xml?id=youtube&name=YouTube&channel_name=jangbricks',
           config_type: 'by_url',
-          name:'YouTube',
+          name: 'YouTube',
           app_center_id: 'pr_youtube',
-          course_navigation: {enabled: true}
+          config_settings: { name: 'YouTube', channel_name: 'foo-bar' },
+          course_navigation: { enabled: true }
         }
       end
 
@@ -170,12 +171,8 @@ describe ExternalToolsController do
         }
       end
 
-      let(:app_api) { double() }
-
-      before do
-        allow(AppCenter::AppApi).to receive(:new).and_return(app_api)
-        allow(app_api).to receive(:fetch_app_center_response).and_return(app_center_response)
-        allow(app_api).to receive(:get_app_config_url).and_return(app_center_response['config_xml_url'])
+      before(:each) do
+        allow_any_instance_of(AppCenter::AppApi).to receive(:fetch_app_center_response).and_return(app_center_response)
 
         configxml = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'config.youtube.xml'))
         stub_request(:get, app_center_response['config_xml_url']).to_return(body: configxml)
@@ -195,7 +192,7 @@ describe ExternalToolsController do
       end
 
       it 'gives error if app_center_id is not provided' do
-        allow(app_api).to receive(:get_app_config_url).and_return('')
+        allow_any_instance_of(AppCenter::AppApi).to receive(:get_app_config_url).and_return('')
         user_session(@teacher)
 
         post(
@@ -205,7 +202,6 @@ describe ExternalToolsController do
         )
 
         expect(response).not_to be_success
-        allow(app_api).to receive(:get_app_config_url).and_return(app_center_response['config_xml_url'])
       end
 
       it 'ignores non-required params' do

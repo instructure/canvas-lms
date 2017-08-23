@@ -1,5 +1,5 @@
 #!/bin/bash
-# little shortcut for doing npm install/update/whatever for each of our
+# little shortcut for doing yarn install/update/whatever for each of our
 # gems that do node-y stuff
 
 # canvas (mis|ab)uses devDependencies, we try not to for these ones
@@ -9,12 +9,7 @@ export NODE_ENV=production
 
 for path in $(ls -1 gems/{,plugins/}*/package.json 2> /dev/null); do
   pushd $(dirname $path) > /dev/null
-  if hash yarn 2>/dev/null; then
-    echo "running yarn $1 for $path"
-    yarn $1
-  else
-    echo "npm is deprecated in canvas-lms. You should start using yarn instead. see https://yarnpkg.com. Running npm $1 for $path"
-    npm $1
-  fi
+  echo "running yarn $1 for $path"
+  yarn $1
   popd > /dev/null
 done

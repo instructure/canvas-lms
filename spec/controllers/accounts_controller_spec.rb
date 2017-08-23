@@ -314,6 +314,36 @@ describe AccountsController do
   end
 
   describe "update" do
+    it "should update account with sis_assignment_name_length_input with value less than 255" do
+      account_with_admin_logged_in
+      @account = @account.sub_accounts.create!
+      post 'update', params: {:id => @account.id,
+                              :account => {
+                                :settings => {
+                                  :sis_assignment_name_length_input => {
+                                    :value => 5
+                                  }
+                                }
+                              }}
+      @account.reload
+      expect(@account.settings[:sis_assignment_name_length_input][:value]).to eq '5'
+    end
+
+    it "should update account with sis_assignment_name_length_input with 255 if none is given" do
+      account_with_admin_logged_in
+      @account = @account.sub_accounts.create!
+      post 'update', params: {:id => @account.id,
+                              :account => {
+                                :settings => {
+                                  :sis_assignment_name_length_input => {
+                                    :value => nil
+                                  }
+                                }
+                              }}
+      @account.reload
+      expect(@account.settings[:sis_assignment_name_length_input][:value]).to eq '255'
+    end
+
     it "should allow admins to set the sis_source_id on sub accounts" do
       account_with_admin_logged_in
       @account = @account.sub_accounts.create!
