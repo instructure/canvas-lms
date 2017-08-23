@@ -169,7 +169,7 @@ test('loads next page on scroll if possible', function () {
 });
 
 test('loads next page if available on window resize that causes window to not have a scrollbar', function () {
-  const historyItems = formatHistoryItems(Fixtures.historyResponse().data);
+  const historyItems = defaultHistoryItems();
   const props = {
     ...defaultProps(),
     historyItems,
