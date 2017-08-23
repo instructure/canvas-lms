@@ -26,7 +26,7 @@ define [
       @testArea = document.createElement('div')
       @testArea.id = "test_area"
       @fixtureNode.appendChild(@testArea)
-      @selectMenu = new SpeedgraderSelectMenu(null, null)
+      @selectMenu = new SpeedgraderSelectMenu(null)
 
     teardown: ->
       @fixtureNode.innerHTML = ""
@@ -80,10 +80,9 @@ define [
 
 
   test "A key press event on the select menu causes the change function to call", ->
-    MENU_PARTS_DELIMITER = "----NO----"
-    optionsHTML = '<option value="1" class="graded ui-selectmenu-hasIcon">Student 1----NO----graded----NO----graded</option><option value="2" class="not_graded ui-selectmenu-hasIcon">Student 2----NO----not graded----NO----not_graded</option>'
+    optionsArray = [{ id: '1', name: 'Student 1', className: { raw: 'not_graded', formatted: 'not graded' } }]
     fired = false
-    selectMenu = new SpeedgraderSelectMenu(optionsHTML, MENU_PARTS_DELIMITER)
+    selectMenu = new SpeedgraderSelectMenu(optionsArray);
     selectMenu.appendTo('#test_area', (e)->
       fired = true
     )
@@ -98,3 +97,10 @@ define [
     @selectMenu.replaceDropdownIcon(@testArea)
 
     equal(@testArea.innerHTML,'<span class="ui-selectmenu-icon"><i class="icon-mini-arrow-down"></i></span>')
+
+  test "Constructs the select from options passed in", ->
+    optionsArray = [
+      { id: '1', name: 'Student 1', className: { raw: 'not_graded', formatted: 'not graded' } }
+      { id: '3', name: 'Student 2', className: { raw: 'graded', formatted: 'graded' } },
+      ]
+    equal(@selectMenu.buildHtml(optionsArray), "<select id='students_selectmenu'><option value=\"1\" class=\"not_graded ui-selectmenu-hasIcon\">Student 1 - not graded</option><option value=\"3\" class=\"graded ui-selectmenu-hasIcon\">Student 2 - graded</option></select>")

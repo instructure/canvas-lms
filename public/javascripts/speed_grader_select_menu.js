@@ -20,11 +20,23 @@ import $ from 'jquery';
 import 'vendor/ui.selectmenu';
 import htmlEscape from './str/htmlEscape';
 
+export default function speedgraderSelectMenu (optionsArray) {
+  // Array of the initial data needed to build the select menu
+  this.options_array = optionsArray;
 
-export default function speedgraderSelectMenu (optionsHtml, delimiter){
-  this.html = `<select id='students_selectmenu'>${optionsHtml}</select>`;
-
+  // Index used by text formatting function
   this.option_index = 0;
+
+  // Array for the generated option tags
+  this.option_tag_array = null;
+
+  this.buildHtml = function (options) {
+    const optionHtml = options.map(option => (
+      `<option value="${option.id}" class="${htmlEscape(option.className.raw)} ui-selectmenu-hasIcon">${htmlEscape(option.name)} - ${htmlEscape(option.className.formatted)}</option>`
+    )).join('');
+
+    return `<select id='students_selectmenu'>${optionHtml}</select>`;
+  };
 
   this.selectMenuAccessibilityFixes = function (container) {
     const $select_menu = $(container).find('select#students_selectmenu');
@@ -89,7 +101,7 @@ export default function speedgraderSelectMenu (optionsHtml, delimiter){
 
   this.appendTo = function (selector, onChange) {
     const self = this;
-    this.$el = $(this.html).appendTo(selector).selectmenu({
+    this.$el = $(this.buildHtml(this.options_array)).appendTo(selector).selectmenu({
       style: 'dropdown',
       format: text => (
         self.formatSelectText(text)
@@ -98,6 +110,9 @@ export default function speedgraderSelectMenu (optionsHtml, delimiter){
         self.our_open(event);
       }
     });
+    // Create indexes into what we've created because we'll want them later
+    this.option_tag_array = $('#students_selectmenu > option');
+
     this.$el.change(onChange);
     this.accessibilityFixes(this.$el.parent());
     this.replaceDropdownIcon(this.$el.parent());
@@ -130,18 +145,11 @@ export default function speedgraderSelectMenu (optionsHtml, delimiter){
     return icon.concat('</span>');
   };
 
-  this.formatSelectText = function (text) {
-    const parts = text.split(delimiter);
-
-    $($('#students_selectmenu > option')[this.option_index])
-      .text(htmlEscape(parts[0]) + ' - ' + htmlEscape(parts[1]));
+  this.formatSelectText = function () {
+    const option = this.options_array[this.option_index];
 
     this.option_index++;
 
-    return this.getIconHtml(htmlEscape(parts[2])) +
-      '<span class="ui-selectmenu-item-header">' +
-      htmlEscape(parts[0]) +
-      '</span>';
+    return `${this.getIconHtml(htmlEscape(option.className.raw))}<span class="ui-selectmenu-item-header">${htmlEscape(option.name)}</span>`;
   };
 }
-
