@@ -23,7 +23,6 @@ import $ from 'jquery'
 import I18n from 'i18nObj'
 import 'translations/_core'
 import 'translations/_core_en'
-import moment from 'moment'
 
 import bigeasyLocales from 'timezone/locales'
 import bigeasyLocale_de_DE from 'custom_timezone_locales/de_DE'
@@ -31,14 +30,25 @@ import bigeasyLocale_fr_FR from 'custom_timezone_locales/fr_FR'
 import bigeasyLocale_fr_CA from 'custom_timezone_locales/fr_CA'
 import bigeasyLocale_he_IL from 'custom_timezone_locales/he_IL'
 import bigeasyLocale_pl_PL from 'custom_timezone_locales/pl_PL'
+import bigeasyLocale_is_IS from 'custom_timezone_locales/is_IS'
+import bigeasyLocale_ar_SA from 'custom_timezone_locales/ar_SA'
+import bigeasyLocale_da_DK from 'custom_timezone_locales/da_DK'
+import bigeasyLocale_fa_IR from 'custom_timezone_locales/fa_IR'
+import bigeasyLocale_ht_HT from 'custom_timezone_locales/ht_HT'
+import bigeasyLocale_hy_AM from 'custom_timezone_locales/hy_AM'
+import bigeasyLocale_mi_NZ from 'custom_timezone_locales/mi_NZ'
+import bigeasyLocale_nn_NO from 'custom_timezone_locales/nn_NO'
+import bigeasyLocale_tr_TR from 'custom_timezone_locales/tr_TR'
 
 import 'custom_moment_locales/de'
 import 'custom_moment_locales/he'
 import 'custom_moment_locales/pl'
+import 'custom_moment_locales/fa'
 import 'custom_moment_locales/fr'
 import 'custom_moment_locales/fr_ca'
 import 'custom_moment_locales/ht_ht'
 import 'custom_moment_locales/mi_nz'
+import 'custom_moment_locales/hy_am'
 
 let originalLocale
 let originalFallbacksMap
@@ -50,6 +60,15 @@ const bigeasyLocalesWithCustom = [
   bigeasyLocale_fr_CA,
   bigeasyLocale_he_IL,
   bigeasyLocale_pl_PL,
+  bigeasyLocale_is_IS,
+  bigeasyLocale_ar_SA,
+  bigeasyLocale_da_DK,
+  bigeasyLocale_fa_IR,
+  bigeasyLocale_ht_HT,
+  bigeasyLocale_hy_AM,
+  bigeasyLocale_mi_NZ,
+  bigeasyLocale_nn_NO,
+  bigeasyLocale_tr_TR
 ]
 
 const preloadedData = bigeasyLocalesWithCustom.reduce((memo, locale) => {
@@ -96,7 +115,6 @@ function assertFormattedParsesToDate (formatted, date) {
 }
 
 locales.forEach((locale) => {
-  //if (locale.key !== 'de') return
   test(`timezone -> moment for ${locale.key}`, () => {
     I18n.locale = locale.key
     try {
@@ -106,7 +124,7 @@ locales.forEach((locale) => {
         assertFormattedParsesToDate(formatted, date)
       })
     } catch (err) {
-      ok(true, 'missing bigeasy locale file')
+      ok(false, 'missing bigeasy locale file')
     }
   })
 
@@ -120,7 +138,7 @@ locales.forEach((locale) => {
         assertFormattedParsesToDate(formatted, date)
       })
     } catch (err) {
-      ok(true, 'missing bigeasy locale file')
+      ok(false, 'missing bigeasy locale file')
     }
   })
 })
