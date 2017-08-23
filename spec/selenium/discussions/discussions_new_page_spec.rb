@@ -175,6 +175,7 @@ describe "discussions" do
         get url
         replace_content(f('input[name=title]'), "Student Discussion")
         type_in_tiny('textarea[name=message]', 'This is the discussion description.')
+        expect(f("#discussion-edit-view")).to_not contain_css("#has_group_category")
         expect_new_page_load {submit_form('.form-actions')}
         expect(f('.discussion-title').text).to eq "Student Discussion"
         expect(f("#content")).not_to contain_css('#topic_publish_button')

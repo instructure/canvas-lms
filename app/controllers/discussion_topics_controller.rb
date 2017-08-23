@@ -409,12 +409,14 @@ class DiscussionTopicsController < ApplicationController
   def edit
     @topic ||= @context.all_discussion_topics.find(params[:id])
     if authorized_action(@topic, @current_user, (@topic.new_record? ? :create : :update))
+      can_set_group_category = @context.respond_to?(:group_categories) && @context.grants_right?(@current_user, session, :manage) # i.e. not a student
       hash =  {
         URL_ROOT: named_context_url(@context, :api_v1_context_discussion_topics_url),
         PERMISSIONS: {
           CAN_CREATE_ASSIGNMENT: @context.respond_to?(:assignments) && @context.assignments.temp_record.grants_right?(@current_user, session, :create),
           CAN_ATTACH: @topic.grants_right?(@current_user, session, :attach),
-          CAN_MODERATE: user_can_moderate
+          CAN_MODERATE: user_can_moderate,
+          CAN_SET_GROUP: can_set_group_category
         }
       }
 
@@ -428,11 +430,14 @@ class DiscussionTopicsController < ApplicationController
       hash[:ATTRIBUTES][:can_group] = @topic.can_group?
       handle_assignment_edit_params(hash[:ATTRIBUTES])
 
-      categories = @context.respond_to?(:group_categories) ? @context.group_categories : []
-      # if discussion has entries and is attached to a deleted group category,
-      # add that category to the ENV list so it will be shown on the edit page.
-      if @topic.group_category_deleted_with_entries?
-        categories << @topic.group_category
+      categories = []
+      if can_set_group_category
+        categories = @context.group_categories
+        # if discussion has entries and is attached to a deleted group category,
+        # add that category to the ENV list so it will be shown on the edit page.
+        if @topic.group_category_deleted_with_entries?
+          categories << @topic.group_category
+        end
       end
 
       if @topic.assignment.present?
@@ -1105,18 +1110,26 @@ class DiscussionTopicsController < ApplicationController
     return unless discussion_topic_hash.has_key?(:group_category_id)
     return if discussion_topic_hash[:group_category_id].nil? && @topic.group_category_id.nil?
     return if discussion_topic_hash[:group_category_id].to_i == @topic.group_category_id
-    if @topic.is_announcement
-      @errors[:group] = t(:error_group_announcement, "You cannot use grouped discussion on an announcement.")
-      return
-    end
-    if !@topic.can_group?
-      @errors[:group] = t(:error_group_change, "You cannot change grouping on a discussion with replies.")
-    end
+    return unless can_set_group_category?
+
     if discussion_topic_hash[:group_category_id]
       discussion_topic_hash[:group_category] = @context.group_categories.find(discussion_topic_hash[:group_category_id])
     else
       discussion_topic_hash[:group_category] = nil
     end
+  end
+
+  def can_set_group_category?
+    error =
+      if !@context.grants_right?(@current_user, session, :manage)
+        t("You cannot set a grouped discussion as a student.")
+      elsif @topic.is_announcement
+        t(:error_group_announcement, "You cannot use grouped discussion on an announcement.")
+      elsif !@topic.can_group?
+        t(:error_group_change, "You cannot change grouping on a discussion with replies.")
+      end
+    @errors[:group] = error if error
+    !error
   end
 
   # TODO: upgrade acts_as_list after rails3
