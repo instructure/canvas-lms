@@ -337,6 +337,7 @@ define [
         isLargeRoster: ENV?.IS_LARGE_ROSTER or false
         conditionalReleaseServiceEnabled: ENV?.CONDITIONAL_RELEASE_SERVICE_ENABLED or false
         lockedItems: @lockedItems
+        anonymousInstructorAnnotationsEnabled: ENV?.ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED or false
 
 
     _attachEditorToDescription: =>

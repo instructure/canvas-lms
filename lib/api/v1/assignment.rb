@@ -48,6 +48,7 @@ module Api::V1::Assignment
       grading_standard_id
       moderated_grading
       omit_from_final_grade
+      anonymous_instructor_annotations
     )
   }.freeze
 
@@ -389,7 +390,8 @@ module Api::V1::Assignment
     notify_of_update
     integration_id
     omit_from_final_grade
-  )
+    anonymous_instructor_annotations
+  ).freeze
 
   API_ALLOWED_TURNITIN_SETTINGS = %w(
     originality_report_visibility
@@ -401,14 +403,14 @@ module Api::V1::Assignment
     exclude_small_matches_type
     exclude_small_matches_value
     submit_papers_to
-  )
+  ).freeze
 
   API_ALLOWED_VERICITE_SETTINGS = %w(
     originality_report_visibility
     exclude_quoted
     exclude_self_plag
     store_in_index
-  )
+  ).freeze
 
   def create_api_assignment(assignment, assignment_params, user, context = assignment.context)
     return :forbidden unless grading_periods_allow_submittable_create?(assignment, assignment_params)

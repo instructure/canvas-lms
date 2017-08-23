@@ -661,6 +661,36 @@ describe AssignmentsController do
       expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
     end
 
+    describe 'js_env ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED' do
+      before(:each) do
+        user_session(@teacher)
+      end
+
+      after(:each) do
+        ENV.delete('ANONYMOUS_INSTRUCTOR_ANNOTATIONS')
+      end
+
+      it 'is true when the ANONYMOUS_INSTRUCTOR_ANNOTATIONS environment variable is set to true' do
+        ENV['ANONYMOUS_INSTRUCTOR_ANNOTATIONS'] = 'true'
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
+
+        expect(assigns[:js_env][:ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED]).to be true
+      end
+
+      it 'is false when the ANONYMOUS_INSTRUCTOR_ANNOTATIONS environment variable is set to false' do
+        ENV['ANONYMOUS_INSTRUCTOR_ANNOTATIONS'] = 'false'
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
+
+        expect(assigns[:js_env][:ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED]).to be false
+      end
+
+      it 'is false when the ANONYMOUS_INSTRUCTOR_ANNOTATIONS environment variable is not set' do
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
+
+        expect(assigns[:js_env][:ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED]).to be false
+      end
+    end
+
     it "bootstraps the correct message_handler id for LTI 2 tools to js_env" do
       user_session(@teacher)
       account = @course.account

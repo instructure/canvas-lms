@@ -744,3 +744,33 @@ define [
 
   test 'does not show the load in new tab checkbox', ->
     equal @view.$externalToolsNewTab.length, 0
+
+  QUnit.module 'EditView: Anonymous Instructor Annotations',
+    setup: ->
+      fakeENV.setup()
+      ENV.COURSE_ID = 1
+      @server = sinon.fakeServer.create()
+
+    teardown: ->
+      @server.restore()
+      fakeENV.teardown()
+
+    editView: ->
+      editView.apply(this, arguments)
+
+  test 'when environment is not set, does not enable editing the property', ->
+    view = @editView()
+    strictEqual(view.toJSON().anonymousInstructorAnnotationsEnabled, false)
+    strictEqual(view.$el.find('input#assignment_anonymous_instructor_annotations').length, 0)
+
+  test 'when environment is set to false, does not enable editing the property', ->
+    ENV.ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED = false
+    view = @editView()
+    strictEqual(view.toJSON().anonymousInstructorAnnotationsEnabled, false)
+    strictEqual(view.$el.find('input#assignment_anonymous_instructor_annotations').length, 0)
+
+  test 'when environment is set to true, enables editing the property', ->
+    ENV.ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED = true
+    view = @editView()
+    strictEqual(view.toJSON().anonymousInstructorAnnotationsEnabled, true)
+    strictEqual(view.$el.find('input#assignment_anonymous_instructor_annotations').length, 1)

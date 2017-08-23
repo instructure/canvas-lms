@@ -478,7 +478,8 @@ class AssignmentsController < ApplicationController
             override_course_and_term_dates: section.restrict_enrollments_to_section_dates
           }
         end,
-        VALID_DATE_RANGE: CourseDateRange.new(@context)
+        VALID_DATE_RANGE: CourseDateRange.new(@context),
+        ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED: ENV['ANONYMOUS_INSTRUCTOR_ANNOTATIONS'] == 'true'
       }
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
