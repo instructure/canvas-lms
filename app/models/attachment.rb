@@ -312,11 +312,11 @@ class Attachment < ActiveRecord::Base
     progress = Progress.where(context_type: 'Attachment', context_id: self, tag: tag).last
     progress ||= Progress.new context: self, tag: tag
 
-    if progress.new_record?
+    if progress.new_record? || !progress.pending?
       progress.reset!
       progress.process_job(MediaObject, :add_media_files, { :run_at => delay.seconds.from_now, :priority => Delayed::LOWER_PRIORITY, :preserve_method_args => true, :max_attempts => 5 }, self, false) && true
     else
-      progress.completed? && !progress.failed?
+      true
     end
   end
 
