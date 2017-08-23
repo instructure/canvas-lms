@@ -157,7 +157,7 @@
 #           "description": "The secondary unique identifier for SIS purposes"
 #         },
 #         "locale": {
-#           "description": "The user's prefererred locale/language"
+#           "description": "The user's preferred locale/language"
 #         },
 #         "name": {
 #           "description": "The full name of the user"
