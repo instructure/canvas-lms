@@ -664,31 +664,29 @@ define([
     ok(typeof SpeedGrader.EG.loadSubmissionPreview === 'function');
   })
 
-  QUnit.module('resizeImg', {
+  QUnit.module('attachmentIFrameContents', {
     setup () {
       fakeENV.setup();
-      $div = $("<div id='iframe_holder'><iframe src='about:blank'></iframe></div>");
-      $('#fixtures').html($div);
+      this.originalStudent = SpeedGrader.EG.currentStudent;
+      SpeedGrader.EG.currentStudent = { id: 4, submission: { user_id: 4 } };
     },
 
     teardown () {
       fakeENV.teardown();
-      $('#fixtures').empty();
+      SpeedGrader.EG.currentStudent = this.originalStudent;
     }
   });
 
-  test('resizes images', () => {
-    const $body = $('#iframe_holder').find('iframe').contents().find('body');
-    $body.html('<img src="#" />');
-    SpeedGrader.EG.resizeImg.call($('#iframe_holder').find('iframe').get(0));
-    equal($body.find('img').attr('style'), 'max-width: 100vw; max-height: 100vh;');
+  test('returns an image tag if the attachment is of type "image"', () => {
+    const attachment = { id: 1, mime_class: 'image' };
+    const contents = SpeedGrader.EG.attachmentIFrameContents(attachment);
+    strictEqual(/^<img/.test(contents.string), true);
   });
 
-  test('does not resize other types of content', () => {
-    const $body = $('#iframe_holder').find('iframe').contents().find('body');
-    $body.html('<p>This is more than an img.</p><img src="#" />');
-    SpeedGrader.EG.resizeImg.call($('#iframe_holder').find('iframe').get(0));
-    notEqual($body.find('img').attr('style'), 'max-width: 100vw; max-height: 100vh;');
+  test('returns an iframe tag if the attachment is not of type "image"', () => {
+    const attachment = { id: 1, mime_class: 'text/plain' };
+    const contents = SpeedGrader.EG.attachmentIFrameContents(attachment);
+    strictEqual(/^<iframe/.test(contents.string), true);
   });
 
   QUnit.module('emptyIframeHolder', {

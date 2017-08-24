@@ -234,17 +234,12 @@ describe "speed grader submissions" do
       add_attachment_student_assignment(filename, @students[0], fullpath)
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      expect(f('#speedgrader_iframe')).to be_displayed
+      image_element = f('#iframe_holder img')
 
-      in_frame("speedgrader_iframe") do
-        # validates the image\attachment is inside the iframe as expected
-        image_element = f('img')
-
-        if Attachment.local_storage?
-          expect(image_element.attribute('src')).to include('download')
-        else
-          expect(image_element.attribute('src')).to include('amazonaws')
-        end
+      if Attachment.local_storage?
+        expect(image_element.attribute('src')).to include('download')
+      else
+        expect(image_element.attribute('src')).to include('amazonaws')
       end
     end
 

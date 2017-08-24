@@ -1904,19 +1904,6 @@ EG = {
       allowfullscreen: true
     });
     $iframe_holder.html($.raw(iframe)).show();
-    this.fitImgToIframe();
-  },
-
-  // if the iframe is only an img, set its max-width and height to 100%
-  fitImgToIframe: function () {
-    $iframe_holder.find('iframe').load(this.resizeImg);
-  },
-
-  resizeImg: function () {
-    var iframeContent = $(this).contents().find('body').children();
-    if (iframeContent.length === 1 && iframeContent.first().is('img')) {
-      iframeContent.attr('style', 'max-width: 100vw; max-height: 100vh;');
-    }
   },
 
   renderLtiLaunch: function($div, urlBase, externalToolUrl) {
@@ -2009,18 +1996,26 @@ EG = {
         },this)});
       $iframe_holder.show().loadDocPreview(previewOptions);
     } else if (browserableCssClasses.test(attachment.mime_class)) {
-      var src = unescape($submission_file_hidden.find('.display_name').attr('href'))
-        .replace("{{submissionId}}", this.currentStudent.submission.user_id)
-        .replace("{{attachmentId}}", attachment.id);
-      var iframe = SpeedgraderHelpers.buildIframe(htmlEscape(src), {
-        frameborder: 0,
-        allowfullscreen: true
-      });
-      $iframe_holder.html(
-        $.raw(iframe)
-      ).show();
-      this.fitImgToIframe();
+      // xsslint safeString.identifier iFrameHolderContents
+      const iFrameHolderContents = this.attachmentIFrameContents(attachment);
+      $iframe_holder.html(iFrameHolderContents).show();
     }
+  },
+
+  attachmentIFrameContents (attachment) {
+    let contents;
+    const genericSrc = unescape($submission_file_hidden.find('.display_name').attr('href'));
+    const src = genericSrc
+      .replace('{{submissionId}}', this.currentStudent.submission.user_id)
+      .replace('{{attachmentId}}', attachment.id);
+
+    if (attachment.mime_class === 'image') {
+      contents = `<img src="${htmlEscape(src)}" style="max-width:100%;max-height:100%;">`;
+    } else {
+      contents = SpeedgraderHelpers.buildIframe(htmlEscape(src), { frameborder: 0, allowfullscreen: true });
+    }
+
+    return $.raw(contents);
   },
 
   showRubric: function(){
