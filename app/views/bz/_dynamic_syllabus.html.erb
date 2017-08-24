@@ -63,6 +63,45 @@
         end
       end
 
+      # let's also fetch assignments not in modules,
+      # with special treatment for course participation
+      @course.assignments.active.each do |obj|
+        text = ''
+        if obj.title.starts_with? "Course Participation - "
+          text = 'Complete Module'
+          disp_name = obj.title["Course Participation - ".length .. -1]
+          icon = 'document'
+          page = @course.wiki_pages.active.where(:title => disp_name).first
+          link = "/courses/#{@course.id}/pages/#{page.url}"
+        else
+          text = 'Submit'
+          icon = 'assignment'
+          disp_name = obj.title
+          link = "/courses/#{@course.id}/assignments/#{obj.id}"
+        end
+
+        next if assignments_shown[obj.id]
+        assignments_shown[obj.id] = true
+
+        overridden = obj.overridden_for(@current_user)
+
+        unless text.empty? || overridden.due_at.nil?
+          # skip anything that is significantly past due
+          # because it ought to be already done
+          next if overridden.due_at < (DateTime.now - 2.days)
+          magic = {}
+          magic[:obj] = obj
+          magic[:text] = "#{text} #{disp_name}"
+          magic[:link] = link
+          magic[:due_at] = due_at(obj, @current_user)
+          magic[:due_at_date] = overridden.due_at
+          magic[:icon] = icon
+
+          objs << magic
+        end
+
+      end
+
       objs = objs.sort { |x, y| x[:due_at_date] <=> y[:due_at_date] }
 
       if objs.any?
