@@ -104,10 +104,10 @@ body.ic-Login-Body { // apply the background to the body element so that you don
 // these have !important because Canvas specificity on labels and
 // links will override these if we don't
 .ic-Form-control--login .ic-Label {
-  color: var(--ic-brand-Login-Content-label-text-color !important);
+  color: var(--ic-brand-Login-Content-label-text-color) !important;
 }
 .ic-Login__link {
-  color: var(--ic-brand-Login-Content-password-text-color !important);
+  color: var(--ic-brand-Login-Content-password-text-color) !important;
   text-decoration: underline;
 }
 .ic-Login__body__error {
