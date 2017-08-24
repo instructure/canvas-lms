@@ -124,6 +124,8 @@ JOKE
                       "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
       ) do |c|
         c.title @course.name
+        c.intro_title @course.intro_title
+        c.intro_text @course.intro_text
         c.course_code @course.course_code
         c.start_at ims_datetime(@course.start_at) if @course.start_at
         c.conclude_at ims_datetime(@course.conclude_at) if @course.conclude_at

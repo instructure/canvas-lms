@@ -32,6 +32,8 @@ class Course < ActiveRecord::Base
   attr_writer :student_count, :primary_enrollment_type, :primary_enrollment_role_id, :primary_enrollment_rank, :primary_enrollment_state, :invitation
 
   attr_accessible :name,
+                  :intro_text,
+                  :intro_title,
                   :section,
                   :account,
                   :group_weighting_scheme,
