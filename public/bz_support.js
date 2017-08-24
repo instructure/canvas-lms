@@ -28,6 +28,8 @@ function bzRetainedInfoSetup() {
       ta.checked = (value == ta.value) ? true : false;
     else if(ta.tagName == "INPUT" || ta.tagName == "TEXTAREA")
       ta.value = value;
+    else if(ta.tagName == "INPUT" && ta.getAttribute("type") == "button")
+      ta.value = value;
     else
       ta.textContent = value;
   }
@@ -65,11 +67,15 @@ function bzRetainedInfoSetup() {
         var http = new XMLHttpRequest();
         http.open("POST", "/bz/user_retained_data", true);
         var value = ta.value;
-        if(ta.getAttribute("type") == "radio")
+        if(ta.getAttribute("type") == "radio"){
           if(!ta.checked)
             return; // we only want to actually save the one that is checked
-        if(ta.getAttribute("type") == "checkbox")
+        } else if(ta.getAttribute("type") == "checkbox"){
           value = ta.checked ? "yes" : "";
+        } else if(ta.getAttribute("type") == "button"){
+          value = "clicked";
+          ta.className += " was-clicked";
+        }
         var data = "name=" + encodeURIComponent(name) + "&value=" + encodeURIComponent(value) + "&type=" + ta.getAttribute("type");
         if (ta.classList.contains("bz-optional-magic-field"))
           data += "&optional=true";
@@ -88,12 +94,15 @@ function bzRetainedInfoSetup() {
       };
 
       ta.className += " bz-retained-field-setup";
-      ta.addEventListener("change", save);
+      if (ta.getAttribute("type") == "button")
+        ta.addEventListener("click", save);
+      else
+        ta.addEventListener("change", save);
 
       var http = new XMLHttpRequest();
       // cut off json p stuff
       http.onload = function() { bzChangeRetainedItem(ta, http.responseText.substring(9)); };
-      http.open("GET", "/bz/user_retained_data?name=" + encodeURIComponent(name), true);
+      http.open("GET", "/bz/user_retained_data?name=" + encodeURIComponent(name) + "&value=" + encodeURIComponent(ta.value) + "&type=" + ta.getAttribute("type"), true);
       http.send();
     })(textareas[i]);
   }
