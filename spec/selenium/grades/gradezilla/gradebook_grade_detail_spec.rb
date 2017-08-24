@@ -25,7 +25,6 @@ describe 'Grade Detail:' do
   include GradezillaCommon
 
   before(:once) do
-    ENV["GRADEBOOK_DEVELOPMENT"] = "true"
     now = Time.zone.now
 
     # create course with 3 students
@@ -92,11 +91,12 @@ describe 'Grade Detail:' do
 
   context "grade detail tray other" do
     before(:each) do
+      ENV["GRADEBOOK_DEVELOPMENT"] = "true"
       user_session(@teacher)
       Gradezilla.visit(@course)
     end
 
-    after(:all) { ENV["GRADEBOOK_DEVELOPMENT"] = "false"}
+    after(:each) { ENV.delete("GRADEBOOK_DEVELOPMENT") }
 
     it 'missing submission has missing-radiobutton selected' do
       Gradezilla::Cells.open_tray(@course.students[0], @a2)
@@ -160,12 +160,13 @@ describe 'Grade Detail:' do
   context 'grade detail tray late options' do
 
     before(:each) do
+      ENV["GRADEBOOK_DEVELOPMENT"] = "true"
       user_session(@teacher)
       Gradezilla.visit(@course)
       Gradezilla::Cells.open_tray(@course.students[0], @a1)
     end
 
-    after(:all) { ENV["GRADEBOOK_DEVELOPMENT"] = "false"}
+    after(:each) { ENV.delete("GRADEBOOK_DEVELOPMENT") }
 
     it 'late submission has late-radiobutton selected', test_id: 3196973, priority: '1' do
       expect(Gradezilla::GradeDetailTray.is_radio_button_selected('late')).to be true

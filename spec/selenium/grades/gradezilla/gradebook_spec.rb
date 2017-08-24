@@ -342,7 +342,7 @@ describe "Gradezilla" do
 
   context 'submission tray assignment navigation' do
     before(:each) { ENV['GRADEBOOK_DEVELOPMENT'] = 'true' }
-    after(:each) { ENV["GRADEBOOK_DEVELOPMENT"] = 'false'}
+    after(:each) { ENV.delete("GRADEBOOK_DEVELOPMENT") }
 
     context 'with default ordering' do
       before(:each) do
