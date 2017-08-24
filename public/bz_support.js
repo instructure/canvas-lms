@@ -22,16 +22,19 @@
 */
 function bzRetainedInfoSetup() {
   function bzChangeRetainedItem(ta, value) {
-    if(ta.tagName == "INPUT" && ta.getAttribute("type") == "checkbox")
+    if(ta.tagName == "INPUT" && ta.getAttribute("type") == "checkbox"){
       ta.checked = (value == "yes") ? true : false;
-    else if(ta.tagName == "INPUT" && ta.getAttribute("type") == "radio")
+    } else if(ta.tagName == "INPUT" && ta.getAttribute("type") == "radio"){
       ta.checked = (value == ta.value) ? true : false;
-    else if(ta.tagName == "INPUT" || ta.tagName == "TEXTAREA")
+    } else if(ta.tagName == "INPUT" && ta.getAttribute("type") == "button"){
+      if (value == "clicked"){
+       ta.className += " was-clicked";
+      }
+    } else if(ta.tagName == "INPUT" || ta.tagName == "TEXTAREA"){
       ta.value = value;
-    else if(ta.tagName == "INPUT" && ta.getAttribute("type") == "button")
-      ta.value = value;
-    else
+    } else {
       ta.textContent = value;
+    }
   }
 
   if(window.ENV && ENV.current_user) {
