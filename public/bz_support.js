@@ -28,7 +28,7 @@ function bzRetainedInfoSetup() {
       ta.checked = (value == ta.value) ? true : false;
     } else if(ta.tagName == "INPUT" && ta.getAttribute("type") == "button"){
       if (value == "clicked"){
-       ta.className += " was-clicked";
+       ta.className += " bz-was-clicked";
       }
     } else if(ta.tagName == "INPUT" || ta.tagName == "TEXTAREA"){
       ta.value = value;
@@ -77,7 +77,7 @@ function bzRetainedInfoSetup() {
           value = ta.checked ? "yes" : "";
         } else if(ta.getAttribute("type") == "button"){
           value = "clicked";
-          ta.className += " was-clicked";
+          ta.className += " bz-was-clicked";
         }
         var data = "name=" + encodeURIComponent(name) + "&value=" + encodeURIComponent(value) + "&type=" + ta.getAttribute("type");
         if (ta.classList.contains("bz-optional-magic-field"))
