@@ -433,6 +433,11 @@ class GroupCategory < ActiveRecord::Base
         distribute_members_among_groups(unassigned_users, groups.active)
       end
     end
+  rescue => e
+    if current_progress
+      current_progress.message = "Error assigning members: #{e.message}"
+      current_progress.fail
+    end
   end
 
   def assign_unassigned_members_in_background(by_section=false)
@@ -526,7 +531,7 @@ class GroupCategory < ActiveRecord::Base
 
     def determine_group_distribution
       # try to figure out how to best split up the groups
-      goal_group_size = @user_count / @groups.count # try to get groups with at least this size
+      goal_group_size = [@user_count / @groups.count, 1].max # try to get groups with at least this size
 
       num_groups_assigned = 0
       user_counts = {}

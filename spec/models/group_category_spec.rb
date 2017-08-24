@@ -567,6 +567,26 @@ describe GroupCategory do
       end
       expect(groups.map(&:users).flatten).to match_array users_to_section.keys # should have distributed everybody
     end
+
+    it "should catch errors and fail the current progress" do
+      expect_any_instantiation_of(@category).to receive(:distribute_members_among_groups_by_section).and_raise("oh noes")
+      @category.assign_unassigned_members_in_background(true)
+      run_jobs
+
+      progress = @category.progresses.last
+      expect(progress).to be_failed
+      expect(progress.message).to include("oh noes")
+    end
+
+    it "should not explode when there are more groups than students" do
+      student_in_course(:course => @course)
+
+      groups = []
+      2.times { |i| groups << @category.groups.create(:name => "Group #{i}", :context => @course) }
+
+      expect(@category.distribute_members_among_groups_by_section).to be_truthy
+      expect(groups.map(&:users).flatten).to eq [@student]
+    end
   end
 end
 
