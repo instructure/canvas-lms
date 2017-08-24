@@ -166,9 +166,10 @@ class BzController < ApplicationController
   end
 
   def user_retained_data
+    Rails.logger.debug("### user_retained_data - all params = #{params.inspect}")
     result = RetainedData.where(:user_id => @current_user.id, :name => params[:name])
     data = ''
-    unless result.empty?
+    if !result.empty?
       data = result.first.value
     end
     render :json => data
