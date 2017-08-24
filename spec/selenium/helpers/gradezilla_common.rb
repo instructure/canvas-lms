@@ -277,7 +277,7 @@ module GradezillaCommon
 
     def create_course_late_policy
       # create late/missing policies on backend
-      @course.create_late_policy(
+      @course.create_late_policy!(
         missing_submission_deduction_enabled: true,
         missing_submission_deduction: 50.0,
         late_submission_deduction_enabled: true,
@@ -328,17 +328,17 @@ module GradezillaCommon
     def make_submissions
       # submit a1(late) and a3(on-time) so a2(missing)
       Timecop.freeze(now) do
-        @a1.submit_homework(@course.students[0], body: 'submitting my homework')
-        @a3.submit_homework(@course.students[0], body: 'submitting my homework')
+        @a1.submit_homework(@course.students.first, body: 'submitting my homework')
+        @a3.submit_homework(@course.students.first, body: 'submitting my homework')
       end
     end
 
     def grade_assignments
       # as a teacher grade the assignments
-      @a1.grade_student(@course.students[0], grade: 90, grader: @teacher)
-      @a2.grade_student(@course.students[0], grade: 10, grader: @teacher)
-      @a3.grade_student(@course.students[0], grade: 9, grader: @teacher)
-      @a4.grade_student(@course.students[0], excuse: true, grader: @teacher)
+      @a1.grade_student(@course.students.first, grade: 90, grader: @teacher)
+      @a2.grade_student(@course.students.first, grade: 10, grader: @teacher)
+      @a3.grade_student(@course.students.first, grade: 9, grader: @teacher)
+      @a4.grade_student(@course.students.first, excuse: true, grader: @teacher)
     end
   end
 end

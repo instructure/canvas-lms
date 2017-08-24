@@ -73,7 +73,7 @@ describe "speed grader - grade display" do
     it "shows late pill" do
       Speedgrader.visit(@course.id, @a1.id)
 
-      expect(Speedgrader.submission_status_pill('late').displayed?).to be true
+      expect(Speedgrader.submission_status_pill('late')).to be_displayed
     end
 
     it "shows late deduction and final grade" do
@@ -90,7 +90,7 @@ describe "speed grader - grade display" do
     it "shows missing pill" do
       Speedgrader.visit(@course.id, @a2.id)
 
-      expect(Speedgrader.submission_status_pill('missing').displayed?).to be true
+      expect(Speedgrader.submission_status_pill('missing')).to be_displayed
     end
   end
 end
