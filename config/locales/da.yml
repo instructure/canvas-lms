@@ -5439,7 +5439,7 @@ da:
     show: 
       change_home_page: Skift
       details: 
-        confirm_unenroll: "Er du sikker på, at du vil afmelde dig dette fag? Du vil ikke længere være i stand til at se faglisten eller kommunikere direkte med lærerne, og du vil ikke længere se fagbegivenheder i din stream om som notifikationer."
+        confirm_unenroll: "Er du sikker på, at du vil afmelde dig dette fag? Du vil ikke længere være i stand til at se faglisten eller kommunikere direkte med lærerne, og du vil ikke længere se fagbegivenheder i din stream som notifikationer."
       draft_state: 
         buttons: 
           cancel: Annuller
