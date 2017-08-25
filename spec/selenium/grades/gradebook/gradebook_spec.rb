@@ -31,6 +31,15 @@ describe "gradebook" do
 
   before(:each) { user_session(@teacher) }
 
+  it "page should load within acceptable time ", priority:"1" do
+    page_load_start_time = Time.now
+    @gradebook_page.visit_gradebook(@course)
+    page_load_finish_time = Time.now
+    page_load_time = page_load_finish_time - page_load_start_time
+    puts "The page loaded in #{page_load_time} seconds"
+    expect(page_load_time).to be > 0.0
+  end
+
   it "hides unpublished/shows published assignments", priority: "1", test_id: 210016 do
     assignment = @course.assignments.create! title: 'unpublished'
     assignment.unpublish
