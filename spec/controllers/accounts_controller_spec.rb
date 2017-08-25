@@ -29,20 +29,6 @@ describe AccountsController do
     account_admin_user(account: @account)
   end
 
-  def cross_listed_course
-    account_with_admin_logged_in
-    @account1 = Account.create!
-    @account1.account_users.create!(user: @user)
-    @course1 = @course
-    @course1.account = @account1
-    @course1.save!
-    @account2 = Account.create!
-    @course2 = course
-    @course2.account = @account2
-    @course2.save!
-    @course2.course_sections.first.crosslist_to_course(@course1)
-  end
-
   context "confirm_delete_user" do
     before(:once) {account_with_admin}
     before(:each) {user_session(@admin)}
@@ -219,6 +205,31 @@ describe AccountsController do
 
       expect(assigns[:associated_courses_count]).to eq 1
     end
+
+    describe "check crosslisting" do
+      before :once do
+        @root_account = Account.create!
+        @account1 = Account.create!({ :root_account => @root_account })
+        @account2 = Account.create!({ :root_account => @root_account })
+        @course1 = course_factory({ :account => @account1, :course_name => "course1" })
+        @course2 = course_factory({ :account => @account2, :course_name => "course2" })
+        @course2.course_sections.create!
+        @course2.course_sections.first.crosslist_to_course(@course1)
+      end
+
+      it "if crosslisted a section to another account's course, don't show that other course" do
+        account_with_admin_logged_in(account: @account2)
+        get 'show', params: {:id => @account2.id }, :format => 'html'
+        expect(assigns[:associated_courses_count]).to eq 1
+      end
+
+      it "if crosslisted a section to this account, do *not* show other account's course" do
+        account_with_admin_logged_in(account: @account1)
+        get 'show', params: {:id => @account1.id }, :format => 'html'
+        expect(assigns[:associated_courses_count]).to eq 1
+      end
+    end
+
     # Check that both published and un-published courses have the correct count
     it "should count course's student enrollments" do
       account_with_admin_logged_in
@@ -242,6 +253,7 @@ describe AccountsController do
       expect(assigns[:courses].find {|c| c.id == c1.id}.student_count).to eq c1.student_enrollments.count
       expect(assigns[:courses].find {|c| c.id == c2.id}.student_count).to eq c2.student_enrollments.count
     end
+
 
     it "should list student counts in unclaimed courses" do
       account_with_admin_logged_in

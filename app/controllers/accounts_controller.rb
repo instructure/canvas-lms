@@ -187,7 +187,6 @@ class AccountsController < ApplicationController
           :hide_enrollmentless_courses => @hide_enrollmentless_courses,
           :only_master_courses => @only_master_courses,
           :order => sort_order)
-
         ActiveRecord::Associations::Preloader.new.preload(@courses, :enrollment_term)
         build_course_stats
       end
