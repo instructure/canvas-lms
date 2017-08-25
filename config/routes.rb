@@ -1491,7 +1491,7 @@ CanvasRails::Application.routes.draw do
       post 'files/:id/create_success', action: :api_create_success
       get 'files/:id/create_success', action: :api_create_success
       match '/api/v1/files/:id/create_success', via: [:options], action: :api_create_success_cors
-      post 'files/:id/capture', action: :api_capture
+      post 'files/capture', action: :api_capture
 
 
       # 'attachment' (rather than 'file') is used below so modules API can use polymorphic_url to generate an item API link
