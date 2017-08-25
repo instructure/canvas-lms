@@ -56,9 +56,11 @@ gem 'bcrypt', '3.1.11'
 gem 'canvas_connect', '0.3.12'
   gem 'adobe_connect', '1.0.6', require: false
 gem 'canvas_webex', '0.17'
-gem 'inst-jobs', '0.13.5'
+gem 'inst-jobs', '0.13.6'
   gem 'rufus-scheduler', '3.4.2', require: false
     gem 'et-orbi', '1.0.5', require: false
+gem 'inst-jobs-autoscaling', '1.0.2'
+  gem 'aws-sdk-autoscaling', '1.0.0.rc12', require: false
 gem 'ffi', '1.9.18', require: false
 gem 'hashery', '2.1.2', require: false
 gem 'highline', '1.7.8', require: false
