@@ -228,6 +228,7 @@ class User < ActiveRecord::Base
   }
 
   def reload(*)
+    @all_pseudonyms = nil
     @all_active_pseudonyms = nil
     super
   end
@@ -2888,6 +2889,10 @@ class User < ActiveRecord::Base
 
   def all_paginatable_accounts
     ShardedBookmarkedCollection.build(Account::Bookmarker, self.adminable_accounts_scope)
+  end
+
+  def all_pseudonyms_loaded?
+    !!@all_pseudonyms
   end
 
   def all_pseudonyms

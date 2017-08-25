@@ -816,6 +816,8 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["enrollment_term_id"] = @default_term.id
         parameters["enrollments"] = true
+        # this extra pseudonym should not cause an extra row in the output
+        @user2.pseudonyms.create!(unique_id: "pseudonym2@instructure.com")
         parsed = read_report("sis_export_csv", {params: parameters, order: [1, 0]})
         expect(parsed.length).to eq 4
 
@@ -1280,6 +1282,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters['admins'] = true
         parameters['include_deleted'] = true
+        @admin.pseudonyms.create!(account: @account, unique_id: 'deleted').destroy
         parsed = read_report('provisioning_csv', {params: parameters, order: [1, 5], header: true})
         expect(parsed).to match_array [['admin_user_name', 'canvas_user_id', 'user_id', 'canvas_account_id',
                                         'account_id', 'role_id', 'role', 'status', 'created_by_sis'],
