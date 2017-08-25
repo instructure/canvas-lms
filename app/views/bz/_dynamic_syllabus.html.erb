@@ -126,13 +126,17 @@
     %>
   </div>
 
+  <% first_module = true %>
+
   <% CoursePart.where(:course_id => @course.id).order(:position, :id).each do |part|
      part_count = 0
      part_modules = @course.context_modules.active.where(:part_id => part.id)
      progressions = {}
      all_complete = true
      part_modules.each do |mod|
-       progress = @progressions.where(:context_module_id => mod.id).first
+       progress = bz_get_progression_proxy(progressions[mod.id], first_module, mod)
+       first_module = false
+
        progressions[mod.id] = progress
        all_complete = false if progress.nil? || progress.workflow_state != 'completed'
      end
@@ -162,7 +166,9 @@
 
     <% part_modules.each do |mod| %>
     <% part_count += 1 %>
-    <% progress = progressions[mod.id] %>
+    <%
+      progress = progressions[mod.id]
+    %>
     <div class="bz-course-part-module-box <%= (progress.nil? || @bypass_lock) ? '' : progress.workflow_state %> " <%
       if progress && progress.workflow_state == 'completed' %> onclick="window.location.href='/courses/<%= @course.id %>/modules/items/<%= mod.content_tags.first.id %>';" style="cursor: pointer;"<%end%>>
       <div class="bz-module-image"><img src="<%= mod.image_url %>" alt="" /></div>
@@ -178,7 +184,7 @@
           if ump.empty?
         %>
           <% unless mod.content_tags.empty? %>
-            <a class="bz-button-pick-up" href="/courses/<%= @course.id %>/modules/items/<%= mod.content_tags.active.first.id %>">Pick up where you left off</a>
+            <a class="bz-button-pick-up" href="/courses/<%= @course.id %>/modules/items/<%= mod.content_tags.active.first.id %>">Get Started</a>
           <% end %>
         <% else %>
           <a class="bz-button-pick-up" href="/courses/<%= @course.id %>/modules/items/<%= ump.first.module_item_id %>">Pick up where you left off</a>
