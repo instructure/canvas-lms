@@ -23,6 +23,52 @@ module ApplicationHelper
   include LocaleSelection
   include Canvas::LockExplanation
 
+  # this is needed by the dynamic syllabus, it just won't
+  # let me define it anywhere else...
+  class BzProgressProxy
+    def initialize(first_module, mod, current_user)
+      @first_module = first_module
+      @mod = mod
+      @current_user = current_user
+    end
+    def workflow_state
+      if @mod.unlock_at && @mod.unlock_at > DateTime.now
+        # unlock in the future
+        return 'locked'
+      else
+        # unlocked now, we started or complete? need to check relevant magic field
+        page = @mod.content_tags.active.first
+        return 'locked' if page.nil?
+
+        page = WikiPage.find(page.content_id)
+
+        data = RetainedData.where(:user_id => @current_user.id, :name => "module_position_#{page.id}")
+        data = data.any? ? data.first : nil
+        if data.nil?
+          return '' # no progress
+        else
+          doc = Nokogiri::HTML(page.body)
+          final_position = 0
+          doc.css('.bz-box .bz-toggle-all-next').each do |o|
+            final_position += 1
+          end
+
+          return data.value.to_s == final_position.to_s ? 'completed' : "started"
+        end
+      end
+    end
+  end
+
+  # gets the above class..
+  def bz_get_progression_proxy(p, first_module, mod)
+    # this is how we would get the Canvas progression...
+    # progress = @progressions.where(:context_module_id => mod.id).first
+
+    # but instead, we need to use our own logic for the single page interactive module
+    p = BzProgressProxy.new(first_module, mod, @current_user)
+    return p
+  end
+
   def beyondz_app_url(path)
     BeyondZConfiguration.url(path)
   end
