@@ -1593,15 +1593,15 @@ da:
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Giv en moderator tilladelse til at evaluere flere uafhængige karakterer for de valgte afleveringer"
   allow_bulk_grade_export_to_sis_e11a6e66: "Tillad bulkeksport af karakterer til SIS"
   allow_course_content_to_be_downloaded_and_viewed_o_48a0d252: "Tillad, at fagindhold kan hentes og ses offline"
-  allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Tillad fag-billeder at blive tildelt til et fag og blive benyttet i panel-kortene."
+  allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Tillad fag-billeder at blive tildelt til et fag og blive benyttet i oversigt-kortene."
   allow_course_images_to_be_assigned_to_a_course_and_adb906f4: "Gør det muligt at føje kursusbilleder til et kursus, og til brug på dashcards."
-  allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "Tillad, at panel-kort omorganiseres for hver bruger."
+  allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "Tillad, at oversigt-kort omorganiseres for hver bruger."
   allow_in_mastery_paths_5332c786: "Tillad i læringsstier"
   allow_intra_group_peer_reviews_53f1e455: "Tillad interne peer review"
   allow_lor_tools: "Giv brugerne mulighed for at se og bruge eksterne værktøjer, der er konfigureret til LOR."
   allow_multiple_attempts_e67a0a37: "Tillad flere forsøg"
   allow_opt_out_of_inbox: "Giv brugerne mulighed for at framelde sig diskussionens indbakke. Dette medfører, at alle diskussionsbeskeder og meddelelser sendes som ASAP-meddelelser til brugerens primære e-mail. Skjul badge for ulæste beskeder på samtalens indbakke, og skjul samtalens meddelelsespræferencer."
-  allow_reorder_dashboard_cards_78215947: "Tillad omorganisering af panel-kort"
+  allow_reorder_dashboard_cards_78215947: "Tillad omorganisering af oversigt-kort"
   allow_students_to_download_course_content_and_view_810e66ec: "Tillad, at studerende henter fagets indhold og viser det offline"
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Giv de studerende mulighed for at se, hvem har meldt sig til tidsvinduer."
   allow_students_to_see_who_was_signed_up_for_time_s_160ba252: "Lad de studerende se, hvem der er tilmeldt tidsvinduer"
@@ -5770,9 +5770,9 @@ da:
     show_more_link: 
       show_less: "Vis mindre"
       show_more: "Vis mere"
-  dashboard_7f1dbf71: Panel
-  dashboard_options_b240ed5a: "Panel indstillinger"
-  dashboard_view_d7d85969: "Panel visning"
+  dashboard_7f1dbf71: Oversigt
+  dashboard_options_b240ed5a: "Oversigt indstillinger"
+  dashboard_view_d7d85969: "Oversigt visning"
   data_exports: dataeksporter
   data_set_identifier_data_set_id_c228b5df: "Datasæt-identifikator: %{data_set_id}"
   date: 
@@ -9536,7 +9536,7 @@ da:
   linked_with_wiki_page_title_b17c3521: "linket med Wiki Page '%{title}'"
   linkedin_5726caca: LinkedIn
   links: 
-    dashboard: "Min panel"
+    dashboard: "Min oversigt"
     errors: 
       4xx_feedback: "Klik her for at fortælle os, hvad du leder efter."
       feedback: "Klik her for at fortælle os, hvad der skete"
@@ -11971,7 +11971,7 @@ da:
   mute_unmute_assignment_62608e44: "Med / uden besked til de studerende om denne opgave"
   muted_283cfa0f: (afbrudt)
   muting_assignment_a9aeb5c7: "Sender ikke beskeder til studerende om opgave ..."
-  my_dashboard_b724020: "Min panel"
+  my_dashboard_b724020: "Min oversigt"
   my_themes_b72217b8: "Mine temaer"
   n_554bc493: "n"
   n_a_d6f6c42f: N/A
@@ -13724,7 +13724,7 @@ da:
   provider_attribute_b1cad655: "Udbyder egenskab"
   provider_icon_5064fa6e: Udbyderikon
   provides_users_with_a_planner_dashboard_option_1e8d234d: "Giver brugere mulighed for planlægning på forsiden."
-  provides_users_with_a_to_do_list_dashboard_option_9334f9fa: "Giver brugere mulighed for en opgaveliste på forsiden."
+  provides_users_with_a_to_do_list_dashboard_option_9334f9fa: "Giver brugere mulighed for en opgaveliste på oversigten."
   provision_a_catalog_account_8cea67f6: "Klargør en Catalog-konto"
   provision_a_quiz_next_service_c7c6bd87: "Lever en Quiz.Next-tjeneste"
   provisioned_catalog_account_26339afd: "Klargjort Catalog-konto"
@@ -15967,7 +15967,7 @@ da:
       already_enrolled: "Du er allerede tilmeldt **%{course}**."
       buttons: 
         go_to_course: "Gå til fag"
-        go_to_dashboard: "Gå til din forside"
+        go_to_dashboard: "Gå til din oversigt"
     authenticate: 
       buttons: 
         enroll_in_course: "Meld dig til faget"
@@ -16001,7 +16001,7 @@ da:
       already_enrolled: "Du har meldt dig til **%{course}**."
       buttons: 
         go_to_course: "Gå til fag"
-        go_to_dashboard: "Gå til din forside"
+        go_to_dashboard: "Gå til din oversigt"
       not_available_yet: "Vi sender din en e-mail lige før faget begynder."
   self_registration_156392d6: Selvtilmelding
   self_signup_15b23092: self_signup
@@ -16393,7 +16393,7 @@ da:
       start_a_new_course: "Opret et nyt fag"
     new_nav_header: 
       links: 
-        dashboard: Forside
+        dashboard: Oversigt
         skip_to_content: "Spring til indhold"
     no_recent_activity: 
       empty_stream_message: "Du har endnu ikke nogen beskeder at vise i dine handlinger. Når du begynder at deltage i dine fag, vil du se disse handlinger blive fyldt med beskeder fra diskussioner, bedømmelsesopdateringer, private beskeder mellem dig og andre brugere osv."
@@ -17953,7 +17953,7 @@ da:
       
       Hvis udbyderen kan konfigurere gyldige callback eller omdirigerings-URI'er,
       bruger du %{callback_url}.
-  to_do_list_dashboard_d741f64e: "Opgaveliste forside"
+  to_do_list_dashboard_d741f64e: "Opgaveliste oversigt"
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Begynd med at indtaste den studerendes navn nedenfor for at finde dem, og klik så på Opdater for at linke fag-observatøren *%{name}* til en studerende."
   to_minscore_43e5452e: "til %{minScore}%"
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "Du skal *slå High Contrast UI fra* for at vise branding for Theme Editor."
@@ -18048,7 +18048,7 @@ da:
   undated_items_toggle_list_visibility_6219e641: "Skift synlighed for liste med udaterede elementer"
   undelivered_message_459916a9: "Ikke leveret besked"
   underline_all_links_description: |-
-      Understreg links viser hyperlinks i navigationsmenuer, forside og sidepaneler som
+      Understreg links viser hyperlinks i navigationsmenuer, oversigt og sidepaneler som
       *understreget tekst*. Denne funktionsindstilling gælder ikke for brugergenereret indhold-links i Rich Content Editor, der altid fremhæver links til alle brugere.
   underline_links_e7cf9b4f: "Understreg links"
   undo_a7be8fef: Fortryd
@@ -18611,7 +18611,7 @@ da:
     user_dashboard: 
       dashboard: Forside
       user_atom_feed: "Bruger Atom Feed (Alle fag)"
-      user_dashboard: "Brugerens panel"
+      user_dashboard: "Brugerens oversigt"
     user_is_deleted: "%{user_name} er blevet slettet"
     user_merge_fail: "Brugerforening mislykkedes. Sørg for, at du har passende tilladelse og prøv igen."
     user_merge_success: "Brugerne blev forenet ! %{first_user} og %{second_user} er nu en og samme."
