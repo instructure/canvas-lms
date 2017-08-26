@@ -58,10 +58,10 @@ describe GradesPresenter do
   end
 
   describe '#student_enrollments' do
-    let(:course1) { stub }
-    let(:course2) { stub }
-    let(:student) { stub(:student? => true, :course => course1, :state_based_on_date => :active) }
-    let(:nonstudent) { stub(:student? => false, :course => course2, :state_based_on_date => :active) }
+    let(:course1) { double }
+    let(:course2) { double }
+    let(:student) { double(:student? => true, :course => course1, :state_based_on_date => :active) }
+    let(:nonstudent) { double(:student? => false, :course => course2, :state_based_on_date => :active) }
     let(:enrollments) { [student, nonstudent] }
     let(:student_enrollments) { presenter.student_enrollments }
 
@@ -83,45 +83,45 @@ describe GradesPresenter do
 
   describe '#observed_enrollments' do
 
-    let(:enrollment) { stub(:state_based_on_date => :active, :is_a? => true, :associated_user_id => 1, :course_id => 1) }
-    let(:enrollment2) { stub(:state_based_on_date => :active, :is_a? => true, :associated_user_id => 2, :course_id => 2) }
+    let(:enrollment) { double(:state_based_on_date => :active, :is_a? => true, :associated_user_id => 1, :course_id => 1) }
+    let(:enrollment2) { double(:state_based_on_date => :active, :is_a? => true, :associated_user_id => 2, :course_id => 2) }
     let(:enrollments) { [enrollment, enrollment2] }
     let(:presenter) { GradesPresenter.new(enrollments) }
 
     before do
       enrollments.each do |e|
-        e.stubs(:shard).returns(shard)
+        allow(e).to receive(:shard).and_return(shard)
       end
     end
 
     it 'uniqs out duplicates' do
-      StudentEnrollment.stubs(active: stub(where: [3]))
+      allow(StudentEnrollment).to receive_messages(active: double(where: [3]))
       expect(presenter.observed_enrollments).to eq [3]
     end
 
     it 'removes nil enrollments' do
-      StudentEnrollment.stubs(active: stub(where: []))
+      allow(StudentEnrollment).to receive_messages(active: double(where: []))
       expect(presenter.observed_enrollments).to eq []
     end
 
     context 'exclusions' do
       before do
-        active_enrollments = stub('active_enrollments')
-        active_enrollments.stubs(:where).returns([1], [2], [3])
-        StudentEnrollment.stubs(:active => active_enrollments)
+        active_enrollments = double('active_enrollments')
+        allow(active_enrollments).to receive(:where).and_return([1], [2], [3])
+        allow(StudentEnrollment).to receive_messages(:active => active_enrollments)
       end
 
       it 'only selects ObserverEnrollments' do
-        student_enrollment = stub(:state_based_on_date => :active)
-        student_enrollment.expects(:is_a?).with(ObserverEnrollment).returns(false)
-        student_enrollment.stubs(:shard).returns(shard)
+        student_enrollment = double(:state_based_on_date => :active)
+        expect(student_enrollment).to receive(:is_a?).with(ObserverEnrollment).and_return(false)
+        allow(student_enrollment).to receive(:shard).and_return(shard)
         enrollments << student_enrollment
         expect(presenter.observed_enrollments).to eq [1, 2]
       end
 
       it 'excludes enrollments without an associated user id' do
-        unassociated_enrollment = stub(:state_based_on_date => :active, :is_a? => true, :associated_user_id => nil)
-        unassociated_enrollment.stubs(:shard).returns(shard)
+        unassociated_enrollment = double(:state_based_on_date => :active, :is_a? => true, :associated_user_id => nil)
+        allow(unassociated_enrollment).to receive(:shard).and_return(shard)
         enrollments << unassociated_enrollment
         expect(presenter.observed_enrollments).to eq [1, 2]
       end
@@ -147,7 +147,7 @@ describe GradesPresenter do
         observer_enrollment.save!
         enrollments << observer_enrollment
 
-        enrollments.each { |e| e.stubs(:state_based_on_date).returns(:active) }
+        enrollments.each { |e| allow(e).to receive(:state_based_on_date).and_return(:active) }
         presenter = GradesPresenter.new(enrollments)
         expect(presenter.observed_enrollments).to include(student_enrollment)
       end
@@ -156,11 +156,11 @@ describe GradesPresenter do
 
   describe '#teacher_enrollments' do
 
-    let(:course1) { stub }
-    let(:course2) { stub }
-    let(:instructor2) { stub(:instructor? => true, :course => course1, :course_section_id => 3, :state_based_on_date => :active) }
-    let(:instructor) { stub(:instructor? => true, :course => course1, :course_section_id => 1, :state_based_on_date => :active) }
-    let(:noninstructor) { stub(:instructor? => false, :course => course2, :state_based_on_date => :active) }
+    let(:course1) { double }
+    let(:course2) { double }
+    let(:instructor2) { double(:instructor? => true, :course => course1, :course_section_id => 3, :state_based_on_date => :active) }
+    let(:instructor) { double(:instructor? => true, :course => course1, :course_section_id => 1, :state_based_on_date => :active) }
+    let(:noninstructor) { double(:instructor? => false, :course => course2, :state_based_on_date => :active) }
     let(:enrollments) { [instructor, instructor2, noninstructor] }
     let(:teacher_enrollments) { presenter.teacher_enrollments }
 
@@ -179,19 +179,19 @@ describe GradesPresenter do
 
   describe '#single_enrollment' do
 
-    let(:course) { stub('course') }
+    let(:course) { double('course') }
 
     let(:attrs) {
       { :student? => false, :instructor? => false, :course_id => 1, :state_based_on_date => :active, :course => course, :is_a? => false }
     }
 
-    let(:observed_enrollment) { stub('observerd_enrollment', attrs.merge(:is_a? => true, :associated_user_id => 1)) }
-    let(:teacher_enrollment) { stub('teacher_enrollment', attrs.merge(:instructor? => true)) }
-    let(:student_enrollment) { student_enrollment = stub('student_enrollment', attrs.merge(:student? => true)) }
+    let(:observed_enrollment) { double('observerd_enrollment', attrs.merge(:is_a? => true, :associated_user_id => 1)) }
+    let(:teacher_enrollment) { double('teacher_enrollment', attrs.merge(:instructor? => true)) }
+    let(:student_enrollment) { student_enrollment = double('student_enrollment', attrs.merge(:student? => true)) }
 
     before do
-      StudentEnrollment.stubs(active: stub(where: [stub]))
-      observed_enrollment.stubs(:shard).returns(shard)
+      allow(StudentEnrollment).to receive_messages(active: double(where: [double]))
+      allow(observed_enrollment).to receive(:shard).and_return(shard)
     end
 
     it 'is true with one student enrollment' do

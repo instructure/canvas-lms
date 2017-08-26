@@ -23,14 +23,14 @@ shared_examples_for 'Quiz Submissions API Restricted Endpoints' do
     @quiz.require_lockdown_browser = true
     @quiz.save
 
-    Quizzes::Quiz.stubs(:lockdown_browser_plugin_enabled?).returns true
+    allow(Quizzes::Quiz).to receive(:lockdown_browser_plugin_enabled?).and_return true
 
     fake_plugin = Object.new
-    fake_plugin.stubs(:authorized?).returns false
-    fake_plugin.stubs(:base).returns fake_plugin
+    allow(fake_plugin).to receive(:authorized?).and_return false
+    allow(fake_plugin).to receive(:base).and_return fake_plugin
 
-    subject.stubs(:ldb_plugin).returns fake_plugin
-    Canvas::LockdownBrowser.stubs(:plugin).returns fake_plugin
+    allow(subject).to receive(:ldb_plugin).and_return fake_plugin
+    allow(Canvas::LockdownBrowser).to receive(:plugin).and_return fake_plugin
 
     @request_proxy.call true, {
       attempt: 1
@@ -337,7 +337,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
     it 'should be accessible implicitly to its own student as "self"' do
       @user = @student
-      @quiz_submission.stubs(:id).returns 'self'
+      allow(@quiz_submission).to receive(:id).and_return 'self'
 
       json = qs_api_show
       expect(json.key?('quiz_submissions')).to be_truthy

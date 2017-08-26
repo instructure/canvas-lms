@@ -48,6 +48,7 @@ describe DataFixup::InitNewGradeHistoryAuditLogIndexes do
 
   before(:each) do
     @database = Canvas::Cassandra::DatabaseBuilder.from_config(:auditors)
+    skip("requires cassandra auditors") unless @database
 
     @values = [
       [

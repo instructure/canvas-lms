@@ -224,6 +224,7 @@ CanvasRails::Application.routes.draw do
         post :change_gradebook_column_size
         post :save_gradebook_column_order
         get :user_ids
+        get :grading_period_assignments
       end
     end
 

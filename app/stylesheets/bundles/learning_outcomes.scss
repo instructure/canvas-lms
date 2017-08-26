@@ -172,7 +172,7 @@ ul.outcome-level {
           top:0;
           width: 4px;
           height: 100%;
-          background: $ic-brand-primary;
+          background: var(--ic-brand-primary);
         }
         &:hover {
           background-color: $ic-bg-light-primary;

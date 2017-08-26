@@ -1,4 +1,4 @@
-# This YAML file is auto-generated from a Transifex import.
+# This YAML file is auto-generated from a translation import.
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 zh-Hant: 
@@ -303,6 +303,7 @@ zh-Hant:
     report_header_canvas_xlist_course_id: canvas_xlist_course_id
     report_header_course: 課程
     report_header_course__id: course_id
+    report_header_course_format: course_format
     report_header_course_id: "課程 ID"
     report_header_course_name: 課程名稱
     report_header_course_sis: "課程 SIS"
@@ -712,6 +713,12 @@ zh-Hant:
     default_account_quotas_not_updated: 預設帳戶配額未更新
     default_account_quotas_updated: 預設帳戶配額已更新
     devry: 
+      attendance_extract: 
+        parameters: 
+          custom_reports: 
+            start: 
+              parameters: 
+                header: 活動日期：
       dcr2: 
         parameters: 
           custom_reports: 
@@ -728,6 +735,24 @@ zh-Hant:
               parameters: 
                 header: 開始時間：
       dcr7: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: 結束時間：
+            start: 
+              parameters: 
+                header: 開始時間：
+      no_submissions: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: 結束時間：
+            start: 
+              parameters: 
+                header: 開始時間：
+      submissions_detail: 
         parameters: 
           custom_reports: 
             end: 
@@ -2136,6 +2161,8 @@ zh-Hant:
         remove_these_dates: 刪除這些日期
     edit: 
       edit_assignment: 編輯任務
+      links: 
+        add_rubric: 題目
     edit_header_view: 
       buttons: 
         not_published: 未發佈
@@ -3417,12 +3444,30 @@ zh-Hant:
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: 如果學生選擇此答案，則按一下以為其輸入評論
   click_to_load_a020891b: （按一下以載入）
   click_to_modify_89fa26aa: 按一下進行修改
+  click_to_order_by_email_ascending_98b1a697: 按此通過電子郵件升序排序
+  click_to_order_by_last_login_ascending_502b6ad2: 按此通過最後登入升序排序
+  click_to_order_by_sis_id_ascending_692d35a7: "按此通過 SIS ID 升序排序"
   click_to_publish_ad27be9d: 點擊發佈。
   click_to_report_profile_picture_370f9625: 按一下報告個人檔案圖片
   click_to_select_bd3b3a0d: 點擊以選取
   click_to_select_user_name_41746803: "點擊以選取使用者%{name}"
   click_to_set_this_answer_as_correct_1326e3fd: 按一下以將此答案設置為正確答案
   click_to_skip_address_8f874b32: "點擊以略過%{address}"
+  click_to_sort_by_email_ascending_cb789ec4: 按此通過電子郵件升序分類
+  click_to_sort_by_email_descending_72801b54: 按此通過電子郵件降序分類
+  click_to_sort_by_enrollments_ascending_f535b994: 按此通過註冊學生升序分類
+  click_to_sort_by_enrollments_descending_3e5c80ee: 按此通過註冊學生降序分類
+  click_to_sort_by_last_login_ascending_eafcbee4: 按此通過最後登入升序分類
+  click_to_sort_by_last_login_descending_61fdadc: 按此通過最後登入降序分類
+  click_to_sort_by_name_ascending_739c011e: 按此通過名稱升序分類
+  click_to_sort_by_name_descending_b6262093: 按此通過名稱降序分類
+  click_to_sort_by_sis_id_ascending_832c870: "按此通過 SIS ID 升序分類"
+  click_to_sort_by_sis_id_descending_2d611236: "按此通過 SIS ID 降序分類"
+  click_to_sort_by_subaccount_ascending_11252bc4: 按此通過子帳戶升序分類
+  click_to_sort_by_subaccount_descending_3d8a2381: 按此通過子帳戶降序分類
+  click_to_sort_by_teacher_ascending_cda7a18c: 按此通過教師升序分類
+  click_to_sort_by_teacher_descending_45ef0d1e: 按此通過教師降序分類
+  click_to_sort_c81ff8c8: 按此分類。
   click_to_test_a_different_score_2e0bb6f0: 按一下以測試不同的成績
   click_to_test_dropdown_b950974d: 按一下此處測試下拉列表
   click_to_unpublish_5b19e761: 點擊取消發佈。
@@ -3442,6 +3487,8 @@ zh-Hant:
   closes_5c6b4367: 關閉：
   code_is_case_sensitive_d8175cad: 密碼會區分大小寫
   cog_icon_69bdffd5: 齒輪圖標
+  col_is_sorted_ascending_cc5152cc: "%{col} 已升序排列。"
+  col_is_sorted_descending_1cef74aa: "%{col} 已降序排列。"
   collaboration: 
     default_title: 未命名的協作
   collaboration_71c024f4: 協作
@@ -4625,6 +4672,7 @@ zh-Hant:
   count_items_selected_91814713: 
     one: "已選擇 %{count} 個項目 "
     other: "已選擇 %{count} 個項目"
+  count_items_would_be_deleted_and_exceeds_the_set_t_a4a21dbe: "%{count} 項目將被刪除，並超過設定閾值%{change_threshold}%"
   count_max_students_2db76773: "%{count} 個/最多 %{max} 個學生"
   count_max_users_bdebb537: "%{count} 個/最多 %{max} 個使用者"
   count_messages_4f8ff204: 
@@ -5865,6 +5913,7 @@ zh-Hant:
       year: 年
   day_9d999bec: 日
   day_s_7cc1231f: 日（複數）
+  days_late_a3a721b0: （已晚天數）
   deactivate_this_key_3e79a2b5: 停用此鍵
   deactivate_user_86c09036: 停用此使用者
   decaying_average_8bf6a0dd: 衰減平均分
@@ -7547,6 +7596,7 @@ zh-Hant:
   generating_preview_ae83830: 創建預覽...
   germany_49_fc5b8179: "德國 (+49)"
   germany_b02d91c9: 德國
+  get_started_b9507525: 開始使用
   get_the_following_from_your_salesforce_connected_a_881fc9a3: "從您的 Salesforce 連接應用程式獲取以下內容"
   get_your_users_error_reports_posted_to_salesforce__76f57839: "獲取您發佈到 Salesforce 雲服務的使用者錯誤報告"
   get_your_users_error_reports_posted_to_salesforce_dfb1a6c2: "獲取您發佈到 Salesforce 的使用者錯誤報告"
@@ -7624,6 +7674,7 @@ zh-Hant:
       submit_comment: 提交註解
       submitting: 正在提交...
     cancel_button: 取消
+    canvadoc_expiring: "您的 Canvas DocViewer 會話快將過期。請重新加載視窗，以免喪失任何工作。"
     click_to_change: 按一下以測試不同的成績
     column_header: 
       assignment_options: 任務選項
@@ -8875,6 +8926,8 @@ zh-Hant:
   host_8be927e0: 主機
   host_is_unreachable_or_not_pointing_to_catalog_fb3fc082: "主機無法訪問或未指向 Catalog"
   hour_34d02553: 小時
+  hour_s_b6e8d238: 小時
+  hours_late_989e9081: （已晚小時數）
   hover_over_me_496521b9: 掛在我上方
   how_is_this_affecting_you_b3b6a639: 問題對您造成什麼影響？
   how_many_minutes_ecca5ee7: 多少分鐘？
@@ -8888,6 +8941,7 @@ zh-Hant:
   i_need_some_help_but_it_is_not_urgent_d967ea0a: 我需要一些支援，但並不緊急
   ic_actions: 
     manage: 管理
+  iceland_354_1a03c558: "冰島 (+354)"
   icon_215a1dc6: 圖標
   icons: 
     discussion_submission: 討論提交
@@ -9471,6 +9525,7 @@ zh-Hant:
   loading_25990131: 正在載入...
   loading_725811ca: 加載中
   loading_announcements_b927a86c: 通告載入中
+  loading_assignments_352ec769: 任務載入中
   loading_associations_9da66c4e: 正在載入關聯
   loading_associations_complete_b93a9c6e: 完成載入關聯
   loading_associations_started_1f65d8d: 開始載入關聯
@@ -9485,7 +9540,9 @@ zh-Hant:
   loading_data_ecd89ba: 載入資料中..
   loading_graders_f6a76142: 正在載入評分人
   loading_mastery_paths_c558a766: 正在載入精通路徑...
+  loading_more_grade_history_results_b235de5: 載入更多評分紀錄結果。
   loading_more_results_def6df65: 正在載入更多結果...
+  loading_results_769c8819: 正在載入結果
   loading_results_spinner_73ef739c: 正在載入結果微調項目
   loading_students_30b71301: 正在載入學生
   loading_sync_history_9f342cbf: 載入同步歷史
@@ -11766,6 +11823,7 @@ zh-Hant:
   more_courses_5ebbe998: 更多課程
   more_info_at_course_name_56dc8c10: "在 %{course_name} 上有更多資訊"
   more_information_3dfb76b5: 更多資訊
+  more_results_were_added_at_the_bottom_of_the_page_dc323877: 更多結果已被添至頁面底部。
   more_than_999_submissions_need_grading_bc087dd0: "超過 999 個提交件需要被評分"
   more_than_9_submissions_need_grading_30157d49: "超過 9個提交件需要被評分"
   more_than_a19b440: "%{more_than}+"
@@ -11960,6 +12018,7 @@ zh-Hant:
   nickname_7df95b09: 暱稱：
   no_74e9b590: 否
   no_assignment_name_adbb215b: 無任務名稱
+  no_assignments_with_that_name_found_1d7be1: 找不到該作業名稱
   no_associated_terms_13bacefc: 沒有相關的學期
   no_attributes_locked_611c5cc: 沒有鎖定屬性
   no_broken_links_found_38d951e3: 找不到斷鏈
@@ -11987,6 +12046,7 @@ zh-Hant:
   no_ltis_configured_f4b9bc6b: "沒有 LTIs 配置"
   no_matching_users_found_83889c10: 沒有找到相符的使用者。
   no_migration_file: 內容遷移所需的文檔。
+  no_more_results_to_load_6774fb1c: 再無能夠載入的結果。
   no_outcome_file_or_authority_given_c90f9c5f: 沒有提供結果文檔或授權
   no_password_was_given_472222e5: 沒有提供密碼
   no_placements_enabled_f705f28: 未啟用配置
@@ -11994,6 +12054,7 @@ zh-Hant:
   no_points_possible_72db3a55: 沒有可能分數
   no_results_f36777ee: 無結果
   no_results_found_58717065: 找不到結果
+  no_results_found_e4b686bd: 未找到結果。
   no_score_yet_c94e919b: 尚無分數
   no_students_dd8de9f0: 無學生
   no_students_have_taken_the_quiz_yet_e667644b: 還沒有學生參加該測驗
@@ -16437,6 +16498,9 @@ zh-Hant:
       titles: 
         full_comments: 按一下以檢視全部評論
         linked_to_learning_outcome: 此標準連結至學習成果
+    rubrics_component: 
+      links: 
+        assign_rubric: 指派題目
     select_content_dialog: 
       add_to_module: "添加 %{item} 至*單元*"
       assignment_item: "任務 ID"
@@ -16796,6 +16860,7 @@ zh-Hant:
   something_is_broken_but_i_can_work_around_it_for_n_7fcedb9d: 有些地方出現了問題，但我現在可以採取應變措施
   something_went_wrong_inactivating_the_user_please__ea7d0001: 在停用用戶時出錯了，請稍後再試一次。
   something_went_wrong_please_try_again_6d337b6c: 出錯了，請稍後再試一次。
+  something_went_wrong_please_try_refreshing_the_pag_4e14a67: "似乎出問題了。請嘗試刷新頁面。如問題依然存在，可能因為「%{assignmentTitle}」一欄已載入太多記錄 SpeedGrader。"
   something_went_wrong_re_activating_the_user_please_82c3e7a: 在重新啟用使用者時出錯了，請稍後再試一次。
   something_went_wrong_updating_the_user_s_role_plea_5de95400: 更新使用者身份時出錯了。請稍後再試一次。
   something_went_wrong_when_trying_to_sync_grades_to_592c4c35: 嘗試同步成績至學生資訊系統時出錯了。請稍後再試。
@@ -16806,9 +16871,11 @@ zh-Hant:
   sortable_name_73f707cf: 可排序的名稱
   sorted_ascending_1f9b52c6: 升序排列。
   sorted_ascending_2318ec99: 升序排列
+  sorted_ascending_3138603c: 升序排列。
   sorted_ascending_b6d61547: 升序排列
   sorted_descending_1e30f0d5: 降序排列
   sorted_descending_7fcec1ff: 降序排列
+  sorted_descending_84ec84c8: 降序排列。
   sorted_descending_d9aa3cf8: 降序排列。
   source_code_2395ca74: 源代碼
   south_korea_16d43049: 韓國
@@ -16973,6 +17040,7 @@ zh-Hant:
   students_will_automatically_receive_full_credit_on_cc61df39: 在學生參加調查之後，其將自動獲得全部學分
   students_with_no_submissions_title: 沒有提交件的學生
   studentsperrangecount_out_of_totalstudentsenrolled_90cbfaf1: "%{studentsPerRangeCount} 來自於 %{totalStudentsEnrolled} 學生數"
+  sub_account_daeadd0: 子帳戶
   sub_accounts: 
     alerts: 
       subaccount_has_courses: 無法刪除其中含有課程的子帳戶
@@ -17042,6 +17110,7 @@ zh-Hant:
     view_rubric_assessment_in_the_speedgrader: "在 SpeedGrader 中檢視評估量表評估"
   submission_in_another_grading_period_e754b329: 另一個評分週期內的提交件
   submission_options_5184a65b: 提交件選項
+  submission_status_3079e730: 提交項目狀態
   submission_tray_429ac3df: 提交項目收集箱
   submissions: 
     assignment_submit_success: 任務已成功提交。

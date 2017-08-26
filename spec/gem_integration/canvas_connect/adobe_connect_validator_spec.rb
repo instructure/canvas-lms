@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
 describe Canvas::Plugins::Validators::AdobeConnectValidator do
-  let(:plugin_setting) { mock }
+  let(:plugin_setting) { double }
 
   subject { Canvas::Plugins::Validators::AdobeConnectValidator }
 
@@ -32,7 +32,7 @@ describe Canvas::Plugins::Validators::AdobeConnectValidator do
   end
 
   it 'should error on missing keys' do
-    plugin_setting.expects(:errors).returns(stub(add: true))
+    expect(plugin_setting).to receive(:errors).and_return(double(add: true))
     expect(subject.validate(to_params(:domain => 'example.com'), plugin_setting)).to be_falsey
   end
 

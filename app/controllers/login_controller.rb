@@ -79,8 +79,8 @@ class LoginController < ApplicationController
 
     unless flash[:delegated_message]
       return redirect_to url_for({ controller: "login/#{auth_type}", action: :new }
-                                     .merge(params.permit(:id))
-                                     .merge(params.permit(pseudonym_session: :unique_id).to_h))
+                                     .merge(params.permit(:id).to_unsafe_h)
+                                     .merge(params.permit(pseudonym_session: :unique_id).to_unsafe_h))
     end
 
     # we had an error from an SSO - we need to show it

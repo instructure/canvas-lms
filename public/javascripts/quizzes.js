@@ -1833,9 +1833,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         }
 
         data['quiz[title]'] = quiz_title;
-        if (lockedItems.content) {
-          data['quiz[description]'] = quizModel.get('description')
-        } else {
+        if (!lockedItems.content) {
           data['quiz[description]'] = RichContentEditor.callOnRCE($('#quiz_description'), 'get_code');
         }
         if ($("#quiz_notify_of_update").is(':checked')) {

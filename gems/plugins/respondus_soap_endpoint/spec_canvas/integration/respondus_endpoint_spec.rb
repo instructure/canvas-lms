@@ -47,7 +47,7 @@ describe "Respondus SOAP API", type: :request do
     streamHandler = soap.proxy.streamhandler
     method_args = [userName, password, context, *(args.map(&:last))]
     streamHandler.capture(soap, method, *method_args) do |s_body, s_headers|
-      post "/api/respondus/soap", s_body, s_headers
+      post "/api/respondus/soap", params: s_body, headers: s_headers
       response
     end
   end
@@ -251,8 +251,8 @@ Implemented for: Canvas LMS}
       self.workflow_state = 'imported'
       self.migration_settings[:imported_assets] = ["quizzes:quiz_xyz"]
     end
-    ContentMigration.stubs(:new).returns(mock_migration)
-    ContentMigration.stubs(:find).with(mock_migration.id).returns(mock_migration)
+    allow(ContentMigration).to receive(:new).and_return(mock_migration)
+    allow(ContentMigration).to receive(:find).with(mock_migration.id).and_return(mock_migration)
 
     status, details, context, item_id = soap_request(
       'PublishServerItem', 'nobody@example.com', 'asdfasdf', context,
@@ -279,8 +279,8 @@ Implemented for: Canvas LMS}
       def @mock_migration.export_content
         self.workflow_state = 'importing'
       end
-      ContentMigration.stubs(:new).returns(@mock_migration)
-      ContentMigration.stubs(:find).with(@mock_migration.id).returns(@mock_migration)
+      allow(ContentMigration).to receive(:new).and_return(@mock_migration)
+      allow(ContentMigration).to receive(:find).with(@mock_migration.id).and_return(@mock_migration)
 
       status, details, context, item_id = soap_request(
         'PublishServerItem', 'nobody@example.com', 'asdfasdf', context,

@@ -154,12 +154,13 @@ module Lti
         }
 
         lti_assignment_id = Lti::Security.decoded_lti_assignment_id(params[:secure_params])
-        launch_attrs[:ext_lti_assignment_id] = lti_assignment_id
+        launch_attrs[:ext_lti_assignment_id] = lti_assignment_id if lti_assignment_id.present?
 
         @lti_launch = Launch.new
         tag = find_tag
         custom_param_opts = prep_tool_settings(message_handler.parameters, tool_proxy, launch_attrs[:resource_link_id])
         custom_param_opts[:content_tag] = tag if tag
+        custom_param_opts[:secure_params] = params[:secure_params] if params[:secure_params].present?
         tool_setting = ToolSetting.find_by(resource_link_id: resource_link_id)
         variable_expander = create_variable_expander(custom_param_opts.merge(tool: tool_proxy,
                                                                              tool_setting: tool_setting))

@@ -264,7 +264,7 @@ describe Message do
       end
 
       it "deletes unreachable push endpoints" do
-        ne = mock()
+        ne = double()
         expect(ne).to receive(:push_json).and_return(false)
         expect(ne).to receive(:destroy)
         expect(@user).to receive(:notification_endpoints).and_return([ne])
@@ -274,7 +274,7 @@ describe Message do
       end
 
       it "delivers to each of a user's push endpoints" do
-        ne = mock()
+        ne = double()
         expect(ne).to receive(:push_json).twice.and_return(true)
         expect(ne).to receive(:destroy).never
         expect(@user).to receive(:notification_endpoints).and_return([ne, ne])

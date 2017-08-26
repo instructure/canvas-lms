@@ -58,7 +58,6 @@ describe AssignmentsApiController, type: :request do
 
   def create_override_for_assignment(assignment=@assignment)
       override = @assignment.assignment_overrides.build
-      @assignment.any_instantiation.unstub(:overridden_for)
       override.title = "I am overridden and being returned in the API!"
       override.set = @section
       override.set_type = 'CourseSection'
@@ -124,6 +123,34 @@ describe AssignmentsApiController, type: :request do
       @course.assignments.create!(title: "Example Assignment", post_to_sis: true)
       json = api_get_assignments_index_from_course(@course)
       expect(json.first['max_name_length']).to eq(20)
+    end
+
+    it 'returns all assignments using paging' do
+      group1 = @course.assignment_groups.create!(:name => 'group1')
+      41.times do
+        @course.assignments.create!(:title => 'assignment1',
+          :assignment_group => group1).
+          update_attribute(:position, 0)
+      end
+      assignment_ids = []
+      page = 1
+      loop do
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/assignments.json?per_page=10&page=#{page}",
+                        {
+                            :controller => 'assignments_api',
+                            :action => 'index',
+                            :format => 'json',
+                            :course_id => @course.id.to_s,
+                            :per_page => '10',
+                            :page => page.to_s
+                        })
+        assignment_ids.concat(json.map { |a| a['id'] })
+        break if json.empty?
+        page +=1
+      end
+      expect(assignment_ids.count).to eq(41)
+      expect(assignment_ids.uniq.count).to eq(41)
     end
 
     it "sorts the returned list of assignments" do
@@ -578,7 +605,7 @@ describe AssignmentsApiController, type: :request do
       end
 
       it "should include overrides if overrides flag is included in the params" do
-        ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
+        allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
         assignments_json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments",
           {
             controller: 'assignments_api',
@@ -949,6 +976,8 @@ describe AssignmentsApiController, type: :request do
         :assignment_group => @group,
         :due_at => Time.zone.now + 1.week
       )
+      assignment.save!
+      assignment.insert_at(1)
       json = api_call_as_user(@teacher, :post,
         "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json",
         { :controller => "assignments_api",
@@ -959,6 +988,22 @@ describe AssignmentsApiController, type: :request do
         {},
         { :expected_status => 200 })
       expect(json["name"]).to eq "some assignment Copy"
+
+      expect(json["assignment_group_id"]).to eq assignment.assignment_group_id
+
+      # The new assignment should have the desired position, and nothing else
+      # in the group should have the same position.
+      new_id = json["id"]
+      new_position = json["position"]
+      expect(new_position).to eq 2
+      assignments_in_group = Assignment.active
+        .by_assignment_group_id(assignment.assignment_group_id)
+        .pluck("id", "position")
+      assignments_in_group.each do |id, position|
+       if id != new_id
+         expect(position).not_to eq(new_position)
+       end
+      end
     end
 
     it "should require non-quiz" do
@@ -1157,10 +1202,10 @@ describe AssignmentsApiController, type: :request do
       @course.assignment_groups.create!({:name => "last group",
         :position => 2})
       @group_category = @course.group_categories.create!(name: "foo")
-      @course.any_instantiation.expects(:turnitin_enabled?).
-        at_least_once.returns true
-      @course.any_instantiation.expects(:vericite_enabled?).
-        at_least_once.returns true
+      expect_any_instantiation_of(@course).to receive(:turnitin_enabled?).
+        at_least(:once).and_return true
+      expect_any_instantiation_of(@course).to receive(:vericite_enabled?).
+        at_least(:once).and_return true
       @json = api_create_assignment_in_course(@course,
         create_assignment_json(@group, @group_category).merge({'muted' => 'true'})
        )
@@ -1227,7 +1272,7 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "does not allow modifying turnitin_enabled when not enabled on the context" do
-      Course.any_instance.expects(:turnitin_enabled?).at_least_once.returns false
+      expect_any_instance_of(Course).to receive(:turnitin_enabled?).at_least(:once).and_return false
       response = api_create_assignment_in_course(@course,
             { 'name' => 'some assignment',
               'turnitin_enabled' => false
@@ -1239,7 +1284,7 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "does not allow modifying vericite_enabled when not enabled on the context" do
-      Course.any_instance.expects(:vericite_enabled?).at_least_once.returns false
+      expect_any_instance_of(Course).to receive(:vericite_enabled?).at_least(:once).and_return false
       response = api_create_assignment_in_course(@course,
             { 'name' => 'some assignment',
               'vericite_enabled' => false
@@ -1287,7 +1332,7 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "sets the configuration LTI 2 tool in account context" do
-      AssignmentConfigurationToolLookup.any_instance.stubs(:create_subscription).returns true
+      allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:create_subscription).and_return true
       account = @course.account
       product_family = Lti::ProductFamily.create(
         vendor_code: '123',
@@ -1334,7 +1379,7 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "sets the configuration an LTI 2 tool in course context" do
-      AssignmentConfigurationToolLookup.any_instance.stubs(:create_subscription).returns true
+      allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:create_subscription).and_return true
       account = @course.account
       product_family = Lti::ProductFamily.create(
         vendor_code: '123',
@@ -1891,13 +1936,15 @@ describe AssignmentsApiController, type: :request do
     end
 
     context "sis validations enabled" do
-      it 'saves with a section with a valid due_date' do
+      before do
         a = @course.account
         a.enable_feature!(:new_sis_integrations)
         a.settings[:sis_syncing] = {value: true}
         a.settings[:sis_require_assignment_due_date] = {value: true}
         a.save!
+      end
 
+      it 'saves with a section override with a valid due_date' do
         assignment_params = {
           'post_to_sis' => true,
           'assignment_overrides' => {
@@ -1910,8 +1957,88 @@ describe AssignmentsApiController, type: :request do
 
         json = api_create_assignment_in_course(@course, assignment_params)
 
-        # expect(json["errors"]).to be_nil
-        expect(json["errors"]).to have_key('due_at')
+        expect(json["errors"]).to be_nil
+      end
+
+      it 'does not save with a section override without a due date' do
+        assignment_params = {
+          'post_to_sis' => true,
+          'assignment_overrides' => {
+            '0' => {
+                'course_section_id' => @course.default_section.id,
+                'due_at' => nil
+            }
+          }
+        }
+
+        json = api_create_assignment_in_course(@course, assignment_params)
+
+        expect(json["errors"]&.keys).to eq ['due_at']
+      end
+
+      it 'saves with an empty section override' do
+        assignment_params = {
+          'due_at' => 7.days.from_now.iso8601,
+          'post_to_sis' => true,
+          'assignment_overrides' => {}
+        }
+
+        json = api_create_assignment_in_course(@course, assignment_params)
+
+        expect(json["errors"]).to be_nil
+      end
+
+      it 'does not save without a due date' do
+        json = api_create_assignment_in_course(@course, 'post_to_sis' => true)
+
+        expect(json["errors"]&.keys).to eq ['due_at']
+      end
+
+      it 'saves with an assignment with a valid due_date' do
+        assignment_params = {
+          'post_to_sis' => true,
+          'due_at' => 7.days.from_now.iso8601
+        }
+
+        json = api_create_assignment_in_course(@course, assignment_params)
+
+        expect(json["errors"]).to be_nil
+      end
+
+      it 'saves with an assignment with a valid title' do
+        account = @course.account
+        account.settings[:sis_assignment_name_length] = {value: true}
+        account.settings[:sis_assignment_name_length_input] = {value: 10}
+        account.save!
+
+        assignment_params = {
+          'name' => 'Gil Faizon',
+          'post_to_sis' => true,
+          'due_at' => 7.days.from_now.iso8601
+        }
+
+        json = api_create_assignment_in_course(@course, assignment_params)
+
+        expect(json["errors"]).to be_nil
+      end
+
+      it 'does not save with an assignment with an invalid title length' do
+        account = @course.account
+        account.settings[:sis_assignment_name_length] = {value: true}
+        account.settings[:sis_assignment_name_length_input] = {value: 10}
+        account.save!
+
+        assignment_params = {
+          'name' => 'Too Much Tuna',
+          'post_to_sis' => true,
+          'due_at' => 7.days.from_now.iso8601
+        }
+
+        json = api_create_assignment_in_course(@course, assignment_params)
+
+        expect(json["errors"]).to_not be_nil
+        expect(json["errors"]&.keys).to eq ['title']
+        expect(json["errors"]["title"].first["message"]).to eq("The title cannot be longer than 10 characters")
       end
     end
   end
@@ -2514,7 +2641,7 @@ describe AssignmentsApiController, type: :request do
       end
 
       before :each do
-        PluginSetting.stubs(:settings_for_plugin).returns({"title" => "yes"}).at_least_once
+        allow(PluginSetting).to receive(:settings_for_plugin).and_return({"title" => "yes"}).at_least(:once)
       end
 
       it "doesn't allow the non-admin to update a frozen attribute" do
@@ -2539,8 +2666,8 @@ describe AssignmentsApiController, type: :request do
       it "allows the admin to update the frozen assignment" do
         @user = account_admin_user
         course_with_teacher(:active_all => true, :user => @user)
-        PluginSetting.expects(:settings_for_plugin).
-          returns(fully_frozen_settings).at_least_once
+        expect(PluginSetting).to receive(:settings_for_plugin).
+          and_return(fully_frozen_settings).at_least(:once)
         @assignment = create_frozen_assignment_in_course(@course)
         raw_api_update_assignment(@course,@assignment,{
           'name' => "This changes!"
@@ -3132,9 +3259,9 @@ describe AssignmentsApiController, type: :request do
       end
 
       before :each do
-        @assignment.any_instantiation.stubs(:overridden_for).
-          returns @assignment
-        @assignment.any_instantiation.stubs(:locked_for?).returns(
+        allow_any_instantiation_of(@assignment).to receive(:overridden_for).
+          and_return @assignment
+        allow_any_instantiation_of(@assignment).to receive(:locked_for?).and_return(
           {:asset_string => '', :unlock_at => 1.hour.from_now }
         )
       end
@@ -3326,9 +3453,9 @@ describe AssignmentsApiController, type: :request do
           :title => "Locked Assignment",
           :description => "locked!"
         )
-        @assignment.any_instantiation.expects(:overridden_for)
-          .returns @assignment
-        @assignment.any_instantiation.expects(:locked_for?).returns({
+        expect_any_instantiation_of(@assignment).to receive(:overridden_for)
+          .and_return @assignment
+        expect_any_instantiation_of(@assignment).to receive(:locked_for?).and_return({
           :asset_string => '',
           :unlock_at => 1.hour.from_now
         }).at_least(1)
@@ -3347,9 +3474,9 @@ describe AssignmentsApiController, type: :request do
           :title => "Locked but Viewable Assignment",
           :description => "locked but viewable!"
         )
-        @assignment.any_instantiation.expects(:overridden_for)
-          .returns @assignment
-        @assignment.any_instantiation.expects(:locked_for?).returns({
+        expect_any_instantiation_of(@assignment).to receive(:overridden_for)
+          .and_return @assignment
+        expect_any_instantiation_of(@assignment).to receive(:locked_for?).and_return({
           :asset_string => '',
           :unlock_at => 1.hour.ago,
           :can_view => true
@@ -3382,7 +3509,7 @@ describe AssignmentsApiController, type: :request do
         before do
           @user = @teacher
           @assignment = create_frozen_assignment_in_course(@course)
-          PluginSetting.stubs(:settings_for_plugin).returns {}
+          allow(PluginSetting).to receive(:settings_for_plugin).and_return(nil)
           @json = api_get_assignment_in_course(@assignment,@course)
         end
 
@@ -3402,7 +3529,7 @@ describe AssignmentsApiController, type: :request do
           end
 
           before :each do
-            PluginSetting.stubs(:settings_for_plugin).returns({"title" => "yes"})
+            allow(PluginSetting).to receive(:settings_for_plugin).and_return({"title" => "yes"})
             @json = api_get_assignment_in_course(@assignment,@course)
           end
 
@@ -3419,7 +3546,7 @@ describe AssignmentsApiController, type: :request do
           end
 
           it "returns an empty list when no frozen attributes" do
-            PluginSetting.stubs(:settings_for_plugin).returns({})
+            allow(PluginSetting).to receive(:settings_for_plugin).and_return({})
             json = api_get_assignment_in_course(@assignment,@course)
             expect(json['frozen_attributes']).to eq []
           end
@@ -3435,9 +3562,9 @@ describe AssignmentsApiController, type: :request do
           end
 
           before :each do
-            PluginSetting.stubs(:settings_for_plugin).returns({"title" => "yes"}) #enable plugin
-            @assignment.any_instantiation.expects(:overridden_for).returns @assignment
-            @assignment.any_instantiation.expects(:frozen?).at_least_once.returns false
+            allow(PluginSetting).to receive(:settings_for_plugin).and_return({"title" => "yes"}) #enable plugin
+            expect_any_instantiation_of(@assignment).to receive(:overridden_for).and_return @assignment
+            expect_any_instantiation_of(@assignment).to receive(:frozen?).at_least(:once).and_return false
             @json = api_get_assignment_in_course(@assignment,@course)
           end
 
@@ -3586,7 +3713,7 @@ describe AssignmentsApiController, type: :request do
       end
 
       it "should include overrides if overrides flag is included in the params" do
-        ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
+        allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
         assignments_json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments/#{@assignment1.id}.json",
           {
             controller: 'assignments_api',
@@ -3794,6 +3921,7 @@ describe AssignmentsApiController, type: :request do
          "assignment_id" => @assignment.id,
          "attempt" => nil,
          "body" => nil,
+         "cached_due_date" => nil,
          "excused" => nil,
          "grade" => "99",
          "entered_grade" => "99",
@@ -3830,6 +3958,7 @@ describe AssignmentsApiController, type: :request do
          "assignment_id" => @assignment.id,
          "attempt" => nil,
          "body" => nil,
+         "cached_due_date" => nil,
          "excused" => nil,
          "grade" => "99",
          "entered_grade" => "99",
@@ -3870,7 +3999,7 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "should preload student_ids when including adhoc overrides" do
-      @override.any_instantiation.expects(:assignment_override_students).never
+      expect_any_instantiation_of(@override).to receive(:assignment_override_students).never
 
       json = api_call_as_user(@teacher, :get,
         "/api/v1/courses/#{@course.id}/assignments?include[]=overrides",
@@ -3884,7 +4013,7 @@ describe AssignmentsApiController, type: :request do
     it "should preload student_ids when including adhoc overrides on assignment groups api as well" do
       # yeah i know this is a separate api; sue me
 
-      @override.any_instantiation.expects(:assignment_override_students).never
+      expect_any_instantiation_of(@override).to receive(:assignment_override_students).never
 
       json = api_call_as_user(@teacher, :get,
         "/api/v1/courses/#{@course.id}/assignment_groups?include[]=assignments&include[]=overrides",

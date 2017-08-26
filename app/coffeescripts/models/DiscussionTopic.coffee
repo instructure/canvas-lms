@@ -94,6 +94,7 @@ define [
 
     toJSON: ->
       json = super
+      delete json.message if (ENV.MASTER_COURSE_DATA?.is_master_course_child_content && ENV.MASTER_COURSE_DATA?.master_course_restrictions?.content)
       delete json.assignment unless json.set_assignment
       _.extend json,
         summary: @summary()

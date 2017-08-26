@@ -29,7 +29,7 @@ describe DisablePostToSisApiController do
     end
 
     it 'responds with 400 when post_to_sis is disabled' do
-      put 'disable_post_to_sis', course_id: course.id
+      put 'disable_post_to_sis', params: {course_id: course.id}
 
       parsed_json = json_parse(response.body)
       expect(response.code).to eq "400"
@@ -45,7 +45,7 @@ describe DisablePostToSisApiController do
       it 'responds with 400 when course is unpublished' do
         course.workflow_state = 'unpublished'
         course.save!
-        put 'disable_post_to_sis', course_id: course.id
+        put 'disable_post_to_sis', params: {course_id: course.id}
 
         parsed_json = json_parse(response.body)
         expect(response.code).to eq "400"
@@ -53,7 +53,7 @@ describe DisablePostToSisApiController do
       end
 
       it 'responds with 200' do
-        put 'disable_post_to_sis', course_id: course.id
+        put 'disable_post_to_sis', params: {course_id: course.id}
 
         expect(response.code).to eq "204"
         expect(response.success?).to be_truthy
@@ -64,7 +64,7 @@ describe DisablePostToSisApiController do
                                       post_to_sis: true,
                                       workflow_state: 'published')
 
-        put 'disable_post_to_sis', course_id: course.id
+        put 'disable_post_to_sis', params: {course_id: course.id}
         assignment = Assignment.find(assignment.id)
 
         expect(response.code).to eq "204"
@@ -89,8 +89,8 @@ describe DisablePostToSisApiController do
         end
 
         it 'responds with 400 when grading period does not exist' do
-          put 'disable_post_to_sis', course_id: course.id,
-                                     grading_period_id: 789465789
+          put 'disable_post_to_sis', params: {course_id: course.id,
+                                     grading_period_id: 789465789}
 
           parsed_json = json_parse(response.body)
           expect(response.code).to eq "400"
@@ -103,8 +103,8 @@ describe DisablePostToSisApiController do
                                         workflow_state: 'published',
                                         due_at: grading_period.start_date + 1.minute)
 
-          put 'disable_post_to_sis', course_id: course.id,
-                                     grading_period_id: grading_period.id
+          put 'disable_post_to_sis', params: {course_id: course.id,
+                                     grading_period_id: grading_period.id}
           assignment = Assignment.find(assignment.id)
 
           expect(response.code).to eq "204"

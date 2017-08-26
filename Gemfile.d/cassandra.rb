@@ -16,10 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 group :cassandra do
-  gem 'cassandra-cql', '1.2.2', github: 'kreynolds/cassandra-cql', ref: 'fa9e4253ec35e1066f76418b1cd6ee03019ecb82' #dependency of canvas_cassandra
+  gem 'cassandra-cql', '1.2.3', github: 'kreynolds/cassandra-cql', ref: '02b5abbe441a345c051a180327932566fd66bb36' #dependency of canvas_cassandra
     gem 'simple_uuid', '0.4.0', require: false
-    gem 'thrift', '0.8.0', require: false
-    gem 'thrift_client', '0.8.4', require: false
+    gem 'thrift', '0.9.3.0', require: false
+    gem 'thrift_client', '0.9.3', require: false, github: 'twitter/thrift_client', ref: '5c10d59881825cb8e26ab1aa8f1d2738e88c0e83'
   gem "canvas_cassandra", path: "gems/canvas_cassandra"
 end
 

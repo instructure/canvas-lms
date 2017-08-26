@@ -30,4 +30,9 @@ class I18nTimeZone < ActiveSupport::TimeZone
   def keyify
     "time_zones.#{name.gsub(/(\W|\s)/,'').underscore}"
   end
+
+  def self.us_zones
+    # only include specially named zones
+    super.select { |zone| ActiveSupport::TimeZone::MAPPING.include?(zone.name) }
+  end
 end

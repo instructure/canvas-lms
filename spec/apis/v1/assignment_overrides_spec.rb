@@ -420,7 +420,6 @@ describe AssignmentOverridesController, type: :request do
 
       context "title" do
         before :once do
-          @override = assignment_override_model
           names = ["Adam Aardvark", "Ben Banana", "Chipmunk Charlie", "Donald Duck", "Erik Erikson", "Freddy Frog"]
           @students = names.map do |name|
             student_in_course(course: @course, :user => user_with_pseudonym(name: name)).user
@@ -775,7 +774,7 @@ describe AssignmentOverridesController, type: :request do
         expect(new_prog).to be_completed # since they can't see the assignment yet
 
         other_prog = mod.evaluate_for(@other_student)
-        other_prog.any_instantiation.expects(:evaluate!).never
+        expect_any_instantiation_of(other_prog).to receive(:evaluate!).never
 
         api_update_override(@course, @assignment, @override, :assignment_override => { :student_ids => [@new_student.id] })
 

@@ -60,7 +60,7 @@ describe PageView do
 
     it "should not start a db transaction on save" do
       PageView.new { |p| p.assign_attributes({ :user => @user, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcdef", :interaction_seconds => 5 }) }.store
-      PageView.connection.expects(:transaction).never
+      expect(PageView.connection).to receive(:transaction).never
       expect(PageView.find("abcdef")).to be_present
     end
 
@@ -91,7 +91,7 @@ describe PageView do
       end
 
       it "should store and load from cassandra when the birth shard is not the default shard" do
-        Shard.stubs(:birth).returns(@shard1)
+        allow(Shard).to receive(:birth).and_return(@shard1)
         @shard2.activate do
           expect {
             @page_view.request_id = "abcde2"
@@ -232,7 +232,7 @@ describe PageView do
         expect(@page_view.store).to be_truthy
         bucket = PageView.user_count_bucket_for_time(store_time)
         expect(Canvas.redis.smembers(bucket)).to eq [@user.global_id.to_s]
-        expect(Canvas.redis.ttl(bucket)).to be > 23.hours
+        expect(Canvas.redis.ttl(bucket)).to be > 23.hours.to_i
 
         store_time_2 = Time.zone.parse('2012-01-13T15:47:52Z')
         @user1 = @user
@@ -276,12 +276,11 @@ describe PageView do
   describe '.generate' do
     let(:params) { {:action => 'path', :controller => 'some'} }
     let(:session) { {:id => '42'} }
-    let(:request) { stub(:url => (@url || 'host.com/some/path'), :path_parameters => params, :user_agent => 'Mozilla', :session_options => session, :method => :get, :remote_ip => '0.0.0.0', :request_method => 'GET') }
+    let(:request) { double(:url => (@url || 'host.com/some/path'), :path_parameters => params, :user_agent => 'Mozilla', :session_options => session, :method => :get, :remote_ip => '0.0.0.0', :request_method => 'GET') }
     let(:user) { User.new }
     let(:attributes) { {:real_user => user, :user => user } }
 
-    before { RequestContextGenerator.stubs( :request_id => 'xyz' ) }
-    after { RequestContextGenerator.unstub :request_id }
+    before { allow(RequestContextGenerator).to receive_messages( :request_id => 'xyz' ) }
 
     subject { PageView.generate(request, attributes) }
 
@@ -359,7 +358,7 @@ describe PageView do
     end
 
     it "should force encoding on string fields" do
-      request = stub(:url => (@url || 'host.com/some/path'), :path_parameters => params, :user_agent => 'Mozilla', :session_options => session, :method => :get, :remote_ip => '0.0.0.0'.encode(Encoding::US_ASCII), :request_method => 'GET')
+      request = double(:url => (@url || 'host.com/some/path'), :path_parameters => params, :user_agent => 'Mozilla', :session_options => session, :method => :get, :remote_ip => '0.0.0.0'.encode(Encoding::US_ASCII), :request_method => 'GET')
       pv = PageView.generate(request,attributes)
 
       expect(pv.remote_ip.encoding).to eq Encoding::UTF_8
@@ -548,14 +547,14 @@ describe PageView do
 
   context "pv4" do
     before do
-      PageView.stubs(:pv4?).returns(true)
-      PageView.stubs(:page_view_method).returns(:pv4)
+      allow(PageView).to receive(:pv4?).and_return(true)
+      allow(PageView).to receive(:page_view_method).and_return(:pv4)
     end
 
     it "store doesn't do anything" do
       pv = PageView.new
-      pv.expects(:save).never
-      pv.expects(:store_page_view_to_user_counts)
+      expect(pv).to receive(:save).never
+      expect(pv).to receive(:store_page_view_to_user_counts)
       pv.user = User.new
       pv.store
     end

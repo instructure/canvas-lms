@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 - present Instructure, Inc.
+# Copyright (C) 2017 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,31 +15,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'mocha/api'
+class AddWorkflowStateToAccountUser < ActiveRecord::Migration[5.0]
+  tag :predeploy
+  disable_ddl_transaction!
 
-module MochaRspecAdapter
-  include Mocha::API
-  include ::RSpec::Mocks::ExampleMethods
-
-  # rspec-mocks shadows mocha's implementations of kind_of, instance_of, and
-  # anything. if you need those, please use rspec-mocks syntax
-
-  def setup_mocks_for_rspec
-    mocha_setup
-    ::RSpec::Mocks.setup
+  def change
+    add_column :account_users, :workflow_state, :string
+    change_column_default(:account_users, :workflow_state, 'active')
+    DataFixup::BackfillNulls.run(AccountUser, :workflow_state, default_value: 'active')
+    change_column_null(:account_users, :workflow_state, false)
+    add_index :account_users, :workflow_state, algorithm: :concurrently
   end
-
-  def verify_mocks_for_rspec
-    mocha_verify
-    ::RSpec::Mocks.verify
-  end
-
-  def teardown_mocks_for_rspec
-    mocha_teardown
-    ::RSpec::Mocks.teardown
-  end
-end
-
-RSpec.configure do |config|
-  config.mock_with MochaRspecAdapter
 end

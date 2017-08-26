@@ -22,7 +22,7 @@ describe Login::Oauth2Controller do
   let(:aac) { Account.default.authentication_providers.create!(auth_type: 'facebook') }
   before do
     aac
-    Canvas::Plugin.find(:facebook).stubs(:settings).returns({})
+    allow(Canvas::Plugin.find(:facebook)).to receive(:settings).and_return({})
 
     # replace on just this instance. this allows the tests to look directly at
     # response.location independent of any implementation plugins may add for
@@ -34,7 +34,7 @@ describe Login::Oauth2Controller do
 
   describe "#new" do
     it "redirects to the provider" do
-      get :new, auth_type: 'facebook'
+      get :new, params: {auth_type: 'facebook'}
       expect(response).to be_redirect
       expect(response.location).to match(%r{^https://www.facebook.com/dialog/oauth\?})
       expect(session[:oauth2_nonce]).to_not be_blank
@@ -42,8 +42,8 @@ describe Login::Oauth2Controller do
 
     it "wraps redirect in delegated_auth_redirect_uri" do
       # needs the `returns` or it returns nil and causes a 500
-      @controller.expects(:delegated_auth_redirect_uri).once.returns('/')
-      get :new, auth_type: 'facebook'
+      expect(@controller).to receive(:delegated_auth_redirect_uri).once.and_return('/')
+      get :new, params: {auth_type: 'facebook'}
       expect(response).to be_redirect
     end
   end
@@ -52,21 +52,21 @@ describe Login::Oauth2Controller do
     it "checks the OAuth2 CSRF token" do
       session[:oauth2_nonce] = 'bob'
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: 'different')
-      get :create, state: jwt
+      get :create, params: {state: jwt}
       # it could be a 422, or 0 if error handling isn't enabled properly in specs
       expect(response).to_not be_success
       expect(response).to_not be_redirect
     end
 
     it "rejects logins that take more than 10 minutes" do
-      get :new, auth_type: 'facebook'
+      get :new, params: {auth_type: 'facebook'}
       expect(response).to be_redirect
       state = CGI.parse(URI.parse(response.location).query)['state'].first
       expect(state).to_not be_nil
 
-      aac.any_instantiation.expects(:get_token).never
+      expect_any_instantiation_of(aac).to receive(:get_token).never
       Timecop.travel(15.minutes) do
-        get :create, state: state
+        get :create, params: {state: state}
         expect(response).to redirect_to(login_url)
         expect(flash[:delegated_message]).to eq "It took too long to login. Please try again"
       end
@@ -75,72 +75,72 @@ describe Login::Oauth2Controller do
     it "does not destroy existing sessions if it's a bogus request" do
       session[:sentinel] = true
 
-      get :create, state: ''
+      get :create, params: {state: ''}
       expect(response).not_to be_success
       expect(session[:sentinel]).to eq true
     end
 
     it "works" do
       session[:oauth2_nonce] = 'bob'
-      aac.any_instantiation.expects(:get_token).returns('token')
-      aac.any_instantiation.expects(:unique_id).with('token').returns('user')
-      aac.any_instantiation.expects(:provider_attributes).with('token').returns({})
+      expect_any_instantiation_of(aac).to receive(:get_token).and_return('token')
+      expect_any_instantiation_of(aac).to receive(:unique_id).with('token').and_return('user')
+      expect_any_instantiation_of(aac).to receive(:provider_attributes).with('token').and_return({})
       user_with_pseudonym(username: 'user', active_all: 1)
       @pseudonym.authentication_provider = aac
       @pseudonym.save!
 
       session[:sentinel] = true
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: 'bob')
-      get :create, state: jwt
+      get :create, params: {state: jwt}
       expect(response).to redirect_to(dashboard_url(login_success: 1))
       # ensure the session was reset
       expect(session[:sentinel]).to be_nil
     end
 
     it "redirects to login if no user found" do
-      aac.any_instantiation.expects(:get_token).returns('token')
-      aac.any_instantiation.expects(:unique_id).with('token').returns('user')
-      aac.any_instantiation.expects(:provider_attributes).with('token').returns({})
+      expect_any_instantiation_of(aac).to receive(:get_token).and_return('token')
+      expect_any_instantiation_of(aac).to receive(:unique_id).with('token').and_return('user')
+      expect_any_instantiation_of(aac).to receive(:provider_attributes).with('token').and_return({})
 
       session[:oauth2_nonce] = 'bob'
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: 'bob')
 
-      get :create, state: jwt
+      get :create, params: {state: jwt}
       expect(response).to redirect_to(login_url)
       expect(flash[:delegated_message]).to_not be_blank
     end
 
     it "redirects to login if no user information returned" do
-      aac.any_instantiation.expects(:get_token).returns('token')
-      aac.any_instantiation.expects(:unique_id).with('token').returns(nil)
-      aac.any_instantiation.expects(:provider_attributes).with('token').returns({})
+      expect_any_instantiation_of(aac).to receive(:get_token).and_return('token')
+      expect_any_instantiation_of(aac).to receive(:unique_id).with('token').and_return(nil)
+      expect_any_instantiation_of(aac).to receive(:provider_attributes).with('token').and_return({})
 
       session[:oauth2_nonce] = 'bob'
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: 'bob')
 
-      get :create, state: jwt
+      get :create, params: {state: jwt}
       expect(response).to redirect_to(login_url)
       expect(flash[:delegated_message]).to_not be_blank
       expect(flash[:delegated_message]).to match(/no unique ID/)
     end
 
     it "(safely) displays an error message from the server" do
-      get :create, error_description: 'failed<script></script>'
+      get :create, params: {error_description: 'failed<script></script>'}
       expect(response).to redirect_to(login_url)
       expect(flash[:delegated_message]).to eq "failed"
     end
 
     it "provisions automatically when enabled" do
       aac.update_attribute(:jit_provisioning, true)
-      aac.any_instantiation.expects(:get_token).returns('token')
-      aac.any_instantiation.expects(:unique_id).with('token').returns('user')
-      aac.any_instantiation.expects(:provider_attributes).with('token').returns({})
+      expect_any_instantiation_of(aac).to receive(:get_token).and_return('token')
+      expect_any_instantiation_of(aac).to receive(:unique_id).with('token').and_return('user')
+      expect_any_instantiation_of(aac).to receive(:provider_attributes).with('token').and_return({})
 
       session[:oauth2_nonce] = 'bob'
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: 'bob')
 
       expect(Account.default.pseudonyms.active.by_unique_id('user')).to_not be_exists
-      get :create, state: jwt
+      get :create, params: {state: jwt}
       expect(response).to redirect_to(dashboard_url(login_success: 1))
       p = Account.default.pseudonyms.active.by_unique_id('user').first!
       expect(p.authentication_provider).to eq aac

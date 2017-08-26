@@ -29,10 +29,6 @@ describe "quizzes assignments" do
     stub_rcs_config
   end
 
-  after(:each) do
-    unstub_rcs_config
-  end
-
   context "created with 'more options'" do
     it "should redirect to the quiz new page and maintain parameters", priority: "2", test_id: 220307 do
       ag = @course.assignment_groups.create!(:name => "Quiz group")

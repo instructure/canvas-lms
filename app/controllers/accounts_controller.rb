@@ -128,7 +128,7 @@ class AccountsController < ApplicationController
   def index
     respond_to do |format|
       format.html do
-        @accounts = @current_user ? @current_user.all_accounts : []
+        @accounts = @current_user ? @current_user.adminable_accounts : []
       end
       format.json do
         if @current_user
@@ -330,6 +330,12 @@ class AccountsController < ApplicationController
   #   - All explanations can be seen in the {api:CoursesController#index Course API index documentation}
   #   - "sections", "needs_grading_count" and "total_scores" are not valid options at the account level
   #
+  # @argument sort [String, "course_name"|"sis_course_id"|"teacher"|"subaccount"|"enrollments"]
+  #   The column to sort results by.
+  #
+  # @argument order [String, "asc"|"desc"]
+  #   The order to sort the given column by.
+  #
   # @returns [Course]
   def courses_api
     return unless authorized_action(@account, @current_user, :read_course_list)
@@ -342,7 +348,39 @@ class AccountsController < ApplicationController
       params[:state] -= %w{available}
     end
 
-    @courses = @account.associated_courses.order(:id).where(:workflow_state => params[:state])
+    order = if params[:sort] == 'course_name'
+              "name, id"
+            elsif params[:sort] == 'sis_course_id'
+              "#{Course.quoted_table_name}.sis_source_id, id"
+            elsif params[:sort] == 'teacher'
+              "(SELECT sortable_name FROM #{User.quoted_table_name}
+                JOIN #{Enrollment.quoted_table_name} on #{User.quoted_table_name}.id
+                = #{Enrollment.quoted_table_name}.user_id
+                WHERE #{Enrollment.quoted_table_name}.workflow_state <> 'deleted'
+                AND #{Enrollment.quoted_table_name}.type = 'TeacherEnrollment'
+                AND #{Enrollment.quoted_table_name}.course_id = #{Course.quoted_table_name}.id
+                ORDER BY #{User.quoted_table_name}.sortable_name
+                LIMIT 1), id"
+            elsif params[:sort] == 'enrollments'
+              "(SELECT DISTINCT COUNT(DISTINCT #{Enrollment.quoted_table_name}.user_id)
+                AS count_user_id FROM #{Enrollment.quoted_table_name}
+                WHERE #{Enrollment.quoted_table_name}.type = 'StudentEnrollment'
+                AND (#{Enrollment.quoted_table_name}.workflow_state
+                NOT IN ('rejected', 'completed', 'deleted', 'inactive'))
+                AND #{Enrollment.quoted_table_name}.course_id
+                = #{Course.quoted_table_name}.id)
+                #{params[:order] == 'desc' ? 'DESC, id DESC' : 'ASC, id ASC'}"
+            elsif params[:sort] == 'subaccount'
+                "(SELECT #{Account.quoted_table_name}.name FROM #{Account.quoted_table_name}
+                WHERE #{Account.quoted_table_name}.id
+                = #{Course.quoted_table_name}.account_id), id"
+            else
+              "id"
+            end
+
+    @courses = @account.associated_courses.order(order).where(:workflow_state => params[:state])
+    @courses = @courses.reverse_order if params[:order] == 'desc' && params[:sort] != 'enrollments'
+
     if params[:hide_enrollmentless_courses] || value_to_boolean(params[:with_enrollments])
       @courses = @courses.with_enrollments
     elsif !params[:with_enrollments].nil? && !value_to_boolean(params[:with_enrollments])
@@ -434,7 +472,7 @@ class AccountsController < ApplicationController
   # Delegated to by the update action (when the request is an api_request?)
   def update_api
     if authorized_action(@account, @current_user, [:manage_account_settings, :manage_storage_quotas])
-      account_params = params[:account].present? ? strong_account_params : {}
+      account_params = params[:account].present? ? strong_account_params.to_unsafe_h : {}
       includes = Array(params[:includes]) || []
       unauthorized = false
 
@@ -463,7 +501,7 @@ class AccountsController < ApplicationController
       end
 
       # account settings (:manage_account_settings)
-      account_settings = account_params.select {|k, v| [:name, :default_time_zone, :settings].include?(k.to_sym)}.with_indifferent_access
+      account_settings = account_params.slice(:name, :default_time_zone, :settings)
       unless account_settings.empty?
         if @account.grants_right?(@current_user, session, :manage_account_settings)
           if account_settings[:settings]
@@ -472,15 +510,7 @@ class AccountsController < ApplicationController
                                                :restrict_student_future_listing,
                                                :lock_all_announcements,
                                                :sis_assignment_name_length_input)
-            sis_name_length_setting = account_settings[:settings][:sis_assignment_name_length_input]
-            if sis_name_length_setting
-              value = sis_name_length_setting[:value]
-              if value.to_i.to_s == value.to_s && value.to_i <= SIS_ASSINGMENT_NAME_LENGTH_DEFAULT && value.to_i >= 0
-                sis_name_length_setting[:value] = value
-              else
-                sis_name_length_setting[:value] = SIS_ASSINGMENT_NAME_LENGTH_DEFAULT
-              end
-            end
+            ensure_sis_max_name_length_value!(account_settings)
           end
           @account.errors.add(:name, t(:account_name_required, 'The account name cannot be blank')) if account_params.has_key?(:name) && account_params[:name].blank?
           @account.errors.add(:default_time_zone, t(:unrecognized_time_zone, "'%{timezone}' is not a recognized time zone", :timezone => account_params[:default_time_zone])) if account_params.has_key?(:default_time_zone) && ActiveSupport::TimeZone.new(account_params[:default_time_zone]).nil?
@@ -491,8 +521,8 @@ class AccountsController < ApplicationController
       end
 
       # quotas (:manage_account_quotas)
-      quota_settings = account_params.select {|k, v| [:default_storage_quota_mb, :default_user_storage_quota_mb,
-                                                      :default_group_storage_quota_mb].include?(k.to_sym)}.with_indifferent_access
+      quota_settings = account_params.slice(:default_storage_quota_mb, :default_user_storage_quota_mb,
+                                                      :default_group_storage_quota_mb)
       unless quota_settings.empty?
         if @account.grants_right?(@current_user, session, :manage_storage_quotas)
           [:default_storage_quota_mb, :default_user_storage_quota_mb, :default_group_storage_quota_mb].each do |quota_type|
@@ -598,7 +628,7 @@ class AccountsController < ApplicationController
 
         custom_help_links = params[:account].delete :custom_help_links
         if custom_help_links
-          sorted_help_links = custom_help_links.select{|_k, h| h['state'] != 'deleted' && h['state'] != 'new'}.sort_by{|_k, h| _k.to_i}
+          sorted_help_links = custom_help_links.to_unsafe_h.select{|_k, h| h['state'] != 'deleted' && h['state'] != 'new'}.sort_by{|_k, h| _k.to_i}
           @account.settings[:custom_help_links] = sorted_help_links.map do |index_with_hash|
             hash = index_with_hash[1].to_hash.with_indifferent_access
             hash.delete('state')
@@ -666,6 +696,8 @@ class AccountsController < ApplicationController
           end
         end
 
+        ensure_sis_max_name_length_value!(params[:account]) if params[:account][:settings]
+
         if sis_id = params[:account].delete(:sis_source_id)
           if !@account.root_account? && sis_id != @account.sis_source_id && @account.root_account.grants_right?(@current_user, session, :manage_sis)
             if sis_id == ''
@@ -716,7 +748,7 @@ class AccountsController < ApplicationController
         end
       end
       load_course_right_side
-      @account_users = @account.account_users
+      @account_users = @account.account_users.active
       ActiveRecord::Associations::Preloader.new.preload(@account_users, user: :communication_channels)
       order_hash = {}
       @account.available_account_roles.each_with_index do |role, idx|
@@ -1040,12 +1072,13 @@ class AccountsController < ApplicationController
     admins = users.map do |user|
       admin = @context.account_users.where(user_id: user.id, role_id: role.id).first_or_initialize
       admin.user = user
+      admin.workflow_state = 'active'
       return unless authorized_action(admin, @current_user, :create)
       admin
     end
 
     account_users = admins.map do |admin|
-      if admin.new_record?
+      if admin.new_record? || admin.workflow_state_changed?
         admin.save!
         if admin.user.registered?
           admin.account_user_notification!
@@ -1124,6 +1157,18 @@ class AccountsController < ApplicationController
   private :localized_timezones
 
   private
+
+  def ensure_sis_max_name_length_value!(account_settings)
+    sis_name_length_setting = account_settings[:settings][:sis_assignment_name_length_input]
+    return if sis_name_length_setting.nil?
+    value = sis_name_length_setting[:value]
+    if value.to_i.to_s == value.to_s && value.to_i <= SIS_ASSINGMENT_NAME_LENGTH_DEFAULT && value.to_i >= 0
+      sis_name_length_setting[:value] = value
+    else
+      sis_name_length_setting[:value] = SIS_ASSINGMENT_NAME_LENGTH_DEFAULT
+    end
+  end
+
   def permitted_account_attributes
     [:name, :turnitin_account_id, :turnitin_shared_secret,
       :turnitin_host, :turnitin_comments, :turnitin_pledge, :turnitin_originality,

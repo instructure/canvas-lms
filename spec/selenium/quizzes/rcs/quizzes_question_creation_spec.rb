@@ -26,10 +26,6 @@ describe 'quizzes question creation' do
     stub_rcs_config
   end
 
-  after(:each) do
-    unstub_rcs_config
-  end
-
   context 'when creating a new question' do
 
     before(:each) do
@@ -465,7 +461,7 @@ describe 'quizzes question creation' do
       driver.execute_script("$('.display_question').first().addClass('hover').addClass('active')")
       fj('.edit_question_link').click
       wait_for_ajaximations
-      type_in_tiny '.question:visible textarea.question_content', '[color2]' 
+      type_in_tiny '.question:visible textarea.question_content', '[color2]'
       question = fj('.question_form:visible')
       select_box = question.find_element(:css, '.blank_id_select')
       select_box.click

@@ -31,10 +31,6 @@ describe "outcomes" do
       stub_rcs_config
     end
 
-    after(:each) do
-      unstub_rcs_config
-    end
-
     def save_without_error(value = 4, title = 'New Outcome')
       replace_content(f('.outcomes-content input[name=title]'), title)
       replace_content(f('input[name=calculation_int]'), value)

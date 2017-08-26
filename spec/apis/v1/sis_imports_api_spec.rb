@@ -521,7 +521,7 @@ describe SisImportsApiController, type: :request do
     # In the current API docs, we specify that you need to send a content-type to make raw
     # post work. However, long ago we added code to make it work even without the header,
     # so we are going to maintain that behavior.
-    post "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv", "\xffab=\xffcd", { "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@user)}" }
+    post "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv", params: "\xffab=\xffcd", headers: { "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@user)}" }
 
     batch = SisBatch.last
     expect(batch.attachment.filename).to eq "sis_import.zip"

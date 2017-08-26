@@ -171,7 +171,7 @@ describe Quizzes::QuizzesController do
       end
 
       it "should display message about the quiz changing significantly" do
-        Quizzes::Quiz.any_instance.stubs(:changed_significantly_since?).returns(true)
+        allow_any_instance_of(Quizzes::Quiz).to receive(:changed_significantly_since?).and_return(true)
         mkquiz
         @quiz.check_if_submissions_need_review
         @quiz_submission.submission_data.each { |q| q[:correct] = "false" }
@@ -182,7 +182,7 @@ describe Quizzes::QuizzesController do
       end
 
       it "should display both messages" do
-        Quizzes::Quiz.any_instance.stubs(:changed_significantly_since?).returns(true)
+        allow_any_instance_of(Quizzes::Quiz).to receive(:changed_significantly_since?).and_return(true)
         mkquiz
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@quiz_submission.id}"
         expect(response.body).to match(%r{The following questions need review})

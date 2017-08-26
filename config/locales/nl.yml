@@ -1,4 +1,4 @@
-# This YAML file is auto-generated from a Transifex import.
+# This YAML file is auto-generated from a translation import.
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 nl: 
@@ -303,6 +303,7 @@ nl:
     report_header_canvas_xlist_course_id: canvas_xlist_course_id
     report_header_course: cursus
     report_header_course__id: course_id
+    report_header_course_format: course_format
     report_header_course_id: cursus-ID
     report_header_course_name: cursusnaam
     report_header_course_sis: "cursus sis"
@@ -712,6 +713,12 @@ nl:
     default_account_quotas_not_updated: "Accountquotas zijn niet bijgewerkt"
     default_account_quotas_updated: "Standaard accountquota's bijgewerkt"
     devry: 
+      attendance_extract: 
+        parameters: 
+          custom_reports: 
+            start: 
+              parameters: 
+                header: "Datum van activiteit:"
       dcr2: 
         parameters: 
           custom_reports: 
@@ -736,6 +743,24 @@ nl:
             start: 
               parameters: 
                 header: "Beginnen bij:"
+      no_submissions: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Eindigen op:"
+            start: 
+              parameters: 
+                header: "Beginnen op:"
+      submissions_detail: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Eindigen op:"
+            start: 
+              parameters: 
+                header: "Beginnen op:"
     embry_riddle_activity_report_csv_parameters: 
       account_reports: 
         embry_riddle: 
@@ -2139,6 +2164,8 @@ nl:
         remove_these_dates: "Deze datums verwijderen"
     edit: 
       edit_assignment: "Opdracht bewerken"
+      links: 
+        add_rubric: Rubriek
     edit_header_view: 
       buttons: 
         not_published: "Niet gepubliceerd"
@@ -3415,12 +3442,30 @@ nl:
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "Klik om opmerkingen toe te voegen, als de cursist dit antwoord kiest"
   click_to_load_a020891b: "(klik om te laden)"
   click_to_modify_89fa26aa: "Klikken om weer te wijzigen"
+  click_to_order_by_email_ascending_98b1a697: "Klik om te rangschikken op e-mail oplopend"
+  click_to_order_by_last_login_ascending_502b6ad2: "Klik om te rangschikken op laatste aanmelding oplopend"
+  click_to_order_by_sis_id_ascending_692d35a7: "Klik om te rangschikken op SIS-ID oplopend"
   click_to_publish_ad27be9d: "Klik om te publiceren."
   click_to_report_profile_picture_370f9625: "Klik om profielfoto te melden"
   click_to_select_bd3b3a0d: "klik om te selecteren"
   click_to_select_user_name_41746803: "Klik om een gebruiker te selecteren %{name}"
   click_to_set_this_answer_as_correct_1326e3fd: "Klik om dit antwoord als juist in te stellen"
   click_to_skip_address_8f874b32: "Klik om over te slaan %{address}"
+  click_to_sort_by_email_ascending_cb789ec4: "Klik om te sorteren op e-mail oplopend"
+  click_to_sort_by_email_descending_72801b54: "Klik om te sorteren op e-mail aflopend"
+  click_to_sort_by_enrollments_ascending_f535b994: "Klik om te sorteren op inschrijvingen oplopend"
+  click_to_sort_by_enrollments_descending_3e5c80ee: "Klik om te sorteren op inschrijvingen aflopend"
+  click_to_sort_by_last_login_ascending_eafcbee4: "Klik om te sorteren op laatste aanmelding oplopend"
+  click_to_sort_by_last_login_descending_61fdadc: "Klik om te sorteren op laatste aanmelding aflopend"
+  click_to_sort_by_name_ascending_739c011e: "Klik om te sorteren op naam oplopend"
+  click_to_sort_by_name_descending_b6262093: "Klik om te sorteren op naam aflopend"
+  click_to_sort_by_sis_id_ascending_832c870: "Klik om te sorteren op SIS-ID oplopend"
+  click_to_sort_by_sis_id_descending_2d611236: "Klik om te sorteren op SIS-ID aflopend"
+  click_to_sort_by_subaccount_ascending_11252bc4: "Klik om te sorteren op subaccount oplopend"
+  click_to_sort_by_subaccount_descending_3d8a2381: "Klik om te sorteren op subaccount aflopend"
+  click_to_sort_by_teacher_ascending_cda7a18c: "Klik om te sorteren op docent oplopend"
+  click_to_sort_by_teacher_descending_45ef0d1e: "Klik om te sorteren op docent aflopend"
+  click_to_sort_c81ff8c8: "Klik om te sorteren."
   click_to_test_a_different_score_2e0bb6f0: "Klikken om een andere score te testen"
   click_to_test_dropdown_b950974d: "Klik om vervolgkeuzelijst te testen"
   click_to_unpublish_5b19e761: "Klik om publicatie ongedaan te maken."
@@ -3440,6 +3485,8 @@ nl:
   closes_5c6b4367: "Sluit:"
   code_is_case_sensitive_d8175cad: "Code is hoofdlettergevoelig."
   cog_icon_69bdffd5: Tandwiel
+  col_is_sorted_ascending_cc5152cc: "%{col} is oplopend gesorteerd"
+  col_is_sorted_descending_1cef74aa: "%{col} is aflopend gesorteerd."
   collaboration: 
     default_title: "Samenwerking zonder naam"
   collaboration_71c024f4: Samenwerking
@@ -4613,6 +4660,7 @@ nl:
   count_items_selected_91814713: 
     one: "%{count} item gekozen"
     other: "%{count} geselecteerde items"
+  count_items_would_be_deleted_and_exceeds_the_set_t_a4a21dbe: "%{count} items zouden worden verwijderd en overschrijdt de ingestelde drempel van %{change_threshold}%"
   count_max_students_2db76773: "%{count} / %{max} studenten"
   count_max_users_bdebb537: "%{count} / %{max} gebruikers"
   count_messages_4f8ff204: 
@@ -5844,6 +5892,7 @@ nl:
       year: Jaar
   day_9d999bec: Dag
   day_s_7cc1231f: Dag(en)
+  days_late_a3a721b0: "Dagen te laat"
   deactivate_this_key_3e79a2b5: "Deze toets activeren"
   deactivate_user_86c09036: "Gebruiker deactiveren"
   decaying_average_8bf6a0dd: "Achteruitgaand gemiddelde"
@@ -7536,6 +7585,7 @@ nl:
   generating_preview_ae83830: "Bezig met genereren van Voorbeeld..."
   germany_49_fc5b8179: "Duitsland (+49)"
   germany_b02d91c9: Duitsland
+  get_started_b9507525: "Aan de slag"
   get_the_following_from_your_salesforce_connected_a_881fc9a3: "Ontvang het volgende van uw Salesforce verbonden App"
   get_your_users_error_reports_posted_to_salesforce__76f57839: "Post de foutrapporten van uw gebruikers in de Salesforce Service Cloud"
   get_your_users_error_reports_posted_to_salesforce_dfb1a6c2: "Post de foutrapporten van uw gebruikers in Salesforce"
@@ -7613,6 +7663,7 @@ nl:
       submit_comment: "Opmerking inleveren"
       submitting: "Bezig met inleveren..."
     cancel_button: Annuleren
+    canvadoc_expiring: "Je Canvas DocViewer-sessie verloopt binnenkort.  Laad het venster opnieuw zodat er geen werk verloren gaat."
     click_to_change: "Klikken om een andere score te testen"
     column_header: 
       assignment_options: Opdrachtopties
@@ -8869,6 +8920,8 @@ nl:
   host_8be927e0: Host
   host_is_unreachable_or_not_pointing_to_catalog_fb3fc082: "Host is niet bereikbaar of wijst niet naar Catalogus"
   hour_34d02553: Uur
+  hour_s_b6e8d238: Uur
+  hours_late_989e9081: "Uur te laat"
   hover_over_me_496521b9: "Beweeg de muis over me heen"
   how_is_this_affecting_you_b3b6a639: "Wat voor gevolgen heeft dit voor jou?"
   how_many_minutes_ecca5ee7: "Hoeveel minuten?"
@@ -8884,6 +8937,7 @@ nl:
   i_need_some_help_but_it_is_not_urgent_d967ea0a: "Ik heb wat hulp nodig, maar het is niet urgent"
   ic_actions: 
     manage: beheren
+  iceland_354_1a03c558: "IJsland (+354)"
   icon_215a1dc6: Pictogram
   icons: 
     discussion_submission: "Discussie inzending"
@@ -9472,6 +9526,7 @@ nl:
   loading_25990131: "Bezig met laden..."
   loading_725811ca: laden
   loading_announcements_b927a86c: "Aankondigingen laden"
+  loading_assignments_352ec769: "Opdrachten aan het laden"
   loading_associations_9da66c4e: "Koppelingen laden"
   loading_associations_complete_b93a9c6e: "Koppelingen laden is voltooid"
   loading_associations_started_1f65d8d: "Koppelingen laden is gestart"
@@ -9486,7 +9541,9 @@ nl:
   loading_data_ecd89ba: "Gegevens laden.."
   loading_graders_f6a76142: "Revisoren laden"
   loading_mastery_paths_c558a766: "Bezig met het laden van Meesterschap Paths..."
+  loading_more_grade_history_results_b235de5: "Meer resultaten van cijfergeschiedenis laden."
   loading_more_results_def6df65: "Bezig met laden van meer resultaten"
+  loading_results_769c8819: "Resultaten laden"
   loading_results_spinner_73ef739c: "Resultatenoverzicht laden"
   loading_students_30b71301: "Cursisten laden"
   loading_sync_history_9f342cbf: "Synchronisatiegeschiedenis laden"
@@ -11813,6 +11870,7 @@ nl:
   more_courses_5ebbe998: "Meer cursussen"
   more_info_at_course_name_56dc8c10: "Meer informatie op %{course_name}"
   more_information_3dfb76b5: "Meer informatie"
+  more_results_were_added_at_the_bottom_of_the_page_dc323877: "Er zijn meer resultaten toegevoegd aan het eind van de pagina."
   more_than_999_submissions_need_grading_bc087dd0: "Meer dan 999 inzendingen moeten beoordeeld worden"
   more_than_9_submissions_need_grading_30157d49: "Meer dan 9 inzendingen moeten beoordeeld worden"
   more_than_a19b440: "%{more_than}+"
@@ -12007,6 +12065,7 @@ nl:
   nickname_7df95b09: "Bijnaam:"
   no_74e9b590: nee
   no_assignment_name_adbb215b: "Geen opdrachtnaam"
+  no_assignments_with_that_name_found_1d7be1: "Geen opdrachten met die naam gevonden"
   no_associated_terms_13bacefc: "Geen bijbehorende termijnen"
   no_attributes_locked_611c5cc: "geen vergrendelde eigenschappen"
   no_broken_links_found_38d951e3: "Geen gebroken koppelingen gevonden"
@@ -12034,6 +12093,7 @@ nl:
   no_ltis_configured_f4b9bc6b: "Geen LTI's geconfigureerd"
   no_matching_users_found_83889c10: "Geen vergelijkbare gebruikers gevonden."
   no_migration_file: "Bestand nodig om inhoud te migreren."
+  no_more_results_to_load_6774fb1c: "Er zijn geen resultaten meer om te laden."
   no_outcome_file_or_authority_given_c90f9c5f: "Geen bestand met leerdoel of toestemming gegeven"
   no_password_was_given_472222e5: "Geen wachtwoord ingesteld"
   no_placements_enabled_f705f28: "Geen plaatsingen ingeschakeld"
@@ -12041,6 +12101,7 @@ nl:
   no_points_possible_72db3a55: "Geen punten mogelijk"
   no_results_f36777ee: "Geen resultaten"
   no_results_found_58717065: "Geen resultaten gevonden"
+  no_results_found_e4b686bd: "Geen resultaten aangetroffen."
   no_score_yet_c94e919b: "Geen score gegeven"
   no_students_dd8de9f0: "Geen cursisten"
   no_students_have_taken_the_quiz_yet_e667644b: "De toets is nog door geen enkele cursist gemaakt"
@@ -16496,6 +16557,9 @@ nl:
       titles: 
         full_comments: "Klikken om volledige opmerkingen te zien"
         linked_to_learning_outcome: "Dit criterium is aan een leerresultaat gekoppeld"
+    rubrics_component: 
+      links: 
+        assign_rubric: "Rubriek toewijzen"
     select_content_dialog: 
       add_to_module: "%{item} aan *module* toevoegen"
       assignment_item: Opdracht
@@ -16855,6 +16919,7 @@ nl:
   something_is_broken_but_i_can_work_around_it_for_n_7fcedb9d: "Er is iets kapot, maar ik kan er voorlopig omheen werken"
   something_went_wrong_inactivating_the_user_please__ea7d0001: "Er is iets misgegaan bij het deactiveren van de gebruiker. Probeer later nog eens."
   something_went_wrong_please_try_again_6d337b6c: "Er is iets misgegaan, probeer het later nog eens."
+  something_went_wrong_please_try_refreshing_the_pag_4e14a67: "Er is iets misgegaan. Probeer de pagina te vernieuwen. Als het probleem blijft bestaan, zijn er wellicht te veel records op \"%{assignmentTitle}\" om SpeedGrader te laden."
   something_went_wrong_re_activating_the_user_please_82c3e7a: "Er is iets misgegaan tijdens het opnieuw activeren van de gebruiker. Probeer het later opnieuw."
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "Er is iets misgegaan tijdens het bijwerken van de gebruikersfunctie. Probeer het later opnieuw."
   something_went_wrong_when_trying_to_sync_grades_to_592c4c35: "Er is iets misgegaan tijdens het synchroniseren van cijfers met het informatiesysteem voor cursisten. Probeer het later opnieuw."
@@ -16865,9 +16930,11 @@ nl:
   sortable_name_73f707cf: "Sorteerbare naam"
   sorted_ascending_1f9b52c6: "Oplopend sorteren"
   sorted_ascending_2318ec99: "Oplopend sorteren"
+  sorted_ascending_3138603c: "oplopend gesorteerd"
   sorted_ascending_b6d61547: "oplopend gesorteerd"
   sorted_descending_1e30f0d5: "aflopend gesorteerd"
   sorted_descending_7fcec1ff: "Aflopend sorteren"
+  sorted_descending_84ec84c8: "aflopend gesorteerd"
   sorted_descending_d9aa3cf8: "Aflopend sorteren."
   source_code_2395ca74: Broncode
   south_korea_16d43049: "Zuid Korea"
@@ -17035,6 +17102,7 @@ nl:
   students_will_automatically_receive_full_credit_on_cc61df39: "cursisten ontvangen automatisch volledig krediet zodra ze de enquête invullen"
   students_with_no_submissions_title: "Cursisten zonder inzendingen"
   studentsperrangecount_out_of_totalstudentsenrolled_90cbfaf1: "%{studentsPerRangeCount} van %{totalStudentsEnrolled} cursisten"
+  sub_account_daeadd0: Subaccount
   sub_accounts: 
     alerts: 
       subaccount_has_courses: "Je kunt geen subaccount met cursussen erin verwijderen."
@@ -17104,6 +17172,7 @@ nl:
     view_rubric_assessment_in_the_speedgrader: "Beoordeling van rubriek weergeven in SpeedGrader"
   submission_in_another_grading_period_e754b329: "Inzending in een andere beoordelingsperiode"
   submission_options_5184a65b: "Opties voor inleveringen"
+  submission_status_3079e730: Inzendingsstatus
   submission_tray_429ac3df: "Menu voor inzending"
   submissions: 
     assignment_submit_success: "Opdracht succesvol ingezonden."

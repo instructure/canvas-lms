@@ -32,10 +32,6 @@ describe 'assignments' do
     stub_rcs_config
   end
 
-  after do
-    unstub_rcs_config
-  end
-
   context 'quick add' do
 
     def fill_out_quick_add_modal(type)

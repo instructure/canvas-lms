@@ -64,7 +64,6 @@ describe "conversations new" do
       conversations
       compose course: @course, subject: 'Christmas', to: [@s1], body: 'The Fat Man cometh.', journal: true, send: true
       time = format_time_for_view(UserNote.last.updated_at)
-      remove_user_session
       get student_user_notes_url
       expect(f('.subject')).to include_text('Christmas')
       expect(f('.user_content').text).to eq 'The Fat Man cometh.'
@@ -76,7 +75,6 @@ describe "conversations new" do
       user_session(@teacher)
       conversations
       compose course: @course, subject: 'Christmas', to: [@s1], body: 'The Fat Man cometh.', journal: true, send: true
-      remove_user_session
       get student_user_notes_url
       f('.delete_link').click
       driver.switch_to.alert.accept

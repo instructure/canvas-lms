@@ -33,10 +33,6 @@ describe 'creating a quiz' do
       stub_rcs_config
     end
 
-    after(:each) do
-      unstub_rcs_config
-    end
-
     it 'prevents assigning a quiz to no one', priority: 1, test_id: 385155 do
       course_quiz(active: true)
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
@@ -95,10 +91,6 @@ describe 'creating a quiz' do
       @account.set_feature_flag! 'post_grades', 'on'
       course_with_teacher_logged_in(:active_all => true, :account => @account)
       stub_rcs_config
-    end
-
-    after do
-      unstub_rcs_config
     end
 
     it "should default to post grades if account setting is enabled" do

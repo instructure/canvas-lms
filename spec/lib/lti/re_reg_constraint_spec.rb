@@ -22,16 +22,16 @@ describe Lti::ReRegConstraint do
 
   describe '#matches?' do
     it 'returns true if the header VND-IMS-CONFIRM-URL is present' do
-      mock_request = mock('mock_request')
-      mock_request.stubs(:headers).returns({'VND-IMS-CONFIRM-URL' => 'http://i-am-a-place-on-the-internet.dev/'})
-      mock_request.stubs(:format).returns('json')
+      mock_request = double('mock_request')
+      allow(mock_request).to receive(:headers).and_return({'VND-IMS-CONFIRM-URL' => 'http://i-am-a-place-on-the-internet.dev/'})
+      allow(mock_request).to receive(:format).and_return('json')
       expect(subject.matches?(mock_request)).to be_truthy
     end
 
     it 'returns failse if the format is not json' do
-      mock_request = mock('mock_request')
-      mock_request.stubs(:headers).returns({'VND-IMS-CONFIRM-URL' => 'http://i-am-a-place-on-the-internet.dev/'})
-      mock_request.stubs(:format).returns('xml')
+      mock_request = double('mock_request')
+      allow(mock_request).to receive(:headers).and_return({'VND-IMS-CONFIRM-URL' => 'http://i-am-a-place-on-the-internet.dev/'})
+      allow(mock_request).to receive(:format).and_return('xml')
       expect(subject.matches?(mock_request)).to be_falsey
     end
 

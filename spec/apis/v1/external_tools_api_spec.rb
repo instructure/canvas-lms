@@ -109,7 +109,7 @@ describe ExternalToolsController, type: :request do
         end
 
         it "returns a service unavailable if redis isn't available" do
-          Canvas.stubs(:redis_enabled?).returns(false)
+          allow(Canvas).to receive(:redis_enabled?).and_return(false)
           params = {id: tool.id.to_s}
           code = get_raw_sessionless_launch_url(@course, 'course', params)
           expect(code).to eq 503

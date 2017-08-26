@@ -25,11 +25,11 @@ describe SubAccountsController do
       account_admin_user(:active_all => true)
       user_session(@user)
 
-      post 'create', :account_id => root_account.id, :account => { :parent_account_id => root_account.id, :name => 'sub account' }
+      post 'create', params: {:account_id => root_account.id, :account => { :parent_account_id => root_account.id, :name => 'sub account' }}
       sub_account = assigns[:sub_account]
       expect(sub_account).not_to be_nil
 
-      post 'create', :account_id => root_account.id, :account => { :parent_account_id => sub_account.id, :name => 'sub sub account 1' }
+      post 'create', params: {:account_id => root_account.id, :account => { :parent_account_id => sub_account.id, :name => 'sub sub account 1' }}
       sub_sub_account_1 = assigns[:sub_account]
       expect(sub_sub_account_1).not_to be_nil
       expect(sub_sub_account_1.name).to eq 'sub sub account 1'
@@ -44,7 +44,7 @@ describe SubAccountsController do
 
       sub_account = root_account.sub_accounts.create(:name => 'sub account')
 
-      post 'create', :account_id => sub_account.id, :account => { :parent_account_id => sub_account.id, :name => 'sub sub account 2' }
+      post 'create', params: {:account_id => sub_account.id, :account => { :parent_account_id => sub_account.id, :name => 'sub sub account 2' }}
       sub_sub_account_2 = assigns[:sub_account]
       expect(sub_sub_account_2).not_to be_nil
       expect(sub_sub_account_2.name).to eq 'sub sub account 2'
@@ -94,7 +94,7 @@ describe SubAccountsController do
       section = course.course_sections.create!
       section.crosslist_to_course(other_course)
 
-      get 'index', :account_id => root_account.id
+      get 'index', params: {:account_id => root_account.id}
 
       @accounts = assigns[:accounts]
       expect(@accounts[root_account.id][:sub_account_count]).to eq 5
@@ -131,7 +131,7 @@ describe SubAccountsController do
 
     it "should delete a sub-account" do
       user_session(@user)
-      delete 'destroy', :account_id => @root_account, :id => @sub_account
+      delete 'destroy', params: {:account_id => @root_account, :id => @sub_account}
       expect(response.status).to eq(200)
       expect(@sub_account.reload).to be_deleted
     end
@@ -140,7 +140,7 @@ describe SubAccountsController do
       @sub_account.courses.create!
       @sub_account.courses.first.destroy
       user_session(@user)
-      delete 'destroy', :account_id => @root_account, :id => @sub_account
+      delete 'destroy', params: {:account_id => @root_account, :id => @sub_account}
       expect(response.status).to eq(200)
       expect(@sub_account.reload).to be_deleted
     end
@@ -148,7 +148,7 @@ describe SubAccountsController do
     it "should not delete a sub-account that contains a course" do
       @sub_account.courses.create!
       user_session(@user)
-      delete 'destroy', :account_id => @root_account, :id => @sub_account
+      delete 'destroy', params: {:account_id => @root_account, :id => @sub_account}
       expect(response.status).to eq(409)
       expect(@sub_account.reload).not_to be_deleted
     end
@@ -157,7 +157,7 @@ describe SubAccountsController do
       @sub_sub_account = @sub_account.sub_accounts.create!
       @sub_sub_account.courses.create!
       user_session(@user)
-      delete 'destroy', :account_id => @root_account, :id => @sub_account
+      delete 'destroy', params: {:account_id => @root_account, :id => @sub_account}
       expect(response.status).to eq(409)
       expect(@sub_account.reload).not_to be_deleted
     end

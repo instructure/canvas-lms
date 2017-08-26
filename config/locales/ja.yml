@@ -1,4 +1,4 @@
-# This YAML file is auto-generated from a Transifex import.
+# This YAML file is auto-generated from a translation import.
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 ja: 
@@ -303,6 +303,7 @@ ja:
     report_header_canvas_xlist_course_id: canvas_xlist_course_id
     report_header_course: コース
     report_header_course__id: course_id
+    report_header_course_format: course_format
     report_header_course_id: "コース ID"
     report_header_course_name: コース名
     report_header_course_sis: "コース SIS"
@@ -712,6 +713,12 @@ ja:
     default_account_quotas_not_updated: "デフォルトのアカウント クォータは更新されませんでした"
     default_account_quotas_updated: "デフォルトのアカウント クォータが更新されました"
     devry: 
+      attendance_extract: 
+        parameters: 
+          custom_reports: 
+            start: 
+              parameters: 
+                header: アクティビティ日：
       dcr2: 
         parameters: 
           custom_reports: 
@@ -728,6 +735,24 @@ ja:
               parameters: 
                 header: "開始日:"
       dcr7: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "終了日:"
+            start: 
+              parameters: 
+                header: "開始日:"
+      no_submissions: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "終了日:"
+            start: 
+              parameters: 
+                header: "開始日:"
+      submissions_detail: 
         parameters: 
           custom_reports: 
             end: 
@@ -2139,6 +2164,8 @@ ja:
         remove_these_dates: これらの日付を削除
     edit: 
       edit_assignment: 課題の編集
+      links: 
+        add_rubric: ルービック
     edit_header_view: 
       buttons: 
         not_published: 未公開
@@ -3420,12 +3447,30 @@ ja:
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: クリックして、受講生がこの解答を選択した場合のコメントを入力
   click_to_load_a020891b: (クリックで読み込み)
   click_to_modify_89fa26aa: クリックして変更する
+  click_to_order_by_email_ascending_98b1a697: クリックしてメールを昇順で並べ替える
+  click_to_order_by_last_login_ascending_502b6ad2: クリックして最後のログイン順で昇順で並べ替える
+  click_to_order_by_sis_id_ascending_692d35a7: "クリックしてSIS ID順で昇順で並べ替える"
   click_to_publish_ad27be9d: ここをクリックして公開。
   click_to_report_profile_picture_370f9625: クリックして、プロファイルの写真をレポートする。
   click_to_select_bd3b3a0d: クリックして選択する
   click_to_select_user_name_41746803: "クリックしてユーザーを選択する%{name}"
   click_to_set_this_answer_as_correct_1326e3fd: クリックして、この解答を正解として設定
   click_to_skip_address_8f874b32: "クリックしてスキップする%{address}"
+  click_to_sort_by_email_ascending_cb789ec4: クリックしてメールを昇順で並べ替える
+  click_to_sort_by_email_descending_72801b54: クリックしてメールの降順で並べ替える
+  click_to_sort_by_enrollments_ascending_f535b994: クリックして登録を降順で並べ替える
+  click_to_sort_by_enrollments_descending_3e5c80ee: クリックして登録を降順で並べ替える
+  click_to_sort_by_last_login_ascending_eafcbee4: クリックして最後のログイン順で昇順で並べ替える
+  click_to_sort_by_last_login_descending_61fdadc: クリックして最後のログイン順で降順で並べ替える
+  click_to_sort_by_name_ascending_739c011e: クリックして氏名を昇順で並べ替える
+  click_to_sort_by_name_descending_b6262093: クリックして氏名を降順で並べ替える
+  click_to_sort_by_sis_id_ascending_832c870: "クリックしてSIS ID順で昇順で並べ替える"
+  click_to_sort_by_sis_id_descending_2d611236: "クリックしてSIS ID順で降順で並べ替える"
+  click_to_sort_by_subaccount_ascending_11252bc4: クリックしてサブアカウントを昇順で並べ替える
+  click_to_sort_by_subaccount_descending_3d8a2381: クリックしてサブアカウントを降順で並べ替える
+  click_to_sort_by_teacher_ascending_cda7a18c: クリックして講師を昇順で並べ替える
+  click_to_sort_by_teacher_descending_45ef0d1e: クリックして講師を降順で並べ替える
+  click_to_sort_c81ff8c8: クリックして並べ替える
   click_to_test_a_different_score_2e0bb6f0: クリックして、別のスコアをテスト
   click_to_test_dropdown_b950974d: クリックして、ドロップダウンをテストする
   click_to_unpublish_5b19e761: ここをクリックして非公開。
@@ -3445,6 +3490,8 @@ ja:
   closes_5c6b4367: 閉じる：
   code_is_case_sensitive_d8175cad: コードは大文字と小文字を区別します。
   cog_icon_69bdffd5: 歯車のアイコン
+  col_is_sorted_ascending_cc5152cc: "%{col} 昇順に並べ替え"
+  col_is_sorted_descending_1cef74aa: "%{col} 降順に並べ替え"
   collaboration: 
     default_title: 名前の付いていない共同作業
   collaboration_71c024f4: 共同作業
@@ -4618,6 +4665,7 @@ ja:
   count_items_selected_91814713: 
     one: "%{count} 件のアイテムが選択されました"
     other: "%{count} 件のアイテムが選択されました"
+  count_items_would_be_deleted_and_exceeds_the_set_t_a4a21dbe: "%{count} アイテムは削除され、既定の閾値を超えています%{change_threshold}%"
   count_max_students_2db76773: "受講生 %{count} / %{max} 人"
   count_max_users_bdebb537: "ユーザ %{count} / %{max} 人"
   count_messages_4f8ff204: 
@@ -5850,6 +5898,7 @@ ja:
       year: 年
   day_9d999bec: 日
   day_s_7cc1231f: 日
+  days_late_a3a721b0: 遅延日数
   deactivate_this_key_3e79a2b5: このキーを非有効化する
   deactivate_user_86c09036: ユーザーを無効にする
   decaying_average_8bf6a0dd: 低下平均
@@ -7542,6 +7591,7 @@ ja:
   generating_preview_ae83830: プレビュー中...
   germany_49_fc5b8179: "ドイツ (+49)"
   germany_b02d91c9: ドイツ
+  get_started_b9507525: 開始する
   get_the_following_from_your_salesforce_connected_a_881fc9a3: あなたのセールスフォースに接続されたアプリからフォロー獲得
   get_your_users_error_reports_posted_to_salesforce__76f57839: セールスフォース・サービス・クラウドにポストされたユーザーエラーレポートを取得
   get_your_users_error_reports_posted_to_salesforce_dfb1a6c2: セールスフォースにポストされたユーザーエラーレポートを取得
@@ -7623,6 +7673,7 @@ ja:
       submit_comment: コメントの提出
       submitting: 提出しています...
     cancel_button: キャンセル
+    canvadoc_expiring: "あなたの Canvas DocViewer セッションが間もなく終了します。作業した分を失わないように、ウィンドウを再ロードしてください。"
     click_to_change: クリックして、別のスコアをテスト
     column_header: 
       assignment_options: 課題のオプション
@@ -8877,6 +8928,8 @@ ja:
   host_8be927e0: ホスト
   host_is_unreachable_or_not_pointing_to_catalog_fb3fc082: ホストがCatalogに到達できないか、ポイントしていません。
   hour_34d02553: 時間
+  hour_s_b6e8d238: 時間（数）
+  hours_late_989e9081: 遅延時間数
   hover_over_me_496521b9: 私にカーソルを移動します
   how_is_this_affecting_you_b3b6a639: この問題はどのくらい深刻ですか?
   how_many_minutes_ecca5ee7: 何分ですか?
@@ -8892,6 +8945,7 @@ ja:
   i_need_some_help_but_it_is_not_urgent_d967ea0a: 支援が必要ですが、緊急ではありません
   ic_actions: 
     manage: 管理
+  iceland_354_1a03c558: "アイスランド (+354)"
   icon_215a1dc6: アイコン
   icons: 
     discussion_submission: ディスカッションの提出
@@ -9479,6 +9533,7 @@ ja:
   loading_25990131: 読み込んでいます...
   loading_725811ca: 読み込み中
   loading_announcements_b927a86c: アナウンスの読み込み
+  loading_assignments_352ec769: 課題を読み込み中
   loading_associations_9da66c4e: 関連付け読み込み中
   loading_associations_complete_b93a9c6e: 関連付け読み込み完了
   loading_associations_started_1f65d8d: 関連付け読み込み開始
@@ -9493,7 +9548,9 @@ ja:
   loading_data_ecd89ba: データをロード中..
   loading_graders_f6a76142: 採点者の読み込み
   loading_mastery_paths_c558a766: 熟達の過程の読み込み中...
+  loading_more_grade_history_results_b235de5: 成績履歴結果をさらに読み込み中。
   loading_more_results_def6df65: より多くの結果を読み込んでいます...
+  loading_results_769c8819: 結果を読み込み中
   loading_results_spinner_73ef739c: 結果をスピナーに読み込む
   loading_students_30b71301: 受講生を読み込む
   loading_sync_history_9f342cbf: 同期履歴の読み込み
@@ -11802,6 +11859,7 @@ ja:
   more_courses_5ebbe998: その他のコース
   more_info_at_course_name_56dc8c10: "詳細は %{course_name} をご覧ください"
   more_information_3dfb76b5: 詳細
+  more_results_were_added_at_the_bottom_of_the_page_dc323877: さらなる結果がページの最後に追加されました。
   more_than_999_submissions_need_grading_bc087dd0: 999点以上の提出物の採点が必要です
   more_than_9_submissions_need_grading_30157d49: 9点以上の提出物の採点が必要です
   more_than_a19b440: "%{more_than}+"
@@ -11996,6 +12054,7 @@ ja:
   nickname_7df95b09: "ニックネーム:"
   no_74e9b590: いいえ
   no_assignment_name_adbb215b: 課題名なし
+  no_assignments_with_that_name_found_1d7be1: その名前の課題は見つかりませんでした
   no_associated_terms_13bacefc: 関連する期間がありません
   no_attributes_locked_611c5cc: 属性がロックされていません
   no_broken_links_found_38d951e3: リンク切れは見つかりません
@@ -12023,6 +12082,7 @@ ja:
   no_ltis_configured_f4b9bc6b: LTIは設定されていません
   no_matching_users_found_83889c10: 一致するユーザは見つかりませんでした。
   no_migration_file: コンテンツ移行にはファイルが必要です。
+  no_more_results_to_load_6774fb1c: これ以上読み込む結果はありません。
   no_outcome_file_or_authority_given_c90f9c5f: 成果ファイルまたは権限が指定されていません
   no_password_was_given_472222e5: パスワードが指定されていません
   no_placements_enabled_f705f28: プレースメントは有効ではありません
@@ -12030,6 +12090,7 @@ ja:
   no_points_possible_72db3a55: 配点なし
   no_results_f36777ee: 結果なし
   no_results_found_58717065: 結果が見つかりません
+  no_results_found_e4b686bd: 検索結果が見つかりません。
   no_score_yet_c94e919b: まだスコアがありません
   no_students_dd8de9f0: 受講生なし
   no_students_have_taken_the_quiz_yet_e667644b: "受講生がまだ 1 人もこのクイズに回答していません"
@@ -16492,6 +16553,9 @@ ja:
       titles: 
         full_comments: クリックしてコメント全体を表示
         linked_to_learning_outcome: この基準がリンクされている学習成果があります。
+    rubrics_component: 
+      links: 
+        assign_rubric: 注釈の割り当て
     select_content_dialog: 
       add_to_module: "*モジュール*に %{item} を追加"
       assignment_item: 課題
@@ -16851,6 +16915,7 @@ ja:
   something_is_broken_but_i_can_work_around_it_for_n_7fcedb9d: 問題がありましたが、現在は回避できています
   something_went_wrong_inactivating_the_user_please__ea7d0001: ユーザーを無効にする際に、何等かのエラーが発生しました。後でもう一度試してください。
   something_went_wrong_please_try_again_6d337b6c: 何らかのエラーが発生しました。もう一度、試してください。
+  something_went_wrong_please_try_refreshing_the_pag_4e14a67: "なにかが失敗しました。ページを更新してみてください。問題が解決しない場合は、\"%{assignmentTitle}\" に 読み込むSpeedGrader記録が多すぎる可能性があります。"
   something_went_wrong_re_activating_the_user_please_82c3e7a: ユーザーを再アクティブ化する際に、何等かのエラーが発生しました。後でもう一度試してください。
   something_went_wrong_updating_the_user_s_role_plea_5de95400: ユーザーの役割を更新する際に、何等かのエラーが発生しました。後でもう一度試してください。
   something_went_wrong_when_trying_to_sync_grades_to_592c4c35: 成績を受講生情報システムに同期中にエラーが発生しました。後ほどもういちど試してください。
@@ -16861,9 +16926,11 @@ ja:
   sortable_name_73f707cf: 並べ替え可能な名前
   sorted_ascending_1f9b52c6: 昇順に並べ替え
   sorted_ascending_2318ec99: 昇順に並べ替え
+  sorted_ascending_3138603c: 昇順に並べ替えました。
   sorted_ascending_b6d61547: 昇順に並べ替え
   sorted_descending_1e30f0d5: 降順に並べ替え
   sorted_descending_7fcec1ff: 降順に並べ替え
+  sorted_descending_84ec84c8: 降順に並べ替えました。
   sorted_descending_d9aa3cf8: 降順に並べ替え
   source_code_2395ca74: "ソース コード"
   south_korea_16d43049: 韓国
@@ -17033,6 +17100,7 @@ ja:
   students_will_automatically_receive_full_credit_on_cc61df39: 受講生は、このサーベイに回答すると、自動的に全単位を取得します
   students_with_no_submissions_title: 提出物のない受講生
   studentsperrangecount_out_of_totalstudentsenrolled_90cbfaf1: "%{totalStudentsEnrolled} 受講生中 %{studentsPerRangeCount} "
+  sub_account_daeadd0: サブアカウント
   sub_accounts: 
     alerts: 
       subaccount_has_courses: コースが含まれているサブアカウントは削除できません
@@ -17102,6 +17170,7 @@ ja:
     view_rubric_assessment_in_the_speedgrader: "注釈のアセスメントを SpeedGrader で表示する"
   submission_in_another_grading_period_e754b329: 別の採点期間の提出物
   submission_options_5184a65b: 提出のオプション
+  submission_status_3079e730: 提出状態
   submission_tray_429ac3df: 提出トレイ
   submissions: 
     assignment_submit_success: 課題は正常に提出されました。

@@ -648,7 +648,7 @@ describe Quizzes::QuizzesApiController, type: :request do
         api_update_quiz({},{published: nil}) # nil shouldn't change published
         expect(@quiz.reload).to be_published
 
-        @quiz.any_instantiation.stubs(:has_student_submissions?).returns true
+        allow_any_instantiation_of(@quiz).to receive(:has_student_submissions?).and_return true
         json = api_update_quiz({},{}) # nil shouldn't change published
         expect(json['unpublishable']).to eq false
 

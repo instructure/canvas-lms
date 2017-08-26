@@ -120,7 +120,7 @@ describe MasterCourses::Restrictor do
 
       MasterCourses::Restrictor.preload_child_restrictions([@page_copy, page2_copy])
 
-      MasterCourses::MasterContentTag.expects(:where).never # don't load again
+      expect(MasterCourses::MasterContentTag).to receive(:where).never # don't load again
       expect(@page_copy.child_content_restrictions).to eq({})
       expect(page2_copy.child_content_restrictions).to eq({:content => true})
     end

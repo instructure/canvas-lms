@@ -24,8 +24,8 @@ describe "API", type: :request do
       obj = Object.new
       obj.extend Api::V1::Json
       course_with_teacher
-      session = mock()
-      @course.expects(:as_json).with({ :include_root => false, :permissions => { :user => @user, :session => session, :include_permissions => false }, :only => [ :name, :sis_source_id ] })
+      session = double()
+      expect(@course).to receive(:as_json).with({ :include_root => false, :permissions => { :user => @user, :session => session, :include_permissions => false }, :only => [ :name, :sis_source_id ] })
       obj.api_json(@course, @user, session, :only => [:name, :sis_source_id])
     end
 
@@ -40,7 +40,7 @@ describe "API", type: :request do
 
       obj.extend Api::V1::Json
       course_with_teacher
-      session = mock()
+      session = double()
 
       json_hash = obj.api_json(@course, @user, session, :only => [:name]) do |json, object|
         json.mapped_value = obj.serialized[:nested_key]
@@ -91,7 +91,7 @@ describe "API", type: :request do
     it "should use html form encoding by default" do
       html_request = "assignment[name]=test+assignment&assignment[points_possible]=15"
       # no content-type header is sent
-      post "/api/v1/courses/#{@course.id}/assignments", html_request, { "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }
+      post "/api/v1/courses/#{@course.id}/assignments", params: html_request, headers: { "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }
       expect(response).to be_success
       expect(response.header[content_type_key]).to eq 'application/json; charset=utf-8'
 
@@ -102,7 +102,7 @@ describe "API", type: :request do
 
     it "should support json POST request bodies" do
       json_request = { "assignment" => { "name" => "test assignment", "points_possible" => 15 } }
-      post "/api/v1/courses/#{@course.id}/assignments", json_request.to_json, { "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }
+      post "/api/v1/courses/#{@course.id}/assignments", params: json_request.to_json, headers: { "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }
       expect(response).to be_success
       expect(response.header[content_type_key]).to eq 'application/json; charset=utf-8'
 
@@ -123,7 +123,8 @@ describe "API", type: :request do
                        "submission" => {
                           "submission_type" => "online_upload",
                           "file_ids" => [a1.id, a2.id] } }
-      post "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions", json_request.to_json, { "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }
+      post "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions",
+        params: json_request.to_json, headers: { "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }
       expect(response).to be_success
       expect(response.header[content_type_key]).to eq 'application/json; charset=utf-8'
 

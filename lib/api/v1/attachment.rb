@@ -108,8 +108,13 @@ module Api::V1::Attachment
       hash['user'] = user_display_json(attachment.user, context)
     end
     if includes.include? 'preview_url'
-      hash['preview_url'] = attachment.crocodoc_url(user, options[:crocodoc_ids]) ||
-                            attachment.canvadoc_url(user, enable_annotations: options[:enable_annotations])
+
+      url_opts = {
+        moderated_grading_whitelist: options[:moderated_grading_whitelist],
+        enable_annotations: options[:enable_annotations]
+      }
+      hash['preview_url'] = attachment.crocodoc_url(user, url_opts) ||
+                            attachment.canvadoc_url(user, url_opts)
     end
     if includes.include? 'enhanced_preview_url'
       hash['preview_url'] = context_url(attachment.context, :context_file_file_preview_url, attachment, annotate: 0)

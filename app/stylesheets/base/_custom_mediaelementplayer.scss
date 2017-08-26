@@ -138,3 +138,21 @@ div.mejs-speed-button {
   background-color: rgba(255,255,255,.4) !important;
 }
 /* End: Speed */
+
+/* style for taking care of the weird outline of focus on audio comments.
+ * see CNVS-22375 for reference.
+ * this should ultimate be fixed in the mediaelement repo, but simon is
+ * currently making big changes to that. once he's done, we should fix this
+ * issue there with 'outline' style instead of this clever hack
+ */
+
+.mejs-audio:focus .mejs-inner:before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  outline: 5px auto rgb(59,153,252);
+  outline-offset: 1px;
+  content: ' ';
+}

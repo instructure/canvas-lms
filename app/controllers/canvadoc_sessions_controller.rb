@@ -40,7 +40,10 @@ class CanvadocSessionsController < ApplicationController
 
       opts[:enable_annotations] = blob["enable_annotations"]
       attachment.submit_to_canvadocs(1, opts) unless attachment.canvadoc_available?
-      url = attachment.canvadoc.session_url(opts.merge(user: @current_user))
+      url = attachment.canvadoc.session_url(opts.merge({
+        user: @current_user,
+        moderated_grading_whitelist: blob["moderated_grading_whitelist"]
+      }))
 
       # For the purposes of reporting student viewership, we only
       # care if the original attachment owner is looking

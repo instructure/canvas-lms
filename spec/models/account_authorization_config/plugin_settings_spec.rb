@@ -32,18 +32,18 @@ describe AccountAuthorizationConfig::PluginSettings do
     end
   end
 
-  let(:plugin) { mock() }
+  let(:plugin) { double() }
 
   before do
-    Canvas::Plugin.stubs(:find).with(:custom_plugin).returns(plugin)
+    allow(Canvas::Plugin).to receive(:find).with(:custom_plugin).and_return(plugin)
   end
 
   describe '.globally_configured?' do
     it 'chains to the plugin being enabled' do
-      plugin.stubs(:enabled?).returns(false)
+      allow(plugin).to receive(:enabled?).and_return(false)
       expect(klass.globally_configured?).to eq false
 
-      plugin.stubs(:enabled?).returns(true)
+      allow(plugin).to receive(:enabled?).and_return(true)
       expect(klass.globally_configured?).to eq true
     end
   end
@@ -51,14 +51,14 @@ describe AccountAuthorizationConfig::PluginSettings do
   describe '.recognized_params' do
     context 'with plugin config' do
       it 'returns nothing' do
-        plugin.stubs(:enabled?).returns(true)
+        allow(plugin).to receive(:enabled?).and_return(true)
         expect(klass.recognized_params).to eq []
       end
     end
 
     context 'without plugin config' do
       it 'returns plugin params' do
-        plugin.stubs(:enabled?).returns(false)
+        allow(plugin).to receive(:enabled?).and_return(false)
         expect(klass.recognized_params).to eq [:auth_host, :noninherited_method]
       end
     end
@@ -72,14 +72,14 @@ describe AccountAuthorizationConfig::PluginSettings do
     end
 
     before do
-      plugin.stubs(:settings).returns(auth_host: 'ps',
+      allow(plugin).to receive(:settings).and_return(auth_host: 'ps',
                                       noninherited_method: 'hidden',
                                       renamed_setting: 'renamed')
     end
 
     context "with plugin config" do
       before do
-        plugin.stubs(:enabled?).returns(true)
+        allow(plugin).to receive(:enabled?).and_return(true)
       end
 
       it 'uses settings from plugin' do
@@ -93,7 +93,7 @@ describe AccountAuthorizationConfig::PluginSettings do
 
     context "without plugin config" do
       before do
-        plugin.stubs(:enabled?).returns(false)
+        allow(plugin).to receive(:enabled?).and_return(false)
       end
 
       it 'uses settings from plugin' do

@@ -29,10 +29,6 @@ describe 'quizzes accessibility' do
     @last_quiz = start_quiz_question
   end
 
-  after(:each) do
-    unstub_rcs_config
-  end
-
   it 'renders all answer arrows accessible to a screen reader', priority: "2", test_id: 209355 do
     skip('started failing around Mar 20, 2016 - need investigation')
     skip_if_chrome('Can not get to student view in Chrome')

@@ -29,10 +29,6 @@ describe "quizzes question creation with attempts" do
     @last_quiz = start_quiz_question
   end
 
-  after(:each) do
-    unstub_rcs_config
-  end
-
   context 'quiz attempts' do
     def fill_out_attempts_and_validate(attempts, alert_text, expected_attempt_text)
       click_settings_tab

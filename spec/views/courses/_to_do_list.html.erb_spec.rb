@@ -109,8 +109,8 @@ describe "courses/_to_do_list.html.erb" do
                          submission_types: "online_text_entry",
                          points_possible: 15,
                          title: "GradeMe")
-        Assignment.stubs(:need_grading_info).returns(Assignment.where(id: @assignment.id))
-        Assignments::NeedsGradingCountQuery.any_instance.stubs(:manual_count).returns(1000)
+        allow(Assignment).to receive(:need_grading_info).and_return(Assignment.where(id: @assignment.id))
+        allow_any_instance_of(Assignments::NeedsGradingCountQuery).to receive(:manual_count).and_return(1000)
         @user = @teacher
         @user.course_nicknames[@course.id] = "My Awesome Course"
         @user.save!
@@ -136,7 +136,7 @@ describe "courses/_to_do_list.html.erb" do
                          points_possible: 15,
                          title: "ModerateMe",
                          moderated_grading: true)
-        Assignments::NeedsGradingCountQuery.any_instance.stubs(:manual_count).returns(1)
+        allow_any_instance_of(Assignments::NeedsGradingCountQuery).to receive(:manual_count).and_return(1)
         @submission = submission_model(assignment: @assignment, body: "my submission")
         @submission.find_or_create_provisional_grade!(@teacher, grade: 5)
         @user = @teacher

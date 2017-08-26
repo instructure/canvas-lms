@@ -16,4 +16,4 @@ services:
     build: ./docker-compose/postgres
 
   redis:
-    image: redis:2.6
+    image: redis:alpine

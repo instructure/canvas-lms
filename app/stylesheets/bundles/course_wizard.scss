@@ -77,7 +77,7 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   flex: 0 0 36px;
 
   &:hover, &:focus {
-    border-color: $ic-brand-primary;
+    border-color: var(--ic-brand-primary);
     background-color: rgba($ic-color-light, 0.1);
   }
   @include breakpoint(mini-tablet) {
@@ -130,7 +130,7 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   @if $use_high_contrast {
     color: $ic-color-light;
     &:hover, &:focus, &.ic-wizard-box__content-trigger--active {
-      background-color: $ic-brand-primary;
+      background-color: var(--ic-brand-primary);
       color: canvas-light;
     }
   }
@@ -145,7 +145,7 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   @include breakpoint(desktop) { @include fontSize(15px); }
 
   &:hover, &:focus, &.ic-wizard-box__content-trigger--active {
-    border-left-color: $ic-brand-primary;
+    border-left-color: var(--ic-brand-primary);
     text-decoration: none;
     color: $ic-color-light;
   }

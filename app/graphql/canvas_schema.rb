@@ -20,6 +20,8 @@ CanvasSchema = GraphQL::Schema.define do
     when Assignment then Types::AssignmentType
     when CourseSection then Types::SectionType
     when User then Types::UserType
+    when Enrollment then Types::EnrollmentType
+    when GradingPeriod then Types::GradingPeriodType
     end
   }
 

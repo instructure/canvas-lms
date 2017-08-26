@@ -106,6 +106,6 @@ class Login::CasController < ApplicationController
   end
 
   def cas_login_url
-    url_for({ controller: 'login/cas', action: :new }.merge(params.slice(:id)))
+    url_for({ controller: 'login/cas', action: :new }.merge(params.permit(:id).to_unsafe_h))
   end
 end

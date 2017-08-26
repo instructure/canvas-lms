@@ -28,5 +28,31 @@ module Types
           nil
       }
     end
+
+    field :enrollments, types[EnrollmentType] do
+      argument :courseId, !types.ID,
+        "only return enrollments for this course",
+        prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+
+      resolve ->(user, args, ctx) do
+        Loaders::IDLoader.for(Course).load(args[:courseId]).then do |course|
+          if course.grants_any_right? ctx[:current_user], :read_roster, :view_all_grades, :manage_grades
+            UserCourseEnrollmentLoader.for(course, ctx[:current_user]).load(user.id)
+          else
+            nil
+          end
+        end
+      end
+    end
   end
 end
+
+class UserCourseEnrollmentLoader < Loaders::ForeignKeyLoader
+  def initialize(course, user)
+    scope = course.
+      apply_enrollment_visibility(course.all_enrollments, user).
+      active_or_pending
+    super(scope, :user_id)
+  end
+end
+

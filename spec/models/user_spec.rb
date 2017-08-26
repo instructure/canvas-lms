@@ -29,12 +29,12 @@ describe User do
 
   it "should get the first email from communication_channel" do
     @user = User.create
-    @cc1 = mock('CommunicationChannel')
-    @cc1.stubs(:path).returns('cc1')
-    @cc2 = mock('CommunicationChannel')
-    @cc2.stubs(:path).returns('cc2')
-    @user.stubs(:communication_channels).returns([@cc1, @cc2])
-    @user.stubs(:communication_channel).returns(@cc1)
+    @cc1 = double('CommunicationChannel')
+    allow(@cc1).to receive(:path).and_return('cc1')
+    @cc2 = double('CommunicationChannel')
+    allow(@cc2).to receive(:path).and_return('cc2')
+    allow(@user).to receive(:communication_channels).and_return([@cc1, @cc2])
+    allow(@user).to receive(:communication_channel).and_return(@cc1)
     expect(@user.communication_channel).to eql(@cc1)
   end
 
@@ -266,7 +266,7 @@ describe User do
     user.reload
     expect(user.associated_account_ids.include?(account1.id)).to be_truthy
     expect(user.associated_account_ids.include?(account2.id)).to be_falsey
-    expect(user.account_users.where(:account_id => [account2, sub])).to be_empty
+    expect(user.account_users.active.where(account_id: [account2, sub])).to be_empty
   end
 
   it "should search by multiple fields" do
@@ -559,7 +559,7 @@ describe User do
       user2 = user_factory
       c1 = course_factory(name: 'a', active_course: true)
       e = c1.enroll_teacher(user1)
-      user2.stubs(:temporary_invitations).returns([e])
+      allow(user2).to receive(:temporary_invitations).and_return([e])
       c2 = course_factory(name: 'b', active_course: true)
       c2.enroll_user(user2)
 
@@ -757,21 +757,21 @@ describe User do
     end
 
     it 'is false if the account is not a root account' do
-      expect(user.has_subset_of_account_permissions?(other_user, stub(:root_account? => false))).to be_falsey
+      expect(user.has_subset_of_account_permissions?(other_user, double(:root_account? => false))).to be_falsey
     end
 
     it 'is true if there are no account users for this root account' do
-      account = stub(:root_account? => true, :all_account_users_for => [])
+      account = double(:root_account? => true, :all_account_users_for => [])
       expect(user.has_subset_of_account_permissions?(other_user, account)).to be_truthy
     end
 
     it 'is true when all account_users for current user are subsets of target user' do
-      account = stub(:root_account? => true, :all_account_users_for => [stub(:is_subset_of? => true)])
+      account = double(:root_account? => true, :all_account_users_for => [double(:is_subset_of? => true)])
       expect(user.has_subset_of_account_permissions?(other_user, account)).to be_truthy
     end
 
     it 'is false when any account_user for current user is not a subset of target user' do
-      account = stub(:root_account? => true, :all_account_users_for => [stub(:is_subset_of? => false)])
+      account = double(:root_account? => true, :all_account_users_for => [double(:is_subset_of? => false)])
       expect(user.has_subset_of_account_permissions?(other_user, account)).to be_falsey
     end
   end
@@ -783,7 +783,7 @@ describe User do
     end
 
     before :each do
-      @course.stubs(:grants_right?).returns(true)
+      allow(@course).to receive(:grants_right?).and_return(true)
     end
 
     it "should require parameters" do
@@ -792,14 +792,14 @@ describe User do
     end
 
     it "should check current courses" do
-      @student.expects(:courses).once.returns([@course])
-      @student.expects(:concluded_courses).never
+      expect(@student).to receive(:courses).once.and_return([@course])
+      expect(@student).to receive(:concluded_courses).never
       expect(@student.check_courses_right?(@teacher, :some_right)).to be_truthy
     end
 
     it "should check concluded courses" do
-      @student.expects(:courses).once.returns([])
-      @student.expects(:concluded_courses).once.returns([@course])
+      expect(@student).to receive(:courses).once.and_return([])
+      expect(@student).to receive(:concluded_courses).once.and_return([@course])
       expect(@student.check_courses_right?(@teacher, :some_right)).to be_truthy
     end
   end
@@ -1162,7 +1162,7 @@ describe User do
     end
 
     it "should return a useful avatar_fallback_url" do
-      HostUrl.stubs(:protocol).returns('https')
+      allow(HostUrl).to receive(:protocol).and_return('https')
 
       expect(User.avatar_fallback_url).to eq(
         "https://#{HostUrl.default_host}/images/messages/avatar-50.png"
@@ -1170,7 +1170,7 @@ describe User do
       expect(User.avatar_fallback_url("/somepath")).to eq(
         "https://#{HostUrl.default_host}/somepath"
       )
-      HostUrl.expects(:default_host).returns('somedomain:3000')
+      expect(HostUrl).to receive(:default_host).and_return('somedomain:3000')
       expect(User.avatar_fallback_url("/path")).to eq(
         "https://somedomain:3000/path"
       )
@@ -1458,11 +1458,6 @@ describe User do
       @account3 = Account.create!
     end
 
-    before :each do
-      Pseudonym.any_instance.stubs(:works_for_account?).returns(false)
-      Pseudonym.any_instance.stubs(:works_for_account?).with(Account.default, false).returns(true)
-    end
-
     it "should create a copy of an existing pseudonym" do
       # from unrelated account
       user_with_pseudonym(:active_all => 1, :account => @account2, :username => 'unrelated@example.com', :password => 'abcdefgh')
@@ -1723,17 +1718,17 @@ describe User do
   describe "select_upcoming_assignments" do
     it "filters based on assignment date for asignments the user cannot delete" do
       time = Time.now + 1.day
-      assignments = [stub, stub, stub]
+      assignments = [double, double, double]
       user = User.new
       assignments.each do |assignment|
-        assignment.stubs(:due_at => time)
-        assignment.expects(:grants_right?).with(user, :delete).returns false
+        allow(assignment).to receive_messages(:due_at => time)
+        expect(assignment).to receive(:grants_right?).with(user, :delete).and_return false
       end
       expect(user.select_upcoming_assignments(assignments,{:end_at => time})).to eq assignments
     end
 
     it "returns assignments that have an override between now and end_at opt" do
-      assignments = [stub, stub, stub, stub]
+      assignments = [double, double, double, double]
       Timecop.freeze(Time.utc(2013,3,13,0,0)) do
         user = User.new
         due_date1 = {:due_at => Time.now + 1.day}
@@ -1741,16 +1736,16 @@ describe User do
         due_date3 = {:due_at => 2.weeks.from_now }
         due_date4 = {:due_at => nil }
         assignments.each do |assignment|
-          assignment.expects(:grants_right?).with(user, :delete).returns true
+          expect(assignment).to receive(:grants_right?).with(user, :delete).and_return true
         end
-        assignments.first.expects(:dates_hash_visible_to).with(user).
-          returns [due_date1]
-        assignments.second.expects(:dates_hash_visible_to).with(user).
-          returns [due_date2]
-        assignments.third.expects(:dates_hash_visible_to).with(user).
-          returns [due_date3]
-        assignments[3].expects(:dates_hash_visible_to).with(user).
-          returns [due_date4]
+        expect(assignments.first).to receive(:dates_hash_visible_to).with(user).
+          and_return [due_date1]
+        expect(assignments.second).to receive(:dates_hash_visible_to).with(user).
+          and_return [due_date2]
+        expect(assignments.third).to receive(:dates_hash_visible_to).with(user).
+          and_return [due_date3]
+        expect(assignments[3]).to receive(:dates_hash_visible_to).with(user).
+          and_return [due_date4]
         upcoming_assignments = user.select_upcoming_assignments(assignments,{
           :end_at => 1.week.from_now
         })
@@ -2830,7 +2825,7 @@ describe User do
       p = user.pseudonyms.create!(:account => account, :unique_id => 'user')
       account.account_users.create!(user: user)
 
-      user.expects(:pseudonyms).never
+      expect(user).to receive(:pseudonyms).never
       expect(user.mfa_settings(pseudonym_hint: p)).to eq :required
     end
   end
@@ -3044,6 +3039,14 @@ describe User do
 
         assmt.update_attribute(:grades_published_at, Time.now.utc)
         expect(@teacher.assignments_needing_moderation.length).to eq 0 # should not count anymore once grades are published
+      end
+
+      it "should not return duplicates" do
+        assmt = @course2.assignments.first
+        assmt.grade_student(@studentA, :grade => "1", :grader => @teacher, :provisional => true)
+        assmt.grade_student(@studentB, :grade => "2", :grader => @teacher, :provisional => true)
+        expect(@teacher.assignments_needing_moderation.length).to eq 1
+        expect(@teacher.assignments_needing_moderation.first).to eq assmt
       end
 
       it "should not give a count for non-moderators" do
@@ -3272,7 +3275,7 @@ describe User do
     end
   end
 
-  describe "all_accounts" do
+  describe "adminable_accounts" do
     specs_require_sharding
 
     it "should include accounts from multiple shards" do
@@ -3283,7 +3286,7 @@ describe User do
         @account2.account_users.create!(user: @user)
       end
 
-      expect(@user.all_accounts.map(&:id).sort).to eq [Account.site_admin, @account2].map(&:id).sort
+      expect(@user.adminable_accounts.map(&:id).sort).to eq [Account.site_admin, @account2].map(&:id).sort
     end
 
     it "should exclude deleted accounts" do
@@ -3295,7 +3298,7 @@ describe User do
         @account2.destroy
       end
 
-      expect(@user.all_accounts.map(&:id).sort).to eq [Account.site_admin].map(&:id).sort
+      expect(@user.adminable_accounts.map(&:id).sort).to eq [Account.site_admin].map(&:id).sort
     end
   end
 
@@ -3357,12 +3360,12 @@ describe User do
     end
 
     context 'after being set to true' do
-      before { user.stubs(preferences: { manual_mark_as_read: true }) }
+      before { allow(user).to receive_messages(preferences: { manual_mark_as_read: true }) }
       it     { is_expected.to be_truthy }
     end
 
     context 'after being set to false' do
-      before { user.stubs(preferences: { manual_mark_as_read: false }) }
+      before { allow(user).to receive_messages(preferences: { manual_mark_as_read: false }) }
       it     { is_expected.to be_falsey }
     end
   end
@@ -3547,7 +3550,7 @@ describe User do
         account_admin_user(user: target, account: account, role: Role.get_built_in_role('AccountMembership'))
         # create seeking user as admin on that account
         seeker = account_admin_user(account: account, role: Role.get_built_in_role('AccountAdmin'))
-        seeker.stubs(:associated_shards).returns([])
+        allow(seeker).to receive(:associated_shards).and_return([])
         # ensure seeking user gets permissions it should on target user
         expect(target.grants_right?(seeker, :view_statistics)).to eq true
       end
@@ -3649,8 +3652,8 @@ describe User do
     end
 
     it "should batch DueDateCacher jobs" do
-      DueDateCacher.expects(:recompute).never
-      DueDateCacher.expects(:recompute_course).twice # sync_enrollments and destroy_enrollments
+      expect(DueDateCacher).to receive(:recompute).never
+      expect(DueDateCacher).to receive(:recompute_course).twice # sync_enrollments and destroy_enrollments
       test_student = @course.student_view_student
       test_student.destroy
       test_student.reload.enrollments.each { |e| expect(e).to be_deleted }
@@ -3675,7 +3678,7 @@ describe User do
 
   it "should reset its conversation counter when told to" do
     user = user_model
-    user.stubs(:conversations).returns Struct.new(:unread).new(Array.new(5))
+    allow(user).to receive(:conversations).and_return Struct.new(:unread).new(Array.new(5))
     user.reset_unread_conversations_counter
     expect(user.reload.unread_conversations_count).to eq 5
   end

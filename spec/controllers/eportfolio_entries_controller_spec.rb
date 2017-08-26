@@ -37,7 +37,7 @@ describe EportfolioEntriesController do
   describe "GET 'show'" do
     before(:once) { eportfolio_entry(@category) }
     it "should require authorization" do
-      get 'show', :eportfolio_id => @portfolio.id, :id => @entry.id
+      get 'show', params: {:eportfolio_id => @portfolio.id, :id => @entry.id}
       assert_unauthorized
     end
     
@@ -48,7 +48,7 @@ describe EportfolioEntriesController do
       attachment.save!
       @entry.content = [{:section_type => 'attachment', :attachment_id => attachment.id}]
       @entry.save!
-      get 'show', :eportfolio_id => @portfolio.id, :id => @entry.id
+      get 'show', params: {:eportfolio_id => @portfolio.id, :id => @entry.id}
       expect(response).to be_success
       expect(assigns[:category]).to eql(@category)
       expect(assigns[:page]).to eql(@entry)
@@ -64,7 +64,7 @@ describe EportfolioEntriesController do
       @category.save!
       @entry.name = "some entry"
       @entry.save!
-      get 'show', :eportfolio_id => @portfolio.id, :category_name => @category.slug, :entry_name => @entry.slug
+      get 'show', params: {:eportfolio_id => @portfolio.id, :category_name => @category.slug, :entry_name => @entry.slug}
       expect(assigns[:category]).to eql(@category)
       expect(assigns[:page]).to eql(@entry)
       expect(assigns[:entries]).not_to be_nil
@@ -74,13 +74,13 @@ describe EportfolioEntriesController do
   
   describe "POST 'create'" do
     it "should require authorization" do
-      post 'create', :eportfolio_id => @portfolio.id
+      post 'create', params: {:eportfolio_id => @portfolio.id}
       assert_unauthorized
     end
     
     it "should create entry" do
       user_session(@user)
-      post 'create', :eportfolio_id => @portfolio.id, :eportfolio_entry => {:eportfolio_category_id => @category.id, :name => "some entry"}
+      post 'create', params: {:eportfolio_id => @portfolio.id, :eportfolio_entry => {:eportfolio_category_id => @category.id, :name => "some entry"}}
       expect(response).to be_redirect
       expect(assigns[:category]).to eql(@category)
       expect(assigns[:page]).not_to be_nil
@@ -91,13 +91,13 @@ describe EportfolioEntriesController do
   describe "PUT 'update'" do
     before(:once) { eportfolio_entry(@category) }
     it "should require authorization" do
-      put 'update', :eportfolio_id => @portfolio.id, :id => @entry.id
+      put 'update', params: {:eportfolio_id => @portfolio.id, :id => @entry.id}
       assert_unauthorized
     end
     
     it "should update entry" do
       user_session(@user)
-      put 'update', :eportfolio_id => @portfolio.id, :id => @entry.id, :eportfolio_entry => {:name => "new name"}
+      put 'update', params: {:eportfolio_id => @portfolio.id, :id => @entry.id, :eportfolio_entry => {:name => "new name"}}
       expect(response).to be_redirect
       expect(assigns[:entry]).not_to be_nil
       expect(assigns[:entry].name).to eql("new name")
@@ -107,13 +107,13 @@ describe EportfolioEntriesController do
   describe "DELETE 'destroy'" do
     before(:once) { eportfolio_entry(@category) }
     it "should require authorization" do
-      delete 'destroy', :eportfolio_id => @portfolio.id, :id => @entry.id
+      delete 'destroy', params: {:eportfolio_id => @portfolio.id, :id => @entry.id}
       assert_unauthorized
     end
     
     it "should delete entry" do
       user_session(@user)
-      delete 'destroy', :eportfolio_id => @portfolio.id, :id => @entry.id
+      delete 'destroy', params: {:eportfolio_id => @portfolio.id, :id => @entry.id}
       expect(response).to be_redirect
       expect(assigns[:entry]).not_to be_nil
       expect(assigns[:entry]).to be_frozen
@@ -123,14 +123,14 @@ describe EportfolioEntriesController do
   describe "GET 'attachment'" do
     before(:once) { eportfolio_entry(@category) }
     it "should require authorization" do
-      get 'attachment', :eportfolio_id => @portfolio.id, :entry_id => @entry.id, :attachment_id => 1
+      get 'attachment', params: {:eportfolio_id => @portfolio.id, :entry_id => @entry.id, :attachment_id => 1}
       assert_unauthorized
     end
     
     it "should redirect to page" do
       user_session(@user)
       begin
-        get 'attachment', :eportfolio_id => @portfolio.id, :entry_id => @entry.id, :attachment_id => SecureRandom.uuid
+        get 'attachment', params: {:eportfolio_id => @portfolio.id, :entry_id => @entry.id, :attachment_id => SecureRandom.uuid}
       rescue => e
         expect(e.to_s).to eql("Not Found")
       end

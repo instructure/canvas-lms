@@ -48,17 +48,15 @@ $sg-header-subnavigation-item: $ic-color-light !default;
 $sg-header-subnavigation-item--hover: $ic-color-neutral !default;
 $sg-header-subnavigation-item--active: $ic-color-light !default;
 
-$sg-content-title-background: $ic-brand-primary !default;
 $sg-content-title-font-color: $ic-color-light !default;
 $sg-content-hr-border-color: $sg-background-global-nav !default;
 
-$sg-src-file-path-background: $ic-brand-primary !default;
 $sg-src-file-path-border-color: $ic-color-light !default;
 $sg-src-file-path-font-color: $ic-color-light !default;
 
 //// Stylesheet Examples & Syntax
 ////////
-$sg-example-tag-color: $ic-brand-primary !default;
+$sg-example-tag-color: var(--ic-brand-primary) !default;
 $sg-example-string-color: $ic-color-neutral !default;
 $sg-example-border: $ic-color-neutral !default;
 $sg-example-main-color: $ic-color-dark !default;

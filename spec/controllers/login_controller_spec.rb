@@ -29,7 +29,7 @@ describe LoginController do
     it "should set merge params correctly in the session" do
       user_with_pseudonym(active: true)
       @cc = @user.communication_channels.create!(:path => 'jt+1@instructure.com')
-      get 'new', :confirm => @cc.confirmation_code, :expected_user_id => @user.id
+      get 'new', params: {:confirm => @cc.confirmation_code, :expected_user_id => @user.id}
       expect(response).to be_redirect
       expect(session[:confirm]).to eq @cc.confirmation_code
       expect(session[:expected_user_id]).to eq @user.id
@@ -49,7 +49,7 @@ describe LoginController do
 
       flash_hash = ActionDispatch::Flash::FlashHash.new
       flash_hash[:delegated_message] = 'hi'
-      controller.stubs(:flash).returns(flash_hash)
+      allow(controller).to receive(:flash).and_return(flash_hash)
       get 'new'
       expect(response).to redirect_to('https://google.com/?message=hi')
     end
@@ -57,7 +57,7 @@ describe LoginController do
     it "handles legacy canvas_login=1 param" do
       account_with_cas(account: Account.default)
 
-      get 'new', canvas_login: '1'
+      get 'new', params: {canvas_login: '1'}
       expect(response).to redirect_to(canvas_login_url)
     end
 
@@ -68,7 +68,7 @@ describe LoginController do
 
       account_with_saml(account: Account.default)
       aac = Account.default.authentication_providers.first
-      get 'new', id: aac
+      get 'new', params: {id: aac}
       expect(response).to redirect_to(saml_login_url(aac))
     end
 
@@ -96,7 +96,7 @@ describe LoginController do
       Account.default.authentication_providers.create!(auth_type: 'facebook')
       account_with_cas(account: Account.default)
 
-      get 'new', authentication_provider: 'cas'
+      get 'new', params: {authentication_provider: 'cas'}
       expect(response).to redirect_to(controller.url_for(controller: 'login/cas', action: :new))
     end
 
@@ -104,12 +104,12 @@ describe LoginController do
       ap2 = Account.default.authentication_providers.create!(auth_type: 'cas')
       account_with_cas(account: Account.default)
 
-      get 'new', authentication_provider: ap2.id
+      get 'new', params: {authentication_provider: ap2.id}
       expect(response).to redirect_to(controller.url_for(controller: 'login/cas', action: :new, id: ap2.id))
     end
 
     it "should pass pseudonym_session[unique_id] to redirect to populate username textbox" do
-      get 'new', "pseudonym_session" => {"unique_id"=>"test"}
+      get 'new', params: {"pseudonym_session" => {"unique_id"=>"test"}}
       expect(response).to redirect_to(
         controller.url_for(controller: 'login/canvas', action: :new)+'?pseudonym_session%5Bunique_id%5D=test')
     end
@@ -117,7 +117,7 @@ describe LoginController do
     it "should pass pseudonym_session[unique_id] to redirect from current username" do
       user_with_pseudonym(unique_id: 'test', active: 1)
       user_session(@user, @pseudonym)
-      get 'new', "pseudonym_session" => {"unique_id"=>"test"}, force_login: 1
+      get 'new', params: {"pseudonym_session" => {"unique_id"=>"test"}, force_login: 1}
       expect(response).to redirect_to(
                             controller.url_for(controller: 'login/canvas', action: :new)+'?pseudonym_session%5Bunique_id%5D=test')
     end
@@ -149,10 +149,18 @@ describe LoginController do
 
     it "follows CAS logout redirect to CAS server" do
       account_with_cas(account: Account.default)
-      session[:login_aac] = Account.default.authentication_providers.first
+      session[:login_aac] = Account.default.authentication_providers.first.id
       delete 'destroy'
       expect(response.status).to eq 302
       expect(response.location).to match(%r{localhost/cas/})
+    end
+
+    it "returns you to Canvas login if you logged in via Canvas, but something else is the primary provider" do
+      account_with_saml(account: Account.default, saml_log_out_url: 'https://www.google.com/')
+      session[:login_aac] = Account.default.canvas_authentication_provider.id
+      delete 'destroy'
+      expect(response.status).to eq 302
+      expect(response.location).to match(%r{/login/canvas$})
     end
   end
 

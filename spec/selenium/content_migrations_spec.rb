@@ -209,7 +209,7 @@ describe "content migrations", :non_parallel do
   end
 
   context "course copy" do
-    before :once do
+    before do
       #the "true" param is important, it forces the cache clear
       #  without it this spec group fails if
       #  you run it with the whole suite

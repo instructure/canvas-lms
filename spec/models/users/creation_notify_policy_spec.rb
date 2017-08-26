@@ -35,24 +35,24 @@ module Users
     end
 
     describe "#dispatch!" do
-      let(:user){ stub() }
-      let(:pseudonym) { stub() }
-      let(:channel){ stub() }
+      let(:user){ double() }
+      let(:pseudonym) { double() }
+      let(:channel){ double() }
 
       context "for self_registration" do
         let(:policy){ CreationNotifyPolicy.new(true, {force_self_registration: true}) }
-        before{ channel.stubs(has_merge_candidates?: false) }
+        before{ allow(channel).to receive_messages(has_merge_candidates?: false) }
 
         it "sends confirmation notification" do
-          user.stubs(pre_registered?: true)
-          pseudonym.expects(:send_confirmation!)
+          allow(user).to receive_messages(pre_registered?: true)
+          expect(pseudonym).to receive(:send_confirmation!)
           result = policy.dispatch!(user, pseudonym, channel)
           expect(result).to be(true)
         end
 
         it "sends the registration notification if the user is pending or registered" do
-          user.stubs(pre_registered?: false, registered?: false)
-          pseudonym.expects(:send_registration_notification!)
+          allow(user).to receive_messages(pre_registered?: false, registered?: false)
+          expect(pseudonym).to receive(:send_registration_notification!)
           result = policy.dispatch!(user, pseudonym, channel)
           expect(result).to be(true)
         end
@@ -60,39 +60,39 @@ module Users
 
       context "when the user isn't yet registered" do
         before do
-          user.stubs(registered?: false)
-          channel.stubs(has_merge_candidates?: false)
+          allow(user).to receive_messages(registered?: false)
+          allow(channel).to receive_messages(has_merge_candidates?: false)
         end
 
         it "sends the registration notification if should notify" do
           policy = CreationNotifyPolicy.new(true, {send_confirmation: '1'})
-          pseudonym.expects(:send_registration_notification!)
+          expect(pseudonym).to receive(:send_registration_notification!)
           result = policy.dispatch!(user, pseudonym, channel)
           expect(result).to be(true)
         end
 
         it "doesnt send the registration notification if shouldnt notify" do
           policy = CreationNotifyPolicy.new(true, {send_confirmation: '0'})
-          pseudonym.expects(:send_registration_notification!).never
+          expect(pseudonym).to receive(:send_registration_notification!).never
           result = policy.dispatch!(user, pseudonym, channel)
           expect(result).to be(false)
         end
       end
 
       context "when the user is registered" do
-        before{ user.stubs(registered?: true) }
+        before{ allow(user).to receive_messages(registered?: true) }
         let(:policy){ CreationNotifyPolicy.new(true, {}) }
 
         it "sends the merge notification if there are merge candidates" do
-          channel.stubs(has_merge_candidates?: true)
-          channel.expects(:send_merge_notification!)
+          allow(channel).to receive_messages(has_merge_candidates?: true)
+          expect(channel).to receive(:send_merge_notification!)
           result = policy.dispatch!(user, pseudonym, channel)
           expect(result).to be(false)
         end
 
         it "does nothing without merge candidates" do
-          channel.stubs(has_merge_candidates?: false)
-          channel.expects(:send_merge_notification!).never
+          allow(channel).to receive_messages(has_merge_candidates?: false)
+          expect(channel).to receive(:send_merge_notification!).never
           result = policy.dispatch!(user, pseudonym, channel)
           expect(result).to be(false)
         end

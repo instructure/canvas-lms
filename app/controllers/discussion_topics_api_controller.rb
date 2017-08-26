@@ -631,6 +631,7 @@ class DiscussionTopicsApiController < ApplicationController
       log_asset_access(@topic, 'topics', 'topics', 'participate')
       if has_attachment
         @attachment = (@current_user || @context).attachments.create(:uploaded_data => params[:attachment])
+        @attachment.handle_duplicates(:rename)
         @entry.attachment = @attachment
         @entry.save
       end

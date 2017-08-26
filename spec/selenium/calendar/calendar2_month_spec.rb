@@ -294,7 +294,7 @@ describe "calendar2" do
       end
 
       it "should not have a delete link for a frozen assignment" do
-        PluginSetting.stubs(:settings_for_plugin).returns({"assignment_group_id" => "true"})
+        allow(PluginSetting).to receive(:settings_for_plugin).and_return({"assignment_group_id" => "true"})
         frozen_assignment = @course.assignments.build(
             name: "frozen assignment",
             due_at: Time.zone.now,

@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "plugins/show" do
   it "renders without exploding" do
-    plugin = stub(
+    plugin = double(
       id: 'some_plugin',
       name: "Some Plugin",
       settings_partial: "settings_header"
@@ -29,8 +29,8 @@ describe "plugins/show" do
 
     assign(:plugin, plugin)
     assign(:plugin_setting, plugin_setting)
-    view.stubs(:plugin_path).returns("/some/path")
-    view.stubs(:params).returns({id: 'some_plugin'})
+    allow(view).to receive(:plugin_path).and_return("/some/path")
+    allow(view).to receive(:params).and_return({id: 'some_plugin'})
     render 'plugins/show'
     expect(response.body).to match("Return to plugins list")
   end

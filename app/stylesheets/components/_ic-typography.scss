@@ -119,8 +119,8 @@ a.text-warning:hover { color: darken($ic-color-alert, 10%); }
 .text-error { color: $ic-color-danger; }
 a.text-error:hover { color: darken($ic-color-danger, 10%); }
 
-.text-info { color: $ic-brand-primary; }
-a.text-info:hover { color: darken($ic-brand-primary, 10%); }
+.text-info { color: var(--ic-brand-primary); }
+a.text-info:hover { color: var(--ic-brand-primary-darkened-10); }
 
 .text-success { color: $ic-color-success; }
 a.text-success:hover { color: darken($ic-color-success, 10%); }

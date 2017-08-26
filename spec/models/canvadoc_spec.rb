@@ -21,8 +21,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe 'Canvadoc' do
 
   def stub_upload
-    Canvadocs::API.any_instance.stubs(:upload).returns "id" => 123456,
-      "status" => "pending"
+    expectation = receive(:upload).and_return "id" => 123456, "status" => "pending"
+    allow_any_instance_of(Canvadocs::API).to expectation
+    expectation
   end
 
   before do
@@ -31,7 +32,7 @@ describe 'Canvadoc' do
                                         "base_url" => "http://example.com",
                                         "annotations_supported" => true}
     stub_upload
-    Canvadocs::API.any_instance.stubs(:session).returns "id" => "blah",
+    allow_any_instance_of(Canvadocs::API).to receive(:session).and_return "id" => "blah",
       "status" => "pending"
     @user = user_model
     @attachment = attachment_model(user: @user, content_type: "application/pdf")
@@ -39,7 +40,7 @@ describe 'Canvadoc' do
   end
 
   def disable_canvadocs
-    Canvadocs.stubs(:enabled?).returns false
+    allow(Canvadocs).to receive(:enabled?).and_return false
   end
 
   describe "#upload" do
@@ -77,20 +78,20 @@ describe 'Canvadoc' do
       @doc.upload
       @doc.has_annotations = true
       canvadocs_api = @doc.send(:canvadocs_api)
-      expect(canvadocs_api).to receive(:session).with(anything, hash_including(annotation_context: 'default')).and_call_original
+      expect(canvadocs_api).to receive(:session).with(anything, hash_including(annotation_context: 'default')).and_return({})
       @doc.session_url(user: @attachment.user, enable_annotations: true)
     end
 
     it "Creates test context for annotation session" do
-      ApplicationController.stubs(:test_cluster?).returns(true)
-      ApplicationController.stubs(:test_cluster_name).returns('super-secret-testing')
+      allow(ApplicationController).to receive(:test_cluster?).and_return(true)
+      allow(ApplicationController).to receive(:test_cluster_name).and_return('super-secret-testing')
 
       @doc.upload
       @doc.has_annotations = true
 
       canvadocs_api = @doc.send(:canvadocs_api)
 
-      expect(canvadocs_api).to receive(:session).with(anything, hash_including(annotation_context: 'default-super-secret-testing')).and_call_original
+      expect(canvadocs_api).to receive(:session).with(anything, hash_including(annotation_context: 'default-super-secret-testing')).and_return({})
       @doc.session_url(user: @attachment.user, enable_annotations: true)
     end
 
@@ -100,7 +101,7 @@ describe 'Canvadoc' do
       @attachment.user.crocodoc_id = 6
       canvadocs_api = @doc.send(:canvadocs_api)
 
-      expect(canvadocs_api).to receive(:session).with(anything, hash_including(user_crocodoc_id: @attachment.user.crocodoc_id)).and_call_original
+      expect(canvadocs_api).to receive(:session).with(anything, hash_including(user_crocodoc_id: @attachment.user.crocodoc_id)).and_return({})
       @doc.session_url(user: @attachment.user, enable_annotations: true)
     end
   end

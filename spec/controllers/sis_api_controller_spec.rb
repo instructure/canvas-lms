@@ -29,7 +29,7 @@ describe SisApiController do
     end
 
     it 'responds with 400 when sis_assignments is disabled' do
-      get 'sis_assignments', course_id: course.id
+      get 'sis_assignments', params: {course_id: course.id}
 
       parsed_json = json_parse(response.body)
       expect(response.code).to eq "400"
@@ -42,7 +42,7 @@ describe SisApiController do
       end
 
       it 'responds with 200' do
-        get 'sis_assignments', course_id: course.id
+        get 'sis_assignments', params: {course_id: course.id}
 
         parsed_json = json_parse(response.body)
         expect(response.code).to eq "200"
@@ -53,7 +53,7 @@ describe SisApiController do
         assignment_model(course: course, workflow_state: 'published')
         assignment = assignment_model(course: course, post_to_sis: true, workflow_state: 'published')
 
-        get 'sis_assignments', course_id: course.id
+        get 'sis_assignments', params: {course_id: course.id}
 
         parsed_json = json_parse(response.body)
         expect(parsed_json.size).to eq 1
@@ -72,14 +72,14 @@ describe SisApiController do
         end
 
         it 'does not include student overrides by default' do
-          get 'sis_assignments', course_id: course.id
+          get 'sis_assignments', params: {course_id: course.id}
 
           parsed_json = json_parse(response.body)
           expect(parsed_json.first).not_to have_key('user_overrides')
         end
 
         it 'does includes student override data by including student_overrides' do
-          get 'sis_assignments', course_id: course.id, include: ['student_overrides']
+          get 'sis_assignments', params: {course_id: course.id, include: ['student_overrides']}
 
           parsed_json = json_parse(response.body)
           expect(parsed_json.first['user_overrides'].size).to eq 1

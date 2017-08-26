@@ -588,8 +588,12 @@ class ExternalToolsController < ApplicationController
     opts = default_opts.merge(opts)
 
     assignment = @context.assignments.active.find(params[:assignment_id]) if params[:assignment_id]
+    adapter = Lti::LtiOutboundAdapter.new(tool, @current_user, @context).prepare_tool_launch(
+      @return_url,
+      variable_expander(assignment: assignment, tool: tool, launch: lti_launch),
+      opts
+    )
 
-    adapter = Lti::LtiOutboundAdapter.new(tool, @current_user, @context).prepare_tool_launch(@return_url, variable_expander(assignment: assignment, tool: tool), opts)
     lti_launch.params = if selection_type == 'homework_submission' && assignment
                           adapter.generate_post_payload_for_homework_submission(assignment)
                         else
@@ -611,7 +615,7 @@ class ExternalToolsController < ApplicationController
       @context,
       self,
       @current_user,
-      media_types,
+      media_types.to_unsafe_h,
       params["export_type"]
     )
     params = Lti::ContentItemSelectionRequest.default_lti_params(@context, @domain_root_account, @current_user).merge(
@@ -915,7 +919,7 @@ class ExternalToolsController < ApplicationController
   #        -F 'config_url=https://example.com/ims/lti/tool_config.xml'
   def create
     if authorized_action(@context, @current_user, :create_tool_manually)
-      external_tool_params = (params[:external_tool] || params).to_hash.with_indifferent_access
+      external_tool_params = (params[:external_tool] || params).to_unsafe_h
       @tool = @context.context_external_tools.new
       if request.content_type == 'application/x-www-form-urlencoded'
         custom_fields = Lti::AppUtil.custom_params(request.raw_post)
@@ -963,9 +967,9 @@ class ExternalToolsController < ApplicationController
         :config_settings
       ]
 
-      external_tool_params = params.to_hash.with_indifferent_access.select{|k, _| required_params.include?(k.to_sym)}
-
-      external_tool_params[:config_url] = app_api.get_app_config_url(params[:app_center_id], params[:config_settings])
+      # we're ok with an "unsafe" hash because we're filtering via required_params
+      external_tool_params = params.to_unsafe_h.select{|k, _| required_params.include?(k.to_sym)}
+      external_tool_params[:config_url] = app_api.get_app_config_url(external_tool_params[:app_center_id], external_tool_params[:config_settings])
       external_tool_params[:config_type] = 'by_url'
 
       @tool = @context.context_external_tools.new
@@ -994,7 +998,7 @@ class ExternalToolsController < ApplicationController
   def update
     @tool = @context.context_external_tools.active.find(params[:id] || params[:external_tool_id])
     if authorized_action(@tool, @current_user, :update_manually)
-      external_tool_params = (params[:external_tool] || params).to_hash.with_indifferent_access
+      external_tool_params = (params[:external_tool] || params).to_unsafe_h
       if request.content_type == 'application/x-www-form-urlencoded'
         custom_fields = Lti::AppUtil.custom_params(request.raw_post)
         external_tool_params[:custom_fields] = custom_fields if custom_fields.present?

@@ -30,23 +30,23 @@ describe CollaborationsController do
 
   describe "GET 'index'" do
     it "should require authorization" do
-      get 'index', :course_id => @course.id
+      get 'index', params: {:course_id => @course.id}
       assert_unauthorized
     end
 
     it "should redirect 'disabled', if disabled by the teacher" do
       user_session(@student)
       @course.update_attribute(:tab_configuration, [{'id'=>16,'hidden'=>true}])
-      get 'index', :course_id => @course.id
+      get 'index', params: {:course_id => @course.id}
       expect(response).to be_redirect
       expect(flash[:notice]).to match(/That page has been disabled/)
     end
 
     it "should assign variables" do
       user_session(@student)
-      controller.stubs(:google_drive_connection).returns(mock(authorized?:true))
+      allow(controller).to receive(:google_drive_connection).and_return(double(authorized?:true))
 
-      get 'index', :course_id => @course.id
+      get 'index', params: {:course_id => @course.id}
 
       expect(response).to be_success
       expect(assigns(:user_has_google_drive)).to eq true
@@ -54,9 +54,9 @@ describe CollaborationsController do
 
     it "should handle users without google authorized" do
       user_session(@student)
-      controller.stubs(:google_drive_connection).returns(mock(authorized?:false))
+      allow(controller).to receive(:google_drive_connection).and_return(double(authorized?:false))
 
-      get 'index', :course_id => @course.id
+      get 'index', params: {:course_id => @course.id}
 
       expect(response).to be_success
       expect(assigns(:user_has_google_drive)).to eq false
@@ -68,7 +68,7 @@ describe CollaborationsController do
       plugin_setting = PluginSetting.find_by_name(plugin.id) || PluginSetting.new(:name => plugin.id, :settings => plugin.default_settings)
       plugin_setting.posted_settings = {}
       plugin_setting.save!
-      get 'index', :course_id => @course.id
+      get 'index', params: {:course_id => @course.id}
 
       expect(response).to be_success
       expect(assigns(:user_has_google_drive)).to be false
@@ -80,7 +80,7 @@ describe CollaborationsController do
       @fake_student = @course.student_view_student
       session[:become_user_id] = @fake_student.id
 
-      get 'index', :course_id => @course.id
+      get 'index', params: {:course_id => @course.id}
       assert_unauthorized
     end
 
@@ -90,9 +90,9 @@ describe CollaborationsController do
       group = gc.groups.create!(:context => @course)
       group.add_user(@student, 'accepted')
 
-      #controller.stubs(:google_docs_connection).returns(mock(authorized?:false))
+      #allow(controller).to receive(:google_docs_connection).and_return(double(authorized?:false))
 
-      get 'index', :group_id => group.id
+      get 'index', params: {:group_id => group.id}
       expect(response).to be_success
     end
 
@@ -109,7 +109,7 @@ describe CollaborationsController do
       ).tap{ |c| c.update_attribute :url, 'http://www.example.com' }
 
 
-      get 'index', course_id: @course.id
+      get 'index', params: {course_id: @course.id}
 
       expect(assigns[:collaborations]).to eq [collab2]
     end
@@ -127,7 +127,7 @@ describe CollaborationsController do
     end
 
     it "should require authorization" do
-      get 'members', id: @collab.id
+      get 'members', params: {id: @collab.id}
       assert_unauthorized
     end
 
@@ -140,7 +140,7 @@ describe CollaborationsController do
       end
 
       it "should return back collaboration members" do
-        get 'members', id: @collab.id
+        get 'members', params: {id: @collab.id}
         hash = JSON.parse(@response.body).first
 
         expect(hash['id']).to eq @collab.collaborators.first.id
@@ -150,7 +150,7 @@ describe CollaborationsController do
       end
 
       it "should include collaborator_lti_id" do
-        get 'members', id: @collab.id, include: ['collaborator_lti_id']
+        get 'members', params: {id: @collab.id, include: ['collaborator_lti_id']}
         @student.reload
         hash = JSON.parse(@response.body).first
 
@@ -158,7 +158,7 @@ describe CollaborationsController do
       end
 
       it "should include avatar_image_url" do
-        get 'members', id: @collab.id, include: ['avatar_image_url']
+        get 'members', params: {id: @collab.id, include: ['avatar_image_url']}
         @student.avatar_image_url = 'https://www.example.com/awesome-avatar.png'
         hash = JSON.parse(@response.body).first
 
@@ -169,12 +169,12 @@ describe CollaborationsController do
 
   describe "GET 'lti_index'" do
     it "should require authorization for the course" do
-      get 'lti_index', :course_id => @course.id
+      get 'lti_index', params: {:course_id => @course.id}
       assert_unauthorized
     end
 
     it "should require authorization for the group" do
-      get 'lti_index', :group_id => @group.id
+      get 'lti_index', params: {:group_id => @group.id}
       assert_unauthorized
     end
   end
@@ -198,7 +198,7 @@ describe CollaborationsController do
       )
       collab.context = @course
       collab.save!
-      get 'show', :course_id=>@course.id, :id => collab.id
+      get 'show', params: {:course_id=>@course.id, :id => collab.id}
       url = CGI::escape(collab[:url])
       expect(response).to redirect_to "/courses/#{@course.id}/external_tools/retrieve?display=borderless&url=#{url}"
     end
@@ -211,7 +211,7 @@ describe CollaborationsController do
 
       before :each do
         user_session(@teacher)
-        get 'show', :course_id=>@course.id, :id => collaboration.id
+        get 'show', params: {:course_id=>@course.id, :id => collaboration.id}
       end
 
       it 'loads the correct collaboration' do
@@ -237,7 +237,7 @@ describe CollaborationsController do
 
     context "logged out user" do
       it 'rejects access properly' do
-        get 'show', course_id: @course.id, id: collaboration.id
+        get 'show', params: {course_id: @course.id, id: collaboration.id}
 
         expect(response.status).to eq 302
         expect(response.headers['Location']).to match(/login/)
@@ -249,19 +249,19 @@ describe CollaborationsController do
     before(:once) { course_with_teacher(active_all: true) }
 
     it "should require authorization" do
-      post 'create', :course_id => @course.id, :collaboration => {}
+      post 'create', params: {:course_id => @course.id, :collaboration => {}}
       assert_unauthorized
     end
 
     it "should fail with invalid collaboration type" do
       user_session(@teacher)
-      post 'create', :course_id => @course.id, :collaboration => {:title => "My Collab"}
+      post 'create', params: {:course_id => @course.id, :collaboration => {:title => "My Collab"}}
       assert_status(500)
     end
 
     it "should create collaboration" do
       user_session(@teacher)
-      post 'create', :course_id => @course.id, :collaboration => {:collaboration_type => 'EtherPad', :title => "My Collab"}
+      post 'create', params: {:course_id => @course.id, :collaboration => {:collaboration_type => 'EtherPad', :title => "My Collab"}}
       expect(response).to be_redirect
       expect(assigns[:collaboration]).not_to be_nil
       expect(assigns[:collaboration].class).to eql(EtherpadCollaboration)
@@ -285,7 +285,7 @@ describe CollaborationsController do
       it "should create a collaboration using content-item" do
         user_session(@teacher)
 
-        post 'create', :course_id => @course.id, :contentItems => content_items.to_json
+        post 'create', params: {:course_id => @course.id, :contentItems => content_items.to_json}
         collaboration = Collaboration.find(assigns[:collaboration].id)
         expect(assigns[:collaboration]).not_to be_nil
         expect(assigns[:collaboration].class).to eql(ExternalToolCollaboration)
@@ -297,26 +297,26 @@ describe CollaborationsController do
 
       it "callback url should not be nil if provided" do
         user_session(@teacher)
-        post 'create', :course_id => @course.id, :contentItems => content_items.to_json
+        post 'create', params: {:course_id => @course.id, :contentItems => content_items.to_json}
         collaboration = ExternalToolCollaboration.last
         expect(collaboration.data["confirmUrl"]).to eq 'http://example.com/confirm/343'
       end
 
       it "should callback on success" do
         user_session(@teacher)
-        content_item_util_stub = mock('ContentItemUtil')
-        content_item_util_stub.expects(:success_callback)
-        Lti::ContentItemUtil.stubs(:new).returns(content_item_util_stub)
-        post 'create', :course_id => @course.id, :contentItems => content_items.to_json
+        content_item_util_stub = double('ContentItemUtil')
+        expect(content_item_util_stub).to receive(:success_callback)
+        allow(Lti::ContentItemUtil).to receive(:new).and_return(content_item_util_stub)
+        post 'create', params: {:course_id => @course.id, :contentItems => content_items.to_json}
       end
 
       it "should callback on failure" do
         user_session(@teacher)
-        Collaboration.any_instance.expects(:save).returns(false)
-        content_item_util_stub = mock('ContentItemUtil')
-        content_item_util_stub.expects(:failure_callback)
-        Lti::ContentItemUtil.stubs(:new).returns(content_item_util_stub)
-        post 'create', :course_id => @course.id, :contentItems => content_items.to_json
+        expect_any_instance_of(Collaboration).to receive(:save).and_return(false)
+        content_item_util_stub = double('ContentItemUtil')
+        expect(content_item_util_stub).to receive(:failure_callback)
+        allow(Lti::ContentItemUtil).to receive(:new).and_return(content_item_util_stub)
+        post 'create', params: {:course_id => @course.id, :contentItems => content_items.to_json}
       end
 
       it "adds users if sent" do
@@ -324,7 +324,7 @@ describe CollaborationsController do
         users = 2.times.map { |_| student_in_course(course: @course, active_all: true).user}
         lti_user_ids = users.map {|student| Lti::Asset.opaque_identifier_for(student)}
         content_items.first['ext_canvas_visibility'] = {users: lti_user_ids}
-        post 'create', :course_id => @course.id, :contentItems => content_items.to_json
+        post 'create', params: {:course_id => @course.id, :contentItems => content_items.to_json}
         collaboration = Collaboration.find(assigns[:collaboration].id)
         expect(collaboration.collaborators.map(&:user_id)).to match_array([*users, @teacher].map(&:id))
       end
@@ -334,7 +334,7 @@ describe CollaborationsController do
         group = group_model(:context => @course)
         group.add_user(@teacher, 'active')
         content_items.first['ext_canvas_visibility'] = {groups: [Lti::Asset.opaque_identifier_for(group)]}
-        post 'create', :course_id => @course.id, :contentItems => content_items.to_json
+        post 'create', params: {:course_id => @course.id, :contentItems => content_items.to_json}
         collaboration = Collaboration.find(assigns[:collaboration].id)
         expect(collaboration.collaborators.map(&:group_id).compact).to match_array([group.id])
       end
@@ -368,7 +368,7 @@ describe CollaborationsController do
 
       it "should update a collaboration using content-item" do
         user_session(@teacher)
-        put 'update', id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json
+        put 'update', params: {id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json}
         collaboration = Collaboration.find(assigns[:collaboration].id)
         expect(assigns[:collaboration]).not_to be_nil
         expect(assigns[:collaboration].class).to eql(ExternalToolCollaboration)
@@ -380,26 +380,26 @@ describe CollaborationsController do
 
       it "callback url should not be nil if provided" do
         user_session(@teacher)
-        put 'update', id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json
+        put 'update', params: {id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json}
         c = ExternalToolCollaboration.find(collaboration.id)
         expect(c.data["confirmUrl"]).to eq 'http://example.com/confirm/343'
       end
 
       it "should callback on success" do
         user_session(@teacher)
-        content_item_util_stub = mock('ContentItemUtil')
-        content_item_util_stub.expects(:success_callback)
-        Lti::ContentItemUtil.stubs(:new).returns(content_item_util_stub)
-        put 'update', id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json
+        content_item_util_stub = double('ContentItemUtil')
+        expect(content_item_util_stub).to receive(:success_callback)
+        allow(Lti::ContentItemUtil).to receive(:new).and_return(content_item_util_stub)
+        put 'update', params: {id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json}
       end
 
       it "should callback on failure" do
         user_session(@teacher)
-        Collaboration.any_instance.stubs(:save).returns(false)
-        content_item_util_stub = mock('ContentItemUtil')
-        content_item_util_stub.expects(:failure_callback)
-        Lti::ContentItemUtil.stubs(:new).returns(content_item_util_stub)
-        put 'update', id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json
+        allow_any_instance_of(Collaboration).to receive(:save).and_return(false)
+        content_item_util_stub = double('ContentItemUtil')
+        expect(content_item_util_stub).to receive(:failure_callback)
+        allow(Lti::ContentItemUtil).to receive(:new).and_return(content_item_util_stub)
+        put 'update', params: {id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json}
       end
 
       it "adds users if sent" do
@@ -407,7 +407,7 @@ describe CollaborationsController do
         users = 2.times.map { |_| student_in_course(course: @course, active_all: true).user}
         lti_user_ids = users.map {|student| Lti::Asset.opaque_identifier_for(student)}
         content_items.first['ext_canvas_visibility'] = {users: lti_user_ids}
-        put 'update', id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json
+        put 'update', params: {id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json}
         collaboration = Collaboration.find(assigns[:collaboration].id)
         expect(collaboration.collaborators.map(&:user_id)).to match_array([*users, @teacher].map(&:id))
       end
@@ -417,7 +417,7 @@ describe CollaborationsController do
         group = group_model(:context => @course)
         group.add_user(@teacher, 'active')
         content_items.first['ext_canvas_visibility'] = {groups: [Lti::Asset.opaque_identifier_for(group)]}
-        put 'update', id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json
+        put 'update', params: {id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json}
         collaboration = Collaboration.find(assigns[:collaboration].id)
         expect(collaboration.collaborators.map(&:group_id).compact).to match_array([group.id])
       end
@@ -431,7 +431,7 @@ describe CollaborationsController do
           users: [Lti::Asset.opaque_identifier_for(@teacher)]
         }
         2.times {
-          put 'update', id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json
+          put 'update', params: {id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json}
         }
         collaboration = Collaboration.find(assigns[:collaboration].id)
 

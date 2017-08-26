@@ -37,7 +37,7 @@ class ConversationParticipant < ActiveRecord::Base
   scope :sent, -> { where("visible_last_authored_at IS NOT NULL").order("visible_last_authored_at DESC, conversation_id DESC") }
   scope :for_masquerading_user, lambda { |user|
     # site admins can see everything
-    next all if user.account_users.map(&:account_id).include?(Account.site_admin.id)
+    next all if user.account_users.active.map(&:account_id).include?(Account.site_admin.id)
 
     # we need to ensure that the user can access *all* of each conversation's
     # accounts (and that each conversation has at least one account). so given
@@ -54,7 +54,7 @@ class ConversationParticipant < ActiveRecord::Base
     # we're also counting on conversations being in the join
 
     own_root_account_ids = Shard.birth.activate do
-      accts = user.associated_root_accounts.select{ |a| a.grants_right?(user, :become_user) }
+      accts = user.associated_root_accounts.shard(user.in_region_associated_shards).select{ |a| a.grants_right?(user, :become_user) }
       # we really shouldn't need the global id here, but we've got a lot of participants with
       # global id's in their root_account_ids for some reason
       accts.map(&:id) + accts.map(&:global_id)

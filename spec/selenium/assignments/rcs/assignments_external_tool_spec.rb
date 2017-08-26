@@ -28,10 +28,6 @@ describe "external tool assignments" do
     @t2 = factory_with_protected_attributes(@course.context_external_tools, :url => "http://www.example.com/tool2", :shared_secret => 'test123', :consumer_key => 'test123', :name => 'tool 2')
   end
 
-  after (:each) do
-    unstub_rcs_config
-  end
-
   it "should allow creating through the 'More Options' link", priority: "2", test_id: 209973 do
     get "/courses/#{@course.id}/assignments"
 

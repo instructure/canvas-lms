@@ -20,8 +20,12 @@ import React from 'react';
 import { bool, func, number, shape, string } from 'prop-types';
 import ComingSoonContent from 'jsx/gradezilla/default_gradebook/components/ComingSoonContent';
 import LatePolicyGrade from 'jsx/gradezilla/default_gradebook/components/LatePolicyGrade';
-import Tray from 'instructure-ui/lib/components/Tray';
+import SubmissionTrayRadioInputGroup from 'jsx/gradezilla/default_gradebook/components/SubmissionTrayRadioInputGroup';
 import Avatar from 'instructure-ui/lib/components/Avatar';
+import Button from 'instructure-ui/lib/components/Button';
+import Container from 'instructure-ui/lib/components/Container';
+import Tray from 'instructure-ui/lib/components/Tray';
+import IconSpeedGraderLine from 'instructure-icons/lib/Line/IconSpeedGraderLine';
 import I18n from 'i18n!gradebook';
 
 function renderAvatar (name, avatarUrl) {
@@ -32,33 +36,34 @@ function renderAvatar (name, avatarUrl) {
   );
 }
 
-function renderTrayContent (showContentComingSoon, student, submission) {
-  if (showContentComingSoon) {
-    return (<ComingSoonContent />);
-  }
-
-  const { name, avatarUrl } = student;
-
+function renderSpeedGraderLink (speedGraderUrl) {
   return (
-    <div id="SubmissionTray__Content">
-      {avatarUrl && renderAvatar(name, avatarUrl)}
-      <div id="SubmissionTray__StudentName">
-        {name}
-      </div>
+    <Container as="div" textAlign="center">
+      <Button href={speedGraderUrl} variant="link">
+        <IconSpeedGraderLine />
+        {I18n.t('SpeedGrader')}
+      </Button>
+    </Container>
+  );
+}
 
-      {!!submission.pointsDeducted && <LatePolicyGrade submission={submission} />}
+function renderComingSoon (speedGraderEnabled, speedGraderUrl) {
+  return (
+    <div>
+      { speedGraderEnabled && renderSpeedGraderLink(speedGraderUrl) }
+      <ComingSoonContent />
     </div>
   );
 }
 
 export default function SubmissionTray (props) {
-  const { showContentComingSoon, student, submission } = props;
-
+  const { name, avatarUrl } = props.student;
+  const speedGraderUrl = `/courses/${props.courseId}/gradebook/speed_grader?assignment_id=${props.submission.assignmentId}#%7B%22student_id%22%3A${props.student.id}%7D`;
   return (
     <Tray
       contentRef={props.contentRef}
       label={I18n.t('Submission tray')}
-      dismissable
+      isDismissable
       closeButtonLabel={I18n.t('Close submission tray')}
       isOpen={props.isOpen}
       trapFocus
@@ -67,28 +72,71 @@ export default function SubmissionTray (props) {
       onClose={props.onClose}
     >
       <div className="SubmissionTray__Container">
-        {renderTrayContent(showContentComingSoon, student, submission)}
+        {
+          props.showContentComingSoon ?
+            renderComingSoon(props.speedGraderEnabled, speedGraderUrl) :
+            <div>
+              <div id="SubmissionTray__Content">
+                {avatarUrl && renderAvatar(name, avatarUrl)}
+
+                <div id="SubmissionTray__StudentName">
+                  {name}
+                </div>
+
+                { props.speedGraderEnabled && renderSpeedGraderLink(speedGraderUrl) }
+
+                {!!props.submission.pointsDeducted && <LatePolicyGrade submission={props.submission} />}
+
+                <div id="SubmissionTray__RadioInputGroup">
+                  <SubmissionTrayRadioInputGroup
+                    colors={props.colors}
+                    locale={props.locale}
+                    latePolicy={props.latePolicy}
+                    submission={props.submission}
+                  />
+                </div>
+              </div>
+            </div>
+        }
       </div>
     </Tray>
   );
 }
 
 SubmissionTray.defaultProps = {
-  contentRef: undefined
+  contentRef: undefined,
+  latePolicy: { lateSubmissionInterval: 'day' }
 }
 
 SubmissionTray.propTypes = {
   contentRef: func,
   isOpen: bool.isRequired,
+  colors: shape({
+    late: string.isRequired,
+    missing: string.isRequired,
+    excused: string.isRequired
+  }).isRequired,
   onClose: func.isRequired,
   onRequestClose: func.isRequired,
   showContentComingSoon: bool.isRequired,
   student: shape({
+    id: string.isRequired,
     name: string.isRequired,
     avatarUrl: string
   }).isRequired,
   submission: shape({
+    excused: bool.isRequired,
     grade: string,
-    pointsDeducted: number
+    late: bool.isRequired,
+    missing: bool.isRequired,
+    pointsDeducted: number,
+    secondsLate: number.isRequired,
+    assignmentId: string.isRequired
+  }),
+  courseId: string.isRequired,
+  speedGraderEnabled: bool.isRequired,
+  locale: string.isRequired,
+  latePolicy: shape({
+    lateSubmissionInterval: string
   }).isRequired
 };

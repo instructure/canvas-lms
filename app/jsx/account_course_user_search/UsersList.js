@@ -16,72 +16,192 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import preventDefault from 'compiled/fn/preventDefault'
+import IconArrowUpSolid from 'instructure-icons/lib/Solid/IconArrowUpSolid'
+import IconArrowDownSolid from 'instructure-icons/lib/Solid/IconArrowDownSolid'
+import Typography from 'instructure-ui/lib/components/Typography'
+import Tooltip from 'instructure-ui/lib/components/Tooltip'
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
-import _ from 'underscore'
 import UsersListRow from './UsersListRow'
 
-  var { string, array, object } = PropTypes;
+const { string, array, object, func } = PropTypes
 
-  var UsersList = React.createClass({
-    propTypes: {
-      accountId: string.isRequired,
-      users: array.isRequired,
-      timezones: object.isRequired,
-      permissions: object.isRequired,
-      handlers: object.isRequired
-    },
+class UsersList extends React.Component {
+  static propTypes = {
+    accountId: string.isRequired,
+    users: array.isRequired,
+    timezones: object.isRequired,
+    permissions: object.isRequired,
+    handlers: object.isRequired,
+    userList: object.isRequired,
+    onUpdateFilters: func.isRequired,
+    onApplyFilters: func.isRequired,
+  }
 
-    render() {
-      const { users, timezones, accountId } = this.props;
+  updateOrder = (column) => {
 
-      return (
-        <div className="content-box" role='grid'>
-          <div role='row' className="grid-row border border-b pad-box-mini">
-            <div role='columnheader' className="col-xs-3">
-              <span className="courses-user-list-header">
-                {I18n.t("Name")}
-              </span>
-            </div>
-            <div role='columnheader' className="col-xs-3">
-              <span className="courses-user-list-header">
-                {I18n.t("Email")}
-              </span>
-            </div>
-            <div role='columnheader' className="col-xs-1">
-              <span className="courses-user-list-header">
-                {I18n.t("SIS ID")}
-              </span>
-            </div>
-            <div role='columnheader' className="col-xs-3">
-              <span className="courses-user-list-header">
-                {I18n.t("Last Login")}
-              </span>
-            </div>
-            <div role='columnheader' className="col-xs-2">
-              <span className='screenreader-only'>{I18n.t("User option links")}</span>
-            </div>
+    let newOrder = 'asc'
+
+    const sort = this.props.userList.searchFilter.sort
+    const order = this.props.userList.searchFilter.order
+
+    if ((column === sort && order === 'asc') || (!sort && column === 'username')) {
+      newOrder = 'desc'
+    }
+
+    this.props.onUpdateFilters({
+      search_term: this.props.userList.searchFilter.search_term,
+      sort: column,
+      order: newOrder,
+    })
+    this.props.onApplyFilters()
+  }
+
+  render () {
+    const { users, timezones, accountId } = this.props;
+
+    const sort = this.props.userList.searchFilter.sort
+    const order = this.props.userList.searchFilter.order
+
+    const nameLabel = I18n.t('Name')
+    const lastLoginLabel = I18n.t('Last Login')
+    const emailLabel = I18n.t('Email')
+    const idLabel = I18n.t('SIS ID')
+
+    let nameTip
+    let lastLoginTip
+    let emailTip
+    let idTip
+
+    let nameArrow = ''
+    let lastLoginArrow = ''
+    let emailArrow = ''
+    let idArrow = ''
+
+    if (sort === 'username' || !sort) {
+      emailTip = I18n.t('Click to order by email ascending')
+      lastLoginTip = I18n.t('Click to order by last login ascending')
+      idTip = I18n.t('Click to order by SIS ID ascending')
+      if (order === 'asc' || !order) {
+        nameTip = I18n.t('Click to sort by name descending')
+        nameArrow = <IconArrowDownSolid />
+      } else {
+        nameTip = I18n.t('Click to sort by name ascending')
+        nameArrow = <IconArrowUpSolid />
+      }
+    } else if (sort === 'last_login') {
+      nameTip = I18n.t('Click to sort by name ascending')
+      emailTip = I18n.t('Click to order by email ascending')
+      idTip = I18n.t('Click to order by SIS ID ascending')
+      if (order === 'asc' || !order) {
+        lastLoginTip = I18n.t('Click to sort by last login descending')
+        lastLoginArrow = <IconArrowDownSolid />
+      } else {
+        lastLoginTip = I18n.t('Click to sort by last login ascending')
+        lastLoginArrow = <IconArrowUpSolid />
+      }
+    } else if (sort === 'email') {
+      nameTip = I18n.t('Click to sort by name ascending')
+      idTip = I18n.t('Click to order by SIS ID ascending')
+      lastLoginTip = I18n.t('Click to order by last login ascending')
+      if (order === 'asc' || !order) {
+        emailTip = I18n.t('Click to sort by email descending')
+        emailArrow = <IconArrowDownSolid />
+      } else {
+        emailTip = I18n.t('Click to sort by email ascending')
+        emailArrow = <IconArrowUpSolid />
+      }
+    } else if (sort === 'sis_id') {
+      nameTip = I18n.t('Click to sort by name ascending')
+      emailTip = I18n.t('Click to order by email ascending')
+      lastLoginTip = I18n.t('Click to order by last login ascending')
+      if (order === 'asc' || !order) {
+        idTip = I18n.t('Click to sort by SIS ID descending')
+        idArrow = <IconArrowDownSolid />
+      } else {
+        idTip = I18n.t('Click to sort by SIS ID ascending')
+        idArrow = <IconArrowUpSolid />
+      }
+    }
+
+    return (
+      <div className="content-box" role="grid">
+        <div role="row" className="grid-row border border-b pad-box-mini">
+          <div role="columnheader" className="col-xs-3">
+            <a
+              role="button"
+              href="#"
+              className="courses-user-list-header"
+              onClick={preventDefault(() => this.updateOrder('username'))}
+            >
+              <Tooltip as={Typography} tip={nameTip}>
+                {nameLabel}
+                {nameArrow}
+              </Tooltip>
+            </a>
           </div>
-          <div className='users-list' role='rowgroup'>
-            {
-              users.map((user) => {
-                return (
-                  <UsersListRow
-                    handlers={this.props.handlers}
-                    key={user.id}
-                    timezones={timezones}
-                    accountId={accountId}
-                    user={user}
-                    permissions={this.props.permissions}
-                  />
-                );
-              })
-            }
+          <div role="columnheader" className="col-xs-3">
+            <a
+              role="button"
+              href="#"
+              className="courses-user-list-header"
+              onClick={preventDefault(() => this.updateOrder('email'))}
+            >
+              <Tooltip as={Typography} tip={emailTip}>
+                {emailLabel}
+                {emailArrow}
+              </Tooltip>
+            </a>
+          </div>
+          <div role="columnheader" className="col-xs-1">
+            <a
+              role="button"
+              href="#"
+              className="courses-user-list-header"
+              onClick={preventDefault(() => this.updateOrder('sis_id'))}
+            >
+              <Tooltip as={Typography} tip={idTip}>
+                {idLabel}
+                {idArrow}
+              </Tooltip>
+            </a>
+          </div>
+          <div role="columnheader" className="col-xs-2">
+            <a
+              role="button"
+              href="#"
+              className="courses-user-list-header"
+              onClick={preventDefault(() => this.updateOrder('last_login'))}
+            >
+              <Tooltip as={Typography} tip={lastLoginTip}>
+                {lastLoginLabel}
+                {lastLoginArrow}
+              </Tooltip>
+            </a>
+          </div>
+          <div role="columnheader" className="col-xs-2">
+            <span className="screenreader-only">{I18n.t('User option links')}</span>
           </div>
         </div>
-      );
-    }
-  });
+        <div className="users-list" role="rowgroup">
+          {
+              users.map(user => (
+                <UsersListRow
+                  handlers={this.props.handlers}
+                  key={user.id}
+                  timezones={timezones}
+                  accountId={accountId}
+                  user={user}
+                  permissions={this.props.permissions}
+                />
+                ))
+            }
+        </div>
+      </div>
+    )
+  }
+  }
 
 export default UsersList

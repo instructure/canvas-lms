@@ -70,10 +70,10 @@ describe SupportHelpers::TurnitinController do
 
       it "should create a new ShardFixer with after_time" do
         fixer = SupportHelpers::Tii::ShardFixer.new(@user.email, '2016-05-01')
-        SupportHelpers::Tii::ShardFixer.expects(:new).
-          with(@user.email, Time.zone.parse('2016-05-01')).returns(fixer)
-        fixer.expects(:monitor_and_fix)
-        get :shard, after_time: '2016-05-01'
+        expect(SupportHelpers::Tii::ShardFixer).to receive(:new).
+          with(@user.email, Time.zone.parse('2016-05-01')).and_return(fixer)
+        expect(fixer).to receive(:monitor_and_fix)
+        get :shard, params: {after_time: '2016-05-01'}
         expect(response.body).to eq("Enqueued TurnItIn ShardFixer ##{fixer.job_id}...")
       end
     end
@@ -82,14 +82,14 @@ describe SupportHelpers::TurnitinController do
       it "should create a new AssignmentFixer with id" do
         assignment_model
         fixer = SupportHelpers::Tii::AssignmentFixer.new(@user.email, nil, @assignment.id)
-        SupportHelpers::Tii::AssignmentFixer.expects(:new).with(@user.email, nil, @assignment.id).returns(fixer)
-        fixer.expects(:monitor_and_fix)
-        get :assignment, id: @assignment.id
+        expect(SupportHelpers::Tii::AssignmentFixer).to receive(:new).with(@user.email, nil, @assignment.id).and_return(fixer)
+        expect(fixer).to receive(:monitor_and_fix)
+        get :assignment, params: {id: @assignment.id}
         expect(response.body).to eq("Enqueued TurnItIn AssignmentFixer ##{fixer.job_id}...")
       end
 
       it "should return 400 status without id" do
-        SupportHelpers::Tii::AssignmentFixer.expects(:new).never
+        expect(SupportHelpers::Tii::AssignmentFixer).to receive(:new).never
         get :assignment
         expect(response.body).to eq('Missing assignment `id` parameter')
         assert_status(400)
@@ -101,10 +101,10 @@ describe SupportHelpers::TurnitinController do
         submission_model
         attachment_model
         fixer = SupportHelpers::Tii::LtiAttachmentFixer.new(@user.email, nil, @submission.id, @attachment.id)
-        SupportHelpers::Tii::LtiAttachmentFixer.expects(:new)
-          .with(@user.email, nil, @submission.id, @attachment.id).returns(fixer)
-        fixer.expects(:monitor_and_fix)
-        get :lti_attachment, submission_id: @submission.id, attachment_id: @attachment.id
+        expect(SupportHelpers::Tii::LtiAttachmentFixer).to receive(:new)
+          .with(@user.email, nil, @submission.id, @attachment.id).and_return(fixer)
+        expect(fixer).to receive(:monitor_and_fix)
+        get :lti_attachment, params: {submission_id: @submission.id, attachment_id: @attachment.id}
         expect(response.body).to eq("Enqueued TurnItIn LtiAttachmentFixer ##{fixer.job_id}...")
       end
     end
@@ -129,8 +129,8 @@ describe SupportHelpers::TurnitinController do
 
   def fixer(klass)
     @fixer = klass.new(@user.email)
-    klass.expects(:new).with(@user.email, nil).returns(@fixer)
-    @fixer.expects(:monitor_and_fix)
+    expect(klass).to receive(:new).with(@user.email, nil).and_return(@fixer)
+    expect(@fixer).to receive(:monitor_and_fix)
     @fixer
   end
 end

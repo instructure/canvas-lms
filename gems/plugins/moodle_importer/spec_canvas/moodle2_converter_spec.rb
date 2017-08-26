@@ -105,6 +105,8 @@ describe Moodle::Converter do
 
   context "modules" do
     it "should convert modules and module items" do
+      skip 'Requires QtiMigrationTool' unless Qti.qti_enabled?
+
       expect(@course.context_modules.count).to eq 8
       expect(@course.context_module_tags.where(:content_type => "Assignment", :title => "Assignment Name")).to be_exists
       expect(@course.context_module_tags.where(:content_type => "WikiPage", :title => "My Sample Page")).to be_exists

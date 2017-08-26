@@ -95,7 +95,7 @@ $sg-Header-height: 85px;
   padding: 10px;
 }
 
-.Colorguide-color--primary        {background: $ic-brand-primary;}
+.Colorguide-color--primary        {background: var(--ic-brand-primary);}
 .Colorguide-color--success        {background: $ic-color-success;}
 .Colorguide-color--action         {background: $ic-color-action;}
 .Colorguide-color--danger         {background: $ic-color-danger;}

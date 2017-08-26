@@ -21,11 +21,10 @@ class AddMoreGistIndexes < ActiveRecord::Migration[4.2]
 
   def self.up
     if is_postgres? && (schema = connection.extension_installed?(:pg_trgm))
-      concurrently = " CONCURRENTLY" if connection.open_transactions == 0
-      execute("CREATE INDEX#{concurrently} index_trgm_users_short_name ON #{User.quoted_table_name} USING gist(LOWER(short_name) #{schema}.gist_trgm_ops)")
-      execute("CREATE INDEX#{concurrently} index_trgm_courses_name ON #{Course.quoted_table_name} USING gist(LOWER(name) #{schema}.gist_trgm_ops)")
-      execute("CREATE INDEX#{concurrently} index_trgm_courses_course_code ON #{Course.quoted_table_name} USING gist(LOWER(course_code) #{schema}.gist_trgm_ops)")
-      execute("CREATE INDEX#{concurrently} index_trgm_courses_sis_source_id ON #{Course.quoted_table_name} USING gist(LOWER(sis_source_id) #{schema}.gist_trgm_ops)")
+      add_index :users, "LOWER(short_name) #{schema}.gist_trgm_ops", name: "index_trgm_users_short_name", using: :gist, algorithm: :concurrently
+      add_index :courses, "LOWER(name) #{schema}.gist_trgm_ops", name: "index_trgm_courses_name", using: :gist, algorithm: :concurrently
+      add_index :courses, "LOWER(course_code) #{schema}.gist_trgm_ops", name: "index_trgm_courses_course_code", using: :gist, algorithm: :concurrently
+      add_index :courses, "LOWER(sis_source_id) #{schema}.gist_trgm_ops", name: "index_trgm_courses_sis_source_id", using: :gist, algorithm: :concurrently
     end
   end
 

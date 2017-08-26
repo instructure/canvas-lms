@@ -116,7 +116,7 @@ module Assignments
           submission_types: ['online_text_entry']
         )
         querier = NeedsGradingCountQuery.new(@assignment, @teacher)
-        @assignment.expects(:moderated_grading?).twice
+        expect(@assignment).to receive(:moderated_grading?).twice
         enable_cache do
           querier.count
           querier.count

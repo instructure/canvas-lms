@@ -202,7 +202,7 @@ describe "conversations new" do
     context "bulk_message locking" do
       before do
         # because i'm too lazy to create more users
-        Conversation.stubs(:max_group_conversation_size).returns(1)
+        allow(Conversation).to receive(:max_group_conversation_size).and_return(1)
       end
 
       it "should check and lock the bulk_message checkbox when over the max size", priority: "2", test_id: 206022 do

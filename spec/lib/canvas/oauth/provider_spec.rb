@@ -23,7 +23,7 @@ module Canvas::Oauth
     let(:provider) { Provider.new('123') }
 
     def stub_dev_key(key)
-      DeveloperKey.stubs(:where).returns(stub(first: key))
+      allow(DeveloperKey).to receive(:where).and_return(double(first: key))
     end
 
     describe 'initialization' do
@@ -44,12 +44,12 @@ module Canvas::Oauth
     describe '#has_valid_key?' do
 
       it 'is true when there is a key and the key is active' do
-        stub_dev_key(stub(active?: true))
+        stub_dev_key(double(active?: true))
         expect(provider.has_valid_key?).to be_truthy
       end
 
       it 'is false when there is a key that is not active' do
-        stub_dev_key(stub(active?: false))
+        stub_dev_key(double(active?: false))
         expect(provider.has_valid_key?).to be_falsey
       end
 
@@ -80,19 +80,19 @@ module Canvas::Oauth
       end
 
       it 'is true when the redirect url is kosher for the developerKey' do
-        stub_dev_key(stub(:redirect_domain_matches? => true))
+        stub_dev_key(double(:redirect_domain_matches? => true))
         expect(provider.has_valid_redirect?).to be_truthy
       end
 
       it 'is false otherwise' do
-        stub_dev_key(stub(:redirect_domain_matches? => false))
+        stub_dev_key(double(:redirect_domain_matches? => false))
         expect(provider.has_valid_redirect?).to be_falsey
       end
     end
 
     describe '#icon_url' do
       it 'delegates to the key' do
-        stub_dev_key(stub(:icon_url => 'unique_url'))
+        stub_dev_key(double(:icon_url => 'unique_url'))
         expect(provider.icon_url).to eq 'unique_url'
       end
     end
@@ -103,7 +103,7 @@ module Canvas::Oauth
       end
 
       it 'delegates to the class level finder on DeveloperKey' do
-        key = stub
+        key = double
         stub_dev_key(key)
         expect(provider.key).to eq key
       end
@@ -131,7 +131,7 @@ module Canvas::Oauth
 
     describe '#app_name' do
       let(:key_attrs) { {:name => 'some app', :user_name => 'some user', :email => 'some email'} }
-      let(:key) { stub(key_attrs) }
+      let(:key) { double(key_attrs) }
 
       it 'prefers the key name' do
         stub_dev_key(key)
@@ -162,7 +162,7 @@ module Canvas::Oauth
 
     describe '#session_hash' do
 
-      before { stub_dev_key(stub(:id => 123)) }
+      before { stub_dev_key(double(:id => 123)) }
 
       it 'uses the key id for a client id' do
         expect(provider.session_hash[:client_id]).to eq 123

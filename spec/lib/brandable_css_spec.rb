@@ -25,12 +25,12 @@ describe BrandableCSS do
     end
 
     it "includes image_url asset path for default images" do
-      # un-memoize so it calls image_url stub
+      # un-memoize so it calls image_url double
       if BrandableCSS.instance_variable_get(:@variables_map_with_image_urls)
         BrandableCSS.remove_instance_variable(:@variables_map_with_image_urls)
       end
       url = "https://test.host/image.png"
-      ActionController::Base.helpers.stubs(:image_url).returns(url)
+      allow(ActionController::Base.helpers).to receive(:image_url).and_return(url)
       tile_wide = BrandableCSS.all_brand_variable_values["ic-brand-msapplication-tile-wide"]
       expect(tile_wide).to eq url
     end
@@ -73,6 +73,15 @@ describe BrandableCSS do
     end
   end
 
+  describe "all_brand_variable_values_as_css" do
+    it "defines the right default css values in the root scope" do
+      expected_css = ":root {
+        #{BrandableCSS.all_brand_variable_values(nil, true).map{ |k, v| "--#{k}: #{v};"}.join("\n")}
+      }"
+      expect(BrandableCSS.default_css).to eq expected_css
+    end
+  end
+
   describe "default_json" do
     it "includes default variables not found in brand config" do
       brand_variables = JSON.parse(BrandableCSS.default_json)
@@ -82,63 +91,94 @@ describe BrandableCSS do
 
   describe "save_default_json!" do
     it "writes the default json representation to the default json file" do
-      Canvas::Cdn.stubs(:enabled?).returns(false)
+      allow(Canvas::Cdn).to receive(:enabled?).and_return(false)
       file = StringIO.new
-      BrandableCSS.stubs(:default_brand_json_file).returns(file)
+      allow(BrandableCSS).to receive(:default_brand_json_file).and_return(file)
       BrandableCSS.save_default_json!
       expect(file.string).to eq BrandableCSS.default_json
     end
 
     it 'uploads json file to s3 if cdn is enabled' do
-      Canvas::Cdn.stubs(:enabled?).returns(true)
-      Canvas::Cdn.stubs(:config).returns(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1', aws_access_key_id: 'id', aws_secret_access_key: 'secret', bucket: 'cdn'))
+      allow(Canvas::Cdn).to receive(:enabled?).and_return(true)
+      allow(Canvas::Cdn).to receive(:config).and_return(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1', aws_access_key_id: 'id', aws_secret_access_key: 'secret', bucket: 'cdn'))
 
       file = StringIO.new
-      BrandableCSS.stubs(:default_brand_json_file).returns(file)
-      File.stubs(:delete)
-      BrandableCSS.s3_uploader.expects(:upload_file).with(BrandableCSS.public_default_json_path)
+      allow(BrandableCSS).to receive(:default_brand_json_file).and_return(file)
+      allow(File).to receive(:delete)
+      expect(BrandableCSS.s3_uploader).to receive(:upload_file).with(BrandableCSS.public_default_json_path)
       BrandableCSS.save_default_json!
     end
 
     it 'deletes the local json file if cdn is enabled' do
-      Canvas::Cdn.stubs(:enabled?).returns(true)
-      Canvas::Cdn.stubs(:config).returns(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1', aws_access_key_id: 'id', aws_secret_access_key: 'secret', bucket: 'cdn'))
+      allow(Canvas::Cdn).to receive(:enabled?).and_return(true)
+      allow(Canvas::Cdn).to receive(:config).and_return(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1', aws_access_key_id: 'id', aws_secret_access_key: 'secret', bucket: 'cdn'))
       file = StringIO.new
-      BrandableCSS.stubs(:default_brand_json_file).returns(file)
-      File.expects(:delete).with(BrandableCSS.default_brand_json_file)
-      BrandableCSS.s3_uploader.expects(:upload_file)
+      allow(BrandableCSS).to receive(:default_brand_json_file).and_return(file)
+      expect(File).to receive(:delete).with(BrandableCSS.default_brand_json_file)
+      expect(BrandableCSS.s3_uploader).to receive(:upload_file)
       BrandableCSS.save_default_json!
     end
   end
 
   describe "save_default_js!" do
     it "writes the default javascript representation to the default js file" do
-      Canvas::Cdn.stubs(:enabled?).returns(false)
+      allow(Canvas::Cdn).to receive(:enabled?).and_return(false)
       file = StringIO.new
-      BrandableCSS.stubs(:default_brand_js_file).returns(file)
+      allow(BrandableCSS).to receive(:default_brand_js_file).and_return(file)
       BrandableCSS.save_default_js!
       expect(file.string).to eq BrandableCSS.default_js
     end
 
     it 'uploads javascript file to s3 if cdn is enabled' do
-      Canvas::Cdn.stubs(:enabled?).returns(true)
-      Canvas::Cdn.stubs(:config).returns(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1', aws_access_key_id: 'id', aws_secret_access_key: 'secret', bucket: 'cdn'))
+      allow(Canvas::Cdn).to receive(:enabled?).and_return(true)
+      allow(Canvas::Cdn).to receive(:config).and_return(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1', aws_access_key_id: 'id', aws_secret_access_key: 'secret', bucket: 'cdn'))
 
       file = StringIO.new
-      BrandableCSS.stubs(:default_brand_js_file).returns(file)
-      File.stubs(:delete)
-      BrandableCSS.s3_uploader.expects(:upload_file).with(BrandableCSS.public_default_js_path)
+      allow(BrandableCSS).to receive(:default_brand_js_file).and_return(file)
+      allow(File).to receive(:delete)
+      expect(BrandableCSS.s3_uploader).to receive(:upload_file).with(BrandableCSS.public_default_js_path)
       BrandableCSS.save_default_js!
     end
 
-    it 'delete the local javascript file if cdn is enabled' do
-      Canvas::Cdn.stubs(:enabled?).returns(true)
-      Canvas::Cdn.stubs(:config).returns(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1', aws_access_key_id: 'id', aws_secret_access_key: 'secret', bucket: 'cdn'))
+    it 'deletes the local javascript file if cdn is enabled' do
+      allow(Canvas::Cdn).to receive(:enabled?).and_return(true)
+      allow(Canvas::Cdn).to receive(:config).and_return(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1', aws_access_key_id: 'id', aws_secret_access_key: 'secret', bucket: 'cdn'))
       file = StringIO.new
-      BrandableCSS.stubs(:default_brand_js_file).returns(file)
-      File.expects(:delete).with(BrandableCSS.default_brand_js_file)
-      BrandableCSS.s3_uploader.expects(:upload_file)
+      allow(BrandableCSS).to receive(:default_brand_js_file).and_return(file)
+      expect(File).to receive(:delete).with(BrandableCSS.default_brand_js_file)
+      expect(BrandableCSS.s3_uploader).to receive(:upload_file)
       BrandableCSS.save_default_js!
+    end
+  end
+
+  describe "save_default_css!" do
+    it "writes the default css variables to the default css file" do
+      allow(Canvas::Cdn).to receive(:enabled?).and_return(false)
+      file = StringIO.new
+      allow(BrandableCSS).to receive(:default_brand_css_file).and_return(file)
+      BrandableCSS.save_default_css!
+      expect(file.string).to eq BrandableCSS.default_css
+    end
+
+    it 'uploads css file to s3 if cdn is enabled' do
+      allow(Canvas::Cdn).to receive(:enabled?).and_return(true)
+      allow(Canvas::Cdn).to receive(:config).and_return(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1', aws_access_key_id: 'id', aws_secret_access_key: 'secret', bucket: 'cdn'))
+
+      file = StringIO.new
+      allow(BrandableCSS).to receive(:default_brand_css_file).and_return(file)
+      allow(File).to receive(:delete)
+      expect(BrandableCSS.s3_uploader).to receive(:upload_file).with(BrandableCSS.public_default_css_path)
+      BrandableCSS.save_default_css!
+    end
+
+    it 'deletes the local css file if cdn is enabled' do
+      allow(Canvas::Cdn).to receive(:enabled?).and_return(true)
+      allow(Canvas::Cdn).to receive(:config).and_return(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1', aws_access_key_id: 'id', aws_secret_access_key: 'secret', bucket: 'cdn'))
+      file = StringIO.new
+      allow(BrandableCSS).to receive(:default_brand_css_file).and_return(file)
+      expect(File).to receive(:delete).with(BrandableCSS.default_brand_css_file)
+      expect(BrandableCSS.s3_uploader).to receive(:upload_file)
+      BrandableCSS.save_default_css!
     end
   end
 end

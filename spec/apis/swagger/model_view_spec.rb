@@ -3,7 +3,7 @@ require 'model_view'
 
 describe ModelView do
   let(:text) { "Example\n{ \"properties\": [] }" }
-  let(:model) { stub('Model', :text => text) }
+  let(:model) { double('Model', :text => text) }
 
   it "is created from model" do
     view = ModelView.new_from_model(model)

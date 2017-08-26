@@ -32,7 +32,7 @@ describe "user_content" do
 
     before (:each) do
       course_with_student_logged_in(:active_all => true)
-      HostUrl.stubs(:is_file_host?).returns(true)
+      allow(HostUrl).to receive(:is_file_host?).and_return(true)
     end
 
     describe "iframes" do

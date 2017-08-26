@@ -28,10 +28,6 @@ describe 'quiz restrictions as a teacher' do
     stub_rcs_config
   end
 
-  after do
-    unstub_rcs_config
-  end
-
   context 'restrict access code' do
     let(:access_code) { '1234' }
     let(:quiz_with_access_code) do

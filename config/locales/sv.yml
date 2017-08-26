@@ -1,4 +1,4 @@
-# This YAML file is auto-generated from a Transifex import.
+# This YAML file is auto-generated from a translation import.
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 sv: 
@@ -303,6 +303,7 @@ sv:
     report_header_canvas_xlist_course_id: canvas_xlist_course_id
     report_header_course: kurs
     report_header_course__id: course_id
+    report_header_course_format: course_format
     report_header_course_id: kurs-id
     report_header_course_name: kursnamn
     report_header_course_sis: "kurs sis"
@@ -714,6 +715,12 @@ sv:
     default_account_quotas_not_updated: "Förinställda kontokvoter uppdaterades inte"
     default_account_quotas_updated: "Förinställda kontokvoter uppdaterades"
     devry: 
+      attendance_extract: 
+        parameters: 
+          custom_reports: 
+            start: 
+              parameters: 
+                header: "Aktivitetsdatum:"
       dcr2: 
         parameters: 
           custom_reports: 
@@ -730,6 +737,24 @@ sv:
               parameters: 
                 header: "Börjar:"
       dcr7: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Avslutas:"
+            start: 
+              parameters: 
+                header: "Börjar:"
+      no_submissions: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Avslutas:"
+            start: 
+              parameters: 
+                header: "Börjar:"
+      submissions_detail: 
         parameters: 
           custom_reports: 
             end: 
@@ -2152,6 +2177,8 @@ sv:
         remove_these_dates: "Radera dessa datumen"
     edit: 
       edit_assignment: "Redigera uppgift"
+      links: 
+        add_rubric: Matris
     edit_header_view: 
       buttons: 
         not_published: "Inte publicerad"
@@ -3449,12 +3476,30 @@ sv:
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "Klicka för att lägga till kommentarer, ifall studenten väljer det här svaret"
   click_to_load_a020891b: "(klicka för att ladda)"
   click_to_modify_89fa26aa: "Klicka för att ändra"
+  click_to_order_by_email_ascending_98b1a697: "Klicka för att beställa via e-post stigande"
+  click_to_order_by_last_login_ascending_502b6ad2: "Klicka för att beställa efter senaste inloggning stigande"
+  click_to_order_by_sis_id_ascending_692d35a7: "Klicka för att beställa efter SIS ID stigande"
   click_to_publish_ad27be9d: "Klicka för att publicera"
   click_to_report_profile_picture_370f9625: "Klicka för att rapportera profilbilden "
   click_to_select_bd3b3a0d: "klicka för att välja"
   click_to_select_user_name_41746803: "Klicka för att välja en användare %{name}"
   click_to_set_this_answer_as_correct_1326e3fd: "Klicka för att ställa in svaret som korrekt"
   click_to_skip_address_8f874b32: "Klicka för att hoppa över %{address}"
+  click_to_sort_by_email_ascending_cb789ec4: "Klicka för att sortera efter e-post stigande"
+  click_to_sort_by_email_descending_72801b54: "Klicka för att sortera efter e-post fallande"
+  click_to_sort_by_enrollments_ascending_f535b994: "Klicka för att sortera efter registreringar stigande"
+  click_to_sort_by_enrollments_descending_3e5c80ee: "Klicka för att sortera efter registreringar fallande"
+  click_to_sort_by_last_login_ascending_eafcbee4: "Klicka för att sortera efter senaste inloggning stigande"
+  click_to_sort_by_last_login_descending_61fdadc: "Klicka för att sortera efter senaste inloggning fallande"
+  click_to_sort_by_name_ascending_739c011e: "Klicka för att sortera efter namn stigande"
+  click_to_sort_by_name_descending_b6262093: "Klicka för att sortera efter namn fallande"
+  click_to_sort_by_sis_id_ascending_832c870: "Klicka för att sortera efter SIS ID stigande"
+  click_to_sort_by_sis_id_descending_2d611236: "Klicka för att sortera efter SIS ID fallande"
+  click_to_sort_by_subaccount_ascending_11252bc4: "Klicka för att sortera efter delkonto stigande"
+  click_to_sort_by_subaccount_descending_3d8a2381: "Klicka för att sortera efter delkonto fallande"
+  click_to_sort_by_teacher_ascending_cda7a18c: "Klicka för att sortera efter lärare stigande"
+  click_to_sort_by_teacher_descending_45ef0d1e: "Klicka för att sortera efter lärare fallande"
+  click_to_sort_c81ff8c8: "Klicka för att sortera."
   click_to_test_a_different_score_2e0bb6f0: "Klicka för att testa en annan poäng"
   click_to_test_dropdown_b950974d: "Klicka för att testa rullgardinsmenyn"
   click_to_unpublish_5b19e761: "Klicka för att avpublicera"
@@ -3474,6 +3519,8 @@ sv:
   closes_5c6b4367: "Stänger:"
   code_is_case_sensitive_d8175cad: "Koden är skiftlägeskänslig"
   cog_icon_69bdffd5: Kugghjuls-ikon
+  col_is_sorted_ascending_cc5152cc: "%{col} sorterat stigande"
+  col_is_sorted_descending_1cef74aa: "%{col} sorterat fallande."
   collaboration: 
     default_title: "Icke namngett samarbete"
   collaboration_71c024f4: Samarbete
@@ -4662,6 +4709,7 @@ sv:
   count_items_selected_91814713: 
     one: "%{count} föremål vald"
     other: "%{count} valda föremål"
+  count_items_would_be_deleted_and_exceeds_the_set_t_a4a21dbe: "%{count} föremål skulle raderas och överstiga den inställda tröskeln för %{change_threshold}%"
   count_max_students_2db76773: "%{count} / %{max} studenter"
   count_max_users_bdebb537: "%{count} / %{max} användare"
   count_messages_4f8ff204: 
@@ -5907,6 +5955,7 @@ sv:
       year: År
   day_9d999bec: Dag
   day_s_7cc1231f: Dag(ar)
+  days_late_a3a721b0: "Dagar sent"
   deactivate_this_key_3e79a2b5: "Avaktivera denna nyckeln"
   deactivate_user_86c09036: "Avaktivera användare"
   decaying_average_8bf6a0dd: "Fallande genomsnitt"
@@ -7600,6 +7649,7 @@ sv:
   generating_preview_ae83830: "Genererar förhandsvisning..."
   germany_49_fc5b8179: "Tyskland (+49)"
   germany_b02d91c9: Tyskland
+  get_started_b9507525: "Sätt igång"
   get_the_following_from_your_salesforce_connected_a_881fc9a3: "Få följande från din Salesforce Connected App"
   get_your_users_error_reports_posted_to_salesforce__76f57839: "Få dina användarfelsrapporter postade till ditt Salesforce Service Cloud"
   get_your_users_error_reports_posted_to_salesforce_dfb1a6c2: "få dina användarfelsrapportet postadee till Salesforce"
@@ -7681,6 +7731,7 @@ sv:
       submit_comment: "Lämna kommentar"
       submitting: "Lämnar in..."
     cancel_button: Avbryt
+    canvadoc_expiring: "Din Canvas DocViewer session utgår snart.  Vänligen ladda om fönstret för att undvika att du förlorar något arbete."
     click_to_change: "Klicka för att testa en annan poäng"
     column_header: 
       assignment_options: Uppgiftsalternativ
@@ -8941,6 +8992,8 @@ sv:
   host_8be927e0: Värd
   host_is_unreachable_or_not_pointing_to_catalog_fb3fc082: "Värden kan inte nås eller är inte riktad mot Katalog"
   hour_34d02553: Timme
+  hour_s_b6e8d238: Timme/timmar
+  hours_late_989e9081: "Timmar sent"
   hover_over_me_496521b9: "Sväva över mig"
   how_is_this_affecting_you_b3b6a639: "Hur påverkar det dig?"
   how_many_minutes_ecca5ee7: "Hur många minuter?"
@@ -8956,6 +9009,7 @@ sv:
   i_need_some_help_but_it_is_not_urgent_d967ea0a: "Jag behöver hjälp men det är inte så bråttom"
   ic_actions: 
     manage: hantera
+  iceland_354_1a03c558: "Island (+354)"
   icon_215a1dc6: Ikon
   icons: 
     discussion_submission: Diskussionsinlämning
@@ -9551,6 +9605,7 @@ sv:
   loading_25990131: Laddar...
   loading_725811ca: laddar
   loading_announcements_b927a86c: "Laddar meddelanden"
+  loading_assignments_352ec769: "Laddar uppgifter"
   loading_associations_9da66c4e: "Laddar associationer"
   loading_associations_complete_b93a9c6e: "Laddar associationer färdigt"
   loading_associations_started_1f65d8d: "Laddar associationer startade"
@@ -9565,7 +9620,9 @@ sv:
   loading_data_ecd89ba: "Laddar data.."
   loading_graders_f6a76142: "Laddar betygsättare"
   loading_mastery_paths_c558a766: "Laddar Mastery Paths..."
+  loading_more_grade_history_results_b235de5: "Laddar mer historik för betygsresultat."
   loading_more_results_def6df65: "Ladda fler resultat.."
+  loading_results_769c8819: "Laddar resultat"
   loading_results_spinner_73ef739c: "Laddar resultats-spinner"
   loading_students_30b71301: "Laddar studenter"
   loading_sync_history_9f342cbf: "Laddar synkroniseringshistorik"
@@ -11886,6 +11943,7 @@ sv:
   more_courses_5ebbe998: "Fler kurser"
   more_info_at_course_name_56dc8c10: "Mer information på %{course_name}"
   more_information_3dfb76b5: "Mer information"
+  more_results_were_added_at_the_bottom_of_the_page_dc323877: "Fler resultat har lagts till längst ner på sidan."
   more_than_999_submissions_need_grading_bc087dd0: "Fler än 999 inlämningar behöver betygsättas"
   more_than_9_submissions_need_grading_30157d49: "Fler än 9 inlämningar måste betygsättas"
   more_than_a19b440: "%{more_than}+"
@@ -12084,6 +12142,7 @@ sv:
   nickname_7df95b09: "Smeknamn:"
   no_74e9b590: nej
   no_assignment_name_adbb215b: "Inget uppgiftsnamn"
+  no_assignments_with_that_name_found_1d7be1: "Inga uppgifter med det namnet hittades"
   no_associated_terms_13bacefc: "Inga associerade terminer"
   no_attributes_locked_611c5cc: "Inga attribut låsta"
   no_broken_links_found_38d951e3: "Inga trasiga länkar hittades"
@@ -12111,6 +12170,7 @@ sv:
   no_ltis_configured_f4b9bc6b: "Inga LTI:er konfigurerade"
   no_matching_users_found_83889c10: "Inga matchande användare hittades."
   no_migration_file: "Fil krävs för innehållsmigrering"
+  no_more_results_to_load_6774fb1c: "Inga fler resultat att laddas."
   no_outcome_file_or_authority_given_c90f9c5f: "Ingen bedömningsfil eller auktoritet har uppgetts"
   no_password_was_given_472222e5: "Inget lösenord uppgavs"
   no_placements_enabled_f705f28: "Inga placeringar har aktiverats"
@@ -12118,6 +12178,7 @@ sv:
   no_points_possible_72db3a55: "Inga möjliga poäng"
   no_results_f36777ee: "Inga resultat"
   no_results_found_58717065: "Inga resultat hittades"
+  no_results_found_e4b686bd: "Inga resultat hittades"
   no_score_yet_c94e919b: "Inga poäng än"
   no_students_dd8de9f0: "Inga studenter"
   no_students_have_taken_the_quiz_yet_e667644b: "Inga studenter har gjort denna Quiz"
@@ -16610,6 +16671,9 @@ sv:
       titles: 
         full_comments: "Klicka för att se hela kommentarer"
         linked_to_learning_outcome: "Det här kriteriet är länkat till ett lärandemål"
+    rubrics_component: 
+      links: 
+        assign_rubric: "Tilldela matris"
     select_content_dialog: 
       add_to_module: "Lägg till %{item} till *modul*"
       assignment_item: Uppgift
@@ -16972,6 +17036,7 @@ sv:
   something_is_broken_but_i_can_work_around_it_for_n_7fcedb9d: "Något är fel, men för tillfället kan jag kan arbeta runt problemet "
   something_went_wrong_inactivating_the_user_please__ea7d0001: "Något gick fel när användaren avaktiverades. Vänligen försök igen senare."
   something_went_wrong_please_try_again_6d337b6c: "Nägot fick fel, vänligen försök igen."
+  something_went_wrong_please_try_refreshing_the_pag_4e14a67: "Någonting gick fel. Vänligen försök att uppdatera sidan. Om problemet kvarstår kan det finnas för många poster på ””%{assignmentTitle}” för att ladda SpeedGrader."
   something_went_wrong_re_activating_the_user_please_82c3e7a: "Något gick fel när användaren återaktiverades. Vänligen försök igen senare."
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "Något gick fel när användarens roll uppdaterades. Vänligen försök igen senare."
   something_went_wrong_when_trying_to_sync_grades_to_592c4c35: "Något gick fel när du försökte synkronisera betyg till student-informationssystemet. Försök igen senare."
@@ -16982,9 +17047,11 @@ sv:
   sortable_name_73f707cf: "Sorterbart namn"
   sorted_ascending_1f9b52c6: "Sorterat i stigande ordning."
   sorted_ascending_2318ec99: "Sortera i stigande ordning"
+  sorted_ascending_3138603c: "sorterat stigande."
   sorted_ascending_b6d61547: "Sorterade stigande"
   sorted_descending_1e30f0d5: "Sorterade fallande"
   sorted_descending_7fcec1ff: "Sortera i fallande ordning"
+  sorted_descending_84ec84c8: "sorterat fallande."
   sorted_descending_d9aa3cf8: "Sorterat i fallande ordning."
   source_code_2395ca74: Källkod
   south_korea_16d43049: Sydkorea
@@ -17151,6 +17218,7 @@ sv:
   students_will_automatically_receive_full_credit_on_cc61df39: "studenter kommer automatiskt få fullständigt beröm när det har slutfört undersökningen"
   students_with_no_submissions_title: "Studenter utan inlämningar"
   studentsperrangecount_out_of_totalstudentsenrolled_90cbfaf1: "%{studentsPerRangeCount} av %{totalStudentsEnrolled} elever"
+  sub_account_daeadd0: Delkonto
   sub_accounts: 
     alerts: 
       subaccount_has_courses: "Du kan inte radera ett under-konto som har kurser i sig"
@@ -17220,6 +17288,7 @@ sv:
     view_rubric_assessment_in_the_speedgrader: "Visa matris utvärdering i SpeedGrader"
   submission_in_another_grading_period_e754b329: "Inläming i annan betygsperiod"
   submission_options_5184a65b: Inlämningsalternativ
+  submission_status_3079e730: Inlämningsstatus
   submission_tray_429ac3df: Inlämningsfack
   submissions: 
     assignment_submit_success: "Uppgiften har lämnats in."

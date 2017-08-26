@@ -22,20 +22,20 @@ module Lti
     describe AuthorizationValidator do
 
       let(:product_family) do
-        product_family_mock = mock("product_family")
-        product_family_mock.stubs(:developer_key).returns(dev_key)
+        product_family_mock = double("product_family")
+        allow(product_family_mock).to receive(:developer_key).and_return(dev_key)
         product_family_mock
       end
 
       let(:account) { Account.create! }
 
       let(:tool_proxy) do
-        tool_proxy_mock = mock("tool_proxy")
-        tool_proxy_mock.stubs(:guid).returns("3b7f3b02-b481-4f63-a6b0-129dee85abee")
-        tool_proxy_mock.stubs(:shared_secret).returns('42')
-        tool_proxy_mock.stubs(:raw_data).returns({'enabled_capability' => ['Security.splitSecret']})
-        tool_proxy_mock.stubs(:workflow_state).returns('active')
-        tool_proxy_mock.stubs(:product_family).returns(product_family)
+        tool_proxy_mock = double("tool_proxy")
+        allow(tool_proxy_mock).to receive(:guid).and_return("3b7f3b02-b481-4f63-a6b0-129dee85abee")
+        allow(tool_proxy_mock).to receive(:shared_secret).and_return('42')
+        allow(tool_proxy_mock).to receive(:raw_data).and_return({'enabled_capability' => ['Security.splitSecret']})
+        allow(tool_proxy_mock).to receive(:workflow_state).and_return('active')
+        allow(tool_proxy_mock).to receive(:product_family).and_return(product_family)
         tool_proxy_mock
       end
 
@@ -76,8 +76,8 @@ module Lti
       end
 
       before do
-        Lti::ToolProxy.stubs(:where).returns([])
-        Lti::ToolProxy.stubs(:where).with(guid: tool_proxy.guid, workflow_state: 'active').returns([tool_proxy])
+        allow(Lti::ToolProxy).to receive(:where).and_return([])
+        allow(Lti::ToolProxy).to receive(:where).with(guid: tool_proxy.guid, workflow_state: 'active').and_return([tool_proxy])
       end
 
       describe "#jwt" do
@@ -233,18 +233,18 @@ module Lti
         end
 
         it "raises Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt if the Tool Proxy is not using a split secret" do
-          tool_proxy.stubs(:raw_data).returns({'enabled_capability' => []})
+          allow(tool_proxy).to receive(:raw_data).and_return({'enabled_capability' => []})
           expect { auth_validator.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
                                                        "the Tool Proxy must be using a split secret"
         end
 
         it "accepts OAuth.splitSecret capability for backwards compatability" do
-          tool_proxy.stubs(:raw_data).returns({'enabled_capability' => ['OAuth.splitSecret']})
+          allow(tool_proxy).to receive(:raw_data).and_return({'enabled_capability' => ['OAuth.splitSecret']})
           expect(auth_validator.tool_proxy).to eq tool_proxy
         end
 
         it "requires an active developer_key" do
-          dev_key.stubs(:active?).returns false
+          allow(dev_key).to receive(:active?).and_return false
           expect { auth_validator.tool_proxy }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
                                                               "the Developer Key is not active"
         end

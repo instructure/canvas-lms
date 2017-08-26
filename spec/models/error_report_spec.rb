@@ -91,7 +91,7 @@ describe ErrorReport do
       :request_parameters => { "client_secret" => "xoxo" }
     }
     mock_attrs[:url] = mock_attrs[:env]["REQUEST_URI"]
-    req = mock(mock_attrs)
+    req = double(mock_attrs)
     report = described_class.new
     report.assign_data(Canvas::Errors::Info.useful_http_env_stuff_from_request(req))
     expect(report.data["QUERY_STRING"]).to eq "?access_token=[FILTERED]&pseudonym[password]=[FILTERED]"

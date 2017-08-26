@@ -65,10 +65,6 @@ describe 'Gradezilla omit from final grade assignments' do
       get "/courses/#{test_course.id}/assignments/#{assignment_2.id}/edit"
     end
 
-    after(:each) do
-      unstub_rcs_config
-    end
-
     it 'do not count towards final grade checkbox is visible on edit' do
       expect(omit_from_final_checkbox).to be_present
     end

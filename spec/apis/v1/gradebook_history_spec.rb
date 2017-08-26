@@ -24,21 +24,21 @@ describe Api::V1::GradebookHistory do
   subject(:gradebook_history) { GradebookHistoryHarness.new }
   let(:course) { double }
   let(:controller) do
-    stub(
+    double(
       :params => {},
-      :request => stub(:query_parameters => {}),
-      :response => stub(:headers => {})
+      :request => double(:query_parameters => {}),
+      :response => double(:headers => {})
     )
   end
   let(:path) { '' }
   let(:user) { User.new }
-  let(:session) { stub }
+  let(:session) { double }
   let(:api_context) { Api::V1::ApiContext.new(controller, path, user, session) }
   let(:now) { Time.now.in_time_zone }
   let(:yesterday) { (now - 24.hours).in_time_zone }
 
   before do
-    Submission.any_instance.stubs(:user_can_read_grade?).with(user, session).returns(true)
+    allow_any_instance_of(Submission).to receive(:user_can_read_grade?).with(user, session).and_return(true)
   end
 
   def submit(assignment, student, day, grader)
@@ -221,12 +221,12 @@ describe Api::V1::GradebookHistory do
 
   describe '#day_string_for' do
     it 'builds a formatted date' do
-      submission = stub(:graded_at => now)
+      submission = double(:graded_at => now)
       expect(gradebook_history.day_string_for(submission)).to match(/\d{4}-\d{2}-\d{2}/)
     end
 
     it 'gives a empty string if there is no time' do
-      submission = stub(:graded_at => nil)
+      submission = double(:graded_at => nil)
       expect(gradebook_history.day_string_for(submission)).to eq ''
     end
   end

@@ -26,8 +26,8 @@ describe DueDateCacher do
 
   describe ".recompute" do
     before do
-      @instance = stub('instance', :recompute => nil)
-      @new_expectation = DueDateCacher.expects(:new).returns(@instance)
+      @instance = double('instance', :recompute => nil)
+      @new_expectation = expect(DueDateCacher).to receive(:new).and_return(@instance)
     end
 
     it "should wrap assignment in an array" do
@@ -36,12 +36,12 @@ describe DueDateCacher do
     end
 
     it "should delegate to an instance" do
-      @instance.expects(:recompute)
+      expect(@instance).to receive(:recompute)
       DueDateCacher.recompute(@assignment)
     end
 
     it "should queue a delayed job in an assignment-specific singleton in production" do
-      @instance.expects(:send_later_if_production_enqueue_args).
+      expect(@instance).to receive(:send_later_if_production_enqueue_args).
         with(:recompute, singleton: "cached_due_date:calculator:Assignment:#{@assignment.global_id}")
       DueDateCacher.recompute(@assignment)
     end
@@ -51,8 +51,8 @@ describe DueDateCacher do
     before do
       @assignments = [@assignment]
       @assignments << assignment_model(:course => @course)
-      @instance = stub('instance', :recompute => nil)
-      @new_expectation = DueDateCacher.expects(:new).returns(@instance)
+      @instance = double('instance', :recompute => nil)
+      @new_expectation = expect(DueDateCacher).to receive(:new).and_return(@instance)
     end
 
     it "should pass along the whole array" do
@@ -61,30 +61,30 @@ describe DueDateCacher do
     end
 
     it "should default to all assignments in the context" do
-      @new_expectation.with { |course, assignment_ids| course.id == @course.id && assignment_ids.sort == @assignments.map(&:id).sort }
+      @new_expectation.with(@course, match_array(@assignments.map(&:id)))
       DueDateCacher.recompute_course(@course)
     end
 
     it "should delegate to an instance" do
-      @instance.expects(:recompute)
+      expect(@instance).to receive(:recompute)
       DueDateCacher.recompute_course(@course, @assignments)
     end
 
     it "should queue a delayed job in a singleton in production if assignments.nil" do
-      @instance.expects(:send_later_if_production_enqueue_args).
+      expect(@instance).to receive(:send_later_if_production_enqueue_args).
           with(:recompute, singleton: "cached_due_date:calculator:Course:#{@course.global_id}")
       DueDateCacher.recompute_course(@course)
     end
 
     it "should queue a delayed job without a singleton if assignments is passed" do
-      @instance.expects(:send_later_if_production_enqueue_args).with(:recompute, {})
+      expect(@instance).to receive(:send_later_if_production_enqueue_args).with(:recompute, {})
       DueDateCacher.recompute_course(@course, @assignments)
     end
 
     it "should operate on a course id" do
-      @instance.expects(:send_later_if_production_enqueue_args).
+      expect(@instance).to receive(:send_later_if_production_enqueue_args).
           with(:recompute, singleton: "cached_due_date:calculator:Course:#{@course.global_id}")
-      @new_expectation.with { |course, assignment_ids| course.id == @course.id && assignment_ids.sort == @assignments.map(&:id).sort }
+      @new_expectation.with(@course, match_array(@assignments.map(&:id).sort))
       DueDateCacher.recompute_course(@course.id)
     end
   end

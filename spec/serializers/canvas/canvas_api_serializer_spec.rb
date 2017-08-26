@@ -70,7 +70,7 @@ describe Canvas::APISerializer do
       con = ActiveModel::FakeController.new(accepts_jsonapi: false, stringify_json_ids: false)
       object = Foo.new(1, 'Alice')
       serializer = FooSerializer.new(object, {root: nil, controller: con})
-      serializer.expects(:stringify_ids?).returns false
+      expect(serializer).to receive(:stringify_ids?).and_return false
       expect(serializer.as_json(root: nil)).to eq({
         id: 1,
         name: 'Alice'
@@ -93,10 +93,10 @@ describe Canvas::APISerializer do
         has_one :bar, embed: :ids
       end
       object = Foo.new(1, 'Bob')
-      object.expects(:bar).returns stub()
+      expect(object).to receive(:bar).and_return double()
       url = "http://example.com/api/v1/bar/1"
       serializer = FooSerializer.new(object, {root: nil, controller: con})
-      serializer.expects(:bar_url).returns(url)
+      expect(serializer).to receive(:bar_url).and_return(url)
       expect(serializer.as_json(root: nil)['links']['bar']).to eq url
     end
 
@@ -109,7 +109,7 @@ describe Canvas::APISerializer do
         attributes :id
       end
       object = Foo.new(1, 'Bob')
-      object.expects(:bar).returns Foo.new(1, 'Alice')
+      expect(object).to receive(:bar).and_return Foo.new(1, 'Alice')
       url = "http://example.com/api/v1/bar/1"
       serializer = FooSerializer.new(object, {root: nil, controller: con})
       expect(serializer.as_json(root: nil)['links']['bar']).to eq "1"
@@ -136,7 +136,7 @@ describe Canvas::APISerializer do
 
       let :object do
         Foo.new(1, 'Bob').tap do |object|
-          object.expects(:bar).returns Bar.new(1, 'Alice')
+          expect(object).to receive(:bar).and_return Bar.new(1, 'Alice')
         end
       end
 

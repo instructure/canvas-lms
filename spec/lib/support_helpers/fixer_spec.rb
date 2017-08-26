@@ -37,7 +37,7 @@ describe SupportHelpers::Fixer do
   describe '#monitor_and_fix' do
     it 'emails the caller upon success' do
       fixer = SupportHelpers::Fixer.new('email')
-      Message.expects(:new).with do |actual|
+      expect(Message).to receive(:new) do |actual|
         actual.slice(:to, :from, :subject, :delay_for) == {
           to: 'email',
           from: 'supporthelperscript@instructure.com',
@@ -45,15 +45,15 @@ describe SupportHelpers::Fixer do
           delay_for: 0
         } && actual[:body] =~ /done in \d+ seconds!/
       end
-      fixer.expects(:fix).returns(nil)
-      Mailer.expects(:create_message)
+      expect(fixer).to receive(:fix).and_return(nil)
+      expect(Mailer).to receive(:create_message)
       fixer.monitor_and_fix
     end
 
     it 'emails the caller upon error' do
       fixer = SupportHelpers::Fixer.new('email')
-      Message.expects(:new)
-      Mailer.expects(:create_message)
+      expect(Message).to receive(:new)
+      expect(Mailer).to receive(:create_message)
       begin
         fixer.monitor_and_fix
       rescue => error

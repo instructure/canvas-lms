@@ -51,7 +51,7 @@ describe SisApiController, type: :request do
       end
 
       it 'requires :bulk_sis_grade_export feature to be enabled or post_grades tool to be installed' do
-        get "/api/sis/accounts/#{context.id}/assignments", account_id: context.id
+        get "/api/sis/accounts/#{context.id}/assignments", params: {account_id: context.id}
         expect(response.status).to eq 400
         expect(json_parse).to include('code' => 'not_enabled')
       end
@@ -59,13 +59,13 @@ describe SisApiController, type: :request do
       shared_examples 'account sis assignments api' do
         it 'requires :view_all_grades permission' do
           context.role_overrides.create!(permission: :view_all_grades, enabled: false, role: admin_role)
-          get "/api/sis/accounts/#{context.id}/assignments", account_id: context.id
+          get "/api/sis/accounts/#{context.id}/assignments", params: {account_id: context.id}
           assert_unauthorized
         end
 
         it 'returns paginated assignment list' do
           # first page
-          get "/api/sis/accounts/#{context.id}/assignments", account_id: context.id, per_page: 2
+          get "/api/sis/accounts/#{context.id}/assignments", params: {account_id: context.id, per_page: 2}
           expect(response).to be_success
           result_json = json_parse
           expect(result_json.length).to eq(2)
@@ -73,7 +73,7 @@ describe SisApiController, type: :request do
           expect(result_json[1]).to include('id' => assignment9.id)
 
           # second page
-          get "/api/sis/accounts/#{context.id}/assignments", account_id: context.id, per_page: 2, page: 2
+          get "/api/sis/accounts/#{context.id}/assignments", params: {account_id: context.id, per_page: 2, page: 2}
           expect(response).to be_success
           result_json = json_parse
           expect(result_json.length).to eq(2)
@@ -81,7 +81,7 @@ describe SisApiController, type: :request do
           expect(result_json[1]).to include('id' => assignment11.id)
 
           # third page
-          get "/api/sis/accounts/#{context.id}/assignments", account_id: context.id, per_page: 2, page: 3
+          get "/api/sis/accounts/#{context.id}/assignments", params: {account_id: context.id, per_page: 2, page: 3}
           expect(json_parse.length).to eq(0)
         end
 
@@ -102,7 +102,7 @@ describe SisApiController, type: :request do
             c.assignments.create!(:post_to_sis => true)
           end
 
-          get "/api/sis/accounts/#{context.id}/assignments?starts_before=#{start_at.iso8601}", :account_id => context.id
+          get "/api/sis/accounts/#{context.id}/assignments?starts_before=#{start_at.iso8601}", params: {:account_id => context.id}
           expect(response).to be_success
 
           result = json_parse
@@ -126,7 +126,7 @@ describe SisApiController, type: :request do
             c.assignments.create!(:post_to_sis => true)
           end
 
-          get "/api/sis/accounts/#{context.id}/assignments?ends_after=#{end_at.iso8601}", :account_id => context.id
+          get "/api/sis/accounts/#{context.id}/assignments?ends_after=#{end_at.iso8601}", params: {:account_id => context.id}
           expect(response).to be_success
 
           result = json_parse
@@ -182,7 +182,7 @@ describe SisApiController, type: :request do
 
       shared_examples 'unpublished course sis assignments api' do
         it 'requires the course to be published' do
-          get "/api/sis/courses/#{@course.id}/assignments", course_id: @course.id
+          get "/api/sis/courses/#{@course.id}/assignments", params: {course_id: @course.id}
           expect(response.status).to eq 400
           expect(json_parse).to include('code' => 'unpublished_course')
         end
@@ -254,7 +254,7 @@ describe SisApiController, type: :request do
       end
 
       it 'requires :bulk_sis_grade_export feature to be enabled or post_grades tool to be installed' do
-        get "/api/sis/courses/#{@course.id}/assignments", course_id: @course.id
+        get "/api/sis/courses/#{@course.id}/assignments", params: {course_id: @course.id}
         expect(response.status).to eq 400
         expect(json_parse).to include('code' => 'not_enabled')
       end
@@ -262,13 +262,13 @@ describe SisApiController, type: :request do
       shared_examples 'course sis assignments api' do
         it 'requires :view_all_grades permission' do
           @course.root_account.role_overrides.create!(permission: :view_all_grades, enabled: false, role: admin_role)
-          get "/api/sis/courses/#{@course.id}/assignments", course_id: @course.id
+          get "/api/sis/courses/#{@course.id}/assignments", params: {course_id: @course.id}
           assert_unauthorized
         end
 
         it 'returns paginated assignment list' do
           # first page
-          get "/api/sis/courses/#{@course.id}/assignments", course_id: @course.id, per_page: 2
+          get "/api/sis/courses/#{@course.id}/assignments", params: {course_id: @course.id, per_page: 2}
           expect(response).to be_success
           result_json = json_parse
           expect(result_json.length).to eq(2)
@@ -276,7 +276,7 @@ describe SisApiController, type: :request do
           expect(result_json[1]).to include('id' => assignment5.id)
 
           # second page
-          get "/api/sis/courses/#{@course.id}/assignments", course_id: @course.id, per_page: 2, page: 2
+          get "/api/sis/courses/#{@course.id}/assignments", params: {course_id: @course.id, per_page: 2, page: 2}
           expect(response).to be_success
           result_json = json_parse
           expect(result_json.length).to eq(2)
@@ -284,7 +284,7 @@ describe SisApiController, type: :request do
           expect(result_json[1]).to include('id' => assignment7.id)
 
           # third page
-          get "/api/sis/courses/#{@course.id}/assignments", course_id: @course.id, per_page: 2, page: 3
+          get "/api/sis/courses/#{@course.id}/assignments", params: {course_id: @course.id, per_page: 2, page: 3}
           expect(response).to be_success
           result_json = json_parse
           expect(result_json.length).to eq(1)
@@ -292,7 +292,7 @@ describe SisApiController, type: :request do
         end
 
         it 'should return an assignment with an override' do
-          get "/api/sis/courses/#{@course.id}/assignments", course_id: @course.id, per_page: 2, page: 2
+          get "/api/sis/courses/#{@course.id}/assignments", params: {course_id: @course.id, per_page: 2, page: 2}
           result_json = json_parse
           assignment = result_json.detect { |a| a['id'] == assignment7.id }
           override = assignment['sections'].first['override']
@@ -300,13 +300,13 @@ describe SisApiController, type: :request do
         end
 
         it 'does not return assignments with inactive overrides' do
-          get "/api/sis/courses/#{@course.id}/assignments", course_id: @course.id, per_page: 2, page: 3
+          get "/api/sis/courses/#{@course.id}/assignments", params: {course_id: @course.id, per_page: 2, page: 3}
           result_json = json_parse
           expect(result_json[0]['sections'].first).not_to include('override')
         end
 
         it 'does not return inactive sections' do
-          get "/api/sis/courses/#{@course.id}/assignments", course_id: @course.id, per_page: 2, page: 3
+          get "/api/sis/courses/#{@course.id}/assignments", params: {course_id: @course.id, per_page: 2, page: 3}
           result_json = json_parse
           section_ids = result_json[0]['sections'].map { |s| s['id'] }
           expect(section_ids).not_to include(inactive_section8.id)

@@ -70,7 +70,7 @@ describe Api::V1::User do
 
     it 'only loads pseudonyms for the user once, even if there are multiple enrollments' do
       sis_stub = SisPseudonym.for(@student, @course, type: :trusted)
-      SisPseudonym.expects(:for).once.returns(sis_stub)
+      expect(SisPseudonym).to receive(:for).once.and_return(sis_stub)
       ta_enrollment = ta_in_course(user: @student, course: @course)
       teacher_enrollment = teacher_in_course(user: @student, course: @course)
       @test_api.current_user = @admin
@@ -212,9 +212,9 @@ describe Api::V1::User do
       @user.pseudonyms.destroy_all
       p = @user.pseudonyms.create!(:unique_id => 'abc', :account => @account2) { |p| p.sis_user_id = 'a'}
       allow(p).to receive(:works_for_account?).with(Account.default, true).and_return(true)
-      Account.default.any_instantiation.stubs(:trust_exists?).returns(true)
-      Account.default.any_instantiation.stubs(:trusted_account_ids).returns([@account2.id])
-      HostUrl.expects(:context_host).with(@account2).returns('school1')
+      allow_any_instantiation_of(Account.default).to receive(:trust_exists?).and_return(true)
+      allow_any_instantiation_of(Account.default).to receive(:trusted_account_ids).and_return([@account2.id])
+      expect(HostUrl).to receive(:context_host).with(@account2).and_return('school1')
       expect(@test_api.user_json(@user, @admin, {}, [], Account.default)).to eq({
           'name' => 'User',
           'sortable_name' => 'User',
@@ -274,9 +274,9 @@ describe Api::V1::User do
     end
 
     def test_context(mock_context, context_to_pass)
-      mock_context.expects(:account).returns(mock_context)
-      mock_context.expects(:global_id).returns(42)
-      mock_context.expects(:grants_any_right?).with(@admin, :manage_students, :read_sis).returns(true)
+      expect(mock_context).to receive(:account).and_return(mock_context)
+      expect(mock_context).to receive(:global_id).and_return(42)
+      expect(mock_context).to receive(:grants_any_right?).with(@admin, :manage_students, :read_sis).and_return(true)
       expect(if context_to_pass
         @test_api.user_json(@student, @admin, {}, [], context_to_pass)
       else
@@ -294,12 +294,12 @@ describe Api::V1::User do
     end
 
     it 'should support manually passing the context' do
-      mock_context = mock()
+      mock_context = double()
       test_context(mock_context, mock_context)
     end
 
     it 'should support loading the context as a member var' do
-      @test_api.context = mock()
+      @test_api.context = double()
       test_context(@test_api.context, nil)
     end
   end
@@ -307,19 +307,19 @@ describe Api::V1::User do
   context 'user_json_is_admin?' do
 
     it 'should support manually passing the current user' do
-      @test_api.context = mock()
-      @test_api.context.expects(:global_id).returns(42)
-      @test_api.context.expects(:account).returns(@test_api.context)
-      @test_api.context.expects(:grants_any_right?).with(@admin, :manage_students, :read_sis).returns(true)
+      @test_api.context = double()
+      expect(@test_api.context).to receive(:global_id).and_return(42)
+      expect(@test_api.context).to receive(:account).and_return(@test_api.context)
+      expect(@test_api.context).to receive(:grants_any_right?).with(@admin, :manage_students, :read_sis).and_return(true)
       @test_api.current_user = @admin
       expect(@test_api.user_json_is_admin?).to eq true
     end
 
     it 'should support loading the current user as a member var' do
-      mock_context = mock()
-      mock_context.expects(:global_id).returns(42)
-      mock_context.expects(:account).returns(mock_context)
-      mock_context.expects(:grants_any_right?).with(@admin, :manage_students, :read_sis).returns(true)
+      mock_context = double()
+      expect(mock_context).to receive(:global_id).and_return(42)
+      expect(mock_context).to receive(:account).and_return(mock_context)
+      expect(mock_context).to receive(:grants_any_right?).with(@admin, :manage_students, :read_sis).and_return(true)
       @test_api.current_user = @admin
       expect(@test_api.user_json_is_admin?(mock_context, @admin)).to eq true
     end
@@ -894,7 +894,7 @@ describe "Users API", type: :request do
     end
 
     it "should send a confirmation if send_confirmation is set to 1" do
-      Pseudonym.any_instance.expects(:send_registration_notification!)
+      expect_any_instance_of(Pseudonym).to receive(:send_registration_notification!)
       api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
         { :controller => 'users', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
         {
@@ -1192,6 +1192,19 @@ describe "Users API", type: :request do
         user = User.find(json['id'])
         expect(user.avatar_image_source).to eql 'external'
         expect(user.avatar_image_url).to eql url_to_set
+      end
+
+      it "should be able to update a name without changing sortable name if sent together" do
+        sortable = "Name, Sortable"
+        @student.update_attributes(:name => "Sortable Name", :sortable_name => sortable)
+        api_call(:put, @path, @path_options, {
+          :user => {:name => "Other Name", :sortable_name => sortable}
+        })
+        expect(@student.reload.sortable_name).to eq sortable
+
+        @student.update_attributes(:name => "Sortable Name", :sortable_name => sortable) # reset
+        api_call(:put, @path, @path_options, {:user => {:name => "Other Name"}}) # only send in the name
+        expect(@student.reload.sortable_name).to eq "Name, Other" # should auto sync
       end
     end
 

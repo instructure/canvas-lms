@@ -27,15 +27,15 @@ describe ExternalFeedAggregator do
 
     it "should work correctly" do
       response = Net::HTTPSuccess.new(1.1, 200, "OK")
-      response.expects(:body).returns(rss_example)
-      CanvasHttp.expects(:get).with(@feed.url).returns(response)
+      expect(response).to receive(:body).and_return(rss_example)
+      expect(CanvasHttp).to receive(:get).with(@feed.url).and_return(response)
       ExternalFeedAggregator.new.process_feed(@feed)
 
       expect(@feed.external_feed_entries.length).to eq 1
     end
 
     it "should set failure counts and refresh_at on failure" do
-      CanvasHttp.expects(:get).with(@feed.url).raises(CanvasHttp::Error)
+      expect(CanvasHttp).to receive(:get).with(@feed.url).and_raise(CanvasHttp::Error)
       ExternalFeedAggregator.new.process_feed(@feed)
       expect(@feed.failures).to eq 1
       expect(@feed.consecutive_failures).to eq 1
@@ -44,8 +44,8 @@ describe ExternalFeedAggregator do
 
     it "should work correctly with atom" do
       response = Net::HTTPSuccess.new(1.1, 200, "OK")
-      response.expects(:body).returns(atom_example)
-      CanvasHttp.expects(:get).with(@feed.url).returns(response)
+      expect(response).to receive(:body).and_return(atom_example)
+      expect(CanvasHttp).to receive(:get).with(@feed.url).and_return(response)
       ExternalFeedAggregator.new.process_feed(@feed)
 
       expect(@feed.external_feed_entries.length).to eq 1

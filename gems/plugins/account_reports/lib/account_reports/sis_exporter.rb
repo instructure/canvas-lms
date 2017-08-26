@@ -232,7 +232,7 @@ module AccountReports
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
         headers = ['course_id', 'integration_id', 'short_name', 'long_name',
-                   'account_id', 'term_id', 'status', 'start_date', 'end_date']
+                   'account_id', 'term_id', 'status', 'start_date', 'end_date', 'course_format']
       else
         headers = []
         headers << I18n.t('#account_reports.report_header_canvas_course_id', 'canvas_course_id')
@@ -247,6 +247,7 @@ module AccountReports
         headers << I18n.t('#account_reports.report_header_status', 'status')
         headers << I18n.t('#account_reports.report_header_start__date', 'start_date')
         headers << I18n.t('#account_reports.report_header_end__date', 'end_date')
+        headers << I18n.t('#account_reports.report_header_course_format', 'course_format')
         headers << I18n.t('created_by_sis')
       end
 
@@ -298,6 +299,7 @@ module AccountReports
             row << nil
             row << nil
           end
+          row << c.course_format
           row << c.sis_batch_id? unless @sis_format
           csv << row
         end

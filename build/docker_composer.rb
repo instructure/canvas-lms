@@ -118,7 +118,7 @@ class DockerComposer
       dump_file = "/tmp/#{ENV["COMPOSE_PROJECT_NAME"]}_structure.sql"
       File.delete dump_file if File.exist?(dump_file)
       FileUtils.touch dump_file
-      docker "exec -i #{ENV["COMPOSE_PROJECT_NAME"]}_postgres_1 pg_dump -s -x -O -U postgres -n public canvas_test_ > #{dump_file}"
+      docker "exec -i #{ENV["COMPOSE_PROJECT_NAME"]}_postgres_1 pg_dump -s -x -O -U postgres -n public -T 'quiz_submission_events_*' canvas_test_ > #{dump_file}"
     end
 
     # data_loader will fetch postgres + cassandra volumes from s3, if
@@ -174,7 +174,6 @@ class DockerComposer
       tasks << "ci:disable_structure_dump"
       tasks << "db:migrate"
       tasks << "ci:prepare_test_shards" if ENV["PREPARE_TEST_DATABASE"] == "1"
-      tasks << "ci:discard_past_quiz_event_partitions"
       tasks << "canvas:quizzes:create_event_partitions"
       tasks << "ci:reset_database" if ENV["PREPARE_TEST_DATABASE"] == "1"
       tasks = tasks.join(" ")

@@ -43,7 +43,7 @@
 .ic-Login__sso-list {
   padding: $ic-sp 0 0 0;
   margin: $ic-sp*2 0 0 0;
-  border-top: 1px solid $ic-brand-Login-footer-link-color;
+  border-top: 1px solid var(--ic-brand-Login-footer-link-color);
 }
 .ic-Login__sso-list__item {
   list-style: none;
@@ -53,14 +53,14 @@
 .Button.ic-Login__sso-button {
   padding: $ic-sp $ic-sp*2;
   background: transparent;
-  color: $ic-brand-Login-footer-link-color;
+  color: var(--ic-brand-Login-footer-link-color);
   border: 1px solid transparent;
   .ic-icon-svg {
     width: 26px;
     height: 26px;
     display: inline-block;
     vertical-align: middle;
-    fill: $ic-brand-Login-footer-link-color;
+    fill: var(--ic-brand-Login-footer-link-color);
   }
   &--has-text {
     display: flex;
@@ -69,12 +69,12 @@
   &:focus,
   &:hover {
     background: transparent;
-    color: $ic-brand-Login-footer-link-color-hover;
-    border: 1px solid $ic-brand-Login-footer-link-color-hover;
+    color: var(--ic-brand-Login-footer-link-color-hover);
+    border: 1px solid var(--ic-brand-Login-footer-link-color-hover);
     &.ui-state-hover {
       background: transparent;
-      color: $ic-brand-Login-footer-link-color-hover;
-      border: 1px solid $ic-brand-Login-footer-link-color-hover;
+      color: var(--ic-brand-Login-footer-link-color-hover);
+      border: 1px solid var(--ic-brand-Login-footer-link-color-hover);
     }
   }
   transition: all 0.5s;
@@ -86,7 +86,7 @@
   padding-right: 0;
 }
 .ic-Login__sso-button__title {
-  color: $ic-brand-Login-footer-link-color;
+  color: var(--ic-brand-Login-footer-link-color);
   padding: 0 $ic-sp;
 }
 .ic-Login__sso-button__title-caps {

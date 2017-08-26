@@ -32,10 +32,6 @@ describe "assignments turn it in" do
     stub_rcs_config
   end
 
-  after (:each) do
-    unstub_rcs_config
-  end
-
   def change_turnitin_settings
     expect(f('#assignment_submission_type')).to be_displayed
     click_option('#assignment_submission_type', 'Online')

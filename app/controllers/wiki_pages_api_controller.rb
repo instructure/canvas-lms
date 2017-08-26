@@ -653,8 +653,12 @@ class WikiPagesApiController < ApplicationController
 
   def assign_todo_date
     if @context.root_account.feature_enabled?(:student_planner) && @page.context.grants_any_right?(@current_user, session, :manage)
-      @page.todo_date = params[:wiki_page][:student_todo_at]
-      @page.todo_date = nil if !value_to_boolean(params[:wiki_page][:student_planner_checkbox])
+      @page.todo_date = params[:wiki_page][:student_todo_at] if params[:wiki_page][:student_todo_at]
+      # Only clear out if the checkbox is explicitly specified in the request
+      if params[:wiki_page].key?("student_planner_checkbox") &&
+        !value_to_boolean(params[:wiki_page][:student_planner_checkbox])
+        @page.todo_date = nil
+      end
       @page.save!
     end
   end

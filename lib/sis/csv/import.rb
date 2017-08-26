@@ -187,7 +187,7 @@ module SIS
             during_tests: false
           })[:error_report]
           error_message = I18n.t("Error while importing CSV. Please contact support."\
-                                 " (Error report %{number})", number: err_id)
+                                 " (Error report %{number})", number: err_id.to_s)
           add_error(nil, error_message)
         else
           add_error(nil, "#{e.message}\n#{e.backtrace.join "\n"}")
@@ -284,7 +284,7 @@ module SIS
             during_tests: false
           })[:error_report]
           error_message = I18n.t("Error while importing CSV. Please contact support. "\
-                                 "(Error report %{number})", number: err_id)
+                                 "(Error report %{number})", number: err_id.to_s)
           add_error(nil, error_message)
           @batch.processing_errors ||= []
           @batch.processing_warnings ||= []

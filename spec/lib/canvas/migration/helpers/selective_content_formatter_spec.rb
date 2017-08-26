@@ -39,14 +39,14 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
                "syllabus_body"=>"oh, hi there."
         }
       }
-      @migration = mock()
-      @migration.stubs(:migration_type).returns('common_cartridge_importer')
-      @migration.stubs(:overview_attachment).returns(@migration)
-      @migration.stubs(:open).returns(@migration)
-      @migration.stubs(:shard).returns('1')
-      @migration.stubs(:cache_key).returns('1')
-      @migration.stubs(:close)
-      @migration.stubs(:read).returns(@overview.to_json)
+      @migration = double()
+      allow(@migration).to receive(:migration_type).and_return('common_cartridge_importer')
+      allow(@migration).to receive(:overview_attachment).and_return(@migration)
+      allow(@migration).to receive(:open).and_return(@migration)
+      allow(@migration).to receive(:shard).and_return('1')
+      allow(@migration).to receive(:cache_key).and_return('1')
+      allow(@migration).to receive(:close)
+      allow(@migration).to receive(:read).and_return(@overview.to_json)
       @formatter = Canvas::Migration::Helpers::SelectiveContentFormatter.new(@migration, "https://example.com")
     end
 
@@ -82,7 +82,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
     end
 
     it "should group attachments by folder" do
-      @migration.stubs(:read).returns({
+      allow(@migration).to receive(:read).and_return({
                                         'file_map' => {
                                                 'a1' => {'path_name' => 'a/a1.html', 'file_name' => 'a1.html', 'migration_id' => 'a1'},
                                                 'a2' => {'path_name' => 'a/a2.html', 'file_name' => 'a2.html', 'migration_id' => 'a2'},
@@ -134,7 +134,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
     end
 
     it "should show announcements separate from discussion topics" do
-      @migration.stubs(:read).returns({
+      allow(@migration).to receive(:read).and_return({
                                           'discussion_topics' => [
                                               {'title' => 'a1', 'migration_id' => 'a1'},
                                               {'title' => 'a2', 'migration_id' => 'a1', 'type' => 'announcement'},
@@ -146,7 +146,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
     end
 
     it "should link resources for quizzes and submittables" do
-      @migration.stubs(:read).returns(@overview.merge({
+      allow(@migration).to receive(:read).and_return(@overview.merge({
         'assessments' => [{'title' => 'q1', 'migration_id' => 'q1', 'assignment_migration_id' => 'a5'}],
         'wikis' => [{'title' => 'w1', 'migration_id' => 'w1', 'assignment_migration_id' => 'a3'}],
         'discussion_topics' => [{'title' => 'd1', 'migration_id' => 'd1', 'assignment_migration_id' => 'a4'}],
@@ -188,9 +188,9 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       @category = @course.group_categories.create(:name => "other category")
       @group = Group.create!(:name=>"group1", :group_category => @category, :context => @course)
       @announcement = announcement_model
-      @migration = mock()
-      @migration.stubs(:migration_type).returns('course_copy_importer')
-      @migration.stubs(:source_course).returns(@course)
+      @migration = double()
+      allow(@migration).to receive(:migration_type).and_return('course_copy_importer')
+      allow(@migration).to receive(:source_course).and_return(@course)
       @course_outcome = outcome_model
       @account_outcome = outcome_model(:outcome_context => @course.account)
     end

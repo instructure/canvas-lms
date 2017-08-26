@@ -213,7 +213,7 @@
 
 .ig-header .name {
   color: #3d454c;
-  @include fontSize(15px);
+  @include fontSize(16px);
   text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
   font-weight: bold;
 }
@@ -230,7 +230,7 @@
 
   .ig-header-title {
     text-decoration: none;
-    @include fontSize(15px);
+    @include fontSize(16px);
     font-weight: bold;
     line-height: 20px;
     margin: auto;

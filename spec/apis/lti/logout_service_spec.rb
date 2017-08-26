@@ -49,8 +49,8 @@ describe LtiApiController, type: :request do
     req = consumer.create_signed_request(:post, opts['path'], nil, :scheme => 'header', :timestamp => opts['timestamp'], :nonce => opts['nonce'])
     req.body = opts['body'] if opts['body']
     post "http://www.example.com#{req.path}",
-         req.body,
-         { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => req['Authorization'] }
+         params: req.body,
+         headers: { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => req['Authorization'] }
   end
 
   it "should generate a logout service URL with token" do
@@ -120,7 +120,7 @@ describe LtiApiController, type: :request do
       login_as 'parajsa', 'password1'
       token = Lti::LogoutService::Token.create(@tool, @pseudonym)
       Lti::LogoutService.register_logout_callback(token, 'http://logout.notify.example.com/789')
-      CanvasHttp.expects(:get).with('http://logout.notify.example.com/789')
+      expect(CanvasHttp).to receive(:get).with('http://logout.notify.example.com/789')
       delete '/logout'
       run_jobs
     end

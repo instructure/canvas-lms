@@ -306,7 +306,7 @@ describe EnrollmentsApiController, type: :request do
       end
 
       it "should not notify by default" do
-        StudentEnrollment.any_instance.expects(:save_without_broadcasting).at_least_once
+        expect_any_instance_of(StudentEnrollment).to receive(:save_without_broadcasting).at_least(:once)
 
         api_call(:post, @path, @path_options, {
             :enrollment => {
@@ -315,7 +315,7 @@ describe EnrollmentsApiController, type: :request do
       end
 
       it "should optionally send notifications" do
-        StudentEnrollment.any_instance.expects(:save).at_least_once
+        expect_any_instance_of(StudentEnrollment).to receive(:save).at_least(:once)
 
         api_call(:post, @path, @path_options, {
           :enrollment => {
@@ -1785,7 +1785,7 @@ describe EnrollmentsApiController, type: :request do
 
       before :each do
         time = Time.now
-        Time.stubs(:now).returns(time)
+        allow(Time).to receive(:now).and_return(time)
       end
 
       context "an authorized user" do

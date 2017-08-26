@@ -28,7 +28,7 @@ describe CommunicationChannelsController do
 
     it "should create a new CC unconfirmed" do
       user_session(@user)
-      post 'create', :user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email'  }
+      post 'create', params: {:user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email'  }}
       expect(response).to be_success
       expect(@user.communication_channels.length).to eq 1
       expect(@user.email_channel).to be_unconfirmed
@@ -39,7 +39,7 @@ describe CommunicationChannelsController do
       u = User.create!
       cc = u.communication_channels.create!(:path => 'jt@instructure.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
       user_session(@user)
-      post 'create', :user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email' }
+      post 'create', params: {:user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email' }}
       expect(response).to be_success
       expect(@user.communication_channels.length).to eq 1
       expect(@user.email_channel).not_to eq cc
@@ -53,7 +53,7 @@ describe CommunicationChannelsController do
         cc.bounce_count = CommunicationChannel::RETIRE_THRESHOLD
       }
       user_session(@user)
-      post 'create', :user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email' }
+      post 'create', params: {:user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email' }}
       expect(response).to be_success
       expect(@user.communication_channels.length).to eq 1
       expect(@user.email_channel).to be_unconfirmed
@@ -64,7 +64,7 @@ describe CommunicationChannelsController do
     it "should not allow duplicate active CCs for a single user" do
       cc = @user.communication_channels.create!(:path => 'jt@instructure.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
       user_session(@user)
-      post 'create', :user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email' }
+      post 'create', params: {:user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email' }}
       expect(response).not_to be_success
     end
   end
@@ -75,7 +75,7 @@ describe CommunicationChannelsController do
 
       it "should confirm an unconfirmed CC" do
         user_session(@user, @pseudonym)
-        get 'confirm', :nonce => @cc.confirmation_code
+        get 'confirm', params: {:nonce => @cc.confirmation_code}
         expect(response).to be_redirect
         expect(response).to redirect_to(user_profile_url(@user))
         @cc.reload
@@ -83,7 +83,7 @@ describe CommunicationChannelsController do
       end
 
       it "should redirect to login when trying to confirm" do
-        get 'confirm', :nonce => @cc.confirmation_code
+        get 'confirm', params: {:nonce => @cc.confirmation_code}
         expect(response).to be_redirect
         expect(response).to redirect_to(login_url(:pseudonym_session => { :unique_id => @pseudonym.unique_id }, :expected_user_id => @pseudonym.user_id))
       end
@@ -95,7 +95,7 @@ describe CommunicationChannelsController do
 
         user_session(@user1, @pseudonym1)
 
-        get 'confirm', :nonce => @cc.confirmation_code
+        get 'confirm', params: {:nonce => @cc.confirmation_code}
         expect(response).to redirect_to(login_url(:pseudonym_session => { :unique_id => @pseudonym.unique_id }, :expected_user_id => @pseudonym.user_id))
       end
 
@@ -105,7 +105,7 @@ describe CommunicationChannelsController do
         user_session(@user, @pseudonym)
         code = @cc.confirmation_code
         @cc.confirm
-        get 'confirm', :nonce => code
+        get 'confirm', params: {:nonce => code}
         expect(response).not_to be_success
         expect(response).to render_template("confirm_failed")
         @cc.reload
@@ -116,7 +116,7 @@ describe CommunicationChannelsController do
         user_with_pseudonym(active_user: 1, username: 'not-an-email@example.com')
         CommunicationChannel.where(id: @cc).update_all(path: 'not-an-email')
         user_session(@user, @pseudonym)
-        get 'confirm', nonce: @cc.confirmation_code
+        get 'confirm', params: {nonce: @cc.confirmation_code}
         expect(response).not_to be_success
         expect(response).to render_template("confirm_failed")
       end
@@ -126,7 +126,7 @@ describe CommunicationChannelsController do
         user_session(@user, @pseudonym)
         code = @cc.confirmation_code
         @cc.confirm
-        get 'confirm', :nonce => code
+        get 'confirm', params: {:nonce => code}
         expect(response).to be_redirect
         @user.reload
         expect(@user).to be_registered
@@ -146,7 +146,7 @@ describe CommunicationChannelsController do
         @user.save
         expect(@user).to be_pre_registered
 
-        get 'confirm', :nonce => @cc.confirmation_code
+        get 'confirm', params: {:nonce => @cc.confirmation_code}
         expect(response).to render_template('confirm')
         expect(assigns[:pseudonym]).to eq @pseudonym
         expect(assigns[:merge_opportunities]).to eq []
@@ -160,7 +160,7 @@ describe CommunicationChannelsController do
         @user.save
         expect(@user).to be_pre_registered
 
-        post 'confirm', :nonce => @cc.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
+        post 'confirm', params: {:nonce => @cc.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}}
         expect(response).to be_redirect
         @user.reload
         expect(@user).to be_registered
@@ -173,7 +173,7 @@ describe CommunicationChannelsController do
         @user.accept_terms
         @user.save
 
-        post 'confirm', :nonce => @cc.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
+        post 'confirm', params: {:nonce => @cc.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}}
         expect(response).to be_redirect
         @user.reload
         expect(@user).to be_registered
@@ -187,7 +187,7 @@ describe CommunicationChannelsController do
         # another user claimed the pseudonym
         u2 = user_with_pseudonym(:username => 'asdf@qwerty.com', :active_user => true)
 
-        post 'confirm', :nonce => cc1.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
+        post 'confirm', params: {:nonce => cc1.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}}
         assert_status(400)
         u1.reload
         expect(u1).not_to be_registered
@@ -202,7 +202,7 @@ describe CommunicationChannelsController do
         expect(@pseudonym.account).to eq @account
         expect(@user).to be_pre_registered
 
-        post 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
+        post 'confirm', params: {:nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}}
         expect(response).to be_redirect
         @user.reload
         expect(@user).to be_registered
@@ -216,7 +216,7 @@ describe CommunicationChannelsController do
         expect(@user).to be_pre_registered
 
         # @domain_root_account == Account.default
-        post 'confirm', :nonce => @cc.confirmation_code
+        post 'confirm', params: {:nonce => @cc.confirmation_code}
         expect(response).to be_success
         expect(response).to render_template('confirm')
         expect(assigns[:pseudonym]).to eq @pseudonym
@@ -226,7 +226,7 @@ describe CommunicationChannelsController do
       it "should not finalize registration for invalid parameters" do
         user_with_pseudonym(:password => :autogenerate)
         @cc.confirm!
-        get 'confirm', :nonce => "asdf"
+        get 'confirm', params: {:nonce => "asdf"}
         expect(response).to render_template("confirm_failed")
         @pseudonym.reload
         expect(@pseudonym.user).not_to be_registered
@@ -240,7 +240,7 @@ describe CommunicationChannelsController do
         expect(@user).to be_creation_pending
         expect(@enrollment).to be_invited
 
-        get 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid
+        get 'confirm', params: {:nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid}
         expect(response).to be_success
         expect(assigns[:pseudonym]).to be_new_record
         expect(assigns[:pseudonym].unique_id).to eq 'jt@instructure.com'
@@ -254,7 +254,7 @@ describe CommunicationChannelsController do
         expect(@user).to be_creation_pending
         expect(@enrollment).to be_invited
 
-        post 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
+        post 'confirm', params: {:nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}}
         expect(response).to be_redirect
         expect(response).to redirect_to(course_url(@course))
         @user.reload
@@ -278,7 +278,7 @@ describe CommunicationChannelsController do
         # not a full user session; just @current_user is set
         controller.instance_variable_set(:@current_user, @user)
 
-        get 'confirm', :nonce => @cc.confirmation_code
+        get 'confirm', params: {:nonce => @cc.confirmation_code}
         expect(response).to be_success
         expect(assigns[:pseudonym]).to be_new_record
         expect(assigns[:pseudonym].unique_id).to eq 'jt@instructure.com'
@@ -292,7 +292,7 @@ describe CommunicationChannelsController do
         controller.instance_variable_set(:@current_user, @user)
         @domain_root_account = Account.default
 
-        post 'confirm', :nonce => @cc.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
+        post 'confirm', params: {:nonce => @cc.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}}
         expect(response).to be_redirect
         expect(response).to redirect_to(dashboard_url)
         @user.reload
@@ -315,7 +315,7 @@ describe CommunicationChannelsController do
         expect(@user).to be_creation_pending
         expect(@enrollment).to be_invited
 
-        get 'confirm', :nonce => @cc.confirmation_code
+        get 'confirm', params: {:nonce => @cc.confirmation_code}
         expect(response).to be_success
         expect(assigns[:pseudonym]).to be_new_record
         expect(assigns[:pseudonym].unique_id).to eq 'jt@instructure.com'
@@ -331,7 +331,7 @@ describe CommunicationChannelsController do
         expect(@user).to be_creation_pending
         expect(@enrollment).to be_invited
 
-        post 'confirm', :nonce => @cc.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
+        post 'confirm', params: {:nonce => @cc.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}}
         expect(response).to be_redirect
         @user.reload
         expect(@user).to be_registered
@@ -355,7 +355,7 @@ describe CommunicationChannelsController do
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         expect(@user).to be_creation_pending
 
-        get 'confirm', :nonce => @cc.confirmation_code
+        get 'confirm', params: {:nonce => @cc.confirmation_code}
         expect(response).to be_success
         expect(assigns[:pseudonym]).to be_new_record
         expect(assigns[:pseudonym].unique_id).to eq 'jt@instructure.com'
@@ -370,7 +370,7 @@ describe CommunicationChannelsController do
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         expect(@user).to be_creation_pending
 
-        post 'confirm', :nonce => @cc.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
+        post 'confirm', params: {:nonce => @cc.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}}
         expect(response).to be_redirect
         @user.reload
         expect(@user).to be_registered
@@ -394,7 +394,7 @@ describe CommunicationChannelsController do
         expect(@user).to be_creation_pending
         expect(@enrollment).to be_invited
         @pseudonym = @user.pseudonyms.create!(:unique_id => 'jt@instructure.com')
-        get 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid
+        get 'confirm', params: {:nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid}
         expect(response).to be_success
         expect(assigns[:pseudonym]).to eq @pseudonym
       end
@@ -409,7 +409,7 @@ describe CommunicationChannelsController do
         expect(@enrollment).to be_invited
         @pseudonym = @user.pseudonyms.create!(:unique_id => 'jt@instructure.com')
 
-        post 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
+        post 'confirm', params: {:nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}}
         expect(response).to be_redirect
         expect(response).to redirect_to(course_url(@course))
         @user.reload
@@ -436,7 +436,7 @@ describe CommunicationChannelsController do
         expect(@user).to be_creation_pending
         expect(@enrollment).to be_invited
 
-        get 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid
+        get 'confirm', params: {:nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid}
         expect(response).to be_success
         expect(assigns[:pseudonym]).to be_new_record
         expect(assigns[:pseudonym].unique_id).to be_blank
@@ -453,7 +453,7 @@ describe CommunicationChannelsController do
         expect(@user).to be_creation_pending
         expect(@enrollment).to be_invited
 
-        post 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
+        post 'confirm', params: {:nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}}
         assert_status(400)
       end
     end
@@ -472,7 +472,7 @@ describe CommunicationChannelsController do
         user_session(@logged_user, @pseudonym)
 
         # render merge opportunities
-        get 'confirm', :nonce => @not_logged_user.email_channel.confirmation_code
+        get 'confirm', params: {:nonce => @not_logged_user.email_channel.confirmation_code}
         expect(response).to render_template('confirm')
         expect(assigns[:merge_opportunities]).to eq [[@user, [@pseudonym]]]
       end
@@ -486,7 +486,7 @@ describe CommunicationChannelsController do
 
         @domain_root_account = Account.default
 
-        get 'confirm', :nonce => @not_logged_user.email_channel.confirmation_code, :confirm => 1
+        get 'confirm', params: {:nonce => @not_logged_user.email_channel.confirmation_code, :confirm => 1}
         expect(response).to redirect_to(dashboard_url)
 
         @not_logged_user.reload
@@ -506,7 +506,7 @@ describe CommunicationChannelsController do
 
         user_session(@logged_user, @pseudonym)
 
-        get 'confirm', :nonce => @not_logged_user.email_channel.confirmation_code, :confirm => 1
+        get 'confirm', params: {:nonce => @not_logged_user.email_channel.confirmation_code, :confirm => 1}
         expect(response).to render_template('confirm_failed')
       end
 
@@ -520,7 +520,7 @@ describe CommunicationChannelsController do
 
         user_session(@logged_user, @pseudonym)
 
-        get 'confirm', :nonce => @not_logged_user.email_channel.confirmation_code, :confirm => 1
+        get 'confirm', params: {:nonce => @not_logged_user.email_channel.confirmation_code, :confirm => 1}
         expect(response).to render_template('confirm_failed')
       end
 
@@ -531,7 +531,7 @@ describe CommunicationChannelsController do
         @logged_user = @user
         user_session(@logged_user, @pseudonym)
 
-        get 'confirm', :nonce => @not_logged_user.email_channel.confirmation_code, :confirm => 1
+        get 'confirm', params: {:nonce => @not_logged_user.email_channel.confirmation_code, :confirm => 1}
         expect(response).to render_template('confirm_failed')
       end
 
@@ -541,13 +541,12 @@ describe CommunicationChannelsController do
         user_with_pseudonym(:username => 'jt+1@instructure.com', :active_all => 1)
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com') { |cc| cc.workflow_state = 'active' }
 
-        get 'confirm', :nonce => @cc.confirmation_code
+        get 'confirm', params: {:nonce => @cc.confirmation_code}
         expect(response).to render_template('confirm')
         expect(assigns[:merge_opportunities]).to eq [[@user1, [@user1.pseudonym]]]
       end
 
       it "should not show users that can't have a pseudonym created for the correct account" do
-        Pseudonym.any_instance.stubs(:works_for_account?).returns(false)
         @account1.authentication_providers.scope.delete_all
         @account1.authentication_providers.create!(:auth_type => 'cas')
         user_with_pseudonym(:active_all => 1, :account => @account1, :username => 'jt@instructure.com')
@@ -558,13 +557,12 @@ describe CommunicationChannelsController do
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         @enrollment = @course.enroll_user(@user)
 
-        get 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid
+        get 'confirm', params: {:nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid}
         expect(response).to render_template('confirm')
         expect(assigns[:merge_opportunities]).to eq []
       end
 
       it "should create a pseudonym in the target account by copying an existing pseudonym when merging" do
-        Pseudonym.any_instance.stubs(:works_for_account?).returns(false)
         user_with_pseudonym(:active_all => 1, :username => 'jt@instructure.com')
         @old_user = @user
 
@@ -575,7 +573,7 @@ describe CommunicationChannelsController do
         @enrollment = @course.enroll_user(@user)
         user_session(@old_user, @old_user.pseudonym)
 
-        get 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :confirm => 1
+        get 'confirm', params: {:nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :confirm => 1}
         expect(response).to redirect_to(course_url(@course))
         @old_user.reload
         @user.reload
@@ -587,7 +585,6 @@ describe CommunicationChannelsController do
       end
 
       it "should include all pseudonyms if there are multiple" do
-        Pseudonym.any_instance.stubs(:works_for_account?).returns(false)
         user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :account => @account1)
         @pseudonym1 = @pseudonym
         @user1 = @user
@@ -596,7 +593,7 @@ describe CommunicationChannelsController do
         user_with_pseudonym(:username => 'jt+1@instructure.com', :active_all => 1, :account => Account.default)
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com') { |cc| cc.workflow_state = 'active' }
 
-        get 'confirm', :nonce => @cc.confirmation_code
+        get 'confirm', params: {:nonce => @cc.confirmation_code}
         expect(response).to render_template('confirm')
         expect(assigns[:merge_opportunities]).to eq [[@user1, [@pseudonym1, @pseudonym2]]]
       end
@@ -612,7 +609,7 @@ describe CommunicationChannelsController do
         user_with_pseudonym(:username => 'jt+1@instructure.com', :active_all => 1, :account => @account1)
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com') { |cc| cc.workflow_state = 'active' }
 
-        get 'confirm', :nonce => @cc.confirmation_code
+        get 'confirm', params: {:nonce => @cc.confirmation_code}
         expect(response).to render_template('confirm')
         expect(assigns[:merge_opportunities]).to eq [[@user1, [@pseudonym1]]]
       end
@@ -625,7 +622,7 @@ describe CommunicationChannelsController do
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
 
-        get 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid
+        get 'confirm', params: {:nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid}
         expect(response).to be_success
         expect(assigns[:current_user]).to be_nil
         expect(assigns[:pseudonym]).to be_new_record
@@ -637,7 +634,7 @@ describe CommunicationChannelsController do
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
 
-        post 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
+        post 'confirm', params: {:nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}}
         expect(response).to be_redirect
         expect(response).to redirect_to(course_url(@course))
         @enrollment.reload
@@ -654,7 +651,7 @@ describe CommunicationChannelsController do
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
 
-        post 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1, :pseudonym => {:unique_id => "haxxor@example.com", :password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
+        post 'confirm', params: {:nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1, :pseudonym => {:unique_id => "haxxor@example.com", :password => 'asdfasdf', :password_confirmation => 'asdfasdf'}}
 
         expect(@user.reload.pseudonyms.first.unique_id).to eq "jt@instructure.com"
       end
@@ -667,7 +664,7 @@ describe CommunicationChannelsController do
         user_with_pseudonym(:active_all => 1, :username => 'bob@instructure.com')
         user_session(@user, @pseudonym)
 
-        get 'confirm', :nonce => @old_cc.confirmation_code, :enrollment => @enrollment.uuid
+        get 'confirm', params: {:nonce => @old_cc.confirmation_code, :enrollment => @enrollment.uuid}
         expect(response).to render_template('confirm')
         expect(assigns[:current_user]).to eq @user
         expect(assigns[:pseudonym]).to be_new_record
@@ -683,7 +680,7 @@ describe CommunicationChannelsController do
         user_with_pseudonym(:active_all => 1, :username => 'bob@instructure.com')
         user_session(@user, @pseudonym)
 
-        post 'confirm', :nonce => @old_cc.confirmation_code, :enrollment => @enrollment.uuid, :confirm => 1
+        post 'confirm', params: {:nonce => @old_cc.confirmation_code, :enrollment => @enrollment.uuid, :confirm => 1}
         expect(response).to redirect_to(course_url(@course))
         expect(assigns[:current_user]).to eq @user
         @enrollment.reload
@@ -702,7 +699,7 @@ describe CommunicationChannelsController do
         user_with_pseudonym(:active_all => 1)
         user_session(@user, @pseudonym)
 
-        get 'confirm', :nonce => @student_cc.confirmation_code, :enrollment => @enrollment.uuid
+        get 'confirm', params: {:nonce => @student_cc.confirmation_code, :enrollment => @enrollment.uuid}
         expect(response).to render_template('confirm')
       end
 
@@ -712,7 +709,7 @@ describe CommunicationChannelsController do
         user_with_pseudonym(:active_all => 1)
         user_session(@user, @pseudonym)
 
-        get 'confirm', :nonce => @student_cc.confirmation_code, :enrollment => @enrollment.uuid, :transfer_enrollment => 1
+        get 'confirm', params: {:nonce => @student_cc.confirmation_code, :enrollment => @enrollment.uuid, :transfer_enrollment => 1}
         expect(response).to redirect_to(course_url(@course))
         @enrollment.reload
         expect(@enrollment).to be_active
@@ -730,7 +727,7 @@ describe CommunicationChannelsController do
           expect(@user.cached_active_emails).to eq []
           @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
           expect(@user.cached_active_emails).to eq []
-          get 'confirm', :nonce => @cc.confirmation_code
+          get 'confirm', params: {:nonce => @cc.confirmation_code}
           @user.reload
           expect(@user.cached_active_emails).to eq ['jt@instructure.com']
         end
@@ -750,7 +747,7 @@ describe CommunicationChannelsController do
       account_admin_user(account: Account.site_admin)
       user_session(@user)
       session[:become_user_id] = u.id
-      post 'reset_bounce_count', :user_id => u.id, :id => cc1.id
+      post 'reset_bounce_count', params: {:user_id => u.id, :id => cc1.id}
       expect(response).to be_success
       cc1.reload
       expect(cc1.bounce_count).to eq(0)
@@ -765,7 +762,7 @@ describe CommunicationChannelsController do
       account_admin_user(account: Account.default)
       user_session(@user)
       session[:become_user_id] = u.id
-      post 'reset_bounce_count', :user_id => u.id, :id => cc1.id
+      post 'reset_bounce_count', params: {:user_id => u.id, :id => cc1.id}
       expect(response).to have_http_status(401)
       cc1.reload
       expect(cc1.bounce_count).to eq(3)
@@ -821,7 +818,7 @@ describe CommunicationChannelsController do
             cc.last_bounce_details = {'bouncedRecipients' => [{'diagnosticCode' => 'stuff and things'}]}
           end
 
-          get 'bouncing_channel_report', account_id: Account.default.id
+          get 'bouncing_channel_report', params: {account_id: Account.default.id}
           expect(response).to have_http_status(:ok)
 
           csv = CSV.parse(response.body)
@@ -847,7 +844,7 @@ describe CommunicationChannelsController do
             cc.bounce_count = 1
           end
 
-          get 'bouncing_channel_report', account_id: Account.default.id
+          get 'bouncing_channel_report', params: {account_id: Account.default.id}
 
           expect(included_channels).to eq([c1])
         end
@@ -867,7 +864,7 @@ describe CommunicationChannelsController do
             cc.bounce_count = 1
           end
 
-          get 'bouncing_channel_report', account_id: Account.default.id
+          get 'bouncing_channel_report', params: {account_id: Account.default.id}
 
           expect(included_channels).to eq([c1])
         end
@@ -881,7 +878,7 @@ describe CommunicationChannelsController do
             cc.bounce_count = 1
           end
 
-          get 'bouncing_channel_report', account_id: a.id
+          get 'bouncing_channel_report', params: {account_id: a.id}
 
           expect(included_channels).to eq([c])
         end
@@ -905,9 +902,9 @@ describe CommunicationChannelsController do
             cc.last_bounce_at = Time.zone.now + 1.day
           end
 
-          get 'bouncing_channel_report', account_id: Account.default.id,
+          get 'bouncing_channel_report', params: {account_id: Account.default.id,
                                          before: Time.zone.now + 1.hour,
-                                         after: Time.zone.now - 1.hour
+                                         after: Time.zone.now - 1.hour}
 
           expect(included_channels).to eq([c2])
         end
@@ -925,13 +922,13 @@ describe CommunicationChannelsController do
             cc.bounce_count = 1
           end
 
-          get 'bouncing_channel_report', account_id: Account.default.id, pattern: 'bar*'
+          get 'bouncing_channel_report', params: {account_id: Account.default.id, pattern: 'bar*'}
 
           expect(included_channels).to eq([c1])
         end
 
         it 'limits to CommunicationChannel::BulkActions::ResetBounceCounts.bulk_limit' do
-          CommunicationChannel::BulkActions::ResetBounceCounts.stubs(:bulk_limit).returns(5)
+          allow(CommunicationChannel::BulkActions::ResetBounceCounts).to receive(:bulk_limit).and_return(5)
           now = Time.zone.now
 
           user_with_pseudonym
@@ -944,7 +941,7 @@ describe CommunicationChannelsController do
             end
           end
 
-          get 'bouncing_channel_report', account_id: Account.default.id
+          get 'bouncing_channel_report', params: {account_id: Account.default.id}
 
           expect(included_channels).to eq(ccs.first(CommunicationChannel::BulkActions::ResetBounceCounts.bulk_limit))
         end
@@ -954,7 +951,7 @@ describe CommunicationChannelsController do
         it "doesn't work" do
           user_with_pseudonym
           user_session(@user)
-          get 'bouncing_channel_report', account_id: Account.default.id
+          get 'bouncing_channel_report', params: {account_id: Account.default.id}
           expect(response).to have_http_status(401)
         end
       end
@@ -983,7 +980,7 @@ describe CommunicationChannelsController do
             cc.bounce_count = 3
           end
 
-          post 'bulk_reset_bounce_counts', account_id: Account.default.id
+          post 'bulk_reset_bounce_counts', params: {account_id: Account.default.id}
 
           expect(response).to have_http_status(:ok)
           [c1, c2, c3].each_with_index do |c,i|
@@ -1014,9 +1011,9 @@ describe CommunicationChannelsController do
             cc.last_bounce_at = Time.zone.now + 1.day
           end
 
-          post 'bulk_reset_bounce_counts', account_id: Account.default.id,
+          post 'bulk_reset_bounce_counts', params: {account_id: Account.default.id,
                                            before: Time.zone.now + 1.hour,
-                                           after: Time.zone.now - 1.hour
+                                           after: Time.zone.now - 1.hour}
 
           run_jobs
           expect(c1.reload.bounce_count).to eq(1)
@@ -1036,7 +1033,7 @@ describe CommunicationChannelsController do
             cc.bounce_count = 1
           end
 
-          post 'bulk_reset_bounce_counts', account_id: Account.default.id, pattern: 'bar*'
+          post 'bulk_reset_bounce_counts', params: {account_id: Account.default.id, pattern: 'bar*'}
 
           run_jobs
           expect(c1.reload.bounce_count).to eq(0)
@@ -1044,7 +1041,7 @@ describe CommunicationChannelsController do
         end
 
         it 'respects the BULK_LIMIT' do
-          CommunicationChannel::BulkActions::ResetBounceCounts.stubs(:bulk_limit).returns(5)
+          allow(CommunicationChannel::BulkActions::ResetBounceCounts).to receive(:bulk_limit).and_return(5)
           now = Time.zone.now
 
           user_with_pseudonym
@@ -1057,7 +1054,7 @@ describe CommunicationChannelsController do
             end
           end
 
-          post 'bulk_reset_bounce_counts', account_id: Account.default.id
+          post 'bulk_reset_bounce_counts', params: {account_id: Account.default.id}
 
           run_jobs
           ccs.each(&:reload)
@@ -1079,7 +1076,7 @@ describe CommunicationChannelsController do
           user_with_pseudonym
           user_session(@user)
 
-          post 'bulk_reset_bounce_counts', account_id: Account.default.id
+          post 'bulk_reset_bounce_counts', params: {account_id: Account.default.id}
 
           expect(response).to have_http_status(401)
           expect(c.reload.bounce_count).to eq(1)
@@ -1115,7 +1112,7 @@ describe CommunicationChannelsController do
 
         context "GET 'unconfirmed_channel_report'" do
           it 'reports channels' do
-            get 'unconfirmed_channel_report', account_id: Account.default.id
+            get 'unconfirmed_channel_report', params: {account_id: Account.default.id}
 
             expect(response).to have_http_status(:ok)
             # can't expect to eq because we get stray channels for the users we created
@@ -1124,7 +1121,7 @@ describe CommunicationChannelsController do
           end
 
           it 'filters by path type' do
-            get 'unconfirmed_channel_report', account_id: Account.default.id, path_type: 'sms'
+            get 'unconfirmed_channel_report', params: {account_id: Account.default.id, path_type: 'sms'}
 
             expect(response).to have_http_status(:ok)
             expect(included_channels).to include(@c5)
@@ -1134,20 +1131,20 @@ describe CommunicationChannelsController do
 
         context "POST 'bulk_confirm'" do
           it 'confirms channels' do
-            post 'bulk_confirm', account_id: Account.default.id
+            post 'bulk_confirm', params: {account_id: Account.default.id}
 
             expect(@c1.reload.workflow_state).to eq('active')
             expect(@c2.reload.workflow_state).to eq('active')
           end
 
           it 'excludes channels with invalid paths' do
-            post 'bulk_confirm', account_id: Account.default.id
+            post 'bulk_confirm', params: {account_id: Account.default.id}
 
             expect(@c4.reload.workflow_state).to eq('unconfirmed')
           end
 
           it 'includes channels with invalid paths if requested' do
-            post 'bulk_confirm', account_id: Account.default.id, with_invalid_paths: '1'
+            post 'bulk_confirm', params: {account_id: Account.default.id, with_invalid_paths: '1'}
 
             expect(@c1.reload.workflow_state).to eq('active')
             expect(@c2.reload.workflow_state).to eq('active')
@@ -1164,14 +1161,14 @@ describe CommunicationChannelsController do
 
         context "GET 'unconfirmed_channel_report'" do
           it "doesn't work" do
-            get 'unconfirmed_channel_report', account_id: Account.default.id
+            get 'unconfirmed_channel_report', params: {account_id: Account.default.id}
             expect(response).to have_http_status(401)
           end
         end
 
         context "POST 'bulk_confirm'" do
           it "doesn't work" do
-            post 'bulk_confirm', account_id: Account.default.id
+            post 'bulk_confirm', params: {account_id: Account.default.id}
             expect(response).to have_http_status(401)
           end
         end
@@ -1181,7 +1178,7 @@ describe CommunicationChannelsController do
 
   it "should re-send communication channel invitation for an invited channel" do
     Notification.create(:name => 'Confirm Email Communication Channel')
-    get 're_send_confirmation', :user_id => @pseudonym.user_id, :id => @cc.id
+    get 're_send_confirmation', params: {:user_id => @pseudonym.user_id, :id => @cc.id}
     expect(response).to be_success
     expect(assigns[:user]).to eql(@user)
     expect(assigns[:cc]).to eql(@cc)
@@ -1193,7 +1190,7 @@ describe CommunicationChannelsController do
     @enrollment = @course.enroll_user(@user)
     expect(@enrollment.context).to eql(@course)
     Notification.create(:name => 'Enrollment Invitation')
-    get 're_send_confirmation', :user_id => @pseudonym.user_id, :id => @cc.id, :enrollment_id => @enrollment.id
+    get 're_send_confirmation', params: {:user_id => @pseudonym.user_id, :id => @cc.id, :enrollment_id => @enrollment.id}
     expect(response).to be_success
     expect(assigns[:user]).to eql(@user)
     expect(assigns[:enrollment]).to eql(@enrollment)
@@ -1210,7 +1207,7 @@ describe CommunicationChannelsController do
         enrollment = @course.enroll_student(@user)
       end
       Notification.create(:name => 'Enrollment Invitation')
-      post 're_send_confirmation', :user_id => enrollment.user_id, :enrollment_id => enrollment.id
+      post 're_send_confirmation', params: {:user_id => enrollment.user_id, :enrollment_id => enrollment.id}
       expect(response).to be_success
       expect(assigns[:enrollment]).to eql(enrollment)
       expect(assigns[:enrollment].messages_sent).not_to be_nil
@@ -1229,7 +1226,7 @@ describe CommunicationChannelsController do
         expect(@user.cached_active_emails).to eq []
         @user.update_attribute(:updated_at, 5.seconds.ago)
         expect(@user.cached_active_emails).to eq ['jt@instructure.com']
-        delete 'destroy', :id => @cc.id
+        delete 'destroy', params: {:id => @cc.id}
         @user.reload
         expect(@user.cached_active_emails).to eq []
       end
@@ -1244,7 +1241,7 @@ describe CommunicationChannelsController do
     Account.default.save!
     @pseudonym.update_attribute(:sis_communication_channel_id, @pseudonym.communication_channel.id)
 
-    delete 'destroy', :id => @pseudonym.communication_channel.id
+    delete 'destroy', params: {:id => @pseudonym.communication_channel.id}
 
     expect(response.code).to eq '401'
   end

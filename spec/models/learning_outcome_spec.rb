@@ -638,13 +638,13 @@ describe LearningOutcome do
       end
 
       it "should grant :update iff the site admin grants :manage_global_outcomes" do
-        @admin = stub
+        @admin = double
 
-        Account.site_admin.expects(:grants_right?).with(@admin, nil, :manage_global_outcomes).returns(true)
+        expect(Account.site_admin).to receive(:grants_right?).with(@admin, nil, :manage_global_outcomes).and_return(true)
         expect(@outcome.grants_right?(@admin, :update)).to be_truthy
         @outcome.clear_permissions_cache(@admin)
 
-        Account.site_admin.expects(:grants_right?).with(@admin, nil, :manage_global_outcomes).returns(false)
+        expect(Account.site_admin).to receive(:grants_right?).with(@admin, nil, :manage_global_outcomes).and_return(false)
         expect(@outcome.grants_right?(@admin, :update)).to be_falsey
       end
     end
@@ -1013,30 +1013,30 @@ describe LearningOutcome do
     end
 
     it "should read vendor_guid_2" do
-      AcademicBenchmark.stubs(:use_new_guid_columns?).returns(false)
+      allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(false)
       expect(@outcome.vendor_guid).to be_nil
       @outcome.vendor_guid = "GUID-XXXX"
       @outcome.save!
       expect(@outcome.vendor_guid).to eql "GUID-XXXX"
-      AcademicBenchmark.stubs(:use_new_guid_columns?).returns(true)
+      allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(true)
       expect(@outcome.vendor_guid).to eql "GUID-XXXX"
       @outcome.write_attribute('vendor_guid_2', "GUID-YYYY")
       expect(@outcome.vendor_guid).to eql "GUID-YYYY"
-      AcademicBenchmark.stubs(:use_new_guid_columns?).returns(false)
+      allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(false)
       expect(@outcome.vendor_guid).to eql "GUID-XXXX"
     end
 
     it "should read migration_id_2" do
-      AcademicBenchmark.stubs(:use_new_guid_columns?).returns(false)
+      allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(false)
       expect(@outcome.migration_id).to be_nil
       @outcome.migration_id = "GUID-XXXX"
       @outcome.save!
       expect(@outcome.migration_id).to eql "GUID-XXXX"
-      AcademicBenchmark.stubs(:use_new_guid_columns?).returns(true)
+      allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(true)
       expect(@outcome.migration_id).to eql "GUID-XXXX"
       @outcome.write_attribute('migration_id_2', "GUID-YYYY")
       expect(@outcome.migration_id).to eql "GUID-YYYY"
-      AcademicBenchmark.stubs(:use_new_guid_columns?).returns(false)
+      allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(false)
       expect(@outcome.migration_id).to eql "GUID-XXXX"
     end
   end

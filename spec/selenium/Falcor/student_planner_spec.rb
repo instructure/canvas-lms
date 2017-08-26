@@ -69,17 +69,17 @@ describe "student planner" do
     it "shows submitted tag for assignments that have submissions", priority: "1", test_id: 3263151 do
       @assignment.submit_homework(@student1, submission_type: "online_text_entry", body: "Assignment submitted")
       go_to_list_view
+      wait_for_planner_load
 
       # Student planner shows submitted assignments as completed. Expand to see the assignment
       expand_completed_item
       validate_pill('Submitted')
     end
 
-    it "shows graded tag for assignments that are graded", priority: "1", test_id: 3263152 do
-      skip('Passes locally but fails Jenkins')
+    it "shows new grades tag for assignments that are graded", priority: "1", test_id: 3263152 do
       @assignment.grade_student(@student1, grade: 10, submission_comment: 'Good', grader: @teacher)
       go_to_list_view
-      validate_pill('Graded')
+      validate_pill('New Grades')
     end
 
     it "shows new feedback tag for assignments that has feedback", priority: "1", test_id: 3263154 do
@@ -139,6 +139,7 @@ describe "student planner" do
 
     it "shows and navigates to quizzes page from student planner", priority: "1", test_id: 3259303 do
       go_to_list_view
+      wait_for_planner_load
       validate_object_displayed('Quiz')
       validate_link_to_url(@quiz, 'quizzes')
     end
@@ -146,6 +147,7 @@ describe "student planner" do
     it "shows and navigates to graded surveys with due dates", priority: "1", test_id: 3282673 do
       @quiz.update(quiz_type: "graded_survey")
       go_to_list_view
+      wait_for_planner_load
       validate_object_displayed('Quiz')
       validate_link_to_url(@quiz, 'quizzes')
     end
@@ -153,6 +155,7 @@ describe "student planner" do
     it "shows and navigates to ungraded surveys with due dates", priority: "1", test_id: 3282674 do
       @quiz.update(quiz_type: "survey")
       go_to_list_view
+      wait_for_planner_load
       validate_object_displayed('Quiz')
       validate_link_to_url(@quiz, 'quizzes')
     end
@@ -160,6 +163,7 @@ describe "student planner" do
     it "shows and navigates to practice quizzes with due dates", priority: "1", test_id: 3284242 do
       @quiz.update(quiz_type: "practice_quiz")
       go_to_list_view
+      wait_for_planner_load
       validate_object_displayed('Quiz')
       validate_link_to_url(@quiz, 'quizzes')
     end
@@ -304,10 +308,11 @@ describe "student planner" do
       expect(f('body')).not_to contain_jqcss("button[title='Close opportunities popover']")
     end
 
-    it "links opportunity to the correct assignment", priority: "1", test_id: 3281712 do
+    it "links opportunity to the correct assignment page", priority: "1", test_id: 3281712 do
       go_to_list_view
       open_opportunities_dropdown
-      expect_new_page_load { fj('div:contains("assignmentThatHasToBeDoneNow")').click }
+      parent = f('#opportunities_parent')
+      fln('assignmentThatHasToBeDoneNow', parent).click
       expect(f('.description.user_content')).to include_text("This will take a long time")
     end
 
@@ -344,6 +349,7 @@ describe "student planner" do
 
     it "loads more items at the bottom of the page", priority: "1", test_id: 3263149 do
       go_to_list_view
+      wait_for_planner_load
       current_last_item = items_displayed.last
       current_items = items_displayed.count
       scroll_to(current_last_item)

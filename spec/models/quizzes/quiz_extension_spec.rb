@@ -129,7 +129,7 @@ describe Quizzes::QuizExtension do
     end
 
     it "should extend a submission's end at using extend_from_now" do
-      @qs.stubs(extendable?: true)
+      allow(@qs).to receive_messages(extendable?: true)
 
       time = 5.minutes.ago
       Timecop.freeze(time) do
@@ -143,7 +143,7 @@ describe Quizzes::QuizExtension do
       end_at = 5.minutes.ago
       @qs.end_at = end_at
       @qs.save!
-      @qs.stubs(extendable?: true)
+      allow(@qs).to receive_messages(extendable?: true)
 
       extension = Quizzes::QuizExtension.new(@qs, extend_from_end_at: 20)
 

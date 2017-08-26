@@ -91,7 +91,7 @@ RSpec.describe LatePolicyController, type: :controller do
       let!(:late_policy) { course.create_late_policy! valid_attributes }
 
       before do
-        get :show, id: course.to_param
+        get :show, params: {id: course.to_param}
       end
 
       it { expect(response).to have_http_status(:ok) }
@@ -103,7 +103,7 @@ RSpec.describe LatePolicyController, type: :controller do
 
       before do
         user_session(user)
-        get :show, id: course.to_param
+        get :show, params: {id: course.to_param}
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
@@ -117,7 +117,7 @@ RSpec.describe LatePolicyController, type: :controller do
 
     context 'given no late_policy' do
       before do
-        get :show, id: course.to_param
+        get :show, params: {id: course.to_param}
       end
 
       it { expect(response).to have_http_status(:not_found) }
@@ -127,12 +127,12 @@ RSpec.describe LatePolicyController, type: :controller do
 
   describe 'POST #create' do
     it 'creates a new LatePolicy' do
-      expect { post :create, id: course.to_param, late_policy: valid_attributes }.to change(LatePolicy, :count).by(1)
+      expect { post :create, params: {id: course.to_param, late_policy: valid_attributes} }.to change(LatePolicy, :count).by(1)
     end
 
     context 'with valid params' do
       before do
-        post :create, id: course.to_param, late_policy: valid_attributes
+        post :create, params: {id: course.to_param, late_policy: valid_attributes}
       end
 
       it { expect(response).to have_http_status(:created) }
@@ -141,7 +141,7 @@ RSpec.describe LatePolicyController, type: :controller do
 
     context 'with invalid params' do
       before do
-        post :create, id: course.to_param, late_policy: invalid_attributes
+        post :create, params: {id: course.to_param, late_policy: invalid_attributes}
       end
 
       it { expect(response).to have_http_status(:unprocessable_entity) }
@@ -153,7 +153,7 @@ RSpec.describe LatePolicyController, type: :controller do
 
       before do
         user_session(user)
-        post :create, id: course.to_param, late_policy: valid_attributes
+        post :create, params: {id: course.to_param, late_policy: valid_attributes}
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
@@ -169,7 +169,7 @@ RSpec.describe LatePolicyController, type: :controller do
       let!(:existing_late_policy) { course.create_late_policy! valid_attributes }
 
       before do
-        post :create, id: course.to_param, late_policy: new_attributes
+        post :create, params: {id: course.to_param, late_policy: new_attributes}
       end
 
       it { expect(response).to have_http_status(:bad_request) }
@@ -181,7 +181,7 @@ RSpec.describe LatePolicyController, type: :controller do
       end
 
       it 'does not delete the existing policy' do
-        post :create, id: course.to_param, late_policy: new_attributes
+        post :create, params: {id: course.to_param, late_policy: new_attributes}
         expect(existing_late_policy.reload).to be_persisted
       end
     end
@@ -195,7 +195,7 @@ RSpec.describe LatePolicyController, type: :controller do
 
       context 'with valid params' do
         before do
-          patch :update, id: course.to_param, late_policy: new_attributes
+          patch :update, params: {id: course.to_param, late_policy: new_attributes}
         end
 
         it { expect(response).to have_http_status(:no_content) }
@@ -205,7 +205,7 @@ RSpec.describe LatePolicyController, type: :controller do
 
       context 'with invalid params' do
         before do
-          patch :update, id: course.to_param, late_policy: invalid_attributes
+          patch :update, params: {id: course.to_param, late_policy: invalid_attributes}
         end
 
         it { expect(response).to have_http_status(:unprocessable_entity) }
@@ -217,7 +217,7 @@ RSpec.describe LatePolicyController, type: :controller do
 
         before do
           user_session(user)
-          patch :update, id: course.to_param, late_policy: new_attributes
+          patch :update, params: {id: course.to_param, late_policy: new_attributes}
         end
 
         it { expect(response).to have_http_status(:unauthorized) }
@@ -232,7 +232,7 @@ RSpec.describe LatePolicyController, type: :controller do
 
     context 'given no existing late policy' do
       before do
-        patch :update, id: course.to_param, late_policy: new_attributes
+        patch :update, params: {id: course.to_param, late_policy: new_attributes}
       end
 
       it { expect(response).to have_http_status(:not_found) }

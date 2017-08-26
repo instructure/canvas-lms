@@ -186,7 +186,7 @@ describe ContextModuleProgression do
 
     it 'does not raise a stale object error during catastrophic evaluate!' do
       progression = stale_progression
-      progression.stubs(:save).at_least_once.raises(ActiveRecord::StaleObjectError.new(progression, 'Save'))
+      allow(progression).to receive(:save).at_least(:once).and_raise(ActiveRecord::StaleObjectError.new(progression, 'Save'))
 
       new_progression = nil
       expect { new_progression = progression.evaluate! }.to_not raise_error
@@ -252,7 +252,7 @@ describe ContextModuleProgression do
     progression.reload
     expect(progression).to be_started
 
-    @topic.any_instantiation.expects(:recalculate_context_module_actions!).never # doesn't recalculate unless it's a new requirement
+    expect_any_instantiation_of(@topic).to receive(:recalculate_context_module_actions!).never # doesn't recalculate unless it's a new requirement
     @module.update_attribute(:completion_requirements, {@tag1.id => {:type => 'must_submit'}, @tag2.id => {:type => 'must_contribute'}})
   end
 

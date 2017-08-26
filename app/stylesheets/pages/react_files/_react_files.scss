@@ -218,7 +218,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
       top:0;
       width: 4px;
       height: 100%;
-      background: $ic-brand-primary;
+      background: var(--ic-brand-primary);
     }
   }
 
@@ -394,7 +394,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
 
 .activeDragTarget {
   background-color: $ic-list-item-background--selected !important;
-  box-shadow: inset 0 0 0px 2px $ic-brand-primary;
+  box-shadow: inset 0 0 0px 2px var(--ic-brand-primary);
 }
 
 .DragFeedback {
@@ -440,7 +440,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
       color:  $ic-color-icon-disabled;
     }
     &.lock-icon button.locked {
-      color: $ic-brand-primary;
+      color: var(--ic-brand-primary);
     }
   }
 }

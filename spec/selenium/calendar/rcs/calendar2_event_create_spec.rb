@@ -36,9 +36,6 @@ describe "calendar2" do
       enable_all_rcs @course.account
       stub_rcs_config
     end
-    after(:each) do
-      unstub_rcs_config
-    end
 
     context "event creation" do
       it "should query for all the sections in a course when creating an event" do

@@ -47,7 +47,7 @@ describe Quizzes::QuizStatisticsSerializer do
   end
 
   let(:user) { User.new }
-  let(:session) { stub }
+  let(:session) { double }
   let(:host_name) { 'example.com' }
 
   let :controller do
@@ -57,8 +57,8 @@ describe Quizzes::QuizStatisticsSerializer do
     }
 
     ActiveModel::FakeController.new(options).tap do |controller|
-      controller.stubs(:session).returns session
-      controller.stubs(:context).returns context
+      allow(controller).to receive(:session).and_return session
+      allow(controller).to receive(:context).and_return context
     end
   end
 
@@ -86,8 +86,8 @@ describe Quizzes::QuizStatisticsSerializer do
   it 'serializes generated_at to point to the earliest report date' do
     oldest = 5.days.ago
 
-    statistics.student_analysis.stubs(created_at: oldest)
-    statistics.item_analysis.stubs(created_at: oldest + 1.days)
+    allow(statistics.student_analysis).to receive_messages(created_at: oldest)
+    allow(statistics.item_analysis).to receive_messages(created_at: oldest + 1.days)
 
     @json = subject.as_json[:quiz_statistics].stringify_keys
     expect(@json['generated_at']).to eq oldest
@@ -118,7 +118,7 @@ describe Quizzes::QuizStatisticsSerializer do
   end
 
   it 'stringifies question_statistics ids' do
-    subject.stubs(student_analysis_report: {
+    allow(subject).to receive_messages(student_analysis_report: {
       questions: [ ['question', { id: 5 }] ]
     })
 
@@ -128,11 +128,11 @@ describe Quizzes::QuizStatisticsSerializer do
   end
 
   it 'munges item_analysis with question_statistics' do
-    subject.stubs(student_analysis_report: {
+    allow(subject).to receive_messages(student_analysis_report: {
       questions: [ ['question', { id: 5 }] ]
     })
 
-    subject.stubs(item_analysis_report: [
+    allow(subject).to receive_messages(item_analysis_report: [
       { question_id: 5, foo: 'bar' }
     ])
 

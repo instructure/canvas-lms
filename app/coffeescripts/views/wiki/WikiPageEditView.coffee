@@ -227,6 +227,11 @@ define [
       else
         page_data.assignment = @model.createAssignment(set_assignment: '0')
       page_data.set_assignment = page_data.assignment.get('set_assignment')
+      page_data.student_planner_checkbox = planner_checkbox_is_checked = $("#student_planner_checkbox").is(":checked")
+      if page_data.student_planner_checkbox
+        page_data.todo_date = $("#todo_date").val()
+      else
+        page_data.todo_date = null
 
       page_data.published = true if @shouldPublish
       page_data

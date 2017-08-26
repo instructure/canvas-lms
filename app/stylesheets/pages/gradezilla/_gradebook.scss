@@ -849,10 +849,41 @@ $gradebook_checkbox_size: 16px;
   }
 }
 
+.NumberInput__Container {
+  display: flex;
+  align-items: center;
+}
+
+.NumberInput__Container-LeftIndent {
+  margin-left: 1.5rem
+}
+
 .SubmissionTray__Container {
   padding: 1.5rem;
   width: 18.75rem;
   font-size: 1.2rem;
+
+  input[type="text"] {
+    height: auto;
+    line-height: 1;
+    margin: 0;
+    padding: auto;
+    box-shadow: none;
+    border: none;
+  }
+}
+
+.SubmissionTray__RadioInput {
+  padding: 0.4rem;
+  margin-bottom: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.SubmissionTray__RadioInput-WithBackground {
+  border: 1px solid $ic-border-color;
+  border-radius: 0.25rem;
 }
 
 #SubmissionTray__Content {

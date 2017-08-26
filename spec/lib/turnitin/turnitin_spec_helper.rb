@@ -53,19 +53,19 @@ RSpec.shared_context "shared_tii_lti", :shared_context => :metadata do
   end
 
   let(:tii_client) do
-    tii_mock = mock('tii_client')
-    tii_mock.stubs(:original_submission).yields(response_mock)
+    tii_mock = double('tii_client')
+    allow(tii_mock).to receive(:original_submission).and_yield(response_mock)
     tii_mock
   end
   let(:filename) { 'my/new/filename.txt' }
   let(:response_mock) do
-    r_mock = mock('response')
-    r_mock.stubs(:headers).
-      returns({
+    r_mock = double('response')
+    allow(r_mock).to receive(:headers).
+      and_return({
                 'content-disposition' => "attachment; filename=#{filename}",
                 'content-type' => 'plain/text'
               })
-    r_mock.stubs(:body).returns('abcdef')
+    allow(r_mock).to receive(:body).and_return('abcdef')
     r_mock
   end
 

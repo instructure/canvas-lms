@@ -198,13 +198,13 @@ describe 'CommunicationChannels API', type: :request do
         end
 
         it "should work" do
-          client = mock()
-          DeveloperKey.stubs(:sns).returns(client)
+          client = double()
+          allow(DeveloperKey).to receive(:sns).and_return(client)
           dk = DeveloperKey.default
           dk.sns_arn = 'apparn'
           dk.save!
           $spec_api_tokens[@user] = @user.access_tokens.create!(developer_key: dk).full_token
-          client.expects(:create_platform_endpoint).once.returns(endpoint_arn: 'endpointarn')
+          expect(client).to receive(:create_platform_endpoint).once.and_return(endpoint_arn: 'endpointarn')
 
           json = api_call(:post, @path, @path_options, @post_params)
           expect(json['type']).to eq 'push'
@@ -213,13 +213,13 @@ describe 'CommunicationChannels API', type: :request do
         end
 
         it "shouldn't create two push channels regardless of case" do
-          client = mock()
-          DeveloperKey.stubs(:sns).returns(client)
+          client = double()
+          allow(DeveloperKey).to receive(:sns).and_return(client)
           dk = DeveloperKey.default
           dk.sns_arn = 'apparn'
           dk.save!
           $spec_api_tokens[@user] = @user.access_tokens.create!(developer_key: dk).full_token
-          client.expects(:create_platform_endpoint).once.returns(endpoint_arn: 'endpointarn')
+          expect(client).to receive(:create_platform_endpoint).once.and_return(endpoint_arn: 'endpointarn')
           @post_params[:communication_channel][:token].upcase!
           api_call(:post, @path, @path_options, @post_params)
           @post_params[:communication_channel][:token].downcase!

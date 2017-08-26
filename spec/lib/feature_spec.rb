@@ -26,8 +26,8 @@ describe Feature do
   let(:t_user) { user_with_pseudonym account: t_root_account }
 
   before do
-    User.any_instance.stubs(:set_default_feature_flags)
-    Feature.stubs(:definitions).returns({
+    allow_any_instance_of(User).to receive(:set_default_feature_flags)
+    allow(Feature).to receive(:definitions).and_return({
         'RA' => Feature.new(feature: 'RA', applies_to: 'RootAccount', state: 'hidden'),
         'A' => Feature.new(feature: 'A', applies_to: 'Account', state: 'on'),
         'C' => Feature.new(feature: 'C', applies_to: 'Course', state: 'off'),
@@ -188,23 +188,23 @@ describe "Feature.register" do
     end
 
     it "should register in a dev environment" do
-      Rails.env.stubs(:test?).returns(false)
-      Rails.env.stubs(:development?).returns(true)
+      allow(Rails.env).to receive(:test?).and_return(false)
+      allow(Rails.env).to receive(:development?).and_return(true)
       Feature.register({dev_feature: t_dev_feature_hash})
       expect(Feature.definitions['dev_feature']).not_to be_nil
     end
 
     it "should register in a production test cluster" do
-      Rails.env.stubs(:test?).returns(false)
-      Rails.env.stubs(:production?).returns(true)
-      ApplicationController.stubs(:test_cluster?).returns(true)
+      allow(Rails.env).to receive(:test?).and_return(false)
+      allow(Rails.env).to receive(:production?).and_return(true)
+      allow(ApplicationController).to receive(:test_cluster?).and_return(true)
       Feature.register({dev_feature: t_dev_feature_hash})
       expect(Feature.definitions['dev_feature']).not_to be_nil
     end
 
     it "should not register in production" do
-      Rails.env.stubs(:test?).returns(false)
-      Rails.env.stubs(:production?).returns(true)
+      allow(Rails.env).to receive(:test?).and_return(false)
+      allow(Rails.env).to receive(:production?).and_return(true)
       Feature.register({dev_feature: t_dev_feature_hash})
       expect(Feature.definitions['dev_feature']).to be_nil
     end
@@ -221,8 +221,8 @@ describe "Feature.register" do
     end
 
     it "should register as 'hidden' in production" do
-      Rails.env.stubs(:test?).returns(false)
-      Rails.env.stubs(:production?).returns(true)
+      allow(Rails.env).to receive(:test?).and_return(false)
+      allow(Rails.env).to receive(:production?).and_return(true)
       Feature.register({dev_feature: t_hidden_in_prod_feature_hash})
       expect(Feature.definitions['dev_feature']).to be_hidden
     end

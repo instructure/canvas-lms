@@ -24,8 +24,6 @@ describe "speed grader" do
   include SpeedGraderCommon
 
   before(:once) do
-    stub_kaltura
-
     course_factory(active_all: true)
     outcome_with_rubric
     @assignment = @course.assignments.new(:name => 'assignment with rubric', :points_possible => 10)
@@ -33,6 +31,10 @@ describe "speed grader" do
     @assignment.save!
     @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
     student_submission
+  end
+
+  before do
+    stub_kaltura
   end
 
   shared_examples_for "moderated grading" do

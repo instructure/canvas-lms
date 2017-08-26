@@ -29,7 +29,7 @@ describe "Outcomes Import API", type: :request do
   end
 
   def stub_ab_config_with(return_value)
-    AcademicBenchmark.stubs(:config).returns(return_value)
+    allow(AcademicBenchmark).to receive(:config).and_return(return_value)
   end
 
   def available_json(expected_status: 200)
@@ -187,9 +187,6 @@ describe "Outcomes Import API", type: :request do
         stub_ab_import
         stub_ab_config
         stub_ab_api
-      end
-
-      before :once do
       end
 
       context "available" do
@@ -377,7 +374,7 @@ describe "Outcomes Import API", type: :request do
           expect(status_json(migration_id: 1)["error"]).to match(/no content migration matching id/i)
         end
         it "check valid migration id" do
-          cm_mock = mock("content_migration", {
+          cm_mock = double("content_migration", {
             id: 2,
             context_id: 1,
             created_at: Time.zone.now,
@@ -386,8 +383,8 @@ describe "Outcomes Import API", type: :request do
             job_progress: nil,
             migration_type: nil
             })
-          cm_mock.stubs(:migration_issues).returns([])
-          ContentMigration.stubs(:find).with('2').returns(cm_mock)
+          allow(cm_mock).to receive(:migration_issues).and_return([])
+          allow(ContentMigration).to receive(:find).with('2').and_return(cm_mock)
           expect(status_json(migration_id: 2)["migration_issues_count"]).to eq 0
         end
       end
@@ -396,22 +393,22 @@ describe "Outcomes Import API", type: :request do
 
   describe "v1" do
     def stub_ab_import
-      cm_mock = mock("content_migration")
-      cm_mock.stubs(:id).returns(3)
-      AcademicBenchmark.stubs(:import).returns(cm_mock)
+      cm_mock = double("content_migration")
+      allow(cm_mock).to receive(:id).and_return(3)
+      allow(AcademicBenchmark).to receive(:import).and_return(cm_mock)
     end
     include_examples "outcomes import" do
       let(:description_key){ "title" }
       let(:json_file) { "available_return_val_v1.json" }
       def stub_ab_api
-        api_mock = mock("api")
-        api_mock.stubs(:list_available_authorities).
-          returns(filename_to_hash("api_list_authorities.json"))
-        api_mock.stubs(:browse_guid).
-          returns(filename_to_hash("api_browse_guid.json"))
-        api_mock.stubs(:browse).
-          returns(filename_to_hash("api_browse.json"))
-        AcademicBenchmark::Api.stubs(:new).returns(api_mock)
+        api_mock = double("api")
+        allow(api_mock).to receive(:list_available_authorities).
+          and_return(filename_to_hash("api_list_authorities.json"))
+        allow(api_mock).to receive(:browse_guid).
+          and_return(filename_to_hash("api_browse_guid.json"))
+        allow(api_mock).to receive(:browse).
+          and_return(filename_to_hash("api_browse.json"))
+        allow(AcademicBenchmark::Api).to receive(:new).and_return(api_mock)
       end
 
       def stub_ab_config
@@ -425,31 +422,31 @@ describe "Outcomes Import API", type: :request do
 
   describe "v3" do
     def stub_ab_import
-      cm_mock = mock("content_migration")
-      cm_mock.stubs(:id).returns(3)
-      AcademicBenchmark.stubs(:import).returns(cm_mock)
+      cm_mock = double("content_migration")
+      allow(cm_mock).to receive(:id).and_return(3)
+      allow(AcademicBenchmark).to receive(:import).and_return(cm_mock)
     end
     include_examples "outcomes import" do
       let(:description_key){ "description" }
       let(:json_file) { "available_return_val.json" }
       def stub_ab_api
-        standards_mock = mock("standards")
-        standards_mock.stubs(:authorities).
-          returns(filename_to_hash("available_authorities.json").
+        standards_mock = double("standards")
+        allow(standards_mock).to receive(:authorities).
+          and_return(filename_to_hash("available_authorities.json").
                   map{ |a| AcademicBenchmarks::Standards::Authority.from_hash(a) })
-        standards_mock.stubs(:authority_documents).
-          with { |*args| args[0] != 'CC' && args[0] != 'NRC' }.
-          returns(filename_to_hash("national_standards_authority_docs.json").
+        allow(standards_mock).to receive(:authority_documents).
+          with(not_eq('CC').and not_eq('NRC')).
+          and_return(filename_to_hash("national_standards_authority_docs.json").
                   map{ |d| AcademicBenchmarks::Standards::Document.from_hash(d) })
-        standards_mock.stubs(:authority_documents).
-          with { |*args| args[0] == 'NRC' }.
-          returns(filename_to_hash("ngss_nrc_authority_docs.json").
+        allow(standards_mock).to receive(:authority_documents).
+          with('NRC').
+          and_return(filename_to_hash("ngss_nrc_authority_docs.json").
                   map{ |d| AcademicBenchmarks::Standards::Document.from_hash(d) })
-        standards_mock.stubs(:authority_documents).
-          with { |*args| args[0] == 'CC' }.
-          returns(filename_to_hash("common_core_authority_docs.json").
+        allow(standards_mock).to receive(:authority_documents).
+          with('CC').
+          and_return(filename_to_hash("common_core_authority_docs.json").
                  map{ |d| AcademicBenchmarks::Standards::Document.from_hash(d) })
-        AcademicBenchmarks::Api::Standards.stubs(:new).returns(standards_mock)
+        allow(AcademicBenchmarks::Api::Standards).to receive(:new).and_return(standards_mock)
       end
 
       def stub_ab_config

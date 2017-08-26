@@ -20,9 +20,9 @@ class PlannerOverride < ActiveRecord::Base
   CONTENT_TYPES = %w(Announcement Assignment DiscussionTopic Quizzes::Quiz WikiPage PlannerNote).freeze
 
   include Workflow
-  belongs_to :plannable, polymorphic: true
+  belongs_to :plannable, polymorphic:
+    [:announcement, :assignment, :discussion_topic, :planner_note, :wiki_page, quiz: 'Quizzes::Quiz']
   belongs_to :user
-  validates_inclusion_of :plannable_type, :allow_nil => false, :in => CONTENT_TYPES
   validates_presence_of :plannable_id, :workflow_state, :user_id
   validates_uniqueness_of :plannable_id, scope: [:user_id, :plannable_type]
 

@@ -79,7 +79,7 @@
       border-bottom: none;
     }
     li.active, li:focus {
-      background: $ic-brand-primary;
+      background: var(--ic-brand-primary);
       outline: none;
     }
     li.active.expanded {

@@ -31,7 +31,7 @@ describe Api::V1::PlannerOverride do
 
   describe '.planner_override_json' do
     let(:api) { PlannerOverrideHarness.new }
-    let(:session) { stub }
+    let(:session) { double }
 
     it 'should show plannable_type as a string' do
       assignment_model

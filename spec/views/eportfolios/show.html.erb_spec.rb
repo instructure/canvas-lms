@@ -43,7 +43,7 @@ describe "/eportfolios/show" do
   end
 
   it "should link the user name if @owner_url is set" do
-    owner_url = assign(:owner_url, user_url(@portfolio.user))
+    owner_url = assign(:owner_url, user_url(@portfolio.user, :host => "test.host"))
     render "eportfolios/show"
     expect(view.content_for(:left_side)[owner_url]).not_to be_nil
     expect(view.content_for(:left_side)[/<a [^>]*id="section-tabs-header-subtitle"/]).not_to be_nil

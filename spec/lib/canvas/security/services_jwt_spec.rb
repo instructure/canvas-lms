@@ -90,7 +90,7 @@ module Canvas::Security
       let(:jwt_string){ ServicesJwt.generate(sub: 1) }
 
       it "uses SecureRandom for generating the JWT" do
-        SecureRandom.stubs(uuid: "some-secure-random-string")
+        allow(SecureRandom).to receive_messages(uuid: "some-secure-random-string")
         jwt = ServicesJwt.new(jwt_string, false)
         expect(jwt.id).to eq("some-secure-random-string")
       end
@@ -134,10 +134,10 @@ module Canvas::Security
       end
 
       describe "via .for_user" do
-        let(:user){ stub(global_id: 42) }
-        let(:ctx){ stub(id: 47) }
+        let(:user){ double(global_id: 42) }
+        let(:ctx){ double(id: 47) }
         let(:host){ "example.instructure.com" }
-        let(:masq_user){ stub(global_id: 24) }
+        let(:masq_user){ double(global_id: 24) }
 
         it "can build from a user and host" do
           jwt = ServicesJwt.for_user(host, user)
@@ -182,7 +182,7 @@ module Canvas::Security
         it 'includes workflow_state if workflows is given' do
           workflows = [:foo]
           state = {'a' => 123}
-          Canvas::JWTWorkflow.expects(:state_for).with(workflows, ctx, user).returns(state)
+          expect(Canvas::JWTWorkflow).to receive(:state_for).with(workflows, ctx, user).and_return(state)
           jwt = ServicesJwt.for_user(host, user, workflows: workflows, context: ctx)
           decrypted_token_body = translate_token.call(jwt)
           expect(decrypted_token_body[:workflow_state]).to eq(state)
@@ -190,7 +190,7 @@ module Canvas::Security
 
         it 'does not include workflow_state if empty' do
           workflows = [:foo]
-          Canvas::JWTWorkflow.expects(:state_for).returns({})
+          expect(Canvas::JWTWorkflow).to receive(:state_for).and_return({})
           jwt = ServicesJwt.for_user(host, user, workflows: workflows, context: ctx)
           decrypted_token_body = translate_token.call(jwt)
           expect(decrypted_token_body).not_to have_key :workflow_state
@@ -217,10 +217,10 @@ module Canvas::Security
       end
 
       describe "refresh_for_user" do
-        let(:user1){ stub(global_id: 42) }
-        let(:user2){ stub(global_id: 43) }
+        let(:user1){ double(global_id: 42) }
+        let(:user2){ double(global_id: 43) }
         let(:host) { 'testhost' }
-        
+
         it 'is invalid if jwt cannot be decoded' do
           expect{ ServicesJwt.refresh_for_user('invalidjwt', host, user1) }
             .to raise_error(ServicesJwt::InvalidRefresh)
@@ -239,7 +239,7 @@ module Canvas::Security
         end
 
         it 'is invlaid masquerading user is different' do
-          masq_user = stub(global_id: 44)
+          masq_user = double(global_id: 44)
           jwt = ServicesJwt.for_user(host, user1, real_user: masq_user)
           expect{ ServicesJwt.refresh_for_user(jwt, host, user1, real_user: user2) }
             .to raise_error(ServicesJwt::InvalidRefresh)

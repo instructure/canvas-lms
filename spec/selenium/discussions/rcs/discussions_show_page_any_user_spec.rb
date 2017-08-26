@@ -49,10 +49,6 @@ describe "discussions" do
         stub_rcs_config
       end
 
-      after(:each) do
-        unstub_rcs_config
-      end
-
       context "topic subscription" do
         context "someone else's topic" do
           let(:topic) { student_topic }

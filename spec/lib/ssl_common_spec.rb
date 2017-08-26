@@ -20,29 +20,29 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe SSLCommon do
   it "should work with http basic auth, username and password" do
-    Net::HTTP::Post.any_instance.expects(:basic_auth).with("theusername", "thepassword")
-    Net::HTTP.any_instance.expects(:start)
+    expect_any_instance_of(Net::HTTP::Post).to receive(:basic_auth).with("theusername", "thepassword")
+    expect_any_instance_of(Net::HTTP).to receive(:start)
     SSLCommon.post_data("http://theusername:thepassword@localhost/endpoint",
         "somedata", "application/x-jt-is-so-cool")
   end
 
   it "should work with http basic auth, username and password, with encoded characters" do
-    Net::HTTP::Post.any_instance.expects(:basic_auth).with("theusername@theuseremail.tld", "thepassword")
-    Net::HTTP.any_instance.expects(:start)
+    expect_any_instance_of(Net::HTTP::Post).to receive(:basic_auth).with("theusername@theuseremail.tld", "thepassword")
+    expect_any_instance_of(Net::HTTP).to receive(:start)
     SSLCommon.post_data("http://theusername%40theuseremail.tld:thepassword@localhost/endpoint",
         "somedata", "application/x-jt-is-so-cool")
   end
 
   it "should work with http basic auth, just username" do
-    Net::HTTP::Post.any_instance.expects(:basic_auth).with("theusername", "")
-    Net::HTTP.any_instance.expects(:start)
+    expect_any_instance_of(Net::HTTP::Post).to receive(:basic_auth).with("theusername", "")
+    expect_any_instance_of(Net::HTTP).to receive(:start)
     SSLCommon.post_data("http://theusername@localhost/endpoint",
         "somedata", "application/x-jt-is-so-cool")
   end
 
   it "should work with no auth" do
-    Net::HTTP::Post.any_instance.expects(:basic_auth).never
-    Net::HTTP.any_instance.expects(:start)
+    expect_any_instance_of(Net::HTTP::Post).to receive(:basic_auth).never
+    expect_any_instance_of(Net::HTTP).to receive(:start)
     SSLCommon.post_data("http://localhost/endpoint",
         "somedata", "application/x-jt-is-so-cool")
   end

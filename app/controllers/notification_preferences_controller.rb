@@ -119,7 +119,7 @@ class NotificationPreferencesController < ApplicationController
   private
   def convert_hash_to_jsonapi_array(hash, key = :id)
     return hash if hash.is_a?(Array)
-    hash.map { |k, v| { key => k }.reverse_merge!(v).with_indifferent_access }
+    hash.to_unsafe_h.map { |k, v| { key => k }.reverse_merge!(v).with_indifferent_access }
   end
 
   def notification_preferences_param

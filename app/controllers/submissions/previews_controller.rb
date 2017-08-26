@@ -34,7 +34,7 @@ module Submissions
       @body_classes << 'is-inside-submission-frame'
 
       if @assignment.moderated_grading?
-        @crocodoc_ids = @submission.crocodoc_whitelist
+        @moderated_grading_whitelist = @submission.moderated_grading_whitelist
       end
 
       unless @assignment.visible_to_user?(@current_user)

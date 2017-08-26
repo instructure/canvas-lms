@@ -26,7 +26,7 @@ class ContentTag < ActiveRecord::Base
 
   include Workflow
   include SearchTermHelper
-  belongs_to :content, :polymorphic => true
+  belongs_to :content, polymorphic: [], exhaustive: false
   validates_inclusion_of :content_type, :allow_nil => true, :in => CONTENT_TYPES
   belongs_to :context, polymorphic:
       [:course, :learning_outcome_group, :assignment, :account,

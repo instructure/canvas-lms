@@ -47,8 +47,8 @@ describe PageView::Pv4Client do
   let(:client) { PageView::Pv4Client.new('http://pv4/', 'token') }
 
   def stub_http_request(response)
-    stub = stub(body: response.to_json)
-    CanvasHttp.stubs(:get).returns(stub)
+    double = double(body: response.to_json)
+    allow(CanvasHttp).to receive(:get).and_return(double)
   end
 
   describe "#fetch" do
@@ -82,8 +82,8 @@ describe PageView::Pv4Client do
         expect_url = "http://pv4/users/1/page_views#{expect_params}"
         expect_header = {'Authorization' => 'Bearer token'}
 
-        res = stub(body: { 'page_views' => [pv4_object] }.to_json)
-        CanvasHttp.expects(:get).with(expect_url, expect_header).returns(res)
+        res = double(body: { 'page_views' => [pv4_object] }.to_json)
+        expect(CanvasHttp).to receive(:get).with(expect_url, expect_header).and_return(res)
         client.fetch(1, start_time: start_time, end_time: end_time)
       end
     end
@@ -104,11 +104,10 @@ describe PageView::Pv4Client do
       now = Time.now.utc
       result = client.for_user(1).paginate(per_page: 10)
 
-      stub = stub(body: '{ "page_views": [] }')
-      CanvasHttp.unstub(:get)
-      CanvasHttp.expects(:get).with(
+      double = double(body: '{ "page_views": [] }')
+      expect(CanvasHttp).to receive(:get).with(
         "http://pv4/users/1/page_views?start_time=#{now.iso8601(PageView::Pv4Client::PRECISION)}&end_time=#{pv4_object['timestamp']}&last_page_view_id=#{pv4_object['request_id']}&limit=10",
-        "Authorization" => "Bearer token").returns(stub)
+        "Authorization" => "Bearer token").and_return(double)
       client.for_user(1, oldest: now, newest: now).
           paginate(page: result.next_page, per_page: 10)
     end

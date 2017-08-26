@@ -65,7 +65,7 @@ describe "site-wide" do
   it "should not set x-frame-options when on a files domain" do
     user_session user_factory(active_all: true)
     attachment_model(:context => @user)
-    FilesController.any_instance.expects(:files_domain?).returns(true)
+    expect_any_instance_of(FilesController).to receive(:files_domain?).and_return(true)
     get "http://files-test.host/files/#{@attachment.id}/download"
     expect(response[x_frame_options]).to be_nil
   end
@@ -136,7 +136,7 @@ describe "site-wide" do
 
   context "policy cache" do
     it "should clear the in-process policy cache between requests" do
-      AdheresToPolicy::Cache.expects(:clear).with(nil).once
+      expect(AdheresToPolicy::Cache).to receive(:clear).with(no_args).once
       get '/'
     end
   end
@@ -198,7 +198,7 @@ describe "site-wide" do
 
   context "error templates" do
     it "returns an html error page even for non-html requests" do
-      Canvas::Errors.expects(:capture).once.returns({})
+      expect(Canvas::Errors).to receive(:capture).once.and_return({})
       get "/courses/blah.png"
     end
   end
@@ -208,8 +208,8 @@ describe "site-wide" do
       course_with_teacher_logged_in
       user_with_pseudonym :username => 'blah'
       post "/courses/#{@course.id}/user_lists.json",
-           { :user_list => ['blah'], :search_type => 'unique_id', :v2 => true },
-           { 'Accept' => 'application/json+canvas-string-ids' }
+           params: { :user_list => ['blah'], :search_type => 'unique_id', :v2 => true },
+           headers: { 'Accept' => 'application/json+canvas-string-ids' }
       json = JSON.parse response.body
       expect(json['users'][0]['user_id']).to be_a String
     end

@@ -23,7 +23,7 @@ describe "brandableCss JS integration specs" do
   EXAMPLE_CDN_HOST = 'https://somecdn.example.com'
 
   it "sets ENV.asset_host correctly" do
-    Canvas::Cdn.config.expects(:host).at_least_once.returns(EXAMPLE_CDN_HOST)
+    expect(Canvas::Cdn.config).to receive(:host).at_least(:once).and_return(EXAMPLE_CDN_HOST)
     get "/login/canvas"
     expect(driver.execute_script("return ENV.ASSET_HOST")).to eq(EXAMPLE_CDN_HOST)
   end

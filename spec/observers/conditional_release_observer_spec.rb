@@ -30,22 +30,22 @@ describe ConditionalReleaseObserver do
 
   describe "submission" do
     it "clears cache on create" do
-      ConditionalRelease::Service.expects(:clear_submissions_cache_for).at_least(1)
-      ConditionalRelease::Service.expects(:clear_rules_cache_for).at_least(1)
+      expect(ConditionalRelease::Service).to receive(:clear_submissions_cache_for).at_least(1)
+      expect(ConditionalRelease::Service).to receive(:clear_rules_cache_for).at_least(1)
       submission_model(assignment: @assignment)
     end
 
     it "clears cache on update" do
-      ConditionalRelease::Service.expects(:clear_submissions_cache_for).at_least(2)
-      ConditionalRelease::Service.expects(:clear_rules_cache_for).at_least(2)
+      expect(ConditionalRelease::Service).to receive(:clear_submissions_cache_for).at_least(2)
+      expect(ConditionalRelease::Service).to receive(:clear_rules_cache_for).at_least(2)
       submission_model(assignment: @assignment)
       @submission.body = "yas"
       @submission.save
     end
 
     it "clears cache on delete" do
-      ConditionalRelease::Service.expects(:clear_submissions_cache_for).at_least(2)
-      ConditionalRelease::Service.expects(:clear_rules_cache_for).at_least(2)
+      expect(ConditionalRelease::Service).to receive(:clear_submissions_cache_for).at_least(2)
+      expect(ConditionalRelease::Service).to receive(:clear_rules_cache_for).at_least(2)
       submission_model(assignment: @assignment)
       @submission.destroy
     end
@@ -53,21 +53,21 @@ describe ConditionalReleaseObserver do
 
   describe "assignment" do
     it "clears cache on create" do
-      ConditionalRelease::Service.expects(:clear_active_rules_cache).at_least(1)
-      ConditionalRelease::Service.expects(:clear_applied_rules_cache).at_least(1)
+      expect(ConditionalRelease::Service).to receive(:clear_active_rules_cache).at_least(1)
+      expect(ConditionalRelease::Service).to receive(:clear_applied_rules_cache).at_least(1)
       assignment_model
     end
 
     it "clears cache on update" do
-      ConditionalRelease::Service.expects(:clear_active_rules_cache).at_least(1)
-      ConditionalRelease::Service.expects(:clear_applied_rules_cache).at_least(1)
+      expect(ConditionalRelease::Service).to receive(:clear_active_rules_cache).at_least(1)
+      expect(ConditionalRelease::Service).to receive(:clear_applied_rules_cache).at_least(1)
       @assignment.name = "different name"
       @assignment.save!
     end
 
     it "clears cache on delete" do
-      ConditionalRelease::Service.expects(:clear_active_rules_cache).at_least(1)
-      ConditionalRelease::Service.expects(:clear_applied_rules_cache).at_least(1)
+      expect(ConditionalRelease::Service).to receive(:clear_active_rules_cache).at_least(1)
+      expect(ConditionalRelease::Service).to receive(:clear_applied_rules_cache).at_least(1)
       @assignment.destroy
     end
   end

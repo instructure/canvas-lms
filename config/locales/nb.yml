@@ -1,4 +1,4 @@
-# This YAML file is auto-generated from a Transifex import.
+# This YAML file is auto-generated from a translation import.
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 nb: 
@@ -303,6 +303,7 @@ nb:
     report_header_canvas_xlist_course_id: canvas_xlist_course_id
     report_header_course: emne
     report_header_course__id: course_id
+    report_header_course_format: course_format
     report_header_course_id: "emne id"
     report_header_course_name: emnenavn
     report_header_course_sis: "emne sis"
@@ -712,6 +713,12 @@ nb:
     default_account_quotas_not_updated: "Standard kontokvoter ble ikke oppdatert"
     default_account_quotas_updated: "Kontokvotene ble oppdatert"
     devry: 
+      attendance_extract: 
+        parameters: 
+          custom_reports: 
+            start: 
+              parameters: 
+                header: "Aktivitetsdato:"
       dcr2: 
         parameters: 
           custom_reports: 
@@ -728,6 +735,24 @@ nb:
               parameters: 
                 header: "Start:"
       dcr7: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Slutt:"
+            start: 
+              parameters: 
+                header: "Start:"
+      no_submissions: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Slutt:"
+            start: 
+              parameters: 
+                header: "Start:"
+      submissions_detail: 
         parameters: 
           custom_reports: 
             end: 
@@ -1083,7 +1108,7 @@ nb:
         external_services_warning_label: "Innhold i pop-up melding:"
         from: Fra
         sample_subject: "Karakter endret: inkluder undersøkelsen, test emnet"
-        subject: Emne
+        subject: Tittel
       open_registration_delegated_warning_message: "En ekstern identitetsleverandør er slått på, og brukere som er opprettet via åpen registrering kan muligens ikke logge inn dersom ikke den eksterne identitetsleverandørens innloggingsskjema har en lenke tilbake til %{url}."
       open_registration_delegated_warning_tooltip: "En ekstern identitetsleverandør er slått på"
       open_report_description: "Åpne Rapport Beskrivelse"
@@ -1578,7 +1603,7 @@ nb:
   allow_course_images_to_be_assigned_to_a_course_and_adb906f4: "Tillat bilder fra kurset å bli tildelt til et kurs og bli brukt på kortene på kontrollpanelet."
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "La kort til instrumentbordet bestilles på nytt til hver bruker."
   allow_in_mastery_paths_5332c786: "Tillat i læringsstier"
-  allow_intra_group_peer_reviews_53f1e455: "Tillat fagfellevurdering innad i gruppen"
+  allow_intra_group_peer_reviews_53f1e455: "Tillat hverandrevurdering innad i gruppen"
   allow_lor_tools: "Tillat brukere å vise og bruke eksterne verktøy som er konfigurert for LOR."
   allow_multiple_attempts_e67a0a37: "Tillat flere forsøk"
   allow_opt_out_of_inbox: "Tillat brukere å trekke seg fra Samtale innboks. Dette vil føre til at alle samtalemeldinger og varslinger som skal sendes som ASAP varslinger til brukerens primære epost, skjuler Samtale innboksens uleste meldinger merke på innboksen, og skjuler samtalens varslingsinnstillinger."
@@ -2142,6 +2167,8 @@ nb:
         remove_these_dates: "Fjern disse datoene"
     edit: 
       edit_assignment: "Rediger oppgave"
+      links: 
+        add_rubric: Rubrikk
     edit_header_view: 
       buttons: 
         not_published: "Ikke publisert"
@@ -2189,7 +2216,7 @@ nb:
       graded_count: "%{graded_count} *av* %{total} rettede innleveringer"
       links: 
         download_submissions: "Last ned innleveringer"
-        peer_reviews: Fagfellevurderinger
+        peer_reviews: Hverandrevurderinger
         reupload_submissions: "Last opp innleveringer på nytt"
       resubmission_count: 
         one: "1 Re-innlevering som ikke er rettet"
@@ -2327,41 +2354,41 @@ nb:
     peer_reviews: 
       buttons: 
         add: "Legg til"
-        assign_peer_reviews: "Tildel fagfellevurdering"
+        assign_peer_reviews: "Tildel hverandrevurdering"
       descriptions: 
-        automatically_assign_reviews: "Du kan tildele fagfellevurdering til de brukerne som har levert inn men som ikke er tildelt vurderinger allerede ved å klikke på knappen nedenfor."
+        automatically_assign_reviews: "Du kan tildele hverandrevurdering til de brukerne som har levert inn men som ikke er tildelt vurderinger allerede ved å klikke på knappen nedenfor."
       details: "Til venstre kan du se en liste over studenter på denne oppgaven, samt hvilke innleveringer (om noen) de har blitt tildelt for \"gjennomgang\"."
       links: 
         assign_peer_review: "Gi %{student} en annen innlevering for vurdering"
         back_to_assignment: "Tilbake til Oppgaven"
       messages: 
-        cancel_peer_review: "Slette denne fagfellevurdering?"
+        cancel_peer_review: "Slette denne hverandrevurdering?"
         no_students_found: "Ingen studenter funnet"
       none_assigned: "Ingen tildelt"
       not_yet_submitted: "foreløpig ikke levert"
       options: 
         select_student: "[ Velg student ]"
-      overview: "Studentes fagfellevurdering antas fullfør når studenter har kommentert minst en gang på siden."
-      overview_with_rubric: "Studentes fagfellevurdering antas fullfør når studenter har kommentert minst en gang på siden og fylt ut rubrikk, vurderingsveiledning for oppgaven."
-      page_title: Fagfellevurderinger
+      overview: "Studentes hverandrevurdering antas fullfør når studenter har kommentert minst en gang på siden."
+      overview_with_rubric: "Studentes hverandrevurdering antas fullfør når studenter har kommentert minst en gang på siden og fylt ut rubrikk, vurderingsveiledning for oppgaven."
+      page_title: Hverandrevurderinger
       reviews_per_user: "%{count} gjennomganger per bruker"
       submitted: levert
-      title: "%{assignment} Fagfellevurdering"
+      title: "%{assignment} Hverandrevurdering"
       titles: 
         automatically_assign_reviews: "Tildel \"Vurderinger\" automatisk"
         remind: "Minn %{assessor} på oppgaven, siste påminnelse %{time}"
         reminder: "Minn %{assessor} på oppgaven, siste påminnelse %{time}"
     peer_reviews_selector: 
       anonymous_peer_reviews: Anonymitet
-      how_to_peer_review: "Hvordan å tildele fagfellevurdering"
+      how_to_peer_review: "Hvordan å tildele hverandrevurdering"
       labels: 
-        anonymous_peer_reviews: "Fagfellevurdering vises anonymt"
-        automatically_assign_peer_reviews: "Automatisk tildele fagfellevurdering"
-        manually_assign_peer_reviews: "Manuelt tildele fagfellevurdering"
-        require_peer_reviews: "Krev fagfellevurdering"
+        anonymous_peer_reviews: "Hverandrevurdering vises anonymt"
+        automatically_assign_peer_reviews: "Automatisk tildele hverandrevurdering"
+        manually_assign_peer_reviews: "Manuelt tildele hverandrevurdering"
+        require_peer_reviews: "Krev hverandrevurdering"
       locked_until: "Tildele vurderinger"
       peer_reviews_assign_at_explanation: "Må komme etter forfallsdato. Hvis tom, brukes fristdato."
-      peer_reviews_header: Fagfellevurderinger
+      peer_reviews_header: Hverandrevurderinger
       reviews_per_user: "Vurderinger per bruker"
     points_possible_number: "Oppnåelige poeng må være et tall"
     positive_number: "Du må bruke et positivt tall"
@@ -2433,7 +2460,7 @@ nb:
         no_comments: "Ingen kommentarer"
         submission_late_timestamp: "%{submitted_at} (for sen)"
       titles: 
-        assigned_peer_reviews: "Tildelte fagfellevurdering"
+        assigned_peer_reviews: "Tildelte hverandrevurdering"
         comments: "Kommentarer:"
         submission: Innlevering
         submission_not_turned_in: "Ikke levert!"
@@ -3417,12 +3444,30 @@ nb:
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "Klikk for å legge inn kommentarer, dersom studenten velger dette svaret"
   click_to_load_a020891b: "(klikk for å laste)"
   click_to_modify_89fa26aa: "Klikk for å modifisere"
+  click_to_order_by_email_ascending_98b1a697: "Klikk for å bestille stigende etter e-post"
+  click_to_order_by_last_login_ascending_502b6ad2: "Klikk for å bestille avtagende etter siste innlogging"
+  click_to_order_by_sis_id_ascending_692d35a7: "Klikk for å bestille stigende etter SIS-ID"
   click_to_publish_ad27be9d: "Trykk her for å publisere"
   click_to_report_profile_picture_370f9625: "Klikk for å rapportere profilbilde"
   click_to_select_bd3b3a0d: "klikk for å velge"
   click_to_select_user_name_41746803: "Klikk for å velge bruker %{name}"
   click_to_set_this_answer_as_correct_1326e3fd: "Klikk for å sette dette svaret som riktig"
   click_to_skip_address_8f874b32: "Klikk for å hoppe over %{address}"
+  click_to_sort_by_email_ascending_cb789ec4: "Klikk for å sortere stigende etter e-post"
+  click_to_sort_by_email_descending_72801b54: "Klikk for å sortere avtagende etter e-post"
+  click_to_sort_by_enrollments_ascending_f535b994: "Klikk for å sortere stigende etter oppmeldinger"
+  click_to_sort_by_enrollments_descending_3e5c80ee: "Klikk for å sortere avtagende etter oppmeldinger"
+  click_to_sort_by_last_login_ascending_eafcbee4: "Klikk for å sortere stigende etter siste innlogging"
+  click_to_sort_by_last_login_descending_61fdadc: "Klikk for å sortere avtagende etter siste innlogging"
+  click_to_sort_by_name_ascending_739c011e: "Klikk for å sortere stigende etter navn"
+  click_to_sort_by_name_descending_b6262093: "Klikk for å sortere avtagende etter navn"
+  click_to_sort_by_sis_id_ascending_832c870: "Klikk for å sortere stigende etter SIS-ID"
+  click_to_sort_by_sis_id_descending_2d611236: "Klikk for å sortere avtagende etter SIS-ID"
+  click_to_sort_by_subaccount_ascending_11252bc4: "Klikk for å sortere stigende etter delkonto"
+  click_to_sort_by_subaccount_descending_3d8a2381: "Klikk for å sortere avtagende etter delkonto"
+  click_to_sort_by_teacher_ascending_cda7a18c: "Klikk for å sortere stigende etter lærer"
+  click_to_sort_by_teacher_descending_45ef0d1e: "Klikk for å sortere avtagende etter lærer"
+  click_to_sort_c81ff8c8: "Klikk for å sortere."
   click_to_test_a_different_score_2e0bb6f0: "Klikk for å teste et annet resultat"
   click_to_test_dropdown_b950974d: "Klikk for å teste nedtrekksmeny"
   click_to_unpublish_5b19e761: "Trykk for å oppheve publiseringen"
@@ -3442,6 +3487,8 @@ nb:
   closes_5c6b4367: "Lukker:"
   code_is_case_sensitive_d8175cad: "Koden benytter små og store bokstaver"
   cog_icon_69bdffd5: Tannhjuls-ikon
+  col_is_sorted_ascending_cc5152cc: "%{col} er sortert stigende"
+  col_is_sorted_descending_1cef74aa: "%{col} er sortert avtagende."
   collaboration: 
     default_title: "Samarbeid uten navn"
   collaboration_71c024f4: Samarbeid
@@ -4494,7 +4541,7 @@ nb:
     message: 
       mark_as_read: "Merk som lest"
       mark_as_unread: "Merk som ulest"
-      no_subject: "Intet emne"
+      no_subject: "Intet tittel"
       open_message: "Åpne melding"
       star_conversation: "Merk samtalen med stjerne"
       starred: "Merket med stjerne"
@@ -4507,7 +4554,7 @@ nb:
       forward: Videresend
       message_actions: "Handlinger for melding"
       more_options: "Flere alternativer"
-      no_subject: "Intet emne"
+      no_subject: "Intet tittel"
       reply: Svar
       reply_all: "Svar til alle"
     message_form_dialog: 
@@ -4523,13 +4570,13 @@ nb:
         attachments: Vedlegg
         course: Emne
         select_course: "Velg et emne"
-        subject: Emne
+        subject: Tittel
         to: Til
       links: 
         media_comment: Gj
       media_comment: Mediekommentar
       no_course: "Ingen emne"
-      no_subject: "Intet emne"
+      no_subject: "Intet tittel"
       search_names_groups_courses: "Søk i navn, grupper og emner"
       send_individual_messages: "Send en individuell melding til hver mottaker"
       titles: 
@@ -4618,6 +4665,7 @@ nb:
   count_items_selected_91814713: 
     one: "%{count} elementet valgt"
     other: "%{count} elementer valgt"
+  count_items_would_be_deleted_and_exceeds_the_set_t_a4a21dbe: "%{count} elementer vil bli slettet og overskrider den definerte terskelen %{change_threshold}%"
   count_max_students_2db76773: "%{count} / %{max} studenter"
   count_max_users_bdebb537: "%{count} / %{max} brukere"
   count_messages_4f8ff204: 
@@ -5850,6 +5898,7 @@ nb:
       year: År
   day_9d999bec: Dag
   day_s_7cc1231f: Dag(er)
+  days_late_a3a721b0: "Dager for sent"
   deactivate_this_key_3e79a2b5: "Deaktiver denne nøkkelen"
   deactivate_user_86c09036: "Deaktiver bruker"
   decaying_average_8bf6a0dd: "Forfalne Gjennomsnitt"
@@ -6224,7 +6273,7 @@ nb:
       last_page: Siste
     peer_reviews: 
       due_date: "frist %{date}"
-      peer_review_alert: "Du har fått i oppdrag å gjøre en fagfellevurdering for %{person}"
+      peer_review_alert: "Du har fått i oppdrag å gjøre en hverandrevurdering for %{person}"
     points_possible_number: "Oppnåelige poeng må være et tall"
     published_button: 
       buttons: 
@@ -6253,7 +6302,7 @@ nb:
       from_context: "Fra *%{context_name}*"
       initial_post_required: "Svar er bare synlige for de som har lagt inn minst ett svar"
       links: 
-        peer_reviews: Fagfellevurderinger
+        peer_reviews: Hverandrevurderinger
       loading_replies: "Laster svar..."
       lock_topic: "Stengt for kommentarer"
       locked: "Dette temaet er stengt for kommentarer"
@@ -7537,6 +7586,7 @@ nb:
   generating_preview_ae83830: "Laster forhåndsvisning…"
   germany_49_fc5b8179: "Tyskland (+49)"
   germany_b02d91c9: Tyskland
+  get_started_b9507525: "Kom i gang"
   get_the_following_from_your_salesforce_connected_a_881fc9a3: "Få følgende fra din Salesforce tilkoblede applikasjon"
   get_your_users_error_reports_posted_to_salesforce__76f57839: "Få dine brukeres avviksrapporter publisert til Salesforce Service Cloud"
   get_your_users_error_reports_posted_to_salesforce_dfb1a6c2: "Få dine brukeres avviksrapporter publisert til Salesforce"
@@ -7618,6 +7668,7 @@ nb:
       submit_comment: "Send inn kommentar"
       submitting: "Sender inn..."
     cancel_button: Avbryt
+    canvadoc_expiring: "Din Canvas DocViewer økt utløper snart.  Vennligst last inn vinduet på nytt for å unngå og miste arbeid."
     click_to_change: "Klikk for å teste et annet resultat"
     column_header: 
       assignment_options: Oppgavevalg
@@ -8787,7 +8838,7 @@ nb:
     send_message: "Send melding"
     sending: Sender...
     somethings_broken_but_i_can_work_around_it_for_now: "Noe er ødelagt, men jeg kan omgå det for øyeblikket"
-    subject: Emne
+    subject: Tittel
     submit_this_support_request: "Send inn etikett"
     which_course_is_this_question_about: "Hvilket emne gjelder spørsmålet?"
     your_email_address: "Din e-postadresse"
@@ -8814,8 +8865,8 @@ nb:
       conversation_label: "Gå til Samtaler"
       discussion_details: Diskusjonsdetaljer
       discussion_label: "Gå til diskusjoner for emne"
-      peer_review_details: Fagfellevurderingsdetaljer
-      peer_review_label: "Gå til fagfellevurderinger for emner"
+      peer_review_details: Hverandrevurderingsdetaljer
+      peer_review_label: "Gå til hverandrevurderinger for emner"
       x_more: "%{x} mer ..."
       x_new_in_announcements: 
         one: "*1* kunngjøring"
@@ -8830,8 +8881,8 @@ nb:
         one: "*1* diskusjon"
         other: "*%{count}* diskusjoner"
       x_new_in_peer_reviews: 
-        one: "*1* Fagfellevurdering"
-        other: "*%{count}* Fagfellevurderinger"
+        one: "*1* Hverandrevurdering"
+        other: "*%{count}* Hverandrevurderinger"
     local: Lokal
     select: 
       prompt: "Vennligst velg"
@@ -8877,6 +8928,8 @@ nb:
   host_8be927e0: Vert
   host_is_unreachable_or_not_pointing_to_catalog_fb3fc082: "Verten er utilgjengelig eller peker ikke til katalog"
   hour_34d02553: Time
+  hour_s_b6e8d238: Time(r)
+  hours_late_989e9081: "Timer for sent"
   hover_over_me_496521b9: "Hold markøren over meg"
   how_is_this_affecting_you_b3b6a639: "Hvordan påvirker dette deg?"
   how_many_minutes_ecca5ee7: "Hvor mange minutter?"
@@ -8892,6 +8945,7 @@ nb:
   i_need_some_help_but_it_is_not_urgent_d967ea0a: "Jeg trenger litt hjelp, men det haster ikke"
   ic_actions: 
     manage: administrer
+  iceland_354_1a03c558: "Island (+354)"
   icon_215a1dc6: Ikon
   icons: 
     discussion_submission: Diskusjonsinnlevering
@@ -9482,6 +9536,7 @@ nb:
   loading_25990131: Laster...
   loading_725811ca: "laster inn"
   loading_announcements_b927a86c: "Laster kunngjøringer"
+  loading_assignments_352ec769: "Laster oppgaver"
   loading_associations_9da66c4e: "Laster inn assosiasjoner"
   loading_associations_complete_b93a9c6e: "Innlasting av assosiasjoner fullført"
   loading_associations_started_1f65d8d: "Innlasting av assosiasjoner påbegynt"
@@ -9496,7 +9551,9 @@ nb:
   loading_data_ecd89ba: "Laster data..."
   loading_graders_f6a76142: "Laster inn karaktersettere"
   loading_mastery_paths_c558a766: "Laster mestringsstier ..."
+  loading_more_grade_history_results_b235de5: "Laster flere resultater over karakterhistorie."
   loading_more_results_def6df65: "Laster inn flere resultater…"
+  loading_results_769c8819: "Laster resultater"
   loading_results_spinner_73ef739c: "Laster resultatspinner"
   loading_students_30b71301: "Laster inn studenter"
   loading_sync_history_9f342cbf: "Laster synkroniseringsloggen"
@@ -10952,7 +11009,7 @@ nb:
         path_type: Stitype
         reply_to: "Svar til"
         sent_at: Sendt
-        subject: Emne
+        subject: Tittel
         to: Til
     messages: 
       failure: "En feil oppsto under sending av eposten din. Last siden på nytt og prøv igjen."
@@ -11209,16 +11266,16 @@ nb:
     page_unpublished_module: "Denne siden er del av en ikke publisert modul og er ikke tilgjengelig ennå."
     peer_review_invitation: 
       email: 
-        body: "Du har blitt invitert til fagfellevurdering %{reviewee}. Følg lenken nedenfor for å gjennomgå dem!"
+        body: "Du har blitt invitert til hverandrevurdering %{reviewee}. Følg lenken nedenfor for å gjennomgå dem!"
         html: 
           link_message: "Klikk her for å fullføre anmeldelsen din"
-        subject: "Tilordnet fagfellevurdering for %{reviewee}"
+        subject: "Tilordnet hverandrevurdering for %{reviewee}"
       sms: 
         more_info: "Mer info på %{url}"
       summary: 
         body: "Du har blitt invitert til fagfellevurdering %{reviewee}. Følg lenken nedenfor for å gjennomgå dem!"
       twitter: 
-        body: "Du har blitt invitert til fagfellevurdering %{reviewee}. Følg lenken nedenfor for å gjennomgå dem!"
+        body: "Du har blitt invitert til hverandrevurdering %{reviewee}. Følg lenken nedenfor for å gjennomgå dem!"
     pseudonym_registration: 
       email: 
         body: "Du har blitt registrert for en Canvas-konto på %{account}. Før du kan logge inn og begynne å bruke Canvas må du fullføre konfigurasjonsprosessen."
@@ -11622,7 +11679,7 @@ nb:
   moderated_grading_e6127f72: "Moderert vurdering"
   moderated_grading_setting_cannot_be_changed_if_gra_ba939ce2: "Moderert vurderingsinnstilling kan ikke endres dersom det eksisterer karaktersatte innleveringer"
   moderated_grading_setting_cannot_be_enabled_for_gr_d81fb43b: "Moderert vurderingsinnstilling kan ikke aktiveres for gruppeoppgaver"
-  moderated_grading_setting_cannot_be_enabled_for_pe_fc7b5b8b: "Moderert vurderingsinnstilling kan ikke aktiveres for fagfellevurderte innleveringer"
+  moderated_grading_setting_cannot_be_enabled_for_pe_fc7b5b8b: "Moderert vurderingsinnstilling kan ikke aktiveres for hverandrevurderte innleveringer"
   moderated_grading_setting_cannot_be_enabled_for_un_e40e6cd4: "Moderert vurderingsinnstilling kan ikke aktiveres for innleveringer uten karakter"
   moderator_49b9f2e1: Moderator
   moderator_sortorder_18063692: "Administrator %{sortOrder}"
@@ -11799,6 +11856,7 @@ nb:
   more_courses_5ebbe998: "Flere emner"
   more_info_at_course_name_56dc8c10: "Mer info på %{course_name}"
   more_information_3dfb76b5: "Mer informasjon"
+  more_results_were_added_at_the_bottom_of_the_page_dc323877: "Flere resultater ble lagt til på bunnen av siden."
   more_than_999_submissions_need_grading_bc087dd0: "Mer enn 999 innleveringer trenger karaktersetting"
   more_than_9_submissions_need_grading_30157d49: "Mer enn 9 innleveringer krever vurdering"
   more_than_a19b440: "%{more_than}+"
@@ -11990,6 +12048,7 @@ nb:
   nickname_7df95b09: "Kallenavn:"
   no_74e9b590: nei
   no_assignment_name_adbb215b: "Ingen oppgavenavn"
+  no_assignments_with_that_name_found_1d7be1: "Ingen oppdrag med det navnet funnet"
   no_associated_terms_13bacefc: "Ingen assosierte semestre"
   no_attributes_locked_611c5cc: "ingen låste attributter"
   no_broken_links_found_38d951e3: "Ingen lenkebrudd funnet"
@@ -12017,6 +12076,7 @@ nb:
   no_ltis_configured_f4b9bc6b: "Ingen LTI'er konfigurert"
   no_matching_users_found_83889c10: "Ingen matchende brukere funnet."
   no_migration_file: "En fil er påkrevet for innholdsflytting."
+  no_more_results_to_load_6774fb1c: "Ingen flere resultater å laste."
   no_outcome_file_or_authority_given_c90f9c5f: "Ingen resultatfil eller autoritet gitt"
   no_password_was_given_472222e5: "Intet passord oppgitt"
   no_placements_enabled_f705f28: "Ingen plasseringer aktivert"
@@ -12024,6 +12084,7 @@ nb:
   no_points_possible_72db3a55: "Ingen mulige poeng"
   no_results_f36777ee: "Ingen resultater"
   no_results_found_58717065: "Ingen resultater funnet"
+  no_results_found_e4b686bd: "Ingen resultater funnet."
   no_score_yet_c94e919b: "Ingen resultat ennå"
   no_students_dd8de9f0: "Ingen studenter"
   no_students_have_taken_the_quiz_yet_e667644b: "Ingen studenter har tatt testen"
@@ -12053,8 +12114,8 @@ nb:
   not_installed_37a21a76: "Ikke installert"
   not_now_97efd947: "Ikke nå"
   not_published_73f7079: "Ikke publisert"
-  not_starred_no_subject_click_to_star_adfefe93: "'Uten stjerne \"(uten emne)\", klikk for å sette stjerne."
-  not_starred_no_subject_click_to_star_dc91380: "Uten stjerne \"(Uten emne)\", klikk for å sette stjerne."
+  not_starred_no_subject_click_to_star_adfefe93: "'Uten stjerne \"(uten tittel)\", klikk for å sette stjerne."
+  not_starred_no_subject_click_to_star_dc91380: "Uten stjerne \"(Uten tittel)\", klikk for å sette stjerne."
   not_starred_subject_click_to_star_4ea6eb64: "Uten stjerne \"%{subject}\", klikk for å sette stjerne."
   not_submitted_7d05fdb4: "Ikke levert"
   not_synced_529cbf29: "Ikke synkronisert"
@@ -12174,7 +12235,7 @@ nb:
         * Nettkonferanse
         * Gruppe
         * Samarbeid
-        * Fagfellevurdering og påminnelse
+        * Hverandrevurdering og påminnelse
     invitation_display: Invitasjon
     late_grading_description: |-
         *Kun instruktør og admin:*
@@ -12262,7 +12323,7 @@ nb:
       updated_wiki_page: "Oppdaterte wikiside"
       web_conference_invitation: "Invitasjon til nettkonferanse"
       web_conference_recording_ready: "Konferanseopptak klart"
-    no_subject: "Intet emne"
+    no_subject: "Intet tittel"
     other_description: |-
         *Kun Instruktør og Administrator:*
         
@@ -12727,12 +12788,12 @@ nb:
   paypal: 
     exception: "Beklager, en avvik har oppstått. Prøv igjen senere."
   pdf_d8236d9a: PDF
-  peer_review_for_assignment_ce72fc52: "Fagfellevurdering for %{assignment}"
-  peer_reviewed_graded_discussion_b339df5b: "Fagfellevurdert gradert diskusjon:"
+  peer_review_for_assignment_ce72fc52: "Hverandrevurdering for %{assignment}"
+  peer_reviewed_graded_discussion_b339df5b: "Hverandrevurdert gradert diskusjon:"
   peer_reviews_api: 
     errors: 
       delete_reminder_failed: "Sletting mislyktes"
-  peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "Fagfellevurderinger kan ikke aktiveres for modererte oppdrag "
+  peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "Hverandrevurderinger kan ikke aktiveres for modererte oppdrag "
   penalty_adjusted_707df573: "*%{penalty}* **%{adjusted}**"
   pending_3e506a5b: Avventer
   pending_message_2d9a8796: "Avventer: %{message}"
@@ -16270,7 +16331,7 @@ nb:
       for_title: "for %{title}"
       labels: 
         body: Melding
-        subject: Emne
+        subject: Tittel
       message_students_who: "Send melding til studenter som…"
       message_type: Meldingstype
       out_of_points: "av %{points_possible}"
@@ -16475,6 +16536,9 @@ nb:
       titles: 
         full_comments: "Klikk for å se alle kommentarer"
         linked_to_learning_outcome: "Dette kriteriet er koblet til et læringsresultat"
+    rubrics_component: 
+      links: 
+        assign_rubric: "Tildel vurderingsveiledning"
     select_content_dialog: 
       add_to_module: "Legg til %{item} til *modul*"
       assignment_item: Oppgave
@@ -16834,6 +16898,7 @@ nb:
   something_is_broken_but_i_can_work_around_it_for_n_7fcedb9d: "Noe er ødelagt, men jeg kan omgå det inntil videre"
   something_went_wrong_inactivating_the_user_please__ea7d0001: "Noe gikk galt med å inaktivere brukeren. Vennligst forsøk igjen senere."
   something_went_wrong_please_try_again_6d337b6c: "Noe gikk galt, prøv igjen"
+  something_went_wrong_please_try_refreshing_the_pag_4e14a67: "Noe gikk galt. Vennligst prøv å oppdatere siden. Hvis problemet vedvarer kan det være for mange poster \"%{assignmentTitle}\" å laste SpeedGrader."
   something_went_wrong_re_activating_the_user_please_82c3e7a: "Noe gikk galt med å re-aktivere brukeren. Vennligst forsøk igjen senere."
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "Noe gikk galt under oppdateringen av brukerrollen. Vennligst forsøk igjen senere."
   something_went_wrong_when_trying_to_sync_grades_to_592c4c35: "Noe gikk galt ved et forsøk på å synkronisere karakterer til studentinformasjonssystemet. Vennligst prøv igjen senere."
@@ -16844,9 +16909,11 @@ nb:
   sortable_name_73f707cf: "Navn for sortering"
   sorted_ascending_1f9b52c6: "Sortere stigende"
   sorted_ascending_2318ec99: "Sortert Stigende"
+  sorted_ascending_3138603c: "sortert stigende."
   sorted_ascending_b6d61547: "sortert stigende"
   sorted_descending_1e30f0d5: "sortert synkende"
   sorted_descending_7fcec1ff: "Sortert Stigende"
+  sorted_descending_84ec84c8: "sortert avtagende."
   sorted_descending_d9aa3cf8: "Sortere synkende"
   source_code_2395ca74: "kilde kode"
   south_korea_16d43049: Sør-Korea
@@ -16900,8 +16967,8 @@ nb:
     previous_object: "Forrige %{type}"
     student_hidden_name: "Student %{position}"
   sso_settings_ebf98263: SSO-innstillinger
-  starred_no_subject_click_to_unstar_3191d64: "Med stjerne \"(Uten emne)\", klikk for å fjerne stjerne."
-  starred_no_subject_click_to_unstar_bff04bce: "Med stjerne \"(Uten emne)\", klikk for å fjerne stjerne."
+  starred_no_subject_click_to_unstar_3191d64: "Med stjerne \"(Uten tittel)\", klikk for å fjerne stjerne."
+  starred_no_subject_click_to_unstar_bff04bce: "Med stjerne \"(Uten tittel)\", klikk for å fjerne stjerne."
   starred_subject_click_to_unstar_6aafcddc: "Med stjerne \"%{subject}\", klikk for å fjerne stjerne."
   start_date_c41cb23a: "Startdato:"
   start_date_e937be8a: Startdato
@@ -16944,7 +17011,7 @@ nb:
   stop_acting_as_user_8809a97f: "Avslutt «Opptre som bruker»"
   storage_used_in_mb_c75fbd9c: "Lagringsplass brukt i MB"
   stream_items_api: 
-    assessment_request_title: "Fagfellevurdering for %{title}"
+    assessment_request_title: "Hverandrevurdering for %{title}"
   student_5da6bfd1: Student
   student_921b864d: student
   student_assignment_outcome_map_title: "Studentens kompetanse"
@@ -17012,6 +17079,7 @@ nb:
   students_will_automatically_receive_full_credit_on_cc61df39: "studentene vil automatisk få full skår så fort de har tatt undersøkelsen"
   students_with_no_submissions_title: "Studenter uten innleveringer"
   studentsperrangecount_out_of_totalstudentsenrolled_90cbfaf1: "%{studentsPerRangeCount} ut av %{totalStudentsEnrolled} studenter"
+  sub_account_daeadd0: Under-konto
   sub_accounts: 
     alerts: 
       subaccount_has_courses: "Du kan ikke slette en underkonto som har emner"
@@ -17043,8 +17111,8 @@ nb:
       other: "%{count} underkontoer"
   subaccount_91f4c279: Underkonto
   subdomain_url_1e43b6f0: "Subdomene URL"
-  subject_114b2e98: Emne
-  subject_must_contain_fewer_than_255_characters_2e72cd02: "Emnet må inneholde maksimalt 255 tegn."
+  subject_114b2e98: Tittel
+  subject_must_contain_fewer_than_255_characters_2e72cd02: "Tittel må inneholde maksimalt 255 tegn."
   subject_reply_to: "Sv: %{subject}"
   submission: 
     atom_no_author: "Ingen forfatter"
@@ -17081,6 +17149,7 @@ nb:
     view_rubric_assessment_in_the_speedgrader: "Vis vurdering av vurderingsveiledning i SpeedGrader"
   submission_in_another_grading_period_e754b329: "Innlevering i en annen vurderingsperiode"
   submission_options_5184a65b: Innleveringsalternativer
+  submission_status_3079e730: Innleveringsstatus
   submission_tray_429ac3df: Innleveringsskuff
   submissions: 
     assignment_submit_success: "Oppgaven ble levert."
@@ -17127,14 +17196,14 @@ nb:
       media_comment: Mediekommentar
       media_comment_link: "Dette er en mediekommentar, *klikk her for å vise*."
       only_see_your_own_comments_muted: "Du kan ikke se alle kommentarene akkurat nå fordi oppgaven er i ferd med å bli rettet"
-      only_see_your_own_comments_peer: "Som fagfellevurdering vil du kun se kommentarer du selv har gitt."
+      only_see_your_own_comments_peer: "Som hverandrevurdering vil du kun se kommentarer du selv har gitt."
       options: 
         new_assessment: "[Ny vurdering]"
       out_of_points: "av %{points_possible}"
-      peer_review: Fagfellevurdering
-      peer_review_not_done: "**Denne fagfellevurdering er ikke ferdig enda.**  For at den skal anses som ferdig, må du legge inn minimum en kommentar."
-      peer_review_not_done_rubric: "**Denne fagfellevurdering er ikke ferdig enda.**  For at den skal anses som ferdig, må du legge inn minst en kommentar og fylle ut skjemaet for vurderingsskjemaet til høyre."
-      peer_review_steps_complete: "Du har fullført de nødvendige trinnene for denne fagfellevurdering."
+      peer_review: Hverandrevurdering
+      peer_review_not_done: "**Denne hverandrevurdering er ikke ferdig enda.**  For at den skal anses som ferdig, må du legge inn minimum en kommentar."
+      peer_review_not_done_rubric: "**Denne hverandrevurdering er ikke ferdig enda.**  For at den skal anses som ferdig, må du legge inn minst en kommentar og fylle ut skjemaet for vurderingsskjemaet til høyre."
+      peer_review_steps_complete: "Du har fullført de nødvendige trinnene for denne hverandrevurdering."
       see_vericite_results: "Se VeriCite resultater"
       sent_to_whole_group: "Send kommentar til hele gruppen"
       show_rubric: "Vis rubrikk, vurderingsveiledning"
@@ -17428,7 +17497,7 @@ nb:
       Takk,
       Canvas Support
   the_message_you_sent_with_the_subject_line_subject_c73f92e4: |-
-      Meldingen du sendte med emnelinjen "%{subject}" ble ikke levert. For å svare på Canvas-meldinger fra denne e-posten må du først bekrefte informasjonskanalen i Canvas-profilen din. Vennligst besøk profilen din og send en bekreftelses e-post på nytt til denne e-postadressen [Se https://community.canvaslms.com/docs/DOC-2281]. Du kan også kontakte denne personen via Canvas-innboks [Se https://community.canvaslms.com/docs/DOC-2670].
+      Meldingen du sendte med tittellinjen "%{subject}" ble ikke levert. For å svare på Canvas-meldinger fra denne e-posten må du først bekrefte informasjonskanalen i Canvas-profilen din. Vennligst besøk profilen din og send en bekreftelses e-post på nytt til denne e-postadressen [Se https://community.canvaslms.com/docs/DOC-2281]. Du kan også kontakte denne personen via Canvas-innboks [Se https://community.canvaslms.com/docs/DOC-2670].
       
       Takk
       Canvas brukerstøtte
@@ -18927,8 +18996,8 @@ nb:
   you_ve_been_invited_to_course_course_role_role_typ_b8ab8f22: "Du er invitert til %{course}. Kursrolle: %{role_type}"
   you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "Du er invitert til å delta på en forelesning på %{website}. Emnet heter %{course}. Emnerolle: %{role_type}"
   you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "Du er invitert til å delta på %{course} emnet. Emnerolle: %{role_type}"
-  you_ve_been_invited_to_peer_review_reviewee_82580fb: "Du er invitert til fagfellevurdering %{reviewee}."
-  you_ve_been_invited_to_peer_review_reviewee_follow_2e71fce2: "Du er invitert til fagfellevurdering %{reviewee}. Følg denne lenken for å se igjennom %{link}."
+  you_ve_been_invited_to_peer_review_reviewee_82580fb: "Du er invitert til hverandrevurdering %{reviewee}."
+  you_ve_been_invited_to_peer_review_reviewee_follow_2e71fce2: "Du er invitert til hverandrevurdering %{reviewee}. Følg denne lenken for å se igjennom %{link}."
   you_ve_been_invited_to_the_course_course_2aac8140: "Du har blitt invitert til, %{course}."
   you_ve_been_invited_to_the_course_course_course_ro_a74d748b: "Du er invitert til emnet, %{course}. Emnerolle: %{role_type}"
   you_ve_been_reminded_to_assess_rubric_context_70eeb600: "Du har blitt påminnet om å vurdere %{rubric}, %{context}."

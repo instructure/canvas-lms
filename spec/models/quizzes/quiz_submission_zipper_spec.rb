@@ -18,98 +18,99 @@
 require File.expand_path File.dirname(__FILE__) + '/../../spec_helper.rb'
 
 describe Quizzes::QuizSubmissionZipper do
-
-  let(:attachments) do
-    [
-      stub(:id => 1, :display_name => "Foobar.ppt"),
-      stub(:id => 2, :display_name => "Cats.docx"),
-      stub(:id => 3, :display_name => "Pandas.png"),
-      stub(:id => 4)
-    ]
-  end
-  let(:submissions) do
-    [
-      stub(:user => stub(:id => 1,:last_name_first => "Dale Tom"),
-           :submission_data => [{
-             :attachment_ids => ["1"],
-             :question_id => 1,
-             :was_preview => false}]),
-      stub(:user => stub(:id => 2, :last_name_first => "Florence Ryan"),
-           :submission_data =>[{
-             :question_id => 2,
-             :attachment_ids => ["2"],
-             :was_preview => false}]),
-      # Teacher upload from Quiz preview:
-      stub(:user => stub(:id => nil, :last_name_first => "Petty Bryan"),
-           :submission_data =>[{
-             :question_id => 3,
-             :attachment_ids => ["3"],
-             :was_preview => true}]),
-      stub(:user => nil, :submission_data => [{}])
-    ]
-  end
-  let(:submission_stubs) do
-    submissions.map do |sub|
-      stub(
-        :latest_submitted_attempt => sub,
-        :was_preview => sub.submission_data.first[:was_preview]
-      )
-    end
-  end
-  let(:zip_attachment) { stub(:id => 1, :user => nil) }
-
-  before :once do
-    @student = course_with_student
-    @quiz = course_quiz !!:active
-  end
-
-  before :each do
-    @quiz.stubs(:quiz_submissions).returns submission_stubs
-    Attachment.stubs(:where).with(:id => ["1","2"]).returns [attachments.first,attachments.second]
-    @zipper = Quizzes::QuizSubmissionZipper.new(:quiz => @quiz,
-                                       :zip_attachment => zip_attachment)
-  end
-
-  describe "#initialize" do
-
-    it "finds the submissions for the given quiz" do
-      filtered_submission = submissions.slice!(2)
-      expect(@zipper.submissions).to include(*submissions)
-      expect(@zipper.submissions).not_to include(filtered_submission)
-    end
-
-    it "stores the passed zip attachment" do
-      expect(@zipper.zip_attachment).to eq zip_attachment
-    end
-
-    it "finds and stores attachments for all the submissions" do
-      expect(@zipper.attachments).to eq({
-        1 => attachments.first,
-        2 => attachments.second
-      })
-    end
-
-    it "sets the filename" do
-      expect(@zipper.filename).to eq(
-        "#{@quiz.context.short_name_slug}-#{@quiz.title} submissions"
-      )
-    end
-  end
-
-  describe "#attachments_with_filenames" do
-
-    it "returns the correct attachment and file name for each attachment" do
-      expect(@zipper.attachments_with_filenames).to eq [
-        [attachments.first, "dale_tom1_question_1_1_Foobar.ppt"],
-        [attachments.second, "florence_ryan2_question_2_2_Cats.docx"]
+  context "common" do
+    let(:attachments) do
+      [
+        double(:id => 1, :display_name => "Foobar.ppt"),
+        double(:id => 2, :display_name => "Cats.docx"),
+        double(:id => 3, :display_name => "Pandas.png"),
+        double(:id => 4)
       ]
+    end
+    let(:submissions) do
+      [
+        double(:user => double(:id => 1,:last_name_first => "Dale Tom"),
+             :submission_data => [{
+               :attachment_ids => ["1"],
+               :question_id => 1,
+               :was_preview => false}]),
+        double(:user => double(:id => 2, :last_name_first => "Florence Ryan"),
+             :submission_data =>[{
+               :question_id => 2,
+               :attachment_ids => ["2"],
+               :was_preview => false}]),
+        # Teacher upload from Quiz preview:
+        double(:user => double(:id => nil, :last_name_first => "Petty Bryan"),
+             :submission_data =>[{
+               :question_id => 3,
+               :attachment_ids => ["3"],
+               :was_preview => true}]),
+        double(:user => nil, :submission_data => [{}])
+      ]
+    end
+    let(:submission_stubs) do
+      submissions.map do |sub|
+        double(
+          :latest_submitted_attempt => sub,
+          :was_preview => sub.submission_data.first[:was_preview]
+        )
+      end
+    end
+    let(:zip_attachment) { double(:id => 1, :user => nil) }
+
+    before :once do
+      @student = course_with_student
+      @quiz = course_quiz !!:active
+    end
+
+    before :each do
+      allow(@quiz).to receive(:quiz_submissions).and_return submission_stubs
+      allow(Attachment).to receive(:where).with(id: ["1", "2"]).and_return([attachments.first, attachments.second])
+      @zipper = Quizzes::QuizSubmissionZipper.new(:quiz => @quiz,
+                                         :zip_attachment => zip_attachment)
+    end
+
+    describe "#initialize" do
+
+      it "finds the submissions for the given quiz" do
+        filtered_submission = submissions.slice!(2)
+        expect(@zipper.submissions).to include(*submissions)
+        expect(@zipper.submissions).not_to include(filtered_submission)
+      end
+
+      it "stores the passed zip attachment" do
+        expect(@zipper.zip_attachment).to eq zip_attachment
+      end
+
+      it "finds and stores attachments for all the submissions" do
+        expect(@zipper.attachments).to eq({
+          1 => attachments.first,
+          2 => attachments.second
+        })
+      end
+
+      it "sets the filename" do
+        expect(@zipper.filename).to eq(
+          "#{@quiz.context.short_name_slug}-#{@quiz.title} submissions"
+        )
+      end
+    end
+
+    describe "#attachments_with_filenames" do
+
+      it "returns the correct attachment and file name for each attachment" do
+        expect(@zipper.attachments_with_filenames).to eq [
+          [attachments.first, "dale_tom1_question_1_1_Foobar.ppt"],
+          [attachments.second, "florence_ryan2_question_2_2_Cats.docx"]
+        ]
+      end
     end
   end
 
   describe "#zip!" do
 
     it "creates a zip file with all the necessary info" do
-      Attachment.unstub(:where)
+      local_storage!
       course_with_student :active_all => true
       student = @student
       quiz = course_quiz !!:active

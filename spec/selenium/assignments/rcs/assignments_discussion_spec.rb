@@ -33,10 +33,6 @@ describe "discussion assignments" do
     stub_rcs_config
   end
 
-  after(:each) do
-    unstub_rcs_config
-  end
-
   context "created with 'more options'" do
     it "should redirect to the discussion new page and maintain parameters", priority: "1", test_id: 209966 do
       ag = @course.assignment_groups.create!(:name => "Stuff")

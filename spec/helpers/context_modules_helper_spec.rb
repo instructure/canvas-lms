@@ -77,7 +77,7 @@ describe ContextModulesHelper do
 
     before do
       @context = t_course
-      ConditionalRelease::Service.stubs(:rules_for).returns([
+      allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
         {
           trigger_assignment: assg.id,
           locked: false,
@@ -87,7 +87,7 @@ describe ContextModulesHelper do
     end
 
     it "should not set mastery_paths if cyoe is disabled" do
-      ConditionalRelease::Service.expects(:rules_for).never
+      expect(ConditionalRelease::Service).to receive(:rules_for).never
       module_data = process_module_data(t_module, true, false, @student, @session)
       item_data = module_data[:items_data][item.id]
       expect(item_data[:mastery_paths]).to be nil
@@ -107,7 +107,7 @@ describe ContextModulesHelper do
     end
 
     it "should set show_cyoe_placeholder to true if no set has been selected and the rule is locked" do
-      ConditionalRelease::Service.stubs(:rules_for).returns([
+      allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
         {
           trigger_assignment: assg.id,
           locked: true,
@@ -127,7 +127,7 @@ describe ContextModulesHelper do
     end
 
     it "should set show_cyoe_placeholder to false if no set has been selected and no sets are available" do
-      ConditionalRelease::Service.stubs(:rules_for).returns([
+      allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
         {
           trigger_assignment: assg.id,
           locked: false,
@@ -141,7 +141,7 @@ describe ContextModulesHelper do
     end
 
     it "should set show_cyoe_placeholder to false if set has been selected for a cyoe trigger assignment module item" do
-      ConditionalRelease::Service.stubs(:rules_for).returns([
+      allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
         {
           selected_set_id: 1,
           trigger_assignment: assg.id,
@@ -158,13 +158,13 @@ describe ContextModulesHelper do
 
   describe "add_mastery_paths_to_cache_key" do
     before do
-      ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
-      ConditionalRelease::Service.stubs(:rules_for).returns([1, 2, 3])
-      ConditionalRelease::Service.stubs(:active_rules).returns([1, 2, 3])
+      allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
+      allow(ConditionalRelease::Service).to receive(:rules_for).and_return([1, 2, 3])
+      allow(ConditionalRelease::Service).to receive(:active_rules).and_return([1, 2, 3])
     end
 
     it "does not affect cache keys unless mastery paths enabled" do
-      ConditionalRelease::Service.stubs(:enabled_in_context?).returns(false)
+      allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(false)
       student_in_course(course: t_course, active_all: true)
       cache = add_mastery_paths_to_cache_key('foo', t_course, t_module, @student)
       expect(cache).to eq 'foo'
@@ -183,7 +183,7 @@ describe ContextModulesHelper do
       s1 = student_in_course(course: t_course, active_all: true)
       s2 = student_in_course(course: t_course, active_all: true)
       cache1 = add_mastery_paths_to_cache_key('foo', t_course, t_module, s1.user)
-      ConditionalRelease::Service.stubs(:rules_for).returns([3, 2, 1])
+      allow(ConditionalRelease::Service).to receive(:rules_for).and_return([3, 2, 1])
       cache2 = add_mastery_paths_to_cache_key('foo', t_course, t_module, s2.user)
       expect(cache1).not_to eq cache2
     end
@@ -201,7 +201,7 @@ describe ContextModulesHelper do
       t1 = teacher_in_course(course: t_course)
       t2 = teacher_in_course(course: t_course)
       cache1 = add_mastery_paths_to_cache_key('foo', t_course, t_module, t1.user)
-      ConditionalRelease::Service.stubs(:active_rules).returns([3, 2, 1])
+      allow(ConditionalRelease::Service).to receive(:active_rules).and_return([3, 2, 1])
       cache2 = add_mastery_paths_to_cache_key('foo', t_course, t_module, t2.user)
       expect(cache1).not_to eq cache2
     end

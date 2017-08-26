@@ -19,8 +19,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe "RequestContextGenerator" do
   let(:env) { {} }
-  let(:request) { stub('Rack::Request', path_parameters: { controller: 'users', action: 'index' }) }
-  let(:context) { stub('Course', class: 'Course', id: 15) }
+  let(:request) { double('Rack::Request', path_parameters: { controller: 'users', action: 'index' }) }
+  let(:context) { double('Course', class: 'Course', id: 15) }
 
   it "should generate the X-Canvas-Meta response header" do
     _, headers, _ = RequestContextGenerator.new(->(env) {

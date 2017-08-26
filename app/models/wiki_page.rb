@@ -55,6 +55,8 @@ class WikiPage < ActiveRecord::Base
     if: proc { self.context.try(:feature_enabled?, :conditional_release) }
   before_save :set_revised_at
   before_validation :ensure_unique_title
+
+  before_save :ensure_context
   after_save  :touch_wiki_context
   after_save  :update_assignment,
     if: proc { self.context.try(:feature_enabled?, :conditional_release) }
@@ -85,6 +87,13 @@ class WikiPage < ActiveRecord::Base
 
   TITLE_LENGTH = 255
   SIMPLY_VERSIONED_EXCLUDE_FIELDS = [:workflow_state, :editing_roles, :notify_of_update].freeze
+
+  def ensure_context
+    # TODO: get rid of once all existing wiki pages have their context populated and wiki page creation methods can be rewritten
+    # e.g. course.wiki.wiki_pages.create -> course.wiki_pages.create
+    self.context_type ||= self.context.class.base_class.name
+    self.context_id ||= self.context.id
+  end
 
   def touch_wiki_context
     self.wiki.touch_context if self.wiki && self.wiki.context
@@ -354,7 +363,7 @@ class WikiPage < ActiveRecord::Base
     end
   end
 
-  def context(user=nil)
+  def context
     shard.activate do
       @context ||= association(:wiki).loaded? ? wiki.context : (Course.where(wiki_id: self.wiki_id).first || Group.where(wiki_id: self.wiki_id).first)
     end

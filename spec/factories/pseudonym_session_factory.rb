@@ -22,7 +22,7 @@ module Factories
     end
 
     unless pseudonym
-      pseudonym = stub(
+      pseudonym = double(
         'Pseudonym',
         :record => user,
         :user_id => user.id,
@@ -34,16 +34,20 @@ module Factories
       # at least one thing cares about the id of the pseudonym... using the
       # object_id should make it unique (but obviously things will fail if
       # it tries to load it from the db.)
-      pseudonym.stubs(:id).returns(pseudonym.object_id)
-      pseudonym.stubs(:unique_id).returns('unique_id')
+      allow(pseudonym).to receive(:id).and_return(pseudonym.object_id)
+      allow(pseudonym).to receive(:unique_id).and_return('unique_id')
     end
 
-    session = stub('PseudonymSession', :record => pseudonym, :session_credentials => nil)
+    session = double('PseudonymSession', :record => pseudonym, :session_credentials => nil)
 
-    PseudonymSession.stubs(:find).returns(session)
+    @session_stubbed = true
+    allow(PseudonymSession).to receive(:find).and_wrap_original do |original|
+      next original.call unless @session_stubbed
+      session
+    end
   end
 
   def remove_user_session
-    PseudonymSession.unstub(:find)
+    @session_stubbed = false
   end
 end

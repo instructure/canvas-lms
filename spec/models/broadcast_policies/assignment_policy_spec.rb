@@ -21,13 +21,13 @@ require_dependency "broadcast_policies/assignment_policy"
 module BroadcastPolicies
   describe AssignmentPolicy do
     let(:context) {
-      ctx = mock()
-      ctx.stubs(:available?).returns(true)
-      ctx.stubs(:concluded?).returns(false)
+      ctx = double()
+      allow(ctx).to receive(:available?).and_return(true)
+      allow(ctx).to receive(:concluded?).and_return(false)
       ctx
     }
     let(:assignment) do
-      stub(:context => context,
+      double(:context => context,
            :published? => true, :muted? => false, :created_at => 4.hours.ago,
            :changed_in_state => true, :due_at => Time.zone.now,
            :points_possible => 100, :assignment_changed => false,
@@ -41,7 +41,7 @@ module BroadcastPolicies
 
     describe "#should_dispatch_assignment_created?" do
       before do
-        assignment.stubs(:just_created).returns true
+        allow(assignment).to receive(:just_created).and_return true
       end
 
       it 'is true when an assignment is published on creation' do
@@ -49,9 +49,9 @@ module BroadcastPolicies
       end
 
       it 'is true when the prior version was unpublished' do
-        assignment.stubs(:just_created).returns false
-        assignment.stubs(:workflow_state_was).returns 'unpublished'
-        assignment.stubs(:workflow_state_changed?).returns true
+        allow(assignment).to receive(:just_created).and_return false
+        allow(assignment).to receive(:workflow_state_was).and_return 'unpublished'
+        allow(assignment).to receive(:workflow_state_changed?).and_return true
         expect(policy.should_dispatch_assignment_created?).to be_truthy
       end
 
@@ -62,18 +62,18 @@ module BroadcastPolicies
 
       specify {
         wont_send_when {
-          assignment.stubs(:just_created).returns false
-          assignment.stubs(:workflow_state_was).returns 'published'
-          assignment.stubs(:workflow_state_changed?).returns false
+          allow(assignment).to receive(:just_created).and_return false
+          allow(assignment).to receive(:workflow_state_was).and_return 'published'
+          allow(assignment).to receive(:workflow_state_changed?).and_return false
         }
       }
-      specify { wont_send_when { assignment.stubs(:published?).returns false}}
-      specify { wont_send_when { context.stubs(:concluded?).returns true } }
+      specify { wont_send_when { allow(assignment).to receive(:published?).and_return false}}
+      specify { wont_send_when { allow(context).to receive(:concluded?).and_return true } }
     end
 
     describe '#should_dispatch_assignment_due_date_changed?' do
       before do
-        assignment.stubs(:workflow_state_changed?).returns false
+        allow(assignment).to receive(:workflow_state_changed?).and_return false
       end
 
       it 'is true when the dependent inputs are true' do
@@ -85,17 +85,17 @@ module BroadcastPolicies
         expect(policy.should_dispatch_assignment_due_date_changed?).to be_falsey
       end
 
-      specify { wont_send_when { context.stubs(:available?).returns false } }
-      specify { wont_send_when { context.stubs(:concluded?).returns true } }
-      specify { wont_send_when { assignment.stubs(:just_created).returns true } }
-      specify { wont_send_when { assignment.stubs(:changed_in_state).returns false } }
-      specify { wont_send_when { assignment.stubs(:due_at).returns assignment.due_at_was } }
-      specify { wont_send_when { assignment.stubs(:created_at).returns 2.hours.ago } }
+      specify { wont_send_when { allow(context).to receive(:available?).and_return false } }
+      specify { wont_send_when { allow(context).to receive(:concluded?).and_return true } }
+      specify { wont_send_when { allow(assignment).to receive(:just_created).and_return true } }
+      specify { wont_send_when { allow(assignment).to receive(:changed_in_state).and_return false } }
+      specify { wont_send_when { allow(assignment).to receive(:due_at).and_return assignment.due_at_was } }
+      specify { wont_send_when { allow(assignment).to receive(:created_at).and_return 2.hours.ago } }
     end
 
     describe '#should_dispatch_assignment_changed?' do
       before do
-        assignment.stubs(:workflow_state_changed?).returns false
+        allow(assignment).to receive(:workflow_state_changed?).and_return false
       end
 
       it 'is true when the dependent inputs are true' do
@@ -107,18 +107,18 @@ module BroadcastPolicies
         expect(policy.should_dispatch_assignment_changed?).to be_falsey
       end
 
-      specify { wont_send_when { context.stubs(:available?).returns false } }
-      specify { wont_send_when { context.stubs(:concluded?).returns true } }
-      specify { wont_send_when { assignment.stubs(:just_created).returns true } }
-      specify { wont_send_when { assignment.stubs(:published?).returns false } }
-      specify { wont_send_when { assignment.stubs(:muted?).returns true } }
-      specify { wont_send_when { assignment.stubs(:created_at).returns 20.minutes.ago } }
-      specify { wont_send_when { assignment.stubs(:points_possible_changed?).returns false } }
+      specify { wont_send_when { allow(context).to receive(:available?).and_return false } }
+      specify { wont_send_when { allow(context).to receive(:concluded?).and_return true } }
+      specify { wont_send_when { allow(assignment).to receive(:just_created).and_return true } }
+      specify { wont_send_when { allow(assignment).to receive(:published?).and_return false } }
+      specify { wont_send_when { allow(assignment).to receive(:muted?).and_return true } }
+      specify { wont_send_when { allow(assignment).to receive(:created_at).and_return 20.minutes.ago } }
+      specify { wont_send_when { allow(assignment).to receive(:points_possible_changed?).and_return false } }
     end
 
     describe '#should_dispatch_assignment_unmuted?' do
       before do
-        assignment.stubs(:recently_unmuted).returns true
+        allow(assignment).to receive(:recently_unmuted).and_return true
       end
 
       it 'is true when the dependent inputs are true' do
@@ -130,8 +130,8 @@ module BroadcastPolicies
         expect(policy.should_dispatch_assignment_unmuted?).to be_falsey
       end
 
-      specify { wont_send_when { context.stubs(:available?).returns false } }
-      specify { wont_send_when { assignment.stubs(:recently_unmuted).returns false } }
+      specify { wont_send_when { allow(context).to receive(:available?).and_return false } }
+      specify { wont_send_when { allow(assignment).to receive(:recently_unmuted).and_return false } }
 
     end
   end

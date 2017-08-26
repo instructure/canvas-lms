@@ -22,11 +22,7 @@ module Lti
   describe ToolConsumerProfileCreator do
 
     let(:root_account) do
-      mock('root account') do
-        stubs(:lti_guid).returns('my_guid')
-        stubs(:name).returns('root_account_name')
-        stubs(:feature_enabled?).returns(false)
-      end
+      double('root account', lti_guid: 'my_guid', name: 'root_account_name', feature_enabled?: false)
     end
     let(:account) { double('account', id: 3, root_account: root_account, class:Account) }
     let(:tcp_url) { "http://example.instructure.com/tcp/#{ToolConsumerProfile::DEFAULT_TCP_UUID}" }
@@ -191,7 +187,7 @@ module Lti
         end
 
         it 'adds the ToolProxyReregistrationRequest capability if the feature flag is on' do
-          root_account.stubs(:feature_enabled?).returns(true)
+          allow(root_account).to receive(:feature_enabled?).and_return(true)
 
           expected_capability = IMS::LTI::Models::Messages::ToolProxyReregistrationRequest::MESSAGE_TYPE
           expect(tcp_creator.create.capability_offered).to include expected_capability
@@ -232,7 +228,7 @@ module Lti
 
           let(:dev_key) do
             dev_key = DeveloperKey.create(api_key: 'test-api-key')
-            DeveloperKey.stubs(:find_cached).returns(dev_key)
+            allow(DeveloperKey).to receive(:find_cached).and_return(dev_key)
             dev_key
           end
 

@@ -42,35 +42,35 @@ describe OutcomesController do
 
   describe "GET 'index'" do
     it "should require authorization" do
-      get 'index', :course_id => @course.id
+      get 'index', params: {:course_id => @course.id}
       assert_unauthorized
     end
 
     it "should redirect 'disabled', if disabled by the teacher" do
       user_session(@student)
       @course.update_attribute(:tab_configuration, [{'id'=>15,'hidden'=>true}])
-      get 'index', :course_id => @course.id
+      get 'index', params: {:course_id => @course.id}
       expect(response).to be_redirect
       expect(flash[:notice]).to match(/That page has been disabled/)
     end
 
     it "should assign variables" do
       user_session(@student)
-      get 'index', :course_id => @course.id
+      get 'index', params: {:course_id => @course.id}
       expect(response).to be_success
     end
 
     it "should work in accounts" do
       user_session(@admin)
       account_outcome
-      get 'index', :account_id => @account.id
+      get 'index', params: {:account_id => @account.id}
     end
 
     it "should find a common core group from settings" do
       user_session(@admin)
       account_outcome
       Setting.set(AcademicBenchmark.common_core_setting_key, @outcome_group.id)
-      get 'index', :account_id => @account.id
+      get 'index', params: {:account_id => @account.id}
       expect(assigns[:js_env][:COMMON_CORE_GROUP_ID]).to eq @outcome_group.id
     end
   end
@@ -78,28 +78,28 @@ describe OutcomesController do
   describe "GET 'show'" do
     it "should require authorization" do
       course_outcome
-      get 'show', :course_id => @course.id, :id => @outcome.id
+      get 'show', params: {:course_id => @course.id, :id => @outcome.id}
       assert_unauthorized
     end
 
     it "should not allow students to view outcomes" do
       user_session(@student)
       course_outcome
-      get 'show', :course_id => @course.id, :id => @outcome.id
+      get 'show', params: {:course_id => @course.id, :id => @outcome.id}
       assert_unauthorized
     end
 
     it "should assign variables" do
       user_session(@teacher)
       course_outcome
-      get 'show', :course_id => @course.id, :id => @outcome.id
+      get 'show', params: {:course_id => @course.id, :id => @outcome.id}
       expect(response).to be_success
     end
 
     it "should work in accounts" do
       user_session(@admin)
       account_outcome
-      get 'show', :account_id => @account.id, :id => @outcome.id
+      get 'show', params: {:account_id => @account.id, :id => @outcome.id}
       expect(response).to be_success
     end
 
@@ -110,7 +110,7 @@ describe OutcomesController do
       alignment = @outcome.align(quiz, @course)
 
       user_session(@admin)
-      get 'show', :account_id => @account.id, :id => @outcome.id
+      get 'show', params: {:account_id => @account.id, :id => @outcome.id}
 
       expect(assigns[:alignments].any?{ |a| a.id == alignment.id }).to be_truthy
     end
@@ -121,7 +121,7 @@ describe OutcomesController do
       @course.large_roster = true
       @course.save!
 
-      get 'show', :course_id => @course.id, :id => @outcome.id
+      get 'show', params: {:course_id => @course.id, :id => @outcome.id}
       expect(response).to be_redirect
     end
   end
@@ -129,35 +129,35 @@ describe OutcomesController do
   describe "GET 'details'" do
     it "should require authorization" do
       course_outcome
-      get 'details', :course_id => @course.id, :outcome_id => @outcome.id
+      get 'details', params: {:course_id => @course.id, :outcome_id => @outcome.id}
       assert_unauthorized
     end
 
     it "should assign variables" do
       user_session(@student)
       course_outcome
-      get 'details', :course_id => @course.id, :outcome_id => @outcome.id
+      get 'details', params: {:course_id => @course.id, :outcome_id => @outcome.id}
       expect(response).to be_success
     end
 
     it "should work in accounts" do
       user_session(@admin)
       account_outcome
-      get 'details', :account_id => @account.id, :outcome_id => @outcome.id
+      get 'details', params: {:account_id => @account.id, :outcome_id => @outcome.id}
     end
   end
 
   describe "GET 'user_outcome_results'" do
     it "should require authorization" do
       account_outcome
-      get 'user_outcome_results', :account_id => @account.id, :user_id => @student.id
+      get 'user_outcome_results', params: {:account_id => @account.id, :user_id => @student.id}
       assert_unauthorized
     end
 
     it "should return outcomes for the given user" do
       account_outcome
       user_session(@admin)
-      get 'user_outcome_results', :account_id => @account.id, :user_id => @student.id
+      get 'user_outcome_results', params: {:account_id => @account.id, :user_id => @student.id}
       expect(response).to be_success
       expect(response).to render_template('user_outcome_results')
     end
@@ -168,7 +168,7 @@ describe OutcomesController do
       account_outcome
 
       user_session(@admin)
-      get 'list', :account_id => @account.id
+      get 'list', params: {:account_id => @account.id}
       expect(response).to be_success
       data = json_parse
       expect(data).not_to be_empty
@@ -179,7 +179,7 @@ describe OutcomesController do
       sub_account_1 = @account.sub_accounts.create!
 
       user_session(@admin)
-      get 'list', :account_id => sub_account_1.id
+      get 'list', params: {:account_id => sub_account_1.id}
       expect(response).to be_success
       data = json_parse
       expect(data).not_to be_empty
@@ -189,7 +189,7 @@ describe OutcomesController do
       account_outcome
 
       user_session(@teacher)
-      get 'list', :course_id => @course.id
+      get 'list', params: {:course_id => @course.id}
       expect(response).to be_success
       data = json_parse
       expect(data).not_to be_empty
@@ -206,20 +206,20 @@ describe OutcomesController do
 
     it "should require authorization" do
       course_outcome
-      post 'create', :course_id => @course.id
+      post 'create', params: {:course_id => @course.id}
       assert_unauthorized
     end
 
     it "should not let a student create a outcome" do
       user_session(@student)
-      post 'create', :course_id => @course.id,
-                     :learning_outcome => { :short_description => TEST_STRING }
+      post 'create', params: {:course_id => @course.id,
+                     :learning_outcome => { :short_description => TEST_STRING }}
       assert_unauthorized
     end
 
     it "should allow creating a new outcome with the root group" do
       user_session(@teacher)
-      post 'create', :course_id => @course.id, :learning_outcome => OUTCOME_PARAMS
+      post 'create', params: {:course_id => @course.id, :learning_outcome => OUTCOME_PARAMS}
       expect(response).to be_redirect
       expect(assigns[:outcome]).not_to be_nil
       expect(assigns[:outcome][:description]).to eql("A long description")
@@ -243,8 +243,8 @@ describe OutcomesController do
       expect(outcome_group.id).not_to be_nil
       expect(outcome_group).not_to be_nil
 
-      post 'create', :course_id => @course.id, :learning_outcome_group_id => outcome_group.id,
-                     :learning_outcome => OUTCOME_PARAMS
+      post 'create', params: {:course_id => @course.id, :learning_outcome_group_id => outcome_group.id,
+                     :learning_outcome => OUTCOME_PARAMS}
       expect(response).to be_redirect
       expect(assigns[:outcome]).not_to be_nil
       expect(assigns[:outcome][:description]).to eql("A long description")
@@ -267,22 +267,22 @@ describe OutcomesController do
     end
 
     it "should require authorization" do
-      put 'update', :course_id => @course.id, :id => @outcome.id,
-                    :learning_outcome => { :short_description => TEST_STRING }
+      put 'update', params: {:course_id => @course.id, :id => @outcome.id,
+                    :learning_outcome => { :short_description => TEST_STRING }}
       assert_unauthorized
     end
 
     it "should not let a student update the outcome" do
       user_session(@student)
-      put 'update', :course_id => @course.id, :id => @outcome.id,
-                    :learning_outcome => { :short_description => TEST_STRING }
+      put 'update', params: {:course_id => @course.id, :id => @outcome.id,
+                    :learning_outcome => { :short_description => TEST_STRING }}
       assert_unauthorized
     end
 
     it "should allow updating the outcome" do
       user_session(@teacher)
-      put 'update', :course_id => @course.id, :id => @outcome.id,
-                    :learning_outcome => { :short_description => TEST_STRING }
+      put 'update', params: {:course_id => @course.id, :id => @outcome.id,
+                    :learning_outcome => { :short_description => TEST_STRING }}
       @outcome.reload
       expect(@outcome[:short_description]).to eql TEST_STRING
     end
@@ -294,19 +294,19 @@ describe OutcomesController do
     end
 
     it "should require authorization" do
-      delete 'destroy', :course_id => @course.id, :id => @outcome.id
+      delete 'destroy', params: {:course_id => @course.id, :id => @outcome.id}
       assert_unauthorized
     end
 
     it "should not let a student delete the outcome" do
       user_session(@student)
-      delete 'destroy', :course_id => @course.id, :id => @outcome.id
+      delete 'destroy', params: {:course_id => @course.id, :id => @outcome.id}
       assert_unauthorized
     end
 
     it "should delete the outcome from the database" do
       user_session(@teacher)
-      delete 'destroy', :course_id => @course.id, :id => @outcome.id
+      delete 'destroy', params: {:course_id => @course.id, :id => @outcome.id}
       @outcome.reload
       expect(@outcome).to be_deleted
     end
@@ -334,18 +334,18 @@ describe OutcomesController do
       it "should require teacher authorization" do
         user_session(@student)
         get 'outcome_result',
-          :course_id => @course.id,
+          params: {:course_id => @course.id,
           :outcome_id => @outcome.id,
-          :id => @outcome.learning_outcome_results.last
+          :id => @outcome.learning_outcome_results.last}
         assert_unauthorized
       end
 
       it "should redirect to show quiz when result is a quiz" do
         user_session(@teacher)
         get 'outcome_result',
-          :course_id => @course.id,
+          params: {:course_id => @course.id,
           :outcome_id => @outcome.id,
-          :id => @outcome.learning_outcome_results.last
+          :id => @outcome.learning_outcome_results.last}
         expect(response).to redirect_to(/#{Regexp.quote(course_quiz_history_url(quiz_id: @submission.quiz_id))}/)
       end
     end

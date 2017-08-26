@@ -565,7 +565,7 @@ describe Submission do
       expect(submission).to receive(:grading_period).and_return(grading_period)
       @assignment.submit_homework(@student, body: "a body")
       submission.score = 700
-      submission.apply_late_policy(@late_policy, 1000)
+      submission.apply_late_policy(@late_policy, @assignment)
       expect(submission.score).to eq 700
       expect(submission.points_deducted).to be nil
     end
@@ -574,7 +574,7 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.score = 700
-        submission.apply_late_policy(@late_policy, 1000)
+        submission.apply_late_policy(@late_policy, @assignment)
         expect(submission.score).to eq 400
         expect(submission.points_deducted).to eq 300
       end
@@ -584,7 +584,19 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.score = 700
-        submission.apply_late_policy(nil, 1000)
+        submission.apply_late_policy(nil, @assignment)
+        expect(submission.score).to eq 700
+        expect(submission.points_deducted).to eq 0
+      end
+    end
+
+    it "deducts nothing if the submission is not late" do
+      Timecop.freeze(@date) do
+        @assignment.submit_homework(@student, body: "gary, what have you done?")
+        submission.score = 700
+        allow(submission).to receive(:late?).and_return(false)
+        submission.apply_late_policy(@late_policy, @assignment)
+
         expect(submission.score).to eq 700
         expect(submission.points_deducted).to eq 0
       end
@@ -595,7 +607,7 @@ describe Submission do
         @assignment.submit_homework(@student, body: "a body")
         original_score = 1.3800000000000001
         submission.score = original_score
-        submission.apply_late_policy(@late_policy, 1000)
+        submission.apply_late_policy(@late_policy, @assignment)
         expect(submission.score).to eq original_score
       end
     end
@@ -604,10 +616,10 @@ describe Submission do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.score = 800
-        submission.apply_late_policy(@late_policy, 1000)
+        submission.apply_late_policy(@late_policy, @assignment)
         expect(submission.score).to eq 500
         expect(submission.points_deducted).to eq 300
-        submission.apply_late_policy(@late_policy, 1000)
+        submission.apply_late_policy(@late_policy, @assignment)
         expect(submission.score).to eq 500
         expect(submission.points_deducted).to eq 300
       end
@@ -616,7 +628,7 @@ describe Submission do
     it "applies missing policy if submission is missing" do
       Timecop.freeze(1.day.from_now(@date)) do
         submission.score = nil
-        submission.apply_late_policy(@late_policy, 1000)
+        submission.apply_late_policy(@late_policy, @assignment)
         expect(submission.score).to eq 200
       end
     end
@@ -625,15 +637,128 @@ describe Submission do
       before(:once) do
         @date = Time.zone.local(2017, 1, 15, 12)
         @assignment.update!(due_at: 3.hours.ago(@date), points_possible: 1000, submission_types: "on_paper")
-        @late_policy = late_policy_model(deduct: 10.0, every: :hour, missing: 80.0)
+        @late_policy = late_policy_factory(course: @course, deduct: 10.0, every: :hour, missing: 80.0)
       end
 
-      it "does not deduct from assignment on paper" do
+      it "does not deduct from late assignment" do
         Timecop.freeze(@date) do
           @assignment.submit_homework(@student, body: "a body")
           @assignment.grade_student(@student, grade: 700, grader: @teacher)
           expect(submission.score).to eq 700
-          expect(submission.points_deducted).to eq 0
+          expect(submission.points_deducted).to eq nil
+        end
+      end
+
+      it "does not grade missing assignment" do
+        Timecop.freeze(@date) do
+          submission.apply_late_policy
+          expect(submission.score).to eq nil
+          expect(submission.points_deducted).to eq nil
+        end
+      end
+
+      it "deducts a percentage per interval late if manually marked late" do
+        @assignment.submit_homework(@student, body: "a body")
+        submission.late_policy_status = 'late'
+        submission.seconds_late_override = 4.hours
+        submission.score = 700
+        submission.apply_late_policy(@late_policy, @assignment)
+        expect(submission.score).to be 300.0
+        expect(submission.points_deducted).to eq 400
+      end
+
+      context "when change late_policy_status from late to none" do
+        before do
+          @assignment.course.update!(late_policy: @late_policy)
+          @assignment.submit_homework(@student, body: "a body")
+
+          submission.update!(
+            score: 700,
+            late_policy_status: 'late',
+            seconds_late_override: 4.hours
+          )
+        end
+
+        it "removes late penalty from score" do
+          expect { submission.update!(late_policy_status: 'none') }
+            .to change { submission.score }.from(300).to(700)
+        end
+
+        it "sets points_deducted to 0" do
+          expect { submission.update!(late_policy_status: 'none') }
+            .to change { submission.points_deducted }.from(400).to(0)
+        end
+      end
+
+      context "when changing late_policy_status from none to nil" do
+        before do
+          @assignment.update!(due_at: 1.hour.from_now)
+          @assignment.course.update!(late_policy: @late_policy)
+          @assignment.submit_homework(@student, body: "a body")
+          submission.update!(score: 700, late_policy_status: 'late', seconds_late_override: 4.hours)
+        end
+
+        it "applies the late policy to the score" do
+          expect { submission.update!(late_policy_status: 'none') }
+            .to change { submission.score }.from(300).to(700)
+        end
+
+        it "applies the late policy to points_deducted" do
+          expect { submission.update!(late_policy_status: 'none') }
+            .to change { submission.points_deducted }.from(400).to(0)
+        end
+      end
+
+      it "applies missing policy if submission is manually marked missing" do
+        Timecop.freeze(1.day.from_now(@date)) do
+          submission.score = nil
+          submission.late_policy_status = 'missing'
+          submission.apply_late_policy(@late_policy, @assignment)
+          expect(submission.score).to eq 200
+        end
+      end
+    end
+
+    context "assignment expecting no submission" do
+      before(:once) do
+        @date = Time.zone.local(2017, 1, 15, 12)
+        @assignment.update!(due_at: 3.hours.ago(@date), points_possible: 1000, submission_types: "none")
+        @late_policy = late_policy_factory(course: @course, deduct: 10.0, every: :hour, missing: 80.0)
+      end
+
+      it "does not deduct from late assignment" do
+        Timecop.freeze(@date) do
+          @assignment.submit_homework(@student, body: "a body")
+          @assignment.grade_student(@student, grade: 700, grader: @teacher)
+          expect(submission.score).to eq 700
+          expect(submission.points_deducted).to eq nil
+        end
+      end
+
+      it "does not grade missing assignment" do
+        Timecop.freeze(@date) do
+          submission.apply_late_policy
+          expect(submission.score).to eq nil
+          expect(submission.points_deducted).to eq nil
+        end
+      end
+
+      it "deducts a percentage per interval late if manually marked late" do
+        @assignment.submit_homework(@student, body: "a body")
+        submission.late_policy_status = 'late'
+        submission.seconds_late_override = 4.hours
+        submission.score = 700
+        submission.apply_late_policy(@late_policy, @assignment)
+        expect(submission.score).to eq 300
+        expect(submission.points_deducted).to eq 400
+      end
+
+      it "applies missing policy if submission is manually marked missing" do
+        Timecop.freeze(1.day.from_now(@date)) do
+          submission.score = nil
+          submission.late_policy_status = 'missing'
+          submission.apply_late_policy(@late_policy, @assignment)
+          expect(submission.score).to eq 200
         end
       end
     end
@@ -719,7 +844,7 @@ describe Submission do
   it "should offer the context, if one is available" do
     @course = Course.new
     @assignment = Assignment.new(:context => @course)
-    @assignment.expects(:context).returns(@course)
+    expect(@assignment).to receive(:context).and_return(@course)
 
     @submission = Submission.new
     expect{@submission.context}.not_to raise_error
@@ -760,19 +885,28 @@ describe Submission do
         @submission.with_versioning(:explicit => true) { @submission.save }
       }.to change(SubmissionVersion, :count)
     end
+
+    it "should not fail preload if versionable is nil" do
+      submission_spec_model
+      version = Version.find_by(versionable: @submission)
+      version.update_attribute(:versionable_id, Submission.last.id + 1)
+      expect do
+        ActiveRecord::Associations::Preloader.new.preload([version].map(&:model), :originality_reports)
+      end.not_to raise_error
+    end
   end
 
   it "should ensure the media object exists" do
     assignment_model
     se = @course.enroll_student(user_factory)
-    MediaObject.expects(:ensure_media_object).with("fake", { :context => se.user, :user => se.user })
+    expect(MediaObject).to receive(:ensure_media_object).with("fake", { :context => se.user, :user => se.user })
     @submission = @assignment.submit_homework(se.user, :media_comment_id => "fake", :media_comment_type => "audio")
   end
 
   it "should log submissions with grade changes" do
     submission_spec_model
 
-    Auditors::GradeChange.expects(:record).once
+    expect(Auditors::GradeChange).to receive(:record).once
 
     @submission.score = 5
     @submission.save!
@@ -784,7 +918,7 @@ describe Submission do
   it "should log excused submissions" do
     submission_spec_model
 
-    Auditors::GradeChange.expects(:record).once
+    expect(Auditors::GradeChange).to receive(:record).once
 
     @submission.excused = true
     @submission.save!
@@ -796,7 +930,7 @@ describe Submission do
   it "should log submissions affected by assignment update" do
     submission_spec_model
 
-    Auditors::GradeChange.expects(:record).twice
+    expect(Auditors::GradeChange).to receive(:record).twice
 
     # only graded submissions are updated by assignment
     @submission.score = 111
@@ -810,7 +944,7 @@ describe Submission do
     submission_spec_model
     @submission.grade_it!
 
-    Auditors::GradeChange.expects(:record)
+    expect(Auditors::GradeChange).to receive(:record)
     @assignment.mute!
   end
 
@@ -819,13 +953,13 @@ describe Submission do
     submission_spec_model
     @submission.grade_it!
 
-    Auditors::GradeChange.expects(:record)
+    expect(Auditors::GradeChange).to receive(:record)
     @assignment.unmute!
   end
 
   it "should not log ungraded submission change when assignment muted" do
     submission_spec_model
-    Auditors::GradeChange.expects(:record).never
+    expect(Auditors::GradeChange).to receive(:record).never
     @assignment.mute!
     @assignment.unmute!
   end
@@ -864,7 +998,7 @@ describe Submission do
   end
 
   context "Discussion Topic" do
-    it "should use correct date for its submitted_at value" do
+    it "submitted_at does not change when a second discussion entry is created" do
       course_with_student(:active_all => true)
       @topic = @course.discussion_topics.create(:title => "some topic")
       @assignment = @course.assignments.create(:title => "some discussion assignment")
@@ -873,12 +1007,12 @@ describe Submission do
       @entry1 = @topic.discussion_entries.create(:message => "first entry", :user => @user)
       @topic.assignment_id = @assignment.id
       @topic.save!
-      @submission = @assignment.submissions.where(:user_id => @entry1.user_id).first
-      new_time = Time.now + 30.minutes
-      Time.stubs(:now).returns(new_time)
-      @entry2 = @topic.discussion_entries.create(:message => "second entry", :user => @user)
-      @submission.reload
-      expect((@submission.submitted_at.to_i - @submission.created_at.to_i).abs).to be < 1.minute
+
+      Timecop.freeze(30.minutes.from_now) do
+        expect do
+          @topic.discussion_entries.create(:message => "second entry", :user => @user)
+        end.not_to(change { @assignment.submissions.find_by(user: @user).submitted_at })
+      end
     end
 
     it "should not create multiple versions on submission for discussion topics" do
@@ -1128,8 +1262,8 @@ describe Submission do
     context "Submission Grade Changed" do
       it "should create a message when the score is changed and the grades were already published" do
         Notification.create(:name => 'Submission Grade Changed')
-        @assignment.stubs(:score_to_grade).returns("10.0")
-        @assignment.stubs(:due_at).returns(Time.now  - 100)
+        allow(@assignment).to receive(:score_to_grade).and_return("10.0")
+        allow(@assignment).to receive(:due_at).and_return(Time.now  - 100)
         submission_spec_model
 
         @cc = @user.communication_channels.create(:path => "somewhere")
@@ -1143,8 +1277,8 @@ describe Submission do
 
       it 'doesnt create a grade changed message when theres a quiz attached' do
         Notification.create(:name => 'Submission Grade Changed')
-        @assignment.stubs(:score_to_grade).returns("10.0")
-        @assignment.stubs(:due_at).returns(Time.now  - 100)
+        allow(@assignment).to receive(:score_to_grade).and_return("10.0")
+        allow(@assignment).to receive(:due_at).and_return(Time.now  - 100)
         submission_spec_model
         @quiz = Quizzes::Quiz.create!(:context => @course)
         @submission.quiz_submission = @quiz.generate_submission(@user)
@@ -1161,8 +1295,8 @@ describe Submission do
       it "should not create a message when the score is changed and the grades were already published for a muted assignment" do
         Notification.create(:name => 'Submission Grade Changed')
         @assignment.mute!
-        @assignment.stubs(:score_to_grade).returns("10.0")
-        @assignment.stubs(:due_at).returns(Time.now  - 100)
+        allow(@assignment).to receive(:score_to_grade).and_return("10.0")
+        allow(@assignment).to receive(:due_at).and_return(Time.now  - 100)
         submission_spec_model
 
         @cc = @user.communication_channels.create(:path => "somewhere")
@@ -1177,8 +1311,8 @@ describe Submission do
 
       it "should NOT create a message when the score is changed and the submission was recently graded" do
         Notification.create(:name => 'Submission Grade Changed')
-        @assignment.stubs(:score_to_grade).returns("10.0")
-        @assignment.stubs(:due_at).returns(Time.now  - 100)
+        allow(@assignment).to receive(:score_to_grade).and_return("10.0")
+        allow(@assignment).to receive(:due_at).and_return(Time.now  - 100)
         submission_spec_model
 
         @cc = @user.communication_channels.create(:path => "somewhere")
@@ -1199,7 +1333,7 @@ describe Submission do
 
       it "delegates to can_grade?" do
         [true, false].each do |value|
-          @submission.stubs(:can_grade?).with(@grader).returns(value)
+          allow(@submission).to receive(:can_grade?).with(@grader).and_return(value)
 
           expect(@submission.grants_right?(@grader, :grade)).to eq(value)
         end
@@ -1213,7 +1347,7 @@ describe Submission do
 
       it "delegates to can_autograde?" do
         [true, false].each do |value|
-          @submission.stubs(:can_autograde?).returns(value)
+          allow(@submission).to receive(:can_autograde?).and_return(value)
 
           expect(@submission.grants_right?(nil, :autograde)).to eq(value)
         end
@@ -1292,13 +1426,13 @@ describe Submission do
       @student = User.new
       @student.id = 42
 
-      @course.stubs(:account_membership_allows).with(@grader).returns(true)
-      @course.stubs(:grants_right?).with(@grader, nil, :manage_grades).returns(true)
+      allow(@course).to receive(:account_membership_allows).with(@grader).and_return(true)
+      allow(@course).to receive(:grants_right?).with(@grader, nil, :manage_grades).and_return(true)
 
       @assignment.course = @course
-      @assignment.stubs(:published?).returns(true)
+      allow(@assignment).to receive(:published?).and_return(true)
       grading_period = double("grading_period", closed?: false)
-      @submission.stubs(:grading_period).returns(grading_period)
+      allow(@submission).to receive(:grading_period).and_return(grading_period)
 
       @submission.grader = @grader
       @submission.user = @student
@@ -1311,7 +1445,7 @@ describe Submission do
 
     context 'when assignment is unpublished' do
       before(:each) do
-        @assignment.stubs(:published?).returns(false)
+        allow(@assignment).to receive(:published?).and_return(false)
 
         @status = @submission.grants_right?(@grader, :grade)
       end
@@ -1327,7 +1461,7 @@ describe Submission do
 
     context 'when the grader does not have the right to manage grades for the course' do
       before(:each) do
-        @course.stubs(:grants_right?).with(@grader, nil, :manage_grades).returns(false)
+        allow(@course).to receive(:grants_right?).with(@grader, nil, :manage_grades).and_return(false)
 
         @status = @submission.grants_right?(@grader, :grade)
       end
@@ -1343,9 +1477,9 @@ describe Submission do
 
     context 'when the grader is a teacher and the assignment is in a closed grading period' do
       before(:each) do
-        @course.stubs(:account_membership_allows).with(@grader).returns(false)
+        allow(@course).to receive(:account_membership_allows).with(@grader).and_return(false)
         grading_period = double("grading_period", closed?: true)
-        @submission.stubs(:grading_period).returns(grading_period)
+        allow(@submission).to receive(:grading_period).and_return(grading_period)
 
         @status = @submission.grants_right?(@grader, :grade)
       end
@@ -1361,9 +1495,9 @@ describe Submission do
 
     context "when grader_id is a teacher's id and the assignment is in a closed grading period" do
       before(:each) do
-        @course.stubs(:account_membership_allows).with(@grader).returns(false)
+        allow(@course).to receive(:account_membership_allows).with(@grader).and_return(false)
         grading_period = double("grading_period", closed?: true)
-        @submission.stubs(:grading_period).returns(grading_period)
+        allow(@submission).to receive(:grading_period).and_return(grading_period)
         @submission.grader = nil
         @submission.grader_id = 10
 
@@ -1381,9 +1515,9 @@ describe Submission do
 
     it 'returns true if the grader is an admin even if the assignment is in
         a closed grading period' do
-      @course.stubs(:account_membership_allows).with(@grader).returns(true)
+      allow(@course).to receive(:account_membership_allows).with(@grader).and_return(true)
       grading_period = double("grading_period", closed?: false)
-      @submission.stubs(:grading_period).returns(grading_period)
+      allow(@submission).to receive(:grading_period).and_return(grading_period)
 
       expect(@submission.grants_right?(@grader, :grade)).to be_truthy
     end
@@ -1399,9 +1533,9 @@ describe Submission do
       @submission.grader_id = -1
       @submission.user_id = 10
 
-      @assignment.stubs(:published?).returns(true)
+      allow(@assignment).to receive(:published?).and_return(true)
       grading_period = double("grading_period", closed?: false)
-      @submission.stubs(:grading_period).returns(grading_period)
+      allow(@submission).to receive(:grading_period).and_return(grading_period)
     end
 
     it 'returns true for published assignments with an autograder and when the assignment is not
@@ -1411,7 +1545,7 @@ describe Submission do
 
     context 'when assignment is unpublished' do
       before(:each) do
-        @assignment.stubs(:published?).returns(false)
+        allow(@assignment).to receive(:published?).and_return(false)
 
         @status = @submission.grants_right?(nil, :autograde)
       end
@@ -1444,7 +1578,7 @@ describe Submission do
     context 'when the assignment is in a closed grading period for the student' do
       before(:each) do
         grading_period = double("grading_period", closed?: true)
-        @submission.stubs(:grading_period).returns(grading_period)
+        allow(@submission).to receive(:grading_period).and_return(grading_period)
 
         @status = @submission.grants_right?(nil, :autograde)
       end
@@ -1626,9 +1760,9 @@ describe Submission do
           submission.assignment = a
           submission.turnitin_data = lti_tii_data
           submission.user = @user
-          outcome_response_processor_mock = mock('outcome_response_processor')
-          outcome_response_processor_mock.expects(:resubmit).with(submission, "attachment_42")
-          Turnitin::OutcomeResponseProcessor.stubs(:new).returns(outcome_response_processor_mock)
+          outcome_response_processor_mock = double('outcome_response_processor')
+          expect(outcome_response_processor_mock).to receive(:resubmit).with(submission, "attachment_42")
+          allow(Turnitin::OutcomeResponseProcessor).to receive(:new).and_return(outcome_response_processor_mock)
           submission.retrieve_lti_tii_score
         end
 
@@ -1639,9 +1773,9 @@ describe Submission do
           submission.assignment = a
           submission.turnitin_data = lti_tii_data.merge(last_processed_attempt: 1)
           submission.user = @user
-          outcome_response_processor_mock = mock('outcome_response_processor')
-          outcome_response_processor_mock.expects(:resubmit).with(submission, "attachment_42")
-          Turnitin::OutcomeResponseProcessor.stubs(:new).returns(outcome_response_processor_mock)
+          outcome_response_processor_mock = double('outcome_response_processor')
+          expect(outcome_response_processor_mock).to receive(:resubmit).with(submission, "attachment_42")
+          allow(Turnitin::OutcomeResponseProcessor).to receive(:new).and_return(outcome_response_processor_mock)
           submission.retrieve_lti_tii_score
         end
       end
@@ -1650,8 +1784,8 @@ describe Submission do
     context "submission" do
       def init_turnitin_api
         @turnitin_api = Turnitin::Client.new('test_account', 'sekret')
-        @submission.context.expects(:turnitin_settings).at_least(1).returns([:placeholder])
-        Turnitin::Client.expects(:new).at_least(1).with(:placeholder).returns(@turnitin_api)
+        expect(@submission.context).to receive(:turnitin_settings).at_least(1).and_return([:placeholder])
+        expect(Turnitin::Client).to receive(:new).at_least(1).with(:placeholder).and_return(@turnitin_api)
       end
 
       before(:once) do
@@ -1671,9 +1805,9 @@ describe Submission do
 
       it "should initially set turnitin submission to pending" do
         init_turnitin_api
-        @turnitin_api.expects(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).returns({ :assignment_id => "1234" })
-        @turnitin_api.expects(:enrollStudent).with(@context, @user).returns(stub(:success? => true))
-        @turnitin_api.expects(:submitPaper).returns({
+        expect(@turnitin_api).to receive(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).and_return({ :assignment_id => "1234" })
+        expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(double(:success? => true))
+        expect(@turnitin_api).to receive(:submitPaper).and_return({
           @submission.asset_string => {
             :object_id => '12345'
           }
@@ -1684,17 +1818,17 @@ describe Submission do
 
       it "should schedule a retry if something fails initially" do
         init_turnitin_api
-        @turnitin_api.expects(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).returns({ :assignment_id => "1234" })
-        @turnitin_api.expects(:enrollStudent).with(@context, @user).returns(stub(:success? => false))
+        expect(@turnitin_api).to receive(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).and_return({ :assignment_id => "1234" })
+        expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(double(:success? => false))
         @submission.submit_to_turnitin
         expect(Delayed::Job.list_jobs(:future, 100).find_all { |j| j.tag == 'Submission#submit_to_turnitin' }.size).to eq 2
       end
 
       it "should set status as failed if something fails on a retry" do
         init_turnitin_api
-        @assignment.expects(:create_in_turnitin).returns(false)
-        @turnitin_api.expects(:enrollStudent).with(@context, @user).returns(stub(:success? => false, :error? => true, :error_hash => {}))
-        @turnitin_api.expects(:submitPaper).never
+        expect(@assignment).to receive(:create_in_turnitin).and_return(false)
+        expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(double(:success? => false, :error? => true, :error_hash => {}))
+        expect(@turnitin_api).to receive(:submitPaper).never
         @submission.submit_to_turnitin(Submission::TURNITIN_RETRY)
         expect(@submission.reload.turnitin_data[:status]).to eq 'error'
       end
@@ -1702,9 +1836,9 @@ describe Submission do
       it "should set status back to pending on retry" do
         init_turnitin_api
         # first a submission, to get us into failed state
-        @assignment.expects(:create_in_turnitin).returns(false)
-        @turnitin_api.expects(:enrollStudent).with(@context, @user).returns(stub(:success? => false, :error? => true, :error_hash => {}))
-        @turnitin_api.expects(:submitPaper).never
+        expect(@assignment).to receive(:create_in_turnitin).and_return(false)
+        expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(double(:success? => false, :error? => true, :error_hash => {}))
+        expect(@turnitin_api).to receive(:submitPaper).never
         @submission.submit_to_turnitin(Submission::TURNITIN_RETRY)
         expect(@submission.reload.turnitin_data[:status]).to eq 'error'
 
@@ -1718,7 +1852,7 @@ describe Submission do
         init_turnitin_api
         @submission.turnitin_data ||= {}
         @submission.turnitin_data[@submission.asset_string] = { :object_id => '1234', :status => 'pending' }
-        @turnitin_api.expects(:generateReport).with(@submission, @submission.asset_string).returns({
+        expect(@turnitin_api).to receive(:generateReport).with(@submission, @submission.asset_string).and_return({
           :similarity_score => 56,
           :web_overlap => 22,
           :publication_overlap => 0,
@@ -1733,7 +1867,7 @@ describe Submission do
         init_turnitin_api
         @submission.turnitin_data ||= {}
         @submission.turnitin_data[@submission.asset_string] = { :object_id => '1234', :status => 'pending' }
-        @turnitin_api.expects(:generateReport).with(@submission, @submission.asset_string).returns({})
+        expect(@turnitin_api).to receive(:generateReport).with(@submission, @submission.asset_string).and_return({})
 
         expects_job_with_tag('Submission#check_turnitin_status') do
           @submission.check_turnitin_status(Submission::TURNITIN_STATUS_RETRY-1)
@@ -1751,10 +1885,10 @@ describe Submission do
         @submission.turnitin_data ||= {}
         @submission.turnitin_data[@submission.asset_string] = { :object_id => '1234', :status => 'pending' }
         @submission.turnitin_data["other_asset"] = { :object_id => 'xxyy', :status => 'pending' }
-        @turnitin_api.expects(:generateReport).with(@submission, @submission.asset_string).returns({
+        expect(@turnitin_api).to receive(:generateReport).with(@submission, @submission.asset_string).and_return({
           :similarity_score => 56, :web_overlap => 22, :publication_overlap => 0, :student_overlap => 33
         })
-        @turnitin_api.expects(:generateReport).with(@submission, "other_asset").returns({ :similarity_score => 20 })
+        expect(@turnitin_api).to receive(:generateReport).with(@submission, "other_asset").and_return({ :similarity_score => 20 })
 
         @submission.check_turnitin_status
         @submission.reload
@@ -1764,7 +1898,7 @@ describe Submission do
 
       it "should not blow up if submission_type has changed when job runs" do
         @submission.submission_type = 'online_url'
-        @submission.context.expects(:turnitin_settings).never
+        expect(@submission.context).to receive(:turnitin_settings).never
         expect { @submission.submit_to_turnitin }.not_to raise_error
       end
     end
@@ -1825,8 +1959,8 @@ describe Submission do
 
       before :each do
         api = Turnitin::Client.new('test_account', 'sekret')
-        Turnitin::Client.expects(:new).at_least(1).returns(api)
-        api.expects(:sendRequest).with(:generate_report, 1, has_entries(:oid => "123456789")).at_least(1).returns('http://foo.bar')
+        expect(Turnitin::Client).to receive(:new).at_least(1).and_return(api)
+        expect(api).to receive(:sendRequest).with(:generate_report, 1, include(:oid => "123456789")).at_least(1).and_return('http://foo.bar')
       end
 
       it "should let teachers view the turnitin report" do
@@ -2032,16 +2166,16 @@ describe Submission do
 
   describe "muted_assignment?" do
     it "returns true if assignment is muted" do
-      assignment = stub(:muted? => true)
+      assignment = double(:muted? => true)
       @submission = Submission.new
-      @submission.expects(:assignment).returns(assignment)
+      expect(@submission).to receive(:assignment).and_return(assignment)
       expect(@submission.muted_assignment?).to eq true
     end
 
     it "returns false if assignment is not muted" do
-      assignment = stub(:muted? => false)
+      assignment = double(:muted? => false)
       @submission = Submission.new
-      @submission.expects(:assignment).returns(assignment)
+      expect(@submission).to receive(:assignment).and_return(assignment)
       expect(@submission.muted_assignment?).to eq false
     end
   end
@@ -2050,20 +2184,20 @@ describe Submission do
     let(:submission) { Submission.new }
 
     it "returns false if submission does not has_submission?" do
-      submission.stubs(:has_submission?).returns false
-      submission.stubs(:graded?).returns true
+      allow(submission).to receive(:has_submission?).and_return false
+      allow(submission).to receive(:graded?).and_return true
       expect(submission.without_graded_submission?).to eq false
     end
 
     it "returns false if submission does is not graded" do
-      submission.stubs(:has_submission?).returns true
-      submission.stubs(:graded?).returns false
+      allow(submission).to receive(:has_submission?).and_return true
+      allow(submission).to receive(:graded?).and_return false
       expect(submission.without_graded_submission?).to eq false
     end
 
     it "returns true if submission is not graded and has no submission" do
-      submission.stubs(:has_submission?).returns false
-      submission.stubs(:graded?).returns false
+      allow(submission).to receive(:has_submission?).and_return false
+      allow(submission).to receive(:graded?).and_return false
       expect(submission.without_graded_submission?).to eq true
     end
   end
@@ -2487,7 +2621,7 @@ describe Submission do
       OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
 
       submission.versioned_originality_reports
-      OriginalityReport.expects(:where).never
+      expect(OriginalityReport).to receive(:where).never
       submission.versioned_originality_reports
     end
 
@@ -2537,7 +2671,7 @@ describe Submission do
       OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
 
       Submission.bulk_load_versioned_originality_reports([submission])
-      OriginalityReport.expects(:where).never
+      expect(OriginalityReport).to receive(:where).never
       submission.versioned_originality_reports
     end
 
@@ -2584,7 +2718,7 @@ describe Submission do
 
   context "bulk loading attachments" do
     def ensure_attachments_arent_queried
-      Attachment.expects(:where).never
+      expect(Attachment).to receive(:where).never
     end
 
     def submission_for_some_user
@@ -2710,7 +2844,7 @@ describe Submission do
     end
 
     it "should send a reminder notification" do
-      AssessmentRequest.any_instance.expects(:send_reminder!).once
+      expect_any_instance_of(AssessmentRequest).to receive(:send_reminder!).once
       submission1, submission2 = @assignment.submissions
       submission1.assign_assessor(submission2)
     end
@@ -2719,15 +2853,15 @@ describe Submission do
   describe "#get_web_snapshot" do
     it "should not blow up if web snapshotting fails" do
       sub = submission_spec_model
-      CutyCapt.expects(:enabled?).returns(true)
-      CutyCapt.expects(:snapshot_attachment_for_url).with(sub.url).returns(nil)
+      expect(CutyCapt).to receive(:enabled?).and_return(true)
+      expect(CutyCapt).to receive(:snapshot_attachment_for_url).with(sub.url).and_return(nil)
       sub.get_web_snapshot
     end
   end
 
   describe '#submit_attachments_to_canvadocs' do
     it 'creates crocodoc documents' do
-      Canvas::Crocodoc.stubs(:enabled?).returns true
+      allow(Canvas::Crocodoc).to receive(:enabled?).and_return true
       s = @assignment.submit_homework(@user,
                                       submission_type: "online_text_entry",
                                       body: "hi")
@@ -2756,9 +2890,9 @@ describe Submission do
       end
 
       before do
-        Canvadocs.stubs(:enabled?).returns true
-        Canvadocs.stubs(:annotations_supported?).returns true
-        Canvadocs.stubs(:config).returns {}
+        allow(Canvadocs).to receive(:enabled?).and_return true
+        allow(Canvadocs).to receive(:annotations_supported?).and_return true
+        allow(Canvadocs).to receive(:config).and_return(nil)
       end
 
       it "ties submissions to canvadocs" do
@@ -2996,14 +3130,14 @@ describe Submission do
     end
   end
 
-  describe 'crocodoc_whitelist' do
+  describe 'moderated_grading_whitelist' do
     before(:once) do
       submission_spec_model
     end
 
     context "not moderated" do
       it "returns nil" do
-        expect(@submission.crocodoc_whitelist).to be_nil
+        expect(@submission.moderated_grading_whitelist).to be_nil
       end
     end
 
@@ -3018,14 +3152,14 @@ describe Submission do
       context "grades not published" do
         context "student not in moderation set" do
           it "returns the student alone" do
-            expect(@submission.crocodoc_whitelist).to eq([@student.reload.crocodoc_id!])
+            expect(@submission.moderated_grading_whitelist).to eq([@student.moderated_grading_ids])
           end
         end
 
         context "student in moderation set" do
           it "returns the student alone" do
             @assignment.moderated_grading_selections.create!(student: @student)
-            expect(@submission.crocodoc_whitelist).to eq([@student.reload.crocodoc_id!])
+            expect(@submission.moderated_grading_whitelist).to eq([@student.moderated_grading_ids])
           end
         end
       end
@@ -3039,7 +3173,7 @@ describe Submission do
 
         context "student not in moderation set" do
           it "returns nil" do
-            expect(@submission.crocodoc_whitelist).to be_nil
+            expect(@submission.moderated_grading_whitelist).to be_nil
           end
         end
 
@@ -3049,14 +3183,16 @@ describe Submission do
           end
 
           it "returns nil if no provisional grade was published" do
-            expect(@submission.crocodoc_whitelist).to be_nil
+            expect(@submission.moderated_grading_whitelist).to be_nil
           end
 
           it "returns the student's and selected provisional grader's ids" do
             @sel.provisional_grade = @pg
             @sel.save!
-            expect(@submission.crocodoc_whitelist).to match_array([@student.reload.crocodoc_id!,
-                                                                   @teacher.reload.crocodoc_id!])
+            expect(@submission.moderated_grading_whitelist).to match_array([
+              @student.moderated_grading_ids,
+              @teacher.moderated_grading_ids
+            ])
           end
 
           it "returns the student's, provisional grader's, and moderator's ids for a copied mark" do
@@ -3064,9 +3200,11 @@ describe Submission do
             final = @pg.copy_to_final_mark!(moderator)
             @sel.provisional_grade = final
             @sel.save!
-            expect(@submission.crocodoc_whitelist).to match_array([@student.reload.crocodoc_id!,
-                                                                   @teacher.reload.crocodoc_id!,
-                                                                   moderator.reload.crocodoc_id!])
+            expect(@submission.moderated_grading_whitelist).to match_array([
+              @student.moderated_grading_ids,
+              @teacher.moderated_grading_ids,
+              moderator.moderated_grading_ids
+            ])
           end
         end
       end
@@ -3183,7 +3321,7 @@ describe Submission do
 
     context 'when #grader_can_grade? returns true' do
       before(:each) do
-        @submission.expects(:grader_can_grade?).returns(true)
+        expect(@submission).to receive(:grader_can_grade?).and_return(true)
       end
 
       it 'returns true' do
@@ -3199,7 +3337,7 @@ describe Submission do
 
     context 'when #grader_can_grade? returns false' do
       before(:each) do
-        @submission.expects(:grader_can_grade?).returns(false)
+        expect(@submission).to receive(:grader_can_grade?).and_return(false)
       end
 
       it 'returns false' do
@@ -3220,27 +3358,27 @@ describe Submission do
     end
 
     it "returns true if grade hasn't been changed" do
-      @submission.expects(:grade_changed?).returns(false)
+      expect(@submission).to receive(:grade_changed?).and_return(false)
 
       expect(@submission.grader_can_grade?).to be_truthy
     end
 
     it "returns true if the submission is autograded and the submission can be autograded" do
-      @submission.expects(:grade_changed?).returns(true)
+      expect(@submission).to receive(:grade_changed?).and_return(true)
 
-      @submission.expects(:autograded?).returns(true)
-      @submission.expects(:grants_right?).with(nil, :autograde).returns(true)
+      expect(@submission).to receive(:autograded?).and_return(true)
+      expect(@submission).to receive(:grants_right?).with(nil, :autograde).and_return(true)
 
       expect(@submission.grader_can_grade?).to be_truthy
     end
 
     it "returns true if the submission isn't autograded but can still be graded" do
-      @submission.expects(:grade_changed?).returns(true)
-      @submission.expects(:autograded?).returns(false)
+      expect(@submission).to receive(:grade_changed?).and_return(true)
+      expect(@submission).to receive(:autograded?).and_return(false)
 
       @submission.grader = @grader = User.new
 
-      @submission.expects(:grants_right?).with(@grader, :grade).returns(true)
+      expect(@submission).to receive(:grants_right?).with(@grader, :grade).and_return(true)
 
       expect(@submission.grader_can_grade?).to be_truthy
     end
@@ -3248,9 +3386,9 @@ describe Submission do
     it "returns false if the grade changed but the submission can't be graded at all" do
       @submission.grader = @grader = User.new
 
-      @submission.expects(:grade_changed?).returns(true)
-      @submission.expects(:autograded?).returns(false)
-      @submission.expects(:grants_right?).with(@grader, :grade).returns(false)
+      expect(@submission).to receive(:grade_changed?).and_return(true)
+      expect(@submission).to receive(:autograded?).and_return(false)
+      expect(@submission).to receive(:grants_right?).with(@grader, :grade).and_return(false)
 
       expect(@submission.grader_can_grade?).to be_falsey
     end
@@ -3409,7 +3547,7 @@ describe Submission do
       submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry',
                                                body: 'whee')
 
-      submission.expects(:submit_to_plagiarism_later).once
+      expect(submission).to receive(:submit_to_plagiarism_later).once
       submission.resubmit_to_vericite
     end
   end

@@ -30,6 +30,10 @@ describe Attachments::GarbageCollector do
     end
     let_once(:gc) { Attachments::GarbageCollector::FolderContextType.new }
 
+    before do
+      local_storage!
+    end
+
     it "destroys content and deletes objects" do
       expect(FileUtils).to receive(:rm).with(att.full_filename)
 
@@ -67,15 +71,30 @@ describe Attachments::GarbageCollector do
         uploaded_data: stub_file_data("folder.zip", "hi", "application/zip")
       )
       expect(att2.root_attachment_id).to eq att.id
-      expect(FileUtils).not_to receive(:rm).with(att.full_filename)
 
       gc.delete_content
       expect(att.reload).to be_deleted
       expect(att2.reload.root_attachment_id).to be_nil
+      expect(att2.reload.store.exists?).to be_truthy
 
       gc.delete_rows
       expect { att.reload }.to raise_error(ActiveRecord::RecordNotFound)
       expect(att2.reload).not_to be_deleted
+    end
+
+    it "doesn't worry about deleted children" do
+      att2 = attachment_model(
+        context: course,
+        folder: nil,
+        root_attachment_id: att.id,
+        uploaded_data: stub_file_data("folder.zip", "hi", "application/zip")
+      )
+      expect(att2.root_attachment_id).to eq att.id
+      att2.destroy
+
+      gc.delete_content
+      expect(att.reload).to be_deleted
+      expect(att2.reload.root_attachment_id).not_to be_nil
     end
 
     it "doesn't change anything with dry_run: true" do
@@ -122,6 +141,28 @@ describe Attachments::GarbageCollector do
       gc.delete_content
       expect(att.reload).not_to be_deleted
       expect(att2.reload).not_to be_deleted
+    end
+
+    it "properly delineates child attachment age" do
+      export2 = course.content_exports.create!
+      att2 = attachment_model(
+        context: export2,
+        folder: nil,
+        root_attachment_id: att.id,
+        uploaded_data: stub_file_data("folder.zip", "hi", "application/zip")
+      )
+      export3 = course.content_exports.create!
+      att3 = attachment_model(
+        context: export3,
+        folder: nil,
+        uploaded_data: stub_file_data("folder2.zip", "hi2", "application/zip")
+      )
+      Attachment.where(id: [att.id, att3.id]).update_all(created_at: 2.days.ago)
+
+      gc.delete_content
+      expect(att.reload).not_to be_deleted
+      expect(att2.reload).not_to be_deleted
+      expect(att3.reload).to be_deleted
     end
 
     it "nulls out ContentExport attachment_ids" do

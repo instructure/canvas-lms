@@ -43,8 +43,8 @@ describe ExternalToolsController do
       user_session(@teacher)
       post(
         "/api/v1/courses/#{@course.id}/external_tools",
-        post_body,
-        { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
+        params: post_body,
+        headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
       )
       expect(response).to be_success
       expect(assigns[:tool]).not_to be_nil
@@ -54,8 +54,8 @@ describe ExternalToolsController do
       user_session(@teacher)
       post(
         "/api/v1/courses/#{@course.id}/external_tools",
-        post_body,
-        { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
+        params: post_body,
+        headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
       )
       tool = assigns[:tool]
       expect(tool.settings[:custom_fields]["Complex!@#$^*(){}[]KEY"]).to eq 'Complex!@#$^*;(){}[]½Value'
@@ -81,8 +81,8 @@ describe ExternalToolsController do
       tool = new_valid_tool(@course)
       put(
         "/api/v1/courses/#{@course.id}/external_tools/#{tool.id}",
-        post_body,
-        { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
+        params: post_body,
+        headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
       )
       assert_status(401)
     end
@@ -92,8 +92,8 @@ describe ExternalToolsController do
       tool = new_valid_tool(@course)
       put(
         "/api/v1/courses/#{@course.id}/external_tools/#{tool.id}",
-        post_body,
-        { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
+        params: post_body,
+        headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
       )
       assert_status(200)
     end
@@ -103,8 +103,8 @@ describe ExternalToolsController do
       tool = new_valid_tool(@course)
       put(
         "/api/v1/courses/#{@course.id}/external_tools/#{tool.id}",
-        post_body,
-        { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
+        params: post_body,
+        headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
       )
       expect(response).to be_success
       expect(assigns[:tool]).not_to be_nil
@@ -115,8 +115,8 @@ describe ExternalToolsController do
       tool = new_valid_tool(@course)
       put(
         "/api/v1/courses/#{@course.id}/external_tools/#{tool.id}",
-        post_body,
-        { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
+        params: post_body,
+        headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
       )
 
       expect(assigns[:tool].settings[:custom_fields]["Complex!@#$^*(){}[]KEY"]).to eq 'Complex!@#$^*;(){}[]½Value'
@@ -134,9 +134,10 @@ describe ExternalToolsController do
           shared_secret: 'N/A',
           config_url: 'https://www.edu-apps.org/lti_public_resources/config.xml?id=youtube&name=YouTube&channel_name=jangbricks',
           config_type: 'by_url',
-          name:'YouTube',
+          name: 'YouTube',
           app_center_id: 'pr_youtube',
-          course_navigation: {enabled: true}
+          config_settings: { name: 'YouTube', channel_name: 'foo-bar' },
+          course_navigation: { enabled: true }
         }
       end
 
@@ -170,12 +171,8 @@ describe ExternalToolsController do
         }
       end
 
-      let(:app_api) { mock() }
-
-      before do
-        AppCenter::AppApi.stubs(:new).returns(app_api)
-        app_api.stubs(:fetch_app_center_response).returns(app_center_response)
-        app_api.stubs(:get_app_config_url).returns(app_center_response['config_xml_url'])
+      before(:each) do
+        allow_any_instance_of(AppCenter::AppApi).to receive(:fetch_app_center_response).and_return(app_center_response)
 
         configxml = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'config.youtube.xml'))
         stub_request(:get, app_center_response['config_xml_url']).to_return(body: configxml)
@@ -186,8 +183,8 @@ describe ExternalToolsController do
         user_session(@teacher)
         post(
           "/api/v1/courses/#{@course.id}/create_tool_with_verification",
-          post_body.to_json,
-          {'CONTENT_TYPE' => 'application/json'}
+          params: post_body.to_json,
+          headers: {'CONTENT_TYPE' => 'application/json'}
         )
 
         expect(response).to be_success
@@ -195,17 +192,16 @@ describe ExternalToolsController do
       end
 
       it 'gives error if app_center_id is not provided' do
-        app_api.stubs(:get_app_config_url).returns('')
+        allow_any_instance_of(AppCenter::AppApi).to receive(:get_app_config_url).and_return('')
         user_session(@teacher)
 
         post(
           "/api/v1/courses/#{@course.id}/create_tool_with_verification",
-          post_body.to_json,
-          {'CONTENT_TYPE' => 'application/json'}
+          params: post_body.to_json,
+          headers: {'CONTENT_TYPE' => 'application/json'}
         )
 
         expect(response).not_to be_success
-        app_api.stubs(:get_app_config_url).returns(app_center_response['config_xml_url'])
       end
 
       it 'ignores non-required params' do
@@ -213,8 +209,8 @@ describe ExternalToolsController do
 
         post(
           "/api/v1/courses/#{@course.id}/create_tool_with_verification",
-          post_body.to_json,
-          {'CONTENT_TYPE' => 'application/json'}
+          params: post_body.to_json,
+          headers: {'CONTENT_TYPE' => 'application/json'}
         )
 
         expect(response).to be_success
@@ -227,8 +223,8 @@ describe ExternalToolsController do
 
         post(
           "/api/v1/courses/#{@course.id}/create_tool_with_verification",
-          post_body.to_json,
-          {'CONTENT_TYPE' => 'application/json'}
+          params: post_body.to_json,
+          headers: {'CONTENT_TYPE' => 'application/json'}
         )
 
         expect(response).to be_success

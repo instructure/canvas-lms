@@ -71,8 +71,8 @@ module Factories
     $stub_file_counter ||= 0
     data ||= "ohai#{$stub_file_counter += 1}"
     sio = StringIO.new(data)
-    sio.stubs(:original_filename).returns(filename)
-    sio.stubs(:content_type).returns(content_type)
+    allow(sio).to receive(:original_filename).and_return(filename)
+    allow(sio).to receive(:content_type).and_return(content_type)
     sio
   end
 

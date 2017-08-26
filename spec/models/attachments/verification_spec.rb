@@ -40,18 +40,18 @@ describe Attachments::Verification do
 
   context "creating a verifier" do
     it "should create a verifier with the attachment id and ctx" do
-      Canvas::Security.expects(:create_jwt).with({
+      expect(Canvas::Security).to receive(:create_jwt).with({
         id: attachment.global_id, user_id: student.global_id, ctx: course.asset_string
-      }, nil).returns("thetoken")
+      }, nil).and_return("thetoken")
 
       verifier = v.verifier_for_user(student, context: course.asset_string)
       expect(verifier).to eq("thetoken")
     end
 
     it "should not include user id if one is not specified" do
-      Canvas::Security.expects(:create_jwt).with({
+      expect(Canvas::Security).to receive(:create_jwt).with({
         id: attachment.global_id, ctx: course.asset_string
-      }, nil).returns("thetoken")
+      }, nil).and_return("thetoken")
 
       verifier = v.verifier_for_user(nil, context: course.asset_string)
       expect(verifier).to eq("thetoken")
@@ -59,9 +59,9 @@ describe Attachments::Verification do
 
     it "should include the expiration if supplied" do
       expires = 1.hour.from_now
-      Canvas::Security.expects(:create_jwt).with({
+      expect(Canvas::Security).to receive(:create_jwt).with({
         id: attachment.global_id, ctx: course.asset_string
-      }, expires).returns("thetoken")
+      }, expires).and_return("thetoken")
 
       verifier = v.verifier_for_user(nil, context: course.asset_string, expires: expires)
       expect(verifier).to eq("thetoken")
@@ -70,30 +70,30 @@ describe Attachments::Verification do
 
   context "verifying a verifier" do
     it "should verify a legacy verifier for read and download" do
-      CanvasStatsd::Statsd.expects(:increment).with("attachments.legacy_verifier_success").twice
+      expect(CanvasStatsd::Statsd).to receive(:increment).with("attachments.legacy_verifier_success").twice
       expect(v.valid_verifier_for_permission?(attachment.uuid, :read)).to eq(true)
       expect(v.valid_verifier_for_permission?(attachment.uuid, :download)).to eq(true)
     end
 
     it "should return false on an expired verifier" do
-      Canvas::Security.expects(:decode_jwt).with("token").raises(Canvas::Security::TokenExpired)
-      CanvasStatsd::Statsd.expects(:increment).with("attachments.token_verifier_expired")
+      expect(Canvas::Security).to receive(:decode_jwt).with("token").and_raise(Canvas::Security::TokenExpired)
+      expect(CanvasStatsd::Statsd).to receive(:increment).with("attachments.token_verifier_expired")
 
       expect(v.valid_verifier_for_permission?("token", :read)).to eq(false)
     end
 
     it "should return false on an invalid verifier" do
-      Canvas::Security.expects(:decode_jwt).with("token").raises(Canvas::Security::InvalidToken)
-      CanvasStatsd::Statsd.expects(:increment).with("attachments.token_verifier_invalid")
+      expect(Canvas::Security).to receive(:decode_jwt).with("token").and_raise(Canvas::Security::InvalidToken)
+      expect(CanvasStatsd::Statsd).to receive(:increment).with("attachments.token_verifier_invalid")
 
       expect(v.valid_verifier_for_permission?("token", :read)).to eq(false)
     end
 
     it "should return false on token id mismatch" do
-      Canvas::Security.expects(:decode_jwt).with("token").returns({
+      expect(Canvas::Security).to receive(:decode_jwt).with("token").and_return({
         id: attachment.global_id + 1
       })
-      CanvasStatsd::Statsd.expects(:increment).with("attachments.token_verifier_id_mismatch")
+      expect(CanvasStatsd::Statsd).to receive(:increment).with("attachments.token_verifier_id_mismatch")
 
       expect(v.valid_verifier_for_permission?("token", :read)).to eq(false)
     end
@@ -102,10 +102,10 @@ describe Attachments::Verification do
       att2 = attachment_model(context: course)
       att2.update_attribute(:locked, true)
       v2 = Attachments::Verification.new(att2)
-      Canvas::Security.expects(:decode_jwt).with("token").returns({
+      expect(Canvas::Security).to receive(:decode_jwt).with("token").and_return({
         id: att2.global_id, user_id: student.global_id
       }).twice
-      CanvasStatsd::Statsd.expects(:increment).with("attachments.token_verifier_success").twice
+      expect(CanvasStatsd::Statsd).to receive(:increment).with("attachments.token_verifier_success").twice
 
       expect(v2.valid_verifier_for_permission?("token", :read)).to eq(true)
       expect(v2.valid_verifier_for_permission?("token", :download)).to eq(false)

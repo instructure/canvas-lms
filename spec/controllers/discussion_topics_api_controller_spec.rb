@@ -27,8 +27,8 @@ describe DiscussionTopicsApiController do
 
     before :each do
       user_session(@student)
-      controller.stubs(:form_authenticity_token => 'abc', :form_authenticity_param => 'abc')
-      post 'add_entry', :format => 'json', :topic_id => @topic.id, :course_id => @course.id, :user_id => @user.id, :message => 'message', :read_state => 'read'
+      allow(controller).to receive_messages(:form_authenticity_token => 'abc', :form_authenticity_param => 'abc')
+      post 'add_entry', params: {:topic_id => @topic.id, :course_id => @course.id, :user_id => @user.id, :message => 'message', :read_state => 'read'}, :format => 'json'
     end
 
     it 'creates a new discussion entry' do
@@ -61,22 +61,22 @@ describe DiscussionTopicsApiController do
       @course.save!
       @topic = @course.discussion_topics.create!(:title => 'discussion')
       user_session(@student)
-      controller.stubs(:form_authenticity_token => 'abc', :form_authenticity_param => 'abc')
+      allow(controller).to receive_messages(:form_authenticity_token => 'abc', :form_authenticity_param => 'abc')
     end
 
     it "fails if attachment a file over student quota (not course)" do
       Setting.set('user_default_quota', -1)
 
-      post 'add_entry', :format => 'json', :topic_id => @topic.id, :course_id => @course.id, :user_id => @user.id, :message => 'message',
-        :read_state => 'read', :attachment => default_uploaded_data
+      post 'add_entry', params: {:topic_id => @topic.id, :course_id => @course.id, :user_id => @user.id, :message => 'message',
+        :read_state => 'read', :attachment => default_uploaded_data}, :format => 'json'
 
       expect(response).to_not be_success
       expect(response.body).to include("User storage quota exceeded")
     end
 
     it "succeeds otherwise" do
-      post 'add_entry', :format => 'json', :topic_id => @topic.id, :course_id => @course.id, :user_id => @user.id, :message => 'message',
-        :read_state => 'read', :attachment => default_uploaded_data
+      post 'add_entry', params: {:topic_id => @topic.id, :course_id => @course.id, :user_id => @user.id, :message => 'message',
+        :read_state => 'read', :attachment => default_uploaded_data}, :format => 'json'
 
       expect(response).to be_success
     end

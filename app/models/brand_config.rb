@@ -122,12 +122,20 @@ class BrandConfig < ActiveRecord::Base
     BrandableCSS.all_brand_variable_values_as_js(self)
   end
 
+  def to_css
+    BrandableCSS.all_brand_variable_values_as_css(self)
+  end
+
   def json_file
     public_brand_dir.join("variables-#{BrandableCSS.default_variables_md5}.json")
   end
 
   def js_file
     public_brand_dir.join("variables-#{BrandableCSS.default_variables_md5}.js")
+  end
+
+  def css_file
+    public_brand_dir.join("variables-#{BrandableCSS.default_variables_md5}.css")
   end
 
   def scss_dir
@@ -150,6 +158,10 @@ class BrandConfig < ActiveRecord::Base
     "#{public_folder}/variables-#{BrandableCSS.default_variables_md5}.js"
   end
 
+  def public_css_path
+    "#{public_folder}/variables-#{BrandableCSS.default_variables_md5}.css"
+  end
+
   def save_scss_file!
     logger.info "saving brand variables file: #{scss_file}"
     scss_dir.mkpath
@@ -170,6 +182,13 @@ class BrandConfig < ActiveRecord::Base
     move_js_to_s3_if_enabled!
   end
 
+  def save_css_file!
+    logger.info "saving brand variables css file: #{css_file}"
+    public_brand_dir.mkpath
+    css_file.write(to_css)
+    move_css_to_s3_if_enabled!
+  end
+
   def move_json_to_s3_if_enabled!
     return unless Canvas::Cdn.enabled?
     s3_uploader.upload_file(public_json_path)
@@ -188,6 +207,15 @@ class BrandConfig < ActiveRecord::Base
     end
   end
 
+  def move_css_to_s3_if_enabled!
+    return unless Canvas::Cdn.enabled?
+    s3_uploader.upload_file(public_css_path)
+    begin
+      File.delete(css_file)
+    rescue Errno::ENOENT # continue if something else deleted it in another process
+    end
+  end
+
   def s3_uploader
     @s3_uploaderer ||= Canvas::Cdn::S3Uploader.new
   end
@@ -196,6 +224,7 @@ class BrandConfig < ActiveRecord::Base
     save_scss_file!
     save_json_file!
     save_js_file!
+    save_css_file!
   end
 
   def remove_scss_dir!

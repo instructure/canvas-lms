@@ -27,34 +27,34 @@ describe SelfEnrollmentsController do
     end
 
     it "should render if the course is open for enrollment" do
-      get 'new', :self_enrollment_code => @course.self_enrollment_code
+      get 'new', params: {:self_enrollment_code => @course.self_enrollment_code}
       expect(response).to be_success
     end
 
     it "should do the delegated auth dance" do
       account = account_with_cas({:account => Account.default})
       
-      get 'new', :self_enrollment_code => @course.self_enrollment_code
+      get 'new', params: {:self_enrollment_code => @course.self_enrollment_code}
       expect(response).to redirect_to login_url
     end
 
     it "forwards authentication_provider param" do
       account_with_cas(account: Account.default)
 
-      get 'new', self_enrollment_code: @course.self_enrollment_code, authentication_provider: 'facebook'
+      get 'new', params: {self_enrollment_code: @course.self_enrollment_code, authentication_provider: 'facebook'}
       expect(response).to redirect_to login_url(authentication_provider: 'facebook')
     end
 
     it "renders directly if authentication_provider=canvas" do
       account_with_cas(account: Account.default)
 
-      get 'new', self_enrollment_code: @course.self_enrollment_code, authentication_provider: 'canvas'
+      get 'new', params: {self_enrollment_code: @course.self_enrollment_code, authentication_provider: 'canvas'}
       expect(response).to be_success
     end
 
     it "should not render for an incorrect code" do
       assert_page_not_found do
-        get 'new', :self_enrollment_code => 'abc'
+        get 'new', params: {:self_enrollment_code => 'abc'}
       end
     end
 
@@ -62,20 +62,20 @@ describe SelfEnrollmentsController do
       code = @course.self_enrollment_code
       @course.update_attribute(:self_enrollment, false)
 
-      get 'new', :self_enrollment_code => code
+      get 'new', params: {:self_enrollment_code => code}
       expect(response).to be_success
     end
 
     it "should default assign login_label_name to 'email'" do
-      get 'new', :self_enrollment_code => @course.self_enrollment_code
+      get 'new', params: {:self_enrollment_code => @course.self_enrollment_code}
       expect(assigns(:login_label_name)).to eq("Email")
     end
 
     it "should change login_label_name when set on domain_root_account" do
       custom_label = "batman is the best"
-      Account.any_instance.stubs(:login_handle_name).returns(custom_label)
+      allow_any_instance_of(Account).to receive(:login_handle_name).and_return(custom_label)
 
-      get 'new', :self_enrollment_code => @course.self_enrollment_code
+      get 'new', params: {:self_enrollment_code => @course.self_enrollment_code}
       expect(assigns(:login_label_name)).to eq(custom_label)
     end
   end

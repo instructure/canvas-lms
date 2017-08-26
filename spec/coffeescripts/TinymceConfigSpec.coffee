@@ -28,7 +28,8 @@ define [
   toolbar1 = "bold,italic,underline,forecolor,backcolor,removeformat," +
                "alignleft,aligncenter,alignright"
   toolbar2 = "outdent,indent,superscript,subscript,bullist,numlist,table," +
-               "instructure_links,unlink,instructure_image,instructure_equation"
+               "media,instructure_links,unlink,instructure_image," +
+               "instructure_equation"
   toolbar3 = "ltr,rtl,fontsizeselect,formatselect"
 
   QUnit.module "EditorConfig",

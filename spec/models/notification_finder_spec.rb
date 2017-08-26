@@ -29,7 +29,7 @@ describe NotificationFinder do
 
     it 'loads notifications from the cache' do
       expect(finder.notifications.length).to eq(1)
-      Notification.expects(:connection).never
+      expect(Notification).to receive(:connection).never
       finder.by_name(notification.name)
       finder.find_by_name(notification.name)
     end

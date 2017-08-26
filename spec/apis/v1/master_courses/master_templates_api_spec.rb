@@ -142,7 +142,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       other_course = course_factory
       @template.add_child_course!(other_course)
 
-      @template.any_instantiation.expects(:add_child_course!).never
+      expect_any_instantiation_of(@template).to receive(:add_child_course!).never
       api_call(:put, @url, @params, {:course_ids_to_add => [other_course.id]})
     end
 
@@ -427,6 +427,8 @@ describe MasterCourses::MasterTemplatesController, type: :request do
     end
 
     it "returns change information from the minion side" do
+      skip 'Requires QtiMigrationTool' unless Qti.qti_enabled?
+
       minion = @minions.first
       minion_migration = minion.content_migrations.last
       minion_page = minion.wiki.wiki_pages.where(migration_id: @template.migration_id_for(@page)).first
@@ -477,7 +479,8 @@ describe MasterCourses::MasterTemplatesController, type: :request do
   end
 
   describe 'unsynced_changes' do
-    before :once do
+    before do
+      local_storage!
       Timecop.travel(1.hour.ago) do
         setup_template
         @master = @course

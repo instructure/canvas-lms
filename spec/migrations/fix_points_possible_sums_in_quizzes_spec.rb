@@ -36,7 +36,7 @@ describe 'FixPointsPossibleSumsInQuizzes' do
 
   before :each do
     # creates rounding error just like the real thing!
-    points = Array.new(question_count){ question_points }.sum
+    points = Array.new(question_count){ question_points }.inject(:+) # .sum uses the native ruby 2.4 sum if the first element is numeric in rails 5.1 ...and doesn't quite give the same answer :/
     allow(Quizzes::Quiz).to receive(:count_points_possible).and_return(points)
   end
 

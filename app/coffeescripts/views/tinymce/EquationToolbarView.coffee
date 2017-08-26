@@ -20,8 +20,9 @@ define [
   'jquery'
   'Backbone'
   'jst/tinymce/EquationToolbarView'
+  'mathml'
   'mathquill'
-], (I18n, $, Backbone, template) ->
+], (I18n, $, Backbone, template, mathml) ->
 
   class EquationToolbarView extends Backbone.View
 
@@ -60,7 +61,7 @@ define [
         
       $('#mathjax-view .mathquill-tab-bar li:first-child').addClass('mathquill-tab-selected')
 
-      $.getScript("//cdnjs.cloudflare.com/ajax/libs/mathjax/2.1/MathJax.js?config=TeX-AMS_HTML.js", @addMathJaxEvents)
+      mathml.loadMathJax('TeX-AMS_HTML.js', @addMathJaxEvents)
 
     addMathJaxEvents: =>
       renderPreview = ->

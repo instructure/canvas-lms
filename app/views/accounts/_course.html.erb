@@ -20,7 +20,7 @@
 <% if !course || !course.deleted? %>
 
 <% master_template = course && @master_template_index && @master_template_index[course.id] %>
-<% teacher_names = course && !master_template && (course.teacher_names || course.teachers.uniq.map(&:name)) %>
+<% teacher_names = course && !master_template && (course.teacher_names || course.teachers.distinct.map(&:name)) %>
 <% student_count = course && !master_template && (course.student_count || course.students.where("enrollments.type <> ?", "StudentViewEnrollment").count) %>
 
 <li class="course" id="course_<%= course ? course.id : "blank" %>" style="<%= hidden unless course %>">

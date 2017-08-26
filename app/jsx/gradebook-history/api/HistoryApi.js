@@ -17,52 +17,28 @@
  */
 
 import axios from 'axios';
-import constants from 'jsx/gradebook-history/constants';
 
-function toParams (id, timeFrame) {
-  return {
+function getGradeHistory (courseId, input) {
+  let url = `/api/v1/audit/grade_change/courses/${courseId}`;
+  url += input.assignment ? `/assignments/${input.assignment}` : '';
+  url += input.grader ? `/graders/${input.grader}` : '';
+  url += input.student ? `/students/${input.student}` : '';
+
+  const params = {
     params: {
-      id,
-      start_time: timeFrame.from,
-      end_time: timeFrame.to,
-      per_page: 10
+      start_time: input.from,
+      end_time: input.to
     }
   };
+
+  return axios.get(encodeURI(url), params);
 }
 
-function getByAssignment (assignmentId, timeFrame = { from: '', to: '' }) {
-  const url = encodeURI(`/api/v1/audit/grade_change/assignments/${assignmentId}`);
-  const params = toParams(assignmentId, timeFrame);
-
-  return axios.get(url, params);
-}
-
-function getByDate (timeFrame = { from: '', to: '' }) {
-  const url = encodeURI(`/api/v1/audit/grade_change/courses/${constants.courseId()}`);
-  const params = {
-    params: { start_time: timeFrame.from, end_time: timeFrame.to }
-  };
-
-  return axios.get(url, params);
-}
-
-function getByGrader (graderId, timeFrame = {from: '', to: ''}) {
-  const url = encodeURI(`/api/v1/audit/grade_change/graders/${graderId}`);
-  const params = toParams(graderId, timeFrame);
-
-  return axios.get(url, params);
-}
-
-function getByStudent (studentId, timeFrame = {from: '', to: ''}) {
-  const url = encodeURI(`/api/v1/audit/grade_change/students/${studentId}`);
-  const params = toParams(studentId, timeFrame);
-
-  return axios.get(url, params);
+function getNextPage (url) {
+  return axios.get(encodeURI(url));
 }
 
 export default {
-  getByAssignment,
-  getByDate,
-  getByGrader,
-  getByStudent
-}
+  getGradeHistory,
+  getNextPage
+};

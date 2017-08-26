@@ -1135,7 +1135,7 @@ ul#question_list {
       margin-right: 4px;
     }
     &.answered a {
-      color: darken($ic-brand-primary, 15);
+      color: var(--ic-brand-primary-darkened-15);
     }
     &.answered.current_question a {
       color: #396eb2;

@@ -17,13 +17,11 @@
  */
 
 import axios from 'axios';
-import constants from 'jsx/gradebook-history/constants';
 import UserApi from 'jsx/gradebook-history/api/UserApi';
 
 QUnit.module('UserApi', {
   setup () {
     this.courseId = 525600;
-    this.courseIdStub = this.stub(constants, 'courseId').returns(this.courseId);
     this.getStub = this.stub(axios, 'get')
       .returns(Promise.resolve({
         response: {}
@@ -31,16 +29,16 @@ QUnit.module('UserApi', {
   }
 });
 
-test('getUsersByName for graders searches by teachers and TAs', function () {
+test('getUsersByName for graders searches by teachers and TAs in a course', function () {
   const searchTerm = 'Norval';
-  const url = encodeURI(`/api/v1/courses/${this.courseId}/users`);
+  const url = `/api/v1/courses/${this.courseId}/users`;
   const params = {
     params: {
       search_term: searchTerm,
       enrollment_type: ['teacher', 'ta']
     }
   };
-  const promise = UserApi.getUsersByName('graders', searchTerm);
+  const promise = UserApi.getUsersByName(this.courseId, 'graders', searchTerm);
 
   return promise.then(() => {
     strictEqual(this.getStub.callCount, 1);
@@ -51,14 +49,14 @@ test('getUsersByName for graders searches by teachers and TAs', function () {
 
 test('getUsersByName for students searches by students', function () {
   const searchTerm = 'Norval';
-  const url = encodeURI(`/api/v1/courses/${this.courseId}/users`);
+  const url = `/api/v1/courses/${this.courseId}/users`;
   const params = {
     params: {
       search_term: searchTerm,
       enrollment_type: ['student', 'student_view']
     }
   };
-  const promise = UserApi.getUsersByName('students', searchTerm);
+  const promise = UserApi.getUsersByName(this.courseId, 'students', searchTerm);
 
   return promise.then(() => {
     strictEqual(this.getStub.callCount, 1);
@@ -68,7 +66,7 @@ test('getUsersByName for students searches by students', function () {
 });
 
 test('getUsersNextPage makes a request with given url', function () {
-  const url = 'https://fake.url/users?page=2';
+  const url = 'https://example.com/users?page=2';
   const promise = UserApi.getUsersNextPage(url);
 
   return promise.then(() => {

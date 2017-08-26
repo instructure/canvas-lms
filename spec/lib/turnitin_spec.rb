@@ -35,7 +35,7 @@ describe Turnitin::Client do
   def stub_net_http_to_return(partial_body, return_code = 1)
     body = "<returndata>#{ partial_body }<rcode>#{return_code}</rcode></returndata>"
     fake_response = FakeHTTPResponse.new(body)
-    Net::HTTP.any_instance.expects(:start).returns(fake_response)
+    expect_any_instance_of(Net::HTTP).to receive(:start).and_return(fake_response)
   end
 
   describe '#state_from_similarity_score' do
@@ -118,8 +118,8 @@ describe Turnitin::Client do
       course_with_student(:active_all => true)
       turnitin_assignment
       @turnitin_api = Turnitin::Client.new('test_account', 'sekret')
-      @assignment.context.expects(:turnitin_settings).at_least(1).returns([:placeholder])
-      Turnitin::Client.expects(:new).with(:placeholder).returns(@turnitin_api)
+      expect(@assignment.context).to receive(:turnitin_settings).at_least(1).and_return([:placeholder])
+      expect(Turnitin::Client).to receive(:new).with(:placeholder).and_return(@turnitin_api)
 
       @sample_turnitin_settings = {
         :originality_report_visibility => 'after_grading',
@@ -186,12 +186,12 @@ describe Turnitin::Client do
       turnitin_submission
       @turnitin_api = Turnitin::Client.new('test_account', 'sekret')
 
-      @submission.context.expects(:turnitin_settings).at_least(1).returns([:placeholder])
-      Turnitin::Client.expects(:new).at_least(1).with(:placeholder).returns(@turnitin_api)
-      @turnitin_api.expects(:enrollStudent).with(@course, @user).returns(stub(:success? => true))
-      @turnitin_api.expects(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).returns({ :assignment_id => "1234" })
-      Attachment.stubs(:instantiate).returns(@attachment)
-      @attachment.expects(:open).returns(:my_stub)
+      expect(@submission.context).to receive(:turnitin_settings).at_least(1).and_return([:placeholder])
+      expect(Turnitin::Client).to receive(:new).at_least(1).with(:placeholder).and_return(@turnitin_api)
+      expect(@turnitin_api).to receive(:enrollStudent).with(@course, @user).and_return(double(:success? => true))
+      expect(@turnitin_api).to receive(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).and_return({ :assignment_id => "1234" })
+      allow(Attachment).to receive(:instantiate).and_return(@attachment)
+      expect(@attachment).to receive(:open).and_return(:my_stub)
     end
 
     it "submits attached files to turnitin" do

@@ -26,7 +26,7 @@ describe "Common Cartridge exporting" do
     course = course_model
     user = user_model
     message = "fail"
-    course.stubs(:wiki).raises(message)
+    allow(course).to receive(:wiki).and_raise(message)
     content_export = ContentExport.new
     content_export.context = course
     content_export.user = user
@@ -463,10 +463,10 @@ describe "Common Cartridge exporting" do
 
     it "should export media tracks" do
       stub_kaltura
-      CanvasKaltura::ClientV3.any_instance.stubs(:startSession)
-      CanvasKaltura::ClientV3.any_instance.stubs(:flavorAssetGetPlaylistUrl).returns('http://www.example.com/blah.flv')
+      allow_any_instance_of(CanvasKaltura::ClientV3).to receive(:startSession)
+      allow_any_instance_of(CanvasKaltura::ClientV3).to receive(:flavorAssetGetPlaylistUrl).and_return('http://www.example.com/blah.flv')
       stub_request(:get, 'http://www.example.com/blah.flv').to_return(body: "", status: 200)
-      CC::CCHelper.stubs(:media_object_info).returns({asset: {id: 1, status: '2'}, filename: 'blah.flv'})
+      allow(CC::CCHelper).to receive(:media_object_info).and_return({asset: {id: 1, status: '2'}, filename: 'blah.flv'})
       obj = @course.media_objects.create! media_id: '0_deadbeef'
       track = obj.media_tracks.create! kind: 'subtitles', locale: 'tlh', content: "Hab SoSlI' Quch!"
       page = @course.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
@@ -681,7 +681,7 @@ describe "Common Cartridge exporting" do
     end
 
     context 'attachment permissions' do
-      before :once do
+      before do
         folder = Folder.root_folders(@course).first
         @visible = Attachment.create!({
           :uploaded_data => stub_png_data('visible.png'),

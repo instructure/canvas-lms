@@ -27,6 +27,15 @@ class Score < ActiveRecord::Base
   validates :current_score, :final_score, numericality: true, allow_nil: true
   validates_uniqueness_of :enrollment_id, scope: :grading_period_id
 
+  set_policy do
+    given { |user, session|
+      (user&.id == enrollment.user_id && !course.hide_final_grades?) ||
+        course.grants_any_right?(user, :manage_grades, :view_all_grades) ||
+        enrollment.user.grants_right?(user, :read_as_parent)
+    }
+    can :read
+  end
+
   def current_grade
     score_to_grade(current_score)
   end

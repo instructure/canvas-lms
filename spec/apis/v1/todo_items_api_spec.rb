@@ -241,7 +241,7 @@ describe UsersController, type: :request do
   end
 
   it "works correctly when turnitin is enabled" do
-    @a2.context.any_instantiation.expects(:turnitin_enabled?).returns true
+    expect_any_instantiation_of(@a2.context).to receive(:turnitin_enabled?).and_return true
     json = api_call(:get, "/api/v1/users/self/todo",
                     :controller => "users", :action => "todo_items",
                     :format => "json")

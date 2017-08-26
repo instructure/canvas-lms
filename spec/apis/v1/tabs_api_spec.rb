@@ -204,7 +204,7 @@ describe TabsController, type: :request do
 
     it "includes webconferences tab if configured" do
       course_with_teacher :active_all => true
-      ApplicationController.any_instance.stubs(:feature_enabled?).with(:web_conferences).returns(true)
+      allow_any_instance_of(ApplicationController).to receive(:feature_enabled?).with(:web_conferences).and_return(true)
       json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs",
                       { :controller => 'tabs', :action => 'index', :course_id => @course.to_param, :format => 'json'},
                       { :include => ['external']})

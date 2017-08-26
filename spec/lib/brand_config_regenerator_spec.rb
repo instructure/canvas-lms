@@ -62,9 +62,9 @@ describe BrandConfigRegenerator do
     regenerator = BrandConfigRegenerator.new(@parent_account, user_factory, new_brand_config)
 
     # 5 = 2 "inheriting" accounts + 3 "inheriting" shared configs
-    brandable_css_stub = BrandableCSS.stubs(:compile_brand!).times(5)
+    brandable_css_stub = allow(BrandableCSS).to receive(:compile_brand!).exactly(5).times
     Delayed::Testing.drain
-    expect(brandable_css_stub).to be_verified
+    brandable_css_stub.verify_messages_received
     expect(regenerator.progresses.count).to eq(5)
 
     # make sure the child account's brand config is based on this new brand config
@@ -99,9 +99,9 @@ describe BrandConfigRegenerator do
 
     regenerator = BrandConfigRegenerator.new(@parent_account, user_factory, new_brand_config)
 
-    brandable_css_stub = BrandableCSS.stubs(:compile_brand!).times(4)
+    brandable_css_stub = allow(BrandableCSS).to receive(:compile_brand!).exactly(4).times
     Delayed::Testing.drain
-    expect(brandable_css_stub).to be_verified
+    brandable_css_stub.verify_messages_received
     expect(regenerator.progresses.count).to eq(4)
 
     expect(@child_account.reload.brand_config.parent).to eq(new_brand_config)
@@ -112,9 +112,9 @@ describe BrandConfigRegenerator do
 
     regenerator = BrandConfigRegenerator.new(@parent_account, user_factory, nil)
 
-    brandable_css_stub = BrandableCSS.stubs(:compile_brand!).times(4)
+    brandable_css_stub = allow(BrandableCSS).to receive(:compile_brand!).exactly(4).times
     Delayed::Testing.drain
-    expect(brandable_css_stub).to be_verified
+    brandable_css_stub.verify_messages_received
     expect(regenerator.progresses.count).to eq(4)
 
     expect(@child_account.reload.brand_config.parent).to eq(nil)
@@ -134,9 +134,9 @@ describe BrandConfigRegenerator do
     regenerator = BrandConfigRegenerator.new(Account.site_admin, user_factory, new_brand_config)
 
     # 6 = 3 "inheriting" accounts = 3 "inheriting" shared configs
-    brandable_css_stub = BrandableCSS.stubs(:compile_brand!).times(6)
+    brandable_css_stub = allow(BrandableCSS).to receive(:compile_brand!).exactly(6).times
     Delayed::Testing.drain
-    expect(brandable_css_stub).to be_verified
+    brandable_css_stub.verify_messages_received
     expect(regenerator.progresses.count).to eq(6)
 
     expect(Account.site_admin.brand_config).to eq(new_brand_config)

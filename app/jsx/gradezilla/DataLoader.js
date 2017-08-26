@@ -25,12 +25,17 @@ const submissionsParams = {
   response_fields: [
     'id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id',
     'grade_matches_current_submission', 'attachments', 'late', 'missing', 'workflow_state', 'excused',
-    'points_deducted'
+    'points_deducted', 'seconds_late', 'cached_due_date'
   ]
 };
 
 function getStudentIds (courseId) {
   const url = `/courses/${courseId}/gradebook/user_ids`;
+  return $.ajaxJSON(url, 'GET', {});
+}
+
+function getGradingPeriodAssignments (courseId) {
+  const url = `/courses/${courseId}/gradebook/grading_period_assignments`;
   return $.ajaxJSON(url, 'GET', {});
 }
 
@@ -47,9 +52,6 @@ function getContextModules (url) {
     return $.ajaxJSON(url, "GET", {});
   };
   const getSections = (url) => {
-    return $.ajaxJSON(url, "GET", {});
-  };
-  const getEffectiveDueDates = (url) => {
     return $.ajaxJSON(url, "GET", {});
   };
 
@@ -190,8 +192,11 @@ function getStudents (options, gotStudentIds) {
 
     // Begin loading Students before any other data.
     const gotStudentIds = getStudentIds(opts.courseId);
+    let gotGradingPeriodAssignments;
+    if (opts.getGradingPeriodAssignments) {
+      gotGradingPeriodAssignments = getGradingPeriodAssignments(opts.courseId);
+    }
     const gotCustomColumns = getCustomColumns(opts.customColumnsURL);
-    const gotEffectiveDueDates = getEffectiveDueDates(opts.effectiveDueDatesURL);
     const gotStudents = getStudents(opts, gotStudentIds);
     const gotContextModules = getContextModules(opts.contextModulesURL);
     const gotSubmissions = getSubmissions(opts.submissionsURL, opts.submissionsChunkCb, opts.submissionsChunkSize);
@@ -209,11 +214,11 @@ function getStudents (options, gotStudentIds) {
       gotAssignmentGroups,
       gotContextModules,
       gotCustomColumns,
+      gotGradingPeriodAssignments,
       gotStudentIds,
       gotStudents,
       gotSubmissions,
-      gotCustomColumnData,
-      gotEffectiveDueDates
+      gotCustomColumnData
     };
   };
 

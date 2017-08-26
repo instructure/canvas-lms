@@ -114,6 +114,10 @@ class ContextModule < ActiveRecord::Base
     end
   end
 
+  def check_for_stale_cache_after_unlocking!
+    self.touch if self.unlock_at && self.unlock_at < Time.now && self.updated_at < self.unlock_at
+  end
+
   def is_prerequisite_for?(mod)
     (mod.prerequisites || []).any? {|prereq| prereq[:type] == 'context_module' && prereq[:id] == self.id }
   end

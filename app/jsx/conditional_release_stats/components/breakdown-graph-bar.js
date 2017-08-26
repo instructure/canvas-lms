@@ -71,10 +71,6 @@ import I18n from 'i18n!cyoe_assignment_sidebar'
             <button
               className='crs-link-button'
               onClick={this.selectRange}
-              aria-label={I18n.t(
-                '%{rangeStudents} out of %{totalStudents} students, click to view range student details',
-                { rangeStudents, totalStudents }
-              )}
               title={I18n.t('View range student details')}
             >
               {I18n.t(

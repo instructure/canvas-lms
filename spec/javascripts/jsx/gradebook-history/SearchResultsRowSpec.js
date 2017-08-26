@@ -19,11 +19,11 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import Fixtures from 'spec/jsx/gradebook-history/Fixtures';
-import { formatHistoryItems } from 'jsx/gradebook-history/reducers/HistoryReducer';
+import { formatHistoryItems } from 'jsx/gradebook-history/actions/HistoryActions';
 import SearchResultsRow from 'jsx/gradebook-history/SearchResultsRow';
 
 const mountComponent = (props = {}) => {
-  const singleItem = formatHistoryItems(Fixtures.historyEventArray(), Fixtures.userMap())[0];
+  const singleItem = formatHistoryItems(Fixtures.historyResponse().data)[0];
   const defaultProps = { item: singleItem };
   const tbody = document.getElementById('search-results-tbody');
 
@@ -37,7 +37,7 @@ QUnit.module('SearchResultsRow', {
     tbody.id = 'search-results-tbody';
     document.body.appendChild(tbody);
 
-    this.item = formatHistoryItems(Fixtures.payload())[0];
+    this.item = formatHistoryItems(Fixtures.historyResponse().data)[0];
     this.wrapper = mountComponent({ item: this.item });
   },
 

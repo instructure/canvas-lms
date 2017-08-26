@@ -42,7 +42,7 @@ module Services
       end
 
       it "fills out host values when enabled" do
-        root_account = stub("root_account", feature_enabled?: true)
+        root_account = double("root_account", feature_enabled?: true)
         env = described_class.env_for(root_account)
         expect(env[:RICH_CONTENT_APP_HOST]).to eq("rce-app")
         expect(env[:RICH_CONTENT_CDN_HOST]).to eq("rce-cdn")
@@ -52,7 +52,7 @@ module Services
         allow(Canvas::DynamicSettings).to receive(:find)
           .with('rich-content-service', use_env: false)
           .and_raise(Imperium::UnableToConnectError, "can't talk to consul")
-        root_account = stub("root_account", feature_enabled?: true)
+        root_account = double("root_account", feature_enabled?: true)
         env = described_class.env_for(root_account)
         expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_truthy
         expect(env[:RICH_CONTENT_APP_HOST]).to eq("error")
@@ -60,10 +60,10 @@ module Services
       end
 
       it "logs errors for later consideration" do
-        Canvas::DynamicSettings.stubs(:find).with("rich-content-service", use_env: false).
-          raises(Canvas::DynamicSettings::ConsulError, "can't talk to consul")
-        root_account = stub("root_account", feature_enabled?: true)
-        Canvas::Errors.expects(:capture_exception).with do |type, e|
+        allow(Canvas::DynamicSettings).to receive(:find).with("rich-content-service", use_env: false).
+          and_raise(Canvas::DynamicSettings::ConsulError, "can't talk to consul")
+        root_account = double("root_account", feature_enabled?: true)
+        expect(Canvas::Errors).to receive(:capture_exception) do |type, e|
           expect(type).to eq(:rce_flag)
           expect(e.is_a?(Canvas::DynamicSettings::ConsulError)).to be_truthy
         end
@@ -71,47 +71,47 @@ module Services
       end
 
       it "includes a generated JWT for the domain, user, context, and workflwos" do
-        root_account = stub("root_account", feature_enabled?: true)
-        user = stub("user", global_id: 'global id')
-        domain = stub("domain")
-        ctx = stub("ctx", grants_any_right?: true)
-        jwt = stub("jwt")
-        Canvas::Security::ServicesJwt.stubs(:for_user).with(domain, user, all_of(
-          has_entry(workflows: [:rich_content, :ui]),
-          has_entry(context: ctx)
-        )).returns(jwt)
+        root_account = double("root_account", feature_enabled?: true)
+        user = double("user", global_id: 'global id')
+        domain = double("domain")
+        ctx = double("ctx", grants_any_right?: true)
+        jwt = double("jwt")
+        allow(Canvas::Security::ServicesJwt).to receive(:for_user).with(domain, user,
+          include(workflows: [:rich_content, :ui],
+            context: ctx)
+        ).and_return(jwt)
         env = described_class.env_for(root_account, user: user, domain: domain, context: ctx)
         expect(env[:JWT]).to eql(jwt)
       end
 
       it "includes a masquerading user if provided" do
-        root_account = stub("root_account", feature_enabled?: true)
-        user = stub("user", global_id: 'global id')
-        masq_user = stub("masq_user", global_id: 'other global id')
-        domain = stub("domain")
-        jwt = stub("jwt")
-        Canvas::Security::ServicesJwt.stubs(:for_user).with(
+        root_account = double("root_account", feature_enabled?: true)
+        user = double("user", global_id: 'global id')
+        masq_user = double("masq_user", global_id: 'other global id')
+        domain = double("domain")
+        jwt = double("jwt")
+        allow(Canvas::Security::ServicesJwt).to receive(:for_user).with(
           domain,
           user,
-          has_entry(real_user: masq_user),
-        ).returns(jwt)
+          include(real_user: masq_user),
+        ).and_return(jwt)
         env = described_class.env_for(root_account,
           user: user, domain: domain, real_user: masq_user)
         expect(env[:JWT]).to eql(jwt)
       end
 
       it "does not allow file uploading without context" do
-        root_account = stub("root_account", feature_enabled?: true)
-        user = stub("user", global_id: 'global id')
+        root_account = double("root_account", feature_enabled?: true)
+        user = double("user", global_id: 'global id')
         env = described_class.env_for(root_account, user: user)
         expect(env[:RICH_CONTENT_CAN_UPLOAD_FILES]).to eq(false)
       end
 
       it "lets context decide if uploading is ok" do
-        root_account = stub("root_account", feature_enabled?: true)
-        user = stub("user", global_id: 'global id')
-        context1 = stub("allowed_context", grants_any_right?: true)
-        context2 = stub("forbidden_context", grants_any_right?: false)
+        root_account = double("root_account", feature_enabled?: true)
+        user = double("user", global_id: 'global id')
+        context1 = double("allowed_context", grants_any_right?: true)
+        context2 = double("forbidden_context", grants_any_right?: false)
         env1 = described_class.env_for(root_account, user: user, context: context1)
         env2 = described_class.env_for(root_account, user: user, context: context2)
         expect(env1[:RICH_CONTENT_CAN_UPLOAD_FILES]).to eq(true)
@@ -119,10 +119,10 @@ module Services
       end
 
       context "with all flags on" do
-        let(:root_account){ stub("root_account") }
+        let(:root_account){double("root_account") }
 
         before(:each) do
-          root_account.stubs(:feature_enabled?).with(:rich_content_service_high_risk).returns(true)
+          allow(root_account).to receive(:feature_enabled?).with(:rich_content_service_high_risk).and_return(true)
         end
 
         it "is contextually on for low risk areas" do
@@ -142,10 +142,10 @@ module Services
       end
 
       context "with flag off" do
-        let(:root_account){ stub("root_account") }
+        let(:root_account){double("root_account") }
 
         before(:each) do
-          root_account.stubs(:feature_enabled?).returns(false)
+          allow(root_account).to receive(:feature_enabled?).and_return(false)
         end
 
         it "is contextually off when no risk specified" do
@@ -165,8 +165,8 @@ module Services
       end
 
       it "treats nil feature values as false" do
-        root_account = stub("root_account")
-        root_account.stubs(:feature_enabled?).with(:rich_content_service_high_risk).returns(nil)
+        root_account = double("root_account")
+        allow(root_account).to receive(:feature_enabled?).with(:rich_content_service_high_risk).and_return(nil)
         env = described_class.env_for(root_account)
         expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to eq(false)
       end

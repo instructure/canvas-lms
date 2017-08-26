@@ -30,10 +30,6 @@ describe "Alerts" do
     stub_rcs_config
   end
 
-  after (:each) do
-    unstub_rcs_config
-  end
-
   it "should be able to create, then update, then delete" do
     get "/accounts/#{@context.id}/settings"
     expect(@alerts.length).to eq 0

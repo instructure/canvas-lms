@@ -23,6 +23,7 @@ import I18n from 'i18n!common'
 import Backbone from 'Backbone'
 import updateSubnavMenuToggle from 'jsx/subnav_menu/updateSubnavMenuToggle'
 import splitAssetString from 'compiled/str/splitAssetString'
+import * as mathml from 'mathml'
 
 // modules that do their own thing on every page that simply need to be required
 import 'translations/_core_en'
@@ -115,3 +116,16 @@ if (
     initializeNewUserTutorials()
   }, 'NewUserTutorialsAsyncChunk')
 }
+
+const supportsCSSVars = window.CSS && window.CSS.supports && window.CSS.supports('(--foo: red)')
+if (!supportsCSSVars) {
+  require.ensure([], (require) => {
+    window.canvasCssVariablesPolyfill = require('jsx/canvasCssVariablesPolyfill')
+  }, 'canvasCssVariablesPolyfill')
+}
+
+$(document).ready(() => {
+  if (mathml.isMathMLOnPage()) {
+    mathml.loadMathJax('MML_HTMLorMML.js')
+  }
+})

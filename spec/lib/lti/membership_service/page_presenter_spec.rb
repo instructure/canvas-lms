@@ -179,7 +179,7 @@ module Lti::MembershipService
 
       describe '#as_json' do
         it 'provides the right next_page url when no page/per_page/role params are given' do
-          Api.stubs(:per_page).returns(1)
+          allow(Api).to receive(:per_page).and_return(1)
 
           uri = URI(hash.fetch(:nextPage))
           expect(uri.scheme).to eq 'https'
@@ -190,7 +190,7 @@ module Lti::MembershipService
         end
 
         it 'provides the right next_page url when page/per_page/role params are given' do
-          Api.stubs(:per_page).returns(1)
+          allow(Api).to receive(:per_page).and_return(1)
           presenter = PagePresenter.new(@course, @user, base_url, page: 2, per_page: 1, role: 'Instructor')
           hash = presenter.as_json
 
@@ -203,7 +203,7 @@ module Lti::MembershipService
         end
 
         it 'returns nil for the next page url when the last page in the collection was requested' do
-          Api.stubs(:per_page).returns(1)
+          allow(Api).to receive(:per_page).and_return(1)
           presenter = PagePresenter.new(@course, @user, base_url, page: 3, per_page: 1, role: 'Instructor')
           hash = presenter.as_json
 

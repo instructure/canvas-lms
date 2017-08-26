@@ -23,7 +23,7 @@ describe AccountAuthorizationConfig::SAML::InCommon do
 
   describe ".refresh_providers" do
     before do
-      AccountAuthorizationConfig::SAML.any_instance.stubs(:download_metadata).returns(nil)
+      allow_any_instance_of(AccountAuthorizationConfig::SAML).to receive(:download_metadata).and_return(nil)
     end
 
     let!(:saml) { Account.default.authentication_providers.create!(auth_type: 'saml',
@@ -32,22 +32,22 @@ describe AccountAuthorizationConfig::SAML::InCommon do
 
     it "does nothing if there aren't any InCommon providers" do
       saml.destroy
-      subject.expects(:refresh_if_necessary).never
+      expect(subject).to receive(:refresh_if_necessary).never
       subject.refresh_providers
     end
 
     it "does nothing if no changes" do
-      subject.expects(:refresh_if_necessary).returns(false)
-      subject.expects(:validate_and_parse_metadata).never
+      expect(subject).to receive(:refresh_if_necessary).and_return(false)
+      expect(subject).to receive(:validate_and_parse_metadata).never
       subject.refresh_providers
     end
 
     it "records errors for missing metadata" do
-      subject.expects(:refresh_if_necessary).returns('xml')
-      subject.expects(:validate_and_parse_metadata).returns({})
+      expect(subject).to receive(:refresh_if_necessary).and_return('xml')
+      expect(subject).to receive(:validate_and_parse_metadata).and_return({})
 
-      Canvas::Errors.expects(:capture_exception).once
-      saml.any_instantiation.expects(:populate_from_metadata).never
+      expect(Canvas::Errors).to receive(:capture_exception).once
+      expect_any_instantiation_of(saml).to receive(:populate_from_metadata).never
 
       subject.refresh_providers
     end
@@ -56,29 +56,29 @@ describe AccountAuthorizationConfig::SAML::InCommon do
       saml2 = Account.default.authentication_providers.create!(auth_type: 'saml',
                                                                metadata_uri: subject::URN,
                                                                idp_entity_id: 'urn:mace:incommon:myschool2.edu')
-      subject.expects(:refresh_if_necessary).returns('xml')
-      subject.expects(:validate_and_parse_metadata).returns({
+      expect(subject).to receive(:refresh_if_necessary).and_return('xml')
+      expect(subject).to receive(:validate_and_parse_metadata).and_return({
           'urn:mace:incommon:myschool.edu' => 'metadata1',
           'urn:mace:incommon:myschool2.edu' => 'metadata2',
         })
 
-      Canvas::Errors.expects(:capture_exception).once
-      saml.any_instantiation.expects(:populate_from_metadata).with('metadata1').raises('error')
-      saml2.any_instantiation.expects(:populate_from_metadata).with('metadata2')
-      saml2.any_instantiation.expects(:save!).never
+      expect(Canvas::Errors).to receive(:capture_exception).once
+      expect_any_instantiation_of(saml).to receive(:populate_from_metadata).with('metadata1').and_raise('error')
+      expect_any_instantiation_of(saml2).to receive(:populate_from_metadata).with('metadata2')
+      expect_any_instantiation_of(saml2).to receive(:save!).never
 
       subject.refresh_providers
     end
 
     it "populates and saves" do
-      subject.expects(:refresh_if_necessary).returns('xml')
-      subject.expects(:validate_and_parse_metadata).returns({
+      expect(subject).to receive(:refresh_if_necessary).and_return('xml')
+      expect(subject).to receive(:validate_and_parse_metadata).and_return({
                                                                 'urn:mace:incommon:myschool.edu' => 'metadata1'
                                                             })
 
-      saml.any_instantiation.expects(:populate_from_metadata).with('metadata1')
-      saml.any_instantiation.expects(:changed?).returns(true)
-      saml.any_instantiation.expects(:save!).once
+      expect_any_instantiation_of(saml).to receive(:populate_from_metadata).with('metadata1')
+      expect_any_instantiation_of(saml).to receive(:changed?).and_return(true)
+      expect_any_instantiation_of(saml).to receive(:save!).once
 
       subject.refresh_providers
     end

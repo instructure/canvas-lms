@@ -50,22 +50,22 @@ describe AuditorApiController do
       end_time = start_time + 2.hour
 
       # No params
-      audits_controller.stubs(:params).returns({})
+      allow(audits_controller).to receive(:params).and_return({})
       expect(audits_controller.query_options).to eq({})
 
       # Unrelated params
       params = { course_id: 42 }
-      audits_controller.stubs(:params).returns(params)
+      allow(audits_controller).to receive(:params).and_return(params)
       expect(audits_controller.query_options).to eq({})
 
       # Start time
       params = { start_time: start_time.iso8601 }
-      audits_controller.stubs(:params).returns(params)
+      allow(audits_controller).to receive(:params).and_return(params)
       expect(audits_controller.query_options).to eq({ oldest: start_time })
 
       # End time
       params = { end_time: end_time.iso8601 }
-      audits_controller.stubs(:params).returns(params)
+      allow(audits_controller).to receive(:params).and_return(params)
       expect(audits_controller.query_options).to eq({ newest: end_time })
 
       # Start and end times
@@ -73,7 +73,7 @@ describe AuditorApiController do
         start_time: start_time.iso8601,
         end_time: end_time.iso8601
       }
-      audits_controller.stubs(:params).returns(params)
+      allow(audits_controller).to receive(:params).and_return(params)
       expect(audits_controller.query_options).to eq({
         oldest: start_time,
         newest: end_time

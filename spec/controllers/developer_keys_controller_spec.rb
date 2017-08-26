@@ -27,14 +27,14 @@ describe DeveloperKeysController do
 
     describe "GET 'index'" do
       it 'should require authorization' do
-        get 'index', account_id: Account.site_admin.id
+        get 'index', params: {account_id: Account.site_admin.id}
         expect(response).to be_redirect
       end
 
       it 'should return the list of developer keys' do
         user_session(@admin)
         dk = DeveloperKey.create!
-        get 'index', account_id: Account.site_admin.id
+        get 'index', params: {account_id: Account.site_admin.id}
         expect(response).to be_success
         expect(assigns[:keys]).to be_include(dk)
       end
@@ -43,7 +43,7 @@ describe DeveloperKeysController do
         user_session(@admin)
         dk = DeveloperKey.create!
         dk.destroy
-        get 'index', account_id: Account.site_admin.id
+        get 'index', params: {account_id: Account.site_admin.id}
         expect(response).to be_success
         expect(assigns[:keys]).to_not be_include(dk)
       end
@@ -52,7 +52,7 @@ describe DeveloperKeysController do
         user_session(@admin)
         dk = DeveloperKey.create!
         dk.deactivate!
-        get 'index', account_id: Account.site_admin.id
+        get 'index', params: {account_id: Account.site_admin.id}
         expect(response).to be_success
         expect(assigns[:keys]).to be_include(dk)
       end
@@ -62,9 +62,9 @@ describe DeveloperKeysController do
       it 'should return the list of developer keys' do
         user_session(@admin)
 
-        post "create", account_id: Account.site_admin.id, developer_key: {
+        post "create", params: {account_id: Account.site_admin.id, developer_key: {
                        redirect_uri: "http://example.com/sdf"
-                     }
+                     }}
         expect(response).to be_success
         json_data = JSON.parse(response.body)
 
@@ -78,7 +78,7 @@ describe DeveloperKeysController do
         user_session(@admin)
 
         dk = DeveloperKey.create!
-        put 'update', id: dk.id, developer_key: { event: :deactivate }, account_id: Account.site_admin.id
+        put 'update', params: {id: dk.id, developer_key: { event: :deactivate }, account_id: Account.site_admin.id}
         expect(response).to be_success
         expect(dk.reload.state).to eq :inactive
       end
@@ -88,7 +88,7 @@ describe DeveloperKeysController do
 
         dk = DeveloperKey.create!
         dk.deactivate!
-        put 'update', id: dk.id, developer_key: { event: :activate }, account_id: Account.site_admin.id
+        put 'update', params: {id: dk.id, developer_key: { event: :activate }, account_id: Account.site_admin.id}
         expect(response).to be_success
         expect(dk.reload.state).to eq :active
       end
@@ -99,7 +99,7 @@ describe DeveloperKeysController do
         user_session(@admin)
 
         dk = DeveloperKey.create!
-        delete 'destroy', id: dk.id, account_id: Account.site_admin.id
+        delete 'destroy', params: {id: dk.id, account_id: Account.site_admin.id}
         expect(response).to be_success
         expect(dk.reload.state).to eq :deleted
       end
@@ -115,33 +115,33 @@ describe DeveloperKeysController do
 
     before :each do
       user_session(@test_domain_root_account_admin)
-      LoadAccount.stubs(:default_domain_root_account).returns(@test_domain_root_account)
+      allow(LoadAccount).to receive(:default_domain_root_account).and_return(@test_domain_root_account)
     end
 
     it 'Should be allowed to access their dev keys' do
-      get 'index', account_id: @test_domain_root_account.id
+      get 'index', params: {account_id: @test_domain_root_account.id}
       expect(response).to be_success
     end
 
     it "An account admin shouldn't be able to access site admin dev keys" do
       user_session(@test_domain_root_account_admin)
-      get 'index', account_id: Account.site_admin.id
+      get 'index', params: {account_id: Account.site_admin.id}
       expect(response).to be_redirect
       expect(flash[:error]).to eq "You don't have permission to access that page"
     end
 
     it "An account admin shouldn't be able to access site admin dev keys explicitly" do
       user_session(@test_domain_root_account_admin)
-      get 'index', account_id: Account.site_admin.id
+      get 'index', params: {account_id: Account.site_admin.id}
       expect(response).to be_redirect
       expect(flash[:error]).to eq "You don't have permission to access that page"
     end
 
     describe "Should be able to create developer key" do
       before :each do
-        post "create", account_id: @test_domain_root_account.id, developer_key: {
+        post "create", params: {account_id: @test_domain_root_account.id, developer_key: {
                        redirect_uri: "http://example.com/sdf"
-                     }
+                     }}
       end
 
       it 'should be allowed to create a dev key' do
@@ -155,9 +155,9 @@ describe DeveloperKeysController do
 
     it 'should be allowed update a dev key' do
       dk = @test_domain_root_account.developer_keys.create!(redirect_uri: 'http://asd.com/')
-      put 'update', id: dk.id, developer_key: {
+      put 'update', params: {id: dk.id, developer_key: {
           redirect_uri: "http://example.com/sdf"
-        }
+        }}
       expect(response).to be_success
       dk.reload
       expect(dk.redirect_uri).to eq("http://example.com/sdf")
@@ -165,13 +165,13 @@ describe DeveloperKeysController do
     end
 
     it "Shouldn't be allowed access dev keys for a sub account" do
-      get 'index', account_id: @sub_account.id
+      get 'index', params: {account_id: @sub_account.id}
       expect(response).to be_redirect
       expect(flash[:error]).to eq "You don't have permission to access that page"
     end
 
     it "Shouldn't be allowed to create dev keys for a sub account" do
-      post 'create', account_id: @sub_account.id
+      post 'create', params: {account_id: @sub_account.id}
       expect(response).to be_redirect
       expect(flash[:error]).to eq "You don't have permission to access that page"
     end
@@ -183,27 +183,27 @@ describe DeveloperKeysController do
       end
 
       it "Shouldn't be allowed access dev keys for a foreign account" do
-        get 'index', account_id: @other_root_account.id
+        get 'index', params: {account_id: @other_root_account.id}
         expect(response).to be_redirect
         expect(flash[:error]).to eq "You don't have permission to access that page"
       end
 
       it "Shouldn't be allowed to create dev keys for a foreign account" do
-        post 'create', account_id: @other_root_account.id
+        post 'create', params: {account_id: @other_root_account.id}
         expect(response).to be_redirect
         expect(flash[:error]).to eq "You don't have permission to access that page"
       end
 
       it "Shouldn't be allowed to update dev keys for a foreign account" do
         dk = @other_root_account.developer_keys.create!
-        post 'update', id: dk.id, account_id: @test_domain_root_account_admin.id, developer_key: { event: :deactivate }
+        post 'update', params: {id: dk.id, account_id: @test_domain_root_account_admin.id, developer_key: { event: :deactivate }}
         expect(response).to be_redirect
         expect(flash[:error]).to eq "You don't have permission to access that page"
       end
 
       it "Shouldn't be allowed to update global dev keys" do
         dk = DeveloperKey.create!
-        post 'update', id: dk.id, account_id: @test_domain_root_account_admin.id, developer_key: { event: :deactivate }
+        post 'update', params: {id: dk.id, account_id: @test_domain_root_account_admin.id, developer_key: { event: :deactivate }}
         expect(response).to be_redirect
         expect(flash[:error]).to eq "You don't have permission to access that page"
       end
@@ -211,7 +211,7 @@ describe DeveloperKeysController do
       it "Shouldn't be allowed to view foreign accounts dev_key" do
         dk = @other_root_account.developer_keys.create!(redirect_uri: 'http://asd.com/')
 
-        post 'update', id: dk.id
+        post 'update', params: {id: dk.id}
         expect(response).to be_redirect
         expect(flash[:error]).to eq "You don't have permission to access that page"
       end

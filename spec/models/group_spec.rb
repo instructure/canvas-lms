@@ -441,7 +441,7 @@ describe Group do
     it "defers to the context if that context is a course" do
       course_with_student
       group = @course.groups.create
-      group.context.stubs(:user_can_manage_own_discussion_posts?).returns(false)
+      allow(group.context).to receive(:user_can_manage_own_discussion_posts?).and_return(false)
       expect( group.user_can_manage_own_discussion_posts?(nil) ).to be_falsey
     end
   end
