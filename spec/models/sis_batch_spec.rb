@@ -619,6 +619,22 @@ U001,,AccountAdmin,active
       expect(b1.processing_warnings).to eq []
     end
 
+    it 'should not allow removing import admin with sis import' do
+      user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
+      b1 = process_csv_data([%{user_id,account_id,role,status
+                               U001,,AccountAdmin,deleted}])
+      expect(b1.processing_errors).to eq []
+      expect(b1.processing_warnings).to eq [["csv_0.csv", "Can't remove yourself user_id 'U001'"]]
+    end
+
+    it 'should not allow removing import admin user with sis import' do
+      p = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001').pseudonym
+      b1 = process_csv_data([%{user_id,login_id,status
+                               U001,#{p.unique_id},deleted}])
+      expect(b1.processing_errors).to eq []
+      expect(b1.processing_warnings).to eq [["csv_0.csv", "Can't remove yourself user_id 'U001'"]]
+    end
+
     describe 'change_threshold in batch mode' do
       before :once do
         @term1 = @account.enrollment_terms.first

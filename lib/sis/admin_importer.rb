@@ -80,6 +80,10 @@ module SIS
         user = get_user(user_id, the_root_account)
         raise ImportError, "Invalid or unknown user_id '#{user_id}' for admin" unless user
 
+        if state == 'deleted' && user.id == @batch&.user_id && @account == @root_account
+          raise ImportError, "Can't remove yourself user_id '#{user_id}'"
+        end
+
         create_or_find_admin(user, state)
         @success_count += 1
       end
