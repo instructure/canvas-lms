@@ -19,6 +19,8 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   belongs_to :master_template, :class_name => "MasterCourses::MasterTemplate"
   belongs_to :user
 
+  has_many :migration_results, :class_name => "MasterCourses::MigrationResult"
+
   serialize :export_results, Hash
   serialize :import_results, Hash
   serialize :migration_settings, Hash
@@ -205,7 +207,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   end
 
   def generate_imports(type, export, subscriptions)
-    # generate all the content_migrations right now (and mark them in import_results) - queue afterwards
+    # generate all the content_migrations right now (and mark them in the migration results table) - queue afterwards
     cms = []
     subscriptions.each do |sub|
       cm = sub.child_course.content_migrations.build
@@ -219,7 +221,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
       cm.exported_attachment = export.attachment
       cm.save!
 
-      self.import_results[cm.id] = {:import_type => type, :subscription_id => sub.id, :state => 'queued'}
+      self.migration_results.create!(:content_migration => cm, :import_type => type, :child_subscription_id => sub.id, :state => "queued")
       cms << cm
     end
     self.save!
@@ -233,13 +235,47 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   end
 
   def update_import_state!(import_migration, state)
-    self.class.transaction do # turns out locking does nothing outside a transaction - oopsimanoob
+    if self.import_results.present? # still using old format - can remove eventually
+      return self.update_import_state_for_old_import_result_format(import_migration, state)
+    end
+
+    res = self.migration_results.where(:content_migration_id => import_migration).first
+    res.state = state
+    res.results[:skipped] = import_migration.skipped_master_course_items.to_a if import_migration.skipped_master_course_items
+    res.save!
+    if state == 'completed' && res.import_type == 'full'
+      if sub = self.master_template.child_subscriptions.active.where(:id => res.child_subscription_id, :use_selective_copy => false).first
+        sub.update_attribute(:use_selective_copy, true) # mark subscription as up-to-date
+      end
+    end
+
+    unless self.migration_results.where.not(:state => %w{completed failed}).exists?
+      self.class.transaction do
+        self.lock!
+        if self.workflow_state == 'imports_queued'
+          if self.migration_results.where.not(:state => "completed").exists?
+            self.workflow_state = 'imports_failed'
+          else
+            self.workflow_state = 'completed'
+            self.imports_completed_at = Time.now
+          end
+          self.save!
+        end
+      end
+    end
+  end
+
+  def update_import_state_for_old_import_result_format(import_migration, state)
+    # can be removed once all running migrations are using the new table
+    self.class.transaction do
       self.lock!
       res = self.import_results[import_migration.id]
       res[:state] = state
       if state == 'completed' && res[:import_type] == :full
-        if sub = self.master_template.child_subscriptions.active.where(:id => res[:subscription_id], :use_selective_copy => false).first
-          sub.update_attribute(:use_selective_copy, true) # mark subscription as up-to-date
+        self.class.connection.after_transaction_commit do
+          if sub = self.master_template.child_subscriptions.active.where(:id => res[:subscription_id], :use_selective_copy => false).first
+            sub.update_attribute(:use_selective_copy, true) # mark subscription as up-to-date
+          end
         end
       end
       res[:skipped] = import_migration.skipped_master_course_items&.to_a || []
