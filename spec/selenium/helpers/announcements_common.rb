@@ -101,4 +101,10 @@ module AnnouncementsCommon
     f('.edit-btn').click
     wait_for_ajaximations
   end
+
+  # sets the course setting checkbox for 'Disable comments on announcements'
+  def disable_comments_on_announcements(set = true)
+    @course.lock_all_announcements = set
+    @course.save!
+  end
 end
