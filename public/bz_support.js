@@ -20,6 +20,20 @@
     4. bz_custom.js runs
     5. bottom scripts in view html run, which can also call thi
 */
+
+var onMagicFieldsLoaded = [];
+var magicFieldsLoaded = false;
+
+function addOnMagicFieldsLoaded(func) {
+  if(magicFieldsLoaded) {
+    console.log("running magic field thing now");
+    func();
+  } else {
+    console.log("queuing magic field thing");
+    onMagicFieldsLoaded.push(func);
+  }
+}
+
 function bzRetainedInfoSetup() {
   function bzChangeRetainedItem(ta, value) {
     if(ta.tagName == "INPUT" && ta.getAttribute("type") == "checkbox")
@@ -39,6 +53,16 @@ function bzRetainedInfoSetup() {
       element.className = "bz-user-name-showing";
       element.textContent = ENV.current_user.display_name;
     }
+  }
+
+  var pendingMagicFieldLoads = 0;
+  var pendingMagicFieldLoadEvent = false;
+  function triggerMagicFieldsLoaded() {
+    pendingMagicFieldLoadEvent = false;
+    magicFieldsLoaded = true;
+    console.log("running on magic fields loaded");
+    for(var i = 0; i < onMagicFieldsLoaded.length; i++)
+      onMagicFieldsLoaded[i]();
   }
 
   var textareas = document.querySelectorAll("[data-bz-retained]");
@@ -90,9 +114,18 @@ function bzRetainedInfoSetup() {
       ta.className += " bz-retained-field-setup";
       ta.addEventListener("change", save);
 
+      pendingMagicFieldLoads += 1;
+
       var http = new XMLHttpRequest();
       // cut off json p stuff
-      http.onload = function() { bzChangeRetainedItem(ta, http.responseText.substring(9)); };
+      http.onload = function() {
+        bzChangeRetainedItem(ta, http.responseText.substring(9));
+        pendingMagicFieldLoads -= 1;
+        if(pendingMagicFieldLoads == 0 && !pendingMagicFieldLoadEvent) {
+          pendingMagicFieldLoadEvent = true;
+          window.requestAnimationFrame(triggerMagicFieldsLoaded);
+        }
+      };
       http.open("GET", "/bz/user_retained_data?name=" + encodeURIComponent(name), true);
       http.send();
     })(textareas[i]);
