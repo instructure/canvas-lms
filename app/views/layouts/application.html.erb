@@ -117,6 +117,9 @@
       </div>
     <% end %>
     <div id="main" class="ic-Layout-columns">
+      <% if !@body_class_no_headers %>
+        <div class="ic-Layout-watermark"></div>
+      <% end %>
       <% if @show_left_side %>
         <div id="left-side"
           class="ic-app-course-menu <% if !@no_left_side_list_view %>list-view<% end %>"
