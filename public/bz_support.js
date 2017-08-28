@@ -36,14 +36,19 @@ function addOnMagicFieldsLoaded(func) {
 
 function bzRetainedInfoSetup() {
   function bzChangeRetainedItem(ta, value) {
-    if(ta.tagName == "INPUT" && ta.getAttribute("type") == "checkbox")
+    if(ta.tagName == "INPUT" && ta.getAttribute("type") == "checkbox"){
       ta.checked = (value == "yes") ? true : false;
-    else if(ta.tagName == "INPUT" && ta.getAttribute("type") == "radio")
+    } else if(ta.tagName == "INPUT" && ta.getAttribute("type") == "radio"){
       ta.checked = (value == ta.value) ? true : false;
-    else if(ta.tagName == "INPUT" || ta.tagName == "TEXTAREA")
+    } else if(ta.tagName == "INPUT" && ta.getAttribute("type") == "button"){
+      if (value == "clicked"){
+       ta.className += " bz-was-clicked";
+      }
+    } else if(ta.tagName == "INPUT" || ta.tagName == "TEXTAREA"){
       ta.value = value;
-    else
+    } else {
       ta.textContent = value;
+    }
   }
 
   if(window.ENV && ENV.current_user) {
@@ -89,11 +94,15 @@ function bzRetainedInfoSetup() {
         var http = new XMLHttpRequest();
         http.open("POST", "/bz/user_retained_data", true);
         var value = ta.value;
-        if(ta.getAttribute("type") == "radio")
+        if(ta.getAttribute("type") == "radio"){
           if(!ta.checked)
             return; // we only want to actually save the one that is checked
-        if(ta.getAttribute("type") == "checkbox")
+        } else if(ta.getAttribute("type") == "checkbox"){
           value = ta.checked ? "yes" : "";
+        } else if(ta.getAttribute("type") == "button"){
+          value = "clicked";
+          ta.className += " bz-was-clicked";
+        }
         var data = "name=" + encodeURIComponent(name) + "&value=" + encodeURIComponent(value) + "&type=" + ta.getAttribute("type");
         if (ta.classList.contains("bz-optional-magic-field"))
           data += "&optional=true";
@@ -112,7 +121,10 @@ function bzRetainedInfoSetup() {
       };
 
       ta.className += " bz-retained-field-setup";
-      ta.addEventListener("change", save);
+      if (ta.getAttribute("type") == "button")
+        ta.addEventListener("click", save);
+      else
+        ta.addEventListener("change", save);
 
       pendingMagicFieldLoads += 1;
 
@@ -126,7 +138,7 @@ function bzRetainedInfoSetup() {
           window.requestAnimationFrame(triggerMagicFieldsLoaded);
         }
       };
-      http.open("GET", "/bz/user_retained_data?name=" + encodeURIComponent(name), true);
+      http.open("GET", "/bz/user_retained_data?name=" + encodeURIComponent(name) + "&value=" + encodeURIComponent(ta.value) + "&type=" + ta.getAttribute("type"), true);
       http.send();
     })(textareas[i]);
   }
