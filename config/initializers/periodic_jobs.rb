@@ -143,16 +143,20 @@ Rails.configuration.after_initialize do
     with_each_shard_by_database(DelayedMessageScrubber, :scrub)
   end
 
-  if BounceNotificationProcessor.enabled?
-    Delayed::Periodic.cron 'BounceNotificationProcessor.process', '*/5 * * * *' do
-      BounceNotificationProcessor.process
-    end
+  Delayed::Periodic.cron 'BounceNotificationProcessor.process', '*/5 * * * *' do
+    DatabaseServer.send_in_each_region(
+      BounceNotificationProcessor,
+      :process,
+      { run_current_region_asynchronously: true }
+    )
   end
 
-  if NotificationFailureProcessor.enabled?
-    Delayed::Periodic.cron 'NotificationFailureProcessor.process', '*/5 * * * *' do
-      NotificationFailureProcessor.process
-    end
+  Delayed::Periodic.cron 'NotificationFailureProcessor.process', '*/5 * * * *' do
+    DatabaseServer.send_in_each_region(
+      NotificationFailureProcessor,
+      :process,
+      { run_current_region_asynchronously: true }
+    )
   end
 
   Delayed::Periodic.cron 'Quizzes::QuizSubmissionEventPartitioner.process', '0 0 * * *' do
