@@ -46,7 +46,7 @@ content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_co
             <a href="#" class="toggle_description_views_link"><%= t "HTML Editor" %></a>
             <a href="#" class="toggle_description_views_link" style="display:none;"><%= t "Rich Content Editor" %></a>
           </div>
-          <textarea id="quiz_description" style="display: block;width: 100%;margin: 0px auto;height: 125px"><%= @quiz.description %></textarea>
+          <textarea id="quiz_description" style="display: none;width: 100%;margin: 0px auto;height: 125px"><%= @quiz.description %></textarea>
         <% end %>
       </div>
 

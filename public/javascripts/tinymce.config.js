@@ -89,7 +89,10 @@ export default class EditorConfig {
 
       non_empty_elements: 'td th iframe video audio object script a i area base basefont br col frame hr img input isindex link meta param embed source wbr track',
       content_css: window.ENV.url_to_what_gets_loaded_inside_the_tinymce_editor_css,
-      browser_spellcheck: true
+      browser_spellcheck: true,
+      init_instance_callback: (ed) => {
+        $(`#${ed.id}`).parent().css('visibility','visible')
+      }
     }
   }
 
