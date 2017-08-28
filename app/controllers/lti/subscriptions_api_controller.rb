@@ -148,7 +148,7 @@ module Lti
     end
 
     def forward_service_response(service_response)
-      render json: service_response, status: service_response.code
+      render json: service_response.body, status: service_response.code
     end
 
     # @!appendix Webhook Subscription Required Capabilities
