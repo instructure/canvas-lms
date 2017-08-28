@@ -175,6 +175,32 @@ describe MasterCourses::MasterMigration do
       end
     end
 
+    it "should continue to work with the old import_results format" do
+      @copy_to = course_factory
+      @sub = @template.add_child_course!(@copy_to)
+
+      topic = @copy_from.discussion_topics.create!(:title => "some title")
+
+      @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @admin)
+      run_job(Delayed::Job.where(:tag => "MasterCourses::MasterMigration#perform_exports").first) # only run the export job right now
+
+      @migration.reload
+      result = @migration.migration_results.first
+      expect(result.state).to eq 'queued'
+
+      import_results = {result.content_migration_id => {
+        :state => 'queued', :import_type => result.import_type.to_sym, :subscription_id => result.child_subscription_id, :skipped => []
+      }}
+      @migration.update_attribute(:import_results, import_results)
+      MasterCourses::MigrationResult.where(:master_migration_id => @migration).delete_all # make sure they're gone
+
+      run_jobs
+
+      expect(@migration.reload).to be_completed
+      expect(@migration.imports_completed_at).to be_present
+      expect(@sub.reload.use_selective_copy?).to be_truthy # should have been marked as up-to-date now
+    end
+
     it "should copy selectively on second time" do
       @copy_to = course_factory
       @sub = @template.add_child_course!(@copy_to)
@@ -191,7 +217,7 @@ describe MasterCourses::MasterMigration do
       expect(topic_to).to be_present
       att_to = @copy_to.attachments.where(:migration_id => mig_id(att)).first
       expect(att_to).to be_present
-      cm1 = ContentMigration.find(@migration.import_results.keys.first)
+      cm1 = @migration.migration_results.first.content_migration
       expect(cm1.migration_settings[:imported_assets]["DiscussionTopic"]).to eq topic_to.id.to_s
       expect(cm1.migration_settings[:imported_assets]["Attachment"]).to eq att_to.id.to_s
 
@@ -203,7 +229,7 @@ describe MasterCourses::MasterMigration do
       page_to = @copy_to.wiki_pages.where(:migration_id => mig_id(page)).first
       expect(page_to).to be_present
 
-      cm2 = ContentMigration.find(@migration.import_results.keys.first)
+      cm2 = @migration.migration_results.first.content_migration
       expect(cm2.migration_settings[:imported_assets]["DiscussionTopic"]).to be_blank # should have excluded it from the selective export
       expect(cm2.migration_settings[:imported_assets]["Attachment"]).to be_blank
       expect(cm2.migration_settings[:imported_assets]["WikiPage"]).to eq page_to.id.to_s
@@ -268,7 +294,7 @@ describe MasterCourses::MasterMigration do
         expect(deletions['WikiPage']).to match_array([mig_id(page), mig_id(page2)])
         expect(deletions['Quizzes::Quiz']).to match_array([mig_id(quiz), mig_id(quiz2)])
 
-        skips = mm.import_results[mm.import_results.keys.first][:skipped]
+        skips = mm.migration_results.first.skipped_items
         expect(skips).to match_array([mig_id(quiz2), mig_id(page2)])
 
         expect(assmt_to.reload).to be_deleted
@@ -540,7 +566,7 @@ describe MasterCourses::MasterMigration do
       [page, assignment].each {|c| c.class.where(:id => c).update_all(:updated_at => 2.seconds.from_now)}
 
       run_master_migration # re-copy all the content but don't actually overwrite the downstream change
-      expect(@migration.import_results.values.first[:skipped]).to match_array([mig_id(assignment), mig_id(page)])
+      expect(@migration.migration_results.first.skipped_items).to match_array([mig_id(assignment), mig_id(page)])
 
       expect(copied_page.reload.body).to eq new_child_text # should have been left alone
       expect(copied_page.title).to eq old_title # even the title
@@ -556,7 +582,7 @@ describe MasterCourses::MasterMigration do
       end
 
       run_master_migration # re-copy all the content but this time overwrite the downstream change because we locked it
-      expect(@migration.import_results.values.first[:skipped]).to be_empty
+      expect(@migration.migration_results.first.skipped_items).to be_empty
 
       expect(copied_assignment.reload.description).to eq new_master_text
       expect(copied_assignment.title).to eq new_master_title
