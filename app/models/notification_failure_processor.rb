@@ -30,24 +30,23 @@ class NotificationFailureProcessor
   }.freeze
 
   def self.config
-    return @config if instance_variable_defined?(:@config)
-    @config = ConfigFile.load('notification_failures').try(:symbolize_keys).try(:freeze)
+    ConfigFile.load('notification_failures').try(:symbolize_keys).try(:freeze)
   end
 
-  class << self
-    alias_method :enabled?, :config
+  def self.enabled?
+    !!self.config
   end
 
-  def self.process(config = self.config)
-    new(config).process
+  def self.process
+    self.new.process
   end
 
-  def initialize(config = self.class.config)
-    raise ConfigurationMissingError unless self.class.enabled? || config
-    @config = DEFAULT_CONFIG.merge(config)
+  def initialize
+    @config = DEFAULT_CONFIG.merge(self.class.config || {})
   end
 
   def process
+    return nil unless self.class.enabled?
     notification_failure_queue.poll(config.slice(*POLL_PARAMS)) do |failure_summary_json|
       summary = parse_failure_summary(failure_summary_json)
       process_failure_summary(summary) if summary
