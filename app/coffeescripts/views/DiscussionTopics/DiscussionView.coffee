@@ -21,13 +21,14 @@ define [
   'underscore'
   'Backbone'
   'jsx/shared/conditional_release/CyoeHelper'
+  'jsx/move_item_tray/NewMoveDialogView'
   'jst/DiscussionTopics/discussion'
   'compiled/views/PublishIconView'
   'compiled/views/LockIconView'
   'compiled/views/ToggleableSubscriptionIconView'
   'compiled/views/assignments/DateDueColumnView'
   'compiled/views/MoveDialogView'
-], (I18n, $, _, {View}, CyoeHelper, template, PublishIconView, LockIconView, ToggleableSubscriptionIconView, DateDueColumnView, MoveDialogView) ->
+], (I18n, $, _, {View}, CyoeHelper, NewMoveDialogView, template, PublishIconView, LockIconView, ToggleableSubscriptionIconView, DateDueColumnView, MoveDialogView) ->
 
   class DiscussionView extends View
     # Public: View template (discussion).
@@ -49,10 +50,11 @@ define [
       deleteFail: I18n.t('flash.fail', 'Discussion Topic deletion failed.')
 
     events:
-      'click .icon-lock':  'toggleLocked'
-      'click .icon-pin':   'togglePinned'
-      'click .icon-trash': 'onDelete'
-      'click':             'onClick'
+      'click .icon-lock':    'toggleLocked'
+      'click .icon-pin':     'togglePinned'
+      'click .icon-trash':   'onDelete'
+      'click .icon-updown':  'onMove'
+      'click':               'onClick'
 
     # Public: Option defaults.
     defaults:
@@ -62,6 +64,7 @@ define [
       '.screenreader-only': '$title'
       '.discussion-row': '$row'
       '.move_item': '$moveItemButton'
+      '.move_panel': '$movePanel'
       '.discussion-actions .al-trigger': '$gearButton'
 
     # Public: Topic is able to be locked/unlocked.
@@ -98,17 +101,19 @@ define [
       options.toggleableSubscriptionIcon = new ToggleableSubscriptionIconView(model: @model)
       if @model.get('assignment')
         options.dateDueColumnView = new DateDueColumnView(model: @model.get('assignment'))
-      @moveItemView = new MoveDialogView
+      @newModalView = new NewMoveDialogView
         model: @model
         nested: true
         closeTarget: @$el.find('a[id=manage_link]')
-        saveURL: -> @model.collection.reorderURL()
+        saveURL: @model.collection.reorderURL()
+        onSuccessfulMove: @onSuccessfulMove
+        movePanelParent: document.getElementById('not_right_side')
       super
 
     render: ->
       super
       @$el.attr('data-id', @model.get('id'))
-      @moveItemView.setTrigger @$moveItemButton
+      @newModalView.setCloseFocus @$gearButton
       this
 
     # Public: Lock or unlock the model and update it on the server.
@@ -136,6 +141,27 @@ define [
         @delete()
       else
         @$el.find('a[id=manage_link]').focus()
+
+    # Public: Called when move menu item is selected
+    #
+    # Returns nothing.
+    onMove: () =>
+      @newModalView.renderOpenMoveDialog();
+
+    # Public: Moves the items currently in the list to match backend
+    #
+    # movedItems - List of ID's of correct order
+    #
+    # Returns nothing.
+    onSuccessfulMove: (movedItems) =>
+      newCollection = @model.collection
+      #update all of the position attributes
+      positions = [1..newCollection.length]
+      movedItems.forEach (id, index) ->
+        newCollection.get(id)?.set 'position', positions[index]
+      newCollection.sort()
+      # finally, call reset to trigger a re-render
+      newCollection.reset newCollection.models
 
     # Public: Delete the model and update the server.
     #
