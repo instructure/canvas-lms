@@ -792,7 +792,7 @@ class FilesController < ApplicationController
 
     # service metadata
     @attachment.filename = params[:name]
-    @attachment.display_name = params[:name].presence
+    @attachment.display_name = params[:display_name] || params[:name]
     @attachment.size = params[:size]
     @attachment.content_type = params[:content_type]
     @attachment.instfs_uuid = params[:instfs_uuid]
