@@ -21,14 +21,15 @@ import parseLinkHeader from 'jsx/shared/helpers/parseLinkHeader'
 import MigrationStates from './migrationStates'
 
 const ApiClient = {
-  _depaginate (url, allResults = []) {
+  _depaginate (url, maxPages = Infinity, allResults = []) {
     return axios.get(url)
       .then((res) => {
         const results = allResults.concat(res.data)
-        if (res.headers.link) {
+        const remainingPages = maxPages - 1
+        if (res.headers.link && remainingPages > 0) {
           const links = parseLinkHeader(res)
           if (links.next) {
-            return this._depaginate(links.next, results)
+            return this._depaginate(links.next, remainingPages, results)
           }
         }
         res.data = results // eslint-disable-line
@@ -55,7 +56,7 @@ const ApiClient = {
       { enrollment_term_id: term },
     ])
 
-    return this._depaginate(`/api/v1/accounts/${subAccount || accountId}/courses?${params}`)
+    return this._depaginate(`/api/v1/accounts/${subAccount || accountId}/courses?${params}`, 1)
   },
 
   getAssociations ({ masterCourse }) {
