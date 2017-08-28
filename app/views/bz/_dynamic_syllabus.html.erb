@@ -71,7 +71,10 @@
           text = 'Complete Module'
           disp_name = obj.title["Course Participation - ".length .. -1]
           icon = 'document'
+          # need the page for the direct link
           page = @course.wiki_pages.active.where(:title => disp_name).first
+          # need the module for the unlock date
+          mod = @course.context_modules.active.where(:name => disp_name).first
           link = "/courses/#{@course.id}/pages/#{page.url}"
         else
           text = 'Submit'
@@ -89,6 +92,7 @@
           # skip anything that is significantly past due
           # because it ought to be already done
           next if overridden.due_at < (DateTime.now - 2.days)
+          next if !mod.nil? && !mod.unlock_at.nil? && mod.unlock_at > DateTime.now # skip locked modules
           magic = {}
           magic[:obj] = obj
           magic[:text] = "#{text} #{disp_name}"
