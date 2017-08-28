@@ -201,6 +201,20 @@ describe Pseudonym do
       expect(ErrorReport.last.message).to match(/timed out/)
       expect(@aac.reload.last_timeout_failure).to be > 1.minute.ago
     end
+
+    it "only checks an explicit LDAP provider" do
+      aac2 = @pseudonym.account.authentication_providers.create!(auth_type: 'ldap')
+      @pseudonym.update_attribute(:authentication_provider, aac2)
+      expect_any_instantiation_of(@aac).to receive(:ldap_bind_result).never
+      expect(aac2).to receive(:ldap_bind_result).and_return(42)
+      expect(@pseudonym.ldap_bind_result('stuff')).to eq 42
+    end
+
+    it "doesn't even check LDAP for a Canvas pseudonym" do
+      @pseudonym.update_attribute(:authentication_provider, @pseudonym.account.canvas_authentication_provider)
+      expect_any_instantiation_of(@aac).to receive(:ldap_bind_result).never
+      expect(@pseudonym.ldap_bind_result('stuff')).to eq nil
+    end
   end
 
   it "should not error on malformed SSHA password" do

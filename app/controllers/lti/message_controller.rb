@@ -33,7 +33,8 @@ module Lti
           @context,
           polymorphic_url([@context, :tool_consumer_profile]),
           -> { polymorphic_url([@context, :registration_return]) },
-          params[:tool_consumer_url]
+          params[:tool_consumer_url],
+          polymorphic_url([:create, @context, :lti_tool_proxy])
         )
 
         @lti_launch.params = message.post_params
@@ -60,7 +61,7 @@ module Lti
           @lti_launch.resource_url = message.launch_url
           @lti_launch.link_text = mh.resource_handler.name
           @lti_launch.launch_type = message.launch_presentation_document_target
-          @lti_launch.params = message.signed_post_params(tp.shared_secret)
+          @lti_launch.params = launch_params(tool_proxy: tp, message: message, private_key: tp.shared_secret)
           render Lti::AppUtil.display_template('borderless') and return
         end
       end
@@ -68,10 +69,10 @@ module Lti
     end
 
     def reregistration_message(mh, tp)
-      IMS::LTI::Models::Messages::ToolProxyReregistrationRequest.new(
+      IMS::LTI::Models::Messages::ToolProxyUpdateRequest.new(
         launch_url: mh.launch_path,
         oauth_consumer_key: tp.guid,
-        lti_version: IMS::LTI::Models::LTIModel::LTI_VERSION_2P1,
+        lti_version: IMS::LTI::Models::LTIModel::LTI_VERSION_2P0,
         tc_profile_url: polymorphic_url([@context, :tool_consumer_profile]),
         launch_presentation_return_url: polymorphic_url([@context, :registration_return]),
         launch_presentation_document_target: IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME
@@ -109,9 +110,11 @@ module Lti
 
     def launch_params(tool_proxy:, message:, private_key:)
       if tool_proxy.security_profiles.find { |sp| sp.security_profile_name == 'lti_jwt_message_security'}
-        domain = HostUrl.context_host(@context, request.host)
-        {jwt: message.to_jwt(private_key: private_key, originating_domain: domain, algorithm: :HS256)}
+        message.roles = message.roles.split(',') if message.roles
+        message.launch_url = Addressable::URI.escape(message.launch_url)
+        {jwt: message.to_jwt(private_key: private_key, originating_domain: request.host, algorithm: :HS256)}
       else
+        message.oauth_callback = 'about:blank'
         message.signed_post_params(private_key)
       end
     end
@@ -163,7 +166,8 @@ module Lti
         custom_param_opts[:secure_params] = params[:secure_params] if params[:secure_params].present?
         tool_setting = ToolSetting.find_by(resource_link_id: resource_link_id)
         variable_expander = create_variable_expander(custom_param_opts.merge(tool: tool_proxy,
-                                                                             tool_setting: tool_setting))
+                                                                             tool_setting: tool_setting,
+                                                                             launch: @lti_launch))
         launch_attrs.merge! enabled_parameters(tool_proxy, message_handler, variable_expander)
 
         message = IMS::LTI::Models::Messages::BasicLTILaunchRequest.new(launch_attrs)

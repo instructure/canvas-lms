@@ -78,27 +78,31 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
   def download_metadata
     return unless metadata_uri.present?
     return unless metadata_uri_changed? || idp_entity_id_changed?
-    # someone's trying to cheat; switch to our more efficient implementation
-    self.metadata_uri = InCommon::URN if metadata_uri == InCommon.endpoint
 
-    if metadata_uri == InCommon::URN
-      unless idp_entity_id.present?
-        errors.add(:idp_entity_id, :present)
-        return
-      end
+    Federation.descendants.each do |federation|
+      # someone's trying to cheat; switch to our more efficient implementation
+      self.metadata_uri = federation::URN if metadata_uri == federation.endpoint
 
-      begin
-        entity = InCommon.metadata[idp_entity_id]
-        unless entity
-          errors.add(:idp_entity_id, t("Entity %{entity_id} not found in InCommon Metadata", entity_id: idp_entity_id))
+      if metadata_uri == federation::URN
+        unless idp_entity_id.present?
+          errors.add(:idp_entity_id, :present)
           return
         end
-        populate_from_metadata(entity)
-      rescue => e
-        ::Canvas::Errors.capture_exception(:incommon, e)
-        errors.add(:metadata_uri, e.message)
+
+        begin
+          entity = federation.metadata[idp_entity_id]
+          unless entity
+            errors.add(:idp_entity_id, t("Entity %{entity_id} not found in %{federation_name} Metadata",
+                                         entity_id: idp_entity_id, federation_name: federation.class_name))
+            return
+          end
+          populate_from_metadata(entity)
+        rescue => e
+          ::Canvas::Errors.capture_exception(:saml_federation, e)
+          errors.add(:metadata_uri, e.message)
+        end
+        return
       end
-      return
     end
 
     begin

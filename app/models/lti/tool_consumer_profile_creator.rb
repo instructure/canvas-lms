@@ -68,7 +68,7 @@ module Lti
 
       # TODO: Extract this
       if @root_account.feature_enabled?(:lti2_rereg)
-        profile.capability_offered << IMS::LTI::Models::Messages::ToolProxyReregistrationRequest::MESSAGE_TYPE
+        profile.capability_offered << IMS::LTI::Models::Messages::ToolProxyUpdateRequest::MESSAGE_TYPE
       end
 
       profile
@@ -118,8 +118,7 @@ module Lti
           digest_algorithm: ['HMAC-SHA1']
         ),
         IMS::LTI::Models::SecurityProfile.new(
-          security_profile_name: 'oauth2_access_token_ws_security',
-          digest_algorithm: ['HS256']
+          security_profile_name: 'oauth2_access_token_ws_security'
         ),
         IMS::LTI::Models::SecurityProfile.new(
           security_profile_name: 'lti_jwt_ws_security',

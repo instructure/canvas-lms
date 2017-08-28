@@ -28,7 +28,7 @@ $form.formSubmit({
     return registrationErrors(errors, ENV.PASSWORD_POLICIES[pseudonymId] != null ? ENV.PASSWORD_POLICIES[pseudonymId] : ENV.PASSWORD_POLICY)
   },
   success () {
-    location.href = '/login/canvas'
+    location.href = '/login/canvas?password_changed=1'
   },
   error (errors) {
     if (errors.nonce) location.href = '/login/canvas'

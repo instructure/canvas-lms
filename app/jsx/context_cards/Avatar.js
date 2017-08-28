@@ -53,17 +53,15 @@ class Avatar extends React.Component {
             />
           </Link>
           {
-            canMasquerade ? (
+            canMasquerade && (
               <Typography size="x-small" weight="bold" as="div">
                 <a
                   href={`/courses/${courseId}?become_user_id=${user.id}`}
-                  aria-label={I18n.t('Masquerade as %{name}', { name: user.short_name })}
+                  aria-label={I18n.t('Act as %{name}', { name: user.short_name })}
                 >
-                  {I18n.t('Masquerade')}
+                  {I18n.t('Act as User')}
                 </a>
               </Typography>
-            ) : (
-              null
             )
           }
         </div>

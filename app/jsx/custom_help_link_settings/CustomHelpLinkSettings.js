@@ -51,7 +51,7 @@ import 'compiled/jquery.rails_flash_notifications'
 
         return {
           ...link,
-          id: 'link' + counter,
+          id: link.id || ('link' + counter),
           available_to: link.available_to || [],
           state: link.state || 'active'
         }
@@ -152,7 +152,7 @@ import 'compiled/jquery.rails_flash_notifications'
       counter++;
 
       const links = [...this.state.links];
-      const id = 'link' + counter;
+      const id = link.id || ('link' + counter);
 
       links.splice(0, 0, {
         ...link,

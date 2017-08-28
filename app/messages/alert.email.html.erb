@@ -1,9 +1,9 @@
 <% define_content :link do %>
-  <%= course_url asset_context.course_id %>
+  <%= course_url data.course_id %>
 <% end %>
 
 <% define_content :subject do %>
-  <%= t('subject', 'Alert: %{user_name}', :user_name => asset_context.user.name) %>
+  <%= t('subject', 'Alert: %{user_name}', :user_name => data.student_name) %>
 <% end %>
 
 <% define_content :footer_link do %>
@@ -14,10 +14,10 @@
 
 <p>
 <%=
-    if asset_context.user_id == user.id
+    if data.user_id == user.id
       t('body_student', {:one => "An alert has been triggered for you because the following condition has been met:", :other => "An alert has been triggered for you because the following conditions have been met:"}, :count => asset.criteria.length)
     else
-      t('body', {:one => "An alert has been triggered for %{student} because the following condition has been met:", :other => "An alert has been triggered for %{student} because the following conditions have been met:"}, :count => asset.criteria.length, :student => asset_context.user.name)
+      t('body', {:one => "An alert has been triggered for %{student} because the following condition has been met:", :other => "An alert has been triggered for %{student} because the following conditions have been met:"}, :count => asset.criteria.length, :student => data.student_name)
     end
 %>
 </p>

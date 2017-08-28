@@ -28,3 +28,19 @@ chmod 664 ./app/stylesheets/_brand_variables.scss
 ```
 
 For more information checkout [Developing with Docker](developing_with_docker.md)
+
+## Known Issues
+
+### Long URL Gateway 502
+
+If a URL is long enough, you may see a Gateway 502 error. This problem
+has been patched in [dinghy-http-proxy#36](https://github.com/codekitchen/dinghy-http-proxy/pull/36)
+however until a new release is cut the follow can be done as a work
+around:
+
+In `~/.dinghy/proxy.conf` add the following:
+
+    proxy_buffers 8 1024k;
+    proxy_buffer_size 1024k;
+
+Restart dinghy afterwards.

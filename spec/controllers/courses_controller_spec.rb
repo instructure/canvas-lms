@@ -845,7 +845,7 @@ describe CoursesController do
       it "should work for wiki view with draft state enabled" do
         @course1.default_view = "wiki"
         @course1.save!
-        @course1.wiki.wiki_pages.create!(:title => 'blah').set_as_front_page!
+        @course1.wiki_pages.create!(:title => 'blah').set_as_front_page!
         get 'show', params: {:id => @course1.id}
         expect(controller.js_env[:WIKI_RIGHTS].symbolize_keys).to eql({:read => true})
         expect(controller.js_env[:PAGE_RIGHTS].symbolize_keys).to eql({:read => true})
@@ -857,7 +857,7 @@ describe CoursesController do
         @course1.show_announcements_on_home_page = true
         @course1.home_page_announcement_limit = 3
         @course1.save!
-        @course1.wiki.wiki_pages.create!(:title => 'blah').set_as_front_page!
+        @course1.wiki_pages.create!(:title => 'blah').set_as_front_page!
         get 'show', params: {:id => @course1.id}
         expect(controller.js_env[:COURSE_HOME]).to be_truthy
         expect(controller.js_env[:SHOW_ANNOUNCEMENTS]).to be_truthy
@@ -870,7 +870,7 @@ describe CoursesController do
         @course1.home_page_announcement_limit = 3
         @course1.is_public = true
         @course1.save!
-        @course1.wiki.wiki_pages.create!(:title => 'blah').set_as_front_page!
+        @course1.wiki_pages.create!(:title => 'blah').set_as_front_page!
         remove_user_session
         get 'show', params: {:id => @course1.id}
         expect(response).to be_success

@@ -35,7 +35,6 @@ $ic-global-nav-link-active:  rgba(black, 0.4);
 $ic-masquerade-color: $ic-color-action;
 $ic-subnav-panel-bgd: $ic-color-light;
 $ic-subnav-tray-bgd: black;
-$ic-logomark-url: url("/images/svg-icons/svg_canvas_logomark_only.svg");
 $ic-tooltip-arrow-size: 0.375rem;
 
 
@@ -257,17 +256,17 @@ button.ic-app-header__menu-list-link {
 
   &::after {
     right: 100%;
-  	top: 50%;
-  	border: solid transparent;
-  	content: "";
-  	height: 0;
-  	width: 0;
-  	position: absolute;
-  	pointer-events: none;
-  	border-color: transparent;
-  	border-right-color: var(--ic-brand-global-nav-ic-icon-svg-fill--active);
-  	border-width: $ic-tooltip-arrow-size;
-  	margin-top: -($ic-tooltip-arrow-size);
+    top: 50%;
+    border: solid transparent;
+    content: "";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    border-color: transparent;
+    border-right-color: var(--ic-brand-global-nav-ic-icon-svg-fill--active);
+    border-width: $ic-tooltip-arrow-size;
+    margin-top: -($ic-tooltip-arrow-size);
   }
 }
 
@@ -289,17 +288,7 @@ button.ic-app-header__menu-list-link {
   width: 100%;
   background-color: var(--ic-brand-global-nav-logo-bgd);
   box-sizing: border-box;
-
-  @if $ic-brand-header-image != $ic-logomark-url {
-    padding: 0;
-  }
-  @else {
-    padding: 0 $ic-sp/2;
-
-    body.primary-nav-expanded & {
-      padding: 0 $ic-sp + 2;
-    }
-  }
+  padding: 0;
 }
 
 .ic-app-header__logomark {
@@ -312,20 +301,10 @@ button.ic-app-header__menu-list-link {
   background-repeat: no-repeat;
   background-size: contain;
   transition: transform 0.3s;
-  @if $ic-brand-header-image != $ic-logomark-url {
-    height: 75px;
-  }
-  @else {
-    height: 65px;
-    transform: scale3d(0.7, 0.7, 0.7); // default canvas logo
-  }
+  height: 75px;
+
   body.primary-nav-expanded & {
-    @if $ic-brand-header-image != $ic-logomark-url {
-      height: 85px;
-    }
-    @else {
-      height: 75px;
-    }
+    height: 85px;
   }
 }
 // set to block to avoid any exta inline spacing at bottom
@@ -352,7 +331,7 @@ body.primary-nav-expanded {
     .menu-item__text {
 
       @if $use_high_contrast {
-        color: $ic-link-color;
+        color: var(--ic-link-color);
       }
       @else {
         color: var(--ic-brand-global-nav-menu-item__text-color--active);
@@ -485,7 +464,7 @@ body.primary-nav-expanded {
     display: inline-block;
     &:focus {
       @include ic-focus-base;
-      @include ic-focus-variant($color: $ic-link-color, $offset: 2px);
+      @include ic-focus-variant($color: var(--ic-link-color), $offset: 2px);
     }
     i[class*=icon-],
     i[class^=icon-] { margin-right: $ic-sp/3; }

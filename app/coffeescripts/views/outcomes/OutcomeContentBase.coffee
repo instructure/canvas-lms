@@ -197,7 +197,7 @@ define [
         @$('input:first').focus()
 
     readOnly: ->
-      @_readOnly || !@model.get('can_edit')
+      @_readOnly
 
     updateTitle: (e) =>
       @model.set 'title', e.currentTarget.value

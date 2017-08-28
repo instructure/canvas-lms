@@ -19,11 +19,13 @@ require_relative '../common'
 require_relative '../helpers/assignments_common'
 require_relative '../helpers/public_courses_context'
 require_relative '../helpers/files_common'
+require_relative '../helpers/admin_settings_common'
 
 describe "assignments" do
   include_context "in-process server selenium tests"
   include FilesCommon
   include AssignmentsCommon
+  include AdminSettingsCommon
 
   # note: due date testing can be found in assignments_overrides_spec
 
@@ -240,6 +242,152 @@ describe "assignments" do
       assignment = @course.assignments.where(title: assignment_name).last
       expect(assignment).not_to be_nil
       expect(assignment).to be_post_to_sis
+    end
+
+    context 'sync to sis' do
+      let(:name_length_limit) { 10 }
+      let(:invalid_name) { "Name Assignment Too Long"}
+      let(:valid_name) { "Name" }
+      let(:points) { "10" }
+      let(:differentiate) { false }
+      let(:due_date_valid) { "Jan 1, 2020 at 11:59pm" }
+      let(:short_date) { "Jan 1, 2020" }
+      let(:error) { "" }
+      let(:settings_enable) { {} }
+      let(:name_length_invalid) { false }
+
+      before(:each) do
+        account_model
+        turn_on_sis
+        new_assignment
+      end
+
+      def differentiate_assignment
+        @course.course_sections.create!(:name => 'Section A')
+        @course.course_sections.create!(:name => 'Section B')
+      end
+
+      def new_assignment
+        course_with_teacher_logged_in(:active_all => true, :account => @account)
+        differentiate_assignment if differentiate
+        get "/courses/#{@course.id}/assignments/new"
+        title_text = name_length_invalid ? invalid_name : valid_name
+        set_value(f("#assignment_name"), title_text)
+        set_value(f("#assignment_points_possible"), points)
+        f("#assignment_text_entry").click
+      end
+
+      def turn_on_sis
+        turn_on_sis_settings(@account)
+        turn_on_limitations
+      end
+
+      def turn_on_limitations
+        @account.settings.merge!(settings_enable)
+        @account.save!
+      end
+
+      def submit_blocked_with_errors
+        f('#edit_assignment_form .btn-primary[type=submit]').click
+        expect(errors).to include(error)
+      end
+
+      def errors
+        ff('.error_box').map(&:text)
+      end
+
+      def due_date_input_fields
+        ff('.DueDateInput')
+      end
+
+      def check_due_date_table(section, due_date="-")
+        row_elements = f('.assignment_dates').find_elements(:tag_name, 'tr')
+        section_row = row_elements.detect{ |i| i.text.include?(section)}
+        expect(section_row).not_to be_nil
+        expect(section_row.text.split("\n").first).to eq due_date
+      end
+
+      def assign_to_section(date_container, section_name)
+        unless f(".ic-tokeninput-is-open", date_container).enabled?
+          f(".ic-tokeninput", date_container).click
+        end
+        section = ff('.ic-tokeninput-option', date_container).select{ |h| h.attribute(:value) == section_name }.first
+        section.click
+      end
+
+      context 'assignment name length' do
+        let(:error) { "Name is too long, must be under 11 characters" }
+        
+        let(:name_length_invalid) { true }
+        let(:settings_enable) { length_settings }
+
+        def length_settings
+          { 
+            :sis_assignment_name_length       => { :value=> true },
+            :sis_assignment_name_length_input => { :value => name_length_limit.to_s } 
+          }
+        end
+
+        it 'validates name length while sis is on' do 
+          submit_blocked_with_errors
+          set_value(f("#assignment_name"), valid_name)
+          submit_assignment_form
+          expect(f('h1.title')).to include_text(valid_name)
+        end
+
+        it 'does not validate when sis is off' do
+          f("#assignment_post_to_sis").click
+          submit_assignment_form
+          expect(f('h1.title')).to include_text(invalid_name)
+        end
+      end
+
+      context 'due date required' do
+        let(:error) { "Please add a due date" }
+        let(:settings_enable) { {:sis_require_assignment_due_date => {:value=> true} } }
+
+        it 'validates due date while sis is on' do
+          submit_blocked_with_errors
+          set_value(due_date_input_fields.first, due_date_valid)
+          submit_assignment_form
+          check_due_date_table('Everyone', short_date)
+        end
+
+        it 'does not validate when sis is off' do
+          f("#assignment_post_to_sis").click
+          submit_assignment_form
+          check_due_date_table('Everyone')
+        end
+
+        describe 'differentiated assignment' do
+          let(:differentiate) { true }
+          let(:section_to_set) { "Section B" }
+
+          before(:each) do
+            assign_section_due_date
+          end
+
+          def assign_section_due_date
+            f('#add_due_date').click
+            due_date_fields = ff('.Container__DueDateRow-item')
+            assign_to_section(due_date_fields.last, section_to_set)
+          end
+
+          it 'checks each due date when on' do
+            submit_blocked_with_errors
+            due_date_input_fields.each{ |h| set_value(h, due_date_valid) }
+            f('#edit_assignment_form .btn-primary[type=submit]').click
+            check_due_date_table(section_to_set, short_date)
+          end
+
+          it 'does not check when sis is off' do
+            f("#assignment_post_to_sis").click
+            submit_assignment_form
+            check_due_date_table(section_to_set)
+            check_due_date_table('Everyone else')
+          end
+        end
+      end
     end
 
     it "should create an assignment with more options", priority: "2", test_id: 622614 do

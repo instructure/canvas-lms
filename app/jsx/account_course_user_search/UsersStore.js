@@ -32,6 +32,7 @@ import createStore from './createStore'
       }
       if (params.sort) payload.sort = params.sort
       if (params.order) payload.order = params.order
+      if (params.role_filter_id) payload.role_filter_id = params.role_filter_id
       payload.include = ['last_login', 'avatar_url', 'email', 'time_zone']
       return payload
     }

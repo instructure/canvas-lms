@@ -18,14 +18,12 @@
 
 module ContextModuleProgressions
   class Finder
-    def self.find_or_create_for_module_and_user(context_module, user)
-      modules = ContextModule
-        .where(workflow_state: 'active')
-        .where(context_type: context_module.context_type, context_id: context_module.context_id)
+    def self.find_or_create_for_context_and_user(context, user)
+      modules = context.context_modules.where(workflow_state: 'active').to_a
 
       existing_progressions = ContextModuleProgression
         .where(user_id: user)
-        .where(context_module_id: modules.map(&:id))
+        .where(context_module_id: modules)
         .index_by(&:context_module_id)
 
       modules.map do |mod|

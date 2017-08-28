@@ -19,7 +19,6 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import { shallow } from 'enzyme';
-import Heading from 'instructure-ui/lib/components/Heading';
 import SearchForm from 'jsx/gradebook-history/SearchForm';
 import SearchResults from 'jsx/gradebook-history/SearchResults';
 import GradebookHistoryApp from 'jsx/gradebook-history/GradebookHistoryApp';
@@ -39,11 +38,6 @@ test('Provider with a store prop', function () {
   const provider = this.wrapper.find(Provider);
   equal(provider.length, 1);
   equal(provider.props().store, GradebookHistoryStore);
-});
-
-test('Heading', function () {
-  const heading = this.wrapper.find(Heading);
-  equal(heading.length, 1);
 });
 
 test('SearchForm', function () {

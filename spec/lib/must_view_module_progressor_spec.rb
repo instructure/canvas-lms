@@ -22,7 +22,7 @@ describe "MustViewModuleProgressor" do
   def create_item(item_type)
     case item_type
     when :page
-      @course.wiki.wiki_pages.create!(title: 'some page')
+      @course.wiki_pages.create!(title: 'some page')
     when :assignment
       @course.assignments.create!(title: 'some assignment')
     when :discussion
@@ -64,11 +64,11 @@ describe "MustViewModuleProgressor" do
 
   def sequential_module_progression_fixture(assignment_requirement_type: 'must_view')
     mod = @course.context_modules.create!(name: 'some module')
-    initial_page = @course.wiki.wiki_pages.create!(title: "initial page")
+    initial_page = @course.wiki_pages.create!(title: "initial page")
     initial_page_tag = mod.add_item(id: initial_page.id, type: 'page')
     assignment = @course.assignments.create!(title: "some assignment")
     assignment_tag = mod.add_item(id: assignment.id, type: 'assignment')
-    final_page = @course.wiki.wiki_pages.create!(title: "some page")
+    final_page = @course.wiki_pages.create!(title: "some page")
     final_page_tag = mod.add_item(id: final_page.id, type: 'page')
     mod.completion_requirements = {
       initial_page_tag.id => {type: 'must_view'},

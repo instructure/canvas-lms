@@ -44,7 +44,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
       # If the submission is a preview, we don't add it to the user's submission history,
       # and it actually gets keyed by the temporary_user_code column instead of
       if @current_user.nil? || is_previewing?
-        @submission = @quiz.quiz_submissions.where(temporary_user_code: temporary_user_code(false)).first
+        @submission = @quiz.quiz_submissions.where(temporary_user_code: temporary_user_code(false), user_id: nil).first
         @submission ||= @quiz.generate_submission(temporary_user_code(false) || @current_user, is_previewing?)
       else
         @submission = @quiz.quiz_submissions.where(user_id: @current_user).first if @current_user.present?
@@ -83,7 +83,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
     end
     if authorized_action(@quiz, @current_user, :submit)
       if @current_user.nil? || is_previewing?
-        @submission = @quiz.quiz_submissions.where(temporary_user_code: temporary_user_code(false)).first
+        @submission = @quiz.quiz_submissions.where(temporary_user_code: temporary_user_code(false), user_id: nil).first
       else
         @submission = @quiz.quiz_submissions.where(user_id: @current_user).first
         if @submission.present? && !@submission.valid_token?(params[:validation_token])
@@ -96,9 +96,9 @@ class Quizzes::QuizSubmissionsController < ApplicationController
         end
       end
 
-      if @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
-      elsif is_previewing? || (@submission && @submission.temporary_user_code == temporary_user_code(false)) ||
-                              (@submission && @submission.grants_right?(@current_user, session, :update))
+      if !@submission || (@quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip))
+      elsif is_previewing? || (@submission.temporary_user_code == temporary_user_code(false)) ||
+                              (@submission.grants_right?(@current_user, session, :update))
         if !@submission.completed? && (!@submission.overdue? || is_previewing?)
           if params[:action] == 'record_answer'
             if last_question = params[:last_question_id]
@@ -111,8 +111,8 @@ class Quizzes::QuizSubmissionsController < ApplicationController
           else
             @submission.backup_submission_data(params)
             render :json => {:backup => true,
-                             :end_at => @submission && @submission.end_at,
-                             :time_left => @submission && @submission.time_left}
+                             :end_at => @submission.end_at,
+                             :time_left => @submission.time_left}
             return
           end
         end

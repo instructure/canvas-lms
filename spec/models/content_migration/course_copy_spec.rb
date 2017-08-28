@@ -169,13 +169,13 @@ describe ContentMigration do
       asmnt1 = @copy_from.assignments.create!(:title => "some assignment")
       tag = mod1.add_item({:id => asmnt1.id, :type => 'assignment', :indent => 1})
       body = %{<p>Link to module item: <a href="/courses/%s/modules/items/%s">some assignment</a></p>}
-      page = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => body % [@copy_from.id, tag.id])
+      page = @copy_from.wiki_pages.create!(:title => "some page", :body => body % [@copy_from.id, tag.id])
 
       run_course_copy
 
       mod1_to = @copy_to.context_modules.where(migration_id: mig_id(mod1)).first
       tag_to = mod1_to.content_tags.first
-      page_to = @copy_to.wiki.wiki_pages.where(migration_id: mig_id(page)).first
+      page_to = @copy_to.wiki_pages.where(migration_id: mig_id(page)).first
       expect(page_to.body).to eq body % [@copy_to.id, tag_to.id]
     end
 
@@ -232,7 +232,7 @@ describe ContentMigration do
       body += "<a class='instructure_file_link' href='/courses/#{@copy_from.id}/files/#{att2.id}/download'>link</a>"
       body += "<img src='/courses/#{@copy_from.id}/files/#{img.id}/preview'>"
       dt = @copy_from.discussion_topics.create!(:message => body, :title => "discussion title")
-      page = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => body)
+      page = @copy_from.wiki_pages.create!(:title => "some page", :body => body)
 
       run_course_copy
 
@@ -240,7 +240,7 @@ describe ContentMigration do
       att_to2 = @copy_to.attachments.where(migration_id: mig_id(att2)).first
       img_to = @copy_to.attachments.where(migration_id: mig_id(img)).first
 
-      page_to = @copy_to.wiki.wiki_pages.where(migration_id: mig_id(page)).first
+      page_to = @copy_to.wiki_pages.where(migration_id: mig_id(page)).first
       expect(page_to.body).to include "/courses/#{@copy_to.id}/files/#{att_to1.id}/download"
       expect(page_to.body).to include "/courses/#{@copy_to.id}/files/#{att_to2.id}/download"
       expect(page_to.body).to include "/courses/#{@copy_to.id}/files/#{img_to.id}/preview"
@@ -259,8 +259,8 @@ describe ContentMigration do
       cm2 = @copy_from.context_modules.create!(:name => "another module")
       att = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
       att2 = Attachment.create!(:filename => 'second.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
-      wiki = @copy_from.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
-      wiki2 = @copy_from.wiki.wiki_pages.create!(:title => "wiki2", :body => "ohais")
+      wiki = @copy_from.wiki_pages.create!(:title => "wiki", :body => "ohai")
+      wiki2 = @copy_from.wiki_pages.create!(:title => "wiki2", :body => "ohais")
       data = [{:points => 3,:description => "Outcome row",:id => 1,:ratings => [{:points => 3,:description => "Rockin'",:criterion_id => 1,:id => 2}]}]
       rub1 = @copy_from.rubrics.build(:title => "rub1")
       rub1.data = data
@@ -313,8 +313,8 @@ describe ContentMigration do
       expect(@copy_to.attachments.where(migration_id: mig_id(att)).first).not_to be_nil
       expect(@copy_to.attachments.where(migration_id: mig_id(att2)).first).to be_nil
 
-      expect(@copy_to.wiki.wiki_pages.where(migration_id: mig_id(wiki)).first).not_to be_nil
-      expect(@copy_to.wiki.wiki_pages.where(migration_id: mig_id(wiki2)).first).to be_nil
+      expect(@copy_to.wiki_pages.where(migration_id: mig_id(wiki)).first).not_to be_nil
+      expect(@copy_to.wiki_pages.where(migration_id: mig_id(wiki2)).first).to be_nil
 
       expect(@copy_to.rubrics.where(migration_id: mig_id(rub1)).first).not_to be_nil
       expect(@copy_to.rubrics.where(migration_id: mig_id(rub2)).first).to be_nil
@@ -330,7 +330,7 @@ describe ContentMigration do
       dt1 = @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
       cm = @copy_from.context_modules.create!(:name => "some module")
       att = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
-      wiki = @copy_from.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
+      wiki = @copy_from.wiki_pages.create!(:title => "wiki", :body => "ohai")
       quiz = @copy_from.quizzes.create! if Qti.qti_enabled?
       ag = @copy_from.assignment_groups.create!(:name => 'empty group')
       asmnt = @copy_from.assignments.create!(:title => "some assignment")
@@ -361,7 +361,7 @@ describe ContentMigration do
       @copy_to.discussion_topics.where(migration_id: mig_id(dt1)).first.destroy
       @copy_to.context_modules.where(migration_id: mig_id(cm)).first.destroy
       @copy_to.attachments.where(migration_id: mig_id(att)).first.destroy
-      @copy_to.wiki.wiki_pages.where(migration_id: mig_id(wiki)).first.destroy
+      @copy_to.wiki_pages.where(migration_id: mig_id(wiki)).first.destroy
       @copy_to.rubrics.where(migration_id: mig_id(rub1)).first.destroy
       @copy_to.created_learning_outcomes.where(migration_id: mig_id(lo)).first.destroy
       @copy_to.quizzes.where(migration_id: mig_id(quiz)).first.destroy if Qti.qti_enabled?
@@ -385,7 +385,7 @@ describe ContentMigration do
       expect(@copy_to.context_modules.where(migration_id: mig_id(cm)).first.workflow_state).to eq 'active'
       expect(@copy_to.attachments.count).to eq 1
       expect(@copy_to.attachments.where(migration_id: mig_id(att)).first.file_state).to eq 'available'
-      expect(@copy_to.wiki.wiki_pages.where(migration_id: mig_id(wiki)).first.workflow_state).to eq 'active'
+      expect(@copy_to.wiki_pages.where(migration_id: mig_id(wiki)).first.workflow_state).to eq 'active'
       rub2 = @copy_to.rubrics.where(migration_id: mig_id(rub1)).first
       expect(rub2.workflow_state).to eq 'active'
       expect(rub2.rubric_associations.first.bookmarked).to eq true
@@ -528,7 +528,7 @@ describe ContentMigration do
 
     it "should sync module items (even when removed) on re-copy" do
       mod = @copy_from.context_modules.create!(:name => "some module")
-      page = @copy_from.wiki.wiki_pages.create(:title => "some page")
+      page = @copy_from.wiki_pages.create(:title => "some page")
       tag1 = mod.add_item({:id => page.id, :type => 'wiki_page'})
       asmnt = @copy_from.assignments.create!(:title => "some assignment")
       tag2 = mod.add_item({:id => asmnt.id, :type => 'assignment', :indent => 1})
@@ -654,14 +654,14 @@ describe ContentMigration do
 
     it "should not desync imported module item published status with existing content" do
       asmnt = @copy_from.assignments.create!(:title => "some assignment")
-      page = @copy_from.wiki.wiki_pages.create!(:title => "some page")
+      page = @copy_from.wiki_pages.create!(:title => "some page")
 
       run_course_copy
 
       new_asmnt = @copy_to.assignments.where(:migration_id => mig_id(asmnt)).first
       new_asmnt.unpublish!
 
-      new_page = @copy_to.wiki.wiki_pages.where(:migration_id => mig_id(page)).first
+      new_page = @copy_to.wiki_pages.where(:migration_id => mig_id(page)).first
       new_page.unpublish!
 
       mod1 = @copy_from.context_modules.create!(:name => "some module")
@@ -680,7 +680,7 @@ describe ContentMigration do
     end
 
     it "should restore deleted module items on re-import" do
-      page = @copy_from.wiki.wiki_pages.create!(:title => "some page")
+      page = @copy_from.wiki_pages.create!(:title => "some page")
 
       mod = @copy_from.context_modules.create!(:name => "some module")
       tag1 = mod.add_item({ :title => 'Example 1', :type => 'external_url', :url => 'http://derp.derp/something' })

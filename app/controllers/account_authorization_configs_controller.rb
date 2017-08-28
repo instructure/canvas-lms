@@ -157,7 +157,7 @@
 #           "description": "The secondary unique identifier for SIS purposes"
 #         },
 #         "locale": {
-#           "description": "The user's prefererred locale/language"
+#           "description": "The user's preferred locale/language"
 #         },
 #         "name": {
 #           "description": "The full name of the user"
@@ -508,9 +508,11 @@ class AccountAuthorizationConfigsController < ApplicationController
   #   will also be saved, and the metadata periodically refreshed, automatically. If
   #   the metadata contains multiple entities, also supply idp_entity_id to distinguish
   #   which one you want (otherwise the only entity in the metadata will be inferred).
-  #   If you provide the URI 'urn:mace:incommon', the InCommon metadata aggregate will
-  #   be used instead, and additional validation checks will happen (including
-  #   validating that the metadata has been properly signed with the InCommon key).
+  #   If you provide the URI 'urn:mace:incommon' or 'http://ukfederation.org.uk',
+  #   the InCommon or UK Access Management Federation metadata aggregate, respectively,
+  #   will be used instead, and additional validation checks will happen (including
+  #   validating that the metadata has been properly signed with the
+  #   appropriate key).
   #
   # - idp_entity_id
   #

@@ -92,7 +92,7 @@ describe ContentTag do
       end
     end
   end
-  
+
   describe "#sync_workflow_state_to_asset?" do
     it "true when content_type is Quiz" do
       content_tag = ContentTag.new(:content_type => "Quiz")
@@ -162,17 +162,17 @@ describe ContentTag do
     expect(tag.content_type).to eql('DiscussionTopic')
     expect(tag.content_id).to eql(5)
   end
-  
+
   it "should not allow setting an invalid content_asset_string" do
     tag = ContentTag.new
     tag.content_asset_string = 'bad_class_41'
     expect(tag.content_type).to eql(nil)
     expect(tag.content_id).to eql(nil)
-    
+
     tag.content_asset_string = 'bad_class'
     expect(tag.content_type).to eql(nil)
     expect(tag.content_id).to eql(nil)
-    
+
     tag.content_asset_string = 'course_55'
     expect(tag.content_type).to eql(nil)
     expect(tag.content_id).to eql(nil)
@@ -223,7 +223,7 @@ describe ContentTag do
     expect(tags).not_to be_empty
     expect(tags.any?{ |t| t.id == tag.id }).to be_truthy
   end
-  
+
   it "should not rename the linked external tool if the tag is renamed" do
     course_factory
     @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
@@ -240,7 +240,7 @@ describe ContentTag do
     @tag.reload
     expect(@tag.title).to eq "Example"
   end
-    
+
   it "should not rename the tag if the linked external tool is renamed" do
     course_factory
     @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
@@ -273,7 +273,7 @@ describe ContentTag do
     @assignment.reload
     expect(@assignment.title).to eq 'some assignment (renamed)'
   end
-  
+
   it "should rename the tag if the linked assignment is renamed" do
     course_factory
     @assignment = @course.assignments.create!(:title => "some assignment")
@@ -321,7 +321,7 @@ describe ContentTag do
 
         @quiz.publish!
         @quiz.reload
-        
+
         ContentTag.update_for @quiz
 
         @tag.reload
@@ -332,7 +332,7 @@ describe ContentTag do
 
   it "should not attempt to update asset name attribute if it's over the db limit" do
     course_factory
-    @page = @course.wiki.wiki_pages.create!(:title => "some page")
+    @page = @course.wiki_pages.create!(:title => "some page")
     @module = @course.context_modules.create!(:name => "module")
     @tag = @module.add_item({:type => 'WikiPage', :title => 'oh noes!' * 35, :id => @page.id})
 
@@ -356,7 +356,7 @@ describe ContentTag do
 
   it "should publish/unpublish the tag if the linked wiki page is published/unpublished" do
     course_factory
-    @page = @course.wiki.wiki_pages.create!(:title => "some page")
+    @page = @course.wiki_pages.create!(:title => "some page")
     @page.workflow_state = 'unpublished'
     @page.save!
     @module = @course.context_modules.create!(:name => "module")
@@ -378,7 +378,7 @@ describe ContentTag do
 
   it "should publish/unpublish the linked wiki page (and its tags) if the tag is published/unpublished" do
     course_factory
-    @page = @course.wiki.wiki_pages.create!(:title => "some page")
+    @page = @course.wiki_pages.create!(:title => "some page")
     @page.workflow_state = 'unpublished'
     @page.save!
     @module = @course.context_modules.create!(:name => "module")
@@ -435,7 +435,7 @@ describe ContentTag do
     @tag.save!
     @tag.update_asset_workflow_state!
   end
-  
+
   it "should not rename tag if linked attachment is renamed" do
     course_factory
     att = Attachment.create!(:filename => 'important title.txt', :display_name => "important title.txt", :uploaded_data => StringIO.new("It's what's on the inside of the file that doesn't matter.'"), :folder => Folder.unfiled_folder(@course), :context => @course)
@@ -443,13 +443,13 @@ describe ContentTag do
     a_module = @course.context_modules.create!(:name => "module")
     tag = a_module.add_item({ :type => 'attachment', :title => 'important title.txt', :id => att.id })
     tag.update_asset_name!
-    
+
     att.display_name = "no longer important.txt"
     ContentTag.update_for(att)
     tag.reload
     expect(tag.title).to eq 'important title.txt'
   end
-  
+
   it "should not rename attachment if linked tag is renamed" do
     course_factory
     att = Attachment.create!(:filename => 'important title.txt', :display_name => "important title.txt", :uploaded_data => StringIO.new("It's what's on the inside of the file that doesn't matter.'"), :folder => Folder.unfiled_folder(@course), :context => @course)
@@ -457,7 +457,7 @@ describe ContentTag do
     a_module = @course.context_modules.create!(:name => "module")
     tag = a_module.add_item({ :type => 'attachment', :title => 'Differently Important Title', :id => att.id })
     tag.update_asset_name!
-    
+
     att.reload
     expect(att.display_name).to eq 'important title.txt'
   end
@@ -593,7 +593,7 @@ describe ContentTag do
     end
     context "other" do
       it "it properly returns wiki pages" do
-        @page = @course.wiki.wiki_pages.create!(:title => "some page")
+        @page = @course.wiki_pages.create!(:title => "some page")
         @module = @course.context_modules.create!(:name => "module")
         @tag = @module.add_item({:type => 'WikiPage', :title => 'oh noes!' * 35, :id => @page.id})
         expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).to include(@tag)

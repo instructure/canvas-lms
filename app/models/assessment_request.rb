@@ -128,9 +128,5 @@ class AssessmentRequest < ActiveRecord::Base
     self.asset.user.name rescue t("#unknown", "Unknown")
   end
 
-  def asset_context_name
-    (self.asset.context.name rescue self.asset.assignment.context.name) rescue t("#unknown", "Unknown")
-  end
-
   def self.serialization_excludes; [:uuid]; end
 end

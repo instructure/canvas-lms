@@ -89,7 +89,7 @@ define(function(require) {
 
       this.title = ChartMixin.addTitle(svg, '');
 
-      const descriptionHolder = (this.refs.wrapper && d3.select(this.refs.wrapper.getDOMNode())) || svg
+      var descriptionHolder = (this.refs.wrapper && d3.select(this.refs.wrapper.getDOMNode())) || svg
       this.description = ChartMixin.addDescription(descriptionHolder, '');
 
       svg.append('g')

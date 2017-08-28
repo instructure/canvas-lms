@@ -23,7 +23,13 @@ describe "gradebook" do
 
   context "as an observer" do
     before(:each) do
-      data_setup_as_observer
+      user_with_pseudonym
+      course_with_observer user: @user, active_all: true
+      @course.observers=[@observer]
+      assignment_setup_defaults
+      assignment_setup
+      @all_students.each {|s| s.observers=[@observer]}
+
       user_session(@teacher)
     end
 

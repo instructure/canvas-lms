@@ -23,10 +23,10 @@ describe "/shared/_select_content_dialog" do
 
   it "should include unpublished wiki pages" do
     course_with_teacher
-    published_page = @course.wiki.wiki_pages.build title: 'published_page'
+    published_page = @course.wiki_pages.build title: 'published_page'
     published_page.workflow_state = 'active'
     published_page.save!
-    unpublished_page = @course.wiki.wiki_pages.build title: 'unpublished_page'
+    unpublished_page = @course.wiki_pages.build title: 'unpublished_page'
     unpublished_page.workflow_state = 'unpublished'
     unpublished_page.save!
     view_context

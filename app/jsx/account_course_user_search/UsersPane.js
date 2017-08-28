@@ -34,14 +34,15 @@ class UsersPane extends React.Component {
       getState: PropTypes.func.isRequired,
       dispatch: PropTypes.func.isRequired,
       subscribe: PropTypes.func.isRequired,
-    }).isRequired
+    }).isRequired,
+    roles: PropTypes.arrayOf(PropTypes.string).isRequired,
   };
 
   constructor (props) {
     super(props)
 
     this.state = {
-      userList: props.store.getState().userList
+      userList: props.store.getState().userList,
     }
   }
 
@@ -113,6 +114,7 @@ class UsersPane extends React.Component {
             handleAddNewUserFormErrors: this.handleAddNewUserFormErrors
           }}
           userList={this.state.userList}
+          roles={this.props.roles}
         />}
 
         {!_.isEmpty(users) &&

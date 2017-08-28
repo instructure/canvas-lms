@@ -405,7 +405,7 @@ describe SIS::CSV::UserImporter do
     before_pseudo_count = Pseudonym.count
     importer = process_csv_data(
       "user_id,login_id,first_name,last_name,email,status",
-      "U1,%user,User,Uno,user@example.com,active"
+      "U1,u\x01ser,User,Uno,user@example.com,active"
     )
     expect(CommunicationChannel.by_path('user@example.com').first).to be_nil
 
@@ -1395,5 +1395,21 @@ describe SIS::CSV::UserImporter do
     expect(importer.warnings.length).to eq 1
     expect(importer.warnings.last.last).to eq "unrecognized authentication provider google for user_1, skipping"
     expect(@account.pseudonyms.active.where(sis_user_id: 'user_1').first).to eq nil
+  end
+
+  it "allows UTF-8 in usernames" do
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1ö,user1ö,User,Unö,user@example.com,active"
+    )
+    user = CommunicationChannel.by_path('user@example.com').first.user
+    expect(user.account).to eql(@account)
+    expect(user.name).to eql("User Unö")
+    expect(user.short_name).to eql("User Unö")
+
+    expect(user.pseudonyms.count).to eql(1)
+    pseudonym = user.pseudonyms.first
+    expect(pseudonym.unique_id).to eql('user1ö')
+    expect(pseudonym.sis_user_id).to eql('user_1ö')
   end
 end

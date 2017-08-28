@@ -38,14 +38,14 @@ describe "Gradezilla - arrange by due date" do
     expected_text = "-"
 
     Gradezilla.open_view_menu_and_arrange_by_menu
-    Gradezilla.popover_menu_item('Due Date - Oldest to Newest').click
+    Gradezilla.view_arrange_by_submenu_item('Due Date - Oldest to Newest').click
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
 
     expect(first_row_cells[0]).to include_text expected_text
 
     Gradezilla.open_view_menu_and_arrange_by_menu
 
-    expect(Gradezilla.popover_menu_item('Due Date - Oldest to Newest').attribute('aria-checked')).to eq 'true'
+    expect(Gradezilla.popover_menu_item_checked?('Due Date - Oldest to Newest')).to eq 'true'
 
     # Setting should stick after reload
     Gradezilla.visit(@course)
@@ -59,7 +59,7 @@ describe "Gradezilla - arrange by due date" do
 
     Gradezilla.open_view_menu_and_arrange_by_menu
 
-    expect(Gradezilla.popover_menu_item('Due Date - Oldest to Newest').attribute('aria-checked')).to eq 'true'
+    expect(Gradezilla.popover_menu_item_checked?('Due Date - Oldest to Newest')).to eq 'true'
   end
 
   it "should put assignments with no due date last when sorting by due date and VDD", priority: "2", test_id: 251038 do
@@ -72,7 +72,7 @@ describe "Gradezilla - arrange by due date" do
     create_assignment_override(assignment2, @section_a, 2)
 
     Gradezilla.open_view_menu_and_arrange_by_menu
-    Gradezilla.popover_menu_item('Due Date - Oldest to Newest').click
+    Gradezilla.view_arrange_by_submenu_item('Due Date - Oldest to Newest').click
 
     # since due date changes in assignments don't reflect in column sorting without a refresh
     Gradezilla.visit(@course)
@@ -94,7 +94,7 @@ describe "Gradezilla - arrange by due date" do
     create_assignment_override(assignment3, @section_b, 4)
 
     Gradezilla.open_view_menu_and_arrange_by_menu
-    Gradezilla.popover_menu_item('Due Date - Oldest to Newest').click
+    Gradezilla.view_arrange_by_submenu_item('Due Date - Oldest to Newest').click
 
     expect(f('#gradebook_grid .container_1 .slick-header-column:nth-child(1)')).to include_text(assignment3.title)
     expect(f('#gradebook_grid .container_1 .slick-header-column:nth-child(2)')).to include_text(@assignment.title)

@@ -1,8 +1,20 @@
-FROM emmenko/nodejs-karma:0.2.0
+FROM instructure/node:6
 
-RUN mkdir /app
-WORKDIR /app
+ENV APP_HOME /usr/src/app/
+ENV NODE_ENV test
+ENV CHROME_BIN /usr/bin/google-chrome
 
-COPY entry_point.sh /opt/bin/entry_point.sh
+USER root
 
-ENTRYPOINT ["/opt/bin/entry_point.sh"]
+RUN curl --silent "https://dl-ssl.google.com/linux/linux_signing_key.pub" | apt-key add - \
+ && curl --silent "https://dl.yarnpkg.com/debian/pubkey.gpg" | apt-key add - \
+ && echo "deb https://dl.google.com/linux/chrome/deb/ stable main" > "/etc/apt/sources.list.d/google.list" \
+ && echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list \
+ && apt-get update --quiet=2 \
+ && apt-get install --quiet=2 google-chrome-beta yarn > /dev/null \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+USER docker
+
+EXPOSE 9876

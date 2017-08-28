@@ -381,7 +381,7 @@ class DiscussionTopic < ActiveRecord::Base
     environment = lock ? :master : :slave
     Shackles.activate(environment) do
       topic_participant = discussion_topic_participants.where(user_id: current_user).select(:unread_entry_count).lock(lock).first
-      topic_participant.try(:unread_entry_count) || self.default_unread_count
+      topic_participant&.unread_entry_count || self.default_unread_count
     end
   end
 

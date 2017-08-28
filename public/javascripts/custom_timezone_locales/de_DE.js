@@ -1,15 +1,7 @@
 module.exports = { // eslint-disable-line import/no-commonjs
   name: 'de_DE',
   day: {
-    abbrev: [
-      'So',
-      'Mo',
-      'Di',
-      'Mi',
-      'Do',
-      'Fr',
-      'Sa'
-    ],
+    abbrev: ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'],
     full: [
       'Sonntag',
       'Montag',
@@ -50,10 +42,7 @@ module.exports = { // eslint-disable-line import/no-commonjs
       'Dezember'
     ]
   },
-  meridiem: [
-    '',
-    ''
-  ],
+  meridiem: ['', ''],
   date: '%d.%m.%Y',
   time24: '%T',
   dateTime: '%a %d %b %Y %T %Z',

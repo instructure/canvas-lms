@@ -49,6 +49,9 @@ describe("I18nliner", function() {
           bar_baz: {
             inline_with_relative_key: "Inline with relative key",
             relative_key: "Relative key"
+          },
+          bar_fizz_buzz: {
+            inline_with_relative_key: "Inline with relative key"
           }
         }
       });

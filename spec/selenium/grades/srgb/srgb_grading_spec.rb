@@ -132,6 +132,13 @@ describe 'Screenreader Gradebook grading' do
       expect(f('.submission_final_grade')).to include_text('Final Grade')
     end
 
+    it 'on missing submissions', priority: "2", test_id: 3308516 do
+      assignment_1.submissions.find_by(user: student).update!(late_policy_status: 'missing')
+      login_to_srgb
+      srgb_page.select_assignment(assignment_1)
+      expect(f('.missing-pill')).to include_text('MISSING')
+    end
+
     it 'on dropped assignments', priority: "2", test_id: 615700 do
       # create an assignment group with drop lowest 1 score rule
       srgb_page.drop_lowest(test_course, 1)

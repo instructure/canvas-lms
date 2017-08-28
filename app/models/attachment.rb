@@ -312,11 +312,11 @@ class Attachment < ActiveRecord::Base
     progress = Progress.where(context_type: 'Attachment', context_id: self, tag: tag).last
     progress ||= Progress.new context: self, tag: tag
 
-    if progress.new_record?
+    if progress.new_record? || !progress.pending?
       progress.reset!
       progress.process_job(MediaObject, :add_media_files, { :run_at => delay.seconds.from_now, :priority => Delayed::LOWER_PRIORITY, :preserve_method_args => true, :max_attempts => 5 }, self, false) && true
     else
-      progress.completed? && !progress.failed?
+      true
     end
   end
 
@@ -408,10 +408,6 @@ class Attachment < ActiveRecord::Base
     res = nil if res == "."
     res ||= ".unknown"
     res.to_s
-  end
-
-  def self.clear_cached_mime_ids
-    @@mime_ids = {}
   end
 
   def default_values
@@ -891,12 +887,11 @@ class Attachment < ActiveRecord::Base
         next if recipient_keys.empty?
 
         notification = BroadcastPolicy.notification_finder.by_name(count.to_i > 1 ? 'New Files Added' : 'New File Added')
-        asset_context = record.context
         data = { :count => count }
         DelayedNotification.send_later_if_production_enqueue_args(
             :process,
             { :priority => Delayed::LOW_PRIORITY },
-            record, notification, recipient_keys, asset_context, data)
+            record, notification, recipient_keys, data)
       end
     end
   end

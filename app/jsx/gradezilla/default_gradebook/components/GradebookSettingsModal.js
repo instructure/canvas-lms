@@ -34,7 +34,8 @@ class GradebookSettingsModal extends React.Component {
     locale: string.isRequired,
     onClose: func.isRequired,
     gradedLateOrMissingSubmissionsExist: bool.isRequired,
-    newGradebookDevelopmentEnabled: bool.isRequired
+    newGradebookDevelopmentEnabled: bool.isRequired,
+    onLatePolicyUpdate: func.isRequired
   }
 
   constructor (props) {
@@ -57,6 +58,7 @@ class GradebookSettingsModal extends React.Component {
   onUpdateLatePolicySuccess = () => {
     const message = I18n.t('Late policies updated');
     showFlashAlert({ message, type: 'success' });
+    this.props.onLatePolicyUpdate({...this.state.latePolicy.data, ...this.state.latePolicy.changes});
     this.close();
   }
 

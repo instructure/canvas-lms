@@ -33,8 +33,9 @@ QUnit.module('GradebookSettingsModal', {
       courseId: '1',
       locale: 'en',
       newGradebookDevelopmentEnabled: true,
-      onClose: () => {},
-      gradedLateOrMissingSubmissionsExist: true
+      onClose () {},
+      gradedLateOrMissingSubmissionsExist: true,
+      onLatePolicyUpdate () {}
     };
     const props = { ...defaultProps, ...customProps };
     this.wrapper = mount(<GradebookSettingsModal {...props} />);
@@ -172,4 +173,11 @@ test('clicking "Update" sends a post request to create a late policy if one does
     const changesArg = GradebookSettingsModalApi.createLatePolicy.getCall(0).args[1];
     propEqual(changesArg, changes, 'createLatePolicy is called with the late policy changes');
   });
+});
+
+test('onUpdateLatePolicySuccess calls the onLatePolicyUpdate prop', function () {
+  const onLatePolicyUpdate = this.stub();
+  const component = this.mountComponent({ onLatePolicyUpdate });
+  component.onUpdateLatePolicySuccess();
+  strictEqual(onLatePolicyUpdate.callCount, 1);
 });

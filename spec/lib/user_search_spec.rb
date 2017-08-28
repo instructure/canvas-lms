@@ -285,7 +285,6 @@ describe UserSearch do
     end
   end
 
-
   describe '.scope_for' do
 
     let(:search_names) do

@@ -39,6 +39,7 @@ define([
         GROUP_GRADING_MODE: false,
         points_possible: 10
       };
+      this.originalStudent = SpeedGrader.EG.currentStudent;
       SpeedGrader.EG.currentStudent = {
         id: 4,
         name: 'Guy B. Studying',
@@ -89,6 +90,7 @@ define([
 
     teardown () {
       $('#fixtures').empty();
+      SpeedGrader.EG.currentStudent = this.originalStudent;
       window.jsonData = this.originalWindowJSONData;
       fakeENV.teardown();
     }
@@ -126,6 +128,7 @@ define([
         GROUP_GRADING_MODE: false,
         points_possible: 10
       };
+      this.originalStudent = SpeedGrader.EG.currentStudent;
       SpeedGrader.EG.currentStudent = {
         id: 4,
         name: 'Guy B. Studying',
@@ -148,6 +151,7 @@ define([
     },
 
     teardown () {
+      SpeedGrader.EG.currentStudent = this.originalStudent;
       fakeENV.teardown();
     }
   })
@@ -167,6 +171,7 @@ define([
         GROUP_GRADING_MODE: false,
         points_possible: 10
       };
+      this.originalStudent = SpeedGrader.EG.currentStudent;
       SpeedGrader.EG.currentStudent = {
         id: 4,
         name: 'Guy B. Studying',
@@ -180,6 +185,7 @@ define([
     },
 
     teardown () {
+      SpeedGrader.EG.currentStudent = this.originalStudent;
       fakeENV.teardown();
       $.getJSON.restore()
     }
@@ -199,6 +205,7 @@ define([
         id: 27,
         GROUP_GRADING_MODE: false,
       };
+      this.originalStudent = SpeedGrader.EG.currentStudent;
       SpeedGrader.EG.currentStudent = {
         id: 4,
         name: 'Guy B. Studying',
@@ -332,6 +339,7 @@ define([
     },
 
     teardown () {
+      SpeedGrader.EG.currentStudent = this.originalStudent;
       $('#fixtures').empty();
       window.jsonData = this.originalWindowJSONData;
       fakeENV.teardown();
@@ -383,6 +391,7 @@ define([
         points_possible: 10,
         studentsWithSubmissions: []
       };
+      this.originalStudent = SpeedGrader.EG.currentStudent;
       SpeedGrader.EG.currentStudent = {
         id: 4,
         name: 'Guy B. Studying',
@@ -416,6 +425,7 @@ define([
     },
 
     teardown () {
+      SpeedGrader.EG.currentStudent = this.originalStudent;
       $('#fixtures').empty();
       window.jsonData = this.originalWindowJSONData;
       fakeENV.teardown();
@@ -448,6 +458,7 @@ define([
         GROUP_GRADING_MODE: false,
         points_possible: 10
       };
+      this.originalStudent = SpeedGrader.EG.currentStudent;
       SpeedGrader.EG.currentStudent = {
         id: 4,
         name: 'Guy B. Studying',
@@ -497,6 +508,7 @@ define([
     },
 
     teardown () {
+      SpeedGrader.EG.currentStudent = this.originalStudent;
       $('#fixtures').empty();
       window.jsonData = this.originalWindowJSONData;
       fakeENV.teardown();
@@ -748,7 +760,20 @@ define([
     equal(grade.pointsDeducted, '-5');
   });
 
-  QUnit.module('speed_grader#getStudentNameAndGrade');
+  QUnit.module('speed_grader#getStudentNameAndGrade', {
+    setup () {
+      this.originalStudent = SpeedGrader.EG.currentStudent;
+      SpeedGrader.EG.currentStudent = {
+        id: 4,
+        name: 'Guy B. Studying',
+        submission_state: 'not_graded'
+      };
+    },
+
+    teardown () {
+      SpeedGrader.EG.currentStudent = this.originalStudent;
+    }
+  });
 
   test('returns name and status', () => {
     let result = SpeedGrader.EG.getStudentNameAndGrade();
@@ -766,6 +791,7 @@ define([
     setup() {
       fakeENV.setup();
       this.originalWindowJSONData = window.jsonData;
+      this.originalStudent = SpeedGrader.EG.currentStudent;
       SpeedGrader.EG.currentStudent = {
         id: 4,
         name: "Guy B. Studying",
@@ -807,6 +833,7 @@ define([
     },
 
     teardown() {
+      SpeedGrader.EG.currentStudent = this.originalStudent;
       fakeENV.teardown();
       window.jsonData = this.originalWindowJSONData;
     }
@@ -961,6 +988,7 @@ define([
 
   QUnit.module('SpeedGrader - gateway timeout', {
     setup () {
+      fakeENV.setup();
       this.server = sinon.fakeServer.create({ respondImmediately: true });
       this.server.respondWith(
         'GET',
@@ -972,6 +1000,7 @@ define([
     teardown () {
       $('#fixtures').empty();
       this.server.restore();
+      fakeENV.teardown();
     }
   });
 
@@ -985,6 +1014,7 @@ define([
 
   QUnit.module('SpeedGrader - no gateway timeout', {
     setup () {
+      fakeENV.setup();
       this.server = sinon.fakeServer.create({ respondImmediately: true });
       this.server.respondWith(
         'GET',
@@ -996,6 +1026,7 @@ define([
     teardown () {
       $('#fixtures').empty();
       this.server.restore();
+      fakeENV.teardown();
     }
   });
 

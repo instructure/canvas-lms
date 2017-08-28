@@ -92,6 +92,9 @@ define [
   contextUrl = get(window, 'ENV.GRADEBOOK_OPTIONS.context_url')
 
   ScreenreaderGradebookController = Ember.ObjectController.extend
+    init: ->
+      @set('effectiveDueDates', Ember.ObjectProxy.create(content: {}))
+      @set('assignmentsFromGroups', Ember.ArrayProxy.create(content: [], isLoaded: false))
 
     checkForCsvExport: (->
       currentProgress = get(window, 'ENV.GRADEBOOK_OPTIONS.gradebook_csv_progress')
@@ -152,7 +155,6 @@ define [
         gradebook_csv_export_date = get(window, 'ENV.GRADEBOOK_OPTIONS.gradebook_csv_progress.progress.updated_at')
         I18n.t('Download Scores Generated on %{date}',
           {date: $.datetimeString(gradebook_csv_export_date)})
-
 
     selectedGradingPeriod: ((key, newValue) ->
       savedGradingPeriodId = userSettings.contextGet('gradebook_current_grading_period')
@@ -415,7 +417,7 @@ define [
       @get('students').forEach (student) => @calculateStudentGrade student
     ).observes(
       'includeUngradedAssignments','groupsAreWeighted', 'assignment_groups.@each.group_weight',
-      'effectiveDueDates.isLoaded', 'selectedGradingPeriod', 'gradingPeriods.@each.weight'
+      'selectedGradingPeriod', 'gradingPeriods.@each.weight'
     )
 
     sectionSelectDefaultLabel: I18n.t "all_sections", "All Sections"
@@ -435,9 +437,9 @@ define [
       if @get('has_grading_periods') && gpId != '0'
         params.grading_period_id = gpId
       @set('assignment_groups', [])
-      @set('assignmentsFromGroups', [])
+      @get('assignmentsFromGroups').setProperties(content: [], isLoaded: false)
       Ember.run.once =>
-        fetchAllPages(get(window, 'ENV.GRADEBOOK_OPTIONS.assignment_groups_url'), records: @get('assignment_groups'), data: params)
+        fetchAllPages(get(window, 'ENV.GRADEBOOK_OPTIONS.assignment_groups_url'), { data: params, records: @get('assignment_groups') })
     ).observes('selectedGradingPeriod').on('init')
 
     pushAssignmentGroups: (subtotals) ->
@@ -479,6 +481,21 @@ define [
           students[s.id] = s
       students
 
+    processLoadingSubmissions: (submissionGroups) ->
+      submissions = []
+
+      _.forEach submissionGroups, (submissionGroup) =>
+        submissions.push(submissionGroup.submissions...)
+
+      @updateEffectiveDueDatesFromSubmissions(submissions)
+      assignmentIds = _.uniq(_.pluck(submissions, 'assignment_id'))
+      assignmentMap = _.indexBy(@get('assignmentsFromGroups.content'), 'id')
+      assignmentIds.forEach (assignmentId) =>
+        assignment = assignmentMap[assignmentId]
+        @updateEffectiveDueDatesOnAssignment(assignment) if assignment
+
+      submissionGroups
+
     fetchStudentSubmissions: (->
       Ember.run.once =>
         notYetLoaded = @get('students').filter (student) ->
@@ -491,7 +508,14 @@ define [
 
         while (studentIds.length)
           chunk = studentIds.splice(0, ENV.GRADEBOOK_OPTIONS.chunk_size || 20)
-          fetchAllPages(ENV.GRADEBOOK_OPTIONS.submissions_url, records: @get('submissions'), data: student_ids: chunk)
+          fetchAllPages(
+            ENV.GRADEBOOK_OPTIONS.submissions_url,
+            {
+              data: { student_ids: chunk },
+              process: (submissions) => @processLoadingSubmissions(submissions),
+              records: @get('submissions')
+            }
+          )
 
     ).observes('students.@each', 'selectedGradingPeriod').on('init')
 
@@ -676,7 +700,15 @@ define [
       submission.submitted_at = tz.parse(submission.submitted_at)
       set(student, "assignment_#{submission.assignment_id}", submission)
 
-    assignmentsFromGroups: []
+    updateEffectiveDueDatesOnAssignment: (assignment) ->
+      assignment.effectiveDueDates = @get('effectiveDueDates.content')[assignment.id] || {}
+      assignment.inClosedGradingPeriod = _.any(assignment.effectiveDueDates, (date) => date.in_closed_grading_period)
+
+    updateEffectiveDueDatesFromSubmissions: (submissions) ->
+      effectiveDueDates = @get('effectiveDueDates.content')
+      gradingPeriods = @getGradingPeriodSet()?.gradingPeriods
+      EffectiveDueDates.updateWithSubmissions(effectiveDueDates, submissions, gradingPeriods)
+      @set('effectiveDueDates.content', effectiveDueDates)
 
     assignments: Ember.ArrayProxy.createWithMixins(
       Ember.SortableMixin, {
@@ -685,19 +717,13 @@ define [
       }
     )
 
-    processAssignment: (as, assignmentGroups, effectiveDueDates) ->
+    processAssignment: (as, assignmentGroups) ->
       assignmentGroup = assignmentGroups.findBy('id', as.assignment_group_id)
       set as, 'sortable_name', as.name.toLowerCase()
       set as, 'ag_position', assignmentGroup.position
       set as, 'noPointsPossibleWarning', assignmentGroup.invalid
 
-      if effectiveDueDates?
-        dueDates = effectiveDueDates.get(as.id) || {}
-        set as, 'effectiveDueDates', dueDates
-        set as, 'inClosedGradingPeriod', _.any(dueDates, (date) => date.in_closed_grading_period)
-      else
-        set as, 'effectiveDueDates', {}
-        set as, 'inClosedGradingPeriod', false
+      @updateEffectiveDueDatesOnAssignment(as)
 
       if as.due_at
         due_at = tz.parse(as.due_at)
@@ -755,9 +781,8 @@ define [
       assignmentGroups = @get('assignment_groups')
       assignments = _.flatten(assignmentGroups.mapBy 'assignments')
       assignmentList = []
-      effectiveDueDates = @get('effectiveDueDates') if @get('effectiveDueDates.isLoaded')
       assignments.forEach (as) =>
-        @processAssignment(as, assignmentGroups, effectiveDueDates)
+        @processAssignment(as, assignmentGroups)
         shouldRemoveAssignment = (as.published is false) or
           as.submission_types.contains 'not_graded' or
           as.submission_types.contains 'attendance' and !@get('showAttendance')
@@ -765,12 +790,11 @@ define [
           assignmentGroups.findBy('id', as.assignment_group_id).assignments.removeObject as
         else
           assignmentList.push(as)
-      @set('assignmentsFromGroups', assignmentList)
-    ).observes('assignment_groups.isLoaded', 'assignment_groups.isLoading', 'effectiveDueDates.isLoaded')
+      @get('assignmentsFromGroups').setProperties(content: assignmentList, isLoaded: true)
+    ).observes('assignment_groups.isLoaded', 'assignment_groups.isLoading')
 
     populateAssignments: (->
-      assignmentsFromGroups = @get('assignmentsFromGroups')
-      assignments = @get('assignments')
+      assignmentsFromGroups = @get('assignmentsFromGroups.content')
       selectedStudent = @get('selectedStudent')
       submissionStateMap = @get('submissionStateMap')
 
@@ -778,18 +802,17 @@ define [
         Ember.SortableMixin, { content: [] }
       )
 
-      effectiveDueDatesLoaded = @get('effectiveDueDates.isLoaded')
       if selectedStudent?
         assignmentsFromGroups.forEach (assignment) =>
           submissionCriteria = { assignment_id: assignment.id, user_id: selectedStudent.id }
-          unless effectiveDueDatesLoaded && submissionStateMap?.getSubmissionState(submissionCriteria)?.hideGrade
+          unless submissionStateMap?.getSubmissionState(submissionCriteria)?.hideGrade
             proxy.addObject(assignment)
       else
         proxy.addObjects(assignmentsFromGroups)
 
       proxy.set('sortProperties', @get('assignments.sortProperties'))
       @set('assignments', proxy)
-    ).observes('assignmentsFromGroups', 'selectedStudent')
+    ).observes('assignmentsFromGroups.isLoaded', 'selectedStudent')
 
     populateSubmissionStateMap: (->
       map = new SubmissionStateMap(
@@ -797,9 +820,9 @@ define [
         selectedGradingPeriodID: @get('selectedGradingPeriod.id') || '0'
         isAdmin: ENV.current_user_roles && _.contains(ENV.current_user_roles, "admin")
       )
-      map.setup(@get('students').toArray(), @get('assignmentsFromGroups').toArray())
+      map.setup(@get('students').toArray(), @get('assignmentsFromGroups.content').toArray())
       @set('submissionStateMap', map)
-    ).observes('enrollments.isLoaded', 'assignmentsFromGroups')
+    ).observes('enrollments.isLoaded', 'assignmentsFromGroups.isLoaded', 'submissions.content.length')
 
     includeUngradedAssignments: (->
       userSettings.contextGet('include_ungraded_assignments') or false

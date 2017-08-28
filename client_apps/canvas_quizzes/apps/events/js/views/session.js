@@ -50,7 +50,7 @@ define(function(require) {
         accessibilityWarningClasses += " screenreader-only";
       }
 
-      const warningMessage = I18n.t('links.log_accessibility_warning',
+      var warningMessage = I18n.t('links.log_accessibility_warning',
         'Warning: For improved accessibility when using Quiz Logs, please remain in the current Stream View.');
 
       return(

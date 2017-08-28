@@ -117,7 +117,10 @@ if (
   }, 'NewUserTutorialsAsyncChunk')
 }
 
-const supportsCSSVars = window.CSS && window.CSS.supports && window.CSS.supports('(--foo: red)')
+// edge < 15 does not support css vars
+// edge >= 15 claims to, but is currently broken
+const edge = window.navigator.userAgent.indexOf("Edge") > -1
+const supportsCSSVars = !edge && window.CSS && window.CSS.supports && window.CSS.supports('(--foo: red)')
 if (!supportsCSSVars) {
   require.ensure([], (require) => {
     window.canvasCssVariablesPolyfill = require('jsx/canvasCssVariablesPolyfill')

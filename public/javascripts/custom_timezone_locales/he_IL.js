@@ -1,24 +1,8 @@
 module.exports = { // eslint-disable-line import/no-commonjs
   name: 'he_IL',
   day: {
-    abbrev: [
-      "א'",
-      "ב'",
-      "ג'",
-      "ד'",
-      "ה'",
-      "ו'",
-      "ש'"
-    ],
-    full: [
-      'ראשון',
-      'שני',
-      'שלישי',
-      'רביעי',
-      'חמישי',
-      'שישי',
-      'שבת'
-    ]
+    abbrev: ["א'", "ב'", "ג'", "ד'", "ה'", "ו'", "ש'"],
+    full: ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת']
   },
   month: {
     abbrev: [
@@ -50,10 +34,7 @@ module.exports = { // eslint-disable-line import/no-commonjs
       'דצמבר'
     ]
   },
-  meridiem: [
-    'AM',
-    'PM'
-  ],
+  meridiem: ['AM', 'PM'],
   date: '%d/%m/%y',
   time24: '%H:%M:%S',
   dateTime: '%Z %H:%M:%S %Y %b %d %a',

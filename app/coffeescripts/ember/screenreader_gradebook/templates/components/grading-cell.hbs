@@ -17,12 +17,24 @@
 {{outOfText}}
 
 {{#if submission.late}}
-  <span class="submission_late_penalty">
-    {{#t}}Late Penalty{{/t}} <strong>{{late_penalty}}</strong>
-  </span>
-  <span class="submission_final_grade">
-    {{#t}}Final Grade{{/t}} <strong>{{final_grade}}</strong>
-  </span>
+  <div class="deduction-box">
+    <div class="deduction-box-labels">
+      <div class="submission_late_penalty">
+        {{#t}}Late Penalty{{/t}}
+      </div>
+      <div class="submission_final_grade">
+        {{#t}}Final Grade{{/t}}
+      </div>
+    </div>
+    <div class="deduction-box-values">
+      <div class="submission_late_penalty">
+        <strong>{{late_penalty}}</strong>
+      </div>
+      <div class="submission_final_grade">
+        <strong>{{final_grade}}</strong>
+      </div>
+    </div>
+  </div>
 {{/if}}
 
 {{#unless isPassFail}}

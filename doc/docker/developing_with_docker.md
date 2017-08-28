@@ -137,6 +137,15 @@ docker-compose exec web pry-remote --wait
 $ docker-compose run --rm web bundle exec rspec spec
 ```
 
+## Running javascript tests
+
+To run tests in headless Chrome, add the `docker-compose/js-tests.override.yml`
+to the `COMPOSE_FILE` environment variable in your .env, and run:
+
+```
+$ docker-compose run --rm js-tests
+```
+
 ### Selenium
 
 To enable Selenium: Add `docker-compose/selenium.override.yml` to your `COMPOSE_FILE` var in `.env`.

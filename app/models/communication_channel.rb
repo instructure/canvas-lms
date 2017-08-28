@@ -169,7 +169,10 @@ class CommunicationChannel < ActiveRecord::Base
       record.workflow_state == 'unconfirmed' and self.user.registered? and
       self.path_type == TYPE_EMAIL
     }
-    p.context { @root_account }
+    p.data { {
+      root_account_id: @root_account.global_id,
+      from_host: HostUrl.context_host(@root_account)
+    } }
 
     p.dispatch :merge_email_communication_channel
     p.to { self }
@@ -186,7 +189,10 @@ class CommunicationChannel < ActiveRecord::Base
       self.path_type == TYPE_SMS and
       !self.user.creation_pending?
     }
-    p.context { @root_account }
+    p.data { {
+      root_account_id: @root_account.global_id,
+      from_host: HostUrl.context_host(@root_account)
+    } }
   end
 
   def uniqueness_of_path
@@ -253,7 +259,7 @@ class CommunicationChannel < ActiveRecord::Base
 
   def forgot_password!
     @request_password = true
-    set_confirmation_code(true)
+    set_confirmation_code(true, Setting.get('password_reset_token_expiration_minutes', '120').to_i.minutes.from_now)
     self.save!
     @request_password = false
   end
@@ -301,13 +307,14 @@ class CommunicationChannel < ActiveRecord::Base
   # works.  If you are resetting the confirmation_code, call @cc.
   # set_confirmation_code(true), or just save the record to leave the old
   # confirmation code in place.
-  def set_confirmation_code(reset=false)
+  def set_confirmation_code(reset=false, expires_at=nil)
     self.confirmation_code = nil if reset
     if self.path_type == TYPE_EMAIL or self.path_type.nil?
       self.confirmation_code ||= CanvasSlug.generate(nil, 25)
     else
       self.confirmation_code ||= CanvasSlug.generate
     end
+    self.confirmation_code_expires_at = expires_at if reset
     true
   end
 

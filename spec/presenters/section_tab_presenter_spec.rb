@@ -43,6 +43,19 @@ describe SectionTabPresenter do
     end
   end
 
+  describe '#screenreader?' do
+    it 'should return false if tab has no screenreader element' do
+      expect(presenter.screenreader?).to be_falsey
+    end
+
+    it 'should return true when tab has screenreader element' do
+      new_presenter = SectionTabPresenter.new(
+        assignments_tab, course
+      )
+      expect(new_presenter.screenreader?).to be_truthy
+    end
+  end
+
   describe '#target?' do
     it 'returns true if the tab has a target attribute' do
       expect(SectionTabPresenter.new(tab.merge(target: '_blank'), course).target?).to eq true
@@ -111,6 +124,12 @@ describe SectionTabPresenter do
         icon: 'icon-home'
       }), course).to_h
       expect(h.keys).to include(:icon, :hidden, :path)
+      expect(h).to_not have_key(:screenreader)
+    end
+
+    it 'should include screenreader text if present' do
+      h = SectionTabPresenter.new(assignments_tab, course).to_h
+      expect(h).to have_key(:screenreader)
     end
   end
 end

@@ -20,6 +20,13 @@
                   </ul>
                 </span>
               {{/if}}
+              {{#if selectedSubmission.missing}}
+                <span class="missing-pill">
+                  <ul class="pill pill-align error" />
+                    <li class="error"><strong>{{#t}}missing{{/t}}</strong></li>
+                  </ul>
+                </span>
+              {{/if}}
             </label>
           </div>
           {{

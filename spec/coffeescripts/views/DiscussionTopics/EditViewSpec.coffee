@@ -128,7 +128,7 @@ define [
 
   test 'validates the group category for non-assignment discussions', ->
     clock = sinon.useFakeTimers()
-    view = @editView()
+    view = @editView(permissions: {CAN_SET_GROUP: true})
     clock.tick(1)
     data = { group_category_id: 'blank' }
     errors = view.validateBeforeSave(data, [])

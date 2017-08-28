@@ -294,6 +294,32 @@ module Lti
         expect(exp_hash[:test]).to eq assignment.lti_context_id
       end
 
+      it 'has a substitution for com.instructure.PostMessageToken' do
+        uuid_pattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+        variable_expander = VariableExpander.new(root_account,
+                                                 account,
+                                                 controller,
+                                                 current_user: user,
+                                                 tool: tool,
+                                                 launch: Lti::Launch.new)
+        exp_hash = {test: '$com.instructure.PostMessageToken'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test] =~ uuid_pattern).to eq 0
+      end
+
+      it 'has a substitution for com.instructure.PostMessageToken when token is provided' do
+        pm_token_override = SecureRandom.uuid
+        variable_expander = VariableExpander.new(root_account,
+                                                 account,
+                                                 controller,
+                                                 current_user: user,
+                                                 tool: tool,
+                                                 post_message_token: pm_token_override)
+        exp_hash = {test: '$com.instructure.PostMessageToken'}
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq pm_token_override
+      end
+
       it 'has a substitution for com.instructure.Assignment.lti.id when secure params are present' do
         lti_assignment_id = SecureRandom.uuid
         secure_params = Canvas::Security.create_jwt(lti_assignment_id: lti_assignment_id)

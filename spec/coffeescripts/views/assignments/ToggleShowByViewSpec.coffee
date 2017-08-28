@@ -88,7 +88,7 @@ define [
 
   test 'should sort assignments into groups correctly', ->
 
-    view = createView(false)
+    view = createView()
     getGrades(view.assignmentGroups, @server)
 
     equal view.assignmentGroups.length, 4
@@ -126,7 +126,7 @@ define [
 
     #Regular observer view
     ENV.current_user_has_been_observer_in_this_course = true
-    view = createView(false)
+    view = createView()
     getGrades(view.assignmentGroups, @server)
 
     past = view.assignmentGroups.findWhere id: "past"
@@ -145,7 +145,7 @@ define [
 
     ENV.current_user_has_been_observer_in_this_course = true
     ENV.observed_student_ids = ["1"]
-    view = createView(false)
+    view = createView()
     getGrades(view.assignmentGroups, @server)
 
     past = view.assignmentGroups.findWhere id: "past"
@@ -166,7 +166,7 @@ define [
 
     ENV.observed_student_ids = ["1", "2"]
     ENV.current_user_has_been_observer_in_this_course = true
-    view = createView(false)
+    view = createView()
     getGrades(view.assignmentGroups, @server)
     past = view.assignmentGroups.findWhere id: "past"
     assignments = past.get("assignments").models

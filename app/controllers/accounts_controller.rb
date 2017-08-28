@@ -336,6 +336,10 @@ class AccountsController < ApplicationController
   # @argument order [String, "asc"|"desc"]
   #   The order to sort the given column by.
   #
+  # @argument search_by [String, "course"|"teacher"]
+  #   The filter to search by. "course" searches for course names, course codes,
+  #   and SIS IDs. "teacher" searches for teacher names
+  #
   # @returns [Course]
   def courses_api
     return unless authorized_action(@account, @current_user, :read_course_list)
@@ -348,19 +352,21 @@ class AccountsController < ApplicationController
       params[:state] -= %w{available}
     end
 
+    name_col = Course.best_unicode_collation_key('name')
+    sortable_name_col = User.sortable_name_order_by_clause(nil)
+
     order = if params[:sort] == 'course_name'
-              "name, id"
+              "#{name_col}"
             elsif params[:sort] == 'sis_course_id'
-              "#{Course.quoted_table_name}.sis_source_id, id"
+              "#{Course.quoted_table_name}.sis_source_id"
             elsif params[:sort] == 'teacher'
-              "(SELECT sortable_name FROM #{User.quoted_table_name}
+              "(SELECT #{sortable_name_col} FROM #{User.quoted_table_name}
                 JOIN #{Enrollment.quoted_table_name} on #{User.quoted_table_name}.id
                 = #{Enrollment.quoted_table_name}.user_id
                 WHERE #{Enrollment.quoted_table_name}.workflow_state <> 'deleted'
                 AND #{Enrollment.quoted_table_name}.type = 'TeacherEnrollment'
                 AND #{Enrollment.quoted_table_name}.course_id = #{Course.quoted_table_name}.id
-                ORDER BY #{User.quoted_table_name}.sortable_name
-                LIMIT 1), id"
+                ORDER BY #{sortable_name_col} LIMIT 1)"
             elsif params[:sort] == 'enrollments'
               "(SELECT DISTINCT COUNT(DISTINCT #{Enrollment.quoted_table_name}.user_id)
                 AS count_user_id FROM #{Enrollment.quoted_table_name}
@@ -368,18 +374,20 @@ class AccountsController < ApplicationController
                 AND (#{Enrollment.quoted_table_name}.workflow_state
                 NOT IN ('rejected', 'completed', 'deleted', 'inactive'))
                 AND #{Enrollment.quoted_table_name}.course_id
-                = #{Course.quoted_table_name}.id)
-                #{params[:order] == 'desc' ? 'DESC, id DESC' : 'ASC, id ASC'}"
+                = #{Course.quoted_table_name}.id)"
             elsif params[:sort] == 'subaccount'
-                "(SELECT #{Account.quoted_table_name}.name FROM #{Account.quoted_table_name}
+              "(SELECT #{name_col} FROM #{Account.quoted_table_name}
                 WHERE #{Account.quoted_table_name}.id
-                = #{Course.quoted_table_name}.account_id), id"
+                = #{Course.quoted_table_name}.account_id)"
             else
               "id"
             end
 
+    if params[:sort] && params[:order]
+      order += (params[:order] == "desc" ? " DESC, id DESC" : ", id")
+    end
+
     @courses = @account.associated_courses.order(order).where(:workflow_state => params[:state])
-    @courses = @courses.reverse_order if params[:order] == 'desc' && params[:sort] != 'enrollments'
 
     if params[:hide_enrollmentless_courses] || value_to_boolean(params[:with_enrollments])
       @courses = @courses.with_enrollments
@@ -426,7 +434,6 @@ class AccountsController < ApplicationController
 
     if params[:search_term]
       search_term = params[:search_term]
-
       is_id = search_term.to_s =~ Api::ID_REGEX
       if is_id && course = @courses.where(id: search_term).first
         @courses = [course]
@@ -435,16 +442,20 @@ class AccountsController < ApplicationController
       else
         SearchTermHelper.validate_search_term(search_term)
 
-        name = ActiveRecord::Base.wildcard('courses.name', search_term)
-        code = ActiveRecord::Base.wildcard('courses.course_code', search_term)
-
-        if @account.grants_any_right?(@current_user, :read_sis, :manage_sis)
-          sis_source = ActiveRecord::Base.wildcard('courses.sis_source_id', search_term)
-          @courses = @courses.where("#{name} OR #{code} OR #{sis_source}")
+        if params[:search_by] == "teacher"
+          @courses = @courses.where("EXISTS (?)", TeacherEnrollment.active.joins(:user).where(
+            ActiveRecord::Base.wildcard('users.name', params[:search_term])).where("enrollments.course_id=courses.id"))
         else
-          @courses = @courses.where("#{name} OR #{code}")
-        end
+          name = ActiveRecord::Base.wildcard('courses.name', search_term)
+          code = ActiveRecord::Base.wildcard('courses.course_code', search_term)
 
+          if @account.grants_any_right?(@current_user, :read_sis, :manage_sis)
+            sis_source = ActiveRecord::Base.wildcard('courses.sis_source_id', search_term)
+            @courses = @courses.where("#{name} OR #{code} OR #{sis_source}")
+          else
+            @courses = @courses.where("#{name} OR #{code}")
+          end
+        end
       end
     end
 
@@ -632,7 +643,7 @@ class AccountsController < ApplicationController
           @account.settings[:custom_help_links] = sorted_help_links.map do |index_with_hash|
             hash = index_with_hash[1].to_hash.with_indifferent_access
             hash.delete('state')
-            hash.assert_valid_keys ["text", "subtext", "url", "available_to", "type"]
+            hash.assert_valid_keys ["text", "subtext", "url", "available_to", "type", "id"]
             hash
           end
           @account.settings[:new_custom_help_links] = true
@@ -765,7 +776,7 @@ class AccountsController < ApplicationController
 
       js_env({
         CUSTOM_HELP_LINKS: @domain_root_account && @domain_root_account.help_links || [],
-        DEFAULT_HELP_LINKS: Account::HelpLinks.default_links,
+        DEFAULT_HELP_LINKS: Account::HelpLinks.instantiate_links(Account::HelpLinks.default_links),
         APP_CENTER: { enabled: Canvas::Plugin.find(:app_center).enabled? },
         LTI_LAUNCH_URL: account_tool_proxy_registration_path(@account),
         CONTEXT_BASE_URL: "/accounts/#{@context.id}",

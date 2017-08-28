@@ -4,10 +4,12 @@ const path = require('path')
 // Put any custom moment locales here:
 const customMomentLocales = [
   'de',
+  'fa',
   'fr',
   'fr-ca',
   'he',
   'ht-ht',
+  'hy-am',
   'mi-nz',
   'pl'
 ]

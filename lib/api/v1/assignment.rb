@@ -416,12 +416,11 @@ module Api::V1::Assignment
     return false unless prepared_create[:valid]
 
     assignment.quiz_lti! if assignment_params.key?(:quiz_lti)
-
-    if prepared_create[:overrides]
+    if prepared_create[:overrides].present?
       create_api_assignment_with_overrides(prepared_create, user)
     else
       prepared_create[:assignment].save!
-      :created
+      return :created
     end
   rescue ActiveRecord::RecordInvalid
     false
@@ -740,7 +739,7 @@ module Api::V1::Assignment
     end
 
     assignment.do_notifications!(prepared_update[:old_assignment], prepared_update[:notify_of_update])
-    :created
+    return :created
   end
 
   def update_api_assignment_with_overrides(prepared_update, user)

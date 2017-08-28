@@ -97,6 +97,12 @@ describe CourseProgress do
       })
     end
 
+    it "should only run item visibility methods once" do
+      expect(AssignmentStudentVisibility).to receive(:visible_assignment_ids_in_course_by_user).once.and_call_original
+      progress = CourseProgress.new(@course, @user).to_json
+      expect(progress[:requirement_count]).to eq 5
+    end
+
     it "should return correct progress for student who has completed some requirements" do
       # turn in first two assignments (module 1)
       submit_homework(@assignment)

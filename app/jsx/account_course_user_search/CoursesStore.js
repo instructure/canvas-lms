@@ -30,6 +30,7 @@ const CoursesStore = createStore({
     if (params.with_students) payload.enrollment_type = ['student']
     if (params.sort) payload.sort = params.sort
     if (params.order) payload.order = params.order
+    if (params.search_by) payload.search_by = params.search_by
     payload.include = ['total_students', 'teachers', 'subaccount']
 
     return payload

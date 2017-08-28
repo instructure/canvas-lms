@@ -178,7 +178,7 @@ describe "Course Account Reports" do
     end
 
     it "should not find courses with objects" do
-      @wiki_page = @course6.wiki.wiki_pages.create(
+      @wiki_page = @course6.wiki_pages.create(
         :title => "Some random wiki page",
         :body => "wiki page content")
       report = run_report(@type)

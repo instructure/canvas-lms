@@ -145,7 +145,7 @@ describe OriginalityReport do
       report.update_attributes(link_id: link_id)
       expected_url = "http://localhost/courses/"\
                      "#{submission.assignment.course.id}/assignments/"\
-                     "#{submission.assignment.id}/lti/resource/#{link_id}"
+                     "#{submission.assignment.id}/lti/resource/#{link_id}?display=borderless"
       expect(report.report_launch_url).to eq expected_url
     end
 

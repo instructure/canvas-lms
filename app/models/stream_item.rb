@@ -175,10 +175,8 @@ class StreamItem < ActiveRecord::Base
     when Message
       res = object.attributes
       res['notification_category'] = object.notification_display_category
-      if !object.context.is_a?(Context) && object.context.respond_to?(:context) && object.context.context.is_a?(Context)
-        self.context = object.context.context
-      elsif object.asset_context_type
-        self.context_type, self.context_id = object.asset_context_type, object.asset_context_id
+      if !object.context.is_a?(Context) && object.context_context
+        self.context = object.context_context
       end
     when Submission
       res = object.attributes
@@ -257,35 +255,38 @@ class StreamItem < ActiveRecord::Base
       # do the bulk insert in user id order to avoid locking problems on postges < 9.3 (foreign keys)
       user_ids_subset.sort!
 
-      inserts = user_ids_subset.map do |user_id|
-        {
-          :stream_item_id => stream_item_id,
-          :user_id => user_id,
-          :hidden => false,
-          :workflow_state => object_unread_for_user(object, user_id),
-          :context_type => l_context_type,
-          :context_id => l_context_id,
-        }
-      end
-      if object.is_a?(Submission) && object.assignment.muted?
-        # set the hidden flag if an assignment and muted (for the owner of the submission)
-        if owner_insert = inserts.detect{|i| i[:user_id] == object.user_id}
-          owner_insert[:hidden] = true
+      user_ids_subset.each_slice(500) do |sliced_user_ids|
+
+        inserts = sliced_user_ids.map do |user_id|
+          {
+            :stream_item_id => stream_item_id,
+            :user_id => user_id,
+            :hidden => false,
+            :workflow_state => object_unread_for_user(object, user_id),
+            :context_type => l_context_type,
+            :context_id => l_context_id,
+          }
         end
-      end
+        if object.is_a?(Submission) && object.assignment.muted?
+          # set the hidden flag if an assignment and muted (for the owner of the submission)
+          if owner_insert = inserts.detect{|i| i[:user_id] == object.user_id}
+            owner_insert[:hidden] = true
+          end
+        end
 
-      StreamItemInstance.unique_constraint_retry do
-        StreamItemInstance.where(:stream_item_id => stream_item_id, :user_id => user_ids_subset).delete_all
-        StreamItemInstance.bulk_insert(inserts)
-      end
+        StreamItemInstance.unique_constraint_retry do
+          StreamItemInstance.where(:stream_item_id => stream_item_id, :user_id => sliced_user_ids).delete_all
+          StreamItemInstance.bulk_insert(inserts)
+        end
 
-      #reset caches manually because the observer wont trigger off of the above mass inserts
-      user_ids_subset.each do |user_id|
-        StreamItemCache.invalidate_recent_stream_items(user_id, l_context_type, l_context_id)
-      end
+        #reset caches manually because the observer wont trigger off of the above mass inserts
+        sliced_user_ids.each do |user_id|
+          StreamItemCache.invalidate_recent_stream_items(user_id, l_context_type, l_context_id)
+        end
 
-      # touch all the users to invalidate the cache
-      User.where(id: user_ids_subset).touch_all
+        # touch all the users to invalidate the cache
+        User.where(id: sliced_user_ids).touch_all
+      end
     end
 
     return [res]

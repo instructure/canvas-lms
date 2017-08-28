@@ -163,6 +163,7 @@ class Assignment < ActiveRecord::Base
     result.ignores.clear
     result.moderated_grading_selections.clear
     result.lti_context_id = nil
+    result.turnitin_id = nil
     result.discussion_topic = nil
     result.peer_review_count = 0
     result.workflow_state = "unpublished"
@@ -691,7 +692,7 @@ class Assignment < ActiveRecord::Base
       self.discussion_topic = topic
     elsif self.context.feature_enabled?(:conditional_release) &&
       self.submission_types == "wiki_page" && @saved_by != :wiki_page
-      page = self.wiki_page || self.context.wiki.wiki_pages.build(:user => @updating_user)
+      page = self.wiki_page || self.context.wiki_pages.build(:user => @updating_user)
       save_submittable(page)
       self.wiki_page = page
     end
@@ -1464,7 +1465,10 @@ class Assignment < ActiveRecord::Base
       did_grade = true if score.present? || submission.excused?
     end
 
-    submission.grade_matches_current_submission = true if did_grade
+    if did_grade
+      submission.grade_matches_current_submission = true
+      submission.instance_variable_set(:@regraded, true)
+    end
 
     if (submission.score_changed? ||
         submission.grade_matches_current_submission) &&
@@ -2547,13 +2551,19 @@ class Assignment < ActiveRecord::Base
 
   def assignment_overrides_due_date_ok?(overrides={})
     if AssignmentUtil.due_date_required?(self)
-      overrides = self.assignment_overrides.empty? ? overrides : self.assignment_overrides
+      overrides = gather_override_data(overrides)
       if overrides.select{|o| o['due_at'].nil?}.length > 0
         errors.add(:due_at, I18n.t("cannot be blank for any assignees when Post to Sis is checked"))
         return false
       end
-      return true
     end
+    true
+  end
+
+  def gather_override_data(overrides)
+    return self.assignment_overrides unless self.assignment_overrides.empty?
+    return overrides.values.reject(&:empty?).flatten if overrides.is_a?(Hash)
+    overrides
   end
 
   def active_assignment_overrides?

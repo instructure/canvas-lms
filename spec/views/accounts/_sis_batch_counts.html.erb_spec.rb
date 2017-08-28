@@ -22,13 +22,15 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 describe "accounts/_sis_batch_counts.html.erb" do
 
   it "should render sis count data" do
-    data = {:counts => {:xlists => 2, :enrollments => 3, :courses => 5, :users => 6, :terms => 6, :group_memberships => 7, :groups => 8, :sections => 9, :accounts => 10}}
+    data = {counts: {xlists: 2, enrollments: 3, courses: 5, users: 6, terms: 6,
+                     group_memberships: 7, groups: 8, sections: 9, accounts: 10,
+                     admins: 1, }}
     report = double()
     expect(report).to receive(:data).and_return(data)
     render :partial => 'accounts/sis_batch_counts', :object => report
-    
+
     map = {:xlists => "Crosslists", :group_memberships => "Group Enrollments"}
-    
+
     data[:counts].each_pair do |type, count|
       name = map[type] || type.to_s.capitalize
       expect(response.body).to match /#{name}: #{count}/

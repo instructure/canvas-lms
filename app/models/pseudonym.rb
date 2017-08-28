@@ -54,7 +54,7 @@ class Pseudonym < ActiveRecord::Base
 
   validates_each :password, {:if => :require_password?}, &Canvas::PasswordPolicy.method("validate")
   acts_as_authentic do |config|
-    config.validates_format_of_login_field_options = {:with => /\A[\w\.\+\-_'@ =]+\z/}
+    config.validates_format_of_login_field_options = {:with => /\A[[:print:]]+\z/}
     config.login_field :unique_id
     config.perishable_token_valid_for = 30.minutes
     config.validates_length_of_login_field_options = {:within => 1..MAX_UNIQUE_ID_LENGTH}
@@ -214,7 +214,7 @@ class Pseudonym < ActiveRecord::Base
 
   def validate_unique_id
     if (!self.account || self.account.email_pseudonyms) && !self.deleted?
-      unless self.unique_id.present? && self.unique_id.match(/\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i)
+      unless self.unique_id.present? && EmailAddressValidator.valid?(self.unique_id)
         self.errors.add(:unique_id, "not_email")
         throw :abort
       end
@@ -436,7 +436,16 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def ldap_bind_result(password_plaintext)
-    account.authentication_providers.active.where(auth_type: 'ldap').each do |config|
+    aps = case authentication_provider
+          when AccountAuthorizationConfig::LDAP
+            [authentication_provider]
+          when nil
+            account.authentication_providers.active.where(auth_type: 'ldap')
+          #when AccountAuthorizationConfig::Canvas
+          else
+            []
+          end
+    aps.each do |config|
       res = config.ldap_bind_result(self.unique_id, password_plaintext)
       return res if res
     end

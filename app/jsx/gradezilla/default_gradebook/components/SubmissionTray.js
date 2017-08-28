@@ -21,9 +21,11 @@ import { bool, func, number, shape, string } from 'prop-types';
 import ComingSoonContent from 'jsx/gradezilla/default_gradebook/components/ComingSoonContent';
 import LatePolicyGrade from 'jsx/gradezilla/default_gradebook/components/LatePolicyGrade';
 import SubmissionTrayRadioInputGroup from 'jsx/gradezilla/default_gradebook/components/SubmissionTrayRadioInputGroup';
+import Carousel from 'jsx/gradezilla/default_gradebook/components/Carousel';
 import Avatar from 'instructure-ui/lib/components/Avatar';
 import Button from 'instructure-ui/lib/components/Button';
 import Container from 'instructure-ui/lib/components/Container';
+import Link from 'instructure-ui/lib/components/Link';
 import Tray from 'instructure-ui/lib/components/Tray';
 import IconSpeedGraderLine from 'instructure-icons/lib/Line/IconSpeedGraderLine';
 import I18n from 'i18n!gradebook';
@@ -83,6 +85,18 @@ export default function SubmissionTray (props) {
                   {name}
                 </div>
 
+                <Carousel
+                  id="assignment-carousel"
+                  onLeftArrowClick={props.selectPreviousAssignment}
+                  onRightArrowClick={props.selectNextAssignment}
+                  displayLeftArrow={!props.isFirstAssignment}
+                  displayRightArrow={!props.isLastAssignment}
+                >
+                  <Link href={props.assignment.htmlUrl}>
+                    {props.assignment.name}
+                  </Link>
+                </Carousel>
+
                 { props.speedGraderEnabled && renderSpeedGraderLink(speedGraderUrl) }
 
                 {!!props.submission.pointsDeducted && <LatePolicyGrade submission={props.submission} />}
@@ -93,6 +107,8 @@ export default function SubmissionTray (props) {
                     locale={props.locale}
                     latePolicy={props.latePolicy}
                     submission={props.submission}
+                    submissionUpdating={props.submissionUpdating}
+                    updateSubmission={props.updateSubmission}
                   />
                 </div>
               </div>
@@ -109,6 +125,10 @@ SubmissionTray.defaultProps = {
 }
 
 SubmissionTray.propTypes = {
+  assignment: shape({
+    name: string.isRequired,
+    htmlUrl: string.isRequired
+  }).isRequired,
   contentRef: func,
   isOpen: bool.isRequired,
   colors: shape({
@@ -133,8 +153,14 @@ SubmissionTray.propTypes = {
     secondsLate: number.isRequired,
     assignmentId: string.isRequired
   }),
+  isFirstAssignment: bool.isRequired,
+  isLastAssignment: bool.isRequired,
+  selectNextAssignment: func.isRequired,
+  selectPreviousAssignment: func.isRequired,
   courseId: string.isRequired,
   speedGraderEnabled: bool.isRequired,
+  submissionUpdating: bool.isRequired,
+  updateSubmission: func.isRequired,
   locale: string.isRequired,
   latePolicy: shape({
     lateSubmissionInterval: string

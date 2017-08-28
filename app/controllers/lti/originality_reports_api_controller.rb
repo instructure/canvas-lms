@@ -267,11 +267,23 @@ module Lti
     end
 
     def submission
-      @_submission ||= Submission.active.find(params[:submission_id])
+      @_submission ||= begin
+        if params[:file_id].present?
+          AttachmentAssociation.find_by(attachment_id: params[:file_id])&.context
+        else
+          Submission.active.find(params[:submission_id])
+        end
+      end
     end
 
     def attachment
-      @_attachment ||= Attachment.find(params.require(:originality_report)[:file_id])
+      @_attachment ||= begin
+        attachment = Attachment.find(params[:file_id]) if params[:file_id].present?
+        if attachment.blank? && params.require(:originality_report)[:file_id].present?
+          attachment = Attachment.find(params.require(:originality_report)[:file_id])
+        end
+        attachment
+      end
     end
 
     def attachment_association
@@ -304,11 +316,12 @@ module Lti
     end
 
     def report_in_context
-      @report = OriginalityReport.find(params[:id])
+      @report = OriginalityReport.find_by(id: params[:id]) || OriginalityReport.find_by!(attachment_id: attachment&.id)
       verify_submission_attachment(@report.attachment, submission)
     end
 
     def verify_submission_attachment(attachment, submission)
+      head :not_found and return unless attachment.present? && submission.present?
       unless submission.assignment == assignment && submission.attachments.include?(attachment)
         head :unauthorized
       end
@@ -316,6 +329,6 @@ module Lti
 
     # @!appendix Originality Report UI Locations
     #
-    #  {include:file:doc/api/originality_report_appendix.md}
+    # {include:file:doc/api/originality_report_appendix.md}
   end
 end

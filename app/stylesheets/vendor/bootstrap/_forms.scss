@@ -124,9 +124,8 @@ input[type="color"],
 
   // Focus state
   &:focus {
-    border-color: lighten($linkColor, 10%);
+    border-color: var(--ic-link-color-lightened-10);
     outline: 0;
-    outline: thin dotted \9; /* IE6-9 */
   }
 }
 
@@ -134,8 +133,6 @@ input[type="color"],
 input[type="radio"],
 input[type="checkbox"] {
   margin: 4px 0 0;
-  *margin-top: 0; /* IE7 */
-  margin-top: 1px \9; /* IE8-9 */
   line-height: normal;
   cursor: pointer;
 }
@@ -411,7 +408,7 @@ This is the standard form actions button bar at the bottom of every content form
 
 .help-block,
 .help-inline {
-  color: lighten($textColor, 15%); // lighten the text some for contrast
+  color: $ic-font-color--subdued; // lighten the text some for contrast
 }
 
 .help-block {

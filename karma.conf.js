@@ -4,22 +4,16 @@ const karmaConfig = {
   frameworks: ['qunit'],
 
   proxies: {
-    '/dist/brandable_css/': '/base/public/dist/brandable_css/'
+    '/dist/brandable_css/': '/base/public/dist/brandable_css/',
+    '/images/': '/base/public/images/'
   },
 
   exclude: [],
 
   // 'dots', 'progress', 'junit', 'growl', 'coverage', 'spec'
-  reporters: ['progress', 'coverage'],
+  reporters: ['progress'],
   // enable the verbose reporter if you want to have more information of where/how specs fail
   // reporters: ['verbose'],
-
-
-  coverageReporter: {
-    type: 'html',
-    dir: 'coverage-js/',
-    subdir: '.'
-  },
 
   port: 9876,
 
@@ -29,12 +23,21 @@ const karmaConfig = {
 
   // - Chrome
   // - ChromeCanary
+  // - ChromeHeadless
   // - Firefox
   // - Opera (has to be installed with `npm install karma-opera-launcher`)
   // - Safari (only Mac; has to be installed with `npm install karma-safari-launcher`)
   // - PhantomJS
   // - IE (only Windows; has to be installed with `npm install karma-ie-launcher`)
   browsers: ['Chrome'],
+
+  // Run headless chrome with `karma start --browsers ChromeHeadlessNoSandbox`
+  customLaunchers: {
+    ChromeHeadlessNoSandbox: {
+      base: 'ChromeHeadless',
+      flags: ['--no-sandbox'] // needed for running tests in local docker
+    }
+  },
 
   // If browser does not capture in given timeout [ms], kill it
   captureTimeout: 60000,
@@ -64,6 +67,25 @@ const karmaConfig = {
   },
 
   webpack: require('./webpack.test.config'),
+}
+
+// For faster local debugging in karma, only add istanbul cruft you've explicity set the "COVERAGE" environment variable
+if (process.env.COVERAGE) {
+  karmaConfig.reporters.push('coverage-istanbul')
+  karmaConfig.coverageIstanbulReporter = {
+    reports: ['html'],
+    dir: 'coverage-js/',
+    fixWebpackSourcePaths: true
+  }
+  karmaConfig.webpack.module.rules.unshift({
+    test: /\.(js|coffee)$/,
+    use: {
+      loader: 'istanbul-instrumenter-loader',
+      options: { esModules: true }
+    },
+    enforce: 'post',
+    exclude: /(node_modules|spec|public\/javascripts\/(bower|client_apps|translations|vendor|custom_moment_locales|custom_timezone_locales))/,
+  })
 }
 
 module.exports = function (config) {

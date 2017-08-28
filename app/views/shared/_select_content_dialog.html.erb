@@ -147,7 +147,7 @@
           <%# cache on the context.wiki instead of just the context because even though it will require a db query, we will get a much better cache hit rate %>
           <option value="new"><%= t :new_page_option, "[ New Page ]" %></option>
           <% cache([@context.wiki, 'non_deleted_wiki_pages']) do  %>
-            <% @context.wiki.wiki_pages.not_deleted.select([:id, :title]).each do |page| %>
+            <% @context.wiki_pages.not_deleted.select([:id, :title]).each do |page| %>
               <% if page && !page.new_record? %>
                 <option value="<%= page.id %>"><%= page.title %></option>
               <% end %>

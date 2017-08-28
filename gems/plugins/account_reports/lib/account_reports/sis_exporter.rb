@@ -24,7 +24,7 @@ module AccountReports
 
     SIS_CSV_REPORTS = ["users", "accounts", "terms", "courses", "sections",
                        "enrollments", "groups", "group_membership",
-                       "group_categories", "xlist", "user_observers"].freeze
+                       "group_categories", "xlist", "user_observers", "admins"].freeze
 
     def initialize(account_report, params = {})
       @account_report = account_report
@@ -790,6 +790,70 @@ module AccountReports
           row << observer.ob_state
           row << observer.o_batch_id? unless @sis_format
           csv << row
+        end
+      end
+    end
+
+    def admins
+      include_other_roots = root_account.trust_exists?
+      if @sis_format
+        # headers are not translated on sis_export to maintain import compatibility
+        headers = ['user_id','account_id','role_id','role','status']
+        headers << 'root_account' if include_other_roots
+      else
+        headers = []
+        headers << I18n.t('canvas_user_id')
+        headers << I18n.t('user_id')
+        headers << I18n.t('canvas_account_id')
+        headers << I18n.t('account_id')
+        headers << I18n.t('role_id')
+        headers << I18n.t('role')
+        headers << I18n.t('status')
+        headers << I18n.t('created_by_sis')
+        headers << I18n.t('root_account') if include_other_roots
+      end
+
+      root_account.shard.activate do
+        admins = AccountUser.
+          select("account_users.*, pseudonyms.unique_id, pseudonyms.sis_user_id,
+                  a.sis_source_id AS account_sis_id,
+                  r.name AS role_name").
+          joins("INNER JOIN #{Account.quoted_table_name} a ON account_users.account_id=a.id
+                 INNER JOIN #{Role.quoted_table_name} r ON account_users.role_id=r.id
+                 LEFT OUTER JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id=account_users.user_id").
+          where("account_users.account_id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
+                 OR account_users.account_id= :account_id", {account_id: account.id})
+
+        admins = admins.where.not(account_users: {sis_batch_id: nil}) if @sis_format
+        admins = admins.where.not(account_users: {workflow_state: 'deleted'}) unless @include_deleted
+
+        generate_and_run_report headers do |csv|
+          admins.find_in_batches do |batch|
+            if include_other_roots
+              # we only need to fetch for users that we don't have a login for.
+              users = batch.map {|au| User.new(id: au.user_id) if au.unique_id.nil?}.compact
+              users_by_id = users.index_by(&:id)
+              sis_ids = load_cross_shard_logins(users)
+            end
+            batch.each do |admin|
+              row = []
+              row << admin.user_id unless @sis_format
+              if admin.unique_id.nil? && include_other_roots
+                u = users_by_id[admin.user_id]
+                p = loaded_pseudonym(sis_ids, u)
+              end
+              row << (p ? p.sis_user_id : admin.sis_user_id)
+              row << admin.account_id unless @sis_format
+              row << admin.account_sis_id
+              row << admin.role_id
+              row << admin.role_name
+              row << admin.workflow_state
+              row << admin.sis_batch_id? unless @sis_format
+              root = p ? p.account : root_account
+              row << HostUrl.context_host(root) if include_other_roots
+              csv << row
+            end
+          end
         end
       end
     end

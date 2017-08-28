@@ -28,7 +28,8 @@ module Factories
       :title => 'note title',
       :details => 'note details',
       :workflow_state => 'active',
-      :todo_date => Date.today
+      :todo_date => Time.zone.today,
+      :course => nil
     }
   end
 end

@@ -140,6 +140,10 @@ module SIS
             should_update_account_associations = false
 
             if !status_is_active && !user.new_record?
+              if user.id == @batch&.user_id
+                @messages << "Can't remove yourself user_id '#{user_row.user_id}'"
+                next
+              end
               # if this user is deleted, we're just going to make sure the user isn't enrolled in anything in this root account and
               # delete the pseudonym.
               enrollment_ids = @root_account.enrollments.active.where(user_id: user).where.not(:workflow_state => 'deleted').pluck(:id)

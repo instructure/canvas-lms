@@ -71,7 +71,7 @@ $cell_height: 33px;
 }
 
 .student-grades-link {
-  @if $use_high_contrast { color: darken($ic-link-color, 5%); }
+  @if $use_high_contrast { color: var(--ic-link-color-darkened-10); }
 }
 
 .meta-cell .avatar {
@@ -150,7 +150,7 @@ $cell_height: 33px;
     @if $use_high_contrast {
       &:hover, &:focus { text-decoration: underline; }
     }
-    @else { color: $ic-link-color; }
+    @else { color: var(--ic-link-color); }
   }
   .muted i {
     color: $ic-color-medium-darker;
@@ -163,7 +163,7 @@ $cell_height: 33px;
       right: 14px;
     };
     // If high contrast, default to regular dark text
-    @if $use_high_contrast == false { color: lighten($ic-font-color-dark, 15%); }
+    @if not $use_high_contrast { color: var(--ic-brand-font-color-dark-lightened-15); }
   }
   .gradebook-header-drop {
     //put it above the "out of"

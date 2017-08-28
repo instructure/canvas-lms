@@ -2018,6 +2018,7 @@ describe DiscussionTopic do
       @course.offer!
       topic = @course.discussion_topics.create!(:title => "title")
       expect(topic.messages_sent["New Discussion Topic"].map(&:user)).to be_include(@user)
+      expect(topic.messages_sent['New Discussion Topic'].first.from_name).to eq @course.name
     end
 
     it "should not send a message for an unpublished course" do

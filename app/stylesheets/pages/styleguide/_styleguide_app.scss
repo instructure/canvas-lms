@@ -43,7 +43,7 @@ $sg-Header-height: 85px;
 }
 .styleguide-section__grid-demo-element {
   padding: 8px 16px;
-  background: lighten($ic-link-color, 15%);
+  background: var(--ic-link-color-lightened-10);
   color: white;
   text-align: center;
   text-transform: uppercase;

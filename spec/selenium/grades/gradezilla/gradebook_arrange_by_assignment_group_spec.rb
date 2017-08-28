@@ -18,6 +18,7 @@
 require_relative '../../helpers/gradezilla_common'
 require_relative '../../helpers/assignment_overrides'
 require_relative '../page_objects/gradezilla_page'
+require_relative '../page_objects/gradezilla_cells_page'
 
 describe "Gradezilla view menu" do
   include_context "in-process server selenium tests"
@@ -33,26 +34,24 @@ describe "Gradezilla view menu" do
     end
 
     it "defaults arrange by to assignment group in the grid", priority: "1", test_id: 220028 do
-      first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-      expect(first_row_cells[0]).to include_text @assignment_1_points
-      expect(first_row_cells[1]).to include_text @assignment_2_points
-      expect(first_row_cells[2]).to include_text "-"
+      expect(Gradezilla::Cells.get_grade(@student_1, @first_assignment)).to eq @assignment_1_points
+      expect(Gradezilla::Cells.get_grade(@student_1, @second_assignment)).to eq @assignment_2_points
+      expect(Gradezilla::Cells.get_grade(@student_1, @third_assignment)).to eq "-"
     end
 
     it "shows default arrange by in the menu" do
       Gradezilla.open_view_menu_and_arrange_by_menu
 
-      expect(Gradezilla.popover_menu_item('Default Order').attribute('aria-checked')).to eq 'true'
+      expect(Gradezilla.popover_menu_item_checked?('Default Order')).to eq 'true'
     end
 
     it "validates arrange columns by assignment group option", priority: "1", test_id: 3253267 do
       Gradezilla.open_view_menu_and_arrange_by_menu
-      Gradezilla.popover_menu_item('Default Order').click
+      Gradezilla.view_arrange_by_submenu_item('Default Order').click
 
-      first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-      expect(first_row_cells[0]).to include_text @assignment_1_points
-      expect(first_row_cells[1]).to include_text @assignment_2_points
-      expect(first_row_cells[2]).to include_text "-"
+      expect(Gradezilla::Cells.get_grade(@student_1, @first_assignment)).to eq @assignment_1_points
+      expect(Gradezilla::Cells.get_grade(@student_1, @second_assignment)).to eq @assignment_2_points
+      expect(Gradezilla::Cells.get_grade(@student_1, @third_assignment)).to eq "-"
     end
   end
 

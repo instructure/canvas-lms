@@ -35,7 +35,6 @@ class Message < ActiveRecord::Base
 
 
   # Associations
-  belongs_to :asset_context, polymorphic: [], exhaustive: false
   belongs_to :communication_channel
   belongs_to :context, polymorphic: [], exhaustive: false
   include NotificationPreloader
@@ -259,7 +258,10 @@ class Message < ActiveRecord::Base
   def link_root_account
     @root_account ||= begin
       context = self.context
-      context = self.asset_context if context.is_a?(CommunicationChannel) && self.asset_context
+      if context.is_a?(CommunicationChannel) && @data&.root_account_id
+        root_account = Account.where(id: @data.root_account_id).first
+        context = root_account if root_account
+      end
 
       context = context.assignment if context.respond_to?(:assignment) && context.assignment
       context = context.rubric_association.context if context.respond_to?(:rubric_association) && context.rubric_association
@@ -496,22 +498,17 @@ class Message < ActiveRecord::Base
     # (temporarily) override course name with user's nickname for the course
     hacked_course = apply_course_nickname_to_asset(self.context, self.user)
 
-    # Ensure we have a path_type
-    path_type = 'dashboard' if to == 'summary'
-    unless path_type
-      path_type = communication_channel.try(:path_type) || 'email'
-    end
-
+    path_type ||= communication_channel.try(:path_type) || 'email'
 
     # Determine the message template file to be used in the message
     filename = template_filename(path_type)
     message_body_template = get_template(filename)
 
-    context, asset, user, delayed_messages, asset_context, data = [self.context,
-      self.context, self.user, @delayed_messages, self.asset_context, @data]
+    context, asset, user, delayed_messages, data = [self.context,
+      self.context, self.user, @delayed_messages, @data]
 
     link_root_account.shard.activate do
-      if message_body_template.present? && path_type.present?
+      if message_body_template.present?
         populate_body(message_body_template, path_type, binding, filename)
 
         # Set the subject and url
@@ -669,6 +666,24 @@ class Message < ActiveRecord::Base
     current_context.root_account
   end
 
+  # This is a dumb name, but it's the context (course/group/account/user) of
+  # the message.context (which should really be message.asset)
+  def context_context
+    @context_context ||= begin
+      unbounded_loop_paranoia_counter = 10
+      current_context = context
+
+      until current_context&.is_a_context?
+        return nil if unbounded_loop_paranoia_counter <= 0 || current_context.nil?
+        return nil unless current_context.respond_to?(:context)
+        current_context = current_context.context
+        unbounded_loop_paranoia_counter -= 1
+      end
+
+      current_context
+    end
+  end
+
   def custom_logo
     context_root_account && context_root_account.settings[:email_logo]
   end
@@ -748,7 +763,7 @@ class Message < ActiveRecord::Base
   #
   # Returns json hash.
   def as_json(options = {})
-    super(:only => [:id, :created_at, :sent_at, :workflow_state, :from, :to, :reply_to, :subject, :body, :html_body])['message']
+    super(:only => [:id, :created_at, :sent_at, :workflow_state, :from, :from_name, :to, :reply_to, :subject, :body, :html_body])['message']
   end
 
   protected
@@ -802,7 +817,7 @@ class Message < ActiveRecord::Base
   # Returns nothing.
   def deliver_via_twitter
     twitter_service = user.user_services.where(service: 'twitter').first
-    host = HostUrl.short_host(self.asset_context)
+    host = HostUrl.context_host(link_root_account)
     msg_id = AssetSignature.generate(self)
     Twitter::Messenger.new(self, twitter_service, host, msg_id).deliver
     complete_dispatch
@@ -881,10 +896,8 @@ class Message < ActiveRecord::Base
 
   private
   def infer_from_name
-    if asset_context
-      return name_helper.from_name if name_helper.from_name.present?
-      return asset_context.name if can_use_asset_name_for_from?
-    end
+    return name_helper.from_name if name_helper.from_name.present?
+    return context_context.nickname_for(user) if can_use_name_for_from?(context_context)
 
     if root_account && root_account.settings[:outgoing_email_default_name]
       return root_account.settings[:outgoing_email_default_name]
@@ -893,8 +906,9 @@ class Message < ActiveRecord::Base
     HostUrl.outgoing_email_default_name
   end
 
-  def can_use_asset_name_for_from?
-    !asset_context.is_a?(Account) && asset_context.name && notification.dashboard? rescue false
+  def can_use_name_for_from?(c)
+    c && !c.is_a?(Account) && notification&.dashboard? &&
+      c.respond_to?(:name) && c.name.present?
   end
 
   def name_helper

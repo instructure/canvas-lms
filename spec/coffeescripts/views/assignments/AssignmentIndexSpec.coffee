@@ -147,6 +147,7 @@ define [
     clear_spy = @spy(IndexView.prototype, 'clearSearch')
     view = assignmentIndex()
     view.$('#search_term').val('something')
-    view.showByView.toggleShowBy({preventDefault: -> })
+    view.showByView.initializeCache()
+    view.showByView.toggleShowBy('date')
     equal view.$('#search_term').val(), ""
     ok clear_spy.called

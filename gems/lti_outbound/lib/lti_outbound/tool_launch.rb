@@ -40,7 +40,6 @@ module LtiOutbound
       @consumer_instance = context.consumer_instance || raise('Consumer instance required for generating LTI content')
 
       @variable_expander = options[:variable_expander] || raise('VariableExpander is required for generating LTI content')
-
       @hash = {}
     end
 

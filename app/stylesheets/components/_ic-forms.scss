@@ -1205,12 +1205,13 @@ $ic-Input-border: lighten($ic-color-dark, 65);
 
 $ic-Input-standard-height: 38px;
 
-@mixin ic-input-variant($border-color: $ic-Input-border, $color: $ic-brand-primary) {
+@mixin ic-input-variant($border-color, $color, $outline-color: rgba($color, 0.2)) {
   border-color: $border-color;
   &:focus {
-    border-color: lighten($color, 10%);
     border-color: $color;
-    @if $use_high_contrast == false { outline-color: rgba($color, 0.2); }
+    @if not $use_high_contrast {
+      outline-color: $outline-color;
+    }
   }
 }
 
@@ -1253,7 +1254,7 @@ input[type="tel"], input[type="color"], .uneditable-input {
     // Remove the webkit gloss in iOS
     -webkit-appearance: none;
 
-    @include ic-input-variant;
+    @include ic-input-variant($ic-Input-border, var(--ic-brand-primary), var(--ic-brand-primary-lightened-15));
 
     @if $use_high_contrast {
       outline-style: dotted;

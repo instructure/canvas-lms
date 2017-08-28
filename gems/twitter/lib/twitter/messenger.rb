@@ -49,9 +49,5 @@ module Twitter
       truncated_body = HtmlTextHelper.strip_and_truncate(message.body, :max_length => (139 - url.length))
       "#{truncated_body} #{url}"
     end
-
-    def asset_context
-      @message.asset_context
-    end
   end
 end

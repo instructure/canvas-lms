@@ -22,7 +22,7 @@ module CC
       wiki_folder = File.join(@export_dir, CCHelper::WIKI_FOLDER)
       FileUtils::mkdir_p wiki_folder
 
-      scope = @course.wiki.wiki_pages.not_deleted
+      scope = @course.wiki_pages.not_deleted
       WikiPages::ScopedToUser.new(@course, @user, scope).scope.each do |page|
         next unless export_object?(page)
         next if @user && page.locked_for?(@user)

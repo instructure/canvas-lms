@@ -371,6 +371,7 @@ class GradebooksController < ApplicationController
           @context.grading_standard_enabled? &&
           (@context.grading_standard.try(:data) || GradingStandard.default_grading_standard)
         ),
+        default_grading_standard: GradingStandard.default_grading_standard,
         course_is_concluded: @context.completed?,
         course_name: @context.name,
         gradebook_is_editable: @gradebook_is_editable,
@@ -734,14 +735,16 @@ class GradebooksController < ApplicationController
   private
 
   def new_gradebook_env(env)
+    development_mode_enabled = !!ENV['GRADEBOOK_DEVELOPMENT']
     graded_late_or_missing_submissions_exist =
-      @context.submissions.graded.late.union(@context.submissions.graded.missing).exists?
+      development_mode_enabled &&
+      (@context.submissions.graded.late.exists? || @context.submissions.graded.missing.exists?)
 
     options = {
       colors: gradebook_settings.fetch(:colors, {}),
       graded_late_or_missing_submissions_exist: graded_late_or_missing_submissions_exist,
       gradezilla: true,
-      new_gradebook_development_enabled: !!ENV['GRADEBOOK_DEVELOPMENT'],
+      new_gradebook_development_enabled: development_mode_enabled,
       late_policy: @context.late_policy.as_json(include_root: false)
     }
     env.deep_merge({ GRADEBOOK_OPTIONS: options })
@@ -785,10 +788,13 @@ class GradebooksController < ApplicationController
   end
 
   def new_history
+    # remove Grades crumb added by default in this controller
+    crumbs.delete_if { |crumb| crumb[0] == "Grades" }
+    add_crumb(t("Gradebook History"),
+              context_url(@context, controller: :gradebooks, action: :history))
     @page_title = t("Gradebook History")
     @body_classes << "full-width padless-content"
     js_bundle :react_gradebook_history
-    css_bundle :react_gradebook_history
     js_env({})
 
     render html: "", layout: true

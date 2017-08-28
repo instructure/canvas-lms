@@ -52,7 +52,7 @@ describe "master courses - child courses - sync history for teacher" do
     topic.update_attributes(title: "something new") # updated but won't apply
     topic_to = @copy_to.discussion_topics.first
     topic_to.update_attributes(title: "something that won't get overwritten")
-    page = @copy_from.wiki.wiki_pages.create!(title: "page") # new object
+    page = @copy_from.wiki_pages.create!(title: "page") # new object
 
     run_master_migration # run selective export
 

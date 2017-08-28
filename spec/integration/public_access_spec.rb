@@ -73,7 +73,7 @@ context "accessing public content" do
   end
 
   it "should show wiki pages" do
-    page = @course.wiki.wiki_pages.create!(:title => "stuff")
+    page = @course.wiki_pages.create!(:title => "stuff")
 
     test_public_access do
       get "/courses/#{@course.id}/pages/#{page.url}"

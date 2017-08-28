@@ -104,7 +104,7 @@ describe "speed grader submissions" do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
-      expect(f('#submission_late_notice')).to be_displayed
+      expect(f('#submission_details')).to contain_css('.submission-late-pill')
     end
 
     it "should not display a late message if an assignment has been overridden", priority: "1", test_id: 283280 do
@@ -118,9 +118,8 @@ describe "speed grader submissions" do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
-      expect(f('#submission_late_notice')).not_to be_displayed
+      expect(f('#submission_details')).not_to contain_css('.submission-late-pill')
     end
-
 
     it "should display no submission message if student does not make a submission", priority: "1", test_id: 283499 do
       @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')

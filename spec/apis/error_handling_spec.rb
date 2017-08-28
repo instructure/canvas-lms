@@ -31,9 +31,9 @@ describe "API Error Handling", type: :request do
     end
 
     it "should not return the base object in ActiveRecord::Errors.to_json" do
-      page = WikiPage.new(:body => 'blah blah', :title => 'blah blah')
-      expect(page.valid?).to be_falsey
-      errors = page.errors.to_json
+      assmt = Assignment.new
+      expect(assmt.valid?).to be_falsey
+      errors = assmt.errors.to_json
       parsed = JSON.parse(errors)['errors']
       expect(parsed.size).to be > 0
       expect(errors).not_to match(/blah blah/)

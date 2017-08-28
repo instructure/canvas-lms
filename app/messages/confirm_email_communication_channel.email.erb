@@ -9,7 +9,7 @@
 <%= t :body,
       "The email address, %{email} is being registered at %{website} for the user, %{user}.",
       :email => asset.path,
-      :website => HostUrl.context_host(asset_context) || HostUrl.default_host,
+      :website => data.from_host || HostUrl.default_host,
       :user => asset.user.name %>
 
 <%= t :details, "To confirm this registration, please visit the following url:" %>

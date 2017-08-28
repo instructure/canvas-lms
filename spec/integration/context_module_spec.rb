@@ -90,7 +90,7 @@ describe ContextModule do
     end
 
     it "should progress for wiki pages" do
-      @page = @course.wiki.wiki_pages.create!(:title => "talk page", :body => 'ohai', :editing_roles => 'teachers,students')
+      @page = @course.wiki_pages.create!(:title => "talk page", :body => 'ohai', :editing_roles => 'teachers,students')
       @tag = @module.add_item(:type => 'wiki_page', :id => @page.id)
       before_after do
         put "/api/v1/courses/#{@course.id}/pages/#{@page.url}", params: {:wiki_page => { :body => 'i agree', :title => 'talk page' }}
@@ -216,7 +216,7 @@ describe ContextModule do
     it "should progress to a wiki page" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
-          page = @course.wiki.wiki_pages.create!(:title => "wiki", :body => content)
+          page = @course.wiki_pages.create!(:title => "wiki", :body => content)
           @test_url = "/courses/#{@course.id}/pages/#{page.url}"
           @tag2 = @mod2.add_item(:type => 'wiki_page', :id => page.id)
           expect(@tag2).to be_published
@@ -268,43 +268,6 @@ describe ContextModule do
         expect(body1.at_css("#context_module_content_#{mod.id} .unlock_details").text).to match /4am/
         expect(body2.at_css("#context_module_content_#{mod.id} .unlock_details").text).to match /7am/
       end
-    end
-  end
-
-  describe "cache_visibilities_for_students" do
-    it "should load visibilities for each model" do
-      expect(AssignmentStudentVisibility).to receive(:visible_assignment_ids_in_course_by_user).and_return({}).once
-      expect(DiscussionTopic).to receive(:visible_ids_by_user).and_return({}).once
-      expect(WikiPage).to receive(:visible_ids_by_user).and_return({}).once
-      expect(Quizzes::QuizStudentVisibility).to receive(:visible_quiz_ids_in_course_by_user).and_return({}).once
-      course_module
-      @module.assignment_visibilities_for_users([2])
-      @module.discussion_visibilities_for_users([2])
-      @module.page_visibilities_for_users([2])
-      @module.quiz_visibilities_for_users([2])
-    end
-  end
-
-  describe "object_visibilities_for_user" do
-    it "should load visibilities for each model" do
-      course_module
-      assignment_model(course: @course, submission_types: "online_url", workflow_state: "published", only_visible_to_overrides: false)
-
-      @module = ContextModule.find(@module.id) #clear cache of visibilities
-
-      user_visibilites = @module.assignment_visibilities_for_users([@user.id])
-      expect(user_visibilites).to eq [@assignment.id]
-    end
-
-    it "should load visibilities for each model with cache" do
-      course_module
-      assignment_model(course: @course, submission_types: "online_url", workflow_state: "published", only_visible_to_overrides: false)
-
-      @module = ContextModule.find(@module.id) #clear old cache of visibilities
-      @module.cache_visibilities_for_students([@user.id]) #make updated cache
-
-      user_visibilites = @module.assignment_visibilities_for_users([@user.id])
-      expect(user_visibilites).to eq [@assignment.id]
     end
   end
 end

@@ -142,10 +142,6 @@ class Gradezilla
       f('span[data-menu-id="previous-export"]')
     end
 
-    def popover_menu_items
-      ff('[role=menu][aria-labelledby*=PopoverMenu] [role=menuitemradio]')
-    end
-
     def slick_custom_col_cell
       ff(".slick-cell.custom_column")
     end
@@ -218,6 +214,10 @@ class Gradezilla
 
     def expanded_popover_menu
       f(expanded_popover_menu_selector)
+    end
+
+    def assignment_carousel
+      f('#assignment-carousel')
     end
 
     # actions
@@ -348,6 +348,22 @@ class Gradezilla
       f(".container_0 .slick-header-column:nth-child(#{n})")
     end
 
+    def submission_tray_left_arrow_selector
+      '#assignment-carousel .left-arrow-button-container button'
+    end
+
+    def submission_tray_right_arrow_selector
+      '#assignment-carousel .right-arrow-button-container button'
+    end
+
+    def click_submission_tray_left_arrow
+      f(submission_tray_left_arrow_selector).click
+    end
+
+    def click_submission_tray_right_arrow
+      f(submission_tray_right_arrow_selector).click
+    end
+
     # Semantic Methods for Gradebook Menus
 
     def open_gradebook_menu(name)
@@ -372,8 +388,7 @@ class Gradezilla
 
     def open_view_menu_and_arrange_by_menu
       view_menu = open_gradebook_menu('View')
-      trigger = ff('button', view_menu).find { |element| element.text == "Arrange By" }
-      trigger.click
+      hover(view_menu_item("Arrange By"))
       view_menu
     end
 
@@ -426,14 +441,17 @@ class Gradezilla
       gradebook_settings_cog.click
     end
 
-    def popover_menu_item(name)
-      popover_menu_items.find do |menu_item|
-        menu_item.text == name
-      end
+    def view_arrange_by_submenu_item(name)
+      fj("[role=menuitemradio]:contains(#{name})")
     end
 
-    def popover_menu_items_select
-      popover_menu_items
+    def view_menu_item(name)
+      fj("[role=menu] li:contains(#{name})")
+    end
+
+    def popover_menu_item_checked?(menu_item_name)
+      menu_item = view_arrange_by_submenu_item(menu_item_name)
+      menu_item.attribute('aria-checked')
     end
 
     def total_cell_mute_icon_select

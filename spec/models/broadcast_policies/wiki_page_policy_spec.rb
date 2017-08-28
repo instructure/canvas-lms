@@ -39,6 +39,7 @@ module BroadcastPolicies
         allow(w).to receive(:created_at).and_return(1.hour.ago)
         allow(w).to receive(:published?).and_return(true)
         allow(w).to receive(:wiki).and_return(wiki)
+        allow(w).to receive(:context).and_return(course)
         allow(w).to receive(:just_created).and_return(false)
       end
     end

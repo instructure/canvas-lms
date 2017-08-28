@@ -31,9 +31,9 @@ describe "master courses banner" do
     @minion.enroll_teacher(@master_teacher).accept!
 
     # sets up the page that gets blueprinted
-    @original_page = @master.wiki.wiki_pages.create! title: 'Unicorn', body: 'don\'t exist! Sorry James'
+    @original_page = @master.wiki_pages.create! title: 'Unicorn', body: 'don\'t exist! Sorry James'
     run_master_course_migration(@master)
-    @copy_page = @minion.wiki.wiki_pages.last
+    @copy_page = @minion.wiki_pages.last
   end
 
   describe "as a master course teacher" do

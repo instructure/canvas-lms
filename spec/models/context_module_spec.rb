@@ -176,7 +176,7 @@ describe ContextModule do
 
     it "should add a wiki page" do
       course_module
-      @page = @course.wiki.wiki_pages.create!(:title => "some page")
+      @page = @course.wiki_pages.create!(:title => "some page")
       @tag = @module.add_item({:id => @page.id, :type => 'wiki_page'}) #@page)
 
       expect(@tag.content).to eql(@page)
@@ -187,7 +187,7 @@ describe ContextModule do
       course_module
       @course.wiki
       other_course = Account.default.courses.create!
-      @page = other_course.wiki.wiki_pages.create!(:title => "new page")
+      @page = other_course.wiki_pages.create!(:title => "new page")
       @tag = @module.add_item({:id => @page.id, :type => 'wiki_page'})
       expect(@tag).to be_nil
     end
@@ -301,7 +301,7 @@ describe ContextModule do
     it "should not generate progressions for non-active modules" do
       student_in_course :active_all => true
       tehmod = @course.context_modules.create! :name => "teh module"
-      page = @course.wiki.wiki_pages.create! :title => "view this page"
+      page = @course.wiki_pages.create! :title => "view this page"
       tag = tehmod.add_item(:id => page.id, :type => 'wiki_page')
       tehmod.completion_requirements = { tag.id => {:type => 'must_view'} }
       tehmod.workflow_state = 'active'
@@ -323,7 +323,7 @@ describe ContextModule do
     it 'should not remove completed contribution requirements when viewed' do
       student_in_course(active_all: true)
       mod = @course.context_modules.create!(name: 'Module')
-      page = @course.wiki.wiki_pages.create!(title: 'Edit This Page')
+      page = @course.wiki_pages.create!(title: 'Edit This Page')
       tag = mod.add_item(id: page.id, type: 'wiki_page')
       mod.completion_requirements = [{ id: tag.id, type: 'must_contribute' }]
       mod.workflow_state = 'active'
@@ -625,14 +625,14 @@ describe ContextModule do
 
       @assignment.context_module_action(@user, :read, nil)
 
-      expect(@module2.evaluate_for(@user)).to be_completed
+      expect(@module2.reload.evaluate_for(@user)).to be_completed
       expect(@module.evaluate_for(@user)).to be_completed
 
       @module.completion_requirements = {@tag.id => {:type => 'min_score', :min_score => 5}}
       @module.save!
 
       expect(@module2.evaluate_for(@user)).to be_completed
-      @module.relock_progressions
+      @module.reload.relock_progressions
       expect(@module2.evaluate_for(@user)).to be_locked
 
       expect(@module.evaluate_for(@user)).to be_unlocked
@@ -647,7 +647,7 @@ describe ContextModule do
       @submissions = @assignment.reload.grade_student(@user, :grade => "4", :grader => @teacher)
 
       expect(@module2.evaluate_for(@user)).to be_completed
-      @module.relock_progressions
+      @module.reload.relock_progressions
       expect(@module2.evaluate_for(@user)).to be_locked
       expect(@module.evaluate_for(@user)).to be_started
 
@@ -893,7 +893,7 @@ describe ContextModule do
       expect(@module2.evaluate_for(@user)).to be_locked
 
       @assignment.context_module_action(@user, :read, nil)
-      expect(@module2.evaluate_for(@user)).to be_completed
+      expect(@module2.reload.evaluate_for(@user)).to be_completed
 
       @progression = @module.evaluate_for(@user)
       expect(@progression).to be_completed
@@ -905,7 +905,7 @@ describe ContextModule do
       @module.save
       @module2.reload
       expect(@module2.evaluate_for(@user)).to be_completed
-      @module.relock_progressions
+      @module.reload.relock_progressions
       expect(@module2.evaluate_for(@user)).to be_locked
 
       @progression = @module.evaluate_for(@user)
@@ -925,7 +925,7 @@ describe ContextModule do
       @submissions = @assignment.reload.grade_student(@user, :grade => "4", :grader => @teacher)
 
       expect(@module2.evaluate_for(@user)).to be_completed
-      @module.relock_progressions
+      @module.reload.relock_progressions
       expect(@module2.evaluate_for(@user)).to be_locked
 
       @progression = @module.evaluate_for(@user)
@@ -1297,5 +1297,24 @@ describe ContextModule do
     expect(m.grants_right?(@teacher, :read)).to eq true
     expect(m.grants_right?(@teacher, :read_as_admin)).to eq true
     expect(m.grants_right?(@teacher, :manage_content)).to eq false
+  end
+
+  it "should only load visibility and progression information once when calculating prerequisites" do
+    course_factory(:active_all => true)
+    student_in_course(:course => @course)
+    m1 = @course.context_modules.create!(:name => "m1")
+    m2 = @course.context_modules.create!(:name => "m2", :prerequisites => [{id: m1.id, type: 'context_module', name: m1.name}])
+
+    [m1, m2].each do |m|
+      assmt = @course.assignments.create!(:title => "assmt", :submission_types => "online_text_entry")
+      assmt.submit_homework(@student, :body => "bloop")
+      tag = m.add_item({:id => assmt.id, :type => 'assignment'})
+      m.update_attribute(:completion_requirements, {tag.id => {:type => "must_submit"}})
+    end
+
+    expect(AssignmentStudentVisibility).to receive(:visible_assignment_ids_in_course_by_user).once.and_call_original
+    expect(ContextModuleProgressions::Finder).to receive(:find_or_create_for_context_and_user).once.and_call_original
+
+    m2.evaluate_for(@student)
   end
 end

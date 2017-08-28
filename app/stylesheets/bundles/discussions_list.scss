@@ -162,7 +162,7 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
 
   &.droppable-hover {
     @if $use_high_contrast {
-      box-shadow: inset 0 0 0 2px $ic-link-color;
+      box-shadow: inset 0 0 0 2px var(--ic-link-color);
     }
     @else {
       > * { opacity: 0.5; }
@@ -301,6 +301,7 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
   .discussion-status {
     color: $ic-color-icon-disabled;
     width: 84px;
+    white-space: nowrap;
 
     .publish-icon, .lock-icon {
       margin-right: 10px;

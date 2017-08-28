@@ -53,7 +53,7 @@ describe "Module Items API", type: :request do
                                                :unlock_at => @christmas,
                                                :require_sequential_progress => true)
     @module2.prerequisites = "module_#{@module1.id}"
-    @wiki_page = @course.wiki.wiki_pages.create!(:title => "wiki title", :body => "")
+    @wiki_page = @course.wiki_pages.create!(:title => "wiki title", :body => "")
     @wiki_page.workflow_state = 'active'; @wiki_page.save!
     @wiki_page_tag = @module2.add_item(:id => @wiki_page.id, :type => 'wiki_page')
     @attachment = attachment_model(:context => @course)
@@ -360,7 +360,7 @@ describe "Module Items API", type: :request do
       end
 
       it "should create with page_url for wiki page items" do
-        wiki_page = @course.wiki.wiki_pages.create!(:title => 'whateva i do wut i want')
+        wiki_page = @course.wiki_pages.create!(:title => 'whateva i do wut i want')
 
         json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
                         {:controller => "context_module_items_api", :action => "create", :format => "json",
@@ -389,7 +389,7 @@ describe "Module Items API", type: :request do
       end
 
       it "should require a non-deleted page_url" do
-        page = @course.wiki.wiki_pages.create(:title => 'Deleted Page')
+        page = @course.wiki_pages.create(:title => 'Deleted Page')
         page.workflow_state = 'deleted'
         page.save!
 
@@ -1339,7 +1339,7 @@ describe "Module Items API", type: :request do
     context 'mark_as_done' do
       before :once do
         @module = @course.context_modules.create(:name => "mark_as_done_module")
-        wiki_page = @course.wiki.wiki_pages.create!(:title => "mark_as_done page", :body => "")
+        wiki_page = @course.wiki_pages.create!(:title => "mark_as_done page", :body => "")
         wiki_page.workflow_state = 'active'
         wiki_page.save!
         @tag = @module.add_item(:id => wiki_page.id, :type => 'wiki_page')

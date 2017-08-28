@@ -28,8 +28,8 @@ describe UserListV2 do
   end
 
   it "should complain about invalid input" do
-    ul = UserListV2.new '%instructure', search_type: 'unique_id'
-    expect(ul.errors).to eq [{:address => '%instructure', :details => :unparseable}]
+    ul = UserListV2.new "i\x01nstructure", search_type: 'unique_id'
+    expect(ul.errors).to eq [{:address => "i\x01nstructure", :details => :unparseable}]
   end
 
   it "should not fail with unicode names" do
