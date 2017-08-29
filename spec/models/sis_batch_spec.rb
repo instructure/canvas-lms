@@ -688,6 +688,19 @@ test_1,u1,student,active}
         expect(@e2.reload).to be_deleted
         expect(batch.processing_errors.size).to eq 0
       end
+
+      it 'should not abort batch if it is above the threshold' do
+        b1 = process_csv_data([%{course_id,user_id,role,status
+                                test_1,u2,student,active}],
+                              batch_mode: true,
+                              batch_mode_term: @term1,
+                              change_threshold: 51)
+        expect(b1.workflow_state).to eq 'imported'
+        expect(@e1.reload).to be_deleted
+        expect(@e2.reload).to be_active
+        expect(b1.processing_errors.size).to eq 0
+      end
+
     end
   end
 end
