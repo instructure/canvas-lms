@@ -132,7 +132,8 @@ define [
         # We were at the top, or there wasn't another page item cog
         $focusOnDelete = $('.new_page')
       else
-        $focusOnDelete = $allCogs[newIndex]
+        $allTitles = $('.collectionViewItems').children().find('.wiki-page-link')
+        $focusOnDelete = $allTitles[newIndex]
 
       deleteDialog = new WikiPageDeleteDialog
         model: @model
