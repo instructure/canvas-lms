@@ -39,6 +39,11 @@ import CustomHelpLinkAction from './CustomHelpLinkAction'
     },
     focus (action) {
       // screenreaders are the worst
+      // We have to force a focus change and a delay because clicking the "up" or "delete" buttons
+      // just causes React to rearrange the DOM nodes, so the focus doesn't actually change. If the
+      // focus doesn't change, screenreaders don't read the up button or delete button again like we
+      // want them to. If we don't delay, then screenreaders don't notice the focus changed.
+      this.actions['edit'].focus();
       setTimeout(() => {
         const ref = this.actions[action];
 
