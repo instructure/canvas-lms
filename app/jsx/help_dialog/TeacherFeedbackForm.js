@@ -73,7 +73,7 @@ import 'compiled/jquery.rails_flash_notifications'
       this.props.onCancel();
     },
     renderCourseOptions () {
-      let options = this.state.courses.map((c) => {
+      let options = this.state.courses.filter(c => !c.access_restricted_by_date).map((c) => {
         const value = `course_${c.id}_admins`;
 
         return (
