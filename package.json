@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "axe-core": "2.1.7",
-    "axios": "0.15.2",
+    "axios": "^0.16.0",
     "babel-cli": "^6.10.1",
     "babel-core": "^6.10.4",
     "babel-eslint": "^7.1.0",
