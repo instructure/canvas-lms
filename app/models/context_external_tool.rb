@@ -624,8 +624,8 @@ class ContextExternalTool < ActiveRecord::Base
 
     context = context.context if context.is_a?(Group)
 
-    tool = context.context_external_tools.having_setting(type).where(id: id).first
-    tool ||= ContextExternalTool.having_setting(type).where(context_type: 'Account', context_id: context.account_chain_ids, id: id).first
+    tool = context.context_external_tools.having_setting(type).active.where(id: id).first
+    tool ||= ContextExternalTool.having_setting(type).active.where(context_type: 'Account', context_id: context.account_chain_ids, id: id).first
     raise ActiveRecord::RecordNotFound if !tool && raise_error
 
     tool
