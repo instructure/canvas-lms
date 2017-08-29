@@ -238,6 +238,8 @@ module Importers
     def self.import_settings_from_migration(course, data, migration)
       return unless data[:course]
       settings = data[:course]
+      course.intro_title = settings[:intro_title]
+      course.intro_text = settings[:intro_text]
       if settings[:tab_configuration] && settings[:tab_configuration].is_a?(Array)
         tab_config = []
         all_tools = nil
