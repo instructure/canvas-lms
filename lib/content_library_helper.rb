@@ -15,6 +15,7 @@ module ContentLibraryHelper
     links.each do |link|
       url = link.attribute('href').to_s
       next if url.match(/\/courses\/1\/files/) # Don't adjust links to download files. We expose them to all courses and can just exist in the Content Library
+      next if url.match(/\/courses\/1\/rubrics/) # Don't adjust links to rubrics. We expose them to all courses and can just exist in the Content Library
       if (url.match(/\/courses\/1\//))
         replaceUrl = url.gsub(/\/courses\/1/, "/courses/LOCAL_COURSE_ID_TOKEN")
         Rails.logger.debug("### replace_content_library_links_with_local_links: replacing Content Library Course ID with LOCAL_COURSE_ID_TOKEN for: replaceUrl = #{replaceUrl}")
