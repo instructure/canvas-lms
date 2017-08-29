@@ -15,7 +15,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-gem "aws-sdk-s3", "1.0.0.rc3" unless defined? Bundler
+unless defined? Bundler
+  # we selinimize outside of bundler for great speed. but there may be
+  # multiple versions of this gem installed though (especially if someone
+  # is upgrading). such haax :o
+  aws_sdk_s3_version = File.read(File.expand_path(File.dirname(__FILE__) + '/../../../../Gemfile.d/app.rb'))
+    .lines
+    .grep(/aws-sdk-s3/)[0]
+    .sub(/.*'(\d+.*?)'.*\n/, '\1')
+  gem "aws-sdk-s3", aws_sdk_s3_version
+end
 require "json"
 require "aws-sdk-s3"
 require "fileutils"
