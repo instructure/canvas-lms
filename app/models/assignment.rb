@@ -33,6 +33,7 @@ class Assignment < ActiveRecord::Base
   include SearchTermHelper
   include Canvas::DraftStateValidations
   include TurnitinID
+  include ContentLibraryHelper
 
   attr_accessible :title, :name, :description, :due_at, :points_possible,
     :grading_type, :submission_types, :assignment_group, :unlock_at, :lock_at,
@@ -48,7 +49,11 @@ class Assignment < ActiveRecord::Base
   def duplicate_across_courses
     if self.description_changed?
       Assignment.where(:clone_of_id => id).each do |assignment|
-        assignment.description = description
+        # Look for links to other pages / assignments in the Content Library and update those
+        # have placeholders that Javascript can replace with the current course ID on load.
+        # Technically we could fix up the course ID directly here, but we can't when creating a new
+        # assignment, so for consistency we use placeholders in both spots.
+        assignment.description = replace_content_library_links_with_local_link_placeholders(description)
         assignment.name = name
         assignment.submission_types = submission_types
 
@@ -67,7 +72,11 @@ class Assignment < ActiveRecord::Base
   def clone_from_master_bank
     if self.clone_of_id_changed? && !self.clone_of_id.nil?
       master = Assignment.find(self.clone_of_id)
-      self.description = master.description
+      # Look for links to other pages / assignments in the Content Library and update those
+      # have placeholders that Javascript can replace with the current course ID on load.
+      # Technically we could fix up the course ID directly here, but we can't when creating a new
+      # assignment, so for consistency we use placeholders in both spots.
+      self.description = replace_content_library_links_with_local_link_placeholders(master.description)
       self.name = master.name
       self.submission_types = master.submission_types
       if self.rubric != master.rubric
