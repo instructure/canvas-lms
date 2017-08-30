@@ -50,10 +50,9 @@ class Assignment < ActiveRecord::Base
     if self.description_changed?
       Assignment.where(:clone_of_id => id).each do |assignment|
         # Look for links to other pages / assignments in the Content Library and update those
-        # have placeholders that Javascript can replace with the current course ID on load.
-        # Technically we could fix up the course ID directly here, but we can't when creating a new
-        # assignment, so for consistency we use placeholders in both spots.
-        assignment.description = replace_content_library_links_with_local_link_placeholders(description)
+        # be links to the associated pages / assignment in the local course.
+        local_course_id = assignment.context_id
+        assignment.description = replace_content_library_links_with_local_links(description, local_course_id)
         assignment.name = name
         assignment.submission_types = submission_types
 
@@ -73,10 +72,9 @@ class Assignment < ActiveRecord::Base
     if self.clone_of_id_changed? && !self.clone_of_id.nil?
       master = Assignment.find(self.clone_of_id)
       # Look for links to other pages / assignments in the Content Library and update those
-      # have placeholders that Javascript can replace with the current course ID on load.
-      # Technically we could fix up the course ID directly here, but we can't when creating a new
-      # assignment, so for consistency we use placeholders in both spots.
-      self.description = replace_content_library_links_with_local_link_placeholders(master.description)
+      # be links to the associated pages / assignment in the local course.
+      local_course_id = self.context_id
+      self.description = replace_content_library_links_with_local_links(master.description, local_course_id)
       self.name = master.name
       self.submission_types = master.submission_types
       if self.rubric != master.rubric
@@ -85,8 +83,6 @@ class Assignment < ActiveRecord::Base
       end
     end
   end
-
-
 
   ALLOWED_GRADING_TYPES = %w(
     pass_fail percent letter_grade gpa_scale points not_graded
