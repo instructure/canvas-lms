@@ -179,6 +179,7 @@ class BzController < ApplicationController
     data = {}
     if params[:names]
       params[:names].each do |name|
+        next if data[name]
         result = RetainedData.where(:user_id => @current_user.id, :name => name)
         data[name] = result.empty? ? '' : result.first.value
       end
