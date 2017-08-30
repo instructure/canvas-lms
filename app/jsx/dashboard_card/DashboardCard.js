@@ -200,7 +200,7 @@ export default class DashboardCard extends Component {
   linksForCard () {
     return this.props.links.map((link) => {
       if (!link.hidden) {
-        const screenReaderLabel = `${link.screenreader} - ${this.state.nicknameInfo.nickname}`;
+        const screenReaderLabel = `${link.label} - ${this.state.nicknameInfo.nickname}`;
         return (
           <DashboardCardAction
             unreadCount={this.unreadCount(link.icon, this.state.stream)}
