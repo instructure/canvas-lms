@@ -71,6 +71,8 @@ function bzRetainedInfoSetup() {
   }
 
   var textareas = document.querySelectorAll("[data-bz-retained]");
+  var names = [];
+  var tas = [];
   for(var i = 0; i < textareas.length; i++) {
     (function(ta) {
       var name = ta.getAttribute("data-bz-retained");
@@ -127,21 +129,50 @@ function bzRetainedInfoSetup() {
         ta.addEventListener("change", save);
 
       pendingMagicFieldLoads += 1;
-
-      var http = new XMLHttpRequest();
-      // cut off json p stuff
-      http.onload = function() {
-        bzChangeRetainedItem(ta, http.responseText.substring(9));
-        pendingMagicFieldLoads -= 1;
-        if(pendingMagicFieldLoads == 0 && !pendingMagicFieldLoadEvent) {
-          pendingMagicFieldLoadEvent = true;
-          window.requestAnimationFrame(triggerMagicFieldsLoaded);
-        }
-      };
-      http.open("GET", "/bz/user_retained_data?name=" + encodeURIComponent(name) + "&value=" + encodeURIComponent(ta.value) + "&type=" + ta.getAttribute("type"), true);
-      http.send();
+      names.push(name);
+      tas.push(ta);
     })(textareas[i]);
   }
+
+
+  var http = new XMLHttpRequest();
+  http.onload = function() {
+    // substring is to cut off json p stuff if we go back to GET, unneeded with POST though
+    var json = http.responseText; //.substring(9)
+    var obj = JSON.parse(json);
+
+    for(var i = 0; i < names.length; i++) {
+      var name = names[i];
+      var ta = tas[i];
+
+      var value = obj[name];
+
+      bzChangeRetainedItem(ta, value);
+      pendingMagicFieldLoads -= 1;
+      if(pendingMagicFieldLoads == 0 && !pendingMagicFieldLoadEvent) {
+        pendingMagicFieldLoadEvent = true;
+        window.requestAnimationFrame(triggerMagicFieldsLoaded);
+        console.log("THE MAGIC HAPPENS");
+      }
+    }
+  };
+  // old one, w don't need all that info though so cutting it off while batching to optimize network use
+  // http.open("GET", "/bz/user_retained_data?name=" + encodeURIComponent(name) + "&value=" + encodeURIComponent(ta.value) + "&type=" + ta.getAttribute("type"), true);
+
+  var data = "";
+  for(var i = 0; i < names.length; i++) {
+    if(data.length)
+      data += "&";
+    data += "names[]=" + encodeURIComponent(names[i]);
+  }
+
+  // I would LIKE to use get on this, but since the name list can be arbitrarily long
+  // and I don't want to risk hitting a browser/server limit of url length, I am going to
+  // POST just in case
+  http.open("POST", "/bz/user_retained_data_batch", true);
+  http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  http.send(data);
+
 }
 
 if(window != window.top) {
