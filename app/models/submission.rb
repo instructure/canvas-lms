@@ -214,8 +214,8 @@ class Submission < ActiveRecord::Base
   end
 
   # see #needs_grading?
-  # When changing these conditions, consider updating index_submissions_on_assignment_id
-  # to maintain performance.
+  # When changing these conditions, update index_submissions_needs_grading to
+  # maintain performance.
   def self.needs_grading_conditions
     conditions = <<-SQL
       submissions.submission_type IS NOT NULL
