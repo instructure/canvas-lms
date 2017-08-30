@@ -269,12 +269,10 @@ tbody.sortable.empty2 {
 }
 
 .drag_and_drop_warning {
-  @include accessibility-prompt;
-  display: none;
-  z-index: 2;
-  position: absolute;
-  top: -28px;
-  left: -1px;
+  @include accessibility-prompt($is-link: false);
+  &:focus {
+    margin-bottom: 8px;
+  }
 }
 
 #add_context_module_form {

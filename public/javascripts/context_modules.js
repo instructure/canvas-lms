@@ -1333,12 +1333,13 @@ import 'compiled/jquery.rails_flash_notifications'
       modules.hideMoveModuleItem();
     });
 
-    $('.icon-drag-handle').on('focus', function (event) {
-      $(event.currentTarget).siblings('.drag_and_drop_warning').show();
-    });
-    $('.icon-drag-handle').on('blur', function (event) {
-      $(event.currentTarget).siblings('.drag_and_drop_warning').hide();
-    });
+    $('.drag_and_drop_warning').on('focus', function (event) {
+      $(event.currentTarget).removeClass('screenreader-only');
+    })
+
+    $('.drag_and_drop_warning').on('blur', function (event) {
+      $(event.currentTarget).addClass('screenreader-only');
+    })
 
     $(".edit_module_link").live('click', function(event) {
       event.preventDefault();
