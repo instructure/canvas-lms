@@ -10,7 +10,7 @@ require 'csv'
 class BzController < ApplicationController
 
   before_filter :require_user
-  skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data, :delete_user]
+  skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data, :delete_user, :user_retained_data_batch]
 
   # When in speed grader and there's an assignment with BOTH magic fields and file upload,
   # Canvas prefers the file upload. It won't even submit the magic field info if the user
@@ -174,6 +174,18 @@ class BzController < ApplicationController
     end
     render :json => data
   end
+
+  def user_retained_data_batch
+    data = {}
+    if params[:names]
+      params[:names].each do |name|
+        result = RetainedData.where(:user_id => @current_user.id, :name => name)
+        data[name] = result.empty? ? '' : result.first.value
+      end
+    end
+    render :json => data
+  end
+
 
   def set_user_retained_data
     Rails.logger.debug("### set_user_retained_data - all params = #{params.inspect}")
