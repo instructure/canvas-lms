@@ -471,9 +471,6 @@ import 'compiled/jquery.rails_flash_notifications'
               $('#context_modules_sortable_container').removeClass('item-group-container--is-empty');
             }
           },
-          open: function(){
-            $(this).find('input[type=text],textarea,select').first().focus();
-          }
         }).dialog('open');
         $module.removeClass('dont_remove');
       },

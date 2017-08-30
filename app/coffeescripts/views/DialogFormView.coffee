@@ -130,7 +130,7 @@ define [
     # @api private
     openAgain: ->
       @dialog.open()
-      @dialog.uiDialog.focus()
+      @dialog.focusable.focus()
 
     ##
     # @api private
