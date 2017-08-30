@@ -30,6 +30,7 @@ import Heading from 'instructure-ui/lib/components/Heading'
 import Typography from 'instructure-ui/lib/components/Typography'
 import Spinner from 'instructure-ui/lib/components/Spinner'
 import Alert from 'instructure-ui/lib/components/Alert'
+import PresentationContent from 'instructure-ui/lib/components/PresentationContent'
 
 import CoursePicker from './CoursePicker'
 import AssociationsTable from './AssociationsTable'
@@ -145,7 +146,7 @@ export default class BlueprintAssociations extends React.Component {
             isExpanded={this.props.isExpanded}
             detailsRef={this.focusManager.registerBeforeRef}
           />
-          <hr />
+          <PresentationContent><hr /></PresentationContent>
           <Heading level="h3">{I18n.t('Associated')}</Heading>
           <AssociationsTable
             existingAssociations={this.props.existingAssociations}
