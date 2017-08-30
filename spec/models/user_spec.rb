@@ -509,6 +509,16 @@ describe User do
     expect(teacher.recent_feedback(:contexts => [@course])).to be_empty
   end
 
+  it "should not include non-recent feedback via old submission comments" do
+    create_course_with_student_and_assignment
+    sub = @assignment.grade_student(@user, grade: 9, grader: @teacher).first
+    sub.submission_comments.create!(:author => @teacher, :comment => 'good jorb')
+    expect(@user.recent_feedback(:contexts => [@course])).to include sub
+    Timecop.travel(1.year.from_now) do
+      expect(@user.recent_feedback(:contexts => [@course])).not_to include sub
+    end
+  end
+
   describe '#courses_with_primary_enrollment' do
 
     it "should return appropriate courses with primary enrollment" do

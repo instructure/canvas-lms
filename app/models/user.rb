@@ -2015,6 +2015,7 @@ class User < ActiveRecord::Base
           subs_with_comment_scope = Submission.active.where(user_id: self).for_context_codes(context_codes).
             joins(:submission_comments, :assignment).
             where(assignments: {muted: false, workflow_state: 'published'}).
+            where('submission_comments.created_at>?', opts[:start_at]).
             where.not(:submission_comments => {:author_id => self, :draft => true}).
             distinct_on("submissions.id").
             order("submissions.id, submission_comments.created_at DESC"). # get the last created comment
