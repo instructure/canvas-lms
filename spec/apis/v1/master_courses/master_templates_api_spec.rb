@@ -58,11 +58,16 @@ describe MasterCourses::MasterTemplatesController, type: :request do
 
     it "should return stuff" do
       time = 2.days.ago
-      @template.master_migrations.create!(:imports_completed_at => time, :workflow_state => 'completed')
+      @template.add_child_course!(Course.create!)
+      mig = @template.master_migrations.create!(:imports_completed_at => time, :workflow_state => 'completed')
+      @template.update_attribute(:active_migration_id, mig.id)
       json = api_call(:get, @url, @params)
       expect(json['id']).to eq @template.id
       expect(json['course_id']).to eq @course.id
       expect(json['last_export_completed_at']).to eq time.iso8601
+      expect(json['associated_course_count']).to eq 1
+      expect(json['latest_migration']['id']).to eq mig.id
+      expect(json['latest_migration']['workflow_state']).to eq 'completed'
     end
   end
 

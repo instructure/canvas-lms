@@ -312,4 +312,15 @@ describe MasterCourses::MasterTemplate do
       expect(t.child_course_count).to eq 1
     end
   end
+
+  describe "#master_course_for_child_course" do
+    it "should load a master course" do
+      t = MasterCourses::MasterTemplate.set_as_master_course(@course)
+      c2 = Course.create!
+      sub = t.add_child_course!(c2)
+      expect(MasterCourses::MasterTemplate.master_course_for_child_course(c2)).to eq @course
+      sub.destroy!
+      expect(MasterCourses::MasterTemplate.master_course_for_child_course(c2)).to eq nil
+    end
+  end
 end

@@ -40,6 +40,15 @@
 #         "description": "Time when the last export was completed",
 #         "example": "2013-08-28T23:59:00-06:00",
 #         "type": "datetime"
+#        },
+#       "associated_course_count": {
+#         "description": "Number of associated courses for the template",
+#         "example": 3,
+#         "type": "integer"
+#        },
+#       "latest_migration": {
+#         "description": "Details of the latest migration",
+#         "type": "BlueprintMigration"
 #        }
 #     }
 #   }

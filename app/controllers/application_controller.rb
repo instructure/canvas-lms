@@ -285,18 +285,23 @@ class ApplicationController < ActionController::Base
     js_bundle :blueprint_courses
     css_bundle :blueprint_courses
 
-    master_course = is_master ? @context : @context.master_course_subscriptions.active.first.master_template.course
+    master_course = is_master ? @context : MasterCourses::MasterTemplate.master_course_for_child_course(@context)
     js_env :DEBUG_BLUEPRINT_COURSES => Rails.env.development? || Rails.env.test?
-    js_env :BLUEPRINT_COURSES_DATA => {
+    bc_data = {
       isMasterCourse: is_master,
       isChildCourse: is_child,
       accountId: @context.account.id,
       masterCourse: master_course.slice(:id, :name, :enrollment_term_id),
       course: @context.slice(:id, :name, :enrollment_term_id),
-      subAccounts: @context.account.sub_accounts.pluck(:id, :name).map{|id, name| {id: id, name: name}},
-      terms: @context.account.root_account.enrollment_terms.active.pluck(:id, :name).map{|id, name| {id: id, name: name}},
-      canManageCourse: MasterCourses::MasterTemplate.is_master_course?(@context) && @context.account.grants_right?(@current_user, :manage_master_courses)
     }
+    if is_master
+      bc_data.merge!(
+        subAccounts: @context.account.sub_accounts.pluck(:id, :name).map{|id, name| {id: id, name: name}},
+        terms: @context.account.root_account.enrollment_terms.active.pluck(:id, :name).map{|id, name| {id: id, name: name}},
+        canManageCourse: @context.account.grants_right?(@current_user, :manage_master_courses)
+      )
+    end
+    js_env :BLUEPRINT_COURSES_DATA => bc_data
     if is_master && js_env.key?(:NEW_USER_TUTORIALS)
       js_env[:NEW_USER_TUTORIALS][:is_enabled] = false
     end
