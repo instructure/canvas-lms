@@ -80,6 +80,7 @@ describe "GradeChangeAudit API", type: :request do
         arguments[:account_id] = Shard.global_id_for(account).to_s
         query_string << "account_id=#{arguments[:account_id]}"
       end
+      arguments[:include] = options.delete(:include) if options.key?(:include)
 
       path = "/api/v1/audit/grade_change/#{type.pluralize}/#{id}"
       path += "?" + query_string.join('&') if query_string.present?
@@ -211,7 +212,7 @@ describe "GradeChangeAudit API", type: :request do
         @event2 = Auditors::GradeChange::Stream.insert(record)
       end
 
-      it "should recognize :start_time" do
+      it "recognizes :start_time" do
         json = expect_event_for_context(@assignment, @event, start_time: 12.hours.ago)
 
         forbid_event_for_context(@assignment, @event2, start_time: 12.hours.ago, json: json)
@@ -231,7 +232,7 @@ describe "GradeChangeAudit API", type: :request do
         end
       end
 
-      it "should recognize :end_time" do
+      it "recognizes :end_time" do
         json = expect_event_for_context(@assignment, @event2, end_time: 12.hours.ago)
         forbid_event_for_context(@assignment, @event, end_time: 12.hours.ago, json: json)
 
@@ -249,6 +250,29 @@ describe "GradeChangeAudit API", type: :request do
           forbid_event_for_course_and_contexts(contexts, @event, end_time: 12.hours.ago, json: json)
         end
       end
+
+      it "includes a grade_current key when passed 'current_grade' in the include param" do
+        events = fetch_for_context(@assignment, include: ["current_grade"])["events"]
+        expect(events.first).to have_key "grade_current"
+      end
+
+      it "returns a grade_current of 'N/A' if a grade is not available" do
+        @submission.destroy
+        events = fetch_for_context(@assignment, include: ["current_grade"])["events"]
+        event = events.find { |e| e["id"] == @event2.id }
+        expect(event["grade_current"]).to eq "N/A"
+      end
+
+      it "does not include a grade_current key when 'current_grade' is not in the include param" do
+        events = fetch_for_context(@assignment, include: [])["events"]
+        expect(events.first).not_to have_key "grade_current"
+      end
+
+      it "does not include a grade_current key in the absence of an include param" do
+        events = fetch_for_context(@assignment)["events"]
+        expect(events.first).not_to have_key "grade_current"
+      end
+
     end
 
     context "deleted entities" do

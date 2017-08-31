@@ -101,7 +101,7 @@ test('getGradeHistory requests with course, assignment, grader, and student', fu
 });
 
 test('getNextPage makes an axios get request', function () {
-  const url = encodeURI('http://example.com/grades?page=42&per_page=100000000');
+  const url = encodeURI('http://example.com/grades?include[]=current_grade&page=42&per_page=100000000');
   HistoryApi.getNextPage(url);
   strictEqual(this.getStub.callCount, 1);
   strictEqual(this.getStub.getCall(0).args[0], url);

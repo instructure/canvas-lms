@@ -47,9 +47,11 @@ function formatHistoryItems (data) {
       grader: users[item.links.grader] ? users[item.links.grader].name : '',
       gradeAfter: item.grade_after || '',
       gradeBefore: item.grade_before || '',
+      gradeCurrent: item.grade_current || '',
       id: item.id,
       pointsPossibleAfter: item.points_possible_after ? item.points_possible_after.toString() : '',
       pointsPossibleBefore: item.points_possible_before ? item.points_possible_before.toString() : '',
+      pointsPossibleCurrent: assignments[item.links.assignment] ? assignments[item.links.assignment].points_possible.toString() : '',
       student: users[item.links.student] ? users[item.links.student].name : '',
     }
   ));
