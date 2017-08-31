@@ -629,6 +629,7 @@ describe ContentExportsApiController, type: :request do
         run_jobs
         export = t_course.content_exports.where(id: json['id']).first
         expect(export).to be_present
+        expect(export.settings["errors"]).to be_blank
         expect(export.attachment).to be_present
         expect(export.attachment.display_name).to eql 'course_files_export.zip'
         tf = export.attachment.open need_local_file: true

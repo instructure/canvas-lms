@@ -163,7 +163,7 @@ module Exporters
       # make database updates at most once per second
       percent_complete = [(@total_copied * 100) / @total_size, 100].min
       now = Time.now
-      if (percent_complete - @last_percent >= 1) && (now - @last_update >= 1.second)
+      if (percent_complete - @last_percent >= 1) && (now - @last_update >= 1) # 1 second
         @export.fast_update_progress(percent_complete)
         @last_percent = percent_complete
         @last_update = now
