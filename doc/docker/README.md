@@ -20,7 +20,7 @@ On Linux you may want to run this to avoid a few permissions issues:
 
 ```bash
 touch mkmf.log .listen_test
-chmod 777 !:2 !:3
+chmod 777 mkmf.log .listen_test
 sudo chown -R `whoami`:9999 .
 chmod 775 gems/canvas_i18nliner
 chmod 775 . log tmp gems/selinimum gems/canvas_i18nliner
