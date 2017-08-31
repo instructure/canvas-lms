@@ -89,6 +89,7 @@ define [
         'data-track-category': "Compose Message"
         'data-track-action'  : "Edit"
         'data-track-label'   : "Send"
+        'data-text-while-loading' : I18n.t('Sending...')
         click: (e) => @sendMessage(e)
       ]
 
@@ -277,7 +278,6 @@ define [
         folder_id: @options.folderId
         intent: 'message'
         formDataTarget: 'url'
-        disableWhileLoading: true
         required: ['body']
         property_validations:
           token_capture: => I18n.t("Invalid recipient name.") if @recipientView and !@recipientView.tokens.length
@@ -289,6 +289,7 @@ define [
           formData
         onSubmit: (@request, submitData) =>
           dfd = $.Deferred()
+          $(@el).parent().disableWhileLoading(dfd, buttons: ['[data-text-while-loading] .ui-button-text']);
           @trigger('submitting', dfd)
           # update conversation when message confirmed sent
           # TODO: construct the new message object and pass it to the MessageDetailView which will need to create a MessageItemView for it
