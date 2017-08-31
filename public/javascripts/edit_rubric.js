@@ -512,13 +512,12 @@ import 'compiled/jquery/fixDialogButtons'
         .data('current_criterion', $criterion)
         .dialog({
           title: I18n.t('titles.criterion_long_description', "Criterion Long Description"),
-          width: 400,
+          width: 416,
           buttons: []
         });
 
       if(editing && !isLearningOutcome) {
         $rubric_long_description_dialog.fixDialogButtons();
-        $rubric_long_description_dialog.find("textarea:visible:first").focus().select();
       }
     })
     .delegate(".find_rubric_link", 'click', function(event) {
