@@ -842,9 +842,6 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user, session| !self.root_topic_id && self.context.grants_all_rights?(user, session, :read_forum, :moderate_forum) }
     can :update and can :delete and can :read and can :attach
 
-    given { |user, session| self.root_topic && self.root_topic.grants_right?(user, session, :update) }
-    can :update
-
     given { |user, session| self.root_topic && self.root_topic.grants_right?(user, session, :delete) }
     can :delete
 

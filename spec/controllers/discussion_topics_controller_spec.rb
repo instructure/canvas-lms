@@ -1015,32 +1015,6 @@ describe DiscussionTopicsController do
       expect(@topic.lock_at).to be_nil
     end
 
-    it "should still update a topic if it is a group discussion (that has submission replies)" do
-      user_session(@teacher)
-
-      student_in_course
-      group_category = @course.group_categories.create(:name => 'category')
-      group = @course.groups.create!(:group_category => group_category)
-      group.add_user(@student)
-
-      course_topic(user: @teacher, with_assignment: true)
-      @topic.group_category = group_category
-      @topic.save!
-      @topic.publish!
-
-      subtopic = @topic.child_topic_for(@student)
-      subtopic.discussion_entries.create!(:message => "student message for grading", :user => @student)
-      subtopic.ensure_submission(@student)
-      subtopic.reply_from(:user => @student, :text => 'hai')
-
-      expect(subtopic.can_unpublish?).to eq false
-
-      put(:update, params: {group_id: group.id, topic_id: subtopic.id,
-          title: 'Updated Topic', locked: true})
-
-      expect(response).to be_success
-    end
-
     it "should set workflow to post_delayed when delayed_post_at and lock_at are in the future" do
       put(:update, params: {course_id: @course.id, topic_id: @topic.id,
           title: 'Updated topic', delayed_post_at: Time.zone.now + 5.days})
