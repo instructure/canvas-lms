@@ -932,7 +932,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :new_discussion_topic
-    p.to { users_with_permissions(active_participants_with_visibility - [user]) }
+    p.to { users_with_permissions(active_participants_with_visibility) }
     p.whenever { |record|
       record.send_notification_for_context? and
       ((record.just_created && record.active?) || record.changed_state(:active, !record.is_announcement ? :unpublished : :post_delayed))
