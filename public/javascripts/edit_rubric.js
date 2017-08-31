@@ -134,7 +134,8 @@ import 'compiled/jquery/fixDialogButtons'
       $criterion.find(".criterion_description").val(outcome.get('title')).focus().select();
 
       $criterion.find(".mastery_points").text(outcome.get('mastery_points'));
-      $criterion.find(".links").remove();
+      $criterion.find(".edit_criterion_link").remove();
+      $criterion.find(".rating .links").remove();
     },
     hideCriterionAdd: function($rubric) {
       $rubric.find('.add_right, .add_left, .add_column').removeClass('add_left add_right add_column');
@@ -292,7 +293,7 @@ import 'compiled/jquery/fixDialogButtons'
             var $ratingsContainers = $ratings.find('.rating .container').css('height', ""),
                 maxHeight = Math.max(
                   $ratings.height(),
-                  $this.find(".criterion_description .container").height()
+                  $this.find(".criterion_description .container .description_content").height()
                 );
             // the -10 here is the padding on the .container.
             $ratingsContainers.css('height', (maxHeight - 10) + 'px');
@@ -481,13 +482,14 @@ import 'compiled/jquery/fixDialogButtons'
             rating.min_points = rubricEditing.localizedPoints(criterion.ratings[count].points)
           }
           var $rating = $rating_template.clone(true);
-          $rating.toggleClass('edge_rating', count === 0 || count === criterion.ratings.length - 1);
+          $rating.toggleClass('edge_rating', count === 1 || count === criterion.ratings.length);
           $rating.fillTemplateData({data: rating});
           $rating.find('.range_rating').showIf(criterion.criterion_use_range === true && rating.min_points !== rating.points);
           $criterion.find(".ratings").append($rating);
         });
         if (criterion.learning_outcome_id) {
-          $criterion.find(".links").remove();
+          $criterion.find(".edit_criterion_link").remove();
+          $criterion.find(".rating .links").remove();
         }
         $rubric.find(".summary").before($criterion);
         $criterion.find(".criterion_points").val(criterion.points).blur();
@@ -922,64 +924,6 @@ import 'compiled/jquery/fixDialogButtons'
       if(!$target.closest('.ratings').length) {
         rubricEditing.hideCriterionAdd($target.parents('.rubric'));
       }
-    }).delegate('.rating', 'mousemove', function(event) {
-      var $this   = $(this),
-          $rubric = $this.parents(".rubric");
-      if($rubric.find(".rating.editing").length > 0 || $this.parents(".criterion").hasClass('learning_outcome_criterion')) {
-        rubricEditing.hideCriterionAdd($rubric);
-        return false;
-      }
-      var expandPadding = 10;
-      if(!$.data(this, 'hover_offset')) {
-        $.data(this, 'hover_offset', $this.offset());
-        $.data(this, 'hover_width', $this.outerWidth());
-        var points = $.data(this, 'points', numberHelper.parse($this.find(".points").text()));
-        var prevPoints = $.data(this, 'prev_points', numberHelper.parse($this.prev(".rating").find(".points").text()));
-        var nextPoints = $.data(this, 'next_points', numberHelper.parse($this.next(".rating").find(".points").text()));
-        $.data(this, 'prev_diff', Math.abs(points - prevPoints));
-        $.data(this, 'next_diff', Math.abs(points - nextPoints));
-      }
-      var offset = $.data(this, 'hover_offset');
-      var width = $.data(this, 'hover_width');
-      var $ratings = $this.parents(".ratings");
-      var x = event.pageX;
-      var y = event.pageY;
-      var leftSide = false;
-      if(x <= offset.left + (width / 2)) {
-        leftSide = true;
-      }
-      var $lastHover = $ratings.data('hover_rating');
-      var lastLeftSide = $ratings.data('hover_left_side');
-      if(!$lastHover || $this[0] != $lastHover[0] || leftSide != lastLeftSide) {
-        rubricEditing.hideCriterionAdd($rubric);
-        var $prevRating, $nextRating;
-        if(leftSide && ($prevRating = $this.prev(".rating")) && $prevRating.length) {// && $(this).data('prev_diff') > 1) {
-          $this.addClass('add_left');
-          $prevRating.addClass('add_right');
-          $this[(x <= offset.left + expandPadding) ? 'addClass': 'removeClass']('add_column');
-        } else if(!leftSide && ($nextRating = $this.next(".rating")) && $nextRating.length) {// && $(this).data('next_diff') > 1) {
-          $this.addClass('add_right');
-          $nextRating.addClass('add_left');
-          $this[(x >= offset.left + width - expandPadding) ? 'addClass' : 'removeClass']('add_column');
-        }
-      } else if($lastHover) {
-        if(leftSide) {
-          if(x <= offset.left + expandPadding && $.data(this, 'prev_diff') > 1) {
-            $this.addClass('add_column');
-          } else {
-            $this.removeClass('add_column');
-          }
-        } else {
-          if(x >= offset.left + width - expandPadding && $.data(this, 'next_diff') > 1) {
-            $this.addClass('add_column');
-          } else {
-            $this.removeClass('add_column');
-          }
-        }
-      }
-      return false;
-    }).delegate('.rating', 'mouseout', function(event) {
-      $(this).data('hover_offset', null).data('hover_width', null);
     }).delegate('.delete_rating_link', 'click', function(event) {
       const $rating_cell = $(this).closest('td')
       const $target = $rating_cell.next().find('.edit_rating_link');
