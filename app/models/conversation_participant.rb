@@ -211,21 +211,11 @@ class ConversationParticipant < ActiveRecord::Base
 
   def all_messages
     self.conversation.shard.activate do
-      if self.conversation.shard == self.shard
-        # use a slightly more forgiving backcompat query (since the migration may not have
-        # fully filled in user_id yet)
-        ConversationMessage.shard(self.conversation.shard).
-          select("conversation_messages.*, conversation_message_participants.tags").
-          joins(:conversation_message_participants).
-          where("conversation_id=? AND (user_id=? OR (conversation_participant_id=? AND user_id IS NULL))", self.conversation_id, self.user_id, self).
-          order("created_at DESC, id DESC")
-      else
-        ConversationMessage.shard(self.conversation.shard).
-          select("conversation_messages.*, conversation_message_participants.tags").
-          joins(:conversation_message_participants).
-          where("conversation_id=? AND user_id=?", self.conversation_id, self.user_id).
-          order("created_at DESC, id DESC")
-      end
+      ConversationMessage.shard(self.conversation.shard).
+        select("conversation_messages.*, conversation_message_participants.tags").
+        joins(:conversation_message_participants).
+        where("conversation_id=? AND user_id=?", self.conversation_id, self.user_id).
+        order("created_at DESC, id DESC")
     end
   end
 
