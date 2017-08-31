@@ -362,8 +362,7 @@ class SisBatch < ActiveRecord::Base
 
   def term_enrollments_scope
     if data[:supplied_batches].include?(:enrollment)
-      scope = self.account.enrollments.active.joins(:course).readonly(false)
-      scope = scope.where.not(sis_batch_id: nil).where.not(sis_batch_id: self)
+      scope = self.account.enrollments.active.joins(:course).readonly(false).where.not(sis_batch_id: nil)
       scope.where(courses: {enrollment_term_id: self.batch_mode_term})
     end
   end

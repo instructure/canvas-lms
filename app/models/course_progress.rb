@@ -78,23 +78,7 @@ class CourseProgress
 
   def requirements
     # e.g. [{id: 1, type: 'must_view'}, {id: 2, type: 'must_view'}]
-    @_requirements ||=
-      begin
-        if modules.empty?
-          []
-        else
-          fm = modules.first # the visibilites are the same for all the modules - load them all now and reuse them
-          user_ids = [@user.id]
-          opts = {
-            :is_teacher => false,
-            :assignment_visibilities => fm.assignment_visibilities_for_users(user_ids),
-            :discussion_visibilities => fm.discussion_visibilities_for_users(user_ids),
-            :page_visibilities => fm.page_visibilities_for_users(user_ids),
-            :quiz_visibilities => fm.quiz_visibilities_for_users(user_ids)
-          }
-          modules.flat_map { |m| m.completion_requirements_visible_to(@user, opts) }.uniq
-        end
-      end
+    @_requirements ||= modules.flat_map { |m| m.completion_requirements_visible_to(@user, :is_teacher => false) }.uniq
   end
 
   def requirement_count
