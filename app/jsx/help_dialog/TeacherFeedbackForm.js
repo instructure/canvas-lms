@@ -41,7 +41,7 @@ import 'compiled/jquery.rails_flash_notifications'
       };
     },
     componentWillMount () {
-      $.getJSON('/api/v1/courses.json', (courses) => {
+      $.getJSON('/api/v1/courses.json?enrollment_state=active&per_page=100', (courses) => {
         this.setState({
           coursesLoaded: true,
           courses
