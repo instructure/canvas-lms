@@ -15,6 +15,10 @@ CanvasRails::Application.routes.draw do
   get 'bz/user_retained_data' => 'bz#user_retained_data'
   post 'bz/user_retained_data' => 'bz#set_user_retained_data'
 
+  # both get and post work in batch mode for longer lists
+  get 'bz/user_retained_data_batch' => 'bz#user_retained_data_batch'
+  post 'bz/user_retained_data_batch' => 'bz#user_retained_data_batch'
+
   get 'bz/retained_data_stats' => 'bz#retained_data_stats'
   get 'bz/retained_data_export' => 'bz#retained_data_export'
 

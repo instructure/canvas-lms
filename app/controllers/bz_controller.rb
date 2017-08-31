@@ -10,7 +10,7 @@ require 'csv'
 class BzController < ApplicationController
 
   before_filter :require_user
-  skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data, :delete_user]
+  skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data, :delete_user, :user_retained_data_batch]
 
   # When in speed grader and there's an assignment with BOTH magic fields and file upload,
   # Canvas prefers the file upload. It won't even submit the magic field info if the user
@@ -175,6 +175,19 @@ class BzController < ApplicationController
     render :json => data
   end
 
+  def user_retained_data_batch
+    data = {}
+    if params[:names]
+      params[:names].each do |name|
+        next if data[name]
+        result = RetainedData.where(:user_id => @current_user.id, :name => name)
+        data[name] = result.empty? ? '' : result.first.value
+      end
+    end
+    render :json => data
+  end
+
+
   def set_user_retained_data
     Rails.logger.debug("### set_user_retained_data - all params = #{params.inspect}")
     result = RetainedData.where(:user_id => @current_user.id, :name => params[:name])
@@ -219,7 +232,7 @@ class BzController < ApplicationController
         # However, given that we can just round up the points at the end of the semester and most the
         # steps will be fractional points, and most the content will be written ahead of time, this
         # shouldn't be a real problem.
-        magic_field_count = Rails.cache.fetch("magic_field_count_for_course_#{course_id}_#{context_module.id}", :expires_in => 1.week) do
+        magic_field_count = Rails.cache.fetch("magic_field_count_for_course_#{course_id}_#{context_module.id}", :expires_in => 1.day) do
           count = 0
           names = {}
           selector = 'input[data-bz-retained]:not(.bz-optional-magic-field),textarea[data-bz-retained]:not(.bz-optional-magic-field)'
@@ -273,18 +286,17 @@ class BzController < ApplicationController
 
           submission = participation_assignment.find_or_create_submission(@current_user)
 
-          # actually a race condition but we should be ok since users will only really
-          # be editing one field at a time anyway and I don't think the Canvas models
-          # have a way to do this with a proper atomic update or a lock.
-          existing_grade = submission.grade.nil? ? 0 : submission.grade.to_f
-          new_grade = existing_grade + step 
-          if (new_grade > (participation_assignment.points_possible.to_f - 0.4))
-            Rails.logger.debug("### set_user_retained_data - awarding full points since they are close enough #{new_grade}")
-            new_grade = participation_assignment.points_possible.to_f # Once they are pretty close to full participation points, always set their grade to full points
-                                                                      # to account for floating point inaccuracies.
+          submission.with_lock do
+            existing_grade = submission.grade.nil? ? 0 : submission.grade.to_f
+            new_grade = existing_grade + step 
+            if (new_grade > (participation_assignment.points_possible.to_f - 0.4))
+              Rails.logger.debug("### set_user_retained_data - awarding full points since they are close enough #{new_grade}")
+              new_grade = participation_assignment.points_possible.to_f # Once they are pretty close to full participation points, always set their grade to full points
+                                                                        # to account for floating point inaccuracies.
+            end
+            Rails.logger.debug("### set_user_retained_data - setting new_grade = #{new_grade} = existing_grade + step = #{existing_grade} + #{step}")
+            participation_assignment.grade_student(@current_user, {:grade => (new_grade), :suppress_notification => true })
           end
-          Rails.logger.debug("### set_user_retained_data - setting new_grade = #{new_grade} = existing_grade + step = #{existing_grade} + #{step}")
-          participation_assignment.grade_student(@current_user, {:grade => (new_grade), :suppress_notification => true })
         end
       end
     end
