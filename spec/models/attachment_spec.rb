@@ -988,6 +988,13 @@ describe Attachment do
       course_model
     end
 
+    it "should work with s3 storage" do
+      s3_storage!
+      attachment = attachment_with_context(@course, :display_name => 'foo')
+      expect(attachment.download_url).to match(/response-content-disposition=attachment/)
+      expect(attachment.inline_url).to match(/response-content-disposition=inline/)
+    end
+
     it 'should allow custom ttl for download_url' do
       attachment = attachment_with_context(@course, :display_name => 'foo')
       allow(attachment).to receive(:authenticated_url) # allow other calls due to, e.g., save
