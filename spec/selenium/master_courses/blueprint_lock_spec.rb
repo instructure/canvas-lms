@@ -109,6 +109,7 @@ describe "master courses - locked items" do
     @discussion = @master.discussion_topics.create!(title: 'My discussion')
 
     run_master_course_migration(@master)
+    @quiz_copy = @minion.quizzes.last
   end
 
   context "on the index page," do
@@ -169,6 +170,14 @@ describe "master courses - locked items" do
 
         refresh_page
         verify_index_unlocked
+      end
+
+      it "does not show wiki sidebar for locked quizzes", priority: "2", test_id: 3333845 do
+        @tag = @template.create_content_tag_for!(@quiz)
+        lock_index_tag
+
+        get "/courses/#{@minion.id}/quizzes/#{@quiz_copy.id}/edit"
+        expect(f('#right-side')).not_to contain_css('#editor_tabs')
       end
     end
 
