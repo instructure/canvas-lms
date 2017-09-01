@@ -802,6 +802,7 @@ module AccountReports
         headers << 'root_account' if include_other_roots
       else
         headers = []
+        headers << I18n.t('admin_user_name')
         headers << I18n.t('canvas_user_id')
         headers << I18n.t('user_id')
         headers << I18n.t('canvas_account_id')
@@ -817,9 +818,11 @@ module AccountReports
         admins = AccountUser.
           select("account_users.*, pseudonyms.unique_id, pseudonyms.sis_user_id,
                   a.sis_source_id AS account_sis_id,
-                  r.name AS role_name").
+                  r.name AS role_name,
+                  u.name AS user_name").
           joins("INNER JOIN #{Account.quoted_table_name} a ON account_users.account_id=a.id
                  INNER JOIN #{Role.quoted_table_name} r ON account_users.role_id=r.id
+                 INNER JOIN #{User.quoted_table_name} u ON account_users.user_id=u.id
                  LEFT OUTER JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id=account_users.user_id").
           where("account_users.account_id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
                  OR account_users.account_id= :account_id", {account_id: account.id})
@@ -837,6 +840,7 @@ module AccountReports
             end
             batch.each do |admin|
               row = []
+              row << admin.user_name unless @sis_format
               row << admin.user_id unless @sis_format
               if admin.unique_id.nil? && include_other_roots
                 u = users_by_id[admin.user_id]

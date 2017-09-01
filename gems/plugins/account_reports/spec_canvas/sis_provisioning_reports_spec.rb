@@ -299,7 +299,7 @@ describe "Default Account Reports" do
       Notification.where(name: "Report Generated").first_or_create
       Notification.where(name: "Report Generation Failed").first_or_create
       @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
-      @admin = account_admin_user(:account => @account)
+      @admin = account_admin_user(account: @account, name: 'default admin')
       @default_term = @account.default_enrollment_term
     end
 
@@ -1255,8 +1255,8 @@ describe "Default Account Reports" do
     describe 'admins' do
       before(:once) do
         create_an_account
-        @u1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
-        @u2 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U002')
+        @u1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001', name: 'user 1')
+        @u2 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U002', name: 'user 2')
         @admin2 = @sub_account.account_users.create(user: @u1)
         @admin2.sis_batch_id=@sis.id
         @admin2.save!
@@ -1281,13 +1281,13 @@ describe "Default Account Reports" do
         parameters['admins'] = true
         parameters['include_deleted'] = true
         parsed = read_report('provisioning_csv', {params: parameters, order: [1, 5], header: true})
-        expect(parsed).to match_array [['canvas_user_id', 'user_id', 'canvas_account_id',
+        expect(parsed).to match_array [['admin_user_name', 'canvas_user_id', 'user_id', 'canvas_account_id',
                                         'account_id', 'role_id', 'role', 'status', 'created_by_sis'],
-                                       [@u1.id.to_s, 'U001', @sub_account.id.to_s, 'sub1',
+                                       ['user 1', @u1.id.to_s, 'U001', @sub_account.id.to_s, 'sub1',
                                         admin_role.id.to_s, 'AccountAdmin', 'active', 'true'],
-                                       [@u2.id.to_s, 'U002', @account.id.to_s, nil,
+                                       ['user 2', @u2.id.to_s, 'U002', @account.id.to_s, nil,
                                         @role1.id.to_s, 'role1', 'active', 'true'],
-                                       [@admin.id.to_s, nil, @account.id.to_s, nil,
+                                       ['default admin', @admin.id.to_s, nil, @account.id.to_s, nil,
                                         admin_role.id.to_s, 'AccountAdmin', 'active', 'false']]
       end
 
