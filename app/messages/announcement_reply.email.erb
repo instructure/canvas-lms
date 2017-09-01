@@ -10,4 +10,8 @@
 
 <%= html_to_text(asset.message, :base_url => dashboard_url) %>
 
-<%= t("Comment by replying to this message, or join the conversation using this link: %{link}.", link: content(:link)) %>
+<% if IncomingMailProcessor::MailboxAccount.reply_to_enabled %>
+  <%= t("Comment by replying to this message, or join the conversation using this link: %{link}.", link: content(:link)) %>
+<% else %>
+  <%= t("Join the conversation using this link: %{link}.", link: content(:link)) %>
+<% end %>

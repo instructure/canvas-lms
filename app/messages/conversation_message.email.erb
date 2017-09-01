@@ -16,7 +16,6 @@
   </a>
 <% end %>
 
-
 <% if asset.conversation.subject.present? %>
   Subject: <%= asset.conversation.subject %>
 <% end %>
@@ -25,8 +24,10 @@
 
 <% if asset.has_media_objects? %>
   <%= t("This message includes media comments. To listen or reply, click this link: %{link}.", link: content(:link)) %>
-<% else %>
+<% elsif IncomingMailProcessor::MailboxAccount.reply_to_enabled %>
   <%= t("You can reply to this message in Canvas by replying directly to this email, or by clicking this link: %{link}.", link: content(:link)) %>
+<% else %>
+  <%= t("You can reply to this message in Canvas by clicking this link: %{link}.", link: content(:link)) %>
 <% end %>
 
 <% unless asset.attachments.empty? %>

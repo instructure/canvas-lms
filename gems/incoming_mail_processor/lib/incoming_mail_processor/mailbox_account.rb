@@ -21,7 +21,7 @@ module IncomingMailProcessor
     attr_accessor :protocol, :config, :address, :error_folder
 
     class << self
-      attr_accessor :default_outgoing_email
+      attr_accessor :default_outgoing_email, :reply_to_enabled
     end
 
 
