@@ -571,6 +571,14 @@ describe SIS::CSV::CourseImporter do
     expect(importer.warnings.map(&:last)).to include "Invalid course_format \"FAT32\" for course test_1"
   end
 
+  it 'should allow unpublished to be passed for active' do
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "c1,TC 101,Test Course 1,A001,T001,unpublished"
+    )
+    expect(Course.active.find_by_sis_source_id('c1')).to be_present
+  end
+
   context "blueprint courses" do
     before :once do
       account_model
