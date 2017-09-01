@@ -1,0 +1,30 @@
+run.config:
+  engine: ruby
+  engine.config:
+    runtime: ruby-2.4
+
+  extra_packages:
+    - nodejs-6
+    - xmlsec1
+    - pkgconf
+    - libxml2
+    - libxslt
+    - zlib
+    - postgresql94-client
+    - python-2.7
+
+  extra_steps:
+    - yarn
+    - npm install
+    - npm install -g coffee-script@1.6.2
+    - npm install -g webpack
+    - npm install -g gulp
+
+worker.jobs:
+  start: bundle script/delayed_job run
+
+data.queue:
+  image: nanobox/redis
+
+data.db:
+  image: nanobox/postgresql:9.4
