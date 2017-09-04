@@ -33,6 +33,37 @@ describe GradeCalculator do
       expect(@user.enrollments.first.computed_final_score).to eql(25.0)
     end
 
+    it "weighted grading periods: gracefully handles (by skipping) enrollments from other courses" do
+      first_course = @course
+      course_with_student active_all: true
+      grading_period_set = @course.root_account.grading_period_groups.create!(weighted: true)
+      grading_period_set.enrollment_terms << @course.enrollment_term
+      grading_period_set.grading_periods.create!(
+        title: "A Grading Period",
+        start_date: 10.days.ago,
+        end_date: 10.days.from_now,
+        weight: 50
+      )
+      expect {
+        GradeCalculator.recompute_final_score(@student.id, first_course.id)
+      }.not_to raise_error
+    end
+
+    it "weighted grading periods: gracefully handles (by skipping) deleted enrollments" do
+      grading_period_set = @course.root_account.grading_period_groups.create!(weighted: true)
+      grading_period_set.enrollment_terms << @course.enrollment_term
+      grading_period_set.grading_periods.create!(
+        title: "A Grading Period",
+        start_date: 10.days.ago,
+        end_date: 10.days.from_now,
+        weight: 50
+      )
+      @user.enrollments.first.destroy
+      expect {
+        GradeCalculator.recompute_final_score(@user.id, @course.id)
+      }.not_to raise_error
+    end
+
     it "can compute scores for users with deleted enrollments when grading periods are used" do
       grading_period_set = @course.root_account.grading_period_groups.create!
       grading_period_set.enrollment_terms << @course.enrollment_term
