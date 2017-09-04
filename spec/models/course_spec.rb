@@ -78,6 +78,22 @@ describe Course do
       end.and_return(nil)
       @course.recompute_student_scores
     end
+
+    it "should not use student ids for deleted enrollments, even if they are explicitly passed" do
+      @course.save!
+      enrollment = course_with_student(course: @course, active_all: true)
+      enrollment.destroy
+      expect(Enrollment).to receive(:recompute_final_score).with([], any_args)
+      @course.recompute_student_scores([enrollment.user_id])
+    end
+
+    it "should not use student ids for users enrolled in other courses, even if they are explicitly passed" do
+      @course.save!
+      first_course = @course
+      enrollment = course_with_student(active_all: true)
+      expect(Enrollment).to receive(:recompute_final_score).with([], any_args)
+      first_course.recompute_student_scores([enrollment.user_id])
+    end
   end
 
   it "should properly determine if group weights are active" do
