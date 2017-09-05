@@ -216,6 +216,102 @@ describe "Files API", type: :request do
 
   end
 
+  describe "api_capture" do
+    let(:secret) { 'secret' }
+    let(:jwt) { Canvas::Security.create_jwt({}, nil, secret) }
+    let(:folder) { Folder.root_folders(@course).first }
+    let(:instfs_uuid) { 123 }
+
+    # default set of params; parts will be overridden per test
+    let(:base_params) do
+      {
+        user_id: @user.id,
+        context_type: Course,
+        context_id: @course.id,
+        size: 2.megabytes,
+        name: 'test.txt',
+        content_type: 'text/plain',
+        instfs_uuid: instfs_uuid,
+        quota_exempt: true,
+        folder_id: folder.id,
+        on_duplicate: 'overwrite',
+        token: jwt,
+      }
+    end
+
+    before do
+      allow(InstFS).to receive(:enabled?).and_return true
+      allow(InstFS).to receive(:jwt_secret).and_return(secret)
+    end
+
+    it "is not available without the InstFS feature" do
+      allow(InstFS).to receive(:enabled?).and_return false
+      raw_api_call(:post, "/api/v1/files/capture?#{base_params.to_query}",
+                   base_params.merge(controller: "files", action: "api_capture", format: "json"))
+      assert_status(404)
+    end
+
+    it "requires a service JWT to authorize" do
+      params = base_params.merge(token: nil)
+      raw_api_call(:post, "/api/v1/files/capture?#{params.to_query}",
+                   params.merge(controller: "files", action: "api_capture", format: "json"))
+      assert_status(403)
+    end
+
+    it "checks quota unless exempt" do
+      @course.storage_quota = base_params[:size] / 2
+      @course.save!
+      params = base_params.merge(quota_exempt: false)
+      json = api_call(:post, "/api/v1/files/capture?#{params.to_query}",
+                      params.merge(controller: "files", action: "api_capture", format: "json"),
+                      expected_status: 400)
+      expect(json['message']).to eq "file size exceeds quota limits"
+    end
+
+    it "bypasses quota when exempt" do
+      @course.storage_quota = base_params[:size] / 2
+      @course.save!
+      params = base_params.merge(quota_exempt: true)
+      raw_api_call(:post, "/api/v1/files/capture?#{params.to_query}",
+                   params.merge(controller: "files", action: "api_capture", format: "json"))
+      assert_status(201)
+    end
+
+    it "creates file locked when usage rights required" do
+      @course.enable_feature!(:usage_rights_required)
+      api_call(:post, "/api/v1/files/capture?#{base_params.to_query}",
+               base_params.merge(controller: "files", action: "api_capture", format: "json"))
+      attachment = Attachment.where(instfs_uuid: instfs_uuid).first
+      expect(attachment.locked).to be true
+    end
+
+    it "creates file unlocked when usage rights not required" do
+      @course.disable_feature!(:usage_rights_required)
+      api_call(:post, "/api/v1/files/capture?#{base_params.to_query}",
+               base_params.merge(controller: "files", action: "api_capture", format: "json"))
+      attachment = Attachment.where(instfs_uuid: instfs_uuid).first
+      expect(attachment.locked).to be false
+    end
+
+    it "handle duplicate paths according to on_duplicate" do
+      params = base_params.merge(on_duplicate: 'overwrite')
+      existing = Attachment.create!(
+        context: @course,
+        folder: folder,
+        uploaded_data: StringIO.new('existing'),
+        filename: params[:name],
+        display_name: params[:name],
+      )
+      api_call(:post, "/api/v1/files/capture?#{base_params.to_query}",
+               base_params.merge(controller: "files", action: "api_capture", format: "json"))
+      existing.reload
+      attachment = Attachment.where(instfs_uuid: instfs_uuid).first
+      expect(attachment.display_name).to eq params[:name]
+      expect(existing).to be_deleted
+      expect(existing.replacement_attachment).to eq attachment
+    end
+  end
+
   describe "#index" do
     before :once do
       @root = Folder.root_folders(@course).first
@@ -285,11 +381,13 @@ describe "Files API", type: :request do
       @f1.locked = true
       @f1.save!
       course_with_student_logged_in(:course => @course)
-      raw_api_call(:get, @files_path, @files_path_options, {}, {}, :expected_status => 401)
+      raw_api_call(:get, @files_path, @files_path_options, {}, {})
+      assert_status(401)
     end
 
     it "should 404 for no folder found" do
-      raw_api_call(:get, "/api/v1/folders/0/files", @files_path_options.merge(:id => "0"), {}, {}, :expected_status => 404)
+      raw_api_call(:get, "/api/v1/folders/0/files", @files_path_options.merge(:id => "0"), {}, {})
+      assert_status(404)
     end
 
     it "should paginate" do

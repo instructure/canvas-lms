@@ -520,9 +520,12 @@ class SubmissionsApiController < ApplicationController
     # teachers will be able to do that for any submission they can grade, so
     # they need to be able to specify the target user.
     permission = :nothing if @user != @current_user
-    # we don't check quota when uploading a file for assignment submission
     if authorized_action(@assignment, @current_user, permission)
-      api_attachment_preflight(@user, request, :check_quota => false, :submission_context => @context)
+      api_attachment_preflight(
+        @user, request,
+        check_quota: false, # we don't check quota when uploading a file for assignment submission
+        folder: @user.submissions_folder(@context) # organize attachment into the course submissions folder
+      )
     end
   end
 

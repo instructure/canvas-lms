@@ -757,6 +757,22 @@ class Attachment < ActiveRecord::Base
     end
   end
 
+  def stored_locally?
+    # if the file exists in inst-fs, it won't be in local storage even if
+    # that's what Canvas otherwise thinks it's configured for
+    return false if instfs_uuid
+    Attachment.local_storage?
+  end
+
+  def can_be_proxied?
+    # we don't support proxying from instfs yet (no equivalent to
+    # s3object.get.body)
+    return false if instfs_uuid
+    mime_class == 'html' && size < Setting.get('max_inline_html_proxy_size', 128 * 1024).to_i ||
+    mime_class == 'flash' && size < Setting.get('max_swf_proxy_size', 1024 * 1024).to_i ||
+    content_type == 'text/css' && size < Setting.get('max_css_proxy_size', 64 * 1024).to_i
+  end
+
   def local_storage_path
     "#{HostUrl.context_host(context)}/#{context_type.underscore.pluralize}/#{context_id}/files/#{id}/download?verifier=#{uuid}"
   end

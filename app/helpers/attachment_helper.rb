@@ -65,21 +65,15 @@ module AttachmentHelper
     set_cache_header(attachment)
     if safer_domain_available?
       redirect_to safe_domain_file_url(attachment, @safer_domain_host, verifier, !inline)
-    elsif Attachment.local_storage?
+    elsif attachment.stored_locally?
       @headers = false if @files_domain
       send_file(attachment.full_filename, :type => attachment.content_type_with_encoding, :disposition => (inline ? 'inline' : 'attachment'), :filename => attachment.display_name)
-    elsif inline && should_proxy_attachment?(attachment)
+    elsif inline && attachment.can_be_proxied?
       send_file_headers!( :length=> attachment.s3object.content_length, :filename=>attachment.filename, :disposition => 'inline', :type => attachment.content_type_with_encoding)
       render body: attachment.s3object.get.body.read
     else
       redirect_to(inline ? attachment.inline_url : attachment.download_url)
     end
-  end
-
-  def should_proxy_attachment?(attachment)
-    attachment.mime_class == 'html' && attachment.size < Setting.get('max_inline_html_proxy_size', 128 * 1024).to_i ||
-      attachment.mime_class == 'flash' && attachment.size < Setting.get('max_swf_proxy_size', 1024 * 1024).to_i ||
-      attachment.content_type == 'text/css' && attachment.size < Setting.get('max_css_proxy_size', 64 * 1024).to_i
   end
 
   # checks if for the current root account there's a 'files' domain
