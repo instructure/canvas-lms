@@ -2875,9 +2875,9 @@ class User < ActiveRecord::Base
   def adminable_accounts
     @adminable_accounts ||= shard.activate do
       Rails.cache.fetch(['adminable_accounts', self, ApplicationController.region].cache_key) do
-        Account.shard(self).active.joins(:account_users).
+        Account.shard(self.in_region_associated_shards).active.joins(:account_users).
           where(account_users: {user_id: self.id}).
-          where.not(account_users: {workflow_state: 'deleted'})
+          where.not(account_users: {workflow_state: 'deleted'}).to_a
       end
     end
   end
