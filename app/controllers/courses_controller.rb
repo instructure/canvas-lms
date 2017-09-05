@@ -1609,9 +1609,11 @@ class CoursesController < ApplicationController
       if !includes.member?("all_courses")
         scope = scope.not_deleted
       end
-      @course = api_find(scope, params[:id])
+      @context = @course = api_find(scope, params[:id])
+      @context_membership = @context.enrollments.where(user_id: @current_user).except(:preload).first # for AUA
 
       if authorized_action(@course, @current_user, :read)
+        log_asset_access([ "home", @context ], "home", "other")
         enrollments = @course.current_enrollments.where(:user_id => @current_user).to_a
         if includes.include?("observed_users") &&
             enrollments.any?(&:assigned_observer?)
