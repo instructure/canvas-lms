@@ -100,11 +100,6 @@ module Importers
 
       migration.add_imported_item(item)
 
-      if hash[:assignment].present?
-        item.assignment = Importers::AssignmentImporter.import_from_migration(
-          hash[:assignment], context, migration)
-      end
-
       (hash[:contents] || []).each do |sub_item|
         next if sub_item[:type] == 'embedded_content'
         Importers::WikiPageImporter.import_from_migration(sub_item.merge({
@@ -225,6 +220,11 @@ module Importers
         allow_save = false
       end
       if allow_save && hash[:migration_id]
+        if hash[:assignment].present?
+          hash[:assignment][:title] ||= item.title
+          item.assignment = Importers::AssignmentImporter.import_from_migration(
+            hash[:assignment], context, migration)
+        end
         if item.changed?
           item.user = nil
         end
