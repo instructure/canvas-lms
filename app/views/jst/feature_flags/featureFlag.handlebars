@@ -22,21 +22,24 @@
     {{#if threeState}}
       <div id="ff_{{id}}" class="ui-buttonset ui-buttonset--feature-settings">
         <div class="ff-background ff-left {{#if disableOff}}ff-disabled{{/if}}">
-          <input type="radio" id="ff_off_{{id}}" name="ff_{{id}}" class="ff_button" {{#if isOff}}checked{{/if}} {{#if disableOff}}disabled{{/if}} data-id="{{id}}" data-action="off">
-          <label for="ff_off_{{id}}" role="button" aria-disabled="{{disableOff}}">
+          <input type="radio" id="ff_off_{{id}}" name="ff_{{id}}" class="ff_button" {{#if isOff}}checked{{/if}}
+            {{#if disableOff}}disabled{{/if}} data-id="{{id}}" data-action="off">
+          <label for="ff_off_{{id}}" role="button" aria-label="Turn off {{title}}" aria-disabled="{{disableOff}}">
               {{#t "off"}}Off{{/t}}
           </label>
         </div>
         <div class="ff-background {{#if disableAllow}}ff-disabled{{/if}} {{#if isSiteAdmin}}ff-right{{/if}}">
-          <input type="radio" id="ff_allowed_{{id}}" name="ff_{{id}}" class="ff_button" {{#if isAllowed}}checked{{/if}} {{#if disableAllow}}disabled{{/if}} data-id="{{id}}" data-action="allowed">
-          <label for="ff_allowed_{{id}}" role="button" aria-disabled="{{disableAllow}}">
+          <input type="radio" id="ff_allowed_{{id}}" name="ff_{{id}}" class="ff_button" {{#if isAllowed}}checked{{/if}}
+            {{#if disableAllow}}disabled{{/if}} data-id="{{id}}" data-action="allowed">
+          <label for="ff_allowed_{{id}}" role="button" aria-label="Allow {{title}}" aria-disabled="{{disableAllow}}">
             {{#t "allow"}}Allow{{/t}}
           </label>
         </div>
         {{#unless isSiteAdmin}}
           <div class="ff-background ff-right {{#if disableOn}}ff-disabled{{/if}}">
-            <input type="radio" id="ff_on_{{id}}" name="ff_{{id}}" class="ff_button" {{#if isOn}}checked{{/if}} {{#if disableOn}}disabled{{/if}} data-id="{{id}}" data-action="on">
-            <label for="ff_on_{{id}}" role="button" aria-disabled="{{disableOn}}">
+            <input type="radio" id="ff_on_{{id}}" name="ff_{{id}}" class="ff_button" {{#if isOn}}checked{{/if}}
+              {{#if disableOn}}disabled{{/if}} data-id="{{id}}" data-action="on">
+            <label for="ff_on_{{id}}" role="button" aria-label="Turn on {{title}}" aria-disabled="{{disableOn}}">
               {{#t "on"}}On{{/t}}
             </label>
            </div>
@@ -56,14 +59,20 @@
             {{#t}}Enable feature: {{title}}{{/t}}
           {{/if}}
         </span>
-        <input id="ff_toggle_{{id}}" class="ic-Super-toggle__input ff_toggle" type="checkbox" {{#if isOn}}checked{{/if}} {{#if disableToggle}}disabled{{/if}} data-id="{{id}}">
+        <input id="ff_toggle_{{id}}" class="ic-Super-toggle__input ff_toggle" type="checkbox"
+               {{#if isOn}}checked{{/if}} {{#if disableToggle}}disabled{{/if}} data-id="{{id}}">
         <div class="ic-Super-toggle__container" aria-hidden="true" data-checked="{{#t "on"}}On{{/t}}" data-unchecked="{{#t "off"}}Off{{/t}}">
           <div class="ic-Super-toggle__switch">
             <div class="ic-Super-toggle__option--LEFT">
-              <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" width="548.9" height="548.9" viewBox="0 0 548.9 548.9" xml:space="preserve"><polygon points="449.3 48 195.5 301.8 99.5 205.9 0 305.4 95.9 401.4 195.5 500.9 295 401.4 548.9 147.5" /></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" width="548.9" height="548.9"
+                   viewBox="0 0 548.9 548.9" xml:space="preserve">
+                <polygon points="449.3 48 195.5 301.8 99.5 205.9 0 305.4 95.9 401.4 195.5 500.9 295 401.4 548.9 147.5" />
+              </svg>
             </div>
             <div class="ic-Super-toggle__option--RIGHT">
-              <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" viewBox="0 0 28 28" xml:space="preserve"><polygon points="28 22.4 19.6 14 28 5.6 22.4 0 14 8.4 5.6 0 0 5.6 8.4 14 0 22.4 5.6 28 14 19.6 22.4 28" /></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" viewBox="0 0 28 28" xml:space="preserve">
+                <polygon points="28 22.4 19.6 14 28 5.6 22.4 0 14 8.4 5.6 0 0 5.6 8.4 14 0 22.4 5.6 28 14 19.6 22.4 28" />
+              </svg>
             </div>
           </div>
         </div>
