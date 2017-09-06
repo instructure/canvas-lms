@@ -189,7 +189,7 @@ class BzController < ApplicationController
 
 
   def set_user_retained_data
-    Rails.logger.debug("### set_user_retained_data - all params = #{params.inspect}")
+    Rails.logger.debug("### set_user_retained_data - all params = #{params.inspect} for user = #{@current_user.name}")
     result = RetainedData.where(:user_id => @current_user.id, :name => params[:name])
     data = nil
     was_new = false
@@ -216,6 +216,23 @@ class BzController < ApplicationController
     if was_new && !was_optional && field_type != 'checkbox' # Checkboxes are optional by nature
       course_id = request.referrer[/\/courses\/(\d+)\//, 1]
       module_item_id = request.referrer[/module_item_id=(\d+)/, 1]
+      if module_item_id.nil?
+        # They may have accessed the page from a direct link which didn't provide the module_item_id parameter,
+        # so look it up.
+        name = request.referrer[/\/courses\/\d+\/pages\/([a-zA-Z0-9_\-]{2,})/, 1]
+        Rails.logger.debug("### set_user_retained_data - parsed the WikiPage name = #{name}")
+        pages = WikiPage.where(:url => name)
+        Rails.logger.debug("### set_user_retained_data - found WikiPages = #{pages.inspect}")
+        tag = nil
+        pages.each do |page| # Don't know which WikiPage is from this course, need to lookup the ContentTag for each to find the association
+          tag = ContentTag.where(:content_id => page.id, :context_id => course_id, :context_type => 'Course', :content_type => 'WikiPage').first
+          if !tag.nil?
+            module_item_id = tag.id
+            Rails.logger.debug("### set_user_retained_data - found ContentTag for this course_id = #{course_id}, tag = #{tag.inspect} and set the module_item_id = #{module_item_id} for the page #{request.referrer}")
+            break
+          end
+        end
+      end
       Rails.logger.debug("### set_user_retained_data - course_id = #{course_id}, module_item_id = #{module_item_id}")
       if course_id && module_item_id
 
@@ -298,6 +315,8 @@ class BzController < ApplicationController
             participation_assignment.grade_student(@current_user, {:grade => (new_grade), :suppress_notification => true })
           end
         end
+      elsif
+        Rails.logger.error("### set_user_retained_data - missing either course_id = #{course_id} or module_item_id = #{module_item_id}. Can't update the Course Participation grade without that! user = #{@current_user.inspect}")
       end
     end
 
