@@ -20,7 +20,7 @@ require_relative '../page_objects/gradezilla_cells_page'
 require_relative '../page_objects/gradezilla_grade_detail_tray_page'
 require_relative '../../helpers/gradezilla_common'
 
-describe 'Grade Detail:' do
+describe 'Grade Detail Tray:' do
   include_context "in-process server selenium tests"
   include GradezillaCommon
   include_context "late_policy_course_setup"
@@ -34,7 +34,7 @@ describe 'Grade Detail:' do
     grade_assignments
   end
 
-  context "grade detail tray other" do
+  context "missing, excused and none status" do
     before(:each) do
       ENV["GRADEBOOK_DEVELOPMENT"] = 'true'
       user_session(@teacher)
@@ -87,8 +87,7 @@ describe 'Grade Detail:' do
     end
   end
 
-
-  context 'grade detail tray late options' do
+  context 'late status' do
     before(:each) do
       ENV["GRADEBOOK_DEVELOPMENT"] = 'true'
       user_session(@teacher)
@@ -128,6 +127,84 @@ describe 'Grade Detail:' do
       expect(final_grade_value).to eq "60"
       expect(Gradezilla::GradeDetailTray.final_grade_text).to eq "60"
       expect(Gradezilla::GradeDetailTray.late_penalty_text).to eq "-30"
+    end
+  end
+
+  context 'assignment navigation' do
+    before(:each) do
+      ENV['GRADEBOOK_DEVELOPMENT'] = 'true'
+      user_session(@teacher)
+    end
+    after(:each) { ENV.delete("GRADEBOOK_DEVELOPMENT") }
+
+    context 'with default ordering' do
+      before(:each) do
+        Gradezilla.visit(@course)
+      end
+
+      it 'clicking assignment name navigates to assignment page' do
+        Gradezilla::Cells.open_tray(@course.students[0], @a1)
+        Gradezilla::GradeDetailTray.assignment_link(@a1.name).click
+
+        expect(driver.current_url).to include "courses/#{@course.id}/assignments/#{@a1.id}"
+      end
+
+      it 'clicking the right arrow loads the next assignment in the tray' do
+        Gradezilla::Cells.open_tray(@course.students[0], @a1)
+        Gradezilla::GradeDetailTray.submission_tray_right_arrow_button.click
+
+        expect(Gradezilla::GradeDetailTray.assignment_link(@a2.name)).to be_displayed
+      end
+
+      it 'clicking the left arrow loads the previous assignment in the tray' do
+        Gradezilla::Cells.open_tray(@course.students[0], @a2)
+        Gradezilla::GradeDetailTray.submission_tray_left_arrow_button.click
+
+        expect(Gradezilla::GradeDetailTray.assignment_link(@a1.name)).to be_displayed
+      end
+
+      it 'left arrow button is not present when leftmost assignment is selected' do
+        Gradezilla::Cells.open_tray(@course.students[0], @a1)
+
+        expect(Gradezilla::GradeDetailTray.submission_tray_full_content).
+          not_to contain_css(Gradezilla::GradeDetailTray.submission_tray_left_arrow_selector)
+      end
+
+      it 'right arrow button is not present when rightmost assignment is selected' do
+        Gradezilla::Cells.open_tray(@course.students[0], @a4)
+
+        expect(Gradezilla::GradeDetailTray.submission_tray_full_content).
+          not_to contain_css(Gradezilla::GradeDetailTray.submission_tray_right_arrow_selector)
+      end
+    end
+
+    context 'when the rightmost column is an assignment column' do
+      before(:each) do
+        unless @teacher.preferences.key?(:gradebook_column_order)
+          @teacher.preferences[:gradebook_column_order] = {}
+        end
+
+        @teacher.preferences[:gradebook_column_order][@course.id] = {
+          sortType: 'custom',
+          customOrder: [
+            "assignment_#{@a1.id}",
+            "assignment_#{@a2.id}",
+            "assignment_group_#{@a1.assignment_group_id}",
+            "assignment_#{@a3.id}",
+            'total_grade',
+            "assignment_#{@a4.id}"
+          ]
+        }
+        @teacher.save!
+        Gradezilla.visit(@course)
+      end
+
+      it 'clicking the left arrow loads the previous assignment in the tray' do
+        Gradezilla::Cells.open_tray(@course.students[0], @a4)
+        Gradezilla::GradeDetailTray.submission_tray_left_arrow_button.click
+
+        expect(Gradezilla::GradeDetailTray.assignment_link(@a3.name)).to be_displayed
+      end
     end
   end
 end

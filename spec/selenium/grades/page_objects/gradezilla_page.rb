@@ -216,10 +216,6 @@ class Gradezilla
       f(expanded_popover_menu_selector)
     end
 
-    def assignment_carousel
-      f('#assignment-carousel')
-    end
-
     # actions
     def visit(course)
       Account.default.enable_feature!(:new_gradebook)
@@ -346,22 +342,6 @@ class Gradezilla
 
     def header_selector_by_col_index(n)
       f(".container_0 .slick-header-column:nth-child(#{n})")
-    end
-
-    def submission_tray_left_arrow_selector
-      '#assignment-carousel .left-arrow-button-container button'
-    end
-
-    def submission_tray_right_arrow_selector
-      '#assignment-carousel .right-arrow-button-container button'
-    end
-
-    def click_submission_tray_left_arrow
-      f(submission_tray_left_arrow_selector).click
-    end
-
-    def click_submission_tray_right_arrow
-      f(submission_tray_right_arrow_selector).click
     end
 
     # Semantic Methods for Gradebook Menus
