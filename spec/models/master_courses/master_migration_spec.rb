@@ -958,6 +958,30 @@ describe MasterCourses::MasterMigration do
       expect(tag.reload).to_not be_deleted
     end
 
+    it "should copy outcomes in selective copies" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      default = @copy_from.root_outcome_group
+      log = @copy_from.learning_outcome_groups.create!(:context => @copy_from, :title => "outcome groupd")
+      default.adopt_outcome_group(log)
+
+      run_master_migration # get the full sync out of the way
+
+      Timecop.freeze(1.minute.from_now) do
+        @lo = @copy_from.created_learning_outcomes.new(:context => @copy_from, :short_description => "whee", :workflow_state => 'active')
+        @lo.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2},
+          {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
+        @lo.save!
+        log.reload.add_outcome(@lo)
+      end
+
+      run_master_migration
+      expect(@migration).to be_completed
+      lo_to = @copy_to.learning_outcomes.where(:migration_id => mig_id(@lo)).first
+      expect(lo_to).to be_present
+    end
+
     it "sends notifications", priority: "2", test_id: 3211103 do
       n0 = Notification.create(:name => "Blueprint Sync Complete")
       n1 = Notification.create(:name => "Blueprint Content Added")
