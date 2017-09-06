@@ -132,7 +132,7 @@ $ic-color-light:             #FFFFFF; // white
 // These background color variables can be used on hover states or focus states
 // and meet our contrast needs when used with our main color variables
 
-$ic-bg-light-neutral:       #EBEDEE;
+$ic-bg-light-neutral:       $ic-color-medium-light;
 $ic-bg-light-neutral-text:  #394B58;
 @if $use_high_contrast { $ic-bg-light-neutral: #EBEDEE; }
 $ic-bg-light-primary:       #E5F2F8;
@@ -186,8 +186,8 @@ $contentBoxPadding:         8px;
 $ic-line-height: 1.5;
 
 $ic-font-family: "LatoWeb", "Helvetica Neue", Helvetica, Arial, sans-serif;
-
 $ic-font-family-fallback: "Helvetica Neue", Helvetica, Arial, sans-serif;
+$ic-font-family-monospace: Monaco, Menlo, Consolas, "Courier New", monospace;
 
 $ic-font-weight: bold; // we can phase this var out now we're on Lato
 
