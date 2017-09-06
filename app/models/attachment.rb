@@ -1701,7 +1701,7 @@ class Attachment < ActiveRecord::Base
   # Pass an existing attachment in opts[:attachment] to use that, rather than
   # creating a new attachment.
   def self.clone_url_as_attachment(url, opts = {})
-    _, uri = CanvasHttp.validate_url(url)
+    _, uri = CanvasHttp.validate_url(url, check_host: true)
 
     CanvasHttp.get(url) do |http_response|
       if http_response.code.to_i == 200
