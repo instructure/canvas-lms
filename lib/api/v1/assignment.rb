@@ -798,7 +798,7 @@ module Api::V1::Assignment
     elsif assignment_params['configuration_tool_type'] == 'Lti::MessageHandler'
       mh = Lti::MessageHandler.find(tool_id)
       mh_context = mh.resource_handler.tool_proxy.context
-      tool = mh if mh_context == @context || mh_context == @context.account || mh_context == @context.root_account
+      tool = mh if mh_context == @context || @context.account_chain.include?(mh_context)
     end
     tool
   end
