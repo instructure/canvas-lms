@@ -17,6 +17,9 @@
  */
 
 import axios from 'axios'
+
+const tag = "STUDENT_CONTEXT_CARDS=1";
+
   class StudentCardStore {
     constructor(studentId, courseId) {
       this.studentId = studentId
@@ -56,14 +59,14 @@ import axios from 'axios'
         `permissions[]=${permission}`
       ).join('&')
 
-      return axios.get(`/api/v1/courses/${courseId}/permissions?${permissions}`)
+      return axios.get(`/api/v1/courses/${courseId}/permissions?${tag}&${permissions}`)
         .then(response =>
           this.setState({permissions: response.data})
         ).catch(() => {})
     }
 
     loadCourse (courseId) {
-      return axios.get(`/api/v1/courses/${courseId}?include[]=sections`)
+      return axios.get(`/api/v1/courses/${courseId}?${tag}&include[]=sections`)
         .then(response => this.setState({course: response.data}))
         .catch(() => {})
     }
@@ -77,14 +80,14 @@ import axios from 'axios'
       ];
       const includesQuery = includes.join('&include[]=');
       return axios.get(
-        `/api/v1/courses/${courseId}/users/${studentId}?include[]=${includesQuery}`
+        `/api/v1/courses/${courseId}/users/${studentId}?${tag}&include[]=${includesQuery}`
       ).then(response => this.setState({user: response.data}))
       .catch(() => {})
     }
 
     loadAnalytics (studentId, courseId) {
       return axios.get(
-        `/api/v1/courses/${courseId}/analytics/student_summaries?student_id=${studentId}`
+        `/api/v1/courses/${courseId}/analytics/student_summaries?${tag}&student_id=${studentId}`
       ).then(response => this.setState({ analytics: response.data[0] || {} }))
       .catch(() => {})
     }
@@ -93,7 +96,7 @@ import axios from 'axios'
 
     loadRecentlyGradedSubmissions (studentId, courseId) {
       return axios.get(
-        `/api/v1/courses/${courseId}/students/submissions?student_ids[]=${studentId}&order=graded_at&order_direction=descending&include[]=assignment&per_page=20`
+        `/api/v1/courses/${courseId}/students/submissions?${tag}&student_ids[]=${studentId}&order=graded_at&order_direction=descending&include[]=assignment&per_page=20`
       ).then((result) => {
         const submissions = result.data
           .filter(s => s.grade != null)
