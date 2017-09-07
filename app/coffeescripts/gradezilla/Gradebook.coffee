@@ -1499,7 +1499,6 @@ define [
 
       id: columnId
       type: 'custom_column'
-      name: htmlEscape customColumn.title
       field: "custom_col_#{customColumn.id}"
       width: 100
       cssClass: "meta-cell custom_column #{columnId}"
@@ -1527,7 +1526,6 @@ define [
       columnDef =
         id: columnId
         field: fieldName
-        name: assignment.name
         object: assignment
         getGridSupport: => @gridSupport
         propFactory: new AssignmentRowCellPropFactory(assignment, @)
@@ -1536,7 +1534,7 @@ define [
         width: assignmentWidth
         cssClass: "assignment #{columnId}"
         headerCssClass: "assignment #{columnId}"
-        toolTip: assignment.name
+        toolTip: htmlEscape(assignment.name)
         type: 'assignment'
         assignmentId: assignment.id
 
@@ -1566,8 +1564,7 @@ define [
       {
         id: columnId
         field: fieldName
-        name: assignmentGroup.name
-        toolTip: assignmentGroup.name
+        toolTip: htmlEscape(assignmentGroup.name)
         object: assignmentGroup
         minWidth: columnWidths.assignmentGroup.min
         maxWidth: columnWidths.assignmentGroup.max
