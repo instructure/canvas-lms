@@ -173,9 +173,9 @@ class RequestThrottle
   end
 
   def rate_limit_exceeded
-    [ 403,
+    [ 429,
       { 'Content-Type' => 'text/plain; charset=utf-8' },
-      ["403 #{Rack::Utils::HTTP_STATUS_CODES[403]} (Rate Limit Exceeded)\n"]
+      ["429 #{Rack::Utils::HTTP_STATUS_CODES[429]} (Rate Limit Exceeded)\n"]
     ]
   end
 
