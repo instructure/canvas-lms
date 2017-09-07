@@ -99,7 +99,7 @@ define([
       )
 
       component.onChange()
-      clock.tick(1) // perform the setState timeout callback
+      clock.tick(5) // perform the setState timeout callback
       equal(document.activeElement, component.closeButtonRef)
       const componentNode = ReactDOM.findDOMNode(component)
       ReactDOM.unmountComponentAtNode(componentNode.parentNode)
