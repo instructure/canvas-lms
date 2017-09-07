@@ -147,7 +147,8 @@ Rails.configuration.after_initialize do
     DatabaseServer.send_in_each_region(
       BounceNotificationProcessor,
       :process,
-      { run_current_region_asynchronously: true }
+      { run_current_region_asynchronously: true,
+        singleton: 'BounceNotificationProcessor.process' }
     )
   end
 
@@ -155,7 +156,8 @@ Rails.configuration.after_initialize do
     DatabaseServer.send_in_each_region(
       NotificationFailureProcessor,
       :process,
-      { run_current_region_asynchronously: true }
+      { run_current_region_asynchronously: true,
+        singleton: 'NotificationFailureProcessor.process' }
     )
   end
 
