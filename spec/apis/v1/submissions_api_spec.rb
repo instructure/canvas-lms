@@ -113,6 +113,26 @@ describe 'Submissions API', type: :request do
       expect(json.size).to eq 0
     end
 
+    it 'returns submissions based on assignments.post_to_sis' do
+      json = api_call(:get,
+        "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
+        { controller: 'submissions_api', action: 'for_students',
+          format: 'json', section_id: 'sis_section_id:my-section-sis-id' },
+          post_to_sis: 'true',
+          student_ids: [@student1.id])
+      expect(json.size).to eq 0
+
+      @a1.post_to_sis = true
+      @a1.save!
+      json = api_call(:get,
+        "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
+        { controller: 'submissions_api', action: 'for_students',
+          format: 'json', section_id: 'sis_section_id:my-section-sis-id' },
+          post_to_sis: 'true',
+          student_ids: [@student1.id])
+      expect(json.size).to eq 1
+    end
+
     it "includes user" do
       json = api_call(:get,
         "/api/v1/sections/#{@section.id}/assignments/#{@a1.id}/submissions.json",
