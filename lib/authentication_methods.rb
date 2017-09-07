@@ -71,7 +71,7 @@ module AuthenticationMethods
     rescue JSON::JWT::InvalidFormat,             # definitely not a JWT
            Canvas::Security::TokenExpired,       # it could be a JWT, but it's expired if so
            Canvas::Security::InvalidToken,       # Looks like garbage
-           Canvas::DynamicSettings::ConsulError  # no config present for talking to consul
+           Canvas::DynamicSettings::NoFallbackError  # no config present for talking to consul
       # these will happen for some configurations (no consul)
       # and for some normal use cases (old token, access token),
       # so we can return and move on

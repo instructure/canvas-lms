@@ -23,8 +23,8 @@ describe InstFS do
   before do
     @app_host = 'http://test.host'
     @secret = "supersecretyup"
-    allow(Canvas::DynamicSettings).to receive(:from_cache).
-      with("inst-fs", anything).
+    allow(Canvas::DynamicSettings).to receive(:find).
+      with(service: "inst-fs", default_ttl: 5.minutes).
       and_return({
         'app-host' => @app_host,
         'secret' => Base64.encode64(@secret)

@@ -24,7 +24,7 @@ module Services
       @app_host = "address-book"
       @secret = "opensesame"
       allow(Canvas::DynamicSettings).to receive(:find).
-        with("address-book", use_env: false).
+        with("address-book", default_ttl: 5.minutes).
         and_return({ "app-host" => @app_host, "secret" => Canvas::Security.base64_encode(@secret) })
       @sender = user_model
       @course = course_model

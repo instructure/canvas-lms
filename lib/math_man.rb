@@ -52,7 +52,7 @@ module MathMan
     end
 
     def with_plugin_settings
-      dynamic_settings = Canvas::DynamicSettings.for_prefix('math-man')
+      dynamic_settings = Canvas::DynamicSettings.find('math-man')
       plugin_settings = Canvas::Plugin.find(:mathman).settings
       settings = {
         base_url: dynamic_settings[:base_url],

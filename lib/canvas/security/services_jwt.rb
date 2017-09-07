@@ -137,11 +137,11 @@ class Canvas::Security::ServicesJwt
   end
 
   def self.encryption_secret
-    Canvas::DynamicSettings.from_cache("canvas", use_env: false)["encryption-secret"]
+    Canvas::DynamicSettings.find("canvas")["encryption-secret"]
   end
 
   def self.signing_secret
-    Canvas::DynamicSettings.from_cache("canvas", use_env: false)["signing-secret"]
+    Canvas::DynamicSettings.find("canvas")["signing-secret"]
   end
 
   private

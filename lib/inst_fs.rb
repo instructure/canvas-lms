@@ -41,8 +41,7 @@ module InstFS
 
     private
     def setting(key)
-      settings = Canvas::DynamicSettings.from_cache("inst-fs", expires_in: 5.minutes, use_env: false)
-      settings[key]
+      Canvas::DynamicSettings.find(service: "inst-fs", default_ttl: 5.minutes)[key]
     rescue Imperium::TimeoutError => e
       Canvas::Errors.capture_exception(:inst_fs, e)
       nil

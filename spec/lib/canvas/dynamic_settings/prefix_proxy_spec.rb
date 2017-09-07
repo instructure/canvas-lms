@@ -22,7 +22,7 @@ module Canvas
   class DynamicSettings
     RSpec.describe PrefixProxy do
       let(:client) { instance_double(Imperium::KV) }
-      let(:proxy) { PrefixProxy.new('foo/bar', default_ttl: 3.minutes, kv_client: client) }
+      let(:proxy) { PrefixProxy.new('foo/bar', service: nil, tree: nil, default_ttl: 3.minutes, kv_client: client) }
 
       after(:each) do
         Cache.reset!
@@ -53,7 +53,7 @@ module Canvas
 
       describe 'fetch_object(key, ttl: @default_ttl)' do
         it 'must fetch the value from consul using the prefix and supplied key' do
-          expect(client).to receive(:get).with('foo/bar/baz', an_instance_of(Symbol))
+          expect(client).to receive(:get).with('foo/bar/baz', an_instance_of(Symbol)).and_return(double(status: 200))
           proxy.fetch_object('baz')
         end
 
@@ -80,6 +80,13 @@ module Canvas
         it "must raise an exception when consul can't be reached and no previous value is found" do
           expect(client).to receive(:get).and_raise(Imperium::TimeoutError)
           expect { proxy.fetch_object('baz') }.to raise_error(Imperium::TimeoutError)
+        end
+
+        it "falls back to global settings" do
+          expect(client).to receive(:get).with('foo/bar/baz', an_instance_of(Symbol)).and_return(nil).ordered
+          mock = double(status: 200)
+          expect(client).to receive(:get).with('global/foo/bar/baz', an_instance_of(Symbol)).and_return(mock).ordered
+          expect(proxy.fetch_object('baz')).to eq mock
         end
       end
 

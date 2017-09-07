@@ -25,7 +25,7 @@ module Services
     context 'service unavailable' do
       before do
         allow(Canvas::DynamicSettings).to receive(:find)
-          .with('live-events-subscription-service', {use_env: false})
+          .with('live-events-subscription-service', default_ttl: 5.minutes)
           .and_return(nil)
       end
 
@@ -39,12 +39,12 @@ module Services
     context 'service available' do
       before do
         allow(Canvas::DynamicSettings).to receive(:find)
-          .with('live-events-subscription-service', {use_env: false})
+          .with('live-events-subscription-service', default_ttl: 5.minutes)
           .and_return({
             'app-host' => 'http://example.com',
           })
         allow(Canvas::DynamicSettings).to receive(:find)
-          .with('canvas', {use_env: false})
+          .with('canvas')
           .and_return({
             'signing-secret' => 'astringthatisactually32byteslong',
             'encryption-secret' => 'astringthatisactually32byteslong'
