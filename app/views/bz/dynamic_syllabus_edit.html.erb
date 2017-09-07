@@ -16,6 +16,9 @@
   <label><span>Course Intro Text:</span>
     <textarea id="bz-course-intro-text-editor" class="rich-text-editor" style="width: 300px; height: 150px;" name="course_intro_text"><%= @course.intro_text %></textarea></label>
 
+  <label><span>Course Gradebook Note:</span>
+    <textarea id="bz-course-gradebook-text-editor" class="rich-text-editor" style="width: 300px; height: 150px;" name="course_gradebook_text"><%= @course.gradebook_text %></textarea></label>
+
   <h3>Course Syllabus Parts</h3>
   <div class="dynamic-syllabus-parts-editor"><div>
     <% def part_code(part, hidden = false) %>
