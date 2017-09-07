@@ -1324,6 +1324,14 @@ class Attachment < ActiveRecord::Base
     end
   end
 
+  def destroy_permanently_plus
+    unless root_attachment_id
+      make_childless
+      destroy_content
+    end
+    destroy_permanently!
+  end
+
   def make_childless(preferred_child = nil)
     return if root_attachment_id
     child = preferred_child || children.take

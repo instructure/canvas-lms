@@ -339,7 +339,7 @@ describe EportfoliosController do
       expect(@portfolio.attachments.first.id).not_to eq @old_zipfile.id
     end
 
-    it "should soft delete old zips if there are associated attachments" do
+    it "should hard delete old zips even if there are associated attachments" do
       expect(@portfolio.attachments.count).to eq 1
       cloned_att = @old_zipfile.clone_for(@user)
       cloned_att.workflow_state = 'to_be_zipped'
@@ -351,8 +351,8 @@ describe EportfoliosController do
       get 'export', params: {:eportfolio_id => @portfolio.id}
 
       @portfolio.reload
-      expect(@portfolio.attachments.count).to eq 2
-      expect(@portfolio.attachments.map(&:file_state)).to include "deleted"
+      expect(@portfolio.attachments.count).to eq 1
+      expect(@portfolio.attachments.map(&:file_state)).not_to include "deleted"
     end
 
     it "should not fail on export if there is an empty entry" do

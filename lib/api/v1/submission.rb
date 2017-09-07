@@ -252,7 +252,7 @@ module Api::V1::Submission
     }).order(:created_at).to_a
 
     attachment = attachments.pop
-    attachments.each { |a| a.destroy_permanently! }
+    attachments.each(&:destroy_permanently_plus)
 
     anonymous = assignment.context.feature_enabled?(:anonymous_grading)
 
@@ -262,7 +262,7 @@ module Api::V1::Submission
       stale ||= (attachment.created_at < Setting.get('submission_zip_ttl_minutes', '60').to_i.minutes.ago)
       stale ||= (attachment.created_at < (updated_at || assignment.submissions.maximum(:submitted_at)))
       if stale
-        attachment.destroy_permanently!
+        attachment.destroy_permanently_plus
         attachment = nil
       end
     end

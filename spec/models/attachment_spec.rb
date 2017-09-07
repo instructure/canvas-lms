@@ -476,6 +476,19 @@ describe Attachment do
       expect(a.content_type).to eq 'unknown/unknown'
     end
 
+    it "should destroy content and record on destroy_permanently_plus" do
+      a = attachment_model
+      a2 = attachment_model(root_attachment: a)
+      expect(a).to receive(:make_childless).once
+      expect(a).to receive(:destroy_content).once
+      expect(a2).to receive(:make_childless).never
+      expect(a2).to receive(:destroy_content).never
+      a2.destroy_permanently_plus
+      a.destroy_permanently_plus
+      expect { a.reload }.to raise_error(ActiveRecord::RecordNotFound)
+      expect { a2.reload }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
     it 'should not delete s3objects if it is not production for destroy_content' do
       allow(ApplicationController).to receive(:test_cluster?).and_return(true)
       s3_storage!
