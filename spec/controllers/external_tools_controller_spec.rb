@@ -1227,6 +1227,11 @@ describe ExternalToolsController do
   end
 
   describe "'GET 'generate_sessionless_launch'" do
+    before do
+      allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
+      allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
+    end
+
     it "generates a sessionless launch" do
       @tool = new_valid_tool(@course)
       user_session(@user)

@@ -118,6 +118,11 @@ describe ExternalToolsController, type: :request do
         end
 
         context 'assessment launch' do
+          before do
+            allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
+            allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
+          end
+
           it 'returns a bad request response if there is no assignment_id' do
             params = {id: tool.id.to_s, launch_type: 'assessment'}
             code = get_raw_sessionless_launch_url(@course, 'course', params)

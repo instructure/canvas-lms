@@ -556,6 +556,12 @@ END
       state: "allowed",
       root_opt_in: true
     },
+    'encrypted_sourcedids' => {
+      display_name: -> { I18n.t('Encrypted Sourcedids for Basic Outcomes') },
+      description: -> { I18n.t('If enabled, Sourcedids used by Canvas for Basic Outcomes will be encrypted.') },
+      applies_to: 'RootAccount',
+      state: 'allowed'
+    }
   )
 
   def self.definitions

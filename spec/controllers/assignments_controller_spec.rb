@@ -421,6 +421,8 @@ describe AssignmentsController do
         Setting.set('enable_page_views', 'db')
         @old_thread_context = Thread.current[:context]
         Thread.current[:context] = { request_id: SecureRandom.uuid }
+        allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
+        allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
       end
 
       after do
