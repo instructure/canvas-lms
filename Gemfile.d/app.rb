@@ -117,7 +117,7 @@ gem 'gepub', '0.7.0beta4'
 gem 'imperium', '0.1.3', require: false
 gem 'academic_benchmarks', '0.0.10', require: false
 
-gem 'graphql', '1.6.6'
+gem 'graphql', '1.6.7'
 gem 'graphql-batch', '~>0.3.1'
 
 gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbacks'
