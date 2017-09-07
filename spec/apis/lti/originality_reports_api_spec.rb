@@ -683,7 +683,8 @@ module Lti
 
         post @endpoints[:create], params: {originality_report: {file_id: @attachment.id, originality_score: 0.4}}, headers: request_headers
         expect(response.status).to eq 400
-        expect(JSON.parse(response.body)['error']['type']).to eq 'RecordNotUnique'
+        attachment_error = JSON.parse(response.body)['errors']['attachment'].first
+        expect(attachment_error['type']).to eq 'taken'
       end
 
       it "requires the plagiarism feature flag" do
