@@ -234,9 +234,15 @@ class BzController < ApplicationController
         end
       end
       Rails.logger.debug("### set_user_retained_data - course_id = #{course_id}, module_item_id = #{module_item_id}")
-      if course_id && module_item_id
-
+      course = nil
+      is_student = false
+      if course_id
         course = Course.find(course_id)
+        is_student = course.student_enrollments.active.where(:user_id => @current_user.id).any?
+      end
+      if is_student && module_item_id
+        # assuming course is set from above
+
         tag = ContentTag.find(module_item_id)
         context_module = tag.context_module
 
