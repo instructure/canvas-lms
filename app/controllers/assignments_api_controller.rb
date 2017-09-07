@@ -810,7 +810,7 @@ class AssignmentsApiController < ApplicationController
   #   format.
   #
   # @argument assignment[integration_data]
-  #   Data related to third party integrations, JSON string required.
+  #   Data used for SIS integrations. Requires admin-level token with the "Manage SIS" permission. JSON string required.
   #
   # @argument assignment[integration_id]
   #   Unique ID from third party integrations
@@ -965,7 +965,7 @@ class AssignmentsApiController < ApplicationController
   #   format.
   #
   # @argument assignment[integration_data]
-  #   Data related to third party integrations, JSON string required.
+  #   Data used for SIS integrations. Requires admin-level token with the "Manage SIS" permission. JSON string required.
   #
   # @argument assignment[integration_id]
   #   Unique ID from third party integrations
