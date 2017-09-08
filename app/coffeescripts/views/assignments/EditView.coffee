@@ -560,7 +560,7 @@ define [
       errors
 
     _validateExternalTool: (data, errors) =>
-      if data.submission_type == 'external_tool' and $.trim(data.external_tool_tag_attributes?.url?.toString()).length == 0
+      if data.submission_type == 'external_tool' && data.grading_type != 'not_graded' && $.trim(data.external_tool_tag_attributes?.url?.toString()).length == 0
         errors["external_tool_tag_attributes[url]"] = [
           message: I18n.t 'External Tool URL cannot be left blank'
         ]
