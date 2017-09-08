@@ -2916,6 +2916,15 @@ describe Submission do
         end
       end
 
+      it "filters out deleted attachments" do
+        student = student_in_course(active_all: true).user
+        attachment = attachment_model(filename: "submission.doc", context: student)
+        submission = @assignment.submit_homework(student, attachments: [attachment])
+        attachment.destroy_permanently!
+        submission_with_attachments = Submission.bulk_load_versioned_attachments([submission]).first
+        expect(submission_with_attachments.versioned_attachments).to be_empty
+      end
+
       it "includes url submission attachments" do
         s = submission_for_some_user
         s.attachment = attachment_model(filename: "screenshot.jpg",
@@ -2983,6 +2992,42 @@ describe Submission do
         expected_attachments_for_submissions = { s => [] }
         result = Submission.bulk_load_attachments_for_submissions(s)
         expect(result).to eq(expected_attachments_for_submissions)
+      end
+
+      it "filters out attachment associations that don't point to an attachment" do
+        student = student_in_course(active_all: true).user
+        attachment = attachment_model(filename: "submission.doc", context: student)
+        submission = @assignment.submit_homework(student, attachments: [attachment])
+        submission.attachment_associations.find_by(attachment_id: attachment.id).update!(attachment_id: nil)
+        attachments = Submission.bulk_load_attachments_for_submissions([submission]).first.second
+        expect(attachments).to be_empty
+      end
+
+      it "filters out attachment associations that point to deleted attachments" do
+        student = student_in_course(active_all: true).user
+        attachment = attachment_model(filename: "submission.doc", context: student)
+        submission = @assignment.submit_homework(student, attachments: [attachment])
+        attachment.destroy_permanently!
+        attachments = Submission.bulk_load_attachments_for_submissions([submission]).first.second
+        expect(attachments).to be_empty
+      end
+
+      it "includes valid attachments and filters out deleted attachments" do
+        student = student_in_course(active_all: true).user
+        attachment = attachment_model(filename: "submission.doc", context: student)
+        submission = @assignment.submit_homework(student, attachments: [attachment])
+        attachment.destroy_permanently!
+
+        another_student = student_in_course(active_all: true).user
+        another_attachment = attachment_model(filename: "submission.doc", context: another_student)
+        another_submission = @assignment.submit_homework(another_student, attachments: [another_attachment])
+
+        bulk_loaded_submissions = Submission.bulk_load_attachments_for_submissions([submission, another_submission])
+        submission_attachments = bulk_loaded_submissions.find { |s| s.first.id == submission.id }.second
+        expect(submission_attachments).to be_empty
+
+        another_submission_attachments = bulk_loaded_submissions.find { |s| s.first.id == another_submission.id }.second
+        expect(another_submission_attachments).not_to be_empty
       end
     end
   end

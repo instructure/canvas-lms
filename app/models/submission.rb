@@ -1530,7 +1530,7 @@ class Submission < ActiveRecord::Base
     end
 
     attachments_by_submission = submissions.map do |s|
-      [s, attachments_by_id.values_at(*attachment_ids_by_submission[s]).flatten.uniq]
+      [s, attachments_by_id.values_at(*attachment_ids_by_submission[s]).flatten.compact.uniq]
     end
     Hash[attachments_by_submission]
   end
