@@ -40,7 +40,7 @@ module ContextModulesHelper
   end
 
   def add_mastery_paths_to_cache_key(cache_key, context, module_or_modules, user)
-    if ConditionalRelease::Service.enabled_in_context?(context)
+    if user && ConditionalRelease::Service.enabled_in_context?(context)
       if context.user_is_student?(user)
         items = Rails.cache.fetch("visible_content_tags_for/#{cache_key}") do
           Array.wrap(module_or_modules).map{ |m| m.content_tags_visible_to(user, :is_teacher => false) }.flatten
