@@ -116,7 +116,10 @@ class ApplicationController < ActionController::Base
     return {} unless request.format.html?
     # set some defaults
     unless @js_env
-      editor_css = view_context.stylesheet_path(css_url_for('what_gets_loaded_inside_the_tinymce_editor'))
+      editor_css = [
+        active_brand_config_css_url,
+        view_context.stylesheet_path(css_url_for('what_gets_loaded_inside_the_tinymce_editor'))
+      ]
       @js_env = {
         ASSET_HOST: Canvas::Cdn.config.host,
         active_brand_config: active_brand_config.try(:md5),
