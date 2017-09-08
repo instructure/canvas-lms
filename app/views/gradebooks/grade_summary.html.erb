@@ -80,8 +80,10 @@
 <% }) %>
 </h2>
 
-<% @presenter.selectable_courses.each do |course| %>
-  <%= course.gradebook_text.html_safe %>
+<% if !@context.gradebook_text.blank? %>
+  <div class="bz-gradebook-note">
+    <%= @context.gradebook_text.html_safe %>
+  </div>
 <% end %>
 
 <div class="dropdowns">
