@@ -46,7 +46,7 @@ module Types
               grades_resolver.call(grading_period_id)
             else
               CourseGradingPeriodLoader.load(enrollment.course).then { |gp|
-                grades_resolver.call(gp.id)
+                grades_resolver.call(gp&.id)
               }
             end
           end

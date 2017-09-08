@@ -32,5 +32,12 @@ describe Types::EnrollmentType do
       expect(grades.enrollment).to eq enrollment
       expect(grades.grading_period).to eq @gp2
     end
+
+    it "works for courses with no grading periods" do
+      @course.enrollment_term.update_attribute :grading_period_group, nil
+      grades = enrollment_type.grades(current_user: @teacher)
+      expect(grades.enrollment).to eq enrollment
+      expect(grades.grading_period).to eq nil
+    end
   end
 end
