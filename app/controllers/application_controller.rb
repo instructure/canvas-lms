@@ -1538,7 +1538,8 @@ class ApplicationController < ActionController::Base
         if @assignment
           return unless require_user
           add_crumb(@resource_title)
-          @prepend_template = 'assignments/description'
+          @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)
+          @prepend_template = 'assignments/lti_header'
           @lti_launch.params = adapter.generate_post_payload_for_assignment(@assignment, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool), lti_turnitin_outcomes_placement_url(@tool.id))
         else
           @lti_launch.params = adapter.generate_post_payload
