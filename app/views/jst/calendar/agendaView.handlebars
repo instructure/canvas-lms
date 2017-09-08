@@ -12,18 +12,54 @@
           <ul class="agenda-event__list">
             {{#each events}}
               <li class="agenda-event__item" data-event-id="{{id}}">
+                <span class="screenreader-only">
+                  {{readableType}},
+                  {{#if assignment}}
+                    {{#t}}Due {{/t}} {{fcMomentToString originalStart "tiny"}}
+                  {{else}}
+                    {{#unless all_day}}
+                      {{#t}}Starts at{{/t}}
+                      {{fcMomentToString originalStart "tiny"}}
+                    {{/unless}}
+                  {{/if}},
+                </span>
+                <span class="screenreader-only">
+                  {{#if ../../meta.better_scheduler}}
+                    {{#if isAppointmentGroupEvent}}
+                      {{#if can_edit}}
+                        {{#truncate title 60}}{{/truncate}} - {{appointmentGroupEventStatus}} {{#if reservedUsers }} - {{reservedUsers}} {{/if}}
+                      {{else}}
+                        {{#truncate title 60}}{{/truncate}} - {{appointmentGroupEventStatus}}
+                      {{/if}}
+                    {{else}}
+                      {{#truncate title 60}}{{/truncate}}
+                    {{/if}}
+                  {{else}}
+                    {{#ifAll ../../../meta.displayAppointmentEvents isAppointmentGroupEvent}}
+                      {{appointmentGroupEventStatus}}
+                    {{else}}
+                      {{#truncate title 60}}{{/truncate}}
+                    {{/ifAll}}
+                  {{/if}}
+                </span>
+                <span class="screenreader-only">
+                  {{#if isCompleted}}
+                    {{#t}}completed{{/t}}
+                  {{else}}
+                    {{#t}}Not Completed{{/t}}
+                  {{/if}}
+                </span>
+                <span class="screenreader-only">{{#t}}Calendar {{contextInfo.name}}{{/t}}</span>
                 <div class="agenda-event__item-container" tabindex="0" role="button">
                   <div class="agenda-event__icon group_{{contextCode}}">
-                    <span class="screenreader-only">{{readableType}},</span>
                     <i class="icon-{{iconType}}"></i>
                   </div>
-                  <div class="agenda-event__time">
+                  <span class="screenreader-only">{{#t}}Open event menu{{/t}}</span>
+                  <div class="agenda-event__time" aria-hidden="true">
                     {{#if assignment}}
-                      {{#t "due"}}Due {{/t}} <span class="screenreader-only">,</span>
-                      {{fcMomentToString originalStart "tiny"}}
+                      {{#t "due"}}Due {{/t}} {{fcMomentToString originalStart "tiny"}}
                     {{else}}
                       {{#unless all_day}}
-                        <span class="screenreader-only">{{#t "starts_at"}}Starts at{{/t}},</span>
                         {{fcMomentToString originalStart "tiny"}}
                       {{/unless}}
                     {{/if}}
@@ -46,9 +82,7 @@
                         {{#truncate title 60}}{{/truncate}}
                       {{/ifAll}}
                     {{/if}}
-                    {{#if isCompleted}}<span class="screenreader-only">,(completed),</span>{{/if}}
                   </span>
-                  <span class="screenreader-only">,{{contextInfo.name}},</span>
                 </div>
               </li>
             {{/each}}
