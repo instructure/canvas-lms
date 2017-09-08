@@ -321,7 +321,7 @@ class BzController < ApplicationController
             participation_assignment.grade_student(@current_user, {:grade => (new_grade), :suppress_notification => true })
           end
         end
-      elsif
+      elsif is_student
         Rails.logger.error("### set_user_retained_data - missing either course_id = #{course_id} or module_item_id = #{module_item_id}. Can't update the Course Participation grade without that! user = #{@current_user.inspect}")
       end
     end
