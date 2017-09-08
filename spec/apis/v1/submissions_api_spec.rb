@@ -113,6 +113,45 @@ describe 'Submissions API', type: :request do
       expect(json.size).to eq 0
     end
 
+    shared_examples_for 'enrollment_state' do
+      it 'should scope call to enrollment_state' do
+        e = @section.enrollments.where(user_id: @student1.id).take
+        json = api_call(:get,
+                        '/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions',
+                        { controller: 'submissions_api', action: 'for_students',
+                          format: 'json', section_id: 'sis_section_id:my-section-sis-id' },
+                        enrollment_state: @enrollment_state, student_ids: [@student1.id])
+        expect(json.size).to eq @active_count
+
+        e.workflow_state = 'completed'
+        e.save!
+        json = api_call(:get,
+                        '/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions',
+                        { controller: 'submissions_api', action: 'for_students',
+                          format: 'json', section_id: 'sis_section_id:my-section-sis-id' },
+                        enrollment_state: @enrollment_state, student_ids: [@student1.id])
+        expect(json.size).to eq @concluded_count
+      end
+    end
+
+    context 'active enrollment_state' do
+      include_examples 'enrollment_state'
+      before do
+        @enrollment_state = 'active'
+        @active_count = 1
+        @concluded_count = 0
+      end
+    end
+
+    context 'conclude enrollment_state' do
+      include_examples 'enrollment_state'
+      before do
+        @enrollment_state = 'concluded'
+        @active_count = 0
+        @concluded_count = 1
+      end
+    end
+
     it 'returns submissions based on assignments.post_to_sis' do
       json = api_call(:get,
         "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
