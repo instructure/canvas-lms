@@ -24,12 +24,12 @@ module Messages
     end
 
     def from_name
-      return nil unless has_named_source?
+      return nil unless asset && has_named_source?
       CanvasTextHelper.truncate_text(anonymized_user_name, :max_length => 50)
     end
 
     def reply_to_name
-      return nil unless has_named_source?
+      return nil unless asset && has_named_source?
       I18n.t(:reply_from_name, "%{name} via Canvas Notifications", name: from_name)
     end
 

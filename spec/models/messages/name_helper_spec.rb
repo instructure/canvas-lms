@@ -48,6 +48,10 @@ module Messages
         expect(asset_for("Nonsense").from_name).to be_nil
       end
 
+      it 'is nil for missing asset' do
+        expect(asset_for("Conversation Message", nil).from_name).to be_nil
+      end
+
       it 'uses the author name for messages with authors' do
         expect(asset_for("Conversation Message").from_name).to eq "Author Name"
       end
