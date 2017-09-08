@@ -525,6 +525,10 @@ describe ContentMigration do
 
       expect(mod2_to.prerequisites.count).to eq 1
       expect(mod2_to.prerequisites.first[:id]).to eq mod1_to.id
+
+      mod1.update_attribute(:require_sequential_progress, false)
+      run_course_copy
+      expect(mod1_to.reload.require_sequential_progress).to be_falsey
     end
 
     it "should sync module items (even when removed) on re-copy" do
