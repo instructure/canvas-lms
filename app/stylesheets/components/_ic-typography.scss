@@ -67,6 +67,9 @@
 }
 
 html {
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
   font-family: $ic-font-family-fallback;
   &.lato-font-loaded {
     font-family: $ic-font-family;
@@ -76,7 +79,6 @@ html {
 body {
   @include fontSize($ic-font-size);
   font-weight: normal;
-  margin: 0;
   line-height: $ic-line-height;
   color: $ic-font-color-dark;
   -webkit-font-smoothing: antialiased; // needed to help render the iconFont clearer
@@ -262,6 +264,24 @@ dd {
   dd {
     margin-left: $horizontalComponentOffset;
   }
+}
+
+///////==============
+/// Prevents sub and sup affecting line-height in all browsers
+///////==============
+
+sub,
+sup {
+  position: relative;
+  font-size: 75%;
+  line-height: 0;
+  vertical-align: baseline;
+}
+sup {
+  top: -0.5em;
+}
+sub {
+  bottom: -0.25em;
 }
 
 ///////==============

@@ -22,6 +22,9 @@
 // Variables (including Bootstrap and jQuery UI), mixins, and functions
 @import "base/environment";
 
+// Reset
+@import "components/ic-reset";
+
 // Heavily customized vendor styles
 @import "vendor/jqueryui/jquery.ui.all";
 @import "base/custom_bootstrap";

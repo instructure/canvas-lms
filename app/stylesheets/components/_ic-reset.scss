@@ -1,0 +1,74 @@
+// Canvas CSS reset
+// Mostly from legacy Bootstrap/Normalize reset, but ok to edit as needed going forward
+
+// Root/body
+body {
+  margin: 0;
+}
+
+audio,
+canvas,
+video {
+  display: inline-block;
+}
+
+// Prevents modern browsers from displaying 'audio' without controls
+audio:not([controls]) {
+  display: none;
+  height: 0; // see https://github.com/necolas/normalize.css/issues/69
+}
+
+// Responsive images
+img {
+  max-width: 100%;
+  height: auto;
+  vertical-align: middle;
+  border: 0;
+  -ms-interpolation-mode: bicubic;
+}
+
+// Prevent max-width from affecting Google Maps
+#map_canvas img,
+.google-maps img {
+  max-width: none;
+}
+
+// Forms (need to be compiled before our existing forms Sass)
+button,
+input,
+select,
+textarea {
+  margin: 0;
+  font-size: 100%;
+  vertical-align: middle;
+}
+
+button::-moz-focus-inner,
+[type="button"]::-moz-focus-inner,
+[type="reset"]::-moz-focus-inner,
+[type="submit"]::-moz-focus-inner {
+  border-style: none;
+  padding: 0;
+}
+
+button,
+html input[type="button"], // Avoid the WebKit bug in Android 4.0.* where (2) destroys native `audio` and `video` controls.
+input[type="reset"],
+input[type="submit"] {
+  -webkit-appearance: button; // Corrects inability to style clickable `input` types in iOS.
+  cursor: pointer;
+}
+
+input[type="search"] { // Appearance in Safari/Chrome
+  box-sizing: content-box;
+  -webkit-appearance: textfield;
+}
+
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none; // Inner-padding issues in Chrome OSX, Safari 5
+}
+
+textarea {
+  vertical-align: top; // Readability and alignment cross-browser
+}
