@@ -207,7 +207,7 @@ describe "context modules" do
 
       # Should go to the next module
       get "/courses/#{@course.id}/assignments/#{@assignment_1.id}"
-      nxt = f('.module-sequence-footer-button--next')
+      nxt = f('.module-sequence-footer-button--next a')
       expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{module2_published_tag.id}")
 
       # Should redirect to the published item
@@ -379,13 +379,13 @@ describe "context modules" do
         get "/courses/#{@course.id}/modules/items/#{@atag1.id}"
         prev = f('.module-sequence-footer-button--previous')
         expect(prev).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@tag_1.id}")
-        nxt = f('.module-sequence-footer-button--next')
+        nxt = f('.module-sequence-footer-button--next a')
         expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@after1.id}")
 
         get "/courses/#{@course.id}/modules/items/#{@atag2.id}"
         prev = f('.module-sequence-footer-button--previous')
         expect(prev).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@tag_2.id}")
-        nxt = f('.module-sequence-footer-button--next')
+        nxt = f('.module-sequence-footer-button--next a')
         expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@after2.id}")
 
         # if the user didn't get here from a module link, we show no nav,
@@ -403,11 +403,11 @@ describe "context modules" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         prev = f('.module-sequence-footer-button--previous')
         expect(prev).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@tag_1.id}")
-        nxt = f('.module-sequence-footer-button--next')
+        nxt = f('.module-sequence-footer-button--next a')
         expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@after1.id}")
       end
 
-      # TODO reimplement per CNVS-29600, but make sure we're testing at the right level
+      # TODO: reimplement per CNVS-29600, but make sure we're testing at the right level
       it "should show module navigation for group assignment discussions"
     end
 

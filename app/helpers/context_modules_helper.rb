@@ -18,6 +18,20 @@
 
 module ContextModulesHelper
   include Api::V1::ContextModule
+  include CyoeHelper
+
+  TRANSLATED_COMMENT_TYPE = {
+    'Announcement': I18n.t('Announcement'),
+    'Assignment': I18n.t('Assignment'),
+    'Attachment': I18n.t('Attachment'),
+    'ContextExternalTool': I18n.t('External Tool'),
+    'ContextModuleSubHeader': I18n.t('Context Module Sub Header'),
+    'DiscussionTopic': I18n.t('Discussion Topic'),
+    'ExternalUrl': I18n.t('External Url'),
+    'Quiz': I18n.t('Quiz'),
+    'Quizzes::Quiz': I18n.t('Quiz'),
+    'WikiPage': I18n.t('Wiki Page')
+  }.freeze
 
   def cache_if_module(context_module, editable, is_student, can_view_unpublished, user, context, &block)
     if context_module
@@ -40,12 +54,12 @@ module ContextModulesHelper
   end
 
   def add_mastery_paths_to_cache_key(cache_key, context, module_or_modules, user)
-    if user && ConditionalRelease::Service.enabled_in_context?(context)
+    if user && cyoe_enabled?(context)
       if context.user_is_student?(user)
         items = Rails.cache.fetch("visible_content_tags_for/#{cache_key}") do
           Array.wrap(module_or_modules).map{ |m| m.content_tags_visible_to(user, :is_teacher => false) }.flatten
         end
-        rules = ConditionalRelease::Service.rules_for(context, user, items, @session)
+        rules = cyoe_rules(context, user, items, @session)
       else
         rules = ConditionalRelease::Service.active_rules(context, user, @session)
       end
@@ -96,27 +110,15 @@ module ContextModulesHelper
     preload_can_unpublish(@context, modules) if can_edit
   end
 
-  def cyoe_able?(item)
-    if item.content_type == 'Assignment'
-      item.graded? && item.content.graded?
-    elsif item.content_type == 'Quizzes::Quiz'
-      item.graded? && item.content.assignment?
-    else
-      item.graded?
-    end
-  end
-
-  def process_module_data(mod, is_student = false, is_cyoe_on = false, current_user = nil, session = nil)
+  def process_module_data(mod, is_student = false, current_user = nil, session = nil)
     # pre-calculated module view data can be added here
     module_data = {
       published_status: mod.published? ? 'published' : 'unpublished',
       items: mod.content_tags_visible_to(@current_user)
     }
 
-    cyoe_rules = []
-
-    if is_cyoe_on
-      cyoe_rules = ConditionalRelease::Service.rules_for(@context, current_user, module_data[:items], session)
+    if cyoe_enabled?(@context)
+      rules = cyoe_rules(@context, current_user, module_data[:items], session) || []
     end
 
     items_data = {}
@@ -126,11 +128,11 @@ module ContextModulesHelper
         published_status: item.published? ? 'published' : 'unpublished',
       }
 
-      if is_cyoe_on
-        item_data[:mastery_paths] = conditional_release(item, { conditional_release_rules: cyoe_rules })
+      if cyoe_enabled?(@context)
+        path_opts = { conditional_release_rules: rules, is_student: is_student }
+        item_data[:mastery_paths] = conditional_release_rule_for_module_item(item, path_opts)
         if is_student && item_data[:mastery_paths].present?
-          item_data[:show_cyoe_placeholder] = item_data[:mastery_paths][:selected_set_id].nil? &&
-                  (item_data[:mastery_paths][:locked] || item_data[:mastery_paths][:assignment_sets].present?)
+          item_data[:show_cyoe_placeholder] = show_cyoe_placeholder(item_data[:mastery_paths])
           item_data[:choose_url] = context_url(@context, :context_url) + '/modules/items/' + item.id.to_s + '/choose'
         end
       end
@@ -144,30 +146,6 @@ module ContextModulesHelper
 
   def module_item_translated_content_type(item)
     return '' unless item
-
-    case item.content_type
-    when 'Announcement'
-      I18n.t('Announcement')
-    when 'Assignment'
-      I18n.t('Assignment')
-    when 'Attachment'
-      I18n.t('Attachment')
-    when 'ContextExternalTool'
-      I18n.t('External Tool')
-    when 'ContextModuleSubHeader'
-      I18n.t('Context Module Sub Header')
-    when 'DiscussionTopic'
-      I18n.t('Discussion Topic')
-    when 'ExternalUrl'
-      I18n.t('External Url')
-    when 'Quiz'
-      I18n.t('Quiz')
-    when 'Quizzes::Quiz'
-      I18n.t('Quiz')
-    when 'WikiPage'
-      I18n.t('Wiki Page')
-    else
-      I18n.t('Unknown Content Type')
-    end
+    TRANSLATED_COMMENT_TYPE[item.content_type.to_sym] || I18n.t('Unknown Content Type')
   end
 end
