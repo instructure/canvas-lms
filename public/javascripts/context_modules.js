@@ -1582,15 +1582,10 @@ import 'compiled/jquery.rails_flash_notifications'
 
       var viewOptions = {
         model: model,
+        title: data.publishTitle,
         el: $el[0]
       };
 
-      if (data.publishMessage) {
-        viewOptions.publishText = data.publishMessage;
-      }
-      if (data.unpublishMessage) {
-        viewOptions.unpublishText = data.unpublishMessage;
-      }
 
       var view = new PublishIconView(viewOptions);
       var row = $el.closest('.ig-row');
