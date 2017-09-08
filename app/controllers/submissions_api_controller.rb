@@ -275,6 +275,10 @@ class SubmissionsApiController < ApplicationController
   # @argument workflow_state [String, "submitted"|"unsubmitted"|"graded"|"pending_review"]
   #   The current status of the submission
   #
+  # @argument enrollment_state [String, "active"|"concluded"|]
+  #   The current state of the enrollments. If omitted will include all
+  #   enrollments that are not deleted.
+  #
   # @argument order [String, "id"|"graded_at"]
   #   The order submissions will be returned in.  Defaults to "id".  Doesn't
   #   affect results for "grouped" mode.
@@ -339,15 +343,26 @@ class SubmissionsApiController < ApplicationController
       if all
         student_ids = allowed_student_ids
       else
-        # if any student_ids exist that the current_user shouldnt have access to, return an error
+        # if any student_ids exist that the current_user shouldn't have access to, return an error
         # (student looking at other students, observer looking at student out of their scope)
         inaccessible_students = student_ids - allowed_student_ids
-        return render_unauthorized_action if !inaccessible_students.empty?
+        return render_unauthorized_action unless inaccessible_students.empty?
       end
     end
 
     if student_ids.is_a?(Array) && student_ids.length > Api.max_per_page
       return render json: { error: 'too many students' }, status: 400
+    end
+
+    if (enrollment_state = params[:enrollment_state].presence)
+      case enrollment_state
+      when 'active'
+        student_ids = @context.all_student_enrollments.active_by_date.where(user_id: student_ids).select(:user_id)
+      when 'concluded'
+        student_ids = @context.all_student_enrollments.completed_by_date.where(user_id: student_ids).select(:user_id)
+      else
+        return render json: {error: 'invalid enrollment_state'}, status: :bad_request
+      end
     end
 
     includes = Array(params[:include])
