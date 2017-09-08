@@ -269,7 +269,7 @@ zh-Hant:
       error_text: "失敗，請將以下錯誤代碼報告給您的系統管理員：ErrorReport:%{error}；"
       extra_text_term: "學期：%{term_name}；"
       message: "已透過以下設置成功生成%{type}報告。帳號：%{account}; %{options}"
-      section_text: "對於章節：%{section}；"
+      section_text: "對於班別：%{section}；"
       start_text: "開始時間：%{start_at}；"
       term_text: "學期：%{term_name}；"
     grades: 
@@ -336,12 +336,12 @@ zh-Hant:
     report_header_parent_account_id: parent_account_id
     report_header_role: 角色
     report_header_role_id: role_id
-    report_header_section: 章節
+    report_header_section: 班別
     report_header_section__id: section_id
-    report_header_section_id: "章節 ID"
-    report_header_section_name: 章節名稱
-    report_header_section_sis: "章節 SIS"
-    report_header_section_sis_id: "章節 SIS ID"
+    report_header_section_id: "班別 ID"
+    report_header_section_name: 班別名稱
+    report_header_section_sis: "班別 SIS"
+    report_header_section_sis_id: "班別 SIS ID"
     report_header_short__name: short_name
     report_header_short_name: 短名稱
     report_header_sis_id: "SIS ID"
@@ -825,7 +825,7 @@ zh-Hant:
           enrollments: 
             check_box: "註冊 CSV"
           sections: 
-            check_box: "章節 CSV"
+            check_box: "班別 CSV"
           users: 
             check_box: "使用 者CSV"
     no_user_message: "沒有找到使用該 ID 的使用者"
@@ -873,7 +873,7 @@ zh-Hant:
           groups: 
             check_box: "群組 CSV"
           sections: 
-            check_box: "章節 CSV"
+            check_box: "班別 CSV"
           terms: 
             check_box: "學期 CSV"
           users: 
@@ -882,7 +882,7 @@ zh-Hant:
             check_box: "X 清單 CSV"
         sis_default: 
           parameters: 
-            note: "*學期設置只會影響課程、章節、註冊和 X 清單 CSV 文檔。"
+            note: "*學期設置只會影響課程、班別、註冊和 X 清單 CSV 文檔。"
     public_courses_csv_description: 
       account_reports: 
         default: 
@@ -925,7 +925,7 @@ zh-Hant:
           quiz_id: 
             field: "測驗 ID"
           section_id: 
-            field: "章節 ID"
+            field: "班別 ID"
     settings: 
       about_google_docs: |-
           Google Docs Previews 了允許使用者從 Canvas 程式內瀏覽文檔，無需下載文檔并採用對應的程式打開(如 Word 或 Excel)。
@@ -1177,7 +1177,7 @@ zh-Hant:
       group_enrollments: 群組註冊
       groups: 群組
       imported_items_title: 導入的項目
-      sections_label: 章節
+      sections_label: 班別
       terms_label: 學期
       users_label: 使用者
     sis_batch_messages: 
@@ -1187,7 +1187,7 @@ zh-Hant:
       account_reports: 
         sis_export: 
           description: 
-            text: "SIS 導出報告：該報告將導出使用者、帳戶、學期和課程、區段、註冊、群組、群組成員所需的所有文檔，以及其各自的類別中的 SIS 導入所需的交叉清單。該報告只會顯示透過 SIS 創建或修改的項目。"
+            text: "SIS 導出報告：該報告將導出使用者、帳戶、學期和課程、班別、註冊、群組、群組成員所需的所有文檔，以及其各自的類別中的 SIS 導入所需的交叉清單。該報告只會顯示透過 SIS 創建或修改的項目。"
     sis_export_csv_parameters: 
       account_reports: 
         default: 
@@ -1203,7 +1203,7 @@ zh-Hant:
           groups: 
             check_box: "群組 CSV"
           sections: 
-            check_box: "章節 CSV"
+            check_box: "班別 CSV"
           terms: 
             check_box: "學期 CSV"
           users: 
@@ -1212,7 +1212,7 @@ zh-Hant:
             check_box: "X 清單 CSV"
         sis_default: 
           parameters: 
-            note: "*學期設置只會影響課程、章節、註冊和 X 清單 CSV 文檔。"
+            note: "*學期設置只會影響課程、班別、註冊和 X 清單 CSV 文檔。"
     sis_import: 
       add_sis_stickiness_instructions: "選中此選項，透過這個 SIS 導入所做的更改將被處理，一如它們進行了 UI 變更一樣，從而防止後續非首要的 SIS 導入更改在此處變更的字段。"
       add_sis_stickiness_label: "如同 UI 變更一樣處理"
@@ -1480,12 +1480,12 @@ zh-Hant:
   add_people_7ee4b2ec: 添加人員
   add_quiz_ip_filter_c7b37dc5: "添加測驗 IP 篩選器"
   add_recipient_ff135ed7: 添加收件者
-  add_remove_or_rearrange_sections_for_this_portfoli_4628320a: 添加、刪除或重新排列此檔案袋的章節
+  add_remove_or_rearrange_sections_for_this_portfoli_4628320a: 添加、刪除或重新排列此檔案袋的部分
   add_review_2fb1590c: 添加檢閲
   add_rubric_3636d9a6: 添加題目
-  add_section_8b027a1c: 添加章節
+  add_section_8b027a1c: 添加班別
   add_set_of_grading_periods_5b4d6e51: 添加一組評分時段
-  add_students_by_searching_by_name_course_section_o_abb9e2f2: 以名字、課程章節或組別搜尋，再添加學生。輸入資料後，按「下方向」鍵確定輸入。用「Enter」鍵選擇結果。
+  add_students_by_searching_by_name_course_section_o_abb9e2f2: 以名字、課程班別或組別搜尋，再添加學生。輸入資料後，按「下方向」鍵確定輸入。用「Enter」鍵選擇結果。
   add_students_tas_and_observers_to_your_course_e84692dd: 添加學生，助教和觀察員到您的課程
   add_students_to_the_course_874be8fb: 添加學生至課程
   add_sub_account_to_account_name_b104db90: "添加子帳戶至%{account_name}"
@@ -1583,7 +1583,7 @@ zh-Hant:
   all_items_a49b66c7: 所有項目
   all_modules_20c9a1c8: 所有單元
   all_my_files_a0213441: 我的全部文檔
-  all_sections_daf11554: 所有章節
+  all_sections_daf11554: 所有班別
   all_start_dates_must_be_before_the_end_date_d949eca9: 開始開始日期必須早於結束日期
   all_students_have_taken_the_quiz_b558f8b4: 所有學生均已參加該測驗
   all_students_have_taken_the_survey_494f9f42: 所有學生均已參加該調查
@@ -1825,7 +1825,7 @@ zh-Hant:
       overlapping_appointments: 預約重疊
   appointment_group_sub_context: 
     errors: 
-      invalid_course_section: 無效的課程章節
+      invalid_course_section: 無效的課程班別
       invalid_group_category: 無效的群組類別
       missing_group_category: 群組預約必須有一個群組類別
   appointments_dcb41d23: 預約
@@ -2330,7 +2330,7 @@ zh-Hant:
     non_number: 必須使用數字
     notices: 
       assignment_delete: 此任務已被刪除
-      assignment_not_available: 您所請求的任務不可用於您的課程章節。
+      assignment_not_available: 您所請求的任務不可用於您的課程班別。
       created: 任務已成功創建。
       updated: 任務已成功更新。
     number_of_assignments: 
@@ -2884,7 +2884,7 @@ zh-Hant:
     update: 更新
     view_account_roster: 查看帳戶名單
     view_course_roster: 查看課程名單
-  by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: 預設情況下，所有連結均為一門課程而啟用。學生們不會希望看到所鏈接的章節不含有任何內容。例如，如果您並未創建任何測驗，他們就不希望看到測驗鏈接。如果您不想讓您的學生們訪問課程的某些區域，您可以對這些鏈接進行排序并將其明確關閉。
+  by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: 預設情況下，所有連結均為一門課程而啟用。學生們不會希望看到所鏈接的部分不含有任何內容。例如，如果您並未創建任何測驗，他們就不希望看到測驗鏈接。如果您不想讓您的學生們訪問課程的某些區域，您可以對這些鏈接進行排序并將其明確關閉。
   by_lti_2_registration_url_e421e523: "按照 LTI 2 註冊 URL"
   by_url_a163275e: "透過 URL"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
@@ -3096,7 +3096,7 @@ zh-Hant:
       count: 計數：
       date: 日期
       delete: 刪除
-      different_date_for_each_section: 對每個章節使用不同的日期
+      different_date_for_each_section: 對每個班別使用不同的日期
       edit_calendar_event_header: 編輯月曆事件
       end_time: 結束時間
       event_description: 事件說明
@@ -3160,7 +3160,7 @@ zh-Hant:
       modal: 
         chooseDueDate: 是否確定返回並選擇截止日期？
         goBackToInclude: 您是否希望返回，以包括：
-        notAllSectionsAssigned: 並非所有章節都會分派此項目。
+        notAllSectionsAssigned: 並非所有班別都會分派此項目。
     name_is_required: 名稱為必填項目！
     no_dates_error: 請指定至少一個日期與時間
     no_groups: 找不到群組
@@ -3279,7 +3279,7 @@ zh-Hant:
   calendars_toggle_list_visibility_488db143: 月曆切換清單可見性
   can_create_rename_and_edit_course_pages_by_default_f9ad4253: 可創建，重新命名和編輯默認的課程頁面
   can_edit_this_page_role_selection_6ccec3c7: 可編輯此頁面角色選擇
-  can_interact_with_users_in_their_section_only_48cb8c43: 僅可在其章節內與使用者互動
+  can_interact_with_users_in_their_section_only_48cb8c43: 僅可在其班別內與使用者互動
   can_t_compute_score_until_an_assignment_has_points_f34dd600: 在任務有可能得分之前，無法計算分數
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: 無法基於題目關聯刪除對應關係。如要刪除這些關聯，您需要從該資產的題目中刪除該行
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: 無法進行針對同一類型多個文檔的版本比較
@@ -3310,7 +3310,7 @@ zh-Hant:
   cannot_delete_an_override_with_a_due_date_within_a_fa94ca3b: 無法刪除到期日在封閉評分期內的重寫
   cannot_grade_at_this_time_489744b0: 這次不能進行評分
   cannot_have_a_blueprint_course_with_students_248e3e76: 不能與學生共有課程藍圖
-  cannot_restrict_by_section_unless_groups_are_empty_662d3144: 無法為課節設限，除非組內沒有成員亦沒有限組員人數
+  cannot_restrict_by_section_unless_groups_are_empty_662d3144: 無法為班別設限，除非組內沒有成員亦沒有限組員人數
   cannot_set_only_visible_to_overrides_when_due_in_a_fac518ce: 在封閉評分期內，使用者無法設定「只可檢視重寫到期日」
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: 無法將重寫到期日設定為封閉評分期內的日期
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "無法設置 sis_account_id 在root_account."
@@ -3862,9 +3862,9 @@ zh-Hant:
       select_quizzes: 選擇要導出的測驗
   content_exports_cannot_be_downloaded_after_days_da_396dfbca: "內容匯出 %{days} 日後便無法下載。"
   content_exports_expire_after_days_days_9bffa557: "內容匯出將於 %{days} 日後失效。"
-  content_for_section_1_7ecfb319: 章節1内容
-  content_for_section_2_e7c6e2a3: 章節2内容
-  content_for_section_3_90c1d235: 章節3内容
+  content_for_section_1_7ecfb319: 部分1内容
+  content_for_section_2_e7c6e2a3: 部分2内容
+  content_for_section_3_90c1d235: 部分3内容
   content_imports: 
     errors: 
       import_failed: "遷移導入過程中出現錯誤。請通知您的系統管理員，並為他們提供下面的代碼：『%{code}』"
@@ -4100,11 +4100,11 @@ zh-Hant:
           enrollment_sis_defined: 此註冊由大學定義，無法刪除
         user_account_details: 使用者帳戶詳細資料
         user_grades: "%{user} 的成績"
-        user_only_view_section: 限制此使用者，以僅檢視同一章節的使用者
+        user_only_view_section: 限制此使用者，以僅檢視同一班別的使用者
         user_outcomes: "%{user} 的成果"
         user_view_all_sections: 讓此使用者檢視所有課程使用者
       user_only_view_section: 此使用者只能檢視為其指定的課程章節的學生
-      user_view_all_sections: 此使用者可以檢視任何課程章節的學生
+      user_view_all_sections: 此使用者可以檢視任何課程班別的學生
     no_user: 
       course: 該使用者不存在或目前不是這門課程中的成員
       group: 該使用者不存在或目前不是該群組中的成員
@@ -4166,14 +4166,14 @@ zh-Hant:
           enrollment_sis_defined: 此註冊由大學定義，無法刪除
         user_account_details: 使用者帳戶詳細資料
         user_grades: 成績
-        user_only_view_section: 限制此使用者，以僅檢視同一章節的使用者
+        user_only_view_section: 限制此使用者，以僅檢視同一班別的使用者
         user_outcomes: 結果
         user_view_all_sections: 讓此使用者檢視所有課程使用者
       no_messages: 無訊息
       no_services: "%{user} 尚未連接任何外部服務至其帳戶。"
       services_not_visible: "此時您看不到 %{user} 冊的服務。"
       user_only_view_section: 此使用者只能檢視為其指定的課程章節的學生
-      user_view_all_sections: 此使用者可以檢視任何課程章節的學生
+      user_view_all_sections: 此使用者可以檢視任何課程班別的學生
     roster_user_services: 
       headings: 
         registered_services: 所註冊的服務
@@ -4446,7 +4446,7 @@ zh-Hant:
     other: "%{contextName} 和 %{count} 其他"
   contextscount_more_66b2f99b: "+ %{contextsCount} 更多"
   continue_ac067716: 繼續
-  continue_typing_to_find_additional_sections_or_stu_49786085: 請鍵入更多資訊，以查找其他分組或學生
+  continue_typing_to_find_additional_sections_or_stu_49786085: 請鍵入更多資訊，以查找其他班別或學生
   contributed_to_this_module_item_and_is_complete_2799d5c: 參與此單元項目並且已完成
   conversation_dialog: 
     errors: 
@@ -4966,36 +4966,36 @@ zh-Hant:
     cant_be_blank: 不能留空
   course_section: 
     sis_id_taken: "SIS ID『%{sis_id}』已在使用中"
-  course_section_7a988066: 課程章節
-  course_section_name_ea880ed1: "課程章節%{name}"
+  course_section_7a988066: 課程班別
+  course_section_name_ea880ed1: "課程班別%{name}"
   course_selection_245808bf: 課程選擇
   course_set_up_tutorial_6ab7c2d1: 課程設置教程
   course_set_up_tutorial_provides_tips_on_how_to_lev_3c098131: "課程設置教程提供有關如何利用 Canvas 每個頁面上的功能的提示。當您未熟悉 Canvas，或是第一次設立新課程時會十分有用。"
   course_settings: 
     buttons: 
-      add_section: 添加章節
-      adding_section: 正在添加章節...
+      add_section: 添加班別
+      adding_section: 正在添加班別...
       re_sending_all: 正在重新發送未被接受的邀請...
       re_sent_all: 已重新發送所有未被接受的邀請！
     cancel: 取消
     confirm: 
-      delete_section: 是否確定要刪除此章節？
+      delete_section: 是否確定要刪除此班別？
       publish_grades: 是否確定要發佈這些成績至學生資訊系統？只有在您所有的成績已經定稿之後，方可進行此操作。
       re_publish_grades: 是否確定要重新發佈這些成績至學生資訊系統？
-    edit_sections_placeholder: 輸入章節名稱
-    edit_sections_title: 章節名稱
+    edit_sections_placeholder: 輸入班別名稱
+    edit_sections_title: 班別名稱
     errors: 
       invalid_sis_status: "無效的 SIS 發佈狀態"
       invitation: 邀請失敗。請再試一次。
       publish_grades: 嘗試發佈成績至學生資訊系統時出錯了。請稍後再試一次。
       re_send_all: 發送失敗，請再試一次
-      section: 添加章節失敗，請再試一次
+      section: 添加班別失敗，請再試一次
     flash: 
       invitation: 邀請已發送。
       linkError: 更新使用者的學生連接時出錯了。請稍後再試一次。
       links: 學生連接已成功更新
-      sectionError: 更新使用者的章節時出錯了。請稍後再試一次。
-      sections: 章節註冊已成功更新
+      sectionError: 更新使用者的班別時出錯了。請稍後再試一次。
+      sections: 班別註冊已成功更新
     invitation_sent: 邀請已發送！
     invitation_sent_now: 此刻
     link_students_placeholder: 輸入學生姓名
@@ -5013,7 +5013,7 @@ zh-Hant:
       link_to_students: 連接至學生
       move_course: 移動課程
       reset_course_content_dialog_help: 重設課程內容
-      section_enrollments: 章節註冊
+      section_enrollments: 班別註冊
   course_settings_sub_navigation_b95deae: 課程設置子導航
   course_setup_wizard_is_showing_a7c087c1: 課程設置嚮導正在顯示。
   course_sis_7ae8f649: "課程 SIS"
@@ -5226,13 +5226,13 @@ zh-Hant:
         have_been_enrolled: 以下使用者已被登記
         name: 名稱
         next: 下一個
-        section: 章節
+        section: 班別
         user_might_not_exist: "如果您的格式正確，請聯絡 Canvas 管理員，以確保該使用者有一個 Canvas 帳戶。"
         user_role: 角色：
         validating: 正在驗證...
         will_not_be_added: 這些使用者有錯誤，不會被添加。請確保他們的格式正確。
       edit_sections_view: 
-        edit_sections_desc: 章節是組織使用者的另一種方式。這可允許您為多個班級教授相同的課程，這樣您就可以將所有課程內容置於一個地方。在下面，您可以移動使用者到不同的章節，或添加/刪除章節註冊。使用者必須始終至少位於一個章節內。
+        edit_sections_desc: 班別是組織使用者的另一種方式。這可允許您為多個班級教授相同的課程，這樣您就可以將所有課程內容置於一個地方。在下面，您可以移動使用者到不同的班別，或添加/刪除班別註冊。使用者必須始終至少位於一個班別內。
       index: 
         cannot_add_users: 無法添加新使用者，因為這門課程已結束
         filter_field_description: 搜索人員。當您在此字段中鍵入時，人員清單將會自動篩選，僅顯示那些與您的輸入相符合的名字。
@@ -5261,7 +5261,7 @@ zh-Hant:
         groups: 群組
       roster_user: 
         links: 
-          edit_sections: 編輯章節
+          edit_sections: 編輯班別
           link_to_students: 連接至學生
           remove_from_course: 從課程刪除
           resend_invitation: 重新發送邀請
@@ -5277,7 +5277,7 @@ zh-Hant:
         name: 名稱
         no_people_found: 找不到任何人
         role: 角色
-        section: 章節
+        section: 班別
         total_activity: 總活動
         you_can_search_by: 可以按以下方式搜索：
       section: 
@@ -5289,8 +5289,8 @@ zh-Hant:
     settings: 
       alerts_title: 警示
       buttons: 
-        add_section: 章節
-        edit_section_name: 編輯章節名稱
+        add_section: 班別
+        edit_section_name: 編輯班別名稱
         move_course: 移動課程
         update_course: 更新課程詳細資料
       course_conclude_at_warning_message: 本課程目前設置在午夜結束，這意味著前一天將是本課程啟動的最後一天。
@@ -5311,7 +5311,7 @@ zh-Hant:
         grade_publishing: 成績發佈
         move_course: 移動課程至另一個根帳戶
         navigation: 課程導覽
-        sections: 課程章節
+        sections: 課程班別
       help: 
         edit_navigation: 拖放專案，以便在課程瀏覽中將其重新排序。
       images: 
@@ -5342,7 +5342,7 @@ zh-Hant:
         course_lock_all_announcements: 停用關於通告的評論
         course_name: 名稱
         course_offline_export: 離線課程
-        course_section_name: 添加新章節
+        course_section_name: 添加新班別
         course_status_published: 課程已發佈
         course_status_unpublished: 課程未發佈
         course_visibility: 可見性
@@ -5378,9 +5378,9 @@ zh-Hant:
         more_options: 更多選項
         move_course: 移動至另一個帳戶
         title: 
-          cant_delete: 您不能刪除有使用者註冊的章節
-          delete_section: 刪除章節
-          edit_section: 編輯章節
+          cant_delete: 您不能刪除有使用者註冊的班別
+          delete_section: 刪除班別
+          edit_section: 編輯班別
       megabytes: MB
       move_module: 
         place: 放置
@@ -5406,7 +5406,7 @@ zh-Hant:
         feature_options: 功能選項
         grade_publishing: 成績發佈
         navigation: 瀏覽
-        sections: 章節
+        sections: 班別
         tools: 應用程式
       titles: 
         edit_navigation: 編輯課程瀏覽
@@ -5539,8 +5539,8 @@ zh-Hant:
         date: 日期
         details: 詳細資料
       syllabus: 
-        hide_specific_dates: 隱藏章節、群組和個人具體日期
-        show_specific_dates: 顯示章節、群組和個人具體日期
+        hide_specific_dates: 隱藏班別、群組和個人具體日期
+        show_specific_dates: 顯示班別、群組和個人具體日期
     titles: 
       rss_feed: "%{course} 摘要"
     to_do_list: 
@@ -5960,7 +5960,7 @@ zh-Hant:
   delete_quiz_142b8099: 刪除測驗
   delete_requirement_bce2d943: 刪除要求
   delete_rubric_9b66412d: 刪除評估量表
-  delete_section_name_a48d9d79: "刪除章節 \"%{name}”"
+  delete_section_name_a48d9d79: "刪除班別 \"%{name}”"
   delete_selected_a023ccf8: 刪除所選項
   delete_survey_56fddbbd: 刪除調查
   delete_term_name_f707abc9: "刪除學期%{name}"
@@ -5972,7 +5972,7 @@ zh-Hant:
   delete_this_key_70f74aa1: 刪除此鍵
   delete_this_page_509f2baf: 刪除此頁面
   delete_this_question_8f955ceb: 刪除此問題
-  delete_this_section_380338: 刪除此分班
+  delete_this_section_380338: 刪除此班別
   delete_this_theme_46d95edc: 確定要刪除該主題？
   delete_this_token_f5962a4f: 刪除此令牌
   delete_time_range_e14461a0: 刪除時間範圍
@@ -6187,7 +6187,7 @@ zh-Hant:
     discussion_list: 
       no_pinned_discussions: 您目前沒有釘選的討論
       pinned_instructions: "如希望釘選到頁面頂部的討論，拖放討論至此處，或著從討論設置功能表中選擇 Pin（釘選）。"
-      there_are_no_discussions_show: 在本章節中沒有要顯示的討論。
+      there_are_no_discussions_show: 在本部分中沒有要顯示的討論。
     discussions_settings_view: 
       allow_student_discussion_editing: 編輯和刪除他們自己的帖子
       allow_student_topics: 創建討論主題
@@ -6440,7 +6440,7 @@ zh-Hant:
     subscribed: 已訂閱
     subscribed_hint: 您已訂閱了此主題。按一下以取消訂閱。
     this_student: 該學生
-    toggle_message: 切換章節可見性
+    toggle_message: 切換部分可見性
     uknown_author: 未知作者
     unknown: 未知
     unknown_author: 未知作者
@@ -6493,7 +6493,7 @@ zh-Hant:
   downloading_course_content_allows_access_to_conten_164d9336: 下載課程内容可以允許離綫瀏覽課程内容。内容包括文檔、頁面、任務、討論話題或測試。按一下『生成ePub』按鈕，生成個課程文檔，並用任何電子書軟件瀏覽。
   draft_comment_b2376ea4: 草擬評論
   drag_and_drop_your_image_here_or_7fba7c14: 將您的影像拖放到這裡或者
-  drag_to_rearrange_sections_637efee3: 拖放以重新排列章節
+  drag_to_rearrange_sections_637efee3: 拖放以重新排列部分
   drag_up_or_down_to_reorder_382126ff: 向上或向下拖曳以重新排序
   drop_image_62a2a071: 拖放影像
   dropdown_option_1_e6ff2fc: "下拉選項 1"
@@ -6516,7 +6516,7 @@ zh-Hant:
   due_date_cannot_be_after_section_end_b0f54388: 截止日期不得晚於章節結束日期
   due_date_cannot_be_after_term_end_5d504cb1: 截止日期不得晚於學期結束日期
   due_date_cannot_be_before_course_start_ecc523ba: 截止日期不得晚於結課日期
-  due_date_cannot_be_before_section_start_f8950484: 截止日期不得早於章節開始日期
+  due_date_cannot_be_before_section_start_f8950484: 截止日期不得早於班別開始日期
   due_date_cannot_be_before_term_start_ea660b2c: 截止日期不得早於學期開始日期
   due_date_cannot_be_before_unlock_date_f263aab0: 截止日期不能早於解鎖日期
   due_date_cannot_fall_in_a_closed_grading_period_e4336124: 到期日不可設於封閉評分期內
@@ -6615,7 +6615,7 @@ zh-Hant:
     titles: 
       criterion_long_description: 標準完整描述
       find_existing_rubric: 尋找現有題目
-  edit_section_name_558cc89: "編輯章節 \"%{name}”"
+  edit_section_name_558cc89: "編輯班別 \"%{name}”"
   edit_survey_b0d6890d: 編輯調查
   edit_term_name_29a8a322: "編輯學期%{name}"
   edit_text_27d8aa3d: "編輯%{text}"
