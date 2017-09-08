@@ -23,6 +23,7 @@ import {send} from 'jsx/shared/rce/RceCommandShim'
 import '../../jquery.instructure_misc_helpers'
 import 'jqueryui/dialog'
 import '../../jquery.instructure_misc_plugins'
+import YouTubeApi from './youtube_api'
 
 
   // TODO: Allow disabling of inline media as well.  Right now
@@ -337,9 +338,14 @@ import '../../jquery.instructure_misc_plugins'
       updateLinks.counter = (updateLinks.counter + 1) % 5;
     } else {
       $(ed.getBody()).find("a").each(function() {
-        var $link = $(this);
+        const yt_api = new YouTubeApi()
+        const $link = $(this);
         if ($link.attr('href') && !$link.hasClass('inline_disabled') && $link.attr('href').match(INST.youTubeRegEx)) {
+          const yttFailCnt = +$link.attr('data-ytt-failcnt') || 0
           $link.addClass('youtube_link_to_box');
+          if ($link.text() === $link.attr('href') && yttFailCnt < 1) {
+            yt_api.titleYouTubeText($link)
+          }
         }
       });
     }
