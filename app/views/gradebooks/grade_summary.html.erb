@@ -80,6 +80,10 @@
 <% }) %>
 </h2>
 
+<% @presenter.selectable_courses.each do |course| %>
+  <%= course.gradebook_text.html_safe %>
+<% end %>
+
 <div class="dropdowns">
   <% if @presenter.has_courses_with_grades? %>
     <div id="course-selector-dropdown" style="margin-left: 10px; float: left;" class="course_selector">

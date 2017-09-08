@@ -872,6 +872,7 @@ class BzController < ApplicationController
     raise "Unauthorized" if !authorized_action(@course, @current_user, :update)
 
     @course.intro_title = params[:course_intro_title]
+    @course.gradebook_text = params[:course_gradebook_text]
     @course.intro_text = params[:course_intro_text]
     @course.save
 
