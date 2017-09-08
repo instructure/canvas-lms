@@ -93,7 +93,7 @@ class Progress < ActiveRecord::Base
       @progress.start
       super
       @progress.reload
-      @progress.complete
+      @progress.complete if @progress.running?
     end
 
     def on_permanent_failure(error)

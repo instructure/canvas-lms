@@ -53,7 +53,6 @@ describe GradebookImporter do
         to raise_error(ArgumentError, "Must provide attachment.")
     end
 
-
     it "handles points possible being sorted in weird places" do
       importer_with_rows(
         'Student,ID,Section,Assignment 1,Final Score',
@@ -152,12 +151,12 @@ describe GradebookImporter do
       uploaded_csv = CSV.generate do |csv|
         csv << ["Student", "ID", "SIS User ID", "SIS Login ID", "Section", "Assignment 1"]
         csv << ["    Points Possible", "", "","", ""]
-        csv << [@u1.name , "", "", "", "", 99]
-        csv << ["" , "", @u2.pseudonym.sis_user_id, "", "", 99]
-        csv << ["" , "", "", @u3.pseudonym.unique_id, "", 99]
+        csv << [@u1.name, "", "", "", "", 99]
+        csv << ["", "", @u2.pseudonym.sis_user_id, "", "", 99]
+        csv << ["", "", "", @u3.pseudonym.unique_id, "", 99]
         csv << ["", "", "", 'inactive_login', "", 99]
         csv << ["", "", "", 'active_login', "", 99]
-        csv << ["" , "", "bogusSISid", "", "", 99]
+        csv << ["", "", "bogusSISid", "", "", 99]
       end
 
       importer_with_rows(uploaded_csv)
@@ -199,7 +198,7 @@ describe GradebookImporter do
       uploaded_csv = CSV.generate do |csv|
         csv << ["Student", "ID", "SIS User ID", "SIS Login ID", "Root Account", "Section", "Assignment 1"]
         csv << ["    Points Possible", "", "","", "", ""]
-        csv << ["" , "",  @u1.pseudonym.sis_user_id, "", "account2", "", 99]
+        csv << ["", "", @u1.pseudonym.sis_user_id, "", "account2", "", 99]
       end
 
       importer_with_rows(uploaded_csv)
@@ -229,8 +228,8 @@ describe GradebookImporter do
       uploaded_csv = CSV.generate do |csv|
         csv << ["Student", "ID", "SIS User ID", "SIS Login ID", "Section", "Assignment 1"]
         csv << ["    Points Possible", "", "","", ""]
-        csv << ["" , "", "0123456", "", "", 99]
-        csv << ["" , "", "", "0231163", "", 99]
+        csv << ["", "", "0123456", "", "", 99]
+        csv << ["", "", "", "0231163", "", 99]
       end
 
       importer_with_rows(uploaded_csv)
@@ -241,6 +240,18 @@ describe GradebookImporter do
 
       expect(hash[:students][1][:id]).to eq @u1.id
       expect(hash[:students][1][:previous_id]).to eq @u1.id
+    end
+
+    it "fails and updates progress if invalid header row" do
+      uploaded_csv = CSV.generate do |csv|
+        csv << ["", "", "0123456", "", "", 99]
+        csv << ["", "", "", "0231163", "", 99]
+      end
+
+      importer_with_rows(uploaded_csv)
+      @progress.reload
+      expect(@progress).to be_failed
+      expect(@progress.message).to eq 'Invalid header row'
     end
   end
 

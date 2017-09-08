@@ -40,6 +40,8 @@ class GradebookImporter
     end
   end
 
+  class InvalidHeaderRow < StandardError; end
+
   attr_reader :context, :contents, :attachment, :assignments, :students,
               :submissions, :missing_assignments, :missing_students, :upload
 
@@ -95,12 +97,19 @@ class GradebookImporter
       prevented_grading_ungradeable_submission: false
     }
 
-    csv_stream do |row|
-      already_processed = check_for_non_student_row(row)
-      unless already_processed
-        @students << process_student(row)
-        process_submissions(row, @students.last)
+    begin
+      csv_stream do |row|
+        already_processed = check_for_non_student_row(row)
+        unless already_processed
+          @students << process_student(row)
+          process_submissions(row, @students.last)
+        end
       end
+    rescue InvalidHeaderRow
+      @progress.message = "Invalid header row"
+      @progress.workflow_state = "failed"
+      @progress.save
+      return
     end
 
     @missing_assignments = []
@@ -248,7 +257,7 @@ class GradebookImporter
   end
 
   def process_header(row)
-    raise "Couldn't find header row" unless header?(row)
+    raise InvalidHeaderRow unless header?(row)
 
     row = strip_non_assignment_columns(row)
     parse_assignments(row) # requires non-assignment columns to be stripped
