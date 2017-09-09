@@ -21,15 +21,17 @@
 .peer_review {
   padding: 2px 5px;
 }
-.peer_review.submission-hover {
+.peer_review.submission-hover, .peer_review.focusWithin {
   background-color: $ic-color-medium-light;
   -moz-border-radius: 3px;
 }
-.peer_review .review_links {
-  display: none;
+.peer_review .review_links i {
+  visibility: hidden;
 }
-.peer_review.submission-hover .review_links {
-  display: inline;
+.peer_review.submission-hover .review_links i,
+.peer_review.focusWithin .review_links i,
+.peer_review .review_links i:focus {
+  visibility: visible;
 }
 .student_reviews .person_gray {
   padding-left: 20px;
@@ -44,5 +46,6 @@
 a.icon-add.assign_peer_review_link,
 a.remind_peer_review_link,
 a.delete_review_link {
+  text-decoration: none;
   color: $ic-color-medium-darker;
 }
