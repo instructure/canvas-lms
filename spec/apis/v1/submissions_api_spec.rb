@@ -152,6 +152,24 @@ describe 'Submissions API', type: :request do
       end
     end
 
+    context 'empty enrollment_state' do
+      include_examples 'enrollment_state'
+      before do
+        @enrollment_state = ''
+        @active_count = 1
+        @concluded_count = 1
+      end
+    end
+
+    it 'should raise on invalid enrollment_state' do
+      json = api_call(:get,
+                      '/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions',
+                      {controller: 'submissions_api', action: 'for_students',
+                       format: 'json', section_id: 'sis_section_id:my-section-sis-id'},
+                      {enrollment_state: 'invalid', student_ids: [@student1.id]}, {}, expected_status: 400)
+      expect(json['error']).to eq 'invalid enrollment_state'
+    end
+
     it 'returns submissions based on assignments.post_to_sis' do
       json = api_call(:get,
         "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
