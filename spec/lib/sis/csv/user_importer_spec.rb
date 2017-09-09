@@ -291,6 +291,19 @@ describe SIS::CSV::UserImporter do
     expect(user2.pseudonym.integration_id).to be_nil
   end
 
+  it "should not set integration_id to nil when it is not passed" do
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status,integration_id",
+      "user_2,user2,User,Dos,user@example.com,active,9000"
+    )
+    process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_2,user2,User,Dos,user@example.com,active"
+    )
+    user2 = Pseudonym.by_unique_id('user2').first.user
+    expect(user2.pseudonym.integration_id).to eq "9000"
+  end
+
   it "should allow setting and resetting of passwords" do
     expect(CommunicationChannel.by_path("user1@example.com").first).to be_nil
     expect(CommunicationChannel.by_path("user2@example.com").first).to be_nil
