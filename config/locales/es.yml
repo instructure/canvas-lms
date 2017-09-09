@@ -112,7 +112,7 @@ es:
     root_account_cant_have_sis_id: "IDs del SIS no pueden establecerse en cuentas de nivel superior"
     sis_id_in_use: "SIS ID \"%{sis_id}\" ya está en uso"
     tab_admin_tools: "Herramientas de administración"
-    tab_authentication: Autentificación
+    tab_authentication: Autenticación
     tab_brand_configs: Temas
     tab_courses: Cursos
     tab_developer_keys: "Claves del desarrollador"
@@ -142,7 +142,7 @@ es:
     test_connection_timeout: "Expiró mientras se conectaba"
     test_host_unknown: "Host desconocido: %{host}"
     test_login_auth_exception: "Excepción en el ingreso: %{error}"
-    test_login_auth_failed: "Falló la autentificación"
+    test_login_auth_failed: "Falló la autenticación"
     test_search_failed: "La búsqueda falló con el siguiente error: %{error}"
   account_authorization_config/saml: 
     debug: 
@@ -153,14 +153,14 @@ es:
     account_required: "debe ser autenticado por LDAP"
     index: 
       delete_auth_confirmation: "¿Está seguro? Los usuarios pueden no ser capaces de ingresar si esto se elimina."
-      delete_auth_link: "Eliminar autentificación"
-      ip_address_list_description: "Si está usando un servicio de autentificación que requiere que los servidores de Canvas contacten a sus servidores directamente, como LDAP, necesitará asegurarse que sus servidores pueden aceptar conexiones de estas direcciones IP:"
+      delete_auth_link: "Eliminar autenticación"
+      ip_address_list_description: "Si está usando un servicio de autenticación que requiere que los servidores de Canvas contacten a sus servidores directamente, como LDAP, necesitará asegurarse que sus servidores pueden aceptar conexiones de estas direcciones IP:"
       no_auth_type_description: "Esta cuenta actualmente no se integra con un proveedor de identidad."
-      page_title: "Configuraciones de autentificación"
+      page_title: "Configuraciones de autenticación"
       profile_page_link_example: "Por ejemplo, aquí está la página de su perfil: [%{friendlyname}](%{url})"
       settings_description: "Para que un usuario se pueda autentificar a través de un proveedor externo de identidad (IdP), el usuario debe tener un identificador de ingreso que está unido a esta cuenta y que coincide con el identificador único provisto por el IdP. Para ver los ingresos actuales del usuario, vea la sección “Información de ingreso” en la página del perfil del usuario. (Encontrado haciendo una búsqueda del usuario en la pestaña de “Usuarios”.)"
-      settings_title: "Configuraciones de autentificación"
-      test_ldap_link: "Probrar la autentificación LDAP"
+      settings_title: "Configuraciones de autenticación"
+      test_ldap_link: "Probrar la autenticación LDAP"
     ldap_fields: 
       auth_filter_description: "Usar *%{placeholder}* como un marcador para el nombre de usuario proporcionado por el usuario. Por ejemplo: *(sAMAccountName=%{placeholder})*"
       identifer_format_description: "El atributo LDAP para buscar el inicio de sesión en Canvas. Dejar en blanco para usar el nombre de usuario proporcionado por el usuario."
@@ -209,8 +209,8 @@ es:
       start_debugging: "Comenzar la limpieza"
       stop_debugging: "Detener la limpieza"
     saml_testing: 
-      auth_request_to_idp: "Solicitud de autentificación enviada a IdP"
-      auth_response_from_idp: "Respuesta de autentificación de IdP"
+      auth_request_to_idp: "Solicitud de autenticación enviada a IdP"
+      auth_response_from_idp: "Respuesta de autenticación de IdP"
       labels: 
         canvas_login_fail_message: "Mensaje de fallo de inicio de sesión en Canvas"
         fingerprint_from_idp: "Huella digital certificada de IdP"
@@ -244,6 +244,7 @@ es:
   account_course_and_user_search_22bf297a: "Búsqueda del curso y usuario de la cuenta"
   account_domain_78f43049: "Dominio de la cuenta"
   account_id_2c3b4f15: "ID de la cuenta"
+  account_id_73966078: account_id
   account_id_f6e26867: "ID de cuenta"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "nombre de la cuenta"
@@ -1042,7 +1043,7 @@ es:
         locked_for_sub_accounts: "Bloquear esta configuración para subcuentas"
         login_handle_name: "Etiqueta de inicio de sesión"
         message: Mensaje
-        mfa_settings: "Autentificación de múltiples factores"
+        mfa_settings: "Autenticación de múltiples factores"
         name: "Nombre de la cuenta"
         new_sub_account_includes: "Dejar que las subcuentas utilicen el Editor de temas para personalizar su propia marca"
         no_enrollments_can_create_courses: "Usuarios sin inscripciones"
@@ -1407,6 +1408,7 @@ es:
   act_as_name_16d15bfa: "Actuar en nombre de %{name}"
   act_as_user_d7ef0e48: "Actuar en nombre de Usuario"
   act_as_user_name_5581cdbb: "Actuar en nombre de %{user_name}"
+  act_as_users_de7ee378: "Actuar en nombre de usuarios"
   actions_efcde10d: Acciones
   actions_for_course_312ff446: "Acciones para %{course}"
   actions_taken_6fb20fd0: "Acciones tomadas"
@@ -1515,8 +1517,10 @@ es:
   addressbook_performance_tap_98ddf67: "AddressBook rendimiento optimizado"
   adjust_final_grade_fa45e7e0: "Ajustar nota final"
   admin_4d3ba42f: Administrador
+  admin_csv_f8d1b3eb: "Administrar CSV"
   admin_navigation_menu_77b801a2: "Menú de navegación de administrador"
   admins_3e1dce15: Administradores
+  after_4c71e718: Después
   after_date_981cd41b: "Después del %{date}"
   after_last_attempt_c9168da2: "Después del último intento"
   ajax_errors: 
@@ -1589,6 +1593,7 @@ es:
   all_items_a49b66c7: "Todos los elementos"
   all_modules_20c9a1c8: "Todos los módulos"
   all_my_files_a0213441: "Todos mis archivos"
+  all_roles_f3bba14d: "Todas las funciones"
   all_sections_daf11554: "Todas las secciones"
   all_start_dates_must_be_before_the_end_date_d949eca9: "Todas las fechas de comienzo deben ser antes de la fecha de término"
   all_students_have_taken_the_quiz_b558f8b4: "Todos los alumnos han realizado el cuestionario"
@@ -1747,6 +1752,7 @@ es:
   anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "La calificación anónima obliga a que los nombres de los alumnos se oculten en SpeedGrader™"
   anonymous_user: "Usuario anónimo"
   anonymous_user_d984b9ce: "Usuario anónimo"
+  anonymously_graded_59149570: "Calificado anónimamente"
   another_assignment_name_369f8481: "Otro nombre de tarea"
   another_configuration_is_currently_selected_select_95b394e: "Otra configuración está seleccionada en este momento. El seleccionar esta configuración anulará la selección de la otra."
   answer_address_book_queries_through_76842372: "Contestar las consultas de la libreta de direcciones a través de"
@@ -2665,7 +2671,7 @@ es:
     corrupted: "Información no disponible"
     login: "INICIAR SESIÓN"
     logout: "CERRAR SESIÓN"
-  authentication_with_provider_was_successful_but_no_6a194137: "La autentificación con %{provider} fue existosa, pero no se proporcionó ningún ID único para iniciar sesión en la Canvas."
+  authentication_with_provider_was_successful_but_no_6a194137: "La autenticación con %{provider} fue existosa, pero no se proporcionó ningún ID único para iniciar sesión en la Canvas."
   author_s_name_b35e905a: "Nombre del autor"
   authorize_e3f25bb4: Autorizar
   auto_leader_7791c30a: auto_leader
@@ -2713,6 +2719,7 @@ es:
   bb_file_description: "Archivo .zip de exportación de Blackboard 6/7/8/9"
   bb_name: "Blackboard Converter"
   be_a_hero_and_ask_your_instructor_to_fix_this_link_4981930c: "Sea un héroe y pida a su instructor que arregle este enlace."
+  before_44c686b4: Antes
   before_implementing_custom_css_or_javascript_pleas_128da8cd: "Antes de implementarse CSS o Javascript personalizados, por favor refiérase a * nuestra documentación*."
   before_implementing_custom_css_or_javascript_pleas_65423572: "Antes de implementar CSS o Javascript personalizados, por favor refiérase a *nuestra documentación*."
   before_publishing_this_file_you_must_specify_usage_2229d20b: "Antes de publicar este archivo debe especificar los derechos de uso."
@@ -3223,6 +3230,7 @@ es:
     see_file: "Ver %{file_name}"
     see_quiz: "Ver %{quiz_name}"
     see_related_link: "Ver el enlace relacionado"
+  calendar_event_89aadc1c: "Evento del calendario"
   calendar_events: 
     crumbs: 
       new: "Nuevo evento del calendario"
@@ -3289,7 +3297,7 @@ es:
   can_create_rename_and_edit_course_pages_by_default_f9ad4253: "puede crear, cambiar el nombre y editar las páginas del curso por defecto"
   can_edit_this_page_role_selection_6ccec3c7: "Puede editar la selección de rol de esta página"
   can_interact_with_users_in_their_section_only_48cb8c43: "Puede interactuar con usuarios solamente en su sección"
-  can_t_compute_score_until_an_assignment_has_points_f34dd600: "No se puede calcular la puntuación hasta que una tarea tenga puntos asociados"
+  can_t_compute_score_until_an_assignment_has_points_f34dd600: "No se puede calcular el puntaje hasta que una tarea tenga puntos asociados"
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "No se pueden eliminar las asignaciones basadas en asociaciones de rúbricas. Para eliminar estas asociaciones debe eliminar la fila en la rúbrica de la tarea."
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "No se puede realizar diferenciación con más de un archivo del mismo tipo"
   can_t_unpublish_if_there_are_student_submissions_2d7cd742: "No se puede cancelar la publicación si hay presentaciones de alumnos"
@@ -3341,6 +3349,7 @@ es:
         login_expiration_minimum: "El vencimiento de la sesión debe producirse a los 20 minutos o más"
         need_integer: "Introduzca números enteros para la memoria de la lista de reproducción"
         stream_name_required: "El nombre del flujo de kinesis es requerido."
+  canvas_account_id_97b0471f: canvas_account_id
   canvas_alert_change_assignment_name_course_name_2fc63d9c: "Alerta de Canvas-Cambiar: %{assignment_name}, %{course_name}"
   canvas_alert_invited_course_as_role_type_9ed79ce3: "Alerta de Canvas-Invitado: %{course} como %{role_type}"
   canvas_alert_invited_course_as_role_type_ea825937: "Alerta de Canvas-Invitado: curso como %{role_type}"
@@ -3359,7 +3368,7 @@ es:
   canvas_error_report_ff678539: "Informe de error de Canvas"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_introduction_video_2d81f3ad: "Video de introducción de Canvas"
-  canvas_multi_factor_authentication_backup_codes_4bd08f93: "Códigos de respaldo de autentificación de múltiples factores de Canvas"
+  canvas_multi_factor_authentication_backup_codes_4bd08f93: "Códigos de respaldo de autenticación de múltiples factores de Canvas"
   canvas_observer_id_59db0918: canvas_observer_id
   canvas_parent_description: "Este ajuste controla si los padres pueden conectarse con los estudiantes en su institución utilizando la aplicación móvil de Canvas para padres "
   canvas_parent_improved_description: "Esta configuración controla si los padres que crean sus propias cuentas en Canvas Parent pueden conectarse con los alumnos de la institución a través de la aplicación móvil Canvas Parent. Nota: Los padres registrados como observadores de Canvas pueden usar la aplicación móvil Canvas Parent inclusive cuando este indicador de funciones esté desactivado."
@@ -3367,6 +3376,7 @@ es:
   canvas_student_id_c74f57bf: canvas_student_id
   canvas_ticketing_email_connector_27e253ae: "Conector de correo electrónico de emisión de boletos de Canvas"
   canvas_ticketing_web_post_connector_11158897: "Conector de publicación de la red de emisión de boletos de Canvas"
+  canvas_user_id_4c18b78a: canvas_user_id
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas volverá a calificar todos sus envíos una vez que haya guardado la evaluación. Este proceso puede tardar algunos minutos."
   card_movement_menu_for_title_b94c09af: "Menú de movimiento de tarjeta para %{title}"
   card_view_eaf73185: "Vista de tarjeta"
@@ -3422,7 +3432,7 @@ es:
   choose_a_course_home_page_8059c7b: "Escoja una página de inicio del curso"
   choose_a_csv_file_to_upload_9644480c: "Escoger un archivo CSV para cargarlo:"
   choose_a_timezone_d9c52998: "Elegir una zona horaria"
-  choose_an_authentication_service_47dc8875: "Escoger un servicio de autentificación"
+  choose_an_authentication_service_47dc8875: "Escoger un servicio de autenticación"
   choose_and_publish_980812cb: "Elegir y publicar"
   choose_assignment_b0132c5e: "-- Escoger tarea --"
   choose_assignment_group_9e7de13c: "Elegir grupo de tarea"
@@ -3828,6 +3838,7 @@ es:
   content_1440204b: Contenido
   content_changed_exceptions_e8bff81e: "Excepciones de modificación en el contenido:"
   content_choice_51f4ca0f: "Elección de contenidos"
+  content_export_files_cannot_be_downloaded_after_da_2872b0e4: "Los archivos de exportación de contenido no pueden descargarse después de %{days} días."
   content_exports: 
     buttons: 
       process: "Procesar Información"
@@ -3868,6 +3879,7 @@ es:
   content_for_section_1_7ecfb319: "Contenido para Sección 1"
   content_for_section_2_e7c6e2a3: "Contenido para Sección 2"
   content_for_section_3_90c1d235: "Contenido para Sección 3"
+  content_import_files_cannot_be_downloaded_after_en_7e3a2099: "Los archivos de importación de contenido no pueden descargarse después de %{ENV.CONTENT_MIGRATIONS_EXPIRE_DA} días."
   content_imports: 
     errors: 
       import_failed: "Se ha producido un error durante la importación.  Informe al administrador de su sistema y facilítele el siguiente código: \"%{code}\""
@@ -4817,6 +4829,7 @@ es:
   course_discussions_38c0b74f: "Foros del curso"
   course_ends_at_e8b166df: "El curso termina el"
   course_export_from_date_expired_ebb0fe15: "Exportación del curso desde %{date} (caducado)"
+  course_export_from_date_file_not_available_8a775e53: "Exportación del curso desde %{date} (archivo no disponible)"
   course_export_from_date_not_available_f576ba24: "Exportación del curso desde %{date} (no disponible)"
   course_exports: 
     errors: 
@@ -5858,6 +5871,7 @@ es:
       - octubre
       - noviembre
       - diciembre
+  date_at_time_25a04cd2: "%{date} en %{time}"
   date_created_87e265bc: "Fecha creada"
   date_ee500367: Fecha
   date_error_7b38f8ff: "Error en la fecha"
@@ -5871,6 +5885,7 @@ es:
     prevText: Previo
   dates: 
     no_date: "Sin fecha"
+  dates_6e416047: Fechas
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -5926,6 +5941,7 @@ es:
   deep_orange_4c7eea99: "Naranjo oscuro"
   deep_purple_bb3e2907: "Morado oscuro"
   default_conference_title: "Conferencia de %{course_name}"
+  default_email_5cb9fa04: "Correo electrónico predeterminado:"
   default_email_9efb7fbd: "Correo electrónico predeterminado"
   default_grade_cannot_be_set_to_ex_723caa59: "La calificación predeterminada no puede establecerse a \n\
       %{ex} "
@@ -6090,6 +6106,7 @@ es:
     redirect_uris: "Redireccionar URIs:"
     save_key: "Guardar la clave"
     tool_id: "ID de la herramienta:"
+    vendor_code: "Código de vendedor (LTI 2):"
   developer_keys: 
     button: 
       saving: "Guardando la clave..."
@@ -6453,11 +6470,13 @@ es:
   discussions_a5f96392: Foros
   discussions_tutorial_tray_4ef79bcc: "Bandeja de tutoriales: foros"
   dismiss_dacdb625: Descartar
+  dismiss_this_5c74dddc: "Descartar esto"
   display_all_text_links_in_canvas_as_underlined_tex_e698e714: "Mostrar todos los enlaces de texto en lCanvas *como texto subrayado*."
   display_as_e2a5c383: "Mostrar como"
   display_as_percentage_3e755dc: "Mostrar como porcentaje"
   display_as_points_63084235: "Mostrar como puntos"
   display_course_catalog: "Muestra una lista de cursos en la que se puede buscar para esta cuenta principal con el marcador \"Incluya este curso en el índice de cursos públicos\" habilitado."
+  display_name_6c2cfc58: "Mostrar nombre:"
   display_name_b80c243e: "Mostrar nombre"
   display_total_grades_when_the_all_grading_periods__1d2b5cf: "Muestra las calificaciones totales cuando se selecciona la opción desplegable de \"Todos los períodos de calificación\" (debe estar habilitada la opción Múltiples períodos de calificación)."
   display_total_grades_when_the_all_grading_periods__4e6add83: "Muestra las calificaciones totales cuando se selecciona la opción desplegable de \"Todos los períodos de calificación\" (deben existir períodos de calificación)."
@@ -6798,6 +6817,7 @@ es:
   enter_your_question_specifying_where_each_dropdown_b428a9ff: "Ingrese su pregunta, especificando donde debe ir cada lista desplegable. Luego defina las posibles respuestas para cada lista desplegable."
   enter_your_question_text_4729b886: "Ingrese su texto de la pregunta."
   enter_your_question_text_students_will_see_the_que_f19af9e9: "Ingrese el texto de la pregunta. Los alumnos verán la pregunta seguida por un recuadro de texto para escribir su respuesta."
+  entity_entity_id_not_found_in_federation_name_meta_e622124: "La entidad %{entity_id} no fue encontrada en los metadatos de %{federation_name}"
   entity_entity_id_not_found_in_incommon_metadata_2efb5131: "La entidad %{entity_id} no fue encontrada en InCommon Metadata"
   eportfolio: 
     buttons: 
@@ -7383,7 +7403,7 @@ es:
     student_groups: "Nueva página de grupos de alumnos"
     student_outcome_gradebook: "Libro de calificaciones de dominio del aprendizaje del alumno"
   federated_attributes_5cbe6441: "Atributos unificados"
-  federated_attributes_are_information_sent_from_you_2116fb61: "Los atributos unificados son información enviada desde su proveedor de autentificación que se puede utilizar para actualizar automáticamente la información correspondiente para los usuarios en Canvas cada vez que se conecten."
+  federated_attributes_are_information_sent_from_you_2116fb61: "Los atributos unificados son información enviada desde su proveedor de autenticación que se puede utilizar para actualizar automáticamente la información correspondiente para los usuarios en Canvas cada vez que se conecten."
   feed_url_is_required_253fda4e: "Se requiere la URL de la fuente"
   field_name_31fff38e: "Nombre del campo"
   file_a_ticket_for_a_personal_response_from_our_sup_1e1ffaff: "Presentar un ticket para obtener una respuesta personal de nuestro equipo de asistencia técnica."
@@ -7395,6 +7415,7 @@ es:
   file_list_updated_38e2a5ad: "Se ha actualizado la lista de archivos"
   file_menu_cc0ca54: "Menú de archivo"
   file_name_2fe68ec1: "Nombre del archivo"
+  file_not_available_1869c733: "archivo no disponible"
   file_not_found_9eec054c: "Archivo no encontrado"
   file_preview: 
     file_preview_headerbutton_close: Cerrar
@@ -7509,6 +7530,7 @@ es:
   filters_92f2776f: Filtros
   final_grade_4d7f6545: "Calificación final"
   final_grade_6938dca8: "Calificación final:"
+  final_grade_6e94d99e: "Calificación final:"
   final_grade_finalgrade_138d9e07: "Calificación final: %{finalGrade}"
   final_grade_finalgrade_408580bb: "Calificación final: *%{finalGrade}*"
   final_grade_info_2aa35d25: "Información de la calificación final"
@@ -7584,6 +7606,7 @@ es:
   from_fdd4956d: Desde
   from_from_to_to_e31f6422: "De %{from} a %{to}"
   front_page_must_be_set_first_4dbbfdbe: "La página de información se debe colocar en primer lugar"
+  full_name_14c958f7: "Nombre completo:"
   full_name_23fdfb6d: "Nombre completo"
   full_name_83cf5453: "Nombre completo"
   full_name_is_required_8efbdc84: "El nombre completo es obligatorio"
@@ -8961,7 +8984,7 @@ es:
     quiz_submission: "Presentación de evaluaciones"
     text_entry_submission: "Presentación de entrada de texto"
   id_ac7afadf: ID
-  id_already_in_use_for_this_account_and_authenticat_dc3a7d65: "El ID ya está en uso para este proveedor de cuenta y autentificación"
+  id_already_in_use_for_this_account_and_authenticat_dc3a7d65: "El ID ya está en uso para este proveedor de cuenta y autenticación"
   id_id_4e148481: "ID: %{id}"
   idp_entity_id_25c51837: "ID de entidad IdP"
   idp_metadata_uri_dae5314a: "URl de metadatos  IdP"
@@ -9183,6 +9206,7 @@ es:
       view_in_new_window: "Ver en una ventana nueva"
     tooltips: 
       enter_search_terms: "ingresar los términos de búsqueda"
+  integration_id_a6977535: "ID de integración:"
   integration_id_int_id_is_already_in_use_f30f03b5: "El ID de la integración \"%{int_id}\" ya está en uso"
   interactions_report_47c1219e: "Informe de interacciones"
   international_sms_9edb9868: "SMS internacional"
@@ -9334,6 +9358,7 @@ es:
   late_2be42b88: Atrasado
   late_8bd684b6: tarde
   late_bd436902: TARDE
+  late_penalty_78099d18: "Sanción por presentación tardía:"
   late_penalty_817fff4e: "Sanción por presentación tardía:"
   late_penalty_9c312b22: "Sanción por presentación tardía"
   late_penalty_pointsdeducted_7033a095: "Sanción por presentación tardía: %{pointsDeducted}"
@@ -9658,13 +9683,13 @@ es:
           verify: Verificar
         details: 
           mfa_enrollment: |-
-              La autentificación de múltiples factores aumenta la seguridad al solicitarle que tenga algo en su posesión física,
+              La autenticación de múltiples factores aumenta la seguridad al solicitarle que tenga algo en su posesión física,
               además de conocer su contraseña, para iniciar sesión en Canvas. Puede ser un dispositivo que genere
               códigos de verificación o un teléfono que reciba mensajes de texto. La aplicación Google Authenticator para [iPhone](%{iphone_url}) o
               [Android](%{android_url}) puede configurarse al escanear el Código QR a continuación. Otros autentificadores pueden configurarse al ingresar la
-              clave secreta **%{secret_key}**. Una vez que ha configurado la autentificación de múltiples factores, se recomienda que ingrese a su
+              clave secreta **%{secret_key}**. Una vez que ha configurado la autenticación de múltiples factores, se recomienda que ingrese a su
               página del perfil e imprima un conjunto de códigos de respaldo, en caso de que su dispositivo habitual de múltiples factores no esté disponible.
-          mfa_required: "Es obligatorio configurar una autentificación de múltiples factores"
+          mfa_required: "Es obligatorio configurar una autenticación de múltiples factores"
           otp_on_device: "Introduzca el código de verificación que aparece en su autentificador"
           otp_sent_to_phone: "Se ha enviado un código de verificación a su teléfono. Ingréselo a continuación."
           send_to_sms: "Enviar mensajes de texto a %{phone_number}"
@@ -9675,11 +9700,11 @@ es:
           verification_code: "Código de verificación"
         links: 
           choose_number: "Elegir un teléfono existente"
-        page_title: "Autentificación de múltiples factores"
+        page_title: "Autenticación de múltiples factores"
         select: 
           new_number: "un teléfono nuevo"
         titles: 
-          mfa: "Autentificación de múltiples factores"
+          mfa: "Autenticación de múltiples factores"
     saml: 
       debug: 
         logout_request_redirect_from_idp: "Petición de cierre de sesión recibida desde IdP"
@@ -9693,6 +9718,7 @@ es:
   login_footer_link_badb3898: "Enlace del pie de la página del inicio de sesión"
   login_footer_link_hover_1b474e6c: "Selector del enlace del pie de la página del inicio de sesión"
   login_id_12109693: "ID de inicio de sesión"
+  login_id_bc943b97: "ID de ingreso:"
   login_instructure_logo_8f2332db: "Logotipo de Instructure del inicio de sesión"
   login_is_invalid_must_be_alphanumeric_or_an_email__ae4499b3: "El ingreso es inválido: debe ser alfanumérico o una dirección de correo electrónico"
   login_is_too_long_25373f95: "El ingreso es demasiado largo"
@@ -11907,8 +11933,8 @@ es:
   move_to_the_beginning_636b342c: "Mover al comienzo"
   move_to_the_end_bc05abf6: "Mover al final"
   moving_a4d552df: Moviendo...
-  multi_factor_authentication_backup_codes_4d781044: "Códigos de respaldo de autentificación de múltiples factores"
-  multi_factor_authentication_configured_865b1bde: "Autentificación de múltiples factores configurada"
+  multi_factor_authentication_backup_codes_4d781044: "Códigos de respaldo de autenticación de múltiples factores"
+  multi_factor_authentication_configured_865b1bde: "Autenticación de múltiples factores configurada"
   multiple_ba5220cd: Múltiple
   multiple_canvas_accounts_are_associated_with_cleve_c1739660: "Múltiples cuentas de Canvas están asociadas con Clever District %{district_id}"
   multiple_due_dates_283dd861: "Múltiples fechas límites"
@@ -12118,6 +12144,7 @@ es:
   norway_47_bc598662: "Noruega (+47)"
   norway_c11471b3: Noruega
   not_a_number: "debe ser un número positivo"
+  not_anonymously_graded_87574f91: "No calificado anónimamente"
   not_available_487d3648: "No está disponible "
   not_available_during_sync_ae645e8c: "No disponible durante la sincronización"
   not_available_until_next_submission_2175158: "No está disponible hasta la próxima entrega"
@@ -12147,7 +12174,7 @@ es:
   note_that_email_may_not_always_be_populated_in_the_bb4a1572: "Tenga en cuenta que el correo electrónico no siempre se rellenará en el perfil del usuario de Microsoft. Oid no se rellenará para cuentas personales de Microsoft."
   note_that_some_attributes_may_not_be_populated_for_7c1f2854: "Tenga en cuenta que puede que algunos atributos no se rellenen para todos los usuarios en Clever."
   note_this_is_not_your_official_score_f2d4582f: "*NOTA*: Esta NO es su puntaje oficial."
-  note_this_login_s_account_uses_delegated_authentic_89227914: "Nota: La cuenta de este usuario utiliza autentificación delegada, pero permite una autentificación de contraseña de Canvas de reserva. Los campos de contraseña de este formulario actualizan la contraseña de Canvas de reserva, *no* la autentificación delegada."
+  note_this_login_s_account_uses_delegated_authentic_89227914: "Nota: La cuenta de este usuario utiliza autenticación delegada, pero permite una autenticación de contraseña de Canvas de reserva. Los campos de contraseña de este formulario actualizan la contraseña de Canvas de reserva, *no* la autenticación delegada."
   notes_c42e0fd5: Notas
   notes_d5339f17: "%{notes}"
   notes_for_name_2eefac11: "Notas para %{name}"
@@ -12453,6 +12480,7 @@ es:
   number_of_allowed_attempts_3d10b740: "Cantidad de intentos permitidos"
   number_of_respondents_e1e7e8b: "Número de respuestas"
   number_of_scores_to_ignore_for_each_student_fb94e818: "Número de puntajes ignorados para cada alumno"
+  numpoints_points_b1f0666a: "%{numPoints} puntos"
   o_224cf405: o
   oauth2_provider: 
     auth: 
@@ -12505,6 +12533,7 @@ es:
   on_time_17ca5ad9: "A tiempo"
   on_time_percent_eebffe38: "A tiempo: %{percent}"
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: "Una vez que esta característica esté habilitada, usted no podrá apagarla de nuevo. Asegúrese de estar listo para habilitar la Carpeta de presentaciones antes de proceder."
+  once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Una vez que ha presentado una respuesta, no podrá modificarla más tarde. No podrá ver la pregunta anterior."
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Una vez que haya cambiado la respuesta, deberá elegir una opción para poder actualizar la pregunta."
   one_per_line_format_name_value_79647700: "Uno por línea. Formato: nombre=valor"
   online_submission_type_file_uploads_24910d74: "Tipo de presentación en línea-Subida de archivos"
@@ -12942,6 +12971,7 @@ es:
       description: "Este complemento se integra con Crocodoc para ofrecer un previsualizador de documentos HTML5 que proporciona a los profesores y los alumnos la capacidad para anotar documentos."
       labels: 
         api_key: "Clave API de Crocodoc"
+        disable_polling: "Desactivar el sondeo para el estado del documento"
     custom_ticketing_email_settings: 
       labels: 
         email_address: "dirección de correo electrónico para enviar el informe de errores a (something@example.com)"
@@ -13084,6 +13114,9 @@ es:
       tag: Etiqueta
       version: Versión
       website: "Página web"
+    inst_fs: 
+      description: "Servicio de archivos que funciona como proxy para S3."
+      name: Inst-FS
     kaltura: 
       description: "Grabación y reproducción de video/audio en Kaltura"
       name: Kaltura
@@ -13158,12 +13191,12 @@ es:
         plugin_enabled: Activado
         use_lti_tool: "Utilice la herramienta LTI para gestionar la configuración de la prueba del explorador LockDown (necesario para el monitor)"
     mathman: 
-      description: "Un simple microService que convierte las fórmulas de LaTeX a MathML y SVG"
+      description: "Un simple microservicio que convierte las fórmulas de LaTeX a MathML y SVG"
       name: MathMan
     med_cornell_export: 
       labels: 
-        password: "Contraseña para autentificación"
-        username: "Nombre de usuario para autentificación"
+        password: "Contraseña para autenticación"
+        username: "Nombre de usuario para autenticación"
     microsoft: 
       description: "Ingreso de Microsoft"
     microsoft_settings: 
@@ -13389,6 +13422,7 @@ es:
   primary_color_button_b75db628: "Botón de color primario"
   primary_color_button_disabled_9081ddff: "Botón de color primario desactivado"
   privacy_290109ea: Privacidad
+  proceed_f3d33864: Proceder
   processing_2fcc9739: Procesando
   product_name: Canvas
   profile: 
@@ -13448,7 +13482,7 @@ es:
     no_registered_services: "No hay servicios registrados"
     notices: 
       contact_confirmed: "Contacto confirmado correctamente."
-      mfa_disabled: "Autentificación de múltiples factores desactivada"
+      mfa_disabled: "Autenticación de múltiples factores desactivada"
       updated_profile: "Perfil actualizado con éxito"
     observees: 
       page_title: "Alumnos en observación"
@@ -13539,18 +13573,18 @@ es:
       linkedin_description: " LinkedIn es un buen recurso para las redes de negocios, y puede ser muy útil después de que ha terminado su educación. Si tiene una cuenta de LinkedIn, puede registrarla aquí. Entonces después de permitir que los miembros con los que comparte cursos/grupos vean sus servicios registrados, fácilmente pueden invitarlo para enlazarse con ellos sin tener que buscar su perfil en LinkedIn. "
       links: 
         add_account: "Agregar Cuenta"
-        configure_mfa: "Establecer la autentificación de múltiples factores"
+        configure_mfa: "Establecer la autenticación de múltiples factores"
         delete_account: "Borrar mi cuenta"
         delicious: Delicious
         diigo: Diigo
-        disable_mfa: "Desactivar la autentificación de múltiples factores"
+        disable_mfa: "Desactivar la autenticación de múltiples factores"
         edit_settings: "Editar las configuraciones"
         google_docs: "Google Docs"
         google_drive: "Google Drive"
         linkedin: LinkedIn
         more_options: "más opciones"
-        otp_backup_codes: "Códigos de respaldo de autentificación de múltiples factores"
-        reconfigure_mfa: "Reconfigurar la autentificación de múltiples factores"
+        otp_backup_codes: "Códigos de respaldo de autenticación de múltiples factores"
+        reconfigure_mfa: "Reconfigurar la autenticación de múltiples factores"
         skype: Skype
         twitter: Twitter
         upload_new_image: "Cargar una nueva imagen"
@@ -13705,6 +13739,7 @@ es:
   provide_a_space_for_users_to_work_on_a_single_goog_8edec82b: |-
       Proporcione un lugar para que los usuarios trabajen en un único documento de Google Docs
       de manera simultánea, desde el curso de Canvas.
+  provide_a_uri_to_your_idp_s_metadata_to_automatica_38e985bd: "Proporcione un URI a los metadatos de su IdP a fin de completar automáticamente los demás campos. Si su escuela forma parte de InCommon o de la Federación de Gestión del Acceso del Reino Unido, especifique urn:mace:incommon o http://ukfederation.org.uk, respectivamente, para el URI de los metadatos, y también proporcione una identificación de entidad de su escuela."
   provide_a_uri_to_your_idp_s_metadata_to_automatica_6f81a3cd: "Proporcione un URI a los metadatos de su PID para rellenar automáticamente los demás campos. Si su escuela es parte de InCommon, especifique urn:mace:incommon para la URl de los metadatos, y también proporcione una identificación con la entidad de su escuela."
   provide_tutorial_information_for_new_users_in_a_fl_c23462ac: "Proporcionar información sobre tutoriales para nuevos usuarios en una bandeja secundaria"
   provider_attribute_b1cad655: "Atributo del proveedor"
@@ -14864,7 +14899,7 @@ es:
           fudge_points_generic_explanation: "Puede adaptar el puntaje de forma manual añadiendo puntos positivos o negativos con este cuadro."
           questions_need_review: "Las siguientes preguntas necesitan revisión"
           quiz_score: "Calificación de la evaluación"
-          score_for_attempt: "Calificación para esta intento"
+          score_for_attempt: "Calificación para este intento"
           score_for_quiz: "Calificación para esta evaluación"
           score_for_survey: "Calificación para esta encuesta"
           survey_score: "Calificación de la encuesta"
@@ -15351,7 +15386,7 @@ es:
   reserved_by_you_cd03b62d: "Reservado por usted"
   reserved_f247b60b: Reservado
   reset_95a81614: Restablecer
-  reset_multi_factor_authentication_2b63a558: "Restablecer la autentificación de múltiples factores"
+  reset_multi_factor_authentication_2b63a558: "Restablecer la autenticación de múltiples factores"
   reset_this_contact_method_s_bounce_count_3845ecf4: "Restablecer este conteo de rebote del método de contacto"
   reset_this_email_address_s_bounce_count_d81d8fd9: "Restablecer este conteo de rebote del correo electrónico"
   resource_url_must_match_the_resource_handler_s_dom_b768cf: "la URL de recursos debe coincidir con el dominio del administrador de recursos"
@@ -15400,6 +15435,7 @@ es:
   role_13a7be77: ROL
   role_7c0b7eaa: "Rol:"
   role_b3951149: rol
+  role_id_f33b0bd2: role_id
   role_override: 
     permission: 
       read_sis: "Leer la información SIS"
@@ -15624,8 +15660,8 @@ es:
   school_of_rock_4b7b1fd0: "Escuela de rock"
   score_68107950: "%{score}%"
   score_does_not_include_groups_because_they_have_no_80d12f42: 
-    one: "El puntaje no incluye %{groups} porque no tiene puntos posibles"
-    other: "El puntaje no incluye %{groups} porque no tienen puntos posibles"
+    one: "El puntaje no incluye a %{groups} porque no se puede evaluar"
+    other: "El puntaje no incluye a %{groups} porque no se pueden evaluar"
   score_does_not_include_groups_becuase_they_have_no_ee031bff: 
     one: "La puntuación no incluye a %{groups} porque no tiene puntos posibles"
     other: "La puntuación no incluye a %{groups} porque no tienen puntos posibles"
@@ -16144,6 +16180,11 @@ es:
       ic_submission-download-dialog: 
         click_to_download: "Haga clic aquí para descargar"
         download_message: "Las presentaciones se comprimirán en un archivo zip para descarga. Esto puede tardar un poco, en función del tamaño y cantidad de los archivos que se presenten."
+        download_message_intro: "Se están recopilando sus presentaciones de alumno."
+        download_submissions: "Descargar todas las presentaciones"
+      ic_submission_download_dialog: 
+        click_to_download: "Haga clic aquí para descargar"
+        download_message: "La presentación se comprimirá en un archivo zip para su descarga. Esto podría demorar un poco según el tamaño y la cantidad de archivos de presentación."
         download_message_intro: "Se están recopilando sus presentaciones de alumno."
         download_submissions: "Descargar todas las presentaciones"
     current_enrollment: 
@@ -16763,6 +16804,7 @@ es:
   show_all_details_9879980c: "Mostrar todos los detalles"
   show_and_hide_courses_menu_9e09d1d0: "Mostrar y esconder el menú de los cursos"
   show_attendance_columns_4d160e16: "Mostrar columnas de asistencia"
+  show_by_709f525b: "Mostrar por"
   show_by_date_e3967761: "Mostrar por fecha"
   show_by_type_c5d61732: "Mostrar por tipo"
   show_calendar_events_in_the_month_view_on_multiple_e94c33ae: "Mostrar los eventos del calendario en la vista mensual en múltiples líneas si el título no cabe en una sola línea"
@@ -16806,7 +16848,7 @@ es:
   singapore_65_b4927585: "Singapur (+65)"
   singapore_a145e422: Singapur
   sis_2164965: SIS
-  sis_agent_token_authentication_2a0b29e3: "Autentificación de autentificador de agente de SIS"
+  sis_agent_token_authentication_2a0b29e3: "Autenticación de autentificador de agente de SIS"
   sis_batch: 
     diff_filename: "sis_upload_diffed_%{id}.zip"
     errors: 
@@ -16820,6 +16862,7 @@ es:
   sis_friendly_name_52b5683d: "Nombre de referencia de SIS"
   sis_grade_export_settings_45a9f709: "Configuración de Exportar Calificaciones del SIS"
   sis_id_4495a887: "ID del SIS"
+  sis_id_70eda157: "Identificación de SIS"
   sis_id_8c2029e1: "ID del SIS"
   sis_import: 
     buttons: 
@@ -16925,6 +16968,7 @@ es:
   sort_by_72dbba9c: "Ordenar según"
   sort_courses_cf94b8d4: "Clasificar los cursos"
   sortable_name_73f707cf: "Nombre clasificable"
+  sortable_name_e25fe66c: "Nombre clasificable:"
   sorted_ascending_1f9b52c6: "Ordenado ascendente."
   sorted_ascending_2318ec99: "Clasificado de forma ascendente"
   sorted_ascending_3138603c: "clasificado de forma ascendente."
@@ -17489,6 +17533,7 @@ es:
       se complete.
   the_error_stack_trace_if_there_is_one_b7e008a1: "La traza de pila del error, si existe alguno"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "La pestaña Archivos es el lugar donde se pueden compartir diapositivas de conferencias, documentos de ejemplos, material colateral de estudio... cualquier cosa que deseen descargar sus alumnos. Actualizar y organizar sus archivos es muy fácil con Canvas. Le enseñaremos cómo."
+  the_following_content_is_partner_provided_ed1da756: "El siguiente contenido está proporcionado por un socio"
   the_following_fields_are_invalid_fields_b3565800: "Los siguientes campos son inválidos: %{fields}"
   the_following_users_are_ready_to_be_added_to_the_c_1ea01560: "Los siguientes usuarios están listos para ser agregados al curso."
   the_following_users_could_not_be_created_2573360a: "No se pudieron crear los siguientes usuarios."
@@ -17505,6 +17550,7 @@ es:
   the_imported_question_text_for_this_question_was_t_83b4e6fb: "El texto de la pregunta importado para esta pregunta era demasiado largo."
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "La institución desde la que inició sesión no está configurada en esta cuenta."
   the_launched_tool_returned_an_invalid_resource_for_24512878: "La herramienta que se ha ejecutado ha dado como resultado un recurso no válido para esta tarea"
+  the_link_you_used_has_expired_click_forgot_passwor_80569899: "El enlace utilizado ha caducado. Haga clic en \"¿Olvidó la contraseña?\" para obtener un nuevo enlace de restablecimiento de contraseña."
   the_list_of_results_has_been_updated_46e3c733: "La lista de resultados ha sido actualizada."
   the_material_is_in_the_public_domain_279c39a3: "El material es de dominio público"
   the_material_is_licensed_under_creative_commons_3242cb5e: "El material tiene licencia Creative Commons"
@@ -17525,6 +17571,7 @@ es:
   the_module_item_is_locked_27fe420b: "El elemento del módulo está bloqueado."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Los puntajes más recientes para el usuario %{current_user_name} y resultado %{outcome_name}."
   the_next_available_appointment_in_this_course_is_o_da10316c: "El siguiente turno disponible en este curso es el *%{date}*"
+  the_preceding_content_is_partner_provided_d753928c: "El contenido anterior está proporcionado por un socio"
   the_previous_sis_batch_was_aborted_d7d89955: "El lote SIS anterior fue abortado"
   the_profile_picture_has_been_reported_d609d6dd: "La imagen de perfil ha sido informada"
   the_provided_academic_benchmark_file_has_an_error_4ad2c631: "El archivo Academic Benchmark proporcionado tiene un error"
@@ -17581,6 +17628,7 @@ es:
   there_was_a_problem_showing_the_teacher_notes_colu_a6e4a2bc: "Hubo un problema al mostrar la columna de observaciones del maestro."
   there_was_a_problem_submitting_your_set_27ca2ed0: "Hubo un problema al presentar su conjunto"
   there_was_a_problem_toggling_the_content_lock_2a5d678b: "Hubo un problema al cambiar el bloqueo de contenido."
+  there_was_a_problem_updating_the_submission_6e5280a1: "Hubo un problema al actualizar la presentación."
   there_was_an_error_generating_the_tool_launch_fb3f47ac: "Hubo un error al generar el lanzamiento de la herramienta"
   there_was_an_error_in_processing_your_request_6513a49a: "Se ha producido un error al procesar su petición"
   there_was_an_error_removing_the_image_c83acffe: "Hubo un error al eliminar la imagen"
@@ -17596,7 +17644,7 @@ es:
   there_was_an_unknown_error_registering_the_tool_b9a29954: "Se produjo un error desconocido al registrar la herramienta"
   there_were_errors_with_the_form_errors_ab5b559a: "Se han producido errores en el formulario: %{errors}"
   there_were_several_possible_matches_with_the_impor_ad58bcd0: "Hubo varias coincidencias posibles con la importación. Por favor, resuélvalas a continuación."
-  these_backup_codes_can_be_used_if_your_multi_facto_ca30a3df: "Estos códigos de respaldo pueden usarse si el dispositivo de autentificación de múltiples factores no está disponible. Imprímalos y consérvelos en un lugar seguro, como su monedero."
+  these_backup_codes_can_be_used_if_your_multi_facto_ca30a3df: "Estos códigos de respaldo pueden usarse si el dispositivo de autenticación de múltiples factores no está disponible. Imprímalos y consérvelos en un lugar seguro, como su monedero."
   these_credentials_are_for_academic_benchmark_api_v_324baaa4: "Estas credenciales son para Academic Benchmark API v3. Dejar la clave Partner vacía hará que el importador use de manera predeterminada Academic Benchmark API v1."
   these_credentials_are_for_academic_benchmark_api_v_952718b1: "Estas credenciales son para Academic Benchmark API v1, el cual se desvalorizará en un lanzamiento futuro."
   these_grading_periods_were_created_for_you_by_an_a_e977c2b5: "Estos periodos de calificación fueron creados para usted por su administrador."
@@ -17879,6 +17927,7 @@ es:
     yakutsk: Yakutsk
     yerevan: Yereván
     zagreb: Zagreb
+    zurich: Zurich
   timeline_of_messages_between_the_student_and_instr_6dbd9ad3: "Línea de tiempo de los mensajes entre el alumno y los instructores"
   timeline_showing_when_assignments_were_turned_in_bb44c8a1: "Línea de tiempo que muestra cuando las tareas se entregaron"
   timeout_when_searching_5c24ff9d: "Expiró mientras buscaba"
@@ -17937,6 +17986,8 @@ es:
       obtener el ID del cliente y el secreto del cliente.
       
       Si el proveedor puede configurar una retrollamada válida o URL de redirección, use %{callback_url}.
+  to_do_1d554f36: "Por hacer"
+  to_do_items_loading_d1cdfcd5: "Cargando los elementos por hacer"
   to_do_list_dashboard_d741f64e: "Tablero con lista de tareas por hacer"
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Para conectar a un observador del curso *%{name}* a un alumno, comience a escribir el nombre del alumnos más abajo para encontrarle y luego haga clic en Actualizar."
   to_minscore_43e5452e: "a %{minScore}%"
@@ -18162,7 +18213,7 @@ es:
   use_between_for_adding_multiple_users_26bff207: "Utilice \",\" entre medio para agregar múltiples usuarios."
   use_default_890939b7: "Usar predeterminado"
   use_mathman_to_convert_latex_to_mathml_680ef7b0: "¿Usar MathMan para convertir LaTeX a MathML?"
-  use_mathman_to_convert_latex_to_svg_3f61c9b: "¿Usar MathMan to convert LaTeX a SVG?"
+  use_mathman_to_convert_latex_to_svg_3f61c9b: "¿Usar MathMan para convertir LaTeX a SVG?"
   use_new_folder_tree_in_files_bc0ea09f: "Use el árbol de carpeta nuevo en archivos"
   use_new_folder_tree_in_files_eb5a451b: "Use el árbol de carpeta nuevo en Archivos"
   use_new_rich_content_editor_with_enhanced_sidebar__8e0bfedd: "Utilice el nuevo editor de contenido enriquecido con barra lateral mejorada en todas partes"
@@ -18202,9 +18253,12 @@ es:
     cant_be_blank: "La ID de usuario de Canvas no puede estar vacía"
     cant_come_before_from: "'Hasta la fecha' no puede ser anterior a 'Desde la fecha'"
     results_found: "Se han encontrado %{length} resultados"
+  user_details_e9aef9e5: "Detalles del usuario"
+  user_id_8256faeb: user_id
   user_id_bcace870: "ID de usuario"
   user_id_or_sis_id_sis_id_should_be_prepended_with__980ff02b: "ID de usuario o ID del SIS (ID del SIS debería ser antepuesto con sis_user_id:)"
   user_id_user_id_69a9e865: "ID del usuario: %{user_id}"
+  user_information_6353d7e1: "Información del usuario"
   user_is_now_group_leader_60ec9b98: "%{user} ahora es el líder del grupo"
   user_isn_t_allowed_to_edit_global_outcomes_a7eb4a87: "El usuario no tiene permisos para modificar los resultados globales"
   user_just_accepted_their_invitation_to_participate_7a4b2ce4: "%{user} acaba de aceptar la invitación para participar en el curso, %{course}. Rol del curso: %{role_type}"
@@ -18251,7 +18305,7 @@ es:
       unauthorized: "Usted no tiene suficientes privilegios para hacer el cambio pedido"
     notices: 
       cant_delete_last_login: "No puede eliminar el último inicio de sesión para un usuario"
-      mfa_reset: "Restablecimiento de autentificación de múltiples factores"
+      mfa_reset: "Restablecimiento de autenticación de múltiples factores"
     save_succeeded: "Guardado correctamente"
     titles: 
       add_login: "Agregar inicio de sesión"
@@ -18485,7 +18539,7 @@ es:
       more: más...
       never: nunca
       none: ninguno
-      reset_mfa: "Restablecer la autentificación de múltiples factores"
+      reset_mfa: "Restablecer la autenticación de múltiples factores"
       titles: 
         logins: "Información del inicio de sesión"
     masquerade: 
@@ -18968,6 +19022,7 @@ es:
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "No puede editar los temas en esta subcuenta."
   you_cannot_remove_this_enrollment_c87be1cb: "Usted no puede eliminar esta inscripción."
   you_cannot_remove_your_default_email_address_8ed68e52: "No puede eliminar su dirección de correo electrónico predeterminada"
+  you_cannot_set_a_grouped_discussion_as_a_student_a20f363: "No puede establecer un debate grupal como alumno."
   you_cannot_use_a_number_greater_than_the_number_of_af33e220: "No puede utilizar un número mayor que el del número de tareas"
   you_created_an_announcement_in_course_c49e3d70: "Usted creó un anuncio en %{course}"
   you_do_not_have_access_to_the_requested_discussion_90d8ec99: "No tiene acceso al debate solicitado."
@@ -19090,6 +19145,7 @@ es:
   your_message_has_been_sent_thank_you_e0284316: "Se ha enviado su mensaje. ¡Gracias!"
   your_message_was_sent_977f6583: "¡Su mensaje ha sido enviado!"
   your_name_7665e1d8: "Su nombre"
+  your_password_has_been_changed_df0e72aa: "Su contraseña ha sido cambiada."
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "No se pudo cargar su foto de perfil. Es posible que haya superado el límite de carga."
   your_search_encountered_the_following_errors_fc3e5e7f: 
     one: "Su búsqueda produjo el siguiente error:"
