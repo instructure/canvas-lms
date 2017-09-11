@@ -562,6 +562,7 @@ RSpec.configure do |config|
     previous_perform_caching = ActionController::Base.perform_caching
     allow(ActionController::Base).to receive(:perform_caching).and_return(true)
     allow_any_instance_of(ActionController::Base).to receive(:perform_caching).and_return(true)
+    MultiCache.reset
     if block_given?
       begin
         yield
