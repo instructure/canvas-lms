@@ -10,21 +10,48 @@ run.config:
     - libxml2
     - libxslt
     - zlib
-    - postgresql94-client
+    - postgresql96-client
     - python-2.7
+    - nginx
+
+  dev_packages:
+    - libfontconfig
 
   extra_steps:
+    - npm install phantomjs-prebuilt
     - yarn
     - npm install
     - npm install -g coffee-script@1.6.2
     - npm install -g webpack
     - npm install -g gulp
 
+
+web.site:
+  start:
+      nginx: nginx -c /app/config/nginx.conf
+      puma: bundle exec puma -C /app/config/puma.rb
+
+  writable_dirs:
+    - tmp
+    - log
+
 worker.jobs:
   start: bundle script/delayed_job run
+
+data.chrome:
+  image: selenium/standalone-chrome
 
 data.queue:
   image: nanobox/redis
 
 data.db:
-  image: nanobox/postgresql:9.4
+  image: nanobox/postgresql:9.6
+
+deploy.config:
+  # before_live:
+  #   web.site:
+  #     - rake db:create
+
+  extra_steps:
+    - rake canvas:compile_assets RAILS_ENV=production
+

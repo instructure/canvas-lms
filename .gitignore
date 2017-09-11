@@ -60,3 +60,7 @@ npm-debug.log
 
 # user docker compose overrides
 docker-compose.local.*
+.env
+deploy.env
+event.json
+.lambda
