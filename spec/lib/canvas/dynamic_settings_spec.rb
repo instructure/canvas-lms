@@ -113,13 +113,11 @@ module Canvas
         expect(proxy).to be_a(DynamicSettings::PrefixProxy)
       end
 
-      it 'must raise an error when neither consul or fallback data have been configured' do
+      it 'must return a FallbackProxy when neither consul or fallback data have been configured' do
         allow(DynamicSettings).to receive(:kv_client).and_return(nil)
         DynamicSettings.fallback_data = nil
-        expect { DynamicSettings.find('foo') }.to raise_error(
-          DynamicSettings::NoFallbackError,
-          /fallback_data is not set/
-        )
+        expect(DynamicSettings.find('foo')).to be_a(DynamicSettings::FallbackProxy)
+        expect(DynamicSettings.find('foo')['bar']).to eq nil
       end
 
       it 'must return a FallbackProxy when consul is not configured' do
