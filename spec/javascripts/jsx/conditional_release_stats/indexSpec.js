@@ -137,16 +137,6 @@ define([
     testRender(false)
   })
 
-  test('does not add for a non-teacher', () => {
-    ENV.current_user_roles = []
-    testRender(false)
-  })
-
-  test('does add for an admin', () => {
-    ENV.current_user_roles = ['admin']
-    testRender(true)
-  })
-
   test('does not add if there is not a rule defined', () => {
     ENV.CONDITIONAL_RELEASE_ENV.rule = null
     testRender(false)
