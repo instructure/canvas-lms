@@ -59,7 +59,7 @@ define [
 
     events:
       'click .element_toggler': 'toggleArrow'
-      'keypress .element_toggler': 'toggleArrowWithKeyboard'
+      'keyclick .element_toggler': 'toggleArrowWithKeyboard'
       'click .tooltip_link': preventDefault ->
       'keydown .assignment_group': 'handleKeys'
 
@@ -305,8 +305,8 @@ define [
       @resetNoToggleCache(ev.currentTarget)
 
     toggleArrowWithKeyboard: (ev) =>
-      if ev.which == 13 || ev.which == 32
-        @toggleArrow(ev)
+      $(ev.target).click()
+      false
 
     resetNoToggleCache: (selector=null) ->
       if selector?
