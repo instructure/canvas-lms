@@ -524,7 +524,7 @@ import 'compiled/jquery/fixDialogButtons'
 
       if(editing && !isLearningOutcome) {
         $rubric_long_description_dialog
-          .fillFormData(data)
+          .fillFormData(data).fillTemplateData({data: data})
           .find('.editing').show().end()
           .find(".displaying").hide().end();
       } else {
