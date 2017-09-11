@@ -1117,9 +1117,9 @@ test('updates to graded', function () {
   student.submission_state = 'graded';
   SpeedGrader.EG.updateSelectMenuStatus(student, this.selectmenu);
 
-  const expected = `<span class="ui-selectmenu-item-icon speedgrader-selectmenu-icon"><i class="icon-check"></i></span><span class="ui-selectmenu-item-header">Guy B. Studying</span>`;
   const entry = this.selectmenu.jquerySelectMenu().data('selectmenu').list.find('li:eq(0)').children();
-  equal(entry.html(), expected);
+  strictEqual(entry.find('span.ui-selectmenu-item-icon.speedgrader-selectmenu-icon i.icon-check').length, 1);
+  strictEqual(entry.find('span.ui-selectmenu-item-header:contains("Guy B. Studying")').length, 1)
 
   const option = $(this.selectmenu.option_tag_array[0]);
   strictEqual(option.hasClass("not_graded"), false);
@@ -1132,9 +1132,9 @@ test('updates to not_graded', function () {
   student.submission_state = 'not_graded';
   SpeedGrader.EG.updateSelectMenuStatus(student, this.selectmenu);
 
-  const expected = `<span class="ui-selectmenu-item-icon speedgrader-selectmenu-icon">●</span><span class="ui-selectmenu-item-header">Sil E. Bus</span>`;
   const entry = this.selectmenu.jquerySelectMenu().data('selectmenu').list.find('li:eq(1)').children();
-  equal(entry.html(), expected);
+  strictEqual(entry.find('span.ui-selectmenu-item-icon.speedgrader-selectmenu-icon:contains("●")').length, 1);
+  strictEqual(entry.find('span.ui-selectmenu-item-header:contains("Sil E. Bus")').length, 1)
 
   const option = $(this.selectmenu.option_tag_array[1]);
   strictEqual(option.hasClass("graded"), false);
@@ -1149,9 +1149,9 @@ test('updates to not_submitted', function () {
   student.submission_state = 'not_submitted';
   SpeedGrader.EG.updateSelectMenuStatus(student, this.selectmenu);
 
-  const expected = `<span class="ui-selectmenu-item-icon speedgrader-selectmenu-icon"></span><span class="ui-selectmenu-item-header">Guy B. Studying</span>`;
   const entry = this.selectmenu.jquerySelectMenu().data('selectmenu').list.find('li:eq(0)').children();
-  equal(entry.html(), expected);
+  strictEqual(entry.find('span.ui-selectmenu-item-icon.speedgrader-selectmenu-icon').length, 1);
+  strictEqual(entry.find('span.ui-selectmenu-item-header:contains("Guy B. Studying")').length, 1)
 
   const option = $(this.selectmenu.option_tag_array[0]);
   strictEqual(option.hasClass("graded"), false);
@@ -1167,9 +1167,9 @@ test('updates to resubmitted', function () {
   student.submission.submitted_at = '2017-07-10T17:00:00Z';
   SpeedGrader.EG.updateSelectMenuStatus(student, this.selectmenu);
 
-  const expected = `<span class="ui-selectmenu-item-icon speedgrader-selectmenu-icon">●</span><span class="ui-selectmenu-item-header">Guy B. Studying</span>`;
   const entry = this.selectmenu.jquerySelectMenu().data('selectmenu').list.find('li:eq(0)').children();
-  equal(entry.html(), expected);
+  strictEqual(entry.find('span.ui-selectmenu-item-icon.speedgrader-selectmenu-icon:contains("●")').length, 1);
+  strictEqual(entry.find('span.ui-selectmenu-item-header:contains("Guy B. Studying")').length, 1)
 
   const option = $(this.selectmenu.option_tag_array[1]);
   strictEqual(option.hasClass("not_graded"), false);
@@ -1185,12 +1185,12 @@ test('updates to not_gradable', function () {
   student.submission.submitted_at = '2017-07-10T17:00:00Z';
   SpeedGrader.EG.updateSelectMenuStatus(student, this.selectmenu);
 
-  const expected = `<span class="ui-selectmenu-item-icon speedgrader-selectmenu-icon"><i class="icon-check"></i></span><span class="ui-selectmenu-item-header">Guy B. Studying</span>`;
   const entry = this.selectmenu.jquerySelectMenu().data('selectmenu').list.find('li:eq(0)').children();
-  equal(entry.html(), expected);
+  strictEqual(entry.find('span.ui-selectmenu-item-icon.speedgrader-selectmenu-icon > i.icon-check').length, 1);
+  strictEqual(entry.find('span.ui-selectmenu-item-header:contains("Guy B. Studying")').length, 1)
 
   const option = $(this.selectmenu.option_tag_array[1]);
   strictEqual(option.hasClass("not_graded"), false);
-  equal(option.text(), "Sil E. Bus - graded");
+  equal(option.text().trim(), "Sil E. Bus - graded");
   strictEqual(option.hasClass("graded"), true);
 });

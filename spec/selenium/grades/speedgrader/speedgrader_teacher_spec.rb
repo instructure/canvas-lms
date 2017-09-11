@@ -235,7 +235,7 @@ describe "speed grader" do
     it "does not duplicate students", priority: "1", test_id: 283985 do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
-      expect(ff("#students_selectmenu option")).to have_size 1
+      expect(ff("#students_selectmenu > option")).to have_size 1
     end
 
     it "filters by section properly", priority: "1", test_id: 283986 do
@@ -245,9 +245,9 @@ describe "speed grader" do
       section_options_text = f("#section-menu ul")[:textContent] # hidden
       expect(section_options_text).to include(@course_section.name)
       goto_section(sections[0].id)
-      expect(ff("#students_selectmenu option")).to have_size 1
+      expect(ff("#students_selectmenu > option")).to have_size 1
       goto_section(sections[1].id)
-      expect(ff("#students_selectmenu option")).to have_size 1
+      expect(ff("#students_selectmenu > option")).to have_size 1
     end
   end
 

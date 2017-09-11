@@ -20,20 +20,52 @@ import $ from 'jquery';
 import 'vendor/ui.selectmenu';
 import htmlEscape from './str/htmlEscape';
 
+function optionsToHtml (optionDefinitions) {
+  return optionDefinitions.map((optionDef) => {
+    let html = '';
+
+    if (optionDef.options) {
+      // This is an optgroup
+      const childrenHtml = optionsToHtml(optionDef.options);
+      html = `
+        <optgroup label="${htmlEscape(optionDef.name)}">
+            ${childrenHtml}
+        </optgroup>
+      `;
+    } else {
+      const labels = [
+        optionDef.name,
+      ]
+
+      if (optionDef.className && optionDef.className.formatted) {
+        labels.push(optionDef.className.formatted);
+      }
+
+      html = `
+        <option value="${htmlEscape(optionDef.id)}" class="${htmlEscape(optionDef.className.raw)} ui-selectmenu-hasIcon">
+            ${htmlEscape(labels.join(' - '))}
+        </option>
+      `;
+    }
+
+    return html;
+  }).join('');
+}
+
 export default function speedgraderSelectMenu (optionsArray) {
   // Array of the initial data needed to build the select menu
   this.options_array = optionsArray;
 
   // Index used by text formatting function
   this.option_index = 0;
+  this.opt_group_found = false;
+  this.option_sub_index = 0;
 
   // Array for the generated option tags
   this.option_tag_array = null;
 
   this.buildHtml = function (options) {
-    const optionHtml = options.map(option => (
-      `<option value="${option.id}" class="${htmlEscape(option.className.raw)} ui-selectmenu-hasIcon">${htmlEscape(option.name)} - ${htmlEscape(option.className.formatted)}</option>`
-    )).join('');
+    const optionHtml = optionsToHtml(options);
 
     return `<select id='students_selectmenu'>${optionHtml}</select>`;
   };
@@ -110,6 +142,9 @@ export default function speedgraderSelectMenu (optionsArray) {
         self.our_open(event);
       }
     });
+    // Remove the section change optgroup since it'll be replaced by a popout menu
+    $('ul#students_selectmenu-menu li.ui-selectmenu-group').remove()
+
     // Create indexes into what we've created because we'll want them later
     this.option_tag_array = $('#students_selectmenu > option');
 
@@ -145,11 +180,50 @@ export default function speedgraderSelectMenu (optionsArray) {
     return icon.concat('</span>');
   };
 
-  this.formatSelectText = function () {
-    const option = this.options_array[this.option_index];
+  this.formatSelectText = function (_text) {
+    let option = this.options_array[this.option_index];
+    let optgroup;
+    let html = '';
 
-    this.option_index++;
+    if (option.options) {
+      optgroup = option;
 
-    return `${this.getIconHtml(htmlEscape(option.className.raw))}<span class="ui-selectmenu-item-header">${htmlEscape(option.name)}</span>`;
+      if (!this.opt_group_found) {
+        // We encountered this optgroup but haven't start traversing it yet
+        this.opt_group_found = true;
+        this.option_sub_index = 0;
+        option = optgroup.options[this.option_sub_index];
+      }
+
+      if (this.opt_group_found && this.option_sub_index < optgroup.options.length) {
+        // We're still traversing this optgroup, carry on
+        option = optgroup.options[this.option_sub_index];
+
+        this.option_sub_index++;
+      } else {
+        this.opt_group_found = false;
+        this.option_sub_index = 0;
+        this.option_index++;
+
+        option = this.options_array[this.option_index]
+        this.option_index++;
+      }
+    } else {
+      this.opt_group_found = false;
+      this.option_sub_index = 0;
+      this.option_index++;
+    }
+
+    if (option.options) {
+      html = htmlEscape(option.name);
+    }
+
+    return `
+        ${html}
+        ${this.getIconHtml(htmlEscape(option.className.raw))}
+        <span class="ui-selectmenu-item-header">
+            ${htmlEscape(option.name)}
+        </span>
+    `;
   };
 }

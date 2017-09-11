@@ -172,6 +172,50 @@ utils = {
   }
 };
 
+function sectionSelectionOptions (courseSections, groupGradingModeEnabled = false, selectedSectionId = null) {
+  if (courseSections.length <= 1 || groupGradingModeEnabled) {
+    return [];
+  }
+
+  let selectedSectionName = I18n.t('All Sections');
+  const sectionOptions = [
+    {
+      id: 'section_0',
+      data: {
+        'section-id': 0
+      },
+      name: I18n.t('Show all sections'),
+      className: {
+        raw: 'section_0'
+      }
+    }
+  ];
+
+  courseSections.forEach((section) => {
+    if (section.id === selectedSectionId) {
+      selectedSectionName = section.name;
+    }
+
+    sectionOptions.push({
+      id: `section_${section.id}`,
+      data: {
+        "section-id": section.id
+      },
+      name: I18n.t('Change section to %{sectionName}', { sectionName: section.name }),
+      className: {
+        raw: `section_${section.id} ${ selectedSectionId === section.id ? 'selected' : '' }`
+      }
+    });
+  });
+
+  return [
+    {
+      name: `Showing: ${selectedSectionName}`,
+      options: sectionOptions
+    }
+  ];
+}
+
 function mergeStudentsAndSubmission() {
   jsonData.studentsWithSubmissions = jsonData.context.students;
   jsonData.studentMap = {};
@@ -261,6 +305,17 @@ function mergeStudentsAndSubmission() {
   }
 }
 
+function changeToSection (sectionId) {
+  if (sectionId === '0') {
+    // We're removing all filters and resetting to default
+    userSettings.contextRemove('grading_show_only_section');
+  } else {
+    userSettings.contextSet('grading_show_only_section', sectionId);
+  }
+
+  window.location.reload();
+}
+
 function initDropdown(){
   var hideStudentNames = utils.shouldHideStudentNames();
   $("#hide_student_names").attr('checked', hideStudentNames);
@@ -275,9 +330,19 @@ function initDropdown(){
     };
   });
 
-  $selectmenu = new SpeedgraderSelectMenu(optionsArray);
-  $selectmenu.appendTo("#combo_box_container", function(){
-    EG.handleStudentChanged();
+  const sectionSelectionOptionList = sectionSelectionOptions(
+    jsonData.context.active_course_sections, jsonData.GROUP_GRADING_MODE, sectionToShow
+  );
+  $selectmenu = new SpeedgraderSelectMenu(sectionSelectionOptionList.concat(optionsArray));
+  $selectmenu.appendTo("#combo_box_container", (event) => {
+    const newStudentOrSection = $(event.target).val()
+
+    if (newStudentOrSection && newStudentOrSection.match(/^section_\d+$/)) {
+      const sectionId = newStudentOrSection.replace(/^section_/, '');
+      changeToSection(sectionId);
+    } else {
+      EG.handleStudentChanged();
+    }
   });
 
   if (jsonData.context.active_course_sections.length && jsonData.context.active_course_sections.length > 1 && !jsonData.GROUP_GRADING_MODE) {
@@ -298,8 +363,7 @@ function initDropdown(){
       .hide()
       .menu()
       .delegate('a', 'click mousedown', function(){
-        userSettings[$(this).data('section-id') == 'all' ? 'contextRemove' : 'contextSet']('grading_show_only_section', $(this).data('section-id'));
-        window.location.reload();
+        changeToSection($(this).data('section-id'));
       });
 
     if (sectionToShow) {
