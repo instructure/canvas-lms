@@ -34,7 +34,7 @@ describe 'Grade Detail Tray:' do
     grade_assignments
   end
 
-  context "missing, excused and none status" do
+  context "status" do
     before(:each) do
       ENV["GRADEBOOK_DEVELOPMENT"] = 'true'
       user_session(@teacher)
@@ -77,13 +77,6 @@ describe 'Grade Detail Tray:' do
       late_policy_status = @course.students[0].submissions.find_by(assignment_id:@a2.id).late_policy_status
 
       expect(late_policy_status).to eq 'none'
-    end
-
-    it 'speedgrader link works' do
-      Gradezilla::Cells.open_tray(@course.students[0], @a1)
-      Gradezilla::GradeDetailTray.speedgrader_link.click
-
-      expect(driver.current_url).to include "courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@a1.id}"
     end
   end
 
@@ -130,7 +123,7 @@ describe 'Grade Detail Tray:' do
     end
   end
 
-  context 'assignment navigation' do
+  context 'navigation' do
     before(:each) do
       ENV['GRADEBOOK_DEVELOPMENT'] = 'true'
       user_session(@teacher)
@@ -142,6 +135,13 @@ describe 'Grade Detail Tray:' do
         Gradezilla.visit(@course)
       end
 
+      it 'speedgrader link navigates to speedgrader page' do
+        Gradezilla::Cells.open_tray(@course.students[0], @a1)
+        Gradezilla::GradeDetailTray.speedgrader_link.click
+
+        expect(driver.current_url).to include "courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@a1.id}"
+      end
+
       it 'clicking assignment name navigates to assignment page' do
         Gradezilla::Cells.open_tray(@course.students[0], @a1)
         Gradezilla::GradeDetailTray.assignment_link(@a1.name).click
@@ -149,14 +149,14 @@ describe 'Grade Detail Tray:' do
         expect(driver.current_url).to include "courses/#{@course.id}/assignments/#{@a1.id}"
       end
 
-      it 'clicking the right arrow loads the next assignment in the tray' do
+      it 'assignment right arrow loads the next assignment in the tray' do
         Gradezilla::Cells.open_tray(@course.students[0], @a1)
         Gradezilla::GradeDetailTray.submission_tray_right_arrow_button.click
 
         expect(Gradezilla::GradeDetailTray.assignment_link(@a2.name)).to be_displayed
       end
 
-      it 'clicking the left arrow loads the previous assignment in the tray' do
+      it 'assignment left arrow loads the previous assignment in the tray' do
         Gradezilla::Cells.open_tray(@course.students[0], @a2)
         Gradezilla::GradeDetailTray.submission_tray_left_arrow_button.click
 

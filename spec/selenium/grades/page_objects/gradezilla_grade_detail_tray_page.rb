@@ -109,12 +109,12 @@ class Gradezilla
       def grade_input
         "#grade-input"
       end
-
       # to-do's ---end
 
       # methods
       def change_status_to(type)
         status_radio_button(type).click
+        driver.action.send_keys(:space).perform
       end
 
       def is_radio_button_selected(type)
