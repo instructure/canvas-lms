@@ -72,7 +72,7 @@ export default React.createClass({
       return (
         <div className="ExternalToolsTable">
           <InfiniteScroll pageStart={0} loadMore={this.loadMore} hasMore={store.getState().hasMore} loader={this.loader()}>
-            <table className="table table-striped" id="external-tools-table">
+            <table className="ic-Table ic-Table--striped ic-Table--condensed" id="external-tools-table">
               <caption className="screenreader-only">{I18n.t('External Apps')}</caption>
               <thead>
                 <tr>
