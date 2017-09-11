@@ -19,7 +19,7 @@ define [
   'compiled/models/WikiPage'
   'compiled/views/wiki/WikiPageIndexItemView'
 ], (WikiPage, WikiPageIndexItemView) ->
-  
+
   QUnit.module 'WikiPageIndexItemView'
 
   test 'model.view maintained by item view', ->
@@ -78,6 +78,7 @@ define [
     CAN:
       MANAGE: true
       PUBLISH: true
+      DUPLICATE: true
 
   testRights 'CAN (manage group)',
     contextName: 'groups'
@@ -87,6 +88,7 @@ define [
     CAN:
       MANAGE: true
       PUBLISH: false
+      DUPLICATE: false
 
   testRights 'CAN (read)',
     contextName: 'courses'
