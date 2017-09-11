@@ -56,7 +56,7 @@ window.rubricAssessment = {
         if ($(this).parents('.rubric').hasClass('assessing')) {
           var val = $(this).val();
           if(val && val.length > 0) {
-            $(this).parents(".custom_ratings_entry").find(".custom_rating_field").val(unescape(val));
+            $(this).parents(".custom_ratings_entry").find(".custom_rating_field").val(decodeURIComponent(val));
           }
         }
       })
