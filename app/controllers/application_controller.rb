@@ -2193,6 +2193,10 @@ class ApplicationController < ActionController::Base
     nil
   end
 
+  def self.cluster
+    nil
+  end
+
   def show_request_delete_account
     false
   end
