@@ -61,7 +61,7 @@ define [
 
     render: =>
       selectedID = @parentModel.groupCategoryId()
-      if !@parentModel.canGroup() or _.isEmpty(@groupCategories)
+      if _.isEmpty(@groupCategories)
         StudentGroupStore.setSelectedGroupSet(null)
       else if !selectedID? or !_.findWhere(@groupCategories, {id: selectedID.toString()})?
         StudentGroupStore.setSelectedGroupSet('blank')
