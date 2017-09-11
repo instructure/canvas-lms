@@ -701,11 +701,16 @@ class SubmissionsApiController < ApplicationController
 
       assessment = params[:rubric_assessment]
       if assessment.is_a?(ActionController::Parameters) && @assignment.rubric_association
+        if (assessment.keys & @assignment.rubric_association.rubric.criteria_object.map{|c| c.id.to_s}).empty?
+          return render :json => {:message => "invalid rubric_assessment"}, :status => :bad_request
+        end
+
         # prepend each key with "criterion_", which is required by the current
         # RubricAssociation#assess code.
         assessment.keys.each do |crit_name|
           assessment["criterion_#{crit_name}"] = assessment.delete(crit_name)
         end
+
         @rubric_assessment = @assignment.rubric_association.assess(
           assessor: @current_user,
           user: @user,

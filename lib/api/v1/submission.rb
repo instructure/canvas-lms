@@ -286,7 +286,7 @@ module Api::V1::Submission
 
   def rubric_assessment_json(rubric_assessment)
     hash = {}
-    rubric_assessment.data.each do |rating|
+    rubric_assessment.data&.each do |rating|
       hash[rating[:criterion_id]] = rating.slice(:points, :comments)
     end
     hash
