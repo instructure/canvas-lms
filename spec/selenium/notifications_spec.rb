@@ -96,7 +96,7 @@ describe "Notifications" do
 
         fj('.ui-tabs-anchor:contains("Plain Text")').click
         expect(f('.message-body')).to include_text('Anonymous User just made a new comment on the '\
-                                                   'submission for User for assignment')
+                                                   "submission for #{@student.reload.short_name} for assignment")
       end
 
       context "observer notifications" do

@@ -1400,6 +1400,12 @@ describe Assignment do
       expect(s3.late_policy_status).to eq "late"
       expect(s3.seconds_late_override).to eq 120
     end
+
+    it "sets the submission's 'lti_user_id'" do
+      setup_assignment_without_submission
+      submission = @a.submit_homework(@user)
+      expect(submission.lti_user_id).to eq @user.lti_context_id
+    end
   end
 
   describe "muting" do

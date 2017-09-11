@@ -178,6 +178,7 @@ module Canvas::LiveEvents
       assignment_id: submission.global_assignment_id,
       user_id: submission.global_user_id,
       submitted_at: submission.submitted_at,
+      lti_user_id: submission.lti_user_id,
       graded_at: submission.graded_at,
       updated_at: submission.updated_at,
       score: submission.score,

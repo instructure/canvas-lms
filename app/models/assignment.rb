@@ -1656,7 +1656,7 @@ class Assignment < ActiveRecord::Base
           :group => group
         })
         homework.submitted_at = Time.zone.now
-
+        homework.lti_user_id = Lti::Asset.opaque_identifier_for(student)
         homework.with_versioning(:explicit => (homework.submission_type != "discussion_topic")) do
           if group
             if student == original_student

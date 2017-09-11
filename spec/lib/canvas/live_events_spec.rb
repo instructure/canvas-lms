@@ -345,6 +345,7 @@ describe Canvas::LiveEvents do
       expect_event('submission_created',
         hash_including(
           user_id: @student.global_id.to_s,
+          lti_user_id: @student.lti_context_id,
           assignment_id: submission.global_assignment_id.to_s,
           lti_assignment_id: submission.assignment.lti_context_id.to_s
         ))
@@ -360,6 +361,7 @@ describe Canvas::LiveEvents do
       expect_event('submission_updated',
         hash_including(
           user_id: @student.global_id.to_s,
+          lti_user_id: @student.lti_context_id,
           assignment_id: submission.global_assignment_id.to_s,
           lti_assignment_id: submission.assignment.lti_context_id.to_s
         ))
@@ -374,6 +376,7 @@ describe Canvas::LiveEvents do
       expect_event('plagiarism_resubmit',
         hash_including(
           user_id: @student.global_id.to_s,
+          lti_user_id: @student.lti_context_id,
           assignment_id: submission.global_assignment_id.to_s,
           lti_assignment_id: submission.assignment.lti_context_id.to_s
         ))
