@@ -2467,6 +2467,42 @@ describe AssignmentsApiController, type: :request do
           expect(response['due_at']).to eq(@section_due_at.iso8601)
         end
 
+        it 'updates overrides for inactive students' do
+          @enrollment.deactivate
+          update_assignment
+          expect(@assignment.assignment_overrides.count).to eq 4
+          @adhoc_override = @assignment.assignment_overrides.where(set_type: 'ADHOC').first
+          expect(@adhoc_override).not_to be_nil
+          expect(@adhoc_override.set).to eq [@student]
+          expect(@adhoc_override.due_at_overridden).to be_truthy
+          expect(@adhoc_override.due_at.to_i).to eq @adhoc_due_at.to_i
+        end
+
+        it 'updates overrides for concluded students' do
+          @enrollment.conclude
+          update_assignment
+          expect(@assignment.assignment_overrides.count).to eq 4
+          @adhoc_override = @assignment.assignment_overrides.where(set_type: 'ADHOC').first
+          expect(@adhoc_override).not_to be_nil
+          expect(@adhoc_override.set).to eq [@student]
+          expect(@adhoc_override.due_at_overridden).to be_truthy
+          expect(@adhoc_override.due_at.to_i).to eq @adhoc_due_at.to_i
+        end
+
+        it 'does not create overrides when student_ids is invalid' do
+          api_update_assignment_call(@course, @assignment, {
+            'name' => 'Assignment With Overrides',
+            'assignment_overrides' => {
+              '0' => {
+                'student_ids' => 'bad parameter',
+                'title' => 'adhoc override',
+                'due_at' => @adhoc_due_at.iso8601
+              }
+            }
+          })
+          expect(@assignment.assignment_overrides.count).to eq 0
+        end
+
         it 'does not override the assignment for the user if passed false for override_dates' do
           @assignment.update!(due_at: 1.day.from_now)
           response = api_update_assignment_call(@course, @assignment,
