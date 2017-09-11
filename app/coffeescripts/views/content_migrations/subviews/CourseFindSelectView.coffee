@@ -42,19 +42,27 @@ define [
 
     render: ->
       super
-      dfd = @getManageableCourses()
-      @$el.disableWhileLoading dfd
-      dfd.done (data) =>
-        @courses = data
-        @coursesByTerms = _.chain(@courses)
-          .groupBy((course) ->
-            course.term
-          ).map((value, key) ->
-            {term: key, courses: value.sort(natcompare.byKey('label'))}
-          ).sort((a, b) ->
-            new Date(b.courses[0].enrollment_start) - new Date(a.courses[0].enrollment_start)
-          ).value()
-        super
+      if @options.show_select
+        dfd = @getManageableCourses()
+        @$el.disableWhileLoading dfd
+        dfd.done (data) =>
+          @courses = data
+          @coursesByTerms = _.chain(@courses)
+            .groupBy((course) ->
+              course.term
+            ).map((value, key) ->
+              {term: key, courses: value.sort(natcompare.byKey('label'))}
+            ).sort((a, b) ->
+              astart = a.courses[0].enrollment_start
+              bstart = b.courses[0].enrollment_start
+              val = 0
+              if astart || bstart
+                val = new Date(bstart) - new Date(astart)
+              if val == 0
+                val = natcompare.strings(a.term, b.term)
+              val
+            ).value()
+          super
 
     afterRender: ->
       @$courseSearchField.autocomplete
