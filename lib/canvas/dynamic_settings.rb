@@ -25,7 +25,6 @@ module Canvas
 
     class Error < StandardError; end
     class ConsulError < Error; end
-    class NoFallbackError < Error; end
 
     CONSUL_READ_OPTIONS = %i{recurse stale}.freeze
     KV_NAMESPACE = "config/canvas".freeze
@@ -94,8 +93,7 @@ module Canvas
         elsif @fallback_data.present?
           DynamicSettings::FallbackProxy.new(@fallback_data[prefix])
         else
-          raise NoFallbackError, 'DynamicSettings.fallback_data is not set and'\
-            ' consul is not configured, unable to supply configuration values.'
+          DynamicSettings::FallbackProxy.new({})
         end
       end
 
