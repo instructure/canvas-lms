@@ -82,16 +82,15 @@
 
 #assignment_show {
   .assignment-title {
-    display: table-row;
-    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
   .title-content {
-    display: table-cell;
-    width: 100%;
+    flex-grow: 1;
     vertical-align: bottom;
   }
   .assignment-buttons {
-    display: table-cell;
     vertical-align: bottom;
     text-align: right;
     min-width: 335px;
