@@ -22,6 +22,7 @@ module Services
   describe RichContent do
     before do
       allow(Services::RichContent).to receive(:contextually_on).and_call_original
+      allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
       allow(Canvas::DynamicSettings).to receive(:find)
         .with('rich-content-service', default_ttl: 5.minutes)
         .and_return({

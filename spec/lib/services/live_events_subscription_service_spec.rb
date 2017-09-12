@@ -24,6 +24,7 @@ module Services
 
     context 'service unavailable' do
       before do
+        allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
         allow(Canvas::DynamicSettings).to receive(:find)
           .with('live-events-subscription-service', default_ttl: 5.minutes)
           .and_return(nil)

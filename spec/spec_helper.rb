@@ -348,6 +348,7 @@ RSpec.configure do |config|
     Canvas::DynamicSettings.reset_cache!
     ActiveRecord::Migration.verbose = false
     RequestStore.clear!
+    MultiCache.reset
     Course.enroll_user_call_count = 0
     $spec_api_tokens = {}
   end
