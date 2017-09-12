@@ -265,7 +265,7 @@ module Helpers
     m.to = opts[:to] || 'some_user'
     m.from = opts[:from] || 'some_other_user'
     m.subject = opts[:subject] || 'a message for you'
-    m.body = opts[:body] || 'nice body'
+    m.body = opts[:body] || 'foo bar'
     m.sent_at = opts[:sent_at] || 5.days.ago
     m.workflow_state = opts[:workflow_state] || 'sent'
     m.user_id = opts[:user_id] || opts[:user].try(:id)

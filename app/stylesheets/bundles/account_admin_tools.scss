@@ -18,6 +18,11 @@
 
 @import "base/environment";
 
+.users-container {
+  max-height: 500px;
+  overflow-y: scroll;
+}
+
 #adminToolsTabPanes {
   .search-controls {
     background-color: $lightBackground;
