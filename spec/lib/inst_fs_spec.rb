@@ -23,6 +23,7 @@ describe InstFS do
   before do
     @app_host = 'http://test.host'
     @secret = "supersecretyup"
+    allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
     allow(Canvas::DynamicSettings).to receive(:find).
       with(service: "inst-fs", default_ttl: 5.minutes).
       and_return({
