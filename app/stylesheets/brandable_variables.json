@@ -82,7 +82,7 @@
   {
     "variable_name": "ic-brand-header-image",
     "type": "image",
-    "accept": "image/png,image/gif,image/jpeg,image/svg",
+    "accept": "image/png,image/gif,image/jpeg,image/svg+xml,image/svg",
     "default": "/images/canvas_logomark_only@2x.png"
   }
 ]},
@@ -91,7 +91,7 @@
   "variables": [{
     "variable_name": "ic-brand-watermark",
     "type": "image",
-    "accept": "image/png,image/svg,image/gif,image/jpeg",
+    "accept": "image/png,image/svg+xml,image/svg,image/gif,image/jpeg",
     "default": ""
   },{
     "variable_name": "ic-brand-watermark-opacity",
@@ -124,7 +124,7 @@
   },{
     "variable_name": "ic-brand-right-sidebar-logo",
     "type": "image",
-    "accept": "image/svg,image/png,image/gif,image/jpeg",
+    "accept": "image/svg+xml,image/svg,image/png,image/gif,image/jpeg",
     "default": ""
   }
 ]},
@@ -138,7 +138,7 @@
   {
     "variable_name": "ic-brand-Login-body-bgd-image",
     "type": "image",
-    "accept": "image/png,image/svg,image/gif,image/jpeg",
+    "accept": "image/png,image/svg+xml,image/svg,image/gif,image/jpeg",
     "default": ""
   },
   {
@@ -149,7 +149,7 @@
   {
     "variable_name": "ic-brand-Login-logo",
     "type": "image",
-    "accept": "image/png,image/gif,image/jpeg, image/svg",
+    "accept": "image/png,image/gif,image/jpeg, image/svg+xml,image/svg",
     "default": "/images/login/canvas-logo.svg"
   },
   {
