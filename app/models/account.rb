@@ -131,6 +131,9 @@ class Account < ActiveRecord::Base
   are_sis_sticky :name
 
   include FeatureFlags
+  def feature_flag_cache
+    MultiCache.cache
+  end
 
   def default_locale(recurse = false)
     result = read_attribute(:default_locale)
