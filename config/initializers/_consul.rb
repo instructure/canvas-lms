@@ -15,6 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+
+# this is nmed _consul.rb so that other initializers (cache_store.rb in particular)
+# can talk to Consul
+
 module ConsulInitializer
   def self.configure_with(settings_hash, logger=Rails.logger)
     if settings_hash.present?
@@ -34,12 +38,10 @@ module ConsulInitializer
 
 end
 
-Rails.configuration.to_prepare do
-  settings = ConfigFile.load("consul")
-  ConsulInitializer.configure_with(settings)
-  fallback_settings = ConfigFile.load("dynamic_settings")
-  ConsulInitializer.fallback_to(fallback_settings)
-end
+settings = ConfigFile.load("consul")
+ConsulInitializer.configure_with(settings)
+fallback_settings = ConfigFile.load("dynamic_settings")
+ConsulInitializer.fallback_to(fallback_settings)
 
 Canvas::Reloader.on_reload do
   Canvas::DynamicSettings.reset_cache!
