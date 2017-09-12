@@ -21,6 +21,14 @@ module Types
       "when this assignment is due",
       property: :due_at
 
+    field :htmlUrl, UrlType, resolve: ->(assignment, _, ctx) {
+      Rails.application.routes.url_helpers.course_assignment_url(
+        course_id: assignment.context_id,
+        id: assignment.id,
+        host: ctx[:request].host_with_port
+      )
+    }
+
     field :needsGradingCount, types.Int do
       # NOTE: this query (as it exists right now) is not batch-able.
       # make this really expensive cost-wise?
