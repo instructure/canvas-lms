@@ -35,22 +35,3 @@ module AddSQLToLogLines
   end
 end
 ActiveRecord::LogSubscriber.prepend(AddSQLToLogLines)
-
-module PartitionRedis
-  class << self
-    attr_reader :per_cluster
-
-    def activate_per_cluster
-      old_per_cluster, @per_cluster = @per_cluster, true
-      yield
-    ensure
-      @per_cluster = old_per_cluster
-    end
-  end
-
-  def cache
-    return super if PartitionRedis.per_cluster
-    Switchman::Shard.default.database_server.cache_store
-  end
-end
-Rails.singleton_class.prepend(PartitionRedis)

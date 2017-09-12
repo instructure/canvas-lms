@@ -24,29 +24,8 @@ module ShardAwarePermissionCacheKey
   def permission_cache_key(user, session, right)
     Shard.default.activate { super }
   end
-
-  def clear_permissions_cache(user, session = nil)
-    PartitionRedis.activate_per_cluster do
-      super
-    end
-  end
 end
 AdheresToPolicy::InstanceMethods.prepend(ShardAwarePermissionCacheKey)
-
-module PerClusterPolicyCaching
-  def read(key, use_rails_cache: true)
-    PartitionRedis.activate_per_cluster do
-      super
-    end
-  end
-
-  def write(key, value, use_rails_cache: true)
-    PartitionRedis.activate_per_cluster do
-      super
-    end
-  end
-end
-AdheresToPolicy::Cache.singleton_class.prepend(PerClusterPolicyCaching)
 
 AdheresToPolicy.configure do |config|
   config.blacklist = -> {
