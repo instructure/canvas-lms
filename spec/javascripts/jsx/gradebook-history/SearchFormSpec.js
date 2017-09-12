@@ -148,7 +148,7 @@ test('turning from started to failure displays an AjaxFlashAlert', function () {
   // and then it'll create it itself, appending the error message into this new container
   equal(document.getElementById('flash_message_holder'), null);
   this.wrapper.setProps({ fetchHistoryStatus: 'failure' });
-  const flashMessageContainer = document.getElementById('flash_message_holder');
+  const flashMessageContainer = document.getElementById('flashalert_message_holder');
   ok(flashMessageContainer.childElementCount > 0);
 });
 

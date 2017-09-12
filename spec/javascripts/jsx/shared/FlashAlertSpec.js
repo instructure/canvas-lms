@@ -42,10 +42,10 @@ QUnit.module('FlashAlert', function (hooks) {
 
   QUnit.module('.showFlashAlert');
 
-  test('closes after 10.5 seconds', function () {
+  test('closes after 11 seconds', function () {
     callShowFlashAlert();
-    clock.tick(10510);
-    strictEqual(document.querySelector('#flash_message_holder').innerHTML, '');
+    clock.tick(11000);
+    strictEqual(document.querySelector('#flashalert_message_holder').innerHTML, '');
   });
 
   test('has no effect when the container element has been removed', function () {

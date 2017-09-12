@@ -97,6 +97,7 @@ describe "master courses - add and remove course associations" do
 
   it "should remove an associated course", priority: "1", test_id: "3077488" do
     get "/courses/#{@master_course.id}"
+    driver.execute_script('ENV.flashAlertTimeout = 2000') # shorten flash alert timeout
     open_associations
     open_courses_list
 
@@ -125,6 +126,9 @@ describe "master courses - add and remove course associations" do
     # but the ToggleDetails is not getting updated (though it does in real life)
     # we'll refresh the page and check it later
     do_save
+    # wait for the flash message to disappear.
+    # has the side-effect of waiting for the page to rerender with new data
+    expect(f('#flashalert_message_holder')).not_to contain_css('.flashalert-message')
 
     # only AlphaMale is left
     minions = current_associations
