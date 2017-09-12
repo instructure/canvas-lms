@@ -33,11 +33,6 @@ environment_configuration(defined?(config) && config) do |config|
   # Really do care if the message wasn't sent.
   config.action_mailer.raise_delivery_errors = true
 
-  # initialize cache store. has to eval, not just require, so that it has
-  # access to config.
-  cache_store_rb = File.dirname(__FILE__) + "/cache_store.rb"
-  eval(File.new(cache_store_rb).read, nil, cache_store_rb, 1)
-
   # allow debugging only in development environment by default
   #
   # Option to DISABLE_RUBY_DEBUGGING is helpful IDE-based debugging.

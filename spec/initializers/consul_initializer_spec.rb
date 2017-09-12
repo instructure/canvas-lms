@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../spec_helper'
-require_relative '../../config/initializers/consul'
+require_relative '../../config/initializers/_consul'
 
 describe ConsulInitializer do
   after(:each) do
@@ -85,7 +85,8 @@ describe ConsulInitializer do
     it "clears the DynamicSettings cache on reload" do
       Canvas::DynamicSettings.reset_cache!
       Canvas::DynamicSettings::Cache.insert('key', double(values: 'value'))
-      allow(Canvas::DynamicSettings).to receive(:kv_client).and_return(true)
+      imperium = double('imperium', get: nil)
+      allow(Canvas::DynamicSettings).to receive(:kv_client).and_return(imperium)
       expect(Canvas::DynamicSettings.find(tree: nil, service: nil)['key']).to eq("value")
       Canvas::Reloader.reload!
       expect(Canvas::DynamicSettings::Cache.store).to eq({})
