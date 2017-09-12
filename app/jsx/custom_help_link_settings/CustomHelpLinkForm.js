@@ -78,10 +78,17 @@ import CustomHelpLinkConstants from './CustomHelpLinkConstants'
       }
     },
     focus () {
-      ReactDOM.findDOMNode(this.textInputRef).focus();
+      const el = this.focusable();
+      if (el) {
+        el.focus();
+      }
     },
     focusable () {
-      ReactDOM.findDOMNode(this.textInputRef);
+      let el = this.textInputRef;
+      if (el.disabled) {
+        el = this.availableToUserRef;
+      }
+      return el;
     },
     render () {
       const {
@@ -173,6 +180,7 @@ import CustomHelpLinkConstants from './CustomHelpLinkConstants'
                       <label key={`${id}_${type.value}`} className="ic-Form-control ic-Form-control--checkbox">
                         <input
                           type="checkbox"
+                          ref={(c) => { if (c && c.value === 'user') { this.availableToUserRef = c; } }}
                           name={`${namePrefix}[available_to][]`}
                           value={type.value}
                           checked={available_to.indexOf(type.value) > -1}
